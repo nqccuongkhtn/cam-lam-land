@@ -42,7 +42,7 @@ services:
 
   # ── Frontend (Next.js). Proxy /api -> backend, khỏi lo CORS ──
   - type: web
-    name: camlam-web
+    name: camlamland
     runtime: docker
     plan: free
     region: singapore
@@ -50,9 +50,6 @@ services:
     dockerContext: .
     envVars:
       - key: BACKEND_HOST
-        fromService:
-          type: web
-          name: camlam-api
-          property: host
+        value: camlam-api.onrender.com
       - key: NEXT_PUBLIC_API_BASE
         value: /api

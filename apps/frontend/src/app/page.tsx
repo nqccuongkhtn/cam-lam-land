@@ -145,7 +145,7 @@ export default function Home() {
               <Link href="/qr" className="border border-slate-300 text-[#0A2540] font-semibold px-6 py-3 rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
             </div>
           </div>
-          <div className="bg-cover bg-center min-h-[300px]" style={{ backgroundImage: `url(${U('1524661135-423995f22d0b')})` }} />
+          <div className="bg-cover bg-center min-h-[340px]" style={{ backgroundImage: 'url(/quyhoach-camlam.jpg)' }} />
         </div>
       </section>
 
@@ -182,7 +182,8 @@ export default function Home() {
           </div>
           <div>
             <p className="font-semibold text-white mb-3">Liên hệ</p>
-            <p className="text-sm text-slate-400">Phát triển bởi<br /><b className="text-white">Nguyễn Quốc Cường</b></p>
+            <a href="tel:0988888888" className="inline-flex items-center gap-1.5 text-lg font-extrabold text-[#C8A14B] hover:text-[#FFD56A]">📞 0988 888 888</a>
+            <p className="text-sm text-slate-400 mt-2">Phát triển bởi<br /><b className="text-white">Nguyễn Quốc Cường</b></p>
           </div>
         </div>
         <div className="border-t border-white/10 text-center text-xs text-slate-500 py-4">© 2026 Cam Lâm Land · Phát triển bởi Nguyễn Quốc Cường</div>

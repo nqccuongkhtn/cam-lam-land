@@ -69,6 +69,7 @@ export default function Nav() {
           ))}
         </nav>
         <div className="flex items-center gap-2 shrink-0">
+          <a href="tel:0988888888" className={`hidden lg:flex items-center gap-1.5 text-sm font-bold mr-1 ${solid ? 'text-[#0A2540]' : 'text-white'}`}>📞 0988 888 888</a>
           <Link href="/map" className="bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-sm shadow-red-600/30">Mở bản đồ</Link>
           <button onClick={() => setOpen((o) => !o)} aria-label="Menu"
             className={`md:hidden grid place-items-center w-9 h-9 rounded-lg border ${solid ? 'border-slate-200 text-[#0A2540]' : 'border-white/50 text-white'}`}>

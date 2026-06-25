@@ -1,0 +1,58 @@
+# ============================================================================
+#  Cam Lâm Land — Render Blueprint (free tier)
+#  Deploy: Render Dashboard > New > Blueprint > chọn repo này > Apply.
+#  Tự tạo: 1 Postgres (PostGIS) + API (Express) + Web (Next.js).
+# ============================================================================
+databases:
+  - name: camlam-db
+    databaseName: camlam_gis
+    user: camlam
+    plan: free
+    region: singapore
+    postgresMajorVersion: "16"
+    ipAllowList: []        # chỉ cho kết nối nội bộ (an toàn)
+
+services:
+  # ── Backend API (Express + tsx). Tự bootstrap schema + seed khi khởi động ──
+  - type: web
+    name: camlam-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: apps/backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: BOOTSTRAP_DB
+        value: "true"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: camlam-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: ADMIN_EMAIL
+        value: admin@camlam.local
+      - key: ADMIN_PASSWORD
+        value: admin12345
+      - key: UPLOAD_DIR
+        value: /tmp/uploads
+
+  # ── Frontend (Next.js). Proxy /api -> backend, khỏi lo CORS ──
+  - type: web
+    name: camlam-web
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: apps/frontend/Dockerfile.render
+    dockerContext: .
+    envVars:
+      - key: BACKEND_HOST
+        fromService:
+          type: web
+          name: camlam-api
+          property: host
+      - key: NEXT_PUBLIC_API_BASE
+        value: /api

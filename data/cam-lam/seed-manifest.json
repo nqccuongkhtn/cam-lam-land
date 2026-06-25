@@ -1,0 +1,6 @@
+[
+  { "file": "admin_boundaries.geojson", "name": "Ranh giới hành chính (Administrative boundaries)", "slug": "admin-boundaries", "layer_type": "admin",  "style": { "color": "#7e57c2", "fillOpacity": 0.05, "weight": 2 } },
+  { "file": "zoning.geojson",            "name": "Quy hoạch sử dụng đất (Zoning / planning)",      "slug": "zoning",          "layer_type": "zoning", "style": { "color": "#fb8c00", "fillOpacity": 0.35, "weight": 1 } },
+  { "file": "land_parcels.geojson",      "name": "Thửa đất (Cadastral land parcels)",             "slug": "land-parcels",    "layer_type": "parcel", "style": { "color": "#1e88e5", "fillOpacity": 0.20, "weight": 1 } },
+  { "file": "roads.geojson",             "name": "Mạng lưới giao thông (Road network)",            "slug": "roads",           "layer_type": "road",   "style": { "color": "#455a64", "fillOpacity": 0, "weight": 3 } }
+]

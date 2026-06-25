@@ -1,0 +1,14 @@
+# DEV hot-reload override (Docker tự gộp lên docker-compose.yml).
+# CHỈ bật hot-reload cho FRONTEND (sửa giao diện là F5 thấy ngay, khỏi build).
+# Backend chạy ổn định từ image; khi sửa backend thì build lại bằng:
+#   docker compose up -d --build backend
+# Tắt hot-reload: xoá/đổi tên file này rồi `docker compose up -d`.
+services:
+  frontend:
+    environment:
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - ./apps/frontend:/app
+      - /app/node_modules
+      - /app/.next

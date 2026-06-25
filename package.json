@@ -1,0 +1,17 @@
+{
+  "name": "cam-lam-gis",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Real estate marketplace + GIS planning platform for Cam Lâm, Khánh Hòa, Vietnam",
+  "scripts": {
+    "dev:backend": "pnpm --filter @camlam/backend dev",
+    "dev:worker": "pnpm --filter @camlam/gis-worker dev",
+    "dev:frontend": "pnpm --filter @camlam/frontend dev",
+    "build": "pnpm -r build",
+    "up": "docker compose up --build",
+    "down": "docker compose down",
+    "reset": "docker compose down -v"
+  },
+  "packageManager": "pnpm@9.6.0",
+  "engines": { "node": ">=20" }
+}

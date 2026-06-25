@@ -145,7 +145,10 @@ export default function Home() {
               <Link href="/qr" className="border border-slate-300 text-[#0A2540] font-semibold px-6 py-3 rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
             </div>
           </div>
-          <div className="bg-cover bg-center min-h-[340px]" style={{ backgroundImage: 'url(/quyhoach-camlam.jpg)' }} />
+          <div className="bg-slate-100 flex items-center justify-center min-h-[280px] p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/quyhoach-camlam.jpg" alt="Mô hình quy hoạch Cam Lâm" loading="lazy" decoding="async" className="w-full h-full object-contain max-h-[460px] rounded-xl" />
+          </div>
         </div>
       </section>
 

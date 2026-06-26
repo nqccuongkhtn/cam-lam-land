@@ -45,6 +45,7 @@ export default function MapPage() {
   const [c1, setC1] = useState(''); const [c2, setC2] = useState('');
   const [c3, setC3] = useState('');
   const [panelOpen, setPanelOpen] = useState(false);
+  const [tool, setTool] = useState<'none' | 'search' | 'base' | 'measure'>('none'); // bảng công cụ trên mobile
 
   const load = useCallback(() => {
     api<{ layers: GisLayer[] }>('/layers').then(async ({ layers }) => {
@@ -100,7 +101,7 @@ export default function MapPage() {
         setFocusPoint({ lng: p.lng, lat: p.lat, label: `Tờ ${c1} - Thửa ${c2}${c3 ? ' - ' + c3 : ''}` });
         setClickVN(null);
         setInfo({ found: true, point: { lng: p.lng, lat: p.lat }, parcel: { properties: { ...p.properties, 'Diện tích (m²)': p.area_m2 } }, zoning: null, listings: [] });
-        setPanelOpen(false);
+        setPanelOpen(false); setTool('none');
       } catch (e: any) { alert('Lỗi tra cứu: ' + e.message); }
       return;
     }
@@ -114,6 +115,7 @@ export default function MapPage() {
       if (Number.isNaN(lat) || Number.isNaN(lng)) return alert('Nhập Vĩ độ (lat), Kinh độ (lng).');
     }
     setFocusPoint({ lng, lat, label: `${lat.toFixed(6)}, ${lng.toFixed(6)}` });
+    setTool('none');
   }
   async function deleteLayer(slug: string, name: string) {
     if (!window.confirm(`Xoá lớp "${name}"?`)) return;
@@ -125,41 +127,79 @@ export default function MapPage() {
       className={`px-2 py-1 rounded text-xs font-medium border whitespace-nowrap ${measure === m ? 'bg-orange-600 text-white border-orange-600' : 'bg-white border-slate-300 text-slate-700'}`}>{label}</button>
   );
 
+  // ---- Nhóm điều khiển dùng chung cho desktop (inline) và mobile (bảng mở rộng) ----
+  const baseMapCtrl = (full = false) => (
+    <div className={`flex rounded-lg border border-slate-300 overflow-hidden ${full ? 'w-full' : ''}`}>
+      {([['street', 'Đường'], ['satellite', 'Vệ tinh'], ['terrain', 'Địa hình']] as [BaseMap, string][]).map(([b, l]) => (
+        <button key={b} onClick={() => setBaseMap(b)} className={`${full ? 'flex-1' : ''} px-3 py-1.5 text-xs font-semibold ${baseMap === b ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>{l}</button>
+      ))}
+    </div>
+  );
+  const labelsCtrl = () => (
+    <label className="flex items-center gap-1.5 text-xs font-medium text-slate-600 cursor-pointer whitespace-nowrap">
+      <input type="checkbox" checked={labels} onChange={(e) => setLabels(e.target.checked)} className="accent-emerald-600 w-4 h-4" />Nhãn & đường
+    </label>
+  );
+  const searchCtrl = (full = false) => (
+    <div className={`flex items-center gap-1.5 ${full ? 'flex-wrap' : ''}`}>
+      <select value={searchMode} onChange={(e) => setSearchMode(e.target.value as any)} className={`border rounded-lg px-2 py-1.5 text-xs bg-white ${full ? 'w-full' : ''}`}>
+        <option value="vn2000">Toạ độ VN-2000</option>
+        <option value="latlng">Lat / Lng</option>
+        <option value="parcel">Số tờ / thửa</option>
+      </select>
+      <input value={c1} onChange={(e) => setC1(e.target.value)} placeholder={searchMode === 'vn2000' ? 'X (Đông)' : searchMode === 'parcel' ? 'Số tờ' : 'Vĩ độ'} className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'flex-1 min-w-[90px]' : 'w-24'}`} />
+      <input value={c2} onChange={(e) => setC2(e.target.value)} placeholder={searchMode === 'vn2000' ? 'Y (Bắc)' : searchMode === 'parcel' ? 'Số thửa' : 'Kinh độ'} className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'flex-1 min-w-[90px]' : 'w-24'}`} />
+      {searchMode === 'parcel' && <input value={c3} onChange={(e) => setC3(e.target.value)} placeholder="Xã (vd: Cam Lâm)" className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'flex-1 min-w-[120px]' : 'w-32'}`} />}
+      <button onClick={doSearch} className={`bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap ${full ? 'w-full mt-1' : ''}`}>Tra cứu</button>
+    </div>
+  );
+  const measureCtrl = () => (
+    <div className="flex items-center gap-1.5 flex-wrap">
+      <span className="text-xs text-slate-400">Đo:</span>
+      {mBtn('distance', '📏 Dài')}{mBtn('area', '⬛ Diện tích')}
+      {measure !== 'off' && <button onClick={() => { setMeasure('off'); setMResult(null); }} className="px-2 py-1 rounded text-xs border border-slate-300 whitespace-nowrap">Xong</button>}
+      {mResult && mResult.points > 0 && (
+        <span className="text-xs font-bold text-orange-700 ml-1 whitespace-nowrap">{mResult.mode === 'distance' ? `Dài: ${fmtLen(mResult.distance)}` : `S: ${fmtArea(mResult.area)}`}</span>
+      )}
+      {measure !== 'off' && <span className="text-[11px] text-slate-400 w-full">Nhấp lần lượt các điểm trên bản đồ…</span>}
+    </div>
+  );
+  const tabBtn = (key: string, icon: string, label: string, active: boolean, dot = false) => (
+    <button onClick={key === 'layers' ? () => { setPanelOpen(true); setTool('none'); } : () => setTool(tool === key ? 'none' : (key as any))}
+      className={`relative flex flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-semibold transition-colors ${active ? 'bg-slate-100 text-[#0A2540]' : 'text-slate-600 hover:bg-slate-50'}`}>
+      <span className="text-base leading-none">{icon}</span>{label}
+      {dot && <span className="absolute top-1.5 right-[calc(50%-14px)] w-1.5 h-1.5 rounded-full bg-orange-500" />}
+    </button>
+  );
+
   return (
     <div className="flex flex-col h-[calc(100vh-56px)] overflow-hidden">
-      {/* Toolbar — 1 hàng cuộn ngang trên mobile, dính cố định */}
-      <div className="flex items-center gap-2 lg:gap-4 px-2 sm:px-3 py-2 bg-white border-b text-sm overflow-x-auto lg:flex-wrap shrink-0 z-20">
-        <button onClick={() => setPanelOpen(true)} className="lg:hidden shrink-0 px-3 py-1.5 rounded-md border border-slate-300 text-xs font-semibold text-slate-700 bg-white">☰ Lớp</button>
-        <div className="flex rounded-md border border-slate-300 overflow-hidden shrink-0">
-          {([['street', 'Đường'], ['satellite', 'Vệ tinh'], ['terrain', 'Địa hình']] as [BaseMap, string][]).map(([b, l]) => (
-            <button key={b} onClick={() => setBaseMap(b)} className={`px-3 py-1 text-xs font-medium ${baseMap === b ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>{l}</button>
-          ))}
+      {/* Toolbar tra cứu quy hoạch — dính cố định; desktop đầy đủ, mobile gọn theo nhóm */}
+      <div className="bg-white border-b border-slate-200 shrink-0 z-20">
+        {/* MÁY TÍNH (lg+): một hàng đầy đủ, tự xuống dòng khi hẹp */}
+        <div className="hidden lg:flex items-center gap-x-4 gap-y-2 px-3 py-2 flex-wrap">
+          {baseMapCtrl()}
+          {labelsCtrl()}
+          <span className="h-5 w-px bg-slate-200" />
+          {searchCtrl()}
+          <span className="h-5 w-px bg-slate-200" />
+          {measureCtrl()}
         </div>
-        <label className="flex items-center gap-1.5 text-xs text-slate-600 shrink-0 cursor-pointer">
-          <input type="checkbox" checked={labels} onChange={(e) => setLabels(e.target.checked)} className="accent-emerald-600" />Nhãn & đường
-        </label>
-        <div className="flex items-center gap-1 shrink-0">
-          <select value={searchMode} onChange={(e) => setSearchMode(e.target.value as any)} className="border rounded px-1.5 py-1 text-xs">
-            <option value="vn2000">VN-2000</option>
-            <option value="latlng">Lat/Lng</option>
-            <option value="parcel">Thửa đất</option>
-          </select>
-          <input value={c1} onChange={(e) => setC1(e.target.value)} placeholder={searchMode === 'vn2000' ? 'X (Đông)' : searchMode === 'parcel' ? 'Số tờ' : 'Vĩ độ'} className="border rounded px-2 py-1 text-xs w-20 sm:w-24" />
-          <input value={c2} onChange={(e) => setC2(e.target.value)} placeholder={searchMode === 'vn2000' ? 'Y (Bắc)' : searchMode === 'parcel' ? 'Số thửa' : 'Kinh độ'} className="border rounded px-2 py-1 text-xs w-20 sm:w-24" />
-          {searchMode === 'parcel' && <input value={c3} onChange={(e) => setC3(e.target.value)} placeholder="Xã (vd: Cam Lâm)" className="border rounded px-2 py-1 text-xs w-28 sm:w-32" />}
-          <button onClick={doSearch} className="bg-blue-600 text-white px-3 py-1 rounded text-xs font-medium shrink-0">Tra cứu</button>
+
+        {/* ĐIỆN THOẠI / iPad dọc (<lg): 4 nút gọn, bấm để mở từng nhóm */}
+        <div className="lg:hidden grid grid-cols-4 divide-x divide-slate-200">
+          {tabBtn('layers', '☰', 'Lớp', false)}
+          {tabBtn('search', '🔍', 'Tra cứu', tool === 'search')}
+          {tabBtn('base', '🗺️', 'Bản đồ', tool === 'base', baseMap !== 'street')}
+          {tabBtn('measure', '📏', 'Đo', tool === 'measure', measure !== 'off')}
         </div>
-        <div className="flex items-center gap-1 shrink-0">
-          <span className="text-xs text-slate-400">Đo:</span>
-          {mBtn('distance', '📏 Dài')}{mBtn('area', '⬛ Diện tích')}
-          {measure !== 'off' && <button onClick={() => { setMeasure('off'); setMResult(null); }} className="px-2 py-1 rounded text-xs border border-slate-300 whitespace-nowrap">Xong</button>}
-          {mResult && mResult.points > 0 && (
-            <span className="text-xs font-medium text-orange-700 ml-1 whitespace-nowrap">
-              {mResult.mode === 'distance' ? `Dài: ${fmtLen(mResult.distance)}` : `S: ${fmtArea(mResult.area)}`}
-            </span>
-          )}
-        </div>
-        {measure !== 'off' && <span className="text-xs text-slate-400 shrink-0 whitespace-nowrap">Nhấp lần lượt các điểm…</span>}
+        {tool !== 'none' && (
+          <div className="lg:hidden border-t border-slate-100 bg-slate-50 px-3 py-3">
+            {tool === 'search' && (<><p className="text-[11px] font-semibold text-slate-500 mb-1.5">Tra cứu theo toạ độ / số thửa</p>{searchCtrl(true)}</>)}
+            {tool === 'base' && (<div className="space-y-2.5"><p className="text-[11px] font-semibold text-slate-500">Bản đồ nền</p>{baseMapCtrl(true)}{labelsCtrl()}</div>)}
+            {tool === 'measure' && (<><p className="text-[11px] font-semibold text-slate-500 mb-1.5">Đo khoảng cách / diện tích</p>{measureCtrl()}</>)}
+          </div>
+        )}
       </div>
 
       {/* Body */}

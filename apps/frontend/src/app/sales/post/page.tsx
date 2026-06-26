@@ -55,12 +55,6 @@ export default function PostListing() {
   }
 
   if (loading || !user) return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
-  if (user.role !== 'sales' && user.role !== 'admin') return (
-    <div className="max-w-md mx-auto py-24 text-center px-4">
-      <p className="text-lg font-bold text-[#0A2540]">Cần tài khoản môi giới để đăng tin</p>
-      <Link href="/register" className="inline-block mt-3 text-[#C8A14B] font-bold">Đăng ký môi giới →</Link>
-    </div>
-  );
 
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:border-[#0A2540] outline-none';
   const lbl = 'block text-sm font-semibold text-slate-700 mb-1';

@@ -23,9 +23,6 @@ export default function SalesDashboard() {
   }
 
   if (loading || !user) return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
-  if (user.role !== 'sales' && user.role !== 'admin') return (
-    <div className="max-w-md mx-auto py-24 text-center px-4"><p className="text-lg font-bold text-[#0A2540]">Khu vực dành cho môi giới</p><Link href="/register" className="inline-block mt-3 text-[#C8A14B] font-bold">Đăng ký môi giới →</Link></div>
-  );
 
   const badge = (s: string) => ({ active: 'bg-emerald-100 text-emerald-700', pending: 'bg-amber-100 text-amber-700', sold: 'bg-slate-200 text-slate-600', hidden: 'bg-red-100 text-red-700' } as any)[s] || 'bg-slate-100 text-slate-600';
 

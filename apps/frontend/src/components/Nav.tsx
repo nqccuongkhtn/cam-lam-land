@@ -53,7 +53,7 @@ export default function Nav() {
   const solid = !isHome || scrolled || open;
   const active = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
   const name = user?.fullName || user?.email?.split('@')[0] || '';
-  const roleLabel = user?.role === 'admin' ? 'Quản trị' : user?.role === 'sales' ? 'Môi giới' : 'Khách';
+  const roleLabel = user?.role === 'admin' ? 'Quản trị' : 'Thành viên';
   function doLogout() { logout(); setOpen(false); router.push('/'); }
 
   return (
@@ -72,7 +72,7 @@ export default function Nav() {
           <a href="tel:0988888888" className={`hidden xl:flex items-center gap-1.5 text-sm font-bold ${solid ? 'text-[#0A2540]' : 'text-white'}`}>📞 0988 888 888</a>
           {user ? (
             <>
-              {(user.role === 'sales' || user.role === 'admin') && (
+              {user && (
                 <Link href="/sales/post" className={`hidden md:block text-sm font-bold ${solid ? 'text-[#C8A14B] hover:text-[#0A2540]' : 'text-[#FFD56A] hover:text-white'}`}>＋ Đăng tin</Link>
               )}
               {user.role === 'admin' && (
@@ -102,7 +102,7 @@ export default function Nav() {
             <Link key={l.href} href={l.href} onClick={() => setOpen(false)}
               className={`py-2.5 px-2 rounded-lg text-sm font-semibold ${active(l.href) ? 'text-[#0A2540] bg-slate-50' : 'text-slate-600 hover:bg-slate-50'}`}>{l.label}</Link>
           ))}
-          {(user?.role === 'sales' || user?.role === 'admin') && (<>
+          {user && (<>
             <Link href="/sales/post" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-bold text-[#C8A14B] hover:bg-slate-50">＋ Đăng tin mới</Link>
             <Link href="/sales" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Tin của tôi</Link>
           </>)}
@@ -114,7 +114,7 @@ export default function Nav() {
             ) : (
               <>
                 <Link href="/login" onClick={() => setOpen(false)} className="block py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Đăng nhập</Link>
-                <Link href="/register" onClick={() => setOpen(false)} className="block py-2.5 px-2 rounded-lg text-sm font-semibold text-[#C8A14B] hover:bg-slate-50">Đăng ký môi giới</Link>
+                <Link href="/register" onClick={() => setOpen(false)} className="block py-2.5 px-2 rounded-lg text-sm font-semibold text-[#C8A14B] hover:bg-slate-50">Đăng ký</Link>
               </>
             )}
           </div>

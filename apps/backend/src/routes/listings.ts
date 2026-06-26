@@ -118,8 +118,6 @@ listingsRouter.get('/:id/leads', authRequired, async (req: AuthedRequest, res, n
 // POST /api/listings — đăng tin (môi giới/admin)
 listingsRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => {
   try {
-    if (req.user!.role !== 'sales' && req.user!.role !== 'admin')
-      return res.status(403).json({ error: 'Chỉ tài khoản môi giới mới được đăng tin' });
     const b = req.body ?? {};
     if (!b.title || b.price == null || b.lng == null || b.lat == null)
       return res.status(400).json({ error: 'Cần tiêu đề, giá và vị trí trên bản đồ' });

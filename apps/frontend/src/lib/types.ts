@@ -4,7 +4,7 @@ export interface Listing {
   propertyType: PropertyType; address: string | null; ward: string | null; bedrooms: number | null;
   bathrooms?: number | null; direction?: string | null; legal?: string | null; frontage?: number | null;
   contactName?: string | null; contactPhone?: string | null; boosted?: boolean; createdBy?: number | null;
-  leadCount?: number; leadViews?: number;
+  leadCount?: number; leadViews?: number; posterAvatar?: string | null;
   status: string; images: string[]; lng: number; lat: number; createdAt: string;
 }
 export interface GisLayer {

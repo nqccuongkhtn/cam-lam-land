@@ -5,12 +5,15 @@ import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 export const listingsRouter = Router();
 
 const SELECT = `
-  SELECT id, title, description, price, area, property_type AS "propertyType",
-         address, ward, bedrooms, bathrooms, direction, legal, frontage,
-         contact_name AS "contactName", contact_phone AS "contactPhone",
-         status, boosted, images, created_by AS "createdBy",
-         ST_X(geom) AS lng, ST_Y(geom) AS lat, created_at AS "createdAt"
-  FROM listings`;
+  SELECT listings.id, listings.title, listings.description, listings.price, listings.area,
+         listings.property_type AS "propertyType", listings.address, listings.ward, listings.bedrooms,
+         listings.bathrooms, listings.direction, listings.legal, listings.frontage,
+         COALESCE(listings.contact_name, u.full_name, 'Cam Lâm Land') AS "contactName",
+         COALESCE(listings.contact_phone, u.phone, '0988888888') AS "contactPhone",
+         u.avatar AS "posterAvatar",
+         listings.status, listings.boosted, listings.images, listings.created_by AS "createdBy",
+         ST_X(listings.geom) AS lng, ST_Y(listings.geom) AS lat, listings.created_at AS "createdAt"
+  FROM listings LEFT JOIN users u ON u.id = listings.created_by`;
 
 /** Ẩn bớt SĐT: chỉ hiện 6 số đầu + '...'. */
 function maskPhone(p: any): string | null {
@@ -31,7 +34,7 @@ function linkImages(listingId: number, images: any): Promise<any> {
 listingsRouter.get('/', async (req, res, next) => {
   try {
     const { minPrice, maxPrice, propertyType, ward, q, bbox } = req.query as Record<string, string>;
-    const where: string[] = [`status NOT IN ('hidden','pending')`];
+    const where: string[] = [`listings.status NOT IN ('hidden','pending')`];
     const params: any[] = [];
     const p = (v: any) => { params.push(v); return `$${params.length}`; };
     if (minPrice)     where.push(`price >= ${p(Number(minPrice))}`);
@@ -43,7 +46,7 @@ listingsRouter.get('/', async (req, res, next) => {
     const limit = Math.min(Number(req.query.limit ?? 100), 500);
     const offset = Number(req.query.offset ?? 0);
     const rows = await query(
-      `${SELECT} WHERE ${where.join(' AND ')} ORDER BY boosted DESC, created_at DESC LIMIT ${limit} OFFSET ${offset}`, params);
+      `${SELECT} WHERE ${where.join(' AND ')} ORDER BY listings.boosted DESC, listings.created_at DESC LIMIT ${limit} OFFSET ${offset}`, params);
     rows.forEach((r: any) => { r.contactPhone = maskPhone(r.contactPhone); });
     res.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=60');
     res.json({ count: rows.length, listings: rows });
@@ -89,7 +92,7 @@ listingsRouter.get('/:id', async (req, res, next) => {
 listingsRouter.post('/:id/reveal', authRequired, async (req: AuthedRequest, res, next) => {
   try {
     const id = Number(req.params.id);
-    const [l] = await query('SELECT contact_phone, contact_name, created_by FROM listings WHERE id=$1', [id]);
+    const [l] = await query(`SELECT COALESCE(listings.contact_phone, u.phone, '0988888888') AS contact_phone, COALESCE(listings.contact_name, u.full_name, 'Cam Lâm Land') AS contact_name, listings.created_by FROM listings LEFT JOIN users u ON u.id = listings.created_by WHERE listings.id=$1`, [id]);
     if (!l) return res.status(404).json({ error: 'Không tìm thấy tin' });
     // Không ghi lead khi người xem là chủ tin hoặc admin
     if (req.user!.role !== 'admin' && l.created_by !== req.user!.id) {

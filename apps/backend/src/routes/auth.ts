@@ -10,7 +10,7 @@ const profile = (u: any) => ({
   id: u.id, email: u.email, role: u.role,
   fullName: u.full_name ?? null, phone: u.phone ?? null,
   tier: u.tier ?? 'free', status: u.status ?? 'active',
-  emailVerified: u.email_verified ?? true,
+  emailVerified: u.email_verified ?? true, avatar: u.avatar ?? null,
 });
 const gen6 = () => String(Math.floor(100000 + Math.random() * 900000));
 const isEmail = (e: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
@@ -95,8 +95,9 @@ authRouter.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body ?? {};
     const [user] = await query('SELECT * FROM users WHERE email=$1', [email]);
-    if (!user || !(await verifyPassword(password ?? '', user.password_hash)))
-      return res.status(401).json({ error: 'Sai email hoặc mật khẩu' });
+    if (!user) return res.status(401).json({ error: 'Email chưa được đăng ký' });
+    if (!(await verifyPassword(password ?? '', user.password_hash)))
+      return res.status(401).json({ error: 'Mật khẩu không đúng' });
     if (user.status === 'suspended') return res.status(403).json({ error: 'Tài khoản đã bị khoá' });
     if (user.role === 'sales' && !user.email_verified)
       return res.status(403).json({ error: 'Email chưa xác thực', needVerify: true, email: user.email });
@@ -110,6 +111,24 @@ authRouter.get('/me', authRequired, async (req: AuthedRequest, res, next) => {
   try {
     const [user] = await query('SELECT * FROM users WHERE id=$1', [req.user!.id]);
     if (!user) return res.status(404).json({ error: 'Không tìm thấy' });
+    res.json({ user: profile(user) });
+  } catch (e) { next(e); }
+});
+
+// PATCH /me — đổi thông tin / avatar / mật khẩu
+authRouter.patch('/me', authRequired, async (req: AuthedRequest, res, next) => {
+  try {
+    const b = req.body ?? {};
+    if (b.newPassword) {
+      if (String(b.newPassword).length < 6) return res.status(400).json({ error: 'Mật khẩu mới tối thiểu 6 ký tự' });
+      const [u] = await query('SELECT password_hash FROM users WHERE id=$1', [req.user!.id]);
+      if (!u || !(await verifyPassword(b.currentPassword ?? '', u.password_hash)))
+        return res.status(400).json({ error: 'Mật khẩu hiện tại không đúng' });
+      await query('UPDATE users SET password_hash=$2 WHERE id=$1', [req.user!.id, await hashPassword(b.newPassword)]);
+    }
+    const [user] = await query(
+      `UPDATE users SET full_name=COALESCE($2,full_name), phone=COALESCE($3,phone), avatar=COALESCE($4,avatar)
+       WHERE id=$1 RETURNING *`, [req.user!.id, b.fullName ?? null, b.phone ?? null, b.avatar ?? null]);
     res.json({ user: profile(user) });
   } catch (e) { next(e); }
 });

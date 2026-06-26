@@ -113,7 +113,7 @@ export default function ListingDetail() {
           <div>
             <div className="bg-white rounded-2xl border border-slate-200 p-5 lg:sticky lg:top-20 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#123459] to-[#081B30] text-[#C8A14B] grid place-items-center text-lg font-extrabold ring-2 ring-[#C8A14B]/30">{(l.contactName || 'C').charAt(0).toUpperCase()}</div>
+                {l.posterAvatar ? <img src={l.posterAvatar} alt="" className="w-12 h-12 rounded-full object-cover ring-2 ring-[#C8A14B]/30" /> : <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#123459] to-[#081B30] text-[#C8A14B] grid place-items-center text-lg font-extrabold ring-2 ring-[#C8A14B]/30">{(l.contactName || 'C').charAt(0).toUpperCase()}</div>}
                 <div><p className="font-bold text-[#0A2540] leading-tight">{l.contactName || 'Cam Lâm Land'}</p><p className="text-xs text-slate-400">Người đăng tin · Cam Lâm Land</p></div>
               </div>
               {full ? (

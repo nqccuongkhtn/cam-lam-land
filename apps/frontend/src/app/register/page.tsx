@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth, type AuthUser } from '@/lib/auth';
+import PasswordInput from '@/components/PasswordInput';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -28,7 +29,7 @@ export default function RegisterPage() {
           <input value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="Họ và tên *" className={inp} />
           <input value={phone} onChange={(e) => setPhone(e.target.value)} required placeholder="Số điện thoại *" className={inp} />
           <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required placeholder="Email *" className={inp} />
-          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required placeholder="Mật khẩu (≥ 6 ký tự) *" className={inp} />
+          <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Mật khẩu (≥ 6 ký tự) *" autoComplete="new-password" />
           {err && <p className="text-red-600 text-sm">{err}</p>}
           <button disabled={busy} className="w-full bg-[#0A2540] hover:bg-[#0d2f54] disabled:opacity-60 text-white font-bold py-2.5 rounded-lg">{busy ? 'Đang tạo…' : 'Đăng ký'}</button>
         </form>

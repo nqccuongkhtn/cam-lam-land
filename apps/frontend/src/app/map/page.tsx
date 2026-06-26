@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import type { GeoLayer, ImageOverlay, BaseMap, MeasureMode, MeasureResult } from '@/components/MapView';
 import { GisLayer, formatVnd } from '@/lib/types';
 import { vn2000ToWgs84, wgs84ToVn2000 } from '@/lib/vn2000';
+import { getToken } from '@/lib/token';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false, loading: () => <div className="h-full w-full grid place-items-center bg-slate-100 text-slate-400 text-sm animate-pulse">Đang tải bản đồ…</div> });
 
@@ -56,7 +57,7 @@ export default function MapPage() {
       setData(Object.fromEntries(entries));
     }).catch(() => {});
   }, []);
-  useEffect(() => { load(); setCanDelete(typeof window !== 'undefined' && !!window.localStorage.getItem('camlam_token')); }, [load]);
+  useEffect(() => { load(); setCanDelete(!!getToken()); }, [load]);
 
   const overlays: ImageOverlay[] = useMemo(
     () => RASTER_OVERLAYS.map((o) => ({ id: o.id, url: o.url, coordinates: o.coordinates, opacity, visible: ovOn[o.id] ?? true })), [opacity, ovOn]);

@@ -1,8 +1,8 @@
 import { API_BASE } from './config';
+import { getToken } from './token';
 
 function authHeaders(): Record<string,string> {
-  if (typeof window === 'undefined') return {};
-  const t = window.localStorage.getItem('camlam_token');
+  const t = getToken();
   return t ? { Authorization: `Bearer ${t}` } : {};
 }
 

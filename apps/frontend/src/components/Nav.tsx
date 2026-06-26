@@ -76,10 +76,12 @@ export default function Nav() {
           <a href="tel:0988888888" className={`hidden xl:flex items-center gap-1.5 text-sm font-bold ${txt}`}>📞 0988 888 888</a>
           {user ? (
             <>
-              <Link href="/sales/post" className="hidden sm:flex items-center bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-4 py-2 rounded-lg shadow-sm shadow-red-600/30">＋ Đăng tin</Link>
+              {!path.startsWith('/sales') && (
+                <Link href="/sales/post" className="hidden sm:flex items-center bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-4 py-2 rounded-lg shadow-sm shadow-red-600/30">＋ Đăng tin</Link>
+              )}
               <div className="relative" ref={acctRef}>
                 <button onClick={() => setAcct((v) => !v)} className={`flex items-center gap-1.5 rounded-full py-1 pl-1 pr-1.5 border ${solid ? 'border-slate-200 hover:bg-slate-50' : 'border-white/30 hover:bg-white/10'}`}>
-                  <span className="w-7 h-7 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-xs font-bold">{(name || 'U').charAt(0).toUpperCase()}</span>
+                  {user.avatar ? <img src={user.avatar} alt="" className="w-7 h-7 rounded-full object-cover" /> : <span className="w-7 h-7 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-xs font-bold">{(name || 'U').charAt(0).toUpperCase()}</span>}
                   <span className={`hidden lg:block text-sm font-semibold max-w-[90px] truncate ${txt}`}>{name}</span>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={`w-4 h-4 ${solid ? 'text-slate-400' : 'text-white/80'}`}><path d="M6 9l6 6 6-6" /></svg>
                 </button>
@@ -90,6 +92,7 @@ export default function Nav() {
                       <p className="text-xs text-slate-400 truncate">{roleLabel} · {user.email}</p>
                     </div>
                     <Link href="/sales/post" className={`${mItem} sm:hidden text-[#C8A14B]`}>＋ Đăng tin mới</Link>
+                    <Link href="/account" className={mItem}>Tài khoản của tôi</Link>
                     <Link href="/sales" className={mItem}>Tin của tôi</Link>
                     {user.role === 'admin' && <Link href="/admin" className={mItem}>Quản trị</Link>}
                     <div className="border-t border-slate-100 my-1" />
@@ -116,6 +119,7 @@ export default function Nav() {
             <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className={`py-2.5 px-2 rounded-lg text-sm font-semibold ${active(l.href) ? 'text-[#0A2540] bg-slate-50' : 'text-slate-600 hover:bg-slate-50'}`}>{l.label}</Link>
           ))}
           {user && (<>
+            <Link href="/account" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Tài khoản của tôi</Link>
             <Link href="/sales/post" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-bold text-[#C8A14B] hover:bg-slate-50">＋ Đăng tin mới</Link>
             <Link href="/sales" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Tin của tôi</Link>
           </>)}

@@ -4,10 +4,16 @@ import { env } from './env.ts';
 // Keep NUMERIC columns (price/area) as JS numbers instead of strings.
 pg.types.setTypeParser(1700, (v) => (v === null ? null : parseFloat(v)));
 
+const poolBase = {
+  max: Number(process.env.PG_POOL_MAX ?? 12),
+  idleTimeoutMillis: 30000,
+  statement_timeout: 20000,        // chặn truy vấn treo
+  keepAlive: true,
+};
 export const pool = new pg.Pool(
   process.env.DATABASE_URL
-    ? { connectionString: process.env.DATABASE_URL, max: 10 }   // Render managed Postgres
-    : { ...env.pg, max: 10 },                                   // local docker-compose
+    ? { connectionString: process.env.DATABASE_URL, ...poolBase }   // Render managed Postgres
+    : { ...env.pg, ...poolBase },                                   // local docker-compose
 );
 
 export async function query<T = any>(text: string, params: any[] = []): Promise<T[]> {

@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import http from 'node:http';
 import { WebSocketServer } from 'ws';
 import { env } from './lib/env.ts';
@@ -18,6 +19,7 @@ import { qrRouter } from './routes/qr.ts';
 import { notFound, errorHandler } from './middleware/error.ts';
 
 const app = express();
+app.use(compression());
 app.use(cors());
 app.use(express.json({ limit: '5mb' }));
 

@@ -45,6 +45,7 @@ listingsRouter.get('/', async (req, res, next) => {
     const rows = await query(
       `${SELECT} WHERE ${where.join(' AND ')} ORDER BY boosted DESC, created_at DESC LIMIT ${limit} OFFSET ${offset}`, params);
     rows.forEach((r: any) => { r.contactPhone = maskPhone(r.contactPhone); });
+    res.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=60');
     res.json({ count: rows.length, listings: rows });
   } catch (e) { next(e); }
 });
@@ -56,6 +57,7 @@ listingsRouter.get('/geojson', async (_req, res, next) => {
         'properties', json_build_object('id',id,'title',title,'price',price,'propertyType',property_type,
           'area',area,'ward',ward,'boosted',boosted,'image', (images)[1])) AS feature
       FROM listings WHERE status NOT IN ('hidden','pending')`);
+    res.set('Cache-Control', 'public, max-age=20, stale-while-revalidate=60');
     res.json({ type: 'FeatureCollection', features: rows.map((r: any) => r.feature) });
   } catch (e) { next(e); }
 });
@@ -78,6 +80,7 @@ listingsRouter.get('/:id', async (req, res, next) => {
     const [row] = await query(`${SELECT} WHERE id=$1`, [Number(req.params.id)]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy tin' });
     row.contactPhone = maskPhone(row.contactPhone);
+    res.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=60');
     res.json(row);
   } catch (e) { next(e); }
 });

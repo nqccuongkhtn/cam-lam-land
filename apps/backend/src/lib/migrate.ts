@@ -50,6 +50,12 @@ CREATE TABLE IF NOT EXISTS listing_leads (
   UNIQUE (listing_id, user_id)
 );
 CREATE INDEX IF NOT EXISTS listing_leads_listing_idx ON listing_leads (listing_id);
+
+-- ── Index tăng tốc truy vấn nóng (chịu tải lớn) ──
+CREATE INDEX IF NOT EXISTS listings_created_by_idx ON listings (created_by);
+CREATE INDEX IF NOT EXISTS listings_ward_idx       ON listings (ward);
+CREATE INDEX IF NOT EXISTS listings_list_idx       ON listings (status, boosted DESC, created_at DESC);
+CREATE INDEX IF NOT EXISTS users_role_idx          ON users (role);
 `;
 
 /** Idempotent schema upgrade — runs every boot (roles, verification, listing fields, images). */

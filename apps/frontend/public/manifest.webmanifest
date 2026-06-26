@@ -1,17 +1,43 @@
 {
+  "id": "/",
   "name": "Cam Lâm Land — Bất động sản & Quy hoạch",
   "short_name": "Cam Lâm Land",
   "description": "Sàn bất động sản & bản đồ quy hoạch GIS huyện Cam Lâm, Khánh Hòa.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "any",
+  "dir": "ltr",
+  "lang": "vi",
   "background_color": "#0A2540",
   "theme_color": "#0A2540",
-  "lang": "vi",
+  "categories": [
+    "business",
+    "lifestyle",
+    "shopping"
+  ],
   "icons": [
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

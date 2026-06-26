@@ -53,5 +53,13 @@ async function main() {
   await migrate();
   await ensureAdmin();
   server.listen(env.port, () => console.log(`[backend] API + WS listening on :${env.port}`));
+
+  // Keep-warm: tự ping để Render (gói free) không "ngủ" → tránh cold-start 500 khi đăng nhập.
+  const selfUrl = process.env.RENDER_EXTERNAL_URL;
+  if (selfUrl) {
+    const ping = () => fetch(`${selfUrl.replace(/\/+$/, '')}/api/health`).then(() => {}).catch(() => {});
+    setInterval(ping, 10 * 60 * 1000); // mỗi 10 phút (< 15 phút Render mới cho ngủ)
+    console.log(`[keepwarm] tự ping ${selfUrl}/api/health mỗi 10 phút (chống ngủ)`);
+  }
 }
 main().catch((e) => { console.error(e); process.exit(1); });

@@ -6,12 +6,22 @@ function authHeaders(): Record<string,string> {
   return t ? { Authorization: `Bearer ${t}` } : {};
 }
 
-export async function api<T = any>(path: string, opts: RequestInit = {}): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...opts,
-    headers: { 'Content-Type': 'application/json', ...authHeaders(), ...(opts.headers || {}) },
-  });
-  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `HTTP ${res.status}`);
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+// Tự thử lại khi máy chủ (gói free) đang "thức dậy": lỗi mạng hoặc 5xx -> gọi lại sau 1–3s.
+export async function api<T = any>(path: string, opts: RequestInit = {}, _retry = 0): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      ...opts,
+      headers: { 'Content-Type': 'application/json', ...authHeaders(), ...(opts.headers || {}) },
+    });
+  } catch {
+    if (_retry < 2) { await wait(1200 * (_retry + 1)); return api(path, opts, _retry + 1); }
+    throw new Error('Không kết nối được máy chủ. Vui lòng kiểm tra mạng và thử lại.');
+  }
+  if (res.status >= 500 && _retry < 2) { await wait(1200 * (_retry + 1)); return api(path, opts, _retry + 1); }
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `Máy chủ đang bận, vui lòng thử lại (mã ${res.status}).`);
   return res.json();
 }
 

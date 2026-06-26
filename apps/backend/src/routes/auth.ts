@@ -2,33 +2,114 @@ import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { hashPassword, verifyPassword, signToken } from '../lib/auth.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
+import { sendVerificationEmail, EMAIL_LIVE } from '../lib/mailer.ts';
 
 export const authRouter = Router();
 
+const profile = (u: any) => ({
+  id: u.id, email: u.email, role: u.role,
+  fullName: u.full_name ?? null, phone: u.phone ?? null,
+  tier: u.tier ?? 'free', status: u.status ?? 'active',
+  emailVerified: u.email_verified ?? true,
+});
+const gen6 = () => String(Math.floor(100000 + Math.random() * 900000));
+const isEmail = (e: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
+
+async function issueCode(email: string): Promise<string> {
+  const code = gen6();
+  await query(
+    `INSERT INTO email_verifications (email, code, expires_at) VALUES ($1,$2, now() + interval '15 minutes')`,
+    [email, code]);
+  await sendVerificationEmail(email, code);
+  return code;
+}
+
+// Khách (user) đăng ký nhanh — không cần xác thực email
 authRouter.post('/register', async (req, res, next) => {
   try {
-    const { email, password } = req.body ?? {};
-    if (!email || !password) return res.status(400).json({ error: 'email and password required' });
-    const exists = await query('SELECT id FROM users WHERE email=$1', [email]);
-    if (exists.length) return res.status(409).json({ error: 'Email already registered' });
+    const { email, password, fullName, phone } = req.body ?? {};
+    if (!email || !password || !phone) return res.status(400).json({ error: 'Cần email, mật khẩu và số điện thoại' });
+    if (!isEmail(email)) return res.status(400).json({ error: 'Email không hợp lệ' });
+    if (String(password).length < 6) return res.status(400).json({ error: 'Mật khẩu tối thiểu 6 ký tự' });
+    if ((await query('SELECT id FROM users WHERE email=$1', [email])).length)
+      return res.status(409).json({ error: 'Email đã được đăng ký' });
     const hash = await hashPassword(password);
     const [user] = await query(
-      `INSERT INTO users (email, password_hash, role) VALUES ($1,$2,'user')
-       RETURNING id, email, role`, [email, hash]);
+      `INSERT INTO users (email, password_hash, role, full_name, phone, email_verified)
+       VALUES ($1,$2,'user',$3,$4,true) RETURNING *`, [email, hash, fullName ?? null, phone]);
     const token = signToken({ id: user.id, email: user.email, role: user.role });
-    res.status(201).json({ token, user });
+    res.status(201).json({ token, user: profile(user) });
   } catch (e) { next(e); }
 });
 
+// Sales / Môi giới đăng ký — phải xác thực email
+authRouter.post('/register-sales', async (req, res, next) => {
+  try {
+    const { fullName, email, phone, password } = req.body ?? {};
+    if (!fullName || !email || !password || !phone) return res.status(400).json({ error: 'Cần họ tên, email, số điện thoại, mật khẩu' });
+    if (!isEmail(email)) return res.status(400).json({ error: 'Email không hợp lệ' });
+    if (String(password).length < 6) return res.status(400).json({ error: 'Mật khẩu tối thiểu 6 ký tự' });
+    if ((await query('SELECT id FROM users WHERE email=$1', [email])).length)
+      return res.status(409).json({ error: 'Email đã được đăng ký' });
+    const hash = await hashPassword(password);
+    await query(
+      `INSERT INTO users (email, password_hash, role, full_name, phone, email_verified, status, tier)
+       VALUES ($1,$2,'sales',$3,$4,false,'active','free')`,
+      [email, hash, fullName, phone ?? null]);
+    const code = await issueCode(email);
+    res.status(201).json({ message: 'Đã gửi mã xác thực tới email của bạn', email, ...(EMAIL_LIVE ? {} : { devCode: code }) });
+  } catch (e) { next(e); }
+});
+
+// Xác thực email bằng mã 6 số → tự đăng nhập
+authRouter.post('/verify-email', async (req, res, next) => {
+  try {
+    const { email, code } = req.body ?? {};
+    if (!email || !code) return res.status(400).json({ error: 'Thiếu email hoặc mã' });
+    const [v] = await query(
+      `SELECT * FROM email_verifications WHERE email=$1 AND code=$2 AND used=false AND expires_at > now()
+       ORDER BY id DESC LIMIT 1`, [email, String(code).trim()]);
+    if (!v) return res.status(400).json({ error: 'Mã không đúng hoặc đã hết hạn' });
+    await query('UPDATE email_verifications SET used=true WHERE id=$1', [v.id]);
+    const [user] = await query('UPDATE users SET email_verified=true WHERE email=$1 RETURNING *', [email]);
+    if (!user) return res.status(404).json({ error: 'Không tìm thấy tài khoản' });
+    const token = signToken({ id: user.id, email: user.email, role: user.role });
+    res.json({ token, user: profile(user) });
+  } catch (e) { next(e); }
+});
+
+// Gửi lại mã
+authRouter.post('/resend-code', async (req, res, next) => {
+  try {
+    const { email } = req.body ?? {};
+    if (!email) return res.status(400).json({ error: 'Thiếu email' });
+    const [u] = await query('SELECT id FROM users WHERE email=$1', [email]);
+    if (!u) return res.status(404).json({ error: 'Email chưa đăng ký' });
+    const code = await issueCode(email);
+    res.json({ message: 'Đã gửi lại mã', email, ...(EMAIL_LIVE ? {} : { devCode: code }) });
+  } catch (e) { next(e); }
+});
+
+// Đăng nhập — trả role; chặn sales chưa xác thực / tài khoản khoá
 authRouter.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body ?? {};
     const [user] = await query('SELECT * FROM users WHERE email=$1', [email]);
     if (!user || !(await verifyPassword(password ?? '', user.password_hash)))
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Sai email hoặc mật khẩu' });
+    if (user.status === 'suspended') return res.status(403).json({ error: 'Tài khoản đã bị khoá' });
+    if (user.role === 'sales' && !user.email_verified)
+      return res.status(403).json({ error: 'Email chưa xác thực', needVerify: true, email: user.email });
     const token = signToken({ id: user.id, email: user.email, role: user.role });
-    res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
+    res.json({ token, user: profile(user) });
   } catch (e) { next(e); }
 });
 
-authRouter.get('/me', authRequired, (req: AuthedRequest, res) => res.json({ user: req.user }));
+// Hồ sơ hiện tại (lấy mới từ DB)
+authRouter.get('/me', authRequired, async (req: AuthedRequest, res, next) => {
+  try {
+    const [user] = await query('SELECT * FROM users WHERE id=$1', [req.user!.id]);
+    if (!user) return res.status(404).json({ error: 'Không tìm thấy' });
+    res.json({ user: profile(user) });
+  } catch (e) { next(e); }
+});

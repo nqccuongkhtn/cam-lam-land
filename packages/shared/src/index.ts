@@ -10,14 +10,15 @@ export const CAM_LAM = {
   srid: 4326,
 } as const;
 
-export type Role = 'user' | 'admin';
+export type Role = 'user' | 'admin' | 'sales';
+export type UserTier = 'free' | 'paid';
 export type PropertyType = 'land' | 'house' | 'apartment' | 'villa' | 'commercial' | 'farm';
 export type ListingStatus = 'active' | 'pending' | 'sold' | 'hidden';
 export type LayerType = 'parcel' | 'zoning' | 'admin' | 'road' | 'custom';
 export type ImportStatus = 'pending' | 'processing' | 'done' | 'error';
 export type SupportedFormat = 'dgn' | 'shp' | 'geojson';
 
-export interface User { id: number; email: string; role: Role; createdAt: string; }
+export interface User { id: number; email: string; role: Role; fullName?: string | null; phone?: string | null; tier?: UserTier; status?: string; emailVerified?: boolean; createdAt?: string; }
 
 export interface Listing {
   id: number;

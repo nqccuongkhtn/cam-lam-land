@@ -2,6 +2,9 @@ export type PropertyType = 'land' | 'house' | 'apartment' | 'villa' | 'commercia
 export interface Listing {
   id: number; title: string; description: string | null; price: number; area: number | null;
   propertyType: PropertyType; address: string | null; ward: string | null; bedrooms: number | null;
+  bathrooms?: number | null; direction?: string | null; legal?: string | null; frontage?: number | null;
+  contactName?: string | null; contactPhone?: string | null; boosted?: boolean; createdBy?: number | null;
+  leadCount?: number; leadViews?: number;
   status: string; images: string[]; lng: number; lat: number; createdAt: string;
 }
 export interface GisLayer {
@@ -21,3 +24,7 @@ export function formatVnd(v: number): string {
   if (v >= 1e6) return `${(v/1e6).toFixed(0)} triệu`;
   return new Intl.NumberFormat('vi-VN').format(v) + ' đ';
 }
+
+export const WARDS = ['Cam Đức','Cam Hải Đông','Cam Hải Tây','Cam Thành Bắc','Cam Hòa','Cam Tân','Cam Hiệp Bắc','Cam Hiệp Nam','Cam An Bắc','Cam An Nam','Cam Phước Tây','Sơn Tân','Suối Cát','Suối Tân'];
+export const DIRECTIONS = ['Đông','Tây','Nam','Bắc','Đông Bắc','Đông Nam','Tây Bắc','Tây Nam'];
+export const LEGAL_OPTIONS = ['Sổ đỏ / Sổ hồng','Sổ hồng riêng','Sổ chung','Hợp đồng mua bán','Đang chờ sổ','Khác'];

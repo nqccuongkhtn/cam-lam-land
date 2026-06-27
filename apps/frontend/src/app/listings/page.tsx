@@ -2,6 +2,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
+import Link from 'next/link';
 import { Listing, PropertyType, PROPERTY_LABELS } from '@/lib/types';
 import ListingCard from '@/components/ListingCard';
 import type { BaseMap, ImageOverlay } from '@/components/MapView';
@@ -31,9 +33,15 @@ export default function ListingsPage() {
   const [info, setInfo] = useState<{ x: number; y: number; lng: number; lat: number; parcel: any; zoning: any } | null>(null);
   const [ads, setAds] = useState<any[]>([]);
   const [sort, setSort] = useState('default');
+  const { user } = useAuth();
+  const [mine, setMine] = useState(false);
 
-  function load(over?: { type?: string; min?: string; max?: string; q?: string }) {
+  function load(over?: { type?: string; min?: string; max?: string; q?: string; mine?: boolean }) {
     setLoading(true);
+    if (over?.mine ?? mine) {
+      api<{ listings: Listing[] }>('/listings/mine').then((d) => setListings(d.listings || [])).catch(() => setListings([])).finally(() => setLoading(false));
+      return;
+    }
     const p = new URLSearchParams();
     const t = over?.type ?? type, mn = over?.min ?? min, mx = over?.max ?? max, kw = over?.q ?? q;
     if (t) p.set('propertyType', t);
@@ -41,6 +49,11 @@ export default function ListingsPage() {
     if (mx) p.set('maxPrice', String(Number(mx) * 1e9));
     if (kw) p.set('q', kw);
     api<{ listings: Listing[] }>(`/listings?${p.toString()}`).then((d) => setListings(d.listings || [])).catch(() => setListings([])).finally(() => setLoading(false));
+  }
+  function showMine(v: boolean) { setMine(v); load({ mine: v }); }
+  async function del(id: number) {
+    if (!confirm('Xoá tin này khỏi giỏ hàng?')) return;
+    try { await api(`/listings/${id}`, { method: 'DELETE' }); load({ mine: true }); } catch (e: any) { alert(e.message); }
   }
   useEffect(() => {
     const sp = new URLSearchParams(window.location.search);
@@ -138,7 +151,7 @@ export default function ListingsPage() {
             <div className="flex flex-wrap items-center gap-2 bg-slate-50/80 border border-slate-200 rounded-2xl p-2 shadow-sm">
               <label className="flex items-center gap-2 flex-1 min-w-[170px] bg-white rounded-xl border border-slate-200 px-3 transition focus-within:border-[#0A2540] focus-within:ring-2 focus-within:ring-[#0A2540]/10">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-4 h-4 text-slate-400 shrink-0"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
-                <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && load()} className="py-2.5 w-full outline-none text-sm bg-transparent" placeholder="Khu vực, từ khoá, dự án…" />
+                <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && showMine(false)} className="py-2.5 w-full outline-none text-sm bg-transparent" placeholder="Khu vực, từ khoá, dự án…" />
               </label>
               <label className="flex items-center gap-2 min-w-[148px] bg-white rounded-xl border border-slate-200 px-3 transition focus-within:border-[#0A2540]">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-slate-400 shrink-0"><path d="M3 11l9-8 9 8M5 10v10h14V10" /></svg>
@@ -153,12 +166,12 @@ export default function ListingsPage() {
                 <input value={max} onChange={(e) => setMax(e.target.value)} type="number" min="0" className="py-2.5 w-12 outline-none text-sm bg-transparent" placeholder="Đến" />
                 <span className="text-xs text-slate-400 font-semibold shrink-0">tỷ</span>
               </label>
-              <button onClick={() => load()} className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg shadow-red-600/30 whitespace-nowrap grow sm:grow-0">
+              <button onClick={() => showMine(false)} className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg shadow-red-600/30 whitespace-nowrap grow sm:grow-0">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" className="w-4 h-4"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
                 Tìm kiếm
               </button>
             </div>
-            <p className="text-sm text-slate-500 mt-2 px-1">{loading ? 'Đang tìm…' : <>Tìm thấy <b className="text-[#0A2540]">{listings.length}</b> bất động sản tại Cam Lâm</>}</p>
+            <p className="text-sm text-slate-500 mt-2 px-1">{loading ? 'Đang tìm…' : mine ? <>Giỏ hàng của bạn: <b className="text-[#0A2540]">{listings.length}</b> sản phẩm</> : <>Tìm thấy <b className="text-[#0A2540]">{listings.length}</b> bất động sản tại Cam Lâm</>}</p>
           </div>
         {/* Toggle Danh sách / Bản đồ — chỉ hiện trên điện thoại & iPad dọc */}
         <div className="lg:hidden flex border-t border-slate-100">
@@ -173,7 +186,12 @@ export default function ListingsPage() {
       <div className="flex-1 min-h-0 lg:flex">
         <div className={`${view === 'map' ? 'hidden' : ''} lg:block h-full overflow-y-auto scroll-soft px-3 sm:px-4 py-4 w-full lg:w-[58%]`}>
           <div className="flex items-center justify-between gap-2 mb-4">
-            <h2 className="text-base sm:text-lg font-extrabold text-[#0A2540]">Bất động sản nổi bật</h2>
+            {user ? (
+              <div className="flex rounded-xl border border-slate-200 overflow-hidden">
+                <button onClick={() => showMine(false)} className={`px-3.5 py-1.5 text-sm font-bold ${!mine ? 'bg-[#0A2540] text-white' : 'text-slate-600'}`}>Tất cả</button>
+                <button onClick={() => showMine(true)} className={`px-3.5 py-1.5 text-sm font-bold ${mine ? 'bg-[#0A2540] text-white' : 'text-slate-600'}`}>🧺 Giỏ của tôi</button>
+              </div>
+            ) : <h2 className="text-base sm:text-lg font-extrabold text-[#0A2540]">Bất động sản nổi bật</h2>}
             <label className="flex items-center gap-1.5 text-sm text-slate-500 shrink-0">
               <span className="hidden sm:inline">Sắp xếp</span>
               <select value={sort} onChange={(e) => setSort(e.target.value)} className="border border-slate-200 rounded-lg px-2.5 py-1.5 text-sm bg-white font-semibold text-[#0A2540] outline-none cursor-pointer">
@@ -199,11 +217,20 @@ export default function ListingsPage() {
             </div>
           ) : listings.length === 0 ? (
             <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-8 text-center text-slate-500 text-sm">
-              Không có kết quả. Nếu chưa có tin, chạy <code className="bg-slate-100 px-1 rounded">them_tin_demo.bat</code> để thêm tin mẫu.
+              {mine ? <>Giỏ hàng của bạn đang trống. <Link href="/sales/post" className="text-[#0A2540] font-bold">Đăng tin đầu tiên →</Link></> : 'Không có kết quả phù hợp.'}
             </div>
           ) : (
             <div className="grid gap-4 content-start grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3">
-              {sorted.map((l) => <ListingCard key={l.id} l={l} />)}
+              {sorted.map((l) => mine ? (
+                <div key={l.id} className="flex flex-col gap-1.5">
+                  <ListingCard l={l} />
+                  <div className="flex gap-1.5">
+                    <Link href={`/sales/edit/${l.id}`} className="flex-1 text-center bg-white border border-slate-200 text-[#0A2540] text-xs font-bold py-1.5 rounded-lg hover:border-[#C8A14B]">✏️ Sửa</Link>
+                    <Link href={`/sales/leads/${l.id}`} className="flex-1 text-center bg-white border border-slate-200 text-[#0A2540] text-xs font-bold py-1.5 rounded-lg hover:border-[#C8A14B]">👁 Khách</Link>
+                    <button onClick={() => del(l.id)} className="flex-1 bg-white border border-red-200 text-red-600 text-xs font-bold py-1.5 rounded-lg hover:bg-red-50">🗑 Xoá</button>
+                  </div>
+                </div>
+              ) : <ListingCard key={l.id} l={l} />)}
             </div>
           )}
         </div>

@@ -28,6 +28,7 @@ export default function ChatWidget() {
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [serr, setSerr] = useState('');
+  const [hint, setHint] = useState(false);
 
   const lastId = useRef(0);
   const seen = useRef<Set<number>>(new Set());
@@ -101,6 +102,14 @@ export default function ChatWidget() {
   }, [msgs, open, room, user, isAdmin]);
 
   useEffect(() => { boxRef.current?.scrollTo({ top: boxRef.current.scrollHeight }); }, [msgs, open, tab]);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try { if (localStorage.getItem('cl-sell-hint') === '1') return; } catch {}
+    const t = setTimeout(() => setHint(true), 2000);
+    return () => clearTimeout(t);
+  }, []);
+  useEffect(() => { if (!hint) return; const t = setTimeout(() => setHint(false), 15000); return () => clearTimeout(t); }, [hint]);
+  function dismissHint() { setHint(false); try { localStorage.setItem('cl-sell-hint', '1'); } catch {} }
 
   function pushMsgs(arr: Msg[]) {
     const fresh = (arr || []).filter((m) => m && !seen.current.has(m.id));
@@ -130,11 +139,22 @@ export default function ChatWidget() {
 
   return (
     <>
-      <button onClick={() => setOpen((o) => !o)} aria-label="Tin nhắn & gửi bán"
-        className="fixed bottom-5 right-5 z-[55] w-14 h-14 grid place-items-center bg-[#0A2540] hover:bg-[#0d2f54] text-white rounded-full shadow-2xl shadow-black/40 ring-2 ring-white/40 transition hover:scale-105 active:scale-95">
-        {open ? <span className="text-2xl leading-none">×</span> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z" /></svg>}
-        {!open && unread > 0 && <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 grid place-items-center bg-red-600 text-white text-[11px] font-bold rounded-full ring-2 ring-white">{unread > 99 ? '99+' : unread}</span>}
-      </button>
+      <div className="fixed bottom-5 right-5 z-[55] flex items-center gap-2">
+        {!open && hint && (
+          <div className="relative bg-white rounded-2xl shadow-xl border border-slate-200 pl-3.5 pr-3 py-2.5 w-[182px] animate-bounce" style={{ animationDuration: '1.5s' }}>
+            <button onClick={dismissHint} aria-label="Đóng" className="absolute -top-2 -right-2 w-5 h-5 bg-slate-700 hover:bg-slate-900 text-white rounded-full text-xs grid place-items-center">×</button>
+            <button onClick={() => { setTab('sell'); setOpen(true); dismissHint(); }} className="text-left w-full">
+              <p className="font-bold text-[#0A2540] text-sm leading-snug">🏷️ Có nhà đất cần bán?</p>
+              <p className="text-xs text-slate-500 mt-0.5">Bấm vào đây để gửi bán — miễn phí!</p>
+            </button>
+          </div>
+        )}
+        <button onClick={() => setOpen((o) => !o)} aria-label="Tin nhắn & gửi bán"
+          className="relative w-14 h-14 grid place-items-center bg-[#0A2540] hover:bg-[#0d2f54] text-white rounded-full shadow-2xl shadow-black/40 ring-2 ring-white/40 transition hover:scale-105 active:scale-95">
+          {open ? <span className="text-2xl leading-none">×</span> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z" /></svg>}
+          {!open && unread > 0 && <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 grid place-items-center bg-red-600 text-white text-[11px] font-bold rounded-full ring-2 ring-white">{unread > 99 ? '99+' : unread}</span>}
+        </button>
+      </div>
 
       {open && (
         <div className="fixed bottom-24 right-3 sm:right-5 z-[56] w-[94vw] max-w-sm h-[70vh] max-h-[580px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">

@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { api } from '@/lib/api';
 import type { GeoLayer, ImageOverlay, BaseMap, MeasureMode, MeasureResult } from '@/components/MapView';
@@ -38,10 +38,10 @@ function parseGmap(url: string): { lat: number; lng: number } | null {
 }
 const openDir = (lat: number, lng: number) => window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank', 'noopener');
 function parseNum(tok: string): number {
-  tok = tok.trim();
-  if (tok.includes('.') && tok.includes(',')) tok = tok.replace(/,/g, '');
-  else if (tok.includes(',')) { const parts = tok.split(','); tok = (parts[parts.length - 1].length === 3 && parts.length >= 2) ? parts.join('') : tok.replace(',', '.'); }
-  return parseFloat(tok);
+  let t = tok.replace(/,/g, '.');
+  const parts = t.split('.');
+  if (parts.length > 2) t = parts.slice(0, -1).join('') + '.' + parts[parts.length - 1];
+  return parseFloat(t);
 }
 // Đọc bảng toạ độ VN-2000 (mỗi dòng 1 điểm), tự nhận biết X(Đông ~5-6 chữ số) và Y(Bắc >900k).
 function parseVnTable(text: string): { x: number; y: number }[] {
@@ -75,6 +75,49 @@ function loadTesseract(): Promise<any> {
   });
   return _tess;
 }
+async function runOcr(src: HTMLCanvasElement | HTMLImageElement): Promise<string> {
+  const T = await loadTesseract();
+  const worker = await T.createWorker('eng');
+  try {
+    await worker.setParameters({ tessedit_char_whitelist: '0123456789.,', tessedit_pageseg_mode: '6' });
+    const out = await worker.recognize(src);
+    return String(out?.data?.text || '');
+  } finally { try { await worker.terminate(); } catch {} }
+}
+function otsu(hist: number[], total: number): number {
+  let sum = 0; for (let i = 0; i < 256; i++) sum += i * hist[i];
+  let sumB = 0, wB = 0, max = 0, th = 127;
+  for (let i = 0; i < 256; i++) { wB += hist[i]; if (!wB) continue; const wF = total - wB; if (!wF) break; sumB += i * hist[i]; const between = wB * wF * ((sumB / wB) - ((sum - sumB) / wF)) ** 2; if (between > max) { max = between; th = i; } }
+  return th;
+}
+function preprocess(src: HTMLImageElement | HTMLCanvasElement): HTMLCanvasElement {
+  const w0 = (src as HTMLImageElement).naturalWidth || (src as HTMLCanvasElement).width;
+  const h0 = (src as HTMLImageElement).naturalHeight || (src as HTMLCanvasElement).height;
+  const sc = w0 < 1100 ? Math.min(1700 / w0, 3) : 1;
+  const w = Math.max(1, Math.round(w0 * sc)), h = Math.max(1, Math.round(h0 * sc));
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const ctx = cv.getContext('2d', { willReadFrequently: true } as any)!;
+  ctx.drawImage(src, 0, 0, w, h);
+  const im = ctx.getImageData(0, 0, w, h), d = im.data;
+  const hist = new Array(256).fill(0); const g = new Uint8Array(w * h);
+  for (let i = 0, p = 0; i < d.length; i += 4, p++) { const v = (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]) | 0; g[p] = v; hist[v]++; }
+  const th = otsu(hist, w * h);
+  for (let i = 0, p = 0; i < d.length; i += 4, p++) { const v = g[p] > th ? 255 : 0; d[i] = d[i + 1] = d[i + 2] = v; }
+  ctx.putImageData(im, 0, 0);
+  return cv;
+}
+// Gom tất cả số cỡ toạ độ rồi ghép thành cặp (đỉnh) — bền với bảng nhiều cột.
+function parseBigPairs(text: string): { x: number; y: number }[] {
+  const nums: number[] = [];
+  for (const t of (text.match(/-?[\d.,]+/g) || [])) { const n = parseNum(t); if (Number.isFinite(n) && n > 90000) nums.push(n); }
+  const pts: { x: number; y: number }[] = [];
+  for (let i = 0; i + 1 < nums.length; i += 2) {
+    const a = nums[i], b = nums[i + 1];
+    const E = a < 900000 ? a : b, N = a < 900000 ? b : a;
+    if (E > 90000 && E < 900000 && N > 900000) pts.push({ x: E, y: N });
+  }
+  return pts;
+}
 
 export default function MapPage() {
   const { user } = useAuth();
@@ -99,9 +142,11 @@ export default function MapPage() {
   const [ads, setAds] = useState<any[]>([]);
   const [fitTo, setFitTo] = useState<[[number, number], [number, number]] | null>(null);
   const [drawOpen, setDrawOpen] = useState(false);
-  const [drawTab, setDrawTab] = useState<'table' | 'paste' | 'import'>('table');
+  const [drawTab, setDrawTab] = useState<'table' | 'import'>('table');
   const [rows, setRows] = useState<{ x: string; y: string }[]>([{ x: '', y: '' }, { x: '', y: '' }, { x: '', y: '' }]);
-  const [pasteText, setPasteText] = useState('');
+  const [camOpen, setCamOpen] = useState(false);
+  const camVideoRef = useRef<HTMLVideoElement>(null);
+  const camStreamRef = useRef<MediaStream | null>(null);
   const [ocrBusy, setOcrBusy] = useState('');
   const [drawResult, setDrawResult] = useState<{ n: number; area: number; perim: number; lat: number; lng: number } | null>(null);
   const [tool, setTool] = useState<'none' | 'search' | 'base' | 'measure'>('none'); // bảng công cụ trên mobile
@@ -119,6 +164,7 @@ export default function MapPage() {
   }, []);
   useEffect(() => { load(); api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {}); }, [load]);
   useEffect(() => { setCanDelete(user?.role === 'admin' || user?.role === 'gis'); }, [user]);
+  useEffect(() => { if (!camOpen) return; const v = camVideoRef.current, st = camStreamRef.current; if (!v || !st) return; v.srcObject = st; v.setAttribute('playsinline', 'true'); v.play().catch(() => {}); }, [camOpen]);
 
   const overlays: ImageOverlay[] = useMemo(
     () => RASTER_OVERLAYS.map((o) => ({ id: o.id, url: o.url, coordinates: o.coordinates, opacity, visible: ovOn[o.id] ?? true })), [opacity, ovOn]);
@@ -203,19 +249,34 @@ export default function MapPage() {
     setRows(parsed.map((p) => ({ x: String(p.x), y: String(p.y) })));
     setDrawTab('table');
   }
+  function loadImage(f: File): Promise<HTMLImageElement> {
+    return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = URL.createObjectURL(f); });
+  }
   async function onCoordFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]; e.target.value = ''; if (!f) return;
     setOcrBusy('Đang đọc…');
     try {
       if (f.type.startsWith('image/')) {
-        const T = await loadTesseract();
+        const img = await loadImage(f);
         setOcrBusy('Đang nhận dạng chữ trong ảnh…');
-        const out = await T.recognize(f, 'eng');
-        applyParsed(parseVnTable(String(out?.data?.text || '')));
-      } else {
-        applyParsed(parseVnTable(await f.text()));
-      }
+        applyParsed(parseBigPairs(await runOcr(preprocess(img))));
+      } else { applyParsed(parseBigPairs(await f.text())); }
     } catch (er: any) { alert('Không đọc được tệp: ' + (er?.message || er)); }
+    finally { setOcrBusy(''); }
+  }
+  async function startCam() {
+    try { const st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } } }); camStreamRef.current = st; setCamOpen(true); }
+    catch (e: any) { alert('Không mở được camera: ' + (e?.message || e)); }
+  }
+  function stopCam() { camStreamRef.current?.getTracks().forEach((t) => t.stop()); camStreamRef.current = null; setCamOpen(false); }
+  async function capture() {
+    const v = camVideoRef.current; if (!v || !v.videoWidth) return;
+    const vw = v.videoWidth, vh = v.videoHeight, cw = Math.round(vw * 0.92), ch = Math.round(vh * 0.66);
+    const cap = document.createElement('canvas'); cap.width = cw; cap.height = ch;
+    cap.getContext('2d')!.drawImage(v, Math.round((vw - cw) / 2), Math.round((vh - ch) / 2), cw, ch, 0, 0, cw, ch);
+    stopCam(); setOcrBusy('Đang nhận dạng chữ trong ảnh…');
+    try { applyParsed(parseBigPairs(await runOcr(preprocess(cap)))); }
+    catch (e: any) { alert('Không đọc được: ' + (e?.message || e)); }
     finally { setOcrBusy(''); }
   }
   function drawParcel() {
@@ -395,7 +456,7 @@ export default function MapPage() {
                   <button onClick={() => setDrawOpen(false)} className="text-slate-400 hover:text-slate-700 text-2xl leading-none">×</button>
                 </div>
                 <div className="flex border-b border-slate-100 px-3">
-                  {([['table', '⌗ Nhập bảng'], ['paste', '⧉ Dán văn bản'], ['import', '📷 Ảnh / tệp']] as [typeof drawTab, string][]).map(([k, lb]) => (
+                  {([['table', '⌗ Nhập bảng'], ['import', '📷 Chụp / Ảnh']] as [typeof drawTab, string][]).map(([k, lb]) => (
                     <button key={k} onClick={() => setDrawTab(k)} className={`px-3 py-2.5 text-sm font-semibold border-b-2 ${drawTab === k ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500'}`}>{lb}</button>
                   ))}
                 </div>
@@ -419,28 +480,41 @@ export default function MapPage() {
                       </div>
                     </div>
                   )}
-                  {drawTab === 'paste' && (
-                    <div className="space-y-2">
-                      <p className="text-sm text-slate-500">Dán bảng toạ độ, mỗi dòng một điểm — tự tách X (Đông) và Y (Bắc).</p>
-                      <textarea value={pasteText} onChange={(e) => setPasteText(e.target.value)} rows={6} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono" placeholder={'1  596100.0  1334050.0\n2  596150.0  1334035.0\n3  596138.0  1333985.0'} />
-                      <button onClick={() => applyParsed(parseVnTable(pasteText))} className="bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-bold px-4 py-2 rounded-lg">Đưa vào bảng →</button>
-                    </div>
-                  )}
                   {drawTab === 'import' && (
                     <div className="space-y-2">
-                      <label className="flex flex-col items-center justify-center gap-1.5 border-2 border-dashed border-slate-300 rounded-xl py-7 cursor-pointer hover:border-[#C8A14B] text-sm text-slate-500 font-semibold text-center px-3">
-                        <input type="file" accept="image/*,.txt,.csv" onChange={onCoordFile} className="hidden" />
-                        {ocrBusy ? <span className="text-[#0A2540]">{ocrBusy}</span> : <>📷 Chụp / chọn ảnh bảng toạ độ<span className="text-xs font-normal text-slate-400">hoặc tệp .txt / .csv — tự tách toạ độ</span></>}
-                      </label>
-                      <p className="text-[11px] text-slate-400">Ảnh cần rõ nét, chụp thẳng. Kết quả đưa vào tab &quot;Nhập bảng&quot; để bạn kiểm tra trước khi vẽ.</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button onClick={startCam} className="flex flex-col items-center justify-center gap-1 border-2 border-[#0A2540] rounded-xl py-6 text-sm font-bold text-[#0A2540] hover:bg-slate-50"><span className="text-2xl">📷</span>Chụp bằng camera</button>
+                        <label className="flex flex-col items-center justify-center gap-1 border-2 border-dashed border-slate-300 rounded-xl py-6 cursor-pointer hover:border-[#C8A14B] text-sm font-bold text-slate-600 text-center">
+                          <input type="file" accept="image/*,.txt,.csv" onChange={onCoordFile} className="hidden" /><span className="text-2xl">🖼️</span>Tải ảnh / tệp
+                        </label>
+                      </div>
+                      {ocrBusy && <p className="text-sm text-[#0A2540] font-semibold text-center">{ocrBusy}</p>}
+                      <p className="text-[11px] text-slate-400">Chụp/chọn ảnh bảng toạ độ rõ nét (hoặc tệp .txt/.csv). Hệ thống tự tách số → đưa vào tab &quot;Nhập bảng&quot; để bạn kiểm tra trước khi vẽ.</p>
                     </div>
                   )}
                 </div>
                 <div className="px-5 pb-5 pt-1 flex items-center gap-2 sticky bottom-0 bg-white">
                   <button onClick={drawParcel} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl">Vẽ & zoom tới thửa ({pointsFromRows().length} điểm)</button>
-                  <button onClick={() => { setRows([{ x: '', y: '' }, { x: '', y: '' }, { x: '', y: '' }]); setPasteText(''); }} className="px-4 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600">Xoá</button>
+                  <button onClick={() => setRows([{ x: '', y: '' }, { x: '', y: '' }, { x: '', y: '' }])} className="px-4 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600">Xoá</button>
                 </div>
               </div>
+            </div>
+          )}
+          {camOpen && (
+            <div className="fixed inset-0 z-[70] bg-black">
+              <video ref={camVideoRef} className="absolute inset-0 w-full h-full object-cover" muted playsInline />
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="border-2 border-emerald-400 rounded-lg" style={{ width: '92%', height: '66%', boxShadow: '0 0 0 100vmax rgba(0,0,0,0.5)' }} />
+              </div>
+              <div className="absolute top-0 inset-x-0 flex items-center justify-between p-4 text-white">
+                <span className="font-semibold text-lg drop-shadow">Chụp bảng toạ độ</span>
+                <button onClick={stopCam} aria-label="Đóng" className="w-10 h-10 rounded-full bg-white/15 backdrop-blur grid place-items-center text-2xl leading-none">✕</button>
+              </div>
+              <div className="absolute bottom-0 inset-x-0 p-6 text-center">
+                <p className="text-white/90 text-sm mb-3 drop-shadow">Đưa bảng toạ độ vừa khít trong khung — chụp thẳng, rõ nét.</p>
+                <button onClick={capture} className="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3 rounded-full text-lg">📷 Chụp</button>
+              </div>
+              {ocrBusy && <div className="absolute inset-0 bg-black/70 grid place-items-center text-white font-semibold text-center px-6">{ocrBusy}</div>}
             </div>
           )}
           {info && (

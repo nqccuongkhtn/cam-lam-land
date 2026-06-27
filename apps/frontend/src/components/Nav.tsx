@@ -7,7 +7,6 @@ import { useAuth } from '@/lib/auth';
 const links = [
   { href: '/', label: 'Trang chủ' },
   { href: '/listings', label: 'Nhà đất' },
-  { href: '/cart', label: 'Giỏ hàng' },
   { href: '/map', label: 'Bản đồ quy hoạch' },
   { href: '/qr', label: 'Tra cứu QR' },
 ];

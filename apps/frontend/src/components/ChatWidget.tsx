@@ -29,6 +29,8 @@ export default function ChatWidget() {
   const [busy, setBusy] = useState(false);
   const [serr, setSerr] = useState('');
   const [hint, setHint] = useState(false);
+  const hintShown = useRef(0);
+  const hintStop = useRef(false);
 
   const lastId = useRef(0);
   const seen = useRef<Set<number>>(new Set());
@@ -104,12 +106,20 @@ export default function ChatWidget() {
   useEffect(() => { boxRef.current?.scrollTo({ top: boxRef.current.scrollHeight }); }, [msgs, open, tab]);
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    try { if (localStorage.getItem('cl-sell-hint') === '1') return; } catch {}
-    const t = setTimeout(() => setHint(true), 2000);
-    return () => clearTimeout(t);
+    let hideT: any;
+    const show = () => {
+      if (hintStop.current) return;
+      setHint(true);
+      const dur = hintShown.current === 0 ? 30000 : 15000; // lần đầu 30s, sau 15s
+      hintShown.current++;
+      clearTimeout(hideT);
+      hideT = setTimeout(() => setHint(false), dur);
+    };
+    const firstT = setTimeout(show, 2000);
+    const iv = setInterval(show, 240000); // hiện lại mỗi 4 phút
+    return () => { clearTimeout(firstT); clearTimeout(hideT); clearInterval(iv); };
   }, []);
-  useEffect(() => { if (!hint) return; const t = setTimeout(() => setHint(false), 15000); return () => clearTimeout(t); }, [hint]);
-  function dismissHint() { setHint(false); try { localStorage.setItem('cl-sell-hint', '1'); } catch {} }
+  function dismissHint() { setHint(false); hintStop.current = true; }
 
   function pushMsgs(arr: Msg[]) {
     const fresh = (arr || []).filter((m) => m && !seen.current.has(m.id));

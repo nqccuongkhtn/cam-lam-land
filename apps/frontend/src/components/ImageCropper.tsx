@@ -24,10 +24,11 @@ export default function ImageCropper({ file, size = 512, title = 'Cân chỉnh �
       const s = Math.max(VIEW / im.width, VIEW / im.height);
       setMinScale(s); setScale(s);
       setPos({ x: (VIEW - im.width * s) / 2, y: (VIEW - im.height * s) / 2 });
-      setImg(im); URL.revokeObjectURL(url);
+      setImg(im);
     };
     im.onerror = () => onCancel();
     im.src = url;
+    return () => { try { URL.revokeObjectURL(url); } catch {} };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file]);
 

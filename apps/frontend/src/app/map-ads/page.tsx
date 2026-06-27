@@ -87,7 +87,7 @@ export default function MapAdsPage() {
             <div>
               <label className={lbl}>Ảnh / avatar nhận diện</label>
               <div className="flex items-center gap-4 mt-2">
-                <div className="cl-ad"><div className="cl-ad-ring">{imageUrl ? <img src={imageUrl} alt="" /> : <div className="cl-ad-ph">{(name || 'C').charAt(0).toUpperCase()}</div>}<span className="cl-ad-brand">Cam Lâm Land</span></div></div>
+                <div className="cl-ad"><div className="cl-ad-ring">{imageUrl ? <img src={imageUrl} alt="" /> : <div className="cl-ad-ph">{(name || 'C').charAt(0).toUpperCase()}</div>}</div></div>
                 <label className="bg-white border border-slate-300 px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-slate-50">{uploading ? 'Đang tải…' : '🖼️ Tải ảnh'}<input type="file" accept="image/*" onChange={onFile} className="hidden" /></label>
                 {imageUrl && <button onClick={() => setImageUrl(null)} className="text-xs text-red-600">Xoá ảnh</button>}
               </div>

@@ -18,6 +18,7 @@ import { adminRouter } from './routes/admin.ts';
 import { qrRouter } from './routes/qr.ts';
 import { mapAdsRouter } from './routes/mapAds.ts';
 import { consignmentsRouter } from './routes/consignments.ts';
+import { chatRouter } from './routes/chat.ts';
 import { notFound, errorHandler } from './middleware/error.ts';
 
 const app = express();
@@ -36,6 +37,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api/qr', qrRouter);
 app.use('/api/map-ads', mapAdsRouter);
 app.use('/api/consignments', consignmentsRouter);
+app.use('/api/chat', chatRouter);
 app.use(notFound);
 app.use(errorHandler);
 

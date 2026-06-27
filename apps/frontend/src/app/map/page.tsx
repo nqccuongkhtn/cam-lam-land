@@ -36,6 +36,31 @@ function parseGmap(url: string): { lat: number; lng: number } | null {
   return null;
 }
 const openDir = (lat: number, lng: number) => window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank', 'noopener');
+function parseNum(tok: string): number {
+  tok = tok.trim();
+  if (tok.includes('.') && tok.includes(',')) tok = tok.replace(/,/g, '');
+  else if (tok.includes(',')) { const parts = tok.split(','); tok = (parts[parts.length - 1].length === 3 && parts.length >= 2) ? parts.join('') : tok.replace(',', '.'); }
+  return parseFloat(tok);
+}
+// Đọc bảng toạ độ VN-2000 (mỗi dòng 1 điểm), tự nhận biết X(Đông ~5-6 chữ số) và Y(Bắc >900k).
+function parseVnTable(text: string): { x: number; y: number }[] {
+  const pts: { x: number; y: number }[] = [];
+  for (const line of text.split(/[\n;]/)) {
+    const big = (line.match(/-?[\d.,]+/g) || []).map(parseNum).filter((n) => Number.isFinite(n) && n > 90000);
+    if (big.length >= 2) {
+      const a2 = big[big.length - 2], b2 = big[big.length - 1];
+      const E = a2 > 900000 ? b2 : a2, N = a2 > 900000 ? a2 : b2;
+      if (E > 90000 && E < 900000 && N > 900000) pts.push({ x: E, y: N });
+    }
+  }
+  return pts;
+}
+function polyAreaM2(pts: { x: number; y: number }[]): number {
+  let s = 0; for (let i = 0; i < pts.length; i++) { const j = (i + 1) % pts.length; s += pts[i].x * pts[j].y - pts[j].x * pts[i].y; } return Math.abs(s) / 2;
+}
+function perimeterM(pts: { x: number; y: number }[]): number {
+  let p = 0; for (let i = 0; i < pts.length; i++) { const j = (i + 1) % pts.length; p += Math.hypot(pts[j].x - pts[i].x, pts[j].y - pts[i].y); } return p;
+}
 
 export default function MapPage() {
   const [layers, setLayers] = useState<GisLayer[]>([]);
@@ -57,6 +82,10 @@ export default function MapPage() {
   const [c3, setC3] = useState('');
   const [panelOpen, setPanelOpen] = useState(false);
   const [ads, setAds] = useState<any[]>([]);
+  const [fitTo, setFitTo] = useState<[[number, number], [number, number]] | null>(null);
+  const [drawOpen, setDrawOpen] = useState(false);
+  const [coordText, setCoordText] = useState('');
+  const [drawResult, setDrawResult] = useState<{ n: number; area: number; perim: number } | null>(null);
   const [tool, setTool] = useState<'none' | 'search' | 'base' | 'measure'>('none'); // bảng công cụ trên mobile
 
   const load = useCallback(() => {
@@ -139,6 +168,17 @@ export default function MapPage() {
     if (!window.confirm(`Xoá lớp "${name}"?`)) return;
     try { await api(`/layers/${slug}`, { method: 'DELETE' }); setData((d) => { const n = { ...d }; delete n[slug]; return n; }); load(); }
     catch (e: any) { alert(/Admin|401|403/i.test(String(e.message)) ? 'Cần đăng nhập Quản trị để xoá.' : 'Lỗi: ' + e.message); }
+  }
+  function drawParcel() {
+    const pts = parseVnTable(coordText);
+    if (pts.length < 3) return alert('Cần ít nhất 3 điểm toạ độ hợp lệ (mỗi dòng một điểm: X Đông, Y Bắc theo VN-2000).');
+    const ll = pts.map((p) => { const w = vn2000ToWgs84(p.x, p.y); return [w.lng, w.lat]; });
+    const ring = [...ll, ll[0]];
+    setHighlight({ type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [ring] } } as any);
+    const lngs = ll.map((c) => c[0]), lats = ll.map((c) => c[1]);
+    setFitTo([[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]]);
+    setDrawResult({ n: pts.length, area: polyAreaM2(pts), perim: perimeterM(pts) });
+    setClickVN(null); setInfo(null); setFocusPoint(null); setDrawOpen(false);
   }
   const mBtn = (m: MeasureMode, label: string) => (
     <button onClick={() => { setMeasure(measure === m ? 'off' : m); setMResult(null); }}
@@ -237,6 +277,7 @@ export default function MapPage() {
             <button onClick={() => setPanelOpen(false)} className="lg:hidden text-slate-400 hover:text-slate-700 text-xl leading-none">✕</button>
           </div>
           <p className="text-xs text-slate-500 mb-3">Cam Lâm, Khánh Hòa · EPSG:4326</p>
+          <button onClick={() => setDrawOpen(true)} className="w-full mb-3 flex items-center justify-center gap-2 bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-bold py-2.5 rounded-lg">✏️ Vẽ thửa từ toạ độ</button>
           <div className="mb-3 pb-3 border-b">
             <div className="flex justify-between text-xs text-slate-500 mb-1"><span>Độ mờ lớp phủ</span><span>{Math.round(opacity * 100)}%</span></div>
             <input type="range" min={0} max={100} value={Math.round(opacity * 100)} onChange={(e) => setOpacity(Number(e.target.value) / 100)} className="w-full accent-emerald-600" />
@@ -264,7 +305,7 @@ export default function MapPage() {
 
         <div className="relative flex-1">
           <MapView layers={geoLayers} overlays={overlays} baseMap={baseMap} labels={labels} measureMode={measure}
-            focusPoint={focusPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={(ovOn['qh-qd205'] ?? true) ? opacity : 1} />
+            focusPoint={focusPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={(ovOn['qh-qd205'] ?? true) ? opacity : 1} fitTo={fitTo} />
           {/* Thanh ĐỘ MỜ lớp phủ dạng DỌC nổi trên bản đồ — chỉ hiện trên điện thoại/iPad (bảng trái bị ẩn) */}
           {(ovOn['qh-qd205'] ?? true) && (
             <div className="lg:hidden absolute top-1/2 right-2 -translate-y-1/2 z-10 flex flex-col items-center gap-1 bg-white/95 backdrop-blur rounded-2xl border border-slate-200 shadow-lg px-2 py-3">
@@ -282,6 +323,37 @@ export default function MapPage() {
               <span className="text-sm font-semibold text-[#0A2540] truncate max-w-[42vw]">📍 {focusPoint.label || 'Vị trí tìm kiếm'}</span>
               <button onClick={() => openDir(focusPoint.lat, focusPoint.lng)} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-full px-3.5 py-1.5 whitespace-nowrap">🧭 Chỉ đường</button>
               <button onClick={() => setFocusPoint(null)} className="text-slate-400 hover:text-slate-700 w-7 h-7 grid place-items-center shrink-0">✕</button>
+            </div>
+          )}
+          {drawResult && (
+            <div className="absolute top-3 left-3 z-10 bg-white rounded-xl shadow-xl border border-slate-200 p-3 text-sm max-w-[250px]">
+              <div className="flex justify-between items-center mb-1">
+                <b className="text-[#0A2540]">📐 Thửa đất đã vẽ</b>
+                <button onClick={() => { setDrawResult(null); setHighlight(null); }} className="text-slate-400 hover:text-slate-700">✕</button>
+              </div>
+              <p className="text-slate-600">Số điểm: <b>{drawResult.n}</b></p>
+              <p className="text-slate-600">Diện tích: <b className="text-emerald-700">{fmtArea(drawResult.area)}</b></p>
+              <p className="text-slate-600">Chu vi: <b>{fmtLen(drawResult.perim)}</b></p>
+            </div>
+          )}
+          {drawOpen && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+              <div className="absolute inset-0 bg-black/50" onClick={() => setDrawOpen(false)} />
+              <div className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                  <h3 className="font-extrabold text-[#0A2540] text-lg">Vẽ ranh thửa từ toạ độ VN-2000</h3>
+                  <button onClick={() => setDrawOpen(false)} className="text-slate-400 hover:text-slate-700 text-2xl leading-none">×</button>
+                </div>
+                <div className="p-5 space-y-3">
+                  <p className="text-sm text-slate-500">Dán bảng toạ độ các đỉnh thửa, <b>mỗi dòng một điểm</b>. Tự nhận biết X (Đông) và Y (Bắc) — không cần đúng thứ tự cột.</p>
+                  <textarea value={coordText} onChange={(e) => setCoordText(e.target.value)} rows={8} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono" placeholder={'1  596100.00  1334050.00\n2  596150.00  1334035.00\n3  596138.00  1333985.00\n4  596088.00  1334000.00'} />
+                  <div className="flex gap-2">
+                    <button onClick={drawParcel} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl">Vẽ & zoom tới thửa</button>
+                    <button onClick={() => setCoordText('')} className="px-4 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600">Xoá</button>
+                  </div>
+                  <button onClick={() => setCoordText('1  596100.00  1334050.00\n2  596150.00  1334035.00\n3  596138.00  1333985.00\n4  596088.00  1334000.00')} className="text-xs text-[#0A2540] font-semibold underline">Dùng ví dụ mẫu</button>
+                </div>
+              </div>
             </div>
           )}
           {info && (

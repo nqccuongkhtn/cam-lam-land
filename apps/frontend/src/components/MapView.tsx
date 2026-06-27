@@ -19,6 +19,7 @@ interface Props {
   initialBounds?: [[number, number], [number, number]]; // tự khớp khung vùng quy hoạch khi mở
   adMarkers?: { id: number; lng: number; lat: number; name: string; phone: string; image?: string | null }[];
   adOpacity?: number; // độ mờ logo quảng cáo (đi theo thanh độ mờ lớp phủ)
+  fitTo?: [[number, number], [number, number]] | null; // zoom khít vào vùng (vd: thửa vừa vẽ)
   onMapClick?: (lng: number, lat: number) => void;
   onMeasure?: (r: MeasureResult) => void;
 }
@@ -63,7 +64,7 @@ function polyArea(pts: { lng: number; lat: number }[]) {
   return Math.abs(s) / 2;
 }
 
-export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, onMapClick, onMeasure }: Props) {
+export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, onMapClick, onMeasure }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const markerRefs = useRef<Marker[]>([]);
@@ -201,13 +202,8 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       const ring = document.createElement('div'); ring.className = 'cl-ad-ring';
       if (a.image) { const im = document.createElement('img'); im.src = a.image; im.alt = ''; ring.appendChild(im); }
       else { const ph = document.createElement('div'); ph.className = 'cl-ad-ph'; ph.textContent = (a.name || 'CL').charAt(0).toUpperCase(); ring.appendChild(ph); }
-      const brand = document.createElement('span'); brand.className = 'cl-ad-brand'; brand.textContent = 'Cam Lâm Land'; ring.appendChild(brand);
       el.appendChild(ring);
-      const label = document.createElement('div'); label.className = 'cl-ad-label';
-      const nm = document.createElement('span'); nm.className = 'cl-ad-name'; nm.textContent = a.name || '';
-      const tel = document.createElement('span'); tel.className = 'cl-ad-phone'; tel.textContent = a.phone || '';
-      label.appendChild(nm); label.appendChild(tel); el.appendChild(label);
-      const mk = new maplibregl.Marker({ element: el, anchor: 'bottom' }).setLngLat([a.lng, a.lat]);
+      const mk = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([a.lng, a.lat]);
       mk.setPopup(new maplibregl.Popup({ offset: 28 }).setHTML(
         `<div style="text-align:center;min-width:130px"><div style="font-weight:800;color:#0A2540">${esc(a.name)}</div>` +
         `<a href="tel:${esc(a.phone)}" style="color:#dc2626;font-weight:700">📞 ${esc(a.phone)}</a>` +
@@ -228,6 +224,11 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     focusMarker.current.togglePopup();
     map.flyTo({ center: [focusPoint.lng, focusPoint.lat], zoom: Math.max(map.getZoom(), 16) });
   }, [focusPoint]);
+
+  useEffect(() => {
+    const map = mapRef.current; if (!map || !fitTo) return;
+    map.fitBounds(fitTo as any, { padding: 60, animate: true, maxZoom: 19, duration: 800 });
+  }, [fitTo]);
 
   useEffect(() => {
     const map = mapRef.current; if (!map || !readyRef.current) return;

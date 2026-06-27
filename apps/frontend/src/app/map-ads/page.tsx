@@ -61,7 +61,7 @@ export default function MapAdsPage() {
     setErr(''); setOk('');
     if (!name.trim() || !phone.trim()) return setErr('Nhập tên và SĐT người quảng cáo.');
     if (!wards.length) return setErr('Chọn ít nhất 1 xã.');
-    if (!points.length) return setErr('Bấm vào bản đồ để ghim ít nhất 1 điểm hiển thị.');
+    if (adStyle !== 'text' && !points.length) return setErr('Bấm vào bản đồ để ghim ít nhất 1 điểm hiển thị.');
     setBusy(true);
     try {
       const body = JSON.stringify({ advertiserName: name, advertiserPhone: phone, imageUrl, wards, months, points, style: adStyle });
@@ -78,7 +78,9 @@ export default function MapAdsPage() {
   if (loading || !user || user.role !== 'admin') return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
 
   const taken = new Set(list.filter((a) => a.active && a.id !== editingId).flatMap((a) => a.wards || []));
-  const preview = points.map((p, i) => ({ id: i, lng: p.lng, lat: p.lat, name: name || 'Tên sales', phone: phone || '09xx', image: imageUrl, style: adStyle }));
+  const preview = adStyle === 'text'
+    ? [{ id: 0, lng: 0, lat: 0, name: name || 'Tên sales', phone: phone || '09xx', image: imageUrl, style: 'text' }]
+    : points.map((p, i) => ({ id: i, lng: p.lng, lat: p.lat, name: name || 'Tên sales', phone: phone || '09xx', image: imageUrl, style: adStyle }));
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm';
   const lbl = 'text-sm font-semibold text-slate-700';
 
@@ -146,13 +148,14 @@ export default function MapAdsPage() {
           </section>
 
           <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
-            <h2 className="font-bold text-[#0A2540]">Ghim điểm hiển thị <span className="font-normal text-slate-400 text-sm">(bấm vào bản đồ)</span></h2>
+            <h2 className="font-bold text-[#0A2540]">{adStyle === 'text' ? <>Xem trước chữ mờ <span className="font-normal text-slate-400 text-sm">(tự phủ khắp bản đồ)</span></> : <>Ghim điểm hiển thị <span className="font-normal text-slate-400 text-sm">(bấm vào bản đồ)</span></>}</h2>
             <div className="relative h-80 rounded-xl overflow-hidden border border-slate-200">
-              <MapView baseMap="satellite" initialBounds={QH_BOUNDS} adMarkers={preview} onMapClick={(lng, lat) => setPoints((p) => [...p, { lng, lat }])} className="absolute inset-0 h-full w-full" />
+              <MapView baseMap="satellite" initialBounds={QH_BOUNDS} adMarkers={preview} onMapClick={(lng, lat) => { if (adStyle !== 'text') setPoints((p) => [...p, { lng, lat }]); }} className="absolute inset-0 h-full w-full" />
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-500"><b className="text-[#0A2540]">{points.length}</b> điểm đã ghim · xem trước logo ngay trên bản đồ</span>
-              {points.length > 0 && <button onClick={() => setPoints([])} className="text-red-600 font-semibold">Xoá hết điểm</button>}
+              {adStyle === 'text'
+                ? <span className="text-slate-500">Chữ <b className="text-[#0A2540]">{name || 'tên'}</b> + SĐT sẽ hiện mờ lặp khắp bản đồ như watermark chống sao chép — không cần ghim điểm.</span>
+                : <><span className="text-slate-500"><b className="text-[#0A2540]">{points.length}</b> điểm đã ghim · xem trước logo ngay trên bản đồ</span>{points.length > 0 && <button onClick={() => setPoints([])} className="text-red-600 font-semibold">Xoá hết điểm</button>}</>}
             </div>
           </section>
         </div>

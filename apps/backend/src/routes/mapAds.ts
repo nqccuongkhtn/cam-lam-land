@@ -12,10 +12,14 @@ mapAdsRouter.get('/active', async (_req, res, next) => {
          FROM map_ads WHERE status='active' AND now() < expires_at`);
     const ads: any[] = [];
     for (const r of rows) {
+      if ((r.style || 'seal') === 'text') {
+        ads.push({ id: r.id, name: r.advertiser_name, phone: r.advertiser_phone, style: 'text' });
+        continue;
+      }
       const pts = Array.isArray(r.points) ? r.points : [];
       for (const p of pts) {
         if (p && Number.isFinite(+p.lng) && Number.isFinite(+p.lat))
-          ads.push({ id: r.id, name: r.advertiser_name, phone: r.advertiser_phone, image: r.image_url, style: r.style || 'seal', lng: +p.lng, lat: +p.lat });
+          ads.push({ id: r.id, name: r.advertiser_name, phone: r.advertiser_phone, image: r.image_url, style: 'seal', lng: +p.lng, lat: +p.lat });
       }
     }
     res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=120');
@@ -47,9 +51,10 @@ mapAdsRouter.post('/', adminRequired, async (req: AuthedRequest, res, next) => {
       ? b.points.filter((p: any) => p && Number.isFinite(+p.lng) && Number.isFinite(+p.lat)).map((p: any) => ({ lng: +p.lng, lat: +p.lat }))
       : [];
     const months = Math.max(1, Math.min(36, Math.round(Number(b.months) || 1)));
+    const style = b.style === 'text' ? 'text' : 'seal';
     if (!name || !phone) return res.status(400).json({ error: 'Cần tên và SĐT người quảng cáo' });
     if (!wards.length) return res.status(400).json({ error: 'Chọn ít nhất 1 xã' });
-    if (!points.length) return res.status(400).json({ error: 'Ghim ít nhất 1 điểm hiển thị trên bản đồ' });
+    if (style !== 'text' && !points.length) return res.status(400).json({ error: 'Ghim ít nhất 1 điểm hiển thị trên bản đồ' });
     const clash = await query(
       `SELECT advertiser_name, wards FROM map_ads
         WHERE status='active' AND now() < expires_at AND wards && $1::text[]`, [wards]);
@@ -58,7 +63,6 @@ mapAdsRouter.post('/', adminRequired, async (req: AuthedRequest, res, next) => {
       clash.forEach((c: any) => (c.wards || []).forEach((w: string) => { if (wards.includes(w)) taken.add(w); }));
       return res.status(409).json({ error: `Các xã đã có người đăng ký độc quyền: ${[...taken].join(', ')}. Hãy bỏ các xã này hoặc xoá quảng cáo cũ trước.` });
     }
-    const style = b.style === 'text' ? 'text' : 'seal';
     const [row] = await query(
       `INSERT INTO map_ads (advertiser_name, advertiser_phone, image_url, wards, points, package, style, expires_at, status, created_by)
        VALUES ($1,$2,$3,$4::text[],$5::jsonb,$6,$7, now() + make_interval(months => $8::int), 'active', $9)
@@ -82,9 +86,10 @@ mapAdsRouter.put('/:id', adminRequired, async (req: AuthedRequest, res, next) =>
       ? b.points.filter((p: any) => p && Number.isFinite(+p.lng) && Number.isFinite(+p.lat)).map((p: any) => ({ lng: +p.lng, lat: +p.lat }))
       : [];
     const months = Math.max(0, Math.min(36, Math.round(Number(b.months) || 0)));
+    const style = b.style === 'text' ? 'text' : 'seal';
     if (!name || !phone) return res.status(400).json({ error: 'Cần tên và SĐT người quảng cáo' });
     if (!wards.length) return res.status(400).json({ error: 'Chọn ít nhất 1 xã' });
-    if (!points.length) return res.status(400).json({ error: 'Ghim ít nhất 1 điểm hiển thị trên bản đồ' });
+    if (style !== 'text' && !points.length) return res.status(400).json({ error: 'Ghim ít nhất 1 điểm hiển thị trên bản đồ' });
     const clash = await query(
       `SELECT wards FROM map_ads WHERE id<>$2 AND status='active' AND now() < expires_at AND wards && $1::text[]`, [wards, id]);
     if (clash.length) {
@@ -93,7 +98,6 @@ mapAdsRouter.put('/:id', adminRequired, async (req: AuthedRequest, res, next) =>
       return res.status(409).json({ error: `Các xã đã có người khác đăng ký độc quyền: ${[...taken].join(', ')}.` });
     }
     const pkg = months ? `${months} tháng` : cur.package;
-    const style = b.style === 'text' ? 'text' : 'seal';
     await query(
       `UPDATE map_ads SET advertiser_name=$2, advertiser_phone=$3, image_url=$4, wards=$5::text[], points=$6::jsonb, package=$7, style=$9,
          expires_at = CASE WHEN $8::int > 0 THEN now() + make_interval(months => $8::int) ELSE expires_at END, status='active'

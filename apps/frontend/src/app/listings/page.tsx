@@ -30,6 +30,7 @@ export default function ListingsPage() {
   const [labels, setLabels] = useState(true);
   const [info, setInfo] = useState<{ x: number; y: number; lng: number; lat: number; parcel: any; zoning: any } | null>(null);
   const [ads, setAds] = useState<any[]>([]);
+  const [sort, setSort] = useState('default');
 
   function load(over?: { type?: string; min?: string; max?: string; q?: string }) {
     setLoading(true);
@@ -53,6 +54,13 @@ export default function ListingsPage() {
 
   const markers = useMemo(() => listings.map((l) => ({ lng: l.lng, lat: l.lat, popupHtml: `<a href="/listings/${l.id}"><b>${l.title}</b></a>` })), [listings]);
   const overlays: ImageOverlay[] = useMemo(() => [{ ...QH, opacity, visible: qhOn }], [opacity, qhOn]);
+  const sorted = useMemo(() => {
+    const a = [...listings];
+    if (sort === 'price-asc') a.sort((x, y) => x.price - y.price);
+    else if (sort === 'price-desc') a.sort((x, y) => y.price - x.price);
+    else if (sort === 'newest') a.sort((x, y) => +new Date(y.createdAt) - +new Date(x.createdAt));
+    return a;
+  }, [listings, sort]);
 
   async function onMapClick(lng: number, lat: number) {
     const vn = wgs84ToVn2000(lng, lat);
@@ -164,6 +172,18 @@ export default function ListingsPage() {
       {/* Thân: danh sách (cuộn) | bản đồ (full chiều cao) */}
       <div className="flex-1 min-h-0 lg:flex">
         <div className={`${view === 'map' ? 'hidden' : ''} lg:block h-full overflow-y-auto scroll-soft px-3 sm:px-4 py-4 w-full lg:w-[58%]`}>
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <h2 className="text-base sm:text-lg font-extrabold text-[#0A2540]">Bất động sản nổi bật</h2>
+            <label className="flex items-center gap-1.5 text-sm text-slate-500 shrink-0">
+              <span className="hidden sm:inline">Sắp xếp</span>
+              <select value={sort} onChange={(e) => setSort(e.target.value)} className="border border-slate-200 rounded-lg px-2.5 py-1.5 text-sm bg-white font-semibold text-[#0A2540] outline-none cursor-pointer">
+                <option value="default">Nổi bật</option>
+                <option value="newest">Mới nhất</option>
+                <option value="price-asc">Giá thấp → cao</option>
+                <option value="price-desc">Giá cao → thấp</option>
+              </select>
+            </label>
+          </div>
           {loading ? (
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -183,7 +203,7 @@ export default function ListingsPage() {
             </div>
           ) : (
             <div className="grid gap-4 content-start grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3">
-              {listings.map((l) => <ListingCard key={l.id} l={l} />)}
+              {sorted.map((l) => <ListingCard key={l.id} l={l} />)}
             </div>
           )}
         </div>

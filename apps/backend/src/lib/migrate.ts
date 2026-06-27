@@ -75,6 +75,22 @@ CREATE TABLE IF NOT EXISTS map_ads (
 );
 CREATE INDEX IF NOT EXISTS map_ads_active_idx ON map_ads (status, expires_at);
 
+-- ── Khách gửi bán / ký gửi BĐS (thu thập thông tin từ khách) ──
+CREATE TABLE IF NOT EXISTS consignments (
+  id            SERIAL PRIMARY KEY,
+  name          TEXT NOT NULL,
+  phone         TEXT NOT NULL,
+  property_type TEXT,
+  ward          TEXT,
+  address       TEXT,
+  area          NUMERIC,
+  price_expect  TEXT,
+  description   TEXT,
+  status        TEXT NOT NULL DEFAULT 'new',
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS consignments_idx ON consignments (status, created_at DESC);
+
 -- ── Dọn dữ liệu: không cho giá âm (đưa về dương) ──
 UPDATE listings SET price = ABS(price) WHERE price < 0;
 `;

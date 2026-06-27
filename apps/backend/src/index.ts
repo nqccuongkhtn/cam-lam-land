@@ -17,6 +17,7 @@ import { imagesRouter } from './routes/images.ts';
 import { adminRouter } from './routes/admin.ts';
 import { qrRouter } from './routes/qr.ts';
 import { mapAdsRouter } from './routes/mapAds.ts';
+import { consignmentsRouter } from './routes/consignments.ts';
 import { notFound, errorHandler } from './middleware/error.ts';
 
 const app = express();
@@ -34,6 +35,7 @@ app.use('/api/images', imagesRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/qr', qrRouter);
 app.use('/api/map-ads', mapAdsRouter);
+app.use('/api/consignments', consignmentsRouter);
 app.use(notFound);
 app.use(errorHandler);
 

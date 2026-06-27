@@ -63,7 +63,7 @@ export default function ListingsPage() {
 
   const mapPanel = (
     <div className="relative h-full w-full">
-      <MapView markers={markers} overlays={overlays} baseMap={baseMap} labels={labels} onMapClick={onMapClick} initialBounds={QH_BOUNDS} adMarkers={ads} className="absolute inset-0 h-full w-full" />
+      <MapView markers={markers} overlays={overlays} baseMap={baseMap} labels={labels} onMapClick={onMapClick} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={qhOn ? opacity : 1} className="absolute inset-0 h-full w-full" />
 
       {/* Bộ chọn nền + bật lớp quy hoạch */}
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-2 max-w-[60%]">
@@ -123,7 +123,7 @@ export default function ListingsPage() {
   );
 
   return (
-    <div className="flex flex-col h-[calc(100vh-56px)] bg-slate-50 max-w-7xl mx-auto w-full">
+    <div className="flex flex-col h-[calc(100vh-56px)] bg-slate-50">
       {/* Thanh lọc */}
       <div className="bg-white border-b border-slate-200 shrink-0 z-20">
         <div className="px-3 sm:px-4 py-2.5 flex flex-wrap gap-2 items-center">

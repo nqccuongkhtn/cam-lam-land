@@ -18,6 +18,7 @@ interface Props {
   highlight?: GeoJSON.Feature | null;
   initialBounds?: [[number, number], [number, number]]; // tự khớp khung vùng quy hoạch khi mở
   adMarkers?: { id: number; lng: number; lat: number; name: string; phone: string; image?: string | null }[];
+  adOpacity?: number; // độ mờ logo quảng cáo (đi theo thanh độ mờ lớp phủ)
   onMapClick?: (lng: number, lat: number) => void;
   onMeasure?: (r: MeasureResult) => void;
 }
@@ -62,12 +63,13 @@ function polyArea(pts: { lng: number; lat: number }[]) {
   return Math.abs(s) / 2;
 }
 
-export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, highlight = null, initialBounds, adMarkers = [], onMapClick, onMeasure }: Props) {
+export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, onMapClick, onMeasure }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const markerRefs = useRef<Marker[]>([]);
   const focusMarker = useRef<Marker | null>(null);
   const adRefs = useRef<Marker[]>([]);
+  const adOpacityRef = useRef(adOpacity); adOpacityRef.current = adOpacity;
   const readyRef = useRef(false);
   const measureModeRef = useRef<MeasureMode>(measureMode);
   const measurePts = useRef<{ lng: number; lat: number }[]>([]);
@@ -195,7 +197,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     adRefs.current.forEach((m) => m.remove());
     const esc = (x: any) => String(x ?? '').replace(/[<>&"]/g, (c) => (({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' } as any)[c]));
     adRefs.current = adMarkers.map((a) => {
-      const el = document.createElement('div'); el.className = 'cl-ad';
+      const el = document.createElement('div'); el.className = 'cl-ad'; el.style.opacity = String(adOpacityRef.current);
       const ring = document.createElement('div'); ring.className = 'cl-ad-ring';
       if (a.image) { const im = document.createElement('img'); im.src = a.image; im.alt = ''; ring.appendChild(im); }
       else { const ph = document.createElement('div'); ph.className = 'cl-ad-ph'; ph.textContent = (a.name || 'CL').charAt(0).toUpperCase(); ring.appendChild(ph); }
@@ -213,6 +215,10 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       mk.addTo(map); return mk;
     });
   }, [adMarkers]);
+
+  useEffect(() => {
+    adRefs.current.forEach((m) => { try { (m.getElement() as HTMLElement).style.opacity = String(adOpacity); } catch {} });
+  }, [adOpacity]);
 
   useEffect(() => {
     const map = mapRef.current; if (!map || !focusPoint) return;

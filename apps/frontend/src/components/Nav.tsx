@@ -63,7 +63,7 @@ export default function Nav() {
 
   return (
     <header className={`${isHome ? 'fixed' : 'sticky'} top-0 inset-x-0 z-50 transition-colors duration-300 ${solid ? 'bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm' : 'bg-gradient-to-b from-black/45 via-black/20 to-transparent'}`}>
-      <div className="mx-auto max-w-7xl h-14 px-4 flex items-center justify-between gap-3">
+      <div className="w-full h-14 px-4 sm:px-5 flex items-center justify-between gap-3">
         <Logo light={!solid} />
         <nav className="hidden md:flex gap-1">
           {links.map((l) => (

@@ -61,6 +61,19 @@ function polyAreaM2(pts: { x: number; y: number }[]): number {
 function perimeterM(pts: { x: number; y: number }[]): number {
   let p = 0; for (let i = 0; i < pts.length; i++) { const j = (i + 1) % pts.length; p += Math.hypot(pts[j].x - pts[i].x, pts[j].y - pts[i].y); } return p;
 }
+let _tess: any = null;
+function loadTesseract(): Promise<any> {
+  if ((window as any).Tesseract) return Promise.resolve((window as any).Tesseract);
+  if (_tess) return _tess;
+  _tess = new Promise((resolve, reject) => {
+    const sc = document.createElement('script');
+    sc.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    sc.onload = () => resolve((window as any).Tesseract);
+    sc.onerror = () => reject(new Error('Không tải được bộ đọc ảnh (OCR).'));
+    document.body.appendChild(sc);
+  });
+  return _tess;
+}
 
 export default function MapPage() {
   const [layers, setLayers] = useState<GisLayer[]>([]);
@@ -84,8 +97,11 @@ export default function MapPage() {
   const [ads, setAds] = useState<any[]>([]);
   const [fitTo, setFitTo] = useState<[[number, number], [number, number]] | null>(null);
   const [drawOpen, setDrawOpen] = useState(false);
-  const [coordText, setCoordText] = useState('');
-  const [drawResult, setDrawResult] = useState<{ n: number; area: number; perim: number } | null>(null);
+  const [drawTab, setDrawTab] = useState<'table' | 'paste' | 'import'>('table');
+  const [rows, setRows] = useState<{ x: string; y: string }[]>([{ x: '', y: '' }, { x: '', y: '' }, { x: '', y: '' }]);
+  const [pasteText, setPasteText] = useState('');
+  const [ocrBusy, setOcrBusy] = useState('');
+  const [drawResult, setDrawResult] = useState<{ n: number; area: number; perim: number; lat: number; lng: number } | null>(null);
   const [tool, setTool] = useState<'none' | 'search' | 'base' | 'measure'>('none'); // bảng công cụ trên mobile
 
   const load = useCallback(() => {
@@ -169,15 +185,45 @@ export default function MapPage() {
     try { await api(`/layers/${slug}`, { method: 'DELETE' }); setData((d) => { const n = { ...d }; delete n[slug]; return n; }); load(); }
     catch (e: any) { alert(/Admin|401|403/i.test(String(e.message)) ? 'Cần đăng nhập Quản trị để xoá.' : 'Lỗi: ' + e.message); }
   }
+  function pointsFromRows(): { x: number; y: number }[] {
+    const pts: { x: number; y: number }[] = [];
+    for (const r of rows) {
+      const a = parseNum(r.x), b = parseNum(r.y);
+      if (!Number.isFinite(a) || !Number.isFinite(b)) continue;
+      const E = a < 900000 ? a : b, N = a < 900000 ? b : a;
+      if (E > 90000 && E < 900000 && N > 900000) pts.push({ x: E, y: N });
+    }
+    return pts;
+  }
+  function applyParsed(parsed: { x: number; y: number }[]) {
+    if (!parsed.length) return alert('Không tìm thấy cặp toạ độ nào. Hãy thử ảnh rõ hơn hoặc nhập tay.');
+    setRows(parsed.map((p) => ({ x: String(p.x), y: String(p.y) })));
+    setDrawTab('table');
+  }
+  async function onCoordFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0]; e.target.value = ''; if (!f) return;
+    setOcrBusy('Đang đọc…');
+    try {
+      if (f.type.startsWith('image/')) {
+        const T = await loadTesseract();
+        setOcrBusy('Đang nhận dạng chữ trong ảnh…');
+        const out = await T.recognize(f, 'eng');
+        applyParsed(parseVnTable(String(out?.data?.text || '')));
+      } else {
+        applyParsed(parseVnTable(await f.text()));
+      }
+    } catch (er: any) { alert('Không đọc được tệp: ' + (er?.message || er)); }
+    finally { setOcrBusy(''); }
+  }
   function drawParcel() {
-    const pts = parseVnTable(coordText);
-    if (pts.length < 3) return alert('Cần ít nhất 3 điểm toạ độ hợp lệ (mỗi dòng một điểm: X Đông, Y Bắc theo VN-2000).');
+    const pts = pointsFromRows();
+    if (pts.length < 3) return alert('Cần ít nhất 3 điểm hợp lệ (X Đông ~5-6 chữ số, Y Bắc ~7 chữ số).');
     const ll = pts.map((p) => { const w = vn2000ToWgs84(p.x, p.y); return [w.lng, w.lat]; });
     const ring = [...ll, ll[0]];
     setHighlight({ type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [ring] } } as any);
     const lngs = ll.map((c) => c[0]), lats = ll.map((c) => c[1]);
     setFitTo([[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]]);
-    setDrawResult({ n: pts.length, area: polyAreaM2(pts), perim: perimeterM(pts) });
+    setDrawResult({ n: pts.length, area: polyAreaM2(pts), perim: perimeterM(pts), lat: ll[0][1], lng: ll[0][0] });
     setClickVN(null); setInfo(null); setFocusPoint(null); setDrawOpen(false);
   }
   const mBtn = (m: MeasureMode, label: string) => (
@@ -334,24 +380,62 @@ export default function MapPage() {
               <p className="text-slate-600">Số điểm: <b>{drawResult.n}</b></p>
               <p className="text-slate-600">Diện tích: <b className="text-emerald-700">{fmtArea(drawResult.area)}</b></p>
               <p className="text-slate-600">Chu vi: <b>{fmtLen(drawResult.perim)}</b></p>
+              <button onClick={() => openDir(drawResult.lat, drawResult.lng)} className="mt-2 w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg py-2">🧭 Chỉ đường tới thửa</button>
             </div>
           )}
           {drawOpen && (
             <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
               <div className="absolute inset-0 bg-black/50" onClick={() => setDrawOpen(false)} />
-              <div className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
-                <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+              <div className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl max-h-[92vh] overflow-y-auto scroll-soft">
+                <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white z-10">
                   <h3 className="font-extrabold text-[#0A2540] text-lg">Vẽ ranh thửa từ toạ độ VN-2000</h3>
                   <button onClick={() => setDrawOpen(false)} className="text-slate-400 hover:text-slate-700 text-2xl leading-none">×</button>
                 </div>
+                <div className="flex border-b border-slate-100 px-3">
+                  {([['table', '⌗ Nhập bảng'], ['paste', '⧉ Dán văn bản'], ['import', '📷 Ảnh / tệp']] as [typeof drawTab, string][]).map(([k, lb]) => (
+                    <button key={k} onClick={() => setDrawTab(k)} className={`px-3 py-2.5 text-sm font-semibold border-b-2 ${drawTab === k ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500'}`}>{lb}</button>
+                  ))}
+                </div>
                 <div className="p-5 space-y-3">
-                  <p className="text-sm text-slate-500">Dán bảng toạ độ các đỉnh thửa, <b>mỗi dòng một điểm</b>. Tự nhận biết X (Đông) và Y (Bắc) — không cần đúng thứ tự cột.</p>
-                  <textarea value={coordText} onChange={(e) => setCoordText(e.target.value)} rows={8} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono" placeholder={'1  596100.00  1334050.00\n2  596150.00  1334035.00\n3  596138.00  1333985.00\n4  596088.00  1334000.00'} />
-                  <div className="flex gap-2">
-                    <button onClick={drawParcel} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl">Vẽ & zoom tới thửa</button>
-                    <button onClick={() => setCoordText('')} className="px-4 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600">Xoá</button>
-                  </div>
-                  <button onClick={() => setCoordText('1  596100.00  1334050.00\n2  596150.00  1334035.00\n3  596138.00  1333985.00\n4  596088.00  1334000.00')} className="text-xs text-[#0A2540] font-semibold underline">Dùng ví dụ mẫu</button>
+                  {drawTab === 'table' && (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-[26px_1fr_1fr_26px] gap-2 text-xs font-semibold text-slate-500 px-1"><span>#</span><span>X (Đông)</span><span>Y (Bắc)</span><span /></div>
+                      <div className="space-y-1.5 max-h-52 overflow-y-auto scroll-soft pr-1">
+                        {rows.map((r, i2) => (
+                          <div key={i2} className="grid grid-cols-[26px_1fr_1fr_26px] gap-2 items-center">
+                            <span className="text-xs text-slate-400 text-center">{i2 + 1}</span>
+                            <input value={r.x} onChange={(e) => setRows((rs) => rs.map((v, j2) => (j2 === i2 ? { ...v, x: e.target.value } : v)))} inputMode="decimal" className="border border-slate-300 rounded-lg px-2 py-1.5 text-sm" placeholder="596100.0" />
+                            <input value={r.y} onChange={(e) => setRows((rs) => rs.map((v, j2) => (j2 === i2 ? { ...v, y: e.target.value } : v)))} inputMode="decimal" className="border border-slate-300 rounded-lg px-2 py-1.5 text-sm" placeholder="1334050.0" />
+                            <button onClick={() => setRows((rs) => (rs.length > 1 ? rs.filter((_, j2) => j2 !== i2) : rs))} className="text-slate-300 hover:text-red-600 text-center">✕</button>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button onClick={() => setRows((rs) => [...rs, { x: '', y: '' }])} className="text-sm font-semibold text-[#0A2540]">+ Thêm điểm</button>
+                        <button onClick={() => setRows([{ x: '596100.0', y: '1334050.0' }, { x: '596150.0', y: '1334035.0' }, { x: '596138.0', y: '1333985.0' }, { x: '596088.0', y: '1334000.0' }])} className="text-xs text-slate-400 underline">Điền ví dụ</button>
+                      </div>
+                    </div>
+                  )}
+                  {drawTab === 'paste' && (
+                    <div className="space-y-2">
+                      <p className="text-sm text-slate-500">Dán bảng toạ độ, mỗi dòng một điểm — tự tách X (Đông) và Y (Bắc).</p>
+                      <textarea value={pasteText} onChange={(e) => setPasteText(e.target.value)} rows={6} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono" placeholder={'1  596100.0  1334050.0\n2  596150.0  1334035.0\n3  596138.0  1333985.0'} />
+                      <button onClick={() => applyParsed(parseVnTable(pasteText))} className="bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-bold px-4 py-2 rounded-lg">Đưa vào bảng →</button>
+                    </div>
+                  )}
+                  {drawTab === 'import' && (
+                    <div className="space-y-2">
+                      <label className="flex flex-col items-center justify-center gap-1.5 border-2 border-dashed border-slate-300 rounded-xl py-7 cursor-pointer hover:border-[#C8A14B] text-sm text-slate-500 font-semibold text-center px-3">
+                        <input type="file" accept="image/*,.txt,.csv" onChange={onCoordFile} className="hidden" />
+                        {ocrBusy ? <span className="text-[#0A2540]">{ocrBusy}</span> : <>📷 Chụp / chọn ảnh bảng toạ độ<span className="text-xs font-normal text-slate-400">hoặc tệp .txt / .csv — tự tách toạ độ</span></>}
+                      </label>
+                      <p className="text-[11px] text-slate-400">Ảnh cần rõ nét, chụp thẳng. Kết quả đưa vào tab &quot;Nhập bảng&quot; để bạn kiểm tra trước khi vẽ.</p>
+                    </div>
+                  )}
+                </div>
+                <div className="px-5 pb-5 pt-1 flex items-center gap-2 sticky bottom-0 bg-white">
+                  <button onClick={drawParcel} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl">Vẽ & zoom tới thửa ({pointsFromRows().length} điểm)</button>
+                  <button onClick={() => { setRows([{ x: '', y: '' }, { x: '', y: '' }, { x: '', y: '' }]); setPasteText(''); }} className="px-4 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600">Xoá</button>
                 </div>
               </div>
             </div>

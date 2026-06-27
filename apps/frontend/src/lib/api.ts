@@ -37,4 +37,11 @@ export async function uploadImages(files: File[]): Promise<{ id: number; url: st
   if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `HTTP ${res.status}`);
   return (await res.json()).images as { id: number; url: string }[];
 }
+export async function ocrImage(blob: Blob): Promise<string> {
+  const fd = new FormData();
+  fd.append('file', blob, 'coords.png');
+  const res = await fetch(`${API_BASE}/ocr`, { method: 'POST', headers: { ...authHeaders() }, body: fd });
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `OCR lỗi (${res.status})`);
+  return (await res.json()).text || '';
+}
 export const apiBase = API_BASE;

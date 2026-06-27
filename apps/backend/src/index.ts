@@ -19,6 +19,7 @@ import { qrRouter } from './routes/qr.ts';
 import { mapAdsRouter } from './routes/mapAds.ts';
 import { consignmentsRouter } from './routes/consignments.ts';
 import { chatRouter } from './routes/chat.ts';
+import { ocrRouter } from './routes/ocr.ts';
 import { notFound, errorHandler } from './middleware/error.ts';
 
 const app = express();
@@ -43,6 +44,7 @@ app.use('/api/qr', qrRouter);
 app.use('/api/map-ads', mapAdsRouter);
 app.use('/api/consignments', consignmentsRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/ocr', ocrRouter);
 app.use(notFound);
 app.use(errorHandler);
 

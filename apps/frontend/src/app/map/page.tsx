@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { api } from '@/lib/api';
+import { api, ocrImage } from '@/lib/api';
 import type { GeoLayer, ImageOverlay, BaseMap, MeasureMode, MeasureResult } from '@/components/MapView';
 import { GisLayer, formatVnd } from '@/lib/types';
 import { vn2000ToWgs84, wgs84ToVn2000 } from '@/lib/vn2000';
@@ -75,22 +75,15 @@ function loadTesseract(): Promise<any> {
   });
   return _tess;
 }
-async function runOcr(src: HTMLCanvasElement, whitelist: string): Promise<string> {
+async function runRecognize(src: HTMLCanvasElement | HTMLImageElement): Promise<string> {
   const T = await loadTesseract();
-  const worker = await T.createWorker('eng');
-  try {
-    const params: any = { tessedit_pageseg_mode: '6' };
-    if (whitelist) params.tessedit_char_whitelist = whitelist;
-    await worker.setParameters(params);
-    const out = await worker.recognize(src);
-    return String(out?.data?.text || '');
-  } finally { try { await worker.terminate(); } catch {} }
+  const out = await T.recognize(src, 'eng');
+  return String(out?.data?.text || '');
 }
-// Tiền xử lý: phóng to + xám + nhị phân hoá THÍCH NGHI (Bradley) — bền với ảnh chụp loá/nghiêng sáng.
 function preprocess(src: HTMLImageElement | HTMLCanvasElement): HTMLCanvasElement {
   const w0 = (src as HTMLImageElement).naturalWidth || (src as HTMLCanvasElement).width;
   const h0 = (src as HTMLImageElement).naturalHeight || (src as HTMLCanvasElement).height;
-  const scl = Math.max(0.5, Math.min(3, 2000 / Math.max(w0, h0)));
+  const scl = Math.max(1, Math.min(2.5, 1500 / Math.max(w0, h0)));
   const w = Math.max(1, Math.round(w0 * scl)), h = Math.max(1, Math.round(h0 * scl));
   const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
   const ctx = cv.getContext('2d', { willReadFrequently: true } as any)!;
@@ -100,7 +93,7 @@ function preprocess(src: HTMLImageElement | HTMLCanvasElement): HTMLCanvasElemen
   for (let p = 0; p < n; p++) { const k = p * 4; g[p] = 0.299 * d[k] + 0.587 * d[k + 1] + 0.114 * d[k + 2]; }
   const integ = new Float64Array((w + 1) * (h + 1));
   for (let y = 0; y < h; y++) { let rs = 0; for (let x = 0; x < w; x++) { rs += g[y * w + x]; integ[(y + 1) * (w + 1) + (x + 1)] = integ[y * (w + 1) + (x + 1)] + rs; } }
-  const half = Math.max(6, Math.floor(w / 32)), th = 0.16;
+  const half = Math.max(8, Math.floor(w / 28)), th = 0.15;
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
     const x1 = Math.max(0, x - half), x2 = Math.min(w - 1, x + half), y1 = Math.max(0, y - half), y2 = Math.min(h - 1, y + half);
     const cnt = (x2 - x1 + 1) * (y2 - y1 + 1);
@@ -112,11 +105,26 @@ function preprocess(src: HTMLImageElement | HTMLCanvasElement): HTMLCanvasElemen
   return cv;
 }
 function normalizeDigits(t: string): string {
-  return t.replace(/[OoQ]/g, '0').replace(/[Il|!]/g, '1').replace(/[Ss]/g, '5').replace(/B/g, '8').replace(/[Zz]/g, '2').replace(/[gq]/g, '9').replace(/G/g, '6');
+  return t.replace(/[OoQ]/g, '0').replace(/[Il|]/g, '1').replace(/[Ss]/g, '5').replace(/B/g, '8').replace(/[Zz]/g, '2').replace(/g/g, '9');
 }
-async function ocrToPoints(cv: HTMLCanvasElement): Promise<{ x: number; y: number }[]> {
-  let pts = parseBigPairs(await runOcr(cv, '0123456789.,'));
-  if (pts.length < 3) pts = parseBigPairs(normalizeDigits(await runOcr(cv, '')));
+function toBlob(src: HTMLImageElement | HTMLCanvasElement): Promise<Blob> {
+  const w0 = src instanceof HTMLCanvasElement ? src.width : ((src as HTMLImageElement).naturalWidth || 1);
+  const h0 = src instanceof HTMLCanvasElement ? src.height : ((src as HTMLImageElement).naturalHeight || 1);
+  const sc = Math.min(1, 1800 / Math.max(w0, h0));
+  const cv = document.createElement('canvas'); cv.width = Math.max(1, Math.round(w0 * sc)); cv.height = Math.max(1, Math.round(h0 * sc));
+  cv.getContext('2d')!.drawImage(src, 0, 0, cv.width, cv.height);
+  return new Promise((resolve, reject) => cv.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), 'image/png'));
+}
+async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{ x: number; y: number }[]> {
+  // 1) Ưu tiên OCR ở SERVER (Tesseract bản gốc — ổn định)
+  try {
+    const txt = await ocrImage(await toBlob(img));
+    const pts = parseBigPairs(normalizeDigits(txt));
+    if (pts.length >= 3) return pts;
+  } catch {}
+  // 2) Dự phòng OCR trong trình duyệt
+  let pts = parseBigPairs(normalizeDigits(await runRecognize(img)));
+  if (pts.length < 3) pts = parseBigPairs(normalizeDigits(await runRecognize(preprocess(img))));
   return pts;
 }
 // Gom tất cả số cỡ toạ độ rồi ghép thành cặp (đỉnh) — bền với bảng nhiều cột.
@@ -272,7 +280,7 @@ export default function MapPage() {
       if (f.type.startsWith('image/')) {
         const img = await loadImage(f);
         setOcrBusy('Đang nhận dạng chữ trong ảnh…');
-        applyParsed(await ocrToPoints(preprocess(img)));
+        applyParsed(await ocrToPoints(img));
       } else { applyParsed(parseBigPairs(await f.text())); }
     } catch (er: any) { alert('Không đọc được tệp: ' + (er?.message || er)); }
     finally { setOcrBusy(''); }
@@ -288,7 +296,7 @@ export default function MapPage() {
     const cap = document.createElement('canvas'); cap.width = cw; cap.height = ch;
     cap.getContext('2d')!.drawImage(v, Math.round((vw - cw) / 2), Math.round((vh - ch) / 2), cw, ch, 0, 0, cw, ch);
     stopCam(); setOcrBusy('Đang nhận dạng chữ trong ảnh…');
-    try { applyParsed(await ocrToPoints(preprocess(cap))); }
+    try { applyParsed(await ocrToPoints(cap)); }
     catch (e: any) { alert('Không đọc được: ' + (e?.message || e)); }
     finally { setOcrBusy(''); }
   }

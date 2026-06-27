@@ -9,7 +9,8 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS status         TEXT NOT NULL DEFAULT 
 ALTER TABLE users ADD COLUMN IF NOT EXISTS tier           TEXT NOT NULL DEFAULT 'free';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar         TEXT;
 ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
-ALTER TABLE users ADD  CONSTRAINT users_role_check CHECK (role IN ('user','admin','sales'));
+UPDATE users SET role='user' WHERE role='sales';
+ALTER TABLE users ADD  CONSTRAINT users_role_check CHECK (role IN ('user','admin','gis'));
 CREATE TABLE IF NOT EXISTS email_verifications (
   id SERIAL PRIMARY KEY, email TEXT NOT NULL, code TEXT NOT NULL,
   expires_at TIMESTAMPTZ NOT NULL, used BOOLEAN NOT NULL DEFAULT false,

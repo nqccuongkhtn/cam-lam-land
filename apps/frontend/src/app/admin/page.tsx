@@ -14,29 +14,32 @@ export default function Admin() {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>('overview');
   useEffect(() => { if (!loading && !user) router.replace('/login'); }, [loading, user, router]);
+  useEffect(() => { if (user?.role === 'gis') setTab('upload'); }, [user]);
 
   if (loading) return <div className="mx-auto max-w-6xl px-4 py-16 text-center text-slate-500">Đang tải…</div>;
   if (!user) return null;
-  if (user.role !== 'admin') return (
+  if (user.role !== 'admin' && user.role !== 'gis') return (
     <div className="mx-auto max-w-md px-4 py-20 text-center">
       <p className="text-xl font-bold text-[#0A2540]">Không có quyền truy cập</p>
-      <p className="text-slate-500 mt-2 text-sm">Trang quản trị chỉ dành cho admin. <Link href="/" className="text-[#0A2540] font-semibold underline">Về trang chủ</Link></p>
+      <p className="text-slate-500 mt-2 text-sm">Trang này chỉ dành cho admin / biên tập GIS. <Link href="/" className="text-[#0A2540] font-semibold underline">Về trang chủ</Link></p>
     </div>
   );
+  const isGis = user.role === 'gis';
+  const shownTabs = isGis ? TABS.filter(([t]) => t === 'upload' || t === 'logs') : TABS;
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-extrabold text-[#0A2540]">Bảng điều khiển quản trị</h1>
+        <h1 className="text-2xl font-extrabold text-[#0A2540]">{isGis ? 'Quản lý bản đồ GIS' : 'Bảng điều khiển quản trị'}</h1>
         <button onClick={() => { logout(); router.replace('/login'); }} className="text-sm text-slate-500 hover:text-slate-800">Đăng xuất</button>
       </div>
       <div className="flex gap-1 border-b mb-5 overflow-x-auto">
-        {TABS.map(([t, l]) => (
+        {shownTabs.map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)} className={`px-4 py-2 text-sm font-semibold border-b-2 whitespace-nowrap ${tab === t ? 'border-[#C8A14B] text-[#0A2540]' : 'border-transparent text-slate-500'}`}>{l}</button>
         ))}
       </div>
-      {tab === 'overview' && <Overview />}
-      {tab === 'users' && <Users />}
-      {tab === 'listings' && <ListingsAdmin />}
+      {tab === 'overview' && !isGis && <Overview />}
+      {tab === 'users' && !isGis && <Users />}
+      {tab === 'listings' && !isGis && <ListingsAdmin />}
       {tab === 'upload' && <UploadGis />}
       {tab === 'logs' && <Logs />}
     </div>
@@ -56,7 +59,7 @@ function Overview() {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Stat label="Người dùng" value={s.users.total} sub={`${s.users.sales} môi giới · ${s.users.paid} trả phí`} />
+        <Stat label="Người dùng" value={s.users.total} sub={`${s.users.gis} biên tập GIS · ${s.users.paid} trả phí`} />
         <Stat label="Tin đăng" value={s.listings.total} sub={`${s.listings.active} hiển thị · ${s.listings.boosted} đẩy`} />
         <Stat label="Tổng giá trị tin" value={formatVnd(s.listings.totalValue)} />
         <Stat label="Ảnh trong CSDL" value={s.images.total} sub={`${(Number(s.images.bytes) / 1048576).toFixed(1)} MB`} />
@@ -83,7 +86,7 @@ function Users() {
           {rows.map((u) => (
             <tr key={u.id} className="border-t">
               <td className="p-2"><div className="font-semibold text-[#0A2540]">{u.fullName || u.email}</div><div className="text-xs text-slate-400">{u.email} · {u.phone || '—'}</div></td>
-              <td className="p-2"><select value={u.role} onChange={(e) => upd(u.id, { role: e.target.value })} className={sel}><option value="user">Khách</option><option value="sales">Môi giới</option><option value="admin">Admin</option></select></td>
+              <td className="p-2"><select value={u.role} onChange={(e) => upd(u.id, { role: e.target.value })} className={sel}><option value="user">Khách</option><option value="gis">Biên tập GIS</option><option value="admin">Admin</option></select></td>
               <td className="p-2"><select value={u.tier} onChange={(e) => upd(u.id, { tier: e.target.value })} className={sel}><option value="free">Free</option><option value="paid">Trả phí</option></select></td>
               <td className="p-2"><select value={u.status} onChange={(e) => upd(u.id, { status: e.target.value })} className={sel}><option value="active">Hoạt động</option><option value="suspended">Khoá</option></select></td>
             </tr>

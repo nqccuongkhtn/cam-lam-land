@@ -18,3 +18,11 @@ export function adminRequired(req: AuthedRequest, res: Response, next: NextFunct
     next();
   });
 }
+
+export function gisRequired(req: AuthedRequest, res: Response, next: NextFunction) {
+  authRequired(req, res, () => {
+    if (req.user?.role !== 'admin' && req.user?.role !== 'gis')
+      return res.status(403).json({ error: 'Cần quyền quản lý bản đồ (admin hoặc GIS)' });
+    next();
+  });
+}

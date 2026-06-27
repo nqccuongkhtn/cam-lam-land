@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
-import { adminRequired } from '../middleware/auth.ts';
+import { gisRequired } from '../middleware/auth.ts';
 
 export const layersRouter = Router();
 
@@ -42,7 +42,7 @@ layersRouter.get('/:slug/features', async (req, res, next) => {
 });
 
 // DELETE /api/layers/:slug  (admin) — remove a layer and all its features (ON DELETE CASCADE)
-layersRouter.delete('/:slug', adminRequired, async (req, res, next) => {
+layersRouter.delete('/:slug', gisRequired, async (req, res, next) => {
   try {
     const rows = await query('DELETE FROM gis_layers WHERE slug=$1 RETURNING id, name', [req.params.slug]);
     if (!rows.length) return res.status(404).json({ error: 'Layer not found' });

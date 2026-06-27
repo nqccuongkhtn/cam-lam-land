@@ -5,6 +5,7 @@ import { api, uploadImages } from '@/lib/api';
 import { resizeImage } from '@/lib/img';
 import { useAuth } from '@/lib/auth';
 import PasswordInput from '@/components/PasswordInput';
+import ImageCropper from '@/components/ImageCropper';
 
 export default function Account() {
   const router = useRouter();
@@ -14,17 +15,20 @@ export default function Account() {
   const [curPw, setCurPw] = useState(''); const [newPw, setNewPw] = useState('');
   const [msg, setMsg] = useState(''); const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false); const [uploading, setUploading] = useState(false);
+  const [cropFile, setCropFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (!loading && !user) { router.replace('/login'); return; }
     if (user) { setFullName(user.fullName || ''); setPhone(user.phone || ''); setAvatar(user.avatar || null); }
   }, [loading, user, router]);
 
-  async function onAvatar(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0]; if (!f) return;
-    setUploading(true); setErr(''); setMsg('');
-    try { const r = await uploadImages([await resizeImage(f, 512, 0.85)]); setAvatar(r[0].url); }
-    catch (e: any) { setErr('Lỗi tải ảnh: ' + e.message); } finally { setUploading(false); e.target.value = ''; }
+  function onAvatar(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0]; e.target.value = ''; if (f) setCropFile(f);
+  }
+  async function onCropDone(blob: Blob) {
+    setCropFile(null); setUploading(true); setErr(''); setMsg('');
+    try { const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' }); const r = await uploadImages([file]); setAvatar(r[0].url); }
+    catch (e: any) { setErr('Lỗi tải ảnh: ' + e.message); } finally { setUploading(false); }
   }
   async function saveInfo(e: React.FormEvent) {
     e.preventDefault(); setErr(''); setMsg(''); setBusy(true);
@@ -75,6 +79,7 @@ export default function Account() {
 
         {err && <p className="text-red-600 text-sm font-semibold">{err}</p>}
         {msg && !err && <p className="text-emerald-600 text-sm font-semibold">{msg}</p>}
+        {cropFile && <ImageCropper file={cropFile} title="Cân chỉnh ảnh đại diện" onCancel={() => setCropFile(null)} onDone={onCropDone} />}
       </div>
     </div>
   );

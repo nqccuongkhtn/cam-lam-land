@@ -94,7 +94,7 @@ export default function Nav() {
                     <Link href="/sales/post" className={`${mItem} sm:hidden text-[#C8A14B]`}>＋ Đăng tin mới</Link>
                     <Link href="/account" className={mItem}>Tài khoản của tôi</Link>
                     <Link href="/sales" className={mItem}>Tin của tôi</Link>
-                    {user.role === 'admin' && <Link href="/admin" className={mItem}>Quản trị</Link>}
+                    {(user.role === 'admin' || user.role === 'gis') && <Link href="/admin" className={mItem}>{user.role === 'admin' ? 'Quản trị' : 'Tải bản đồ GIS'}</Link>}
                     {user.role === 'admin' && <Link href="/map-ads" className={mItem}>Quảng cáo bản đồ</Link>}
                     {user.role === 'admin' && <Link href="/consignments" className={mItem}>Khách gửi bán</Link>}
                     <div className="border-t border-slate-100 my-1" />
@@ -125,7 +125,7 @@ export default function Nav() {
             <Link href="/sales/post" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-bold text-[#C8A14B] hover:bg-slate-50">＋ Đăng tin mới</Link>
             <Link href="/sales" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Tin của tôi</Link>
           </>)}
-          {user?.role === 'admin' && <Link href="/admin" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Quản trị</Link>}
+          {(user?.role === 'admin' || user?.role === 'gis') && <Link href="/admin" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">{user?.role === 'admin' ? 'Quản trị' : 'Tải bản đồ GIS'}</Link>}
           {user?.role === 'admin' && <Link href="/map-ads" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Quảng cáo bản đồ</Link>}
           {user?.role === 'admin' && <Link href="/consignments" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Khách gửi bán</Link>}
           <a href="tel:0988888888" className="py-2.5 px-2 text-sm font-bold text-[#0A2540]">📞 Hotline 0988 888 888</a>

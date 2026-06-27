@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { api } from '@/lib/api';
 import { WARDS, PROPERTY_LABELS, type PropertyType } from '@/lib/types';
@@ -14,6 +14,15 @@ export default function SellFab() {
   const [err, setErr] = useState('');
   const [f, setF] = useState({ name: '', phone: '', propertyType: '', ward: '', address: '', area: '', priceExpect: '', description: '' });
   const set = (k: string, v: string) => setF((s) => ({ ...s, [k]: v }));
+  const [hint, setHint] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try { if (localStorage.getItem('cl-sell-hint') === '1') return; } catch {}
+    const t = setTimeout(() => setHint(true), 1800);
+    return () => clearTimeout(t);
+  }, []);
+  useEffect(() => { if (!hint) return; const t = setTimeout(() => setHint(false), 12000); return () => clearTimeout(t); }, [hint]);
+  function dismissHint() { setHint(false); try { localStorage.setItem('cl-sell-hint', '1'); } catch {} }
 
   if (path?.startsWith('/admin') || path?.startsWith('/map-ads') || path?.startsWith('/consignments')) return null;
 
@@ -30,11 +39,21 @@ export default function SellFab() {
 
   return (
     <>
-      <button onClick={() => setOpen(true)} aria-label="Gửi bán nhà đất"
-        className="fixed bottom-5 right-5 z-[55] flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold pl-3.5 pr-4 py-3 rounded-full shadow-2xl shadow-red-900/40 ring-2 ring-white/50 transition hover:scale-105 active:scale-95">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /><path d="M9 21v-6h6v6" /></svg>
-        <span className="hidden sm:inline text-sm">Gửi bán nhà đất</span>
-      </button>
+      <div className="fixed bottom-5 right-5 z-[55] flex items-end gap-2">
+        {hint && (
+          <div className="relative bg-white rounded-2xl shadow-xl border border-slate-200 px-3.5 py-2.5 w-[190px]" style={{ animation: 'clPop .3s ease' }}>
+            <button onClick={dismissHint} aria-label="Đóng" className="absolute -top-2 -right-2 w-5 h-5 bg-slate-700 hover:bg-slate-900 text-white rounded-full text-xs grid place-items-center">×</button>
+            <p className="font-bold text-[#0A2540] text-sm leading-snug">Bạn có nhà đất cần bán?</p>
+            <p className="text-xs text-slate-500 mt-0.5">Ký gửi miễn phí — định giá & bán giúp bạn.</p>
+            <button onClick={() => { setOpen(true); dismissHint(); }} className="text-xs font-bold text-red-600 mt-1.5">Gửi bán ngay →</button>
+          </div>
+        )}
+        <button onClick={() => setOpen(true)} aria-label="Gửi bán nhà đất"
+          className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold pl-3.5 pr-4 py-3 rounded-full shadow-2xl shadow-red-900/40 ring-2 ring-white/50 transition hover:scale-105 active:scale-95">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /><path d="M9 21v-6h6v6" /></svg>
+          <span className="hidden sm:inline text-sm">Gửi bán nhà đất</span>
+        </button>
+      </div>
 
       {open && (
         <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">

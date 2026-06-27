@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { api } from './api';
 import { getToken, setToken, clearToken } from './token';
 
-export type Role = 'user' | 'admin' | 'sales';
+export type Role = 'user' | 'admin' | 'gis';
 export interface AuthUser {
   id: number; email: string; role: Role;
   fullName?: string | null; phone?: string | null;

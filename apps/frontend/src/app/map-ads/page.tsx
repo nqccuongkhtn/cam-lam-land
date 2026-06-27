@@ -7,6 +7,7 @@ import { api, uploadImages } from '@/lib/api';
 import { resizeImage } from '@/lib/img';
 import { useAuth } from '@/lib/auth';
 import { WARDS } from '@/lib/types';
+import ImageCropper from '@/components/ImageCropper';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
@@ -31,16 +32,19 @@ export default function MapAdsPage() {
   const [err, setErr] = useState('');
   const [ok, setOk] = useState('');
   const [list, setList] = useState<Ad[]>([]);
+  const [cropFile, setCropFile] = useState<File | null>(null);
 
   useEffect(() => { if (!loading && (!user || user.role !== 'admin')) router.replace('/'); }, [loading, user, router]);
   function reload() { api<{ ads: Ad[] }>('/map-ads').then((r) => setList(r.ads || [])).catch(() => {}); }
   useEffect(() => { if (user?.role === 'admin') reload(); }, [user]);
 
-  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0]; if (!f) return;
-    setUploading(true); setErr('');
-    try { const x = await resizeImage(f); const up = await uploadImages([x]); setImageUrl(up[0].url); }
-    catch (e: any) { setErr('Lỗi tải ảnh: ' + e.message); } finally { setUploading(false); e.target.value = ''; }
+  function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0]; e.target.value = ''; if (f) setCropFile(f);
+  }
+  async function onCropDone(blob: Blob) {
+    setCropFile(null); setUploading(true); setErr('');
+    try { const file = new File([blob], 'ad.jpg', { type: 'image/jpeg' }); const up = await uploadImages([file]); setImageUrl(up[0].url); }
+    catch (e: any) { setErr('Lỗi tải ảnh: ' + e.message); } finally { setUploading(false); }
   }
   function toggleWard(w: string) { setWards((s) => (s.includes(w) ? s.filter((x) => x !== w) : [...s, w])); }
 
@@ -64,6 +68,7 @@ export default function MapAdsPage() {
 
   if (loading || !user || user.role !== 'admin') return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
 
+  const taken = new Set(list.filter((a) => a.active).flatMap((a) => a.wards || []));
   const preview = points.map((p, i) => ({ id: i, lng: p.lng, lat: p.lat, name: name || 'Tên sales', phone: phone || '09xx', image: imageUrl }));
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm';
   const lbl = 'text-sm font-semibold text-slate-700';
@@ -87,7 +92,7 @@ export default function MapAdsPage() {
             <div>
               <label className={lbl}>Ảnh / avatar nhận diện</label>
               <div className="flex items-center gap-4 mt-2">
-                <svg width="86" height="86" viewBox="0 0 96 96" style={{ filter: 'drop-shadow(0 2px 5px rgba(0,0,0,.3))' }}><defs><clipPath id="cpv"><circle cx="48" cy="48" r="30" /></clipPath><path id="tpv" d="M 10 48 A 38 38 0 0 1 86 48" /><path id="bpv" d="M 86 48 A 38 38 0 0 0 10 48" /></defs><circle cx="48" cy="48" r="47" fill="#0A2540" /><circle cx="48" cy="48" r="45.5" fill="none" stroke="#C8A14B" strokeWidth="0.9" />{imageUrl ? <image href={imageUrl} x="18" y="18" width="60" height="60" clipPath="url(#cpv)" preserveAspectRatio="xMidYMid slice" /> : <text x="48" y="50" textAnchor="middle" dominantBaseline="middle" fontSize="22" fontWeight="800" fill="#C8A14B">{(name || 'C').charAt(0).toUpperCase()}</text>}<circle cx="48" cy="48" r="31" fill="none" stroke="#C8A14B" strokeWidth="1.3" /><text fontSize="8.4" fontWeight="800" letterSpacing="0.3" fill="#fff"><textPath href="#tpv" startOffset="50%" textAnchor="middle">{(name || 'Tên sales').slice(0, 16)}</textPath></text><text fontSize="8.4" fontWeight="800" letterSpacing="0.8" fill="#fff"><textPath href="#bpv" startOffset="50%" textAnchor="middle">{phone || 'SĐT'}</textPath></text><text x="8.5" y="48" textAnchor="middle" dominantBaseline="central" fontSize="7.5" fill="#C8A14B">★</text><text x="87.5" y="48" textAnchor="middle" dominantBaseline="central" fontSize="7.5" fill="#C8A14B">★</text></svg>
+                <svg width="86" height="86" viewBox="0 0 96 96" style={{ filter: 'drop-shadow(0 2px 5px rgba(0,0,0,.3))' }}><defs><clipPath id="cpv"><circle cx="48" cy="48" r="30" /></clipPath><path id="tpv" d="M 10 48 A 38 38 0 0 1 86 48" /><path id="bpv" d="M 86 48 A 38 38 0 0 1 10 48" /></defs><circle cx="48" cy="48" r="47" fill="#0A2540" /><circle cx="48" cy="48" r="45.5" fill="none" stroke="#C8A14B" strokeWidth="0.9" />{imageUrl ? <image href={imageUrl} x="18" y="18" width="60" height="60" clipPath="url(#cpv)" preserveAspectRatio="xMidYMid slice" /> : <text x="48" y="50" textAnchor="middle" dominantBaseline="middle" fontSize="22" fontWeight="800" fill="#C8A14B">{(name || 'C').charAt(0).toUpperCase()}</text>}<circle cx="48" cy="48" r="31" fill="none" stroke="#C8A14B" strokeWidth="1.3" /><text fontSize="8.4" fontWeight="800" letterSpacing="0.3" fill="#fff"><textPath href="#tpv" startOffset="50%" textAnchor="middle">{(name || 'Tên sales').slice(0, 16)}</textPath></text><text fontSize="8.4" fontWeight="800" letterSpacing="0.8" fill="#fff"><textPath href="#bpv" startOffset="50%" textAnchor="middle">{phone || 'SĐT'}</textPath></text><text x="8.5" y="48" textAnchor="middle" dominantBaseline="central" fontSize="7.5" fill="#C8A14B">★</text><text x="87.5" y="48" textAnchor="middle" dominantBaseline="central" fontSize="7.5" fill="#C8A14B">★</text></svg>
                 <label className="bg-white border border-slate-300 px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-slate-50">{uploading ? 'Đang tải…' : '🖼️ Tải ảnh'}<input type="file" accept="image/*" onChange={onFile} className="hidden" /></label>
                 {imageUrl && <button onClick={() => setImageUrl(null)} className="text-xs text-red-600">Xoá ảnh</button>}
               </div>
@@ -95,11 +100,15 @@ export default function MapAdsPage() {
             <div>
               <label className={lbl}>Xã đăng ký (độc quyền) *</label>
               <div className="grid grid-cols-2 gap-1.5 mt-1 max-h-44 overflow-y-auto scroll-soft border border-slate-200 rounded-lg p-2">
-                {WARDS.map((w) => (
-                  <label key={w} className="flex items-center gap-1.5 text-sm cursor-pointer">
-                    <input type="checkbox" checked={wards.includes(w)} onChange={() => toggleWard(w)} className="accent-[#0A2540]" />{w}
-                  </label>
-                ))}
+                {WARDS.map((w) => {
+                  const locked = taken.has(w) && !wards.includes(w);
+                  return (
+                    <label key={w} className={`flex items-center gap-1.5 text-sm ${locked ? 'text-slate-300 cursor-not-allowed' : 'cursor-pointer'}`}>
+                      <input type="checkbox" disabled={locked} checked={wards.includes(w)} onChange={() => toggleWard(w)} className="accent-[#0A2540]" />
+                      <span>{w}{locked && <span className="text-[10px] text-red-400 ml-0.5">(đã thuê)</span>}</span>
+                    </label>
+                  );
+                })}
               </div>
             </div>
             <div>
@@ -141,6 +150,8 @@ export default function MapAdsPage() {
             </div>
           )}
         </section>
+
+        {cropFile && <ImageCropper file={cropFile} title="Cân chỉnh ảnh quảng cáo" onCancel={() => setCropFile(null)} onDone={onCropDone} />}
       </div>
     </div>
   );

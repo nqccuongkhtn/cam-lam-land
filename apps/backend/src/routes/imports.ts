@@ -4,7 +4,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { query } from '../lib/db.ts';
 import { env } from '../lib/env.ts';
-import { adminRequired, type AuthedRequest } from '../middleware/auth.ts';
+import { gisRequired, type AuthedRequest } from '../middleware/auth.ts';
 
 export const importsRouter = Router();
 
@@ -19,7 +19,7 @@ const upload = multer({ storage, limits: { fileSize: 200 * 1024 * 1024 } });
 const FORMATS: Record<string, string> = { '.dgn': 'dgn', '.shp': 'shp', '.zip': 'shp', '.geojson': 'geojson', '.json': 'geojson' };
 
 // POST /api/imports/upload  (admin) — upload a .dgn/.shp/.zip/.geojson and queue conversion
-importsRouter.post('/upload', adminRequired, upload.single('file'), async (req: AuthedRequest, res, next) => {
+importsRouter.post('/upload', gisRequired, upload.single('file'), async (req: AuthedRequest, res, next) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'file field is required' });
     const ext = path.extname(req.file.originalname).toLowerCase();
@@ -39,7 +39,7 @@ importsRouter.post('/upload', adminRequired, upload.single('file'), async (req: 
 });
 
 // GET /api/imports  (admin) — processing log / status
-importsRouter.get('/', adminRequired, async (_req, res, next) => {
+importsRouter.get('/', gisRequired, async (_req, res, next) => {
   try {
     const jobs = await query(`
       SELECT id, layer_id AS "layerId", original_filename AS "originalFilename",
@@ -52,7 +52,7 @@ importsRouter.get('/', adminRequired, async (_req, res, next) => {
 });
 
 // DELETE /api/imports/:id  (admin) — remove a job AND its imported layer (+ features via cascade)
-importsRouter.delete('/:id', adminRequired, async (req, res, next) => {
+importsRouter.delete('/:id', gisRequired, async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     const [job] = await query('SELECT layer_id FROM import_jobs WHERE id=$1', [id]);

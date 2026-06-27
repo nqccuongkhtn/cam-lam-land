@@ -42,25 +42,6 @@ authRouter.post('/register', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// Sales / Môi giới đăng ký — phải xác thực email
-authRouter.post('/register-sales', async (req, res, next) => {
-  try {
-    const { fullName, email, phone, password } = req.body ?? {};
-    if (!fullName || !email || !password || !phone) return res.status(400).json({ error: 'Cần họ tên, email, số điện thoại, mật khẩu' });
-    if (!isEmail(email)) return res.status(400).json({ error: 'Email không hợp lệ' });
-    if (String(password).length < 6) return res.status(400).json({ error: 'Mật khẩu tối thiểu 6 ký tự' });
-    if ((await query('SELECT id FROM users WHERE email=$1', [email])).length)
-      return res.status(409).json({ error: 'Email đã được đăng ký' });
-    const hash = await hashPassword(password);
-    await query(
-      `INSERT INTO users (email, password_hash, role, full_name, phone, email_verified, status, tier)
-       VALUES ($1,$2,'sales',$3,$4,false,'active','free')`,
-      [email, hash, fullName, phone ?? null]);
-    const code = await issueCode(email);
-    res.status(201).json({ message: 'Đã gửi mã xác thực tới email của bạn', email, ...(EMAIL_LIVE ? {} : { devCode: code }) });
-  } catch (e) { next(e); }
-});
-
 // Xác thực email bằng mã 6 số → tự đăng nhập
 authRouter.post('/verify-email', async (req, res, next) => {
   try {
@@ -90,7 +71,7 @@ authRouter.post('/resend-code', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// Đăng nhập — trả role; chặn sales chưa xác thực / tài khoản khoá
+// Đăng nhập — trả role; chặn tài khoản bị khoá
 authRouter.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body ?? {};
@@ -99,8 +80,6 @@ authRouter.post('/login', async (req, res, next) => {
     if (!(await verifyPassword(password ?? '', user.password_hash)))
       return res.status(401).json({ error: 'Mật khẩu không đúng' });
     if (user.status === 'suspended') return res.status(403).json({ error: 'Tài khoản đã bị khoá' });
-    if (user.role === 'sales' && !user.email_verified)
-      return res.status(403).json({ error: 'Email chưa xác thực', needVerify: true, email: user.email });
     const token = signToken({ id: user.id, email: user.email, role: user.role });
     res.json({ token, user: profile(user) });
   } catch (e) { next(e); }

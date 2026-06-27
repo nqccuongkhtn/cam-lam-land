@@ -16,6 +16,7 @@ async function ensureUser(email: string, password: string, role: string, fullNam
 export async function ensureAdmin(): Promise<void> {
   await ensureUser(env.adminEmail, env.adminPassword, 'admin', 'Quản trị viên', '0988888888', 'paid');
   await ensureUser('khach@camlam.vn', 'khach12345', 'user', 'Nguyễn Văn Khách', '0900000001');
+  await ensureUser('dat@camlam.vn', 'dat12345', 'gis', 'Nguyễn Tiến Đạt', '0900000002');
 
   // Quảng cáo bản đồ mẫu (để hiển thị ngay trên bản đồ)
   const ad = await query('SELECT id FROM map_ads LIMIT 1');

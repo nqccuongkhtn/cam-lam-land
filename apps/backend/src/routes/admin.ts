@@ -10,7 +10,7 @@ adminRouter.get('/stats', async (_req, res, next) => {
   try {
     const [users] = await query(`SELECT
       count(*)::int AS total,
-      count(*) FILTER (WHERE role='sales')::int AS sales,
+      count(*) FILTER (WHERE role='gis')::int AS gis,
       count(*) FILTER (WHERE role='user')::int  AS users,
       count(*) FILTER (WHERE role='admin')::int AS admins,
       count(*) FILTER (WHERE tier='paid')::int  AS paid

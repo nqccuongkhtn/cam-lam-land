@@ -6,6 +6,7 @@ import type { GeoLayer, ImageOverlay, BaseMap, MeasureMode, MeasureResult } from
 import { GisLayer, formatVnd } from '@/lib/types';
 import { vn2000ToWgs84, wgs84ToVn2000 } from '@/lib/vn2000';
 import { getToken } from '@/lib/token';
+import { useAuth } from '@/lib/auth';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false, loading: () => <div className="h-full w-full grid place-items-center bg-slate-100 text-slate-400 text-sm animate-pulse">Đang tải bản đồ…</div> });
 
@@ -76,6 +77,7 @@ function loadTesseract(): Promise<any> {
 }
 
 export default function MapPage() {
+  const { user } = useAuth();
   const [layers, setLayers] = useState<GisLayer[]>([]);
   const [data, setData] = useState<Record<string, GeoJSON.FeatureCollection>>({});
   const [visible, setVisible] = useState<Record<string, boolean>>({});
@@ -115,7 +117,8 @@ export default function MapPage() {
       setData(Object.fromEntries(entries));
     }).catch(() => {});
   }, []);
-  useEffect(() => { load(); setCanDelete(!!getToken()); api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {}); }, [load]);
+  useEffect(() => { load(); api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {}); }, [load]);
+  useEffect(() => { setCanDelete(user?.role === 'admin' || user?.role === 'gis'); }, [user]);
 
   const overlays: ImageOverlay[] = useMemo(
     () => RASTER_OVERLAYS.map((o) => ({ id: o.id, url: o.url, coordinates: o.coordinates, opacity, visible: ovOn[o.id] ?? true })), [opacity, ovOn]);

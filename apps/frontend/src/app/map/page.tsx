@@ -75,36 +75,49 @@ function loadTesseract(): Promise<any> {
   });
   return _tess;
 }
-async function runOcr(src: HTMLCanvasElement | HTMLImageElement): Promise<string> {
+async function runOcr(src: HTMLCanvasElement, whitelist: string): Promise<string> {
   const T = await loadTesseract();
   const worker = await T.createWorker('eng');
   try {
-    await worker.setParameters({ tessedit_char_whitelist: '0123456789.,', tessedit_pageseg_mode: '6' });
+    const params: any = { tessedit_pageseg_mode: '6' };
+    if (whitelist) params.tessedit_char_whitelist = whitelist;
+    await worker.setParameters(params);
     const out = await worker.recognize(src);
     return String(out?.data?.text || '');
   } finally { try { await worker.terminate(); } catch {} }
 }
-function otsu(hist: number[], total: number): number {
-  let sum = 0; for (let i = 0; i < 256; i++) sum += i * hist[i];
-  let sumB = 0, wB = 0, max = 0, th = 127;
-  for (let i = 0; i < 256; i++) { wB += hist[i]; if (!wB) continue; const wF = total - wB; if (!wF) break; sumB += i * hist[i]; const between = wB * wF * ((sumB / wB) - ((sum - sumB) / wF)) ** 2; if (between > max) { max = between; th = i; } }
-  return th;
-}
+// Tiền xử lý: phóng to + xám + nhị phân hoá THÍCH NGHI (Bradley) — bền với ảnh chụp loá/nghiêng sáng.
 function preprocess(src: HTMLImageElement | HTMLCanvasElement): HTMLCanvasElement {
   const w0 = (src as HTMLImageElement).naturalWidth || (src as HTMLCanvasElement).width;
   const h0 = (src as HTMLImageElement).naturalHeight || (src as HTMLCanvasElement).height;
-  const sc = w0 < 1100 ? Math.min(1700 / w0, 3) : 1;
-  const w = Math.max(1, Math.round(w0 * sc)), h = Math.max(1, Math.round(h0 * sc));
+  const scl = Math.max(0.5, Math.min(3, 2000 / Math.max(w0, h0)));
+  const w = Math.max(1, Math.round(w0 * scl)), h = Math.max(1, Math.round(h0 * scl));
   const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
   const ctx = cv.getContext('2d', { willReadFrequently: true } as any)!;
-  ctx.drawImage(src, 0, 0, w, h);
-  const im = ctx.getImageData(0, 0, w, h), d = im.data;
-  const hist = new Array(256).fill(0); const g = new Uint8Array(w * h);
-  for (let i = 0, p = 0; i < d.length; i += 4, p++) { const v = (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]) | 0; g[p] = v; hist[v]++; }
-  const th = otsu(hist, w * h);
-  for (let i = 0, p = 0; i < d.length; i += 4, p++) { const v = g[p] > th ? 255 : 0; d[i] = d[i + 1] = d[i + 2] = v; }
+  (ctx as any).imageSmoothingQuality = 'high'; ctx.drawImage(src, 0, 0, w, h);
+  const im = ctx.getImageData(0, 0, w, h), d = im.data, n = w * h;
+  const g = new Float64Array(n);
+  for (let p = 0; p < n; p++) { const k = p * 4; g[p] = 0.299 * d[k] + 0.587 * d[k + 1] + 0.114 * d[k + 2]; }
+  const integ = new Float64Array((w + 1) * (h + 1));
+  for (let y = 0; y < h; y++) { let rs = 0; for (let x = 0; x < w; x++) { rs += g[y * w + x]; integ[(y + 1) * (w + 1) + (x + 1)] = integ[y * (w + 1) + (x + 1)] + rs; } }
+  const half = Math.max(6, Math.floor(w / 32)), th = 0.16;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const x1 = Math.max(0, x - half), x2 = Math.min(w - 1, x + half), y1 = Math.max(0, y - half), y2 = Math.min(h - 1, y + half);
+    const cnt = (x2 - x1 + 1) * (y2 - y1 + 1);
+    const sum = integ[(y2 + 1) * (w + 1) + (x2 + 1)] - integ[y1 * (w + 1) + (x2 + 1)] - integ[(y2 + 1) * (w + 1) + x1] + integ[y1 * (w + 1) + x1];
+    const v = (g[y * w + x] * cnt <= sum * (1 - th)) ? 0 : 255;
+    const k = (y * w + x) * 4; d[k] = d[k + 1] = d[k + 2] = v;
+  }
   ctx.putImageData(im, 0, 0);
   return cv;
+}
+function normalizeDigits(t: string): string {
+  return t.replace(/[OoQ]/g, '0').replace(/[Il|!]/g, '1').replace(/[Ss]/g, '5').replace(/B/g, '8').replace(/[Zz]/g, '2').replace(/[gq]/g, '9').replace(/G/g, '6');
+}
+async function ocrToPoints(cv: HTMLCanvasElement): Promise<{ x: number; y: number }[]> {
+  let pts = parseBigPairs(await runOcr(cv, '0123456789.,'));
+  if (pts.length < 3) pts = parseBigPairs(normalizeDigits(await runOcr(cv, '')));
+  return pts;
 }
 // Gom tất cả số cỡ toạ độ rồi ghép thành cặp (đỉnh) — bền với bảng nhiều cột.
 function parseBigPairs(text: string): { x: number; y: number }[] {
@@ -245,7 +258,7 @@ export default function MapPage() {
     return pts;
   }
   function applyParsed(parsed: { x: number; y: number }[]) {
-    if (!parsed.length) return alert('Không tìm thấy cặp toạ độ nào. Hãy thử ảnh rõ hơn hoặc nhập tay.');
+    if (!parsed.length) return alert('Chưa nhận được toạ độ từ ảnh. Hãy chụp GẦN, THẲNG, đủ sáng — chỉ lấy phần bảng số. Hoặc nhập tay ở tab "Nhập bảng".');
     setRows(parsed.map((p) => ({ x: String(p.x), y: String(p.y) })));
     setDrawTab('table');
   }
@@ -259,7 +272,7 @@ export default function MapPage() {
       if (f.type.startsWith('image/')) {
         const img = await loadImage(f);
         setOcrBusy('Đang nhận dạng chữ trong ảnh…');
-        applyParsed(parseBigPairs(await runOcr(preprocess(img))));
+        applyParsed(await ocrToPoints(preprocess(img)));
       } else { applyParsed(parseBigPairs(await f.text())); }
     } catch (er: any) { alert('Không đọc được tệp: ' + (er?.message || er)); }
     finally { setOcrBusy(''); }
@@ -275,7 +288,7 @@ export default function MapPage() {
     const cap = document.createElement('canvas'); cap.width = cw; cap.height = ch;
     cap.getContext('2d')!.drawImage(v, Math.round((vw - cw) / 2), Math.round((vh - ch) / 2), cw, ch, 0, 0, cw, ch);
     stopCam(); setOcrBusy('Đang nhận dạng chữ trong ảnh…');
-    try { applyParsed(parseBigPairs(await runOcr(preprocess(cap)))); }
+    try { applyParsed(await ocrToPoints(preprocess(cap))); }
     catch (e: any) { alert('Không đọc được: ' + (e?.message || e)); }
     finally { setOcrBusy(''); }
   }

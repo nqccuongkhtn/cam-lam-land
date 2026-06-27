@@ -112,13 +112,30 @@ chatRouter.get('/rooms', authRequired, async (req: AuthedRequest, res, next) => 
     const rows = await query(
       `SELECT m.room,
               COALESCE(NULLIF(u.full_name, ''), u.email, 'Khách') AS name,
+              u.phone AS phone,
               (SELECT body FROM chat_messages WHERE room=m.room ORDER BY id DESC LIMIT 1) AS "lastBody",
               max(m.created_at) AS "lastAt", count(*)::int AS count
          FROM chat_messages m
          LEFT JOIN users u ON u.id = NULLIF(split_part(m.room, ':', 2), '')::int
          WHERE m.room LIKE 'support:%'
-         GROUP BY m.room, u.full_name, u.email
+         GROUP BY m.room, u.full_name, u.email, u.phone
          ORDER BY max(m.created_at) DESC`);
     res.json({ rooms: rows });
+  } catch (e) { next(e); }
+});
+
+// GET /api/chat/users?q= — admin tìm khách (kể cả chưa từng nhắn) để mở hội thoại mới
+chatRouter.get('/users', authRequired, async (req: AuthedRequest, res, next) => {
+  try {
+    if (req.user!.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+    const q = String(req.query.q ?? '').trim();
+    if (!q) return res.json({ users: [] });
+    const like = `%${q.replace(/[%_\\]/g, (m) => '\\' + m)}%`;
+    const rows = await query(
+      `SELECT id, COALESCE(NULLIF(full_name,''), email) AS name, email, phone, avatar
+         FROM users
+        WHERE role <> 'admin' AND (full_name ILIKE $1 OR email ILIKE $1 OR phone ILIKE $1)
+        ORDER BY full_name NULLS LAST, id LIMIT 20`, [like]);
+    res.json({ users: rows });
   } catch (e) { next(e); }
 });

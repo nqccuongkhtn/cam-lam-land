@@ -6,7 +6,7 @@ import { getToken } from '@/lib/token';
 import { WARDS, PROPERTY_LABELS, type PropertyType } from '@/lib/types';
 
 interface Msg { id: number; userId: number | null; name: string; avatar?: string | null; body: string; createdAt: string; }
-interface Room { room: string; name: string; lastBody: string; lastAt: string; count: number; }
+interface Room { room: string; name: string; phone?: string | null; lastBody: string; lastAt: string; count: number; }
 const TYPES: PropertyType[] = ['land', 'house', 'apartment', 'villa', 'commercial', 'farm'];
 type Tab = 'community' | 'support' | 'sell';
 
@@ -34,6 +34,9 @@ export default function ChatWidget() {
   const [peerAck, setPeerAck] = useState<{ received: number; read: number } | null>(null);
   const [listOpen, setListOpen] = useState(true);
   const [roomQ, setRoomQ] = useState('');
+  const [userHits, setUserHits] = useState<{ id: number; name: string; email: string; phone: string | null; avatar: string | null }[]>([]);
+  const [pickedName, setPickedName] = useState('');
+  const [pickedPhone, setPickedPhone] = useState('');
   const acked = useRef(0);
 
   const lastId = useRef(0);
@@ -100,6 +103,12 @@ export default function ChatWidget() {
     load(); const iv = setInterval(load, 6000); return () => clearInterval(iv);
   }, [open, isAdmin, tab]);
 
+  useEffect(() => {
+    if (!open || !isAdmin || tab !== 'support' || !roomQ.trim()) { setUserHits([]); return; }
+    const t = setTimeout(() => { api<{ users: any[] }>(`/chat/users?q=${encodeURIComponent(roomQ.trim())}`).then((r) => setUserHits(r.users || [])).catch(() => {}); }, 300);
+    return () => clearTimeout(t);
+  }, [open, isAdmin, tab, roomQ]);
+
   // Đánh dấu đã đọc khi đang xem
   useEffect(() => {
     if (!open || !room || !lastId.current) return;
@@ -152,6 +161,11 @@ export default function ChatWidget() {
   const adminSupport = isAdmin && tab === 'support';
   let lastMineId = 0; if (user) for (const m of msgs) if (m.userId === user.id) lastMineId = m.id;
   const roomList = rooms.filter((r) => !roomQ.trim() || (r.name || '').toLowerCase().includes(roomQ.trim().toLowerCase()));
+  const roomSet = new Set(rooms.map((r) => r.room));
+  const newUsers = (roomQ.trim() && adminSupport) ? userHits.filter((u) => !roomSet.has(`support:${u.id}`)) : [];
+  const activeRoom = rooms.find((r) => r.room === room);
+  const activeName = activeRoom?.name || pickedName || 'Khách hàng';
+  const activePhone = activeRoom?.phone || pickedPhone || '';
   const canType = tab !== 'sell' && !!user && !!room && !needPick;
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm';
 
@@ -238,19 +252,35 @@ export default function ChatWidget() {
                     <input value={roomQ} onChange={(e) => setRoomQ(e.target.value)} placeholder="🔍 Tìm khách…" className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm outline-none focus:border-[#0A2540]" />
                   </div>
                   <div className="flex-1 overflow-y-auto scroll-soft">
-                    {roomList.length === 0 ? <p className="p-3 text-xs text-slate-400">{roomQ ? 'Không tìm thấy khách.' : 'Chưa có khách nhắn.'}</p>
-                      : roomList.map((r) => {
-                        const active = room === r.room;
-                        return (
-                          <button key={r.room} onClick={() => setRoom(r.room)} className={`w-full flex items-center gap-2 px-2.5 py-2 text-left border-b border-slate-50 hover:bg-slate-50 ${active ? 'bg-slate-100' : ''}`}>
-                            <span className="w-9 h-9 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-sm font-bold shrink-0">{(r.name || '?').charAt(0).toUpperCase()}</span>
-                            <span className="min-w-0 flex-1">
-                              <span className="block text-sm font-semibold text-[#0A2540] truncate">{r.name}</span>
-                              <span className="block text-[11px] text-slate-400 truncate">{r.lastBody || '—'}</span>
-                            </span>
-                          </button>
-                        );
-                      })}
+                    {roomList.length === 0 && newUsers.length === 0 ? <p className="p-3 text-xs text-slate-400">{roomQ ? 'Không tìm thấy khách.' : 'Chưa có khách nhắn.'}</p> : (
+                      <>
+                        {roomList.map((r) => {
+                          const active = room === r.room;
+                          return (
+                            <button key={r.room} onClick={() => { setRoom(r.room); setPickedName(r.name); setPickedPhone(r.phone || ''); }} className={`w-full flex items-center gap-2 px-2.5 py-2 text-left border-b border-slate-50 hover:bg-slate-50 ${active ? 'bg-slate-100' : ''}`}>
+                              <span className="w-9 h-9 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-sm font-bold shrink-0">{(r.name || '?').charAt(0).toUpperCase()}</span>
+                              <span className="min-w-0 flex-1">
+                                <span className="block text-sm font-semibold text-[#0A2540] truncate">{r.name}</span>
+                                <span className="block text-[11px] text-slate-400 truncate">{r.lastBody || '—'}</span>
+                              </span>
+                            </button>
+                          );
+                        })}
+                        {newUsers.length > 0 && <p className="px-2.5 py-1 text-[10px] font-bold text-slate-400 bg-slate-50 uppercase tracking-wide">Khách chưa nhắn</p>}
+                        {newUsers.map((u) => {
+                          const active = room === `support:${u.id}`;
+                          return (
+                            <button key={'u' + u.id} onClick={() => { setRoom(`support:${u.id}`); setPickedName(u.name); setPickedPhone(u.phone || ''); }} className={`w-full flex items-center gap-2 px-2.5 py-2 text-left border-b border-slate-50 hover:bg-slate-50 ${active ? 'bg-slate-100' : ''}`}>
+                              {u.avatar ? <img src={u.avatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" /> : <span className="w-9 h-9 rounded-full bg-slate-300 text-white grid place-items-center text-sm font-bold shrink-0">{(u.name || '?').charAt(0).toUpperCase()}</span>}
+                              <span className="min-w-0 flex-1">
+                                <span className="block text-sm font-semibold text-[#0A2540] truncate">{u.name}</span>
+                                <span className="block text-[11px] text-emerald-600 truncate">Bấm để nhắn lần đầu</span>
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </>
+                    )}
                   </div>
                 </aside>
               )}
@@ -259,7 +289,10 @@ export default function ChatWidget() {
                   <div className="flex items-center gap-2 px-2.5 py-2 border-b border-slate-100 shrink-0 bg-white">
                     <button onClick={() => setRoom('')} className="sm:hidden w-7 h-7 grid place-items-center rounded-full hover:bg-slate-100 text-slate-600">←</button>
                     <button onClick={() => setListOpen((v) => !v)} title="Thu gọn danh sách" className="hidden sm:grid w-7 h-7 place-items-center rounded-full hover:bg-slate-100 text-slate-600">☰</button>
-                    <b className="text-sm text-[#0A2540] truncate">{rooms.find((r) => r.room === room)?.name || 'Khách hàng'}</b>
+                    <div className="min-w-0 leading-tight">
+                      <b className="text-sm text-[#0A2540] truncate block">{activeName}</b>
+                      {activePhone ? <a href={`tel:${activePhone}`} className="text-[11px] text-red-600 font-semibold">📞 {activePhone}</a> : null}
+                    </div>
                   </div>
                 )}
                 {tab === 'community' && (
@@ -270,7 +303,7 @@ export default function ChatWidget() {
               )}
                 <div ref={boxRef} className="flex-1 overflow-y-auto scroll-soft p-3 space-y-2 bg-slate-50">
                   {needPick ? <p className="text-center text-sm text-slate-400 mt-8">← Chọn một khách để trả lời.</p>
-                    : msgs.length === 0 ? <p className="text-center text-sm text-slate-400 mt-8">{tab === 'community' ? 'Chào mừng đến Cộng đồng đầu tư Cam Lâm 👋' : 'Gửi tin cho admin để được hỗ trợ.'}</p>
+                    : msgs.length === 0 ? <p className="text-center text-sm text-slate-400 mt-8">{tab === 'community' ? 'Chào mừng đến Cộng đồng đầu tư Cam Lâm 👋' : isAdmin ? 'Chưa có tin nhắn — gửi lời chào tới khách 👋' : 'Gửi tin cho admin để được hỗ trợ.'}</p>
                     : msgs.map((m) => {
                       const mine = m.userId === user.id;
                       return (

@@ -126,7 +126,7 @@ export default function ListingsPage() {
     <div className="flex flex-col h-[calc(100vh-56px)] bg-slate-50">
       {/* Thanh lọc */}
       <div className="bg-white border-b border-slate-200 shrink-0 z-20">
-        <div className="px-3 sm:px-4 py-2.5 flex flex-wrap gap-2 items-center">
+        <div className="max-w-7xl mx-auto w-full px-4 py-2.5 flex flex-wrap gap-2 items-center">
           <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && load()}
             className="border rounded-lg px-3 py-2 text-sm w-full sm:w-52 md:w-60" placeholder="🔍 Khu vực, từ khoá…" />
           <select value={type} onChange={(e) => setType(e.target.value as PropertyType)} className="border rounded-lg px-3 py-2 text-sm bg-white flex-1 sm:flex-none">

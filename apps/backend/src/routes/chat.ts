@@ -111,11 +111,14 @@ chatRouter.get('/rooms', authRequired, async (req: AuthedRequest, res, next) => 
     if (req.user!.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
     const rows = await query(
       `SELECT m.room,
-              (SELECT name FROM chat_messages WHERE room=m.room ORDER BY id DESC LIMIT 1) AS name,
+              COALESCE(NULLIF(u.full_name, ''), u.email, 'Khách') AS name,
               (SELECT body FROM chat_messages WHERE room=m.room ORDER BY id DESC LIMIT 1) AS "lastBody",
               max(m.created_at) AS "lastAt", count(*)::int AS count
-         FROM chat_messages m WHERE m.room LIKE 'support:%'
-         GROUP BY m.room ORDER BY max(m.created_at) DESC`);
+         FROM chat_messages m
+         LEFT JOIN users u ON u.id = NULLIF(split_part(m.room, ':', 2), '')::int
+         WHERE m.room LIKE 'support:%'
+         GROUP BY m.room, u.full_name, u.email
+         ORDER BY max(m.created_at) DESC`);
     res.json({ rooms: rows });
   } catch (e) { next(e); }
 });

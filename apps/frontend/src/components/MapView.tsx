@@ -17,7 +17,7 @@ interface Props {
   focusPoint?: { lng: number; lat: number; label?: string } | null;
   highlight?: GeoJSON.Feature | null;
   initialBounds?: [[number, number], [number, number]]; // tự khớp khung vùng quy hoạch khi mở
-  adMarkers?: { id: number; lng: number; lat: number; name: string; phone: string; image?: string | null }[];
+  adMarkers?: { id: number; lng: number; lat: number; name: string; phone: string; image?: string | null; style?: string }[];
   adOpacity?: number; // độ mờ logo quảng cáo (đi theo thanh độ mờ lớp phủ)
   fitTo?: [[number, number], [number, number]] | null; // zoom khít vào vùng (vd: thửa vừa vẽ)
   onMapClick?: (lng: number, lat: number) => void;
@@ -198,13 +198,19 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     adRefs.current.forEach((m) => m.remove());
     const esc = (x: any) => String(x ?? '').replace(/[<>&"]/g, (c) => (({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' } as any)[c]));
     adRefs.current = adMarkers.map((a) => {
-      const el = document.createElement('div'); el.className = 'cl-ad'; el.style.opacity = String(adOpacityRef.current); el.style.filter = 'drop-shadow(0 2px 5px rgba(0,0,0,.4))';
-      const uid = 'ad' + a.id + Math.random().toString(36).slice(2, 6);
-      const nm = esc(String(a.name || '').slice(0, 26)), tel = esc(String(a.phone || ''));
-      const center = a.image
-        ? `<image xlink:href="${esc(a.image)}" x="18" y="18" width="64" height="64" clip-path="url(#c${uid})" preserveAspectRatio="xMidYMid slice"/>`
-        : `<text x="50" y="51" text-anchor="middle" dominant-baseline="middle" font-size="26" font-weight="800" fill="#C8A14B" font-family="Inter,sans-serif">${esc(String(a.name || 'C').charAt(0)).toUpperCase()}</text>`;
-      el.innerHTML = `<svg width="96" height="96" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><clipPath id="c${uid}"><circle cx="50" cy="50" r="28"/></clipPath><path id="t${uid}" d="M 11 50 A 39 39 0 0 1 89 50"/><path id="b${uid}" d="M 4 50 A 46 46 0 0 0 96 50"/></defs><circle cx="50" cy="50" r="49" fill="#0A2540"/><circle cx="50" cy="50" r="47.5" fill="none" stroke="#C8A14B" stroke-width="1"/>${center}<circle cx="50" cy="50" r="29" fill="none" stroke="#C8A14B" stroke-width="1.4"/><text font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="#ffffff"><textPath xlink:href="#t${uid}" startOffset="50%" text-anchor="middle" textLength="96" lengthAdjust="spacingAndGlyphs">${nm}</textPath></text><text font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="#ffffff"><textPath xlink:href="#b${uid}" startOffset="50%" text-anchor="middle" textLength="96" lengthAdjust="spacingAndGlyphs">${tel}</textPath></text><text x="7.5" y="50" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#C8A14B">★</text><text x="92.5" y="50" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#C8A14B">★</text></svg>`;
+      const el = document.createElement('div'); el.className = 'cl-ad'; el.style.opacity = String(adOpacityRef.current);
+      const nm = esc(String(a.name || '').slice(0, 28)), tel = esc(String(a.phone || ''));
+      if (a.style === 'text') {
+        el.style.filter = '';
+        el.innerHTML = `<div style="text-align:center;white-space:nowrap;font-family:Inter,system-ui,sans-serif;text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 3px rgba(0,0,0,.85);line-height:1.15;pointer-events:none;"><div style="font-size:16px;font-weight:800;color:#ffffff;letter-spacing:.3px;">${nm}</div><div style="font-size:13px;font-weight:700;color:#FFD874;">${tel}</div></div>`;
+      } else {
+        el.style.filter = 'drop-shadow(0 2px 5px rgba(0,0,0,.4))';
+        const uid = 'ad' + a.id + Math.random().toString(36).slice(2, 6);
+        const center = a.image
+          ? `<image xlink:href="${esc(a.image)}" x="18" y="18" width="64" height="64" clip-path="url(#c${uid})" preserveAspectRatio="xMidYMid slice"/>`
+          : `<text x="50" y="51" text-anchor="middle" dominant-baseline="middle" font-size="26" font-weight="800" fill="#C8A14B" font-family="Inter,sans-serif">${esc(String(a.name || 'C').charAt(0)).toUpperCase()}</text>`;
+        el.innerHTML = `<svg width="96" height="96" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><clipPath id="c${uid}"><circle cx="50" cy="50" r="28"/></clipPath><path id="t${uid}" d="M 11 50 A 39 39 0 0 1 89 50"/><path id="b${uid}" d="M 4 50 A 46 46 0 0 0 96 50"/></defs><circle cx="50" cy="50" r="49" fill="#0A2540"/><circle cx="50" cy="50" r="47.5" fill="none" stroke="#C8A14B" stroke-width="1"/>${center}<circle cx="50" cy="50" r="29" fill="none" stroke="#C8A14B" stroke-width="1.4"/><text font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="#ffffff"><textPath xlink:href="#t${uid}" startOffset="50%" text-anchor="middle" textLength="96" lengthAdjust="spacingAndGlyphs">${nm}</textPath></text><text font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="#ffffff"><textPath xlink:href="#b${uid}" startOffset="50%" text-anchor="middle" textLength="96" lengthAdjust="spacingAndGlyphs">${tel}</textPath></text><text x="7.5" y="50" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#C8A14B">★</text><text x="92.5" y="50" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#C8A14B">★</text></svg>`;
+      }
       const mk = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([a.lng, a.lat]);
       mk.setPopup(new maplibregl.Popup({ offset: 28 }).setHTML(
         `<div style="text-align:center;min-width:130px"><div style="font-weight:800;color:#0A2540">${esc(a.name)}</div>` +

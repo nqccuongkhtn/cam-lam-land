@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS map_ads (
   wards            TEXT[] NOT NULL DEFAULT '{}',
   points           JSONB  NOT NULL DEFAULT '[]',
   package          TEXT,
+  style            TEXT NOT NULL DEFAULT 'seal',
   starts_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
   expires_at       TIMESTAMPTZ NOT NULL,
   status           TEXT NOT NULL DEFAULT 'active',
@@ -75,6 +76,7 @@ CREATE TABLE IF NOT EXISTS map_ads (
   created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS map_ads_active_idx ON map_ads (status, expires_at);
+ALTER TABLE map_ads ADD COLUMN IF NOT EXISTS style TEXT NOT NULL DEFAULT 'seal';
 
 -- ── Khách gửi bán / ký gửi BĐS (thu thập thông tin từ khách) ──
 CREATE TABLE IF NOT EXISTS consignments (

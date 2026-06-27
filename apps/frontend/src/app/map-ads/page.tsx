@@ -15,7 +15,7 @@ const MONTHS = [1, 3, 6, 12];
 
 interface Ad {
   id: number; advertiserName: string; advertiserPhone: string; imageUrl: string | null;
-  wards: string[]; points: any[]; package: string; status: string; expiresAt: string; active: boolean;
+  wards: string[]; points: any[]; package: string; status: string; expiresAt: string; active: boolean; style?: string;
 }
 
 export default function MapAdsPage() {
@@ -33,6 +33,8 @@ export default function MapAdsPage() {
   const [ok, setOk] = useState('');
   const [list, setList] = useState<Ad[]>([]);
   const [cropFile, setCropFile] = useState<File | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [adStyle, setAdStyle] = useState<'seal' | 'text'>('seal');
 
   useEffect(() => { if (!loading && (!user || user.role !== 'admin')) router.replace('/'); }, [loading, user, router]);
   function reload() { api<{ ads: Ad[] }>('/map-ads').then((r) => setList(r.ads || [])).catch(() => {}); }
@@ -48,6 +50,13 @@ export default function MapAdsPage() {
   }
   function toggleWard(w: string) { setWards((s) => (s.includes(w) ? s.filter((x) => x !== w) : [...s, w])); }
 
+  function resetForm() { setEditingId(null); setName(''); setPhone(''); setImageUrl(null); setWards([]); setPoints([]); setMonths(6); setErr(''); setAdStyle('seal'); }
+  function startEdit(a: Ad) {
+    setEditingId(a.id); setErr(''); setOk('');
+    setName(a.advertiserName || ''); setPhone(a.advertiserPhone || ''); setImageUrl(a.imageUrl || null);
+    setWards(a.wards || []); setPoints((a.points || []).map((p: any) => ({ lng: +p.lng, lat: +p.lat }))); setMonths(0); setAdStyle((a.style as any) === 'text' ? 'text' : 'seal');
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   async function submit() {
     setErr(''); setOk('');
     if (!name.trim() || !phone.trim()) return setErr('Nhập tên và SĐT người quảng cáo.');
@@ -55,10 +64,10 @@ export default function MapAdsPage() {
     if (!points.length) return setErr('Bấm vào bản đồ để ghim ít nhất 1 điểm hiển thị.');
     setBusy(true);
     try {
-      await api('/map-ads', { method: 'POST', body: JSON.stringify({ advertiserName: name, advertiserPhone: phone, imageUrl, wards, months, points }) });
-      setOk('Đã tạo quảng cáo — logo sẽ xuất hiện trên bản đồ.');
-      setName(''); setPhone(''); setImageUrl(null); setWards([]); setPoints([]); setMonths(6);
-      reload();
+      const body = JSON.stringify({ advertiserName: name, advertiserPhone: phone, imageUrl, wards, months, points, style: adStyle });
+      if (editingId) { await api(`/map-ads/${editingId}`, { method: 'PUT', body }); setOk('Đã lưu thay đổi quảng cáo.'); }
+      else { await api('/map-ads', { method: 'POST', body }); setOk('Đã tạo quảng cáo — logo sẽ xuất hiện trên bản đồ.'); }
+      resetForm(); reload();
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   }
   async function del(id: number) {
@@ -68,8 +77,8 @@ export default function MapAdsPage() {
 
   if (loading || !user || user.role !== 'admin') return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
 
-  const taken = new Set(list.filter((a) => a.active).flatMap((a) => a.wards || []));
-  const preview = points.map((p, i) => ({ id: i, lng: p.lng, lat: p.lat, name: name || 'Tên sales', phone: phone || '09xx', image: imageUrl }));
+  const taken = new Set(list.filter((a) => a.active && a.id !== editingId).flatMap((a) => a.wards || []));
+  const preview = points.map((p, i) => ({ id: i, lng: p.lng, lat: p.lat, name: name || 'Tên sales', phone: phone || '09xx', image: imageUrl, style: adStyle }));
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm';
   const lbl = 'text-sm font-semibold text-slate-700';
 
@@ -84,11 +93,20 @@ export default function MapAdsPage() {
 
         <div className="grid lg:grid-cols-2 gap-5">
           <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
-            <h2 className="font-bold text-[#0A2540]">Tạo quảng cáo</h2>
+            <h2 className="font-bold text-[#0A2540]">{editingId ? `Sửa quảng cáo #${editingId}` : 'Tạo quảng cáo'}</h2>
             <div className="grid sm:grid-cols-2 gap-3">
               <div><label className={lbl}>Tên sales *</label><input className={inp} value={name} onChange={(e) => setName(e.target.value)} placeholder="Nguyễn Quốc Cường" /></div>
               <div><label className={lbl}>SĐT *</label><input className={inp} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0988…" /></div>
             </div>
+            <div>
+              <label className={lbl}>Kiểu hiển thị trên bản đồ</label>
+              <div className="grid grid-cols-2 gap-2 mt-1">
+                <button type="button" onClick={() => setAdStyle('seal')} className={`px-3 py-2 rounded-lg border text-sm font-semibold ${adStyle === 'seal' ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-300 text-slate-600 hover:bg-slate-50'}`}>🟡 Logo tròn (avatar)</button>
+                <button type="button" onClick={() => setAdStyle('text')} className={`px-3 py-2 rounded-lg border text-sm font-semibold ${adStyle === 'text' ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-300 text-slate-600 hover:bg-slate-50'}`}>🔤 Chữ mờ (tên + SĐT)</button>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1">{adStyle === 'text' ? 'Tên & SĐT hiện mờ trực tiếp trên nền bản đồ (không cần ảnh).' : 'Huy hiệu tròn: ảnh ở giữa, tên & SĐT cong quanh viền.'}</p>
+            </div>
+            {adStyle === 'seal' && (
             <div>
               <label className={lbl}>Ảnh / avatar nhận diện</label>
               <div className="flex items-center gap-4 mt-2">
@@ -97,6 +115,7 @@ export default function MapAdsPage() {
                 {imageUrl && <button onClick={() => setImageUrl(null)} className="text-xs text-red-600">Xoá ảnh</button>}
               </div>
             </div>
+            )}
             <div>
               <label className={lbl}>Xã đăng ký (độc quyền) *</label>
               <div className="grid grid-cols-2 gap-1.5 mt-1 max-h-44 overflow-y-auto scroll-soft border border-slate-200 rounded-lg p-2">
@@ -112,12 +131,18 @@ export default function MapAdsPage() {
               </div>
             </div>
             <div>
-              <label className={lbl}>Gói thời hạn</label>
-              <select className={inp} value={months} onChange={(e) => setMonths(Number(e.target.value))}>{MONTHS.map((m) => <option key={m} value={m}>{m} tháng</option>)}</select>
+              <label className={lbl}>Gói thời hạn{editingId ? ' (gia hạn)' : ''}</label>
+              <select className={inp} value={months} onChange={(e) => setMonths(Number(e.target.value))}>
+                {editingId ? <option value={0}>Giữ nguyên hạn hiện tại</option> : null}
+                {MONTHS.map((m) => <option key={m} value={m}>{m} tháng{editingId ? ' (đặt lại từ hôm nay)' : ''}</option>)}
+              </select>
             </div>
             {err && <p className="text-sm text-red-600 font-semibold">{err}</p>}
             {ok && <p className="text-sm text-emerald-700 font-semibold">{ok}</p>}
-            <button disabled={busy || uploading} onClick={submit} className="bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg shadow-red-600/30">{busy ? 'Đang lưu…' : 'Tạo quảng cáo'}</button>
+            <div className="flex items-center gap-2">
+              <button disabled={busy || uploading} onClick={submit} className="bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg shadow-red-600/30">{busy ? 'Đang lưu…' : editingId ? 'Lưu thay đổi' : 'Tạo quảng cáo'}</button>
+              {editingId ? <button onClick={resetForm} className="px-5 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600 hover:bg-slate-50">Huỷ</button> : null}
+            </div>
           </section>
 
           <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
@@ -137,14 +162,17 @@ export default function MapAdsPage() {
           {list.length === 0 ? <p className="text-sm text-slate-400">Chưa có quảng cáo nào.</p> : (
             <div className="space-y-2">
               {list.map((a) => (
-                <div key={a.id} className="flex items-center gap-3 border border-slate-100 rounded-xl p-3">
+                <div key={a.id} className={`flex items-center gap-3 border rounded-xl p-3 ${editingId === a.id ? 'border-[#C8A14B] bg-amber-50/50' : 'border-slate-100'}`}>
                   <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-[#C8A14B]/40 shrink-0 bg-[#0A2540] grid place-items-center text-[#C8A14B] font-bold">{a.imageUrl ? <img src={a.imageUrl} alt="" className="w-full h-full object-cover" /> : (a.advertiserName || 'C').charAt(0)}</div>
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-[#0A2540] text-sm truncate">{a.advertiserName} · <span className="text-red-600">{a.advertiserPhone}</span></p>
                     <p className="text-xs text-slate-500 truncate">{(a.wards || []).join(', ')}</p>
                     <p className="text-[11px] text-slate-400">{(a.points || []).length} điểm · {a.package} · {a.active ? <span className="text-emerald-600 font-semibold">Đang chạy</span> : <span>Hết hạn</span>} · đến {new Date(a.expiresAt).toLocaleDateString('vi-VN')}</p>
                   </div>
-                  <button onClick={() => del(a.id)} className="text-slate-400 hover:text-red-600 text-sm shrink-0">🗑 Xoá</button>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <button onClick={() => startEdit(a)} className="text-slate-600 hover:text-[#0A2540] text-sm font-semibold">✏️ Sửa</button>
+                    <button onClick={() => del(a.id)} className="text-slate-400 hover:text-red-600 text-sm">🗑 Xoá</button>
+                  </div>
                 </div>
               ))}
             </div>

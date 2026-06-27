@@ -33,6 +33,7 @@ export default function ChatWidget() {
   const hintStop = useRef(false);
   const [peerAck, setPeerAck] = useState<{ received: number; read: number } | null>(null);
   const [listOpen, setListOpen] = useState(true);
+  const [roomQ, setRoomQ] = useState('');
   const acked = useRef(0);
 
   const lastId = useRef(0);
@@ -150,6 +151,7 @@ export default function ChatWidget() {
   const needPick = isAdmin && tab === 'support' && !room.startsWith('support:');
   const adminSupport = isAdmin && tab === 'support';
   let lastMineId = 0; if (user) for (const m of msgs) if (m.userId === user.id) lastMineId = m.id;
+  const roomList = rooms.filter((r) => !roomQ.trim() || (r.name || '').toLowerCase().includes(roomQ.trim().toLowerCase()));
   const canType = tab !== 'sell' && !!user && !!room && !needPick;
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm';
 
@@ -230,11 +232,14 @@ export default function ChatWidget() {
           ) : (
             <div className={`flex-1 min-h-0 flex ${adminSupport ? 'flex-row' : 'flex-col'}`}>
               {adminSupport && (
-                <aside className={`${room ? 'hidden sm:flex' : 'flex'} flex-col shrink-0 border-r border-slate-100 bg-white w-full ${(!room || listOpen) ? 'sm:w-52' : 'sm:w-0 sm:overflow-hidden sm:border-r-0'} transition-all`}>
-                  <div className="px-3 py-2 text-[11px] font-bold text-slate-500 border-b border-slate-100 shrink-0">💬 Hội thoại ({rooms.length})</div>
+                <aside className={`${room ? 'hidden sm:flex' : 'flex'} sm:order-2 flex-col shrink-0 sm:border-l border-slate-100 bg-white w-full ${(!room || listOpen) ? 'sm:w-52' : 'sm:w-0 sm:overflow-hidden sm:border-l-0'} transition-all`}>
+                  <div className="px-2 py-2 border-b border-slate-100 shrink-0 space-y-1.5">
+                    <p className="text-[11px] font-bold text-slate-500 px-1">💬 Hội thoại ({rooms.length})</p>
+                    <input value={roomQ} onChange={(e) => setRoomQ(e.target.value)} placeholder="🔍 Tìm khách…" className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm outline-none focus:border-[#0A2540]" />
+                  </div>
                   <div className="flex-1 overflow-y-auto scroll-soft">
-                    {rooms.length === 0 ? <p className="p-3 text-xs text-slate-400">Chưa có khách nhắn.</p>
-                      : rooms.map((r) => {
+                    {roomList.length === 0 ? <p className="p-3 text-xs text-slate-400">{roomQ ? 'Không tìm thấy khách.' : 'Chưa có khách nhắn.'}</p>
+                      : roomList.map((r) => {
                         const active = room === r.room;
                         return (
                           <button key={r.room} onClick={() => setRoom(r.room)} className={`w-full flex items-center gap-2 px-2.5 py-2 text-left border-b border-slate-50 hover:bg-slate-50 ${active ? 'bg-slate-100' : ''}`}>
@@ -249,7 +254,7 @@ export default function ChatWidget() {
                   </div>
                 </aside>
               )}
-              <div className={`flex-1 min-h-0 flex flex-col ${adminSupport && !room ? 'hidden sm:flex' : 'flex'}`}>
+              <div className={`flex-1 min-h-0 flex flex-col sm:order-1 ${adminSupport && !room ? 'hidden sm:flex' : 'flex'}`}>
                 {adminSupport && room && (
                   <div className="flex items-center gap-2 px-2.5 py-2 border-b border-slate-100 shrink-0 bg-white">
                     <button onClick={() => setRoom('')} className="sm:hidden w-7 h-7 grid place-items-center rounded-full hover:bg-slate-100 text-slate-600">←</button>

@@ -1,0 +1,80 @@
+{
+ "type": "FeatureCollection",
+ "name": "diachinh_mau",
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "SoTo": "53",
+    "SoThua": "12",
+    "Xa": "Cam Đức",
+    "MDSD": "ONT",
+    "DienTich": 1936
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       109.145,
+       12.072
+      ],
+      [
+       109.1454,
+       12.072
+      ],
+      [
+       109.1454,
+       12.0724
+      ],
+      [
+       109.145,
+       12.0724
+      ],
+      [
+       109.145,
+       12.072
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "SoTo": "53",
+    "SoThua": "13",
+    "Xa": "Cam Đức",
+    "MDSD": "CLN",
+    "DienTich": 1936
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       109.1454,
+       12.072
+      ],
+      [
+       109.1458,
+       12.072
+      ],
+      [
+       109.1458,
+       12.0724
+      ],
+      [
+       109.1454,
+       12.0724
+      ],
+      [
+       109.1454,
+       12.072
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}

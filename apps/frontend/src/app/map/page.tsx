@@ -21,8 +21,9 @@ const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.925702
 
 interface ParcelInfo {
   found: boolean; point: { lng: number; lat: number };
-  parcel: { properties: Record<string, any> } | null;
+  parcel: { properties: Record<string, any>; soTo?: string | null; soThua?: string | null; xa?: string | null; areaM2?: number } | null;
   zoning: Record<string, any> | null;
+  overlaps?: { layer: string; type: string; areaM2: number }[];
   listings: { id: number; title: string; price: number }[];
 }
 const fmtLen = (m: number) => (m >= 1000 ? (m / 1000).toFixed(3) + ' km' : m.toFixed(1) + ' m');
@@ -211,9 +212,13 @@ export default function MapPage() {
       const base = (l.style?.color as string) || DEFAULT_COLORS[l.layerType] || '#16a34a';
       const colorExpr: any = ['coalesce', ['get', 'color'], base];
       const gtype = (l.geometryType || '').toLowerCase();
-      const vis = visible[l.slug] ?? false;
+      const vis = visible[l.slug] ?? (l.layerType === 'parcel');
       if (gtype.includes('line')) out.push({ id: `${l.slug}-line`, type: 'line', data: fc, visible: vis, paint: { 'line-color': colorExpr, 'line-width': (l.style?.weight as number) ?? 2.5 } });
       else if (gtype.includes('point')) out.push({ id: `${l.slug}-pt`, type: 'circle', data: fc, visible: vis, paint: { 'circle-color': colorExpr, 'circle-radius': 5, 'circle-stroke-color': '#fff', 'circle-stroke-width': 1 } });
+      else if (l.layerType === 'parcel') {
+        out.push({ id: `${l.slug}-line`, type: 'line', data: fc, visible: vis, paint: { 'line-color': colorExpr, 'line-width': (l.style?.weight as number) ?? 0.9 } });
+        out.push({ id: `${l.slug}-label`, type: 'symbol', data: fc, visible: vis, paint: { 'text-color': '#111827', 'text-halo-color': '#ffffff', 'text-halo-width': 1.5 }, layout: { 'text-field': ['coalesce', ['get', 'SoThua'], ['get', 'so_thua'], ['get', 'SOTHUA'], ['get', 'sothua'], ['get', 'thua'], ['get', 'THUA'], ['get', 'SHThua'], ['get', 'ThuaDat'], ''], 'text-size': 11, 'text-font': ['Noto Sans Regular'], 'symbol-placement': 'point', 'text-allow-overlap': false } });
+      }
       else {
         out.push({ id: `${l.slug}-fill`, type: 'fill', data: fc, visible: vis, paint: { 'fill-color': colorExpr, 'fill-opacity': opacity } });
         out.push({ id: `${l.slug}-line`, type: 'line', data: fc, visible: vis, paint: { 'line-color': colorExpr, 'line-width': (l.style?.weight as number) ?? 0.7 } });
@@ -570,8 +575,20 @@ export default function MapPage() {
                 </div>
               )}
               {!info.found && <p className="text-slate-500">Không có dữ liệu thửa/quy hoạch tại vị trí này.</p>}
-              {info.parcel && <Section title="Thửa đất">{Object.entries(info.parcel.properties).map(([k, v]) => <Row key={k} k={k} v={String(v)} />)}</Section>}
-              {info.zoning && <Section title="Quy hoạch">{Object.entries(info.zoning).map(([k, v]) => <Row key={k} k={k} v={String(v)} />)}</Section>}
+              {info.parcel && (
+                <Section title="Thửa đất">
+                  {info.parcel.soTo && <Row k="Số tờ" v={String(info.parcel.soTo)} />}
+                  {info.parcel.soThua && <Row k="Số thửa" v={String(info.parcel.soThua)} />}
+                  {info.parcel.xa && <Row k="Xã/Phường" v={String(info.parcel.xa)} />}
+                  {info.parcel.areaM2 != null && <Row k="Diện tích" v={fmtArea(info.parcel.areaM2)} />}
+                </Section>
+              )}
+              {info.overlaps && info.overlaps.length > 0 && (
+                <Section title="Quy hoạch chồng lấn">
+                  {info.overlaps.map((o, i) => <Row key={i} k={`${o.type}${o.layer ? ' · ' + o.layer : ''}`} v={fmtArea(o.areaM2)} />)}
+                </Section>
+              )}
+              {(!info.overlaps || info.overlaps.length === 0) && info.zoning && <Section title="Quy hoạch">{Object.entries(info.zoning).map(([k, v]) => <Row key={k} k={k} v={String(v)} />)}</Section>}
               <Section title={`Tin rao liên quan (${info.listings.length})`}>
                 {info.listings.length === 0 && <p className="text-slate-500">Chưa có tin nào.</p>}
                 {info.listings.map((x) => <a key={x.id} href={`/listings/${x.id}`} className="block text-emerald-700 hover:underline">• {x.title} — {formatVnd(x.price)}</a>)}

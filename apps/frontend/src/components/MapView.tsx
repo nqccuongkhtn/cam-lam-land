@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import maplibregl, { Map as MlMap, Marker } from 'maplibre-gl';
 import { MAP } from '@/lib/config';
 
-export interface GeoLayer { id: string; type: 'fill' | 'line' | 'circle'; data: GeoJSON.FeatureCollection; visible: boolean; paint: Record<string, any>; }
+export interface GeoLayer { id: string; type: 'fill' | 'line' | 'circle' | 'symbol'; data: GeoJSON.FeatureCollection; visible: boolean; paint: Record<string, any>; layout?: Record<string, any>; }
 export interface MarkerSpec { lng: number; lat: number; color?: string; popupHtml?: string; onClick?: () => void; }
 export interface ImageOverlay { id: string; url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number; visible: boolean; }
 export type BaseMap = 'street' | 'satellite' | 'terrain';
@@ -35,6 +35,7 @@ const LABELS = ['https://mt0.google.com/vt/lyrs=h&x={x}&y={y}&z={z}', 'https://m
 const rasterSrc = (tiles: string[]) => ({ type: 'raster' as const, tiles, tileSize: 256, maxzoom: 21, attribution: '© Google' });
 const BASE_STYLE: maplibregl.StyleSpecification = {
   version: 8,
+  glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf',
   sources: {
     'base-street': rasterSrc(BASES.street.tiles),
     'base-satellite': rasterSrc(BASES.satellite.tiles),
@@ -179,7 +180,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       const srcId = `src-${l.id}`;
       const src = map.getSource(srcId) as maplibregl.GeoJSONSource | undefined;
       if (src) src.setData(l.data as any); else map.addSource(srcId, { type: 'geojson', data: l.data as any });
-      if (!map.getLayer(l.id)) map.addLayer({ id: l.id, type: l.type, source: srcId, paint: l.paint } as any);
+      if (!map.getLayer(l.id)) map.addLayer({ id: l.id, type: l.type, source: srcId, paint: l.paint, layout: l.layout || {} } as any);
       else for (const [k, v] of Object.entries(l.paint)) map.setPaintProperty(l.id, k as any, v);
       map.setLayoutProperty(l.id, 'visibility', l.visible ? 'visible' : 'none');
     }

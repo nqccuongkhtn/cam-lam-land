@@ -2,8 +2,9 @@ import { Router } from 'express';
 import multer from 'multer';
 import path from 'node:path';
 import fs from 'node:fs';
-import { query } from '../lib/db.ts';
+import { query, pool } from '../lib/db.ts';
 import { env } from '../lib/env.ts';
+import { vn2000ToWgs84 } from '../lib/vn2000.ts';
 import { gisRequired, type AuthedRequest } from '../middleware/auth.ts';
 
 export const importsRouter = Router();
@@ -16,29 +17,89 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 200 * 1024 * 1024 } });
 
-const FORMATS: Record<string, string> = { '.dgn': 'dgn', '.shp': 'shp', '.zip': 'shp', '.geojson': 'geojson', '.json': 'geojson' };
+const FORMATS: Record<string, string> = { '.geojson': 'geojson', '.json': 'geojson', '.dgn': 'dgn', '.shp': 'shp', '.zip': 'shp' };
 
-// POST /api/imports/upload  (admin) — upload a .dgn/.shp/.zip/.geojson and queue conversion
+// ---- GeoJSON ingest (không cần GDAL) + tự quy đổi VN-2000 (mét) -> WGS84 ----
+function firstCoord(c: any): number[] | null {
+  while (Array.isArray(c) && Array.isArray(c[0])) c = c[0];
+  return Array.isArray(c) && typeof c[0] === 'number' ? c : null;
+}
+function reprojCoords(c: any): any {
+  if (typeof c[0] === 'number') { const w = vn2000ToWgs84(c[0], c[1]); return [w.lng, w.lat]; }
+  return c.map(reprojCoords);
+}
+function slugify(s: string): string {
+  return (s || 'layer').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd')
+    .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40) || 'layer';
+}
+async function ingestGeoJson(filePath: string, name: string, layerType: string) {
+  const fc = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  const features: any[] = fc?.type === 'FeatureCollection' ? (fc.features || []) : (fc?.type === 'Feature' ? [fc] : []);
+  if (!features.length) throw new Error('Không tìm thấy đối tượng (FeatureCollection rỗng).');
+  let sample: number[] | null = null;
+  for (const f of features) { sample = firstCoord(f.geometry?.coordinates); if (sample) break; }
+  const reprojected = !!sample && (Math.abs(sample[0]) > 200 || Math.abs(sample[1]) > 200);
+  const types = new Set(features.map((f) => f.geometry?.type).filter(Boolean));
+  const geometryType = types.size === 1 ? [...types][0] : 'Mixed';
+  const slug = `${slugify(name)}-${Date.now().toString(36)}`;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [layer] } = await client.query(
+      `INSERT INTO gis_layers (name, slug, layer_type, geometry_type, source_format, source_file, style, status, feature_count)
+       VALUES ($1,$2,$3,$4,'geojson',$5,'{}','processing',0) RETURNING id`,
+      [name, slug, layerType, geometryType, path.basename(filePath)]);
+    const layerId = layer.id; let count = 0;
+    for (const f of features) {
+      const g = f.geometry; if (!g || !g.coordinates) continue;
+      if (reprojected) g.coordinates = reprojCoords(g.coordinates);
+      await client.query(
+        `INSERT INTO gis_features (layer_id, properties, geom)
+         VALUES ($1,$2, ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON($3),4326)))`,
+        [layerId, JSON.stringify(f.properties ?? {}), JSON.stringify(g)]);
+      count++;
+    }
+    await client.query(`UPDATE gis_layers SET feature_count=$2, status='ready' WHERE id=$1`, [layerId, count]);
+    await client.query('COMMIT');
+    return { layerId, count, reprojected };
+  } catch (e) { await client.query('ROLLBACK'); throw e; }
+  finally { client.release(); }
+}
+
+// POST /api/imports/upload (gis) — nạp .geojson trực tiếp (DGN/SHP: hướng dẫn xuất GeoJSON)
 importsRouter.post('/upload', gisRequired, upload.single('file'), async (req: AuthedRequest, res, next) => {
   try {
-    if (!req.file) return res.status(400).json({ error: 'file field is required' });
+    if (!req.file) return res.status(400).json({ error: 'Thiếu file' });
     const ext = path.extname(req.file.originalname).toLowerCase();
     const format = FORMATS[ext];
-    if (!format) {
-      fs.unlinkSync(req.file.path);
-      return res.status(400).json({ error: `Unsupported format ${ext}. Use .dgn, .shp, .zip or .geojson` });
-    }
+    if (!format) { fs.unlinkSync(req.file.path); return res.status(400).json({ error: `Định dạng ${ext} chưa hỗ trợ. Hãy dùng .geojson` }); }
     const layerName = (req.body?.name as string) || path.parse(req.file.originalname).name;
     const layerType = (req.body?.layerType as string) || 'custom';
     const [job] = await query(`
       INSERT INTO import_jobs (original_filename, file_path, source_format, layer_name, layer_type, created_by, status)
       VALUES ($1,$2,$3,$4,$5,$6,'pending') RETURNING *`,
       [req.file.originalname, req.file.path, format, layerName, layerType, req.user!.id]);
-    res.status(202).json({ message: 'Upload queued for processing', job });
+
+    if (format === 'geojson') {
+      try {
+        const r = await ingestGeoJson(req.file.path, layerName, layerType);
+        await query(`UPDATE import_jobs SET layer_id=$2, status='done', feature_count=$3, log=$4, updated_at=now() WHERE id=$1`,
+          [job.id, r.layerId, r.count, `Đã nạp ${r.count} đối tượng${r.reprojected ? ' (tự quy đổi VN-2000→WGS84)' : ''}`]);
+        try { fs.unlinkSync(req.file.path); } catch {}
+        return res.status(201).json({ message: `Đã nạp ${r.count} đối tượng.`, layerId: r.layerId, featureCount: r.count, reprojected: r.reprojected });
+      } catch (e: any) {
+        const msg = String(e?.message || e).slice(0, 400);
+        await query(`UPDATE import_jobs SET status='error', log=$2, updated_at=now() WHERE id=$1`, [job.id, msg]);
+        return res.status(400).json({ error: 'Lỗi nạp GeoJSON: ' + msg });
+      }
+    }
+    await query(`UPDATE import_jobs SET status='error', log=$2, updated_at=now() WHERE id=$1`,
+      [job.id, 'Máy chủ chưa hỗ trợ chuyển đổi DGN/SHP — hãy xuất sang GeoJSON.']);
+    return res.status(400).json({ error: 'Máy chủ nhận trực tiếp GeoJSON. Hãy xuất lớp ra .geojson (toạ độ VN-2000 hoặc WGS84 đều được — hệ thống tự quy đổi) rồi tải lại.' });
   } catch (e) { next(e); }
 });
 
-// GET /api/imports  (admin) — processing log / status
+// GET /api/imports (gis) — nhật ký xử lý
 importsRouter.get('/', gisRequired, async (_req, res, next) => {
   try {
     const jobs = await query(`
@@ -51,12 +112,12 @@ importsRouter.get('/', gisRequired, async (_req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// DELETE /api/imports/:id  (admin) — remove a job AND its imported layer (+ features via cascade)
+// DELETE /api/imports/:id (gis) — xoá job + lớp đã nạp (features cascade)
 importsRouter.delete('/:id', gisRequired, async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     const [job] = await query('SELECT layer_id FROM import_jobs WHERE id=$1', [id]);
-    if (!job) return res.status(404).json({ error: 'Job not found' });
+    if (!job) return res.status(404).json({ error: 'Không tìm thấy job' });
     if (job.layer_id) await query('DELETE FROM gis_layers WHERE id=$1', [job.layer_id]);
     await query('DELETE FROM import_jobs WHERE id=$1', [id]);
     res.json({ deleted: id });

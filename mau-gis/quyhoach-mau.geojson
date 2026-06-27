@@ -1,0 +1,74 @@
+{
+ "type": "FeatureCollection",
+ "name": "quyhoach_mau",
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "KyHieu": "ODT",
+    "TenLoaiDat": "Đất ở đô thị"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       109.1448,
+       12.0718
+      ],
+      [
+       109.1456,
+       12.0718
+      ],
+      [
+       109.1456,
+       12.0726
+      ],
+      [
+       109.1448,
+       12.0726
+      ],
+      [
+       109.1448,
+       12.0718
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "KyHieu": "DGT",
+    "TenLoaiDat": "Đất giao thông"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       109.1456,
+       12.0718
+      ],
+      [
+       109.1459,
+       12.0718
+      ],
+      [
+       109.1459,
+       12.0726
+      ],
+      [
+       109.1456,
+       12.0726
+      ],
+      [
+       109.1456,
+       12.0718
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}

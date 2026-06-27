@@ -233,12 +233,20 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     const seenK = new Set<string>();
     const uniq = tAds.filter((a) => { const k = a.name + '|' + a.phone; if (seenK.has(k)) return false; seenK.add(k); return true; });
     if (!uniq.length) { if (wmRef.current) { wmRef.current.remove(); wmRef.current = null; } return; }
-    const rowH = 110, tileW = 300, tileH = rowH * uniq.length;
+    const rowH = 128, tileW = 360, tileH = rowH * uniq.length;
     const rows = uniq.map((a, i) => `<text x='${tileW / 2}' y='${i * rowH + rowH / 2}' text-anchor='middle' dominant-baseline='middle' font-family='Roboto,Arial,sans-serif' font-size='13' font-weight='700' fill='rgba(255,255,255,0.95)' stroke='rgba(0,0,0,0.55)' stroke-width='0.5' paint-order='stroke'>${esc2(a.name)} · ${esc2(a.phone)}</text>`).join('');
     const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${tileW}' height='${tileH}'>${rows}</svg>`;
     let el = wmRef.current;
-    if (!el) { el = document.createElement('div'); el.setAttribute('aria-hidden', 'true'); el.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:2;background-repeat:repeat;background-position:center;'; if (getComputedStyle(cont).position === 'static') cont.style.position = 'relative'; cont.appendChild(el); wmRef.current = el; }
-    el.style.backgroundImage = `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
+    if (!el) {
+      el = document.createElement('div'); el.setAttribute('aria-hidden', 'true');
+      el.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:2;';
+      const layer = document.createElement('div');
+      layer.style.cssText = 'position:absolute;top:-30%;left:-30%;width:160%;height:160%;background-repeat:repeat;background-position:center;transform:rotate(-30deg);transform-origin:center center;';
+      el.appendChild(layer);
+      if (getComputedStyle(cont).position === 'static') cont.style.position = 'relative';
+      cont.appendChild(el); wmRef.current = el;
+    }
+    (el.firstChild as HTMLDivElement).style.backgroundImage = `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
     el.style.opacity = String(adOpacityRef.current * WM_OPACITY);
     const mp = mapRef.current;
     el.style.display = (mp && mp.getZoom() < WM_MIN_ZOOM) ? 'none' : '';

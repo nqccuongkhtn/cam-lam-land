@@ -37,11 +37,20 @@ export default function ChatWidget() {
   const [userHits, setUserHits] = useState<{ id: number; name: string; email: string; phone: string | null; avatar: string | null; online?: boolean }[]>([]);
   const [pickedName, setPickedName] = useState('');
   const [pickedPhone, setPickedPhone] = useState('');
+  const [notify, setNotify] = useState(true);
+  const [toast, setToast] = useState<{ room: string; name: string; body: string; avatar?: string | null } | null>(null);
+  const [dragX, setDragX] = useState(0);
+  const dragStart = useRef<number | null>(null);
+  const draggedRef = useRef(false);
   const acked = useRef(0);
 
   const lastId = useRef(0);
   const seen = useRef<Set<number>>(new Set());
   const roomRef = useRef(room); roomRef.current = room;
+  const openRef = useRef(open); openRef.current = open;
+  const tabRef = useRef(tab); tabRef.current = tab;
+  const notifyRef = useRef(notify); notifyRef.current = notify;
+  const audioRef = useRef<any>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const seenComm = useRef(0), seenSupp = useRef(0);
   const unread = unreadComm + unreadSupp;
@@ -89,18 +98,34 @@ export default function ChatWidget() {
     return () => { alive = false; clearInterval(iv); };
   }, [open, user, room]);
 
-  // WebSocket real-time
+  // WebSocket real-time + thông báo tin nhắn (luôn bật khi đã đăng nhập)
   useEffect(() => {
-    if (!open || !user || !wsUrl) return;
+    if (!user || !wsUrl) return;
     const token = getToken();
-    let ws: WebSocket;
-    try { ws = new WebSocket(token ? `${wsUrl}?token=${encodeURIComponent(token)}` : wsUrl); } catch { return; }
-    ws.onopen = () => setLive(true);
-    ws.onclose = () => setLive(false);
-    ws.onerror = () => setLive(false);
-    ws.onmessage = (ev) => { try { const d = JSON.parse(ev.data); if (d.type === 'chat' && d.room === roomRef.current && d.message) pushMsgs([d.message]); } catch {} };
-    return () => { try { ws.close(); } catch {} setLive(false); };
-  }, [open, user, wsUrl]);
+    let ws: WebSocket | null = null; let dead = false; let retry: any;
+    const connect = () => {
+      try { ws = new WebSocket(token ? `${wsUrl}?token=${encodeURIComponent(token)}` : wsUrl); } catch { return; }
+      ws.onopen = () => setLive(true);
+      ws.onclose = () => { setLive(false); if (!dead) retry = setTimeout(connect, 4000); };
+      ws.onerror = () => setLive(false);
+      ws.onmessage = (ev) => {
+        try {
+          const d = JSON.parse(ev.data);
+          if (d.type !== 'chat' || !d.message) return;
+          const m = d.message;
+          if (openRef.current && d.room === roomRef.current) pushMsgs([m]);
+          if (m.userId === user.id) return;
+          const viewing = openRef.current && ((d.room === 'community' && tabRef.current === 'community') || (d.room.startsWith('support:') && tabRef.current === 'support' && roomRef.current === d.room));
+          if (viewing || !notifyRef.current) return;
+          const raw = String(m.body || '').replace(/\s+/g, ' ').trim();
+          setToast({ room: d.room, name: m.name || 'Tin nhắn', body: raw.length > 42 ? raw.slice(0, 42) + '…' : raw, avatar: m.avatar });
+          playDing();
+        } catch {}
+      };
+    };
+    connect();
+    return () => { dead = true; clearTimeout(retry); try { ws && ws.close(); } catch {} setLive(false); };
+  }, [user, wsUrl]);
 
   useEffect(() => {
     if (!open || !isAdmin || tab !== 'support') return;
@@ -123,6 +148,8 @@ export default function ChatWidget() {
   }, [msgs, open, room, user, isAdmin]);
 
   useEffect(() => { boxRef.current?.scrollTo({ top: boxRef.current.scrollHeight }); }, [msgs, open, tab]);
+  useEffect(() => { try { setNotify(localStorage.getItem('cl-notify') !== '0'); } catch {} }, []);
+  useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(null), 5000); return () => clearTimeout(t); }, [toast]);
   useEffect(() => {
     if (typeof window === 'undefined') return;
     let hideT: any;
@@ -145,6 +172,23 @@ export default function ChatWidget() {
     if (!fresh.length) return;
     fresh.forEach((m) => { seen.current.add(m.id); lastId.current = Math.max(lastId.current, m.id); });
     setMsgs((cur) => [...cur, ...fresh]);
+  }
+  function primeAudio() { try { if (!audioRef.current) audioRef.current = new (window.AudioContext || (window as any).webkitAudioContext)(); if (audioRef.current.state === 'suspended') audioRef.current.resume(); } catch {} }
+  function playDing() {
+    try {
+      primeAudio(); const ctx = audioRef.current; if (!ctx) return; const t0 = ctx.currentTime;
+      [880, 1245].forEach((f, i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.value = f; o.connect(g); g.connect(ctx.destination);
+        const t = t0 + i * 0.12; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.2, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.26); o.start(t); o.stop(t + 0.3);
+      });
+    } catch {}
+  }
+  function toggleNotify() { primeAudio(); setNotify((v) => { const nv = !v; try { localStorage.setItem('cl-notify', nv ? '1' : '0'); } catch {} return nv; }); }
+  function openFromToast(t: { room: string; name: string }) {
+    primeAudio(); setOpen(true);
+    if (t.room === 'community') setTab('community');
+    else if (t.room.startsWith('support:')) { setTab('support'); if (isAdmin) { setRoom(t.room); setPickedName(t.name); } }
+    setToast(null);
   }
   async function send() {
     const body = text.trim(); if (!body || !room || !user) return;
@@ -178,6 +222,24 @@ export default function ChatWidget() {
 
   return (
     <>
+      {toast && (
+        <div className="fixed top-4 left-3 right-3 sm:left-auto sm:right-5 sm:w-80 z-[60] select-none"
+          style={{ transform: `translateX(${dragX}px)`, opacity: Math.max(0, 1 - Math.abs(dragX) / 170), touchAction: 'pan-y' }}
+          onPointerDown={(e) => { dragStart.current = e.clientX; draggedRef.current = false; }}
+          onPointerMove={(e) => { if (dragStart.current != null) { const dx = e.clientX - dragStart.current; if (Math.abs(dx) > 8) draggedRef.current = true; setDragX(dx); } }}
+          onPointerUp={() => { if (Math.abs(dragX) > 70) setToast(null); dragStart.current = null; setDragX(0); }}
+          onPointerCancel={() => { dragStart.current = null; setDragX(0); }}>
+          <div onClick={() => { if (draggedRef.current) { draggedRef.current = false; return; } openFromToast(toast); }}
+            className="cursor-pointer bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 flex items-center gap-3">
+            {toast.avatar ? <img src={toast.avatar} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" /> : <span className="w-10 h-10 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center font-bold shrink-0">{(toast.name || '?').charAt(0).toUpperCase()}</span>}
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-[#0A2540] truncate">💬 {toast.name}</p>
+              <p className="text-xs text-slate-500 truncate">{toast.body}</p>
+            </div>
+            <button onClick={(e) => { e.stopPropagation(); setToast(null); }} className="text-slate-300 hover:text-slate-500 text-lg leading-none shrink-0">×</button>
+          </div>
+        </div>
+      )}
       <div className="fixed bottom-5 right-5 z-[55] flex items-center gap-2">
         {!open && hint && (
           <div className="relative bg-white rounded-2xl shadow-xl border border-slate-200 pl-3.5 pr-3 py-2.5 w-[182px] animate-bounce" style={{ animationDuration: '1.5s' }}>
@@ -188,7 +250,7 @@ export default function ChatWidget() {
             </button>
           </div>
         )}
-        <button onClick={() => setOpen((o) => !o)} aria-label="Tin nhắn & gửi bán"
+        <button onClick={() => { primeAudio(); setOpen((o) => !o); }} aria-label="Tin nhắn & gửi bán"
           className="relative w-14 h-14 grid place-items-center bg-[#0A2540] hover:bg-[#0d2f54] text-white rounded-full shadow-2xl shadow-black/40 ring-2 ring-white/40 transition hover:scale-105 active:scale-95">
           {open ? <span className="text-2xl leading-none">×</span> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z" /></svg>}
           {!open && unread > 0 && <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 grid place-items-center bg-red-600 text-white text-[11px] font-bold rounded-full ring-2 ring-white">{unread > 99 ? '99+' : unread}</span>}
@@ -200,7 +262,10 @@ export default function ChatWidget() {
           <div className="bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white shrink-0">
             <div className="flex items-center justify-between px-4 pt-3">
               <b className="flex items-center gap-2">Cam Lâm Land {tab !== 'sell' && <span className={`w-2 h-2 rounded-full ${live ? 'bg-emerald-400' : 'bg-slate-400'}`} />}</b>
-              <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white text-xl leading-none">✕</button>
+              <div className="flex items-center gap-3">
+                <button onClick={toggleNotify} title={notify ? 'Tắt báo tin nhắn' : 'Bật báo tin nhắn'} className="text-white/70 hover:text-white text-base leading-none">{notify ? '🔔' : '🔕'}</button>
+                <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white text-xl leading-none">✕</button>
+              </div>
             </div>
             <div className="flex mt-2 text-sm font-bold">
               {([['community', 'Cộng đồng', unreadComm], ['support', isAdmin ? 'Hỗ trợ khách' : 'Hỗ trợ', unreadSupp], ['sell', 'Gửi bán', 0]] as [Tab, string, number][]).map(([t, lb, n]) => (

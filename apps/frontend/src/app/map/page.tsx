@@ -451,7 +451,7 @@ export default function MapPage() {
 
         <div className="relative flex-1">
           <MapView layers={geoLayers} overlays={overlays} baseMap={baseMap} labels={labels} measureMode={measure}
-            focusPoint={focusPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={(ovOn['qh-qd205'] ?? true) ? opacity : 1} fitTo={fitTo} />
+            focusPoint={focusPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={1} fitTo={fitTo} />
           {/* Thanh ĐỘ MỜ lớp phủ dạng DỌC nổi trên bản đồ — chỉ hiện trên điện thoại/iPad (bảng trái bị ẩn) */}
           {(ovOn['qh-qd205'] ?? true) && (
             <div className="lg:hidden absolute top-1/2 right-2 -translate-y-1/2 z-10 flex flex-col items-center gap-1 bg-white/95 backdrop-blur rounded-2xl border border-slate-200 shadow-lg px-2 py-3">

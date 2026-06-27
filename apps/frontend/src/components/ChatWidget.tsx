@@ -230,9 +230,10 @@ export default function ChatWidget() {
                   </select>
                 </div>
               )}
+              {tab === 'community' && <div className="px-3 py-1.5 bg-slate-50 text-[11px] font-bold text-[#0A2540] border-b border-slate-100 shrink-0 text-center">👥 Cộng đồng đầu tư Cam Lâm</div>}
               <div ref={boxRef} className="flex-1 overflow-y-auto scroll-soft p-3 space-y-2 bg-slate-50">
                 {needPick ? <p className="text-center text-sm text-slate-400 mt-8">Chọn một khách để trả lời.</p>
-                  : msgs.length === 0 ? <p className="text-center text-sm text-slate-400 mt-8">{tab === 'community' ? 'Chào mừng đến nhóm cộng đồng 👋' : 'Gửi tin cho admin để được hỗ trợ.'}</p>
+                  : msgs.length === 0 ? <p className="text-center text-sm text-slate-400 mt-8">{tab === 'community' ? 'Chào mừng đến Cộng đồng đầu tư Cam Lâm 👋' : 'Gửi tin cho admin để được hỗ trợ.'}</p>
                   : msgs.map((m) => {
                     const mine = m.userId === user.id;
                     return (

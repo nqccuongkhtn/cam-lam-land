@@ -15,12 +15,33 @@ function canAccess(room: string, user: { id: number; role: string }): boolean {
 }
 
 // Lọc nội dung gửi lên nhóm cộng đồng: chặn số điện thoại & từ ngữ tục.
-const BAD = new Set(['địt','đụ','đéo','đếch','đách','cặc','lồn','buồi','đĩ','cứt','đmm','dmm','đcm','dcm','vcl','vkl','clmm','cmnr','cml','đméo','fuck','shit','đjt','djt']);
+const NUM_WORDS = new Set(['khong','không','linh','le','lẻ','mot','một','mốt','hai','ba','bon','bốn','tu','tư','nam','năm','lam','lăm','sau','sáu','bay','bảy','bẩy','tam','tám','chin','chín']);
+const BAD_DIA = ['địt','cặc','cặk','lồn','buồi','đụmá','đụmẹ','đụmày','địtmẹ','địtmày','concặc','cáilồn','vãilồn','súcvật','ócchó','đồchó','thằngchó','conchó','chếtmẹ','đĩđiếm','đjt','đệt'];
+const BAD_NODIA = ['ditme','ditmemay','dmm','dcm','dkm','vcl','vkl','vloz','concac','cailon','dume','dumay','dumevl','ditcon','ocho','sucvat','thangcho','concho','clmm','cmnr','ditmaday','vclmm','vkldm'];
+const BAD_TOKEN = new Set(['đụ','đéo','đếch','đách','đĩ','cứt','cặc','lồn','buồi','địt','vl','dm','đm','vcl','vkl','clm','cmm','đmm','dmm','đcm','dcm','đjt','djt','loz','wtf','fuck','fck','shit','bitch']);
+function stripDia(x: string): string { return x.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd'); }
+function isPhone(body: string): boolean {
+  const re = /\d(?:[\s.\-_]?\d){8,}/;
+  if (re.test(body)) return true;
+  if (re.test(body.toLowerCase().replace(/[oóòỏõọôồổỗộơờởỡợ]/g, '0'))) return true;
+  const words = body.toLowerCase().split(/[^a-zà-ỹ]+/i).filter(Boolean);
+  let run = 0, max = 0, total = 0;
+  for (const w of words) { if (NUM_WORDS.has(w) || NUM_WORDS.has(stripDia(w))) { run++; total++; if (run > max) max = run; } else run = 0; }
+  return max >= 6 || total >= 9;
+}
+function isProfane(body: string): boolean {
+  const low = body.toLowerCase();
+  const colDia = low.replace(/[^a-zà-ỹ]/gi, '');
+  if (BAD_DIA.some((w) => colDia.includes(w))) return true;
+  const colNo = stripDia(low).replace(/[^a-z]/g, '');
+  if (BAD_NODIA.some((w) => colNo.includes(w))) return true;
+  const toks = low.split(/[^a-zà-ỹ0-9]+/i).filter(Boolean);
+  if (toks.some((t) => BAD_TOKEN.has(t))) return true;
+  return false;
+}
 function badContent(body: string): 'phone' | 'word' | null {
-  const d = body.replace(/[\s.\-_()+]+/g, '');
-  if (/\d{9,}/.test(d)) return 'phone';
-  const toks = body.toLowerCase().split(/[^a-zà-ỹ0-9]+/i);
-  if (toks.some((t) => BAD.has(t))) return 'word';
+  if (isPhone(body)) return 'phone';
+  if (isProfane(body)) return 'word';
   return null;
 }
 

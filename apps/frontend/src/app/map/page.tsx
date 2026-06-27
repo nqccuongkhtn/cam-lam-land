@@ -182,6 +182,7 @@ export default function MapPage() {
   const camVideoRef = useRef<HTMLVideoElement>(null);
   const camStreamRef = useRef<MediaStream | null>(null);
   const [ocrBusy, setOcrBusy] = useState('');
+  const [ocrOk, setOcrOk] = useState(0);
   const [drawResult, setDrawResult] = useState<{ n: number; area: number; perim: number; lat: number; lng: number } | null>(null);
   const [tool, setTool] = useState<'none' | 'search' | 'base' | 'measure'>('none'); // bảng công cụ trên mobile
 
@@ -281,6 +282,7 @@ export default function MapPage() {
   function applyParsed(parsed: { x: number; y: number }[]) {
     if (!parsed.length) return alert('Chưa nhận được toạ độ từ ảnh. Hãy chụp GẦN, THẲNG, đủ sáng — chỉ lấy phần bảng số. Hoặc nhập tay ở tab "Nhập bảng".');
     setRows(parsed.map((p) => ({ x: String(p.x), y: String(p.y) })));
+    setOcrOk(parsed.length);
     setDrawTab('table');
   }
   function loadImage(f: File): Promise<HTMLImageElement> {
@@ -491,12 +493,13 @@ export default function MapPage() {
                 </div>
                 <div className="flex border-b border-slate-100 px-3">
                   {([['table', '⌗ Nhập bảng'], ['import', '📷 Chụp / Ảnh']] as [typeof drawTab, string][]).map(([k, lb]) => (
-                    <button key={k} onClick={() => setDrawTab(k)} className={`px-3 py-2.5 text-sm font-semibold border-b-2 ${drawTab === k ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500'}`}>{lb}</button>
+                    <button key={k} onClick={() => { setDrawTab(k); setOcrOk(0); }} className={`px-3 py-2.5 text-sm font-semibold border-b-2 ${drawTab === k ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500'}`}>{lb}</button>
                   ))}
                 </div>
                 <div className="p-5 space-y-3">
                   {drawTab === 'table' && (
                     <div className="space-y-2">
+                      {ocrOk > 0 && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg px-3 py-2">✅ Đã nhận {ocrOk} điểm từ ảnh. Kiểm tra lại số rồi bấm “Vẽ & zoom tới thửa”.</div>}
                       <div className="grid grid-cols-[26px_1fr_1fr_26px] gap-2 text-xs font-semibold text-slate-500 px-1"><span>#</span><span>X (Đông)</span><span>Y (Bắc)</span><span /></div>
                       <div className="space-y-1.5 max-h-52 overflow-y-auto scroll-soft pr-1">
                         {rows.map((r, i2) => (

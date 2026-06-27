@@ -30,4 +30,12 @@ export async function ensureAdmin(): Promise<void> {
        'Mẫu 6 tháng']);
     console.log('[seed] map_ads mẫu');
   }
+
+  // Xoá tin nhắn nhóm cộng đồng cũ (chạy đúng 1 lần)
+  const flag = await query("SELECT 1 FROM app_flags WHERE key='community_reset_v1'");
+  if (!flag.length) {
+    await query("DELETE FROM chat_messages WHERE room='community'");
+    await query("INSERT INTO app_flags (key) VALUES ('community_reset_v1') ON CONFLICT DO NOTHING");
+    console.log('[chat] đã xoá tin nhắn cộng đồng cũ (một lần)');
+  }
 }

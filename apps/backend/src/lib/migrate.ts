@@ -102,6 +102,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS chat_room_idx ON chat_messages (room, id);
+CREATE TABLE IF NOT EXISTS app_flags (key TEXT PRIMARY KEY, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
 
 -- ── Dọn dữ liệu: không cho giá âm (đưa về dương) ──
 UPDATE listings SET price = ABS(price) WHERE price < 0;

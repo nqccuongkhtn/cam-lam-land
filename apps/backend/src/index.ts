@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
 import http from 'node:http';
-import { WebSocketServer } from 'ws';
+import { initWs } from './lib/ws.ts';
 import { env } from './lib/env.ts';
 import { waitForDb } from './lib/db.ts';
 import { ensureAdmin } from './lib/ensureAdmin.ts';
@@ -27,6 +27,11 @@ app.use(cors());
 app.use(express.json({ limit: '5mb' }));
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', region: 'Cam Lâm, Khánh Hòa', ts: Date.now() }));
+app.get('/api/config', (_req, res) => {
+  const ext = process.env.RENDER_EXTERNAL_URL || '';
+  const host = ext.replace(/^https?:\/\//, '');
+  res.json({ wsUrl: host ? `wss://${host}/ws` : '' });
+});
 app.use('/api/auth', authRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/layers', layersRouter);
@@ -42,16 +47,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 const server = http.createServer(app);
-
-// Optional: WebSocket channel for live map updates (broadcast hook).
-const wss = new WebSocketServer({ server, path: '/ws' });
-wss.on('connection', (ws) => {
-  ws.send(JSON.stringify({ type: 'hello', region: 'Cam Lâm' }));
-});
-export const broadcast = (msg: unknown) => {
-  const data = JSON.stringify(msg);
-  wss.clients.forEach((c) => c.readyState === 1 && c.send(data));
-};
+initWs(server);
 
 async function main() {
   await waitForDb();

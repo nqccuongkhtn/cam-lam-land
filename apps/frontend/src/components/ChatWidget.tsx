@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/lib/auth';
 import { api } from '@/lib/api';
+import { getToken } from '@/lib/token';
 
 interface Msg { id: number; userId: number | null; name: string; body: string; createdAt: string; }
 interface Room { room: string; name: string; lastBody: string; lastAt: string; count: number; }
@@ -14,9 +15,22 @@ export default function ChatWidget() {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [text, setText] = useState('');
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [wsUrl, setWsUrl] = useState('');
+  const [live, setLive] = useState(false);
   const lastId = useRef(0);
+  const seen = useRef<Set<number>>(new Set());
+  const roomRef = useRef(room); roomRef.current = room;
   const boxRef = useRef<HTMLDivElement>(null);
   const isAdmin = user?.role === 'admin';
+
+  function pushMsgs(arr: Msg[]) {
+    const fresh = (arr || []).filter((m) => m && !seen.current.has(m.id));
+    if (!fresh.length) return;
+    fresh.forEach((m) => { seen.current.add(m.id); lastId.current = Math.max(lastId.current, m.id); });
+    setMsgs((cur) => [...cur, ...fresh]);
+  }
+
+  useEffect(() => { if (user) api<{ wsUrl: string }>('/config').then((r) => setWsUrl(r.wsUrl || '')).catch(() => {}); }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -25,23 +39,33 @@ export default function ChatWidget() {
     else setRoom('');
   }, [tab, user, isAdmin]);
 
-  // Nạp + polling tin nhắn của phòng đang mở
+  // Nạp lịch sử + polling nhẹ dự phòng cho phòng đang mở
   useEffect(() => {
     if (!open || !user || !room) { setMsgs([]); return; }
-    lastId.current = 0; setMsgs([]);
+    seen.current = new Set(); lastId.current = 0; setMsgs([]);
     let alive = true;
     const tick = async () => {
-      try {
-        const r = await api<{ messages: Msg[] }>(`/chat/messages?room=${encodeURIComponent(room)}&after=${lastId.current}`);
-        if (!alive || !r.messages.length) return;
-        lastId.current = r.messages[r.messages.length - 1].id;
-        setMsgs((m) => [...m, ...r.messages]);
-      } catch {}
+      try { const r = await api<{ messages: Msg[] }>(`/chat/messages?room=${encodeURIComponent(room)}&after=${lastId.current}`); if (alive) pushMsgs(r.messages); } catch {}
     };
     tick();
-    const iv = setInterval(tick, 3500);
+    const iv = setInterval(tick, 8000);
     return () => { alive = false; clearInterval(iv); };
   }, [open, user, room]);
+
+  // WebSocket real-time
+  useEffect(() => {
+    if (!open || !user || !wsUrl) return;
+    const token = getToken();
+    let ws: WebSocket;
+    try { ws = new WebSocket(token ? `${wsUrl}?token=${encodeURIComponent(token)}` : wsUrl); } catch { return; }
+    ws.onopen = () => setLive(true);
+    ws.onclose = () => setLive(false);
+    ws.onerror = () => setLive(false);
+    ws.onmessage = (ev) => {
+      try { const d = JSON.parse(ev.data); if (d.type === 'chat' && d.room === roomRef.current && d.message) pushMsgs([d.message]); } catch {}
+    };
+    return () => { try { ws.close(); } catch {} setLive(false); };
+  }, [open, user, wsUrl]);
 
   // Admin: danh sách hội thoại hỗ trợ
   useEffect(() => {
@@ -59,8 +83,7 @@ export default function ChatWidget() {
     setText('');
     try {
       const r = await api<{ id: number; createdAt: string; name: string }>('/chat/messages', { method: 'POST', body: JSON.stringify({ room, body }) });
-      setMsgs((m) => [...m, { id: r.id, userId: user.id, name: r.name, body, createdAt: r.createdAt }]);
-      lastId.current = Math.max(lastId.current, r.id);
+      pushMsgs([{ id: r.id, userId: user.id, name: r.name, body, createdAt: r.createdAt }]);
     } catch (e: any) { alert(e.message); }
   }
 
@@ -71,15 +94,17 @@ export default function ChatWidget() {
   return (
     <>
       <button onClick={() => setOpen((o) => !o)} aria-label="Tin nhắn"
-        className="fixed bottom-5 left-5 z-[55] w-14 h-14 grid place-items-center bg-[#0A2540] hover:bg-[#0d2f54] text-white rounded-full shadow-2xl shadow-black/30 ring-2 ring-white/40 transition hover:scale-105 active:scale-95">
+        className="fixed bottom-24 right-5 z-[55] w-14 h-14 grid place-items-center bg-[#0A2540] hover:bg-[#0d2f54] text-white rounded-full shadow-2xl shadow-black/30 ring-2 ring-white/40 transition hover:scale-105 active:scale-95">
         {open ? <span className="text-2xl leading-none">×</span> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z" /></svg>}
       </button>
 
       {open && (
-        <div className="fixed bottom-24 left-3 sm:left-5 z-[56] w-[94vw] max-w-sm h-[68vh] max-h-[560px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+        <div className="fixed bottom-40 right-3 sm:right-5 z-[56] w-[94vw] max-w-sm h-[68vh] max-h-[560px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
           <div className="bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white shrink-0">
             <div className="flex items-center justify-between px-4 pt-3">
-              <b>Tin nhắn Cam Lâm Land</b>
+              <b className="flex items-center gap-2">Tin nhắn Cam Lâm Land
+                <span className={`w-2 h-2 rounded-full ${live ? 'bg-emerald-400' : 'bg-slate-400'}`} title={live ? 'Trực tuyến' : 'Đang kết nối'} />
+              </b>
               <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white text-xl leading-none">✕</button>
             </div>
             <div className="flex mt-2">

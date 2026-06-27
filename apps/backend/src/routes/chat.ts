@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
+import { broadcastChat } from '../lib/ws.ts';
 
 export const chatRouter = Router();
 
@@ -38,6 +39,8 @@ chatRouter.post('/messages', authRequired, async (req: AuthedRequest, res, next)
     const [row] = await query(
       `INSERT INTO chat_messages (room, user_id, name, body) VALUES ($1,$2,$3,$4) RETURNING id, created_at AS "createdAt"`,
       [room, req.user!.id, name, body]);
+    const message = { id: row.id, room, userId: req.user!.id, name, body, createdAt: row.createdAt };
+    broadcastChat(room, message);
     res.status(201).json({ id: row.id, createdAt: row.createdAt, name });
   } catch (e) { next(e); }
 });

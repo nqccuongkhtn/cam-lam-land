@@ -30,13 +30,14 @@ layersRouter.get('/:slug/features', async (req, res, next) => {
       params.push(w, s, e, n);
       bboxClause = ` AND geom && ST_MakeEnvelope($2,$3,$4,$5,4326)`;
     }
+    const lim = Math.min(20000, Math.max(1, Number(req.query.limit) || 8000));
     const rows = await query(`
       SELECT json_build_object(
         'type','Feature','id',id,
         'geometry', ST_AsGeoJSON(geom)::json,
         'properties', properties
       ) AS feature
-      FROM gis_features WHERE layer_id=$1${bboxClause}`, params);
+      FROM gis_features WHERE layer_id=$1${bboxClause} LIMIT ${lim}`, params);
     res.json({ type: 'FeatureCollection', features: rows.map((r: any) => r.feature) });
   } catch (e) { next(e); }
 });

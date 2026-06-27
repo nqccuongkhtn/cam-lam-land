@@ -18,6 +18,7 @@ const RASTER_OVERLAYS = [
     coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]] },
 ];
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
+const PARCEL_MIN_ZOOM = 14; // thửa đất chỉ tải khi đủ gần
 
 interface ParcelInfo {
   found: boolean; point: { lng: number; lat: number };
@@ -159,6 +160,11 @@ export default function MapPage() {
   const [layers, setLayers] = useState<GisLayer[]>([]);
   const [data, setData] = useState<Record<string, GeoJSON.FeatureCollection>>({});
   const [visible, setVisible] = useState<Record<string, boolean>>({});
+  const [zoomNow, setZoomNow] = useState(0);
+  const layersRef = useRef<GisLayer[]>([]); layersRef.current = layers;
+  const visibleRef = useRef<Record<string, boolean>>({}); visibleRef.current = visible;
+  const viewRef = useRef<{ west: number; south: number; east: number; north: number; zoom: number } | null>(null);
+  const featTimer = useRef<any>(null);
   const [info, setInfo] = useState<ParcelInfo | null>(null);
   const [clickVN, setClickVN] = useState<{ x: number; y: number; lng: number; lat: number } | null>(null);
   const [opacity, setOpacity] = useState(0.85);
@@ -187,18 +193,28 @@ export default function MapPage() {
   const [drawResult, setDrawResult] = useState<{ n: number; area: number; perim: number; lat: number; lng: number } | null>(null);
   const [tool, setTool] = useState<'none' | 'search' | 'base' | 'measure'>('none'); // bảng công cụ trên mobile
 
-  const load = useCallback(() => {
-    api<{ layers: GisLayer[] }>('/layers').then(async ({ layers }) => {
-      setLayers(layers);
-      setVisible((prev) => Object.fromEntries(layers.map((l) => [l.slug, prev[l.slug] ?? false])));
-      const entries = await Promise.all(layers.map(async (l) => {
-        try { return [l.slug, await api<GeoJSON.FeatureCollection>(`/layers/${l.slug}/features`)] as const; }
-        catch { return [l.slug, { type: 'FeatureCollection', features: [] }] as const; }
-      }));
-      setData(Object.fromEntries(entries));
-    }).catch(() => {});
+  const refreshFeatures = useCallback((v: { west: number; south: number; east: number; north: number; zoom: number }) => {
+    const bbox = `${v.west},${v.south},${v.east},${v.north}`;
+    for (const l of layersRef.current) {
+      const vis = visibleRef.current[l.slug] ?? (l.layerType === 'parcel');
+      if (!vis) continue;
+      if (l.layerType === 'parcel' && v.zoom < PARCEL_MIN_ZOOM) { setData((d) => ({ ...d, [l.slug]: { type: 'FeatureCollection', features: [] } })); continue; }
+      api<GeoJSON.FeatureCollection>(`/layers/${l.slug}/features?bbox=${bbox}`).then((fc) => setData((d) => ({ ...d, [l.slug]: fc }))).catch(() => {});
+    }
   }, []);
+  const onViewport = useCallback((v: { west: number; south: number; east: number; north: number; zoom: number }) => {
+    viewRef.current = v; setZoomNow(v.zoom);
+    clearTimeout(featTimer.current); featTimer.current = setTimeout(() => refreshFeatures(v), 350);
+  }, [refreshFeatures]);
+  const load = useCallback(() => {
+    api<{ layers: GisLayer[] }>('/layers').then(({ layers }) => {
+      setLayers(layers);
+      setVisible((prev) => Object.fromEntries(layers.map((l) => [l.slug, prev[l.slug] ?? (l.layerType === 'parcel')])));
+      if (viewRef.current) refreshFeatures(viewRef.current);
+    }).catch(() => {});
+  }, [refreshFeatures]);
   useEffect(() => { load(); api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {}); }, [load]);
+  useEffect(() => { if (viewRef.current) refreshFeatures(viewRef.current); }, [visible, refreshFeatures]);
   useEffect(() => { setCanDelete(user?.role === 'admin' || user?.role === 'gis'); }, [user]);
   useEffect(() => { if (!camOpen) return; const v = camVideoRef.current, st = camStreamRef.current; if (!v || !st) return; v.srcObject = st; v.setAttribute('playsinline', 'true'); v.play().catch(() => {}); }, [camOpen]);
 
@@ -444,7 +460,7 @@ export default function MapPage() {
           {layers.length === 0 && <p className="text-sm text-slate-500">Đang tải…</p>}
           {layers.map((l) => (
             <div key={l.slug} className="flex items-center gap-2 py-1.5 text-sm">
-              <input type="checkbox" checked={visible[l.slug] ?? false} onChange={(e) => setVisible((v) => ({ ...v, [l.slug]: e.target.checked }))} />
+              <input type="checkbox" checked={visible[l.slug] ?? (l.layerType === 'parcel')} onChange={(e) => setVisible((v) => ({ ...v, [l.slug]: e.target.checked }))} />
               <span className="inline-block w-3 h-3 rounded-sm shrink-0" style={{ background: (l.style?.color as string) || DEFAULT_COLORS[l.layerType] }} />
               <span className="flex-1 truncate" title={l.name}>{l.name}</span>
               <span className="text-xs text-slate-400">{l.featureCount}</span>
@@ -456,7 +472,10 @@ export default function MapPage() {
 
         <div className="relative flex-1">
           <MapView layers={geoLayers} overlays={overlays} baseMap={baseMap} labels={labels} measureMode={measure}
-            focusPoint={focusPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={1} fitTo={fitTo} />
+            focusPoint={focusPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} onViewport={onViewport} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={1} fitTo={fitTo} />
+          {zoomNow > 0 && zoomNow < PARCEL_MIN_ZOOM && layers.some((l) => l.layerType === 'parcel' && (visible[l.slug] ?? true)) && (
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 bg-[#0A2540]/90 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">🔍 Phóng to để hiển thị thửa đất</div>
+          )}
           {/* Thanh ĐỘ MỜ lớp phủ dạng DỌC nổi trên bản đồ — chỉ hiện trên điện thoại/iPad (bảng trái bị ẩn) */}
           {(ovOn['qh-qd205'] ?? true) && (
             <div className="lg:hidden absolute top-1/2 right-2 -translate-y-1/2 z-10 flex flex-col items-center gap-1 bg-white/95 backdrop-blur rounded-2xl border border-slate-200 shadow-lg px-2 py-3">

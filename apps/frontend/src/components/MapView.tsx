@@ -22,6 +22,7 @@ interface Props {
   fitTo?: [[number, number], [number, number]] | null; // zoom khít vào vùng (vd: thửa vừa vẽ)
   onMapClick?: (lng: number, lat: number) => void;
   onMeasure?: (r: MeasureResult) => void;
+  onViewport?: (v: { west: number; south: number; east: number; north: number; zoom: number }) => void;
 }
 
 // Google tiles — best detail/zoom for Vietnam. lyrs: m=đường, y=vệ tinh+nhãn, p=địa hình
@@ -67,7 +68,7 @@ function polyArea(pts: { lng: number; lat: number }[]) {
 
 const WM_MIN_ZOOM = 14; // chữ mờ chỉ hiện khi zoom gần
 const WM_OPACITY = 0.38; // nhạt kiểu Shutterstock
-export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, onMapClick, onMeasure }: Props) {
+export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, onMapClick, onMeasure, onViewport }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const markerRefs = useRef<Marker[]>([]);
@@ -75,6 +76,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
   const adRefs = useRef<Marker[]>([]);
   const adOpacityRef = useRef(adOpacity); adOpacityRef.current = adOpacity;
   const wmRef = useRef<HTMLDivElement | null>(null);
+  const onViewportRef = useRef(onViewport); onViewportRef.current = onViewport;
   const readyRef = useRef(false);
   const measureModeRef = useRef<MeasureMode>(measureMode);
   const measurePts = useRef<{ lng: number; lat: number }[]>([]);
@@ -116,6 +118,8 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     mapRef.current = map;
     const wmZoom = () => { if (wmRef.current) wmRef.current.style.display = map.getZoom() < WM_MIN_ZOOM ? 'none' : ''; };
     map.on('zoom', wmZoom); map.on('load', wmZoom);
+    const fireView = () => { const fn = onViewportRef.current; if (!fn) return; const b = map.getBounds(); fn({ west: b.getWest(), south: b.getSouth(), east: b.getEast(), north: b.getNorth(), zoom: map.getZoom() }); };
+    map.on('moveend', fireView); map.on('load', fireView);
     // Tự resize + khớp khung khi container đổi kích thước (vd: chuyển tab Danh sách↔Bản đồ trên mobile).
     let ro: ResizeObserver | null = null;
     if (typeof ResizeObserver !== 'undefined' && containerRef.current) {

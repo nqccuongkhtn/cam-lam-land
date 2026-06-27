@@ -202,7 +202,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       const nm = esc(String(a.name || '').slice(0, 28)), tel = esc(String(a.phone || ''));
       if (a.style === 'text') {
         el.style.filter = '';
-        el.innerHTML = `<div style="text-align:center;white-space:nowrap;font-family:Inter,system-ui,sans-serif;text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 3px rgba(0,0,0,.85);line-height:1.15;pointer-events:none;"><div style="font-size:16px;font-weight:800;color:#ffffff;letter-spacing:.3px;">${nm}</div><div style="font-size:13px;font-weight:700;color:#FFD874;">${tel}</div></div>`;
+        el.innerHTML = `<div style="text-align:center;white-space:nowrap;font-family:'Roboto','Inter',system-ui,sans-serif;line-height:1.18;pointer-events:none;"><div style="font-size:16px;font-weight:700;letter-spacing:.3px;color:rgba(255,255,255,.96);-webkit-text-stroke:0.6px rgba(0,0,0,.55);text-shadow:0 1px 2px rgba(0,0,0,.6);">${nm}</div><div style="font-size:14px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.96);-webkit-text-stroke:0.5px rgba(0,0,0,.5);text-shadow:0 1px 2px rgba(0,0,0,.55);">${tel}</div></div>`;
       } else {
         el.style.filter = 'drop-shadow(0 2px 5px rgba(0,0,0,.4))';
         const uid = 'ad' + a.id + Math.random().toString(36).slice(2, 6);

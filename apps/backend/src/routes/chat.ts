@@ -55,7 +55,30 @@ chatRouter.get('/messages', authRequired, async (req: AuthedRequest, res, next) 
       `SELECT m.id, m.room, m.user_id AS "userId", m.name, m.body, m.created_at AS "createdAt", u.avatar
          FROM chat_messages m LEFT JOIN users u ON u.id = m.user_id
          WHERE m.room=$1 AND m.id > $2 ORDER BY m.id ASC LIMIT 300`, [room, after]);
-    res.json({ messages: rows });
+    let ack: { received: number; read: number } | null = null;
+    if (req.user!.role === 'admin' && room.startsWith('support:')) {
+      const uid = Number(room.slice(8));
+      const [a] = await query('SELECT received_id AS "received", read_id AS "read" FROM chat_reads WHERE room=$1 AND user_id=$2', [room, uid]);
+      ack = { received: a?.received ?? 0, read: a?.read ?? 0 };
+    }
+    res.json({ messages: rows, ack });
+  } catch (e) { next(e); }
+});
+
+// POST /api/chat/ack — đánh dấu đã nhận / đã xem (để admin thấy trạng thái)
+chatRouter.post('/ack', authRequired, async (req: AuthedRequest, res, next) => {
+  try {
+    const room = String(req.body?.room ?? '');
+    if (!canAccess(room, req.user!)) return res.status(403).json({ error: 'Không có quyền' });
+    const received = Math.max(0, Number(req.body?.received ?? 0) || 0);
+    const read = Math.max(0, Number(req.body?.read ?? 0) || 0);
+    await query(
+      `INSERT INTO chat_reads (room, user_id, received_id, read_id, updated_at) VALUES ($1,$2,$3,$4, now())
+       ON CONFLICT (room, user_id) DO UPDATE SET
+         received_id = GREATEST(chat_reads.received_id, EXCLUDED.received_id),
+         read_id = GREATEST(chat_reads.read_id, EXCLUDED.read_id), updated_at = now()`,
+      [room, req.user!.id, received, read]);
+    res.json({ ok: true });
   } catch (e) { next(e); }
 });
 

@@ -31,6 +31,9 @@ export default function ChatWidget() {
   const [hint, setHint] = useState(false);
   const hintShown = useRef(0);
   const hintStop = useRef(false);
+  const [peerAck, setPeerAck] = useState<{ received: number; read: number } | null>(null);
+  const [listOpen, setListOpen] = useState(true);
+  const acked = useRef(0);
 
   const lastId = useRef(0);
   const seen = useRef<Set<number>>(new Set());
@@ -59,7 +62,7 @@ export default function ChatWidget() {
     if (!user) { setUnreadComm(0); setUnreadSupp(0); return; }
     const poll = async () => {
       try { const c = await api<{ messages: Msg[] }>(`/chat/messages?room=community&after=${seenComm.current}`); setUnreadComm(c.messages.filter((m) => m.userId !== user.id).length); } catch {}
-      if (!isAdmin) { try { const s = await api<{ messages: Msg[] }>(`/chat/messages?room=support:${user.id}&after=${seenSupp.current}`); setUnreadSupp(s.messages.filter((m) => m.userId !== user.id).length); } catch {} }
+      if (!isAdmin) { try { const s = await api<{ messages: Msg[] }>(`/chat/messages?room=support:${user.id}&after=${seenSupp.current}`); setUnreadSupp(s.messages.filter((m) => m.userId !== user.id).length); if (s.messages.length) api('/chat/ack', { method: 'POST', body: JSON.stringify({ room: `support:${user.id}`, received: Math.max(...s.messages.map((m) => m.id)) }) }).catch(() => {}); } catch {} }
     };
     poll();
     const iv = setInterval(poll, 12000);
@@ -69,9 +72,9 @@ export default function ChatWidget() {
   // Phòng đang mở: nạp + polling dự phòng
   useEffect(() => {
     if (!open || !user || !room) { setMsgs([]); return; }
-    seen.current = new Set(); lastId.current = 0; setMsgs([]); setWarn('');
+    seen.current = new Set(); lastId.current = 0; acked.current = 0; setMsgs([]); setWarn(''); setPeerAck(null);
     let alive = true;
-    const tick = async () => { try { const r = await api<{ messages: Msg[] }>(`/chat/messages?room=${encodeURIComponent(room)}&after=${lastId.current}`); if (alive) pushMsgs(r.messages); } catch {} };
+    const tick = async () => { try { const r = await api<{ messages: Msg[]; ack?: { received: number; read: number } | null }>(`/chat/messages?room=${encodeURIComponent(room)}&after=${lastId.current}`); if (alive) { pushMsgs(r.messages); if (r.ack) setPeerAck(r.ack); } } catch {} };
     tick();
     const iv = setInterval(tick, 8000);
     return () => { alive = false; clearInterval(iv); };
@@ -101,6 +104,7 @@ export default function ChatWidget() {
     if (!open || !room || !lastId.current) return;
     if (room === 'community') { seenComm.current = lastId.current; try { localStorage.setItem('cl-seen-community', String(lastId.current)); } catch {} setUnreadComm(0); }
     else if (room.startsWith('support:') && user && !isAdmin) { seenSupp.current = lastId.current; try { localStorage.setItem(`cl-seen-support:${user.id}`, String(lastId.current)); } catch {} setUnreadSupp(0); }
+    if (room.startsWith('support:') && lastId.current > acked.current) { acked.current = lastId.current; api('/chat/ack', { method: 'POST', body: JSON.stringify({ room, received: lastId.current, read: lastId.current }) }).catch(() => {}); }
   }, [msgs, open, room, user, isAdmin]);
 
   useEffect(() => { boxRef.current?.scrollTo({ top: boxRef.current.scrollHeight }); }, [msgs, open, tab]);
@@ -144,6 +148,8 @@ export default function ChatWidget() {
   }
 
   const needPick = isAdmin && tab === 'support' && !room.startsWith('support:');
+  const adminSupport = isAdmin && tab === 'support';
+  let lastMineId = 0; if (user) for (const m of msgs) if (m.userId === user.id) lastMineId = m.id;
   const canType = tab !== 'sell' && !!user && !!room && !needPick;
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm';
 
@@ -167,7 +173,7 @@ export default function ChatWidget() {
       </div>
 
       {open && (
-        <div className="fixed bottom-24 right-3 sm:right-5 z-[56] w-[94vw] max-w-sm h-[70vh] max-h-[580px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+        <div className={`fixed bottom-24 right-3 sm:right-5 z-[56] w-[94vw] ${adminSupport ? 'max-w-[680px]' : 'max-w-sm'} h-[70vh] max-h-[580px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden`}>
           <div className="bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white shrink-0">
             <div className="flex items-center justify-between px-4 pt-3">
               <b className="flex items-center gap-2">Cam Lâm Land {tab !== 'sell' && <span className={`w-2 h-2 rounded-full ${live ? 'bg-emerald-400' : 'bg-slate-400'}`} />}</b>
@@ -222,41 +228,73 @@ export default function ChatWidget() {
               </div>
             </div>
           ) : (
-            <>
-              {isAdmin && tab === 'support' && (
-                <div className="p-2 border-b border-slate-100 shrink-0">
-                  <select value={room.startsWith('support:') ? room : ''} onChange={(e) => setRoom(e.target.value)} className="w-full border border-slate-300 rounded-lg px-2.5 py-2 text-sm">
-                    <option value="">— Chọn khách ({rooms.length}) —</option>{rooms.map((r) => <option key={r.room} value={r.room}>{r.name} · {r.count} tin</option>)}
-                  </select>
-                </div>
-              )}
-              {tab === 'community' && <div className="px-3 py-1.5 bg-slate-50 text-[11px] font-bold text-[#0A2540] border-b border-slate-100 shrink-0 text-center">👥 Cộng đồng đầu tư Cam Lâm</div>}
-              <div ref={boxRef} className="flex-1 overflow-y-auto scroll-soft p-3 space-y-2 bg-slate-50">
-                {needPick ? <p className="text-center text-sm text-slate-400 mt-8">Chọn một khách để trả lời.</p>
-                  : msgs.length === 0 ? <p className="text-center text-sm text-slate-400 mt-8">{tab === 'community' ? 'Chào mừng đến Cộng đồng đầu tư Cam Lâm 👋' : 'Gửi tin cho admin để được hỗ trợ.'}</p>
-                  : msgs.map((m) => {
-                    const mine = m.userId === user.id;
-                    return (
-                      <div key={m.id} className={`flex items-end gap-1.5 ${mine ? 'justify-end' : 'justify-start'}`}>
-                        {!mine && (m.avatar ? <img src={m.avatar} alt="" className="w-7 h-7 rounded-full object-cover shrink-0" /> : <span className="w-7 h-7 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-[11px] font-bold shrink-0">{(m.name || '?').charAt(0).toUpperCase()}</span>)}
-                        <div className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${mine ? 'bg-[#0A2540] text-white rounded-br-sm' : 'bg-white border border-slate-200 rounded-bl-sm'}`}>
-                          {!mine && <p className="text-[11px] font-bold text-[#C8A14B] mb-0.5">{m.name}</p>}
-                          <p className="whitespace-pre-wrap break-words">{m.body}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
-              {canType && (
-                <div className="border-t border-slate-100 shrink-0">
-                  {warn && <p className="px-3 pt-2 text-xs text-red-600 font-semibold leading-snug">⚠️ {warn}</p>}
-                  <div className="p-2 flex gap-2">
-                    <input value={text} onChange={(e) => { setText(e.target.value); if (warn) setWarn(''); }} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Nhập tin nhắn…" className="flex-1 border border-slate-300 rounded-full px-3.5 py-2 text-sm outline-none focus:border-[#0A2540]" />
-                    <button onClick={send} className="bg-red-600 hover:bg-red-700 text-white rounded-full px-4 py-2 text-sm font-bold shrink-0">Gửi</button>
+            <div className={`flex-1 min-h-0 flex ${adminSupport ? 'flex-row' : 'flex-col'}`}>
+              {adminSupport && (
+                <aside className={`${room ? 'hidden sm:flex' : 'flex'} flex-col shrink-0 border-r border-slate-100 bg-white w-full ${(!room || listOpen) ? 'sm:w-52' : 'sm:w-0 sm:overflow-hidden sm:border-r-0'} transition-all`}>
+                  <div className="px-3 py-2 text-[11px] font-bold text-slate-500 border-b border-slate-100 shrink-0">💬 Hội thoại ({rooms.length})</div>
+                  <div className="flex-1 overflow-y-auto scroll-soft">
+                    {rooms.length === 0 ? <p className="p-3 text-xs text-slate-400">Chưa có khách nhắn.</p>
+                      : rooms.map((r) => {
+                        const active = room === r.room;
+                        return (
+                          <button key={r.room} onClick={() => setRoom(r.room)} className={`w-full flex items-center gap-2 px-2.5 py-2 text-left border-b border-slate-50 hover:bg-slate-50 ${active ? 'bg-slate-100' : ''}`}>
+                            <span className="w-9 h-9 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-sm font-bold shrink-0">{(r.name || '?').charAt(0).toUpperCase()}</span>
+                            <span className="min-w-0 flex-1">
+                              <span className="block text-sm font-semibold text-[#0A2540] truncate">{r.name}</span>
+                              <span className="block text-[11px] text-slate-400 truncate">{r.lastBody || '—'}</span>
+                            </span>
+                          </button>
+                        );
+                      })}
                   </div>
+                </aside>
+              )}
+              <div className={`flex-1 min-h-0 flex flex-col ${adminSupport && !room ? 'hidden sm:flex' : 'flex'}`}>
+                {adminSupport && room && (
+                  <div className="flex items-center gap-2 px-2.5 py-2 border-b border-slate-100 shrink-0 bg-white">
+                    <button onClick={() => setRoom('')} className="sm:hidden w-7 h-7 grid place-items-center rounded-full hover:bg-slate-100 text-slate-600">←</button>
+                    <button onClick={() => setListOpen((v) => !v)} title="Thu gọn danh sách" className="hidden sm:grid w-7 h-7 place-items-center rounded-full hover:bg-slate-100 text-slate-600">☰</button>
+                    <b className="text-sm text-[#0A2540] truncate">{rooms.find((r) => r.room === room)?.name || 'Khách hàng'}</b>
+                  </div>
+                )}
+                {tab === 'community' && (
+                <div className="px-3 py-1.5 bg-slate-50 border-b border-slate-100 shrink-0 text-center">
+                  <p className="text-[11px] font-bold text-[#0A2540]">👥 Cộng đồng đầu tư Cam Lâm</p>
+                  <p className="text-[10px] text-slate-500">Admin: Nguyễn Quốc Cường · <a href="tel:0988888888" className="font-semibold text-[#0A2540]">0988 888 888</a></p>
                 </div>
               )}
-            </>
+                <div ref={boxRef} className="flex-1 overflow-y-auto scroll-soft p-3 space-y-2 bg-slate-50">
+                  {needPick ? <p className="text-center text-sm text-slate-400 mt-8">← Chọn một khách để trả lời.</p>
+                    : msgs.length === 0 ? <p className="text-center text-sm text-slate-400 mt-8">{tab === 'community' ? 'Chào mừng đến Cộng đồng đầu tư Cam Lâm 👋' : 'Gửi tin cho admin để được hỗ trợ.'}</p>
+                    : msgs.map((m) => {
+                      const mine = m.userId === user.id;
+                      return (
+                        <div key={m.id}>
+                          <div className={`flex items-end gap-1.5 ${mine ? 'justify-end' : 'justify-start'}`}>
+                            {!mine && (m.avatar ? <img src={m.avatar} alt="" className="w-7 h-7 rounded-full object-cover shrink-0" /> : <span className="w-7 h-7 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-[11px] font-bold shrink-0">{(m.name || '?').charAt(0).toUpperCase()}</span>)}
+                            <div className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${mine ? 'bg-[#0A2540] text-white rounded-br-sm' : 'bg-white border border-slate-200 rounded-bl-sm'}`}>
+                              {!mine && <p className="text-[11px] font-bold text-[#C8A14B] mb-0.5">{m.name}</p>}
+                              <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                            </div>
+                          </div>
+                          {adminSupport && mine && m.id === lastMineId && peerAck && (
+                            <p className="text-[10px] text-slate-400 text-right mt-0.5 pr-1">{peerAck.read >= m.id ? '✓✓ Đã xem' : peerAck.received >= m.id ? '✓ Đã nhận' : 'Đã gửi'}</p>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
+                {canType && (
+                  <div className="border-t border-slate-100 shrink-0">
+                    {warn && <p className="px-3 pt-2 text-xs text-red-600 font-semibold leading-snug">⚠️ {warn}</p>}
+                    <div className="p-2 flex gap-2">
+                      <input value={text} onChange={(e) => { setText(e.target.value); if (warn) setWarn(''); }} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Nhập tin nhắn…" className="flex-1 border border-slate-300 rounded-full px-3.5 py-2 text-sm outline-none focus:border-[#0A2540]" />
+                      <button onClick={send} className="bg-red-600 hover:bg-red-700 text-white rounded-full px-4 py-2 text-sm font-bold shrink-0">Gửi</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </div>
       )}

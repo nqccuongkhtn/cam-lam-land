@@ -130,12 +130,13 @@ function UploadGis() {
   async function submit() {
     if (!file) return setMsg('Vui lòng chọn tệp .dgn/.shp/.zip/.geojson');
     const fd = new FormData(); fd.append('file', file); fd.append('name', name || file.name); fd.append('layerType', layerType);
-    try { const r = await uploadGis(fd); setMsg(`✅ Đã nhận, đang xử lý (job #${r.job.id}). Xem tab Nhật ký.`); } catch (e: any) { setMsg(`❌ ${e.message}`); }
+    setMsg('⏳ Đang nạp…');
+    try { const r = await uploadGis(fd); setMsg(`✅ ${r.message || 'Đã nạp xong'}${r.reprojected ? ' (tự quy đổi VN-2000→WGS84)' : ''}. Mở trang Bản đồ để xem.`); setFile(null); } catch (e: any) { setMsg(`❌ ${e.message}`); }
   }
   return (
     <div className="max-w-lg bg-white border border-slate-200 rounded-xl p-5">
       <h2 className="font-bold text-[#0A2540] mb-3">Tải lên dữ liệu GIS</h2>
-      <p className="text-sm text-slate-500 mb-3">Hỗ trợ <b>.dgn</b>, <b>.shp</b> (nén .zip), <b>.geojson</b>. Tự chuyển sang EPSG:4326 và hiển thị trên bản đồ.</p>
+      <p className="text-sm text-slate-500 mb-3">Nạp trực tiếp <b>.geojson</b> — toạ độ <b>VN-2000 hoặc WGS84</b> đều được (tự quy đổi). DGN/SHP: hãy xuất sang GeoJSON trước.</p>
       <input type="file" accept=".dgn,.shp,.zip,.geojson,.json" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="mb-3 block w-full text-sm" />
       <input className="border border-slate-300 rounded-md px-3 py-2 w-full mb-2 text-sm" placeholder="Tên lớp (vd: Quy hoạch 2030)" value={name} onChange={(e) => setName(e.target.value)} />
       <select className="border border-slate-300 rounded-md px-3 py-2 w-full mb-3 text-sm" value={layerType} onChange={(e) => setLayerType(e.target.value)}>
@@ -171,7 +172,7 @@ function Logs() {
               <td className="p-2 text-right"><button onClick={() => del(j)} className="text-red-600 hover:underline text-xs font-medium">Xoá</button></td>
             </tr>
           ))}
-          {jobs.length === 0 && <tr><td colSpan={6} className="p-4 text-slate-500">Chưa có lần nhập nào.</td></tr>}
+          {jobs.length === 0 && <tr><td colSpan={6} className="p-4 text-slate-500">Chưa có job nào.</td></tr>}
         </tbody>
       </table>
     </div>

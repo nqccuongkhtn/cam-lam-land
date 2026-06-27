@@ -6,7 +6,7 @@ import { getToken } from '@/lib/token';
 import { WARDS, PROPERTY_LABELS, type PropertyType } from '@/lib/types';
 
 interface Msg { id: number; userId: number | null; name: string; avatar?: string | null; body: string; createdAt: string; }
-interface Room { room: string; name: string; phone?: string | null; lastBody: string; lastAt: string; count: number; }
+interface Room { room: string; name: string; phone?: string | null; online?: boolean; lastBody: string; lastAt: string; count: number; }
 const TYPES: PropertyType[] = ['land', 'house', 'apartment', 'villa', 'commercial', 'farm'];
 type Tab = 'community' | 'support' | 'sell';
 
@@ -34,7 +34,7 @@ export default function ChatWidget() {
   const [peerAck, setPeerAck] = useState<{ received: number; read: number } | null>(null);
   const [listOpen, setListOpen] = useState(true);
   const [roomQ, setRoomQ] = useState('');
-  const [userHits, setUserHits] = useState<{ id: number; name: string; email: string; phone: string | null; avatar: string | null }[]>([]);
+  const [userHits, setUserHits] = useState<{ id: number; name: string; email: string; phone: string | null; avatar: string | null; online?: boolean }[]>([]);
   const [pickedName, setPickedName] = useState('');
   const [pickedPhone, setPickedPhone] = useState('');
   const acked = useRef(0);
@@ -53,6 +53,11 @@ export default function ChatWidget() {
     if (user) { try { seenSupp.current = Number(localStorage.getItem(`cl-seen-support:${user.id}`) || 0); } catch {} }
   }, [user]);
   useEffect(() => { if (user) api<{ wsUrl: string }>('/config').then((r) => setWsUrl(r.wsUrl || '')).catch(() => {}); }, [user]);
+  useEffect(() => {
+    if (!user) return;
+    const ping = () => api('/auth/ping', { method: 'POST' }).catch(() => {});
+    ping(); const iv = setInterval(ping, 45000); return () => clearInterval(iv);
+  }, [user]);
 
   useEffect(() => {
     if (!user) { setRoom(''); return; }
@@ -104,10 +109,10 @@ export default function ChatWidget() {
   }, [open, isAdmin, tab]);
 
   useEffect(() => {
-    if (!open || !isAdmin || tab !== 'support' || !roomQ.trim()) { setUserHits([]); return; }
-    const t = setTimeout(() => { api<{ users: any[] }>(`/chat/users?q=${encodeURIComponent(roomQ.trim())}`).then((r) => setUserHits(r.users || [])).catch(() => {}); }, 300);
-    return () => clearTimeout(t);
-  }, [open, isAdmin, tab, roomQ]);
+    if (!open || !isAdmin || tab !== 'support') { setUserHits([]); return; }
+    const load = () => api<{ users: any[] }>('/chat/users').then((r) => setUserHits(r.users || [])).catch(() => {});
+    load(); const iv = setInterval(load, 20000); return () => clearInterval(iv);
+  }, [open, isAdmin, tab]);
 
   // Đánh dấu đã đọc khi đang xem
   useEffect(() => {
@@ -162,10 +167,12 @@ export default function ChatWidget() {
   let lastMineId = 0; if (user) for (const m of msgs) if (m.userId === user.id) lastMineId = m.id;
   const roomList = rooms.filter((r) => !roomQ.trim() || (r.name || '').toLowerCase().includes(roomQ.trim().toLowerCase()));
   const roomSet = new Set(rooms.map((r) => r.room));
-  const newUsers = (roomQ.trim() && adminSupport) ? userHits.filter((u) => !roomSet.has(`support:${u.id}`)) : [];
+  const nq = roomQ.trim().toLowerCase();
+  const newUsers = adminSupport ? userHits.filter((u) => !roomSet.has(`support:${u.id}`) && (!nq || (u.name || '').toLowerCase().includes(nq) || (u.phone || '').toLowerCase().includes(nq))) : [];
   const activeRoom = rooms.find((r) => r.room === room);
   const activeName = activeRoom?.name || pickedName || 'Khách hàng';
   const activePhone = activeRoom?.phone || pickedPhone || '';
+  const activeOnline = activeRoom ? !!activeRoom.online : (userHits.find((u) => `support:${u.id}` === room)?.online ?? false);
   const canType = tab !== 'sell' && !!user && !!room && !needPick;
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm';
 
@@ -258,7 +265,10 @@ export default function ChatWidget() {
                           const active = room === r.room;
                           return (
                             <button key={r.room} onClick={() => { setRoom(r.room); setPickedName(r.name); setPickedPhone(r.phone || ''); }} className={`w-full flex items-center gap-2 px-2.5 py-2 text-left border-b border-slate-50 hover:bg-slate-50 ${active ? 'bg-slate-100' : ''}`}>
-                              <span className="w-9 h-9 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-sm font-bold shrink-0">{(r.name || '?').charAt(0).toUpperCase()}</span>
+                              <span className="relative shrink-0">
+                                <span className="w-9 h-9 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-sm font-bold">{(r.name || '?').charAt(0).toUpperCase()}</span>
+                                <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-white ${r.online ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                              </span>
                               <span className="min-w-0 flex-1">
                                 <span className="block text-sm font-semibold text-[#0A2540] truncate">{r.name}</span>
                                 <span className="block text-[11px] text-slate-400 truncate">{r.lastBody || '—'}</span>
@@ -271,7 +281,10 @@ export default function ChatWidget() {
                           const active = room === `support:${u.id}`;
                           return (
                             <button key={'u' + u.id} onClick={() => { setRoom(`support:${u.id}`); setPickedName(u.name); setPickedPhone(u.phone || ''); }} className={`w-full flex items-center gap-2 px-2.5 py-2 text-left border-b border-slate-50 hover:bg-slate-50 ${active ? 'bg-slate-100' : ''}`}>
-                              {u.avatar ? <img src={u.avatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" /> : <span className="w-9 h-9 rounded-full bg-slate-300 text-white grid place-items-center text-sm font-bold shrink-0">{(u.name || '?').charAt(0).toUpperCase()}</span>}
+                              <span className="relative shrink-0">
+                                {u.avatar ? <img src={u.avatar} alt="" className="w-9 h-9 rounded-full object-cover" /> : <span className="w-9 h-9 rounded-full bg-slate-300 text-white grid place-items-center text-sm font-bold">{(u.name || '?').charAt(0).toUpperCase()}</span>}
+                                <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-white ${u.online ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                              </span>
                               <span className="min-w-0 flex-1">
                                 <span className="block text-sm font-semibold text-[#0A2540] truncate">{u.name}</span>
                                 <span className="block text-[11px] text-emerald-600 truncate">Bấm để nhắn lần đầu</span>
@@ -290,8 +303,11 @@ export default function ChatWidget() {
                     <button onClick={() => setRoom('')} className="sm:hidden w-7 h-7 grid place-items-center rounded-full hover:bg-slate-100 text-slate-600">←</button>
                     <button onClick={() => setListOpen((v) => !v)} title="Thu gọn danh sách" className="hidden sm:grid w-7 h-7 place-items-center rounded-full hover:bg-slate-100 text-slate-600">☰</button>
                     <div className="min-w-0 leading-tight">
-                      <b className="text-sm text-[#0A2540] truncate block">{activeName}</b>
-                      {activePhone ? <a href={`tel:${activePhone}`} className="text-[11px] text-red-600 font-semibold">📞 {activePhone}</a> : null}
+                      <b className="text-sm text-[#0A2540] truncate flex items-center gap-1.5"><span className={`w-2 h-2 rounded-full ${activeOnline ? 'bg-emerald-500' : 'bg-slate-300'}`} />{activeName}</b>
+                      <span className="text-[11px] flex items-center gap-1.5">
+                        {activePhone ? <a href={`tel:${activePhone}`} className="text-red-600 font-semibold">📞 {activePhone}</a> : null}
+                        <span className={activeOnline ? 'text-emerald-600 font-semibold' : 'text-slate-400'}>{activeOnline ? '● Đang online' : '○ Ngoại tuyến'}</span>
+                      </span>
                     </div>
                   </div>
                 )}

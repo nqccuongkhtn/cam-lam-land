@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS map_ads (
 );
 CREATE INDEX IF NOT EXISTS map_ads_active_idx ON map_ads (status, expires_at);
 ALTER TABLE map_ads ADD COLUMN IF NOT EXISTS style TEXT NOT NULL DEFAULT 'seal';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ;
 
 -- ── Khách gửi bán / ký gửi BĐS (thu thập thông tin từ khách) ──
 CREATE TABLE IF NOT EXISTS consignments (

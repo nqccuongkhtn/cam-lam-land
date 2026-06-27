@@ -111,3 +111,9 @@ authRouter.patch('/me', authRequired, async (req: AuthedRequest, res, next) => {
     res.json({ user: profile(user) });
   } catch (e) { next(e); }
 });
+
+// Heartbeat — đánh dấu còn hoạt động (để biết online)
+authRouter.post('/ping', authRequired, async (req: AuthedRequest, res, next) => {
+  try { await query('UPDATE users SET last_seen_at = now() WHERE id=$1', [req.user!.id]); res.json({ ok: true }); }
+  catch (e) { next(e); }
+});

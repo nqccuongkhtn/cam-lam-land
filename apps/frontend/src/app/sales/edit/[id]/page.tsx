@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { api, uploadImages } from '@/lib/api';
 import { resizeImage } from '@/lib/img';
 import { useAuth } from '@/lib/auth';
@@ -10,9 +10,11 @@ import { PROPERTY_LABELS, WARDS, DIRECTIONS, LEGAL_OPTIONS, formatVnd, type Prop
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
 const TYPES: PropertyType[] = ['land', 'house', 'apartment', 'villa', 'commercial', 'farm'];
+const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
 
-export default function PostListing() {
+export default function EditListing() {
   const router = useRouter();
+  const { id } = useParams<{ id: string }>();
   const { user, loading } = useAuth();
   const [f, setF] = useState({ title: '', propertyType: 'land' as PropertyType, priceVal: '', priceUnit: 'ty', area: '', bedrooms: '', bathrooms: '', direction: '', legal: '', frontage: '', ward: '', address: '', description: '', contactName: '' });
   const [images, setImages] = useState<string[]>([]);
@@ -20,19 +22,37 @@ export default function PostListing() {
   const [uploading, setUploading] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
+  const [ready, setReady] = useState(false);
+  const [denied, setDenied] = useState(false);
   const set = (k: string, v: any) => setF((s) => ({ ...s, [k]: v }));
 
-  useEffect(() => { if (!loading && !user) router.replace('/login'); }, [loading, user, router]);
+  useEffect(() => {
+    if (loading) return;
+    if (!user) { router.replace('/login'); return; }
+    if (ready || denied) return;
+    api<any>(`/listings/${id}`).then((l) => {
+      if (l.createdBy !== user.id && user.role !== 'admin') { setDenied(true); return; }
+      const price = Number(l.price) || 0;
+      const priceUnit = price >= 1e9 ? 'ty' : 'trieu';
+      const priceVal = price >= 1e9 ? String(+(price / 1e9).toFixed(3)) : String(Math.round(price / 1e6));
+      setF({
+        title: l.title || '', propertyType: l.propertyType || 'land', priceVal, priceUnit,
+        area: l.area != null ? String(l.area) : '', bedrooms: l.bedrooms != null ? String(l.bedrooms) : '',
+        bathrooms: l.bathrooms != null ? String(l.bathrooms) : '', direction: l.direction || '', legal: l.legal || '',
+        frontage: l.frontage != null ? String(l.frontage) : '', ward: l.ward || '', address: l.address || '',
+        description: l.description || '', contactName: l.contactName || '',
+      });
+      setImages(Array.isArray(l.images) ? l.images : []);
+      if (l.lng != null && l.lat != null) setCoord({ lng: l.lng, lat: l.lat });
+      setReady(true);
+    }).catch(() => { setErr('Không tải được tin.'); setReady(true); });
+  }, [loading, user, id, ready, denied, router]);
 
   async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files || []);
-    if (!files.length) return;
+    const files = Array.from(e.target.files || []); if (!files.length) return;
     setUploading(true); setErr('');
-    try {
-      const resized = await Promise.all(files.map((x) => resizeImage(x)));
-      const up = await uploadImages(resized);
-      setImages((p) => [...p, ...up.map((u) => u.url)]);
-    } catch (e: any) { setErr('Lỗi tải ảnh: ' + e.message); } finally { setUploading(false); e.target.value = ''; }
+    try { const resized = await Promise.all(files.map((x) => resizeImage(x))); const up = await uploadImages(resized); setImages((p) => [...p, ...up.map((u) => u.url)]); }
+    catch (e: any) { setErr('Lỗi tải ảnh: ' + e.message); } finally { setUploading(false); e.target.value = ''; }
   }
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setErr('');
@@ -43,19 +63,20 @@ export default function PostListing() {
     const price = priceNum * (f.priceUnit === 'ty' ? 1e9 : 1e6);
     setBusy(true);
     try {
-      await api('/listings', { method: 'POST', body: JSON.stringify({
+      await api(`/listings/${id}`, { method: 'PUT', body: JSON.stringify({
         title: f.title, propertyType: f.propertyType, price, area: f.area ? Number(f.area) : null,
         bedrooms: f.bedrooms ? Number(f.bedrooms) : null, bathrooms: f.bathrooms ? Number(f.bathrooms) : null,
         direction: f.direction || null, legal: f.legal || null, frontage: f.frontage ? Number(f.frontage) : null,
         ward: f.ward || null, address: f.address || null, description: f.description || null,
-        contactName: f.contactName || user?.fullName || null, contactPhone: null,
+        contactName: f.contactName || null, contactPhone: null,
         images, lng: coord.lng, lat: coord.lat,
       }) });
       router.push('/sales');
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   }
 
-  if (loading || !user) return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
+  if (loading || (!ready && !denied)) return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
+  if (denied) return <div className="py-24 text-center text-slate-500">Bạn không có quyền sửa tin này. <Link href="/sales" className="text-[#0A2540] font-bold">← Tin của tôi</Link></div>;
 
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:border-[#0A2540] outline-none';
   const lbl = 'block text-sm font-semibold text-slate-700 mb-1';
@@ -67,13 +88,13 @@ export default function PostListing() {
     <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-8">
       <form onSubmit={submit} className="mx-auto max-w-3xl px-4 space-y-5">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-extrabold text-[#0A2540]">Đăng tin bất động sản</h1>
+          <h1 className="text-2xl font-extrabold text-[#0A2540]">Chỉnh sửa tin</h1>
           <Link href="/sales" className="text-sm font-semibold text-slate-500 hover:text-[#0A2540]">← Tin của tôi</Link>
         </div>
 
         <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
           <h2 className="font-bold text-[#0A2540]">Thông tin chính</h2>
-          <div><label className={lbl}>Tiêu đề *</label><input className={inp} value={f.title} onChange={(e) => set('title', e.target.value)} placeholder="VD: Đất nền ven biển Bãi Dài, sổ đỏ" /></div>
+          <div><label className={lbl}>Tiêu đề *</label><input className={inp} value={f.title} onChange={(e) => set('title', e.target.value)} /></div>
           <div className="grid sm:grid-cols-2 gap-4">
             <div><label className={lbl}>Loại hình *</label>
               <select className={inp} value={f.propertyType} onChange={(e) => set('propertyType', e.target.value)}>{TYPES.map((t) => <option key={t} value={t}>{PROPERTY_LABELS[t]}</option>)}</select></div>
@@ -110,7 +131,7 @@ export default function PostListing() {
           <div>
             <label className={lbl}>Ghim vị trí trên bản đồ * <span className="font-normal text-slate-400">(bấm vào bản đồ)</span></label>
             <div className="relative h-72 rounded-xl overflow-hidden border border-slate-200">
-              <MapView markers={coord ? [{ lng: coord.lng, lat: coord.lat }] : []} baseMap="satellite" onMapClick={(lng, lat) => setCoord({ lng, lat })} className="absolute inset-0 h-full w-full" />
+              <MapView markers={coord ? [{ lng: coord.lng, lat: coord.lat }] : []} baseMap="satellite" initialBounds={QH_BOUNDS} onMapClick={(lng, lat) => setCoord({ lng, lat })} className="absolute inset-0 h-full w-full" />
               <div className="absolute top-2 left-2 z-10 bg-white/95 rounded-lg px-2.5 py-1.5 text-xs font-semibold shadow">
                 {coord ? <span className="text-emerald-700">✓ Đã ghim: {coord.lat.toFixed(5)}, {coord.lng.toFixed(5)}</span> : <span className="text-slate-500">Bấm vào bản đồ để chọn vị trí</span>}
               </div>
@@ -122,7 +143,7 @@ export default function PostListing() {
           <h2 className="font-bold text-[#0A2540]">Hình ảnh</h2>
           <label className="flex items-center justify-center gap-2 border-2 border-dashed border-slate-300 rounded-xl py-6 cursor-pointer hover:border-[#C8A14B] text-sm text-slate-500 font-semibold">
             <input type="file" accept="image/*" multiple onChange={onFiles} className="hidden" />
-            {uploading ? 'Đang tải ảnh…' : '＋ Chọn ảnh từ máy (tải lên trực tiếp)'}
+            {uploading ? 'Đang tải ảnh…' : '＋ Thêm ảnh từ máy'}
           </label>
           {images.length > 0 && (
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -141,9 +162,9 @@ export default function PostListing() {
           <h2 className="font-bold text-[#0A2540]">Mô tả & liên hệ</h2>
           <textarea className={`${inp} min-h-[120px]`} value={f.description} onChange={(e) => set('description', e.target.value)} placeholder="Mô tả chi tiết bất động sản…" />
           <div className="grid sm:grid-cols-2 gap-4">
-            <div><label className={lbl}>Tên liên hệ</label><input className={inp} value={f.contactName} onChange={(e) => set('contactName', e.target.value)} placeholder={user.fullName || ''} /></div>
+            <div><label className={lbl}>Tên liên hệ</label><input className={inp} value={f.contactName} onChange={(e) => set('contactName', e.target.value)} placeholder={user?.fullName || ''} /></div>
             <div><label className={lbl}>SĐT liên hệ</label>
-              <div className={`${inp} bg-slate-50 text-slate-600 flex items-center`}>{user.phone || 'Chưa có SĐT trong tài khoản'}</div>
+              <div className={`${inp} bg-slate-50 text-slate-600 flex items-center`}>{user?.phone || 'Chưa có SĐT trong tài khoản'}</div>
               <p className="text-xs text-slate-400 mt-1">Tự dùng SĐT của tài khoản. Đổi tại <Link href="/account" className="text-[#0A2540] font-semibold">Tài khoản</Link>.</p>
             </div>
           </div>
@@ -151,7 +172,7 @@ export default function PostListing() {
 
         {err && <p className="text-red-600 text-sm font-semibold">{err}</p>}
         <div className="flex gap-3 pb-10">
-          <button disabled={busy || uploading} className="bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold px-8 py-3 rounded-xl shadow-lg shadow-red-600/30">{busy ? 'Đang đăng…' : 'Đăng tin'}</button>
+          <button disabled={busy || uploading} className="bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold px-8 py-3 rounded-xl shadow-lg shadow-red-600/30">{busy ? 'Đang lưu…' : 'Lưu thay đổi'}</button>
           <Link href="/sales" className="px-6 py-3 rounded-xl border border-slate-300 font-semibold text-slate-600">Huỷ</Link>
         </div>
       </form>

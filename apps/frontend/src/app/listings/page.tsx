@@ -29,6 +29,7 @@ export default function ListingsPage() {
   const [opacity, setOpacity] = useState(0.7);
   const [labels, setLabels] = useState(true);
   const [info, setInfo] = useState<{ x: number; y: number; lng: number; lat: number; parcel: any; zoning: any } | null>(null);
+  const [ads, setAds] = useState<any[]>([]);
 
   function load(over?: { type?: string; min?: string; max?: string; q?: string }) {
     setLoading(true);
@@ -46,6 +47,7 @@ export default function ListingsPage() {
     const mx = sp.get('maxPrice') ? String(Number(sp.get('maxPrice')) / 1e9) : '';
     const kw = sp.get('q') || '';
     setType(t); setMax(mx); setQ(kw); load({ type: t, max: mx, q: kw });
+    api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -61,7 +63,7 @@ export default function ListingsPage() {
 
   const mapPanel = (
     <div className="relative h-full w-full">
-      <MapView markers={markers} overlays={overlays} baseMap={baseMap} labels={labels} onMapClick={onMapClick} initialBounds={QH_BOUNDS} className="absolute inset-0 h-full w-full" />
+      <MapView markers={markers} overlays={overlays} baseMap={baseMap} labels={labels} onMapClick={onMapClick} initialBounds={QH_BOUNDS} adMarkers={ads} className="absolute inset-0 h-full w-full" />
 
       {/* Bộ chọn nền + bật lớp quy hoạch */}
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-2 max-w-[60%]">
@@ -121,7 +123,7 @@ export default function ListingsPage() {
   );
 
   return (
-    <div className="flex flex-col h-[calc(100vh-56px)] bg-slate-50">
+    <div className="flex flex-col h-[calc(100vh-56px)] bg-slate-50 max-w-7xl mx-auto w-full">
       {/* Thanh lọc */}
       <div className="bg-white border-b border-slate-200 shrink-0 z-20">
         <div className="px-3 sm:px-4 py-2.5 flex flex-wrap gap-2 items-center">

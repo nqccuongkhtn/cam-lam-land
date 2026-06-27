@@ -127,6 +127,7 @@ listingsRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => 
     const b = req.body ?? {};
     if (!b.title || b.price == null || b.lng == null || b.lat == null)
       return res.status(400).json({ error: 'Cần tiêu đề, giá và vị trí trên bản đồ' });
+    if (Number(b.price) < 0) return res.status(400).json({ error: 'Giá không được âm' });
     const [row] = await query(
       `INSERT INTO listings
          (title,description,price,area,property_type,address,ward,bedrooms,bathrooms,direction,legal,frontage,
@@ -153,6 +154,7 @@ listingsRouter.put('/:id', authRequired, async (req: AuthedRequest, res, next) =
     const id = Number(req.params.id);
     if (!(await ownerOrAdmin(req, id))) return res.status(403).json({ error: 'Không có quyền sửa tin này' });
     const b = req.body ?? {};
+    if (b.price != null && Number(b.price) < 0) return res.status(400).json({ error: 'Giá không được âm' });
     const [row] = await query(
       `UPDATE listings SET
          title=COALESCE($2,title), description=COALESCE($3,description), price=COALESCE($4,price), area=COALESCE($5,area),

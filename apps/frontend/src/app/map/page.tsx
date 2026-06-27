@@ -26,6 +26,15 @@ interface ParcelInfo {
 }
 const fmtLen = (m: number) => (m >= 1000 ? (m / 1000).toFixed(3) + ' km' : m.toFixed(1) + ' m');
 const fmtArea = (m2: number) => (m2 >= 10000 ? (m2 / 10000).toFixed(4) + ' ha (' + m2.toFixed(0) + ' m²)' : m2.toFixed(1) + ' m²');
+// Tách toạ độ từ link Google Maps (…/@lat,lng…, !3dlat!4dlng, q=lat,lng, hoặc "lat,lng").
+function parseGmap(url: string): { lat: number; lng: number } | null {
+  if (!url) return null;
+  let m = url.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/); if (m) return { lat: +m[1], lng: +m[2] };
+  m = url.match(/!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/); if (m) return { lat: +m[1], lng: +m[2] };
+  m = url.match(/(?:[?&](?:q|query|ll|sll|destination)=|loc:)(-?\d+(?:\.\d+)?)[,+\s]+(-?\d+(?:\.\d+)?)/i); if (m) return { lat: +m[1], lng: +m[2] };
+  m = url.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/); if (m) return { lat: +m[1], lng: +m[2] };
+  return null;
+}
 
 export default function MapPage() {
   const [layers, setLayers] = useState<GisLayer[]>([]);
@@ -42,10 +51,11 @@ export default function MapPage() {
   const [mResult, setMResult] = useState<MeasureResult | null>(null);
   const [focusPoint, setFocusPoint] = useState<{ lng: number; lat: number; label?: string } | null>(null);
   const [highlight, setHighlight] = useState<any>(null);
-  const [searchMode, setSearchMode] = useState<'vn2000' | 'latlng' | 'parcel'>('vn2000');
+  const [searchMode, setSearchMode] = useState<'parcel' | 'vn2000' | 'latlng' | 'gmap'>('parcel');
   const [c1, setC1] = useState(''); const [c2, setC2] = useState('');
   const [c3, setC3] = useState('');
   const [panelOpen, setPanelOpen] = useState(false);
+  const [ads, setAds] = useState<any[]>([]);
   const [tool, setTool] = useState<'none' | 'search' | 'base' | 'measure'>('none'); // bảng công cụ trên mobile
 
   const load = useCallback(() => {
@@ -59,7 +69,7 @@ export default function MapPage() {
       setData(Object.fromEntries(entries));
     }).catch(() => {});
   }, []);
-  useEffect(() => { load(); setCanDelete(!!getToken()); }, [load]);
+  useEffect(() => { load(); setCanDelete(!!getToken()); api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {}); }, [load]);
 
   const overlays: ImageOverlay[] = useMemo(
     () => RASTER_OVERLAYS.map((o) => ({ id: o.id, url: o.url, coordinates: o.coordinates, opacity, visible: ovOn[o.id] ?? true })), [opacity, ovOn]);
@@ -106,6 +116,12 @@ export default function MapPage() {
       } catch (e: any) { alert('Lỗi tra cứu: ' + e.message); }
       return;
     }
+    if (searchMode === 'gmap') {
+      const g = parseGmap(c1.trim());
+      if (!g) return alert('Không đọc được toạ độ từ link. Hãy dán link Google Maps có dạng …/@12.34,109.12,… hoặc copy toạ độ. (Link rút gọn goo.gl cần mở ra để lấy link đầy đủ.)');
+      setFocusPoint({ lng: g.lng, lat: g.lat, label: `${g.lat.toFixed(6)}, ${g.lng.toFixed(6)}` });
+      setTool('none'); return;
+    }
     let lng: number, lat: number;
     if (searchMode === 'vn2000') {
       const x = parseFloat(c1), y = parseFloat(c2);
@@ -144,13 +160,20 @@ export default function MapPage() {
   const searchCtrl = (full = false) => (
     <div className={`flex items-center gap-1.5 ${full ? 'flex-wrap' : ''}`}>
       <select value={searchMode} onChange={(e) => setSearchMode(e.target.value as any)} className={`border rounded-lg px-2 py-1.5 text-xs bg-white ${full ? 'w-full' : ''}`}>
-        <option value="vn2000">Toạ độ VN-2000</option>
-        <option value="latlng">Lat / Lng</option>
         <option value="parcel">Số tờ / thửa</option>
+        <option value="vn2000">Toạ độ VN-2000</option>
+        <option value="latlng">Lat / Lng (WGS-84)</option>
+        <option value="gmap">Link Google Maps</option>
       </select>
-      <input value={c1} onChange={(e) => setC1(e.target.value)} placeholder={searchMode === 'vn2000' ? 'X (Đông)' : searchMode === 'parcel' ? 'Số tờ' : 'Vĩ độ'} className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'flex-1 min-w-[90px]' : 'w-24'}`} />
-      <input value={c2} onChange={(e) => setC2(e.target.value)} placeholder={searchMode === 'vn2000' ? 'Y (Bắc)' : searchMode === 'parcel' ? 'Số thửa' : 'Kinh độ'} className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'flex-1 min-w-[90px]' : 'w-24'}`} />
-      {searchMode === 'parcel' && <input value={c3} onChange={(e) => setC3(e.target.value)} placeholder="Xã (vd: Cam Lâm)" className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'flex-1 min-w-[120px]' : 'w-32'}`} />}
+      {searchMode === 'gmap' ? (
+        <input value={c1} onChange={(e) => setC1(e.target.value)} placeholder="Dán link Google Maps (…/@12.34,109.12…)" className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'w-full' : 'w-56'}`} />
+      ) : (
+        <>
+          <input value={c1} onChange={(e) => setC1(e.target.value)} placeholder={searchMode === 'vn2000' ? 'X (Đông)' : searchMode === 'parcel' ? 'Số tờ' : 'Vĩ độ'} className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'flex-1 min-w-[90px]' : 'w-24'}`} />
+          <input value={c2} onChange={(e) => setC2(e.target.value)} placeholder={searchMode === 'vn2000' ? 'Y (Bắc)' : searchMode === 'parcel' ? 'Số thửa' : 'Kinh độ'} className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'flex-1 min-w-[90px]' : 'w-24'}`} />
+          {searchMode === 'parcel' && <input value={c3} onChange={(e) => setC3(e.target.value)} placeholder="Xã (vd: Cam Lâm)" className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'flex-1 min-w-[120px]' : 'w-32'}`} />}
+        </>
+      )}
       <button onClick={doSearch} className={`bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap ${full ? 'w-full mt-1' : ''}`}>Tra cứu</button>
     </div>
   );
@@ -240,7 +263,19 @@ export default function MapPage() {
 
         <div className="relative flex-1">
           <MapView layers={geoLayers} overlays={overlays} baseMap={baseMap} labels={labels} measureMode={measure}
-            focusPoint={focusPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} initialBounds={QH_BOUNDS} />
+            focusPoint={focusPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} initialBounds={QH_BOUNDS} adMarkers={ads} />
+          {/* Thanh ĐỘ MỜ lớp phủ dạng DỌC nổi trên bản đồ — chỉ hiện trên điện thoại/iPad (bảng trái bị ẩn) */}
+          {(ovOn['qh-qd205'] ?? true) && (
+            <div className="lg:hidden absolute top-1/2 right-2 -translate-y-1/2 z-10 flex flex-col items-center gap-1 bg-white/95 backdrop-blur rounded-2xl border border-slate-200 shadow-lg px-2 py-3">
+              <span className="text-[10px] font-bold text-slate-500">Đậm</span>
+              <div className="relative h-36 w-7">
+                <input type="range" min={0} max={100} value={Math.round(opacity * 100)} onChange={(e) => setOpacity(Number(e.target.value) / 100)}
+                  className="absolute left-1/2 top-1/2 w-36 -translate-x-1/2 -translate-y-1/2 -rotate-90 accent-emerald-600 cursor-pointer" aria-label="Độ mờ lớp phủ" />
+              </div>
+              <span className="text-[10px] font-bold text-slate-500">Mờ</span>
+              <span className="text-[11px] text-[#0A2540] font-extrabold mt-0.5">{Math.round(opacity * 100)}%</span>
+            </div>
+          )}
           {info && (
             <div className="absolute top-3 right-3 left-3 sm:left-auto sm:w-80 max-h-[80%] overflow-y-auto bg-white rounded-xl shadow-xl border p-4 text-sm z-10">
               <div className="flex justify-between items-center mb-2">

@@ -65,6 +65,18 @@ export default function ListingDetail() {
                 <img src={imgs[active]} alt={l.title} onError={(e) => { (e.currentTarget as HTMLImageElement).src = fb(active); }} className="w-full h-full object-contain" />
                 {l.boosted && <span className="absolute top-3 left-3 bg-[#C8A14B] text-white text-xs font-bold px-2.5 py-1 rounded-full">⭐ Tin nổi bật</span>}
                 <span className="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full">📷 {active + 1}/{imgs.length}</span>
+                {imgs.length > 1 && (
+                  <>
+                    <button onClick={() => setActive((a) => (a - 1 + imgs.length) % imgs.length)} aria-label="Ảnh trước"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 grid place-items-center rounded-full bg-black/45 hover:bg-black/70 active:scale-95 text-white backdrop-blur transition">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M15 18l-6-6 6-6" /></svg>
+                    </button>
+                    <button onClick={() => setActive((a) => (a + 1) % imgs.length)} aria-label="Ảnh sau"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 grid place-items-center rounded-full bg-black/45 hover:bg-black/70 active:scale-95 text-white backdrop-blur transition">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M9 18l6-6-6-6" /></svg>
+                    </button>
+                  </>
+                )}
               </div>
               {imgs.length > 1 && (
                 <div className="flex gap-2 p-2 overflow-x-auto">
@@ -132,6 +144,9 @@ export default function ListingDetail() {
                 </div>
               )}
               <button onClick={() => setSaved((v) => !v)} className={`mt-2.5 w-full flex items-center justify-center gap-2 font-bold py-2.5 rounded-xl border transition ${saved ? 'border-red-200 text-red-600 bg-red-50' : 'border-slate-300 text-slate-600 hover:bg-slate-50'}`}><IHeart filled={saved} /> {saved ? 'Đã lưu tin' : 'Lưu tin'}</button>
+              {user && (l.createdBy === user.id || user.role === 'admin') && (
+                <Link href={`/sales/edit/${l.id}`} className="mt-2.5 w-full flex items-center justify-center gap-2 font-bold py-2.5 rounded-xl border border-[#C8A14B]/50 text-[#8a6d1f] bg-[#C8A14B]/10 hover:bg-[#C8A14B]/20">✏️ Sửa tin</Link>
+              )}
               <p className="text-[11px] text-slate-400 mt-3 text-center">Mã tin #{l.id} · đăng {new Date(l.createdAt).toLocaleDateString('vi-VN')}</p>
             </div>
           </div>

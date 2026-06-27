@@ -95,6 +95,7 @@ export default function Nav() {
                     <Link href="/account" className={mItem}>Tài khoản của tôi</Link>
                     <Link href="/sales" className={mItem}>Tin của tôi</Link>
                     {user.role === 'admin' && <Link href="/admin" className={mItem}>Quản trị</Link>}
+                    {user.role === 'admin' && <Link href="/map-ads" className={mItem}>Quảng cáo bản đồ</Link>}
                     <div className="border-t border-slate-100 my-1" />
                     <button onClick={doLogout} className={`${mItem} text-red-600`}>Đăng xuất</button>
                   </div>
@@ -124,6 +125,7 @@ export default function Nav() {
             <Link href="/sales" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Tin của tôi</Link>
           </>)}
           {user?.role === 'admin' && <Link href="/admin" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Quản trị</Link>}
+          {user?.role === 'admin' && <Link href="/map-ads" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Quảng cáo bản đồ</Link>}
           <a href="tel:0988888888" className="py-2.5 px-2 text-sm font-bold text-[#0A2540]">📞 Hotline 0988 888 888</a>
           <div className="border-t border-slate-100 mt-1 pt-2">
             {user ? (

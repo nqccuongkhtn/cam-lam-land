@@ -12,7 +12,6 @@ export default function QrPage() {
   const [copied, setCopied] = useState(false);
   const [err, setErr] = useState('');
   const [scanning, setScanning] = useState(false);
-  const [flash, setFlash] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
@@ -32,45 +31,31 @@ export default function QrPage() {
         }
       } catch {}
       if (window.jsQR) { if (!cancelled) setReady(true); return; }
-      const sc = document.createElement('script');
-      sc.src = CDN; sc.async = true;
-      sc.onload = () => { if (!cancelled) setReady(true); };
-      sc.onerror = () => { if (!cancelled) setErr('Không tải được thư viện quét QR.'); };
-      document.body.appendChild(sc);
+      const s = document.createElement('script');
+      s.src = CDN; s.async = true;
+      s.onload = () => { if (!cancelled) setReady(true); };
+      s.onerror = () => { if (!cancelled) setErr('Không tải được thư viện quét QR.'); };
+      document.body.appendChild(s);
     })();
     return () => { cancelled = true; stopCamera(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Khi mở khung quét: gắn luồng camera vào <video> rồi chạy vòng lặp nhận diện.
-  useEffect(() => {
-    if (!scanning) return;
-    const v = videoRef.current, stream = streamRef.current;
-    if (!v || !stream) return;
-    v.srcObject = stream; v.setAttribute('playsinline', 'true');
-    v.play().catch(() => {});
-    lastTickRef.current = 0;
-    rafRef.current = requestAnimationFrame(scanLoop);
-    return () => cancelAnimationFrame(rafRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scanning]);
 
   async function handleDecoded(text: string) {
     setCode(text); setErr(''); setCopied(false);
     try { await navigator.clipboard.writeText(text); setCopied(true); } catch {}
   }
 
-  // jsQR: chỉ giải mã VÙNG GIỮA khung (72%) đã thu nhỏ -> nhanh & trúng hơn quét cả ảnh.
-  function decodeVideoROI(v: HTMLVideoElement): string | null {
+  // jsQR: thu nhỏ cả khung hình rồi giải mã -> nhanh hơn, vẫn nhận mã ở bất kỳ vị trí nào trong hình.
+  function decodeVideoFrame(v: HTMLVideoElement): string | null {
     const vw = v.videoWidth, vh = v.videoHeight;
     if (!vw || !vh || !window.jsQR) return null;
-    const side = Math.floor(Math.min(vw, vh) * 0.72);
-    const sx = Math.floor((vw - side) / 2), sy = Math.floor((vh - side) / 2);
-    const t = 384;
-    const cv = canvasRef.current!; cv.width = t; cv.height = t;
+    const scale = Math.min(640 / Math.max(vw, vh), 1);
+    const w = Math.round(vw * scale), h = Math.round(vh * scale);
+    const cv = canvasRef.current!; cv.width = w; cv.height = h;
     const ctx = cv.getContext('2d', { willReadFrequently: true } as any)!;
-    ctx.drawImage(v, sx, sy, side, side, 0, 0, t, t);
-    const img = ctx.getImageData(0, 0, t, t);
+    ctx.drawImage(v, 0, 0, w, h);
+    const img = ctx.getImageData(0, 0, w, h);
     return window.jsQR(img.data, img.width, img.height, { inversionAttempts: 'attemptBoth' })?.data ?? null;
   }
 
@@ -79,12 +64,12 @@ export default function QrPage() {
     const v = videoRef.current;
     if (v && v.readyState >= 2) {
       const now = performance.now();
-      if (now - lastTickRef.current >= 110) { // ~9 lần/giây, đủ mượt & nhẹ máy
+      if (now - lastTickRef.current >= 110) { // ~9 lần/giây
         lastTickRef.current = now;
         try {
           let text: string | null = null;
           if (detectorRef.current) { const r = await detectorRef.current.detect(v); if (r && r.length) text = r[0].rawValue; }
-          else text = decodeVideoROI(v);
+          else text = decodeVideoFrame(v);
           if (text) { onDetected(text); return; }
         } catch {}
       }
@@ -94,19 +79,20 @@ export default function QrPage() {
 
   function onDetected(text: string) {
     if (!streamRef.current) return;
-    try { (navigator as any).vibrate?.(90); } catch {}
-    setFlash(true);
+    try { (navigator as any).vibrate?.(80); } catch {}
     stopCamera();
     handleDecoded(text);
-    setTimeout(() => setFlash(false), 450);
   }
 
   async function startCamera() {
     setErr('');
     if (!detectorRef.current && !window.jsQR) return setErr('Bộ quét chưa sẵn sàng, thử lại sau giây lát.');
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 1280 } } });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       streamRef.current = stream; setScanning(true);
+      const v = videoRef.current!; v.srcObject = stream; await v.play();
+      lastTickRef.current = 0;
+      rafRef.current = requestAnimationFrame(scanLoop);
     } catch (e: any) {
       setScanning(false);
       setErr(e?.name === 'NotAllowedError' ? 'Bạn chưa cấp quyền camera cho trang. Hãy cho phép camera rồi thử lại.' : 'Không mở được camera: ' + (e?.message || e));
@@ -125,7 +111,7 @@ export default function QrPage() {
       if (!window.jsQR) return resolve(null);
       const url = URL.createObjectURL(f); const img = new Image();
       img.onload = () => {
-        const scale = Math.max(Math.min(1600 / Math.max(img.width, img.height), 3), 1);
+        const scale = Math.max(Math.min(2000 / Math.max(img.width, img.height), 4), 1);
         const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
         const cv = canvasRef.current!; cv.width = w; cv.height = h;
         const ctx = cv.getContext('2d', { willReadFrequently: true } as any)!; ctx.drawImage(img, 0, 0, w, h);
@@ -147,7 +133,7 @@ export default function QrPage() {
       }
       if (!text) text = await decodeFileWithJsQR(f);
       if (text) { stopCamera(); handleDecoded(text); }
-      else setErr('Không tìm thấy mã QR trong ảnh. Hãy chụp/cắt sát mã QR, rõ nét.');
+      else setErr('Không tìm thấy mã QR trong ảnh. Cắt sát mã QR và chụp rõ nét.');
     } catch (er: any) { setErr('Không đọc được ảnh: ' + (er?.message || er)); }
   }
 
@@ -161,20 +147,21 @@ export default function QrPage() {
 
       <div className="grid md:grid-cols-2 gap-4">
         <div className="bg-white border rounded-xl p-4">
-          <h2 className="font-semibold mb-2">1. Quét mã QR</h2>
-          <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 p-6 text-center">
-            <div className="text-4xl mb-2">📷</div>
-            <p className="text-sm text-slate-500 mb-3">Quét <b>tự động</b> bằng camera — đưa mã vào khung là nhận ngay, không cần bấm chụp.</p>
-            <div className="flex flex-wrap gap-2 justify-center">
-              <button onClick={startCamera} disabled={!ready} className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50">📷 Quét bằng camera</button>
-              <label className="bg-white border border-slate-300 px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer hover:bg-slate-50">🖼️ Tải ảnh QR
-                <input type="file" accept="image/*" onChange={onFile} className="hidden" />
-              </label>
-            </div>
-            {!ready && <p className="text-xs text-slate-400 mt-2">Đang tải bộ quét…</p>}
+          <h2 className="font-semibold mb-2">1. Quét / tải mã QR</h2>
+          <div className="relative w-full bg-slate-900 rounded mb-2 aspect-video overflow-hidden flex items-center justify-center">
+            <video ref={videoRef} className={`w-full h-full object-cover ${scanning ? '' : 'hidden'}`} muted playsInline />
+            {!scanning && <span className="text-slate-400 text-sm">Camera / ảnh QR</span>}
           </div>
+          <div className="flex gap-2">
+            {!scanning
+              ? <button onClick={startCamera} disabled={!ready} className="bg-emerald-600 text-white px-3 py-1.5 rounded text-sm disabled:opacity-50">📷 Camera</button>
+              : <button onClick={stopCamera} className="bg-slate-600 text-white px-3 py-1.5 rounded text-sm">Dừng</button>}
+            <label className="bg-white border px-3 py-1.5 rounded text-sm cursor-pointer hover:bg-slate-50">🖼️ Tải ảnh QR
+              <input type="file" accept="image/*" onChange={onFile} className="hidden" />
+            </label>
+          </div>
+          {scanning && <p className="text-xs text-slate-400 mt-2">Đưa mã QR vào khung hình — hệ thống tự nhận, không cần bấm chụp.</p>}
           {err && <p className="text-sm text-red-600 mt-2">{err}</p>}
-          {code && <p className="text-sm text-emerald-700 mt-2 font-semibold">✓ Đã quét được mã QR.</p>}
         </div>
 
         <div className="bg-white border rounded-xl p-4">
@@ -210,35 +197,6 @@ export default function QrPage() {
           </p>
           <iframe src={VBDLIS_URL} className="w-full h-[640px] border rounded" title="VBDLIS" />
           <p className="text-xs text-slate-400 mt-1">* Nếu khung trên trống (trang VBĐLIS chặn nhúng), bấm &quot;Mở tab mới&quot; — mã đã được copy sẵn để dán.</p>
-        </div>
-      )}
-
-      {/* Khung quét toàn màn hình kiểu Zalo — tự nhận, không cần bấm chụp */}
-      {scanning && (
-        <div className="fixed inset-0 z-[70] bg-black select-none">
-          <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" muted playsInline />
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="relative" style={{ width: 'min(74vw, 320px)', height: 'min(74vw, 320px)' }}>
-              <div className="absolute inset-0 rounded-2xl" style={{ boxShadow: '0 0 0 100vmax rgba(0,0,0,0.55)' }} />
-              <span className="absolute -top-1 -left-1 w-9 h-9 border-t-4 border-l-4 border-emerald-400 rounded-tl-2xl" />
-              <span className="absolute -top-1 -right-1 w-9 h-9 border-t-4 border-r-4 border-emerald-400 rounded-tr-2xl" />
-              <span className="absolute -bottom-1 -left-1 w-9 h-9 border-b-4 border-l-4 border-emerald-400 rounded-bl-2xl" />
-              <span className="absolute -bottom-1 -right-1 w-9 h-9 border-b-4 border-r-4 border-emerald-400 rounded-br-2xl" />
-              <div className="qr-scanline absolute left-3 right-3 h-0.5 rounded bg-emerald-400" style={{ boxShadow: '0 0 10px 2px rgba(52,211,153,0.9)' }} />
-            </div>
-          </div>
-          <div className="absolute top-0 inset-x-0 flex items-center justify-between p-4 text-white">
-            <span className="font-semibold text-lg drop-shadow">Quét mã QR</span>
-            <button onClick={stopCamera} aria-label="Đóng" className="w-10 h-10 grid place-items-center rounded-full bg-white/15 backdrop-blur text-2xl leading-none">✕</button>
-          </div>
-          <div className="absolute bottom-0 inset-x-0 p-6 text-center">
-            <p className="text-white/90 text-sm mb-3 drop-shadow">Đưa mã QR của Giấy chứng nhận vào khung — hệ thống tự nhận, không cần bấm chụp.</p>
-            <label className="inline-block bg-white/15 hover:bg-white/25 backdrop-blur text-white px-4 py-2 rounded-full text-sm font-semibold cursor-pointer">🖼️ Chọn ảnh từ máy
-              <input type="file" accept="image/*" onChange={onFile} className="hidden" />
-            </label>
-          </div>
-          {flash && <div className="absolute inset-0 bg-emerald-400/40" />}
-          {err && <div className="absolute top-16 inset-x-4 text-center"><span className="inline-block bg-red-600 text-white text-sm px-3 py-1.5 rounded-lg">{err}</span></div>}
         </div>
       )}
     </div>

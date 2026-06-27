@@ -56,6 +56,7 @@ export default function SalesDashboard() {
                 </div>
                 <div className="flex flex-col gap-1.5 shrink-0">
                   <Link href={`/listings/${l.id}`} className="text-xs font-semibold text-[#0A2540] border border-slate-300 rounded-lg px-3 py-1.5 text-center hover:bg-slate-50">Xem</Link>
+                  <Link href={`/sales/edit/${l.id}`} className="text-xs font-semibold text-[#0A2540] border border-slate-300 rounded-lg px-3 py-1.5 text-center hover:bg-slate-50">Sửa</Link>
                   <button onClick={() => del(l.id)} className="text-xs font-semibold text-red-600 border border-red-200 rounded-lg px-3 py-1.5 hover:bg-red-50">Xoá</button>
                 </div>
               </div>

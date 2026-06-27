@@ -17,6 +17,7 @@ interface Props {
   focusPoint?: { lng: number; lat: number; label?: string } | null;
   highlight?: GeoJSON.Feature | null;
   initialBounds?: [[number, number], [number, number]]; // tự khớp khung vùng quy hoạch khi mở
+  adMarkers?: { id: number; lng: number; lat: number; name: string; phone: string; image?: string | null }[];
   onMapClick?: (lng: number, lat: number) => void;
   onMeasure?: (r: MeasureResult) => void;
 }
@@ -61,11 +62,12 @@ function polyArea(pts: { lng: number; lat: number }[]) {
   return Math.abs(s) / 2;
 }
 
-export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, highlight = null, initialBounds, onMapClick, onMeasure }: Props) {
+export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, highlight = null, initialBounds, adMarkers = [], onMapClick, onMeasure }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const markerRefs = useRef<Marker[]>([]);
   const focusMarker = useRef<Marker | null>(null);
+  const adRefs = useRef<Marker[]>([]);
   const readyRef = useRef(false);
   const measureModeRef = useRef<MeasureMode>(measureMode);
   const measurePts = useRef<{ lng: number; lat: number }[]>([]);
@@ -86,6 +88,8 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     if (!containerRef.current || mapRef.current) return;
     const map = new maplibregl.Map({ container: containerRef.current, style: BASE_STYLE, center: center ?? MAP.center, zoom: zoom ?? MAP.zoom, maxZoom: 22 });
     map.addControl(new maplibregl.NavigationControl(), 'top-right');
+    // Định vị GPS: đưa bản đồ về vị trí người dùng, có chấm xanh + theo dõi khi di chuyển.
+    map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true, showUserHeading: true, showAccuracyCircle: true }), 'top-right');
     map.on('load', () => {
       readyRef.current = true;
       map.addSource('measure', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
@@ -184,6 +188,31 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       mk.addTo(map); return mk;
     });
   }, [markers]);
+
+  // Logo quảng cáo tròn (avatar/ảnh + tên & SĐT ngoài vòng, chữ Cam Lâm Land bên trong)
+  useEffect(() => {
+    const map = mapRef.current; if (!map) return;
+    adRefs.current.forEach((m) => m.remove());
+    const esc = (x: any) => String(x ?? '').replace(/[<>&"]/g, (c) => (({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' } as any)[c]));
+    adRefs.current = adMarkers.map((a) => {
+      const el = document.createElement('div'); el.className = 'cl-ad';
+      const ring = document.createElement('div'); ring.className = 'cl-ad-ring';
+      if (a.image) { const im = document.createElement('img'); im.src = a.image; im.alt = ''; ring.appendChild(im); }
+      else { const ph = document.createElement('div'); ph.className = 'cl-ad-ph'; ph.textContent = (a.name || 'CL').charAt(0).toUpperCase(); ring.appendChild(ph); }
+      const brand = document.createElement('span'); brand.className = 'cl-ad-brand'; brand.textContent = 'Cam Lâm Land'; ring.appendChild(brand);
+      el.appendChild(ring);
+      const label = document.createElement('div'); label.className = 'cl-ad-label';
+      const nm = document.createElement('span'); nm.className = 'cl-ad-name'; nm.textContent = a.name || '';
+      const tel = document.createElement('span'); tel.className = 'cl-ad-phone'; tel.textContent = a.phone || '';
+      label.appendChild(nm); label.appendChild(tel); el.appendChild(label);
+      const mk = new maplibregl.Marker({ element: el, anchor: 'bottom' }).setLngLat([a.lng, a.lat]);
+      mk.setPopup(new maplibregl.Popup({ offset: 28 }).setHTML(
+        `<div style="text-align:center;min-width:130px"><div style="font-weight:800;color:#0A2540">${esc(a.name)}</div>` +
+        `<a href="tel:${esc(a.phone)}" style="color:#dc2626;font-weight:700">📞 ${esc(a.phone)}</a>` +
+        `<div style="color:#C8A14B;font-weight:700;font-size:11px;margin-top:2px">⭐ Cam Lâm Land</div></div>`));
+      mk.addTo(map); return mk;
+    });
+  }, [adMarkers]);
 
   useEffect(() => {
     const map = mapRef.current; if (!map || !focusPoint) return;

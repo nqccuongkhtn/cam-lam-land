@@ -57,6 +57,26 @@ CREATE INDEX IF NOT EXISTS listings_created_by_idx ON listings (created_by);
 CREATE INDEX IF NOT EXISTS listings_ward_idx       ON listings (ward);
 CREATE INDEX IF NOT EXISTS listings_list_idx       ON listings (status, boosted DESC, created_at DESC);
 CREATE INDEX IF NOT EXISTS users_role_idx          ON users (role);
+
+-- ── Quảng cáo bản đồ: logo tròn theo xã, độc quyền, có thời hạn ──
+CREATE TABLE IF NOT EXISTS map_ads (
+  id               SERIAL PRIMARY KEY,
+  advertiser_name  TEXT NOT NULL,
+  advertiser_phone TEXT NOT NULL,
+  image_url        TEXT,
+  wards            TEXT[] NOT NULL DEFAULT '{}',
+  points           JSONB  NOT NULL DEFAULT '[]',
+  package          TEXT,
+  starts_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at       TIMESTAMPTZ NOT NULL,
+  status           TEXT NOT NULL DEFAULT 'active',
+  created_by       INT REFERENCES users(id) ON DELETE SET NULL,
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS map_ads_active_idx ON map_ads (status, expires_at);
+
+-- ── Dọn dữ liệu: không cho giá âm (đưa về dương) ──
+UPDATE listings SET price = ABS(price) WHERE price < 0;
 `;
 
 /** Idempotent schema upgrade — runs every boot (roles, verification, listing fields, images). */

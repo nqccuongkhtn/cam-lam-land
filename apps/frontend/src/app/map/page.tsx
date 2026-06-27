@@ -163,7 +163,7 @@ export default function MapPage() {
   const [opacity, setOpacity] = useState(0.85);
   const [canDelete, setCanDelete] = useState(false);
   const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true });
-  const [baseMap, setBaseMap] = useState<BaseMap>('street');
+  const [baseMap, setBaseMap] = useState<BaseMap>('satellite');
   const [labels, setLabels] = useState(true);
   const [measure, setMeasure] = useState<MeasureMode>('off');
   const [mResult, setMResult] = useState<MeasureResult | null>(null);

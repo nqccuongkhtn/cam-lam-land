@@ -64,6 +64,8 @@ function polyArea(pts: { lng: number; lat: number }[]) {
   return Math.abs(s) / 2;
 }
 
+const WM_MIN_ZOOM = 14; // chữ mờ chỉ hiện khi zoom gần
+const WM_OPACITY = 0.5; // làm mờ thêm
 export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, onMapClick, onMeasure }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
@@ -111,6 +113,8 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     });
     map.getCanvas().style.cursor = '';
     mapRef.current = map;
+    const wmZoom = () => { if (wmRef.current) wmRef.current.style.display = map.getZoom() < WM_MIN_ZOOM ? 'none' : ''; };
+    map.on('zoom', wmZoom); map.on('load', wmZoom);
     // Tự resize + khớp khung khi container đổi kích thước (vd: chuyển tab Danh sách↔Bản đồ trên mobile).
     let ro: ResizeObserver | null = null;
     if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
@@ -229,18 +233,20 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     const seenK = new Set<string>();
     const uniq = tAds.filter((a) => { const k = a.name + '|' + a.phone; if (seenK.has(k)) return false; seenK.add(k); return true; });
     if (!uniq.length) { if (wmRef.current) { wmRef.current.remove(); wmRef.current = null; } return; }
-    const rowH = 58, tileW = 300, tileH = rowH * uniq.length;
-    const rows = uniq.map((a, i) => `<text x='${tileW / 2}' y='${i * rowH + rowH / 2}' text-anchor='middle' dominant-baseline='middle' font-family='Roboto,Arial,sans-serif' font-size='15' font-weight='700' fill='rgba(255,255,255,0.9)' stroke='rgba(0,0,0,0.5)' stroke-width='0.7' paint-order='stroke'>${esc2(a.name)} · ${esc2(a.phone)}</text>`).join('');
+    const rowH = 46, tileW = 250, tileH = rowH * uniq.length;
+    const rows = uniq.map((a, i) => `<text x='${tileW / 2}' y='${i * rowH + rowH / 2}' text-anchor='middle' dominant-baseline='middle' font-family='Roboto,Arial,sans-serif' font-size='12' font-weight='600' fill='rgba(255,255,255,0.82)' stroke='rgba(0,0,0,0.42)' stroke-width='0.6' paint-order='stroke'>${esc2(a.name)} · ${esc2(a.phone)}</text>`).join('');
     const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${tileW}' height='${tileH}'>${rows}</svg>`;
     let el = wmRef.current;
     if (!el) { el = document.createElement('div'); el.setAttribute('aria-hidden', 'true'); el.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:2;background-repeat:repeat;background-position:center;'; if (getComputedStyle(cont).position === 'static') cont.style.position = 'relative'; cont.appendChild(el); wmRef.current = el; }
     el.style.backgroundImage = `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
-    el.style.opacity = String(adOpacityRef.current);
+    el.style.opacity = String(adOpacityRef.current * WM_OPACITY);
+    const mp = mapRef.current;
+    el.style.display = (mp && mp.getZoom() < WM_MIN_ZOOM) ? 'none' : '';
   }, [adMarkers]);
 
   useEffect(() => {
     adRefs.current.forEach((m) => { try { (m.getElement() as HTMLElement).style.opacity = String(adOpacity); } catch {} });
-    if (wmRef.current) wmRef.current.style.opacity = String(adOpacity);
+    if (wmRef.current) wmRef.current.style.opacity = String(adOpacity * WM_OPACITY);
   }, [adOpacity]);
 
   useEffect(() => {

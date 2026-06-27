@@ -115,35 +115,42 @@ function toBlob(src: HTMLImageElement | HTMLCanvasElement): Promise<Blob> {
   cv.getContext('2d')!.drawImage(src, 0, 0, cv.width, cv.height);
   return new Promise((resolve, reject) => cv.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), 'image/png'));
 }
-async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{ pts: { x: number; y: number }[]; raw: string; src: string }> {
-  let raw = '', src = '';
+async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{ pts: { x: number; y: number }[]; msg: string }> {
+  let serverPart = '';
   try {
     const txt = await ocrImage(await toBlob(img));
-    raw = txt; src = 'server';
     const pts = parseBigPairs(normalizeDigits(txt));
-    if (pts.length >= 3) return { pts, raw, src };
-  } catch (e: any) { src = 'server-lỗi:' + (e?.message || e); }
+    if (pts.length >= 3) return { pts, msg: '' };
+    serverPart = '• Server OCR: chạy nhưng chỉ ra ' + pts.length + ' điểm. Đọc được:\n' + (txt ? txt.slice(0, 240) : '(trống)');
+  } catch (e: any) {
+    serverPart = '• Server OCR LỖI: ' + (e?.message || e) + '\n  (⚠️ Hãy build lại backend camlam-api để cài Tesseract)';
+  }
+  let cli = '';
   try {
-    const t1 = await runRecognize(img);
-    if (t1) { raw = t1; src = 'trình duyệt'; }
-    let pts = parseBigPairs(normalizeDigits(t1));
-    if (pts.length < 3) { const t2 = await runRecognize(preprocess(img)); if (t2) raw = t2; pts = parseBigPairs(normalizeDigits(t2)); }
-    return { pts, raw, src };
-  } catch (e: any) { return { pts: [], raw, src: src + ' / tr.duyệt-lỗi:' + (e?.message || e) }; }
+    cli = await runRecognize(img);
+    let pts = parseBigPairs(normalizeDigits(cli));
+    if (pts.length < 3) { const t2 = await runRecognize(preprocess(img)); if (t2) cli = t2; pts = parseBigPairs(normalizeDigits(t2)); }
+    if (pts.length >= 3) return { pts, msg: '' };
+  } catch {}
+  return { pts: [], msg: serverPart + '\n\n• Trình duyệt OCR đọc được:\n' + (cli ? cli.slice(0, 240) : '(trống)') };
 }
-function showOcrResult(r: { pts: { x: number; y: number }[]; raw: string; src: string }, apply: (pts: { x: number; y: number }[]) => void) {
+function showOcrResult(r: { pts: { x: number; y: number }[]; msg: string }, apply: (pts: { x: number; y: number }[]) => void) {
   if (r.pts.length) { apply(r.pts); return; }
-  alert('Chưa tách được toạ độ.\n\nNguồn OCR: ' + (r.src || 'không chạy') + '\nĐọc được:\n' + (r.raw ? r.raw.slice(0, 400) : '(TRỐNG — OCR không chạy được)') + '\n\n→ Chụp màn hình thông báo này gửi mình, hoặc nhập tay ở tab "Nhập bảng".');
+  alert('Chưa tách được toạ độ.\n\n' + r.msg + '\n\n→ Nếu Server OCR lỗi: build lại backend. Hoặc nhập tay ở tab "Nhập bảng".');
 }
-// Gom tất cả số cỡ toạ độ rồi ghép thành cặp (đỉnh) — bền với bảng nhiều cột.
+// Khôi phục số bị OCR rớt dấu phẩy (8-9 chữ số = to gấp 100 lần).
+function recoverCoord(n: number): number { return n >= 9000000 ? n / 100 : (n >= 3000000 ? n / 10 : n); }
+// Gom số cỡ toạ độ, ghép theo loại (Bắc>900k / Đông<900k), bỏ qua hàng nhiễu.
 function parseBigPairs(text: string): { x: number; y: number }[] {
   const nums: number[] = [];
-  for (const t of (text.match(/-?[\d.,]+/g) || [])) { const n = parseNum(t); if (Number.isFinite(n) && n > 90000) nums.push(n); }
+  for (const t of (text.match(/-?[\d.,]+/g) || [])) { const n = parseNum(t); if (Number.isFinite(n) && n > 90000) nums.push(recoverCoord(n)); }
   const pts: { x: number; y: number }[] = [];
-  for (let i = 0; i + 1 < nums.length; i += 2) {
+  for (let i = 0; i < nums.length - 1; i++) {
     const a = nums[i], b = nums[i + 1];
-    const E = a < 900000 ? a : b, N = a < 900000 ? b : a;
-    if (E > 90000 && E < 900000 && N > 900000) pts.push({ x: E, y: N });
+    const aN = a >= 900000, bN = b >= 900000;
+    if (aN === bN) continue;
+    const E = aN ? b : a, N = aN ? a : b;
+    if (E > 90000 && E < 900000 && N >= 900000 && N < 3000000) { pts.push({ x: E, y: N }); i++; }
   }
   return pts;
 }

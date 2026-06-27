@@ -116,27 +116,25 @@ function toBlob(src: HTMLImageElement | HTMLCanvasElement): Promise<Blob> {
   return new Promise((resolve, reject) => cv.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), 'image/png'));
 }
 async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{ pts: { x: number; y: number }[]; msg: string }> {
-  let serverPart = '';
+  let status = '';
   try {
     const txt = await ocrImage(await toBlob(img));
     const pts = parseBigPairs(normalizeDigits(txt));
     if (pts.length >= 3) return { pts, msg: '' };
-    serverPart = '• Server OCR: chạy nhưng chỉ ra ' + pts.length + ' điểm. Đọc được:\n' + (txt ? txt.slice(0, 240) : '(trống)');
+    status = '✅ SERVER OCR đã chạy nhưng đọc chưa đủ (ra ' + pts.length + ' điểm).\nĐọc được: ' + (txt ? txt.replace(/\s+/g, ' ').slice(0, 180) : '(trống)') + '\n\nHãy chụp gần/thẳng/rõ hơn, hoặc nhập tay.';
   } catch (e: any) {
-    serverPart = '• Server OCR LỖI: ' + (e?.message || e) + '\n  (⚠️ Hãy build lại backend camlam-api để cài Tesseract)';
+    status = '⛔ SERVER OCR CHƯA CHẠY:\n' + String(e?.message || e) + '\n\n→ Backend camlam-api cần BUILD LẠI (cài Tesseract). Vào Render xem service camlam-api đã "Live" bản mới chưa.\n(Đang tạm dùng OCR trình duyệt — yếu nên đọc lỗi.)';
   }
-  let cli = '';
   try {
-    cli = await runRecognize(img);
-    let pts = parseBigPairs(normalizeDigits(cli));
-    if (pts.length < 3) { const t2 = await runRecognize(preprocess(img)); if (t2) cli = t2; pts = parseBigPairs(normalizeDigits(t2)); }
+    let pts = parseBigPairs(normalizeDigits(await runRecognize(img)));
+    if (pts.length < 3) pts = parseBigPairs(normalizeDigits(await runRecognize(preprocess(img))));
     if (pts.length >= 3) return { pts, msg: '' };
   } catch {}
-  return { pts: [], msg: serverPart + '\n\n• Trình duyệt OCR đọc được:\n' + (cli ? cli.slice(0, 240) : '(trống)') };
+  return { pts: [], msg: status };
 }
 function showOcrResult(r: { pts: { x: number; y: number }[]; msg: string }, apply: (pts: { x: number; y: number }[]) => void) {
   if (r.pts.length) { apply(r.pts); return; }
-  alert('Chưa tách được toạ độ.\n\n' + r.msg + '\n\n→ Nếu Server OCR lỗi: build lại backend. Hoặc nhập tay ở tab "Nhập bảng".');
+  alert('Chưa tách được toạ độ.\n\n' + r.msg);
 }
 // Khôi phục số bị OCR rớt dấu phẩy (8-9 chữ số = to gấp 100 lần).
 function recoverCoord(n: number): number { return n >= 9000000 ? n / 100 : (n >= 3000000 ? n / 10 : n); }

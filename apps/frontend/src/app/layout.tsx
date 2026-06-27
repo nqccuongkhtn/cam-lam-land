@@ -3,7 +3,6 @@ import type { Metadata, Viewport } from 'next';
 import Nav from '@/components/Nav';
 import Providers from './providers';
 import PwaRegister from './pwa-register';
-import SellFab from '@/components/SellFab';
 import ChatWidget from '@/components/ChatWidget';
 
 export const metadata: Metadata = {
@@ -29,7 +28,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <PwaRegister />
           <Nav />
           <main className="min-h-[calc(100vh-56px)]">{children}</main>
-          <SellFab />
           <ChatWidget />
         </Providers>
       </body>

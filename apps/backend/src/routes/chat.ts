@@ -14,6 +14,16 @@ function canAccess(room: string, user: { id: number; role: string }): boolean {
   return false;
 }
 
+// Lọc nội dung gửi lên nhóm cộng đồng: chặn số điện thoại & từ ngữ tục.
+const BAD = new Set(['địt','đụ','đéo','đếch','đách','cặc','lồn','buồi','đĩ','cứt','đmm','dmm','đcm','dcm','vcl','vkl','clmm','cmnr','cml','đméo','fuck','shit','đjt','djt']);
+function badContent(body: string): 'phone' | 'word' | null {
+  const d = body.replace(/[\s.\-_()+]+/g, '');
+  if (/\d{9,}/.test(d)) return 'phone';
+  const toks = body.toLowerCase().split(/[^a-zà-ỹ0-9]+/i);
+  if (toks.some((t) => BAD.has(t))) return 'word';
+  return null;
+}
+
 // GET /api/chat/messages?room=...&after=<id>
 chatRouter.get('/messages', authRequired, async (req: AuthedRequest, res, next) => {
   try {
@@ -21,8 +31,9 @@ chatRouter.get('/messages', authRequired, async (req: AuthedRequest, res, next) 
     if (!canAccess(room, req.user!)) return res.status(403).json({ error: 'Không có quyền' });
     const after = Number(req.query.after ?? 0) || 0;
     const rows = await query(
-      `SELECT id, room, user_id AS "userId", name, body, created_at AS "createdAt"
-         FROM chat_messages WHERE room=$1 AND id > $2 ORDER BY id ASC LIMIT 300`, [room, after]);
+      `SELECT m.id, m.room, m.user_id AS "userId", m.name, m.body, m.created_at AS "createdAt", u.avatar
+         FROM chat_messages m LEFT JOIN users u ON u.id = m.user_id
+         WHERE m.room=$1 AND m.id > $2 ORDER BY m.id ASC LIMIT 300`, [room, after]);
     res.json({ messages: rows });
   } catch (e) { next(e); }
 });
@@ -34,14 +45,19 @@ chatRouter.post('/messages', authRequired, async (req: AuthedRequest, res, next)
     const body = String(req.body?.body ?? '').trim().slice(0, 2000);
     if (!canAccess(room, req.user!)) return res.status(403).json({ error: 'Không có quyền' });
     if (!body) return res.status(400).json({ error: 'Tin nhắn trống' });
-    const [u] = await query('SELECT full_name, email FROM users WHERE id=$1', [req.user!.id]);
+    if (room === 'community') {
+      const bad = badContent(body);
+      if (bad === 'phone') return res.status(400).json({ error: 'Không được gửi số điện thoại lên nhóm cộng đồng. Vui lòng nhắn riêng.', blocked: 'phone' });
+      if (bad === 'word') return res.status(400).json({ error: 'Tin nhắn có từ ngữ không phù hợp nên không được gửi lên nhóm.', blocked: 'word' });
+    }
+    const [u] = await query('SELECT full_name, email, avatar FROM users WHERE id=$1', [req.user!.id]);
     const name = u?.full_name || (u?.email ? String(u.email).split('@')[0] : 'Người dùng');
     const [row] = await query(
       `INSERT INTO chat_messages (room, user_id, name, body) VALUES ($1,$2,$3,$4) RETURNING id, created_at AS "createdAt"`,
       [room, req.user!.id, name, body]);
-    const message = { id: row.id, room, userId: req.user!.id, name, body, createdAt: row.createdAt };
+    const message = { id: row.id, room, userId: req.user!.id, name, avatar: u?.avatar ?? null, body, createdAt: row.createdAt };
     broadcastChat(room, message);
-    res.status(201).json({ id: row.id, createdAt: row.createdAt, name });
+    res.status(201).json({ id: row.id, createdAt: row.createdAt, name, avatar: u?.avatar ?? null });
   } catch (e) { next(e); }
 });
 

@@ -70,6 +70,7 @@ listingsRouter.get('/mine', authRequired, async (req: AuthedRequest, res, next) 
   try {
     const rows = await query(
       `SELECT id, title, price, property_type AS "propertyType", ward, status, boosted, images,
+              ST_X(geom) AS lng, ST_Y(geom) AS lat, created_by AS "createdBy",
               created_at AS "createdAt",
               (SELECT count(*)::int FROM listing_leads ll WHERE ll.listing_id=listings.id) AS "leadCount",
               (SELECT COALESCE(sum(views),0)::int FROM listing_leads ll WHERE ll.listing_id=listings.id) AS "leadViews"

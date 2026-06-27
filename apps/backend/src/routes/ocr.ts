@@ -27,10 +27,14 @@ ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, n
     await writeFile(tmp, req.file.buffer);
     let text = '';
     try {
-      text = await runTesseract(tmp, ['--psm', '6', '-c', 'tessedit_char_whitelist=0123456789.,']);
-      if (!/\d{5,}/.test(text)) {
-        const t2 = await runTesseract(tmp, ['--psm', '4']);
-        if (/\d/.test(t2)) text = t2;
+      // Không dùng whitelist (giữ khoảng cách giữa các số); thử nhiều PSM, chọn kết quả nhiều số cỡ toạ độ nhất.
+      let bestScore = -1;
+      for (const psm of ['4', '6', '11', '3']) {
+        let t = '';
+        try { t = await runTesseract(tmp, ['--psm', psm]); } catch {}
+        const score = (t.match(/\d{5,7}/g) || []).length;
+        if (score > bestScore) { bestScore = score; text = t; }
+        if (bestScore >= 6) break;
       }
     } finally { unlink(tmp).catch(() => {}); }
     res.json({ text });

@@ -110,7 +110,7 @@ function normalizeDigits(t: string): string {
 function toBlob(src: HTMLImageElement | HTMLCanvasElement): Promise<Blob> {
   const w0 = src instanceof HTMLCanvasElement ? src.width : ((src as HTMLImageElement).naturalWidth || 1);
   const h0 = src instanceof HTMLCanvasElement ? src.height : ((src as HTMLImageElement).naturalHeight || 1);
-  const sc = Math.min(1, 1800 / Math.max(w0, h0));
+  const sc = Math.min(2.5, 1700 / Math.max(w0, h0));
   const cv = document.createElement('canvas'); cv.width = Math.max(1, Math.round(w0 * sc)); cv.height = Math.max(1, Math.round(h0 * sc));
   cv.getContext('2d')!.drawImage(src, 0, 0, cv.width, cv.height);
   return new Promise((resolve, reject) => cv.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), 'image/png'));

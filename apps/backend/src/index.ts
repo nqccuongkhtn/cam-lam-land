@@ -18,6 +18,8 @@ import { adminRouter } from './routes/admin.ts';
 import { qrRouter } from './routes/qr.ts';
 import { mapAdsRouter } from './routes/mapAds.ts';
 import { consignmentsRouter } from './routes/consignments.ts';
+import { pushRouter } from './routes/push.ts';
+import { vapidPublicKey } from './lib/push.ts';
 import { chatRouter } from './routes/chat.ts';
 import { ocrRouter } from './routes/ocr.ts';
 import { notFound, errorHandler } from './middleware/error.ts';
@@ -31,7 +33,7 @@ app.get('/api/health', (_req, res) => res.json({ status: 'ok', region: 'Cam Lâm
 app.get('/api/config', (_req, res) => {
   const ext = process.env.RENDER_EXTERNAL_URL || '';
   const host = ext.replace(/^https?:\/\//, '');
-  res.json({ wsUrl: host ? `wss://${host}/ws` : '' });
+  res.json({ wsUrl: host ? `wss://${host}/ws` : '', vapidPublic: vapidPublicKey });
 });
 app.use('/api/auth', authRouter);
 app.use('/api/listings', listingsRouter);
@@ -45,6 +47,7 @@ app.use('/api/map-ads', mapAdsRouter);
 app.use('/api/consignments', consignmentsRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/ocr', ocrRouter);
+app.use('/api/push', pushRouter);
 app.use(notFound);
 app.use(errorHandler);
 

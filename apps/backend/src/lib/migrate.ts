@@ -78,6 +78,15 @@ CREATE TABLE IF NOT EXISTS map_ads (
 CREATE INDEX IF NOT EXISTS map_ads_active_idx ON map_ads (status, expires_at);
 ALTER TABLE map_ads ADD COLUMN IF NOT EXISTS style TEXT NOT NULL DEFAULT 'seal';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ;
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  endpoint TEXT NOT NULL UNIQUE,
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS push_sub_user_idx ON push_subscriptions (user_id);
 
 -- ── Khách gửi bán / ký gửi BĐS (thu thập thông tin từ khách) ──
 CREATE TABLE IF NOT EXISTS consignments (

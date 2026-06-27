@@ -65,7 +65,7 @@ function polyArea(pts: { lng: number; lat: number }[]) {
 }
 
 const WM_MIN_ZOOM = 14; // chữ mờ chỉ hiện khi zoom gần
-const WM_OPACITY = 0.65; // đậm hơn một chút
+const WM_OPACITY = 0.38; // nhạt kiểu Shutterstock
 export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, onMapClick, onMeasure }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
@@ -233,9 +233,17 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     const seenK = new Set<string>();
     const uniq = tAds.filter((a) => { const k = a.name + '|' + a.phone; if (seenK.has(k)) return false; seenK.add(k); return true; });
     if (!uniq.length) { if (wmRef.current) { wmRef.current.remove(); wmRef.current = null; } return; }
-    const rowH = 128, tileW = 360, tileH = rowH * uniq.length;
-    const rows = uniq.map((a, i) => `<text x='${tileW / 2}' y='${i * rowH + rowH / 2}' text-anchor='middle' dominant-baseline='middle' font-family='Roboto,Arial,sans-serif' font-size='13' font-weight='700' fill='rgba(255,255,255,0.95)' stroke='rgba(0,0,0,0.55)' stroke-width='0.5' paint-order='stroke'>${esc2(a.name)} · ${esc2(a.phone)}</text>`).join('');
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${tileW}' height='${tileH}'>${rows}</svg>`;
+    const band = 150, tileW = 440;
+    const cols = uniq.length >= 2 ? uniq : [uniq[0], uniq[0]];
+    const tileH = band * cols.length;
+    const ts = "text-anchor='middle' dominant-baseline='middle' font-family='Roboto,Arial,sans-serif' font-size='13' font-weight='500' letter-spacing='0.5' fill='rgba(255,255,255,0.9)' filter='url(#wmsh)'";
+    const rows = cols.map((a, i) => {
+      const y = i * band + band / 2; const label = `${esc2(a.name)} · ${esc2(a.phone)}`;
+      return i % 2 === 0
+        ? `<text x='${tileW / 2}' y='${y}' ${ts}>${label}</text>`
+        : `<text x='0' y='${y}' ${ts}>${label}</text><text x='${tileW}' y='${y}' ${ts}>${label}</text>`;
+    }).join('');
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${tileW}' height='${tileH}'><defs><filter id='wmsh' x='-40%' y='-80%' width='180%' height='260%'><feDropShadow dx='0' dy='0.4' stdDeviation='0.9' flood-color='#000' flood-opacity='0.5'/></filter></defs>${rows}</svg>`;
     let el = wmRef.current;
     if (!el) {
       el = document.createElement('div'); el.setAttribute('aria-hidden', 'true');

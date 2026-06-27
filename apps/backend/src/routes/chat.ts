@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { broadcastChat } from '../lib/ws.ts';
+import { pushToUsers, pushAllExcept } from '../lib/push.ts';
 
 export const chatRouter = Router();
 
@@ -101,6 +102,14 @@ chatRouter.post('/messages', authRequired, async (req: AuthedRequest, res, next)
       [room, req.user!.id, name, body]);
     const message = { id: row.id, room, userId: req.user!.id, name, avatar: u?.avatar ?? null, body, createdAt: row.createdAt };
     broadcastChat(room, message);
+    // Web Push chạy ngầm (kể cả khi không mở web)
+    const payload = { title: name, body: body.length > 60 ? body.slice(0, 60) + '…' : body, room, url: '/', tag: room };
+    if (room === 'community') { pushAllExcept(req.user!.id, payload).catch(() => {}); }
+    else if (room.startsWith('support:')) {
+      const ownerId = Number(room.slice(8));
+      const admins = await query("SELECT id FROM users WHERE role='admin'");
+      pushToUsers([ownerId, ...admins.map((a: any) => a.id)], payload, req.user!.id).catch(() => {});
+    }
     res.status(201).json({ id: row.id, createdAt: row.createdAt, name, avatar: u?.avatar ?? null });
   } catch (e) { next(e); }
 });

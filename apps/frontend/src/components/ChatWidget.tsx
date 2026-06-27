@@ -10,6 +10,14 @@ interface Room { room: string; name: string; phone?: string | null; online?: boo
 const TYPES: PropertyType[] = ['land', 'house', 'apartment', 'villa', 'commercial', 'farm'];
 type Tab = 'community' | 'support' | 'sell';
 
+function urlB64ToUint8(base64: string): Uint8Array {
+  const pad = '='.repeat((4 - (base64.length % 4)) % 4);
+  const b64 = (base64 + pad).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(b64); const arr = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+  return arr;
+}
+
 export default function ChatWidget() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
@@ -38,6 +46,7 @@ export default function ChatWidget() {
   const [pickedName, setPickedName] = useState('');
   const [pickedPhone, setPickedPhone] = useState('');
   const [notify, setNotify] = useState(true);
+  const [vapid, setVapid] = useState('');
   const [toast, setToast] = useState<{ room: string; name: string; body: string; avatar?: string | null } | null>(null);
   const [dragX, setDragX] = useState(0);
   const dragStart = useRef<number | null>(null);
@@ -50,6 +59,7 @@ export default function ChatWidget() {
   const openRef = useRef(open); openRef.current = open;
   const tabRef = useRef(tab); tabRef.current = tab;
   const notifyRef = useRef(notify); notifyRef.current = notify;
+  const vapidRef = useRef(''); vapidRef.current = vapid;
   const audioRef = useRef<any>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const seenComm = useRef(0), seenSupp = useRef(0);
@@ -61,7 +71,7 @@ export default function ChatWidget() {
     try { seenComm.current = Number(localStorage.getItem('cl-seen-community') || 0); } catch {}
     if (user) { try { seenSupp.current = Number(localStorage.getItem(`cl-seen-support:${user.id}`) || 0); } catch {} }
   }, [user]);
-  useEffect(() => { if (user) api<{ wsUrl: string }>('/config').then((r) => setWsUrl(r.wsUrl || '')).catch(() => {}); }, [user]);
+  useEffect(() => { if (user) api<{ wsUrl: string; vapidPublic?: string }>('/config').then((r) => { setWsUrl(r.wsUrl || ''); setVapid(r.vapidPublic || ''); }).catch(() => {}); }, [user]);
   useEffect(() => {
     if (!user) return;
     const ping = () => api('/auth/ping', { method: 'POST' }).catch(() => {});
@@ -149,6 +159,7 @@ export default function ChatWidget() {
 
   useEffect(() => { boxRef.current?.scrollTo({ top: boxRef.current.scrollHeight }); }, [msgs, open, tab]);
   useEffect(() => { try { setNotify(localStorage.getItem('cl-notify') !== '0'); } catch {} }, []);
+  useEffect(() => { if (user && vapid && notify && typeof Notification !== 'undefined' && Notification.permission === 'granted') subscribePush(); }, [user, vapid, notify]);
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(null), 5000); return () => clearTimeout(t); }, [toast]);
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -183,12 +194,31 @@ export default function ChatWidget() {
       });
     } catch {}
   }
-  function toggleNotify() { primeAudio(); setNotify((v) => { const nv = !v; try { localStorage.setItem('cl-notify', nv ? '1' : '0'); } catch {} return nv; }); }
+  function toggleNotify() { primeAudio(); setNotify((v) => { const nv = !v; try { localStorage.setItem('cl-notify', nv ? '1' : '0'); } catch {} if (nv) subscribePush(); else unsubscribePush(); return nv; }); }
   function openFromToast(t: { room: string; name: string }) {
     primeAudio(); setOpen(true);
     if (t.room === 'community') setTab('community');
     else if (t.room.startsWith('support:')) { setTab('support'); if (isAdmin) { setRoom(t.room); setPickedName(t.name); } }
     setToast(null);
+  }
+  async function subscribePush() {
+    try {
+      if (typeof navigator === 'undefined' || !('serviceWorker' in navigator) || typeof window === 'undefined' || !('PushManager' in window) || !vapidRef.current) return;
+      if (typeof Notification === 'undefined' || Notification.permission === 'denied') return;
+      if (Notification.permission !== 'granted') { const perm = await Notification.requestPermission(); if (perm !== 'granted') return; }
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8(vapidRef.current) });
+      await api('/push/subscribe', { method: 'POST', body: JSON.stringify(sub) });
+    } catch {}
+  }
+  async function unsubscribePush() {
+    try {
+      if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if (sub) { await api('/push/unsubscribe', { method: 'POST', body: JSON.stringify({ endpoint: sub.endpoint }) }).catch(() => {}); await sub.unsubscribe().catch(() => {}); }
+    } catch {}
   }
   async function send() {
     const body = text.trim(); if (!body || !room || !user) return;

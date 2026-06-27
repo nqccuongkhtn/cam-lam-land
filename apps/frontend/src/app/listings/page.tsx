@@ -126,7 +126,7 @@ export default function ListingsPage() {
     <div className="flex flex-col h-[calc(100vh-56px)] bg-slate-50">
       {/* Thanh lọc */}
       <div className="bg-white border-b border-slate-200 shrink-0 z-20">
-        <div className="max-w-7xl mx-auto w-full px-4 py-2.5 flex flex-wrap gap-2 items-center">
+        <div className="max-w-7xl mx-auto w-full px-4 py-2.5 relative flex flex-wrap gap-2 items-center justify-center">
           <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && load()}
             className="border rounded-lg px-3 py-2 text-sm w-full sm:w-52 md:w-60" placeholder="🔍 Khu vực, từ khoá…" />
           <select value={type} onChange={(e) => setType(e.target.value as PropertyType)} className="border rounded-lg px-3 py-2 text-sm bg-white flex-1 sm:flex-none">
@@ -135,7 +135,7 @@ export default function ListingsPage() {
           <input value={min} onChange={(e) => setMin(e.target.value)} className="border rounded-lg px-3 py-2 text-sm w-[48%] sm:w-24" placeholder="Giá từ (tỷ)" />
           <input value={max} onChange={(e) => setMax(e.target.value)} className="border rounded-lg px-3 py-2 text-sm w-[48%] sm:w-24" placeholder="đến (tỷ)" />
           <button onClick={() => load()} className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg text-sm font-bold flex-1 sm:flex-none shadow-sm shadow-red-600/30">Tìm kiếm</button>
-          <span className="text-sm text-slate-500 ml-auto hidden md:block">{loading ? 'Đang tìm…' : <><b className="text-[#0A2540]">{listings.length}</b> BĐS</>}</span>
+          <span className="text-sm text-slate-500 hidden md:block md:absolute md:right-4 md:top-1/2 md:-translate-y-1/2">{loading ? 'Đang tìm…' : <><b className="text-[#0A2540]">{listings.length}</b> BĐS</>}</span>
         </div>
         {/* Toggle Danh sách / Bản đồ — chỉ hiện trên điện thoại & iPad dọc */}
         <div className="lg:hidden flex border-t border-slate-100">

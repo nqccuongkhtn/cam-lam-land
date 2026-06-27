@@ -126,17 +126,32 @@ export default function ListingsPage() {
     <div className="flex flex-col h-[calc(100vh-56px)] bg-slate-50">
       {/* Thanh lọc */}
       <div className="bg-white border-b border-slate-200 shrink-0 z-20">
-        <div className="max-w-7xl mx-auto w-full px-4 py-2.5 relative flex flex-wrap gap-2 items-center justify-center">
-          <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && load()}
-            className="border rounded-lg px-3 py-2 text-sm w-full sm:w-52 md:w-60" placeholder="🔍 Khu vực, từ khoá…" />
-          <select value={type} onChange={(e) => setType(e.target.value as PropertyType)} className="border rounded-lg px-3 py-2 text-sm bg-white flex-1 sm:flex-none">
-            {TYPES.map((t) => <option key={t} value={t}>{t ? PROPERTY_LABELS[t as PropertyType] : 'Loại hình'}</option>)}
-          </select>
-          <input value={min} onChange={(e) => setMin(e.target.value)} className="border rounded-lg px-3 py-2 text-sm w-[48%] sm:w-24" placeholder="Giá từ (tỷ)" />
-          <input value={max} onChange={(e) => setMax(e.target.value)} className="border rounded-lg px-3 py-2 text-sm w-[48%] sm:w-24" placeholder="đến (tỷ)" />
-          <button onClick={() => load()} className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg text-sm font-bold flex-1 sm:flex-none shadow-sm shadow-red-600/30">Tìm kiếm</button>
-          <span className="text-sm text-slate-500 hidden md:block md:absolute md:right-4 md:top-1/2 md:-translate-y-1/2">{loading ? 'Đang tìm…' : <><b className="text-[#0A2540]">{listings.length}</b> BĐS</>}</span>
-        </div>
+        <div className="max-w-7xl mx-auto w-full px-3 sm:px-4 py-3">
+            <div className="flex flex-wrap items-center gap-2 bg-slate-50/80 border border-slate-200 rounded-2xl p-2 shadow-sm">
+              <label className="flex items-center gap-2 flex-1 min-w-[170px] bg-white rounded-xl border border-slate-200 px-3 transition focus-within:border-[#0A2540] focus-within:ring-2 focus-within:ring-[#0A2540]/10">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-4 h-4 text-slate-400 shrink-0"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
+                <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && load()} className="py-2.5 w-full outline-none text-sm bg-transparent" placeholder="Khu vực, từ khoá, dự án…" />
+              </label>
+              <label className="flex items-center gap-2 min-w-[148px] bg-white rounded-xl border border-slate-200 px-3 transition focus-within:border-[#0A2540]">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-slate-400 shrink-0"><path d="M3 11l9-8 9 8M5 10v10h14V10" /></svg>
+                <select value={type} onChange={(e) => setType(e.target.value as PropertyType)} className="py-2.5 w-full outline-none text-sm bg-transparent text-slate-700 cursor-pointer">
+                  {TYPES.map((t) => <option key={t} value={t}>{t ? PROPERTY_LABELS[t as PropertyType] : 'Loại hình'}</option>)}
+                </select>
+              </label>
+              <label className="flex items-center gap-1.5 bg-white rounded-xl border border-slate-200 px-3 transition focus-within:border-[#0A2540]">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-slate-400 shrink-0"><path d="M20.6 13.4 12 22l-9-9V3h8z" /><circle cx="7.5" cy="7.5" r="1.1" fill="currentColor" stroke="none" /></svg>
+                <input value={min} onChange={(e) => setMin(e.target.value)} type="number" min="0" className="py-2.5 w-12 outline-none text-sm bg-transparent" placeholder="Từ" />
+                <span className="text-slate-300">–</span>
+                <input value={max} onChange={(e) => setMax(e.target.value)} type="number" min="0" className="py-2.5 w-12 outline-none text-sm bg-transparent" placeholder="Đến" />
+                <span className="text-xs text-slate-400 font-semibold shrink-0">tỷ</span>
+              </label>
+              <button onClick={() => load()} className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg shadow-red-600/30 whitespace-nowrap grow sm:grow-0">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" className="w-4 h-4"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
+                Tìm kiếm
+              </button>
+            </div>
+            <p className="text-sm text-slate-500 mt-2 px-1">{loading ? 'Đang tìm…' : <>Tìm thấy <b className="text-[#0A2540]">{listings.length}</b> bất động sản tại Cam Lâm</>}</p>
+          </div>
         {/* Toggle Danh sách / Bản đồ — chỉ hiện trên điện thoại & iPad dọc */}
         <div className="lg:hidden flex border-t border-slate-100">
           {([['list', '🏠 Danh sách'], ['map', '🗺️ Bản đồ & quy hoạch']] as [typeof view, string][]).map(([v, label]) => (

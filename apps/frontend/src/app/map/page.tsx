@@ -35,6 +35,7 @@ function parseGmap(url: string): { lat: number; lng: number } | null {
   m = url.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/); if (m) return { lat: +m[1], lng: +m[2] };
   return null;
 }
+const openDir = (lat: number, lng: number) => window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank', 'noopener');
 
 export default function MapPage() {
   const [layers, setLayers] = useState<GisLayer[]>([]);
@@ -276,12 +277,22 @@ export default function MapPage() {
               <span className="text-[11px] text-[#0A2540] font-extrabold mt-0.5">{Math.round(opacity * 100)}%</span>
             </div>
           )}
+          {focusPoint && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-white rounded-full shadow-lg border border-slate-200 pl-4 pr-2 py-1.5 max-w-[92%]">
+              <span className="text-sm font-semibold text-[#0A2540] truncate max-w-[42vw]">📍 {focusPoint.label || 'Vị trí tìm kiếm'}</span>
+              <button onClick={() => openDir(focusPoint.lat, focusPoint.lng)} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-full px-3.5 py-1.5 whitespace-nowrap">🧭 Chỉ đường</button>
+              <button onClick={() => setFocusPoint(null)} className="text-slate-400 hover:text-slate-700 w-7 h-7 grid place-items-center shrink-0">✕</button>
+            </div>
+          )}
           {info && (
             <div className="absolute top-3 right-3 left-3 sm:left-auto sm:w-80 max-h-[80%] overflow-y-auto bg-white rounded-xl shadow-xl border p-4 text-sm z-10">
               <div className="flex justify-between items-center mb-2">
                 <h3 className="font-bold">Thông tin tại điểm</h3>
                 <button onClick={() => setInfo(null)} className="text-slate-400 hover:text-slate-700">✕</button>
               </div>
+              {info.point && (
+                <button onClick={() => openDir(info.point!.lat, info.point!.lng)} className="mb-3 w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg py-2">🧭 Chỉ đường tới đây</button>
+              )}
               {clickVN && (
                 <div className="mb-2 text-xs bg-slate-50 rounded p-2">
                   <div>VN-2000: <b>X={clickVN.x.toFixed(2)}</b>, <b>Y={clickVN.y.toFixed(2)}</b></div>

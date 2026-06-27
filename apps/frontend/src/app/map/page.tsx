@@ -115,17 +115,25 @@ function toBlob(src: HTMLImageElement | HTMLCanvasElement): Promise<Blob> {
   cv.getContext('2d')!.drawImage(src, 0, 0, cv.width, cv.height);
   return new Promise((resolve, reject) => cv.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), 'image/png'));
 }
-async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{ x: number; y: number }[]> {
-  // 1) Ưu tiên OCR ở SERVER (Tesseract bản gốc — ổn định)
+async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{ pts: { x: number; y: number }[]; raw: string; src: string }> {
+  let raw = '', src = '';
   try {
     const txt = await ocrImage(await toBlob(img));
+    raw = txt; src = 'server';
     const pts = parseBigPairs(normalizeDigits(txt));
-    if (pts.length >= 3) return pts;
-  } catch {}
-  // 2) Dự phòng OCR trong trình duyệt
-  let pts = parseBigPairs(normalizeDigits(await runRecognize(img)));
-  if (pts.length < 3) pts = parseBigPairs(normalizeDigits(await runRecognize(preprocess(img))));
-  return pts;
+    if (pts.length >= 3) return { pts, raw, src };
+  } catch (e: any) { src = 'server-lỗi:' + (e?.message || e); }
+  try {
+    const t1 = await runRecognize(img);
+    if (t1) { raw = t1; src = 'trình duyệt'; }
+    let pts = parseBigPairs(normalizeDigits(t1));
+    if (pts.length < 3) { const t2 = await runRecognize(preprocess(img)); if (t2) raw = t2; pts = parseBigPairs(normalizeDigits(t2)); }
+    return { pts, raw, src };
+  } catch (e: any) { return { pts: [], raw, src: src + ' / tr.duyệt-lỗi:' + (e?.message || e) }; }
+}
+function showOcrResult(r: { pts: { x: number; y: number }[]; raw: string; src: string }, apply: (pts: { x: number; y: number }[]) => void) {
+  if (r.pts.length) { apply(r.pts); return; }
+  alert('Chưa tách được toạ độ.\n\nNguồn OCR: ' + (r.src || 'không chạy') + '\nĐọc được:\n' + (r.raw ? r.raw.slice(0, 400) : '(TRỐNG — OCR không chạy được)') + '\n\n→ Chụp màn hình thông báo này gửi mình, hoặc nhập tay ở tab "Nhập bảng".');
 }
 // Gom tất cả số cỡ toạ độ rồi ghép thành cặp (đỉnh) — bền với bảng nhiều cột.
 function parseBigPairs(text: string): { x: number; y: number }[] {
@@ -280,7 +288,7 @@ export default function MapPage() {
       if (f.type.startsWith('image/')) {
         const img = await loadImage(f);
         setOcrBusy('Đang nhận dạng chữ trong ảnh…');
-        applyParsed(await ocrToPoints(img));
+        showOcrResult(await ocrToPoints(img), applyParsed);
       } else { applyParsed(parseBigPairs(await f.text())); }
     } catch (er: any) { alert('Không đọc được tệp: ' + (er?.message || er)); }
     finally { setOcrBusy(''); }
@@ -296,7 +304,7 @@ export default function MapPage() {
     const cap = document.createElement('canvas'); cap.width = cw; cap.height = ch;
     cap.getContext('2d')!.drawImage(v, Math.round((vw - cw) / 2), Math.round((vh - ch) / 2), cw, ch, 0, 0, cw, ch);
     stopCam(); setOcrBusy('Đang nhận dạng chữ trong ảnh…');
-    try { applyParsed(await ocrToPoints(cap)); }
+    try { showOcrResult(await ocrToPoints(cap), applyParsed); }
     catch (e: any) { alert('Không đọc được: ' + (e?.message || e)); }
     finally { setOcrBusy(''); }
   }

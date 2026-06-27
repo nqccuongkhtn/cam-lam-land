@@ -80,7 +80,7 @@ listingsRouter.get('/mine', authRequired, async (req: AuthedRequest, res, next) 
 
 listingsRouter.get('/:id', async (req, res, next) => {
   try {
-    const [row] = await query(`${SELECT} WHERE id=$1`, [Number(req.params.id)]);
+    const [row] = await query(`${SELECT} WHERE listings.id=$1`, [Number(req.params.id)]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy tin' });
     row.contactPhone = maskPhone(row.contactPhone);
     res.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=60');
@@ -137,7 +137,7 @@ listingsRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => 
        b.ward ?? null, b.bedrooms ?? null, b.bathrooms ?? null, b.direction ?? null, b.legal ?? null, b.frontage ?? null,
        b.contactName ?? null, b.contactPhone ?? null, b.images ?? [], b.lng, b.lat, req.user!.id]);
     await linkImages(row.id, b.images);
-    const [created] = await query(`${SELECT} WHERE id=$1`, [row.id]);
+    const [created] = await query(`${SELECT} WHERE listings.id=$1`, [row.id]);
     res.status(201).json(created);
   } catch (e) { next(e); }
 });
@@ -168,7 +168,7 @@ listingsRouter.put('/:id', authRequired, async (req: AuthedRequest, res, next) =
        b.images ?? null, b.lng ?? null, b.lat ?? null]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy tin' });
     if (b.images) await linkImages(id, b.images);
-    const [updated] = await query(`${SELECT} WHERE id=$1`, [id]);
+    const [updated] = await query(`${SELECT} WHERE listings.id=$1`, [id]);
     res.json(updated);
   } catch (e) { next(e); }
 });

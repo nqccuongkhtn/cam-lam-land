@@ -16,6 +16,7 @@ interface Props {
   baseMap?: BaseMap; labels?: boolean; measureMode?: MeasureMode;
   focusPoint?: { lng: number; lat: number; label?: string } | null;
   highlight?: GeoJSON.Feature | null;
+  initialBounds?: [[number, number], [number, number]]; // tự khớp khung vùng quy hoạch khi mở
   onMapClick?: (lng: number, lat: number) => void;
   onMeasure?: (r: MeasureResult) => void;
 }
@@ -60,7 +61,7 @@ function polyArea(pts: { lng: number; lat: number }[]) {
   return Math.abs(s) / 2;
 }
 
-export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, highlight = null, onMapClick, onMeasure }: Props) {
+export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, highlight = null, initialBounds, onMapClick, onMeasure }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const markerRefs = useRef<Marker[]>([]);
@@ -68,6 +69,18 @@ export default function MapView({ center, zoom, className, layers = [], markers 
   const readyRef = useRef(false);
   const measureModeRef = useRef<MeasureMode>(measureMode);
   const measurePts = useRef<{ lng: number; lat: number }[]>([]);
+  const initialBoundsRef = useRef(initialBounds);
+  initialBoundsRef.current = initialBounds;
+  const didFitRef = useRef(false);
+
+  // Khớp khung đúng vùng quy hoạch ngay khi mở (chỉ chạy 1 lần, khi container đã có kích thước thật).
+  function tryInitialFit() {
+    const map = mapRef.current, c = containerRef.current, b = initialBoundsRef.current;
+    if (!map || !readyRef.current || didFitRef.current || !b || !c) return;
+    if (c.clientWidth < 50 || c.clientHeight < 50) return;
+    map.fitBounds(b as any, { padding: 28, animate: false, maxZoom: 16 });
+    didFitRef.current = true;
+  }
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -82,7 +95,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       map.addSource('highlight', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
       map.addLayer({ id: 'highlight-fill', type: 'fill', source: 'highlight', filter: ['==', '$type', 'Polygon'], paint: { 'fill-color': '#fde047', 'fill-opacity': 0.35 } });
       map.addLayer({ id: 'highlight-line', type: 'line', source: 'highlight', paint: { 'line-color': '#ca8a04', 'line-width': 3 } });
-      syncBase(); syncOverlays(); syncLayers();
+      syncBase(); syncOverlays(); syncLayers(); tryInitialFit();
     });
     map.on('click', (e) => {
       if (measureModeRef.current !== 'off') addMeasurePoint(e.lngLat.lng, e.lngLat.lat);
@@ -90,7 +103,13 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     });
     map.getCanvas().style.cursor = '';
     mapRef.current = map;
-    return () => { map.remove(); mapRef.current = null; readyRef.current = false; };
+    // Tự resize + khớp khung khi container đổi kích thước (vd: chuyển tab Danh sách↔Bản đồ trên mobile).
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+      ro = new ResizeObserver(() => { if (mapRef.current) { mapRef.current.resize(); tryInitialFit(); } });
+      ro.observe(containerRef.current);
+    }
+    return () => { ro?.disconnect(); map.remove(); mapRef.current = null; readyRef.current = false; didFitRef.current = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

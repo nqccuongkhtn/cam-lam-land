@@ -16,6 +16,7 @@ const RASTER_OVERLAYS = [
   { id: 'qh-qd205', name: 'Ảnh quy hoạch QĐ205', url: '/overlays/QD205.png',
     coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]] },
 ];
+const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
 
 interface ParcelInfo {
   found: boolean; point: { lng: number; lat: number };
@@ -239,7 +240,7 @@ export default function MapPage() {
 
         <div className="relative flex-1">
           <MapView layers={geoLayers} overlays={overlays} baseMap={baseMap} labels={labels} measureMode={measure}
-            focusPoint={focusPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} />
+            focusPoint={focusPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} initialBounds={QH_BOUNDS} />
           {info && (
             <div className="absolute top-3 right-3 left-3 sm:left-auto sm:w-80 max-h-[80%] overflow-y-auto bg-white rounded-xl shadow-xl border p-4 text-sm z-10">
               <div className="flex justify-between items-center mb-2">

@@ -15,6 +15,7 @@ const QH = {
   id: 'qh-qd205', url: '/overlays/QD205.png',
   coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]],
 };
+const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
 interface ParcelInfo { found: boolean; parcel: { properties: Record<string, any> } | null; zoning: Record<string, any> | null; }
 
 export default function ListingsPage() {
@@ -60,7 +61,7 @@ export default function ListingsPage() {
 
   const mapPanel = (
     <div className="relative h-full w-full">
-      <MapView markers={markers} overlays={overlays} baseMap={baseMap} labels={labels} onMapClick={onMapClick} className="absolute inset-0 h-full w-full" />
+      <MapView markers={markers} overlays={overlays} baseMap={baseMap} labels={labels} onMapClick={onMapClick} initialBounds={QH_BOUNDS} className="absolute inset-0 h-full w-full" />
 
       {/* Bộ chọn nền + bật lớp quy hoạch */}
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-2 max-w-[60%]">

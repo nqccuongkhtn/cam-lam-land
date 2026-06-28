@@ -4,6 +4,7 @@ import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 
 export const listingsRouter = Router();
 
+const FREE_POST_LIMIT = 30; // tài khoản free: tối đa 30 tin/tháng
 const SELECT = `
   SELECT listings.id, listings.title, listings.description, listings.price, listings.area,
          listings.property_type AS "propertyType", listings.address, listings.ward, listings.bedrooms,
@@ -62,10 +63,19 @@ listingsRouter.post('/:id/boost', authRequired, async (req: AuthedRequest, res, 
     if (l.created_by !== req.user!.id && req.user!.role !== 'admin') return res.status(403).json({ error: 'Không có quyền' });
     const tier = ['normal', 'silver', 'gold', 'diamond'].includes(req.body?.tier) ? req.body.tier : null;
     const bump = !!req.body?.bump;
+    const isBoost = bump || (tier !== null && tier !== 'normal');
+    if (isBoost && req.user!.role !== 'admin') {
+      const [u] = await query(`SELECT boost_quota, boost_used, pkg_tier, boost_expires_at FROM users WHERE id=$1`, [req.user!.id]);
+      const active = !!u && !!u.boost_expires_at && new Date(u.boost_expires_at).getTime() > Date.now();
+      if (!active) return res.status(403).json({ error: 'Bạn chưa có gói đẩy tin hoặc gói đã hết hạn. Vào Bảng giá để mua gói.' });
+      if (Number(u.boost_used) >= Number(u.boost_quota)) return res.status(403).json({ error: `Hết lượt đẩy của gói (đã dùng ${u.boost_used}/${u.boost_quota}). Nâng gói tại Bảng giá.` });
+      const rank: Record<string, number> = { normal: 0, silver: 1, gold: 2, diamond: 3 };
+      if (tier && (rank[tier] ?? 0) > (rank[u.pkg_tier] ?? 0)) return res.status(403).json({ error: `Gói của bạn chỉ tới hạng ${u.pkg_tier}. Nâng gói để dùng hạng cao hơn.` });
+    }
     const [row] = await query(
       `UPDATE listings SET tier=COALESCE($2,tier), bumped_at=CASE WHEN $3 THEN now() ELSE bumped_at END, boosted=(COALESCE($2,tier) <> 'normal')
        WHERE id=$1 RETURNING id, tier, boosted`, [id, tier, bump]);
-    if (bump || (tier && tier !== 'normal')) bumpUsage(l.created_by, 'boosts').catch(() => {});
+    if (isBoost && req.user!.role !== 'admin') await query('UPDATE users SET boost_used = boost_used + 1 WHERE id=$1', [req.user!.id]);
     res.json({ ok: true, tier: row.tier });
   } catch (e) { next(e); }
 });
@@ -98,8 +108,12 @@ listingsRouter.get('/mine', authRequired, async (req: AuthedRequest, res, next) 
 
 listingsRouter.get('/usage', authRequired, async (req: AuthedRequest, res, next) => {
   try {
-    const [u] = await query(`SELECT posts, boosts FROM listing_usage WHERE user_id=$1 AND ym=to_char(now() AT TIME ZONE 'Asia/Ho_Chi_Minh','YYYY-MM')`, [req.user!.id]);
-    res.json({ posts: u?.posts ?? 0, boosts: u?.boosts ?? 0 });
+    const [u] = await query(
+      `SELECT COALESCE(usg.posts,0) AS posts, usr.boost_quota AS "boostQuota", usr.boost_used AS "boostUsed",
+              usr.pkg_tier AS "pkgTier", usr.post_quota AS "postQuota", usr.post_expires_at AS "postExpiresAt", usr.boost_expires_at AS "boostExpiresAt"
+         FROM users usr LEFT JOIN listing_usage usg ON usg.user_id=usr.id AND usg.ym=to_char(now() AT TIME ZONE 'Asia/Ho_Chi_Minh','YYYY-MM')
+        WHERE usr.id=$1`, [req.user!.id]);
+    res.json({ posts: u?.posts ?? 0, boostQuota: u?.boostQuota ?? 0, boostUsed: u?.boostUsed ?? 0, pkgTier: u?.pkgTier ?? null, postQuota: u?.postQuota ?? 0, postExpiresAt: u?.postExpiresAt ?? null, boostExpiresAt: u?.boostExpiresAt ?? null });
   } catch (e) { next(e); }
 });
 
@@ -153,6 +167,15 @@ listingsRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => 
     if (!b.title || b.price == null || b.lng == null || b.lat == null)
       return res.status(400).json({ error: 'Cần tiêu đề, giá và vị trí trên bản đồ' });
     if (Number(b.price) < 0) return res.status(400).json({ error: 'Giá không được âm' });
+    if (req.user!.role !== 'admin') {
+      const [u] = await query(
+        `SELECT post_expires_at AS exp, post_quota AS "postQuota", COALESCE((SELECT posts FROM listing_usage WHERE user_id=$1 AND ym=to_char(now() AT TIME ZONE 'Asia/Ho_Chi_Minh','YYYY-MM')),0) AS posts
+           FROM users WHERE id=$1`, [req.user!.id]);
+      const active = !!u?.exp && new Date(u.exp).getTime() > Date.now();
+      const limit = active ? Number(u?.postQuota ?? 0) : FREE_POST_LIMIT;
+      if (Number(u?.posts ?? 0) >= limit)
+        return res.status(403).json({ error: `Đã đạt giới hạn ${limit} tin/tháng${active ? ' của gói' : ' (tài khoản miễn phí)'}. ${active ? 'Nâng gói' : 'Mua gói VIP'} để đăng thêm.` });
+    }
     const [row] = await query(
       `INSERT INTO listings
          (title,description,price,area,property_type,address,ward,bedrooms,bathrooms,direction,legal,frontage,

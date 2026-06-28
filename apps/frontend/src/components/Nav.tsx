@@ -9,6 +9,7 @@ const links = [
   { href: '/listings', label: 'Nhà đất' },
   { href: '/map', label: 'Bản đồ quy hoạch' },
   { href: '/qr', label: 'Tra cứu QR' },
+  { href: '/goi', label: 'Bảng giá' },
 ];
 
 function Logo({ light }: { light: boolean }) {

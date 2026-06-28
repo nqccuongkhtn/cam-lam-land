@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 
-type Tab = 'overview' | 'users' | 'listings' | 'upload' | 'logs';
-const TABS: [Tab, string][] = [['overview', 'Tổng quan'], ['users', 'Người dùng'], ['listings', 'Tin đăng'], ['upload', 'Tải GIS'], ['logs', 'Nhật ký']];
+type Tab = 'overview' | 'users' | 'listings' | 'payments' | 'upload' | 'logs';
+const TABS: [Tab, string][] = [['overview', 'Tổng quan'], ['users', 'Người dùng'], ['listings', 'Tin đăng'], ['payments', 'Thanh toán'], ['upload', 'Tải GIS'], ['logs', 'Nhật ký']];
 
 export default function Admin() {
   const { user, loading, logout } = useAuth();
@@ -40,6 +40,7 @@ export default function Admin() {
       {tab === 'overview' && !isGis && <Overview />}
       {tab === 'users' && !isGis && <Users />}
       {tab === 'listings' && !isGis && <ListingsAdmin />}
+      {tab === 'payments' && !isGis && <Payments />}
       {tab === 'upload' && <UploadGis />}
       {tab === 'logs' && <Logs />}
     </div>
@@ -81,7 +82,7 @@ function Users() {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 overflow-x-auto">
       <table className="w-full text-sm min-w-[660px]">
-        <thead className="bg-slate-50 text-left text-slate-500"><tr><th className="p-2">Tài khoản</th><th className="p-2">Vai trò</th><th className="p-2">Gói</th><th className="p-2">Trạng thái</th></tr></thead>
+        <thead className="bg-slate-50 text-left text-slate-500"><tr><th className="p-2">Tài khoản</th><th className="p-2">Vai trò</th><th className="p-2">Gói</th><th className="p-2">Trạng thái</th><th className="p-2">Gói đẩy/th</th></tr></thead>
         <tbody>
           {rows.map((u) => (
             <tr key={u.id} className="border-t">
@@ -89,9 +90,10 @@ function Users() {
               <td className="p-2"><select value={u.role} onChange={(e) => upd(u.id, { role: e.target.value })} className={sel}><option value="user">Khách</option><option value="gis">Biên tập GIS</option><option value="admin">Admin</option></select></td>
               <td className="p-2"><select value={u.tier} onChange={(e) => upd(u.id, { tier: e.target.value })} className={sel}><option value="free">Free</option><option value="paid">Trả phí</option></select></td>
               <td className="p-2"><select value={u.status} onChange={(e) => upd(u.id, { status: e.target.value })} className={sel}><option value="active">Hoạt động</option><option value="suspended">Khoá</option></select></td>
+              <td className="p-2"><input type="number" min="0" defaultValue={u.boostQuota ?? 0} onBlur={(e) => upd(u.id, { boostQuota: Math.max(0, Number(e.target.value) || 0) })} title="Số lượt đẩy tin/tháng" className="w-16 border border-slate-300 rounded px-1.5 py-1 text-xs" /></td>
             </tr>
           ))}
-          {rows.length === 0 && <tr><td colSpan={4} className="p-4 text-slate-500">Chưa có người dùng.</td></tr>}
+          {rows.length === 0 && <tr><td colSpan={5} className="p-4 text-slate-500">Chưa có người dùng.</td></tr>}
         </tbody>
       </table>
     </div>
@@ -173,6 +175,35 @@ function Logs() {
             </tr>
           ))}
           {jobs.length === 0 && <tr><td colSpan={6} className="p-4 text-slate-500">Chưa có job nào.</td></tr>}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function Payments() {
+  const [rows, setRows] = useState<any[]>([]);
+  const load = useCallback(() => { api<{ payments: any[] }>('/payments').then((d) => setRows(d.payments || [])).catch(() => {}); }, []);
+  useEffect(() => { load(); const i = setInterval(load, 8000); return () => clearInterval(i); }, [load]);
+  async function confirm(id: number) { if (!window.confirm('Xác nhận đã nhận tiền & kích hoạt gói cho khách?')) return; try { await api(`/payments/${id}/confirm`, { method: 'POST' }); load(); } catch (e: any) { alert(e.message); } }
+  const fmt = (n: number) => Number(n).toLocaleString('vi-VN') + 'đ';
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 overflow-x-auto">
+      <table className="w-full text-sm min-w-[720px]">
+        <thead className="bg-slate-50 text-left text-slate-500"><tr><th className="p-2">#</th><th className="p-2">Khách</th><th className="p-2">Gói</th><th className="p-2">Số tiền</th><th className="p-2">Nội dung CK</th><th className="p-2">Trạng thái</th><th className="p-2"></th></tr></thead>
+        <tbody>
+          {rows.map((p) => (
+            <tr key={p.id} className="border-t">
+              <td className="p-2">{p.id}</td>
+              <td className="p-2"><div className="font-semibold text-[#0A2540]">{p.userName}</div><div className="text-xs text-slate-400">{p.email}</div></td>
+              <td className="p-2 uppercase">{p.packageId}</td>
+              <td className="p-2 font-bold text-red-600">{fmt(p.amount)}</td>
+              <td className="p-2 font-mono text-xs">{p.note}</td>
+              <td className={`p-2 font-semibold ${p.status === 'paid' ? 'text-emerald-700' : 'text-amber-600'}`}>{p.status === 'paid' ? 'Đã thanh toán' : 'Chờ thanh toán'}</td>
+              <td className="p-2 text-right">{p.status !== 'paid' && <button onClick={() => confirm(p.id)} className="text-xs font-bold text-white bg-[#0A2540] hover:bg-[#0d2f54] rounded px-2.5 py-1">✓ Xác nhận</button>}</td>
+            </tr>
+          ))}
+          {rows.length === 0 && <tr><td colSpan={7} className="p-4 text-slate-500">Chưa có đơn nào.</td></tr>}
         </tbody>
       </table>
     </div>

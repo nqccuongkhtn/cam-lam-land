@@ -4,7 +4,7 @@ import compression from 'compression';
 import http from 'node:http';
 import { initWs } from './lib/ws.ts';
 import { env } from './lib/env.ts';
-import { waitForDb } from './lib/db.ts';
+import { waitForDb, query } from './lib/db.ts';
 import { ensureAdmin } from './lib/ensureAdmin.ts';
 import { bootstrap } from './lib/bootstrap.ts';
 import { migrate } from './lib/migrate.ts';
@@ -19,6 +19,7 @@ import { qrRouter } from './routes/qr.ts';
 import { mapAdsRouter } from './routes/mapAds.ts';
 import { consignmentsRouter } from './routes/consignments.ts';
 import { pushRouter } from './routes/push.ts';
+import { paymentsRouter } from './routes/payments.ts';
 import { vapidPublicKey } from './lib/push.ts';
 import { chatRouter } from './routes/chat.ts';
 import { ocrRouter } from './routes/ocr.ts';
@@ -48,6 +49,7 @@ app.use('/api/consignments', consignmentsRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/ocr', ocrRouter);
 app.use('/api/push', pushRouter);
+app.use('/api/payments', paymentsRouter);
 app.use(notFound);
 app.use(errorHandler);
 
@@ -68,5 +70,16 @@ async function main() {
     setInterval(ping, 10 * 60 * 1000); // mỗi 10 phút (< 15 phút Render mới cho ngủ)
     console.log(`[keepwarm] tự ping ${selfUrl}/api/health mỗi 10 phút (chống ngủ)`);
   }
+
+  // Thuật toán đẩy tin: VIP tự nổi lại định kỳ (perk theo hạng, KHÔNG trừ lượt khách)
+  // Kim cương mỗi 6h · Vàng 12h · Bạc 24h — giữ tin VIP luôn tươi ở đầu hạng.
+  const autoBump = () => query(
+    `UPDATE listings SET bumped_at = now()
+       WHERE status NOT IN ('hidden','pending','sold') AND (
+         (tier='diamond' AND COALESCE(bumped_at, created_at) < now() - interval '6 hours') OR
+         (tier='gold'    AND COALESCE(bumped_at, created_at) < now() - interval '12 hours') OR
+         (tier='silver'  AND COALESCE(bumped_at, created_at) < now() - interval '24 hours'))`).then(() => {}).catch(() => {});
+  setInterval(autoBump, 30 * 60 * 1000); // soát mỗi 30 phút
+  autoBump();
 }
 main().catch((e) => { console.error(e); process.exit(1); });

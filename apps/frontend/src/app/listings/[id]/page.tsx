@@ -102,17 +102,10 @@ export default function ListingDetail() {
             <div className="bg-white rounded-2xl border border-slate-200 p-5">
               <h1 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">{l.title}</h1>
               <p className="text-slate-500 mt-1 text-sm">📍 {[l.address, l.ward, 'Cam Lâm, Khánh Hòa'].filter(Boolean).join(', ')}</p>
-              <p className="text-xs text-slate-400 mt-1">🕒 {postedLabel(l.createdAt)}</p>
               <div className="grid grid-cols-3 gap-3 mt-4 border-y border-slate-100 py-3">
                 <div><p className="text-xs text-slate-400">Mức giá</p><p className="text-lg md:text-xl font-extrabold text-red-600">{formatVnd(l.price)}</p></div>
                 <div><p className="text-xs text-slate-400">Diện tích</p><p className="text-lg md:text-xl font-extrabold text-[#0A2540]">{l.area ? `${l.area} m²` : '—'}</p></div>
                 <div><p className="text-xs text-slate-400">Giá/m²</p><p className="text-lg md:text-xl font-extrabold text-[#0A2540]">{pricePerM2 ? formatVnd(pricePerM2) : '—'}</p></div>
-              </div>
-              <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Mã tin</p><p className="font-bold text-[#0A2540] text-sm">{code}</p></div>
-                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Loại tin</p><p className="font-bold text-[#0A2540] text-sm">{typeLabel}</p></div>
-                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Ngày đăng</p><p className="font-bold text-[#0A2540] text-sm">{created ? created.toLocaleDateString('vi-VN') : '—'}</p></div>
-                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Hết hạn hiển thị</p><p className="font-bold text-[#0A2540] text-sm">{expiry ? expiry.toLocaleDateString('vi-VN') : 'Không giới hạn'}</p></div>
               </div>
               <div className="flex items-center gap-2 mt-3 flex-wrap">
                 <button onClick={share} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#0A2540] border border-slate-200 rounded-lg px-3 py-1.5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" /></svg> Chia sẻ</button>
@@ -143,6 +136,17 @@ export default function ListingDetail() {
                 <MapView center={[l.lng, l.lat]} zoom={15} baseMap="satellite" markers={[{ lng: l.lng, lat: l.lat, popupHtml: `<b>${l.title}</b>` }]} className="h-full w-full" />
               </div>
               <a href={`https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lng}`} target="_blank" rel="noreferrer" className="mt-2 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl">🧭 Chỉ đường đến bất động sản</a>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-slate-200 p-5">
+              <h2 className="font-bold text-[#0A2540] mb-3">Thông tin tin đăng</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Mã tin</p><p className="font-bold text-[#0A2540] text-sm">{code}</p></div>
+                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Loại tin</p><p className="font-bold text-[#0A2540] text-sm">{typeLabel}</p></div>
+                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Ngày đăng</p><p className="font-bold text-[#0A2540] text-sm">{created ? created.toLocaleDateString('vi-VN') : '—'}</p></div>
+                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Hết hạn hiển thị</p><p className="font-bold text-[#0A2540] text-sm">{expiry ? expiry.toLocaleDateString('vi-VN') : 'Không giới hạn'}</p></div>
+              </div>
+              <p className="text-xs text-slate-400 mt-3">🕒 {postedLabel(l.createdAt)}</p>
             </div>
           </div>
 

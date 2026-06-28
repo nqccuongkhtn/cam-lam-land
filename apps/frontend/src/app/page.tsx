@@ -39,7 +39,7 @@ const STATS = [
   { n: '8', l: 'Xã / Khu vực', d: 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z' },
 ];
 
-const NEWS: Record<string, { title: string; url: string; img?: string; date?: string }[]> = {
+const NEWS: Record<string, { title: string; url: string; img?: string; date?: string; source?: string }[]> = {
   'Tin nổi bật': [
     { title: 'Thủ tướng phê duyệt Quy hoạch chung đô thị mới Cam Lâm đến năm 2045', url: 'https://thanhnien.vn/thu-tuong-phe-duyet-quy-hoach-chung-do-thi-moi-cam-lam-den-2045-185240228205628777.htm', img: U('1486406146926-c627a92ad1ab'), date: '28/02/2024' },
     { title: 'Cam Lâm trở thành cực tăng trưởng phía Nam Khánh Hòa và vùng Nam Trung Bộ', url: 'https://baochinhphu.vn/cam-lam-tro-thanh-cuc-tang-truong-vung-nam-trung-bo-102240228164301983.htm' },
@@ -65,8 +65,14 @@ export default function Home() {
   const router = useRouter();
   const { flags } = useFlags();
   const [listings, setListings] = useState<Listing[]>([]);
+  const [marketNews, setMarketNews] = useState<{ title: string; url: string; img?: string; date?: string; source?: string }[]>([]);
   const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Tin nổi bật');
   useEffect(() => { api<{ listings: Listing[] }>('/listings?limit=20').then((d) => setListings(d.listings || [])).catch(() => {}); }, []);
+  useEffect(() => {
+    api<{ news: any[] }>('/news')
+      .then((d) => setMarketNews((d.news || []).map((n) => ({ title: n.title, url: n.url, img: n.image || U('1486406146926-c627a92ad1ab'), date: n.publishedAt ? new Date(n.publishedAt).toLocaleDateString('vi-VN') : undefined, source: n.source }))))
+      .catch(() => {});
+  }, []);
 
   function search() {
     const p = new URLSearchParams();
@@ -75,6 +81,7 @@ export default function Home() {
   }
   const featured = listings.length > 0 ? listings : STATIC;
   const fromApi = listings.length > 0;
+  const newsItems = newsTab === 'Thị trường BĐS' && marketNews.length ? marketNews : NEWS[newsTab];
 
   return (
     <div className="bg-slate-50">
@@ -129,18 +136,18 @@ export default function Home() {
           <a href="/listings" className="ml-auto text-red-600 text-sm font-semibold whitespace-nowrap shrink-0">Xem thêm →</a>
         </div>
         <div className="grid lg:grid-cols-[1.05fr_1fr_0.62fr] gap-6">
-          {(() => { const feat = NEWS[newsTab][0]; return (
+          {(() => { const feat = newsItems[0]; return (
             <a href={feat.url} target={feat.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="group block">
               <div className="aspect-[16/10] rounded-xl overflow-hidden bg-slate-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={feat.img} alt={feat.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
               </div>
               <h3 className="font-extrabold text-[#0A2540] mt-3 text-lg leading-snug line-clamp-2 group-hover:text-red-600">{feat.title}</h3>
-              {feat.date && <p className="text-xs text-slate-400 mt-2">🕒 {feat.date}</p>}
+              {feat.date && <p className="text-xs text-slate-400 mt-2">🕒 {feat.date}{feat.source ? ` · ${feat.source}` : ''}</p>}
             </a>
           ); })()}
           <div className="divide-y divide-slate-100">
-            {NEWS[newsTab].slice(1).map((h) => (
+            {newsItems.slice(1).map((h) => (
               <a key={h.title} href={h.url} target={h.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="block py-2.5 text-[15px] text-slate-700 hover:text-red-600 leading-snug line-clamp-2">{h.title}</a>
             ))}
           </div>

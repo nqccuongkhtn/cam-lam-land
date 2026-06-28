@@ -21,6 +21,7 @@ import { consignmentsRouter } from './routes/consignments.ts';
 import { pushRouter } from './routes/push.ts';
 import { paymentsRouter } from './routes/payments.ts';
 import { flagsRouter } from './routes/flags.ts';
+import { newsRouter, refreshNews } from './routes/news.ts';
 import { vapidPublicKey } from './lib/push.ts';
 import { chatRouter } from './routes/chat.ts';
 import { ocrRouter } from './routes/ocr.ts';
@@ -52,6 +53,7 @@ app.use('/api/ocr', ocrRouter);
 app.use('/api/push', pushRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/flags', flagsRouter);
+app.use('/api/news', newsRouter);
 app.use(notFound);
 app.use(errorHandler);
 
@@ -63,6 +65,8 @@ async function main() {
   if (process.env.BOOTSTRAP_DB === 'true') await bootstrap();
   await migrate();
   await ensureAdmin();
+  refreshNews(true).catch(() => {});
+  setInterval(() => refreshNews(true).catch(() => {}), 6 * 60 * 60 * 1000); // tự cập nhật tin BĐS mỗi 6 giờ
   server.listen(env.port, () => console.log(`[backend] API + WS listening on :${env.port}`));
 
   // Keep-warm: tự ping để Render (gói free) không "ngủ" → tránh cold-start 500 khi đăng nhập.

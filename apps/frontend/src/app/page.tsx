@@ -81,7 +81,7 @@ export default function Home() {
   }
   const featured = listings.length > 0 ? listings : STATIC;
   const fromApi = listings.length > 0;
-  const newsItems = newsTab === 'Thị trường BĐS' && marketNews.length ? marketNews : NEWS[newsTab];
+  const newsItems = newsTab === 'Thị trường BĐS' && marketNews.length ? [...marketNews, ...NEWS['Thị trường BĐS'].slice(-2)] : NEWS[newsTab];
 
   return (
     <div className="bg-slate-50">

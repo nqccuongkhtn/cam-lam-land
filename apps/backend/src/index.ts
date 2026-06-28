@@ -65,8 +65,17 @@ async function main() {
   if (process.env.BOOTSTRAP_DB === 'true') await bootstrap();
   await migrate();
   await ensureAdmin();
-  refreshNews(true).catch(() => {});
-  setInterval(() => refreshNews(true).catch(() => {}), 6 * 60 * 60 * 1000); // tự cập nhật tin BĐS mỗi 6 giờ
+  refreshNews(true).catch(() => {}); // lấy tin ngay khi khởi động
+  // Tự cập nhật tin BĐS mỗi 6 giờ từ 6h sáng (giờ VN): 06:00, 12:00, 18:00, 00:00
+  let lastNewsSlot = '';
+  setInterval(() => {
+    const d = new Date(Date.now() + 7 * 3600 * 1000); // giờ VN
+    const h = d.getUTCHours();
+    if (h % 6 === 0) {
+      const slot = `${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}-${h}`;
+      if (slot !== lastNewsSlot) { lastNewsSlot = slot; refreshNews(true).catch(() => {}); }
+    }
+  }, 60 * 1000);
   server.listen(env.port, () => console.log(`[backend] API + WS listening on :${env.port}`));
 
   // Keep-warm: tự ping để Render (gói free) không "ngủ" → tránh cold-start 500 khi đăng nhập.

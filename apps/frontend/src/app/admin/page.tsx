@@ -52,12 +52,18 @@ export default function Admin() {
 function Config() {
   const [flags, setFlags] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState('');
+  const [newsMsg, setNewsMsg] = useState('');
   const load = useCallback(() => { api<{ flags: Record<string, boolean> }>('/flags').then((r) => setFlags(r.flags || {})).catch(() => {}); }, []);
   useEffect(() => { load(); }, [load]);
   async function toggle(key: string, on: boolean) {
     setBusy(key);
     try { await api('/flags', { method: 'POST', body: JSON.stringify({ key, on }) }); setFlags((f) => ({ ...f, [key]: on })); refreshFlags(); }
     catch (e: any) { const m = String(e?.message || ''); alert(/404|không tìm/i.test(m) ? 'Máy chủ chưa có tính năng này — cần rebuild lại camlam-api rồi thử lại.' : 'Lỗi: ' + m); } finally { setBusy(''); }
+  }
+  async function doRefreshNews() {
+    setNewsMsg('Đang lấy tin…');
+    try { const r = await api<{ count: number }>('/news/refresh', { method: 'POST' }); setNewsMsg(`✓ Đã cập nhật ${r.count} tin BĐS.`); }
+    catch (e: any) { const m = String(e?.message || ''); setNewsMsg(/404|không tìm/i.test(m) ? '✗ Máy chủ chưa có tính năng — cần rebuild lại camlam-api.' : '✗ ' + m); }
   }
   const ITEMS: [string, string, string][] = [
     ['services_live', 'Trang Dịch vụ & Bảng giá (/dichvu)', 'Hiện trang bảng giá, các ô “mua/nâng gói”, banner quảng cáo trang chủ và quảng cáo 2 bên. Tắt = khách thấy “Sắp ra mắt”, admin vẫn xem trước được.'],
@@ -77,6 +83,12 @@ function Config() {
           </button>
         </div>
       ))}
+      <div className="bg-white rounded-2xl border border-slate-200 p-4">
+        <p className="font-bold text-[#0A2540]">📰 Tin tức thị trường (trang chủ)</p>
+        <p className="text-sm text-slate-500 mt-0.5">Tự lấy bài BĐS từ nguồn uy tín (VnExpress, CafeF…) mỗi 6 giờ. Bấm để cập nhật ngay.</p>
+        <button onClick={doRefreshNews} className="mt-3 bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-4 py-2 rounded-xl text-sm">Cập nhật tin ngay</button>
+        {newsMsg && <p className="text-xs text-slate-600 mt-2 font-medium">{newsMsg}</p>}
+      </div>
       <p className="text-xs text-slate-400">{flags.services_live ? '🟢 Dịch vụ đang công khai với khách.' : '🔒 Dịch vụ đang ẩn — chỉ admin xem được.'}</p>
     </div>
   );

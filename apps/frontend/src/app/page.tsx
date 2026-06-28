@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { Listing, PropertyType, PROPERTY_LABELS } from '@/lib/types';
 import ListingCard from '@/components/ListingCard';
+import { useFlags } from '@/lib/flags';
 
 const U = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=800&q=60`;
 const CATS: { t: PropertyType; icon: string }[] = [
@@ -62,6 +63,7 @@ function Ic({ d }: { d: string }) {
 
 export default function Home() {
   const router = useRouter();
+  const { flags } = useFlags();
   const [listings, setListings] = useState<Listing[]>([]);
   const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Tin nổi bật');
   useEffect(() => { api<{ listings: Listing[] }>('/listings?limit=20').then((d) => setListings(d.listings || [])).catch(() => {}); }, []);
@@ -222,6 +224,7 @@ export default function Home() {
       </section>
 
       {/* AD CONTACT — tế nhị */}
+      {flags.services_live && (
       <section className="mx-auto max-w-7xl px-4 pb-12">
         <div className="rounded-2xl border border-slate-200 bg-white px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-center sm:text-left">
@@ -234,6 +237,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* FOOTER */}
       <footer className="bg-[#0A2540] text-slate-300">

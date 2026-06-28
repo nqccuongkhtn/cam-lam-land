@@ -4,7 +4,7 @@ import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 
 export const listingsRouter = Router();
 
-const FREE_POST_LIMIT = 30; // tài khoản free: tối đa 30 tin/tháng
+const FREE_POST_LIMIT = 3; // tài khoản free: tối đa 3 tin/tháng
 const SELECT = `
   SELECT listings.id, listings.title, listings.description, listings.price, listings.area,
          listings.property_type AS "propertyType", listings.address, listings.ward, listings.bedrooms,

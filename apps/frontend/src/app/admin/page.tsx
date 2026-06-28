@@ -1,13 +1,14 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
+import { refreshFlags } from '@/lib/flags';
 import { api, uploadGis } from '@/lib/api';
 import { ImportJob, formatVnd, PROPERTY_LABELS } from '@/lib/types';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 
-type Tab = 'overview' | 'users' | 'listings' | 'payments' | 'upload' | 'logs';
-const TABS: [Tab, string][] = [['overview', 'Tổng quan'], ['users', 'Người dùng'], ['listings', 'Tin đăng'], ['payments', 'Thanh toán'], ['upload', 'Tải GIS'], ['logs', 'Nhật ký']];
+type Tab = 'overview' | 'users' | 'listings' | 'payments' | 'config' | 'upload' | 'logs';
+const TABS: [Tab, string][] = [['overview', 'Tổng quan'], ['users', 'Người dùng'], ['listings', 'Tin đăng'], ['payments', 'Thanh toán'], ['config', 'Cấu hình'], ['upload', 'Tải GIS'], ['logs', 'Nhật ký']];
 
 export default function Admin() {
   const { user, loading, logout } = useAuth();
@@ -41,12 +42,45 @@ export default function Admin() {
       {tab === 'users' && !isGis && <Users />}
       {tab === 'listings' && !isGis && <ListingsAdmin />}
       {tab === 'payments' && !isGis && <Payments />}
+      {tab === 'config' && !isGis && <Config />}
       {tab === 'upload' && <UploadGis />}
       {tab === 'logs' && <Logs />}
     </div>
   );
 }
 
+function Config() {
+  const [flags, setFlags] = useState<Record<string, boolean>>({});
+  const [busy, setBusy] = useState('');
+  const load = useCallback(() => { api<{ flags: Record<string, boolean> }>('/flags').then((r) => setFlags(r.flags || {})).catch(() => {}); }, []);
+  useEffect(() => { load(); }, [load]);
+  async function toggle(key: string, on: boolean) {
+    setBusy(key);
+    try { await api('/flags', { method: 'POST', body: JSON.stringify({ key, on }) }); setFlags((f) => ({ ...f, [key]: on })); refreshFlags(); }
+    catch (e: any) { alert('Lỗi: ' + e.message); } finally { setBusy(''); }
+  }
+  const ITEMS: [string, string, string][] = [
+    ['services_live', 'Trang Dịch vụ & Bảng giá (/dichvu)', 'Hiện trang bảng giá, các ô “mua/nâng gói”, banner quảng cáo trang chủ và quảng cáo 2 bên. Tắt = khách thấy “Sắp ra mắt”, admin vẫn xem trước được.'],
+  ];
+  return (
+    <div className="space-y-3 max-w-2xl">
+      <p className="text-sm text-slate-500">Bật/tắt các tính năng <b>chưa triển khai</b>. Khi tắt, khách không thấy; bạn (admin) vẫn xem trước được để kiểm tra.</p>
+      {ITEMS.map(([key, title, desc]) => (
+        <div key={key} className="bg-white rounded-2xl border border-slate-200 p-4 flex items-start justify-between gap-4">
+          <div>
+            <p className="font-bold text-[#0A2540]">{title}</p>
+            <p className="text-sm text-slate-500 mt-0.5">{desc}</p>
+          </div>
+          <button onClick={() => toggle(key, !flags[key])} disabled={busy === key} aria-label="Bật/tắt"
+            className={`shrink-0 w-14 h-8 rounded-full transition relative ${flags[key] ? 'bg-emerald-500' : 'bg-slate-300'}`}>
+            <span className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow transition-all ${flags[key] ? 'left-7' : 'left-1'}`} />
+          </button>
+        </div>
+      ))}
+      <p className="text-xs text-slate-400">{flags.services_live ? '🟢 Dịch vụ đang công khai với khách.' : '🔒 Dịch vụ đang ẩn — chỉ admin xem được.'}</p>
+    </div>
+  );
+}
 function Stat({ label, value, sub }: { label: string; value: any; sub?: string }) {
   return <div className="bg-white rounded-2xl border border-slate-200 p-4"><p className="text-2xl md:text-3xl font-extrabold text-[#0A2540]">{value}</p><p className="text-sm text-slate-500">{label}</p>{sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}</div>;
 }

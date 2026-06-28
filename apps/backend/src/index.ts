@@ -20,6 +20,7 @@ import { mapAdsRouter } from './routes/mapAds.ts';
 import { consignmentsRouter } from './routes/consignments.ts';
 import { pushRouter } from './routes/push.ts';
 import { paymentsRouter } from './routes/payments.ts';
+import { flagsRouter } from './routes/flags.ts';
 import { vapidPublicKey } from './lib/push.ts';
 import { chatRouter } from './routes/chat.ts';
 import { ocrRouter } from './routes/ocr.ts';
@@ -50,6 +51,7 @@ app.use('/api/chat', chatRouter);
 app.use('/api/ocr', ocrRouter);
 app.use('/api/push', pushRouter);
 app.use('/api/payments', paymentsRouter);
+app.use('/api/flags', flagsRouter);
 app.use(notFound);
 app.use(errorHandler);
 

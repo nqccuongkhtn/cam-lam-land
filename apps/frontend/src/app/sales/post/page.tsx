@@ -78,7 +78,7 @@ export default function PostListing() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="font-bold">🚀 Đăng nhiều tin hơn & đẩy tin lên VIP</p>
-              <p className="text-sm text-slate-300 mt-0.5">Miễn phí 3 tin/tháng — mua gói để đăng thêm và làm nổi bật tin.</p>
+              <p className="text-sm text-slate-300 mt-0.5">Miễn phí 1 tin/tháng — mua gói để đăng thêm và làm nổi bật tin.</p>
             </div>
             <span className="bg-[#C8A14B] text-[#0A2540] font-bold px-4 py-2 rounded-xl whitespace-nowrap shrink-0">Xem bảng giá →</span>
           </div>

@@ -47,10 +47,10 @@ export default function SalesDashboard() {
           <div><h1 className="text-2xl font-extrabold text-[#0A2540]">Tin của tôi</h1><p className="text-sm text-slate-500">Xin chào, {user.fullName || user.email} · {items.length} tin</p></div>
           <Link href="/sales/post" className="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-red-600/30">＋ Đăng tin mới</Link>
         </div>
-        <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
-          {(() => { const active = !!usage.postExpiresAt && new Date(usage.postExpiresAt).getTime() > Date.now(); return (
-            <span className={`inline-flex items-center gap-1.5 border rounded-full px-3 py-1.5 ${(active ? usage.posts >= usage.postQuota : usage.posts >= 3) ? 'bg-red-50 border-red-200 text-red-600' : 'bg-white border-slate-200'}`}>
-              {active ? <><b className="text-[#0A2540]">{usage.posts}/{usage.postQuota}</b> tin (gói)</> : <><b className="text-[#0A2540]">{usage.posts}/3</b> tin tháng này (miễn phí)</>}
+        {flags.services_live && (<div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
+          {(() => { const active = !!usage.postExpiresAt && new Date(usage.postExpiresAt).getTime() > Date.now(); const dl = active ? Math.max(0, Math.ceil((new Date(usage.postExpiresAt as string).getTime() - Date.now()) / 86400000)) : 0; return (
+            <span className={`inline-flex items-center gap-1.5 border rounded-full px-3 py-1.5 ${(active ? usage.posts >= usage.postQuota : usage.posts >= 1) ? 'bg-red-50 border-red-200 text-red-600' : 'bg-white border-slate-200'}`}>
+              {active ? <><b className="text-[#0A2540]">{usage.posts}/{usage.postQuota}</b> tin · gói còn {dl} ngày</> : <><b className="text-[#0A2540]">{usage.posts}/1</b> tin tháng này (miễn phí)</>}
             </span>
           ); })()}
           {(() => { const dleft = usage.boostExpiresAt ? Math.max(0, Math.ceil((new Date(usage.boostExpiresAt).getTime() - Date.now()) / 86400000)) : 0; const active = dleft > 0; return (
@@ -58,9 +58,9 @@ export default function SalesDashboard() {
               {active ? <>Gói {usage.pkgTier ? usage.pkgTier.toUpperCase() : ''}: đẩy <b>{usage.boostUsed}/{usage.boostQuota}</b> · còn <b>{dleft}</b> ngày</> : 'Chưa có gói đẩy'}
             </span>
           ); })()}
-          {flags.services_live && <Link href="/dichvu" className="text-xs font-bold text-red-600 hover:text-red-700">Mua / nâng gói →</Link>}
+          <Link href="/dichvu" className="text-xs font-bold text-red-600 hover:text-red-700">Mua / nâng gói →</Link>
           <span className="text-xs text-slate-400">· Xoá tin không hoàn lượt</span>
-        </div>
+        </div>)}
         {flags.services_live && (
         <div className="mb-5 bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="flex-1">
@@ -74,21 +74,23 @@ export default function SalesDashboard() {
           <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-10 text-center text-slate-500">Bạn chưa có tin nào. <Link href="/sales/post" className="text-[#0A2540] font-bold">Đăng tin đầu tiên →</Link></div>
         ) : (
           <div className="space-y-3">
-            {items.map((l) => (
+            {items.map((l) => { const exp = l.status === 'active' && (!l.tier || l.tier === 'normal') && (Date.now() - new Date(l.bumpedAt || l.createdAt || Date.now()).getTime()) > 7 * 86400000; return (
               <div key={l.id} className="bg-white rounded-2xl border border-slate-200 p-3 flex gap-3 items-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={l.images?.[0] || `https://picsum.photos/seed/cl${l.id}/200`} alt="" className="w-24 h-20 object-cover rounded-lg bg-slate-100 shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${badge(l.status)}`}>{l.status}</span>{l.tier && l.tier !== 'normal' && <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full text-white ${TIER_BADGE[l.tier] || 'bg-[#C8A14B]'}`}>{TIER_LABEL[l.tier]}</span>}</div>
+                  <div className="flex items-center gap-2"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${badge(l.status)}`}>{l.status}</span>{l.tier && l.tier !== 'normal' && <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full text-white ${TIER_BADGE[l.tier] || 'bg-[#C8A14B]'}`}>{TIER_LABEL[l.tier]}</span>}{exp && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700" title="Tin thường chỉ hiển thị 7 ngày — đẩy tin để hiện lại">⏳ Hết hạn hiển thị</span>}</div>
                   <p className="font-bold text-[#0A2540] truncate mt-0.5">{l.title}</p>
                   <p className="text-sm text-slate-500">{formatVnd(l.price)} · {PROPERTY_LABELS[l.propertyType]} · {l.ward || 'Cam Lâm'}</p>
                   <Link href={`/sales/leads/${l.id}`} className="inline-block mt-1 text-xs font-bold text-[#0A2540] bg-[#C8A14B]/15 hover:bg-[#C8A14B]/25 rounded-full px-2.5 py-1">👁 {l.leadViews || 0} lượt xem · {l.leadCount || 0} khách quan tâm →</Link>
                 </div>
                 <div className="flex flex-col gap-1.5 shrink-0 w-[150px]">
+                  {flags.services_live && (<>
                   <select value={l.tier || 'normal'} onChange={(e) => boost(l.id, { tier: e.target.value })} className="text-xs font-semibold border border-slate-300 rounded-lg px-2 py-1.5 bg-white cursor-pointer">
                     <option value="normal">Tin thường</option><option value="silver">VIP Bạc</option><option value="gold">VIP Vàng</option><option value="diamond">VIP Kim cương</option>
                   </select>
                   <button onClick={() => boost(l.id, { bump: true })} className="text-xs font-bold text-white bg-[#0A2540] hover:bg-[#0d2f54] rounded-lg px-3 py-1.5">↑ Đẩy lên đầu</button>
+                  </>)}
                   <div className="flex gap-1.5">
                     <Link href={`/listings/${l.id}`} className="flex-1 text-xs font-semibold text-[#0A2540] border border-slate-300 rounded-lg px-2 py-1.5 text-center hover:bg-slate-50">Xem</Link>
                     <Link href={`/sales/edit/${l.id}`} className="flex-1 text-xs font-semibold text-[#0A2540] border border-slate-300 rounded-lg px-2 py-1.5 text-center hover:bg-slate-50">Sửa</Link>
@@ -96,7 +98,7 @@ export default function SalesDashboard() {
                   </div>
                 </div>
               </div>
-            ))}
+            ); })}
           </div>
         )}
       </div>

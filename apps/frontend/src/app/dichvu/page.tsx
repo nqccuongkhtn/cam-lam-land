@@ -129,7 +129,7 @@ export default function ServicesPage() {
         )}
 
         <h2 className="text-xl font-extrabold text-[#0A2540] mb-1">Gói đăng tin</h2>
-        <p className="text-sm text-slate-500 mb-5">Miễn phí 3 tin/tháng · mua gói để đăng thêm (đăng càng nhiều, giá mỗi tin càng rẻ).</p>
+        <p className="text-sm text-slate-500 mb-5">Miễn phí 1 tin/tháng · mua gói để đăng thêm (đăng càng nhiều, giá mỗi tin càng rẻ).</p>
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5 mb-12 items-stretch">{postPkgs.map((p) => <Card key={p.id} p={p} />)}</div>
 
         <h2 className="text-xl font-extrabold text-[#0A2540] mb-1">Gói đẩy tin VIP</h2>

@@ -9,7 +9,7 @@ export const paymentsRouter = Router();
 async function activate(order: any): Promise<void> {
   const pkg = findPkg(order.package_id); if (!pkg) return;
   if (pkg.kind === 'post') {
-    await query(`UPDATE users SET post_quota=$2, post_expires_at = now() + ($3::int) * interval '1 day', tier='paid' WHERE id=$1`,
+    await query(`UPDATE users SET post_quota=$2, post_used=0, post_expires_at = now() + ($3::int) * interval '1 day', tier='paid' WHERE id=$1`,
       [order.user_id, pkg.posts, pkg.days]);
   } else {
     await query(`UPDATE users SET pkg_id=$2, pkg_tier=$3, boost_quota=$4, boost_used=0, boost_expires_at = now() + ($5::int) * interval '1 day', tier='paid' WHERE id=$1`,

@@ -33,7 +33,7 @@ function Logo({ light }: { light: boolean }) {
 export default function Nav() {
   const path = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const isHome = path === '/';
   const [open, setOpen] = useState(false);
   const [acct, setAcct] = useState(false);
@@ -103,6 +103,8 @@ export default function Nav() {
                 )}
               </div>
             </>
+          ) : loading ? (
+            <div className={`w-8 h-8 rounded-full animate-pulse ${solid ? 'bg-slate-200' : 'bg-white/25'}`} />
           ) : (
             <>
               <Link href="/login" className={`hidden sm:block text-sm font-bold ${solid ? 'text-[#0A2540] hover:text-[#C8A14B]' : 'text-white hover:text-[#FFD56A]'}`}>Đăng nhập</Link>
@@ -132,7 +134,7 @@ export default function Nav() {
           <div className="border-t border-slate-100 mt-1 pt-2">
             {user ? (
               <button onClick={doLogout} className="w-full text-left py-2.5 px-2 rounded-lg text-sm font-semibold text-red-600 hover:bg-slate-50">Đăng xuất ({name})</button>
-            ) : (
+            ) : loading ? null : (
               <>
                 <Link href="/login" onClick={() => setOpen(false)} className="block py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Đăng nhập</Link>
                 <Link href="/register" onClick={() => setOpen(false)} className="block py-2.5 px-2 rounded-lg text-sm font-semibold text-[#C8A14B] hover:bg-slate-50">Đăng ký</Link>

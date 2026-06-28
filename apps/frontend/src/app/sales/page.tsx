@@ -56,7 +56,7 @@ export default function SalesDashboard() {
               {active ? <>Gói {usage.pkgTier ? usage.pkgTier.toUpperCase() : ''}: đẩy <b>{usage.boostUsed}/{usage.boostQuota}</b> · còn <b>{dleft}</b> ngày</> : 'Chưa có gói đẩy'}
             </span>
           ); })()}
-          <Link href="/goi" className="text-xs font-bold text-red-600 hover:text-red-700">Mua / nâng gói →</Link>
+          <Link href="/dichvu" className="text-xs font-bold text-red-600 hover:text-red-700">Mua / nâng gói →</Link>
           <span className="text-xs text-slate-400">· Xoá tin không hoàn lượt</span>
         </div>
         <div className="mb-5 bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
@@ -64,7 +64,7 @@ export default function SalesDashboard() {
             <p className="font-bold">⭐ Gói đẩy tin & quảng cáo trên bản đồ</p>
             <p className="text-sm text-slate-300 mt-0.5">Đẩy tin lên đầu danh sách · ghim quảng cáo nổi bật trên bản đồ. Mua gói — liên hệ admin để kích hoạt.</p>
           </div>
-          <Link href="/goi" className="bg-[#C8A14B] hover:bg-[#b8923f] text-[#0A2540] font-bold px-4 py-2 rounded-xl text-center whitespace-nowrap">Xem bảng giá gói →</Link>
+          <Link href="/dichvu" className="bg-[#C8A14B] hover:bg-[#b8923f] text-[#0A2540] font-bold px-4 py-2 rounded-xl text-center whitespace-nowrap">Xem bảng giá gói →</Link>
         </div>
         {busy ? <p className="text-slate-500">Đang tải…</p> : items.length === 0 ? (
           <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-10 text-center text-slate-500">Bạn chưa có tin nào. <Link href="/sales/post" className="text-[#0A2540] font-bold">Đăng tin đầu tiên →</Link></div>

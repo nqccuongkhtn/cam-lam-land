@@ -71,7 +71,7 @@ export default function PostListing() {
           <Link href="/sales" className="text-sm font-semibold text-slate-500 hover:text-[#0A2540]">← Tin của tôi</Link>
         </div>
 
-        <Link href="/goi" className="block bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white rounded-2xl p-4 hover:brightness-110 transition">
+        <Link href="/dichvu" className="block bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white rounded-2xl p-4 hover:brightness-110 transition">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="font-bold">🚀 Đăng nhiều tin hơn & đẩy tin lên VIP</p>

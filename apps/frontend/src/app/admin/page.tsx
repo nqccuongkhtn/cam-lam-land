@@ -57,7 +57,7 @@ function Config() {
   async function toggle(key: string, on: boolean) {
     setBusy(key);
     try { await api('/flags', { method: 'POST', body: JSON.stringify({ key, on }) }); setFlags((f) => ({ ...f, [key]: on })); refreshFlags(); }
-    catch (e: any) { alert('Lỗi: ' + e.message); } finally { setBusy(''); }
+    catch (e: any) { const m = String(e?.message || ''); alert(/404|không tìm/i.test(m) ? 'Máy chủ chưa có tính năng này — cần rebuild lại camlam-api rồi thử lại.' : 'Lỗi: ' + m); } finally { setBusy(''); }
   }
   const ITEMS: [string, string, string][] = [
     ['services_live', 'Trang Dịch vụ & Bảng giá (/dichvu)', 'Hiện trang bảng giá, các ô “mua/nâng gói”, banner quảng cáo trang chủ và quảng cáo 2 bên. Tắt = khách thấy “Sắp ra mắt”, admin vẫn xem trước được.'],

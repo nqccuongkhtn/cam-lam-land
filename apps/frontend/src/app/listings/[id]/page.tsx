@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { api } from '@/lib/api';
-import { Listing, PROPERTY_LABELS, formatVnd } from '@/lib/types';
+import { Listing, PROPERTY_LABELS, formatVnd, TIER_LABEL, postedLabel } from '@/lib/types';
 import { useAuth } from '@/lib/auth';
 import ListingCard from '@/components/ListingCard';
 
@@ -56,6 +56,12 @@ export default function ListingDetail() {
     ['📏', 'Mặt tiền', l.frontage ? `${l.frontage} m` : null], ['🏷️', 'Loại hình', PROPERTY_LABELS[l.propertyType]],
   ];
   const fb = (i: number) => `https://picsum.photos/seed/cl${l.id}_${i}/1000/700`;
+  const created = l.createdAt ? new Date(l.createdAt) : null;
+  const refT = l.bumpedAt ? new Date(l.bumpedAt) : created;
+  const isVip = !!l.tier && l.tier !== 'normal';
+  const expiry = (!isVip && refT) ? new Date(refT.getTime() + 7 * 86400000) : null;
+  const code = 'CL' + String(l.id).padStart(5, '0');
+  const typeLabel = isVip ? (TIER_LABEL[l.tier as string] || 'VIP') : 'Tin thường';
 
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
@@ -96,10 +102,17 @@ export default function ListingDetail() {
             <div className="bg-white rounded-2xl border border-slate-200 p-5">
               <h1 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">{l.title}</h1>
               <p className="text-slate-500 mt-1 text-sm">📍 {[l.address, l.ward, 'Cam Lâm, Khánh Hòa'].filter(Boolean).join(', ')}</p>
+              <p className="text-xs text-slate-400 mt-1">🕒 {postedLabel(l.createdAt)}</p>
               <div className="grid grid-cols-3 gap-3 mt-4 border-y border-slate-100 py-3">
                 <div><p className="text-xs text-slate-400">Mức giá</p><p className="text-lg md:text-xl font-extrabold text-red-600">{formatVnd(l.price)}</p></div>
                 <div><p className="text-xs text-slate-400">Diện tích</p><p className="text-lg md:text-xl font-extrabold text-[#0A2540]">{l.area ? `${l.area} m²` : '—'}</p></div>
                 <div><p className="text-xs text-slate-400">Giá/m²</p><p className="text-lg md:text-xl font-extrabold text-[#0A2540]">{pricePerM2 ? formatVnd(pricePerM2) : '—'}</p></div>
+              </div>
+              <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Mã tin</p><p className="font-bold text-[#0A2540] text-sm">{code}</p></div>
+                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Loại tin</p><p className="font-bold text-[#0A2540] text-sm">{typeLabel}</p></div>
+                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Ngày đăng</p><p className="font-bold text-[#0A2540] text-sm">{created ? created.toLocaleDateString('vi-VN') : '—'}</p></div>
+                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Hết hạn hiển thị</p><p className="font-bold text-[#0A2540] text-sm">{expiry ? expiry.toLocaleDateString('vi-VN') : 'Không giới hạn'}</p></div>
               </div>
               <div className="flex items-center gap-2 mt-3 flex-wrap">
                 <button onClick={share} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#0A2540] border border-slate-200 rounded-lg px-3 py-1.5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" /></svg> Chia sẻ</button>
@@ -159,7 +172,7 @@ export default function ListingDetail() {
               {user && l.createdBy === user.id && (
                 <Link href={`/sales/edit/${l.id}`} className="mt-2.5 w-full flex items-center justify-center gap-2 font-bold py-2.5 rounded-xl border border-[#C8A14B]/50 text-[#8a6d1f] bg-[#C8A14B]/10 hover:bg-[#C8A14B]/20">✏️ Sửa tin</Link>
               )}
-              <p className="text-[11px] text-slate-400 mt-3 text-center">Mã tin #{l.id} · đăng {new Date(l.createdAt).toLocaleDateString('vi-VN')}</p>
+              <p className="text-[11px] text-slate-400 mt-3 text-center">Mã tin {code} · {postedLabel(l.createdAt)}</p>
             </div>
           </div>
         </div>

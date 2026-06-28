@@ -244,7 +244,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     const seenK = new Set<string>();
     const uniq = tAds.filter((a) => { const k = a.name + '|' + a.phone; if (seenK.has(k)) return false; seenK.add(k); return true; });
     if (!uniq.length) { if (wmRef.current) { wmRef.current.remove(); wmRef.current = null; } return; }
-    const band = 150, tileW = 440;
+    const band = 194, tileW = 570; // thưa hơn ~0.6× mật độ cũ (440×150)
     const cols = uniq.length >= 2 ? uniq : [uniq[0], uniq[0]];
     const tileH = band * cols.length;
     const ts = "text-anchor='middle' dominant-baseline='middle' font-family='Roboto,Arial,sans-serif' font-size='13' font-weight='600' letter-spacing='0.4' fill='rgba(255,255,255,0.98)' filter='url(#wmsh)'";

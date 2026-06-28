@@ -36,3 +36,15 @@ export const TIER_BADGE: Record<string, string> = {
   gold: 'bg-gradient-to-r from-amber-500 to-yellow-500',
   silver: 'bg-gradient-to-r from-slate-400 to-slate-600',
 };
+
+export function postedLabel(iso?: string): string {
+  if (!iso) return 'Đăng hôm nay';
+  const d = new Date(iso); if (isNaN(d.getTime())) return 'Đăng hôm nay';
+  const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+  if (days <= 0) return 'Đăng hôm nay';
+  if (days === 1) return 'Đăng hôm qua';
+  if (days < 7) return `Đăng ${days} ngày trước`;
+  if (days < 30) return `Đăng ${Math.floor(days / 7)} tuần trước`;
+  if (days < 365) return `Đăng ${Math.floor(days / 30)} tháng trước`;
+  return 'Đăng ' + d.toLocaleDateString('vi-VN');
+}

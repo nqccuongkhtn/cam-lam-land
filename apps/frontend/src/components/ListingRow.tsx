@@ -1,19 +1,10 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { Listing, formatVnd, TIER_BADGE, TIER_LABEL } from '@/lib/types';
+import { Listing, formatVnd, TIER_BADGE, TIER_LABEL, postedLabel } from '@/lib/types';
 
 function IPin() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="2.5" /></svg>; }
 
-function postedLabel(iso?: string): string {
-  if (!iso) return 'Đăng hôm nay';
-  const d = new Date(iso); if (isNaN(d.getTime())) return 'Đăng hôm nay';
-  const days = Math.floor((Date.now() - d.getTime()) / 86400000);
-  if (days <= 0) return 'Đăng hôm nay';
-  if (days === 1) return 'Đăng hôm qua';
-  if (days < 30) return `Đăng ${days} ngày trước`;
-  return 'Đăng ' + d.toLocaleDateString('vi-VN');
-}
 
 export default function ListingRow({ l, href }: { l: Listing; href?: string }) {
   const [fav, setFav] = useState(false);

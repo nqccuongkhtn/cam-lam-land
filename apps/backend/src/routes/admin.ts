@@ -52,8 +52,8 @@ adminRouter.patch('/users/:id', async (req, res, next) => {
 // Quản lý tin (mọi trạng thái)
 adminRouter.get('/listings', async (_req, res, next) => {
   try {
-    const rows = await query(`SELECT id, title, price, property_type AS "propertyType", ward, status, boosted,
-      created_by AS "createdBy", created_at AS "createdAt", images FROM listings ORDER BY boosted DESC, created_at DESC LIMIT 500`);
+    const rows = await query(`SELECT id, title, price, property_type AS "propertyType", ward, status, boosted, tier,
+      created_by AS "createdBy", created_at AS "createdAt", images FROM listings ORDER BY CASE tier WHEN 'diamond' THEN 3 WHEN 'gold' THEN 2 WHEN 'silver' THEN 1 ELSE 0 END DESC, COALESCE(bumped_at, created_at) DESC LIMIT 500`);
     res.json({ listings: rows });
   } catch (e) { next(e); }
 });
@@ -61,8 +61,10 @@ adminRouter.patch('/listings/:id', async (req, res, next) => {
   try {
     const id = Number(req.params.id); const b = req.body ?? {};
     const [row] = await query(
-      `UPDATE listings SET status=COALESCE($2,status), boosted=COALESCE($3,boosted)
-       WHERE id=$1 RETURNING id, status, boosted`, [id, b.status ?? null, b.boosted ?? null]);
+      `UPDATE listings SET status=COALESCE($2,status), tier=COALESCE($3,tier),
+              bumped_at=CASE WHEN $4 THEN now() ELSE bumped_at END,
+              boosted=(COALESCE($3,tier) <> 'normal')
+       WHERE id=$1 RETURNING id, status, tier, boosted`, [id, b.status ?? null, b.tier ?? null, !!b.bump]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy tin' });
     res.json({ listing: row });
   } catch (e) { next(e); }

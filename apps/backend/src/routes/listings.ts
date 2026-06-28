@@ -11,7 +11,7 @@ const SELECT = `
          COALESCE(listings.contact_name, u.full_name, 'Cam Lâm Land') AS "contactName",
          COALESCE(listings.contact_phone, u.phone, '0988888888') AS "contactPhone",
          u.avatar AS "posterAvatar",
-         listings.status, listings.boosted, listings.images, listings.created_by AS "createdBy",
+         listings.status, listings.boosted, listings.tier, listings.bumped_at AS "bumpedAt", listings.images, listings.created_by AS "createdBy",
          ST_X(listings.geom) AS lng, ST_Y(listings.geom) AS lat, listings.created_at AS "createdAt"
   FROM listings LEFT JOIN users u ON u.id = listings.created_by`;
 
@@ -46,10 +46,27 @@ listingsRouter.get('/', async (req, res, next) => {
     const limit = Math.min(Number(req.query.limit ?? 100), 500);
     const offset = Number(req.query.offset ?? 0);
     const rows = await query(
-      `${SELECT} WHERE ${where.join(' AND ')} ORDER BY listings.boosted DESC, listings.created_at DESC LIMIT ${limit} OFFSET ${offset}`, params);
+      `${SELECT} WHERE ${where.join(' AND ')} ORDER BY CASE listings.tier WHEN 'diamond' THEN 3 WHEN 'gold' THEN 2 WHEN 'silver' THEN 1 ELSE 0 END DESC, COALESCE(listings.bumped_at, listings.created_at) DESC LIMIT ${limit} OFFSET ${offset}`, params);
     rows.forEach((r: any) => { r.contactPhone = maskPhone(r.contactPhone); });
     res.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=60');
     res.json({ count: rows.length, listings: rows });
+  } catch (e) { next(e); }
+});
+
+// POST /api/listings/:id/boost — đặt hạng VIP / đẩy lên đầu (chủ tin hoặc admin)
+listingsRouter.post('/:id/boost', authRequired, async (req: AuthedRequest, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    const [l] = await query('SELECT created_by FROM listings WHERE id=$1', [id]);
+    if (!l) return res.status(404).json({ error: 'Không tìm thấy tin' });
+    if (l.created_by !== req.user!.id && req.user!.role !== 'admin') return res.status(403).json({ error: 'Không có quyền' });
+    const tier = ['normal', 'silver', 'gold', 'diamond'].includes(req.body?.tier) ? req.body.tier : null;
+    const bump = !!req.body?.bump;
+    const [row] = await query(
+      `UPDATE listings SET tier=COALESCE($2,tier), bumped_at=CASE WHEN $3 THEN now() ELSE bumped_at END, boosted=(COALESCE($2,tier) <> 'normal')
+       WHERE id=$1 RETURNING id, tier, boosted`, [id, tier, bump]);
+    if (bump || (tier && tier !== 'normal')) bumpUsage(l.created_by, 'boosts').catch(() => {});
+    res.json({ ok: true, tier: row.tier });
   } catch (e) { next(e); }
 });
 
@@ -69,13 +86,20 @@ listingsRouter.get('/geojson', async (_req, res, next) => {
 listingsRouter.get('/mine', authRequired, async (req: AuthedRequest, res, next) => {
   try {
     const rows = await query(
-      `SELECT id, title, price, property_type AS "propertyType", ward, status, boosted, images,
+      `SELECT id, title, price, property_type AS "propertyType", ward, status, boosted, tier, bumped_at AS "bumpedAt", images,
               ST_X(geom) AS lng, ST_Y(geom) AS lat, created_by AS "createdBy",
               created_at AS "createdAt",
               (SELECT count(*)::int FROM listing_leads ll WHERE ll.listing_id=listings.id) AS "leadCount",
               (SELECT COALESCE(sum(views),0)::int FROM listing_leads ll WHERE ll.listing_id=listings.id) AS "leadViews"
-       FROM listings WHERE created_by=$1 ORDER BY created_at DESC`, [req.user!.id]);
+       FROM listings WHERE created_by=$1 ORDER BY CASE tier WHEN 'diamond' THEN 3 WHEN 'gold' THEN 2 WHEN 'silver' THEN 1 ELSE 0 END DESC, COALESCE(bumped_at, created_at) DESC`, [req.user!.id]);
     res.json({ count: rows.length, listings: rows });
+  } catch (e) { next(e); }
+});
+
+listingsRouter.get('/usage', authRequired, async (req: AuthedRequest, res, next) => {
+  try {
+    const [u] = await query(`SELECT posts, boosts FROM listing_usage WHERE user_id=$1 AND ym=to_char(now() AT TIME ZONE 'Asia/Ho_Chi_Minh','YYYY-MM')`, [req.user!.id]);
+    res.json({ posts: u?.posts ?? 0, boosts: u?.boosts ?? 0 });
   } catch (e) { next(e); }
 });
 
@@ -139,6 +163,7 @@ listingsRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => 
        b.ward ?? null, b.bedrooms ?? null, b.bathrooms ?? null, b.direction ?? null, b.legal ?? null, b.frontage ?? null,
        b.contactName ?? null, b.contactPhone ?? null, b.images ?? [], b.lng, b.lat, req.user!.id]);
     await linkImages(row.id, b.images);
+    bumpUsage(req.user!.id, 'posts').catch(() => {});
     const [created] = await query(`${SELECT} WHERE listings.id=$1`, [row.id]);
     res.status(201).json(created);
   } catch (e) { next(e); }
@@ -149,11 +174,23 @@ async function ownerOrAdmin(req: AuthedRequest, id: number): Promise<boolean> {
   const [l] = await query('SELECT created_by FROM listings WHERE id=$1', [id]);
   return !!l && l.created_by === req.user!.id;
 }
+// Chỉ chủ tin (admin KHÔNG được sửa nội dung tin người khác)
+async function ownerOnly(req: AuthedRequest, id: number): Promise<boolean> {
+  const [l] = await query('SELECT created_by FROM listings WHERE id=$1', [id]);
+  return !!l && l.created_by === req.user!.id;
+}
+// Đếm lượt đăng/đẩy theo tháng (chỉ tăng, KHÔNG giảm khi xoá tin)
+async function bumpUsage(userId: number, field: 'posts' | 'boosts'): Promise<void> {
+  if (!userId) return;
+  await query(
+    `INSERT INTO listing_usage (user_id, ym, ${field}) VALUES ($1, to_char(now() AT TIME ZONE 'Asia/Ho_Chi_Minh','YYYY-MM'), 1)
+     ON CONFLICT (user_id, ym) DO UPDATE SET ${field} = listing_usage.${field} + 1`, [userId]);
+}
 
 listingsRouter.put('/:id', authRequired, async (req: AuthedRequest, res, next) => {
   try {
     const id = Number(req.params.id);
-    if (!(await ownerOrAdmin(req, id))) return res.status(403).json({ error: 'Không có quyền sửa tin này' });
+    if (!(await ownerOnly(req, id))) return res.status(403).json({ error: 'Chỉ chủ tin mới được sửa. Admin chỉ có thể xoá.' });
     const b = req.body ?? {};
     if (b.price != null && Number(b.price) < 0) return res.status(400).json({ error: 'Giá không được âm' });
     const [row] = await query(

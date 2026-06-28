@@ -3,7 +3,7 @@ export interface Listing {
   id: number; title: string; description: string | null; price: number; area: number | null;
   propertyType: PropertyType; address: string | null; ward: string | null; bedrooms: number | null;
   bathrooms?: number | null; direction?: string | null; legal?: string | null; frontage?: number | null;
-  contactName?: string | null; contactPhone?: string | null; boosted?: boolean; createdBy?: number | null;
+  contactName?: string | null; contactPhone?: string | null; boosted?: boolean; tier?: string; bumpedAt?: string | null; createdBy?: number | null;
   leadCount?: number; leadViews?: number; posterAvatar?: string | null;
   status: string; images: string[]; lng: number; lat: number; createdAt: string;
 }
@@ -28,3 +28,11 @@ export function formatVnd(v: number): string {
 export const WARDS = ['Cam Đức','Cam Hải Đông','Cam Hải Tây','Cam Thành Bắc','Cam Hòa','Cam Tân','Cam Hiệp Bắc','Cam Hiệp Nam','Cam An Bắc','Cam An Nam','Cam Phước Tây','Sơn Tân','Suối Cát','Suối Tân'];
 export const DIRECTIONS = ['Đông','Tây','Nam','Bắc','Đông Bắc','Đông Nam','Tây Bắc','Tây Nam'];
 export const LEGAL_OPTIONS = ['Sổ đỏ / Sổ hồng','Sổ hồng riêng','Sổ chung','Hợp đồng mua bán','Đang chờ sổ','Khác'];
+
+export const TIERS = ['normal', 'silver', 'gold', 'diamond'] as const;
+export const TIER_LABEL: Record<string, string> = { normal: 'Tin thường', silver: 'VIP Bạc', gold: 'VIP Vàng', diamond: 'VIP Kim Cương' };
+export const TIER_BADGE: Record<string, string> = {
+  diamond: 'bg-gradient-to-r from-rose-600 to-red-500',
+  gold: 'bg-gradient-to-r from-amber-500 to-yellow-500',
+  silver: 'bg-gradient-to-r from-slate-400 to-slate-600',
+};

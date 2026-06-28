@@ -26,6 +26,9 @@ ALTER TABLE listings ADD COLUMN IF NOT EXISTS frontage      NUMERIC(8,2);
 ALTER TABLE listings ADD COLUMN IF NOT EXISTS contact_name  TEXT;
 ALTER TABLE listings ADD COLUMN IF NOT EXISTS contact_phone TEXT;
 ALTER TABLE listings ADD COLUMN IF NOT EXISTS boosted       BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE listings ADD COLUMN IF NOT EXISTS tier          TEXT NOT NULL DEFAULT 'normal';
+ALTER TABLE listings ADD COLUMN IF NOT EXISTS bumped_at     TIMESTAMPTZ;
+UPDATE listings SET tier='gold' WHERE boosted=true AND tier='normal';
 
 -- ── Ảnh lưu trực tiếp trong Postgres (GĐ2) ──
 CREATE TABLE IF NOT EXISTS listing_images (
@@ -87,6 +90,13 @@ CREATE TABLE IF NOT EXISTS push_subscriptions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS push_sub_user_idx ON push_subscriptions (user_id);
+CREATE TABLE IF NOT EXISTS listing_usage (
+  user_id INT NOT NULL,
+  ym      TEXT NOT NULL,
+  posts   INT NOT NULL DEFAULT 0,
+  boosts  INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (user_id, ym)
+);
 
 -- ── Khách gửi bán / ký gửi BĐS (thu thập thông tin từ khách) ──
 CREATE TABLE IF NOT EXISTS consignments (

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { Listing, formatVnd } from '@/lib/types';
+import { Listing, formatVnd, TIER_BADGE, TIER_LABEL } from '@/lib/types';
 
 function IPin() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="2.5" /></svg>; }
 
@@ -27,11 +27,11 @@ export default function ListingRow({ l, href }: { l: Listing; href?: string }) {
         <img src={l.images?.[0] ?? `https://picsum.photos/seed/cl${l.id}/800/600`} alt={l.title}
           onError={(e) => { (e.currentTarget as HTMLImageElement).src = `https://picsum.photos/seed/cl${l.id}/800/600`; }}
           loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
-        {l.boosted && <span className="absolute top-2 left-2 bg-[#C8A14B] text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded">VIP</span>}
+        {l.tier && l.tier !== 'normal' && <span className={`absolute top-2 left-2 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded shadow ${TIER_BADGE[l.tier] || 'bg-[#C8A14B]'}`}>{(TIER_LABEL[l.tier] || 'VIP').toUpperCase()}</span>}
         {nImg > 1 && <span className="absolute bottom-2 left-2 bg-black/55 backdrop-blur text-white text-[11px] font-medium px-1.5 py-0.5 rounded-md">📷 {nImg}</span>}
       </div>
       <div className="flex-1 min-w-0 py-2.5 pr-3 flex flex-col">
-        <h3 className="text-[15px] font-semibold text-slate-800 line-clamp-2 leading-snug group-hover:text-red-700">{l.title}</h3>
+        <h3 className={`text-[15px] font-semibold line-clamp-2 leading-snug group-hover:text-red-700 ${l.tier === 'diamond' ? 'text-red-600 uppercase' : 'text-slate-800'}`}>{l.title}</h3>
         <div className="flex items-center flex-wrap gap-x-2 mt-1.5 text-sm">
           <span className="text-red-600 font-bold">{formatVnd(l.price)}</span>
           {l.area != null && <span className="text-slate-700">· {l.area} m²</span>}

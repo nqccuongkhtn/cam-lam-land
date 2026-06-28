@@ -156,7 +156,7 @@ export default function ListingDetail() {
                 </div>
               )}
               <button onClick={() => setSaved((v) => !v)} className={`mt-2.5 w-full flex items-center justify-center gap-2 font-bold py-2.5 rounded-xl border transition ${saved ? 'border-red-200 text-red-600 bg-red-50' : 'border-slate-300 text-slate-600 hover:bg-slate-50'}`}><IHeart filled={saved} /> {saved ? 'Đã lưu tin' : 'Lưu tin'}</button>
-              {user && (l.createdBy === user.id || user.role === 'admin') && (
+              {user && l.createdBy === user.id && (
                 <Link href={`/sales/edit/${l.id}`} className="mt-2.5 w-full flex items-center justify-center gap-2 font-bold py-2.5 rounded-xl border border-[#C8A14B]/50 text-[#8a6d1f] bg-[#C8A14B]/10 hover:bg-[#C8A14B]/20">✏️ Sửa tin</Link>
               )}
               <p className="text-[11px] text-slate-400 mt-3 text-center">Mã tin #{l.id} · đăng {new Date(l.createdAt).toLocaleDateString('vi-VN')}</p>

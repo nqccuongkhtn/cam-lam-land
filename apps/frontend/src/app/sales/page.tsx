@@ -4,22 +4,27 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
-import { Listing, PROPERTY_LABELS, formatVnd } from '@/lib/types';
+import { Listing, PROPERTY_LABELS, formatVnd, TIER_LABEL, TIER_BADGE } from '@/lib/types';
 
 export default function SalesDashboard() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const [items, setItems] = useState<Listing[]>([]);
   const [busy, setBusy] = useState(true);
+  const [usage, setUsage] = useState<{ posts: number; boosts: number }>({ posts: 0, boosts: 0 });
 
   const load = useCallback(() => {
     api<{ listings: Listing[] }>('/listings/mine').then((d) => setItems(d.listings || [])).catch(() => setItems([])).finally(() => setBusy(false));
+    api<{ posts: number; boosts: number }>('/listings/usage').then(setUsage).catch(() => {});
   }, []);
   useEffect(() => { if (!loading && !user) router.replace('/login'); else if (user) load(); }, [loading, user, router, load]);
 
   async function del(id: number) {
     if (!window.confirm('Xoá tin này?')) return;
     try { await api(`/listings/${id}`, { method: 'DELETE' }); load(); } catch (e: any) { alert('Lỗi: ' + e.message); }
+  }
+  async function boost(id: number, body: any) {
+    try { await api(`/listings/${id}/boost`, { method: 'POST', body: JSON.stringify(body) }); load(); } catch (e: any) { alert('Lỗi: ' + e.message); }
   }
 
   if (loading || !user) return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
@@ -32,6 +37,11 @@ export default function SalesDashboard() {
         <div className="flex items-center justify-between mb-5">
           <div><h1 className="text-2xl font-extrabold text-[#0A2540]">Tin của tôi</h1><p className="text-sm text-slate-500">Xin chào, {user.fullName || user.email} · {items.length} tin</p></div>
           <Link href="/sales/post" className="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-red-600/30">＋ Đăng tin mới</Link>
+        </div>
+        <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
+          <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 rounded-full px-3 py-1.5"><b className="text-[#0A2540]">{usage.posts}</b> tin đã đăng tháng này</span>
+          <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 rounded-full px-3 py-1.5"><b className="text-[#0A2540]">{usage.boosts}</b> lượt đẩy tin tháng này</span>
+          <span className="text-xs text-slate-400">· Xoá tin không hoàn lại lượt</span>
         </div>
         <div className="mb-5 bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="flex-1">
@@ -49,15 +59,21 @@ export default function SalesDashboard() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={l.images?.[0] || `https://picsum.photos/seed/cl${l.id}/200`} alt="" className="w-24 h-20 object-cover rounded-lg bg-slate-100 shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${badge(l.status)}`}>{l.status}</span>{l.boosted && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#C8A14B]/20 text-[#8a6d1f]">⭐ Đẩy tin</span>}</div>
+                  <div className="flex items-center gap-2"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${badge(l.status)}`}>{l.status}</span>{l.tier && l.tier !== 'normal' && <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full text-white ${TIER_BADGE[l.tier] || 'bg-[#C8A14B]'}`}>{TIER_LABEL[l.tier]}</span>}</div>
                   <p className="font-bold text-[#0A2540] truncate mt-0.5">{l.title}</p>
                   <p className="text-sm text-slate-500">{formatVnd(l.price)} · {PROPERTY_LABELS[l.propertyType]} · {l.ward || 'Cam Lâm'}</p>
                   <Link href={`/sales/leads/${l.id}`} className="inline-block mt-1 text-xs font-bold text-[#0A2540] bg-[#C8A14B]/15 hover:bg-[#C8A14B]/25 rounded-full px-2.5 py-1">👁 {l.leadViews || 0} lượt xem · {l.leadCount || 0} khách quan tâm →</Link>
                 </div>
-                <div className="flex flex-col gap-1.5 shrink-0">
-                  <Link href={`/listings/${l.id}`} className="text-xs font-semibold text-[#0A2540] border border-slate-300 rounded-lg px-3 py-1.5 text-center hover:bg-slate-50">Xem</Link>
-                  <Link href={`/sales/edit/${l.id}`} className="text-xs font-semibold text-[#0A2540] border border-slate-300 rounded-lg px-3 py-1.5 text-center hover:bg-slate-50">Sửa</Link>
-                  <button onClick={() => del(l.id)} className="text-xs font-semibold text-red-600 border border-red-200 rounded-lg px-3 py-1.5 hover:bg-red-50">Xoá</button>
+                <div className="flex flex-col gap-1.5 shrink-0 w-[150px]">
+                  <select value={l.tier || 'normal'} onChange={(e) => boost(l.id, { tier: e.target.value })} className="text-xs font-semibold border border-slate-300 rounded-lg px-2 py-1.5 bg-white cursor-pointer">
+                    <option value="normal">Tin thường</option><option value="silver">VIP Bạc</option><option value="gold">VIP Vàng</option><option value="diamond">VIP Kim cương</option>
+                  </select>
+                  <button onClick={() => boost(l.id, { bump: true })} className="text-xs font-bold text-white bg-[#0A2540] hover:bg-[#0d2f54] rounded-lg px-3 py-1.5">↑ Đẩy lên đầu</button>
+                  <div className="flex gap-1.5">
+                    <Link href={`/listings/${l.id}`} className="flex-1 text-xs font-semibold text-[#0A2540] border border-slate-300 rounded-lg px-2 py-1.5 text-center hover:bg-slate-50">Xem</Link>
+                    <Link href={`/sales/edit/${l.id}`} className="flex-1 text-xs font-semibold text-[#0A2540] border border-slate-300 rounded-lg px-2 py-1.5 text-center hover:bg-slate-50">Sửa</Link>
+                    <button onClick={() => del(l.id)} className="flex-1 text-xs font-semibold text-red-600 border border-red-200 rounded-lg px-2 py-1.5 hover:bg-red-50">Xoá</button>
+                  </div>
                 </div>
               </div>
             ))}

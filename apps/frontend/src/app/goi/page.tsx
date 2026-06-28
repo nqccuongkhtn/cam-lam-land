@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 
 interface Pkg { id: string; name: string; kind: 'post' | 'boost'; tier?: 'normal' | 'silver' | 'gold' | 'diamond'; boosts?: number; posts?: number; days: number; price: number; perks: string[]; popular?: boolean }
-interface Bank { bankId: string; account: string; name: string }
+interface Bank { bankId: string; account: string; name: string; demo?: boolean }
 const RING: Record<string, string> = { post: 'border-sky-300', normal: 'border-slate-300', silver: 'border-slate-300', gold: 'border-amber-400', diamond: 'border-rose-400' };
 const HEAD: Record<string, string> = { post: 'from-sky-600 to-blue-600', normal: 'from-slate-500 to-slate-700', silver: 'from-slate-400 to-slate-600', gold: 'from-amber-500 to-yellow-500', diamond: 'from-rose-600 to-red-500' };
 const fmt = (n: number) => n.toLocaleString('vi-VN') + 'đ';
@@ -106,7 +106,8 @@ export default function PricingPage() {
                   <div className="flex justify-between"><span className="text-slate-500">Số tiền</span><b className="text-red-600">{fmt(order.amount)}</b></div>
                   <div className="flex justify-between"><span className="text-slate-500">Nội dung</span><b className="text-red-600">{order.note}</b></div>
                 </div>
-                <p className="text-xs text-slate-500 mt-3 text-center">Quét QR hoặc chuyển khoản <b>đúng nội dung</b> ở trên. Gói sẽ <b>tự kích hoạt</b> sau khi nhận tiền.</p>
+                {order.bank.demo && <p className="text-[11px] text-amber-600 mt-2 text-center font-medium">Số tài khoản đang ở chế độ thử nghiệm — vui lòng liên hệ <a href="tel:0988888888" className="underline">admin</a> trước khi chuyển khoản.</p>}
+                <p className="text-xs text-slate-500 mt-2 text-center">Quét QR hoặc chuyển khoản <b>đúng nội dung</b> ở trên. Gói sẽ <b>tự kích hoạt</b> sau khi nhận tiền.</p>
                 <div className="mt-3 flex items-center justify-center gap-2 text-xs text-amber-600"><span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" /> Đang chờ thanh toán…</div>
               </>
             )}

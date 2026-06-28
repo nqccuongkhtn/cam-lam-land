@@ -71,6 +71,16 @@ export default function PostListing() {
           <Link href="/sales" className="text-sm font-semibold text-slate-500 hover:text-[#0A2540]">← Tin của tôi</Link>
         </div>
 
+        <Link href="/goi" className="block bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white rounded-2xl p-4 hover:brightness-110 transition">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="font-bold">🚀 Đăng nhiều tin hơn & đẩy tin lên VIP</p>
+              <p className="text-sm text-slate-300 mt-0.5">Miễn phí 30 tin/tháng — mua gói để đăng thêm và làm nổi bật tin.</p>
+            </div>
+            <span className="bg-[#C8A14B] text-[#0A2540] font-bold px-4 py-2 rounded-xl whitespace-nowrap shrink-0">Xem bảng giá →</span>
+          </div>
+        </Link>
+
         <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
           <h2 className="font-bold text-[#0A2540]">Thông tin chính</h2>
           <div><label className={lbl}>Tiêu đề *</label><input className={inp} value={f.title} onChange={(e) => set('title', e.target.value)} placeholder="VD: Đất nền ven biển Bãi Dài, sổ đỏ" /></div>

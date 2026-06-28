@@ -221,6 +221,20 @@ export default function Home() {
         </div>
       </section>
 
+      {/* AD CONTACT — tế nhị */}
+      <section className="mx-auto max-w-7xl px-4 pb-12">
+        <div className="rounded-2xl border border-slate-200 bg-white px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-center sm:text-left">
+            <p className="font-bold text-[#0A2540]">📣 Quảng cáo cùng Cam Lâm Land</p>
+            <p className="text-sm text-slate-500 mt-0.5">Đưa thương hiệu, dự án của bạn đến khách quan tâm bất động sản Cam Lâm — banner, logo trên bản đồ, đẩy tin nổi bật.</p>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <Link href="/dichvu" className="border border-slate-300 text-[#0A2540] font-semibold px-5 py-2.5 rounded-xl hover:bg-slate-50 text-sm whitespace-nowrap">Xem dịch vụ</Link>
+            <a href="tel:0988888888" className="bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-5 py-2.5 rounded-xl text-sm whitespace-nowrap">Liên hệ quảng cáo</a>
+          </div>
+        </div>
+      </section>
+
       {/* FOOTER */}
       <footer className="bg-[#0A2540] text-slate-300">
         {/* Số liệu (đã chuyển vào footer, căn trái thẳng hàng với các cột) */}

@@ -136,7 +136,7 @@ function UploadGis() {
   return (
     <div className="max-w-lg bg-white border border-slate-200 rounded-xl p-5">
       <h2 className="font-bold text-[#0A2540] mb-3">Tải lên dữ liệu GIS</h2>
-      <p className="text-sm text-slate-500 mb-3">Nạp trực tiếp <b>.geojson</b> — toạ độ <b>VN-2000 hoặc WGS84</b> đều được (tự quy đổi). DGN/SHP: hãy xuất sang GeoJSON trước.</p>
+      <p className="text-sm text-slate-500 mb-3">Nạp trực tiếp <b>.geojson</b> hoặc <b>Shapefile nén .zip</b> — toạ độ <b>VN-2000/WGS84</b> đều được (tự quy đổi). DGN: xuất sang SHP/GeoJSON trước.</p>
       <input type="file" accept=".dgn,.shp,.zip,.geojson,.json" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="mb-3 block w-full text-sm" />
       <input className="border border-slate-300 rounded-md px-3 py-2 w-full mb-2 text-sm" placeholder="Tên lớp (vd: Quy hoạch 2030)" value={name} onChange={(e) => setName(e.target.value)} />
       <select className="border border-slate-300 rounded-md px-3 py-2 w-full mb-3 text-sm" value={layerType} onChange={(e) => setLayerType(e.target.value)}>

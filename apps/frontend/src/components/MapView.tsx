@@ -4,7 +4,7 @@ import maplibregl, { Map as MlMap, Marker } from 'maplibre-gl';
 import { MAP } from '@/lib/config';
 
 export interface GeoLayer { id: string; type: 'fill' | 'line' | 'circle' | 'symbol'; data: GeoJSON.FeatureCollection; visible: boolean; paint: Record<string, any>; layout?: Record<string, any>; }
-export interface MarkerSpec { lng: number; lat: number; color?: string; popupHtml?: string; onClick?: () => void; }
+export interface MarkerSpec { lng: number; lat: number; color?: string; popupHtml?: string; label?: string; onClick?: () => void; }
 export interface ImageOverlay { id: string; url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number; visible: boolean; }
 export type BaseMap = 'street' | 'satellite' | 'terrain';
 export type MeasureMode = 'off' | 'distance' | 'area';
@@ -195,8 +195,14 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     const map = mapRef.current; if (!map) return;
     markerRefs.current.forEach((m) => m.remove());
     markerRefs.current = markers.map((m) => {
-      const mk = new maplibregl.Marker({ color: m.color ?? '#e53935' }).setLngLat([m.lng, m.lat]);
-      if (m.popupHtml) mk.setPopup(new maplibregl.Popup({ offset: 24 }).setHTML(m.popupHtml));
+      let mk: maplibregl.Marker;
+      if (m.label) {
+        const el = document.createElement('div'); el.className = 'cl-price-pin'; el.textContent = m.label;
+        mk = new maplibregl.Marker({ element: el, anchor: 'bottom' }).setLngLat([m.lng, m.lat]);
+      } else {
+        mk = new maplibregl.Marker({ color: m.color ?? '#e53935' }).setLngLat([m.lng, m.lat]);
+      }
+      if (m.popupHtml) mk.setPopup(new maplibregl.Popup({ offset: 18 }).setHTML(m.popupHtml));
       if (m.onClick) mk.getElement().addEventListener('click', m.onClick);
       mk.addTo(map); return mk;
     });

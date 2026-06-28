@@ -44,3 +44,7 @@ button, a, input, select, textarea {
 .cl-ad-phone { display: block; font-size: 10px; font-weight: 700; color: #dc2626; }
 
 @keyframes clPop { from { opacity: 0; transform: translateY(8px) scale(.96); } to { opacity: 1; transform: none; } }
+
+/* Ghim tin dạng nhãn giá trên bản đồ (kiểu batdongsan) */
+.cl-price-pin { background:#0A2540; color:#fff; font-size:12px; font-weight:800; line-height:1; padding:4px 8px; border-radius:9999px; white-space:nowrap; box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:pointer; border:1.5px solid #fff; }
+.cl-price-pin:hover { background:#dc2626; z-index:6; }

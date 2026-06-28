@@ -38,6 +38,11 @@ export default function ListingDetail() {
     try { const r = await api<{ contactPhone: string }>(`/listings/${id}/reveal`, { method: 'POST' }); setFull(r.contactPhone); }
     catch (e: any) { alert(e.message); } finally { setRevealing(false); }
   }
+  function share() {
+    const url = typeof window !== 'undefined' ? window.location.href : '';
+    if (typeof navigator !== 'undefined' && (navigator as any).share) (navigator as any).share({ title: l?.title, url }).catch(() => {});
+    else if (typeof navigator !== 'undefined' && navigator.clipboard) { navigator.clipboard.writeText(url); alert('Đã sao chép liên kết tin.'); }
+  }
 
   if (err) return <div className="mx-auto max-w-3xl p-10 text-center text-slate-500">Không tìm thấy tin.</div>;
   if (!l) return <div className="mx-auto max-w-3xl p-10 text-center text-slate-500">Đang tải…</div>;
@@ -96,6 +101,11 @@ export default function ListingDetail() {
                 <div><p className="text-xs text-slate-400">Diện tích</p><p className="text-lg md:text-xl font-extrabold text-[#0A2540]">{l.area ? `${l.area} m²` : '—'}</p></div>
                 <div><p className="text-xs text-slate-400">Giá/m²</p><p className="text-lg md:text-xl font-extrabold text-[#0A2540]">{pricePerM2 ? formatVnd(pricePerM2) : '—'}</p></div>
               </div>
+              <div className="flex items-center gap-2 mt-3 flex-wrap">
+                <button onClick={share} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#0A2540] border border-slate-200 rounded-lg px-3 py-1.5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" /></svg> Chia sẻ</button>
+                <button onClick={() => setSaved((v) => !v)} className={`inline-flex items-center gap-1.5 text-sm border rounded-lg px-3 py-1.5 ${saved ? 'border-red-200 text-red-600 bg-red-50' : 'border-slate-200 text-slate-500 hover:text-red-600'}`}><IHeart filled={saved} /> {saved ? 'Đã lưu' : 'Lưu'}</button>
+                <Link href={`/listings?ward=${encodeURIComponent(l.ward || '')}`} className="ml-auto inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-sm font-semibold rounded-lg px-3 py-1.5 hover:bg-emerald-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M3 17l6-6 4 4 8-8" /><path d="M14 7h7v7" /></svg> Giá khu vực {l.ward || 'Cam Lâm'}</Link>
+              </div>
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 p-5">
@@ -129,10 +139,11 @@ export default function ListingDetail() {
                 {l.posterAvatar ? <img src={l.posterAvatar} alt="" className="w-12 h-12 rounded-full object-cover ring-2 ring-[#C8A14B]/30" /> : <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#123459] to-[#081B30] text-[#C8A14B] grid place-items-center text-lg font-extrabold ring-2 ring-[#C8A14B]/30">{(l.contactName || 'C').charAt(0).toUpperCase()}</div>}
                 <div><p className="font-bold text-[#0A2540] leading-tight">{l.contactName || 'Cam Lâm Land'}</p><p className="text-xs text-slate-400">Người đăng tin · Cam Lâm Land</p></div>
               </div>
+              <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="mt-4 flex items-center justify-center gap-2 bg-[#0068FF] hover:bg-[#0058d6] text-white font-bold py-3 rounded-xl"><svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M12 2C6.5 2 2 5.8 2 10.5c0 2.6 1.4 4.9 3.6 6.4-.1.9-.5 2.2-1.2 3.1 1.4-.2 2.8-.8 3.9-1.5 1.1.3 2.4.5 3.7.5 5.5 0 10-3.8 10-8.5S17.5 2 12 2z" /></svg> Chat qua Zalo</a>
               {full ? (
-                <a href={`tel:${full.replace(/\s/g, '')}`} className="mt-4 flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-extrabold text-lg py-3.5 rounded-xl shadow-lg shadow-red-600/30"><IPhone /> {full}</a>
+                <a href={`tel:${full.replace(/\s/g, '')}`} className="mt-2.5 flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-extrabold text-lg py-3.5 rounded-xl shadow-lg shadow-red-600/30"><IPhone /> {full}</a>
               ) : (
-                <div className="mt-4">
+                <div className="mt-2.5">
                   <div className="flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
                     <span className="grid place-items-center w-8 h-8 rounded-lg bg-[#0A2540] text-white shrink-0"><ILock /></span>
                     <span className="text-xl font-extrabold text-[#0A2540] tracking-wider">{l.contactPhone || '0988 88•••'}</span>

@@ -45,8 +45,8 @@ function Ic({ d }: { d: string }) {
 export default function Home() {
   const router = useRouter();
   const [listings, setListings] = useState<Listing[]>([]);
-  const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState('');
-  useEffect(() => { api<{ listings: Listing[] }>('/listings?limit=8').then((d) => setListings(d.listings || [])).catch(() => {}); }, []);
+  const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false);
+  useEffect(() => { api<{ listings: Listing[] }>('/listings?limit=20').then((d) => setListings(d.listings || [])).catch(() => {}); }, []);
 
   function search() {
     const p = new URLSearchParams();
@@ -100,17 +100,28 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FEATURED */}
+      {/* FEATURED — kiểu batdongsan */}
       <section className="mx-auto max-w-7xl px-4 py-14">
-        <div className="flex items-end justify-between mb-6">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-[#0A2540]">Bất động sản nổi bật</h2>
-            <p className="text-slate-500 text-sm mt-1">Những tin đăng được quan tâm nhất tại Cam Lâm</p>
+        <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-[#0A2540]">Bất động sản dành cho bạn</h2>
+          <div className="flex items-center gap-3 text-sm font-semibold text-[#0A2540]">
+            <Link href="/listings" className="hover:text-red-600">Tin bán mới nhất</Link>
+            <span className="text-slate-300">|</span>
+            <Link href="/listings" className="hover:text-red-600">Tin cho thuê mới nhất</Link>
           </div>
-          <Link href="/listings" className="text-[#0A2540] text-sm font-semibold border border-slate-300 rounded-lg px-4 py-2 hover:bg-white">Xem tất cả →</Link>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-          {featured.slice(0, 8).map((l) => <ListingCard key={l.id} l={l} href={fromApi ? undefined : '/listings'} />)}
+          {(expanded ? featured : featured.slice(0, 8)).map((l) => <ListingCard key={l.id} l={l} href={fromApi ? undefined : '/listings'} />)}
+        </div>
+        <div className="mt-8 text-center">
+          {featured.length > 8 ? (
+            <button onClick={() => setExpanded((v) => !v)} className="inline-flex items-center gap-1.5 border border-slate-300 hover:border-[#0A2540] hover:text-[#0A2540] text-slate-600 font-semibold rounded-full px-7 py-2.5 bg-white transition">
+              {expanded ? 'Thu gọn' : 'Mở rộng'}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6" /></svg>
+            </button>
+          ) : (
+            <Link href="/listings" className="inline-flex items-center gap-1.5 border border-slate-300 hover:border-[#0A2540] text-[#0A2540] font-semibold rounded-full px-7 py-2.5 bg-white">Xem tất cả →</Link>
+          )}
         </div>
         {!fromApi && <p className="text-center text-xs text-slate-400 mt-4">* Đang hiển thị tin mẫu. Chạy <code className="bg-slate-100 px-1 rounded">start.bat</code> → <code className="bg-slate-100 px-1 rounded">them_tin_demo.bat</code> để có tin thật.</p>}
       </section>

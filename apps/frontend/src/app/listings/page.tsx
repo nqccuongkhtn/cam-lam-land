@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import Link from 'next/link';
-import { Listing, PropertyType, PROPERTY_LABELS } from '@/lib/types';
+import { Listing, PropertyType, PROPERTY_LABELS, formatVnd } from '@/lib/types';
 import ListingCard from '@/components/ListingCard';
 import type { BaseMap, ImageOverlay } from '@/components/MapView';
 import { wgs84ToVn2000 } from '@/lib/vn2000';
@@ -65,7 +65,7 @@ export default function ListingsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const markers = useMemo(() => listings.map((l) => ({ lng: l.lng, lat: l.lat, popupHtml: `<a href="/listings/${l.id}"><b>${l.title}</b></a>` })), [listings]);
+  const markers = useMemo(() => listings.map((l) => ({ lng: l.lng, lat: l.lat, label: formatVnd(l.price), popupHtml: `<a href="/listings/${l.id}" style="font-weight:700;color:#0A2540">${l.title}</a><br/><b style="color:#dc2626">${formatVnd(l.price)}</b>` })), [listings]);
   const overlays: ImageOverlay[] = useMemo(() => [{ ...QH, opacity, visible: qhOn }], [opacity, qhOn]);
   const sorted = useMemo(() => {
     const a = [...listings];
@@ -88,11 +88,6 @@ export default function ListingsPage() {
 
       {/* Bộ chọn nền + bật lớp quy hoạch */}
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-2 max-w-[60%]">
-        <div className="flex rounded-lg overflow-hidden border border-slate-300 shadow bg-white text-[11px] sm:text-xs font-semibold">
-          {([['street', 'Đường'], ['satellite', 'Vệ tinh'], ['terrain', 'Địa hình']] as [BaseMap, string][]).map(([b, l]) => (
-            <button key={b} onClick={() => setBaseMap(b)} className={`px-2.5 py-1.5 ${baseMap === b ? 'bg-[#0A2540] text-white' : 'text-slate-700 hover:bg-slate-100'}`}>{l}</button>
-          ))}
-        </div>
         <label className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 shadow px-2.5 py-1.5 text-[11px] sm:text-xs font-semibold text-slate-700 cursor-pointer w-fit">
           <input type="checkbox" checked={qhOn} onChange={(e) => setQhOn(e.target.checked)} className="accent-red-600" />
           Lớp quy hoạch
@@ -140,6 +135,22 @@ export default function ListingsPage() {
           <a href="/map" className="mt-2.5 inline-block text-[#0A2540] font-semibold hover:text-red-600">Mở công cụ bản đồ đầy đủ →</a>
         </div>
       )}
+
+      {/* Đổi lớp bản đồ kiểu thumbnail */}
+      <div className="absolute bottom-3 right-3 z-10 bg-white rounded-xl border border-slate-200 shadow-lg p-2">
+        <p className="text-[10px] font-bold text-slate-500 mb-1 px-0.5">Loại bản đồ</p>
+        <div className="flex gap-1.5">
+          {([['street', 'Mặc định', 'm'], ['satellite', 'Vệ tinh', 's'], ['terrain', 'Địa hình', 'p']] as [BaseMap, string, string][]).map(([b, label, lyr]) => (
+            <button key={b} onClick={() => setBaseMap(b)} className="text-center w-14">
+              <span className={`block w-14 h-12 rounded-lg overflow-hidden border-2 ${baseMap === b ? 'border-red-600' : 'border-slate-200'}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={`https://mt1.google.com/vt/lyrs=${lyr}&x=3289&y=1909&z=12`} alt={label} loading="lazy" className="w-full h-full object-cover" />
+              </span>
+              <span className={`block text-[10px] mt-0.5 font-semibold ${baseMap === b ? 'text-red-600' : 'text-slate-600'}`}>{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 

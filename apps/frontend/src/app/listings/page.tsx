@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import Link from 'next/link';
 import { Listing, PropertyType, PROPERTY_LABELS, formatVnd } from '@/lib/types';
 import ListingCard from '@/components/ListingCard';
+import ListingRow from '@/components/ListingRow';
 import type { BaseMap, ImageOverlay } from '@/components/MapView';
 import { wgs84ToVn2000 } from '@/lib/vn2000';
 
@@ -214,15 +215,11 @@ export default function ListingsPage() {
             </label>
           </div>
           {loading ? (
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                  <div className="h-52 skeleton" />
-                  <div className="p-4 space-y-2.5">
-                    <div className="h-4 w-3/4 skeleton rounded" />
-                    <div className="h-5 w-1/2 skeleton rounded" />
-                    <div className="h-3 w-2/3 skeleton rounded" />
-                  </div>
+            <div className="flex flex-col gap-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex gap-3 bg-white rounded-xl border border-slate-200 overflow-hidden">
+                  <div className="w-48 h-32 skeleton shrink-0" />
+                  <div className="flex-1 py-3 pr-3 space-y-2.5"><div className="h-4 w-3/4 skeleton rounded" /><div className="h-5 w-1/2 skeleton rounded" /><div className="h-3 w-2/3 skeleton rounded" /></div>
                 </div>
               ))}
             </div>
@@ -231,17 +228,17 @@ export default function ListingsPage() {
               {mine ? <>Giỏ hàng của bạn đang trống. <Link href="/sales/post" className="text-[#0A2540] font-bold">Đăng tin đầu tiên →</Link></> : 'Không có kết quả phù hợp.'}
             </div>
           ) : (
-            <div className="grid gap-4 content-start grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3">
+            <div className="flex flex-col gap-3">
               {sorted.map((l) => mine ? (
                 <div key={l.id} className="flex flex-col gap-1.5">
-                  <ListingCard l={l} />
+                  <ListingRow l={l} />
                   <div className="flex gap-1.5">
                     <Link href={`/sales/edit/${l.id}`} className="flex-1 text-center bg-white border border-slate-200 text-[#0A2540] text-xs font-bold py-1.5 rounded-lg hover:border-[#C8A14B]">✏️ Sửa</Link>
                     <Link href={`/sales/leads/${l.id}`} className="flex-1 text-center bg-white border border-slate-200 text-[#0A2540] text-xs font-bold py-1.5 rounded-lg hover:border-[#C8A14B]">👁 Khách</Link>
                     <button onClick={() => del(l.id)} className="flex-1 bg-white border border-red-200 text-red-600 text-xs font-bold py-1.5 rounded-lg hover:bg-red-50">🗑 Xoá</button>
                   </div>
                 </div>
-              ) : <ListingCard key={l.id} l={l} />)}
+              ) : <ListingRow key={l.id} l={l} />)}
             </div>
           )}
         </div>

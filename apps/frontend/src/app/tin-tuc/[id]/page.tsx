@@ -1,20 +1,24 @@
 'use client';
-import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { api } from '@/lib/api';
 
-interface Article { id: number; title: string; url: string; source?: string; image?: string; summary?: string; publishedAt?: string }
+interface Article { title: string; url: string; source?: string; image?: string; summary?: string; publishedAt?: string }
+
+// Giải mã slug base64url (UTF-8) → dữ liệu bài. Không cần backend.
+function decodeSlug(s: string): Article | null {
+  try {
+    const b = s.replace(/-/g, '+').replace(/_/g, '/');
+    const bin = atob(b);
+    const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes));
+  } catch { return null; }
+}
 
 export default function NewsReader() {
   const { id } = useParams<{ id: string }>();
-  const [a, setA] = useState<Article | null>(null);
-  const [err, setErr] = useState(false);
+  const a = id ? decodeSlug(decodeURIComponent(id)) : null;
 
-  useEffect(() => { api<Article>(`/news/${id}`).then(setA).catch(() => setErr(true)); }, [id]);
-
-  if (err) return <div className="mx-auto max-w-3xl p-12 text-center text-slate-500">Không tìm thấy bài viết. <Link href="/" className="text-[#0A2540] font-semibold underline">Về trang chủ</Link></div>;
-  if (!a) return <div className="mx-auto max-w-3xl p-12 text-center text-slate-400">Đang tải…</div>;
+  if (!a) return <div className="mx-auto max-w-3xl p-12 text-center text-slate-500">Không tìm thấy bài viết. <Link href="/" className="text-[#0A2540] font-semibold underline">Về trang chủ</Link></div>;
 
   const date = a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('vi-VN') : '';
 
@@ -31,10 +35,7 @@ export default function NewsReader() {
           <span className="ml-auto text-[11px] bg-slate-100 text-slate-500 rounded-full px-2 py-0.5">Tổng hợp</span>
         </div>
 
-        {a.image && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={a.image} alt={a.title} className="w-full rounded-2xl mt-5 bg-slate-100 object-cover max-h-[460px]" />
-        )}
+        {a.image && <img src={a.image} alt={a.title} className="w-full rounded-2xl mt-5 bg-slate-100 object-cover max-h-[460px]" />}
 
         {a.summary && <p className="text-slate-700 leading-relaxed mt-5 text-[17px] whitespace-pre-line">{a.summary}</p>}
 

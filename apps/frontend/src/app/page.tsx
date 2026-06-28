@@ -69,8 +69,9 @@ export default function Home() {
   const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Tin nổi bật');
   useEffect(() => { api<{ listings: Listing[] }>('/listings?limit=20').then((d) => setListings(d.listings || [])).catch(() => {}); }, []);
   useEffect(() => {
-    api<{ news: any[] }>('/news')
-      .then((d) => setMarketNews((d.news || []).map((n) => ({ title: n.title, url: '/tin-tuc/' + n.id, img: n.image || U('1486406146926-c627a92ad1ab'), date: n.publishedAt ? new Date(n.publishedAt).toLocaleDateString('vi-VN') : undefined, source: n.source }))))
+    fetch('/feed/news')
+      .then((r) => r.json())
+      .then((d) => setMarketNews((d.news || []).map((n: any) => ({ title: n.title, url: '/tin-tuc/' + n.slug, img: n.image || U('1486406146926-c627a92ad1ab'), date: n.publishedAt ? new Date(n.publishedAt).toLocaleDateString('vi-VN') : undefined, source: n.source }))))
       .catch(() => {});
   }, []);
 

@@ -28,7 +28,7 @@ async function fetchSource(src: { name: string; url: string }): Promise<any[]> {
     const image = (desc.match(/<img[^>]+src=["']?([^"' >]+)/) || [])[1] || null;
     const d = pub ? new Date(pub) : new Date();
     if (!title || !link || isNaN(d.getTime()) || BAD.test(title)) continue;
-    const item = { title, url: link, source: src.name, image, summary: strip(desc).slice(0, 240), publishedAt: d.toISOString() };
+    const item = { title, url: link, source: src.name, image, summary: strip(desc).slice(0, 600), publishedAt: d.toISOString() };
     out.push({ ...item, slug: Buffer.from(JSON.stringify(item), 'utf8').toString('base64url') });
   }
   return out;

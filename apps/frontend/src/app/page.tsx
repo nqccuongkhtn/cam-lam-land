@@ -82,7 +82,7 @@ export default function Home() {
   }
   const featured = listings.length > 0 ? listings : STATIC;
   const fromApi = listings.length > 0;
-  const newsItems = newsTab === 'Thị trường BĐS' && marketNews.length ? [...marketNews, ...NEWS['Thị trường BĐS'].slice(-2)] : NEWS[newsTab];
+  const newsItems = newsTab === 'Thị trường BĐS' && marketNews.length ? [...marketNews.slice(0, 6), ...NEWS['Thị trường BĐS'].slice(-2)] : NEWS[newsTab];
 
   return (
     <div className="bg-slate-50">
@@ -134,7 +134,7 @@ export default function Home() {
           {Object.keys(NEWS).map((t) => (
             <button key={t} onClick={() => setNewsTab(t)} className={`pb-2.5 text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${newsTab === t ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500 hover:text-[#0A2540]'}`}>{t}</button>
           ))}
-          <a href="/listings" className="ml-auto text-red-600 text-sm font-semibold whitespace-nowrap shrink-0">Xem thêm →</a>
+          <Link href="/tin-tuc" className="ml-auto text-red-600 text-sm font-semibold whitespace-nowrap shrink-0">Xem thêm →</Link>
         </div>
         <div className="grid lg:grid-cols-[1.05fr_1fr_0.62fr] gap-6">
           {(() => { const feat = newsItems[0]; return (

@@ -36,8 +36,16 @@ async function fetchSource(src: { name: string; url: string }): Promise<any[]> {
 
 let cache: { at: number; items: any[] } = { at: 0, items: [] };
 
+// Làm mới mỗi 6 giờ theo giờ VN, bắt đầu từ 6h sáng: mốc 00:00, 06:00, 12:00, 18:00
+function slotStart(): number {
+  const vn = new Date(Date.now() + 7 * 3600 * 1000); // giờ VN coi như UTC
+  const slotHour = Math.floor(vn.getUTCHours() / 6) * 6;
+  return Date.UTC(vn.getUTCFullYear(), vn.getUTCMonth(), vn.getUTCDate(), slotHour) - 7 * 3600 * 1000;
+}
+
 export async function GET() {
-  if (cache.items.length && Date.now() - cache.at < 30 * 60 * 1000)
+  // còn trong khung 6 giờ hiện tại thì dùng lại bản đã lấy; sang khung mới mới lấy lại
+  if (cache.items.length && cache.at >= slotStart())
     return NextResponse.json({ news: cache.items });
   const results = await Promise.allSettled(SOURCES.map(fetchSource));
   const all: any[] = [];

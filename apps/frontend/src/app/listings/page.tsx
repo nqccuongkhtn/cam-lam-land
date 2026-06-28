@@ -99,13 +99,33 @@ export default function ListingsPage() {
   const mapPanel = (
     <div className="relative h-full w-full">
       <MapView markers={markers} overlays={overlays} baseMap={baseMap} labels={labels} onMapClick={onMapClick} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={qhOn ? opacity : 1} className="absolute inset-0 h-full w-full" />
-      <div className="absolute top-3 left-3 z-10 flex flex-col gap-2 max-w-[60%]">
+      <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
         <label className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 shadow px-2.5 py-1.5 text-[11px] sm:text-xs font-semibold text-slate-700 cursor-pointer w-fit">
           <input type="checkbox" checked={qhOn} onChange={(e) => setQhOn(e.target.checked)} className="accent-red-600" /> Lớp quy hoạch
         </label>
         <label className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 shadow px-2.5 py-1.5 text-[11px] sm:text-xs font-semibold text-slate-700 cursor-pointer w-fit">
           <input type="checkbox" checked={labels} onChange={(e) => setLabels(e.target.checked)} className="accent-red-600" /> Nhãn & đường
         </label>
+        <div>
+          {layerOpen ? (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-2">
+              <div className="flex items-center justify-between mb-1 px-0.5"><span className="text-[10px] font-bold text-slate-500">Loại bản đồ</span><button onClick={() => setLayerOpen(false)} className="text-slate-400 hover:text-slate-700 text-xs leading-none">✕</button></div>
+              <div className="flex gap-1.5">
+                {BASE_THUMBS.map(([b, label, lyr]) => (
+                  <button key={b} onClick={() => { setBaseMap(b); setLayerOpen(false); }} className="text-center w-14">
+                    <span className={`block w-14 h-12 rounded-lg overflow-hidden border-2 ${baseMap === b ? 'border-red-600' : 'border-slate-200'}`}>{/* eslint-disable-next-line @next/next/no-img-element */}<img src={`https://mt1.google.com/vt/lyrs=${lyr}&x=3289&y=1909&z=12`} alt={label} loading="lazy" className="w-full h-full object-cover" /></span>
+                    <span className={`block text-[10px] mt-0.5 font-semibold ${baseMap === b ? 'text-red-600' : 'text-slate-600'}`}>{label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <button onClick={() => setLayerOpen(true)} title="Đổi lớp bản đồ" className="flex items-center gap-1.5 bg-white rounded-lg border border-slate-200 shadow px-2 py-1.5 hover:bg-slate-50 w-fit">
+              <span className="block w-7 h-7 rounded-md overflow-hidden border border-slate-200">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={`https://mt1.google.com/vt/lyrs=${lyrOf(baseMap)}&x=3289&y=1909&z=12`} alt="" className="w-full h-full object-cover" /></span>
+              <span className="text-[11px] sm:text-xs font-semibold text-slate-700">Lớp bản đồ</span>
+            </button>
+          )}
+        </div>
       </div>
       {qhOn && (
         <div className="absolute top-1/2 right-3 -translate-y-1/2 z-10 flex flex-col items-center gap-1 bg-white/95 backdrop-blur rounded-2xl border border-slate-200 shadow-lg px-2 py-3">
@@ -135,35 +155,7 @@ export default function ListingsPage() {
           <a href="/map" className="mt-2.5 inline-block text-[#0A2540] font-semibold hover:text-red-600">Mở công cụ bản đồ đầy đủ →</a>
         </div>
       )}
-      <div className="absolute bottom-3 left-3 z-10">
-        {layerOpen ? (
-          <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-2">
-            <div className="flex items-center justify-between mb-1 px-0.5">
-              <span className="text-[10px] font-bold text-slate-500">Loại bản đồ</span>
-              <button onClick={() => setLayerOpen(false)} className="text-slate-400 hover:text-slate-700 text-xs leading-none">✕</button>
-            </div>
-            <div className="flex gap-1.5">
-              {BASE_THUMBS.map(([b, label, lyr]) => (
-                <button key={b} onClick={() => { setBaseMap(b); setLayerOpen(false); }} className="text-center w-14">
-                  <span className={`block w-14 h-12 rounded-lg overflow-hidden border-2 ${baseMap === b ? 'border-red-600' : 'border-slate-200'}`}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={`https://mt1.google.com/vt/lyrs=${lyr}&x=3289&y=1909&z=12`} alt={label} loading="lazy" className="w-full h-full object-cover" />
-                  </span>
-                  <span className={`block text-[10px] mt-0.5 font-semibold ${baseMap === b ? 'text-red-600' : 'text-slate-600'}`}>{label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <button onClick={() => setLayerOpen(true)} title="Đổi lớp bản đồ" className="flex items-center gap-1.5 bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 pr-3 hover:bg-slate-50">
-            <span className="block w-9 h-9 rounded-lg overflow-hidden border border-slate-200">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`https://mt1.google.com/vt/lyrs=${lyrOf(baseMap)}&x=3289&y=1909&z=12`} alt="" className="w-full h-full object-cover" />
-            </span>
-            <span className="text-xs font-bold text-slate-600">Lớp bản đồ</span>
-          </button>
-        )}
-      </div>
+
     </div>
   );
 

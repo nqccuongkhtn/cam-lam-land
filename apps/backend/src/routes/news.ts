@@ -11,7 +11,7 @@ const SOURCES = [
   { name: 'Báo Xây dựng', url: 'https://baoxaydung.com.vn/rss/bat-dong-san.rss' },
 ];
 // Bỏ tin tiêu cực — chỉ giữ tin tích cực / trung lập
-const BAD = /(lừa đảo|vỡ nợ|phá sản|siết nợ|tranh chấp|khởi tố|bắt giam|lao dốc|bán tháo|nợ xấu|đóng băng|ế ẩm|sụt giảm|giảm mạnh|thổi giá|bong bóng|chiếm đoạt|cảnh báo|kiện|tù|án)/i;
+const BAD = /(lừa đảo|vỡ nợ|phá sản|siết nợ|tranh chấp|khởi tố|khởi kiện|kiện tụng|bắt giam|lao dốc|bán tháo|nợ xấu|đóng băng|ế ẩm|sụt giảm|giảm mạnh|thổi giá|bong bóng|chiếm đoạt|cảnh báo sốt|trục lợi)/i;
 
 const decode = (s: string): string => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'").trim();
 const strip = (s: string): string => s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -58,7 +58,7 @@ export async function refreshNews(force = false): Promise<number> {
 
 newsRouter.get('/', async (_req, res) => {
   try {
-    const rows = await query(`SELECT title, url, source, image, summary, published_at AS "publishedAt" FROM news ORDER BY published_at DESC LIMIT 12`);
+    const rows = await query(`SELECT id, title, url, source, image, summary, published_at AS "publishedAt" FROM news ORDER BY published_at DESC LIMIT 12`);
     res.set('Cache-Control', 'public, max-age=600, stale-while-revalidate=1800');
     res.json({ news: rows });
   } catch { res.json({ news: [] }); }
@@ -67,4 +67,13 @@ newsRouter.get('/', async (_req, res) => {
 newsRouter.post('/refresh', adminRequired, async (_req, res) => {
   try { const n = await refreshNews(true); res.json({ ok: true, count: n }); }
   catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
+});
+
+newsRouter.get('/:id', async (req, res) => {
+  try {
+    const [row] = await query(`SELECT id, title, url, source, image, summary, published_at AS "publishedAt" FROM news WHERE id=$1`, [Number(req.params.id)]);
+    if (!row) return res.status(404).json({ error: 'Không tìm thấy bài viết' });
+    res.set('Cache-Control', 'public, max-age=600');
+    res.json(row);
+  } catch { res.status(404).json({ error: 'Không tìm thấy bài viết' }); }
 });

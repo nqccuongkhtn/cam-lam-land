@@ -70,7 +70,7 @@ export default function Home() {
   useEffect(() => { api<{ listings: Listing[] }>('/listings?limit=20').then((d) => setListings(d.listings || [])).catch(() => {}); }, []);
   useEffect(() => {
     api<{ news: any[] }>('/news')
-      .then((d) => setMarketNews((d.news || []).map((n) => ({ title: n.title, url: n.url, img: n.image || U('1486406146926-c627a92ad1ab'), date: n.publishedAt ? new Date(n.publishedAt).toLocaleDateString('vi-VN') : undefined, source: n.source }))))
+      .then((d) => setMarketNews((d.news || []).map((n) => ({ title: n.title, url: '/tin-tuc/' + n.id, img: n.image || U('1486406146926-c627a92ad1ab'), date: n.publishedAt ? new Date(n.publishedAt).toLocaleDateString('vi-VN') : undefined, source: n.source }))))
       .catch(() => {});
   }, []);
 

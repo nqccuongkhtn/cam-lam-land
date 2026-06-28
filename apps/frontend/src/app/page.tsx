@@ -47,14 +47,6 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
     { title: 'Phê duyệt quy hoạch phân khu đô thị phía Bắc Cam Lâm', url: 'https://congbaokhanhhoa.gov.vn/noi-dung/id/3479/Phe-duyet-quy-hoach-phan-khu-do-thi-phia-Bac-Cam-Lam' },
     { title: 'Khánh Hòa hướng tới trở thành thành phố trực thuộc Trung ương', url: 'https://baochinhphu.vn/cam-lam-tro-thanh-cuc-tang-truong-vung-nam-trung-bo-102240228164301983.htm' },
   ],
-  'Quy hoạch Cam Lâm': [
-    { title: 'Tra cứu bản đồ quy hoạch & thửa đất Cam Lâm trực tuyến', url: '/map', img: '/quyhoach-camlam.jpg', date: 'Công cụ' },
-    { title: 'Xem thửa đất đang dính quy hoạch gì, bao nhiêu m²', url: '/map' },
-    { title: 'Tra cứu theo số tờ / số thửa / xã ngay trên bản đồ', url: '/map' },
-    { title: 'Nền ảnh vệ tinh độ nét cao toàn huyện Cam Lâm', url: '/map' },
-    { title: 'Tra cứu nhanh thửa đất bằng mã QR', url: '/qr' },
-    { title: 'Chuyển đổi toạ độ VN-2000 ↔ WGS84 trực tiếp', url: '/map' },
-  ],
   'Thị trường BĐS': [
     { title: 'Bất động sản Cam Lâm — cập nhật tin bán mới nhất', url: '/listings', img: U('1564013799919-ab600027ffc6'), date: 'Hôm nay' },
     { title: 'Nhà đất trung tâm Cam Đức', url: '/listings?q=Cam Đức' },
@@ -153,8 +145,9 @@ export default function Home() {
           <div className="space-y-4">
             <Link href="/map" className="block rounded-xl bg-gradient-to-br from-[#a3121b] to-[#6d0d14] text-white p-5 hover:brightness-110 transition">
               <p className="text-[11px] tracking-wide text-white/70 font-semibold">CAM LÂM LAND</p>
-              <p className="font-extrabold text-lg mt-1 leading-tight">Toàn cảnh thị trường & quy hoạch Cam Lâm</p>
-              <span className="inline-block mt-3 bg-white text-[#a3121b] text-xs font-bold px-3 py-1.5 rounded">Xem bản đồ →</span>
+              <p className="font-extrabold text-lg mt-1 leading-tight">Sàn BĐS & Bản đồ quy hoạch GIS Cam Lâm</p>
+              <p className="text-xs text-white/80 mt-1.5 leading-snug">Tra cứu quy hoạch, mua bán nhà đất, nền vệ tinh — tất cả tại một nơi.</p>
+              <span className="inline-block mt-3 bg-white text-[#a3121b] text-xs font-bold px-3 py-1.5 rounded">Khám phá ngay →</span>
             </Link>
             <Link href="/sales/post" className="block rounded-xl bg-gradient-to-br from-[#0A2540] to-[#0d2f54] text-white p-5 hover:brightness-110 transition">
               <p className="text-[11px] tracking-wide text-[#C8A14B] font-semibold">MIỄN PHÍ</p>

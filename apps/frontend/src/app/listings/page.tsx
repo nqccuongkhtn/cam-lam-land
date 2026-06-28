@@ -13,6 +13,8 @@ const MapView = dynamic(() => import('@/components/MapView'), { ssr: false, load
 const TYPES: (PropertyType | '')[] = ['', 'land', 'house', 'apartment', 'villa', 'commercial', 'farm'];
 const PRICE_RANGES: [string, string, string][] = [['Tất cả mức giá', '', ''], ['Dưới 1 tỷ', '', '1'], ['1 - 3 tỷ', '1', '3'], ['3 - 5 tỷ', '3', '5'], ['5 - 10 tỷ', '5', '10'], ['10 - 20 tỷ', '10', '20'], ['Trên 20 tỷ', '20', '']];
 const AREA_RANGES: [string, number, number][] = [['Tất cả diện tích', 0, 0], ['Dưới 50 m²', 0, 50], ['50 - 80 m²', 50, 80], ['80 - 100 m²', 80, 100], ['100 - 150 m²', 100, 150], ['150 - 300 m²', 150, 300], ['Trên 300 m²', 300, 0]];
+const BASE_THUMBS: [BaseMap, string, string][] = [['street', 'Mặc định', 'm'], ['satellite', 'Vệ tinh', 's'], ['terrain', 'Địa hình', 'p']];
+const lyrOf = (b: BaseMap) => (b === 'satellite' ? 's' : b === 'terrain' ? 'p' : 'm');
 
 const QH = {
   id: 'qh-qd205', url: '/overlays/QD205.png',
@@ -29,6 +31,7 @@ export default function ListingsPage() {
   const [verified, setVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mapView, setMapView] = useState(false);
+  const [layerOpen, setLayerOpen] = useState(false);
   const [baseMap, setBaseMap] = useState<BaseMap>('satellite');
   const [qhOn, setQhOn] = useState(true);
   const [opacity, setOpacity] = useState(0.7);
@@ -115,7 +118,7 @@ export default function ListingsPage() {
         </div>
       )}
       {info && (
-        <div className="absolute bottom-3 left-3 right-3 sm:right-auto sm:w-80 z-10 bg-white rounded-2xl border border-slate-200 shadow-xl p-3.5 text-xs">
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-[340px] max-w-[92%] z-10 bg-white rounded-2xl border border-slate-200 shadow-xl p-3.5 text-xs">
           <div className="flex items-center justify-between mb-2">
             <b className="text-[#0A2540] text-sm">📍 Kiểm tra quy hoạch</b>
             <button onClick={() => setInfo(null)} className="text-slate-400 hover:text-slate-700 text-base leading-none">✕</button>
@@ -132,19 +135,34 @@ export default function ListingsPage() {
           <a href="/map" className="mt-2.5 inline-block text-[#0A2540] font-semibold hover:text-red-600">Mở công cụ bản đồ đầy đủ →</a>
         </div>
       )}
-      <div className="absolute bottom-3 right-3 z-10 bg-white rounded-xl border border-slate-200 shadow-lg p-2">
-        <p className="text-[10px] font-bold text-slate-500 mb-1 px-0.5">Loại bản đồ</p>
-        <div className="flex gap-1.5">
-          {([['street', 'Mặc định', 'm'], ['satellite', 'Vệ tinh', 's'], ['terrain', 'Địa hình', 'p']] as [BaseMap, string, string][]).map(([b, label, lyr]) => (
-            <button key={b} onClick={() => setBaseMap(b)} className="text-center w-14">
-              <span className={`block w-14 h-12 rounded-lg overflow-hidden border-2 ${baseMap === b ? 'border-red-600' : 'border-slate-200'}`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={`https://mt1.google.com/vt/lyrs=${lyr}&x=3289&y=1909&z=12`} alt={label} loading="lazy" className="w-full h-full object-cover" />
-              </span>
-              <span className={`block text-[10px] mt-0.5 font-semibold ${baseMap === b ? 'text-red-600' : 'text-slate-600'}`}>{label}</span>
-            </button>
-          ))}
-        </div>
+      <div className="absolute bottom-3 left-3 z-10">
+        {layerOpen ? (
+          <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-2">
+            <div className="flex items-center justify-between mb-1 px-0.5">
+              <span className="text-[10px] font-bold text-slate-500">Loại bản đồ</span>
+              <button onClick={() => setLayerOpen(false)} className="text-slate-400 hover:text-slate-700 text-xs leading-none">✕</button>
+            </div>
+            <div className="flex gap-1.5">
+              {BASE_THUMBS.map(([b, label, lyr]) => (
+                <button key={b} onClick={() => { setBaseMap(b); setLayerOpen(false); }} className="text-center w-14">
+                  <span className={`block w-14 h-12 rounded-lg overflow-hidden border-2 ${baseMap === b ? 'border-red-600' : 'border-slate-200'}`}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={`https://mt1.google.com/vt/lyrs=${lyr}&x=3289&y=1909&z=12`} alt={label} loading="lazy" className="w-full h-full object-cover" />
+                  </span>
+                  <span className={`block text-[10px] mt-0.5 font-semibold ${baseMap === b ? 'text-red-600' : 'text-slate-600'}`}>{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <button onClick={() => setLayerOpen(true)} title="Đổi lớp bản đồ" className="flex items-center gap-1.5 bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 pr-3 hover:bg-slate-50">
+            <span className="block w-9 h-9 rounded-lg overflow-hidden border border-slate-200">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`https://mt1.google.com/vt/lyrs=${lyrOf(baseMap)}&x=3289&y=1909&z=12`} alt="" className="w-full h-full object-cover" />
+            </span>
+            <span className="text-xs font-bold text-slate-600">Lớp bản đồ</span>
+          </button>
+        )}
       </div>
     </div>
   );
@@ -253,9 +271,9 @@ export default function ListingsPage() {
       </div>
 
       {mapView ? (
-        <div className="lg:flex h-[calc(100vh-170px)]">
-          <div className="h-full overflow-y-auto scroll-soft px-3 sm:px-4 py-4 w-full lg:w-[55%]">{listHeader}{listItems}</div>
-          <div className="hidden lg:block h-full w-[45%] border-l border-slate-200 relative">{mapPanel}</div>
+        <div className="lg:flex h-[calc(100vh-150px)]">
+          <div className="h-full overflow-y-auto scroll-soft px-3 sm:px-4 py-4 w-full lg:w-[40%] lg:max-w-[560px]">{listHeader}{listItems}</div>
+          <div className="hidden lg:block h-full flex-1 border-l border-slate-200 relative">{mapPanel}</div>
         </div>
       ) : (
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-5 lg:flex lg:gap-6 lg:items-start">

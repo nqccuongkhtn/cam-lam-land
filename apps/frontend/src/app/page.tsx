@@ -38,6 +38,32 @@ const STATS = [
   { n: '8', l: 'Xã / Khu vực', d: 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z' },
 ];
 
+const NEWS: Record<string, { title: string; url: string; img?: string; date?: string }[]> = {
+  'Tin nổi bật': [
+    { title: 'Thủ tướng phê duyệt Quy hoạch chung đô thị mới Cam Lâm đến năm 2045', url: 'https://thanhnien.vn/thu-tuong-phe-duyet-quy-hoach-chung-do-thi-moi-cam-lam-den-2045-185240228205628777.htm', img: U('1486406146926-c627a92ad1ab'), date: '28/02/2024' },
+    { title: 'Cam Lâm trở thành cực tăng trưởng phía Nam Khánh Hòa và vùng Nam Trung Bộ', url: 'https://baochinhphu.vn/cam-lam-tro-thanh-cuc-tang-truong-vung-nam-trung-bo-102240228164301983.htm' },
+    { title: 'Công bố 3 đồ án quy hoạch phân khu của Đô thị mới Cam Lâm', url: 'https://baokhanhhoa.vn/xa-hoi/202408/cong-bo-3-do-an-quy-hoach-phan-khu-cua-do-thi-moi-cam-lam-b956a11/' },
+    { title: 'Đô thị sân bay Cam Lâm — tầm nhìn đô thị quốc tế đến năm 2045', url: 'https://quyhoach.xaydung.gov.vn/vn/quy-hoach/18260/quy-hoach-chung-do-thi-moi-cam-lam--tinh-khanh-hoa-den-nam-2045.aspx' },
+    { title: 'Phê duyệt quy hoạch phân khu đô thị phía Bắc Cam Lâm', url: 'https://congbaokhanhhoa.gov.vn/noi-dung/id/3479/Phe-duyet-quy-hoach-phan-khu-do-thi-phia-Bac-Cam-Lam' },
+    { title: 'Khánh Hòa hướng tới trở thành thành phố trực thuộc Trung ương', url: 'https://baochinhphu.vn/cam-lam-tro-thanh-cuc-tang-truong-vung-nam-trung-bo-102240228164301983.htm' },
+  ],
+  'Quy hoạch Cam Lâm': [
+    { title: 'Tra cứu bản đồ quy hoạch & thửa đất Cam Lâm trực tuyến', url: '/map', img: '/quyhoach-camlam.jpg', date: 'Công cụ' },
+    { title: 'Xem thửa đất đang dính quy hoạch gì, bao nhiêu m²', url: '/map' },
+    { title: 'Tra cứu theo số tờ / số thửa / xã ngay trên bản đồ', url: '/map' },
+    { title: 'Nền ảnh vệ tinh độ nét cao toàn huyện Cam Lâm', url: '/map' },
+    { title: 'Tra cứu nhanh thửa đất bằng mã QR', url: '/qr' },
+    { title: 'Chuyển đổi toạ độ VN-2000 ↔ WGS84 trực tiếp', url: '/map' },
+  ],
+  'Thị trường BĐS': [
+    { title: 'Bất động sản Cam Lâm — cập nhật tin bán mới nhất', url: '/listings', img: U('1564013799919-ab600027ffc6'), date: 'Hôm nay' },
+    { title: 'Nhà đất trung tâm Cam Đức', url: '/listings?q=Cam Đức' },
+    { title: 'Đất nền ven biển Bãi Dài, Cam Hải Đông', url: '/listings?q=Cam Hải Đông' },
+    { title: 'Ký gửi nhà đất — định giá & bán giúp miễn phí', url: '/listings' },
+    { title: 'Đăng tin bán nhà đất miễn phí tại Cam Lâm', url: '/sales/post' },
+  ],
+};
+
 function Ic({ d }: { d: string }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#0A2540]/60 shrink-0"><path d={d} /></svg>;
 }
@@ -45,7 +71,7 @@ function Ic({ d }: { d: string }) {
 export default function Home() {
   const router = useRouter();
   const [listings, setListings] = useState<Listing[]>([]);
-  const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false);
+  const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Tin nổi bật');
   useEffect(() => { api<{ listings: Listing[] }>('/listings?limit=20').then((d) => setListings(d.listings || [])).catch(() => {}); }, []);
 
   function search() {
@@ -96,6 +122,45 @@ export default function Home() {
                 {c.icon} {PROPERTY_LABELS[c.t]}
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TIN TỨC & QUY HOẠCH — kiểu batdongsan */}
+      <section className="mx-auto max-w-7xl px-4 pt-14">
+        <div className="flex items-center gap-5 border-b border-slate-200 mb-5 overflow-x-auto">
+          {Object.keys(NEWS).map((t) => (
+            <button key={t} onClick={() => setNewsTab(t)} className={`pb-2.5 text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${newsTab === t ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500 hover:text-[#0A2540]'}`}>{t}</button>
+          ))}
+          <a href="/listings" className="ml-auto text-red-600 text-sm font-semibold whitespace-nowrap shrink-0">Xem thêm →</a>
+        </div>
+        <div className="grid lg:grid-cols-[1.05fr_1fr_0.62fr] gap-6">
+          {(() => { const feat = NEWS[newsTab][0]; return (
+            <a href={feat.url} target={feat.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="group block">
+              <div className="aspect-[16/10] rounded-xl overflow-hidden bg-slate-100">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={feat.img} alt={feat.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+              </div>
+              <h3 className="font-extrabold text-[#0A2540] mt-3 text-lg leading-snug line-clamp-2 group-hover:text-red-600">{feat.title}</h3>
+              {feat.date && <p className="text-xs text-slate-400 mt-2">🕒 {feat.date}</p>}
+            </a>
+          ); })()}
+          <div className="divide-y divide-slate-100">
+            {NEWS[newsTab].slice(1).map((h) => (
+              <a key={h.title} href={h.url} target={h.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="block py-2.5 text-[15px] text-slate-700 hover:text-red-600 leading-snug line-clamp-2">{h.title}</a>
+            ))}
+          </div>
+          <div className="space-y-4">
+            <Link href="/map" className="block rounded-xl bg-gradient-to-br from-[#a3121b] to-[#6d0d14] text-white p-5 hover:brightness-110 transition">
+              <p className="text-[11px] tracking-wide text-white/70 font-semibold">CAM LÂM LAND</p>
+              <p className="font-extrabold text-lg mt-1 leading-tight">Toàn cảnh thị trường & quy hoạch Cam Lâm</p>
+              <span className="inline-block mt-3 bg-white text-[#a3121b] text-xs font-bold px-3 py-1.5 rounded">Xem bản đồ →</span>
+            </Link>
+            <Link href="/sales/post" className="block rounded-xl bg-gradient-to-br from-[#0A2540] to-[#0d2f54] text-white p-5 hover:brightness-110 transition">
+              <p className="text-[11px] tracking-wide text-[#C8A14B] font-semibold">MIỄN PHÍ</p>
+              <p className="font-extrabold text-lg mt-1 leading-tight">Đăng tin — tiếp cận khách mua ngay</p>
+              <span className="inline-block mt-3 bg-[#C8A14B] text-[#0A2540] text-xs font-bold px-3 py-1.5 rounded">Đăng tin ngay →</span>
+            </Link>
           </div>
         </div>
       </section>

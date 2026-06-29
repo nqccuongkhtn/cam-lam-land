@@ -106,7 +106,7 @@ function Lead({ n }: { n: N }) {
   return (
     <Link href={`/tin-tuc/${n.slug}`} className="group block">
       <div className="aspect-[16/9] rounded-lg overflow-hidden bg-slate-100"><Thumb src={n.image} alt={n.title} /></div>
-      <h2 className="text-xl md:text-2xl font-bold text-[#0A2540] mt-3 leading-snug group-hover:text-red-600">{n.title}</h2>
+      <h2 className="text-2xl md:text-[28px] font-bold text-[#0A2540] mt-3 leading-snug group-hover:text-red-600">{n.title}</h2>
       {n.summary && <p className="text-slate-500 text-[15px] mt-2 line-clamp-3">{n.summary}</p>}
       <p className="text-xs text-slate-400 mt-2">{meta(n)}</p>
     </Link>
@@ -114,7 +114,7 @@ function Lead({ n }: { n: N }) {
 }
 function Small({ n }: { n: N }) {
   return (
-    <Link href={`/tin-tuc/${n.slug}`} className="group flex gap-3 items-start py-3">
+    <Link href={`/tin-tuc/${n.slug}`} className="group flex gap-3 items-start py-3.5">
       <div className="w-24 h-16 rounded overflow-hidden bg-slate-100 shrink-0"><Thumb src={n.image} alt={n.title} /></div>
       <h3 className="text-sm font-semibold text-[#0A2540] leading-snug line-clamp-3 group-hover:text-red-600">{n.title}</h3>
     </Link>
@@ -122,11 +122,11 @@ function Small({ n }: { n: N }) {
 }
 function Row({ n }: { n: N }) {
   return (
-    <Link href={`/tin-tuc/${n.slug}`} className="group flex gap-4 items-start py-4">
-      <div className="w-32 sm:w-48 aspect-[16/10] rounded-lg overflow-hidden bg-slate-100 shrink-0"><Thumb src={n.image} alt={n.title} /></div>
+    <Link href={`/tin-tuc/${n.slug}`} className="group flex gap-5 items-start py-5">
+      <div className="w-36 sm:w-56 aspect-[16/10] rounded-lg overflow-hidden bg-slate-100 shrink-0"><Thumb src={n.image} alt={n.title} /></div>
       <div className="min-w-0">
-        <h3 className="font-bold text-[#0A2540] leading-snug line-clamp-2 group-hover:text-red-600 text-[15px] md:text-base">{n.title}</h3>
-        {n.summary && <p className="text-sm text-slate-500 mt-1.5 line-clamp-2 hidden sm:block">{n.summary}</p>}
+        <h3 className="font-bold text-[#0A2540] leading-snug line-clamp-2 group-hover:text-red-600 text-base md:text-lg">{n.title}</h3>
+        {n.summary && <p className="text-[15px] text-slate-500 mt-2 line-clamp-2 hidden sm:block">{n.summary}</p>}
         <p className="text-xs text-slate-400 mt-2">{meta(n)}</p>
       </div>
     </Link>
@@ -150,10 +150,10 @@ export default function NewsIndex() {
 
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
-      <div className="max-w-[1440px] mx-auto px-4 py-6">
+      <div className="max-w-[1680px] mx-auto px-4 py-6">
         {showAd && <div className="hidden lg:block"><BillboardAd ad={ad} /></div>}
 
-        <div className="xl:flex xl:gap-6">
+        <div className="xl:flex xl:gap-8">
           {showAd && <aside className="hidden xl:block w-60 shrink-0"><div className="sticky top-20 h-[calc(100vh-100px)]"><WingAd ad={ad} /></div></aside>}
 
           <div className="flex-1 min-w-0 pt-5 xl:pt-6">

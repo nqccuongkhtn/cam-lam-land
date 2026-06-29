@@ -5,6 +5,7 @@ import Providers from './providers';
 import PwaRegister from './pwa-register';
 import ChatWidget from '@/components/ChatWidget';
 import AiAssistant from '@/components/AiAssistant';
+import ScrollToTop from '@/components/ScrollToTop';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://camlamland.onrender.com';
 const JSONLD = {
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSONLD) }} />
         <Providers>
           <PwaRegister />
+          <ScrollToTop />
           <Nav />
           <main className="min-h-[calc(100vh-56px)]">{children}</main>
           <ChatWidget />

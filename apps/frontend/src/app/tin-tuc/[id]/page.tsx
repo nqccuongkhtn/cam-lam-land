@@ -42,7 +42,7 @@ export default function NewsReader() {
 
         {a.image && <img src={a.image} alt={a.title} className="w-full rounded-2xl mt-5 bg-slate-100 object-cover max-h-[460px]" />}
 
-        {(a.body || a.summary) && <p className="text-slate-700 leading-relaxed mt-5 text-[17px] whitespace-pre-line">{a.body || a.summary}</p>}
+        {(a.body || a.summary) && <div className="mt-5 text-slate-700 leading-relaxed text-[17px] space-y-4">{String(a.body || a.summary).split(/\n{2,}/).map((para, i) => <p key={i}>{para}</p>)}</div>}
 
         <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5">
           <p className="text-sm text-slate-600">Bài do Cam Lâm Land biên tập, dựa trên thông tin từ <b>{a.source || 'báo chí'}</b>. Xem bản gốc đầy đủ tại nguồn:</p>

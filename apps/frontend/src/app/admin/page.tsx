@@ -52,8 +52,13 @@ export default function Admin() {
 function Config() {
   const [flags, setFlags] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState('');
+  const [ad, setAd] = useState<any>({ enabled: true, image: '', link: '/sales/post', title: 'Đăng tin nhà đất MIỄN PHÍ', sub: 'Tiếp cận khách mua tại Cam Lâm.', cta: 'Đăng ngay' });
+  const [adMsg, setAdMsg] = useState('');
   const load = useCallback(() => { api<{ flags: Record<string, boolean> }>('/flags').then((r) => setFlags(r.flags || {})).catch(() => {}); }, []);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => { api<{ value: any }>('/config/tintuc_ad').then((r) => { if (r.value && typeof r.value === 'object') setAd((a: any) => ({ ...a, ...r.value })); }).catch(() => {}); }, []);
+  const setAdField = (k: string, v: string) => setAd((a: any) => ({ ...a, [k]: v }));
+  async function saveAd() { setAdMsg('Đang lưu…'); try { await api('/config/tintuc_ad', { method: 'POST', body: JSON.stringify({ value: ad }) }); setAdMsg('✓ Đã lưu — quảng cáo đã cập nhật.'); } catch (e: any) { const m = String(e?.message || ''); setAdMsg(/404|not ?found|không tìm/i.test(m) ? '✗ Cần rebuild lại camlam-api.' : '✗ ' + m); } }
   async function toggle(key: string, on: boolean) {
     setBusy(key);
     try { await api('/flags', { method: 'POST', body: JSON.stringify({ key, on }) }); setFlags((f) => ({ ...f, [key]: on })); refreshFlags(); }
@@ -80,6 +85,22 @@ function Config() {
       <div className="bg-white rounded-2xl border border-slate-200 p-4">
         <p className="font-bold text-[#0A2540]">📰 Tin tức thị trường (trang chủ)</p>
         <p className="text-sm text-slate-500 mt-0.5">Tự lấy bài BĐS từ nguồn uy tín (VnExpress, CafeF, Báo Xây dựng) và hiển thị ở tab “Thị trường BĐS” — chạy sẵn trong web, không cần thao tác.</p>
+      </div>
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-2.5">
+        <div className="flex items-center justify-between">
+          <p className="font-bold text-[#0A2540]">📢 Quảng cáo trang Tin tức (2 bên)</p>
+          <button onClick={() => setAd((a: any) => ({ ...a, enabled: a.enabled === false }))} aria-label="Bật/tắt" className={`w-12 h-7 rounded-full relative transition ${ad.enabled !== false ? 'bg-emerald-500' : 'bg-slate-300'}`}><span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-all ${ad.enabled !== false ? 'left-6' : 'left-1'}`} /></button>
+        </div>
+        <p className="text-xs text-slate-500">Banner hiện 2 bên trang <b>/tin-tuc</b> (màn hình rộng). Có ảnh thì hiện ảnh; để trống ảnh thì hiện banner chữ. Công tắc để bật/tắt.</p>
+        <input value={ad.image || ''} onChange={(e) => setAdField('image', e.target.value)} placeholder="URL ảnh banner (để trống = banner chữ)" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        <input value={ad.link || ''} onChange={(e) => setAdField('link', e.target.value)} placeholder="Link khi bấm (vd: /sales/post hoặc https://...)" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        <input value={ad.title || ''} onChange={(e) => setAdField('title', e.target.value)} placeholder="Tiêu đề (khi không có ảnh)" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        <input value={ad.sub || ''} onChange={(e) => setAdField('sub', e.target.value)} placeholder="Mô tả ngắn" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        <input value={ad.cta || ''} onChange={(e) => setAdField('cta', e.target.value)} placeholder="Chữ nút (vd: Đăng ngay)" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        <div className="flex items-center gap-3 pt-1">
+          <button onClick={saveAd} className="bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-4 py-2 rounded-xl text-sm">Lưu quảng cáo</button>
+          {adMsg && <span className="text-xs font-medium text-slate-600">{adMsg}</span>}
+        </div>
       </div>
       <p className="text-xs text-slate-400">{flags.services_live ? '🟢 Dịch vụ đang công khai với khách.' : '🔒 Dịch vụ đang ẩn — chỉ admin xem được.'}</p>
     </div>

@@ -3,30 +3,37 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 interface N { title: string; url: string; source?: string; image?: string; summary?: string; publishedAt?: string; slug: string }
-interface Ad { enabled?: boolean; image?: string; link?: string; title?: string; sub?: string; cta?: string }
+interface Ad { enabled?: boolean; image?: string; images?: string[]; link?: string; title?: string; sub?: string; cta?: string }
 
-const SAMPLE_AD: Ad = { enabled: true, image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&h=1200&q=70', link: '/sales/post', title: 'ĐĂNG TIN NHÀ ĐẤT MIỄN PHÍ', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' };
+const SAMPLE_AD: Ad = { enabled: true, images: ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&h=1400&q=70', 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=600&h=1400&q=70', 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=600&h=1400&q=70'], link: '/sales/post', title: 'ĐĂNG TIN NHÀ ĐẤT MIỄN PHÍ', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' };
 
 function AdBanner({ ad }: { ad: Ad }) {
+  const imgs = ((ad.images && ad.images.length ? ad.images : ad.image ? [ad.image] : []) as string[]).filter(Boolean);
+  const [idx, setIdx] = useState(0);
+  useEffect(() => { if (imgs.length < 2) return; const t = setInterval(() => setIdx((i) => (i + 1) % imgs.length), 4500); return () => clearInterval(t); }, [imgs.length]);
   const ext = (ad.link || '').startsWith('http');
   const tgt = ext ? '_blank' : undefined;
-  if (ad.image) return (
-    <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group block relative rounded-2xl overflow-hidden border border-slate-200 shadow-md hover:shadow-xl transition aspect-[300/600] bg-slate-100">
-      <img src={ad.image} alt={ad.title || 'Quảng cáo'} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-      <span className="absolute top-2 right-2 bg-white/85 text-slate-600 text-[9px] font-bold px-1.5 py-0.5 rounded">QC</span>
-      <div className="absolute inset-x-0 bottom-0 p-3 pt-12 bg-gradient-to-t from-black/85 via-black/40 to-transparent text-white text-center">
-        <p className="font-extrabold text-base leading-tight drop-shadow">{ad.title}</p>
-        {ad.sub && <p className="text-xs text-white/90 mt-1 drop-shadow">{ad.sub}</p>}
-        <span className="mt-2.5 block bg-[#C8A14B] group-hover:bg-[#d4af5a] text-[#0A2540] text-sm font-extrabold px-3 py-2 rounded-lg transition">{ad.cta || 'Xem ngay'} →</span>
-      </div>
+  if (!imgs.length) return (
+    <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group flex flex-col justify-center text-center h-full w-full rounded-2xl border border-slate-200 shadow-lg bg-gradient-to-br from-[#0A2540] to-[#10355f] text-white p-5">
+      <p className="text-[10px] tracking-wider text-white/50 font-semibold">QUẢNG CÁO</p>
+      <p className="font-extrabold text-xl mt-3 leading-tight">{ad.title}</p>
+      {ad.sub && <p className="text-sm text-white/80 mt-2">{ad.sub}</p>}
+      <span className="cl-pulse mt-5 inline-block bg-[#C8A14B] text-[#0A2540] text-sm font-extrabold px-4 py-2.5 rounded-lg">{ad.cta || 'Xem ngay'} →</span>
     </a>
   );
   return (
-    <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group block rounded-2xl overflow-hidden border border-slate-200 shadow-md hover:shadow-xl transition aspect-[300/600] bg-gradient-to-br from-[#0A2540] to-[#10355f] text-white p-4 flex flex-col justify-center text-center">
-      <p className="text-[10px] tracking-wider text-white/50 font-semibold">QUẢNG CÁO</p>
-      <p className="font-extrabold text-lg mt-2 leading-tight">{ad.title}</p>
-      {ad.sub && <p className="text-xs text-white/80 mt-2 leading-snug">{ad.sub}</p>}
-      <span className="mt-4 inline-block bg-[#C8A14B] text-[#0A2540] text-sm font-extrabold px-4 py-2 rounded-lg">{ad.cta || 'Xem ngay'} →</span>
+    <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group block relative rounded-2xl overflow-hidden border border-slate-200 shadow-lg h-full w-full bg-[#0A2540]">
+      {imgs.map((src, i) => (
+        <div key={i} className={`absolute inset-0 transition-opacity duration-1000 ${i === idx ? 'opacity-100' : 'opacity-0'}`}>
+          <img src={src} alt="" className="w-full h-full object-cover cl-ken" />
+        </div>
+      ))}
+      <span className="absolute top-2 right-2 z-10 bg-white/85 text-slate-600 text-[9px] font-bold px-1.5 py-0.5 rounded">QC</span>
+      <div className="absolute inset-x-0 bottom-0 z-10 p-4 pt-16 bg-gradient-to-t from-black/90 via-black/45 to-transparent text-white text-center">
+        <p className="font-extrabold text-lg leading-tight drop-shadow">{ad.title}</p>
+        {ad.sub && <p className="text-sm text-white/90 mt-1.5 drop-shadow">{ad.sub}</p>}
+        <span className="cl-pulse mt-3 block bg-[#C8A14B] text-[#0A2540] text-sm font-extrabold px-3 py-2.5 rounded-lg">{ad.cta || 'Xem ngay'} →</span>
+      </div>
     </a>
   );
 }
@@ -86,7 +93,7 @@ export default function NewsIndex() {
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
       <div className="max-w-[1440px] mx-auto px-4 py-6 xl:flex xl:gap-6">
-        {showAd && <aside className="hidden xl:block w-56 shrink-0"><div className="sticky top-20"><AdBanner ad={ad} /></div></aside>}
+        {showAd && <aside className="hidden xl:block w-60 shrink-0"><div className="sticky top-20 h-[calc(100vh-100px)]"><AdBanner ad={ad} /></div></aside>}
 
         <div className="flex-1 min-w-0">
           <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <span className="text-slate-600">Tin tức</span></div>
@@ -110,7 +117,7 @@ export default function NewsIndex() {
           )}
         </div>
 
-        {showAd && <aside className="hidden xl:block w-56 shrink-0"><div className="sticky top-20"><AdBanner ad={ad} /></div></aside>}
+        {showAd && <aside className="hidden xl:block w-60 shrink-0"><div className="sticky top-20 h-[calc(100vh-100px)]"><AdBanner ad={ad} /></div></aside>}
       </div>
     </div>
   );

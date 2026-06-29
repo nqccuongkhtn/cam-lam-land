@@ -51,7 +51,7 @@ export default function Admin() {
 }
 
 function AdsManager() {
-  const [ad, setAd] = useState<any>({ enabled: true, image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&h=1200&q=70', link: '/sales/post', title: 'ĐĂNG TIN NHÀ ĐẤT MIỄN PHÍ', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' });
+  const [ad, setAd] = useState<any>({ enabled: true, images: ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&h=1400&q=70'], link: '/sales/post', title: 'ĐĂNG TIN NHÀ ĐẤT MIỄN PHÍ', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' });
   const [adMsg, setAdMsg] = useState('');
   const [mapCount, setMapCount] = useState<number | null>(null);
   useEffect(() => { api<{ value: any }>('/config/tintuc_ad').then((r) => { if (r.value && typeof r.value === 'object') setAd((a: any) => ({ ...a, ...r.value })); }).catch(() => {}); }, []);
@@ -60,6 +60,7 @@ function AdsManager() {
   async function save() { setAdMsg('Đang lưu…'); try { await api('/config/tintuc_ad', { method: 'POST', body: JSON.stringify({ value: ad }) }); setAdMsg('✓ Đã lưu.'); } catch (e: any) { const m = String(e?.message || ''); setAdMsg(/404|not ?found|không tìm/i.test(m) ? '✗ Cần rebuild lại camlam-api.' : '✗ ' + m); } }
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm';
   const on = ad.enabled !== false;
+  const firstImg = (ad.images && ad.images[0]) || ad.image || '';
   return (
     <div className="space-y-4 max-w-3xl">
       <p className="text-sm text-slate-500">Quản lý <b>toàn bộ quảng cáo</b> của web tại đây.</p>
@@ -77,10 +78,10 @@ function AdsManager() {
           <p className="font-bold text-[#0A2540]">📢 Banner trang Tin tức (2 bên)</p>
           <button onClick={() => setAd((a: any) => ({ ...a, enabled: a.enabled === false }))} aria-label="Bật/tắt" className={`w-12 h-7 rounded-full relative transition ${on ? 'bg-emerald-500' : 'bg-slate-300'}`}><span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-all ${on ? 'left-6' : 'left-1'}`} /></button>
         </div>
-        <p className="text-xs text-slate-500 mt-1">Chuẩn display ad 300×600. Có ảnh → ảnh phủ + chữ; trống ảnh → banner chữ. Nên dùng ảnh đứng (vd 600×1200).</p>
+        <p className="text-xs text-slate-500 mt-1">Banner dọc cao như batdongsan. Nhập nhiều ảnh (mỗi dòng 1 URL) để chạy động (slideshow + zoom). Ảnh đứng, vd 600×1400.</p>
         <div className="grid sm:grid-cols-[1fr_170px] gap-4 mt-3 items-start">
           <div className="space-y-2.5">
-            <input value={ad.image || ''} onChange={(e) => setF('image', e.target.value)} placeholder="URL ảnh (đứng, vd 600×1200)" className={inp} />
+            <textarea value={(ad.images && ad.images.length ? ad.images : ad.image ? [ad.image] : []).join('\n')} onChange={(e) => setAd((a: any) => ({ ...a, images: e.target.value.split('\n').map((x: string) => x.trim()).filter(Boolean) }))} rows={3} placeholder="URL ảnh — MỖI DÒNG 1 ẢNH (nhiều ảnh = chạy slideshow động)" className={inp} />
             <input value={ad.link || ''} onChange={(e) => setF('link', e.target.value)} placeholder="Link khi bấm (vd /sales/post)" className={inp} />
             <input value={ad.title || ''} onChange={(e) => setF('title', e.target.value)} placeholder="Tiêu đề" className={inp} />
             <input value={ad.sub || ''} onChange={(e) => setF('sub', e.target.value)} placeholder="Mô tả ngắn" className={inp} />
@@ -90,10 +91,10 @@ function AdsManager() {
           <div>
             <p className="text-[11px] text-slate-400 mb-1.5 text-center">Xem trước</p>
             <div className="relative rounded-xl overflow-hidden border border-slate-200 aspect-[300/600] bg-slate-100">
-              {ad.image ? (
+              {firstImg ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ad.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                  <img src={firstImg} alt="" className="absolute inset-0 w-full h-full object-cover" />
                   <div className="absolute inset-x-0 bottom-0 p-2 pt-8 bg-gradient-to-t from-black/85 to-transparent text-white text-center">
                     <p className="font-extrabold text-xs leading-tight">{ad.title}</p>
                     {ad.sub && <p className="text-[10px] text-white/90 mt-0.5">{ad.sub}</p>}

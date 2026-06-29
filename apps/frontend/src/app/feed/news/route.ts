@@ -20,6 +20,10 @@ const GEMINI_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const AI_KEY = process.env.ANTHROPIC_API_KEY;
 const AI_MODEL = process.env.AI_MODEL || 'claude-haiku-4-5-20251001';
+// Model 2.5/3 bật "thinking" mặc định -> ngốn hết token output -> trả rỗng. Tắt thinking cho các model này.
+const NO_THINK = /(^|[^0-9])(2\.5|3\.)/.test(GEMINI_MODEL) || GEMINI_MODEL.includes('flash-latest') || GEMINI_MODEL.includes('pro-latest');
+let lastErr: string | null = null; // lỗi AI gần nhất (cho chẩn đoán ?diag=1)
+
 const newsPrompt = (title: string, summary: string): string => `Bạn là biên tập viên bất động sản của Cam Lâm Land. Viết MỘT BÀI tổng hợp - phân tích 3-4 đoạn (khoảng 250-400 chữ) bằng tiếng Việt, văn phong báo chí riêng, mạch lạc, KHÔNG sao chép nguyên văn nguồn. Đoạn đầu nêu thông tin/sự kiện chính. Các đoạn sau phân tích ý nghĩa, bối cảnh thị trường bất động sản, và nếu phù hợp thì liên hệ khu vực Cam Lâm - Khánh Hòa. TUYỆT ĐỐI KHÔNG bịa thêm số liệu hay sự kiện cụ thể không có trong nguồn; phần phân tích chỉ mang tính nhận định chung. Cách các đoạn bằng MỘT DÒNG TRỐNG. Không thêm tiêu đề, không mở đầu kiểu "Tóm tắt:".\n\nTiêu đề: ${title}\nThông tin nguồn: ${summary}`;
 
 async function rewrite(title: string, summary: string): Promise<string | null> {
@@ -27,14 +31,25 @@ async function rewrite(title: string, summary: string): Promise<string | null> {
   // 1) Gemini (miễn phí)
   if (GEMINI_KEY) {
     try {
+      const genCfg: any = { maxOutputTokens: 2048, temperature: 0.7 };
+      if (NO_THINK) genCfg.thinkingConfig = { thinkingBudget: 0 };
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-goog-api-key': GEMINI_KEY },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: 1024, temperature: 0.7 } }),
-        signal: AbortSignal.timeout(18000),
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: genCfg }),
+        signal: AbortSignal.timeout(20000),
       });
-      if (res.ok) { const j: any = await res.json(); const txt = j?.candidates?.[0]?.content?.parts?.[0]?.text?.trim(); if (txt) return txt; }
-    } catch { /* lỗi -> thử Claude / bỏ qua */ }
+      if (res.ok) {
+        const j: any = await res.json();
+        const txt = j?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        if (txt) { lastErr = null; return txt; }
+        lastErr = 'Gemini trả rỗng (finishReason=' + (j?.candidates?.[0]?.finishReason || '?') + ')';
+      } else {
+        lastErr = 'Gemini HTTP ' + res.status + ': ' + (await res.text().catch(() => '')).slice(0, 200);
+      }
+    } catch (e: any) { lastErr = 'Gemini lỗi: ' + (e?.message || String(e)); }
+  } else {
+    lastErr = 'Chưa cấu hình GEMINI_API_KEY';
   }
   // 2) Claude (trả phí)
   if (AI_KEY) {
@@ -43,10 +58,11 @@ async function rewrite(title: string, summary: string): Promise<string | null> {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-api-key': AI_KEY, 'anthropic-version': '2023-06-01' },
         body: JSON.stringify({ model: AI_MODEL, max_tokens: 900, messages: [{ role: 'user', content: prompt }] }),
-        signal: AbortSignal.timeout(18000),
+        signal: AbortSignal.timeout(20000),
       });
-      if (res.ok) { const j: any = await res.json(); const txt = j?.content?.[0]?.text?.trim(); if (txt) return txt; }
-    } catch { /* bỏ qua */ }
+      if (res.ok) { const j: any = await res.json(); const txt = j?.content?.[0]?.text?.trim(); if (txt) { lastErr = null; return txt; } }
+      else { lastErr = 'Claude HTTP ' + res.status; }
+    } catch (e: any) { lastErr = 'Claude lỗi: ' + (e?.message || String(e)); }
   }
   return null;
 }
@@ -85,7 +101,23 @@ function slotStart(): number {
   return Date.UTC(vn.getUTCFullYear(), vn.getUTCMonth(), vn.getUTCDate() + dayOffset, h) - 7 * 3600 * 1000;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  // Chẩn đoán: /feed/news?diag=1 -> thử viết lại 1 mẫu, báo trạng thái key & lỗi (KHÔNG lộ key).
+  if (new URL(req.url).searchParams.get('diag') === '1') {
+    const sample = await rewrite('Kiểm tra hệ thống tin tức', 'Hạ tầng giao thông khu vực Cam Lâm, Khánh Hòa đang được đầu tư phát triển mạnh.');
+    return NextResponse.json({
+      hasGeminiKey: !!GEMINI_KEY,
+      geminiModel: GEMINI_MODEL,
+      disableThinking: NO_THINK,
+      hasClaudeKey: !!AI_KEY,
+      stored: store.length,
+      testRewriteOk: !!sample,
+      testRewriteLen: sample ? sample.length : 0,
+      testRewritePreview: sample ? sample.slice(0, 300) : null,
+      lastError: lastErr,
+    });
+  }
+
   const slot = slotStart();
   if (store.length && lastSlot === slot) return NextResponse.json({ news: store });
 

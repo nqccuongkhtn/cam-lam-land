@@ -5,85 +5,104 @@ import Link from 'next/link';
 interface N { title: string; url: string; source?: string; image?: string; summary?: string; publishedAt?: string; slug: string }
 interface Ad { enabled?: boolean; image?: string; images?: string[]; link?: string; title?: string; sub?: string; cta?: string }
 
-const SAMPLE_AD: Ad = { enabled: true, images: ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&h=1400&q=70', 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=600&h=1400&q=70', 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=600&h=1400&q=70'], link: '/sales/post', title: 'ĐĂNG TIN NHÀ ĐẤT MIỄN PHÍ', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' };
+const SAMPLE_AD: Ad = { enabled: true, images: ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&h=1400&q=70', 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=600&h=1400&q=70', 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=600&h=1400&q=70'], link: '/sales/post', title: 'Đăng tin nhà đất miễn phí', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' };
 
 const imgsOf = (ad: Ad) => ((ad.images && ad.images.length ? ad.images : ad.image ? [ad.image] : []) as string[]).filter(Boolean);
+const isExt = (l?: string) => (l || '').startsWith('http');
 function useSlides(n: number) {
   const [idx, setIdx] = useState(0);
   useEffect(() => { if (n < 2) return; const t = setInterval(() => setIdx((i) => (i + 1) % n), 5000); return () => clearInterval(t); }, [n]);
   return idx;
 }
-// Nút CTA có vệt sáng quét mượt
 function Cta({ text, className = '' }: { text: string; className?: string }) {
   return (
-    <span className={`relative overflow-hidden bg-[#C8A14B] text-[#0A2540] font-extrabold rounded-lg ${className}`}>
+    <span className={`relative overflow-hidden bg-[#C8A14B] text-[#0A2540] font-bold rounded-md ${className}`}>
       <span className="relative z-10">{text} →</span>
       <span aria-hidden className="cl-shine pointer-events-none absolute top-0 bottom-0 w-1/4 bg-white/45 blur-[3px]" />
     </span>
+  );
+}
+function Slides({ imgs, idx }: { imgs: string[]; idx: number }) {
+  return <>{imgs.map((src, i) => <img key={i} src={src} alt="" className={`absolute inset-0 w-full h-full object-cover cl-ken transition-opacity duration-[1300ms] ease-in-out ${i === idx ? 'opacity-100' : 'opacity-0'}`} />)}</>;
+}
+// Khung quảng cáo kiểu Znews: thẻ trắng, nút × đóng, nhãn QC
+function AdFrame({ children, className = '' }: { children: any; className?: string }) {
+  const [closed, setClosed] = useState(false);
+  if (closed) return null;
+  return (
+    <div className={`cl-fadeup relative rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-white ${className}`}>
+      <span className="absolute top-1.5 left-1.5 z-20 bg-white/90 text-slate-400 text-[8px] font-bold px-1 py-0.5 rounded leading-none">QC</span>
+      <button onClick={() => setClosed(true)} aria-label="Đóng quảng cáo" className="absolute top-1.5 right-1.5 z-20 w-6 h-6 bg-white/95 hover:bg-white rounded-full grid place-items-center text-slate-500 hover:text-slate-800 text-sm shadow leading-none">×</button>
+      {children}
+    </div>
   );
 }
 
 // Cánh gà dọc
 function WingAd({ ad }: { ad: Ad }) {
   const imgs = imgsOf(ad); const idx = useSlides(imgs.length);
-  const ext = (ad.link || '').startsWith('http'); const tgt = ext ? '_blank' : undefined;
-  if (!imgs.length) return (
-    <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="cl-fadeup group flex flex-col justify-center text-center h-full w-full rounded-2xl border border-slate-200 shadow-lg bg-gradient-to-br from-[#0A2540] to-[#10355f] text-white p-5">
-      <p className="text-[10px] tracking-wider text-white/50 font-semibold">QUẢNG CÁO</p>
-      <p className="font-extrabold text-xl mt-3 leading-tight">{ad.title}</p>
-      {ad.sub && <p className="text-sm text-white/80 mt-2">{ad.sub}</p>}
-      <Cta text={ad.cta || 'Xem ngay'} className="mt-5 inline-block text-sm px-4 py-2.5" />
-    </a>
-  );
+  const tgt = isExt(ad.link) ? '_blank' : undefined;
   return (
-    <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="cl-fadeup group block relative rounded-2xl overflow-hidden border border-slate-200 shadow-lg h-full w-full bg-[#0A2540]">
-      {imgs.map((src, i) => <div key={i} className={`absolute inset-0 transition-opacity duration-[1300ms] ease-in-out ${i === idx ? 'opacity-100' : 'opacity-0'}`}><img src={src} alt="" className="w-full h-full object-cover cl-ken" /></div>)}
-      <span className="absolute top-2 right-2 z-10 bg-white/85 text-slate-600 text-[9px] font-bold px-1.5 py-0.5 rounded">QC</span>
-      <div className="absolute inset-x-0 bottom-0 z-10 p-4 pt-16 bg-gradient-to-t from-black/90 via-black/45 to-transparent text-white text-center">
-        <p className="font-extrabold text-lg leading-tight drop-shadow">{ad.title}</p>
-        {ad.sub && <p className="text-sm text-white/90 mt-1.5 drop-shadow">{ad.sub}</p>}
-        <Cta text={ad.cta || 'Xem ngay'} className="mt-3 block text-sm px-3 py-2.5" />
-      </div>
-    </a>
+    <AdFrame className="h-full w-full flex flex-col">
+      <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group flex flex-col flex-1 min-h-0">
+        <div className="relative flex-1 bg-slate-100 overflow-hidden">
+          {imgs.length ? <Slides imgs={imgs} idx={idx} /> : <div className="absolute inset-0 bg-gradient-to-br from-[#0A2540] to-[#10355f]" />}
+        </div>
+        {(ad.title || ad.cta) && (
+          <div className="bg-white px-3 py-3 text-center border-t border-slate-100">
+            {ad.title && <p className="font-bold text-[#0A2540] text-sm leading-snug line-clamp-2">{ad.title}</p>}
+            {ad.sub && <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">{ad.sub}</p>}
+            {ad.cta && <Cta text={ad.cta} className="mt-2 inline-block text-xs px-4 py-1.5" />}
+          </div>
+        )}
+      </a>
+    </AdFrame>
   );
 }
 
 // Dải ngang trên đầu
 function BillboardAd({ ad }: { ad: Ad }) {
   const imgs = imgsOf(ad); const idx = useSlides(imgs.length);
-  const ext = (ad.link || '').startsWith('http'); const tgt = ext ? '_blank' : undefined;
+  const tgt = isExt(ad.link) ? '_blank' : undefined;
   return (
-    <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="cl-fadeup group relative block h-28 rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-[#0A2540]">
-      {imgs.map((src, i) => <img key={i} src={src} alt="" className={`absolute inset-0 w-full h-full object-cover cl-ken transition-opacity duration-[1300ms] ease-in-out ${i === idx ? 'opacity-60' : 'opacity-0'}`} />)}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0A2540]/95 via-[#0A2540]/70 to-[#0A2540]/20" />
-      <span className="absolute top-2 right-2 z-10 bg-white/85 text-slate-600 text-[9px] font-bold px-1.5 py-0.5 rounded">QC</span>
-      <div className="relative z-10 h-full flex items-center justify-between gap-4 px-6 text-white">
-        <div className="min-w-0">
-          <p className="font-extrabold text-lg md:text-2xl leading-tight truncate">{ad.title}</p>
-          {ad.sub && <p className="text-sm text-white/85 mt-1 truncate">{ad.sub}</p>}
+    <AdFrame className="h-28">
+      <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group flex items-stretch h-full">
+        <div className="relative w-40 sm:w-56 shrink-0 bg-slate-100 overflow-hidden">
+          {imgs.length ? <Slides imgs={imgs} idx={idx} /> : <div className="absolute inset-0 bg-gradient-to-br from-[#0A2540] to-[#10355f]" />}
         </div>
-        <Cta text={ad.cta || 'Xem ngay'} className="shrink-0 text-sm px-5 py-2.5 whitespace-nowrap" />
-      </div>
-    </a>
+        <div className="flex-1 min-w-0 flex items-center justify-between gap-4 px-5">
+          <div className="min-w-0">
+            <p className="font-extrabold text-[#0A2540] text-lg md:text-xl leading-tight line-clamp-2">{ad.title}</p>
+            {ad.sub && <p className="text-sm text-slate-500 mt-1 line-clamp-1">{ad.sub}</p>}
+          </div>
+          {ad.cta && <Cta text={ad.cta} className="shrink-0 text-sm px-5 py-2.5 whitespace-nowrap" />}
+        </div>
+      </a>
+    </AdFrame>
   );
 }
 
 // Native chèn giữa danh sách
 function NativeAd({ ad }: { ad: Ad }) {
+  const [closed, setClosed] = useState(false);
   const img = imgsOf(ad)[0] || '';
-  const ext = (ad.link || '').startsWith('http'); const tgt = ext ? '_blank' : undefined;
+  const tgt = isExt(ad.link) ? '_blank' : undefined;
+  if (closed) return null;
   return (
-    <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group flex gap-4 items-start py-4">
-      <div className="w-32 sm:w-48 aspect-[16/10] rounded-lg overflow-hidden bg-slate-100 shrink-0 relative">
-        {img ? <img src={img} alt="" className="w-full h-full object-cover group-hover:scale-105 transition duration-700" /> : <div className="w-full h-full grid place-items-center text-slate-300">📰</div>}
-        <span className="absolute top-1 left-1 bg-[#C8A14B] text-[#0A2540] text-[9px] font-bold px-1.5 py-0.5 rounded shadow">Tài trợ</span>
-      </div>
-      <div className="min-w-0">
-        <h3 className="font-bold text-[#0A2540] leading-snug line-clamp-2 group-hover:text-red-600 text-[15px] md:text-base">{ad.title}</h3>
-        {ad.sub && <p className="text-sm text-slate-500 mt-1.5 line-clamp-2">{ad.sub}</p>}
-        <p className="text-xs text-[#C8A14B] font-bold mt-2">Quảng cáo · {ad.cta || 'Xem ngay'} →</p>
-      </div>
-    </a>
+    <div className="relative py-4">
+      <button onClick={() => setClosed(true)} aria-label="Đóng" className="absolute top-3 right-0 z-10 w-5 h-5 bg-slate-100 hover:bg-slate-200 rounded-full grid place-items-center text-slate-400 text-xs leading-none">×</button>
+      <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group flex gap-4 items-start">
+        <div className="w-32 sm:w-48 aspect-[16/10] rounded-lg overflow-hidden bg-slate-100 shrink-0 relative">
+          {img ? <img src={img} alt="" className="w-full h-full object-cover group-hover:scale-105 transition duration-700" /> : <div className="w-full h-full grid place-items-center text-slate-300">📰</div>}
+          <span className="absolute top-1 left-1 bg-[#C8A14B] text-[#0A2540] text-[9px] font-bold px-1.5 py-0.5 rounded shadow">Tài trợ</span>
+        </div>
+        <div className="min-w-0 pr-5">
+          <h3 className="font-bold text-[#0A2540] leading-snug line-clamp-2 group-hover:text-red-600 text-[15px] md:text-base">{ad.title}</h3>
+          {ad.sub && <p className="text-sm text-slate-500 mt-1.5 line-clamp-2">{ad.sub}</p>}
+          <p className="text-xs text-[#C8A14B] font-bold mt-2">Quảng cáo · {ad.cta || 'Xem ngay'} →</p>
+        </div>
+      </a>
+    </div>
   );
 }
 

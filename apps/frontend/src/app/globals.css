@@ -49,8 +49,10 @@ button, a, input, select, textarea {
 .cl-price-pin { background:#0A2540; color:#fff; font-size:12px; font-weight:800; line-height:1; padding:4px 8px; border-radius:9999px; white-space:nowrap; box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:pointer; border:1.5px solid #fff; }
 .cl-price-pin:hover { background:#dc2626; z-index:6; }
 
-/* Quảng cáo động (skyscraper) */
-@keyframes clKen { from { transform: scale(1); } to { transform: scale(1.14); } }
-.cl-ken { animation: clKen 9s ease-in-out infinite alternate; }
-@keyframes clPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-.cl-pulse { animation: clPulse 1.8s ease-in-out infinite; }
+/* Quảng cáo động — chuyển động mượt (kiểu Znews) */
+@keyframes clKen { from { transform: scale(1.02); } to { transform: scale(1.09); } }
+.cl-ken { animation: clKen 16s ease-in-out infinite alternate; will-change: transform; }
+@keyframes clShine { 0% { transform: translateX(-180%) skewX(-18deg); } 55%, 100% { transform: translateX(360%) skewX(-18deg); } }
+.cl-shine { animation: clShine 3.8s ease-in-out infinite; }
+@keyframes clFadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.cl-fadeup { animation: clFadeUp .6s ease-out both; }

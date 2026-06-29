@@ -134,6 +134,19 @@ chatRouter.get('/rooms', authRequired, async (req: AuthedRequest, res, next) => 
   } catch (e) { next(e); }
 });
 
+// GET /api/chat/mention — danh sách TÊN mọi người dùng (để @nhắc trong chat), chỉ tên, không lộ liên hệ
+chatRouter.get('/mention', authRequired, async (_req: AuthedRequest, res, next) => {
+  try {
+    const rows = await query(
+      `SELECT id, COALESCE(NULLIF(full_name,''), split_part(email,'@',1)) AS name
+         FROM users
+        WHERE COALESCE(NULLIF(full_name,''), email) IS NOT NULL
+        ORDER BY full_name NULLS LAST, id LIMIT 500`);
+    res.set('Cache-Control', 'private, max-age=120');
+    res.json({ users: rows });
+  } catch (e) { next(e); }
+});
+
 // GET /api/chat/users?q= — admin tìm khách (kể cả chưa từng nhắn) để mở hội thoại mới
 chatRouter.get('/users', authRequired, async (req: AuthedRequest, res, next) => {
   try {

@@ -68,6 +68,7 @@ export default function ChatWidget() {
   const [vapid, setVapid] = useState('');
   const [toast, setToast] = useState<{ room: string; name: string; body: string; avatar?: string | null } | null>(null);
   const [dragX, setDragX] = useState(0);
+  const [allNames, setAllNames] = useState<string[]>([]);
   const dragStart = useRef<number | null>(null);
   const draggedRef = useRef(false);
   const acked = useRef(0);
@@ -87,6 +88,7 @@ export default function ChatWidget() {
   const setS = (k: string, v: string) => setSf((s) => ({ ...s, [k]: v }));
 
   useEffect(() => { setTab(user ? 'community' : 'sell'); }, [user]);
+  useEffect(() => { if (!user) { setAllNames([]); return; } api<{ users: { name: string }[] }>('/chat/mention').then((r) => setAllNames((r.users || []).map((u) => u.name).filter(Boolean))).catch(() => {}); }, [user]);
   useEffect(() => {
     try { seenComm.current = Number(localStorage.getItem('cl-seen-community') || 0); } catch {}
     if (user) { try { seenSupp.current = Number(localStorage.getItem(`cl-seen-support:${user.id}`) || 0); } catch {} }
@@ -271,9 +273,10 @@ export default function ChatWidget() {
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm';
   const myName = (user as any)?.fullName || (user as any)?.email || '';
   const chatNames = Array.from(new Set(msgs.map((m) => m.name).filter(Boolean))) as string[];
+  const allMentionNames = Array.from(new Set([...allNames, ...chatNames])) as string[];
   const mentionQ = (text.match(/(?:^|\s)@([^\s@]{0,24})$/) || [])[1];
   const mentionList = (room === 'community' && mentionQ !== undefined)
-    ? chatNames.filter((n) => norm(n) !== norm(myName) && norm(n).includes(norm(mentionQ))).slice(0, 6)
+    ? allMentionNames.filter((n) => norm(n) !== norm(myName) && norm(n).includes(norm(mentionQ))).slice(0, 8)
     : [];
   const pickMention = (n: string) => { setText((t) => t.replace(/(^|\s)@[^\s@]{0,24}$/, (_f, pre) => `${pre}@${n} `)); setTimeout(() => msgInputRef.current?.focus(), 0); };
 
@@ -450,7 +453,7 @@ export default function ChatWidget() {
                             {!mine && (m.avatar ? <img src={m.avatar} alt="" className="w-7 h-7 rounded-full object-cover shrink-0" /> : <span className="w-7 h-7 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-[11px] font-bold shrink-0">{(m.name || '?').charAt(0).toUpperCase()}</span>)}
                             <div className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${mine ? 'bg-[#0A2540] text-white rounded-br-sm' : 'bg-white border border-slate-200 rounded-bl-sm'}`}>
                               {!mine && <p className="text-[11px] font-bold text-[#C8A14B] mb-0.5">{m.name}</p>}
-                              <p className="whitespace-pre-wrap break-words">{renderWithMentions(m.body, chatNames, myName)}</p>
+                              <p className="whitespace-pre-wrap break-words">{renderWithMentions(m.body, allMentionNames, myName)}</p>
                             </div>
                           </div>
                           {adminSupport && mine && m.id === lastMineId && peerAck && (

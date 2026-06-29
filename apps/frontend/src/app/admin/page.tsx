@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 
 type Tab = 'overview' | 'users' | 'listings' | 'payments' | 'config' | 'upload' | 'logs';
-const TABS: [Tab, string][] = [['overview', 'Tổng quan'], ['users', 'Người dùng'], ['listings', 'Tin đăng'], ['payments', 'Thanh toán'], ['config', 'Cấu hình'], ['upload', 'Tải GIS'], ['logs', 'Nhật ký']];
+const TABS: [Tab, string][] = [['overview', 'Tổng quan'], ['users', 'Người dùng'], ['listings', 'Tin đăng'], ['payments', 'Thanh toán'], ['config', 'Cấu hình'], ['upload', 'Tải bản đồ'], ['logs', 'Nhật ký']];
 
 export default function Admin() {
   const { user, loading, logout } = useAuth();
@@ -22,7 +22,7 @@ export default function Admin() {
   if (user.role !== 'admin' && user.role !== 'gis') return (
     <div className="mx-auto max-w-md px-4 py-20 text-center">
       <p className="text-xl font-bold text-[#0A2540]">Không có quyền truy cập</p>
-      <p className="text-slate-500 mt-2 text-sm">Trang này chỉ dành cho admin / biên tập GIS. <Link href="/" className="text-[#0A2540] font-semibold underline">Về trang chủ</Link></p>
+      <p className="text-slate-500 mt-2 text-sm">Trang này chỉ dành cho admin / biên tập bản đồ. <Link href="/" className="text-[#0A2540] font-semibold underline">Về trang chủ</Link></p>
     </div>
   );
   const isGis = user.role === 'gis';
@@ -98,7 +98,7 @@ function Overview() {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Stat label="Người dùng" value={s.users.total} sub={`${s.users.gis} biên tập GIS · ${s.users.paid} trả phí`} />
+        <Stat label="Người dùng" value={s.users.total} sub={`${s.users.gis} biên tập bản đồ · ${s.users.paid} trả phí`} />
         <Stat label="Tin đăng" value={s.listings.total} sub={`${s.listings.active} hiển thị · ${s.listings.boosted} đẩy`} />
         <Stat label="Tổng giá trị tin" value={formatVnd(s.listings.totalValue)} />
         <Stat label="Ảnh trong CSDL" value={s.images.total} sub={`${(Number(s.images.bytes) / 1048576).toFixed(1)} MB`} />
@@ -175,7 +175,7 @@ function UploadGis() {
   }
   return (
     <div className="max-w-lg bg-white border border-slate-200 rounded-xl p-5">
-      <h2 className="font-bold text-[#0A2540] mb-3">Tải lên dữ liệu GIS</h2>
+      <h2 className="font-bold text-[#0A2540] mb-3">Tải lên dữ liệu bản đồ</h2>
       <p className="text-sm text-slate-500 mb-3">Nạp trực tiếp <b>.geojson</b> hoặc <b>Shapefile nén .zip</b> — toạ độ <b>VN-2000/WGS84</b> đều được (tự quy đổi). DGN: xuất sang SHP/GeoJSON trước.</p>
       <input type="file" accept=".dgn,.shp,.zip,.geojson,.json" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="mb-3 block w-full text-sm" />
       <input className="border border-slate-300 rounded-md px-3 py-2 w-full mb-2 text-sm" placeholder="Tên lớp (vd: Quy hoạch 2030)" value={name} onChange={(e) => setName(e.target.value)} />

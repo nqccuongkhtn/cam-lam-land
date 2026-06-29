@@ -440,7 +440,7 @@ export default function MapPage() {
 
         <aside className={`${panelOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-200 absolute lg:static inset-y-0 left-0 z-30 w-72 max-w-[82%] shrink-0 bg-white border-r border-slate-200 overflow-y-auto scroll-soft p-4 shadow-xl lg:shadow-none`}>
           <div className="flex items-center justify-between mb-1">
-            <h2 className="font-bold">Lớp bản đồ GIS</h2>
+            <h2 className="font-bold">Lớp bản đồ</h2>
             <button onClick={() => setPanelOpen(false)} className="lg:hidden text-slate-400 hover:text-slate-700 text-xl leading-none">✕</button>
           </div>
           <p className="text-xs text-slate-500 mb-3">Cam Lâm, Khánh Hòa · EPSG:4326</p>

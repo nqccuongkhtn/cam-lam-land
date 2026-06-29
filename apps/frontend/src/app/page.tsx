@@ -155,7 +155,7 @@ export default function Home() {
           <div className="space-y-4">
             <Link href="/map" className="block rounded-xl bg-gradient-to-br from-[#a3121b] to-[#6d0d14] text-white p-5 hover:brightness-110 transition">
               <p className="text-[11px] tracking-wide text-white/70 font-semibold">CAM LÂM LAND</p>
-              <p className="font-extrabold text-lg mt-1 leading-tight">Sàn BĐS & Bản đồ quy hoạch GIS Cam Lâm</p>
+              <p className="font-extrabold text-lg mt-1 leading-tight">Sàn BĐS & Bản đồ quy hoạch Cam Lâm</p>
               <p className="text-xs text-white/80 mt-1.5 leading-snug">Tra cứu quy hoạch, mua bán nhà đất, nền vệ tinh — tất cả tại một nơi.</p>
               <span className="inline-block mt-3 bg-white text-[#a3121b] text-xs font-bold px-3 py-1.5 rounded">Khám phá ngay →</span>
             </Link>
@@ -216,7 +216,7 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 py-14">
         <div className="grid md:grid-cols-2 rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-sm">
           <div className="p-8 md:p-12 flex flex-col justify-center">
-            <span className="text-[#C8A14B] font-semibold text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH GIS</span>
+            <span className="text-[#C8A14B] font-semibold text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>
             <h2 className="text-3xl font-extrabold text-[#0A2540] mt-2">Tra cứu quy hoạch & thửa đất chính xác</h2>
             <p className="text-slate-500 mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số tờ/số thửa/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
             <div className="mt-6 flex gap-3">
@@ -268,7 +268,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 py-12 grid sm:grid-cols-4 gap-8">
           <div className="sm:col-span-2">
             <p className="font-extrabold text-xl text-white">Cam Lâm <span className="text-[#C8A14B]">Land</span></p>
-            <p className="text-sm mt-3 text-slate-400 max-w-sm">Nền tảng bất động sản & bản đồ quy hoạch GIS huyện Cam Lâm, Khánh Hòa — minh bạch, chính xác, hiện đại.</p>
+            <p className="text-sm mt-3 text-slate-400 max-w-sm">Nền tảng bất động sản & bản đồ quy hoạch huyện Cam Lâm, Khánh Hòa — minh bạch, chính xác, hiện đại.</p>
           </div>
           <div>
             <p className="font-semibold text-white mb-3">Khám phá</p>

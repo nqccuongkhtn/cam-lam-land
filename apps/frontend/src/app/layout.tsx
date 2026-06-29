@@ -9,7 +9,7 @@ import AiAssistant from '@/components/AiAssistant';
 export const metadata: Metadata = {
   applicationName: 'Cam Lâm Land',
   title: 'Cam Lâm Land — Bất động sản & Bản đồ quy hoạch',
-  description: 'Sàn bất động sản và hệ thống bản đồ GIS quy hoạch cho huyện Cam Lâm, Khánh Hòa.',
+  description: 'Sàn bất động sản và bản đồ quy hoạch huyện Cam Lâm, Khánh Hòa.',
   manifest: '/manifest.webmanifest',
   appleWebApp: { capable: true, title: 'Cam Lâm Land', statusBarStyle: 'black-translucent' },
   icons: { icon: '/icons/icon-192.png', shortcut: '/icons/icon-192.png', apple: '/icons/apple-180.png' },

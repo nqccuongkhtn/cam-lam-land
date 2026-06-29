@@ -93,7 +93,7 @@ export default function ListingsPage() {
     setInfo({ x: vn.x, y: vn.y, lng, lat, parcel, zoning });
   }
 
-  const chip = 'appearance-none bg-white border border-slate-300 rounded-full pl-3.5 pr-8 py-2 text-sm font-semibold text-slate-700 hover:border-[#0A2540] cursor-pointer bg-[length:14px] bg-no-repeat';
+  const chip = 'appearance-none bg-white border border-slate-300 rounded-full pl-3 sm:pl-3.5 pr-7 sm:pr-8 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:border-[#0A2540] cursor-pointer bg-[length:14px] bg-no-repeat';
   const chevron = { backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")", backgroundPosition: 'right 10px center' };
 
   const mapPanel = (
@@ -252,12 +252,12 @@ export default function ListingsPage() {
               {mapView ? 'Đóng bản đồ' : 'Xem bản đồ'}
             </button>
           </div>
-          <div className="flex items-center gap-2 overflow-x-auto scroll-soft pb-0.5">
-            <span className="inline-flex items-center gap-1.5 bg-[#0A2540] text-white rounded-full px-3.5 py-2 text-sm font-semibold shrink-0">⚙ Lọc{activeFilters > 0 && <span className="bg-white text-[#0A2540] rounded-full w-5 h-5 grid place-items-center text-xs font-extrabold">{activeFilters}</span>}</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 bg-[#0A2540] text-white rounded-full px-3 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold shrink-0">⚙ Lọc{activeFilters > 0 && <span className="bg-white text-[#0A2540] rounded-full w-5 h-5 grid place-items-center text-xs font-extrabold">{activeFilters}</span>}</span>
             <select value={type} onChange={(e) => { setType(e.target.value as PropertyType); load({ type: e.target.value }); }} className={`${chip} shrink-0`} style={chevron}>{TYPES.map((t) => <option key={t} value={t}>{t ? PROPERTY_LABELS[t as PropertyType] : 'Loại hình'}</option>)}</select>
             <select value={`${min}|${max}`} onChange={(e) => { const [mn, mx] = e.target.value.split('|'); setMin(mn); setMax(mx); load({ min: mn, max: mx }); }} className={`${chip} shrink-0`} style={chevron}>{PRICE_RANGES.map(([label, mn, mx]) => <option key={label} value={`${mn}|${mx}`}>{label}</option>)}</select>
             <select value={`${areaRange.min}|${areaRange.max}`} onChange={(e) => { const [mn, mx] = e.target.value.split('|').map(Number); setAreaRange({ min: mn, max: mx }); }} className={`${chip} shrink-0`} style={chevron}>{AREA_RANGES.map(([label, mn, mx]) => <option key={label} value={`${mn}|${mx}`}>{label}</option>)}</select>
-            <button onClick={() => setVerified((v) => !v)} className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-semibold shrink-0 border ${verified ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-white border-slate-300 text-slate-600'}`}>✓ Tin có ảnh</button>
+            <button onClick={() => setVerified((v) => !v)} className={`inline-flex items-center gap-1.5 rounded-full px-3 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold shrink-0 border ${verified ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-white border-slate-300 text-slate-600'}`}>✓ Tin có ảnh</button>
           </div>
         </div>
       </div>

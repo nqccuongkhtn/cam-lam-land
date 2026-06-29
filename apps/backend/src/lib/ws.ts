@@ -24,7 +24,9 @@ export function broadcastChat(room: string, message: any): void {
   wss.clients.forEach((c: any) => {
     if (c.readyState !== 1 || !c.user) return;
     const u = c.user;
-    const ok = room === 'community' || (room.startsWith('support:') && (u.role === 'admin' || u.id === Number(room.slice(8))));
+    const ok = room === 'community'
+      || (room.startsWith('support:') && (u.role === 'admin' || u.id === Number(room.slice(8))))
+      || (room.startsWith('advisory:') && (u.role === 'admin' || u.id === Number(room.slice(9))));
     if (ok) { try { c.send(data); } catch {} }
   });
 }

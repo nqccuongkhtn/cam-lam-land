@@ -34,7 +34,7 @@ adminRouter.get('/stats', async (_req, res, next) => {
 adminRouter.get('/users', async (_req, res, next) => {
   try {
     const rows = await query(`SELECT id, email, role, full_name AS "fullName", phone, tier, status, boost_quota AS "boostQuota",
-      email_verified AS "emailVerified", created_at AS "createdAt" FROM users ORDER BY created_at DESC LIMIT 500`);
+      is_advisor AS "isAdvisor", email_verified AS "emailVerified", created_at AS "createdAt" FROM users ORDER BY created_at DESC LIMIT 500`);
     res.json({ users: rows });
   } catch (e) { next(e); }
 });
@@ -42,9 +42,9 @@ adminRouter.patch('/users/:id', async (req, res, next) => {
   try {
     const id = Number(req.params.id); const b = req.body ?? {};
     const [row] = await query(
-      `UPDATE users SET role=COALESCE($2,role), tier=COALESCE($3,tier), status=COALESCE($4,status), boost_quota=COALESCE($5,boost_quota)
-       WHERE id=$1 RETURNING id, email, role, tier, status, boost_quota AS "boostQuota"`,
-      [id, b.role ?? null, b.tier ?? null, b.status ?? null, b.boostQuota ?? null]);
+      `UPDATE users SET role=COALESCE($2,role), tier=COALESCE($3,tier), status=COALESCE($4,status), boost_quota=COALESCE($5,boost_quota), is_advisor=COALESCE($6,is_advisor)
+       WHERE id=$1 RETURNING id, email, role, tier, status, boost_quota AS "boostQuota", is_advisor AS "isAdvisor"`,
+      [id, b.role ?? null, b.tier ?? null, b.status ?? null, b.boostQuota ?? null, typeof b.isAdvisor === 'boolean' ? b.isAdvisor : null]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
     res.json({ user: row });
   } catch (e) { next(e); }

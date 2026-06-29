@@ -6,9 +6,9 @@ import { getToken } from '@/lib/token';
 import { WARDS, PROPERTY_LABELS, type PropertyType } from '@/lib/types';
 
 interface Msg { id: number; userId: number | null; name: string; avatar?: string | null; body: string; createdAt: string; }
-interface Room { room: string; name: string; phone?: string | null; online?: boolean; lastBody: string; lastAt: string; count: number; }
+interface Room { room: string; name: string; phone?: string | null; online?: boolean; lastBody: string; lastAt: string; count: number; unread?: number; }
 const TYPES: PropertyType[] = ['land', 'house', 'apartment', 'villa', 'commercial', 'farm'];
-type Tab = 'community' | 'support' | 'sell';
+type Tab = 'community' | 'support' | 'advisory' | 'sell';
 
 const escRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const norm = (s: string) => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
@@ -51,6 +51,9 @@ export default function ChatWidget() {
   const [live, setLive] = useState(false);
   const [unreadComm, setUnreadComm] = useState(0);
   const [unreadSupp, setUnreadSupp] = useState(0);
+  const [unreadAdv, setUnreadAdv] = useState(0);
+  const [isAdvisor, setIsAdvisor] = useState(false);
+  const [advRooms, setAdvRooms] = useState<Room[]>([]);
   const [sf, setSf] = useState({ name: '', phone: '', propertyType: '', ward: '', address: '', area: '', priceExpect: '', description: '' });
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -83,16 +86,17 @@ export default function ChatWidget() {
   const audioRef = useRef<any>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const msgInputRef = useRef<HTMLInputElement>(null);
-  const seenComm = useRef(0), seenSupp = useRef(0);
-  const unread = unreadComm + unreadSupp;
+  const seenComm = useRef(0), seenSupp = useRef(0), seenAdv = useRef(0);
+  const unread = unreadComm + unreadSupp + unreadAdv;
   const setS = (k: string, v: string) => setSf((s) => ({ ...s, [k]: v }));
 
   useEffect(() => { setTab(user ? 'community' : 'sell'); }, [user]);
   useEffect(() => { if (!user) { setAllNames([]); return; } api<{ users: { name: string }[] }>('/chat/mention').then((r) => setAllNames((r.users || []).map((u) => u.name).filter(Boolean))).catch(() => {}); }, [user]);
   useEffect(() => {
     try { seenComm.current = Number(localStorage.getItem('cl-seen-community') || 0); } catch {}
-    if (user) { try { seenSupp.current = Number(localStorage.getItem(`cl-seen-support:${user.id}`) || 0); } catch {} }
+    if (user) { try { seenSupp.current = Number(localStorage.getItem(`cl-seen-support:${user.id}`) || 0); seenAdv.current = Number(localStorage.getItem(`cl-seen-advisory:${user.id}`) || 0); } catch {} }
   }, [user]);
+  useEffect(() => { if (!user) { setIsAdvisor(false); return; } api<{ advisor: boolean }>('/chat/advisory-access').then((r) => setIsAdvisor(!!r.advisor)).catch(() => {}); }, [user]);
   useEffect(() => { if (user) api<{ wsUrl: string; vapidPublic?: string }>('/config').then((r) => { setWsUrl(r.wsUrl || ''); setVapid(r.vapidPublic || ''); }).catch(() => {}); }, [user]);
   useEffect(() => {
     if (!user) return;
@@ -104,20 +108,23 @@ export default function ChatWidget() {
     if (!user) { setRoom(''); return; }
     if (tab === 'community') setRoom('community');
     else if (tab === 'support') setRoom(isAdmin ? '' : `support:${user.id}`);
+    else if (tab === 'advisory') setRoom(isAdvisor ? '' : `advisory:${user.id}`);
     else setRoom('');
-  }, [tab, user, isAdmin]);
+  }, [tab, user, isAdmin, isAdvisor]);
 
   // Đếm tin chưa đọc (chạy nền kể cả khi đóng)
   useEffect(() => {
-    if (!user) { setUnreadComm(0); setUnreadSupp(0); return; }
+    if (!user) { setUnreadComm(0); setUnreadSupp(0); setUnreadAdv(0); return; }
     const poll = async () => {
       try { const c = await api<{ messages: Msg[] }>(`/chat/messages?room=community&after=${seenComm.current}`); setUnreadComm(c.messages.filter((m) => m.userId !== user.id).length); } catch {}
       if (!isAdmin) { try { const s = await api<{ messages: Msg[] }>(`/chat/messages?room=support:${user.id}&after=${seenSupp.current}`); setUnreadSupp(s.messages.filter((m) => m.userId !== user.id).length); if (s.messages.length) api('/chat/ack', { method: 'POST', body: JSON.stringify({ room: `support:${user.id}`, received: Math.max(...s.messages.map((m) => m.id)) }) }).catch(() => {}); } catch {} }
+      if (isAdvisor) { try { const a = await api<{ rooms: Room[] }>('/chat/advisory-rooms'); setAdvRooms(a.rooms || []); } catch {} }
+      else { try { const s = await api<{ messages: Msg[] }>(`/chat/messages?room=advisory:${user.id}&after=${seenAdv.current}`); setUnreadAdv(s.messages.filter((m) => m.userId !== user.id).length); if (s.messages.length) api('/chat/ack', { method: 'POST', body: JSON.stringify({ room: `advisory:${user.id}`, received: Math.max(...s.messages.map((m) => m.id)) }) }).catch(() => {}); } catch {} }
     };
     poll();
     const iv = setInterval(poll, 12000);
     return () => clearInterval(iv);
-  }, [user, isAdmin]);
+  }, [user, isAdmin, isAdvisor]);
 
   // Phòng đang mở: nạp + polling dự phòng
   useEffect(() => {
@@ -147,7 +154,7 @@ export default function ChatWidget() {
           const m = d.message;
           if (openRef.current && d.room === roomRef.current) pushMsgs([m]);
           if (m.userId === user.id) return;
-          const viewing = openRef.current && ((d.room === 'community' && tabRef.current === 'community') || (d.room.startsWith('support:') && tabRef.current === 'support' && roomRef.current === d.room));
+          const viewing = openRef.current && d.room === roomRef.current;
           if (viewing || !notifyRef.current) return;
           const raw = String(m.body || '').replace(/\s+/g, ' ').trim();
           setToast({ room: d.room, name: m.name || 'Tin nhắn', body: raw.length > 42 ? raw.slice(0, 42) + '…' : raw, avatar: m.avatar });
@@ -166,6 +173,13 @@ export default function ChatWidget() {
   }, [open, isAdmin, tab]);
 
   useEffect(() => {
+    if (!open || !isAdvisor || tab !== 'advisory') return;
+    const load = () => api<{ rooms: Room[] }>('/chat/advisory-rooms').then((r) => setAdvRooms(r.rooms || [])).catch(() => {});
+    load(); const iv = setInterval(load, 6000); return () => clearInterval(iv);
+  }, [open, isAdvisor, tab]);
+  useEffect(() => { if (isAdvisor) setUnreadAdv(advRooms.reduce((n, r) => n + (r.unread || 0), 0)); }, [advRooms, isAdvisor]);
+
+  useEffect(() => {
     if (!open || !isAdmin || tab !== 'support') { setUserHits([]); return; }
     const load = () => api<{ users: any[] }>('/chat/users').then((r) => setUserHits(r.users || [])).catch(() => {});
     load(); const iv = setInterval(load, 20000); return () => clearInterval(iv);
@@ -176,8 +190,13 @@ export default function ChatWidget() {
     if (!open || !room || !lastId.current) return;
     if (room === 'community') { seenComm.current = lastId.current; try { localStorage.setItem('cl-seen-community', String(lastId.current)); } catch {} setUnreadComm(0); }
     else if (room.startsWith('support:') && user && !isAdmin) { seenSupp.current = lastId.current; try { localStorage.setItem(`cl-seen-support:${user.id}`, String(lastId.current)); } catch {} setUnreadSupp(0); }
-    if (room.startsWith('support:') && lastId.current > acked.current) { acked.current = lastId.current; api('/chat/ack', { method: 'POST', body: JSON.stringify({ room, received: lastId.current, read: lastId.current }) }).catch(() => {}); }
-  }, [msgs, open, room, user, isAdmin]);
+    else if (room.startsWith('advisory:') && user && !isAdvisor) { seenAdv.current = lastId.current; try { localStorage.setItem(`cl-seen-advisory:${user.id}`, String(lastId.current)); } catch {} setUnreadAdv(0); }
+    if ((room.startsWith('support:') || room.startsWith('advisory:')) && lastId.current > acked.current) {
+      acked.current = lastId.current;
+      api('/chat/ack', { method: 'POST', body: JSON.stringify({ room, received: lastId.current, read: lastId.current }) }).catch(() => {});
+      if (room.startsWith('advisory:') && isAdvisor) setAdvRooms((rs) => rs.map((r) => (r.room === room ? { ...r, unread: 0 } : r)));
+    }
+  }, [msgs, open, room, user, isAdmin, isAdvisor]);
 
   useEffect(() => { boxRef.current?.scrollTo({ top: boxRef.current.scrollHeight }); }, [msgs, open, tab]);
   useEffect(() => { try { setNotify(localStorage.getItem('cl-notify') !== '0'); } catch {} }, []);
@@ -221,6 +240,7 @@ export default function ChatWidget() {
     primeAudio(); setOpen(true);
     if (t.room === 'community') setTab('community');
     else if (t.room.startsWith('support:')) { setTab('support'); if (isAdmin) { setRoom(t.room); setPickedName(t.name); } }
+    else if (t.room.startsWith('advisory:')) { setTab('advisory'); if (isAdvisor) { setRoom(t.room); setPickedName(t.name); } }
     setToast(null);
   }
   async function subscribePush() {
@@ -258,14 +278,16 @@ export default function ChatWidget() {
     catch (e: any) { setSerr(e.message); } finally { setBusy(false); }
   }
 
-  const needPick = isAdmin && tab === 'support' && !room.startsWith('support:');
   const adminSupport = isAdmin && tab === 'support';
+  const staffAdvisory = isAdvisor && tab === 'advisory';
+  const twoPane = adminSupport || staffAdvisory;
+  const needPick = twoPane && !room;
   let lastMineId = 0; if (user) for (const m of msgs) if (m.userId === user.id) lastMineId = m.id;
-  const roomList = rooms.filter((r) => !roomQ.trim() || (r.name || '').toLowerCase().includes(roomQ.trim().toLowerCase()));
+  const roomList = (tab === 'advisory' ? advRooms : rooms).filter((r) => !roomQ.trim() || (r.name || '').toLowerCase().includes(roomQ.trim().toLowerCase()));
   const roomSet = new Set(rooms.map((r) => r.room));
   const nq = roomQ.trim().toLowerCase();
   const newUsers = adminSupport ? userHits.filter((u) => !roomSet.has(`support:${u.id}`) && (!nq || (u.name || '').toLowerCase().includes(nq) || (u.phone || '').toLowerCase().includes(nq))) : [];
-  const activeRoom = rooms.find((r) => r.room === room);
+  const activeRoom = (tab === 'advisory' ? advRooms : rooms).find((r) => r.room === room);
   const activeName = activeRoom?.name || pickedName || 'Khách hàng';
   const activePhone = activeRoom?.phone || pickedPhone || '';
   const activeOnline = activeRoom ? !!activeRoom.online : (userHits.find((u) => `support:${u.id}` === room)?.online ?? false);
@@ -318,7 +340,7 @@ export default function ChatWidget() {
       </div>
 
       {open && (
-        <div className={`fixed bottom-24 right-3 sm:right-5 z-[56] w-[94vw] ${adminSupport ? 'max-w-[680px]' : 'max-w-sm'} h-[70vh] max-h-[580px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden`}>
+        <div className={`fixed bottom-24 right-3 sm:right-5 z-[56] w-[94vw] ${twoPane ? 'max-w-[680px]' : 'max-w-sm'} h-[70vh] max-h-[580px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden`}>
           <div className="bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white shrink-0">
             <div className="flex items-center justify-between px-4 pt-3">
               <b className="flex items-center gap-2">Cam Lâm Land {tab !== 'sell' && <span className={`w-2 h-2 rounded-full ${live ? 'bg-emerald-400' : 'bg-slate-400'}`} />}</b>
@@ -327,10 +349,12 @@ export default function ChatWidget() {
                 <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white text-xl leading-none">✕</button>
               </div>
             </div>
-            <div className="flex mt-2 text-sm font-bold">
-              {([['community', 'Cộng đồng', unreadComm], ['support', isAdmin ? 'Hỗ trợ khách' : 'Hỗ trợ', unreadSupp], ['sell', 'Gửi bán', 0]] as [Tab, string, number][]).map(([t, lb, n]) => (
+            <div className="flex mt-2 text-[13px] font-bold">
+              {([['community', 'Cộng đồng', unreadComm, false], ['support', 'Hỗ trợ', unreadSupp, isAdmin], ['advisory', 'Đầu tư', unreadAdv, true], ['sell', 'Gửi bán', 0, false]] as [Tab, string, number, boolean][]).map(([t, lb, n, num]) => (
                 <button key={t} onClick={() => setTab(t)} className={`relative flex-1 py-2 border-b-2 ${tab === t ? 'border-[#C8A14B] text-white' : 'border-transparent text-white/55'}`}>
-                  {lb}{n > 0 && tab !== t && <span className="absolute top-1 right-1.5 w-2 h-2 bg-red-500 rounded-full" />}
+                  {lb}{n > 0 && tab !== t && (num
+                    ? <span className="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#0A2540]">{n > 99 ? '99+' : n}</span>
+                    : <span className="absolute top-1 right-1.5 w-2 h-2 bg-red-500 rounded-full" />)}
                 </button>
               ))}
             </div>
@@ -376,11 +400,11 @@ export default function ChatWidget() {
               </div>
             </div>
           ) : (
-            <div className={`flex-1 min-h-0 flex ${adminSupport ? 'flex-row' : 'flex-col'}`}>
-              {adminSupport && (
+            <div className={`flex-1 min-h-0 flex ${twoPane ? 'flex-row' : 'flex-col'}`}>
+              {twoPane && (
                 <aside className={`${room ? 'hidden sm:flex' : 'flex'} sm:order-2 flex-col shrink-0 sm:border-l border-slate-100 bg-white w-full ${(!room || listOpen) ? 'sm:w-52' : 'sm:w-0 sm:overflow-hidden sm:border-l-0'} transition-all`}>
                   <div className="px-2 py-2 border-b border-slate-100 shrink-0 space-y-1.5">
-                    <p className="text-[11px] font-bold text-slate-500 px-1">💬 Hội thoại ({rooms.length})</p>
+                    <p className="text-[11px] font-bold text-slate-500 px-1">{tab === 'advisory' ? '💰 Tư vấn đầu tư' : '💬 Hội thoại'} ({(tab === 'advisory' ? advRooms : rooms).length})</p>
                     <input value={roomQ} onChange={(e) => setRoomQ(e.target.value)} placeholder="🔍 Tìm khách…" className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm outline-none focus:border-[#0A2540]" />
                   </div>
                   <div className="flex-1 overflow-y-auto scroll-soft">
@@ -398,6 +422,7 @@ export default function ChatWidget() {
                                 <span className="block text-sm font-semibold text-[#0A2540] truncate">{r.name}</span>
                                 <span className="block text-[11px] text-slate-400 truncate">{r.lastBody || '—'}</span>
                               </span>
+                              {(r.unread || 0) > 0 && <span className="shrink-0 min-w-[18px] h-[18px] px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full">{(r.unread || 0) > 99 ? '99+' : r.unread}</span>}
                             </button>
                           );
                         })}
@@ -422,8 +447,8 @@ export default function ChatWidget() {
                   </div>
                 </aside>
               )}
-              <div className={`flex-1 min-h-0 flex flex-col sm:order-1 ${adminSupport && !room ? 'hidden sm:flex' : 'flex'}`}>
-                {adminSupport && room && (
+              <div className={`flex-1 min-h-0 flex flex-col sm:order-1 ${twoPane && !room ? 'hidden sm:flex' : 'flex'}`}>
+                {twoPane && room && (
                   <div className="flex items-center gap-2 px-2.5 py-2 border-b border-slate-100 shrink-0 bg-white">
                     <button onClick={() => setRoom('')} className="sm:hidden w-7 h-7 grid place-items-center rounded-full hover:bg-slate-100 text-slate-600">←</button>
                     <button onClick={() => setListOpen((v) => !v)} title="Thu gọn danh sách" className="hidden sm:grid w-7 h-7 place-items-center rounded-full hover:bg-slate-100 text-slate-600">☰</button>
@@ -442,9 +467,15 @@ export default function ChatWidget() {
                   <p className="text-[10px] text-slate-500">Admin: Nguyễn Quốc Cường · <a href="tel:0988888888" className="font-semibold text-[#0A2540]">0988 888 888</a></p>
                 </div>
               )}
+                {tab === 'advisory' && !twoPane && (
+                <div className="px-3 py-2 bg-amber-50 border-b border-amber-100 shrink-0 text-center">
+                  <p className="text-[11px] font-bold text-[#0A2540]">💰 Tư vấn đầu tư bất động sản Cam Lâm</p>
+                  <p className="text-[10px] text-slate-500">Đội ngũ chuyên viên sẽ phản hồi câu hỏi của bạn sớm nhất.</p>
+                </div>
+              )}
                 <div ref={boxRef} className="flex-1 overflow-y-auto scroll-soft p-3 space-y-2 bg-slate-50">
                   {needPick ? <p className="text-center text-sm text-slate-400 mt-8">← Chọn một khách để trả lời.</p>
-                    : msgs.length === 0 ? <p className="text-center text-sm text-slate-400 mt-8">{tab === 'community' ? 'Chào mừng đến Cộng đồng đầu tư Cam Lâm 👋' : isAdmin ? 'Chưa có tin nhắn — gửi lời chào tới khách 👋' : 'Gửi tin cho admin để được hỗ trợ.'}</p>
+                    : msgs.length === 0 ? <p className="text-center text-sm text-slate-400 mt-8">{tab === 'community' ? 'Chào mừng đến Cộng đồng đầu tư Cam Lâm 👋' : tab === 'advisory' ? (twoPane ? 'Chọn một khách để tư vấn đầu tư 👋' : 'Đặt câu hỏi về đầu tư BĐS Cam Lâm — đội ngũ tư vấn sẽ trả lời sớm 💰') : isAdmin ? 'Chưa có tin nhắn — gửi lời chào tới khách 👋' : 'Gửi tin cho admin để được hỗ trợ.'}</p>
                     : msgs.map((m) => {
                       const mine = m.userId === user.id;
                       return (

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-// Lấy tin BĐS từ nguồn uy tín, AI viết lại thành nội dung riêng, lưu 7 ngày, làm mới mỗi 2 giờ.
+// Lấy tin BĐS từ nguồn uy tín, tải NGUYÊN bài gốc + ảnh, AI viết lại thành bài đầy đủ (độ dài ~ bài gốc), lưu 7 ngày, làm mới mỗi 2 giờ.
 export const dynamic = 'force-dynamic';
 
 const SOURCES = [
@@ -10,34 +10,44 @@ const SOURCES = [
 ];
 const BAD = /(lừa đảo|vỡ nợ|phá sản|siết nợ|tranh chấp|khởi tố|khởi kiện|kiện tụng|bắt giam|lao dốc|bán tháo|nợ xấu|đóng băng|ế ẩm|sụt giảm|giảm mạnh|thổi giá|bong bóng|chiếm đoạt|cảnh báo sốt|trục lợi)/i;
 
-const decode = (s: string): string => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'").trim();
+const decode = (s: string): string => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ').trim();
 const strip = (s: string): string => s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 const vnSlug = (s: string): string => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60).replace(/-+$/, '');
 const shortHash = (s: string): string => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h.toString(36); };
 
-// ── AI viết lại: ưu tiên Gemini (MIỄN PHÍ - GEMINI_API_KEY), nếu không thì dùng Claude (ANTHROPIC_API_KEY). Không có key nào thì để tóm tắt nguồn. ──
+// ── AI viết lại: ưu tiên Gemini (MIỄN PHÍ - GEMINI_API_KEY), nếu không thì Claude (ANTHROPIC_API_KEY). Không có key nào thì để tóm tắt nguồn. ──
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const AI_KEY = process.env.ANTHROPIC_API_KEY;
 const AI_MODEL = process.env.AI_MODEL || 'claude-haiku-4-5-20251001';
-// Model 2.5/3 bật "thinking" mặc định -> ngốn hết token output -> trả rỗng. Tắt thinking cho các model này.
 const NO_THINK = /(^|[^0-9])(2\.5|3\.)/.test(GEMINI_MODEL) || GEMINI_MODEL.includes('flash-latest') || GEMINI_MODEL.includes('pro-latest');
-let lastErr: string | null = null; // lỗi AI gần nhất (cho chẩn đoán ?diag=1)
+let lastErr: string | null = null;
 
-const newsPrompt = (title: string, summary: string): string => `Bạn là biên tập viên bất động sản của Cam Lâm Land. Viết MỘT BÀI tổng hợp - phân tích 3-4 đoạn (khoảng 250-400 chữ) bằng tiếng Việt, văn phong báo chí riêng, mạch lạc, KHÔNG sao chép nguyên văn nguồn. Đoạn đầu nêu thông tin/sự kiện chính. Các đoạn sau phân tích ý nghĩa, bối cảnh thị trường bất động sản, và nếu phù hợp thì liên hệ khu vực Cam Lâm - Khánh Hòa. TUYỆT ĐỐI KHÔNG bịa thêm số liệu hay sự kiện cụ thể không có trong nguồn; phần phân tích chỉ mang tính nhận định chung. Cách các đoạn bằng MỘT DÒNG TRỐNG. Không thêm tiêu đề, không mở đầu kiểu "Tóm tắt:".\n\nTiêu đề: ${title}\nThông tin nguồn: ${summary}`;
+const newsPrompt = (title: string, full: string): string => `Bạn là biên tập viên bất động sản của Cam Lâm Land. Hãy viết lại bài báo dưới đây thành MỘT BÀI HOÀN CHỈNH bằng tiếng Việt, văn phong báo chí, mạch lạc.
 
-async function rewrite(title: string, summary: string): Promise<string | null> {
-  const prompt = newsPrompt(title, summary);
-  // 1) Gemini (miễn phí)
+YÊU CẦU:
+- Độ dài tương đương khoảng 80% bài gốc, chia thành NHIỀU đoạn (mỗi đoạn cách nhau MỘT DÒNG TRỐNG).
+- Giữ ĐẦY ĐỦ các ý chính, sự kiện, địa danh và SỐ LIỆU CÓ THẬT trong bài gốc.
+- DIỄN ĐẠT LẠI bằng câu chữ riêng, KHÔNG sao chép nguyên văn từng câu của bài gốc.
+- TUYỆT ĐỐI KHÔNG bịa thêm số liệu/sự kiện không có trong bài gốc.
+- Không thêm tiêu đề, không mở đầu kiểu "Tóm tắt:" hay "Bài viết:".
+
+Tiêu đề: ${title}
+
+NỘI DUNG BÀI GỐC:
+${full}`;
+
+async function rewrite(title: string, full: string): Promise<string | null> {
+  const prompt = newsPrompt(title, full);
   if (GEMINI_KEY) {
     try {
-      const genCfg: any = { maxOutputTokens: 2048, temperature: 0.7 };
+      const genCfg: any = { maxOutputTokens: 4096, temperature: 0.7 };
       if (NO_THINK) genCfg.thinkingConfig = { thinkingBudget: 0 };
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-goog-api-key': GEMINI_KEY },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: genCfg }),
-        signal: AbortSignal.timeout(20000),
+        signal: AbortSignal.timeout(28000),
       });
       if (res.ok) {
         const j: any = await res.json();
@@ -51,20 +61,44 @@ async function rewrite(title: string, summary: string): Promise<string | null> {
   } else {
     lastErr = 'Chưa cấu hình GEMINI_API_KEY';
   }
-  // 2) Claude (trả phí)
   if (AI_KEY) {
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-api-key': AI_KEY, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({ model: AI_MODEL, max_tokens: 900, messages: [{ role: 'user', content: prompt }] }),
-        signal: AbortSignal.timeout(20000),
+        body: JSON.stringify({ model: AI_MODEL, max_tokens: 2200, messages: [{ role: 'user', content: prompt }] }),
+        signal: AbortSignal.timeout(28000),
       });
       if (res.ok) { const j: any = await res.json(); const txt = j?.content?.[0]?.text?.trim(); if (txt) { lastErr = null; return txt; } }
       else { lastErr = 'Claude HTTP ' + res.status; }
     } catch (e: any) { lastErr = 'Claude lỗi: ' + (e?.message || String(e)); }
   }
   return null;
+}
+
+// Tải nguyên trang bài gốc: trích NỘI DUNG (các đoạn <p>) + nhiều ẢNH.
+async function fetchArticle(url: string): Promise<{ text: string; images: string[] }> {
+  try {
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CamLamLand/1.0)' }, signal: AbortSignal.timeout(9000), cache: 'no-store' });
+    if (!res.ok) return { text: '', images: [] };
+    let html = await res.text();
+    html = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ');
+    // Ảnh: lấy từ data-src / data-original / src, lọc bỏ logo/icon/quảng cáo
+    const images: string[] = [];
+    for (const m of html.matchAll(/<img[^>]+>/gi)) {
+      const tag = m[0];
+      const src = (tag.match(/(?:data-src|data-original|data-srcset|src)=["']([^"' ]+)/i) || [])[1];
+      if (src && /^https?:\/\//i.test(src) && /\.(jpe?g|png|webp)(\?|$)/i.test(src) && !/(logo|icon|avatar|sprite|banner|advert|quang-?cao|1x1|pixel|blank)/i.test(src)) images.push(src);
+    }
+    // Nội dung: ưu tiên trong <article>, nếu không thì toàn trang; gom các đoạn <p> đủ dài.
+    const scope = (html.match(/<article[\s\S]*?<\/article>/i) || [])[0] || html;
+    const paras: string[] = [];
+    for (const m of scope.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)) {
+      const t = strip(decode(m[1]));
+      if (t.length >= 45 && !/^(theo |nguồn|ảnh\s*:|video\s*:|xem thêm|đọc thêm)/i.test(t)) paras.push(t);
+    }
+    return { text: paras.join('\n\n').slice(0, 7000), images: Array.from(new Set(images)).slice(0, 5) };
+  } catch { return { text: '', images: [] }; }
 }
 
 async function fetchSource(src: { name: string; url: string }): Promise<any[]> {
@@ -89,6 +123,7 @@ async function fetchSource(src: { name: string; url: string }): Promise<any[]> {
 // Kho lưu trong tiến trình: tích luỹ & giữ 7 ngày
 let store: any[] = [];
 let lastSlot = -1;
+const FRESH_CAP = 14; // số bài mới tải+viết lại mỗi lần làm mới (kiểm soát chi phí/độ trễ)
 
 // Mốc làm mới: mỗi 2 giờ trong khung 6h–22h (giờ VN). Ngoài khung đó giữ bản 22h, không cập nhật.
 function slotStart(): number {
@@ -102,19 +137,12 @@ function slotStart(): number {
 }
 
 export async function GET(req: Request) {
-  // Chẩn đoán: /feed/news?diag=1 -> thử viết lại 1 mẫu, báo trạng thái key & lỗi (KHÔNG lộ key).
   if (new URL(req.url).searchParams.get('diag') === '1') {
-    const sample = await rewrite('Kiểm tra hệ thống tin tức', 'Hạ tầng giao thông khu vực Cam Lâm, Khánh Hòa đang được đầu tư phát triển mạnh.');
+    const sample = await rewrite('Kiểm tra hệ thống tin tức', 'Hạ tầng giao thông khu vực Cam Lâm, Khánh Hòa đang được đầu tư phát triển mạnh, với nhiều dự án đường ven biển và kết nối sân bay Cam Ranh.');
     return NextResponse.json({
-      hasGeminiKey: !!GEMINI_KEY,
-      geminiModel: GEMINI_MODEL,
-      disableThinking: NO_THINK,
-      hasClaudeKey: !!AI_KEY,
-      stored: store.length,
-      testRewriteOk: !!sample,
-      testRewriteLen: sample ? sample.length : 0,
-      testRewritePreview: sample ? sample.slice(0, 300) : null,
-      lastError: lastErr,
+      hasGeminiKey: !!GEMINI_KEY, geminiModel: GEMINI_MODEL, disableThinking: NO_THINK, hasClaudeKey: !!AI_KEY,
+      stored: store.length, testRewriteOk: !!sample, testRewriteLen: sample ? sample.length : 0,
+      testRewritePreview: sample ? sample.slice(0, 300) : null, lastError: lastErr,
     });
   }
 
@@ -126,9 +154,14 @@ export async function GET(req: Request) {
   for (const r of results) if (r.status === 'fulfilled') fetched.push(...r.value);
 
   const byUrl = new Map<string, any>(store.map((a) => [a.url, a]));
-  const fresh = fetched.filter((a) => !byUrl.has(a.url));
+  const fresh = fetched.filter((a) => !byUrl.has(a.url)).slice(0, FRESH_CAP);
   await Promise.allSettled(fresh.map(async (a) => {
-    a.body = (await rewrite(a.title, a.summary)) || a.summary;
+    const art = await fetchArticle(a.url);
+    const full = art.text && art.text.length > (a.summary || '').length ? art.text : (a.summary || a.title);
+    a.body = (await rewrite(a.title, full)) || a.summary;
+    const imgs = Array.from(new Set([a.image, ...art.images].filter(Boolean)));
+    a.images = imgs.slice(0, 5);
+    if (!a.image && a.images[0]) a.image = a.images[0];
     a.slug = `${vnSlug(a.title) || 'tin'}-${shortHash(a.url)}`;
   }));
   for (const a of fresh) byUrl.set(a.url, a);

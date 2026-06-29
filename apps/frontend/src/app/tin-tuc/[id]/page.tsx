@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
-interface Article { title: string; url: string; source?: string; image?: string; summary?: string; body?: string; publishedAt?: string; slug: string }
+interface Article { title: string; url: string; source?: string; image?: string; images?: string[]; summary?: string; body?: string; publishedAt?: string; slug: string }
 
 export default function NewsReader() {
   const { id } = useParams<{ id: string }>();
@@ -40,9 +40,19 @@ export default function NewsReader() {
           <span className="ml-auto text-[11px] bg-slate-100 text-slate-500 rounded-full px-2 py-0.5">Biên tập</span>
         </div>
 
-        {a.image && <img src={a.image} alt={a.title} className="w-full rounded-2xl mt-5 bg-slate-100 object-cover max-h-[460px]" />}
+        {(() => { const hero = (a.images && a.images[0]) || a.image; return hero ? <img src={hero} alt={a.title} className="w-full rounded-2xl mt-5 bg-slate-100 object-cover max-h-[460px]" /> : null; })()}
 
-        {(a.body || a.summary) && <div className="mt-5 text-slate-700 leading-relaxed text-[17px] space-y-4">{String(a.body || a.summary).split(/\n{2,}/).map((para, i) => <p key={i}>{para}</p>)}</div>}
+        {(a.body || a.summary) && (() => {
+          const paras = String(a.body || a.summary).split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+          const extra = (a.images || []).slice(1);
+          const out: any[] = []; let ip = 0;
+          paras.forEach((para, i) => {
+            out.push(<p key={'p' + i}>{para}</p>);
+            if ((i + 1) % 2 === 0 && ip < extra.length) { const src = extra[ip++]; out.push(<img key={'i' + i} src={src} alt="" className="w-full rounded-2xl bg-slate-100 object-cover max-h-[420px] my-2" />); }
+          });
+          while (ip < extra.length) { const src = extra[ip++]; out.push(<img key={'z' + ip} src={src} alt="" className="w-full rounded-2xl bg-slate-100 object-cover max-h-[420px] my-2" />); }
+          return <div className="mt-5 text-slate-700 leading-relaxed text-[17px] space-y-4">{out}</div>;
+        })()}
 
         <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5">
           <p className="text-sm text-slate-600">Bài do Cam Lâm Land biên tập, dựa trên thông tin từ <b>{a.source || 'báo chí'}</b>. Xem bản gốc đầy đủ tại nguồn:</p>

@@ -191,7 +191,7 @@ function Users() {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 overflow-x-auto">
       <table className="w-full text-sm min-w-[660px]">
-        <thead className="bg-slate-50 text-left text-slate-500"><tr><th className="p-2">Tài khoản</th><th className="p-2">Vai trò</th><th className="p-2">Gói</th><th className="p-2">Trạng thái</th><th className="p-2">Gói đẩy/th</th></tr></thead>
+        <thead className="bg-slate-50 text-left text-slate-500"><tr><th className="p-2">Tài khoản</th><th className="p-2">Vai trò</th><th className="p-2">Gói</th><th className="p-2">Trạng thái</th><th className="p-2">Gói đẩy/th</th><th className="p-2">Tư vấn ĐT</th></tr></thead>
         <tbody>
           {rows.map((u) => (
             <tr key={u.id} className="border-t">
@@ -200,9 +200,10 @@ function Users() {
               <td className="p-2"><select value={u.tier} onChange={(e) => upd(u.id, { tier: e.target.value })} className={sel}><option value="free">Free</option><option value="paid">Trả phí</option></select></td>
               <td className="p-2"><select value={u.status} onChange={(e) => upd(u.id, { status: e.target.value })} className={sel}><option value="active">Hoạt động</option><option value="suspended">Khoá</option></select></td>
               <td className="p-2"><input type="number" min="0" defaultValue={u.boostQuota ?? 0} onBlur={(e) => upd(u.id, { boostQuota: Math.max(0, Number(e.target.value) || 0) })} title="Số lượt đẩy tin/tháng" className="w-16 border border-slate-300 rounded px-1.5 py-1 text-xs" /></td>
+              <td className="p-2"><button onClick={() => upd(u.id, { isAdvisor: !u.isAdvisor })} className={`px-2.5 py-1 rounded-full text-xs font-bold ${u.isAdvisor ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'}`} title="Cho phép tài khoản này trả lời kênh Tư vấn đầu tư">{u.isAdvisor ? '✓ Tư vấn' : 'Tắt'}</button></td>
             </tr>
           ))}
-          {rows.length === 0 && <tr><td colSpan={5} className="p-4 text-slate-500">Chưa có người dùng.</td></tr>}
+          {rows.length === 0 && <tr><td colSpan={6} className="p-4 text-slate-500">Chưa có người dùng.</td></tr>}
         </tbody>
       </table>
     </div>

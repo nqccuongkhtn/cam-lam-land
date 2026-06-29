@@ -7,11 +7,21 @@ import { pushToUsers, pushAllExcept } from '../lib/push.ts';
 
 export const chatRouter = Router();
 
-function canAccess(room: string, user: { id: number; role: string }): boolean {
+async function isAdvisor(user: { id: number; role: string }): Promise<boolean> {
+  if (user.role === 'admin') return true;
+  const [u] = await query('SELECT is_advisor FROM users WHERE id=$1', [user.id]);
+  return !!u?.is_advisor;
+}
+
+async function canAccess(room: string, user: { id: number; role: string }): Promise<boolean> {
   if (room === 'community') return true;
   if (room.startsWith('support:')) {
     const uid = Number(room.slice(8));
     return user.role === 'admin' || user.id === uid;
+  }
+  if (room.startsWith('advisory:')) {
+    const uid = Number(room.slice(9));
+    return user.id === uid || (await isAdvisor(user));
   }
   return false;
 }
@@ -51,7 +61,7 @@ function badContent(body: string): 'phone' | 'word' | null {
 chatRouter.get('/messages', authRequired, async (req: AuthedRequest, res, next) => {
   try {
     const room = String(req.query.room ?? '');
-    if (!canAccess(room, req.user!)) return res.status(403).json({ error: 'Không có quyền' });
+    if (!(await canAccess(room, req.user!))) return res.status(403).json({ error: 'Không có quyền' });
     const after = Number(req.query.after ?? 0) || 0;
     const rows = await query(
       `SELECT m.id, m.room, m.user_id AS "userId", m.name, m.body, m.created_at AS "createdAt", u.avatar
@@ -71,7 +81,7 @@ chatRouter.get('/messages', authRequired, async (req: AuthedRequest, res, next) 
 chatRouter.post('/ack', authRequired, async (req: AuthedRequest, res, next) => {
   try {
     const room = String(req.body?.room ?? '');
-    if (!canAccess(room, req.user!)) return res.status(403).json({ error: 'Không có quyền' });
+    if (!(await canAccess(room, req.user!))) return res.status(403).json({ error: 'Không có quyền' });
     const received = Math.max(0, Number(req.body?.received ?? 0) || 0);
     const read = Math.max(0, Number(req.body?.read ?? 0) || 0);
     await query(
@@ -89,7 +99,7 @@ chatRouter.post('/messages', authRequired, async (req: AuthedRequest, res, next)
   try {
     const room = String(req.body?.room ?? '');
     const body = String(req.body?.body ?? '').trim().slice(0, 2000);
-    if (!canAccess(room, req.user!)) return res.status(403).json({ error: 'Không có quyền' });
+    if (!(await canAccess(room, req.user!))) return res.status(403).json({ error: 'Không có quyền' });
     if (!body) return res.status(400).json({ error: 'Tin nhắn trống' });
     if (room === 'community') {
       const bad = badContent(body);
@@ -110,6 +120,11 @@ chatRouter.post('/messages', authRequired, async (req: AuthedRequest, res, next)
       const ownerId = Number(room.slice(8));
       const admins = await query("SELECT id FROM users WHERE role='admin'");
       pushToUsers([ownerId, ...admins.map((a: any) => a.id)], payload, req.user!.id).catch(() => {});
+    }
+    else if (room.startsWith('advisory:')) {
+      const ownerId = Number(room.slice(9));
+      const staff = await query("SELECT id FROM users WHERE role='admin' OR is_advisor=true");
+      pushToUsers([ownerId, ...staff.map((a: any) => a.id)], payload, req.user!.id).catch(() => {});
     }
     res.status(201).json({ id: row.id, createdAt: row.createdAt, name, avatar: u?.avatar ?? null });
   } catch (e) { next(e); }
@@ -165,5 +180,35 @@ chatRouter.get('/users', authRequired, async (req: AuthedRequest, res, next) => 
         WHERE role <> 'admin' AND (full_name ILIKE $1 OR email ILIKE $1 OR phone ILIKE $1)
         ORDER BY (last_seen_at > now() - interval '2 minutes') DESC, full_name NULLS LAST, id LIMIT 300`, [like]);
     res.json({ users: rows });
+  } catch (e) { next(e); }
+});
+
+
+// GET /api/chat/advisory-access — người dùng hiện tại có quyền tư vấn đầu tư không
+chatRouter.get('/advisory-access', authRequired, async (req: AuthedRequest, res, next) => {
+  try { res.json({ advisor: await isAdvisor(req.user!) }); } catch (e) { next(e); }
+});
+
+// GET /api/chat/advisory-rooms — hội thoại "Tư vấn đầu tư" + SỐ TIN CHƯA ĐỌC tính RIÊNG cho người xem
+chatRouter.get('/advisory-rooms', authRequired, async (req: AuthedRequest, res, next) => {
+  try {
+    if (!(await isAdvisor(req.user!))) return res.status(403).json({ error: 'Không có quyền tư vấn' });
+    const rows = await query(
+      `SELECT r.room,
+              COALESCE(NULLIF(u.full_name, ''), u.email, 'Khách') AS name,
+              u.phone AS phone,
+              (u.last_seen_at > now() - interval '2 minutes') AS online,
+              (SELECT body FROM chat_messages WHERE room=r.room ORDER BY id DESC LIMIT 1) AS "lastBody",
+              r."lastAt", r.count,
+              (SELECT count(*) FROM chat_messages cm
+                 WHERE cm.room = r.room
+                   AND cm.user_id = NULLIF(split_part(r.room, ':', 2), '')::int
+                   AND cm.id > COALESCE(cr.read_id, 0))::int AS unread
+         FROM (SELECT room, max(created_at) AS "lastAt", count(*)::int AS count
+                 FROM chat_messages WHERE room LIKE 'advisory:%' GROUP BY room) r
+         LEFT JOIN users u ON u.id = NULLIF(split_part(r.room, ':', 2), '')::int
+         LEFT JOIN chat_reads cr ON cr.room = r.room AND cr.user_id = $1
+        ORDER BY r."lastAt" DESC`, [req.user!.id]);
+    res.json({ rooms: rows });
   } catch (e) { next(e); }
 });

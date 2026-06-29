@@ -157,7 +157,8 @@ export default function ChatWidget() {
           const viewing = openRef.current && d.room === roomRef.current;
           if (viewing || !notifyRef.current) return;
           const raw = String(m.body || '').replace(/\s+/g, ' ').trim();
-          setToast({ room: d.room, name: m.name || 'Tin nhắn', body: raw.length > 42 ? raw.slice(0, 42) + '…' : raw, avatar: m.avatar });
+          const advMask = d.room.startsWith('advisory:') && Number(d.room.slice(9)) === user.id && m.userId !== user.id;
+          setToast({ room: d.room, name: advMask ? 'Chuyên viên tư vấn' : (m.name || 'Tin nhắn'), body: raw.length > 42 ? raw.slice(0, 42) + '…' : raw, avatar: advMask ? '/icons/icon-192.png' : m.avatar });
           playDing();
         } catch {}
       };
@@ -493,12 +494,16 @@ export default function ChatWidget() {
                     : msgs.length === 0 ? <p className="text-center text-sm text-slate-400 mt-8">{tab === 'community' ? 'Chào mừng đến Cộng đồng đầu tư Cam Lâm 👋' : tab === 'advisory' ? (twoPane ? 'Chọn một khách để tư vấn đầu tư 👋' : 'Đặt câu hỏi về đầu tư BĐS Cam Lâm — đội ngũ tư vấn sẽ trả lời sớm 💰') : isAdmin ? 'Chưa có tin nhắn — gửi lời chào tới khách 👋' : 'Gửi tin cho admin để được hỗ trợ.'}</p>
                     : msgs.map((m) => {
                       const mine = m.userId === user.id;
+                      // Kênh Tư vấn đầu tư: khách thấy người trả lời là "Chuyên viên tư vấn" + logo website (ẩn danh tính nhân viên).
+                      const maskAdv = !mine && tab === 'advisory' && !isAdvisor;
+                      const dName = maskAdv ? 'Chuyên viên tư vấn' : m.name;
+                      const dAvatar = maskAdv ? '/icons/icon-192.png' : m.avatar;
                       return (
                         <div key={m.id}>
                           <div className={`flex items-end gap-1.5 ${mine ? 'justify-end' : 'justify-start'}`}>
-                            {!mine && (m.avatar ? <img src={m.avatar} alt="" className="w-7 h-7 rounded-full object-cover shrink-0" /> : <span className="w-7 h-7 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-[11px] font-bold shrink-0">{(m.name || '?').charAt(0).toUpperCase()}</span>)}
+                            {!mine && (dAvatar ? <img src={dAvatar} alt="" className="w-7 h-7 rounded-full object-cover shrink-0 bg-white border border-slate-200" /> : <span className="w-7 h-7 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-[11px] font-bold shrink-0">{(dName || '?').charAt(0).toUpperCase()}</span>)}
                             <div className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${mine ? 'bg-[#0A2540] text-white rounded-br-sm' : 'bg-white border border-slate-200 rounded-bl-sm'}`}>
-                              {!mine && <p className="text-[11px] font-bold text-[#C8A14B] mb-0.5">{m.name}</p>}
+                              {!mine && <p className="text-[11px] font-bold text-[#C8A14B] mb-0.5">{dName}</p>}
                               <p className="whitespace-pre-wrap break-words">{renderWithMentions(m.body, allMentionNames, myName)}</p>
                             </div>
                           </div>

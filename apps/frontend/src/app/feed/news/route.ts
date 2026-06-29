@@ -78,6 +78,20 @@ async function rewrite(title: string, full: string): Promise<string | null> {
 
 // Lọc ảnh sạch (bỏ logo/icon/quảng cáo/ảnh "vận hành bởi"...).
 const cleanImg = (u: string): boolean => /^https?:\/\//i.test(u) && /\.(jpe?g|png|webp)(\?|$)/i.test(u) && !/(logo|icon|avatar|sprite|banner|advert|quang-?cao|vccorp|operate|share|placeholder|default|blank|pixel|1x1|skin|template|thumb-?fb)/i.test(u);
+// Bỏ dòng chú thích ảnh ("... Ảnh: Vinhomes", "Nguồn: ...") còn sót trong nội dung.
+const dropCaptions = (text: string): string => text.split(/\n{2,}/).map((p) => p.trim()).filter((t) => t && !/[Ảả]nh\s*:\s*\S/.test(t) && !/^\(?\s*[Ảả]nh\b/.test(t) && !/^[Nn]guồn\s*:\s*\S/.test(t)).join('\n\n');
+// Bỏ ảnh TRÙNG (cùng tấm khác kích thước) bằng tên ảnh đã chuẩn hoá.
+const imgKey = (u: string): string => {
+  let x = u.split('?')[0].split('#')[0].toLowerCase();
+  x = x.substring(x.lastIndexOf('/') + 1).replace(/\.(jpe?g|png|webp)$/i, '');
+  x = x.replace(/[-_](w|h|r|s)?\d{2,4}(x\d{2,4})?$/i, '').replace(/[-_]\d{2,4}x\d{2,4}/i, '');
+  return x || u;
+};
+const dedupeImages = (urls: string[]): string[] => {
+  const seen = new Set<string>(); const out: string[] = [];
+  for (const u of urls) { const k = imgKey(u); if (!seen.has(k)) { seen.add(k); out.push(u); } }
+  return out;
+};
 
 // Tải nguyên trang bài gốc: khoanh vùng nội dung, cắt chân trang, trích các đoạn <p> + 1 ảnh sạch.
 async function fetchArticle(url: string): Promise<{ text: string; images: string[] }> {
@@ -98,7 +112,7 @@ async function fetchArticle(url: string): Promise<{ text: string; images: string
     const paras: string[] = [];
     for (const m of scope.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)) {
       const t = strip(decode(m[1]));
-      if (t.length >= 45 && !/^(theo |nguồn|ảnh\s*:|video\s*:|xem thêm|đọc thêm|>>)/i.test(t)) paras.push(t);
+      if (t.length >= 45 && !/^(theo |nguồn|ảnh\s*:|video\s*:|xem thêm|đọc thêm|>>)/i.test(t) && !/[Ảả]nh\s*:\s*\S/.test(t) && !/^[Nn]guồn\s*:\s*\S/.test(t)) paras.push(t);
     }
     return { text: paras.join('\n\n').slice(0, 7000), images: Array.from(new Set(images)).slice(0, 6) };
   } catch { return { text: '', images: [] }; }
@@ -161,10 +175,10 @@ export async function GET(req: Request) {
   await Promise.allSettled(fresh.map(async (a) => {
     const art = await fetchArticle(a.url);
     const full = art.text && art.text.length > 200 ? art.text : (a.summary || a.title);
-    a.body = (await rewrite(a.title, full)) || full;
-    const hero = [a.image, ...art.images].filter((u): u is string => !!u && cleanImg(u))[0] || null;
-    a.images = hero ? [hero] : [];
-    a.image = hero;
+    a.body = dropCaptions((await rewrite(a.title, full)) || full);
+    const imgs = dedupeImages([a.image, ...art.images].filter((u): u is string => !!u && cleanImg(u))).slice(0, 3);
+    a.images = imgs;
+    a.image = imgs[0] || null;
     a.slug = `${vnSlug(a.title) || 'tin'}-${shortHash(a.url)}`;
   }));
   for (const a of fresh) byUrl.set(a.url, a);

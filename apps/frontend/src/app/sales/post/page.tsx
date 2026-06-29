@@ -21,6 +21,7 @@ export default function PostListing() {
   const [coord, setCoord] = useState<{ lng: number; lat: number } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [aiBusy, setAiBusy] = useState(false);
   const [err, setErr] = useState('');
   const set = (k: string, v: any) => setF((s) => ({ ...s, [k]: v }));
 
@@ -61,6 +62,16 @@ export default function PostListing() {
 
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:border-[#0A2540] outline-none';
   const lbl = 'block text-sm font-semibold text-slate-700 mb-1';
+  async function aiDescribe() {
+    setAiBusy(true);
+    try {
+      const price = f.priceVal ? `${f.priceVal} ${f.priceUnit === 'ty' ? 'tỷ' : 'triệu'}` : '';
+      const r = await fetch('/feed/ai/describe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: f.title, propertyType: PROPERTY_LABELS[f.propertyType], price, area: f.area, ward: f.ward, address: f.address, direction: f.direction, legal: f.legal, bedrooms: f.bedrooms, bathrooms: f.bathrooms, frontage: f.frontage }) });
+      const d = await r.json();
+      if (!r.ok) { alert(d.error || 'Không tạo được mô tả.'); return; }
+      set('description', d.description);
+    } catch { alert('Lỗi kết nối, thử lại.'); } finally { setAiBusy(false); }
+  }
   const priceTotal = f.priceVal ? Number(f.priceVal) * (f.priceUnit === 'ty' ? 1e9 : 1e6) : 0;
   const priceVnd = priceTotal > 0 ? formatVnd(priceTotal) : '';
   const perM2 = priceTotal > 0 && Number(f.area) > 0 ? formatVnd(priceTotal / Number(f.area)) : '';
@@ -152,7 +163,10 @@ export default function PostListing() {
         </section>
 
         <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
-          <h2 className="font-bold text-[#0A2540]">Mô tả & liên hệ</h2>
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="font-bold text-[#0A2540]">Mô tả & liên hệ</h2>
+            <button type="button" onClick={aiDescribe} disabled={aiBusy} className="text-xs font-bold text-[#0A2540] bg-[#C8A14B]/20 hover:bg-[#C8A14B]/30 border border-[#C8A14B]/40 rounded-lg px-3 py-1.5 disabled:opacity-60 whitespace-nowrap">{aiBusy ? 'Đang viết…' : '✨ AI viết mô tả'}</button>
+          </div>
           <textarea className={`${inp} min-h-[120px]`} value={f.description} onChange={(e) => set('description', e.target.value)} placeholder="Mô tả chi tiết bất động sản…" />
           <div className="grid sm:grid-cols-2 gap-4">
             <div><label className={lbl}>Tên liên hệ</label><input className={inp} value={f.contactName} onChange={(e) => set('contactName', e.target.value)} placeholder={user.fullName || ''} /></div>

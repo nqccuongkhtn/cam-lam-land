@@ -4,6 +4,7 @@ import Nav from '@/components/Nav';
 import Providers from './providers';
 import PwaRegister from './pwa-register';
 import ChatWidget from '@/components/ChatWidget';
+import AiAssistant from '@/components/AiAssistant';
 
 export const metadata: Metadata = {
   applicationName: 'Cam Lâm Land',
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Nav />
           <main className="min-h-[calc(100vh-56px)]">{children}</main>
           <ChatWidget />
+          <AiAssistant />
         </Providers>
       </body>
     </html>

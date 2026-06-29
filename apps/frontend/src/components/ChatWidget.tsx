@@ -53,7 +53,6 @@ export default function ChatWidget() {
   const [unreadSupp, setUnreadSupp] = useState(0);
   const [unreadAdv, setUnreadAdv] = useState(0);
   const [isAdvisor, setIsAdvisor] = useState(false);
-  const [advReady, setAdvReady] = useState(false); // backend đã hỗ trợ kênh tư vấn riêng chưa
   const [advRooms, setAdvRooms] = useState<Room[]>([]);
   const [sf, setSf] = useState({ name: '', phone: '', propertyType: '', ward: '', address: '', area: '', priceExpect: '', description: '' });
   const [sent, setSent] = useState(false);
@@ -97,7 +96,7 @@ export default function ChatWidget() {
     try { seenComm.current = Number(localStorage.getItem('cl-seen-community') || 0); } catch {}
     if (user) { try { seenSupp.current = Number(localStorage.getItem(`cl-seen-support:${user.id}`) || 0); seenAdv.current = Number(localStorage.getItem(`cl-seen-advisory:${user.id}`) || 0); } catch {} }
   }, [user]);
-  useEffect(() => { if (!user) { setIsAdvisor(false); setAdvReady(false); return; } api<{ advisor: boolean }>('/chat/advisory-access').then((r) => { setIsAdvisor(!!r.advisor); setAdvReady(true); }).catch(() => { setIsAdvisor(false); setAdvReady(false); }); }, [user]);
+  useEffect(() => { if (!user) { setIsAdvisor(false); return; } api<{ advisor: boolean }>('/chat/advisory-access').then((r) => setIsAdvisor(!!r.advisor)).catch(() => {}); }, [user]);
   useEffect(() => { if (user) api<{ wsUrl: string; vapidPublic?: string }>('/config').then((r) => { setWsUrl(r.wsUrl || ''); setVapid(r.vapidPublic || ''); }).catch(() => {}); }, [user]);
   useEffect(() => {
     if (!user) return;
@@ -109,9 +108,9 @@ export default function ChatWidget() {
     if (!user) { setRoom(''); return; }
     if (tab === 'community') setRoom('community');
     else if (tab === 'support') setRoom(isAdmin ? '' : `support:${user.id}`);
-    else if (tab === 'advisory') setRoom(isAdvisor ? '' : (advReady ? `advisory:${user.id}` : `support:${user.id}`));
+    else if (tab === 'advisory') setRoom(isAdvisor ? '' : `advisory:${user.id}`);
     else setRoom('');
-  }, [tab, user, isAdmin, isAdvisor, advReady]);
+  }, [tab, user, isAdmin, isAdvisor]);
 
   // Đếm tin chưa đọc (chạy nền kể cả khi đóng)
   useEffect(() => {

@@ -357,7 +357,7 @@ export default function ChatWidget() {
                 Liên hệ admin{unreadSupp > 0 && tab !== 'support' && <span className="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#0A2540]">{unreadSupp > 99 ? '99+' : unreadSupp}</span>}
               </button>
               <button onClick={() => setTab((t) => (t === 'sell' || t === 'advisory') ? t : 'sell')} className={`relative flex-1 py-2 border-b-2 ${(tab === 'sell' || tab === 'advisory') ? 'border-[#C8A14B] text-white' : 'border-transparent text-white/55'}`}>
-                Bán & Tư vấn{unreadAdv > 0 && tab !== 'advisory' && <span className="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#0A2540]">{unreadAdv > 99 ? '99+' : unreadAdv}</span>}
+                Ký gửi & Tư vấn{unreadAdv > 0 && tab !== 'advisory' && <span className="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#0A2540]">{unreadAdv > 99 ? '99+' : unreadAdv}</span>}
               </button>
             </div>
             {(tab === 'sell' || tab === 'advisory') && (

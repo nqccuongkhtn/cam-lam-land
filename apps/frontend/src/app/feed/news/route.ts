@@ -76,28 +76,31 @@ async function rewrite(title: string, full: string): Promise<string | null> {
   return null;
 }
 
-// Tải nguyên trang bài gốc: trích NỘI DUNG (các đoạn <p>) + nhiều ẢNH.
+// Lọc ảnh sạch (bỏ logo/icon/quảng cáo/ảnh "vận hành bởi"...).
+const cleanImg = (u: string): boolean => /^https?:\/\//i.test(u) && /\.(jpe?g|png|webp)(\?|$)/i.test(u) && !/(logo|icon|avatar|sprite|banner|advert|quang-?cao|vccorp|operate|share|placeholder|default|blank|pixel|1x1|skin|template|thumb-?fb)/i.test(u);
+
+// Tải nguyên trang bài gốc: khoanh vùng nội dung, cắt chân trang, trích các đoạn <p> + 1 ảnh sạch.
 async function fetchArticle(url: string): Promise<{ text: string; images: string[] }> {
   try {
     const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CamLamLand/1.0)' }, signal: AbortSignal.timeout(9000), cache: 'no-store' });
     if (!res.ok) return { text: '', images: [] };
     let html = await res.text();
-    html = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ');
-    // Ảnh: lấy từ data-src / data-original / src, lọc bỏ logo/icon/quảng cáo
+    html = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ').replace(/<header[\s\S]*?<\/header>/gi, ' ').replace(/<footer[\s\S]*?<\/footer>/gi, ' ');
+    let scope = (html.match(/<article[\s\S]*?<\/article>/i) || [])[0];
+    if (!scope) { const m = html.match(/<div[^>]+(?:id|class)=["'][^"']*(detail-content|article-body|fck_detail|contentdetail|news-content|main-?content|entry-content|the-article-body|content_detail)[^"']*["'][\s\S]*$/i); scope = m ? m[0] : html; }
+    const cut = scope.search(/Vận hành bởi|VCCorp|class=["'][^"']*(relate|relation|footer|tag-list|share|box-category|comment|widget)/i);
+    if (cut > 600) scope = scope.slice(0, cut);
     const images: string[] = [];
-    for (const m of html.matchAll(/<img[^>]+>/gi)) {
-      const tag = m[0];
-      const src = (tag.match(/(?:data-src|data-original|data-srcset|src)=["']([^"' ]+)/i) || [])[1];
-      if (src && /^https?:\/\//i.test(src) && /\.(jpe?g|png|webp)(\?|$)/i.test(src) && !/(logo|icon|avatar|sprite|banner|advert|quang-?cao|1x1|pixel|blank)/i.test(src)) images.push(src);
+    for (const m of scope.matchAll(/<img[^>]+>/gi)) {
+      const src = (m[0].match(/(?:data-src|data-original|src)=["']([^"' ]+)/i) || [])[1];
+      if (src && cleanImg(src)) images.push(src);
     }
-    // Nội dung: ưu tiên trong <article>, nếu không thì toàn trang; gom các đoạn <p> đủ dài.
-    const scope = (html.match(/<article[\s\S]*?<\/article>/i) || [])[0] || html;
     const paras: string[] = [];
     for (const m of scope.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)) {
       const t = strip(decode(m[1]));
-      if (t.length >= 45 && !/^(theo |nguồn|ảnh\s*:|video\s*:|xem thêm|đọc thêm)/i.test(t)) paras.push(t);
+      if (t.length >= 45 && !/^(theo |nguồn|ảnh\s*:|video\s*:|xem thêm|đọc thêm|>>)/i.test(t)) paras.push(t);
     }
-    return { text: paras.join('\n\n').slice(0, 7000), images: Array.from(new Set(images)).slice(0, 5) };
+    return { text: paras.join('\n\n').slice(0, 7000), images: Array.from(new Set(images)).slice(0, 6) };
   } catch { return { text: '', images: [] }; }
 }
 
@@ -157,11 +160,11 @@ export async function GET(req: Request) {
   const fresh = fetched.filter((a) => !byUrl.has(a.url)).slice(0, FRESH_CAP);
   await Promise.allSettled(fresh.map(async (a) => {
     const art = await fetchArticle(a.url);
-    const full = art.text && art.text.length > (a.summary || '').length ? art.text : (a.summary || a.title);
-    a.body = (await rewrite(a.title, full)) || a.summary;
-    const imgs = Array.from(new Set([a.image, ...art.images].filter(Boolean)));
-    a.images = imgs.slice(0, 5);
-    if (!a.image && a.images[0]) a.image = a.images[0];
+    const full = art.text && art.text.length > 200 ? art.text : (a.summary || a.title);
+    a.body = (await rewrite(a.title, full)) || full;
+    const hero = [a.image, ...art.images].filter((u): u is string => !!u && cleanImg(u))[0] || null;
+    a.images = hero ? [hero] : [];
+    a.image = hero;
     a.slug = `${vnSlug(a.title) || 'tin'}-${shortHash(a.url)}`;
   }));
   for (const a of fresh) byUrl.set(a.url, a);

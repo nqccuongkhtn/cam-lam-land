@@ -5,7 +5,7 @@ import Link from 'next/link';
 interface N { title: string; url: string; source?: string; image?: string; summary?: string; publishedAt?: string; slug: string }
 interface Ad { enabled?: boolean; image?: string; images?: string[]; link?: string; title?: string; sub?: string; cta?: string }
 
-const SAMPLE_AD: Ad = { enabled: true, images: ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&h=1400&q=70', 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=600&h=1400&q=70', 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=600&h=1400&q=70'], link: '/sales/post', title: 'Đăng tin nhà đất miễn phí', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' };
+const SAMPLE_AD: Ad = { enabled: true, images: ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1280&h=800&q=72', 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1280&h=800&q=72', 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1280&h=800&q=72'], link: '/sales/post', title: 'Đăng tin nhà đất miễn phí', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' };
 
 const imgsOf = (ad: Ad) => ((ad.images && ad.images.length ? ad.images : ad.image ? [ad.image] : []) as string[]).filter(Boolean);
 const isExt = (l?: string) => (l || '').startsWith('http');
@@ -60,22 +60,19 @@ function WingAd({ ad }: { ad: Ad }) {
   );
 }
 
-// Dải ngang trên đầu
+// Dải ngang trên đầu (billboard lớn, ảnh phủ full + chữ to bên trái)
 function BillboardAd({ ad }: { ad: Ad }) {
   const imgs = imgsOf(ad); const idx = useSlides(imgs.length);
   const tgt = isExt(ad.link) ? '_blank' : undefined;
   return (
-    <AdFrame className="h-28">
-      <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group flex items-stretch h-full">
-        <div className="relative w-40 sm:w-56 shrink-0 bg-slate-100 overflow-hidden">
-          {imgs.length ? <Slides imgs={imgs} idx={idx} /> : <div className="absolute inset-0 bg-gradient-to-br from-[#0A2540] to-[#10355f]" />}
-        </div>
-        <div className="flex-1 min-w-0 flex items-center justify-between gap-4 px-5">
-          <div className="min-w-0">
-            <p className="font-extrabold text-[#0A2540] text-lg md:text-xl leading-tight line-clamp-2">{ad.title}</p>
-            {ad.sub && <p className="text-sm text-slate-500 mt-1 line-clamp-1">{ad.sub}</p>}
-          </div>
-          {ad.cta && <Cta text={ad.cta} className="shrink-0 text-sm px-5 py-2.5 whitespace-nowrap" />}
+    <AdFrame className="h-56 md:h-64">
+      <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group block relative h-full w-full bg-[#0A2540]">
+        {imgs.length ? <Slides imgs={imgs} idx={idx} /> : <div className="absolute inset-0 bg-gradient-to-br from-[#0A2540] to-[#10355f]" />}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0A2540]/95 via-[#0A2540]/55 to-transparent" />
+        <div className="absolute inset-y-0 left-0 z-10 flex flex-col justify-center p-6 md:p-10 max-w-[62%] text-white">
+          <p className="font-extrabold text-2xl md:text-4xl leading-tight drop-shadow">{ad.title}</p>
+          {ad.sub && <p className="text-sm md:text-lg text-white/85 mt-2 md:mt-3 drop-shadow">{ad.sub}</p>}
+          {ad.cta && <Cta text={ad.cta} className="mt-4 md:mt-5 self-start text-sm md:text-base px-6 py-3" />}
         </div>
       </a>
     </AdFrame>

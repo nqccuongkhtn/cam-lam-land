@@ -51,7 +51,7 @@ export default function Admin() {
 }
 
 function AdsManager() {
-  const [ad, setAd] = useState<any>({ enabled: true, images: ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&h=1400&q=70'], link: '/sales/post', title: 'ĐĂNG TIN NHÀ ĐẤT MIỄN PHÍ', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' });
+  const [ad, setAd] = useState<any>({ enabled: true, images: ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1280&h=800&q=72'], link: '/sales/post', title: 'ĐĂNG TIN NHÀ ĐẤT MIỄN PHÍ', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' });
   const [adMsg, setAdMsg] = useState('');
   const [mapCount, setMapCount] = useState<number | null>(null);
   useEffect(() => { api<{ value: any }>('/config/tintuc_ad').then((r) => { if (r.value && typeof r.value === 'object') setAd((a: any) => ({ ...a, ...r.value })); }).catch(() => {}); }, []);

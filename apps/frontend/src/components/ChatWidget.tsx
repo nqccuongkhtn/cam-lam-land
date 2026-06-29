@@ -10,6 +10,25 @@ interface Room { room: string; name: string; phone?: string | null; online?: boo
 const TYPES: PropertyType[] = ['land', 'house', 'apartment', 'villa', 'commercial', 'farm'];
 type Tab = 'community' | 'support' | 'sell';
 
+const escRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const norm = (s: string) => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+function renderWithMentions(body: string, names: string[], myName: string): any {
+  if (!body || !names.length) return body;
+  const sorted = Array.from(new Set(names)).filter(Boolean).sort((a, b) => b.length - a.length).map(escRe);
+  if (!sorted.length) return body;
+  let re: RegExp;
+  try { re = new RegExp(`@(${sorted.join('|')})`, 'g'); } catch { return body; }
+  const out: any[] = []; let last = 0; let m: RegExpExecArray | null; let i = 0;
+  while ((m = re.exec(body)) !== null) {
+    if (m.index > last) out.push(body.slice(last, m.index));
+    const isMe = !!myName && m[1].toLowerCase() === myName.toLowerCase();
+    out.push(<span key={i++} className={`font-semibold rounded px-0.5 ${isMe ? 'bg-[#C8A14B] text-[#0A2540]' : 'text-blue-600'}`}>@{m[1]}</span>);
+    last = m.index + m[0].length;
+  }
+  if (last < body.length) out.push(body.slice(last));
+  return out;
+}
+
 function urlB64ToUint8(base64: string): Uint8Array {
   const pad = '='.repeat((4 - (base64.length % 4)) % 4);
   const b64 = (base64 + pad).replace(/-/g, '+').replace(/_/g, '/');
@@ -62,6 +81,7 @@ export default function ChatWidget() {
   const vapidRef = useRef(''); vapidRef.current = vapid;
   const audioRef = useRef<any>(null);
   const boxRef = useRef<HTMLDivElement>(null);
+  const msgInputRef = useRef<HTMLInputElement>(null);
   const seenComm = useRef(0), seenSupp = useRef(0);
   const unread = unreadComm + unreadSupp;
   const setS = (k: string, v: string) => setSf((s) => ({ ...s, [k]: v }));
@@ -249,6 +269,13 @@ export default function ChatWidget() {
   const activeOnline = activeRoom ? !!activeRoom.online : (userHits.find((u) => `support:${u.id}` === room)?.online ?? false);
   const canType = tab !== 'sell' && !!user && !!room && !needPick;
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm';
+  const myName = (user as any)?.fullName || (user as any)?.email || '';
+  const chatNames = Array.from(new Set(msgs.map((m) => m.name).filter(Boolean))) as string[];
+  const mentionQ = (text.match(/(?:^|\s)@([^\s@]{0,24})$/) || [])[1];
+  const mentionList = (room === 'community' && mentionQ !== undefined)
+    ? chatNames.filter((n) => norm(n) !== norm(myName) && norm(n).includes(norm(mentionQ))).slice(0, 6)
+    : [];
+  const pickMention = (n: string) => { setText((t) => t.replace(/(^|\s)@[^\s@]{0,24}$/, (_f, pre) => `${pre}@${n} `)); setTimeout(() => msgInputRef.current?.focus(), 0); };
 
   return (
     <>
@@ -423,7 +450,7 @@ export default function ChatWidget() {
                             {!mine && (m.avatar ? <img src={m.avatar} alt="" className="w-7 h-7 rounded-full object-cover shrink-0" /> : <span className="w-7 h-7 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-[11px] font-bold shrink-0">{(m.name || '?').charAt(0).toUpperCase()}</span>)}
                             <div className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${mine ? 'bg-[#0A2540] text-white rounded-br-sm' : 'bg-white border border-slate-200 rounded-bl-sm'}`}>
                               {!mine && <p className="text-[11px] font-bold text-[#C8A14B] mb-0.5">{m.name}</p>}
-                              <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                              <p className="whitespace-pre-wrap break-words">{renderWithMentions(m.body, chatNames, myName)}</p>
                             </div>
                           </div>
                           {adminSupport && mine && m.id === lastMineId && peerAck && (
@@ -436,9 +463,21 @@ export default function ChatWidget() {
                 {canType && (
                   <div className="border-t border-slate-100 shrink-0">
                     {warn && <p className="px-3 pt-2 text-xs text-red-600 font-semibold leading-snug">⚠️ {warn}</p>}
-                    <div className="p-2 flex gap-2">
-                      <input value={text} onChange={(e) => { setText(e.target.value); if (warn) setWarn(''); }} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Nhập tin nhắn…" className="flex-1 border border-slate-300 rounded-full px-3.5 py-2 text-sm outline-none focus:border-[#0A2540]" />
-                      <button onClick={send} className="bg-red-600 hover:bg-red-700 text-white rounded-full px-4 py-2 text-sm font-bold shrink-0">Gửi</button>
+                    <div className="p-2">
+                      {mentionList.length > 0 && (
+                        <div className="mb-1.5 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden max-h-44 overflow-y-auto">
+                          {mentionList.map((n) => (
+                            <button key={n} type="button" onMouseDown={(e) => { e.preventDefault(); pickMention(n); }} className="w-full text-left px-3 py-2 text-sm hover:bg-slate-100 flex items-center gap-2">
+                              <span className="w-6 h-6 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-[10px] font-bold shrink-0">{n.charAt(0).toUpperCase()}</span>
+                              <b className="text-[#0A2540] truncate">{n}</b>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      <div className="flex gap-2">
+                        <input ref={msgInputRef} value={text} onChange={(e) => { setText(e.target.value); if (warn) setWarn(''); }} onKeyDown={(e) => { if (e.key === 'Enter') { if (mentionList.length) { e.preventDefault(); pickMention(mentionList[0]); } else send(); } }} placeholder="Nhập tin nhắn…  (gõ @ để nhắc tên)" className="flex-1 border border-slate-300 rounded-full px-3.5 py-2 text-sm outline-none focus:border-[#0A2540]" />
+                        <button onClick={send} className="bg-red-600 hover:bg-red-700 text-white rounded-full px-4 py-2 text-sm font-bold shrink-0">Gửi</button>
+                      </div>
                     </div>
                   </div>
                 )}

@@ -170,7 +170,7 @@ export default function MapAdsPage() {
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-[#0A2540] text-sm truncate">{a.advertiserName} · <span className="text-red-600">{a.advertiserPhone}</span></p>
                     <p className="text-xs text-slate-500 truncate">{(a.wards || []).join(', ')}</p>
-                    <p className="text-[11px] text-slate-400">{(a.points || []).length} điểm · {a.package} · {a.active ? <span className="text-emerald-600 font-semibold">Đang chạy</span> : <span>Hết hạn</span>} · đến {new Date(a.expiresAt).toLocaleDateString('vi-VN')}</p>
+                    <p className="text-[11px] text-slate-400"><span className={`inline-block mr-1.5 px-1.5 py-0.5 rounded font-bold ${a.style === 'text' ? 'bg-sky-100 text-sky-700' : 'bg-amber-100 text-amber-700'}`}>{a.style === 'text' ? 'Chữ mờ' : 'Logo ghim'}</span>{(a.points || []).length} điểm · {a.package} · {a.active ? <span className="text-emerald-600 font-semibold">Đang chạy</span> : <span>Hết hạn</span>} · đến {new Date(a.expiresAt).toLocaleDateString('vi-VN')}</p>
                   </div>
                   <div className="flex flex-col items-end gap-1 shrink-0">
                     <button onClick={() => startEdit(a)} className="text-slate-600 hover:text-[#0A2540] text-sm font-semibold">✏️ Sửa</button>

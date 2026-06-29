@@ -5,7 +5,6 @@ import Link from 'next/link';
 interface N { title: string; url: string; source?: string; image?: string; summary?: string; publishedAt?: string; slug: string }
 interface Ad { enabled?: boolean; image?: string; link?: string; title?: string; sub?: string; cta?: string }
 
-// Mẫu quảng cáo đặt sẵn (hiện khi admin chưa cấu hình / backend chưa bật)
 const SAMPLE_AD: Ad = { enabled: true, image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&h=1200&q=70', link: '/sales/post', title: 'ĐĂNG TIN NHÀ ĐẤT MIỄN PHÍ', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' };
 
 function AdBanner({ ad }: { ad: Ad }) {
@@ -13,7 +12,6 @@ function AdBanner({ ad }: { ad: Ad }) {
   const tgt = ext ? '_blank' : undefined;
   if (ad.image) return (
     <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group block relative rounded-2xl overflow-hidden border border-slate-200 shadow-md hover:shadow-xl transition aspect-[300/600] bg-slate-100">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={ad.image} alt={ad.title || 'Quảng cáo'} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500" />
       <span className="absolute top-2 right-2 bg-white/85 text-slate-600 text-[9px] font-bold px-1.5 py-0.5 rounded">QC</span>
       <div className="absolute inset-x-0 bottom-0 p-3 pt-12 bg-gradient-to-t from-black/85 via-black/40 to-transparent text-white text-center">
@@ -33,6 +31,45 @@ function AdBanner({ ad }: { ad: Ad }) {
   );
 }
 
+const fmtDate = (iso?: string) => (iso ? new Date(iso).toLocaleDateString('vi-VN') : '');
+const meta = (n: N) => `${n.source || ''}${n.source && fmtDate(n.publishedAt) ? ' · ' : ''}${fmtDate(n.publishedAt)}`;
+function Thumb({ src, alt }: { src?: string; alt: string }) {
+  return src
+    ? <img src={src} alt={alt} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+    : <div className="w-full h-full grid place-items-center text-slate-300 text-2xl">📰</div>;
+}
+
+function Lead({ n }: { n: N }) {
+  return (
+    <Link href={`/tin-tuc/${n.slug}`} className="group block">
+      <div className="aspect-[16/9] rounded-lg overflow-hidden bg-slate-100"><Thumb src={n.image} alt={n.title} /></div>
+      <h2 className="text-xl md:text-2xl font-bold text-[#0A2540] mt-3 leading-snug group-hover:text-red-600">{n.title}</h2>
+      {n.summary && <p className="text-slate-500 text-[15px] mt-2 line-clamp-3">{n.summary}</p>}
+      <p className="text-xs text-slate-400 mt-2">{meta(n)}</p>
+    </Link>
+  );
+}
+function Small({ n }: { n: N }) {
+  return (
+    <Link href={`/tin-tuc/${n.slug}`} className="group flex gap-3 items-start py-3">
+      <div className="w-24 h-16 rounded overflow-hidden bg-slate-100 shrink-0"><Thumb src={n.image} alt={n.title} /></div>
+      <h3 className="text-sm font-semibold text-[#0A2540] leading-snug line-clamp-3 group-hover:text-red-600">{n.title}</h3>
+    </Link>
+  );
+}
+function Row({ n }: { n: N }) {
+  return (
+    <Link href={`/tin-tuc/${n.slug}`} className="group flex gap-4 items-start py-4">
+      <div className="w-32 sm:w-48 aspect-[16/10] rounded-lg overflow-hidden bg-slate-100 shrink-0"><Thumb src={n.image} alt={n.title} /></div>
+      <div className="min-w-0">
+        <h3 className="font-bold text-[#0A2540] leading-snug line-clamp-2 group-hover:text-red-600 text-[15px] md:text-base">{n.title}</h3>
+        {n.summary && <p className="text-sm text-slate-500 mt-1.5 line-clamp-2 hidden sm:block">{n.summary}</p>}
+        <p className="text-xs text-slate-400 mt-2">{meta(n)}</p>
+      </div>
+    </Link>
+  );
+}
+
 export default function NewsIndex() {
   const [news, setNews] = useState<N[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,39 +79,34 @@ export default function NewsIndex() {
   useEffect(() => { fetch('/api/config/tintuc_ad').then((r) => r.json()).then((d) => { if (d && d.value && typeof d.value === 'object') setAd({ ...SAMPLE_AD, ...d.value }); }).catch(() => {}); }, []);
 
   const showAd = ad && ad.enabled !== false;
+  const lead = news[0];
+  const sideList = news.slice(1, 5);
+  const rest = news.slice(5);
 
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
-      <div className="max-w-[1440px] mx-auto px-4 py-8 xl:flex xl:gap-6">
+      <div className="max-w-[1440px] mx-auto px-4 py-6 xl:flex xl:gap-6">
         {showAd && <aside className="hidden xl:block w-56 shrink-0"><div className="sticky top-20"><AdBanner ad={ad} /></div></aside>}
 
         <div className="flex-1 min-w-0">
-          <div className="text-xs text-slate-400 mb-2"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <span className="text-slate-600">Tin tức thị trường</span></div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-[#0A2540]">Tin tức thị trường bất động sản</h1>
-          <p className="text-slate-500 mt-1 text-sm">Tổng hợp từ nguồn uy tín: VnExpress, CafeF, Báo Xây dựng — cập nhật tự động.</p>
+          <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <span className="text-slate-600">Tin tức</span></div>
+          <div className="flex items-center gap-2.5 border-b-2 border-red-600 pb-2 mb-5">
+            <span className="w-1.5 h-6 bg-red-600 rounded-sm" />
+            <h1 className="text-lg md:text-xl font-extrabold text-[#0A2540] uppercase tracking-tight">Tin tức thị trường BĐS</h1>
+          </div>
 
           {loading ? (
-            <p className="text-slate-400 mt-10">Đang tải tin…</p>
+            <p className="text-slate-400 py-10">Đang tải tin…</p>
           ) : news.length === 0 ? (
-            <p className="text-slate-400 mt-10">Chưa có tin. Vui lòng quay lại sau.</p>
+            <p className="text-slate-400 py-10">Chưa có tin. Vui lòng quay lại sau.</p>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
-              {news.map((n) => {
-                const date = n.publishedAt ? new Date(n.publishedAt).toLocaleDateString('vi-VN') : '';
-                return (
-                  <Link key={n.slug} href={`/tin-tuc/${n.slug}`} className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg hover:border-slate-300 transition flex flex-col">
-                    <div className="aspect-[16/10] bg-slate-100 overflow-hidden">
-                      {n.image && <img src={n.image} alt={n.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />}
-                    </div>
-                    <div className="p-4 flex flex-col flex-1">
-                      <h3 className="font-bold text-[#0A2540] leading-snug line-clamp-3 group-hover:text-red-600">{n.title}</h3>
-                      {n.summary && <p className="text-sm text-slate-500 mt-2 line-clamp-2 flex-1">{n.summary}</p>}
-                      <p className="text-xs text-slate-400 mt-3">{n.source}{n.source && date ? ' · ' : ''}{date}</p>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+            <>
+              <div className="grid lg:grid-cols-[1.7fr_1fr] gap-x-7 gap-y-4 pb-6 mb-2 border-b border-slate-200">
+                {lead && <Lead n={lead} />}
+                <div className="divide-y divide-slate-100 lg:border-l lg:border-slate-100 lg:pl-6">{sideList.map((n) => <Small key={n.slug} n={n} />)}</div>
+              </div>
+              <div className="divide-y divide-slate-100">{rest.map((n) => <Row key={n.slug} n={n} />)}</div>
+            </>
           )}
         </div>
 

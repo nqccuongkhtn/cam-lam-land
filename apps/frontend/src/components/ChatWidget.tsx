@@ -353,17 +353,17 @@ export default function ChatWidget() {
               <button onClick={() => setTab('community')} className={`relative flex-1 py-2 border-b-2 ${tab === 'community' ? 'border-[#C8A14B] text-white' : 'border-transparent text-white/55'}`}>
                 Cộng đồng{unreadComm > 0 && tab !== 'community' && <span className="absolute top-1 right-1.5 w-2 h-2 bg-red-500 rounded-full" />}
               </button>
-              <button onClick={() => setTab((t) => (t === 'support' || t === 'advisory') ? t : 'support')} className={`relative flex-1 py-2 border-b-2 ${(tab === 'support' || tab === 'advisory') ? 'border-[#C8A14B] text-white' : 'border-transparent text-white/55'}`}>
-                Liên hệ admin{(unreadSupp + unreadAdv) > 0 && !(tab === 'support' || tab === 'advisory') && <span className="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#0A2540]">{(unreadSupp + unreadAdv) > 99 ? '99+' : (unreadSupp + unreadAdv)}</span>}
+              <button onClick={() => setTab('support')} className={`relative flex-1 py-2 border-b-2 ${tab === 'support' ? 'border-[#C8A14B] text-white' : 'border-transparent text-white/55'}`}>
+                Liên hệ admin{unreadSupp > 0 && tab !== 'support' && <span className="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#0A2540]">{unreadSupp > 99 ? '99+' : unreadSupp}</span>}
               </button>
-              <button onClick={() => setTab('sell')} className={`relative flex-1 py-2 border-b-2 ${tab === 'sell' ? 'border-[#C8A14B] text-white' : 'border-transparent text-white/55'}`}>
-                Gửi bán
+              <button onClick={() => setTab((t) => (t === 'sell' || t === 'advisory') ? t : 'sell')} className={`relative flex-1 py-2 border-b-2 ${(tab === 'sell' || tab === 'advisory') ? 'border-[#C8A14B] text-white' : 'border-transparent text-white/55'}`}>
+                Gửi bán{unreadAdv > 0 && tab !== 'advisory' && <span className="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#0A2540]">{unreadAdv > 99 ? '99+' : unreadAdv}</span>}
               </button>
             </div>
-            {(tab === 'support' || tab === 'advisory') && (
+            {(tab === 'sell' || tab === 'advisory') && (
               <div className="flex gap-2 px-2 pb-2">
-                <button onClick={() => setTab('support')} className={`relative flex-1 py-1.5 rounded-full text-[12px] font-bold transition ${tab === 'support' ? 'bg-white text-[#0A2540]' : 'bg-white/10 text-white/70 hover:bg-white/20'}`}>
-                  Hỗ trợ{unreadSupp > 0 && tab !== 'support' && <span className="absolute -top-0.5 right-1.5 min-w-[15px] h-[15px] px-1 grid place-items-center bg-red-500 text-white text-[9px] font-bold rounded-full">{unreadSupp > 99 ? '99+' : unreadSupp}</span>}
+                <button onClick={() => setTab('sell')} className={`relative flex-1 py-1.5 rounded-full text-[12px] font-bold transition ${tab === 'sell' ? 'bg-white text-[#0A2540]' : 'bg-white/10 text-white/70 hover:bg-white/20'}`}>
+                  Gửi bán
                 </button>
                 <button onClick={() => setTab('advisory')} className={`relative flex-1 py-1.5 rounded-full text-[12px] font-bold transition ${tab === 'advisory' ? 'bg-white text-[#0A2540]' : 'bg-white/10 text-white/70 hover:bg-white/20'}`}>
                   Tư vấn đầu tư{unreadAdv > 0 && tab !== 'advisory' && <span className="absolute -top-0.5 right-1.5 min-w-[15px] h-[15px] px-1 grid place-items-center bg-red-500 text-white text-[9px] font-bold rounded-full">{unreadAdv > 99 ? '99+' : unreadAdv}</span>}
@@ -416,7 +416,10 @@ export default function ChatWidget() {
               {twoPane && (
                 <aside className={`${room ? 'hidden sm:flex' : 'flex'} sm:order-2 flex-col shrink-0 sm:border-l border-slate-100 bg-white w-full ${(!room || listOpen) ? 'sm:w-52' : 'sm:w-0 sm:overflow-hidden sm:border-l-0'} transition-all`}>
                   <div className="px-2 py-2 border-b border-slate-100 shrink-0 space-y-1.5">
-                    <p className="text-[11px] font-bold text-slate-500 px-1">{tab === 'advisory' ? '💰 Tư vấn đầu tư' : '💬 Hội thoại'} ({(tab === 'advisory' ? advRooms : rooms).length})</p>
+                    <div className="flex items-center justify-between px-1">
+                      <p className="text-[11px] font-bold text-slate-500">{tab === 'advisory' ? '💰 Tư vấn đầu tư' : '💬 Hội thoại'} ({(tab === 'advisory' ? advRooms : rooms).length})</p>
+                      {tab === 'advisory' && <a href="/tu-van" target="_blank" className="text-[10px] font-bold text-red-600 hover:underline shrink-0">Trang quản trị ↗</a>}
+                    </div>
                     <input value={roomQ} onChange={(e) => setRoomQ(e.target.value)} placeholder="🔍 Tìm khách…" className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm outline-none focus:border-[#0A2540]" />
                   </div>
                   <div className="flex-1 overflow-y-auto scroll-soft">

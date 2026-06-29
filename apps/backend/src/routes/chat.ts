@@ -203,7 +203,14 @@ chatRouter.get('/advisory-rooms', authRequired, async (req: AuthedRequest, res, 
               (SELECT count(*) FROM chat_messages cm
                  WHERE cm.room = r.room
                    AND cm.user_id = NULLIF(split_part(r.room, ':', 2), '')::int
-                   AND cm.id > COALESCE(cr.read_id, 0))::int AS unread
+                   AND cm.id > COALESCE(cr.read_id, 0))::int AS unread,
+              (SELECT (m.user_id IS NOT DISTINCT FROM NULLIF(split_part(r.room, ':', 2), '')::int)
+                 FROM chat_messages m WHERE m.room = r.room ORDER BY m.id DESC LIMIT 1) AS waiting,
+              (SELECT min(m.created_at) FROM chat_messages m
+                 WHERE m.room = r.room
+                   AND m.user_id = NULLIF(split_part(r.room, ':', 2), '')::int
+                   AND m.id > COALESCE((SELECT max(m2.id) FROM chat_messages m2
+                                          WHERE m2.room = r.room AND m2.user_id <> NULLIF(split_part(r.room, ':', 2), '')::int), 0)) AS "waitingSince"
          FROM (SELECT room, max(created_at) AS "lastAt", count(*)::int AS count
                  FROM chat_messages WHERE room LIKE 'advisory:%' GROUP BY room) r
          LEFT JOIN users u ON u.id = NULLIF(split_part(r.room, ':', 2), '')::int

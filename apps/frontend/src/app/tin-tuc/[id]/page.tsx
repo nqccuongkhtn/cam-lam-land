@@ -15,10 +15,10 @@ export default function NewsReader() {
     fetch('/feed/news').then((r) => r.json()).then((d) => { setA((d.news || []).find((x: any) => x.slug === slug) || null); }).catch(() => {}).finally(() => setDone(true));
   }, [slug]);
 
-  if (!done) return <div className="mx-auto max-w-3xl p-12 text-center text-slate-400">Đang tải…</div>;
+  if (!done) return <div className="mx-auto max-w-4xl p-12 text-center text-slate-400">Đang tải…</div>;
 
   if (!a) return (
-    <div className="mx-auto max-w-3xl px-4 py-16 text-center">
+    <div className="mx-auto max-w-4xl px-4 py-16 text-center">
       <p className="text-5xl">🗞️</p>
       <p className="text-lg font-bold text-[#0A2540] mt-3">Bài viết không còn được lưu</p>
       <p className="text-slate-500 mt-1 text-sm">Tin tức chỉ được lưu trong 7 ngày.</p>
@@ -30,7 +30,7 @@ export default function NewsReader() {
 
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
-      <article className="mx-auto max-w-3xl px-4 py-8">
+      <article className="mx-auto max-w-4xl px-4 py-8">
         <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <Link href="/tin-tuc" className="hover:text-[#0A2540]">Tin tức</Link> › <span className="text-slate-600">Bài viết</span></div>
 
         <h1 className="text-2xl md:text-3xl font-extrabold text-[#0A2540] leading-tight">{a.title}</h1>
@@ -50,7 +50,7 @@ export default function NewsReader() {
             out.push(<p key={'p' + i}>{para}</p>);
             if ((i + 1) % 2 === 0 && ip < extra.length) { const src = extra[ip++]; out.push(<img key={'i' + i} src={src} alt="" className="w-full rounded-2xl bg-slate-100 object-cover max-h-[440px] my-1" />); }
           });
-          return <div className="mt-5 text-slate-700 leading-relaxed text-[17px] space-y-4">{out}</div>;
+          return <div className="mt-5 text-slate-700 leading-relaxed text-[18px] space-y-4">{out}</div>;
         })()}
 
         <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5">

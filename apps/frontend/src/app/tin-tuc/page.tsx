@@ -6,22 +6,29 @@ interface N { title: string; url: string; source?: string; image?: string; summa
 interface Ad { enabled?: boolean; image?: string; link?: string; title?: string; sub?: string; cta?: string }
 
 // Mẫu quảng cáo đặt sẵn (hiện khi admin chưa cấu hình / backend chưa bật)
-const SAMPLE_AD: Ad = { enabled: true, image: '', link: '/sales/post', title: 'Đăng tin nhà đất MIỄN PHÍ', sub: 'Tiếp cận khách mua tại Cam Lâm — đăng 3 phút là có ngay.', cta: 'Đăng ngay' };
+const SAMPLE_AD: Ad = { enabled: true, image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&h=1200&q=70', link: '/sales/post', title: 'ĐĂNG TIN NHÀ ĐẤT MIỄN PHÍ', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' };
 
 function AdBanner({ ad }: { ad: Ad }) {
   const ext = (ad.link || '').startsWith('http');
+  const tgt = ext ? '_blank' : undefined;
+  if (ad.image) return (
+    <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group block relative rounded-2xl overflow-hidden border border-slate-200 shadow-md hover:shadow-xl transition aspect-[300/600] bg-slate-100">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={ad.image} alt={ad.title || 'Quảng cáo'} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+      <span className="absolute top-2 right-2 bg-white/85 text-slate-600 text-[9px] font-bold px-1.5 py-0.5 rounded">QC</span>
+      <div className="absolute inset-x-0 bottom-0 p-3 pt-12 bg-gradient-to-t from-black/85 via-black/40 to-transparent text-white text-center">
+        <p className="font-extrabold text-base leading-tight drop-shadow">{ad.title}</p>
+        {ad.sub && <p className="text-xs text-white/90 mt-1 drop-shadow">{ad.sub}</p>}
+        <span className="mt-2.5 block bg-[#C8A14B] group-hover:bg-[#d4af5a] text-[#0A2540] text-sm font-extrabold px-3 py-2 rounded-lg transition">{ad.cta || 'Xem ngay'} →</span>
+      </div>
+    </a>
+  );
   return (
-    <a href={ad.link || '#'} target={ext ? '_blank' : undefined} rel="noreferrer" className="block rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition">
-      {ad.image
-        ? <img src={ad.image} alt={ad.title || 'Quảng cáo'} className="w-full object-cover" />
-        : (
-          <div className="bg-gradient-to-br from-[#0A2540] to-[#10355f] text-white p-4 min-h-[360px] flex flex-col justify-center text-center">
-            <p className="text-[10px] tracking-wider text-white/50 font-semibold">QUẢNG CÁO</p>
-            <p className="font-extrabold text-base mt-2 leading-tight">{ad.title}</p>
-            {ad.sub && <p className="text-xs text-white/80 mt-2 leading-snug">{ad.sub}</p>}
-            <span className="mt-3 inline-block bg-[#C8A14B] text-[#0A2540] text-xs font-bold px-3 py-1.5 rounded">{ad.cta || 'Xem ngay'} →</span>
-          </div>
-        )}
+    <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group block rounded-2xl overflow-hidden border border-slate-200 shadow-md hover:shadow-xl transition aspect-[300/600] bg-gradient-to-br from-[#0A2540] to-[#10355f] text-white p-4 flex flex-col justify-center text-center">
+      <p className="text-[10px] tracking-wider text-white/50 font-semibold">QUẢNG CÁO</p>
+      <p className="font-extrabold text-lg mt-2 leading-tight">{ad.title}</p>
+      {ad.sub && <p className="text-xs text-white/80 mt-2 leading-snug">{ad.sub}</p>}
+      <span className="mt-4 inline-block bg-[#C8A14B] text-[#0A2540] text-sm font-extrabold px-4 py-2 rounded-lg">{ad.cta || 'Xem ngay'} →</span>
     </a>
   );
 }
@@ -38,8 +45,8 @@ export default function NewsIndex() {
 
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
-      <div className="max-w-[1320px] mx-auto px-4 py-8 xl:flex xl:gap-6">
-        {showAd && <aside className="hidden xl:block w-44 shrink-0"><div className="sticky top-20"><AdBanner ad={ad} /></div></aside>}
+      <div className="max-w-[1440px] mx-auto px-4 py-8 xl:flex xl:gap-6">
+        {showAd && <aside className="hidden xl:block w-56 shrink-0"><div className="sticky top-20"><AdBanner ad={ad} /></div></aside>}
 
         <div className="flex-1 min-w-0">
           <div className="text-xs text-slate-400 mb-2"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <span className="text-slate-600">Tin tức thị trường</span></div>
@@ -71,7 +78,7 @@ export default function NewsIndex() {
           )}
         </div>
 
-        {showAd && <aside className="hidden xl:block w-44 shrink-0"><div className="sticky top-20"><AdBanner ad={ad} /></div></aside>}
+        {showAd && <aside className="hidden xl:block w-56 shrink-0"><div className="sticky top-20"><AdBanner ad={ad} /></div></aside>}
       </div>
     </div>
   );

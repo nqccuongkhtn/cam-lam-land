@@ -7,8 +7,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 
-type Tab = 'overview' | 'users' | 'listings' | 'payments' | 'config' | 'upload' | 'logs';
-const TABS: [Tab, string][] = [['overview', 'Tổng quan'], ['users', 'Người dùng'], ['listings', 'Tin đăng'], ['payments', 'Thanh toán'], ['config', 'Cấu hình'], ['upload', 'Tải bản đồ'], ['logs', 'Nhật ký']];
+type Tab = 'overview' | 'users' | 'listings' | 'payments' | 'ads' | 'config' | 'upload' | 'logs';
+const TABS: [Tab, string][] = [['overview', 'Tổng quan'], ['users', 'Người dùng'], ['listings', 'Tin đăng'], ['payments', 'Thanh toán'], ['ads', 'Quảng cáo'], ['config', 'Cấu hình'], ['upload', 'Tải bản đồ'], ['logs', 'Nhật ký']];
 
 export default function Admin() {
   const { user, loading, logout } = useAuth();
@@ -42,6 +42,7 @@ export default function Admin() {
       {tab === 'users' && !isGis && <Users />}
       {tab === 'listings' && !isGis && <ListingsAdmin />}
       {tab === 'payments' && !isGis && <Payments />}
+      {tab === 'ads' && !isGis && <AdsManager />}
       {tab === 'config' && !isGis && <Config />}
       {tab === 'upload' && <UploadGis />}
       {tab === 'logs' && <Logs />}
@@ -49,16 +50,80 @@ export default function Admin() {
   );
 }
 
+function AdsManager() {
+  const [ad, setAd] = useState<any>({ enabled: true, image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&h=1200&q=70', link: '/sales/post', title: 'ĐĂNG TIN NHÀ ĐẤT MIỄN PHÍ', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' });
+  const [adMsg, setAdMsg] = useState('');
+  const [mapCount, setMapCount] = useState<number | null>(null);
+  useEffect(() => { api<{ value: any }>('/config/tintuc_ad').then((r) => { if (r.value && typeof r.value === 'object') setAd((a: any) => ({ ...a, ...r.value })); }).catch(() => {}); }, []);
+  useEffect(() => { api<{ ads: any[] }>('/map-ads').then((r) => setMapCount((r.ads || []).length)).catch(() => {}); }, []);
+  const setF = (k: string, v: string) => setAd((a: any) => ({ ...a, [k]: v }));
+  async function save() { setAdMsg('Đang lưu…'); try { await api('/config/tintuc_ad', { method: 'POST', body: JSON.stringify({ value: ad }) }); setAdMsg('✓ Đã lưu.'); } catch (e: any) { const m = String(e?.message || ''); setAdMsg(/404|not ?found|không tìm/i.test(m) ? '✗ Cần rebuild lại camlam-api.' : '✗ ' + m); } }
+  const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm';
+  const on = ad.enabled !== false;
+  return (
+    <div className="space-y-4 max-w-3xl">
+      <p className="text-sm text-slate-500">Quản lý <b>toàn bộ quảng cáo</b> của web tại đây.</p>
+
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 flex items-center justify-between gap-4">
+        <div>
+          <p className="font-bold text-[#0A2540]">🗺️ Quảng cáo trên bản đồ</p>
+          <p className="text-sm text-slate-500 mt-0.5">Logo ghim điểm / chữ mờ trên bản đồ quy hoạch — đang chạy <b>{mapCount ?? '…'}</b> quảng cáo.</p>
+        </div>
+        <Link href="/map-ads" className="shrink-0 bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-4 py-2 rounded-xl text-sm whitespace-nowrap">Quản lý →</Link>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-slate-200 p-4">
+        <div className="flex items-center justify-between">
+          <p className="font-bold text-[#0A2540]">📢 Banner trang Tin tức (2 bên)</p>
+          <button onClick={() => setAd((a: any) => ({ ...a, enabled: a.enabled === false }))} aria-label="Bật/tắt" className={`w-12 h-7 rounded-full relative transition ${on ? 'bg-emerald-500' : 'bg-slate-300'}`}><span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-all ${on ? 'left-6' : 'left-1'}`} /></button>
+        </div>
+        <p className="text-xs text-slate-500 mt-1">Chuẩn display ad 300×600. Có ảnh → ảnh phủ + chữ; trống ảnh → banner chữ. Nên dùng ảnh đứng (vd 600×1200).</p>
+        <div className="grid sm:grid-cols-[1fr_170px] gap-4 mt-3 items-start">
+          <div className="space-y-2.5">
+            <input value={ad.image || ''} onChange={(e) => setF('image', e.target.value)} placeholder="URL ảnh (đứng, vd 600×1200)" className={inp} />
+            <input value={ad.link || ''} onChange={(e) => setF('link', e.target.value)} placeholder="Link khi bấm (vd /sales/post)" className={inp} />
+            <input value={ad.title || ''} onChange={(e) => setF('title', e.target.value)} placeholder="Tiêu đề" className={inp} />
+            <input value={ad.sub || ''} onChange={(e) => setF('sub', e.target.value)} placeholder="Mô tả ngắn" className={inp} />
+            <input value={ad.cta || ''} onChange={(e) => setF('cta', e.target.value)} placeholder="Chữ nút" className={inp} />
+            <div className="flex items-center gap-3"><button onClick={save} className="bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-4 py-2 rounded-xl text-sm">Lưu</button>{adMsg && <span className="text-xs font-medium text-slate-600">{adMsg}</span>}</div>
+          </div>
+          <div>
+            <p className="text-[11px] text-slate-400 mb-1.5 text-center">Xem trước</p>
+            <div className="relative rounded-xl overflow-hidden border border-slate-200 aspect-[300/600] bg-slate-100">
+              {ad.image ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={ad.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 p-2 pt-8 bg-gradient-to-t from-black/85 to-transparent text-white text-center">
+                    <p className="font-extrabold text-xs leading-tight">{ad.title}</p>
+                    {ad.sub && <p className="text-[10px] text-white/90 mt-0.5">{ad.sub}</p>}
+                    <span className="mt-1.5 block bg-[#C8A14B] text-[#0A2540] text-[11px] font-bold py-1 rounded">{ad.cta || 'Xem'} →</span>
+                  </div>
+                </>
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0A2540] to-[#10355f] text-white p-2 flex flex-col justify-center text-center">
+                  <p className="font-extrabold text-sm">{ad.title}</p>
+                  {ad.sub && <p className="text-[10px] text-white/80 mt-1">{ad.sub}</p>}
+                  <span className="mt-2 inline-block bg-[#C8A14B] text-[#0A2540] text-[11px] font-bold px-2 py-1 rounded">{ad.cta || 'Xem'} →</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-slate-200 p-4">
+        <p className="font-bold text-[#0A2540]">📣 Banner liên hệ quảng cáo (trang chủ)</p>
+        <p className="text-sm text-slate-500 mt-0.5">Hiện ở cuối trang chủ khi <b>Dịch vụ</b> đang bật. Bật/tắt ở tab <b>Cấu hình</b>.</p>
+      </div>
+    </div>
+  );
+}
 function Config() {
   const [flags, setFlags] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState('');
-  const [ad, setAd] = useState<any>({ enabled: true, image: '', link: '/sales/post', title: 'Đăng tin nhà đất MIỄN PHÍ', sub: 'Tiếp cận khách mua tại Cam Lâm.', cta: 'Đăng ngay' });
-  const [adMsg, setAdMsg] = useState('');
   const load = useCallback(() => { api<{ flags: Record<string, boolean> }>('/flags').then((r) => setFlags(r.flags || {})).catch(() => {}); }, []);
   useEffect(() => { load(); }, [load]);
-  useEffect(() => { api<{ value: any }>('/config/tintuc_ad').then((r) => { if (r.value && typeof r.value === 'object') setAd((a: any) => ({ ...a, ...r.value })); }).catch(() => {}); }, []);
-  const setAdField = (k: string, v: string) => setAd((a: any) => ({ ...a, [k]: v }));
-  async function saveAd() { setAdMsg('Đang lưu…'); try { await api('/config/tintuc_ad', { method: 'POST', body: JSON.stringify({ value: ad }) }); setAdMsg('✓ Đã lưu — quảng cáo đã cập nhật.'); } catch (e: any) { const m = String(e?.message || ''); setAdMsg(/404|not ?found|không tìm/i.test(m) ? '✗ Cần rebuild lại camlam-api.' : '✗ ' + m); } }
   async function toggle(key: string, on: boolean) {
     setBusy(key);
     try { await api('/flags', { method: 'POST', body: JSON.stringify({ key, on }) }); setFlags((f) => ({ ...f, [key]: on })); refreshFlags(); }
@@ -85,22 +150,6 @@ function Config() {
       <div className="bg-white rounded-2xl border border-slate-200 p-4">
         <p className="font-bold text-[#0A2540]">📰 Tin tức thị trường (trang chủ)</p>
         <p className="text-sm text-slate-500 mt-0.5">Tự lấy bài BĐS từ nguồn uy tín (VnExpress, CafeF, Báo Xây dựng) và hiển thị ở tab “Thị trường BĐS” — chạy sẵn trong web, không cần thao tác.</p>
-      </div>
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-2.5">
-        <div className="flex items-center justify-between">
-          <p className="font-bold text-[#0A2540]">📢 Quảng cáo trang Tin tức (2 bên)</p>
-          <button onClick={() => setAd((a: any) => ({ ...a, enabled: a.enabled === false }))} aria-label="Bật/tắt" className={`w-12 h-7 rounded-full relative transition ${ad.enabled !== false ? 'bg-emerald-500' : 'bg-slate-300'}`}><span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-all ${ad.enabled !== false ? 'left-6' : 'left-1'}`} /></button>
-        </div>
-        <p className="text-xs text-slate-500">Banner hiện 2 bên trang <b>/tin-tuc</b> (màn hình rộng). Có ảnh thì hiện ảnh; để trống ảnh thì hiện banner chữ. Công tắc để bật/tắt.</p>
-        <input value={ad.image || ''} onChange={(e) => setAdField('image', e.target.value)} placeholder="URL ảnh banner (để trống = banner chữ)" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
-        <input value={ad.link || ''} onChange={(e) => setAdField('link', e.target.value)} placeholder="Link khi bấm (vd: /sales/post hoặc https://...)" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
-        <input value={ad.title || ''} onChange={(e) => setAdField('title', e.target.value)} placeholder="Tiêu đề (khi không có ảnh)" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
-        <input value={ad.sub || ''} onChange={(e) => setAdField('sub', e.target.value)} placeholder="Mô tả ngắn" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
-        <input value={ad.cta || ''} onChange={(e) => setAdField('cta', e.target.value)} placeholder="Chữ nút (vd: Đăng ngay)" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
-        <div className="flex items-center gap-3 pt-1">
-          <button onClick={saveAd} className="bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-4 py-2 rounded-xl text-sm">Lưu quảng cáo</button>
-          {adMsg && <span className="text-xs font-medium text-slate-600">{adMsg}</span>}
-        </div>
       </div>
       <p className="text-xs text-slate-400">{flags.services_live ? '🟢 Dịch vụ đang công khai với khách.' : '🔒 Dịch vụ đang ẩn — chỉ admin xem được.'}</p>
     </div>

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { isFlagOn } from '../lib/flags.ts';
+import { cached, cachePut, cacheDrop } from '../lib/cache.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 
 export const listingsRouter = Router();
@@ -35,6 +36,9 @@ function linkImages(listingId: number, images: any): Promise<any> {
 // GET /api/listings — bộ lọc + ưu tiên tin đẩy
 listingsRouter.get('/', async (req, res, next) => {
   try {
+    const ckey = 'listings:list:' + JSON.stringify(req.query);
+    const chit = cached<any>(ckey);
+    if (chit) { res.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=60'); return res.json(chit); }
     const { minPrice, maxPrice, propertyType, ward, q, bbox } = req.query as Record<string, string>;
     const where: string[] = [`listings.status NOT IN ('hidden','pending')`, `(listings.tier <> 'normal' OR COALESCE(listings.bumped_at, listings.created_at) > now() - interval '7 days')`];
     const params: any[] = [];
@@ -50,8 +54,10 @@ listingsRouter.get('/', async (req, res, next) => {
     const rows = await query(
       `${SELECT} WHERE ${where.join(' AND ')} ORDER BY CASE listings.tier WHEN 'diamond' THEN 3 WHEN 'gold' THEN 2 WHEN 'silver' THEN 1 ELSE 0 END DESC, COALESCE(listings.bumped_at, listings.created_at) DESC LIMIT ${limit} OFFSET ${offset}`, params);
     rows.forEach((r: any) => { r.contactPhone = maskPhone(r.contactPhone); });
+    const payload = { count: rows.length, listings: rows };
+    cachePut(ckey, payload, 20000);
     res.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=60');
-    res.json({ count: rows.length, listings: rows });
+    res.json(payload);
   } catch (e) { next(e); }
 });
 
@@ -78,20 +84,25 @@ listingsRouter.post('/:id/boost', authRequired, async (req: AuthedRequest, res, 
       `UPDATE listings SET tier=COALESCE($2,tier), bumped_at=CASE WHEN $3 THEN now() ELSE bumped_at END, boosted=(COALESCE($2,tier) <> 'normal')
        WHERE id=$1 RETURNING id, tier, boosted`, [id, tier, bump]);
     if (isBoost && req.user!.role !== 'admin') await query('UPDATE users SET boost_used = boost_used + 1 WHERE id=$1', [req.user!.id]);
+    cacheDrop('listings:');
     res.json({ ok: true, tier: row.tier });
   } catch (e) { next(e); }
 });
 
 listingsRouter.get('/geojson', async (_req, res, next) => {
   try {
+    const ghit = cached<any>('listings:geojson');
+    if (ghit) { res.set('Cache-Control', 'public, max-age=20, stale-while-revalidate=60'); return res.json(ghit); }
     const rows = await query(`
       SELECT json_build_object('type','Feature','geometry', ST_AsGeoJSON(geom)::json,
         'properties', json_build_object('id',id,'title',title,'price',price,'propertyType',property_type,
           'area',area,'ward',ward,'boosted',boosted,'image', (images)[1])) AS feature
       FROM listings WHERE status NOT IN ('hidden','pending')
         AND (tier <> 'normal' OR COALESCE(bumped_at, created_at) > now() - interval '7 days')`);
+    const gpayload = { type: 'FeatureCollection', features: rows.map((r: any) => r.feature) };
+    cachePut('listings:geojson', gpayload, 30000);
     res.set('Cache-Control', 'public, max-age=20, stale-while-revalidate=60');
-    res.json({ type: 'FeatureCollection', features: rows.map((r: any) => r.feature) });
+    res.json(gpayload);
   } catch (e) { next(e); }
 });
 
@@ -196,6 +207,7 @@ listingsRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => 
        b.ward ?? null, b.bedrooms ?? null, b.bathrooms ?? null, b.direction ?? null, b.legal ?? null, b.frontage ?? null,
        b.contactName ?? null, b.contactPhone ?? null, b.images ?? [], b.lng, b.lat, req.user!.id]);
     await linkImages(row.id, b.images);
+    cacheDrop('listings:');
     if (svcOn && req.user!.role !== 'admin') { if (pkgActive) await query('UPDATE users SET post_used = post_used + 1 WHERE id=$1', [req.user!.id]); else bumpUsage(req.user!.id, 'posts').catch(() => {}); }
     const [created] = await query(`${SELECT} WHERE listings.id=$1`, [row.id]);
     res.status(201).json(created);
@@ -251,6 +263,7 @@ listingsRouter.delete('/:id', authRequired, async (req: AuthedRequest, res, next
     const id = Number(req.params.id);
     if (!(await ownerOrAdmin(req, id))) return res.status(403).json({ error: 'Không có quyền xoá tin này' });
     const r = await query('DELETE FROM listings WHERE id=$1 RETURNING id', [id]);
+    cacheDrop('listings:');
     if (!r.length) return res.status(404).json({ error: 'Không tìm thấy tin' });
     res.json({ deleted: r[0].id });
   } catch (e) { next(e); }

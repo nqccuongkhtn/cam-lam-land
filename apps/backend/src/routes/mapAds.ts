@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { cached, cachePut, cacheDrop } from '../lib/cache.ts';
 import { query } from '../lib/db.ts';
 import { adminRequired, type AuthedRequest } from '../middleware/auth.ts';
 
@@ -7,6 +8,8 @@ export const mapAdsRouter = Router();
 // GET /api/map-ads/active — các điểm quảng cáo đang hiệu lực (công khai, hiển thị trên bản đồ)
 mapAdsRouter.get('/active', async (_req, res, next) => {
   try {
+    const ahit = cached<any>('mapads:active');
+    if (ahit) { res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=120'); return res.json(ahit); }
     const rows = await query(
       `SELECT id, advertiser_name, advertiser_phone, image_url, points, style
          FROM map_ads WHERE status='active' AND now() < expires_at`);
@@ -22,8 +25,10 @@ mapAdsRouter.get('/active', async (_req, res, next) => {
           ads.push({ id: r.id, name: r.advertiser_name, phone: r.advertiser_phone, image: r.image_url, style: 'seal', lng: +p.lng, lat: +p.lat });
       }
     }
+    const apayload = { ads };
+    cachePut('mapads:active', apayload, 30000);
     res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=120');
-    res.json({ ads });
+    res.json(apayload);
   } catch (e) { next(e); }
 });
 
@@ -103,7 +108,7 @@ mapAdsRouter.put('/:id', adminRequired, async (req: AuthedRequest, res, next) =>
          expires_at = CASE WHEN $8::int > 0 THEN now() + make_interval(months => $8::int) ELSE expires_at END, status='active'
        WHERE id=$1`,
       [id, name, phone, b.imageUrl ?? null, wards, JSON.stringify(points), pkg, months, style]);
-    res.json({ id });
+    cacheDrop('mapads:'); res.json({ id });
   } catch (e) { next(e); }
 });
 
@@ -112,6 +117,6 @@ mapAdsRouter.delete('/:id', adminRequired, async (req, res, next) => {
   try {
     const r = await query('DELETE FROM map_ads WHERE id=$1 RETURNING id', [Number(req.params.id)]);
     if (!r.length) return res.status(404).json({ error: 'Không tìm thấy' });
-    res.json({ deleted: r[0].id });
+    cacheDrop('mapads:'); res.json({ deleted: r[0].id });
   } catch (e) { next(e); }
 });

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { cached, cachePut } from '../lib/cache.ts';
 import { query } from '../lib/db.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { broadcastChat } from '../lib/ws.ts';
@@ -137,13 +138,17 @@ chatRouter.get('/rooms', authRequired, async (req: AuthedRequest, res, next) => 
 // GET /api/chat/mention — danh sách TÊN mọi người dùng (để @nhắc trong chat), chỉ tên, không lộ liên hệ
 chatRouter.get('/mention', authRequired, async (_req: AuthedRequest, res, next) => {
   try {
+    const mhit = cached<any>('chat:mention');
+    if (mhit) { res.set('Cache-Control', 'private, max-age=120'); return res.json(mhit); }
     const rows = await query(
       `SELECT id, COALESCE(NULLIF(full_name,''), split_part(email,'@',1)) AS name
          FROM users
         WHERE COALESCE(NULLIF(full_name,''), email) IS NOT NULL
         ORDER BY full_name NULLS LAST, id LIMIT 500`);
+    const mpayload = { users: rows };
+    cachePut('chat:mention', mpayload, 120000);
     res.set('Cache-Control', 'private, max-age=120');
-    res.json({ users: rows });
+    res.json(mpayload);
   } catch (e) { next(e); }
 });
 

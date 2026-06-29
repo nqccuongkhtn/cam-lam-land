@@ -19,7 +19,7 @@ const STATIC: Pkg[] = [
   { id: 'gold', name: 'VIP Vàng', kind: 'boost', tier: 'gold', boosts: 20, days: 20, price: 4999000, popular: true, perks: ['Hiển thị hạng VIP Vàng', '20 lượt đẩy', 'Tự nổi lại mỗi 12h', 'Ưu tiên trên hạng Bạc', 'Hiệu lực 20 ngày'] },
   { id: 'diamond', name: 'VIP Kim Cương', kind: 'boost', tier: 'diamond', boosts: 20, days: 20, price: 9999000, perks: ['Hiển thị hạng VIP Kim Cương', '20 lượt đẩy', 'Tự nổi lại mỗi 6h', 'Luôn trên cùng · tiêu đề đỏ', 'Hiệu lực 20 ngày'] },
 ];
-const STATIC_BANK: Bank = { bankId: 'MB', account: '0359033303', name: 'NGUYEN QUOC CUONG', demo: true };
+const STATIC_BANK: Bank = { bankId: 'BIDV', account: '8855951682', name: 'NGUYEN QUOC CUONG', demo: false };
 const ACCENT: Record<string, string> = { post: '#0ea5e9', normal: '#64748b', silver: '#94a3b8', gold: '#f59e0b', diamond: '#e11d48' };
 const fmt = (n: number) => n.toLocaleString('vi-VN') + 'đ';
 const keyOf = (p: Pkg) => (p.kind === 'post' ? 'post' : p.tier || 'silver');

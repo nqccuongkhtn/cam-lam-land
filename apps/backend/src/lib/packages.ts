@@ -24,4 +24,4 @@ export const PACKAGES: Pkg[] = [
 ];
 export const TIER_RANK: Record<string, number> = { normal: 0, silver: 1, gold: 2, diamond: 3 };
 export const findPkg = (id: string): Pkg | undefined => PACKAGES.find((p) => p.id === id);
-export const BANK = { bankId: process.env.BANK_ID || 'MB', account: process.env.BANK_ACCOUNT || '0359033303', name: process.env.BANK_NAME || 'NGUYEN QUOC CUONG', demo: !process.env.BANK_ACCOUNT };
+export const BANK = { bankId: process.env.BANK_ID || 'BIDV', account: process.env.BANK_ACCOUNT || '8855951682', name: process.env.BANK_NAME || 'NGUYEN QUOC CUONG', demo: process.env.BANK_DEMO === 'true' };

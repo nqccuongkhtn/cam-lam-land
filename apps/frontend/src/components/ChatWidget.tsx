@@ -350,14 +350,26 @@ export default function ChatWidget() {
               </div>
             </div>
             <div className="flex mt-2 text-[13px] font-bold">
-              {([['community', 'Cộng đồng', unreadComm, false], ['support', 'Hỗ trợ', unreadSupp, isAdmin], ['advisory', 'Đầu tư', unreadAdv, true], ['sell', 'Gửi bán', 0, false]] as [Tab, string, number, boolean][]).map(([t, lb, n, num]) => (
-                <button key={t} onClick={() => setTab(t)} className={`relative flex-1 py-2 border-b-2 ${tab === t ? 'border-[#C8A14B] text-white' : 'border-transparent text-white/55'}`}>
-                  {lb}{n > 0 && tab !== t && (num
-                    ? <span className="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#0A2540]">{n > 99 ? '99+' : n}</span>
-                    : <span className="absolute top-1 right-1.5 w-2 h-2 bg-red-500 rounded-full" />)}
-                </button>
-              ))}
+              <button onClick={() => setTab('community')} className={`relative flex-1 py-2 border-b-2 ${tab === 'community' ? 'border-[#C8A14B] text-white' : 'border-transparent text-white/55'}`}>
+                Cộng đồng{unreadComm > 0 && tab !== 'community' && <span className="absolute top-1 right-1.5 w-2 h-2 bg-red-500 rounded-full" />}
+              </button>
+              <button onClick={() => setTab((t) => (t === 'support' || t === 'advisory') ? t : 'support')} className={`relative flex-1 py-2 border-b-2 ${(tab === 'support' || tab === 'advisory') ? 'border-[#C8A14B] text-white' : 'border-transparent text-white/55'}`}>
+                Liên hệ admin{(unreadSupp + unreadAdv) > 0 && !(tab === 'support' || tab === 'advisory') && <span className="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#0A2540]">{(unreadSupp + unreadAdv) > 99 ? '99+' : (unreadSupp + unreadAdv)}</span>}
+              </button>
+              <button onClick={() => setTab('sell')} className={`relative flex-1 py-2 border-b-2 ${tab === 'sell' ? 'border-[#C8A14B] text-white' : 'border-transparent text-white/55'}`}>
+                Gửi bán
+              </button>
             </div>
+            {(tab === 'support' || tab === 'advisory') && (
+              <div className="flex gap-2 px-2 pb-2">
+                <button onClick={() => setTab('support')} className={`relative flex-1 py-1.5 rounded-full text-[12px] font-bold transition ${tab === 'support' ? 'bg-white text-[#0A2540]' : 'bg-white/10 text-white/70 hover:bg-white/20'}`}>
+                  Hỗ trợ{unreadSupp > 0 && tab !== 'support' && <span className="absolute -top-0.5 right-1.5 min-w-[15px] h-[15px] px-1 grid place-items-center bg-red-500 text-white text-[9px] font-bold rounded-full">{unreadSupp > 99 ? '99+' : unreadSupp}</span>}
+                </button>
+                <button onClick={() => setTab('advisory')} className={`relative flex-1 py-1.5 rounded-full text-[12px] font-bold transition ${tab === 'advisory' ? 'bg-white text-[#0A2540]' : 'bg-white/10 text-white/70 hover:bg-white/20'}`}>
+                  Tư vấn đầu tư{unreadAdv > 0 && tab !== 'advisory' && <span className="absolute -top-0.5 right-1.5 min-w-[15px] h-[15px] px-1 grid place-items-center bg-red-500 text-white text-[9px] font-bold rounded-full">{unreadAdv > 99 ? '99+' : unreadAdv}</span>}
+                </button>
+              </div>
+            )}
           </div>
 
           {tab === 'sell' ? (

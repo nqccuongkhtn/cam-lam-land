@@ -13,6 +13,8 @@ const BAD = /(lừa đảo|vỡ nợ|phá sản|siết nợ|tranh chấp|khởi 
 const decode = (s: string): string => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'").trim();
 const strip = (s: string): string => s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 const b64url = (s: string): string => Buffer.from(s, 'utf8').toString('base64url');
+const vnSlug = (s: string): string => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60).replace(/-+$/, '');
+const shortHash = (s: string): string => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h.toString(36); };
 
 // ── AI viết lại (tuỳ chọn): cần ANTHROPIC_API_KEY trong env. Không có thì trả null ──
 const AI_KEY = process.env.ANTHROPIC_API_KEY;
@@ -84,7 +86,7 @@ export async function GET() {
   // Viết lại nội dung cho các bài MỚI (nếu có AI key); không có thì dùng đoạn tóm tắt nguồn
   await Promise.allSettled(fresh.map(async (a) => {
     a.body = (await rewrite(a.title, a.summary)) || a.summary;
-    a.slug = b64url(a.url);
+    a.slug = `${vnSlug(a.title) || 'tin'}-${shortHash(a.url)}`;
   }));
   for (const a of fresh) byUrl.set(a.url, a);
 

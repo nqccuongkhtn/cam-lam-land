@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-// Lấy tin BĐS từ nguồn uy tín NGAY TRONG FRONTEND (server-side) — không cần backend.
+// Lấy tin BĐS từ nguồn uy tín, AI viết lại thành nội dung riêng, lưu 7 ngày, làm mới mỗi 2 giờ.
 export const dynamic = 'force-dynamic';
 
 const SOURCES = [
@@ -8,11 +8,34 @@ const SOURCES = [
   { name: 'CafeF', url: 'https://cafef.vn/bat-dong-san.rss' },
   { name: 'Báo Xây dựng', url: 'https://baoxaydung.com.vn/rss/bat-dong-san.rss' },
 ];
-// Bỏ tin tiêu cực — chỉ giữ tin tích cực / trung lập
 const BAD = /(lừa đảo|vỡ nợ|phá sản|siết nợ|tranh chấp|khởi tố|khởi kiện|kiện tụng|bắt giam|lao dốc|bán tháo|nợ xấu|đóng băng|ế ẩm|sụt giảm|giảm mạnh|thổi giá|bong bóng|chiếm đoạt|cảnh báo sốt|trục lợi)/i;
 
 const decode = (s: string): string => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'").trim();
 const strip = (s: string): string => s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+const b64url = (s: string): string => Buffer.from(s, 'utf8').toString('base64url');
+
+// ── AI viết lại (tuỳ chọn): cần ANTHROPIC_API_KEY trong env. Không có thì trả null ──
+const AI_KEY = process.env.ANTHROPIC_API_KEY;
+const AI_MODEL = process.env.AI_MODEL || 'claude-haiku-4-5-20251001';
+async function rewrite(title: string, summary: string): Promise<string | null> {
+  if (!AI_KEY) return null;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': AI_KEY, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: AI_MODEL,
+        max_tokens: 420,
+        messages: [{ role: 'user', content: `Bạn là biên tập viên bất động sản của Cam Lâm Land. Viết lại bản tin dưới đây thành một đoạn 4-6 câu tiếng Việt, văn phong riêng, mạch lạc, KHÔNG sao chép nguyên văn — chỉ giữ lại sự kiện, số liệu, địa điểm chính. Không thêm tiêu đề, không mở đầu kiểu "Tóm tắt:".\n\nTiêu đề: ${title}\nThông tin nguồn: ${summary}` }],
+      }),
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!res.ok) return null;
+    const j: any = await res.json();
+    const txt = j?.content?.[0]?.text?.trim();
+    return txt || null;
+  } catch { return null; }
+}
 
 async function fetchSource(src: { name: string; url: string }): Promise<any[]> {
   const res = await fetch(src.url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CamLamLand/1.0)' }, signal: AbortSignal.timeout(8000), cache: 'no-store' });
@@ -28,33 +51,49 @@ async function fetchSource(src: { name: string; url: string }): Promise<any[]> {
     const image = (desc.match(/<img[^>]+src=["']?([^"' >]+)/) || [])[1] || null;
     const d = pub ? new Date(pub) : new Date();
     if (!title || !link || isNaN(d.getTime()) || BAD.test(title)) continue;
-    const item = { title, url: link, source: src.name, image, summary: strip(desc).slice(0, 600), publishedAt: d.toISOString() };
-    out.push({ ...item, slug: Buffer.from(JSON.stringify(item), 'utf8').toString('base64url') });
+    out.push({ title, url: link, source: src.name, image, summary: strip(desc).slice(0, 600), publishedAt: d.toISOString() });
   }
   return out;
 }
 
-let cache: { at: number; items: any[] } = { at: 0, items: [] };
+// Kho lưu trong tiến trình: tích luỹ & giữ 7 ngày
+let store: any[] = [];
+let lastSlot = -1;
 
-// Làm mới mỗi 6 giờ theo giờ VN, bắt đầu từ 6h sáng: mốc 00:00, 06:00, 12:00, 18:00
+// Mốc làm mới: mỗi 2 giờ trong khung 6h–22h (giờ VN). Ngoài khung đó giữ bản 22h, không cập nhật.
 function slotStart(): number {
-  const vn = new Date(Date.now() + 7 * 3600 * 1000); // giờ VN coi như UTC
-  const slotHour = Math.floor(vn.getUTCHours() / 6) * 6;
-  return Date.UTC(vn.getUTCFullYear(), vn.getUTCMonth(), vn.getUTCDate(), slotHour) - 7 * 3600 * 1000;
+  const vn = new Date(Date.now() + 7 * 3600 * 1000);
+  let h = vn.getUTCHours();
+  let dayOffset = 0;
+  if (h < 6) { h = 22; dayOffset = -1; }   // 0–5h: dùng lại bản 22h hôm trước
+  else if (h >= 22) { h = 22; }            // 22–23h: mốc 22h hôm nay
+  else { h = h - (h % 2); }                // 6–21h: mốc chẵn gần nhất (6,8,…,20)
+  return Date.UTC(vn.getUTCFullYear(), vn.getUTCMonth(), vn.getUTCDate() + dayOffset, h) - 7 * 3600 * 1000;
 }
 
 export async function GET() {
-  // còn trong khung 6 giờ hiện tại thì dùng lại bản đã lấy; sang khung mới mới lấy lại
-  if (cache.items.length && cache.at >= slotStart())
-    return NextResponse.json({ news: cache.items });
+  const slot = slotStart();
+  if (store.length && lastSlot === slot) return NextResponse.json({ news: store });
+
   const results = await Promise.allSettled(SOURCES.map(fetchSource));
-  const all: any[] = [];
-  for (const r of results) if (r.status === 'fulfilled') all.push(...r.value);
-  const seen = new Set<string>();
-  const items = all
-    .filter((a) => { if (seen.has(a.url)) return false; seen.add(a.url); return true; })
+  const fetched: any[] = [];
+  for (const r of results) if (r.status === 'fulfilled') fetched.push(...r.value);
+
+  const byUrl = new Map<string, any>(store.map((a) => [a.url, a]));
+  const fresh = fetched.filter((a) => !byUrl.has(a.url));
+  // Viết lại nội dung cho các bài MỚI (nếu có AI key); không có thì dùng đoạn tóm tắt nguồn
+  await Promise.allSettled(fresh.map(async (a) => {
+    a.body = (await rewrite(a.title, a.summary)) || a.summary;
+    a.slug = b64url(a.url);
+  }));
+  for (const a of fresh) byUrl.set(a.url, a);
+
+  const weekAgo = Date.now() - 7 * 86400000; // 7 ngày
+  store = [...byUrl.values()]
+    .filter((a) => a.slug && +new Date(a.publishedAt) >= weekAgo)
     .sort((a, b) => +new Date(b.publishedAt) - +new Date(a.publishedAt))
-    .slice(0, 12);
-  if (items.length) cache = { at: Date.now(), items };
-  return NextResponse.json({ news: items.length ? items : cache.items });
+    .slice(0, 60);
+  if (fetched.length) lastSlot = slot;
+
+  return NextResponse.json({ news: store });
 }

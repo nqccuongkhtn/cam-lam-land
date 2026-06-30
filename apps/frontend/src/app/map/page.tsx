@@ -15,6 +15,7 @@ const DEFAULT_COLORS: Record<string, string> = {
 };
 const RASTER_OVERLAYS = [
   { id: 'qh-qd205', name: 'Ảnh quy hoạch QĐ205', url: '/overlays/QD205.png',
+    tiles: ['/tiles/qd205/{z}/{x}/{y}.png'], minzoom: 9, maxzoom: 15,
     coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]] },
 ];
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
@@ -197,7 +198,7 @@ export default function MapPage() {
   const refreshFeatures = useCallback((v: { west: number; south: number; east: number; north: number; zoom: number }) => {
     const bbox = `${v.west},${v.south},${v.east},${v.north}`;
     for (const l of layersRef.current) {
-      const vis = visibleRef.current[l.slug] ?? (l.layerType === 'parcel' || l.layerType === 'zoning');
+      const vis = visibleRef.current[l.slug] ?? (l.layerType === 'parcel');
       if (!vis) continue;
       const minZ = l.layerType === 'parcel' ? PARCEL_MIN_ZOOM : (l.layerType === 'zoning' ? ZONING_MIN_ZOOM : 0);
       if (minZ && v.zoom < minZ) { setData((d) => ({ ...d, [l.slug]: { type: 'FeatureCollection', features: [] } })); continue; }
@@ -211,7 +212,7 @@ export default function MapPage() {
   const load = useCallback(() => {
     api<{ layers: GisLayer[] }>('/layers').then(({ layers }) => {
       setLayers(layers);
-      setVisible((prev) => Object.fromEntries(layers.map((l) => [l.slug, prev[l.slug] ?? (l.layerType === 'parcel' || l.layerType === 'zoning')])));
+      setVisible((prev) => Object.fromEntries(layers.map((l) => [l.slug, prev[l.slug] ?? (l.layerType === 'parcel')])));
       if (viewRef.current) refreshFeatures(viewRef.current);
     }).catch(() => {});
   }, [refreshFeatures]);
@@ -221,7 +222,7 @@ export default function MapPage() {
   useEffect(() => { if (!camOpen) return; const v = camVideoRef.current, st = camStreamRef.current; if (!v || !st) return; v.srcObject = st; v.setAttribute('playsinline', 'true'); v.play().catch(() => {}); }, [camOpen]);
 
   const overlays: ImageOverlay[] = useMemo(
-    () => RASTER_OVERLAYS.map((o) => ({ id: o.id, url: o.url, coordinates: o.coordinates, opacity, visible: ovOn[o.id] ?? true })), [opacity, ovOn]);
+    () => RASTER_OVERLAYS.map((o) => ({ id: o.id, url: o.url, coordinates: o.coordinates, opacity, visible: ovOn[o.id] ?? true, tiles: (o as any).tiles, minzoom: (o as any).minzoom, maxzoom: (o as any).maxzoom })), [opacity, ovOn]);
 
   const geoLayers: GeoLayer[] = useMemo(() => {
     const out: GeoLayer[] = [];
@@ -230,7 +231,7 @@ export default function MapPage() {
       const base = (l.style?.color as string) || DEFAULT_COLORS[l.layerType] || '#16a34a';
       const colorExpr: any = ['coalesce', ['get', 'color'], base];
       const gtype = (l.geometryType || '').toLowerCase();
-      const vis = visible[l.slug] ?? (l.layerType === 'parcel' || l.layerType === 'zoning');
+      const vis = visible[l.slug] ?? (l.layerType === 'parcel');
       if (gtype.includes('line')) out.push({ id: `${l.slug}-line`, type: 'line', data: fc, visible: vis, paint: { 'line-color': colorExpr, 'line-width': (l.style?.weight as number) ?? 2.5 } });
       else if (gtype.includes('point')) out.push({ id: `${l.slug}-pt`, type: 'circle', data: fc, visible: vis, paint: { 'circle-color': colorExpr, 'circle-radius': 5, 'circle-stroke-color': '#fff', 'circle-stroke-width': 1 } });
       else if (l.layerType === 'parcel') {
@@ -476,7 +477,7 @@ export default function MapPage() {
         <div className="relative flex-1">
           <MapView layers={geoLayers} overlays={overlays} baseMap={baseMap} labels={labels} measureMode={measure}
             focusPoint={focusPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} onViewport={onViewport} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={1} fitTo={fitTo} />
-          {zoomNow > 0 && zoomNow < ZONING_MIN_ZOOM && layers.some((l) => (l.layerType === 'parcel' || l.layerType === 'zoning') && (visible[l.slug] ?? true)) && (
+          {zoomNow > 0 && zoomNow < ZONING_MIN_ZOOM && layers.some((l) => (l.layerType === 'parcel') && (visible[l.slug] ?? true)) && (
             <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 bg-[#0A2540]/90 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">🔍 Đang dùng ảnh quy hoạch · phóng to để hiện ranh + click thửa</div>
           )}
           {/* Thanh ĐỘ MỜ lớp phủ dạng DỌC nổi trên bản đồ — chỉ hiện trên điện thoại/iPad (bảng trái bị ẩn) */}

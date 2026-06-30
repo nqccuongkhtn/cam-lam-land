@@ -5,7 +5,7 @@ import { MAP } from '@/lib/config';
 
 export interface GeoLayer { id: string; type: 'fill' | 'line' | 'circle' | 'symbol'; data: GeoJSON.FeatureCollection; visible: boolean; paint: Record<string, any>; layout?: Record<string, any>; }
 export interface MarkerSpec { lng: number; lat: number; color?: string; popupHtml?: string; label?: string; onClick?: () => void; }
-export interface ImageOverlay { id: string; url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number; visible: boolean; }
+export interface ImageOverlay { id: string; url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number; visible: boolean; tiles?: string[]; minzoom?: number; maxzoom?: number; }
 export type BaseMap = 'street' | 'satellite' | 'terrain';
 export type MeasureMode = 'off' | 'distance' | 'area';
 export interface MeasureResult { mode: MeasureMode; points: number; distance: number; area: number; }
@@ -170,7 +170,8 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     for (const ov of overlays) {
       const srcId = `ovsrc-${ov.id}`;
       if (!map.getSource(srcId)) {
-        map.addSource(srcId, { type: 'image', url: ov.url, coordinates: ov.coordinates as any });
+        if (ov.tiles && ov.tiles.length) map.addSource(srcId, { type: 'raster', tiles: ov.tiles, tileSize: 256, minzoom: ov.minzoom ?? 0, maxzoom: ov.maxzoom ?? 22 } as any);
+        else map.addSource(srcId, { type: 'image', url: ov.url, coordinates: ov.coordinates as any });
         map.addLayer({ id: ov.id, type: 'raster', source: srcId, paint: { 'raster-opacity': ov.opacity } });
       } else map.setPaintProperty(ov.id, 'raster-opacity', ov.opacity);
       map.setLayoutProperty(ov.id, 'visibility', ov.visible ? 'visible' : 'none');
@@ -298,5 +299,4 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     ['highlight-fill', 'highlight-line'].forEach((id) => { if (map.getLayer(id)) map.moveLayer(id); });
   }, [highlight]);
 
-  return <div ref={containerRef} className={className ?? 'h-full w-full'} />;
-}
+  return <div ref={containerRef}

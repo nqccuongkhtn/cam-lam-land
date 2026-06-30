@@ -19,6 +19,7 @@ const RASTER_OVERLAYS = [
 ];
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
 const PARCEL_MIN_ZOOM = 14; // thửa đất chỉ tải khi đủ gần
+const ZONING_MIN_ZOOM = 14; // lớp quy hoạch (vector) chỉ tải khi zoom gần — ở xa dùng ẢNH quy hoạch cho nhẹ
 
 interface ParcelInfo {
   found: boolean; point: { lng: number; lat: number };
@@ -196,9 +197,10 @@ export default function MapPage() {
   const refreshFeatures = useCallback((v: { west: number; south: number; east: number; north: number; zoom: number }) => {
     const bbox = `${v.west},${v.south},${v.east},${v.north}`;
     for (const l of layersRef.current) {
-      const vis = visibleRef.current[l.slug] ?? (l.layerType === 'parcel');
+      const vis = visibleRef.current[l.slug] ?? (l.layerType === 'parcel' || l.layerType === 'zoning');
       if (!vis) continue;
-      if (l.layerType === 'parcel' && v.zoom < PARCEL_MIN_ZOOM) { setData((d) => ({ ...d, [l.slug]: { type: 'FeatureCollection', features: [] } })); continue; }
+      const minZ = l.layerType === 'parcel' ? PARCEL_MIN_ZOOM : (l.layerType === 'zoning' ? ZONING_MIN_ZOOM : 0);
+      if (minZ && v.zoom < minZ) { setData((d) => ({ ...d, [l.slug]: { type: 'FeatureCollection', features: [] } })); continue; }
       api<GeoJSON.FeatureCollection>(`/layers/${l.slug}/features?bbox=${bbox}&z=${Math.round(v.zoom)}`).then((fc) => setData((d) => ({ ...d, [l.slug]: fc }))).catch(() => {});
     }
   }, []);
@@ -209,7 +211,7 @@ export default function MapPage() {
   const load = useCallback(() => {
     api<{ layers: GisLayer[] }>('/layers').then(({ layers }) => {
       setLayers(layers);
-      setVisible((prev) => Object.fromEntries(layers.map((l) => [l.slug, prev[l.slug] ?? (l.layerType === 'parcel')])));
+      setVisible((prev) => Object.fromEntries(layers.map((l) => [l.slug, prev[l.slug] ?? (l.layerType === 'parcel' || l.layerType === 'zoning')])));
       if (viewRef.current) refreshFeatures(viewRef.current);
     }).catch(() => {});
   }, [refreshFeatures]);
@@ -228,7 +230,7 @@ export default function MapPage() {
       const base = (l.style?.color as string) || DEFAULT_COLORS[l.layerType] || '#16a34a';
       const colorExpr: any = ['coalesce', ['get', 'color'], base];
       const gtype = (l.geometryType || '').toLowerCase();
-      const vis = visible[l.slug] ?? (l.layerType === 'parcel');
+      const vis = visible[l.slug] ?? (l.layerType === 'parcel' || l.layerType === 'zoning');
       if (gtype.includes('line')) out.push({ id: `${l.slug}-line`, type: 'line', data: fc, visible: vis, paint: { 'line-color': colorExpr, 'line-width': (l.style?.weight as number) ?? 2.5 } });
       else if (gtype.includes('point')) out.push({ id: `${l.slug}-pt`, type: 'circle', data: fc, visible: vis, paint: { 'circle-color': colorExpr, 'circle-radius': 5, 'circle-stroke-color': '#fff', 'circle-stroke-width': 1 } });
       else if (l.layerType === 'parcel') {
@@ -474,8 +476,8 @@ export default function MapPage() {
         <div className="relative flex-1">
           <MapView layers={geoLayers} overlays={overlays} baseMap={baseMap} labels={labels} measureMode={measure}
             focusPoint={focusPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} onViewport={onViewport} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={1} fitTo={fitTo} />
-          {zoomNow > 0 && zoomNow < PARCEL_MIN_ZOOM && layers.some((l) => l.layerType === 'parcel' && (visible[l.slug] ?? true)) && (
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 bg-[#0A2540]/90 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">🔍 Phóng to để hiển thị thửa đất</div>
+          {zoomNow > 0 && zoomNow < ZONING_MIN_ZOOM && layers.some((l) => (l.layerType === 'parcel' || l.layerType === 'zoning') && (visible[l.slug] ?? true)) && (
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 bg-[#0A2540]/90 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">🔍 Đang dùng ảnh quy hoạch · phóng to để hiện ranh + click thửa</div>
           )}
           {/* Thanh ĐỘ MỜ lớp phủ dạng DỌC nổi trên bản đồ — chỉ hiện trên điện thoại/iPad (bảng trái bị ẩn) */}
           {(ovOn['qh-qd205'] ?? true) && (

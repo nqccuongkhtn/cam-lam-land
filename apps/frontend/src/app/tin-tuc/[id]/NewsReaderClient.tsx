@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { useNewsAd, showAd, BillboardAd, NativeAd, SidebarAd } from '@/components/newsAds';
 
 interface Article { title: string; url: string; source?: string; image?: string; images?: string[]; summary?: string; body?: string; publishedAt?: string; slug: string }
 
@@ -22,14 +23,39 @@ function WmImg({ src, alt, wrap, img }: { src: string; alt?: string; wrap?: stri
   );
 }
 
+function RelatedList({ items }: { items: Article[] }) {
+  if (!items.length) return null;
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+      <p className="px-4 py-2.5 border-b-2 border-red-600 font-extrabold text-[#0A2540] text-sm uppercase tracking-tight">Tin liên quan</p>
+      <div className="divide-y divide-slate-100">
+        {items.map((n) => (
+          <Link key={n.slug} href={`/tin-tuc/${n.slug}`} className="group flex gap-3 items-start p-3 hover:bg-slate-50">
+            <div className="w-20 h-14 rounded-lg overflow-hidden bg-slate-100 shrink-0">
+              {n.image ? <img src={n.image} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full grid place-items-center text-slate-300">📰</div>}
+            </div>
+            <p className="text-[13px] font-semibold text-[#0A2540] leading-snug line-clamp-3 group-hover:text-red-600">{n.title}</p>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function NewsReaderClient() {
   const { id } = useParams<{ id: string }>();
   const slug = id ? decodeURIComponent(id) : '';
   const [a, setA] = useState<Article | null>(null);
+  const [related, setRelated] = useState<Article[]>([]);
   const [done, setDone] = useState(false);
+  const ad = useNewsAd();
 
   useEffect(() => {
-    fetch('/feed/news').then((r) => r.json()).then((d) => { setA((d.news || []).find((x: any) => x.slug === slug) || null); }).catch(() => {}).finally(() => setDone(true));
+    fetch('/feed/news').then((r) => r.json()).then((d) => {
+      const list: Article[] = d.news || [];
+      setA(list.find((x: any) => x.slug === slug) || null);
+      setRelated(list.filter((x: any) => x.slug !== slug).slice(0, 8));
+    }).catch(() => {}).finally(() => setDone(true));
   }, [slug]);
 
   if (!done) return <div className="mx-auto max-w-5xl p-12 text-center text-slate-400">Đang tải…</div>;
@@ -44,40 +70,56 @@ export default function NewsReaderClient() {
   );
 
   const date = a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('vi-VN') : '';
+  const hero = (a.images && a.images[0]) || a.image;
+  const paras = String(a.body || a.summary || '').split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  const extra = (a.images || []).slice(1);
+  const body: any[] = []; let ip = 0;
+  paras.forEach((para, i) => {
+    body.push(<p key={'p' + i}>{para}</p>);
+    if (i === 2 && showAd(ad)) body.push(<div key="adin" className="my-4"><NativeAd ad={ad} /></div>);
+    if ((i + 1) % 2 === 0 && ip < extra.length) body.push(<WmImg key={'i' + i} src={extra[ip++]} wrap="my-1" img="max-h-[440px]" />);
+  });
 
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
-      <article className="mx-auto max-w-5xl px-4 py-8">
+      <div className="mx-auto max-w-6xl px-4 py-6">
         <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <Link href="/tin-tuc" className="hover:text-[#0A2540]">Tin tức</Link> › <span className="text-slate-600">Bài viết</span></div>
 
-        <h1 className="text-2xl md:text-3xl font-extrabold text-[#0A2540] leading-tight">{a.title}</h1>
-        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-sm text-slate-400 mt-3">
-          <span className="font-semibold text-[#0A2540]">Cam Lâm Land</span>
-          {date && <span>· 🕒 {date}</span>}
-          <span className="ml-auto text-[11px] bg-slate-100 text-slate-500 rounded-full px-2 py-0.5">Biên tập</span>
+        {showAd(ad) && <div className="mb-5"><BillboardAd ad={ad} /></div>}
+
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
+          <article className="min-w-0">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-[#0A2540] leading-tight">{a.title}</h1>
+            <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-sm text-slate-400 mt-3">
+              <span className="font-semibold text-[#0A2540]">Cam Lâm Land</span>
+              {date && <span>· 🕒 {date}</span>}
+              <span className="ml-auto text-[11px] bg-slate-100 text-slate-500 rounded-full px-2 py-0.5">Biên tập</span>
+            </div>
+
+            {hero && <WmImg src={hero} alt={a.title} wrap="mt-5" img="max-h-[460px]" />}
+
+            {a.summary && <p className="mt-5 text-[17px] font-semibold text-[#0A2540] leading-relaxed">{a.summary}</p>}
+
+            <div className="mt-4 text-slate-700 leading-relaxed text-[18px] space-y-4">{body}</div>
+
+            <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5">
+              <p className="text-sm text-slate-600">Bài do Cam Lâm Land biên tập, dựa trên thông tin từ <b>{a.source || 'báo chí'}</b>. Xem bản gốc đầy đủ tại nguồn:</p>
+              <a href={a.url} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-2 bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-5 py-2.5 rounded-xl">Đọc bản gốc tại {a.source || 'nguồn'} →</a>
+              <p className="text-[11px] text-slate-400 mt-3">Nguồn: <a href={a.url} target="_blank" rel="noreferrer" className="underline break-all hover:text-[#0A2540]">{a.url}</a></p>
+            </div>
+
+            <div className="lg:hidden mt-6"><RelatedList items={related.slice(0, 6)} /></div>
+            <div className="mt-6"><Link href="/tin-tuc" className="text-sm font-semibold text-red-600 hover:text-red-700">← Tất cả tin tức</Link></div>
+          </article>
+
+          <aside className="hidden lg:block">
+            <div className="sticky top-20 space-y-5">
+              {showAd(ad) && <SidebarAd ad={ad} />}
+              <RelatedList items={related} />
+            </div>
+          </aside>
         </div>
-
-        {(() => { const hero = (a.images && a.images[0]) || a.image; return hero ? <WmImg src={hero} alt={a.title} wrap="mt-5" img="max-h-[460px]" /> : null; })()}
-
-        {(a.body || a.summary) && (() => {
-          const paras = String(a.body || a.summary).split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
-          const extra = (a.images || []).slice(1);
-          const out: any[] = []; let ip = 0;
-          paras.forEach((para, i) => {
-            out.push(<p key={'p' + i}>{para}</p>);
-            if ((i + 1) % 2 === 0 && ip < extra.length) { const src = extra[ip++]; out.push(<WmImg key={'i' + i} src={src} wrap="my-1" img="max-h-[440px]" />); }
-          });
-          return <div className="mt-5 text-slate-700 leading-relaxed text-[18px] space-y-4">{out}</div>;
-        })()}
-
-        <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5">
-          <p className="text-sm text-slate-600">Bài do Cam Lâm Land biên tập, dựa trên thông tin từ <b>{a.source || 'báo chí'}</b>. Xem bản gốc đầy đủ tại nguồn:</p>
-          <a href={a.url} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-2 bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-5 py-2.5 rounded-xl">Đọc bản gốc tại {a.source || 'nguồn'} →</a>
-          <p className="text-[11px] text-slate-400 mt-3">Nguồn: <a href={a.url} target="_blank" rel="noreferrer" className="underline break-all hover:text-[#0A2540]">{a.url}</a></p>
-        </div>
-
-        <div className="mt-6"><Link href="/tin-tuc" className="text-sm font-semibold text-red-600 hover:text-red-700">← Tất cả tin tức</Link></div>
-      </article>
+      </div>
     </div>
   );
 }

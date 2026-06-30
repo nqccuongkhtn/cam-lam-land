@@ -236,8 +236,9 @@ export default function MapPage() {
         out.push({ id: `${l.slug}-label`, type: 'symbol', data: fc, visible: vis, paint: { 'text-color': '#111827', 'text-halo-color': '#ffffff', 'text-halo-width': 1.5 }, layout: { 'text-field': ['coalesce', ['get', 'SoThua'], ['get', 'so_thua'], ['get', 'SOTHUA'], ['get', 'sothua'], ['get', 'thua'], ['get', 'THUA'], ['get', 'SHThua'], ['get', 'ThuaDat'], ''], 'text-size': 11, 'text-font': ['Noto Sans Regular'], 'symbol-placement': 'point', 'text-allow-overlap': false } });
       }
       else {
-        out.push({ id: `${l.slug}-fill`, type: 'fill', data: fc, visible: vis, paint: { 'fill-color': colorExpr, 'fill-opacity': opacity } });
-        out.push({ id: `${l.slug}-line`, type: 'line', data: fc, visible: vis, paint: { 'line-color': colorExpr, 'line-width': (l.style?.weight as number) ?? 0.7 } });
+        // Lớp quy hoạch CHỈ VẼ VIỀN (không tô nền) -> rất nhẹ, hết lag. Màu nền do ảnh quy hoạch gốc (overlay) lo.
+        // Click vào thửa vẫn ra diện tích dính từng loại QH vì việc đó server tính (không phụ thuộc lớp này có vẽ hay không).
+        out.push({ id: `${l.slug}-line`, type: 'line', data: fc, visible: vis, paint: { 'line-color': colorExpr, 'line-width': (l.style?.weight as number) ?? 0.8, 'line-opacity': 0.85 } });
       }
     }
     return out;

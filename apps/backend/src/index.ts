@@ -64,9 +64,10 @@ initWs(server);
 
 async function main() {
   await waitForDb();
-  if (process.env.BOOTSTRAP_DB === 'true') await bootstrap();
-  await migrate();
-  await ensureAdmin();
+  // Các bước khởi tạo DB: nếu lỗi thì GHI LOG rõ nhưng VẪN cho server chạy (tránh deploy fail vì 1 câu lệnh).
+  if (process.env.BOOTSTRAP_DB === 'true') { try { await bootstrap(); } catch (e: any) { console.error('[boot] bootstrap lỗi (bỏ qua):', e?.stack || e?.message || e); } }
+  try { await migrate(); } catch (e: any) { console.error('[boot] migrate lỗi (bỏ qua, server vẫn chạy):', e?.stack || e?.message || e); }
+  try { await ensureAdmin(); } catch (e: any) { console.error('[boot] ensureAdmin lỗi (bỏ qua):', e?.stack || e?.message || e); }
   refreshNews(true).catch(() => {}); // lấy tin ngay khi khởi động
   // Tự cập nhật tin BĐS mỗi 6 giờ từ 6h sáng (giờ VN): 06:00, 12:00, 18:00, 00:00
   let lastNewsSlot = '';
@@ -99,4 +100,4 @@ async function main() {
   setInterval(autoBump, 30 * 60 * 1000); // soát mỗi 30 phút
   autoBump();
 }
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch((e) => { console.error('[BOOT FATAL]', (e && (e.stack || e.message)) || e); setTimeout(() => process.exit(1), 400); });

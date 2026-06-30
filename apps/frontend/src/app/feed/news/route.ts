@@ -18,7 +18,7 @@ const RE = /(bất động sản|nhà đất|đất nền|đất ở|căn hộ|c
 const decode = (s: string): string => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ').trim();
 const strip = (s: string): string => s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 const vnSlug = (s: string): string => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60).replace(/-+$/, '');
-const shortHash = (s: string): string => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h.toString(36); };
+const shortHash = (s: string): string => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h.toString(); }; // đuôi slug = SỐ
 
 // ── AI viết lại: ưu tiên Gemini (MIỄN PHÍ - GEMINI_API_KEY), nếu không thì Claude (ANTHROPIC_API_KEY). Không có key nào thì để tóm tắt nguồn. ──
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
@@ -186,7 +186,7 @@ export async function GET(req: Request) {
     const imgs = dedupeImages([a.image, ...art.images].filter((u): u is string => !!u && cleanImg(u))).slice(0, 3);
     a.images = imgs;
     a.image = imgs[0] || null;
-    a.slug = `${vnSlug(a.title) || 'tin'}-${shortHash(a.url)}`;
+    a.slug = `${vnSlug(a.title) || 'tin'}-${shortHash(a.url)}`; // mô tả + đuôi SỐ
   }));
   for (const a of fresh) byUrl.set(a.url, a);
 

@@ -5,6 +5,23 @@ import Link from 'next/link';
 
 interface Article { title: string; url: string; source?: string; image?: string; images?: string[]; summary?: string; body?: string; publishedAt?: string; slug: string }
 
+// Ảnh có watermark Cam Lâm Land + SĐT, dải mờ che logo/credit của báo gốc.
+function WmImg({ src, alt, wrap, img }: { src: string; alt?: string; wrap?: string; img?: string }) {
+  return (
+    <div className={`relative overflow-hidden rounded-2xl bg-slate-100 ${wrap || ''}`}>
+      <img src={src} alt={alt || ''} className={`w-full object-cover block ${img || ''}`} />
+      <div className="absolute inset-0 grid place-items-center pointer-events-none">
+        <span className="text-white/15 font-black text-2xl sm:text-4xl tracking-widest -rotate-6 select-none" style={{ textShadow: '0 1px 6px rgba(0,0,0,.3)' }}>CAM LÂM LAND</span>
+      </div>
+      <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/55 to-transparent pointer-events-none" />
+      <div className="absolute right-2.5 bottom-2 flex items-center gap-1.5 pointer-events-none">
+        <img src="/icons/icon-192.png" alt="" className="w-4 h-4 rounded-[3px]" />
+        <span className="text-white text-[11px] font-bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,.7)' }}>Cam Lâm Land · 0988 888 888</span>
+      </div>
+    </div>
+  );
+}
+
 export default function NewsReaderClient() {
   const { id } = useParams<{ id: string }>();
   const slug = id ? decodeURIComponent(id) : '';
@@ -40,7 +57,7 @@ export default function NewsReaderClient() {
           <span className="ml-auto text-[11px] bg-slate-100 text-slate-500 rounded-full px-2 py-0.5">Biên tập</span>
         </div>
 
-        {(() => { const hero = (a.images && a.images[0]) || a.image; return hero ? <img src={hero} alt={a.title} className="w-full rounded-2xl mt-5 bg-slate-100 object-cover max-h-[460px]" /> : null; })()}
+        {(() => { const hero = (a.images && a.images[0]) || a.image; return hero ? <WmImg src={hero} alt={a.title} wrap="mt-5" img="max-h-[460px]" /> : null; })()}
 
         {(a.body || a.summary) && (() => {
           const paras = String(a.body || a.summary).split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
@@ -48,7 +65,7 @@ export default function NewsReaderClient() {
           const out: any[] = []; let ip = 0;
           paras.forEach((para, i) => {
             out.push(<p key={'p' + i}>{para}</p>);
-            if ((i + 1) % 2 === 0 && ip < extra.length) { const src = extra[ip++]; out.push(<img key={'i' + i} src={src} alt="" className="w-full rounded-2xl bg-slate-100 object-cover max-h-[440px] my-1" />); }
+            if ((i + 1) % 2 === 0 && ip < extra.length) { const src = extra[ip++]; out.push(<WmImg key={'i' + i} src={src} wrap="my-1" img="max-h-[440px]" />); }
           });
           return <div className="mt-5 text-slate-700 leading-relaxed text-[18px] space-y-4">{out}</div>;
         })()}

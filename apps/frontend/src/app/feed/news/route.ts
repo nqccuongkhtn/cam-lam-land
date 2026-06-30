@@ -9,6 +9,8 @@ const SOURCES = [
   { name: 'Báo Xây dựng', url: 'https://baoxaydung.com.vn/rss/bat-dong-san.rss' },
 ];
 const BAD = /(lừa đảo|vỡ nợ|phá sản|siết nợ|tranh chấp|khởi tố|khởi kiện|kiện tụng|bắt giam|lao dốc|bán tháo|nợ xấu|đóng băng|ế ẩm|sụt giảm|giảm mạnh|thổi giá|bong bóng|chiếm đoạt|cảnh báo sốt|trục lợi)/i;
+// Tin thuộc thị trường Khánh Hòa -> ưu tiên hiển thị trước
+const LOCAL = /(Khánh\s*Hòa|Khanh\s*Hoa|Cam\s*Lâm|Cam\s*Lam|Nha\s*Trang|Cam\s*Ranh|Bãi\s*Dài|Bai\s*Dai|Vạn\s*Ninh|Ninh\s*Hòa|Diên\s*Khánh|Cam\s*Đức|Cam\s*Hải)/i;
 
 const decode = (s: string): string => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ').trim();
 const strip = (s: string): string => s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -132,7 +134,8 @@ async function fetchSource(src: { name: string; url: string }): Promise<any[]> {
     const image = (desc.match(/<img[^>]+src=["']?([^"' >]+)/) || [])[1] || null;
     const d = pub ? new Date(pub) : new Date();
     if (!title || !link || isNaN(d.getTime()) || BAD.test(title)) continue;
-    out.push({ title, url: link, source: src.name, image, summary: strip(desc).slice(0, 600), publishedAt: d.toISOString() });
+    const sm = strip(desc);
+    out.push({ title, url: link, source: src.name, image, summary: sm.slice(0, 600), publishedAt: d.toISOString(), local: LOCAL.test(title + ' ' + sm) });
   }
   return out;
 }
@@ -186,7 +189,7 @@ export async function GET(req: Request) {
   const weekAgo = Date.now() - 7 * 86400000;
   store = [...byUrl.values()]
     .filter((a) => a.slug && +new Date(a.publishedAt) >= weekAgo)
-    .sort((a, b) => +new Date(b.publishedAt) - +new Date(a.publishedAt))
+    .sort((a, b) => (b.local ? 1 : 0) - (a.local ? 1 : 0) || +new Date(b.publishedAt) - +new Date(a.publishedAt))
     .slice(0, 60);
   if (fetched.length) lastSlot = slot;
 

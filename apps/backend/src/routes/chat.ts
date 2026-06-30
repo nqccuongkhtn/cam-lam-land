@@ -9,8 +9,10 @@ export const chatRouter = Router();
 
 async function isAdvisor(user: { id: number; role: string }): Promise<boolean> {
   if (user.role === 'admin') return true;
-  const [u] = await query('SELECT is_advisor FROM users WHERE id=$1', [user.id]);
-  return !!u?.is_advisor;
+  try {
+    const [u] = await query('SELECT is_advisor FROM users WHERE id=$1', [user.id]);
+    return !!u?.is_advisor;
+  } catch { return false; } // thiếu cột is_advisor -> coi như chưa phải tư vấn viên (không chặn khách)
 }
 
 async function canAccess(room: string, user: { id: number; role: string }): Promise<boolean> {

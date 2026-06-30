@@ -66,13 +66,16 @@ export default function Home() {
   const { flags } = useFlags();
   const [listings, setListings] = useState<Listing[]>([]);
   const [marketNews, setMarketNews] = useState<{ title: string; url: string; img?: string; date?: string; source?: string }[]>([]);
+  const [marketLoading, setMarketLoading] = useState(true);
   const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Tin nổi bật');
   useEffect(() => { api<{ listings: Listing[] }>('/listings?limit=20').then((d) => setListings(d.listings || [])).catch(() => {}); }, []);
   useEffect(() => {
+    setMarketLoading(true);
     fetch('/feed/news')
       .then((r) => r.json())
       .then((d) => setMarketNews((d.news || []).map((n: any) => ({ title: n.title, url: '/tin-tuc/' + n.slug, img: n.image || U('1486406146926-c627a92ad1ab'), date: n.publishedAt ? new Date(n.publishedAt).toLocaleDateString('vi-VN') : undefined, source: n.source }))))
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setMarketLoading(false));
   }, []);
 
   function search() {
@@ -82,7 +85,8 @@ export default function Home() {
   }
   const featured = listings.length > 0 ? listings : STATIC;
   const fromApi = listings.length > 0;
-  const newsItems = newsTab === 'Thị trường BĐS' && marketNews.length ? [...marketNews.slice(0, 6), ...NEWS['Thị trường BĐS'].slice(-2)] : NEWS[newsTab];
+  const newsItems = newsTab === 'Thị trường BĐS' ? (marketNews.length ? marketNews.slice(0, 8) : NEWS['Thị trường BĐS']) : NEWS[newsTab];
+  const marketLoadingNow = newsTab === 'Thị trường BĐS' && marketLoading && !marketNews.length;
 
   return (
     <div className="bg-slate-50">
@@ -137,6 +141,14 @@ export default function Home() {
           <Link href="/tin-tuc" className="ml-auto text-red-600 text-sm font-semibold whitespace-nowrap shrink-0">Xem thêm →</Link>
         </div>
         <div className="grid lg:grid-cols-[1.05fr_1fr_0.62fr] gap-6">
+          {marketLoadingNow ? (
+            <div className="lg:col-span-2 grid place-items-center min-h-[220px] text-slate-400 text-sm">
+              <div className="text-center">
+                <div className="w-8 h-8 border-2 border-slate-200 border-t-red-500 rounded-full animate-spin mx-auto" />
+                <p className="mt-3">Đang tải tin thị trường…</p>
+              </div>
+            </div>
+          ) : (<>
           {(() => { const feat = newsItems[0]; return (
             <a href={feat.url} target={feat.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="group block">
               <div className="aspect-[16/10] rounded-xl overflow-hidden bg-slate-100">
@@ -152,6 +164,7 @@ export default function Home() {
               <a key={h.title} href={h.url} target={h.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="block py-2.5 text-[15px] text-slate-700 hover:text-red-600 leading-snug line-clamp-2">{h.title}</a>
             ))}
           </div>
+          </>)}
           <div className="space-y-4">
             <Link href="/map" className="block rounded-xl bg-gradient-to-br from-[#a3121b] to-[#6d0d14] text-white p-5 hover:brightness-110 transition">
               <p className="text-[11px] tracking-wide text-white/70 font-semibold">CAM LÂM LAND</p>

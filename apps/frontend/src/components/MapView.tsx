@@ -299,4 +299,5 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     ['highlight-fill', 'highlight-line'].forEach((id) => { if (map.getLayer(id)) map.moveLayer(id); });
   }, [highlight]);
 
-  return <div ref={containerRef}
+  return <div ref={containerRef} className={className ?? 'h-full w-full'} />;
+}

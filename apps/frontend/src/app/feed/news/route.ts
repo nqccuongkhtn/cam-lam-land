@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 const SOURCES = [
+  { name: 'Báo Khánh Hòa', url: 'https://baokhanhhoa.vn/rss/kinh-te.rss', local: true, re: true },
   { name: 'VnExpress', url: 'https://vnexpress.net/rss/bat-dong-san.rss' },
   { name: 'CafeF', url: 'https://cafef.vn/bat-dong-san.rss' },
   { name: 'Báo Xây dựng', url: 'https://baoxaydung.com.vn/rss/bat-dong-san.rss' },
@@ -11,6 +12,8 @@ const SOURCES = [
 const BAD = /(lừa đảo|vỡ nợ|phá sản|siết nợ|tranh chấp|khởi tố|khởi kiện|kiện tụng|bắt giam|lao dốc|bán tháo|nợ xấu|đóng băng|ế ẩm|sụt giảm|giảm mạnh|thổi giá|bong bóng|chiếm đoạt|cảnh báo sốt|trục lợi)/i;
 // Tin thuộc thị trường Khánh Hòa -> ưu tiên hiển thị trước
 const LOCAL = /(Khánh\s*Hòa|Khanh\s*Hoa|Cam\s*Lâm|Cam\s*Lam|Nha\s*Trang|Cam\s*Ranh|Bãi\s*Dài|Bai\s*Dai|Vạn\s*Ninh|Ninh\s*Hòa|Diên\s*Khánh|Cam\s*Đức|Cam\s*Hải)/i;
+// Lọc tin liên quan BĐS (áp dụng cho nguồn báo địa phương tổng hợp như Báo Khánh Hòa)
+const RE = /(bất động sản|nhà đất|đất nền|đất ở|căn hộ|chung cư|biệt thự|nhà phố|liền kề|quy hoạch|dự án|đô thị|hạ tầng|khu công nghiệp|đấu giá|sổ đỏ|mặt bằng|thổ cư|ven biển|sân bay|cao tốc|tái định cư|đầu tư|giải phóng mặt bằng)/i;
 
 const decode = (s: string): string => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ').trim();
 const strip = (s: string): string => s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -120,7 +123,7 @@ async function fetchArticle(url: string): Promise<{ text: string; images: string
   } catch { return { text: '', images: [] }; }
 }
 
-async function fetchSource(src: { name: string; url: string }): Promise<any[]> {
+async function fetchSource(src: { name: string; url: string; local?: boolean; re?: boolean }): Promise<any[]> {
   const res = await fetch(src.url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CamLamLand/1.0)' }, signal: AbortSignal.timeout(8000), cache: 'no-store' });
   if (!res.ok) return [];
   const xml = await res.text();
@@ -135,7 +138,8 @@ async function fetchSource(src: { name: string; url: string }): Promise<any[]> {
     const d = pub ? new Date(pub) : new Date();
     if (!title || !link || isNaN(d.getTime()) || BAD.test(title)) continue;
     const sm = strip(desc);
-    out.push({ title, url: link, source: src.name, image, summary: sm.slice(0, 600), publishedAt: d.toISOString(), local: LOCAL.test(title + ' ' + sm) });
+    if (src.re && !RE.test(title + ' ' + sm)) continue; // nguồn tổng hợp -> chỉ lấy tin BĐS
+    out.push({ title, url: link, source: src.name, image, summary: sm.slice(0, 600), publishedAt: d.toISOString(), local: !!src.local || LOCAL.test(title + ' ' + sm) });
   }
   return out;
 }

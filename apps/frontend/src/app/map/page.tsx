@@ -199,7 +199,7 @@ export default function MapPage() {
       const vis = visibleRef.current[l.slug] ?? (l.layerType === 'parcel');
       if (!vis) continue;
       if (l.layerType === 'parcel' && v.zoom < PARCEL_MIN_ZOOM) { setData((d) => ({ ...d, [l.slug]: { type: 'FeatureCollection', features: [] } })); continue; }
-      api<GeoJSON.FeatureCollection>(`/layers/${l.slug}/features?bbox=${bbox}`).then((fc) => setData((d) => ({ ...d, [l.slug]: fc }))).catch(() => {});
+      api<GeoJSON.FeatureCollection>(`/layers/${l.slug}/features?bbox=${bbox}&z=${Math.round(v.zoom)}`).then((fc) => setData((d) => ({ ...d, [l.slug]: fc }))).catch(() => {});
     }
   }, []);
   const onViewport = useCallback((v: { west: number; south: number; east: number; north: number; zoom: number }) => {

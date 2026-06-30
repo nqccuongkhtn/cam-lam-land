@@ -100,6 +100,9 @@ chatRouter.post('/messages', authRequired, async (req: AuthedRequest, res, next)
     const room = String(req.body?.room ?? '');
     const body = String(req.body?.body ?? '').trim().slice(0, 2000);
     if (!(await canAccess(room, req.user!))) return res.status(403).json({ error: 'Không có quyền' });
+    // Chặn admin/tư vấn viên tự nhắn vào phòng hỗ trợ/tư vấn của CHÍNH MÌNH.
+    if ((room === `support:${req.user!.id}` || room === `advisory:${req.user!.id}`) && (req.user!.role === 'admin' || (await isAdvisor(req.user!))))
+      return res.status(400).json({ error: 'Admin/tư vấn viên không thể tự nhắn cho chính mình.' });
     if (!body) return res.status(400).json({ error: 'Tin nhắn trống' });
     if (room === 'community') {
       const bad = badContent(body);

@@ -284,10 +284,10 @@ export default function ChatWidget() {
   const twoPane = adminSupport || staffAdvisory;
   const needPick = twoPane && !room;
   let lastMineId = 0; if (user) for (const m of msgs) if (m.userId === user.id) lastMineId = m.id;
-  const roomList = (tab === 'advisory' ? advRooms : rooms).filter((r) => !roomQ.trim() || (r.name || '').toLowerCase().includes(roomQ.trim().toLowerCase()));
+  const roomList = (tab === 'advisory' ? advRooms : rooms).filter((r) => r.room !== `support:${user?.id}` && r.room !== `advisory:${user?.id}`).filter((r) => !roomQ.trim() || (r.name || '').toLowerCase().includes(roomQ.trim().toLowerCase()));
   const roomSet = new Set(rooms.map((r) => r.room));
   const nq = roomQ.trim().toLowerCase();
-  const newUsers = adminSupport ? userHits.filter((u) => !roomSet.has(`support:${u.id}`) && (!nq || (u.name || '').toLowerCase().includes(nq) || (u.phone || '').toLowerCase().includes(nq))) : [];
+  const newUsers = adminSupport ? userHits.filter((u) => u.id !== user?.id && !roomSet.has(`support:${u.id}`) && (!nq || (u.name || '').toLowerCase().includes(nq) || (u.phone || '').toLowerCase().includes(nq))) : [];
   const activeRoom = (tab === 'advisory' ? advRooms : rooms).find((r) => r.room === room);
   const activeName = activeRoom?.name || pickedName || 'Khách hàng';
   const activePhone = activeRoom?.phone || pickedPhone || '';

@@ -61,6 +61,32 @@ function Ic({ d }: { d: string }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#0A2540]/60 shrink-0"><path d={d} /></svg>;
 }
 
+const SEARCH_HINTS = [
+  'Đất nền Cam Lâm dưới 1 tỷ',
+  'Nhà phố trung tâm Cam Đức',
+  'Đất ven biển Bãi Dài, Cam Hải Đông',
+  'Biệt thự nghỉ dưỡng gần sân bay Cam Ranh',
+  'Đất nông nghiệp giá tốt Suối Tân',
+];
+// Placeholder gõ chữ luân phiên các gợi ý tìm kiếm để kích thích người dùng nhập.
+function useTypingHint(items: string[]): string {
+  const [txt, setTxt] = useState('');
+  useEffect(() => {
+    let i = 0, ci = 0, del = false; let t: any;
+    const tick = () => {
+      const w = items[i % items.length];
+      ci += del ? -1 : 1;
+      setTxt(w.slice(0, Math.max(0, ci)));
+      if (!del && ci >= w.length) { del = true; t = setTimeout(tick, 1500); return; }
+      if (del && ci <= 0) { del = false; i++; t = setTimeout(tick, 350); return; }
+      t = setTimeout(tick, del ? 35 : 70);
+    };
+    t = setTimeout(tick, 700);
+    return () => clearTimeout(t);
+  }, []);
+  return txt;
+}
+
 export default function Home() {
   const router = useRouter();
   const { flags } = useFlags();
@@ -68,6 +94,7 @@ export default function Home() {
   const [marketNews, setMarketNews] = useState<{ title: string; url: string; img?: string; date?: string; source?: string }[]>([]);
   const [marketLoading, setMarketLoading] = useState(true);
   const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Tin nổi bật');
+  const searchHint = useTypingHint(SEARCH_HINTS);
   useEffect(() => { api<{ listings: Listing[] }>('/listings?limit=20').then((d) => setListings(d.listings || [])).catch(() => {}); }, []);
   useEffect(() => {
     setMarketLoading(true);
@@ -103,7 +130,7 @@ export default function Home() {
           <div className="mt-9 bg-white rounded-2xl shadow-2xl p-3 max-w-5xl grid md:grid-cols-[1.3fr_1fr_1fr_auto] gap-2">
             <label className="flex items-center gap-2 px-3 rounded-xl border border-slate-200 focus-within:border-[#0A2540]">
               <Ic d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" />
-              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder="Khu vực, dự án…" className="py-3 w-full outline-none text-slate-800 text-sm" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder={searchHint || 'Khu vực, dự án…'} className="py-3 w-full outline-none text-slate-800 text-sm" />
             </label>
             <label className="flex items-center gap-2 px-3 rounded-xl border border-slate-200">
               <Ic d="M3 11l9-8 9 8M5 10v10h14V10" />

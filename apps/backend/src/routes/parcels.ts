@@ -63,7 +63,8 @@ parcelsRouter.get('/at', async (req, res, next) => {
                COALESCE(NULLIF(f.properties->>'KyHieu',''), NULLIF(f.properties->>'MaLoaiDat',''),
                         NULLIF(f.properties->>'TenLoaiDat',''), NULLIF(f.properties->>'LoaiDat',''),
                         NULLIF(f.properties->>'MDSDD',''), NULLIF(f.properties->>'QHSDD',''),
-                        NULLIF(f.properties->>'Loai',''), NULLIF(f.properties->>'loai',''), '—') AS type,
+                        NULLIF(f.properties->>'Loai',''), NULLIF(f.properties->>'loai',''),
+                        NULLIF(f.properties->>'layer',''), NULLIF(f.properties->>'Layer',''), '—') AS type,
                ROUND(SUM(ST_Area(ST_Intersection(f.geom, p.geom)::geography))::numeric, 1) AS "areaM2"
         FROM gis_features f JOIN gis_layers l ON l.id=f.layer_id, p
         WHERE l.layer_type='zoning' AND ST_Intersects(f.geom, p.geom)

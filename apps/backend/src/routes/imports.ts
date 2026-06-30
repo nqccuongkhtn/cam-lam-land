@@ -55,7 +55,7 @@ async function ingestFeatures(features: any[], name: string, layerType: string, 
       if (reprojected) g.coordinates = reprojCoords(g.coordinates);
       await client.query(
         `INSERT INTO gis_features (layer_id, properties, geom)
-         VALUES ($1,$2, ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON($3),4326)))`,
+         VALUES ($1,$2, ST_Force2D(ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON($3),4326))))`,
         [layerId, JSON.stringify(f.properties ?? {}), JSON.stringify(g)]);
       count++;
     }

@@ -15,7 +15,7 @@ const DEFAULT_COLORS: Record<string, string> = {
 };
 const RASTER_OVERLAYS = [
   { id: 'qh-qd205', name: 'Ảnh quy hoạch QĐ205', url: '/overlays/QD205.png',
-    tiles: ['/tiles/qd205v4/{z}/{x}/{y}.png'], minzoom: 9, maxzoom: 17,
+    tiles: ['/tiles/qd205v3/{z}/{x}/{y}.png'], minzoom: 10, maxzoom: 17,
     coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]] },
 ];
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];

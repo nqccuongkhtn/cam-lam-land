@@ -8,6 +8,7 @@ import ListingCard from '@/components/ListingCard';
 import HomeUtilities from '@/components/HomeUtilities';
 import PromoBanner from '@/components/PromoBanner';
 import FeaturedPartners from '@/components/FeaturedPartners';
+import FeaturedProjects from '@/components/FeaturedProjects';
 import { useFlags } from '@/lib/flags';
 
 const U = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=800&q=60`;
@@ -259,6 +260,9 @@ export default function Home() {
         {!fromApi && <p className="text-center text-xs text-slate-400 mt-4">* Đang hiển thị tin mẫu. Chạy <code className="bg-slate-100 px-1 rounded">start.bat</code> → <code className="bg-slate-100 px-1 rounded">them_tin_demo.bat</code> để có tin thật.</p>}
       </section>
 
+      {/* DỰ ÁN BĐS NỔI BẬT — admin quản lý (kiểu batdongsan) */}
+      <FeaturedProjects />
+
       {/* PROMO BANNER — quảng cáo (kiểu batdongsan) */}
       <PromoBanner />
 
@@ -271,7 +275,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* PLANNING PROMO */}
+      {/* HỖ TRỢ TIỆN ÍCH */}
+      <HomeUtilities />
+
+      {/* DOANH NGHIỆP TIÊU BIỂU — logo carousel (kiểu batdongsan) */}
+      <FeaturedPartners />
+
+      {/* PLANNING PROMO — chuyển xuống dưới Tiện ích & Doanh nghiệp */}
       <section className="mx-auto max-w-7xl px-4 py-14">
         <div className="grid md:grid-cols-2 rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-sm">
           <div className="p-8 md:p-12 flex flex-col justify-center">
@@ -289,12 +299,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* HỖ TRỢ TIỆN ÍCH — chuyển xuống dưới mục Bản đồ quy hoạch */}
-      <HomeUtilities />
-
-      {/* DOANH NGHIỆP TIÊU BIỂU — logo carousel (kiểu batdongsan) */}
-      <FeaturedPartners />
 
       {/* AD CONTACT — tế nhị */}
       {flags.services_live && (

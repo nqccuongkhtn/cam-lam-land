@@ -31,7 +31,7 @@ const STATIC: Listing[] = ([
   status: 'active', images: [U(img)], lng: 109.09, lat: 12.07, createdAt: '',
 }));
 const AREAS = [
-  { name: 'Cam Đức', ward: 'Cam Đức', sub: 'Trung tâm huyện', img: U('1486406146926-c627a92ad1ab') },
+  { name: 'Cam Đức', ward: 'Cam Đức', sub: 'Trung tâm huyện', img: '/quyhoach-camlam.jpg' },
   { name: 'Cam Hải Đông', ward: 'Cam Hải Đông', sub: 'Bãi Dài · ven biển', img: U('1507525428034-b723cf961d3e') },
   { name: 'Cam Thành Bắc', ward: 'Cam Thành Bắc', sub: 'Ven đầm Thủy Triều', img: U('1449844908441-8829872d2607') },
   { name: 'Suối Tân', ward: 'Suối Tân', sub: 'Giáp Diên Khánh', img: U('1441974231531-c6227db76b6e') },
@@ -280,25 +280,6 @@ export default function Home() {
 
       {/* DOANH NGHIỆP TIÊU BIỂU — logo carousel (kiểu batdongsan) */}
       <FeaturedPartners />
-
-      {/* PLANNING PROMO — chuyển xuống dưới Tiện ích & Doanh nghiệp */}
-      <section className="mx-auto max-w-7xl px-4 py-14">
-        <div className="grid md:grid-cols-2 rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-sm">
-          <div className="p-8 md:p-12 flex flex-col justify-center">
-            <span className="text-[#C8A14B] font-semibold text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>
-            <h2 className="text-3xl font-extrabold text-[#0A2540] mt-2">Tra cứu quy hoạch & thửa đất chính xác</h2>
-            <p className="text-slate-500 mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số tờ/số thửa/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
-            <div className="mt-6 flex gap-3">
-              <Link href="/map" className="bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-6 py-3 rounded-xl">Mở bản đồ →</Link>
-              <Link href="/qr" className="border border-slate-300 text-[#0A2540] font-semibold px-6 py-3 rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
-            </div>
-          </div>
-          <div className="bg-slate-100 flex items-center justify-center min-h-[280px] p-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/quyhoach-camlam.jpg" alt="Mô hình quy hoạch Cam Lâm" loading="lazy" decoding="async" className="w-full h-full object-contain max-h-[460px] rounded-xl" />
-          </div>
-        </div>
-      </section>
 
       {/* AD CONTACT — tế nhị */}
       {flags.services_live && (

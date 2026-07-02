@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { Listing, PropertyType, PROPERTY_LABELS } from '@/lib/types';
 import ListingCard from '@/components/ListingCard';
+import HomeUtilities from '@/components/HomeUtilities';
 import { useFlags } from '@/lib/flags';
 
 const U = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=800&q=60`;
@@ -233,6 +234,9 @@ export default function Home() {
         </div>
         {!fromApi && <p className="text-center text-xs text-slate-400 mt-4">* Đang hiển thị tin mẫu. Chạy <code className="bg-slate-100 px-1 rounded">start.bat</code> → <code className="bg-slate-100 px-1 rounded">them_tin_demo.bat</code> để có tin thật.</p>}
       </section>
+
+      {/* HỖ TRỢ TIỆN ÍCH — kiểu batdongsan */}
+      <HomeUtilities />
 
       {/* EXPLORE BY LOCATION */}
       <section className="mx-auto max-w-7xl px-4 pb-4">

@@ -6,6 +6,8 @@ import { api } from '@/lib/api';
 import { Listing, PropertyType, PROPERTY_LABELS } from '@/lib/types';
 import ListingCard from '@/components/ListingCard';
 import HomeUtilities from '@/components/HomeUtilities';
+import PromoBanner from '@/components/PromoBanner';
+import FeaturedPartners from '@/components/FeaturedPartners';
 import { useFlags } from '@/lib/flags';
 
 const U = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=800&q=60`;
@@ -28,10 +30,12 @@ const STATIC: Listing[] = ([
   status: 'active', images: [U(img)], lng: 109.09, lat: 12.07, createdAt: '',
 }));
 const AREAS = [
-  { name: 'Bãi Dài', sub: 'Cam Hải Đông', img: U('1507525428034-b723cf961d3e') },
-  { name: 'Cam Đức', sub: 'Trung tâm huyện', img: U('1486406146926-c627a92ad1ab') },
-  { name: 'Cam Ranh', sub: 'Vịnh Cam Ranh', img: U('1505228395891-9a51e7e86bf6') },
-  { name: 'Nha Trang', sub: 'Lân cận', img: U('1528127269322-539801943592') },
+  { name: 'Cam Đức', ward: 'Cam Đức', sub: 'Trung tâm huyện', img: U('1486406146926-c627a92ad1ab') },
+  { name: 'Cam Hải Đông', ward: 'Cam Hải Đông', sub: 'Bãi Dài · ven biển', img: U('1507525428034-b723cf961d3e') },
+  { name: 'Cam Thành Bắc', ward: 'Cam Thành Bắc', sub: 'Ven đầm Thủy Triều', img: U('1449844908441-8829872d2607') },
+  { name: 'Suối Tân', ward: 'Suối Tân', sub: 'Giáp Diên Khánh', img: U('1441974231531-c6227db76b6e') },
+  { name: 'Cam Hiệp Bắc', ward: 'Cam Hiệp Bắc', sub: 'Sinh thái · nông nghiệp', img: U('1500382017468-9049fed747ef') },
+  { name: 'Cam An Bắc', ward: 'Cam An Bắc', sub: 'Quỹ đất rộng', img: U('1470071459604-3b5ec3a7fe05') },
 ];
 const STATS = [
   { n: '2,000+', l: 'Bất động sản', d: 'M3 21h18M5 21V7l6-4 6 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01' },
@@ -88,6 +92,22 @@ function useTypingHint(items: string[]): string {
   return txt;
 }
 
+type AreaWithCount = { name: string; ward: string; sub: string; img: string; count: number };
+function AreaCard({ a, big }: { a: AreaWithCount; big?: boolean }) {
+  return (
+    <Link href={`/listings?ward=${encodeURIComponent(a.ward)}`}
+      className={`group relative rounded-2xl overflow-hidden shadow-sm bg-slate-100 ${big ? 'col-span-2 md:row-span-2 h-64 md:h-auto' : 'h-[132px] md:h-auto'}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={a.img} alt={a.name} loading="lazy" decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://picsum.photos/seed/' + encodeURIComponent(a.name) + '/700/500'; }} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0A2540]/90 via-[#0A2540]/25 to-transparent" />
+      <div className={`absolute left-0 bottom-0 text-white ${big ? 'p-4 md:p-6' : 'p-3.5'}`}>
+        <p className={`font-bold leading-tight ${big ? 'text-2xl md:text-3xl' : 'text-base'}`}>{a.name}</p>
+        <p className={`text-white/85 ${big ? 'text-sm mt-1' : 'text-[12px] mt-0.5'}`}>{a.count > 0 ? `${a.count.toLocaleString('vi-VN')} tin đăng` : a.sub}</p>
+      </div>
+    </Link>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
   const { flags } = useFlags();
@@ -97,6 +117,8 @@ export default function Home() {
   const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Tin nổi bật');
   const searchHint = useTypingHint(SEARCH_HINTS);
   useEffect(() => { api<{ listings: Listing[] }>('/listings?limit=20').then((d) => setListings(d.listings || [])).catch(() => {}); }, []);
+  const [areaCounts, setAreaCounts] = useState<Record<string, number>>({});
+  useEffect(() => { api<{ areas: { ward: string; count: number }[] }>('/listings/areas').then((d) => { const m: Record<string, number> = {}; (d.areas || []).forEach((a) => { m[a.ward] = a.count; }); setAreaCounts(m); }).catch(() => {}); }, []);
   useEffect(() => {
     setMarketLoading(true);
     fetch('/feed/news')
@@ -115,6 +137,8 @@ export default function Home() {
   const fromApi = listings.length > 0;
   const newsItems = newsTab === 'Thị trường BĐS' ? (marketNews.length ? marketNews.slice(0, 8) : NEWS['Thị trường BĐS']) : NEWS[newsTab];
   const marketLoadingNow = newsTab === 'Thị trường BĐS' && marketLoading && !marketNews.length;
+  const areasRanked: AreaWithCount[] = [...AREAS].map((a) => ({ ...a, count: areaCounts[a.ward] || 0 })).sort((x, y) => y.count - x.count);
+  const bigArea = areasRanked[0]; const gridAreas = areasRanked.slice(1, 5);
 
   return (
     <div className="bg-slate-50">
@@ -238,21 +262,15 @@ export default function Home() {
       {/* HỖ TRỢ TIỆN ÍCH — kiểu batdongsan */}
       <HomeUtilities />
 
-      {/* EXPLORE BY LOCATION */}
-      <section className="mx-auto max-w-7xl px-4 pb-4">
-        <h2 className="text-2xl md:text-3xl font-extrabold text-[#0A2540] mb-6">Khám phá theo khu vực</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {AREAS.map((a) => (
-            <Link key={a.name} href="/listings" className="group relative h-44 rounded-2xl overflow-hidden shadow-sm bg-slate-100">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={a.img} alt={a.name} loading="lazy" decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://picsum.photos/seed/' + encodeURIComponent(a.name) + '/600/400'; }} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0A2540]/85 via-[#0A2540]/20 to-transparent" />
-              <div className="absolute bottom-3 left-4 text-white">
-                <p className="font-bold text-lg leading-tight">{a.name}</p>
-                <p className="text-xs text-white/70">{a.sub}</p>
-              </div>
-            </Link>
-          ))}
+      {/* PROMO BANNER — quảng cáo (kiểu batdongsan) */}
+      <PromoBanner />
+
+      {/* BĐS THEO ĐỊA ĐIỂM — ô lớn + lưới + số tin (kiểu batdongsan) */}
+      <section className="mx-auto max-w-7xl px-4 pt-8 pb-4">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-[#0A2540] mb-6">Bất động sản theo địa điểm</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 md:grid-rows-2 gap-3 md:gap-4 md:h-[420px]">
+          <AreaCard a={bigArea} big />
+          {gridAreas.map((a) => <AreaCard key={a.ward} a={a} />)}
         </div>
       </section>
 
@@ -274,6 +292,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* DOANH NGHIỆP TIÊU BIỂU — logo carousel (kiểu batdongsan) */}
+      <FeaturedPartners />
 
       {/* AD CONTACT — tế nhị */}
       {flags.services_live && (

@@ -61,6 +61,23 @@ listingsRouter.get('/', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+// GET /api/listings/areas — số tin đang hiển thị theo từng xã/khu vực (cho mục "Bất động sản theo địa điểm")
+// Đặt TRƯỚC route '/:id' để không bị nuốt.
+listingsRouter.get('/areas', async (_req, res, next) => {
+  try {
+    const ahit = cached<any>('listings:areas');
+    if (ahit) { res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300'); return res.json(ahit); }
+    const rows = await query(
+      `SELECT COALESCE(NULLIF(TRIM(ward), ''), 'Khác') AS ward, COUNT(*)::int AS count
+       FROM listings WHERE status NOT IN ('hidden','pending')
+       GROUP BY 1 ORDER BY count DESC`);
+    const payload = { areas: rows };
+    cachePut('listings:areas', payload, 60000);
+    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+    res.json(payload);
+  } catch (e) { next(e); }
+});
+
 // POST /api/listings/:id/boost — đặt hạng VIP / đẩy lên đầu (chủ tin hoặc admin)
 listingsRouter.post('/:id/boost', authRequired, async (req: AuthedRequest, res, next) => {
   try {

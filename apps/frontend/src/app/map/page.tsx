@@ -194,6 +194,7 @@ export default function MapPage() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [ads, setAds] = useState<any[]>([]);
   const [qhVector, setQhVector] = useState<GeoJSON.FeatureCollection | null>(null);
+  const [qhLines, setQhLines] = useState<GeoJSON.FeatureCollection | null>(null);
   const qhVectorRef = useRef<GeoJSON.FeatureCollection | null>(null); qhVectorRef.current = qhVector;
   const [qhvOn, setQhvOn] = useState(true);
   const [qhvHit, setQhvHit] = useState<{ lo: string; hz: string }[]>([]);
@@ -231,7 +232,10 @@ export default function MapPage() {
     }).catch(() => {});
   }, [refreshFeatures]);
   useEffect(() => { load(); api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {}); }, [load]);
-  useEffect(() => { fetch('/qh_vector.geojson').then((r) => r.json()).then(setQhVector).catch(() => {}); }, []);
+  useEffect(() => {
+    fetch('/qh_vector.geojson').then((r) => r.json()).then(setQhVector).catch(() => {});
+    fetch('/qh_lines.geojson').then((r) => r.json()).then(setQhLines).catch(() => {});
+  }, []);
   useEffect(() => { if (viewRef.current) refreshFeatures(viewRef.current); }, [visible, refreshFeatures]);
   useEffect(() => { setCanDelete(user?.role === 'admin' || user?.role === 'gis'); }, [user]);
   useEffect(() => { if (!camOpen) return; const v = camVideoRef.current, st = camStreamRef.current; if (!v || !st) return; v.srcObject = st; v.setAttribute('playsinline', 'true'); v.play().catch(() => {}); }, [camOpen]);
@@ -244,7 +248,11 @@ export default function MapPage() {
     // Lớp QUY HOẠCH VECTOR: tô màu theo từng vùng (màu lấy từ dữ liệu), nét vô hạn, click ra loại đất.
     if (qhvOn && qhVector) {
       out.push({ id: 'qhv-fill', type: 'fill', data: qhVector, visible: true, paint: { 'fill-color': ['get', 'c'] as any, 'fill-opacity': opacity * 0.82 } });
-      out.push({ id: 'qhv-line', type: 'line', data: qhVector, visible: true, paint: { 'line-color': 'rgba(20,20,20,0.4)', 'line-width': 0.4 } });
+      out.push({ id: 'qhv-line', type: 'line', data: qhVector, visible: true, paint: { 'line-color': 'rgba(20,20,20,0.5)', 'line-width': ['interpolate', ['linear'], ['zoom'], 12, 0.3, 16, 0.7, 19, 1.4] as any } });
+    }
+    if (qhvOn && qhLines) {
+      // Lớp NÉT: đường + ranh + cung từ bản gốc — mảnh khi xa, dày dần khi zoom sâu.
+      out.push({ id: 'qhv-detail', type: 'line', data: qhLines, visible: true, paint: { 'line-color': 'rgba(35,35,35,0.55)', 'line-width': ['interpolate', ['linear'], ['zoom'], 11, 0.12, 14, 0.45, 18, 1.3] as any } });
     }
     for (const l of layers) {
       const fc = data[l.slug]; if (!fc) continue;
@@ -265,7 +273,7 @@ export default function MapPage() {
       }
     }
     return out;
-  }, [layers, data, visible, opacity, qhVector, qhvOn]);
+  }, [layers, data, visible, opacity, qhVector, qhLines, qhvOn]);
 
   async function onMapClick(lng: number, lat: number) {
     const vn = wgs84ToVn2000(lng, lat);

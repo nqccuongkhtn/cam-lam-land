@@ -247,13 +247,14 @@ export default function MapPage() {
     const out: GeoLayer[] = [];
     // Lớp QUY HOẠCH VECTOR: tô màu theo từng vùng (màu lấy từ dữ liệu), nét vô hạn, click ra loại đất.
     const rasterOn = (ovOn['qh-qd205'] ?? true);
-    // Nền màu vector (phẳng, khớp đúng màu raster) — lấp LIỀN MẠCH chỗ raster z18 bị thủng, đặt DƯỚI lớp raster.
-    if (qhVector && (rasterOn || qhvOn)) {
-      out.push({ id: 'qhv-fill', type: 'fill', data: qhVector, visible: true, beforeId: rasterOn ? 'qh-qd205' : undefined, paint: { 'fill-color': ['get', 'c'] as any, 'fill-opacity': rasterOn ? 1 : opacity * 0.82 } });
+    // (1) Khi bật raster: lấp chỗ raster z18 bị thủng bằng màu vector phẳng, đặt NGAY DƯỚI raster → liền mạch, hết "chỗ vá". (Lớp này ẩn dưới raster, không cần thấy.)
+    if (qhVector && rasterOn) {
+      out.push({ id: 'qhv-fill', type: 'fill', data: qhVector, visible: true, beforeId: 'qh-qd205', paint: { 'fill-color': ['get', 'c'] as any, 'fill-opacity': 1 } });
     }
-    // Nét vector chỉ khi xem VECTOR độc lập (raster tắt) — khi bật raster thì raster đã có sẵn nét.
-    if (qhvOn && !rasterOn) {
-      if (qhVector) out.push({ id: 'qhv-line', type: 'line', data: qhVector, visible: true, paint: { 'line-color': 'rgba(20,20,20,0.5)', 'line-width': ['interpolate', ['linear'], ['zoom'], 12, 0.3, 16, 0.7, 19, 1.4] as any } });
+    // (2) Nút "Quy hoạch vector": hiện RÕ lớp vector ở TRÊN CÙNG — nét vô hạn, click xem loại đất.
+    if (qhVector && qhvOn) {
+      out.push({ id: 'qhv-top', type: 'fill', data: qhVector, visible: true, paint: { 'fill-color': ['get', 'c'] as any, 'fill-opacity': rasterOn ? 1 : opacity } });
+      out.push({ id: 'qhv-topline', type: 'line', data: qhVector, visible: true, paint: { 'line-color': 'rgba(20,20,20,0.5)', 'line-width': ['interpolate', ['linear'], ['zoom'], 12, 0.3, 16, 0.7, 19, 1.4] as any } });
       if (qhLines) out.push({ id: 'qhv-detail', type: 'line', data: qhLines, visible: true, paint: { 'line-color': 'rgba(35,35,35,0.55)', 'line-width': ['interpolate', ['linear'], ['zoom'], 11, 0.12, 14, 0.45, 18, 1.3] as any } });
     }
     for (const l of layers) {

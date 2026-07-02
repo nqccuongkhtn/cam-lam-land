@@ -32,7 +32,7 @@ const STATIC: Listing[] = ([
   status: 'active', images: [U(img)], lng: 109.09, lat: 12.07, createdAt: '',
 }));
 const AREAS = [
-  { name: 'Cam Đức', ward: 'Cam Đức', sub: 'Trung tâm huyện', img: '/quyhoach-camlam.jpg' },
+  { name: 'Cam Đức', ward: 'Cam Đức', sub: 'Trung tâm huyện', img: U('1486406146926-c627a92ad1ab') },
   { name: 'Cam Hải Đông', ward: 'Cam Hải Đông', sub: 'Bãi Dài · ven biển', img: U('1507525428034-b723cf961d3e') },
   { name: 'Cam Thành Bắc', ward: 'Cam Thành Bắc', sub: 'Ven đầm Thủy Triều', img: U('1449844908441-8829872d2607') },
   { name: 'Suối Tân', ward: 'Suối Tân', sub: 'Giáp Diên Khánh', img: U('1441974231531-c6227db76b6e') },
@@ -187,7 +187,7 @@ export default function Home() {
       </section>
 
       {/* TIN TỨC & QUY HOẠCH — kiểu batdongsan */}
-      <section className="mx-auto max-w-7xl px-4 pt-14">
+      <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="flex items-center gap-5 border-b border-slate-200 mb-5 overflow-x-auto">
           {Object.keys(NEWS).map((t) => (
             <button key={t} onClick={() => setNewsTab(t)} className={`pb-2.5 text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${newsTab === t ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500 hover:text-[#0A2540]'}`}>{t}</button>
@@ -236,9 +236,9 @@ export default function Home() {
       </section>
 
       {/* FEATURED — kiểu batdongsan */}
-      <section className="mx-auto max-w-7xl px-4 py-14">
+      <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-[#0A2540]">Bất động sản dành cho bạn</h2>
+          <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">Bất động sản dành cho bạn</h2>
           <div className="flex items-center gap-3 text-sm font-semibold text-[#0A2540]">
             <Link href="/listings" className="hover:text-red-600">Tin bán mới nhất</Link>
             <span className="text-slate-300">|</span>
@@ -268,8 +268,8 @@ export default function Home() {
       <PromoBanner />
 
       {/* BĐS THEO ĐỊA ĐIỂM — ô lớn + lưới + số tin (kiểu batdongsan) */}
-      <section className="mx-auto max-w-7xl px-4 pt-8 pb-4">
-        <h2 className="text-2xl md:text-3xl font-extrabold text-[#0A2540] mb-6">Bất động sản theo địa điểm</h2>
+      <section className="mx-auto max-w-7xl px-4 py-10">
+        <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-6">Bất động sản theo địa điểm</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 md:grid-rows-2 gap-3 md:gap-4 md:h-[420px]">
           <AreaCard a={bigArea} big />
           {gridAreas.map((a) => <AreaCard key={a.ward} a={a} />)}
@@ -283,7 +283,7 @@ export default function Home() {
       <FeaturedPartners />
 
       {/* PLANNING PROMO — dưới Tiện ích & Doanh nghiệp tiêu biểu */}
-      <section className="mx-auto max-w-7xl px-4 py-14">
+      <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="grid md:grid-cols-2 rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-sm">
           <div className="p-8 md:p-12 flex flex-col justify-center">
             <span className="text-[#C8A14B] font-semibold text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>

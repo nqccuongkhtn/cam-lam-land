@@ -48,8 +48,8 @@ export default function HomeUtilities() {
     { k: 'fs', icon: '🧭', t: 'Tư vấn phong thủy', d: 'Hướng nhà hợp tuổi' },
   ] as const;
   return (
-    <section className="mx-auto max-w-7xl px-4 py-4">
-      <h2 className="text-2xl md:text-3xl font-extrabold text-[#0A2540] mb-6">Hỗ trợ tiện ích</h2>
+    <section className="mx-auto max-w-7xl px-4 py-10">
+      <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-6">Hỗ trợ tiện ích</h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {TOOLS.map((tl) => (
           <button key={tl.k} onClick={() => setOpen(tl.k)}

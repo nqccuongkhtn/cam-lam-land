@@ -179,7 +179,7 @@ export default function MapPage() {
   const featTimer = useRef<any>(null);
   const [info, setInfo] = useState<ParcelInfo | null>(null);
   const [clickVN, setClickVN] = useState<{ x: number; y: number; lng: number; lat: number } | null>(null);
-  const [opacity, setOpacity] = useState(0.85);
+  const [opacity, setOpacity] = useState(1);
   const [canDelete, setCanDelete] = useState(false);
   const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true });
   const [baseMap, setBaseMap] = useState<BaseMap>('satellite');

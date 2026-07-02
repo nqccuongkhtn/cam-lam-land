@@ -43,9 +43,7 @@ export default function FeaturedPartners() {
   const [logoUrl, setLogoUrl] = useState('');
   const [saving, setSaving] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const posRef = useRef(0);
   const hoverRef = useRef(false);
-  const manualUntilRef = useRef(0);
 
   const load = () => api<{ partners: Partner[] }>('/partners').then((r) => setPartners(r.partners || [])).catch(() => {});
   useEffect(() => { load(); }, []);
@@ -55,37 +53,29 @@ export default function FeaturedPartners() {
   while (half.length < Math.max(8, base.length * 2)) half.push(...base);
   const track = [...half, ...half];
 
-  // Tự trượt chậm (đi hết một nửa trong 84s). Dùng bộ tích lũy float để không bị làm tròn về 0.
-  // Dừng khi rê chuột; khi bấm nút thì tạm dừng auto để cuộn mượt, xong tự chạy lại.
+  // Đứng 3 giây → lướt nhanh 1 ô (cuộn mượt) → đứng 3 giây... Dừng khi rê chuột. Vòng lặp liền mạch nhờ track nhân đôi.
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
-    let raf = 0;
-    let last = performance.now();
-    const step = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000);
-      last = now;
+    const advance = () => {
+      if (hoverRef.current) return;
       const halfW = el.scrollWidth / 2;
-      const paused = hoverRef.current || now < manualUntilRef.current;
-      if (halfW > 0) {
-        if (paused) {
-          posRef.current = el.scrollLeft;
-        } else {
-          posRef.current += (halfW / 84) * dt;
-          if (posRef.current >= halfW) posRef.current -= halfW;
-          el.scrollLeft = posRef.current;
-        }
-      }
-      raf = requestAnimationFrame(step);
+      if (halfW > 0 && el.scrollLeft >= halfW - 1) el.scrollLeft -= halfW; // reset liền mạch (nửa sau giống hệt nửa đầu)
+      const row = el.firstElementChild as HTMLElement | null;
+      const kids = row?.children;
+      let stepPx = el.clientWidth * 0.5;
+      if (kids && kids.length >= 2) stepPx = (kids[1] as HTMLElement).offsetLeft - (kids[0] as HTMLElement).offsetLeft; // đúng bề rộng 1 ô + khoảng cách
+      el.scrollBy({ left: stepPx, behavior: 'smooth' });
     };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
+    const iv = setInterval(advance, 3000);
+    return () => clearInterval(iv);
   }, [partners.length]);
 
   const nudge = (dir: number) => {
     const el = scrollerRef.current;
     if (!el) return;
-    manualUntilRef.current = performance.now() + 800;
+    const halfW = el.scrollWidth / 2;
+    if (dir > 0 && halfW > 0 && el.scrollLeft >= halfW - 1) el.scrollLeft -= halfW;
     el.scrollBy({ left: dir * Math.max(240, el.clientWidth * 0.7), behavior: 'smooth' });
   };
 

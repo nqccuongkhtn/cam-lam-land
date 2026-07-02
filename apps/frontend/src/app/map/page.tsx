@@ -157,6 +157,16 @@ function parseBigPairs(text: string): { x: number; y: number }[] {
   return pts;
 }
 
+// Điểm có nằm trong vòng đa giác không (ray casting) — để click ra loại đất QH vector ngay ở trình duyệt.
+function pointInRing(lng: number, lat: number, ring: number[][]): boolean {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+    if (((yi > lat) !== (yj > lat)) && (lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi)) inside = !inside;
+  }
+  return inside;
+}
+
 export default function MapPage() {
   const { user } = useAuth();
   const [layers, setLayers] = useState<GisLayer[]>([]);
@@ -171,7 +181,7 @@ export default function MapPage() {
   const [clickVN, setClickVN] = useState<{ x: number; y: number; lng: number; lat: number } | null>(null);
   const [opacity, setOpacity] = useState(0.85);
   const [canDelete, setCanDelete] = useState(false);
-  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true });
+  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': false });
   const [baseMap, setBaseMap] = useState<BaseMap>('satellite');
   const [labels, setLabels] = useState(true);
   const [measure, setMeasure] = useState<MeasureMode>('off');
@@ -183,6 +193,10 @@ export default function MapPage() {
   const [c3, setC3] = useState('');
   const [panelOpen, setPanelOpen] = useState(false);
   const [ads, setAds] = useState<any[]>([]);
+  const [qhVector, setQhVector] = useState<GeoJSON.FeatureCollection | null>(null);
+  const qhVectorRef = useRef<GeoJSON.FeatureCollection | null>(null); qhVectorRef.current = qhVector;
+  const [qhvOn, setQhvOn] = useState(true);
+  const [qhvHit, setQhvHit] = useState<{ lo: string; hz: string }[]>([]);
   const [fitTo, setFitTo] = useState<[[number, number], [number, number]] | null>(null);
   const [drawOpen, setDrawOpen] = useState(false);
   const [drawTab, setDrawTab] = useState<'table' | 'import'>('table');
@@ -217,6 +231,7 @@ export default function MapPage() {
     }).catch(() => {});
   }, [refreshFeatures]);
   useEffect(() => { load(); api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {}); }, [load]);
+  useEffect(() => { fetch('/qh_vector.geojson').then((r) => r.json()).then(setQhVector).catch(() => {}); }, []);
   useEffect(() => { if (viewRef.current) refreshFeatures(viewRef.current); }, [visible, refreshFeatures]);
   useEffect(() => { setCanDelete(user?.role === 'admin' || user?.role === 'gis'); }, [user]);
   useEffect(() => { if (!camOpen) return; const v = camVideoRef.current, st = camStreamRef.current; if (!v || !st) return; v.srcObject = st; v.setAttribute('playsinline', 'true'); v.play().catch(() => {}); }, [camOpen]);
@@ -226,6 +241,11 @@ export default function MapPage() {
 
   const geoLayers: GeoLayer[] = useMemo(() => {
     const out: GeoLayer[] = [];
+    // Lớp QUY HOẠCH VECTOR: tô màu theo từng vùng (màu lấy từ dữ liệu), nét vô hạn, click ra loại đất.
+    if (qhvOn && qhVector) {
+      out.push({ id: 'qhv-fill', type: 'fill', data: qhVector, visible: true, paint: { 'fill-color': ['get', 'c'] as any, 'fill-opacity': opacity * 0.82 } });
+      out.push({ id: 'qhv-line', type: 'line', data: qhVector, visible: true, paint: { 'line-color': 'rgba(20,20,20,0.4)', 'line-width': 0.4 } });
+    }
     for (const l of layers) {
       const fc = data[l.slug]; if (!fc) continue;
       const base = (l.style?.color as string) || DEFAULT_COLORS[l.layerType] || '#16a34a';
@@ -245,12 +265,29 @@ export default function MapPage() {
       }
     }
     return out;
-  }, [layers, data, visible, opacity]);
+  }, [layers, data, visible, opacity, qhVector, qhvOn]);
 
   async function onMapClick(lng: number, lat: number) {
     const vn = wgs84ToVn2000(lng, lat);
     setClickVN({ x: vn.x, y: vn.y, lng, lat });
-    try { setInfo(await api<ParcelInfo>(`/parcels/at?lng=${lng}&lat=${lat}`)); } catch { setInfo(null); }
+    // Loại đất quy hoạch (vector) tại điểm — tính ngay ở trình duyệt, không cần server.
+    const gv = qhVectorRef.current;
+    if (gv) {
+      const hits: { lo: string; hz: string; area: number }[] = [];
+      for (const ft of gv.features as any[]) {
+        const ring = ft.geometry?.coordinates?.[0]; if (!ring) continue;
+        if (pointInRing(lng, lat, ring)) {
+          let sArea = 0; for (let i = 0; i < ring.length - 1; i++) sArea += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1];
+          hits.push({ lo: ft.properties.lo, hz: ft.properties.hz, area: Math.abs(sArea) });
+        }
+      }
+      hits.sort((x, y) => x.area - y.area); // vùng nhỏ (cụ thể) hiện trước
+      const seen = new Set<string>(); const uniq: { lo: string; hz: string }[] = [];
+      for (const h of hits) { const k = h.lo + h.hz; if (!seen.has(k)) { seen.add(k); uniq.push({ lo: h.lo, hz: h.hz }); } }
+      setQhvHit(uniq.slice(0, 4));
+    } else setQhvHit([]);
+    try { setInfo(await api<ParcelInfo>(`/parcels/at?lng=${lng}&lat=${lat}`)); }
+    catch { setInfo({ found: false, point: { lng, lat }, parcel: null, zoning: null, listings: [] }); }
   }
   async function doSearch() {
     if (searchMode === 'parcel') {
@@ -460,6 +497,10 @@ export default function MapPage() {
               <span className="inline-block w-3 h-3 rounded-sm shrink-0 bg-amber-500" /><span className="flex-1">🛰️ {o.name}</span>
             </label>
           ))}
+          <label className="flex items-center gap-2 py-1.5 text-sm cursor-pointer">
+            <input type="checkbox" checked={qhvOn} onChange={(e) => setQhvOn(e.target.checked)} />
+            <span className="inline-block w-3 h-3 rounded-sm shrink-0 bg-emerald-600" /><span className="flex-1">🧩 Quy hoạch vector (nét, click xem loại đất)</span>
+          </label>
           <p className="text-xs font-semibold text-slate-500 mt-3 mb-1 pt-2 border-t">Lớp vector (bật/tắt)</p>
           {layers.length === 0 && <p className="text-sm text-slate-500">Đang tải…</p>}
           {layers.map((l) => (
@@ -596,6 +637,16 @@ export default function MapPage() {
                   <div>VN-2000: <b>X={clickVN.x.toFixed(2)}</b>, <b>Y={clickVN.y.toFixed(2)}</b></div>
                   <div>WGS84: {clickVN.lat.toFixed(6)}, {clickVN.lng.toFixed(6)}</div>
                 </div>
+              )}
+              {qhvHit.length > 0 && (
+                <Section title="Quy hoạch sử dụng đất">
+                  {qhvHit.map((h, i) => (
+                    <div key={i} className="flex items-center justify-between gap-2 py-0.5">
+                      <span className="text-slate-700">{h.lo}</span>
+                      <span className="text-[11px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 whitespace-nowrap">{h.hz === 'HT' ? 'Hiện trạng' : h.hz === '2045' ? 'QH 2045' : h.hz === '2030' ? 'QH 2030' : 'Quy hoạch'}</span>
+                    </div>
+                  ))}
+                </Section>
               )}
               {!info.found && <p className="text-slate-500">Không có dữ liệu thửa/quy hoạch tại vị trí này.</p>}
               {info.parcel && (

@@ -44,8 +44,8 @@ function Newsletter() {
 export default function SiteFooter() {
   return (
     <footer className="bg-[#0A2540] text-slate-300 border-t border-slate-200">
-      <div className="border-b border-white/10">
-        <div className="mx-auto max-w-7xl px-4 py-9 grid grid-cols-2 lg:grid-cols-4 gap-y-7 gap-x-6">
+      <div>
+        <div className="mx-auto max-w-7xl px-4 pt-10 pb-2 grid grid-cols-2 lg:grid-cols-4 gap-y-7 gap-x-6">
           {STATS.map((s) => (
             <div key={s.l} className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl grid place-items-center bg-white/[0.06] border border-[#C8A14B]/40 text-[#C8A14B] shrink-0">

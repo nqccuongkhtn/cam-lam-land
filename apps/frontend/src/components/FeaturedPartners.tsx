@@ -23,9 +23,11 @@ function Tile({ p, isAdmin, onDelete }: { p: Partner; isAdmin: boolean; onDelete
     <div className="group relative shrink-0 w-52 md:w-60 h-24 md:h-28 bg-white border border-slate-200 rounded-2xl grid place-items-center px-4 hover:shadow-md hover:border-slate-300 transition">
       {p.logoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={p.logoUrl} alt={p.name} loading="lazy" decoding="async" className="max-h-14 md:max-h-16 max-w-full object-contain grayscale group-hover:grayscale-0 transition" />
+        <img src={p.logoUrl} alt={p.name} loading="lazy" decoding="async" className="max-h-14 md:max-h-16 max-w-full object-contain grayscale group-hover:grayscale-0 transition duration-300" />
       ) : (
-        <Wordmark name={p.name} />
+        <span className="grayscale group-hover:grayscale-0 transition duration-300">
+          <Wordmark name={p.name} />
+        </span>
       )}
       {isAdmin && p.id > 0 ? (
         <button onClick={onDelete} aria-label="Xoa doanh nghiep" className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 text-white text-sm grid place-items-center opacity-0 group-hover:opacity-100 shadow transition">×</button>

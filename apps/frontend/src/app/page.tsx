@@ -259,9 +259,6 @@ export default function Home() {
         {!fromApi && <p className="text-center text-xs text-slate-400 mt-4">* Đang hiển thị tin mẫu. Chạy <code className="bg-slate-100 px-1 rounded">start.bat</code> → <code className="bg-slate-100 px-1 rounded">them_tin_demo.bat</code> để có tin thật.</p>}
       </section>
 
-      {/* HỖ TRỢ TIỆN ÍCH — kiểu batdongsan */}
-      <HomeUtilities />
-
       {/* PROMO BANNER — quảng cáo (kiểu batdongsan) */}
       <PromoBanner />
 
@@ -292,6 +289,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* HỖ TRỢ TIỆN ÍCH — chuyển xuống dưới mục Bản đồ quy hoạch */}
+      <HomeUtilities />
 
       {/* DOANH NGHIỆP TIÊU BIỂU — logo carousel (kiểu batdongsan) */}
       <FeaturedPartners />

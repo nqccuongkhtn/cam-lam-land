@@ -367,7 +367,7 @@ export default function ChatWidget() {
                   Gửi bán
                 </button>
                 <button onClick={() => setTab('advisory')} className={`relative flex-1 py-1.5 rounded-full text-[12px] font-bold transition ${tab === 'advisory' ? 'bg-white text-[#0A2540]' : 'bg-white/10 text-white/70 hover:bg-white/20'}`}>
-                  Tư vấn đầu tư{unreadAdv > 0 && tab !== 'advisory' && <span className="absolute -top-0.5 right-1.5 min-w-[15px] h-[15px] px-1 grid place-items-center bg-red-500 text-white text-[9px] font-bold rounded-full">{unreadAdv > 99 ? '99+' : unreadAdv}</span>}
+                  Đầu tư & Pháp lý{unreadAdv > 0 && tab !== 'advisory' && <span className="absolute -top-0.5 right-1.5 min-w-[15px] h-[15px] px-1 grid place-items-center bg-red-500 text-white text-[9px] font-bold rounded-full">{unreadAdv > 99 ? '99+' : unreadAdv}</span>}
                 </button>
               </div>
             )}
@@ -418,7 +418,7 @@ export default function ChatWidget() {
                 <aside className={`${room ? 'hidden sm:flex' : 'flex'} sm:order-2 flex-col shrink-0 sm:border-l border-slate-100 bg-white w-full ${(!room || listOpen) ? 'sm:w-52' : 'sm:w-0 sm:overflow-hidden sm:border-l-0'} transition-all`}>
                   <div className="px-2 py-2 border-b border-slate-100 shrink-0 space-y-1.5">
                     <div className="flex items-center justify-between px-1">
-                      <p className="text-[11px] font-bold text-slate-500">{tab === 'advisory' ? '💰 Tư vấn đầu tư' : '💬 Hội thoại'} ({(tab === 'advisory' ? advRooms : rooms).length})</p>
+                      <p className="text-[11px] font-bold text-slate-500">{tab === 'advisory' ? '💰 Tư vấn đầu tư & Pháp lý' : '💬 Hội thoại'} ({(tab === 'advisory' ? advRooms : rooms).length})</p>
                       {tab === 'advisory' && <a href="/tu-van" target="_blank" className="text-[10px] font-bold text-red-600 hover:underline shrink-0">Trang quản trị ↗</a>}
                     </div>
                     <input value={roomQ} onChange={(e) => setRoomQ(e.target.value)} placeholder="🔍 Tìm khách…" className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm outline-none focus:border-[#0A2540]" />
@@ -485,13 +485,13 @@ export default function ChatWidget() {
               )}
                 {tab === 'advisory' && !twoPane && (
                 <div className="px-3 py-2 bg-amber-50 border-b border-amber-100 shrink-0 text-center">
-                  <p className="text-[11px] font-bold text-[#0A2540]">💰 Tư vấn đầu tư bất động sản Cam Lâm</p>
-                  <p className="text-[10px] text-slate-500">Đội ngũ chuyên viên sẽ phản hồi câu hỏi của bạn sớm nhất.</p>
+                  <p className="text-[11px] font-bold text-[#0A2540]">💰 Tư vấn đầu tư & pháp lý BĐS Cam Lâm</p>
+                  <p className="text-[10px] text-slate-500">Đội ngũ chuyên viên tư vấn đầu tư & pháp lý sẽ phản hồi sớm nhất.</p>
                 </div>
               )}
                 <div ref={boxRef} className="flex-1 overflow-y-auto scroll-soft p-3 space-y-2 bg-slate-50">
                   {needPick ? <p className="text-center text-sm text-slate-400 mt-8">← Chọn một khách để trả lời.</p>
-                    : msgs.length === 0 ? <p className="text-center text-sm text-slate-400 mt-8">{tab === 'community' ? 'Chào mừng đến Cộng đồng đầu tư Cam Lâm 👋' : tab === 'advisory' ? (twoPane ? 'Chọn một khách để tư vấn đầu tư 👋' : 'Đặt câu hỏi về đầu tư BĐS Cam Lâm — đội ngũ tư vấn sẽ trả lời sớm 💰') : isAdmin ? 'Chưa có tin nhắn — gửi lời chào tới khách 👋' : 'Gửi tin cho admin để được hỗ trợ.'}</p>
+                    : msgs.length === 0 ? <p className="text-center text-sm text-slate-400 mt-8">{tab === 'community' ? 'Chào mừng đến Cộng đồng đầu tư Cam Lâm 👋' : tab === 'advisory' ? (twoPane ? 'Chọn một khách để tư vấn đầu tư 👋' : 'Đặt câu hỏi về đầu tư & pháp lý BĐS Cam Lâm — đội ngũ tư vấn sẽ trả lời sớm 💰') : isAdmin ? 'Chưa có tin nhắn — gửi lời chào tới khách 👋' : 'Gửi tin cho admin để được hỗ trợ.'}</p>
                     : msgs.map((m) => {
                       const mine = m.userId === user.id;
                       // Kênh Tư vấn đầu tư: khách thấy người trả lời là "Chuyên viên tư vấn" + logo website (ẩn danh tính nhân viên).

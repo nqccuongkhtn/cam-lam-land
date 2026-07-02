@@ -86,7 +86,7 @@ export default function TuVanPage() {
     <div className="max-w-md mx-auto p-12 text-center">
       <p className="text-5xl">🔒</p>
       <p className="font-bold text-[#0A2540] mt-3 text-lg">Khu vực dành cho tư vấn viên</p>
-      <p className="text-slate-500 text-sm mt-1">Bạn cần được admin cấp quyền “Tư vấn đầu tư” để vào trang này.</p>
+      <p className="text-slate-500 text-sm mt-1">Bạn cần được admin cấp quyền “Tư vấn đầu tư & Pháp lý” để vào trang này.</p>
       <Link href="/" className="inline-block mt-5 text-sm font-semibold text-red-600">← Về trang chủ</Link>
     </div>
   );
@@ -98,7 +98,7 @@ export default function TuVanPage() {
     <div className="max-w-6xl mx-auto px-3 py-5">
       <div className="flex items-center justify-between mb-4 gap-3">
         <div>
-          <h1 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">💰 Quản trị Tư vấn đầu tư</h1>
+          <h1 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">💰 Quản trị Tư vấn đầu tư & Pháp lý</h1>
           <p className="text-sm text-slate-500">Khách chưa được trả lời xếp lên đầu, ai nhắn trước ưu tiên trước.</p>
         </div>
         <span className="shrink-0 bg-red-50 text-red-600 font-bold text-sm rounded-full px-3 py-1.5">{waitingCount} đang chờ</span>

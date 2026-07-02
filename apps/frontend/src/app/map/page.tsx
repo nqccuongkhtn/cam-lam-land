@@ -194,9 +194,7 @@ export default function MapPage() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [ads, setAds] = useState<any[]>([]);
   const [qhVector, setQhVector] = useState<GeoJSON.FeatureCollection | null>(null);
-  const [qhLines, setQhLines] = useState<GeoJSON.FeatureCollection | null>(null);
   const qhVectorRef = useRef<GeoJSON.FeatureCollection | null>(null); qhVectorRef.current = qhVector;
-  const [qhvOn, setQhvOn] = useState(false);
   const [qhvHit, setQhvHit] = useState<{ lo: string; hz: string }[]>([]);
   const [fitTo, setFitTo] = useState<[[number, number], [number, number]] | null>(null);
   const [drawOpen, setDrawOpen] = useState(false);
@@ -232,10 +230,7 @@ export default function MapPage() {
     }).catch(() => {});
   }, [refreshFeatures]);
   useEffect(() => { load(); api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {}); }, [load]);
-  useEffect(() => {
-    fetch('/qh_vector.geojson').then((r) => r.json()).then(setQhVector).catch(() => {});
-    fetch('/qh_lines.geojson').then((r) => r.json()).then(setQhLines).catch(() => {});
-  }, []);
+  useEffect(() => { fetch('/qh_vector.geojson').then((r) => r.json()).then(setQhVector).catch(() => {}); }, []);
   useEffect(() => { if (viewRef.current) refreshFeatures(viewRef.current); }, [visible, refreshFeatures]);
   useEffect(() => { setCanDelete(user?.role === 'admin' || user?.role === 'gis'); }, [user]);
   useEffect(() => { if (!camOpen) return; const v = camVideoRef.current, st = camStreamRef.current; if (!v || !st) return; v.srcObject = st; v.setAttribute('playsinline', 'true'); v.play().catch(() => {}); }, [camOpen]);
@@ -246,16 +241,9 @@ export default function MapPage() {
   const geoLayers: GeoLayer[] = useMemo(() => {
     const out: GeoLayer[] = [];
     // Lớp QUY HOẠCH VECTOR: tô màu theo từng vùng (màu lấy từ dữ liệu), nét vô hạn, click ra loại đất.
-    const rasterOn = (ovOn['qh-qd205'] ?? true);
-    // (1) Khi bật raster: lấp chỗ raster z18 bị thủng bằng màu vector phẳng, đặt NGAY DƯỚI raster → liền mạch, hết "chỗ vá". (Lớp này ẩn dưới raster, không cần thấy.)
-    if (qhVector && rasterOn) {
+    // Khi bật raster (ảnh quy hoạch): lấp chỗ raster z18 bị thủng bằng màu vector phẳng, đặt NGAY DƯỚI raster → liền mạch, hết "chỗ vá".
+    if (qhVector && (ovOn['qh-qd205'] ?? true)) {
       out.push({ id: 'qhv-fill', type: 'fill', data: qhVector, visible: true, beforeId: 'qh-qd205', paint: { 'fill-color': ['get', 'c'] as any, 'fill-opacity': 1 } });
-    }
-    // (2) Nút "Quy hoạch vector": hiện RÕ lớp vector ở TRÊN CÙNG — nét vô hạn, click xem loại đất.
-    if (qhVector && qhvOn) {
-      out.push({ id: 'qhv-top', type: 'fill', data: qhVector, visible: true, paint: { 'fill-color': ['get', 'c'] as any, 'fill-opacity': rasterOn ? 1 : opacity } });
-      out.push({ id: 'qhv-topline', type: 'line', data: qhVector, visible: true, paint: { 'line-color': 'rgba(20,20,20,0.5)', 'line-width': ['interpolate', ['linear'], ['zoom'], 12, 0.3, 16, 0.7, 19, 1.4] as any } });
-      if (qhLines) out.push({ id: 'qhv-detail', type: 'line', data: qhLines, visible: true, paint: { 'line-color': 'rgba(35,35,35,0.55)', 'line-width': ['interpolate', ['linear'], ['zoom'], 11, 0.12, 14, 0.45, 18, 1.3] as any } });
     }
     for (const l of layers) {
       const fc = data[l.slug]; if (!fc) continue;
@@ -276,7 +264,7 @@ export default function MapPage() {
       }
     }
     return out;
-  }, [layers, data, visible, opacity, qhVector, qhLines, qhvOn, ovOn]);
+  }, [layers, data, visible, opacity, qhVector, ovOn]);
 
   async function onMapClick(lng: number, lat: number) {
     const vn = wgs84ToVn2000(lng, lat);
@@ -508,10 +496,6 @@ export default function MapPage() {
               <span className="inline-block w-3 h-3 rounded-sm shrink-0 bg-amber-500" /><span className="flex-1">🛰️ {o.name}</span>
             </label>
           ))}
-          <label className="flex items-center gap-2 py-1.5 text-sm cursor-pointer">
-            <input type="checkbox" checked={qhvOn} onChange={(e) => setQhvOn(e.target.checked)} />
-            <span className="inline-block w-3 h-3 rounded-sm shrink-0 bg-emerald-600" /><span className="flex-1">🧩 Quy hoạch vector (nét, click xem loại đất)</span>
-          </label>
           <p className="text-xs font-semibold text-slate-500 mt-3 mb-1 pt-2 border-t">Lớp vector (bật/tắt)</p>
           {layers.length === 0 && <p className="text-sm text-slate-500">Đang tải…</p>}
           {layers.map((l) => (

@@ -243,7 +243,7 @@ export default function MapPage() {
     // Lớp QUY HOẠCH VECTOR: tô màu theo từng vùng (màu lấy từ dữ liệu), nét vô hạn, click ra loại đất.
     // Lớp màu vector đặt DƯỚI raster để lấp chỗ raster z18 bị thủng → liền mạch. Ẩn/hiện ĐÚNG theo raster (tắt raster là ẩn luôn).
     if (qhVector) {
-      out.push({ id: 'qhv-fill', type: 'fill', data: qhVector, visible: (ovOn['qh-qd205'] ?? true), beforeId: 'qh-qd205', paint: { 'fill-color': ['get', 'c'] as any, 'fill-opacity': 1 } });
+      out.push({ id: 'qhv-fill', type: 'fill', data: qhVector, visible: (ovOn['qh-qd205'] ?? true), beforeId: 'qh-qd205', paint: { 'fill-color': ['get', 'c'] as any, 'fill-opacity': opacity } });
     }
     for (const l of layers) {
       const fc = data[l.slug]; if (!fc) continue;

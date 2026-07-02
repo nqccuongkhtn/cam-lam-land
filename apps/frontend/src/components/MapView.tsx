@@ -9,7 +9,7 @@ if (typeof window !== 'undefined' && !(maplibregl as any).__pmtiles) {
   try { (maplibregl as any).addProtocol('pmtiles', new PMTilesProtocol().tile); (maplibregl as any).__pmtiles = true; } catch {}
 }
 
-export interface GeoLayer { id: string; type: 'fill' | 'line' | 'circle' | 'symbol'; data: GeoJSON.FeatureCollection; visible: boolean; paint: Record<string, any>; layout?: Record<string, any>; }
+export interface GeoLayer { id: string; type: 'fill' | 'line' | 'circle' | 'symbol'; data: GeoJSON.FeatureCollection; visible: boolean; paint: Record<string, any>; layout?: Record<string, any>; beforeId?: string; }
 export interface MarkerSpec { lng: number; lat: number; color?: string; popupHtml?: string; label?: string; onClick?: () => void; }
 export interface ImageOverlay { id: string; url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number; visible: boolean; pmtiles?: string; fillMaxzoom?: number; tiles?: string[]; minzoom?: number; maxzoom?: number; }
 export type BaseMap = 'street' | 'satellite' | 'terrain';

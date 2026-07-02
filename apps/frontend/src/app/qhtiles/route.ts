@@ -1,8 +1,8 @@
-// Proxy CÙNG TÊN MIỀN cho file qd205.pmtiles (đang host trên GitHub Releases).
-// Mục đích: né CORS (GitHub không cho trình duyệt tải trực tiếp) và hỗ trợ HTTP range
-// để MapLibre + pmtiles chỉ tải đúng phần tile đang xem.
-// Cơ chế: lần đầu tải nguyên file 148MB về /tmp (đệm), các lần sau phục vụ range từ đĩa (nhanh).
-import { createReadStream, createWriteStream, existsSync, statSync } from 'fs';
+// Phục vụ file qd205.pmtiles CÙNG TÊN MIỀN (né CORS của GitHub) + hỗ trợ HTTP range.
+// Ưu tiên file đã NẠP SẴN vào image lúc build (Dockerfile.render tải về /app/qd205.pmtiles).
+// Nếu vì lý do nào đó không có, mới tải runtime về /tmp — tải ra file .part rồi đổi tên,
+// và BẮT BUỘC đủ ~148MB mới dùng (tránh phục vụ file tải dở gây "mất ảnh").
+import { createReadStream, createWriteStream, existsSync, statSync, renameSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { Readable } from 'stream';
@@ -12,19 +12,26 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const SRC = 'https://github.com/nqccuongkhtn/cam-lam-land/releases/download/tiles/qd205.pmtiles';
-const FILE = join(tmpdir(), 'qd205.pmtiles');
-let ready: Promise<void> | null = null;
+const BAKED = join(process.cwd(), 'qd205.pmtiles'); // nạp sẵn lúc build
+const CACHE = join(tmpdir(), 'qd205.pmtiles');       // dự phòng: tải runtime
+const MIN_OK = 140_000_000;                          // file thật ~147.6MB
 
-// Tải file về đĩa 1 lần (dedupe: mọi request đầu tiên cùng chờ 1 promise).
-function ensureFile(): Promise<void> {
-  if (ready) return ready;
-  ready = (async () => {
-    if (existsSync(FILE) && statSync(FILE).size > 1_000_000) return;
+let resolving: Promise<string> | null = null;
+
+function resolveFile(): Promise<string> {
+  if (resolving) return resolving;
+  resolving = (async () => {
+    if (existsSync(BAKED) && statSync(BAKED).size >= MIN_OK) return BAKED;
+    if (existsSync(CACHE) && statSync(CACHE).size >= MIN_OK) return CACHE;
+    const part = CACHE + '.part';
     const res = await fetch(SRC);
     if (!res.ok || !res.body) throw new Error('tải pmtiles lỗi: ' + res.status);
-    await pipeline(Readable.fromWeb(res.body as any), createWriteStream(FILE));
-  })().catch((e) => { ready = null; throw e; });
-  return ready;
+    await pipeline(Readable.fromWeb(res.body as any), createWriteStream(part));
+    if (statSync(part).size < MIN_OK) throw new Error('file tải chưa đủ');
+    renameSync(part, CACHE);
+    return CACHE;
+  })().catch((e) => { resolving = null; throw e; });
+  return resolving;
 }
 
 const CORS: Record<string, string> = {
@@ -39,12 +46,13 @@ export async function OPTIONS() {
 }
 
 export async function GET(req: Request) {
+  let file: string;
   try {
-    await ensureFile();
+    file = await resolveFile();
   } catch (e: any) {
     return new Response('upstream error: ' + (e?.message || e), { status: 502, headers: CORS });
   }
-  const size = statSync(FILE).size;
+  const size = statSync(file).size;
   const base: Record<string, string> = {
     ...CORS,
     'accept-ranges': 'bytes',
@@ -60,12 +68,12 @@ export async function GET(req: Request) {
     if (Number.isNaN(start) || start >= size || start > end) {
       return new Response(null, { status: 416, headers: { ...base, 'content-range': `bytes */${size}` } });
     }
-    const stream = createReadStream(FILE, { start, end });
+    const stream = createReadStream(file, { start, end });
     return new Response(Readable.toWeb(stream) as any, {
       status: 206,
       headers: { ...base, 'content-range': `bytes ${start}-${end}/${size}`, 'content-length': String(end - start + 1) },
     });
   }
-  const stream = createReadStream(FILE);
+  const stream = createReadStream(file);
   return new Response(Readable.toWeb(stream) as any, { status: 200, headers: { ...base, 'content-length': String(size) } });
 }

@@ -6,5 +6,10 @@ RUN npm install
 COPY apps/frontend ./
 ENV NODE_ENV=production
 RUN npm run build
+# Nạp sẵn file PMTiles quy hoạch vào image lúc build (phục vụ ổn định, không tải lúc chạy).
+# Build FAIL nếu tải lỗi hoặc file < 140MB — không bao giờ ship file cụt gây "mất ảnh".
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && rm -rf /var/lib/apt/lists/* \
+ && curl -fSL "https://github.com/nqccuongkhtn/cam-lam-land/releases/download/tiles/qd205.pmtiles" -o qd205.pmtiles \
+ && test "$(stat -c%s qd205.pmtiles)" -gt 140000000
 EXPOSE 3000
 CMD ["sh","-c","npx next start -p ${PORT:-3000}"]

@@ -182,7 +182,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
         // Lớp NỀN: mức zoom thấp (đủ màu, không thủng ruột) — chỉ bật khi zoom sâu để lấp lỗ trống ở z17-18.
         if (!map.getSource(fillSrc)) {
           map.addSource(fillSrc, { type: 'raster', tiles: tpl, tileSize: 256, minzoom: ov.minzoom ?? 10, maxzoom: ov.fillMaxzoom ?? 14 } as any);
-          map.addLayer({ id: fillId, type: 'raster', source: fillSrc, minzoom: 16, paint: { 'raster-opacity': ov.opacity } });
+          map.addLayer({ id: fillId, type: 'raster', source: fillSrc, paint: { 'raster-opacity': ov.opacity } });
         }
         // Lớp CHI TIẾT: mức zoom cao (nét viền) chồng lên trên. Dùng dạng url (đã chạy tốt).
         if (!map.getSource(srcId)) {

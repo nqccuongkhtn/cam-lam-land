@@ -181,7 +181,7 @@ export default function MapPage() {
   const [clickVN, setClickVN] = useState<{ x: number; y: number; lng: number; lat: number } | null>(null);
   const [opacity, setOpacity] = useState(0.85);
   const [canDelete, setCanDelete] = useState(false);
-  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': false });
+  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true });
   const [baseMap, setBaseMap] = useState<BaseMap>('satellite');
   const [labels, setLabels] = useState(true);
   const [measure, setMeasure] = useState<MeasureMode>('off');
@@ -196,7 +196,7 @@ export default function MapPage() {
   const [qhVector, setQhVector] = useState<GeoJSON.FeatureCollection | null>(null);
   const [qhLines, setQhLines] = useState<GeoJSON.FeatureCollection | null>(null);
   const qhVectorRef = useRef<GeoJSON.FeatureCollection | null>(null); qhVectorRef.current = qhVector;
-  const [qhvOn, setQhvOn] = useState(true);
+  const [qhvOn, setQhvOn] = useState(false);
   const [qhvHit, setQhvHit] = useState<{ lo: string; hz: string }[]>([]);
   const [fitTo, setFitTo] = useState<[[number, number], [number, number]] | null>(null);
   const [drawOpen, setDrawOpen] = useState(false);

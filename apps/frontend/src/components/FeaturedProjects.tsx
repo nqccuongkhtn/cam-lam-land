@@ -84,8 +84,8 @@ export default function FeaturedProjects() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
-        {list.slice(0, 6).map((p) => (
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        {list.slice(0, 8).map((p) => (
           <ProjectCard key={p.id} p={p} isAdmin={!!isAdmin} onDelete={() => del(p.id)} />
         ))}
       </div>

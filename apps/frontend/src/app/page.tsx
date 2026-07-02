@@ -9,6 +9,7 @@ import HomeUtilities from '@/components/HomeUtilities';
 import PromoBanner from '@/components/PromoBanner';
 import FeaturedPartners from '@/components/FeaturedPartners';
 import FeaturedProjects from '@/components/FeaturedProjects';
+import SiteFooter from '@/components/SiteFooter';
 import { useFlags } from '@/lib/flags';
 
 const U = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=800&q=60`;
@@ -281,6 +282,25 @@ export default function Home() {
       {/* DOANH NGHIỆP TIÊU BIỂU — logo carousel (kiểu batdongsan) */}
       <FeaturedPartners />
 
+      {/* PLANNING PROMO — dưới Tiện ích & Doanh nghiệp tiêu biểu */}
+      <section className="mx-auto max-w-7xl px-4 py-14">
+        <div className="grid md:grid-cols-2 rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-sm">
+          <div className="p-8 md:p-12 flex flex-col justify-center">
+            <span className="text-[#C8A14B] font-semibold text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>
+            <h2 className="text-3xl font-extrabold text-[#0A2540] mt-2">Tra cứu quy hoạch & thửa đất chính xác</h2>
+            <p className="text-slate-500 mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số tờ/số thửa/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
+            <div className="mt-6 flex gap-3">
+              <Link href="/map" className="bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-6 py-3 rounded-xl">Mở bản đồ →</Link>
+              <Link href="/qr" className="border border-slate-300 text-[#0A2540] font-semibold px-6 py-3 rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
+            </div>
+          </div>
+          <div className="bg-slate-100 flex items-center justify-center min-h-[280px] p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/quyhoach-camlam.jpg" alt="Mô hình quy hoạch Cam Lâm" loading="lazy" decoding="async" className="w-full h-full object-contain max-h-[460px] rounded-xl" />
+          </div>
+        </div>
+      </section>
+
       {/* AD CONTACT — tế nhị */}
       {flags.services_live && (
       <section className="mx-auto max-w-7xl px-4 pb-12">
@@ -297,45 +317,8 @@ export default function Home() {
       </section>
       )}
 
-      {/* FOOTER */}
-      <footer className="bg-[#0A2540] text-slate-300">
-        {/* Số liệu (đã chuyển vào footer, căn trái thẳng hàng với các cột) */}
-        <div className="border-b border-white/10">
-          <div className="mx-auto max-w-7xl px-4 py-9 grid grid-cols-2 lg:grid-cols-4 gap-y-7 gap-x-6">
-            {STATS.map((s) => (
-              <div key={s.l} className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl grid place-items-center bg-white/[0.06] border border-[#C8A14B]/40 text-[#C8A14B] shrink-0">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d={s.d} /></svg>
-                </div>
-                <div>
-                  <div className="text-2xl md:text-3xl font-extrabold text-white leading-none">{s.n}</div>
-                  <div className="text-slate-400 text-xs mt-1">{s.l}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="mx-auto max-w-7xl px-4 py-12 grid sm:grid-cols-4 gap-8">
-          <div className="sm:col-span-2">
-            <p className="font-extrabold text-xl text-white">Cam Lâm <span className="text-[#C8A14B]">Land</span></p>
-            <p className="text-sm mt-3 text-slate-400 max-w-sm">Nền tảng bất động sản & bản đồ quy hoạch huyện Cam Lâm, Khánh Hòa — minh bạch, chính xác, hiện đại.</p>
-          </div>
-          <div>
-            <p className="font-semibold text-white mb-3">Khám phá</p>
-            <ul className="text-sm space-y-2 text-slate-400">
-              <li><Link href="/listings" className="hover:text-[#C8A14B]">Nhà đất</Link></li>
-              <li><Link href="/map" className="hover:text-[#C8A14B]">Bản đồ quy hoạch</Link></li>
-              <li><Link href="/qr" className="hover:text-[#C8A14B]">Tra cứu QR</Link></li>
-            </ul>
-          </div>
-          <div>
-            <p className="font-semibold text-white mb-3">Liên hệ</p>
-            <a href="tel:0988888888" className="inline-flex items-center gap-1.5 text-lg font-extrabold text-[#C8A14B] hover:text-[#FFD56A]">📞 0988 888 888</a>
-            <p className="text-sm text-slate-400 mt-2">Phát triển bởi<br /><b className="text-white">Nguyễn Quốc Cường</b></p>
-          </div>
-        </div>
-        <div className="border-t border-white/10 text-center text-xs text-slate-500 py-4">© 2026 Cam Lâm Land · Phát triển bởi Nguyễn Quốc Cường</div>
-      </footer>
+      {/* FOOTER — nhiều tầng (kiểu batdongsan) */}
+      <SiteFooter />
     </div>
   );
 }

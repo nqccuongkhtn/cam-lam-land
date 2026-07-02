@@ -9,23 +9,18 @@ function Wordmark({ name }: { name: string }) {
   const n = name.trim().toLowerCase();
   if (n === 'cam lâm land') {
     return (
-      <span className="flex items-center gap-1.5 whitespace-nowrap">
-        <span className="w-7 h-7 shrink-0 grid place-items-center rounded-md bg-[#0A2540]">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-[#C8A14B]"><path d="M12 3 2 12h3v8h6v-5h2v5h6v-8h3z" /></svg>
-        </span>
-        <span className="font-extrabold text-[15px] md:text-lg leading-none tracking-tight"><span className="text-[#0A2540]">Cam Lâm</span> <span className="text-[#C8A14B]">Land</span></span>
-      </span>
+      <span className="font-extrabold text-[26px] md:text-3xl leading-none tracking-tight whitespace-nowrap"><span className="text-[#0A2540]">Cam Lâm</span> <span className="text-[#C8A14B]">Land</span></span>
     );
   }
   if (n === 'vingroup') {
-    return <span className="font-serif font-bold text-[26px] md:text-3xl tracking-tight text-slate-600 whitespace-nowrap">Vin<span className="text-[#b01e2e]">group</span></span>;
+    return <span className="font-serif font-bold text-[26px] md:text-3xl leading-none tracking-tight text-slate-600 whitespace-nowrap">Vin<span className="text-[#b01e2e]">group</span></span>;
   }
-  return <span className="font-bold text-slate-600 text-sm md:text-base text-center leading-tight px-1 line-clamp-2">{name}</span>;
+  return <span className="font-bold text-slate-600 text-base md:text-lg text-center leading-tight line-clamp-2">{name}</span>;
 }
 
 function Tile({ p, isAdmin, onDelete }: { p: Partner; isAdmin: boolean; onDelete: () => void }) {
   return (
-    <div className="group relative shrink-0 w-44 md:w-52 h-24 md:h-28 bg-white border border-slate-200 rounded-2xl grid place-items-center px-4 hover:shadow-md hover:border-slate-300 transition">
+    <div className="group relative shrink-0 w-52 md:w-60 h-24 md:h-28 bg-white border border-slate-200 rounded-2xl grid place-items-center px-4 hover:shadow-md hover:border-slate-300 transition">
       {p.logoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={p.logoUrl} alt={p.name} loading="lazy" decoding="async" className="max-h-14 md:max-h-16 max-w-full object-contain grayscale group-hover:grayscale-0 transition" />
@@ -48,7 +43,9 @@ export default function FeaturedPartners() {
   const [logoUrl, setLogoUrl] = useState('');
   const [saving, setSaving] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const pausedRef = useRef(false);
+  const posRef = useRef(0);
+  const hoverRef = useRef(false);
+  const manualUntilRef = useRef(0);
 
   const load = () => api<{ partners: Partner[] }>('/partners').then((r) => setPartners(r.partners || [])).catch(() => {});
   useEffect(() => { load(); }, []);
@@ -58,19 +55,26 @@ export default function FeaturedPartners() {
   while (half.length < Math.max(8, base.length * 2)) half.push(...base);
   const track = [...half, ...half];
 
-  // Tự trượt chậm (đi hết một nửa trong 84s ~ chậm bằng 1/3 lúc đầu), dừng khi rê chuột. Người dùng vẫn kéo/nhấn nút được.
+  // Tự trượt chậm (đi hết một nửa trong 84s). Dùng bộ tích lũy float để không bị làm tròn về 0.
+  // Dừng khi rê chuột; khi bấm nút thì tạm dừng auto để cuộn mượt, xong tự chạy lại.
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
     let raf = 0;
     let last = performance.now();
     const step = (now: number) => {
-      const dt = (now - last) / 1000;
+      const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       const halfW = el.scrollWidth / 2;
-      if (!pausedRef.current && halfW > 0) {
-        el.scrollLeft += (halfW / 84) * dt;
-        if (el.scrollLeft >= halfW) el.scrollLeft -= halfW;
+      const paused = hoverRef.current || now < manualUntilRef.current;
+      if (halfW > 0) {
+        if (paused) {
+          posRef.current = el.scrollLeft;
+        } else {
+          posRef.current += (halfW / 84) * dt;
+          if (posRef.current >= halfW) posRef.current -= halfW;
+          el.scrollLeft = posRef.current;
+        }
       }
       raf = requestAnimationFrame(step);
     };
@@ -81,6 +85,7 @@ export default function FeaturedPartners() {
   const nudge = (dir: number) => {
     const el = scrollerRef.current;
     if (!el) return;
+    manualUntilRef.current = performance.now() + 800;
     el.scrollBy({ left: dir * Math.max(240, el.clientWidth * 0.7), behavior: 'smooth' });
   };
 
@@ -108,7 +113,7 @@ export default function FeaturedPartners() {
 
       <div className="relative">
         <button onClick={() => nudge(-1)} aria-label="Xem trước" className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 grid place-items-center rounded-full bg-white border border-slate-300 shadow-sm text-slate-500 hover:text-[#0A2540] hover:border-[#0A2540] text-lg leading-none">‹</button>
-        <div ref={scrollerRef} onMouseEnter={() => { pausedRef.current = true; }} onMouseLeave={() => { pausedRef.current = false; }}
+        <div ref={scrollerRef} onMouseEnter={() => { hoverRef.current = true; }} onMouseLeave={() => { hoverRef.current = false; }}
           className="overflow-x-auto px-7 md:px-10 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <div className="flex gap-3 md:gap-4 w-max py-1">
             {track.map((p, i) => (

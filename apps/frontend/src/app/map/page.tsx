@@ -15,7 +15,7 @@ const DEFAULT_COLORS: Record<string, string> = {
 };
 const RASTER_OVERLAYS = [
   { id: 'qh-qd205', name: 'Ảnh quy hoạch QĐ205', url: '/overlays/QD205.png',
-    pmtiles: 'pmtiles:///qhtiles', minzoom: 10, maxzoom: 18,
+    pmtiles: 'pmtiles:///qhtiles', minzoom: 10, maxzoom: 18, fillMaxzoom: 14,
     coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]] },
 ];
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
@@ -222,7 +222,7 @@ export default function MapPage() {
   useEffect(() => { if (!camOpen) return; const v = camVideoRef.current, st = camStreamRef.current; if (!v || !st) return; v.srcObject = st; v.setAttribute('playsinline', 'true'); v.play().catch(() => {}); }, [camOpen]);
 
   const overlays: ImageOverlay[] = useMemo(
-    () => RASTER_OVERLAYS.map((o) => ({ id: o.id, url: o.url, coordinates: o.coordinates, opacity, visible: ovOn[o.id] ?? true, pmtiles: (o as any).pmtiles, tiles: (o as any).tiles, minzoom: (o as any).minzoom, maxzoom: (o as any).maxzoom })), [opacity, ovOn]);
+    () => RASTER_OVERLAYS.map((o) => ({ id: o.id, url: o.url, coordinates: o.coordinates, opacity, visible: ovOn[o.id] ?? true, pmtiles: (o as any).pmtiles, fillMaxzoom: (o as any).fillMaxzoom, tiles: (o as any).tiles, minzoom: (o as any).minzoom, maxzoom: (o as any).maxzoom })), [opacity, ovOn]);
 
   const geoLayers: GeoLayer[] = useMemo(() => {
     const out: GeoLayer[] = [];

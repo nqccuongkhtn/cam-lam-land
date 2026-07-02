@@ -11,7 +11,7 @@ if (typeof window !== 'undefined' && !(maplibregl as any).__pmtiles) {
 
 export interface GeoLayer { id: string; type: 'fill' | 'line' | 'circle' | 'symbol'; data: GeoJSON.FeatureCollection; visible: boolean; paint: Record<string, any>; layout?: Record<string, any>; }
 export interface MarkerSpec { lng: number; lat: number; color?: string; popupHtml?: string; label?: string; onClick?: () => void; }
-export interface ImageOverlay { id: string; url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number; visible: boolean; pmtiles?: string; tiles?: string[]; minzoom?: number; maxzoom?: number; }
+export interface ImageOverlay { id: string; url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number; visible: boolean; pmtiles?: string; fillMaxzoom?: number; tiles?: string[]; minzoom?: number; maxzoom?: number; }
 export type BaseMap = 'street' | 'satellite' | 'terrain';
 export type MeasureMode = 'off' | 'distance' | 'area';
 export interface MeasureResult { mode: MeasureMode; points: number; distance: number; area: number; }
@@ -175,13 +175,32 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     const map = mapRef.current; if (!map || !readyRef.current) return;
     for (const ov of overlays) {
       const srcId = `ovsrc-${ov.id}`;
-      if (!map.getSource(srcId)) {
-        if (ov.pmtiles) map.addSource(srcId, { type: 'raster', url: ov.pmtiles, tileSize: 256, minzoom: ov.minzoom ?? 0, maxzoom: ov.maxzoom ?? 22 } as any);
-        else if (ov.tiles && ov.tiles.length) map.addSource(srcId, { type: 'raster', tiles: ov.tiles, tileSize: 256, minzoom: ov.minzoom ?? 0, maxzoom: ov.maxzoom ?? 22 } as any);
-        else map.addSource(srcId, { type: 'image', url: ov.url, coordinates: ov.coordinates as any });
-        map.addLayer({ id: ov.id, type: 'raster', source: srcId, paint: { 'raster-opacity': ov.opacity, 'raster-resampling': 'nearest' } });
-      } else map.setPaintProperty(ov.id, 'raster-opacity', ov.opacity);
-      map.setLayoutProperty(ov.id, 'visibility', ov.visible ? 'visible' : 'none');
+      if (ov.pmtiles) {
+        // Đọc pmtiles theo dạng tile-template để tự đặt maxzoom riêng cho từng lớp.
+        const tpl = [`${ov.pmtiles}/{z}/{x}/{y}`];
+        const fillId = `${ov.id}-fill`, fillSrc = `${srcId}-fill`;
+        // Lớp NỀN: mức zoom thấp (đủ màu, không thủng ruột) — chỉ bật khi zoom sâu để lấp lỗ trống ở z17-18.
+        if (!map.getSource(fillSrc)) {
+          map.addSource(fillSrc, { type: 'raster', tiles: tpl, tileSize: 256, minzoom: ov.minzoom ?? 10, maxzoom: ov.fillMaxzoom ?? 14 } as any);
+          map.addLayer({ id: fillId, type: 'raster', source: fillSrc, minzoom: 16, paint: { 'raster-opacity': ov.opacity } });
+        }
+        // Lớp CHI TIẾT: mức zoom cao (nét viền) chồng lên trên. Dùng dạng url (đã chạy tốt).
+        if (!map.getSource(srcId)) {
+          map.addSource(srcId, { type: 'raster', url: ov.pmtiles, tileSize: 256, minzoom: ov.minzoom ?? 10, maxzoom: ov.maxzoom ?? 18 } as any);
+          map.addLayer({ id: ov.id, type: 'raster', source: srcId, paint: { 'raster-opacity': ov.opacity, 'raster-resampling': 'nearest' } });
+        }
+        for (const id of [fillId, ov.id]) {
+          map.setPaintProperty(id, 'raster-opacity', ov.opacity);
+          map.setLayoutProperty(id, 'visibility', ov.visible ? 'visible' : 'none');
+        }
+      } else {
+        if (!map.getSource(srcId)) {
+          if (ov.tiles && ov.tiles.length) map.addSource(srcId, { type: 'raster', tiles: ov.tiles, tileSize: 256, minzoom: ov.minzoom ?? 0, maxzoom: ov.maxzoom ?? 22 } as any);
+          else map.addSource(srcId, { type: 'image', url: ov.url, coordinates: ov.coordinates as any });
+          map.addLayer({ id: ov.id, type: 'raster', source: srcId, paint: { 'raster-opacity': ov.opacity } });
+        } else map.setPaintProperty(ov.id, 'raster-opacity', ov.opacity);
+        map.setLayoutProperty(ov.id, 'visibility', ov.visible ? 'visible' : 'none');
+      }
     }
   }
   useEffect(() => { syncOverlays(); /* eslint-disable-next-line */ }, [overlays]);

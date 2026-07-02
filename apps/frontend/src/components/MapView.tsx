@@ -179,7 +179,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
         if (ov.pmtiles) map.addSource(srcId, { type: 'raster', url: ov.pmtiles, tileSize: 256, minzoom: ov.minzoom ?? 0, maxzoom: ov.maxzoom ?? 22 } as any);
         else if (ov.tiles && ov.tiles.length) map.addSource(srcId, { type: 'raster', tiles: ov.tiles, tileSize: 256, minzoom: ov.minzoom ?? 0, maxzoom: ov.maxzoom ?? 22 } as any);
         else map.addSource(srcId, { type: 'image', url: ov.url, coordinates: ov.coordinates as any });
-        map.addLayer({ id: ov.id, type: 'raster', source: srcId, paint: { 'raster-opacity': ov.opacity } });
+        map.addLayer({ id: ov.id, type: 'raster', source: srcId, paint: { 'raster-opacity': ov.opacity, 'raster-resampling': 'nearest' } });
       } else map.setPaintProperty(ov.id, 'raster-opacity', ov.opacity);
       map.setLayoutProperty(ov.id, 'visibility', ov.visible ? 'visible' : 'none');
     }

@@ -35,38 +35,38 @@ function Newsletter() {
   };
   return (
     <form onSubmit={submit} className="flex rounded-lg overflow-hidden bg-white/10 border border-white/15">
-      <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Nhập email của bạn" className="flex-1 bg-transparent px-3 py-2.5 text-sm text-white placeholder-slate-400 outline-none" />
-      <button type="submit" className="bg-red-600 hover:bg-red-700 text-white px-4 text-sm font-semibold">Gửi</button>
+      <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Nhập email của bạn" className="flex-1 min-w-0 bg-transparent px-3 py-2.5 text-sm text-white placeholder-slate-400 outline-none" />
+      <button type="submit" className="bg-red-600 hover:bg-red-700 text-white px-4 text-sm font-semibold shrink-0">Gửi</button>
     </form>
   );
 }
 
 export default function SiteFooter() {
   return (
-    <footer className="bg-[#0A2540] text-slate-300 border-t border-slate-200">
-      <div>
-        <div className="mx-auto max-w-7xl px-4 pt-10 pb-2 grid grid-cols-2 lg:grid-cols-4 gap-y-7 gap-x-6">
-          {STATS.map((s) => (
-            <div key={s.l} className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl grid place-items-center bg-white/[0.06] border border-[#C8A14B]/40 text-[#C8A14B] shrink-0">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d={s.d} /></svg>
-              </div>
-              <div>
-                <div className="text-2xl md:text-3xl font-extrabold text-white leading-none">{s.n}</div>
-                <div className="text-slate-400 text-xs mt-1">{s.l}</div>
-              </div>
+    <footer className="bg-[#0A2540] text-slate-300">
+      {/* Số liệu — 4 mục đều nhau */}
+      <div className="mx-auto max-w-7xl px-4 pt-12 pb-10 grid grid-cols-2 lg:grid-cols-4 gap-6">
+        {STATS.map((s) => (
+          <div key={s.l} className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl grid place-items-center bg-white/[0.06] border border-[#C8A14B]/40 text-[#C8A14B] shrink-0">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d={s.d} /></svg>
             </div>
-          ))}
-        </div>
+            <div>
+              <div className="text-xl md:text-2xl font-extrabold text-white leading-none">{s.n}</div>
+              <div className="text-slate-400 text-xs mt-1">{s.l}</div>
+            </div>
+          </div>
+        ))}
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-12 grid gap-8 md:grid-cols-12">
-        <div className="md:col-span-4">
+      {/* 4 cột đều nhau */}
+      <div className="mx-auto max-w-7xl px-4 pb-10 grid gap-x-6 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
           <p className="font-extrabold text-xl text-white">Cam Lâm <span className="text-[#C8A14B]">Land</span></p>
-          <p className="text-sm mt-3 text-slate-400 max-w-sm">Nền tảng bất động sản &amp; bản đồ quy hoạch huyện Cam Lâm, Khánh Hòa.</p>
+          <p className="text-sm mt-3 text-slate-400">Nền tảng bất động sản &amp; bản đồ quy hoạch huyện Cam Lâm, Khánh Hòa.</p>
           <a href="tel:0988888888" className="inline-flex items-center gap-1.5 text-lg font-extrabold text-[#C8A14B] hover:text-[#FFD56A] mt-4">📞 0988 888 888</a>
           <p className="text-sm text-slate-400 mt-1">✉️ lienhe@camlamland.vn</p>
-          <div className="flex items-center gap-3 mt-4">
+          <div className="flex flex-wrap items-center gap-2.5 mt-4">
             <a href="#" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-2">
               <span className="text-lg">▶</span><span className="text-[11px] leading-tight">Tải trên<br /><b className="text-white text-xs">Google Play</b></span>
             </a>
@@ -80,21 +80,21 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        <div className="md:col-span-2">
+        <div>
           <p className="font-semibold text-white mb-3">Hướng dẫn</p>
           <ul className="text-sm space-y-2 text-slate-400">
             {HELP.map(([label, href]) => <li key={label}><Link href={href} className="hover:text-[#C8A14B]">{label}</Link></li>)}
           </ul>
         </div>
 
-        <div className="md:col-span-3">
+        <div>
           <p className="font-semibold text-white mb-3">Quy định</p>
           <ul className="text-sm space-y-2 text-slate-400">
             {RULES.map(([label, href]) => <li key={label}><a href={href} className="hover:text-[#C8A14B]">{label}</a></li>)}
           </ul>
         </div>
 
-        <div className="md:col-span-3">
+        <div>
           <p className="font-semibold text-white mb-3">Đăng ký nhận tin</p>
           <p className="text-xs text-slate-400 mb-2">Nhận tin nhà đất &amp; quy hoạch Cam Lâm mới nhất.</p>
           <Newsletter />
@@ -105,12 +105,10 @@ export default function SiteFooter() {
         </div>
       </div>
 
-      <div className="border-t border-white/10">
-        <div className="mx-auto max-w-7xl px-4 py-6 text-xs text-slate-400 leading-relaxed">
-          <b className="text-slate-200">CAM LÂM LAND</b> — Nền tảng bất động sản &amp; quy hoạch huyện Cam Lâm, tỉnh Khánh Hòa. Phát triển bởi Nguyễn Quốc Cường. Địa chỉ: Cam Lâm, Khánh Hòa · Hotline: 0988 888 888 · Email: lienhe@camlamland.vn.
-        </div>
+      <div className="mx-auto max-w-7xl px-4 pb-4 text-xs text-slate-400 leading-relaxed">
+        <b className="text-slate-200">CAM LÂM LAND</b> — Nền tảng bất động sản &amp; quy hoạch huyện Cam Lâm, tỉnh Khánh Hòa. Phát triển bởi Nguyễn Quốc Cường. Địa chỉ: Cam Lâm, Khánh Hòa · Hotline: 0988 888 888 · Email: lienhe@camlamland.vn.
       </div>
-      <div className="border-t border-white/10 text-center text-xs text-slate-500 py-4">© 2026 Cam Lâm Land · Phát triển bởi Nguyễn Quốc Cường</div>
+      <div className="mx-auto max-w-7xl px-4 text-center sm:text-left text-xs text-slate-500 pb-6">© 2026 Cam Lâm Land · Phát triển bởi Nguyễn Quốc Cường</div>
     </footer>
   );
 }

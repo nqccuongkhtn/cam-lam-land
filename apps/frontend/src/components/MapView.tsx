@@ -211,7 +211,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       const srcId = `src-${l.id}`;
       const src = map.getSource(srcId) as maplibregl.GeoJSONSource | undefined;
       if (src) src.setData(l.data as any); else map.addSource(srcId, { type: 'geojson', data: l.data as any });
-      if (!map.getLayer(l.id)) map.addLayer({ id: l.id, type: l.type, source: srcId, paint: l.paint, layout: l.layout || {} } as any);
+      if (!map.getLayer(l.id)) map.addLayer({ id: l.id, type: l.type, source: srcId, paint: l.paint, layout: l.layout || {} } as any, (l.beforeId && map.getLayer(l.beforeId)) ? l.beforeId : undefined);
       else for (const [k, v] of Object.entries(l.paint)) map.setPaintProperty(l.id, k as any, v);
       map.setLayoutProperty(l.id, 'visibility', l.visible ? 'visible' : 'none');
     }

@@ -18,6 +18,7 @@ const lyrOf = (b: BaseMap) => (b === 'satellite' ? 's' : b === 'terrain' ? 'p' :
 
 const QH = {
   id: 'qh-qd205', url: '/overlays/QD205.png',
+  pmtiles: 'pmtiles:///qhtiles', minzoom: 10, maxzoom: 18, fillMaxzoom: 14,
   coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]],
 };
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];

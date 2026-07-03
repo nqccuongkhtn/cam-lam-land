@@ -52,8 +52,10 @@ async def do_ocr(file: UploadFile = File(...), x_token: str = Header(default="")
         arr,
         detail=0,
         allowlist="0123456789.,-: ",
-        text_threshold=0.5,
+        decoder="beamsearch",   # chính xác hơn greedy
+        text_threshold=0.6,
         low_text=0.3,
+        mag_ratio=1.5,          # phóng to để bắt chữ số nhỏ rõ hơn
     )
     text = "\n".join(str(x) for x in lines if str(x).strip())
     print(f"[ocr] Đọc được {len(lines)} vùng số.")

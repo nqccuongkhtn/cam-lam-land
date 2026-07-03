@@ -126,6 +126,15 @@ function toBlob(src: HTMLImageElement | HTMLCanvasElement): Promise<Blob> {
   cv.getContext('2d')!.drawImage(src, 0, 0, cv.width, cv.height);
   return new Promise((resolve, reject) => cv.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), 'image/png'));
 }
+// Ảnh GỐC nén JPEG (<1MB) — cho engine mạnh (máy nội bộ / OCR.space / Gemini) đọc ảnh tự nhiên, ít nhầm số hơn ảnh nhị phân hoá.
+function toJpeg(src: HTMLImageElement | HTMLCanvasElement, maxDim = 1900, q = 0.85): Promise<Blob> {
+  const w0 = src instanceof HTMLCanvasElement ? src.width : ((src as HTMLImageElement).naturalWidth || 1);
+  const h0 = src instanceof HTMLCanvasElement ? src.height : ((src as HTMLImageElement).naturalHeight || 1);
+  const sc = Math.min(1, maxDim / Math.max(w0, h0));
+  const cv = document.createElement('canvas'); cv.width = Math.max(1, Math.round(w0 * sc)); cv.height = Math.max(1, Math.round(h0 * sc));
+  cv.getContext('2d')!.drawImage(src, 0, 0, cv.width, cv.height);
+  return new Promise((resolve, reject) => cv.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), 'image/jpeg', q));
+}
 function engineLabel(e: string): string { return e === 'paste' ? 'dán tay' : e === 'self' ? 'máy OCR nội bộ' : e === 'ocrspace' ? 'OCR.space' : e === 'gemini' ? 'Gemini AI' : e === 'tesseract' ? 'máy chủ (Tesseract)' : e === 'browser' ? 'trình duyệt (yếu)' : 'máy chủ'; }
 async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{ pts: { x: number; y: number }[]; msg: string; engine: string; raw: string }> {
   let status = '', engine = '', raw = '', firstText = '', firstEngine = '';
@@ -133,12 +142,12 @@ async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{
   const keep = (pts: { x: number; y: number }[], eng: string, text: string) => { if (pts.length > best.length) { best = pts; engine = eng; raw = text; } };
   const pre = preprocess(img);
   try {
-    // Lần 1: ảnh NHỊ PHÂN (nhỏ <1MB hợp giới hạn OCR.space, sắc nét cho Tesseract)
-    let r = await ocrImage(await toBlob(pre));
+    // Lần 1: ảnh GỐC nén JPEG (<1MB) — engine mạnh (máy nội bộ/OCR.space/Gemini) đọc tự nhiên, ít nhầm số.
+    let r = await ocrImage(await toJpeg(img));
     firstText = r.text; firstEngine = r.engine;
     keep(parseBigPairs(r.text), r.engine, r.text);
-    // Lần 2: chưa đủ → gửi ảnh GỐC (cho Gemini/engine mạnh đọc ca khó)
-    if (best.length < 3) { r = await ocrImage(await toBlob(img)); keep(parseBigPairs(r.text), r.engine, r.text); }
+    // Lần 2: chưa đủ → gửi ảnh nhị phân hoá (đỡ cho Tesseract khi không có engine mạnh)
+    if (best.length < 3) { r = await ocrImage(await toBlob(pre)); keep(parseBigPairs(r.text), r.engine, r.text); }
   } catch (e: any) {
     const m = String(e?.message || e);
     status = /unauthor|forbidden|401|403/i.test(m)

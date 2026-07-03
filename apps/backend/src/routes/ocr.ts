@@ -63,20 +63,11 @@ async function selfOcr(buffer: Buffer, mime: string): Promise<string> {
   return String(j?.text || '');
 }
 
-// POST /api/ocr — Máy nội bộ → OCR.space → Gemini → Tesseract (server)
+// POST /api/ocr — OCR.space → Gemini → Máy nội bộ → Tesseract (server)
 ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, next) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Thiếu ảnh' });
-    // 0) Máy OCR nội bộ (self-host) — ưu tiên cao nhất khi đang bật (mạnh + không giới hạn).
-    if (SELF_OCR_URL) {
-      try {
-        const t = await selfOcr(req.file.buffer, req.file.mimetype);
-        const nnum = (t.match(/\d{5,}/g) || []).length;
-        console.log(`[ocr] Máy nội bộ đọc ${nnum} số:`, JSON.stringify(t).slice(0, 240));
-        if (nnum > 0) return res.json({ text: t, engine: 'self' });
-      } catch (e: any) { console.error('[ocr] Máy nội bộ LỖI (thử tiếp):', e?.message || e); }
-    }
-    // 1) OCR.space — miễn phí nhiều lượt nhất (~500/ngày, không cần thẻ).
+    // 1) OCR.space — ƯU TIÊN CHÍNH (miễn phí ~500/ngày, không cần thẻ).
     if (OCRSPACE_KEY) {
       try {
         const stext = await ocrSpace(req.file.buffer, req.file.mimetype);
@@ -94,7 +85,15 @@ ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, n
         if (nnum > 0) return res.json({ text: gtext, engine: 'gemini' });
       } catch (e: any) { console.error('[ocr] Gemini LỖI (chuyển Tesseract):', e?.message || e); }
     }
-    if (!OCRSPACE_KEY && !GEMINI_KEY) console.log('[ocr] Chưa có OCRSPACE_API_KEY/GEMINI_API_KEY — dùng Tesseract.');
+    // 3) Máy OCR nội bộ (self-host) — LỚP DỰ PHÒNG SÂU, chỉ chạy khi cloud lỗi/hết quota + PC đang bật.
+    if (SELF_OCR_URL) {
+      try {
+        const t = await selfOcr(req.file.buffer, req.file.mimetype);
+        const nnum = (t.match(/\d{5,}/g) || []).length;
+        console.log(`[ocr] Máy nội bộ đọc ${nnum} số:`, JSON.stringify(t).slice(0, 240));
+        if (nnum > 0) return res.json({ text: t, engine: 'self' });
+      } catch (e: any) { console.error('[ocr] Máy nội bộ LỖI (chuyển Tesseract):', e?.message || e); }
+    }
     const tmp = join(tmpdir(), 'ocr_' + randomBytes(6).toString('hex'));
     await writeFile(tmp, req.file.buffer);
     let text = '';

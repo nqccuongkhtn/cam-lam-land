@@ -16,7 +16,7 @@ export default function Page() {
         <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <span className="text-slate-600">Giới thiệu</span></div>
         <article className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
           <h1 className="text-2xl md:text-3xl font-extrabold text-[#0A2540]">Giới thiệu Cam Lâm <span className="text-[#C8A14B]">Land</span></h1>
-          <p className="text-slate-600 mt-4 leading-relaxed">Cam Lâm Land là nền tảng bất động sản kết hợp bản đồ quy hoạch dành riêng cho huyện Cam Lâm, tỉnh Khánh Hòa. Chúng tôi giúp người dân và nhà đầu tư tìm mua, bán, cho thuê nhà đất; đồng thời tra cứu quy hoạch một cách minh bạch, chính xác và cập nhật.</p>
+          <p className="text-slate-600 mt-4 leading-relaxed">Cam Lâm Land là nền tảng bất động sản kết hợp bản đồ quy hoạch. Chúng tôi giúp người dân và nhà đầu tư tìm mua, bán, cho thuê nhà đất; đồng thời tra cứu quy hoạch một cách minh bạch, chính xác và cập nhật.</p>
 
           <div className="grid sm:grid-cols-2 gap-4 mt-6">
             {FEATURES.map((f) => (

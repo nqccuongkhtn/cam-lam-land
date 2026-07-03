@@ -234,6 +234,8 @@ export default function MapPage() {
   useEffect(() => { if (viewRef.current) refreshFeatures(viewRef.current); }, [visible, refreshFeatures]);
   useEffect(() => { setCanDelete(user?.role === 'admin' || user?.role === 'gis'); }, [user]);
   useEffect(() => { if (!camOpen) return; const v = camVideoRef.current, st = camStreamRef.current; if (!v || !st) return; v.srcObject = st; v.setAttribute('playsinline', 'true'); v.play().catch(() => {}); }, [camOpen]);
+  // Giải phóng camera khi rời trang (tránh giữ camera chạy ngầm trên điện thoại).
+  useEffect(() => () => { camStreamRef.current?.getTracks().forEach((t) => t.stop()); camStreamRef.current = null; }, []);
 
   const overlays: ImageOverlay[] = useMemo(
     () => RASTER_OVERLAYS.map((o) => ({ id: o.id, url: o.url, coordinates: o.coordinates, opacity, visible: ovOn[o.id] ?? true, pmtiles: (o as any).pmtiles, fillMaxzoom: (o as any).fillMaxzoom, tiles: (o as any).tiles, minzoom: (o as any).minzoom, maxzoom: (o as any).maxzoom })), [opacity, ovOn]);

@@ -200,8 +200,9 @@ export default function NewsIndex() {
   useEffect(() => { fetch('/api/config/tintuc_ad').then((r) => r.json()).then((d) => { if (d && d.value && typeof d.value === 'object') setAd({ ...SAMPLE_AD, ...d.value }); }).catch(() => {}); }, []);
 
   const showAd = ad && ad.enabled !== false;
-  const kw = q.trim().toLowerCase();
-  const filtered = kw ? news.filter((n) => (n.title + ' ' + (n.summary || '')).toLowerCase().includes(kw)) : news;
+  const na = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
+  const toks = na(q).split(/\s+/).filter(Boolean);
+  const filtered = toks.length ? news.filter((n) => { const d = na(n.title + ' ' + (n.summary || '')); return toks.every((t) => d.includes(t)); }) : news;
   const lead = filtered[0];
   const heroSide = filtered.slice(1, 5);
   const grid = filtered.slice(5, 11);

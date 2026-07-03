@@ -3,6 +3,7 @@ import { query } from '../lib/db.ts';
 import { isFlagOn } from '../lib/flags.ts';
 import { cached, cachePut, cacheDrop } from '../lib/cache.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
+import { vnNoAccent, vnTokens } from '../lib/vn.ts';
 
 export const listingsRouter = Router();
 
@@ -46,13 +47,17 @@ listingsRouter.get('/', async (req, res, next) => {
     if (minPrice)     where.push(`price >= ${p(Number(minPrice))}`);
     if (maxPrice)     where.push(`price <= ${p(Number(maxPrice))}`);
     if (propertyType) where.push(`property_type = ${p(propertyType)}`);
-    if (ward)         where.push(`ward = ${p(ward)}`);
-    if (q) { const t = p(`%${q}%`); where.push(`(title ILIKE ${t} OR description ILIKE ${t} OR address ILIKE ${t})`); }
+    if (ward)         where.push(`vn_unaccent(COALESCE(listings.ward,'')) = ${p(vnNoAccent(String(ward).trim()))}`);
+    // Tìm KHÔNG DẤU, không phân biệt hoa/thường, khớp MỌI token (AND) trên: tiêu đề + mô tả + địa chỉ + xã.
+    if (q) {
+      const doc = `vn_unaccent(COALESCE(listings.title,'')||' '||COALESCE(listings.description,'')||' '||COALESCE(listings.address,'')||' '||COALESCE(listings.ward,''))`;
+      for (const tok of vnTokens(q)) where.push(`${doc} LIKE ${p('%' + tok + '%')}`);
+    }
     if (bbox) { const [w, s, e, n] = bbox.split(',').map(Number); where.push(`geom && ST_MakeEnvelope(${p(w)},${p(s)},${p(e)},${p(n)},4326)`); }
-    const limit = Math.min(Number(req.query.limit ?? 100), 500);
-    const offset = Number(req.query.offset ?? 0);
+    const limit = Math.min(Number(req.query.limit ?? 100) || 100, 500);
+    const offset = Math.max(0, Number(req.query.offset ?? 0) || 0);
     const rows = await query(
-      `${SELECT} WHERE ${where.join(' AND ')} ORDER BY CASE listings.tier WHEN 'diamond' THEN 3 WHEN 'gold' THEN 2 WHEN 'silver' THEN 1 ELSE 0 END DESC, COALESCE(listings.bumped_at, listings.created_at) DESC LIMIT ${limit} OFFSET ${offset}`, params);
+      `${SELECT} WHERE ${where.join(' AND ')} ORDER BY CASE listings.tier WHEN 'diamond' THEN 3 WHEN 'gold' THEN 2 WHEN 'silver' THEN 1 ELSE 0 END DESC, COALESCE(listings.bumped_at, listings.created_at) DESC LIMIT ${p(limit)} OFFSET ${p(offset)}`, params);
     rows.forEach((r: any) => { r.contactPhone = maskPhone(r.contactPhone); });
     const payload = { count: rows.length, listings: rows };
     cachePut(ckey, payload, 20000);

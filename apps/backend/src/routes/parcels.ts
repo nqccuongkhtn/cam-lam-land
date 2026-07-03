@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
+import { vnNoAccent } from '../lib/vn.ts';
 
 export const parcelsRouter = Router();
 
@@ -8,10 +9,24 @@ const KEYS_TO = ['so_to', 'SoTo', 'SOTO', 'soto', 'to', 'TO', 'ToBanDo', 'SoToBa
 const KEYS_THUA = ['so_thua', 'SoThua', 'SOTHUA', 'sothua', 'thua', 'THUA', 'ThuaDat', 'SHThua', 'MaThua'];
 const KEYS_XA = ['xa', 'Xa', 'XA', 'TenXa', 'ten_xa', 'Phuong', 'MaXa'];
 
-function keyClause(keys: string[], val: string, params: any[]): string {
-  params.push(val);
+// Số tờ/số thửa: chấp nhận khoảng trắng thừa, số 0 đứng đầu ("05" = "5"), hoa/thường.
+function numKeyClause(keys: string[], val: string, params: any[]): string {
+  const raw = String(val).trim().toLowerCase();
+  const parts: string[] = [];
+  params.push(raw); const pRaw = `$${params.length}`;
+  for (const k of keys) parts.push(`lower(btrim(f.properties->>'${k}')) = ${pRaw}`);
+  const digits = raw.replace(/[^0-9]/g, '');
+  if (digits) {
+    params.push(digits.replace(/^0+/, '')); const pD = `$${params.length}`;
+    for (const k of keys) parts.push(`regexp_replace(regexp_replace(f.properties->>'${k}','[^0-9]','','g'),'^0+','') = ${pD}`);
+  }
+  return '(' + parts.join(' OR ') + ')';
+}
+// Xã: tìm KHÔNG DẤU, khớp một phần ("cam lam" khớp "Xã Cam Lâm").
+function textKeyClause(keys: string[], val: string, params: any[]): string {
+  params.push('%' + vnNoAccent(String(val).trim()) + '%');
   const p = `$${params.length}`;
-  return '(' + keys.map((k) => `f.properties->>'${k}' = ${p}`).join(' OR ') + ')';
+  return '(' + keys.map((k) => `vn_unaccent(f.properties->>'${k}') LIKE ${p}`).join(' OR ') + ')';
 }
 
 // GET /api/parcels/search?soto=&sothua=&xa=  — find cadastral parcels by sheet/parcel no.
@@ -21,9 +36,9 @@ parcelsRouter.get('/search', async (req, res, next) => {
     if (!soto && !sothua) return res.status(400).json({ error: 'Cần ít nhất số tờ hoặc số thửa' });
     const params: any[] = [];
     const where: string[] = [`l.layer_type IN ('parcel','custom','zoning')`];
-    if (soto) where.push(keyClause(KEYS_TO, soto, params));
-    if (sothua) where.push(keyClause(KEYS_THUA, sothua, params));
-    if (xa) where.push(keyClause(KEYS_XA, xa, params));
+    if (soto) where.push(numKeyClause(KEYS_TO, soto, params));
+    if (sothua) where.push(numKeyClause(KEYS_THUA, sothua, params));
+    if (xa && xa.trim()) where.push(textKeyClause(KEYS_XA, xa, params));
     const rows = await query(`
       SELECT f.id, f.properties,
              ST_AsGeoJSON(f.geom)::json AS geometry,

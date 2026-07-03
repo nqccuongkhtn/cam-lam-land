@@ -45,18 +45,22 @@ export default function Page() {
             <p>Từ chính kinh nghiệm thực tế ấy, chúng tôi quyết định số hoá mọi thứ: đưa dữ liệu quy hoạch lên bản đồ trực tuyến đến từng thửa đất, minh bạch hoá tin đăng và mang sự tư vấn tận tâm &quot;ngoài đời&quot; lên nền tảng số. Cam Lâm Land ra đời để bất kỳ ai — dù ở Cam Lâm hay từ xa — đều tra cứu được quy hoạch chính xác, xem tin đăng rõ ràng và quyết định với sự an tâm. Với chúng tôi, giá trị lớn nhất không phải số lượng tin đăng, mà là sự minh bạch và niềm tin.</p>
           </div>
 
-          <h2 className="text-lg font-bold text-[#0A2540] mt-8 mb-3">Chặng đường hình thành</h2>
-          <div className="space-y-4">
+          <h2 className="text-lg font-bold text-[#0A2540] mt-8 mb-5">Chặng đường hình thành</h2>
+          <ol className="relative ml-1 space-y-6">
+            <span aria-hidden className="absolute left-[6px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-[#C8A14B] via-[#C8A14B]/50 to-[#C8A14B]/10" />
             {MILESTONES.map(([year, text]) => (
-              <div key={year} className="flex gap-4">
-                <div className="shrink-0 w-28"><span className="inline-block bg-[#0A2540] text-white font-bold text-xs rounded-lg px-2.5 py-1.5 whitespace-nowrap">{year}</span></div>
-                <p className="text-[15px] text-slate-700 leading-relaxed border-l-2 border-[#C8A14B]/40 pl-4">{text}</p>
-              </div>
+              <li key={year} className="relative pl-8">
+                <span aria-hidden className="absolute left-0 top-1.5 w-3.5 h-3.5 rounded-full bg-[#C8A14B] ring-4 ring-white" />
+                <span className="inline-block bg-[#0A2540] text-white text-xs font-bold rounded-md px-2.5 py-1 mb-1.5">{year}</span>
+                <p className="text-[15px] text-slate-600 leading-relaxed">{text}</p>
+              </li>
             ))}
-          </div>
+          </ol>
 
-          <h2 className="text-lg font-bold text-[#0A2540] mt-8 mb-2">Sứ mệnh</h2>
-          <p className="text-[15px] text-slate-700 leading-relaxed">Minh bạch hoá thông tin bất động sản và quy hoạch tại Cam Lâm, giúp mỗi quyết định mua bán, đầu tư trở nên an toàn và dễ dàng hơn.</p>
+          <div className="mt-8 rounded-2xl bg-gradient-to-br from-[#0A2540] to-[#0d2f54] p-6">
+            <p className="text-[#FFD56A] text-xs font-bold uppercase tracking-wider">Sứ mệnh</p>
+            <p className="text-[15px] md:text-base leading-relaxed mt-2 text-slate-100">Minh bạch hoá thông tin bất động sản và quy hoạch tại Cam Lâm — để mỗi quyết định mua bán, đầu tư đều an toàn, rõ ràng và dễ dàng hơn.</p>
+          </div>
 
           <h2 className="text-lg font-bold text-[#0A2540] mt-6 mb-2">Liên hệ</h2>
           <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm text-slate-700 space-y-1">

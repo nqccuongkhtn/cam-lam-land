@@ -162,8 +162,8 @@ function Stat({ label, value, sub }: { label: string; value: any; sub?: string }
 function Row({ k, v }: { k: string; v: number }) {
   return <div className="flex justify-between text-sm py-1 border-b border-slate-50"><span className="text-slate-600">{k}</span><b className="text-[#0A2540]">{v}</b></div>;
 }
-const OCR_LABELS: Record<string, string> = { ocrspace: 'OCR.space', gemini: 'Gemini AI', self: 'Máy nội bộ', tesseract: 'Tesseract (máy chủ)' };
-const OCR_LIMITS: Record<string, string> = { ocrspace: '500 / ngày', gemini: '1.500 / ngày', self: 'không giới hạn', tesseract: 'không giới hạn' };
+const OCR_LABELS: Record<string, string> = { gemini: 'Gemini AI', groq: 'Groq (Llama 4)', openrouter: 'OpenRouter', ocrspace: 'OCR.space', self: 'Máy nội bộ', tesseract: 'Tesseract (máy chủ)' };
+const OCR_LIMITS: Record<string, string> = { gemini: 'nhiều model', groq: '14.400 / ngày', openrouter: '~200 / ngày', ocrspace: '500 / ngày', self: 'không giới hạn', tesseract: 'không giới hạn' };
 function OcrUsage() {
   const [d, setD] = useState<any>(null);
   useEffect(() => { api('/ocr/usage').then(setD).catch(() => {}); }, []);
@@ -177,7 +177,7 @@ function OcrUsage() {
       <table className="w-full text-sm">
         <thead className="text-left text-slate-500"><tr><th className="py-1">Nguồn AI</th><th className="py-1 text-right">Đã dùng</th><th className="py-1 text-right">Giới hạn free/ngày</th></tr></thead>
         <tbody>
-          {['ocrspace', 'gemini', 'self', 'tesseract'].map((eng) => {
+          {['gemini', 'groq', 'openrouter', 'ocrspace', 'self', 'tesseract'].map((eng) => {
             const c = today.find((r) => r.engine === eng)?.count ?? 0;
             return <tr key={eng} className="border-t border-slate-50"><td className="py-1.5 text-slate-600">{OCR_LABELS[eng]}</td><td className="py-1.5 text-right font-bold text-[#0A2540]">{c}</td><td className="py-1.5 text-right text-slate-400 text-xs">{OCR_LIMITS[eng]}</td></tr>;
           })}

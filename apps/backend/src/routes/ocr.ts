@@ -35,17 +35,66 @@ async function geminiOcr(buffer: Buffer, mime: string): Promise<string> {
   return String(j?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text).filter(Boolean).join('\n') || '');
 }
 
-// POST /api/ocr — Gemini (nếu có GEMINI_API_KEY) → Tesseract (server)
+// ── OCR.space (miễn phí ~500 lượt/ngày, không cần thẻ) — đọc bảng số tốt (isTable); bỏ qua nếu chưa có OCRSPACE_API_KEY ──
+const OCRSPACE_KEY = process.env.OCRSPACE_API_KEY || '';
+async function ocrSpace(buffer: Buffer, mime: string): Promise<string> {
+  const fd = new FormData();
+  fd.append('base64Image', `data:${mime || 'image/png'};base64,${buffer.toString('base64')}`);
+  fd.append('OCREngine', '2');
+  fd.append('isTable', 'true');
+  fd.append('scale', 'true');
+  fd.append('language', 'eng');
+  const r = await fetch('https://api.ocr.space/parse/image', { method: 'POST', headers: { apikey: OCRSPACE_KEY }, body: fd, signal: AbortSignal.timeout(25000) });
+  if (!r.ok) throw new Error('OCR.space HTTP ' + r.status);
+  const j: any = await r.json();
+  if (j.IsErroredOnProcessing) throw new Error('OCR.space: ' + (Array.isArray(j.ErrorMessage) ? j.ErrorMessage.join('; ') : (j.ErrorMessage || 'lỗi')));
+  return String((j?.ParsedResults || []).map((p: any) => p?.ParsedText).filter(Boolean).join('\n') || '');
+}
+
+// ── OCR nội bộ (self-host EasyOCR/PaddleOCR trên máy văn phòng) — mạnh, KHÔNG giới hạn lượt; bỏ qua nếu chưa đặt SELF_OCR_URL ──
+const SELF_OCR_URL = process.env.SELF_OCR_URL || '';
+const SELF_OCR_TOKEN = process.env.SELF_OCR_TOKEN || '';
+async function selfOcr(buffer: Buffer, mime: string): Promise<string> {
+  const fd = new FormData();
+  fd.append('file', new Blob([buffer], { type: mime || 'image/png' }), 'coords.png');
+  const r = await fetch(SELF_OCR_URL.replace(/\/+$/, '') + '/ocr', { method: 'POST', headers: SELF_OCR_TOKEN ? { 'x-token': SELF_OCR_TOKEN } : {}, body: fd, signal: AbortSignal.timeout(30000) });
+  if (!r.ok) throw new Error('Self-OCR HTTP ' + r.status);
+  const j: any = await r.json();
+  return String(j?.text || '');
+}
+
+// POST /api/ocr — Máy nội bộ → OCR.space → Gemini → Tesseract (server)
 ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, next) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Thiếu ảnh' });
-    // Ưu tiên Gemini nếu đã cấu hình key (mạnh hơn Tesseract nhiều); lỗi/thiếu key thì tự chuyển Tesseract.
+    // 0) Máy OCR nội bộ (self-host) — ưu tiên cao nhất khi đang bật (mạnh + không giới hạn).
+    if (SELF_OCR_URL) {
+      try {
+        const t = await selfOcr(req.file.buffer, req.file.mimetype);
+        const nnum = (t.match(/\d{5,}/g) || []).length;
+        console.log(`[ocr] Máy nội bộ đọc ${nnum} số:`, JSON.stringify(t).slice(0, 240));
+        if (nnum > 0) return res.json({ text: t, engine: 'self' });
+      } catch (e: any) { console.error('[ocr] Máy nội bộ LỖI (thử tiếp):', e?.message || e); }
+    }
+    // 1) OCR.space — miễn phí nhiều lượt nhất (~500/ngày, không cần thẻ).
+    if (OCRSPACE_KEY) {
+      try {
+        const stext = await ocrSpace(req.file.buffer, req.file.mimetype);
+        const nnum = (stext.match(/\d{5,}/g) || []).length;
+        console.log(`[ocr] OCR.space đọc ${nnum} số cỡ toạ độ:`, JSON.stringify(stext).slice(0, 240));
+        if (nnum > 0) return res.json({ text: stext, engine: 'ocrspace' });
+      } catch (e: any) { console.error('[ocr] OCR.space LỖI (thử tiếp):', e?.message || e); }
+    }
+    // 2) Gemini (chất lượng cao, free 20/ngày) — dùng khi OCR.space chưa ra số.
     if (GEMINI_KEY) {
       try {
         const gtext = await geminiOcr(req.file.buffer, req.file.mimetype);
-        if (/\d{5,}/.test(gtext)) return res.json({ text: gtext, engine: 'gemini' });
-      } catch (e: any) { console.error('[ocr] Gemini lỗi, chuyển Tesseract:', e?.message || e); }
+        const nnum = (gtext.match(/\d{5,}/g) || []).length;
+        console.log(`[ocr] Gemini (${GEMINI_MODEL}) đọc ${nnum} số cỡ toạ độ:`, JSON.stringify(gtext).slice(0, 240));
+        if (nnum > 0) return res.json({ text: gtext, engine: 'gemini' });
+      } catch (e: any) { console.error('[ocr] Gemini LỖI (chuyển Tesseract):', e?.message || e); }
     }
+    if (!OCRSPACE_KEY && !GEMINI_KEY) console.log('[ocr] Chưa có OCRSPACE_API_KEY/GEMINI_API_KEY — dùng Tesseract.');
     const tmp = join(tmpdir(), 'ocr_' + randomBytes(6).toString('hex'));
     await writeFile(tmp, req.file.buffer);
     let text = '';

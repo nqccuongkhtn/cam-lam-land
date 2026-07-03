@@ -126,19 +126,19 @@ function toBlob(src: HTMLImageElement | HTMLCanvasElement): Promise<Blob> {
   cv.getContext('2d')!.drawImage(src, 0, 0, cv.width, cv.height);
   return new Promise((resolve, reject) => cv.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), 'image/png'));
 }
-function engineLabel(e: string): string { return e === 'gemini' ? 'Gemini AI' : e === 'tesseract' ? 'máy chủ (Tesseract)' : e === 'browser' ? 'trình duyệt (yếu)' : 'máy chủ'; }
+function engineLabel(e: string): string { return e === 'paste' ? 'dán tay' : e === 'self' ? 'máy OCR nội bộ' : e === 'ocrspace' ? 'OCR.space' : e === 'gemini' ? 'Gemini AI' : e === 'tesseract' ? 'máy chủ (Tesseract)' : e === 'browser' ? 'trình duyệt (yếu)' : 'máy chủ'; }
 async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{ pts: { x: number; y: number }[]; msg: string; engine: string; raw: string }> {
   let status = '', engine = '', raw = '', firstText = '', firstEngine = '';
   let best: { x: number; y: number }[] = [];
   const keep = (pts: { x: number; y: number }[], eng: string, text: string) => { if (pts.length > best.length) { best = pts; engine = eng; raw = text; } };
   const pre = preprocess(img);
   try {
-    // Lần 1: ẢNH GỐC — Gemini đọc ảnh tự nhiên tốt nhất (đừng nhị phân hoá gắt kẻo mất nét)
-    let r = await ocrImage(await toBlob(img));
+    // Lần 1: ảnh NHỊ PHÂN (nhỏ <1MB hợp giới hạn OCR.space, sắc nét cho Tesseract)
+    let r = await ocrImage(await toBlob(pre));
     firstText = r.text; firstEngine = r.engine;
     keep(parseBigPairs(r.text), r.engine, r.text);
-    // Lần 2: chưa đủ → gửi ảnh đã nhị phân hoá (tốt cho Tesseract)
-    if (best.length < 3) { r = await ocrImage(await toBlob(pre)); keep(parseBigPairs(r.text), r.engine, r.text); }
+    // Lần 2: chưa đủ → gửi ảnh GỐC (cho Gemini/engine mạnh đọc ca khó)
+    if (best.length < 3) { r = await ocrImage(await toBlob(img)); keep(parseBigPairs(r.text), r.engine, r.text); }
   } catch (e: any) {
     const m = String(e?.message || e);
     status = /unauthor|forbidden|401|403/i.test(m)
@@ -240,6 +240,7 @@ export default function MapPage() {
   const ocrTimer = useRef<any>(null);
   const [ocrOk, setOcrOk] = useState(0);
   const [ocrEngine, setOcrEngine] = useState('');
+  const [pasteText, setPasteText] = useState('');
   const [drawResult, setDrawResult] = useState<{ n: number; area: number; perim: number; lat: number; lng: number } | null>(null);
   const [tool, setTool] = useState<'none' | 'search' | 'base' | 'measure'>('none'); // bảng công cụ trên mobile
 
@@ -380,6 +381,14 @@ export default function MapPage() {
     setOcrEngine(engine || '');
     setDrawTab('table');
   }
+  function applyPaste() {
+    const pts = parseBigPairs(pasteText);
+    if (!pts.length) return alert('Không tìm thấy cặp toạ độ hợp lệ.\nMỗi dòng cần 1 số Bắc (~1,2–1,48 triệu) và 1 số Đông (~380–720 nghìn). Ví dụ:\n1  1335000.50  567890.12');
+    setRows(pts.map((p) => ({ x: String(p.x), y: String(p.y) })));
+    setOcrOk(pts.length);
+    setOcrEngine('paste');
+    setPasteText('');
+  }
   function loadImage(f: File): Promise<HTMLImageElement> {
     return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = URL.createObjectURL(f); });
   }
@@ -413,7 +422,7 @@ export default function MapPage() {
   }
   async function capture() {
     const v = camVideoRef.current; if (!v || !v.videoWidth) return;
-    const vw = v.videoWidth, vh = v.videoHeight, cw = Math.round(vw * 0.92), ch = Math.round(vh * 0.66);
+    const vw = v.videoWidth, vh = v.videoHeight, cw = Math.round(vw * 0.96), ch = Math.round(vh * 0.86);
     const cap = document.createElement('canvas'); cap.width = cw; cap.height = ch;
     cap.getContext('2d')!.drawImage(v, Math.round((vw - cw) / 2), Math.round((vh - ch) / 2), cw, ch, 0, 0, cw, ch);
     stopCam(); setOcrBusy('Đang tải & đọc ảnh…'); startProgress();
@@ -608,7 +617,12 @@ export default function MapPage() {
                 <div className="p-5 space-y-3">
                   {drawTab === 'table' && (
                     <div className="space-y-2">
-                      {ocrOk > 0 && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg px-3 py-2">✅ Đã nhận {ocrOk} điểm{ocrEngine ? ' (đọc bằng ' + engineLabel(ocrEngine) + ')' : ''} từ ảnh. Kiểm tra lại số rồi bấm “Vẽ & zoom tới thửa”.</div>}
+                      <div className="rounded-lg border border-[#C8A14B]/40 bg-[#C8A14B]/[0.06] p-2.5">
+                        <p className="text-xs font-bold text-[#0A2540] mb-1.5">📋 Dán nhanh toạ độ (chính xác 100%, không cần chụp)</p>
+                        <textarea value={pasteText} onChange={(e) => setPasteText(e.target.value)} rows={3} placeholder={'Dán từ Excel/Word/Zalo, mỗi dòng 1 điểm:\n1  1335000.50  567890.12\n2  1335010.20  567900.35'} className="w-full border border-slate-300 rounded-lg px-2.5 py-2 text-xs font-mono outline-none focus:border-[#0A2540]" />
+                        <button onClick={applyPaste} className="mt-1.5 w-full bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold py-2 rounded-lg text-sm">Tách số vào bảng ↓</button>
+                      </div>
+                      {ocrOk > 0 && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg px-3 py-2">✅ Đã nhận {ocrOk} điểm{ocrEngine ? ' · nguồn: ' + engineLabel(ocrEngine) : ''}. Kiểm tra lại số rồi bấm “Vẽ & zoom tới thửa”.</div>}
                       <div className="grid grid-cols-[26px_1fr_1fr_26px] gap-2 text-xs font-semibold text-slate-500 px-1"><span>#</span><span>X (Bắc)</span><span>Y (Đông)</span><span /></div>
                       <div className="space-y-1.5 max-h-52 overflow-y-auto scroll-soft pr-1">
                         {rows.map((r, i2) => (
@@ -655,7 +669,7 @@ export default function MapPage() {
             <div className="fixed inset-0 z-[70] bg-black h-[100dvh] overflow-hidden">
               <video ref={camVideoRef} className="absolute inset-0 w-full h-full object-cover" muted playsInline />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="border-2 border-emerald-400 rounded-lg" style={{ width: '92%', height: '66%', boxShadow: '0 0 0 100vmax rgba(0,0,0,0.5)' }} />
+                <div className="border-2 border-emerald-400 rounded-lg" style={{ width: '96%', height: '86%', boxShadow: '0 0 0 100vmax rgba(0,0,0,0.5)' }} />
               </div>
               <div className="absolute top-0 inset-x-0 flex items-center justify-between px-4 pb-4 text-white bg-gradient-to-b from-black/70 to-transparent" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
                 <span className="font-semibold text-lg drop-shadow">Chụp bảng toạ độ</span>

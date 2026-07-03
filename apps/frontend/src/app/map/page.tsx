@@ -135,7 +135,7 @@ function toJpeg(src: HTMLImageElement | HTMLCanvasElement, maxDim = 1900, q = 0.
   cv.getContext('2d')!.drawImage(src, 0, 0, cv.width, cv.height);
   return new Promise((resolve, reject) => cv.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), 'image/jpeg', q));
 }
-function engineLabel(e: string): string { return e === 'paste' ? 'dán tay' : e === 'self' ? 'máy OCR nội bộ' : e === 'ocrspace' ? 'OCR.space' : e === 'gemini' ? 'Gemini AI' : e === 'tesseract' ? 'máy chủ (Tesseract)' : e === 'browser' ? 'trình duyệt (yếu)' : 'máy chủ'; }
+function engineLabel(e: string): string { return e === 'paste' ? 'dán tay' : 'AI Cam Lâm Land'; }
 async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{ pts: { x: number; y: number }[]; msg: string; engine: string; raw: string }> {
   let status = '', engine = '', raw = '', firstText = '', firstEngine = '';
   let best: { x: number; y: number }[] = [];
@@ -631,7 +631,7 @@ export default function MapPage() {
                         <textarea value={pasteText} onChange={(e) => setPasteText(e.target.value)} rows={3} placeholder={'Dán từ Excel/Word/Zalo, mỗi dòng 1 điểm:\n1  1335000.50  567890.12\n2  1335010.20  567900.35'} className="w-full border border-slate-300 rounded-lg px-2.5 py-2 text-xs font-mono outline-none focus:border-[#0A2540]" />
                         <button onClick={applyPaste} className="mt-1.5 w-full bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold py-2 rounded-lg text-sm">Tách số vào bảng ↓</button>
                       </div>
-                      {ocrOk > 0 && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg px-3 py-2">✅ Đã nhận {ocrOk} điểm{ocrEngine ? ' · nguồn: ' + engineLabel(ocrEngine) : ''}. Kiểm tra lại số rồi bấm “Vẽ & zoom tới thửa”.</div>}
+                      {ocrOk > 0 && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg px-3 py-2">✅ Đã nhận {ocrOk} điểm{ocrEngine ? ' · nguồn: ' + engineLabel(ocrEngine) : ''}{ocrEngine && ocrEngine !== 'paste' ? ' đang trong giai đoạn thử nghiệm' : ''}. Vui lòng kiểm tra lại số rồi bấm “Vẽ & zoom tới thửa”.</div>}
                       <div className="grid grid-cols-[26px_1fr_1fr_26px] gap-2 text-xs font-semibold text-slate-500 px-1"><span>#</span><span>X (Bắc)</span><span>Y (Đông)</span><span /></div>
                       <div className="space-y-1.5 max-h-52 overflow-y-auto scroll-soft pr-1">
                         {rows.map((r, i2) => (

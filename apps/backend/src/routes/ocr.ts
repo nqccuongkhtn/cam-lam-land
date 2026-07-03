@@ -22,20 +22,20 @@ function runTesseract(file: string, args: string[]): Promise<string> {
 
 // ── Gemini (miễn phí) — đọc bảng toạ độ mạnh hơn Tesseract nhiều; tự bỏ qua nếu chưa cấu hình GEMINI_API_KEY ──
 const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY || '';
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3-flash';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3-flash-preview'; // tên ĐÚNG của Gemini 3 Flash (free ~1.500 lượt/ngày); "gemini-3-flash" (thiếu -preview) sẽ 404. Nếu tài khoản chưa có sẽ tự lùi về gemini-2.5-flash bên dưới.
 const GEMINI_PROMPT = `Bạn là công cụ trích xuất toạ độ từ ảnh bảng toạ độ địa chính VN-2000 (Khánh Hòa, Việt Nam). Đọc TẤT CẢ các điểm ranh thửa trong ảnh. Mỗi điểm gồm 2 số: X = toạ độ Bắc (Northing) 7 chữ số phần nguyên, thường bắt đầu bằng 1 (khoảng 1200000-1480000); Y = toạ độ Đông (Easting) 6 chữ số phần nguyên (khoảng 380000-720000). CHỈ in kết quả, MỖI DÒNG MỘT ĐIỂM đúng định dạng: X Y (X trước, Y sau, cách nhau một dấu cách; giữ nguyên phần thập phân nếu có; TUYỆT ĐỐI không kèm số thứ tự, chữ, đơn vị hay ký tự nào khác). Không đọc được điểm nào thì để trống.`;
 async function geminiCall(model: string, buffer: Buffer, mime: string): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GEMINI_KEY)}`;
   const body = {
     contents: [{ parts: [{ text: GEMINI_PROMPT }, { inline_data: { mime_type: mime || 'image/png', data: buffer.toString('base64') } }] }],
-    generationConfig: { temperature: 0, maxOutputTokens: 2048 },
+    generationConfig: { temperature: 0, maxOutputTokens: 4096 }, // nới rộng: Gemini 3 dùng "thinking" tốn thêm token, tránh cụt bảng toạ độ
   };
   const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(25000) });
   if (!r.ok) throw new Error('Gemini HTTP ' + r.status + ' (' + model + '): ' + (await r.text().catch(() => '')).slice(0, 200));
   const j: any = await r.json();
   return String(j?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text).filter(Boolean).join('\n') || '');
 }
-// Dùng model cấu hình (mặc định gemini-3-flash). Nếu API từ chối tên model (4xx: sai tên/chưa có quyền) thì TỰ LÙI về gemini-2.5-flash (free ổn định) để Gemini vẫn chạy, không rơi xuống OCR.space vì lỗi tên model.
+// Dùng model cấu hình (mặc định gemini-2.5-flash). Nếu đặt GEMINI_MODEL sang model khác mà API từ chối (4xx: sai tên/chưa có quyền) thì TỰ LÙI về gemini-2.5-flash để Gemini vẫn chạy, không rơi xuống OCR.space vì lỗi tên model.
 const GEMINI_FALLBACK = 'gemini-2.5-flash';
 async function geminiOcr(buffer: Buffer, mime: string): Promise<string> {
   try { return await geminiCall(GEMINI_MODEL, buffer, mime); }
@@ -87,7 +87,7 @@ function bumpOcr(engine: string): void {
 ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, next) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Thiếu ảnh' });
-    // 1) Gemini — ƯU TIÊN CHÍNH (vision AI, đọc được cả ảnh có nền hoa văn bảo an của sổ đỏ; free 1.500 lượt/ngày với gemini-3-flash).
+    // 1) Gemini — ƯU TIÊN CHÍNH (vision AI, đọc được cả ảnh có nền hoa văn bảo an của sổ đỏ; free).
     if (GEMINI_KEY) {
       try {
         const gtext = await geminiOcr(req.file.buffer, req.file.mimetype);

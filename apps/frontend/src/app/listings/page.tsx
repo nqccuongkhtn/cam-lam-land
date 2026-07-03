@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import Link from 'next/link';
 import { Listing, PropertyType, PROPERTY_LABELS, formatVnd } from '@/lib/types';
 import ListingRow from '@/components/ListingRow';
+import SiteFooter from '@/components/SiteFooter';
 import type { BaseMap, ImageOverlay } from '@/components/MapView';
 import { wgs84ToVn2000 } from '@/lib/vn2000';
 
@@ -274,6 +275,7 @@ export default function ListingsPage() {
           <div className="hidden lg:block mt-0">{sidebar}</div>
         </div>
       )}
+      {!mapView && <SiteFooter />}
     </div>
   );
 }

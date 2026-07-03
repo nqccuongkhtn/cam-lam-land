@@ -14,6 +14,7 @@ const IPhone = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" 
 const ILock = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>;
 const IEye = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>;
 const IHeart = ({ filled }: { filled?: boolean }) => <svg viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 1 0-7.8 7.8l1 1.1L12 21l7.8-7.4 1-1.1a5.5 5.5 0 0 0 0-7.8z" /></svg>;
+const Ic = ({ d }: { d: string }) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]"><path d={d} /></svg>;
 
 export default function ListingDetail() {
   const { id } = useParams<{ id: string }>();
@@ -49,11 +50,23 @@ export default function ListingDetail() {
 
   const imgs = l.images?.length ? l.images : [`https://picsum.photos/seed/cl${l.id}/1000/700`];
   const pricePerM2 = l.area && l.area > 0 ? l.price / l.area : null;
-  const specs: [string, string, any][] = [
-    ['📐', 'Diện tích', l.area ? `${l.area} m²` : null], ['💰', 'Mức giá', formatVnd(l.price)],
-    ['🛏️', 'Phòng ngủ', l.bedrooms], ['🛁', 'Phòng tắm', l.bathrooms],
-    ['🧭', 'Hướng', l.direction], ['📜', 'Pháp lý', l.legal],
-    ['📏', 'Mặt tiền', l.frontage ? `${l.frontage} m` : null], ['🏷️', 'Loại hình', PROPERTY_LABELS[l.propertyType]],
+  const specs: [string, any][] = [
+    ['Mức giá', formatVnd(l.price)],
+    ['Diện tích', l.area ? `${l.area} m²` : null],
+    ['Giá/m²', pricePerM2 ? formatVnd(pricePerM2) : null],
+    ['Số phòng ngủ', l.bedrooms ? `${l.bedrooms} phòng` : null],
+    ['Số phòng tắm, vệ sinh', l.bathrooms ? `${l.bathrooms} phòng` : null],
+    ['Hướng nhà', l.direction],
+    ['Mặt tiền', l.frontage ? `${l.frontage} m` : null],
+    ['Pháp lý', l.legal],
+    ['Loại hình', PROPERTY_LABELS[l.propertyType]],
+  ];
+  const heroStats: [string, string, any][] = [
+    ['M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3', 'Diện tích', l.area ? `${l.area} m²` : null],
+    ['M18 8l4 4-4 4M6 8l-4 4 4 4M2 12h20', 'Mặt tiền', l.frontage ? `${l.frontage} m` : null],
+    ['M2 4v16 M2 8h18a2 2 0 0 1 2 2v10 M2 17h20 M6 8v9', 'Phòng ngủ', l.bedrooms ? `${l.bedrooms} PN` : null],
+    ['M12 2.7l5.66 5.66a8 8 0 1 1-11.32 0z', 'Phòng tắm', l.bathrooms ? `${l.bathrooms} WC` : null],
+    ['M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z M16.2 7.8l-2.9 6.4-6.4 2.9 2.9-6.4z', 'Hướng', l.direction],
   ];
   const fb = (i: number) => `https://picsum.photos/seed/cl${l.id}_${i}/1000/700`;
   const created = l.createdAt ? new Date(l.createdAt) : null;
@@ -100,14 +113,21 @@ export default function ListingDetail() {
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 p-5">
-              <h1 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">{l.title}</h1>
-              <p className="text-slate-500 mt-1 text-sm">📍 {[l.address, l.ward, 'Cam Lâm, Khánh Hòa'].filter(Boolean).join(', ')}</p>
-              <div className="grid grid-cols-3 gap-3 mt-4 border-y border-slate-100 py-3">
-                <div><p className="text-xs text-slate-400">Mức giá</p><p className="text-lg md:text-xl font-extrabold text-red-600">{formatVnd(l.price)}</p></div>
-                <div><p className="text-xs text-slate-400">Diện tích</p><p className="text-lg md:text-xl font-extrabold text-[#0A2540]">{l.area ? `${l.area} m²` : '—'}</p></div>
-                <div><p className="text-xs text-slate-400">Giá/m²</p><p className="text-lg md:text-xl font-extrabold text-[#0A2540]">{pricePerM2 ? formatVnd(pricePerM2) : '—'}</p></div>
+              <h1 className="text-xl md:text-2xl font-extrabold text-[#0A2540] leading-snug">{l.title}</h1>
+              <p className="text-slate-500 mt-1.5 text-sm flex items-start gap-1.5"><span className="text-red-500 mt-0.5 shrink-0"><Ic d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" /></span><span>{[l.address, l.ward, 'Cam Lâm, Khánh Hòa'].filter(Boolean).join(', ')}</span></p>
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mt-4">
+                <span className="text-2xl md:text-3xl font-extrabold text-red-600 leading-none">{formatVnd(l.price)}</span>
+                {pricePerM2 && <span className="text-sm font-semibold text-slate-500">~ {formatVnd(pricePerM2)}/m²</span>}
               </div>
-              <div className="flex items-center gap-2 mt-3 flex-wrap">
+              <div className="flex flex-wrap gap-y-3 mt-4 border-t border-slate-100 pt-4">
+                {heroStats.filter(([, , v]) => v != null && v !== '').map(([d, label, val], i) => (
+                  <div key={label} className={`flex items-center gap-2.5 pr-5 ${i > 0 ? 'pl-5 border-l border-slate-100' : ''}`}>
+                    <span className="text-[#C8A14B]"><Ic d={d as string} /></span>
+                    <div><p className="text-[11px] text-slate-400 leading-none">{label}</p><p className="font-bold text-[#0A2540] text-sm mt-1 leading-none">{String(val)}</p></div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-100 flex-wrap">
                 <button onClick={share} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#0A2540] border border-slate-200 rounded-lg px-3 py-1.5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" /></svg> Chia sẻ</button>
                 <button onClick={() => setSaved((v) => !v)} className={`inline-flex items-center gap-1.5 text-sm border rounded-lg px-3 py-1.5 ${saved ? 'border-red-200 text-red-600 bg-red-50' : 'border-slate-200 text-slate-500 hover:text-red-600'}`}><IHeart filled={saved} /> {saved ? 'Đã lưu' : 'Lưu'}</button>
                 <Link href={`/listings?ward=${encodeURIComponent(l.ward || '')}`} className="ml-auto inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-sm font-semibold rounded-lg px-3 py-1.5 hover:bg-emerald-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M3 17l6-6 4 4 8-8" /><path d="M14 7h7v7" /></svg> Giá khu vực {l.ward || 'Cam Lâm'}</Link>
@@ -115,19 +135,19 @@ export default function ListingDetail() {
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 p-5">
-              <h2 className="font-bold text-[#0A2540] mb-2">Đặc điểm bất động sản</h2>
-              <div className="grid sm:grid-cols-2 gap-x-6">
-                {specs.filter(([, , v]) => v != null && v !== '').map(([ic, k, v]) => (
-                  <div key={k} className="flex items-center justify-between border-b border-slate-50 py-2 text-sm">
-                    <span className="text-slate-500">{ic} {k}</span><b className="text-[#0A2540] text-right">{String(v)}</b>
-                  </div>
-                ))}
-              </div>
+              <h2 className="text-lg font-bold text-[#0A2540] mb-2">Thông tin mô tả</h2>
+              <p className="text-slate-700 whitespace-pre-line leading-relaxed">{l.description ?? 'Đang cập nhật.'}</p>
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 p-5">
-              <h2 className="font-bold text-[#0A2540] mb-2">Thông tin mô tả</h2>
-              <p className="text-slate-700 whitespace-pre-line leading-relaxed">{l.description ?? 'Đang cập nhật.'}</p>
+              <h2 className="text-lg font-bold text-[#0A2540] mb-3">Đặc điểm bất động sản</h2>
+              <div className="grid sm:grid-cols-2 sm:gap-x-8">
+                {specs.filter(([, v]) => v != null && v !== '').map(([k, v]) => (
+                  <div key={k} className="flex items-center justify-between gap-4 border-b border-slate-100 py-2.5 text-sm">
+                    <span className="text-slate-500">{k}</span><b className="text-[#0A2540] text-right">{String(v)}</b>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 p-3">

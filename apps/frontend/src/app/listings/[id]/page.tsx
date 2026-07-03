@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import ListingDetailClient from './ListingDetailClient';
+import SiteFooter from '@/components/SiteFooter';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://camlamland.onrender.com';
 const BACKEND = process.env.BACKEND_HOST ? (process.env.BACKEND_HOST.startsWith('http') ? process.env.BACKEND_HOST : `https://${process.env.BACKEND_HOST}`) : '';
@@ -50,6 +51,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     <>
       {ld && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />}
       <ListingDetailClient />
+      <SiteFooter />
     </>
   );
 }

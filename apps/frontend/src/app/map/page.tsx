@@ -47,7 +47,7 @@ function parseNum(tok: string): number {
   if (parts.length > 2) t = parts.slice(0, -1).join('') + '.' + parts[parts.length - 1];
   return parseFloat(t);
 }
-// Đọc bảng toạ độ VN-2000 (mỗi dòng 1 điểm), tự nhận biết X(Đông ~5-6 chữ số) và Y(Bắc >900k).
+// Đọc bảng toạ độ VN-2000 (mỗi dòng 1 điểm), tự nhận biết Y(Đông ~5-6 chữ số) và X(Bắc >900k).
 function parseVnTable(text: string): { x: number; y: number }[] {
   const pts: { x: number; y: number }[] = [];
   for (const line of text.split(/[\n;]/)) {
@@ -265,7 +265,7 @@ export default function MapPage() {
 
   async function onMapClick(lng: number, lat: number) {
     const vn = wgs84ToVn2000(lng, lat);
-    setClickVN({ x: vn.x, y: vn.y, lng, lat });
+    setClickVN({ x: vn.y, y: vn.x, lng, lat }); // sổ: X=Bắc(Northing), Y=Đông(Easting)
     // Loại đất quy hoạch (vector) tại điểm — tính ngay ở trình duyệt, không cần server.
     const gv = qhVectorRef.current;
     if (gv) {
@@ -312,9 +312,10 @@ export default function MapPage() {
     }
     let lng: number, lat: number;
     if (searchMode === 'vn2000') {
-      const x = parseFloat(c1), y = parseFloat(c2);
-      if (Number.isNaN(x) || Number.isNaN(y)) return alert('Nhập X (Đông), Y (Bắc) hệ VN-2000.');
-      const w = vn2000ToWgs84(x, y); lng = w.lng; lat = w.lat;
+      const a = parseFloat(c1), b = parseFloat(c2);
+      if (Number.isNaN(a) || Number.isNaN(b)) return alert('Nhập X (Bắc), Y (Đông) hệ VN-2000.');
+      const E = a < 900000 ? a : b, N = a < 900000 ? b : a; // sổ: X=Bắc(>900k), Y=Đông(<900k) — tự nhận, không lo nhầm X/Y
+      const w = vn2000ToWgs84(E, N); lng = w.lng; lat = w.lat;
     } else {
       lat = parseFloat(c1); lng = parseFloat(c2);
       if (Number.isNaN(lat) || Number.isNaN(lng)) return alert('Nhập Vĩ độ (lat), Kinh độ (lng).');
@@ -414,8 +415,8 @@ export default function MapPage() {
         <input value={c1} onChange={(e) => setC1(e.target.value)} placeholder="Dán link Google Maps (…/@12.34,109.12…)" className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'w-full' : 'w-56'}`} />
       ) : (
         <>
-          <input value={c1} onChange={(e) => setC1(e.target.value)} placeholder={searchMode === 'vn2000' ? 'X (Đông)' : searchMode === 'parcel' ? 'Số tờ' : 'Vĩ độ'} className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'flex-1 min-w-[90px]' : 'w-24'}`} />
-          <input value={c2} onChange={(e) => setC2(e.target.value)} placeholder={searchMode === 'vn2000' ? 'Y (Bắc)' : searchMode === 'parcel' ? 'Số thửa' : 'Kinh độ'} className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'flex-1 min-w-[90px]' : 'w-24'}`} />
+          <input value={c1} onChange={(e) => setC1(e.target.value)} placeholder={searchMode === 'vn2000' ? 'X (Bắc)' : searchMode === 'parcel' ? 'Số tờ' : 'Vĩ độ'} className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'flex-1 min-w-[90px]' : 'w-24'}`} />
+          <input value={c2} onChange={(e) => setC2(e.target.value)} placeholder={searchMode === 'vn2000' ? 'Y (Đông)' : searchMode === 'parcel' ? 'Số thửa' : 'Kinh độ'} className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'flex-1 min-w-[90px]' : 'w-24'}`} />
           {searchMode === 'parcel' && <input value={c3} onChange={(e) => setC3(e.target.value)} placeholder="Xã (vd: Cam Lâm)" className={`border rounded-lg px-2.5 py-1.5 text-xs ${full ? 'flex-1 min-w-[120px]' : 'w-32'}`} />}
         </>
       )}
@@ -561,7 +562,7 @@ export default function MapPage() {
                   {drawTab === 'table' && (
                     <div className="space-y-2">
                       {ocrOk > 0 && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg px-3 py-2">✅ Đã nhận {ocrOk} điểm từ ảnh. Kiểm tra lại số rồi bấm “Vẽ & zoom tới thửa”.</div>}
-                      <div className="grid grid-cols-[26px_1fr_1fr_26px] gap-2 text-xs font-semibold text-slate-500 px-1"><span>#</span><span>X (Đông)</span><span>Y (Bắc)</span><span /></div>
+                      <div className="grid grid-cols-[26px_1fr_1fr_26px] gap-2 text-xs font-semibold text-slate-500 px-1"><span>#</span><span>X (Bắc)</span><span>Y (Đông)</span><span /></div>
                       <div className="space-y-1.5 max-h-52 overflow-y-auto scroll-soft pr-1">
                         {rows.map((r, i2) => (
                           <div key={i2} className="grid grid-cols-[26px_1fr_1fr_26px] gap-2 items-center">

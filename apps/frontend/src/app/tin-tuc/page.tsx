@@ -57,6 +57,23 @@ function WingAd({ ad }: { ad: Ad }) {
   );
 }
 
+// Cánh gà kiểu Znews: fixed kẹp 2 bên cột nội dung, trượt vào khi cuộn xuống (màn ≥1536px)
+function WingRails({ ad }: { ad: Ad }) {
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShown(window.scrollY > 340);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return (
+    <div aria-hidden className="hidden 2xl:block fixed top-24 bottom-6 inset-x-0 mx-auto max-w-[1500px] z-20 pointer-events-none">
+      <aside className={`pointer-events-auto absolute left-0 top-0 bottom-0 w-[150px] transition-all duration-500 ease-out ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}><WingAd ad={ad} /></aside>
+      <aside className={`pointer-events-auto absolute right-0 top-0 bottom-0 w-[150px] transition-all duration-500 ease-out ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}><WingAd ad={ad} /></aside>
+    </div>
+  );
+}
+
 // Dải ngang trên đầu (billboard lớn, ảnh phủ full + chữ to bên trái)
 function BillboardAd({ ad }: { ad: Ad }) {
   const imgs = imgsOf(ad); const idx = useSlides(imgs.length);
@@ -194,11 +211,10 @@ export default function NewsIndex() {
 
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
-      <div className="mx-auto max-w-[1500px] px-4 py-6">
+      {showAd && <WingRails ad={ad} />}
+      <div className="mx-auto max-w-[1040px] px-4 py-6">
         {showAd && <div className="hidden md:block mb-6"><BillboardAd ad={ad} /></div>}
-        <div className="xl:flex xl:gap-6">
-          {showAd && <aside className="hidden xl:block w-44 shrink-0"><div className="sticky top-20 h-[calc(100vh-88px)]"><WingAd ad={ad} /></div></aside>}
-          <div className="flex-1 min-w-0 pt-1">
+        <div className="pt-1">
             <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <span className="text-slate-600">Tin tức</span></div>
             <div className="flex flex-wrap items-center gap-3 border-b-2 border-red-600 pb-2 mb-5">
               <span className="w-1.5 h-6 bg-red-600 rounded-sm" />
@@ -240,8 +256,6 @@ export default function NewsIndex() {
                 </section>
               </>
             )}
-          </div>
-          {showAd && <aside className="hidden xl:block w-44 shrink-0"><div className="sticky top-20 h-[calc(100vh-88px)]"><WingAd ad={ad} /></div></aside>}
         </div>
       </div>
     </div>

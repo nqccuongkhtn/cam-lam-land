@@ -28,8 +28,8 @@ function Slides({ imgs, idx }: { imgs: string[]; idx: number }) {
 // Khung quảng cáo kiểu Znews: thẻ trắng, nút × đóng, nhãn QC
 function AdFrame({ children, className = '' }: { children: any; className?: string }) {
   return (
-    <div className={`cl-fadeup relative overflow-hidden border border-slate-200 shadow-sm bg-white ${className}`}>
-      <span className="absolute top-1.5 left-1.5 z-20 bg-white/90 text-slate-400 text-[8px] font-bold px-1 py-0.5 rounded leading-none">QC</span>
+    <div className={`cl-fadeup group/ad relative overflow-hidden border border-slate-200 shadow-md hover:shadow-xl transition-shadow duration-300 bg-white ${className}`}>
+      <span className="absolute top-1.5 left-1.5 z-20 bg-[#0A2540]/75 text-white/90 text-[8px] font-bold px-1.5 py-0.5 rounded leading-none tracking-wide">QC</span>
       {children}
     </div>
   );
@@ -198,7 +198,7 @@ export default function NewsIndex() {
         {showAd && <div className="hidden lg:block"><BillboardAd ad={ad} /></div>}
 
         <div className="xl:flex xl:gap-8">
-          {showAd && <aside className="hidden xl:block w-60 shrink-0"><div className="sticky top-20 h-[calc(100vh-100px)]"><WingAd ad={ad} /></div></aside>}
+          {showAd && <aside className="hidden xl:block w-64 shrink-0"><div className="sticky top-20 h-[calc(100vh-100px)]"><WingAd ad={ad} /></div></aside>}
 
           <div className="flex-1 min-w-0 pt-5 xl:pt-6">
             <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <span className="text-slate-600">Tin tức</span></div>
@@ -234,30 +234,17 @@ export default function NewsIndex() {
                   </section>
                 )}
 
-                {/* Tin khác + sidebar Đọc nhiều */}
-                <div className="lg:flex lg:gap-8">
-                  <div className="flex-1 min-w-0">
-                    <SectionHead title="Tin khác" />
-                    <div className="divide-y divide-slate-100">{rows}</div>
-                    {hasMore && <div className="text-center mt-6"><button onClick={() => setLimit((l) => l + 12)} className="inline-flex items-center gap-2 bg-white border border-slate-300 hover:border-[#0A2540] text-[#0A2540] font-semibold px-8 py-3 rounded-full text-sm">Xem thêm tin →</button></div>}
-                  </div>
-                  <aside className="lg:w-72 shrink-0 mt-8 lg:mt-0">
-                    <div className="sticky top-20">
-                      <SectionHead title="Đọc nhiều" />
-                      <div className="divide-y divide-slate-100">{trending.map((n, i) => <RankRow key={n.slug} n={n} rank={i + 1} />)}</div>
-                      <Link href="/sales/post" className="block mt-6 rounded-xl bg-gradient-to-br from-[#0A2540] to-[#10355f] text-white p-5 text-center">
-                        <p className="font-extrabold text-lg">Đăng tin miễn phí</p>
-                        <p className="text-xs text-white/80 mt-1">Tiếp cận khách mua tại Cam Lâm</p>
-                        <span className="inline-block mt-3 bg-[#C8A14B] text-[#0A2540] font-bold text-sm px-5 py-2 rounded-lg">Đăng ngay →</span>
-                      </Link>
-                    </div>
-                  </aside>
-                </div>
+                {/* Tin khác — 1 cột gọn gàng */}
+                <section>
+                  <SectionHead title="Tin khác" />
+                  <div className="divide-y divide-slate-100">{rows}</div>
+                  {hasMore && <div className="text-center mt-6"><button onClick={() => setLimit((l) => l + 12)} className="inline-flex items-center gap-2 bg-white border border-slate-300 hover:border-[#0A2540] text-[#0A2540] font-semibold px-8 py-3 rounded-full text-sm">Xem thêm tin →</button></div>}
+                </section>
               </>
             )}
           </div>
 
-          {showAd && <aside className="hidden xl:block w-60 shrink-0"><div className="sticky top-20 h-[calc(100vh-100px)]"><WingAd ad={ad} /></div></aside>}
+          {showAd && <aside className="hidden xl:block w-64 shrink-0"><div className="sticky top-20 h-[calc(100vh-100px)]"><WingAd ad={ad} /></div></aside>}
         </div>
       </div>
     </div>

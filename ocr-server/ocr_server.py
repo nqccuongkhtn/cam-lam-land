@@ -20,7 +20,7 @@
 import io
 import os
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps, ImageFilter
 from fastapi import FastAPI, UploadFile, File, Header, HTTPException
 import easyocr
 import uvicorn
@@ -40,25 +40,40 @@ def health():
     return {"status": "ok"}
 
 
+def enhance(img: Image.Image) -> Image.Image:
+    # Tien xu ly manh (chay tren PC nen thoai mai): xam hoa + phong to + tang tuong phan + lam net.
+    g = img.convert("L")
+    w, h = g.size
+    m = max(w, h)
+    if m < 2200:
+        s = 2200.0 / m
+        g = g.resize((max(1, int(w * s)), max(1, int(h * s))), Image.LANCZOS)
+    g = ImageOps.autocontrast(g, cutoff=1)
+    g = g.filter(ImageFilter.UnsharpMask(radius=2, percent=170, threshold=2))
+    return g
+
+
 @app.post("/ocr")
 async def do_ocr(file: UploadFile = File(...), x_token: str = Header(default="")):
     if TOKEN and x_token != TOKEN:
         raise HTTPException(status_code=401, detail="Sai token")
     data = await file.read()
     img = Image.open(io.BytesIO(data)).convert("RGB")
-    arr = np.array(img)
-    # Chỉ nhận số + dấu (bảng toạ độ) -> bớt đọc nhầm chữ.
+    arr = np.array(enhance(img))
+    # Chi nhan so + dau (bang toa do) -> bot doc nham chu.
     lines = reader.readtext(
         arr,
         detail=0,
         allowlist="0123456789.,-: ",
-        decoder="beamsearch",   # chính xác hơn greedy
+        decoder="beamsearch",     # chinh xac hon greedy
         text_threshold=0.6,
         low_text=0.3,
-        mag_ratio=1.5,          # phóng to để bắt chữ số nhỏ rõ hơn
+        mag_ratio=1.3,            # phong to them de bat chu so nho
+        contrast_ths=0.05,        # vung mo tuong phan thap -> doc lai
+        adjust_contrast=0.7,
     )
     text = "\n".join(str(x) for x in lines if str(x).strip())
-    print(f"[ocr] Đọc được {len(lines)} vùng số.")
+    print(f"[ocr] Doc duoc {len(lines)} vung so.")
     return {"text": text}
 
 

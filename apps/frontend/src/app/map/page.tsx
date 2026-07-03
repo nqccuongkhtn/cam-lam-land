@@ -127,7 +127,7 @@ function toBlob(src: HTMLImageElement | HTMLCanvasElement): Promise<Blob> {
   return new Promise((resolve, reject) => cv.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), 'image/png'));
 }
 // Ảnh GỐC nén JPEG (<1MB) — cho engine mạnh (máy nội bộ / OCR.space / Gemini) đọc ảnh tự nhiên, ít nhầm số hơn ảnh nhị phân hoá.
-function toJpeg(src: HTMLImageElement | HTMLCanvasElement, maxDim = 1900, q = 0.85): Promise<Blob> {
+function toJpeg(src: HTMLImageElement | HTMLCanvasElement, maxDim = 2200, q = 0.9): Promise<Blob> {
   const w0 = src instanceof HTMLCanvasElement ? src.width : ((src as HTMLImageElement).naturalWidth || 1);
   const h0 = src instanceof HTMLCanvasElement ? src.height : ((src as HTMLImageElement).naturalHeight || 1);
   const sc = Math.min(1, maxDim / Math.max(w0, h0));

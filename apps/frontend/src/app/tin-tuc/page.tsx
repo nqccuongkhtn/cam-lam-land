@@ -67,9 +67,9 @@ function WingRails({ ad }: { ad: Ad }) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
   return (
-    <div aria-hidden className="hidden 2xl:block fixed top-24 bottom-6 inset-x-0 mx-auto max-w-[1500px] z-20 pointer-events-none">
-      <aside className={`pointer-events-auto absolute left-0 top-0 bottom-0 w-[150px] transition-all duration-500 ease-out ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}><WingAd ad={ad} /></aside>
-      <aside className={`pointer-events-auto absolute right-0 top-0 bottom-0 w-[150px] transition-all duration-500 ease-out ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}><WingAd ad={ad} /></aside>
+    <div aria-hidden className="hidden 2xl:block fixed top-24 bottom-6 inset-x-0 mx-auto max-w-[1400px] z-20 pointer-events-none">
+      <aside className={`pointer-events-auto absolute left-0 top-0 bottom-0 w-[160px] transition-all duration-500 ease-out ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}><WingAd ad={ad} /></aside>
+      <aside className={`pointer-events-auto absolute right-0 top-0 bottom-0 w-[160px] transition-all duration-500 ease-out ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}><WingAd ad={ad} /></aside>
     </div>
   );
 }
@@ -210,9 +210,17 @@ export default function NewsIndex() {
   const hasMore = rest.length > limit;
 
   return (
-    <div className={`min-h-[calc(100vh-56px)] transition-colors ${showAd ? 'bg-slate-50 2xl:bg-[#0a0e16]' : 'bg-slate-50'}`}>
+    <div className={`relative overflow-hidden min-h-[calc(100vh-56px)] ${showAd ? 'bg-slate-50 2xl:bg-[#0a0e16]' : 'bg-slate-50'}`}>
       {showAd && <WingRails ad={ad} />}
-      <div className="mx-auto max-w-[1040px] px-4 py-6">
+      {showAd && (
+        <div aria-hidden className="hidden 2xl:block absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute left-[5%] top-44 w-64 h-64 rounded-full bg-[#C8A14B]/[0.08] blur-3xl" />
+          <div className="absolute right-[6%] top-1/2 w-72 h-72 rounded-full bg-white/[0.06] blur-3xl" />
+          <div className="absolute left-[3%] bottom-24 w-48 h-48 rounded-full bg-[#C8A14B]/[0.06] blur-2xl" />
+          <div className="absolute right-[4%] bottom-44 w-44 h-44 rounded-full bg-white/[0.05] blur-2xl" />
+        </div>
+      )}
+      <div className="relative z-10 mx-auto max-w-[1040px] px-4 py-6">
         {showAd && <div className="hidden md:block mb-6"><BillboardAd ad={ad} /></div>}
         <div className="bg-white rounded-2xl shadow-sm 2xl:shadow-2xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <div className="pt-0">

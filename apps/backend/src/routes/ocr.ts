@@ -67,7 +67,7 @@ ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, n
         if (bestScore >= 6) break;
       }
     } finally { unlink(tmp).catch(() => {}); }
-    res.json({ text });
+    res.json({ text, engine: 'tesseract' });
   } catch (e: any) {
     if (/ENOENT/.test(String(e?.message || e))) return res.status(503).json({ error: 'Máy chủ chưa cài Tesseract OCR' });
     next(e);

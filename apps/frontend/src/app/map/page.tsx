@@ -126,32 +126,39 @@ function toBlob(src: HTMLImageElement | HTMLCanvasElement): Promise<Blob> {
   cv.getContext('2d')!.drawImage(src, 0, 0, cv.width, cv.height);
   return new Promise((resolve, reject) => cv.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), 'image/png'));
 }
-async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{ pts: { x: number; y: number }[]; msg: string }> {
-  let status = '';
+function engineLabel(e: string): string { return e === 'gemini' ? 'Gemini AI' : e === 'tesseract' ? 'máy chủ (Tesseract)' : e === 'browser' ? 'trình duyệt (yếu)' : 'máy chủ'; }
+async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{ pts: { x: number; y: number }[]; msg: string; engine: string; raw: string }> {
+  let status = '', engine = '', raw = '', firstText = '', firstEngine = '';
   let best: { x: number; y: number }[] = [];
-  const keep = (pts: { x: number; y: number }[]) => { if (pts.length > best.length) best = pts; };
-  const pre = preprocess(img); // nhị phân hoá + phóng to + tương phản — dễ đọc hơn NHIỀU so với ảnh màu thô
-  // 1) Server OCR — GỬI ẢNH ĐÃ NHỊ PHÂN HOÁ (trước đây gửi ảnh màu thô nên đọc sai)
+  const keep = (pts: { x: number; y: number }[], eng: string, text: string) => { if (pts.length > best.length) { best = pts; engine = eng; raw = text; } };
+  const pre = preprocess(img);
   try {
-    keep(parseBigPairs(await ocrImage(await toBlob(pre))));
-    if (best.length < 3) keep(parseBigPairs(await ocrImage(await toBlob(img))));
+    // Lần 1: ẢNH GỐC — Gemini đọc ảnh tự nhiên tốt nhất (đừng nhị phân hoá gắt kẻo mất nét)
+    let r = await ocrImage(await toBlob(img));
+    firstText = r.text; firstEngine = r.engine;
+    keep(parseBigPairs(r.text), r.engine, r.text);
+    // Lần 2: chưa đủ → gửi ảnh đã nhị phân hoá (tốt cho Tesseract)
+    if (best.length < 3) { r = await ocrImage(await toBlob(pre)); keep(parseBigPairs(r.text), r.engine, r.text); }
   } catch (e: any) {
     const m = String(e?.message || e);
     status = /unauthor|forbidden|401|403/i.test(m)
       ? '🔒 Vui lòng ĐĂNG NHẬP để dùng tính năng đọc ảnh bảng toạ độ (chỉ tài khoản đã đăng nhập).'
       : '⛔ SERVER OCR CHƯA CHẠY:\n' + m + '\n\n→ Backend camlam-api cần cài Tesseract. Đang tạm dùng OCR trình duyệt.';
   }
-  // 2) OCR trình duyệt (whitelist chỉ số) — bổ sung khi server thiếu/không chạy
+  // OCR trình duyệt (whitelist chỉ số) — bổ sung khi server thiếu/không chạy
   if (best.length < 3) {
-    try { keep(parseBigPairs(await runRecognize(pre))); } catch {}
-    if (best.length < 3) { try { keep(parseBigPairs(await runRecognize(img))); } catch {} }
+    try { const t = await runRecognize(pre); if (!firstText) { firstText = t; firstEngine = 'browser'; } keep(parseBigPairs(t), 'browser', t); } catch {}
+    if (best.length < 3) { try { const t = await runRecognize(img); keep(parseBigPairs(t), 'browser', t); } catch {} }
   }
-  if (best.length >= 3) return { pts: best, msg: '' };
-  return { pts: best, msg: status || ('Chỉ đọc được ' + best.length + ' điểm — chưa đủ.\nHãy chụp GẦN, THẲNG, đủ sáng, chỉ lấy phần bảng số; hoặc nhập tay ở tab "Nhập bảng".') };
+  if (!best.length && firstText) { raw = firstText; engine = firstEngine; }
+  if (best.length >= 3) return { pts: best, msg: '', engine, raw };
+  return { pts: best, msg: status || ('Chỉ đọc được ' + best.length + ' điểm — chưa đủ.\nHãy chụp GẦN, THẲNG, đủ sáng, chỉ lấy phần bảng số; hoặc nhập tay ở tab "Nhập bảng".'), engine, raw };
 }
-function showOcrResult(r: { pts: { x: number; y: number }[]; msg: string }, apply: (pts: { x: number; y: number }[]) => void) {
-  if (r.pts.length) { apply(r.pts); return; }
-  alert('Chưa tách được toạ độ.\n\n' + r.msg);
+function showOcrResult(r: { pts: { x: number; y: number }[]; msg: string; engine?: string; raw?: string }, apply: (pts: { x: number; y: number }[], engine?: string) => void) {
+  if (r.pts.length) { apply(r.pts, r.engine); return; }
+  const eng = r.engine ? '\n\nĐọc bằng: ' + engineLabel(r.engine) : '';
+  const rawShow = r.raw ? '\n\nChữ đọc được:\n' + r.raw.replace(/\s*\n\s*/g, '\n').trim().slice(0, 300) : '';
+  alert('Chưa tách được toạ độ.' + eng + '\n\n' + r.msg + rawShow);
 }
 // VN-2000 Khánh Hòa: Đông (E) ~6 chữ số nguyên [380k–720k]; Bắc (N) ~7 chữ số (thường bắt đầu bằng 1) [1.20M–1.48M].
 const E_MIN = 380000, E_MAX = 720000, N_MIN = 1200000, N_MAX = 1480000;
@@ -232,6 +239,7 @@ export default function MapPage() {
   const [ocrPct, setOcrPct] = useState(0);
   const ocrTimer = useRef<any>(null);
   const [ocrOk, setOcrOk] = useState(0);
+  const [ocrEngine, setOcrEngine] = useState('');
   const [drawResult, setDrawResult] = useState<{ n: number; area: number; perim: number; lat: number; lng: number } | null>(null);
   const [tool, setTool] = useState<'none' | 'search' | 'base' | 'measure'>('none'); // bảng công cụ trên mobile
 
@@ -365,10 +373,11 @@ export default function MapPage() {
     }
     return pts;
   }
-  function applyParsed(parsed: { x: number; y: number }[]) {
+  function applyParsed(parsed: { x: number; y: number }[], engine?: string) {
     if (!parsed.length) return alert('Chưa nhận được toạ độ từ ảnh. Hãy chụp GẦN, THẲNG, đủ sáng — chỉ lấy phần bảng số. Hoặc nhập tay ở tab "Nhập bảng".');
     setRows(parsed.map((p) => ({ x: String(p.x), y: String(p.y) })));
     setOcrOk(parsed.length);
+    setOcrEngine(engine || '');
     setDrawTab('table');
   }
   function loadImage(f: File): Promise<HTMLImageElement> {
@@ -599,7 +608,7 @@ export default function MapPage() {
                 <div className="p-5 space-y-3">
                   {drawTab === 'table' && (
                     <div className="space-y-2">
-                      {ocrOk > 0 && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg px-3 py-2">✅ Đã nhận {ocrOk} điểm từ ảnh. Kiểm tra lại số rồi bấm “Vẽ & zoom tới thửa”.</div>}
+                      {ocrOk > 0 && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg px-3 py-2">✅ Đã nhận {ocrOk} điểm{ocrEngine ? ' (đọc bằng ' + engineLabel(ocrEngine) + ')' : ''} từ ảnh. Kiểm tra lại số rồi bấm “Vẽ & zoom tới thửa”.</div>}
                       <div className="grid grid-cols-[26px_1fr_1fr_26px] gap-2 text-xs font-semibold text-slate-500 px-1"><span>#</span><span>X (Bắc)</span><span>Y (Đông)</span><span /></div>
                       <div className="space-y-1.5 max-h-52 overflow-y-auto scroll-soft pr-1">
                         {rows.map((r, i2) => (

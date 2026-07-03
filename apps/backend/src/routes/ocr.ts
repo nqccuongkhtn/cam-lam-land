@@ -27,11 +27,18 @@ ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, n
     await writeFile(tmp, req.file.buffer);
     let text = '';
     try {
-      // Không dùng whitelist (giữ khoảng cách giữa các số); thử nhiều PSM, chọn kết quả nhiều số cỡ toạ độ nhất.
+      // Ưu tiên whitelist chỉ số + dấu (bảng toạ độ) với LSTM, rồi mới thử không whitelist; chọn kết quả nhiều số cỡ toạ độ nhất.
       let bestScore = -1;
-      for (const psm of ['4', '6', '11', '3']) {
+      const WL = '0123456789.,-: ';
+      const attempts: string[][] = [
+        ['--oem', '1', '--psm', '6', '-c', `tessedit_char_whitelist=${WL}`],
+        ['--oem', '1', '--psm', '4', '-c', `tessedit_char_whitelist=${WL}`],
+        ['--oem', '1', '--psm', '6'],
+        ['--oem', '1', '--psm', '11'],
+      ];
+      for (const args of attempts) {
         let t = '';
-        try { t = await runTesseract(tmp, ['--psm', psm]); } catch {}
+        try { t = await runTesseract(tmp, args); } catch {}
         const score = (t.match(/\d{5,7}/g) || []).length;
         if (score > bestScore) { bestScore = score; text = t; }
         if (bestScore >= 6) break;

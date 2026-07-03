@@ -140,21 +140,33 @@ function showOcrResult(r: { pts: { x: number; y: number }[]; msg: string }, appl
   if (r.pts.length) { apply(r.pts); return; }
   alert('Chưa tách được toạ độ.\n\n' + r.msg);
 }
-// Khôi phục số bị OCR rớt dấu phẩy (8-9 chữ số = to gấp 100 lần).
-function recoverCoord(n: number): number { return n >= 9000000 ? n / 100 : (n >= 3000000 ? n / 10 : n); }
-// Gom số cỡ toạ độ, ghép theo loại (Bắc>900k / Đông<900k), bỏ qua hàng nhiễu.
+// VN-2000 Khánh Hòa: Đông (E) ~6 chữ số nguyên [380k–720k]; Bắc (N) ~7 chữ số (thường bắt đầu bằng 1) [1.20M–1.48M].
+const E_MIN = 380000, E_MAX = 720000, N_MIN = 1200000, N_MAX = 1480000;
+// Dựng lại 1 số toạ độ từ CHUỖI CHỈ CÒN SỐ theo SỐ CHỮ SỐ phần nguyên → tự đặt lại dấu thập phân (bất kể OCR có bắt được dấu chấm/phẩy hay không) + kiểm tra biên vùng để loại số rác.
+function reconstructCoord(run: string): { v: number; kind: 'E' | 'N' } | null {
+  const s = String(run).replace(/\D/g, '');
+  if (s.length < 6) return null;
+  if (s.length >= 7) { const n = parseFloat(s.slice(0, 7) + (s.length > 7 ? '.' + s.slice(7) : '')); if (n >= N_MIN && n <= N_MAX) return { v: n, kind: 'N' }; }
+  const e = parseFloat(s.slice(0, 6) + (s.length > 6 ? '.' + s.slice(6) : ''));
+  if (e >= E_MIN && e <= E_MAX) return { v: e, kind: 'E' };
+  return null;
+}
+// Đọc bảng toạ độ: ưu tiên THEO DÒNG (mỗi dòng 1 điểm = 1 Đông + 1 Bắc, bỏ STT/nhiễu); nếu mất cấu trúc dòng thì ghép phẳng cặp E–N.
 function parseBigPairs(text: string): { x: number; y: number }[] {
-  const nums: number[] = [];
-  for (const t of (text.match(/-?[\d.,]+/g) || [])) { const n = parseNum(t); if (Number.isFinite(n) && n > 90000) nums.push(recoverCoord(n)); }
-  const pts: { x: number; y: number }[] = [];
-  for (let i = 0; i < nums.length - 1; i++) {
-    const a = nums[i], b = nums[i + 1];
-    const aN = a >= 900000, bN = b >= 900000;
-    if (aN === bN) continue;
-    const E = aN ? b : a, N = aN ? a : b;
-    if (E > 90000 && E < 900000 && N >= 900000 && N < 3000000) { pts.push({ x: E, y: N }); i++; }
+  const t = normalizeDigits(text);
+  const RUN = /\d[\d.,]*\d|\d/g;
+  const byLine: { x: number; y: number }[] = [];
+  for (const line of t.split(/[\n\r;]+/)) {
+    let E: number | null = null, N: number | null = null;
+    for (const run of (line.match(RUN) || [])) { const r = reconstructCoord(run); if (!r) continue; if (r.kind === 'E' && E == null) E = r.v; else if (r.kind === 'N' && N == null) N = r.v; }
+    if (E != null && N != null) byLine.push({ x: N, y: E }); // x=Bắc, y=Đông (đúng sổ)
   }
-  return pts;
+  if (byLine.length >= 3) return byLine;
+  const items: { v: number; kind: 'E' | 'N' }[] = [];
+  for (const run of (t.match(RUN) || [])) { const r = reconstructCoord(run); if (r) items.push(r); }
+  const flat: { x: number; y: number }[] = [];
+  for (let i = 0; i < items.length - 1; i++) { const a = items[i], b = items[i + 1]; if (a.kind === b.kind) continue; const E = a.kind === 'E' ? a.v : b.v, N = a.kind === 'N' ? a.v : b.v; flat.push({ x: N, y: E }); i++; }
+  return flat.length > byLine.length ? flat : byLine;
 }
 
 // Điểm có nằm trong vòng đa giác không (ray casting) — để click ra loại đất QH vector ngay ở trình duyệt.

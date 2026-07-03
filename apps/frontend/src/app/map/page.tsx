@@ -79,15 +79,22 @@ function loadTesseract(): Promise<any> {
   });
   return _tess;
 }
+let _worker: any = null;
+async function getWorker(T: any): Promise<any> {
+  if (_worker) return _worker;
+  const w = await T.createWorker('eng');
+  await w.setParameters({ tessedit_char_whitelist: '0123456789.,-: ', tessedit_pageseg_mode: '6' });
+  _worker = w; return w;
+}
 async function runRecognize(src: HTMLCanvasElement | HTMLImageElement): Promise<string> {
   const T = await loadTesseract();
-  const out = await T.recognize(src, 'eng');
-  return String(out?.data?.text || '');
+  try { const w = await getWorker(T); const out = await w.recognize(src); return String(out?.data?.text || ''); }
+  catch { const out = await T.recognize(src, 'eng'); return String(out?.data?.text || ''); } // dự phòng API cũ
 }
 function preprocess(src: HTMLImageElement | HTMLCanvasElement): HTMLCanvasElement {
   const w0 = (src as HTMLImageElement).naturalWidth || (src as HTMLCanvasElement).width;
   const h0 = (src as HTMLImageElement).naturalHeight || (src as HTMLCanvasElement).height;
-  const scl = Math.max(1, Math.min(2.5, 1500 / Math.max(w0, h0)));
+  const scl = Math.max(1, Math.min(3, 2200 / Math.max(w0, h0)));
   const w = Math.max(1, Math.round(w0 * scl)), h = Math.max(1, Math.round(h0 * scl));
   const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
   const ctx = cv.getContext('2d', { willReadFrequently: true } as any)!;
@@ -114,27 +121,30 @@ function normalizeDigits(t: string): string {
 function toBlob(src: HTMLImageElement | HTMLCanvasElement): Promise<Blob> {
   const w0 = src instanceof HTMLCanvasElement ? src.width : ((src as HTMLImageElement).naturalWidth || 1);
   const h0 = src instanceof HTMLCanvasElement ? src.height : ((src as HTMLImageElement).naturalHeight || 1);
-  const sc = Math.min(2.5, 1700 / Math.max(w0, h0));
+  const sc = Math.min(3, 2400 / Math.max(w0, h0));
   const cv = document.createElement('canvas'); cv.width = Math.max(1, Math.round(w0 * sc)); cv.height = Math.max(1, Math.round(h0 * sc));
   cv.getContext('2d')!.drawImage(src, 0, 0, cv.width, cv.height);
   return new Promise((resolve, reject) => cv.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), 'image/png'));
 }
 async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{ pts: { x: number; y: number }[]; msg: string }> {
   let status = '';
+  let best: { x: number; y: number }[] = [];
+  const keep = (pts: { x: number; y: number }[]) => { if (pts.length > best.length) best = pts; };
+  const pre = preprocess(img); // nhị phân hoá + phóng to + tương phản — dễ đọc hơn NHIỀU so với ảnh màu thô
+  // 1) Server OCR — GỬI ẢNH ĐÃ NHỊ PHÂN HOÁ (trước đây gửi ảnh màu thô nên đọc sai)
   try {
-    const txt = await ocrImage(await toBlob(img));
-    const pts = parseBigPairs(normalizeDigits(txt));
-    if (pts.length >= 3) return { pts, msg: '' };
-    status = '✅ SERVER OCR đã chạy nhưng đọc chưa đủ (ra ' + pts.length + ' điểm).\nĐọc được: ' + (txt ? txt.replace(/\s+/g, ' ').slice(0, 180) : '(trống)') + '\n\nHãy chụp gần/thẳng/rõ hơn, hoặc nhập tay.';
+    keep(parseBigPairs(await ocrImage(await toBlob(pre))));
+    if (best.length < 3) keep(parseBigPairs(await ocrImage(await toBlob(img))));
   } catch (e: any) {
-    status = '⛔ SERVER OCR CHƯA CHẠY:\n' + String(e?.message || e) + '\n\n→ Backend camlam-api cần BUILD LẠI (cài Tesseract). Vào Render xem service camlam-api đã "Live" bản mới chưa.\n(Đang tạm dùng OCR trình duyệt — yếu nên đọc lỗi.)';
+    status = '⛔ SERVER OCR CHƯA CHẠY:\n' + String(e?.message || e) + '\n\n→ Backend camlam-api cần cài Tesseract. Đang tạm dùng OCR trình duyệt.';
   }
-  try {
-    let pts = parseBigPairs(normalizeDigits(await runRecognize(img)));
-    if (pts.length < 3) pts = parseBigPairs(normalizeDigits(await runRecognize(preprocess(img))));
-    if (pts.length >= 3) return { pts, msg: '' };
-  } catch {}
-  return { pts: [], msg: status };
+  // 2) OCR trình duyệt (whitelist chỉ số) — bổ sung khi server thiếu/không chạy
+  if (best.length < 3) {
+    try { keep(parseBigPairs(await runRecognize(pre))); } catch {}
+    if (best.length < 3) { try { keep(parseBigPairs(await runRecognize(img))); } catch {} }
+  }
+  if (best.length >= 3) return { pts: best, msg: '' };
+  return { pts: best, msg: status || ('Chỉ đọc được ' + best.length + ' điểm — chưa đủ.\nHãy chụp GẦN, THẲNG, đủ sáng, chỉ lấy phần bảng số; hoặc nhập tay ở tab "Nhập bảng".') };
 }
 function showOcrResult(r: { pts: { x: number; y: number }[]; msg: string }, apply: (pts: { x: number; y: number }[]) => void) {
   if (r.pts.length) { apply(r.pts); return; }
@@ -372,7 +382,7 @@ export default function MapPage() {
     finally { setOcrBusy(''); }
   }
   async function startCam() {
-    try { const st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } } }); camStreamRef.current = st; setCamOpen(true); }
+    try { const st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 2560 }, height: { ideal: 1440 } } }); try { await st.getVideoTracks()[0]?.applyConstraints({ advanced: [{ focusMode: 'continuous' }] as any }); } catch {} camStreamRef.current = st; setCamOpen(true); }
     catch (e: any) { alert('Không mở được camera: ' + (e?.message || e)); }
   }
   function stopCam() { camStreamRef.current?.getTracks().forEach((t) => t.stop()); camStreamRef.current = null; setCamOpen(false); }

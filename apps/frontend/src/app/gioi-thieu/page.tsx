@@ -9,6 +9,13 @@ const FEATURES = [
   { icon: '🤝', t: 'Tư vấn & Ký gửi', d: 'Tư vấn đầu tư và pháp lý bất động sản; nhận ký gửi mua bán, cho thuê nhà đất.' },
 ];
 
+const MILESTONES: [string, string][] = [
+  ['Đầu 2025', 'Khởi nguồn từ trăn trở về thông tin quy hoạch thiếu minh bạch; khảo sát nhu cầu và bắt đầu thu thập, số hoá dữ liệu quy hoạch Cam Lâm.'],
+  ['Giữa 2025', 'Hoàn thiện bản đồ quy hoạch trên nền vệ tinh độ nét cao, tra cứu theo số tờ/số thửa/xã và toạ độ VN-2000.'],
+  ['Cuối 2025', 'Ra mắt chợ nhà đất: đăng tin miễn phí, tìm kiếm và hiển thị tin đăng trực tiếp trên bản đồ.'],
+  ['2026', 'Bổ sung tra cứu QR thửa đất, tư vấn đầu tư & pháp lý và tin tức thị trường; không ngừng hoàn thiện và mở rộng.'],
+];
+
 export default function Page() {
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
@@ -26,6 +33,23 @@ export default function Page() {
                   <p className="font-bold text-[#0A2540]">{f.t}</p>
                   <p className="text-sm text-slate-500 mt-1 leading-relaxed">{f.d}</p>
                 </div>
+              </div>
+            ))}
+          </div>
+
+          <h2 className="text-lg font-bold text-[#0A2540] mt-8 mb-2">Câu chuyện của chúng tôi</h2>
+          <div className="space-y-3 text-[15px] text-slate-700 leading-relaxed">
+            <p>Cam Lâm những năm gần đây trở thành một trong những điểm nóng bất động sản của cả nước — nơi hội tụ định hướng đô thị sân bay, hạ tầng ven biển và làn sóng đầu tư đổ về. Nhưng đằng sau sự sôi động ấy là một thực tế: thông tin quy hoạch tản mát, bản đồ cũ, tin đồn lan nhanh hơn dữ liệu chính thống. Không ít người mua đất chỉ dựa vào lời nói, bản vẽ tay hay những tấm ảnh mập mờ — và trả giá bằng rủi ro pháp lý, bằng những đồng vốn dành dụm cả đời.</p>
+            <p>Là những người gắn bó với mảnh đất Cam Lâm, chúng tôi hiểu rõ nỗi lo đó. Cam Lâm Land ra đời từ một mong muốn giản dị: để bất kỳ ai — từ người dân bán mảnh vườn của gia đình đến nhà đầu tư ở xa — đều có thể tra cứu quy hoạch chính xác, xem tin đăng minh bạch và ra quyết định với sự an tâm. Chúng tôi đưa công nghệ bản đồ GIS và dữ liệu quy hoạch số hoá đến từng thửa đất, kết hợp với một sàn nhà đất thân thiện, để biến thông tin phức tạp thành thứ ai cũng dùng được.</p>
+            <p>Với chúng tôi, mỗi thửa đất đều gắn với một câu chuyện và một dự định của ai đó. Vì vậy, giá trị lớn nhất mà Cam Lâm Land theo đuổi không phải là số lượng tin đăng, mà là sự minh bạch và niềm tin — để mỗi giao dịch tại Cam Lâm đều an toàn, rõ ràng và công bằng hơn.</p>
+          </div>
+
+          <h2 className="text-lg font-bold text-[#0A2540] mt-8 mb-3">Chặng đường hình thành</h2>
+          <div className="space-y-4">
+            {MILESTONES.map(([year, text]) => (
+              <div key={year} className="flex gap-4">
+                <div className="shrink-0 w-24"><span className="inline-block bg-[#0A2540] text-white font-bold text-xs sm:text-sm rounded-lg px-2.5 py-1.5 whitespace-nowrap">{year}</span></div>
+                <p className="text-[15px] text-slate-700 leading-relaxed border-l-2 border-[#C8A14B]/40 pl-4">{text}</p>
               </div>
             ))}
           </div>

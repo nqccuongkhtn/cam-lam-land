@@ -7,7 +7,10 @@ import { useAuth } from '@/lib/auth';
 type Project = { id: number; name: string; status?: string | null; scale?: string | null; location?: string | null; imageUrl?: string | null };
 
 const DEFAULTS: Project[] = [
-  { id: -1, name: 'Đô thị mới sân bay Cam Lâm', status: 'Đang quy hoạch', scale: 'Đô thị sân bay', location: 'Cam Lâm, Khánh Hòa', imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=60' },
+  { id: -1, name: 'Đô thị mới sân bay Cam Lâm', status: 'Đang thu hồi bồi thường', scale: 'Đô thị sân bay', location: 'Cam Lâm, Khánh Hòa', imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=60' },
+  { id: -4, name: 'Golden Bay 1', status: 'Đang mở bán', scale: 'Đất nền ven biển', location: 'Bãi Dài, Cam Lâm', imageUrl: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=800&q=60' },
+  { id: -5, name: 'Golden Bay 2', status: 'Đang mở bán', scale: 'Đất nền nghỉ dưỡng', location: 'Bãi Dài, Cam Lâm', imageUrl: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=60' },
+  { id: -6, name: 'Khu nghỉ dưỡng Bãi Dài Resort', status: 'Đang mở bán', scale: 'Resort ven biển', location: 'Cam Hải Đông, Cam Lâm', imageUrl: 'https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?auto=format&fit=crop&w=800&q=60' },
   { id: -2, name: 'Khu du lịch Bãi Dài', status: 'Đang mở bán', scale: 'Ven biển', location: 'Cam Hải Đông, Cam Lâm', imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=60' },
   { id: -3, name: 'Khu đô thị trung tâm Cam Đức', status: 'Đang cập nhật', scale: 'Trung tâm huyện', location: 'Cam Đức, Cam Lâm', imageUrl: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=60' },
 ];
@@ -109,6 +112,7 @@ export default function FeaturedProjects() {
                   <select value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })} className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]">
                     <option>Đang mở bán</option>
                     <option>Sắp mở bán</option>
+                    <option>Đang thu hồi bồi thường</option>
                     <option>Đang quy hoạch</option>
                     <option>Đang cập nhật</option>
                   </select>

@@ -136,7 +136,10 @@ async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{
     keep(parseBigPairs(await ocrImage(await toBlob(pre))));
     if (best.length < 3) keep(parseBigPairs(await ocrImage(await toBlob(img))));
   } catch (e: any) {
-    status = '⛔ SERVER OCR CHƯA CHẠY:\n' + String(e?.message || e) + '\n\n→ Backend camlam-api cần cài Tesseract. Đang tạm dùng OCR trình duyệt.';
+    const m = String(e?.message || e);
+    status = /unauthor|forbidden|401|403/i.test(m)
+      ? '🔒 Vui lòng ĐĂNG NHẬP để dùng tính năng đọc ảnh bảng toạ độ (chỉ tài khoản đã đăng nhập).'
+      : '⛔ SERVER OCR CHƯA CHẠY:\n' + m + '\n\n→ Backend camlam-api cần cài Tesseract. Đang tạm dùng OCR trình duyệt.';
   }
   // 2) OCR trình duyệt (whitelist chỉ số) — bổ sung khi server thiếu/không chạy
   if (best.length < 3) {

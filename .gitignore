@@ -11,3 +11,5 @@ dist/
 Thumbs.db
 data/uploads/*
 !data/uploads/.gitkeep
+# Máy OCR nội bộ (chạy trên PC, chứa authtoken bí mật + file exe lớn) — KHÔNG đẩy lên GitHub
+ocr-server/

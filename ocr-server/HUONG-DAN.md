@@ -16,6 +16,26 @@ Chỉ cần **bấm đúp vào file `CHAY-MAY-OCR.bat`**. Nó tự làm hết: c
 
 ---
 
+## 🔒 URL CỐ ĐỊNH — dán 1 lần dùng mãi (ngrok)
+
+Cách cloudflared ở trên **đổi URL mỗi lần chạy**. Muốn URL **không bao giờ đổi**, dùng file **`CHAY-MAY-OCR-CODINH.bat`** (chạy bằng ngrok):
+
+1. Tạo tài khoản ngrok miễn phí: https://dashboard.ngrok.com/signup
+2. Lấy **Authtoken**: https://dashboard.ngrok.com/get-started/your-authtoken → copy.
+3. Lấy **domain miễn phí** (bản free cho 1 domain): https://dashboard.ngrok.com/domains → bấm **Create Domain** → được tên dạng `abcd-1234.ngrok-free.app` → copy.
+4. Mở **`CHAY-MAY-OCR-CODINH.bat`** bằng **Notepad**, điền 2 dòng đầu rồi Save:
+   ```
+   set NGROK_TOKEN=<authtoken vừa copy>
+   set NGROK_DOMAIN=abcd-1234.ngrok-free.app
+   ```
+   (domain **không** kèm `https://`).
+5. **Bấm đúp** `CHAY-MAY-OCR-CODINH.bat`.
+6. Trên Render đặt **`SELF_OCR_URL` = `https://abcd-1234.ngrok-free.app`** — **1 lần duy nhất**, từ nay khỏi sửa.
+
+> Nếu cửa sổ ngrok báo lỗi cờ `--url`, mở file .bat đổi `--url=https://%NGROK_DOMAIN%` thành `--domain=%NGROK_DOMAIN%`.
+
+---
+
 ## Bước 1 — Cài Python
 
 1. Tải **Python 3.10** (hoặc 3.11) tại https://www.python.org/downloads/

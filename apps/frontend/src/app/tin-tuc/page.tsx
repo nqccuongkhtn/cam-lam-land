@@ -194,13 +194,11 @@ export default function NewsIndex() {
 
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
-      <div className="max-w-[1680px] mx-auto px-4 py-6">
-        {showAd && <div className="hidden lg:block mb-6"><BillboardAd ad={ad} /></div>}
-
-        <div className="xl:flex xl:gap-8">
-          {showAd && <aside className="hidden xl:block w-64 shrink-0"><div className="sticky top-20 h-[calc(100vh-100px)]"><WingAd ad={ad} /></div></aside>}
-
-          <div className="flex-1 min-w-0 pt-6 lg:pt-0">
+      <div className="mx-auto max-w-[1500px] px-4 py-6">
+        {showAd && <div className="hidden md:block mb-6"><BillboardAd ad={ad} /></div>}
+        <div className="xl:flex xl:gap-6">
+          {showAd && <aside className="hidden xl:block w-44 shrink-0"><div className="sticky top-20 h-[calc(100vh-88px)]"><WingAd ad={ad} /></div></aside>}
+          <div className="flex-1 min-w-0 pt-1">
             <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <span className="text-slate-600">Tin tức</span></div>
             <div className="flex flex-wrap items-center gap-3 border-b-2 border-red-600 pb-2 mb-5">
               <span className="w-1.5 h-6 bg-red-600 rounded-sm" />
@@ -243,8 +241,7 @@ export default function NewsIndex() {
               </>
             )}
           </div>
-
-          {showAd && <aside className="hidden xl:block w-64 shrink-0"><div className="sticky top-20 h-[calc(100vh-100px)]"><WingAd ad={ad} /></div></aside>}
+          {showAd && <aside className="hidden xl:block w-44 shrink-0"><div className="sticky top-20 h-[calc(100vh-88px)]"><WingAd ad={ad} /></div></aside>}
         </div>
       </div>
     </div>

@@ -229,6 +229,8 @@ export default function MapPage() {
   const camVideoRef = useRef<HTMLVideoElement>(null);
   const camStreamRef = useRef<MediaStream | null>(null);
   const [ocrBusy, setOcrBusy] = useState('');
+  const [ocrPct, setOcrPct] = useState(0);
+  const ocrTimer = useRef<any>(null);
   const [ocrOk, setOcrOk] = useState(0);
   const [drawResult, setDrawResult] = useState<{ n: number; area: number; perim: number; lat: number; lng: number } | null>(null);
   const [tool, setTool] = useState<'none' | 'search' | 'base' | 'measure'>('none'); // bảng công cụ trên mobile
@@ -260,7 +262,7 @@ export default function MapPage() {
   useEffect(() => { setCanDelete(user?.role === 'admin' || user?.role === 'gis'); }, [user]);
   useEffect(() => { if (!camOpen) return; const v = camVideoRef.current, st = camStreamRef.current; if (!v || !st) return; v.srcObject = st; v.setAttribute('playsinline', 'true'); v.play().catch(() => {}); }, [camOpen]);
   // Giải phóng camera khi rời trang (tránh giữ camera chạy ngầm trên điện thoại).
-  useEffect(() => () => { camStreamRef.current?.getTracks().forEach((t) => t.stop()); camStreamRef.current = null; }, []);
+  useEffect(() => () => { camStreamRef.current?.getTracks().forEach((t) => t.stop()); camStreamRef.current = null; if (ocrTimer.current) clearInterval(ocrTimer.current); }, []);
 
   const overlays: ImageOverlay[] = useMemo(
     () => RASTER_OVERLAYS.map((o) => ({ id: o.id, url: o.url, coordinates: o.coordinates, opacity, visible: ovOn[o.id] ?? true, pmtiles: (o as any).pmtiles, fillMaxzoom: (o as any).fillMaxzoom, tiles: (o as any).tiles, minzoom: (o as any).minzoom, maxzoom: (o as any).maxzoom })), [opacity, ovOn]);
@@ -374,30 +376,41 @@ export default function MapPage() {
   }
   async function onCoordFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]; e.target.value = ''; if (!f) return;
-    setOcrBusy('Đang đọc…');
+    setOcrBusy('Đang đọc…'); startProgress();
     try {
       if (f.type.startsWith('image/')) {
         const img = await loadImage(f);
-        setOcrBusy('Đang nhận dạng chữ trong ảnh…');
+        setOcrBusy('Đang tải & đọc ảnh…');
         showOcrResult(await ocrToPoints(img), applyParsed);
       } else { applyParsed(parseBigPairs(await f.text())); }
     } catch (er: any) { alert('Không đọc được tệp: ' + (er?.message || er)); }
-    finally { setOcrBusy(''); }
+    finally { endProgress(); }
   }
   async function startCam() {
     try { const st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 2560 }, height: { ideal: 1440 } } }); try { await st.getVideoTracks()[0]?.applyConstraints({ advanced: [{ focusMode: 'continuous' }] as any }); } catch {} camStreamRef.current = st; setCamOpen(true); }
     catch (e: any) { alert('Không mở được camera: ' + (e?.message || e)); }
   }
   function stopCam() { camStreamRef.current?.getTracks().forEach((t) => t.stop()); camStreamRef.current = null; setCamOpen(false); }
+  function startProgress() {
+    if (ocrTimer.current) clearInterval(ocrTimer.current);
+    setOcrPct(0);
+    let p = 0;
+    ocrTimer.current = setInterval(() => { p += Math.max(0.7, (92 - p) * 0.06); if (p > 92) p = 92; setOcrPct(Math.round(p)); }, 180);
+  }
+  function endProgress() {
+    if (ocrTimer.current) { clearInterval(ocrTimer.current); ocrTimer.current = null; }
+    setOcrPct(100);
+    setTimeout(() => { setOcrBusy(''); setOcrPct(0); }, 350);
+  }
   async function capture() {
     const v = camVideoRef.current; if (!v || !v.videoWidth) return;
     const vw = v.videoWidth, vh = v.videoHeight, cw = Math.round(vw * 0.92), ch = Math.round(vh * 0.66);
     const cap = document.createElement('canvas'); cap.width = cw; cap.height = ch;
     cap.getContext('2d')!.drawImage(v, Math.round((vw - cw) / 2), Math.round((vh - ch) / 2), cw, ch, 0, 0, cw, ch);
-    stopCam(); setOcrBusy('Đang nhận dạng chữ trong ảnh…');
+    stopCam(); setOcrBusy('Đang tải & đọc ảnh…'); startProgress();
     try { showOcrResult(await ocrToPoints(cap), applyParsed); }
     catch (e: any) { alert('Không đọc được: ' + (e?.message || e)); }
-    finally { setOcrBusy(''); }
+    finally { endProgress(); }
   }
   function drawParcel() {
     const pts = pointsFromRows();
@@ -612,7 +625,12 @@ export default function MapPage() {
                           <input type="file" accept="image/*,.txt,.csv" onChange={onCoordFile} className="hidden" /><span className="text-2xl">🖼️</span>Tải ảnh / tệp
                         </label>
                       </div>
-                      {ocrBusy && <p className="text-sm text-[#0A2540] font-semibold text-center">{ocrBusy}</p>}
+                      {ocrBusy && (
+                        <div className="pt-1">
+                          <div className="flex items-center justify-between text-sm text-[#0A2540] font-semibold mb-1"><span>{ocrBusy}</span><span>{ocrPct}%</span></div>
+                          <div className="h-2 rounded-full bg-slate-200 overflow-hidden"><div className="h-full bg-[#0A2540] rounded-full transition-all duration-200 ease-out" style={{ width: ocrPct + '%' }} /></div>
+                        </div>
+                      )}
                       <p className="text-[11px] text-slate-400">Chụp/chọn ảnh bảng toạ độ rõ nét (hoặc tệp .txt/.csv). Hệ thống tự tách số → đưa vào tab &quot;Nhập bảng&quot; để bạn kiểm tra trước khi vẽ.</p>
                     </div>
                   )}
@@ -638,7 +656,7 @@ export default function MapPage() {
                 <p className="text-white/90 text-sm mb-3 drop-shadow">Đưa bảng toạ độ vừa khít trong khung — chụp thẳng, rõ nét.</p>
                 <button onClick={capture} className="bg-red-600 hover:bg-red-700 text-white font-extrabold px-10 py-3.5 rounded-full text-lg shadow-lg shadow-red-900/40 active:scale-95 transition">📷 Chụp</button>
               </div>
-              {ocrBusy && <div className="absolute inset-0 bg-black/70 grid place-items-center text-white font-semibold text-center px-6">{ocrBusy}</div>}
+              {ocrBusy && <div className="absolute inset-0 bg-black/70 grid place-items-center text-white font-semibold px-6"><div className="w-64 max-w-[80%]"><div className="flex items-center justify-between text-sm mb-2"><span>{ocrBusy}</span><span>{ocrPct}%</span></div><div className="h-2 rounded-full bg-white/25 overflow-hidden"><div className="h-full bg-white rounded-full transition-all duration-200 ease-out" style={{ width: ocrPct + '%' }} /></div></div></div>}
             </div>
           )}
           {info && (

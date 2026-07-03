@@ -66,10 +66,13 @@ function WingRails({ ad }: { ad: Ad }) {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+  const cls = 'pointer-events-auto fixed top-24 bottom-6 z-20 transition-all duration-500 ease-out';
+  const w = 'calc((100vw - 1040px) * 0.4)';
+  const off = 'calc((100vw - 1040px) * 0.05)';
   return (
-    <div aria-hidden className="hidden 2xl:block fixed top-24 bottom-6 inset-x-0 mx-auto max-w-[1400px] z-20 pointer-events-none">
-      <aside className={`pointer-events-auto absolute left-0 top-0 bottom-0 w-[160px] transition-all duration-500 ease-out ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}><WingAd ad={ad} /></aside>
-      <aside className={`pointer-events-auto absolute right-0 top-0 bottom-0 w-[160px] transition-all duration-500 ease-out ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}><WingAd ad={ad} /></aside>
+    <div aria-hidden className="hidden 2xl:block">
+      <aside className={`${cls} ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`} style={{ width: w, maxWidth: 460, left: off }}><WingAd ad={ad} /></aside>
+      <aside className={`${cls} ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`} style={{ width: w, maxWidth: 460, right: off }}><WingAd ad={ad} /></aside>
     </div>
   );
 }

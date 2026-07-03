@@ -285,6 +285,7 @@ export default function MapPage() {
   const [drawTab, setDrawTab] = useState<'table' | 'import'>('table');
   const [rows, setRows] = useState<{ x: string; y: string }[]>([{ x: '', y: '' }, { x: '', y: '' }, { x: '', y: '' }]);
   const [camOpen, setCamOpen] = useState(false);
+  const [camFlash, setCamFlash] = useState(false);
   const camVideoRef = useRef<HTMLVideoElement>(null);
   const camStreamRef = useRef<MediaStream | null>(null);
   const [ocrBusy, setOcrBusy] = useState('');
@@ -446,6 +447,7 @@ export default function MapPage() {
   }
   async function onCoordFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]; e.target.value = ''; if (!f) return;
+    if (f.type.startsWith('image/') && !requireLogin()) return;
     setOcrBusy('Đang đọc…'); startProgress();
     try {
       if (f.type.startsWith('image/')) {
@@ -456,7 +458,14 @@ export default function MapPage() {
     } catch (er: any) { alert('Không đọc được tệp: ' + (er?.message || er)); }
     finally { endProgress(); }
   }
+  // Vẽ ranh bằng CHỤP/ẢNH toạ độ cần đăng nhập (dùng API OCR). Chưa đăng nhập → nhắc đăng nhập đơn giản.
+  function requireLogin(): boolean {
+    if (user) return true;
+    if (confirm('🔒 Tính năng vẽ ranh bằng chụp/ảnh toạ độ cần đăng nhập.\n\nĐăng nhập ngay?')) window.location.href = '/login?next=/map';
+    return false;
+  }
   async function startCam() {
+    if (!requireLogin()) return;
     try { const st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 2560 }, height: { ideal: 1440 } } }); try { await st.getVideoTracks()[0]?.applyConstraints({ advanced: [{ focusMode: 'continuous' }] as any }); } catch {} camStreamRef.current = st; setCamOpen(true); }
     catch (e: any) { alert('Không mở được camera: ' + (e?.message || e)); }
   }
@@ -477,6 +486,10 @@ export default function MapPage() {
     const vw = v.videoWidth, vh = v.videoHeight, cw = Math.round(vw * 0.96), ch = Math.round(vh * 0.86);
     const cap = document.createElement('canvas'); cap.width = cw; cap.height = ch;
     cap.getContext('2d')!.drawImage(v, Math.round((vw - cw) / 2), Math.round((vh - ch) / 2), cw, ch, 0, 0, cw, ch);
+    // Phản hồi "đã chụp": rung nhẹ + nháy trắng màn hình (như camera iPhone), rồi mới chuyển sang đọc.
+    try { navigator.vibrate?.(35); } catch {}
+    setCamFlash(true); setTimeout(() => setCamFlash(false), 110);
+    await new Promise((r) => setTimeout(r, 180));
     stopCam(); setOcrBusy('Đang tải & đọc ảnh…'); startProgress();
     try { showOcrResult(await ocrToPoints(cap), applyParsed); }
     catch (e: any) { alert('Không đọc được: ' + (e?.message || e)); }
@@ -728,10 +741,14 @@ export default function MapPage() {
                 <button onClick={stopCam} aria-label="Đóng" className="w-10 h-10 rounded-full bg-white/15 backdrop-blur grid place-items-center text-2xl leading-none">✕</button>
               </div>
               <div className="absolute bottom-0 inset-x-0 px-6 pt-10 text-center bg-gradient-to-t from-black/80 via-black/40 to-transparent" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.25rem)' }}>
-                <p className="text-white/90 text-sm mb-3 drop-shadow">Đưa bảng toạ độ vừa khít trong khung — chụp thẳng, rõ nét.</p>
-                <button onClick={capture} className="bg-red-600 hover:bg-red-700 text-white font-extrabold px-10 py-3.5 rounded-full text-lg shadow-lg shadow-red-900/40 active:scale-95 transition">📷 Chụp</button>
+                <p className="text-white/90 text-sm mb-4 drop-shadow">Đưa bảng toạ độ vừa khít trong khung — chụp thẳng, rõ nét.</p>
+                <button onClick={capture} aria-label="Chụp" className="group relative mx-auto block w-[76px] h-[76px] rounded-full active:scale-90 transition-transform duration-150">
+                  <span className="absolute inset-0 rounded-full border-[3px] border-white/95 shadow-lg" />
+                  <span className="absolute inset-[5px] rounded-full bg-white transition-all duration-150 group-active:inset-[10px] group-active:bg-white/70" />
+                </button>
               </div>
-              {ocrBusy && <div className="absolute inset-0 bg-black/70 grid place-items-center text-white font-semibold px-6"><div className="w-64 max-w-[80%]"><div className="flex items-center justify-between text-sm mb-2"><span>{ocrBusy}</span><span>{ocrPct}%</span></div><div className="h-2 rounded-full bg-white/25 overflow-hidden"><div className="h-full bg-white rounded-full transition-all duration-200 ease-out" style={{ width: ocrPct + '%' }} /></div></div></div>}
+              <div className={`absolute inset-0 z-[75] bg-white pointer-events-none transition-opacity ${camFlash ? 'opacity-80 duration-0' : 'opacity-0 duration-300'}`} />
+              {ocrBusy && <div className="absolute inset-0 z-[76] bg-black/70 grid place-items-center text-white font-semibold px-6"><div className="w-64 max-w-[80%]"><div className="flex items-center justify-between text-sm mb-2"><span>{ocrBusy}</span><span>{ocrPct}%</span></div><div className="h-2 rounded-full bg-white/25 overflow-hidden"><div className="h-full bg-white rounded-full transition-all duration-200 ease-out" style={{ width: ocrPct + '%' }} /></div></div></div>}
             </div>
           )}
           {info && (

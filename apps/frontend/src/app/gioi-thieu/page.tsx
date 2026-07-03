@@ -3,10 +3,10 @@ import Link from 'next/link';
 export const metadata = { title: 'Giới thiệu | Cam Lâm Land' };
 
 const FEATURES = [
-  { icon: '🏠', t: 'Chợ nhà đất Cam Lâm', d: 'Mua bán, cho thuê đất nền, nhà riêng, căn hộ, biệt thự — đăng tin miễn phí, thông tin minh bạch.' },
-  { icon: '🗺️', t: 'Bản đồ quy hoạch', d: 'Tra cứu quy hoạch sử dụng đất trên nền vệ tinh độ nét cao đến z18, theo số tờ/số thửa/xã, toạ độ VN-2000.' },
-  { icon: '🔎', t: 'Tra cứu QR thửa đất', d: 'Quét mã QR để tra cứu nhanh thông tin và ranh giới thửa đất.' },
-  { icon: '🤝', t: 'Tư vấn & Ký gửi', d: 'Tư vấn đầu tư và pháp lý bất động sản; nhận ký gửi mua bán, cho thuê nhà đất.' },
+  { p: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10', t: 'Chợ nhà đất Cam Lâm', d: 'Mua bán, cho thuê đất nền, nhà riêng, căn hộ, biệt thự — đăng tin miễn phí, thông tin minh bạch.' },
+  { p: 'M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z M9 3v15 M15 6v15', t: 'Bản đồ quy hoạch', d: 'Tra cứu quy hoạch sử dụng đất trên nền vệ tinh độ nét cao đến z18, theo số tờ/số thửa/xã, toạ độ VN-2000.' },
+  { p: 'M3 7V5a2 2 0 0 1 2-2h2 M17 3h2a2 2 0 0 1 2 2v2 M21 17v2a2 2 0 0 1-2 2h-2 M7 21H5a2 2 0 0 1-2-2v-2 M7 12h10', t: 'Tra cứu QR thửa đất', d: 'Quét mã QR để tra cứu nhanh thông tin và ranh giới thửa đất.' },
+  { p: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M22 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75', t: 'Tư vấn & Ký gửi', d: 'Tư vấn đầu tư và pháp lý bất động sản; nhận ký gửi mua bán, cho thuê nhà đất.' },
 ];
 
 const MILESTONES: [string, string][] = [
@@ -28,8 +28,10 @@ export default function Page() {
 
           <div className="grid sm:grid-cols-2 gap-4 mt-6">
             {FEATURES.map((f) => (
-              <div key={f.t} className="flex gap-3 rounded-xl border border-slate-200 p-4">
-                <span className="text-2xl shrink-0">{f.icon}</span>
+              <div key={f.t} className="flex gap-3.5 rounded-xl border border-slate-200 p-4 transition hover:border-[#C8A14B]/50 hover:shadow-sm">
+                <div className="w-11 h-11 rounded-xl bg-[#0A2540] grid place-items-center shrink-0">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="w-[22px] h-[22px] text-[#C8A14B]"><path d={f.p} /></svg>
+                </div>
                 <div>
                   <p className="font-bold text-[#0A2540]">{f.t}</p>
                   <p className="text-sm text-slate-500 mt-1 leading-relaxed">{f.d}</p>

@@ -162,6 +162,38 @@ function Stat({ label, value, sub }: { label: string; value: any; sub?: string }
 function Row({ k, v }: { k: string; v: number }) {
   return <div className="flex justify-between text-sm py-1 border-b border-slate-50"><span className="text-slate-600">{k}</span><b className="text-[#0A2540]">{v}</b></div>;
 }
+const OCR_LABELS: Record<string, string> = { ocrspace: 'OCR.space', gemini: 'Gemini AI', self: 'Máy nội bộ', tesseract: 'Tesseract (máy chủ)' };
+const OCR_LIMITS: Record<string, string> = { ocrspace: '500 / ngày', gemini: '1.500 / ngày', self: 'không giới hạn', tesseract: 'không giới hạn' };
+function OcrUsage() {
+  const [d, setD] = useState<any>(null);
+  useEffect(() => { api('/ocr/usage').then(setD).catch(() => {}); }, []);
+  if (!d) return null;
+  const today: any[] = d.today || [];
+  const dmy = (s: string) => (s ? s.split('-').reverse().join('/') : '');
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 p-4">
+      <h3 className="font-bold text-[#0A2540] mb-1">📊 Lượt đọc toạ độ (OCR) hôm nay · {dmy(d.ymd)}</h3>
+      <p className="text-xs text-slate-400 mb-3">Reset mỗi ngày (giờ VN). Theo dõi để không vượt hạn miễn phí của từng nguồn.</p>
+      <table className="w-full text-sm">
+        <thead className="text-left text-slate-500"><tr><th className="py-1">Nguồn AI</th><th className="py-1 text-right">Đã dùng</th><th className="py-1 text-right">Giới hạn free/ngày</th></tr></thead>
+        <tbody>
+          {['ocrspace', 'gemini', 'self', 'tesseract'].map((eng) => {
+            const c = today.find((r) => r.engine === eng)?.count ?? 0;
+            return <tr key={eng} className="border-t border-slate-50"><td className="py-1.5 text-slate-600">{OCR_LABELS[eng]}</td><td className="py-1.5 text-right font-bold text-[#0A2540]">{c}</td><td className="py-1.5 text-right text-slate-400 text-xs">{OCR_LIMITS[eng]}</td></tr>;
+          })}
+        </tbody>
+      </table>
+      {Array.isArray(d.last7) && d.last7.length > 0 && (
+        <div className="mt-3 pt-3 border-t border-slate-100">
+          <p className="text-xs font-semibold text-slate-500 mb-1.5">7 ngày gần đây (tổng/ngày)</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600">
+            {d.last7.map((r: any) => <span key={r.ymd}>{dmy(String(r.ymd).slice(5))}: <b className="text-[#0A2540]">{r.total}</b></span>)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 function Overview() {
   const [s, setS] = useState<any>(null);
   useEffect(() => { api('/admin/stats').then(setS).catch(() => {}); }, []);
@@ -178,6 +210,7 @@ function Overview() {
         <div className="bg-white rounded-2xl border border-slate-200 p-4"><h3 className="font-bold text-[#0A2540] mb-2">Tin theo loại hình</h3>{s.byType.map((r: any) => <Row key={r.type} k={PROPERTY_LABELS[r.type as keyof typeof PROPERTY_LABELS] || r.type} v={r.n} />)}</div>
         <div className="bg-white rounded-2xl border border-slate-200 p-4"><h3 className="font-bold text-[#0A2540] mb-2">Tin theo xã</h3>{s.byWard.map((r: any) => <Row key={r.ward} k={r.ward} v={r.n} />)}</div>
       </div>
+      <OcrUsage />
     </div>
   );
 }

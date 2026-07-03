@@ -5,7 +5,8 @@ import { writeFile, unlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomBytes } from 'node:crypto';
-import { authRequired } from '../middleware/auth.ts';
+import { authRequired, adminRequired } from '../middleware/auth.ts';
+import { query } from '../lib/db.ts';
 
 export const ocrRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 12 * 1024 * 1024 } });
@@ -21,7 +22,7 @@ function runTesseract(file: string, args: string[]): Promise<string> {
 
 // ── Gemini (miễn phí) — đọc bảng toạ độ mạnh hơn Tesseract nhiều; tự bỏ qua nếu chưa cấu hình GEMINI_API_KEY ──
 const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY || '';
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3-flash';
 const GEMINI_PROMPT = `Bạn là công cụ trích xuất toạ độ từ ảnh bảng toạ độ địa chính VN-2000 (Khánh Hòa, Việt Nam). Đọc TẤT CẢ các điểm ranh thửa trong ảnh. Mỗi điểm gồm 2 số: X = toạ độ Bắc (Northing) 7 chữ số phần nguyên, thường bắt đầu bằng 1 (khoảng 1200000-1480000); Y = toạ độ Đông (Easting) 6 chữ số phần nguyên (khoảng 380000-720000). CHỈ in kết quả, MỖI DÒNG MỘT ĐIỂM đúng định dạng: X Y (X trước, Y sau, cách nhau một dấu cách; giữ nguyên phần thập phân nếu có; TUYỆT ĐỐI không kèm số thứ tự, chữ, đơn vị hay ký tự nào khác). Không đọc được điểm nào thì để trống.`;
 async function geminiOcr(buffer: Buffer, mime: string): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(GEMINI_KEY)}`;
@@ -63,6 +64,12 @@ async function selfOcr(buffer: Buffer, mime: string): Promise<string> {
   return String(j?.text || '');
 }
 
+// Đếm lượt OCR theo nguồn + ngày (giờ VN) để admin theo dõi hạn free.
+function ymdVN(): string { return new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10); }
+function bumpOcr(engine: string): void {
+  query(`INSERT INTO ocr_usage (engine, ymd, count) VALUES ($1, $2, 1) ON CONFLICT (engine, ymd) DO UPDATE SET count = ocr_usage.count + 1`, [engine, ymdVN()]).catch(() => {});
+}
+
 // POST /api/ocr — OCR.space → Gemini → Máy nội bộ → Tesseract (server)
 ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, next) => {
   try {
@@ -73,7 +80,7 @@ ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, n
         const stext = await ocrSpace(req.file.buffer, req.file.mimetype);
         const nnum = (stext.match(/\d{5,}/g) || []).length;
         console.log(`[ocr] OCR.space đọc ${nnum} số cỡ toạ độ:`, JSON.stringify(stext).slice(0, 240));
-        if (nnum > 0) return res.json({ text: stext, engine: 'ocrspace' });
+        if (nnum > 0) { bumpOcr('ocrspace'); return res.json({ text: stext, engine: 'ocrspace' }); }
       } catch (e: any) { console.error('[ocr] OCR.space LỖI (thử tiếp):', e?.message || e); }
     }
     // 2) Gemini (chất lượng cao, free 20/ngày) — dùng khi OCR.space chưa ra số.
@@ -82,7 +89,7 @@ ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, n
         const gtext = await geminiOcr(req.file.buffer, req.file.mimetype);
         const nnum = (gtext.match(/\d{5,}/g) || []).length;
         console.log(`[ocr] Gemini (${GEMINI_MODEL}) đọc ${nnum} số cỡ toạ độ:`, JSON.stringify(gtext).slice(0, 240));
-        if (nnum > 0) return res.json({ text: gtext, engine: 'gemini' });
+        if (nnum > 0) { bumpOcr('gemini'); return res.json({ text: gtext, engine: 'gemini' }); }
       } catch (e: any) { console.error('[ocr] Gemini LỖI (chuyển Tesseract):', e?.message || e); }
     }
     // 3) Máy OCR nội bộ (self-host) — LỚP DỰ PHÒNG SÂU, chỉ chạy khi cloud lỗi/hết quota + PC đang bật.
@@ -91,7 +98,7 @@ ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, n
         const t = await selfOcr(req.file.buffer, req.file.mimetype);
         const nnum = (t.match(/\d{5,}/g) || []).length;
         console.log(`[ocr] Máy nội bộ đọc ${nnum} số:`, JSON.stringify(t).slice(0, 240));
-        if (nnum > 0) return res.json({ text: t, engine: 'self' });
+        if (nnum > 0) { bumpOcr('self'); return res.json({ text: t, engine: 'self' }); }
       } catch (e: any) { console.error('[ocr] Máy nội bộ LỖI (chuyển Tesseract):', e?.message || e); }
     }
     const tmp = join(tmpdir(), 'ocr_' + randomBytes(6).toString('hex'));
@@ -115,9 +122,21 @@ ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, n
         if (bestScore >= 6) break;
       }
     } finally { unlink(tmp).catch(() => {}); }
+    bumpOcr('tesseract');
     res.json({ text, engine: 'tesseract' });
   } catch (e: any) {
     if (/ENOENT/.test(String(e?.message || e))) return res.status(503).json({ error: 'Máy chủ chưa cài Tesseract OCR' });
     next(e);
   }
+});
+
+// GET /api/ocr/usage — thống kê lượt OCR theo nguồn/ngày (chỉ admin).
+ocrRouter.get('/usage', adminRequired, async (_req, res, next) => {
+  try {
+    const ymd = ymdVN();
+    const start7 = new Date(Date.now() + 7 * 3600 * 1000 - 6 * 86400000).toISOString().slice(0, 10);
+    const today = await query(`SELECT engine, count FROM ocr_usage WHERE ymd=$1 ORDER BY count DESC`, [ymd]);
+    const last7 = await query(`SELECT ymd, SUM(count)::int AS total FROM ocr_usage WHERE ymd >= $1 GROUP BY ymd ORDER BY ymd DESC`, [start7]);
+    res.json({ ymd, today, last7 });
+  } catch (e) { next(e); }
 });

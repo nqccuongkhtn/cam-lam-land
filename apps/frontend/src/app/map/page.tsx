@@ -135,19 +135,62 @@ function toJpeg(src: HTMLImageElement | HTMLCanvasElement, maxDim = 2200, q = 0.
   cv.getContext('2d')!.drawImage(src, 0, 0, cv.width, cv.height);
   return new Promise((resolve, reject) => cv.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), 'image/jpeg', q));
 }
+// Ảnh ĐÃ LÀM SẠCH cho AI đọc dễ nhất: xám hoá → LÀM PHẲNG NỀN (khử bóng/ánh sáng lệch + nền hoa văn bảo an của sổ đỏ) → tăng tương phản → LÀM NÉT (unsharp) → phóng to.
+// Giữ ảnh XÁM (không nhị phân) nên Gemini/OCR.space vẫn đọc tự nhiên nhưng rõ hơn hẳn ảnh gốc. Kỹ thuật: chia cho trung bình cục bộ (illumination correction) + gamma + unsharp 3x3.
+function enhanceForAI(src: HTMLImageElement | HTMLCanvasElement, maxDim = 2200, q = 0.92): Promise<Blob> {
+  const w0 = (src as HTMLImageElement).naturalWidth || (src as HTMLCanvasElement).width;
+  const h0 = (src as HTMLImageElement).naturalHeight || (src as HTMLCanvasElement).height;
+  const scl = Math.max(1, Math.min(2, maxDim / Math.max(w0, h0)));
+  const w = Math.max(1, Math.round(w0 * scl)), h = Math.max(1, Math.round(h0 * scl));
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const ctx = cv.getContext('2d', { willReadFrequently: true } as any)!;
+  (ctx as any).imageSmoothingQuality = 'high'; ctx.drawImage(src, 0, 0, w, h);
+  const im = ctx.getImageData(0, 0, w, h), d = im.data, n = w * h;
+  // 1) Xám hoá.
+  const g = new Float64Array(n);
+  for (let p = 0; p < n; p++) { const k = p * 4; g[p] = 0.299 * d[k] + 0.587 * d[k + 1] + 0.114 * d[k + 2]; }
+  // 2) Làm phẳng nền: nền = trung bình cục bộ cửa sổ LỚN (ảnh tích phân) → CHIA → nền về gần trắng đều, khử bóng & làm mờ hoa văn bảo an; chữ giữ đậm.
+  const integ = new Float64Array((w + 1) * (h + 1));
+  for (let y = 0; y < h; y++) { let rs = 0; for (let x = 0; x < w; x++) { rs += g[y * w + x]; integ[(y + 1) * (w + 1) + (x + 1)] = integ[y * (w + 1) + (x + 1)] + rs; } }
+  const half = Math.max(12, Math.floor(w / 12));
+  const wm = new Float64Array(n);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const x1 = Math.max(0, x - half), x2 = Math.min(w - 1, x + half), y1 = Math.max(0, y - half), y2 = Math.min(h - 1, y + half);
+    const cnt = (x2 - x1 + 1) * (y2 - y1 + 1);
+    const sum = integ[(y2 + 1) * (w + 1) + (x2 + 1)] - integ[y1 * (w + 1) + (x2 + 1)] - integ[(y2 + 1) * (w + 1) + x1] + integ[y1 * (w + 1) + x1];
+    const bg = Math.max(1, sum / cnt);
+    let v = (g[y * w + x] / bg) * 250; if (v > 255) v = 255;   // chia cho nền → trắng đều
+    wm[y * w + x] = v;
+  }
+  // 3) Làm nét (unsharp 3x3) + gamma nhẹ cho chữ đậm hơn; xuất ảnh xám.
+  const amt = 0.6;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const i = y * w + x;
+    const blur = (wm[x > 0 ? i - 1 : i] + wm[x < w - 1 ? i + 1 : i] + wm[y > 0 ? i - w : i] + wm[y < h - 1 ? i + w : i]) * 0.25;
+    let v = wm[i] + amt * (wm[i] - blur);                        // unsharp
+    v = 255 * Math.pow(Math.min(1, Math.max(0, v / 255)), 1.25); // gamma → chữ đậm
+    if (v < 0) v = 0; else if (v > 255) v = 255;
+    const k = i * 4; d[k] = d[k + 1] = d[k + 2] = v;
+  }
+  ctx.putImageData(im, 0, 0);
+  return new Promise((resolve, reject) => cv.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), 'image/jpeg', q));
+}
 function engineLabel(e: string): string { return e === 'paste' ? 'dán tay' : 'AI Cam Lâm Land'; }
 async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{ pts: { x: number; y: number }[]; msg: string; engine: string; raw: string }> {
   let status = '', engine = '', raw = '', firstText = '', firstEngine = '';
   let best: { x: number; y: number }[] = [];
   const keep = (pts: { x: number; y: number }[], eng: string, text: string) => { if (pts.length > best.length) { best = pts; engine = eng; raw = text; } };
-  const pre = preprocess(img);
+  let pre: HTMLCanvasElement | null = null;
+  const getPre = () => (pre ||= preprocess(img)); // chỉ nhị phân hoá khi cần (tiết kiệm CPU đường thành công)
   try {
-    // Lần 1: ảnh GỐC nén JPEG (<1MB) — engine mạnh (máy nội bộ/OCR.space/Gemini) đọc tự nhiên, ít nhầm số.
-    let r = await ocrImage(await toJpeg(img));
+    // Lần 1: ảnh ĐÃ LÀM SẠCH (xám + phẳng nền + tăng tương phản + làm nét) — engine mạnh (máy nội bộ/OCR.space/Gemini) đọc RÕ NHẤT, ít nhầm số.
+    let r = await ocrImage(await enhanceForAI(img));
     firstText = r.text; firstEngine = r.engine;
     keep(parseBigPairs(r.text), r.engine, r.text);
-    // Lần 2: chưa đủ → gửi ảnh nhị phân hoá (đỡ cho Tesseract khi không có engine mạnh)
-    if (best.length < 3) { r = await ocrImage(await toBlob(pre)); keep(parseBigPairs(r.text), r.engine, r.text); }
+    // Lần 2: chưa đủ → ảnh nhị phân hoá (đỡ cho Tesseract khi không có engine mạnh).
+    if (best.length < 3) { r = await ocrImage(await toBlob(getPre())); keep(parseBigPairs(r.text), r.engine, r.text); }
+    // Lần 3: vẫn thiếu → ảnh GỐC tự nhiên (phòng khi ảnh vốn đã sạch, tránh xử lý quá tay).
+    if (best.length < 3) { r = await ocrImage(await toJpeg(img)); keep(parseBigPairs(r.text), r.engine, r.text); }
   } catch (e: any) {
     const m = String(e?.message || e);
     status = /unauthor|forbidden|401|403/i.test(m)
@@ -156,7 +199,7 @@ async function ocrToPoints(img: HTMLImageElement | HTMLCanvasElement): Promise<{
   }
   // OCR trình duyệt (whitelist chỉ số) — bổ sung khi server thiếu/không chạy
   if (best.length < 3) {
-    try { const t = await runRecognize(pre); if (!firstText) { firstText = t; firstEngine = 'browser'; } keep(parseBigPairs(t), 'browser', t); } catch {}
+    try { const t = await runRecognize(getPre()); if (!firstText) { firstText = t; firstEngine = 'browser'; } keep(parseBigPairs(t), 'browser', t); } catch {}
     if (best.length < 3) { try { const t = await runRecognize(img); keep(parseBigPairs(t), 'browser', t); } catch {} }
   }
   if (!best.length && firstText) { raw = firstText; engine = firstEngine; }

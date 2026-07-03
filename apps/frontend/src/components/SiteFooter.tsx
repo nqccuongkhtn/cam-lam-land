@@ -3,7 +3,7 @@ import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 
 const HELP: [string, string][] = [
-  ['Giới thiệu Cam Lâm Land', '/dichvu'],
+  ['Giới thiệu Cam Lâm Land', '/gioi-thieu'],
   ['Dịch vụ & Bảng giá', '/dichvu'],
   ['Nhà đất bán & cho thuê', '/listings'],
   ['Bản đồ quy hoạch', '/map'],
@@ -11,11 +11,11 @@ const HELP: [string, string][] = [
   ['Tin tức', '/tin-tuc'],
 ];
 const RULES: [string, string][] = [
-  ['Quy định đăng tin', '#'],
-  ['Quy chế hoạt động', '#'],
-  ['Điều khoản sử dụng', '#'],
-  ['Chính sách bảo mật', '#'],
-  ['Giải quyết khiếu nại', '#'],
+  ['Quy định đăng tin', '/quy-dinh-dang-tin'],
+  ['Quy chế hoạt động', '/quy-che-hoat-dong'],
+  ['Điều khoản sử dụng', '/dieu-khoan-su-dung'],
+  ['Chính sách bảo mật', '/chinh-sach-bao-mat'],
+  ['Giải quyết khiếu nại', '/giai-quyet-khieu-nai'],
 ];
 
 const STATS = [
@@ -90,7 +90,7 @@ export default function SiteFooter() {
         <div>
           <p className="font-semibold text-white mb-3">Quy định</p>
           <ul className="text-sm space-y-2 text-slate-400">
-            {RULES.map(([label, href]) => <li key={label}><a href={href} className="hover:text-[#C8A14B]">{label}</a></li>)}
+            {RULES.map(([label, href]) => <li key={label}><Link href={href} className="hover:text-[#C8A14B]">{label}</Link></li>)}
           </ul>
         </div>
 

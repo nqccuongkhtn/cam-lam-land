@@ -50,13 +50,24 @@ export default function QrPage() {
   function decodeVideoFrame(v: HTMLVideoElement): string | null {
     const vw = v.videoWidth, vh = v.videoHeight;
     if (!vw || !vh || !window.jsQR) return null;
-    const scale = Math.min(640 / Math.max(vw, vh), 1);
-    const w = Math.round(vw * scale), h = Math.round(vh * scale);
-    const cv = canvasRef.current!; cv.width = w; cv.height = h;
+    const cv = canvasRef.current!;
     const ctx = cv.getContext('2d', { willReadFrequently: true } as any)!;
+    // Lần 1: cắt vùng vuông giữa khung (nơi người dùng ngắm QR) & giải mã ở độ phân giải cao → bắt được cả QR nhỏ.
+    const crop = Math.round(Math.min(vw, vh) * 0.8);
+    const T = 900;
+    cv.width = T; cv.height = T;
+    ctx.drawImage(v, Math.round((vw - crop) / 2), Math.round((vh - crop) / 2), crop, crop, 0, 0, T, T);
+    let img = ctx.getImageData(0, 0, T, T);
+    let r = window.jsQR(img.data, T, T, { inversionAttempts: 'attemptBoth' });
+    if (r?.data) return r.data;
+    // Lần 2: quét toàn khung (QR nằm lệch) ở độ phân giải vừa phải.
+    const scale = Math.min(1080 / Math.max(vw, vh), 1);
+    const w = Math.round(vw * scale), h = Math.round(vh * scale);
+    cv.width = w; cv.height = h;
     ctx.drawImage(v, 0, 0, w, h);
-    const img = ctx.getImageData(0, 0, w, h);
-    return window.jsQR(img.data, img.width, img.height, { inversionAttempts: 'attemptBoth' })?.data ?? null;
+    img = ctx.getImageData(0, 0, w, h);
+    r = window.jsQR(img.data, w, h, { inversionAttempts: 'attemptBoth' });
+    return r?.data ?? null;
   }
 
   const scanLoop = async () => {
@@ -64,7 +75,7 @@ export default function QrPage() {
     const v = videoRef.current;
     if (v && v.readyState >= 2) {
       const now = performance.now();
-      if (now - lastTickRef.current >= 110) { // ~9 lần/giây
+      if (now - lastTickRef.current >= 140) { // ~7 lần/giây (2 lượt decode/khung)
         lastTickRef.current = now;
         try {
           let text: string | null = null;
@@ -88,7 +99,8 @@ export default function QrPage() {
     setErr('');
     if (!detectorRef.current && !window.jsQR) return setErr('Bộ quét chưa sẵn sàng, thử lại sau giây lát.');
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } } });
+      try { await stream.getVideoTracks()[0]?.applyConstraints({ advanced: [{ focusMode: 'continuous' }] as any }); } catch {}
       streamRef.current = stream; setScanning(true);
       const v = videoRef.current!; v.srcObject = stream; await v.play();
       lastTickRef.current = 0;

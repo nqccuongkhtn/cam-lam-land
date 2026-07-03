@@ -599,18 +599,18 @@ export default function MapPage() {
             </div>
           )}
           {camOpen && (
-            <div className="fixed inset-0 z-[70] bg-black">
+            <div className="fixed inset-0 z-[70] bg-black h-[100dvh] overflow-hidden">
               <video ref={camVideoRef} className="absolute inset-0 w-full h-full object-cover" muted playsInline />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="border-2 border-emerald-400 rounded-lg" style={{ width: '92%', height: '66%', boxShadow: '0 0 0 100vmax rgba(0,0,0,0.5)' }} />
               </div>
-              <div className="absolute top-0 inset-x-0 flex items-center justify-between p-4 text-white">
+              <div className="absolute top-0 inset-x-0 flex items-center justify-between px-4 pb-4 text-white bg-gradient-to-b from-black/70 to-transparent" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
                 <span className="font-semibold text-lg drop-shadow">Chụp bảng toạ độ</span>
                 <button onClick={stopCam} aria-label="Đóng" className="w-10 h-10 rounded-full bg-white/15 backdrop-blur grid place-items-center text-2xl leading-none">✕</button>
               </div>
-              <div className="absolute bottom-0 inset-x-0 p-6 text-center">
+              <div className="absolute bottom-0 inset-x-0 px-6 pt-10 text-center bg-gradient-to-t from-black/80 via-black/40 to-transparent" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.25rem)' }}>
                 <p className="text-white/90 text-sm mb-3 drop-shadow">Đưa bảng toạ độ vừa khít trong khung — chụp thẳng, rõ nét.</p>
-                <button onClick={capture} className="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3 rounded-full text-lg">📷 Chụp</button>
+                <button onClick={capture} className="bg-red-600 hover:bg-red-700 text-white font-extrabold px-10 py-3.5 rounded-full text-lg shadow-lg shadow-red-900/40 active:scale-95 transition">📷 Chụp</button>
               </div>
               {ocrBusy && <div className="absolute inset-0 bg-black/70 grid place-items-center text-white font-semibold text-center px-6">{ocrBusy}</div>}
             </div>

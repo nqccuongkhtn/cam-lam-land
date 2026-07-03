@@ -70,11 +70,20 @@ function bumpOcr(engine: string): void {
   query(`INSERT INTO ocr_usage (engine, ymd, count) VALUES ($1, $2, 1) ON CONFLICT (engine, ymd) DO UPDATE SET count = ocr_usage.count + 1`, [engine, ymdVN()]).catch(() => {});
 }
 
-// POST /api/ocr — OCR.space → Gemini → Máy nội bộ → Tesseract (server)
+// POST /api/ocr — Gemini → OCR.space → Máy nội bộ → Tesseract (server)
 ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, next) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Thiếu ảnh' });
-    // 1) OCR.space — ƯU TIÊN CHÍNH (miễn phí ~500/ngày, không cần thẻ).
+    // 1) Gemini — ƯU TIÊN CHÍNH (vision AI, đọc được cả ảnh có nền hoa văn bảo an của sổ đỏ; free 1.500 lượt/ngày với gemini-3-flash).
+    if (GEMINI_KEY) {
+      try {
+        const gtext = await geminiOcr(req.file.buffer, req.file.mimetype);
+        const nnum = (gtext.match(/\d{5,}/g) || []).length;
+        console.log(`[ocr] Gemini (${GEMINI_MODEL}) đọc ${nnum} số cỡ toạ độ:`, JSON.stringify(gtext).slice(0, 240));
+        if (nnum > 0) { bumpOcr('gemini'); return res.json({ text: gtext, engine: 'gemini' }); }
+      } catch (e: any) { console.error('[ocr] Gemini LỖI (thử tiếp):', e?.message || e); }
+    }
+    // 2) OCR.space — dự phòng khi Gemini chưa ra số/hết quota (miễn phí ~500/ngày, không cần thẻ).
     if (OCRSPACE_KEY) {
       try {
         const stext = await ocrSpace(req.file.buffer, req.file.mimetype);
@@ -82,15 +91,6 @@ ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, n
         console.log(`[ocr] OCR.space đọc ${nnum} số cỡ toạ độ:`, JSON.stringify(stext).slice(0, 240));
         if (nnum > 0) { bumpOcr('ocrspace'); return res.json({ text: stext, engine: 'ocrspace' }); }
       } catch (e: any) { console.error('[ocr] OCR.space LỖI (thử tiếp):', e?.message || e); }
-    }
-    // 2) Gemini (chất lượng cao, free 20/ngày) — dùng khi OCR.space chưa ra số.
-    if (GEMINI_KEY) {
-      try {
-        const gtext = await geminiOcr(req.file.buffer, req.file.mimetype);
-        const nnum = (gtext.match(/\d{5,}/g) || []).length;
-        console.log(`[ocr] Gemini (${GEMINI_MODEL}) đọc ${nnum} số cỡ toạ độ:`, JSON.stringify(gtext).slice(0, 240));
-        if (nnum > 0) { bumpOcr('gemini'); return res.json({ text: gtext, engine: 'gemini' }); }
-      } catch (e: any) { console.error('[ocr] Gemini LỖI (chuyển Tesseract):', e?.message || e); }
     }
     // 3) Máy OCR nội bộ (self-host) — LỚP DỰ PHÒNG SÂU, chỉ chạy khi cloud lỗi/hết quota + PC đang bật.
     if (SELF_OCR_URL) {

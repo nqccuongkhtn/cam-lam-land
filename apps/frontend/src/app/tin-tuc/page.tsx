@@ -67,8 +67,8 @@ function WingRails({ ad }: { ad: Ad }) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
   const cls = 'pointer-events-auto fixed top-24 bottom-6 z-20 transition-all duration-500 ease-out';
-  const w = 'calc((100vw - 1040px) * 0.3)';
-  const off = 'calc((100vw - 1040px) * 0.1)';
+  const w = 'calc((100vw - 1120px) * 0.3)';
+  const off = 'calc((100vw - 1120px) * 0.1)';
   return (
     <div aria-hidden className="hidden 2xl:block">
       <aside className={`${cls} ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`} style={{ width: w, maxWidth: 340, left: off }}><WingAd ad={ad} /></aside>
@@ -213,19 +213,11 @@ export default function NewsIndex() {
   const hasMore = rest.length > limit;
 
   return (
-    <div className={`relative overflow-hidden min-h-[calc(100vh-56px)] ${showAd ? 'bg-slate-50 2xl:bg-[#0a0e16]' : 'bg-slate-50'}`}>
+    <div className="relative min-h-[calc(100vh-56px)] bg-white">
       {showAd && <WingRails ad={ad} />}
-      {showAd && (
-        <div aria-hidden className="hidden 2xl:block absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute left-[5%] top-44 w-64 h-64 rounded-full bg-[#C8A14B]/[0.08] blur-3xl" />
-          <div className="absolute right-[6%] top-1/2 w-72 h-72 rounded-full bg-white/[0.06] blur-3xl" />
-          <div className="absolute left-[3%] bottom-24 w-48 h-48 rounded-full bg-[#C8A14B]/[0.06] blur-2xl" />
-          <div className="absolute right-[4%] bottom-44 w-44 h-44 rounded-full bg-white/[0.05] blur-2xl" />
-        </div>
-      )}
-      <div className="relative z-10 mx-auto max-w-[1040px] px-4 py-6">
+      <div className="relative z-10 mx-auto max-w-[1120px] px-4 sm:px-6 lg:px-8 py-6">
         {showAd && <div className="hidden md:block mb-6"><BillboardAd ad={ad} /></div>}
-        <div className="bg-white rounded-2xl shadow-sm 2xl:shadow-2xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div>
           <div className="pt-0">
             <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <span className="text-slate-600">Tin tức</span></div>
             <div className="flex flex-wrap items-center gap-3 border-b-2 border-red-600 pb-2 mb-5">

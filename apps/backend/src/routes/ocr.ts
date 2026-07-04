@@ -21,12 +21,13 @@ function runTesseract(file: string, args: string[]): Promise<string> {
 }
 
 // ── Gemini (miễn phí) — đọc bảng toạ độ mạnh hơn Tesseract nhiều; tự bỏ qua nếu chưa cấu hình GEMINI_API_KEY ──
-const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY || '';
-// Danh sách model Gemini thử LẦN LƯỢT — mỗi model có quota riêng trên CÙNG 1 key, nên hết con này tự sang con khác (nhân quota free lên nhiều lần). Đặt GEMINI_MODELS="a,b,c" để tuỳ chỉnh.
-const GEMINI_MODELS = (process.env.GEMINI_MODELS || process.env.GEMINI_MODEL || 'gemini-3-flash-preview,gemini-2.5-flash,gemini-2.5-flash-lite,gemini-2.0-flash').split(',').map((s) => s.trim()).filter(Boolean);
+// NHIỀU API key (nhiều tài khoản Google) — mỗi key có quota free RIÊNG. Xâu vào để "chạy Gemini bằng mọi giá": hết quota key này tự sang key khác. Đặt GEMINI_API_KEYS="key1,key2,key3" (hoặc vẫn 1 key qua GEMINI_API_KEY).
+const GEMINI_KEYS = (process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY || '').split(',').map((s) => s.trim()).filter(Boolean);
+// Model Gemini — mỗi model có quota riêng trên MỖI key. Thử KEY × MODEL để vắt kiệt quota Gemini trước khi rơi sang engine khác. Ưu tiên gemini-2.5-flash (chính xác + nhanh). Bỏ gemini-3-flash-preview khỏi mặc định (hay timeout); muốn dùng thì đặt GEMINI_MODELS.
+const GEMINI_MODELS = (process.env.GEMINI_MODELS || process.env.GEMINI_MODEL || 'gemini-2.5-flash,gemini-2.5-flash-lite,gemini-2.0-flash,gemini-2.0-flash-lite').split(',').map((s) => s.trim()).filter(Boolean);
 const GEMINI_PROMPT = `Bạn là công cụ trích xuất toạ độ từ ảnh bảng toạ độ địa chính VN-2000 (Khánh Hòa, Việt Nam). Đọc TẤT CẢ các điểm ranh thửa trong ảnh. Mỗi điểm gồm 2 số: X = toạ độ Bắc (Northing) 7 chữ số phần nguyên, thường bắt đầu bằng 1 (khoảng 1200000-1480000); Y = toạ độ Đông (Easting) 6 chữ số phần nguyên (khoảng 380000-720000). CHỈ in kết quả, MỖI DÒNG MỘT ĐIỂM đúng định dạng: X Y (X trước, Y sau, cách nhau một dấu cách; giữ nguyên phần thập phân nếu có; TUYỆT ĐỐI không kèm số thứ tự, chữ, đơn vị hay ký tự nào khác). Không đọc được điểm nào thì để trống.`;
-async function geminiCall(model: string, buffer: Buffer, mime: string): Promise<string> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GEMINI_KEY)}`;
+async function geminiCall(model: string, key: string, buffer: Buffer, mime: string): Promise<string> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
   // TẮT bớt "thinking" cho phản hồi NHANH (đọc bảng số không cần suy luận, tránh timeout): Gemini 3 → thinkingLevel=MINIMAL; Gemini 2.5 → thinkingBudget=0. Model 2.0/cũ hơn KHÔNG hỗ trợ thinking nên bỏ qua (gửi vào sẽ lỗi 400).
   const generationConfig: any = { temperature: 0, maxOutputTokens: 4096 };
   if (/gemini-3/.test(model)) generationConfig.thinkingConfig = { thinkingLevel: 'MINIMAL' };
@@ -35,20 +36,23 @@ async function geminiCall(model: string, buffer: Buffer, mime: string): Promise<
     contents: [{ parts: [{ text: GEMINI_PROMPT }, { inline_data: { mime_type: mime || 'image/png', data: buffer.toString('base64') } }] }],
     generationConfig,
   };
-  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(30000) });
+  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
   if (!r.ok) throw new Error('Gemini HTTP ' + r.status + ' (' + model + '): ' + (await r.text().catch(() => '')).slice(0, 200));
   const j: any = await r.json();
   return String(j?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text).filter(Boolean).join('\n') || '');
 }
-// Thử LẦN LƯỢT từng model trong GEMINI_MODELS: model nào ra được số toạ độ thì nhận luôn; model lỗi (503 quá tải/timeout/4xx…) hoặc không ra số thì sang model kế. Hết sạch mới ném lỗi để cascade sang Groq/OpenRouter/OCR.space.
+// Ưu tiên Gemini BẰNG MỌI GIÁ: thử mọi tổ hợp KEY × MODEL (mỗi key×model là 1 quota free riêng). Cái nào ra số thì nhận luôn; lỗi/hết quota/không ra số thì thử tiếp. Vắt kiệt hết mới ném lỗi để rơi sang Groq/OpenRouter/OCR.space.
 async function geminiOcr(buffer: Buffer, mime: string): Promise<{ text: string; model: string }> {
   let lastErr: any = null;
-  for (const model of GEMINI_MODELS) {
-    try {
-      const t = await geminiCall(model, buffer, mime);
-      if ((t.match(/\d{5,}/g) || []).length > 0) return { text: t, model };
-      lastErr = new Error('không ra số'); console.error(`[ocr] Gemini "${model}" không ra số → thử model kế`);
-    } catch (e: any) { lastErr = e; console.error(`[ocr] Gemini "${model}" lỗi (${String(e?.message || e).slice(0, 120)}) → thử model kế`); }
+  for (let ki = 0; ki < GEMINI_KEYS.length; ki++) {
+    const key = GEMINI_KEYS[ki];
+    for (const model of GEMINI_MODELS) {
+      try {
+        const t = await geminiCall(model, key, buffer, mime);
+        if ((t.match(/\d{5,}/g) || []).length > 0) return { text: t, model: `${model}#key${ki + 1}` };
+        lastErr = new Error('không ra số'); console.error(`[ocr] Gemini "${model}" (key${ki + 1}) không ra số → thử tiếp`);
+      } catch (e: any) { lastErr = e; console.error(`[ocr] Gemini "${model}" (key${ki + 1}) lỗi (${String(e?.message || e).slice(0, 120)}) → thử tiếp`); }
+    }
   }
   throw lastErr || new Error('Gemini không đọc được');
 }
@@ -113,7 +117,7 @@ ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, n
   try {
     if (!req.file) return res.status(400).json({ error: 'Thiếu ảnh' });
     // 1) Gemini — ƯU TIÊN CHÍNH (thử lần lượt nhiều model, mỗi model quota riêng). Đọc được ảnh nền hoa văn sổ đỏ; free.
-    if (GEMINI_KEY) {
+    if (GEMINI_KEYS.length) {
       try {
         const g = await geminiOcr(req.file.buffer, req.file.mimetype);
         const nnum = (g.text.match(/\d{5,}/g) || []).length;

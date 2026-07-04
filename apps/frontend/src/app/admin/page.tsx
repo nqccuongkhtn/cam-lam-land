@@ -200,6 +200,7 @@ function Overview() {
   if (!s) return <p className="text-slate-500">Đang tải báo cáo…</p>;
   return (
     <div className="space-y-5">
+      <DemoData />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Stat label="Người dùng" value={s.users.total} sub={`${s.users.gis} biên tập bản đồ · ${s.users.paid} trả phí`} />
         <Stat label="Tin đăng" value={s.listings.total} sub={`${s.listings.active} hiển thị · ${s.listings.boosted} đẩy`} />
@@ -211,6 +212,38 @@ function Overview() {
         <div className="bg-white rounded-2xl border border-slate-200 p-4"><h3 className="font-bold text-[#0A2540] mb-2">Tin theo xã</h3>{s.byWard.map((r: any) => <Row key={r.ward} k={r.ward} v={r.n} />)}</div>
       </div>
       <OcrUsage />
+    </div>
+  );
+}
+
+function DemoData() {
+  const [busy, setBusy] = useState('');
+  const [msg, setMsg] = useState('');
+  async function seed() {
+    if (!confirm('Tạo ~50 tin mẫu + tin nhắn mẫu để test? (dọn dữ liệu mẫu cũ trước, không đụng tin thật)')) return;
+    setBusy('seed'); setMsg('');
+    try { const r = await api<any>('/admin/seed-demo', { method: 'POST', body: JSON.stringify({ count: 50 }) }); setMsg(`✓ Đã tạo ${r.listings} tin + ${r.chat} tin nhắn (3 môi giới mẫu). Mở trang Nhà đất để xem.`); }
+    catch (e: any) { setMsg('Lỗi: ' + e.message); } finally { setBusy(''); }
+  }
+  async function clearAll() {
+    if (!confirm('Xoá TẤT CẢ dữ liệu mẫu (tin + tin nhắn + tài khoản môi giới mẫu)? Tin thật của bạn không bị ảnh hưởng.')) return;
+    setBusy('clear'); setMsg('');
+    try { const r = await api<any>('/admin/clear-demo', { method: 'POST' }); setMsg(`✓ Đã xoá sạch dữ liệu mẫu (${r.removedAgents} môi giới mẫu).`); }
+    catch (e: any) { setMsg('Lỗi: ' + e.message); } finally { setBusy(''); }
+  }
+  return (
+    <div className="bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white rounded-2xl p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="font-bold">🧪 Dữ liệu mẫu để kiểm thử</p>
+          <p className="text-sm text-white/70 mt-0.5">Tạo nhanh ~50 tin (bán / cho thuê, đủ loại hình, có tin VIP) + tin nhắn cộng đồng & tư vấn — bấm là chạy. Xoá sạch khi test xong.</p>
+        </div>
+        <div className="flex gap-2 shrink-0">
+          <button onClick={seed} disabled={!!busy} className="bg-[#C8A14B] hover:bg-[#b8923f] disabled:opacity-60 text-[#0A2540] font-bold px-4 py-2 rounded-xl">{busy === 'seed' ? 'Đang tạo…' : '＋ Tạo 50 tin mẫu'}</button>
+          <button onClick={clearAll} disabled={!!busy} className="bg-white/10 hover:bg-white/20 disabled:opacity-60 border border-white/30 text-white font-bold px-4 py-2 rounded-xl">{busy === 'clear' ? 'Đang xoá…' : 'Xoá dữ liệu mẫu'}</button>
+        </div>
+      </div>
+      {msg && <p className="text-sm mt-2 font-semibold text-[#FFD56A]">{msg}</p>}
     </div>
   );
 }

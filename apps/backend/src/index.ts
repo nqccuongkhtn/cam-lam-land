@@ -30,11 +30,29 @@ import { vapidPublicKey } from './lib/push.ts';
 import { chatRouter } from './routes/chat.ts';
 import { ocrRouter } from './routes/ocr.ts';
 import { notFound, errorHandler } from './middleware/error.ts';
+import { securityHeaders, rateLimit } from './middleware/security.ts';
 
 const app = express();
+app.disable('x-powered-by'); // không lộ "Express"
+app.set('trust proxy', 1);   // Render đứng sau proxy → lấy đúng IP khách cho rate-limit
 app.use(compression());
-app.use(cors());
+// CORS allowlist: chỉ cho phép frontend (onrender.com), localhost dev, và origin cấu hình qua CORS_ORIGINS.
+const CORS_ORIGINS = (process.env.CORS_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);
+app.use(cors({
+  origin(origin, cb) {
+    if (!origin) return cb(null, true); // same-origin, app di động, health-check
+    try {
+      const host = new URL(origin).hostname;
+      if (CORS_ORIGINS.includes(origin) || host === 'localhost' || host === '127.0.0.1' || /\.onrender\.com$/.test(host)) return cb(null, true);
+    } catch { /* origin lạ, bỏ qua */ }
+    return cb(null, false); // ngoài allowlist → trình duyệt chặn
+  },
+  credentials: true,
+}));
+app.use(securityHeaders);
 app.use(express.json({ limit: '5mb' }));
+// Chống lụt yêu cầu toàn cục (rộng rãi, không cản người dùng thật).
+app.use('/api', rateLimit({ windowMs: 60 * 1000, max: 600, key: 'global' }));
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', region: 'Cam Lâm, Khánh Hòa', ts: Date.now() }));
 app.get('/api/config', (_req, res) => {
@@ -42,7 +60,7 @@ app.get('/api/config', (_req, res) => {
   const host = ext.replace(/^https?:\/\//, '');
   res.json({ wsUrl: host ? `wss://${host}/ws` : '', vapidPublic: vapidPublicKey });
 });
-app.use('/api/auth', authRouter);
+app.use('/api/auth', rateLimit({ windowMs: 10 * 60 * 1000, max: 30, key: 'auth', message: 'Quá nhiều lần thử đăng nhập/đăng ký. Vui lòng đợi vài phút rồi thử lại.' }), authRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/layers', layersRouter);
 app.use('/api/parcels', parcelsRouter);
@@ -56,7 +74,7 @@ app.use('/api/projects', projectsRouter);
 app.use('/api/consignments', consignmentsRouter);
 app.use('/api/invest', investRouter);
 app.use('/api/chat', chatRouter);
-app.use('/api/ocr', ocrRouter);
+app.use('/api/ocr', rateLimit({ windowMs: 10 * 60 * 1000, max: 60, key: 'ocr', message: 'Bạn quét ảnh quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), ocrRouter);
 app.use('/api/push', pushRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/flags', flagsRouter);

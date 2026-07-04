@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { Listing, formatVnd, TIER_BADGE, TIER_LABEL, postedLabel } from '@/lib/types';
+import { Listing, priceLabel, TIER_BADGE, TIER_LABEL, postedLabel } from '@/lib/types';
 
 function IPin() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="2.5" /></svg>; }
 
@@ -18,12 +18,13 @@ export default function ListingCard({ l, href }: { l: Listing; href?: string }) 
           onError={(e) => { (e.currentTarget as HTMLImageElement).src = `https://picsum.photos/seed/cl${l.id}/800/600`; }}
           loading="lazy" decoding="async" className="h-full w-full object-cover group-hover:scale-105 transition duration-500" />
         {l.tier && l.tier !== 'normal' && <span className={`absolute top-2 left-2 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded shadow ${TIER_BADGE[l.tier] || 'bg-[#C8A14B]'}`}>{(TIER_LABEL[l.tier] || 'VIP').toUpperCase()}</span>}
+        {l.deal === 'rent' && <span className="absolute top-2 right-2 bg-emerald-600 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded shadow">CHO THUÊ</span>}
         {nImg > 1 && <span className="absolute bottom-2 right-2 bg-black/55 backdrop-blur text-white text-[11px] font-medium px-2 py-0.5 rounded-md">📷 {nImg}</span>}
       </div>
       <div className="p-3 flex flex-col flex-1">
         <h3 className={`text-[15px] font-medium line-clamp-2 leading-snug min-h-[2.6rem] group-hover:text-red-700 ${l.tier === 'diamond' ? 'text-red-600 uppercase' : 'text-slate-800'}`}>{l.title}</h3>
         <div className="mt-1.5 flex items-baseline gap-1.5 flex-wrap">
-          <span className="text-red-600 font-bold text-lg leading-none">{formatVnd(l.price)}</span>
+          <span className="text-red-600 font-bold text-lg leading-none">{priceLabel(l.price, l.deal)}</span>
           {l.area != null && <span className="text-slate-500 text-sm">· {l.area} m²</span>}
         </div>
         <div className="mt-1.5 flex items-center gap-1 text-[13px] text-slate-500 truncate"><IPin /> <span className="truncate">{l.ward ?? 'Cam Lâm'}, Khánh Hòa</span></div>

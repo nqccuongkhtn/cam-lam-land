@@ -15,7 +15,7 @@ const SELECT = `
          COALESCE(listings.contact_name, u.full_name, 'Cam Lâm Land') AS "contactName",
          COALESCE(listings.contact_phone, u.phone, '0988888888') AS "contactPhone",
          u.avatar AS "posterAvatar",
-         listings.status, listings.boosted, listings.tier, listings.bumped_at AS "bumpedAt", listings.images, listings.created_by AS "createdBy",
+         listings.status, listings.deal, listings.boosted, listings.tier, listings.bumped_at AS "bumpedAt", listings.images, listings.created_by AS "createdBy",
          ST_X(listings.geom) AS lng, ST_Y(listings.geom) AS lat, listings.created_at AS "createdAt"
   FROM listings LEFT JOIN users u ON u.id = listings.created_by`;
 
@@ -40,10 +40,12 @@ listingsRouter.get('/', async (req, res, next) => {
     const ckey = 'listings:list:' + JSON.stringify(req.query);
     const chit = cached<any>(ckey);
     if (chit) { res.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=60'); return res.json(chit); }
-    const { minPrice, maxPrice, propertyType, ward, q, bbox } = req.query as Record<string, string>;
+    const { minPrice, maxPrice, propertyType, ward, q, bbox, deal } = req.query as Record<string, string>;
     const where: string[] = [`listings.status NOT IN ('hidden','pending')`, `(listings.tier <> 'normal' OR COALESCE(listings.bumped_at, listings.created_at) > now() - interval '7 days')`];
     const params: any[] = [];
     const p = (v: any) => { params.push(v); return `$${params.length}`; };
+    // Mặc định chỉ hiện tin BÁN; ?deal=rent để xem tin cho thuê; ?deal=all để xem tất cả.
+    if (deal !== 'all') where.push(`listings.deal = ${p(deal === 'rent' ? 'rent' : 'sale')}`);
     if (minPrice)     where.push(`price >= ${p(Number(minPrice))}`);
     if (maxPrice)     where.push(`price <= ${p(Number(maxPrice))}`);
     if (propertyType) where.push(`property_type = ${p(propertyType)}`);
@@ -74,7 +76,7 @@ listingsRouter.get('/areas', async (_req, res, next) => {
     if (ahit) { res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300'); return res.json(ahit); }
     const rows = await query(
       `SELECT COALESCE(NULLIF(TRIM(ward), ''), 'Khác') AS ward, COUNT(*)::int AS count
-       FROM listings WHERE status NOT IN ('hidden','pending')
+       FROM listings WHERE status NOT IN ('hidden','pending') AND deal = 'sale'
        GROUP BY 1 ORDER BY count DESC`);
     const payload = { areas: rows };
     cachePut('listings:areas', payload, 60000);
@@ -100,7 +102,7 @@ listingsRouter.get('/gia-khu-vuc', async (req, res, next) => {
               ROUND(MIN(price / NULLIF(area, 0)))::bigint AS "minPerM2",
               ROUND(MAX(price / NULLIF(area, 0)))::bigint AS "maxPerM2"
          FROM listings
-        WHERE status NOT IN ('hidden','pending') AND area >= 10 AND price >= 1000000${typeCond}
+        WHERE status NOT IN ('hidden','pending') AND deal = 'sale' AND area >= 10 AND price >= 1000000${typeCond}
         GROUP BY 1 HAVING COUNT(*) >= 1 ORDER BY count DESC`, params);
     const payload = { type: type || null, areas: rows };
     cachePut(ckey, payload, 120000);
@@ -269,12 +271,12 @@ listingsRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => 
     const [row] = await query(
       `INSERT INTO listings
          (title,description,price,area,property_type,address,ward,bedrooms,bathrooms,direction,legal,frontage,
-          contact_name,contact_phone,images,status,geom,created_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,'active', ST_SetSRID(ST_MakePoint($16,$17),4326), $18)
+          contact_name,contact_phone,images,status,geom,created_by,deal)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,'active', ST_SetSRID(ST_MakePoint($16,$17),4326), $18, $19)
        RETURNING id`,
       [b.title, b.description ?? null, b.price, b.area ?? null, b.propertyType ?? 'land', b.address ?? null,
        b.ward ?? null, b.bedrooms ?? null, b.bathrooms ?? null, b.direction ?? null, b.legal ?? null, b.frontage ?? null,
-       b.contactName ?? null, b.contactPhone ?? null, b.images ?? [], b.lng, b.lat, req.user!.id]);
+       b.contactName ?? null, b.contactPhone ?? null, b.images ?? [], b.lng, b.lat, req.user!.id, b.deal === 'rent' ? 'rent' : 'sale']);
     await linkImages(row.id, b.images);
     cacheDrop('listings:');
     if (svcOn && req.user!.role !== 'admin') { if (pkgActive) await query('UPDATE users SET post_used = post_used + 1 WHERE id=$1', [req.user!.id]); else bumpUsage(req.user!.id, 'posts').catch(() => {}); }
@@ -314,12 +316,13 @@ listingsRouter.put('/:id', authRequired, async (req: AuthedRequest, res, next) =
          bedrooms=COALESCE($9,bedrooms), bathrooms=COALESCE($10,bathrooms), direction=COALESCE($11,direction),
          legal=COALESCE($12,legal), frontage=COALESCE($13,frontage), contact_name=COALESCE($14,contact_name),
          contact_phone=COALESCE($15,contact_phone), status=COALESCE($16,status), images=COALESCE($17,images),
-         geom=CASE WHEN $18::float8 IS NULL THEN geom ELSE ST_SetSRID(ST_MakePoint($18,$19),4326) END
+         geom=CASE WHEN $18::float8 IS NULL THEN geom ELSE ST_SetSRID(ST_MakePoint($18,$19),4326) END,
+         deal=COALESCE($20,deal)
        WHERE id=$1 RETURNING id`,
       [id, b.title ?? null, b.description ?? null, b.price ?? null, b.area ?? null, b.propertyType ?? null,
        b.address ?? null, b.ward ?? null, b.bedrooms ?? null, b.bathrooms ?? null, b.direction ?? null,
        b.legal ?? null, b.frontage ?? null, b.contactName ?? null, b.contactPhone ?? null, b.status ?? null,
-       b.images ?? null, b.lng ?? null, b.lat ?? null]);
+       b.images ?? null, b.lng ?? null, b.lat ?? null, b.deal ?? null]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy tin' });
     if (b.images) await linkImages(id, b.images);
     const [updated] = await query(`${SELECT} WHERE listings.id=$1`, [id]);

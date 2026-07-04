@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Listing, formatVnd, TIER_BADGE, TIER_LABEL, postedLabel } from '@/lib/types';
+import { Listing, priceLabel, TIER_BADGE, TIER_LABEL, postedLabel } from '@/lib/types';
 import { inCompare, toggleCompare } from '@/lib/compare';
 
 function IPin() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="2.5" /></svg>; }
@@ -27,14 +27,15 @@ export default function ListingRow({ l, href }: { l: Listing; href?: string }) {
           onError={(e) => { (e.currentTarget as HTMLImageElement).src = `https://picsum.photos/seed/cl${l.id}/800/600`; }}
           loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
         {l.tier && l.tier !== 'normal' && <span className={`absolute top-2 left-2 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded shadow ${TIER_BADGE[l.tier] || 'bg-[#C8A14B]'}`}>{(TIER_LABEL[l.tier] || 'VIP').toUpperCase()}</span>}
+        {l.deal === 'rent' && <span className="absolute top-2 right-2 bg-emerald-600 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded shadow">CHO THUÊ</span>}
         {nImg > 1 && <span className="absolute bottom-2 left-2 bg-black/55 backdrop-blur text-white text-[11px] font-medium px-1.5 py-0.5 rounded-md">📷 {nImg}</span>}
       </div>
       <div className="flex-1 min-w-0 py-2.5 pr-3 flex flex-col">
         <h3 className={`text-[15px] font-semibold line-clamp-2 leading-snug group-hover:text-red-700 ${l.tier === 'diamond' ? 'text-red-600 uppercase' : 'text-slate-800'}`}>{l.title}</h3>
         <div className="flex items-center flex-wrap gap-x-2 mt-1.5 text-sm">
-          <span className="text-red-600 font-bold">{formatVnd(l.price)}</span>
+          <span className="text-red-600 font-bold">{priceLabel(l.price, l.deal)}</span>
           {l.area != null && <span className="text-slate-700">· {l.area} m²</span>}
-          {perM2 != null && <span className="text-slate-400 text-[13px]">· {perM2.toFixed(1).replace('.', ',')} tr/m²</span>}
+          {perM2 != null && l.deal !== 'rent' && <span className="text-slate-400 text-[13px]">· {perM2.toFixed(1).replace('.', ',')} tr/m²</span>}
           {l.bedrooms != null && <span className="text-slate-500 text-[13px]">· 🛏 {l.bedrooms}</span>}
           {l.bathrooms != null && <span className="text-slate-500 text-[13px]">· 🛁 {l.bathrooms}</span>}
         </div>

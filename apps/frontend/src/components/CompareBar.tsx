@@ -2,7 +2,7 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import Link from 'next/link';
 import { getCompare, removeCompare, clearCompare } from '@/lib/compare';
-import { formatVnd, PROPERTY_LABELS, type Listing, type PropertyType } from '@/lib/types';
+import { priceLabel, PROPERTY_LABELS, type Listing, type PropertyType } from '@/lib/types';
 
 export default function CompareBar() {
   const [items, setItems] = useState<Listing[]>([]);
@@ -17,9 +17,10 @@ export default function CompareBar() {
   if (items.length === 0) return null;
   const perM2 = (l: Listing) => (l.area && l.area > 0 ? (l.price / l.area / 1e6).toFixed(1).replace('.', ',') + ' tr/m²' : '—');
   const rows: [string, (l: Listing) => ReactNode][] = [
-    ['Giá', (l) => <b className="text-red-600">{formatVnd(l.price)}</b>],
+    ['Hình thức', (l) => (l.deal === 'rent' ? 'Cho thuê' : 'Cần bán')],
+    ['Giá', (l) => <b className="text-red-600">{priceLabel(l.price, l.deal)}</b>],
     ['Diện tích', (l) => (l.area != null ? l.area + ' m²' : '—')],
-    ['Giá/m²', (l) => perM2(l)],
+    ['Giá/m²', (l) => (l.deal === 'rent' ? '—' : perM2(l))],
     ['Loại', (l) => PROPERTY_LABELS[l.propertyType as PropertyType] || l.propertyType || '—'],
     ['Khu vực', (l) => l.ward || '—'],
     ['Địa chỉ', (l) => l.address || '—'],

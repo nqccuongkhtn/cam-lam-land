@@ -76,9 +76,9 @@ authRouter.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body ?? {};
     const [user] = await query('SELECT * FROM users WHERE email=$1', [email]);
-    if (!user) return res.status(401).json({ error: 'Email chưa được đăng ký' });
-    if (!(await verifyPassword(password ?? '', user.password_hash)))
-      return res.status(401).json({ error: 'Mật khẩu không đúng' });
+    // Thông báo GỘP để không lộ email nào đã đăng ký (chống dò tài khoản).
+    if (!user || !(await verifyPassword(password ?? '', user.password_hash)))
+      return res.status(401).json({ error: 'Email hoặc mật khẩu không đúng' });
     if (user.status === 'suspended') return res.status(403).json({ error: 'Tài khoản đã bị khoá' });
     const token = signToken({ id: user.id, email: user.email, role: user.role });
     res.json({ token, user: profile(user) });

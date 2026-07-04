@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useFlags } from '@/lib/flags';
-import { Listing, PROPERTY_LABELS, formatVnd, TIER_LABEL, TIER_BADGE } from '@/lib/types';
+import { Listing, PROPERTY_LABELS, priceLabel, TIER_LABEL, TIER_BADGE } from '@/lib/types';
 
 export default function SalesDashboard() {
   const router = useRouter();
@@ -81,7 +81,7 @@ export default function SalesDashboard() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${badge(l.status)}`}>{l.status}</span>{l.tier && l.tier !== 'normal' && <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full text-white ${TIER_BADGE[l.tier] || 'bg-[#C8A14B]'}`}>{TIER_LABEL[l.tier]}</span>}{exp && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700" title="Tin thường chỉ hiển thị 7 ngày — đẩy tin để hiện lại">⏳ Hết hạn hiển thị</span>}</div>
                   <p className="font-bold text-[#0A2540] truncate mt-0.5">{l.title}</p>
-                  <p className="text-sm text-slate-500">{formatVnd(l.price)} · {PROPERTY_LABELS[l.propertyType]} · {l.ward || 'Cam Lâm'}</p>
+                  <p className="text-sm text-slate-500">{l.deal === 'rent' && <span className="text-emerald-700 font-semibold">Cho thuê · </span>}{priceLabel(l.price, l.deal)} · {PROPERTY_LABELS[l.propertyType]} · {l.ward || 'Cam Lâm'}</p>
                   <Link href={`/sales/leads/${l.id}`} className="inline-block mt-1 text-xs font-bold text-[#0A2540] bg-[#C8A14B]/15 hover:bg-[#C8A14B]/25 rounded-full px-2.5 py-1">👁 {l.leadViews || 0} lượt xem · {l.leadCount || 0} khách quan tâm →</Link>
                 </div>
                 <div className="flex flex-col gap-1.5 shrink-0 w-[150px]">

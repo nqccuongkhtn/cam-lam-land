@@ -6,17 +6,18 @@ import { useRouter, useParams } from 'next/navigation';
 import { api, uploadImages } from '@/lib/api';
 import { resizeImage } from '@/lib/img';
 import { useAuth } from '@/lib/auth';
-import { PROPERTY_LABELS, WARDS, DIRECTIONS, LEGAL_OPTIONS, formatVnd, type PropertyType } from '@/lib/types';
+import { PROPERTY_LABELS, WARDS, DIRECTIONS, LEGAL_OPTIONS, formatVnd, priceLabel, SALE_PROPERTY_TYPES, RENT_PROPERTY_TYPES, type PropertyType, type DealType } from '@/lib/types';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
-const TYPES: PropertyType[] = ['land', 'house', 'apartment', 'villa', 'commercial', 'farm'];
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
 
 export default function EditListing() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
   const { user, loading } = useAuth();
-  const [f, setF] = useState({ title: '', propertyType: 'land' as PropertyType, priceVal: '', priceUnit: 'ty', area: '', bedrooms: '', bathrooms: '', direction: '', legal: '', frontage: '', ward: '', address: '', description: '', contactName: '' });
+  const [f, setF] = useState({ title: '', deal: 'sale' as DealType, propertyType: 'land' as PropertyType, priceVal: '', priceUnit: 'ty', area: '', bedrooms: '', bathrooms: '', direction: '', legal: '', frontage: '', ward: '', address: '', description: '', contactName: '' });
+  const TYPES = f.deal === 'rent' ? RENT_PROPERTY_TYPES : SALE_PROPERTY_TYPES;
+  const setDeal = (deal: DealType) => setF((s) => ({ ...s, deal, propertyType: (deal === 'rent' ? RENT_PROPERTY_TYPES : SALE_PROPERTY_TYPES).includes(s.propertyType) ? s.propertyType : (deal === 'rent' ? RENT_PROPERTY_TYPES : SALE_PROPERTY_TYPES)[0] }));
   const [images, setImages] = useState<string[]>([]);
   const [coord, setCoord] = useState<{ lng: number; lat: number } | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -36,7 +37,7 @@ export default function EditListing() {
       const priceUnit = price >= 1e9 ? 'ty' : 'trieu';
       const priceVal = price >= 1e9 ? String(+(price / 1e9).toFixed(3)) : String(Math.round(price / 1e6));
       setF({
-        title: l.title || '', propertyType: l.propertyType || 'land', priceVal, priceUnit,
+        title: l.title || '', deal: l.deal === 'rent' ? 'rent' : 'sale', propertyType: l.propertyType || 'land', priceVal, priceUnit,
         area: l.area != null ? String(l.area) : '', bedrooms: l.bedrooms != null ? String(l.bedrooms) : '',
         bathrooms: l.bathrooms != null ? String(l.bathrooms) : '', direction: l.direction || '', legal: l.legal || '',
         frontage: l.frontage != null ? String(l.frontage) : '', ward: l.ward || '', address: l.address || '',
@@ -64,7 +65,7 @@ export default function EditListing() {
     setBusy(true);
     try {
       await api(`/listings/${id}`, { method: 'PUT', body: JSON.stringify({
-        title: f.title, propertyType: f.propertyType, price, area: f.area ? Number(f.area) : null,
+        title: f.title, deal: f.deal, propertyType: f.propertyType, price, area: f.area ? Number(f.area) : null,
         bedrooms: f.bedrooms ? Number(f.bedrooms) : null, bathrooms: f.bathrooms ? Number(f.bathrooms) : null,
         direction: f.direction || null, legal: f.legal || null, frontage: f.frontage ? Number(f.frontage) : null,
         ward: f.ward || null, address: f.address || null, description: f.description || null,
@@ -81,8 +82,8 @@ export default function EditListing() {
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:border-[#0A2540] outline-none';
   const lbl = 'block text-sm font-semibold text-slate-700 mb-1';
   const priceTotal = f.priceVal ? Number(f.priceVal) * (f.priceUnit === 'ty' ? 1e9 : 1e6) : 0;
-  const priceVnd = priceTotal > 0 ? formatVnd(priceTotal) : '';
-  const perM2 = priceTotal > 0 && Number(f.area) > 0 ? formatVnd(priceTotal / Number(f.area)) : '';
+  const priceVnd = priceTotal > 0 ? priceLabel(priceTotal, f.deal) : '';
+  const perM2 = priceTotal > 0 && Number(f.area) > 0 && f.deal !== 'rent' ? formatVnd(priceTotal / Number(f.area)) : '';
 
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-8">
@@ -94,6 +95,13 @@ export default function EditListing() {
 
         <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
           <h2 className="font-bold text-[#0A2540]">Thông tin chính</h2>
+          <div>
+            <label className={lbl}>Nhu cầu *</label>
+            <div className="inline-flex rounded-xl border border-slate-300 overflow-hidden">
+              <button type="button" onClick={() => setDeal('sale')} className={`px-5 py-2 text-sm font-bold transition ${f.deal === 'sale' ? 'bg-red-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>Cần bán</button>
+              <button type="button" onClick={() => setDeal('rent')} className={`px-5 py-2 text-sm font-bold transition ${f.deal === 'rent' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>Cho thuê</button>
+            </div>
+          </div>
           <div><label className={lbl}>Tiêu đề *</label><input className={inp} value={f.title} onChange={(e) => set('title', e.target.value)} /></div>
           <div className="grid sm:grid-cols-2 gap-4">
             <div><label className={lbl}>Loại hình *</label>
@@ -101,9 +109,9 @@ export default function EditListing() {
             <div><label className={lbl}>Diện tích (m²)</label><input className={inp} type="number" min="0" value={f.area} onChange={(e) => set('area', e.target.value)} placeholder="250" /></div>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
-            <div><label className={lbl}>Giá *</label>
+            <div><label className={lbl}>{f.deal === 'rent' ? 'Giá thuê / tháng *' : 'Giá *'}</label>
               <div className="flex gap-2">
-                <input className={inp} type="number" min="0" step="0.01" value={f.priceVal} onChange={(e) => set('priceVal', e.target.value.replace('-', ''))} placeholder="2.8" />
+                <input className={inp} type="number" min="0" step="0.01" value={f.priceVal} onChange={(e) => set('priceVal', e.target.value.replace('-', ''))} placeholder={f.deal === 'rent' ? '5' : '2.8'} />
                 <select className="border border-slate-300 rounded-lg px-2 text-sm" value={f.priceUnit} onChange={(e) => set('priceUnit', e.target.value)}><option value="ty">Tỷ</option><option value="trieu">Triệu</option></select>
               </div>
               {priceVnd && <p className="text-xs text-[#C8A14B] font-semibold mt-1">= {priceVnd}{perM2 && <span className="text-slate-500 font-medium"> · {perM2}/m²</span>}</p>}

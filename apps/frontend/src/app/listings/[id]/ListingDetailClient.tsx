@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { api } from '@/lib/api';
-import { Listing, PROPERTY_LABELS, formatVnd, TIER_LABEL, postedLabel } from '@/lib/types';
+import { Listing, PROPERTY_LABELS, formatVnd, priceLabel, DEAL_LABELS, TIER_LABEL, postedLabel } from '@/lib/types';
 import { useAuth } from '@/lib/auth';
 import ListingCard from '@/components/ListingCard';
 
@@ -51,9 +51,10 @@ export default function ListingDetail() {
   const imgs = l.images?.length ? l.images : [`https://picsum.photos/seed/cl${l.id}/1000/700`];
   const pricePerM2 = l.area && l.area > 0 ? l.price / l.area : null;
   const specs: [string, any][] = [
-    ['Mức giá', formatVnd(l.price)],
+    ['Hình thức', l.deal === 'rent' ? 'Cho thuê' : 'Cần bán'],
+    ['Mức giá', priceLabel(l.price, l.deal)],
     ['Diện tích', l.area ? `${l.area} m²` : null],
-    ['Giá/m²', pricePerM2 ? formatVnd(pricePerM2) : null],
+    ['Giá/m²', l.deal !== 'rent' && pricePerM2 ? formatVnd(pricePerM2) : null],
     ['Số phòng ngủ', l.bedrooms ? `${l.bedrooms} phòng` : null],
     ['Số phòng tắm, vệ sinh', l.bathrooms ? `${l.bathrooms} phòng` : null],
     ['Hướng nhà', l.direction],
@@ -113,11 +114,15 @@ export default function ListingDetail() {
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 p-5">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className={`text-[11px] font-extrabold px-2 py-0.5 rounded-full ${l.deal === 'rent' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>{l.deal === 'rent' ? 'CHO THUÊ' : 'CẦN BÁN'}</span>
+                {l.propertyType && <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">{PROPERTY_LABELS[l.propertyType]}</span>}
+              </div>
               <h1 className="text-xl md:text-2xl font-extrabold text-[#0A2540] leading-snug">{l.title}</h1>
               <p className="text-slate-500 mt-1.5 text-sm flex items-start gap-1.5"><span className="text-red-500 mt-0.5 shrink-0"><Ic d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" /></span><span>{[l.address, l.ward, 'Cam Lâm, Khánh Hòa'].filter(Boolean).join(', ')}</span></p>
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mt-4">
-                <span className="text-2xl md:text-3xl font-extrabold text-red-600 leading-none">{formatVnd(l.price)}</span>
-                {pricePerM2 && <span className="text-sm font-semibold text-slate-500">~ {formatVnd(pricePerM2)}/m²</span>}
+                <span className="text-2xl md:text-3xl font-extrabold text-red-600 leading-none">{priceLabel(l.price, l.deal)}</span>
+                {l.deal !== 'rent' && pricePerM2 && <span className="text-sm font-semibold text-slate-500">~ {formatVnd(pricePerM2)}/m²</span>}
               </div>
               <div className="flex flex-wrap gap-y-3 mt-4 border-t border-slate-100 pt-4">
                 {heroStats.filter(([, , v]) => v != null && v !== '').map(([d, label, val], i) => (

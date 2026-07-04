@@ -7,16 +7,17 @@ import { api, uploadImages } from '@/lib/api';
 import { resizeImage } from '@/lib/img';
 import { useAuth } from '@/lib/auth';
 import { useFlags } from '@/lib/flags';
-import { PROPERTY_LABELS, WARDS, DIRECTIONS, LEGAL_OPTIONS, formatVnd, type PropertyType } from '@/lib/types';
+import { PROPERTY_LABELS, WARDS, DIRECTIONS, LEGAL_OPTIONS, formatVnd, priceLabel, SALE_PROPERTY_TYPES, RENT_PROPERTY_TYPES, type PropertyType, type DealType } from '@/lib/types';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
-const TYPES: PropertyType[] = ['land', 'house', 'apartment', 'villa', 'commercial', 'farm'];
 
 export default function PostListing() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const { flags } = useFlags();
-  const [f, setF] = useState({ title: '', propertyType: 'land' as PropertyType, priceVal: '', priceUnit: 'ty', area: '', bedrooms: '', bathrooms: '', direction: '', legal: '', frontage: '', ward: '', address: '', description: '', contactName: '' });
+  const [f, setF] = useState({ title: '', deal: 'sale' as DealType, propertyType: 'land' as PropertyType, priceVal: '', priceUnit: 'ty', area: '', bedrooms: '', bathrooms: '', direction: '', legal: '', frontage: '', ward: '', address: '', description: '', contactName: '' });
+  const TYPES = f.deal === 'rent' ? RENT_PROPERTY_TYPES : SALE_PROPERTY_TYPES;
+  const setDeal = (deal: DealType) => setF((s) => ({ ...s, deal, propertyType: (deal === 'rent' ? RENT_PROPERTY_TYPES : SALE_PROPERTY_TYPES)[0], priceUnit: deal === 'rent' ? 'trieu' : 'ty' }));
   const [images, setImages] = useState<string[]>([]);
   const [coord, setCoord] = useState<{ lng: number; lat: number } | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -47,7 +48,7 @@ export default function PostListing() {
     setBusy(true);
     try {
       await api('/listings', { method: 'POST', body: JSON.stringify({
-        title: f.title, propertyType: f.propertyType, price, area: f.area ? Number(f.area) : null,
+        title: f.title, deal: f.deal, propertyType: f.propertyType, price, area: f.area ? Number(f.area) : null,
         bedrooms: f.bedrooms ? Number(f.bedrooms) : null, bathrooms: f.bathrooms ? Number(f.bathrooms) : null,
         direction: f.direction || null, legal: f.legal || null, frontage: f.frontage ? Number(f.frontage) : null,
         ward: f.ward || null, address: f.address || null, description: f.description || null,
@@ -73,8 +74,8 @@ export default function PostListing() {
     } catch { alert('Lỗi kết nối, thử lại.'); } finally { setAiBusy(false); }
   }
   const priceTotal = f.priceVal ? Number(f.priceVal) * (f.priceUnit === 'ty' ? 1e9 : 1e6) : 0;
-  const priceVnd = priceTotal > 0 ? formatVnd(priceTotal) : '';
-  const perM2 = priceTotal > 0 && Number(f.area) > 0 ? formatVnd(priceTotal / Number(f.area)) : '';
+  const priceVnd = priceTotal > 0 ? priceLabel(priceTotal, f.deal) : '';
+  const perM2 = priceTotal > 0 && Number(f.area) > 0 && f.deal !== 'rent' ? formatVnd(priceTotal / Number(f.area)) : '';
 
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-8">
@@ -98,16 +99,23 @@ export default function PostListing() {
 
         <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
           <h2 className="font-bold text-[#0A2540]">Thông tin chính</h2>
-          <div><label className={lbl}>Tiêu đề *</label><input className={inp} value={f.title} onChange={(e) => set('title', e.target.value)} placeholder="VD: Đất nền ven biển Bãi Dài, sổ đỏ" /></div>
+          <div>
+            <label className={lbl}>Nhu cầu *</label>
+            <div className="inline-flex rounded-xl border border-slate-300 overflow-hidden">
+              <button type="button" onClick={() => setDeal('sale')} className={`px-5 py-2 text-sm font-bold transition ${f.deal === 'sale' ? 'bg-red-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>Cần bán</button>
+              <button type="button" onClick={() => setDeal('rent')} className={`px-5 py-2 text-sm font-bold transition ${f.deal === 'rent' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>Cho thuê</button>
+            </div>
+          </div>
+          <div><label className={lbl}>Tiêu đề *</label><input className={inp} value={f.title} onChange={(e) => set('title', e.target.value)} placeholder={f.deal === 'rent' ? 'VD: Cho thuê nhà nguyên căn Cam Đức, 3 phòng ngủ' : 'VD: Đất nền ven biển Bãi Dài, sổ đỏ'} /></div>
           <div className="grid sm:grid-cols-2 gap-4">
             <div><label className={lbl}>Loại hình *</label>
               <select className={inp} value={f.propertyType} onChange={(e) => set('propertyType', e.target.value)}>{TYPES.map((t) => <option key={t} value={t}>{PROPERTY_LABELS[t]}</option>)}</select></div>
             <div><label className={lbl}>Diện tích (m²)</label><input className={inp} type="number" min="0" value={f.area} onChange={(e) => set('area', e.target.value)} placeholder="250" /></div>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
-            <div><label className={lbl}>Giá *</label>
+            <div><label className={lbl}>{f.deal === 'rent' ? 'Giá thuê / tháng *' : 'Giá *'}</label>
               <div className="flex gap-2">
-                <input className={inp} type="number" min="0" step="0.01" value={f.priceVal} onChange={(e) => set('priceVal', e.target.value.replace('-', ''))} placeholder="2.8" />
+                <input className={inp} type="number" min="0" step="0.01" value={f.priceVal} onChange={(e) => set('priceVal', e.target.value.replace('-', ''))} placeholder={f.deal === 'rent' ? '5' : '2.8'} />
                 <select className="border border-slate-300 rounded-lg px-2 text-sm" value={f.priceUnit} onChange={(e) => set('priceUnit', e.target.value)}><option value="ty">Tỷ</option><option value="trieu">Triệu</option></select>
               </div>
               {priceVnd && <p className="text-xs text-[#C8A14B] font-semibold mt-1">= {priceVnd}{perM2 && <span className="text-slate-500 font-medium"> · {perM2}/m²</span>}</p>}

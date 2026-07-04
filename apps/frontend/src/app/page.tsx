@@ -123,7 +123,7 @@ export default function Home() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [marketNews, setMarketNews] = useState<{ title: string; url: string; img?: string; date?: string; source?: string }[]>([]);
   const [marketLoading, setMarketLoading] = useState(true);
-  const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Tin nổi bật');
+  const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Tin nổi bật'); const [heroDeal, setHeroDeal] = useState<'sale' | 'rent'>('sale');
   const searchHint = useTypingHint(SEARCH_HINTS);
   useEffect(() => { api<{ listings: Listing[] }>('/listings?limit=20').then((d) => setListings(d.listings || [])).catch(() => {}); }, []);
   const [areaCounts, setAreaCounts] = useState<Record<string, number>>({});
@@ -140,6 +140,7 @@ export default function Home() {
   function search() {
     const p = new URLSearchParams();
     if (type) p.set('propertyType', type); if (max) p.set('maxPrice', String(Number(max) * 1e9)); if (q) p.set('q', q);
+    if (heroDeal === 'rent') p.set('deal', 'rent');
     router.push(`/listings?${p.toString()}`);
   }
   const featured = listings.length > 0 ? listings : STATIC;
@@ -160,8 +161,14 @@ export default function Home() {
           <h1 className="text-4xl md:text-6xl font-extrabold mt-3 max-w-3xl leading-[1.1] drop-shadow-[0_3px_18px_rgba(0,0,0,0.55)]">Tìm ngôi nhà mơ ước <span className="text-[#FFD56A]">của bạn</span></h1>
           <p className="mt-4 text-slate-100 text-lg max-w-2xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">Khám phá hàng ngàn bất động sản cao cấp và tra cứu quy hoạch chính xác trên toàn khu vực.</p>
 
+          {/* Bán / Cho thuê */}
+          <div className="mt-7 inline-flex bg-white/15 backdrop-blur rounded-full p-1 border border-white/25">
+            <button onClick={() => setHeroDeal('sale')} className={`px-5 py-1.5 rounded-full text-sm font-bold transition ${heroDeal === 'sale' ? 'bg-white text-[#0A2540]' : 'text-white/90 hover:text-white'}`}>Nhà đất bán</button>
+            <button onClick={() => setHeroDeal('rent')} className={`px-5 py-1.5 rounded-full text-sm font-bold transition ${heroDeal === 'rent' ? 'bg-white text-[#0A2540]' : 'text-white/90 hover:text-white'}`}>Cho thuê</button>
+          </div>
+
           {/* Search card */}
-          <div className="mt-9 bg-white rounded-2xl shadow-2xl p-3 max-w-5xl grid md:grid-cols-[1.3fr_1fr_1fr_auto] gap-2">
+          <div className="mt-3 bg-white rounded-2xl shadow-2xl p-3 max-w-5xl grid md:grid-cols-[1.3fr_1fr_1fr_auto] gap-2">
             <label className="flex items-center gap-2 px-3 rounded-xl border border-slate-200 focus-within:border-[#0A2540]">
               <Ic d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" />
               <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder={searchHint || 'Khu vực, dự án…'} className="py-3 w-full outline-none text-slate-800 text-sm" />
@@ -249,7 +256,7 @@ export default function Home() {
           <div className="flex items-center gap-3 text-sm font-semibold text-[#0A2540]">
             <Link href="/listings" className="hover:text-red-600">Tin bán mới nhất</Link>
             <span className="text-slate-300">|</span>
-            <Link href="/listings" className="hover:text-red-600">Tin cho thuê mới nhất</Link>
+            <Link href="/listings?deal=rent" className="hover:text-red-600">Tin cho thuê mới nhất</Link>
           </div>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">

@@ -4,15 +4,16 @@ import dynamic from 'next/dynamic';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import Link from 'next/link';
-import { Listing, PropertyType, PROPERTY_LABELS, formatVnd } from '@/lib/types';
+import { Listing, PropertyType, PROPERTY_LABELS, priceLabel, SALE_PROPERTY_TYPES, RENT_PROPERTY_TYPES, type DealType } from '@/lib/types';
 import ListingRow from '@/components/ListingRow';
 import SiteFooter from '@/components/SiteFooter';
 import type { BaseMap, ImageOverlay } from '@/components/MapView';
 import { wgs84ToVn2000 } from '@/lib/vn2000';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false, loading: () => <div className="h-full w-full grid place-items-center bg-slate-100 text-slate-400 text-sm animate-pulse">Đang tải bản đồ…</div> });
-const TYPES: (PropertyType | '')[] = ['', 'land', 'house', 'apartment', 'villa', 'commercial', 'farm'];
-const PRICE_RANGES: [string, string, string][] = [['Tất cả mức giá', '', ''], ['Dưới 1 tỷ', '', '1'], ['1 - 3 tỷ', '1', '3'], ['3 - 5 tỷ', '3', '5'], ['5 - 10 tỷ', '5', '10'], ['10 - 20 tỷ', '10', '20'], ['Trên 20 tỷ', '20', '']];
+// Khoảng giá theo tỷ (bán) — cho thuê dùng phần lẻ của tỷ để load() giữ nguyên hệ số ×1e9 (3 triệu = 0.003 tỷ).
+const SALE_PRICE_RANGES: [string, string, string][] = [['Tất cả mức giá', '', ''], ['Dưới 1 tỷ', '', '1'], ['1 - 3 tỷ', '1', '3'], ['3 - 5 tỷ', '3', '5'], ['5 - 10 tỷ', '5', '10'], ['10 - 20 tỷ', '10', '20'], ['Trên 20 tỷ', '20', '']];
+const RENT_PRICE_RANGES: [string, string, string][] = [['Tất cả mức giá', '', ''], ['Dưới 3 triệu', '', '0.003'], ['3 - 5 triệu', '0.003', '0.005'], ['5 - 10 triệu', '0.005', '0.01'], ['10 - 20 triệu', '0.01', '0.02'], ['20 - 50 triệu', '0.02', '0.05'], ['Trên 50 triệu', '0.05', '']];
 const AREA_RANGES: [string, number, number][] = [['Tất cả diện tích', 0, 0], ['Dưới 50 m²', 0, 50], ['50 - 80 m²', 50, 80], ['80 - 100 m²', 80, 100], ['100 - 150 m²', 100, 150], ['150 - 300 m²', 150, 300], ['Trên 300 m²', 300, 0]];
 const BASE_THUMBS: [BaseMap, string, string][] = [['street', 'Mặc định', 'm'], ['satellite', 'Vệ tinh', 's'], ['terrain', 'Địa hình', 'p']];
 const lyrOf = (b: BaseMap) => (b === 'satellite' ? 's' : b === 'terrain' ? 'p' : 'm');
@@ -43,21 +44,26 @@ export default function ListingsPage() {
   const [sort, setSort] = useState('default');
   const { user } = useAuth();
   const [mine, setMine] = useState(false);
+  const [deal, setDeal] = useState<DealType>('sale');
+  const TYPES = ['', ...(deal === 'rent' ? RENT_PROPERTY_TYPES : SALE_PROPERTY_TYPES)] as (PropertyType | '')[];
+  const PRICE_RANGES = deal === 'rent' ? RENT_PRICE_RANGES : SALE_PRICE_RANGES;
 
-  function load(over?: { type?: string; min?: string; max?: string; q?: string; mine?: boolean }) {
+  function load(over?: { type?: string; min?: string; max?: string; q?: string; mine?: boolean; deal?: string }) {
     setLoading(true);
     if (over?.mine ?? mine) {
       api<{ listings: Listing[] }>('/listings/mine').then((d) => setListings(d.listings || [])).catch(() => setListings([])).finally(() => setLoading(false));
       return;
     }
     const p = new URLSearchParams();
-    const t = over?.type ?? type, mn = over?.min ?? min, mx = over?.max ?? max, kw = over?.q ?? q;
+    const t = over?.type ?? type, mn = over?.min ?? min, mx = over?.max ?? max, kw = over?.q ?? q, dl = over?.deal ?? deal;
     if (t) p.set('propertyType', t);
     if (mn) p.set('minPrice', String(Number(mn) * 1e9));
     if (mx) p.set('maxPrice', String(Number(mx) * 1e9));
     if (kw) p.set('q', kw);
+    p.set('deal', dl);
     api<{ listings: Listing[] }>(`/listings?${p.toString()}`).then((d) => setListings(d.listings || [])).catch(() => setListings([])).finally(() => setLoading(false));
   }
+  function switchDeal(d: DealType) { if (d === deal) return; setDeal(d); setType(''); setMin(''); setMax(''); setMine(false); load({ deal: d, type: '', min: '', max: '', mine: false }); }
   function showMine(v: boolean) { setMine(v); load({ mine: v }); }
   async function del(id: number) {
     if (!confirm('Xoá tin này khỏi giỏ hàng?')) return;
@@ -68,12 +74,13 @@ export default function ListingsPage() {
     const t = (sp.get('propertyType') as PropertyType) || '';
     const mx = sp.get('maxPrice') ? String(Number(sp.get('maxPrice')) / 1e9) : '';
     const kw = sp.get('q') || sp.get('ward') || '';
-    setType(t); setMax(mx); setQ(kw); load({ type: t, max: mx, q: kw });
+    const dl = (sp.get('deal') === 'rent' ? 'rent' : 'sale') as DealType;
+    setType(t); setMax(mx); setQ(kw); setDeal(dl); load({ type: t, max: mx, q: kw, deal: dl });
     api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const markers = useMemo(() => listings.map((l) => ({ lng: l.lng, lat: l.lat, label: formatVnd(l.price), popupHtml: `<a href="/listings/${l.id}" style="font-weight:700;color:#0A2540">${l.title}</a><br/><b style="color:#dc2626">${formatVnd(l.price)}</b>` })), [listings]);
+  const markers = useMemo(() => listings.map((l) => ({ lng: l.lng, lat: l.lat, label: priceLabel(l.price, l.deal), popupHtml: `<a href="/listings/${l.id}" style="font-weight:700;color:#0A2540">${l.title}</a><br/><b style="color:#dc2626">${priceLabel(l.price, l.deal)}</b>` })), [listings]);
   const overlays: ImageOverlay[] = useMemo(() => [{ ...QH, opacity, visible: qhOn }], [opacity, qhOn]);
   const shown = useMemo(() => {
     let a = [...listings];
@@ -86,7 +93,7 @@ export default function ListingsPage() {
   }, [listings, sort, areaRange, verified]);
 
   const activeFilters = (type ? 1 : 0) + (min || max ? 1 : 0) + (areaRange.min || areaRange.max ? 1 : 0) + (verified ? 1 : 0);
-  const title = `Mua bán ${type ? (PROPERTY_LABELS[type] as string).toLowerCase() : 'nhà đất'} tại Cam Lâm, Khánh Hòa`;
+  const title = `${deal === 'rent' ? 'Cho thuê' : 'Mua bán'} ${type ? (PROPERTY_LABELS[type] as string).toLowerCase() : 'nhà đất'} tại Cam Lâm, Khánh Hòa`;
 
   async function onMapClick(lng: number, lat: number) {
     const vn = wgs84ToVn2000(lng, lat);
@@ -163,7 +170,11 @@ export default function ListingsPage() {
 
   const listHeader = (
     <>
-      <div className="text-xs text-slate-400 mb-1"><Link href="/" className="hover:text-[#0A2540]">Bán</Link> › <span className="hover:text-[#0A2540]">Khánh Hòa</span> › <span className="text-slate-600">Cam Lâm</span></div>
+      <div className="inline-flex rounded-full bg-slate-100 p-1 mb-2">
+        <button onClick={() => switchDeal('sale')} className={`px-4 py-1.5 rounded-full text-sm font-bold transition ${deal === 'sale' ? 'bg-red-600 text-white shadow' : 'text-slate-600 hover:text-[#0A2540]'}`}>Nhà đất bán</button>
+        <button onClick={() => switchDeal('rent')} className={`px-4 py-1.5 rounded-full text-sm font-bold transition ${deal === 'rent' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-[#0A2540]'}`}>Cho thuê</button>
+      </div>
+      <div className="text-xs text-slate-400 mb-1"><Link href="/" className="hover:text-[#0A2540]">{deal === 'rent' ? 'Cho thuê' : 'Bán'}</Link> › <span className="hover:text-[#0A2540]">Khánh Hòa</span> › <span className="text-slate-600">Cam Lâm</span></div>
       {user ? (
         <div className="flex rounded-xl border border-slate-200 overflow-hidden w-fit mb-1">
           <button onClick={() => showMine(false)} className={`px-3.5 py-1.5 text-sm font-bold ${!mine ? 'bg-[#0A2540] text-white' : 'text-slate-600'}`}>Tất cả</button>

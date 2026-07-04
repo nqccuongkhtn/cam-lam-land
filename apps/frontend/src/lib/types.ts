@@ -1,7 +1,8 @@
-export type PropertyType = 'land' | 'house' | 'apartment' | 'villa' | 'commercial' | 'farm';
+export type PropertyType = 'land' | 'house' | 'apartment' | 'villa' | 'commercial' | 'farm' | 'room' | 'office' | 'warehouse';
+export type DealType = 'sale' | 'rent';
 export interface Listing {
   id: number; title: string; description: string | null; price: number; area: number | null;
-  propertyType: PropertyType; address: string | null; ward: string | null; bedrooms: number | null;
+  propertyType: PropertyType; deal?: DealType; address: string | null; ward: string | null; bedrooms: number | null;
   bathrooms?: number | null; direction?: string | null; legal?: string | null; frontage?: number | null;
   contactName?: string | null; contactPhone?: string | null; boosted?: boolean; tier?: string; bumpedAt?: string | null; createdBy?: number | null;
   leadCount?: number; leadViews?: number; posterAvatar?: string | null;
@@ -17,12 +18,21 @@ export interface ImportJob {
   layerType: string; status: string; log: string; featureCount: number|null; createdAt: string; updatedAt: string;
 }
 export const PROPERTY_LABELS: Record<PropertyType,string> = {
-  land:'Đất nền', house:'Nhà phố', apartment:'Căn hộ', villa:'Biệt thự', commercial:'Thương mại', farm:'Đất nông nghiệp',
+  land:'Đất nền', house:'Nhà phố', apartment:'Căn hộ', villa:'Biệt thự', commercial:'Mặt bằng KD', farm:'Đất nông nghiệp',
+  room:'Phòng trọ', office:'Văn phòng', warehouse:'Kho / Xưởng',
 };
+// Loại BĐS theo nhu cầu — form đăng tin đổi danh sách theo Bán / Cho thuê.
+export const SALE_PROPERTY_TYPES: PropertyType[] = ['land', 'house', 'apartment', 'villa', 'commercial', 'farm'];
+export const RENT_PROPERTY_TYPES: PropertyType[] = ['house', 'apartment', 'room', 'commercial', 'office', 'warehouse'];
+export const DEAL_LABELS: Record<DealType, string> = { sale: 'Bán', rent: 'Cho thuê' };
 export function formatVnd(v: number): string {
   if (v >= 1e9) return `${(v/1e9).toFixed(v%1e9===0?0:2)} tỷ`;
   if (v >= 1e6) return `${(v/1e6).toFixed(0)} triệu`;
   return new Intl.NumberFormat('vi-VN').format(v) + ' đ';
+}
+/** Giá kèm hậu tố /tháng khi là tin cho thuê. */
+export function priceLabel(price: number, deal?: string): string {
+  return formatVnd(price) + (deal === 'rent' ? '/tháng' : '');
 }
 
 export const WARDS = ['Cam Đức','Cam Hải Đông','Cam Hải Tây','Cam Thành Bắc','Cam Hòa','Cam Tân','Cam Hiệp Bắc','Cam Hiệp Nam','Cam An Bắc','Cam An Nam','Cam Phước Tây','Sơn Tân','Suối Cát','Suối Tân'];

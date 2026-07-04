@@ -164,7 +164,7 @@ export default function Home() {
           {/* Bán / Cho thuê */}
           <div className="mt-7 inline-flex bg-white/15 backdrop-blur rounded-full p-1 border border-white/25">
             <button onClick={() => setHeroDeal('sale')} className={`px-5 py-1.5 rounded-full text-sm font-bold transition ${heroDeal === 'sale' ? 'bg-white text-[#0A2540]' : 'text-white/90 hover:text-white'}`}>Nhà đất bán</button>
-            <button onClick={() => setHeroDeal('rent')} className={`px-5 py-1.5 rounded-full text-sm font-bold transition ${heroDeal === 'rent' ? 'bg-white text-[#0A2540]' : 'text-white/90 hover:text-white'}`}>Nhà đất cho thuê</button>
+            <button onClick={() => setHeroDeal('rent')} className={`px-5 py-1.5 rounded-full text-sm font-bold transition ${heroDeal === 'rent' ? 'bg-white text-[#0A2540]' : 'text-white/90 hover:text-white'}`}>Cho thuê</button>
           </div>
 
           {/* Search card */}

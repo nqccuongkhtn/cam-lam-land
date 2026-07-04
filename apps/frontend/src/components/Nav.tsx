@@ -7,10 +7,9 @@ import { useAuth } from '@/lib/auth';
 const links = [
   { href: '/', label: 'Trang chủ' },
   { href: '/listings', label: 'Nhà đất bán' },
-  { href: '/listings?deal=rent', label: 'Nhà đất cho thuê' },
+  { href: '/listings?deal=rent', label: 'Cho thuê' },
   { href: '/map', label: 'Bản đồ quy hoạch' },
   { href: '/qr', label: 'Tra cứu QR' },
-  { href: '/dau-tu', label: 'Đầu tư' },
 ];
 
 function Logo({ light }: { light: boolean }) {

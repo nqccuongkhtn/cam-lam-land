@@ -172,7 +172,7 @@ export default function ListingsPage() {
     <>
       <div className="inline-flex rounded-full bg-slate-100 p-1 mb-2">
         <button onClick={() => switchDeal('sale')} className={`px-4 py-1.5 rounded-full text-sm font-bold transition ${deal === 'sale' ? 'bg-red-600 text-white shadow' : 'text-slate-600 hover:text-[#0A2540]'}`}>Nhà đất bán</button>
-        <button onClick={() => switchDeal('rent')} className={`px-4 py-1.5 rounded-full text-sm font-bold transition ${deal === 'rent' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-[#0A2540]'}`}>Nhà đất cho thuê</button>
+        <button onClick={() => switchDeal('rent')} className={`px-4 py-1.5 rounded-full text-sm font-bold transition ${deal === 'rent' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-[#0A2540]'}`}>Cho thuê</button>
       </div>
       <div className="text-xs text-slate-400 mb-1"><Link href="/" className="hover:text-[#0A2540]">{deal === 'rent' ? 'Cho thuê' : 'Bán'}</Link> › <span className="hover:text-[#0A2540]">Khánh Hòa</span> › <span className="text-slate-600">Cam Lâm</span></div>
       {user ? (

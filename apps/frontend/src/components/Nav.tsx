@@ -9,6 +9,7 @@ const links = [
   { href: '/listings', label: 'Nhà đất' },
   { href: '/map', label: 'Bản đồ quy hoạch' },
   { href: '/qr', label: 'Tra cứu QR' },
+  { href: '/dau-tu', label: 'Đầu tư' },
 ];
 
 function Logo({ light }: { light: boolean }) {
@@ -97,6 +98,7 @@ export default function Nav() {
                     {(user.role === 'admin' || user.role === 'gis') && <Link href="/admin" className={mItem}>{user.role === 'admin' ? 'Quản trị' : 'Tải bản đồ GIS'}</Link>}
                     {user.role === 'admin' && <Link href="/map-ads" className={mItem}>Quảng cáo bản đồ</Link>}
                     {user.role === 'admin' && <Link href="/consignments" className={mItem}>Khách gửi bán</Link>}
+                    {user.role === 'admin' && <Link href="/invest-leads" className={mItem}>Đăng ký góp vốn</Link>}
                     <div className="border-t border-slate-100 my-1" />
                     <button onClick={doLogout} className={`${mItem} text-red-600`}>Đăng xuất</button>
                   </div>
@@ -130,6 +132,7 @@ export default function Nav() {
           {(user?.role === 'admin' || user?.role === 'gis') && <Link href="/admin" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">{user?.role === 'admin' ? 'Quản trị' : 'Tải bản đồ GIS'}</Link>}
           {user?.role === 'admin' && <Link href="/map-ads" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Quảng cáo bản đồ</Link>}
           {user?.role === 'admin' && <Link href="/consignments" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Khách gửi bán</Link>}
+          {user?.role === 'admin' && <Link href="/invest-leads" onClick={() => setOpen(false)} className="py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50">Đăng ký góp vốn</Link>}
           <a href="tel:0988888888" className="py-2.5 px-2 text-sm font-bold text-[#0A2540]">📞 Hotline 0988 888 888</a>
           <div className="border-t border-slate-100 mt-1 pt-2">
             {user ? (

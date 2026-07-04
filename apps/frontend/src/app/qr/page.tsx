@@ -177,22 +177,24 @@ export default function QrPage() {
         </div>
 
         <div className="bg-white border rounded-xl p-4">
-          <h2 className="font-semibold mb-2">2. Thông tin mã QR</h2>
-          {!code && <p className="text-sm text-slate-400">Chưa có mã.</p>}
+          <h2 className="font-semibold mb-2">2. Thông tin xác thực Giấy chứng nhận</h2>
+          {!code && <p className="text-sm text-slate-400">Chưa có mã. Quét bằng camera hoặc tải ảnh mã QR ở bên trái.</p>}
           {code && (
             <>
-              <table className="w-full text-sm mb-2">
-                <tbody>
-                  {fields.map((f, i) => (FIELD_LABELS[i] && f ? (
-                    <tr key={i} className="border-b last:border-0">
-                      <td className="py-1 text-slate-500 pr-2 whitespace-nowrap">{FIELD_LABELS[i]}</td>
-                      <td className="py-1 font-medium text-right break-all">{f}</td>
-                    </tr>
-                  ) : null))}
-                </tbody>
-              </table>
+              <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg px-3 py-2 text-sm font-semibold mb-3">
+                <span>✓</span> Đã đọc được mã QR hợp lệ trên Giấy chứng nhận
+              </div>
+              <dl className="divide-y divide-slate-100 text-sm mb-3">
+                {fields.map((f, i) => (FIELD_LABELS[i] && f ? (
+                  <div key={i} className="flex justify-between gap-3 py-1.5">
+                    <dt className="text-slate-500 whitespace-nowrap">{FIELD_LABELS[i]}</dt>
+                    <dd className="font-semibold text-[#0A2540] text-right break-all">{f}</dd>
+                  </div>
+                ) : null))}
+              </dl>
               <button onClick={() => { navigator.clipboard.writeText(code); setCopied(true); }}
-                className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm">{copied ? '✓ Đã copy mã' : 'Copy mã'}</button>
+                className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-sm font-semibold">{copied ? '✓ Đã copy mã tra cứu' : '📋 Copy mã tra cứu'}</button>
+              <p className="text-[11px] text-slate-400 mt-2">Đây là thông tin xác thực in kèm mã QR (xác nhận sổ thật + mã để tra cứu). Chi tiết thửa đất (chủ, diện tích, ranh giới) xem ở bước 3.</p>
             </>
           )}
         </div>
@@ -200,15 +202,14 @@ export default function QrPage() {
 
       {code && (
         <div className="bg-white border rounded-xl p-4 mt-4">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="font-semibold">3. Tra cứu trên Cổng VBĐLIS</h2>
-            <a href={VBDLIS_URL} target="_blank" rel="noreferrer" className="text-blue-600 text-sm font-medium">Mở tab mới ↗</a>
-          </div>
-          <p className="text-sm text-amber-700 bg-amber-50 rounded p-2 mb-2">
-            {copied ? '✓ Mã đã được copy. ' : ''}Dán mã (Ctrl+V) vào ô tra cứu bên dưới → xác nhận &quot;không phải người máy&quot; → bấm <b>Tìm kiếm</b> để xem thông tin Giấy chứng nhận.
-          </p>
-          <iframe src={VBDLIS_URL} className="w-full h-[640px] border rounded" title="VBDLIS" />
-          <p className="text-xs text-slate-400 mt-1">* Nếu khung trên trống (trang VBĐLIS chặn nhúng), bấm &quot;Mở tab mới&quot; — mã đã được copy sẵn để dán.</p>
+          <h2 className="font-semibold mb-1">3. Xem chi tiết thửa đất trên cổng chính thức</h2>
+          <p className="text-sm text-slate-500 mb-3">Thông tin chi tiết (chủ sở hữu, diện tích, ranh giới) nằm trong cơ sở dữ liệu đất đai quốc gia. Bấm nút dưới để mở <b>cổng VBĐLIS chính thức</b> — mã tra cứu đã được copy sẵn, chỉ cần dán vào, tick &quot;không phải người máy&quot; rồi bấm Tìm kiếm.</p>
+          <button
+            onClick={() => { try { navigator.clipboard.writeText(code); setCopied(true); } catch {} window.open(VBDLIS_URL, '_blank', 'noopener'); }}
+            className="w-full bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold py-3 rounded-xl text-sm">
+            📋 Copy mã &amp; mở cổng VBĐLIS chính thức ↗
+          </button>
+          <p className="text-[11px] text-slate-400 mt-2">Cổng chính thức: tracuuqr.vbdlis.vn — thông tin phản hồi từ mã QR có giá trị pháp lý như trên Giấy chứng nhận. Cam Lâm Land không lưu trữ dữ liệu tra cứu của bạn.</p>
         </div>
       )}
     </div>

@@ -134,6 +134,19 @@ CREATE TABLE IF NOT EXISTS consignments (
 );
 CREATE INDEX IF NOT EXISTS consignments_idx ON consignments (status, created_at DESC);
 
+-- ── CamInvest: khách đăng ký quan tâm góp vốn đầu tư ──
+CREATE TABLE IF NOT EXISTS invest_leads (
+  id          SERIAL PRIMARY KEY,
+  name        TEXT NOT NULL,
+  phone       TEXT NOT NULL,
+  amount      TEXT,
+  tenure      TEXT,
+  note        TEXT,
+  status      TEXT NOT NULL DEFAULT 'new',
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS invest_leads_idx ON invest_leads (status, created_at DESC);
+
 -- ── Chat (cộng đồng + hỗ trợ admin), lưu trữ ──
 CREATE TABLE IF NOT EXISTS chat_messages (
   id         SERIAL PRIMARY KEY,

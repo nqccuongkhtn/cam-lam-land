@@ -84,16 +84,12 @@ function ListingsInner() {
   }, [searchParams]);
   useEffect(() => { api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {}); }, []);
 
-  const markers = useMemo(() => listings.map((l) => {
-    const isVip = !!l.tier && l.tier !== 'normal';
-    return {
-      lng: l.lng, lat: l.lat,
-      tier: isVip ? l.tier : undefined,     // VIP: pill giá + tên gói
-      dot: !isVip,                          // tin thường: chấm nhỏ (không hiện giá)
-      label: isVip ? priceLabel(l.price, l.deal) : undefined,
-      popupHtml: `<a href="/listings/${l.id}" style="font-weight:700;color:#0A2540">${l.title}</a><br/><b style="color:#dc2626">${priceLabel(l.price, l.deal)}</b>`,
-    };
-  }), [listings]);
+  const markers = useMemo(() => listings.map((l) => ({
+    lng: l.lng, lat: l.lat,
+    tier: l.tier || 'normal',              // MapView: VIP → pill giá; tin thường → chấm (rê chuột/zoom cận hiện giá)
+    label: priceLabel(l.price, l.deal),
+    popupHtml: `<a href="/listings/${l.id}" style="font-weight:700;color:#0A2540">${l.title}</a><br/><b style="color:#dc2626">${priceLabel(l.price, l.deal)}</b>`,
+  })), [listings]);
   const overlays: ImageOverlay[] = useMemo(() => [{ ...QH, opacity, visible: qhOn }], [opacity, qhOn]);
   const shown = useMemo(() => {
     let a = [...listings];

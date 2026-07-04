@@ -124,6 +124,9 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     mapRef.current = map;
     const wmZoom = () => { if (wmRef.current) wmRef.current.style.display = map.getZoom() < WM_MIN_ZOOM ? 'none' : ''; };
     map.on('zoom', wmZoom); map.on('load', wmZoom);
+    // Zoom cận (>=14.5) → thêm class để tin thường tự hiện giá như VIP.
+    const zoomClass = () => map.getContainer().classList.toggle('cl-zoomed', map.getZoom() >= 14.5);
+    map.on('zoom', zoomClass); map.on('load', zoomClass);
     const fireView = () => { const fn = onViewportRef.current; if (!fn) return; const b = map.getBounds(); fn({ west: b.getWest(), south: b.getSouth(), east: b.getEast(), north: b.getNorth(), zoom: map.getZoom() }); };
     map.on('moveend', fireView); map.on('load', fireView);
     // Tự resize + khớp khung khi container đổi kích thước (vd: chuyển tab Danh sách↔Bản đồ trên mobile).
@@ -224,15 +227,15 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     const TIER_TXT: Record<string, string> = { diamond: 'Kim Cương', gold: 'VIP Vàng', silver: 'VIP Bạc' };
     markerRefs.current = markers.map((m) => {
       let mk: maplibregl.Marker;
-      if (m.tier && m.tier !== 'normal') {
-        // Tin VIP: pill giá + tên gói (nổi bật)
-        const el = document.createElement('div'); el.className = 'cl-price-pin cl-vip';
-        const pr = document.createElement('span'); pr.textContent = m.label || ''; el.appendChild(pr);
-        const tag = document.createElement('b'); tag.className = 'cl-vip-tag cl-vip-' + m.tier; tag.textContent = TIER_TXT[m.tier] || 'VIP'; el.appendChild(tag);
-        mk = new maplibregl.Marker({ element: el, anchor: 'bottom' }).setLngLat([m.lng, m.lat]);
-      } else if (m.dot) {
-        // Tin thường: chấm nhỏ (không hiện giá) cho gọn bản đồ
-        const el = document.createElement('div'); el.className = 'cl-dot';
+      if (m.tier !== undefined) {
+        // Tin đăng: chấm (tin thường) / pill giá + tên gói (VIP). Rê chuột hoặc zoom cận → chấm hiện giá.
+        const isVip = !!m.tier && m.tier !== 'normal';
+        const el = document.createElement('div'); el.className = 'cl-mk ' + (isVip ? 'cl-mk-vip' : 'cl-mk-normal');
+        const dot = document.createElement('b'); dot.className = 'cl-mk-dot'; el.appendChild(dot);
+        const pill = document.createElement('span'); pill.className = 'cl-mk-pill';
+        const pr = document.createElement('span'); pr.textContent = m.label || ''; pill.appendChild(pr);
+        if (isVip) { const tag = document.createElement('b'); tag.className = 'cl-vip-tag cl-vip-' + m.tier; tag.textContent = TIER_TXT[m.tier] || 'VIP'; pill.appendChild(tag); }
+        el.appendChild(pill);
         mk = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([m.lng, m.lat]);
       } else if (m.label) {
         const el = document.createElement('div'); el.className = 'cl-price-pin'; el.textContent = m.label;
@@ -240,14 +243,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       } else {
         mk = new maplibregl.Marker({ color: m.color ?? '#e53935' }).setLngLat([m.lng, m.lat]);
       }
-      if (m.popupHtml) {
-        const popup = new maplibregl.Popup({ offset: 18, closeButton: false }).setHTML(m.popupHtml);
-        mk.setPopup(popup); // vẫn cho bấm (mobile chạm)
-        const el = mk.getElement();
-        el.style.cursor = 'pointer';
-        el.addEventListener('mouseenter', () => { popup.setLngLat([m.lng, m.lat]).addTo(map); }); // rê chuột là hiện
-        el.addEventListener('mouseleave', () => { popup.remove(); });
-      }
+      if (m.popupHtml) mk.setPopup(new maplibregl.Popup({ offset: 18 }).setHTML(m.popupHtml)); // bấm để mở
       if (m.onClick) mk.getElement().addEventListener('click', m.onClick);
       mk.addTo(map); return mk;
     });

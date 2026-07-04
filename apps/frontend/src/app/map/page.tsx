@@ -269,7 +269,7 @@ export default function MapPage() {
   const [baseMap, setBaseMap] = useState<BaseMap>('satellite');
   const [labels, setLabels] = useState(true);
   const [ranhXa, setRanhXa] = useState<GeoJSON.FeatureCollection | null>(null);
-  const [ranhOn, setRanhOn] = useState(true);
+  const [ranhOn, setRanhOn] = useState(false); // tắt mặc định — ranh xã chờ dữ liệu chuẩn (làm sau)
   const [measure, setMeasure] = useState<MeasureMode>('off');
   const [mResult, setMResult] = useState<MeasureResult | null>(null);
   const [focusPoint, setFocusPoint] = useState<{ lng: number; lat: number; label?: string } | null>(null);

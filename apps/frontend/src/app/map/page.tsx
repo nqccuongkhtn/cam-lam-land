@@ -268,6 +268,8 @@ export default function MapPage() {
   const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true });
   const [baseMap, setBaseMap] = useState<BaseMap>('satellite');
   const [labels, setLabels] = useState(true);
+  const [ranhXa, setRanhXa] = useState<GeoJSON.FeatureCollection | null>(null);
+  const [ranhOn, setRanhOn] = useState(true);
   const [measure, setMeasure] = useState<MeasureMode>('off');
   const [mResult, setMResult] = useState<MeasureResult | null>(null);
   const [focusPoint, setFocusPoint] = useState<{ lng: number; lat: number; label?: string } | null>(null);
@@ -322,6 +324,7 @@ export default function MapPage() {
   useEffect(() => { fetch('/qh_vector.geojson').then((r) => r.json()).then(setQhVector).catch(() => {}); }, []);
   useEffect(() => { if (viewRef.current) refreshFeatures(viewRef.current); }, [visible, refreshFeatures]);
   useEffect(() => { setCanDelete(user?.role === 'admin' || user?.role === 'gis'); }, [user]);
+  useEffect(() => { fetch('/ranh-xa.geojson').then((r) => (r.ok ? r.json() : null)).then(setRanhXa).catch(() => {}); }, []);
   useEffect(() => { if (!camOpen) return; const v = camVideoRef.current, st = camStreamRef.current; if (!v || !st) return; v.srcObject = st; v.setAttribute('playsinline', 'true'); v.play().catch(() => {}); }, [camOpen]);
   // Giải phóng camera khi rời trang (tránh giữ camera chạy ngầm trên điện thoại).
   useEffect(() => () => { camStreamRef.current?.getTracks().forEach((t) => t.stop()); camStreamRef.current = null; if (ocrTimer.current) clearInterval(ocrTimer.current); }, []);
@@ -349,8 +352,13 @@ export default function MapPage() {
         out.push({ id: `${l.slug}-line`, type: 'line', data: fc, visible: vis, paint: { 'line-color': colorExpr, 'line-width': (l.style?.weight as number) ?? 0.8, 'line-opacity': 0.85 } });
       }
     }
+    if (ranhXa && ranhXa.features?.length) {
+      const f6 = ranhXa.features.filter((x: any) => x?.properties?.color === 6);
+      const fc = (f6.length ? { type: 'FeatureCollection', features: f6 } : ranhXa) as GeoJSON.FeatureCollection;
+      out.push({ id: 'ranh-xa', type: 'line', data: fc, visible: ranhOn, paint: { 'line-color': '#C8A14B', 'line-width': 2.2, 'line-opacity': 0.95, 'line-dasharray': [3, 1.5] } });
+    }
     return out;
-  }, [layers, data, visible, opacity]);
+  }, [layers, data, visible, opacity, ranhXa, ranhOn]);
 
   async function onMapClick(lng: number, lat: number) {
     const vn = wgs84ToVn2000(lng, lat);
@@ -615,6 +623,12 @@ export default function MapPage() {
               <span className="inline-block w-3 h-3 rounded-sm shrink-0 bg-amber-500" /><span className="flex-1">🛰️ {o.name}</span>
             </label>
           ))}
+          {ranhXa && (
+            <label className="flex items-center gap-2 py-1.5 text-sm cursor-pointer mt-2 pt-2 border-t">
+              <input type="checkbox" checked={ranhOn} onChange={(e) => setRanhOn(e.target.checked)} className="accent-emerald-600 w-4 h-4" />
+              <span className="inline-block w-3 h-3 rounded-sm shrink-0 bg-[#C8A14B]" /><span className="flex-1">🗺️ Ranh giới xã (thống nhất 20/10/2025)</span>
+            </label>
+          )}
           <p className="text-xs font-semibold text-slate-500 mt-3 mb-1 pt-2 border-t">Lớp vector (bật/tắt)</p>
           {layers.length === 0 && <p className="text-sm text-slate-500">Đang tải…</p>}
           {layers.map((l) => (

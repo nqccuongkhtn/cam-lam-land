@@ -9,6 +9,7 @@ const SOURCES = [
   { name: 'VnExpress', url: 'https://vnexpress.net/rss/bat-dong-san.rss' },
   { name: 'CafeF', url: 'https://cafef.vn/bat-dong-san.rss' },
   { name: 'Báo Xây dựng', url: 'https://baoxaydung.com.vn/rss/bat-dong-san.rss' },
+  { name: 'Reatimes', url: 'https://reatimes.vn/rss' },
 ];
 // Bỏ tin tiêu cực — chỉ giữ tin tích cực / trung lập
 const BAD = /(lừa đảo|vỡ nợ|phá sản|siết nợ|tranh chấp|khởi tố|khởi kiện|kiện tụng|bắt giam|lao dốc|bán tháo|nợ xấu|đóng băng|ế ẩm|sụt giảm|giảm mạnh|thổi giá|bong bóng|chiếm đoạt|cảnh báo sốt|trục lợi)/i;
@@ -27,7 +28,11 @@ async function fetchSource(src: { name: string; url: string }): Promise<any[]> {
     const link = decode((b.match(/<link>([\s\S]*?)<\/link>/) || [])[1] || '');
     const desc = decode((b.match(/<description>([\s\S]*?)<\/description>/) || [])[1] || '');
     const pub = decode((b.match(/<pubDate>([\s\S]*?)<\/pubDate>/) || [])[1] || '');
-    const img = (desc.match(/<img[^>]+src=["']?([^"' >]+)/) || [])[1] || null;
+    const img = (desc.match(/<img[^>]+src=["']?([^"' >]+)/) || [])[1]
+      || (b.match(/<enclosure[^>]+url=["']([^"']+)["'][^>]*type=["']image/) || [])[1]
+      || (b.match(/<media:content[^>]+url=["']([^"']+)["']/) || [])[1]
+      || (b.match(/<media:thumbnail[^>]+url=["']([^"']+)["']/) || [])[1]
+      || null;
     const d = pub ? new Date(pub) : new Date();
     if (!title || !link || isNaN(d.getTime())) continue;
     if (BAD.test(title)) continue;

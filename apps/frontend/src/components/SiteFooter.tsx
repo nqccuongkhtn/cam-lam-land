@@ -6,9 +6,11 @@ const HELP: [string, string][] = [
   ['Giới thiệu Cam Lâm Land', '/gioi-thieu'],
   ['Dịch vụ & Bảng giá', '/dichvu'],
   ['Nhà đất bán & cho thuê', '/listings'],
+  ['Giá đất khu vực & định giá', '/gia-dat'],
+  ['Bảng giá đất Khánh Hòa', '/bang-gia-dat'],
   ['Bản đồ quy hoạch', '/map'],
   ['Tra cứu QR thửa đất', '/qr'],
-  ['Đọc thông tin sổ đỏ (AI)', '/doc-so-do'],
+  ['Cẩm nang pháp lý nhà đất', '/cam-nang'],
   ['Góp vốn đầu tư (CamInvest)', '/dau-tu'],
   ['Tin tức', '/tin-tuc'],
 ];

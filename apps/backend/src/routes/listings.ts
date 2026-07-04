@@ -83,6 +83,32 @@ listingsRouter.get('/areas', async (_req, res, next) => {
   } catch (e) { next(e); }
 });
 
+// GET /api/listings/gia-khu-vuc — giá THAM KHẢO trung vị (đ/m²) theo xã, tính từ tin đang đăng. ?type= lọc loại BĐS (tuỳ chọn).
+listingsRouter.get('/gia-khu-vuc', async (req, res, next) => {
+  try {
+    const type = String((req.query as any).type || '').trim();
+    const ckey = 'listings:giakv:' + type;
+    const hit = cached<any>(ckey);
+    if (hit) { res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=600'); return res.json(hit); }
+    const params: any[] = [];
+    let typeCond = '';
+    if (type) { params.push(type); typeCond = ` AND property_type = $${params.length}`; }
+    const rows = await query(
+      `SELECT COALESCE(NULLIF(TRIM(ward), ''), 'Khác') AS ward,
+              COUNT(*)::int AS count,
+              ROUND(percentile_cont(0.5) WITHIN GROUP (ORDER BY price / NULLIF(area, 0)))::bigint AS "medPerM2",
+              ROUND(MIN(price / NULLIF(area, 0)))::bigint AS "minPerM2",
+              ROUND(MAX(price / NULLIF(area, 0)))::bigint AS "maxPerM2"
+         FROM listings
+        WHERE status NOT IN ('hidden','pending') AND area >= 10 AND price >= 1000000${typeCond}
+        GROUP BY 1 HAVING COUNT(*) >= 1 ORDER BY count DESC`, params);
+    const payload = { type: type || null, areas: rows };
+    cachePut(ckey, payload, 120000);
+    res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=600');
+    res.json(payload);
+  } catch (e) { next(e); }
+});
+
 // POST /api/listings/:id/boost — đặt hạng VIP / đẩy lên đầu (chủ tin hoặc admin)
 listingsRouter.post('/:id/boost', authRequired, async (req: AuthedRequest, res, next) => {
   try {

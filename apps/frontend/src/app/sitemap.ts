@@ -6,7 +6,7 @@ const BACKEND = process.env.BACKEND_HOST ? (process.env.BACKEND_HOST.startsWith(
 export const revalidate = 3600; // làm mới sitemap mỗi giờ
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticUrls: MetadataRoute.Sitemap = ['', '/listings', '/map', '/tin-tuc', '/dichvu'].map((p) => ({
+  const staticUrls: MetadataRoute.Sitemap = ['', '/listings', '/map', '/gia-dat', '/bang-gia-dat', '/tin-tuc', '/qr', '/cam-nang', '/dau-tu', '/dichvu'].map((p) => ({
     url: `${SITE}${p}`, changeFrequency: p === '' || p === '/listings' ? 'daily' : 'weekly', priority: p === '' ? 1 : 0.8,
   }));
   let listings: MetadataRoute.Sitemap = [];

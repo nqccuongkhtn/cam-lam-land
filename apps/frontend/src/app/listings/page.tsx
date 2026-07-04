@@ -277,9 +277,9 @@ function ListingsInner() {
               <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && showMine(false)} className="py-2.5 w-full outline-none text-sm bg-transparent" placeholder="Khu vực, từ khoá, dự án…" />
             </label>
             <button onClick={() => showMine(false)} className="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-full text-sm whitespace-nowrap">Tìm kiếm</button>
-            <button onClick={() => setMapView((v) => !v)} className={`hidden md:flex items-center gap-1.5 font-bold px-4 py-2.5 rounded-full text-sm whitespace-nowrap ${mapView ? 'bg-[#0A2540] text-white' : 'bg-teal-600 hover:bg-teal-700 text-white'}`}>
+            <button onClick={() => setMapView((v) => !v)} aria-label={mapView ? 'Đóng bản đồ' : 'Xem bản đồ'} className={`flex items-center gap-1.5 font-bold px-3 sm:px-4 py-2.5 rounded-full text-sm whitespace-nowrap shrink-0 ${mapView ? 'bg-[#0A2540] text-white' : 'bg-teal-600 hover:bg-teal-700 text-white'}`}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M9 20l-5.5 2.5V6L9 3.5m0 16.5 6 -2.5M9 20V3.5m6 14 5.5 2.5V6L15 3.5m0 14V3.5m0 0L9 6" /></svg>
-              {mapView ? 'Đóng bản đồ' : 'Xem bản đồ'}
+              <span className="hidden sm:inline">{mapView ? 'Đóng bản đồ' : 'Xem bản đồ'}</span>
             </button>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -293,9 +293,9 @@ function ListingsInner() {
       </div>
 
       {mapView ? (
-        <div className="lg:flex h-[calc(100vh-150px)]">
-          <div className="h-full overflow-y-auto scroll-soft px-3 sm:px-4 py-4 w-full lg:w-[40%] lg:max-w-[560px]">{listHeader}{listItems}</div>
-          <div className="hidden lg:block h-full flex-1 border-l border-slate-200 relative">{mapPanel}</div>
+        <div className="lg:flex h-[calc(100vh-140px)]">
+          <div className="hidden lg:block h-full overflow-y-auto scroll-soft px-3 sm:px-4 py-4 w-full lg:w-[40%] lg:max-w-[560px]">{listHeader}{listItems}</div>
+          <div className="block h-full flex-1 lg:border-l border-slate-200 relative">{mapPanel}</div>
         </div>
       ) : (
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-5 lg:flex lg:gap-6 lg:items-start">

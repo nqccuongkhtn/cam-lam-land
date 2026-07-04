@@ -243,7 +243,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       } else {
         mk = new maplibregl.Marker({ color: m.color ?? '#e53935' }).setLngLat([m.lng, m.lat]);
       }
-      if (m.popupHtml) mk.setPopup(new maplibregl.Popup({ offset: 18 }).setHTML(m.popupHtml)); // bấm để mở
+      if (m.popupHtml) mk.setPopup(new maplibregl.Popup({ offset: 18, closeButton: true, closeOnClick: false }).setHTML(m.popupHtml)); // bấm để mở, giữ tới khi bấm X
       if (m.onClick) mk.getElement().addEventListener('click', m.onClick);
       mk.addTo(map); return mk;
     });

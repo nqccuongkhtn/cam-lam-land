@@ -63,6 +63,10 @@ button, a, input, select, textarea {
 .cl-vip-diamond { background:linear-gradient(90deg,#e11d48,#f43f5e); }
 .cl-vip-gold { background:linear-gradient(90deg,#f59e0b,#eab308); color:#3a2c00; }
 .cl-vip-silver { background:linear-gradient(90deg,#94a3b8,#64748b); }
+/* Nút X đóng popup — to, dễ bấm (cả trên điện thoại) */
+.maplibregl-popup-close-button { width:26px; height:26px; font-size:20px; line-height:22px; color:#64748b; border-radius:8px; }
+.maplibregl-popup-close-button:hover { background:#f1f5f9; color:#dc2626; }
+.maplibregl-popup-content { padding:10px 26px 10px 12px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,.18); }
 
 /* Quảng cáo động — chuyển động mượt (kiểu Znews) */
 @keyframes clKen { from { transform: scale(1.02); } to { transform: scale(1.09); } }

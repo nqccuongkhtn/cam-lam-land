@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Listing, priceLabel, TIER_BADGE, TIER_LABEL, postedLabel } from '@/lib/types';
+import { displayViews } from '@/lib/views';
 import { inCompare, toggleCompare } from '@/lib/compare';
 
 function IPin() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="2.5" /></svg>; }
@@ -42,7 +43,7 @@ export default function ListingRow({ l, href }: { l: Listing; href?: string }) {
         <div className="text-[13px] text-slate-500 mt-1 flex items-center gap-1 truncate"><IPin /> <span className="truncate">{l.ward ?? 'Cam Lâm'}, Khánh Hòa</span></div>
         {l.description && <p className="text-[13px] text-slate-500 mt-1 line-clamp-2 hidden sm:block">{l.description}</p>}
         <div className="mt-auto pt-2 flex items-center justify-between">
-          <span className="text-xs text-slate-400">{postedLabel(l.createdAt)}</span>
+          <span className="text-xs text-slate-400">{postedLabel(l.createdAt)} · 👁 {displayViews(l).toLocaleString('vi-VN')}</span>
           <div className="flex items-center gap-1.5">
             <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCompare(l); }} aria-label="So sánh" title="So sánh"
               className={`w-8 h-8 grid place-items-center rounded-lg border transition ${cmp ? 'border-[#0A2540] text-[#0A2540] bg-[#0A2540]/5' : 'border-slate-200 text-slate-400 hover:text-[#0A2540] hover:border-[#0A2540]/40'}`}>

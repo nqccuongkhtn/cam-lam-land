@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { Listing, PROPERTY_LABELS, formatVnd, priceLabel, DEAL_LABELS, TIER_LABEL, postedLabel } from '@/lib/types';
+import { displayViews } from '@/lib/views';
 import { useAuth } from '@/lib/auth';
 import ListingCard from '@/components/ListingCard';
 
@@ -208,7 +209,7 @@ export default function ListingDetail() {
               {user && l.createdBy === user.id && (
                 <Link href={`/sales/edit/${l.id}`} className="mt-2.5 w-full flex items-center justify-center gap-2 font-bold py-2.5 rounded-xl border border-[#C8A14B]/50 text-[#8a6d1f] bg-[#C8A14B]/10 hover:bg-[#C8A14B]/20">✏️ Sửa tin</Link>
               )}
-              <p className="text-[11px] text-slate-400 mt-3 text-center">Mã tin {code} · {postedLabel(l.createdAt)}</p>
+              <p className="text-[11px] text-slate-400 mt-3 text-center">Mã tin {code} · {postedLabel(l.createdAt)} · 👁 {displayViews(l).toLocaleString('vi-VN')} lượt xem</p>
             </div>
           </div>
         </div>

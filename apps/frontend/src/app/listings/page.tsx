@@ -1,6 +1,7 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, Suspense } from 'react';
 import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import Link from 'next/link';
@@ -26,7 +27,8 @@ const QH = {
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
 interface ParcelInfo { found: boolean; parcel: { properties: Record<string, any> } | null; zoning: Record<string, any> | null; }
 
-export default function ListingsPage() {
+function ListingsInner() {
+  const searchParams = useSearchParams();
   const [listings, setListings] = useState<Listing[]>([]);
   const [type, setType] = useState<PropertyType | ''>('');
   const [min, setMin] = useState(''); const [max, setMax] = useState(''); const [q, setQ] = useState('');
@@ -69,16 +71,17 @@ export default function ListingsPage() {
     if (!confirm('Xoá tin này khỏi giỏ hàng?')) return;
     try { await api(`/listings/${id}`, { method: 'DELETE' }); load({ mine: true }); } catch (e: any) { alert(e.message); }
   }
+  // Đọc lại bộ lọc từ URL MỖI KHI query đổi (vd bấm "Cho thuê" trên menu khi đang ở /listings).
   useEffect(() => {
-    const sp = new URLSearchParams(window.location.search);
+    const sp = searchParams;
     const t = (sp.get('propertyType') as PropertyType) || '';
     const mx = sp.get('maxPrice') ? String(Number(sp.get('maxPrice')) / 1e9) : '';
     const kw = sp.get('q') || sp.get('ward') || '';
     const dl = (sp.get('deal') === 'rent' ? 'rent' : 'sale') as DealType;
     setType(t); setMax(mx); setQ(kw); setDeal(dl); load({ type: t, max: mx, q: kw, deal: dl });
-    api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams]);
+  useEffect(() => { api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {}); }, []);
 
   const markers = useMemo(() => listings.map((l) => ({ lng: l.lng, lat: l.lat, label: priceLabel(l.price, l.deal), popupHtml: `<a href="/listings/${l.id}" style="font-weight:700;color:#0A2540">${l.title}</a><br/><b style="color:#dc2626">${priceLabel(l.price, l.deal)}</b>` })), [listings]);
   const overlays: ImageOverlay[] = useMemo(() => [{ ...QH, opacity, visible: qhOn }], [opacity, qhOn]);
@@ -292,5 +295,13 @@ export default function ListingsPage() {
       )}
       {!mapView && <SiteFooter />}
     </div>
+  );
+}
+
+export default function ListingsPage() {
+  return (
+    <Suspense fallback={<div className="py-24 text-center text-slate-400">Đang tải…</div>}>
+      <ListingsInner />
+    </Suspense>
   );
 }

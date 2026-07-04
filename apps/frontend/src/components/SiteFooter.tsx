@@ -11,7 +11,6 @@ const HELP: [string, string][] = [
   ['Bản đồ quy hoạch', '/map'],
   ['Tra cứu QR thửa đất', '/qr'],
   ['Cẩm nang pháp lý nhà đất', '/cam-nang'],
-  ['Góp vốn đầu tư (CamInvest)', '/dau-tu'],
   ['Tin tức', '/tin-tuc'],
 ];
 const RULES: [string, string][] = [

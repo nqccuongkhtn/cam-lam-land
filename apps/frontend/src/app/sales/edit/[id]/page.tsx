@@ -31,7 +31,7 @@ export default function EditListing() {
     if (loading) return;
     if (!user) { router.replace('/login'); return; }
     if (ready || denied) return;
-    api<any>(`/listings/${id}`).then((l) => {
+    api<any>(`/listings/${id}?noview=1`).then((l) => {
       if (l.createdBy !== user.id && user.role !== 'admin') { setDenied(true); return; }
       const price = Number(l.price) || 0;
       const priceUnit = price >= 1e9 ? 'ty' : 'trieu';

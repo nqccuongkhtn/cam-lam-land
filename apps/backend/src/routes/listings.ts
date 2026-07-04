@@ -15,7 +15,7 @@ const SELECT = `
          COALESCE(listings.contact_name, u.full_name, 'Cam Lâm Land') AS "contactName",
          COALESCE(listings.contact_phone, u.phone, '0988888888') AS "contactPhone",
          u.avatar AS "posterAvatar",
-         listings.status, listings.deal, listings.boosted, listings.tier, listings.bumped_at AS "bumpedAt", listings.images, listings.created_by AS "createdBy",
+         listings.status, listings.deal, listings.views, listings.boosted, listings.tier, listings.bumped_at AS "bumpedAt", listings.images, listings.created_by AS "createdBy",
          ST_X(listings.geom) AS lng, ST_Y(listings.geom) AS lat, listings.created_at AS "createdAt"
   FROM listings LEFT JOIN users u ON u.id = listings.created_by`;
 
@@ -207,8 +207,12 @@ listingsRouter.get('/:id', async (req, res, next) => {
   try {
     const [row] = await query(`${SELECT} WHERE listings.id=$1`, [Number(req.params.id)]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy tin' });
+    // Đếm lượt xem tin (không chặn phản hồi). Trang sửa tin gọi kèm ?noview=1 để không tự tăng.
+    if (req.query.noview !== '1') {
+      query('UPDATE listings SET views = views + 1 WHERE id=$1', [row.id]).catch(() => {});
+      row.views = (row.views || 0) + 1;
+    }
     row.contactPhone = maskPhone(row.contactPhone);
-    res.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=60');
     res.json(row);
   } catch (e) { next(e); }
 });

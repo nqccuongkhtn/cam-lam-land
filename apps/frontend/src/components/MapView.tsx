@@ -124,8 +124,8 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     mapRef.current = map;
     const wmZoom = () => { if (wmRef.current) wmRef.current.style.display = map.getZoom() < WM_MIN_ZOOM ? 'none' : ''; };
     map.on('zoom', wmZoom); map.on('load', wmZoom);
-    // Zoom SÁT (>=16, mức đường phố) → thêm class để tin thường tự hiện giá như VIP.
-    const zoomClass = () => map.getContainer().classList.toggle('cl-zoomed', map.getZoom() >= 16);
+    // Zoom SÁT (>=17, sát đường phố) → thêm class để tin thường tự hiện giá như VIP.
+    const zoomClass = () => map.getContainer().classList.toggle('cl-zoomed', map.getZoom() >= 17);
     map.on('zoom', zoomClass); map.on('load', zoomClass);
     const fireView = () => { const fn = onViewportRef.current; if (!fn) return; const b = map.getBounds(); fn({ west: b.getWest(), south: b.getSouth(), east: b.getEast(), north: b.getNorth(), zoom: map.getZoom() }); };
     map.on('moveend', fireView); map.on('load', fireView);

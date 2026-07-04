@@ -59,6 +59,18 @@ export default function GuidePage({ params }: { params: { slug: string } }) {
         <p className="text-[13px] text-amber-800/90">Nội dung mang tính tham khảo, hướng dẫn chung; quy định pháp luật có thể thay đổi (đặc biệt theo Luật Đất đai 2024). Vui lòng đối chiếu quy định hiện hành hoặc hỏi cơ quan chức năng trước khi thực hiện.</p>
       </div>
 
+      {/* Liên hệ tư vấn pháp lý */}
+      <div className="mt-6 bg-[#0A2540] text-white rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="font-bold text-sm">Cần hỗ trợ thủ tục pháp lý nhà đất?</p>
+          <p className="text-white/70 text-xs mt-0.5">Cam Lâm Land tư vấn sang tên, tách thửa, thuế phí, hợp đồng… — tư vấn miễn phí ban đầu.</p>
+        </div>
+        <div className="flex gap-2 shrink-0">
+          <a href="tel:0988888888" className="bg-[#C8A14B] hover:bg-[#b8923f] text-[#0A2540] font-extrabold px-4 py-2 rounded-lg text-sm whitespace-nowrap">📞 0988 888 888</a>
+          <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="bg-white/15 hover:bg-white/25 text-white font-bold px-4 py-2 rounded-lg text-sm">Zalo</a>
+        </div>
+      </div>
+
       {/* Công cụ liên quan */}
       <div className="grid sm:grid-cols-2 gap-3 mt-6">
         <Link href="/qr" className="bg-white border border-slate-200 rounded-xl p-4 hover:border-[#C8A14B]">

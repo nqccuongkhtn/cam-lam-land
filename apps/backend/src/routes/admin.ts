@@ -42,10 +42,13 @@ async function clearDemoContent(): Promise<number[]> {
   const ids = rows.map((r: any) => r.id);
   if (ids.length) {
     await query(`DELETE FROM listings WHERE created_by = ANY($1::int[])`, [ids]);
-    await query(`DELETE FROM chat_messages WHERE user_id = ANY($1::int[]) OR room = ANY($2::text[])`, [ids, ids.map((id: number) => 'advisory:' + id)]);
+    await query(`DELETE FROM chat_messages WHERE user_id = ANY($1::int[]) OR room = ANY($2::text[])`, [ids, ids.flatMap((id: number) => ['advisory:' + id, 'support:' + id])]);
   }
+  await query(`DELETE FROM consignments WHERE description LIKE '%(dữ liệu mẫu)%'`);
+  await query(`DELETE FROM invest_leads WHERE note LIKE '%(dữ liệu mẫu)%'`);
   return ids;
 }
+const DEMO_CUSTOMERS = ['Phạm Văn Dũng','Hoàng Thị Em','Võ Minh Phúc','Đặng Thị Giang','Bùi Quốc Huy','Ngô Thị Kim','Đỗ Văn Long','Trần Thị Mai','Lý Văn Nam','Phan Thị Oanh','Trương Văn Phú','Hồ Thị Quỳnh'];
 
 // POST /api/admin/seed-demo — tạo ~50 tin mẫu đủ loại + tin nhắn mẫu (dọn mẫu cũ trước, không nhân đôi).
 adminRouter.post('/seed-demo', async (req: AuthedRequest, res, next) => {
@@ -115,7 +118,47 @@ adminRouter.post('/seed-demo', async (req: AuthedRequest, res, next) => {
       ['advisory:' + a1, a1, DEMO_AGENTS[0].name, 'Em muốn hỏi thủ tục tách thửa đất ở Cam Hải Đông cần điều kiện gì ạ?']);
     await query(`INSERT INTO chat_messages (room, user_id, name, body, created_at) VALUES ($1,$2,$3,$4, now() - interval '1 hours')`,
       ['advisory:' + a1, req.user!.id, 'Chuyên viên tư vấn', 'Chào anh/chị, tách thửa cần đủ diện tích tối thiểu theo quy định của tỉnh và thửa phải có sổ. Anh/chị để lại SĐT em tư vấn chi tiết ạ.']);
-    res.json({ ok: true, listings: created, agents: ids.length, chat: community.length + 2 });
+    const a2 = ids[1], a3 = ids[2];
+    // Khách nhắn HỖ TRỢ (nhiều luồng để test hộp thư)
+    const support: [number, string, string][] = [
+      [a2, DEMO_AGENTS[1].name, 'Cho em hỏi đăng tin có mất phí không ạ?'],
+      [a3, DEMO_AGENTS[2].name, 'Mình quên mật khẩu thì lấy lại kiểu gì vậy shop?'],
+    ];
+    for (const [uid, nm, body] of support) {
+      await query(`INSERT INTO chat_messages (room, user_id, name, body, created_at) VALUES ($1,$2,$3,$4, now() - interval '3 hours')`, ['support:' + uid, uid, nm, body]);
+    }
+    await query(`INSERT INTO chat_messages (room, user_id, name, body, created_at) VALUES ($1,$2,$3,$4, now() - interval '2 hours')`,
+      ['support:' + a2, req.user!.id, 'Hỗ trợ Cam Lâm Land', 'Dạ đăng tin miễn phí 1 tin/tháng ạ. Anh/chị cần em hướng dẫn không?']);
+    // Khách nhắn TƯ VẤN đầu tư/pháp lý thêm
+    await query(`INSERT INTO chat_messages (room, user_id, name, body, created_at) VALUES ($1,$2,$3,$4, now() - interval '4 hours')`,
+      ['advisory:' + a2, a2, DEMO_AGENTS[1].name, 'Em có 500 triệu muốn đầu tư đất Cam Lâm, nên chọn khu nào ạ?']);
+    await query(`INSERT INTO chat_messages (room, user_id, name, body, created_at) VALUES ($1,$2,$3,$4, now() - interval '6 hours')`,
+      ['advisory:' + a3, a3, DEMO_AGENTS[2].name, 'Gói góp vốn CamInvest lãi suất bao nhiêu %/năm vậy anh?']);
+
+    // Khách GỬI BÁN (ký gửi) — hiện ở trang "Khách gửi bán"
+    const cTypes = ['land','house','apartment','villa','commercial','farm'];
+    const cStatus = ['new','new','new','contacted','done'];
+    const priceExpects = ['Khoảng 2 tỷ','3,5 tỷ thương lượng','1,8 tỷ','5 tỷ','800 triệu','Thoả thuận','12 tỷ','2,2 tỷ/lô'];
+    let consign = 0;
+    for (let k = 0; k < 12; k++) {
+      await query(
+        `INSERT INTO consignments (name, phone, property_type, ward, address, area, price_expect, description, status, created_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9, now() - ($10||' hours')::interval)`,
+        [pick(DEMO_CUSTOMERS), '0900' + String(100000 + k), pick(cTypes), pick(DEMO_WARDS), `Thôn ${Math.ceil(rnd(1, 9))}`, roundTo(rnd(60, 400), 1), pick(priceExpects), 'Cần bán, pháp lý đầy đủ, liên hệ chính chủ. — (dữ liệu mẫu)', pick(cStatus), String(k * 5)]);
+      consign++;
+    }
+    // Khách đăng ký TƯ VẤN ĐẦU TƯ (CamInvest) — hiện ở trang "Đăng ký góp vốn"
+    const amounts = ['200 triệu','500 triệu','1 tỷ','2 tỷ','300 triệu','5 tỷ','800 triệu'];
+    const tenures = ['6 tháng','12 tháng','24 tháng','36 tháng'];
+    let invest = 0;
+    for (let k = 0; k < 12; k++) {
+      await query(
+        `INSERT INTO invest_leads (name, phone, amount, tenure, note, status, created_at)
+         VALUES ($1,$2,$3,$4,$5,$6, now() - ($7||' hours')::interval)`,
+        [pick(DEMO_CUSTOMERS), '0900' + String(200000 + k), pick(amounts), pick(tenures), 'Quan tâm gói góp vốn, muốn tư vấn lợi nhuận & hợp đồng. — (dữ liệu mẫu)', pick(cStatus), String(k * 7)]);
+      invest++;
+    }
+    res.json({ ok: true, listings: created, agents: ids.length, chat: community.length + 7, consignments: consign, invest });
   } catch (e) { next(e); }
 });
 

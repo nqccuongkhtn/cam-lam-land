@@ -222,7 +222,7 @@ function DemoData() {
   async function seed() {
     if (!confirm('Tạo ~50 tin mẫu + tin nhắn mẫu để test? (dọn dữ liệu mẫu cũ trước, không đụng tin thật)')) return;
     setBusy('seed'); setMsg('');
-    try { const r = await api<any>('/admin/seed-demo', { method: 'POST', body: JSON.stringify({ count: 50 }) }); setMsg(`✓ Đã tạo ${r.listings} tin + ${r.chat} tin nhắn (3 môi giới mẫu). Mở trang Nhà đất để xem.`); }
+    try { const r = await api<any>('/admin/seed-demo', { method: 'POST', body: JSON.stringify({ count: 50 }) }); setMsg(`✓ Đã tạo ${r.listings} tin, ${r.chat} tin nhắn, ${r.consignments} khách gửi bán, ${r.invest} đăng ký đầu tư (3 môi giới mẫu).`); }
     catch (e: any) { setMsg('Lỗi: ' + e.message); } finally { setBusy(''); }
   }
   async function clearAll() {
@@ -236,7 +236,7 @@ function DemoData() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="font-bold">🧪 Dữ liệu mẫu để kiểm thử</p>
-          <p className="text-sm text-white/70 mt-0.5">Tạo nhanh ~50 tin (bán / cho thuê, đủ loại hình, có tin VIP) + tin nhắn cộng đồng & tư vấn — bấm là chạy. Xoá sạch khi test xong.</p>
+          <p className="text-sm text-white/70 mt-0.5">Tạo nhanh ~50 tin (bán / cho thuê, đủ loại, có VIP) + tin nhắn cộng đồng, hỗ trợ & tư vấn + khách gửi bán + đăng ký đầu tư — bấm là chạy. Xoá sạch khi test xong.</p>
         </div>
         <div className="flex gap-2 shrink-0">
           <button onClick={seed} disabled={!!busy} className="bg-[#C8A14B] hover:bg-[#b8923f] disabled:opacity-60 text-[#0A2540] font-bold px-4 py-2 rounded-xl">{busy === 'seed' ? 'Đang tạo…' : '＋ Tạo 50 tin mẫu'}</button>

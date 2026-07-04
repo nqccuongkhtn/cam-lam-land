@@ -10,7 +10,7 @@ if (typeof window !== 'undefined' && !(maplibregl as any).__pmtiles) {
 }
 
 export interface GeoLayer { id: string; type: 'fill' | 'line' | 'circle' | 'symbol'; data: GeoJSON.FeatureCollection; visible: boolean; paint: Record<string, any>; layout?: Record<string, any>; beforeId?: string; }
-export interface MarkerSpec { lng: number; lat: number; color?: string; popupHtml?: string; label?: string; onClick?: () => void; }
+export interface MarkerSpec { lng: number; lat: number; color?: string; popupHtml?: string; label?: string; tier?: string; dot?: boolean; onClick?: () => void; }
 export interface ImageOverlay { id: string; url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number; visible: boolean; pmtiles?: string; fillMaxzoom?: number; tiles?: string[]; minzoom?: number; maxzoom?: number; }
 export type BaseMap = 'street' | 'satellite' | 'terrain';
 export type MeasureMode = 'off' | 'distance' | 'area';
@@ -221,9 +221,20 @@ export default function MapView({ center, zoom, className, layers = [], markers 
   useEffect(() => {
     const map = mapRef.current; if (!map) return;
     markerRefs.current.forEach((m) => m.remove());
+    const TIER_TXT: Record<string, string> = { diamond: 'Kim Cương', gold: 'VIP Vàng', silver: 'VIP Bạc' };
     markerRefs.current = markers.map((m) => {
       let mk: maplibregl.Marker;
-      if (m.label) {
+      if (m.tier && m.tier !== 'normal') {
+        // Tin VIP: pill giá + tên gói (nổi bật)
+        const el = document.createElement('div'); el.className = 'cl-price-pin cl-vip';
+        const pr = document.createElement('span'); pr.textContent = m.label || ''; el.appendChild(pr);
+        const tag = document.createElement('b'); tag.className = 'cl-vip-tag cl-vip-' + m.tier; tag.textContent = TIER_TXT[m.tier] || 'VIP'; el.appendChild(tag);
+        mk = new maplibregl.Marker({ element: el, anchor: 'bottom' }).setLngLat([m.lng, m.lat]);
+      } else if (m.dot) {
+        // Tin thường: chấm nhỏ (không hiện giá) cho gọn bản đồ
+        const el = document.createElement('div'); el.className = 'cl-dot';
+        mk = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([m.lng, m.lat]);
+      } else if (m.label) {
         const el = document.createElement('div'); el.className = 'cl-price-pin'; el.textContent = m.label;
         mk = new maplibregl.Marker({ element: el, anchor: 'bottom' }).setLngLat([m.lng, m.lat]);
       } else {

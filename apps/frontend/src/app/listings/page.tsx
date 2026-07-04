@@ -53,7 +53,8 @@ function ListingsInner() {
   function load(over?: { type?: string; min?: string; max?: string; q?: string; mine?: boolean; deal?: string }) {
     setLoading(true);
     if (over?.mine ?? mine) {
-      api<{ listings: Listing[] }>('/listings/mine').then((d) => setListings(d.listings || [])).catch(() => setListings([])).finally(() => setLoading(false));
+      const dl = over?.deal ?? deal;
+      api<{ listings: Listing[] }>(`/listings/mine?deal=${dl}`).then((d) => setListings(d.listings || [])).catch(() => setListings([])).finally(() => setLoading(false));
       return;
     }
     const p = new URLSearchParams();
@@ -83,7 +84,16 @@ function ListingsInner() {
   }, [searchParams]);
   useEffect(() => { api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {}); }, []);
 
-  const markers = useMemo(() => listings.map((l) => ({ lng: l.lng, lat: l.lat, label: priceLabel(l.price, l.deal), popupHtml: `<a href="/listings/${l.id}" style="font-weight:700;color:#0A2540">${l.title}</a><br/><b style="color:#dc2626">${priceLabel(l.price, l.deal)}</b>` })), [listings]);
+  const markers = useMemo(() => listings.map((l) => {
+    const isVip = !!l.tier && l.tier !== 'normal';
+    return {
+      lng: l.lng, lat: l.lat,
+      tier: isVip ? l.tier : undefined,     // VIP: pill giá + tên gói
+      dot: !isVip,                          // tin thường: chấm nhỏ (không hiện giá)
+      label: isVip ? priceLabel(l.price, l.deal) : undefined,
+      popupHtml: `<a href="/listings/${l.id}" style="font-weight:700;color:#0A2540">${l.title}</a><br/><b style="color:#dc2626">${priceLabel(l.price, l.deal)}</b>`,
+    };
+  }), [listings]);
   const overlays: ImageOverlay[] = useMemo(() => [{ ...QH, opacity, visible: qhOn }], [opacity, qhOn]);
   const shown = useMemo(() => {
     let a = [...listings];

@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { Listing, PROPERTY_LABELS, formatVnd, priceLabel, DEAL_LABELS, TIER_LABEL, postedLabel } from '@/lib/types';
-import { displayViews } from '@/lib/views';
+import { displayViews, rememberViews } from '@/lib/views';
 import { useAuth } from '@/lib/auth';
 import ListingCard from '@/components/ListingCard';
 
@@ -28,7 +28,7 @@ export default function ListingDetail() {
   const [saved, setSaved] = useState(false);
   const [similar, setSimilar] = useState<Listing[]>([]);
 
-  useEffect(() => { setL(null); setFull(null); setActive(0); api<Listing>(`/listings/${id}`).then(setL).catch((e) => setErr(e.message)); }, [id]);
+  useEffect(() => { setL(null); setFull(null); setActive(0); api<Listing>(`/listings/${id}`).then((data) => { setL(data); rememberViews(data.id, data.views || 0); }).catch((e) => setErr(e.message)); }, [id]);
   useEffect(() => {
     if (!l) return;
     const qs = l.ward ? `ward=${encodeURIComponent(l.ward)}` : `propertyType=${l.propertyType}`;

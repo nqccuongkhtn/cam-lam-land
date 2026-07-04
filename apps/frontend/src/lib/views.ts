@@ -31,7 +31,33 @@ export function fakeBoost(l: { id: number; createdAt?: string; tier?: string }, 
   return Math.round(total * grow * yearFade);
 }
 
-/** Luot xem de HIEN THI = luot xem that + moi (tich luy theo thoi gian, giam dan nam dau). */
+/** Luot xem de HIEN THI = luot xem that + moi. (Ket hop lop ghi nho o card qua viewedReal.) */
 export function displayViews(l: { id: number; views?: number; createdAt?: string; tier?: string }, now = Date.now()): number {
   return (l.views || 0) + fakeBoost(l, now);
+}
+
+// ── Lop "ghi nho luot xem" phia client ──────────────────────────────────────
+// Trang chi tiet tang +1 o DB, nhung trang danh sach da nap tu truoc nen con so cu.
+// Ta ghi so luot THAT moi nhat vao localStorage; moi card doc lai de hien nhat quan
+// ngay tren MOI trang (danh sach, trang chu, trang moi gioi...) ma khong can tai lai.
+const VKEY = 'camlam_viewed_v1';
+function readOverlay(): Record<string, number> {
+  if (typeof window === 'undefined') return {};
+  try { return JSON.parse(localStorage.getItem(VKEY) || '{}'); } catch { return {}; }
+}
+/** Ghi nho so luot xem THAT moi nhat cua 1 tin (goi o trang chi tiet sau khi tai xong). */
+export function rememberViews(id: number, realViews: number): void {
+  if (typeof window === 'undefined' || !id) return;
+  try {
+    const o = readOverlay();
+    if ((o[id] || 0) < realViews) {
+      o[id] = realViews;
+      localStorage.setItem(VKEY, JSON.stringify(o));
+      window.dispatchEvent(new Event('views-change'));
+    }
+  } catch { /* ignore */ }
+}
+/** So luot xem THAT da ghi nho cho 1 tin (0 neu chua co). */
+export function viewedReal(id: number): number {
+  return readOverlay()[id] || 0;
 }

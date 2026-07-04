@@ -48,6 +48,15 @@ button, a, input, select, textarea {
 /* Ghim tin dạng nhãn giá trên bản đồ (kiểu batdongsan) */
 .cl-price-pin { background:#0A2540; color:#fff; font-size:12px; font-weight:800; line-height:1; padding:4px 8px; border-radius:9999px; white-space:nowrap; box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:pointer; border:1.5px solid #fff; }
 .cl-price-pin:hover { background:#dc2626; z-index:6; }
+/* Marker tin VIP: pill giá + tên gói */
+.cl-price-pin.cl-vip { display:inline-flex; align-items:center; gap:5px; padding:4px 6px 4px 9px; z-index:5; }
+.cl-vip-tag { font-size:9px; font-weight:900; line-height:1; padding:3px 5px; border-radius:6px; color:#fff; letter-spacing:.3px; text-transform:uppercase; white-space:nowrap; }
+.cl-vip-diamond { background:linear-gradient(90deg,#e11d48,#f43f5e); }
+.cl-vip-gold { background:linear-gradient(90deg,#f59e0b,#eab308); color:#3a2c00; }
+.cl-vip-silver { background:linear-gradient(90deg,#94a3b8,#64748b); }
+/* Marker tin thường: chấm nhỏ (không hiện giá) */
+.cl-dot { width:11px; height:11px; border-radius:50%; background:#1f2937; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.45); cursor:pointer; transition:transform .12s; }
+.cl-dot:hover { transform:scale(1.5); background:#dc2626; z-index:6; }
 
 /* Quảng cáo động — chuyển động mượt (kiểu Znews) */
 @keyframes clKen { from { transform: scale(1.02); } to { transform: scale(1.09); } }

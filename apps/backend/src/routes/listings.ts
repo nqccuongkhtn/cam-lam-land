@@ -177,16 +177,20 @@ listingsRouter.get('/geojson', async (_req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// GET /api/listings/mine — tin của tôi + số khách quan tâm
+// GET /api/listings/mine — tin của tôi + số khách quan tâm. ?deal=sale|rent lọc theo tab (tuỳ chọn).
 listingsRouter.get('/mine', authRequired, async (req: AuthedRequest, res, next) => {
   try {
+    const deal = String((req.query as any).deal || '');
+    const params: any[] = [req.user!.id];
+    let dealCond = '';
+    if (deal === 'rent' || deal === 'sale') { params.push(deal); dealCond = ` AND deal = $${params.length}`; }
     const rows = await query(
-      `SELECT id, title, price, property_type AS "propertyType", ward, status, boosted, tier, bumped_at AS "bumpedAt", images,
+      `SELECT id, title, price, property_type AS "propertyType", deal, views, ward, status, boosted, tier, bumped_at AS "bumpedAt", images,
               ST_X(geom) AS lng, ST_Y(geom) AS lat, created_by AS "createdBy",
               created_at AS "createdAt",
               (SELECT count(*)::int FROM listing_leads ll WHERE ll.listing_id=listings.id) AS "leadCount",
-              (SELECT COALESCE(sum(views),0)::int FROM listing_leads ll WHERE ll.listing_id=listings.id) AS "leadViews"
-       FROM listings WHERE created_by=$1 ORDER BY CASE tier WHEN 'diamond' THEN 3 WHEN 'gold' THEN 2 WHEN 'silver' THEN 1 ELSE 0 END DESC, COALESCE(bumped_at, created_at) DESC`, [req.user!.id]);
+              (SELECT COALESCE(sum(ll.views),0)::int FROM listing_leads ll WHERE ll.listing_id=listings.id) AS "leadViews"
+       FROM listings WHERE created_by=$1${dealCond} ORDER BY CASE tier WHEN 'diamond' THEN 3 WHEN 'gold' THEN 2 WHEN 'silver' THEN 1 ELSE 0 END DESC, COALESCE(bumped_at, created_at) DESC`, params);
     res.json({ count: rows.length, listings: rows });
   } catch (e) { next(e); }
 });

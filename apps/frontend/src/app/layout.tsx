@@ -5,6 +5,7 @@ import Providers from './providers';
 import PwaRegister from './pwa-register';
 import ChatWidget from '@/components/ChatWidget';
 import AiAssistant from '@/components/AiAssistant';
+import CompareBar from '@/components/CompareBar';
 import ScrollToTop from '@/components/ScrollToTop';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://camlamland.onrender.com';
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main className="min-h-[calc(100vh-56px)]">{children}</main>
           <ChatWidget />
           <AiAssistant />
+          <CompareBar />
         </Providers>
       </body>
     </html>

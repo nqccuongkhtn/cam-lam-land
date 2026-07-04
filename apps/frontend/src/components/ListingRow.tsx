@@ -1,13 +1,21 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Listing, formatVnd, TIER_BADGE, TIER_LABEL, postedLabel } from '@/lib/types';
+import { inCompare, toggleCompare } from '@/lib/compare';
 
 function IPin() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="2.5" /></svg>; }
 
 
 export default function ListingRow({ l, href }: { l: Listing; href?: string }) {
   const [fav, setFav] = useState(false);
+  const [cmp, setCmp] = useState(false);
+  useEffect(() => {
+    const sync = () => setCmp(inCompare(l.id));
+    sync();
+    window.addEventListener('compare-change', sync);
+    return () => window.removeEventListener('compare-change', sync);
+  }, [l.id]);
   const nImg = l.images?.length ?? 0;
   const perM2 = l.area && l.area > 0 ? l.price / l.area / 1e6 : null;
   return (
@@ -34,10 +42,16 @@ export default function ListingRow({ l, href }: { l: Listing; href?: string }) {
         {l.description && <p className="text-[13px] text-slate-500 mt-1 line-clamp-2 hidden sm:block">{l.description}</p>}
         <div className="mt-auto pt-2 flex items-center justify-between">
           <span className="text-xs text-slate-400">{postedLabel(l.createdAt)}</span>
-          <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setFav((v) => !v); }} aria-label="Lưu tin"
-            className={`w-8 h-8 grid place-items-center rounded-lg border transition ${fav ? 'border-red-200 text-red-500 bg-red-50' : 'border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200'}`}>
-            <svg viewBox="0 0 24 24" fill={fav ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" /></svg>
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCompare(l); }} aria-label="So sánh" title="So sánh"
+              className={`w-8 h-8 grid place-items-center rounded-lg border transition ${cmp ? 'border-[#0A2540] text-[#0A2540] bg-[#0A2540]/5' : 'border-slate-200 text-slate-400 hover:text-[#0A2540] hover:border-[#0A2540]/40'}`}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M8 3 4 7l4 4" /><path d="M4 7h16" /><path d="m16 21 4-4-4-4" /><path d="M20 17H4" /></svg>
+            </button>
+            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setFav((v) => !v); }} aria-label="Lưu tin"
+              className={`w-8 h-8 grid place-items-center rounded-lg border transition ${fav ? 'border-red-200 text-red-500 bg-red-50' : 'border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200'}`}>
+              <svg viewBox="0 0 24 24" fill={fav ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" /></svg>
+            </button>
+          </div>
         </div>
       </div>
     </Link>

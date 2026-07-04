@@ -44,7 +44,7 @@ export default function HomeUtilities() {
   const TOOLS = [
     { k: 'age', icon: '☯️', t: 'Xem tuổi xây nhà', d: 'Kim Lâu · Hoang Ốc · Tam Tai' },
     { k: 'cost', icon: '🏗️', t: 'Chi phí làm nhà', d: 'Ước tính theo m² & số tầng' },
-    { k: 'loan', icon: '🧮', t: 'Tính lãi suất vay', d: 'Trả góp ngân hàng mua nhà' },
+    { k: 'loan', icon: '🧮', t: 'Tính vay mua nhà', d: 'Số cần vay & trả góp/tháng' },
     { k: 'fs', icon: '🧭', t: 'Tư vấn phong thủy', d: 'Hướng nhà hợp tuổi' },
   ] as const;
   return (
@@ -143,22 +143,40 @@ function CostTool() {
 }
 
 function LoanTool() {
-  const [sotien, setSotien] = useState(''); const [ls, setLs] = useState('9'); const [nam, setNam] = useState('15'); const [pt, setPt] = useState<'giamdan' | 'deu'>('giamdan');
-  const P = +sotien * 1e6, r = +ls / 100 / 12, n = (+nam || 1) * 12;
+  const [gia, setGia] = useState(''); const [von, setVon] = useState('');
+  const [ls, setLs] = useState('9'); const [nam, setNam] = useState('15');
+  const [pt, setPt] = useState<'giamdan' | 'deu'>('giamdan'); const [tn, setTn] = useState('');
+  const num = (s: string) => s.replace(/\D/g, '');
+  const giaN = +gia * 1e6, vonN = +von * 1e6, tnN = +tn * 1e6;
+  const P = Math.max(0, giaN - vonN); // số tiền cần vay
+  const r = +ls / 100 / 12, n = (+nam || 1) * 12;
   const ok = P > 0 && +ls > 0 && n > 0;
+  const ltv = giaN > 0 ? (P / giaN) * 100 : 0;
   let out: { thangDau: number; thangCuoi?: number; tongLai: number; tong: number } | null = null;
   if (ok) {
     if (pt === 'deu') { const M = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1); out = { thangDau: M, tongLai: M * n - P, tong: M * n }; }
     else { const goc = P / n; const tongLai = ((P * r) * (n + 1)) / 2; out = { thangDau: goc + P * r, thangCuoi: goc + goc * r, tongLai, tong: P + tongLai }; }
   }
+  const pctTN = out && tnN > 0 ? (out.thangDau / tnN) * 100 : 0;
   return (
     <div className="space-y-3">
-      <div><label className={lbl}>Số tiền vay (triệu đồng)</label><input className={inp} value={sotien} onChange={(e) => setSotien(e.target.value.replace(/\D/g, ''))} inputMode="numeric" placeholder="VD: 1000 (= 1 tỷ)" /></div>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={lbl}>Giá nhà/đất (triệu)</label><input className={inp} value={gia} onChange={(e) => setGia(num(e.target.value))} inputMode="numeric" placeholder="VD: 2000" /></div>
+        <div><label className={lbl}>Vốn tự có (triệu)</label><input className={inp} value={von} onChange={(e) => setVon(num(e.target.value))} inputMode="numeric" placeholder="VD: 800" /></div>
+      </div>
+      {P > 0 && (
+        <div className={`rounded-lg px-3 py-2 text-xs font-semibold ${ltv > 70 ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'}`}>
+          Cần vay <b>{fmtVnd(P)}</b>{giaN > 0 && <> · <b>{Math.round(ltv)}%</b> giá trị</>}{ltv > 70 && ' ⚠ nên vay ≤ 70%'}
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-3">
         <div><label className={lbl}>Lãi suất (%/năm)</label><input className={inp} value={ls} onChange={(e) => setLs(e.target.value.replace(/[^\d.]/g, ''))} inputMode="decimal" /></div>
-        <div><label className={lbl}>Thời hạn (năm)</label><input className={inp} value={nam} onChange={(e) => setNam(e.target.value.replace(/\D/g, ''))} inputMode="numeric" /></div>
+        <div><label className={lbl}>Thời hạn (năm)</label><input className={inp} value={nam} onChange={(e) => setNam(num(e.target.value))} inputMode="numeric" /></div>
       </div>
-      <div><label className={lbl}>Cách tính</label><select className={inp} value={pt} onChange={(e) => setPt(e.target.value as any)}><option value="giamdan">Dư nợ giảm dần</option><option value="deu">Trả góp đều hàng tháng</option></select></div>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={lbl}>Cách tính</label><select className={inp} value={pt} onChange={(e) => setPt(e.target.value as any)}><option value="giamdan">Dư nợ giảm dần</option><option value="deu">Trả góp đều</option></select></div>
+        <div><label className={lbl}>Thu nhập/tháng (triệu)</label><input className={inp} value={tn} onChange={(e) => setTn(num(e.target.value))} inputMode="numeric" placeholder="tuỳ chọn" /></div>
+      </div>
       {out && (
         <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm space-y-1.5">
           {pt === 'deu'
@@ -169,8 +187,14 @@ function LoanTool() {
               </>}
           <div className="flex justify-between"><span className="text-slate-500">Tổng lãi</span><b>{fmtVnd(out.tongLai)}</b></div>
           <div className="flex justify-between pt-1.5 border-t border-slate-200"><span className="font-bold text-[#0A2540]">Tổng phải trả</span><b className="text-[#0A2540]">{fmtVnd(out.tong)}</b></div>
+          {tnN > 0 && (
+            <div className={`flex justify-between pt-1.5 border-t border-slate-200 ${pctTN <= 40 ? 'text-emerald-600' : 'text-red-600'}`}>
+              <span className="font-semibold">Trả góp / thu nhập</span><b>{Math.round(pctTN)}% {pctTN <= 40 ? '· an toàn ✓' : '· khá cao ⚠'}</b>
+            </div>
+          )}
         </div>
       )}
+      <p className="text-[11px] text-slate-400">Gợi ý an toàn: vay ≤ 70% giá trị và trả góp/tháng ≤ 40% thu nhập.</p>
     </div>
   );
 }

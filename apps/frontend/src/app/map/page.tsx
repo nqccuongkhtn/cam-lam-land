@@ -7,6 +7,7 @@ import { GisLayer, formatVnd } from '@/lib/types';
 import { vn2000ToWgs84, wgs84ToVn2000 } from '@/lib/vn2000';
 import { getToken } from '@/lib/token';
 import { useAuth } from '@/lib/auth';
+import { getPlaces, addPlace, removePlace, type SavedPlace } from '@/lib/savedPlaces';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false, loading: () => <div className="h-full w-full grid place-items-center bg-slate-100 text-slate-400 text-sm animate-pulse">Đang tải bản đồ…</div> });
 
@@ -270,6 +271,7 @@ export default function MapPage() {
   const [labels, setLabels] = useState(true);
   const [ranhXa, setRanhXa] = useState<GeoJSON.FeatureCollection | null>(null);
   const [ranhOn, setRanhOn] = useState(false); // tắt mặc định — ranh xã chờ dữ liệu chuẩn (làm sau)
+  const [places, setPlaces] = useState<SavedPlace[]>([]);
   const [measure, setMeasure] = useState<MeasureMode>('off');
   const [mResult, setMResult] = useState<MeasureResult | null>(null);
   const [focusPoint, setFocusPoint] = useState<{ lng: number; lat: number; label?: string } | null>(null);
@@ -325,6 +327,7 @@ export default function MapPage() {
   useEffect(() => { if (viewRef.current) refreshFeatures(viewRef.current); }, [visible, refreshFeatures]);
   useEffect(() => { setCanDelete(user?.role === 'admin' || user?.role === 'gis'); }, [user]);
   useEffect(() => { fetch('/ranh-xa.geojson').then((r) => (r.ok ? r.json() : null)).then(setRanhXa).catch(() => {}); }, []);
+  useEffect(() => { const sync = () => setPlaces(getPlaces()); sync(); window.addEventListener('places-change', sync); return () => window.removeEventListener('places-change', sync); }, []);
   useEffect(() => { if (!camOpen) return; const v = camVideoRef.current, st = camStreamRef.current; if (!v || !st) return; v.srcObject = st; v.setAttribute('playsinline', 'true'); v.play().catch(() => {}); }, [camOpen]);
   // Giải phóng camera khi rời trang (tránh giữ camera chạy ngầm trên điện thoại).
   useEffect(() => () => { camStreamRef.current?.getTracks().forEach((t) => t.stop()); camStreamRef.current = null; if (ocrTimer.current) clearInterval(ocrTimer.current); }, []);
@@ -359,6 +362,8 @@ export default function MapPage() {
     }
     return out;
   }, [layers, data, visible, opacity, ranhXa, ranhOn]);
+
+  const placeMarkers = useMemo(() => places.map((p) => ({ lng: p.lng, lat: p.lat, color: '#C8A14B', popupHtml: `<div style="font-size:12px;line-height:1.4"><b>📍 Điểm đã lưu</b><br>${(p.note || '(không ghi chú)').replace(/[<>&]/g, (c) => (({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }) as any)[c])}<br>VN-2000: X=${p.x.toFixed(1)} · Y=${p.y.toFixed(1)}</div>` })), [places]);
 
   async function onMapClick(lng: number, lat: number) {
     const vn = wgs84ToVn2000(lng, lat);
@@ -640,11 +645,24 @@ export default function MapPage() {
               {canDelete && <button onClick={() => deleteLayer(l.slug, l.name)} title="Xoá lớp" className="text-slate-300 hover:text-red-600">🗑</button>}
             </div>
           ))}
-          <p className="text-xs text-slate-400 mt-4">💡 Nhấp vào bản đồ để xem toạ độ + tra cứu thửa/quy hoạch.</p>
+          {places.length > 0 && (
+            <div className="mt-3 pt-3 border-t">
+              <p className="text-xs font-semibold text-slate-500 mb-1">📍 Điểm đã lưu ({places.length})</p>
+              <div className="space-y-1 max-h-44 overflow-y-auto scroll-soft">
+                {places.map((p) => (
+                  <div key={p.id} className="flex items-center gap-1.5 text-xs bg-slate-50 rounded px-2 py-1">
+                    <button onClick={() => { setFocusPoint({ lng: p.lng, lat: p.lat }); setFitTo([[p.lng - 0.004, p.lat - 0.004], [p.lng + 0.004, p.lat + 0.004]]); }} className="flex-1 text-left truncate hover:text-[#0A2540]" title={p.note || ''}>{p.note || `X=${p.x.toFixed(0)} · Y=${p.y.toFixed(0)}`}</button>
+                    <button onClick={() => removePlace(p.id)} aria-label="Xoá" className="text-slate-300 hover:text-red-600 shrink-0">✕</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          <p className="text-xs text-slate-400 mt-4">💡 Nhấp vào bản đồ để xem toạ độ + lưu điểm + tra cứu thửa/quy hoạch.</p>
         </aside>
 
         <div className="relative flex-1">
-          <MapView layers={geoLayers} overlays={overlays} baseMap={baseMap} labels={labels} measureMode={measure}
+          <MapView layers={geoLayers} overlays={overlays} markers={placeMarkers} baseMap={baseMap} labels={labels} measureMode={measure}
             focusPoint={focusPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} onViewport={onViewport} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={1} fitTo={fitTo} />
           {zoomNow > 0 && zoomNow < ZONING_MIN_ZOOM && layers.some((l) => (l.layerType === 'parcel') && (visible[l.slug] ?? true)) && (
             <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 bg-[#0A2540]/90 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">🔍 Đang dùng ảnh quy hoạch · phóng to để hiện ranh + click thửa</div>
@@ -778,6 +796,7 @@ export default function MapPage() {
                 <div className="mb-2 text-xs bg-slate-50 rounded p-2">
                   <div>VN-2000: <b>X={clickVN.x.toFixed(2)}</b>, <b>Y={clickVN.y.toFixed(2)}</b></div>
                   <div>WGS84: {clickVN.lat.toFixed(6)}, {clickVN.lng.toFixed(6)}</div>
+                  <button onClick={() => { const note = window.prompt('Ghi chú cho điểm này (tuỳ chọn):', '') ?? ''; addPlace({ lng: clickVN.lng, lat: clickVN.lat, x: clickVN.x, y: clickVN.y, note }); }} className="mt-1.5 w-full bg-[#C8A14B] hover:bg-[#b8923f] text-[#0A2540] font-bold py-1.5 rounded text-xs">💾 Lưu điểm này</button>
                 </div>
               )}
               {qhvHit.length > 0 && (

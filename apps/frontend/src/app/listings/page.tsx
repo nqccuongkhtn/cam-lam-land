@@ -172,7 +172,10 @@ export default function ListingsPage() {
       ) : null}
       <h1 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">{mine ? 'Giỏ hàng của bạn' : title}</h1>
       <p className="text-sm text-slate-500 mt-0.5">{loading ? 'Đang tìm…' : <>Hiện có <b className="text-[#0A2540]">{shown.length}</b> bất động sản.</>}</p>
-      <Link href="/gia-dat" className="inline-flex items-center gap-1.5 mt-2 bg-[#C8A14B]/10 text-[#0A2540] font-bold text-sm px-3 py-1.5 rounded-full hover:bg-[#C8A14B]/20">💰 Giá đất khu vực &amp; định giá nhanh →</Link>
+      <div className="flex flex-wrap gap-2 mt-2">
+        <Link href="/gia-dat" className="inline-flex items-center gap-1.5 bg-[#C8A14B]/10 text-[#0A2540] font-bold text-sm px-3 py-1.5 rounded-full hover:bg-[#C8A14B]/20">💰 Giá đất &amp; định giá nhanh</Link>
+        <Link href="/cam-nang" className="inline-flex items-center gap-1.5 bg-[#0A2540]/[0.06] text-[#0A2540] font-bold text-sm px-3 py-1.5 rounded-full hover:bg-[#0A2540]/10">📚 Cẩm nang pháp lý nhà đất</Link>
+      </div>
       <div className="flex items-center justify-between mt-3 mb-3">
         <label className="hidden sm:flex items-center gap-2 text-sm text-slate-500"><span className="w-7 h-7 grid place-items-center rounded-full bg-amber-100 text-amber-600">🔔</span> Nhận tin mới</label>
         <label className="flex items-center gap-1.5 text-sm text-slate-500 ml-auto">

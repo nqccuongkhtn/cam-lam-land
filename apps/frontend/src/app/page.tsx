@@ -62,6 +62,13 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
     { title: 'Ký gửi nhà đất — định giá & bán giúp miễn phí', url: '/listings' },
     { title: 'Đăng tin bán nhà đất miễn phí tại Cam Lâm', url: '/sales/post' },
   ],
+  'Cẩm nang nhà đất': [
+    { title: 'Thủ tục sang tên Sổ đỏ (chuyển nhượng quyền sử dụng đất)', url: '/cam-nang/sang-ten-so-do', img: U('1486406146926-c627a92ad1ab'), date: 'Cẩm nang' },
+    { title: 'Các loại thuế, phí khi mua bán nhà đất phải nộp', url: '/cam-nang/thue-phi-mua-ban-nha-dat' },
+    { title: 'Cách kiểm tra Sổ đỏ thật hay giả nhanh, chính xác', url: '/cam-nang/kiem-tra-so-do-that-gia' },
+    { title: 'Cách kiểm tra đất có dính quy hoạch không', url: '/cam-nang/kiem-tra-quy-hoach-dat' },
+    { title: '📚 Xem tất cả cẩm nang pháp lý nhà đất', url: '/cam-nang' },
+  ],
 };
 
 function Ic({ d }: { d: string }) {

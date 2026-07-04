@@ -172,10 +172,17 @@ export default function ListingDetail() {
 
           <div>
             <div className="bg-white rounded-2xl border border-slate-200 p-5 lg:sticky lg:top-20 shadow-sm">
-              <div className="flex items-center gap-3">
-                {l.posterAvatar ? <img src={l.posterAvatar} alt="" className="w-12 h-12 rounded-full object-cover ring-2 ring-[#C8A14B]/30" /> : <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#123459] to-[#081B30] text-[#C8A14B] grid place-items-center text-lg font-extrabold ring-2 ring-[#C8A14B]/30">{(l.contactName || 'C').charAt(0).toUpperCase()}</div>}
-                <div><p className="font-bold text-[#0A2540] leading-tight">{l.contactName || 'Cam Lâm Land'}</p><p className="text-xs text-slate-400">Người đăng tin · Cam Lâm Land</p></div>
-              </div>
+              {l.createdBy ? (
+                <Link href={`/moi-gioi/${l.createdBy}`} className="flex items-center gap-3 group -m-1 p-1 rounded-lg hover:bg-slate-50 transition">
+                  {l.posterAvatar ? <img src={l.posterAvatar} alt="" className="w-12 h-12 rounded-full object-cover ring-2 ring-[#C8A14B]/30" /> : <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#123459] to-[#081B30] text-[#C8A14B] grid place-items-center text-lg font-extrabold ring-2 ring-[#C8A14B]/30">{(l.contactName || 'C').charAt(0).toUpperCase()}</div>}
+                  <div><p className="font-bold text-[#0A2540] leading-tight group-hover:text-red-700">{l.contactName || 'Cam Lâm Land'}</p><p className="text-xs text-slate-400">Người đăng tin · <span className="text-[#C8A14B] font-semibold group-hover:underline">Xem trang cá nhân →</span></p></div>
+                </Link>
+              ) : (
+                <div className="flex items-center gap-3">
+                  {l.posterAvatar ? <img src={l.posterAvatar} alt="" className="w-12 h-12 rounded-full object-cover ring-2 ring-[#C8A14B]/30" /> : <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#123459] to-[#081B30] text-[#C8A14B] grid place-items-center text-lg font-extrabold ring-2 ring-[#C8A14B]/30">{(l.contactName || 'C').charAt(0).toUpperCase()}</div>}
+                  <div><p className="font-bold text-[#0A2540] leading-tight">{l.contactName || 'Cam Lâm Land'}</p><p className="text-xs text-slate-400">Người đăng tin · Cam Lâm Land</p></div>
+                </div>
+              )}
               <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="mt-4 flex items-center justify-center gap-2 bg-[#0068FF] hover:bg-[#0058d6] text-white font-bold py-3 rounded-xl"><svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M12 2C6.5 2 2 5.8 2 10.5c0 2.6 1.4 4.9 3.6 6.4-.1.9-.5 2.2-1.2 3.1 1.4-.2 2.8-.8 3.9-1.5 1.1.3 2.4.5 3.7.5 5.5 0 10-3.8 10-8.5S17.5 2 12 2z" /></svg> Chat qua Zalo</a>
               {full ? (
                 <a href={`tel:${full.replace(/\s/g, '')}`} className="mt-2.5 flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-extrabold text-lg py-3.5 rounded-xl shadow-lg shadow-red-600/30"><IPhone /> {full}</a>

@@ -109,6 +109,27 @@ listingsRouter.get('/gia-khu-vuc', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+// GET /api/listings/agent/:id — trang cá nhân người đăng (môi giới): thông tin + tin đang hiển thị + tin hết hạn/đã ẩn.
+listingsRouter.get('/agent/:id', async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    if (!id) return res.status(400).json({ error: 'id không hợp lệ' });
+    const [agent] = await query(`SELECT id, full_name AS "name", phone, avatar, role, created_at AS "createdAt" FROM users WHERE id=$1`, [id]);
+    if (!agent) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+    const active = await query(
+      `${SELECT} WHERE listings.created_by=$1 AND listings.status NOT IN ('hidden','pending','sold')
+         AND (listings.tier <> 'normal' OR COALESCE(listings.bumped_at, listings.created_at) > now() - interval '7 days')
+       ORDER BY CASE listings.tier WHEN 'diamond' THEN 3 WHEN 'gold' THEN 2 WHEN 'silver' THEN 1 ELSE 0 END DESC, COALESCE(listings.bumped_at, listings.created_at) DESC LIMIT 60`, [id]);
+    const expired = await query(
+      `${SELECT} WHERE listings.created_by=$1 AND listings.status <> 'pending'
+         AND (listings.status IN ('hidden','sold') OR (listings.tier = 'normal' AND COALESCE(listings.bumped_at, listings.created_at) <= now() - interval '7 days'))
+       ORDER BY COALESCE(listings.bumped_at, listings.created_at) DESC LIMIT 60`, [id]);
+    for (const r of active) r.contactPhone = maskPhone(r.contactPhone);
+    for (const r of expired) r.contactPhone = maskPhone(r.contactPhone);
+    res.json({ agent, active, expired });
+  } catch (e) { next(e); }
+});
+
 // POST /api/listings/:id/boost — đặt hạng VIP / đẩy lên đầu (chủ tin hoặc admin)
 listingsRouter.post('/:id/boost', authRequired, async (req: AuthedRequest, res, next) => {
   try {

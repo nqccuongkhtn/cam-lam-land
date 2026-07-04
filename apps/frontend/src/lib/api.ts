@@ -45,4 +45,12 @@ export async function ocrImage(blob: Blob): Promise<{ text: string; engine: stri
   const j = await res.json();
   return { text: j.text || '', engine: j.engine || 'máy chủ' };
 }
+export async function ocrCertInfo(blob: Blob): Promise<{ text: string; engine: string }> {
+  const fd = new FormData();
+  fd.append('file', blob, 'so-do.jpg');
+  const res = await fetch(`${API_BASE}/ocr/info`, { method: 'POST', headers: { ...authHeaders() }, body: fd });
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `Đọc sổ lỗi (${res.status})`);
+  const j = await res.json();
+  return { text: j.text || '', engine: j.engine || 'AI' };
+}
 export const apiBase = API_BASE;

@@ -26,14 +26,29 @@ const GEMINI_KEYS = (process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY |
 // Model Gemini — mỗi model có quota riêng trên MỖI key. Thử KEY × MODEL để vắt kiệt quota Gemini trước khi rơi sang engine khác. Ưu tiên gemini-2.5-flash (chính xác + nhanh). Bỏ gemini-3-flash-preview khỏi mặc định (hay timeout); muốn dùng thì đặt GEMINI_MODELS.
 const GEMINI_MODELS = (process.env.GEMINI_MODELS || process.env.GEMINI_MODEL || 'gemini-2.5-flash,gemini-2.5-flash-lite,gemini-2.0-flash,gemini-2.0-flash-lite').split(',').map((s) => s.trim()).filter(Boolean);
 const GEMINI_PROMPT = `Bạn là công cụ trích xuất toạ độ từ ảnh bảng toạ độ địa chính VN-2000 (Khánh Hòa, Việt Nam). Đọc TẤT CẢ các điểm ranh thửa trong ảnh. Mỗi điểm gồm 2 số: X = toạ độ Bắc (Northing) 7 chữ số phần nguyên, thường bắt đầu bằng 1 (khoảng 1200000-1480000); Y = toạ độ Đông (Easting) 6 chữ số phần nguyên (khoảng 380000-720000). CHỈ in kết quả, MỖI DÒNG MỘT ĐIỂM đúng định dạng: X Y (X trước, Y sau, cách nhau một dấu cách; giữ nguyên phần thập phân nếu có; TUYỆT ĐỐI không kèm số thứ tự, chữ, đơn vị hay ký tự nào khác). Không đọc được điểm nào thì để trống.`;
-async function geminiCall(model: string, key: string, buffer: Buffer, mime: string): Promise<string> {
+// Prompt đọc TOÀN BỘ thông tin trên Giấy chứng nhận (sổ đỏ) từ ảnh — dùng cho /api/ocr/info.
+const CERT_INFO_PROMPT = `Bạn là công cụ đọc Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất (sổ đỏ/sổ hồng) Việt Nam từ ảnh. Hãy trích xuất các trường có trên ảnh, MỖI TRƯỜNG MỘT DÒNG đúng định dạng "Nhãn: giá trị". Các nhãn cần lấy (bỏ qua dòng nào không đọc được, KHÔNG bịa):
+Người sử dụng đất/chủ sở hữu
+Số CCCD/CMND
+Thửa đất số
+Tờ bản đồ số
+Diện tích
+Loại đất (mục đích sử dụng)
+Thời hạn sử dụng
+Hình thức sử dụng
+Địa chỉ thửa đất
+Nguồn gốc sử dụng
+Số phát hành (seri)
+Số vào sổ cấp GCN
+CHỈ in các dòng "Nhãn: giá trị", tuyệt đối không thêm lời giải thích. Chỉ đọc đúng những gì nhìn thấy trên ảnh.`;
+async function geminiCall(model: string, key: string, buffer: Buffer, mime: string, prompt: string = GEMINI_PROMPT): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
   // TẮT bớt "thinking" cho phản hồi NHANH (đọc bảng số không cần suy luận, tránh timeout): Gemini 3 → thinkingLevel=MINIMAL; Gemini 2.5 → thinkingBudget=0. Model 2.0/cũ hơn KHÔNG hỗ trợ thinking nên bỏ qua (gửi vào sẽ lỗi 400).
   const generationConfig: any = { temperature: 0, maxOutputTokens: 4096 };
   if (/gemini-3/.test(model)) generationConfig.thinkingConfig = { thinkingLevel: 'MINIMAL' };
   else if (/gemini-2\.5/.test(model)) generationConfig.thinkingConfig = { thinkingBudget: 0 };
   const body = {
-    contents: [{ parts: [{ text: GEMINI_PROMPT }, { inline_data: { mime_type: mime || 'image/png', data: buffer.toString('base64') } }] }],
+    contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: mime || 'image/png', data: buffer.toString('base64') } }] }],
     generationConfig,
   };
   const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
@@ -42,15 +57,15 @@ async function geminiCall(model: string, key: string, buffer: Buffer, mime: stri
   return String(j?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text).filter(Boolean).join('\n') || '');
 }
 // Ưu tiên Gemini BẰNG MỌI GIÁ: thử mọi tổ hợp KEY × MODEL (mỗi key×model là 1 quota free riêng). Cái nào ra số thì nhận luôn; lỗi/hết quota/không ra số thì thử tiếp. Vắt kiệt hết mới ném lỗi để rơi sang Groq/OpenRouter/OCR.space.
-async function geminiOcr(buffer: Buffer, mime: string): Promise<{ text: string; model: string }> {
+async function geminiOcr(buffer: Buffer, mime: string, prompt: string = GEMINI_PROMPT, accept: (t: string) => boolean = (t) => (t.match(/\d{5,}/g) || []).length > 0): Promise<{ text: string; model: string }> {
   let lastErr: any = null;
   for (let ki = 0; ki < GEMINI_KEYS.length; ki++) {
     const key = GEMINI_KEYS[ki];
     for (const model of GEMINI_MODELS) {
       try {
-        const t = await geminiCall(model, key, buffer, mime);
-        if ((t.match(/\d{5,}/g) || []).length > 0) return { text: t, model: `${model}#key${ki + 1}` };
-        lastErr = new Error('không ra số'); console.error(`[ocr] Gemini "${model}" (key${ki + 1}) không ra số → thử tiếp`);
+        const t = await geminiCall(model, key, buffer, mime, prompt);
+        if (accept(t)) return { text: t, model: `${model}#key${ki + 1}` };
+        lastErr = new Error('không đạt'); console.error(`[ocr] Gemini "${model}" (key${ki + 1}) không đạt → thử tiếp`);
       } catch (e: any) { lastErr = e; console.error(`[ocr] Gemini "${model}" (key${ki + 1}) lỗi (${String(e?.message || e).slice(0, 120)}) → thử tiếp`); }
     }
   }
@@ -62,11 +77,11 @@ const GROQ_KEY = process.env.GROQ_API_KEY || '';
 const GROQ_MODEL = process.env.GROQ_MODEL || 'meta-llama/llama-4-scout-17b-16e-instruct'; // Groq free ~1.000 lượt/ngày cho model vision này (không cần thẻ)
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY || '';
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.2-11b-vision-instruct:free'; // đổi sang model đuôi :free khác ở openrouter.ai/models nếu muốn
-async function openaiVisionOcr(baseUrl: string, apiKey: string, model: string, buffer: Buffer, mime: string): Promise<string> {
+async function openaiVisionOcr(baseUrl: string, apiKey: string, model: string, buffer: Buffer, mime: string, prompt: string = GEMINI_PROMPT): Promise<string> {
   const dataUri = `data:${mime || 'image/png'};base64,${buffer.toString('base64')}`;
   const body = {
     model, temperature: 0, max_tokens: 2048,
-    messages: [{ role: 'user', content: [{ type: 'text', text: GEMINI_PROMPT }, { type: 'image_url', image_url: { url: dataUri } }] }],
+    messages: [{ role: 'user', content: [{ type: 'text', text: prompt }, { type: 'image_url', image_url: { url: dataUri } }] }],
   };
   const r = await fetch(baseUrl.replace(/\/+$/, '') + '/chat/completions', {
     method: 'POST',
@@ -188,6 +203,35 @@ ocrRouter.post('/', authRequired, upload.single('file'), async (req: any, res, n
     if (/ENOENT/.test(String(e?.message || e))) return res.status(503).json({ error: 'Máy chủ chưa cài Tesseract OCR' });
     next(e);
   }
+});
+
+// POST /api/ocr/info — đọc THÔNG TIN Giấy chứng nhận từ ảnh (chỉ AI vision: Gemini → Groq → OpenRouter). Trả về text các dòng "Nhãn: giá trị".
+ocrRouter.post('/info', authRequired, upload.single('file'), async (req: any, res, next) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'Thiếu ảnh' });
+    const buf = req.file.buffer, mime = req.file.mimetype;
+    const okInfo = (t: string) => t.trim().length > 15 && /[:：]/.test(t);
+    if (GEMINI_KEYS.length) {
+      try {
+        const g = await geminiOcr(buf, mime, CERT_INFO_PROMPT, okInfo);
+        console.log(`[ocr-info] Gemini (${g.model}) đọc thông tin sổ`);
+        bumpOcr('gemini'); return res.json({ text: g.text, engine: 'gemini' });
+      } catch (e: any) { console.error('[ocr-info] Gemini lỗi (thử tiếp):', e?.message || e); }
+    }
+    if (GROQ_KEY) {
+      try {
+        const t = await openaiVisionOcr('https://api.groq.com/openai/v1', GROQ_KEY, GROQ_MODEL, buf, mime, CERT_INFO_PROMPT);
+        if (okInfo(t)) { bumpOcr('groq'); return res.json({ text: t, engine: 'groq' }); }
+      } catch (e: any) { console.error('[ocr-info] Groq lỗi (thử tiếp):', e?.message || e); }
+    }
+    if (OPENROUTER_KEY) {
+      try {
+        const t = await openaiVisionOcr('https://openrouter.ai/api/v1', OPENROUTER_KEY, OPENROUTER_MODEL, buf, mime, CERT_INFO_PROMPT);
+        if (okInfo(t)) { bumpOcr('openrouter'); return res.json({ text: t, engine: 'openrouter' }); }
+      } catch (e: any) { console.error('[ocr-info] OpenRouter lỗi:', e?.message || e); }
+    }
+    return res.status(422).json({ error: 'AI chưa đọc được thông tin. Hãy chụp/tải ảnh sổ rõ nét, đủ sáng, thẳng mặt sổ rồi thử lại.' });
+  } catch (e) { next(e); }
 });
 
 // GET /api/ocr/usage — thống kê lượt OCR theo nguồn/ngày (chỉ admin).

@@ -8,6 +8,7 @@ const HELP: [string, string][] = [
   ['Nhà đất bán & cho thuê', '/listings'],
   ['Bản đồ quy hoạch', '/map'],
   ['Tra cứu QR thửa đất', '/qr'],
+  ['Đọc thông tin sổ đỏ (AI)', '/doc-so-do'],
   ['Góp vốn đầu tư (CamInvest)', '/dau-tu'],
   ['Tin tức', '/tin-tuc'],
 ];

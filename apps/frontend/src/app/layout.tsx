@@ -1,4 +1,5 @@
 import './globals.css';
+import { Suspense } from 'react';
 import type { Metadata, Viewport } from 'next';
 import Nav from '@/components/Nav';
 import Providers from './providers';
@@ -46,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <PwaRegister />
           <ScrollToTop />
-          <Nav />
+          <Suspense fallback={<div className="h-14" />}><Nav /></Suspense>
           <main className="min-h-[calc(100vh-56px)]">{children}</main>
           <ChatWidget />
           <AiAssistant />

@@ -1,38 +1,37 @@
-// ─────────────────────────────────────────────────────────────────────────
-// LƯỢT XEM HIỂN THỊ = lượt xem THẬT + phần "mồi" (seed) chỉ trong NĂM ĐẦU.
+// LUOT XEM HIEN THI = luot xem THAT (khach click) + phan "moi" tich luy dan.
 //
-// Thuật toán:
-//   • yearFade: hệ số giảm TUYẾN TÍNH từ 1 → 0 trong 1 năm kể từ ngày mở web.
-//       yearFade = 1 - (nay - SITE_LAUNCH) / 1_năm   (kẹp trong [0,1])
-//     → mới mở: mồi lớn nhất; đủ 1 năm: mồi = 0 → hiển thị ĐÚNG số thật.
-//   • seed: con số nền ỔN ĐỊNH theo từng tin (băm từ id) để mỗi tin một khác,
-//     nhân hệ số hạng VIP (tin VIP nhiều "view" hơn cho hợp lý).
-//   • ramp: vài ngày đầu của mỗi tin cho tăng dần như view tích luỹ thật.
+// Cai tien: tin MOI dang KHONG nhay so ngay. Phan moi tich luy DAN theo tuoi tin
+// (bang 0 luc vua dang, tang nhanh vai tuan dau roi cham lai va bao hoa) - giong
+// cach mot tin that hut view. Toan bo phan moi lai GIAM ve 0 trong NAM DAU cua web.
 //
-//   displayViews = viewsThật + round(seed × tierMult × ramp × yearFade)
+// Cong thuc:
+//   grow(tuoiTin) = 1 - exp(-tuoiTin / tau)   // 0 luc moi, tien dan toi 1 (tau ~ 16-34 ngay/tin)
+//   yearFade      = 1 - (nay - ngayMoWeb)/1nam // kep trong 0..1; het nam dau = 0
+//   moi           = tong(tin) * hangVIP * grow * yearFade
+//   HIEN THI      = luotThat + moi
 //
-// LƯU Ý: DB luôn lưu số THẬT (cột views). Đây chỉ là lớp HIỂN THỊ ở trang công khai.
-// Sau 1 năm, tự động trùng khớp số thật. Đổi ngày mở web bên dưới hoặc đặt
-// biến môi trường NEXT_PUBLIC_SITE_LAUNCH = 'YYYY-MM-DD'.
-// ─────────────────────────────────────────────────────────────────────────
+// Tin vua dang: moi ~ 0, chi hien luot xem THAT. Khach cang click, so that cang
+// cong them len tren phan moi. DB luon giu so that; day chi la lop hien thi.
+// Doi ngay mo web ben duoi hoac dat NEXT_PUBLIC_SITE_LAUNCH = 'YYYY-MM-DD'.
 const DAY = 86_400_000;
 const YEAR = 365 * DAY;
 const SITE_LAUNCH = new Date(process.env.NEXT_PUBLIC_SITE_LAUNCH || '2026-07-01T00:00:00+07:00').getTime();
 
 function hash(n: number): number { return Math.imul((n | 0) ^ 0x9e3779b9, 2654435761) >>> 0; }
 
-/** Phần "mồi" cộng thêm cho 1 tin tại thời điểm now (0 sau năm đầu). */
+/** Phan "moi" cong them cho 1 tin: tich luy dan theo tuoi tin, ve 0 sau nam dau. */
 export function fakeBoost(l: { id: number; createdAt?: string; tier?: string }, now = Date.now()): number {
   const yearFade = Math.max(0, Math.min(1, 1 - (now - SITE_LAUNCH) / YEAR));
   if (yearFade <= 0) return 0;
-  const seed = 90 + (hash(l.id) % 160); // 90–250, ổn định theo tin
-  const tierMult = l.tier === 'diamond' ? 2.4 : l.tier === 'gold' ? 1.8 : l.tier === 'silver' ? 1.3 : 1;
   const ageDays = l.createdAt ? Math.max(0, (now - new Date(l.createdAt).getTime()) / DAY) : 30;
-  const ramp = Math.min(1, 0.25 + ageDays / 8); // ngày đầu tăng dần, bão hoà sau ~1 tuần
-  return Math.round(seed * tierMult * ramp * yearFade);
+  const tierMult = l.tier === 'diamond' ? 2.4 : l.tier === 'gold' ? 1.8 : l.tier === 'silver' ? 1.3 : 1;
+  const total = (60 + (hash(l.id) % 140)) * tierMult; // tong moi toi da cua tin (~60-200 x hang)
+  const tau = 16 + (hash(l.id >> 3) % 18);            // hang so thoi gian 16-34 ngay (moi tin khac)
+  const grow = 1 - Math.exp(-ageDays / tau);         // 0 luc moi, tien dan toi 1
+  return Math.round(total * grow * yearFade);
 }
 
-/** Lượt xem để HIỂN THỊ (thật + mồi năm đầu). */
+/** Luot xem de HIEN THI = luot xem that + moi (tich luy theo thoi gian, giam dan nam dau). */
 export function displayViews(l: { id: number; views?: number; createdAt?: string; tier?: string }, now = Date.now()): number {
   return (l.views || 0) + fakeBoost(l, now);
 }

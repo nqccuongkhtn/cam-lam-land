@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/lib/auth';
 
@@ -33,6 +33,7 @@ function Logo({ light }: { light: boolean }) {
 
 export default function Nav() {
   const path = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const { user, loading, logout } = useAuth();
   const isHome = path === '/';
@@ -46,7 +47,7 @@ export default function Nav() {
     onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-  useEffect(() => { setOpen(false); setAcct(false); }, [path]);
+  useEffect(() => { setOpen(false); setAcct(false); }, [path, searchParams]);
   useEffect(() => {
     const onDoc = (e: MouseEvent) => { if (acctRef.current && !acctRef.current.contains(e.target as Node)) setAcct(false); };
     document.addEventListener('mousedown', onDoc);
@@ -54,7 +55,13 @@ export default function Nav() {
   }, []);
 
   const solid = !isHome || scrolled || open || acct;
-  const active = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+  const isRent = searchParams.get('deal') === 'rent';
+  const active = (href: string) => {
+    if (href === '/') return path === '/';
+    if (href === '/listings') return path === '/listings' && !isRent;          // Nhà đất bán
+    if (href === '/listings?deal=rent') return path === '/listings' && isRent;  // Cho thuê
+    return path.startsWith(href);
+  };
   const name = user?.fullName || user?.email?.split('@')[0] || '';
   const roleLabel = user?.role === 'admin' ? 'Quản trị viên' : 'Thành viên';
   function doLogout() { logout(); setAcct(false); setOpen(false); router.push('/'); }

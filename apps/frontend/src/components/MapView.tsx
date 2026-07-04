@@ -240,7 +240,14 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       } else {
         mk = new maplibregl.Marker({ color: m.color ?? '#e53935' }).setLngLat([m.lng, m.lat]);
       }
-      if (m.popupHtml) mk.setPopup(new maplibregl.Popup({ offset: 18 }).setHTML(m.popupHtml));
+      if (m.popupHtml) {
+        const popup = new maplibregl.Popup({ offset: 18, closeButton: false }).setHTML(m.popupHtml);
+        mk.setPopup(popup); // vẫn cho bấm (mobile chạm)
+        const el = mk.getElement();
+        el.style.cursor = 'pointer';
+        el.addEventListener('mouseenter', () => { popup.setLngLat([m.lng, m.lat]).addTo(map); }); // rê chuột là hiện
+        el.addEventListener('mouseleave', () => { popup.remove(); });
+      }
       if (m.onClick) mk.getElement().addEventListener('click', m.onClick);
       mk.addTo(map); return mk;
     });

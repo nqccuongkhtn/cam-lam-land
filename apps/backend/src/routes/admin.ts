@@ -52,10 +52,13 @@ async function clearDemoContent(): Promise<number[]> {
   const rows = await query(`SELECT id FROM users WHERE email LIKE 'demo-%@camlam.local'`);
   const ids = rows.map((r: any) => r.id);
   if (ids.length) {
+    const demoRooms = ids.flatMap((id: number) => ['advisory:' + id, 'support:' + id]);
     await query(`DELETE FROM listings WHERE created_by = ANY($1::int[])`, [ids]);
-    await query(`DELETE FROM chat_messages WHERE user_id = ANY($1::int[]) OR room = ANY($2::text[])`, [ids, ids.flatMap((id: number) => ['advisory:' + id, 'support:' + id])]);
+    await query(`DELETE FROM chat_messages WHERE user_id = ANY($1::int[]) OR room = ANY($2::text[])`, [ids, demoRooms]);
+    await query(`DELETE FROM chat_reads WHERE user_id = ANY($1::int[]) OR room = ANY($2::text[])`, [ids, demoRooms]);
   }
   await query(`DELETE FROM chat_messages WHERE room='community'`); // xoá HOÀN TOÀN chat cộng đồng để tạo lại
+  await query(`DELETE FROM chat_reads WHERE room='community'`);
   await query(`DELETE FROM consignments WHERE description LIKE '%(dữ liệu mẫu)%'`);
   await query(`DELETE FROM invest_leads WHERE note LIKE '%(dữ liệu mẫu)%'`);
   return ids;
@@ -145,33 +148,181 @@ adminRouter.post('/seed-demo', async (req: AuthedRequest, res, next) => {
     const created = rowsL.length;
     // ── 168 tin nhắn CỘNG ĐỒNG, ~10 người trao đổi ──
     const chatUsers = custIds.map((id, i) => ({ id, name: DEMO_CUST_USERS[i].name })).concat(ids.map((id, i) => ({ id, name: DEMO_AGENTS[i].name })));
-    const cTpl: ((w: string) => string)[] = [
-      (w) => `Khu ${w} giờ giá tầm bao nhiêu 1m² vậy cả nhà?`,
-      (w) => `Có anh chị nào cần mua đất ${w} sổ đỏ riêng không ạ?`,
-      (w) => `Mình có lô ${w} giá tốt, ai quan tâm ib nhé.`,
-      (w) => `Cho thuê nhà nguyên căn ${w}, ai cần liên hệ mình.`,
-      (w) => `Đất ${w} dạo này giao dịch sôi động không mọi người?`,
-      (w) => `Mới đi xem lô ${w}, view đẹp mà giá hơi chát 😅`,
-      (w) => `${w} có dự án nào sắp mở bán không cả nhà?`,
-      (w) => `Nhận ký gửi mua bán nhà đất ${w}, uy tín ạ.`,
-      (w) => `Pháp lý đất ${w} ổn không mọi người, mình đang tính xuống tiền.`,
-      (w) => `Cần thuê mặt bằng ${w} mở quán, ai có ib giúp em.`,
-      () => `Sân bay Cam Lâm mà triển khai thì khu ven biển còn lên nữa 🚀`,
-      () => `Cao tốc với đường ven biển xong là bất động sản khu này bay 🔥`,
-      () => `Cả nhà cho hỏi thủ tục tách thửa giờ mất bao lâu ạ?`,
-      () => `Mua đất mà sợ dính quy hoạch thì kiểm tra ở đâu vậy mọi người?`,
-      () => `Lãi suất vay mua nhà giờ khoảng bao nhiêu % rồi các bác nhỉ?`,
-      () => `Thuế phí sang tên sổ đỏ tính sao vậy, ai rành chỉ em với.`,
+    const COMMUNITY_MSGS = [
+      'Chào cả nhà, em mới vô nhóm, hóng thông tin đất Cam Lâm với ạ 🙌',
+      'Chào bạn mới, nhóm mình vui tính lắm cứ tự nhiên hehe',
+      'Cho em hỏi khu Bãi Dài giờ đất nền tầm bao nhiêu 1m² rồi ạ',
+      'Bãi Dài sát biển chát lắm bạn, có lô 30-40tr/m² lận',
+      'Ối vậy thì em xin kiếu, tiền đâu ra 🥲',
+      'Vô trong xíu sau đường ven biển thì mềm hơn, tầm 12-15tr thôi',
+      'Chuẩn, mình cũng đang ôm 1 lô trong đó chờ đường ven biển xong',
+      'Đường ven biển chừng nào xong vậy mấy bác, nghe hứa hoài',
+      'Nghe đâu đang thi công rồi, đoạn Cam Hải Đông thấy máy múc rầm rộ',
+      'Hôm qua đi ngang thấy xe ben chạy quá trời luôn',
+      'Sân bay Cam Lâm mà duyệt nữa là khu này còn sốt nữa',
+      'Sân bay còn xa lắm ông ơi, đừng mơ mộng quá ôm hàng mệt 😂',
+      'Thì đầu tư dài hạn mà, ai cần lướt sóng đâu',
+      'Nói vậy chứ hồi dịch ôm đất muốn khóc luôn nè',
+      'Giờ ấm lại rồi, tháng này mình chốt được 2 lô Cam Đức đó',
+      'Xin vía bác, em rao 3 tháng chưa ai hỏi luôn 🥲',
+      'Đất bác ở đâu giá sao, tả nghe coi',
+      'Lô 100m2 Cam Thành Bắc sổ riêng, em để 1 tỷ 2, ai cần ib',
+      'Giá ok đó, mặt tiền hay hẻm vậy bạn',
+      'Hẻm bê tông xe hơi vô thoải mái ạ',
+      'Vậy là được rồi, khu đó dân cư đông chưa',
+      'Đông vừa, có trường với chợ gần, ở ổn',
+      'Cho mình hỏi thủ tục sang tên giờ mất bao lâu vậy mọi người',
+      'Nhanh thì tuần rưỡi hai tuần, hồ sơ đầy đủ là ok',
+      'Ai làm sổ khu Suối Cát chưa, thấy lâu lâu á',
+      'Suối Cát xa quá em không rành, hóng cùng',
+      'Có bác nào bán đất vườn trồng xoài không, mình kiếm miếng làm farmstay',
+      'Farmstay giờ hot ha, khu Cam Tân nhiều vườn đẹp lắm',
+      'Mình có 5 sào xoài Cam Hiệp Nam, đang tính bán bớt 2 sào',
+      'Giá sào bao nhiêu vậy anh',
+      'Tùy vị trí, mặt đường tầm 900tr tới 1 tỷ 2 một sào',
+      'Hơi cao ha, đất nông nghiệp mà',
+      'Thì gần đường lớn nên vậy đó bạn',
+      'Cả nhà cho hỏi đất dính quy hoạch kiểm tra ở đâu cho chắc',
+      'Lên phòng tài nguyên môi trường huyện hỏi cho chắc ăn nha',
+      'Hoặc coi trên bản đồ quy hoạch của web mình nè, tra được thửa luôn',
+      'Ồ tiện ha, để mình thử coi',
+      'Ừ mình hay xài coi thửa với quy hoạch, khá ổn',
+      'Nhà em cần thuê nguyên căn gần chợ Cam Đức, ai có ib giúp với',
+      'Nhà anh 3 phòng gần chợ, 7 triệu tháng, còn trống nè',
+      'Ib em số đi anh',
+      'Ok em nhắn riêng nha',
+      'Trời hôm nay nắng dễ sợ, đi coi đất mà xỉu ngang 🥵',
+      'Cam Lâm mùa này nắng banh nóc mà, ráng đi bác',
+      'Chốt được lô nào chưa mà đi dữ vậy',
+      'Coi 3 lô rồi mà chưa ưng cái nào, kén quá',
+      'Kén vừa thôi không hết hàng đẹp giờ 😆',
+      'Đúng đó, đất đẹp giá tốt ra là có người ôm liền',
+      'Mình mới bán căn nhà mặt tiền Cam Đức, mừng ghê 🎉',
+      'Chúc mừng nha, bao nhiêu vậy khoe đi',
+      'Dạ 4 tỷ mấy, thương lượng chút đỉnh',
+      'Ngon, mặt tiền Cam Đức giờ có giá lắm',
+      'Ai rành cho hỏi đất nông nghiệp lên thổ cư khó không',
+      'Phải phù hợp quy hoạch với đóng tiền chuyển mục đích, tùy khu',
+      'Tiền chuyển mục đích tính sao vậy',
+      'Theo bảng giá đất với diện tích, khu trung tâm cao hơn',
+      'Ối nghe đã thấy mệt 😵',
+      'Thì đất mà, thủ tục nó vậy ráng chịu',
+      'Có ai đi công chứng cuối tuần được không, thứ 7 có làm ko',
+      'Sáng thứ 7 có làm tới trưa á',
+      'Ok cảm ơn nha',
+      'Cả nhà ơi giá đất Cam Hải Tây dạo này sao rồi',
+      'Cam Hải Tây gần đầm đẹp lắm, đất ở tầm 10-16tr tùy vị trí',
+      'Gần đầm Thủy Triều view chill thiệt',
+      'Ừ chiều ra đầm hóng gió số dzách 😎',
+      'Mình đang tính mua miếng gần đầm làm homestay',
+      'Ý hay đó, khu đó khách du lịch bắt đầu ghé nhiều',
+      'Nhưng coi chừng dính hành lang bảo vệ đầm nha, hỏi kỹ',
+      'Ồ cảm ơn nhắc, suýt quên vụ đó',
+      'Có bác nào biết lô nào gần biển mà sổ hồng riêng không',
+      'Sát biển sổ riêng hiếm lắm, đa số phân lô nội bộ',
+      'Vậy rủi ro ha, thôi né',
+      'Ừ mua đất cứ sổ riêng cho lành',
+      'Nay có ai đi ăn bánh căn Cam Đức không, đói quá 🤤',
+      'Ăn xong rồi bàn đất tiếp haha',
+      'Cái nhóm này lúc nào cũng đói với đất 😂',
+      'Thì dân buôn đất mà, ăn no mới tỉnh táo lật kèo được',
+      'Chuẩn bài luôn',
+      'Mình cần mua gấp lô tầm 800tr khu nào cũng được, sổ riêng',
+      '800tr giờ ra xa xa tí như Cam Phước Tây hay Suối Tân mới có',
+      'Xa vậy cũng được, để dành sau này',
+      'Ok để mình lục hàng ib bạn',
+      'Cảm ơn nhiều nha',
+      'Trời đất Cam Lâm lên giá nhanh thiệt, mới đó mà',
+      'Hạ tầng làm tới đâu giá theo tới đó thôi',
+      'Mong sao đừng sốt ảo rồi xì hơi như mấy năm trước',
+      'Lần này thật hơn, có hạ tầng thật mà',
+      'Ừ hy vọng vậy',
+      'Ai có nhà cho thuê làm văn phòng nhỏ ở Cam Đức không',
+      'Có mặt bằng tầng trệt 40m2 gần ngã tư, 6 triệu',
+      'Cho xin thông tin ib nha',
+      'Ok gửi liền',
+      'Mình mới có lô đất đẹp lắm, ai coi ib mình gửi hình',
+      'Up cho ae ngắm chút đi',
+      'Nhóm không cho up hình á, ib từng người thôi',
+      'Vậy hơi bất tiện ha',
+      'Thì tránh spam đó mà',
+      'Có ai đầu tư đất Cam Lâm từ hồi 2019 không, giờ lời chưa',
+      'Lời chứ, hồi đó mua Cam Đức 8tr giờ 20tr rồi',
+      'Gấp gần 3 lần, đỉnh thật',
+      'Ai mua đúng chỗ thôi, có người ôm chỗ xấu vẫn nằm im',
+      'Đúng, vị trí là số 1',
+      'Cho hỏi mua bán qua vi bằng có an toàn không mấy bác',
+      'Né vi bằng ra nha, cứ sổ với công chứng cho chắc',
+      'Vi bằng nhiều vụ dính rồi, cẩn thận',
+      'Cảm ơn, may hỏi trước',
+      'Nay giá xăng lên đi coi đất tốn kém ghê 😅',
+      'Thì gộp mấy lô coi 1 lượt cho đỡ tốn',
+      'Ý hay, để mình hẹn chủ đất coi 1 buổi luôn',
+      'Cần thuê kho nhỏ chứa hàng gần QL1A, ai có không',
+      'Kho 200m2 gần QL1A đoạn Suối Tân, 12 triệu tháng',
+      'Hơi xa mà thôi được, ib mình',
+      'Ok nha',
+      'Đất mặt tiền đường lớn với hẻm chênh nhau nhiều không mọi người',
+      'Mặt tiền đường lớn gấp rưỡi gấp đôi hẻm là bình thường',
+      'Vậy mua hẻm rồi chờ mở đường là ăn ha 😏',
+      'Nếu quy hoạch mở đường thật thì ngon, mà hên xui',
+      'Đánh bạc với quy hoạch cũng rén 😂',
+      'Mình khoái khu Cam Hòa, yên tĩnh mà gần trung tâm',
+      'Cam Hòa được đó, dân cư hiền, đất còn mềm',
+      'Giá Cam Hòa tầm nhiêu vậy',
+      'Đất ở tầm 8-12tr, mặt tiền cao hơn',
+      'Ok trong tầm với, để tính',
+      'Có bác nào bán nhà cấp 4 có sẵn để ở liền không',
+      'Nhà cấp 4 Cam Đức 90m2 đất, nhà cũ, 1 tỷ 8',
+      'Ở được liền hay phải sửa',
+      'Dọn vô ở liền, sửa sang tí cho mới thôi',
+      'Ngon, ib xin địa chỉ coi nha',
+      'Trời chiều mát rồi, ai đi coi đất kèo mình với 🚗',
+      'Đi đâu rủ luôn, mình rảnh nè',
+      'Kèo Cam Hải Đông coi lô ven biển, hùn xe cho vui',
+      'Ok đợi mình 15 phút',
+      'Cả nhà cho hỏi làm sổ lần đầu tốn khoảng nhiêu tiền',
+      'Tùy diện tích với loại đất, có lệ phí trước bạ với thuế',
+      'Trước bạ 0.5% giá trị á',
+      'Ừ cộng lặt vặt nữa, chuẩn bị dư ra chút cho chắc',
+      'Cảm ơn nha, để em tính toán',
+      'Ai bán đất gần trường học cho con đi học tiện với',
+      'Gần trường Cam Đức có vài lô, để mình kiếm',
+      'Ưu tiên sổ riêng ở liền được nha',
+      'Ok note lại',
+      'Nhóm mình ngày càng đông vui ha 😄',
+      'Ừ toàn ae dễ thương, thông tin cũng nhiều',
+      'Cứ đà này Cam Lâm lên thành phố tới nơi',
+      'Từ từ thôi ông, còn lâu haha',
+      'Thì cứ mơ cho vui, có mục tiêu mà phấn đấu 😆',
+      'Chuẩn, tinh thần lạc quan',
+      'Có ai cần môi giới dẫn đi coi đất không, mình rành khu này',
+      'Bạn làm khu nào chủ yếu',
+      'Mình chuyên Cam Đức với Cam Hải Đông, dẫn nhiệt tình',
+      'Ok khi nào cần mình ib nha',
+      'Cứ thoải mái, không mua cũng tư vấn free',
+      'Người dễ thương ghê 👍',
+      'Mình mới xuống cọc lô Cam Thành Bắc, hồi hộp quá',
+      'Cọc rồi thì lo làm hợp đồng công chứng cho chắc nha',
+      'Ừ hẹn chủ tuần sau ra công chứng',
+      'Chúc thuận lợi nha bạn',
+      'Cảm ơn cả nhà, có gì báo kết quả sau 😁',
+      'Nhớ khao nhóm khi ra sổ đó nha 🍜',
+      'Chắc chắn rồi, hẹn ly cà phê 😄',
+      'Nhóm này khao hoài chắc mập hết quá 🤣',
+      'Mập mà vui là được haha',
+      'Thôi khuya rồi ngủ đây cả nhà, mai đi coi đất tiếp',
+      'Ngủ ngon nha, mai cày tiếp',
+      'Gút nai cả nhà 🌙',
+      'Mai ai đi Cam Hải Đông hú mình với nha, chốt kèo luôn',
     ];
     {
       const params: any[] = []; const vals: string[] = [];
-      for (let k = 0; k < 168; k++) {
-        const u = pick(chatUsers);
-        const w = Math.random() < 0.8 ? pick(HOT_WEIGHTED) : pick(OTHER_WARDS);
-        const body = pick(cTpl)(w);
-        const hoursAgo = ((168 - k) * 1.4 * (Math.random() * 0.6 + 0.7)).toFixed(1); // rải ~10 ngày, cũ→mới
-        const b = params.length; params.push(u.id, u.name, body, hoursAgo);
-        vals.push(`('community',$${b + 1},$${b + 2},$${b + 3}, now() - ($${b + 4}||' hours')::interval)`);
+      for (let k = 0; k < COMMUNITY_MSGS.length; k++) {
+        const u = chatUsers[(k * 5 + 2) % chatUsers.length]; // đổi người liên tục cho tự nhiên
+        const minutesAgo = Math.max(1, Math.round((COMMUNITY_MSGS.length - k) * 80 + rnd(-25, 25))); // cũ→mới, rải ~9 ngày
+        const b = params.length; params.push(u.id, u.name, COMMUNITY_MSGS[k], String(minutesAgo));
+        vals.push(`('community',$${b + 1},$${b + 2},$${b + 3}, now() - ($${b + 4}||' minutes')::interval)`);
       }
       await query(`INSERT INTO chat_messages (room, user_id, name, body, created_at) VALUES ${vals.join(',')}`, params);
     }
@@ -201,7 +352,14 @@ adminRouter.post('/seed-demo', async (req: AuthedRequest, res, next) => {
       for (const [room, uid, nm, body, h] of cm) { const b = params.length; params.push(room, uid, nm, body, String(h)); vals.push(`($${b + 1},$${b + 2},$${b + 3},$${b + 4}, now() - ($${b + 5}||' hours')::interval)`); }
       await query(`INSERT INTO chat_messages (room, user_id, name, body, created_at) VALUES ${vals.join(',')}`, params);
     }
-    const chatCount = 168 + cm.length;
+    // Đánh dấu admin ĐÃ ĐỌC các phòng mẫu (cộng đồng + tư vấn/hỗ trợ) → không còn badge "chưa đọc" ở tin đã trả lời.
+    const demoRooms = Array.from(new Set(cm.map((c) => c[0])));
+    await query(
+      `INSERT INTO chat_reads (room, user_id, received_id, read_id, updated_at)
+       SELECT room, $1, max(id), max(id), now() FROM chat_messages WHERE room='community' OR room = ANY($2::text[]) GROUP BY room
+       ON CONFLICT (room, user_id) DO UPDATE SET received_id=EXCLUDED.received_id, read_id=EXCLUDED.read_id, updated_at=now()`,
+      [req.user!.id, demoRooms]);
+    const chatCount = COMMUNITY_MSGS.length + cm.length;
 
     // Khách GỬI BÁN (ký gửi) — hiện ở trang "Khách gửi bán"
     const cTypes = ['land','house','apartment','villa','commercial','farm'];

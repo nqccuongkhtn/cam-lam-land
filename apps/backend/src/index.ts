@@ -32,6 +32,10 @@ import { ocrRouter } from './routes/ocr.ts';
 import { notFound, errorHandler } from './middleware/error.ts';
 import { securityHeaders, rateLimit } from './middleware/security.ts';
 
+// CHỐNG RỚT TIẾN TRÌNH: log lỗi không bắt được thay vì để Node thoát → Render khỏi phải khởi động lại.
+process.on('unhandledRejection', (reason: any) => console.error('[unhandledRejection]', (reason && (reason.stack || reason.message)) || reason));
+process.on('uncaughtException', (err: any) => console.error('[uncaughtException]', (err && (err.stack || err.message)) || err));
+
 const app = express();
 app.disable('x-powered-by'); // không lộ "Express"
 app.set('trust proxy', 1);   // Render đứng sau proxy → lấy đúng IP khách cho rate-limit

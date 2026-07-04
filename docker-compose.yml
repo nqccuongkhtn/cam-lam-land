@@ -40,6 +40,28 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@camlam.local}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin12345}
       UPLOAD_DIR: /data/uploads
+      # ── AI đọc ảnh sổ đỏ / OCR (COPY KEY TỪ RENDER VÀO .env thì mới chạy) ──
+      GEMINI_API_KEYS: ${GEMINI_API_KEYS:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODELS: ${GEMINI_MODELS:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OCRSPACE_API_KEY: ${OCRSPACE_API_KEY:-}
+      SELF_OCR_URL: ${SELF_OCR_URL:-}
+      SELF_OCR_TOKEN: ${SELF_OCR_TOKEN:-}
+      # ── Thông báo đẩy (push) ──
+      VAPID_PUBLIC: ${VAPID_PUBLIC:-}
+      VAPID_PRIVATE: ${VAPID_PRIVATE:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-}
+      # ── Email + Thanh toán/ngân hàng ──
+      EMAIL_ENABLED: ${EMAIL_ENABLED:-}
+      PAYMENT_WEBHOOK_KEY: ${PAYMENT_WEBHOOK_KEY:-}
+      BANK_ID: ${BANK_ID:-}
+      BANK_ACCOUNT: ${BANK_ACCOUNT:-}
+      BANK_NAME: ${BANK_NAME:-}
+      # ── Khác ──
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      PG_POOL_MAX: ${PG_POOL_MAX:-12}
     volumes:
       - uploads:/data/uploads
     depends_on:

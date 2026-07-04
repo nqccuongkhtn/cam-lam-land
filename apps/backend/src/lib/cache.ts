@@ -8,9 +8,14 @@ export function cached<T = any>(key: string): T | undefined {
   if (e.exp < Date.now()) { store.delete(key); return undefined; }
   return e.val as T;
 }
+const MAX = 400;
 export function cachePut(key: string, val: any, ttlMs: number): void {
   store.set(key, { exp: Date.now() + ttlMs, val });
-  if (store.size > 1000) { const now = Date.now(); for (const [k, v] of store) if (v.exp < now) store.delete(k); }
+  if (store.size > MAX) {
+    const now = Date.now();
+    for (const [k, v] of store) if (v.exp < now) store.delete(k);           // bỏ bản hết hạn trước
+    while (store.size > MAX) { const k = store.keys().next().value; if (k === undefined) break; store.delete(k); } // vẫn to → bỏ cũ nhất
+  }
 }
 export function cacheDrop(prefix: string): void {
   for (const k of store.keys()) if (k.startsWith(prefix)) store.delete(k);

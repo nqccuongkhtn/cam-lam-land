@@ -1,0 +1,17 @@
+# ─────────────────────────────────────────────────────────────────────────
+# Cloudflare Tunnel: đưa web (nginx:80) ra Internet qua domain của bạn.
+# CHỈ thêm file này khi ĐÃ có TUNNEL_TOKEN trong .env:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.tunnel.yml up -d
+# (CHAY-SERVER.bat tự động thêm file này nếu phát hiện TUNNEL_TOKEN.)
+# Trong Cloudflare Zero Trust: Public hostname → Service = HTTP → nginx:80
+# ─────────────────────────────────────────────────────────────────────────
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: camlam_tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:-}
+    depends_on:
+      - nginx

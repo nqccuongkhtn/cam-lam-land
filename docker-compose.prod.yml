@@ -1,0 +1,18 @@
+# ─────────────────────────────────────────────────────────────────────────
+# FRONTEND bản PRODUCTION (build tối ưu, không dev mode → hết lỗi thiếu module,
+# nhẹ & ổn hơn). Dùng cùng file gốc:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# (Có file này thì KHÔNG nạp docker-compose.override.yml dev.)
+# Tunnel ra Internet nằm ở docker-compose.tunnel.yml (thêm khi đã có TUNNEL_TOKEN).
+# ─────────────────────────────────────────────────────────────────────────
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile.prod
+      args:
+        NEXT_PUBLIC_API_BASE: ${NEXT_PUBLIC_API_BASE:-/api}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-}
+        NEXT_PUBLIC_MAP_CENTER_LNG: ${NEXT_PUBLIC_MAP_CENTER_LNG:-109.0917}
+        NEXT_PUBLIC_MAP_CENTER_LAT: ${NEXT_PUBLIC_MAP_CENTER_LAT:-12.0771}
+        NEXT_PUBLIC_MAP_ZOOM: ${NEXT_PUBLIC_MAP_ZOOM:-12}

@@ -16,6 +16,11 @@ export const pool = new pg.Pool(
     : { ...env.pg, ...poolBase },                                   // local docker-compose
 );
 
+// QUAN TRỌNG: Postgres (nhất là gói free Render) hay ngắt kết nối rảnh. Nếu KHÔNG bắt lỗi
+// này thì client rảnh phát 'error' → thành uncaughtException → RỚT cả server. Bắt để pool tự
+// bỏ kết nối hỏng và chạy tiếp (không sập).
+pool.on('error', (err: any) => console.error('[pg pool error] kết nối rảnh lỗi, pool tự phục hồi:', err?.message || err));
+
 export async function query<T = any>(text: string, params: any[] = []): Promise<T[]> {
   const res = await pool.query(text, params);
   return res.rows as T[];

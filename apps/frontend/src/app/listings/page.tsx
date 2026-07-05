@@ -1,11 +1,12 @@
 'use client';
 import { useEffect, useMemo, useState, Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import { useSearchParams } from 'next/navigation';
-import { api } from '@/lib/api';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { api, thumbUrl } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import Link from 'next/link';
 import { Listing, PropertyType, PROPERTY_LABELS, priceLabel, SALE_PROPERTY_TYPES, RENT_PROPERTY_TYPES, type DealType } from '@/lib/types';
+import { listMyPlaces, removePlace, type SavedPlace } from '@/lib/savedPlaces';
 import ListingRow from '@/components/ListingRow';
 import SiteFooter from '@/components/SiteFooter';
 import type { BaseMap, ImageOverlay } from '@/components/MapView';
@@ -29,6 +30,7 @@ interface ParcelInfo { found: boolean; parcel: { properties: Record<string, any>
 
 function ListingsInner() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [listings, setListings] = useState<Listing[]>([]);
   const [type, setType] = useState<PropertyType | ''>('');
   const [min, setMin] = useState(''); const [max, setMax] = useState(''); const [q, setQ] = useState('');
@@ -46,6 +48,7 @@ function ListingsInner() {
   const [sort, setSort] = useState('default');
   const { user } = useAuth();
   const [mine, setMine] = useState(false);
+  const [drafts, setDrafts] = useState<SavedPlace[]>([]); // sản phẩm đã lưu trên bản đồ — CHƯA đăng tin
   const [deal, setDeal] = useState<DealType>('sale');
   const TYPES = ['', ...(deal === 'rent' ? RENT_PROPERTY_TYPES : SALE_PROPERTY_TYPES)] as (PropertyType | '')[];
   const PRICE_RANGES = deal === 'rent' ? RENT_PRICE_RANGES : SALE_PRICE_RANGES;
@@ -67,10 +70,20 @@ function ListingsInner() {
     api<{ listings: Listing[] }>(`/listings?${p.toString()}`).then((d) => setListings(d.listings || [])).catch(() => setListings([])).finally(() => setLoading(false));
   }
   function switchDeal(d: DealType) { if (d === deal) return; setDeal(d); setType(''); setMin(''); setMax(''); setMine(false); load({ deal: d, type: '', min: '', max: '', mine: false }); }
-  function showMine(v: boolean) { setMine(v); load({ mine: v }); }
+  const loadDrafts = () => { if (user) listMyPlaces().then(setDrafts).catch(() => setDrafts([])); else setDrafts([]); };
+  function showMine(v: boolean) { setMine(v); load({ mine: v }); if (v) loadDrafts(); }
   async function del(id: number) {
     if (!confirm('Xoá tin này khỏi giỏ hàng?')) return;
     try { await api(`/listings/${id}`, { method: 'DELETE' }); load({ mine: true }); } catch (e: any) { alert(e.message); }
+  }
+  // "Đăng tin này": mang sản phẩm đã lưu sang form đăng tin (đổ sẵn tên/giá/diện tích/ảnh/vị trí).
+  function publishDraft(d: SavedPlace) {
+    try { sessionStorage.setItem('camlam_draft', JSON.stringify({ id: d.id, note: d.note, price: d.price, area: d.area, images: d.images, lng: d.lng, lat: d.lat, x: d.x, y: d.y })); } catch { /* ignore */ }
+    router.push('/sales/post');
+  }
+  async function delDraft(id: number) {
+    if (!confirm('Xoá sản phẩm đã lưu này?')) return;
+    try { await removePlace(id); loadDrafts(); } catch (e: any) { alert(e.message); }
   }
   // Đọc lại bộ lọc từ URL MỖI KHI query đổi (vd bấm "Cho thuê" trên menu khi đang ở /listings).
   useEffect(() => {
@@ -208,7 +221,7 @@ function ListingsInner() {
     </>
   );
 
-  const listItems = loading ? (
+  const skeleton = (
     <div className="flex flex-col gap-3">
       {Array.from({ length: 5 }).map((_, i) => (
         <div key={i} className="flex gap-3 bg-white rounded-xl border border-slate-200 overflow-hidden">
@@ -217,20 +230,70 @@ function ListingsInner() {
         </div>
       ))}
     </div>
+  );
+  const listItems = loading ? skeleton : mine ? (
+    (shown.length === 0 && drafts.length === 0) ? (
+      <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-8 text-center text-slate-500 text-sm">Giỏ hàng của bạn đang trống. <Link href="/sales/post" className="text-[#0A2540] font-bold">Đăng tin đầu tiên →</Link></div>
+    ) : (
+      <div className="flex flex-col gap-5">
+        {shown.length > 0 && (
+          <div>
+            <div className="flex items-baseline gap-2 mb-2"><span className="text-sm font-extrabold text-emerald-700">✅ Đã đăng ({shown.length})</span><span className="text-[11px] text-slate-400">đang hiển thị cho khách</span></div>
+            <div className="flex flex-col gap-3">
+              {shown.map((l) => {
+                const vip = !!l.tier && l.tier !== 'normal';
+                return (
+                  <div key={l.id} className={`flex flex-col gap-1.5 ${vip ? 'rounded-2xl p-1.5 ring-2 ring-[#C8A14B]/60 bg-gradient-to-br from-[#C8A14B]/10 to-transparent' : ''}`}>
+                    <div className="relative">
+                      <ListingRow l={l} />
+                      <span className="absolute top-2 left-2 z-[5] bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">✓ Đã đăng</span>
+                      {vip && <span className="absolute top-2 right-2 z-[5] bg-[#C8A14B] text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow">★ VIP</span>}
+                    </div>
+                    <div className="flex gap-1.5">
+                      <Link href={`/sales/edit/${l.id}`} className="flex-1 text-center bg-white border border-slate-200 text-[#0A2540] text-xs font-bold py-1.5 rounded-lg hover:border-[#C8A14B]">✏️ Sửa</Link>
+                      <Link href={`/sales/leads/${l.id}`} className="flex-1 text-center bg-white border border-slate-200 text-[#0A2540] text-xs font-bold py-1.5 rounded-lg hover:border-[#C8A14B]">👁 Khách</Link>
+                      <button onClick={() => del(l.id)} className="flex-1 bg-white border border-red-200 text-red-600 text-xs font-bold py-1.5 rounded-lg hover:bg-red-50">🗑 Xoá</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        {drafts.length > 0 && (
+          <div>
+            <div className="flex items-baseline gap-2 mb-1"><span className="text-sm font-extrabold text-[#7c3aed]">📌 Đã lưu — chưa đăng ({drafts.length})</span></div>
+            <p className="text-[11px] text-slate-400 mb-2">Sản phẩm bạn lưu trên bản đồ. Bấm <b className="text-[#7c3aed]">Đăng tin này</b> để đăng nhanh — giữ sẵn ảnh, giá, vị trí.</p>
+            <div className="flex flex-col gap-2.5">
+              {drafts.map((d) => (
+                <div key={'d' + d.id} className="flex gap-3 bg-white rounded-xl border border-dashed border-[#7c3aed]/50 overflow-hidden">
+                  <div className="w-28 sm:w-32 shrink-0 self-stretch min-h-[7rem] bg-slate-100 relative">
+                    {d.images && d.images[0]
+                      ? <img src={thumbUrl(d.images[0])} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                      : <div className="absolute inset-0 grid place-items-center text-3xl text-slate-300">📌</div>}
+                    <span className="absolute top-1.5 left-1.5 z-10 bg-[#7c3aed] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">CHƯA ĐĂNG</span>
+                  </div>
+                  <div className="flex-1 min-w-0 py-2 pr-2 flex flex-col">
+                    <p className="font-bold text-[#0A2540] text-sm line-clamp-1">{d.note || 'Sản phẩm đã lưu'}</p>
+                    <p className="text-sm mt-0.5">{d.price ? <span className="text-red-600 font-extrabold">{d.price}</span> : <span className="text-slate-400">Chưa có giá</span>}{d.area ? <span className="text-slate-500 font-medium"> · {d.area} m²</span> : null}</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">📍 {d.lat.toFixed(5)}, {d.lng.toFixed(5)}</p>
+                    <div className="flex gap-1.5 mt-auto pt-1.5">
+                      <button onClick={() => publishDraft(d)} className="flex-1 bg-[#7c3aed] hover:bg-[#6d28d9] text-white text-xs font-bold py-1.5 rounded-lg">＋ Đăng tin này</button>
+                      <button onClick={() => delDraft(d.id)} className="bg-white border border-red-200 text-red-600 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-red-50">🗑</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
   ) : shown.length === 0 ? (
-    <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-8 text-center text-slate-500 text-sm">{mine ? <>Giỏ hàng của bạn đang trống. <Link href="/sales/post" className="text-[#0A2540] font-bold">Đăng tin đầu tiên →</Link></> : 'Không có kết quả phù hợp.'}</div>
+    <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-8 text-center text-slate-500 text-sm">Không có kết quả phù hợp.</div>
   ) : (
     <div className="flex flex-col gap-3">
-      {shown.map((l) => mine ? (
-        <div key={l.id} className="flex flex-col gap-1.5">
-          <ListingRow l={l} />
-          <div className="flex gap-1.5">
-            <Link href={`/sales/edit/${l.id}`} className="flex-1 text-center bg-white border border-slate-200 text-[#0A2540] text-xs font-bold py-1.5 rounded-lg hover:border-[#C8A14B]">✏️ Sửa</Link>
-            <Link href={`/sales/leads/${l.id}`} className="flex-1 text-center bg-white border border-slate-200 text-[#0A2540] text-xs font-bold py-1.5 rounded-lg hover:border-[#C8A14B]">👁 Khách</Link>
-            <button onClick={() => del(l.id)} className="flex-1 bg-white border border-red-200 text-red-600 text-xs font-bold py-1.5 rounded-lg hover:bg-red-50">🗑 Xoá</button>
-          </div>
-        </div>
-      ) : <ListingRow key={l.id} l={l} />)}
+      {shown.map((l) => <ListingRow key={l.id} l={l} />)}
     </div>
   );
 

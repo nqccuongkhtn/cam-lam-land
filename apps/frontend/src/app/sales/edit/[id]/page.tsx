@@ -51,8 +51,10 @@ export default function EditListing() {
 
   async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []); if (!files.length) return;
+    const room = Math.max(0, 5 - images.length);
+    if (room <= 0) { setErr('Tối đa 5 ảnh mỗi tin.'); e.target.value = ''; return; }
     setUploading(true); setErr('');
-    try { const resized = await Promise.all(files.map((x) => resizeImage(x))); const up = await uploadImages(resized); setImages((p) => [...p, ...up.map((u) => u.url)]); }
+    try { const resized = await Promise.all(files.slice(0, room).map((x) => resizeImage(x))); const up = await uploadImages(resized); setImages((p) => [...p, ...up.map((u) => u.url)].slice(0, 5)); }
     catch (e: any) { setErr('Lỗi tải ảnh: ' + e.message); } finally { setUploading(false); e.target.value = ''; }
   }
   async function submit(e: React.FormEvent) {

@@ -1,13 +1,14 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { api, ocrImage } from '@/lib/api';
+import { useRouter } from 'next/navigation';
+import { api, ocrImage, uploadImages } from '@/lib/api';
 import type { GeoLayer, ImageOverlay, BaseMap, MeasureMode, MeasureResult } from '@/components/MapView';
 import { GisLayer, formatVnd } from '@/lib/types';
 import { vn2000ToWgs84, wgs84ToVn2000 } from '@/lib/vn2000';
 import { getToken } from '@/lib/token';
 import { useAuth } from '@/lib/auth';
-import { getPlaces, addPlace, removePlace, type SavedPlace } from '@/lib/savedPlaces';
+import { listMyPlaces, listAllPlaces, addPlace, removePlace, type SavedPlace } from '@/lib/savedPlaces';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false, loading: () => <div className="h-full w-full grid place-items-center bg-slate-100 text-slate-400 text-sm animate-pulse">Đang tải bản đồ…</div> });
 
@@ -272,6 +273,10 @@ export default function MapPage() {
   const [ranhXa, setRanhXa] = useState<GeoJSON.FeatureCollection | null>(null);
   const [ranhOn, setRanhOn] = useState(false); // tắt mặc định — ranh xã chờ dữ liệu chuẩn (làm sau)
   const [places, setPlaces] = useState<SavedPlace[]>([]);
+  const [adminAll, setAdminAll] = useState(false);
+  const router = useRouter();
+  const [pName, setPName] = useState(''); const [pPrice, setPPrice] = useState(''); const [pArea, setPArea] = useState('');
+  const [pImages, setPImages] = useState<string[]>([]); const [pUp, setPUp] = useState(false);
   const [measure, setMeasure] = useState<MeasureMode>('off');
   const [mResult, setMResult] = useState<MeasureResult | null>(null);
   const [focusPoint, setFocusPoint] = useState<{ lng: number; lat: number; label?: string } | null>(null);
@@ -327,7 +332,33 @@ export default function MapPage() {
   useEffect(() => { if (viewRef.current) refreshFeatures(viewRef.current); }, [visible, refreshFeatures]);
   useEffect(() => { setCanDelete(user?.role === 'admin' || user?.role === 'gis'); }, [user]);
   useEffect(() => { fetch('/ranh-xa.geojson').then((r) => (r.ok ? r.json() : null)).then(setRanhXa).catch(() => {}); }, []);
-  useEffect(() => { const sync = () => setPlaces(getPlaces()); sync(); window.addEventListener('places-change', sync); return () => window.removeEventListener('places-change', sync); }, []);
+  const loadPlaces = useCallback(async () => {
+    if (!user) { setPlaces([]); return; }
+    try { setPlaces((adminAll && user.role === 'admin') ? await listAllPlaces() : await listMyPlaces()); } catch { setPlaces([]); }
+  }, [user, adminAll]);
+  useEffect(() => { loadPlaces(); }, [loadPlaces]);
+  // "Đăng tin này": mang sản phẩm đã lưu sang form đăng tin (đổ sẵn tên/giá/diện tích/ảnh/vị trí).
+  function publishPlace(p: SavedPlace) {
+    try { sessionStorage.setItem('camlam_draft', JSON.stringify({ id: p.id, note: p.note, price: p.price, area: p.area, images: p.images, lng: p.lng, lat: p.lat, x: p.x, y: p.y })); } catch { /* ignore */ }
+    router.push('/sales/post');
+  }
+  async function savePlace() {
+    if (!clickVN) return;
+    if (!pName.trim()) { alert('Nhập tên/mô tả sản phẩm.'); return; }
+    try {
+      await addPlace({ lng: clickVN.lng, lat: clickVN.lat, x: clickVN.x, y: clickVN.y, note: pName.trim(), price: pPrice.trim() || undefined, area: pArea.trim() || undefined, images: pImages });
+      setPName(''); setPPrice(''); setPArea(''); setPImages([]); loadPlaces();
+    } catch (e: any) { alert('Lỗi lưu: ' + (e?.message || e)); }
+  }
+  async function onPlaceFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []); e.target.value = '';
+    if (!files.length) return;
+    const room = Math.max(0, 5 - pImages.length);
+    if (room <= 0) { alert('Tối đa 5 ảnh.'); return; }
+    setPUp(true);
+    try { const up = await uploadImages(files.slice(0, room)); setPImages((p) => [...p, ...up.map((u) => u.url)].slice(0, 5)); }
+    catch (err: any) { alert('Lỗi tải ảnh: ' + (err?.message || err)); } finally { setPUp(false); }
+  }
   useEffect(() => { if (!camOpen) return; const v = camVideoRef.current, st = camStreamRef.current; if (!v || !st) return; v.srcObject = st; v.setAttribute('playsinline', 'true'); v.play().catch(() => {}); }, [camOpen]);
   // Giải phóng camera khi rời trang (tránh giữ camera chạy ngầm trên điện thoại).
   useEffect(() => () => { camStreamRef.current?.getTracks().forEach((t) => t.stop()); camStreamRef.current = null; if (ocrTimer.current) clearInterval(ocrTimer.current); }, []);
@@ -363,7 +394,13 @@ export default function MapPage() {
     return out;
   }, [layers, data, visible, opacity, ranhXa, ranhOn]);
 
-  const placeMarkers = useMemo(() => places.map((p) => ({ lng: p.lng, lat: p.lat, color: '#C8A14B', popupHtml: `<div style="font-size:12px;line-height:1.4"><b>📍 Điểm đã lưu</b><br>${(p.note || '(không ghi chú)').replace(/[<>&]/g, (c) => (({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }) as any)[c])}<br>VN-2000: X=${p.x.toFixed(1)} · Y=${p.y.toFixed(1)}</div>` })), [places]);
+  const placeMarkers = useMemo(() => {
+    const esc = (s: any) => String(s ?? '').replace(/[<>&]/g, (c) => (({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }) as any)[c]);
+    return places.map((p) => ({
+      lng: p.lng, lat: p.lat, color: '#7c3aed',
+      popupHtml: `<div style="font-size:12px;line-height:1.5;max-width:210px"><b>📌 ${esc(p.note || 'Sản phẩm đã lưu')}</b>${p.price ? `<br>💰 ${esc(p.price)}` : ''}${p.area ? ` · ${esc(p.area)} m²` : ''}${p.ownerName ? `<br><span style="color:#7c3aed;font-weight:600">👤 ${esc(p.ownerName)}${p.ownerPhone ? ' · ' + esc(p.ownerPhone) : ''}</span>` : ''}<br><span style="color:#94a3b8">X=${(p.x ?? 0).toFixed(1)} · Y=${(p.y ?? 0).toFixed(1)}</span></div>`,
+    }));
+  }, [places]);
 
   async function onMapClick(lng: number, lat: number) {
     const vn = wgs84ToVn2000(lng, lat);
@@ -645,20 +682,30 @@ export default function MapPage() {
               {canDelete && <button onClick={() => deleteLayer(l.slug, l.name)} title="Xoá lớp" className="text-slate-300 hover:text-red-600">🗑</button>}
             </div>
           ))}
-          {places.length > 0 && (
+          {user && (
             <div className="mt-3 pt-3 border-t">
-              <p className="text-xs font-semibold text-slate-500 mb-1">📍 Điểm đã lưu ({places.length})</p>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs font-semibold text-slate-500">📌 {adminAll ? 'Tất cả đã lưu' : 'Sản phẩm của tôi'} ({places.length})</p>
+                {user.role === 'admin' && (
+                  <label className="flex items-center gap-1 text-[11px] text-slate-500 cursor-pointer"><input type="checkbox" checked={adminAll} onChange={(e) => setAdminAll(e.target.checked)} className="accent-[#7c3aed]" /> Xem tất cả</label>
+                )}
+              </div>
               <div className="space-y-1 max-h-44 overflow-y-auto scroll-soft">
+                {places.length === 0 && <p className="text-[11px] text-slate-400">Chưa có. Bấm vào bản đồ rồi &quot;Lưu sản phẩm&quot;.</p>}
                 {places.map((p) => (
                   <div key={p.id} className="flex items-center gap-1.5 text-xs bg-slate-50 rounded px-2 py-1">
-                    <button onClick={() => { setFocusPoint({ lng: p.lng, lat: p.lat }); setFitTo([[p.lng - 0.004, p.lat - 0.004], [p.lng + 0.004, p.lat + 0.004]]); }} className="flex-1 text-left truncate hover:text-[#0A2540]" title={p.note || ''}>{p.note || `X=${p.x.toFixed(0)} · Y=${p.y.toFixed(0)}`}</button>
-                    <button onClick={() => removePlace(p.id)} aria-label="Xoá" className="text-slate-300 hover:text-red-600 shrink-0">✕</button>
+                    <button onClick={() => { setFocusPoint({ lng: p.lng, lat: p.lat }); setFitTo([[p.lng - 0.004, p.lat - 0.004], [p.lng + 0.004, p.lat + 0.004]]); }} className="flex-1 min-w-0 text-left hover:text-[#7c3aed]" title={p.note || ''}>
+                      <span className="block truncate font-medium">{p.note || `X=${(p.x ?? 0).toFixed(0)}`}{p.price ? ` · ${p.price}` : ''}</span>
+                      {adminAll && p.ownerName && <span className="block text-[10px] text-[#7c3aed] truncate">👤 {p.ownerName}{p.ownerPhone ? ' · ' + p.ownerPhone : ''}</span>}
+                    </button>
+                    {!adminAll && <button onClick={() => publishPlace(p)} title="Đăng tin này" className="shrink-0 bg-[#7c3aed] hover:bg-[#6d28d9] text-white text-[10px] font-bold px-2 py-0.5 rounded">＋ Đăng</button>}
+                    <button onClick={async () => { await removePlace(p.id).catch(() => {}); loadPlaces(); }} aria-label="Xoá" className="text-slate-300 hover:text-red-600 shrink-0">✕</button>
                   </div>
                 ))}
               </div>
             </div>
           )}
-          <p className="text-xs text-slate-400 mt-4">💡 Nhấp vào bản đồ để xem toạ độ + lưu điểm + tra cứu thửa/quy hoạch.</p>
+          <p className="text-xs text-slate-400 mt-4">💡 Nhấp vào bản đồ để xem toạ độ + lưu sản phẩm + tra cứu thửa/quy hoạch.</p>
         </aside>
 
         <div className="relative flex-1">
@@ -796,7 +843,34 @@ export default function MapPage() {
                 <div className="mb-2 text-xs bg-slate-50 rounded p-2">
                   <div>VN-2000: <b>X={clickVN.x.toFixed(2)}</b>, <b>Y={clickVN.y.toFixed(2)}</b></div>
                   <div>WGS84: {clickVN.lat.toFixed(6)}, {clickVN.lng.toFixed(6)}</div>
-                  <button onClick={() => { const note = window.prompt('Ghi chú cho điểm này (tuỳ chọn):', '') ?? ''; addPlace({ lng: clickVN.lng, lat: clickVN.lat, x: clickVN.x, y: clickVN.y, note }); }} className="mt-1.5 w-full bg-[#C8A14B] hover:bg-[#b8923f] text-[#0A2540] font-bold py-1.5 rounded text-xs">💾 Lưu điểm này</button>
+                  {user ? (
+                    <div className="mt-2 space-y-1">
+                      <input value={pName} onChange={(e) => setPName(e.target.value)} placeholder="Tên / mô tả sản phẩm *" className="w-full text-xs border border-slate-300 rounded px-2 py-1 outline-none focus:border-[#7c3aed]" />
+                      <div className="flex gap-1">
+                        <input value={pPrice} onChange={(e) => setPPrice(e.target.value)} placeholder="Giá (vd 2 tỷ)" className="flex-1 min-w-0 text-xs border border-slate-300 rounded px-2 py-1 outline-none focus:border-[#7c3aed]" />
+                        <input value={pArea} onChange={(e) => setPArea(e.target.value)} placeholder="DT m²" className="w-16 text-xs border border-slate-300 rounded px-2 py-1 outline-none focus:border-[#7c3aed]" />
+                      </div>
+                      <div className="flex items-center gap-1 flex-wrap">
+                        {pImages.map((u) => (
+                          <div key={u} className="relative w-9 h-9 rounded overflow-hidden border border-slate-200">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={u} alt="" className="w-full h-full object-cover" />
+                            <button onClick={() => setPImages((p) => p.filter((x) => x !== u))} className="absolute top-0 right-0 bg-black/60 text-white text-[9px] w-3.5 h-3.5 grid place-items-center">✕</button>
+                          </div>
+                        ))}
+                        {pImages.length < 5 && (
+                          <label className="w-9 h-9 rounded border border-dashed border-slate-300 grid place-items-center text-slate-400 cursor-pointer hover:border-[#7c3aed]">
+                            {pUp ? '…' : '＋'}
+                            <input type="file" accept="image/*" multiple onChange={onPlaceFiles} className="hidden" />
+                          </label>
+                        )}
+                        <span className="text-[10px] text-slate-400">Ảnh {pImages.length}/5</span>
+                      </div>
+                      <button onClick={savePlace} disabled={pUp} className="w-full bg-[#7c3aed] hover:bg-[#6d28d9] disabled:opacity-60 text-white font-bold py-1.5 rounded text-xs">💾 Lưu sản phẩm này</button>
+                    </div>
+                  ) : (
+                    <a href="/login" className="mt-2 block text-center bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold py-1.5 rounded text-xs">🔒 Đăng nhập để lưu sản phẩm</a>
+                  )}
                 </div>
               )}
               {qhvHit.length > 0 && (

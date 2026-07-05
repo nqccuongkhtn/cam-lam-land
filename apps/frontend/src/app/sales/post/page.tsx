@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api, uploadImages } from '@/lib/api';
 import { resizeImage } from '@/lib/img';
+import { removePlace } from '@/lib/savedPlaces';
 import { useAuth } from '@/lib/auth';
 import { useFlags } from '@/lib/flags';
 import { PROPERTY_LABELS, WARDS, DIRECTIONS, LEGAL_OPTIONS, formatVnd, priceLabel, SALE_PROPERTY_TYPES, RENT_PROPERTY_TYPES, type PropertyType, type DealType } from '@/lib/types';
@@ -24,18 +25,36 @@ export default function PostListing() {
   const [busy, setBusy] = useState(false);
   const [aiBusy, setAiBusy] = useState(false);
   const [err, setErr] = useState('');
+  const [draftId, setDraftId] = useState<number | null>(null);
   const set = (k: string, v: any) => setF((s) => ({ ...s, [k]: v }));
 
   useEffect(() => { if (!loading && !user) router.replace('/login'); }, [loading, user, router]);
+  // Nhận "Đăng tin này" từ Giỏ hàng / bản đồ: đổ sẵn tên, giá, diện tích, ảnh, vị trí của sản phẩm đã lưu.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('camlam_draft'); if (!raw) return;
+      sessionStorage.removeItem('camlam_draft');
+      const d = JSON.parse(raw);
+      setDraftId(typeof d.id === 'number' ? d.id : null);
+      const s = String(d.price || '').toLowerCase();
+      const num = parseFloat(s.replace(',', '.').replace(/[^\d.]/g, ''));
+      const pr = num > 0 ? { priceVal: String(num), priceUnit: (s.includes('tri') ? 'trieu' : 'ty') } : {};
+      setF((prev) => ({ ...prev, title: d.note || prev.title, area: d.area ? String(d.area).replace(/[^\d.]/g, '') : prev.area, ...pr }));
+      if (Array.isArray(d.images) && d.images.length) setImages(d.images.slice(0, 5));
+      if (d.lng != null && d.lat != null) setCoord({ lng: d.lng, lat: d.lat });
+    } catch { /* bỏ qua */ }
+  }, []);
 
   async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
+    const room = Math.max(0, 5 - images.length);
+    if (room <= 0) { setErr('Tối đa 5 ảnh mỗi tin.'); e.target.value = ''; return; }
     setUploading(true); setErr('');
     try {
-      const resized = await Promise.all(files.map((x) => resizeImage(x)));
+      const resized = await Promise.all(files.slice(0, room).map((x) => resizeImage(x)));
       const up = await uploadImages(resized);
-      setImages((p) => [...p, ...up.map((u) => u.url)]);
+      setImages((p) => [...p, ...up.map((u) => u.url)].slice(0, 5));
     } catch (e: any) { setErr('Lỗi tải ảnh: ' + e.message); } finally { setUploading(false); e.target.value = ''; }
   }
   async function submit(e: React.FormEvent) {
@@ -55,6 +74,7 @@ export default function PostListing() {
         contactName: f.contactName || user?.fullName || null, contactPhone: null,
         images, lng: coord.lng, lat: coord.lat,
       }) });
+      if (draftId) removePlace(draftId).catch(() => {}); // đã đăng thì bỏ khỏi "chưa đăng"
       router.push('/sales');
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   }

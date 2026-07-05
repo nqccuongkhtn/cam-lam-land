@@ -184,6 +184,18 @@ export async function migrate(): Promise<void> {
   // ── Cho thuê: cột giao dịch (sale/rent) + nới ràng buộc loại BĐS (thêm phòng trọ/văn phòng/kho xưởng) ──
   await pool.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS deal TEXT NOT NULL DEFAULT 'sale'`).catch((e: any) => console.error('[migrate] deal lỗi:', e?.message || e));
   await pool.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS views INT NOT NULL DEFAULT 0`).catch((e: any) => console.error('[migrate] views lỗi:', e?.message || e));
+  await pool.query(`ALTER TABLE listing_images ADD COLUMN IF NOT EXISTS thumb BYTEA`).catch((e: any) => console.error('[migrate] thumb lỗi:', e?.message || e));
+  // Kho "điểm/sản phẩm đã lưu" trên bản đồ theo tài khoản (sales lưu sản phẩm; khách lưu thửa quan tâm; admin xem tất cả).
+  await pool.query(`CREATE TABLE IF NOT EXISTS saved_places (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    lng DOUBLE PRECISION NOT NULL, lat DOUBLE PRECISION NOT NULL,
+    x_vn DOUBLE PRECISION, y_vn DOUBLE PRECISION,
+    note TEXT, price TEXT, area TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`).catch((e: any) => console.error('[migrate] saved_places lỗi:', e?.message || e));
+  await pool.query(`CREATE INDEX IF NOT EXISTS saved_places_user_idx ON saved_places (user_id)`).catch((e: any) => console.error('[migrate] saved_places index lỗi:', e?.message || e));
+  await pool.query(`ALTER TABLE saved_places ADD COLUMN IF NOT EXISTS images TEXT[] NOT NULL DEFAULT '{}'`).catch((e: any) => console.error('[migrate] saved_places images lỗi:', e?.message || e));
   await pool.query(`ALTER TABLE listings DROP CONSTRAINT IF EXISTS listings_property_type_check`).catch((e: any) => console.error('[migrate] drop property_type check lỗi:', e?.message || e));
   await pool.query(`CREATE INDEX IF NOT EXISTS listings_deal_idx ON listings (deal)`).catch((e: any) => console.error('[migrate] deal index lỗi:', e?.message || e));
   await pool.query(`CREATE INDEX IF NOT EXISTS chat_messages_room_user_idx ON chat_messages (room, user_id, id)`).catch((e: any) => console.error('[migrate] index lỗi:', e?.message || e));

@@ -1,20 +1,27 @@
 'use client';
-export interface SavedPlace { id: string; lng: number; lat: number; x: number; y: number; note: string; at: number; }
+import { api } from './api';
 
-const KEY = 'camlam_places_v1';
+export interface SavedPlace {
+  id: number; lng: number; lat: number; x?: number; y?: number;
+  note?: string | null; price?: string | null; area?: string | null; images?: string[]; createdAt?: string;
+  // chỉ có khi admin xem tất cả:
+  userId?: number; ownerName?: string; ownerPhone?: string | null; ownerRole?: string;
+}
 
-export function getPlaces(): SavedPlace[] {
-  if (typeof window === 'undefined') return [];
-  try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; }
+/** Điểm/sản phẩm đã lưu của CHÍNH mình (cần đăng nhập). */
+export async function listMyPlaces(): Promise<SavedPlace[]> {
+  return (await api<{ places: SavedPlace[] }>('/saved-places')).places || [];
 }
-function save(list: SavedPlace[]) {
-  try { localStorage.setItem(KEY, JSON.stringify(list)); } catch {}
-  window.dispatchEvent(new Event('places-change'));
+/** ADMIN: tất cả điểm đã lưu của mọi người + tên/SĐT (kho sales + lead khách). */
+export async function listAllPlaces(): Promise<SavedPlace[]> {
+  return (await api<{ places: SavedPlace[] }>('/saved-places/all')).places || [];
 }
-export function addPlace(p: Omit<SavedPlace, 'id' | 'at'>): void {
-  save([{ ...p, id: Date.now().toString(36), at: Date.now() }, ...getPlaces()].slice(0, 100));
+export async function addPlace(p: { lng: number; lat: number; x?: number; y?: number; note?: string; price?: string; area?: string; images?: string[] }): Promise<SavedPlace> {
+  return (await api<{ place: SavedPlace }>('/saved-places', { method: 'POST', body: JSON.stringify(p) })).place;
 }
-export function updatePlaceNote(id: string, note: string): void {
-  save(getPlaces().map((x) => (x.id === id ? { ...x, note } : x)));
+export async function updatePlace(id: number, patch: { note?: string; price?: string; area?: string }): Promise<void> {
+  await api(`/saved-places/${id}`, { method: 'PATCH', body: JSON.stringify(patch) });
 }
-export function removePlace(id: string): void { save(getPlaces().filter((x) => x.id !== id)); }
+export async function removePlace(id: number): Promise<void> {
+  await api(`/saved-places/${id}`, { method: 'DELETE' });
+}

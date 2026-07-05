@@ -1,6 +1,6 @@
-/** Resize + nén ảnh phía client (canvas) trước khi tải lên — nhẹ DB. */
-export async function resizeImage(file: File, max = 1600, quality = 0.82): Promise<File> {
-  if (!file.type.startsWith('image/')) return file;
+/** Chỉ co ảnh RẤT lớn (>4MB) cho chắc dưới giới hạn upload; phần nén + chuyển WebP để compressImage (lib/api.ts) lo 1 lần cho ảnh nét nhất. */
+export async function resizeImage(file: File, max = 2200, quality = 0.9): Promise<File> {
+  if (!file.type.startsWith('image/') || file.size < 4 * 1024 * 1024) return file;
   const url = URL.createObjectURL(file);
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Listing, priceLabel, TIER_BADGE, TIER_LABEL, postedLabel } from '@/lib/types';
 import { displayViews, viewedReal } from '@/lib/views';
+import { thumbUrl } from '@/lib/api';
 import { inCompare, toggleCompare } from '@/lib/compare';
 
 function IPin() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="2.5" /></svg>; }
@@ -31,7 +32,7 @@ export default function ListingRow({ l, href }: { l: Listing; href?: string }) {
       className="group flex gap-3 bg-white rounded-xl border border-slate-200 hover:shadow-md hover:border-slate-300 transition overflow-hidden">
       <div className="relative w-[42%] sm:w-48 md:w-56 shrink-0 self-stretch min-h-[124px] bg-slate-100">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={l.images?.[0] ?? `https://picsum.photos/seed/cl${l.id}/800/600`} alt={l.title}
+        <img src={thumbUrl(l.images?.[0]) ?? `https://picsum.photos/seed/cl${l.id}/800/600`} alt={l.title}
           onError={(e) => { (e.currentTarget as HTMLImageElement).src = `https://picsum.photos/seed/cl${l.id}/800/600`; }}
           loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
         {l.tier && l.tier !== 'normal' && <span className={`absolute top-2 left-2 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded shadow ${TIER_BADGE[l.tier] || 'bg-[#C8A14B]'}`}>{(TIER_LABEL[l.tier] || 'VIP').toUpperCase()}</span>}

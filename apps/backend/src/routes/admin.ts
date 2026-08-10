@@ -94,6 +94,10 @@ adminRouter.post('/seed-demo', async (req: AuthedRequest, res, next) => {
     const typeVN: Record<string, string> = { land:'đất nền', house:'nhà phố', apartment:'căn hộ', villa:'biệt thự', commercial:'mặt bằng', farm:'đất vườn', room:'phòng trọ', office:'văn phòng', warehouse:'kho xưởng' };
     // Xã "hot" (trung tâm + ven biển) ~80%; Cam Đức & Cam Hải Đông dày nhất.
     const HOT_WEIGHTED = ['Cam Đức','Cam Đức','Cam Đức','Cam Hải Đông','Cam Hải Đông','Cam Hải Đông','Cam Hải Tây','Cam Hải Tây','Cam Hòa','Cam Thành Bắc'];
+    // Ảnh nhà đất thật (unsplash) theo loại BĐS — thay ảnh picsum ngẫu nhiên (trước đây ra rau củ/tượng...).
+    const U = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=800&q=60`;
+    const IMG_LAND = ['photo-1613490493576-7fde63acd811', 'photo-1486406146926-c627a92ad1ab'].map(U);
+    const IMG_HOUSE = ['photo-1564013799919-ab600027ffc6', 'photo-1512453979798-5ea266f8880c', 'photo-1505228395891-9a51e7e86bf6'].map(U);
     const rowsL: any[][] = [];
     for (let i = 0; i < deals.length; i++) {
       const deal = deals[i];
@@ -129,7 +133,8 @@ adminRouter.post('/seed-demo', async (req: AuthedRequest, res, next) => {
       const title = `${deal === 'rent' ? 'Cho thuê' : 'Bán'} ${typeVN[pt]} ${ward} ${area}m² - ${priceTxt}${tier !== 'normal' ? ' (VIP)' : ''}`;
       const desc = `${deal === 'rent' ? 'Cho thuê' : 'Cần bán'} ${typeVN[pt]} tại ${ward}, Cam Lâm, Khánh Hòa. Diện tích ${area}m²${beds ? `, ${beds} phòng ngủ` : ''}. Vị trí thuận tiện, pháp lý rõ ràng. (Tin mẫu để kiểm thử)`;
       const nImg = 2 + Math.floor(Math.random() * 3);
-      const images = Array.from({ length: nImg }, (_, k) => `https://picsum.photos/seed/demo${i}-${k}/800/600`);
+      const pool = (pt === 'land' || pt === 'farm') ? IMG_LAND : IMG_HOUSE;
+      const images = Array.from({ length: nImg }, (_, k) => pool[(i + k) % pool.length]);
       const status = i % 17 === 0 ? 'hidden' : (i % 23 === 0 ? 'sold' : 'active');
       const isVip = tier !== 'normal';
       const ageDays = isVip ? Math.floor(rnd(0, 90)) : (i % 5 === 0 ? Math.floor(rnd(10, 120)) : Math.floor(rnd(0, 6)));
@@ -423,20 +428,27 @@ adminRouter.get('/stats', async (_req, res, next) => {
 });
 
 // Người dùng
-adminRouter.get('/users', async (_req, res, next) => {
+adminRouter.get('/users', async (req, res, next) => {
   try {
+    const q = String(req.query.q || '').trim();
+    const per = Math.min(100, Math.max(10, Number(req.query.per) || 30));
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const where = q ? `WHERE full_name ILIKE $1 OR email ILIKE $1 OR phone ILIKE $1` : '';
+    const params: any[] = q ? [`%${q}%`] : [];
+    const [{ total }] = await query(`SELECT count(*)::int AS total FROM users ${where}`, params);
     const rows = await query(`SELECT id, email, role, full_name AS "fullName", phone, tier, status, boost_quota AS "boostQuota",
-      is_advisor AS "isAdvisor", email_verified AS "emailVerified", created_at AS "createdAt" FROM users ORDER BY created_at DESC LIMIT 500`);
-    res.json({ users: rows });
+      is_advisor AS "isAdvisor", email_verified AS "emailVerified", rating, rating_count AS "ratingCount", created_at AS "createdAt"
+      FROM users ${where} ORDER BY created_at DESC LIMIT ${per} OFFSET ${(page - 1) * per}`, params);
+    res.json({ users: rows, total, page, per });
   } catch (e) { next(e); }
 });
 adminRouter.patch('/users/:id', async (req, res, next) => {
   try {
     const id = Number(req.params.id); const b = req.body ?? {};
     const [row] = await query(
-      `UPDATE users SET role=COALESCE($2,role), tier=COALESCE($3,tier), status=COALESCE($4,status), boost_quota=COALESCE($5,boost_quota), is_advisor=COALESCE($6,is_advisor)
-       WHERE id=$1 RETURNING id, email, role, tier, status, boost_quota AS "boostQuota", is_advisor AS "isAdvisor"`,
-      [id, b.role ?? null, b.tier ?? null, b.status ?? null, b.boostQuota ?? null, typeof b.isAdvisor === 'boolean' ? b.isAdvisor : null]);
+      `UPDATE users SET role=COALESCE($2,role), tier=COALESCE($3,tier), status=COALESCE($4,status), boost_quota=COALESCE($5,boost_quota), is_advisor=COALESCE($6,is_advisor), rating=COALESCE($7,rating), rating_count=COALESCE($8,rating_count)
+       WHERE id=$1 RETURNING id, email, role, tier, status, boost_quota AS "boostQuota", is_advisor AS "isAdvisor", rating, rating_count AS "ratingCount"`,
+      [id, b.role ?? null, b.tier ?? null, b.status ?? null, b.boostQuota ?? null, typeof b.isAdvisor === 'boolean' ? b.isAdvisor : null, b.rating ?? null, b.ratingCount ?? null]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
     res.json({ user: row });
   } catch (e) { next(e); }
@@ -445,7 +457,7 @@ adminRouter.patch('/users/:id', async (req, res, next) => {
 // Quản lý tin (mọi trạng thái)
 adminRouter.get('/listings', async (_req, res, next) => {
   try {
-    const rows = await query(`SELECT id, title, price, property_type AS "propertyType", ward, status, boosted, tier,
+    const rows = await query(`SELECT id, title, price, property_type AS "propertyType", ward, status, boosted, tier, verified,
       created_by AS "createdBy", created_at AS "createdAt", images FROM listings ORDER BY CASE tier WHEN 'diamond' THEN 3 WHEN 'gold' THEN 2 WHEN 'silver' THEN 1 ELSE 0 END DESC, COALESCE(bumped_at, created_at) DESC LIMIT 500`);
     res.json({ listings: rows });
   } catch (e) { next(e); }
@@ -456,8 +468,10 @@ adminRouter.patch('/listings/:id', async (req, res, next) => {
     const [row] = await query(
       `UPDATE listings SET status=COALESCE($2,status), tier=COALESCE($3,tier),
               bumped_at=CASE WHEN $4 THEN now() ELSE bumped_at END,
-              boosted=(COALESCE($3,tier) <> 'normal')
-       WHERE id=$1 RETURNING id, status, tier, boosted`, [id, b.status ?? null, b.tier ?? null, !!b.bump]);
+              boosted=(COALESCE($3,tier) <> 'normal'),
+              verified=COALESCE($5,verified),
+              verified_at=CASE WHEN $5 IS TRUE THEN now() WHEN $5 IS FALSE THEN NULL ELSE verified_at END
+       WHERE id=$1 RETURNING id, status, tier, boosted, verified`, [id, b.status ?? null, b.tier ?? null, !!b.bump, typeof b.verified === 'boolean' ? b.verified : null]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy tin' });
     res.json({ listing: row });
   } catch (e) { next(e); }

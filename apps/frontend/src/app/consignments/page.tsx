@@ -30,10 +30,10 @@ export default function ConsignmentsPage() {
   const shown = filter === 'all' ? items : items.filter((i) => i.status === filter);
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-8">
-      <div className="mx-auto max-w-5xl px-4">
+    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-5 sm:py-8">
+      <div className="mx-auto max-w-5xl px-3 sm:px-4">
         <div className="flex items-center justify-between mb-1">
-          <h1 className="text-2xl font-extrabold text-[#0A2540]">Khách gửi bán ({items.length})</h1>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540]">Khách gửi bán ({items.length})</h1>
           <Link href="/admin" className="text-sm font-semibold text-slate-500 hover:text-[#0A2540]">← Quản trị</Link>
         </div>
         <p className="text-sm text-slate-500 mb-4">Thông tin BĐS khách gửi qua nút &quot;Gửi bán&quot; — liên hệ định giá & nhận ký gửi.</p>

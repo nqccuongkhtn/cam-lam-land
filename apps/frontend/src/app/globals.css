@@ -9,14 +9,61 @@ body { color: #1f2937; background: #f8fafc;
   font-family: 'Inter', ui-sans-serif, system-ui, "Segoe UI", Roboto, Arial, sans-serif;
   -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
 * { -webkit-tap-highlight-color: transparent; }
+
+/* ===== App-like: cho PWA cảm giác như app native ===== */
+html, body { overscroll-behavior: none; }                 /* tắt kéo nảy / pull-to-refresh của trình duyệt */
+body { -webkit-touch-callout: none; }                      /* không hiện menu khi giữ lâu (iOS) */
+button, a, nav, header, label, select, summary, [role="button"] {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+button, a, [role="button"], summary { touch-action: manipulation; } /* bỏ trễ 300ms + chặn double-tap zoom trên nút */
+input, textarea, [contenteditable="true"] { -webkit-user-select: text; user-select: text; } /* vẫn chọn/sửa được ở ô nhập */
+/* Chạy khi ĐÃ CÀI (standalone): kéo an toàn, chừa tai thỏ */
+@media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
+  html, body { overscroll-behavior: none; }
+}
 button, a, input, select, textarea {
   transition: color .2s var(--ease), background-color .2s var(--ease), border-color .2s var(--ease), box-shadow .25s var(--ease), transform .2s var(--ease);
+}
+
+/* ===== App-feel bổ sung ===== */
+html { accent-color: #0A2540; }                                   /* checkbox/radio/range màu thương hiệu như app */
+::selection { background: rgba(10,37,64,.9); color: #fff; }        /* bôi chọn màu thương hiệu */
+img, a, button { -webkit-user-drag: none; user-drag: none; }      /* không kéo-lê ảnh/nút kiểu web */
+/* iOS: KHÔNG auto-zoom khi chạm ô nhập (font < 16px mới zoom) — cảm giác như app */
+@media (max-width: 767px) {
+  input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea { font-size: 16px !important; }
+}
+/* Nhấn "lún" nhẹ để có phản hồi chạm (gắn class cl-press vào nút/card muốn có hiệu ứng) */
+.cl-press { transition: transform .12s var(--ease); }
+.cl-press:active { transform: scale(.97); }
+/* Sheet trong hub tien ich (Kieu 3): troi len tu duoi + nen mo dan */
+.cl-sheet-up { animation: clSheetUp .3s cubic-bezier(0.22, 1, 0.36, 1); }
+.cl-sheet-fade { animation: clSheetFade .28s ease; }
+@keyframes clSheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes clSheetFade { from { opacity: 0; } to { opacity: 1; } }
+/* A11y: vòng focus RÕ cho người dùng bàn phím — CHỈ hiện khi điều hướng bằng phím (Tab),
+   không hiện khi bấm chuột/chạm. Không áp cho input/select/textarea (đã có focus:border riêng). */
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid #0A2540;
+  outline-offset: 2px;
 }
 .maplibregl-popup-content { font-size: 13px; padding: 10px 12px; border-radius: 8px; }
 
 .skeleton { background: #e9edf3; animation: skelPulse 1.6s ease-in-out infinite; }
 @keyframes skelPulse { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
 
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+/* Cuộn "đà" mượt (iOS) + không kéo lan ra trang khi cuộn vùng con */
+.scroll-soft, .no-scrollbar { -webkit-overflow-scrolling: touch; }
+.no-scrollbar { overscroll-behavior: contain; }
+/* Thẻ lớn (tin đăng) bấm "lún" nhẹ, êm hơn cl-press */
+.cl-tap { transition: transform .16s var(--ease), box-shadow .25s var(--ease); }
+.cl-tap:active { transform: scale(.985); }
+/* Ảnh hiện dần khi tải xong: gắn class cl-img, JS thêm .is-on ở onLoad */
+.cl-img { opacity: 0; transition: opacity .45s var(--ease); }
+.cl-img.is-on { opacity: 1; }
 .scroll-soft { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
 .scroll-soft::-webkit-scrollbar { width: 8px; height: 8px; }
 .scroll-soft::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
@@ -48,6 +95,9 @@ button, a, input, select, textarea {
 /* Ghim tin dạng nhãn giá trên bản đồ (kiểu batdongsan) */
 .cl-price-pin { background:#0A2540; color:#fff; font-size:12px; font-weight:800; line-height:1; padding:4px 8px; border-radius:9999px; white-space:nowrap; box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:pointer; border:1.5px solid #fff; }
 .cl-price-pin:hover { background:#dc2626; z-index:6; }
+/* Chip "Lưu tin này" nhỏ, nằm ngay dưới ghim điểm đã chọn (to hơn pin một tẹo) */
+.cl-chip { background:#fff; color:#2563eb; font-size:12px; font-weight:800; line-height:1; padding:5px 11px; border-radius:9999px; white-space:nowrap; box-shadow:0 3px 10px rgba(0,0,0,.28); border:1.5px solid #2563eb; cursor:pointer; }
+.cl-chip:active, .cl-chip:hover { background:#eff6ff; }
 /* Marker BĐS: chấm (tin thường) / pill giá (VIP, hoặc khi rê chuột / zoom cận) */
 .cl-mk { display:grid; place-items:center; cursor:pointer; }
 .cl-mk-dot { display:block; width:11px; height:11px; border-radius:50%; background:#1f2937; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.45); transition:transform .12s; }
@@ -63,10 +113,26 @@ button, a, input, select, textarea {
 .cl-vip-diamond { background:linear-gradient(90deg,#e11d48,#f43f5e); }
 .cl-vip-gold { background:linear-gradient(90deg,#f59e0b,#eab308); color:#3a2c00; }
 .cl-vip-silver { background:linear-gradient(90deg,#94a3b8,#64748b); }
+/* In / Lưu PDF báo giá định giá — khi in chỉ hiện khối #baogia-print */
+@media print {
+  body * { visibility: hidden !important; }
+  .no-print { display: none !important; }
+  #baogia-print, #baogia-print * { visibility: visible !important; }
+  #baogia-print { display: block !important; position: absolute; left: 0; top: 0; width: 100%; padding: 0; color: #000; }
+  @page { margin: 14mm; }
+}
 /* Nút X đóng popup — to, dễ bấm (cả trên điện thoại) */
-.maplibregl-popup-close-button { width:26px; height:26px; font-size:20px; line-height:22px; color:#64748b; border-radius:8px; }
+.maplibregl-popup-close-button { width:26px; height:26px; font-size:20px; line-height:22px; color:#64748b; border-radius:8px; z-index:1; }
 .maplibregl-popup-close-button:hover { background:#f1f5f9; color:#dc2626; }
-.maplibregl-popup-content { padding:10px 26px 10px 12px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,.18); }
+/* Popup dài (tin lưu nhiều thông tin) → cuộn trong khung, không bị cắt ngoài mép bản đồ */
+.maplibregl-popup-content { padding:10px 26px 10px 12px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,.18); max-height:min(60vh,420px); overflow-y:auto; }
+.maplibregl-popup { max-width:280px !important; }
+/* Cụm nút điều khiển maplibre (zoom/định vị): bo góc, viền mảnh, shadow navy dịu, hover sạch — hợp design system.
+   CHỈ đổi hình thức, KHÔNG resize (tránh đè UI khác), KHÔNG chạm JS/tương tác map. */
+.maplibregl-ctrl-group { border: 0.5px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 14px rgba(10,37,64,.10); overflow: hidden; }
+.maplibregl-ctrl-group button:hover { background-color: #f1f5f9; }
+.maplibregl-ctrl-group button:active { background-color: #e2e8f0; }
+.maplibregl-ctrl-group button + button { border-top-color: #eef2f7; }
 
 /* Quảng cáo động — chuyển động mượt (kiểu Znews) */
 @keyframes clKen { from { transform: scale(1.02); } to { transform: scale(1.09); } }
@@ -75,3 +141,43 @@ button, a, input, select, textarea {
 .cl-shine { animation: clShine 3.8s ease-in-out infinite; }
 @keyframes clFadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 .cl-fadeup { animation: clFadeUp .6s ease-out both; }
+
+/* Viền sáng LƯỚT quanh nút (kích thích bấm) — dùng cho pill Danh sách/Bản đồ */
+@property --cl-glow-a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.cl-glow { position: relative; }
+.cl-glow::before {
+  content: ''; position: absolute; inset: -2px; border-radius: inherit; z-index: 0; pointer-events: none;
+  background: conic-gradient(from var(--cl-glow-a), transparent 0deg, #FFD56A 45deg, #ffffff 72deg, transparent 115deg, transparent 360deg);
+  animation: clGlowSpin 2.6s linear infinite;
+}
+@keyframes clGlowSpin { to { --cl-glow-a: 360deg; } }
+
+/* Thanh tìm kiếm + lọc (trang tin): BÁM dưới Nav bằng 'top' theo biến --cl-nav-h (Nav đặt: menu hiện=3.5rem, ẩn=0),
+   cộng tai thỏ. KHÔNG dùng transform trên position:sticky — iOS Safari KHÔNG cập nhật transform cho lớp sticky đã
+   composite (will-change) nên thanh đứng im, lộ dải 56px của menu. Đổi 'top' theo biến là cách iOS xử lý chuẩn → hết hở. */
+.cl-listbar { position: sticky; top: calc(env(safe-area-inset-top) + var(--cl-nav-h, 3.5rem)); }
+/* TRẦN TRẮNG dự phòng: dải trắng ngay TRÊN thanh, lấp mọi khe khi menu trượt che/nhả */
+.cl-listbar::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 6rem; background: #fff; pointer-events: none; }
+
+/* Hub Tiện ích trên MOBILE: choán full màn, chừa chỗ cho menu trên+dưới bằng padding co theo (ẩn menu khi lướt → padding về 0 → nội dung rộng hết). */
+@media (max-width: 767px) {
+  .cl-hub { position: fixed; inset: 0; z-index: 30; height: auto !important;
+    padding-top: var(--cl-hub-pt, calc(3.5rem + env(safe-area-inset-top)));
+    padding-bottom: var(--cl-hub-pb, calc(3.375rem + env(safe-area-inset-bottom)));
+    transition: padding .3s ease; }
+}
+
+/* Nút nổi (pill Danh sách/Bản đồ + bong bóng chat): bám đáy, TỰ HẠ XUỐNG khi thanh điều hướng dưới ẩn — chuyển mượt.
+   --cl-fab-shift do BottomNav cập nhật: -48px (nâng trên thanh dưới) hoặc 0px (sát đáy). */
+.cl-fab { bottom: calc(12px + env(safe-area-inset-bottom)); transform: translateY(var(--cl-fab-shift, -48px)); transition: transform .3s ease; }
+.cl-fab-pill { bottom: calc(12px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(var(--cl-fab-shift, -48px)); transition: transform .3s ease; }
+@media (min-width: 768px) { .cl-fab { bottom: 20px; transform: none; } }
+
+/* Menu mobile ở đầu trang mở ra: trượt + mờ dần cho mượt */
+@keyframes clMenuIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+.cl-menu-in { animation: clMenuIn .22s ease-out; transform-origin: top center; }
+
+/* ĐÃ CÀI PWA (chạy standalone) → ẩn ngay mọi gợi ý "cài app" (nút footer + banner), không chớp nháy. */
+@media all and (display-mode: standalone) { .cl-install-cta { display: none !important; } }
+
+/* Splash khi mở app: CSS đã được NHÚNG THẲNG trong <head> (SPLASH_CSS ở layout.tsx) để phủ tức thì, không chờ file này. */

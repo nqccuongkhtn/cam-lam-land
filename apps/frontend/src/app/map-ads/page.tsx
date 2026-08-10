@@ -85,16 +85,16 @@ export default function MapAdsPage() {
   const lbl = 'text-sm font-semibold text-slate-700';
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-8">
-      <div className="mx-auto max-w-5xl px-4 space-y-5">
+    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-5 sm:py-8">
+      <div className="mx-auto max-w-5xl px-3 sm:px-4 space-y-4 sm:space-y-5">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-extrabold text-[#0A2540]">Quảng cáo trên bản đồ</h1>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540]">Quảng cáo trên bản đồ</h1>
           <Link href="/admin" className="text-sm font-semibold text-slate-500 hover:text-[#0A2540]">← Quản trị</Link>
         </div>
         <p className="text-sm text-slate-500">Quảng cáo <b>độc quyền theo xã</b>: mỗi xã chỉ 1 người trong thời hạn gói, không bán đại trà. Logo hiển thị thưa tại các điểm bạn ghim trên bản đồ.</p>
 
-        <div className="grid lg:grid-cols-2 gap-5">
-          <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
+        <div className="grid lg:grid-cols-2 gap-4 sm:gap-5">
+          <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
             <h2 className="font-bold text-[#0A2540]">{editingId ? `Sửa quảng cáo #${editingId}` : 'Tạo quảng cáo'}</h2>
             <div className="grid sm:grid-cols-2 gap-3">
               <div><label className={lbl}>Tên sales *</label><input className={inp} value={name} onChange={(e) => setName(e.target.value)} placeholder="Nguyễn Quốc Cường" /></div>
@@ -147,7 +147,7 @@ export default function MapAdsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+          <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-3">
             <h2 className="font-bold text-[#0A2540]">{adStyle === 'text' ? <>Xem trước chữ mờ <span className="font-normal text-slate-400 text-sm">(tự phủ khắp bản đồ)</span></> : <>Ghim điểm hiển thị <span className="font-normal text-slate-400 text-sm">(bấm vào bản đồ)</span></>}</h2>
             <div className="relative h-80 rounded-xl overflow-hidden border border-slate-200">
               <MapView baseMap="satellite" initialBounds={QH_BOUNDS} adMarkers={preview} onMapClick={(lng, lat) => { if (adStyle !== 'text') setPoints((p) => [...p, { lng, lat }]); }} className="absolute inset-0 h-full w-full" />
@@ -160,7 +160,7 @@ export default function MapAdsPage() {
           </section>
         </div>
 
-        <section className="bg-white rounded-2xl border border-slate-200 p-5">
+        <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
           <h2 className="font-bold text-[#0A2540] mb-3">Quảng cáo đang có ({list.length})</h2>
           {list.length === 0 ? <p className="text-sm text-slate-400">Chưa có quảng cáo nào.</p> : (
             <div className="space-y-2">

@@ -29,26 +29,26 @@ export default function Leads() {
   const fmt = (s: string) => new Date(s).toLocaleString('vi-VN');
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-8">
-      <div className="mx-auto max-w-3xl px-4">
+    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-5 sm:py-8">
+      <div className="mx-auto max-w-3xl px-3 sm:px-4">
         <Link href="/sales" className="text-sm font-semibold text-slate-500 hover:text-[#0A2540]">← Tin của tôi</Link>
-        <h1 className="text-2xl font-extrabold text-[#0A2540] mt-2">Khách quan tâm</h1>
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540] mt-2">Khách quan tâm</h1>
         <p className="text-slate-500 text-sm">{data.title}</p>
-        <p className="text-sm text-slate-500 mb-4">{data.leads.length} khách · xếp theo mức độ quan tâm (xem nhiều nhất lên đầu)</p>
+        <p className="text-sm text-slate-500 mb-3 sm:mb-4">{data.leads.length} khách · xếp theo mức độ quan tâm (xem nhiều nhất lên đầu)</p>
         {data.leads.length === 0 ? (
-          <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-10 text-center text-slate-500">Chưa có khách nào xem số liên hệ của tin này.</div>
+          <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-8 sm:p-10 text-center text-slate-500">Chưa có khách nào xem số liên hệ của tin này.</div>
         ) : (
           <div className="bg-white rounded-2xl border border-slate-200 overflow-x-auto">
-            <table className="w-full text-sm min-w-[560px]">
-              <thead className="bg-slate-50 text-left text-slate-500"><tr><th className="p-2 w-8">#</th><th className="p-2">Khách</th><th className="p-2">Số lần xem</th><th className="p-2">Mức quan tâm</th><th className="p-2">Xem gần nhất</th></tr></thead>
+            <table className="w-full text-sm min-w-[480px]">
+              <thead className="bg-slate-50 text-left text-slate-500"><tr><th className="p-2 w-8">#</th><th className="p-2">Khách</th><th className="p-2">Xem</th><th className="p-2">Mức quan tâm</th><th className="p-2 hidden sm:table-cell">Xem gần nhất</th></tr></thead>
               <tbody>
                 {data.leads.map((ld, i) => { const lv = level(ld.views); return (
                   <tr key={ld.id} className="border-t">
                     <td className="p-2 font-bold text-slate-400">{i + 1}</td>
-                    <td className="p-2"><div className="font-semibold text-[#0A2540]">{ld.name || 'Khách'}</div><a href={`tel:${(ld.phone || '').replace(/\s/g, '')}`} className="text-xs text-[#0A2540] font-semibold">{ld.phone || '—'}</a></td>
+                    <td className="p-2"><div className="font-semibold text-[#0A2540]">{ld.name || 'Khách'}</div><a href={`tel:${(ld.phone || '').replace(/\s/g, '')}`} className="text-xs text-[#7c3aed] font-semibold">{ld.phone || '—'}</a></td>
                     <td className="p-2 font-bold text-[#0A2540]">{ld.views}</td>
                     <td className="p-2"><span className={`text-xs font-bold px-2 py-0.5 rounded-full ${lv.c}`}>{lv.f} {lv.t}</span></td>
-                    <td className="p-2 text-xs text-slate-400">{fmt(ld.lastAt)}</td>
+                    <td className="p-2 text-xs text-slate-400 hidden sm:table-cell">{fmt(ld.lastAt)}</td>
                   </tr>
                 ); })}
               </tbody>

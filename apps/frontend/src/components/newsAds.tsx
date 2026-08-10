@@ -23,7 +23,7 @@ export function useNewsAd(): Ad {
 
 export function Cta({ text, className = '' }: { text: string; className?: string }) {
   return (
-    <span className={`relative overflow-hidden bg-[#C8A14B] text-[#0A2540] font-bold rounded-md ${className}`}>
+    <span className={`relative inline-flex items-center justify-center whitespace-nowrap overflow-hidden bg-[#C8A14B] text-[#0A2540] font-bold rounded-md ${className}`}>
       <span className="relative z-10">{text} →</span>
       <span aria-hidden className="cl-shine pointer-events-none absolute top-0 bottom-0 w-1/4 bg-white/45 blur-[3px]" />
     </span>
@@ -49,10 +49,10 @@ export function BillboardAd({ ad }: { ad: Ad }) {
       <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group block relative h-full w-full bg-[#0A2540]">
         {imgs.length ? <Slides imgs={imgs} idx={idx} /> : <div className="absolute inset-0 bg-gradient-to-br from-[#0A2540] to-[#10355f]" />}
         <div className="absolute inset-0 bg-gradient-to-r from-[#0A2540]/95 via-[#0A2540]/55 to-transparent" />
-        <div className="absolute inset-y-0 left-0 z-10 flex flex-col justify-center p-5 md:p-8 max-w-[62%] text-white">
-          <p className="font-extrabold text-xl md:text-3xl leading-tight drop-shadow">{ad.title}</p>
-          {ad.sub && <p className="text-sm md:text-base text-white/85 mt-1.5 md:mt-2 drop-shadow line-clamp-2">{ad.sub}</p>}
-          {ad.cta && <Cta text={ad.cta} className="mt-3 md:mt-4 self-start text-sm px-5 py-2.5" />}
+        <div className="absolute inset-y-0 left-0 z-10 flex flex-col justify-center p-4 sm:p-5 md:p-8 max-w-[70%] sm:max-w-[62%] text-white">
+          <p className="font-extrabold text-base sm:text-xl md:text-3xl leading-tight drop-shadow">{ad.title}</p>
+          {ad.sub && <p className="text-xs sm:text-sm md:text-base text-white/85 mt-1 sm:mt-1.5 md:mt-2 drop-shadow line-clamp-2">{ad.sub}</p>}
+          {ad.cta && <Cta text={ad.cta} className="mt-2 sm:mt-3 md:mt-4 self-start text-xs sm:text-sm px-3 sm:px-5 py-2 sm:py-2.5" />}
         </div>
       </a>
     </AdFrame>

@@ -48,12 +48,12 @@ export default function HomeUtilities() {
     { k: 'fs', icon: '🧭', t: 'Tư vấn phong thủy', d: 'Hướng nhà hợp tuổi' },
   ] as const;
   return (
-    <section className="mx-auto max-w-7xl px-4 py-10">
-      <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-6">Hỗ trợ tiện ích</h2>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+    <section className="mx-auto max-w-7xl px-3 sm:px-4 py-7 sm:py-10">
+      <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-4 sm:mb-6">Hỗ trợ tiện ích</h2>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4">
         {TOOLS.map((tl) => (
           <button key={tl.k} onClick={() => setOpen(tl.k)}
-            className="group flex items-center gap-3 bg-white border border-slate-200 rounded-2xl p-4 text-left hover:border-[#C8A14B] hover:shadow-md transition">
+            className="group flex items-center gap-2.5 sm:gap-3 bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 text-left hover:border-[#C8A14B] hover:shadow-md transition">
             <span className="w-11 h-11 grid place-items-center rounded-xl bg-slate-50 text-2xl group-hover:bg-[#0A2540]/5 shrink-0">{tl.icon}</span>
             <span className="min-w-0">
               <span className="block font-bold text-[#0A2540] text-sm leading-tight">{tl.t}</span>
@@ -164,19 +164,19 @@ function LoanTool() {
         <div><label className={lbl}>Giá nhà/đất (triệu)</label><input className={inp} value={gia} onChange={(e) => setGia(num(e.target.value))} inputMode="numeric" placeholder="VD: 2000" /></div>
         <div><label className={lbl}>Vốn tự có (triệu)</label><input className={inp} value={von} onChange={(e) => setVon(num(e.target.value))} inputMode="numeric" placeholder="VD: 800" /></div>
       </div>
-      {P > 0 && (
-        <div className={`rounded-lg px-3 py-2 text-xs font-semibold ${ltv > 70 ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'}`}>
-          Cần vay <b>{fmtVnd(P)}</b>{giaN > 0 && <> · <b>{Math.round(ltv)}%</b> giá trị</>}{ltv > 70 && ' ⚠ nên vay ≤ 70%'}
-        </div>
-      )}
       <div className="grid grid-cols-2 gap-3">
         <div><label className={lbl}>Lãi suất (%/năm)</label><input className={inp} value={ls} onChange={(e) => setLs(e.target.value.replace(/[^\d.]/g, ''))} inputMode="decimal" /></div>
-        <div><label className={lbl}>Thời hạn (năm)</label><input className={inp} value={nam} onChange={(e) => setNam(num(e.target.value))} inputMode="numeric" /></div>
+        <div><label className={lbl}>Thời hạn (năm)</label><input className={inp} value={nam} onChange={(e) => { const d = num(e.target.value); setNam(d === '' ? '' : String(Math.min(40, +d))); }} inputMode="numeric" max={40} placeholder="≤ 40 năm" /></div>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div><label className={lbl}>Cách tính</label><select className={inp} value={pt} onChange={(e) => setPt(e.target.value as any)}><option value="giamdan">Dư nợ giảm dần</option><option value="deu">Trả góp đều</option></select></div>
         <div><label className={lbl}>Thu nhập/tháng (triệu)</label><input className={inp} value={tn} onChange={(e) => setTn(num(e.target.value))} inputMode="numeric" placeholder="tuỳ chọn" /></div>
       </div>
+      {P > 0 && (
+        <div className={`rounded-lg px-3 py-2 text-xs font-semibold ${ltv > 70 ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'}`}>
+          Cần vay <b>{fmtVnd(P)}</b>{giaN > 0 && <> · <b>{Math.round(ltv)}%</b> giá trị</>}{ltv > 70 && ' ⚠ nên vay ≤ 70%'}
+        </div>
+      )}
       {out && (
         <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm space-y-1.5">
           {pt === 'deu'

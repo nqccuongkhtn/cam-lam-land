@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { adminRequired } from '../middleware/auth.ts';
+import { isValidPhone } from '../lib/vn.ts';
 
 export const investRouter = Router();
 
@@ -8,13 +9,14 @@ export const investRouter = Router();
 investRouter.post('/', async (req, res, next) => {
   try {
     const b = req.body ?? {};
-    const name = String(b.name ?? '').trim();
+    const name = String(b.name ?? '').trim().slice(0, 80);
     const phone = String(b.phone ?? '').trim();
-    if (!name || !phone) return res.status(400).json({ error: 'Vui lòng nhập họ tên và số điện thoại' });
+    if (!name) return res.status(400).json({ error: 'Vui lòng nhập họ tên' });
+    if (!isValidPhone(phone)) return res.status(400).json({ error: 'Số điện thoại không hợp lệ (cần 9–11 chữ số).' });
     const [row] = await query(
       `INSERT INTO invest_leads (name, phone, amount, tenure, note)
        VALUES ($1,$2,$3,$4,$5) RETURNING id`,
-      [name, phone, b.amount ? String(b.amount).slice(0, 60) : null, b.tenure ? String(b.tenure).slice(0, 30) : null, b.note ? String(b.note).slice(0, 1000) : null]);
+      [name, phone.slice(0, 20), b.amount ? String(b.amount).slice(0, 60) : null, b.tenure ? String(b.tenure).slice(0, 30) : null, b.note ? String(b.note).slice(0, 1000) : null]);
     res.status(201).json({ id: row.id, ok: true });
   } catch (e) { next(e); }
 });
@@ -24,7 +26,7 @@ investRouter.get('/', adminRequired, async (_req, res, next) => {
   try {
     const rows = await query(
       `SELECT id, name, phone, amount, tenure, note, status, created_at AS "createdAt"
-         FROM invest_leads ORDER BY created_at DESC`);
+         FROM invest_leads ORDER BY created_at DESC LIMIT 2000`);
     res.json({ count: rows.length, items: rows });
   } catch (e) { next(e); }
 });

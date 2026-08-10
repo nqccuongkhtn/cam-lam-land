@@ -14,8 +14,40 @@ const SOURCES = [
 // Bỏ tin tiêu cực — chỉ giữ tin tích cực / trung lập
 const BAD = /(lừa đảo|vỡ nợ|phá sản|siết nợ|tranh chấp|khởi tố|khởi kiện|kiện tụng|bắt giam|lao dốc|bán tháo|nợ xấu|đóng băng|ế ẩm|sụt giảm|giảm mạnh|thổi giá|bong bóng|chiếm đoạt|cảnh báo sốt|trục lợi)/i;
 
-const decode = (s: string): string => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'").trim();
+// Bảng entity TÊN hay gặp ở RSS báo tiếng Việt (entity SỐ thập phân/hex xử lý bằng regex bên dưới).
+const NAMED: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', ndash: '–', mdash: '—', hellip: '…', lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”', laquo: '«', raquo: '»', copy: '©', reg: '®', trade: '™', deg: '°', middot: '·', bull: '•', euro: '€', times: '×', divide: '÷', agrave: 'à', aacute: 'á', acirc: 'â', atilde: 'ã', auml: 'ä', aring: 'å', egrave: 'è', eacute: 'é', ecirc: 'ê', euml: 'ë', igrave: 'ì', iacute: 'í', icirc: 'î', iuml: 'ï', ograve: 'ò', oacute: 'ó', ocirc: 'ô', otilde: 'õ', ouml: 'ö', ugrave: 'ù', uacute: 'ú', ucirc: 'û', uuml: 'ü', yacute: 'ý', yuml: 'ÿ', ntilde: 'ñ', ccedil: 'ç', Agrave: 'À', Aacute: 'Á', Acirc: 'Â', Atilde: 'Ã', Egrave: 'È', Eacute: 'É', Ecirc: 'Ê', Igrave: 'Ì', Iacute: 'Í', Ograve: 'Ò', Oacute: 'Ó', Ocirc: 'Ô', Otilde: 'Õ', Ugrave: 'Ù', Uacute: 'Ú', Yacute: 'Ý', Ntilde: 'Ñ', Ccedil: 'Ç' };
+// Giải mã ĐẦY ĐỦ: CDATA + entity SỐ (thập phân & hex — gồm ký tự tiếng Việt như &#7879;) + entity TÊN (&aacute; ...).
+const decode = (s: string): string => s
+  .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+  .replace(/&#x([0-9a-fA-F]+);/g, (m, h) => { const n = parseInt(h, 16); return n > 0 && n <= 0x10FFFF ? String.fromCodePoint(n) : m; })
+  .replace(/&#(\d+);/g, (m, d) => { const n = parseInt(d, 10); return n > 0 && n <= 0x10FFFF ? String.fromCodePoint(n) : m; })
+  .replace(/&([a-zA-Z][a-zA-Z0-9]+);/g, (m, name) => (Object.prototype.hasOwnProperty.call(NAMED, name) ? NAMED[name] : m))
+  .trim();
 const strip = (s: string): string => s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
+// Ảnh RÁC/không phải ảnh bài: logo, icon, avatar, pixel theo dõi, spacer, quảng cáo…
+const JUNK_IMG = /(logo|icon|avatar|sprite|spacer|blank|pixel|1x1|beacon|tracking|placeholder|gravatar|doubleclick|\/ads?[\/_.]|\.svg(\?|$))/i;
+const goodImg = (u?: string | null): string | null => {
+  if (!u) return null;
+  const url = decode(String(u)).trim();
+  if (!/^https?:\/\//i.test(url)) return null; // bỏ data: và đường dẫn tương đối
+  if (JUNK_IMG.test(url)) return null;
+  return url;
+};
+// Chọn ảnh ĐẠI DIỆN: ưu tiên ảnh feed CHỈ ĐỊNH (media:content lớn nhất → thumbnail → enclosure),
+// vì <img> đầu trong mô tả hay là logo/ảnh bài liên quan/quảng cáo → để CUỐI. Lấy ứng viên "sạch" đầu tiên.
+function pickImage(item: string, desc: string): string | null {
+  const cands: (string | undefined)[] = [];
+  const media = [...item.matchAll(/<media:content\b[^>]*\burl=["']([^"']+)["'][^>]*>/gi)]
+    .map((m) => ({ url: m[1], w: Number((m[0].match(/\bwidth=["']?(\d+)/) || [])[1] || 0) }))
+    .sort((a, b) => b.w - a.w);
+  for (const m of media) cands.push(m.url);
+  cands.push((item.match(/<media:thumbnail\b[^>]*\burl=["']([^"']+)["']/i) || [])[1]);
+  cands.push((item.match(/<enclosure\b[^>]*\burl=["']([^"']+)["'][^>]*type=["']image/i) || [])[1]);
+  for (const m of desc.matchAll(/<img[^>]+src=["']?([^"' >]+)/gi)) cands.push(m[1]); // kém tin cậy nhất
+  for (const c of cands) { const g = goodImg(c); if (g) return g; }
+  return null;
+}
 
 async function fetchSource(src: { name: string; url: string }): Promise<any[]> {
   const res = await fetch(src.url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CamLamLand/1.0)' }, signal: AbortSignal.timeout(9000) });
@@ -28,11 +60,7 @@ async function fetchSource(src: { name: string; url: string }): Promise<any[]> {
     const link = decode((b.match(/<link>([\s\S]*?)<\/link>/) || [])[1] || '');
     const desc = decode((b.match(/<description>([\s\S]*?)<\/description>/) || [])[1] || '');
     const pub = decode((b.match(/<pubDate>([\s\S]*?)<\/pubDate>/) || [])[1] || '');
-    const img = (desc.match(/<img[^>]+src=["']?([^"' >]+)/) || [])[1]
-      || (b.match(/<enclosure[^>]+url=["']([^"']+)["'][^>]*type=["']image/) || [])[1]
-      || (b.match(/<media:content[^>]+url=["']([^"']+)["']/) || [])[1]
-      || (b.match(/<media:thumbnail[^>]+url=["']([^"']+)["']/) || [])[1]
-      || null;
+    const img = pickImage(b, desc);
     const d = pub ? new Date(pub) : new Date();
     if (!title || !link || isNaN(d.getTime())) continue;
     if (BAD.test(title)) continue;

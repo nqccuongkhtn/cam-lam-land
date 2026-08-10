@@ -1,18 +1,26 @@
 'use client';
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import Link from 'next/link';
+import InstallAppButton from './InstallAppButton';
+import { api } from '@/lib/api';
 
-const HELP: [string, string][] = [
+const DISCOVER: [string, string][] = [
   ['Giới thiệu Cam Lâm Land', '/gioi-thieu'],
   ['Dịch vụ & Bảng giá', '/dichvu'],
   ['Nhà đất bán & cho thuê', '/listings'],
-  ['Giá đất khu vực & định giá', '/gia-dat'],
-  ['Bảng giá đất Khánh Hòa', '/bang-gia-dat'],
-  ['Bản đồ quy hoạch', '/map'],
-  ['Tra cứu QR thửa đất', '/qr'],
-  ['Cẩm nang pháp lý nhà đất', '/cam-nang'],
+  ['Nhà đất theo khu vực', '/nha-dat'],
   ['Góp vốn đầu tư (CamInvest)', '/dau-tu'],
   ['Tin tức', '/tin-tuc'],
+  ['🎮 Chơi game trúng quà tuần', '/game'],
+];
+const TOOLS: [string, string][] = [
+  ['🧰 Tiện ích (tất cả công cụ)', '/tien-ich'],
+  ['Bản đồ quy hoạch', '/map'],
+  ['Tra cứu QR thửa đất', '/qr'],
+  ['Giá đất khu vực & định giá', '/gia-dat'],
+  ['Bảng giá đất Khánh Hòa', '/bang-gia-dat'],
+  ['Cẩm nang pháp lý nhà đất', '/cam-nang'],
+  ['Văn bản pháp luật nhà đất', '/van-ban'],
 ];
 const RULES: [string, string][] = [
   ['Quy định đăng tin', '/quy-dinh-dang-tin'],
@@ -26,37 +34,52 @@ const STATS = [
   { n: '2,000+', l: 'Bất động sản', d: 'M3 21h18M5 21V7l6-4 6 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01' },
   { n: '5,000+', l: 'Khách hàng', d: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' },
   { n: '50+', l: 'Dự án quy hoạch', d: 'M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' },
-  { n: '8', l: 'Xã / Khu vực', d: 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z' },
+  { n: '8 năm', l: 'Kinh nghiệm', d: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 6v6l4 2' },
 ];
 
 function Newsletter() {
   const [email, setEmail] = useState('');
-  const submit = (e: FormEvent) => {
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
-    setEmail('');
-    alert('Cảm ơn bạn đã đăng ký nhận tin từ Cam Lâm Land!');
+    const em = email.trim();
+    if (!em) { setMsg({ ok: false, text: 'Vui lòng nhập email.' }); return; }
+    setBusy(true); setMsg(null);
+    try {
+      await api('/newsletter', { method: 'POST', body: JSON.stringify({ email: em }) }); // LƯU lead thật (không chỉ alert)
+      setEmail(''); setMsg({ ok: true, text: 'Đã đăng ký nhận tin. Cảm ơn bạn!' });
+    } catch (er: any) {
+      setMsg({ ok: false, text: er?.message || 'Đăng ký chưa thành công, thử lại sau.' });
+    } finally { setBusy(false); }
   };
   return (
-    <form onSubmit={submit} className="flex rounded-lg overflow-hidden bg-white/10 border border-white/15">
-      <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Nhập email của bạn" className="flex-1 min-w-0 bg-transparent px-3 py-2.5 text-sm text-white placeholder-slate-400 outline-none" />
-      <button type="submit" className="bg-red-600 hover:bg-red-700 text-white px-4 text-sm font-semibold shrink-0">Gửi</button>
-    </form>
+    <div>
+      <form onSubmit={submit} className="flex rounded-lg overflow-hidden bg-white/10 border border-white/15">
+        <input value={email} onChange={(e) => { setEmail(e.target.value); setMsg(null); }} type="email" required placeholder="Nhập email của bạn" className="flex-1 min-w-0 bg-transparent px-3 py-2.5 text-sm text-white placeholder-slate-400 outline-none" />
+        <button type="submit" disabled={busy} className="cl-press bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white px-4 text-sm font-semibold shrink-0">{busy ? '…' : 'Gửi'}</button>
+      </form>
+      {msg && <p className={`mt-1.5 text-[12px] ${msg.ok ? 'text-emerald-400' : 'text-red-400'}`}>{msg.text}</p>}
+    </div>
   );
+}
+
+function SectionTitle({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return <p className={`mb-3 font-semibold text-white ${className}`}>{children}</p>;
 }
 
 export default function SiteFooter() {
   return (
     <footer className="bg-[#0A2540] text-slate-300">
       {/* Số liệu — 4 mục đều nhau */}
-      <div className="mx-auto max-w-7xl px-4 pt-12 pb-10 grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="mx-auto max-w-7xl px-3 sm:px-4 pt-8 sm:pt-12 pb-8 sm:pb-10 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 border-b border-white/10">
         {STATS.map((s) => (
-          <div key={s.l} className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl grid place-items-center bg-white/[0.06] border border-[#C8A14B]/40 text-[#C8A14B] shrink-0">
+          <div key={s.l} className="flex items-center gap-2 sm:gap-3">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl grid place-items-center bg-white/[0.06] border border-[#C8A14B]/40 text-[#C8A14B] shrink-0">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d={s.d} /></svg>
             </div>
             <div>
-              <div className="text-xl md:text-2xl font-extrabold text-white leading-none">{s.n}</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-extrabold text-white leading-none">{s.n}</div>
               <div className="text-slate-400 text-xs mt-1">{s.l}</div>
             </div>
           </div>
@@ -64,18 +87,16 @@ export default function SiteFooter() {
       </div>
 
       {/* 4 cột đều nhau */}
-      <div className="mx-auto max-w-7xl px-4 pb-10 grid gap-x-6 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto max-w-7xl px-3 sm:px-4 pb-8 sm:pb-10 grid gap-x-6 sm:gap-x-8 gap-y-8 sm:gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <p className="font-extrabold text-xl text-white">Cam Lâm <span className="text-[#C8A14B]">Land</span></p>
-          <p className="text-sm mt-3 text-slate-400">Nền tảng bất động sản &amp; bản đồ quy hoạch huyện Cam Lâm, Khánh Hòa.</p>
+          <p className="text-sm mt-3 text-slate-400">Nền tảng bất động sản &amp; bản đồ quy hoạch khu vực Cam Lâm, Khánh Hòa.</p>
           <a href="tel:0988888888" className="inline-flex items-center gap-1.5 text-lg font-extrabold text-[#C8A14B] hover:text-[#FFD56A] mt-4">📞 0988 888 888</a>
           <p className="text-sm text-slate-400 mt-1">✉️ lienhe@camlamland.vn</p>
           <div className="flex flex-wrap items-center gap-2.5 mt-4">
-            <a href="#" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-2">
-              <span className="text-lg">▶</span><span className="text-[11px] leading-tight">Tải trên<br /><b className="text-white text-xs">Google Play</b></span>
-            </a>
+            <InstallAppButton className="flex items-center gap-2 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-2" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=0&data=https%3A%2F%2Fcamlamland.onrender.com" alt="QR mở web Cam Lâm Land" width={56} height={56} className="w-14 h-14 rounded-lg bg-white p-1" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=0&data=https%3A%2F%2Fbatdongsancamlam.dpdns.org" alt="QR mở web Cam Lâm Land" width={56} height={56} className="w-14 h-14 rounded-lg bg-white p-1" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
           </div>
           <div className="flex gap-2 mt-4">
             <a href="#" aria-label="Facebook" className="w-9 h-9 grid place-items-center rounded-full bg-white/10 hover:bg-white/20 font-bold">f</a>
@@ -85,34 +106,37 @@ export default function SiteFooter() {
         </div>
 
         <div>
-          <p className="font-semibold text-white mb-3">Hướng dẫn</p>
+          <SectionTitle>Khám phá</SectionTitle>
           <ul className="text-sm space-y-2 text-slate-400">
-            {HELP.map(([label, href]) => <li key={label}><Link href={href} className="hover:text-[#C8A14B]">{label}</Link></li>)}
+            {DISCOVER.map(([label, href]) => <li key={label}><Link href={href} className="inline-block transition duration-150 hover:translate-x-0.5 hover:text-[#C8A14B]">{label}</Link></li>)}
           </ul>
         </div>
 
         <div>
-          <p className="font-semibold text-white mb-3">Quy định</p>
+          <SectionTitle>Tra cứu &amp; công cụ</SectionTitle>
           <ul className="text-sm space-y-2 text-slate-400">
-            {RULES.map(([label, href]) => <li key={label}><Link href={href} className="hover:text-[#C8A14B]">{label}</Link></li>)}
+            {TOOLS.map(([label, href]) => <li key={label}><Link href={href} className="inline-block transition duration-150 hover:translate-x-0.5 hover:text-[#C8A14B]">{label}</Link></li>)}
           </ul>
         </div>
 
         <div>
-          <p className="font-semibold text-white mb-3">Đăng ký nhận tin</p>
+          <SectionTitle>Quy định</SectionTitle>
+          <ul className="text-sm space-y-2 text-slate-400">
+            {RULES.map(([label, href]) => <li key={label}><Link href={href} className="inline-block transition duration-150 hover:translate-x-0.5 hover:text-[#C8A14B]">{label}</Link></li>)}
+          </ul>
+          <SectionTitle className="mt-6">Đăng ký nhận tin</SectionTitle>
           <p className="text-xs text-slate-400 mb-2">Nhận tin nhà đất &amp; quy hoạch Cam Lâm mới nhất.</p>
           <Newsletter />
-          <p className="font-semibold text-white mt-6 mb-2">Quốc gia &amp; Ngôn ngữ</p>
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-lg px-3 py-2 text-sm">
+          <div className="mt-5 inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm">
             <span className="text-base">🇻🇳</span> Việt Nam
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 pb-4 text-xs text-slate-400 leading-relaxed">
-        <b className="text-slate-200">CAM LÂM LAND</b> — Nền tảng bất động sản &amp; quy hoạch huyện Cam Lâm, tỉnh Khánh Hòa. Phát triển bởi Nguyễn Quốc Cường. Địa chỉ: Cam Lâm, Khánh Hòa · Hotline: 0988 888 888 · Email: lienhe@camlamland.vn.
+      <div className="mx-auto max-w-7xl px-3 sm:px-4 pt-6 pb-4 border-t border-white/10 text-xs text-slate-400 leading-relaxed">
+        <b className="text-slate-200">CAM LÂM LAND</b> — Nền tảng bất động sản &amp; quy hoạch khu vực Cam Lâm, tỉnh Khánh Hòa. Phát triển bởi Nguyễn Quốc Cường. Địa chỉ: Cam Lâm, Khánh Hòa · Hotline: 0988 888 888 · Email: lienhe@camlamland.vn.
       </div>
-      <div className="mx-auto max-w-7xl px-4 text-center sm:text-left text-xs text-slate-500 pb-6">© 2026 Cam Lâm Land · Phát triển bởi Nguyễn Quốc Cường</div>
+      <div className="mx-auto max-w-7xl px-3 sm:px-4 text-center sm:text-left text-xs text-slate-500 pb-6">© 2026 Cam Lâm Land · Phát triển bởi Nguyễn Quốc Cường</div>
     </footer>
   );
 }

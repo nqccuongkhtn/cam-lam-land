@@ -14,30 +14,39 @@ export default function Admin() {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
   const [tab, setTab] = useState<Tab>('overview');
+  const [embedded, setEmbedded] = useState(false); // nhúng trong hub Quản lý -> ẩn tiêu đề & tab (điều hướng bằng sidebar ngoài)
   useEffect(() => { if (!loading && !user) router.replace('/login'); }, [loading, user, router]);
   useEffect(() => { if (user?.role === 'gis') setTab('upload'); }, [user]);
+  useEffect(() => { try { const p = new URLSearchParams(window.location.search); const t = p.get('tab'); if (t && TABS.some(([x]) => x === t)) setTab(t as Tab); setEmbedded(p.get('embed') === '1' || document.documentElement.classList.contains('embed')); } catch { /* */ } }, []);
+  // AN TOÀN: chặn <select> đổi giá trị NGOÀI Ý MUỐN khi LĂN CHUỘT — nếu đang focus 1 select mà cuộn thì bỏ focus
+  // để cuộn trang (không lỡ đổi vai trò/hạng/trạng thái). Một chỗ, bảo vệ mọi select trong bảng quản trị.
+  useEffect(() => {
+    const onWheel = () => { const el = document.activeElement as HTMLElement | null; if (el && el.tagName === 'SELECT') el.blur(); };
+    document.addEventListener('wheel', onWheel, { passive: true });
+    return () => document.removeEventListener('wheel', onWheel);
+  }, []);
 
   if (loading) return <div className="mx-auto max-w-6xl px-4 py-16 text-center text-slate-500">Đang tải…</div>;
   if (!user) return null;
   if (user.role !== 'admin' && user.role !== 'gis') return (
     <div className="mx-auto max-w-md px-4 py-20 text-center">
       <p className="text-xl font-bold text-[#0A2540]">Không có quyền truy cập</p>
-      <p className="text-slate-500 mt-2 text-sm">Trang này chỉ dành cho admin / biên tập bản đồ. <Link href="/" className="text-[#0A2540] font-semibold underline">Về trang chủ</Link></p>
+      <p className="text-slate-500 mt-2 text-sm">Trang này chỉ dành cho admin / biên tập bản đồ. <Link href="/" target="_top" className="text-[#0A2540] font-semibold underline">Về trang chủ</Link></p>
     </div>
   );
   const isGis = user.role === 'gis';
   const shownTabs = isGis ? TABS.filter(([t]) => t === 'upload' || t === 'logs') : TABS;
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className={`mx-auto max-w-6xl px-4 ${embedded ? 'py-4' : 'py-6'}`}>
+      {!embedded && <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-extrabold text-[#0A2540]">{isGis ? 'Quản lý bản đồ GIS' : 'Bảng điều khiển quản trị'}</h1>
         <button onClick={() => { logout(); router.replace('/login'); }} className="text-sm text-slate-500 hover:text-slate-800">Đăng xuất</button>
-      </div>
-      <div className="flex gap-1 border-b mb-5 overflow-x-auto">
+      </div>}
+      {!embedded && <div className="flex gap-1 border-b mb-5 overflow-x-auto">
         {shownTabs.map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)} className={`px-4 py-2 text-sm font-semibold border-b-2 whitespace-nowrap ${tab === t ? 'border-[#C8A14B] text-[#0A2540]' : 'border-transparent text-slate-500'}`}>{l}</button>
         ))}
-      </div>
+      </div>}
       {tab === 'overview' && !isGis && <Overview />}
       {tab === 'users' && !isGis && <Users />}
       {tab === 'listings' && !isGis && <ListingsAdmin />}
@@ -197,9 +206,22 @@ function OcrUsage() {
 function Overview() {
   const [s, setS] = useState<any>(null);
   useEffect(() => { api('/admin/stats').then(setS).catch(() => {}); }, []);
-  if (!s) return <p className="text-slate-500">Đang tải báo cáo…</p>;
+  if (!s) return (
+    <div className="space-y-5 animate-pulse" aria-busy="true" aria-label="Đang tải báo cáo">
+      <div className="h-[68px] rounded-2xl bg-slate-200/70" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">{[0, 1, 2, 3].map((i) => <div key={i} className="h-[76px] rounded-2xl bg-slate-200/70" />)}</div>
+      <div className="grid md:grid-cols-2 gap-4"><div className="h-40 rounded-2xl bg-slate-200/70" /><div className="h-40 rounded-2xl bg-slate-200/70" /></div>
+    </div>
+  );
   return (
     <div className="space-y-5">
+      <Link href="/admin/traffic" className="flex items-center justify-between bg-gradient-to-r from-[#0A2540] to-[#16324f] text-white rounded-2xl p-4 hover:opacity-95">
+        <div>
+          <p className="font-bold text-lg">📊 Lượt truy cập web</p>
+          <p className="text-white/70 text-sm">Chi tiết: đang xem, theo ngày, top trang, nguồn truy cập</p>
+        </div>
+        <span className="text-2xl">→</span>
+      </Link>
       <DemoData />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Stat label="Người dùng" value={s.users.total} sub={`${s.users.gis} biên tập bản đồ · ${s.users.paid} trả phí`} />
@@ -238,9 +260,9 @@ function DemoData() {
           <p className="font-bold">🧪 Dữ liệu mẫu để kiểm thử</p>
           <p className="text-sm text-white/70 mt-0.5">Tạo nhanh 347 tin (179 bán + 168 thuê, giá sát thị trường, đủ loại + VIP, 80% ở xã ven biển/trung tâm) + 168 chat cộng đồng (~10 người) + nhiều luồng hỗ trợ/tư vấn + khách gửi bán + đăng ký đầu tư. Xoá sạch khi test xong.</p>
         </div>
-        <div className="flex gap-2 shrink-0">
-          <button onClick={seed} disabled={!!busy} className="bg-[#C8A14B] hover:bg-[#b8923f] disabled:opacity-60 text-[#0A2540] font-bold px-4 py-2 rounded-xl">{busy === 'seed' ? 'Đang tạo…' : '＋ Tạo 347 tin mẫu'}</button>
-          <button onClick={clearAll} disabled={!!busy} className="bg-white/10 hover:bg-white/20 disabled:opacity-60 border border-white/30 text-white font-bold px-4 py-2 rounded-xl">{busy === 'clear' ? 'Đang xoá…' : 'Xoá dữ liệu mẫu'}</button>
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+          <button onClick={seed} disabled={!!busy} className="flex-1 sm:flex-none whitespace-nowrap bg-[#C8A14B] hover:bg-[#b8923f] disabled:opacity-60 text-[#0A2540] font-bold px-4 py-2 rounded-xl">{busy === 'seed' ? 'Đang tạo…' : '＋ Tạo 347 tin mẫu'}</button>
+          <button onClick={clearAll} disabled={!!busy} className="flex-1 sm:flex-none whitespace-nowrap bg-white/10 hover:bg-white/20 disabled:opacity-60 border border-white/30 text-white font-bold px-4 py-2 rounded-xl">{busy === 'clear' ? 'Đang xoá…' : 'Xoá dữ liệu mẫu'}</button>
         </div>
       </div>
       {msg && <p className="text-sm mt-2 font-semibold text-[#FFD56A]">{msg}</p>}
@@ -250,35 +272,51 @@ function DemoData() {
 
 function Users() {
   const [rows, setRows] = useState<any[]>([]);
-  const load = useCallback(() => { api<{ users: any[] }>('/admin/users').then((d) => setRows(d.users)).catch(() => {}); }, []);
+  const [loading, setLoading] = useState(true);
+  const [q, setQ] = useState(''); const [dq, setDq] = useState(''); const [page, setPage] = useState(1); const [total, setTotal] = useState(0); const per = 30;
+  useEffect(() => { const t = setTimeout(() => { setDq(q.trim()); setPage(1); }, 300); return () => clearTimeout(t); }, [q]);
+  const load = useCallback(() => { setLoading(true); api<{ users: any[]; total: number }>(`/admin/users?q=${encodeURIComponent(dq)}&page=${page}&per=${per}`).then((d) => { setRows(d.users); setTotal(d.total || 0); }).catch(() => {}).finally(() => setLoading(false)); }, [dq, page]);
   useEffect(() => { load(); }, [load]);
   async function upd(id: number, patch: any) { try { await api(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }); load(); } catch (e: any) { alert(e.message); } }
   const sel = 'border border-slate-300 rounded px-1.5 py-1 text-xs';
+  const pages = Math.max(1, Math.ceil(total / per));
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 overflow-x-auto">
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm theo tên / email / số điện thoại…" className="min-w-[220px] flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        <span className="shrink-0 text-sm text-slate-500">{total.toLocaleString('vi')} người dùng</span>
+      </div>
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-x-auto">
       <table className="w-full text-sm min-w-[660px]">
         <thead className="bg-slate-50 text-left text-slate-500"><tr><th className="p-2">Tài khoản</th><th className="p-2">Vai trò</th><th className="p-2">Gói</th><th className="p-2">Trạng thái</th><th className="p-2">Gói đẩy/th</th><th className="p-2">Tư vấn ĐT</th></tr></thead>
         <tbody>
           {rows.map((u) => (
             <tr key={u.id} className="border-t">
               <td className="p-2"><div className="font-semibold text-[#0A2540]">{u.fullName || u.email}</div><div className="text-xs text-slate-400">{u.email} · {u.phone || '—'}</div></td>
-              <td className="p-2"><select value={u.role} onChange={(e) => upd(u.id, { role: e.target.value })} className={sel}><option value="user">Khách</option><option value="gis">Biên tập GIS</option><option value="admin">Admin</option></select></td>
+              <td className="p-2"><select value={u.role} onChange={(e) => { const role = e.target.value; if (role === 'admin' && !confirm(`Cấp quyền ADMIN cho ${u.email}? Tài khoản này sẽ có toàn quyền quản trị.`)) return; upd(u.id, { role }); }} className={sel}><option value="user">Khách</option><option value="gis">Biên tập GIS</option><option value="vanban">Quản lý văn bản</option><option value="hotlist">🔥 Tra cứu danh sách nóng</option><option value="admin">Admin</option></select></td>
               <td className="p-2"><select value={u.tier} onChange={(e) => upd(u.id, { tier: e.target.value })} className={sel}><option value="free">Free</option><option value="paid">Trả phí</option></select></td>
-              <td className="p-2"><select value={u.status} onChange={(e) => upd(u.id, { status: e.target.value })} className={sel}><option value="active">Hoạt động</option><option value="suspended">Khoá</option></select></td>
+              <td className="p-2"><select value={u.status} onChange={(e) => { const status = e.target.value; if (status === 'suspended' && !confirm(`Khoá tài khoản ${u.email}? Người dùng sẽ không đăng nhập được.`)) return; upd(u.id, { status }); }} className={sel}><option value="active">Hoạt động</option><option value="suspended">Khoá</option></select></td>
               <td className="p-2"><input type="number" min="0" defaultValue={u.boostQuota ?? 0} onBlur={(e) => upd(u.id, { boostQuota: Math.max(0, Number(e.target.value) || 0) })} title="Số lượt đẩy tin/tháng" className="w-16 border border-slate-300 rounded px-1.5 py-1 text-xs" /></td>
-              <td className="p-2"><button onClick={() => upd(u.id, { isAdvisor: !u.isAdvisor })} className={`px-2.5 py-1 rounded-full text-xs font-bold ${u.isAdvisor ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'}`} title="Cho phép tài khoản này trả lời kênh Tư vấn đầu tư">{u.isAdvisor ? '✓ Tư vấn' : 'Tắt'}</button></td>
+              <td className="p-2"><button onClick={() => upd(u.id, { isAdvisor: !u.isAdvisor })} className={`px-2.5 py-1 rounded-full text-xs font-bold ${u.isAdvisor ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'}`} title="Cho phép tài khoản này trả lời kênh Tư vấn đầu tư">{u.isAdvisor ? '✓ Tư vấn' : 'Tắt'}</button> <select value={String(u.rating ?? 0)} onChange={(e) => upd(u.id, { rating: Number(e.target.value) })} title="Chấm sao môi giới (Cam Lâm Land)" className={sel}><option value="0">☆ chưa</option><option value="3">★★★</option><option value="3.5">★★★½</option><option value="4">★★★★</option><option value="4.5">★★★★½</option><option value="5">★★★★★</option></select></td>
             </tr>
           ))}
-          {rows.length === 0 && <tr><td colSpan={6} className="p-4 text-slate-500">Chưa có người dùng.</td></tr>}
+          {loading ? <tr><td colSpan={6} className="p-6 text-center text-slate-400"><span className="inline-block w-5 h-5 border-2 border-slate-200 border-t-[#0A2540] rounded-full animate-spin align-[-3px]" /> Đang tải…</td></tr> : rows.length === 0 ? <tr><td colSpan={6} className="p-4 text-slate-500">Không tìm thấy người dùng.</td></tr> : null}
         </tbody>
       </table>
+      </div>
+      {pages > 1 && <div className="flex items-center justify-center gap-2 text-sm">
+        <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="rounded-lg border px-3 py-1.5 disabled:opacity-40">‹ Trước</button>
+        <span className="text-slate-500">Trang {page} / {pages}</span>
+        <button onClick={() => setPage((p) => Math.min(pages, p + 1))} disabled={page >= pages} className="rounded-lg border px-3 py-1.5 disabled:opacity-40">Sau ›</button>
+      </div>}
     </div>
   );
 }
 
 function ListingsAdmin() {
   const [rows, setRows] = useState<any[]>([]);
-  const load = useCallback(() => { api<{ listings: any[] }>('/admin/listings').then((d) => setRows(d.listings)).catch(() => {}); }, []);
+  const [loading, setLoading] = useState(true);
+  const load = useCallback(() => { setLoading(true); api<{ listings: any[] }>('/admin/listings').then((d) => setRows(d.listings)).catch(() => {}).finally(() => setLoading(false)); }, []);
   useEffect(() => { load(); }, [load]);
   async function patch(id: number, p: any) { try { await api(`/admin/listings/${id}`, { method: 'PATCH', body: JSON.stringify(p) }); load(); } catch (e: any) { alert(e.message); } }
   async function del(id: number) { if (!window.confirm('Xoá tin này?')) return; try { await api(`/listings/${id}`, { method: 'DELETE' }); load(); } catch (e: any) { alert(e.message); } }
@@ -292,10 +330,10 @@ function ListingsAdmin() {
               <td className="p-2"><div className="font-semibold text-[#0A2540] truncate max-w-[280px]">{l.title}</div><div className="text-xs text-slate-400">{formatVnd(l.price)} · {l.ward || 'Cam Lâm'}</div></td>
               <td className="p-2"><select value={l.status} onChange={(e) => patch(l.id, { status: e.target.value })} className="border border-slate-300 rounded px-1.5 py-1 text-xs"><option value="active">Hiển thị</option><option value="pending">Chờ duyệt</option><option value="hidden">Ẩn</option><option value="sold">Đã bán</option></select></td>
               <td className="p-2 whitespace-nowrap"><select value={l.tier || 'normal'} onChange={(e) => patch(l.id, { tier: e.target.value })} className="border border-slate-300 rounded px-1.5 py-1 text-xs"><option value="normal">Thường</option><option value="silver">VIP Bạc</option><option value="gold">VIP Vàng</option><option value="diamond">VIP Kim cương</option></select><button onClick={() => patch(l.id, { bump: true })} title="Đẩy lên đầu" className="ml-1.5 text-xs font-bold px-2 py-1 rounded bg-[#0A2540] text-white hover:bg-[#0d2f54]">↑ Đẩy</button></td>
-              <td className="p-2 text-right whitespace-nowrap"><Link href={`/listings/${l.id}`} className="text-xs text-[#0A2540] font-semibold mr-3">Xem</Link><button onClick={() => del(l.id)} className="text-xs text-red-600 font-semibold">Xoá</button></td>
+              <td className="p-2 text-right whitespace-nowrap"><button onClick={() => patch(l.id, { verified: !l.verified })} title="Xác thực bởi Cam Lâm Land" className={`text-xs font-bold px-2 py-1 rounded mr-2 ${l.verified ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}>{l.verified ? '✔ Đã XT' : 'Xác thực'}</button><Link href={`/listings/${l.id}`} className="text-xs text-[#0A2540] font-semibold mr-3">Xem</Link><button onClick={() => del(l.id)} className="text-xs text-red-600 font-semibold">Xoá</button></td>
             </tr>
           ))}
-          {rows.length === 0 && <tr><td colSpan={4} className="p-4 text-slate-500">Chưa có tin nào.</td></tr>}
+          {loading ? <tr><td colSpan={4} className="p-6 text-center text-slate-400"><span className="inline-block w-5 h-5 border-2 border-slate-200 border-t-[#0A2540] rounded-full animate-spin align-[-3px]" /> Đang tải…</td></tr> : rows.length === 0 ? <tr><td colSpan={4} className="p-4 text-slate-500">Chưa có tin nào.</td></tr> : null}
         </tbody>
       </table>
     </div>
@@ -314,7 +352,7 @@ function UploadGis() {
   return (
     <div className="max-w-lg bg-white border border-slate-200 rounded-xl p-5">
       <h2 className="font-bold text-[#0A2540] mb-3">Tải lên dữ liệu bản đồ</h2>
-      <p className="text-sm text-slate-500 mb-3">Nạp trực tiếp <b>.geojson</b> hoặc <b>Shapefile nén .zip</b> — toạ độ <b>VN-2000/WGS84</b> đều được (tự quy đổi). DGN: xuất sang SHP/GeoJSON trước.</p>
+      <p className="text-sm text-slate-500 mb-3">Nạp trực tiếp <b>.geojson</b>, <b>Shapefile nén .zip</b> hoặc <b>DGN</b> — toạ độ <b>VN-2000/WGS84</b> đều được (tự quy đổi). DGN <b>V8 tự đổi qua mạng</b>; file DGN được xử lý nền, xem tiến độ ở danh sách import.</p>
       <input type="file" accept=".dgn,.shp,.zip,.geojson,.json" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="mb-3 block w-full text-sm" />
       <input className="border border-slate-300 rounded-md px-3 py-2 w-full mb-2 text-sm" placeholder="Tên lớp (vd: Quy hoạch 2030)" value={name} onChange={(e) => setName(e.target.value)} />
       <select className="border border-slate-300 rounded-md px-3 py-2 w-full mb-3 text-sm" value={layerType} onChange={(e) => setLayerType(e.target.value)}>
@@ -329,7 +367,7 @@ function UploadGis() {
 function Logs() {
   const [jobs, setJobs] = useState<ImportJob[]>([]);
   const load = () => api<{ jobs: ImportJob[] }>('/imports').then((d) => setJobs(d.jobs)).catch(() => {});
-  useEffect(() => { load(); const i = setInterval(load, 4000); return () => clearInterval(i); }, []);
+  useEffect(() => { load(); const i = setInterval(() => { if (document.visibilityState === 'visible') load(); }, 4000); return () => clearInterval(i); }, []); // tạm dừng khi tab ẩn
   const color: Record<string, string> = { done: 'text-emerald-700', error: 'text-red-600', processing: 'text-amber-600', pending: 'text-slate-500' };
   async function del(j: ImportJob) {
     if (!window.confirm(`Xoá "${j.layerName || j.originalFilename}" và lớp dữ liệu của nó?`)) return;
@@ -360,7 +398,7 @@ function Logs() {
 function Payments() {
   const [rows, setRows] = useState<any[]>([]);
   const load = useCallback(() => { api<{ payments: any[] }>('/payments').then((d) => setRows(d.payments || [])).catch(() => {}); }, []);
-  useEffect(() => { load(); const i = setInterval(load, 8000); return () => clearInterval(i); }, [load]);
+  useEffect(() => { load(); const i = setInterval(() => { if (document.visibilityState === 'visible') load(); }, 8000); return () => clearInterval(i); }, [load]); // tạm dừng khi tab ẩn
   async function confirm(id: number) { if (!window.confirm('Xác nhận đã nhận tiền & kích hoạt gói cho khách?')) return; try { await api(`/payments/${id}/confirm`, { method: 'POST' }); load(); } catch (e: any) { alert(e.message); } }
   const fmt = (n: number) => Number(n).toLocaleString('vi-VN') + 'đ';
   return (

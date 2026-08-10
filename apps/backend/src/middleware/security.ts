@@ -3,7 +3,9 @@ import type { Request, Response, NextFunction } from 'express';
 /** Security headers — tự đặt, không cần thư viện ngoài (helmet). */
 export function securityHeaders(req: Request, res: Response, next: NextFunction) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
+  // /api/images phục vụ ảnh + PDF công văn cần NHÚNG xem ngay trong web → KHÔNG đặt DENY cho nhánh này
+  // (tệp public, không có gì để clickjack). Các nhánh còn lại vẫn chặn frame chống clickjacking.
+  if (!req.path.startsWith('/api/images')) res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'geolocation=(self), camera=(self), microphone=(), payment=()');
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
@@ -18,7 +20,7 @@ export function securityHeaders(req: Request, res: Response, next: NextFunction)
  * Rate limiter in-memory (sliding window) theo IP — chống brute-force & lạm dụng.
  * Đủ dùng cho 1 tiến trình (backend Render chạy 1 instance). Không cần Redis.
  */
-export function rateLimit(opts: { windowMs: number; max: number; key?: string; message?: string }) {
+export function rateLimit(opts: { windowMs: number; max: number; key?: string; message?: string; skip?: (req: Request) => boolean }) {
   const hits = new Map<string, number[]>();
   const { windowMs, max } = opts;
   const timer = setInterval(() => {
@@ -30,6 +32,7 @@ export function rateLimit(opts: { windowMs: number; max: number; key?: string; m
   }, windowMs);
   timer.unref?.(); // không giữ tiến trình sống chỉ vì timer này
   return (req: Request, res: Response, next: NextFunction) => {
+    if (opts.skip?.(req)) return next(); // bỏ qua giới hạn (vd: GET /auth/me, tài khoản admin)
     const ip = req.ip || req.socket.remoteAddress || 'unknown';
     const k = (opts.key || 'rl') + ':' + ip;
     const now = Date.now();

@@ -24,14 +24,14 @@ export default function DauTuPage() {
     <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
       {/* Hero */}
       <div className="bg-gradient-to-br from-[#0A2540] to-[#0d3a6b] text-white">
-        <div className="mx-auto max-w-5xl px-4 py-12">
+        <div className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-12">
           <span className="inline-block bg-[#C8A14B] text-[#0A2540] font-extrabold text-xs px-3 py-1 rounded-full mb-3">CamInvest</span>
-          <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight">Góp vốn đầu tư bất động sản cùng Cam Lâm Land</h1>
-          <p className="text-white/85 mt-3 max-w-2xl">Hình thức uỷ thác đầu tư: nhà đầu tư góp vốn cùng Cam Lâm Land mua những bất động sản tiềm năng tại Cam Lâm – Khánh Hòa, được cam kết lợi nhuận theo thời gian góp vốn.</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight">Góp vốn đầu tư bất động sản cùng Cam Lâm Land</h1>
+          <p className="text-sm sm:text-base text-white/85 mt-3 max-w-2xl">Hình thức uỷ thác đầu tư: nhà đầu tư góp vốn cùng Cam Lâm Land mua những bất động sản tiềm năng tại Cam Lâm – Khánh Hòa, được cam kết lợi nhuận theo thời gian góp vốn.</p>
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 py-8 grid lg:grid-cols-5 gap-6">
+      <div className="mx-auto max-w-5xl px-3 py-5 sm:px-4 sm:py-8 grid lg:grid-cols-5 gap-4 sm:gap-6">
         {/* Nội dung */}
         <div className="lg:col-span-3 space-y-5">
           <div className="bg-white rounded-2xl border border-slate-200 p-5">
@@ -87,8 +87,8 @@ export default function DauTuPage() {
               </div>
             ) : (
               <form onSubmit={submit} className="space-y-3">
-                <input value={f.name} onChange={(e) => set('name', e.target.value)} placeholder="Họ và tên *" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]" />
-                <input value={f.phone} onChange={(e) => set('phone', e.target.value)} inputMode="tel" placeholder="Số điện thoại *" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]" />
+                <input value={f.name} onChange={(e) => set('name', e.target.value)} required maxLength={80} placeholder="Họ và tên *" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]" />
+                <input value={f.phone} onChange={(e) => set('phone', e.target.value)} required type="tel" inputMode="tel" pattern="[0-9+ .()-]{8,15}" maxLength={20} placeholder="Số điện thoại *" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]" />
                 <input value={f.amount} onChange={(e) => set('amount', e.target.value)} placeholder="Số tiền dự kiến góp (tuỳ chọn)" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]" />
                 <select value={f.tenure} onChange={(e) => set('tenure', e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0A2540] text-slate-600">
                   <option value="">Kỳ hạn quan tâm (tuỳ chọn)</option>

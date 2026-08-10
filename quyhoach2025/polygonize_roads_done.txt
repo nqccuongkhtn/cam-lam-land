@@ -1,0 +1,7 @@
+BAT DAU
+1) mep duong: 407 duong
+1b) snap khep khe: 407 duong
+2) polygonize: 129 manh kin
+3) XUAT faces -> D:\Cam Lam gis\apps\backend\data\road_faces.geojson
+4) XUAT tim duong -> D:\Cam Lam gis\apps\backend\data\road_centerlines.geojson
+DONE_OK

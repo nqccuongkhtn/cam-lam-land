@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import GiaDatClient from './GiaDatClient';
+import ServicesSection from '@/components/ServicesSection';
+import LegalConsultCTA from '@/components/LegalConsultCTA';
 
 export const metadata: Metadata = {
   title: 'Giá đất Cam Lâm, Khánh Hòa — Tham khảo & định giá nhanh',
@@ -9,5 +11,13 @@ export const metadata: Metadata = {
 };
 
 export default function GiaDatPage() {
-  return <GiaDatClient />;
+  return (
+    <>
+      <GiaDatClient />
+      <div className="mx-auto max-w-7xl px-3 sm:px-4 pb-6 sm:pb-8">
+        <ServicesSection className="mt-6 sm:mt-8" />
+        <LegalConsultCTA topic="Dịch vụ pháp lý (từ Giá đất)" className="mt-4" />
+      </div>
+    </>
+  );
 }

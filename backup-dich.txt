@@ -1,0 +1,8 @@
+#E:\CamLamBackup
+# ^^^ XOA dau # o dau DONG 1 phia tren, roi sua thanh noi ban muon backup ra:
+#   - O dia ngoai (USB/HDD):  E:\CamLamBackup        (E = chu o dia ngoai cua ban)
+#   - May phu trong mang LAN: \\TEN-MAY-PHU\CamLamBackup
+#   - Thu muc cloud:          C:\Users\ADMIN\Proton Drive
+#
+# Quy tac: DONG DAU TIEN cua file nay = noi backup. Khong viet gi khac tren dong 1.
+# De nguyen (con dau #) = chua dat -> he thong se tu tim cloud (OneDrive/Proton/Google) neu co.

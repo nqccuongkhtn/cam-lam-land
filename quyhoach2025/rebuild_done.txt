@@ -1,0 +1,7 @@
+BAT DAU
+1) ranh QH+duong (bo HT): 919 duong
+1b) fixgeometries: 919 duong sach
+1c) snap khep khe: 919 duong
+2) polygonize: 597 vung
+4) XONG (mang tho) -> D:\Cam Lam gis\apps\frontend\public\qh_vector_v5.geojson
+DONE_OK

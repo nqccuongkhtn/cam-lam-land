@@ -39,5 +39,13 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    { "name": "Nhà đất bán", "short_name": "Nhà đất", "url": "/listings", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Bản đồ quy hoạch", "short_name": "Bản đồ", "url": "/map", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Bảng giá đất", "short_name": "Bảng giá", "url": "/bang-gia-dat", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Đăng tin", "short_name": "Đăng tin", "url": "/sales/post", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ],
+  "launch_handler": { "client_mode": "navigate-existing" },
+  "prefer_related_applications": false
 }

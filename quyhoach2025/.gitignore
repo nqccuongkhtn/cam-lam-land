@@ -1,0 +1,28 @@
+# ===== Dữ liệu LỚN / dẫn xuất (không đưa vào git, chống phình + chống sập) =====
+*.geojson
+*.mbtiles
+*.pmtiles
+*.gpkg
+*.npy
+# (Giữ LẠI trong git: *.dgn nguồn, code, .md — vì dgn là dữ liệu gốc khó thay thế)
+
+# ===== Build / phụ thuộc =====
+node_modules/
+**/node_modules/
+dist/
+build/
+.vite/
+.next/
+__pycache__/
+*.pyc
+
+# ===== Bí mật / môi trường =====
+.env
+.env.*
+!.env.example
+
+# ===== Linh tinh =====
+*.log
+*.tmp
+.DS_Store
+Thumbs.db

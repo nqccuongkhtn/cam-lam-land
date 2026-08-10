@@ -30,7 +30,7 @@ function Tile({ p, isAdmin, onDelete }: { p: Partner; isAdmin: boolean; onDelete
         </span>
       )}
       {isAdmin && p.id > 0 ? (
-        <button onClick={onDelete} aria-label="Xoa doanh nghiep" className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 text-white text-sm grid place-items-center opacity-0 group-hover:opacity-100 shadow transition">×</button>
+        <button onClick={onDelete} aria-label="Xoa doanh nghiep" className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 text-white text-sm grid place-items-center opacity-100 lg:opacity-0 lg:group-hover:opacity-100 shadow transition">×</button>
       ) : null}
     </div>
   );
@@ -55,29 +55,28 @@ export default function FeaturedPartners() {
   while (half.length < Math.max(8, base.length * 2)) half.push(...base);
   const track = [...half, ...half];
 
-  // Đứng 3 giây → lướt nhanh 1 ô (cuộn mượt) → đứng 3 giây... Dừng khi rê chuột. Vòng lặp liền mạch nhờ track nhân đôi.
+  // Đứng 3 giây → lướt nhanh 1 ô (cuộn mượt) → đứng 3 giây... Dừng khi rê chuột.
+  // Vòng lặp LIỀN MẠCH & CHỐNG TRỐNG: mỗi lần cuộn (auto/vuốt/momentum) vượt NỬA track → nhảy lùi đúng nửa track
+  // (nửa sau giống hệt nửa đầu nên không thấy). Nhờ vậy scrollLeft luôn nằm trong [0, halfW), không bao giờ ra vùng trống.
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
+    const wrap = () => { const halfW = el.scrollWidth / 2; if (halfW > 0) { if (el.scrollLeft >= halfW) el.scrollLeft -= halfW; else if (el.scrollLeft < 0) el.scrollLeft += halfW; } };
+    el.addEventListener('scroll', wrap, { passive: true });
     const advance = () => {
       if (hoverRef.current) return;
-      const halfW = el.scrollWidth / 2;
-      if (halfW > 0 && el.scrollLeft >= halfW - 1) el.scrollLeft -= halfW; // reset liền mạch (nửa sau giống hệt nửa đầu)
-      const row = el.firstElementChild as HTMLElement | null;
-      const kids = row?.children;
+      const row = el.firstElementChild as HTMLElement | null; const kids = row?.children;
       let stepPx = el.clientWidth * 0.5;
       if (kids && kids.length >= 2) stepPx = (kids[1] as HTMLElement).offsetLeft - (kids[0] as HTMLElement).offsetLeft; // đúng bề rộng 1 ô + khoảng cách
       el.scrollBy({ left: stepPx, behavior: 'smooth' });
     };
     const iv = setInterval(advance, 3000);
-    return () => clearInterval(iv);
+    return () => { clearInterval(iv); el.removeEventListener('scroll', wrap); };
   }, [partners.length]);
 
   const nudge = (dir: number) => {
     const el = scrollerRef.current;
     if (!el) return;
-    const halfW = el.scrollWidth / 2;
-    if (dir > 0 && halfW > 0 && el.scrollLeft >= halfW - 1) el.scrollLeft -= halfW;
     el.scrollBy({ left: dir * Math.max(240, el.clientWidth * 0.7), behavior: 'smooth' });
   };
 
@@ -95,8 +94,8 @@ export default function FeaturedPartners() {
   }
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-10">
-      <div className="flex items-center justify-between mb-6 gap-3">
+    <section className="mx-auto max-w-7xl px-3 sm:px-4 py-7 sm:py-10">
+      <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
         <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">Doanh nghiệp tiêu biểu</h2>
         {isAdmin ? (
           <button onClick={() => setAddOpen(true)} className="shrink-0 inline-flex items-center gap-1.5 bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-semibold px-4 py-2 rounded-xl">＋ Thêm doanh nghiệp</button>

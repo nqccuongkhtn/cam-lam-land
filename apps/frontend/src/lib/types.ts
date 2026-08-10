@@ -25,17 +25,25 @@ export const PROPERTY_LABELS: Record<PropertyType,string> = {
 export const SALE_PROPERTY_TYPES: PropertyType[] = ['land', 'house', 'apartment', 'villa', 'commercial', 'farm'];
 export const RENT_PROPERTY_TYPES: PropertyType[] = ['house', 'apartment', 'room', 'commercial', 'office', 'warehouse'];
 export const DEAL_LABELS: Record<DealType, string> = { sale: 'Bán', rent: 'Cho thuê' };
+// Nhóm hàng nghìn bằng dấu chấm — TẤT ĐỊNH (giống hệt trên server & client), tránh lỗi HYDRATION
+// mà Intl.NumberFormat / toLocaleString('vi-VN') gây ra khi bộ ICU của Node khác trình duyệt.
+export const fmtInt = (n: number): string => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 export function formatVnd(v: number): string {
   if (v >= 1e9) return `${(v/1e9).toFixed(v%1e9===0?0:2)} tỷ`;
   if (v >= 1e6) return `${(v/1e6).toFixed(0)} triệu`;
-  return new Intl.NumberFormat('vi-VN').format(v) + ' đ';
+  return fmtInt(v) + ' đ';
 }
 /** Giá kèm hậu tố /tháng khi là tin cho thuê. */
 export function priceLabel(price: number, deal?: string): string {
   return formatVnd(price) + (deal === 'rent' ? '/tháng' : '');
 }
 
-export const WARDS = ['Cam Đức','Cam Hải Đông','Cam Hải Tây','Cam Thành Bắc','Cam Hòa','Cam Tân','Cam Hiệp Bắc','Cam Hiệp Nam','Cam An Bắc','Cam An Nam','Cam Phước Tây','Sơn Tân','Suối Cát','Suối Tân'];
+// Xã HIỆN NAY của Cam Lâm (từ 01/7/2025 bỏ cấp huyện, còn 4 xã)
+export const WARDS_NEW = ['Cam Lâm', 'Suối Dầu', 'Cam Hiệp', 'Cam An'];
+// Xã/thị trấn CŨ (trước sáp nhập) — GIỮ để tin đăng cũ & tra cứu không mất
+export const WARDS_OLD = ['Cam Đức','Cam Hải Đông','Cam Hải Tây','Cam Thành Bắc','Cam Hòa','Cam Tân','Cam Hiệp Bắc','Cam Hiệp Nam','Cam An Bắc','Cam An Nam','Cam Phước Tây','Sơn Tân','Suối Cát','Suối Tân'];
+// Danh sách chọn khu vực: 4 xã MỚI lên đầu, 14 xã CŨ theo sau
+export const WARDS = [...WARDS_NEW, ...WARDS_OLD];
 export const DIRECTIONS = ['Đông','Tây','Nam','Bắc','Đông Bắc','Đông Nam','Tây Bắc','Tây Nam'];
 export const LEGAL_OPTIONS = ['Sổ đỏ / Sổ hồng','Sổ hồng riêng','Sổ chung','Hợp đồng mua bán','Đang chờ sổ','Khác'];
 

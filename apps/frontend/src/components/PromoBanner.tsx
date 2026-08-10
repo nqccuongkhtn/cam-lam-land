@@ -7,7 +7,7 @@ type Slide = { grad: string; dark?: boolean; badge: string; title: string; sub: 
 
 const SLIDES: Slide[] = [
   { grad: 'from-[#c1121f] via-[#d81f26] to-[#e63946]', badge: 'MIỄN PHÍ ĐĂNG TIN', title: 'Bán nhà đất Cam Lâm nhanh hơn cùng Cam Lâm Land', sub: 'Hiển thị trên bản đồ quy hoạch · Tiếp cận đúng khách · Hỗ trợ pháp lý', cta: 'Đăng tin ngay', href: '/sales/post', emoji: '🚀' },
-  { grad: 'from-[#e8c36b] via-[#d9a94e] to-[#c8912f]', dark: true, badge: 'DÀNH CHO DOANH NGHIỆP', title: 'Quảng bá thương hiệu & dự án của bạn tại Cam Lâm', sub: 'Banner trang chủ · Logo trên bản đồ · Đẩy tin nổi bật', cta: 'Xem dịch vụ', href: '/dichvu', emoji: '🏆' },
+  { grad: 'from-[#d6a445] via-[#c8912f] to-[#b07d22]', dark: true, badge: 'DÀNH CHO DOANH NGHIỆP', title: 'Quảng bá thương hiệu & dự án của bạn tại Cam Lâm', sub: 'Banner trang chủ · Logo trên bản đồ · Đẩy tin nổi bật', cta: 'Xem dịch vụ', href: '/dichvu', emoji: '🏆' },
   { grad: 'from-[#0A2540] via-[#0d2f54] to-[#123a63]', badge: 'BẢN ĐỒ QUY HOẠCH', title: 'Tra cứu quy hoạch & thửa đất Cam Lâm chính xác', sub: 'Nền vệ tinh nét cao · Toạ độ VN-2000 · Đo đạc trực tiếp', cta: 'Mở bản đồ', href: '/map', emoji: '🗺️' },
 ];
 
@@ -32,7 +32,7 @@ export default function PromoBanner() {
           <div className="flex-1 text-center sm:text-left">
             <span className={`inline-block text-[11px] font-bold px-2.5 py-1 rounded-full tracking-wide ${s.dark ? 'bg-[#0A2540]/15' : 'bg-white/20'}`}>{s.badge}</span>
             <h3 className="mt-2 text-xl md:text-3xl font-extrabold leading-tight">{s.title}</h3>
-            <p className={`mt-2 text-sm ${s.dark ? 'text-[#0A2540]/80' : 'text-white/90'}`}>{s.sub}</p>
+            <p className={`mt-2 text-sm ${s.dark ? 'text-[#0A2540] font-medium' : 'text-white/90'}`}>{s.sub}</p>
           </div>
           <div className="shrink-0 flex items-center gap-3">
             <div className="hidden md:block text-6xl select-none">{s.emoji}</div>

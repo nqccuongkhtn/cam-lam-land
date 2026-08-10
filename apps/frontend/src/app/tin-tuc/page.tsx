@@ -1,19 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSlides, imgsOf, useNewsAd, type Ad } from '@/components/newsAds'; // dùng chung, tránh lặp
+import { decodeEntities } from '@/lib/htmlEntities';
 
 interface N { title: string; url: string; source?: string; image?: string; summary?: string; publishedAt?: string; slug: string }
-interface Ad { enabled?: boolean; image?: string; images?: string[]; link?: string; title?: string; sub?: string; cta?: string }
 
-const SAMPLE_AD: Ad = { enabled: true, images: ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1280&h=800&q=72', 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1280&h=800&q=72', 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1280&h=800&q=72'], link: '/sales/post', title: 'Đăng tin nhà đất miễn phí', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' };
-
-const imgsOf = (ad: Ad) => ((ad.images && ad.images.length ? ad.images : ad.image ? [ad.image] : []) as string[]).filter(Boolean);
 const isExt = (l?: string) => (l || '').startsWith('http');
-function useSlides(n: number) {
-  const [idx, setIdx] = useState(0);
-  useEffect(() => { if (n < 2) return; const t = setInterval(() => setIdx((i) => (i + 1) % n), 5000); return () => clearInterval(t); }, [n]);
-  return idx;
-}
 function Cta({ text, className = '' }: { text: string; className?: string }) {
   return (
     <span className={`relative overflow-hidden bg-[#C8A14B] text-[#0A2540] font-bold rounded-md ${className}`}>
@@ -126,13 +119,13 @@ function Thumb({ src, alt }: { src?: string; alt: string }) {
 }
 function Lead({ n }: { n: N }) {
   return (
-    <Link href={`/tin-tuc/${n.slug}`} className="group block">
+    <Link href={`/tin-tuc/${n.slug}`} className="cl-tap group block">
       <div className="relative aspect-[16/9] rounded-lg overflow-hidden bg-slate-100">
         <Thumb src={n.image} alt={n.title} />
         {isNew(n.publishedAt) && <span className="absolute top-2 left-2 bg-red-600 text-white text-[11px] font-bold px-2 py-0.5 rounded shadow">MỚI</span>}
         {n.source && <span className="absolute bottom-2 left-2 bg-black/60 backdrop-blur text-white text-[11px] font-medium px-2 py-0.5 rounded">{n.source}</span>}
       </div>
-      <h2 className="text-2xl md:text-[28px] font-bold text-[#0A2540] mt-3 leading-snug group-hover:text-red-600">{n.title}</h2>
+      <h2 className="text-xl sm:text-2xl md:text-[28px] font-bold text-[#0A2540] mt-3 leading-snug group-hover:text-red-600">{n.title}</h2>
       {n.summary && <p className="text-slate-500 text-[15px] mt-2 line-clamp-3">{n.summary}</p>}
       <p className="text-xs text-slate-400 mt-2">{meta(n)}</p>
     </Link>
@@ -140,7 +133,7 @@ function Lead({ n }: { n: N }) {
 }
 function SideItem({ n, rank }: { n: N; rank: number }) {
   return (
-    <Link href={`/tin-tuc/${n.slug}`} className="group flex gap-3 items-center py-3">
+    <Link href={`/tin-tuc/${n.slug}`} className="cl-tap group flex gap-3 items-center py-3">
       <span className={`shrink-0 w-6 text-center text-xl font-black leading-none ${rank <= 3 ? 'text-red-600' : 'text-slate-300'}`}>{rank}</span>
       <div className="w-20 h-14 rounded overflow-hidden bg-slate-100 shrink-0"><Thumb src={n.image} alt={n.title} /></div>
       <h3 className="text-[13px] font-semibold text-[#0A2540] leading-snug line-clamp-2 group-hover:text-red-600">{n.title}</h3>
@@ -149,8 +142,8 @@ function SideItem({ n, rank }: { n: N; rank: number }) {
 }
 function Row({ n }: { n: N }) {
   return (
-    <Link href={`/tin-tuc/${n.slug}`} className="group flex gap-5 items-start py-5">
-      <div className="w-36 sm:w-56 aspect-[16/10] rounded-lg overflow-hidden bg-slate-100 shrink-0"><Thumb src={n.image} alt={n.title} /></div>
+    <Link href={`/tin-tuc/${n.slug}`} className="cl-tap group flex gap-3 sm:gap-5 items-start py-4 sm:py-5">
+      <div className="w-28 sm:w-36 md:w-56 aspect-[16/10] rounded-lg overflow-hidden bg-slate-100 shrink-0"><Thumb src={n.image} alt={n.title} /></div>
       <div className="min-w-0">
         <h3 className="font-bold text-[#0A2540] leading-snug line-clamp-2 group-hover:text-red-600 text-base md:text-lg">{n.title}</h3>
         {n.summary && <p className="text-[15px] text-slate-500 mt-2 line-clamp-2 hidden sm:block">{n.summary}</p>}
@@ -170,7 +163,7 @@ function SectionHead({ title }: { title: string }) {
 }
 function NewsCard({ n }: { n: N }) {
   return (
-    <Link href={`/tin-tuc/${n.slug}`} className="group block">
+    <Link href={`/tin-tuc/${n.slug}`} className="cl-tap group block">
       <div className="relative aspect-[16/10] rounded-lg overflow-hidden bg-slate-100">
         <Thumb src={n.image} alt={n.title} />
         {isNew(n.publishedAt) && <span className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">MỚI</span>}
@@ -182,7 +175,7 @@ function NewsCard({ n }: { n: N }) {
 }
 function RankRow({ n, rank }: { n: N; rank: number }) {
   return (
-    <Link href={`/tin-tuc/${n.slug}`} className="group flex gap-3 items-start py-2.5">
+    <Link href={`/tin-tuc/${n.slug}`} className="cl-tap group flex gap-3 items-start py-2.5">
       <span className={`shrink-0 w-5 text-center text-lg font-black leading-none ${rank <= 3 ? 'text-red-600' : 'text-slate-300'}`}>{rank}</span>
       <h4 className="text-[13px] font-semibold text-[#0A2540] leading-snug line-clamp-3 group-hover:text-red-600">{n.title}</h4>
     </Link>
@@ -192,12 +185,11 @@ function RankRow({ n, rank }: { n: N; rank: number }) {
 export default function NewsIndex() {
   const [news, setNews] = useState<N[]>([]);
   const [loading, setLoading] = useState(true);
-  const [ad, setAd] = useState<Ad>(SAMPLE_AD);
+  const ad = useNewsAd();
   const [limit, setLimit] = useState(12);
   const [q, setQ] = useState('');
 
-  useEffect(() => { fetch('/feed/news').then((r) => r.json()).then((d) => setNews(d.news || [])).catch(() => {}).finally(() => setLoading(false)); }, []);
-  useEffect(() => { fetch('/api/config/tintuc_ad').then((r) => r.json()).then((d) => { if (d && d.value && typeof d.value === 'object') setAd({ ...SAMPLE_AD, ...d.value }); }).catch(() => {}); }, []);
+  useEffect(() => { fetch('/feed/news').then((r) => r.json()).then((d) => setNews((d.news || []).map((n: any) => ({ ...n, title: decodeEntities(n.title), summary: decodeEntities(n.summary) })))).catch(() => {}).finally(() => setLoading(false)); }, []);
 
   const showAd = ad && ad.enabled !== false;
   const na = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
@@ -216,7 +208,7 @@ export default function NewsIndex() {
   return (
     <div className="relative min-h-[calc(100vh-56px)] bg-white">
       {showAd && <WingRails ad={ad} />}
-      <div className="relative z-10 mx-auto max-w-[1120px] px-4 sm:px-6 lg:px-8 py-6">
+      <div className="relative z-10 mx-auto max-w-[1120px] px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
         {showAd && <div className="hidden md:block mb-6"><BillboardAd ad={ad} /></div>}
         <div>
           <div className="pt-0">
@@ -237,7 +229,7 @@ export default function NewsIndex() {
             ) : (
               <>
                 {/* Hero: tin chủ + Nổi bật đánh số */}
-                <div className="grid lg:grid-cols-[1.7fr_1fr] gap-x-7 gap-y-4 pb-7 mb-8 border-b border-slate-200">
+                <div className="grid lg:grid-cols-[1.7fr_1fr] gap-x-5 sm:gap-x-7 gap-y-3 sm:gap-y-4 pb-5 sm:pb-7 mb-6 sm:mb-8 border-b border-slate-200">
                   {lead && <Lead n={lead} />}
                   <div className="lg:border-l lg:border-slate-100 lg:pl-6">
                     <p className="flex items-center gap-1.5 text-red-600 font-bold text-sm mb-1">🔥 Nổi bật</p>
@@ -247,9 +239,9 @@ export default function NewsIndex() {
 
                 {/* Lưới thẻ: Mới cập nhật */}
                 {grid.length > 0 && (
-                  <section className="mb-8">
+                  <section className="mb-6 sm:mb-8">
                     <SectionHead title="Mới cập nhật" />
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-7">{grid.map((n) => <NewsCard key={n.slug} n={n} />)}</div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-3 sm:gap-x-5 gap-y-5 sm:gap-y-7">{grid.map((n) => <NewsCard key={n.slug} n={n} />)}</div>
                   </section>
                 )}
 

@@ -13,3 +13,40 @@ data/uploads/*
 !data/uploads/.gitkeep
 # Máy OCR nội bộ (chạy trên PC, chứa authtoken bí mật + file exe lớn) — KHÔNG đẩy lên GitHub
 ocr-server/
+# Key GroupDocs của phần mềm chuẩn hóa DGN (bí mật) — KHÔNG đẩy lên GitHub
+TOOL-CHUANHOA-DGN/chuanhoa_config.json
+
+# ===== Xưởng xử lý dữ liệu quyhoach2025: loại dữ liệu LỚN khỏi git =====
+# Giữ trong git: *.dgn (nguồn gốc, khó thay thế), rebuild_qh.py, *.user.js, *.md
+# Loại (tái tạo được / rất nặng):
+quyhoach2025/**/*.geojson
+quyhoach2025/**/*.mbtiles
+quyhoach2025/**/*.pmtiles
+quyhoach2025/**/*.gpkg
+quyhoach2025/**/*.npy
+quyhoach2025/**/*.gtp
+quyhoach2025/_qh_tile_cu_*/
+quyhoach2025/**/tiles/
+
+# ===== Chặn dữ liệu lớn NGOÀI quyhoach2025 =====
+# Tile raster (hàng trăm nghìn file nhỏ, tái tạo được từ .dgn/PDF)
+_qh_tile_cu_*/
+apps/frontend/public/tiles/
+
+# GeoJSON vector quy hoạch bản nháp v2..v6 (mỗi file 20-60 MB, tái tạo được)
+# Giữ lại: apps/frontend/public/qh_vector.geojson (bản đang dùng)
+apps/frontend/public/qh_vector_v*.geojson
+apps/frontend/public/qh_smooth.geojson
+apps/frontend/public/qh_fill.geojson
+
+# Ảnh kiểm tra / căn chỉnh + mảng numpy ở thư mục gốc (file tạm khi dò toạ độ)
+/*.png
+/*.npy
+/*.tmp
+!camlam-server.png
+!chu-giai-loai-dat.png
+
+# Cache Python & thư mục sao lưu cục bộ
+__pycache__/
+**/__pycache__/
+backup/

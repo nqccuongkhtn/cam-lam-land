@@ -1,0 +1,6 @@
+BAT DAU
+0) nap mep duong: 300 feature (multiline)
+1) snap khep khe: xong
+2) polygonize: 157 block
+3) XUAT -> D:\Cam Lam gis\apps\backend\data\road_faces.geojson
+DONE_OK

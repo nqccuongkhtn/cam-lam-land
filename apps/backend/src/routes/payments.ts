@@ -7,7 +7,19 @@ export const paymentsRouter = Router();
 
 // Kích hoạt gói cho khách (gọi khi webhook báo đã trả tiền HOẶC admin xác nhận tay)
 async function activate(order: any): Promise<void> {
+  // NẠP VÍ công cụ Lập danh mục: đơn package_id='wallet' → cộng số dư (đồng) thay vì kích hoạt gói.
+  if (order.package_id === 'wallet') {
+    const flipped = await query(`UPDATE payments SET status='paid', paid_at=now() WHERE id=$1 AND status<>'paid' RETURNING id`, [order.id]);
+    if (!flipped.length) return; // idempotent: đã cộng rồi thì thôi
+    await query(`INSERT INTO danhmuc_credits (user_id, balance, updated_at) VALUES ($1,$2,now())
+      ON CONFLICT (user_id) DO UPDATE SET balance = danhmuc_credits.balance + EXCLUDED.balance, updated_at=now()`, [order.user_id, order.amount]);
+    return;
+  }
   const pkg = findPkg(order.package_id); if (!pkg) return;
+  // CHỐT trạng thái đơn TRƯỚC (idempotent): chỉ đi tiếp nếu ĐÚNG lần này chuyển pending→paid.
+  // Nếu webhook gọi lặp / admin bấm xác nhận 2 lần → UPDATE không trả row → KHÔNG cộng gói lần nữa (chống cộng gói 2 lần).
+  const flipped = await query(`UPDATE payments SET status='paid', paid_at=now() WHERE id=$1 AND status<>'paid' RETURNING id`, [order.id]);
+  if (!flipped.length) return;
   if (pkg.kind === 'post') {
     await query(`UPDATE users SET post_quota=$2, post_used=0, post_expires_at = now() + ($3::int) * interval '1 day', tier='paid' WHERE id=$1`,
       [order.user_id, pkg.posts, pkg.days]);
@@ -15,7 +27,6 @@ async function activate(order: any): Promise<void> {
     await query(`UPDATE users SET pkg_id=$2, pkg_tier=$3, boost_quota=$4, boost_used=0, boost_expires_at = now() + ($5::int) * interval '1 day', tier='paid' WHERE id=$1`,
       [order.user_id, pkg.id, pkg.tier, pkg.boosts, pkg.days]);
   }
-  await query(`UPDATE payments SET status='paid', paid_at=now() WHERE id=$1 AND status<>'paid'`, [order.id]);
 }
 
 paymentsRouter.get('/packages', (_req, res) => res.json({ packages: PACKAGES, bank: BANK }));

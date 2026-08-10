@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import NewsReaderClient from './NewsReaderClient';
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://camlamland.onrender.com';
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns.org';
 
 async function getArticle(slug: string): Promise<any | null> {
   try {

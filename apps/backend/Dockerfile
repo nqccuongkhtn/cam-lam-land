@@ -1,8 +1,14 @@
 # Backend API (Express + TypeScript via tsx). Build context = repo root.
 FROM node:20-bookworm-slim
 WORKDIR /app
-# Tesseract OCR (đọc bảng toạ độ từ ảnh, chạy server cho ổn định)
-RUN apt-get update && apt-get install -y --no-install-recommends tesseract-ocr && rm -rf /var/lib/apt/lists/*
+# Công cụ máy chủ: Tesseract OCR (toạ độ + tiếng Việt) · LibreOffice (chuyển Office↔PDF) · ocrmypdf (OCR PDF) · qpdf (đặt/gỡ mật khẩu PDF).
+# Ảnh Docker sẽ nặng hơn (~1.5GB) — đây là chủ đích để có đầy đủ tính năng PDF phía máy chủ.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      tesseract-ocr tesseract-ocr-vie \
+      libreoffice-writer libreoffice-calc libreoffice-impress libreoffice-draw \
+      ocrmypdf ghostscript qpdf poppler-utils \
+      fonts-liberation fonts-dejavu \
+ && rm -rf /var/lib/apt/lists/*
 # shared package is imported via relative path, so copy it alongside the app
 COPY packages/shared ./packages/shared
 COPY apps/backend/package.json ./apps/backend/package.json

@@ -8,14 +8,16 @@ import { vnNoAccent, vnTokens } from '../lib/vn.ts';
 export const listingsRouter = Router();
 
 const FREE_POST_LIMIT = 1; // tài khoản free: 1 tin/tháng
+// Giới hạn độ dài chuỗi trước khi lưu (chống dữ liệu rác/quá khổ làm phình DB). null giữ nguyên null.
+const clip = (v: any, n: number) => (v === undefined || v === null ? null : String(v).slice(0, n));
 const SELECT = `
   SELECT listings.id, listings.title, listings.description, listings.price, listings.area,
          listings.property_type AS "propertyType", listings.address, listings.ward, listings.bedrooms,
          listings.bathrooms, listings.direction, listings.legal, listings.frontage,
          COALESCE(listings.contact_name, u.full_name, 'Cam Lâm Land') AS "contactName",
          COALESCE(listings.contact_phone, u.phone, '0988888888') AS "contactPhone",
-         u.avatar AS "posterAvatar",
-         listings.status, listings.deal, listings.views, listings.boosted, listings.tier, listings.bumped_at AS "bumpedAt", listings.images, listings.created_by AS "createdBy",
+         u.avatar AS "posterAvatar", CASE WHEN COALESCE(u.rating_count,0) > 0 THEN u.rating END AS "posterRating", u.rating_count AS "posterRatingCount",
+         listings.status, listings.deal, listings.views, listings.boosted, listings.tier, listings.verified, listings.bumped_at AS "bumpedAt", listings.images, listings.created_by AS "createdBy",
          ST_X(listings.geom) AS lng, ST_Y(listings.geom) AS lat, listings.created_at AS "createdAt"
   FROM listings LEFT JOIN users u ON u.id = listings.created_by`;
 
@@ -35,6 +37,22 @@ function linkImages(listingId: number, images: any): Promise<any> {
 }
 
 // GET /api/listings — bộ lọc + ưu tiên tin đẩy
+// Nhận CẢ slug (dat-nen, nha-pho…) lẫn giá trị gốc (land, house…) cho propertyType → trang landing /nha-dat/* luôn lọc đúng.
+const TYPE_SLUG: Record<string, string> = {
+  'dat-nen': 'land', 'dat-tho-cu': 'land', 'dat-mat-tien': 'land', 'dat-nen-du-an': 'land', 'dat-ven-bien': 'land',
+  'dat-vuon': 'farm', 'dat-nong-nghiep': 'farm', 'nha-pho': 'house', 'nha-cap-4': 'house', 'nha-mat-tien': 'house',
+  'biet-thu': 'villa', 'can-ho': 'apartment', 'mat-bang-kinh-doanh': 'commercial', 'kho-xuong': 'warehouse',
+  'cho-thue-nha': 'house', 'cho-thue-can-ho': 'apartment', 'cho-thue-phong-tro': 'room', 'cho-thue-mat-bang': 'commercial', 'cho-thue-van-phong': 'office', 'cho-thue-kho-xuong': 'warehouse',
+};
+// Sáp nhập 01/7/2025: xã MỚI (2 cấp) ⊇ các xã CŨ (3 cấp). Lọc bằng tên MỚI → khớp mọi xã cũ thành phần
+// (xã cũ bị tách sang nhiều xã mới nên đây là khớp GẦN ĐÚNG, chấp nhận được cho bộ lọc). Key = tên mới đã bỏ dấu.
+const WARD_EXPAND: Record<string, string[]> = {
+  'cam lam': ['Cam Lâm', 'Cam Đức', 'Cam Hải Đông', 'Cam Hải Tây', 'Cam Thành Bắc', 'Cam Hiệp Bắc', 'Cam Hiệp Nam', 'Cam Hòa', 'Cam Tân', 'Sơn Tân', 'Cam An Nam', 'Cam An Bắc'],
+  'suoi dau': ['Suối Dầu', 'Suối Cát', 'Cam Hòa', 'Cam Tân', 'Sơn Tân', 'Suối Tân'],
+  'cam hiep': ['Cam Hiệp', 'Cam Tân', 'Cam Hòa', 'Cam Hiệp Bắc', 'Cam Hiệp Nam', 'Sơn Tân'],
+  'cam an': ['Cam An', 'Cam An Bắc', 'Cam Phước Tây', 'Cam An Nam'],
+};
+
 listingsRouter.get('/', async (req, res, next) => {
   try {
     const ckey = 'listings:list:' + JSON.stringify(req.query);
@@ -48,8 +66,14 @@ listingsRouter.get('/', async (req, res, next) => {
     if (deal !== 'all') where.push(`listings.deal = ${p(deal === 'rent' ? 'rent' : 'sale')}`);
     if (minPrice)     where.push(`price >= ${p(Number(minPrice))}`);
     if (maxPrice)     where.push(`price <= ${p(Number(maxPrice))}`);
-    if (propertyType) where.push(`property_type = ${p(propertyType)}`);
-    if (ward)         where.push(`vn_unaccent(COALESCE(listings.ward,'')) = ${p(vnNoAccent(String(ward).trim()))}`);
+    if (propertyType) where.push(`property_type = ${p(TYPE_SLUG[propertyType] || propertyType)}`);
+    // Ward khớp KHÔNG DẤU; chuẩn hoá '-' của slug thành ' ' ("cam-duc"→"Cam Đức"). Nếu là XÃ MỚI → mở rộng ra các xã cũ.
+    if (ward) {
+      const key = vnNoAccent(String(ward).trim().replace(/[-_]+/g, ' '));
+      const names = WARD_EXPAND[key];
+      if (names) where.push(`vn_unaccent(COALESCE(listings.ward,'')) IN (${names.map((n) => p(vnNoAccent(n))).join(',')})`);
+      else where.push(`vn_unaccent(COALESCE(listings.ward,'')) = ${p(key)}`);
+    }
     // Tìm KHÔNG DẤU, không phân biệt hoa/thường, khớp MỌI token (AND) trên: tiêu đề + mô tả + địa chỉ + xã.
     if (q) {
       const doc = `vn_unaccent(COALESCE(listings.title,'')||' '||COALESCE(listings.description,'')||' '||COALESCE(listings.address,'')||' '||COALESCE(listings.ward,''))`;
@@ -59,8 +83,10 @@ listingsRouter.get('/', async (req, res, next) => {
     const limit = Math.min(Number(req.query.limit ?? 100) || 100, 500);
     const offset = Math.max(0, Number(req.query.offset ?? 0) || 0);
     const rows = await query(
-      `${SELECT} WHERE ${where.join(' AND ')} ORDER BY CASE listings.tier WHEN 'diamond' THEN 3 WHEN 'gold' THEN 2 WHEN 'silver' THEN 1 ELSE 0 END DESC, COALESCE(listings.bumped_at, listings.created_at) DESC LIMIT ${p(limit)} OFFSET ${p(offset)}`, params);
-    rows.forEach((r: any) => { r.contactPhone = maskPhone(r.contactPhone); });
+      // Thứ tự: VIP (hạng cao trước, mới đẩy trước) → TIN THƯỜNG theo giờ đăng TĂNG DẦN (đăng sau hiện sau/xuống dưới; muốn lên đầu thì đẩy tin).
+      `${SELECT} WHERE ${where.join(' AND ')} ORDER BY CASE listings.tier WHEN 'diamond' THEN 3 WHEN 'gold' THEN 2 WHEN 'silver' THEN 1 ELSE 0 END DESC, CASE WHEN listings.tier = 'normal' THEN COALESCE(listings.bumped_at, listings.created_at) END ASC, COALESCE(listings.bumped_at, listings.created_at) DESC LIMIT ${p(limit)} OFFSET ${p(offset)}`, params);
+    // Ẩn bớt SĐT + CẮT NGẮN mô tả trong DANH SÁCH (thẻ tin không dùng mô tả đầy đủ → nhẹ payload, tải nhanh; trang chi tiết vẫn lấy đủ).
+    rows.forEach((r: any) => { r.contactPhone = maskPhone(r.contactPhone); if (r.description && r.description.length > 160) r.description = r.description.slice(0, 160) + '…'; });
     const payload = { count: rows.length, listings: rows };
     cachePut(ckey, payload, 20000);
     res.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=60');
@@ -116,7 +142,7 @@ listingsRouter.get('/agent/:id', async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     if (!id) return res.status(400).json({ error: 'id không hợp lệ' });
-    const [agent] = await query(`SELECT id, full_name AS "name", phone, avatar, role, created_at AS "createdAt" FROM users WHERE id=$1`, [id]);
+    const [agent] = await query(`SELECT id, full_name AS "name", phone, avatar, role, rating, rating_count AS "ratingCount", created_at AS "createdAt" FROM users WHERE id=$1`, [id]);
     if (!agent) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
     const active = await query(
       `${SELECT} WHERE listings.created_by=$1 AND listings.status NOT IN ('hidden','pending','sold')
@@ -128,6 +154,7 @@ listingsRouter.get('/agent/:id', async (req, res, next) => {
        ORDER BY COALESCE(listings.bumped_at, listings.created_at) DESC LIMIT 60`, [id]);
     for (const r of active) r.contactPhone = maskPhone(r.contactPhone);
     for (const r of expired) r.contactPhone = maskPhone(r.contactPhone);
+    res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=120');
     res.json({ agent, active, expired });
   } catch (e) { next(e); }
 });
@@ -147,14 +174,15 @@ listingsRouter.post('/:id/boost', authRequired, async (req: AuthedRequest, res, 
       const [u] = await query(`SELECT boost_quota, boost_used, pkg_tier, boost_expires_at FROM users WHERE id=$1`, [req.user!.id]);
       const active = !!u && !!u.boost_expires_at && new Date(u.boost_expires_at).getTime() > Date.now();
       if (!active) return res.status(403).json({ error: 'Bạn chưa có gói đẩy tin hoặc gói đã hết hạn. Vào Bảng giá để mua gói.' });
-      if (Number(u.boost_used) >= Number(u.boost_quota)) return res.status(403).json({ error: `Hết lượt đẩy của gói (đã dùng ${u.boost_used}/${u.boost_quota}). Nâng gói tại Bảng giá.` });
       const rank: Record<string, number> = { normal: 0, silver: 1, gold: 2, diamond: 3 };
       if (tier && (rank[tier] ?? 0) > (rank[u.pkg_tier] ?? 0)) return res.status(403).json({ error: `Gói của bạn chỉ tới hạng ${u.pkg_tier}. Nâng gói để dùng hạng cao hơn.` });
+      // ATOMIC: chỉ +1 lượt đẩy khi CÒN lượt → chống vượt quota khi bấm nhanh / nhiều tab cùng lúc.
+      const consumed = await query(`UPDATE users SET boost_used = boost_used + 1 WHERE id=$1 AND boost_used < boost_quota RETURNING boost_used`, [req.user!.id]);
+      if (!consumed.length) return res.status(403).json({ error: `Hết lượt đẩy của gói (đã dùng ${u.boost_used}/${u.boost_quota}). Nâng gói tại Bảng giá.` });
     }
     const [row] = await query(
       `UPDATE listings SET tier=COALESCE($2,tier), bumped_at=CASE WHEN $3 THEN now() ELSE bumped_at END, boosted=(COALESCE($2,tier) <> 'normal')
        WHERE id=$1 RETURNING id, tier, boosted`, [id, tier, bump]);
-    if (isBoost && req.user!.role !== 'admin') await query('UPDATE users SET boost_used = boost_used + 1 WHERE id=$1', [req.user!.id]);
     cacheDrop('listings:');
     res.json({ ok: true, tier: row.tier });
   } catch (e) { next(e); }
@@ -270,7 +298,9 @@ listingsRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => 
            FROM users WHERE id=$1`, [req.user!.id]);
       pkgActive = !!u?.exp && new Date(u.exp).getTime() > Date.now();
       if (pkgActive) {
-        if (Number(u?.postUsed ?? 0) >= Number(u?.postQuota ?? 0))
+        // ATOMIC: trừ 1 tin của gói NGAY, chỉ khi còn hạn mức → chống vượt quota khi đăng nhiều lần/nhiều tab.
+        const consumed = await query(`UPDATE users SET post_used = post_used + 1 WHERE id=$1 AND post_used < post_quota RETURNING post_used`, [req.user!.id]);
+        if (!consumed.length)
           return res.status(403).json({ error: `Đã dùng hết ${u.postQuota} tin của gói (gói còn hạn tới ${new Date(u.exp).toLocaleDateString('vi-VN')}). Mua thêm gói để đăng tiếp.` });
       } else if (Number(u?.freePosts ?? 0) >= FREE_POST_LIMIT) {
         return res.status(403).json({ error: `Đã đạt giới hạn ${FREE_POST_LIMIT} tin/tháng (tài khoản miễn phí). Mua gói để đăng thêm.` });
@@ -282,12 +312,12 @@ listingsRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => 
           contact_name,contact_phone,images,status,geom,created_by,deal)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,'active', ST_SetSRID(ST_MakePoint($16,$17),4326), $18, $19)
        RETURNING id`,
-      [b.title, b.description ?? null, b.price, b.area ?? null, b.propertyType ?? 'land', b.address ?? null,
-       b.ward ?? null, b.bedrooms ?? null, b.bathrooms ?? null, b.direction ?? null, b.legal ?? null, b.frontage ?? null,
-       b.contactName ?? null, b.contactPhone ?? null, b.images ?? [], b.lng, b.lat, req.user!.id, b.deal === 'rent' ? 'rent' : 'sale']);
+      [clip(b.title, 200), clip(b.description, 5000), b.price, b.area ?? null, clip(b.propertyType, 40) ?? 'land', clip(b.address, 300),
+       clip(b.ward, 120), b.bedrooms ?? null, b.bathrooms ?? null, clip(b.direction, 60), clip(b.legal, 120), b.frontage ?? null,
+       clip(b.contactName, 120), clip(b.contactPhone, 30), b.images ?? [], b.lng, b.lat, req.user!.id, b.deal === 'rent' ? 'rent' : 'sale']);
     await linkImages(row.id, b.images);
     cacheDrop('listings:');
-    if (svcOn && req.user!.role !== 'admin') { if (pkgActive) await query('UPDATE users SET post_used = post_used + 1 WHERE id=$1', [req.user!.id]); else bumpUsage(req.user!.id, 'posts').catch(() => {}); }
+    if (svcOn && req.user!.role !== 'admin' && !pkgActive) bumpUsage(req.user!.id, 'posts').catch(() => {}); // gói trả phí ĐÃ trừ atomic ở trên; free-tier đếm theo tháng ở đây
     const [created] = await query(`${SELECT} WHERE listings.id=$1`, [row.id]);
     res.status(201).json(created);
   } catch (e) { next(e); }
@@ -327,10 +357,10 @@ listingsRouter.put('/:id', authRequired, async (req: AuthedRequest, res, next) =
          geom=CASE WHEN $18::float8 IS NULL THEN geom ELSE ST_SetSRID(ST_MakePoint($18,$19),4326) END,
          deal=COALESCE($20,deal)
        WHERE id=$1 RETURNING id`,
-      [id, b.title ?? null, b.description ?? null, b.price ?? null, b.area ?? null, b.propertyType ?? null,
-       b.address ?? null, b.ward ?? null, b.bedrooms ?? null, b.bathrooms ?? null, b.direction ?? null,
-       b.legal ?? null, b.frontage ?? null, b.contactName ?? null, b.contactPhone ?? null, b.status ?? null,
-       b.images ?? null, b.lng ?? null, b.lat ?? null, b.deal ?? null]);
+      [id, clip(b.title, 200), clip(b.description, 5000), b.price ?? null, b.area ?? null, clip(b.propertyType, 40),
+       clip(b.address, 300), clip(b.ward, 120), b.bedrooms ?? null, b.bathrooms ?? null, clip(b.direction, 60),
+       clip(b.legal, 120), b.frontage ?? null, clip(b.contactName, 120), clip(b.contactPhone, 30), clip(b.status, 20),
+       b.images ?? null, b.lng ?? null, b.lat ?? null, clip(b.deal, 10)]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy tin' });
     if (b.images) await linkImages(id, b.images);
     const [updated] = await query(`${SELECT} WHERE listings.id=$1`, [id]);

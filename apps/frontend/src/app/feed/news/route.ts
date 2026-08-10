@@ -1,19 +1,55 @@
 import { NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 
 // Lấy tin BĐS từ nguồn uy tín, tải NGUYÊN bài gốc + ảnh, AI viết lại thành bài đầy đủ (độ dài ~ bài gốc), lưu 7 ngày, làm mới mỗi 2 giờ.
 export const dynamic = 'force-dynamic';
 
+// Ảnh Bãi Dài Cam Lâm chủ site thả vào public/bai-dai/. Tên có 'hero'/'cam-lam' → TIN ĐẦU TIÊN (luôn trên cùng); còn lại XOAY VÒNG theo ngày.
+function baiDaiPool(): { hero: string | null; rest: string[] } {
+  try {
+    const files = fs.readdirSync(path.join(process.cwd(), 'public', 'bai-dai')).filter((f) => /\.(jpe?g|png|webp)$/i.test(f)).sort();
+    if (!files.length) return { hero: null, rest: [] };
+    const heroF = files.find((f) => /hero|cam.?l[aâ]m/i.test(f)) || null;
+    return { hero: heroF ? '/bai-dai/' + heroF : null, rest: files.filter((f) => f !== heroF).map((f) => '/bai-dai/' + f) };
+  } catch { return { hero: null, rest: [] }; }
+}
+function applyBaiDai() {
+  const { hero, rest } = baiDaiPool();
+  const day = Math.floor(Date.now() / 86400000); // xoay vòng theo NGÀY
+  PINNED.forEach((a: any, i: number) => {
+    if (i === 0 && hero) { a.image = hero; a.images = [hero]; return; }
+    if (rest.length) { const img = rest[(i + day) % rest.length]; a.image = img; a.images = [img]; }
+  });
+}
+
 const SOURCES = [
+  // ── Khánh Hòa (địa phương) — ưu tiên "Tin nổi bật"; lọc theo từ khoá BĐS/quy hoạch (re) ──
   { name: 'Báo Khánh Hòa', url: 'https://baokhanhhoa.vn/rss/kinh-te.rss', local: true, re: true },
+  { name: 'Báo Khánh Hòa', url: 'https://baokhanhhoa.vn/rss/xa-hoi.rss', local: true, re: true },
+  { name: 'Báo Khánh Hòa', url: 'https://baokhanhhoa.vn/rss/cam-lam.rss', local: true, re: true },
+  { name: 'Báo Khánh Hòa', url: 'https://baokhanhhoa.vn/rss/quy-hoach-tinh-khanh-hoa.rss', local: true, re: true },
+  { name: 'Báo Khánh Hòa', url: 'https://baokhanhhoa.vn/rss/nha-trang.rss', local: true, re: true },
+  // ── Bất động sản & xây dựng toàn quốc (bắt tin nhắc Khánh Hòa + tin thị trường) ──
   { name: 'VnExpress', url: 'https://vnexpress.net/rss/bat-dong-san.rss' },
   { name: 'CafeF', url: 'https://cafef.vn/bat-dong-san.rss' },
   { name: 'Báo Xây dựng', url: 'https://baoxaydung.com.vn/rss/bat-dong-san.rss' },
+  { name: 'Reatimes', url: 'https://reatimes.vn/rss' },
+  { name: 'Dân trí', url: 'https://dantri.com.vn/bat-dong-san.rss' },
+  { name: 'Vietnamnet', url: 'https://vietnamnet.vn/rss/bat-dong-san.rss' },
+  { name: 'Người Lao Động', url: 'https://nld.com.vn/bat-dong-san.rss' },
+  { name: 'Tuổi Trẻ', url: 'https://tuoitre.vn/rss/nha-dat.rss' },
+  { name: 'Thanh Niên', url: 'https://thanhnien.vn/rss/dia-oc.rss' },
+  { name: 'Tiền Phong', url: 'https://tienphong.vn/rss/dia-oc-142.rss' },
 ];
 const BAD = /(lừa đảo|vỡ nợ|phá sản|siết nợ|tranh chấp|khởi tố|khởi kiện|kiện tụng|bắt giam|lao dốc|bán tháo|nợ xấu|đóng băng|ế ẩm|sụt giảm|giảm mạnh|thổi giá|bong bóng|chiếm đoạt|cảnh báo sốt|trục lợi)/i;
-// Tin thuộc thị trường Khánh Hòa -> ưu tiên hiển thị trước
-const LOCAL = /(Khánh\s*Hòa|Khanh\s*Hoa|Cam\s*Lâm|Cam\s*Lam|Nha\s*Trang|Cam\s*Ranh|Bãi\s*Dài|Bai\s*Dai|Vạn\s*Ninh|Ninh\s*Hòa|Diên\s*Khánh|Cam\s*Đức|Cam\s*Hải)/i;
 // Lọc tin liên quan BĐS (áp dụng cho nguồn báo địa phương tổng hợp như Báo Khánh Hòa)
 const RE = /(bất động sản|nhà đất|đất nền|đất ở|căn hộ|chung cư|biệt thự|nhà phố|liền kề|quy hoạch|dự án|đô thị|hạ tầng|khu công nghiệp|đấu giá|sổ đỏ|mặt bằng|thổ cư|ven biển|sân bay|cao tốc|tái định cư|đầu tư|giải phóng mặt bằng)/i;
+// Phân HẠNG ưu tiên vị trí cho mục "Tin nổi bật": Cam Lâm(3) > Cam Ranh/Nha Trang/Ninh Hòa(2) > Khánh Hòa(1) > khác(0).
+const T_CAMLAM = /(Cam\s*Lâm|Cam\s*Lam|Cam\s*Đức|Cam\s*Duc|Cam\s*Hải|Cam\s*Hai|Bãi\s*Dài|Bai\s*Dai|Suối\s*Tân|Suoi\s*Tan|Suối\s*Dầu|Cam\s*Hiệp|Cam\s*An|Cam\s*Thành|Cam\s*Phước|Cam\s*Tân|Sơn\s*Tân|Thủy\s*Triều)/i;
+const T_NEAR = /(Cam\s*Ranh|Nha\s*Trang|Ninh\s*Hòa|Ninh\s*Hoa)/i;
+const T_KH = /(Khánh\s*Hòa|Khanh\s*Hoa|Diên\s*Khánh|Vạn\s*Ninh|Trường\s*Sa|Khánh\s*Sơn|Khánh\s*Vĩnh)/i;
+const tierOf = (t: string): number => (T_CAMLAM.test(t) ? 3 : T_NEAR.test(t) ? 2 : T_KH.test(t) ? 1 : 0);
 
 const decode = (s: string): string => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ').trim();
 const strip = (s: string): string => s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -104,22 +140,31 @@ async function fetchArticle(url: string): Promise<{ text: string; images: string
     const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CamLamLand/1.0)' }, signal: AbortSignal.timeout(9000), cache: 'no-store' });
     if (!res.ok) return { text: '', images: [] };
     let html = await res.text();
+    // ẢNH ĐẠI DIỆN CHUẨN của bài: og:image / twitter:image trong <head> — đáng tin & ĐÚNG bài, ưu tiên hơn ảnh bới trong thân.
+    const metaImgs: string[] = [];
+    for (const m of html.matchAll(/<meta\b[^>]*>/gi)) {
+      if (!/\b(?:property|name)=["'](?:og:image(?::url)?|twitter:image(?::src)?)["']/i.test(m[0])) continue;
+      const c0 = (m[0].match(/\bcontent=["']([^"']+)["']/i) || [])[1]; if (!c0) continue;
+      let c = decode(c0); if (c.startsWith('//')) c = 'https:' + c;
+      if (cleanImg(c)) metaImgs.push(c);
+    }
     html = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ').replace(/<header[\s\S]*?<\/header>/gi, ' ').replace(/<footer[\s\S]*?<\/footer>/gi, ' ');
     let scope = (html.match(/<article[\s\S]*?<\/article>/i) || [])[0];
     if (!scope) { const m = html.match(/<div[^>]+(?:id|class)=["'][^"']*(detail-content|article-body|fck_detail|contentdetail|news-content|main-?content|entry-content|the-article-body|content_detail)[^"']*["'][\s\S]*$/i); scope = m ? m[0] : html; }
     const cut = scope.search(/Vận hành bởi|VCCorp|class=["'][^"']*(relate|relation|footer|tag-list|share|box-category|comment|widget)/i);
     if (cut > 600) scope = scope.slice(0, cut);
-    const images: string[] = [];
+    const bodyImgs: string[] = [];
     for (const m of scope.matchAll(/<img[^>]+>/gi)) {
       const src = (m[0].match(/(?:data-src|data-original|src)=["']([^"' ]+)/i) || [])[1];
-      if (src && cleanImg(src)) images.push(src);
+      if (src && cleanImg(src)) bodyImgs.push(src);
     }
     const paras: string[] = [];
     for (const m of scope.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)) {
       const t = strip(decode(m[1]));
       if (t.length >= 45 && !/^(theo |nguồn|ảnh\s*:|video\s*:|xem thêm|đọc thêm|>>)/i.test(t) && !/[Ảả]nh\s*:\s*\S/.test(t) && !/^[Nn]guồn\s*:\s*\S/.test(t)) paras.push(t);
     }
-    return { text: paras.join('\n\n').slice(0, 7000), images: Array.from(new Set(images)).slice(0, 6) };
+    // og:image (đại diện chuẩn) LÊN ĐẦU, rồi mới đến ảnh trong thân bài.
+    return { text: paras.join('\n\n').slice(0, 7000), images: Array.from(new Set([...metaImgs, ...bodyImgs])).slice(0, 6) };
   } catch { return { text: '', images: [] }; }
 }
 
@@ -139,15 +184,57 @@ async function fetchSource(src: { name: string; url: string; local?: boolean; re
     if (!title || !link || isNaN(d.getTime()) || BAD.test(title)) continue;
     const sm = strip(desc);
     if (src.re && !RE.test(title + ' ' + sm)) continue; // nguồn tổng hợp -> chỉ lấy tin BĐS
-    out.push({ title, url: link, source: src.name, image, summary: sm.slice(0, 600), publishedAt: d.toISOString(), local: !!src.local || LOCAL.test(title + ' ' + sm) });
+    const tier = tierOf(title + ' ' + sm);
+    out.push({ title, url: link, source: src.name, image, summary: sm.slice(0, 600), publishedAt: d.toISOString(), local: !!src.local || tier >= 1, tier });
   }
   return out;
 }
 
-// Kho lưu trong tiến trình: tích luỹ & giữ 7 ngày
-let store: any[] = [];
+// ── GHIM: bài về ĐÔ THỊ MỚI CAM LÂM — luôn hiện ở "Tin nổi bật", KHÔNG hết hạn (tin cũ vẫn giữ) ──
+const PIMG = (id: string): string => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1200&q=80`;
+const PINNED: any[] = [
+  {
+    title: 'Thủ tướng phê duyệt Quy hoạch chung đô thị mới Cam Lâm đến năm 2045',
+    url: 'https://baochinhphu.vn/cam-lam-tro-thanh-cuc-tang-truong-vung-nam-trung-bo-102240228164301983.htm',
+    source: 'Báo Chính phủ', publishedAt: '2024-02-28T08:00:00+07:00', image: PIMG('1696857144141-97ad5cae0172'),
+    summary: 'Ngày 28/2/2024, Thủ tướng Chính phủ ban hành Quyết định 205/QĐ-TTg phê duyệt Quy hoạch chung đô thị mới Cam Lâm, tỉnh Khánh Hòa đến năm 2045 — định hướng phát triển toàn huyện Cam Lâm thành đô thị sân bay tầm quốc tế.',
+    body: 'Phạm vi lập quy hoạch gồm toàn bộ ranh giới hành chính huyện Cam Lâm, tổng diện tích tự nhiên khoảng 54.719 ha (không bao gồm mặt nước đầm Thủy Triều).\n\nĐịnh hướng đưa Cam Lâm trở thành cực tăng trưởng phía Nam tỉnh Khánh Hòa và vùng Nam Trung Bộ, góp phần giúp Khánh Hòa sớm trở thành thành phố trực thuộc Trung ương.\n\nĐô thị mới Cam Lâm phát triển theo mô hình đô thị sân bay hiện đại, sinh thái đẳng cấp quốc tế; chú trọng du lịch biển, logistics, dịch vụ tài chính và trung tâm đổi mới sáng tạo.',
+  },
+  {
+    title: 'Đô thị mới Cam Lâm — mô hình đô thị sân bay sinh thái đẳng cấp quốc tế',
+    url: 'https://quyhoach.xaydung.gov.vn/vn/quy-hoach/18260/quy-hoach-chung-do-thi-moi-cam-lam--tinh-khanh-hoa-den-nam-2045.aspx',
+    source: 'Cổng Quy hoạch Xây dựng', publishedAt: '2024-03-02T08:00:00+07:00', image: PIMG('1596178060727-1f6885ee334d'),
+    summary: 'Đô thị mới Cam Lâm được quy hoạch theo mô hình đô thị sân bay quy mô quốc tế, gắn với sân bay Cam Ranh, phát triển du lịch, logistics và đổi mới sáng tạo.',
+    body: 'Đô thị mới Cam Lâm có tính chất là đô thị sân bay quy mô quốc tế, kết nối với sân bay quốc tế Cam Ranh và các trục giao thông trọng điểm của vùng.\n\nQuy hoạch hướng tới một đô thị thông minh, phát triển hài hòa giữa khu vực ven biển, vùng đồng bằng và vùng đồi núi phía Tây.\n\nCác lĩnh vực ưu tiên gồm du lịch nghỉ dưỡng, logistics hàng không, tài chính và giáo dục - y tế chất lượng cao mang tầm khu vực.',
+  },
+  {
+    title: 'Dân số đô thị mới Cam Lâm dự kiến đạt khoảng 770.000 người vào năm 2045',
+    url: 'https://nld.com.vn/quy-hoach-chung-do-thi-moi-cam-lam-duoc-phe-duyet-19624022818180863.htm',
+    source: 'Người Lao Động', publishedAt: '2024-02-29T08:00:00+07:00', image: PIMG('1696857174061-6f0c3a685040'),
+    summary: 'Theo quy hoạch, dân số đô thị mới Cam Lâm dự kiến khoảng 320.000 người vào năm 2030 và khoảng 770.000 người vào năm 2045.',
+    body: 'Theo dự báo trong quy hoạch, đến năm 2030 dân số toàn đô thị khoảng 320.000 người, trong đó dân số đô thị khoảng 224.000 người, tỷ lệ đô thị hóa khoảng 70%.\n\nĐến năm 2045, dân số dự kiến khoảng 770.000 người, dân số đô thị khoảng 639.780 người, tỷ lệ đô thị hóa khoảng 83%.\n\nĐây là cơ sở để bố trí hạ tầng kỹ thuật, hạ tầng xã hội và các khu chức năng cho một đô thị sân bay quy mô lớn.',
+  },
+  {
+    title: 'Cam Lâm — cực tăng trưởng mới phía Nam Khánh Hòa và vùng Nam Trung Bộ',
+    url: 'https://kinhtedothi.vn/phe-duyet-quy-hoach-chung-do-thi-moi-cam-lam-tinh-khanh-hoa-den-nam-2045',
+    source: 'Kinh tế & Đô thị', publishedAt: '2024-03-01T08:00:00+07:00', image: PIMG('1696857144077-9dca1f0e66bc'),
+    summary: 'Quy hoạch chung được phê duyệt mở đường để Cam Lâm trở thành cực tăng trưởng phía Nam Khánh Hòa, liên kết Nha Trang và vịnh Cam Ranh.',
+    body: 'Việc phê duyệt quy hoạch chung tạo hành lang pháp lý để Cam Lâm thu hút đầu tư, phát triển hạ tầng và trở thành động lực tăng trưởng mới của Khánh Hòa.\n\nĐô thị mới Cam Lâm được kỳ vọng liên kết chặt chẽ với thành phố Nha Trang và khu vực vịnh Cam Ranh, hình thành chuỗi đô thị - du lịch ven biển Nam Trung Bộ.\n\nĐịnh hướng phát triển gắn với bảo tồn cảnh quan đầm Thủy Triều, vùng ven biển Bãi Dài và các không gian sinh thái đặc trưng.',
+  },
+  {
+    title: 'Toàn văn Quyết định 205/QĐ-TTg về quy hoạch đô thị mới Cam Lâm',
+    url: 'https://thuvienphapluat.vn/van-ban/Xay-dung-Do-thi/Quyet-dinh-205-QD-TTg-2024-phe-duyet-Quy-hoach-chung-do-thi-moi-Cam-Lam-Khanh-Hoa-den-2045-600262.aspx',
+    source: 'Thư viện Pháp luật', publishedAt: '2024-02-28T10:00:00+07:00', image: PIMG('1630471300276-e454cff47e02'),
+    summary: 'Toàn văn Quyết định 205/QĐ-TTg nêu chi tiết mục tiêu, phạm vi và định hướng phát triển không gian đô thị mới Cam Lâm đến năm 2045.',
+    body: 'Quyết định 205/QĐ-TTg ngày 28/2/2024 quy định chi tiết về mục tiêu, phạm vi, tính chất, quy mô và định hướng tổ chức không gian của đô thị mới Cam Lâm đến năm 2045.\n\nQuy hoạch là căn cứ để lập các quy hoạch phân khu, quy hoạch chi tiết và triển khai các dự án đầu tư trên địa bàn.\n\nNgười dân và nhà đầu tư có thể tra cứu ranh giới, định hướng sử dụng đất và hạ tầng khung để chuẩn bị kế hoạch phù hợp.',
+  },
+].map((a, i) => ({ ...a, order: i, tier: 3, local: true, pin: true, images: [a.image], slug: `${vnSlug(a.title) || 'tin'}-${shortHash(a.url)}` }));
+
+// Kho lưu trong tiến trình: tích luỹ & giữ 7 ngày (bài GHIM giữ vĩnh viễn)
+let store: any[] = [...PINNED];
 let lastSlot = -1;
-const FRESH_CAP = 14; // số bài mới tải+viết lại mỗi lần làm mới (kiểm soát chi phí/độ trễ)
+let refreshing = false; // đang làm mới RSS ở nền
+const FRESH_CAP = 18; // số bài mới tải+viết lại mỗi lần làm mới (kiểm soát chi phí/độ trễ)
 
 // Mốc làm mới: mỗi 2 giờ trong khung 6h–22h (giờ VN). Ngoài khung đó giữ bản 22h, không cập nhật.
 function slotStart(): number {
@@ -170,32 +257,40 @@ export async function GET(req: Request) {
     });
   }
 
+  applyBaiDai(); // cập nhật ảnh Bãi Dài cho bài ghim mỗi request (thả ảnh vào là hiện ngay)
   const slot = slotStart();
-  if (store.length && lastSlot === slot) return NextResponse.json({ news: store });
+  // Trả DỮ LIỆU HIỆN CÓ ngay (bài ghim + tin đã lưu) → KHÔNG "nháy" tin cũ/link ngoài. RSS làm mới CHẠY NỀN.
+  if (lastSlot !== slot && !refreshing) {
+    refreshing = true;
+    refreshFeed(slot).catch(() => {}).finally(() => { refreshing = false; });
+  }
+  return NextResponse.json({ news: store });
+}
 
+async function refreshFeed(slot: number): Promise<void> {
   const results = await Promise.allSettled(SOURCES.map(fetchSource));
   const fetched: any[] = [];
   for (const r of results) if (r.status === 'fulfilled') fetched.push(...r.value);
-
   const byUrl = new Map<string, any>(store.map((a) => [a.url, a]));
+  // Ưu tiên xử lý (tải bài + viết lại) tin Cam Lâm/Khánh Hòa TRƯỚC để "Tin nổi bật" luôn có tin thật.
+  fetched.sort((a, b) => (b.tier || 0) - (a.tier || 0) || +new Date(b.publishedAt) - +new Date(a.publishedAt));
   const fresh = fetched.filter((a) => !byUrl.has(a.url)).slice(0, FRESH_CAP);
   await Promise.allSettled(fresh.map(async (a) => {
     const art = await fetchArticle(a.url);
     const full = art.text && art.text.length > 200 ? art.text : (a.summary || a.title);
     a.body = dropCaptions((await rewrite(a.title, full)) || full);
-    const imgs = dedupeImages([a.image, ...art.images].filter((u): u is string => !!u && cleanImg(u))).slice(0, 3);
+    const imgs = dedupeImages([...art.images, a.image].filter((u): u is string => !!u && cleanImg(u))).slice(0, 3); // og:image (đại diện chuẩn) LÊN ĐẦU, ảnh RSS làm dự phòng
     a.images = imgs;
     a.image = imgs[0] || null;
     a.slug = `${vnSlug(a.title) || 'tin'}-${shortHash(a.url)}`; // mô tả + đuôi SỐ
   }));
   for (const a of fresh) byUrl.set(a.url, a);
-
   const weekAgo = Date.now() - 7 * 86400000;
-  store = [...byUrl.values()]
-    .filter((a) => a.slug && +new Date(a.publishedAt) >= weekAgo)
+  const localKeep = Date.now() - 60 * 86400000; // tin Khánh Hòa (tier≥1) GIỮ 60 ngày
+  const rotating = [...byUrl.values()]
+    .filter((a) => !a.pin && a.slug && +new Date(a.publishedAt) >= ((a.tier || 0) >= 1 ? localKeep : weekAgo))
     .sort((a, b) => (b.local ? 1 : 0) - (a.local ? 1 : 0) || +new Date(b.publishedAt) - +new Date(a.publishedAt))
-    .slice(0, 60);
+    .slice(0, 75);
+  store = [...PINNED, ...rotating]; // bài GHIM luôn đứng đầu
   if (fetched.length) lastSlot = slot;
-
-  return NextResponse.json({ news: store });
 }

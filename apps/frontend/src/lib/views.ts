@@ -61,3 +61,19 @@ export function rememberViews(id: number, realViews: number): void {
 export function viewedReal(id: number): number {
   return readOverlay()[id] || 0;
 }
+
+// ── "Đã xem gần đây": danh sách tin khách vừa mở (lưu client) ────────────────
+const RKEY = 'camlam_recent_v1';
+/** Danh sách tin đã xem gần đây (mới nhất trước). */
+export function getRecent(): any[] {
+  if (typeof window === 'undefined') return [];
+  try { return JSON.parse(localStorage.getItem(RKEY) || '[]'); } catch { return []; }
+}
+/** Ghi 1 tin vào đầu danh sách đã xem (khử trùng theo id, giữ tối đa 12). */
+export function pushRecent(l: { id: number } | null | undefined): void {
+  if (typeof window === 'undefined' || !l?.id) return;
+  try {
+    const next = [l, ...getRecent().filter((x: any) => x?.id !== l.id)].slice(0, 12);
+    localStorage.setItem(RKEY, JSON.stringify(next));
+  } catch { /* ignore */ }
+}

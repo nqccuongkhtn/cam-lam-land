@@ -6,6 +6,25 @@ services:
     image: postgis/postgis:16-3.4
     container_name: camlam_postgis
     restart: unless-stopped
+    # Tinh chỉnh hiệu năng: tăng bộ nhớ đệm + tối ưu cho SSD → truy vấn bản đồ/tin nhanh hơn.
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "effective_cache_size=768MB"
+      - "-c"
+      - "work_mem=24MB"
+      - "-c"
+      - "maintenance_work_mem=128MB"
+      - "-c"
+      - "random_page_cost=1.1"
+      - "-c"
+      - "effective_io_concurrency=200"
+      - "-c"
+      - "max_wal_size=2GB"
+      - "-c"
+      - "checkpoint_completion_target=0.9"
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-camlam}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-camlam_secret_change_me}
@@ -64,11 +83,19 @@ services:
       PG_POOL_MAX: ${PG_POOL_MAX:-12}
     volumes:
       - uploads:/data/uploads
+      - logs:/app/apps/backend/logs        # GIỮ log lỗi/chậm qua các lần build lại
     depends_on:
       postgis:
         condition: service_healthy
     expose:
       - "4000"
+    # Tự kiểm tra sức khoẻ backend (gồm cả DB qua /api/ping siêu nhẹ) → Docker báo unhealthy khi hỏng.
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:4000/api/ping').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 45s
 
   gis-worker:
     build:
@@ -85,6 +112,9 @@ services:
       UPLOAD_DIR: /data/uploads
       WORKER_POLL_MS: ${WORKER_POLL_MS:-4000}
       SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
+      # Đổi DGN V8 → DXF qua mạng (GroupDocs, miễn phí). Lấy tại dashboard.groupdocs.cloud
+      GROUPDOCS_CLIENT_ID: ${GROUPDOCS_CLIENT_ID:-}
+      GROUPDOCS_CLIENT_SECRET: ${GROUPDOCS_CLIENT_SECRET:-}
     volumes:
       - uploads:/data/uploads
       - ./data/cam-lam:/data/cam-lam:ro
@@ -100,6 +130,9 @@ services:
     restart: unless-stopped
     environment:
       NEXT_PUBLIC_API_BASE: ${NEXT_PUBLIC_API_BASE:-/api}
+      # SSR (server component) gọi backend TRỰC TIẾP qua tên service nội bộ — thiếu biến này thì
+      # các trang render sẵn (/nha-dat/*, /listings/[id], sitemap) trả RỖNG dù /api client vẫn chạy qua nginx.
+      BACKEND_HOST: ${BACKEND_HOST:-http://backend:4000}
       NEXT_PUBLIC_MAP_CENTER_LNG: ${NEXT_PUBLIC_MAP_CENTER_LNG:-109.0917}
       NEXT_PUBLIC_MAP_CENTER_LAT: ${NEXT_PUBLIC_MAP_CENTER_LAT:-12.0771}
       NEXT_PUBLIC_MAP_ZOOM: ${NEXT_PUBLIC_MAP_ZOOM:-12}
@@ -114,6 +147,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx:/usr/share/nginx/maintenance:ro
     ports:
       - "${NGINX_PORT:-80}:80"
     depends_on:
@@ -123,3 +157,4 @@ services:
 volumes:
   pgdata:
   uploads:
+  logs:

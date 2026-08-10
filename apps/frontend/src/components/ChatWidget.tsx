@@ -1,9 +1,12 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { api } from '@/lib/api';
 import { getToken } from '@/lib/token';
-import { WARDS, PROPERTY_LABELS, type PropertyType } from '@/lib/types';
+import { WARDS_NEW, WARDS_OLD, PROPERTY_LABELS, type PropertyType } from '@/lib/types';
+import FlappyMini from './FlappyMini';
+import { useLockBody } from '@/lib/useLockBody';
 
 interface Msg { id: number; userId: number | null; name: string; avatar?: string | null; body: string; createdAt: string; }
 interface Room { room: string; name: string; phone?: string | null; online?: boolean; lastBody: string; lastAt: string; count: number; unread?: number; }
@@ -41,6 +44,7 @@ export default function ChatWidget() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
   const [open, setOpen] = useState(false);
+  useLockBody(open); // khoá cuộn nền khi khung chat đang mở → nền phía dưới không lướt được
   const [tab, setTab] = useState<Tab>('community');
   const [room, setRoom] = useState('community');
   const [msgs, setMsgs] = useState<Msg[]>([]);
@@ -63,6 +67,7 @@ export default function ChatWidget() {
   const hintStop = useRef(false);
   const [peerAck, setPeerAck] = useState<{ received: number; read: number } | null>(null);
   const [listOpen, setListOpen] = useState(true);
+  const [gameOpen, setGameOpen] = useState(false);
   const [roomQ, setRoomQ] = useState('');
   const [userHits, setUserHits] = useState<{ id: number; name: string; email: string; phone: string | null; avatar: string | null; online?: boolean }[]>([]);
   const [pickedName, setPickedName] = useState('');
@@ -74,6 +79,9 @@ export default function ChatWidget() {
   const [allNames, setAllNames] = useState<string[]>([]);
   const dragStart = useRef<number | null>(null);
   const draggedRef = useRef(false);
+  const [bubblePos, setBubblePos] = useState<{ x: number; y: number } | null>(null);
+  const bubbleDrag = useRef<{ sx: number; sy: number; ox: number; oy: number; moved: boolean; lx: number; ly: number } | null>(null);
+  const bubbleMoved = useRef(false);
   const acked = useRef(0);
 
   const lastId = useRef(0);
@@ -91,6 +99,12 @@ export default function ChatWidget() {
   const setS = (k: string, v: string) => setSf((s) => ({ ...s, [k]: v }));
 
   useEffect(() => { setTab('advisory'); }, [user]);
+  // Nút "Chat tư vấn" ở nơi khác (CTA pháp lý, mục dịch vụ) phát 'cl-open-chat' → mở hộp chat & nhảy tới đúng tab (mặc định Tư vấn & Pháp lý).
+  useEffect(() => {
+    const openTo = (e: any) => { const t = e?.detail?.tab; primeAudio(); setTab((t === 'sell' || t === 'community' || t === 'support' || t === 'advisory') ? t : 'advisory'); setOpen(true); dismissHint(); };
+    window.addEventListener('cl-open-chat', openTo);
+    return () => window.removeEventListener('cl-open-chat', openTo);
+  }, []);
   useEffect(() => { if (!user) { setAllNames([]); return; } api<{ users: { name: string }[] }>('/chat/mention').then((r) => setAllNames((r.users || []).map((u) => u.name).filter(Boolean))).catch(() => {}); }, [user]);
   useEffect(() => {
     try { seenComm.current = Number(localStorage.getItem('cl-seen-community') || 0); } catch {}
@@ -116,14 +130,28 @@ export default function ChatWidget() {
   useEffect(() => {
     if (!user) { setUnreadComm(0); setUnreadSupp(0); setUnreadAdv(0); return; }
     const poll = async () => {
-      try { const c = await api<{ messages: Msg[] }>(`/chat/messages?room=community&after=${seenComm.current}`); setUnreadComm(c.messages.filter((m) => m.userId !== user.id).length); } catch {}
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return; // tab ẩn → KHÔNG poll nền (đỡ tốn mạng/pin); WebSocket vẫn nhận tin real-time khi cần
+      try {
+        const c = await api<{ messages: Msg[] }>(`/chat/messages?room=community&after=${seenComm.current}`);
+        if (seenComm.current === 0 && c.messages.length) {
+          // LẦN ĐẦU: đặt mốc = tin mới nhất → KHÔNG coi cả lịch sử (168 tin) là "chưa đọc" (hết badge 99+),
+          // và các lần poll sau chỉ lấy tin MỚI (after=id lớn nhất → nhẹ, hết tải lại toàn bộ mỗi 12s).
+          seenComm.current = Math.max(...c.messages.map((m) => m.id));
+          try { localStorage.setItem('cl-seen-community', String(seenComm.current)); } catch {}
+          setUnreadComm(0);
+        } else {
+          setUnreadComm(c.messages.filter((m) => m.userId !== user.id).length);
+        }
+      } catch {}
       if (!isAdmin) { try { const s = await api<{ messages: Msg[] }>(`/chat/messages?room=support:${user.id}&after=${seenSupp.current}`); setUnreadSupp(s.messages.filter((m) => m.userId !== user.id).length); if (s.messages.length) api('/chat/ack', { method: 'POST', body: JSON.stringify({ room: `support:${user.id}`, received: Math.max(...s.messages.map((m) => m.id)) }) }).catch(() => {}); } catch {} }
       if (isAdvisor) { try { const a = await api<{ rooms: Room[] }>('/chat/advisory-rooms'); setAdvRooms(a.rooms || []); } catch {} }
       else { try { const s = await api<{ messages: Msg[] }>(`/chat/messages?room=advisory:${user.id}&after=${seenAdv.current}`); setUnreadAdv(s.messages.filter((m) => m.userId !== user.id).length); if (s.messages.length) api('/chat/ack', { method: 'POST', body: JSON.stringify({ room: `advisory:${user.id}`, received: Math.max(...s.messages.map((m) => m.id)) }) }).catch(() => {}); } catch {} }
     };
     poll();
     const iv = setInterval(poll, 12000);
-    return () => clearInterval(iv);
+    const onVis = () => { if (document.visibilityState === 'visible') poll(); }; // quay lại tab → cập nhật ngay
+    document.addEventListener('visibilitychange', onVis);
+    return () => { clearInterval(iv); document.removeEventListener('visibilitychange', onVis); };
   }, [user, isAdmin, isAdvisor]);
 
   // Phòng đang mở: nạp + polling dự phòng
@@ -214,11 +242,43 @@ export default function ChatWidget() {
       clearTimeout(hideT);
       hideT = setTimeout(() => setHint(false), dur);
     };
-    const firstT = setTimeout(show, 2000);
-    const iv = setInterval(show, 240000); // hiện lại mỗi 4 phút
+    // Chỉ chào lần MỞ APP đầu (mỗi phiên) — không hiện lại mỗi lần chuyển trang.
+    let already = false;
+    try { already = !!sessionStorage.getItem('cl-hint-shown'); } catch {}
+    let firstT: any;
+    if (!already) firstT = setTimeout(() => { show(); try { sessionStorage.setItem('cl-hint-shown', '1'); } catch {} }, 2000);
+    const iv = setInterval(show, 240000); // hiện lại mỗi 4 phút (trong phiên)
     return () => { clearTimeout(firstT); clearTimeout(hideT); clearInterval(iv); };
   }, []);
   function dismissHint() { setHint(false); hintStop.current = true; }
+  // ===== Bong bóng chat kéo di chuyển tự do (chat head Android) — dính mép + nhớ vị trí =====
+  useEffect(() => { try { const s = localStorage.getItem('cl-bubble-pos'); if (s) { const p = JSON.parse(s); if (p && typeof p.x === 'number' && typeof p.y === 'number') setBubblePos(p); } } catch {} }, []);
+  const BUB = 56;
+  function clampBubble(x: number, y: number) {
+    const W = typeof window !== 'undefined' ? window.innerWidth : 400, H = typeof window !== 'undefined' ? window.innerHeight : 800;
+    return { x: Math.max(6, Math.min(x, W - BUB - 6)), y: Math.max(6, Math.min(y, H - BUB - 6)) };
+  }
+  function bubbleDown(e: any) {
+    const r = e.currentTarget.getBoundingClientRect();
+    bubbleDrag.current = { sx: e.clientX, sy: e.clientY, ox: r.left, oy: r.top, moved: false, lx: r.left, ly: r.top };
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
+  }
+  function bubbleMove(e: any) {
+    const d = bubbleDrag.current; if (!d) return;
+    const dx = e.clientX - d.sx, dy = e.clientY - d.sy;
+    if (Math.abs(dx) > 6 || Math.abs(dy) > 6) { d.moved = true; if (hint) setHint(false); }
+    if (d.moved) { const p = clampBubble(d.ox + dx, d.oy + dy); d.lx = p.x; d.ly = p.y; setBubblePos(p); }
+  }
+  function bubbleUp() {
+    const d = bubbleDrag.current; bubbleDrag.current = null; if (!d) return;
+    if (d.moved) {
+      bubbleMoved.current = true;
+      const W = window.innerWidth, snapX = (d.lx + BUB / 2) < W / 2 ? 8 : W - BUB - 8; // dính mép trái/phải
+      const fin = clampBubble(snapX, d.ly);
+      setBubblePos(fin);
+      try { localStorage.setItem('cl-bubble-pos', JSON.stringify(fin)); } catch {}
+    }
+  }
 
   function pushMsgs(arr: Msg[]) {
     const fresh = (arr || []).filter((m) => m && !seen.current.has(m.id));
@@ -323,31 +383,48 @@ export default function ChatWidget() {
           </div>
         </div>
       )}
-      <div className="fixed bottom-5 right-5 z-[55] flex items-center gap-2">
-        {!open && hint && (
-          <div className="relative bg-white rounded-2xl shadow-xl border border-slate-200 pl-3.5 pr-3 py-2.5 w-[182px] animate-bounce" style={{ animationDuration: '1.5s' }}>
+      {/* Popup MỜI GỌI gửi bán (ĐIỆN THOẠI dọc) — mobile không có bong bóng nên hiện lời mời độc lập ở góc dưới. Bấm → mở form Gửi bán. */}
+      {!open && hint && (
+        <div className="fixed z-[55] cl-fab right-4 md:right-5 pointer-events-none sm:hidden">
+          <div className="relative pointer-events-auto bg-white rounded-2xl shadow-xl border border-slate-200 pl-3.5 pr-3 py-2.5 w-[210px] animate-bounce" style={{ animationDuration: '1.5s' }}>
             <button onClick={dismissHint} aria-label="Đóng" className="absolute -top-2 -right-2 w-5 h-5 bg-slate-700 hover:bg-slate-900 text-white rounded-full text-xs grid place-items-center">×</button>
-            <button onClick={() => { setTab('sell'); setOpen(true); dismissHint(); }} className="text-left w-full">
-              <p className="font-bold text-[#0A2540] text-sm leading-snug">🏷️ Có nhà đất cần bán?</p>
+            <button onClick={() => { primeAudio(); setTab('sell'); setOpen(true); dismissHint(); }} className="text-left w-full">
+              <p className="font-bold text-[#0A2540] text-sm leading-snug">🏷️ Có nhà đất cần bán / ký gửi?</p>
+              <p className="text-xs text-slate-500 mt-0.5">Bấm vào đây để gửi bán — miễn phí!</p>
+            </button>
+          </div>
+        </div>
+      )}
+      {/* Bong bóng chat NỔI — hiện trên web & tablet/iPad (sm+, ≥640px); điện thoại (dọc) dùng icon chat trên header. Kèm lời mời gửi bán phía trên. */}
+      <div className={`fixed z-[55] hidden sm:flex flex-col items-end gap-2 select-none pointer-events-none ${bubblePos ? '' : 'cl-fab right-4 md:right-5'}`} style={bubblePos ? { left: bubblePos.x, top: bubblePos.y } : undefined}>
+        {!open && hint && (
+          <div className="relative pointer-events-auto bg-white rounded-2xl shadow-xl border border-slate-200 pl-3.5 pr-3 py-2.5 w-[210px] animate-bounce" style={{ animationDuration: '1.5s' }}>
+            <button onClick={dismissHint} aria-label="Đóng" className="absolute -top-2 -right-2 w-5 h-5 bg-slate-700 hover:bg-slate-900 text-white rounded-full text-xs grid place-items-center">×</button>
+            <button onClick={() => { primeAudio(); setTab('sell'); setOpen(true); dismissHint(); }} className="text-left w-full">
+              <p className="font-bold text-[#0A2540] text-sm leading-snug">🏷️ Có nhà đất cần bán / ký gửi?</p>
               <p className="text-xs text-slate-500 mt-0.5">Bấm vào đây để gửi bán — miễn phí!</p>
             </button>
           </div>
         )}
-        <button onClick={() => { primeAudio(); if (!open) setTab('advisory'); setOpen((o) => !o); }} aria-label="Tin nhắn & gửi bán"
-          className="relative w-14 h-14 grid place-items-center bg-[#0A2540] hover:bg-[#0d2f54] text-white rounded-full shadow-2xl shadow-black/40 ring-2 ring-white/40 transition hover:scale-105 active:scale-95">
+        <button onPointerDown={bubbleDown} onPointerMove={bubbleMove} onPointerUp={bubbleUp} onPointerCancel={() => { bubbleDrag.current = null; }} style={{ touchAction: 'none' }}
+          onClick={() => { if (bubbleMoved.current) { bubbleMoved.current = false; return; } primeAudio(); if (!open) setTab('advisory'); setOpen((o) => !o); }} aria-label="Tin nhắn & gửi bán" title="Bấm để mở · Giữ và kéo để di chuyển"
+          className="relative pointer-events-auto w-14 h-14 grid place-items-center bg-[#0A2540] hover:bg-[#0d2f54] text-white rounded-full shadow-2xl shadow-black/40 ring-2 ring-white/40 transition hover:scale-105 active:scale-95 cursor-grab active:cursor-grabbing">
           {open ? <span className="text-2xl leading-none">×</span> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z" /></svg>}
           {!open && unread > 0 && <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 grid place-items-center bg-red-600 text-white text-[11px] font-bold rounded-full ring-2 ring-white">{unread > 99 ? '99+' : unread}</span>}
         </button>
       </div>
 
       {open && (
-        <div className={`fixed bottom-24 right-3 sm:right-5 z-[56] w-[94vw] ${twoPane ? 'max-w-[680px]' : 'max-w-sm'} h-[70vh] max-h-[580px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden`}>
+        <>
+        {/* Lớp phủ CHỈ chặn thao tác lớp dưới (trang + thanh dưới) khi chat mở; đóng chat bằng nút ✕ (bấm ra ngoài KHÔNG đóng). */}
+        <div className="fixed inset-0 z-[55] bg-black/30" aria-hidden="true" />
+        <div className={`fixed z-[56] bg-white shadow-2xl flex flex-col overflow-hidden inset-0 pt-[env(safe-area-inset-top)] sm:inset-auto sm:pt-0 sm:bottom-5 sm:right-5 sm:w-[94vw] ${twoPane ? 'sm:max-w-[680px]' : 'sm:max-w-sm'} sm:h-[70vh] sm:max-h-[580px] sm:rounded-2xl sm:border sm:border-slate-200`}>
           <div className="bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white shrink-0">
             <div className="flex items-center justify-between px-4 pt-3">
               <b className="flex items-center gap-2">Cam Lâm Land {tab !== 'sell' && <span className={`w-2 h-2 rounded-full ${live ? 'bg-emerald-400' : 'bg-slate-400'}`} />}</b>
               <div className="flex items-center gap-3">
                 <button onClick={toggleNotify} title={notify ? 'Tắt báo tin nhắn' : 'Bật báo tin nhắn'} className="text-white/70 hover:text-white text-base leading-none">{notify ? '🔔' : '🔕'}</button>
-                <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white text-xl leading-none">✕</button>
+                <button onClick={() => setOpen(false)} aria-label="Đóng" title="Đóng" className="text-white/80 hover:text-white text-xl leading-none">✕</button>
               </div>
             </div>
             <div className="flex mt-2 text-[13px] font-bold">
@@ -391,7 +468,7 @@ export default function ChatWidget() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <select className={inp} value={sf.propertyType} onChange={(e) => setS('propertyType', e.target.value)}><option value="">Loại hình</option>{TYPES.map((t) => <option key={t} value={t}>{PROPERTY_LABELS[t]}</option>)}</select>
-                    <select className={inp} value={sf.ward} onChange={(e) => setS('ward', e.target.value)}><option value="">Xã / phường</option>{WARDS.map((w) => <option key={w} value={w}>{w}</option>)}</select>
+                    <select className={inp} value={sf.ward} onChange={(e) => setS('ward', e.target.value)}><option value="">Xã / phường</option><optgroup label="Xã hiện nay (sau sáp nhập)">{WARDS_NEW.map((w) => <option key={w} value={w}>{w}</option>)}</optgroup><optgroup label="Xã/thị trấn cũ">{WARDS_OLD.map((w) => <option key={w} value={w}>{w}</option>)}</optgroup></select>
                   </div>
                   <input className={inp} value={sf.address} onChange={(e) => setS('address', e.target.value)} placeholder="Địa chỉ (đường, thôn…)" />
                   <div className="grid grid-cols-2 gap-3">
@@ -400,7 +477,7 @@ export default function ChatWidget() {
                   </div>
                   <textarea className={`${inp} min-h-[70px]`} value={sf.description} onChange={(e) => setS('description', e.target.value)} placeholder="Mô tả thêm (hướng, pháp lý…)" />
                   {serr && <p className="text-sm text-red-600 font-semibold">{serr}</p>}
-                  <button disabled={busy} onClick={submitSell} className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold py-3 rounded-xl">{busy ? 'Đang gửi…' : 'Gửi thông tin'}</button>
+                  <button disabled={busy} onClick={submitSell} className="cl-press w-full bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold py-3 rounded-xl">{busy ? 'Đang gửi…' : 'Gửi thông tin'}</button>
                   <p className="text-[11px] text-slate-400 text-center">Hoặc gọi <a href="tel:0988888888" className="font-bold text-[#0A2540]">0988 888 888</a></p>
                 </div>
               )}
@@ -409,7 +486,7 @@ export default function ChatWidget() {
             <div className="flex-1 grid place-items-center p-6 text-center">
               <div>
                 <p className="text-slate-500 text-sm">Đăng nhập để chat cộng đồng & nhắn admin.</p>
-                <a href="/login" className="inline-block mt-3 bg-[#0A2540] text-white font-bold px-5 py-2.5 rounded-xl text-sm">Đăng nhập</a>
+                <Link href="/login" className="inline-block mt-3 bg-[#0A2540] text-white font-bold px-5 py-2.5 rounded-xl text-sm">Đăng nhập</Link>
               </div>
             </div>
           ) : (
@@ -478,9 +555,17 @@ export default function ChatWidget() {
                   </div>
                 )}
                 {tab === 'community' && (
-                <div className="px-3 py-1.5 bg-slate-50 border-b border-slate-100 shrink-0 text-center">
-                  <p className="text-[11px] font-bold text-[#0A2540]">👥 Cộng đồng đầu tư Cam Lâm</p>
-                  <p className="text-[10px] text-slate-500">Admin: Nguyễn Quốc Cường · <a href="tel:0988888888" className="font-semibold text-[#0A2540]">0988 888 888</a></p>
+                <div className="shrink-0 border-b border-slate-100 bg-slate-50">
+                  <div className="flex items-center gap-2 px-2.5 py-1">
+                    <span className="min-w-0 flex-1 leading-tight">
+                      <span className="block text-[11px] font-bold text-[#0A2540] truncate">👥 Cộng đồng Cam Lâm Land</span>
+                      <span className="block text-[9px] text-slate-500 truncate">Admin: Nguyễn Quốc Cường · <a href="tel:0988888888" className="font-semibold text-[#0A2540]">0988 888 888</a></span>
+                    </span>
+                    <button onClick={() => setGameOpen((v) => !v)} className="shrink-0 flex items-center gap-1 rounded-full bg-[#0A2540] pl-2 pr-2.5 py-1 text-[10px] font-bold text-white hover:brightness-110">
+                      <span>🎮</span><span className="text-[#C8A14B]">Game trúng quà</span><span>{gameOpen ? '▴' : '▾'}</span>
+                    </button>
+                  </div>
+                  {gameOpen && <div className="px-2 pb-2"><FlappyMini maxH={168} /></div>}
                 </div>
               )}
                 {tab === 'advisory' && !twoPane && (
@@ -530,7 +615,7 @@ export default function ChatWidget() {
                       )}
                       <div className="flex gap-2">
                         <input ref={msgInputRef} value={text} onChange={(e) => { setText(e.target.value); if (warn) setWarn(''); }} onKeyDown={(e) => { if (e.key === 'Enter') { if (mentionList.length) { e.preventDefault(); pickMention(mentionList[0]); } else send(); } }} placeholder="Nhập tin nhắn…  (gõ @ để nhắc tên)" className="flex-1 border border-slate-300 rounded-full px-3.5 py-2 text-sm outline-none focus:border-[#0A2540]" />
-                        <button onClick={send} className="bg-red-600 hover:bg-red-700 text-white rounded-full px-4 py-2 text-sm font-bold shrink-0">Gửi</button>
+                        <button onClick={send} className="cl-press bg-red-600 hover:bg-red-700 text-white rounded-full px-4 py-2 text-sm font-bold shrink-0">Gửi</button>
                       </div>
                     </div>
                   </div>
@@ -539,6 +624,7 @@ export default function ChatWidget() {
             </div>
           )}
         </div>
+        </>
       )}
     </>
   );

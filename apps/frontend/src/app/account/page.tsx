@@ -46,12 +46,12 @@ export default function Account() {
   const lbl = 'block text-sm font-semibold text-slate-700 mb-1';
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-8">
-      <div className="mx-auto max-w-2xl px-4 space-y-5">
-        <h1 className="text-2xl font-extrabold text-[#0A2540]">Tài khoản của tôi</h1>
+    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-5 sm:py-8">
+      <div className="mx-auto max-w-2xl px-3 sm:px-4 space-y-4 sm:space-y-5">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540]">Tài khoản của tôi</h1>
 
-        <form onSubmit={saveInfo} className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
-          <div className="flex items-center gap-4">
+        <form onSubmit={saveInfo} className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             {avatar
               ? <img src={avatar} alt="" className="w-20 h-20 rounded-full object-cover ring-2 ring-[#C8A14B]/40" />
               : <div className="w-20 h-20 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-2xl font-extrabold">{(fullName || user.email || 'U').charAt(0).toUpperCase()}</div>}
@@ -67,14 +67,14 @@ export default function Account() {
           <div><label className={lbl}>Họ và tên</label><input className={inp} value={fullName} onChange={(e) => setFullName(e.target.value)} /></div>
           <div><label className={lbl}>Số điện thoại</label><input className={inp} value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
           <div><label className={lbl}>Email</label><input className={`${inp} bg-slate-50 text-slate-500`} value={user.email} disabled /></div>
-          <button disabled={busy || uploading} className="bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold px-6 py-2.5 rounded-xl shadow-sm shadow-red-600/30">Lưu thông tin</button>
+          <button disabled={busy || uploading} className="cl-press bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold px-6 py-2.5 rounded-xl shadow-sm shadow-red-600/30">Lưu thông tin</button>
         </form>
 
-        <form onSubmit={savePw} className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
+        <form onSubmit={savePw} className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
           <h2 className="font-bold text-[#0A2540]">Đổi mật khẩu</h2>
           <div><label className={lbl}>Mật khẩu hiện tại</label><PasswordInput value={curPw} onChange={(e) => setCurPw(e.target.value)} autoComplete="current-password" /></div>
           <div><label className={lbl}>Mật khẩu mới (≥ 6 ký tự)</label><PasswordInput value={newPw} onChange={(e) => setNewPw(e.target.value)} autoComplete="new-password" /></div>
-          <button disabled={busy || !curPw || !newPw} className="bg-[#0A2540] hover:bg-[#0d2f54] disabled:opacity-60 text-white font-bold px-6 py-2.5 rounded-xl">Đổi mật khẩu</button>
+          <button disabled={busy || !curPw || !newPw} className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] disabled:opacity-60 text-white font-bold px-6 py-2.5 rounded-xl">Đổi mật khẩu</button>
         </form>
 
         {err && <p className="text-red-600 text-sm font-semibold">{err}</p>}

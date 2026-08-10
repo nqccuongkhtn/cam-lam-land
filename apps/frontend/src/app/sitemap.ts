@@ -1,13 +1,18 @@
 import type { MetadataRoute } from 'next';
+import { ALL_SLUGS } from '@/lib/seoLanding';
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://camlamland.onrender.com';
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns.org';
 const BACKEND = process.env.BACKEND_HOST ? (process.env.BACKEND_HOST.startsWith('http') ? process.env.BACKEND_HOST : `https://${process.env.BACKEND_HOST}`) : '';
 
 export const revalidate = 3600; // làm mới sitemap mỗi giờ
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticUrls: MetadataRoute.Sitemap = ['', '/listings', '/map', '/gia-dat', '/bang-gia-dat', '/tin-tuc', '/qr', '/cam-nang', '/dau-tu', '/dichvu'].map((p) => ({
+  const staticUrls: MetadataRoute.Sitemap = ['', '/listings', '/nha-dat', '/map', '/gia-dat', '/bang-gia-dat', '/tin-tuc', '/qr', '/cam-nang', '/dau-tu', '/dichvu'].map((p) => ({
     url: `${SITE}${p}`, changeFrequency: p === '' || p === '/listings' ? 'daily' : 'weekly', priority: p === '' ? 1 : 0.8,
+  }));
+  // Trang đích SEO theo khu vực × loại hình (đất nền Cam Đức, nhà phố Bãi Dài…)
+  const landing: MetadataRoute.Sitemap = ALL_SLUGS.map((slug) => ({
+    url: `${SITE}/nha-dat/${slug}`, changeFrequency: 'daily', priority: 0.75,
   }));
   let listings: MetadataRoute.Sitemap = [];
   try {
@@ -23,5 +28,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     }
   } catch { /* backend lỗi -> chỉ trả sitemap tĩnh */ }
-  return [...staticUrls, ...listings];
+  return [...staticUrls, ...landing, ...listings];
 }

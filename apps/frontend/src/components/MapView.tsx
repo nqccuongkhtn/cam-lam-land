@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import maplibregl, { Map as MlMap, Marker } from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css'; // CSS đi kèm CHUNK bản đồ (chỉ tải ở trang có map) — bỏ link unpkg toàn cục cho nhẹ mọi trang khác
 import { Protocol as PMTilesProtocol } from 'pmtiles';
 import { MAP } from '@/lib/config';
 
@@ -9,8 +10,8 @@ if (typeof window !== 'undefined' && !(maplibregl as any).__pmtiles) {
   try { (maplibregl as any).addProtocol('pmtiles', new PMTilesProtocol().tile); (maplibregl as any).__pmtiles = true; } catch {}
 }
 
-export interface GeoLayer { id: string; type: 'fill' | 'line' | 'circle' | 'symbol'; data: GeoJSON.FeatureCollection; visible: boolean; paint: Record<string, any>; layout?: Record<string, any>; beforeId?: string; }
-export interface MarkerSpec { lng: number; lat: number; color?: string; popupHtml?: string; label?: string; tier?: string; dot?: boolean; onClick?: () => void; }
+export interface GeoLayer { id: string; type: 'fill' | 'line' | 'circle' | 'symbol'; data: GeoJSON.FeatureCollection; visible: boolean; paint: Record<string, any>; layout?: Record<string, any>; beforeId?: string; minzoom?: number; }
+export interface MarkerSpec { lng: number; lat: number; color?: string; popupHtml?: string; label?: string; tier?: string; dot?: boolean; onClick?: () => void; chip?: string; }
 export interface ImageOverlay { id: string; url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number; visible: boolean; pmtiles?: string; fillMaxzoom?: number; tiles?: string[]; minzoom?: number; maxzoom?: number; }
 export type BaseMap = 'street' | 'satellite' | 'terrain';
 export type MeasureMode = 'off' | 'distance' | 'area';
@@ -21,6 +22,7 @@ interface Props {
   layers?: GeoLayer[]; markers?: MarkerSpec[]; overlays?: ImageOverlay[];
   baseMap?: BaseMap; labels?: boolean; measureMode?: MeasureMode;
   focusPoint?: { lng: number; lat: number; label?: string } | null;
+  flyToPoint?: { lng: number; lat: number } | null; // bay tới + zoom cận + dời tâm lên (điểm nằm giữa vùng trống, không bị bảng che)
   highlight?: GeoJSON.Feature | null;
   initialBounds?: [[number, number], [number, number]]; // tự khớp khung vùng quy hoạch khi mở
   adMarkers?: { id: number; lng: number; lat: number; name: string; phone: string; image?: string | null; style?: string }[];
@@ -29,6 +31,7 @@ interface Props {
   onMapClick?: (lng: number, lat: number) => void;
   onMeasure?: (r: MeasureResult) => void;
   onViewport?: (v: { west: number; south: number; east: number; north: number; zoom: number }) => void;
+  textLabels?: { lng: number; lat: number; text: string; minzoom?: number }[]; // nhãn chữ vẽ bằng HTML (không cần glyph/font server)
 }
 
 // Google tiles — best detail/zoom for Vietnam. lyrs: m=đường, y=vệ tinh+nhãn, p=địa hình
@@ -74,12 +77,52 @@ function polyArea(pts: { lng: number; lat: number }[]) {
 
 const WM_MIN_ZOOM = 14; // chữ mờ chỉ hiện khi zoom gần
 const WM_OPACITY = 0.55; // rõ hơn một chút cho dễ đọc
-export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, onMapClick, onMeasure, onViewport }: Props) {
+// ==== Kích thước thửa (độ dài từng cạnh + diện tích) — hiển thị kiểu Guland ====
+function edgeMeters(a: number[], b: number[]): number {
+  const R = 6378137, toR = Math.PI / 180;
+  const dLat = (b[1] - a[1]) * toR, dLng = (b[0] - a[0]) * toR;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a[1] * toR) * Math.cos(b[1] * toR) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+function ringAreaM2(ring: number[][]): number {
+  const R = 6378137, toR = Math.PI / 180;
+  const lat0 = ring.reduce((s, p) => s + p[1], 0) / ring.length * toR;
+  const xy = ring.map((p) => [p[0] * toR * R * Math.cos(lat0), p[1] * toR * R]);
+  let a = 0;
+  for (let i = 0; i < xy.length - 1; i++) a += xy[i][0] * xy[i + 1][1] - xy[i + 1][0] * xy[i][1];
+  return Math.abs(a) / 2;
+}
+function parcelDims(hl: any): any[] {
+  if (!hl || !hl.geometry) return [];
+  const g = hl.geometry;
+  const polys = g.type === 'Polygon' ? [g.coordinates] : g.type === 'MultiPolygon' ? g.coordinates : [];
+  const out: any[] = [];
+  for (const poly of polys) {
+    const ring = poly[0]; if (!ring || ring.length < 3) continue;
+    for (let i = 0; i < ring.length - 1; i++) {
+      const a = ring[i], b = ring[i + 1];
+      const d = edgeMeters(a, b);
+      if (d < 0.3) continue;
+      const latR = (a[1] + b[1]) / 2 * Math.PI / 180;
+      const rot = Math.atan2((b[0] - a[0]) * Math.cos(latR), b[1] - a[1]) * 180 / Math.PI - 90; // xoay chữ dọc cạnh
+      out.push({ type: 'Feature', properties: { len: d < 10 ? d.toFixed(1) + 'm' : Math.round(d) + 'm', rot }, geometry: { type: 'Point', coordinates: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] } });
+    }
+    const n = ring.length - 1;
+    const cx = ring.slice(0, n).reduce((s: number, p: number[]) => s + p[0], 0) / n;
+    const cy = ring.slice(0, n).reduce((s: number, p: number[]) => s + p[1], 0) / n;
+    const area = ringAreaM2(ring);
+    out.push({ type: 'Feature', properties: { area: (area >= 1000 ? Math.round(area).toLocaleString('vi') : area.toFixed(1)) + ' m²' }, geometry: { type: 'Point', coordinates: [cx, cy] } });
+  }
+  return out;
+}
+
+export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, flyToPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, onMapClick, onMeasure, onViewport, textLabels = [] }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const markerRefs = useRef<Marker[]>([]);
   const focusMarker = useRef<Marker | null>(null);
   const adRefs = useRef<Marker[]>([]);
+  const labelRefs = useRef<Marker[]>([]);
   const adOpacityRef = useRef(adOpacity); adOpacityRef.current = adOpacity;
   const wmRef = useRef<HTMLDivElement | null>(null);
   const onViewportRef = useRef(onViewport); onViewportRef.current = onViewport;
@@ -113,10 +156,16 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       map.addLayer({ id: 'measure-pts', type: 'circle', source: 'measure', filter: ['==', '$type', 'Point'], paint: { 'circle-radius': 4, 'circle-color': '#ea580c', 'circle-stroke-color': '#fff', 'circle-stroke-width': 1.5 } });
       map.addSource('highlight', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
       map.addLayer({ id: 'highlight-fill', type: 'fill', source: 'highlight', filter: ['==', '$type', 'Polygon'], paint: { 'fill-color': '#fde047', 'fill-opacity': 0.35 } });
-      map.addLayer({ id: 'highlight-line', type: 'line', source: 'highlight', paint: { 'line-color': '#ca8a04', 'line-width': 3 } });
+      map.addLayer({ id: 'highlight-line', type: 'line', source: 'highlight', paint: { 'line-color': '#7c3aed', 'line-width': 2.5 } });
+      // Kích thước thửa kiểu Guland: độ dài từng cạnh (dọc cạnh) + diện tích ở giữa
+      map.addSource('highlight-dims', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+      map.addLayer({ id: 'hl-edge', type: 'symbol', source: 'highlight-dims', filter: ['has', 'len'], layout: { 'text-field': ['get', 'len'], 'text-size': 11, 'text-font': ['Noto Sans Regular'], 'text-rotate': ['get', 'rot'], 'text-rotation-alignment': 'map', 'text-keep-upright': true, 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': '#ffffff', 'text-halo-color': '#7c3aed', 'text-halo-width': 2 } });
+      map.addLayer({ id: 'hl-area', type: 'symbol', source: 'highlight-dims', filter: ['has', 'area'], layout: { 'text-field': ['get', 'area'], 'text-size': 13, 'text-font': ['Noto Sans Regular'], 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': '#0A2540', 'text-halo-color': '#ffffff', 'text-halo-width': 2.5 } });
       syncBase(); syncOverlays(); syncLayers(); tryInitialFit();
     });
     map.on('click', (e) => {
+      const tgt = e.originalEvent?.target as HTMLElement | null;
+      if (tgt && tgt.closest && tgt.closest('.maplibregl-marker')) return; // bấm trúng marker (pin giá, quảng cáo, điểm lưu) → chỉ mở popup của nó, KHÔNG xử lý như click bản đồ
       if (measureModeRef.current !== 'off') addMeasurePoint(e.lngLat.lng, e.lngLat.lat);
       else if (onMapClick) onMapClick(e.lngLat.lng, e.lngLat.lat);
     });
@@ -124,8 +173,8 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     mapRef.current = map;
     const wmZoom = () => { if (wmRef.current) wmRef.current.style.display = map.getZoom() < WM_MIN_ZOOM ? 'none' : ''; };
     map.on('zoom', wmZoom); map.on('load', wmZoom);
-    // Zoom SÁT (>=17, sát đường phố) → thêm class để tin thường tự hiện giá như VIP.
-    const zoomClass = () => map.getContainer().classList.toggle('cl-zoomed', map.getZoom() >= 17);
+    // Zoom SÁT (>=16, hợp với điện thoại) → thêm class để tin thường tự hiện giá như VIP.
+    const zoomClass = () => map.getContainer().classList.toggle('cl-zoomed', map.getZoom() >= 16);
     map.on('zoom', zoomClass); map.on('load', zoomClass);
     const fireView = () => { const fn = onViewportRef.current; if (!fn) return; const b = map.getBounds(); fn({ west: b.getWest(), south: b.getSouth(), east: b.getEast(), north: b.getNorth(), zoom: map.getZoom() }); };
     map.on('moveend', fireView); map.on('load', fireView);
@@ -186,11 +235,13 @@ export default function MapView({ center, zoom, className, layers = [], markers 
         if (!map.getSource(fillSrc)) {
           map.addSource(fillSrc, { type: 'raster', tiles: tpl, tileSize: 256, minzoom: ov.minzoom ?? 10, maxzoom: ov.fillMaxzoom ?? 14 } as any);
           map.addLayer({ id: fillId, type: 'raster', source: fillSrc, paint: { 'raster-opacity': ov.opacity } });
+          if (map.getLayer('measure-fill')) map.moveLayer(fillId, 'measure-fill');
         }
         // Lớp CHI TIẾT: mức zoom cao (nét viền) chồng lên trên. Dùng dạng url (đã chạy tốt).
         if (!map.getSource(srcId)) {
           map.addSource(srcId, { type: 'raster', url: ov.pmtiles, tileSize: 256, minzoom: ov.minzoom ?? 10, maxzoom: ov.maxzoom ?? 18 } as any);
           map.addLayer({ id: ov.id, type: 'raster', source: srcId, paint: { 'raster-opacity': ov.opacity, 'raster-resampling': 'nearest' } });
+          if (map.getLayer('measure-fill')) map.moveLayer(ov.id, 'measure-fill');
         }
         for (const id of [fillId, ov.id]) {
           map.setPaintProperty(id, 'raster-opacity', ov.opacity);
@@ -200,7 +251,9 @@ export default function MapView({ center, zoom, className, layers = [], markers 
         if (!map.getSource(srcId)) {
           if (ov.tiles && ov.tiles.length) map.addSource(srcId, { type: 'raster', tiles: ov.tiles, tileSize: 256, minzoom: ov.minzoom ?? 0, maxzoom: ov.maxzoom ?? 22 } as any);
           else map.addSource(srcId, { type: 'image', url: ov.url, coordinates: ov.coordinates as any });
-          map.addLayer({ id: ov.id, type: 'raster', source: srcId, paint: { 'raster-opacity': ov.opacity } });
+          map.addLayer({ id: ov.id, type: 'raster', source: srcId, paint: { 'raster-opacity': ov.opacity, 'raster-resampling': 'nearest' } });
+          // Ép ảnh raster QH xuống DƯỚI mọi lớp vector (ngay trên nền) để KHÔNG che ranh thửa/nhãn.
+          if (map.getLayer('measure-fill')) map.moveLayer(ov.id, 'measure-fill');
         } else map.setPaintProperty(ov.id, 'raster-opacity', ov.opacity);
         map.setLayoutProperty(ov.id, 'visibility', ov.visible ? 'visible' : 'none');
       }
@@ -214,7 +267,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       const srcId = `src-${l.id}`;
       const src = map.getSource(srcId) as maplibregl.GeoJSONSource | undefined;
       if (src) src.setData(l.data as any); else map.addSource(srcId, { type: 'geojson', data: l.data as any });
-      if (!map.getLayer(l.id)) map.addLayer({ id: l.id, type: l.type, source: srcId, paint: l.paint, layout: l.layout || {} } as any, (l.beforeId && map.getLayer(l.beforeId)) ? l.beforeId : undefined);
+      if (!map.getLayer(l.id)) map.addLayer({ id: l.id, type: l.type, source: srcId, paint: l.paint, layout: l.layout || {}, ...(l.minzoom != null ? { minzoom: l.minzoom } : {}) } as any, (l.beforeId && map.getLayer(l.beforeId)) ? l.beforeId : undefined);
       else for (const [k, v] of Object.entries(l.paint)) map.setPaintProperty(l.id, k as any, v);
       map.setLayoutProperty(l.id, 'visibility', l.visible ? 'visible' : 'none');
     }
@@ -223,37 +276,73 @@ export default function MapView({ center, zoom, className, layers = [], markers 
 
   useEffect(() => {
     const map = mapRef.current; if (!map) return;
-    markerRefs.current.forEach((m) => m.remove());
     const TIER_TXT: Record<string, string> = { diamond: 'Kim Cương', gold: 'VIP Vàng', silver: 'VIP Bạc' };
-    markerRefs.current = markers.map((m) => {
+    // Tạo 1 marker DOM theo loại (tin đăng / pin giá / chip / ghim mặc định)
+    const makeMarker = (m: MarkerSpec, pill = true) => {
       let mk: maplibregl.Marker;
       if (m.tier !== undefined) {
-        // Tin đăng: chấm (tin thường) / pill giá + tên gói (VIP). Rê chuột hoặc zoom cận → chấm hiện giá.
-        const isVip = !!m.tier && m.tier !== 'normal';
-        const el = document.createElement('div'); el.className = 'cl-mk ' + (isVip ? 'cl-mk-vip' : 'cl-mk-normal');
+        const vip = !!m.tier && m.tier !== 'normal';
+        // pill=true → bung pill (giá + hạng); pill=false → chỉ CHẤM (chưa tới zoom).
+        const el = document.createElement('div'); el.className = 'cl-mk ' + (pill ? 'cl-mk-vip' : 'cl-mk-normal');
         const dot = document.createElement('b'); dot.className = 'cl-mk-dot'; el.appendChild(dot);
-        const pill = document.createElement('span'); pill.className = 'cl-mk-pill';
-        const pr = document.createElement('span'); pr.textContent = m.label || ''; pill.appendChild(pr);
-        if (isVip) { const tag = document.createElement('b'); tag.className = 'cl-vip-tag cl-vip-' + m.tier; tag.textContent = TIER_TXT[m.tier] || 'VIP'; pill.appendChild(tag); }
-        el.appendChild(pill);
+        const pl = document.createElement('span'); pl.className = 'cl-mk-pill';
+        const pr = document.createElement('span'); pr.textContent = m.label || ''; pl.appendChild(pr);
+        if (pill && vip) { const tag = document.createElement('b'); tag.className = 'cl-vip-tag cl-vip-' + m.tier; tag.textContent = TIER_TXT[m.tier] || 'VIP'; pl.appendChild(tag); }
+        el.appendChild(pl);
         mk = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([m.lng, m.lat]);
       } else if (m.label) {
         const el = document.createElement('div'); el.className = 'cl-price-pin'; el.textContent = m.label;
         mk = new maplibregl.Marker({ element: el, anchor: 'bottom' }).setLngLat([m.lng, m.lat]);
+      } else if (m.chip !== undefined) {
+        const el = document.createElement('div'); el.className = 'cl-chip'; el.textContent = m.chip;
+        mk = new maplibregl.Marker({ element: el, anchor: 'top', offset: [0, 8] }).setLngLat([m.lng, m.lat]);
       } else {
         mk = new maplibregl.Marker({ color: m.color ?? '#e53935' }).setLngLat([m.lng, m.lat]);
       }
-      if (m.popupHtml) mk.setPopup(new maplibregl.Popup({ offset: 18, closeButton: true, closeOnClick: false }).setHTML(m.popupHtml)); // bấm để mở, giữ tới khi bấm X
-      if (m.onClick) mk.getElement().addEventListener('click', m.onClick);
+      if (m.popupHtml) mk.setPopup(new maplibregl.Popup({ offset: 18, closeButton: true, closeOnClick: false }).setHTML(m.popupHtml));
+      if (m.onClick) mk.getElement().addEventListener('click', (ev) => { ev.stopPropagation(); m.onClick!(); });
       mk.addTo(map); return mk;
-    });
+    };
+    // Ngưỡng zoom để BUNG PILL (giá + hạng). Dưới ngưỡng → chỉ CHẤM (tin vẫn hiện). Vàng/Bạc hiện sớm hơn.
+    const PILL_MINZ: Record<string, number> = { diamond: 0, gold: 11, silver: 12.5, normal: 14 };
+    const render = () => {
+      markerRefs.current.forEach((mk) => mk.remove());
+      const z = map.getZoom() || 0;
+      // MỌI tin luôn hiện: đủ zoom → bung pill; chưa đủ → chấm nhỏ. Marker khác (ghim, chip) luôn nguyên.
+      markerRefs.current = markers.map((m) => makeMarker(m, m.tier === undefined ? true : z >= (PILL_MINZ[m.tier] ?? 14)));
+    };
+    render();
+    map.on('moveend', render);
+    return () => { map.off('moveend', render); markerRefs.current.forEach((mk) => mk.remove()); markerRefs.current = []; };
   }, [markers]);
+
+  // Nhãn chữ HTML (vd tên thôn): vẽ bằng DOM nên KHÔNG phụ thuộc glyph/font server (openmaptiles).
+  // Khi mạng chặn font server, chữ symbol của MapLibre không hiện — nhãn HTML này vẫn hiện bình thường.
+  useEffect(() => {
+    const map = mapRef.current; if (!map || !readyRef.current) return;
+    const build = () => {
+      labelRefs.current.forEach((m) => m.remove()); labelRefs.current = [];
+      if (!textLabels.length) return;
+      const z = map.getZoom() || 0;
+      for (const t of textLabels) {
+        if (z < (t.minzoom ?? 10.5)) continue;
+        const el = document.createElement('div');
+        el.style.cssText = "font:700 12px/1.1 system-ui,'Segoe UI',Arial,sans-serif;color:#4a148c;white-space:nowrap;pointer-events:none;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff,0 0 2px #fff;";
+        el.textContent = t.text;
+        labelRefs.current.push(new maplibregl.Marker({ element: el, anchor: 'left' }).setLngLat([t.lng, t.lat]).addTo(map));
+      }
+    };
+    build();
+    map.on('moveend', build);
+    return () => { map.off('moveend', build); labelRefs.current.forEach((m) => m.remove()); labelRefs.current = []; };
+  }, [textLabels]);
 
   // Logo quảng cáo tròn (avatar/ảnh + tên & SĐT ngoài vòng, chữ Cam Lâm Land bên trong)
   useEffect(() => {
     const map = mapRef.current; if (!map) return;
     adRefs.current.forEach((m) => m.remove());
     const esc = (x: any) => String(x ?? '').replace(/[<>&"]/g, (c) => (({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' } as any)[c]));
+    const adSize = typeof window !== 'undefined' && window.innerWidth < 768 ? 58 : 96; // huy hiệu NHỎ hơn trên điện thoại → đỡ che bản đồ & thanh điều khiển
     adRefs.current = adMarkers.filter((a) => a.style !== 'text').map((a) => {
       const el = document.createElement('div'); el.className = 'cl-ad'; el.style.opacity = String(adOpacityRef.current);
       const nm = esc(String(a.name || '').slice(0, 28)), tel = esc(String(a.phone || ''));
@@ -266,7 +355,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
         const center = a.image
           ? `<image xlink:href="${esc(a.image)}" x="18" y="18" width="64" height="64" clip-path="url(#c${uid})" preserveAspectRatio="xMidYMid slice"/>`
           : `<text x="50" y="51" text-anchor="middle" dominant-baseline="middle" font-size="26" font-weight="800" fill="#C8A14B" font-family="Inter,sans-serif">${esc(String(a.name || 'C').charAt(0)).toUpperCase()}</text>`;
-        el.innerHTML = `<svg width="96" height="96" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><clipPath id="c${uid}"><circle cx="50" cy="50" r="28"/></clipPath><path id="t${uid}" d="M 11 50 A 39 39 0 0 1 89 50"/><path id="b${uid}" d="M 4 50 A 46 46 0 0 0 96 50"/></defs><circle cx="50" cy="50" r="49" fill="#0A2540"/><circle cx="50" cy="50" r="47.5" fill="none" stroke="#C8A14B" stroke-width="1"/>${center}<circle cx="50" cy="50" r="29" fill="none" stroke="#C8A14B" stroke-width="1.4"/><text font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="#ffffff"><textPath xlink:href="#t${uid}" startOffset="50%" text-anchor="middle" textLength="96" lengthAdjust="spacingAndGlyphs">${nm}</textPath></text><text font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="#ffffff"><textPath xlink:href="#b${uid}" startOffset="50%" text-anchor="middle" textLength="96" lengthAdjust="spacingAndGlyphs">${tel}</textPath></text><text x="7.5" y="50" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#C8A14B">★</text><text x="92.5" y="50" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#C8A14B">★</text></svg>`;
+        el.innerHTML = `<svg width="${adSize}" height="${adSize}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><clipPath id="c${uid}"><circle cx="50" cy="50" r="28"/></clipPath><path id="t${uid}" d="M 11 50 A 39 39 0 0 1 89 50"/><path id="b${uid}" d="M 4 50 A 46 46 0 0 0 96 50"/></defs><circle cx="50" cy="50" r="49" fill="#0A2540"/><circle cx="50" cy="50" r="47.5" fill="none" stroke="#C8A14B" stroke-width="1"/>${center}<circle cx="50" cy="50" r="29" fill="none" stroke="#C8A14B" stroke-width="1.4"/><text font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="#ffffff"><textPath xlink:href="#t${uid}" startOffset="50%" text-anchor="middle" textLength="96" lengthAdjust="spacingAndGlyphs">${nm}</textPath></text><text font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="#ffffff"><textPath xlink:href="#b${uid}" startOffset="50%" text-anchor="middle" textLength="96" lengthAdjust="spacingAndGlyphs">${tel}</textPath></text><text x="7.5" y="50" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#C8A14B">★</text><text x="92.5" y="50" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#C8A14B">★</text></svg>`;
       }
       const mk = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([a.lng, a.lat]);
       mk.setPopup(new maplibregl.Popup({ offset: 28 }).setHTML(
@@ -326,6 +415,12 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     map.flyTo({ center: [focusPoint.lng, focusPoint.lat], zoom: Math.max(map.getZoom(), 16) });
   }, [focusPoint]);
 
+  // Click 1 điểm → bay tới, zoom cận, dời tâm LÊN để pin nằm giữa vùng trống phía trên (không bị bảng thông tin thửa che).
+  useEffect(() => {
+    const map = mapRef.current; if (!map || !flyToPoint) return;
+    map.easeTo({ center: [flyToPoint.lng, flyToPoint.lat], zoom: Math.max(map.getZoom(), 17), offset: [0, -150], duration: 600 });
+  }, [flyToPoint]);
+
   useEffect(() => {
     const map = mapRef.current; if (!map || !fitTo) return;
     map.fitBounds(fitTo as any, { padding: 60, animate: true, maxZoom: 19, duration: 800 });
@@ -336,7 +431,9 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     const src = map.getSource('highlight') as maplibregl.GeoJSONSource | undefined;
     if (!src) return;
     src.setData((highlight ? { type: 'FeatureCollection', features: [highlight] } : { type: 'FeatureCollection', features: [] }) as any);
-    ['highlight-fill', 'highlight-line'].forEach((id) => { if (map.getLayer(id)) map.moveLayer(id); });
+    const dsrc = map.getSource('highlight-dims') as maplibregl.GeoJSONSource | undefined;
+    if (dsrc) dsrc.setData({ type: 'FeatureCollection', features: parcelDims(highlight) } as any);
+    ['highlight-fill', 'highlight-line', 'hl-edge', 'hl-area'].forEach((id) => { if (map.getLayer(id)) map.moveLayer(id); });
   }, [highlight]);
 
   return <div ref={containerRef} className={className ?? 'h-full w-full'} />;

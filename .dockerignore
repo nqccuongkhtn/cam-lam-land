@@ -1,0 +1,39 @@
+# Build context slimming — các thứ này KHÔNG được COPY trong bất kỳ Dockerfile nào
+# (mỗi image tự npm install / next build), nên loại khỏi context để build NHANH & nhẹ hơn.
+# GIỮ LẠI: packages/shared, apps/*, db/init, data/cam-lam (đều được COPY).
+
+# Nặng nhất & luôn an toàn khi loại
+**/node_modules
+**/.next
+.git
+.gitignore
+.gitattributes
+
+# Thư mục/tệp KHÔNG dùng khi build image
+backup
+_scripts-cu
+_qh_tile_cu_qd205v4
+HD-lam-tile-quyhoach
+__pycache__
+scripts/qh-pipeline
+
+# Dữ liệu bản đồ gốc / tệp nặng ở thư mục gốc (không được COPY)
+*.dgn
+*.gtp
+*.npy
+*.log
+*.tmp
+
+# Tài liệu & script quản lý máy chủ (không cần trong image)
+*.md
+*.bat
+*.ps1
+*.vbs
+
+# Biến môi trường bí mật — không đưa vào image (Dockerfile không COPY .env)
+.env
+.env.*
+!.env.example
+
+# ===== Xưởng xử lý dữ liệu — KHÔNG cần trong image web (loại cả thư mục) =====
+quyhoach2025

@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import { api, NO_IMG } from '@/lib/api';
 import { Listing, PropertyType, PROPERTY_LABELS } from '@/lib/types';
 import ListingCard from '@/components/ListingCard';
 import HomeUtilities from '@/components/HomeUtilities';
@@ -43,7 +43,7 @@ const STATS = [
   { n: '2,000+', l: 'Bất động sản', d: 'M3 21h18M5 21V7l6-4 6 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01' },
   { n: '5,000+', l: 'Khách hàng', d: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' },
   { n: '50+', l: 'Dự án quy hoạch', d: 'M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' },
-  { n: '8', l: 'Xã / Khu vực', d: 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z' },
+  { n: '8 năm', l: 'Kinh nghiệm', d: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 6v6l4 2' },
 ];
 
 const NEWS: Record<string, { title: string; url: string; img?: string; date?: string; source?: string }[]> = {
@@ -67,6 +67,9 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
     { title: 'Các loại thuế, phí khi mua bán nhà đất phải nộp', url: '/cam-nang/thue-phi-mua-ban-nha-dat' },
     { title: 'Cách kiểm tra Sổ đỏ thật hay giả nhanh, chính xác', url: '/cam-nang/kiem-tra-so-do-that-gia' },
     { title: 'Cách kiểm tra đất có dính quy hoạch không', url: '/cam-nang/kiem-tra-quy-hoach-dat' },
+    { title: '🔎 Tra cứu văn bản pháp luật nhà đất (quy hoạch, bồi thường, tái định cư, NOXH)', url: '/van-ban' },
+    { title: '⚖️ Dịch vụ pháp lý nhà đất — sang tên, tách thửa, thuế phí', url: '/cam-nang#dich-vu-phap-ly' },
+    { title: '📝 Mẫu hợp đồng đặt cọc Cam Lâm Land — tạo & in miễn phí', url: '/hop-dong-dat-coc' },
     { title: '📚 Xem tất cả cẩm nang pháp lý nhà đất', url: '/cam-nang' },
   ],
 };
@@ -105,9 +108,9 @@ type AreaWithCount = { name: string; ward: string; sub: string; img: string; cou
 function AreaCard({ a, big }: { a: AreaWithCount; big?: boolean }) {
   return (
     <Link href={`/listings?ward=${encodeURIComponent(a.ward)}`}
-      className={`group relative rounded-2xl overflow-hidden shadow-sm bg-slate-100 ${big ? 'col-span-2 md:row-span-2 h-64 md:h-auto' : 'h-[132px] md:h-auto'}`}>
+      className={`cl-tap group relative rounded-2xl overflow-hidden shadow-sm bg-slate-100 ${big ? 'col-span-2 md:row-span-2 h-64 md:h-auto' : 'h-[132px] md:h-auto'}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={a.img} alt={a.name} loading="lazy" decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://picsum.photos/seed/' + encodeURIComponent(a.name) + '/700/500'; }} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+      <img src={a.img} alt={a.name} loading="lazy" decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).src = NO_IMG; }} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#0A2540]/90 via-[#0A2540]/25 to-transparent" />
       <div className={`absolute left-0 bottom-0 text-white ${big ? 'p-4 md:p-6' : 'p-3.5'}`}>
         <p className={`font-bold leading-tight ${big ? 'text-2xl md:text-3xl' : 'text-base'}`}>{a.name}</p>
@@ -122,6 +125,7 @@ export default function Home() {
   const { flags } = useFlags();
   const [listings, setListings] = useState<Listing[]>([]);
   const [marketNews, setMarketNews] = useState<{ title: string; url: string; img?: string; date?: string; source?: string }[]>([]);
+  const [featuredNews, setFeaturedNews] = useState<{ title: string; url: string; img?: string; date?: string; source?: string }[]>([]);
   const [marketLoading, setMarketLoading] = useState(true);
   const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Tin nổi bật'); const [heroDeal, setHeroDeal] = useState<'sale' | 'rent'>('sale');
   const searchHint = useTypingHint(SEARCH_HINTS);
@@ -132,7 +136,15 @@ export default function Home() {
     setMarketLoading(true);
     fetch('/feed/news')
       .then((r) => r.json())
-      .then((d) => setMarketNews((d.news || []).map((n: any) => ({ title: n.title, url: '/tin-tuc/' + n.slug, img: n.image || U('1486406146926-c627a92ad1ab'), date: n.publishedAt ? new Date(n.publishedAt).toLocaleDateString('vi-VN') : undefined, source: n.source }))))
+      .then((d) => {
+        const raw: any[] = d.news || [];
+        const toCard = (n: any) => ({ title: n.title, url: '/tin-tuc/' + n.slug, img: n.image || U('1486406146926-c627a92ad1ab'), date: n.publishedAt ? new Date(n.publishedAt).toLocaleDateString('vi-VN') : undefined, source: n.source });
+        setMarketNews(raw.filter((n) => !n.pin).map(toCard)); // Thị trường BĐS — GIỮ NGUYÊN (bỏ bài ghim)
+        // Tin nổi bật: CHỈ tin về ĐÔ THỊ MỚI CAM LÂM (bài ghim + tin mới khớp từ khoá), mới nhất trước.
+        const DTM = /đô thị mới cam lâm|đô thị sân bay cam lâm|đô thị cam lâm|phân khu.*cam lâm|cam lâm.*đô thị/i;
+        const feat = raw.filter((n) => n.pin || DTM.test((n.title || '') + ' ' + (n.summary || ''))).sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || +new Date(b.publishedAt) - +new Date(a.publishedAt)).map(toCard);
+        setFeaturedNews(feat);
+      })
       .catch(() => {})
       .finally(() => setMarketLoading(false));
   }, []);
@@ -145,8 +157,10 @@ export default function Home() {
   }
   const featured = listings.length > 0 ? listings : STATIC;
   const fromApi = listings.length > 0;
-  const newsItems = newsTab === 'Thị trường BĐS' ? (marketNews.length ? marketNews.slice(0, 8) : NEWS['Thị trường BĐS']) : NEWS[newsTab];
-  const marketLoadingNow = newsTab === 'Thị trường BĐS' && marketLoading && !marketNews.length;
+  const newsItems = newsTab === 'Thị trường BĐS' ? (marketNews.length ? marketNews.slice(0, 8) : NEWS['Thị trường BĐS'])
+    : newsTab === 'Tin nổi bật' ? (featuredNews.length ? featuredNews.slice(0, 8) : NEWS['Tin nổi bật'])
+    : NEWS[newsTab];
+  const marketLoadingNow = marketLoading && ((newsTab === 'Thị trường BĐS' && !marketNews.length) || (newsTab === 'Tin nổi bật' && !featuredNews.length));
   const areasRanked: AreaWithCount[] = [...AREAS].map((a) => ({ ...a, count: areaCounts[a.ward] || 0 })).sort((x, y) => y.count - x.count);
   const bigArea = areasRanked[0]; const gridAreas = areasRanked.slice(1, 5);
 
@@ -156,10 +170,10 @@ export default function Home() {
       <section className="relative">
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${U('1564013799919-ab600027ffc6')})` }} />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/35 to-slate-900/10" />
-        <div className="relative mx-auto max-w-7xl px-4 pt-24 md:pt-28 pb-24 text-white">
+        <div className="relative mx-auto max-w-7xl px-3 sm:px-4 pt-[calc(5rem_+_env(safe-area-inset-top))] sm:pt-24 md:pt-28 pb-16 sm:pb-24 text-white">
           <p className="text-[#FFD56A] font-semibold tracking-wide drop-shadow">★ Nền tảng bất động sản & quy hoạch Cam Lâm</p>
-          <h1 className="text-4xl md:text-6xl font-extrabold mt-3 max-w-3xl leading-[1.1] drop-shadow-[0_3px_18px_rgba(0,0,0,0.55)]">Tìm ngôi nhà mơ ước <span className="text-[#FFD56A]">của bạn</span></h1>
-          <p className="mt-4 text-slate-100 text-lg max-w-2xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">Khám phá hàng ngàn bất động sản cao cấp và tra cứu quy hoạch chính xác trên toàn khu vực.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold mt-3 max-w-3xl leading-[1.1] drop-shadow-[0_3px_18px_rgba(0,0,0,0.55)]">Tìm ngôi nhà mơ ước <span className="text-[#FFD56A]">của bạn</span></h1>
+          <p className="mt-3 sm:mt-4 text-slate-100 text-sm sm:text-lg max-w-2xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">Khám phá hàng ngàn bất động sản cao cấp và tra cứu quy hoạch chính xác trên toàn khu vực.</p>
 
           {/* Bán / Cho thuê */}
           <div className="mt-7 inline-flex bg-white/15 backdrop-blur rounded-full p-1 border border-white/25">
@@ -168,7 +182,7 @@ export default function Home() {
           </div>
 
           {/* Search card */}
-          <div className="mt-3 bg-white rounded-2xl shadow-2xl p-3 max-w-5xl grid md:grid-cols-[1.3fr_1fr_1fr_auto] gap-2">
+          <div className="mt-3 bg-white rounded-xl sm:rounded-2xl shadow-2xl p-2 sm:p-3 max-w-5xl grid md:grid-cols-[1.3fr_1fr_1fr_auto] gap-2">
             <label className="flex items-center gap-2 px-3 rounded-xl border border-slate-200 focus-within:border-[#0A2540]">
               <Ic d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" />
               <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder={searchHint || 'Khu vực, dự án…'} className="py-3 w-full outline-none text-slate-800 text-sm" />
@@ -185,14 +199,14 @@ export default function Home() {
                 <option value="">Mức giá</option><option value="1">Dưới 1 tỷ</option><option value="3">Dưới 3 tỷ</option><option value="5">Dưới 5 tỷ</option><option value="10">Dưới 10 tỷ</option>
               </select>
             </label>
-            <button onClick={search} className="bg-red-600 hover:bg-red-700 text-white font-bold px-7 py-3 rounded-xl whitespace-nowrap shadow-lg shadow-red-600/30">Tìm kiếm</button>
+            <button onClick={search} className="cl-press bg-red-600 hover:bg-red-700 text-white font-bold px-7 py-3 rounded-xl whitespace-nowrap shadow-lg shadow-red-600/30">Tìm kiếm</button>
           </div>
 
           {/* Quick categories */}
           <div className="mt-5 flex flex-wrap gap-2">
             {CATS.map((c) => (
               <Link key={c.t} href={`/listings?propertyType=${c.t}`}
-                className="bg-white/10 hover:bg-[#C8A14B] hover:text-[#0A2540] hover:border-[#C8A14B] backdrop-blur border border-white/25 rounded-full px-4 py-1.5 text-sm font-semibold transition">
+                className="bg-white/10 hover:bg-[#C8A14B] hover:text-[#0A2540] hover:border-[#C8A14B] backdrop-blur border border-white/25 rounded-full px-4 py-1.5 text-sm font-semibold transition active:scale-[.97]">
                 {c.icon} {PROPERTY_LABELS[c.t]}
               </Link>
             ))}
@@ -201,19 +215,19 @@ export default function Home() {
       </section>
 
       {/* TIN TỨC & QUY HOẠCH — kiểu batdongsan */}
-      <section className="mx-auto max-w-7xl px-4 py-10">
+      <section className="mx-auto max-w-7xl px-3 sm:px-4 py-6 sm:py-10">
         <div className="flex items-center gap-5 border-b border-slate-200 mb-5 overflow-x-auto">
           {Object.keys(NEWS).map((t) => (
             <button key={t} onClick={() => setNewsTab(t)} className={`pb-2.5 text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${newsTab === t ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500 hover:text-[#0A2540]'}`}>{t}</button>
           ))}
           <Link href="/tin-tuc" className="ml-auto text-red-600 text-sm font-semibold whitespace-nowrap shrink-0">Xem thêm →</Link>
         </div>
-        <div className="grid lg:grid-cols-[1.05fr_1fr_0.62fr] gap-6">
+        <div className="grid lg:grid-cols-[1.05fr_1fr_0.62fr] gap-3 sm:gap-6">
           {marketLoadingNow ? (
             <div className="lg:col-span-2 grid place-items-center min-h-[220px] text-slate-400 text-sm">
               <div className="text-center">
                 <div className="w-8 h-8 border-2 border-slate-200 border-t-red-500 rounded-full animate-spin mx-auto" />
-                <p className="mt-3">Đang tải tin thị trường…</p>
+                <p className="mt-3">Đang tải tin…</p>
               </div>
             </div>
           ) : (<>
@@ -234,13 +248,13 @@ export default function Home() {
           </div>
           </>)}
           <div className="space-y-4">
-            <Link href="/map" className="block rounded-xl bg-gradient-to-br from-[#a3121b] to-[#6d0d14] text-white p-5 hover:brightness-110 transition">
+            <Link href="/map" className="block rounded-xl bg-gradient-to-br from-[#a3121b] to-[#6d0d14] text-white p-5 hover:brightness-110 transition active:scale-[.98]">
               <p className="text-[11px] tracking-wide text-white/70 font-semibold">CAM LÂM LAND</p>
               <p className="font-extrabold text-lg mt-1 leading-tight">Sàn BĐS & Bản đồ quy hoạch Cam Lâm</p>
               <p className="text-xs text-white/80 mt-1.5 leading-snug">Tra cứu quy hoạch, mua bán nhà đất, nền vệ tinh — tất cả tại một nơi.</p>
               <span className="inline-block mt-3 bg-white text-[#a3121b] text-xs font-bold px-3 py-1.5 rounded">Khám phá ngay →</span>
             </Link>
-            <Link href="/sales/post" className="block rounded-xl bg-gradient-to-br from-[#0A2540] to-[#0d2f54] text-white p-5 hover:brightness-110 transition">
+            <Link href="/sales/post" className="block rounded-xl bg-gradient-to-br from-[#0A2540] to-[#0d2f54] text-white p-5 hover:brightness-110 transition active:scale-[.98]">
               <p className="text-[11px] tracking-wide text-[#C8A14B] font-semibold">MIỄN PHÍ</p>
               <p className="font-extrabold text-lg mt-1 leading-tight">Đăng tin — tiếp cận khách mua ngay</p>
               <span className="inline-block mt-3 bg-[#C8A14B] text-[#0A2540] text-xs font-bold px-3 py-1.5 rounded">Đăng tin ngay →</span>
@@ -250,8 +264,8 @@ export default function Home() {
       </section>
 
       {/* FEATURED — kiểu batdongsan */}
-      <section className="mx-auto max-w-7xl px-4 py-10">
-        <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
+      <section className="mx-auto max-w-7xl px-3 sm:px-4 py-6 sm:py-10">
+        <div className="flex items-center justify-between mb-4 sm:mb-6 flex-wrap gap-2">
           <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">Bất động sản dành cho bạn</h2>
           <div className="flex items-center gap-3 text-sm font-semibold text-[#0A2540]">
             <Link href="/listings" className="hover:text-red-600">Tin bán mới nhất</Link>
@@ -259,10 +273,10 @@ export default function Home() {
             <Link href="/listings?deal=rent" className="hover:text-red-600">Tin cho thuê mới nhất</Link>
           </div>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
           {(expanded ? featured : featured.slice(0, 8)).map((l) => <ListingCard key={l.id} l={l} href={fromApi ? undefined : '/listings'} />)}
         </div>
-        <div className="mt-8 text-center">
+        <div className="mt-6 sm:mt-8 text-center">
           {featured.length > 8 ? (
             <button onClick={() => setExpanded((v) => !v)} className="inline-flex items-center gap-1.5 border border-slate-300 hover:border-[#0A2540] hover:text-[#0A2540] text-slate-600 font-semibold rounded-full px-7 py-2.5 bg-white transition">
               {expanded ? 'Thu gọn' : 'Mở rộng'}
@@ -272,7 +286,6 @@ export default function Home() {
             <Link href="/listings" className="inline-flex items-center gap-1.5 border border-slate-300 hover:border-[#0A2540] text-[#0A2540] font-semibold rounded-full px-7 py-2.5 bg-white">Xem tất cả →</Link>
           )}
         </div>
-        {!fromApi && <p className="text-center text-xs text-slate-400 mt-4">* Đang hiển thị tin mẫu. Chạy <code className="bg-slate-100 px-1 rounded">start.bat</code> → <code className="bg-slate-100 px-1 rounded">them_tin_demo.bat</code> để có tin thật.</p>}
       </section>
 
       {/* DỰ ÁN BĐS NỔI BẬT — admin quản lý (kiểu batdongsan) */}
@@ -282,8 +295,8 @@ export default function Home() {
       <PromoBanner />
 
       {/* BĐS THEO ĐỊA ĐIỂM — ô lớn + lưới + số tin (kiểu batdongsan) */}
-      <section className="mx-auto max-w-7xl px-4 py-10">
-        <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-6">Bất động sản theo địa điểm</h2>
+      <section className="mx-auto max-w-7xl px-3 sm:px-4 py-6 sm:py-10">
+        <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-4 sm:mb-6">Bất động sản theo địa điểm</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 md:grid-rows-2 gap-3 md:gap-4 md:h-[420px]">
           <AreaCard a={bigArea} big />
           {gridAreas.map((a) => <AreaCard key={a.ward} a={a} />)}
@@ -297,15 +310,15 @@ export default function Home() {
       <FeaturedPartners />
 
       {/* PLANNING PROMO — dưới Tiện ích & Doanh nghiệp tiêu biểu */}
-      <section className="mx-auto max-w-7xl px-4 py-10">
-        <div className="grid md:grid-cols-2 rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-sm">
-          <div className="p-8 md:p-12 flex flex-col justify-center">
+      <section className="mx-auto max-w-7xl px-3 sm:px-4 py-6 sm:py-10">
+        <div className="grid md:grid-cols-2 rounded-xl sm:rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-sm">
+          <div className="p-5 sm:p-8 md:p-12 flex flex-col justify-center">
             <span className="text-[#C8A14B] font-semibold text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>
-            <h2 className="text-3xl font-extrabold text-[#0A2540] mt-2">Tra cứu quy hoạch & thửa đất chính xác</h2>
-            <p className="text-slate-500 mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số tờ/số thửa/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
-            <div className="mt-6 flex gap-3">
-              <Link href="/map" className="bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-6 py-3 rounded-xl">Mở bản đồ →</Link>
-              <Link href="/qr" className="border border-slate-300 text-[#0A2540] font-semibold px-6 py-3 rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] mt-2">Tra cứu quy hoạch & thửa đất chính xác</h2>
+            <p className="text-sm sm:text-base text-slate-500 mt-2 sm:mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số tờ/số thửa/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
+            <div className="mt-4 sm:mt-6 flex gap-3">
+              <Link href="/map" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-6 py-3 rounded-xl">Mở bản đồ →</Link>
+              <Link href="/qr" className="cl-press border border-slate-300 text-[#0A2540] font-semibold px-6 py-3 rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
             </div>
           </div>
           <div className="bg-slate-100 flex items-center justify-center min-h-[280px] p-2">
@@ -317,15 +330,15 @@ export default function Home() {
 
       {/* AD CONTACT — tế nhị */}
       {flags.services_live && (
-      <section className="mx-auto max-w-7xl px-4 pb-12">
-        <div className="rounded-2xl border border-slate-200 bg-white px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <section className="mx-auto max-w-7xl px-3 sm:px-4 pb-8 sm:pb-12">
+        <div className="rounded-2xl border border-slate-200 bg-white px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-center sm:text-left">
             <p className="font-bold text-[#0A2540]">📣 Quảng cáo cùng Cam Lâm Land</p>
             <p className="text-sm text-slate-500 mt-0.5">Đưa thương hiệu, dự án của bạn đến khách quan tâm bất động sản Cam Lâm — banner, logo trên bản đồ, đẩy tin nổi bật.</p>
           </div>
           <div className="flex gap-2 shrink-0">
             <Link href="/dichvu" className="border border-slate-300 text-[#0A2540] font-semibold px-5 py-2.5 rounded-xl hover:bg-slate-50 text-sm whitespace-nowrap">Xem dịch vụ</Link>
-            <a href="tel:0988888888" className="bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-5 py-2.5 rounded-xl text-sm whitespace-nowrap">Liên hệ quảng cáo</a>
+            <a href="tel:0988888888" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-5 py-2.5 rounded-xl text-sm whitespace-nowrap">Liên hệ quảng cáo</a>
           </div>
         </div>
       </section>

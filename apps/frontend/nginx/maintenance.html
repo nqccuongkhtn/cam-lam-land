@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<meta name="theme-color" content="#000000" />
+<title>Đang bảo trì · Cam Lâm Land</title>
+<style>
+  :root{ --gold:#C8A14B; --text:#f5f5f7; --muted:#9b9ba1; --card:rgba(255,255,255,.055); --line:rgba(255,255,255,.12); }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; height:100%; }
+  body{ background:#000; color:var(--text); overflow:hidden; position:relative; min-height:100dvh; padding:22px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Inter,Helvetica,Arial,sans-serif; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+  body::before{ content:""; position:fixed; inset:0; pointer-events:none; background:radial-gradient(58% 46% at 50% 16%, rgba(200,161,75,.18), transparent 68%); }
+  .wrap{ width:100%; max-width:430px; z-index:1; display:flex; flex-direction:column; align-items:center; }
+  .brand{ display:flex; align-items:center; gap:9px; margin-bottom:24px; }
+  .brand svg{ width:25px; height:25px; display:block; }
+  .brand b{ font-size:15px; font-weight:600; letter-spacing:.2px; }
+  .brand b i{ color:var(--gold); font-style:normal; }
+  .dot{ width:6px; height:6px; border-radius:50%; background:var(--gold); box-shadow:0 0 0 0 rgba(200,161,75,.6); animation:pulse 2s infinite; margin-left:2px; }
+  @keyframes pulse{ 0%{box-shadow:0 0 0 0 rgba(200,161,75,.55)} 70%{box-shadow:0 0 0 8px rgba(200,161,75,0)} 100%{box-shadow:0 0 0 0 rgba(200,161,75,0)} }
+  h1{ font-size:31px; line-height:1.08; font-weight:600; letter-spacing:-.022em; margin:0 0 10px; text-align:center; }
+  .sub{ color:var(--muted); font-size:15px; line-height:1.5; text-align:center; margin:0 0 22px; max-width:340px; }
+  .card{ width:100%; background:var(--card); border:1px solid var(--line); border-radius:26px; padding:13px 13px 15px; backdrop-filter:blur(28px) saturate(150%); -webkit-backdrop-filter:blur(28px) saturate(150%); box-shadow:0 30px 70px -22px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.06); }
+  .ghead{ display:flex; align-items:center; justify-content:space-between; padding:2px 6px 10px; }
+  .ghead .t{ font-size:12.5px; font-weight:600; color:var(--muted); letter-spacing:.2px; }
+  .ghead .s{ font-size:12.5px; font-weight:600; color:var(--text); }
+  .ghead .s b{ color:var(--gold); font-variant-numeric:tabular-nums; }
+  .mute{ appearance:none; border:0; background:transparent; cursor:pointer; font-size:14px; margin-left:9px; padding:2px 5px; border-radius:8px; line-height:1; vertical-align:-1px; }
+  .mute:hover{ background:rgba(255,255,255,.12); }
+  .cwrap{ position:relative; }
+  canvas{ width:100%; display:block; border-radius:17px; background:#dceffb; touch-action:none; cursor:pointer; }
+  .hint{ text-align:center; color:var(--muted); font-size:12px; margin-top:11px; transition:opacity .3s; }
+  .gameover{ position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:5px; border-radius:17px; background:rgba(6,12,22,.66); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); padding:12px; cursor:pointer; overflow:hidden; }
+  .go-t{ font-size:19px; font-weight:700; color:#fff; letter-spacing:-.01em; }
+  .go-sub{ font-size:13px; color:#cfd3da; }
+  .go-sub b{ color:var(--gold); }
+  .lb-title{ font-size:11px; font-weight:700; color:#9b9ba1; letter-spacing:.4px; text-transform:uppercase; margin-top:5px; }
+  .lb{ width:100%; max-width:234px; display:flex; flex-direction:column; gap:3px; }
+  .lb-row{ display:flex; align-items:center; gap:9px; font-size:13px; color:#e7e9ee; background:rgba(255,255,255,.07); border-radius:8px; padding:4px 11px; }
+  .lb-row.me{ background:rgba(200,161,75,.26); color:#fff; }
+  .lb-rk{ width:14px; color:#9b9ba1; font-weight:700; }
+  .lb-sc{ flex:1; font-weight:700; font-variant-numeric:tabular-nums; }
+  .lb-you{ font-size:10px; color:var(--gold); font-weight:700; }
+  .go-btn{ margin-top:7px; appearance:none; border:0; cursor:pointer; background:#fff; color:#000; font-weight:600; font-size:14px; padding:9px 24px; border-radius:980px; }
+  .foot{ margin-top:20px; display:flex; gap:10px; }
+  .btn{ appearance:none; border:0; cursor:pointer; font-family:inherit; font-weight:600; font-size:15px; padding:11px 22px; border-radius:980px; transition:transform .14s ease, opacity .2s; }
+  .btn:active{ transform:scale(.955); }
+  .btn-p{ background:#fff; color:#000; }
+  .btn-s{ background:rgba(255,255,255,.09); color:#fff; border:1px solid var(--line); }
+  #yt{ position:fixed; left:-9999px; top:0; width:240px; height:135px; border:0; }
+  @media (max-height:700px){ .sub{ display:none } h1{ font-size:25px; margin-bottom:14px } .brand{ margin-bottom:16px } .foot{ margin-top:15px } }
+  @media (max-width:380px){ h1{ font-size:27px } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.6a6.6 6.6 0 0 0-6.6 6.6c0 4.72 5.86 10.82 6.11 11.07a.68.68 0 0 0 .98 0c.25-.25 6.11-6.35 6.11-11.07A6.6 6.6 0 0 0 12 2.6Z" fill="#C8A14B"/><circle cx="12" cy="9.2" r="2.35" fill="#000"/></svg>
+      <b>Cam Lâm <i>Land</i></b><span class="dot"></span>
+    </div>
+    <h1>Đang bảo trì</h1>
+    <p class="sub">Hệ thống đang được nâng cấp để phục vụ bạn tốt hơn. Vui lòng quay lại sau ít phút — trong lúc chờ, chơi một ván nhé.</p>
+    <div class="card">
+      <div class="ghead">
+        <span class="t">Flappy Bird</span>
+        <span class="s">Điểm <b id="score">0</b> &nbsp;·&nbsp; Kỷ lục <b id="best">0</b><button id="mute" class="mute" title="Bật/tắt âm thanh" aria-label="Bật/tắt âm thanh">🔊</button></span>
+      </div>
+      <div class="cwrap">
+        <canvas id="c"></canvas>
+        <div class="gameover" id="over">
+          <div class="go-t">Kết thúc</div>
+          <div class="go-sub">Điểm <b id="fScore">0</b> &nbsp;·&nbsp; Kỷ lục <b id="fBest">0</b></div>
+          <div class="lb-title">Bảng xếp hạng</div>
+          <div class="lb" id="lb"></div>
+          <button class="go-btn" id="replay">↻ Chơi lại</button>
+        </div>
+      </div>
+      <p class="hint" id="hint">Chạm màn hình / phím cách để bay lên</p>
+    </div>
+    <div class="foot">
+      <button class="btn btn-p" onclick="try{(window.top||window).location.reload()}catch(e){location.reload()}">Thử lại</button>
+      <button class="btn btn-s" onclick="try{(window.top||window).location.href='/'}catch(e){location.href='/'}">Trang chủ</button>
+    </div>
+  </div>
+  <div id="yt" aria-hidden="true"></div>
+
+  <script>
+  (function(){
+    var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+    var DPR = Math.min(window.devicePixelRatio || 1, 2);
+    var elScore = document.getElementById('score'), elBest = document.getElementById('best'), elHint = document.getElementById('hint');
+    var elOver = document.getElementById('over'), elLB = document.getElementById('lb'), elFS = document.getElementById('fScore'), elFB = document.getElementById('fBest');
+    var W = 340, H = 400;
+    var best = 0; try { best = parseInt(localStorage.getItem('flappy_best') || '0', 10) || 0; } catch(e){}
+    elBest.textContent = best;
+
+    // Am thanh THAT cua game (Web Audio) — tieng dap canh / qua cot / thua.
+    var actx = null, muted = false;
+    try { muted = localStorage.getItem('flappy_muted') === '1'; } catch(e){}
+    var elMute = document.getElementById('mute'); function paintMute(){ if (elMute) elMute.textContent = muted ? '🔇' : '🔊'; } paintMute();
+    function ensureAudio(){ if (!actx){ try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} } if (actx && actx.state === 'suspended') actx.resume(); }
+    function tone(f, d, dur, type, vol){ if (!actx || muted || !f) return; var o = actx.createOscillator(), g = actx.createGain(); o.type = type || 'sine'; o.frequency.value = f; var t0 = actx.currentTime + (d || 0); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol || 0.1, t0 + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur); o.connect(g); g.connect(actx.destination); o.start(t0); o.stop(t0 + dur + 0.03); }
+    function sfxFlap(){ tone(560, 0, 0.07, 'square', 0.05); tone(880, 0.02, 0.05, 'square', 0.03); }
+    function sfxScore(){ tone(880, 0, 0.09, 'sine', 0.11); tone(1320, 0.06, 0.10, 'sine', 0.09); }
+    function sfxHit(){ tone(180, 0, 0.16, 'sawtooth', 0.14); tone(70, 0.06, 0.42, 'sine', 0.12); }
+    if (elMute) elMute.addEventListener('click', function(e){ e.stopPropagation(); muted = !muted; try { localStorage.setItem('flappy_muted', muted ? '1' : '0'); } catch(x){} paintMute(); if (!muted){ ensureAudio(); if (ytReady){ try { yt.unMute(); yt.playVideo(); } catch(z){} } } else if (ytReady){ try { yt.mute(); } catch(z){} } });
+
+    // Nhac nen — bai hat qua trinh phat YouTube chinh thuc (can mang; khong tai/sao chep).
+    var yt = null, ytReady = false, gestured = false, VIDEO = 'koQjoSLHkEU';
+    window.onYouTubeIframeAPIReady = function(){
+      try {
+        yt = new YT.Player('yt', {
+          videoId: VIDEO,
+          playerVars: { autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: VIDEO, playsinline: 1, modestbranding: 1, rel: 0, fs: 0 },
+          events: {
+            onReady: function(){ ytReady = true; try { yt.setVolume(55); yt.playVideo(); if (gestured && !muted) yt.unMute(); } catch(e){} },
+            onStateChange: function(ev){ if (ev.data === 0){ try { yt.seekTo(0); yt.playVideo(); } catch(e){} } }
+          }
+        });
+      } catch(e){}
+    };
+    function musicGesture(){ gestured = true; if (ytReady && !muted){ try { yt.unMute(); yt.playVideo(); } catch(e){} } }
+    document.addEventListener('pointerdown', musicGesture);
+
+    // Bang xep hang ky luc (luu localStorage, giu 5 diem cao nhat)
+    function loadLB(){ try { var a = JSON.parse(localStorage.getItem('flappy_lb') || '[]'); return (a instanceof Array) ? a : []; } catch(e){ return []; } }
+    function addScore(n){ var a = loadLB(); if (n > 0) a.push(n); a.sort(function(x, y){ return y - x; }); a = a.slice(0, 5); try { localStorage.setItem('flappy_lb', JSON.stringify(a)); } catch(e){} return a; }
+
+    var bird, pipes, score, state, gap, pw, sp, speed, gravity, flapV, last = 0, adTimer = 0;
+
+    function fit(){ var w = cv.clientWidth || (cv.parentElement ? cv.parentElement.clientWidth - 26 : 340); var h = Math.min(Math.round(w * 1.16), Math.round((window.innerHeight || 640) * 0.47)); cv.style.height = h + 'px'; cv.width = Math.round(w * DPR); cv.height = Math.round(h * DPR); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); W = w; H = h; }
+    function reset(){ gap = H * 0.30; pw = Math.max(44, W * 0.145); sp = Math.max(150, W * 0.62); speed = Math.max(1.7, W * 0.0075); gravity = H * 0.0011; flapV = -H * 0.0165; bird = { x: W * 0.30, y: H * 0.44, vy: 0, r: Math.max(9, H * 0.026), rot: 0 }; pipes = []; score = 0; state = 'ready'; adTimer = 0; elScore.textContent = '0'; elHint.style.opacity = 1; elHint.textContent = 'Chạm màn hình / phím cách để bay lên'; if (elOver) elOver.style.display = 'none'; }
+    function addPipe(x){ var m = H * 0.13; var gy = m + Math.random() * (H - gap - 2 * m); pipes.push({ x: x, gy: gy, passed: false }); }
+    function start(){ state = 'play'; pipes = []; addPipe(W + 30); addPipe(W + 30 + sp); elHint.style.opacity = 0; }
+    function flap(){ ensureAudio(); if (state === 'ready'){ start(); bird.vy = flapV; sfxFlap(); } else if (state === 'play'){ bird.vy = flapV; sfxFlap(); } else { reset(); } }
+    function gameOver(){ if (state === 'over') return; state = 'over'; sfxHit(); if (score > best){ best = score; try { localStorage.setItem('flappy_best', String(best)); } catch(e){} elBest.textContent = best; } showOver(); }
+    function showOver(){
+      var lb = addScore(score);
+      if (elFS) elFS.textContent = score; if (elFB) elFB.textContent = best;
+      if (elLB){ var html = '', hl = false;
+        for (var i = 0; i < lb.length; i++){ var mine = (!hl && lb[i] === score && score > 0); if (mine) hl = true;
+          html += '<div class="lb-row' + (mine ? ' me' : '') + '"><span class="lb-rk">' + (i + 1) + '</span><span class="lb-sc">' + lb[i] + ' điểm</span>' + (mine ? '<span class="lb-you">Bạn</span>' : '') + '</div>';
+        }
+        if (!lb.length) html = '<div class="lb-row"><span class="lb-sc">Chưa có điểm — cố lên!</span></div>';
+        elLB.innerHTML = html;
+      }
+      if (elOver) elOver.style.display = 'flex';
+      elHint.style.opacity = 0;
+    }
+    function rrp(x, y, w, h, r){ if (h < 0) return; r = Math.min(r, w/2, h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+    function rr(x, y, w, h, r){ rrp(x, y, w, h, r); ctx.fill(); }
+
+    // Quang cao Cam Lam Land o NEN game (hien ~2.5s moi moc +10 diem)
+    function drawAd(){
+      if (adTimer <= 0) return;
+      var op = adTimer > 150 ? (170 - adTimer) / 20 : (adTimer < 45 ? adTimer / 45 : 1);
+      op = Math.max(0, Math.min(1, op)) * 0.95;
+      var w = Math.min(W * 0.84, 300), h = Math.min(Math.max(H * 0.19, 58), 80), x = (W - w) / 2, y = H * 0.14;
+      ctx.save(); ctx.globalAlpha = op;
+      ctx.fillStyle = '#0e2a45'; rr(x, y, w, h, 12);
+      ctx.strokeStyle = '#C8A14B'; ctx.lineWidth = 1.5; rrp(x + 1, y + 1, w - 2, h - 2, 11); ctx.stroke();
+      var r = h * 0.2, lx = x + h * 0.52, ly = y + h * 0.4;
+      ctx.fillStyle = '#C8A14B'; ctx.beginPath(); ctx.arc(lx, ly, r, 0, 6.2832); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(lx - r * 0.72, ly + r * 0.35); ctx.lineTo(lx, ly + r * 1.55); ctx.lineTo(lx + r * 0.72, ly + r * 0.35); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#0e2a45'; ctx.beginPath(); ctx.arc(lx, ly, r * 0.42, 0, 6.2832); ctx.fill();
+      var tx = x + h * 0.92;
+      ctx.textBaseline = 'alphabetic';
+      ctx.font = '700 ' + Math.round(h * 0.27) + 'px -apple-system,"Segoe UI",Roboto,sans-serif';
+      ctx.fillStyle = '#ffffff'; ctx.fillText('Cam Lâm ', tx, y + h * 0.44);
+      var w1 = ctx.measureText('Cam Lâm ').width;
+      ctx.fillStyle = '#C8A14B'; ctx.fillText('Land', tx + w1, y + h * 0.44);
+      ctx.fillStyle = '#cdb98a'; ctx.font = '500 ' + Math.round(h * 0.2) + 'px -apple-system,"Segoe UI",Roboto,sans-serif';
+      ctx.fillText('Nhà đất · Bản đồ quy hoạch Cam Lâm', tx, y + h * 0.74);
+      ctx.restore();
+    }
+
+    function update(dt){
+      if (state === 'play'){
+        bird.vy += gravity * dt; bird.y += bird.vy * dt; bird.rot = Math.max(-0.5, Math.min(1.1, bird.vy * 0.06));
+        for (var i = 0; i < pipes.length; i++) pipes[i].x -= speed * dt;
+        if (pipes.length && pipes[pipes.length-1].x < W - sp) addPipe(pipes[pipes.length-1].x + sp);
+        if (pipes.length && pipes[0].x < -pw - 6) pipes.shift();
+        for (var j = 0; j < pipes.length; j++){ var p = pipes[j];
+          if (!p.passed && p.x + pw < bird.x){ p.passed = true; score++; elScore.textContent = score; sfxScore(); if (score % 10 === 0) adTimer = 170; }
+          if (bird.x + bird.r > p.x && bird.x - bird.r < p.x + pw){ if (bird.y - bird.r < p.gy || bird.y + bird.r > p.gy + gap) gameOver(); }
+        }
+        if (bird.y + bird.r > H){ bird.y = H - bird.r; gameOver(); }
+        if (bird.y - bird.r < 0){ bird.y = bird.r; bird.vy = 0; }
+        if (adTimer > 0) adTimer--;
+      } else if (state === 'ready'){ bird.y = H * 0.44 + Math.sin(Date.now() / 320) * (H * 0.012); }
+    }
+    function draw(){
+      var g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#c7e7fb'); g.addColorStop(1, '#eef8ff'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      drawAd();
+      for (var i = 0; i < pipes.length; i++){ var p = pipes[i];
+        ctx.fillStyle = '#12324f'; rr(p.x, -4, pw, p.gy + 4, 9); rr(p.x, p.gy + gap, pw, H - (p.gy + gap) + 4, 9);
+        ctx.fillStyle = '#C8A14B'; rr(p.x - 3, p.gy - 13, pw + 6, 13, 5); rr(p.x - 3, p.gy + gap, pw + 6, 13, 5);
+      }
+      ctx.save(); ctx.translate(bird.x, bird.y); ctx.rotate(bird.rot);
+      var bg = ctx.createRadialGradient(-bird.r*0.3, -bird.r*0.3, bird.r*0.2, 0, 0, bird.r); bg.addColorStop(0, '#ffe0a0'); bg.addColorStop(1, '#C8A14B');
+      ctx.fillStyle = bg; ctx.beginPath(); ctx.arc(0, 0, bird.r, 0, 6.2832); ctx.fill();
+      ctx.fillStyle = '#e8823a'; ctx.beginPath(); ctx.moveTo(bird.r*0.65, -bird.r*0.05); ctx.lineTo(bird.r*1.28, -bird.r*0.18); ctx.lineTo(bird.r*1.28, bird.r*0.2); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(bird.r*0.32, -bird.r*0.28, bird.r*0.28, 0, 6.2832); ctx.fill();
+      ctx.fillStyle = '#12324f'; ctx.beginPath(); ctx.arc(bird.r*0.40, -bird.r*0.28, bird.r*0.14, 0, 6.2832); ctx.fill();
+      ctx.restore();
+      if (state === 'ready'){ ctx.fillStyle = 'rgba(8,16,28,0.05)'; ctx.fillRect(0, 0, W, H); }
+    }
+    function loop(now){ var dt = last ? Math.min((now - last) / 16.667, 2.4) : 1; last = now; update(dt); draw(); requestAnimationFrame(loop); }
+    cv.addEventListener('pointerdown', function(e){ e.preventDefault(); flap(); });
+    if (elOver) elOver.addEventListener('pointerdown', function(e){ e.preventDefault(); e.stopPropagation(); reset(); });
+    window.addEventListener('keydown', function(e){ if (e.code === 'Space' || e.key === ' ' || e.key === 'ArrowUp'){ e.preventDefault(); flap(); } });
+    var rt; window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(function(){ fit(); if (state !== 'play') reset(); }, 150); });
+    fit(); reset(); requestAnimationFrame(loop);
+  })();
+  </script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>

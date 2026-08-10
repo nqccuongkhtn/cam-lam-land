@@ -83,7 +83,7 @@ export default function TuVanPage() {
 
   if (allowed === null) return <div className="p-12 text-center text-slate-400">Đang tải…</div>;
   if (!allowed) return (
-    <div className="max-w-md mx-auto p-12 text-center">
+    <div className="max-w-md mx-auto px-4 py-8 sm:p-12 text-center">
       <p className="text-5xl">🔒</p>
       <p className="font-bold text-[#0A2540] mt-3 text-lg">Khu vực dành cho tư vấn viên</p>
       <p className="text-slate-500 text-sm mt-1">Bạn cần được admin cấp quyền “Tư vấn đầu tư & Pháp lý” để vào trang này.</p>
@@ -151,7 +151,7 @@ export default function TuVanPage() {
               </div>
               <div className="p-2 border-t border-slate-100 flex gap-2">
                 <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') send(); }} placeholder="Nhập câu trả lời…" className="flex-1 border border-slate-300 rounded-full px-4 py-2 text-sm outline-none focus:border-[#0A2540]" />
-                <button onClick={send} className="bg-red-600 hover:bg-red-700 text-white font-bold px-5 rounded-full text-sm">Gửi</button>
+                <button onClick={send} className="cl-press bg-red-600 hover:bg-red-700 text-white font-bold px-5 rounded-full text-sm">Gửi</button>
               </div>
             </>
           )}

@@ -16,7 +16,7 @@ imagesRouter.post('/', authRequired, upload.fields([{ name: 'files', maxCount: 1
     const images: { id: number; url: string }[] = [];
     for (let i = 0; i < files.length; i++) {
       const f = files[i];
-      if (!String(f.mimetype).startsWith('image/')) continue;
+      if (!String(f.mimetype).startsWith('image/') && f.mimetype !== 'application/pdf') continue; // nhận ẢNH + PDF (đính kèm công văn danh sách nóng)
       const t = thumbs[i];
       const [row] = await query(
         `INSERT INTO listing_images (owner_id, mime, bytes, size, thumb) VALUES ($1,$2,$3,$4,$5) RETURNING id`,
@@ -27,8 +27,10 @@ imagesRouter.post('/', authRequired, upload.fields([{ name: 'files', maxCount: 1
   } catch (e) { next(e); }
 });
 
-// GET /api/images/:id/thumb — ảnh THU NHỎ cho thẻ tin (nhẹ). Ảnh cũ chưa có thumb thì trả ảnh gốc.
-imagesRouter.get('/:id/thumb', async (req, res, next) => {
+// Đuôi .webp/.jpg trong URL (vd /api/images/12/thumb.webp) KHÔNG đổi ảnh — chỉ để Cloudflare
+// nhận diện là file tĩnh và CACHE ở biên (gần người dùng) => điện thoại tải ảnh nhanh hơn nhiều.
+// GET /api/images/:id/thumb(.webp) — ảnh THU NHỎ cho thẻ tin (nhẹ). Ảnh cũ chưa có thumb thì trả ảnh gốc.
+imagesRouter.get(['/:id/thumb.:ext', '/:id/thumb'], async (req, res, next) => {
   try {
     const [row] = await query('SELECT mime, thumb, bytes FROM listing_images WHERE id=$1', [Number(req.params.id)]);
     if (!row) return res.status(404).end();
@@ -38,8 +40,8 @@ imagesRouter.get('/:id/thumb', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// GET /api/images/:id — phục vụ ảnh gốc từ DB
-imagesRouter.get('/:id', async (req, res, next) => {
+// GET /api/images/:id(.webp) — phục vụ ảnh gốc từ DB
+imagesRouter.get(['/:id.:ext', '/:id'], async (req, res, next) => {
   try {
     const [row] = await query('SELECT mime, bytes FROM listing_images WHERE id=$1', [Number(req.params.id)]);
     if (!row) return res.status(404).end();

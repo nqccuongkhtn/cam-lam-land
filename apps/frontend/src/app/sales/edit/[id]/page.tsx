@@ -6,7 +6,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { api, uploadImages } from '@/lib/api';
 import { resizeImage } from '@/lib/img';
 import { useAuth } from '@/lib/auth';
-import { PROPERTY_LABELS, WARDS, DIRECTIONS, LEGAL_OPTIONS, formatVnd, priceLabel, SALE_PROPERTY_TYPES, RENT_PROPERTY_TYPES, type PropertyType, type DealType } from '@/lib/types';
+import { PROPERTY_LABELS, WARDS_NEW, WARDS_OLD, DIRECTIONS, LEGAL_OPTIONS, formatVnd, priceLabel, SALE_PROPERTY_TYPES, RENT_PROPERTY_TYPES, type PropertyType, type DealType } from '@/lib/types';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
@@ -71,7 +71,7 @@ export default function EditListing() {
         bedrooms: f.bedrooms ? Number(f.bedrooms) : null, bathrooms: f.bathrooms ? Number(f.bathrooms) : null,
         direction: f.direction || null, legal: f.legal || null, frontage: f.frontage ? Number(f.frontage) : null,
         ward: f.ward || null, address: f.address || null, description: f.description || null,
-        contactName: f.contactName || null, contactPhone: null,
+        contactName: user?.fullName || user?.email || null, contactPhone: null, // tên liên hệ = tên tài khoản
         images, lng: coord.lng, lat: coord.lat,
       }) });
       router.push('/sales');
@@ -88,14 +88,14 @@ export default function EditListing() {
   const perM2 = priceTotal > 0 && Number(f.area) > 0 && f.deal !== 'rent' ? formatVnd(priceTotal / Number(f.area)) : '';
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-8">
-      <form onSubmit={submit} className="mx-auto max-w-3xl px-4 space-y-5">
+    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-5 sm:py-8">
+      <form onSubmit={submit} className="mx-auto max-w-3xl px-3 sm:px-4 space-y-4 sm:space-y-5">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-extrabold text-[#0A2540]">Chỉnh sửa tin</h1>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540]">Chỉnh sửa tin</h1>
           <Link href="/sales" className="text-sm font-semibold text-slate-500 hover:text-[#0A2540]">← Tin của tôi</Link>
         </div>
 
-        <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
+        <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
           <h2 className="font-bold text-[#0A2540]">Thông tin chính</h2>
           <div>
             <label className={lbl}>Nhu cầu *</label>
@@ -105,12 +105,12 @@ export default function EditListing() {
             </div>
           </div>
           <div><label className={lbl}>Tiêu đề *</label><input className={inp} value={f.title} onChange={(e) => set('title', e.target.value)} /></div>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
             <div><label className={lbl}>Loại hình *</label>
               <select className={inp} value={f.propertyType} onChange={(e) => set('propertyType', e.target.value)}>{TYPES.map((t) => <option key={t} value={t}>{PROPERTY_LABELS[t]}</option>)}</select></div>
             <div><label className={lbl}>Diện tích (m²)</label><input className={inp} type="number" min="0" value={f.area} onChange={(e) => set('area', e.target.value)} placeholder="250" /></div>
           </div>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
             <div><label className={lbl}>{f.deal === 'rent' ? 'Giá thuê / tháng *' : 'Giá *'}</label>
               <div className="flex gap-2">
                 <input className={inp} type="number" min="0" step="0.01" value={f.priceVal} onChange={(e) => set('priceVal', e.target.value.replace('-', ''))} placeholder={f.deal === 'rent' ? '5' : '2.8'} />
@@ -122,9 +122,9 @@ export default function EditListing() {
           </div>
         </section>
 
-        <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
+        <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
           <h2 className="font-bold text-[#0A2540]">Chi tiết</h2>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
             <div><label className={lbl}>Phòng ngủ</label><input className={inp} type="number" min="0" value={f.bedrooms} onChange={(e) => set('bedrooms', e.target.value)} /></div>
             <div><label className={lbl}>Phòng tắm</label><input className={inp} type="number" min="0" value={f.bathrooms} onChange={(e) => set('bathrooms', e.target.value)} /></div>
             <div><label className={lbl}>Hướng</label><select className={inp} value={f.direction} onChange={(e) => set('direction', e.target.value)}><option value="">— Chọn —</option>{DIRECTIONS.map((d) => <option key={d} value={d}>{d}</option>)}</select></div>
@@ -132,15 +132,15 @@ export default function EditListing() {
           </div>
         </section>
 
-        <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
+        <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
           <h2 className="font-bold text-[#0A2540]">Vị trí</h2>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div><label className={lbl}>Xã / Phường</label><select className={inp} value={f.ward} onChange={(e) => set('ward', e.target.value)}><option value="">— Chọn xã —</option>{WARDS.map((w) => <option key={w} value={w}>{w}</option>)}</select></div>
+          <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+            <div><label className={lbl}>Xã / Phường</label><select className={inp} value={f.ward} onChange={(e) => set('ward', e.target.value)}><option value="">— Chọn xã —</option><optgroup label="Xã hiện nay (sau sáp nhập)">{WARDS_NEW.map((w) => <option key={w} value={w}>{w}</option>)}</optgroup><optgroup label="Xã/thị trấn cũ">{WARDS_OLD.map((w) => <option key={w} value={w}>{w}</option>)}</optgroup></select></div>
             <div><label className={lbl}>Địa chỉ cụ thể</label><input className={inp} value={f.address} onChange={(e) => set('address', e.target.value)} placeholder="Đường, thôn…" /></div>
           </div>
           <div>
             <label className={lbl}>Ghim vị trí trên bản đồ * <span className="font-normal text-slate-400">(bấm vào bản đồ)</span></label>
-            <div className="relative h-72 rounded-xl overflow-hidden border border-slate-200">
+            <div className="relative h-60 sm:h-72 rounded-xl overflow-hidden border border-slate-200">
               <MapView markers={coord ? [{ lng: coord.lng, lat: coord.lat }] : []} baseMap="satellite" initialBounds={QH_BOUNDS} onMapClick={(lng, lat) => setCoord({ lng, lat })} className="absolute inset-0 h-full w-full" />
               <div className="absolute top-2 left-2 z-10 bg-white/95 rounded-lg px-2.5 py-1.5 text-xs font-semibold shadow">
                 {coord ? <span className="text-emerald-700">✓ Đã ghim: {coord.lat.toFixed(5)}, {coord.lng.toFixed(5)}</span> : <span className="text-slate-500">Bấm vào bản đồ để chọn vị trí</span>}
@@ -149,9 +149,9 @@ export default function EditListing() {
           </div>
         </section>
 
-        <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+        <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-3">
           <h2 className="font-bold text-[#0A2540]">Hình ảnh</h2>
-          <label className="flex items-center justify-center gap-2 border-2 border-dashed border-slate-300 rounded-xl py-6 cursor-pointer hover:border-[#C8A14B] text-sm text-slate-500 font-semibold">
+          <label className="flex items-center justify-center gap-2 border-2 border-dashed border-slate-300 rounded-xl py-5 sm:py-6 cursor-pointer hover:border-[#C8A14B] text-sm text-slate-500 font-semibold">
             <input type="file" accept="image/*" multiple onChange={onFiles} className="hidden" />
             {uploading ? 'Đang tải ảnh…' : '＋ Thêm ảnh từ máy'}
           </label>
@@ -168,11 +168,11 @@ export default function EditListing() {
           )}
         </section>
 
-        <section className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
+        <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
           <h2 className="font-bold text-[#0A2540]">Mô tả & liên hệ</h2>
           <textarea className={`${inp} min-h-[120px]`} value={f.description} onChange={(e) => set('description', e.target.value)} placeholder="Mô tả chi tiết bất động sản…" />
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div><label className={lbl}>Tên liên hệ</label><input className={inp} value={f.contactName} onChange={(e) => set('contactName', e.target.value)} placeholder={user?.fullName || ''} /></div>
+          <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+            <div><label className={lbl}>Tên liên hệ</label><input className={`${inp} bg-slate-100 text-slate-500 cursor-not-allowed`} value={user?.fullName || user?.email || ''} readOnly title="Tên liên hệ lấy theo tài khoản, không sửa được" /><p className="text-[11px] text-slate-400 mt-1">Theo tên tài khoản của bạn.</p></div>
             <div><label className={lbl}>SĐT liên hệ</label>
               <div className={`${inp} bg-slate-50 text-slate-600 flex items-center`}>{user?.phone || 'Chưa có SĐT trong tài khoản'}</div>
               <p className="text-xs text-slate-400 mt-1">Tự dùng SĐT của tài khoản. Đổi tại <Link href="/account" className="text-[#0A2540] font-semibold">Tài khoản</Link>.</p>
@@ -181,9 +181,9 @@ export default function EditListing() {
         </section>
 
         {err && <p className="text-red-600 text-sm font-semibold">{err}</p>}
-        <div className="flex gap-3 pb-10">
-          <button disabled={busy || uploading} className="bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold px-8 py-3 rounded-xl shadow-lg shadow-red-600/30">{busy ? 'Đang lưu…' : 'Lưu thay đổi'}</button>
-          <Link href="/sales" className="px-6 py-3 rounded-xl border border-slate-300 font-semibold text-slate-600">Huỷ</Link>
+        <div className="flex gap-3 pb-8 sm:pb-10">
+          <button disabled={busy || uploading} className="cl-press flex-1 sm:flex-none bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold px-6 sm:px-8 py-3 rounded-xl shadow-lg shadow-red-600/30">{busy ? 'Đang lưu…' : 'Lưu thay đổi'}</button>
+          <Link href="/sales" className="cl-press flex-1 sm:flex-none text-center px-4 sm:px-6 py-3 rounded-xl border border-slate-300 font-semibold text-slate-600">Huỷ</Link>
         </div>
       </form>
     </div>

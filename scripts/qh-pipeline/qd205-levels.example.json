@@ -1,0 +1,13 @@
+{
+  "__note__": "MẪU ánh xạ LEVEL (layer CAD trong DGN) → loại đất + màu + kịch bản. Tên level bên trái phải TRÙNG tên level thật trong file (xem danh sách khi chạy 2-map-levels.mjs lần đầu). Màu 'c' lấy theo BẢNG CHÚ GIẢI của QĐ205 để tô khớp ảnh. hz: '2045' (QH chung), '2030' (QHSDĐ), 'HT' (hiện trạng).",
+  "Dat_don_vi_o": { "lo": "Đất đơn vị ở", "c": "#f4d06f", "hz": "2045" },
+  "Dat_don_vi_o_moi": { "lo": "Đất đơn vị ở mới (mật độ trung bình)", "c": "#f2b705", "hz": "2045" },
+  "Dat_hon_hop": { "lo": "Đất hỗn hợp", "c": "#e07a5f", "hz": "2045" },
+  "Dat_giao_thong": { "lo": "Đất giao thông", "c": "#e6e6e6", "hz": "2045" },
+  "Cay_xanh_do_thi": { "lo": "Cây xanh đô thị", "c": "#8bc34a", "hz": "2045" },
+  "Cay_xanh": { "lo": "Cây xanh", "c": "#4caf50", "hz": "2045" },
+  "Dat_du_lich": { "lo": "Đất du lịch", "c": "#4fc3f7", "hz": "2045" },
+  "Dich_vu_cong_cong": { "lo": "Dịch vụ công cộng", "c": "#ba68c8", "hz": "2045" },
+  "Dan_cu_nong_thon": { "lo": "Dân cư nông thôn", "c": "#d4a373", "hz": "2045" },
+  "Mat_nuoc": { "lo": "Mặt nước", "c": "#90caf9", "hz": "2045" }
+}

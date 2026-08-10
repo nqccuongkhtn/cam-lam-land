@@ -1,0 +1,383 @@
+import { Router } from 'express';
+import { query } from '../lib/db.ts';
+import { authRequired, vanBanRequired } from '../middleware/auth.ts';
+
+export const vanBanRouter = Router();
+const UA = { 'User-Agent': 'Mozilla/5.0 (compatible; CamLamLand/1.0)' };
+const tim = (kw: string) => `https://thuvienphapluat.vn/page/tim-van-ban.aspx?keyword=${encodeURIComponent(kw)}`;
+const CAMLAM = 'https://camlam.khanhhoa.gov.vn/module/document';
+
+type Seed = { so: string; ngay: string; ty: string; chuDe: string; lv: string; cq: string; nguon: string; url: string; luot?: number; nb?: boolean };
+const SEED: Seed[] = [
+  { so: '893/QĐ-UBND', ngay: '2026-04-04', ty: 'Phê duyệt Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 và Kế hoạch sử dụng đất năm đầu của điều chỉnh quy hoạch sử dụng đất huyện Cam Lâm.', chuDe: 'Quy hoạch', lv: 'Quy hoạch', cq: 'UBND tỉnh Khánh Hòa', nguon: 'Công báo Khánh Hòa', url: 'https://congbaokhanhhoa.gov.vn/vi-vn/noi-dung-van-ban/vanbanid/22060', luot: 7823, nb: true },
+  { so: '757/QĐ-TTg', ngay: '2026-04-28', ty: 'Phê duyệt Nhiệm vụ Quy hoạch chung đô thị Khánh Hòa đến năm 2050, tầm nhìn đến năm 2075.', chuDe: 'Quy hoạch', lv: 'Quy hoạch', cq: 'Thủ tướng Chính phủ', nguon: 'Pháp luật', url: 'https://luatvietnam.vn/dat-dai/quyet-dinh-757-qd-ttg-2026-phe-duyet-quy-hoach-chung-do-thi-khanh-hoa-den-2050-433391-d1.html', luot: 5337, nb: true },
+  { so: '205/QĐ-TTg', ngay: '2024-02-28', ty: 'Phê duyệt Quy hoạch chung đô thị mới Cam Lâm, tỉnh Khánh Hòa đến năm 2045.', chuDe: 'Quy hoạch', lv: 'Quy hoạch', cq: 'Thủ tướng Chính phủ', nguon: 'Pháp luật', url: 'https://thuvienphapluat.vn/van-ban/Xay-dung-Do-thi/Quyet-dinh-205-QD-TTg-2024-phe-duyet-Quy-hoach-chung-do-thi-moi-Cam-Lam-Khanh-Hoa-den-2045-600262.aspx', nb: true },
+  { so: '2279/QĐ-UBND', ngay: '2026-06-26', ty: 'Phê duyệt điều chỉnh Quy hoạch tỉnh Khánh Hòa thời kỳ 2021 - 2030, tầm nhìn đến năm 2050.', chuDe: 'Quy hoạch', lv: 'Quy hoạch', cq: 'UBND tỉnh Khánh Hòa', nguon: 'Công báo Khánh Hòa', url: tim('2279/QĐ-UBND Khánh Hòa quy hoạch tỉnh 2021 2030'), luot: 2921, nb: true },
+  { so: '30/QĐ-UBND', ngay: '2026-01-15', ty: 'Phê duyệt quy hoạch phân khu (tỷ lệ 1/2000) phân khu sinh thái núi Cù Hin, đô thị mới Cam Lâm.', chuDe: 'Quy hoạch', lv: 'Quy hoạch', cq: 'UBND xã Suối Dầu', nguon: 'Cổng Cam Lâm', url: CAMLAM, luot: 680, nb: true },
+  { so: '1525/UBND', ngay: '2025-04-22', ty: 'Triển khai thực hiện Kế hoạch sử dụng đất năm 2025 của huyện Cam Lâm đã được UBND tỉnh phê duyệt.', chuDe: 'Quy hoạch', lv: 'Đất đai', cq: 'UBND huyện Cam Lâm', nguon: 'Cổng Cam Lâm', url: CAMLAM },
+  { so: '102/2024/NĐ-CP', ngay: '2024-07-30', ty: 'Quy định chi tiết thi hành một số điều của Luật Đất đai (quy hoạch – kế hoạch sử dụng đất, giao đất, cho thuê đất).', chuDe: 'Quy hoạch', lv: 'Đất đai', cq: 'Chính phủ', nguon: 'Pháp luật', url: 'https://thuvienphapluat.vn/van-ban/Bat-dong-san/Nghi-dinh-102-2024-ND-CP-huong-dan-Luat-Dat-dai-603982.aspx' },
+  { so: '8757/KH-UBND', ngay: '2026-07-09', ty: 'Kế hoạch phát triển Hệ thống cảng biển Khánh Hòa giai đoạn 2026 – 2030.', chuDe: 'Quy hoạch', lv: 'Quy hoạch', cq: 'UBND tỉnh Khánh Hòa', nguon: 'Công báo Khánh Hòa', url: 'https://congbaokhanhhoa.gov.vn/noi-dung-van-ban/vanbanid/23238' },
+  { so: '46/2026/TT-BXD', ngay: '2026-06-30', ty: 'Ban hành Quy chuẩn kỹ thuật quốc gia về quy hoạch đô thị và nông thôn.', chuDe: 'Quy hoạch', lv: 'Xây dựng', cq: 'Bộ Xây dựng', nguon: 'Cổng Cam Lâm', url: tim('46/2026/TT-BXD Quy chuẩn quy hoạch đô thị nông thôn'), luot: 854 },
+  { so: 'QCVN 01:2026/BXD', ngay: '2026-07-06', ty: 'Quy chuẩn kỹ thuật quốc gia về quy hoạch đô thị và nông thôn 2026.', chuDe: 'Quy hoạch', lv: 'Xây dựng', cq: 'Bộ Xây dựng', nguon: 'Cổng Cam Lâm', url: tim('QCVN 01:2026/BXD quy hoạch đô thị nông thôn'), luot: 510 },
+  { so: '2958/KH-UBND', ngay: '2026-07-06', ty: 'Kế hoạch triển khai Chương trình 90 ngày cao điểm giải phóng mặt bằng các dự án động lực, trọng điểm.', chuDe: 'Bồi thường', lv: 'Bồi thường - GPMB', cq: 'UBND phường Bắc Cam Ranh', nguon: 'Cổng Cam Lâm', url: CAMLAM, luot: 5671 },
+  { so: '15/2025/NQ-HĐND', ngay: '2025-07-01', ty: 'Bảng giá đất tỉnh Khánh Hòa (lần đầu theo Luật Đất đai 2024), áp dụng từ 01/01/2026 — căn cứ tính bồi thường.', chuDe: 'Bồi thường', lv: 'Giá đất', cq: 'HĐND tỉnh Khánh Hòa', nguon: 'Pháp luật', url: 'https://thuvienphapluat.vn/van-ban/Bat-dong-san/Nghi-quyet-15-2025-NQ-HDND-Bang-gia-dat-lan-dau-Khanh-Hoa-tu-01-01-2026-688194.aspx' },
+  { so: '23/2025/QĐ-UBND', ngay: '2025-04-10', ty: 'Sửa đổi, bổ sung bảng giá các loại đất tỉnh Khánh Hòa, áp dụng từ 11/4/2025.', chuDe: 'Bồi thường', lv: 'Giá đất', cq: 'UBND tỉnh Khánh Hòa', nguon: 'Pháp luật', url: 'https://thuvienphapluat.vn/chinh-sach-phap-luat-moi/vn/ho-tro-phap-luat/bat-dong-san/83020/bang-gia-dat-khanh-hoa-ap-dung-tu-ngay-11-4-2025' },
+  { so: '71/2024/NĐ-CP', ngay: '2024-06-27', ty: 'Quy định về giá đất — phương pháp định giá, xây dựng và điều chỉnh bảng giá đất, giá đất cụ thể.', chuDe: 'Bồi thường', lv: 'Giá đất', cq: 'Chính phủ', nguon: 'Pháp luật', url: tim('71/2024/NĐ-CP') },
+  { so: '88/2024/NĐ-CP', ngay: '2024-07-15', ty: 'Bồi thường, hỗ trợ, tái định cư khi Nhà nước thu hồi đất (nghị định gốc của Trung ương).', chuDe: 'Tái định cư', lv: 'Bồi thường - TĐC', cq: 'Chính phủ', nguon: 'Pháp luật', url: tim('88/2024/NĐ-CP bồi thường hỗ trợ tái định cư') },
+  // ── Bổ sung: bồi thường & tái định cư từ cấp cao tới cấp thấp ──
+  { so: '35/2026/QĐ-UBND', ngay: '2026-05-14', ty: 'Quy định đơn giá bồi thường, hỗ trợ thiệt hại đối với cây trồng, vật nuôi khi Nhà nước thu hồi đất trên địa bàn tỉnh Khánh Hòa (hiệu lực 14/5/2026, thay QĐ 32/2024).', chuDe: 'Bồi thường', lv: 'Đơn giá bồi thường', cq: 'UBND tỉnh Khánh Hòa', nguon: 'Công báo Khánh Hòa', url: 'https://congbaokhanhhoa.gov.vn/Portals/0/FileVanBans/35_2026_Q%C4%90_UBND.signed.pdf' },
+  { so: '32/2024/QĐ-UBND', ngay: '2024-10-01', ty: 'Quy định đơn giá bồi thường, hỗ trợ thiệt hại đối với cây trồng, vật nuôi khi Nhà nước thu hồi đất (Khánh Hòa) — nay được thay bằng QĐ 35/2026.', chuDe: 'Bồi thường', lv: 'Đơn giá bồi thường', cq: 'UBND tỉnh Khánh Hòa', nguon: 'Pháp luật', url: tim('32/2024/QĐ-UBND Khánh Hòa đơn giá bồi thường cây trồng vật nuôi') },
+  { so: '17/2024/QĐ-UBND', ngay: '2024-08-29', ty: 'Quy định chi tiết một số nội dung về bồi thường, hỗ trợ, tái định cư khi Nhà nước thu hồi đất trên địa bàn tỉnh Khánh Hòa (hiệu lực 01/9/2024).', chuDe: 'Tái định cư', lv: 'Bồi thường - TĐC', cq: 'UBND tỉnh Khánh Hòa', nguon: 'Công báo Khánh Hòa', url: 'https://congbaokhanhhoa.gov.vn/vi-vn/noi-dung-van-ban/vanbanid/21084' },
+  { so: '14/2025/QĐ-UBND', ngay: '2025-08-07', ty: 'Sửa đổi, bổ sung Quyết định 17/2024/QĐ-UBND về bồi thường, hỗ trợ, tái định cư khi Nhà nước thu hồi đất tại Khánh Hòa (hiệu lực 01/8/2025).', chuDe: 'Tái định cư', lv: 'Bồi thường - TĐC', cq: 'UBND tỉnh Khánh Hòa', nguon: 'Pháp luật', url: 'https://luatvietnam.vn/chinh-sach/quyet-dinh-14-2025-qd-ubnd-407929-d2.html' },
+  { so: '2436/QĐ-UBND', ngay: '2024-10-15', ty: 'Đính chính Quy định về bồi thường, hỗ trợ, tái định cư khi Nhà nước thu hồi đất trên địa bàn tỉnh Khánh Hòa (đính chính QĐ 17/2024).', chuDe: 'Tái định cư', lv: 'Bồi thường - TĐC', cq: 'UBND tỉnh Khánh Hòa', nguon: 'Pháp luật', url: tim('2436/QĐ-UBND Khánh Hòa đính chính bồi thường hỗ trợ tái định cư') },
+  { so: '27/2023/QH15', ngay: '2023-11-27', ty: 'Luật Nhà ở 2023 — sở hữu, phát triển, quản lý nhà ở; chính sách nhà ở xã hội, nhà chung cư.', chuDe: 'Nhà ở xã hội', lv: 'Nhà ở - BĐS', cq: 'Quốc hội', nguon: 'Pháp luật', url: tim('27/2023/QH15 Luật Nhà ở') },
+  { so: '2180/QĐ-UBND', ngay: '2026-06-18', ty: 'Giao đất (đợt 1) cho Công ty CP Đầu tư và Phát triển Nhà ở KVG thực hiện dự án Nhà ở cho gia đình lực lượng vũ trang tại phường Nam Nha Trang.', chuDe: 'Nhà ở xã hội', lv: 'Nhà ở', cq: 'UBND tỉnh Khánh Hòa', nguon: 'Công báo Khánh Hòa', url: 'https://congbaokhanhhoa.gov.vn/noi-dung-van-ban/vanbanid/23226' },
+  { so: '2302/QĐ-UBND', ngay: '2026-07-04', ty: 'Cho Công ty CP Phát triển BĐS Biển Trần Phú thuê đất thực hiện dự án Tổ hợp thương mại, dịch vụ du lịch cao cấp 48-48A Trần Phú, Nha Trang.', chuDe: 'Khác', lv: 'Đất đai', cq: 'UBND tỉnh Khánh Hòa', nguon: 'Công báo Khánh Hòa', url: 'https://congbaokhanhhoa.gov.vn/noi-dung-van-ban/vanbanid/23232' },
+  { so: '2295/QĐ-UBND', ngay: '2026-07-03', ty: 'Điều chỉnh, bổ sung QĐ 658/QĐ-UBND về thuê đất tại dự án Công ty TNHH Bia San Miguel Việt Nam, xã Suối Hiệp.', chuDe: 'Khác', lv: 'Đất đai', cq: 'UBND tỉnh Khánh Hòa', nguon: 'Công báo Khánh Hòa', url: 'https://congbaokhanhhoa.gov.vn/noi-dung-van-ban/vanbanid/23245' },
+  { so: '2161/QĐ-UBND', ngay: '2026-06-17', ty: 'Đính chính QĐ 09/2026/QĐ-UBND về trình tự, thủ tục cho thuê quỹ đất ngắn hạn trên địa bàn tỉnh Khánh Hòa.', chuDe: 'Khác', lv: 'Đất đai', cq: 'UBND tỉnh Khánh Hòa', nguon: 'Công báo Khánh Hòa', url: 'https://congbaokhanhhoa.gov.vn/noi-dung-van-ban/vanbanid/23229' },
+  { so: '31/2024/QH15', ngay: '2024-01-18', ty: 'Luật Đất đai 2024 — quản lý, sử dụng đất; thu hồi, bồi thường, định giá, cấp Giấy chứng nhận.', chuDe: 'Khác', lv: 'Đất đai', cq: 'Quốc hội', nguon: 'Pháp luật', url: 'https://thuvienphapluat.vn/van-ban/Bat-dong-san/Luat-Dat-dai-2024-31-2024-QH15-523642.aspx' },
+  { so: '29/2023/QH15', ngay: '2023-11-28', ty: 'Luật Kinh doanh bất động sản 2023 — điều kiện kinh doanh, chuyển nhượng dự án, môi giới, sàn giao dịch.', chuDe: 'Khác', lv: 'Nhà ở - BĐS', cq: 'Quốc hội', nguon: 'Pháp luật', url: tim('29/2023/QH15 Luật Kinh doanh bất động sản') },
+  { so: '101/2024/NĐ-CP', ngay: '2024-07-15', ty: 'Điều tra cơ bản đất đai; đăng ký, cấp Giấy chứng nhận quyền sử dụng đất; hệ thống thông tin đất đai.', chuDe: 'Khác', lv: 'Đất đai', cq: 'Chính phủ', nguon: 'Pháp luật', url: tim('101/2024/NĐ-CP') },
+  { so: '103/2024/NĐ-CP', ngay: '2024-07-30', ty: 'Quy định về tiền sử dụng đất, tiền thuê đất theo Luật Đất đai 2024.', chuDe: 'Khác', lv: 'Đất đai', cq: 'Chính phủ', nguon: 'Pháp luật', url: tim('103/2024/NĐ-CP') },
+  { so: '27/NQ-HĐND', ngay: '2026-06-15', ty: 'Nghị quyết về việc sắp xếp lại thôn và tên gọi các thôn sau sắp xếp trên địa bàn xã Cam Lâm.', chuDe: 'Khác', lv: 'Nội chính', cq: 'HĐND xã Cam Lâm', nguon: 'Cổng Cam Lâm', url: CAMLAM, luot: 808 },
+  { so: '25/QĐ-UBND', ngay: '2025-01-16', ty: 'Công nhận đạt chuẩn "Đô thị văn minh" đối với thị trấn Cam Đức, huyện Cam Lâm.', chuDe: 'Khác', lv: 'Văn hóa - Xã hội', cq: 'UBND huyện Cam Lâm', nguon: 'Cổng Cam Lâm', url: CAMLAM },
+];
+
+export async function seedVanBan(): Promise<void> {
+  try {
+    // DỌN RÁC cũ: xoá các bản ghi dính thẻ HTML/mã QR base64 do phiên bản crawler trước để lại
+    // (số ký hiệu/trích yếu chứa <img ... data:image;base64 ... qr_download>). Crawl sau sẽ thêm lại bản sạch.
+    await query(`DELETE FROM van_ban WHERE nguon <> 'Admin' AND (
+        so_hieu LIKE '%<%' OR so_hieu LIKE '%data:%' OR so_hieu LIKE '%base64%' OR so_hieu LIKE '%qr_download%'
+        OR trich_yeu LIKE '%data:image%' OR trich_yeu LIKE '%base64%' OR trich_yeu LIKE '%qr_download%' OR trich_yeu LIKE '%<img%')`).catch(() => {});
+    // Upsert idempotent MỖI lần khởi động: thêm văn bản mới trong SEED mà KHÔNG đụng dữ liệu đã có
+    // (admin sửa / crawler thêm đều được giữ nguyên nhờ ON CONFLICT DO NOTHING).
+    for (const s of SEED) {
+      await query(
+        `INSERT INTO van_ban (so_hieu, trich_yeu, ngay_ban_hanh, co_quan, chu_de, linh_vuc, nguon, link_goc, luot_tai, noi_bat)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT (so_hieu, ngay_ban_hanh) DO NOTHING`,
+        [s.so, s.ty, s.ngay, s.cq, s.chuDe, s.lv, s.nguon, s.url, s.luot ?? 0, s.nb ?? false]).catch(() => {});
+    }
+    console.log('[van-ban] seed/upsert', SEED.length, 'văn bản');
+  } catch (e: any) { console.error('[van-ban] seed lỗi:', e?.message || e); }
+}
+
+// Phân loại chủ đề theo từ khóa trong trích yếu. KW rộng để lấy nhiều văn bản nhà đất/xây dựng/đầu tư.
+const KW = /(đất|quy hoạch|bồi thường|đền bù|hỗ trợ|tái định cư|nhà ở|căn hộ|chung cư|giá đất|thu hồi|giao đất|cho thuê đất|thuê đất|giải phóng mặt bằng|GPMB|phân khu|kế hoạch sử dụng đất|giấy chứng nhận|GCN|sổ đỏ|sổ hồng|chuyển nhượng|chuyển mục đích|tách thửa|hợp thửa|đấu giá|xây dựng|công trình|dự án|đầu tư|hạ tầng|đô thị|nông thôn mới|khu công nghiệp|cụm công nghiệp|khu kinh tế|du lịch|resort|sân bay|cảng|tài nguyên|khoáng sản|thủy lợi|định giá|cấp phép)/i;
+function classify(t: string): string {
+  if (/tái định cư/i.test(t)) return 'Tái định cư';
+  if (/(nhà ở xã hội|NOXH)/i.test(t)) return 'Nhà ở xã hội';
+  if (/(bồi thường|đền bù|hỗ trợ|giải phóng mặt bằng|GPMB|thu hồi)/i.test(t)) return 'Bồi thường';
+  if (/(quy hoạch|phân khu|kế hoạch sử dụng đất)/i.test(t)) return 'Quy hoạch';
+  if (/(giao đất|cho thuê đất|thuê đất|đấu giá|chuyển mục đích|tách thửa|hợp thửa)/i.test(t)) return 'Giao & thuê đất';
+  if (/(giấy chứng nhận|GCN|sổ đỏ|sổ hồng|cấp giấy|đăng ký đất đai)/i.test(t)) return 'Giấy chứng nhận';
+  if (/(định giá|giá đất|bảng giá)/i.test(t)) return 'Định giá đất';
+  return 'Khác';
+}
+const clean = (s: string) => String(s || '')
+  .replace(/data:[^\s"'<>]+/gi, ' ')                 // xoá chuỗi data:image;base64,... (mã QR/ảnh nhúng)
+  .replace(/<[^>]*>/g, ' ')                          // lột thẻ HTML hoàn chỉnh
+  .replace(/[<>]/g, ' ')                             // dọn ký tự < > lẻ còn sót (do thuộc tính lồng nhau)
+  .replace(/&#(\d+);/g, (_, n) => { try { return String.fromCodePoint(Number(n)); } catch { return ''; } })
+  .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => { try { return String.fromCodePoint(parseInt(h, 16)); } catch { return ''; } })
+  .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ')
+  .replace(/\s+/g, ' ').trim();
+// Trích đúng SỐ KÝ HIỆU (vd 185/NQ-HĐND, 2549/QĐ-UBND) từ chuỗi đã làm sạch — tránh dính đuôi rác/lặp.
+const soOf = (s: string) => {
+  const c = clean(s);
+  const m = c.match(/\d+\s*\/\s*[A-Za-zĐđ][A-Za-zĐđ0-9.\/-]*/);
+  return m ? m[0].replace(/\s+/g, '') : (c.split(/["\s]/)[0] || '');
+};
+
+// Kho Công báo tổng hợp (tracuucongbao): danh sách /trang-chu/pg/N phân trang bằng GET (853 trang, 2005→nay),
+// sắp MỚI→CŨ → duyệt tin cậy từ 2021 tới nay rồi tự dừng khi qua mốc 2021. Không cần postback.
+const DOMAIN = 'https://tracuucongbao.khanhhoa.gov.vn';
+const H1 = (re: RegExp, s: string) => (s.match(re) || [])[1] || '';
+const absol = (p: string) => (p.startsWith('http') ? p : DOMAIN + '/' + p.replace(/^\/+/, ''));
+
+function parseRows(html: string): { so: string; ngay: string; coQuan: string; trichYeu: string; pdfPath: string; id: string }[] {
+  const out: any[] = [];
+  for (const tr of html.match(/<tr[^>]*>[\s\S]*?<\/tr>/gi) || []) {
+    const id = H1(/vanbanid\/(\d+)/, tr);
+    if (!id) continue;
+    const tds = [...tr.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map((mm) => clean(mm[1].replace(/<[^>]+>/g, ' ')));
+    if (tds.length < 3) continue;
+    const so = soOf(H1(/vanbanid\/\d+[^>]*>([^<]+)</, tr) || tds[0]);
+    const d = tr.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
+    const ngay = d ? `${d[3]}-${d[2].padStart(2, '0')}-${d[1].padStart(2, '0')}` : '';
+    const cells = tds.slice(1);
+    const trichYeu = cells.reduce((a, b) => (b.length > a.length ? b : a), '');
+    const coQuan = cells.find((c) => /^(UBND|HĐND|Xã |Phường |Chủ tịch|Thành phố|Huyện |Thị xã)/i.test(c) && c.length < 45) || 'UBND tỉnh Khánh Hòa';
+    const pdfPath = H1(/(Portals\/0\/FileVanBans[^"'\s]+\.pdf)/i, tr).replace(/\\/g, '/');
+    out.push({ so, ngay, coQuan, trichYeu, pdfPath, id });
+  }
+  return out;
+}
+
+let lastCrawl = 0;
+export async function crawlCongBao(force = false, deep = false, onAdd?: (isNew: boolean) => void): Promise<number> {
+  if (!force && Date.now() - lastCrawl < 55 * 60 * 1000) return 0; // chốt 55 phút → lịch mỗi giờ luôn cào được "gần đây", tránh cào trùng dồn dập
+  lastCrawl = Date.now();
+  const MAX_PAGES = deep ? 950 : 15;    // sâu: cào TRỌN kho (2005→nay, ~853 trang) · gần đây: 15 trang mới nhất (mỗi giờ)
+  const seen = new Set<string>();       // CHỐNG ĐẾM TRÙNG trong 1 lần chạy: mục "Mục lục"/"Văn bản được quan tâm" lặp trên MỌI trang
+  let n = 0, empty = 0;
+  for (let pg = 1; pg <= MAX_PAGES; pg++) {
+    let rows: any[];
+    try {
+      const r = await fetch(`${DOMAIN}/trang-chu/pg/${pg}`, { headers: UA, signal: AbortSignal.timeout(15000) });
+      if (!r.ok) break;
+      rows = parseRows(await r.text());
+    } catch { break; }
+    if (!rows.length) { if (++empty >= 3) break; continue; } // chỉ dừng khi 3 trang RỖNG liên tiếp = hết kho (KHÔNG dừng sớm vì trang ít văn bản đất)
+    empty = 0;
+    for (const row of rows) {
+      const year = Number((row.ngay || '').slice(0, 4));
+      if (!year || !row.trichYeu || !row.so || !KW.test(`${row.trichYeu} ${row.so}`)) continue; // lấy MỌI năm (2005→nay), miễn khớp từ khoá nhà đất/quy hoạch
+      const key = `${row.so}|${row.ngay}`;
+      if (seen.has(key)) continue;       // đã xử lý trong lần chạy này → KHÔNG upsert lại (tránh cộng dồn ảo)
+      seen.add(key);
+      const link = row.pdfPath ? absol(row.pdfPath) : `${DOMAIN}/noi-dung-van-ban/vanbanid/${row.id}`;
+      await query(
+        `INSERT INTO van_ban (so_hieu, trich_yeu, ngay_ban_hanh, co_quan, chu_de, linh_vuc, nguon, link_goc)
+         VALUES ($1,$2,$3,$4,$5,'Đất đai','Công báo Khánh Hòa',$6)
+         ON CONFLICT (so_hieu, ngay_ban_hanh) DO UPDATE SET trich_yeu=EXCLUDED.trich_yeu,
+           chu_de=EXCLUDED.chu_de, link_goc=COALESCE(EXCLUDED.link_goc, van_ban.link_goc)
+         RETURNING (xmax = 0) AS inserted`,
+        [row.so, row.trichYeu, row.ngay, row.coQuan, classify(`${row.trichYeu} ${row.so}`), link])
+        .then((rs: any) => { n++; onAdd?.(!!(rs && rs[0] && rs[0].inserted)); }).catch(() => {});
+    }
+    await new Promise((z) => setTimeout(z, 300)); // lịch sự với máy chủ nguồn giữa các trang
+  }
+  console.log(`[van-ban] crawl Công báo (${deep ? 'sâu toàn kho' : 'gần đây'}): ${n} văn bản không trùng`);
+  return n;
+}
+
+// ── Cổng TTĐT tỉnh Khánh Hòa: quét trang tra cứu văn bản /module/document của từng cổng ──
+// Các cổng dùng chung nền tảng PSC Portal; GridView trang 1 hiển thị ~10 văn bản MỚI NHẤT (đủ để cập nhật hằng ngày).
+// Số văn bản đất đai mỗi cổng ít — đây là NGUỒN BỔ SUNG; Công báo mới là kho tổng hợp đầy đủ.
+const PORTALS_DOC: { ten: string; base: string }[] = [
+  { ten: 'Cổng tỉnh Khánh Hòa', base: 'https://khanhhoa.gov.vn' },
+  { ten: 'Sở Xây dựng', base: 'https://sxd.khanhhoa.gov.vn' },
+  { ten: 'Sở Nông nghiệp & Môi trường', base: 'https://snnmt.khanhhoa.gov.vn' },
+  { ten: 'Cam Lâm', base: 'https://camlam.khanhhoa.gov.vn' },
+  { ten: 'Cam An', base: 'https://caman.khanhhoa.gov.vn' },
+  { ten: 'Cam Hiệp', base: 'https://camhiep.khanhhoa.gov.vn' },
+  { ten: 'Suối Dầu', base: 'https://suoidau.khanhhoa.gov.vn' },
+  { ten: 'Suối Hiệp', base: 'https://suoihiep.khanhhoa.gov.vn' },
+  { ten: 'Cam Ranh', base: 'https://camranh.khanhhoa.gov.vn' },
+  { ten: 'Bắc Cam Ranh', base: 'https://baccamranh.khanhhoa.gov.vn' },
+  { ten: 'Nam Cam Ranh', base: 'https://namcamranh.khanhhoa.gov.vn' },
+  { ten: 'Cam Linh', base: 'https://camlinh.khanhhoa.gov.vn' },
+  { ten: 'Ba Ngòi', base: 'https://bangoi.khanhhoa.gov.vn' },
+  { ten: 'Nha Trang', base: 'https://nhatrang.khanhhoa.gov.vn' },
+  { ten: 'Bắc Nha Trang', base: 'https://bacnhatrang.khanhhoa.gov.vn' },
+  { ten: 'Tây Nha Trang', base: 'https://taynhatrang.khanhhoa.gov.vn' },
+  { ten: 'Nam Nha Trang', base: 'https://namnhatrang.khanhhoa.gov.vn' },
+  { ten: 'Diên Khánh', base: 'https://dienkhanh.khanhhoa.gov.vn' },
+  { ten: 'Diên Lạc', base: 'https://dienlac.khanhhoa.gov.vn' },
+  { ten: 'Diên Điền', base: 'https://diendien.khanhhoa.gov.vn' },
+  { ten: 'Diên Lâm', base: 'https://dienlam.khanhhoa.gov.vn' },
+  { ten: 'Diên Thọ', base: 'https://dientho.khanhhoa.gov.vn' },
+];
+
+// RadGrid nạp RỖNG rồi gọi web service JSON (ASMX ScriptService) để lấy dữ liệu — ta gọi thẳng service đó cho chuẩn.
+// POST {base}/Services/DMSSearch.asmx/Search  (Content-Type: application/json)
+//   body: {notation,subject,content,idField,idCategory,idCategories,dateBegin,dateEnd,isCopy,starIndex,endIndex}
+//   trả:  {"d":"<mảng JSON>_<tổng>"} — mỗi phần tử: {Notation, CreatedDate:"/Date(ms)/", Subject, LuotXem, Id}
+const EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
+function parseAspDate(v: any): string {
+  if (v == null) return '';
+  const s = String(v);
+  const m = s.match(/\/Date\((-?\d+)/);                 // định dạng .NET: /Date(1712...)/
+  if (m) { const d = new Date(Number(m[1])); return isNaN(+d) ? '' : d.toISOString().slice(0, 10); }
+  const dmy = s.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
+  if (dmy) return `${dmy[3]}-${dmy[2].padStart(2, '0')}-${dmy[1].padStart(2, '0')}`;
+  const iso = s.match(/(\d{4})-(\d{2})-(\d{2})/);
+  return iso ? iso[0] : '';
+}
+
+// Gọi API DMSSearch của 1 cổng → danh sách văn bản mới nhất (tối đa 150).
+async function fetchPortalDocs(base: string): Promise<{ so: string; ngay: string; trichYeu: string; luot: number; id: string; link: string }[]> {
+  const body = JSON.stringify({ notation: '', subject: '', content: '', idField: EMPTY_GUID, idCategory: EMPTY_GUID, idCategories: EMPTY_GUID, dateBegin: '', dateEnd: '', isCopy: false, starIndex: 0, endIndex: 150 });
+  const r = await fetch(`${base}/Services/DMSSearch.asmx/Search`, {
+    method: 'POST', body,
+    headers: { ...UA, 'Content-Type': 'application/json; charset=utf-8', 'Accept': 'application/json' },
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!r.ok) return [];
+  const j: any = await r.json().catch(() => null);
+  let s: string = j && typeof j.d === 'string' ? j.d : '';
+  if (!s) return [];
+  const i = s.lastIndexOf('_');                          // service nối "<mảng JSON>_<tổng>"
+  if (i > 0) s = s.slice(0, i);
+  let arr: any[]; try { arr = JSON.parse(s); } catch { return []; }
+  if (!Array.isArray(arr)) return [];
+  return arr.map((o: any) => {
+    let link = '';                                       // nếu service có trả trường file/URL thì dùng làm link tải
+    for (const k of Object.keys(o || {})) {
+      const v = o[k];
+      if (typeof v !== 'string') continue;
+      if (/\.(pdf|docx?)($|\?)/i.test(v)) { link = v; break; }
+      if (/^https?:\/\//i.test(v) && /(file|download|document|upload|attach)/i.test(v)) link = v;
+    }
+    if (link && !/^https?:/i.test(link)) { try { link = new URL(link, base).href; } catch { link = ''; } }
+    return { so: soOf(String(o.Notation || '')), ngay: parseAspDate(o.CreatedDate), trichYeu: clean(String(o.Subject || '')), luot: Number(o.LuotXem) || 0, id: String(o.Id || ''), link };
+  });
+}
+
+// Quét toàn bộ cổng TTĐT qua API (best-effort): cổng nào lỗi/không có service thì bỏ qua, không ảnh hưởng cổng khác.
+export async function crawlPortals(onAdd?: (isNew: boolean) => void): Promise<number> {
+  let n = 0; const seen = new Set<string>();
+  for (const p of PORTALS_DOC) {
+    try {
+      const docs = await fetchPortalDocs(p.base);
+      for (const d of docs) {
+        const year = Number((d.ngay || '').slice(0, 4));
+        const text = `${d.trichYeu} ${d.so}`;
+        if (!d.so || d.trichYeu.length < 8 || !year || !KW.test(text)) continue;  // lấy đất đai/dự án MỌI năm, có số ký hiệu
+        const key = `${d.so}|${d.ngay}`;
+        if (seen.has(key)) continue;          // chống đếm trùng (cùng văn bản ở nhiều cổng)
+        seen.add(key);
+        await query(
+          `INSERT INTO van_ban (so_hieu, trich_yeu, ngay_ban_hanh, co_quan, chu_de, linh_vuc, nguon, link_goc, luot_tai)
+           VALUES ($1,$2,$3,$4,$5,'Đất đai',$6,$7,$8)
+           ON CONFLICT (so_hieu, ngay_ban_hanh) DO UPDATE SET
+             link_goc = COALESCE(NULLIF(van_ban.link_goc, ''), EXCLUDED.link_goc)
+           RETURNING (xmax = 0) AS inserted`,
+          [d.so, d.trichYeu, d.ngay, `Cổng ${p.ten}`, classify(text), `Cổng ${p.ten}`, d.link || `${p.base}/module/document`, d.luot]
+        ).then((rs: any) => { n++; onAdd?.(!!(rs && rs[0] && rs[0].inserted)); }).catch(() => {});
+      }
+    } catch { /* cổng lỗi/timeout → bỏ qua */ }
+    await new Promise((z) => setTimeout(z, 300));
+  }
+  console.log(`[van-ban] crawl ${PORTALS_DOC.length} cổng TTĐT (DMS API): ${n} văn bản`);
+  return n;
+}
+
+// Crawl NỀN: /refresh khởi động rồi trả lời NGAY (tránh 524 — Cloudflare cắt kết nối ở ~100s khi crawl sâu).
+// Client hỏi tiến độ qua /refresh-status tới khi running=false. Chặn chạy trùng bằng cờ running.
+const crawlState = { running: false, added: 0, updated: 0, startedAt: 0, finishedAt: 0, error: '' };
+function startCrawlBg(): boolean {
+  if (crawlState.running) return false;
+  crawlState.running = true; crawlState.added = 0; crawlState.updated = 0; crawlState.startedAt = Date.now(); crawlState.finishedAt = 0; crawlState.error = '';
+  const cb = (isNew: boolean) => { if (isNew) crawlState.added++; else crawlState.updated++; };
+  (async () => {
+    try { await crawlCongBao(true, true, cb); await crawlPortals(cb); }
+    catch (e: any) { crawlState.error = e?.message || 'Lỗi crawl'; }
+    finally { crawlState.running = false; crawlState.finishedAt = Date.now(); }
+  })();
+  return true;
+}
+
+// Lấy URL PDF trực tiếp từ trang chi tiết. Công báo nhúng PDF qua Google Docs viewer:
+//   viewer?url=https://.../Portals/0/FileVanBans\<Ten>.pdf&embedded=true   (đường dẫn dùng dấu '\')
+// Chuẩn hoá '\'→'/', mã hoá ký tự tiếng Việt, chấp nhận nhiều dạng.
+function normPdf(raw: string, base: string): string | null {
+  try {
+    let u = decodeURIComponent(raw.trim()).replace(/&amp;/gi, '&').replace(/\\/g, '/');
+    if (!/^https?:/i.test(u)) u = new URL(u, base).href;
+    return new URL(u).href;        // new URL tự mã hoá ký tự non-ASCII trong path
+  } catch { try { return new URL(raw.replace(/\\/g, '/'), base).href; } catch { return null; } }
+}
+async function resolvePdf(link: string): Promise<string | null> {
+  if (!link) return null;
+  if (/\.pdf(\?|$)/i.test(link)) return normPdf(link, link);
+  try {
+    const r = await fetch(link, { headers: UA, signal: AbortSignal.timeout(12000) });
+    if (!r.ok) return null;
+    const html = await r.text();
+    const m = html.match(/viewer\?url=([^"'&\s]+\.pdf)/i)                              // 1) Google Docs viewer
+      || html.match(/(https?:\/\/[^"'<>\s]*FileVanBans[\\/][^"'<>\s]+\.pdf)/i)          // 2) FileVanBans (\ hoặc /)
+      || html.match(/["'(]\s*([^"'()<>\s]+\.pdf)\s*["')]/i);                            // 3) .pdf bất kỳ trong href/src
+    if (!m) return null;
+    return normPdf(m[1] || m[0], link);
+  } catch { return null; }
+}
+
+// ── GET / (danh sách) — CÔNG KHAI (ai cũng xem được trích yếu); chỉ TẢI mới cần đăng nhập ──
+vanBanRouter.get('/', async (_req, res) => {
+  try {
+    const rows = await query(`
+      SELECT id, so_hieu AS "soKyHieu", trich_yeu AS "trichYeu",
+             to_char(ngay_ban_hanh,'YYYY-MM-DD') AS ngay, co_quan AS "coQuan",
+             chu_de AS "chuDe", linh_vuc AS "linhVuc", nguon,
+             luot_tai AS "luotTai", noi_bat AS "noiBat",
+             (link_goc IS NOT NULL AND link_goc <> '') AS "coFile"
+      FROM van_ban ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 8000`);
+    res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=1800'); // metadata (không nội dung nặng) — cache CDN 5' cho nhẹ tải
+    res.json({ docs: rows });
+  } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
+});
+
+// ── GET /manage — danh sách đầy đủ (có link gốc) cho người quản lý văn bản ──
+vanBanRouter.get('/manage', vanBanRequired, async (_req, res) => {
+  try {
+    const rows = await query(`
+      SELECT id, so_hieu AS "soKyHieu", trich_yeu AS "trichYeu",
+             to_char(ngay_ban_hanh,'YYYY-MM-DD') AS ngay, co_quan AS "coQuan",
+             chu_de AS "chuDe", linh_vuc AS "linhVuc", nguon, link_goc AS "linkGoc",
+             luot_tai AS "luotTai", noi_bat AS "noiBat"
+      FROM van_ban ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 8000`);
+    res.json({ docs: rows });
+  } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
+});
+
+// ── GET /:id/pdf — proxy tải PDF qua server (đếm lượt) — CHỈ người đăng nhập ──
+vanBanRouter.get('/:id/pdf', authRequired, async (req, res) => {
+  try {
+    const [row] = await query<any>('SELECT id, so_hieu, link_goc FROM van_ban WHERE id=$1', [Number(req.params.id)]);
+    if (!row) return res.status(404).json({ error: 'Không tìm thấy văn bản' });
+    query('UPDATE van_ban SET luot_tai = luot_tai + 1 WHERE id=$1', [row.id]).catch(() => {});
+    const pdf = await resolvePdf(row.link_goc);
+    if (pdf) {
+      let ref = ''; try { ref = new URL(row.link_goc).origin + '/'; } catch { /* link_goc rỗng */ }
+      const r = await fetch(pdf, { headers: { ...UA, ...(ref ? { Referer: ref } : {}) }, signal: AbortSignal.timeout(20000) });
+      const ct = r.headers.get('content-type') || '';
+      if (r.ok && (/pdf/i.test(ct) || /\.pdf/i.test(pdf))) {
+        const buf = Buffer.from(await r.arrayBuffer());
+        res.set('Content-Type', 'application/pdf');
+        res.set('Content-Disposition', `inline; filename="${String(row.so_hieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf"`);
+        res.set('Cache-Control', 'private, max-age=86400');
+        return res.send(buf);
+      }
+    }
+    return res.json({ redirect: row.link_goc || null }); // không lấy được PDF → mở trang nguồn
+  } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi tải' }); }
+});
+
+// ── Admin: thêm / sửa / xoá / làm mới ──
+vanBanRouter.post('/', vanBanRequired, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const [r] = await query(
+      `INSERT INTO van_ban (so_hieu, trich_yeu, ngay_ban_hanh, co_quan, chu_de, linh_vuc, nguon, link_goc, noi_bat)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+       ON CONFLICT (so_hieu, ngay_ban_hanh) DO UPDATE SET trich_yeu=EXCLUDED.trich_yeu, co_quan=EXCLUDED.co_quan,
+         chu_de=EXCLUDED.chu_de, linh_vuc=EXCLUDED.linh_vuc, nguon=EXCLUDED.nguon, link_goc=EXCLUDED.link_goc, noi_bat=EXCLUDED.noi_bat
+       RETURNING id`,
+      [b.soKyHieu || null, b.trichYeu, b.ngay || null, b.coQuan || null, b.chuDe || 'Khác', b.linhVuc || null, b.nguon || 'Admin', b.linkGoc || null, !!b.noiBat]);
+    res.json({ ok: true, id: r?.id });
+  } catch (e: any) { res.status(400).json({ error: e?.message || 'Lỗi thêm' }); }
+});
+vanBanRouter.put('/:id', vanBanRequired, async (req, res) => {
+  try {
+    const b = req.body || {};
+    await query(
+      `UPDATE van_ban SET so_hieu=$2, trich_yeu=$3, ngay_ban_hanh=$4, co_quan=$5, chu_de=$6, linh_vuc=$7, nguon=$8, link_goc=$9, noi_bat=$10 WHERE id=$1`,
+      [Number(req.params.id), b.soKyHieu || null, b.trichYeu, b.ngay || null, b.coQuan || null, b.chuDe || 'Khác', b.linhVuc || null, b.nguon || null, b.linkGoc || null, !!b.noiBat]);
+    res.json({ ok: true });
+  } catch (e: any) { res.status(400).json({ error: e?.message || 'Lỗi sửa' }); }
+});
+vanBanRouter.delete('/:id', vanBanRequired, async (req, res) => {
+  try { await query('DELETE FROM van_ban WHERE id=$1', [Number(req.params.id)]); res.json({ ok: true }); }
+  catch (e: any) { res.status(400).json({ error: e?.message || 'Lỗi xoá' }); }
+});
+// Khởi động đồng bộ NỀN rồi trả lời NGAY (không chờ crawl xong → không còn 524).
+vanBanRouter.post('/refresh', vanBanRequired, (_req, res) => {
+  const started = startCrawlBg();
+  res.json({ ok: true, started, running: crawlState.running, added: crawlState.added });
+});
+// Tiến độ đồng bộ để client hỏi định kỳ.
+vanBanRouter.get('/refresh-status', vanBanRequired, (_req, res) => {
+  res.json({ running: crawlState.running, added: crawlState.added, updated: crawlState.updated, error: crawlState.error, finishedAt: crawlState.finishedAt });
+});

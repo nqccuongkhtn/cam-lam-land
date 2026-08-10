@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { api } from './api';
 import { getToken, setToken, clearToken } from './token';
 
-export type Role = 'user' | 'admin' | 'gis';
+export type Role = 'user' | 'admin' | 'gis' | 'vanban';
 export interface AuthUser {
   id: number; email: string; role: Role;
   fullName?: string | null; phone?: string | null;
@@ -40,6 +40,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const cached = readCachedUser();
     if (cached) setUser(cached); // hiện tên ngay, không chờ /auth/me
     refresh();                   // xác thực lại ở nền
+  }, [refresh]);
+  // ĐỒNG BỘ đăng nhập/đăng xuất giữa các cửa sổ & IFRAME (hub Tiện ích/Quản lý): token đổi ở nơi khác -> tự cập nhật, khỏi phải tải lại.
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => { if (!e.key || e.key === 'camlam_token' || e.key === USER_KEY) refresh(); };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, [refresh]);
   const login = (t: string, u: AuthUser, remember = true) => { setToken(t, remember); writeCachedUser(u, remember); setUser(u); };
   const logout = () => { clearToken(); writeCachedUser(null); setUser(null); };

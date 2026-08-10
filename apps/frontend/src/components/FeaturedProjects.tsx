@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
@@ -14,11 +14,11 @@ const DEFAULTS: Project[] = [
   { id: -3, name: 'Khu đô thị trung tâm Cam Đức', status: 'Đang cập nhật', scale: 'Trung tâm huyện', location: 'Cam Đức, Cam Lâm', imageUrl: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=60' },
 ];
 
-function badgeClass(status?: string | null) {
+function chipClass(status?: string | null) {
   const s = (status || '').toLowerCase();
-  if (s.includes('mở bán') && !s.includes('sắp')) return 'bg-emerald-500';
-  if (s.includes('sắp')) return 'bg-amber-500';
-  return 'bg-slate-500';
+  if (s.includes('mở bán') && !s.includes('sắp')) return 'bg-emerald-50 text-emerald-700';
+  if (s.includes('sắp')) return 'bg-amber-50 text-amber-700';
+  return 'bg-slate-100 text-slate-500';
 }
 
 function IPin() {
@@ -27,23 +27,23 @@ function IPin() {
 
 function ProjectCard({ p, isAdmin, onDelete }: { p: Project; isAdmin: boolean; onDelete: () => void }) {
   return (
-    <div className="group relative">
-      <Link href="/map" className="block bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-lg hover:border-slate-300 transition">
+    <div className="group relative h-full">
+      <Link href={`/listings?q=${encodeURIComponent(p.name)}`} className="flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg hover:border-slate-300 transition active:scale-[.99]">
         <div className="relative aspect-[16/10] bg-slate-100 overflow-hidden">
           {p.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={p.imageUrl} alt={p.name} loading="lazy" decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+            <img src={p.imageUrl} alt={p.name} loading="lazy" decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden'; }} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
           ) : null}
-          {p.status ? <span className={`absolute bottom-2 left-2 text-white text-[11px] font-bold px-2 py-0.5 rounded shadow ${badgeClass(p.status)}`}>{p.status}</span> : null}
         </div>
-        <div className="p-3">
-          <h3 className="font-bold text-[#0A2540] line-clamp-1 group-hover:text-red-700">{p.name}</h3>
-          {p.scale ? <p className="text-sm text-slate-600 mt-1">{p.scale}</p> : null}
+        <div className="p-3.5">
+          {p.status ? <span className={`inline-block text-[11px] font-semibold px-2 py-0.5 rounded ${chipClass(p.status)}`}>{p.status}</span> : null}
+          <h3 className="font-bold text-[#0A2540] line-clamp-1 group-hover:text-red-700 mt-1.5">{p.name}</h3>
+          {p.scale ? <p className="text-[13px] text-slate-700 mt-1 font-medium truncate">{p.scale}</p> : null}
           {p.location ? <p className="mt-1 flex items-center gap-1 text-[13px] text-slate-500"><IPin /> <span className="truncate">{p.location}</span></p> : null}
         </div>
       </Link>
       {isAdmin && p.id > 0 ? (
-        <button onClick={onDelete} aria-label="Xoa du an" className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-red-500 hover:bg-red-600 text-white text-lg leading-none grid place-items-center shadow">×</button>
+        <button onClick={onDelete} aria-label="Xoá dự án" className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-red-500 hover:bg-red-600 text-white text-lg leading-none grid place-items-center shadow opacity-0 group-hover:opacity-100 max-sm:opacity-100 transition">×</button>
       ) : null}
     </div>
   );
@@ -56,15 +56,66 @@ export default function FeaturedProjects() {
   const [addOpen, setAddOpen] = useState(false);
   const [f, setF] = useState({ name: '', status: 'Đang mở bán', scale: '', location: '', imageUrl: '' });
   const [saving, setSaving] = useState(false);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const hoverRef = useRef(false);
+  const pauseUntil = useRef(0);
+  const halfRef = useRef(0);
 
   const load = () => api<{ projects: Project[] }>('/projects').then((r) => setProjects(r.projects || [])).catch(() => {});
   useEffect(() => { load(); }, []);
 
   const list = projects.length ? projects : DEFAULTS;
+  const loop = list.length >= 4;                 // đủ thẻ mới nhân đôi + tự trượt
+  const track = loop ? [...list, ...list] : list;
 
-  async function del(id: number) {
-    if (!confirm('Xoa du an nay khoi trang chu?')) return;
-    try { await api('/projects/' + id, { method: 'DELETE' }); load(); } catch (e: any) { alert(e?.message || 'Loi'); }
+  // Đo bề rộng đúng của 1 vòng (nửa track) để lặp liền mạch — tính lại khi resize.
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el || !loop) return;
+    const calc = () => {
+      const row = el.firstElementChild as HTMLElement | null;
+      const kids = row?.children;
+      if (kids && kids.length >= list.length * 2 && list.length) {
+        halfRef.current = (kids[list.length] as HTMLElement).offsetLeft - (kids[0] as HTMLElement).offsetLeft;
+      } else { halfRef.current = el.scrollWidth / 2; }
+    };
+    calc();
+    window.addEventListener('resize', calc);
+    return () => window.removeEventListener('resize', calc);
+  }, [loop, list.length]);
+
+  // Auto-trượt kiểu "Doanh nghiệp tiêu biểu": đứng yên → lướt đúng 1 thẻ (cuộn mượt) → đứng yên.
+  // Nhịp CHẬM hơn một tẹo (4,2s so với 3s) cho mượt. Dừng khi rê chuột / chạm / vừa bấm mũi tên.
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el || !loop) return;
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const advance = () => {
+      if (hoverRef.current || performance.now() < pauseUntil.current) return;
+      const halfW = halfRef.current || el.scrollWidth / 2;
+      if (halfW > 0 && el.scrollLeft >= halfW - 1) el.scrollLeft -= halfW; // reset liền mạch trước khi lướt
+      const row = el.firstElementChild as HTMLElement | null;
+      const kids = row?.children;
+      let step = el.clientWidth * 0.5;
+      if (kids && kids.length >= 2) step = (kids[1] as HTMLElement).offsetLeft - (kids[0] as HTMLElement).offsetLeft; // đúng 1 thẻ + khoảng cách
+      el.scrollBy({ left: step, behavior: 'smooth' });
+    };
+    const iv = setInterval(advance, 4200);
+    return () => clearInterval(iv);
+  }, [loop, list.length]);
+
+  const nudge = (dir: number) => {
+    const el = scrollerRef.current; if (!el) return;
+    pauseUntil.current = performance.now() + 1800;                  // tạm ngưng auto để cuộn tay mượt
+    const card = el.querySelector('[data-card]') as HTMLElement | null;
+    const step = card ? card.offsetWidth + 20 : el.clientWidth * 0.8;
+    if (dir < 0 && halfRef.current > 0 && el.scrollLeft <= step) el.scrollLeft += halfRef.current; // lùi ở đầu → nhảy sang nửa sau, không kẹt (chỉ khi có lặp)
+    el.scrollBy({ left: dir * step, behavior: 'smooth' });
+  };
+
+  async function del(id: number, name: string) {
+    if (!confirm(`Xoá dự án "${name}" khỏi trang chủ?\n\nHành động này không thể hoàn tác.`)) return;
+    try { await api('/projects/' + id, { method: 'DELETE' }); load(); } catch (e: any) { alert(e?.message || 'Lỗi'); }
   }
   async function add() {
     if (!f.name.trim()) return;
@@ -77,19 +128,35 @@ export default function FeaturedProjects() {
   }
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-10">
-      <div className="flex items-center justify-between mb-6 gap-3">
+    <section className="mx-auto max-w-7xl px-3 sm:px-4 py-7 sm:py-10">
+      <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
         <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">Dự án bất động sản nổi bật</h2>
         <div className="flex items-center gap-2 shrink-0">
           {isAdmin ? <button onClick={() => setAddOpen(true)} className="inline-flex items-center gap-1.5 bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-semibold px-4 py-2 rounded-xl">＋ Thêm dự án</button> : null}
-          <Link href="/map" className="text-red-600 font-semibold text-sm hover:underline whitespace-nowrap">Xem thêm →</Link>
+          <Link href="/listings" className="text-red-600 font-semibold text-sm hover:underline whitespace-nowrap">Xem thêm →</Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-        {list.slice(0, 8).map((p) => (
-          <ProjectCard key={p.id} p={p} isAdmin={!!isAdmin} onDelete={() => del(p.id)} />
-        ))}
+      <div className="relative">
+        <button onClick={() => nudge(-1)} aria-label="Xem trước"
+          className="hidden sm:grid absolute left-0 top-[34%] -translate-y-1/2 z-10 w-10 h-10 place-items-center rounded-full bg-white/95 backdrop-blur border border-slate-200 shadow-md text-slate-500 hover:text-[#0A2540] hover:shadow-lg text-xl leading-none transition">‹</button>
+
+        <div ref={scrollerRef}
+          onMouseEnter={() => { hoverRef.current = true; }}
+          onMouseLeave={() => { hoverRef.current = false; }}
+          onTouchStart={() => { pauseUntil.current = performance.now() + 4000; }}
+          className="overflow-x-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div className="flex gap-4 md:gap-5 w-max py-1">
+            {track.map((p, i) => (
+              <div data-card key={i} className="shrink-0 w-[236px] sm:w-[262px] md:w-[288px]">
+                <ProjectCard p={p} isAdmin={!!isAdmin && i < list.length} onDelete={() => del(p.id, p.name)} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <button onClick={() => nudge(1)} aria-label="Xem tiếp"
+          className="hidden sm:grid absolute right-0 top-[34%] -translate-y-1/2 z-10 w-10 h-10 place-items-center rounded-full bg-white/95 backdrop-blur border border-slate-200 shadow-md text-slate-500 hover:text-[#0A2540] hover:shadow-lg text-xl leading-none transition">›</button>
       </div>
 
       {isAdmin && addOpen ? (

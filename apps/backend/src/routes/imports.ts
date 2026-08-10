@@ -104,9 +104,12 @@ importsRouter.post('/upload', gisRequired, upload.single('file'), async (req: Au
         return res.status(400).json({ error: 'Lỗi nạp dữ liệu: ' + msg });
       }
     }
-    await query(`UPDATE import_jobs SET status='error', log=$2, updated_at=now() WHERE id=$1`,
-      [job.id, 'DGN chưa hỗ trợ trực tiếp — hãy xuất sang Shapefile (.zip) hoặc GeoJSON.']);
-    return res.status(400).json({ error: 'DGN chưa hỗ trợ trực tiếp. Hãy xuất sang Shapefile (nén .zip) hoặc GeoJSON rồi tải lại.' });
+    // DGN: để job ở trạng thái 'pending' cho gis-worker xử lý bằng GDAL
+    // (DGN V7 đọc trực tiếp; DGN V8 tự đổi qua mạng nếu máy chủ có GROUPDOCS_CLIENT_ID/SECRET).
+    return res.status(202).json({
+      message: 'Đã nhận file DGN — hệ thống đang chuẩn hóa (DGN V8 sẽ tự đổi qua mạng). Xem tiến độ ở danh sách import.',
+      jobId: job.id, status: 'processing',
+    });
   } catch (e) { next(e); }
 });
 

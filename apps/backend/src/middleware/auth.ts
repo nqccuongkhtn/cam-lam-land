@@ -26,3 +26,12 @@ export function gisRequired(req: AuthedRequest, res: Response, next: NextFunctio
     next();
   });
 }
+
+// Quản lý văn bản: admin HOẶC role 'vanban'.
+export function vanBanRequired(req: AuthedRequest, res: Response, next: NextFunction) {
+  authRequired(req, res, () => {
+    if (req.user?.role !== 'admin' && req.user?.role !== 'vanban')
+      return res.status(403).json({ error: 'Cần quyền quản lý văn bản (admin hoặc quản lý văn bản)' });
+    next();
+  });
+}

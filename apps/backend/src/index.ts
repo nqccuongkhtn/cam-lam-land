@@ -21,21 +21,34 @@ import { partnersRouter } from './routes/partners.ts';
 import { projectsRouter } from './routes/projects.ts';
 import { consignmentsRouter } from './routes/consignments.ts';
 import { investRouter } from './routes/invest.ts';
+import { gameRouter } from './routes/game.ts';
 import { pushRouter } from './routes/push.ts';
 import { paymentsRouter } from './routes/payments.ts';
 import { flagsRouter } from './routes/flags.ts';
 import { newsRouter, refreshNews } from './routes/news.ts';
+import { newsletterRouter } from './routes/newsletter.ts';
+import { vanBanRouter, seedVanBan, crawlCongBao, crawlPortals } from './routes/vanBan.ts';
 import { configRouter } from './routes/config.ts';
 import { savedPlacesRouter } from './routes/savedPlaces.ts';
+import { crmRouter } from './routes/crm.ts';
+import { sendSms, smsConfigured } from './lib/sms.ts';
+import { trafficRouter } from './routes/traffic.ts';
 import { vapidPublicKey } from './lib/push.ts';
 import { chatRouter } from './routes/chat.ts';
 import { ocrRouter } from './routes/ocr.ts';
+import { hotlistRouter } from './routes/hotlist.ts'; // ĐẤT NÓNG (dùng tạm — dễ gỡ)
+import { pdftoolsRouter } from './routes/pdftools.ts'; // CÔNG CỤ PDF máy chủ (dùng tạm — dễ gỡ)
+import { danhMucRouter } from './routes/danhMuc.ts'; // LẬP DANH MỤC HỒ SƠ (dùng tạm — dễ gỡ)
+import { aiScriptRouter } from './routes/aiScript.ts'; // AI VIẾT KỊCH BẢN VIDEO (dùng chung khoá AI, dễ gỡ)
+// TẠO VIDEO BẢN ĐỒ: xử lý HOÀN TOÀN trên máy khách (ffmpeg.wasm) — KHÔNG có endpoint máy chủ (không nhận/không lưu video).
+import { tilesRouter } from './routes/tiles.ts'; // PROXY tile ảnh vệ tinh (sạch CORS để quay được video)
 import { notFound, errorHandler } from './middleware/error.ts';
 import { securityHeaders, rateLimit } from './middleware/security.ts';
+import { logError, requestLogger } from './lib/logger.ts';
 
-// CHỐNG RỚT TIẾN TRÌNH: log lỗi không bắt được thay vì để Node thoát → Render khỏi phải khởi động lại.
-process.on('unhandledRejection', (reason: any) => console.error('[unhandledRejection]', (reason && (reason.stack || reason.message)) || reason));
-process.on('uncaughtException', (err: any) => console.error('[uncaughtException]', (err && (err.stack || err.message)) || err));
+// CHỐNG RỚT TIẾN TRÌNH: GHI LOG (file + console) lỗi không bắt được thay vì để Node thoát.
+process.on('unhandledRejection', (reason: any) => logError('[unhandledRejection] ' + ((reason && (reason.stack || reason.message)) || reason)));
+process.on('uncaughtException', (err: any) => logError('[uncaughtException] ' + ((err && (err.stack || err.message)) || err)));
 
 const app = express();
 app.disable('x-powered-by'); // không lộ "Express"
@@ -55,17 +68,34 @@ app.use(cors({
   credentials: true,
 }));
 app.use(securityHeaders);
+app.use(requestLogger); // ghi log request LỖI (5xx) hoặc CHẬM (>2s) ra file access-*.log
 app.use(express.json({ limit: '5mb' }));
+// PROXY TILE ẢNH VỆ TINH — đặt TRƯỚC rate-limit toàn cục (1 phiên bản đồ tải rất nhiều tile, không được tính vào giới hạn).
+app.use('/api/tiles', tilesRouter);
 // Chống lụt yêu cầu toàn cục (rộng rãi, không cản người dùng thật).
-app.use('/api', rateLimit({ windowMs: 60 * 1000, max: 600, key: 'global' }));
+app.use('/api', rateLimit({ windowMs: 60 * 1000, max: Number(process.env.RATE_LIMIT_GLOBAL) || 600, key: 'global' })); // đặt RATE_LIMIT_GLOBAL cao khi ĐO TẢI
 
-app.get('/api/health', (_req, res) => res.json({ status: 'ok', region: 'Cam Lâm, Khánh Hòa', ts: Date.now() }));
+// /api/ping — siêu nhẹ cho uptime monitor (KHÔNG đụng DB, trả 200 tức thì).
+app.get('/api/ping', (_req, res) => res.status(200).type('text/plain').send('ok'));
+// /api/health — kiểm tra CẢ DB (SELECT 1, timeout 3s): 200 nếu khoẻ, 503 nếu DB lỗi → giám sát bắt được sự cố.
+app.get('/api/health', async (_req, res) => {
+  const t0 = Date.now();
+  try {
+    await Promise.race([query('SELECT 1'), new Promise((_r, rej) => setTimeout(() => rej(new Error('db timeout 3s')), 3000))]);
+    res.json({ status: 'ok', db: 'up', dbMs: Date.now() - t0, uptimeSec: Math.round(process.uptime()), region: 'Cam Lâm, Khánh Hòa', ts: Date.now() });
+  } catch (e: any) {
+    logError('[health] DB không phản hồi: ' + (e?.message || e));
+    res.status(503).json({ status: 'degraded', db: 'down', error: e?.message || String(e), uptimeSec: Math.round(process.uptime()), ts: Date.now() });
+  }
+});
 app.get('/api/config', (_req, res) => {
   const ext = process.env.RENDER_EXTERNAL_URL || '';
   const host = ext.replace(/^https?:\/\//, '');
   res.json({ wsUrl: host ? `wss://${host}/ws` : '', vapidPublic: vapidPublicKey });
 });
-app.use('/api/auth', rateLimit({ windowMs: 10 * 60 * 1000, max: 30, key: 'auth', message: 'Quá nhiều lần thử đăng nhập/đăng ký. Vui lòng đợi vài phút rồi thử lại.' }), authRouter);
+// Chống brute-force: CHỈ tính POST (đăng nhập/đăng ký). GET /auth/me (kiểm tra phiên mỗi lần tải trang) KHÔNG bị tính → refresh nhiều không bị khoá. Email admin luôn được bỏ qua.
+const AUTH_SKIP_EMAILS = new Set([env.adminEmail.toLowerCase(), ...((process.env.RATE_LIMIT_SKIP_EMAILS || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean))]);
+app.use('/api/auth', rateLimit({ windowMs: 10 * 60 * 1000, max: 60, key: 'auth', skip: (req) => req.method !== 'POST' || AUTH_SKIP_EMAILS.has(String((req.body as any)?.email || '').trim().toLowerCase()), message: 'Quá nhiều lần thử đăng nhập/đăng ký. Vui lòng đợi vài phút rồi thử lại.' }), authRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/layers', layersRouter);
 app.use('/api/parcels', parcelsRouter);
@@ -77,15 +107,24 @@ app.use('/api/map-ads', mapAdsRouter);
 app.use('/api/partners', partnersRouter);
 app.use('/api/projects', projectsRouter);
 app.use('/api/consignments', consignmentsRouter);
+app.use('/api/newsletter', newsletterRouter);
 app.use('/api/invest', investRouter);
+app.use('/api/game', gameRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/ocr', rateLimit({ windowMs: 10 * 60 * 1000, max: 60, key: 'ocr', message: 'Bạn quét ảnh quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), ocrRouter);
 app.use('/api/push', pushRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/flags', flagsRouter);
 app.use('/api/news', newsRouter);
+app.use('/api/van-ban', vanBanRouter);
 app.use('/api/config', configRouter);
 app.use('/api/saved-places', savedPlacesRouter);
+app.use('/api/crm', crmRouter);
+app.use('/api/hotlist', hotlistRouter); // ĐẤT NÓNG (dùng tạm — dễ gỡ)
+app.use('/api/pdftools', rateLimit({ windowMs: 10 * 60 * 1000, max: 40, key: 'pdftools', message: 'Bạn dùng công cụ PDF máy chủ quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), pdftoolsRouter); // CÔNG CỤ PDF máy chủ (dùng tạm — dễ gỡ)
+app.use('/api/danh-muc', rateLimit({ windowMs: 10 * 60 * 1000, max: 20, key: 'danhmuc', message: 'Bạn lập danh mục quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), danhMucRouter); // LẬP DANH MỤC HỒ SƠ (dùng tạm — dễ gỡ)
+app.use('/api/ai', rateLimit({ windowMs: 10 * 60 * 1000, max: 30, key: 'aiscript', message: 'Bạn dùng AI viết kịch bản quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), aiScriptRouter); // AI VIẾT KỊCH BẢN VIDEO (dùng chung khoá AI)
+app.use('/api', trafficRouter);
 app.use(notFound);
 app.use(errorHandler);
 
@@ -99,6 +138,10 @@ async function main() {
   try { await migrate(); } catch (e: any) { console.error('[boot] migrate lỗi (bỏ qua, server vẫn chạy):', e?.stack || e?.message || e); }
   try { await ensureAdmin(); } catch (e: any) { console.error('[boot] ensureAdmin lỗi (bỏ qua):', e?.stack || e?.message || e); }
   refreshNews(true).catch(() => {}); // lấy tin ngay khi khởi động
+  // Văn bản: seed → crawl Công báo (kho đầy đủ) → quét các cổng TTĐT (bổ sung); sau đó TỰ LÀM MỚI: Công báo mỗi GIỜ, cổng TTĐT mỗi 6 giờ.
+  seedVanBan().then(() => crawlCongBao(true, true)).then(() => crawlPortals()).catch(() => {}); // khởi động: backfill SÂU toàn kho (2005→nay, ~853 trang, chạy nền ~15') + quét cổng
+  setInterval(() => crawlCongBao().catch(() => {}), 60 * 60 * 1000);   // Công báo (nguồn chính): tự làm mới MỖI GIỜ — crawl "gần đây" (15 trang, nhẹ)
+  setInterval(() => crawlPortals().catch(() => {}), 6 * 3600 * 1000);  // cổng TTĐT (bổ sung, cấp quốc gia): mỗi 6 giờ cho đỡ tải nguồn ngoài
   // Tự cập nhật tin BĐS mỗi 6 giờ từ 6h sáng (giờ VN): 06:00, 12:00, 18:00, 00:00
   let lastNewsSlot = '';
   setInterval(() => {
@@ -129,5 +172,28 @@ async function main() {
          (tier='silver'  AND COALESCE(bumped_at, created_at) < now() - interval '24 hours'))`).then(() => {}).catch(() => {});
   setInterval(autoBump, 30 * 60 * 1000); // soát mỗi 30 phút
   autoBump();
+
+  // Nhắc CÔNG CHỨNG tự động qua SMS: quét hẹn trong 24h tới (bật SMS, chưa gửi) → gửi rồi đánh dấu.
+  // Chỉ chạy khi đã cấu hình cổng SMS (env SMS_*). Nhắc trong app luôn hoạt động độc lập.
+  const notaryReminder = async () => {
+    if (!smsConfigured()) return;
+    try {
+      const rows = await query(
+        `SELECT a.id, a.appoint_at, a.location, c.phone AS cust_phone
+           FROM notary_appointments a JOIN customers c ON c.id=a.customer_id
+          WHERE a.sms_reminder=true AND a.sms_sent_at IS NULL AND a.status='Chờ'
+            AND a.appoint_at > now() AND a.appoint_at <= now() + interval '24 hours'
+            AND c.phone IS NOT NULL AND c.phone <> '' LIMIT 50`);
+      for (const a of rows) {
+        const s = new Date(a.appoint_at).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' });
+        const msg = `Nhac lich cong chung luc ${s}${a.location ? ' tai ' + a.location : ''}. Vui long co mat dung gio. - Cam Lam Land`;
+        const rs = await sendSms(a.cust_phone, msg);
+        if (rs.ok) await query(`UPDATE notary_appointments SET sms_sent_at=now() WHERE id=$1`, [a.id]);
+        else console.warn('[sms] hen', a.id, 'khong gui:', rs.reason);
+      }
+    } catch (e: any) { console.error('[notaryReminder]', e?.message || e); }
+  };
+  setInterval(notaryReminder, 5 * 60 * 1000); // soát mỗi 5 phút
+  notaryReminder();
 }
 main().catch((e) => { console.error('[BOOT FATAL]', (e && (e.stack || e.message)) || e); setTimeout(() => process.exit(1), 400); });

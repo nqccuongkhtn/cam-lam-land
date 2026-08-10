@@ -1,0 +1,3686 @@
+{
+ "Xã Cam Lâm": {
+  "xa": "Xã Cam Lâm",
+  "datNongNghiep": [
+   {
+    "loai": "Đất trồng cây hàng năm",
+    "vt1": 54000,
+    "vt2": 41400
+   },
+   {
+    "loai": "Đất trồng cây lâu năm",
+    "vt1": 54000,
+    "vt2": 41400
+   },
+   {
+    "loai": "Đất nuôi trồng thủy sản",
+    "vt1": 37800,
+    "vt2": 27000
+   },
+   {
+    "loai": "Đất rừng sản xuất",
+    "vt1": 18000,
+    "vt2": 12600
+   },
+   {
+    "loai": "Đất rừng phòng hộ, rừng đặc dụng",
+    "vt1": 14400,
+    "vt2": 10800
+   },
+   {
+    "loai": "Đất làm muối",
+    "vt1": 36000,
+    "vt2": 27000
+   }
+  ],
+  "datO": [
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Bà Huyện Thanh Quan",
+    "tu": "Trường Chinh",
+    "den": "Võ Thị Sáu",
+    "vt": [
+     2390960,
+     1521520,
+     1086800,
+     652080,
+     543400
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Bà Huyện Thanh Quan",
+    "tu": "Võ Thị Sáu",
+    "den": "Hoàng Văn Thụ",
+    "vt": [
+     2092090,
+     1331330,
+     950950,
+     570570,
+     475475
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Bà Huyện Thanh Quan",
+    "tu": "Hoàng Văn Thụ",
+    "den": "Nguyễn Thiện Thuật",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Bà Huyện Thanh Quan",
+    "tu": "Nguyễn Thiện Thuật",
+    "den": "Kênh chính Nam",
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đào Duy Anh",
+    "tu": "Trường Chinh",
+    "den": "Võ Thị Sáu",
+    "vt": [
+     1630200,
+     1141140,
+     760760,
+     624910,
+     543400
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đào Duy Anh",
+    "tu": "Võ Thị Sáu",
+    "den": "Trần Quý Cáp",
+    "vt": [
+     1467180,
+     1027026,
+     684684,
+     562419,
+     489060
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đào Duy Anh",
+    "tu": "Trần Quý Cáp",
+    "den": "Nguyễn Thiện Thuật",
+    "vt": [
+     1304160,
+     912912,
+     608608,
+     499928,
+     434720
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đào Duy Anh",
+    "tu": "Nguyễn Thiện Thuật",
+    "den": "Kênh chính Nam",
+    "vt": [
+     1141140,
+     798798,
+     532532,
+     437437,
+     380380
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đinh Tiên Hoàng",
+    "tu": "Trường Chinh",
+    "den": "Tiếp giáp cầu bê tông Cam Hải",
+    "vt": [
+     3403400,
+     1806805,
+     1426425,
+     950950,
+     570570
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường nhà ông Lại (giáp ranh địa bàn Cam Hải Tây cũ)",
+    "tu": "Trường Chinh",
+    "den": "Đinh Tiên Hoàng",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hải Thượng Lãn Ông",
+    "tu": "Trường Chinh",
+    "den": "Cống bản (nhà ông Trần Văn Linh)",
+    "vt": [
+     978120,
+     684684,
+     489060,
+     415701,
+     342342
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hải Thượng Lãn Ông",
+    "tu": "Cống bản (nhà ông Trần Văn Linh)",
+    "den": "Hoàng Văn Thụ",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hải Thượng Lãn Ông",
+    "tu": "Hoàng Văn Thụ",
+    "den": "Nguyễn Thiện Thuật",
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hải Thượng Lãn Ông",
+    "tu": "Nguyễn Thiện Thuật",
+    "den": "Kênh chính Nam",
+    "vt": [
+     652080,
+     456456,
+     326040,
+     277134,
+     228228
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hồ Xuân Hương",
+    "tu": "Trường Chinh",
+    "den": "Võ Thị Sáu",
+    "vt": [
+     2390960,
+     1521520,
+     1086800,
+     652080,
+     543400
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hồ Xuân Hương",
+    "tu": "Võ Thị Sáu",
+    "den": "Hoàng Văn Thụ",
+    "vt": [
+     2092090,
+     1331330,
+     950950,
+     570570,
+     475475
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hồ Xuân Hương",
+    "tu": "Hoàng Văn Thụ",
+    "den": "Nguyễn Thiện Thuật",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hồ Xuân Hương",
+    "tu": "Nguyễn Thiện Thuật",
+    "den": "Kênh chính Nam",
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hoàng Quốc Việt",
+    "tu": "Trường Chinh",
+    "den": "Nhà bà Nguyễn Thị Hưng",
+    "vt": [
+     679250,
+     489060,
+     407550,
+     353210,
+     271700
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hoàng Quốc Việt",
+    "tu": "Đoạn còn lại",
+    "den": null,
+    "vt": [
+     611325,
+     440154,
+     366795,
+     317889,
+     244530
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hoàng Văn Thái",
+    "tu": "Trường Chinh",
+    "den": "Giáp Bệnh viện đa khoa huyện Cam Lâm",
+    "vt": [
+     679250,
+     489060,
+     407550,
+     353210,
+     271700
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hoàng Văn Thụ",
+    "tu": "Ngô Gia Tự",
+    "den": "Nguyễn Du",
+    "vt": [
+     978120,
+     684684,
+     456456,
+     374946,
+     326040
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hoàng Văn Thụ",
+    "tu": "Nguyễn Du",
+    "den": "Nguyễn Trãi",
+    "vt": [
+     1304160,
+     912912,
+     608608,
+     499928,
+     434720
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hoàng Văn Thụ",
+    "tu": "Nguyễn Trãi",
+    "den": "Lưu Hữu Phước",
+    "vt": [
+     1141140,
+     798798,
+     532532,
+     437437,
+     380380
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Hàm Nghi",
+    "tu": "Trường Chinh",
+    "den": "Đường quy hoạch Lê Duẩn",
+    "vt": [
+     1304160,
+     912912,
+     608608,
+     499928,
+     434720
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Lê Lai",
+    "tu": "Trường Chinh",
+    "den": "Ngã ba trường Mầu giáo",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Lê Lai",
+    "tu": "Ngã ba trường Mẫu giáo",
+    "den": "Đầm Thủy Triều",
+    "vt": [
+     679250,
+     489060,
+     407550,
+     353210,
+     271700
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Lý Thái Tổ",
+    "tu": "Trường Chinh",
+    "den": "Lê Duẩn",
+    "vt": [
+     1141140,
+     798798,
+     532532,
+     437437,
+     380380
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Lý Tự Trọng",
+    "tu": null,
+    "den": null,
+    "vt": [
+     978120,
+     684684,
+     489060,
+     415701,
+     342342
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Lưu Hữu Phước",
+    "tu": "Trường Chinh",
+    "den": "Võ Thị Sáu",
+    "vt": [
+     1086800,
+     760760,
+     543400,
+     461890,
+     380380
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Lưu Hữu Phước",
+    "tu": "Võ Thị Sáu",
+    "den": "Trần Quý Cáp",
+    "vt": [
+     978120,
+     684684,
+     489060,
+     415701,
+     342342
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Lưu Hữu Phước",
+    "tu": "Trần Quý Cáp",
+    "den": "Nguyễn Khanh",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Lưu Hữu Phước",
+    "tu": "Nguyễn Khanh",
+    "den": "Cao Thắng",
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Lê Thị Hồng Gấm",
+    "tu": "Trường Chinh",
+    "den": "Cuối đường",
+    "vt": [
+     679250,
+     489060,
+     407550,
+     353210,
+     271700
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Ngô Gia Tự",
+    "tu": "Trường Chinh",
+    "den": "Kênh chính Nam",
+    "vt": [
+     679250,
+     489060,
+     407550,
+     353210,
+     271700
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Ngô Tất Tố",
+    "tu": "Trường Chinh",
+    "den": "Võ Thị Sáu",
+    "vt": [
+     1630200,
+     1141140,
+     760760,
+     624910,
+     543400
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Ngô Tất Tố",
+    "tu": "Võ Thị Sáu",
+    "den": "Trần Quý Cáp",
+    "vt": [
+     1467180,
+     1027026,
+     684684,
+     562419,
+     489060
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Ngô Tất Tố",
+    "tu": "Trần Quý Cáp",
+    "den": "Nguyễn Thiện Thuật",
+    "vt": [
+     1304160,
+     912912,
+     608608,
+     499928,
+     434720
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Ngô Tất Tố",
+    "tu": "Nguyễn Thiện Thuật",
+    "den": "Kênh chính Nam",
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Du",
+    "tu": "Trường Chinh",
+    "den": "Nhà thờ Hoà Yên",
+    "vt": [
+     1630200,
+     1141140,
+     760760,
+     624910,
+     543400
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Du",
+    "tu": "Nhà thờ Hòa Yên",
+    "den": "Hết trường THCS Quang Trung",
+    "vt": [
+     978120,
+     684684,
+     489060,
+     415701,
+     342342
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Du",
+    "tu": "Đoạn còn lại",
+    "den": null,
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Khanh",
+    "tu": null,
+    "den": null,
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Khuyến",
+    "tu": "Trường Chinh",
+    "den": "Võ Thị Sáu",
+    "vt": [
+     978120,
+     684684,
+     489060,
+     415701,
+     342342
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Khuyến",
+    "tu": "Võ Thị Sáu",
+    "den": "Nguyễn Thiện Thuật",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Khuyến",
+    "tu": "Nguyễn Thiện Thuật",
+    "den": "Trường THCS Quang Trung",
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Thái Bình",
+    "tu": "Trường Chinh",
+    "den": "Ngã ba đường đất (nhà bà Nguyễn Thị Khả)",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Thái Bình",
+    "tu": "Đoạn còn lại",
+    "den": null,
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Thiện Thuật",
+    "tu": "Bà Huyện Thanh Quan",
+    "den": "Ngô Gia Tự",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Thiện Thuật",
+    "tu": "Còn lại",
+    "den": null,
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Trãi",
+    "tu": "Trường Chinh",
+    "den": "Nhà thờ Hoà Nghĩa",
+    "vt": [
+     1630200,
+     1141140,
+     760760,
+     624910,
+     543400
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Trãi",
+    "tu": "Trần Quý Cáp",
+    "den": "Cống bàn",
+    "vt": [
+     978120,
+     684684,
+     489060,
+     415701,
+     342342
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Trãi",
+    "tu": "Cống bản",
+    "den": "Nghĩa Trang Công Giáo",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Văn Trỗi",
+    "tu": "Trường Chinh",
+    "den": "Hết đường bê tông",
+    "vt": [
+     1304160,
+     912912,
+     608608,
+     499928,
+     434720
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Văn Trỗi",
+    "tu": "Tiếp theo",
+    "den": "Hết đất bà Phạm Thị Xuân",
+    "vt": [
+     1141140,
+     798798,
+     532532,
+     437437,
+     380380
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Viết Xuân",
+    "tu": "Trường Chinh",
+    "den": "Hết Trường Mẫu giáo Bãi Giếng Nam",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Nguyễn Viết Xuân",
+    "tu": "Đoạn còn lại",
+    "den": null,
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Phạm Văn Đồng",
+    "tu": "Đinh Tiên Hoàng",
+    "den": "Lê Lai",
+    "vt": [
+     1630200,
+     1141140,
+     760760,
+     624910,
+     543400
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Tản Đà",
+    "tu": "Trường Chinh",
+    "den": "Võ Thị Sáu",
+    "vt": [
+     1086800,
+     760760,
+     543400,
+     461890,
+     380380
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Tản Đà",
+    "tu": "Võ Thị Sáu",
+    "den": "Trần Quý Cáp",
+    "vt": [
+     978120,
+     684684,
+     489060,
+     415701,
+     342342
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Tản Đà",
+    "tu": "Trần Quý Cáp",
+    "den": "Nguyễn Khanh",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Tản Đà",
+    "tu": "Nguyễn Khanh",
+    "den": "Kênh chính Nam",
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Tô Văn Ơn",
+    "tu": "Trường Chinh",
+    "den": "Ngã tư đường đất (nhà ông Giáp Hà Trúc)",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Tô Văn Ơn",
+    "tu": "Tiếp theo",
+    "den": "Ngã ba đường đất (nhà bà Tô Thị Vân)",
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Tô Văn Ơn",
+    "tu": "Tiếp theo",
+    "den": "Hết đất ông Nguyễn Sơn",
+    "vt": [
+     652080,
+     456456,
+     326040,
+     277134,
+     228228
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trần Đại Nghĩa",
+    "tu": "Trường Chinh",
+    "den": "Ngã ba đường đất vào cổng sau trường Mầm non Cam Đức",
+    "vt": [
+     1304160,
+     912912,
+     608608,
+     499928,
+     434720
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trần Đại Nghĩa",
+    "tu": "Tiếp theo",
+    "den": "Giáp ranh Khu tái định cư Bãi Giếng Trung",
+    "vt": [
+     1141140,
+     798798,
+     532532,
+     437437,
+     380380
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trần Quý Cáp",
+    "tu": "Hồ Xuân Hương",
+    "den": "Lưu Hữu Phước",
+    "vt": [
+     1304160,
+     912912,
+     608608,
+     499928,
+     434720
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trần Tế Xương",
+    "tu": "Trường Chinh",
+    "den": "Võ Thị Sáu",
+    "vt": [
+     978120,
+     684684,
+     489060,
+     415701,
+     342342
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trần Tế Xương",
+    "tu": "Võ Thị Sáu",
+    "den": "Hoàng Văn Thụ",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trần Tế Xương",
+    "tu": "Hoàng Văn Thụ",
+    "den": "Nguyễn Thiện Thuật",
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trần Tế Xương",
+    "tu": "Nguyễn Thiện Thuật",
+    "den": "Kênh chính Nam",
+    "vt": [
+     652080,
+     456456,
+     326040,
+     277134,
+     228228
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trường Chinh",
+    "tu": "Giáp ranh địa bàn Cam Hải Tây cũ (phía Tây nhà ông Bùi Công Trạng, phía Đông nhà ông Nguyễn Văn Lại)",
+    "den": "Cống ngang đường (nhà ông Phạm Đình Trọng)",
+    "vt": [
+     3889600,
+     2064920,
+     1630200,
+     1086800,
+     652080
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trường Chinh",
+    "tu": "Tiếp theo",
+    "den": "Giáp ranh địa bàn Cam Thành Bắc cũ (phía Tây đến hết nhà ông Võ Xuân Hồng, phía Đông đến hết nhà ông Nguyễn Lúc",
+    "vt": [
+     4862000,
+     2581150,
+     2037750,
+     1358500,
+     815100
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trường Chinh đi Cam Hải Đông (đường xí nghiệp cát)",
+    "tu": "Trường Chinh",
+    "den": "Đinh Tiên Hoàng",
+    "vt": [
+     1304160,
+     912912,
+     608608,
+     499928,
+     434720
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trường Chinh đi Cam Hiệp Bắc",
+    "tu": "Trường Chinh",
+    "den": "Ngã ba đường đất giáp ranh địa bàn Cam Hải Tây cũ",
+    "vt": [
+     1304160,
+     912912,
+     608608,
+     499928,
+     434720
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trường Chinh đi Cam Hiệp Bắc",
+    "tu": "Ngã ba đường đất giáp ranh địa bàn Cam Hài Tây cũ",
+    "den": "Đại Hàn",
+    "vt": [
+     1086800,
+     760760,
+     543400,
+     461890,
+     380380
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trường Chinh đi Cam Hiệp Bắc",
+    "tu": "Đại Hàn",
+    "den": "Giáp ranh địa bàn Cam Hiệp Bắc cũ",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trương Vĩnh Ký",
+    "tu": "Trường Chinh",
+    "den": "Cống thoát nước (sau trường Tiểu học Cam Đức 1)",
+    "vt": [
+     1086800,
+     760760,
+     543400,
+     461890,
+     380380
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trương Vĩnh Ký",
+    "tu": "Cống thoát nước (sau trường tiểu học Cam Đức 1)",
+    "den": "Hoàng Văn Thụ",
+    "vt": [
+     978120,
+     684684,
+     489060,
+     415701,
+     342342
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trương Vĩnh Ký",
+    "tu": "Hoàng Văn Thụ",
+    "den": "Nguyễn Thiện Thuật",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Trương Vĩnh Ký",
+    "tu": "Nguyễn Thiện Thuật",
+    "den": "Kênh chính Nam",
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Văn Cao",
+    "tu": "Trường Chinh",
+    "den": "Võ Thị Sáu",
+    "vt": [
+     978120,
+     684684,
+     489060,
+     415701,
+     342342
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Văn Cao",
+    "tu": "Võ Thị Sáu",
+    "den": "Nguyễn Khanh",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Văn Cao",
+    "tu": "Nguyễn Khanh",
+    "den": "Kênh chính Nam",
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Võ Thị Sáu",
+    "tu": "Nguyễn Khuyến",
+    "den": "Bà Huyện Thanh Quan",
+    "vt": [
+     1304160,
+     912912,
+     608608,
+     499928,
+     434720
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Võ Thị Sáu",
+    "tu": "Bà Huyện Thanh Quan",
+    "den": "Nguyễn Trãi",
+    "vt": [
+     1467180,
+     1027026,
+     684684,
+     562419,
+     489060
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Võ Thị Sáu",
+    "tu": "Còn lại",
+    "den": null,
+    "vt": [
+     1141140,
+     798798,
+     532532,
+     437437,
+     380380
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Xuân Diệu",
+    "tu": "Trường Chinh",
+    "den": "Võ Thị Sáu",
+    "vt": [
+     978120,
+     684684,
+     489060,
+     415701,
+     342342
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Xuân Diệu",
+    "tu": "Võ Thị Sáu",
+    "den": "Trần Quý Cáp",
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Xuân Diệu",
+    "tu": "Trần Quý Cáp",
+    "den": "Kênh chính Nam",
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường bên cạnh cây xăng Châu pháp",
+    "tu": "Trường Chinh",
+    "den": "Kênh chính Nam",
+    "vt": [
+     679250,
+     489060,
+     407550,
+     353210,
+     271700
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường xóm 5 (bên cạnh Chi cục thi hành án Cam Lâm)",
+    "tu": "Trường Chinh",
+    "den": "Hết đường bê tông",
+    "vt": [
+     679250,
+     489060,
+     407550,
+     353210,
+     271700
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường xóm 5 (bên cạnh Chi cục thi hành án Cam Lâm)",
+    "tu": "Đoạn còn lại",
+    "den": null,
+    "vt": [
+     611325,
+     440154,
+     366795,
+     317889,
+     244530
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường xóm 6 (bên cạnh nhà bác sĩ Chung)",
+    "tu": "Trường Chinh",
+    "den": "Hết đường bê tông",
+    "vt": [
+     679250,
+     489060,
+     407550,
+     353210,
+     271700
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường xóm 6 (bên cạnh nhà bác sĩ Chung)",
+    "tu": "Đoạn còn lại",
+    "den": null,
+    "vt": [
+     611325,
+     440154,
+     366795,
+     317889,
+     244530
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường cổng tổ dân phố văn hóa Bãi Giếng 3",
+    "tu": "Trường Chinh",
+    "den": "Hết đường bê tông",
+    "vt": [
+     679250,
+     489060,
+     407550,
+     353210,
+     271700
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường cổng tổ dân phố văn hóa Bãi Giếng 3",
+    "tu": "Đoạn còn lại",
+    "den": null,
+    "vt": [
+     611325,
+     440154,
+     366795,
+     317889,
+     244530
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường Nguyễn Thị Định",
+    "tu": "Trường Chinh",
+    "den": "Trung tâm văn hóa thể thao huyện Cam Lâm",
+    "vt": [
+     611325,
+     440154,
+     366795,
+     317889,
+     244530
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đại Hàn (đường số 7)",
+    "tu": "Đường Trường Chinh đi Cam Hiệp Bắc",
+    "den": "Đường xã Cam Thành Bắc đi địa bàn Cam Hiệp Nam cũ (WB2)",
+    "vt": [
+     543400,
+     391248,
+     326040,
+     282568,
+     217360
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường Lập Định-Suối Môn",
+    "tu": null,
+    "den": null,
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường vào trường Hùng Vương",
+    "tu": "Trường Chinh",
+    "den": "Đường bên cạnh Chi cục Thi hành án",
+    "vt": [
+     679250,
+     489060,
+     407550,
+     353210,
+     271700
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường giáp ranh địa bàn Cam Hải Tây cũ",
+    "tu": "Trường Chinh",
+    "den": "Ngã ba giáp địa bàn Cam Hải Tây cũ (nhà bà Võ Thị Suy)",
+    "vt": [
+     679250,
+     489060,
+     407550,
+     353210,
+     271700
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường nhựa quy hoạch 30m",
+    "tu": null,
+    "den": null,
+    "vt": [
+     1086800,
+     760760,
+     543400,
+     461890,
+     380380
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường bê tông quy hoạch 9,5m",
+    "tu": null,
+    "den": null,
+    "vt": [
+     978120,
+     684684,
+     489060,
+     415701,
+     342342
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường dẫn vào cao tốc Bắc - Nam (Lê Lợi)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     1141140,
+     798798,
+     532532,
+     437437,
+     380380
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường vào khu tái định cư Bãi Giếng 1",
+    "tu": null,
+    "den": null,
+    "vt": [
+     1086800,
+     760760,
+     543400,
+     461890,
+     380380
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường Lê Duẩn (đoạn chưa thi công dự án)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     869440,
+     608608,
+     434720,
+     369512,
+     304304
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Đức cũ",
+    "duong": "Đường Nguyễn Chí Thanh",
+    "tu": null,
+    "den": null,
+    "vt": [
+     760760,
+     532532,
+     380380,
+     323323,
+     266266
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Thôn Thủy Triều",
+    "tu": null,
+    "den": null,
+    "vt": [
+     154440,
+     120120,
+     102960,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Thôn Cù Hin",
+    "tu": null,
+    "den": null,
+    "vt": [
+     154440,
+     120120,
+     102960,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường N6",
+    "tu": null,
+    "den": null,
+    "vt": [
+     154440,
+     120120,
+     102960,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường N4",
+    "tu": null,
+    "den": null,
+    "vt": [
+     154440,
+     120120,
+     102960,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường N3",
+    "tu": null,
+    "den": null,
+    "vt": [
+     154440,
+     120120,
+     102960,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường N2",
+    "tu": null,
+    "den": null,
+    "vt": [
+     154440,
+     120120,
+     102960,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường N1B",
+    "tu": null,
+    "den": null,
+    "vt": [
+     154440,
+     120120,
+     102960,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường K3",
+    "tu": null,
+    "den": null,
+    "vt": [
+     154440,
+     120120,
+     102960,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường K8",
+    "tu": null,
+    "den": null,
+    "vt": [
+     154440,
+     120120,
+     102960,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường L9",
+    "tu": null,
+    "den": null,
+    "vt": [
+     154440,
+     120120,
+     102960,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường K10",
+    "tu": null,
+    "den": null,
+    "vt": [
+     154440,
+     120120,
+     102960,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường K11",
+    "tu": null,
+    "den": null,
+    "vt": [
+     154440,
+     120120,
+     102960,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường N5A",
+    "tu": null,
+    "den": null,
+    "vt": [
+     154440,
+     120120,
+     102960,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường liên thôn Cù Hin và thôn Thủy Triều",
+    "tu": null,
+    "den": null,
+    "vt": [
+     154440,
+     120120,
+     102960,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Tây cũ",
+    "duong": "Thôn Bắc Vĩnh",
+    "tu": "Khoảng giữa đường Quốc lộ 1A và Quốc lộ 1 cũ và đường từ Quốc lộ 1 cũ tại ngã 3 Bắc Vĩnh",
+    "den": "Cầu Gỗ phạm vi 50m (hai bên đường)",
+    "vt": [
+     656370,
+     481338,
+     350064,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Tây cũ",
+    "duong": "Thôn Bắc Vĩnh",
+    "tu": "Đoạn còn lại",
+    "den": null,
+    "vt": [
+     481338,
+     350064,
+     262548,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Tây cũ",
+    "duong": "Thôn Bãi Giếng 2",
+    "tu": null,
+    "den": null,
+    "vt": [
+     656370,
+     481338,
+     350064,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Tây cũ",
+    "duong": "Thôn Tân Hải",
+    "tu": null,
+    "den": null,
+    "vt": [
+     481338,
+     350064,
+     262548,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Bắc cũ",
+    "duong": "Thôn Trung Hiệp 1",
+    "tu": "Từ cầu Suối Sâu",
+    "den": "Giáp ranh Trung Hiệp 2",
+    "vt": [
+     218790,
+     160446,
+     116688,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Bắc cũ",
+    "duong": "Thôn Trung Hiệp 1",
+    "tu": "Từ cầu Suối Sâu",
+    "den": "Giáp ranh Cam Hóa",
+    "vt": [
+     187187,
+     136136,
+     102102,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Bắc cũ",
+    "duong": "Thôn Trung Hiệp 2",
+    "tu": null,
+    "den": null,
+    "vt": [
+     187187,
+     136136,
+     102102,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Nam cũ",
+    "duong": "Thôn Vĩnh Thái",
+    "tu": null,
+    "den": null,
+    "vt": [
+     255255,
+     187187,
+     136136,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Nam cũ",
+    "duong": "Thôn Suối Cát",
+    "tu": null,
+    "den": null,
+    "vt": [
+     255255,
+     187187,
+     136136,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Nam cũ",
+    "duong": "Thôn Quảng Đức",
+    "tu": null,
+    "den": null,
+    "vt": [
+     187187,
+     136136,
+     102102,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hòa cũ",
+    "duong": "Các thôn: Cửu Lợi 1, Cửu Lợi 2, Cửu Lợi 3, Văn Tử Đông, Văn Tử Tây",
+    "tu": "Các khu vực nằm ngoài khu vực nằm giữa đường Quốc lộ 1A và Quốc lộ 1 cũ",
+    "den": null,
+    "vt": [
+     374374,
+     272272,
+     204204,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hòa cũ",
+    "duong": "Các thôn: Lập Định 1, Lập Định 2, Lập Định 3",
+    "tu": null,
+    "den": null,
+    "vt": [
+     374374,
+     272272,
+     204204,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hòa cũ",
+    "duong": "Giáp đường bê tông nhựa rộng 6m (quy hoạch rộng 12m)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     374374,
+     272272,
+     204204,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hòa cũ",
+    "duong": "Giáp đường bê tông nhựa rộng 6m (quy hoạch rộng 8m)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     374374,
+     272272,
+     204204,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Tân cũ",
+    "duong": "Thôn Vinh Bình",
+    "tu": "Từ giáp Quốc lộ 1A",
+    "den": "Tràn Suối Gỗ",
+    "vt": [
+     291720,
+     213928,
+     155584,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Tân cũ",
+    "duong": "Thôn Vinh Bình",
+    "tu": "Các khu vực còn lại",
+    "den": null,
+    "vt": [
+     213928,
+     155584,
+     116688,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Tân cũ",
+    "duong": "Thôn Phú Bình 2",
+    "tu": "Từ Quốc lộ 1A",
+    "den": "Đường ray xe lửa",
+    "vt": [
+     291720,
+     213928,
+     155584,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Tân cũ",
+    "duong": "Thôn Phú Bình 2",
+    "tu": "Các khu vực còn lại",
+    "den": null,
+    "vt": [
+     213928,
+     155584,
+     116688,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Thôn Tân Thành",
+    "tu": null,
+    "den": null,
+    "vt": [
+     364650,
+     267410,
+     194480,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Thôn Tân Quý",
+    "tu": null,
+    "den": null,
+    "vt": [
+     364650,
+     267410,
+     194480,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Thôn Tân Phú",
+    "tu": null,
+    "den": null,
+    "vt": [
+     364650,
+     267410,
+     194480,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Thôn Tân Sinh Đông",
+    "tu": "Khoảng giữa đường Đồng Bà Thìn- Suối Cát với đường Lam Sơn (ven đường Lam Sơn, cách 50m về phía Bắc)",
+    "den": null,
+    "vt": [
+     364650,
+     267410,
+     194480,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Thôn Tân Sinh Đông",
+    "tu": "Đoạn còn lại",
+    "den": null,
+    "vt": [
+     267410,
+     194480,
+     145860,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Thôn Tân Lập",
+    "tu": null,
+    "den": null,
+    "vt": [
+     267410,
+     194480,
+     145860,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Thôn Tân Sinh Tây",
+    "tu": null,
+    "den": null,
+    "vt": [
+     267410,
+     194480,
+     145860,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Thôn Suối Cam",
+    "tu": null,
+    "den": null,
+    "vt": [
+     364650,
+     267410,
+     194480,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Thôn Lam Sơn",
+    "tu": null,
+    "den": null,
+    "vt": [
+     364650,
+     267410,
+     194480,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Tân cũ",
+    "duong": "Thôn Dầu Sơn",
+    "tu": null,
+    "den": null,
+    "vt": [
+     231660,
+     180180,
+     154440,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Tân cũ",
+    "duong": "Thôn Đồng Cau",
+    "tu": null,
+    "den": null,
+    "vt": [
+     231660,
+     180180,
+     154440,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Tân cũ",
+    "duong": "Thôn Vĩnh Phú",
+    "tu": null,
+    "den": null,
+    "vt": [
+     180180,
+     154440,
+     128700,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "Tuyến đường liên xã Cam Tân - Sơn Tân",
+    "tu": null,
+    "den": null,
+    "vt": [
+     96525,
+     75075,
+     64350,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "QUỐC LỘ 1A",
+    "tu": "Từ Cầu Lò Than",
+    "den": "Giáp ranh UBND xã Suối Tân cũ",
+    "vt": [
+     3672000,
+     1836000,
+     1101600,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "QUỐC LỘ 1A",
+    "tu": "Tiếp theo",
+    "den": "Giáp ranh Chùa Phổ Thiện",
+    "vt": [
+     2060400,
+     1030200,
+     618120,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "QUỐC LỘ 1A",
+    "tu": "Tiếp theo",
+    "den": "Giáp ranh địa bàn Cam Tân cũ",
+    "vt": [
+     1224000,
+     612000,
+     367200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "QUỐC LỘ 1A",
+    "tu": "Từ giáp ranh địa bàn Suối Tân cũ",
+    "den": "Vườn cây Kim An",
+    "vt": [
+     918000,
+     459000,
+     275400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "QUỐC LỘ 1A",
+    "tu": "Tiếp theo",
+    "den": "Giáp ranh địa bàn Cam Hòa cũ",
+    "vt": [
+     969000,
+     484500,
+     290700,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "QUỐC LỘ 1A",
+    "tu": "Từ giáp ranh địa bàn Cam Tân cũ",
+    "den": "Cầu Cửu Lựu",
+    "vt": [
+     969000,
+     484500,
+     290700,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "QUỐC LỘ 1A",
+    "tu": "Tiếp theo",
+    "den": "Ngã ba Cửu Lợi",
+    "vt": [
+     1224000,
+     612000,
+     367200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "QUỐC LỘ 1A",
+    "tu": "Tiếp theo",
+    "den": "Giáp ranh địa bàn Cam Hải Tây cũ",
+    "vt": [
+     2142000,
+     1071000,
+     642600,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "QUỐC LỘ 1A",
+    "tu": "Từ giáp ranh địa bàn Cam Hòa cũ",
+    "den": "Giáp ranh địa bàn Cam Đức cũ",
+    "vt": [
+     2142000,
+     1071000,
+     642600,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "QUỐC LỘ 1A",
+    "tu": "Từ giáp ranh địa bàn Cam Đức cũ",
+    "den": "Lữ Hải Quân 101",
+    "vt": [
+     2448000,
+     1224000,
+     734400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "QUỐC LỘ 1A",
+    "tu": "Tiếp theo",
+    "den": "Giáp ranh địa bàn Cam Nghĩa, Cam Ranh cũ",
+    "vt": [
+     1428000,
+     714000,
+     428400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "ĐƯỜNG LẬP ĐỊNH - SUỐI MÔN (TỈNH LỘ 3)",
+    "tu": "Từ Quốc lộ 1A",
+    "den": "Ngã ba Lập Định - Suối Môn",
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "ĐƯỜNG LẬP ĐỊNH - SUỐI MÔN (TỈNH LỘ 3)",
+    "tu": "Tiếp theo",
+    "den": "Cầu Suối Sâu",
+    "vt": [
+     408000,
+     204000,
+     122400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "ĐƯỜNG LẬP ĐỊNH - SUỐI MÔN (TỈNH LỘ 3)",
+    "tu": "Tiếp theo",
+    "den": "Đường đi Hố Mây",
+    "vt": [
+     612000,
+     306000,
+     183600,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "ĐƯỜNG LẬP ĐỊNH - SUỐI MÔN (TỈNH LỘ 3)",
+    "tu": "Tiếp theo",
+    "den": "Giáp đường WB2 đi Cam Thành Bắc",
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "ĐƯỜNG LẬP ĐỊNH - SUỐI MÔN (TỈNH LỘ 3)",
+    "tu": "Từ đường WB2 đi Cam Thành Bắc",
+    "den": "Giáp đường Yến Phi (ga Suối Cát)",
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "ĐƯỜNG LẬP ĐỊNH - SUỐI MÔN (TỈNH LỘ 3)",
+    "tu": "Từ đường Yến Phi",
+    "den": "Cầu Vĩnh Thái",
+    "vt": [
+     969000,
+     484500,
+     290700,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "ĐƯỜNG LẬP ĐỊNH - SUỐI MÔN (TỈNH LỘ 3)",
+    "tu": "Tiếp theo",
+    "den": "Đường đi địa bàn Cam An Bắc cũ",
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "ĐƯỜNG LẬP ĐỊNH - SUỐI MÔN (TỈNH LỘ 3)",
+    "tu": "Tiếp theo",
+    "den": "Hết trường THCS Hoàng Hoa Thám (địa bàn Cam An Nam cũ)",
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "TỈNH LỘ 9",
+    "tu": "Từ giáp ranh địa bàn Cam Phước Đông, Cam Ranh cũ",
+    "den": "Cầu Đồng Lát 1",
+    "vt": [
+     612000,
+     306000,
+     183600,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "TỈNH LỘ 9",
+    "tu": "Đoạn còn lại",
+    "den": "Áp dụng giá đất phi nông nghiệp tại nông thôn",
+    "vt": [
+     null,
+     null,
+     null,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": null,
+    "tu": "Đường từ cầu bê tông Cam Hải",
+    "den": "Giáp đại lộ Nguyễn Tất Thành",
+    "vt": [
+     714000,
+     357000,
+     214200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": null,
+    "tu": "Đường Nguyễn Tất Thành đoạn từ giáp ranh địa bàn Phước Đồng cũ",
+    "den": "Giáp khu du lịch Bắc Bán đảo Cam Ranh",
+    "vt": [
+     1836000,
+     918000,
+     550800,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Khu du lịch Bắc bán đảo Cam Ranh (toàn bộ khu vực phía Đông đường Nguyễn Tất Thành)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     1836000,
+     918000,
+     550800,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Khu du lịch Bắc bán đảo Cam Ranh (toàn bộ khu vực phía Tây đường Nguyễn Tất Thành - trong phạm vi 100m tính từ đường Nguyễn Tất Thành)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     1734000,
+     867000,
+     520200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường D1, D2, N5A (trong khu N3)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     867000,
+     433500,
+     260100,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường D3 (trong khu N3)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     714000,
+     357000,
+     214200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường K8 (trong khu N3)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     714000,
+     357000,
+     214200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Đường N3-1 (trong khu N3)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     561000,
+     280500,
+     168300,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Đông cũ",
+    "duong": "Các đường còn lại trong khu N3",
+    "tu": null,
+    "den": null,
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Tây cũ",
+    "duong": "Đường Cửu Lợi (Quốc lộ 1 cũ)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     1224000,
+     612000,
+     367200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Tây cũ",
+    "duong": "Quốc lộ 1A đi Cam Hiệp Bắc",
+    "tu": "Từ giáp ranh địa bàn Cam Đức cũ",
+    "den": "Nhà ông Nguyễn Thành Đạt",
+    "vt": [
+     918000,
+     459000,
+     275400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Tây cũ",
+    "duong": "Quốc lộ 1A đi Cam Hiệp Bắc",
+    "tu": "Từ nhà ông Nguyễn Thành Đạt",
+    "den": "Giáp ranh địa bàn Cam Hiệp Bắc cũ",
+    "vt": [
+     714000,
+     357000,
+     214200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Tây cũ",
+    "duong": "Quốc lộ 1A đi Cam Hải Đông (đường Đinh Tiên Hoàng)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     2652000,
+     1326000,
+     795600,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Tây cũ",
+    "duong": "Đường qua Trạm Y tế địa bàn Cam Hải Tây cũ",
+    "tu": "Từ Quốc lộ 1A",
+    "den": "Giáp ranh Trạm Y tế địa bàn Cam Hải Tây cũ",
+    "vt": [
+     714000,
+     357000,
+     214200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Tây cũ",
+    "duong": "Đường qua Trạm Y tế địa bàn Cam Hải Tây cũ",
+    "tu": "Từ giáp ranh Trạm Y tế địa bàn Cam Hải Tây cũ",
+    "den": "Giáp nhà ông Bảo",
+    "vt": [
+     459000,
+     229500,
+     137700,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Tây cũ",
+    "duong": "Đường thôn Tân Hải",
+    "tu": "Từ cổng làng văn hóa",
+    "den": "Giáp đường xuống cầu Gỗ",
+    "vt": [
+     714000,
+     357000,
+     214200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Tây cũ",
+    "duong": "Đường thôn Tân Hải",
+    "tu": "Từ nhà ông Kính",
+    "den": "Nhà ông Nhạc",
+    "vt": [
+     459000,
+     229500,
+     137700,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hải Tây cũ",
+    "duong": "Đường Quốc lộ 1A đi Cam Hải Đông (Đường cũ) (Đường phía bắc Nhà ông Lại)",
+    "tu": "Giáp thửa đất tiếp giáp đường Đinh Tiên Hoàng về hướng Quốc lộ 1A",
+    "den": "Giáp thửa đất tiếp giáp đường Đinh Tiên Hoàng về hướng địa bàn Cam Hải Đông cũ.",
+    "vt": [
+     1020000,
+     510000,
+     306000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Bắc cũ",
+    "duong": "Từ ngã ba đường Lập Định - Suối Môn đi Quốc lộ 1A (Nguyễn Công Trứ)",
+    "tu": "Từ ngã ba Lập Định - Suối Môn",
+    "den": "Cổng làng văn hóa thôn Trung Hiệp 1",
+    "vt": [
+     918000,
+     459000,
+     275400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Bắc cũ",
+    "duong": "Từ ngã ba đường Lập Định - Suối Môn đi Quốc lộ 1A (Nguyễn Công Trứ)",
+    "tu": "Từ cổng làng văn hóa thôn Trung Hiệp 1",
+    "den": "Giáp ranh địa bàn Cam Hải Tây cũ",
+    "vt": [
+     714000,
+     357000,
+     214200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Nam cũ",
+    "duong": "Từ đường Lập Định-Suối Môn đi Quốc lộ 1A (Đồng Bà Thìn, địa bàn Cam Thành Bắc cũ)",
+    "tu": "Từ đường Lập Định - Suối Môn",
+    "den": "Nhà ông Võ Thu",
+    "vt": [
+     816000,
+     408000,
+     244800,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Nam cũ",
+    "duong": "Từ đường Lập Định-Suối Môn đi Quốc lộ 1A (Đồng Bà Thìn, địa bàn Cam Thành Bắc cũ)",
+    "tu": "Đoạn tiếp theo",
+    "den": "Giáp địa bàn Cam Thành Bắc cũ",
+    "vt": [
+     612000,
+     306000,
+     183600,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Nam cũ",
+    "duong": "Đường Trần Hưng Đạo",
+    "tu": "Từ đường Lập Định - Suối Môn",
+    "den": "Giáp đường xe lửa",
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Nam cũ",
+    "duong": "Đường địa bàn Cam Hiệp Nam cũ đi địa bàn Cam Thành Bắc cũ (WB2)",
+    "tu": "Từ đường Lập Định - Suối Môn",
+    "den": "Giáp ranh địa bàn Cam Thành Bắc cũ",
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hòa cũ",
+    "duong": "Đường Cửu Lợi (Quốc lộ 1 cũ)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     1173000,
+     586500,
+     351900,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hòa cũ",
+    "duong": "Từ Ngã ba Lập Định - Suối Môn đến Hồ Cam Ranh",
+    "tu": null,
+    "den": null,
+    "vt": [
+     408000,
+     204000,
+     122400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Tân cũ",
+    "duong": "Đường thôn Vinh Bình: từ QL 1A đến nhà ông Hồ Văn Gần",
+    "tu": null,
+    "den": null,
+    "vt": [
+     408000,
+     204000,
+     122400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Đường Đồng Bà Thìn đi địa bàn Cam Hiệp Nam cũ",
+    "tu": "Từ Quốc lộ 1A",
+    "den": "Đường vào hồ chứa nước nhà máy Đường và doanh trại Quân đội",
+    "vt": [
+     969000,
+     484500,
+     290700,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Đường Đồng Bà Thìn đi địa bàn Cam Hiệp Nam cũ",
+    "tu": "Từ đường vào hồ chứa nước nhà máy Đường và doanh trại Quân đội",
+    "den": "Đường số 4 (hai bên đường)",
+    "vt": [
+     816000,
+     408000,
+     244800,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Đường Đồng Bà Thìn đi địa bàn Cam Hiệp Nam cũ",
+    "tu": "Đoạn tiếp theo (hai bên đường)",
+    "den": "Giáp ranh địa bàn Cam Hiệp Nam cũ",
+    "vt": [
+     612000,
+     306000,
+     183600,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Đường Đồng Bà Thìn đi địa bàn Cam Hiệp Nam cũ",
+    "tu": "Đường vào Nhà máy đường: từ QL1A",
+    "den": "Nhà máy đường",
+    "vt": [
+     816000,
+     408000,
+     244800,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Đường địa bàn Cam Thành Bắc cũ đi địa bàn Cam Hiệp Nam cũ (WB2)",
+    "tu": "Từ Quốc lộ 1A",
+    "den": "Ngã ba đường lên đền Phật Mẫu",
+    "vt": [
+     816000,
+     408000,
+     244800,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Đường địa bàn Cam Thành Bắc cũ đi địa bàn Cam Hiệp Nam cũ (WB2)",
+    "tu": "Từ ngã ba đường lên đền Phật Mẫu",
+    "den": "Giáp địa bàn Cam Hiệp Nam cũ",
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Đường Lam Sơn",
+    "tu": "Từ Quốc lộ 1A",
+    "den": "Nhà ông Bông",
+    "vt": [
+     714000,
+     357000,
+     214200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Đường Lam Sơn",
+    "tu": "Đoạn còn lại",
+    "den": null,
+    "vt": [
+     612000,
+     306000,
+     183600,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Đường Đại Hàn (đường số 7)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     408000,
+     204000,
+     122400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Thành Bắc cũ",
+    "duong": "Đường Tân Thành - Tân Lập",
+    "tu": null,
+    "den": null,
+    "vt": [
+     816000,
+     408000,
+     244800,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam An Nam cũ",
+    "duong": "Đường Đại Hàn (đường số 7)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     408000,
+     204000,
+     122400,
+     null,
+     null
+    ]
+   }
+  ]
+ },
+ "Xã Cam An": {
+  "xa": "Xã Cam An",
+  "datNongNghiep": [
+   {
+    "loai": "Đất trồng cây hàng năm",
+    "vt1": 54000,
+    "vt2": 41400
+   },
+   {
+    "loai": "Đất trồng cây lâu năm",
+    "vt1": 54000,
+    "vt2": 41400
+   },
+   {
+    "loai": "Đất nuôi trồng thủy sản",
+    "vt1": 37800,
+    "vt2": 27000
+   },
+   {
+    "loai": "Đất rừng sản xuất",
+    "vt1": 18000,
+    "vt2": 12600
+   },
+   {
+    "loai": "Đất rừng phòng hộ, rừng đặc dụng",
+    "vt1": 14400,
+    "vt2": 10800
+   },
+   {
+    "loai": "Đất làm muối",
+    "vt1": 36000,
+    "vt2": 27000
+   }
+  ],
+  "datO": [
+   {
+    "diaBan": "Địa bàn Cam An Bắc cũ",
+    "duong": "Thôn Cửa Tùng",
+    "tu": null,
+    "den": null,
+    "vt": [
+     165750,
+     121550,
+     88400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam An Bắc cũ",
+    "duong": "Thôn Hiền Lương",
+    "tu": null,
+    "den": null,
+    "vt": [
+     165750,
+     121550,
+     88400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam An Bắc cũ",
+    "duong": "Thôn Triệu Hải",
+    "tu": null,
+    "den": null,
+    "vt": [
+     165750,
+     121550,
+     88400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam An Bắc cũ",
+    "duong": "Thôn Thủy Ba",
+    "tu": null,
+    "den": null,
+    "vt": [
+     165750,
+     121550,
+     88400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam An Bắc cũ",
+    "duong": "Thôn Tân An",
+    "tu": null,
+    "den": null,
+    "vt": [
+     165750,
+     121550,
+     88400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam An Nam cũ",
+    "duong": "Thôn Vĩnh Đông",
+    "tu": null,
+    "den": null,
+    "vt": [
+     198900,
+     145860,
+     106080,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam An Nam cũ",
+    "duong": "Thôn Vĩnh Nam",
+    "tu": null,
+    "den": null,
+    "vt": [
+     198900,
+     145860,
+     106080,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam An Nam cũ",
+    "duong": "Thôn Vĩnh Trung",
+    "tu": null,
+    "den": null,
+    "vt": [
+     198900,
+     145860,
+     106080,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Phước Tây cũ",
+    "duong": "Thôn Văn Thủy 1",
+    "tu": null,
+    "den": null,
+    "vt": [
+     198900,
+     145860,
+     106080,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Phước Tây cũ",
+    "duong": "Thôn Văn Thủy 2",
+    "tu": null,
+    "den": null,
+    "vt": [
+     170170,
+     123760,
+     92820,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Phước Tây cũ",
+    "duong": "Thôn Tân Lập",
+    "tu": null,
+    "den": null,
+    "vt": [
+     170170,
+     123760,
+     92820,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Phước Tây cũ",
+    "duong": "Tuyến đường liên xã Cam Phước Tây -Cam An Bắc",
+    "tu": null,
+    "den": null,
+    "vt": [
+     232050,
+     170170,
+     123760,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Phước Tây cũ",
+    "duong": "Thôn Vân Sơn",
+    "tu": null,
+    "den": null,
+    "vt": [
+     87750,
+     68250,
+     58500,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Phước Tây cũ",
+    "duong": "Giáp đường bê tông nhựa rộng 6m (QH từ 12-13m)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     243100,
+     176800,
+     132600,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Phước Tây cũ",
+    "duong": "Đường QH từ 12 - 13m",
+    "tu": null,
+    "den": null,
+    "vt": [
+     243100,
+     176800,
+     132600,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Phước Tây cũ",
+    "duong": "ĐƯỜNG LẬP ĐỊNH - SUỐI MÔN (TỈNH LỘ 3)",
+    "tu": "Từ hết Trường THCS Hoàng Hoa Thám (xã Cam An Nam cũ)",
+    "den": "Ngã ba đường tránh địa bàn Cam An Nam cũ",
+    "vt": [
+     969000,
+     484500,
+     290700,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Phước Tây cũ",
+    "duong": "ĐƯỜNG LẬP ĐỊNH - SUỐI MÔN (TỈNH LỘ 3)",
+    "tu": "Từ đường tránh địa bàn Cam An Nam cũ",
+    "den": "Tỉnh lộ 9",
+    "vt": [
+     408000,
+     204000,
+     122400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Phước Tây cũ",
+    "duong": "TỈNH LỘ 9",
+    "tu": "Đoạn từ giáp ranh phường Ba Ngòi (xã Cam Phước Đông cũ)",
+    "den": "cầu Đồng Lát 1",
+    "vt": [
+     612000,
+     306000,
+     183600,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Phước Tây cũ",
+    "duong": "TỈNH LỘ 9",
+    "tu": "Từ Cầu Đồng Lát 1",
+    "den": "Trường THCS Trần Quang Khải",
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Phước Tây cũ",
+    "duong": "TỈNH LỘ 9",
+    "tu": "Từ Trường THCS Trần Quang Khải",
+    "den": "Ngã ba đường tránh Hồ Tà Rục",
+    "vt": [
+     561000,
+     280500,
+     168300,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Phước Tây cũ",
+    "duong": "Đoạn qua xã Cam An Nam",
+    "tu": null,
+    "den": null,
+    "vt": [
+     816000,
+     408000,
+     244800,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam An Bắc cũ",
+    "duong": "Đường Trần Hưng Đạo",
+    "tu": "Từ giáp ranh xã Cam Lâm (xã Cam Hiệp Nam cũ)",
+    "den": "UBND xã Cam An (UBND xã Cam An Bắc cũ)",
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam An Bắc cũ",
+    "duong": "Đường Trần Hưng Đạo",
+    "tu": "Từ UBND xã Cam An",
+    "den": "Nhà bà Nguyễn Thị Lệ Trang",
+    "vt": [
+     408000,
+     204000,
+     122400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam An Bắc cũ",
+    "duong": "Đường Trần Hưng Đạo",
+    "tu": "Đoạn còn lại",
+    "den": null,
+    "vt": [
+     357000,
+     178500,
+     107100,
+     null,
+     null
+    ]
+   }
+  ]
+ },
+ "Xã Cam Hiệp": {
+  "xa": "Xã Cam Hiệp",
+  "datNongNghiep": [
+   {
+    "loai": "Đất trồng cây hàng năm",
+    "vt1": 54000,
+    "vt2": 41400
+   },
+   {
+    "loai": "Đất trồng cây lâu năm",
+    "vt1": 54000,
+    "vt2": 41400
+   },
+   {
+    "loai": "Đất nuôi trồng thủy sản",
+    "vt1": 37800,
+    "vt2": 27000
+   },
+   {
+    "loai": "Đất rừng sản xuất",
+    "vt1": 18000,
+    "vt2": 12600
+   },
+   {
+    "loai": "Đất rừng phòng hộ, rừng đặc dụng",
+    "vt1": 14400,
+    "vt2": 10800
+   },
+   {
+    "loai": "Đất làm muối",
+    "vt1": 36000,
+    "vt2": 27000
+   }
+  ],
+  "datO": [
+   {
+    "diaBan": "Địa bàn Cam Hiệp Bắc cũ",
+    "duong": "Thôn Trung Hiệp 1",
+    "tu": "Tù cầu Suối Sâu",
+    "den": "Giáp ranh Trung Hiệp 2",
+    "vt": [
+     198900,
+     145860,
+     106080,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Bắc cũ",
+    "duong": "Thôn Trung Hiệp 1",
+    "tu": "Từ cầu Suối Sâu",
+    "den": "Giáp ranh Cam Hòa",
+    "vt": [
+     170170,
+     123760,
+     92820,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Bắc cũ",
+    "duong": "Thôn Trung Hiệp 2",
+    "tu": null,
+    "den": null,
+    "vt": [
+     170170,
+     123760,
+     92820,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Nam cũ",
+    "duong": "Thôn Vĩnh Thái",
+    "tu": null,
+    "den": null,
+    "vt": [
+     232050,
+     170170,
+     123760,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Nam cũ",
+    "duong": "Thôn Suối Cát",
+    "tu": null,
+    "den": null,
+    "vt": [
+     232050,
+     170170,
+     123760,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hiệp Nam cũ",
+    "duong": "Thôn Quảng Đức",
+    "tu": null,
+    "den": null,
+    "vt": [
+     170170,
+     123760,
+     92820,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Hòa cũ",
+    "duong": "Các thôn: Lập Định 1, Lập Định 2, Lập Định 3",
+    "tu": null,
+    "den": null,
+    "vt": [
+     340340,
+     247520,
+     185640,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Tân cũ",
+    "duong": "Thôn Phú Bình 1",
+    "tu": null,
+    "den": null,
+    "vt": [
+     194480,
+     141440,
+     106080,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Tân cũ",
+    "duong": "Thôn Xuân Lập",
+    "tu": null,
+    "den": null,
+    "vt": [
+     194480,
+     141440,
+     106080,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Tân cũ",
+    "duong": "Tuyến đường dân sinh (đường gom) thuộc tuyến đường Cao tốc Bắc - Nam đoạn bắt đầu từ giáp địa bàn Cam Hòa cũ đến giáp địa bàn Suối Tân cũ",
+    "tu": null,
+    "den": null,
+    "vt": [
+     194480,
+     141440,
+     106080,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Tân cũ",
+    "duong": "Đường N1, N2, N3 quy hoạch 9,5m",
+    "tu": null,
+    "den": null,
+    "vt": [
+     194480,
+     141440,
+     106080,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Tân cũ",
+    "duong": "Đường bê tông quy hoạch 5,2m",
+    "tu": null,
+    "den": null,
+    "vt": [
+     194480,
+     141440,
+     106080,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "Thôn Suối Cốc",
+    "tu": null,
+    "den": null,
+    "vt": [
+     87750,
+     68250,
+     58500,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "Thôn VaLy",
+    "tu": null,
+    "den": null,
+    "vt": [
+     68250,
+     58500,
+     48750,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "Tuyến đường liên xã Cam Tân - Sơn Tân (cũ)",
+    "tu": null,
+    "den": null,
+    "vt": [
+     87750,
+     68250,
+     58500,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "ĐƯỜNG VẬN CHUYỂN NÔNG SẢN",
+    "tu": "Từ xã Cam Hòa",
+    "den": "Giáp ranh địa bàn Cam Hiệp Nam cũ",
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Sơn Tân cũ",
+    "duong": "ĐƯỜNG VẬN CHUYỂN NÔNG SẢN",
+    "tu": "Đoạn còn lại",
+    "den": null,
+    "vt": [
+     612000,
+     306000,
+     183600,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Cam Tân cũ",
+    "duong": "Đường Phú Bình 2 - Hồ Cam Ranh",
+    "tu": null,
+    "den": null,
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   }
+  ]
+ },
+ "Xã Suối Dầu": {
+  "xa": "Xã Suối Dầu",
+  "datNongNghiep": [
+   {
+    "loai": "Đất trồng cây hàng năm",
+    "vt1": 54000,
+    "vt2": 41400
+   },
+   {
+    "loai": "Đất trồng cây lâu năm",
+    "vt1": 54000,
+    "vt2": 41400
+   },
+   {
+    "loai": "Đất nuôi trồng thủy sản",
+    "vt1": 37800,
+    "vt2": 27000
+   },
+   {
+    "loai": "Đất rừng sản xuất",
+    "vt1": 18000,
+    "vt2": 12600
+   },
+   {
+    "loai": "Đất rừng phòng hộ, rừng đặc dụng",
+    "vt1": 14400,
+    "vt2": 10800
+   },
+   {
+    "loai": "Đất làm muối",
+    "vt1": 36000,
+    "vt2": 27000
+   }
+  ],
+  "datO": [
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "Thôn Tân Xương 1",
+    "tu": null,
+    "den": null,
+    "vt": [
+     497250,
+     364650,
+     265200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "Thôn Tân Xương 2",
+    "tu": null,
+    "den": null,
+    "vt": [
+     364650,
+     265200,
+     198900,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "Thôn Khánh Thành Bắc",
+    "tu": null,
+    "den": null,
+    "vt": [
+     497250,
+     364650,
+     265200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "Thôn Khánh Thành Nam",
+    "tu": null,
+    "den": null,
+    "vt": [
+     497250,
+     364650,
+     265200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "Giáp đường bê tông quy hoạch 9,5m",
+    "tu": null,
+    "den": null,
+    "vt": [
+     364650,
+     265200,
+     198900,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Tân cũ",
+    "duong": "Thôn Cây Xoài",
+    "tu": null,
+    "den": null,
+    "vt": [
+     210600,
+     163800,
+     140400,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "Thôn Suối Lau 1",
+    "tu": null,
+    "den": null,
+    "vt": [
+     131625,
+     102375,
+     87750,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "Thôn Suối Lau 2 và 3",
+    "tu": null,
+    "den": null,
+    "vt": [
+     102375,
+     87750,
+     73125,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "Giáp đường bê tông quy hoạch 9,5m",
+    "tu": null,
+    "den": null,
+    "vt": [
+     102375,
+     87750,
+     73125,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "QUỐC LỘ 1A",
+    "tu": "Từ giáp ranh địa bàn Diên Khánh cũ",
+    "den": "Giáp khách sạn Sơn Trà",
+    "vt": [
+     1836000,
+     918000,
+     550800,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "QUỐC LỘ 1A",
+    "tu": "Tiếp theo",
+    "den": "Giáp ranh địa bàn Suối Tân cũ",
+    "vt": [
+     2040000,
+     1020000,
+     612000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "QUỐC LỘ 1A",
+    "tu": "Từ giáp ranh địa bàn Suối Cát cũ",
+    "den": "Cầu Lò Than",
+    "vt": [
+     2060400,
+     1030200,
+     618120,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "HƯƠNG LỘ 4",
+    "tu": "Chợ Tân Xương 1",
+    "den": "Nhà bà Liễu",
+    "vt": [
+     714000,
+     357000,
+     214200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "HƯƠNG LỘ 4",
+    "tu": "Từ nhà bà Liễu",
+    "den": "Khu du lịch Hòn Bà",
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "HƯƠNG LỘ 39",
+    "tu": "Từ Quốc lộ 1",
+    "den": "Cầu 20",
+    "vt": [
+     714000,
+     357000,
+     214200,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "ĐƯỜNG TRẢNG É",
+    "tu": "Từ quốc lộ 1A",
+    "den": "Giáp ranh địa bàn Phước Đồng, thành phố Nha Trang cũ",
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   },
+   {
+    "diaBan": "Địa bàn Suối Cát cũ",
+    "duong": "ĐƯỜNG TRẢNG É",
+    "tu": "Đoạn qua địa bàn Suối Cát - Suối Tân cũ",
+    "den": null,
+    "vt": [
+     510000,
+     255000,
+     153000,
+     null,
+     null
+    ]
+   }
+  ]
+ }
+}

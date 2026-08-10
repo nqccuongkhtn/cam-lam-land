@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { adminRequired } from '../middleware/auth.ts';
+import { isValidPhone } from '../lib/vn.ts';
 
 export const consignmentsRouter = Router();
 
@@ -8,13 +9,14 @@ export const consignmentsRouter = Router();
 consignmentsRouter.post('/', async (req, res, next) => {
   try {
     const b = req.body ?? {};
-    const name = String(b.name ?? '').trim();
+    const name = String(b.name ?? '').trim().slice(0, 80);
     const phone = String(b.phone ?? '').trim();
-    if (!name || !phone) return res.status(400).json({ error: 'Vui lòng nhập họ tên và số điện thoại' });
+    if (!name) return res.status(400).json({ error: 'Vui lòng nhập họ tên' });
+    if (!isValidPhone(phone)) return res.status(400).json({ error: 'Số điện thoại không hợp lệ (cần 9–11 chữ số).' });
     const [row] = await query(
       `INSERT INTO consignments (name, phone, property_type, ward, address, area, price_expect, description)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`,
-      [name, phone, b.propertyType || null, b.ward || null, b.address || null,
+      [name, phone.slice(0, 20), b.propertyType || null, b.ward || null, b.address || null,
        b.area ? Number(b.area) : null, b.priceExpect || null, b.description || null]);
     res.status(201).json({ id: row.id, ok: true });
   } catch (e) { next(e); }
@@ -26,7 +28,7 @@ consignmentsRouter.get('/', adminRequired, async (_req, res, next) => {
     const rows = await query(
       `SELECT id, name, phone, property_type AS "propertyType", ward, address, area,
               price_expect AS "priceExpect", description, status, created_at AS "createdAt"
-         FROM consignments ORDER BY created_at DESC`);
+         FROM consignments ORDER BY created_at DESC LIMIT 2000`);
     res.json({ count: rows.length, items: rows });
   } catch (e) { next(e); }
 });

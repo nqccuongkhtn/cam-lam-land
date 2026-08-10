@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import { useLockBody } from '@/lib/useLockBody';
 
 interface Pt { x: number; y: number }
 
@@ -7,6 +8,7 @@ export default function ImageCropper({ file, size = 512, title = 'Cân chỉnh �
   file: File; size?: number; title?: string; round?: boolean;
   onCancel: () => void; onDone: (blob: Blob) => void;
 }) {
+  useLockBody(); // khoá cuộn nền khi mở cân chỉnh ảnh
   const VIEW = 280;
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const [scale, setScale] = useState(1);

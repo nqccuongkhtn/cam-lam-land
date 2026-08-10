@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { GUIDES, getGuide } from '../guides';
+import ShareRow from '@/components/ShareRow';
+import LegalConsultCTA from '@/components/LegalConsultCTA';
 
 export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }));
@@ -10,7 +12,12 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const g = getGuide(params.slug);
   if (!g) return { title: 'Không tìm thấy bài viết' };
-  return { title: g.title, description: g.desc, alternates: { canonical: `/cam-nang/${g.slug}` } };
+  return {
+    title: g.title, description: g.desc,
+    alternates: { canonical: `/cam-nang/${g.slug}` },
+    openGraph: { type: 'article', url: `/cam-nang/${g.slug}`, title: g.title, description: g.desc, images: ['/icons/icon-512.png'] },
+    twitter: { card: 'summary_large_image', title: g.title, description: g.desc, images: ['/icons/icon-512.png'] },
+  };
 }
 
 export default function GuidePage({ params }: { params: { slug: string } }) {
@@ -30,7 +37,7 @@ export default function GuidePage({ params }: { params: { slug: string } }) {
   const others = GUIDES.filter((x) => x.slug !== g.slug).slice(0, 3);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <div className="mx-auto max-w-3xl px-3 py-5 sm:px-4 sm:py-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
       <nav className="text-sm text-slate-400 mb-3">
         <Link href="/cam-nang" className="hover:text-[#0A2540]">Cẩm nang</Link> <span className="mx-1">/</span> <span className="text-slate-500">{g.title}</span>
@@ -38,12 +45,12 @@ export default function GuidePage({ params }: { params: { slug: string } }) {
 
       <article>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] leading-tight">{g.title}</h1>
-        <p className="text-slate-600 mt-3 leading-relaxed">{g.intro}</p>
+        <p className="text-sm sm:text-base text-slate-600 mt-3 leading-relaxed">{g.intro}</p>
 
         {g.body.map((b, i) => (
           <section key={i} className="mt-5">
             <h2 className="text-lg font-bold text-[#0A2540] mb-2">{b.h}</h2>
-            {b.p && <p className="text-slate-600 leading-relaxed">{b.p}</p>}
+            {b.p && <p className="text-sm sm:text-base text-slate-600 leading-relaxed">{b.p}</p>}
             {b.list && (
               <ul className="mt-1 space-y-1.5">
                 {b.list.map((it, j) => (
@@ -55,36 +62,20 @@ export default function GuidePage({ params }: { params: { slug: string } }) {
         ))}
       </article>
 
+      <div className="mt-5 sm:mt-6 flex items-center justify-between gap-3 flex-wrap border-t border-slate-100 pt-4">
+        <p className="text-[13px] text-slate-500 font-semibold">Thấy hữu ích? Gửi cho người đang cần mua/bán đất:</p>
+        <ShareRow title={g.title} />
+      </div>
+
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mt-6">
         <p className="text-[13px] text-amber-800/90">Nội dung mang tính tham khảo, hướng dẫn chung; quy định pháp luật có thể thay đổi (đặc biệt theo Luật Đất đai 2024). Vui lòng đối chiếu quy định hiện hành hoặc hỏi cơ quan chức năng trước khi thực hiện.</p>
       </div>
 
-      {/* Liên hệ tư vấn pháp lý */}
-      <div className="mt-6 bg-[#0A2540] text-white rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="font-bold text-sm">Cần hỗ trợ thủ tục pháp lý nhà đất?</p>
-          <p className="text-white/70 text-xs mt-0.5">Cam Lâm Land tư vấn sang tên, tách thửa, thuế phí, hợp đồng… — tư vấn miễn phí ban đầu.</p>
-        </div>
-        <div className="flex gap-2 shrink-0">
-          <a href="tel:0988888888" className="bg-[#C8A14B] hover:bg-[#b8923f] text-[#0A2540] font-extrabold px-4 py-2 rounded-lg text-sm whitespace-nowrap">📞 0988 888 888</a>
-          <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="bg-white/15 hover:bg-white/25 text-white font-bold px-4 py-2 rounded-lg text-sm">Zalo</a>
-        </div>
-      </div>
-
-      {/* Công cụ liên quan */}
-      <div className="grid sm:grid-cols-2 gap-3 mt-6">
-        <Link href="/qr" className="bg-white border border-slate-200 rounded-xl p-4 hover:border-[#C8A14B]">
-          <p className="font-bold text-[#0A2540] text-sm">🔎 Tra cứu QR &amp; kiểm tra sổ</p>
-          <p className="text-xs text-slate-500 mt-1">Quét mã QR trên sổ để đối chiếu thông tin xác thực.</p>
-        </Link>
-        <Link href="/map" className="bg-white border border-slate-200 rounded-xl p-4 hover:border-[#C8A14B]">
-          <p className="font-bold text-[#0A2540] text-sm">🗺️ Bản đồ quy hoạch</p>
-          <p className="text-xs text-slate-500 mt-1">Kiểm tra quy hoạch, vẽ ranh thửa từ toạ độ VN-2000.</p>
-        </Link>
-      </div>
+      {/* CTA để lại SĐT — đặt ĐÚNG KHOẢNH KHẮC: khách vừa đọc xong bài hướng dẫn pháp lý */}
+      <LegalConsultCTA topic={g.title} className="mt-6" />
 
       {others.length > 0 && (
-        <div className="mt-8">
+        <div className="mt-6 sm:mt-8">
           <h2 className="font-bold text-[#0A2540] mb-2">Bài viết khác</h2>
           <ul className="space-y-1.5">
             {others.map((o) => (

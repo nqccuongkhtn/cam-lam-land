@@ -17,7 +17,8 @@
     "ws": "^8.18.0",
     "compression": "^1.7.4",
     "web-push": "^3.6.7",
-    "shpjs": "^4.0.4"
+    "shpjs": "^4.0.4",
+    "exceljs": "^4.4.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

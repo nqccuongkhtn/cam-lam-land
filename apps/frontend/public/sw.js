@@ -1,21 +1,98 @@
-const CACHE = 'camlam-v2';
-self.addEventListener('install', () => self.skipWaiting());
+const CACHE = 'camlam-v86';
+const API_CACHE = 'camlam-api-v1'; // cache RIÊNG cho API công khai (dễ dọn, giới hạn dung lượng)
+const OFFLINE = '/offline.html';
+// Precache khung app để MỞ APP là vẽ ngay (không chờ mạng → hết màn đen ~1s lúc khởi động).
+const PRECACHE = [OFFLINE, '/', '/icons/icon-192.png'];
+
+// API công khai được phép cache (GET, không cá nhân hoá). Tin cá nhân/đăng nhập KHÔNG cache.
+function isPublicApi(p) {
+  return p === '/api/listings' || p === '/api/listings/areas' || p === '/api/listings/gia-khu-vuc'
+    || p === '/api/listings/geojson' || p === '/api/config'
+    || p.startsWith('/api/news') || p.startsWith('/api/layers') || p.startsWith('/api/map-ads')
+    || p.startsWith('/api/partners') || p.startsWith('/api/projects');
+}
+// Giữ cache API gọn: xoá bớt mục cũ nhất khi vượt ngưỡng.
+async function trimCache(name, max) {
+  const c = await caches.open(name); const keys = await c.keys();
+  for (let i = 0; i < keys.length - max; i++) await c.delete(keys[i]);
+}
+
+self.addEventListener('install', (e) => {
+  // Thêm TỪNG file (không atomic) để 1 file lỗi không làm hỏng cả precache — '/' vẫn được cache.
+  e.waitUntil(caches.open(CACHE).then((c) => Promise.all(PRECACHE.map((u) => c.add(u).catch(() => {})))));
+  self.skipWaiting();
+});
 self.addEventListener('activate', (e) => e.waitUntil((async () => {
   const keys = await caches.keys();
-  await Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)));
+  await Promise.all(keys.filter((k) => k !== CACHE && k !== API_CACHE).map((k) => caches.delete(k)));
   await self.clients.claim();
 })()));
+
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   const url = new URL(req.url);
-  if (req.method !== 'GET' || url.origin !== location.origin || url.pathname.startsWith('/api/')) return;
-  e.respondWith(
-    fetch(req).then((res) => {
-      const copy = res.clone();
-      caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+  if (req.method !== 'GET' || url.origin !== location.origin) return;
+
+  // API CÔNG KHAI (GET, không kèm Authorization): stale-while-revalidate → app mượt tức thì,
+  // dùng được offline, và GIẢM TẢI backend. API cá nhân/đăng nhập để mạng lo (không cache).
+  if (url.pathname.startsWith('/api/')) {
+    if (!req.headers.get('authorization') && isPublicApi(url.pathname)) {
+      const net = fetch(req).then((res) => {
+        if (res && res.ok) { const copy = res.clone(); caches.open(API_CACHE).then((c) => c.put(req, copy).then(() => trimCache(API_CACHE, 80))).catch(() => {}); }
+        return res;
+      }).catch(() => null);
+      e.waitUntil(net);
+      e.respondWith((async () => {
+        const cache = await caches.open(API_CACHE);
+        const cached = await cache.match(req);
+        return cached || (await net) || new Response(JSON.stringify({ error: 'offline' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+      })());
+    }
+    return; // API khác: để mạng xử lý bình thường
+  }
+
+  // TIN TỨC ĐỘNG (/feed/news…): NETWORK-FIRST — luôn lấy bản mới (bài ghim + slug mới nhất),
+  // chỉ dùng cache khi offline. Tránh cache-first phục vụ bản cũ khiến mở bài ra "không tìm thấy".
+  if (url.pathname.startsWith('/feed/')) {
+    e.respondWith((async () => {
+      try {
+        const res = await fetch(req);
+        if (res && res.ok) { const copy = res.clone(); caches.open(API_CACHE).then((c) => c.put(req, copy).then(() => trimCache(API_CACHE, 80))).catch(() => {}); }
+        return res;
+      } catch {
+        const cache = await caches.open(API_CACHE);
+        return (await cache.match(req)) || new Response(JSON.stringify({ news: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      }
+    })());
+    return;
+  }
+
+  // ĐIỀU HƯỚNG TRANG (mở app / đổi trang): trả CACHE TỨC THÌ rồi cập nhật ngầm (stale-while-revalidate).
+  // Đây là mấu chốt hết cảnh màn đen: WebView có HTML ngay → splash nhúng sẵn hiện lập tức.
+  if (req.mode === 'navigate') {
+    const net = fetch(req).then((res) => {
+      if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {}); }
       return res;
-    }).catch(() => caches.match(req).then((m) => m || caches.match('/')))
-  );
+    }).catch(() => null);
+    e.waitUntil(net); // giữ SW sống để việc cập nhật ngầm hoàn tất
+    e.respondWith((async () => {
+      const cache = await caches.open(CACHE);
+      const cached = await cache.match(req);
+      if (cached) return cached;                    // có sẵn → trả ngay, KHÔNG chờ mạng
+      return (await net) || (await cache.match(OFFLINE)) || (await cache.match('/')) || Response.error();
+    })());
+    return;
+  }
+
+  // TÀI NGUYÊN TĨNH (JS/CSS/ảnh/font… của Next, đa số bất biến theo hash): cache-first cho nhanh.
+  e.respondWith((async () => {
+    const cache = await caches.open(CACHE);
+    const cached = await cache.match(req);
+    if (cached) return cached;
+    const res = await fetch(req).catch(() => null);
+    if (res && res.status === 200) { const copy = res.clone(); cache.put(req, copy).catch(() => {}); }
+    return res || cached || Response.error();
+  })());
 });
 
 self.addEventListener('push', (e) => {

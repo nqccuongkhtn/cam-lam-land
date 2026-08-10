@@ -1,0 +1,10 @@
+THẢ ẢNH BÃI DÀI CAM LÂM VÀO ĐÂY
+
+1. Lưu / kéo-thả tất cả ảnh biển Bãi Dài Cam Lâm vào thư mục này.
+2. Ảnh có gắn chữ "CAM LÂM" (dùng cho tin ĐẦU TIÊN, luôn trên cùng):
+   đặt tên bắt đầu bằng "hero", ví dụ: hero-cam-lam.jpg
+3. Các ảnh còn lại đặt tên tùy ý (1.jpg, 2.jpg, movenpick.jpg, ...).
+4. Định dạng: .jpg .jpeg .png .webp
+
+Xong nhắn mình một tiếng — mình sẽ copy toàn bộ ảnh sang thư mục web
+(apps/frontend/public/bai-dai) và gắn vào mục "Tin nổi bật".

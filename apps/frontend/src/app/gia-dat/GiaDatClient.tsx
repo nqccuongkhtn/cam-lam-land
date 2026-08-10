@@ -29,9 +29,9 @@ export default function GiaDatClient() {
   const est = sel && dtNum > 0 ? { mid: sel.medPerM2 * dtNum, lo: sel.minPerM2 * dtNum, hi: sel.maxPerM2 * dtNum } : null;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-3xl font-extrabold text-[#0A2540]">Giá đất khu vực Cam Lâm</h1>
-      <p className="text-slate-600 mt-2 mb-5 max-w-2xl">Giá <b>tham khảo</b> (trung vị) tính từ các tin đang rao trên Cam Lâm Land theo từng xã. Đây <b>không phải giá đất nhà nước</b> mà là mặt bằng rao bán thực tế để bạn ước lượng nhanh.</p>
+    <div className="mx-auto max-w-4xl px-3 sm:px-4 py-6 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540]">Giá đất khu vực Cam Lâm</h1>
+      <p className="text-slate-600 text-sm sm:text-base mt-2 mb-4 sm:mb-5 max-w-2xl">Giá <b>tham khảo</b> (trung vị) tính từ các tin đang rao trên Cam Lâm Land theo từng xã. Đây <b>không phải giá đất nhà nước</b> mà là mặt bằng rao bán thực tế để bạn ước lượng nhanh.</p>
 
       {/* Lọc loại BĐS */}
       <div className="flex flex-wrap gap-2 mb-5">
@@ -43,7 +43,7 @@ export default function GiaDatClient() {
       </div>
 
       {/* Định giá nhanh */}
-      <div className="bg-[#0A2540] text-white rounded-2xl p-5 mb-6">
+      <div className="bg-[#0A2540] text-white rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6">
         <h2 className="font-extrabold text-lg mb-1">⚡ Định giá nhanh</h2>
         <p className="text-white/70 text-sm mb-3">Chọn khu vực + nhập diện tích để ước lượng giá trị theo mặt bằng rao bán.</p>
         <div className="grid sm:grid-cols-2 gap-3">

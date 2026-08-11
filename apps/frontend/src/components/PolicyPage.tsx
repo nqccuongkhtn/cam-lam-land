@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 export default function PolicyPage({ title, updated, intro, sections }: { title: string; updated?: string; intro?: string; sections: { h: string; body: ReactNode }[] }) {
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
+    <div className="bg-slate-50 min-h-[calc(100dvh-56px)]">
       <div className="max-w-3xl mx-auto px-3 py-5 sm:px-4 sm:py-8">
         <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <span className="text-slate-600">{title}</span></div>
         <article className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 md:p-8">

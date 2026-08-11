@@ -437,7 +437,7 @@ adminRouter.get('/users', async (req, res, next) => {
     const params: any[] = q ? [`%${q}%`] : [];
     const [{ total }] = await query(`SELECT count(*)::int AS total FROM users ${where}`, params);
     const rows = await query(`SELECT id, email, role, full_name AS "fullName", phone, tier, status, boost_quota AS "boostQuota",
-      is_advisor AS "isAdvisor", email_verified AS "emailVerified", rating, rating_count AS "ratingCount", created_at AS "createdAt"
+      is_advisor AS "isAdvisor", email_verified AS "emailVerified", rating, rating_count AS "ratingCount", video_expires_at AS "videoExpiresAt", created_at AS "createdAt"
       FROM users ${where} ORDER BY created_at DESC LIMIT ${per} OFFSET ${(page - 1) * per}`, params);
     res.json({ users: rows, total, page, per });
   } catch (e) { next(e); }
@@ -449,6 +449,22 @@ adminRouter.patch('/users/:id', async (req, res, next) => {
       `UPDATE users SET role=COALESCE($2,role), tier=COALESCE($3,tier), status=COALESCE($4,status), boost_quota=COALESCE($5,boost_quota), is_advisor=COALESCE($6,is_advisor), rating=COALESCE($7,rating), rating_count=COALESCE($8,rating_count)
        WHERE id=$1 RETURNING id, email, role, tier, status, boost_quota AS "boostQuota", is_advisor AS "isAdvisor", rating, rating_count AS "ratingCount"`,
       [id, b.role ?? null, b.tier ?? null, b.status ?? null, b.boostQuota ?? null, typeof b.isAdvisor === 'boolean' ? b.isAdvisor : null, b.rating ?? null, b.ratingCount ?? null]);
+    if (!row) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+    res.json({ user: row });
+  } catch (e) { next(e); }
+});
+
+// Cấp / thu hồi quyền dùng TẠO VIDEO BẢN ĐỒ cho 1 tài khoản (dùng khi khách trả tiền ngoài web).
+//   { videoDays: 30 } → cộng thêm 30 ngày (gói cũ còn hạn thì cộng dồn)
+//   { videoDays: 0 }  → thu hồi ngay lập tức
+adminRouter.post('/users/:id/video', async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    const days = Math.max(0, Math.min(3650, Number(req.body?.videoDays) || 0));
+    const [row] = days > 0
+      ? await query(`UPDATE users SET video_expires_at = GREATEST(COALESCE(video_expires_at, now()), now()) + ($2::int) * interval '1 day', tier='paid'
+                     WHERE id=$1 RETURNING id, email, video_expires_at AS "videoExpiresAt"`, [id, days])
+      : await query(`UPDATE users SET video_expires_at = NULL WHERE id=$1 RETURNING id, email, video_expires_at AS "videoExpiresAt"`, [id]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
     res.json({ user: row });
   } catch (e) { next(e); }

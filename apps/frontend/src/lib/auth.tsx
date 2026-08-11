@@ -3,7 +3,8 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { api } from './api';
 import { getToken, setToken, clearToken } from './token';
 
-export type Role = 'user' | 'admin' | 'gis' | 'vanban';
+// Khớp với packages/shared/src/index.ts và ràng buộc trong database.
+export type Role = 'user' | 'admin' | 'gis' | 'vanban' | 'hotlist';
 export interface AuthUser {
   id: number; email: string; role: Role;
   fullName?: string | null; phone?: string | null;

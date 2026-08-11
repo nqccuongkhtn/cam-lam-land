@@ -206,7 +206,7 @@ export default function NewsIndex() {
   const hasMore = rest.length > limit;
 
   return (
-    <div className="relative min-h-[calc(100vh-56px)] bg-white">
+    <div className="relative min-h-[calc(100dvh-56px)] bg-white">
       {showAd && <WingRails ad={ad} />}
       <div className="relative z-10 mx-auto max-w-[1120px] px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
         {showAd && <div className="hidden md:block mb-6"><BillboardAd ad={ad} /></div>}

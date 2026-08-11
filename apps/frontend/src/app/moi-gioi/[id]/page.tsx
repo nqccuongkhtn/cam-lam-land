@@ -41,7 +41,7 @@ export default function AgentProfilePage() {
   const total = active.length + expired.length;
 
   return (
-    <div className="bg-slate-50 min-h-screen">
+    <div className="bg-slate-50 min-h-[100dvh]">
       {/* Header */}
       <div className="bg-gradient-to-br from-[#0A2540] to-[#081B30] text-white">
         <div className="max-w-5xl mx-auto px-3 sm:px-4 py-5 sm:py-10 flex items-center gap-3 sm:gap-5">

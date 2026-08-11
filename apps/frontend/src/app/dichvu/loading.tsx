@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui';
 
 export default function Loading() {
   return (
-    <div className="min-h-[calc(100vh-56px)] bg-slate-50">
+    <div className="min-h-[calc(100dvh-56px)] bg-slate-50">
       <div className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-8">
         <Skeleton h={28} w="55%" className="mx-auto" />
         <Skeleton h={14} w="80%" className="mx-auto mt-3" />

@@ -114,7 +114,8 @@ const SELF_OCR_URL = process.env.SELF_OCR_URL || '';
 const SELF_OCR_TOKEN = process.env.SELF_OCR_TOKEN || '';
 async function selfOcr(buffer: Buffer, mime: string): Promise<string> {
   const fd = new FormData();
-  fd.append('file', new Blob([buffer], { type: mime || 'image/png' }), 'coords.png');
+  // Bọc qua Uint8Array: Buffer của Node không phải kiểu dữ liệu mà Blob chấp nhận trực tiếp.
+  fd.append('file', new Blob([new Uint8Array(buffer)], { type: mime || 'image/png' }), 'coords.png');
   const r = await fetch(SELF_OCR_URL.replace(/\/+$/, '') + '/ocr', { method: 'POST', headers: SELF_OCR_TOKEN ? { 'x-token': SELF_OCR_TOKEN } : {}, body: fd, signal: AbortSignal.timeout(30000) });
   if (!r.ok) throw new Error('Self-OCR HTTP ' + r.status);
   const j: any = await r.json();

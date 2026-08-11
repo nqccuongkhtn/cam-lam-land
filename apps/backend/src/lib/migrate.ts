@@ -1,4 +1,6 @@
+import { createHash } from 'node:crypto';
 import { pool } from './db.ts';
+import { vnNoAccent, vnTranslateTable } from './vn.ts';
 
 const SQL = `
 -- ── Tài khoản & vai trò (GĐ1) ──
@@ -179,11 +181,15 @@ UPDATE listings SET price = ABS(price) WHERE price < 0;
 /** Idempotent schema upgrade — runs every boot (roles, verification, listing fields, images). */
 export async function migrate(): Promise<void> {
   await pool.query(SQL).catch((e: any) => console.error('[migrate] SQL chính lỗi (bỏ qua, chạy tiếp):', e?.message || e));
-  // Bỏ dấu tiếng Việt cho tìm kiếm KHÔNG DẤU — IMMUTABLE, không cần extension. Khớp CHÍNH XÁC với vnNoAccent() ở lib/vn.ts.
+  // ── Bỏ dấu tiếng Việt cho tìm kiếm KHÔNG DẤU ──────────────────────────────
+  // Bảng đổi chữ được SINH TỰ ĐỘNG từ vnNoAccent() (lib/vn.ts) — nơi DUY NHẤT định nghĩa quy tắc
+  // — nên hàm SQL và hàm JS KHÔNG THỂ lệch nhau (trước đây chép tay 2 nơi, lệch là tìm kiếm sai
+  // âm thầm). Gồm cả chữ HOA có dấu và chữ gõ kiểu TÁCH DẤU. IMMUTABLE để dùng được cho index hàm.
+  const { from: vnFrom, to: vnTo } = vnTranslateTable();
+  const vnFp = createHash('sha1').update(vnFrom + '|' + vnTo).digest('hex').slice(0, 12);
+  const sq = (x: string) => x.replace(/'/g, "''");
   await pool.query(`CREATE OR REPLACE FUNCTION vn_unaccent(t text) RETURNS text AS $$
-    SELECT translate(lower($1),
-      'àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ',
-      'aaaaaaaaaaaaaaaaaeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyyd')
+    SELECT translate(lower($1), '${sq(vnFrom)}', '${sq(vnTo)}')
   $$ LANGUAGE sql IMMUTABLE`).catch((e: any) => console.error('[migrate] vn_unaccent lỗi:', e?.message || e));
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -203,6 +209,35 @@ export async function migrate(): Promise<void> {
   await pool.query(`CREATE INDEX IF NOT EXISTS listings_search_trgm_idx ON listings USING gin (vn_unaccent(COALESCE(title,'')||' '||COALESCE(description,'')||' '||COALESCE(address,'')||' '||COALESCE(ward,'')) gin_trgm_ops)`).catch((e: any) => console.error('[migrate] idx search trgm lỗi:', e?.message || e));
   // Cập nhật thống kê để planner chọn đúng index.
   await pool.query(`ANALYZE listings`).catch(() => {});
+
+  // ── AN TOÀN KHI ĐỔI QUY TẮC BỎ DẤU ────────────────────────────────────────
+  // 2 index ở trên dựng THEO hàm vn_unaccent(). Postgres KHÔNG tự dựng lại khi hàm đổi định nghĩa
+  // → index cũ sẽ trả kết quả SAI mà không báo gì. Nên lưu "vân tay" của bảng đổi chữ: khác lần
+  // trước thì dựng lại 2 index đó. Bình thường vân tay trùng → bỏ qua, không tốn gì.
+  const fpCu = await pool.query(`SELECT value->>'fp' AS fp FROM app_config WHERE key='vn_unaccent_fp'`)
+    .then((r: any) => r.rows[0]?.fp as string | undefined).catch(() => undefined);
+  if (fpCu !== vnFp) {
+    console.log(`[migrate] quy tắc bỏ dấu đã đổi (${fpCu ?? 'chưa lưu'} → ${vnFp}) — dựng lại index liên quan…`);
+    for (const idx of ['listings_ward_noaccent_idx', 'listings_search_trgm_idx']) {
+      await pool.query(`REINDEX INDEX ${idx}`).catch((e: any) => console.error(`[migrate] REINDEX ${idx} lỗi:`, e?.message || e));
+    }
+    await pool.query(`INSERT INTO app_config (key, value) VALUES ('vn_unaccent_fp', jsonb_build_object('fp', $1::text))
+                      ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`, [vnFp])
+      .catch((e: any) => console.error('[migrate] lưu vân tay bỏ dấu lỗi:', e?.message || e));
+  }
+  // TỰ KIỂM: hàm SQL và hàm JS phải cho ra kết quả Y HỆT trên tên thật (kể cả chữ gõ TÁCH DẤU).
+  // Lệch nhau = lọc theo xã trả rỗng mà không có lỗi nào → phải GÀO LÊN trong log.
+  const mauTest = ['Cam Đức', 'CAM HẢI ĐÔNG', 'Suối Dầu', 'Xã Cam Phước Tây', 'Đất ở đô thị', 'Cam Đức'.normalize('NFD')];
+  await pool.query(`SELECT vn_unaccent(x) AS v FROM unnest($1::text[]) WITH ORDINALITY AS t(x, i) ORDER BY i`, [mauTest])
+    .then((r: any) => {
+      const lech = mauTest.map((s, i) => ({ chuoi: s, sql: r.rows[i]?.v, js: vnNoAccent(s) })).filter((x) => x.sql !== x.js);
+      if (lech.length) console.error('[migrate] *** CẢNH BÁO: hàm bỏ dấu SQL và JS KHÔNG khớp — tìm kiếm & lọc theo xã sẽ SAI:', JSON.stringify(lech));
+      else console.log('[migrate] bỏ dấu tiếng Việt: SQL khớp JS (' + vnFp + ')');
+    })
+    .catch((e: any) => console.error('[migrate] tự kiểm bỏ dấu lỗi:', e?.message || e));
+
+  // Hạn dùng gói TẠO VIDEO BẢN ĐỒ (gói bán riêng). NULL = chưa mua/đã hết hạn.
+  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS video_expires_at TIMESTAMPTZ`).catch((e: any) => console.error('[migrate] video_expires_at lỗi:', e?.message || e));
 
   // Tư vấn đầu tư — chạy RIÊNG từng câu (idempotent) để KHÔNG bị cuốn theo lỗi/rollback của khối SQL lớn.
   await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_advisor BOOLEAN NOT NULL DEFAULT false`).catch((e: any) => console.error('[migrate] is_advisor lỗi:', e?.message || e));

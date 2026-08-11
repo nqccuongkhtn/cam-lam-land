@@ -22,7 +22,7 @@ export default function LoginPage() {
     } catch (e: any) { setErr(e.message || 'Đăng nhập thất bại'); } finally { setBusy(false); }
   }
   return (
-    <div className="min-h-[calc(100vh-56px)] grid place-items-center bg-slate-50 px-3 py-8 sm:px-4 sm:py-16">
+    <div className="min-h-[calc(100dvh-56px)] grid place-items-center bg-slate-50 px-3 py-8 sm:px-4 sm:py-16">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-5 sm:p-7">
         <h1 className="text-2xl font-extrabold text-[#0A2540]">Đăng nhập</h1>
         <p className="text-sm text-slate-500 mt-1 mb-5">Cam Lâm <span className="text-[#C8A14B] font-bold">Land</span> — sàn bất động sản & quy hoạch</p>

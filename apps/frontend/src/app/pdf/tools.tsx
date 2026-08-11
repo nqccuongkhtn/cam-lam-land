@@ -382,7 +382,7 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
                 {msg && active.id !== 'compress' && <p className="mb-2 mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{msg}</p>}
                 {compressRows.length > 0 && (
                   <>
-                    <div className="mb-2 mt-2 overflow-hidden rounded-xl border">
+                    <div className="mb-2 mt-2 overflow-x-auto rounded-xl border">
                       <table className="w-full border-collapse text-sm">
                         <thead className="bg-slate-50 text-[11px] uppercase tracking-wide text-slate-500">
                           <tr>

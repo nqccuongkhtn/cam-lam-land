@@ -1,4 +1,8 @@
-export interface Pkg { id: string; name: string; kind: 'post' | 'boost'; tier?: 'normal' | 'silver' | 'gold' | 'diamond'; boosts?: number; posts?: number; days: number; price: number; perks: string[]; popular?: boolean; }
+export interface Pkg { id: string; name: string; kind: 'post' | 'boost' | 'video'; tier?: 'normal' | 'silver' | 'gold' | 'diamond'; boosts?: number; posts?: number; days: number; price: number; perks: string[]; popular?: boolean; }
+
+// Giá & thời hạn gói TẠO VIDEO BẢN ĐỒ — xem ghi chú ở cuối danh sách PACKAGES bên dưới.
+export const VIDEO_PRICE = Number(process.env.VIDEO_PKG_PRICE || 0);  // 0 = chưa đặt giá
+export const VIDEO_DAYS = Number(process.env.VIDEO_PKG_DAYS || 30);
 
 export const PACKAGES: Pkg[] = [
   // ===== GÓI ĐĂNG TIN (30 ngày) — miễn phí 3 tin/tháng =====
@@ -21,6 +25,18 @@ export const PACKAGES: Pkg[] = [
     perks: ['Tin hiển thị hạng VIP Vàng', '20 lượt đẩy tin', 'Tự nổi lại mỗi 12 giờ', 'Ưu tiên trên hạng Bạc', 'Hiệu lực 20 ngày'] },
   { id: 'diamond', name: 'VIP Kim Cương', kind: 'boost', tier: 'diamond', boosts: 20, days: 20, price: 9999000,
     perks: ['Tin hiển thị hạng VIP Kim Cương', '20 lượt đẩy tin', 'Tự nổi lại mỗi 6 giờ', 'Luôn nằm trên cùng', 'Tiêu đề nổi bật màu đỏ', 'Hiệu lực 20 ngày'] },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  GÓI TẠO VIDEO BẢN ĐỒ  —  bán RIÊNG, không dính gì tới gói đăng tin / đẩy tin
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  ►►► CHỖ ĐẶT GIÁ: sửa 2 số ở ngay dưới (VIDEO_PRICE và VIDEO_DAYS) là xong.
+  //      Hoặc đổi trong file .env mà KHÔNG cần sửa code:
+  //          VIDEO_PKG_PRICE=499000     (giá bán, đơn vị đồng)
+  //          VIDEO_PKG_DAYS=30          (dùng được bao nhiêu ngày)
+  //  Để giá = 0 nghĩa là CHƯA ĐẶT GIÁ: trang dịch vụ sẽ hiện "Liên hệ" và
+  //  không cho bấm mua; admin vẫn cấp quyền tay được cho từng tài khoản.
+  { id: 'video', name: 'Tạo video bản đồ', kind: 'video', days: VIDEO_DAYS, price: VIDEO_PRICE,
+    perks: ['Tạo video bản đồ không giới hạn', 'Đủ 6 kịch bản dựng sẵn', 'Xuất MP4 1080p · xuất cả bộ ZIP', 'AI viết kịch bản', `Hiệu lực ${VIDEO_DAYS} ngày`] },
 ];
 export const TIER_RANK: Record<string, number> = { normal: 0, silver: 1, gold: 2, diamond: 3 };
 export const findPkg = (id: string): Pkg | undefined => PACKAGES.find((p) => p.id === id);

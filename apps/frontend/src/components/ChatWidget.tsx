@@ -311,7 +311,7 @@ export default function ChatWidget() {
       if (Notification.permission !== 'granted') { const perm = await Notification.requestPermission(); if (perm !== 'granted') return; }
       const reg = await navigator.serviceWorker.ready;
       let sub = await reg.pushManager.getSubscription();
-      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8(vapidRef.current) });
+      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8(vapidRef.current) as BufferSource });
       await api('/push/subscribe', { method: 'POST', body: JSON.stringify(sub) });
     } catch {}
   }
@@ -496,7 +496,7 @@ export default function ChatWidget() {
                   <div className="px-2 py-2 border-b border-slate-100 shrink-0 space-y-1.5">
                     <div className="flex items-center justify-between px-1">
                       <p className="text-[11px] font-bold text-slate-500">{tab === 'advisory' ? '💰 Tư vấn đầu tư & Pháp lý' : '💬 Hội thoại'} ({(tab === 'advisory' ? advRooms : rooms).length})</p>
-                      {tab === 'advisory' && <a href="/tu-van" target="_blank" className="text-[10px] font-bold text-red-600 hover:underline shrink-0">Trang quản trị ↗</a>}
+                      {tab === 'advisory' && <a href="/tu-van" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-red-600 hover:underline shrink-0">Trang quản trị ↗</a>}
                     </div>
                     <input value={roomQ} onChange={(e) => setRoomQ(e.target.value)} placeholder="🔍 Tìm khách…" className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm outline-none focus:border-[#0A2540]" />
                   </div>

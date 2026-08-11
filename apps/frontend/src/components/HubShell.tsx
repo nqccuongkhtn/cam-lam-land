@@ -92,7 +92,7 @@ export default function HubShell({ tools, storageKey = 'hub', hideMobileMenu = f
   if (!cur) return null;
 
   return (
-    <div className="cl-hub flex flex-col bg-slate-100 h-[calc(100svh-104px)] md:h-[calc(100vh-56px)]">
+    <div className="cl-hub flex flex-col bg-slate-100 h-[calc(100svh-104px)] md:h-[calc(100dvh-56px)]">
       <div className="flex flex-1 min-h-0">
         {/* Sidebar (desktop) */}
         <nav className={`hidden md:flex md:flex-col shrink-0 bg-white border-r border-slate-200 overflow-y-auto py-2 transition-[width] duration-200 ${collapsed ? 'w-[58px]' : 'w-64'}`}>
@@ -205,7 +205,7 @@ export default function HubShell({ tools, storageKey = 'hub', hideMobileMenu = f
                 </div>
               </div>
             )}
-            <iframe ref={iframeRef} key={`${cur.key}-${reloadN}`} src={withEmbed(cur.path)} title={cur.name} onLoad={onFrameLoad}
+            <iframe ref={iframeRef} key={`${cur.key}-${reloadN}`} src={withEmbed(cur.path)} title={cur.name} onLoad={onFrameLoad} allow="fullscreen"
               className="w-full h-full block" style={{ border: 0 }} />
 
           </div>

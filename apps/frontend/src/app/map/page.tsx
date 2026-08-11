@@ -115,7 +115,7 @@ function preprocess(src: HTMLImageElement | HTMLCanvasElement): HTMLCanvasElemen
   const scl = Math.max(1, Math.min(3, 2200 / Math.max(w0, h0)));
   const w = Math.max(1, Math.round(w0 * scl)), h = Math.max(1, Math.round(h0 * scl));
   const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
-  const ctx = cv.getContext('2d', { willReadFrequently: true } as any)!;
+  const ctx = cv.getContext('2d', { willReadFrequently: true } as any) as CanvasRenderingContext2D;
   (ctx as any).imageSmoothingQuality = 'high'; ctx.drawImage(src, 0, 0, w, h);
   const im = ctx.getImageData(0, 0, w, h), d = im.data, n = w * h;
   const g = new Float64Array(n);
@@ -161,7 +161,7 @@ function enhanceForAI(src: HTMLImageElement | HTMLCanvasElement, maxDim = 2200, 
   const scl = Math.max(1, Math.min(2, maxDim / Math.max(w0, h0)));
   const w = Math.max(1, Math.round(w0 * scl)), h = Math.max(1, Math.round(h0 * scl));
   const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
-  const ctx = cv.getContext('2d', { willReadFrequently: true } as any)!;
+  const ctx = cv.getContext('2d', { willReadFrequently: true } as any) as CanvasRenderingContext2D;
   (ctx as any).imageSmoothingQuality = 'high'; ctx.drawImage(src, 0, 0, w, h);
   const im = ctx.getImageData(0, 0, w, h), d = im.data, n = w * h;
   // 1) Xám hoá.
@@ -960,7 +960,7 @@ export default function MapPage() {
             {RASTER_OVERLAYS.map((o) => (
               <label key={o.id} className="flex items-center gap-2.5 py-1.5 text-sm cursor-pointer">
                 <input type="checkbox" checked={ovOn[o.id] ?? true} onChange={(e) => setOvOn((v) => ({ ...v, [o.id]: e.target.checked }))} className="accent-emerald-600 w-4 h-4" />
-                <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 bg-amber-500" /><span className="flex-1 text-slate-700">🛰️ {o.name}</span>
+                <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 bg-amber-500" /><span className="min-w-0 flex-1 truncate text-slate-700" title={o.name}>🛰️ {o.name}</span>
               </label>
             ))}
             <div className="mt-1 pl-[26px]">

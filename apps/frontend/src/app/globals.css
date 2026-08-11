@@ -181,3 +181,33 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 @media all and (display-mode: standalone) { .cl-install-cta { display: none !important; } }
 
 /* Splash khi mở app: CSS đã được NHÚNG THẲNG trong <head> (SPLASH_CSS ở layout.tsx) để phủ tức thì, không chờ file này. */
+
+
+/* ══ TẠO VIDEO BẢN ĐỒ — bố cục vừa khít 1 màn hình ════════════════════════════
+   Trên MÀN HÌNH LỚN: cả công cụ cao đúng bằng 1 màn hình. Khung xem trước TỰ GIÃN
+   lấy hết chỗ trống còn lại (màn hình càng lớn → video xem càng to), timeline luôn
+   hiện ĐỦ các thanh, không có thanh cuộn riêng, không phải cuộn trang.
+   Trên ĐIỆN THOẠI: giữ kiểu cuộn bình thường, vì bảng cài đặt nằm xếp phía dưới. */
+/* Khung xem trước GIỮ ĐÚNG TỈ LỆ khổ video đang chọn (--cl-ar do trang đặt: 16/9, 9/16 hoặc 1/1)
+   → nhìn trên màn hình thế nào thì video xuất ra y như vậy, không bị kéo dẹt. */
+.cl-video-stage { aspect-ratio: var(--cl-ar, 16 / 9); width: 100%; height: auto; max-height: 58dvh; margin-inline: auto; }
+@media (min-width: 1024px) {
+  .cl-video-tool  { display: flex; flex-direction: column; height: calc(100dvh - 96px); min-height: 560px; }
+  html.embed .cl-video-tool { height: 100dvh; min-height: 0; }
+  .cl-video-body  { flex: 1 1 auto; min-height: 0; }
+  /* Cao bằng đúng chỗ trống còn lại, RỘNG tự suy ra từ tỉ lệ → khung luôn chuẩn khổ, tự căn giữa. */
+  .cl-video-stage { flex: 1 1 0; align-self: center; width: auto; height: auto; max-width: 100%; max-height: none; min-height: 200px; }
+}
+
+/* Khi XEM TRƯỚC phóng toàn màn hình: khung lấp đầy màn hình, bỏ viền/bo góc cho gọn. */
+.cl-video-stage:fullscreen { width: 100vw; height: 100dvh; max-width: none; max-height: none; min-height: 0;
+  aspect-ratio: auto; margin: 0; border: 0; border-radius: 0; background: #000; }
+
+/* ══ Nút điều khiển bản đồ VỪA NGÓN TAY trên điện thoại ══════════════════════
+   MapLibre mặc định để nút phóng to / thu nhỏ / định vị chỉ 29×29px — quá nhỏ so với
+   chuẩn vùng chạm 44px của điện thoại, rất hay bấm trượt. Phóng lên 42px NHƯNG CHỈ trên
+   thiết bị cảm ứng (máy tính dùng chuột giữ nguyên cỡ gọn như cũ). */
+@media (hover: none) and (pointer: coarse) {
+  .maplibregl-ctrl-group button { width: 42px; height: 42px; }
+  .maplibregl-ctrl-group button .maplibregl-ctrl-icon { background-size: 21px 21px; }
+}

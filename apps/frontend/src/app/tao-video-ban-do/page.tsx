@@ -162,7 +162,7 @@ function haversine(a: [number, number], b: [number, number]): number {
 }
 const fmtDist = (m: number) => (m >= 1000 ? (m / 1000).toFixed(m >= 10000 ? 0 : 1) + ' km' : Math.round(m) + ' m');
 
-export default function MapVideoPage() {
+function MapVideoTool() {
   const { user } = useAuth();
   const isPro = user?.role === 'admin'; // TODO: sau này mở thêm gói trả phí; bản free LUÔN giữ logo web.
   const boxRef = useRef<HTMLDivElement | null>(null);
@@ -661,7 +661,7 @@ export default function MapVideoPage() {
     m.setLayoutProperty('lab', 'visibility', labels && base === 'sat' ? 'visible' : 'none'); // nhãn địa danh chỉ chồng lên vệ tinh
   }, [labels, base]);
 
-  const fc = (features: any[]) => ({ type: 'FeatureCollection', features });
+  const fc = (features: any[]) => ({ type: 'FeatureCollection' as const, features });
   const lineFeat = (coords: [number, number][]) => (coords.length >= 2 ? [{ type: 'Feature', geometry: { type: 'LineString', coordinates: coords }, properties: {} }] : []);
   function drawParcel() {
     const c = parcel.current; const feats: any[] = [];
@@ -879,7 +879,7 @@ export default function MapVideoPage() {
   async function animateDirections(map: any, total: number, cl: any, rr: any) {
     const bAll = bounds();
     const camAll: any = (bAll && map.cameraForBounds(bAll, { padding: 120, maxZoom: 18 })) || { center: map.getCenter(), zoom: map.getZoom() };
-    const cc = (c: any): [number, number] => (Array.isArray(c) ? c : [c.lng, c.lat]);
+    const cc = (c: any): [number, number] => (Array.isArray(c) ? (c as [number, number]) : [c.lng, c.lat]);
     const centerAll = cc(camAll.center); const zAll = camAll.zoom;
     let bParcel = bAll;
     if (parcel.current.length) { const bp = new maplibregl.LngLatBounds(parcel.current[0] as any, parcel.current[0] as any); parcel.current.forEach((p) => bp.extend(p as any)); bParcel = bp; }
@@ -934,14 +934,44 @@ export default function MapVideoPage() {
     } catch { toast.error('Không truy cập được micro'); setVoiceRec(false); }
   }
 
+  // Phóng khung xem trước ra TOÀN MÀN HÌNH (và thu lại). Bọc try/catch vì trình duyệt có thể
+  // từ chối (vd: trang nhúng chưa được cấp quyền) — từ chối thì vẫn xem bình thường, không lỗi.
+  async function moToanManHinh(): Promise<void> {
+    const el: any = stageRef.current; if (!el || typeof document === 'undefined') return;
+    try {
+      if (!document.fullscreenElement && !(document as any).webkitFullscreenElement) {
+        await (el.requestFullscreen?.({ navigationUI: 'hide' }) ?? el.webkitRequestFullscreen?.());
+      }
+    } catch { /* trình duyệt từ chối → bỏ qua, xem ở khung thường */ }
+    setTimeout(() => { try { mapRef.current?.resize(); } catch { /* ignore */ } }, 150);
+  }
+  function thoatToanManHinh(): void {
+    if (typeof document === 'undefined') return;
+    try {
+      if (document.fullscreenElement || (document as any).webkitFullscreenElement) {
+        (document.exitFullscreen?.() ?? (document as any).webkitExitFullscreen?.());
+      }
+    } catch { /* ignore */ }
+    setTimeout(() => { try { mapRef.current?.resize(); } catch { /* ignore */ } }, 150);
+  }
+
   // XEM TRƯỚC: chạy hoạt ảnh trên bản đồ, KHÔNG quay/xuất.
+  // Tự phóng TOÀN MÀN HÌNH khi chạy để xem đúng khung hình như video thật, xong tự thu lại.
   async function preview() {
     const map = mapRef.current; if (!map || rec || previewing) return;
     if (!parcel.current.length && route.current.length < 2) { toast.error('Hãy vẽ lô đất hoặc tuyến đường trước'); return; }
     setMode('none'); setPreviewing(true); stopRef.current = false;
+    await moToanManHinh();
     try { toast.info('Đang tải bản đồ…'); await warmTiles(map); await animateCamera(map, Math.max(4, duration) * 1000); }
-    finally { setPreviewing(false); stopRef.current = false; try { map.easeTo({ pitch: 0, bearing: 0, duration: 500 }); } catch { /* ignore */ } }
+    finally { setPreviewing(false); stopRef.current = false; thoatToanManHinh(); try { map.easeTo({ pitch: 0, bearing: 0, duration: 500 }); } catch { /* ignore */ } }
   }
+
+  // Người dùng bấm phím Esc để thoát toàn màn hình → dừng luôn việc chạy thử cho khớp.
+  useEffect(() => {
+    const onFs = () => { if (!document.fullscreenElement && previewing) stopRef.current = true; };
+    document.addEventListener('fullscreenchange', onFs);
+    return () => document.removeEventListener('fullscreenchange', onFs);
+  }, [previewing]);
 
   // Kéo PLAYHEAD để tua tới thời điểm bất kỳ (bấm/kéo trên nền timeline).
   function scrubAt(clientX: number) { const cont = tlRef.current; if (!cont) return; const rc = cont.getBoundingClientRect(); const t = Math.max(0, Math.min(1, (clientX - rc.left) / rc.width)) * duration; setPlayhead(Math.round(t * 10) / 10); }
@@ -1113,7 +1143,7 @@ export default function MapVideoPage() {
   const inChart = playhead >= clips.chart[0] && playhead <= clips.chart[0] + clips.chart[1];
   const so = objects.find((o) => o.id === selObj) || null; // object đang chọn (cho inspector)
   return (
-    <div className="overflow-hidden rounded-2xl shadow-lg" style={{ background: '#0f1e30' }}>
+    <div className="cl-video-tool overflow-hidden rounded-2xl shadow-lg" style={{ background: '#0f1e30' }}>
       {/* THANH TRÊN */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3" style={{ background: '#0b1826' }}>
         <div className="flex items-center gap-2 font-bold text-white">🎬 Tạo video bản đồ <span className="text-[11px] font-normal" style={{ color: saveState === 'saved' ? '#7bd88f' : '#94a3b8' }}>{saveState === 'saving' ? '· Đang lưu…' : saveState === 'saved' ? '· Đã lưu' : ''}</span></div>
@@ -1153,9 +1183,9 @@ export default function MapVideoPage() {
       </div>
 
       {/* THÂN: sân khấu (trái) + bảng thuộc tính (phải) */}
-      <div className="flex flex-col lg:flex-row lg:items-stretch">
+      <div className="cl-video-body flex flex-col lg:flex-row lg:items-stretch">
         {/* SÂN KHẤU */}
-        <div className="flex min-w-0 flex-1 flex-col p-4">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col p-4">
           <div className="flex gap-2">
             <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder="Tìm địa điểm (vd: Cam Đức, Cam Lâm)" className="min-w-0 flex-1 rounded-lg border-0 px-3 py-2 text-sm" style={{ background: '#1b3149', color: '#e2e8f0' }} />
             <button onClick={search} className="rounded-lg px-3 py-2 text-sm font-semibold" style={{ background: GOLD, color: NAVY }}>Tìm</button>
@@ -1205,7 +1235,7 @@ export default function MapVideoPage() {
           {mode !== 'none' && <div className="mt-1 text-xs" style={{ color: GOLD }}>{mode === 'parcel' ? 'Bấm lần lượt các điểm để khoanh lô.' : mode === 'route' ? 'Bấm lần lượt các điểm để vẽ tuyến.' : mode === 'marker' ? 'Bấm để đặt điểm nhấn.' : mode === 'radius' ? 'Bấm 1 điểm làm tâm vòng bán kính.' : mode === 'edit' ? 'Kéo đỉnh (chấm trắng) để dời · bấm đỉnh để xoá.' : 'Bấm điểm A rồi điểm B để đo khoảng cách.'} Bấm lại nút để dừng.</div>}
 
       {/* Bản đồ — CHIẾM HẾT chiều cao khối (canvas lớn, không để trống); tối thiểu 320px. */}
-      <div ref={stageRef} onPointerDown={() => setSelObj(null)} className="relative mt-3 overflow-hidden rounded-xl border" style={{ height: 'clamp(200px, 36vh, 480px)', maxWidth: '100%', borderColor: '#2a3f57' }}>
+      <div ref={stageRef} onPointerDown={() => setSelObj(null)} className="cl-video-stage relative mt-3 overflow-hidden rounded-xl border" style={{ borderColor: '#2a3f57', ['--cl-ar' as any]: orient.replace(':', ' / ') }}>
         {/* Lớp bọc absolute lấp đầy khung; ô bản đồ để height:100% TƯỜNG MINH (CSS MapLibre đặt .maplibregl-map{position:relative} nên không dùng absolute cho ô map được). */}
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
           <div ref={boxRef} style={{ width: '100%', height: '100%', background: 'linear-gradient(#a6c4e2, #cdd8e0 55%, #aeb6ad)' }} />
@@ -1265,7 +1295,7 @@ export default function MapVideoPage() {
         </div>
 
         {/* BẢNG THUỘC TÍNH */}
-        <div className="w-full shrink-0 space-y-3 overflow-y-auto p-3 lg:max-h-[calc(100dvh-230px)] lg:w-[344px]" style={{ background: '#0b1826' }}>
+        <div className="w-full shrink-0 space-y-3 overflow-y-auto p-3 lg:max-h-full lg:w-[344px]" style={{ background: '#0b1826' }}>
           {/* PROPERTY INSPECTOR — khi chọn 1 object chữ/ảnh */}
           {so && (
             <div className="rounded-xl bg-white p-3" style={{ boxShadow: '0 0 0 2px ' + GOLD }}>
@@ -1339,13 +1369,13 @@ export default function MapVideoPage() {
             </div>
             <div className="mt-2 flex items-center gap-2">
               <span className="text-xs font-semibold text-slate-500">🎥 Camera:</span>
-              <select value={camStyle} onChange={(e) => setCamStyle(e.target.value)} className="flex-1 rounded-lg border px-2 py-1 text-xs" style={{ borderColor: '#d8cfbc' }}>
+              <select value={camStyle} onChange={(e) => setCamStyle(e.target.value)} className="min-w-0 flex-1 rounded-lg border px-2 py-1 text-xs" style={{ borderColor: '#d8cfbc' }}>
                 {CAMSTYLES.map((c) => <option key={c.key} value={c.key}>{c.name}</option>)}
               </select>
             </div>
             <div className="mt-2 flex items-center gap-2">
               <span className="text-xs font-semibold text-slate-500">✨ Chữ hiện:</span>
-              <select value={textAnim} onChange={(e) => setTextAnim(e.target.value)} className="flex-1 rounded-lg border px-2 py-1 text-xs" style={{ borderColor: '#d8cfbc' }}>
+              <select value={textAnim} onChange={(e) => setTextAnim(e.target.value)} className="min-w-0 flex-1 rounded-lg border px-2 py-1 text-xs" style={{ borderColor: '#d8cfbc' }}>
                 {TEXTANIMS.map((c) => <option key={c.key} value={c.key}>{c.name}</option>)}
               </select>
             </div>
@@ -1548,7 +1578,7 @@ export default function MapVideoPage() {
       </div>
 
       {/* TIMELINE — kéo clip để dời, kéo cạnh để co giãn; điều khiển KHI phần tử hiện trong video */}
-      <div className="px-4 py-3" style={{ background: '#0b1826', borderTop: '1px solid #1b3149' }}>
+      <div className="shrink-0 px-4 py-3" style={{ background: '#0b1826', borderTop: '1px solid #1b3149' }}>
         <div className="mb-2 flex items-center gap-3">
           <button onClick={() => { if (previewing) { stopRef.current = true; } else { preview(); } }} disabled={!ready || rec || exporting || busyAll} className="rounded-lg px-3 py-1.5 text-xs font-bold" style={{ background: previewing ? '#64748b' : GOLD, color: NAVY }}>{previewing ? '⏸ Dừng' : '▶ Chạy thử'}</button>
           <button onClick={() => (selObj ? splitObj(selObj) : toast.info('Chọn 1 object rồi Cắt'))} disabled={!selObj} className="rounded-lg px-3 py-1.5 text-xs font-bold disabled:opacity-40" style={{ background: '#1b3149', color: '#e2e8f0' }} title="Cắt clip object tại playhead (phím S không dùng — bấm nút)">✂ Cắt</button>
@@ -1560,7 +1590,7 @@ export default function MapVideoPage() {
             <button onClick={() => setTlZoom((z) => Math.min(6, +(z + 0.5).toFixed(1)))} className="rounded px-2 py-0.5 font-bold text-slate-300">＋</button>
           </div>
         </div>
-        <div className="overflow-auto" style={{ maxHeight: '26vh' }}>
+        <div className="overflow-x-auto">
         <div ref={tlRef} onPointerDown={scrubStart} className="relative select-none" style={{ width: `${tlZoom * 100}%` }}>
           {scenes.length > 0 && (
             <div className="relative mb-1 h-5">
@@ -1611,6 +1641,76 @@ export default function MapVideoPage() {
     </div>
   );
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  LỚP CHẶN QUYỀN — chỉ ADMIN và tài khoản ĐÃ MUA GÓI TẠO VIDEO mới vào được.
+//  Đặt bọc ngoài (không phải bên trong công cụ) để khi chưa có quyền thì công cụ
+//  KHÔNG chạy chút nào: không dựng bản đồ, không tải ảnh vệ tinh → nhẹ máy khách.
+// ═══════════════════════════════════════════════════════════════════════════════
+const GOLD_G = '#C8A14B', NAVY_G = '#0A2540';
+
+function Khoa({ ly_do }: { ly_do: 'chua-dang-nhap' | 'chua-mua' }) {
+  const chuaDangNhap = ly_do === 'chua-dang-nhap';
+  return (
+    <div className="grid min-h-[70vh] place-items-center px-4 py-10">
+      <div className="w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-slate-200">
+        <div className="px-6 py-7 text-center" style={{ background: NAVY_G }}>
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl text-3xl" style={{ background: 'rgba(200,161,75,.16)' }}>🎬</div>
+          <h1 className="mt-4 text-xl font-extrabold text-white">Tạo video bản đồ</h1>
+          <p className="mt-1 text-sm" style={{ color: GOLD_G }}>Tính năng dành riêng cho tài khoản trả phí</p>
+        </div>
+        <div className="px-6 py-6">
+          <p className="text-[15px] leading-relaxed text-slate-700">
+            {chuaDangNhap
+              ? 'Bạn hãy đăng nhập để hệ thống kiểm tra gói dịch vụ của tài khoản mình nhé.'
+              : 'Tài khoản của bạn hiện chưa có gói Tạo video bản đồ. Nâng cấp để biến mỗi mảnh đất thành một đoạn phim giới thiệu chuyên nghiệp — đăng Facebook, TikTok, Zalo đều hút khách hơn hẳn ảnh tĩnh.'}
+          </p>
+          <ul className="mt-5 space-y-2.5 text-sm text-slate-600">
+            {['Khoanh lô, vẽ tuyến đường, bay camera trên ảnh vệ tinh',
+              '6 kịch bản dựng sẵn: Vị trí · Hạ tầng · Tiện ích · Đầu tư · Bán hàng · Dẫn đường',
+              'Chèn chữ, logo, nhạc nền · xuất MP4 1080p',
+              'Xuất cả bộ 6 video một lần thành file ZIP'].map((t) => (
+              <li key={t} className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-emerald-500">✓</span>{t}</li>
+            ))}
+          </ul>
+          <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
+            {chuaDangNhap ? (
+              <a href="/login" className="flex-1 rounded-xl py-3 text-center font-bold text-white transition hover:opacity-90" style={{ background: NAVY_G }}>Đăng nhập</a>
+            ) : (
+              <a href="/dichvu" className="flex-1 rounded-xl py-3 text-center font-bold text-white transition hover:opacity-90" style={{ background: NAVY_G }}>Xem bảng giá &amp; nâng cấp</a>
+            )}
+            <a href="tel:0988888888" className="flex-1 rounded-xl border border-slate-200 bg-slate-50 py-3 text-center font-bold text-slate-700 transition hover:bg-slate-100">Gọi tư vấn 0988 888 888</a>
+          </div>
+          <p className="mt-4 text-center text-xs text-slate-400">Đã thanh toán mà chưa vào được? Gọi admin để kích hoạt ngay trong ít phút.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function MapVideoPage() {
+  const { user, loading } = useAuth();
+  const [conHan, setConHan] = useState<boolean | null>(null); // null = đang hỏi máy chủ
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) { setConHan(false); return; }
+    if (user.role === 'admin') { setConHan(true); return; }   // admin luôn dùng được
+    let huy = false;
+    api<{ current: { videoExpiresAt?: string | null } | null }>('/payments/my')
+      .then((r) => { if (huy) return; const h = r?.current?.videoExpiresAt; setConHan(!!h && new Date(h).getTime() > Date.now()); })
+      .catch(() => { if (!huy) setConHan(false); });
+    return () => { huy = true; };
+  }, [user, loading]);
+
+  if (loading || conHan === null) {
+    return <div className="grid min-h-[70vh] place-items-center text-sm text-slate-400">Đang kiểm tra tài khoản…</div>;
+  }
+  if (!user) return <Khoa ly_do="chua-dang-nhap" />;
+  if (!conHan) return <Khoa ly_do="chua-mua" />;
+  return <MapVideoTool />;
+}
+
 
 // ── ffmpeg.wasm: đổi WebM→MP4 (+ ghép nhạc) NGAY TRONG TRÌNH DUYỆT. Nạp 1 lần, lõi single-thread (không cần cấu hình đặc biệt). ──
 let _ff: any = null;

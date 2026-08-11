@@ -85,7 +85,7 @@ export default function MapAdsPage() {
   const lbl = 'text-sm font-semibold text-slate-700';
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-5 sm:py-8">
+    <div className="bg-slate-50 min-h-[calc(100dvh-56px)] py-5 sm:py-8">
       <div className="mx-auto max-w-5xl px-3 sm:px-4 space-y-4 sm:space-y-5">
         <div className="flex items-center justify-between">
           <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540]">Quảng cáo trên bản đồ</h1>

@@ -30,7 +30,7 @@ export default function ConsignmentsPage() {
   const shown = filter === 'all' ? items : items.filter((i) => i.status === filter);
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-5 sm:py-8">
+    <div className="bg-slate-50 min-h-[calc(100dvh-56px)] py-5 sm:py-8">
       <div className="mx-auto max-w-5xl px-3 sm:px-4">
         <div className="flex items-center justify-between mb-1">
           <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540]">Khách gửi bán ({items.length})</h1>

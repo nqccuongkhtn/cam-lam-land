@@ -147,7 +147,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     const map = new maplibregl.Map({ container: containerRef.current, style: BASE_STYLE, center: center ?? MAP.center, zoom: zoom ?? MAP.zoom, maxZoom: 22 });
     map.addControl(new maplibregl.NavigationControl(), 'top-right');
     // Định vị GPS: đưa bản đồ về vị trí người dùng, có chấm xanh + theo dõi khi di chuyển.
-    map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true, showUserHeading: true, showAccuracyCircle: true }), 'top-right');
+    map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true, showUserHeading: true, showAccuracyCircle: true } as any), 'top-right');
     map.on('load', () => {
       readyRef.current = true;
       map.addSource('measure', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });

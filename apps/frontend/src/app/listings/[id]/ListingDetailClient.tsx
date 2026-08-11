@@ -155,7 +155,7 @@ export default function ListingDetail() {
   const typeLabel = isVip ? (TIER_LABEL[l.tier as string] || 'VIP') : 'Tin thường';
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
+    <div className="bg-slate-50 min-h-[calc(100dvh-56px)]">
       <div className="mx-auto max-w-6xl px-3 sm:px-4 py-4 sm:py-5">
         <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <Link href="/listings" className="hover:text-[#0A2540]">Nhà đất</Link> › <span className="text-slate-600">{l.ward || 'Cam Lâm'}</span></div>
 

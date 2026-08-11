@@ -6,7 +6,7 @@ import { Fragment } from 'react';
 export type Added = { id: number; nguon: string; ten: string; soThua: string; soTo: string; xa: string; noiDung: string; ghiChu: string; link: string; mucDo: string; nguoiThem: string; createdAt: string; soDen: string; ngayDen: string; soKyHieu: string; ngayVb: string; donViGui: string; loaiVb: string; soVbGoc: string; soGiayTo: string; namSinh: string; diaChi: string; soPhatHanh: string; soVaoSo: string; ngayCap: string; hetHieuLucAt?: string | null; hetHieuLucBoi?: string | null };
 
 export const norm = (s: any) => String(s ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/đ/g, 'd');
-export const digits = (s: any) => String(s ?? '').match(/\d+/g) || [];
+export const digits = (s: any): string[] => String(s ?? '').match(/\d+/g) || [];
 export const SHORT: Record<string, string> = { 'NGĂN CHẶN giao dịch': 'Ngăn chặn', 'Hồ sơ không đủ ĐK': 'Hồ sơ', 'Công ích/Lâm trường': 'Công ích', 'Thành Mậu (bđ201)': 'Thành Mậu', 'Bản đồ 201↔VN2000': 'BĐ 201↔VN', 'Người (Sheet3)': 'Người' };
 export function sevOf(src: string, mucDo?: string) {
   const m = norm(mucDo || ''); // bản ghi thêm mới: ưu tiên MỨC ĐỘ đã chọn (ngan-chan / canh-bao / thuong)

@@ -21,7 +21,7 @@ export default function RegisterPage() {
   }
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:border-[#0A2540] outline-none';
   return (
-    <div className="min-h-[calc(100vh-56px)] grid place-items-center bg-slate-50 px-3 py-8 sm:px-4 sm:py-16">
+    <div className="min-h-[calc(100dvh-56px)] grid place-items-center bg-slate-50 px-3 py-8 sm:px-4 sm:py-16">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-5 sm:p-7">
         <h1 className="text-2xl font-extrabold text-[#0A2540]">Đăng ký tài khoản</h1>
         <p className="text-sm text-slate-500 mt-1 mb-5">Một tài khoản — vừa <b>xem tin</b>, vừa <b>đăng tin</b> bán/cho thuê trên Cam Lâm <span className="text-[#C8A14B] font-bold">Land</span>.</p>

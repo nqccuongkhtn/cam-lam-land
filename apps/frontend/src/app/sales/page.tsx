@@ -40,7 +40,7 @@ export default function SalesDashboard() {
   const badge = (s: string) => ({ active: 'bg-emerald-100 text-emerald-700', pending: 'bg-amber-100 text-amber-700', sold: 'bg-slate-200 text-slate-600', hidden: 'bg-red-100 text-red-700' } as any)[s] || 'bg-slate-100 text-slate-600';
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-5 sm:py-8">
+    <div className="bg-slate-50 min-h-[calc(100dvh-56px)] py-5 sm:py-8">
       {toast && <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] bg-[#0A2540] text-white font-bold px-5 py-3 rounded-xl shadow-2xl border border-[#C8A14B]/40">{toast}</div>}
       <div className="mx-auto max-w-5xl px-3 sm:px-4">
         <div className="flex items-center justify-between mb-4 sm:mb-5">

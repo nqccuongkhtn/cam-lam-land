@@ -62,7 +62,7 @@ export default function QrPage() {
         const scale = Math.max(Math.min(2000 / Math.max(img.width, img.height), 4), 1);
         const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
         const cv = canvasRef.current!; cv.width = w; cv.height = h;
-        const ctx = cv.getContext('2d', { willReadFrequently: true } as any)!; ctx.drawImage(img, 0, 0, w, h);
+        const ctx = cv.getContext('2d', { willReadFrequently: true } as any) as CanvasRenderingContext2D; ctx.drawImage(img, 0, 0, w, h);
         const t = jsQR(ctx.getImageData(0, 0, w, h).data, w, h, { inversionAttempts: 'attemptBoth' })?.data ?? null;
         URL.revokeObjectURL(url); resolve(t);
       };

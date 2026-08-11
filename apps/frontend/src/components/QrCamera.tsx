@@ -148,7 +148,7 @@ export default function QrCamera({ onDetected, onClose }: { onDetected: (text: s
     const v = videoRef.current; const jsQR = (window as any).jsQR;
     if (!v || !jsQR) return null;
     const vw = v.videoWidth, vh = v.videoHeight; if (!vw || !vh) return null;
-    const cv = canvasRef.current!; const ctx = cv.getContext('2d', { willReadFrequently: true } as any)!;
+    const cv = canvasRef.current!; const ctx = cv.getContext('2d', { willReadFrequently: true } as any) as CanvasRenderingContext2D;
     const crop = Math.round(Math.min(vw, vh) * ratio);
     const sx0 = Math.round((vw - crop) / 2), sy0 = Math.round((vh - crop) / 2);
     const T = 900; cv.width = T; cv.height = T;
@@ -167,7 +167,7 @@ export default function QrCamera({ onDetected, onClose }: { onDetected: (text: s
     setFlashOn(true); setTimeout(() => setFlashOn(false), 180);
     const vw = v.videoWidth, vh = v.videoHeight;
     const cv = canvasRef.current!; cv.width = vw; cv.height = vh;
-    const ctx = cv.getContext('2d', { willReadFrequently: true } as any)!;
+    const ctx = cv.getContext('2d', { willReadFrequently: true } as any) as CanvasRenderingContext2D;
     ctx.drawImage(v, 0, 0, vw, vh);
     setCaptured(cv.toDataURL('image/jpeg', 0.9)); setNoQr(false); setOkFound(false);
     let text: string | null = null;

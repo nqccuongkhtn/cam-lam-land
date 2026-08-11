@@ -174,7 +174,7 @@ export async function opToImages(ctx: any, fmt: 'png' | 'jpg' = 'png') {
   const { pages, docs } = ctx; const mime = fmt === 'png' ? 'image/png' : 'image/jpeg'; const outFiles: Array<{ name: string; url: string }> = [];
   for (let i = 0; i < pages.length; i++) {
     const canvas = await renderPage(docs, pages[i], 2);
-    const blob = new Blob([canvasToBytes(canvas, mime, 0.92)], { type: mime });
+    const blob = new Blob([canvasToBytes(canvas, mime, 0.92) as BlobPart], { type: mime });
     outFiles.push({ name: `trang-${i + 1}.${fmt}`, url: URL.createObjectURL(blob) });
   }
   return outFiles;

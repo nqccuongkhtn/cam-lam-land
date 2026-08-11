@@ -26,10 +26,17 @@ configRouter.post('/:key', adminRequired, async (req, res) => {
   const key = req.params.key;
   if (!KEYS.includes(key)) return res.status(400).json({ error: 'Key không hợp lệ' });
   const value = req.body?.value ?? {};
-  await query(
-    `INSERT INTO app_config (key, value, updated_at) VALUES ($1, $2::jsonb, now())
-     ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`,
-    [key, JSON.stringify(value)]);
-  cacheDrop('config:' + key);
-  res.json({ ok: true });
+  // BẮT LỖI: Express 4 KHÔNG tự bắt lỗi của hàm async → thiếu try/catch là request treo
+  // vĩnh viễn (người dùng thấy vòng xoay mãi không dứt) và server ghi unhandledRejection.
+  try {
+    await query(
+      `INSERT INTO app_config (key, value, updated_at) VALUES ($1, $2::jsonb, now())
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`,
+      [key, JSON.stringify(value)]);
+    cacheDrop('config:' + key);
+    res.json({ ok: true });
+  } catch (e: any) {
+    console.error('[config] lưu cấu hình lỗi:', e?.message || e);
+    res.status(500).json({ error: 'Không lưu được cấu hình. Vui lòng thử lại.' });
+  }
 });

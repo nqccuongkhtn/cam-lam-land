@@ -51,7 +51,7 @@ export default function CrmBoardPage() {
   );
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
+    <div className="bg-slate-50 min-h-[calc(100dvh-56px)]">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-5">
         <div className="flex items-center gap-2 mb-3">
           <div>

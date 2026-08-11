@@ -46,7 +46,7 @@ export default function Account() {
   const lbl = 'block text-sm font-semibold text-slate-700 mb-1';
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-5 sm:py-8">
+    <div className="bg-slate-50 min-h-[calc(100dvh-56px)] py-5 sm:py-8">
       <div className="mx-auto max-w-2xl px-3 sm:px-4 space-y-4 sm:space-y-5">
         <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540]">Tài khoản của tôi</h1>
 

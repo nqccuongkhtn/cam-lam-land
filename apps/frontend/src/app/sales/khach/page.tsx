@@ -123,7 +123,7 @@ export default function CrmKhachPage() {
   const shown = list.filter((c) => (!q || (c.name || '').toLowerCase().includes(q.toLowerCase()) || (c.phone || '').includes(q)) && (!stageFilter || (c.dealStage || 'Mới') === stageFilter));
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
+    <div className="bg-slate-50 min-h-[calc(100dvh-56px)]">
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-5">
         <div className={`flex items-center justify-between mb-3 ${sel ? 'hidden lg:flex' : ''}`}>
           <div>
@@ -182,7 +182,7 @@ export default function CrmKhachPage() {
                 );
               })}
             </div>
-            <div className="space-y-2 lg:max-h-[calc(100vh-180px)] lg:overflow-y-auto scroll-soft lg:pr-1">
+            <div className="space-y-2 lg:max-h-[calc(100dvh-180px)] lg:overflow-y-auto scroll-soft lg:pr-1">
             {shown.length === 0 ? <p className="text-slate-400 text-sm py-6 text-center">Chưa có khách. Bấm ＋ Thêm khách.</p> : null}
             {shown.map((c) => (
               <button key={c.id} onClick={() => openCust(c.id)} className={`w-full text-left bg-white rounded-xl border p-3 transition hover:shadow-md ${sel === c.id ? 'border-[#7c3aed] ring-2 ring-[#7c3aed]/20 shadow-sm' : 'border-slate-200 hover:border-slate-300'}`}>
@@ -299,7 +299,7 @@ export default function CrmKhachPage() {
                             {detail.activities.slice(0, 3).map((a, i) => (
                               <div key={a.id} className="flex gap-2.5">
                                 <div className="flex flex-col items-center shrink-0">
-                                  <span className="w-7 h-7 rounded-full grid place-items-center text-xs shadow-sm" style={{ background: actStyle(a.kind).bg }}>{actStyle(a.kind).ic}</span>
+                                  <span className="w-7 h-7 rounded-full grid place-items-center text-xs shadow-sm" style={{ background: actStyle(a.kind ?? '').bg }}>{actStyle(a.kind ?? '').ic}</span>
                                   {i < Math.min(3, detail.activities.length) - 1 && <span className="w-px flex-1 bg-slate-200 my-1" />}
                                 </div>
                                 <div className="min-w-0 flex-1 pb-0.5">
@@ -432,7 +432,7 @@ export default function CrmKhachPage() {
                         {detail.activities.map((a, i) => (
                           <div key={a.id} className="flex gap-2.5 group">
                             <div className="flex flex-col items-center shrink-0">
-                              <span className="w-7 h-7 rounded-full grid place-items-center text-xs shadow-sm" style={{ background: actStyle(a.kind).bg }}>{actStyle(a.kind).ic}</span>
+                              <span className="w-7 h-7 rounded-full grid place-items-center text-xs shadow-sm" style={{ background: actStyle(a.kind ?? '').bg }}>{actStyle(a.kind ?? '').ic}</span>
                               {i < detail.activities.length - 1 && <span className="w-px flex-1 bg-slate-200 my-1" />}
                             </div>
                             <div className="flex-1 min-w-0 pb-3">

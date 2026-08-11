@@ -29,7 +29,7 @@ export default function Leads() {
   const fmt = (s: string) => new Date(s).toLocaleString('vi-VN');
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)] py-5 sm:py-8">
+    <div className="bg-slate-50 min-h-[calc(100dvh-56px)] py-5 sm:py-8">
       <div className="mx-auto max-w-3xl px-3 sm:px-4">
         <Link href="/sales" className="text-sm font-semibold text-slate-500 hover:text-[#0A2540]">← Tin của tôi</Link>
         <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540] mt-2">Khách quan tâm</h1>

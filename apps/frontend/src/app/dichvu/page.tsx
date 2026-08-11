@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useFlags } from '@/lib/flags';
 
-interface Pkg { id: string; name: string; kind: 'post' | 'boost'; tier?: 'normal' | 'silver' | 'gold' | 'diamond'; boosts?: number; posts?: number; days: number; price: number; perks: string[]; popular?: boolean }
+interface Pkg { id: string; name: string; kind: 'post' | 'boost' | 'video'; tier?: 'normal' | 'silver' | 'gold' | 'diamond'; boosts?: number; posts?: number; days: number; price: number; perks: string[]; popular?: boolean }
 interface Bank { bankId: string; account: string; name: string; demo?: boolean }
 
 const STATIC: Pkg[] = [
@@ -20,9 +20,9 @@ const STATIC: Pkg[] = [
   { id: 'diamond', name: 'VIP Kim Cương', kind: 'boost', tier: 'diamond', boosts: 20, days: 20, price: 9999000, perks: ['Hiển thị hạng VIP Kim Cương', '20 lượt đẩy', 'Tự nổi lại mỗi 6h', 'Luôn trên cùng · tiêu đề đỏ', 'Hiệu lực 20 ngày'] },
 ];
 const STATIC_BANK: Bank = { bankId: 'BIDV', account: '8855951682', name: 'NGUYEN QUOC CUONG', demo: false };
-const ACCENT: Record<string, string> = { post: '#0ea5e9', normal: '#64748b', silver: '#94a3b8', gold: '#f59e0b', diamond: '#e11d48' };
+const ACCENT: Record<string, string> = { video: '#8b5cf6', post: '#0ea5e9', normal: '#64748b', silver: '#94a3b8', gold: '#f59e0b', diamond: '#e11d48' };
 const fmt = (n: number) => n.toLocaleString('vi-VN') + 'đ';
-const keyOf = (p: Pkg) => (p.kind === 'post' ? 'post' : p.tier || 'silver');
+const keyOf = (p: Pkg) => (p.kind === 'video' ? 'video' : p.kind === 'post' ? 'post' : p.tier || 'silver');
 const dleft = (iso?: string | null) => (iso ? Math.max(0, Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000)) : 0);
 
 export default function ServicesPage() {
@@ -58,6 +58,8 @@ export default function ServicesPage() {
   const postDays = dleft(current?.postExpiresAt), boostDays = dleft(current?.boostExpiresAt);
   const postPkgs = packages.filter((p) => p.kind === 'post');
   const boostPkgs = packages.filter((p) => p.kind === 'boost');
+  const videoPkgs = packages.filter((p) => p.kind === 'video');
+  const videoDays = dleft(current?.videoExpiresAt);
   const adsLeft = mapAds.filter((_, i) => i % 2 === 0);
   const adsRight = mapAds.filter((_, i) => i % 2 === 1);
   const RailCard = ({ a }: { a: any }) => (
@@ -84,19 +86,23 @@ export default function ServicesPage() {
           <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: ACCENT[k] }} />
           <p className="font-bold text-[#0A2540]">{p.name}</p>
         </div>
-        <p className="text-2xl md:text-[28px] font-extrabold text-[#0A2540] mt-3 leading-none">{fmt(p.price)}</p>
+        <p className="text-2xl md:text-[28px] font-extrabold text-[#0A2540] mt-3 leading-none">{p.price > 0 ? fmt(p.price) : 'Liên hệ'}</p>
         <p className="text-xs text-slate-400 mt-1.5">{p.days} ngày{perTin ? ` · ~${perTin.toLocaleString('vi-VN')}đ/tin` : p.boosts ? ` · ${p.boosts} lượt đẩy` : ''}</p>
         <ul className="mt-4 space-y-2 flex-1 text-sm text-slate-600">
           {p.perks.map((t) => <li key={t} className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5 shrink-0">✓</span>{t}</li>)}
         </ul>
+        {p.price <= 0 ? (
+          <a href="tel:0988888888" className="mt-5 w-full font-bold py-2.5 rounded-xl transition text-center bg-[#0A2540] text-white hover:bg-[#0d2f54]">Gọi để kích hoạt</a>
+        ) : (
         <button onClick={() => buy(p)} disabled={busy === p.id} className={`mt-5 w-full font-bold py-2.5 rounded-xl transition ${p.popular ? 'bg-[#0A2540] text-white hover:bg-[#0d2f54]' : 'bg-slate-100 text-[#0A2540] hover:bg-[#0A2540] hover:text-white'}`}>{busy === p.id ? 'Đang tạo…' : 'Mua ngay'}</button>
+        )}
       </div>
     );
   };
 
   if (!loaded) return <div className="bg-slate-50 min-h-[60vh] grid place-items-center text-slate-400">Đang tải…</div>;
   if (!flags.services_live && !isAdmin) return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)] grid place-items-center px-4 text-center">
+    <div className="bg-slate-50 min-h-[calc(100dvh-56px)] grid place-items-center px-4 text-center">
       <div>
         <div className="text-5xl">🛠️</div>
         <h1 className="text-2xl font-extrabold text-[#0A2540] mt-3">Dịch vụ sắp ra mắt</h1>
@@ -105,7 +111,7 @@ export default function ServicesPage() {
     </div>
   );
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
+    <div className="bg-slate-50 min-h-[calc(100dvh-56px)]">
       {!flags.services_live && isAdmin && <div className="bg-amber-100 border-b border-amber-300 text-amber-800 text-sm font-semibold text-center py-2 px-4">⚠️ Trang đang ẩn với khách — bật “Dịch vụ” ở Quản trị để công khai.</div>}
       <div className="bg-[#0A2540] text-white">
         <div className="max-w-5xl mx-auto px-4 py-12 text-center">
@@ -135,6 +141,17 @@ export default function ServicesPage() {
         <h2 className="text-xl font-extrabold text-[#0A2540] mb-1">Gói đẩy tin VIP</h2>
         <p className="text-sm text-slate-500 mb-5">Tin nổi bật trên đầu danh sách & bản đồ. Hạng cao được hệ thống tự làm nổi thường xuyên hơn.</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 items-stretch">{boostPkgs.map((p) => <Card key={p.id} p={p} />)}</div>
+
+        {videoPkgs.length > 0 && (
+          <>
+            <h2 className="text-xl font-extrabold text-[#0A2540] mb-1 mt-12">🎬 Gói Tạo video bản đồ</h2>
+            <p className="text-sm text-slate-500 mb-5">
+              Biến mỗi mảnh đất thành một đoạn phim giới thiệu: khoanh lô, vẽ tuyến, bay camera trên ảnh vệ tinh rồi xuất MP4 1080p.
+              {videoDays > 0 && <b className="text-emerald-600"> Gói của bạn còn {videoDays} ngày.</b>}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 items-stretch">{videoPkgs.map((p) => <Card key={p.id} p={p} />)}</div>
+          </>
+        )}
 
         <div className="mt-12 bg-white rounded-2xl border border-slate-200 p-6">
           <h3 className="text-xl font-extrabold text-[#0A2540]">💳 Phương thức thanh toán</h3>

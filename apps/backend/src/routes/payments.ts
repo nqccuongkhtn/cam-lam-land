@@ -20,7 +20,11 @@ async function activate(order: any): Promise<void> {
   // Nếu webhook gọi lặp / admin bấm xác nhận 2 lần → UPDATE không trả row → KHÔNG cộng gói lần nữa (chống cộng gói 2 lần).
   const flipped = await query(`UPDATE payments SET status='paid', paid_at=now() WHERE id=$1 AND status<>'paid' RETURNING id`, [order.id]);
   if (!flipped.length) return;
-  if (pkg.kind === 'post') {
+  if (pkg.kind === 'video') {
+    // Gói TẠO VIDEO BẢN ĐỒ: cộng dồn ngày nếu gói cũ còn hạn (mua sớm không bị mất ngày thừa).
+    await query(`UPDATE users SET video_expires_at = GREATEST(COALESCE(video_expires_at, now()), now()) + ($2::int) * interval '1 day', tier='paid' WHERE id=$1`,
+      [order.user_id, pkg.days]);
+  } else if (pkg.kind === 'post') {
     await query(`UPDATE users SET post_quota=$2, post_used=0, post_expires_at = now() + ($3::int) * interval '1 day', tier='paid' WHERE id=$1`,
       [order.user_id, pkg.posts, pkg.days]);
   } else {
@@ -35,6 +39,7 @@ paymentsRouter.get('/packages', (_req, res) => res.json({ packages: PACKAGES, ba
 paymentsRouter.post('/order', authRequired, async (req: AuthedRequest, res, next) => {
   try {
     const pkg = findPkg(String(req.body?.packageId)); if (!pkg) return res.status(400).json({ error: 'Gói không hợp lệ' });
+    if (!(pkg.price > 0)) return res.status(400).json({ error: 'Gói này chưa công bố giá. Vui lòng liên hệ admin để được kích hoạt.' });
     const [o] = await query(`INSERT INTO payments (user_id, package_id, amount, status) VALUES ($1,$2,$3,'pending') RETURNING id`, [req.user!.id, pkg.id, pkg.price]);
     const note = `CLL${o.id}`;
     await query(`UPDATE payments SET note=$2 WHERE id=$1`, [o.id, note]);
@@ -45,7 +50,7 @@ paymentsRouter.post('/order', authRequired, async (req: AuthedRequest, res, next
 // Trạng thái gói + đơn của tôi
 paymentsRouter.get('/my', authRequired, async (req: AuthedRequest, res, next) => {
   try {
-    const [u] = await query(`SELECT pkg_tier AS "pkgTier", boost_quota AS "boostQuota", boost_used AS "boostUsed", boost_expires_at AS "boostExpiresAt", post_quota AS "postQuota", post_expires_at AS "postExpiresAt" FROM users WHERE id=$1`, [req.user!.id]);
+    const [u] = await query(`SELECT pkg_tier AS "pkgTier", boost_quota AS "boostQuota", boost_used AS "boostUsed", boost_expires_at AS "boostExpiresAt", post_quota AS "postQuota", post_expires_at AS "postExpiresAt", video_expires_at AS "videoExpiresAt" FROM users WHERE id=$1`, [req.user!.id]);
     const orders = await query(`SELECT id, package_id AS "packageId", amount, status, note, created_at AS "createdAt" FROM payments WHERE user_id=$1 ORDER BY id DESC LIMIT 20`, [req.user!.id]);
     res.json({ current: u ?? null, orders });
   } catch (e) { next(e); }

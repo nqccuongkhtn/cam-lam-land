@@ -21,7 +21,7 @@ export default function DauTuPage() {
   }
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
+    <div className="bg-slate-50 min-h-[calc(100dvh-56px)]">
       {/* Hero */}
       <div className="bg-gradient-to-br from-[#0A2540] to-[#0d3a6b] text-white">
         <div className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-12">

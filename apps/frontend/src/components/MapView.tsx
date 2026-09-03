@@ -4,6 +4,8 @@ import maplibregl, { Map as MlMap, Marker } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css'; // CSS đi kèm CHUNK bản đồ (chỉ tải ở trang có map) — bỏ link unpkg toàn cục cho nhẹ mọi trang khác
 import { Protocol as PMTilesProtocol } from 'pmtiles';
 import { MAP } from '@/lib/config';
+import { themLopBienDao } from '@/lib/bienDao';
+import { batTaiTruoc, soOAnhNenGiu } from '@/lib/tilePrefetch';
 
 // Đăng ký giao thức pmtiles cho MapLibre (đọc 1 file .pmtiles qua HTTP range request) — chỉ đăng ký 1 lần.
 if (typeof window !== 'undefined' && !(maplibregl as any).__pmtiles) {
@@ -13,6 +15,9 @@ if (typeof window !== 'undefined' && !(maplibregl as any).__pmtiles) {
 export interface GeoLayer { id: string; type: 'fill' | 'line' | 'circle' | 'symbol'; data: GeoJSON.FeatureCollection; visible: boolean; paint: Record<string, any>; layout?: Record<string, any>; beforeId?: string; minzoom?: number; }
 export interface MarkerSpec { lng: number; lat: number; color?: string; popupHtml?: string; label?: string; tier?: string; dot?: boolean; onClick?: () => void; chip?: string; }
 export interface ImageOverlay { id: string; url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number; visible: boolean; pmtiles?: string; fillMaxzoom?: number; tiles?: string[]; minzoom?: number; maxzoom?: number; }
+// Một PHƯƠNG ÁN đi được vẽ lên bản đồ. chon=true là tuyến người dùng đang chọn (xanh đậm),
+// còn lại vẽ xám mờ — bấm vào là đổi sang tuyến đó, y như Google Maps.
+export interface TuyenVe { id: number; hinh: GeoJSON.LineString; nhan: string; chon: boolean }
 export type BaseMap = 'street' | 'satellite' | 'terrain';
 export type MeasureMode = 'off' | 'distance' | 'area';
 export interface MeasureResult { mode: MeasureMode; points: number; distance: number; area: number; }
@@ -32,31 +37,67 @@ interface Props {
   onMeasure?: (r: MeasureResult) => void;
   onViewport?: (v: { west: number; south: number; east: number; north: number; zoom: number }) => void;
   textLabels?: { lng: number; lat: number; text: string; minzoom?: number }[]; // nhãn chữ vẽ bằng HTML (không cần glyph/font server)
+  // BẢN ĐỒ ĐỊA CHÍNH — dạng Ô VECTOR (vector tile), LUÔN BẬT, không có nút tắt.
+  // Truyền vào địa chỉ ô kèm "vé xem"; vé hết hạn thì chỉ cần truyền địa chỉ mới,
+  // bản đồ tự đổi chứ không phải dựng lại lớp (nên không bị chớp màn hình).
+  diaChinhTiles?: string[] | null;
+  routes?: TuyenVe[];                 // các phương án đường đi (chỉ đường)
+  onPickRoute?: (id: number) => void; // bấm vào tuyến xám → chọn tuyến đó
 }
 
 // Google tiles — best detail/zoom for Vietnam. lyrs: m=đường, y=vệ tinh+nhãn, p=địa hình
+// Dùng ĐỦ 4 máy chủ mt0..mt3: trình duyệt chỉ cho ~6 kết nối cùng lúc TỚI MỖI TÊN MIỀN,
+// chia ra 4 tên miền là tải song song gấp mấy lần → ảnh về nhanh hơn hẳn, đỡ trắng.
+const gg = (l: string) => [0, 1, 2, 3].map((i) => `https://mt${i}.google.com/vt/lyrs=${l}&x={x}&y={y}&z={z}`);
 const BASES: Record<BaseMap, { tiles: string[] }> = {
-  street: { tiles: ['https://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'] },
-  satellite: { tiles: ['https://mt0.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'] },
-  terrain: { tiles: ['https://mt0.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', 'https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}'] },
+  street: { tiles: gg('m') },
+  satellite: { tiles: gg('s') },
+  terrain: { tiles: gg('p') },
 };
 // Lớp nhãn & đường trong suốt (chồng lên vệ tinh) — kiểu Google Hybrid
-const LABELS = ['https://mt0.google.com/vt/lyrs=h&x={x}&y={y}&z={z}', 'https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}'];
+const LABELS = gg('h');
 const rasterSrc = (tiles: string[]) => ({ type: 'raster' as const, tiles, tileSize: 256, maxzoom: 21, attribution: '© Google' });
+// LỚP LÓT chống "bản đồ trắng": cùng ảnh nền nhưng CHỈ tải tới mức zoom 13.
+// Cả huyện Cam Lâm ở mức 13 chỉ vài chục ô ảnh → tải một nhoáng là xong và nằm luôn trong bộ nhớ đệm.
+// Khi phóng to, MapLibre kéo giãn mấy ô này ra làm nền: người xem thấy ảnh HƠI MỜ thay vì Ô TRẮNG,
+// tới khi ảnh nét về thì đè lên. Đây đúng là cách Google Earth/Google Maps vẫn làm.
+const LOT_MAXZOOM = 13;
+const rasterLot = (tiles: string[]) => ({ type: 'raster' as const, tiles, tileSize: 256, maxzoom: LOT_MAXZOOM });
+// Lót TẦNG 2 (mức 16): ảnh mức 16 kéo giãn ra chỉ hơi mềm, mắt gần như không nhận ra; còn lót mức 13
+// giãn tới 32 lần thì mờ tịt, lộ rõ từng ô vuông. Có đủ hai tầng thì lúc nào cũng có ảnh "đỡ" ở mức
+// gần nhất, ảnh nét về lúc nào là thay lúc đó.
+const rasterLot2 = (tiles: string[]) => ({ type: 'raster' as const, tiles, tileSize: 256, maxzoom: 16 });
 const BASE_STYLE: maplibregl.StyleSpecification = {
   version: 8,
-  glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf',
+  // Phông chữ tự chứa trong web (xem apps/frontend/public/fonts) — máy chủ openmaptiles trả file hỏng.
+  glyphs: '/fonts/{fontstack}/{range}.pbf',
   sources: {
+    'lot-street': rasterLot(BASES.street.tiles),
+    'lot-satellite': rasterLot(BASES.satellite.tiles),
+    'lot-terrain': rasterLot(BASES.terrain.tiles),
+    'lot2-street': rasterLot2(BASES.street.tiles),
+    'lot2-satellite': rasterLot2(BASES.satellite.tiles),
+    'lot2-terrain': rasterLot2(BASES.terrain.tiles),
     'base-street': rasterSrc(BASES.street.tiles),
     'base-satellite': rasterSrc(BASES.satellite.tiles),
     'base-terrain': rasterSrc(BASES.terrain.tiles),
     'base-labels': rasterSrc(LABELS),
   },
   layers: [
-    { id: 'base-street', type: 'raster', source: 'base-street' },
-    { id: 'base-satellite', type: 'raster', source: 'base-satellite', layout: { visibility: 'none' } },
-    { id: 'base-terrain', type: 'raster', source: 'base-terrain', layout: { visibility: 'none' } },
-    { id: 'base-labels', type: 'raster', source: 'base-labels', layout: { visibility: 'none' } },
+    // Nền màu: chỗ nào chưa có ảnh thì ra màu xám nhạt như Google, KHÔNG còn màu trắng chói.
+    { id: 'nen-mau', type: 'background', paint: { 'background-color': '#dfe3e8' } },
+    // Lớp lót mờ (zoom thấp) nằm ngay dưới ảnh nét — luôn có sẵn nên không bao giờ để lộ ô trắng.
+    { id: 'lot-street', type: 'raster', source: 'lot-street', paint: { 'raster-fade-duration': 0 } },
+    { id: 'lot-satellite', type: 'raster', source: 'lot-satellite', layout: { visibility: 'none' }, paint: { 'raster-fade-duration': 0 } },
+    { id: 'lot-terrain', type: 'raster', source: 'lot-terrain', layout: { visibility: 'none' }, paint: { 'raster-fade-duration': 0 } },
+    { id: 'lot2-street', type: 'raster', source: 'lot2-street', paint: { 'raster-fade-duration': 0 } },
+    { id: 'lot2-satellite', type: 'raster', source: 'lot2-satellite', layout: { visibility: 'none' }, paint: { 'raster-fade-duration': 0 } },
+    { id: 'lot2-terrain', type: 'raster', source: 'lot2-terrain', layout: { visibility: 'none' }, paint: { 'raster-fade-duration': 0 } },
+    // 'raster-fade-duration': 0 → ảnh tải xong hiện NGAY, không mờ dần 0,3 giây (đã có lớp lót đỡ bên dưới).
+    { id: 'base-street', type: 'raster', source: 'base-street', paint: { 'raster-fade-duration': 0 } },
+    { id: 'base-satellite', type: 'raster', source: 'base-satellite', layout: { visibility: 'none' }, paint: { 'raster-fade-duration': 0 } },
+    { id: 'base-terrain', type: 'raster', source: 'base-terrain', layout: { visibility: 'none' }, paint: { 'raster-fade-duration': 0 } },
+    { id: 'base-labels', type: 'raster', source: 'base-labels', layout: { visibility: 'none' }, paint: { 'raster-fade-duration': 0 } },
   ],
 };
 
@@ -105,18 +146,29 @@ function parcelDims(hl: any): any[] {
       if (d < 0.3) continue;
       const latR = (a[1] + b[1]) / 2 * Math.PI / 180;
       const rot = Math.atan2((b[0] - a[0]) * Math.cos(latR), b[1] - a[1]) * 180 / Math.PI - 90; // xoay chữ dọc cạnh
-      out.push({ type: 'Feature', properties: { len: d < 10 ? d.toFixed(1) + 'm' : Math.round(d) + 'm', rot }, geometry: { type: 'Point', coordinates: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] } });
+      const chu = d < 10 ? d.toFixed(1) + 'm' : Math.round(d) + 'm';
+      // Mức phóng TỐI THIỂU để cạnh này được ghi số đo: chỉ ghi khi trên màn hình cạnh dài
+      // hơn chính con chữ. Thửa ranh cong có hàng trăm cạnh ngắn 1–2m — nếu ghi hết thì ở
+      // mức phóng xa cả đường ranh bị chữ phủ trắng, không đọc được gì (xem hàm locCanhTheoZoom).
+      const rongChuPx = chu.length * 6.2 + 10;
+      const minz = Math.log2(rongChuPx * 156543.03392 * Math.cos(latR) / d);
+      out.push({ type: 'Feature', properties: { len: chu, rot, minz: Math.round(minz * 100) / 100 }, geometry: { type: 'Point', coordinates: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] } });
     }
     const n = ring.length - 1;
     const cx = ring.slice(0, n).reduce((s: number, p: number[]) => s + p[0], 0) / n;
     const cy = ring.slice(0, n).reduce((s: number, p: number[]) => s + p[1], 0) / n;
-    const area = ringAreaM2(ring);
+    // Diện tích ghi giữa thửa: ưu tiên con số CHÍNH THỨC do máy chủ đo (cùng nguồn với bảng
+    // "Thông tin thửa") để hai chỗ không lệch nhau. Máy chủ đo trên mặt cầu Trái Đất, còn công thức
+    // tính tại chỗ dưới đây chỉ là phép gần đúng nên lệch được vài mét vuông — chỉ dùng khi
+    // không có số của máy chủ (vd thửa người dùng tự vẽ từ bảng toạ độ).
+    const soMayChu = Number(hl.properties?.dienTichChinhThuc);
+    const area = (polys.length === 1 && Number.isFinite(soMayChu) && soMayChu > 0) ? soMayChu : ringAreaM2(ring);
     out.push({ type: 'Feature', properties: { area: (area >= 1000 ? Math.round(area).toLocaleString('vi') : area.toFixed(1)) + ' m²' }, geometry: { type: 'Point', coordinates: [cx, cy] } });
   }
   return out;
 }
 
-export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, flyToPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, onMapClick, onMeasure, onViewport, textLabels = [] }: Props) {
+export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, flyToPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, onMapClick, onMeasure, onViewport, textLabels = [], routes = [], onPickRoute, diaChinhTiles = null }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const markerRefs = useRef<Marker[]>([]);
@@ -126,12 +178,18 @@ export default function MapView({ center, zoom, className, layers = [], markers 
   const adOpacityRef = useRef(adOpacity); adOpacityRef.current = adOpacity;
   const wmRef = useRef<HTMLDivElement | null>(null);
   const onViewportRef = useRef(onViewport); onViewportRef.current = onViewport;
+  const onPickRouteRef = useRef(onPickRoute); onPickRouteRef.current = onPickRoute;
+  const routeLabelRefs = useRef<Marker[]>([]);
   const readyRef = useRef(false);
   const measureModeRef = useRef<MeasureMode>(measureMode);
   const measurePts = useRef<{ lng: number; lat: number }[]>([]);
+  // Giữ địa chỉ ô địa chính trong ref: nếu vé xem về TRƯỚC khi bản đồ nạp xong thì
+  // lúc nạp xong vẫn đọc được giá trị mới nhất (đọc thẳng biến sẽ dính giá trị cũ).
+  const dcTilesRef = useRef(diaChinhTiles); dcTilesRef.current = diaChinhTiles;
   const initialBoundsRef = useRef(initialBounds);
   initialBoundsRef.current = initialBounds;
   const didFitRef = useRef(false);
+  const zCanhRef = useRef(-1); // mức phóng lần cuối đã lọc nhãn độ dài cạnh
 
   // Khớp khung đúng vùng quy hoạch ngay khi mở (chỉ chạy 1 lần, khi container đã có kích thước thật).
   function tryInitialFit() {
@@ -142,9 +200,30 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     didFitRef.current = true;
   }
 
+  // Chỉ ghi số đo những cạnh ĐỦ DÀI trên màn hình: cạnh nào ngắn hơn con chữ thì giấu đi.
+  // Thửa có ranh cong (hàng trăm đỉnh, mỗi cạnh 1–2m) nếu ghi hết sẽ phủ trắng cả đường ranh
+  // khi nhìn xa; càng phóng to thì càng nhiều cạnh đủ chỗ để hiện số.
+  function locCanhTheoZoom(batBuoc = false) {
+    const map = mapRef.current;
+    if (!map || !map.getLayer('hl-edge')) return;
+    // Làm tròn 1/4 mức phóng: kéo zoom là sự kiện bắn liên tục, đặt lại bộ lọc mỗi khung hình
+    // sẽ giật; đổi 1/4 mức mới đặt lại một lần là mắt không nhận ra khác biệt.
+    const z = Math.round(map.getZoom() * 4) / 4;
+    if (!batBuoc && z === zCanhRef.current) return;
+    zCanhRef.current = z;
+    map.setFilter('hl-edge', ['all', ['has', 'len'], ['<=', ['get', 'minz'], z]] as any);
+  }
+
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
-    const map = new maplibregl.Map({ container: containerRef.current, style: BASE_STYLE, center: center ?? MAP.center, zoom: zoom ?? MAP.zoom, maxZoom: 22 });
+    // Mấy tuỳ chọn dưới đây là phần LỚN nhất giúp bản đồ hết trắng:
+    //  · fadeDuration 0  → ảnh tải xong hiện NGAY, không mờ dần 0,3 giây như mặc định;
+    //  · maxTileCacheSize → nhớ nhiều ô ảnh trong máy, kéo qua kéo lại vùng cũ là có ngay, khỏi tải lại;
+    //  · refreshExpiredTiles false → không đi tải lại ảnh "hết hạn" (Google ghi hạn rất ngắn) nên không nhấp nháy.
+    const map = new maplibregl.Map({
+      container: containerRef.current, style: BASE_STYLE, center: center ?? MAP.center, zoom: zoom ?? MAP.zoom, maxZoom: 22,
+      fadeDuration: 0, maxTileCacheSize: soOAnhNenGiu(0.4), refreshExpiredTiles: false,
+    });
     map.addControl(new maplibregl.NavigationControl(), 'top-right');
     // Định vị GPS: đưa bản đồ về vị trí người dùng, có chấm xanh + theo dõi khi di chuyển.
     map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true, showUserHeading: true, showAccuracyCircle: true } as any), 'top-right');
@@ -159,9 +238,15 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       map.addLayer({ id: 'highlight-line', type: 'line', source: 'highlight', paint: { 'line-color': '#7c3aed', 'line-width': 2.5 } });
       // Kích thước thửa kiểu Guland: độ dài từng cạnh (dọc cạnh) + diện tích ở giữa
       map.addSource('highlight-dims', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
-      map.addLayer({ id: 'hl-edge', type: 'symbol', source: 'highlight-dims', filter: ['has', 'len'], layout: { 'text-field': ['get', 'len'], 'text-size': 11, 'text-font': ['Noto Sans Regular'], 'text-rotate': ['get', 'rot'], 'text-rotation-alignment': 'map', 'text-keep-upright': true, 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': '#ffffff', 'text-halo-color': '#7c3aed', 'text-halo-width': 2 } });
+      // 'text-allow-overlap' để MẶC ĐỊNH (false) → chữ nào chồng lên chữ khác thì tự giấu bớt.
+      // Trước đây bật cho hiện hết nên thửa nhiều đỉnh bị chữ đè lên nhau thành một vệt trắng.
+      map.addLayer({ id: 'hl-edge', type: 'symbol', source: 'highlight-dims', filter: ['all', ['has', 'len'], ['<=', ['get', 'minz'], map.getZoom()]], layout: { 'text-field': ['get', 'len'], 'text-size': 11, 'text-font': ['Noto Sans Regular'], 'text-rotate': ['get', 'rot'], 'text-rotation-alignment': 'map', 'text-keep-upright': true, 'text-padding': 3 }, paint: { 'text-color': '#ffffff', 'text-halo-color': '#7c3aed', 'text-halo-width': 2 } });
       map.addLayer({ id: 'hl-area', type: 'symbol', source: 'highlight-dims', filter: ['has', 'area'], layout: { 'text-field': ['get', 'area'], 'text-size': 13, 'text-font': ['Noto Sans Regular'], 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': '#0A2540', 'text-halo-color': '#ffffff', 'text-halo-width': 2.5 } });
-      syncBase(); syncOverlays(); syncLayers(); tryInitialFit();
+      // HOÀNG SA · TRƯỜNG SA — chồng lên trên cùng, luôn bật. Ảnh nền của nhà cung cấp nước ngoài
+      // hay bỏ trống hai quần đảo này; lớp đây vẽ đè lên nên ảnh chụp màn hình bản đồ không bị bắt bẻ.
+      themLopBienDao(map);
+      syncBase(); syncOverlays(); syncLayers(); syncDiaChinh(); syncRoutes(); tryInitialFit();
+      map.on('zoom', locCanhTheoZoom);
     });
     map.on('click', (e) => {
       const tgt = e.originalEvent?.target as HTMLElement | null;
@@ -170,7 +255,13 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       else if (onMapClick) onMapClick(e.lngLat.lng, e.lngLat.lat);
     });
     map.getCanvas().style.cursor = '';
+    // Bật bộ TẢI TRƯỚC ô ảnh (đoán hướng kéo + vành đai quanh màn hình) — xem lib/tilePrefetch.ts
+    const tatTaiTruoc = batTaiTruoc(map);
     mapRef.current = map;
+    // Tay cầm để soi bản đồ khi cần kiểm tra sự cố (gõ __banDo trong Console của trình duyệt).
+    // Chỉ đọc trạng thái, không ảnh hưởng gì tới người dùng.
+    (window as any).__banDo = map;
+    map.on('error', (e: any) => console.error('[bản đồ] lỗi:', e?.error?.message || e?.error || e));
     const wmZoom = () => { if (wmRef.current) wmRef.current.style.display = map.getZoom() < WM_MIN_ZOOM ? 'none' : ''; };
     map.on('zoom', wmZoom); map.on('load', wmZoom);
     // Zoom SÁT (>=16, hợp với điện thoại) → thêm class để tin thường tự hiện giá như VIP.
@@ -184,7 +275,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       ro = new ResizeObserver(() => { if (mapRef.current) { mapRef.current.resize(); tryInitialFit(); } });
       ro.observe(containerRef.current);
     }
-    return () => { ro?.disconnect(); map.remove(); mapRef.current = null; readyRef.current = false; didFitRef.current = false; };
+    return () => { ro?.disconnect(); tatTaiTruoc(); map.remove(); mapRef.current = null; readyRef.current = false; didFitRef.current = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -217,8 +308,11 @@ export default function MapView({ center, zoom, className, layers = [], markers 
 
   function syncBase() {
     const map = mapRef.current; if (!map || !readyRef.current) return;
-    (['street', 'satellite', 'terrain'] as BaseMap[]).forEach((b) =>
-      map.setLayoutProperty(`base-${b}`, 'visibility', b === baseMap ? 'visible' : 'none'));
+    (['street', 'satellite', 'terrain'] as BaseMap[]).forEach((b) => {
+      map.setLayoutProperty(`base-${b}`, 'visibility', b === baseMap ? 'visible' : 'none');
+      for (const lot of [`lot-${b}`, `lot2-${b}`])   // hai tầng lót đi theo nền đang chọn
+        if (map.getLayer(lot)) map.setLayoutProperty(lot, 'visibility', b === baseMap ? 'visible' : 'none');
+    });
     if (map.getLayer('base-labels')) map.setLayoutProperty('base-labels', 'visibility', labels && baseMap !== 'street' ? 'visible' : 'none');
   }
   useEffect(() => { syncBase(); /* eslint-disable-next-line */ }, [baseMap, labels]);
@@ -258,8 +352,68 @@ export default function MapView({ center, zoom, className, layers = [], markers 
         map.setLayoutProperty(ov.id, 'visibility', ov.visible ? 'visible' : 'none');
       }
     }
+    themLopBienDao(map);   // thêm lớp phủ xong thì đẩy Hoàng Sa · Trường Sa lên trên cùng lại
   }
   useEffect(() => { syncOverlays(); /* eslint-disable-next-line */ }, [overlays]);
+
+  // ==== CHỈ ĐƯỜNG: vẽ nhiều phương án, bấm để chọn (giống Google Maps) ====
+  // Mỗi tuyến vẽ 2 nét chồng nhau: nét TRẮNG to bên dưới làm viền cho nổi trên ảnh vệ tinh,
+  // nét màu nhỏ hơn nằm trên. Tuyến đang chọn màu xanh Google (#1a73e8), tuyến khác màu xám (#9aa0a6).
+  function syncRoutes() {
+    const map = mapRef.current; if (!map || !readyRef.current) return;
+    if (!routes.length && !map.getSource('tuyen')) return;   // trang không dùng chỉ đường thì bỏ qua hẳn
+    const fc: any = {
+      type: 'FeatureCollection',
+      features: (routes || []).map((r) => ({ type: 'Feature', properties: { id: r.id, chon: r.chon ? 1 : 0 }, geometry: r.hinh })),
+    };
+    const src = map.getSource('tuyen') as maplibregl.GeoJSONSource | undefined;
+    if (src) src.setData(fc);
+    else {
+      map.addSource('tuyen', { type: 'geojson', data: fc });
+      const net = (id: string, chon: number, mau: string, rong: number) => ({
+        id, type: 'line' as const, source: 'tuyen', filter: ['==', ['get', 'chon'], chon] as any,
+        layout: { 'line-cap': 'round' as const, 'line-join': 'round' as const },
+        paint: { 'line-color': mau, 'line-width': rong, ...(chon ? {} : { 'line-opacity': 0.85 }) },
+      });
+      // Thứ tự thêm = thứ tự vẽ: tuyến phụ nằm dưới, tuyến đang chọn nằm trên cùng.
+      map.addLayer(net('tuyen-phu-vien', 0, '#ffffff', 9) as any);
+      map.addLayer(net('tuyen-phu', 0, '#9aa0a6', 5.5) as any);
+      map.addLayer(net('tuyen-vien', 1, '#ffffff', 13) as any);
+      map.addLayer(net('tuyen-chinh', 1, '#1a73e8', 8) as any);
+      // Bấm vào tuyến xám → chọn tuyến đó. Vùng bấm là nét trắng to nên ngón tay dễ trúng.
+      const bam = (e: any) => {
+        const f = e.features && e.features[0]; if (!f) return;
+        e.originalEvent?.stopPropagation?.();
+        onPickRouteRef.current?.(Number(f.properties?.id));
+      };
+      for (const id of ['tuyen-phu-vien', 'tuyen-phu']) {
+        map.on('click', id, bam);
+        map.on('mouseenter', id, () => { map.getCanvas().style.cursor = 'pointer'; });
+        map.on('mouseleave', id, () => { map.getCanvas().style.cursor = ''; });
+      }
+    }
+    for (const id of ['tuyen-phu-vien', 'tuyen-phu', 'tuyen-vien', 'tuyen-chinh']) if (map.getLayer(id)) map.moveLayer(id);
+    themLopBienDao(map);
+    try { map.triggerRepaint(); } catch { /* ignore */ }   // vẽ lại NGAY, không đợi tới lúc người dùng chạm vào bản đồ
+
+    // Nhãn "12 phút" đặt giữa mỗi tuyến — bấm nhãn cũng chọn được tuyến (dễ bấm hơn nét đường trên điện thoại).
+    routeLabelRefs.current.forEach((m) => m.remove()); routeLabelRefs.current = [];
+    for (const r of routes || []) {
+      const c = (r.hinh?.coordinates || []) as [number, number][];
+      if (c.length < 2 || !r.nhan) continue;
+      let tong = 0; const kc = (a: number[], b: number[]) => Math.hypot(b[0] - a[0], b[1] - a[1]);
+      for (let i = 1; i < c.length; i++) tong += kc(c[i - 1], c[i]);
+      let di = 0, giua = c[Math.floor(c.length / 2)];
+      for (let i = 1; i < c.length; i++) { di += kc(c[i - 1], c[i]); if (di >= tong / 2) { giua = c[i]; break; } }
+      const el = document.createElement('div');
+      el.style.cssText = `font:700 12px/1 system-ui,'Segoe UI',Arial,sans-serif;padding:5px 9px;border-radius:999px;white-space:nowrap;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.35);border:1px solid rgba(0,0,0,.08);${r.chon ? 'background:#1a73e8;color:#fff;' : 'background:#fff;color:#3c4043;'}`;
+      el.textContent = r.nhan;
+      el.addEventListener('click', (ev) => { ev.stopPropagation(); onPickRouteRef.current?.(r.id); });
+      routeLabelRefs.current.push(new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat(giua).addTo(map));
+    }
+  }
+  useEffect(() => { syncRoutes(); /* eslint-disable-next-line */ }, [routes]);
+  useEffect(() => () => { routeLabelRefs.current.forEach((m) => m.remove()); routeLabelRefs.current = []; }, []);
 
   function syncLayers() {
     const map = mapRef.current; if (!map || !readyRef.current) return;
@@ -271,8 +425,51 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       else for (const [k, v] of Object.entries(l.paint)) map.setPaintProperty(l.id, k as any, v);
       map.setLayoutProperty(l.id, 'visibility', l.visible ? 'visible' : 'none');
     }
+    themLopBienDao(map);   // lớp GIS mới thêm cũng không được che tên hai quần đảo
   }
   useEffect(() => { syncLayers(); /* eslint-disable-next-line */ }, [layers]);
+
+  // ══ BẢN ĐỒ ĐỊA CHÍNH — Ô VECTOR, LUÔN BẬT ══════════════════════════════════
+  // Máy chủ chỉ phát ô ở mức phóng 16; gần hơn thì trình duyệt tự phóng to ô đó lên
+  // (đó là lý do đặt maxzoom 16) — vừa nét, vừa không phải giữ nhiều mức ô trên máy chủ.
+  // Thửa chỉ hiện từ mức 16 trở đi, xa hơn thì ẩn cho bản đồ thoáng.
+  const DC_MIN_ZOOM = 16;
+  function syncDiaChinh() {
+    const map = mapRef.current; if (!map || !readyRef.current) return;
+    const tiles = dcTilesRef.current;
+    const src = map.getSource('src-dia-chinh') as any;
+    if (!tiles || !tiles.length) {
+      // Chưa có vé xem → chỉ ẩn đi, KHÔNG gỡ lớp (gỡ rồi dựng lại gây chớp bản đồ).
+      for (const id of ['dc-fill', 'dc-line', 'dc-nhan']) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'none');
+      return;
+    }
+    if (src) {
+      // Vé mới → chỉ thay địa chỉ ô, giữ nguyên lớp và những ô đã tải.
+      if (typeof src.setTiles === 'function') src.setTiles(tiles);
+      for (const id of ['dc-fill', 'dc-line', 'dc-nhan']) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'visible');
+      return;
+    }
+    map.addSource('src-dia-chinh', { type: 'vector', tiles, minzoom: 16, maxzoom: 16 } as any);
+    // Nền thửa: xanh rất nhạt, đậm dần khi phóng to.
+    map.addLayer({
+      id: 'dc-fill', type: 'fill', source: 'src-dia-chinh', 'source-layer': 'dc', minzoom: DC_MIN_ZOOM,
+      paint: { 'fill-color': '#1e88e5', 'fill-opacity': ['interpolate', ['linear'], ['zoom'], 16, 0.08, 18, 0.16] as any },
+    } as any);
+    // Viền thửa
+    map.addLayer({
+      id: 'dc-line', type: 'line', source: 'src-dia-chinh', 'source-layer': 'dc', minzoom: DC_MIN_ZOOM,
+      paint: { 'line-color': '#1565c0', 'line-width': ['interpolate', ['linear'], ['zoom'], 16, 1.1, 18, 2.2, 20, 3] as any, 'line-opacity': 1 },
+    } as any);
+    // Số thửa — chỉ hiện khi đã phóng khá gần cho đỡ rối.
+    map.addLayer({
+      id: 'dc-nhan', type: 'symbol', source: 'src-dia-chinh', 'source-layer': 'dc', minzoom: 17,
+      layout: { 'text-field': ['get', 's'], 'text-size': ['interpolate', ['linear'], ['zoom'], 17, 10, 20, 13] as any,
+                'text-font': ['Noto Sans Regular'], 'text-allow-overlap': false },
+      paint: { 'text-color': '#0d47a1', 'text-halo-color': 'rgba(255,255,255,0.85)', 'text-halo-width': 1.2 },
+    } as any);
+    themLopBienDao(map);   // hai quần đảo luôn nằm trên cùng
+  }
+  useEffect(() => { syncDiaChinh(); /* eslint-disable-next-line */ }, [diaChinhTiles]);
 
   useEffect(() => {
     const map = mapRef.current; if (!map) return;
@@ -311,9 +508,15 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       // MỌI tin luôn hiện: đủ zoom → bung pill; chưa đủ → chấm nhỏ. Marker khác (ghim, chip) luôn nguyên.
       markerRefs.current = markers.map((m) => makeMarker(m, m.tier === undefined ? true : z >= (PILL_MINZ[m.tier] ?? 14)));
     };
+    // Dựng lại ghim là việc NẶNG (xoá rồi tạo lại từng thẻ HTML). Vị trí ghim thì bản đồ tự lo,
+    // nên chỉ cần dựng lại khi mức zoom vừa vượt qua một ngưỡng "bung pill" — kéo bản đồ qua lại
+    // không còn phải dựng lại gì cả, nhờ vậy hết giật ở chỗ có nhiều tin.
+    const chuKy = () => { const z = map.getZoom() || 0; return Object.values(PILL_MINZ).map((n) => (z >= n ? 1 : 0)).join(''); };
+    let kyTruoc = chuKy();
     render();
-    map.on('moveend', render);
-    return () => { map.off('moveend', render); markerRefs.current.forEach((mk) => mk.remove()); markerRefs.current = []; };
+    const khiKeoXong = () => { const k = chuKy(); if (k === kyTruoc) return; kyTruoc = k; render(); };
+    map.on('moveend', khiKeoXong);
+    return () => { map.off('moveend', khiKeoXong); markerRefs.current.forEach((mk) => mk.remove()); markerRefs.current = []; };
   }, [markers]);
 
   // Nhãn chữ HTML (vd tên thôn): vẽ bằng DOM nên KHÔNG phụ thuộc glyph/font server (openmaptiles).
@@ -333,8 +536,12 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       }
     };
     build();
-    map.on('moveend', build);
-    return () => { map.off('moveend', build); labelRefs.current.forEach((m) => m.remove()); labelRefs.current = []; };
+    // Nhãn chỉ ẩn/hiện theo MỨC ZOOM, mà bản đồ tự giữ đúng vị trí cho chúng → chỉ dựng lại khi
+    // zoom nhích qua nửa mức. Kéo ngang dọc thì không đụng gì, đỡ giật.
+    let zTruoc = Math.round((map.getZoom() || 0) * 2);
+    const khiKeoXong = () => { const z = Math.round((map.getZoom() || 0) * 2); if (z === zTruoc) return; zTruoc = z; build(); };
+    map.on('moveend', khiKeoXong);
+    return () => { map.off('moveend', khiKeoXong); labelRefs.current.forEach((m) => m.remove()); labelRefs.current = []; };
   }, [textLabels]);
 
   // Logo quảng cáo tròn (avatar/ảnh + tên & SĐT ngoài vòng, chữ Cam Lâm Land bên trong)
@@ -433,6 +640,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     src.setData((highlight ? { type: 'FeatureCollection', features: [highlight] } : { type: 'FeatureCollection', features: [] }) as any);
     const dsrc = map.getSource('highlight-dims') as maplibregl.GeoJSONSource | undefined;
     if (dsrc) dsrc.setData({ type: 'FeatureCollection', features: parcelDims(highlight) } as any);
+    locCanhTheoZoom(true);
     ['highlight-fill', 'highlight-line', 'hl-edge', 'hl-area'].forEach((id) => { if (map.getLayer(id)) map.moveLayer(id); });
   }, [highlight]);
 

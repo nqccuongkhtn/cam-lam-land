@@ -46,6 +46,7 @@ Script tự chọn file compose: luôn `docker-compose.yml + docker-compose.prod
 thêm `docker-compose.tunnel.yml` nếu `.env` có `TUNNEL_TOKEN`.
 
 Các script `.bat` khác ở thư mục gốc: `SAO-LUU.bat` (sao lưu DB), `PHUC-HOI.bat` (khôi phục),
+`NEN-KHO-DOCKER.bat` (nén kho Docker lấy lại chỗ ổ C — xem mục cảnh báo bên dưới),
 `TAO-TAI-KHOAN.bat`, `KIEM-TRA-IP.bat`, `KHOI-DONG-CUNG-MAY.ps1` (tự chạy khi bật máy).
 
 ### Chạy từng phần không cần Docker
@@ -152,6 +153,214 @@ Lúc khởi động còn có bước tự kiểm: SQL và JS lệch nhau thì lo
 **6. Ảnh tin đăng lưu thẳng trong Postgres** (bảng `listing_images`, kiểu `BYTEA`) — không dùng ổ đĩa/S3.
 Trình duyệt nén ảnh + **nung dấu mờ "Cam Lâm Land"** vào giữa ảnh **trước khi gửi lên** (`src/lib/api.ts`),
 kèm bản thu nhỏ riêng. Ảnh phục vụ qua `/api/images/:id` (thêm đuôi `.webp`/`.pdf` để Cloudflare cache biên).
+
+---
+
+## Bản đồ địa chính toàn tỉnh (733.249 thửa) — LUÔN BẬT + CHỐNG CÀO
+
+Nguồn: `D:\Cam Lam gis\gis khanh hoa\` — 147 file `.geojson` (~475 MB), mỗi file một xã/phường,
+đã ở hệ WGS84, thuộc tính `{to, thua, xa, xaId, dienTich_m2, mucDichSuDung, nhan}`.
+147 file ghép **khảm kín, không đè lên nhau** → tổng 733.249 thửa là con số thật, không đếm trùng.
+
+**Bảng riêng, KHÔNG dùng chung `gis_features`.** Vì `gis_features` cất mọi thứ trong cột JSONB nên
+không đánh chỉ mục theo số tờ/số thửa được — với 733 nghìn thửa là quét cả bảng, rất chậm.
+
+| Bảng | Vai trò |
+|---|---|
+| `dia_chinh` | 733k thửa: `xa_id, cap, so_to, so_thua, to_num, thua_num, dien_tich, mdsd, geom(MultiPolygon,4326)` |
+| `dia_chinh_xa` | Danh mục 147 xã: tên, **cấp**, **huyện/TP cũ**, số thửa, khung bao, tâm |
+
+### Xã CŨ ↔ xã MỚI — lấy theo VĂN BẢN, không đoán
+Dữ liệu gốc dùng tên xã ở **ba đời khác nhau** và **không hề ghi** xã cũ nay thuộc xã mới nào.
+Bảng ánh xạ nằm ở **`scripts/dia-chinh/xa-moi.json`**, lập theo:
+- **Nghị quyết 1667/NQ-UBTVQH15** — sắp xếp cấp xã Khánh Hoà 2025 (65 đơn vị mới, hiệu lực 1/7/2025);
+- **Nghị quyết 1196/NQ-UBTVQH15** (Khánh Hoà) và **1198/NQ-UBTVQH15** (Ninh Thuận) — bước sắp xếp
+  hiệu lực 1/11/2024, phải bắc cầu qua đây. Ví dụ: `phường Xương Huân` → (2024) `phường Vạn Thạnh`
+  → (2025) `phường Nha Trang`.
+
+`cap` = 2 (đơn vị hiện hành) hoặc 3 (đơn vị cũ) — **lấy từ danh sách 64 mã trong `xa-moi.json`**.
+⚠️ **ĐỪNG suy từ chữ HOA/thường trong tên file** như bản đầu: quy ước đó của bên lập dữ liệu **sai ở 17 xã**
+(vd `xã Đại Lãnh`, `xã Vạn Ninh`, `xã Diên Điền`, `xã Lâm Sơn` viết thường nhưng đã là xã MỚI).
+Phép thử tự kiểm: dữ liệu phải ra **đúng 64 đơn vị 2 cấp** = 65 đơn vị của tỉnh − đặc khu Trường Sa
+(không có bản đồ địa chính). Ra khác 64 là bảng ánh xạ sai.
+
+### Danh mục hành chính CHÍNH THỨC + công cụ đối chiếu
+`scripts/dia-chinh/dvhc/` giữ danh mục lấy thẳng từ hệ thống của Sở (`khh.mplis.gov.vn`, `DanhMucAjax`):
+`khanh-hoa-2cap.json` (65 xã mới + 139 xã cũ + 16 huyện cũ), `dvhc-2cap.js` (bộ 5 quy tắc + hàm tra
+hai chiều), `test-dvhc.js` (bộ kiểm). Năm quy tắc rút từ dữ liệu thật toàn quốc:
+1. **Kế thừa mã** — xã mới KHÔNG có mã mới, nó lấy lại mã của đúng MỘT xã cũ trong nhóm ("đơn vị gốc").
+2. **`trangThai`** = cờ phân cấp: true = 2 cấp đang hiệu lực, false = 3 cấp (lịch sử). Mọi huyện đều false.
+3. **`tenCu`** = tên cũ của CHÍNH mã đó, KHÔNG phải danh sách sáp nhập.
+4. **`tinhIdCu` / `huyenIdCu`** = tỉnh/huyện cũ — đường duy nhất dựng lại bản đồ sáp nhập.
+5. **`maXaTrucThuocs`** = liên kết chéo, chỉ điền cho ngoại lệ chuyển huyện/tỉnh (cả tỉnh chỉ có 1 bản ghi).
+
+⇒ Danh mục **KHÔNG chứa** danh sách "xã cũ nào nhập vào xã mới" — phải lấy từ nghị quyết. Đúng như
+`xa-moi.json` đang làm.
+
+**Kiểm tra lại bất cứ lúc nào:**
+```bash
+docker compose exec -T postgis psql -U camlam -d camlam_gis -tAF'|'   -c "SELECT xa_id, ten, cap, huyen, coalesce(xa_moi_id,'') FROM dia_chinh_xa ORDER BY xa_id;" > /tmp/db-xa.txt
+node scripts/dia-chinh/doi-chieu-danh-muc.mjs /tmp/db-xa.txt
+```
+Hiện trạng: **147/147 xã khớp tuyệt đối** danh mục Sở — 0 lệch cấp, 0 lệch tên, 0 lệch huyện.
+
+### Quy tắc ĐÁNH LẠI SỐ TỜ BẢN ĐỒ khi sáp nhập
+Rút ra từ bảng tra chính thức của địa phương (`apps/frontend/src/lib/traSoBanDo.ts`), khớp cả 4 xã
+của huyện Cam Lâm cũ:
+1. Mỗi xã mới **đánh lại số tờ liên tục từ 1**.
+2. **Xã cũ "gốc" GIỮ NGUYÊN số tờ** — và xã gốc chính là xã cũ mà xã mới **kế thừa mã số** (quy tắc R1
+   của danh mục Sở). Cam Đức→Cam Lâm (22453) · Suối Cát→Suối Dầu (22708) · Cam Tân→Cam Hiệp (22435) ·
+   Cam An Bắc→Cam An (22465). Hai nguồn độc lập cho cùng một kết luận.
+3. Các xã cũ còn lại đánh **tiếp theo từng khối**, mỗi xã cũ một khối liên tục, trong khối giữ đúng
+   thứ tự số tờ cũ tăng dần. Vd Xã Cam Lâm: Cam Đức 1–57 (giữ) → Cam Hải Đông 1–63 thành 58–120 →
+   Cam Hải Tây 2–34 thành 121–153 → … → Cam An Bắc tờ 22 thành tờ 399.
+4. Xã cũ bị chia chỉ mang sang những tờ thuộc phần đất của mình → dãy số cũ bị đứt quãng.
+   Tờ nào bị ranh xã mới cắt qua thì **xuất hiện ở CẢ HAI xã mới** với hai số tờ mới khác nhau
+   (toàn huyện Cam Lâm có 60/577 tờ như vậy).
+
+**Dữ liệu địa chính hiện có VẪN DÙNG SỐ TỜ CŨ**, chưa đánh lại — kiểm chứng: file "Xã Cam Lâm" chỉ có
+tờ 1–57 đúng bằng số tờ của thị trấn Cam Đức, không phải 1–399.
+→ Bảng `dia_chinh_to (xa_moi_id, to_moi, xa_cu_id, to_cu)` đổi số tờ MỚI ↔ CŨ, dựng bằng
+`node scripts/dia-chinh/dung-bang-so-to.mjs`. Hiện có 1.661 dòng (647 cho 4 xã Cam Lâm + 1.014 cho 4 phường Nha Trang); xã khác có bảng
+thì bổ sung y hệt. `/api/dc/tim` tự đổi số tờ khi người dùng chọn xã mới → **ra đúng 1 kết quả**.
+Chưa có bảng tra cho xã nào thì tìm rộng rồi hiện bảng cho chọn.
+
+**Làm cho CẢ TỈNH:** 64 xã mới — **25 xã không cần** bảng tra (chỉ gồm 1 xã cũ nên không thể trùng số),
+**8 xã đã có** (4 xã huyện Cam Lâm cũ + 4 phường Nha Trang), **31 xã còn thiếu** (225.079 thửa).
+⚠️ **KHÔNG suy ra được bằng công thức.** Quy tắc "xã gốc giữ số, các xã còn lại nối tiếp theo thứ tự
+nghị quyết" chỉ đúng 2/4 xã Cam Lâm; hai xã kia thứ tự khối khác hẳn (do địa phương tự quyết khi biên
+tập bộ bản đồ). Đoán bừa = in sai số tờ lên phiếu trích lục → tuyệt đối không làm.
+
+**Bốn phường Nha Trang (163.299 thửa) — nạp 3/9/2026 từ ảnh chụp bảng của Văn phòng Đăng ký.**
+Bảng dựng bằng `scripts/dia-chinh/bang-so-to-nha-trang.mjs` (khai theo KHỐI, có ghi rõ căn cứ từng khối)
+→ `bang-so-to-nha-trang.csv` (1.014 dòng). Ba điều rút ra, dùng lại được cho 31 xã còn thiếu:
+1. **Quy tắc "đơn vị gốc giữ nguyên số tờ" giờ đúng 8/8** — và đơn vị gốc luôn là đơn vị **kế thừa mã số**
+   theo danh mục Sở (Vĩnh Ngọc → Tây NT · Tân Tiến → NT · Vĩnh Phước → Bắc NT · Vĩnh Thái → Nam NT).
+   Trong bảng in, khối của đơn vị gốc **để trống hàng số tờ cũ**.
+2. **Bảng gọi xã cũ bằng TÊN ĐỜI 2024** (sau NQ 1196), không phải tên đời gốc mà dữ liệu địa chính đang dùng.
+   Ví dụ khối "Vạn Thạnh" thật ra gồm Vạn Thạnh + Xương Huân + Vạn Thắng, đánh lại 1–41 theo thứ tự
+   Vạn Thạnh 1–12 → 1–12, Xương Huân 1–17 → 13–29, Vạn Thắng 1–12 → 30–41. Tương tự "Tân Tiến" =
+   Tân Tiến + Phước Tân + Tân Lập, "Phương Sài" = Phương Sài + Phương Sơn. **Phải tách khối ra** trước khi nạp.
+3. **CÁCH TỰ KIỂM CHỨNG (rất mạnh, nên làm cho mọi bảng sau này):** trong dữ liệu đã có sẵn một ít thửa
+   **mang số tờ MỚI** (do đo vẽ lại sau sáp nhập). Chồng hình chúng lên các tờ cũ bằng PostGIS
+   (`ST_Intersection` trên `ST_Buffer(ST_Collect(geom),0)`) là ra thẳng cặp (tờ mới ↔ tờ cũ) — không cần đoán.
+   Ở Nha Trang có **33 tờ kiểm được, cả 33 đều khớp bảng**; thêm phép cộng độ dài khối phải đúng bằng
+   số tờ cuối cùng của phường (296 · 204 · 219 · 295) và các chỗ bảng bỏ trống đúng bằng những tờ
+   không có trong dữ liệu. Ba chỗ "lệch" còn lại đều là thửa lẻ (1 thửa) hoặc tờ dư, xem dưới.
+
+⚠️ **Bốn chỗ dữ liệu có thửa nhưng bảng KHÔNG cấp số tờ mới** (1.638 thửa, ~1%) — tra theo số tờ mới sẽ
+không ra, cần hỏi lại Văn phòng Đăng ký: **Vĩnh Thái tờ 50–54** (1.561 thửa, đã đo khoảng cách xác nhận
+nằm trong đất Vĩnh Thái chứ không phải Phước Hải), **Phước Hòa tờ 20** (47), **Vĩnh Hải tờ 63** (29),
+**Phương Sơn tờ 21** (1).
+→ Phải **xin bảng đối chiếu của Chi nhánh Văn phòng Đăng ký đất đai** từng nơi. Có bảng thì nạp bằng:
+```bash
+node scripts/dia-chinh/nap-bang-so-to.mjs bang-cua-xa.csv > nap.sql   # CSV 4 cột: xã mới, tờ mới, xã cũ, tờ cũ
+docker compose exec -T postgis psql -U camlam -d camlam_gis < nap.sql # tên xã không cần dấu, hoặc ghi mã xã
+node scripts/dia-chinh/nap-bang-so-to.mjs --bao-cao                   # xem còn thiếu xã nào
+```
+Nạp xong tự động sửa luôn phần chia thửa cho xã cũ bị cắt.
+
+**Bảng tra số tờ còn là CĂN CỨ CHÍNH THỨC để chia 5 xã bị cắt** — chuẩn hơn hẳn cách ước lượng theo
+vị trí. 517/577 cặp (xã cũ, tờ cũ) chỉ thuộc đúng một xã mới → gán thẳng; 60 cặp còn lại là tờ bị ranh
+cắt qua nên vẫn dùng ước lượng. Áp bảng tra đã **sửa lại 26.380 thửa** (vd xã Cam Hoà: ước lượng cho
+1.146 thửa về Cam Lâm, thực tế là 11.951).
+
+`dia_chinh_xa.ten_goc` = tên xã cũ đã mang mã đó (trường `donViGoc` của danh mục Sở, có cho 50/65 xã mới).
+Nhờ nó, bấm vào thửa trong file "Xã Cam Lâm" hiện đúng "Trước sáp nhập: thị trấn Cam Đức".
+
+### ⚠️ CHỌN XÃ MỚI PHẢI TRA THEO `xa_moi_id`, KHÔNG PHẢI `xa_id`
+Thửa đất **vẫn nằm nguyên dưới MÃ XÃ CŨ** — hệ thống địa chính không dời sang mã mới sau sáp nhập.
+Chọn "Xã Cam Lâm" mà lọc `xa_id = '22453'` thì chỉ ra **14.683** thửa, trong khi xã đó thật ra có
+**54.263** thửa — **sót 73%**. `/api/dc/tim` hỏi cấp của xã được chọn trước rồi mới quyết định lọc theo
+cột nào; và **bỏ lọc theo cấp khi đã chọn xã** (lọc cấp lại sót đúng đám thửa còn mang mã cũ).
+Cột `so_thua` + khung bao của xã 2 cấp trong `dia_chinh_xa` cũng tính theo `xa_moi_id` vì lý do này.
+Hệ quả: tra theo xã mới hay ra **nhiều thửa trùng số tờ/số thửa** (mỗi xã cũ có bộ số riêng) → giao diện
+có bảng "Tìm thấy N thửa trùng số" cho người dùng chọn, mỗi dòng ghi rõ xã cũ để phân biệt.
+
+**6 xã bị CHIA** cho nhiều xã mới (văn bản chỉ ghi "một phần diện tích", không có ranh giới):
+`Cam Hòa`, `Cam Hiệp Bắc`, `Cam Hiệp Nam`, `Cam An Nam`, `Suối Tân`, `phường Đông Hải` (Ninh Thuận).
+Với 6 xã này phải xét **TỪNG THỬA**: thửa gần thửa của xã mới nào nhất thì thuộc xã đó, và **chỉ so với
+danh sách xã mới được phép** (khai trong `bi_chia`) nên không gán nhảy lung tung. Đây là **ước lượng
+theo vị trí**, không phải theo văn bản — chỗ duy nhất trong hệ thống không có căn cứ pháp lý tuyệt đối.
+
+Kết quả lưu ở cột `dia_chinh.xa_moi_id` (từng thửa) và `dia_chinh_xa.xa_moi_id` (từng xã).
+`GET /api/parcels/at` trả về `xa` = đơn vị **hiện hành**, `xaCu` + `huyenCu` = tên **trước sáp nhập**;
+giao diện hiện "Khu vực mới: …" và dòng nhỏ "Trước sáp nhập: …".
+
+### Nạp dữ liệu (chạy lại nhiều lần vẫn an toàn)
+```bash
+bash scripts/dia-chinh/nap-tat-ca.sh "D:/Cam Lam gis/gis khanh hoa"   # ~10 phút, tự tháo/dựng lại chỉ mục
+node scripts/dia-chinh/dung-danh-muc.mjs "D:/Cam Lam gis/gis khanh hoa" | docker compose exec -T postgis psql -U camlam -d camlam_gis
+```
+Nạp xã nào thì **xoá sạch xã đó trước** rồi nạp mới → không bao giờ nhân đôi.
+`scripts/dia-chinh/huyen-cu.json` là bảng xếp xã cũ vào **huyện/TP cũ** (dữ liệu gốc không có thông tin huyện);
+sửa file này rồi chạy lại `dung-danh-muc.mjs` là xong.
+Lưu ý: dữ liệu gốc có **6 thửa sai toạ độ** (rơi tận Đắk Lắk) — vẫn giữ trong bảng nhưng bị loại khỏi
+phép tính khung bao, nếu không nút "bay tới xã" sẽ zoom sai.
+
+### Phục vụ ra web — `apps/backend/src/routes/diaChinh.ts` (`/api/dc`)
+Thửa **KHÔNG** còn đi qua `/api/layers/:slug/features` nữa. Giờ gửi theo **Ô VUÔNG NHỎ (vector tile)**:
+
+| Đường | Việc |
+|---|---|
+| `GET /api/dc/ve` | cấp "vé xem bản đồ" ngắn hạn (45 phút), gắn với địa chỉ máy |
+| `GET /api/dc/:z/:x/:y.mvt?v=<vé>` | **một ô bản đồ**, chỉ phục vụ đúng mức phóng **z=16** |
+| `GET /api/dc/danh-muc` | 147 xã chia 2 nhóm cấp, kèm huyện cũ + khung bao (cho ô "Chọn xã") |
+| `GET /api/dc/tim?to=&thua=&xaId=&cap=` | tra số tờ/số thửa (tối đa 40 kết quả, 12 kết quả đầu mới kèm hình) |
+
+Chỉ dựng ô ở **z16**, gần hơn thì trình duyệt tự phóng to ô đó lên (`maxzoom: 16`) → không có ô nào
+"nhìn cả tỉnh" để tải về, và số ô phải bảo vệ giảm hẳn. Ô dày nhất (491 thửa) chỉ **26 KB, dựng 21 ms**.
+
+### Bốn lớp khoá chống cào (tính năng sống còn)
+1. **Vé xem** — không có vé thì mọi ô đều bị từ chối (401). Vé ký bằng HMAC, gắn địa chỉ máy, hết hạn 45 phút.
+2. **Hạn mức** — `DC_TILE_5P` ô/5 phút và `DC_TILE_NGAY` ô/ngày cho mỗi máy.
+3. **Đo độ phủ** — đếm số ô **KHÁC NHAU** trong 1 giờ (`DC_PHU_GIO`); người xem thật quanh quẩn một vùng,
+   máy cào phải quét đều khắp → vượt ngưỡng là khoá máy đó `DC_KHOA_GIO` giờ.
+4. **Giấu phần giá trị nhất** — ô tile CHỈ có hình thửa + số tờ + số thửa. Diện tích, loại đất, quy hoạch
+   phải bấm từng thửa (`/api/parcels/at`, giới hạn 150 lần/phút).
+
+Kèm theo: `/api/layers/:slug/features` **bắt buộc có bbox** và bbox không quá 0,6° (trước đây gọi trần trụi
+là lấy được 20.000 đối tượng một lượt); lớp `layer_type='parcel'` **không hiện trong danh sách lớp** với
+người dùng thường. Nginx có luật riêng `location /api/dc/` với `proxy_cache off` — **nếu để nginx cache thì
+mọi lớp khoá trên đều vô hiệu** (nginx trả ô đã lưu mà không hỏi backend); backend tự giữ ô trong bộ nhớ
+(`DC_KHO_MB`, mặc định 64 MB) nên vẫn nhanh.
+
+Địa chỉ máy lấy từ header `CF-Connecting-IP` của Cloudflare (người dùng không tự đặt được), không có thì lùi về `req.ip`.
+
+Mọi con số chỉnh trong `.env` (`DC_*`) — xem `.env.example`. `DC_TAT_CHONG_CAO=true` tắt hết khoá, **chỉ dùng khi thử nghiệm**.
+
+### ⚠️ Bẫy đã vấp: địa chỉ ô bản đồ PHẢI ghi đầy đủ
+Bản đồ nạp ô vector ở **một luồng chạy nền riêng** (Web Worker sinh từ blob). Luồng đó không biết
+trang web đang ở tên miền nào, nên đường dẫn ghi tắt `/api/dc/{z}/{x}/{y}.mvt` **hỏng hoàn toàn** —
+mọi ô báo `errored`, ranh thửa mất sạch mà **không có lỗi nào hiện ra** (ảnh nền Google vẫn chạy vì
+ảnh raster tải ở luồng chính). Phải ghi `window.location.origin + API_BASE + '/dc/...'`.
+Kiểm tra nhanh trong Console: `Object.values(__banDo.style.sourceCaches['src-dia-chinh']._tiles).map(t=>t.state)`
+— phải ra `loaded`, nếu ra `errored` là dính lỗi này.
+
+### Trên giao diện
+- Lớp thửa **LUÔN BẬT**, không có nút tắt và **không xuất hiện trong bảng "Lớp bản đồ"** — người dùng
+  không tắt được, cũng không biết có bao nhiêu lớp/bao nhiêu thửa. Chỉ hiện từ mức phóng 16.
+- Thứ tự ô tra cứu: **cấp → huyện/TP cũ → xã/phường → số tờ → số thửa** (chọn địa giới trước, vì
+  số tờ/số thửa chỉ có nghĩa khi đã biết hỏi ở xã nào).
+- Hai ô địa giới là kiểu **"sổ xuống + gõ tìm"** (`OChonCoGo` trong `app/map/page.tsx`): chọn huyện rồi
+  thì ô xã chỉ sổ ra xã của huyện đó, chưa chọn thì sổ ra hết. Bấm vào ô là gõ tìm ngay, **gõ không dấu
+  vẫn ra**. Mỗi dòng ghi kèm tên huyện để phân biệt **10 cặp xã trùng tên** (vd "xã Vĩnh Hải · Huyện Ninh Hải"
+  khác "phường Vĩnh Hải · TP. Nha Trang"). Chọn xong bản đồ **bay tới đúng xã** và tự điền luôn ô huyện.
+- Hai ô đó có **hai cách dùng**: bấm vào là sổ ra **danh sách đầy đủ** (ô vẫn hiện xã đang chọn, dòng
+  đang chọn có dấu ✓ và tự cuộn tới), hoặc **gõ tên để lọc**. Ô `<input>` cần **cả `onFocus` lẫn `onClick`**:
+  vừa chọn xong thì con trỏ còn nằm trong ô nên lần bấm sau không có sự kiện `focus` → không có `onClick`
+  là bấm mãi không mở lại được danh sách.
+- **Đổi huyện / đổi xã / đổi cấp là DỌN SẠCH kết quả cũ** (`donKetQuaCu()`): đóng bảng "Thông tin thửa",
+  bỏ tô sáng ranh thửa, xoá ô số tờ/số thửa, gỡ ghim. Không dọn thì người dùng chọn xã khác mà vẫn thấy
+  thửa của xã trước — rất dễ nhìn nhầm.
+- **SỐ THỬA CỦA TỪNG XÃ CHỈ QUẢN TRỊ VIÊN THẤY.** `/api/dc/danh-muc` và `/api/parcels/dia-ban` **không gửi
+  trường `soThua`/`count`** xuống nếu không phải admin/gis (giấu ở giao diện là vô nghĩa — mở trình duyệt ra
+  vẫn đọc được). Bản admin cache riêng khoá `:admin` + trả `Cache-Control: private, no-store` để nginx
+  không phát nhầm cho người khác. Biết xã nào bao nhiêu thửa là biết quy mô kho dữ liệu và biết nhắm vào đâu để cào.
+- Diện tích ghi giữa thửa trên bản đồ lấy **đúng con số máy chủ đo** (`dienTichChinhThuc`), không tự tính lại
+  — trước đây tự tính nên lệch vài mét vuông so với bảng "Thông tin thửa".
+- Danh sách xã lấy từ database, **không còn ghi cứng** trong code như trước (trước chỉ có 4 xã mới + 14 xã cũ của Cam Lâm).
+- Gõ `__banDo` trong Console trình duyệt để soi bản đồ khi cần tìm sự cố.
 
 ---
 
@@ -309,6 +518,24 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
 - `TOOL-CHUANHOA-DGN/` — công cụ chuẩn hoá file DGN.
 
 ---
+
+## ⚠️ Ổ C đầy → Docker sập → web chết
+
+Kho Docker (`%LOCALAPPDATA%\Docker\wsl\disk\docker_data.vhdx`) **chỉ phình ra, không bao giờ tự co lại**.
+Mỗi lần `docker compose build` là nở thêm vài GB dù bên trong đã xoá bớt. Đã từng phình tới **38,46 GB**
+trong khi dữ liệu thật bên trong chỉ ~6 GB → ổ C còn 0,47 GB → **Docker Desktop không khởi động nổi
+(lỗi WSL bootstrap), toàn bộ web sập**, mà nhìn qua tên miền vẫn thấy trang chủ vì Cloudflare còn cache
+(chỉ `/api/*` trả 502).
+
+**Khắc phục: bấm nút `Nen kho Docker (lay lai cho trong o C)`** trên bảng điều khiển `QUAN-LY-SERVER.vbs`
+(hoặc nháy đúp `NEN-KHO-DOCKER.bat`). Cả hai chạy chung `NEN-KHO-DOCKER.ps1`, tự xin quyền quản trị.
+Sáu bước: dừng web cho PostgreSQL đóng sạch → tắt Docker Desktop → tắt WSL → nén file kho
+(`Optimize-VHD`, không có thì `diskpart compact vdisk`) → bật lại Docker → bật lại web + khởi động lại nginx. **Không xoá gì bên trong** — database, ảnh máy, dữ liệu
+địa chính nguyên vẹn. Lần chạy thật: **38,46 GB → lấy lại ~21,6 GB cho ổ C**, mất khoảng 5–10 phút.
+
+Trước khi nén nhớ `docker compose ... stop` cho PostgreSQL đóng sạch (exit 0). Dọn thêm:
+`docker builder prune -af` (đệm build) và `docker image prune -a` (ảnh không dùng) — **TUYỆT ĐỐI KHÔNG**
+chạy `docker volume prune`: volume chứa database, lúc container đang tắt nó hiện là "không dùng".
 
 ## Những chỗ hay vấp
 

@@ -1,0 +1,73 @@
+{
+  "_ghi_chu": [
+    "BẢNG XẾP XÃ/PHƯỜNG CŨ VÀO HUYỆN / THỊ XÃ / THÀNH PHỐ CŨ (trước sáp nhập 1/7/2025).",
+    "File dữ liệu địa chính gốc KHÔNG có thông tin huyện, nên phải xếp tay ở đây.",
+    "Khoá = mã xã (số cuối tên file geojson). Giá trị = tên huyện/TP cũ hiện trên giao diện.",
+    "Xếp sai xã nào thì sửa thẳng ở đây rồi chạy lại: node scripts/dia-chinh/dung-danh-muc.mjs",
+    "Nhóm 2 cấp (đơn vị mới sau sáp nhập) xếp theo TỈNH CŨ, vì chúng không còn thuộc huyện nào.",
+    "Sau khi nạp, script tự kiểm tra bằng toạ độ: xã nào nằm xa hẳn phần còn lại của huyện sẽ bị báo ra."
+  ],
+
+  "cap3": {
+    "22327": "TP. Nha Trang", "22330": "TP. Nha Trang", "22336": "TP. Nha Trang",
+    "22339": "TP. Nha Trang", "22342": "TP. Nha Trang", "22345": "TP. Nha Trang",
+    "22348": "TP. Nha Trang", "22351": "TP. Nha Trang", "22354": "TP. Nha Trang",
+    "22357": "TP. Nha Trang", "22360": "TP. Nha Trang", "22363": "TP. Nha Trang",
+    "22369": "TP. Nha Trang", "22372": "TP. Nha Trang", "22375": "TP. Nha Trang",
+    "22378": "TP. Nha Trang", "22381": "TP. Nha Trang", "22384": "TP. Nha Trang",
+    "22387": "TP. Nha Trang", "22393": "TP. Nha Trang", "22396": "TP. Nha Trang",
+    "22399": "TP. Nha Trang", "22405": "TP. Nha Trang",
+
+    "22408": "TP. Cam Ranh", "22414": "TP. Cam Ranh", "22417": "TP. Cam Ranh",
+    "22423": "TP. Cam Ranh", "22426": "TP. Cam Ranh", "22429": "TP. Cam Ranh",
+    "22432": "TP. Cam Ranh", "22468": "TP. Cam Ranh", "22474": "TP. Cam Ranh",
+    "22477": "TP. Cam Ranh", "22483": "TP. Cam Ranh",
+
+    "22438": "Huyện Cam Lâm", "22441": "Huyện Cam Lâm", "22444": "Huyện Cam Lâm",
+    "22447": "Huyện Cam Lâm", "22450": "Huyện Cam Lâm", "22456": "Huyện Cam Lâm",
+    "22459": "Huyện Cam Lâm", "22462": "Huyện Cam Lâm", "22471": "Huyện Cam Lâm",
+
+    "22489": "Huyện Vạn Ninh", "22498": "Huyện Vạn Ninh", "22504": "Huyện Vạn Ninh",
+    "22516": "Huyện Vạn Ninh", "22525": "Huyện Vạn Ninh",
+
+    "22534": "Thị xã Ninh Hòa", "22579": "Thị xã Ninh Hòa",
+
+    "22618": "Huyện Khánh Vĩnh", "22621": "Huyện Khánh Vĩnh", "22627": "Huyện Khánh Vĩnh",
+    "22630": "Huyện Khánh Vĩnh", "22633": "Huyện Khánh Vĩnh", "22636": "Huyện Khánh Vĩnh",
+    "22639": "Huyện Khánh Vĩnh", "22642": "Huyện Khánh Vĩnh", "22645": "Huyện Khánh Vĩnh",
+
+    "22657": "Huyện Diên Khánh", "22672": "Huyện Diên Khánh", "22678": "Huyện Diên Khánh",
+    "22702": "Huyện Diên Khánh", "22711": "Huyện Diên Khánh",
+
+    "22717": "Huyện Khánh Sơn", "22723": "Huyện Khánh Sơn", "22726": "Huyện Khánh Sơn",
+    "22729": "Huyện Khánh Sơn", "22735": "Huyện Khánh Sơn",
+
+    "22738": "TP. Phan Rang - Tháp Chàm", "22744": "TP. Phan Rang - Tháp Chàm",
+    "22747": "TP. Phan Rang - Tháp Chàm", "22750": "TP. Phan Rang - Tháp Chàm",
+    "22753": "TP. Phan Rang - Tháp Chàm", "22765": "TP. Phan Rang - Tháp Chàm",
+    "22768": "TP. Phan Rang - Tháp Chàm", "22774": "TP. Phan Rang - Tháp Chàm",
+    "22777": "TP. Phan Rang - Tháp Chàm", "22779": "TP. Phan Rang - Tháp Chàm",
+
+    "22783": "Huyện Bác Ái", "22789": "Huyện Bác Ái", "22792": "Huyện Bác Ái",
+    "22798": "Huyện Bác Ái", "22804": "Huyện Bác Ái",
+
+    "22813": "Huyện Ninh Sơn", "22816": "Huyện Ninh Sơn", "22819": "Huyện Ninh Sơn",
+    "22822": "Huyện Ninh Sơn", "22825": "Huyện Ninh Sơn", "22831": "Huyện Ninh Sơn",
+
+    "22840": "Huyện Thuận Bắc", "22856": "Huyện Thuận Bắc",
+
+    "22846": "Huyện Ninh Hải", "22855": "Huyện Ninh Hải", "22858": "Huyện Ninh Hải",
+
+    "22879": "Huyện Ninh Phước", "22882": "Huyện Ninh Phước",
+    "22891": "Huyện Ninh Phước", "22894": "Huyện Ninh Phước",
+
+    "22910": "Huyện Thuận Nam"
+  },
+
+  "cap2_theo_ma": {
+    "_ghi_chu": "Đơn vị MỚI xếp theo tỉnh cũ. Mã dưới 22738 là địa bàn Khánh Hoà cũ, từ 22738 trở lên là Ninh Thuận cũ.",
+    "nguong": 22738,
+    "duoi": "Khánh Hoà (cũ)",
+    "tren": "Ninh Thuận (cũ)"
+  }
+}

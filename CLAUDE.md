@@ -226,7 +226,7 @@ thì bổ sung y hệt. `/api/dc/tim` tự đổi số tờ khi người dùng c
 Chưa có bảng tra cho xã nào thì tìm rộng rồi hiện bảng cho chọn.
 
 **Làm cho CẢ TỈNH:** 64 xã mới — **25 xã không cần** bảng tra (chỉ gồm 1 xã cũ nên không thể trùng số),
-**8 xã đã có** (4 xã huyện Cam Lâm cũ + 4 phường Nha Trang), **31 xã còn thiếu** (225.079 thửa).
+**16 xã đã có** (4 xã Cam Lâm cũ + 4 phường Nha Trang + 8 xã/phường Ninh Hòa cũ), **29 xã còn thiếu** (194.684 thửa).
 ⚠️ **KHÔNG suy ra được bằng công thức.** Quy tắc "xã gốc giữ số, các xã còn lại nối tiếp theo thứ tự
 nghị quyết" chỉ đúng 2/4 xã Cam Lâm; hai xã kia thứ tự khối khác hẳn (do địa phương tự quyết khi biên
 tập bộ bản đồ). Đoán bừa = in sai số tờ lên phiếu trích lục → tuyệt đối không làm.
@@ -252,6 +252,34 @@ Bảng dựng bằng `scripts/dia-chinh/bang-so-to-nha-trang.mjs` (khai theo KH�
 không ra, cần hỏi lại Văn phòng Đăng ký: **Vĩnh Thái tờ 50–54** (1.561 thửa, đã đo khoảng cách xác nhận
 nằm trong đất Vĩnh Thái chứ không phải Phước Hải), **Phước Hòa tờ 20** (47), **Vĩnh Hải tờ 63** (29),
 **Phương Sơn tờ 21** (1).
+
+**Tám xã/phường Ninh Hòa (116.273 thửa) — nạp 3/9/2026 từ file Excel phụ lục 1.10–1.17 của Văn phòng
+Đăng ký** (bản gốc: `scripts/dia-chinh/anh-bang-goc/ninh-hoa-phu-luc.xlsx`, mỗi sheet một xã mới,
+cột C/D/E/F = tên xã mới / tờ mới / tên xã cũ / tờ cũ). Dựng bằng
+`python scripts/dia-chinh/bang-so-to-ninh-hoa.py` → `bang-so-to-ninh-hoa.csv` (1.289 dòng).
+Quy tắc "đơn vị gốc giữ nguyên số tờ" khớp **8/8** với danh mục Sở → tính cả Cam Lâm và Nha Trang là **16/16**.
+
+⚠️ **NINH HOÀ KHÁC NHA TRANG — chỗ dễ làm hỏng nhất.** Ở Nha Trang mỗi xã cũ còn một file riêng mang số
+tờ cũ nên nạp bảng nguyên xi là dùng được. Ở Ninh Hoà thì **hầu hết xã cũ KHÔNG có file riêng**: dữ liệu
+nằm trong file của xã GỐC (số tờ cũ của chính xã gốc, đổi 1:1), kèm một ít thửa đã đo vẽ lại **mang sẵn
+số tờ MỚI**. Nạp bảng nguyên xi ⇒ tra ra **0 kết quả**. Nên script tự đếm với TỪNG số tờ xem thửa thật
+nằm đâu rồi mới chọn đích: có ở file xã cũ thì trỏ (xã cũ, tờ cũ), không thì trỏ (xã mới, chính số tờ đó).
+Kết quả: 26 dòng trỏ file xã cũ (Ninh Phước cũ), 1.263 dòng giữ nguyên số. **Xin được dữ liệu địa chính
+của các xã cũ Ninh Hoà thì chạy lại script là bảng tự chỉnh.**
+Cái lợi thấy ngay: 6.961 thửa của Ninh Phước cũ giờ tra được bằng số tờ mới (72–120), và 11.927 thửa của
+Đông Ninh Hoà hết bị tra lẫn với Ninh Phước (18 số tờ trùng nhau giữa hai file).
+Ngoài bảng: **Tây Ninh Hoà tờ 1–3** (43 thửa) — bảng bắt đầu từ tờ 4.
+
+⚠️ **HAI BẪY KHI ĐỌC FILE EXCEL CỦA SỞ** (đã vấp cả hai):
+1. **Chữ tiếng Việt gõ tách dấu (NFD)** — vài sheet lưu kiểu này, so tên xã kiểu thường sẽ trượt và
+   **mất trắng khối đầu tiên** của sheet đó (lần đầu mất 168 dòng mà không có lỗi gì). Phải `normalize('NFC')`.
+2. **Xuống dòng kiểu Windows (CRLF)** — file CSV ghi bằng Python trên Windows mặc định ra `
+`,
+   `psql \copy` báo `unquoted newline found in data` và **không nạp dòng nào**, nhưng câu kiểm tra sau đó
+   vẫn chạy nên nhìn như "thiếu hàng loạt". Phải ghi `newline='
+'`.
+3. Ô gộp dải số như "1-95" bị Excel hiểu thành **ngày tháng** (`1995-01-01`) — chỉ ở dòng tiêu đề khối,
+   bỏ qua được vì các dòng chi tiết bên dưới mới là dữ liệu.
 → Phải **xin bảng đối chiếu của Chi nhánh Văn phòng Đăng ký đất đai** từng nơi. Có bảng thì nạp bằng:
 ```bash
 node scripts/dia-chinh/nap-bang-so-to.mjs bang-cua-xa.csv > nap.sql   # CSV 4 cột: xã mới, tờ mới, xã cũ, tờ cũ

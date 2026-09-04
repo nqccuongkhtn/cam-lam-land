@@ -22,31 +22,13 @@
 #    Khi nào xin được dữ liệu địa chính của các xã cũ thì chạy lại script này.
 #
 # CHẠY:  python scripts/dia-chinh/bang-so-to-ninh-hoa.py <file.xlsx> <ra.csv>
-import sys, subprocess, unicodedata as ud
-from collections import defaultdict
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import openpyxl
+from lib_so_to import nfc, num, tao_bang   # phần dùng chung: chuẩn hoá chữ, đổi tên xã → mã, chọn đích, ghi CSV
 
 XLSX = sys.argv[1] if len(sys.argv) > 1 else 'scripts/dia-chinh/anh-bang-goc/ninh-hoa-phu-luc.xlsx'
 RA   = sys.argv[2] if len(sys.argv) > 2 else 'scripts/dia-chinh/bang-so-to-ninh-hoa.csv'
-
-def nfc(s): return ud.normalize('NFC', str(s)).replace('\xa0', ' ').strip()
-def bodau(s):
-    s = ud.normalize('NFD', nfc(s))
-    s = ''.join(c for c in s if not ud.combining(c)).replace('đ', 'd').replace('Đ', 'D').lower()
-    s = s.replace('(cu)', ' ')
-    for p in ('xa ', 'phuong ', 'thi tran ', 'dac khu '):
-        if s.startswith(p): s = s[len(p):]
-    return ''.join(c for c in s if c.isalnum())
-def num(v):
-    if isinstance(v, bool): return None
-    if isinstance(v, int): return v
-    if isinstance(v, float) and v == int(v): return int(v)
-    if isinstance(v, str) and nfc(v).isdigit(): return int(nfc(v))
-    return None
-def psql(sql):
-    return subprocess.run(['docker', 'compose', 'exec', '-T', 'postgis', 'psql', '-U', 'camlam',
-                           '-d', 'camlam_gis', '-tAF|', '-c', sql],
-                          capture_output=True, text=True, encoding='utf-8').stdout
 
 # ── 1. Đọc Excel thành các dòng (tên xã mới, tờ mới, tên xã cũ, tờ cũ) ────────
 wb = openpyxl.load_workbook(XLSX, data_only=True)
@@ -66,42 +48,4 @@ for ws in wb.worksheets:
             dong.append((xaMoi, tm, xaCu, tc))
 print(f'Đọc được {len(dong)} dòng từ {len(wb.worksheets)} sheet')
 
-# ── 2. Đổi tên xã → mã xã ────────────────────────────────────────────────────
-dsXa = [l.split('|') for l in psql('SELECT xa_id, ten, cap, coalesce(xa_moi_id, %s) FROM dia_chinh_xa;'
-                                   % "''").strip().splitlines() if l]
-theoTen = defaultdict(list)
-for ma, ten, cap, xm in dsXa: theoTen[bodau(ten)].append((ma, ten, int(cap), xm))
-
-def maXaMoi(ten):
-    hop = [h for h in theoTen[bodau(ten)] if h[2] == 2]
-    if len(hop) != 1: raise SystemExit(f'Không nhận ra xã mới "{ten}" ({len(hop)} kết quả)')
-    return hop[0][0]
-def maXaCu(ten, maMoi):
-    # Trùng tên toàn tỉnh rất nhiều (vd "Ninh Phước" ở cả Ninh Hòa lẫn Ninh Thuận)
-    # → chỉ nhận xã cấp 3 ĐANG THUỘC đúng xã mới đó.
-    hop = [h for h in theoTen[bodau(ten)] if h[2] == 3 and h[3] == maMoi]
-    return hop[0][0] if len(hop) == 1 else None
-
-# ── 3. Đếm thửa để chọn đích cho từng số tờ ──────────────────────────────────
-dem = defaultdict(int)
-for l in psql('SELECT xa_id, to_num, count(*) FROM dia_chinh GROUP BY 1,2;').strip().splitlines():
-    if l: p = l.split('|'); dem[(p[0], int(p[1]))] = int(p[2])
-
-ra, thongKe = [], defaultdict(int)
-for tenMoi, tm, tenCu, tc in dong:
-    mm = maXaMoi(tenMoi)
-    mc = maXaCu(tenCu, mm)
-    nCu  = dem.get((mc, tc), 0) if mc else 0
-    nMoi = dem.get((mm, tm), 0)
-    if nCu and nCu >= nMoi:
-        ra.append((mm, tm, mc, tc)); thongKe['theo file xã cũ'] += 1; thongKe['thửa tra được'] += nCu
-    else:
-        ra.append((mm, tm, mm, tm)); thongKe['theo file xã mới (giữ số)'] += 1; thongKe['thửa tra được'] += nMoi
-        if not nMoi: thongKe['tờ chưa có thửa nào'] += 1
-
-# newline='\n': ép xuống dòng kiểu Unix. Để mặc định thì trên Windows ra kiểu \r\n,
-# psql \copy báo "unquoted newline found in data" và KHÔNG nạp được dòng nào (đã vấp).
-with open(RA, 'w', encoding='utf-8', newline='\n') as fh:
-    for r in ra: fh.write(','.join(map(str, r)) + '\n')
-for k, v in thongKe.items(): print(f'   {k}: {v:,}'.replace(',', '.'))
-print(f'Ghi {len(ra)} dòng → {RA}')
+tao_bang(dong, RA)

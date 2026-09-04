@@ -1541,7 +1541,7 @@ export default function MapPage() {
                           {khuMoi && khuCu && (
                             <div className="text-slate-500 text-[11px] mt-0.5">
                               <span className="text-slate-400">Khu vực mới: </span>{khuMoi}
-                              {toMoi && <> · <span className="text-slate-400">tờ mới </span><b className="text-[#0A2540]">{toMoi}</b></>}
+                              {toMoi && toMoi !== toCu && <> · <span className="text-slate-400">tờ mới </span><b className="text-[#0A2540]">{toMoi}</b></>}
                             </div>
                           )}
                           {thieuBangTra && <div className="text-slate-400 text-[10px] mt-0.5">Xã mới chưa có bảng tra số tờ</div>}
@@ -1553,7 +1553,9 @@ export default function MapPage() {
                           {(khuCu || toMoi) && (
                             <div className="text-slate-500 text-[11px] mt-0.5">
                               <span className="text-slate-400">Trước sáp nhập: </span>{khuCu || '—'}
-                              {toMoi && toCu && <> · <span className="text-slate-400">tờ cũ </span><b className="text-[#0A2540]">{toCu}</b></>}
+                              {/* Xã nào sáp nhập mà số tờ GIỮ NGUYÊN (vd Vạn Ninh, Ninh Hoà) thì tờ mới
+                                  trùng tờ cũ — ghi lại lần nữa chỉ tổ rối, nên bỏ. */}
+                              {toMoi && toCu && toMoi !== toCu && <> · <span className="text-slate-400">tờ cũ </span><b className="text-[#0A2540]">{toCu}</b></>}
                             </div>
                           )}
                           {thieuBangTra && <div className="text-slate-400 text-[10px] mt-0.5">Xã này chưa có bảng tra số tờ mới — số đang hiện là số tờ cũ</div>}

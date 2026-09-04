@@ -226,7 +226,8 @@ thì bổ sung y hệt. `/api/dc/tim` tự đổi số tờ khi người dùng c
 Chưa có bảng tra cho xã nào thì tìm rộng rồi hiện bảng cho chọn.
 
 **Làm cho CẢ TỈNH:** 64 xã mới — **25 xã không cần** bảng tra (chỉ gồm 1 xã cũ nên không thể trùng số),
-**16 xã đã có** (4 xã Cam Lâm cũ + 4 phường Nha Trang + 8 xã/phường Ninh Hòa cũ), **29 xã còn thiếu** (194.684 thửa).
+**21 xã đã có** (4 xã Cam Lâm cũ + 4 phường Nha Trang + 8 xã/phường Ninh Hoà cũ + 5 xã Vạn Ninh cũ),
+**29 xã còn thiếu** (194.684 thửa — nhóm Vạn Ninh vốn nằm ở nhóm "không cần" vì mỗi xã mới chỉ có 1 file dữ liệu).
 ⚠️ **KHÔNG suy ra được bằng công thức.** Quy tắc "xã gốc giữ số, các xã còn lại nối tiếp theo thứ tự
 nghị quyết" chỉ đúng 2/4 xã Cam Lâm; hai xã kia thứ tự khối khác hẳn (do địa phương tự quyết khi biên
 tập bộ bản đồ). Đoán bừa = in sai số tờ lên phiếu trích lục → tuyệt đối không làm.
@@ -281,6 +282,17 @@ Ngoài bảng: **Tây Ninh Hoà tờ 1–3** (43 thửa) — bảng bắt đầu
 '`.
 3. Ô gộp dải số như "1-95" bị Excel hiểu thành **ngày tháng** (`1995-01-01`) — chỉ ở dòng tiêu đề khối,
    bỏ qua được vì các dòng chi tiết bên dưới mới là dữ liệu.
+
+**Năm xã Vạn Ninh (52.146 thửa) — nạp 4/9/2026** từ `anh-bang-goc/van-ninh-to-ban-do.xlsx`, dựng bằng
+`python scripts/dia-chinh/bang-so-to-van-ninh.py` → 638 dòng, **phủ 100% thửa**.
+File này trình bày kiểu **KHỐI CỘT nằm cạnh nhau** trong MỘT sheet (dòng 1 = xã mới, dòng 2 = xã cũ,
+dòng 3 = cặp cột "Tờ BĐ cũ | Tờ BĐ mới"), khác hẳn Ninh Hoà xếp theo sheet → mỗi nơi phải viết bộ đọc riêng.
+Xã gốc để **trống cột "Tờ BĐ cũ"** = giữ nguyên số tờ; khớp 5/5 danh mục Sở ⇒ quy tắc đúng **21/21**.
+Dữ liệu Vạn Ninh giống Ninh Hoà (xã cũ không có file riêng) nên bảng ra toàn dòng "giữ nguyên số".
+
+**Phần dùng chung của mọi bảng nằm ở `scripts/dia-chinh/lib_so_to.py`** (chuẩn hoá chữ, đổi tên xã → mã,
+chọn đích theo nơi có dữ liệu, ghi CSV đúng kiểu xuống dòng). Thêm huyện mới thì chỉ viết đoạn ĐỌC FILE
+rồi gọi `tao_bang(dong, ra_csv)`.
 → Phải **xin bảng đối chiếu của Chi nhánh Văn phòng Đăng ký đất đai** từng nơi. Có bảng thì nạp bằng:
 ```bash
 node scripts/dia-chinh/nap-bang-so-to.mjs bang-cua-xa.csv > nap.sql   # CSV 4 cột: xã mới, tờ mới, xã cũ, tờ cũ

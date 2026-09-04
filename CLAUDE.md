@@ -418,8 +418,13 @@ Kiểm tra nhanh trong Console: `Object.values(__banDo.style.sourceCaches['src-d
   chỗ nhả tay** — thư viện chỉ so chỗ bấm với chỗ nhả, hai chỗ trùng nhau nên tưởng người dùng bấm
   đứng yên → mở bảng thông tin thửa. Cách chặn: nhớ chỗ ĐẶT NGÓN TAY lúc `touchstart`, và **bỏ qua mọi
   sự kiện chuột trong 800ms sau khi chạm** (nếu không, chuột giả ghi đè mất chỗ đặt tay). Ngưỡng:
-  chuột 5 điểm ảnh, ngón tay 12. Đã thử 7 trường hợp: bấm/gõ đứng yên và gõ rung tay 6px vẫn chọn được;
-  kéo chuột 160px, lướt tay 25px/160px/300px đều không chọn.
+  chuột 5 điểm ảnh, ngón tay 12. **Lớp chặn ăn chắc nhất** là nhìn vào chính bản đồ: hễ bản đồ vừa bị
+  NGƯỜI DÙNG làm xê dịch trong vòng 350ms (sự kiện `move` có `originalEvent`), hoặc đang trôi theo đà
+  (`isMoving()`), thì cú bấm ngay sau đó là đuôi của động tác kéo. Lớp này không phụ thuộc việc thư viện
+  có ghi được chỗ đặt chuột hay không — bấm trúng ghim giá / lớp chữ mờ rồi kéo là thư viện KHÔNG ghi được.
+  Chuyển động do máy tự chạy (bay tới thửa, khớp khung) không có `originalEvent` nên không bị tính nhầm.
+  Đã thử bằng chuột thật qua trình duyệt: kéo 280px làm bản đồ chạy ~800m → **0 lần** chọn thửa;
+  bấm đứng yên → **1 lần**, bảng thông tin thửa mở đúng.
 - Gõ `__banDo` trong Console trình duyệt để soi bản đồ khi cần tìm sự cố.
 
 ---

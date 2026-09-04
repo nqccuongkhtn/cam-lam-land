@@ -201,14 +201,23 @@ export default function MapView({ center, zoom, className, layers = [], markers 
   // Cú "chuột giả" sinh ra từ chạm phải bị bỏ qua, nếu không nó ghi đè mất chỗ đặt tay.
   const NGUONG_CHUOT = 5, NGUONG_CHAM = 12; // điểm ảnh
   const CHO_CHUOT_GIA = 800;                // ms — trong khoảng này mọi sự kiện chuột đều là giả
+  const CHO_SAU_KEO = 350;                  // ms — vừa kéo xong thì cú bấm ngay sau đó là của cú kéo
   const diemDat = useRef<{ x: number; y: number; cham: boolean } | null>(null);
   const lucChamCuoi = useRef(0);
+  const lucKeoCuoi = useRef(0);
   const daKeo = useRef(false);
   // CHỈ ĐỌC, không xoá dấu vết — vì một cú bấm có thể chạy qua nhiều chỗ xử lý (bấm nền bản đồ,
   // bấm trúng tuyến đường…), xoá ở chỗ đầu thì chỗ sau lại tưởng là bấm thật. Dấu vết được
   // đặt lại ở lần đặt tay kế tiếp.
   function laKeoChuKhongPhaiBam(e: any): boolean {
     if (daKeo.current) return true;
+    // Bản đồ vừa bị NGƯỜI DÙNG làm xê dịch xong (kéo, chụm ngón, lăn chuột) → cú bấm ngay sau đó
+    // là cái đuôi của động tác kéo chứ không phải chọn thửa. Đây là lớp chặn ăn chắc nhất vì nó
+    // nhìn vào việc bản đồ CÓ THẬT SỰ CHẠY hay không, không phụ thuộc chỗ đặt chuột được ghi lại
+    // hay không (bấm trúng ghim giá, chữ mờ… là thư viện không ghi được chỗ đặt chuột).
+    if (Date.now() - lucKeoCuoi.current < CHO_SAU_KEO) return true;
+    const map = mapRef.current;
+    if (map && (map.isMoving() || map.isZooming())) return true;   // đang trôi theo đà, bấm để dừng lại
     const d = diemDat.current;
     if (!d || !e?.point) return false;
     return Math.hypot(e.point.x - d.x, e.point.y - d.y) > (d.cham ? NGUONG_CHAM : NGUONG_CHUOT);
@@ -284,10 +293,11 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       diemDat.current = e?.point ? { x: e.point.x, y: e.point.y, cham: false } : null;
       daKeo.current = false;
     });
-    // Xoay hoặc phóng bằng tay (chụm hai ngón, lăn chuột, bấm đúp) thì chắc chắn không phải
-    // chọn thửa. Riêng KÉO thì KHÔNG chặn ở đây mà để phép đo quãng đường bên dưới lo:
-    // bản đồ nhúc nhích 2–3 điểm ảnh do rung tay vẫn phải tính là một cú bấm bình thường.
+    // Xoay bằng tay thì chắc chắn không phải chọn thửa.
     map.on('rotatestart', () => { daKeo.current = true; });
+    // Bản đồ xê dịch DO NGƯỜI DÙNG (có `originalEvent`) → ghi lại thời điểm. Chuyển động do máy
+    // tự chạy (bay tới thửa, khớp khung) không có `originalEvent` nên không tính.
+    map.on('move', (e: any) => { if (e?.originalEvent) lucKeoCuoi.current = Date.now(); });
     map.on('zoomstart', (e: any) => { if (e?.originalEvent) daKeo.current = true; });
     map.on('click', (e) => {
       const tgt = e.originalEvent?.target as HTMLElement | null;

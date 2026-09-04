@@ -201,7 +201,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
   // Cú "chuột giả" sinh ra từ chạm phải bị bỏ qua, nếu không nó ghi đè mất chỗ đặt tay.
   const NGUONG_CHUOT = 5, NGUONG_CHAM = 12; // điểm ảnh
   const CHO_CHUOT_GIA = 800;                // ms — trong khoảng này mọi sự kiện chuột đều là giả
-  const CHO_SAU_KEO = 350;                  // ms — vừa kéo xong thì cú bấm ngay sau đó là của cú kéo
+  const CHO_SAU_KEO = 400;                  // ms — vừa kéo xong thì cú bấm ngay sau đó là của cú kéo
   const diemDat = useRef<{ x: number; y: number; cham: boolean } | null>(null);
   const lucChamCuoi = useRef(0);
   const lucKeoCuoi = useRef(0);

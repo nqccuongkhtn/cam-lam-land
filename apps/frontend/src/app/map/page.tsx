@@ -1513,7 +1513,9 @@ export default function MapPage() {
                     || (cuTen ? (cuHuyen ? `${cuTen} · ${cuHuyen}` : cuTen) : '');
                   const khuMoi = pickProp(props, ['KhuVucMoi', 'khu_vuc_moi', 'DiaChiMoi']) || info.parcel.xa || '';
                   // Số tờ trong DỮ LIỆU luôn là số tờ CŨ. Số tờ MỚI chỉ có khi xã đó đã có bảng tra.
-                  const toCu = info.parcel.soTo || '';
+                  // Số tờ CŨ: ưu tiên con số máy chủ lấy từ bảng tra (đúng theo giấy tờ), vì ở
+                  // Ninh Hoà / Vạn Ninh số đang lưu trong dữ liệu chính là số tờ MỚI rồi.
+                  const toCu = ((info.parcel as any).soToCu as string | null) || info.parcel.soTo || '';
                   const toMoi = ((info.parcel as any).soToMoi as string | null) || '';
                   // Chỉ nhắc "chưa có bảng tra" ở xã GỘP TỪ NHIỀU XÃ CŨ. Xã chỉ gồm 1 xã cũ thì
                   // số tờ vốn không đổi, nhắc vào chỉ tổ rối.

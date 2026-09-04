@@ -12,7 +12,14 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS tier           TEXT NOT NULL DEFAULT 
 ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar         TEXT;
 ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
 UPDATE users SET role='user' WHERE role='sales';
-ALTER TABLE users ADD  CONSTRAINT users_role_check CHECK (role IN ('user','admin','gis','vanban','hotlist'));
+ALTER TABLE users ADD  CONSTRAINT users_role_check CHECK (role IN ('user','admin','gis','vanban','hotlist','danhmuc'));
+-- MỘT NGƯỜI CÓ THỂ GIỮ NHIỀU VAI TRÒ: cột roles là DANH SÁCH vai trò của tài khoản đó.
+-- Cột role cũ vẫn giữ, coi như "vai trò chính" (để chỗ nào chưa kịp đổi vẫn chạy bình thường).
+ALTER TABLE users ADD COLUMN IF NOT EXISTS roles TEXT[] NOT NULL DEFAULT '{}';
+UPDATE users SET roles = ARRAY[role] WHERE roles IS NULL OR cardinality(roles) = 0;
+ALTER TABLE users DROP CONSTRAINT IF EXISTS users_roles_check;
+ALTER TABLE users ADD  CONSTRAINT users_roles_check CHECK (roles <@ ARRAY['user','admin','gis','vanban','hotlist','danhmuc']::text[]);
+CREATE INDEX IF NOT EXISTS users_roles_idx ON users USING GIN (roles);
 CREATE TABLE IF NOT EXISTS email_verifications (
   id SERIAL PRIMARY KEY, email TEXT NOT NULL, code TEXT NOT NULL,
   expires_at TIMESTAMPTZ NOT NULL, used BOOLEAN NOT NULL DEFAULT false,
@@ -405,5 +412,105 @@ export async function migrate(): Promise<void> {
   await pool.query(`CREATE INDEX IF NOT EXISTS listing_leads_user_idx ON listing_leads (user_id)`).catch(() => {}); // upsert ON CONFLICT (listing_id,user_id)
   await pool.query(`CREATE INDEX IF NOT EXISTS site_visits_ref_idx ON site_visits (ref) WHERE ref IS NOT NULL AND ref <> ''`).catch(() => {}); // báo cáo nguồn truy cập
   await pool.query(`CREATE INDEX IF NOT EXISTS site_visits_path_idx ON site_visits (path) WHERE path IS NOT NULL`).catch(() => {}); // báo cáo top trang
+  // ── KHO HỒ SƠ (dùng tạm — dễ gỡ): nơi cất file Excel/PDF danh mục đã lập, chia theo thư mục ──
+  // File cất THẲNG trong database (cột BYTEA) y như cách làm với ảnh tin đăng — khỏi lo ổ đĩa,
+  // sao lưu database là sao lưu luôn cả kho. File danh mục chỉ vài chục KB nên rất nhẹ.
+  await pool.query(`CREATE TABLE IF NOT EXISTS kho_files (
+    id BIGSERIAL PRIMARY KEY,
+    thu_muc TEXT NOT NULL DEFAULT 'phong-kinh-te',
+    so_tt INT,
+    ten TEXT NOT NULL,
+    ten_khong_dau TEXT,
+    mime TEXT NOT NULL DEFAULT 'application/octet-stream',
+    co_bytes INT NOT NULL DEFAULT 0,
+    du_lieu BYTEA NOT NULL,
+    ghi_chu TEXT,
+    nguoi_tai INT REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`).catch((e: any) => console.error('[migrate] kho_files lỗi:', e?.message || e));
+  // Tải LẠI đúng tên file cũ thì ĐÈ LÊN bản cũ chứ không đẻ ra bản thứ hai (nhờ khoá duy nhất này).
+  await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS kho_files_ten_idx ON kho_files (thu_muc, ten)`).catch(() => {});
+  // Sắp xếp mặc định là theo SỐ THỨ TỰ ở đầu tên file → index đúng theo thứ tự đó cho nhanh.
+  await pool.query(`CREATE INDEX IF NOT EXISTS kho_files_stt_idx ON kho_files (thu_muc, so_tt)`).catch(() => {});
+  await pool.query(`CREATE INDEX IF NOT EXISTS kho_files_tim_idx ON kho_files (thu_muc, ten_khong_dau)`).catch(() => {});
+  // Thư mục rỗng (chưa có file nào) vẫn phải hiện ra, nên phải có bảng riêng cho nó.
+  await pool.query(`CREATE TABLE IF NOT EXISTS kho_thu_muc (
+    slug TEXT PRIMARY KEY,
+    ten TEXT NOT NULL,
+    icon TEXT NOT NULL DEFAULT '📁',
+    thu_tu INT NOT NULL DEFAULT 100,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`).catch((e: any) => console.error('[migrate] kho_thu_muc lỗi:', e?.message || e));
+  await pool.query(`INSERT INTO kho_thu_muc (slug, ten, icon, thu_tu) VALUES ('phong-kinh-te', 'Phòng Kinh tế', '🏛️', 1) ON CONFLICT (slug) DO NOTHING`).catch(() => {});
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // BẢN ĐỒ ĐỊA CHÍNH TOÀN TỈNH (733k thửa) — bảng RIÊNG, không dùng chung gis_features
+  // ══════════════════════════════════════════════════════════════════════════════
+  // Vì sao tách riêng: gis_features cất mọi thứ vào cột JSONB nên không đánh chỉ mục
+  // theo số tờ/số thửa được → với hơn 700 nghìn thửa thì tra cứu phải quét cả bảng, rất chậm.
+  // Bảng này có cột riêng cho từng thông tin nên tra cứu gần như tức thì.
+  await pool.query(`CREATE TABLE IF NOT EXISTS dia_chinh (
+    id       BIGSERIAL PRIMARY KEY,
+    xa_id    TEXT NOT NULL,              -- mã xã (khoá thật, KHÔNG dùng tên vì có 10 cặp xã trùng tên)
+    cap      SMALLINT NOT NULL DEFAULT 3, -- 2 = đơn vị mới sau sáp nhập 2025 · 3 = đơn vị cũ
+    so_to    TEXT,                        -- số tờ bản đồ, giữ nguyên chữ gốc
+    so_thua  TEXT,                        -- số thửa, giữ nguyên chữ gốc
+    to_num   INT,                         -- số tờ đã đổi ra SỐ (để tra cứu nhanh, "05" = 5)
+    thua_num INT,                         -- số thửa đã đổi ra số
+    dien_tich REAL,                       -- diện tích m2 lấy sẵn trong file gốc
+    mdsd     TEXT,                        -- mục đích sử dụng (ODT, CLN, BHK...)
+    xa_moi_id TEXT,                     -- mã xã/phường HIỆN HÀNH (2 cấp) chứa thửa này
+    geom     geometry(MultiPolygon,4326) NOT NULL
+  )`).catch((e: any) => console.error('[migrate] dia_chinh lỗi:', e?.message || e));
+  await pool.query(`CREATE INDEX IF NOT EXISTS dia_chinh_geom_gix ON dia_chinh USING GIST (geom)`).catch(() => {});
+  // Tra "tờ mấy thửa mấy ở xã nào" — chỉ mục này lo trọn.
+  await pool.query(`CREATE INDEX IF NOT EXISTS dia_chinh_tim_idx ON dia_chinh (xa_id, to_num, thua_num)`).catch(() => {});
+  // Tra "tờ mấy thửa mấy" mà KHÔNG chọn xã (tìm khắp tỉnh).
+  await pool.query(`CREATE INDEX IF NOT EXISTS dia_chinh_to_thua_idx ON dia_chinh (to_num, thua_num)`).catch(() => {});
+
+  // Danh mục xã/phường — sinh tự động sau khi nạp, dùng cho ô "Chọn xã" và nút bay tới.
+  // Cột cap ở đây SỬA TAY ĐƯỢC: quy ước viết hoa/thường trong file gốc không chuẩn 100%
+  // (vd xã Vạn Ninh, Tu Bông, Đại Lãnh viết thường nhưng thực chất là xã MỚI 2025).
+  await pool.query(`CREATE TABLE IF NOT EXISTS dia_chinh_xa (
+    xa_id    TEXT PRIMARY KEY,
+    ten      TEXT NOT NULL,               -- tên có dấu, đúng như file gốc
+    ten_kd   TEXT,                        -- tên không dấu, để gõ tìm không cần bỏ dấu
+    cap      SMALLINT NOT NULL DEFAULT 3,
+    huyen    TEXT,                        -- huyện/thị xã/thành phố CŨ (trước sáp nhập 2025)
+    xa_moi_id TEXT,                     -- xã/phường HIỆN HÀNH tiếp nhận xã này (2 cấp trỏ về chính nó)
+    so_thua  INT NOT NULL DEFAULT 0,
+    minx DOUBLE PRECISION, miny DOUBLE PRECISION,
+    maxx DOUBLE PRECISION, maxy DOUBLE PRECISION,
+    cx   DOUBLE PRECISION, cy   DOUBLE PRECISION,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`).catch((e: any) => console.error('[migrate] dia_chinh_xa lỗi:', e?.message || e));
+  await pool.query(`ALTER TABLE dia_chinh_xa ADD COLUMN IF NOT EXISTS huyen TEXT`).catch(() => {});
+  await pool.query(`ALTER TABLE dia_chinh_xa ADD COLUMN IF NOT EXISTS xa_moi_id TEXT`).catch(() => {});
+  // ten_goc: tên đơn vị CŨ đã mang đúng mã đó (trường donViGoc/tenCu của danh mục Sở).
+  // Xã mới kế thừa mã của một xã cũ, nên thửa trong file mang tên xã MỚI thật ra vẫn là đất
+  // của xã cũ đó (vd file "Xã Cam Hiệp" chứa đất xã Cam Tân cũ). Rỗng = xã mới giữ nguyên tên.
+  await pool.query(`ALTER TABLE dia_chinh_xa ADD COLUMN IF NOT EXISTS ten_goc TEXT`).catch(() => {});
+  // so_xa_gop: xã mới này gộp từ mấy xã cũ. >1 mới có nguy cơ trùng số tờ nên mới cần bảng tra.
+  await pool.query(`ALTER TABLE dia_chinh_xa ADD COLUMN IF NOT EXISTS so_xa_gop INT NOT NULL DEFAULT 1`).catch(() => {});
+  await pool.query(`CREATE TABLE IF NOT EXISTS dia_chinh_to (
+    xa_moi_id TEXT NOT NULL, to_moi INT NOT NULL,
+    xa_cu_id TEXT NOT NULL,  to_cu  INT NOT NULL,
+    PRIMARY KEY (xa_moi_id, to_moi))`).catch(() => {});
+  await pool.query(`CREATE INDEX IF NOT EXISTS dia_chinh_to_nguoc_idx ON dia_chinh_to (xa_cu_id, to_cu)`).catch(() => {});
+  // ── HAI CỘT "SỰ THẬT THEO GIẤY TỜ" ──────────────────────────────────────────
+  // Phải tách bạch HAI thứ khác nhau:
+  //   · (xa_cu_id, to_cu)      = CHỖ ĐI TÌM dữ liệu — nơi thửa thật sự đang nằm trong kho.
+  //   · (ten_xa_cu, to_cu_that)= ĐIỀU BẢNG GIẤY GHI  — xã cũ nào, tờ cũ mấy.
+  // Hai cái này KHÁC nhau ở Ninh Hoà và Vạn Ninh: các xã cũ không có file riêng, dữ liệu nằm
+  // chung trong file của xã gốc và đã mang sẵn số tờ mới. Nếu chỉ có cặp đầu thì web ghi
+  // "Trước sáp nhập: xã Vạn Thọ" cho cả thửa vốn là đất Đại Lãnh cũ — sai tên xã.
+  // Để rỗng = hai cái trùng nhau (trường hợp Nha Trang, Cam Lâm).
+  await pool.query(`ALTER TABLE dia_chinh_to ADD COLUMN IF NOT EXISTS ten_xa_cu TEXT`).catch(() => {});
+  await pool.query(`ALTER TABLE dia_chinh_to ADD COLUMN IF NOT EXISTS to_cu_that INT`).catch(() => {});
+  await pool.query(`ALTER TABLE dia_chinh ADD COLUMN IF NOT EXISTS xa_moi_id TEXT`).catch(() => {});
+  await pool.query(`CREATE INDEX IF NOT EXISTS dia_chinh_xa_moi_idx ON dia_chinh (xa_moi_id)`).catch(() => {});
+  await pool.query(`CREATE INDEX IF NOT EXISTS dia_chinh_xa_cap_idx ON dia_chinh_xa (cap, ten)`).catch(() => {});
+  await pool.query(`CREATE INDEX IF NOT EXISTS dia_chinh_xa_huyen_idx ON dia_chinh_xa (cap, huyen, ten)`).catch(() => {});
+
   console.log('[migrate] schema up to date');
 }

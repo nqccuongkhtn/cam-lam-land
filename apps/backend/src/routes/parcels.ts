@@ -85,6 +85,8 @@ parcelsRouter.get('/at', async (req, res, next) => {
              x.ten AS "xa", x.cap, x.huyen, x.ten_goc AS "tenGoc",
              xm.ten AS "xaMoi", xm.xa_id AS "xaMoiId",
              tt.to_moi AS "soToMoi",   -- số tờ theo bản đồ MỚI (nếu xã đó đã có bảng tra)
+             tt.ten_xa_cu AS "tenXaCuThat",  -- xã cũ THẬT theo bảng giấy (khác tên gốc của file)
+             tt.to_cu_that AS "soToCuThat",  -- số tờ cũ THẬT theo bảng giấy
              xm.so_xa_gop AS "soXaGop", -- xã mới này gộp từ mấy xã cũ (1 = không thể trùng số tờ)
              ST_AsGeoJSON(d.geom)::json AS geometry,
              ROUND(ST_Area(d.geom::geography)::numeric, 1) AS "areaM2"
@@ -100,7 +102,12 @@ parcelsRouter.get('/at', async (req, res, next) => {
       const laCu = Number(dc.cap) === 3;
       // File mang tên xã MỚI thật ra chứa đất của xã cũ đã bị "nuốt mã" (vd file "Xã Cam Hiệp"
       // chứa đất xã Cam Tân cũ). Danh mục của Sở có sẵn tên gốc đó → hiện cho đúng.
-      const tenTruoc = laCu ? dc.xa : (dc.tenGoc || null);
+      // Ưu tiên tên xã cũ THẬT lấy từ bảng tra số tờ. Vì sao cần: ở Ninh Hoà và Vạn Ninh, cả mấy
+      // xã cũ dùng chung MỘT file mang tên xã gốc — lấy tên gốc của file thì thửa vốn là đất
+      // Đại Lãnh cũ lại bị ghi thành "xã Vạn Thọ". Bảng tra biết đúng từng tờ thuộc xã cũ nào.
+      const tenTruoc = dc.tenXaCuThat || (laCu ? dc.xa : (dc.tenGoc || null));
+      // Số tờ CŨ để hiện kèm: cũng lấy theo bảng giấy nếu có, không thì là số đang lưu trong dữ liệu.
+      const soToCu = dc.soToCuThat != null ? String(dc.soToCuThat) : (dc.soTo == null ? null : String(dc.soTo));
       // Dựng lại khối "properties" y như dữ liệu cũ để phần giao diện không phải sửa gì.
       parcel = { ...dc, layer_name: dc.xaMoi || dc.xa || 'Bản đồ địa chính',
         soToMoi: dc.soToMoi == null ? null : String(dc.soToMoi),   // null = xã này chưa có bảng tra số tờ
@@ -108,6 +115,7 @@ parcelsRouter.get('/at', async (req, res, next) => {
         // không cần bảng tra và cũng không nên nhắc gì cho khỏi nhiễu.
         canBangTraSoTo: Number(dc.soXaGop) > 1 && dc.soToMoi == null,
         xaCu: tenTruoc,                   // tên đơn vị CŨ của mảnh đất này
+        soToCu,                           // số tờ CŨ tương ứng (để hiện "tờ cũ …")
         huyenCu: laCu ? dc.huyen : null,  // huyện/TP cũ
         properties: { to: dc.soTo, thua: dc.soThua, xa: dc.xaMoi || dc.xa, xaCu: tenTruoc,
                       mucDichSuDung: dc.mdsd || '',

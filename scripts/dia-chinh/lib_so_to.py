@@ -10,8 +10,10 @@
 #   là dùng được. Nơi thì xã cũ KHÔNG có file riêng, dữ liệu nằm chung trong file của xã gốc và
 #   phần lớn đã mang sẵn số tờ MỚI (Ninh Hoà, Vạn Ninh) — nạp nguyên xi thì tra ra 0 kết quả.
 #   Nên với từng số tờ, script tự đếm xem thửa thật nằm ở đâu rồi mới ghi đích.
-import subprocess, unicodedata as ud
+import subprocess, json, os, unicodedata as ud
 from collections import defaultdict
+
+DANH_MUC = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dvhc', 'khanh-hoa-2cap.json')
 
 def nfc(s):
     """Chuẩn hoá chữ tiếng Việt về kiểu GÕ LIỀN DẤU. Bảng của Sở có file gõ TÁCH DẤU,
@@ -62,16 +64,34 @@ def tao_bang(dong, ra_csv):
     for l in psql('SELECT xa_id, to_num, count(*) FROM dia_chinh GROUP BY 1,2;').strip().splitlines():
         if l: p = l.split('|'); dem[(p[0], int(p[1]))] = int(p[2])
 
+    # Bảng của Sở có nơi ghi tên trống ("Đại Lãnh", "Vạn Giã"), có nơi ghi đủ ("phường Ninh Diêm").
+    # Tra danh mục chính thức để lấy tên ĐẦY ĐỦ ĐÚNG loại đơn vị — đoán bừa "xã " đằng trước là
+    # sai với thị trấn Vạn Giã. Trùng tên giữa các huyện thì lọc theo huyện cũ của xã mới.
+    dm = json.load(open(DANH_MUC, encoding='utf-8'))
+    huyenCua = {str(x['xaId']): x.get('huyenIdCu') for x in dm['xaMoi']}
+    tenDayDu = defaultdict(set)
+    for x in dm['xaCu']:                       # xã cũ đã mất mã (bị xoá khi sáp nhập)
+        if x.get('ten'): tenDayDu[(x.get('huyenIdCu'), bodau(x['ten']))].add(x['ten'])
+    for x in dm['xaMoi']:                      # xã cũ ĐƯỢC KẾ THỪA MÃ thì nằm ở trường donViGoc
+        if x.get('donViGoc'): tenDayDu[(x.get('huyenIdCu'), bodau(x['donViGoc']))].add(x['donViGoc'])
+        elif x.get('ten'): tenDayDu[(x.get('huyenIdCu'), bodau(x['ten']))].add(x['ten'])
+    def tenChuan(ten, maMoi):
+        hop = tenDayDu.get((huyenCua.get(maMoi), bodau(ten)), set())
+        return next(iter(hop)) if len(hop) == 1 else nfc(ten)
+
     ra, tk = [], defaultdict(int)
     for tenMoi, tm, tenCu, tc in dong:
         mm = maXaMoi(tenMoi)
         mc = maXaCu(tenCu, mm)
         nCu = dem.get((mc, tc), 0) if mc else 0
         nMoi = dem.get((mm, tm), 0)
+        # Hai cột cuối luôn ghi ĐIỀU BẢNG GIẤY GHI (xã cũ thật + tờ cũ thật), bất kể tìm ở đâu
+        # → web hiện đúng "Trước sáp nhập: xã Đại Lãnh · tờ cũ 1" thay vì tên xã gốc của cả file.
+        that = (tenChuan(tenCu, mm), tc)
         if nCu and nCu >= nMoi:
-            ra.append((mm, tm, mc, tc)); tk['theo file xã cũ'] += 1; tk['thửa tra được'] += nCu
+            ra.append((mm, tm, mc, tc) + that); tk['theo file xã cũ'] += 1; tk['thửa tra được'] += nCu
         else:
-            ra.append((mm, tm, mm, tm)); tk['theo file xã mới (giữ số)'] += 1; tk['thửa tra được'] += nMoi
+            ra.append((mm, tm, mm, tm) + that); tk['theo file xã mới (giữ số)'] += 1; tk['thửa tra được'] += nMoi
             if not nMoi: tk['tờ chưa có thửa nào'] += 1
     # newline='\n': ép xuống dòng kiểu Unix. Để mặc định thì trên Windows ra \r\n,
     # psql \copy báo "unquoted newline found in data" và KHÔNG nạp được dòng nào (đã vấp).

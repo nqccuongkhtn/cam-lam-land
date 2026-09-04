@@ -290,6 +290,17 @@ dòng 3 = cặp cột "Tờ BĐ cũ | Tờ BĐ mới"), khác hẳn Ninh Hoà x�
 Xã gốc để **trống cột "Tờ BĐ cũ"** = giữ nguyên số tờ; khớp 5/5 danh mục Sở ⇒ quy tắc đúng **21/21**.
 Dữ liệu Vạn Ninh giống Ninh Hoà (xã cũ không có file riêng) nên bảng ra toàn dòng "giữ nguyên số".
 
+**BẢNG TRA GHI HAI THỨ KHÁC NHAU — đừng lẫn lộn** (thêm 4/9/2026):
+- `xa_cu_id, to_cu` = **CHỖ ĐI TÌM** dữ liệu, tức thửa đang nằm ở file nào, số tờ mấy trong kho.
+- `ten_xa_cu, to_cu_that` = **ĐIỀU BẢNG GIẤY GHI**, tức xã cũ nào, tờ cũ mấy. Rỗng = hai cái trùng nhau.
+
+Hai cái này khác nhau ở **Ninh Hoà và Vạn Ninh**: mấy xã cũ dùng chung MỘT file mang tên xã gốc và
+số tờ trong file đã là số tờ MỚI. Chỉ có cặp đầu thì web ghi "Trước sáp nhập: **xã Vạn Thọ**" cho cả
+thửa vốn là đất Đại Lãnh cũ — sai tên xã, ảnh hưởng ~168.000 thửa. Có cặp sau thì hiện đúng
+"Trước sáp nhập: **xã Đại Lãnh** · tờ cũ 1". `/api/parcels/at` trả thêm `soToCu`.
+Tên xã cũ lấy **tên đầy đủ đúng loại đơn vị** từ danh mục Sở (đừng tự chắp "xã " — Vạn Giã là **thị trấn**);
+xã cũ đã bị nuốt mã thì tên nằm ở trường `donViGoc` của xã mới chứ không có trong danh sách `xaCu`.
+
 **Phần dùng chung của mọi bảng nằm ở `scripts/dia-chinh/lib_so_to.py`** (chuẩn hoá chữ, đổi tên xã → mã,
 chọn đích theo nơi có dữ liệu, ghi CSV đúng kiểu xuống dòng). Thêm huyện mới thì chỉ viết đoạn ĐỌC FILE
 rồi gọi `tao_bang(dong, ra_csv)`.

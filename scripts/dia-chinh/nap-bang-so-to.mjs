@@ -15,6 +15,12 @@
 //     22453,59,22441,2
 // Cột xã ghi TÊN (không cần dấu, không cần chữ "xã/phường") hoặc ghi thẳng MÃ XÃ — cách nào cũng được.
 //
+// Có thể thêm 2 CỘT NỮA (không bắt buộc):
+//     … , tên xã cũ THẬT theo bảng giấy , số tờ cũ THẬT
+// Dùng khi CHỖ ĐI TÌM dữ liệu khác với ĐIỀU BẢNG GIẤY GHI — đúng cảnh Ninh Hoà và Vạn Ninh:
+// xã cũ không có file riêng nên phải tìm trong file xã mới theo số tờ mới, nhưng khi hiện lên
+// web vẫn phải ghi đúng "Trước sáp nhập: xã Đại Lãnh · tờ cũ 1". Bỏ trống = hai cái trùng nhau.
+//
 // CHẠY:
 //     node scripts/dia-chinh/nap-bang-so-to.mjs bang-cua-xa.csv > nap.sql
 //     docker compose exec -T postgis psql -U camlam -d camlam_gis < nap.sql
@@ -85,13 +91,16 @@ noiDung.trim().split(/\r?\n/).forEach((l, i) => {
   if (!l.trim()) return;
   const c = l.split(/\t|,|;/).map((x) => x.trim().replace(/^"|"$/g, ''));
   if (c.length < 4) { loi.push(`dòng ${i + 1}: cần 4 cột, thấy ${c.length}`); return; }
-  const [aXaMoi, aToMoi, aXaCu, aToCu] = c;
+  const [aXaMoi, aToMoi, aXaCu, aToCu, aTenCu, aToCuThat] = c;
   if (!/^\d+$/.test(aToMoi) || !/^\d+$/.test(aToCu)) return;   // bỏ qua dòng tiêu đề
   const xm = timXa(aXaMoi, 2), xc = timXa(aXaCu, 3);
   if (!xm) { loi.push(`dòng ${i + 1}: không nhận ra xã mới "${aXaMoi}"`); return; }
   if (!xc) { loi.push(`dòng ${i + 1}: không nhận ra xã cũ "${aXaCu}"`); return; }
   xaMoiGap.add(xm.ma);
-  dong.push(`('${xm.ma}', ${Number(aToMoi)}, '${xc.ma}', ${Number(aToCu)})`);
+  const nhay = (v) => `'${String(v).replace(/'/g, "''")}'`;
+  const tenCu = (aTenCu || '').trim() ? nhay(aTenCu.trim()) : 'NULL';
+  const toCuThat = /^\d+$/.test(String(aToCuThat || '').trim()) ? Number(aToCuThat) : 'NULL';
+  dong.push(`('${xm.ma}', ${Number(aToMoi)}, '${xc.ma}', ${Number(aToCu)}, ${tenCu}, ${toCuThat})`);
 });
 
 if (loi.length) { loi.slice(0, 20).forEach((x) => console.error('! ' + x)); if (loi.length > 20) console.error(`! …và ${loi.length - 20} dòng nữa`); }
@@ -102,9 +111,12 @@ CREATE TABLE IF NOT EXISTS dia_chinh_to (
   xa_moi_id TEXT NOT NULL, to_moi INT NOT NULL,
   xa_cu_id TEXT NOT NULL,  to_cu  INT NOT NULL,
   PRIMARY KEY (xa_moi_id, to_moi));
+-- Hai cột "sự thật theo giấy tờ" (xem migrate.ts). Chạy trên database cũ chưa có cột thì thêm vào.
+ALTER TABLE dia_chinh_to ADD COLUMN IF NOT EXISTS ten_xa_cu TEXT;
+ALTER TABLE dia_chinh_to ADD COLUMN IF NOT EXISTS to_cu_that INT;
 -- Nạp lại xã nào thì xoá sạch xã đó trước → chạy lại nhiều lần vẫn không nhân đôi.
 DELETE FROM dia_chinh_to WHERE xa_moi_id IN (${[...xaMoiGap].map((m) => `'${m}'`).join(',')});
-INSERT INTO dia_chinh_to (xa_moi_id, to_moi, xa_cu_id, to_cu) VALUES
+INSERT INTO dia_chinh_to (xa_moi_id, to_moi, xa_cu_id, to_cu, ten_xa_cu, to_cu_that) VALUES
 ${dong.join(',\n')};
 CREATE INDEX IF NOT EXISTS dia_chinh_to_nguoc_idx ON dia_chinh_to (xa_cu_id, to_cu);
 

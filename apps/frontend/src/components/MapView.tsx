@@ -191,6 +191,29 @@ export default function MapView({ center, zoom, className, layers = [], markers 
   const didFitRef = useRef(false);
   const zCanhRef = useRef(-1); // mức phóng lần cuối đã lọc nhãn độ dài cạnh
 
+  // ── PHÂN BIỆT "LƯỚT BẢN ĐỒ" VỚI "BẤM CHỌN THỬA" ─────────────────────────────
+  // Với CHUỘT thì thư viện bản đồ tự lo: kéo quá 3 điểm ảnh là nó bỏ qua cú bấm.
+  // Nhưng với NGÓN TAY thì hỏng: lướt xong nhả tay ra, trình duyệt còn bắn thêm một bộ
+  // "chuột giả" (mousedown + mouseup + click) NGAY TẠI CHỖ NHẢ TAY. Thư viện chỉ so chỗ
+  // bấm chuột với chỗ nhả chuột — hai chỗ này trùng nhau — nên nó tưởng người dùng vừa
+  // bấm đứng yên → mở luôn bảng thông tin thửa. Đây chính là lỗi "kéo lướt mà dính chọn thửa".
+  // Cách chặn: nhớ chỗ ĐẶT NGÓN TAY lúc bắt đầu, tới lúc có cú bấm thì so với chỗ đó.
+  // Cú "chuột giả" sinh ra từ chạm phải bị bỏ qua, nếu không nó ghi đè mất chỗ đặt tay.
+  const NGUONG_CHUOT = 5, NGUONG_CHAM = 12; // điểm ảnh
+  const CHO_CHUOT_GIA = 800;                // ms — trong khoảng này mọi sự kiện chuột đều là giả
+  const diemDat = useRef<{ x: number; y: number; cham: boolean } | null>(null);
+  const lucChamCuoi = useRef(0);
+  const daKeo = useRef(false);
+  // CHỈ ĐỌC, không xoá dấu vết — vì một cú bấm có thể chạy qua nhiều chỗ xử lý (bấm nền bản đồ,
+  // bấm trúng tuyến đường…), xoá ở chỗ đầu thì chỗ sau lại tưởng là bấm thật. Dấu vết được
+  // đặt lại ở lần đặt tay kế tiếp.
+  function laKeoChuKhongPhaiBam(e: any): boolean {
+    if (daKeo.current) return true;
+    const d = diemDat.current;
+    if (!d || !e?.point) return false;
+    return Math.hypot(e.point.x - d.x, e.point.y - d.y) > (d.cham ? NGUONG_CHAM : NGUONG_CHUOT);
+  }
+
   // Khớp khung đúng vùng quy hoạch ngay khi mở (chỉ chạy 1 lần, khi container đã có kích thước thật).
   function tryInitialFit() {
     const map = mapRef.current, c = containerRef.current, b = initialBoundsRef.current;
@@ -248,9 +271,28 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       syncBase(); syncOverlays(); syncLayers(); syncDiaChinh(); syncRoutes(); tryInitialFit();
       map.on('zoom', locCanhTheoZoom);
     });
+    // Ghi lại chỗ ĐẶT tay/chuột để lát nữa so với chỗ nhả ra (xem laKeoChuKhongPhaiBam).
+    map.on('touchstart', (e: any) => {
+      lucChamCuoi.current = Date.now();
+      diemDat.current = e?.point ? { x: e.point.x, y: e.point.y, cham: true } : null;
+      daKeo.current = false;
+    });
+    map.on('touchend', () => { lucChamCuoi.current = Date.now(); });
+    map.on('mousedown', (e: any) => {
+      // Vừa chạm xong → đây là "chuột giả" do trình duyệt bịa ra, KHÔNG được ghi đè chỗ đặt ngón tay.
+      if (Date.now() - lucChamCuoi.current < CHO_CHUOT_GIA) return;
+      diemDat.current = e?.point ? { x: e.point.x, y: e.point.y, cham: false } : null;
+      daKeo.current = false;
+    });
+    // Xoay hoặc phóng bằng tay (chụm hai ngón, lăn chuột, bấm đúp) thì chắc chắn không phải
+    // chọn thửa. Riêng KÉO thì KHÔNG chặn ở đây mà để phép đo quãng đường bên dưới lo:
+    // bản đồ nhúc nhích 2–3 điểm ảnh do rung tay vẫn phải tính là một cú bấm bình thường.
+    map.on('rotatestart', () => { daKeo.current = true; });
+    map.on('zoomstart', (e: any) => { if (e?.originalEvent) daKeo.current = true; });
     map.on('click', (e) => {
       const tgt = e.originalEvent?.target as HTMLElement | null;
       if (tgt && tgt.closest && tgt.closest('.maplibregl-marker')) return; // bấm trúng marker (pin giá, quảng cáo, điểm lưu) → chỉ mở popup của nó, KHÔNG xử lý như click bản đồ
+      if (laKeoChuKhongPhaiBam(e)) return;                                // đang lướt bản đồ chứ không chọn thửa
       if (measureModeRef.current !== 'off') addMeasurePoint(e.lngLat.lng, e.lngLat.lat);
       else if (onMapClick) onMapClick(e.lngLat.lng, e.lngLat.lat);
     });
@@ -383,6 +425,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       // Bấm vào tuyến xám → chọn tuyến đó. Vùng bấm là nét trắng to nên ngón tay dễ trúng.
       const bam = (e: any) => {
         const f = e.features && e.features[0]; if (!f) return;
+        if (laKeoChuKhongPhaiBam(e)) return;   // đang kéo bản đồ, không phải chọn tuyến
         e.originalEvent?.stopPropagation?.();
         onPickRouteRef.current?.(Number(f.properties?.id));
       };

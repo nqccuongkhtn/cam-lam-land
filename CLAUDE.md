@@ -412,6 +412,14 @@ Kiểm tra nhanh trong Console: `Object.values(__banDo.style.sourceCaches['src-d
 - Diện tích ghi giữa thửa trên bản đồ lấy **đúng con số máy chủ đo** (`dienTichChinhThuc`), không tự tính lại
   — trước đây tự tính nên lệch vài mét vuông so với bảng "Thông tin thửa".
 - Danh sách xã lấy từ database, **không còn ghi cứng** trong code như trước (trước chỉ có 4 xã mới + 14 xã cũ của Cam Lâm).
+- **Lướt bản đồ trên điện thoại KHÔNG được tính là bấm chọn thửa** (`MapView.tsx`). Thư viện bản đồ
+  tự lo phần chuột (kéo quá 3 điểm ảnh là bỏ qua cú bấm), nhưng với NGÓN TAY thì hỏng: lướt xong
+  nhả tay ra, trình duyệt còn bắn thêm một bộ **"chuột giả"** (mousedown + mouseup + click) **ngay tại
+  chỗ nhả tay** — thư viện chỉ so chỗ bấm với chỗ nhả, hai chỗ trùng nhau nên tưởng người dùng bấm
+  đứng yên → mở bảng thông tin thửa. Cách chặn: nhớ chỗ ĐẶT NGÓN TAY lúc `touchstart`, và **bỏ qua mọi
+  sự kiện chuột trong 800ms sau khi chạm** (nếu không, chuột giả ghi đè mất chỗ đặt tay). Ngưỡng:
+  chuột 5 điểm ảnh, ngón tay 12. Đã thử 7 trường hợp: bấm/gõ đứng yên và gõ rung tay 6px vẫn chọn được;
+  kéo chuột 160px, lướt tay 25px/160px/300px đều không chọn.
 - Gõ `__banDo` trong Console trình duyệt để soi bản đồ khi cần tìm sự cố.
 
 ---

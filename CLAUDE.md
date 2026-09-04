@@ -273,7 +273,8 @@ Ngoài bảng: **Tây Ninh Hoà tờ 1–3** (43 thửa) — bảng bắt đầu
 ⚠️ **HAI BẪY KHI ĐỌC FILE EXCEL CỦA SỞ** (đã vấp cả hai):
 1. **Chữ tiếng Việt gõ tách dấu (NFD)** — vài sheet lưu kiểu này, so tên xã kiểu thường sẽ trượt và
    **mất trắng khối đầu tiên** của sheet đó (lần đầu mất 168 dòng mà không có lỗi gì). Phải `normalize('NFC')`.
-2. **Xuống dòng kiểu Windows (CRLF)** — file CSV ghi bằng Python trên Windows mặc định ra `
+2. **Xuống dòng kiểu Windows (CRLF)** — file CSV ghi bằng Python trên Windows mặc định ra `
+
 `,
    `psql \copy` báo `unquoted newline found in data` và **không nạp dòng nào**, nhưng câu kiểm tra sau đó
    vẫn chạy nên nhìn như "thiếu hàng loạt". Phải ghi `newline='
@@ -408,6 +409,23 @@ Có **ba cách tính, xếp theo thứ tự ưu tiên**:
 2. **Cách B (dự phòng)** — SQL PostGIS: `ST_Intersection` giữa thửa và các ô quy hoạch, phần thửa trống
    còn lại coi là "Đất giao thông".
 3. Nếu dữ liệu vector **đã có ô "Đất giao thông" thật** thì dùng thẳng, không bịa phần trống.
+
+### ⚠️ QUY HOẠCH CHỈ CÓ Ở HUYỆN CAM LÂM CŨ — ngoài vùng phải nói "chưa có", không được đoán
+Dữ liệu QH duy nhất đang có là **QĐ205 (huyện Cam Lâm cũ)**. Nhưng cách C có một nhánh
+"điểm xa mọi ô đất ⇒ **Đất giao thông**" (đúng khi ở trong huyện, vì khoảng trống giữa các ô là lòng đường).
+Khi bấm vào thửa ở **Nha Trang, Cam Ranh, Ninh Hoà…** thì MỌI điểm đều rơi vào nhánh đó
+→ web hiện **"Đất giao thông" phủ kín cả thửa**, nhìn y như kết quả thật. Đã sửa 4/9/2026:
+- `qhCompute.ts` có hàm **`ngoaiVungQh(ring)`**: quanh thửa trong bán kính **~550m** không có ô đất QH nào
+  ⇒ ngoài vùng ⇒ `computeQhAreas` trả `null` ngay, không tính gì.
+  Lấy 550m chứ không phải 50m vì trong huyện Cam Lâm có khoảng trống rộng hơn trăm mét (hành lang đường
+  lớn, mặt nước) — ngưỡng hẹp là mấy thửa đó bị hiểu nhầm thành "chưa có dữ liệu". Đo thử: thửa Nha Trang
+  và Cam Ranh cách ô QH gần nhất **hơn 1 km**, nên hai bên vẫn tách bạch rõ.
+- `/api/parcels/at` trả thêm cờ **`qhNgoaiVung`**; trang bản đồ hiện dòng "Khu vực này **chưa có dữ liệu
+  quy hoạch**…" và **ẩn nút xuất phiếu trích lục** (phiếu ghi sẵn tên QĐ205 nên in ra là phiếu sai).
+- **Kiểm tra khi sửa phần này:** 60 thửa Cam Lâm ngẫu nhiên phải ra QH **y như trước** (0 thửa bị gắn
+  "ngoài vùng"), còn thửa Nha Trang / Cam Ranh phải ra rỗng + `qhNgoaiVung=true`.
+- Nhân tiện sửa luôn một lỗi cũ: hai câu SQL tính QH dự phòng đọc cứng `gis_features WHERE id=$1`, trong
+  khi thửa địa chính nằm ở bảng `dia_chinh` → **nhầm bảng**, mã trùng nhau là lấy phải hình thửa khác.
 
 **Dữ liệu bắt buộc phải có:** `apps/backend/data/qh_zones.json`, `road_mask.bin`, `road_mask.json`
 (đường dẫn đọc theo `QH_DATA_DIR`, mặc định `<thư mục chạy>/data`; trong container là `/app/apps/backend/data`).

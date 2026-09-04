@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
+import { cached, cachePut } from '../lib/cache.ts';
 import { vnNoAccent } from '../lib/vn.ts';
-import { computeQhAreas, outerRing, qhReady } from '../lib/qhCompute.ts';
+import { verifyToken, coVaiTro } from '../lib/auth.ts';
+import { computeQhAreas, outerRing, qhReady, ngoaiVungQh } from '../lib/qhCompute.ts';
 
 export const parcelsRouter = Router();
 
@@ -70,14 +72,58 @@ parcelsRouter.get('/at', async (req, res, next) => {
     if (Number.isNaN(lng) || Number.isNaN(lat)) return res.status(400).json({ error: 'lng and lat required' });
     const pt = `ST_SetSRID(ST_MakePoint($1,$2),4326)`;
     const coal = (keys: string[]) => `COALESCE(${keys.map((k) => `NULLIF(f.properties->>'${k}','')`).join(',')})`;
-    const [parcel] = await query(`
-      SELECT f.id, f.properties, ST_AsGeoJSON(f.geom)::json AS geometry, l.name AS layer_name,
-             ROUND(ST_Area(f.geom::geography)::numeric, 1) AS "areaM2",
-             ${coal(KEYS_TO)} AS "soTo", ${coal(KEYS_THUA)} AS "soThua", ${coal(KEYS_XA)} AS "xa"
-      FROM gis_features f JOIN gis_layers l ON l.id=f.layer_id
-      WHERE l.layer_type IN ('parcel','custom') AND ST_Contains(f.geom, ${pt})
-        AND (${coal(KEYS_TO)} IS NOT NULL OR ${coal(KEYS_THUA)} IS NOT NULL)
-      ORDER BY (l.layer_type='parcel') DESC LIMIT 1`, [lng, lat]);
+    // ── TÌM THỬA TẠI ĐIỂM BẤM ──
+    // Ưu tiên BẢNG ĐỊA CHÍNH TOÀN TỈNH (dia_chinh, 733 nghìn thửa) vì có chỉ mục riêng nên rất nhanh.
+    // Không thấy mới lùi về các lớp cũ nạp qua trang quản trị (gis_features).
+    let parcel: any = null;
+    let tuBangMoi = false;
+    // Lấy CẢ HAI tên: tên xã ghi trong dữ liệu gốc (có thể là đơn vị CŨ) và tên đơn vị
+    // HIỆN HÀNH sau sáp nhập 1/7/2025 — hai cái này khác nhau ở 83/147 xã, trước đây web
+    // lấy nhầm tên cũ rồi ghi là "Khu vực mới" nên hiện sai.
+    const [dc] = await query(`
+      SELECT d.id, d.so_to AS "soTo", d.so_thua AS "soThua", d.mdsd, d.dien_tich,
+             x.ten AS "xa", x.cap, x.huyen, x.ten_goc AS "tenGoc",
+             xm.ten AS "xaMoi", xm.xa_id AS "xaMoiId",
+             tt.to_moi AS "soToMoi",   -- số tờ theo bản đồ MỚI (nếu xã đó đã có bảng tra)
+             xm.so_xa_gop AS "soXaGop", -- xã mới này gộp từ mấy xã cũ (1 = không thể trùng số tờ)
+             ST_AsGeoJSON(d.geom)::json AS geometry,
+             ROUND(ST_Area(d.geom::geography)::numeric, 1) AS "areaM2"
+      FROM dia_chinh d
+      LEFT JOIN dia_chinh_xa x  ON x.xa_id  = d.xa_id
+      LEFT JOIN dia_chinh_xa xm ON xm.xa_id = d.xa_moi_id
+      -- Đổi số tờ CŨ (đang lưu trong dữ liệu) sang số tờ MỚI của xã sau sáp nhập.
+      -- Khớp cả xa_moi_id vì một tờ cũ bị ranh xã mới cắt qua thì nằm ở hai xã mới với hai số khác nhau.
+      LEFT JOIN dia_chinh_to tt ON tt.xa_cu_id = d.xa_id AND tt.to_cu = d.to_num AND tt.xa_moi_id = d.xa_moi_id
+      WHERE ST_Intersects(d.geom, ${pt}) LIMIT 1`, [lng, lat]).catch(() => [] as any[]);
+    if (dc) {
+      tuBangMoi = true;
+      const laCu = Number(dc.cap) === 3;
+      // File mang tên xã MỚI thật ra chứa đất của xã cũ đã bị "nuốt mã" (vd file "Xã Cam Hiệp"
+      // chứa đất xã Cam Tân cũ). Danh mục của Sở có sẵn tên gốc đó → hiện cho đúng.
+      const tenTruoc = laCu ? dc.xa : (dc.tenGoc || null);
+      // Dựng lại khối "properties" y như dữ liệu cũ để phần giao diện không phải sửa gì.
+      parcel = { ...dc, layer_name: dc.xaMoi || dc.xa || 'Bản đồ địa chính',
+        soToMoi: dc.soToMoi == null ? null : String(dc.soToMoi),   // null = xã này chưa có bảng tra số tờ
+        // Chỉ xã GỘP TỪ NHIỀU XÃ CŨ mới phải đánh lại số tờ. Xã chỉ gồm 1 xã cũ thì số tờ giữ nguyên,
+        // không cần bảng tra và cũng không nên nhắc gì cho khỏi nhiễu.
+        canBangTraSoTo: Number(dc.soXaGop) > 1 && dc.soToMoi == null,
+        xaCu: tenTruoc,                   // tên đơn vị CŨ của mảnh đất này
+        huyenCu: laCu ? dc.huyen : null,  // huyện/TP cũ
+        properties: { to: dc.soTo, thua: dc.soThua, xa: dc.xaMoi || dc.xa, xaCu: tenTruoc,
+                      mucDichSuDung: dc.mdsd || '',
+                      dienTich_m2: dc.dien_tich == null ? null : Number(dc.dien_tich),
+                      nhan: `Tờ ${dc.soTo}, thửa ${dc.soThua}` } };
+      parcel.xa = dc.xaMoi || dc.xa;      // "xa" giờ LUÔN là đơn vị hiện hành
+    } else {
+      [parcel] = await query(`
+        SELECT f.id, f.properties, ST_AsGeoJSON(f.geom)::json AS geometry, l.name AS layer_name,
+               ROUND(ST_Area(f.geom::geography)::numeric, 1) AS "areaM2",
+               ${coal(KEYS_TO)} AS "soTo", ${coal(KEYS_THUA)} AS "soThua", ${coal(KEYS_XA)} AS "xa"
+        FROM gis_features f JOIN gis_layers l ON l.id=f.layer_id
+        WHERE l.layer_type IN ('parcel','custom') AND ST_Contains(f.geom, ${pt})
+          AND (${coal(KEYS_TO)} IS NOT NULL OR ${coal(KEYS_THUA)} IS NOT NULL)
+        ORDER BY (l.layer_type='parcel') DESC LIMIT 1`, [lng, lat]);
+    }
     // Mặt nạ "vùng đã có QH" (nội thị) — KHÔNG phải loại đất; dùng để suy ra Đất giao thông
     // (đường = phần thửa trống nằm giữa các ô đất, giống app tham chiếu).
     const MASK = `(f.properties->>'bg'='true' OR f.properties->>'loai'='Đất nội thị (chưa phân loại)' OR f.properties->>'lo'='Noi thi')`;
@@ -95,15 +141,22 @@ parcelsRouter.get('/at', async (req, res, next) => {
     const IA = `ST_Area(ST_CollectionExtract(ST_Union(ST_Intersection(ST_MakeValid(f.geom), p.geom)),3)::geography)`;
     // Chồng lấn quy hoạch: thửa đè lên những ô đất nào, mỗi loại bao nhiêu m²
     let overlaps: any[] = [];
-    if (parcel) {
+    // Bảng chứa hình thửa: thửa lấy từ bản đồ địa chính mới thì nằm ở dia_chinh, còn lại ở gis_features.
+    // (Trước đây mấy câu tính quy hoạch dự phòng bên dưới luôn đọc gis_features — với thửa địa chính
+    //  thì đó là NHẦM BẢNG, mã số trùng nhau là lấy phải hình của thửa khác.)
+    const bangThua = tuBangMoi ? 'dia_chinh' : 'gis_features';
+    // Thửa nằm ngoài vùng đã có dữ liệu quy hoạch (hiện chỉ có huyện Cam Lâm cũ)?
+    const ringThua = outerRing((parcel as any)?.geometry) || [];
+    const ngoaiQh = !!parcel && ngoaiVungQh(ringThua);
+    if (parcel && !ngoaiQh) {
       // ƯU TIÊN: diện tích QH theo ĐƯỜNG THẬT (QĐ205 cố định) — chạy TƯƠI theo hình thửa hiện tại.
       // Nhờ vậy đổi/nạp bản đồ địa chính mới vẫn đúng, KHÔNG cần tính sẵn lại. Thiếu dữ liệu đường → rơi về cách cũ.
-      const _pre = qhReady() ? computeQhAreas(outerRing((parcel as any).geometry) || [], Number((parcel as any).areaM2) || 0) : null;
+      const _pre = qhReady() ? computeQhAreas(ringThua, Number((parcel as any).areaM2) || 0) : null;
       if (_pre && _pre.length) {
         overlaps = _pre.map((o) => ({ layer: 'Quy hoạch', type: o.type, hz: o.hz, areaM2: o.areaM2 }));
       } else {
       overlaps = await query(`
-        WITH p AS (SELECT ST_MakeValid(geom) AS geom FROM gis_features WHERE id=$1)
+        WITH p AS (SELECT ST_MakeValid(geom) AS geom FROM ${bangThua} WHERE id=$1)
         SELECT ${TYPE} AS type, NULLIF(f.properties->>'hz','') AS hz,
                ROUND(${IA}::numeric, 1) AS "areaM2"
         FROM gis_features f JOIN gis_layers l ON l.id=f.layer_id, p
@@ -113,7 +166,7 @@ parcelsRouter.get('/at', async (req, res, next) => {
         ORDER BY "areaM2" DESC`, [parcel.id]);
       // Đất giao thông = (thửa ∩ mặt nạ nội thị) − (thửa ∩ các ô đất)
       const [gt] = await query(`
-        WITH p AS (SELECT ST_MakeValid(geom) AS geom FROM gis_features WHERE id=$1),
+        WITH p AS (SELECT ST_MakeValid(geom) AS geom FROM ${bangThua} WHERE id=$1),
         m AS (SELECT COALESCE(${IA},0) a
               FROM gis_features f JOIN gis_layers l ON l.id=f.layer_id, p
               WHERE l.layer_type='zoning' AND ${MASK} AND ST_Intersects(f.geom,p.geom)),
@@ -140,7 +193,16 @@ parcelsRouter.get('/at', async (req, res, next) => {
     }
     // Thửa liền kề (tiếp giáp ranh) → ghi số hiệu quanh sơ đồ trích lục.
     let neighbors: any[] = [];
-    if (parcel) {
+    if (parcel && tuBangMoi) {
+      // Thửa liền kề trong bảng địa chính mới — chỉ tìm quanh thửa đang xem nên rất nhanh.
+      neighbors = await query(`
+        SELECT d.so_thua AS "so",
+               ST_X(ST_PointOnSurface(d.geom)) AS lng, ST_Y(ST_PointOnSurface(d.geom)) AS lat
+        FROM dia_chinh d, (SELECT geom FROM dia_chinh WHERE id=$1) p
+        WHERE d.id <> $1 AND d.so_thua IS NOT NULL
+          AND d.geom && p.geom AND ST_Touches(d.geom, p.geom)
+        LIMIT 16`, [parcel.id]).catch(() => [] as any[]);
+    } else if (parcel) {
       neighbors = await query(`
         SELECT ${coal(KEYS_THUA)} AS "so",
                ST_X(ST_PointOnSurface(ST_CollectionExtract(ST_MakeValid(f.geom),3))) AS lng,
@@ -161,25 +223,38 @@ parcelsRouter.get('/at', async (req, res, next) => {
     if (zoningOut?.loai && RENAME_LOAI[zoningOut.loai]) zoningOut = { ...zoningOut, loai: RENAME_LOAI[zoningOut.loai] };
     const linked = parcel
       ? await query(`SELECT id,title,price,property_type AS "propertyType", ST_X(geom) lng, ST_Y(geom) lat
-          FROM listings WHERE status<>'hidden' AND ST_Contains((SELECT geom FROM gis_features WHERE id=$1), geom)`, [parcel.id])
+          FROM listings WHERE status<>'hidden' AND ST_Contains((SELECT geom FROM ${bangThua} WHERE id=$1), geom)`, [parcel.id])
       : await query(`SELECT id,title,price,property_type AS "propertyType", ST_X(geom) lng, ST_Y(geom) lat
           FROM listings WHERE status<>'hidden' AND ST_DWithin(geom::geography, ${pt}::geography, 300)`, [lng, lat]);
     if (!parcel && !zoningOut && overlaps.length === 0 && linked.length === 0)
       return res.json({ found: false, point: { lng, lat }, parcel: null, zoning: null, overlaps: [], listings: [] });
-    res.json({ found: true, point: { lng, lat }, parcel: parcel ?? null, zoning: zoningOut, overlaps, neighbors, listings: linked });
+    // qhNgoaiVung = thửa nằm NGOÀI vùng đã có dữ liệu quy hoạch (hiện chỉ có huyện Cam Lâm cũ).
+    // Giao diện dựa vào cờ này để nói thẳng "chưa có dữ liệu", thay vì im lặng để người xem
+    // tưởng thửa không dính quy hoạch gì.
+    res.json({ found: true, point: { lng, lat }, parcel: parcel ?? null, zoning: zoningOut, overlaps, neighbors, listings: linked,
+               qhNgoaiVung: ngoaiQh && overlaps.length === 0 });
   } catch (e) { next(e); }
 });
 
-// GET /api/parcels/dia-ban — danh sách {cap, huyen, xa} có trong dữ liệu thửa (cho ô chọn xã theo cấp)
-parcelsRouter.get('/dia-ban', async (_req, res, next) => {
+// GET /api/parcels/dia-ban — danh sách xã có trong dữ liệu thửa (cho ô chọn xã theo cấp)
+// TRƯỚC ĐÂY: gom nhóm thẳng trên bảng gis_features → phải quét TOÀN BỘ bảng mỗi lần ai đó mở
+// trang bản đồ. Với 733 nghìn thửa thì đó là truy vấn nặng nhất hệ thống, mở bản đồ sẽ đứng hình.
+// GIỜ: đọc bảng danh mục dia_chinh_xa (147 dòng, đã tính sẵn) → gần như tức thì.
+parcelsRouter.get('/dia-ban', async (req, res, next) => {
   try {
+    // Số thửa của từng xã là thông tin nội bộ → chỉ quản trị viên mới nhận được con số.
+    const h = String(req.headers.authorization || '');
+    const nguoi = h.startsWith('Bearer ') ? verifyToken(h.slice(7)) : null;
+    const quanLy = coVaiTro(nguoi as any, 'admin', 'gis');
+    const KEY = quanLy ? 'parcels:dia-ban:admin' : 'parcels:dia-ban';
+    const san = cached<any>(KEY);
+    if (san) return res.json(san);
     const rows = await query(`
-      SELECT ${coalKeys(KEYS_CAP)} AS cap, ${coalKeys(KEYS_HUYEN)} AS huyen, ${coalKeys(KEYS_XA)} AS xa,
-             COUNT(*)::int AS "count"
-      FROM gis_features f JOIN gis_layers l ON l.id=f.layer_id
-      WHERE l.layer_type IN ('parcel','custom') AND ${coalKeys(KEYS_XA)} IS NOT NULL
-      GROUP BY cap, huyen, xa
-      ORDER BY cap NULLS LAST, huyen NULLS LAST, xa`);
-    res.json({ list: rows });
+      SELECT cap::text AS cap, huyen, ten AS xa, so_thua AS "count", xa_id AS "xaId"
+      FROM dia_chinh_xa WHERE so_thua > 0 ORDER BY cap, huyen, ten`).catch(() => [] as any[]);
+    const out = { list: rows.map((r: any) => quanLy ? r : { cap: r.cap, huyen: r.huyen, xa: r.xa, xaId: r.xaId }) };
+    cachePut(KEY, out, 10 * 60 * 1000);
+    if (quanLy) res.setHeader('Cache-Control', 'private, no-store');
+    res.json(out);
   } catch (e) { next(e); }
 });

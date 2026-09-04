@@ -15,11 +15,18 @@ type Zone = [number, number, number, number, number[][], string, number, number]
 let ZONE: Zone[] = [];
 const zoneIdx = new Map<string, number[]>();
 let ready = false;
+// Khung bao của TOÀN BỘ dữ liệu quy hoạch (hiện chỉ có QĐ205 — huyện Cam Lâm cũ).
+// Ra ngoài khung này là KHÔNG CÓ dữ liệu quy hoạch, phải nói thẳng "chưa có" chứ tuyệt đối
+// không được đoán. Trước đây thiếu khung này nên một thửa ở Nha Trang bị trả về
+// "Đất giao thông" phủ kín cả thửa — nhìn như kết quả thật, rất dễ tin nhầm.
+let zX0 = Infinity, zY0 = Infinity, zX1 = -Infinity, zY1 = -Infinity;
 
 try {
   ZONE = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'qh_zones.json'), 'utf-8'));
   for (let k = 0; k < ZONE.length; k++) {
     const z = ZONE[k];
+    if (z[0] < zX0) zX0 = z[0]; if (z[1] < zY0) zY0 = z[1];
+    if (z[2] > zX1) zX1 = z[2]; if (z[3] > zY1) zY1 = z[3];
     const gx0 = Math.floor(z[0] / CELL), gx1 = Math.floor(z[2] / CELL);
     const gy0 = Math.floor(z[1] / CELL), gy1 = Math.floor(z[3] / CELL);
     for (let gx = gx0; gx <= gx1; gx++) for (let gy = gy0; gy <= gy1; gy++) {
@@ -27,7 +34,7 @@ try {
     }
   }
   ready = ZONE.length > 0;
-  console.log(`[qhCompute] nạp ${ZONE.length} ô đất QH`);
+  console.log(`[qhCompute] nạp ${ZONE.length} ô đất QH · phạm vi ${zX0.toFixed(4)},${zY0.toFixed(4)} → ${zX1.toFixed(4)},${zY1.toFixed(4)}`);
 } catch (e: any) {
   console.log('[qhCompute] thiếu qh_zones.json → dùng cách cũ:', e?.message || e);
 }
@@ -45,6 +52,34 @@ try {
 }
 
 export function qhReady() { return ready; }
+
+// Thửa này có nằm trong vùng ĐÃ CÓ dữ liệu quy hoạch không?
+// Chưa nạp dữ liệu QH thì coi như KHÔNG có vùng nào → mọi nơi đều "ngoài vùng".
+//
+// ⚠️ CHỈ so KHUNG BAO là KHÔNG ĐỦ: khung bao của QĐ205 là hình chữ nhật, trùm cả một phần
+// Cam Ranh và nam Nha Trang — mấy chỗ đó không hề có ô đất quy hoạch nào nhưng vẫn lọt.
+// Nên sau bước loại nhanh bằng khung bao, phải hỏi tiếp: quanh thửa có ô đất QH nào không.
+const NOI = 0.001; // ~110m, nới quanh khung bao để thửa sát mép vẫn tính là trong vùng
+export function ngoaiVungQh(ring: number[][] | null | undefined): boolean {
+  if (!ready) return true;
+  if (!ring || ring.length < 3) return false;   // không biết hình thửa thì đừng kết luận
+  let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
+  for (const c of ring) { if (c[0] < minx) minx = c[0]; if (c[0] > maxx) maxx = c[0]; if (c[1] < miny) miny = c[1]; if (c[1] > maxy) maxy = c[1]; }
+  if (maxx < zX0 - NOI || minx > zX1 + NOI || maxy < zY0 - NOI || miny > zY1 + NOI) return true;
+  // Quanh thửa (bán kính ~550m) có ô đất quy hoạch nào không? Chỉ cần có một ô là coi như
+  // khu vực này ĐÃ có dữ liệu, phần trống bên trong vẫn tính theo cách cũ (lòng đường).
+  // Vì sao lấy tận 550m mà không phải 50m: trong huyện Cam Lâm có những khoảng trống rộng
+  // hơn trăm mét (hành lang đường lớn, mặt nước…), lấy ngưỡng hẹp là mấy thửa đó bị hiểu
+  // nhầm thành "chưa có dữ liệu". Còn Nha Trang, Cam Ranh thì cách ô gần nhất hàng cây số
+  // nên hai bên vẫn tách bạch rõ ràng.
+  const PHU = 0.005;
+  const gx0 = Math.floor((minx - PHU) / CELL), gx1 = Math.floor((maxx + PHU) / CELL);
+  const gy0 = Math.floor((miny - PHU) / CELL), gy1 = Math.floor((maxy + PHU) / CELL);
+  for (let gx = gx0; gx <= gx1; gx++) for (let gy = gy0; gy <= gy1; gy++) {
+    if (zoneIdx.has(`${gx},${gy}`)) return false;
+  }
+  return true;
+}
 
 // Đường tại điểm: 1=đường, 0=đất, null=ngoài phạm vi mask.
 function roadAt(x: number, y: number): 0 | 1 | null {
@@ -113,6 +148,10 @@ function nearestLand(x: number, y: number): string | null {
 // ring: [[lng,lat],…] WGS84 (ranh ngoài thửa); dienTich: diện tích thửa (m²) từ DB.
 export function computeQhAreas(ring: number[][], dienTich: number): { type: string; hz: string; areaM2: number }[] | null {
   if (!ready || !ring || ring.length < 3 || !(dienTich > 0)) return null;
+  // Ngoài phạm vi dữ liệu QH (vd Nha Trang, Ninh Hoà…) thì KHÔNG tính gì cả.
+  // Bỏ bước này là mọi điểm đều rơi vào nhánh "ngoài mặt nạ ⇒ Đất giao thông" bên dưới,
+  // thửa nào cũng ra "Đất giao thông" phủ kín — sai mà nhìn như thật.
+  if (ngoaiVungQh(ring)) return null;
   let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
   for (const c of ring) { if (c[0] < minx) minx = c[0]; if (c[0] > maxx) maxx = c[0]; if (c[1] < miny) miny = c[1]; if (c[1] > maxy) maxy = c[1]; }
   const N = 44; const cnt: Record<string, number> = {}; let ins = 0;
@@ -126,6 +165,9 @@ export function computeQhAreas(ring: number[][], dienTich: number): { type: stri
     else {
       const near = nearestLand(x, y);                        // ô QH gần nhất ≤50m (null nếu xa)
       if (near) lo = (r === 1) ? 'Đất giao thông' : near;    // trong vùng QH: lòng đường=gt, khe hở vẽ thiếu=ô gần nhất
+      // Điểm xa mọi ô đất: TRONG vùng quy hoạch thì đó là lòng đường (cách B) — giữ nguyên,
+      // vì đây là chỗ làm cho kết quả khớp app tham chiếu ±3%. Còn thửa nằm HẲN ngoài vùng
+      // quy hoạch thì đã bị chặn từ đầu hàm rồi, không xuống tới đây.
       else lo = (r === null) ? 'Đất giao thông' : 'Đất khác'; // ngoài mask→cách B; trong mask mà xa mọi ô⇒ngoài QĐ205
     }
     cnt[lo] = (cnt[lo] || 0) + 1;

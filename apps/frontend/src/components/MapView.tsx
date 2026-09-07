@@ -120,13 +120,6 @@ function polyArea(pts: { lng: number; lat: number }[]) {
 // MỘT MÀU DUY NHẤT (xanh neon). Không pha màu thứ hai — pha vào là thành đường đứt
 // quãng hai màu, mất hẳn cảm giác "đường neon đang chạy".
 const MAU_NEON = '#00e5ff';
-// Các bước nét đứt để làm vệt sáng CHẠY quanh viền (xem batVienChay).
-// Mỗi bước dịch nét đi một chút; hết vòng lại quay về bước đầu nên vệt chạy liên tục.
-const BUOC_CHAY: number[][] = [
-  [0, 4, 3], [0.5, 4, 2.5], [1, 4, 2], [1.5, 4, 1.5], [2, 4, 1], [2.5, 4, 0.5],
-  [3, 4, 0], [0, 0.5, 3, 3.5], [0, 1, 3, 3], [0, 1.5, 3, 2.5], [0, 2, 3, 2],
-  [0, 2.5, 3, 1.5], [0, 3, 3, 1], [0, 3.5, 3, 0.5],
-];
 
 // Lấy ranh NGOÀI của thửa + độ dài dồn từng đoạn, để chấm tròn chạy ĐỀU quanh viền
 // (không có bảng độ dài này thì chấm sẽ chạy nhanh ở cạnh ngắn, chậm ở cạnh dài).
@@ -243,14 +236,12 @@ export default function MapView({ center, zoom, className, layers = [], markers 
   const vienRef = useRef<ReturnType<typeof doVien>>(null);   // ranh thửa + độ dài dồn
   function batVienChay() {
     if (chayRef.current != null) return;                 // đang chạy rồi thì thôi
-    let b = 0, t = 0;
+    let t = 0;   // vị trí chấm tròn trên chu vi, 0 → 1
     chayRef.current = window.setInterval(() => {
       const map = mapRef.current;
-      if (!map || !map.getLayer('highlight-chay')) return;
+      if (!map || !map.getLayer('highlight-dau')) return;
       if (typeof document !== 'undefined' && document.hidden) return;   // trang bị ẩn → nghỉ
       try {
-        b = (b + 1) % BUOC_CHAY.length;
-        map.setPaintProperty('highlight-chay', 'line-dasharray', BUOC_CHAY[b]);
         // Chấm tròn bò dọc theo ranh thửa, hết một vòng là quay lại từ đầu.
         const v = vienRef.current;
         const src = map.getSource('highlight-dau') as maplibregl.GeoJSONSource | undefined;
@@ -349,16 +340,16 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       // trong (nhà, cây, đường đi) — trước đây tô vàng đục 35% che mất, ảnh vệ tinh gần như
       // không đọc được. Dấu hiệu nhận biết thửa nằm ở viền xanh + số đo cạnh là đủ rõ.
       map.addLayer({ id: 'highlight-fill', type: 'fill', source: 'highlight', filter: ['==', '$type', 'Polygon'], paint: { 'fill-color': '#00a2ff', 'fill-opacity': 0 } });
-      // BỐN LỚP, CÙNG MỘT MÀU NEON — chỉ khác độ dày và độ mờ:
-      //  1. quầng sáng toả ra (làm nên cảm giác đèn neon)
-      //  2. viền nền mờ (để lúc vệt sáng chưa chạy tới vẫn thấy ranh thửa)
-      //  3. vệt sáng chạy vòng quanh
-      //  4. chấm tròn dẫn đầu vệt sáng
-      map.addLayer({ id: 'highlight-quang', type: 'line', source: 'highlight', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': MAU_NEON, 'line-width': 9, 'line-opacity': 0.22, 'line-blur': 5 } });
-      map.addLayer({ id: 'highlight-line', type: 'line', source: 'highlight', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': MAU_NEON, 'line-width': 2.2, 'line-opacity': 0.45 } });
-      map.addLayer({ id: 'highlight-chay', type: 'line', source: 'highlight', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': MAU_NEON, 'line-width': 3, 'line-dasharray': BUOC_CHAY[0] } });
+      // BA LỚP, CÙNG MỘT MÀU NEON — KHÔNG nét đứt, KHÔNG màu thứ hai:
+      //  1. quầng sáng toả ra (nhoè) → cảm giác đèn neon
+      //  2. đường viền LIỀN MẠCH, đây chính là "tuyến"
+      //  3. chấm tròn chạy trên tuyến
+      map.addLayer({ id: 'highlight-quang', type: 'line', source: 'highlight', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': MAU_NEON, 'line-width': 10, 'line-opacity': 0.3, 'line-blur': 6 } });
+      map.addLayer({ id: 'highlight-line', type: 'line', source: 'highlight', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': MAU_NEON, 'line-width': 2.8 } });
       map.addSource('highlight-dau', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
-      map.addLayer({ id: 'highlight-dau', type: 'circle', source: 'highlight-dau', paint: { 'circle-radius': 4.5, 'circle-color': MAU_NEON, 'circle-blur': 0.35, 'circle-stroke-width': 1.6, 'circle-stroke-color': MAU_NEON, 'circle-stroke-opacity': 0.55 } });
+      // Chấm tròn: lõi đặc + vành sáng mờ quanh nó, vẫn cùng một màu.
+      map.addLayer({ id: 'highlight-dau-quang', type: 'circle', source: 'highlight-dau', paint: { 'circle-radius': 11, 'circle-color': MAU_NEON, 'circle-opacity': 0.3, 'circle-blur': 1 } });
+      map.addLayer({ id: 'highlight-dau', type: 'circle', source: 'highlight-dau', paint: { 'circle-radius': 5, 'circle-color': MAU_NEON } });
       // Kích thước thửa kiểu Guland: độ dài từng cạnh (dọc cạnh) + diện tích ở giữa
       map.addSource('highlight-dims', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
       // 'text-allow-overlap' để MẶC ĐỊNH (false) → chữ nào chồng lên chữ khác thì tự giấu bớt.
@@ -785,7 +776,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     const dsrc = map.getSource('highlight-dims') as maplibregl.GeoJSONSource | undefined;
     if (dsrc) dsrc.setData({ type: 'FeatureCollection', features: parcelDims(highlight) } as any);
     locCanhTheoZoom(true);
-    ['highlight-fill', 'highlight-quang', 'highlight-line', 'highlight-chay', 'highlight-dau', 'hl-edge', 'hl-area']
+    ['highlight-fill', 'highlight-quang', 'highlight-line', 'highlight-dau-quang', 'highlight-dau', 'hl-edge', 'hl-area']
       .forEach((id) => { if (map.getLayer(id)) map.moveLayer(id); });
     // Có thửa đang chọn thì cho vệt sáng + chấm tròn chạy quanh viền; bỏ chọn thì dừng hẳn cho đỡ tốn pin.
     vienRef.current = highlight ? doVien(highlight) : null;

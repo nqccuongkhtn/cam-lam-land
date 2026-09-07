@@ -116,6 +116,14 @@ function polyArea(pts: { lng: number; lat: number }[]) {
   return Math.abs(s) / 2;
 }
 
+// Các bước nét đứt để làm vạch CHẠY quanh viền thửa (xem batVienChay).
+// Mỗi bước dịch nét đi một chút; chạy hết vòng rồi quay lại bước đầu nên vệt sáng chạy liên tục.
+const BUOC_CHAY: number[][] = [
+  [0, 4, 3], [0.5, 4, 2.5], [1, 4, 2], [1.5, 4, 1.5], [2, 4, 1], [2.5, 4, 0.5],
+  [3, 4, 0], [0, 0.5, 3, 3.5], [0, 1, 3, 3], [0, 1.5, 3, 2.5], [0, 2, 3, 2],
+  [0, 2.5, 3, 1.5], [0, 3, 3, 1], [0, 3.5, 3, 0.5],
+];
+
 const WM_MIN_ZOOM = 14; // chữ mờ chỉ hiện khi zoom gần
 const WM_OPACITY = 0.55; // rõ hơn một chút cho dễ đọc
 // ==== Kích thước thửa (độ dài từng cạnh + diện tích) — hiển thị kiểu Guland ====
@@ -190,6 +198,30 @@ export default function MapView({ center, zoom, className, layers = [], markers 
   initialBoundsRef.current = initialBounds;
   const didFitRef = useRef(false);
   const zCanhRef = useRef(-1); // mức phóng lần cuối đã lọc nhãn độ dài cạnh
+
+  // ── VIỀN CHẠY QUANH THỬA ĐANG CHỌN (kiểu tuyến đang dẫn đường) ─────────────
+  // Một vạch trắng chạy vòng quanh viền xanh, y như tuyến đường trên app chỉ đường.
+  // Cách làm: cứ mỗi nhịp lại đổi kiểu nét đứt của lớp viền trắng, mỗi bước dịch nét đi một
+  // chút — mắt nhìn thành vệt sáng chạy. Chỉ chạy khi ĐANG chọn thửa; bỏ chọn, rời trang hay
+  // thu nhỏ trình duyệt là dừng ngay, không để nó quay vô ích làm nóng máy tốn pin điện thoại.
+  const NHIP_CHAY = 70; // ms mỗi bước — nhanh hơn nữa thì mắt không nhận ra mà tốn pin
+  const chayRef = useRef<number | null>(null);
+  function batVienChay() {
+    if (chayRef.current != null) return;                 // đang chạy rồi thì thôi
+    let b = 0;
+    chayRef.current = window.setInterval(() => {
+      const map = mapRef.current;
+      if (!map || !map.getLayer('highlight-chay')) return;
+      if (typeof document !== 'undefined' && document.hidden) return;   // trang bị ẩn → nghỉ
+      b = (b + 1) % BUOC_CHAY.length;
+      try { map.setPaintProperty('highlight-chay', 'line-dasharray', BUOC_CHAY[b]); } catch { /* bản đồ đang dựng lại */ }
+    }, NHIP_CHAY);
+  }
+  function tatVienChay() {
+    if (chayRef.current == null) return;
+    window.clearInterval(chayRef.current);
+    chayRef.current = null;
+  }
 
   // ── PHÂN BIỆT "LƯỚT BẢN ĐỒ" VỚI "BẤM CHỌN THỬA" ─────────────────────────────
   // Với CHUỘT thì thư viện bản đồ tự lo: kéo quá 3 điểm ảnh là nó bỏ qua cú bấm.
@@ -272,6 +304,8 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       // không đọc được. Dấu hiệu nhận biết thửa nằm ở viền xanh + số đo cạnh là đủ rõ.
       map.addLayer({ id: 'highlight-fill', type: 'fill', source: 'highlight', filter: ['==', '$type', 'Polygon'], paint: { 'fill-color': '#00a2ff', 'fill-opacity': 0 } });
       map.addLayer({ id: 'highlight-line', type: 'line', source: 'highlight', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#00a2ff', 'line-width': 2.6 } });
+      // Vạch trắng CHẠY vòng quanh viền (kiểu tuyến đang dẫn đường) — xem batVienChay().
+      map.addLayer({ id: 'highlight-chay', type: 'line', source: 'highlight', layout: { 'line-join': 'round' }, paint: { 'line-color': '#ffffff', 'line-width': 2.6, 'line-dasharray': BUOC_CHAY[0] } });
       // Kích thước thửa kiểu Guland: độ dài từng cạnh (dọc cạnh) + diện tích ở giữa
       map.addSource('highlight-dims', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
       // 'text-allow-overlap' để MẶC ĐỊNH (false) → chữ nào chồng lên chữ khác thì tự giấu bớt.
@@ -331,7 +365,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       ro = new ResizeObserver(() => { if (mapRef.current) { mapRef.current.resize(); tryInitialFit(); } });
       ro.observe(containerRef.current);
     }
-    return () => { ro?.disconnect(); tatTaiTruoc(); map.remove(); mapRef.current = null; readyRef.current = false; didFitRef.current = false; };
+    return () => { ro?.disconnect(); tatTaiTruoc(); tatVienChay(); map.remove(); mapRef.current = null; readyRef.current = false; didFitRef.current = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -698,7 +732,9 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     const dsrc = map.getSource('highlight-dims') as maplibregl.GeoJSONSource | undefined;
     if (dsrc) dsrc.setData({ type: 'FeatureCollection', features: parcelDims(highlight) } as any);
     locCanhTheoZoom(true);
-    ['highlight-fill', 'highlight-line', 'hl-edge', 'hl-area'].forEach((id) => { if (map.getLayer(id)) map.moveLayer(id); });
+    ['highlight-fill', 'highlight-line', 'highlight-chay', 'hl-edge', 'hl-area'].forEach((id) => { if (map.getLayer(id)) map.moveLayer(id); });
+    // Có thửa đang chọn thì cho vạch chạy quanh viền; bỏ chọn thì dừng hẳn cho đỡ tốn pin.
+    if (highlight) batVienChay(); else tatVienChay();
   }, [highlight]);
 
   return <div ref={containerRef} className={className ?? 'h-full w-full'} />;

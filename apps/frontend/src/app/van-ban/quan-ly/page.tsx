@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import { api } from '@/lib/api';
 import { CHUDE_LIST, CHUDE_META, type ChuDeNhom } from '../data';
@@ -49,7 +49,7 @@ function diaBanOf(d: { coQuan?: string; trichYeu?: string }): string {
 export default function QuanLyVanBan() {
   const { user, loading } = useAuth();
   const { openLogin } = useLoginGate();
-  const canManage = user && (user.role === 'admin' || user.role === 'vanban');
+  const canManage = user && (laAdmin(user) || coVaiTro(user, 'vanban'));
   const [docs, setDocs] = useState<Doc[] | null>(null);
   const [q, setQ] = useState('');
   const [chuDe, setChuDe] = useState<ChuDeNhom | 'all'>('all');

@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import HubShell, { type HubTool } from '@/components/HubShell';
-import { useAuth } from '@/lib/auth';
+import { useAuth, coVaiTro, laAdmin } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 
 const ALL: HubTool[] = [
@@ -17,8 +17,9 @@ const ALL: HubTool[] = [
 export default function QuanTriPage() {
   const { user, loading } = useAuth();
   const { openLogin } = useLoginGate();
-  const role = user?.role;
-  const canManage = role === 'admin' || role === 'gis' || role === 'vanban';
+  // Một người có thể giữ nhiều vai trò → xét cả danh sách, và công cụ hiện ra là GỘP của các vai trò đó.
+  const canManage = coVaiTro(user, 'admin', 'gis', 'vanban');
+  const chiGis = coVaiTro(user, 'gis') && !laAdmin(user);
 
   if (loading) return <div className="mx-auto max-w-lg px-4 py-16 text-center text-slate-400">Đang tải…</div>;
   if (!canManage) return (
@@ -32,18 +33,17 @@ export default function QuanTriPage() {
   );
 
   // Submenu "Quản trị hệ thống" — bấm item mẹ là sổ xuống ngay trong sidebar (không tạo sidebar thứ 2)
-  const adminSecs: [string, string][] = role === 'gis'
+  const adminSecs: [string, string][] = chiGis
     ? [['upload', 'Tải bản đồ'], ['logs', 'Nhật ký']]
     : [['overview', 'Tổng quan'], ['listings', 'Tin đăng'], ['ads', 'Quảng cáo'], ['users', 'Người dùng'], ['payments', 'Thanh toán'], ['config', 'Cấu hình'], ['logs', 'Nhật ký'], ['upload', 'Tải bản đồ']];
   const adminChildren: HubTool[] = adminSecs.map(([k, n]) => ({ key: 'admin-' + k, name: n, desc: '', icon: '⚙️', path: '/admin?tab=' + k }));
 
   // Lọc công cụ theo quyền
-  const tools = ALL.filter((t) => {
-    if (role === 'admin') return true;
-    if (role === 'vanban') return t.key === 'van-ban' || t.key === 'sales';
-    if (role === 'gis') return t.key === 'admin' || t.key === 'map-ads' || t.key === 'sales';
-    return false;
-  }).map((t) => (t.key === 'admin' ? { ...t, children: adminChildren } : t));
+  const duocDung = new Set<string>();
+  if (coVaiTro(user, 'vanban')) ['van-ban', 'sales'].forEach((k) => duocDung.add(k));
+  if (coVaiTro(user, 'gis')) ['admin', 'map-ads', 'sales'].forEach((k) => duocDung.add(k));
+  const tools = ALL.filter((t) => laAdmin(user) || duocDung.has(t.key))
+    .map((t) => (t.key === 'admin' ? { ...t, children: adminChildren } : t));
 
   return <HubShell title="🛠️ Quản trị Cam Lâm Land" subtitle="Bảng điều khiển quản lý" tools={tools} storageKey="quantri" />;
 }

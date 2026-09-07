@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/lib/auth';
 import { toolIconSvg } from '@/lib/toolIcons';
 import { TIEN_ICH_TOOLS } from '@/lib/tienIchTools';
-import { runToolAction } from '@/components/HubShell';
+import { runToolAction, locTheoQuyen } from '@/components/HubShell';
 
 type Name = 'home' | 'find' | 'post' | 'map' | 'me' | 'tools';
 
@@ -106,7 +106,8 @@ export default function BottomNav() {
               <button type="button" onClick={() => setToolsOpen(false)} aria-label="Đóng" className="grid h-8 w-8 place-items-center rounded-full text-slate-400 active:bg-slate-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]"><path d="M18 6 6 18M6 6l12 12" /></svg></button>
             </div>
             <div className="grid grid-cols-4 gap-1">
-              {TIEN_ICH_TOOLS.map((t) => {
+              {/* Công cụ nội bộ chỉ hiện với tài khoản được cấp quyền — lọc y như trang Tiện ích. */}
+              {locTheoQuyen(TIEN_ICH_TOOLS, user).map((t) => {
                 const cls = 'flex flex-col items-center gap-1.5 rounded-xl px-1 py-2.5 active:bg-slate-50';
                 const inner = (<><span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#0A2540] text-[#C8A14B]" dangerouslySetInnerHTML={{ __html: toolIconSvg(t.key, 22) }} /><span className="line-clamp-2 text-center text-[10px] leading-[1.15] text-slate-600">{t.name}</span></>);
                 return t.action

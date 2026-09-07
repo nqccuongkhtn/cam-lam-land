@@ -5,6 +5,7 @@ import { GUIDES, getGuide } from '../guides';
 import ShareRow from '@/components/ShareRow';
 import LegalConsultCTA from '@/components/LegalConsultCTA';
 
+import { ldJson } from '@/lib/jsonld';
 export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }));
 }
@@ -38,7 +39,7 @@ export default function GuidePage({ params }: { params: { slug: string } }) {
 
   return (
     <div className="mx-auto max-w-3xl px-3 py-5 sm:px-4 sm:py-8">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(jsonld) }} />
       <nav className="text-sm text-slate-400 mb-3">
         <Link href="/cam-nang" className="hover:text-[#0A2540]">Cẩm nang</Link> <span className="mx-1">/</span> <span className="text-slate-500">{g.title}</span>
       </nav>

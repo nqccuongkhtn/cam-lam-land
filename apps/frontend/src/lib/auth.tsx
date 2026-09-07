@@ -4,15 +4,31 @@ import { api } from './api';
 import { getToken, setToken, clearToken } from './token';
 
 // Khớp với packages/shared/src/index.ts và ràng buộc trong database.
-export type Role = 'user' | 'admin' | 'gis' | 'vanban' | 'hotlist';
+export type Role = 'user' | 'admin' | 'gis' | 'vanban' | 'hotlist' | 'danhmuc';
 export interface AuthUser {
-  id: number; email: string; role: Role;
+  id: number; email: string; role: Role; roles?: Role[];
   fullName?: string | null; phone?: string | null;
   tier?: string; status?: string; emailVerified?: boolean; avatar?: string | null;
 }
 interface Ctx { user: AuthUser | null; loading: boolean; login: (t: string, u: AuthUser, remember?: boolean) => void; logout: () => void; refresh: () => Promise<void>; }
 const AuthCtx = createContext<Ctx>({ user: null, loading: true, login: () => {}, logout: () => {}, refresh: async () => {} });
 export const useAuth = () => useContext(AuthCtx);
+
+// ── KIỂM TRA VAI TRÒ (một người có thể giữ nhiều vai trò) ──
+/** Danh sách vai trò của tài khoản. Tài khoản cũ chỉ có một vai trò thì trả về đúng một. */
+export const dsVaiTro = (u?: { role?: string | null; roles?: string[] | null } | null): string[] =>
+  !u ? [] : (Array.isArray(u.roles) && u.roles.length ? u.roles : (u.role ? [u.role] : []));
+/** Có ít nhất một trong các vai trò kể ra không? */
+export const coVaiTro = (u: { role?: string | null; roles?: string[] | null } | null | undefined, ...canCo: string[]): boolean => {
+  const ds = dsVaiTro(u); return canCo.some((v) => ds.includes(v));
+};
+/** Quản trị viên. */
+export const laAdmin = (u?: { role?: string | null; roles?: string[] | null } | null) => coVaiTro(u, 'admin');
+/** Tên tiếng Việt của từng vai trò — dùng chung cho trang quản trị và chỗ nào cần hiện ra. */
+export const TEN_VAI_TRO: Record<string, string> = {
+  user: 'Khách', admin: 'Admin', gis: 'Biên tập GIS', vanban: 'Quản lý văn bản',
+  hotlist: '🔥 Tra cứu danh sách nóng', danhmuc: '🗄️ Kho danh mục hồ sơ',
+};
 
 const USER_KEY = 'camlam_user';
 function readCachedUser(): AuthUser | null {

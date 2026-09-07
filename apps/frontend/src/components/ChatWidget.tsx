@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin } from '@/lib/auth';
 import { api } from '@/lib/api';
 import { getToken } from '@/lib/token';
 import { WARDS_NEW, WARDS_OLD, PROPERTY_LABELS, type PropertyType } from '@/lib/types';
@@ -42,7 +42,7 @@ function urlB64ToUint8(base64: string): Uint8Array {
 
 export default function ChatWidget() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = laAdmin(user);
   const [open, setOpen] = useState(false);
   useLockBody(open); // khoá cuộn nền khi khung chat đang mở → nền phía dưới không lướt được
   const [tab, setTab] = useState<Tab>('community');

@@ -230,8 +230,27 @@ const PINNED: any[] = [
   },
 ].map((a, i) => ({ ...a, order: i, tier: 3, local: true, pin: true, images: [a.image], slug: `${vnSlug(a.title) || 'tin'}-${shortHash(a.url)}` }));
 
-// Kho lưu trong tiến trình: tích luỹ & giữ 7 ngày (bài GHIM giữ vĩnh viễn)
-let store: any[] = [...PINNED];
+// ══ KHO TIN GIỮ LẠI NGOÀI BỘ NHỚ ══
+// Trước đây kho tin chỉ nằm trong bộ nhớ tiến trình. Máy chủ dựng lại (hoặc container khởi động lại)
+// là mất sạch, chỉ còn mấy bài ghim. Ai đang mở dở một bài tin sẽ bị báo "Bài viết không còn được lưu"
+// dù bài mới đăng hôm qua — bấm F5 thì lại thấy, vì lần gọi đầu đã kích hoạt tải mới ở nền.
+// Nay kho được ghi ra một file trên đĩa, khởi động lại là nạp lại ngay, không mất bài nào.
+const KHO = path.join(process.cwd(), '.kho-tin', 'tin.json');
+function napKho(): any[] {
+  try {
+    const d = JSON.parse(fs.readFileSync(KHO, 'utf8'));
+    if (Array.isArray(d?.news) && d.news.length) return d.news;
+  } catch { /* chưa có file, hoặc file hỏng — coi như kho rỗng */ }
+  return [];
+}
+function luuKho(ds: any[]): void {
+  try {
+    fs.mkdirSync(path.dirname(KHO), { recursive: true });
+    fs.writeFileSync(KHO, JSON.stringify({ luc: Date.now(), news: ds }));
+  } catch (e) { console.warn('[tin tức] không ghi được kho:', e); }
+}
+// Bài ghim luôn lấy bản mới nhất trong mã nguồn; tin xoay vòng lấy từ kho đã lưu.
+let store: any[] = [...PINNED, ...napKho().filter((a: any) => !a.pin)];
 let lastSlot = -1;
 let refreshing = false; // đang làm mới RSS ở nền
 const FRESH_CAP = 18; // số bài mới tải+viết lại mỗi lần làm mới (kiểm soát chi phí/độ trễ)
@@ -264,6 +283,14 @@ export async function GET(req: Request) {
     refreshing = true;
     refreshFeed(slot).catch(() => {}).finally(() => { refreshing = false; });
   }
+  // Kho chưa có tin xoay vòng nào (máy chủ vừa dựng lại, kho trên đĩa cũng trống) thì CHỜ mẻ đầu
+  // tối đa 15 giây rồi hãy trả. Trả ngay lúc này là trả danh sách cụt — ai đang mở một bài tin sẽ
+  // bị báo nhầm là bài đã hết hạn.
+  if (store.length <= PINNED.length && refreshing) {
+    for (let i = 0; i < 60 && refreshing && store.length <= PINNED.length; i++) {
+      await new Promise((r) => setTimeout(r, 250));
+    }
+  }
   return NextResponse.json({ news: store });
 }
 
@@ -292,5 +319,6 @@ async function refreshFeed(slot: number): Promise<void> {
     .sort((a, b) => (b.local ? 1 : 0) - (a.local ? 1 : 0) || +new Date(b.publishedAt) - +new Date(a.publishedAt))
     .slice(0, 75);
   store = [...PINNED, ...rotating]; // bài GHIM luôn đứng đầu
+  luuKho(rotating);                  // ghi ra đĩa để lần khởi động sau còn nguyên
   if (fetched.length) lastSlot = slot;
 }

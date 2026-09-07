@@ -11,6 +11,7 @@ import AppSplash from '@/components/AppSplash';
 import InstallPrompt from '@/components/InstallPrompt';
 import DeferredWidgets from '@/components/DeferredWidgets';
 
+import { ldJson } from '@/lib/jsonld';
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns.org';
 const JSONLD = {
   '@context': 'https://schema.org',
@@ -64,7 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="vi">
       <head>
         {/* Đánh dấu chế độ đã cài NGAY trước khi vẽ khung hình đầu — để splash phủ tức thì (fallback iOS) */}
-        <script dangerouslySetInnerHTML={{ __html: "try{if(matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||matchMedia('(display-mode: minimal-ui)').matches||navigator.standalone===true){document.documentElement.classList.add('pwa-app')}if(sessionStorage.getItem('cl-splash-done')){document.documentElement.classList.add('splash-done')}else{sessionStorage.setItem('cl-splash-done','1')}if(new URLSearchParams(location.search).get('embed')==='1'){document.documentElement.classList.add('embed')}}catch(e){}" }} />
+        <script dangerouslySetInnerHTML={{ __html: "try{if(matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||matchMedia('(display-mode: minimal-ui)').matches||navigator.standalone===true){document.documentElement.classList.add('pwa-app')}if(sessionStorage.getItem('cl-splash-done')){document.documentElement.classList.add('splash-done')}else{sessionStorage.setItem('cl-splash-done','1')}if(new URLSearchParams(location.search).get('embed')==='1'||window.self!==window.top){document.documentElement.classList.add('embed')}}catch(e){}" }} />
         {/* CSS splash nhúng thẳng — không chờ globals.css, hết cảnh màn đen trước splash */}
         <style dangerouslySetInnerHTML={{ __html: SPLASH_CSS }} />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -91,7 +92,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <AppSplash />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSONLD) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(JSONLD) }} />
         <Providers>
           <PwaRegister />
           <ScrollToTop />

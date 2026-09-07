@@ -8,6 +8,7 @@ import { PAGE_BY_SLUG, CORE_SLUGS, AREAS, TYPES, type PageDef } from '@/lib/seoL
 import { formatVnd, type Listing } from '@/lib/types';
 import bangGia from '@/data/camlamBangGia.json';
 
+import { ldJson } from '@/lib/jsonld';
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns.org';
 const BACKEND = process.env.BACKEND_HOST ? (process.env.BACKEND_HOST.startsWith('http') ? process.env.BACKEND_HOST : `https://${process.env.BACKEND_HOST}`) : '';
 
@@ -125,7 +126,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(ld) }} />
       <div className="mx-auto max-w-6xl px-3 sm:px-4 py-5 sm:py-7">
         {/* Breadcrumb */}
         <nav className="text-[12px] text-slate-500 mb-3 flex flex-wrap items-center gap-1">

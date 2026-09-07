@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { api, uploadImages } from '@/lib/api';
 import { resizeImage } from '@/lib/img';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin } from '@/lib/auth';
 import { PROPERTY_LABELS, WARDS_NEW, WARDS_OLD, DIRECTIONS, LEGAL_OPTIONS, formatVnd, priceLabel, SALE_PROPERTY_TYPES, RENT_PROPERTY_TYPES, type PropertyType, type DealType } from '@/lib/types';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
@@ -32,7 +32,7 @@ export default function EditListing() {
     if (!user) { router.replace('/login'); return; }
     if (ready || denied) return;
     api<any>(`/listings/${id}?noview=1`).then((l) => {
-      if (l.createdBy !== user.id && user.role !== 'admin') { setDenied(true); return; }
+      if (l.createdBy !== user.id && !laAdmin(user)) { setDenied(true); return; }
       const price = Number(l.price) || 0;
       const priceUnit = price >= 1e9 ? 'ty' : 'trieu';
       const priceVal = price >= 1e9 ? String(+(price / 1e9).toFixed(3)) : String(Math.round(price / 1e6));

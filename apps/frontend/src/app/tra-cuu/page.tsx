@@ -3,7 +3,7 @@
 // TRA CỨU "DANH SÁCH NÓNG" (dùng tạm). Gỡ: xoá thư mục app/tra-cuu + public/danh-sach-nong.json + routes/hotlist.ts + dòng đăng ký + DROP TABLE hot_records.
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import { type Added, norm, digits, SHORT, sevOf, chipCls, chipSoft } from './parts';
 import { EditModal } from './EditModal';
@@ -17,8 +17,8 @@ const STEP = 60;
 export default function TraCuuPage() {
   const { user, loading: authLoading } = useAuth();
   const { openLogin } = useLoginGate();
-  const canManage = !!user && (user.role === 'admin' || (user.role as any) === 'hotlist'); // admin/hotlist: xem + sửa + đánh dấu hết hiệu lực
-  const isAdmin = !!user && user.role === 'admin'; // CHỈ admin: xoá vĩnh viễn
+  const canManage = !!user && (laAdmin(user) || coVaiTro(user, 'hotlist')); // admin/hotlist: xem + sửa + đánh dấu hết hiệu lực
+  const isAdmin = !!user && laAdmin(user); // CHỈ admin: xoá vĩnh viễn
   const [data, setData] = useState<any>(null); const [recs, setRecs] = useState<Rec[]>([]); const [added, setAdded] = useState<Added[]>([]); const [sheets, setSheets] = useState<{ name: string; createdBy?: string; createdAt?: string }[]>([]);
   const [err, setErr] = useState<string | null>(null); const [loading, setLoading] = useState('Đang tải dữ liệu…');
   const [q, setQ] = useState(''); const [qth, setQth] = useState(''); const [qto, setQto] = useState(''); const [qxa, setQxa] = useState(''); const [qsrc, setQsrc] = useState('');

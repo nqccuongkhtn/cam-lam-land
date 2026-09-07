@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @next/next/no-img-element, react-hooks/exhaustive-deps */
 // PDF EDITOR (dùng tạm). GIỮ NGUYÊN trang gốc; chỉ che+sửa ĐÚNG ô người dùng bấm. Xuất: sao chép trang gốc + vẽ overlay. Cuộn xem mọi trang. Nút 🧰 mở thêm công cụ.
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { type Ov, type PageRef, uid, fromHex, FAM, PageView, SignPad } from './parts';
+import { type Ov, type PageRef, uid, fromHex, FAM, PageView, SignPad, XemTo } from './parts';
 import { PdfHub } from './tools';
 import { Toolbar } from './Toolbar';
 
@@ -33,17 +33,20 @@ export default function PdfEditorPage() {
   const docs = useRef<Record<string, { bytes: Uint8Array; doc: any }>>({});
   const [pages, setPages] = useState<PageRef[]>([]); const [ovByPage, setOvByPage] = useState<Record<string, Ov[]>>({});
   const [zoom, setZoom] = useState(1.15); const [tool, setTool] = useState<any>('edit'); const [color, setColor] = useState('#111111'); const [fontSize, setFontSize] = useState(14);
+  const [xemTo, setXemTo] = useState<number | null>(null); // đang mở XEM TO ở trang nào (null = đóng)
   const [sel, setSel] = useState<string | null>(null); const [thumbs, setThumbs] = useState<Record<string, string>>({}); const [signOpen, setSignOpen] = useState(false); const [mode, setMode] = useState<'hub' | 'edit'>('hub');
   const itemsCache = useRef<Record<string, any[]>>({});
   const fileRef = useRef<HTMLInputElement | null>(null); const mergeRef = useRef<HTMLInputElement | null>(null); const imgRef = useRef<HTMLInputElement | null>(null);
   const pageEls = useRef<Record<string, HTMLDivElement | null>>({}); const pendImage = useRef<string | null>(null); const thumbDrag = useRef<number | null>(null);
+  const [thumbOver, setThumbOver] = useState<number | null>(null);   // đang kéo lơ lửng trên trang nào (tô viền cho thấy sẽ thả vào đây)
 
   useEffect(() => { (async () => { try { await loadScript(CDN.pdfjs); (window as any).pdfjsLib.GlobalWorkerOptions.workerSrc = CDN.worker; await loadScript(CDN.pdflib); await loadScript(CDN.fontkit); setReady(true); } catch (e: any) { setErr(e?.message || 'Lỗi tải thư viện'); } })(); }, []);
   const setOv = useCallback((pid: string, fn: (a: Ov[]) => Ov[]) => setOvByPage((m) => ({ ...m, [pid]: fn(m[pid] || []) })), []);
   const renderThumb = useCallback(async (pg: PageRef) => { try { const page = await docs.current[pg.srcId].doc.getPage(pg.pageIndex + 1); const vp = page.getViewport({ scale: 0.2, rotation: (page.rotate + pg.rot) % 360 }); const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height; await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise; setThumbs((t) => ({ ...t, [pg.id]: c.toDataURL('image/jpeg', 0.6) })); } catch { /* */ } }, []);
   const addFile = useCallback(async (file: File, merge: boolean) => { setBusy('Đang mở PDF…'); try { const bytes = new Uint8Array(await file.arrayBuffer()); const doc = await (window as any).pdfjsLib.getDocument({ data: bytes.slice() }).promise; const srcId = uid(); docs.current[srcId] = { bytes, doc }; const np: PageRef[] = Array.from({ length: doc.numPages }, (_, i) => ({ id: uid(), srcId, pageIndex: i, rot: 0 })); if (merge) setPages((p) => [...p, ...np]); else { itemsCache.current = {}; setOvByPage({}); setPages(np); } np.forEach(renderThumb); } catch (e: any) { setErr('Không mở được PDF: ' + (e?.message || e)); } finally { setBusy(null); } }, []);
   const onPickImage = useCallback(async (file: File) => { const data = await new Promise<string>((res) => { const r = new FileReader(); r.onload = () => res(r.result as string); r.readAsDataURL(file); }); const pid = pendImage.current || pages[0]?.id; if (!pid) return; setOv(pid, (a) => [...a, { id: uid(), kind: 'image', x: 150, y: 400, w: 140, h: 80, data }]); setTool('select'); }, [pages, setOv]);
-  const rotate = (i: number) => { setPages((p) => p.map((x, k) => (k === i ? { ...x, rot: (x.rot + 90) % 360 } : x))); const pg = pages[i]; if (pg) { delete itemsCache.current[pg.id]; setTimeout(() => renderThumb({ ...pg, rot: (pg.rot + 90) % 360 }), 0); } };
+  // buoc = 90 xoay phải, -90 xoay trái. Cộng thêm 360 rồi chia lấy dư để không ra số âm.
+  const rotate = (i: number, buoc: number = 90) => { const xoay = (r: number) => (r + buoc + 360) % 360; setPages((p) => p.map((x, k) => (k === i ? { ...x, rot: xoay(x.rot) } : x))); const pg = pages[i]; if (pg) { delete itemsCache.current[pg.id]; setTimeout(() => renderThumb({ ...pg, rot: xoay(pg.rot) }), 0); } };
   const del = (i: number) => setPages((p) => p.filter((_, k) => k !== i));
   const moveThumb = (from: number, to: number) => setPages((p) => { const a = [...p]; const [x] = a.splice(from, 1); a.splice(to, 0, x); return a; });
 
@@ -93,14 +96,29 @@ export default function PdfEditorPage() {
       ) : (
         <div className="flex min-h-0 flex-1">
           <div className="hidden w-36 shrink-0 overflow-y-auto border-r bg-white p-2 md:block">
+            <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-wide text-slate-400">Kéo trang để đổi thứ tự</p>
             {pages.map((pg, i) => (
-              <div key={pg.id} draggable onDragStart={() => (thumbDrag.current = i)} onDragOver={(e) => e.preventDefault()} onDrop={() => { if (thumbDrag.current != null) { moveThumb(thumbDrag.current, i); thumbDrag.current = null; } }} onClick={() => pageEls.current[pg.id]?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="group relative mb-2 cursor-pointer rounded border-2 border-transparent hover:border-[#0A2540]">
+              <div key={pg.id} draggable
+                onDragStart={(e) => { thumbDrag.current = i; try { e.dataTransfer.effectAllowed = 'move'; } catch { /* */ } }}
+                onDragOver={(e) => { e.preventDefault(); setThumbOver(i); }}
+                onDragLeave={() => setThumbOver((o) => (o === i ? null : o))}
+                onDragEnd={() => { thumbDrag.current = null; setThumbOver(null); }}
+                onDrop={() => { if (thumbDrag.current != null) { moveThumb(thumbDrag.current, i); thumbDrag.current = null; } setThumbOver(null); }}
+                onClick={() => pageEls.current[pg.id]?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                className={`group relative mb-2 cursor-move rounded border-2 ${thumbOver === i ? 'border-emerald-500' : 'border-transparent hover:border-[#0A2540]'}`}>
                 {thumbs[pg.id] ? <img src={thumbs[pg.id]} alt="" className="w-full rounded" /> : <div className="grid h-24 place-items-center bg-slate-100 text-xs text-slate-400">…</div>}
                 <span className="absolute left-1 top-1 rounded bg-black/60 px-1 text-[10px] text-white">{i + 1}</span>
-                <div className="absolute right-1 top-1 hidden gap-0.5 group-hover:flex">
-                  <button onClick={(e) => { e.stopPropagation(); rotate(i); }} title="Xoay" className="rounded bg-white/90 px-1 text-[11px] shadow">↻</button>
+                <div className="cl-pdf-thumb-actions absolute right-1 top-1 flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button onClick={(e) => { e.stopPropagation(); rotate(i, -90); }} title="Xoay trái" className="rounded bg-white/90 px-1 text-[11px] shadow">↺</button>
+                  <button onClick={(e) => { e.stopPropagation(); rotate(i, 90); }} title="Xoay phải" className="rounded bg-white/90 px-1 text-[11px] shadow">↻</button>
+                  <button onClick={(e) => { e.stopPropagation(); setXemTo(i); }} title="Xem to" className="rounded bg-white/90 px-1 text-[11px] shadow">⤢</button>
                   <button onClick={(e) => { e.stopPropagation(); exportPdf([i]); }} title="Tải trang này" className="rounded bg-white/90 px-1 text-[11px] shadow">⬇</button>
                   <button onClick={(e) => { e.stopPropagation(); del(i); }} title="Xoá trang" className="rounded bg-white/90 px-1 text-[11px] text-red-600 shadow">✕</button>
+                </div>
+                {/* Đưa trang lên trên / xuống dưới một bậc — dùng khi không kéo thả được */}
+                <div className="cl-pdf-thumb-actions absolute bottom-1 right-1 flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button onClick={(e) => { e.stopPropagation(); if (i > 0) moveThumb(i, i - 1); }} disabled={i === 0} title="Đưa lên trước một trang" className="rounded bg-white/90 px-1 text-[11px] shadow disabled:opacity-30">▲</button>
+                  <button onClick={(e) => { e.stopPropagation(); if (i < pages.length - 1) moveThumb(i, i + 1); }} disabled={i >= pages.length - 1} title="Đẩy xuống sau một trang" className="rounded bg-white/90 px-1 text-[11px] shadow disabled:opacity-30">▼</button>
                 </div>
               </div>
             ))}
@@ -108,7 +126,12 @@ export default function PdfEditorPage() {
           <div className="min-h-0 flex-1 overflow-auto bg-slate-200 p-4">
             {pages.map((pg, i) => (
               <div key={pg.id} ref={(el) => { pageEls.current[pg.id] = el; }} className="mx-auto mb-5 w-fit">
-                <div className="mb-1 text-center text-xs text-slate-500">Trang {i + 1}/{pages.length}</div>
+                <div className="mb-1 flex items-center justify-center gap-2 text-xs text-slate-500">
+                  <button onClick={() => rotate(i, -90)} title="Xoay trái 90°" aria-label="Xoay trái 90 độ" className="grid h-9 w-9 place-items-center rounded-lg bg-white text-base shadow-sm ring-1 ring-slate-300 transition active:scale-95 hover:bg-slate-50">↺</button>
+                  <span className="min-w-[92px] text-center tabular-nums">Trang {i + 1}/{pages.length}</span>
+                  <button onClick={() => rotate(i, 90)} title="Xoay phải 90°" aria-label="Xoay phải 90 độ" className="grid h-9 w-9 place-items-center rounded-lg bg-white text-base shadow-sm ring-1 ring-slate-300 transition active:scale-95 hover:bg-slate-50">↻</button>
+                  <button onClick={() => setXemTo(i)} title="Xem to toàn màn hình" aria-label="Xem to toàn màn hình" className="grid h-9 w-9 place-items-center rounded-lg bg-white text-base shadow-sm ring-1 ring-slate-300 transition active:scale-95 hover:bg-slate-50">⤢</button>
+                </div>
                 <PageView pg={pg} doc={docs.current[pg.srcId]?.doc} zoom={zoom} tool={tool} color={color} fontSize={fontSize} ov={ovByPage[pg.id] || []} sel={sel} setSel={setSel} setOv={setOv} setTool={setTool} itemsCache={itemsCache} onImage={(pid: string) => { pendImage.current = pid; imgRef.current?.click(); }} />
               </div>
             ))}
@@ -116,6 +139,9 @@ export default function PdfEditorPage() {
         </div>
       )}
       {busy && <div className="fixed inset-0 z-50 grid place-items-center bg-black/30 text-white"><div className="rounded-lg bg-[#0A2540] px-6 py-3 font-semibold">{busy}</div></div>}
+      {xemTo !== null && (
+        <XemTo pages={pages} index={xemTo} docs={docs.current} onRotate={rotate} onClose={() => setXemTo(null)} />
+      )}
       {signOpen && <SignPad onClose={() => setSignOpen(false)} onDone={(data) => { setSignOpen(false); const pid = pages[0]?.id; if (pid) { setOv(pid, (a) => [...a, { id: uid(), kind: 'image', x: 150, y: 300, w: 160, h: 60, data }]); setTool('select'); } }} />}
       <input ref={fileRef} type="file" accept="application/pdf" hidden onChange={(e) => e.target.files?.[0] && addFile(e.target.files[0], false)} />
       <input ref={mergeRef} type="file" accept="application/pdf" hidden onChange={(e) => e.target.files?.[0] && addFile(e.target.files[0], true)} />

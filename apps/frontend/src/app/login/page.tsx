@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { useAuth, type AuthUser } from '@/lib/auth';
+import { useAuth, type AuthUser, laAdmin } from '@/lib/auth';
 import PasswordInput from '@/components/PasswordInput';
 
 export default function LoginPage() {
@@ -18,7 +18,7 @@ export default function LoginPage() {
     try {
       const r = await api<{ token: string; user: AuthUser }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
       login(r.token, r.user, remember);
-      router.push(r.user.role === 'admin' ? '/admin' : '/');
+      router.push(laAdmin(r.user) ? '/admin' : '/');
     } catch (e: any) { setErr(e.message || 'Đăng nhập thất bại'); } finally { setBusy(false); }
   }
   return (

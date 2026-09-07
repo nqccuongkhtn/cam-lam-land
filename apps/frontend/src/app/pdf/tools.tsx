@@ -4,6 +4,7 @@
 // vùng thả tệp -> XEM TRƯỚC file (thumbnail từng trang) -> tuỳ chọn -> xử lý. Sửa chữ mở trình soạn đầy đủ.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as ops from './pdfops';
+import { XemTo } from './parts';
 import { apiBase } from '@/lib/api';
 import { getToken } from '@/lib/token';
 import { toast } from '@/lib/toast';
@@ -56,36 +57,105 @@ const typeLabel = (t: Tool) => t.input === 'images' ? 'ảnh (JPG, PNG…)' : t.
 const dlBlob = (blob: Blob, name: string) => { const u = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 4000); };
 const cdName = (cd: string | null, fb: string) => { if (!cd) return fb; const m = /filename\*?=(?:UTF-8'')?["']?([^"';]+)/i.exec(cd); try { return m ? decodeURIComponent(m[1]) : fb; } catch { return fb; } };
 
-// XEM TRƯỚC tệp: PDF -> thumbnail từng trang; ảnh -> xem ảnh; Office -> thẻ tên tệp.
-function FilePreview({ files, input }: { files: File[]; input: Tool['input'] }) {
+// XEM TRƯỚC tệp: PDF -> ảnh nhỏ TỪNG TRANG (đủ mọi trang, tạo dần cho nhẹ máy);
+// ảnh -> xem ảnh; Office -> thẻ tên tệp.
+// Với công cụ XOAY TRANG: mỗi trang có nút xoay riêng, bấm vào trang để MỞ TO xem cho rõ.
+function FilePreview({ files, input, xoayTung, gocTrang, datGoc, datSoTrang, thuTu, datThuTu }: { files: File[]; input: Tool['input']; xoayTung?: boolean; gocTrang?: number[]; datGoc?: (f: (g: number[]) => number[]) => void; datSoTrang?: (n: number) => void; thuTu?: number[]; datThuTu?: (f: (t: number[]) => number[]) => void }) {
   const [thumbs, setThumbs] = useState<string[]>([]); const [pageN, setPageN] = useState(0); const [busy, setBusy] = useState(false);
+  const [doc, setDoc] = useState<any>(null); const [xem, setXem] = useState<number | null>(null);
+  const keoTu = useRef<number | null>(null);                 // đang kéo ô thứ mấy (theo vị trí đang hiện)
+  const [dangTren, setDangTren] = useState<number | null>(null);   // con trỏ đang lơ lửng trên ô nào (để tô viền xanh)
   useEffect(() => {
     let dead = false;
     (async () => {
-      setThumbs([]); setPageN(0); const f = files[0]; if (!f) return;
+      setThumbs([]); setPageN(0); setDoc(null); setXem(null); datSoTrang?.(0); const f = files[0]; if (!f) return;
       if (input === 'pdf' || input === 'pdfs') {
         setBusy(true);
         try {
           const bytes = new Uint8Array(await f.arrayBuffer());
-          const doc = await (window as any).pdfjsLib.getDocument({ data: bytes }).promise; if (dead) return;
-          setPageN(doc.numPages); const out: string[] = []; const max = Math.min(doc.numPages, 12);
-          for (let i = 1; i <= max; i++) { const page = await doc.getPage(i); const vp = page.getViewport({ scale: 0.4 }); const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height; await page.render({ canvasContext: c.getContext('2d')!, viewport: vp }).promise; if (dead) return; out.push(c.toDataURL('image/jpeg', 0.6)); }
-          setThumbs(out);
+          const d = await (window as any).pdfjsLib.getDocument({ data: bytes }).promise; if (dead) return;
+          setDoc(d); setPageN(d.numPages); datSoTrang?.(d.numPages);
+          datThuTu?.(() => Array.from({ length: d.numPages }, (_, i) => i));   // thứ tự ban đầu = đúng thứ tự trong file
+          // Tạo DẦN từng ảnh nhỏ và hiện ngay — hồ sơ dày vẫn thấy trang đầu sớm, không đứng hình.
+          for (let i = 1; i <= d.numPages; i++) {
+            const page = await d.getPage(i); const vp = page.getViewport({ scale: 0.4 });
+            const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height;
+            await page.render({ canvasContext: c.getContext('2d')!, viewport: vp }).promise; if (dead) return;
+            const url = c.toDataURL('image/jpeg', 0.6);
+            setThumbs((t) => [...t, url]);
+          }
         } catch { /* */ } finally { if (!dead) setBusy(false); }
       }
     })();
     return () => { dead = true; };
   }, [files, input]);
 
+  // CHÚ Ý: góc xoay được nhớ theo SỐ TRANG GỐC (không phải theo ô thứ mấy trên màn hình),
+  // nên kéo trang đi chỗ khác thì góc xoay đi theo trang đó, không bị lệch sang trang bên cạnh.
+  const goc = (i: number) => (gocTrang?.[i] || 0);
+  const xoay = (i: number, buoc: number) => datGoc?.((g) => { const a = [...g]; while (a.length <= i) a.push(0); a[i] = (a[i] + buoc + 360) % 360; return a; });
+  // Trang xoay ngang thì thu nhỏ lại cho vừa ô vuông, khỏi tràn ra ngoài.
+  const bienDoi = (d: number) => `rotate(${d}deg)` + (d % 180 ? ' scale(.72)' : '');
+  // Thứ tự đang hiện: mỗi số là SỐ THỨ TỰ TRANG GỐC. Chưa kéo gì thì là 0,1,2…
+  const dsTrang = (thuTu && thuTu.length === pageN && pageN > 0) ? thuTu : Array.from({ length: thumbs.length }, (_, i) => i);
+  const daDoiCho = dsTrang.some((oi, i) => oi !== i);
+  // Kéo trang từ chỗ này sang chỗ kia: rút ra rồi chèn vào, các trang khác dồn lại.
+  const doiCho = (tu: number | null, toi: number) => { if (tu == null || tu === toi) return; datThuTu?.((t) => { const a = t.length === pageN ? [...t] : Array.from({ length: pageN }, (_, i) => i); const [m] = a.splice(tu, 1); a.splice(toi, 0, m); return a; }); };
+
   if (input === 'images') return <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{files.map((f, i) => <div key={i} className="overflow-hidden rounded-lg border bg-slate-50"><img src={URL.createObjectURL(f)} alt="" className="h-28 w-full object-contain" /><div className="truncate px-1.5 py-1 text-[10px] text-slate-400">{f.name}</div></div>)}</div>;
   if (input.startsWith('office')) return <div className="flex items-center gap-3 rounded-lg border bg-slate-50 p-4"><span className="text-4xl">📄</span><div className="min-w-0"><p className="truncate font-semibold text-[#0A2540]">{files[0]?.name}</p><p className="text-xs text-slate-400">{files[0] && fmtSize(files[0].size)} · Tệp Office không xem trước được, bấm xử lý để chuyển sang PDF.</p></div></div>;
+
+  const SRC = 'S1';
   return (
     <div>
-      {busy && <p className="mb-2 text-center text-sm text-slate-400">Đang tạo bản xem trước…</p>}
+      {busy && <p className="mb-2 text-center text-sm text-slate-400">Đang tạo bản xem trước… {thumbs.length}/{pageN || '?'}</p>}
+      {xoayTung && !!thumbs.length && (
+        <div className="mb-2 text-center text-xs text-slate-500">
+          <b>Kéo một trang thả sang chỗ khác để đổi vị trí</b> · nút ↺ ↻ xoay riêng từng trang · bấm vào trang để xem to
+          {daDoiCho && <button onClick={() => datThuTu?.(() => Array.from({ length: pageN }, (_, i) => i))} className="ml-2 rounded-lg border border-slate-300 bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-600 hover:bg-slate-100">↩ Về thứ tự cũ</button>}
+        </div>
+      )}
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
-        {thumbs.map((src, i) => <div key={i} className="overflow-hidden rounded-lg border bg-white shadow-sm"><img src={src} alt="" className="w-full" /><div className="bg-slate-50 py-0.5 text-center text-[10px] text-slate-400">Trang {i + 1}</div></div>)}
+        {dsTrang.map((oi, i) => (
+          <div key={oi} draggable={!!xoayTung}
+            onDragStart={(e) => { keoTu.current = i; try { e.dataTransfer.effectAllowed = 'move'; } catch { /* */ } }}
+            onDragOver={(e) => { if (!xoayTung) return; e.preventDefault(); setDangTren(i); }}
+            onDragLeave={() => setDangTren((o) => (o === i ? null : o))}
+            onDrop={(e) => { e.preventDefault(); doiCho(keoTu.current, i); keoTu.current = null; setDangTren(null); }}
+            onDragEnd={() => { keoTu.current = null; setDangTren(null); }}
+            className={`group relative overflow-hidden rounded-lg border bg-white shadow-sm ${xoayTung ? 'cursor-move select-none' : ''} ${dangTren === i ? 'ring-2 ring-emerald-500' : ''}`}>
+            <div onClick={() => setXem(i)} title="Bấm để xem to" className="grid aspect-[3/4] cursor-zoom-in place-items-center overflow-hidden bg-white">
+              {thumbs[oi]
+                ? <img src={thumbs[oi]} draggable={false} alt="" className="max-h-full max-w-full object-contain transition-transform" style={{ transform: bienDoi(goc(oi)) }} />
+                : <span className="text-xs text-slate-300">…</span>}
+            </div>
+            {xoayTung && (
+              <>
+                {/* Số THỨ TỰ MỚI của trang — nhìn số này là biết file tải về xếp thế nào */}
+                <span className="absolute left-1 top-1 z-10 grid h-5 min-w-[20px] place-items-center rounded-full bg-[#0A2540]/85 px-1 text-[10px] font-bold text-white">{i + 1}</span>
+                <div className="cl-pdf-thumb-actions absolute right-1 top-1 flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button onClick={(e) => { e.stopPropagation(); xoay(oi, -90); }} title="Xoay trái" className="grid h-7 w-7 place-items-center rounded bg-white/95 text-[13px] shadow ring-1 ring-slate-200 active:scale-90">↺</button>
+                  <button onClick={(e) => { e.stopPropagation(); xoay(oi, 90); }} title="Xoay phải" className="grid h-7 w-7 place-items-center rounded bg-white/95 text-[13px] shadow ring-1 ring-slate-200 active:scale-90">↻</button>
+                </div>
+                {/* Hai nút này để dành cho điện thoại / máy tính bảng — nơi không kéo thả được */}
+                <div className="absolute inset-x-0 bottom-5 flex justify-between px-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button onClick={(e) => { e.stopPropagation(); doiCho(i, i - 1); }} disabled={i === 0} title="Đưa lên trước một chỗ" className="grid h-6 w-6 place-items-center rounded bg-white/95 text-[12px] font-bold text-slate-600 shadow ring-1 ring-slate-200 disabled:opacity-30">◀</button>
+                  <button onClick={(e) => { e.stopPropagation(); doiCho(i, i + 1); }} disabled={i >= dsTrang.length - 1} title="Đẩy xuống sau một chỗ" className="grid h-6 w-6 place-items-center rounded bg-white/95 text-[12px] font-bold text-slate-600 shadow ring-1 ring-slate-200 disabled:opacity-30">▶</button>
+                </div>
+              </>
+            )}
+            <div className="flex items-center justify-center gap-1 bg-slate-50 py-0.5 text-[10px] text-slate-400">
+              Trang {i + 1}
+              {xoayTung && oi !== i ? <span className="rounded bg-sky-100 px-1 font-semibold text-sky-700" title="Trang này vốn nằm ở vị trí nào trong file gốc">gốc {oi + 1}</span> : null}
+              {xoayTung && goc(oi) ? <span className="rounded bg-amber-100 px-1 font-semibold text-amber-700">{goc(oi)}°</span> : null}
+            </div>
+          </div>
+        ))}
       </div>
-      {pageN > thumbs.length && <p className="mt-2 text-center text-xs text-slate-400">… và {pageN - thumbs.length} trang nữa (tổng {pageN} trang)</p>}
+      {xem !== null && doc && (
+        <XemTo pages={dsTrang.map((oi) => ({ id: 'p' + oi, srcId: SRC, pageIndex: oi, rot: goc(oi) }))} index={xem} docs={{ [SRC]: { doc } }}
+          onRotate={(i: number, b: number) => xoayTung && xoay(dsTrang[i], b)} onClose={() => setXem(null)} />
+      )}
     </div>
   );
 }
@@ -203,9 +273,13 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
   const fileInput = useRef<HTMLInputElement | null>(null);
   const [q, setQ] = useState(''); const [active, setActive] = useState<Tool | null>(null);
   const [files, setFiles] = useState<File[]>([]); const [rots, setRots] = useState<number[]>([]); const [dirName, setDirName] = useState(''); const dirHandle = useRef<any>(null); const [useDir, setUseDir] = useState(false); const [outName, setOutName] = useState(''); const [drag, setDrag] = useState(false); const addMode = useRef(false);
-  const [range, setRange] = useState(''); const [angle, setAngle] = useState(90); const [after, setAfter] = useState(1); const [quality, setQuality] = useState(0.4); const [wm, setWm] = useState('BẢN SAO'); const [pw, setPw] = useState('');
+  const [soTrang, setSoTrang] = useState(0);
+  const [gocTrang, setGocTrang] = useState<number[]>([]); // góc xoay RIÊNG từng trang (đặt bằng nút ↺ ↻ ở bản xem trước)
+  const [thuTuTrang, setThuTuTrang] = useState<number[]>([]); // thứ tự trang sau khi KÉO ĐỔI CHỖ (mỗi số = trang thứ mấy trong file gốc)
+  const [range, setRange] = useState(''); const [after, setAfter] = useState(1); const [quality, setQuality] = useState(0.4); const [wm, setWm] = useState('BẢN SAO'); const [pw, setPw] = useState('');
   const [msg, setMsg] = useState(''); const [err, setErr] = useState(''); const [resultUrl, setResultUrl] = useState(''); const [working, setWorking] = useState(false); const [compressRows, setCompressRows] = useState<Array<{ name: string; before: number; after: number; url: string; blob: Blob }>>([]); const [compressSel, setCompressSel] = useState<Set<number>>(new Set()); const [outFiles, setOutFiles] = useState<Array<{ name: string; url: string }>>([]);
 
+  useEffect(() => { setGocTrang([]); setThuTuTrang([]); }, [files, active]); // tệp/công cụ đổi → bỏ góc xoay và thứ tự đã sắp
   const ctxOf = (s: any) => ({ pages: s?.pages || [], docs: s?.docs || {}, PDFLib: PDFLib(), pdfjsLib: pdfjsLib() });
   const loadSrc = async (file: File) => { const bytes = new Uint8Array(await file.arrayBuffer()); const doc = await pdfjsLib().getDocument({ data: bytes.slice() }).promise; const srcId = 'S' + Math.random().toString(36).slice(2, 6); const pgs = Array.from({ length: doc.numPages }, (_, i) => ({ id: 'p' + i, srcId, pageIndex: i, rot: 0 })); return { pages: pgs, docs: { [srcId]: { bytes, doc } } }; };
 
@@ -222,7 +296,7 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
   };
   const saveRows = async (rows: Array<{ name: string; blob: Blob }>) => { for (const r of rows) await saveRow(r); if (useDir && dirHandle.current && rows.length) toast.success(`Đã lưu ${rows.length} tệp vào 📁 ${dirName}`); };
   // Đã tạo tệp xong mà người dùng chỉnh sửa (thêm/bớt/xoay ảnh, đổi tên, đổi nơi lưu) → xoá kết quả cũ để nút "tải về" hiện lại.
-  useEffect(() => { setResultUrl((u) => { if (u) URL.revokeObjectURL(u); return ''; }); setCompressSel(new Set()); setCompressRows((rows) => { rows.forEach((r) => URL.revokeObjectURL(r.url)); return []; }); setOutFiles((rows) => { rows.forEach((r) => URL.revokeObjectURL(r.url)); return []; }); setMsg(''); }, [files, rots, outName, useDir]);
+  useEffect(() => { setResultUrl((u) => { if (u) URL.revokeObjectURL(u); return ''; }); setCompressSel(new Set()); setCompressRows((rows) => { rows.forEach((r) => URL.revokeObjectURL(r.url)); return []; }); setOutFiles((rows) => { rows.forEach((r) => URL.revokeObjectURL(r.url)); return []; }); setMsg(''); }, [files, rots, outName, useDir, gocTrang, thuTuTrang]);
   const enter = (t: Tool) => { if (t.engine === 'edit') return onEdit(); setActive(t); setFiles([]); setRots([]); setOutName(''); setMsg(''); setErr(''); clearResult(); clearCompress(); clearOut(); setPw(''); setRange(''); setDrag(false); };
   const back = () => { setActive(null); setFiles([]); setRots([]); setOutName(''); setMsg(''); setErr(''); clearResult(); clearCompress(); clearOut(); };
   // Chọn 1 lần thư mục lưu → lần sau lưu THẲNG vào đó (không hộp thoại). Bỏ tick = hỏi nơi lưu mỗi lần.
@@ -259,6 +333,8 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
     window.addEventListener('paste', onPaste); return () => window.removeEventListener('paste', onPaste);
   }, [active]);
 
+  // Xoay MỌI trang thêm một góc. Cộng dồn vào góc riêng đang có nên bản xem trước đổi ngay.
+  const xoayTatCa = (buoc: number) => setGocTrang(() => Array.from({ length: soTrang }, (_, i) => ((gocTrang[i] || 0) + buoc + 360) % 360));
   const run = async (label: string, fn: () => Promise<any>) => { setWorking(true); setBusy(label); setMsg(''); setErr(''); setResultUrl((old) => { if (old) URL.revokeObjectURL(old); return ''; }); setOutFiles((rows) => { rows.forEach((r) => URL.revokeObjectURL(r.url)); return []; }); try { const r = await fn(); setMsg('✅ Hoàn tất.'); if (Array.isArray(r)) setOutFiles(r); else if (typeof r === 'string' && r) setResultUrl(r); } catch (e: any) { if (e?.cancelled) { setMsg(''); setErr(''); } else { setErr(''); toast.error(e?.message || String(e), 'Không thể xử lý'); } } finally { setWorking(false); setBusy(null); } };
   const doClient = async (t: Tool) => {
     // Nén NHIỀU tệp PDF → trả BẢNG đối chiếu (không tự tải; người dùng tải từ bảng).
@@ -270,7 +346,15 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
     if (t.id === 'split') return ops.opSplit(ctx);
     if (t.id === 'extract') return ops.opExtract(ctx, range);
     if (t.id === 'remove') return ops.opRemove(ctx, range);
-    if (t.id === 'rotate') return ops.opRotate(ctx, angle, range);
+    if (t.id === 'rotate') {
+      const dt = thuTuTrang.length === ctx.pages.length ? thuTuTrang : ctx.pages.map((_: any, i: number) => i);
+      const daKeo = dt.some((oi: number, i: number) => oi !== i);
+      const daXoay = gocTrang.some((g) => g);
+      if (!daXoay && !daKeo) throw new Error('Chưa xoay hay đổi chỗ trang nào. Dùng nút ↺ ↻ để xoay trang, hoặc kéo trang thả sang chỗ khác để đổi thứ tự.');
+      // Bản xem trước là DUY NHẤT: xếp lại trang đúng thứ tự đang nhìn thấy, mỗi trang mang theo góc xoay của chính nó.
+      ctx.pages = dt.map((oi: number) => { const pg = ctx.pages[oi]; return { ...pg, rot: ((pg.rot || 0) + (gocTrang[oi] || 0)) % 360 }; });
+      return ops.opRotate(ctx, 0, '', daXoay ? 'xoay-trang.pdf' : 'sap-xep-trang.pdf');
+    }
     if (t.id === 'reverse') return ops.opReverse(ctx);
     if (t.id === 'blank') return ops.opBlank(ctx, after);
     if (t.id === 'pagenum') return ops.opPageNumbers(ctx);
@@ -365,10 +449,21 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
                   <span className="text-lg">📄</span><span className="min-w-0 flex-1 truncate font-medium text-[#0A2540]">{files[0].name}</span>
                   <button onClick={() => openPicker(false)} className="rounded-lg border px-3 py-1 text-xs font-medium hover:bg-slate-50">Chọn tệp khác</button>
                 </div>
-                <div className="mb-3 rounded-xl border bg-white p-3"><p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Xem trước tệp</p><FilePreview files={files} input={active.input} /></div>
+                <div className="mb-3 rounded-xl border bg-white p-3"><p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Xem trước tệp</p><FilePreview files={files} input={active.input} xoayTung={active.id === 'rotate'} gocTrang={gocTrang} datGoc={setGocTrang} datSoTrang={setSoTrang} thuTu={thuTuTrang} datThuTu={setThuTuTrang} /></div>
 
                 {active.opts?.includes('range') && <label className="mb-3 block text-sm text-slate-600">Trang {active.id === 'extract' ? 'cần lấy' : 'cần xoá'} (vd: 1,3,5-7)<input value={range} onChange={(e) => setRange(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2" placeholder="1,3,5-7" /></label>}
-                {active.opts?.includes('rotate') && <div className="mb-3 grid grid-cols-2 gap-3"><label className="block text-sm text-slate-600">Góc xoay<select value={angle} onChange={(e) => setAngle(+e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2"><option value={90}>90° phải</option><option value={180}>180°</option><option value={270}>90° trái</option></select></label><label className="block text-sm text-slate-600">Trang (trống = tất cả)<input value={range} onChange={(e) => setRange(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2" placeholder="tất cả" /></label></div>}
+                {active.opts?.includes('rotate') && (
+                  <div className="mb-3 rounded-xl border bg-slate-50 p-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-semibold text-slate-600">Xoay tất cả:</span>
+                      <button onClick={() => xoayTatCa(-90)} disabled={!soTrang} className="rounded-lg border bg-white px-3 py-1.5 text-sm font-semibold shadow-sm transition active:scale-95 hover:bg-slate-100 disabled:opacity-40">↺ Trái 90°</button>
+                      <button onClick={() => xoayTatCa(90)} disabled={!soTrang} className="rounded-lg border bg-white px-3 py-1.5 text-sm font-semibold shadow-sm transition active:scale-95 hover:bg-slate-100 disabled:opacity-40">↻ Phải 90°</button>
+                      <button onClick={() => xoayTatCa(180)} disabled={!soTrang} className="rounded-lg border bg-white px-3 py-1.5 text-sm font-semibold shadow-sm transition active:scale-95 hover:bg-slate-100 disabled:opacity-40">180°</button>
+                      <button onClick={() => setGocTrang([])} disabled={!gocTrang.some((g) => g)} className="ml-auto rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-500 transition hover:bg-slate-200 disabled:opacity-40">Đặt lại</button>
+                    </div>
+                    <p className="mt-2 text-xs text-slate-500">Xoay riêng một trang: bấm ↺ ↻ trên trang đó ở phần xem trước, hoặc bấm vào trang để mở to rồi xoay.<br /><b>Đổi vị trí trang:</b> kéo một trang thả vào chỗ trang khác — các trang còn lại tự dồn lại; trên điện thoại thì dùng hai nút ◀ ▶ ở giữa mỗi trang. Số tròn xanh đậm ở góc là <b>thứ tự trong tệp sẽ tải về</b>. <b>Nhìn thấy sao thì tệp tải về đúng như vậy.</b></p>
+                  </div>
+                )}
                 {active.opts?.includes('blank') && <label className="mb-3 block text-sm text-slate-600">Chèn trang trắng sau trang số<input type="number" min={0} value={after} onChange={(e) => setAfter(+e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2" /></label>}
                 {active.opts?.includes('compress') && <label className="mb-3 block text-sm text-slate-600">Mức nén<select value={quality} onChange={(e) => setQuality(+e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2"><option value={0.4}>Nén mạnh (nhẹ nhất)</option><option value={0.6}>Vừa</option><option value={0.8}>Nén nhẹ (nét hơn)</option></select></label>}
                 {active.opts?.includes('watermark') && <label className="mb-3 block text-sm text-slate-600">Chữ dấu mờ<input value={wm} onChange={(e) => setWm(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2" placeholder="BẢN SAO" /></label>}
@@ -446,7 +541,7 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
                 ) : (
                   <>
                     {/* Đã tải xong → nút tải bị LÀM MỜ & KHÔNG bấm được (tránh tải trùng); chỉnh sửa gì đó sẽ tự bật lại. */}
-                    <button onClick={process} disabled={working || !!resultUrl || outFiles.length > 0} className="mt-1 w-full rounded-xl bg-emerald-600 py-3 text-base font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40">{working ? 'Đang xử lý…' : resultUrl ? '✓ Đã tải xong' : outFiles.length ? '✓ Đã tạo xong' : `${active.name} & tải về`}</button>
+                    <button onClick={process} disabled={working || !!resultUrl || outFiles.length > 0} className="mt-1 w-full rounded-xl bg-emerald-600 py-3 text-base font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40">{working ? 'Đang xử lý…' : resultUrl ? '✓ Đã tải xong' : outFiles.length ? '✓ Đã tạo xong' : (active.id === 'rotate' ? 'Tải về' : `${active.name} & tải về`)}</button>
                     {resultUrl && <button onClick={() => window.open(resultUrl, '_blank')} className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-emerald-600 py-2.5 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50">📄 Mở tệp vừa tạo để kiểm tra</button>}
                   </>
                 )}

@@ -3,6 +3,7 @@ import ListingDetailClient from './ListingDetailClient';
 import SiteFooter from '@/components/SiteFooter';
 import SideAds from '@/components/SideAds';
 
+import { ldJson } from '@/lib/jsonld';
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns.org';
 const BACKEND = process.env.BACKEND_HOST ? (process.env.BACKEND_HOST.startsWith('http') ? process.env.BACKEND_HOST : `https://${process.env.BACKEND_HOST}`) : '';
 
@@ -65,7 +66,7 @@ export default async function Page({ params }: { params: { id: string } }) {
   } : null;
   return (
     <>
-      {ld && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />}
+      {ld && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(ld) }} />}
       {/* Quảng cáo 2 cánh gà — CHỈ hiện ở tin THƯỜNG (không VIP, không đẩy nổi bật) */}
       {!l?.boosted && (!l?.tier || l.tier === 'normal') && <SideAds />}
       <ListingDetailClient />

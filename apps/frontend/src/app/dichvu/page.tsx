@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin } from '@/lib/auth';
 import { useFlags } from '@/lib/flags';
 
 interface Pkg { id: string; name: string; kind: 'post' | 'boost' | 'video'; tier?: 'normal' | 'silver' | 'gold' | 'diamond'; boosts?: number; posts?: number; days: number; price: number; perks: string[]; popular?: boolean }
@@ -28,7 +28,7 @@ const dleft = (iso?: string | null) => (iso ? Math.max(0, Math.ceil((new Date(is
 export default function ServicesPage() {
   const { user } = useAuth(); const router = useRouter();
   const { flags, loaded } = useFlags();
-  const isAdmin = (user as any)?.role === 'admin';
+  const isAdmin = laAdmin(user);
   const [packages, setPackages] = useState<Pkg[]>(STATIC);
   const [bank, setBank] = useState<Bank>(STATIC_BANK);
   const [current, setCurrent] = useState<any>(null);

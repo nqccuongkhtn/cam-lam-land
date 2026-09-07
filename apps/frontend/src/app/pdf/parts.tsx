@@ -168,3 +168,150 @@ export function SignPad({ onClose, onDone }: { onClose: () => void; onDone: (d: 
     </div>
   );
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  XEM TO — mở hồ sơ ra TOÀN MÀN HÌNH, CUỘN/VUỐT qua từng trang như đọc sách,
+//  thấy trang nào nằm ngang thì xoay ngay trang đó.
+//  · Cuộn chuột hoặc vuốt ngón tay để lướt qua các trang (không bắt buộc bấm nút).
+//  · Số trang trên thanh công cụ TỰ ĐỔI theo trang đang nhìn thấy.
+//  · Nút xoay tác động lên ĐÚNG trang đang xem, và là xoay THẬT — xuất file ra vẫn giữ chiều.
+//  · Phóng to/thu nhỏ chỉ để nhìn, không đụng vào file.
+//  Trang chỉ được vẽ khi sắp lướt tới (đỡ nặng máy với hồ sơ nhiều trang).
+// ═══════════════════════════════════════════════════════════════════════════════
+function NutXem({ onClick, disabled, title, children }: any) {
+  return (
+    <button onClick={onClick} disabled={disabled} title={title} aria-label={title}
+      className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-lg leading-none text-white transition hover:bg-white/15 active:scale-90 disabled:opacity-30">
+      {children}
+    </button>
+  );
+}
+
+/** Một trang trong bộ xem. Chỉ vẽ khi đã lướt tới gần (tiết kiệm máy). */
+function TrangXem({ pg, doc, zoom, onDo }: any) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const boxRef = useRef<HTMLDivElement | null>(null);
+  const [gan, setGan] = useState(false);
+
+  // Báo cho bộ xem biết khung của trang này (để tính trang đang nhìn thấy) + bật vẽ khi tới gần
+  useEffect(() => {
+    const el = boxRef.current; if (!el) return;
+    onDo(pg.id, el);
+    const ob = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) setGan(true); }, { rootMargin: '800px 0px' });
+    ob.observe(el);
+    return () => ob.disconnect();
+  }, [pg.id]);
+
+  useEffect(() => { if (gan) ve(); /* eslint-disable-next-line */ }, [gan, zoom, pg.rot, doc]);
+  async function ve() {
+    if (!doc || !canvasRef.current) return;
+    const page = await doc.getPage(pg.pageIndex + 1);
+    const vp = page.getViewport({ scale: zoom, rotation: (page.rotate + pg.rot) % 360 });
+    const c = canvasRef.current; c.width = vp.width; c.height = vp.height;
+    await page.render({ canvasContext: c.getContext('2d')!, viewport: vp }).promise;
+  }
+
+  return (
+    <div ref={boxRef} className="mb-5 flex justify-center">
+      <canvas ref={canvasRef} className="block rounded bg-white shadow-2xl" style={{ minHeight: gan ? undefined : 320, minWidth: gan ? undefined : 240 }} />
+    </div>
+  );
+}
+
+export function XemTo({ pages, index, docs, onRotate, onClose }: any) {
+  const cuonRef = useRef<HTMLDivElement | null>(null);
+  const khungRef = useRef<Record<string, HTMLElement>>({});
+  const [zoom, setZoom] = useState(0);      // 0 = chưa tính → tự tính cho vừa màn hình
+  const [hien, setHien] = useState(index);  // trang đang nhìn thấy
+  const daNhay = useRef(false);             // đã nhảy tới trang mở đầu chưa
+
+  const ghiKhung = (id: string, el: HTMLElement) => { khungRef.current[id] = el; };
+
+  // Tính cỡ cho vừa màn hình, dựa trên trang đang mở
+  useEffect(() => {
+    (async () => {
+      const pg = pages[index]; const doc = docs?.[pg?.srcId]?.doc;
+      if (!pg || !doc) return;
+      const page = await doc.getPage(pg.pageIndex + 1);
+      const g = page.getViewport({ scale: 1, rotation: (page.rotate + pg.rot) % 360 });
+      const vua = Math.min((window.innerWidth - 40) / g.width, (window.innerHeight - 110) / g.height);
+      setZoom(Math.max(0.15, Math.min(vua, 4)));
+    })();
+    /* eslint-disable-next-line */
+  }, []);
+
+  // Mở ra là nhảy thẳng tới trang bạn vừa bấm
+  useEffect(() => {
+    if (daNhay.current || !zoom) return;
+    const el = khungRef.current[pages[index]?.id];
+    if (el) { el.scrollIntoView({ block: 'start' }); daNhay.current = true; }
+  }, [zoom, index, pages]);
+
+  // CUỘN/VUỐT tới đâu thì số trang đổi tới đó — không cần bấm nút
+  useEffect(() => {
+    const box = cuonRef.current; if (!box) return;
+    const doTrang = () => {
+      const giua = box.scrollTop + box.clientHeight / 2;
+      let tot = 0, min = Infinity;
+      pages.forEach((pg: any, i: number) => {
+        const el = khungRef.current[pg.id]; if (!el) return;
+        const tam = el.offsetTop + el.offsetHeight / 2;
+        const d = Math.abs(tam - giua);
+        if (d < min) { min = d; tot = i; }
+      });
+      setHien(tot);
+    };
+    box.addEventListener('scroll', doTrang, { passive: true });
+    doTrang();
+    return () => box.removeEventListener('scroll', doTrang);
+  }, [pages, zoom]);
+
+  const toiTrang = (i: number) => {
+    const k = Math.max(0, Math.min(pages.length - 1, i));
+    khungRef.current[pages[k]?.id]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  const thuNho = () => setZoom((z) => Math.max(0.15, +(z - 0.2).toFixed(2)));
+  const phongTo = () => setZoom((z) => Math.min(6, +(z + 0.2).toFixed(2)));
+
+  // Phím tắt: ← → / PageUp PageDown chuyển trang · + − phóng thu · Esc đóng
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') toiTrang(hien - 1);
+      else if (e.key === 'ArrowRight' || e.key === 'PageDown') toiTrang(hien + 1);
+      else if (e.key === '+' || e.key === '=') phongTo();
+      else if (e.key === '-') thuNho();
+      else return;
+      e.preventDefault();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
+
+  if (!pages.length) return null;
+  const vach = <span className="mx-1 h-5 w-px shrink-0" style={{ background: 'rgba(255,255,255,.25)' }} />;
+  return (
+    <div className="fixed inset-0 z-[100] flex flex-col" style={{ background: 'rgba(0,0,0,.88)' }}>
+      <div className="pointer-events-none flex shrink-0 justify-center p-3">
+        <div className="pointer-events-auto flex items-center gap-0.5 overflow-x-auto rounded-2xl px-2 py-1.5 shadow-2xl" style={{ background: '#2f2f2f' }}>
+          <NutXem onClick={() => toiTrang(hien - 1)} disabled={hien <= 0} title="Trang trước">‹</NutXem>
+          <span className="min-w-[74px] select-none text-center text-sm font-semibold tabular-nums text-white">{hien + 1} / {pages.length}</span>
+          <NutXem onClick={() => toiTrang(hien + 1)} disabled={hien >= pages.length - 1} title="Trang sau">›</NutXem>
+          {vach}
+          <NutXem onClick={thuNho} title="Thu nhỏ">－</NutXem>
+          <NutXem onClick={phongTo} title="Phóng to">＋</NutXem>
+          {vach}
+          <NutXem onClick={() => onRotate(hien, -90)} title="Xoay trái trang đang xem">↺</NutXem>
+          <NutXem onClick={() => onRotate(hien, 90)} title="Xoay phải trang đang xem">↻</NutXem>
+          {vach}
+          <NutXem onClick={onClose} title="Đóng (Esc)">✕</NutXem>
+        </div>
+      </div>
+      <div ref={cuonRef} className="scroll-soft min-h-0 flex-1 overflow-auto overscroll-contain p-4" style={{ WebkitOverflowScrolling: 'touch' }}>
+        {pages.map((pg: PageRef) => (
+          <TrangXem key={pg.id} pg={pg} doc={docs?.[pg.srcId]?.doc} zoom={zoom || 1} onDo={ghiKhung} />
+        ))}
+      </div>
+    </div>
+  );
+}

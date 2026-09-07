@@ -64,11 +64,11 @@ export async function opRemove(ctx: any, range: string) {
   const order = pages.map((_: any, i: number) => i).filter((i: number) => !rm.has(i)); if (!order.length) throw new Error('Không thể xoá hết tất cả các trang');
   return dlReturn(await (await buildDoc(pages, docs, PDFLib, order)).save(), 'xoa-trang.pdf');
 }
-export async function opRotate(ctx: any, angle: number, range: string) {
+export async function opRotate(ctx: any, angle: number, range: string, ten = 'xoay-trang.pdf') {
   const { pages, docs, PDFLib } = ctx; const sel = range.trim() ? new Set(parseRange(range, pages.length)) : null;
   const out = await PDFLib.PDFDocument.create(); const cache: Record<string, any> = {};
   for (let i = 0; i < pages.length; i++) { const pg = pages[i]; if (!cache[pg.srcId]) cache[pg.srcId] = await PDFLib.PDFDocument.load(docs[pg.srcId].bytes); const [cp] = await out.copyPages(cache[pg.srcId], [pg.pageIndex]); const p = out.addPage(cp); const extra = (pg.rot || 0) + (!sel || sel.has(i) ? angle : 0); if (extra) p.setRotation(PDFLib.degrees(((p.getRotation().angle || 0) + extra) % 360)); }
-  return dlReturn(await out.save(), 'xoay-trang.pdf');
+  return dlReturn(await out.save(), ten);
 }
 export async function opReverse(ctx: any) {
   const { pages, docs, PDFLib } = ctx; const order = pages.map((_: any, i: number) => i).reverse();

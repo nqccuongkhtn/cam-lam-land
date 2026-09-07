@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { laAdmin } from '@/lib/auth';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
@@ -51,7 +52,7 @@ export default function AgentProfilePage() {
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl sm:text-3xl font-extrabold truncate">{agent.name || 'Người đăng tin'}</h1>
-              {agent.role === 'admin' && <span className="bg-[#C8A14B] text-[#0A2540] text-[11px] font-bold px-2 py-0.5 rounded-full">Chính chủ sàn</span>}
+              {laAdmin(agent) && <span className="bg-[#C8A14B] text-[#0A2540] text-[11px] font-bold px-2 py-0.5 rounded-full">Chính chủ sàn</span>}
               {(agent as any).rating > 0 && <span className="inline-flex items-center gap-0.5 bg-white/10 rounded-full px-2 py-0.5 text-[13px] font-bold" title="Đánh giá bởi Cam Lâm Land"><span className="text-[#FFD56A]">★</span> {Number((agent as any).rating).toFixed(1)}<span className="text-white/50 font-normal">/5</span></span>}
             </div>
             <p className="text-white/60 text-sm mt-1">Người đăng tin · Cam Lâm Land{agent.createdAt ? ' · ' + joinedLabel(agent.createdAt) : ''}</p>

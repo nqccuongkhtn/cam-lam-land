@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import NewsReaderClient from './NewsReaderClient';
 
+import { ldJson } from '@/lib/jsonld';
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns.org';
 
 async function getArticle(slug: string): Promise<any | null> {
@@ -46,7 +47,7 @@ export default async function Page({ params }: { params: { id: string } }) {
   } : null;
   return (
     <>
-      {ld && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />}
+      {ld && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(ld) }} />}
       <NewsReaderClient />
     </>
   );

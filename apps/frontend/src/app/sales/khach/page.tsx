@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin } from '@/lib/auth';
 import {
   listCustomers, getCustomer, addCustomer, updateCustomer, removeCustomer,
   addNeed, updateNeed, removeNeed, updateInterest, removeInterest, getMatch, addInterest, addActivity, removeActivity, updateActivity, clearActivities,
@@ -131,7 +131,7 @@ export default function CrmKhachPage() {
             <p className="text-sm text-slate-500 hidden sm:block">Quản lý khách, nhu cầu và các tin họ quan tâm — chốt deal hiệu quả.</p>
           </div>
           <div className="flex items-center gap-2">
-            {user.role === 'admin' && (
+            {laAdmin(user) && (
               <label className="flex items-center gap-1 text-xs font-semibold text-slate-600 cursor-pointer bg-white border border-slate-200 rounded-full px-2.5 py-1.5"><input type="checkbox" checked={adminAll} onChange={(e) => { setAdminAll(e.target.checked); setSel(null); setDetail(null); }} className="accent-[#7c3aed]" /> Xem toàn đội</label>
             )}
             <button onClick={() => { setEditCustId(null); setCf({ name: '', phone: '', source: '', note: '' }); setShowAdd((v) => !v); }} className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-bold px-3 sm:px-4 py-2 rounded-full text-sm whitespace-nowrap">＋ Thêm khách</button>

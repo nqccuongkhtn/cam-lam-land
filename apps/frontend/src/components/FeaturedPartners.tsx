@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { api } from '@/lib/api';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin } from '@/lib/auth';
 
 type Partner = { id: number; name: string; logoUrl?: string | null };
 
@@ -38,7 +38,7 @@ function Tile({ p, isAdmin, onDelete }: { p: Partner; isAdmin: boolean; onDelete
 
 export default function FeaturedPartners() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = laAdmin(user);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [addOpen, setAddOpen] = useState(false);
   const [name, setName] = useState('');

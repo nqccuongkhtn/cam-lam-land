@@ -24,6 +24,80 @@ function WmImg({ src, alt, wrap, img }: { src: string; alt?: string; wrap?: stri
   );
 }
 
+// ══ CHIA SẺ BÀI ══
+// Điện thoại: bấm "Chia sẻ" là mở đúng bảng chia sẻ của máy — có sẵn Zalo, Messenger, tin nhắn…
+// Máy tính: không có bảng đó nên bày thẳng Facebook, Zalo và nút chép đường dẫn.
+function ChiaSe({ tieuDe, gon }: { tieuDe: string; gon?: boolean }) {
+  const [daChep, setDaChep] = useState(false);
+  const [hienLink, setHienLink] = useState('');   // chép không được thì bày đường dẫn ra cho tự chép
+  const [coMayChiaSe, setCoMayChiaSe] = useState(false);
+  useEffect(() => { setCoMayChiaSe(typeof navigator !== 'undefined' && !!(navigator as any).share); }, []);
+  const diaChi = () => (typeof window === 'undefined' ? '' : window.location.href);
+
+  const chep = async () => {
+    const u = diaChi();
+    // Lệnh chép của trình duyệt có lúc TREO (cửa sổ không được chọn, hoặc đang chờ hỏi quyền) —
+    // treo thì nút bấm như không có tác dụng. Nên đặt hạn 1,2 giây, quá hạn là chuyển cách khác.
+    const coHan = (p: Promise<any>) => Promise.race([p, new Promise((_, ng) => setTimeout(() => ng(new Error('quá hạn')), 1200))]);
+    try { await coHan(navigator.clipboard.writeText(u)); }
+    catch {
+      // Cách cũ: mượn một ô nhập tạm rồi ra lệnh chép
+      let ok = false;
+      try {
+        const t = document.createElement('textarea'); t.value = u;
+        t.style.position = 'fixed'; t.style.top = '0'; t.style.opacity = '0';
+        document.body.appendChild(t); t.focus(); t.select();
+        ok = document.execCommand('copy');
+        document.body.removeChild(t);
+      } catch { ok = false; }
+      // Cả hai cách đều không xong thì BÀY ĐƯỜNG DẪN RA cho người dùng tự chép —
+      // đừng để nút bấm mà chẳng thấy gì xảy ra.
+      if (!ok) { setHienLink(u); return; }
+    }
+    setHienLink(''); setDaChep(true); setTimeout(() => setDaChep(false), 2000);
+  };
+  const mayChiaSe = async () => {
+    try { await (navigator as any).share({ title: tieuDe, text: tieuDe, url: diaChi() }); } catch { /* người dùng đóng bảng chia sẻ */ }
+  };
+  const moCuaSo = (u: string) => { try { window.open(u, '_blank', 'noopener,width=640,height=560'); } catch { /* trình duyệt chặn cửa sổ bật */ } };
+
+  const nut = 'inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-[13px] font-bold transition';
+  return (
+    <div className={`flex flex-wrap items-center gap-2 ${gon ? '' : 'rounded-2xl border border-slate-200 bg-white p-3 sm:p-4'}`}>
+      {!gon && <span className="mr-1 text-sm font-bold text-[#0A2540]">Chia sẻ bài này:</span>}
+      {coMayChiaSe && (
+        <button onClick={mayChiaSe} className={`${nut} bg-[#0A2540] text-white hover:bg-[#0d2f54]`} aria-label="Chia sẻ">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" /></svg>
+          Chia sẻ
+        </button>
+      )}
+      <button onClick={() => moCuaSo('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(diaChi()))}
+        className={`${nut} ${coMayChiaSe ? 'hidden sm:inline-flex' : ''} bg-[#1877F2] text-white hover:brightness-110`} aria-label="Chia sẻ lên Facebook">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 10-11.6 9.9v-7h-2.5V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0022 12z" /></svg>
+        Facebook
+      </button>
+      <button onClick={() => moCuaSo('https://sp.zalo.me/plugins/share?u=' + encodeURIComponent(diaChi()))}
+        className={`${nut} ${coMayChiaSe ? 'hidden sm:inline-flex' : ''} bg-[#0068FF] text-white hover:brightness-110`} aria-label="Chia sẻ qua Zalo">
+        <span className="font-black tracking-tight">Zalo</span>
+      </button>
+      <button onClick={chep} className={`${nut} ${daChep ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-[#0A2540] hover:bg-slate-200'}`} aria-label="Sao chép đường dẫn">
+        {daChep ? (
+          <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>Đã chép</>
+        ) : (
+          <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15V5a2 2 0 012-2h10" /></svg>Chép đường dẫn</>
+        )}
+      </button>
+      {hienLink && (
+        <div className="mt-1 flex w-full items-center gap-2">
+          <input readOnly value={hienLink} onFocus={(e) => e.currentTarget.select()} autoFocus
+            className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[12px] text-slate-600" />
+          <span className="shrink-0 text-[11px] text-slate-500">Bấm Ctrl+C để chép</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function RelatedList({ items }: { items: Article[] }) {
   if (!items.length) return null;
   return (
@@ -52,11 +126,27 @@ export default function NewsReaderClient() {
   const ad = useNewsAd();
 
   useEffect(() => {
-    fetch('/feed/news').then((r) => r.json()).then((d) => {
-      const list: Article[] = d.news || [];
-      setA(list.find((x: any) => x.slug === slug) || null);
-      setRelated(list.filter((x: any) => x.slug !== slug).slice(0, 8));
-    }).catch(() => {}).finally(() => setDone(true));
+    let huy = false;
+    // Không thấy bài thì THỬ LẠI một lần sau 3 giây rồi mới kết luận.
+    // Lý do: máy chủ vừa dựng lại thì kho tin đang được tải lại ở nền — lần hỏi đầu có thể chưa có
+    // bài, mà báo ngay "bài không còn được lưu" là báo oan (bấm F5 lại thấy).
+    const hoi = async (lanCuoi: boolean) => {
+      try {
+        const d = await (await fetch('/feed/news', { cache: 'no-store' })).json();
+        const list: Article[] = d.news || [];
+        const bai = list.find((x: any) => x.slug === slug) || null;
+        if (huy) return true;
+        if (bai || lanCuoi) {
+          setA(bai);
+          setRelated(list.filter((x: any) => x.slug !== slug).slice(0, 8));
+          setDone(true);
+          return true;
+        }
+      } catch { if (lanCuoi && !huy) setDone(true); return true; }
+      return false;
+    };
+    hoi(false).then((xong) => { if (!xong && !huy) setTimeout(() => { if (!huy) hoi(true); }, 3000); });
+    return () => { huy = true; };
   }, [slug]);
 
   if (!done) return <div className="mx-auto max-w-5xl p-12 text-center text-slate-400">Đang tải…</div>;
@@ -101,6 +191,8 @@ export default function NewsReaderClient() {
               <span className="ml-auto text-[11px] bg-slate-100 text-slate-500 rounded-full px-2 py-0.5">Biên tập</span>
             </div>
 
+            <div className="mt-3 border-y border-slate-200 py-2.5"><ChiaSe tieuDe={decodeEntities(a.title)} gon /></div>
+
             {hero && <WmImg src={hero} alt={a.title} wrap="mt-5" img="max-h-[460px]" />}
 
             {a.summary && <p className="mt-5 text-[17px] font-semibold text-[#0A2540] leading-relaxed">{decodeEntities(a.summary)}</p>}
@@ -112,6 +204,8 @@ export default function NewsReaderClient() {
               <a href={a.url} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-2 bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-5 py-2.5 rounded-xl">Đọc bản gốc tại {a.source || 'nguồn'} →</a>
               <p className="text-[11px] text-slate-400 mt-3">Nguồn: <a href={a.url} target="_blank" rel="noreferrer" className="underline break-all hover:text-[#0A2540]">{a.url}</a></p>
             </div>
+
+            <div className="mt-5"><ChiaSe tieuDe={decodeEntities(a.title)} /></div>
 
             <div className="lg:hidden mt-6"><RelatedList items={related.slice(0, 6)} /></div>
             <div className="mt-6"><Link href="/tin-tuc" className="text-sm font-semibold text-red-600 hover:text-red-700">← Tất cả tin tức</Link></div>

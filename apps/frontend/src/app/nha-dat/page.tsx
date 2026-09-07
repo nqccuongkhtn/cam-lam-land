@@ -3,6 +3,7 @@ import Link from 'next/link';
 import SiteFooter from '@/components/SiteFooter';
 import { AREAS, TYPES } from '@/lib/seoLanding';
 
+import { ldJson } from '@/lib/jsonld';
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns.org';
 
 export const metadata: Metadata = {
@@ -34,7 +35,7 @@ function Chip({ href, children }: { href: string; children: React.ReactNode }) {
 export default function NhaDatHub() {
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(ld) }} />
       <div className="mx-auto max-w-6xl px-3 sm:px-4 py-6 sm:py-8">
         <nav className="text-[12px] text-slate-500 mb-3 flex items-center gap-1">
           <Link href="/" className="hover:text-[#C8A14B]">Trang chủ</Link><span>›</span>

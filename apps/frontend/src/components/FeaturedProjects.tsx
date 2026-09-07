@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin } from '@/lib/auth';
 
 type Project = { id: number; name: string; status?: string | null; scale?: string | null; location?: string | null; imageUrl?: string | null };
 
@@ -51,7 +51,7 @@ function ProjectCard({ p, isAdmin, onDelete }: { p: Project; isAdmin: boolean; o
 
 export default function FeaturedProjects() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = laAdmin(user);
   const [projects, setProjects] = useState<Project[]>([]);
   const [addOpen, setAddOpen] = useState(false);
   const [f, setF] = useState({ name: '', status: 'Đang mở bán', scale: '', location: '', imageUrl: '' });

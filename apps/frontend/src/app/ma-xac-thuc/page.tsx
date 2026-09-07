@@ -129,13 +129,16 @@ export default function MaXacThucPage() {
         </div>
       )}
 
-      {/* Vạch thời gian chung: hết vạch là cả bảng đổi mã */}
+      {/* Vạch thời gian chung: chạy ĐẦY DẦN, đầy hết vạch là cả bảng đổi mã mới. */}
       <div className="mb-3">
         <div className="flex items-center justify-between text-[12px] text-slate-400 mb-1">
           <span>Mã đổi sau</span><span className="font-bold text-slate-600">{conLai}s</span>
         </div>
         <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
-          <div className="h-full bg-[#00a2ff] transition-[width] duration-1000 ease-linear" style={{ width: `${(conLai / 30) * 100}%` }} />
+          {/* Vạch vừa đầy tới đích thì nhảy về 0 — bỏ hiệu ứng trượt ở đúng nhịp đó cho khỏi
+              nhìn thấy nó "chạy giật lùi" về đầu. */}
+          <div className={`h-full bg-[#00a2ff] ${conLai >= 29 ? '' : 'transition-[width] duration-1000 ease-linear'}`}
+            style={{ width: `${((30 - conLai) / 30) * 100}%` }} />
         </div>
       </div>
 

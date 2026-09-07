@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin } from '@/lib/auth';
 import { PROPERTY_LABELS, type PropertyType } from '@/lib/types';
 
 interface Item { id: number; name: string; phone: string; propertyType: string | null; ward: string | null; address: string | null; area: number | null; priceExpect: string | null; description: string | null; status: string; createdAt: string; }
@@ -19,14 +19,14 @@ export default function ConsignmentsPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [filter, setFilter] = useState('all');
 
-  useEffect(() => { if (!loading && (!user || user.role !== 'admin')) router.replace('/'); }, [loading, user, router]);
+  useEffect(() => { if (!loading && (!user || !laAdmin(user))) router.replace('/'); }, [loading, user, router]);
   function reload() { api<{ items: Item[] }>('/consignments').then((r) => setItems(r.items || [])).catch(() => {}); }
-  useEffect(() => { if (user?.role === 'admin') reload(); }, [user]);
+  useEffect(() => { if (laAdmin(user)) reload(); }, [user]);
 
   async function setStatus(id: number, status: string) { try { await api(`/consignments/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) }); reload(); } catch (e: any) { alert(e.message); } }
   async function del(id: number) { if (!confirm('Xoá yêu cầu này?')) return; try { await api(`/consignments/${id}`, { method: 'DELETE' }); reload(); } catch (e: any) { alert(e.message); } }
 
-  if (loading || !user || user.role !== 'admin') return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
+  if (loading || !user || !laAdmin(user)) return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
   const shown = filter === 'all' ? items : items.filter((i) => i.status === filter);
 
   return (

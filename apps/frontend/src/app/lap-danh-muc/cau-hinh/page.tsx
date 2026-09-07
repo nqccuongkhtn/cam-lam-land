@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // TRANG CẤU HÌNH QUẢN TRỊ cho công cụ Lập danh mục — CHỈ admin. Không đặt trên trang khách để tránh lộ khoá/giá.
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin } from '@/lib/auth';
 import { apiBase } from '@/lib/api';
 import { getToken } from '@/lib/token';
 import { toast } from '@/lib/toast';
@@ -19,7 +19,7 @@ export default function CauHinhPage() {
   const [price, setPrice] = useState(568);
   const [servicePrice, setServicePrice] = useState(200);
   const [saving, setSaving] = useState(false);
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = laAdmin(user);
 
   async function load() {
     try {

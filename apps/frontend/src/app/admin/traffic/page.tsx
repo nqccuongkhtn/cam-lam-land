@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin } from '@/lib/auth';
 
 interface Detail {
   total: number; today: number; yesterday: number; week: number; month: number; online: number; uniques: number;
@@ -33,7 +33,7 @@ export default function AdminTraffic() {
 
   if (loading) return <div className="mx-auto max-w-6xl px-4 py-16 text-center text-slate-500">Đang tải…</div>;
   if (!user) return null;
-  if (user.role !== 'admin') return (
+  if (!laAdmin(user)) return (
     <div className="mx-auto max-w-md px-4 py-20 text-center">
       <p className="text-xl font-bold text-[#0A2540]">Không có quyền truy cập</p>
       <p className="text-slate-500 mt-2 text-sm">Trang này chỉ dành cho admin. <Link href="/" className="text-[#0A2540] font-semibold underline">Về trang chủ</Link></p>

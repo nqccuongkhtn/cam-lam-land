@@ -1,8 +1,18 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { toolIconSvg as iconSvg } from '@/lib/toolIcons';
+import { useAuth, coVaiTro } from '@/lib/auth';
 
-export type HubTool = { key: string; name: string; desc: string; icon: string; path: string; login?: boolean; children?: HubTool[]; action?: string };
+// `vaiTro`: chỉ những tài khoản mang một trong các vai trò này mới THẤY công cụ.
+// Bỏ trống = ai cũng thấy. (Khác với `login` — cái đó chỉ nhắc phải đăng nhập.)
+export type HubTool = { key: string; name: string; desc: string; icon: string; path: string; login?: boolean; vaiTro?: string[]; children?: HubTool[]; action?: string };
+
+/** Lọc bỏ những công cụ mà tài khoản này không có quyền thấy. */
+export function locTheoQuyen(ds: HubTool[], user: any): HubTool[] {
+  return ds
+    .filter((t) => !t.vaiTro?.length || coVaiTro(user, ...t.vaiTro))
+    .map((t) => (t.children?.length ? { ...t, children: locTheoQuyen(t.children, user) } : t));
+}
 
 const withEmbed = (p: string) => p + (p.includes('?') ? '&' : '?') + 'embed=1';
 
@@ -16,7 +26,10 @@ export function runToolAction(t: HubTool): boolean {
 }
 
 // Khung "admin dashboard" dùng chung: 1 sidebar; item MẸ có submenu -> bấm là sổ xuống (accordion). Nội dung nhúng qua iframe.
-export default function HubShell({ tools, storageKey = 'hub', hideMobileMenu = false }: { title?: string; subtitle?: string; tools: HubTool[]; storageKey?: string; hideMobileMenu?: boolean }) {
+export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileMenu = false }: { title?: string; subtitle?: string; tools: HubTool[]; storageKey?: string; hideMobileMenu?: boolean }) {
+  // Công cụ nội bộ (vd tra mã xác thực) chỉ hiện với tài khoản được cấp quyền.
+  const { user } = useAuth();
+  const tools = useMemo(() => locTheoQuyen(tatCa, user), [tatCa, user]);
   const leaves = useMemo(() => tools.flatMap((t) => (t.children?.length ? t.children : [t])), [tools]);
   const parentOf = useMemo(() => { const m: Record<string, string> = {}; tools.forEach((t) => t.children?.forEach((c) => { m[c.key] = t.key; })); return m; }, [tools]);
   const [tab, setTab] = useState<string>(leaves.find((l) => !l.action)?.key || leaves[0]?.key || '');

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api, uploadImages } from '@/lib/api';
 import { resizeImage } from '@/lib/img';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin } from '@/lib/auth';
 import { WARDS } from '@/lib/types';
 import ImageCropper from '@/components/ImageCropper';
 
@@ -36,9 +36,9 @@ export default function MapAdsPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [adStyle, setAdStyle] = useState<'seal' | 'text'>('seal');
 
-  useEffect(() => { if (!loading && (!user || user.role !== 'admin')) router.replace('/'); }, [loading, user, router]);
+  useEffect(() => { if (!loading && (!user || !laAdmin(user))) router.replace('/'); }, [loading, user, router]);
   function reload() { api<{ ads: Ad[] }>('/map-ads').then((r) => setList(r.ads || [])).catch(() => {}); }
-  useEffect(() => { if (user?.role === 'admin') reload(); }, [user]);
+  useEffect(() => { if (laAdmin(user)) reload(); }, [user]);
 
   function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]; e.target.value = ''; if (f) setCropFile(f);
@@ -75,7 +75,7 @@ export default function MapAdsPage() {
     try { await api(`/map-ads/${id}`, { method: 'DELETE' }); reload(); } catch (e: any) { alert(e.message); }
   }
 
-  if (loading || !user || user.role !== 'admin') return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
+  if (loading || !user || !laAdmin(user)) return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
 
   const taken = new Set(list.filter((a) => a.active && a.id !== editingId).flatMap((a) => a.wards || []));
   const preview = adStyle === 'text'

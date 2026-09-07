@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin } from '@/lib/auth';
 import { getStats, getBoard, listAppointments, updateInterest, removeInterest, type CrmStats, type Interest, type Appointment } from '@/lib/crm';
 
 const STATUSES = ['Mới', 'Đang tư vấn', 'Thương lượng', 'Đã chốt', 'Không thành'];
@@ -58,7 +58,7 @@ export default function CrmBoardPage() {
             <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold text-[#0A2540]">Pipeline chốt deal</h1>
             <p className="text-xs text-slate-500">Mỗi thẻ là 1 khách quan tâm 1 tin. Đổi ô “Giai đoạn” trong thẻ để chuyển cột (Mới → … → Đã chốt).</p>
           </div>
-          {user.role === 'admin' && (
+          {laAdmin(user) && (
             <label className="flex items-center gap-1 text-xs font-semibold text-slate-600 cursor-pointer bg-white border border-slate-200 rounded-full px-2.5 py-1.5"><input type="checkbox" checked={adminAll} onChange={(e) => setAdminAll(e.target.checked)} className="accent-[#7c3aed]" /> Toàn đội</label>
           )}
           <div className="ml-auto inline-flex rounded-full bg-white border border-slate-200 p-1 text-xs sm:text-sm font-bold shrink-0">

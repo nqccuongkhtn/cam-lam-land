@@ -119,9 +119,9 @@ function polyArea(pts: { lng: number; lat: number }[]) {
 // ── THỬA ĐANG CHỌN: VIỀN NEON CHẠY QUANH, CÓ CHẤM TRÒN DẪN ĐẦU ────────────────
 // MỘT MÀU DUY NHẤT (xanh neon). Không pha màu thứ hai — pha vào là thành đường đứt
 // quãng hai màu, mất hẳn cảm giác "đường neon đang chạy".
-// Xanh neon SÁNG hơn tông cũ (#00e5ff) — nổi rõ hơn hẳn trên ảnh vệ tinh tối màu
-// (cây cối, mái nhà) mà vẫn không lẫn với ranh thửa xanh dương và tuyến đường cam/vàng.
-const MAU_NEON = '#4df3ff';
+// XANH LÁ NEON — nổi bật trên ảnh vệ tinh (cây cối, mái nhà, nền đất) mà không lẫn với
+// ranh thửa xanh dương, tuyến đường cam/vàng hay lớp ảnh quy hoạch.
+const MAU_NEON = '#39ff88';
 const MAU_CHAM = '#ffffff';   // chấm tròn dẫn đầu để TRẮNG cho bật hẳn lên
 
 // Lấy ranh NGOÀI của thửa + độ dài dồn từng đoạn, để chấm tròn chạy ĐỀU quanh viền

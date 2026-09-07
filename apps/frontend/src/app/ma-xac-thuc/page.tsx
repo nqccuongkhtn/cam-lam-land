@@ -107,8 +107,7 @@ export default function MaXacThucPage() {
         )}
       </div>
       <p className="text-slate-500 text-sm mb-4">
-        Mã tự đổi sau mỗi 30 giây, giống hệt ứng dụng Google Authenticator trên điện thoại.
-        Bấm vào mã là chép được ngay.
+        Mã tự đổi sau mỗi 30 giây. Bấm vào mã là chép được ngay.
       </p>
 
       {quanTri && moThem && (

@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import { useHideOnScroll } from '@/lib/hideOnScroll';
 
@@ -101,7 +101,7 @@ export default function Nav() {
     return path.startsWith(href);
   };
   const name = user?.fullName || user?.email?.split('@')[0] || '';
-  const roleLabel = user?.role === 'admin' ? 'Quản trị viên' : 'Thành viên';
+  const roleLabel = laAdmin(user) ? 'Quản trị viên' : 'Thành viên';
   function doLogout() { logout(); setAcct(false); setOpen(false); router.push('/'); }
 
   const txt = solid ? 'text-[#0A2540]' : 'text-white';
@@ -149,7 +149,9 @@ export default function Nav() {
                     <Link href="/sales/post" className={`${mItem} sm:hidden text-[#C8A14B]`}>＋ Đăng tin mới</Link>
                     <Link href="/account" className={mItem}>Tài khoản của tôi</Link>
                     <Link href="/sales" className={mItem}>Tin của tôi</Link>
-                    {(user.role === 'admin' || user.role === 'gis' || user.role === 'vanban') && <Link href="/quan-tri" className={`${mItem} font-bold text-[#0A2540]`}>🛠️ Trang quản lý</Link>}
+                    {(laAdmin(user) || coVaiTro(user, 'gis') || coVaiTro(user, 'vanban')) && <Link href="/quan-tri" className={`${mItem} font-bold text-[#0A2540]`}>🛠️ Trang quản lý</Link>}
+                    {/* Mã xác thực 2 lớp của các tài khoản dùng chung — chỉ hiện với người được cấp quyền. */}
+                    {coVaiTro(user, 'admin', 'xacthuc') && <Link href="/ma-xac-thuc" className={mItem}>🔐 Mã xác thực</Link>}
                     <div className="border-t border-slate-100 my-1" />
                     <button onClick={doLogout} className={`${mItem} text-red-600`}>Đăng xuất</button>
                   </div>
@@ -190,10 +192,16 @@ export default function Nav() {
               <Link href="/sales" onClick={() => setOpen(false)} className="flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50"><span className="text-slate-400"><MIco><rect x="4.5" y="3.5" width="15" height="17" rx="2" /><path d="M8 8.5h8M8 12h8M8 15.5h5" /></MIco></span>Tin của tôi</Link>
             </div>
           )}
-          {user && (user.role === 'admin' || user.role === 'gis' || user.role === 'vanban') && (
+          {user && (laAdmin(user) || coVaiTro(user, 'gis') || coVaiTro(user, 'vanban') || coVaiTro(user, 'xacthuc')) && (
             <div className="mt-1.5 pt-2 border-t border-slate-100">
               <p className="px-2 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wide">Quản lý</p>
-              <Link href="/quan-tri" onClick={() => setOpen(false)} className="flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-bold text-[#0A2540] hover:bg-slate-50"><span className="text-slate-400"><MIco><path d="M12 3.5 5 6v5c0 4.2 3 7.6 7 9.5 4-1.9 7-5.3 7-9.5V6l-7-2.5Z" /><path d="m9.3 11.8 1.9 1.9 3.4-3.8" /></MIco></span>Trang quản lý</Link>
+              {(laAdmin(user) || coVaiTro(user, 'gis') || coVaiTro(user, 'vanban')) && (
+                <Link href="/quan-tri" onClick={() => setOpen(false)} className="flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-bold text-[#0A2540] hover:bg-slate-50"><span className="text-slate-400"><MIco><path d="M12 3.5 5 6v5c0 4.2 3 7.6 7 9.5 4-1.9 7-5.3 7-9.5V6l-7-2.5Z" /><path d="m9.3 11.8 1.9 1.9 3.4-3.8" /></MIco></span>Trang quản lý</Link>
+              )}
+              {/* Mã xác thực 2 lớp — chỉ người được cấp quyền mới thấy dòng này. */}
+              {coVaiTro(user, 'admin', 'xacthuc') && (
+                <Link href="/ma-xac-thuc" onClick={() => setOpen(false)} className="flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50"><span className="text-slate-400"><MIco><path d="M7 11V8a5 5 0 0 1 10 0v3" /><rect x="5" y="11" width="14" height="9" rx="2" /></MIco></span>Mã xác thực</Link>
+              )}
             </div>
           )}
           <div className="mt-1.5 pt-2 border-t border-slate-100">

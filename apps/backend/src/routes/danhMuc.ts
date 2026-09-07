@@ -2,12 +2,13 @@
 // Nhận PDF scan hồ sơ đất đai → render từng trang → AI đọc & phân tách văn bản → xuất Excel đúng mẫu danh mục.
 // Khoá AI do ADMIN quản lý trong app_config (key 'danhmuc_ai'); nếu trống thì fallback biến môi trường.
 import { Router } from 'express';
+import { laAdmin } from '../lib/auth.ts';
 import multer from 'multer';
 import { execFile } from 'node:child_process';
 import { writeFile, readFile, mkdtemp, rm, readdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createCipheriv, createDecipheriv, randomBytes, createHash } from 'node:crypto';
+import { maHoa, giaiMa } from '../lib/matMa.ts';
 import { query } from '../lib/db.ts';
 import { adminRequired, authRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { BANK } from '../lib/packages.ts';
@@ -44,19 +45,9 @@ async function getAiCfg(): Promise<AiCfg> {
 }
 
 // ── Khoá API RIÊNG theo user (mã hoá AES-256-GCM khi lưu; không bao giờ trả khoá gốc ra ngoài) ──
-const ENC_KEY = createHash('sha256').update(String(process.env.KEY_SECRET || process.env.JWT_SECRET || 'camlam-danhmuc')).digest();
-function encSecret(plain: string): string {
-  const iv = randomBytes(12); const c = createCipheriv('aes-256-gcm', ENC_KEY, iv);
-  const enc = Buffer.concat([c.update(plain, 'utf8'), c.final()]);
-  return Buffer.concat([iv, c.getAuthTag(), enc]).toString('base64');
-}
-function decSecret(b64: string): string {
-  try {
-    const raw = Buffer.from(b64, 'base64');
-    const d = createDecipheriv('aes-256-gcm', ENC_KEY, raw.subarray(0, 12)); d.setAuthTag(raw.subarray(12, 28));
-    return Buffer.concat([d.update(raw.subarray(28)), d.final()]).toString('utf8');
-  } catch { return ''; }
-}
+// Phần mã hoá đã dọn sang lib/matMa.ts để chỗ khác dùng lại (kho mã xác thực 2 lớp cũng cần).
+const encSecret = maHoa;
+const decSecret = giaiMa;
 async function getUserKey(userId: number): Promise<string> {
   try { const r = await query<{ enc: string }>('SELECT enc FROM user_ai_keys WHERE user_id=$1', [userId]); return r[0]?.enc ? decSecret(r[0].enc) : ''; } catch { return ''; }
 }
@@ -129,6 +120,44 @@ function acquireSlot(): Promise<boolean> {
 function releaseSlot(): void { active = Math.max(0, active - 1); const n = waiters.shift(); if (n) n(); }
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+// KHUÔN DỮ LIỆU BẮT BUỘC: khai báo cho Anthropic biết kết quả phải đúng hình dạng này.
+// Nhờ vậy AI KHÔNG THỂ trả về chữ thừa, rào ```json, hay thiếu cột — trước đây phải dò bằng
+// biểu thức tìm kiếm và hay hỏng ở hồ sơ dài (lỗi NO_DOCS). Mọi trường đều bắt buộc; không đọc
+// được thì AI để chuỗi rỗng, đúng như hướng dẫn trong SYSTEM_PROMPT.
+const KHUON_DANH_MUC = {
+  type: 'object',
+  properties: {
+    nguoiSuDung: { type: 'string', description: 'Người sử dụng đất / chủ hồ sơ' },
+    soTo: { type: 'string', description: 'Số tờ bản đồ' },
+    soThua: { type: 'string', description: 'Số thửa' },
+    hoSoTitle: { type: 'string', description: 'Tiêu đề hồ sơ' },
+    documents: {
+      type: 'array',
+      description: 'Danh sách văn bản trong hồ sơ, theo thứ tự trang',
+      items: {
+        type: 'object',
+        properties: {
+          stt: { type: 'integer', description: 'Số thứ tự, bắt đầu từ 1' },
+          soKyHieu: { type: 'string', description: 'Số và ký hiệu văn bản; không có thì để rỗng' },
+          ngay: { type: 'string', description: 'Ngày ban hành dạng dd/mm/yyyy; không rõ thì để rỗng' },
+          tacGia: { type: 'string', description: 'Cơ quan hoặc người ban hành' },
+          trichYeu: { type: 'string', description: 'Trích yếu ngắn gọn 1–2 dòng' },
+          toSo: { type: 'string', description: 'Tờ số, vd "1" hoặc "13-15"' },
+          ghiChu: { type: 'string', description: 'Bản chính hoặc Bản photo' },
+        },
+        required: ['stt', 'soKyHieu', 'ngay', 'tacGia', 'trichYeu', 'toSo', 'ghiChu'],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ['nguoiSuDung', 'soTo', 'soThua', 'hoSoTitle', 'documents'],
+  additionalProperties: false,
+} as const;
+
+// Không phải model nào cũng nhận khuôn dữ liệu bắt buộc. Model cũ admin lỡ nhập → tự bỏ khuôn,
+// quay về cách dò chữ như cũ (vẫn chạy) thay vì báo lỗi.
+const NHAN_KHUON = /^claude-(fable-5|mythos-5|opus-5|opus-4-8|sonnet-5|haiku-4-5|opus-4-5|opus-4-1)/;
+
 // ── Gọi AI vision với TẤT CẢ trang trong 1 lượt; tự thử lại khi quá tải (429/529/5xx) ──
 async function callClaudeVision(cfg: AiCfg, pages: Buffer[], apiKey: string): Promise<any> {
   const content: any[] = [{ type: 'text', text: `Hồ sơ gồm ${pages.length} trang (đánh số 1..${pages.length}). Hãy lập danh mục theo yêu cầu và chỉ trả JSON.` }];
@@ -136,7 +165,19 @@ async function callClaudeVision(cfg: AiCfg, pages: Buffer[], apiKey: string): Pr
     content.push({ type: 'text', text: `Trang ${i + 1}:` });
     content.push({ type: 'image', source: { type: 'base64', media_type: 'image/png', data: buf.toString('base64') } });
   });
-  const body = JSON.stringify({ model: cfg.model, max_tokens: 8000, output_config: { effort: cfg.effort }, system: SYSTEM_PROMPT + '\n' + FEWSHOT, messages: [{ role: 'user', content }] });
+  // Trần chữ 16000: model đời mới TỰ SUY NGHĨ trước khi trả lời, phần suy nghĩ ĂN CHUNG hạn mức
+  // này. Để 8000 như trước thì hồ sơ dài dễ bị cắt giữa chừng → kết quả hỏng. 16000 vẫn dưới
+  // ngưỡng an toàn cho kiểu gọi không truyền dòng.
+  const dungKhuon = NHAN_KHUON.test(cfg.model);
+  const body = JSON.stringify({
+    model: cfg.model,
+    max_tokens: 16000,
+    output_config: dungKhuon
+      ? { effort: cfg.effort, format: { type: 'json_schema', schema: KHUON_DANH_MUC } }
+      : { effort: cfg.effort },
+    system: SYSTEM_PROMPT + "\n" + FEWSHOT,
+    messages: [{ role: 'user', content }],
+  });
   let lastErr: any = null;
   for (let attempt = 0; attempt < 3; attempt++) {
     let res: any;
@@ -150,6 +191,8 @@ async function callClaudeVision(cfg: AiCfg, pages: Buffer[], apiKey: string): Pr
     if (res.ok) {
       const j: any = await res.json();
       const text = String(j?.content?.map((p: any) => p?.text).filter(Boolean).join('\n') || '');
+      // Có khuôn dữ liệu bắt buộc → kết quả CHẮC CHẮN là JSON sạch, đọc thẳng.
+      if (dungKhuon) { try { return JSON.parse(text); } catch { /* rơi xuống cách dò bên dưới */ } }
       const mm = text.match(/\{[\s\S]*\}/); // gỡ rào ```json nếu có
       if (!mm) throw new Error('NO_DOCS');
       return JSON.parse(mm[0]);
@@ -216,7 +259,7 @@ const safe = (n: string) => String(n || '').replace(/[\\/:*?"<>|]/g, ' ').replac
 danhMucRouter.get('/wallet', authRequired, async (req: AuthedRequest, res, next) => {
   try {
     const cfg = await getAiCfg();
-    const isAdmin = req.user?.role === 'admin';
+    const isAdmin = laAdmin(req.user);
     const unit = isAdmin ? 0 : cfg.pricePerPage;
     res.json({ balance: await getBalance(req.user!.id), pricePerPage: unit, isAdmin, enabled: cfg.enabled, hasKey: !!cfg.apiKey });
   } catch (e) { next(e); }
@@ -256,7 +299,7 @@ danhMucRouter.post('/quote', authRequired, upload.single('file'), async (req: an
   try {
     if (!req.file) return res.status(400).json({ error: 'Thiếu tệp PDF' });
     const cfg = await getAiCfg();
-    const isAdmin = req.user?.role === 'admin';
+    const isAdmin = laAdmin(req.user);
     const pages = await pdfPageCount(req.file.buffer);
     if (!pages) return res.status(422).json({ error: 'Không đọc được số trang (tệp hỏng hoặc không phải PDF).' });
     if (pages > MAX_PAGES) return res.status(413).json({ error: `Hồ sơ ${pages} trang vượt giới hạn ${MAX_PAGES} trang/lần. Hãy tách nhỏ rồi thử lại.`, pages });
@@ -276,7 +319,7 @@ danhMucRouter.post('/run', authRequired, upload.single('file'), async (req: any,
   const cfg = await getAiCfg();
   if (!cfg.enabled) return res.status(503).json({ error: 'Tính năng đang tạm tắt (liên hệ quản trị).' });
   const uid = req.user!.id;
-  const isAdmin = req.user?.role === 'admin';
+  const isAdmin = laAdmin(req.user);
   const ownKey = isAdmin ? '' : await getUserKey(uid); // khách được admin GÁN khoá riêng → chạy bằng khoá đó (để theo dõi/thu hồi riêng)
   const effKey = ownKey || cfg.apiKey;                 // chưa gán → dùng khoá chung
   if (!effKey) return res.status(503).json({ error: 'Dịch vụ chưa sẵn sàng. Vui lòng liên hệ quản trị viên.' });

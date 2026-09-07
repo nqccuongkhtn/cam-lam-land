@@ -12,13 +12,13 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS tier           TEXT NOT NULL DEFAULT 
 ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar         TEXT;
 ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
 UPDATE users SET role='user' WHERE role='sales';
-ALTER TABLE users ADD  CONSTRAINT users_role_check CHECK (role IN ('user','admin','gis','vanban','hotlist','danhmuc'));
+ALTER TABLE users ADD  CONSTRAINT users_role_check CHECK (role IN ('user','admin','gis','vanban','hotlist','danhmuc','xacthuc'));
 -- MỘT NGƯỜI CÓ THỂ GIỮ NHIỀU VAI TRÒ: cột roles là DANH SÁCH vai trò của tài khoản đó.
 -- Cột role cũ vẫn giữ, coi như "vai trò chính" (để chỗ nào chưa kịp đổi vẫn chạy bình thường).
 ALTER TABLE users ADD COLUMN IF NOT EXISTS roles TEXT[] NOT NULL DEFAULT '{}';
 UPDATE users SET roles = ARRAY[role] WHERE roles IS NULL OR cardinality(roles) = 0;
 ALTER TABLE users DROP CONSTRAINT IF EXISTS users_roles_check;
-ALTER TABLE users ADD  CONSTRAINT users_roles_check CHECK (roles <@ ARRAY['user','admin','gis','vanban','hotlist','danhmuc']::text[]);
+ALTER TABLE users ADD  CONSTRAINT users_roles_check CHECK (roles <@ ARRAY['user','admin','gis','vanban','hotlist','danhmuc','xacthuc']::text[]);
 CREATE INDEX IF NOT EXISTS users_roles_idx ON users USING GIN (roles);
 CREATE TABLE IF NOT EXISTS email_verifications (
   id SERIAL PRIMARY KEY, email TEXT NOT NULL, code TEXT NOT NULL,
@@ -505,6 +505,19 @@ export async function migrate(): Promise<void> {
   // chung trong file của xã gốc và đã mang sẵn số tờ mới. Nếu chỉ có cặp đầu thì web ghi
   // "Trước sáp nhập: xã Vạn Thọ" cho cả thửa vốn là đất Đại Lãnh cũ — sai tên xã.
   // Để rỗng = hai cái trùng nhau (trường hợp Nha Trang, Cam Lâm).
+  // ── KHO MÃ XÁC THỰC (Google Authenticator) DÙNG CHUNG TRONG CƠ QUAN ─────────
+  // Mỗi dòng là một tài khoản trên hệ thống ngoài (vd VBDLIS). Cột `bi_mat` lưu chuỗi bí mật
+  // ĐÃ MÃ HOÁ (AES-256-GCM, xem lib/matMa.ts) — mở database ra xem cũng chỉ thấy chuỗi vô nghĩa.
+  // Chuỗi bí mật KHÔNG BAO GIỜ được gửi ra trình duyệt; máy chủ tự sinh mã 6 số rồi mới gửi.
+  await pool.query(`CREATE TABLE IF NOT EXISTS totp_tai_khoan (
+    id SERIAL PRIMARY KEY,
+    ten TEXT NOT NULL,
+    he_thong TEXT NOT NULL DEFAULT '',
+    bi_mat TEXT NOT NULL,
+    ghi_chu TEXT NOT NULL DEFAULT '',
+    thu_tu INT NOT NULL DEFAULT 0,
+    tao_luc TIMESTAMPTZ NOT NULL DEFAULT now())`).catch(() => {});
+  await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS totp_tai_khoan_ten_idx ON totp_tai_khoan (he_thong, ten)`).catch(() => {});
   await pool.query(`ALTER TABLE dia_chinh_to ADD COLUMN IF NOT EXISTS ten_xa_cu TEXT`).catch(() => {});
   await pool.query(`ALTER TABLE dia_chinh_to ADD COLUMN IF NOT EXISTS to_cu_that INT`).catch(() => {});
   await pool.query(`ALTER TABLE dia_chinh ADD COLUMN IF NOT EXISTS xa_moi_id TEXT`).catch(() => {});

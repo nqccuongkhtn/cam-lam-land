@@ -303,15 +303,17 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       // trong (nhà, cây, đường đi) — trước đây tô vàng đục 35% che mất, ảnh vệ tinh gần như
       // không đọc được. Dấu hiệu nhận biết thửa nằm ở viền xanh + số đo cạnh là đủ rõ.
       map.addLayer({ id: 'highlight-fill', type: 'fill', source: 'highlight', filter: ['==', '$type', 'Polygon'], paint: { 'fill-color': '#00a2ff', 'fill-opacity': 0 } });
-      map.addLayer({ id: 'highlight-line', type: 'line', source: 'highlight', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#00a2ff', 'line-width': 2.6 } });
+      map.addLayer({ id: 'highlight-line', type: 'line', source: 'highlight', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#00a2ff', 'line-width': 3.2 } });
       // Vạch trắng CHẠY vòng quanh viền (kiểu tuyến đang dẫn đường) — xem batVienChay().
-      map.addLayer({ id: 'highlight-chay', type: 'line', source: 'highlight', layout: { 'line-join': 'round' }, paint: { 'line-color': '#ffffff', 'line-width': 2.6, 'line-dasharray': BUOC_CHAY[0] } });
+      // Cố ý để MẢNH HƠN viền xanh: vạch trắng chạy Ở GIỮA lòng viền nên nhìn tổng thể vẫn là
+      // một đường xanh liền mạch như ảnh mẫu, chứ không thành đường đứt quãng trắng–xanh.
+      map.addLayer({ id: 'highlight-chay', type: 'line', source: 'highlight', layout: { 'line-join': 'round' }, paint: { 'line-color': '#ffffff', 'line-width': 1.4, 'line-dasharray': BUOC_CHAY[0] } });
       // Kích thước thửa kiểu Guland: độ dài từng cạnh (dọc cạnh) + diện tích ở giữa
       map.addSource('highlight-dims', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
       // 'text-allow-overlap' để MẶC ĐỊNH (false) → chữ nào chồng lên chữ khác thì tự giấu bớt.
       // Trước đây bật cho hiện hết nên thửa nhiều đỉnh bị chữ đè lên nhau thành một vệt trắng.
-      map.addLayer({ id: 'hl-edge', type: 'symbol', source: 'highlight-dims', filter: ['all', ['has', 'len'], ['<=', ['get', 'minz'], map.getZoom()]], layout: { 'text-field': ['get', 'len'], 'text-size': 11, 'text-font': ['Noto Sans Regular'], 'text-rotate': ['get', 'rot'], 'text-rotation-alignment': 'map', 'text-keep-upright': true, 'text-padding': 3 }, paint: { 'text-color': '#0A2540', 'text-halo-color': '#ffffff', 'text-halo-width': 2 } });
-      map.addLayer({ id: 'hl-area', type: 'symbol', source: 'highlight-dims', filter: ['has', 'area'], layout: { 'text-field': ['get', 'area'], 'text-size': 13, 'text-font': ['Noto Sans Regular'], 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': '#0A2540', 'text-halo-color': '#ffffff', 'text-halo-width': 2.5 } });
+      map.addLayer({ id: 'hl-edge', type: 'symbol', source: 'highlight-dims', filter: ['all', ['has', 'len'], ['<=', ['get', 'minz'], map.getZoom()]], layout: { 'text-field': ['get', 'len'], 'text-size': 12.5, 'text-font': ['Noto Sans Regular'], 'text-rotate': ['get', 'rot'], 'text-rotation-alignment': 'map', 'text-keep-upright': true, 'text-padding': 3 }, paint: { 'text-color': '#0A2540', 'text-halo-color': '#ffffff', 'text-halo-width': 2.6, 'text-halo-blur': 0.2 } });
+      map.addLayer({ id: 'hl-area', type: 'symbol', source: 'highlight-dims', filter: ['has', 'area'], layout: { 'text-field': ['get', 'area'], 'text-size': 14.5, 'text-font': ['Noto Sans Regular'], 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': '#0A2540', 'text-halo-color': '#ffffff', 'text-halo-width': 3, 'text-halo-blur': 0.2 } });
       // HOÀNG SA · TRƯỜNG SA — chồng lên trên cùng, luôn bật. Ảnh nền của nhà cung cấp nước ngoài
       // hay bỏ trống hai quần đảo này; lớp đây vẽ đè lên nên ảnh chụp màn hình bản đồ không bị bắt bẻ.
       themLopBienDao(map);

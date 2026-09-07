@@ -1,11 +1,11 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { refreshFlags } from '@/lib/flags';
 import { api, uploadGis } from '@/lib/api';
 import { ImportJob, formatVnd, PROPERTY_LABELS } from '@/lib/types';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth';
+import { useAuth, coVaiTro, laAdmin } from '@/lib/auth';
 
 type Tab = 'overview' | 'users' | 'listings' | 'payments' | 'ads' | 'config' | 'upload' | 'logs';
 const TABS: [Tab, string][] = [['overview', 'Tổng quan'], ['users', 'Người dùng'], ['listings', 'Tin đăng'], ['payments', 'Thanh toán'], ['ads', 'Quảng cáo'], ['config', 'Cấu hình'], ['upload', 'Tải bản đồ'], ['logs', 'Nhật ký']];
@@ -16,7 +16,7 @@ export default function Admin() {
   const [tab, setTab] = useState<Tab>('overview');
   const [embedded, setEmbedded] = useState(false); // nhúng trong hub Quản lý -> ẩn tiêu đề & tab (điều hướng bằng sidebar ngoài)
   useEffect(() => { if (!loading && !user) router.replace('/login'); }, [loading, user, router]);
-  useEffect(() => { if (user?.role === 'gis') setTab('upload'); }, [user]);
+  useEffect(() => { if (coVaiTro(user, 'gis') && !laAdmin(user)) setTab('upload'); }, [user]);
   useEffect(() => { try { const p = new URLSearchParams(window.location.search); const t = p.get('tab'); if (t && TABS.some(([x]) => x === t)) setTab(t as Tab); setEmbedded(p.get('embed') === '1' || document.documentElement.classList.contains('embed')); } catch { /* */ } }, []);
   // AN TOÀN: chặn <select> đổi giá trị NGOÀI Ý MUỐN khi LĂN CHUỘT — nếu đang focus 1 select mà cuộn thì bỏ focus
   // để cuộn trang (không lỡ đổi vai trò/hạng/trạng thái). Một chỗ, bảo vệ mọi select trong bảng quản trị.
@@ -28,13 +28,13 @@ export default function Admin() {
 
   if (loading) return <div className="mx-auto max-w-6xl px-4 py-16 text-center text-slate-500">Đang tải…</div>;
   if (!user) return null;
-  if (user.role !== 'admin' && user.role !== 'gis') return (
+  if (!coVaiTro(user, 'admin', 'gis')) return (
     <div className="mx-auto max-w-md px-4 py-20 text-center">
       <p className="text-xl font-bold text-[#0A2540]">Không có quyền truy cập</p>
       <p className="text-slate-500 mt-2 text-sm">Trang này chỉ dành cho admin / biên tập bản đồ. <Link href="/" target="_top" className="text-[#0A2540] font-semibold underline">Về trang chủ</Link></p>
     </div>
   );
-  const isGis = user.role === 'gis';
+  const isGis = coVaiTro(user, 'gis') && !laAdmin(user);   // chỉ có mỗi vai trò GIS → rút gọn màn hình
   const shownTabs = isGis ? TABS.filter(([t]) => t === 'upload' || t === 'logs') : TABS;
   return (
     <div className={`mx-auto max-w-6xl px-4 ${embedded ? 'py-4' : 'py-6'}`}>
@@ -277,6 +277,73 @@ function Users() {
   useEffect(() => { const t = setTimeout(() => { setDq(q.trim()); setPage(1); }, 300); return () => clearTimeout(t); }, [q]);
   const load = useCallback(() => { setLoading(true); api<{ users: any[]; total: number }>(`/admin/users?q=${encodeURIComponent(dq)}&page=${page}&per=${per}`).then((d) => { setRows(d.users); setTotal(d.total || 0); }).catch(() => {}).finally(() => setLoading(false)); }, [dq, page]);
   useEffect(() => { load(); }, [load]);
+// ── CẤP VAI TRÒ: MỘT NGƯỜI CÓ THỂ GIỮ NHIỀU VAI TRÒ ──
+// Một ô bấm vào là SỔ XUỐNG danh sách vai trò, mỗi dòng có ô tích. Tích bao nhiêu vai trò cũng được
+// (ví dụ vừa tra danh sách nóng vừa vào kho danh mục). Không tích gì thì là khách thường.
+const VAI_TRO_DS: [string, string, string][] = [
+  ['gis', '🗺️', 'Biên tập GIS'], ['vanban', '📄', 'Quản lý văn bản'],
+  ['hotlist', '🔥', 'Tra cứu danh sách nóng'], ['danhmuc', '🗄️', 'Kho danh mục hồ sơ'],
+  ['xacthuc', '🔐', 'Tra mã xác thực 2 lớp'], ['admin', '👑', 'Admin — toàn quyền'],
+];
+function OVaiTro({ u, luu }: { u: any; luu: (roles: string[]) => void }) {
+  const [mo, setMo] = useState(false);
+  const [dang, setDang] = useState<string[]>(
+    Array.isArray(u.roles) && u.roles.length ? u.roles : (u.role ? [u.role] : ['user']));
+  const hop = useRef<HTMLDivElement>(null);
+  // Máy chủ trả về vai trò mới (sau khi lưu, hoặc khi tải lại bảng) thì cập nhật theo.
+  const vanTay = (Array.isArray(u.roles) ? u.roles : []).join(',') + '|' + (u.role || '');
+  useEffect(() => {
+    setDang(Array.isArray(u.roles) && u.roles.length ? u.roles : (u.role ? [u.role] : ['user']));
+  }, [vanTay]);
+  // Bấm ra chỗ khác trên trang thì đóng bảng chọn.
+  useEffect(() => {
+    if (!mo) return;
+    const ngoai = (e: MouseEvent) => { if (hop.current && !hop.current.contains(e.target as Node)) setMo(false); };
+    document.addEventListener('mousedown', ngoai);
+    return () => document.removeEventListener('mousedown', ngoai);
+  }, [mo]);
+  const bat = (v: string) => {
+    const co = dang.includes(v);
+    if (v === 'admin' && !co && !confirm(`Cấp quyền ADMIN cho ${u.email}? Tài khoản này sẽ có toàn quyền quản trị.`)) return;
+    let moi = co ? dang.filter((x) => x !== v) : [...dang.filter((x) => x !== 'user'), v];
+    if (!moi.length) moi = ['user'];                       // bỏ hết vai trò → về khách thường
+    setDang(moi);                                          // đổi màu NGAY, khỏi chờ máy chủ trả lời
+    luu(moi);
+  };
+  const daChon = VAI_TRO_DS.filter(([v]) => dang.includes(v));
+  return (
+    <div className="relative min-w-[168px]" ref={hop}>
+      <button onClick={() => setMo(!mo)}
+        className="w-full flex items-center justify-between gap-2 border border-slate-300 rounded-lg px-2 py-1 text-xs bg-white hover:border-slate-400">
+        <span className="truncate">
+          {daChon.length === 0 ? <span className="text-slate-400">Khách thường</span>
+            : daChon.length === 1 ? <span className="font-semibold text-[#0A2540]">{daChon[0][1]} {daChon[0][2].split(' — ')[0]}</span>
+            : <span className="font-semibold text-[#0A2540]">{daChon.map(([, i]) => i).join(' ')} {daChon.length} vai trò</span>}
+        </span>
+        <span className="text-slate-400 text-[10px]">▾</span>
+      </button>
+      {mo && (
+        <div className="absolute z-30 mt-1 w-[228px] bg-white border border-slate-200 rounded-xl shadow-xl p-1">
+          {VAI_TRO_DS.map(([v, icon, ten]) => {
+            const on = dang.includes(v);
+            return (
+              <button key={v} onClick={() => bat(v)}
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-left transition ${on ? 'bg-[#0A2540]/5' : 'hover:bg-slate-50'}`}>
+                <span className={`w-4 h-4 shrink-0 rounded border flex items-center justify-center text-[10px] font-bold ${on
+                  ? (v === 'admin' ? 'bg-[#C8A14B] border-[#C8A14B] text-white' : 'bg-[#0A2540] border-[#0A2540] text-white')
+                  : 'border-slate-300 text-transparent'}`}>✓</span>
+                <span>{icon}</span>
+                <span className={on ? 'font-semibold text-[#0A2540]' : 'text-slate-600'}>{ten}</span>
+              </button>
+            );
+          })}
+          <div className="px-2 py-1 text-[10px] text-slate-400 border-t mt-1">Tích được nhiều vai trò cùng lúc</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
   async function upd(id: number, patch: any) { try { await api(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }); load(); } catch (e: any) { alert(e.message); } }
   const sel = 'border border-slate-300 rounded px-1.5 py-1 text-xs';
   const pages = Math.max(1, Math.ceil(total / per));
@@ -293,7 +360,7 @@ function Users() {
           {rows.map((u) => (
             <tr key={u.id} className="border-t">
               <td className="p-2"><div className="font-semibold text-[#0A2540]">{u.fullName || u.email}</div><div className="text-xs text-slate-400">{u.email} · {u.phone || '—'}</div></td>
-              <td className="p-2"><select value={u.role} onChange={(e) => { const role = e.target.value; if (role === 'admin' && !confirm(`Cấp quyền ADMIN cho ${u.email}? Tài khoản này sẽ có toàn quyền quản trị.`)) return; upd(u.id, { role }); }} className={sel}><option value="user">Khách</option><option value="gis">Biên tập GIS</option><option value="vanban">Quản lý văn bản</option><option value="hotlist">🔥 Tra cứu danh sách nóng</option><option value="admin">Admin</option></select></td>
+              <td className="p-2"><OVaiTro u={u} luu={(roles) => upd(u.id, { roles })} /></td>
               <td className="p-2"><select value={u.tier} onChange={(e) => upd(u.id, { tier: e.target.value })} className={sel}><option value="free">Free</option><option value="paid">Trả phí</option></select></td>
               <td className="p-2"><select value={u.status} onChange={(e) => { const status = e.target.value; if (status === 'suspended' && !confirm(`Khoá tài khoản ${u.email}? Người dùng sẽ không đăng nhập được.`)) return; upd(u.id, { status }); }} className={sel}><option value="active">Hoạt động</option><option value="suspended">Khoá</option></select></td>
               <td className="p-2"><input type="number" min="0" defaultValue={u.boostQuota ?? 0} onBlur={(e) => upd(u.id, { boostQuota: Math.max(0, Number(e.target.value) || 0) })} title="Số lượt đẩy tin/tháng" className="w-16 border border-slate-300 rounded px-1.5 py-1 text-xs" /></td>

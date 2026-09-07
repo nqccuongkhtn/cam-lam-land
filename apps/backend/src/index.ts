@@ -12,6 +12,7 @@ import { authRouter } from './routes/auth.ts';
 import { listingsRouter } from './routes/listings.ts';
 import { layersRouter } from './routes/layers.ts';
 import { parcelsRouter } from './routes/parcels.ts';
+import { diaChinhRouter } from './routes/diaChinh.ts'; // BẢN ĐỒ ĐỊA CHÍNH toàn tỉnh (ô vector + chống cào)
 import { importsRouter } from './routes/imports.ts';
 import { imagesRouter } from './routes/images.ts';
 import { adminRouter } from './routes/admin.ts';
@@ -37,8 +38,12 @@ import { vapidPublicKey } from './lib/push.ts';
 import { chatRouter } from './routes/chat.ts';
 import { ocrRouter } from './routes/ocr.ts';
 import { hotlistRouter } from './routes/hotlist.ts'; // ĐẤT NÓNG (dùng tạm — dễ gỡ)
+import { chiDuongRouter } from './routes/chiDuong.ts'; // CHỈ ĐƯỜNG NHIỀU TUYẾN (dùng tạm — dễ gỡ)
+import { doCaoRouter } from './routes/doCao.ts'; // TRA ĐỘ CAO MẶT ĐẤT — biết chỗ nào là biển (dùng tạm — dễ gỡ)
 import { pdftoolsRouter } from './routes/pdftools.ts'; // CÔNG CỤ PDF máy chủ (dùng tạm — dễ gỡ)
 import { danhMucRouter } from './routes/danhMuc.ts'; // LẬP DANH MỤC HỒ SƠ (dùng tạm — dễ gỡ)
+import { totpRouter } from './routes/totp.ts'; // TRA MÃ XÁC THỰC 2 LỚP (dùng tạm — dễ gỡ)
+import { khoHoSoRouter, khoUploadRouter } from './routes/khoHoSo.ts'; // KHO HỒ SƠ — thư mục cất file danh mục (dùng tạm — dễ gỡ)
 import { aiScriptRouter } from './routes/aiScript.ts'; // AI VIẾT KỊCH BẢN VIDEO (dùng chung khoá AI, dễ gỡ)
 // TẠO VIDEO BẢN ĐỒ: xử lý HOÀN TOÀN trên máy khách (ffmpeg.wasm) — KHÔNG có endpoint máy chủ (không nhận/không lưu video).
 import { tilesRouter } from './routes/tiles.ts'; // PROXY tile ảnh vệ tinh (sạch CORS để quay được video)
@@ -72,6 +77,14 @@ app.use(requestLogger); // ghi log request LỖI (5xx) hoặc CHẬM (>2s) ra fi
 app.use(express.json({ limit: '5mb' }));
 // PROXY TILE ẢNH VỆ TINH — đặt TRƯỚC rate-limit toàn cục (1 phiên bản đồ tải rất nhiều tile, không được tính vào giới hạn).
 app.use('/api/tiles', tilesRouter);
+// BẢN ĐỒ ĐỊA CHÍNH — cũng đặt TRƯỚC giới hạn toàn cục vì một phiên xem bản đồ tải rất nhiều ô.
+// Đường này TỰ CÓ bộ khoá chống cào riêng bên trong (vé xem + hạn mức + đo độ phủ),
+// chặt hơn giới hạn toàn cục rất nhiều nên không cần cộng dồn vào đó.
+// Ba đường /ve, /danh-muc, /tim là đường "hỏi đáp" nên siết vừa phải; còn đường lấy Ô BẢN ĐỒ
+// (/api/dc/16/x/y) thì bỏ qua ở đây vì một phiên xem tải rất nhiều ô — ô đã có bộ khoá riêng bên trong.
+app.use('/api/dc', rateLimit({ windowMs: 60 * 1000, max: 90, key: 'dc-hoi',
+  skip: (req) => /^\/\d+\/\d+\/\d+/.test(req.path),
+  message: 'Bạn tra cứu quá nhanh. Vui lòng chậm lại một chút.' }), diaChinhRouter);
 // Chống lụt yêu cầu toàn cục (rộng rãi, không cản người dùng thật).
 app.use('/api', rateLimit({ windowMs: 60 * 1000, max: Number(process.env.RATE_LIMIT_GLOBAL) || 600, key: 'global' })); // đặt RATE_LIMIT_GLOBAL cao khi ĐO TẢI
 
@@ -98,7 +111,10 @@ const AUTH_SKIP_EMAILS = new Set([env.adminEmail.toLowerCase(), ...((process.env
 app.use('/api/auth', rateLimit({ windowMs: 10 * 60 * 1000, max: 60, key: 'auth', skip: (req) => req.method !== 'POST' || AUTH_SKIP_EMAILS.has(String((req.body as any)?.email || '').trim().toLowerCase()), message: 'Quá nhiều lần thử đăng nhập/đăng ký. Vui lòng đợi vài phút rồi thử lại.' }), authRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/layers', layersRouter);
-app.use('/api/parcels', parcelsRouter);
+// Bấm vào thửa để xem thông tin: người thật bấm nhiều lắm cũng vài lần mỗi giây, còn máy cào
+// thì gọi liên tục. 150 lần/phút là rất rộng rãi với người dùng nhưng chặn đứng kiểu quét tự động.
+app.use('/api/parcels', rateLimit({ windowMs: 60 * 1000, max: 150, key: 'thua',
+  message: 'Bạn xem thửa quá nhanh. Vui lòng chậm lại một chút.' }), parcelsRouter);
 app.use('/api/imports', importsRouter);
 app.use('/api/images', imagesRouter);
 app.use('/api/admin', adminRouter);
@@ -121,9 +137,19 @@ app.use('/api/config', configRouter);
 app.use('/api/saved-places', savedPlacesRouter);
 app.use('/api/crm', crmRouter);
 app.use('/api/hotlist', hotlistRouter); // ĐẤT NÓNG (dùng tạm — dễ gỡ)
-app.use('/api/pdftools', rateLimit({ windowMs: 10 * 60 * 1000, max: 40, key: 'pdftools', message: 'Bạn dùng công cụ PDF máy chủ quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), pdftoolsRouter); // CÔNG CỤ PDF máy chủ (dùng tạm — dễ gỡ)
+// Chỉ đường: 120 lượt/10 phút cho mỗi máy — đủ dùng thoải mái, chặn kẻ quét hàng loạt làm máy tìm đường miễn phí chặn IP của ta.
+app.use('/api/do-cao', doCaoRouter); // TRA ĐỘ CAO MẶT ĐẤT (dùng tạm — dễ gỡ)
+app.use('/api/chi-duong', rateLimit({ windowMs: 10 * 60 * 1000, max: 120, key: 'chiduong', message: 'Bạn tìm đường quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), chiDuongRouter); // CHỈ ĐƯỜNG NHIỀU TUYẾN (dùng tạm — dễ gỡ)
+app.use('/api/pdftools', rateLimit({ windowMs: 10 * 60 * 1000, max: 12, key: 'pdftools', message: 'Bạn dùng công cụ PDF máy chủ quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), pdftoolsRouter); // 12 lần/10 phút: công cụ này không cần đăng nhập mà rất nặng máy // CÔNG CỤ PDF máy chủ (dùng tạm — dễ gỡ)
+// ĐẶT TRƯỚC bộ hạn chế của /api/danh-muc: đường /api/danh-muc/upload là chỗ MÁY tự đẩy file lên kho,
+// đẩy vài chục file một lượt là chuyện thường — dùng chung mức 20 lần/10 phút của việc chạy AI thì tắc ngay.
+app.use('/api/danh-muc', rateLimit({ windowMs: 10 * 60 * 1000, max: 300, key: 'khoupload', message: 'Tải file lên kho quá nhiều lần. Đợi ít phút rồi thử lại.' }), khoUploadRouter);
+app.use('/api/kho-ho-so', rateLimit({ windowMs: 10 * 60 * 1000, max: 300, key: 'khohoso' }), khoHoSoRouter); // KHO HỒ SƠ (dùng tạm — dễ gỡ)
 app.use('/api/danh-muc', rateLimit({ windowMs: 10 * 60 * 1000, max: 20, key: 'danhmuc', message: 'Bạn lập danh mục quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), danhMucRouter); // LẬP DANH MỤC HỒ SƠ (dùng tạm — dễ gỡ)
 app.use('/api/ai', rateLimit({ windowMs: 10 * 60 * 1000, max: 30, key: 'aiscript', message: 'Bạn dùng AI viết kịch bản quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), aiScriptRouter); // AI VIẾT KỊCH BẢN VIDEO (dùng chung khoá AI)
+// TRA MÃ XÁC THỰC 2 LỚP của các tài khoản dùng chung (VBDLIS…). Mã đổi 30 giây/lần nên trang web
+// hỏi khá thường xuyên → để mức thoáng, nhưng vẫn có trần phòng khi tài khoản bị chiếm rồi quét mò.
+app.use('/api/totp', rateLimit({ windowMs: 10 * 60 * 1000, max: 400, key: 'totp', message: 'Bạn tra mã quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), totpRouter); // TRA MÃ XÁC THỰC (dùng tạm — dễ gỡ)
 app.use('/api', trafficRouter);
 app.use(notFound);
 app.use(errorHandler);

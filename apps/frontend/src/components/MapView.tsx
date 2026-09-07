@@ -119,7 +119,10 @@ function polyArea(pts: { lng: number; lat: number }[]) {
 // ── THỬA ĐANG CHỌN: VIỀN NEON CHẠY QUANH, CÓ CHẤM TRÒN DẪN ĐẦU ────────────────
 // MỘT MÀU DUY NHẤT (xanh neon). Không pha màu thứ hai — pha vào là thành đường đứt
 // quãng hai màu, mất hẳn cảm giác "đường neon đang chạy".
-const MAU_NEON = '#00e5ff';
+// Xanh neon SÁNG hơn tông cũ (#00e5ff) — nổi rõ hơn hẳn trên ảnh vệ tinh tối màu
+// (cây cối, mái nhà) mà vẫn không lẫn với ranh thửa xanh dương và tuyến đường cam/vàng.
+const MAU_NEON = '#4df3ff';
+const MAU_CHAM = '#ffffff';   // chấm tròn dẫn đầu để TRẮNG cho bật hẳn lên
 
 // Lấy ranh NGOÀI của thửa + độ dài dồn từng đoạn, để chấm tròn chạy ĐỀU quanh viền
 // (không có bảng độ dài này thì chấm sẽ chạy nhanh ở cạnh ngắn, chậm ở cạnh dài).
@@ -344,12 +347,12 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       //  1. quầng sáng toả ra (nhoè) → cảm giác đèn neon
       //  2. đường viền LIỀN MẠCH, đây chính là "tuyến"
       //  3. chấm tròn chạy trên tuyến
-      map.addLayer({ id: 'highlight-quang', type: 'line', source: 'highlight', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': MAU_NEON, 'line-width': 10, 'line-opacity': 0.3, 'line-blur': 6 } });
-      map.addLayer({ id: 'highlight-line', type: 'line', source: 'highlight', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': MAU_NEON, 'line-width': 2.8 } });
+      map.addLayer({ id: 'highlight-quang', type: 'line', source: 'highlight', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': MAU_NEON, 'line-width': 11, 'line-opacity': 0.4, 'line-blur': 6 } });
+      map.addLayer({ id: 'highlight-line', type: 'line', source: 'highlight', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': MAU_NEON, 'line-width': 3.2 } });
       map.addSource('highlight-dau', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
-      // Chấm tròn: lõi đặc + vành sáng mờ quanh nó, vẫn cùng một màu.
-      map.addLayer({ id: 'highlight-dau-quang', type: 'circle', source: 'highlight-dau', paint: { 'circle-radius': 11, 'circle-color': MAU_NEON, 'circle-opacity': 0.3, 'circle-blur': 1 } });
-      map.addLayer({ id: 'highlight-dau', type: 'circle', source: 'highlight-dau', paint: { 'circle-radius': 5, 'circle-color': MAU_NEON } });
+      // Chấm tròn dẫn đầu: quầng neon toả ra + lõi TRẮNG đặc ở giữa cho nổi bật.
+      map.addLayer({ id: 'highlight-dau-quang', type: 'circle', source: 'highlight-dau', paint: { 'circle-radius': 11, 'circle-color': MAU_NEON, 'circle-opacity': 0.45, 'circle-blur': 1 } });
+      map.addLayer({ id: 'highlight-dau', type: 'circle', source: 'highlight-dau', paint: { 'circle-radius': 5, 'circle-color': MAU_CHAM, 'circle-stroke-width': 1.6, 'circle-stroke-color': MAU_NEON } });
       // Kích thước thửa kiểu Guland: độ dài từng cạnh (dọc cạnh) + diện tích ở giữa
       map.addSource('highlight-dims', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
       // 'text-allow-overlap' để MẶC ĐỊNH (false) → chữ nào chồng lên chữ khác thì tự giấu bớt.

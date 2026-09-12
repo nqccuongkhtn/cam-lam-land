@@ -1,0 +1,435 @@
+{
+ "_doc": "Sinh tự động bởi scripts/qh-pipeline/8-tao-chu-giai.py — đừng sửa tay.",
+ "nhom": [
+  {
+   "nhom": "Đất ở",
+   "muc": [
+    {
+     "mau": "#f2c23e",
+     "ten": "Đơn vị ở mới mật độ trung bình · Nhóm nhà ở · Đơn vị ở mới mật độ trung bình (2030)",
+     "so": 402
+    },
+    {
+     "mau": "#f8d879",
+     "ten": "Nhóm nhà ở thấp tầng",
+     "so": 363
+    },
+    {
+     "mau": "#d0a735",
+     "ten": "Nhóm nhà ở (sắc đậm trong bản vẽ)",
+     "so": 313
+    },
+    {
+     "mau": "#f6d478",
+     "ten": "Nhóm nhà ở (sắc nhạt trong bản vẽ)",
+     "so": 252
+    },
+    {
+     "mau": "#fae6a0",
+     "ten": "Đơn vị ở mật độ thấp đến năm 2045 · Đơn vị ở mật độ thấp đến năm 2030",
+     "so": 183
+    },
+    {
+     "mau": "#dac99b",
+     "ten": "Nhóm nhà ở (hiện trạng)",
+     "so": 151
+    },
+    {
+     "mau": "#ded9c4",
+     "ten": "Làng xóm (hiện trạng)",
+     "so": 90
+    },
+    {
+     "mau": "#d7d3bd",
+     "ten": "Làng xóm đô thị hoá (hiện trạng)",
+     "so": 74
+    },
+    {
+     "mau": "#e3d59b",
+     "ten": "Làng xóm · L-QH-langxomdothihoa",
+     "so": 54
+    },
+    {
+     "mau": "#e3decb",
+     "ten": "Dân cư nông thôn (hiện trạng)",
+     "so": 53
+    },
+    {
+     "mau": "#e0930f",
+     "ten": "Nhà ở chung cư · Đơn vị ở mới mật độ cao",
+     "so": 43
+    },
+    {
+     "mau": "#edab55",
+     "ten": "Nhóm nhà ở trong khu hỗn hợp",
+     "so": 37
+    },
+    {
+     "mau": "#c8bc8d",
+     "ten": "Dân cư nông thôn (sắc đậm trong bản vẽ)",
+     "so": 19
+    },
+    {
+     "mau": "#efe6bf",
+     "ten": "Dân cư nông thôn (sắc nhạt trong bản vẽ)",
+     "so": 2
+    },
+    {
+     "mau": "#e9dcae",
+     "ten": "Hiện trạng cải tạo chỉnh trang",
+     "so": 1
+    },
+    {
+     "mau": "#dccf90",
+     "ten": "Làng xóm đô thị hoá",
+     "so": 1
+    }
+   ]
+  },
+  {
+   "nhom": "Đất hỗn hợp",
+   "muc": [
+    {
+     "mau": "#d4552a",
+     "ten": "Đất hỗn hợp – nhóm nhà ở · Đất hỗn hợp",
+     "so": 80
+    }
+   ]
+  },
+  {
+   "nhom": "Thương mại – dịch vụ – du lịch",
+   "muc": [
+    {
+     "mau": "#f4685f",
+     "ten": "Dịch vụ đơn vị ở · Dịch vụ nông thôn",
+     "so": 117
+    },
+    {
+     "mau": "#ff3fd0",
+     "ten": "Đất du lịch · Du lịch – khu du lịch",
+     "so": 67
+    },
+    {
+     "mau": "#ee3b3b",
+     "ten": "Đất dịch vụ · Dịch vụ đô thị",
+     "so": 56
+    },
+    {
+     "mau": "#aa709c",
+     "ten": "Đất du lịch (hiện trạng) (sắc đậm trong bản vẽ)",
+     "so": 24
+    },
+    {
+     "mau": "#ff86c2",
+     "ten": "Du lịch – khu dịch vụ",
+     "so": 20
+    },
+    {
+     "mau": "#2f9e56",
+     "ten": "Sân golf",
+     "so": 5
+    },
+    {
+     "mau": "#d4a4c8",
+     "ten": "Đất du lịch (hiện trạng) (sắc nhạt trong bản vẽ)",
+     "so": 3
+    },
+    {
+     "mau": "#c1908d",
+     "ten": "Dịch vụ nông thôn (hiện trạng)",
+     "so": 1
+    },
+    {
+     "mau": "#ae6f6f",
+     "ten": "Đất dịch vụ (hiện trạng)",
+     "so": 1
+    }
+   ]
+  },
+  {
+   "nhom": "Công trình công cộng",
+   "muc": [
+    {
+     "mau": "#f2a3a3",
+     "ten": "Trường học · Trường học nông thôn",
+     "so": 296
+    },
+    {
+     "mau": "#cd8fd8",
+     "ten": "Văn hoá đơn vị ở · Đất cơ sở văn hoá · Vanhoa (Nong thon) · Vanhoa ĐT",
+     "so": 84
+    },
+    {
+     "mau": "#a79c95",
+     "ten": "Di tích – tôn giáo (hiện trạng) · Di tích (hiện trạng)",
+     "so": 77
+    },
+    {
+     "mau": "#f0629a",
+     "ten": "Y tế đơn vị ở · Đất cơ sở y tế · Yte ngoai do thi · Yte ĐT",
+     "so": 77
+    },
+    {
+     "mau": "#e78585",
+     "ten": "Trường THPT · Đất đào tạo · Đào tạo – nghiên cứu",
+     "so": 22
+    },
+    {
+     "mau": "#d7baba",
+     "ten": "Trường học (hiện trạng) · Truonghoc (Nong thon) (hiện trạng)",
+     "so": 22
+    },
+    {
+     "mau": "#b6aec6",
+     "ten": "Đất cơ quan (hiện trạng) · Coquanngoaidothi (hiện trạng) · Coquandothi (hiện trạng)",
+     "so": 12
+    },
+    {
+     "mau": "#b09bdd",
+     "ten": "Đất cơ quan · Coquandothi · Coquanngoaidothi",
+     "so": 8
+    },
+    {
+     "mau": "#c1abc4",
+     "ten": "Vanhoa (Nong thon) (hiện trạng) · Văn hoá đơn vị ở (hiện trạng) · Đất cơ sở văn hoá (hiện trạng)",
+     "so": 8
+    },
+    {
+     "mau": "#a98a76",
+     "ten": "Di tích – tôn giáo",
+     "so": 8
+    },
+    {
+     "mau": "#c18ea3",
+     "ten": "Y tế đơn vị ở (hiện trạng) · Đất cơ sở y tế (hiện trạng) · Yte ngoai do thi (hiện trạng) · Yte_CT (hiện trạng)",
+     "so": 7
+    },
+    {
+     "mau": "#c6a3a3",
+     "ten": "Đào tạo – nghiên cứu (hiện trạng)",
+     "so": 2
+    }
+   ]
+  },
+  {
+   "nhom": "Cây xanh – thể dục thể thao",
+   "muc": [
+    {
+     "mau": "#3f9c50",
+     "ten": "Cây xanh chuyên dụng",
+     "so": 386
+    },
+    {
+     "mau": "#85d64f",
+     "ten": "Cây xanh công cộng đơn vị ở · Cây xanh công cộng nông thôn",
+     "so": 288
+    },
+    {
+     "mau": "#6ec832",
+     "ten": "Cây xanh công cộng đô thị · Cây xanh công cộng",
+     "so": 138
+    },
+    {
+     "mau": "#57bf5b",
+     "ten": "Thể dục thể thao đơn vị ở · Sân bãi thể thao nông thôn",
+     "so": 95
+    },
+    {
+     "mau": "#9bdd6b",
+     "ten": "Cây xanh sử dụng hạn chế · Cây xanh sử dụng hạn chế – công viên thể dục thể thao · CXHC- CV TDTT",
+     "so": 25
+    },
+    {
+     "mau": "#4caf50",
+     "ten": "Thể dục thể thao · Thể dục thể thao đô thị",
+     "so": 25
+    },
+    {
+     "mau": "#8cb18d",
+     "ten": "Thể dục thể thao đơn vị ở (hiện trạng)",
+     "so": 5
+    },
+    {
+     "mau": "#98b883",
+     "ten": "Cây xanh công cộng (hiện trạng)",
+     "so": 4
+    },
+    {
+     "mau": "#aac696",
+     "ten": "Cây xanh công cộng đơn vị ở (hiện trạng)",
+     "so": 2
+    },
+    {
+     "mau": "#80a382",
+     "ten": "Thể dục thể thao (hiện trạng)",
+     "so": 1
+    }
+   ]
+  },
+  {
+   "nhom": "Rừng",
+   "muc": [
+    {
+     "mau": "#658569",
+     "ten": "Đất rừng sản xuất (hiện trạng)",
+     "so": 21
+    },
+    {
+     "mau": "#526d56",
+     "ten": "Đất rừng phòng hộ (hiện trạng)",
+     "so": 21
+    },
+    {
+     "mau": "#2f8a3a",
+     "ten": "KXD_DulichRung_qh",
+     "so": 1
+    }
+   ]
+  },
+  {
+   "nhom": "Nông nghiệp",
+   "muc": [
+    {
+     "mau": "#dfe5c1",
+     "ten": "Đất nông nghiệp (hiện trạng)",
+     "so": 27
+    }
+   ]
+  },
+  {
+   "nhom": "Mặt nước",
+   "muc": [
+    {
+     "mau": "#2f8fe0",
+     "ten": "Mặt nước, hồ ao đầm (đơn vị ở đến năm 2045) · Mặt nước, hồ ao đầm (đơn vị ở đến năm 2030) · Mặt nước, hồ ao đầm · Hồ nước · Mặt nước, hồ ao đầm (đô thị) · L-DAMTHUYTRIEU",
+     "so": 98
+    },
+    {
+     "mau": "#2a7fdb",
+     "ten": "Sông suối",
+     "so": 75
+    },
+    {
+     "mau": "#6986a7",
+     "ten": "Sông suối (hiện trạng)",
+     "so": 39
+    },
+    {
+     "mau": "#49a3e8",
+     "ten": "Mặt nước sử dụng công cộng (đơn vị ở)",
+     "so": 20
+    },
+    {
+     "mau": "#7092af",
+     "ten": "Hồ nước (hiện trạng)",
+     "so": 10
+    },
+    {
+     "mau": "#5d799c",
+     "ten": "Mặt nước biển (hiện trạng)",
+     "so": 7
+    },
+    {
+     "mau": "#6db1e9",
+     "ten": "Hồ nước (sắc nhạt trong bản vẽ)",
+     "so": 6
+    },
+    {
+     "mau": "#5b9fe6",
+     "ten": "Sông suối (ngoài ranh giới)",
+     "so": 5
+    },
+    {
+     "mau": "#287bc1",
+     "ten": "Hồ nước (sắc đậm trong bản vẽ)",
+     "so": 1
+    }
+   ]
+  },
+  {
+   "nhom": "Giao thông – hạ tầng",
+   "muc": [
+    {
+     "mau": "#ababab",
+     "ten": "Bãi đỗ xe đơn vị ở",
+     "so": 107
+    },
+    {
+     "mau": "#9e9e9e",
+     "ten": "Bãi đỗ xe · Bai do xe NT",
+     "so": 57
+    },
+    {
+     "mau": "#7e57c2",
+     "ten": "Hạ tầng khác · Hạ tầng khác đô thị",
+     "so": 36
+    },
+    {
+     "mau": "#86779d",
+     "ten": "Hạ tầng khác (hiện trạng) · Hạ tầng khác đô thị (hiện trạng)",
+     "so": 16
+    },
+    {
+     "mau": "#6d6d6d",
+     "ten": "@ Dat nghia trang · Nghĩa trang",
+     "so": 13
+    },
+    {
+     "mau": "#7f7f7f",
+     "ten": "Nghĩa trang (hiện trạng)",
+     "so": 8
+    },
+    {
+     "mau": "#8f6ccb",
+     "ten": "Hạ tầng kỹ thuật ngoài đô thị · Hạ tầng khác ngoài đô thị",
+     "so": 7
+    },
+    {
+     "mau": "#9589ab",
+     "ten": "Hạ tầng kỹ thuật ngoài đô thị (hiện trạng)",
+     "so": 5
+    }
+   ]
+  },
+  {
+   "nhom": "Công nghiệp",
+   "muc": [
+    {
+     "mau": "#9575cd",
+     "ten": "Sản xuất công nghiệp · Đất công nghiệp",
+     "so": 21
+    },
+    {
+     "mau": "#9c90af",
+     "ten": "Đất công nghiệp (hiện trạng)",
+     "so": 4
+    }
+   ]
+  },
+  {
+   "nhom": "Quốc phòng – an ninh",
+   "muc": [
+    {
+     "mau": "#8a9a4a",
+     "ten": "Đất an ninh",
+     "so": 19
+    },
+    {
+     "mau": "#7f846d",
+     "ten": "Đất quốc phòng (hiện trạng)",
+     "so": 16
+    },
+    {
+     "mau": "#6b7a3a",
+     "ten": "Đất quốc phòng",
+     "so": 11
+    },
+    {
+     "mau": "#999f83",
+     "ten": "Đất an ninh (hiện trạng) · Anninh_CT (hiện trạng)",
+     "so": 6
+    }
+   ]
+  }
+ ]
+}

@@ -263,8 +263,20 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     const map = new maplibregl.Map({
       container: containerRef.current, style: BASE_STYLE, center: center ?? MAP.center, zoom: zoom ?? MAP.zoom, maxZoom: 22,
       fadeDuration: 0, maxTileCacheSize: soOAnhNenGiu(0.4), refreshExpiredTiles: false,
+      // KHOÁ XOAY BẢN ĐỒ — luôn hướng Bắc lên trên.
+      // Vì sao: người dùng hay vô tình xoay (trên điện thoại chỉ cần hai ngón hơi lệch nhau là
+      // bản đồ quay), xoay rồi thì trên/dưới không còn là bắc/nam nên đọc số tờ, so với sổ đỏ
+      // và với bản vẽ quy hoạch đều bị rối; mà cũng không có nút nào rõ ràng để trả về hướng cũ.
+      // `pitch`/`bearing` đặt cứng 0 và chặn cả ba đường xoay: kéo chuột phải, hai ngón, bàn phím.
+      bearing: 0, pitch: 0, dragRotate: false, pitchWithRotate: false, touchPitch: false,
     });
-    map.addControl(new maplibregl.NavigationControl(), 'top-right');
+    // Hai ngón trên điện thoại: vẫn cho phóng to/thu nhỏ, chỉ bỏ phần xoay.
+    map.touchZoomRotate.disableRotation();
+    // Bàn phím: bỏ luôn phím xoay (shift + mũi tên) cho chắc — tắt cả bộ bàn phím vì
+    // phóng/kéo bằng bàn phím gần như không ai dùng trên trang bản đồ này.
+    map.keyboard.disable();
+    // Nút la bàn trong NavigationControl cũng ẩn đi — để lại thì bấm vào không có tác dụng gì.
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
     // Định vị GPS: đưa bản đồ về vị trí người dùng, có chấm xanh + theo dõi khi di chuyển.
     map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true, showUserHeading: true, showAccuracyCircle: true } as any), 'top-right');
     map.on('load', () => {

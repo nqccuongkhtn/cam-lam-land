@@ -126,6 +126,10 @@ app.use('/api/consignments', consignmentsRouter);
 app.use('/api/newsletter', newsletterRouter);
 app.use('/api/invest', investRouter);
 app.use('/api/game', gameRouter);
+// Gửi ảnh/PDF trong chat: 30 tệp/10 phút mỗi máy — đủ cho trao đổi giấy tờ bình thường,
+// chặn được kiểu nhồi file cho phình database. ĐẶT TRƯỚC router chat mới ăn.
+app.use('/api/chat/file', rateLimit({ windowMs: 10 * 60 * 1000, max: 30, key: 'chatfile', message: 'Bạn gửi tệp quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.',
+  skip: (req) => req.method !== 'POST' })); // chỉ đếm lượt GỬI — xem lại ảnh cũ không được tính
 app.use('/api/chat', chatRouter);
 app.use('/api/ocr', rateLimit({ windowMs: 10 * 60 * 1000, max: 60, key: 'ocr', message: 'Bạn quét ảnh quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), ocrRouter);
 app.use('/api/push', pushRouter);

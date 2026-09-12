@@ -141,3 +141,26 @@ export async function ocrImage(blob: Blob): Promise<{ text: string; engine: stri
   return { text: j.text || '', engine: j.engine || 'máy chủ' };
 }
 export const apiBase = API_BASE;
+
+// ── CHAT: gửi 1 tệp (ảnh hoặc PDF) vào một phòng chat ────────────────────────
+// Khác uploadFile ở chỗ tệp KHÔNG vào kho ảnh tin rao mà vào bảng riêng có kiểm quyền,
+// nên trả về id tệp chứ không phải link công khai — muốn xem phải gọi kèm thẻ đăng nhập.
+// Ảnh: nén cho nhẹ nhưng để 1600px/400KB (đọc chữ trên sổ đỏ mới rõ) và CỐ Ý KHÔNG đóng dấu mờ
+// — dấu nằm giữa ảnh sẽ che mất chữ trên giấy tờ. PDF: giữ nguyên, không đụng vào.
+export const CHAT_TEP_TOI_DA = 10 * 1024 * 1024;
+export async function uploadChatFile(room: string, file: File): Promise<any> {
+  const f = file.type.startsWith('image/') ? await compressImage(file, 1600, 400, false) : file;
+  if (f.size > CHAT_TEP_TOI_DA) throw new Error('Tệp quá lớn — tối đa 10MB.');
+  const fd = new FormData();
+  fd.append('room', room);
+  fd.append('file', f, f.name || 'tep');
+  const res = await fetch(`${API_BASE}/chat/file`, { method: 'POST', headers: { ...authHeaders() }, body: fd });
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `Gửi tệp lỗi (${res.status})`);
+  return res.json();
+}
+// Tải nội dung tệp chat về dạng blob (phải kèm thẻ đăng nhập nên KHÔNG dùng <img src> thẳng được).
+export async function chatFileBlob(fileId: number): Promise<string> {
+  const res = await fetch(`${API_BASE}/chat/file/${fileId}`, { headers: { ...authHeaders() } });
+  if (!res.ok) throw new Error(`Không tải được tệp (${res.status})`);
+  return URL.createObjectURL(await res.blob());
+}

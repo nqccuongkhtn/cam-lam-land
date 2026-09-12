@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { laAdmin } from '../lib/auth.ts';
 import { query } from '../lib/db.ts';
 import { isFlagOn } from '../lib/flags.ts';
 import { cached, cachePut, cacheDrop } from '../lib/cache.ts';
@@ -165,12 +166,12 @@ listingsRouter.post('/:id/boost', authRequired, async (req: AuthedRequest, res, 
     const id = Number(req.params.id);
     const [l] = await query('SELECT created_by FROM listings WHERE id=$1', [id]);
     if (!l) return res.status(404).json({ error: 'Không tìm thấy tin' });
-    if (l.created_by !== req.user!.id && req.user!.role !== 'admin') return res.status(403).json({ error: 'Không có quyền' });
-    if (!(await isFlagOn('services_live')) && req.user!.role !== 'admin') return res.status(403).json({ error: 'Tính năng đẩy tin hiện chưa được mở.' });
+    if (l.created_by !== req.user!.id && !laAdmin(req.user)) return res.status(403).json({ error: 'Không có quyền' });
+    if (!(await isFlagOn('services_live')) && !laAdmin(req.user)) return res.status(403).json({ error: 'Tính năng đẩy tin hiện chưa được mở.' });
     const tier = ['normal', 'silver', 'gold', 'diamond'].includes(req.body?.tier) ? req.body.tier : null;
     const bump = !!req.body?.bump;
     const isBoost = bump || (tier !== null && tier !== 'normal');
-    if (isBoost && req.user!.role !== 'admin') {
+    if (isBoost && !laAdmin(req.user)) {
       const [u] = await query(`SELECT boost_quota, boost_used, pkg_tier, boost_expires_at FROM users WHERE id=$1`, [req.user!.id]);
       const active = !!u && !!u.boost_expires_at && new Date(u.boost_expires_at).getTime() > Date.now();
       if (!active) return res.status(403).json({ error: 'Bạn chưa có gói đẩy tin hoặc gói đã hết hạn. Vào Bảng giá để mua gói.' });
@@ -256,7 +257,7 @@ listingsRouter.post('/:id/reveal', authRequired, async (req: AuthedRequest, res,
     const [l] = await query(`SELECT COALESCE(listings.contact_phone, u.phone, '0988888888') AS contact_phone, COALESCE(listings.contact_name, u.full_name, 'Cam Lâm Land') AS contact_name, listings.created_by FROM listings LEFT JOIN users u ON u.id = listings.created_by WHERE listings.id=$1`, [id]);
     if (!l) return res.status(404).json({ error: 'Không tìm thấy tin' });
     // Không ghi lead khi người xem là chủ tin hoặc admin
-    if (req.user!.role !== 'admin' && l.created_by !== req.user!.id) {
+    if (!laAdmin(req.user) && l.created_by !== req.user!.id) {
       const [u] = await query('SELECT full_name, phone, email FROM users WHERE id=$1', [req.user!.id]);
       await query(
         `INSERT INTO listing_leads (listing_id, user_id, name, phone) VALUES ($1,$2,$3,$4)
@@ -274,7 +275,7 @@ listingsRouter.get('/:id/leads', authRequired, async (req: AuthedRequest, res, n
     const id = Number(req.params.id);
     const [l] = await query('SELECT title, created_by FROM listings WHERE id=$1', [id]);
     if (!l) return res.status(404).json({ error: 'Không tìm thấy tin' });
-    if (req.user!.role !== 'admin' && l.created_by !== req.user!.id) return res.status(403).json({ error: 'Không có quyền' });
+    if (!laAdmin(req.user) && l.created_by !== req.user!.id) return res.status(403).json({ error: 'Không có quyền' });
     const leads = await query(
       `SELECT id, name, phone, views, first_at AS "firstAt", last_at AS "lastAt"
        FROM listing_leads WHERE listing_id=$1 ORDER BY views DESC, last_at DESC`, [id]);
@@ -291,7 +292,7 @@ listingsRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => 
     if (Number(b.price) < 0) return res.status(400).json({ error: 'Giá không được âm' });
     const svcOn = await isFlagOn('services_live');
     let pkgActive = false;
-    if (svcOn && req.user!.role !== 'admin') {
+    if (svcOn && !laAdmin(req.user)) {
       const [u] = await query(
         `SELECT post_expires_at AS exp, post_quota AS "postQuota", post_used AS "postUsed",
                 COALESCE((SELECT posts FROM listing_usage WHERE user_id=$1 AND ym=to_char(now() AT TIME ZONE 'Asia/Ho_Chi_Minh','YYYY-MM')),0) AS "freePosts"
@@ -317,14 +318,14 @@ listingsRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => 
        clip(b.contactName, 120), clip(b.contactPhone, 30), b.images ?? [], b.lng, b.lat, req.user!.id, b.deal === 'rent' ? 'rent' : 'sale']);
     await linkImages(row.id, b.images);
     cacheDrop('listings:');
-    if (svcOn && req.user!.role !== 'admin' && !pkgActive) bumpUsage(req.user!.id, 'posts').catch(() => {}); // gói trả phí ĐÃ trừ atomic ở trên; free-tier đếm theo tháng ở đây
+    if (svcOn && !laAdmin(req.user) && !pkgActive) bumpUsage(req.user!.id, 'posts').catch(() => {}); // gói trả phí ĐÃ trừ atomic ở trên; free-tier đếm theo tháng ở đây
     const [created] = await query(`${SELECT} WHERE listings.id=$1`, [row.id]);
     res.status(201).json(created);
   } catch (e) { next(e); }
 });
 
 async function ownerOrAdmin(req: AuthedRequest, id: number): Promise<boolean> {
-  if (req.user!.role === 'admin') return true;
+  if (laAdmin(req.user)) return true;
   const [l] = await query('SELECT created_by FROM listings WHERE id=$1', [id]);
   return !!l && l.created_by === req.user!.id;
 }

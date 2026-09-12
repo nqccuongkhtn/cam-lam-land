@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { laAdmin } from '../lib/auth.ts';
 import { query } from '../lib/db.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 
@@ -9,7 +10,7 @@ const uid = (req: AuthedRequest) => req.user!.id;
 const clip = (v: any, n = 500) => (v === undefined || v === null ? null : String(v).slice(0, n));
 async function owns(table: string, id: number, req: AuthedRequest): Promise<boolean> {
   const [r] = await query(`SELECT user_id FROM ${table} WHERE id=$1`, [id]);
-  return !!r && (r.user_id === uid(req) || req.user!.role === 'admin');
+  return !!r && (r.user_id === uid(req) || laAdmin(req.user));
 }
 
 // ===================== KHÁCH HÀNG =====================
@@ -18,7 +19,7 @@ const CUS = `id, name, phone, source, note, created_at AS "createdAt"`;
 // GET /api/crm/customers — danh sách khách của tôi + số nhu cầu + số tin quan tâm
 crmRouter.get('/customers', authRequired, async (req: AuthedRequest, res, next) => {
   try {
-    const all = req.query.all === '1' && req.user!.role === 'admin';
+    const all = req.query.all === '1' && laAdmin(req.user);
     const rows = await query(
       `SELECT c.id, c.name, c.phone, c.source, c.note, c.created_at AS "createdAt",
               (SELECT count(*) FROM customer_needs n WHERE n.customer_id=c.id)::int AS "needCount",
@@ -238,7 +239,7 @@ crmRouter.delete('/interests/:id', authRequired, async (req: AuthedRequest, res,
 // GET /api/crm/stats — tổng hợp pipeline
 crmRouter.get('/stats', authRequired, async (req: AuthedRequest, res, next) => {
   try {
-    const all = req.query.all === '1' && req.user!.role === 'admin';
+    const all = req.query.all === '1' && laAdmin(req.user);
     const p = all ? [] : [uid(req)];
     const uw = all ? '' : 'WHERE user_id=$1';
     const ua = all ? 'WHERE' : 'WHERE user_id=$1 AND';
@@ -256,7 +257,7 @@ crmRouter.get('/stats', authRequired, async (req: AuthedRequest, res, next) => {
 // GET /api/crm/board — mọi quan tâm (khách + tin + follow-up) cho bảng pipeline
 crmRouter.get('/board', authRequired, async (req: AuthedRequest, res, next) => {
   try {
-    const all = req.query.all === '1' && req.user!.role === 'admin';
+    const all = req.query.all === '1' && laAdmin(req.user);
     const rows = await query(
       `SELECT i.id, i.interest, i.deal_status AS "dealStatus", i.note, i.follow_up_at AS "followUpAt", i.created_at AS "createdAt",
               i.customer_id AS "customerId", c.name AS "custName", c.phone AS "custPhone",
@@ -297,7 +298,7 @@ const APPT = `id, appoint_at AS "appointAt", location, note, status, sms_reminde
 // GET /api/crm/appointments — danh sách (toàn đội nếu admin ?all=1)
 crmRouter.get('/appointments', authRequired, async (req: AuthedRequest, res, next) => {
   try {
-    const all = req.query.all === '1' && req.user!.role === 'admin';
+    const all = req.query.all === '1' && laAdmin(req.user);
     const rows = await query(
       `SELECT a.id, a.appoint_at AS "appointAt", a.location, a.note, a.status, a.sms_reminder AS "smsReminder", a.sms_sent_at AS "smsSentAt",
               a.customer_id AS "customerId", c.name AS "custName", c.phone AS "custPhone",

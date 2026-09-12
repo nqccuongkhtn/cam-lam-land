@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { gisRequired } from '../middleware/auth.ts';
+import { verifyToken, coVaiTro } from '../lib/auth.ts';
 
 export const layersRouter = Router();
 
@@ -10,10 +11,19 @@ const LAYER_SELECT = `
          status, visible, style, created_at AS "createdAt"
   FROM gis_layers`;
 
-// GET /api/layers — list every available map layer
-layersRouter.get('/', async (_req, res, next) => {
+// GET /api/layers — danh sách lớp bản đồ hiện ra ở bảng "Lớp bản đồ"
+// LỚP ĐỊA CHÍNH (layer_type='parcel') KHÔNG hiện ở đây nữa: bản đồ thửa đất giờ LUÔN BẬT,
+// phục vụ qua đường riêng /api/dc (ô vector, có khoá chống cào), người dùng không tắt được
+// và cũng không nhìn thấy có bao nhiêu lớp / bao nhiêu thửa. Người quản lý GIS vẫn thấy đủ
+// để còn quản lý, xoá lớp cũ.
+layersRouter.get('/', async (req: any, res, next) => {
   try {
-    res.json({ layers: await query(`${LAYER_SELECT} ORDER BY layer_type, name`) });
+    // Đọc nhanh thẻ đăng nhập để biết có phải người quản lý bản đồ không (không cần hỏi database).
+    const h = String(req.headers.authorization || '');
+    const nguoi = h.startsWith('Bearer ') ? verifyToken(h.slice(7)) : null;
+    const quanLy = coVaiTro(nguoi as any, 'admin', 'gis');
+    const loc = quanLy ? '' : ` WHERE layer_type <> 'parcel'`;
+    res.json({ layers: await query(`${LAYER_SELECT}${loc} ORDER BY layer_type, name`) });
   } catch (e) { next(e); }
 });
 
@@ -23,14 +33,17 @@ layersRouter.get('/:slug/features', async (req, res, next) => {
     const [layer] = await query('SELECT id FROM gis_layers WHERE slug=$1', [req.params.slug]);
     if (!layer) return res.status(404).json({ error: 'Layer not found' });
 
-    const params: any[] = [layer.id];
-    let bboxClause = '';
-    if (req.query.bbox) {
-      const [w, s, e, n] = String(req.query.bbox).split(',').map(Number);
-      params.push(w, s, e, n);
-      bboxClause = ` AND geom && ST_MakeEnvelope($2,$3,$4,$5,4326)`;
-    }
-    const lim = Math.min(20000, Math.max(1, Number(req.query.limit) || 8000));
+    // ── CHỐNG CÀO: BẮT BUỘC phải kèm khung nhìn (bbox), và khung không được quá rộng ──
+    // Trước đây gọi không kèm bbox là lấy được tới 20.000 đối tượng một lượt → chạy vòng lặp
+    // vài chục lần là ôm trọn cả lớp. Giờ phải nêu rõ đang xem vùng nào, và vùng đó phải nhỏ.
+    if (!req.query.bbox) return res.status(400).json({ error: 'Thiếu khung nhìn (bbox).' });
+    const [w, s, e, n] = String(req.query.bbox).split(',').map(Number);
+    if (![w, s, e, n].every((v) => Number.isFinite(v))) return res.status(400).json({ error: 'Khung nhìn không hợp lệ.' });
+    const rong = Math.abs(e - w), cao = Math.abs(n - s);
+    if (rong > 0.6 || cao > 0.6) return res.status(400).json({ error: 'Khung nhìn quá rộng — hãy phóng to bản đồ.' });
+    const params: any[] = [layer.id, w, s, e, n];
+    const bboxClause = ` AND geom && ST_MakeEnvelope($2,$3,$4,$5,4326)`;
+    const lim = Math.min(4000, Math.max(1, Number(req.query.limit) || 4000));
     // Đơn giản hoá hình học theo mức zoom để tải/vẽ nhanh. HÌNH GỐC vẫn nằm trong DB nên
     // tính diện tích (parcels/at) vẫn chính xác — đây chỉ là hình để HIỂN THỊ.
     // tol ≈ nửa pixel ở mức zoom hiện tại (đơn vị độ). Zoom càng lớn → tol càng nhỏ → càng chi tiết.

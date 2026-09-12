@@ -33,6 +33,10 @@ interface Props {
   adMarkers?: { id: number; lng: number; lat: number; name: string; phone: string; image?: string | null; style?: string }[];
   adOpacity?: number; // độ mờ logo quảng cáo (đi theo thanh độ mờ lớp phủ)
   fitTo?: [[number, number], [number, number]] | null; // zoom khít vào vùng (vd: thửa vừa vẽ)
+  // Mức phóng THẤP NHẤT được phép sau khi khớp khung. Lớp ảnh quy hoạch chỉ vẽ từ `minzoom`
+  // trở lên; khớp khung một vùng rộng (vd QĐ205 trùm cả huyện) thì mức phóng rơi xuống ~11,5
+  // → khớp xong bản đồ vẫn TRỐNG TRƠN. Có ô này thì thà thấy hụt chút rìa còn hơn thấy trắng.
+  fitMinZoom?: number;
   onMapClick?: (lng: number, lat: number) => void;
   onMeasure?: (r: MeasureResult) => void;
   onViewport?: (v: { west: number; south: number; east: number; north: number; zoom: number }) => void;
@@ -172,7 +176,7 @@ function parcelDims(hl: any): any[] {
   return out;
 }
 
-export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, flyToPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, onMapClick, onMeasure, onViewport, textLabels = [], routes = [], onPickRoute, diaChinhTiles = null }: Props) {
+export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, flyToPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, fitMinZoom, onMapClick, onMeasure, onViewport, textLabels = [], routes = [], onPickRoute, diaChinhTiles = null }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const markerRefs = useRef<Marker[]>([]);
@@ -691,8 +695,17 @@ export default function MapView({ center, zoom, className, layers = [], markers 
 
   useEffect(() => {
     const map = mapRef.current; if (!map || !fitTo) return;
+    // Hỏi trước xem khớp khung xong sẽ ra mức phóng bao nhiêu. Nếu thấp hơn mức tối thiểu thì
+    // vẫn về đúng tâm vùng đó nhưng giữ mức phóng tối thiểu — khớp khít mà không thấy gì thì vô ích.
+    if (fitMinZoom) {
+      const cam = map.cameraForBounds(fitTo as any, { padding: 60 }) as any;
+      if (cam && typeof cam.zoom === 'number' && cam.zoom < fitMinZoom) {
+        map.easeTo({ center: cam.center, zoom: fitMinZoom, duration: 800 });
+        return;
+      }
+    }
     map.fitBounds(fitTo as any, { padding: 60, animate: true, maxZoom: 19, duration: 800 });
-  }, [fitTo]);
+  }, [fitTo, fitMinZoom]);
 
   useEffect(() => {
     const map = mapRef.current; if (!map || !readyRef.current) return;

@@ -3,8 +3,17 @@ import { query } from '../lib/db.ts';
 import { cached, cachePut } from '../lib/cache.ts';
 import { vnNoAccent } from '../lib/vn.ts';
 import { verifyToken, coVaiTro } from '../lib/auth.ts';
-import { computeQhAreas, outerRing, qhReady, ngoaiVungQh } from '../lib/qhCompute.ts';
+import { computeQhAreas, computeQhTheoBan, outerRing, qhReady, ngoaiVungQh } from '../lib/qhCompute.ts';
 
+
+// Mã mục đích sử dụng KHÔNG mở tra cứu thửa — đây là hạ tầng công cộng do Nhà nước quản lý,
+// không phải đất giao dịch. Giá trị là cụm từ hiện thẳng cho người dùng đọc.
+// Thêm/bớt loại nào thì sửa ĐÚNG MỘT CHỖ này (routes/diaChinh.ts đọc lại đúng bảng này).
+export const CHAN_TRA_CUU: Record<string, string> = {
+  DGT: 'phần đường giao thông',
+  SON: 'phần sông, suối, kênh rạch',
+  DTL: 'phần công trình thuỷ lợi',
+};
 export const parcelsRouter = Router();
 
 // candidate JSONB property keys used by Vietnamese cadastral data
@@ -97,6 +106,18 @@ parcelsRouter.get('/at', async (req, res, next) => {
       -- Khớp cả xa_moi_id vì một tờ cũ bị ranh xã mới cắt qua thì nằm ở hai xã mới với hai số khác nhau.
       LEFT JOIN dia_chinh_to tt ON tt.xa_cu_id = d.xa_id AND tt.to_cu = d.to_num AND tt.xa_moi_id = d.xa_moi_id
       WHERE ST_Intersects(d.geom, ${pt}) LIMIT 1`, [lng, lat]).catch(() => [] as any[]);
+    // ── ĐẤT HẠ TẦNG CÔNG CỘNG: TẠM THỜI KHÔNG CHO TRA RA THỬA ──
+    // Sổ địa chính cấp số tờ/số thửa cho cả đường sá, sông suối, kênh mương y như thửa đất của
+    // dân — thường gom cả mạng đường (hoặc cả con suối) của một xã thành MỘT thửa khổng lồ:
+    // riêng Cam Đức có thửa đường 13.920 m² và thửa suối 398.950 m². Trả về như thửa bình thường
+    // thì người xem tưởng đó là lô đất mênh mông đang rao bán.
+    // Chỉ chặn thửa THUẦN một loại; thửa vừa đất ở vừa có phần đường (vd 'ODT+DGT') vẫn tra bình
+    // thường vì đó là đất của dân.
+    const laDuong = dc ? CHAN_TRA_CUU[String(dc.mdsd || '').trim().toUpperCase()] : null;
+    if (laDuong) {
+      return res.json({ found: false, khongTraCuu: laDuong, point: { lng, lat },
+                        parcel: null, zoning: null, listings: [] });
+    }
     if (dc) {
       tuBangMoi = true;
       const laCu = Number(dc.cap) === 3;
@@ -239,8 +260,13 @@ parcelsRouter.get('/at', async (req, res, next) => {
     // qhNgoaiVung = thửa nằm NGOÀI vùng đã có dữ liệu quy hoạch (hiện chỉ có huyện Cam Lâm cũ).
     // Giao diện dựa vào cờ này để nói thẳng "chưa có dữ liệu", thay vì im lặng để người xem
     // tưởng thửa không dính quy hoạch gì.
+    // Một thửa hay bị NHIỀU bản quy hoạch phủ chồng (QĐ205 trùm cả huyện, bên trong còn QĐ893 và
+    // các bản phân khu 1/2000). Liệt kê RIÊNG từng bản, mỗi bản ghi rõ loại đất + diện tích, để
+    // người xem tự đối chiếu — không bản nào bị giấu đi.
+    const qhCacBan = parcel ? computeQhTheoBan(ringThua, Number((parcel as any).areaM2) || 0) : [];
     res.json({ found: true, point: { lng, lat }, parcel: parcel ?? null, zoning: zoningOut, overlaps, neighbors, listings: linked,
-               qhNgoaiVung: ngoaiQh && overlaps.length === 0 });
+               qhCacBan,
+               qhNgoaiVung: ngoaiQh && overlaps.length === 0 && qhCacBan.length === 0 });
   } catch (e) { next(e); }
 });
 

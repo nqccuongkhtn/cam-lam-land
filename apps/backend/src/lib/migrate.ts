@@ -525,5 +525,33 @@ export async function migrate(): Promise<void> {
   await pool.query(`CREATE INDEX IF NOT EXISTS dia_chinh_xa_cap_idx ON dia_chinh_xa (cap, ten)`).catch(() => {});
   await pool.query(`CREATE INDEX IF NOT EXISTS dia_chinh_xa_huyen_idx ON dia_chinh_xa (cap, huyen, ten)`).catch(() => {});
 
+
+  // ── CHAT: gửi ẢNH + PDF, và THU HỒI tin nhắn ────────────────────────────────
+  // Tệp chat để BẢNG RIÊNG, KHÔNG dùng chung `listing_images`: đường /api/images/:id
+  // không kiểm tra quyền gì cả (ảnh tin rao vốn công khai nên không sao), trong khi
+  // ảnh sổ đỏ / hợp đồng khách gửi trong chat thì tuyệt đối không được lộ.
+  await pool.query(`CREATE TABLE IF NOT EXISTS chat_files (
+    id BIGSERIAL PRIMARY KEY,
+    room TEXT NOT NULL,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
+    ten TEXT NOT NULL,
+    mime TEXT NOT NULL,
+    co_bytes INT NOT NULL DEFAULT 0,
+    du_lieu BYTEA NOT NULL,
+    thumb BYTEA,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now())`).catch((e: any) => console.error('[migrate] chat_files lỗi:', e?.message || e));
+  await pool.query(`CREATE INDEX IF NOT EXISTS chat_files_room_idx ON chat_files (room, id)`).catch(() => {});
+  // kind: 'text' | 'image' | 'file'. Tin có tệp thì body rỗng.
+  await pool.query(`ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'text'`).catch((e: any) => console.error('[migrate] chat kind lỗi:', e?.message || e));
+  await pool.query(`ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS file_id BIGINT`).catch(() => {});
+  await pool.query(`ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS file_name TEXT`).catch(() => {});
+  await pool.query(`ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS file_mime TEXT`).catch(() => {});
+  await pool.query(`ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS file_size INT`).catch(() => {});
+  // deleted_at = mốc THU HỒI. Xoá mềm: giữ dòng tin để còn hiện chữ mờ "đã thu hồi",
+  // nhưng body bị xoá trắng và dòng trong chat_files bị XOÁ HẲN (tệp mất thật khỏi máy chủ).
+  await pool.query(`ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ`).catch((e: any) => console.error('[migrate] chat deleted_at lỗi:', e?.message || e));
+  await pool.query(`CREATE INDEX IF NOT EXISTS chat_thu_hoi_idx ON chat_messages (room, deleted_at) WHERE deleted_at IS NOT NULL`).catch(() => {});
+  // Quyền gửi ảnh/PDF của KHÁCH: mặc định TẮT, admin tự mở cho từng người trong khung chat.
+  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS chat_upload BOOLEAN NOT NULL DEFAULT false`).catch((e: any) => console.error('[migrate] users chat_upload lỗi:', e?.message || e));
   console.log('[migrate] schema up to date');
 }

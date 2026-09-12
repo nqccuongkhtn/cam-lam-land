@@ -7,8 +7,8 @@ async function ensureUser(email: string, password: string, role: string, fullNam
   if (ex.length) return;
   const hash = await hashPassword(password);
   await query(
-    `INSERT INTO users (email, password_hash, role, full_name, phone, email_verified, status, tier)
-     VALUES ($1,$2,$3,$4,$5,true,'active',$6)`, [email, hash, role, fullName, phone, tier]);
+    `INSERT INTO users (email, password_hash, role, roles, full_name, phone, email_verified, status, tier)
+     VALUES ($1,$2,$3,ARRAY[$3]::text[],$4,$5,true,'active',$6)`, [email, hash, role, fullName, phone, tier]);
   console.log(`[auth] seed ${role}: ${email}`);
 }
 

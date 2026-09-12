@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { laAdmin } from '../lib/auth.ts';
 import { query } from '../lib/db.ts';
 import { authRequired, adminRequired, type AuthedRequest } from '../middleware/auth.ts';
 
@@ -55,7 +56,7 @@ savedPlacesRouter.post('/', authRequired, async (req: AuthedRequest, res, next) 
 
 async function ownerOrAdmin(req: AuthedRequest, id: number): Promise<boolean> {
   const [r] = await query('SELECT user_id FROM saved_places WHERE id=$1', [id]);
-  return !!r && (r.user_id === req.user!.id || req.user!.role === 'admin');
+  return !!r && (r.user_id === req.user!.id || laAdmin(req.user));
 }
 
 // PATCH /api/saved-places/:id — sửa (chủ hoặc admin)

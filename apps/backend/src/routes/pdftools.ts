@@ -8,7 +8,10 @@ import { tmpdir } from 'node:os';
 import { join, extname, basename } from 'node:path';
 
 export const pdftoolsRouter = Router();
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 60 * 1024 * 1024 } });
+// GIỚI HẠN 25MB (trước 60MB). Công cụ này KHÔNG cần đăng nhập, mà mỗi lần gọi là máy chủ è cổ
+// chạy LibreOffice/OCR — để file quá lớn thì chỉ cần vài người gửi liên tục là máy ở nhà đơ, cả web sập.
+// 25MB vẫn thừa cho hồ sơ nhà đất (sổ đỏ scan cỡ 2-8MB).
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
 
 const CT: Record<string, string> = {
   pdf: 'application/pdf',
@@ -39,7 +42,9 @@ pdftoolsRouter.post('/convert', upload.single('file'), async (req: any, res, nex
   const to = String(req.query.to || 'pdf').toLowerCase().replace(/[^a-z]/g, '');
   if (!req.file) return res.status(400).json({ error: 'Thiếu tệp' });
   if (!['pdf', 'docx', 'xlsx', 'pptx'].includes(to)) return res.status(400).json({ error: 'Định dạng đích không hỗ trợ' });
-  const inExt = (extname(req.file.originalname || '').slice(1) || 'bin').toLowerCase();
+  // Lọc SẠCH phần đuôi tệp: chỉ giữ chữ và số. Người dùng đặt tên tệp kiểu "a.pdf/../../x" thì
+  // phần đuôi lấy ra có thể chứa dấu gạch chéo và chấm — ghép thẳng vào đường dẫn là thoát ra ngoài thư mục.
+  const inExt = ((extname(req.file.originalname || '').slice(1) || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin').slice(0, 8);
   const dir = await mkdtemp(join(tmpdir(), 'lo_'));
   try {
     const inPath = join(dir, 'src.' + inExt);
@@ -47,7 +52,7 @@ pdftoolsRouter.post('/convert', upload.single('file'), async (req: any, res, nex
     const args = ['--headless', '--norestore', '--nolockcheck', `-env:UserInstallation=file://${join(dir, 'profile')}`];
     if (inExt === 'pdf' && to === 'docx') args.push('--infilter=writer_pdf_import'); // ép PDF -> Writer để ra Word đọc/sửa được
     args.push('--convert-to', to, '--outdir', dir, inPath);
-    await run('soffice', args, { timeout: 180000 });
+    await run('soffice', args, { timeout: 90000 });     // 90 giây là quá đủ cho tệp 25MB
     const files = await readdir(dir);
     const outName = files.find((f) => f.toLowerCase().endsWith('.' + to) && f !== 'src.' + inExt);
     if (!outName) return res.status(422).json({ error: 'Không chuyển đổi được tệp này (định dạng nguồn có thể không được hỗ trợ).' });
@@ -67,7 +72,7 @@ pdftoolsRouter.post('/ocr', upload.single('file'), async (req: any, res, next) =
     const inPath = join(dir, 'in.pdf'), outPath = join(dir, 'out.pdf');
     await writeFile(inPath, req.file.buffer);
     // --skip-text: trang đã có chữ thì giữ nguyên, chỉ OCR trang ảnh. -l vie+eng: nhận cả tiếng Việt.
-    await run('ocrmypdf', ['--skip-text', '-l', 'vie+eng', '--optimize', '0', inPath, outPath], { timeout: 280000, okCodes: [] });
+    await run('ocrmypdf', ['--skip-text', '-l', 'vie+eng', '--optimize', '0', inPath, outPath], { timeout: 120000, okCodes: [] });   // 2 phút, trước 4 phút 40
     const out = await readFile(outPath);
     sendDl(res, out, safeBase(req.file.originalname) + '-ocr.pdf', 'pdf');
   } catch (e: any) {

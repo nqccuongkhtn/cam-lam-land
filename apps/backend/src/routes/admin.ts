@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
-import { adminRequired, type AuthedRequest } from '../middleware/auth.ts';
-import { hashPassword } from '../lib/auth.ts';
+import { adminRequired, quenVaiTro, type AuthedRequest } from '../middleware/auth.ts';
+import { hashPassword, dsVaiTro, chuanHoaVaiTro, vaiTroChinh } from '../lib/auth.ts';
 
 export const adminRouter = Router();
 adminRouter.use(adminRequired);
@@ -38,8 +38,8 @@ async function demoAgentIds(): Promise<number[]> {
     let [u] = await query(`SELECT id FROM users WHERE email=$1`, [a.email]);
     if (!u) {
       [u] = await query(
-        `INSERT INTO users (email,password_hash,role,full_name,phone,email_verified,avatar)
-         VALUES ($1,$2,'user',$3,$4,true,$5) RETURNING id`,
+        `INSERT INTO users (email,password_hash,role,roles,full_name,phone,email_verified,avatar)
+         VALUES ($1,$2,'user',ARRAY['user']::text[],$3,$4,true,$5) RETURNING id`,
         [a.email, await hashPassword('demo-' + Math.random().toString(36).slice(2)), a.name, a.phone, avatar]);
     } else {
       await query(`UPDATE users SET full_name=$2, phone=$3, avatar=$4 WHERE id=$1`, [u.id, a.name, a.phone, avatar]);
@@ -71,7 +71,7 @@ async function demoCustomerIds(): Promise<number[]> {
   for (const c of DEMO_CUST_USERS) {
     const avatar = `https://i.pravatar.cc/150?u=${encodeURIComponent(c.email)}`;
     let [u] = await query(`SELECT id FROM users WHERE email=$1`, [c.email]);
-    if (!u) [u] = await query(`INSERT INTO users (email,password_hash,role,full_name,phone,email_verified,avatar) VALUES ($1,$2,'user',$3,$4,true,$5) RETURNING id`,
+    if (!u) [u] = await query(`INSERT INTO users (email,password_hash,role,roles,full_name,phone,email_verified,avatar) VALUES ($1,$2,'user',ARRAY['user']::text[],$3,$4,true,$5) RETURNING id`,
       [c.email, await hashPassword('demo-' + Math.random().toString(36).slice(2)), c.name, c.phone, avatar]);
     else await query(`UPDATE users SET full_name=$2, phone=$3, avatar=$4 WHERE id=$1`, [u.id, c.name, c.phone, avatar]);
     ids.push(u.id);
@@ -407,9 +407,9 @@ adminRouter.get('/stats', async (_req, res, next) => {
   try {
     const [users] = await query(`SELECT
       count(*)::int AS total,
-      count(*) FILTER (WHERE role='gis')::int AS gis,
-      count(*) FILTER (WHERE role='user')::int  AS users,
-      count(*) FILTER (WHERE role='admin')::int AS admins,
+      count(*) FILTER (WHERE 'gis' = ANY(roles))::int AS gis,
+      count(*) FILTER (WHERE 'user' = ANY(roles))::int  AS users,
+      count(*) FILTER (WHERE 'admin' = ANY(roles))::int AS admins,
       count(*) FILTER (WHERE tier='paid')::int  AS paid
       FROM users`);
     const [listings] = await query(`SELECT
@@ -436,21 +436,30 @@ adminRouter.get('/users', async (req, res, next) => {
     const where = q ? `WHERE full_name ILIKE $1 OR email ILIKE $1 OR phone ILIKE $1` : '';
     const params: any[] = q ? [`%${q}%`] : [];
     const [{ total }] = await query(`SELECT count(*)::int AS total FROM users ${where}`, params);
-    const rows = await query(`SELECT id, email, role, full_name AS "fullName", phone, tier, status, boost_quota AS "boostQuota",
+    const rows = await query(`SELECT id, email, role, roles, full_name AS "fullName", phone, tier, status, boost_quota AS "boostQuota",
       is_advisor AS "isAdvisor", email_verified AS "emailVerified", rating, rating_count AS "ratingCount", video_expires_at AS "videoExpiresAt", created_at AS "createdAt"
       FROM users ${where} ORDER BY created_at DESC LIMIT ${per} OFFSET ${(page - 1) * per}`, params);
-    res.json({ users: rows, total, page, per });
+    res.json({ users: rows.map((u: any) => ({ ...u, roles: dsVaiTro(u) })), total, page, per });
   } catch (e) { next(e); }
 });
 adminRouter.patch('/users/:id', async (req, res, next) => {
   try {
     const id = Number(req.params.id); const b = req.body ?? {};
+    // CẤP VAI TRÒ — một người có thể giữ NHIỀU vai trò cùng lúc.
+    //   · gửi lên { roles: ['gis','vanban'] }  → đặt đúng danh sách đó
+    //   · gửi lên { role: 'gis' } (kiểu cũ)    → hiểu là chỉ có một vai trò
+    // Cột role vẫn được ghi theo vai trò lớn nhất trong danh sách, để chỗ nào còn đọc mỗi cột đó
+    // vẫn hiểu đúng quyền. Không gửi gì về vai trò thì giữ nguyên như cũ.
+    let roles: string[] | null = null;
+    if (Array.isArray(b.roles)) roles = chuanHoaVaiTro(b.roles);
+    else if (typeof b.role === 'string' && b.role) roles = chuanHoaVaiTro([b.role]);
     const [row] = await query(
-      `UPDATE users SET role=COALESCE($2,role), tier=COALESCE($3,tier), status=COALESCE($4,status), boost_quota=COALESCE($5,boost_quota), is_advisor=COALESCE($6,is_advisor), rating=COALESCE($7,rating), rating_count=COALESCE($8,rating_count)
-       WHERE id=$1 RETURNING id, email, role, tier, status, boost_quota AS "boostQuota", is_advisor AS "isAdvisor", rating, rating_count AS "ratingCount"`,
-      [id, b.role ?? null, b.tier ?? null, b.status ?? null, b.boostQuota ?? null, typeof b.isAdvisor === 'boolean' ? b.isAdvisor : null, b.rating ?? null, b.ratingCount ?? null]);
+      `UPDATE users SET roles=COALESCE($9::text[],roles), role=COALESCE($2,role), tier=COALESCE($3,tier), status=COALESCE($4,status), boost_quota=COALESCE($5,boost_quota), is_advisor=COALESCE($6,is_advisor), rating=COALESCE($7,rating), rating_count=COALESCE($8,rating_count)
+       WHERE id=$1 RETURNING id, email, role, roles, tier, status, boost_quota AS "boostQuota", is_advisor AS "isAdvisor", rating, rating_count AS "ratingCount"`,
+      [id, roles ? vaiTroChinh(roles) : null, b.tier ?? null, b.status ?? null, b.boostQuota ?? null, typeof b.isAdvisor === 'boolean' ? b.isAdvisor : null, b.rating ?? null, b.ratingCount ?? null, roles]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
-    res.json({ user: row });
+    quenVaiTro(id);                       // áp dụng vai trò mới NGAY, người kia không phải đăng nhập lại
+    res.json({ user: { ...row, roles: dsVaiTro(row) } });
   } catch (e) { next(e); }
 });
 

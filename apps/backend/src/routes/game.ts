@@ -30,7 +30,7 @@ gameRouter.post('/score', async (req, res, next) => {
       `INSERT INTO customers (user_id, name, phone, source, note)
        SELECT u.id, $1, $2, 'Mini-game', $3
          FROM users u
-        WHERE u.role = 'admin'
+        WHERE 'admin' = ANY(u.roles)
           AND NOT EXISTS (SELECT 1 FROM customers c WHERE c.phone = $2)
         ORDER BY u.id LIMIT 1`,
       [name, phone, 'Khách chơi mini-game Cam Lâm Land — quan tâm định giá đất / tư vấn.']

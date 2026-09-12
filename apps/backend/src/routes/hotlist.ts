@@ -3,11 +3,12 @@
 // Quyền: SỬA + đánh dấu HẾT HIỆU LỰC + TẠO sheet = admin HOẶC 'hotlist'. XOÁ vĩnh viễn (bản ghi & sheet) = CHỈ admin (sheet chỉ xoá được khi đã rỗng).
 // Trường công văn đến theo NĐ 30/2020 (Sổ đăng ký văn bản đến): số đến, ngày đến, số/ký hiệu, ngày văn bản, đơn vị gửi (tác giả).
 import { Router } from 'express';
+import { laAdmin, coVaiTro } from '../lib/auth.ts';
 import { query } from '../lib/db.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 
 export const hotlistRouter = Router();
-const canManage = (req: AuthedRequest) => !!req.user && (req.user.role === 'admin' || (req.user.role as any) === 'hotlist');
+const canManage = (req: AuthedRequest) => coVaiTro(req.user, 'admin', 'hotlist');
 
 let ensured = false;
 async function ensure() {
@@ -81,7 +82,7 @@ hotlistRouter.post('/sheets', authRequired, async (req: AuthedRequest, res, next
 // DELETE /api/hotlist/sheets — XOÁ sheet (CHỈ admin, và CHỈ khi sheet đã rỗng — 0 bản ghi). Đặt TRƯỚC /:id.
 hotlistRouter.delete('/sheets', authRequired, async (req: AuthedRequest, res, next) => {
   try {
-    await ensure(); if (!req.user || req.user.role !== 'admin') return res.status(403).json({ error: 'Chỉ admin mới được xoá sheet.' });
+    await ensure(); if (!req.user || !laAdmin(req.user)) return res.status(403).json({ error: 'Chỉ admin mới được xoá sheet.' });
     const name = String((req.body as any)?.name ?? '').trim(); if (!name) return res.status(400).json({ error: 'Thiếu tên sheet.' });
     const [{ c }] = await query(`SELECT count(*)::int AS c FROM hot_records WHERE nguon=$1`, [name]);
     if (Number(c) > 0) return res.status(409).json({ error: `Sheet còn ${c} bản ghi — hãy xoá/chuyển hết bản ghi trước khi xoá sheet.` });
@@ -124,5 +125,5 @@ hotlistRouter.patch('/:id/het-hieu-luc', authRequired, async (req: AuthedRequest
 
 // DELETE /api/hotlist/:id — XOÁ VĨNH VIỄN (CHỈ admin).
 hotlistRouter.delete('/:id', authRequired, async (req: AuthedRequest, res, next) => {
-  try { await ensure(); if (!req.user || req.user.role !== 'admin') return res.status(403).json({ error: 'Chỉ admin mới được xoá vĩnh viễn bản ghi.' }); await query('DELETE FROM hot_records WHERE id=$1', [Number(req.params.id)]); res.json({ ok: true }); } catch (e) { next(e); }
+  try { await ensure(); if (!req.user || !laAdmin(req.user)) return res.status(403).json({ error: 'Chỉ admin mới được xoá vĩnh viễn bản ghi.' }); await query('DELETE FROM hot_records WHERE id=$1', [Number(req.params.id)]); res.json({ ok: true }); } catch (e) { next(e); }
 });

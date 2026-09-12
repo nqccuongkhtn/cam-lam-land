@@ -2,13 +2,15 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useAuth, laAdmin } from '@/lib/auth';
-import { api } from '@/lib/api';
+import { api, uploadChatFile } from '@/lib/api';
 import { getToken } from '@/lib/token';
 import { WARDS_NEW, WARDS_OLD, PROPERTY_LABELS, type PropertyType } from '@/lib/types';
 import FlappyMini from './FlappyMini';
+import ChatDinhKem from './ChatDinhKem';
 import { useLockBody } from '@/lib/useLockBody';
 
-interface Msg { id: number; userId: number | null; name: string; avatar?: string | null; body: string; createdAt: string; }
+interface Msg { id: number; userId: number | null; name: string; avatar?: string | null; body: string; createdAt: string;
+  kind?: string; fileId?: number | null; fileName?: string | null; fileMime?: string | null; fileSize?: number | null; deletedAt?: string | null; }
 interface Room { room: string; name: string; phone?: string | null; online?: boolean; lastBody: string; lastAt: string; count: number; unread?: number; }
 const TYPES: PropertyType[] = ['land', 'house', 'apartment', 'villa', 'commercial', 'farm'];
 type Tab = 'community' | 'support' | 'advisory' | 'sell';
@@ -66,6 +68,10 @@ export default function ChatWidget() {
   const hintShown = useRef(0);
   const hintStop = useRef(false);
   const [peerAck, setPeerAck] = useState<{ received: number; read: number } | null>(null);
+  const [canUpload, setCanUpload] = useState(false);                  // MÌNH có được gửi ảnh/PDF ở phòng này không
+  const [peerUpload, setPeerUpload] = useState<boolean | null>(null); // khách bên kia đang được mở hay khoá (chỉ admin biết)
+  const [dangGuiTep, setDangGuiTep] = useState(false);
+  const [menuTin, setMenuTin] = useState(0);                          // id tin đang mở menu "⋯"
   const [listOpen, setListOpen] = useState(true);
   const [gameOpen, setGameOpen] = useState(false);
   const [roomQ, setRoomQ] = useState('');
@@ -94,6 +100,7 @@ export default function ChatWidget() {
   const audioRef = useRef<any>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const msgInputRef = useRef<HTMLInputElement>(null);
+  const tepRef = useRef<HTMLInputElement>(null);
   const seenComm = useRef(0), seenSupp = useRef(0), seenAdv = useRef(0);
   const unread = unreadComm + unreadSupp + unreadAdv;
   const setS = (k: string, v: string) => setSf((s) => ({ ...s, [k]: v }));
@@ -158,8 +165,19 @@ export default function ChatWidget() {
   useEffect(() => {
     if (!open || !user || !room) { setMsgs([]); return; }
     seen.current = new Set(); lastId.current = 0; acked.current = 0; setMsgs([]); setWarn(''); setPeerAck(null);
+    setCanUpload(false); setPeerUpload(null); setMenuTin(0);
     let alive = true;
-    const tick = async () => { try { const r = await api<{ messages: Msg[]; ack?: { received: number; read: number } | null }>(`/chat/messages?room=${encodeURIComponent(room)}&after=${lastId.current}`); if (alive) { pushMsgs(r.messages); if (r.ack) setPeerAck(r.ack); } } catch {} };
+    const tick = async () => {
+      try {
+        const r = await api<{ messages: Msg[]; ack?: { received: number; read: number } | null; recalled?: number[]; canUpload?: boolean; peerUpload?: boolean | null }>(`/chat/messages?room=${encodeURIComponent(room)}&after=${lastId.current}`);
+        if (!alive) return;
+        pushMsgs(r.messages);
+        if (r.ack) setPeerAck(r.ack);
+        setCanUpload(!!r.canUpload);
+        setPeerUpload(r.peerUpload ?? null);
+        danhDauThuHoi(r.recalled || []);
+      } catch {}
+    };
     tick();
     const iv = setInterval(tick, 8000);
     return () => { alive = false; clearInterval(iv); };
@@ -178,13 +196,17 @@ export default function ChatWidget() {
       ws.onmessage = (ev) => {
         try {
           const d = JSON.parse(ev.data);
+          // Tin vừa bị THU HỒI — phải nới điều kiện dưới, trước đây mọi loại khác 'chat' đều bị bỏ qua.
+          if (d.type === 'chat-recall') { danhDauThuHoi([Number(d.id)]); return; }
           if (d.type !== 'chat' || !d.message) return;
           const m = d.message;
           if (openRef.current && d.room === roomRef.current) pushMsgs([m]);
           if (m.userId === user.id) return;
           const viewing = openRef.current && d.room === roomRef.current;
           if (viewing || !notifyRef.current) return;
-          const raw = String(m.body || '').replace(/\s+/g, ' ').trim();
+          const raw = m.kind === 'image' ? '📷 Đã gửi một hình ảnh'
+            : m.kind === 'file' ? `📕 ${m.fileName || 'Tệp PDF'}`
+            : String(m.body || '').replace(/\s+/g, ' ').trim();
           const advMask = d.room.startsWith('advisory:') && Number(d.room.slice(9)) === user.id && m.userId !== user.id;
           setToast({ room: d.room, name: advMask ? 'Chuyên viên tư vấn' : (m.name || 'Tin nhắn'), body: raw.length > 42 ? raw.slice(0, 42) + '…' : raw, avatar: advMask ? '/icons/icon-192.png' : m.avatar });
           playDing();
@@ -252,12 +274,47 @@ export default function ChatWidget() {
   }, []);
   function dismissHint() { setHint(false); hintStop.current = true; }
   // ===== Bong bóng chat kéo di chuyển tự do (chat head Android) — dính mép + nhớ vị trí =====
-  useEffect(() => { try { const s = localStorage.getItem('cl-bubble-pos'); if (s) { const p = JSON.parse(s); if (p && typeof p.x === 'number' && typeof p.y === 'number') setBubblePos(p); } } catch {} }, []);
+  // ⚠️ KHÔNG nhớ toạ độ điểm ảnh tuyệt đối. Toạ độ đó chỉ đúng với ĐÚNG cỡ cửa sổ và ĐÚNG mức
+  // phóng lúc kéo; đổi zoom hay đổi cỡ cửa sổ là bong bóng nhảy ra giữa màn hình, thậm chí lọt
+  // hẳn ra ngoài không gọi lại được. Thay vào đó chỉ nhớ HAI thứ không phụ thuộc kích thước:
+  //   · mép nào  (bong bóng vốn luôn dính mép trái hoặc phải)
+  //   · cao bao nhiêu phần trăm màn hình
+  // Từ hai thứ đó tính lại toạ độ mỗi lần mở trang và mỗi lần đổi cỡ cửa sổ → luôn đúng chỗ.
+  const NEO_KEY = 'cl-bubble-neo';
+  const neo = useRef<{ mep: 'trai' | 'phai'; ty: number } | null>(null);
   const BUB = 56;
+  // ⚠️ KHÔNG dùng window.innerWidth: con số đó TÍNH CẢ THANH CUỘN (~15px), nên đặt bong bóng
+  // sát mép phải là nó nấp một phần sau thanh cuộn. clientWidth mới là bề rộng NHÌN THẤY.
+  function khungNhin() {
+    if (typeof document === 'undefined') return { W: 400, H: 800 };
+    const e = document.documentElement;
+    return { W: e.clientWidth || window.innerWidth, H: e.clientHeight || window.innerHeight };
+  }
   function clampBubble(x: number, y: number) {
-    const W = typeof window !== 'undefined' ? window.innerWidth : 400, H = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const { W, H } = khungNhin();
     return { x: Math.max(6, Math.min(x, W - BUB - 6)), y: Math.max(6, Math.min(y, H - BUB - 6)) };
   }
+  function tuNeo(n: { mep: 'trai' | 'phai'; ty: number }) {
+    const { W, H } = khungNhin();
+    return clampBubble(n.mep === 'trai' ? 8 : W - BUB - 8, n.ty * H);
+  }
+  useEffect(() => {
+    try {
+      localStorage.removeItem('cl-bubble-pos'); // bỏ hẳn kiểu nhớ cũ (toạ độ tuyệt đối)
+      const s = localStorage.getItem(NEO_KEY);
+      if (!s) return;                            // chưa kéo bao giờ → để mặc định góc dưới phải
+      const n = JSON.parse(s);
+      if (n && (n.mep === 'trai' || n.mep === 'phai') && typeof n.ty === 'number') {
+        neo.current = n; setBubblePos(tuNeo(n));
+      }
+    } catch {}
+  }, []);
+  // Đổi cỡ cửa sổ / đổi mức phóng → tính lại từ mép + tỉ lệ, không dùng toạ độ cũ.
+  useEffect(() => {
+    const doiCo = () => { if (neo.current) setBubblePos(tuNeo(neo.current)); };
+    window.addEventListener('resize', doiCo);
+    return () => window.removeEventListener('resize', doiCo);
+  }, []);
   function bubbleDown(e: any) {
     const r = e.currentTarget.getBoundingClientRect();
     bubbleDrag.current = { sx: e.clientX, sy: e.clientY, ox: r.left, oy: r.top, moved: false, lx: r.left, ly: r.top };
@@ -273,10 +330,12 @@ export default function ChatWidget() {
     const d = bubbleDrag.current; bubbleDrag.current = null; if (!d) return;
     if (d.moved) {
       bubbleMoved.current = true;
-      const W = window.innerWidth, snapX = (d.lx + BUB / 2) < W / 2 ? 8 : W - BUB - 8; // dính mép trái/phải
-      const fin = clampBubble(snapX, d.ly);
-      setBubblePos(fin);
-      try { localStorage.setItem('cl-bubble-pos', JSON.stringify(fin)); } catch {}
+      const { W, H } = khungNhin();
+      const mep: 'trai' | 'phai' = (d.lx + BUB / 2) < W / 2 ? 'trai' : 'phai'; // dính mép trái/phải
+      const n = { mep, ty: Math.min(1, Math.max(0, d.ly / H)) };               // độ cao tính theo TỈ LỆ
+      neo.current = n;
+      setBubblePos(tuNeo(n));
+      try { localStorage.setItem(NEO_KEY, JSON.stringify(n)); } catch {}
     }
   }
 
@@ -323,6 +382,36 @@ export default function ChatWidget() {
       if (sub) { await api('/push/unsubscribe', { method: 'POST', body: JSON.stringify({ endpoint: sub.endpoint }) }).catch(() => {}); await sub.unsubscribe().catch(() => {}); }
     } catch {}
   }
+  // Đổi các tin có id trong danh sách thành "đã thu hồi" ngay trên màn hình.
+  function danhDauThuHoi(ids: number[]) {
+    if (!ids?.length) return;
+    const bo = new Set(ids.map(Number));
+    setMsgs((cur) => cur.some((m) => bo.has(m.id) && !m.deletedAt)
+      ? cur.map((m) => (bo.has(m.id) ? { ...m, deletedAt: m.deletedAt || new Date().toISOString(), kind: 'text', body: '', fileId: null } : m))
+      : cur);
+  }
+  async function guiTep(f?: File | null) {
+    if (!f || !room || !user) return;
+    setWarn(''); setDangGuiTep(true);
+    try { pushMsgs([await uploadChatFile(room, f)]); }
+    catch (e: any) { setWarn(e.message || 'Không gửi được tệp.'); }
+    finally { setDangGuiTep(false); }
+  }
+  async function thuHoi(id: number) {
+    setMenuTin(0);
+    if (!window.confirm('Thu hồi tin nhắn này?\n\nTệp đính kèm sẽ bị xoá khỏi máy chủ và KHÔNG lấy lại được.')) return;
+    try { await api(`/chat/messages/${id}`, { method: 'DELETE' }); danhDauThuHoi([id]); }
+    catch (e: any) { setWarn(e.message || 'Không thu hồi được.'); }
+  }
+  // Admin bật/tắt quyền gửi ảnh-PDF của đúng khách đang mở.
+  async function doiQuyenTep() {
+    const uid = Number(room.slice(room.startsWith('support:') ? 8 : 9));
+    if (!uid) return;
+    try {
+      const r = await api<{ cho: boolean }>('/chat/quyen-gui-file', { method: 'POST', body: JSON.stringify({ userId: uid, cho: !peerUpload }) });
+      setPeerUpload(!!r.cho);
+    } catch (e: any) { setWarn(e.message || 'Không đổi được quyền.'); }
+  }
   async function send() {
     const body = text.trim(); if (!body || !room || !user) return;
     setText(''); setWarn('');
@@ -342,6 +431,7 @@ export default function ChatWidget() {
   const adminSupport = isAdmin && tab === 'support';
   const staffAdvisory = isAdvisor && tab === 'advisory';
   const twoPane = adminSupport || staffAdvisory;
+  const coTheThuHoi = isAdmin || isAdvisor; // chỉ admin & tư vấn viên gỡ được tin của chính mình
   const needPick = twoPane && !room;
   let lastMineId = 0; if (user) for (const m of msgs) if (m.userId === user.id) lastMineId = m.id;
   const roomList = (tab === 'advisory' ? advRooms : rooms).filter((r) => r.room !== `support:${user?.id}` && r.room !== `advisory:${user?.id}`).filter((r) => !roomQ.trim() || (r.name || '').toLowerCase().includes(roomQ.trim().toLowerCase()));
@@ -552,6 +642,12 @@ export default function ChatWidget() {
                         <span className={activeOnline ? 'text-emerald-600 font-semibold' : 'text-slate-400'}>{activeOnline ? '● Đang online' : '○ Ngoại tuyến'}</span>
                       </span>
                     </div>
+                    {isAdmin && peerUpload !== null && (
+                      <button onClick={doiQuyenTep} title={peerUpload ? 'Đang CHO khách gửi ảnh/tệp — bấm để khoá lại' : 'Khách CHƯA gửi được ảnh/tệp — bấm để mở'}
+                        className={`ml-auto shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-bold ${peerUpload ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-slate-100 border-slate-300 text-slate-500'}`}>
+                        📎 {peerUpload ? 'Cho gửi' : 'Đã khoá'}
+                      </button>
+                    )}
                   </div>
                 )}
                 {tab === 'community' && (
@@ -583,13 +679,30 @@ export default function ChatWidget() {
                       const maskAdv = !mine && tab === 'advisory' && !isAdvisor;
                       const dName = maskAdv ? 'Chuyên viên tư vấn' : m.name;
                       const dAvatar = maskAdv ? '/icons/icon-192.png' : m.avatar;
+                      // Tin ĐÃ THU HỒI: chỉ còn một dòng chữ mờ, không tên, không avatar, không nút gì.
+                      if (m.deletedAt) return (
+                        <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
+                          <p className="max-w-[78%] rounded-2xl border border-dashed border-slate-300 px-3 py-1.5 text-[13px] italic text-slate-400">Tin nhắn đã được thu hồi</p>
+                        </div>
+                      );
+                      const coTep = m.kind === 'image' || m.kind === 'file';
                       return (
                         <div key={m.id}>
                           <div className={`flex items-end gap-1.5 ${mine ? 'justify-end' : 'justify-start'}`}>
+                            {mine && coTheThuHoi && (
+                              <span className="relative shrink-0 self-center">
+                                <button onClick={() => setMenuTin((v) => (v === m.id ? 0 : m.id))} title="Tuỳ chọn" className="w-6 h-6 grid place-items-center rounded-full leading-none text-slate-300 hover:text-slate-600 hover:bg-slate-200">⋯</button>
+                                {menuTin === m.id && (
+                                  <button onClick={() => thuHoi(m.id)} className="absolute right-0 bottom-7 z-10 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-red-600 shadow-lg hover:bg-red-50">Thu hồi tin nhắn</button>
+                                )}
+                              </span>
+                            )}
                             {!mine && (dAvatar ? <img src={dAvatar} alt="" className="w-7 h-7 rounded-full object-cover shrink-0 bg-white border border-slate-200" /> : <span className="w-7 h-7 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-[11px] font-bold shrink-0">{(dName || '?').charAt(0).toUpperCase()}</span>)}
                             <div className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${mine ? 'bg-[#0A2540] text-white rounded-br-sm' : 'bg-white border border-slate-200 rounded-bl-sm'}`}>
                               {!mine && <p className="text-[11px] font-bold text-[#C8A14B] mb-0.5">{dName}</p>}
-                              <p className="whitespace-pre-wrap break-words">{renderWithMentions(m.body, allMentionNames, myName)}</p>
+                              {coTep
+                                ? <ChatDinhKem fileId={m.fileId} fileName={m.fileName} fileMime={m.fileMime} fileSize={m.fileSize} mine={mine} />
+                                : <p className="whitespace-pre-wrap break-words">{renderWithMentions(m.body, allMentionNames, myName)}</p>}
                             </div>
                           </div>
                           {adminSupport && mine && m.id === lastMineId && peerAck && (
@@ -613,7 +726,13 @@ export default function ChatWidget() {
                           ))}
                         </div>
                       )}
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 items-center">
+                        {canUpload && (
+                          <>
+                            <input ref={tepRef} type="file" accept="image/*,application/pdf,.pdf" className="hidden" onChange={(e) => { guiTep(e.target.files?.[0]); e.target.value = ''; }} />
+                            <button onClick={() => tepRef.current?.click()} disabled={dangGuiTep} title="Gửi ảnh hoặc tệp PDF (tối đa 10MB)" className="shrink-0 w-9 h-9 grid place-items-center rounded-full border border-slate-300 text-lg hover:bg-slate-100 disabled:opacity-50">{dangGuiTep ? '⏳' : '📎'}</button>
+                          </>
+                        )}
                         <input ref={msgInputRef} value={text} onChange={(e) => { setText(e.target.value); if (warn) setWarn(''); }} onKeyDown={(e) => { if (e.key === 'Enter') { if (mentionList.length) { e.preventDefault(); pickMention(mentionList[0]); } else send(); } }} placeholder="Nhập tin nhắn…  (gõ @ để nhắc tên)" className="flex-1 border border-slate-300 rounded-full px-3.5 py-2 text-sm outline-none focus:border-[#0A2540]" />
                         <button onClick={send} className="cl-press bg-red-600 hover:bg-red-700 text-white rounded-full px-4 py-2 text-sm font-bold shrink-0">Gửi</button>
                       </div>

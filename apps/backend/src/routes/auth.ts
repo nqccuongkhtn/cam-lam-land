@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
-import { hashPassword, verifyPassword, signToken } from '../lib/auth.ts';
+import { hashPassword, verifyPassword, signToken, dsVaiTro } from '../lib/auth.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { sendVerificationEmail, EMAIL_LIVE } from '../lib/mailer.ts';
 
 export const authRouter = Router();
 
 const profile = (u: any) => ({
-  id: u.id, email: u.email, role: u.role,
+  id: u.id, email: u.email, role: u.role, roles: dsVaiTro(u),
   fullName: u.full_name ?? null, phone: u.phone ?? null,
   tier: u.tier ?? 'free', status: u.status ?? 'active',
   emailVerified: u.email_verified ?? true, avatar: u.avatar ?? null,
@@ -35,9 +35,9 @@ authRouter.post('/register', async (req, res, next) => {
       return res.status(409).json({ error: 'Email đã được đăng ký' });
     const hash = await hashPassword(password);
     const [user] = await query(
-      `INSERT INTO users (email, password_hash, role, full_name, phone, email_verified)
-       VALUES ($1,$2,'user',$3,$4,true) RETURNING *`, [email, hash, fullName ?? null, phone]);
-    const token = signToken({ id: user.id, email: user.email, role: user.role });
+      `INSERT INTO users (email, password_hash, role, roles, full_name, phone, email_verified)
+       VALUES ($1,$2,'user',ARRAY['user']::text[],$3,$4,true) RETURNING *`, [email, hash, fullName ?? null, phone]);
+    const token = signToken({ id: user.id, email: user.email, role: user.role, roles: dsVaiTro(user) as any });
     res.status(201).json({ token, user: profile(user) });
   } catch (e) { next(e); }
 });
@@ -54,7 +54,7 @@ authRouter.post('/verify-email', async (req, res, next) => {
     await query('UPDATE email_verifications SET used=true WHERE id=$1', [v.id]);
     const [user] = await query('UPDATE users SET email_verified=true WHERE email=$1 RETURNING *', [email]);
     if (!user) return res.status(404).json({ error: 'Không tìm thấy tài khoản' });
-    const token = signToken({ id: user.id, email: user.email, role: user.role });
+    const token = signToken({ id: user.id, email: user.email, role: user.role, roles: dsVaiTro(user) as any });
     res.json({ token, user: profile(user) });
   } catch (e) { next(e); }
 });
@@ -80,7 +80,7 @@ authRouter.post('/login', async (req, res, next) => {
     if (!user || !(await verifyPassword(password ?? '', user.password_hash)))
       return res.status(401).json({ error: 'Email hoặc mật khẩu không đúng' });
     if (user.status === 'suspended') return res.status(403).json({ error: 'Tài khoản đã bị khoá' });
-    const token = signToken({ id: user.id, email: user.email, role: user.role });
+    const token = signToken({ id: user.id, email: user.email, role: user.role, roles: dsVaiTro(user) as any });
     res.json({ token, user: profile(user) });
   } catch (e) { next(e); }
 });

@@ -15,7 +15,7 @@ export const CAM_LAM = {
 //   gis     · quản lý lớp bản đồ         vanban  · quản lý văn bản pháp luật
 //   hotlist · quản lý danh sách nóng
 // ('sales' đã bỏ từ lâu — migrate.ts tự đổi các tài khoản cũ sang 'user'.)
-export type Role = 'user' | 'admin' | 'gis' | 'vanban' | 'hotlist';
+export type Role = 'user' | 'admin' | 'gis' | 'vanban' | 'hotlist' | 'danhmuc';
 export type UserTier = 'free' | 'paid';
 export type PropertyType = 'land' | 'house' | 'apartment' | 'villa' | 'commercial' | 'farm';
 export type ListingStatus = 'active' | 'pending' | 'sold' | 'hidden';
@@ -23,7 +23,9 @@ export type LayerType = 'parcel' | 'zoning' | 'admin' | 'road' | 'custom';
 export type ImportStatus = 'pending' | 'processing' | 'done' | 'error';
 export type SupportedFormat = 'dgn' | 'shp' | 'geojson';
 
-export interface User { id: number; email: string; role: Role; fullName?: string | null; phone?: string | null; tier?: UserTier; status?: string; emailVerified?: boolean; createdAt?: string; }
+// roles = TẤT CẢ vai trò của tài khoản (một người có thể giữ nhiều vai trò cùng lúc).
+// role  = vai trò lớn nhất trong số đó, giữ lại cho mấy chỗ code cũ chỉ đọc một vai trò.
+export interface User { id: number; email: string; role: Role; roles?: Role[]; fullName?: string | null; phone?: string | null; tier?: UserTier; status?: string; emailVerified?: boolean; createdAt?: string; }
 
 export interface Listing {
   id: number;

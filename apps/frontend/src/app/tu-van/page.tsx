@@ -1,11 +1,13 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/lib/auth';
-import { api } from '@/lib/api';
+import { useAuth, laAdmin } from '@/lib/auth';
+import { api, uploadChatFile } from '@/lib/api';
+import ChatDinhKem from '@/components/ChatDinhKem';
 
 interface Room { room: string; name: string; phone?: string | null; online?: boolean; lastBody?: string; lastAt?: string; count?: number; unread?: number; waiting?: boolean; waitingSince?: string | null; }
-interface Msg { id: number; userId: number | null; name: string; avatar?: string | null; body: string; createdAt: string; }
+interface Msg { id: number; userId: number | null; name: string; avatar?: string | null; body: string; createdAt: string;
+  kind?: string; fileId?: number | null; fileName?: string | null; fileMime?: string | null; fileSize?: number | null; deletedAt?: string | null; }
 
 function waitText(since?: string | null): string {
   if (!since) return '';
@@ -35,9 +37,15 @@ export default function TuVanPage() {
   const [room, setRoom] = useState('');
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [text, setText] = useState('');
+  const [canUpload, setCanUpload] = useState(false);
+  const [peerUpload, setPeerUpload] = useState<boolean | null>(null);
+  const [dangGuiTep, setDangGuiTep] = useState(false);
+  const [menuTin, setMenuTin] = useState(0);
   const boxRef = useRef<HTMLDivElement>(null);
+  const tepRef = useRef<HTMLInputElement>(null);
   const lastId = useRef(0);
   const acked = useRef(0);
+  const isAdmin = laAdmin(user);
 
   useEffect(() => { if (!user) { setAllowed(false); return; } api<{ advisor: boolean }>('/chat/advisory-access').then((r) => setAllowed(!!r.advisor)).catch(() => setAllowed(false)); }, [user]);
 
@@ -46,13 +54,17 @@ export default function TuVanPage() {
 
   useEffect(() => {
     if (!room) { setMsgs([]); lastId.current = 0; acked.current = 0; return; }
-    lastId.current = 0; acked.current = 0; setMsgs([]);
+    lastId.current = 0; acked.current = 0; setMsgs([]); setCanUpload(false); setPeerUpload(null); setMenuTin(0);
     let alive = true;
     const tick = async () => {
       try {
-        const r = await api<{ messages: Msg[] }>(`/chat/messages?room=${encodeURIComponent(room)}&after=0`);
+        // Trang nay hoi lai TOAN BO tin moi 5 giay (after=0) nen tin bi thu hoi tu hien dung,
+        // khong can WebSocket hay danh sach `recalled` nhu khung chat noi.
+        const r = await api<{ messages: Msg[]; canUpload?: boolean; peerUpload?: boolean | null }>(`/chat/messages?room=${encodeURIComponent(room)}&after=0`);
         if (!alive) return;
         setMsgs(r.messages || []);
+        setCanUpload(!!r.canUpload);
+        setPeerUpload(r.peerUpload ?? null);
         const max = (r.messages || []).reduce((mx, m) => Math.max(mx, m.id), 0);
         lastId.current = max;
         if (max > acked.current) {
@@ -79,6 +91,32 @@ export default function TuVanPage() {
       lastId.current = Math.max(lastId.current, r.id);
       loadRooms();
     } catch (e: any) { setText(body); alert(e.message || 'Không gửi được'); }
+  }
+
+  async function guiTep(f?: File | null) {
+    if (!f || !room) return;
+    setDangGuiTep(true);
+    try { const m = await uploadChatFile(room, f); setMsgs((cur) => [...cur, m]); lastId.current = Math.max(lastId.current, m.id); loadRooms(); }
+    catch (e: any) { alert(e.message || 'Không gửi được tệp'); }
+    finally { setDangGuiTep(false); }
+  }
+  async function thuHoi(id: number) {
+    setMenuTin(0);
+    if (!window.confirm('Thu hồi tin nhắn này?\n\nTệp đính kèm sẽ bị xoá khỏi máy chủ và KHÔNG lấy lại được.')) return;
+    try {
+      await api(`/chat/messages/${id}`, { method: 'DELETE' });
+      setMsgs((cur) => cur.map((m) => (m.id === id ? { ...m, deletedAt: new Date().toISOString(), kind: 'text', body: '', fileId: null } : m)));
+      loadRooms();
+    } catch (e: any) { alert(e.message || 'Không thu hồi được'); }
+  }
+  // Chỉ ADMIN mới mở/khoá được quyền gửi ảnh-PDF của khách; tư vấn viên thường chỉ nhìn thấy trạng thái.
+  async function doiQuyenTep() {
+    const uid = Number(room.slice(9));
+    if (!uid) return;
+    try {
+      const r = await api<{ cho: boolean }>('/chat/quyen-gui-file', { method: 'POST', body: JSON.stringify({ userId: uid, cho: !peerUpload }) });
+      setPeerUpload(!!r.cho);
+    } catch (e: any) { alert(e.message || 'Không đổi được quyền'); }
   }
 
   if (allowed === null) return <div className="p-12 text-center text-slate-400">Đang tải…</div>;
@@ -135,21 +173,49 @@ export default function TuVanPage() {
                 <b className="text-[#0A2540]">{active?.name || 'Khách'}</b>
                 {active?.phone ? <a href={`tel:${active.phone}`} className="text-red-600 text-sm font-semibold">📞 {active.phone}</a> : null}
                 {active?.waiting && <span className="text-[11px] font-bold text-red-500">⏳ đang chờ {waitText(active.waitingSince)}</span>}
+                {isAdmin && peerUpload !== null && (
+                  <button onClick={doiQuyenTep} title={peerUpload ? 'Đang CHO khách gửi ảnh/tệp — bấm để khoá lại' : 'Khách CHƯA gửi được ảnh/tệp — bấm để mở'}
+                    className={`ml-auto shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-bold ${peerUpload ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-slate-100 border-slate-300 text-slate-500'}`}>
+                    📎 {peerUpload ? 'Cho gửi' : 'Đã khoá'}
+                  </button>
+                )}
               </div>
               <div ref={boxRef} className="flex-1 overflow-y-auto p-3 space-y-2 bg-slate-50">
                 {msgs.length === 0 ? <p className="text-center text-sm text-slate-400 mt-8">Chưa có tin nhắn.</p> : msgs.map((m) => {
                   const mine = m.userId === user?.id;
-                  return (
+                  if (m.deletedAt) return (
                     <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
+                      <p className="max-w-[75%] rounded-2xl border border-dashed border-slate-300 px-3 py-1.5 text-[13px] italic text-slate-400">Tin nhắn đã được thu hồi</p>
+                    </div>
+                  );
+                  const coTep = m.kind === 'image' || m.kind === 'file';
+                  return (
+                    <div key={m.id} className={`flex items-end gap-1.5 ${mine ? 'justify-end' : 'justify-start'}`}>
+                      {mine && (
+                        <span className="relative shrink-0 self-center">
+                          <button onClick={() => setMenuTin((v) => (v === m.id ? 0 : m.id))} title="Tuỳ chọn" className="w-6 h-6 grid place-items-center rounded-full leading-none text-slate-300 hover:text-slate-600 hover:bg-slate-200">⋯</button>
+                          {menuTin === m.id && (
+                            <button onClick={() => thuHoi(m.id)} className="absolute right-0 bottom-7 z-10 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-red-600 shadow-lg hover:bg-red-50">Thu hồi tin nhắn</button>
+                          )}
+                        </span>
+                      )}
                       <div className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${mine ? 'bg-[#0A2540] text-white' : 'bg-white border border-slate-200'}`}>
                         {!mine && <p className="text-[11px] font-bold text-[#C8A14B] mb-0.5">{m.name}</p>}
-                        <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                        {coTep
+                          ? <ChatDinhKem fileId={m.fileId} fileName={m.fileName} fileMime={m.fileMime} fileSize={m.fileSize} mine={mine} />
+                          : <p className="whitespace-pre-wrap break-words">{m.body}</p>}
                       </div>
                     </div>
                   );
                 })}
               </div>
-              <div className="p-2 border-t border-slate-100 flex gap-2">
+              <div className="p-2 border-t border-slate-100 flex gap-2 items-center">
+                {canUpload && (
+                  <>
+                    <input ref={tepRef} type="file" accept="image/*,application/pdf,.pdf" className="hidden" onChange={(e) => { guiTep(e.target.files?.[0]); e.target.value = ''; }} />
+                    <button onClick={() => tepRef.current?.click()} disabled={dangGuiTep} title="Gửi ảnh hoặc tệp PDF (tối đa 10MB)" className="shrink-0 w-9 h-9 grid place-items-center rounded-full border border-slate-300 text-lg hover:bg-slate-100 disabled:opacity-50">{dangGuiTep ? '⏳' : '📎'}</button>
+                  </>
+                )}
                 <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') send(); }} placeholder="Nhập câu trả lời…" className="flex-1 border border-slate-300 rounded-full px-4 py-2 text-sm outline-none focus:border-[#0A2540]" />
                 <button onClick={send} className="cl-press bg-red-600 hover:bg-red-700 text-white font-bold px-5 rounded-full text-sm">Gửi</button>
               </div>

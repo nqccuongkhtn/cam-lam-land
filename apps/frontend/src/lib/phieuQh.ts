@@ -18,6 +18,10 @@ export type PhieuOpts = {
   parcel: Parcel;
   geometry: any;
   overlaps?: Overlap[];
+  // Các bản quy hoạch KHÁC cùng phủ lên thửa (QĐ893, các bản phân khu 1/2000).
+  // Một thửa ở Cam Lâm thường dính nhiều bản chồng nhau — phiếu phải in ĐỦ, ghi rõ từng bản,
+  // chứ in mỗi QĐ205 là người cầm phiếu tưởng thửa chỉ chịu một quy hoạch.
+  qhCacBan?: { ma: string; ten: string; phuTramPhanTram?: number; areas: { type: string; areaM2: number }[] }[];
   qhPieces?: { lo: string; hz?: string; c?: string; ring: number[][] }[];   // ô QH cắt qua thửa (ring WGS84) + màu thật → TÔ MÀU lên thửa
   neighbors?: { so: string; lng: number; lat: number }[];       // thửa liền kề (số hiệu + điểm đại diện WGS84)
   scenario?: string;                                             // kịch bản QH đang áp trên web: 'HT' | '2030' | '2045'
@@ -352,6 +356,16 @@ function buildHtml(o: PhieuOpts): string {
   const qhInfoHtml = items.length
     ? `<div class="qhb"><b>Căn cứ:</b> ${canCu}.<br><b>Nội dung:</b> Thửa đất có ${bdOf(items)}.</div>`
     : `<div class="cx">Chưa có dữ liệu quy hoạch số hóa tại thửa này.</div>`;
+  // Mỗi bản quy hoạch khác một khối riêng, ghi rõ căn cứ + loại đất + diện tích.
+  const banKhacHtml = (o.qhCacBan || [])
+    .filter((b) => b && b.areas && b.areas.length)
+    .map((b) => {
+      const ds = b.areas.filter((x) => x && x.areaM2 > 0.5);
+      if (!ds.length) return '';
+      // Không in "chỉ phủ X% thửa" — chữ nghề, người cầm phiếu không hiểu.
+      return `<div class="qhb"><b>Căn cứ:</b> ${esc(b.ten)}.<br><b>Nội dung:</b> Thửa đất có ${bdOf(ds)}.</div>`;
+    })
+    .join('');
   const qhTypes = ovAll.map((x) => x.type);
 
   const lng = o.point?.lng, lat = o.point?.lat;
@@ -464,6 +478,7 @@ function buildHtml(o: PhieuOpts): string {
         ${legendHtml}
         <div class="sec" style="margin-top:5px">Thông tin quy hoạch</div>
         ${qhInfoHtml}
+        ${banKhacHtml}
       </div>
       <div>
         <div class="sec" style="margin-top:0">Bảng kê toạ độ và khoảng cách (Hệ tọa độ VN-2000)</div>

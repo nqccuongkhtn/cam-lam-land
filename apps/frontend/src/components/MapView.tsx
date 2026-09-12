@@ -279,7 +279,18 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
     // Định vị GPS: đưa bản đồ về vị trí người dùng, có chấm xanh + theo dõi khi di chuyển.
     map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true, showUserHeading: true, showAccuracyCircle: true } as any), 'top-right');
-    map.on('load', () => {
+    // ⚠️ KHÔNG chỉ dựa vào sự kiện 'load' của maplibre.
+    // 'load' chỉ chạy khi KIỂU BẢN ĐỒ nạp xong VÀ mọi ô ảnh của khung nhìn đầu tiên tải xong.
+    // Ảnh nền lấy từ Google; mạng chậm hoặc một vài ô ảnh bị treo là 'load' KHÔNG BAO GIỜ chạy,
+    // mà toàn bộ phần khởi tạo dưới đây nằm trong nó: lớp quy hoạch, ranh thửa, tô sáng thửa,
+    // lớp Hoàng Sa · Trường Sa — tất cả không được thêm vào. Người dùng chỉ thấy ảnh nền trơ,
+    // tích vào lớp quy hoạch cũng không hiện gì, mà KHÔNG có lỗi nào báo ra.
+    // Đo thật trên Chrome ngày 12/9/2026: isStyleLoaded() = true nhưng loaded() = false mãi,
+    // 'load' không chạy một lần nào → bản đồ mất sạch lớp quy hoạch.
+    // Nên bắc thêm đường thứ hai: hễ KIỂU BẢN ĐỒ đã nạp xong thì khởi tạo luôn, không đợi ảnh.
+    // Hàm có chốt readyRef nên gọi mấy lần cũng chỉ chạy đúng một lần.
+    const khoiTaoLop = () => {
+      if (readyRef.current) return;
       readyRef.current = true;
       map.addSource('measure', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
       map.addLayer({ id: 'measure-fill', type: 'fill', source: 'measure', filter: ['==', '$type', 'Polygon'], paint: { 'fill-color': '#f59e0b', 'fill-opacity': 0.2 } });
@@ -303,7 +314,10 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       themLopBienDao(map);
       syncBase(); syncOverlays(); syncLayers(); syncDiaChinh(); syncRoutes(); tryInitialFit();
       map.on('zoom', locCanhTheoZoom);
-    });
+    };
+    map.on('load', khoiTaoLop);
+    map.on('styledata', () => { if (map.isStyleLoaded()) khoiTaoLop(); });
+    if (map.isStyleLoaded()) khoiTaoLop();   // kiểu bản đồ viết thẳng trong mã nên có thể xong ngay
     // Ghi lại chỗ ĐẶT tay/chuột để lát nữa so với chỗ nhả ra (xem laKeoChuKhongPhaiBam).
     map.on('touchstart', (e: any) => {
       lucChamCuoi.current = Date.now();

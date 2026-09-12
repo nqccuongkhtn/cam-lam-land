@@ -480,12 +480,12 @@ export default function MapPage() {
   // File `/chu-giai-qh.json` do scripts/qh-pipeline/8-tao-chu-giai.py sinh ra, chỉ liệt kê
   // những loại đất THẬT SỰ có trên bản đồ. Nạp LÚC BẤM MỞ chứ không nạp sẵn — ai không xem
   // chú giải thì không phải tải thêm gì.
-  const [chuGiai, setChuGiai] = useState<{ nhom: string; muc: { mau: string; ten: string; so: number }[] }[] | null>(null);
+  const [chuGiai, setChuGiai] = useState<{ nhom: string; muc: { mau: string; ten: string; dayDu?: string; so: number }[] }[] | null>(null);
   const [chuGiaiOpen, setChuGiaiOpen] = useState(false);
   // Ảnh PNG QĐ205 là lớp CHÍNH (đúng màu/ký hiệu gốc) — bật mặc định, hiển thị TRÊN lớp vector.
   // Hai lớp phân khu MẶC ĐỊNH TẮT: chúng nằm đè lên vùng QĐ205, bật sẵn cả ba thì màu chồng màu.
   // Người dùng tự tích vào mới hiện.
-  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd893': false });
+  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd918': false, 'qh-qd893': false });
   const [qhFillOn, setQhFillOn] = useState(false);        // TẮT mặc định — giống Guland: hiển thị bằng ẢNH raster. Bật tay nếu muốn lấp chỗ trống.
   // 'all' = gộp cả 3 kịch bản (phủ kín nhất). Từng kịch bản riêng lẻ chỉ phủ một phần.
   const [qhScenario, setQhScenario] = useState<'all' | 'HT' | '2030' | '2045'>('all');
@@ -1358,7 +1358,7 @@ export default function MapPage() {
                 Chỉ hiện khi đang bật một lớp phân khu 1/2000 — bốn bản đó mới là bản được
                 tô theo loại đất. QĐ205 và QĐ893 vẫn giữ màu bản vẽ gốc nên bảng này không
                 đúng cho chúng, hiện ra là dẫn người xem đọc sai. */}
-            {MUC_QH[1].gom.some((id) => !!ovOn[id]) && (
+            {(MUC_QH.find((x) => x.id === 'phan-khu')?.gom || []).some((id) => !!ovOn[id]) && (
               <div className="mt-2">
                 <button
                   onClick={() => {
@@ -1384,7 +1384,9 @@ export default function MapPage() {
                       <div key={n.nhom} className="mb-2 last:mb-0">
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">{n.nhom}</p>
                         {n.muc.map((m) => (
-                          <div key={m.mau + m.ten} className="flex items-start gap-2 py-[3px]">
+                          /* title = tên đầy đủ: một màu hay gánh 3-4 loại đất, dòng chú giải chỉ
+                             ghi 2 tên đầu cho gọn, rê chuột vào mới hiện hết. */
+                          <div key={m.mau + m.ten} title={m.dayDu || m.ten} className="flex items-start gap-2 py-[3px]">
                             <span className="mt-[3px] inline-block w-3.5 h-3.5 rounded-sm shrink-0 border border-black/10"
                               style={{ background: m.mau }} />
                             <span className="min-w-0 flex-1 text-[11px] leading-snug text-slate-600">{m.ten}</span>

@@ -65,10 +65,15 @@ def main(files):
             g['so'] += n
         if not theo_mau:
             continue
+        # Một màu có thể gánh 3-4 loại đất; ghi hết ra thì dòng chú giải dài 3 hàng, đọc mệt.
+        # Ghi 2 tên nhiều ô nhất, còn lại gộp thành '+N loại nữa'; tên đầy đủ để ở 'dayDu'
+        # cho web hiện khi rê chuột.
         muc = []
         for g in sorted(theo_mau.values(), key=lambda x: -x['so']):
             g['ten'].sort(key=lambda x: -x[1])
-            muc.append({'mau': g['mau'], 'ten': ' · '.join(t for t, _ in g['ten']), 'so': g['so']})
+            ten = [t for t, _ in g['ten']]
+            ngan = ' · '.join(ten[:2]) + ((' + %d loại nữa' % (len(ten) - 2)) if len(ten) > 2 else '')
+            muc.append({'mau': g['mau'], 'ten': ngan, 'dayDu': ' · '.join(ten), 'so': g['so']})
         ra.append({'nhom': ten_nhom, 'muc': muc})
 
     with io.open(RA, 'w', encoding='utf-8') as fp:

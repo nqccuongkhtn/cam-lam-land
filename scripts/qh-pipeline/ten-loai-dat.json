@@ -116,12 +116,26 @@
   "cayxanhcc_nong thon": "Cây xanh công cộng nông thôn",
   "truonghoc_nong thon": "Trường học nông thôn",
   "sanbaithethao_nong thon": "Sân bãi thể thao nông thôn",
-  "hien trang cai tao chinh trang": "Hiện trạng cải tạo chỉnh trang"
+  "hien trang cai tao chinh trang": "Hiện trạng cải tạo chỉnh trang",
+  "vanhoa (nong thon)": "Đất cơ sở văn hoá (nông thôn)",
+  "vanhoa đt": "Đất cơ sở văn hoá (đô thị)",
+  "yte ngoai do thi": "Đất cơ sở y tế (ngoài đô thị)",
+  "yte đt": "Đất cơ sở y tế (đô thị)",
+  "truonghoc (nong thon)": "Trường học (nông thôn)",
+  "coquandothi": "Đất cơ quan (đô thị)",
+  "coquanngoaidothi": "Đất cơ quan (ngoài đô thị)",
+  "bai do xe nt": "Bãi đỗ xe (nông thôn)",
+  "@ dat nghia trang": "Nghĩa trang",
+  "cxhc- cv tdtt": "Cây xanh sử dụng hạn chế – công viên thể dục thể thao",
+  "l-qh-langxomdothihoa": "Làng xóm đô thị hoá",
+  "l-damthuytrieu": "Đầm Thuỷ Triều"
  },
  "can_xac_nhan": {
   "_doc": "Các chữ viết tắt đã được CHỦ DỰ ÁN xác nhận ngày 11/9/2026, không còn phải đoán: CD = chuyên dụng · HC = sử dụng hạn chế · CC = công cộng · ĐT = đô thị · ĐVO = đơn vị ở · TB = mật độ trung bình · KDV = khu dịch vụ · KDL = khu du lịch. Chữ tắt nào gặp sau này mà chưa rõ thì GIỮ NGUYÊN, ghi vào đây chờ hỏi lại — đừng tự suy, vì tên này in lên phiếu trích lục người ta mang đi giao dịch.",
   "NC": "'DaotaoNC' → 'Đào tạo – nghiên cứu'. Đây là PHỎNG ĐOÁN của chủ dự án (11/9/2026), chưa đối chiếu bảng chú giải in. Nếu sau này thấy sai thì sửa ở đây, không phải sửa code.",
-  "_CH (đã giải quyết)": "CH = CẤP HUYỆN. Từ 2025 bỏ cấp huyện nên đuôi này bị CẮT BỎ khi hiện tên (vd 'Dichvu_CH' → 'Đất dịch vụ'). Chủ dự án xác nhận 11/9/2026."
+  "_CH (đã giải quyết)": "CH = CẤP HUYỆN. Từ 2025 bỏ cấp huyện nên đuôi này bị CẮT BỎ khi hiện tên (vd 'Dichvu_CH' → 'Đất dịch vụ'). Chủ dự án xác nhận 11/9/2026.",
+  "KXD": "'KXD_DulichRung_qh' (QĐ2076, 1 ô) — chưa rõ 'KXD' là gì (đoán là khu vực không xây dựng nhưng KHÔNG dám ghi vào). Giữ nguyên chữ bản vẽ.",
+  "_CT": "Đuôi '_CT' ở 'Yte_CT', 'Anninh_CT', 'DaotaoNC_CT' (QĐ2076) — chưa rõ nghĩa. Giữ nguyên chữ bản vẽ, chờ hỏi lại đơn vị lập quy hoạch."
  },
  "ma_qhsdd": {
   "_doc": "Mã loại đất chuẩn ghi sẵn trong bản vẽ QĐ893, tên lấy theo danh mục ký hiệu loại đất của Bộ TNMT.",

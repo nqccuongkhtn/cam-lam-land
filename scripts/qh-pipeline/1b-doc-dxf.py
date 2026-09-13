@@ -311,7 +311,18 @@ def main(vao, ra, bo_mau=(), lay_net=False):
     # nằm ở vị trí 492/531, QĐ918 có mảng 932 ha ở vị trí 319/454 — vẽ gần cuối nên chúng
     # TRÙM KÍN các ô đất nhỏ vẽ trước đó, nhìn ra một mảng màu to đè lên khu chi tiết
     # (chủ dự án phát hiện: "có vài chỗ màu bị đè"). Sắp theo diện tích giảm dần là hết.
-    out.sort(key=lambda f: -dien_tich_ring(f['geometry']))
+    # Thứ tự vẽ BA BẬC (vẽ trước = nằm dưới):
+    #   0. HT_*                        hiện trạng
+    #   1. QH2030_/QH2045_/QHDD_/QHDH_ khối quy hoạch (đơn vị ở, khu chức năng)
+    #   2. DAT_*                       phần CHIA NHỎ CHI TIẾT bên trong khối
+    # Trong mỗi bậc: mảng TO vẽ trước, mảng NHỎ vẽ sau (nằm trên).
+    # Vì sao cần bậc 2: đo trên QĐ2076 có 16,7% diện tích bị hai ô đất chồng lên nhau,
+    # đúng kiểu 'DAT_O_Nhomnhao Thaptang' nằm trong 'QH2045_DAT_DVO moiTB'. Nếu chỉ sắp
+    # theo diện tích thì một mảng chia nhỏ hơi to sẽ bị khối lớn vẽ sau trùm mất, cả khu
+    # chi tiết biến thành một mảng màu (chủ dự án gọi là "chồng màu").
+    BAC_VE = {'HT': 0, 'DAT': 2}
+    out.sort(key=lambda f: (BAC_VE.get(f['properties'].get('hz') or '', 1),
+                            -dien_tich_ring(f['geometry'])))
     print('  · giữ %d vùng | bỏ %d (level không phải quy hoạch), %d (ra ngoài khung), %d (lỗi hình)'
           % (len(out), bo_lv, bo_ngoai, loi))
     from collections import Counter

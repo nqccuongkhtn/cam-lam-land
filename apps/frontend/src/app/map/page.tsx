@@ -112,7 +112,7 @@ const RASTER_OVERLAYS = [
     tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png'], minzoom: 12, maxzoom: 18,
     coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ⚠️ MÀU BẢN ĐỒ QUY HOẠCH LẤY ĐÚNG TỪ BẢN VẼ — ĐỌC KỸ TRƯỚC KHI ĐỔI (13/9/2026)
-  // Bốn bộ tile phân khu (qd2076v10 · qd2101v11 · qd2222v11 · qd918v7) dùng BẢNG MÀU AUTOCAD.
+  // Bốn bộ tile phân khu (qd2076v11 · qd2101v12 · qd2222v12 · qd918v8) dùng BẢNG MÀU AUTOCAD.
   // Đã thử bảng MicroStation (chủ dự án tự xuất ra từ Settings → Color Table) nhưng đối chiếu
   // với bản vẽ mở bằng MicroStation thì bảng AutoCAD vẽ ĐÚNG HƠN — nên giữ AutoCAD.
   // Muốn thử lại bảng khác: python 9-doi-bang-mau.py <vao.geojson> <ra.geojson> <tên-bảng>
@@ -127,8 +127,11 @@ const RASTER_OVERLAYS = [
   // ⚠️ HAI VIỆC NỮA ĐÃ LÀM CHO BỘ v10/v7/v11/v11 (13/9/2026):
   // 1. LỚP HIỆN TRẠNG NẰM DƯỚI LỚP QUY HOẠCH. Sắp mỗi theo diện tích thì một mảnh hiện trạng
   //    nhỏ vẫn đè lên ô đất quy hoạch bên dưới nó — mà người xem cần thấy phần QUY HOẠCH.
-  //    Nay xếp hai bậc: hiện trạng (hz='HT') vẽ trước, quy hoạch vẽ sau; trong mỗi bậc thì
-  //    mảng to vẽ trước.
+  //    Nay xếp BA BẬC: (0) hiện trạng HT_* nằm dưới · (1) khối quy hoạch QH2030_/QH2045_/
+  //    QHDD_/QHDH_ ở giữa · (2) phần CHIA NHỎ CHI TIẾT bên trong khối (level DAT_*) nằm trên.
+  //    Trong mỗi bậc: mảng to vẽ trước. Đo trên QĐ2076 có tới 16,7% diện tích bị hai ô đất
+  //    chồng nhau đúng kiểu 'DAT_O_Nhomnhao Thaptang' nằm trong 'QH2045_DAT_DVO moiTB' —
+  //    sắp mỗi theo diện tích thì khối lớn vẽ sau trùm kín cả khu chi tiết.
   // 2. LÀM TƯƠI MÀU mà GIỮ NGUYÊN TÔNG. Bảng AutoCAD có rất nhiều màu ở mức tối 15-30% (vẽ để
   //    xem trên nền đen của MicroStation), đưa lên nền vệ tinh thì thành mảng nâu-đen.
   //    Bảng `bang-mau/autocad-tuoi.tbl` kéo độ sáng theo đường cong L^0.72: màu tối sáng lên
@@ -168,7 +171,7 @@ const RASTER_OVERLAYS = [
   // có 1.792 vùng nhưng tới 48.411 nét (chỉ giới đường đỏ, lề đường, ranh phân khu). Bỏ nét đi thì
   // nhìn chỉ thấy mấy mảng màu rời rạc, khác hẳn lúc mở file CAD gốc.
   { id: 'qh-qd2076', name: 'Quy hoạch phân khu phía Bắc QĐ2076 (1/2000)', url: '',
-    tiles: ['/tiles/qd2076v10/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2076v11/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.0288, 12.2004], [109.2513, 12.2004], [109.2513, 12.0527], [109.0288, 12.0527]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ2101 · quy hoạch phân khu trung tâm 1/2000 ────────────────────────────────────
   // Bản "v3" sửa hai lỗi của v2:
@@ -183,7 +186,7 @@ const RASTER_OVERLAYS = [
   // /tiles/ là `immutable, max-age=1 năm` nên trình duyệt và Cloudflare sẽ giữ nguyên ảnh cũ
   // cả năm, sửa xong mà người dùng vẫn thấy y như trước.
   { id: 'qh-qd2101', name: 'Quy hoạch phân khu trung tâm QĐ2101 (1/2000)', url: '',
-    tiles: ['/tiles/qd2101v11/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2101v12/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.1187, 12.0793], [109.2041, 12.0793], [109.2041, 11.99], [109.1187, 11.99]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ2222 · quy hoạch 1/2000 ──────────────────────────────────────────────────────
   // Bản "v3" sửa lỗi "mảng xám" của v2: v2 được cắt từ bản dữ liệu CŨ, lúc đó một số ô đất
@@ -195,12 +198,12 @@ const RASTER_OVERLAYS = [
   // Khung bao thu hẹp theo đúng ranh giới thật: trước ghi vươn ra tận 109.33 chỉ vì ô chú giải
   // nằm ngoài đó, chứ quy hoạch không hề trải tới chỗ ấy.
   { id: 'qh-qd2222', name: 'Quy hoạch QĐ2222 (1/2000)', url: '',
-    tiles: ['/tiles/qd2222v11/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2222v12/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.1630, 12.1505], [109.2237, 12.1505], [109.2237, 12.0258], [109.1630, 12.0258]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ918 · quy hoạch phân khu PHỨC HỢP PHÍA TÂY 1/2000 ────────────────────────────
   // Bản gốc là DGN V8, không công cụ nào trên máy đọc nổi; chủ dự án xuất ra DXF rồi mới nạp được.
   { id: 'qh-qd918', name: 'Quy hoạch phân khu phức hợp phía Tây QĐ918 (1/2000)', url: '',
-    tiles: ['/tiles/qd918v7/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd918v8/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.0372, 12.1265], [109.1454, 12.1265], [109.1454, 11.9569], [109.0372, 11.9569]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ893 · quy hoạch SỬ DỤNG ĐẤT đến 2030, phủ TOÀN huyện Cam Lâm cũ ───────
   // Bản này KHÔNG cần lớp nét: nó vốn là các mảng tô kín (nông nghiệp, đất ở, giao thông, mặt

@@ -111,21 +111,27 @@ const RASTER_OVERLAYS = [
     // ở mức 10–11 trình duyệt đi đòi những ô không hề tồn tại, lần nào cũng nhận 404.
     tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png'], minzoom: 12, maxzoom: 18,
     coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]] },
-  // ⚠️ BỐN BỘ TILE PHÂN KHU ĐÃ ĐƯỢC TÔ LẠI MÀU THEO LOẠI ĐẤT (12/9/2026)
-  // (qd2076v6 · qd2101v7 · qd2222v7 · qd918v3 — trước đó là v4/v5/v5/v1).
-  // Lý do: màu trong bản vẽ CAD được chọn để xem trên NỀN ĐEN của MicroStation nên rất nhiều
-  // ô tối ở mức 15–30%. Đo trên bộ tile cũ qd918v1: 38% diện tích là #3f7f6f, 21% là #264c2f,
-  // 11% là #262613 — mà #262613 là RGB(38,38,19), gần như màu đen. Trên nền vệ tinh nhìn ra
-  // một mảng nâu đen, không đọc được gì. Nặng hơn: CÙNG một loại đất mà hai bản vẽ tô hai màu
-  // khác nhau ('Đất du lịch' ở QĐ2101 là #ff00ff hồng, ở QĐ918 là #7f007f tím tối) → bật hai
-  // lớp cạnh nhau là người xem tưởng hai loại đất.
-  // Nay tô theo LOẠI ĐẤT bằng bộ màu ở scripts/qh-pipeline/mau-loai-dat.json
-  // (bước scripts/qh-pipeline/7-to-mau-loai-dat.py). Tên loại đất KHÔNG đổi — vẫn lấy từ tên
-  // level trong bản vẽ — chỉ đổi màu hiển thị. Loại đất nào chưa khai màu thì GIỮ NGUYÊN màu CAD.
-  // Đã kiểm: QĐ2101 tô lại 1.637/1.637 ô · QĐ2076 2.056/2.056 · QĐ918 454/454 · QĐ2222 514/531.
-  // Bản v6/v7/v7/v3 (13/9/2026): chủ dự án xem thấy màu còn NHẠT hơn app nên đã kéo đậm
-  // đồng loạt — tăng độ tươi 22%, hạ độ sáng 10% (màu vốn đã tối như rừng thì giữ nguyên).
+  // ⚠️ MÀU BẢN ĐỒ QUY HOẠCH LẤY ĐÚNG TỪ BẢN VẼ — ĐỌC KỸ TRƯỚC KHI ĐỔI (13/9/2026)
+  // Bốn bộ tile phân khu (qd2076v7 · qd2101v8 · qd2222v8 · qd918v4) dựng lại bằng
+  // BẢNG MÀU CỦA MICROSTATION, không phải bảng màu AutoCAD.
+  //
+  // Vì sao quan trọng: bản vẽ CAD không ghi màu thật, nó chỉ ghi SỐ HIỆU MÀU (1–255), muốn
+  // biết số đó là màu gì phải tra bảng màu. AutoCAD và MicroStation có bảng KHÁC NHAU, mà bản
+  // vẽ này vẽ bằng MicroStation. Cùng số hiệu 42 (đất ở): MicroStation ra vàng nhạt #ffdf7f,
+  // AutoCAD ra nâu xỉn #a57c00. Tra nhầm bảng là cả bản đồ lệch màu so với bản vẽ được duyệt,
+  // mà KHÔNG có lỗi nào báo ra.
+  // Bảng đúng: scripts/qh-pipeline/bang-mau/mau-microstation.tbl — chính chủ dự án xuất ra từ
+  // MicroStation (Settings → Color Table → Save As) ngày 13/9/2026. Đối chiếu: trùng 255/256 ô
+  // với acadcolor.tbl (bảng MicroStation dùng khi mở file DWG/DXF), chỉ khác ô 0 là màu nền.
+  // Dựng lại bằng:  python 1b-doc-dxf.py <ban-ve.dxf> <ra.geojson> --bang=mau-microstation
+  //
+  // ĐÃ THỬ VÀ ĐÃ BỎ: từng tô lại theo LOẠI ĐẤT bằng bộ màu tự đặt cho tươi hơn
+  // (scripts/qh-pipeline/7-to-mau-loai-dat.py). Nhìn thì đẹp nhưng chủ dự án đối chiếu với
+  // MicroStation và app tra cứu thì lệch — bản đồ quy hoạch phải giống bản vẽ được duyệt,
+  // không được làm đẹp theo ý mình. Script vẫn để lại nhưng KHÔNG dùng trong quy trình.
+  //
   // Cắt từ z8 (trước là z12) để thu nhỏ nhìn cả huyện vẫn thấy quy hoạch.
+  // Đổi tên thư mục mỗi lần cắt lại là BẮT BUỘC: nginx đặt /tiles/ là "immutable, 1 năm".
   // ⚠️ BA BỘ TILE DƯỚI ĐÂY (qd2076v4 · qd2101v5 · qd2222v5) DỰNG TỪ BỘ ĐỌC DXF MỚI
   // (scripts/qh-pipeline/1b-doc-dxf.py). Bộ cũ đi qua ogr2ogr và LÀM RƠI mọi level có tên
   // tiếng Việt có dấu — riêng QĐ2076 mất 416/2.064 vùng tô (20%), QĐ2101 mất cả level
@@ -142,7 +148,7 @@ const RASTER_OVERLAYS = [
   // có 1.792 vùng nhưng tới 48.411 nét (chỉ giới đường đỏ, lề đường, ranh phân khu). Bỏ nét đi thì
   // nhìn chỉ thấy mấy mảng màu rời rạc, khác hẳn lúc mở file CAD gốc.
   { id: 'qh-qd2076', name: 'Quy hoạch phân khu phía Bắc QĐ2076 (1/2000)', url: '',
-    tiles: ['/tiles/qd2076v6/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2076v7/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.0288, 12.2004], [109.2513, 12.2004], [109.2513, 12.0527], [109.0288, 12.0527]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ2101 · quy hoạch phân khu trung tâm 1/2000 ────────────────────────────────────
   // Bản "v3" sửa hai lỗi của v2:
@@ -157,7 +163,7 @@ const RASTER_OVERLAYS = [
   // /tiles/ là `immutable, max-age=1 năm` nên trình duyệt và Cloudflare sẽ giữ nguyên ảnh cũ
   // cả năm, sửa xong mà người dùng vẫn thấy y như trước.
   { id: 'qh-qd2101', name: 'Quy hoạch phân khu trung tâm QĐ2101 (1/2000)', url: '',
-    tiles: ['/tiles/qd2101v7/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2101v8/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.1187, 12.0793], [109.2041, 12.0793], [109.2041, 11.99], [109.1187, 11.99]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ2222 · quy hoạch 1/2000 ──────────────────────────────────────────────────────
   // Bản "v3" sửa lỗi "mảng xám" của v2: v2 được cắt từ bản dữ liệu CŨ, lúc đó một số ô đất
@@ -169,12 +175,12 @@ const RASTER_OVERLAYS = [
   // Khung bao thu hẹp theo đúng ranh giới thật: trước ghi vươn ra tận 109.33 chỉ vì ô chú giải
   // nằm ngoài đó, chứ quy hoạch không hề trải tới chỗ ấy.
   { id: 'qh-qd2222', name: 'Quy hoạch QĐ2222 (1/2000)', url: '',
-    tiles: ['/tiles/qd2222v7/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2222v8/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.1630, 12.1505], [109.2237, 12.1505], [109.2237, 12.0258], [109.1630, 12.0258]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ918 · quy hoạch phân khu PHỨC HỢP PHÍA TÂY 1/2000 ────────────────────────────
   // Bản gốc là DGN V8, không công cụ nào trên máy đọc nổi; chủ dự án xuất ra DXF rồi mới nạp được.
   { id: 'qh-qd918', name: 'Quy hoạch phân khu phức hợp phía Tây QĐ918 (1/2000)', url: '',
-    tiles: ['/tiles/qd918v3/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd918v4/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.0372, 12.1265], [109.1454, 12.1265], [109.1454, 11.9569], [109.0372, 11.9569]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ893 · quy hoạch SỬ DỤNG ĐẤT đến 2030, phủ TOÀN huyện Cam Lâm cũ ───────
   // Bản này KHÔNG cần lớp nét: nó vốn là các mảng tô kín (nông nghiệp, đất ở, giao thông, mặt
@@ -619,7 +625,7 @@ export default function MapPage() {
   const [ocrEngine, setOcrEngine] = useState('');
   const [pasteText, setPasteText] = useState('');
   const [drawResult, setDrawResult] = useState<{ n: number; area: number; perim: number; lat: number; lng: number } | null>(null);
-  const [tool, setTool] = useState<'none' | 'search' | 'base' | 'measure'>('none'); // bảng công cụ trên mobile
+  const [tool, setTool] = useState<'none' | 'search' | 'chugiai' | 'measure'>('none'); // bảng công cụ trên mobile
   // ==== CHỈ ĐƯỜNG NHIỀU TUYẾN ====
   const [dirDen, setDirDen] = useState<Diem | null>(null);     // điểm đến (bấm nút 🧭 là có) — có nó thì bảng chỉ đường mở
   const [dirDi, setDirDi] = useState<Diem | null>(null);       // điểm đi (mặc định lấy vị trí hiện tại)
@@ -1187,12 +1193,16 @@ export default function MapPage() {
   );
 
   // ---- Nhóm điều khiển dùng chung cho desktop (inline) và mobile (bảng mở rộng) ----
+  // Nền bản đồ: dùng Ô SỔ XUỐNG cho gọn, giống mấy ô tra cứu bên cạnh.
+  // Ba nút bấm cũ chiếm gần 200px trên thanh công cụ, mà người dùng đổi nền rất thưa —
+  // nhường chỗ đó cho Chú giải và Đo - vẽ thì đáng hơn.
   const baseMapCtrl = (full = false) => (
-    <div className={`flex items-center gap-0.5 rounded-lg bg-slate-100 p-0.5 ${full ? 'w-full' : ''}`}>
-      {([['street', 'Đường'], ['satellite', 'Vệ tinh'], ['terrain', 'Địa hình']] as [BaseMap, string][]).map(([b, l]) => (
-        <button key={b} onClick={() => setBaseMap(b)} className={`${full ? 'flex-1' : ''} px-3 py-1 rounded-md text-xs font-semibold transition ${baseMap === b ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>{l}</button>
+    <select value={baseMap} onChange={(e) => setBaseMap(e.target.value as BaseMap)}
+      className={`rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs font-semibold text-slate-700 outline-none focus:border-emerald-600 ${full ? 'w-full' : ''}`}>
+      {([['street', '🗺 Nền: Đường'], ['satellite', '🛰 Nền: Vệ tinh'], ['terrain', '⛰ Nền: Địa hình']] as [BaseMap, string][]).map(([b, l]) => (
+        <option key={b} value={b}>{l}</option>
       ))}
-    </div>
+    </select>
   );
   const labelsCtrl = () => (
     <label className="flex items-center gap-1.5 text-xs font-medium text-slate-600 cursor-pointer whitespace-nowrap">
@@ -1275,8 +1285,13 @@ export default function MapPage() {
   );
   const measureCtrl = () => (
     <div className="flex items-center gap-1.5 flex-wrap">
-      <span className="text-xs text-slate-400">Đo:</span>
+      <span className="text-xs text-slate-400">Đo - vẽ:</span>
       {mBtn('distance', '📏 Dài')}{mBtn('area', '⬛ Diện tích')}
+      {/* Vẽ thửa từ toạ độ đứng chung nhóm "Đo - vẽ" cho đúng nghĩa: cả ba đều là công cụ
+          người dùng TỰ TẠO hình trên bản đồ. Trước đây nút này nằm lẻ trong bảng lớp bên trái,
+          chỗ đó toàn là bật/tắt lớp có sẵn nên lạc quẻ và khó tìm. */}
+      <button onClick={() => setDrawOpen(true)}
+        className="cl-press px-2 py-1 rounded text-xs font-medium border bg-white border-slate-300 text-slate-700 whitespace-nowrap hover:bg-slate-50">✏️ Vẽ thửa từ toạ độ</button>
       {measure !== 'off' && <button onClick={() => { setMeasure('off'); setMResult(null); }} className="px-2 py-1 rounded text-xs border border-slate-300 whitespace-nowrap">Xong</button>}
       {mResult && mResult.points > 0 && (
         <span className="text-xs font-bold text-orange-700 ml-1 whitespace-nowrap">{mResult.mode === 'distance' ? `Dài: ${fmtLen(mResult.distance)}` : `S: ${fmtArea(mResult.area)}`}</span>
@@ -1284,13 +1299,85 @@ export default function MapPage() {
       {measure !== 'off' && <span className="text-[11px] text-slate-400 w-full">Nhấp lần lượt các điểm trên bản đồ…</span>}
     </div>
   );
+  // ── MỘT KHỐI QUY HOẠCH trong bảng "Thông tin thửa" ─────────────────────────
+  // Đây là phần QUAN TRỌNG NHẤT của cả trang: người mua đất bấm vào thửa là để xem chỗ này.
+  // Trước đây nó trình bày nhạt hơn cả mấy dòng số tờ/số thửa bên trên (tiêu đề xám nhỏ, mỗi
+  // loại đất một dòng chữ xám) nên nhìn vào không thấy đâu là ý chính.
+  // Nay: loại đất chiếm NHIỀU NHẤT được cho chữ to + huy hiệu phần trăm, mỗi loại có thanh
+  // tỉ lệ — liếc một cái là biết thửa nghiêng về loại đất nào.
+  const khoiQh = (ten: string, areas: { type: string; areaM2: number }[], khoa: string) => {
+    const ds = [...(areas || [])].filter((a) => a && a.areaM2 > 0).sort((a, b) => b.areaM2 - a.areaM2);
+    if (!ds.length) return null;
+    const tong = ds.reduce((t, a) => t + a.areaM2, 0) || 1;
+    return (
+      <div key={khoa} className="mt-2.5 pt-2 border-t border-slate-200">
+        <p className="flex items-center gap-1.5 text-[11px] font-extrabold text-[#0A2540] uppercase tracking-wide mb-1.5">
+          <span className="inline-block w-1 h-3.5 rounded-full bg-[#C8A14B]" />{ten}
+        </p>
+        {ds.map((a, i) => {
+          const pct = Math.round((a.areaM2 / tong) * 100);
+          return (
+            <div key={i} className={i === 0 ? 'mb-1.5' : 'mb-1'}>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className={`min-w-0 truncate ${i === 0 ? 'text-[14px] font-bold text-[#0A2540]' : 'text-[13px] text-slate-600'}`}>{a.type}</span>
+                <span className="flex items-baseline gap-1.5 shrink-0">
+                  {i === 0 && ds.length > 1 && (
+                    <span className="rounded-full bg-[#C8A14B]/15 px-1.5 py-px text-[10px] font-extrabold text-[#8a6d20]">{pct}%</span>
+                  )}
+                  <span className={i === 0 ? 'text-[14px] font-extrabold text-[#0A2540]' : 'text-[13px] font-semibold text-slate-600'}>{fmtArea(a.areaM2)}</span>
+                </span>
+              </div>
+              <div className="mt-[3px] h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-full rounded-full" style={{ width: pct + '%', background: i === 0 ? '#C8A14B' : '#cbd5e1' }} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+  // Nạp bảng chú giải MỘT LẦN, lúc người dùng bấm mở (ai không xem thì khỏi tải thêm gì).
+  const napChuGiai = () => {
+    if (chuGiai) return;
+    fetch('/chu-giai-qh.json').then((r) => r.json())
+      .then((d) => setChuGiai(d?.nhom || []))
+      .catch(() => setChuGiai([]));
+  };
+  // Ruột bảng chú giải — dùng chung cho bảng bên trái (máy tính) và nhóm trên thanh (điện thoại).
+  const chuGiaiNoiDung = () => (
+    <div className="max-h-72 overflow-y-auto rounded-lg border bg-slate-50/60 p-2">
+      {chuGiai === null && <p className="text-[11px] text-slate-400 py-1">Đang tải…</p>}
+      {chuGiai !== null && chuGiai.length === 0 && (
+        <p className="text-[11px] text-slate-400 py-1">Chưa có dữ liệu chú giải.</p>
+      )}
+      {(chuGiai || []).map((n) => (
+        <div key={n.nhom} className="mb-2 last:mb-0">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">{n.nhom}</p>
+          {n.muc.map((m) => (
+            /* title = tên đầy đủ: một màu hay gánh 3–4 loại đất, dòng chú giải chỉ ghi 2 tên
+               đầu cho gọn, rê chuột vào mới hiện hết. */
+            <div key={m.mau + m.ten} title={m.dayDu || m.ten} className="flex items-start gap-2 py-[3px]">
+              <span className="mt-[3px] inline-block w-3.5 h-3.5 rounded-sm shrink-0 border border-black/10"
+                style={{ background: m.mau }} />
+              <span className="min-w-0 flex-1 text-[11px] leading-snug text-slate-600">{m.ten}</span>
+            </div>
+          ))}
+        </div>
+      ))}
+      <p className="mt-2 pt-2 border-t text-[10px] leading-snug text-slate-400">
+        Màu lấy đúng từ bản vẽ quy hoạch được duyệt (bảng màu MicroStation).
+        Thông tin chỉ mang tính tham khảo.
+      </p>
+    </div>
+  );
   const tabBtn = (key: string, label: string, active: boolean, dot = false) => (
     <button onClick={
       key === 'layers' ? () => { setPanelOpen(true); setTool('none'); }
         : key === 'measure' ? () => { const open = tool !== 'measure'; setTool(open ? 'measure' : 'none'); setMeasure(open ? 'distance' : 'off'); setMResult(null); }
-          : () => setTool(tool === key ? 'none' : (key as any))}
+          : key === 'chugiai' ? () => { napChuGiai(); setTool(tool === 'chugiai' ? 'none' : 'chugiai'); }
+            : () => setTool(tool === key ? 'none' : (key as any))}
       className={`relative flex items-center justify-center gap-1.5 py-2.5 text-[12px] font-semibold transition active:scale-[.96] ${active ? 'bg-slate-100 text-[#0A2540]' : 'text-slate-600 hover:bg-slate-50'}`}>
-      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">{key === 'search' ? <><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></> : <path d={key === 'layers' ? 'M12 2 2 7l10 5 10-5-10-5z M2 12l10 5 10-5 M2 17l10 5 10-5' : key === 'base' ? 'M9 20l-5.5 2.5V6L9 3.5m0 16.5 6-2.5M9 20V3.5m6 14 5.5 2.5V6L15 3.5m0 14V3.5m0 0L9 6' : 'M4 8h16v8H4z M8 8v3M12 8v4M16 8v3'} />}</svg>{label}
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">{key === 'search' ? <><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></> : <path d={key === 'layers' ? 'M12 2 2 7l10 5 10-5-10-5z M2 12l10 5 10-5 M2 17l10 5 10-5' : key === 'chugiai' ? 'M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4z M20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z' : 'M4 8h16v8H4z M8 8v3M12 8v4M16 8v3'} />}</svg>{label}
       {dot && <span className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full bg-orange-500" />}
     </button>
   );
@@ -1313,14 +1400,14 @@ export default function MapPage() {
         <div className="lg:hidden grid grid-cols-4 divide-x divide-slate-200">
           {tabBtn('layers', 'Lớp', false)}
           {tabBtn('search', 'Tra cứu', tool === 'search')}
-          {tabBtn('base', 'Bản đồ', tool === 'base', baseMap !== 'street')}
-          {tabBtn('measure', 'Đo', tool === 'measure', measure !== 'off')}
+          {tabBtn('chugiai', 'Chú giải', tool === 'chugiai')}
+          {tabBtn('measure', 'Đo - vẽ', tool === 'measure', measure !== 'off')}
         </div>
         {tool !== 'none' && (
           <div className="lg:hidden border-t border-slate-100 bg-slate-50 px-3 py-3">
             {tool === 'search' && (<><p className="text-[11px] font-semibold text-slate-500 mb-1.5">Tra cứu theo toạ độ / số thửa</p>{searchCtrl(true)}</>)}
-            {tool === 'base' && (<div className="space-y-2.5"><p className="text-[11px] font-semibold text-slate-500">Bản đồ nền</p>{baseMapCtrl(true)}{labelsCtrl()}</div>)}
-            {tool === 'measure' && (<><p className="text-[11px] font-semibold text-slate-500 mb-1.5">Đo khoảng cách / diện tích</p>{measureCtrl()}</>)}
+            {tool === 'chugiai' && (<><p className="text-[11px] font-semibold text-slate-500 mb-1.5">Chú giải loại đất</p>{chuGiaiNoiDung()}</>)}
+            {tool === 'measure' && (<><p className="text-[11px] font-semibold text-slate-500 mb-1.5">Đo khoảng cách · diện tích · vẽ thửa</p>{measureCtrl()}</>)}
           </div>
         )}
       </div>
@@ -1331,11 +1418,15 @@ export default function MapPage() {
 
         <aside className={`${panelOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-200 absolute lg:static inset-y-0 left-0 z-30 w-72 max-w-[82%] shrink-0 bg-white border-r border-slate-200 overflow-y-auto scroll-soft p-4 shadow-xl lg:shadow-none`}>
           <div className="flex items-center justify-between mb-1">
-            <h2 className="font-bold">Lớp bản đồ</h2>
+            <h2 className="font-bold">Lớp Q.Hoạch</h2>
             <button onClick={() => setPanelOpen(false)} className="lg:hidden text-slate-400 hover:text-slate-700 text-xl leading-none">✕</button>
           </div>
-          <p className="text-xs text-slate-500 mb-3">Cam Lâm, Khánh Hòa · EPSG:4326</p>
-          <button onClick={() => setDrawOpen(true)} className="cl-press w-full mb-3 flex items-center justify-center gap-2 bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-bold py-2.5 rounded-lg">✏️ Vẽ thửa từ toạ độ</button>
+          <p className="text-xs text-slate-500 mb-2.5">Cam Lâm, Khánh Hòa · EPSG:4326</p>
+          {/* Ô chọn nền bản đồ nằm ở đây vì trên điện thoại nhóm 'Bản đồ' ở thanh trên đã được
+              nhường chỗ cho Chú giải. Máy tính vẫn có ô này ở thanh trên, để đây thêm cũng không
+              thừa: người dùng hay mở bảng lớp rồi mới nghĩ đến chuyện đổi nền. */}
+          <div className="flex items-center gap-2 mb-3 lg:hidden">{baseMapCtrl(true)}</div>
+          <div className="mb-3 lg:hidden">{labelsCtrl()}</div>
           <div className="pt-1">
             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1.5">Bản đồ quy hoạch</p>
             {MUC_QH.map((o) => (
@@ -1363,45 +1454,13 @@ export default function MapPage() {
             {(MUC_QH.find((x) => x.id === 'phan-khu')?.gom || []).some((id) => !!ovOn[id]) && (
               <div className="mt-2">
                 <button
-                  onClick={() => {
-                    setChuGiaiOpen((v) => !v);
-                    if (!chuGiai) {
-                      fetch('/chu-giai-qh.json').then((r) => r.json())
-                        .then((d) => setChuGiai(d?.nhom || []))
-                        .catch(() => setChuGiai([]));
-                    }
-                  }}
+                  onClick={() => { setChuGiaiOpen((v) => !v); napChuGiai(); }}
                   className="cl-press w-full flex items-center justify-between gap-2 rounded-lg border px-2.5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50"
                 >
                   <span>📖 Chú giải loại đất</span>
                   <span className="text-slate-400">{chuGiaiOpen ? '▲' : '▼'}</span>
                 </button>
-                {chuGiaiOpen && (
-                  <div className="mt-1.5 max-h-72 overflow-y-auto rounded-lg border bg-slate-50/60 p-2">
-                    {chuGiai === null && <p className="text-[11px] text-slate-400 py-1">Đang tải…</p>}
-                    {chuGiai !== null && chuGiai.length === 0 && (
-                      <p className="text-[11px] text-slate-400 py-1">Chưa có dữ liệu chú giải.</p>
-                    )}
-                    {(chuGiai || []).map((n) => (
-                      <div key={n.nhom} className="mb-2 last:mb-0">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">{n.nhom}</p>
-                        {n.muc.map((m) => (
-                          /* title = tên đầy đủ: một màu hay gánh 3-4 loại đất, dòng chú giải chỉ
-                             ghi 2 tên đầu cho gọn, rê chuột vào mới hiện hết. */
-                          <div key={m.mau + m.ten} title={m.dayDu || m.ten} className="flex items-start gap-2 py-[3px]">
-                            <span className="mt-[3px] inline-block w-3.5 h-3.5 rounded-sm shrink-0 border border-black/10"
-                              style={{ background: m.mau }} />
-                            <span className="min-w-0 flex-1 text-[11px] leading-snug text-slate-600">{m.ten}</span>
-                          </div>
-                        ))}
-                      </div>
-                    ))}
-                    <p className="mt-2 pt-2 border-t text-[10px] leading-snug text-slate-400">
-                      Màu do web tô lại theo loại đất cho dễ đọc. Tên loại đất lấy đúng từ bản vẽ
-                      quy hoạch được duyệt; thông tin chỉ mang tính tham khảo.
-                    </p>
-                  </div>
-                )}
+                {chuGiaiOpen && <div className="mt-1.5">{chuGiaiNoiDung()}</div>}
               </div>
             )}
           </div>
@@ -1813,30 +1872,17 @@ export default function MapPage() {
                   + phân khu 1/2000) nên đoạn này dài không đoán trước được. Cho nó cuộn riêng thì
                   bảng không cao thêm, mà đầu bảng và hai hàng nút ở đáy vẫn đứng yên. */}
               <div className="px-4 py-2 text-sm flex-1 min-h-0 overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#cbd5e1_transparent]">
-                {info.parcel && info.overlaps && info.overlaps.length > 0 && (
-                  <div className="mt-2 pt-1.5 border-t border-slate-100">
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-0.5">Quy hoạch chung 2045 · QĐ205</p>
-                    {info.overlaps.map((o, i) => <div key={i} className="flex justify-between items-center gap-2 py-px"><span className="text-slate-600">{o.type}</span><span className="font-medium shrink-0">{fmtArea(o.areaM2)}</span></div>)}
-                  </div>
-                )}
+                {info.parcel && info.overlaps && info.overlaps.length > 0
+                  && khoiQh('Quy hoạch chung 2045 · QĐ205', info.overlaps, 'qd205')}
 
                 {/* MỘT THỬA THƯỜNG DÍNH NHIỀU BẢN QUY HOẠCH CHỒNG LÊN NHAU: QĐ205 trùm cả huyện,
                     bên trong còn quy hoạch sử dụng đất QĐ893 và các bản phân khu 1/2000.
                     Không bản nào được phép giấu bản nào — liệt kê RIÊNG từng bản, ghi rõ loại đất
                     và diện tích, để người xem tự đối chiếu. */}
-                {info.parcel && (info as any).qhCacBan?.length > 0 && (info as any).qhCacBan.map((b: any) => (
-                  <div key={b.ma} className="mt-2 pt-1.5 border-t border-slate-100">
-                    {/* KHÔNG hiện "chỉ phủ X% thửa" — đó là chữ nghề, người mua đất đọc không hiểu.
-                        Con số phần trăm vẫn có trong dữ liệu trả về (phuTramPhanTram) để dò lỗi khi cần. */}
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-0.5">{b.ten}</p>
-                    {b.areas.map((a: any, i: number) => (
-                      <div key={i} className="flex justify-between items-center gap-2 py-px">
-                        <span className="text-slate-600">{a.type}</span>
-                        <span className="font-medium shrink-0">{fmtArea(a.areaM2)}</span>
-                      </div>
-                    ))}
-                  </div>
-                ))}
+                {/* KHÔNG hiện "chỉ phủ X% thửa" — đó là chữ nghề, người mua đất đọc không hiểu.
+                    Con số phần trăm vẫn có trong dữ liệu trả về (phuTramPhanTram) để dò lỗi khi cần. */}
+                {info.parcel && (info as any).qhCacBan?.length > 0
+                  && (info as any).qhCacBan.map((b: any) => khoiQh(b.ten, b.areas, b.ma))}
 
                 {/* Ngoài huyện Cam Lâm cũ thì CHƯA có dữ liệu quy hoạch. Nói thẳng ra, vì trước đây
                     máy chủ đoán bừa mọi thửa ngoài vùng thành "Đất giao thông" phủ kín cả thửa. */}

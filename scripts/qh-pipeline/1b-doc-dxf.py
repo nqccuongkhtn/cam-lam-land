@@ -148,25 +148,37 @@ def mau(e, doc):
     Quên bước này thì hình ra TRẮNG hết: đo thật, QĐ2076 có 2.027/2.225 vùng và QĐ2222 có
     404/670 vùng khai BYLAYER, bỏ qua là bản đồ trắng xoá gần hết.
     """
+    m, _ = mau_va_so(e, doc)
+    return m
+
+
+def mau_va_so(e, doc):
+    """Trả về (màu #rrggbb, số hiệu màu trong bản vẽ).
+
+    Số hiệu màu là thứ bản vẽ THẬT SỰ ghi; màu chỉ là kết quả tra bảng. Ghi cả hai xuống
+    file thì sau này đổi bảng màu khác chỉ mất vài giây, khỏi phải đọc lại cả file DXF
+    (đọc lại mất vài phút mỗi bản vẽ). Số hiệu = 0 nghĩa là hình khai MÀU THẬT (true_color)
+    chứ không qua bảng, hoặc không dò ra số hiệu.
+    """
     tc = e.dxf.get('true_color', None)
     if tc:
-        return '#%06x' % (tc & 0xFFFFFF)
+        return '#%06x' % (tc & 0xFFFFFF), 0
     ci = e.dxf.get('color', 256)
     if ci in (0, 256):                       # BYBLOCK / BYLAYER → hỏi level
         try:
             lay = doc.layers.get(e.dxf.layer)
             ltc = getattr(lay.dxf, 'true_color', None)
             if ltc:
-                return '#%06x' % (ltc & 0xFFFFFF)
+                return '#%06x' % (ltc & 0xFFFFFF), 0
             ci = abs(int(lay.color))         # level tắt hiển thị thì màu ghi số âm
         except Exception:
             ci = 7
     if ci in (0, 256) or ci < 1 or ci > 255:
-        return '#9aa0a6'
+        return '#9aa0a6', 0
     try:
-        return BANG[ci]
+        return BANG[ci], ci
     except Exception:
-        return '#9aa0a6'
+        return '#9aa0a6', 0
 
 
 def doc_net(d, msp):
@@ -241,7 +253,7 @@ def main(vao, ra, bo_mau=(), lay_net=False):
         except Exception:
             loi += 1
             continue
-        c = mau(e, d)
+        c, so_mau = mau_va_so(e, d)
         if c in bo_mau:
             bo_lv += 1
             continue
@@ -269,7 +281,7 @@ def main(vao, ra, bo_mau=(), lay_net=False):
                 ring.append(ring[0])
             if len(ring) < 4:
                 continue
-            out.append({'type': 'Feature', 'properties': {'lo': lv, 'c': c, 'hz': hz},
+            out.append({'type': 'Feature', 'properties': {'lo': lv, 'c': c, 'ci': so_mau, 'hz': hz},
                         'geometry': {'type': 'Polygon', 'coordinates': [ring]}})
 
     print('  · giữ %d vùng | bỏ %d (level không phải quy hoạch), %d (ra ngoài khung), %d (lỗi hình)'

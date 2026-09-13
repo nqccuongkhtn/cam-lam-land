@@ -160,7 +160,7 @@
     {
      "mau": "#a55267",
      "ten": "Văn hoá đơn vị ở · Đất cơ sở văn hoá + 5 loại nữa",
-     "dayDu": "Văn hoá đơn vị ở · Đất cơ sở văn hoá · Đất cơ sở văn hoá (nông thôn) (hiện trạng) · Văn hoá đơn vị ở (hiện trạng) · Đất cơ sở văn hoá (nông thôn) · Đất cơ sở văn hoá (đô thị) · Đất cơ sở văn hoá (hiện trạng)",
+     "dayDu": "Văn hoá đơn vị ở · Đất cơ sở văn hoá · Đất cơ sở văn hoá (nông thôn) (hiện trạng) · Văn hoá đơn vị ở (hiện trạng) · Đất cơ sở văn hoá (đô thị) · Đất cơ sở văn hoá (nông thôn) · Đất cơ sở văn hoá (hiện trạng)",
      "so": 85
     },
     {
@@ -194,15 +194,15 @@
      "so": 5
     },
     {
-     "mau": "#4c3900",
-     "ten": "Đất cơ quan (ngoài đô thị) (hiện trạng) · Đất cơ quan (ngoài đô thị)",
-     "dayDu": "Đất cơ quan (ngoài đô thị) (hiện trạng) · Đất cơ quan (ngoài đô thị)",
-     "so": 4
-    },
-    {
      "mau": "#005f7f",
      "ten": "Đào tạo – nghiên cứu (hiện trạng) · Đất đào tạo + 1 loại nữa",
      "dayDu": "Đào tạo – nghiên cứu (hiện trạng) · Đất đào tạo · Đào tạo – nghiên cứu",
+     "so": 4
+    },
+    {
+     "mau": "#4c3900",
+     "ten": "Đất cơ quan (ngoài đô thị) (hiện trạng) · Đất cơ quan (ngoài đô thị)",
+     "dayDu": "Đất cơ quan (ngoài đô thị) (hiện trạng) · Đất cơ quan (ngoài đô thị)",
      "so": 4
     }
    ]
@@ -335,7 +335,7 @@
     {
      "mau": "#1c1358",
      "ten": "Hạ tầng khác · Hạ tầng khác đô thị + 5 loại nữa",
-     "dayDu": "Hạ tầng khác · Hạ tầng khác đô thị · Hạ tầng kỹ thuật ngoài đô thị · Hạ tầng kỹ thuật ngoài đô thị (hiện trạng) · Hạ tầng khác (hiện trạng) · Hạ tầng khác ngoài đô thị · Hạ tầng khác đô thị (hiện trạng)",
+     "dayDu": "Hạ tầng khác · Hạ tầng khác đô thị · Hạ tầng kỹ thuật ngoài đô thị (hiện trạng) · Hạ tầng kỹ thuật ngoài đô thị · Hạ tầng khác (hiện trạng) · Hạ tầng khác ngoài đô thị · Hạ tầng khác đô thị (hiện trạng)",
      "so": 44
     },
     {
@@ -386,8 +386,8 @@
     },
     {
      "mau": "#4c4c00",
-     "ten": "Đất an ninh (hiện trạng) · Đất an ninh",
-     "dayDu": "Đất an ninh (hiện trạng) · Đất an ninh",
+     "ten": "Đất an ninh · Đất an ninh (hiện trạng)",
+     "dayDu": "Đất an ninh · Đất an ninh (hiện trạng)",
      "so": 2
     }
    ]

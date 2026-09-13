@@ -181,6 +181,27 @@ def mau_va_so(e, doc):
         return '#9aa0a6', 0
 
 
+
+def dien_tich_ring(g):
+    """Diện tích gần đúng của một hình (đơn vị độ²) — chỉ để SẮP XẾP nên không cần chính xác."""
+    if not g:
+        return 0.0
+    kieu = g.get('type')
+    khoi = [g.get('coordinates')] if kieu == 'Polygon' else (g.get('coordinates') or [])
+    if kieu not in ('Polygon', 'MultiPolygon'):
+        return 0.0
+    t = 0.0
+    for poly in khoi:
+        r = (poly or [None])[0]
+        if not r or len(r) < 4:
+            continue
+        s2 = 0.0
+        for i in range(len(r)):
+            s2 += r[i - 1][0] * r[i][1] - r[i][0] * r[i - 1][1]
+        t += abs(s2) / 2
+    return t
+
+
 def doc_net(d, msp):
     """Rút LỚP NÉT (đường, chỉ giới, ranh…) — dùng cho việc cắt tile và dựng mặt nạ đường."""
     ra = []
@@ -284,6 +305,13 @@ def main(vao, ra, bo_mau=(), lay_net=False):
             out.append({'type': 'Feature', 'properties': {'lo': lv, 'c': c, 'ci': so_mau, 'hz': hz},
                         'geometry': {'type': 'Polygon', 'coordinates': [ring]}})
 
+    # ⚠️ MẢNG TO VẼ TRƯỚC, MẢNG NHỎ VẼ SAU (nằm trên).
+    # Ảnh tile được vẽ theo ĐÚNG THỨ TỰ trong file, nên mảng nào nằm cuối là nằm trên cùng.
+    # Bản vẽ CAD không xếp theo diện tích: đo thật thì QĐ2222 có mảng rừng sản xuất 1.046 ha
+    # nằm ở vị trí 492/531, QĐ918 có mảng 932 ha ở vị trí 319/454 — vẽ gần cuối nên chúng
+    # TRÙM KÍN các ô đất nhỏ vẽ trước đó, nhìn ra một mảng màu to đè lên khu chi tiết
+    # (chủ dự án phát hiện: "có vài chỗ màu bị đè"). Sắp theo diện tích giảm dần là hết.
+    out.sort(key=lambda f: -dien_tich_ring(f['geometry']))
     print('  · giữ %d vùng | bỏ %d (level không phải quy hoạch), %d (ra ngoài khung), %d (lỗi hình)'
           % (len(out), bo_lv, bo_ngoai, loi))
     from collections import Counter

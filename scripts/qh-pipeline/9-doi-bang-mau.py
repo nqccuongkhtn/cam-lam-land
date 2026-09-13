@@ -20,13 +20,37 @@ Tên bảng màu: `autocad` (bảng sẵn trong ezdxf) hoặc tên file .tbl tro
 thì GIỮ NGUYÊN màu cũ, vì màu đó không phụ thuộc bảng.
 """
 import collections
+import importlib.util
 import io
 import json
 import os
 import sys
+import unicodedata
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BANG_DIR = os.path.join(HERE, 'bang-mau')
+
+# ── SỬA MÀU RIÊNG CHO TỪNG LOẠI ĐẤT ─────────────────────────────────────────
+# Mỗi đồ án do một đơn vị vẽ, cùng một loại đất mà số hiệu màu khác nhau
+# ('Sản xuất công nghiệp': QĐ2076/QĐ2101 tím số 192, QĐ918 xanh dương số 5).
+# Bảng mau-sua-rieng.json ép một màu duy nhất cho những loại đất như vậy.
+# Xem phần `_doc` trong file đó — CHỈ ghi vào khi đã đối chiếu và chủ dự án xác nhận.
+_spec = importlib.util.spec_from_file_location('_z5', os.path.join(HERE, '5-tao-qh-zones.py'))
+_z5 = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_z5)
+
+
+def _khong_dau(x):
+    x = unicodedata.normalize('NFD', x or '')
+    x = ''.join(c for c in x if unicodedata.category(c) != 'Mn')
+    return x.replace('đ', 'd').replace('Đ', 'D').lower().strip()
+
+
+try:
+    with io.open(os.path.join(HERE, 'mau-sua-rieng.json'), encoding='utf-8') as _fp:
+        SUA_RIENG = {_khong_dau(k): v for k, v in json.load(_fp)['mau'].items()}
+except Exception:
+    SUA_RIENG = {}
 
 
 def nap_bang(ten):
@@ -50,6 +74,7 @@ def main(vao, ra, ten_bang):
     d = json.load(io.open(vao, encoding='utf-8'))
     doi = giu = 0
     dem = collections.Counter()
+    ep = collections.Counter()
     for f in d.get('features', []):
         p = f.get('properties') or {}
         ci = p.get('ci') or 0
@@ -59,10 +84,17 @@ def main(vao, ra, ten_bang):
             dem[(ci, bang[ci])] += 1
         else:
             giu += 1
+        # Ép màu cho loại đất nào bị các bản vẽ tô không thống nhất
+        m = SUA_RIENG.get(_khong_dau(_z5.ten_loai(p.get('lo', ''))))
+        if m:
+            p['c'] = m
+            ep[_z5.ten_loai(p.get('lo', ''))] += 1
     with io.open(ra, 'w', encoding='utf-8') as fp:
         json.dump(d, fp, ensure_ascii=False)
     print('%s → %s   (bảng màu: %s)' % (os.path.basename(vao), os.path.basename(ra), ten_bang))
     print('  · đổi màu %d ô · giữ nguyên %d ô (không có số hiệu màu)' % (doi, giu))
+    if ep:
+        print('  · ép màu riêng: ' + ' · '.join('%s %d ô' % (k, v) for k, v in ep.most_common()))
     print('  · 6 số hiệu nhiều ô nhất: ' + ' · '.join('%d→%s (%d ô)' % (ci, m, n) for (ci, m), n in dem.most_common(6)))
     print('  >>> %s — %.1f MB' % (ra, os.path.getsize(ra) / 1048576))
 

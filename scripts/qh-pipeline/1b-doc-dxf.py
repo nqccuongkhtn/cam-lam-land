@@ -312,15 +312,19 @@ def main(vao, ra, bo_mau=(), lay_net=False):
     # TRÙM KÍN các ô đất nhỏ vẽ trước đó, nhìn ra một mảng màu to đè lên khu chi tiết
     # (chủ dự án phát hiện: "có vài chỗ màu bị đè"). Sắp theo diện tích giảm dần là hết.
     # Thứ tự vẽ BA BẬC (vẽ trước = nằm dưới):
-    #   0. HT_*                        hiện trạng
-    #   1. QH2030_/QH2045_/QHDD_/QHDH_ khối quy hoạch (đơn vị ở, khu chức năng)
-    #   2. DAT_*                       phần CHIA NHỎ CHI TIẾT bên trong khối
+    #   0. HT_*                        hiện trạng — nằm dưới cùng
+    #   1. DAT_*                       phân loại chung, KHÔNG ghi mốc năm
+    #   2. QH2030_/QH2045_/QHDD_/QHDH_ quy hoạch theo MỐC NĂM — nằm trên cùng
     # Trong mỗi bậc: mảng TO vẽ trước, mảng NHỎ vẽ sau (nằm trên).
-    # Vì sao cần bậc 2: đo trên QĐ2076 có 16,7% diện tích bị hai ô đất chồng lên nhau,
-    # đúng kiểu 'DAT_O_Nhomnhao Thaptang' nằm trong 'QH2045_DAT_DVO moiTB'. Nếu chỉ sắp
-    # theo diện tích thì một mảng chia nhỏ hơi to sẽ bị khối lớn vẽ sau trùm mất, cả khu
-    # chi tiết biến thành một mảng màu (chủ dự án gọi là "chồng màu").
-    BAC_VE = {'HT': 0, 'DAT': 2}
+    # Vì sao phải chia bậc chứ không chỉ sắp theo diện tích: đo trên QĐ2076 có tới 16,7%
+    # diện tích bị HAI ô đất chồng lên nhau, và hai bên xấp xỉ bằng nhau nên sắp theo diện
+    # tích là ăn may — lúc cái này trên, lúc cái kia trên.
+    #   'DAT_O_Nhomnhao Thaptang'                  363 ô · 912 ha · #e2aa00 vàng nghệ
+    #   'QH2045_ DAT_Don vi o mat do thap...'      106 ô · 211 ha · #e7ff9f vàng chanh
+    #   'QH2030_ DAT_Don vi o mat do thap...'       77 ô · 209 ha · #e7ff9f
+    # Chủ dự án đối chiếu MicroStation: phần ĐƠN VỊ Ở MẬT ĐỘ THẤP phải nhìn thấy, tức
+    # level ghi MỐC NĂM (QH2030_/QH2045_) nằm TRÊN level phân loại chung (DAT_).
+    BAC_VE = {'HT': 0, 'DAT': 1}   # còn lại (QH2030/QH2045/QHDD/QHDH) = 2, nằm trên cùng
     out.sort(key=lambda f: (BAC_VE.get(f['properties'].get('hz') or '', 1),
                             -dien_tich_ring(f['geometry'])))
     print('  · giữ %d vùng | bỏ %d (level không phải quy hoạch), %d (ra ngoài khung), %d (lỗi hình)'

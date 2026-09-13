@@ -1,4 +1,4 @@
-const CACHE = 'camlam-v86';
+const CACHE = 'camlam-v87';   // tăng số này là xoá sạch cache cũ của mọi máy ở lần vào sau
 const API_CACHE = 'camlam-api-v1'; // cache RIÊNG cho API công khai (dễ dọn, giới hạn dung lượng)
 const OFFLINE = '/offline.html';
 // Precache khung app để MỞ APP là vẽ ngay (không chờ mạng → hết màn đen ~1s lúc khởi động).
@@ -80,6 +80,28 @@ self.addEventListener('fetch', (e) => {
       const cached = await cache.match(req);
       if (cached) return cached;                    // có sẵn → trả ngay, KHÔNG chờ mạng
       return (await net) || (await cache.match(OFFLINE)) || (await cache.match('/')) || Response.error();
+    })());
+    return;
+  }
+
+  // ⚠️ FILE DỮ LIỆU TÊN CỐ ĐỊNH (.json/.geojson trong thư mục public): HỎI MẠNG TRƯỚC.
+  // Mấy file này KHÔNG có mã băm trong tên (chu-giai-qh.json, qh_vector.geojson, ranh-xa.geojson,
+  // danh-sach-nong.json…) nên nếu dùng cache-first như tài nguyên của Next thì máy nào đã vào web
+  // một lần là GIỮ BẢN CŨ MÃI MÃI — sửa dữ liệu bao nhiêu lần cũng không thấy. Đã vấp thật ngày
+  // 13/9/2026: đổi bảng chú giải xong, tải lại trang mấy lần vẫn ra bảng cũ.
+  // Cách làm: hỏi mạng trước, lấy được thì cập nhật luôn vào cache; mất mạng mới lấy bản đã lưu.
+  // (Ảnh tile và ảnh overlay KHÔNG rơi vào đây — chúng nằm trong thư mục có đánh số bản
+  //  qd2101v7, qd918v3… nên đổi bản là đổi đường dẫn, cache-first vẫn vừa đúng vừa nhanh.)
+  if (/\.(json|geojson)$/i.test(url.pathname) && !url.pathname.startsWith('/tiles/')) {
+    e.respondWith((async () => {
+      const cache = await caches.open(CACHE);
+      try {
+        const res = await fetch(req);
+        if (res && res.status === 200) { const copy = res.clone(); cache.put(req, copy).catch(() => {}); }
+        return res;
+      } catch (x) {
+        return (await cache.match(req)) || Response.error();
+      }
     })());
     return;
   }

@@ -390,6 +390,9 @@ export default function ChatWidget() {
       ? cur.map((m) => (bo.has(m.id) ? { ...m, deletedAt: m.deletedAt || new Date().toISOString(), kind: 'text', body: '', fileId: null } : m))
       : cur);
   }
+  // Kéo thả tệp vào khung chat cho nhanh (vẫn giữ nút kẹp cho ai quen bấm).
+  const [dangKeoTep, setDangKeoTep] = useState(false);
+
   async function guiTep(f?: File | null) {
     if (!f || !room || !user) return;
     setWarn(''); setDangGuiTep(true);
@@ -420,6 +423,34 @@ export default function ChatWidget() {
       pushMsgs([{ id: r.id, userId: user.id, name: r.name, avatar: r.avatar, body, createdAt: r.createdAt }]);
     } catch (e: any) { setWarn(e.message || 'Không gửi được.'); setText(body); }
   }
+  // ── GỬI ĐỊNH VỊ ───────────────────────────────────────────────────────────
+  // Chỉ bật ở phòng HỖ TRỢ (support:) và KÝ GỬI & TƯ VẤN (advisory:) — hai bên biết nhau,
+  // gửi chỗ đất cho nhau là việc bình thường. CHAT CỘNG ĐỒNG thì KHÔNG, vì ở đó ai cũng đọc
+  // được, lộ vị trí nhà/đất của mình cho người lạ (chủ dự án dặn rõ).
+  // Toạ độ gửi đi là WGS84 (vĩ độ, kinh độ) — dán vào Google Maps hay mở trên bản đồ của web
+  // đều ra đúng chỗ.
+  const [dangDinhVi, setDangDinhVi] = useState(false);
+  const choGuiViTri = !!room && (room.startsWith('support:') || room.startsWith('advisory:'));
+
+  async function guiViTri() {
+    if (!room || !user || dangDinhVi) return;
+    if (!navigator.geolocation) { setWarn('Máy này không hỗ trợ định vị.'); return; }
+    setDangDinhVi(true); setWarn('');
+    navigator.geolocation.getCurrentPosition(async (v) => {
+      const body = `📍 Vị trí: ${v.coords.latitude.toFixed(6)}, ${v.coords.longitude.toFixed(6)}`;
+      try {
+        const r = await api<{ id: number; createdAt: string; name: string; avatar?: string | null }>(
+          '/chat/messages', { method: 'POST', body: JSON.stringify({ room, body }) });
+        pushMsgs([{ id: r.id, userId: user.id, name: r.name, avatar: r.avatar, body, createdAt: r.createdAt }]);
+      } catch (e: any) { setWarn(e.message || 'Không gửi được vị trí.'); }
+      setDangDinhVi(false);
+    }, (e) => {
+      setDangDinhVi(false);
+      setWarn(e.code === 1 ? 'Bạn chưa cho phép truy cập vị trí. Hãy bật quyền vị trí cho trang này rồi thử lại.'
+        : 'Không lấy được vị trí. Thử lại ở chỗ thoáng hoặc bật GPS.');
+    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
+  }
+
   async function submitSell() {
     setSerr('');
     if (!sf.name.trim() || !sf.phone.trim()) return setSerr('Vui lòng nhập họ tên và số điện thoại.');
@@ -702,7 +733,25 @@ export default function ChatWidget() {
                               {!mine && <p className="text-[11px] font-bold text-[#C8A14B] mb-0.5">{dName}</p>}
                               {coTep
                                 ? <ChatDinhKem fileId={m.fileId} fileName={m.fileName} fileMime={m.fileMime} fileSize={m.fileSize} mine={mine} />
-                                : <p className="whitespace-pre-wrap break-words">{renderWithMentions(m.body, allMentionNames, myName)}</p>}
+                                : (() => {
+                                    // Tin nhắn VỊ TRÍ: vẽ thành thẻ có nút mở bản đồ / chỉ đường,
+                                    // thay vì để người nhận tự chép hai con số ra Google Maps.
+                                    const vt = /^📍\s*Vị trí:\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/.exec(m.body || '');
+                                    if (!vt) return <p className="whitespace-pre-wrap break-words">{renderWithMentions(m.body, allMentionNames, myName)}</p>;
+                                    const la = vt[1], lo = vt[2];
+                                    return (
+                                      <div className="min-w-[190px]">
+                                        <p className="font-bold">📍 Vị trí đã gửi</p>
+                                        <p className={`text-[11px] tabular-nums ${mine ? 'text-white/70' : 'text-slate-500'}`}>{la}, {lo}</p>
+                                        <div className="mt-1.5 flex gap-1.5">
+                                          <a href={`/map?lat=${la}&lng=${lo}`} target="_blank" rel="noopener noreferrer"
+                                            className={`flex-1 text-center rounded-lg px-2 py-1 text-[11px] font-bold ${mine ? 'bg-white/15 hover:bg-white/25' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}>Xem trên bản đồ</a>
+                                          <a href={`https://www.google.com/maps/dir/?api=1&destination=${la},${lo}`} target="_blank" rel="noopener noreferrer"
+                                            className={`flex-1 text-center rounded-lg px-2 py-1 text-[11px] font-bold ${mine ? 'bg-white/15 hover:bg-white/25' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}>Chỉ đường</a>
+                                        </div>
+                                      </div>
+                                    );
+                                  })()}
                             </div>
                           </div>
                           {adminSupport && mine && m.id === lastMineId && peerAck && (
@@ -713,7 +762,20 @@ export default function ChatWidget() {
                     })}
                 </div>
                 {canType && (
-                  <div className="border-t border-slate-100 shrink-0">
+                  <div className="border-t border-slate-100 shrink-0 relative"
+                    onDragOver={(e) => { if (canUpload) { e.preventDefault(); setDangKeoTep(true); } }}
+                    onDragLeave={() => setDangKeoTep(false)}
+                    onDrop={(e) => {
+                      if (!canUpload) return;
+                      e.preventDefault(); setDangKeoTep(false);
+                      const f = e.dataTransfer?.files?.[0];
+                      if (f) guiTep(f);
+                    }}>
+                    {dangKeoTep && (
+                      <div className="absolute inset-0 z-10 grid place-items-center rounded-t-xl border-2 border-dashed border-[#C8A14B] bg-[#C8A14B]/10 pointer-events-none">
+                        <p className="text-xs font-bold text-[#8a6d20]">Thả tệp vào đây để gửi</p>
+                      </div>
+                    )}
                     {warn && <p className="px-3 pt-2 text-xs text-red-600 font-semibold leading-snug">⚠️ {warn}</p>}
                     <div className="p-2">
                       {mentionList.length > 0 && (
@@ -730,8 +792,29 @@ export default function ChatWidget() {
                         {canUpload && (
                           <>
                             <input ref={tepRef} type="file" accept="image/*,application/pdf,.pdf" className="hidden" onChange={(e) => { guiTep(e.target.files?.[0]); e.target.value = ''; }} />
-                            <button onClick={() => tepRef.current?.click()} disabled={dangGuiTep} title="Gửi ảnh hoặc tệp PDF (tối đa 10MB)" className="shrink-0 w-9 h-9 grid place-items-center rounded-full border border-slate-300 text-lg hover:bg-slate-100 disabled:opacity-50">{dangGuiTep ? '⏳' : '📎'}</button>
+                            {/* Nút kẹp tệp: biểu tượng vẽ nét cho sắc, đang gửi thì quay vòng.
+                                Emoji 📎 cũ mỗi máy hiện một kiểu và bị mờ trên màn hình nét cao. */}
+                            <button onClick={() => tepRef.current?.click()} disabled={dangGuiTep}
+                              title="Gửi ảnh hoặc tệp PDF (tối đa 10MB) — hoặc kéo thả tệp vào khung chat"
+                              className="cl-press shrink-0 w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-slate-500 hover:text-[#0A2540] hover:bg-slate-50 hover:border-slate-300 transition disabled:opacity-50">
+                              {dangGuiTep ? (
+                                <svg viewBox="0 0 24 24" width="17" height="17" className="animate-spin" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+                                  <path d="M21 12a9 9 0 1 1-6.2-8.6" />
+                                </svg>
+                              ) : (
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M21.4 11.1 12.3 20.2a5.5 5.5 0 0 1-7.8-7.8l9.2-9.2a3.7 3.7 0 0 1 5.2 5.2l-9.1 9.2a1.8 1.8 0 0 1-2.6-2.6l8.5-8.5" />
+                                </svg>
+                              )}
+                            </button>
                           </>
+                        )}
+                        {choGuiViTri && (
+                          <button onClick={guiViTri} disabled={dangDinhVi}
+                            title="Gửi vị trí hiện tại của bạn"
+                            className="cl-press shrink-0 w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-lg hover:bg-slate-50 disabled:opacity-50">
+                            {dangDinhVi ? '…' : '📍'}
+                          </button>
                         )}
                         <input ref={msgInputRef} value={text} onChange={(e) => { setText(e.target.value); if (warn) setWarn(''); }} onKeyDown={(e) => { if (e.key === 'Enter') { if (mentionList.length) { e.preventDefault(); pickMention(mentionList[0]); } else send(); } }} placeholder="Nhập tin nhắn…  (gõ @ để nhắc tên)" className="flex-1 border border-slate-300 rounded-full px-3.5 py-2 text-sm outline-none focus:border-[#0A2540]" />
                         <button onClick={send} className="cl-press bg-red-600 hover:bg-red-700 text-white rounded-full px-4 py-2 text-sm font-bold shrink-0">Gửi</button>

@@ -73,10 +73,20 @@ export default function ChatDinhKem({ fileId, fileName, fileMime, fileSize, mine
       <>
         {loi ? <p className="text-xs italic opacity-70">{loi}</p>
           : src ? (
-            <img src={src} alt={fileName || 'Hình ảnh'} onClick={() => setTo(true)}
-              className="rounded-lg max-h-56 w-auto max-w-full cursor-zoom-in bg-white/10" />
+            /* Bọc ảnh trong khung có bo góc + lớp phủ hiện tên tệp và nút tải khi rê chuột.
+               Trước đây chỉ có mỗi tấm ảnh trơ, muốn tải về phải bấm phóng to rồi mới thấy nút. */
+            <div className="group relative inline-block overflow-hidden rounded-xl">
+              <img src={src} alt={fileName || 'Hình ảnh'} onClick={() => setTo(true)}
+                className="block max-h-56 w-auto max-w-full cursor-zoom-in bg-white/10 transition duration-200 group-hover:brightness-[.88]" />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/65 to-transparent p-2 opacity-0 transition group-hover:opacity-100">
+                <span className="min-w-0 truncate text-[11px] font-semibold text-white/90">{fileName || 'Hình ảnh'}</span>
+                <button onClick={(e) => { e.stopPropagation(); moTep(true); }}
+                  title="Tải ảnh về máy"
+                  className="pointer-events-auto shrink-0 rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-bold text-white backdrop-blur hover:bg-white/35">⬇ Tải</button>
+              </div>
+            </div>
           ) : (
-            <div className="w-40 h-28 rounded-lg bg-slate-200 animate-pulse grid place-items-center text-xs text-slate-500">Đang tải ảnh…</div>
+            <div className="w-40 h-28 rounded-xl bg-slate-200 animate-pulse grid place-items-center text-xs text-slate-500">Đang tải ảnh…</div>
           )}
         {to && src && (
           <div className="fixed inset-0 z-[100] bg-black/95 flex flex-col" onClick={() => setTo(false)}>
@@ -98,15 +108,19 @@ export default function ChatDinhKem({ fileId, fileName, fileMime, fileSize, mine
   }
 
   // PDF (và mọi tệp không phải ảnh)
+  // Thẻ tài liệu: ô biểu tượng vuông bo góc + tên tệp + dung lượng, hai NÚT BẤM thật
+  // (trước là hai chữ gạch chân bé xíu, trên điện thoại rất khó bấm trúng).
   return (
-    <div className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 ${mine ? 'bg-white/10' : 'bg-slate-50 border border-slate-200'}`}>
-      <span className="text-2xl leading-none shrink-0">📕</span>
+    <div className={`flex items-start gap-2.5 rounded-xl p-2.5 min-w-[200px] ${mine ? 'bg-white/10' : 'bg-white border border-slate-200 shadow-sm'}`}>
+      <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg text-[11px] font-extrabold tracking-wide ${mine ? 'bg-white/15 text-white' : 'bg-red-50 text-red-600 border border-red-100'}`}>PDF</span>
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-bold truncate">{fileName || 'Tài liệu.pdf'}</p>
+        <p className="text-xs font-bold truncate leading-snug">{fileName || 'Tài liệu.pdf'}</p>
         <p className={`text-[11px] ${mine ? 'text-white/60' : 'text-slate-400'}`}>{coChu(fileSize) || 'PDF'}</p>
-        <div className="flex gap-2 mt-1">
-          <button onClick={() => moTep(false)} disabled={dangTai} className={`text-[11px] font-bold underline ${mine ? 'text-white' : 'text-[#0A2540]'} disabled:opacity-50`}>{dangTai ? 'Đang mở…' : 'Mở'}</button>
-          <button onClick={() => moTep(true)} disabled={dangTai} className={`text-[11px] font-bold underline ${mine ? 'text-white/80' : 'text-slate-500'} disabled:opacity-50`}>Tải về</button>
+        <div className="flex gap-1.5 mt-1.5">
+          <button onClick={() => moTep(false)} disabled={dangTai}
+            className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition disabled:opacity-50 ${mine ? 'bg-white/20 hover:bg-white/30 text-white' : 'bg-[#0A2540] hover:bg-[#0d2f54] text-white'}`}>{dangTai ? 'Đang mở…' : 'Mở'}</button>
+          <button onClick={() => moTep(true)} disabled={dangTai}
+            className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition disabled:opacity-50 ${mine ? 'bg-white/10 hover:bg-white/20 text-white/90' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'}`}>⬇ Tải về</button>
         </div>
         {loi && <p className="text-[11px] text-red-400 mt-0.5">{loi}</p>}
       </div>

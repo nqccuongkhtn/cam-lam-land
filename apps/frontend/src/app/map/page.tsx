@@ -112,7 +112,7 @@ const RASTER_OVERLAYS = [
     tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png'], minzoom: 12, maxzoom: 18,
     coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ⚠️ MÀU BẢN ĐỒ QUY HOẠCH LẤY ĐÚNG TỪ BẢN VẼ — ĐỌC KỸ TRƯỚC KHI ĐỔI (13/9/2026)
-  // Bốn bộ tile phân khu (qd2076v9 · qd2101v10 · qd2222v10 · qd918v6) dùng BẢNG MÀU AUTOCAD.
+  // Bốn bộ tile phân khu (qd2076v10 · qd2101v11 · qd2222v11 · qd918v7) dùng BẢNG MÀU AUTOCAD.
   // Đã thử bảng MicroStation (chủ dự án tự xuất ra từ Settings → Color Table) nhưng đối chiếu
   // với bản vẽ mở bằng MicroStation thì bảng AutoCAD vẽ ĐÚNG HƠN — nên giữ AutoCAD.
   // Muốn thử lại bảng khác: python 9-doi-bang-mau.py <vao.geojson> <ra.geojson> <tên-bảng>
@@ -123,6 +123,17 @@ const RASTER_OVERLAYS = [
   // mảng rừng 1.046 ha ở vị trí 492/531, QĐ918 có mảng 932 ha ở vị trí 319/454 — vẽ gần cuối
   // nên trùm kín các ô đất chi tiết vẽ trước (chủ dự án phát hiện "có vài chỗ màu bị đè").
   // 1b-doc-dxf.py nay tự sắp theo diện tích giảm dần trước khi ghi file.
+  //
+  // ⚠️ HAI VIỆC NỮA ĐÃ LÀM CHO BỘ v10/v7/v11/v11 (13/9/2026):
+  // 1. LỚP HIỆN TRẠNG NẰM DƯỚI LỚP QUY HOẠCH. Sắp mỗi theo diện tích thì một mảnh hiện trạng
+  //    nhỏ vẫn đè lên ô đất quy hoạch bên dưới nó — mà người xem cần thấy phần QUY HOẠCH.
+  //    Nay xếp hai bậc: hiện trạng (hz='HT') vẽ trước, quy hoạch vẽ sau; trong mỗi bậc thì
+  //    mảng to vẽ trước.
+  // 2. LÀM TƯƠI MÀU mà GIỮ NGUYÊN TÔNG. Bảng AutoCAD có rất nhiều màu ở mức tối 15-30% (vẽ để
+  //    xem trên nền đen của MicroStation), đưa lên nền vệ tinh thì thành mảng nâu-đen.
+  //    Bảng `bang-mau/autocad-tuoi.tbl` kéo độ sáng theo đường cong L^0.72: màu tối sáng lên
+  //    hẳn, màu sáng gần như không đổi, tông màu (hue) giữ nguyên nên vẫn đúng bản vẽ.
+  //    Đất ở #a57c00→#e2aa00 · cây xanh #52a500→#70e200 · mặt nước #0052a5→#0070e2.
   //
   // Vì sao quan trọng: bản vẽ CAD không ghi màu thật, nó chỉ ghi SỐ HIỆU MÀU (1–255), muốn
   // biết số đó là màu gì phải tra bảng màu. AutoCAD và MicroStation có bảng KHÁC NHAU, mà bản
@@ -157,7 +168,7 @@ const RASTER_OVERLAYS = [
   // có 1.792 vùng nhưng tới 48.411 nét (chỉ giới đường đỏ, lề đường, ranh phân khu). Bỏ nét đi thì
   // nhìn chỉ thấy mấy mảng màu rời rạc, khác hẳn lúc mở file CAD gốc.
   { id: 'qh-qd2076', name: 'Quy hoạch phân khu phía Bắc QĐ2076 (1/2000)', url: '',
-    tiles: ['/tiles/qd2076v9/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2076v10/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.0288, 12.2004], [109.2513, 12.2004], [109.2513, 12.0527], [109.0288, 12.0527]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ2101 · quy hoạch phân khu trung tâm 1/2000 ────────────────────────────────────
   // Bản "v3" sửa hai lỗi của v2:
@@ -172,7 +183,7 @@ const RASTER_OVERLAYS = [
   // /tiles/ là `immutable, max-age=1 năm` nên trình duyệt và Cloudflare sẽ giữ nguyên ảnh cũ
   // cả năm, sửa xong mà người dùng vẫn thấy y như trước.
   { id: 'qh-qd2101', name: 'Quy hoạch phân khu trung tâm QĐ2101 (1/2000)', url: '',
-    tiles: ['/tiles/qd2101v10/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2101v11/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.1187, 12.0793], [109.2041, 12.0793], [109.2041, 11.99], [109.1187, 11.99]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ2222 · quy hoạch 1/2000 ──────────────────────────────────────────────────────
   // Bản "v3" sửa lỗi "mảng xám" của v2: v2 được cắt từ bản dữ liệu CŨ, lúc đó một số ô đất
@@ -184,12 +195,12 @@ const RASTER_OVERLAYS = [
   // Khung bao thu hẹp theo đúng ranh giới thật: trước ghi vươn ra tận 109.33 chỉ vì ô chú giải
   // nằm ngoài đó, chứ quy hoạch không hề trải tới chỗ ấy.
   { id: 'qh-qd2222', name: 'Quy hoạch QĐ2222 (1/2000)', url: '',
-    tiles: ['/tiles/qd2222v10/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2222v11/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.1630, 12.1505], [109.2237, 12.1505], [109.2237, 12.0258], [109.1630, 12.0258]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ918 · quy hoạch phân khu PHỨC HỢP PHÍA TÂY 1/2000 ────────────────────────────
   // Bản gốc là DGN V8, không công cụ nào trên máy đọc nổi; chủ dự án xuất ra DXF rồi mới nạp được.
   { id: 'qh-qd918', name: 'Quy hoạch phân khu phức hợp phía Tây QĐ918 (1/2000)', url: '',
-    tiles: ['/tiles/qd918v6/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd918v7/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.0372, 12.1265], [109.1454, 12.1265], [109.1454, 11.9569], [109.0372, 11.9569]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ893 · quy hoạch SỬ DỤNG ĐẤT đến 2030, phủ TOÀN huyện Cam Lâm cũ ───────
   // Bản này KHÔNG cần lớp nét: nó vốn là các mảng tô kín (nông nghiệp, đất ở, giao thông, mặt
@@ -1543,6 +1554,28 @@ export default function MapPage() {
           <MapView layers={geoLayers} overlays={overlays} markers={allMarkers} baseMap={baseMap} labels={labels} measureMode={measure}
             focusPoint={focusPoint} flyToPoint={flyPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} onViewport={onViewport} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={1} fitTo={fitTo} textLabels={textLabels}
             routes={dirTuyen} onPickRoute={setDirChon} diaChinhTiles={dcTiles} />
+
+          {/* ── ĐỔI LỚP QUY HOẠCH NGAY TRÊN BẢN ĐỒ — CHỈ ĐIỆN THOẠI ──────────────────
+              Trên điện thoại, muốn đổi lớp quy hoạch phải mở bảng "Lớp Q.Hoạch", bảng đó
+              trùm kín màn hình nên vừa chọn xong là mất luôn chỗ đang xem, phải kéo tìm lại.
+              Thanh này nổi ngay trên bản đồ: trượt ngang để chọn, bấm phát đổi luôn, bản đồ
+              KHÔNG xê dịch. Bấm lại lớp đang bật thì tắt hết, chỉ còn ảnh nền.
+              Máy tính không cần (bảng lớp nằm cố định bên trái, không che gì). */}
+          <div className="lg:hidden absolute left-0 right-0 top-2 z-10 px-2 pointer-events-none">
+            <div className="flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden pointer-events-auto">
+              {MUC_QH.map((o) => {
+                const bat = o.gom.every((id) => !!ovOn[id]);
+                return (
+                  <button key={o.id} onClick={() => chonLopQh(o, !bat)}
+                    className={`cl-press shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-[12px] font-bold shadow-md backdrop-blur transition ${
+                      bat ? 'bg-[#0A2540] text-white' : 'bg-white/90 text-slate-600 hover:bg-white'}`}>
+                    <span className={`mr-1.5 inline-block h-2 w-2 rounded-full align-middle ${bat ? 'bg-[#C8A14B]' : 'bg-slate-300'}`} />
+                    {o.ten}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
           {/* ── DANH SÁCH THỬA TÌM ĐƯỢC ── hiện khi có nhiều thửa cùng số tờ/số thửa.
               Rất hay gặp khi tra theo XÃ MỚI, vì một xã mới gộp nhiều xã cũ mà mỗi xã cũ
               lại có bộ số tờ/số thửa riêng — trùng số là chuyện bình thường. ── */}

@@ -32,94 +32,82 @@
   "  nông nghiệp = vàng chanh · mặt nước = xanh dương · giao thông/bãi xe = xám ·",
   "  công nghiệp = tím · quốc phòng-an ninh = ô liu."
  ],
-
  "mau": {
-  "Nhóm nhà ở": "#f2c23e",
-  "Nhóm nhà ở thấp tầng": "#f8d879",
-  "Nhà ở chung cư": "#e0930f",
-  "Nhóm nhà ở trong khu hỗn hợp": "#edab55",
-  "Đơn vị ở mới mật độ cao": "#e0930f",
-  "Đơn vị ở mới mật độ trung bình": "#f2c23e",
-  "Đơn vị ở mới mật độ trung bình (2030)": "#f2c23e",
-  "Đơn vị ở mật độ thấp đến năm 2030": "#fae6a0",
-  "Đơn vị ở mật độ thấp đến năm 2045": "#fae6a0",
-  "Dân cư nông thôn": "#e8dba4",
-  "Làng xóm": "#e3d59b",
-  "Làng xóm đô thị hoá": "#dccf90",
-  "Hiện trạng cải tạo chỉnh trang": "#e9dcae",
-
-  "Đất hỗn hợp": "#d4552a",
-  "Đất hỗn hợp – nhóm nhà ở": "#d4552a",
-
-  "Đất du lịch": "#ff3fd0",
-  "Du lịch – khu du lịch": "#ff3fd0",
-  "Du lịch – khu dịch vụ": "#ff86c2",
-  "Đất dịch vụ": "#ee3b3b",
-  "Dịch vụ đô thị": "#ee3b3b",
-  "Dịch vụ đơn vị ở": "#f4685f",
-  "Dịch vụ nông thôn": "#f4685f",
-  "Sân golf": "#2f9e56",
-
-  "Trường học": "#f2a3a3",
-  "Trường học nông thôn": "#f2a3a3",
-  "Trường THPT": "#e78585",
-  "Đất đào tạo": "#e78585",
-  "Đào tạo – nghiên cứu": "#e78585",
-  "Đất cơ sở y tế": "#f0629a",
-  "Y tế đơn vị ở": "#f0629a",
-  "Đất cơ sở văn hoá": "#cd8fd8",
-  "Văn hoá đơn vị ở": "#cd8fd8",
-  "Đất cơ quan": "#b09bdd",
-  "Di tích": "#a98a76",
-  "Di tích – tôn giáo": "#a98a76",
-
-  "Cây xanh công cộng": "#6ec832",
-  "Cây xanh công cộng đô thị": "#6ec832",
-  "Cây xanh công cộng đơn vị ở": "#85d64f",
-  "Cây xanh công cộng nông thôn": "#85d64f",
-  "Cây xanh chuyên dụng": "#3f9c50",
-  "Cây xanh sử dụng hạn chế": "#9bdd6b",
-  "Cây xanh sử dụng hạn chế – công viên thể dục thể thao": "#9bdd6b",
-  "Thể dục thể thao": "#4caf50",
-  "Thể dục thể thao đô thị": "#4caf50",
-  "Thể dục thể thao đơn vị ở": "#57bf5b",
-  "Sân bãi thể thao nông thôn": "#57bf5b",
-
-  "Đất rừng sản xuất": "#2f8a3a",
+  "Nhóm nhà ở": "#ffc013",
+  "Nhóm nhà ở thấp tầng": "#ffd24d",
+  "Nhà ở chung cư": "#d78800",
+  "Nhóm nhà ở trong khu hỗn hợp": "#fe9f24",
+  "Đơn vị ở mới mật độ cao": "#d78800",
+  "Đơn vị ở mới mật độ trung bình": "#ffc013",
+  "Đơn vị ở mới mật độ trung bình (2030)": "#ffc013",
+  "Đơn vị ở mật độ thấp đến năm 2030": "#ffe072",
+  "Đơn vị ở mật độ thấp đến năm 2045": "#ffe072",
+  "Dân cư nông thôn": "#ead57a",
+  "Làng xóm": "#e5cf73",
+  "Làng xóm đô thị hoá": "#deca6a",
+  "Hiện trạng cải tạo chỉnh trang": "#e9d385",
+  "Đất hỗn hợp": "#d04415",
+  "Đất hỗn hợp – nhóm nhà ở": "#d04415",
+  "Đất du lịch": "#ff1fc8",
+  "Du lịch – khu du lịch": "#ff1fc8",
+  "Du lịch – khu dịch vụ": "#ff5fae",
+  "Đất dịch vụ": "#ff0c0c",
+  "Dịch vụ đô thị": "#ff0c0c",
+  "Dịch vụ đơn vị ở": "#ff3e32",
+  "Dịch vụ nông thôn": "#ff3e32",
+  "Sân golf": "#1f994a",
+  "Trường học": "#f97373",
+  "Trường học nông thôn": "#f97373",
+  "Trường THPT": "#ee5959",
+  "Đất đào tạo": "#ee5959",
+  "Đào tạo – nghiên cứu": "#ee5959",
+  "Đất cơ sở y tế": "#ff3182",
+  "Y tế đơn vị ở": "#ff3182",
+  "Đất cơ sở văn hoá": "#c86ad9",
+  "Văn hoá đơn vị ở": "#c86ad9",
+  "Đất cơ quan": "#9676dd",
+  "Di tích": "#a47a5e",
+  "Di tích – tôn giáo": "#a47a5e",
+  "Cây xanh công cộng": "#60c31e",
+  "Cây xanh công cộng đô thị": "#60c31e",
+  "Cây xanh công cộng đơn vị ở": "#71e126",
+  "Cây xanh công cộng nông thôn": "#71e126",
+  "Cây xanh chuyên dụng": "#2f9642",
+  "Cây xanh sử dụng hạn chế": "#87e642",
+  "Cây xanh sử dụng hạn chế – công viên thể dục thể thao": "#87e642",
+  "Thể dục thể thao": "#3ba73f",
+  "Thể dục thể thao đô thị": "#3ba73f",
+  "Thể dục thể thao đơn vị ở": "#39c23e",
+  "Sân bãi thể thao nông thôn": "#39c23e",
+  "Đất rừng sản xuất": "#21852d",
   "Đất rừng phòng hộ": "#1e6b2a",
   "Đất rừng đặc dụng": "#14532d",
-
-  "Đất nông nghiệp": "#dcea87",
-  "Đất nuôi trồng thuỷ sản": "#9fd8cd",
-  "Đất chưa sử dụng": "#e2e2e2",
-
-  "Sông suối": "#2a7fdb",
-  "Sông suối (ngoài ranh giới)": "#5b9fe6",
-  "Hồ nước": "#2f8fe0",
-  "Mặt nước biển": "#1f6fd0",
-  "Mặt nước, hồ ao đầm": "#2f8fe0",
-  "Mặt nước, hồ ao đầm (đô thị)": "#2f8fe0",
-  "Mặt nước, hồ ao đầm (đơn vị ở đến năm 2030)": "#2f8fe0",
-  "Mặt nước, hồ ao đầm (đơn vị ở đến năm 2045)": "#2f8fe0",
-  "Mặt nước sử dụng công cộng (đơn vị ở)": "#49a3e8",
-
-  "Đường giao thông": "#d5d5d5",
-  "Bãi đỗ xe": "#9e9e9e",
-  "Bãi đỗ xe đơn vị ở": "#ababab",
-  "Hạ tầng khác": "#7e57c2",
-  "Hạ tầng khác đô thị": "#7e57c2",
-  "Hạ tầng khác ngoài đô thị": "#8f6ccb",
-  "Hạ tầng kỹ thuật ngoài đô thị": "#8f6ccb",
-  "Nghĩa trang": "#6d6d6d",
-
-  "Sản xuất công nghiệp": "#9575cd",
-  "Đất công nghiệp": "#9575cd",
-  "Sản xuất vật liệu": "#a58ad6",
-
-  "Đất quốc phòng": "#6b7a3a",
-  "Đất an ninh": "#8a9a4a"
+  "Đất nông nghiệp": "#ddf25a",
+  "Đất nuôi trồng thuỷ sản": "#7cd5c4",
+  "Đất chưa sử dụng": "#cbcbcb",
+  "Sông suối": "#1071db",
+  "Sông suối (ngoài ranh giới)": "#2d8ef4",
+  "Hồ nước": "#0c83e8",
+  "Mặt nước biển": "#0a62cd",
+  "Mặt nước, hồ ao đầm": "#0c83e8",
+  "Mặt nước, hồ ao đầm (đô thị)": "#0c83e8",
+  "Mặt nước, hồ ao đầm (đơn vị ở đến năm 2030)": "#0c83e8",
+  "Mặt nước, hồ ao đầm (đơn vị ở đến năm 2045)": "#0c83e8",
+  "Mặt nước sử dụng công cộng (đơn vị ở)": "#1a98f9",
+  "Đường giao thông": "#c0c0c0",
+  "Bãi đỗ xe": "#8e8e8e",
+  "Bãi đỗ xe đơn vị ở": "#9a9a9a",
+  "Hạ tầng khác": "#6b36c7",
+  "Hạ tầng khác đô thị": "#6b36c7",
+  "Hạ tầng khác ngoài đô thị": "#7a49cf",
+  "Hạ tầng kỹ thuật ngoài đô thị": "#7a49cf",
+  "Nghĩa trang": "#626262",
+  "Sản xuất công nghiệp": "#8052d0",
+  "Đất công nghiệp": "#8052d0",
+  "Sản xuất vật liệu": "#8e66d7",
+  "Đất quốc phòng": "#64742e",
+  "Đất an ninh": "#81933b"
  },
-
  "_doc_nhom": [
   "XẾP NHÓM để in BẢNG CHÚ GIẢI trên web. Mỗi màu chỉ thuộc đúng MỘT nhóm, nên chỉ cần",
   "liệt kê màu là suy ra được nhóm của từng loại đất. Thứ tự dưới đây là thứ tự hiện trên web.",
@@ -127,92 +115,369 @@
   "trên bản đồ — không liệt kê loại đất không tồn tại cho đỡ rối."
  ],
  "nhom": {
-  "Đất ở": ["#f2c23e", "#f8d879", "#e0930f", "#edab55", "#fae6a0", "#e8dba4", "#e3d59b", "#dccf90", "#e9dcae"],
-  "Đất hỗn hợp": ["#d4552a"],
-  "Thương mại – dịch vụ – du lịch": ["#ff3fd0", "#ff86c2", "#ee3b3b", "#f4685f", "#2f9e56"],
-  "Công trình công cộng": ["#f2a3a3", "#e78585", "#f0629a", "#cd8fd8", "#b09bdd", "#a98a76"],
-  "Cây xanh – thể dục thể thao": ["#6ec832", "#85d64f", "#3f9c50", "#9bdd6b", "#4caf50", "#57bf5b"],
-  "Rừng": ["#2f8a3a", "#1e6b2a", "#14532d"],
-  "Nông nghiệp": ["#dcea87", "#9fd8cd", "#e2e2e2"],
-  "Mặt nước": ["#2a7fdb", "#5b9fe6", "#2f8fe0", "#1f6fd0", "#49a3e8"],
-  "Giao thông – hạ tầng": ["#d5d5d5", "#9e9e9e", "#ababab", "#7e57c2", "#8f6ccb", "#6d6d6d"],
-  "Công nghiệp": ["#9575cd", "#a58ad6"],
-  "Quốc phòng – an ninh": ["#6b7a3a", "#8a9a4a"]
+  "Đất ở": [
+   "#ffc013",
+   "#ffd24d",
+   "#d78800",
+   "#fe9f24",
+   "#ffe072",
+   "#ead57a",
+   "#e5cf73",
+   "#deca6a",
+   "#e9d385"
+  ],
+  "Đất hỗn hợp": [
+   "#d04415"
+  ],
+  "Thương mại – dịch vụ – du lịch": [
+   "#ff1fc8",
+   "#ff5fae",
+   "#ff0c0c",
+   "#ff3e32",
+   "#1f994a"
+  ],
+  "Công trình công cộng": [
+   "#f97373",
+   "#ee5959",
+   "#ff3182",
+   "#c86ad9",
+   "#9676dd",
+   "#a47a5e"
+  ],
+  "Cây xanh – thể dục thể thao": [
+   "#60c31e",
+   "#71e126",
+   "#2f9642",
+   "#87e642",
+   "#3ba73f",
+   "#39c23e"
+  ],
+  "Rừng": [
+   "#21852d",
+   "#1e6b2a",
+   "#14532d"
+  ],
+  "Nông nghiệp": [
+   "#ddf25a",
+   "#7cd5c4",
+   "#cbcbcb"
+  ],
+  "Mặt nước": [
+   "#1071db",
+   "#2d8ef4",
+   "#0c83e8",
+   "#0a62cd",
+   "#1a98f9"
+  ],
+  "Giao thông – hạ tầng": [
+   "#c0c0c0",
+   "#8e8e8e",
+   "#9a9a9a",
+   "#6b36c7",
+   "#7a49cf",
+   "#626262"
+  ],
+  "Công nghiệp": [
+   "#8052d0",
+   "#8e66d7"
+  ],
+  "Quốc phòng – an ninh": [
+   "#64742e",
+   "#81933b"
+  ]
  },
-
  "luat": [
-  ["nghia trang", "#6d6d6d"],
-  ["rung phong ho", "#1e6b2a"],
-  ["rung dac dung", "#14532d"],
-  ["rung", "#2f8a3a"],
-  ["cxhc", "#9bdd6b"],
-  ["cay xanh", "#6ec832"],
-  ["cayxanh", "#6ec832"],
-  ["cv tdtt", "#9bdd6b"],
-  ["tdtt", "#4caf50"],
-  ["the duc", "#4caf50"],
-  ["the thao", "#4caf50"],
-  ["golf", "#2f9e56"],
-  ["mat nuoc", "#2f8fe0"],
-  ["matnuoc", "#2f8fe0"],
-  ["song suoi", "#2a7fdb"],
-  ["songsuoi", "#2a7fdb"],
-  ["ho nuoc", "#2f8fe0"],
-  ["honuoc", "#2f8fe0"],
-  ["dam", "#2f8fe0"],
-  ["kenh", "#2a7fdb"],
-  ["bai do xe", "#9e9e9e"],
-  ["bai do", "#9e9e9e"],
-  ["dodxe", "#9e9e9e"],
-  ["do xe", "#9e9e9e"],
-  ["giao thong", "#d5d5d5"],
-  ["duonggt", "#d5d5d5"],
-  ["truong", "#f2a3a3"],
-  ["dao tao", "#e78585"],
-  ["daotao", "#e78585"],
-  ["y te", "#f0629a"],
-  ["yte", "#f0629a"],
-  ["van hoa", "#cd8fd8"],
-  ["vanhoa", "#cd8fd8"],
-  ["co quan", "#b09bdd"],
-  ["coquan", "#b09bdd"],
-  ["di tich", "#a98a76"],
-  ["ton giao", "#a98a76"],
-  ["du lich", "#ff3fd0"],
-  ["dulich", "#ff3fd0"],
-  ["dich vu", "#ee3b3b"],
-  ["dichvu", "#ee3b3b"],
-  ["thuong mai", "#ee3b3b"],
-  ["hon hop", "#d4552a"],
-  ["honhop", "#d4552a"],
-  ["cong nghiep", "#9575cd"],
-  ["congnghiep", "#9575cd"],
-  ["vat lieu", "#a58ad6"],
-  ["quoc phong", "#6b7a3a"],
-  ["quocphong", "#6b7a3a"],
-  ["an ninh", "#8a9a4a"],
-  ["anninh", "#8a9a4a"],
-  ["ha tang", "#7e57c2"],
-  ["hatang", "#7e57c2"],
-  ["thuy san", "#9fd8cd"],
-  ["nuoi trong", "#9fd8cd"],
-  ["nong nghiep", "#dcea87"],
-  ["nongnghiep", "#dcea87"],
-  ["lua", "#dcea87"],
-  ["chua su dung", "#e2e2e2"],
-  ["lang xom", "#e3d59b"],
-  ["langxom", "#e3d59b"],
-  ["dan cu", "#e8dba4"],
-  ["dancu", "#e8dba4"],
-  ["chung cu", "#e0930f"],
-  ["chungcu", "#e0930f"],
-  ["mat do cao", "#e0930f"],
-  ["mat do thap", "#fae6a0"],
-  ["don vi o", "#f2c23e"],
-  ["donvio", "#f2c23e"],
-  ["nhom nha o", "#f2c23e"],
-  ["nhomnhao", "#f2c23e"],
-  ["nha o", "#f2c23e"],
-  ["nhao", "#f2c23e"]
+  [
+   "nghia trang",
+   "#626262"
+  ],
+  [
+   "rung phong ho",
+   "#1e6b2a"
+  ],
+  [
+   "rung dac dung",
+   "#14532d"
+  ],
+  [
+   "rung",
+   "#21852d"
+  ],
+  [
+   "cxhc",
+   "#87e642"
+  ],
+  [
+   "cay xanh",
+   "#60c31e"
+  ],
+  [
+   "cayxanh",
+   "#60c31e"
+  ],
+  [
+   "cv tdtt",
+   "#87e642"
+  ],
+  [
+   "tdtt",
+   "#3ba73f"
+  ],
+  [
+   "the duc",
+   "#3ba73f"
+  ],
+  [
+   "the thao",
+   "#3ba73f"
+  ],
+  [
+   "golf",
+   "#1f994a"
+  ],
+  [
+   "mat nuoc",
+   "#0c83e8"
+  ],
+  [
+   "matnuoc",
+   "#0c83e8"
+  ],
+  [
+   "song suoi",
+   "#1071db"
+  ],
+  [
+   "songsuoi",
+   "#1071db"
+  ],
+  [
+   "ho nuoc",
+   "#0c83e8"
+  ],
+  [
+   "honuoc",
+   "#0c83e8"
+  ],
+  [
+   "dam",
+   "#0c83e8"
+  ],
+  [
+   "kenh",
+   "#1071db"
+  ],
+  [
+   "bai do xe",
+   "#8e8e8e"
+  ],
+  [
+   "bai do",
+   "#8e8e8e"
+  ],
+  [
+   "dodxe",
+   "#8e8e8e"
+  ],
+  [
+   "do xe",
+   "#8e8e8e"
+  ],
+  [
+   "giao thong",
+   "#c0c0c0"
+  ],
+  [
+   "duonggt",
+   "#c0c0c0"
+  ],
+  [
+   "truong",
+   "#f97373"
+  ],
+  [
+   "dao tao",
+   "#ee5959"
+  ],
+  [
+   "daotao",
+   "#ee5959"
+  ],
+  [
+   "y te",
+   "#ff3182"
+  ],
+  [
+   "yte",
+   "#ff3182"
+  ],
+  [
+   "van hoa",
+   "#c86ad9"
+  ],
+  [
+   "vanhoa",
+   "#c86ad9"
+  ],
+  [
+   "co quan",
+   "#9676dd"
+  ],
+  [
+   "coquan",
+   "#9676dd"
+  ],
+  [
+   "di tich",
+   "#a47a5e"
+  ],
+  [
+   "ton giao",
+   "#a47a5e"
+  ],
+  [
+   "du lich",
+   "#ff1fc8"
+  ],
+  [
+   "dulich",
+   "#ff1fc8"
+  ],
+  [
+   "dich vu",
+   "#ff0c0c"
+  ],
+  [
+   "dichvu",
+   "#ff0c0c"
+  ],
+  [
+   "thuong mai",
+   "#ff0c0c"
+  ],
+  [
+   "hon hop",
+   "#d04415"
+  ],
+  [
+   "honhop",
+   "#d04415"
+  ],
+  [
+   "cong nghiep",
+   "#8052d0"
+  ],
+  [
+   "congnghiep",
+   "#8052d0"
+  ],
+  [
+   "vat lieu",
+   "#8e66d7"
+  ],
+  [
+   "quoc phong",
+   "#64742e"
+  ],
+  [
+   "quocphong",
+   "#64742e"
+  ],
+  [
+   "an ninh",
+   "#81933b"
+  ],
+  [
+   "anninh",
+   "#81933b"
+  ],
+  [
+   "ha tang",
+   "#6b36c7"
+  ],
+  [
+   "hatang",
+   "#6b36c7"
+  ],
+  [
+   "thuy san",
+   "#7cd5c4"
+  ],
+  [
+   "nuoi trong",
+   "#7cd5c4"
+  ],
+  [
+   "nong nghiep",
+   "#ddf25a"
+  ],
+  [
+   "nongnghiep",
+   "#ddf25a"
+  ],
+  [
+   "lua",
+   "#ddf25a"
+  ],
+  [
+   "chua su dung",
+   "#cbcbcb"
+  ],
+  [
+   "lang xom",
+   "#e5cf73"
+  ],
+  [
+   "langxom",
+   "#e5cf73"
+  ],
+  [
+   "dan cu",
+   "#ead57a"
+  ],
+  [
+   "dancu",
+   "#ead57a"
+  ],
+  [
+   "chung cu",
+   "#d78800"
+  ],
+  [
+   "chungcu",
+   "#d78800"
+  ],
+  [
+   "mat do cao",
+   "#d78800"
+  ],
+  [
+   "mat do thap",
+   "#ffe072"
+  ],
+  [
+   "don vi o",
+   "#ffc013"
+  ],
+  [
+   "donvio",
+   "#ffc013"
+  ],
+  [
+   "nhom nha o",
+   "#ffc013"
+  ],
+  [
+   "nhomnhao",
+   "#ffc013"
+  ],
+  [
+   "nha o",
+   "#ffc013"
+  ],
+  [
+   "nhao",
+   "#ffc013"
+  ]
  ]
 }

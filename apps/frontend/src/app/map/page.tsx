@@ -112,7 +112,7 @@ const RASTER_OVERLAYS = [
     tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png'], minzoom: 12, maxzoom: 18,
     coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ⚠️ BỐN BỘ TILE PHÂN KHU ĐÃ ĐƯỢC TÔ LẠI MÀU THEO LOẠI ĐẤT (12/9/2026)
-  // (qd2076v5 · qd2101v6 · qd2222v6 · qd918v2 — trước đó là v4/v5/v5/v1).
+  // (qd2076v6 · qd2101v7 · qd2222v7 · qd918v3 — trước đó là v4/v5/v5/v1).
   // Lý do: màu trong bản vẽ CAD được chọn để xem trên NỀN ĐEN của MicroStation nên rất nhiều
   // ô tối ở mức 15–30%. Đo trên bộ tile cũ qd918v1: 38% diện tích là #3f7f6f, 21% là #264c2f,
   // 11% là #262613 — mà #262613 là RGB(38,38,19), gần như màu đen. Trên nền vệ tinh nhìn ra
@@ -123,6 +123,8 @@ const RASTER_OVERLAYS = [
   // (bước scripts/qh-pipeline/7-to-mau-loai-dat.py). Tên loại đất KHÔNG đổi — vẫn lấy từ tên
   // level trong bản vẽ — chỉ đổi màu hiển thị. Loại đất nào chưa khai màu thì GIỮ NGUYÊN màu CAD.
   // Đã kiểm: QĐ2101 tô lại 1.637/1.637 ô · QĐ2076 2.056/2.056 · QĐ918 454/454 · QĐ2222 514/531.
+  // Bản v6/v7/v7/v3 (13/9/2026): chủ dự án xem thấy màu còn NHẠT hơn app nên đã kéo đậm
+  // đồng loạt — tăng độ tươi 22%, hạ độ sáng 10% (màu vốn đã tối như rừng thì giữ nguyên).
   // Cắt từ z8 (trước là z12) để thu nhỏ nhìn cả huyện vẫn thấy quy hoạch.
   // ⚠️ BA BỘ TILE DƯỚI ĐÂY (qd2076v4 · qd2101v5 · qd2222v5) DỰNG TỪ BỘ ĐỌC DXF MỚI
   // (scripts/qh-pipeline/1b-doc-dxf.py). Bộ cũ đi qua ogr2ogr và LÀM RƠI mọi level có tên
@@ -140,7 +142,7 @@ const RASTER_OVERLAYS = [
   // có 1.792 vùng nhưng tới 48.411 nét (chỉ giới đường đỏ, lề đường, ranh phân khu). Bỏ nét đi thì
   // nhìn chỉ thấy mấy mảng màu rời rạc, khác hẳn lúc mở file CAD gốc.
   { id: 'qh-qd2076', name: 'Quy hoạch phân khu phía Bắc QĐ2076 (1/2000)', url: '',
-    tiles: ['/tiles/qd2076v5/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2076v6/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.0288, 12.2004], [109.2513, 12.2004], [109.2513, 12.0527], [109.0288, 12.0527]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ2101 · quy hoạch phân khu trung tâm 1/2000 ────────────────────────────────────
   // Bản "v3" sửa hai lỗi của v2:
@@ -155,7 +157,7 @@ const RASTER_OVERLAYS = [
   // /tiles/ là `immutable, max-age=1 năm` nên trình duyệt và Cloudflare sẽ giữ nguyên ảnh cũ
   // cả năm, sửa xong mà người dùng vẫn thấy y như trước.
   { id: 'qh-qd2101', name: 'Quy hoạch phân khu trung tâm QĐ2101 (1/2000)', url: '',
-    tiles: ['/tiles/qd2101v6/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2101v7/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.1187, 12.0793], [109.2041, 12.0793], [109.2041, 11.99], [109.1187, 11.99]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ2222 · quy hoạch 1/2000 ──────────────────────────────────────────────────────
   // Bản "v3" sửa lỗi "mảng xám" của v2: v2 được cắt từ bản dữ liệu CŨ, lúc đó một số ô đất
@@ -167,12 +169,12 @@ const RASTER_OVERLAYS = [
   // Khung bao thu hẹp theo đúng ranh giới thật: trước ghi vươn ra tận 109.33 chỉ vì ô chú giải
   // nằm ngoài đó, chứ quy hoạch không hề trải tới chỗ ấy.
   { id: 'qh-qd2222', name: 'Quy hoạch QĐ2222 (1/2000)', url: '',
-    tiles: ['/tiles/qd2222v6/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2222v7/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.1630, 12.1505], [109.2237, 12.1505], [109.2237, 12.0258], [109.1630, 12.0258]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ918 · quy hoạch phân khu PHỨC HỢP PHÍA TÂY 1/2000 ────────────────────────────
   // Bản gốc là DGN V8, không công cụ nào trên máy đọc nổi; chủ dự án xuất ra DXF rồi mới nạp được.
   { id: 'qh-qd918', name: 'Quy hoạch phân khu phức hợp phía Tây QĐ918 (1/2000)', url: '',
-    tiles: ['/tiles/qd918v2/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd918v3/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.0372, 12.1265], [109.1454, 12.1265], [109.1454, 11.9569], [109.0372, 11.9569]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ893 · quy hoạch SỬ DỤNG ĐẤT đến 2030, phủ TOÀN huyện Cam Lâm cũ ───────
   // Bản này KHÔNG cần lớp nét: nó vốn là các mảng tô kín (nông nghiệp, đất ở, giao thông, mặt

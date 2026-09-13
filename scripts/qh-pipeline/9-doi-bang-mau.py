@@ -48,9 +48,12 @@ def _khong_dau(x):
 
 try:
     with io.open(os.path.join(HERE, 'mau-sua-rieng.json'), encoding='utf-8') as _fp:
-        SUA_RIENG = {_khong_dau(k): v for k, v in json.load(_fp)['mau'].items()}
+        _sr = json.load(_fp)
+    SUA_RIENG = {_khong_dau(k): v for k, v in _sr['mau'].items()}
+    # Hoa văn vẽ đè lên nền (vd 'cong' = lưới dấu +), bước 3-cat-tile.py đọc trường 'hoa'
+    HOA_VAN = {_khong_dau(k): v for k, v in (_sr.get('hoaVan') or {}).items()}
 except Exception:
-    SUA_RIENG = {}
+    SUA_RIENG, HOA_VAN = {}, {}
 
 
 def nap_bang(ten):
@@ -85,10 +88,12 @@ def main(vao, ra, ten_bang):
         else:
             giu += 1
         # Ép màu cho loại đất nào bị các bản vẽ tô không thống nhất
-        m = SUA_RIENG.get(_khong_dau(_z5.ten_loai(p.get('lo', ''))))
+        loai = _khong_dau(_z5.ten_loai(p.get('lo', '')))
+        m = SUA_RIENG.get(loai)
         if m:
             p['c'] = m
             ep[_z5.ten_loai(p.get('lo', ''))] += 1
+        p['hoa'] = HOA_VAN.get(loai, '')
     with io.open(ra, 'w', encoding='utf-8') as fp:
         json.dump(d, fp, ensure_ascii=False)
     print('%s → %s   (bảng màu: %s)' % (os.path.basename(vao), os.path.basename(ra), ten_bang))

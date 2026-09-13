@@ -77,6 +77,29 @@ except Exception:
 lyr.setRenderer(QgsSingleSymbolRenderer(sym))
 QgsProject.instance().addMapLayer(lyr)
 
+# ── HOA VĂN vẽ đè lên nền (trường 'hoa', do bước 9-doi-bang-mau.py ghi) ───────
+# 'cong' = lưới dấu "+" đen, giống app tham chiếu vẽ Cây xanh chuyên dụng (bản vẽ gốc: hoa văn CROSS).
+# Tính bằng ĐIỂM ẢNH chứ không theo mét: app giữ dấu cùng cỡ ở mọi mức phóng.
+# Bước lặp 8 điểm ảnh (app đo được ~6,5): 256 chia hết cho 8 nên dấu nối liền qua mép các ô ảnh.
+if 'hoa' in ten_truong:
+    from qgis.core import QgsPointPatternFillSymbolLayer, QgsMarkerSymbol
+    lyr_hoa = QgsVectorLayer(SRC, 'hoavan', 'ogr')
+    lyr_hoa.setSubsetString("\"hoa\" = 'cong'")
+    so_hoa = lyr_hoa.featureCount()
+    if so_hoa > 0:
+        dau = QgsMarkerSymbol.createSimple({'name': 'cross', 'size': '5', 'size_unit': 'Pixel',
+                                            'color': '0,0,0', 'outline_color': '0,0,0',
+                                            'outline_width': '1', 'outline_width_unit': 'Pixel'})
+        luoi = QgsPointPatternFillSymbolLayer.create({'distance_x': '8', 'distance_y': '8',
+                                                     'distance_x_unit': 'Pixel', 'distance_y_unit': 'Pixel'})
+        luoi.setSubSymbol(dau)
+        sh = QgsFillSymbol()
+        sh.changeSymbolLayer(0, luoi)
+        lyr_hoa.setRenderer(QgsSingleSymbolRenderer(sh))
+        QgsProject.instance().addMapLayer(lyr_hoa, False)
+        QgsProject.instance().layerTreeRoot().insertLayer(0, lyr_hoa)   # trên lớp nền
+        print('Hoa văn dấu +: %d vùng' % so_hoa)
+
 # ── Lớp NÉT vẽ đè lên trên (đường, chỉ giới, lề đường…) ─────────────────────
 lyr_net = None
 if NET:

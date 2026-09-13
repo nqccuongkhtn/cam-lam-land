@@ -476,11 +476,12 @@ export default function MapPage() {
   // Mặc định 70% chứ không phải đặc kín: bật lớp quy hoạch ở 100% thì ranh thửa và số thửa
   // bên dưới bị chìm hẳn, mà người xem chủ yếu cần đối chiếu THỬA với quy hoạch.
   // Ai muốn xem màu thật thì kéo thanh 'Độ mờ' lên 100%.
-  // Độ mờ lớp quy hoạch, mặc định 80% (chủ dự án chọn). 100% thì quy hoạch phủ kín, không
-  // còn thấy nhà cửa/đường thật bên dưới để định vị; 70% thì ảnh vệ tinh tối lẫn lên làm màu
-  // bị xỉn. 80% là chỗ vừa: màu vẫn tươi mà vẫn thấy lờ mờ nền vệ tinh để biết mình đang ở đâu.
-  // Từ 12/9/2026 màu quy hoạch đã được tô lại cho tươi nên hạ độ mờ không còn làm màu bị đục.
-  const [opacity, setOpacity] = useState(0.8);
+  // Độ mờ lớp quy hoạch — MẶC ĐỊNH 100%, đừng hạ xuống.
+  // Để 80% thì MỌI MÀU đều bị trộn với ảnh vệ tinh bên dưới nên lệch hẳn so với bản vẽ gốc:
+  // đất ở #ffdf7f hoá #dac373, dịch vụ #ff7f7f hoá #da7673 — nhìn xỉn đi và KHÔNG còn khớp
+  // với màu thấy trong MicroStation. Mà đây là bản đồ quy hoạch, màu phải đúng bản vẽ được
+  // duyệt. Ai muốn thấy nhà cửa bên dưới thì tự kéo thanh "Độ mờ" xuống.
+  const [opacity, setOpacity] = useState(1);
   const [canDelete, setCanDelete] = useState(false);
   // BẢNG CHÚ GIẢI của bản đồ quy hoạch phân khu. Từ 12/9/2026 bốn bản phân khu được tô màu
   // theo LOẠI ĐẤT (xem ghi chú ở RASTER_OVERLAYS) nên phải có chú giải, không thì người xem
@@ -1193,17 +1194,24 @@ export default function MapPage() {
   );
 
   // ---- Nhóm điều khiển dùng chung cho desktop (inline) và mobile (bảng mở rộng) ----
-  // Nền bản đồ: dùng Ô SỔ XUỐNG cho gọn, giống mấy ô tra cứu bên cạnh.
-  // Ba nút bấm cũ chiếm gần 200px trên thanh công cụ, mà người dùng đổi nền rất thưa —
-  // nhường chỗ đó cho Chú giải và Đo - vẽ thì đáng hơn.
-  const baseMapCtrl = (full = false) => (
+  // Nền bản đồ. MÁY TÍNH giữ 3 nút như cũ (màn rộng, bấm một phát là xong).
+  // ĐIỆN THOẠI dùng Ô SỔ XUỐNG: màn hẹp, 3 nút chiếm gần hết một hàng, mà từ khi nhóm
+  // 'Bản đồ' trên thanh trên được nhường chỗ cho Chú giải thì ô này nằm trong bảng lớp,
+  // chỗ đó càng phải gọn.  (full = true nghĩa là đang vẽ cho điện thoại.)
+  const baseMapCtrl = (full = false) => (full ? (
     <select value={baseMap} onChange={(e) => setBaseMap(e.target.value as BaseMap)}
-      className={`rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs font-semibold text-slate-700 outline-none focus:border-emerald-600 ${full ? 'w-full' : ''}`}>
+      className="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs font-semibold text-slate-700 outline-none focus:border-emerald-600">
       {([['street', '🗺 Nền: Đường'], ['satellite', '🛰 Nền: Vệ tinh'], ['terrain', '⛰ Nền: Địa hình']] as [BaseMap, string][]).map(([b, l]) => (
         <option key={b} value={b}>{l}</option>
       ))}
     </select>
-  );
+  ) : (
+    <div className="flex items-center gap-0.5 rounded-lg bg-slate-100 p-0.5">
+      {([['street', 'Đường'], ['satellite', 'Vệ tinh'], ['terrain', 'Địa hình']] as [BaseMap, string][]).map(([b, l]) => (
+        <button key={b} onClick={() => setBaseMap(b)} className={`px-3 py-1 rounded-md text-xs font-semibold transition ${baseMap === b ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>{l}</button>
+      ))}
+    </div>
+  ));
   const labelsCtrl = () => (
     <label className="flex items-center gap-1.5 text-xs font-medium text-slate-600 cursor-pointer whitespace-nowrap">
       <input type="checkbox" checked={labels} onChange={(e) => setLabels(e.target.checked)} className="accent-emerald-600 w-4 h-4" />Nhãn & đường
@@ -1283,15 +1291,17 @@ export default function MapPage() {
       <button onClick={doSearch} className={`cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white px-4 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap ${full ? 'w-full mt-1' : ''}`}>Tra cứu</button>
     </div>
   );
-  const measureCtrl = () => (
+  // dt = true: đang vẽ cho ĐIỆN THOẠI. Chỉ ở điện thoại mới gộp "Vẽ thửa từ toạ độ" vào
+  // nhóm này (màn hẹp, gom ba công cụ TỰ TẠO HÌNH vào một chỗ cho dễ tìm). Máy tính giữ
+  // nguyên như cũ: nhãn "Đo:" và nút vẽ thửa nằm ở bảng lớp bên trái.
+  const measureCtrl = (dt = false) => (
     <div className="flex items-center gap-1.5 flex-wrap">
-      <span className="text-xs text-slate-400">Đo - vẽ:</span>
+      <span className="text-xs text-slate-400">{dt ? 'Đo - vẽ:' : 'Đo:'}</span>
       {mBtn('distance', '📏 Dài')}{mBtn('area', '⬛ Diện tích')}
-      {/* Vẽ thửa từ toạ độ đứng chung nhóm "Đo - vẽ" cho đúng nghĩa: cả ba đều là công cụ
-          người dùng TỰ TẠO hình trên bản đồ. Trước đây nút này nằm lẻ trong bảng lớp bên trái,
-          chỗ đó toàn là bật/tắt lớp có sẵn nên lạc quẻ và khó tìm. */}
-      <button onClick={() => setDrawOpen(true)}
-        className="cl-press px-2 py-1 rounded text-xs font-medium border bg-white border-slate-300 text-slate-700 whitespace-nowrap hover:bg-slate-50">✏️ Vẽ thửa từ toạ độ</button>
+      {dt && (
+        <button onClick={() => setDrawOpen(true)}
+          className="cl-press px-2 py-1 rounded text-xs font-medium border bg-white border-slate-300 text-slate-700 whitespace-nowrap hover:bg-slate-50">✏️ Vẽ thửa từ toạ độ</button>
+      )}
       {measure !== 'off' && <button onClick={() => { setMeasure('off'); setMResult(null); }} className="px-2 py-1 rounded text-xs border border-slate-300 whitespace-nowrap">Xong</button>}
       {mResult && mResult.points > 0 && (
         <span className="text-xs font-bold text-orange-700 ml-1 whitespace-nowrap">{mResult.mode === 'distance' ? `Dài: ${fmtLen(mResult.distance)}` : `S: ${fmtArea(mResult.area)}`}</span>
@@ -1407,7 +1417,7 @@ export default function MapPage() {
           <div className="lg:hidden border-t border-slate-100 bg-slate-50 px-3 py-3">
             {tool === 'search' && (<><p className="text-[11px] font-semibold text-slate-500 mb-1.5">Tra cứu theo toạ độ / số thửa</p>{searchCtrl(true)}</>)}
             {tool === 'chugiai' && (<><p className="text-[11px] font-semibold text-slate-500 mb-1.5">Chú giải loại đất</p>{chuGiaiNoiDung()}</>)}
-            {tool === 'measure' && (<><p className="text-[11px] font-semibold text-slate-500 mb-1.5">Đo khoảng cách · diện tích · vẽ thửa</p>{measureCtrl()}</>)}
+            {tool === 'measure' && (<><p className="text-[11px] font-semibold text-slate-500 mb-1.5">Đo khoảng cách · diện tích · vẽ thửa</p>{measureCtrl(true)}</>)}
           </div>
         )}
       </div>
@@ -1422,6 +1432,9 @@ export default function MapPage() {
             <button onClick={() => setPanelOpen(false)} className="lg:hidden text-slate-400 hover:text-slate-700 text-xl leading-none">✕</button>
           </div>
           <p className="text-xs text-slate-500 mb-2.5">Cam Lâm, Khánh Hòa · EPSG:4326</p>
+          {/* Máy tính: giữ nguyên nút này ở bảng lớp như cũ. Điện thoại thì nó đã nằm trong
+              nhóm "Đo - vẽ" ở thanh trên rồi, để thêm ở đây là thừa. */}
+          <button onClick={() => setDrawOpen(true)} className="cl-press hidden lg:flex w-full mb-3 items-center justify-center gap-2 bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-bold py-2.5 rounded-lg">✏️ Vẽ thửa từ toạ độ</button>
           {/* Ô chọn nền bản đồ nằm ở đây vì trên điện thoại nhóm 'Bản đồ' ở thanh trên đã được
               nhường chỗ cho Chú giải. Máy tính vẫn có ô này ở thanh trên, để đây thêm cũng không
               thừa: người dùng hay mở bảng lớp rồi mới nghĩ đến chuyện đổi nền. */}

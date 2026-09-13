@@ -52,8 +52,10 @@ try:
     SUA_RIENG = {_khong_dau(k): v for k, v in _sr['mau'].items()}
     # Hoa văn vẽ đè lên nền (vd 'cong' = lưới dấu +), bước 3-cat-tile.py đọc trường 'hoa'
     HOA_VAN = {_khong_dau(k): v for k, v in (_sr.get('hoaVan') or {}).items()}
+    # Sửa theo SỐ HIỆU MÀU bản vẽ (mọi loại đất cùng số màu), áp ngay sau khi tra bảng
+    SO_MAU = {int(k): v for k, v in (_sr.get('soMau') or {}).items()}
 except Exception:
-    SUA_RIENG, HOA_VAN = {}, {}
+    SUA_RIENG, HOA_VAN, SO_MAU = {}, {}, {}
 
 
 def nap_bang(ten):
@@ -82,7 +84,7 @@ def main(vao, ra, ten_bang):
         p = f.get('properties') or {}
         ci = p.get('ci') or 0
         if 1 <= ci <= 255:
-            p['c'] = bang[ci]
+            p['c'] = SO_MAU.get(ci, bang[ci])
             doi += 1
             dem[(ci, bang[ci])] += 1
         else:

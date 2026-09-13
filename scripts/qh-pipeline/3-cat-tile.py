@@ -112,10 +112,18 @@ if NET:
     # 0.25mm: đủ mảnh để ở mức phóng gần không che mất ô đất, vẫn thấy rõ mạng đường.
     sn = QgsLineSymbol.createSimple({'color': '0,0,0', 'width': '0.25'})
     sln = sn.symbolLayer(0)
+    # NHÌN XA THÌ NÉT MẢNH + NHẠT (13/9/2026). Cùng một nét 0,25mm ở mọi mức phóng thì khi thu
+    # nhỏ, hàng trăm km nét (hè đường, tim đường, chỉ giới) dồn vào một ô ảnh, phủ kín mảng màu —
+    # chủ dự án so với app thấy dải QĐ2222 "sẫm và rối". App phóng gần thì nét vẫn đầy đủ.
+    # Tỉ lệ bản đồ khi cắt tile ở 96 DPI: z14 ≈ 1:36.000 · z15 ≈ 1:18.000 · z16 ≈ 1:9.000.
+    BAC = "CASE WHEN @map_scale > 25000 THEN %s WHEN @map_scale > 12000 THEN %s ELSE %s END"
+    mau_net = "set_color_part(\"%s\", 'alpha', %s)" % (COLOR_FIELD, BAC % (160, 215, 255))
     try:
-        sln.setDataDefinedProperty(QgsSymbolLayer.PropertyStrokeColor, QgsProperty.fromField(COLOR_FIELD))
+        P_MAU, P_RONG = QgsSymbolLayer.PropertyStrokeColor, QgsSymbolLayer.PropertyStrokeWidth
     except Exception:
-        sln.setDataDefinedProperty(QgsSymbolLayer.Property.PropertyStrokeColor, QgsProperty.fromField(COLOR_FIELD))
+        P_MAU, P_RONG = QgsSymbolLayer.Property.PropertyStrokeColor, QgsSymbolLayer.Property.PropertyStrokeWidth
+    sln.setDataDefinedProperty(P_MAU, QgsProperty.fromExpression(mau_net))
+    sln.setDataDefinedProperty(P_RONG, QgsProperty.fromExpression(BAC % (0.17, 0.21, 0.25)))
     lyr_net.setRenderer(QgsSingleSymbolRenderer(sn))
     QgsProject.instance().addMapLayer(lyr_net, False)
     # Chèn vào ĐẦU cây lớp = nằm TRÊN CÙNG khi vẽ.

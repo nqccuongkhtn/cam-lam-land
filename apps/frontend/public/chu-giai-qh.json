@@ -17,16 +17,10 @@
      "so": 435
     },
     {
-     "mau": "#6f6f41",
-     "ten": "Nhóm nhà ở (hiện trạng) · Làng xóm đô thị hoá (hiện trạng) + 3 loại nữa",
-     "dayDu": "Nhóm nhà ở (hiện trạng) · Làng xóm đô thị hoá (hiện trạng) · Dân cư nông thôn (hiện trạng) · Dân cư nông thôn · Làng xóm đô thị hoá",
-     "so": 259
-    },
-    {
-     "mau": "#444428",
-     "ten": "Làng xóm (hiện trạng) · Làng xóm",
-     "dayDu": "Làng xóm (hiện trạng) · Làng xóm",
-     "so": 139
+     "mau": "#979763",
+     "ten": "Nhóm nhà ở (hiện trạng) · Làng xóm (hiện trạng) + 5 loại nữa",
+     "dayDu": "Nhóm nhà ở (hiện trạng) · Làng xóm (hiện trạng) · Làng xóm đô thị hoá (hiện trạng) · Dân cư nông thôn (hiện trạng) · Làng xóm · Dân cư nông thôn · Làng xóm đô thị hoá",
+     "so": 398
     },
     {
      "mau": "#cc4619",
@@ -70,15 +64,21 @@
    "muc": [
     {
      "mau": "#cc1919",
-     "ten": "Dịch vụ đơn vị ở · Đất dịch vụ + 2 loại nữa",
-     "dayDu": "Dịch vụ đơn vị ở · Đất dịch vụ · Dịch vụ đô thị · Đất dịch vụ (hiện trạng)",
-     "so": 162
+     "ten": "Dịch vụ đơn vị ở · Dịch vụ đô thị",
+     "dayDu": "Dịch vụ đơn vị ở · Dịch vụ đô thị",
+     "so": 125
     },
     {
      "mau": "#e94fe9",
      "ten": "Đất du lịch · Đất du lịch (hiện trạng) + 1 loại nữa",
      "dayDu": "Đất du lịch · Đất du lịch (hiện trạng) · Du lịch – khu du lịch",
      "so": 94
+    },
+    {
+     "mau": "#cc19cc",
+     "ten": "Đất dịch vụ · Đất dịch vụ (hiện trạng)",
+     "dayDu": "Đất dịch vụ · Đất dịch vụ (hiện trạng)",
+     "so": 44
     },
     {
      "mau": "#f5abbd",
@@ -97,18 +97,6 @@
      "ten": "Sân golf",
      "dayDu": "Sân golf",
      "so": 5
-    },
-    {
-     "mau": "#e94f4f",
-     "ten": "Đất dịch vụ",
-     "dayDu": "Đất dịch vụ",
-     "so": 4
-    },
-    {
-     "mau": "#cc19cc",
-     "ten": "Đất dịch vụ",
-     "dayDu": "Đất dịch vụ",
-     "so": 3
     }
    ]
   },

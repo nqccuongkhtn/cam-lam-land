@@ -51,25 +51,37 @@
   "  = nền mint #d5f7df + dấu '+' đen xếp lưới. Bản vẽ gốc cũng ghi hoa văn CROSS cho mọi ô loại này.",
   "  Nền đặt ở mục 'mau', hoa văn đặt ở mục 'hoaVan' (bước 9 ghi trường 'hoa', bước 3 vẽ dấu).",
   "  Đo ảnh app: dấu lặp 13 điểm ảnh trên ảnh chụp 2x ≈ 6,5 điểm ảnh thật.",
+  "→ Sau đó chủ dự án: 'đất dịch vụ ra hồng tím rồi nhưng chưa trùng với những phân khu khác'",
+  "  → ÉP LẠI 'Đất dịch vụ' nhưng về HỒNG TÍM #cc19cc (màu QĐ2076 = màu app), không phải đỏ.",
+  "→ Chủ dự án: 'đất ở của phân khu phía Tây chưa bằng app'. Đo ảnh app: MỌI mảng ô liu",
+  "  (Làng xóm QĐ918, Làng xóm đô thị hoá / Dân cư nông thôn QĐ2076, Nhóm nhà ở ô liu QĐ2101)",
+  "  đều ra #979763, trong khi web ra #444428 (số màu 59) và #6f6f41 (số màu 57) — tối hơn hẳn.",
+  "  → Thêm mục 'soMau': sửa màu THEO SỐ HIỆU MÀU bản vẽ, áp ngay sau khi tra bảng, trước 'mau'.",
+  "  Dùng mục này khi app tô sai lệch theo SỐ MÀU (mọi loại đất cùng số màu đều lệch như nhau).",
   "",
   "Lưu ý khi đổi hệ số làm tươi: mã màu ghi trong bảng này phải QUY ĐỔI THEO, nếu không nó",
   "vẫn giữ màu tính theo hệ số cũ và lệch hẳn so với phần còn lại của bản đồ."
  ],
+ "soMau": {
+  "57": "#979763",
+  "59": "#979763"
+ },
  "hoaVan": {
   "Cây xanh chuyên dụng": "cong"
  },
  "mau": {
   "Cây xanh chuyên dụng": "#d5f7df",
+  "Đất dịch vụ": "#cc19cc",
   "Sản xuất công nghiệp": "#7000e2",
   "Đất công nghiệp": "#7000e2",
-  "Dân cư nông thôn": "#6f6f41",
+  "Dân cư nông thôn": "#979763",
   "Đất quốc phòng": "#354428",
   "Trường học": "#a05d5d",
   "Đất cơ sở y tế": "#e94fc2",
   "Đất an ninh": "#84a915",
   "Đất cơ sở văn hoá": "#b37e8b",
   "Nhóm nhà ở thấp tầng": "#cc9f19",
-  "Làng xóm": "#444428",
+  "Làng xóm": "#979763",
   "Cây xanh sử dụng hạn chế": "#15a915",
   "Sông suối": "#1972cc",
   "Đất du lịch": "#e94fe9",
@@ -79,6 +91,6 @@
   "Hạ tầng khác": "#352a7e",
   "Thể dục thể thao": "#15a915",
   "Hồ nước": "#155ea9",
-  "Làng xóm đô thị hoá": "#6f6f41"
+  "Làng xóm đô thị hoá": "#979763"
  }
 }

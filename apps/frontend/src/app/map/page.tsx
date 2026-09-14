@@ -357,6 +357,12 @@ interface ParcelInfo {
 }
 const fmtLen = (m: number) => (m >= 1000 ? (m / 1000).toFixed(3) + ' km' : m.toFixed(1) + ' m');
 const fmtArea = (m2: number) => (m2 >= 10000 ? (m2 / 10000).toFixed(4) + ' ha (' + m2.toFixed(0) + ' m²)' : m2.toFixed(1) + ' m²');
+// Diện tích GỌN MỘT DÒNG cho bảng thửa trên điện thoại: chỉ m², có DẤU CHẤM NGĂN HÀNG NGHÌN kiểu Việt Nam
+// (241.343 m² · 565,4 m²) — chủ dự án 14/9/2026: "24.1343 ha (241343 m²)" dài, xuống dòng, khó đọc số lớn.
+// Từ 1.000 m² trở lên bỏ số lẻ (số lẻ vài phần mười mét vuông không có ý nghĩa ở diện tích lớn).
+const fmtM2 = (m2: number) => (m2 >= 1000
+  ? Math.round(m2).toLocaleString('vi-VN')
+  : m2.toLocaleString('vi-VN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })) + ' m²';
 // Lấy trường đầu tiên có giá trị trong properties (dữ liệu địa chính đặt tên khoá không thống nhất).
 const pickProp = (p: Record<string, any> | undefined, keys: string[]) => { for (const k of keys) { const v = p?.[k]; if (v != null && String(v).trim() && String(v).trim() !== '0') return String(v).trim(); } return ''; };
 // Màu badge loại đất theo ký hiệu (ODT/đất ở → hồng, lúa → vàng, cây/rừng → xanh…).
@@ -598,27 +604,10 @@ export default function MapPage() {
   // NẤC THU NHỎ của bảng thửa (điện thoại, 14/9/2026): chỉ còn dòng "Tờ · Thửa · Diện tích" + tên xã,
   // ẩn trang quy hoạch + hàng nút → bản đồ gần như hiện hết. Ba nấc: thu nhỏ ⇄ vừa ⇄ đầy đủ.
   const [sheetNho, setSheetNho] = useState(false);
-  // HAI KIỂU THU BẢNG THỬA (chủ dự án muốn có sẵn cách thứ hai để chọn, 14/9/2026) — lưu theo từng máy:
-  //   'tu-dong' (mặc định): NGÓN TAY KÉO / PHÓNG BẢN ĐỒ là bảng tự thu nhỏ còn 1 dòng; chạm dòng đó mở lại.
-  //   'vuot'             : bảng đứng yên, người dùng tự vuốt đầu bảng lên/xuống để đổi nấc.
-  // Cả hai kiểu đều vuốt tay được; khác nhau ở chỗ có TỰ thu khi kéo bản đồ hay không.
-  //   'the-ngang'        : CÁCH 3 (chủ dự án: "vẫn xem đầy đủ thông tin và xem được bản đồ rộng") — bảng THẤP CỐ ĐỊNH
-  //                        ~1/3 màn hình; dòng đầu gộp Tờ·Thửa·DT + 4 nút biểu tượng; bỏ hàng nút chân bảng; mỗi bản
-  //                        quy hoạch là THẺ HẸP (thẻ sau ló mép), nhiều loại đất thì xếp 2 cột chữ nhỏ.
-  type KieuThuBang = 'tu-dong' | 'vuot' | 'the-ngang';
-  const [kieuThuBang, setKieuThuBang] = useState<KieuThuBang>('tu-dong');
-  useEffect(() => {
-    // Link so sánh nhanh cho chủ dự án: /map?kieu=1 (Tự thu nhỏ) · ?kieu=2 (Vuốt tay) · ?kieu=3 (Thẻ ngang).
-    // Mở link là đổi kiểu và GHI NHỚ luôn trên máy đó.
-    try {
-      const q = new URLSearchParams(window.location.search).get('kieu');
-      const tuLink = ({ '1': 'tu-dong', '2': 'vuot', '3': 'the-ngang' } as Record<string, KieuThuBang>)[q || ''];
-      if (tuLink) { setKieuThuBang(tuLink); localStorage.setItem('cl-kieu-thu-bang', tuLink); return; }
-      const v = localStorage.getItem('cl-kieu-thu-bang'); if (v === 'vuot' || v === 'tu-dong' || v === 'the-ngang') setKieuThuBang(v);
-    } catch { /* */ }
-  }, []);
-  const doiKieuThuBang = (v: KieuThuBang) => { setKieuThuBang(v); setSheetNho(false); setSheetExpanded(false); try { localStorage.setItem('cl-kieu-thu-bang', v); } catch { /* */ } };
-  const theNgang = kieuThuBang === 'the-ngang';
+  // CHỐT KIỂU "TỰ THU NHỎ" (chủ dự án chọn 14/9/2026 sau khi so 3 kiểu): ngón tay KÉO / PHÓNG bản đồ là bảng
+  // tự thu còn 2–3 dòng; chạm dòng đó mở lại; vuốt đầu bảng lên/xuống vẫn đổi nấc bằng tay được.
+  // Hai kiểu đã thử rồi GỠ: "Vuốt tay" (bảng đứng yên, chỉ tự vuốt) và "Thẻ ngang" (bảng thấp cố định, thẻ hẹp
+  // ló mép, nút biểu tượng) — đừng dựng lại nếu chủ dự án không yêu cầu.
   const vuotBangY = useRef<number | null>(null);
   const vuotBang = {
     onTouchStart: (e: React.TouchEvent) => { vuotBangY.current = e.touches[0].clientY; },
@@ -636,10 +625,9 @@ export default function MapPage() {
   // Màu từng loại đất theo bản quy hoạch (public/mau-loai-dat-qh.json) — tô ô diện tích trong trang lướt.
   const [mauQh, setMauQh] = useState<Record<string, Record<string, string>> | null>(null);
   useEffect(() => { fetch('/mau-loai-dat-qh.json').then((r) => r.json()).then(setMauQh).catch(() => setMauQh({})); }, []);
-  // Kiểu 'tu-dong': nghe bản đồ — người dùng KÉO / PHÓNG / XOAY (sự kiện có originalEvent, tức do ngón tay,
+  // TỰ THU NHỎ: nghe bản đồ — người dùng KÉO / PHÓNG / XOAY (sự kiện có originalEvent, tức do ngón tay,
   // không phải do máy tự bay tới thửa) thì thu bảng thửa về nấc nhỏ. Chỉ điện thoại (< 640px).
   useEffect(() => {
-    if (kieuThuBang !== 'tu-dong') return;
     let m: any = null, hen: any = null;
     const thu = (e: any) => { if (window.innerWidth < 640 && (e?.originalEvent || e?.type === 'dragstart')) { setSheetNho(true); setSheetExpanded(false); } };
     const gan = () => {
@@ -649,7 +637,7 @@ export default function MapPage() {
     };
     gan();
     return () => { clearTimeout(hen); if (m) { m.off('dragstart', thu); m.off('zoomstart', thu); m.off('rotatestart', thu); m.off('pitchstart', thu); } };
-  }, [kieuThuBang]);
+  }, []);
   const trangQhRef = useRef<HTMLDivElement>(null);
   const [trangQh, setTrangQh] = useState(0);
   const [parcelMore, setParcelMore] = useState(true);  // giữ lại cho mấy nút cũ gọi tới; bảng thửa nay hiện đủ, không còn thu gọn
@@ -1545,7 +1533,7 @@ export default function MapPage() {
   // anChon = true: bảng đáy Tra cứu của điện thoại — kiểu tra đã chọn bằng THẺ nên ẩn ô sổ xuống.
   const searchCtrl = (full = false, anChon = false) => (
     <div className={`flex items-center gap-1.5 ${full ? 'flex-wrap' : ''}`}>
-      <select value={searchMode} hidden={anChon} onChange={(e) => setSearchMode(e.target.value as any)} className={`border rounded-lg px-2 py-1.5 text-xs bg-white ${full ? 'w-full' : ''}`}>
+      <select value={searchMode} hidden={anChon} onChange={(e) => { setC1(''); setC2(''); setSearchMode(e.target.value as any); }} className={`border rounded-lg px-2 py-1.5 text-xs bg-white ${full ? 'w-full' : ''}`}>
         <option value="parcel">Số tờ / thửa</option>
         <option value="vn2000">Toạ độ VN-2000</option>
         <option value="latlng">Lat / Lng (WGS-84)</option>
@@ -1700,7 +1688,7 @@ export default function MapPage() {
     setTrangQh(i);
     requestAnimationFrame(() => { const el = trangQhRef.current; if (el) el.scrollTo({ left: i * buocTrang(el), behavior: 'auto' }); });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [info, theNgang]);
+  }, [info]);
   // Một bước lướt = bề rộng một thẻ + khoảng hở (kiểu Thẻ ngang thẻ hẹp hơn khung, các kiểu khác = cả khung).
   function buocTrang(el: HTMLDivElement) {
     const a = el.children[0] as HTMLElement | undefined, b = el.children[1] as HTMLElement | undefined;
@@ -1932,7 +1920,9 @@ export default function MapPage() {
             <div style={kieuBangDay} className="lg:hidden absolute inset-x-0 bottom-[var(--menu-de,calc(56px+env(safe-area-inset-bottom)))] z-30 max-h-[62%] flex flex-col rounded-t-2xl bg-white shadow-[0_-8px_30px_rgba(0,0,0,.18)]">
               <div className="flex items-center border-b border-slate-200 pl-2 pr-1">
                 {([['goc', 'Góc ranh'], ['to', 'Thửa tờ'], ['toado', 'Toạ độ'], ['gmap', 'Google Maps']] as [typeof tcTab, string][]).map(([k, lb]) => (
-                  <button key={k} onClick={() => { setTcTab(k); if (k === 'to') setSearchMode('parcel'); else if (k === 'gmap') setSearchMode('gmap'); else if (k === 'toado' && searchMode !== 'latlng') setSearchMode('vn2000'); }}
+                  // ĐỔI THẺ LÀ XOÁ Ô NHẬP: 3 thẻ Thửa tờ · Toạ độ · Google Maps dùng CHUNG hai ô c1/c2, không xoá thì
+                  // số thửa/tờ vừa gõ DÍNH sang ô toạ độ và ô link (chủ dự án báo lỗi 14/9/2026).
+                  <button key={k} onClick={() => { if (k !== tcTab) { setC1(''); setC2(''); } setTcTab(k); if (k === 'to') setSearchMode('parcel'); else if (k === 'gmap') setSearchMode('gmap'); else if (k === 'toado' && searchMode !== 'latlng') setSearchMode('vn2000'); }}
                     // flex-1: 4 thẻ CHIA ĐỀU bề ngang (trước dồn trái, bên phải hở — chủ dự án báo 14/9/2026)
                     className={`relative flex-1 whitespace-nowrap px-1 py-2.5 text-center text-[13px] ${tcTab === k ? 'font-semibold text-[#0A2540]' : 'text-slate-500'}`}>
                     {lb}{tcTab === k && <span className="absolute inset-x-2 bottom-0 h-[2.5px] rounded-full bg-[#C8A14B]" />}
@@ -2055,7 +2045,7 @@ export default function MapPage() {
                   <div>
                     <div className="mb-2 inline-flex rounded-lg bg-slate-100 p-0.5 text-[13px]">
                       {([['vn2000', 'VN-2000 (X, Y)'], ['latlng', 'Kinh / vĩ độ']] as const).map(([k, lb]) => (
-                        <button key={k} onClick={() => setSearchMode(k)} className={`rounded-md px-3 py-1.5 ${searchMode === k ? 'bg-white font-semibold text-[#0A2540] shadow-sm' : 'text-slate-500'}`}>{lb}</button>
+                        <button key={k} onClick={() => { if (k !== searchMode) { setC1(''); setC2(''); } setSearchMode(k); }} className={`rounded-md px-3 py-1.5 ${searchMode === k ? 'bg-white font-semibold text-[#0A2540] shadow-sm' : 'text-slate-500'}`}>{lb}</button>
                       ))}
                     </div>
                     {searchCtrl(true, true)}
@@ -2206,19 +2196,6 @@ export default function MapPage() {
                         <span>📌 Sản phẩm đã lưu ({places.length})</span><span className="text-[#c7c7cc] text-xl leading-none">›</span>
                       </button>
                     )}
-                  </div>
-                  {/* CHỌN KIỂU THU BẢNG THÔNG TIN THỬA — lưu theo máy (xem kieuThuBang). */}
-                  {tieuDe('Bảng thông tin thửa')}
-                  <div className="bg-[#f2f2f7] px-3 pb-3">
-                    <div className="grid grid-cols-3 gap-1 rounded-[10px] bg-slate-200/70 p-1">
-                      {([['tu-dong', 'Tự thu nhỏ', 'khi kéo bản đồ'], ['vuot', 'Vuốt tay', 'tự vuốt lên/xuống'], ['the-ngang', 'Thẻ ngang', 'thấp, xem đủ']] as const).map(([k, lb, phu]) => (
-                        <button key={k} type="button" onClick={() => doiKieuThuBang(k)}
-                          className={`rounded-lg py-1.5 text-center ${kieuThuBang === k ? 'bg-white shadow-sm' : ''}`}>
-                          <span className={`block text-[13.5px] ${kieuThuBang === k ? 'font-semibold text-[#0A2540]' : 'text-slate-600'}`}>{lb}</span>
-                          <span className="block text-[10.5px] text-slate-400">{phu}</span>
-                        </button>
-                      ))}
-                    </div>
                   </div>
                 </div>
                 <button onClick={() => setQhSheet(false)} className="mt-2 w-full rounded-[14px] bg-white py-[11px] text-[14px] font-semibold text-[#0A2540] shadow-2xl active:bg-[#e5e5ea]">Đóng</button>
@@ -2458,7 +2435,7 @@ export default function MapPage() {
                  · sau khi bảng hiện ra, hàm tranhBiChe() đo vị trí bảng rồi TRƯỢT bản đồ đúng đoạn
                    ngắn nhất để thửa lọt ra ngoài bảng (không đổi mức phóng, không giật).
                id="bang-thua" chính là để đo vị trí bảng. */
-            <div id="bang-thua" className={`absolute left-2 right-2 bottom-[calc(var(--menu-de,calc(56px+env(safe-area-inset-bottom)))+4px)] sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:bottom-3 sm:w-96 sm:max-w-[calc(100%-1.5rem)] ${theNgang ? 'max-h-[36%]' : sheetExpanded ? 'max-h-[80%]' : 'max-h-[50%]'} sm:max-h-[42%] flex flex-col overflow-hidden z-20 bg-white rounded-2xl shadow-2xl border border-slate-200 transition-[max-height] duration-300`}>
+            <div id="bang-thua" className={`absolute left-2 right-2 bottom-[calc(var(--menu-de,calc(56px+env(safe-area-inset-bottom)))+4px)] sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:bottom-3 sm:w-96 sm:max-w-[calc(100%-1.5rem)] ${sheetExpanded ? 'max-h-[80%]' : 'max-h-[50%]'} sm:max-h-[42%] flex flex-col overflow-hidden z-20 bg-white rounded-2xl shadow-2xl border border-slate-200 transition-[max-height] duration-300`}>
               <div {...vuotBang} className="sticky top-0 bg-white/95 backdrop-blur border-b border-slate-100 rounded-t-2xl">
                 {/* Chạm vạch kéo: đang thu nhỏ → mở nấc vừa; còn lại → vừa ⇄ đầy đủ. Vuốt lên/xuống: xem vuotBang. */}
                 <button onClick={() => { if (sheetNho) setSheetNho(false); else setSheetExpanded((v) => !v); }} className="sm:hidden w-full flex flex-col items-center pt-1.5 pb-1" aria-label={sheetNho ? 'Mở bảng' : sheetExpanded ? 'Thu gọn' : 'Kéo lên xem đầy đủ'}>
@@ -2469,17 +2446,6 @@ export default function MapPage() {
                 </button>
                 <div className="flex justify-between items-center px-4 py-0 sm:py-1.5 absolute right-0 top-0 sm:static sm:w-full">
                   <h3 className="hidden sm:block font-extrabold text-[#0A2540] text-[15px]">Thông tin thửa</h3>
-                  {/* Kiểu THẺ NGANG (điện thoại): 4 nút biểu tượng nằm cạnh ✕ thay cho hàng nút chân bảng (đã ẩn).
-                      Bấm là "bấm hộ" đúng nút gốc ở chân bảng (theo id) nên mọi xử lý giữ nguyên một chỗ. */}
-                  {theNgang && info.parcel && (
-                    <span className="sm:hidden mr-0.5 flex items-center gap-1">
-                      {([['nut-phieu-qh', '🖨', 'Xuất phiếu quy hoạch'], ['nut-chia-se', '🔗', 'Chia sẻ'], ['nut-chi-duong', '🧭', 'Chỉ đường'], ['nut-luu-diem', '📌', 'Lưu điểm']] as const).map(([id, ic, nhan]) => (
-                        <button key={id} type="button" aria-label={nhan} title={nhan}
-                          onClick={(e) => { e.stopPropagation(); (document.getElementById(id) as HTMLElement | null)?.click(); }}
-                          className="grid h-7 w-7 place-items-center rounded-full bg-slate-100 text-[13px] active:bg-slate-200">{ic}</button>
-                      ))}
-                    </span>
-                  )}
                   <button onClick={() => setInfo(null)} className="text-slate-400 hover:text-slate-700 w-7 h-7 grid place-items-center rounded-lg hover:bg-slate-100 text-lg leading-none">✕</button>
                 </div>
               </div>
@@ -2522,9 +2488,9 @@ export default function MapPage() {
                       {/* Điện thoại: MỘT DÒNG như app — "Tờ 149 · Thửa 83 · 1.255,9 m²". Máy tính giữ 3 ô.
                           CHỌN THỬA TRÊN BẢN ĐỒ LUÔN HIỆN SỐ TỜ MỚI TRƯỚC (chủ dự án 14/9/2026), bất kể đang ở lớp
                           3 cấp hay 2 cấp; số tờ cũ + xã cũ ghi ở dòng dưới. Xã chưa có bảng tra thì chỉ có số tờ đang có. */}
-                      <div className={`sm:hidden font-bold leading-snug text-[#0A2540] ${theNgang ? 'pr-[150px] text-[14px]' : 'pr-8 text-[15px]'}`}>
+                      <div className={`sm:hidden font-bold leading-snug text-[#0A2540] pr-8 text-[15px]`}>
                         Thửa {info.parcel.soThua || '—'} · Tờ {toMoi || toCu || '—'}
-                        {info.parcel.areaM2 != null && <> · <span className="font-normal text-slate-500">Diện tích</span> {fmtArea(info.parcel.areaM2)}</>}
+                        {info.parcel.areaM2 != null && <> · <span className="font-normal text-slate-500">Diện tích</span> <span className="whitespace-nowrap">{fmtM2(info.parcel.areaM2)}</span></>}
                       </div>
                       <div className="hidden sm:grid grid-cols-3 gap-2">
                         {/* THỬA TRƯỚC, TỜ SAU — quy tắc chung toàn web. */}
@@ -2625,22 +2591,21 @@ export default function MapPage() {
                         </div>
                       )}
                       <div ref={trangQhRef} onScroll={() => { clearTimeout((trangQhRef as any).t); (trangQhRef as any).t = setTimeout(khiLuotTrangQh, 90); }}
-                        className={`flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${theNgang ? 'gap-2 px-3 scroll-px-3' : ''}`}>
+                        className={`flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}>
                         {ds.map((t) => (
                           /* Kiểu THẺ NGANG: thẻ hẹp 86% có viền, thẻ sau LÓ MÉP để biết còn bản khác; nhiều loại đất
                              (> 3) thì xếp 2 CỘT chữ nhỏ → xem đủ mọi loại đất mà bảng vẫn thấp. KHÔNG bỏ loại đất nào. */
-                          <div key={t.muc.id} className={theNgang ? 'w-[86%] shrink-0 snap-start rounded-xl border border-slate-200 px-2.5 py-1.5' : 'w-full shrink-0 snap-center px-4'}>
+                          <div key={t.muc.id} className="w-full shrink-0 snap-center px-4">
                             {/* Tiêu đề + tên các mảnh phân khu gộp MỘT dòng cho gọn. */}
-                            <p className={`truncate font-bold leading-snug text-[#0A2540] ${theNgang ? 'text-[12px]' : 'text-[13px]'}`}>{t.tieuDe}{t.phu && <span className="ml-1.5 text-[10.5px] font-normal text-slate-400">{t.phu}</span>}</p>
-                            <div className={theNgang && t.areas.length > 3 ? 'mt-1 grid grid-cols-2 gap-x-2 gap-y-[3px]' : 'mt-1 space-y-[3px]'}>
+                            <p className={`truncate font-bold leading-snug text-[#0A2540] text-[13px]`}>{t.tieuDe}{t.phu && <span className="ml-1.5 text-[10.5px] font-normal text-slate-400">{t.phu}</span>}</p>
+                            <div className="mt-1 space-y-[3px]">
                               {t.areas.map((a) => {
                                 const mau = mauQh?.[t.bangMau]?.[a.type] || '#e2e8f0';
-                                const hep = theNgang && t.areas.length > 3;
                                 return (
-                                  <div key={a.type} className={`flex min-w-0 items-center ${hep ? 'gap-1' : 'gap-2'}`} title={`${fmtArea(a.areaM2)} · ${a.type}`}>
-                                    <span className={`shrink-0 rounded border border-black/10 py-px text-right font-bold tabular-nums ${hep ? 'min-w-[50px] px-1 text-[10.5px] leading-[16px]' : 'min-w-[64px] px-1.5 text-[12px] leading-[18px]'}`}
-                                      style={{ background: mau, color: chuTrenMau(mau) }}>{fmtArea(a.areaM2)}</span>
-                                    <span className={`min-w-0 truncate font-medium text-slate-700 ${hep ? 'text-[11px]' : 'text-[12.5px]'}`}>{a.type}</span>
+                                  <div key={a.type} className="flex min-w-0 items-center gap-2" title={`${fmtM2(a.areaM2)} · ${a.type}`}>
+                                    <span className="min-w-[64px] shrink-0 rounded border border-black/10 px-1.5 py-px text-right text-[12px] font-bold leading-[18px] tabular-nums"
+                                      style={{ background: mau, color: chuTrenMau(mau) }}>{fmtM2(a.areaM2)}</span>
+                                    <span className="min-w-0 truncate text-[12.5px] font-medium text-slate-700">{a.type}</span>
                                   </div>
                                 );
                               })}
@@ -2681,7 +2646,7 @@ export default function MapPage() {
 
                 {clickVN && (
                   /* Điện thoại: ẩn dòng VN-2000 cho gọn — chỉ hiện khi đang mở phần Lưu điểm. */
-                  <div className={`mt-2 pt-1.5 border-t border-slate-100 ${showSave || theNgang ? '' : 'hidden sm:block'}`}>
+                  <div className={`mt-2 pt-1.5 border-t border-slate-100 ${showSave ? '' : 'hidden sm:block'}`}>
                     <div className="text-[11px] text-slate-400">VN-2000: <b className="text-slate-600">X={clickVN.x.toFixed(2)}</b> · <b className="text-slate-600">Y={clickVN.y.toFixed(2)}</b></div>
                     {user && showSave && (
                       <div className="mt-2 space-y-1">
@@ -2728,7 +2693,7 @@ export default function MapPage() {
                   Trước ghim bằng "sticky" với khoảng cách đoán sẵn nên vẫn nhúc nhích. */}
               {/* Điện thoại: TẤT CẢ NÚT MỘT HÀNG NGANG gọn như app (Phiếu QH · Lưu · Chia sẻ · Chỉ đường),
                   lướt ngang nếu thiếu chỗ. Máy tính giữ nút phiếu to + hàng 3 nút. */}
-              <div className={`${sheetNho || theNgang ? 'max-sm:hidden' : ''} shrink-0 px-2.5 sm:px-4 pt-1.5 pb-2 bg-white border-t border-slate-100 grid grid-cols-4 gap-1 sm:block`}>
+              <div className={`${sheetNho ? 'max-sm:hidden' : ''} shrink-0 px-2.5 sm:px-4 pt-1.5 pb-2 bg-white border-t border-slate-100 grid grid-cols-4 gap-1 sm:block`}>
                 {/* Phiếu trích lục ghi rõ "Quy hoạch chung đô thị mới Cam Lâm 2045" nên chỉ cho xuất
                     khi thửa nằm trong vùng có dữ liệu — ngoài vùng mà in ra là phiếu sai. */}
                 {info.parcel && !info.qhNgoaiVung && (

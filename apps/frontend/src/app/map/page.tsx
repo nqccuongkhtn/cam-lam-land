@@ -2524,7 +2524,7 @@ export default function MapPage() {
                           3 cấp hay 2 cấp; số tờ cũ + xã cũ ghi ở dòng dưới. Xã chưa có bảng tra thì chỉ có số tờ đang có. */}
                       <div className={`sm:hidden font-bold leading-snug text-[#0A2540] ${theNgang ? 'pr-[150px] text-[14px]' : 'pr-8 text-[15px]'}`}>
                         Thửa {info.parcel.soThua || '—'} · Tờ {toMoi || toCu || '—'}
-                        {info.parcel.areaM2 != null && <> · {fmtArea(info.parcel.areaM2)}</>}
+                        {info.parcel.areaM2 != null && <> · <span className="font-normal text-slate-500">Diện tích</span> {fmtArea(info.parcel.areaM2)}</>}
                       </div>
                       <div className="hidden sm:grid grid-cols-3 gap-2">
                         {/* THỬA TRƯỚC, TỜ SAU — quy tắc chung toàn web. */}
@@ -2535,12 +2535,18 @@ export default function MapPage() {
                       {/* Điện thoại: xã MỚI trước, rồi "trước sáp nhập: xã cũ · huyện cũ · tờ cũ". KHÔNG CẮT CHỮ (trước
                           để truncate nên mất đuôi "tờ mới …" — chủ dự án báo thiếu thông tin), dài thì xuống dòng. */}
                       {(khuCu || khuMoi) && (
-                        <div className="sm:hidden pr-1 text-[12px] leading-snug text-slate-500">
+                        <div className="sm:hidden text-[12px] leading-snug text-slate-500">
                           <b className="font-semibold text-slate-700">{khuMoi || khuCu}</b>
-                          {khuCu && khuMoi ? <> · trước sáp nhập: {khuCu}</> : null}
-                          {toMoi && toCu && toMoi !== toCu ? <> · tờ cũ {toCu}</> : null}
                           {/* Giữ ĐỦ thông tin như bảng máy tính: ghi chú xã chưa có bảng tra số tờ (rút gọn). */}
                           {thieuBangTra && <span className="text-slate-400"> · chưa có bảng tra số tờ</span>}
+                          {/* "Trước sáp nhập" XUỐNG DÒNG RIÊNG và CỐ NẰM GỌN 1 DÒNG (chủ dự án 14/9/2026): chữ 11px, không
+                              xuống dòng, "Huyện" viết "H." cho ngắn. Vẫn dài quá thì vuốt ngang được, KHÔNG cắt mất chữ. */}
+                          {(khuCu && khuMoi) || (toMoi && toCu && toMoi !== toCu) ? (
+                            <div className="overflow-x-auto whitespace-nowrap text-[11px] text-slate-400 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                              Trước sáp nhập: {khuCu && khuMoi ? <span className="text-slate-500">{khuCu.replace(/Huyện /g, 'H. ').replace(/Thành phố /g, 'TP. ').replace(/Thị xã /g, 'TX. ')}</span> : null}
+                              {toMoi && toCu && toMoi !== toCu ? <> · tờ cũ <b className="font-semibold text-slate-500">{toCu}</b></> : null}
+                            </div>
+                          ) : null}
                         </div>
                       )}
                       <div className="hidden sm:block">
@@ -2722,7 +2728,7 @@ export default function MapPage() {
                   Trước ghim bằng "sticky" với khoảng cách đoán sẵn nên vẫn nhúc nhích. */}
               {/* Điện thoại: TẤT CẢ NÚT MỘT HÀNG NGANG gọn như app (Phiếu QH · Lưu · Chia sẻ · Chỉ đường),
                   lướt ngang nếu thiếu chỗ. Máy tính giữ nút phiếu to + hàng 3 nút. */}
-              <div className={`${sheetNho || theNgang ? 'max-sm:hidden' : ''} shrink-0 px-3 sm:px-4 pt-1.5 pb-2 bg-white border-t border-slate-100 flex gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:block`}>
+              <div className={`${sheetNho || theNgang ? 'max-sm:hidden' : ''} shrink-0 px-2.5 sm:px-4 pt-1.5 pb-2 bg-white border-t border-slate-100 grid grid-cols-4 gap-1 sm:block`}>
                 {/* Phiếu trích lục ghi rõ "Quy hoạch chung đô thị mới Cam Lâm 2045" nên chỉ cho xuất
                     khi thửa nằm trong vùng có dữ liệu — ngoài vùng mà in ra là phiếu sai. */}
                 {info.parcel && !info.qhNgoaiVung && (
@@ -2747,18 +2753,18 @@ export default function MapPage() {
                       const areas = (info.overlaps && info.overlaps.length) ? info.overlaps : qhAreasFromVector(ring); finish(areas.length ? areas : []);
                     }}
                     id="nut-phieu-qh"
-                    className="shrink-0 whitespace-nowrap px-3 sm:px-0 sm:mb-1.5 sm:w-full flex items-center justify-center gap-1.5 sm:gap-2 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-xs sm:text-sm font-bold bg-[#0A2540] hover:bg-[#0d3a6b] text-white">
-                    🖨 <span className="sm:hidden">Phiếu QH</span><span className="hidden sm:inline">Xuất phiếu kiểm tra quy hoạch</span>
+                    className="min-w-0 whitespace-nowrap px-1 sm:px-0 sm:mb-1.5 sm:w-full flex items-center justify-center gap-1.5 sm:gap-2 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold bg-[#0A2540] hover:bg-[#0d3a6b] text-white">
+                    🖨<span className="sm:hidden">Phiếu QH</span><span className="hidden sm:inline">Xuất phiếu kiểm tra quy hoạch</span>
                   </button>
                 )}
                 <div className="contents sm:grid sm:grid-cols-3 sm:gap-2">
                   {user ? (
-                    <button id="nut-luu-diem" onClick={() => setShowSave((v) => { const nv = !v; if (nv) { setSheetExpanded(true); setParcelMore(true); } return nv; })} className={`shrink-0 whitespace-nowrap px-3 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-xs font-bold transition ${showSave ? 'bg-[#7c3aed] text-white' : 'bg-[#7c3aed]/10 text-[#7c3aed] hover:bg-[#7c3aed]/20'}`}>📌 Lưu điểm</button>
+                    <button id="nut-luu-diem" onClick={() => setShowSave((v) => { const nv = !v; if (nv) { setSheetExpanded(true); setParcelMore(true); } return nv; })} className={`min-w-0 whitespace-nowrap px-1 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold transition ${showSave ? 'bg-[#7c3aed] text-white' : 'bg-[#7c3aed]/10 text-[#7c3aed] hover:bg-[#7c3aed]/20'}`}>📌<span className="sm:hidden">Lưu</span><span className="hidden sm:inline"> Lưu điểm</span></button>
                   ) : (
-                    <Link id="nut-luu-diem" href="/login" className="shrink-0 whitespace-nowrap px-3 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-xs font-bold bg-[#7c3aed]/10 text-[#7c3aed]">🔒 Lưu điểm</Link>
+                    <Link id="nut-luu-diem" href="/login" className="min-w-0 whitespace-nowrap px-1 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold bg-[#7c3aed]/10 text-[#7c3aed]">🔒<span className="sm:hidden">Lưu</span><span className="hidden sm:inline"> Lưu điểm</span></Link>
                   )}
-                  <button id="nut-chia-se" onClick={() => { const t = `Thửa ${info.parcel?.soThua || '?'}, Tờ ${info.parcel?.soTo || '?'} —${info.parcel?.xa || 'Cam Lâm'}${info.point ? ` (${info.point.lat.toFixed(6)},${info.point.lng.toFixed(6)})` : ''}`; navigator.clipboard?.writeText(t).then(() => alert('Đã sao chép mã chia sẻ:\n' + t)).catch(() => alert(t)); }} className="shrink-0 whitespace-nowrap px-3 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">🔗 Chia sẻ</button>
-                  {info.point && <button id="nut-chi-duong" onClick={() => moChiDuong(info.point!.lat, info.point!.lng, 'Thửa đang xem')} className="shrink-0 whitespace-nowrap px-3 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">🧭 Chỉ đường</button>}
+                  <button id="nut-chia-se" onClick={() => { const t = `Thửa ${info.parcel?.soThua || '?'}, Tờ ${info.parcel?.soTo || '?'} —${info.parcel?.xa || 'Cam Lâm'}${info.point ? ` (${info.point.lat.toFixed(6)},${info.point.lng.toFixed(6)})` : ''}`; navigator.clipboard?.writeText(t).then(() => alert('Đã sao chép mã chia sẻ:\n' + t)).catch(() => alert(t)); }} className="min-w-0 whitespace-nowrap px-1 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">🔗 Chia sẻ</button>
+                  {info.point && <button id="nut-chi-duong" onClick={() => moChiDuong(info.point!.lat, info.point!.lng, 'Thửa đang xem')} className="min-w-0 whitespace-nowrap px-1 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">🧭 Chỉ đường</button>}
                 </div>
               </div>
             </div>

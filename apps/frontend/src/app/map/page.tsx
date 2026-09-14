@@ -359,10 +359,9 @@ const fmtLen = (m: number) => (m >= 1000 ? (m / 1000).toFixed(3) + ' km' : m.toF
 const fmtArea = (m2: number) => (m2 >= 10000 ? (m2 / 10000).toFixed(4) + ' ha (' + m2.toFixed(0) + ' m²)' : m2.toFixed(1) + ' m²');
 // Diện tích GỌN MỘT DÒNG cho bảng thửa trên điện thoại: chỉ m², có DẤU CHẤM NGĂN HÀNG NGHÌN kiểu Việt Nam
 // (241.343 m² · 565,4 m²) — chủ dự án 14/9/2026: "24.1343 ha (241343 m²)" dài, xuống dòng, khó đọc số lớn.
-// Từ 1.000 m² trở lên bỏ số lẻ (số lẻ vài phần mười mét vuông không có ý nghĩa ở diện tích lớn).
-const fmtM2 = (m2: number) => (m2 >= 1000
-  ? Math.round(m2).toLocaleString('vi-VN')
-  : m2.toLocaleString('vi-VN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })) + ' m²';
+// KHÔNG làm tròn về số nguyên (chủ dự án: diện tích phải đúng số) — giữ tối đa 2 chữ số thập phân:
+// 1255.9 → "1.255,9 m²" · 241343 → "241.343 m²" · 565.456 → "565,46 m²".
+const fmtM2 = (m2: number) => m2.toLocaleString('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' m²';
 // Lấy trường đầu tiên có giá trị trong properties (dữ liệu địa chính đặt tên khoá không thống nhất).
 const pickProp = (p: Record<string, any> | undefined, keys: string[]) => { for (const k of keys) { const v = p?.[k]; if (v != null && String(v).trim() && String(v).trim() !== '0') return String(v).trim(); } return ''; };
 // Màu badge loại đất theo ký hiệu (ODT/đất ở → hồng, lúa → vàng, cây/rừng → xanh…).
@@ -1151,7 +1150,9 @@ export default function MapPage() {
     onClick: () => { pinClickRef.current = Date.now(); setInfo(null); setSelPlace(p); },
   })), [places]);
   // Ghim XANH tại điểm vừa bấm (điểm đang chọn) — như /listings.
-  const allMarkers = useMemo(() => clickVN ? [...placeMarkers, { lng: clickVN.lng, lat: clickVN.lat, color: '#2563eb' }] : placeMarkers, [placeMarkers, clickVN]);
+  // Ghim xanh tại điểm bấm CHỈ HIỆN KHI ĐANG LƯU ĐIỂM (showSave) — chủ dự án 14/9/2026: bấm/tìm thửa mà cắm
+  // ghim thì ghim che mất chính thửa đó; ranh thửa đã được tô sáng là đủ biết đang xem thửa nào.
+  const allMarkers = useMemo(() => (clickVN && showSave) ? [...placeMarkers, { lng: clickVN.lng, lat: clickVN.lat, color: '#2563eb' }] : placeMarkers, [placeMarkers, clickVN, showSave]);
   useEffect(() => {
     setShowAddInt(false);
     if (!selPlace) { setInterests([]); return; }
@@ -1346,7 +1347,8 @@ export default function MapPage() {
       const sp = new URLSearchParams(window.location.search);
       const lng = parseFloat(sp.get('lng') || ''), lat = parseFloat(sp.get('lat') || '');
       if (!Number.isNaN(lng) && !Number.isNaN(lat)) {
-        setFocusPoint({ lng, lat, label: `Thửa ${sp.get('thua') || '?'} · Tờ ${sp.get('to') || '?'}` });
+        // Bay tới, KHÔNG cắm ghim (ghim che mất thửa — chủ dự án 14/9/2026; ghim chỉ dùng cho "Lưu điểm").
+        setFlyPoint({ lng, lat });
         setTimeout(() => { onMapClick(lng, lat).catch(() => {}); }, 700);
       }
     } catch { /* bỏ qua */ }
@@ -1358,7 +1360,8 @@ export default function MapPage() {
     const props = { to: p.soTo, thua: p.soThua, xa: p.tenXa, xaCu: p.tenXaCu,
                     dienTich_m2: p.dienTich, mucDichSuDung: p.mdsd, nhan: `Thửa ${p.soThua}, tờ ${p.soTo}` };
     if (p.hinh) setHighlight({ type: 'Feature', properties: props, geometry: p.hinh });
-    setFocusPoint({ lng: p.lng, lat: p.lat, label: `Thửa ${p.soThua} · Tờ ${p.soTo}${p.tenXa ? ' · ' + p.tenXa : ''}` });
+    // Bay tới + tô sáng ranh thửa, KHÔNG cắm ghim (ghim che mất thửa — chủ dự án 14/9/2026).
+    setFocusPoint(null); setFlyPoint({ lng: p.lng, lat: p.lat });
     setPanelOpen(false); setTool('none');
     // Nạp ĐẦY ĐỦ thông tin thửa (quy hoạch, chồng lấn, toạ độ, tin BĐS…) giống bấm trực tiếp trên bản đồ.
     await onMapClick(p.lng, p.lat);

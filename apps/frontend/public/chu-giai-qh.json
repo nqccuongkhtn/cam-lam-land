@@ -63,22 +63,16 @@
    "nhom": "Thương mại – dịch vụ – du lịch",
    "muc": [
     {
+     "mau": "#fb30fc",
+     "ten": "Đất du lịch · Đất dịch vụ + 3 loại nữa",
+     "dayDu": "Đất du lịch · Đất dịch vụ · Đất du lịch (hiện trạng) · Du lịch – khu du lịch · Đất dịch vụ (hiện trạng)",
+     "so": 138
+    },
+    {
      "mau": "#cc1919",
      "ten": "Dịch vụ đơn vị ở · Dịch vụ đô thị",
      "dayDu": "Dịch vụ đơn vị ở · Dịch vụ đô thị",
      "so": 125
-    },
-    {
-     "mau": "#e94fe9",
-     "ten": "Đất du lịch · Đất du lịch (hiện trạng) + 1 loại nữa",
-     "dayDu": "Đất du lịch · Đất du lịch (hiện trạng) · Du lịch – khu du lịch",
-     "so": 94
-    },
-    {
-     "mau": "#cc19cc",
-     "ten": "Đất dịch vụ · Đất dịch vụ (hiện trạng)",
-     "dayDu": "Đất dịch vụ · Đất dịch vụ (hiện trạng)",
-     "so": 44
     },
     {
      "mau": "#f5abbd",

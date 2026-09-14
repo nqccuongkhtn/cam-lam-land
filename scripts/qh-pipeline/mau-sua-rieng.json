@@ -58,20 +58,26 @@
   "  đều ra #979763, trong khi web ra #444428 (số màu 59) và #6f6f41 (số màu 57) — tối hơn hẳn.",
   "  → Thêm mục 'soMau': sửa màu THEO SỐ HIỆU MÀU bản vẽ, áp ngay sau khi tra bảng, trước 'mau'.",
   "  Dùng mục này khi app tô sai lệch theo SỐ MÀU (mọi loại đất cùng số màu đều lệch như nhau).",
+  "→ Chủ dự án hỏi màu đất du lịch: đo ảnh app (QĐ2222, QĐ2076) ra hồng tím RỰC #fb30fc, web ra",
+  "  #e94fe9 (bảng làm tươi kéo bớt độ rực). Ép Đất du lịch + Du lịch – khu du lịch về #fb30fc.",
+  "→ Chủ dự án chốt: 2 chỗ hồng tím Cam Tân 36/101 + Suối Tân 1/310 (QĐ2076, level",
+  "  QH2030_DAT_NDD_Dich vu, số màu 212 — chỉ 3 ô dùng số này) tô CÙNG MÀU ĐẤT DU LỊCH #fb30fc.",
+  "  Sau đó chủ dự án: mọi Đất dịch vụ CÙNG MÀU NHAU HẾT → ép cả 4 đồ án về #fb30fc.",
   "",
   "Lưu ý khi đổi hệ số làm tươi: mã màu ghi trong bảng này phải QUY ĐỔI THEO, nếu không nó",
   "vẫn giữ màu tính theo hệ số cũ và lệch hẳn so với phần còn lại của bản đồ."
  ],
  "soMau": {
   "57": "#979763",
-  "59": "#979763"
+  "59": "#979763",
+  "212": "#fb30fc"
  },
  "hoaVan": {
   "Cây xanh chuyên dụng": "cong"
  },
  "mau": {
   "Cây xanh chuyên dụng": "#d5f7df",
-  "Đất dịch vụ": "#cc19cc",
+  "Đất dịch vụ": "#fb30fc",
   "Sản xuất công nghiệp": "#7000e2",
   "Đất công nghiệp": "#7000e2",
   "Dân cư nông thôn": "#979763",
@@ -84,7 +90,8 @@
   "Làng xóm": "#979763",
   "Cây xanh sử dụng hạn chế": "#15a915",
   "Sông suối": "#1972cc",
-  "Đất du lịch": "#e94fe9",
+  "Đất du lịch": "#fb30fc",
+  "Du lịch – khu du lịch": "#fb30fc",
   "Cây xanh công cộng đơn vị ở": "#72cc19",
   "Bãi đỗ xe đơn vị ở": "#848484",
   "Trường THPT": "#a93915",

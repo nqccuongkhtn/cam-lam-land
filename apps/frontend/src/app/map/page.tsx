@@ -112,7 +112,7 @@ const RASTER_OVERLAYS = [
     tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png'], minzoom: 12, maxzoom: 18,
     coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ⚠️ MÀU BẢN ĐỒ QUY HOẠCH LẤY ĐÚNG TỪ BẢN VẼ — ĐỌC KỸ TRƯỚC KHI ĐỔI (13/9/2026)
-  // Bốn bộ tile phân khu (qd2076v19 · qd2101v20 · qd2222v20 · qd918v16) dùng BẢNG MÀU AUTOCAD.
+  // Bốn bộ tile phân khu (qd2076v21 · qd2101v22 · qd2222v22 · qd918v18) dùng BẢNG MÀU AUTOCAD.
   // Đã thử bảng MicroStation (chủ dự án tự xuất ra từ Settings → Color Table) nhưng đối chiếu
   // với bản vẽ mở bằng MicroStation thì bảng AutoCAD vẽ ĐÚNG HƠN — nên giữ AutoCAD.
   // Muốn thử lại bảng khác: python 9-doi-bang-mau.py <vao.geojson> <ra.geojson> <tên-bảng>
@@ -171,7 +171,7 @@ const RASTER_OVERLAYS = [
   // có 1.792 vùng nhưng tới 48.411 nét (chỉ giới đường đỏ, lề đường, ranh phân khu). Bỏ nét đi thì
   // nhìn chỉ thấy mấy mảng màu rời rạc, khác hẳn lúc mở file CAD gốc.
   { id: 'qh-qd2076', name: 'Quy hoạch phân khu phía Bắc QĐ2076 (1/2000)', url: '',
-    tiles: ['/tiles/qd2076v19/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2076v21/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.0288, 12.2004], [109.2513, 12.2004], [109.2513, 12.0527], [109.0288, 12.0527]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ2101 · quy hoạch phân khu trung tâm 1/2000 ────────────────────────────────────
   // Bản "v3" sửa hai lỗi của v2:
@@ -186,7 +186,7 @@ const RASTER_OVERLAYS = [
   // /tiles/ là `immutable, max-age=1 năm` nên trình duyệt và Cloudflare sẽ giữ nguyên ảnh cũ
   // cả năm, sửa xong mà người dùng vẫn thấy y như trước.
   { id: 'qh-qd2101', name: 'Quy hoạch phân khu trung tâm QĐ2101 (1/2000)', url: '',
-    tiles: ['/tiles/qd2101v20/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2101v22/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.1187, 12.0793], [109.2041, 12.0793], [109.2041, 11.99], [109.1187, 11.99]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ2222 · quy hoạch 1/2000 ──────────────────────────────────────────────────────
   // Bản "v3" sửa lỗi "mảng xám" của v2: v2 được cắt từ bản dữ liệu CŨ, lúc đó một số ô đất
@@ -198,12 +198,12 @@ const RASTER_OVERLAYS = [
   // Khung bao thu hẹp theo đúng ranh giới thật: trước ghi vươn ra tận 109.33 chỉ vì ô chú giải
   // nằm ngoài đó, chứ quy hoạch không hề trải tới chỗ ấy.
   { id: 'qh-qd2222', name: 'Quy hoạch QĐ2222 (1/2000)', url: '',
-    tiles: ['/tiles/qd2222v20/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd2222v22/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.1630, 12.1505], [109.2237, 12.1505], [109.2237, 12.0258], [109.1630, 12.0258]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ918 · quy hoạch phân khu PHỨC HỢP PHÍA TÂY 1/2000 ────────────────────────────
   // Bản gốc là DGN V8, không công cụ nào trên máy đọc nổi; chủ dự án xuất ra DXF rồi mới nạp được.
   { id: 'qh-qd918', name: 'Quy hoạch phân khu phức hợp phía Tây QĐ918 (1/2000)', url: '',
-    tiles: ['/tiles/qd918v16/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    tiles: ['/tiles/qd918v18/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.0372, 12.1265], [109.1454, 12.1265], [109.1454, 11.9569], [109.0372, 11.9569]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ893 · quy hoạch SỬ DỤNG ĐẤT đến 2030, phủ TOÀN huyện Cam Lâm cũ ───────
   // Bản này KHÔNG cần lớp nét: nó vốn là các mảng tô kín (nông nghiệp, đất ở, giao thông, mặt
@@ -1333,39 +1333,22 @@ export default function MapPage() {
     </div>
   );
   // ── MỘT KHỐI QUY HOẠCH trong bảng "Thông tin thửa" ─────────────────────────
-  // Đây là phần QUAN TRỌNG NHẤT của cả trang: người mua đất bấm vào thửa là để xem chỗ này.
-  // Trước đây nó trình bày nhạt hơn cả mấy dòng số tờ/số thửa bên trên (tiêu đề xám nhỏ, mỗi
-  // loại đất một dòng chữ xám) nên nhìn vào không thấy đâu là ý chính.
-  // Nay: loại đất chiếm NHIỀU NHẤT được cho chữ to + huy hiệu phần trăm, mỗi loại có thanh
-  // tỉ lệ — liếc một cái là biết thửa nghiêng về loại đất nào.
+  // TRÌNH BÀY GIẢN DỊ NHƯ BẢN TRƯỚC 12/8/2026: tiêu đề xám nhỏ, mỗi loại đất một dòng
+  // "tên loại đất — diện tích". Ngày 12/9 từng đổi sang chữ to + huy hiệu % + thanh tỉ lệ màu,
+  // chủ dự án chê "quá lòe loẹt" (13/9) → trả về kiểu cũ. Đừng thêm lại màu mè ở đây.
+  // Vẫn giữ việc liệt kê RIÊNG từng bản quy hoạch (QĐ205 · QĐ893 · phân khu) — đó là dữ liệu.
   const khoiQh = (ten: string, areas: { type: string; areaM2: number }[], khoa: string) => {
     const ds = [...(areas || [])].filter((a) => a && a.areaM2 > 0).sort((a, b) => b.areaM2 - a.areaM2);
     if (!ds.length) return null;
-    const tong = ds.reduce((t, a) => t + a.areaM2, 0) || 1;
     return (
-      <div key={khoa} className="mt-2.5 pt-2 border-t border-slate-200">
-        <p className="flex items-center gap-1.5 text-[11px] font-extrabold text-[#0A2540] uppercase tracking-wide mb-1.5">
-          <span className="inline-block w-1 h-3.5 rounded-full bg-[#C8A14B]" />{ten}
-        </p>
-        {ds.map((a, i) => {
-          const pct = Math.round((a.areaM2 / tong) * 100);
-          return (
-            <div key={i} className={i === 0 ? 'mb-1.5' : 'mb-1'}>
-              <div className="flex items-baseline justify-between gap-2">
-                <span className={`min-w-0 truncate ${i === 0 ? 'text-[14px] font-bold text-[#0A2540]' : 'text-[13px] text-slate-600'}`}>{a.type}</span>
-                <span className="flex items-baseline gap-1.5 shrink-0">
-                  {i === 0 && ds.length > 1 && (
-                    <span className="rounded-full bg-[#C8A14B]/15 px-1.5 py-px text-[10px] font-extrabold text-[#8a6d20]">{pct}%</span>
-                  )}
-                  <span className={i === 0 ? 'text-[14px] font-extrabold text-[#0A2540]' : 'text-[13px] font-semibold text-slate-600'}>{fmtArea(a.areaM2)}</span>
-                </span>
-              </div>
-              <div className="mt-[3px] h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                <div className="h-full rounded-full" style={{ width: pct + '%', background: i === 0 ? '#C8A14B' : '#cbd5e1' }} />
-              </div>
-            </div>
-          );
-        })}
+      <div key={khoa} className="mt-3 pt-2.5 border-t border-slate-100">
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1">{ten}</p>
+        {ds.map((a, i) => (
+          <div key={i} className="flex justify-between items-center gap-2 py-0.5">
+            <span className="text-slate-600">{a.type}</span>
+            <span className="font-medium shrink-0">{fmtArea(a.areaM2)}</span>
+          </div>
+        ))}
       </div>
     );
   };

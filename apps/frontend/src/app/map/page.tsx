@@ -224,10 +224,12 @@ const RASTER_OVERLAYS = [
 // QĐ2222 ven biển · QĐ918 phức hợp phía Tây) là BỐN MẢNH CỦA CÙNG MỘT BỘ quy hoạch phân khu —
 // nên gộp thành MỘT dòng, bật là bật cả ba. Ảnh của chúng nền trong suốt, vùng lại không trùm
 // nhau đáng kể nên chồng lên nhau ra một tấm liền mạch.
-const MUC_QH: { id: string; ten: string; gom: string[] }[] = [
-  { id: 'qh-qd205', ten: 'Quy hoạch chung 2045 (QĐ205)', gom: ['qh-qd205'] },
-  { id: 'phan-khu', ten: 'Quy hoạch phân khu 1/2000', gom: ['qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin'] },
-  { id: 'qh-qd893', ten: 'Quy hoạch sử dụng đất 2030 (QĐ893)', gom: ['qh-qd893'] },
+// `tenNgan` = chữ trên thanh nút nổi của ĐIỆN THOẠI: màn hẹp ~360px, để tên đầy đủ thì 3 nút
+// không vừa, nút đầu và nút cuối bị cắt mất chữ (chủ dự án chụp màn hình báo lỗi 14/9/2026).
+const MUC_QH: { id: string; ten: string; tenNgan: string; gom: string[] }[] = [
+  { id: 'qh-qd205', ten: 'Quy hoạch chung 2045 (QĐ205)', tenNgan: 'QH chung 205', gom: ['qh-qd205'] },
+  { id: 'phan-khu', ten: 'Quy hoạch phân khu 1/2000', tenNgan: 'Phân khu 1/2000', gom: ['qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin'] },
+  { id: 'qh-qd893', ten: 'Quy hoạch sử dụng đất 2030 (QĐ893)', tenNgan: 'Sử dụng đất 893', gom: ['qh-qd893'] },
 ];
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
 // Khung bao [tây, nam, đông, bắc] của một hình GeoJSON bất kỳ (điểm, đường, vùng, nhiều vùng).
@@ -513,6 +515,7 @@ export default function MapPage() {
   // với màu thấy trong MicroStation. Mà đây là bản đồ quy hoạch, màu phải đúng bản vẽ được
   // duyệt. Ai muốn thấy nhà cửa bên dưới thì tự kéo thanh "Độ mờ" xuống.
   const [opacity, setOpacity] = useState(1);
+  const [nenOpen, setNenOpen] = useState(false);   // điện thoại: bảng chọn nền nổi trên bản đồ đang mở
   const [canDelete, setCanDelete] = useState(false);
   // BẢNG CHÚ GIẢI của bản đồ quy hoạch phân khu. Từ 12/9/2026 bốn bản phân khu được tô màu
   // theo LOẠI ĐẤT (xem ghi chú ở RASTER_OVERLAYS) nên phải có chú giải, không thì người xem
@@ -1325,19 +1328,22 @@ export default function MapPage() {
   // dt = true: đang vẽ cho ĐIỆN THOẠI. Chỉ ở điện thoại mới gộp "Vẽ thửa từ toạ độ" vào
   // nhóm này (màn hẹp, gom ba công cụ TỰ TẠO HÌNH vào một chỗ cho dễ tìm). Máy tính giữ
   // nguyên như cũ: nhãn "Đo:" và nút vẽ thửa nằm ở bảng lớp bên trái.
+  // Thứ tự trên ĐIỆN THOẠI (chủ dự án chốt 14/9/2026): hàng trên "Dài · Diện tích · Xong",
+  // "Vẽ thửa từ toạ độ" xuống hàng riêng bên dưới dòng hướng dẫn. Trước đó nút vẽ thửa chen
+  // giữa làm "Xong" rớt xuống một mình một hàng.
   const measureCtrl = (dt = false) => (
     <div className="flex items-center gap-1.5 flex-wrap">
       <span className="text-xs text-slate-400">{dt ? 'Đo - vẽ:' : 'Đo:'}</span>
       {mBtn('distance', '📏 Dài')}{mBtn('area', '⬛ Diện tích')}
-      {dt && (
-        <button onClick={() => setDrawOpen(true)}
-          className="cl-press px-2 py-1 rounded text-xs font-medium border bg-white border-slate-300 text-slate-700 whitespace-nowrap hover:bg-slate-50">✏️ Vẽ thửa từ toạ độ</button>
-      )}
       {measure !== 'off' && <button onClick={() => { setMeasure('off'); setMResult(null); }} className="px-2 py-1 rounded text-xs border border-slate-300 whitespace-nowrap">Xong</button>}
       {mResult && mResult.points > 0 && (
         <span className="text-xs font-bold text-orange-700 ml-1 whitespace-nowrap">{mResult.mode === 'distance' ? `Dài: ${fmtLen(mResult.distance)}` : `S: ${fmtArea(mResult.area)}`}</span>
       )}
       {measure !== 'off' && <span className="text-[11px] text-slate-400 w-full">Nhấp lần lượt các điểm trên bản đồ…</span>}
+      {dt && (
+        <button onClick={() => setDrawOpen(true)}
+          className="cl-press px-2 py-1 rounded text-xs font-medium border bg-white border-slate-300 text-slate-700 whitespace-nowrap hover:bg-slate-50">✏️ Vẽ thửa từ toạ độ</button>
+      )}
     </div>
   );
   // ── MỘT KHỐI QUY HOẠCH trong bảng "Thông tin thửa" ─────────────────────────
@@ -1395,12 +1401,14 @@ export default function MapPage() {
     </div>
   );
   const tabBtn = (key: string, label: string, active: boolean, dot = false) => (
+    // MỖI LÚC CHỈ MỘT NHÓM MỞ: bấm nhóm nào là đóng bảng "Lớp Q.Hoạch" + tắt đo của nhóm khác.
+    // Trước đây mở "Đo - vẽ" mà bảng lớp vẫn nằm đè nửa màn hình (chủ dự án chụp màn hình báo).
     <button onClick={
-      key === 'layers' ? () => { setPanelOpen(true); setTool('none'); }
-        : key === 'measure' ? () => { const open = tool !== 'measure'; setTool(open ? 'measure' : 'none'); setMeasure(open ? 'distance' : 'off'); setMResult(null); }
-          : key === 'chugiai' ? () => { napChuGiai(); setTool(tool === 'chugiai' ? 'none' : 'chugiai'); }
-            : () => setTool(tool === key ? 'none' : (key as any))}
-      className={`relative flex items-center justify-center gap-1.5 py-2.5 text-[12px] font-semibold transition active:scale-[.96] ${active ? 'bg-slate-100 text-[#0A2540]' : 'text-slate-600 hover:bg-slate-50'}`}>
+      key === 'layers' ? () => { setPanelOpen(true); setTool('none'); setMeasure('off'); setMResult(null); setNenOpen(false); }
+        : key === 'measure' ? () => { const open = tool !== 'measure'; setPanelOpen(false); setTool(open ? 'measure' : 'none'); setMeasure(open ? 'distance' : 'off'); setMResult(null); }
+          : key === 'chugiai' ? () => { napChuGiai(); setPanelOpen(false); setTool(tool === 'chugiai' ? 'none' : 'chugiai'); }
+            : () => { setPanelOpen(false); setTool(tool === key ? 'none' : (key as any)); }}
+      className={`relative flex items-center justify-center gap-1 px-0.5 py-2.5 text-[11px] min-[390px]:text-[12px] font-semibold whitespace-nowrap transition active:scale-[.96] ${active ? 'bg-slate-100 text-[#0A2540]' : 'text-slate-600 hover:bg-slate-50'}`}>
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">{key === 'search' ? <><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></> : <path d={key === 'layers' ? 'M12 2 2 7l10 5 10-5-10-5z M2 12l10 5 10-5 M2 17l10 5 10-5' : key === 'chugiai' ? 'M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4z M20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z' : 'M4 8h16v8H4z M8 8v3M12 8v4M16 8v3'} />}</svg>{label}
       {dot && <span className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full bg-orange-500" />}
     </button>
@@ -1422,7 +1430,7 @@ export default function MapPage() {
 
         {/* ĐIỆN THOẠI / iPad dọc (<lg): 4 nút gọn, bấm để mở từng nhóm */}
         <div className="lg:hidden grid grid-cols-4 divide-x divide-slate-200">
-          {tabBtn('layers', 'Lớp', false)}
+          {tabBtn('layers', 'Lớp Q.Hoạch', panelOpen)}
           {tabBtn('search', 'Tra cứu', tool === 'search')}
           {tabBtn('chugiai', 'Chú giải', tool === 'chugiai')}
           {tabBtn('measure', 'Đo - vẽ', tool === 'measure', measure !== 'off')}
@@ -1452,8 +1460,8 @@ export default function MapPage() {
           {/* Ô chọn nền bản đồ nằm ở đây vì trên điện thoại nhóm 'Bản đồ' ở thanh trên đã được
               nhường chỗ cho Chú giải. Máy tính vẫn có ô này ở thanh trên, để đây thêm cũng không
               thừa: người dùng hay mở bảng lớp rồi mới nghĩ đến chuyện đổi nền. */}
-          <div className="flex items-center gap-2 mb-3 lg:hidden">{baseMapCtrl(true)}</div>
-          <div className="mb-3 lg:hidden">{labelsCtrl()}</div>
+          {/* Điện thoại: ô chọn NỀN BẢN ĐỒ + "Nhãn & đường" đã đưa ra NỔI TRÊN BẢN ĐỒ (nút "Nền"
+              góc trái dưới) giống app tham chiếu — không còn nằm trong bảng này. */}
           <div className="pt-1">
             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1.5">Bản đồ quy hoạch</p>
             {MUC_QH.map((o) => (
@@ -1478,8 +1486,10 @@ export default function MapPage() {
                 Chỉ hiện khi đang bật một lớp phân khu 1/2000 — bốn bản đó mới là bản được
                 tô theo loại đất. QĐ205 và QĐ893 vẫn giữ màu bản vẽ gốc nên bảng này không
                 đúng cho chúng, hiện ra là dẫn người xem đọc sai. */}
+            {/* Điện thoại KHÔNG hiện khối này (chủ dự án yêu cầu 14/9/2026): đã có nhóm "Chú giải"
+                riêng trên thanh trên, để thêm trong bảng lớp là trùng. */}
             {(MUC_QH.find((x) => x.id === 'phan-khu')?.gom || []).some((id) => !!ovOn[id]) && (
-              <div className="mt-2">
+              <div className="mt-2 hidden lg:block">
                 <button
                   onClick={() => { setChuGiaiOpen((v) => !v); napChuGiai(); }}
                   className="cl-press w-full flex items-center justify-between gap-2 rounded-lg border px-2.5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50"
@@ -1564,11 +1574,37 @@ export default function MapPage() {
                     className={`cl-press shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-[12px] font-bold shadow-md backdrop-blur transition ${
                       bat ? 'bg-[#0A2540] text-white' : 'bg-white/90 text-slate-600 hover:bg-white'}`}>
                     <span className={`mr-1.5 inline-block h-2 w-2 rounded-full align-middle ${bat ? 'bg-[#C8A14B]' : 'bg-slate-300'}`} />
-                    {o.ten}
+                    {o.tenNgan}
                   </button>
                 );
               })}
             </div>
+          </div>
+          {/* ── NỀN BẢN ĐỒ NỔI TRÊN BẢN ĐỒ — CHỈ ĐIỆN THOẠI (14/9/2026, làm theo app tham chiếu) ──
+              Trước đây ô chọn nền nằm trong bảng "Lớp Q.Hoạch": muốn đổi nền phải mở bảng trùm nửa
+              màn hình. Giờ là nút vuông góc trái dưới, bấm ra 3 ô Đường · Vệ tinh · Địa hình kèm
+              "Nhãn & đường"; chọn xong tự đóng. Đặt bottom-[72px] để nằm trên thanh menu dưới đáy. */}
+          {/* Lúc mở phải nổi trên bong bóng "Có nhà đất cần bán" của ChatWidget (fixed z-[55]),
+              không thì bong bóng che mất ô Vệ tinh / Địa hình. Lúc đóng thì về z-10 như các nút khác. */}
+          <div className={`lg:hidden absolute left-2 bottom-[72px] flex items-end gap-2 ${nenOpen ? 'z-[57]' : 'z-10'}`}>
+            <button onClick={() => setNenOpen((v) => !v)} aria-label="Chọn nền bản đồ"
+              className={`cl-press flex h-12 w-12 flex-col items-center justify-center rounded-xl border-2 shadow-lg ${nenOpen ? 'border-[#C8A14B] bg-[#0A2540] text-white' : 'border-white bg-white/95 text-[#0A2540]'}`}>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z M2 12l10 5 10-5 M2 17l10 5 10-5" /></svg>
+              <span className="text-[9px] font-bold leading-none mt-0.5">Nền</span>
+            </button>
+            {nenOpen && (
+              <div className="rounded-xl bg-white/95 backdrop-blur p-2 shadow-xl border border-slate-200">
+                <div className="flex gap-1.5">
+                  {([['street', '🗺', 'Đường'], ['satellite', '🛰', 'Vệ tinh'], ['terrain', '⛰', 'Địa hình']] as [BaseMap, string, string][]).map(([b, ic, l]) => (
+                    <button key={b} onClick={() => { setBaseMap(b); setNenOpen(false); }}
+                      className={`cl-press flex w-14 flex-col items-center gap-0.5 rounded-lg border-2 py-1.5 text-[10px] font-bold ${baseMap === b ? 'border-emerald-600 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600'}`}>
+                      <span className="text-lg leading-none">{ic}</span>{l}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-1.5 pt-1.5 border-t border-slate-100">{labelsCtrl()}</div>
+              </div>
+            )}
           </div>
           {/* ── DANH SÁCH THỬA TÌM ĐƯỢC ── hiện khi có nhiều thửa cùng số tờ/số thửa.
               Rất hay gặp khi tra theo XÃ MỚI, vì một xã mới gộp nhiều xã cũ mà mỗi xã cũ
@@ -1596,7 +1632,9 @@ export default function MapPage() {
             </div>
           )}
           {zoomNow > 0 && zoomNow < PARCEL_SHOW_ZOOM && (
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 bg-[#0A2540]/90 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">🔍 Phóng to để hiện thửa đất</div>
+            // Điện thoại: đẩy xuống DƯỚI thanh nút quy hoạch (top-12). Để top-2 như máy tính thì
+            // nó đè đúng lên thanh nút, che mất chữ và bấm không trúng nút.
+            <div className="pointer-events-none absolute top-12 lg:top-2 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap bg-[#0A2540]/90 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">🔍 Phóng to để hiện thửa đất</div>
           )}
           {/* BẢNG ĐẦY ĐỦ khi bấm gim tin lưu — như giỏ hàng */}
           {selPlace && (
@@ -1668,8 +1706,10 @@ export default function MapPage() {
               </div>
             </div>
           )}
-          {/* Thanh ĐỘ MỜ lớp phủ dạng DỌC nổi trên bản đồ — chỉ hiện trên điện thoại/iPad (bảng trái bị ẩn) */}
-          {(qhFillOn || ovOn['qh-qd205']) && (
+          {/* Thanh ĐỘ MỜ lớp phủ dạng DỌC nổi trên bản đồ — chỉ hiện trên điện thoại/iPad (bảng trái bị ẩn).
+              Hiện khi bật BẤT KỲ lớp quy hoạch nào. Trước chỉ hiện với QĐ205 nên bật phân khu / QĐ893
+              thì mất nút kéo, dù bản đồ vẫn áp độ mờ cho mọi lớp. */}
+          {(qhFillOn || RASTER_OVERLAYS.some((o) => !!ovOn[o.id])) && (
             <div className="lg:hidden absolute top-1/2 right-2 -translate-y-1/2 z-10 flex flex-col items-center gap-1.5 bg-white/95 backdrop-blur rounded-full border border-slate-200 shadow-lg px-1.5 py-3">
               <span className="text-[9px] font-bold text-slate-400">Đậm</span>
               <div className="relative h-28 w-5">

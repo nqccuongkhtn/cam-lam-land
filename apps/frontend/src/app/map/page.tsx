@@ -23,12 +23,15 @@ const boDauVn = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replac
 // (gõ không dấu cũng ra). Dùng cho ô chọn huyện/TP cũ và ô chọn xã/phường.
 // Đặt NGOÀI trang chính: nếu để bên trong, mỗi lần trang vẽ lại thì ô này bị dựng lại từ đầu
 // và con trỏ đang gõ sẽ nhảy ra ngoài.
-function OChonCoGo({ nhan, dsMuc, giaTri, khiChon, className }: {
+function OChonCoGo({ nhan, dsMuc, giaTri, khiChon, className, dienThoai = false }: {
   nhan: string;
   dsMuc: { id: string; ten: string; phu?: string }[];
   giaTri: string;
   khiChon: (id: string) => void;
   className?: string;
+  // dienThoai: bảng đáy Tra cứu trên điện thoại — chữ 16px (iPhone tự PHÓNG TO cả trang khi bấm ô chữ
+  // nhỏ hơn 16px) và danh sách SỔ LÊN TRÊN (bảng nằm sát bàn phím, sổ xuống là bị bàn phím che mất).
+  dienThoai?: boolean;
 }) {
   const [go, setGo] = useState('');
   const [daGo, setDaGo] = useState(false);   // đã bắt đầu gõ hay chưa (chưa gõ thì sổ ĐỦ danh sách)
@@ -70,10 +73,10 @@ function OChonCoGo({ nhan, dsMuc, giaTri, khiChon, className }: {
           if (e.key === 'Enter' && loc.length) { e.preventDefault(); chon(loc[0].id); (e.target as HTMLInputElement).blur(); }
           if (e.key === 'Escape') dong();
         }}
-        className={`border rounded-lg pl-2.5 pr-6 py-1.5 text-xs w-full bg-white truncate ${giaTri ? 'border-[#0A2540] font-semibold text-[#0A2540]' : 'border-slate-300'}`} />
+        className={`border rounded-lg pl-2.5 pr-6 w-full bg-white truncate ${dienThoai ? 'py-2 text-[16px]' : 'py-1.5 text-xs'} ${giaTri ? 'border-[#0A2540] font-semibold text-[#0A2540]' : 'border-slate-300'}`} />
       <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[9px]">▼</span>
       {mo && (
-        <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto scroll-soft">
+        <div className={`absolute left-0 right-0 z-50 bg-white border border-slate-200 rounded-lg shadow-xl overflow-y-auto scroll-soft ${dienThoai ? 'bottom-full mb-1 max-h-[38vh]' : 'top-full mt-1 max-h-60'}`}>
           {giaTri && (
             <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => chon('')}
               className="w-full text-left px-2.5 py-1.5 text-[11px] text-slate-400 hover:bg-slate-50 border-b border-slate-100 sticky top-0 bg-white">— Bỏ chọn —</button>
@@ -246,7 +249,7 @@ const RASTER_OVERLAYS = [
 // `tenApp` = tên ghi trong BẢNG ĐÁY chọn bản đồ + dòng tên góc trái dưới bản đồ (điện thoại) —
 // viết tắt đúng kiểu app tham chiếu cho gọn MỘT DÒNG (chủ dự án chê chữ to, xuống 2 dòng, 14/9/2026).
 const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: string[] }[] = [
-  { id: 'qh-qd205', ten: 'Quy hoạch chung 2045 (QĐ205)', tenNgan: 'QH chung 205', tenApp: 'QH Xây dựng chung 2045', gom: ['qh-qd205'] },
+  { id: 'qh-qd205', ten: 'Quy hoạch chung 2045 (QĐ205)', tenNgan: 'QH chung 205', tenApp: 'Quy hoạch chung 2045', gom: ['qh-qd205'] },
   { id: 'phan-khu', ten: 'Quy hoạch phân khu 1/2000', tenNgan: 'Phân khu 1/2000', tenApp: 'QHXD Phân khu', gom:['qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin', 'qh-taynam', 'qh-taybac'] },
   { id: 'qh-qd893', ten: 'Quy hoạch sử dụng đất 2030 (QĐ893)', tenNgan: 'Sử dụng đất 893', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-qd893'] },
 ];
@@ -540,6 +543,37 @@ export default function MapPage() {
   // CHE MẤT nút "Tra cứu" / "Vẽ & zoom tới thửa" ở đáy các bảng (chủ dự án chụp màn hình 14/9/2026).
   //   menuDe  = phần thanh menu đè lên KHUNG BẢN ĐỒ (px) → cho các bảng đặt `absolute` trong khung
   //   menuCao = chiều cao thanh menu tính từ đáy MÀN HÌNH (px) → cho bảng đặt `fixed`
+  // BÀN PHÍM ĐIỆN THOẠI ĐANG MỞ (học theo app, chủ dự án chê "đẩy lên hết gớm quá" 14/9/2026).
+  // Bàn phím iPhone bật lên thì Safari đẩy cả trang lên: thanh menu đáy nổi lơ lửng trên bàn phím,
+  // bảng Tra cứu bị kéo mất nửa trên. Cách làm như app: đo MÉP TRÊN BÀN PHÍM bằng visualViewport,
+  // bảng đáy dính đúng vào mép đó (fixed), thanh menu đáy + bong bóng chat tạm ẨN (lớp `cl-ban-phim`).
+  //   dinh = toạ độ (px, tính từ đầu trang) của mép trên bàn phím; caoNhin = chiều cao vùng còn thấy.
+  const [banPhim, setBanPhim] = useState<{ dinh: number; caoNhin: number } | null>(null);
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const tinh = () => {
+      const phanBiChe = window.innerHeight - vv.height;   // bàn phím (và thanh công cụ của nó) chiếm
+      const mo = phanBiChe > 150 && window.innerWidth < 1024 && !!document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+      document.documentElement.classList.toggle('cl-ban-phim', mo);
+      setBanPhim((c) => {
+        if (!mo) return c ? null : c;
+        const moi = { dinh: Math.round(vv.offsetTop + vv.height), caoNhin: Math.round(vv.height) };
+        return c && c.dinh === moi.dinh && c.caoNhin === moi.caoNhin ? c : moi;
+      });
+    };
+    vv.addEventListener('resize', tinh); vv.addEventListener('scroll', tinh);
+    document.addEventListener('focusin', tinh); document.addEventListener('focusout', () => setTimeout(tinh, 50));
+    return () => {
+      vv.removeEventListener('resize', tinh); vv.removeEventListener('scroll', tinh);
+      document.removeEventListener('focusin', tinh);
+      document.documentElement.classList.remove('cl-ban-phim');
+    };
+  }, []);
+  // Kiểu đặt bảng đáy khi bàn phím mở: dính mép trên bàn phím, cao tối đa 72% vùng còn thấy.
+  const kieuBangDay: React.CSSProperties | undefined = banPhim
+    ? { position: 'fixed', left: 0, right: 0, bottom: 'auto', top: banPhim.dinh, transform: 'translateY(-100%)', maxHeight: Math.round(banPhim.caoNhin * 0.72), zIndex: 70 }
+    : undefined;
   const khungBanDoRef = useRef<HTMLDivElement>(null);
   const [menuDo, setMenuDo] = useState<{ de: number; cao: number } | null>(null);
   useEffect(() => {
@@ -577,7 +611,6 @@ export default function MapPage() {
   }, []);
   const [qhSheet, setQhSheet] = useState(false);   // điện thoại: bảng đáy "Chọn bản đồ quy hoạch" đang mở
   const [tcTab, setTcTab] = useState<'goc' | 'to' | 'toado' | 'gmap'>('to'); // thẻ đang mở của bảng đáy Tra cứu
-  const [diemGiua, setDiemGiua] = useState(0);     // tăng 1 = thêm điểm đo ở tâm bản đồ (nút "Chọn điểm")
   const [gocTab, setGocTab] = useState<'bang' | 'anh' | 'dan'>('bang'); // 3 thẻ con của Góc ranh
   const [canDelete, setCanDelete] = useState(false);
   // BẢNG CHÚ GIẢI của bản đồ quy hoạch phân khu. Từ 12/9/2026 bốn bản phân khu được tô màu
@@ -769,8 +802,12 @@ export default function MapPage() {
     const xs = cac.flatMap((o) => o.coordinates.map((c) => c[0]));
     const ys = cac.flatMap((o) => o.coordinates.map((c) => c[1]));
     const tam: [number, number] = [(Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...ys) + Math.max(...ys)) / 2];
+    // ⚠️ minzoom khai ở trên là mức của BỘ ẢNH (ô 256px). Thư viện bản đồ tính mức phóng theo ô 512px,
+    // nên ô ảnh mức N đã hiện ở mức phóng BẢN ĐỒ N−1. Bay tới đúng N là sâu thừa 1 nấc (chủ dự án thấy
+    // QĐ205 "zoom hơi sâu", 14/9/2026) → mức nhỏ nhất thấy được ảnh = N − 1.
+    const zThay = zMin - 1;
     const m: any = (window as any).__banDo;
-    if (m && zMin > 0 && m.getZoom() < zMin) m.easeTo({ center: tam, zoom: zMin, duration: 900 });
+    if (m && zThay > 0 && m.getZoom() < zThay) m.easeTo({ center: tam, zoom: zThay, duration: 900 });
   }, []);
   // ĐẨY BẢN ĐỒ KHI THỬA BỊ BẢNG CHE.
   // Bảng "Thông tin thửa" nằm giữa-dưới, hay đè lên đúng thửa vừa bấm. Hàm này đo vị trí bảng,
@@ -1395,8 +1432,8 @@ export default function MapPage() {
             </>
           ) : (
             <>
-              <input value={c1} onChange={(e) => setC1(e.target.value)} placeholder={searchMode === 'vn2000' ? 'X (Bắc)' : 'Vĩ độ'} className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
-              <input value={c2} onChange={(e) => setC2(e.target.value)} placeholder={searchMode === 'vn2000' ? 'Y (Đông)' : 'Kinh độ'} className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
+              <input value={c1} onChange={(e) => setC1(e.target.value)} inputMode="decimal" placeholder={searchMode === 'vn2000' ? 'X (Bắc)' : 'Vĩ độ'} className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
+              <input value={c2} onChange={(e) => setC2(e.target.value)} inputMode="decimal" placeholder={searchMode === 'vn2000' ? 'Y (Đông)' : 'Kinh độ'} className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
             </>
           )}
         </>
@@ -1654,28 +1691,14 @@ export default function MapPage() {
         <div ref={khungBanDoRef} className="relative flex-1">
           <MapView layers={geoLayers} overlays={overlays} markers={allMarkers} baseMap={baseMap} labels={labels} measureMode={measure}
             focusPoint={focusPoint} flyToPoint={flyPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} onViewport={onViewport} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={1} fitTo={fitTo} textLabels={textLabels}
-            routes={dirTuyen} onPickRoute={setDirChon} diaChinhTiles={dcTiles} themDiemGiua={diemGiua} />
-
-          {/* ── DẤU NGẮM GIỮA BẢN ĐỒ khi đang đo — CHỈ ĐIỆN THOẠI, kiểu app ──────────────────────
-              Kéo bản đồ cho điểm cần đo nằm đúng tâm dấu ngắm rồi bấm "Chọn điểm". Không nhận chạm
-              (pointer-events-none) nên vẫn kéo/bấm bản đồ bình thường qua nó. */}
-          {measure !== 'off' && (
-            <div className="lg:hidden pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2" aria-hidden>
-              <svg width="44" height="44" viewBox="0 0 44 44" className="drop-shadow-[0_0_2px_rgba(0,0,0,.8)]">
-                <g stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
-                  <path d="M22 4v11M22 29v11M4 22h11M29 22h11" />
-                </g>
-                <circle cx="22" cy="22" r="2.2" fill="#ef4444" stroke="#fff" strokeWidth="1" />
-              </svg>
-            </div>
-          )}
+            routes={dirTuyen} onPickRoute={setDirChon} diaChinhTiles={dcTiles} />
 
           {/* ── BẢNG ĐÁY "TRA CỨU" — CHỈ ĐIỆN THOẠI, học theo app tham chiếu (14/9/2026) ───────────
               4 thẻ: Góc ranh (bảng toạ độ VN-2000 → vẽ thửa) · Tờ thửa · Toạ độ · Google Maps.
               Nằm sát trên thanh menu đáy, cuộn được, bản đồ vẫn thấy phía trên. Trước đây là khối
               xổ xuống dưới thanh nút trên cùng, đẩy bản đồ và che mất phần đầu. */}
           {tool === 'search' && (
-            <div className="lg:hidden absolute inset-x-0 bottom-[var(--menu-de,calc(56px+env(safe-area-inset-bottom)))] z-30 max-h-[62%] flex flex-col rounded-t-2xl bg-white shadow-[0_-8px_30px_rgba(0,0,0,.18)]">
+            <div style={kieuBangDay} className="lg:hidden absolute inset-x-0 bottom-[var(--menu-de,calc(56px+env(safe-area-inset-bottom)))] z-30 max-h-[62%] flex flex-col rounded-t-2xl bg-white shadow-[0_-8px_30px_rgba(0,0,0,.18)]">
               <div className="flex items-center border-b border-slate-200 pl-2 pr-1">
                 {([['goc', 'Góc ranh'], ['to', 'Tờ thửa'], ['toado', 'Toạ độ'], ['gmap', 'Google Maps']] as [typeof tcTab, string][]).map(([k, lb]) => (
                   <button key={k} onClick={() => { setTcTab(k); if (k === 'to') setSearchMode('parcel'); else if (k === 'gmap') setSearchMode('gmap'); else if (k === 'toado' && searchMode !== 'latlng') setSearchMode('vn2000'); }}
@@ -1757,7 +1780,47 @@ export default function MapPage() {
                     </div>
                   </div>
                 )}
-                {tcTab === 'to' && searchCtrl(true, true)}
+                {/* THẺ TỜ THỬA — trình bày KIỂU APP: mỗi ô một dòng, nhãn bên trái, ô bên phải; số tờ / số thửa
+                    bật BÀN PHÍM SỐ. Thứ tự vẫn giữ quy tắc cũ: chọn địa giới trước (cấp → huyện → xã) rồi mới
+                    tới số tờ, số thửa. Ruột (c1 = số tờ, c2 = số thửa, doSearch) dùng chung với máy tính. */}
+                {tcTab === 'to' && (
+                  <div className="space-y-2">
+                    {([
+                      ['Hệ thống hành chính', (
+                        <select value={cap} onChange={(e) => { setCap(e.target.value as any); setC3(''); setHuyenChon(''); donKetQuaCu(); }}
+                          className="w-full rounded-lg border border-slate-300 bg-white px-2 py-2 text-[16px]">
+                          <option value="3">3 cấp (huyện – xã)</option>
+                          <option value="2">2 cấp (xã mới)</option>
+                        </select>
+                      )],
+                      [cap === '3' ? 'Huyện / TP cũ' : 'Khu vực', (
+                        <OChonCoGo dienThoai nhan={cap === '3' ? 'Chọn huyện/TP cũ' : 'Chọn khu vực'} giaTri={huyenChon}
+                          dsMuc={dsHuyen.map(([h, n]) => ({ id: h, ten: h, phu: `${n} xã/phường` }))}
+                          khiChon={(h) => { setHuyenChon(h); setC3(''); donKetQuaCu(); }} />
+                      )],
+                      ['Xã / phường', (
+                        <OChonCoGo dienThoai nhan="Gõ hoặc chọn xã/phường" giaTri={c3}
+                          dsMuc={xaTheoHuyen.map((x) => ({ id: x.xaId, ten: x.ten, phu: x.soThua ? `${x.huyen} · ${x.soThua.toLocaleString('vi-VN')} thửa` : x.huyen }))}
+                          khiChon={(ma) => { donKetQuaCu(); setC3(ma); const x = dsXaCap.find((y) => y.xaId === ma) || null; if (x) { setHuyenChon(x.huyen); bayToiXa(x); } }} />
+                      )],
+                      [nhanOSoTo, (
+                        <input value={c1} onChange={(e) => setC1(e.target.value)} inputMode="numeric" enterKeyHint="next" placeholder="Nhập số tờ"
+                          className="w-full rounded-lg border border-slate-300 px-2.5 py-2 text-[16px] outline-none focus:border-[#6c5ce7]" />
+                      )],
+                      ['Số thửa', (
+                        <input value={c2} onChange={(e) => setC2(e.target.value)} inputMode="numeric" enterKeyHint="search" placeholder="Nhập số thửa"
+                          onKeyDown={(e) => { if (e.key === 'Enter') { (e.target as HTMLInputElement).blur(); doSearch(); setTool('none'); } }}
+                          className="w-full rounded-lg border border-slate-300 px-2.5 py-2 text-[16px] outline-none focus:border-[#6c5ce7]" />
+                      )],
+                    ] as [string, React.ReactNode][]).map(([nhan, o]) => (
+                      <div key={nhan} className="grid grid-cols-[42%_1fr] items-center gap-2">
+                        <span className="text-[13.5px] text-slate-600">{nhan}</span>{o}
+                      </div>
+                    ))}
+                    <button onClick={() => { (document.activeElement as HTMLElement | null)?.blur(); doSearch(); setTool('none'); }}
+                      className="cl-press mt-1 w-full rounded-xl bg-[#6c5ce7] py-2.5 text-[14px] font-semibold text-white">Tra cứu</button>
+                  </div>
+                )}
                 {tcTab === 'toado' && (
                   <div>
                     <div className="mb-2 inline-flex rounded-lg bg-slate-100 p-0.5 text-[13px]">
@@ -1778,11 +1841,12 @@ export default function MapPage() {
             </div>
           )}
 
-          {/* ── BẢNG ĐÁY "ĐO - VẼ" (thước đo) — CHỈ ĐIỆN THOẠI, học theo app tham chiếu ─────────────
-              Dấu ngắm giữa bản đồ + nút "Chọn điểm" (thêm điểm ở TÂM bản đồ): chính xác hơn chạm
-              tay, vì ngón tay che mất chỗ cần chọn. Bấm thẳng lên bản đồ vẫn thêm điểm như cũ. */}
+          {/* ── BẢNG ĐÁY "ĐO" (thước đo) — CHỈ ĐIỆN THOẠI ─────────────────────────────────────────────
+              Người dùng CHẠM THẲNG lên bản đồ để chọn từng điểm (lướt bản đồ không bị tính là chạm —
+              xem MapView). Từng có dấu ngắm giữa bản đồ + nút "Chọn điểm" kiểu app, chủ dự án bỏ
+              (14/9/2026): "người dùng tự lướt và chọn điểm trên bản đồ chứ cần gì chọn điểm". */}
           {tool === 'measure' && measure !== 'off' && (
-            <div className="lg:hidden absolute inset-x-0 bottom-[var(--menu-de,calc(56px+env(safe-area-inset-bottom)))] z-30 rounded-t-2xl bg-white px-3.5 pb-3 pt-2.5 shadow-[0_-8px_30px_rgba(0,0,0,.18)]">
+            <div style={kieuBangDay} className="lg:hidden absolute inset-x-0 bottom-[var(--menu-de,calc(56px+env(safe-area-inset-bottom)))] z-30 rounded-t-2xl bg-white px-3.5 pb-3 pt-2.5 shadow-[0_-8px_30px_rgba(0,0,0,.18)]">
               <div className="flex items-center gap-2">
                 <p className="text-[14px] font-semibold text-slate-700">Hướng dẫn</p>
                 <div className="ml-2 inline-flex rounded-lg bg-slate-100 p-0.5 text-[12.5px]">
@@ -1793,7 +1857,7 @@ export default function MapPage() {
                 <button onClick={() => { setMeasure('off'); setMResult(null); setTool('none'); }} aria-label="Đóng" className="ml-auto grid h-8 w-8 place-items-center text-xl text-slate-400">✕</button>
               </div>
               <p className="mt-1.5 text-[13px] leading-snug text-slate-500">
-                Di chuyển bản đồ sao cho điểm cần chọn nằm ở <b>tâm dấu ngắm</b> giữa bản đồ, rồi bấm <b>Chọn điểm</b>.
+                Chạm lần lượt các điểm cần đo trên bản đồ. Lướt bản đồ để di chuyển, không bị tính là chọn điểm.
               </p>
               {mResult && mResult.points > 0 && (
                 <p className="mt-1.5 text-[13px] font-bold text-orange-700">
@@ -1802,10 +1866,7 @@ export default function MapPage() {
               )}
               {/* Không có nút "Xong": trùng việc với dấu ✕ ở góc (chủ dự án 14/9/2026). Vẽ thửa từ toạ độ
                   đã nằm ở Tra cứu → Góc ranh nên bảng này CHỈ ĐO. */}
-              <div className="mt-2.5 grid grid-cols-[1.4fr_1fr] gap-2">
-                <button onClick={() => setDiemGiua((n) => n + 1)} className="cl-press rounded-xl bg-[#6c5ce7] py-2.5 text-[14px] font-semibold text-white">Chọn điểm</button>
-                <button onClick={() => { const m = measure; setMeasure('off'); setMResult(null); requestAnimationFrame(() => setMeasure(m)); }} className="cl-press rounded-xl bg-[#eef0fb] py-2.5 text-[14px] font-semibold text-[#0A2540]">Đo lại</button>
-              </div>
+              <button onClick={() => { const m = measure; setMeasure('off'); setMResult(null); requestAnimationFrame(() => setMeasure(m)); }} className="cl-press mt-2.5 w-full rounded-xl bg-[#eef0fb] py-2.5 text-[14px] font-semibold text-[#0A2540]">Đo lại</button>
             </div>
           )}
 

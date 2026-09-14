@@ -47,9 +47,6 @@ interface Props {
   diaChinhTiles?: string[] | null;
   routes?: TuyenVe[];                 // các phương án đường đi (chỉ đường)
   onPickRoute?: (id: number) => void; // bấm vào tuyến xám → chọn tuyến đó
-  // THƯỚC ĐO KIỂU APP (điện thoại, 14/9/2026): mỗi lần số này TĂNG thì thêm một điểm đo đúng
-  // TÂM bản đồ (chỗ có dấu ngắm do trang vẽ). Không đụng gì tới cách xử lý chạm/kéo bên dưới.
-  themDiemGiua?: number;
 }
 
 // Google tiles — best detail/zoom for Vietnam. lyrs: m=đường, y=vệ tinh+nhãn, p=địa hình
@@ -179,7 +176,7 @@ function parcelDims(hl: any): any[] {
   return out;
 }
 
-export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, flyToPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, fitMinZoom, onMapClick, onMeasure, onViewport, textLabels = [], routes = [], onPickRoute, diaChinhTiles = null, themDiemGiua = 0 }: Props) {
+export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, flyToPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, fitMinZoom, onMapClick, onMeasure, onViewport, textLabels = [], routes = [], onPickRoute, diaChinhTiles = null }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const markerRefs = useRef<Marker[]>([]);
@@ -391,14 +388,6 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     const area = measureModeRef.current === 'area' ? polyArea(pts) : 0;
     onMeasure?.({ mode: measureModeRef.current, points: pts.length, distance, area });
   }
-  // Nút "Chọn điểm" (điện thoại): thêm điểm đo ở TÂM bản đồ. Chỉ chạy khi đang bật đo.
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!themDiemGiua || !map || measureModeRef.current === 'off') return;
-    const c = map.getCenter();
-    addMeasurePoint(c.lng, c.lat);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [themDiemGiua]);
   useEffect(() => {
     measureModeRef.current = measureMode;
     measurePts.current = [];

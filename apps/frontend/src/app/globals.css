@@ -455,4 +455,8 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 @media (max-width: 1023px) {
   html.cl-ban-do, html.cl-ban-do * { scrollbar-width: none; -ms-overflow-style: none; }
   html.cl-ban-do::-webkit-scrollbar, html.cl-ban-do *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+  /* Bàn phím đang mở (app/map/page.tsx gắn lớp `cl-ban-phim`): ẩn thanh menu đáy + bong bóng chat,
+     không để chúng nổi lơ lửng giữa bảng Tra cứu và bàn phím như trước. */
+  html.cl-ban-do.cl-ban-phim nav.fixed.bottom-0,
+  html.cl-ban-do.cl-ban-phim .cl-fab { display: none !important; }
 }

@@ -222,6 +222,8 @@ for (const b of [
   { ma: 'cuhin', ten: 'Quy hoạch phân khu Cù Hin 1/2000', tep: 'qh_zones_cuhin.json' },
   // Bản vẽ gốc: quyhoach2025/Tay Nam da sua - ban cuoi.dxf (chủ dự án sửa 2 chỗ, nạp 14/9/2026).
   { ma: 'taynam', ten: 'Quy hoạch phân khu Tây Nam 1/2000', tep: 'qh_zones_taynam.json' },
+  // Bản vẽ gốc: quyhoach2025/1-2000 Phan khu Tay Bac.dxf (nạp 14/9/2026).
+  { ma: 'taybac', ten: 'Quy hoạch phân khu Tây Bắc 1/2000', tep: 'qh_zones_taybac.json' },
 ]) {
   try {
     const zone: Zone[] = JSON.parse(fs.readFileSync(path.join(DATA_DIR, b.tep), 'utf-8'));

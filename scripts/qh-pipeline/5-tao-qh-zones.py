@@ -220,6 +220,11 @@ def main(vao, ma, duong_text=None):
                 continue
             loai = NHOM_MAU.get((p.get('c') or '').lower(), CHUA_RO)
             bac = 0          # bậc 0 = thấp nhất, luôn thua mọi ô có tên thật
+        elif re.fullmatch(r'\s*\d+\s*', p.get('lo') or ''):
+            # Level chỉ là con số (vd '0' — level mặc định của CAD): bản vẽ KHÔNG nói đây là đất gì.
+            # Không ghi thì phiếu tra cứu in ra loại đất tên "0" (gặp ở Cù Hin, 2 ô). Không đoán.
+            loai = CHUA_RO
+            bac = 0
         else:
             loai = ten_loai(p.get('lo'))
         # làm tròn toạ độ 6 số lẻ (~0,1 m) cho file nhẹ đi đáng kể

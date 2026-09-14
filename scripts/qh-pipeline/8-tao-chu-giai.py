@@ -74,6 +74,8 @@ def main(files):
         d = json.load(io.open(f, encoding='utf-8'))
         for ft in d.get('features', []):
             p = ft.get('properties') or {}
+            if (p.get('lo') or '').strip().isdigit():
+                continue    # level chỉ là con số (vd '0' ở Cù Hin): bản vẽ không nói đất gì, in "0" vào chú giải vô nghĩa
             ten = ten_loai(p.get('lo', ''))
             # Bản vẽ tô HIỆN TRẠNG bằng màu khác hẳn quy hoạch, mà tên level sau khi cắt tiền tố
             # lại ra giống nhau ('Nhóm nhà ở'). Ghi rõ để người xem khỏi tưởng bảng in lặp.

@@ -218,6 +218,8 @@ for (const b of [
   { ma: '2101', ten: 'QĐ2101 — Quy hoạch phân khu trung tâm 1/2000',     tep: 'qh_zones_2101.json' },
   { ma: '2222', ten: 'QĐ2222 — Quy hoạch 1/2000',              tep: 'qh_zones_2222.json' },
   { ma: '918',  ten: 'QĐ918 — Quy hoạch phân khu phức hợp phía Tây 1/2000', tep: 'qh_zones_918.json' },
+  // Bản vẽ gốc: quyhoach2025/phân khu cù hin 1.2000.dxf (nạp 14/9/2026). Chưa có số quyết định.
+  { ma: 'cuhin', ten: 'Quy hoạch phân khu Cù Hin 1/2000', tep: 'qh_zones_cuhin.json' },
 ]) {
   try {
     const zone: Zone[] = JSON.parse(fs.readFileSync(path.join(DATA_DIR, b.tep), 'utf-8'));

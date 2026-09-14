@@ -11,16 +11,16 @@
      "so": 1124
     },
     {
+     "mau": "#979763",
+     "ten": "Làng xóm (hiện trạng) · Nhóm nhà ở (hiện trạng) + 5 loại nữa",
+     "dayDu": "Làng xóm (hiện trạng) · Nhóm nhà ở (hiện trạng) · Làng xóm · Làng xóm đô thị hoá (hiện trạng) · Dân cư nông thôn (hiện trạng) · Dân cư nông thôn · Làng xóm đô thị hoá",
+     "so": 540
+    },
+    {
      "mau": "#e2f5ab",
      "ten": "Nhóm nhà ở · Đơn vị ở mật độ thấp đến năm 2045 + 1 loại nữa",
      "dayDu": "Nhóm nhà ở · Đơn vị ở mật độ thấp đến năm 2045 · Đơn vị ở mật độ thấp đến năm 2030",
      "so": 435
-    },
-    {
-     "mau": "#979763",
-     "ten": "Nhóm nhà ở (hiện trạng) · Làng xóm (hiện trạng) + 5 loại nữa",
-     "dayDu": "Nhóm nhà ở (hiện trạng) · Làng xóm (hiện trạng) · Làng xóm đô thị hoá (hiện trạng) · Dân cư nông thôn (hiện trạng) · Làng xóm · Dân cư nông thôn · Làng xóm đô thị hoá",
-     "so": 398
     },
     {
      "mau": "#cc4619",
@@ -55,7 +55,7 @@
      "mau": "#cc4619",
      "ten": "Đất hỗn hợp – nhóm nhà ở · Đất hỗn hợp",
      "dayDu": "Đất hỗn hợp – nhóm nhà ở · Đất hỗn hợp",
-     "so": 80
+     "so": 86
     }
    ]
   },
@@ -66,7 +66,7 @@
      "mau": "#fb30fc",
      "ten": "Đất du lịch · Đất dịch vụ + 3 loại nữa",
      "dayDu": "Đất du lịch · Đất dịch vụ · Đất du lịch (hiện trạng) · Du lịch – khu du lịch · Đất dịch vụ (hiện trạng)",
-     "so": 138
+     "so": 148
     },
     {
      "mau": "#cc1919",
@@ -101,48 +101,48 @@
      "mau": "#a05d5d",
      "ten": "Trường học · Trường học (hiện trạng) + 2 loại nữa",
      "dayDu": "Trường học · Trường học (hiện trạng) · Trường học nông thôn · Trường học (nông thôn) (hiện trạng)",
-     "so": 318
-    },
-    {
-     "mau": "#b37e8b",
-     "ten": "Văn hoá đơn vị ở · Đất cơ sở văn hoá + 5 loại nữa",
-     "dayDu": "Văn hoá đơn vị ở · Đất cơ sở văn hoá · Đất cơ sở văn hoá (nông thôn) (hiện trạng) · Văn hoá đơn vị ở (hiện trạng) · Đất cơ sở văn hoá (hiện trạng) · Đất cơ sở văn hoá (đô thị) · Đất cơ sở văn hoá (nông thôn)",
-     "so": 92
+     "so": 328
     },
     {
      "mau": "#750f0f",
      "ten": "Di tích – tôn giáo (hiện trạng) · Di tích (hiện trạng) + 1 loại nữa",
      "dayDu": "Di tích – tôn giáo (hiện trạng) · Di tích (hiện trạng) · Di tích – tôn giáo",
-     "so": 85
+     "so": 100
+    },
+    {
+     "mau": "#b37e8b",
+     "ten": "Văn hoá đơn vị ở · Đất cơ sở văn hoá + 5 loại nữa",
+     "dayDu": "Văn hoá đơn vị ở · Đất cơ sở văn hoá · Đất cơ sở văn hoá (nông thôn) (hiện trạng) · Đất cơ sở văn hoá (hiện trạng) · Văn hoá đơn vị ở (hiện trạng) · Đất cơ sở văn hoá (đô thị) · Đất cơ sở văn hoá (nông thôn)",
+     "so": 94
     },
     {
      "mau": "#e94fc2",
      "ten": "Y tế đơn vị ở · Đất cơ sở y tế + 6 loại nữa",
-     "dayDu": "Y tế đơn vị ở · Đất cơ sở y tế · Y tế đơn vị ở (hiện trạng) · Đất cơ sở y tế (ngoài đô thị) · Đất cơ sở y tế (hiện trạng) · Đất cơ sở y tế (ngoài đô thị) (hiện trạng) · Đất cơ sở y tế (đô thị) · Yte_CT (hiện trạng)",
-     "so": 84
+     "dayDu": "Y tế đơn vị ở · Đất cơ sở y tế · Đất cơ sở y tế (hiện trạng) · Y tế đơn vị ở (hiện trạng) · Đất cơ sở y tế (ngoài đô thị) · Đất cơ sở y tế (ngoài đô thị) (hiện trạng) · Đất cơ sở y tế (đô thị) · Yte_CT (hiện trạng)",
+     "so": 89
     },
     {
      "mau": "#a93915",
-     "ten": "Trường THPT",
-     "dayDu": "Trường THPT",
-     "so": 20
+     "ten": "Trường THPT · Trường THPT (hiện trạng)",
+     "dayDu": "Trường THPT · Trường THPT (hiện trạng)",
+     "so": 22
     },
     {
      "mau": "#a95e15",
      "ten": "Đất cơ quan (hiện trạng) · Đất cơ quan + 2 loại nữa",
      "dayDu": "Đất cơ quan (hiện trạng) · Đất cơ quan · Đất cơ quan (đô thị) · Đất cơ quan (đô thị) (hiện trạng)",
-     "so": 16
+     "so": 19
+    },
+    {
+     "mau": "#1584a9",
+     "ten": "Đào tạo – nghiên cứu (hiện trạng) · Đào tạo – nghiên cứu + 1 loại nữa",
+     "dayDu": "Đào tạo – nghiên cứu (hiện trạng) · Đào tạo – nghiên cứu · Đất đào tạo",
+     "so": 7
     },
     {
      "mau": "#755c0f",
      "ten": "Đất cơ quan (ngoài đô thị) (hiện trạng) · Đất cơ quan (ngoài đô thị)",
      "dayDu": "Đất cơ quan (ngoài đô thị) (hiện trạng) · Đất cơ quan (ngoài đô thị)",
-     "so": 4
-    },
-    {
-     "mau": "#1584a9",
-     "ten": "Đào tạo – nghiên cứu (hiện trạng) · Đất đào tạo + 1 loại nữa",
-     "dayDu": "Đào tạo – nghiên cứu (hiện trạng) · Đất đào tạo · Đào tạo – nghiên cứu",
      "so": 4
     }
    ]
@@ -151,22 +151,22 @@
    "nhom": "Cây xanh – thể dục thể thao",
    "muc": [
     {
+     "mau": "#d5f7df",
+     "ten": "Cây xanh chuyên dụng · Cây xanh chuyên dụng (hiện trạng)",
+     "dayDu": "Cây xanh chuyên dụng · Cây xanh chuyên dụng (hiện trạng)",
+     "so": 455
+    },
+    {
      "mau": "#72cc19",
      "ten": "Cây xanh công cộng đơn vị ở · Cây xanh công cộng đô thị + 3 loại nữa",
      "dayDu": "Cây xanh công cộng đơn vị ở · Cây xanh công cộng đô thị · Cây xanh công cộng · Cây xanh công cộng (hiện trạng) · Cây xanh công cộng đơn vị ở (hiện trạng)",
-     "so": 421
-    },
-    {
-     "mau": "#d5f7df",
-     "ten": "Cây xanh chuyên dụng",
-     "dayDu": "Cây xanh chuyên dụng",
-     "so": 386
+     "so": 426
     },
     {
      "mau": "#15a915",
      "ten": "Thể dục thể thao đơn vị ở · Thể dục thể thao + 4 loại nữa",
      "dayDu": "Thể dục thể thao đơn vị ở · Thể dục thể thao · Cây xanh sử dụng hạn chế · Thể dục thể thao đô thị · Thể dục thể thao đơn vị ở (hiện trạng) · Thể dục thể thao (hiện trạng)",
-     "so": 131
+     "so": 133
     },
     {
      "mau": "#0f750f",
@@ -195,7 +195,7 @@
      "mau": "#416f4c",
      "ten": "Đất rừng sản xuất (hiện trạng)",
      "dayDu": "Đất rừng sản xuất (hiện trạng)",
-     "so": 21
+     "so": 23
     },
     {
      "mau": "#5da08f",
@@ -218,7 +218,7 @@
      "mau": "#4fe94f",
      "ten": "Đất nông nghiệp (hiện trạng)",
      "dayDu": "Đất nông nghiệp (hiện trạng)",
-     "so": 27
+     "so": 41
     }
    ]
   },
@@ -226,16 +226,16 @@
    "nhom": "Mặt nước",
    "muc": [
     {
+     "mau": "#1972cc",
+     "ten": "Sông suối · Sông suối (hiện trạng) + 2 loại nữa",
+     "dayDu": "Sông suối · Sông suối (hiện trạng) · Mặt nước biển (hiện trạng) · Sông suối (ngoài ranh giới)",
+     "so": 160
+    },
+    {
      "mau": "#155ea9",
      "ten": "Mặt nước, hồ ao đầm (đơn vị ở đến năm 2045) · Mặt nước, hồ ao đầm (đơn vị ở đến năm 2030) + 6 loại nữa",
      "dayDu": "Mặt nước, hồ ao đầm (đơn vị ở đến năm 2045) · Mặt nước, hồ ao đầm (đơn vị ở đến năm 2030) · Mặt nước, hồ ao đầm · Hồ nước · Mặt nước sử dụng công cộng (đơn vị ở) · Hồ nước (hiện trạng) · Mặt nước, hồ ao đầm (đô thị) · Đầm Thuỷ Triều",
      "so": 135
-    },
-    {
-     "mau": "#1972cc",
-     "ten": "Sông suối · Sông suối (hiện trạng) + 2 loại nữa",
-     "dayDu": "Sông suối · Sông suối (hiện trạng) · Mặt nước biển (hiện trạng) · Sông suối (ngoài ranh giới)",
-     "so": 126
     }
    ]
   },
@@ -245,20 +245,20 @@
     {
      "mau": "#848484",
      "ten": "Bãi đỗ xe đơn vị ở · Nghĩa trang + 2 loại nữa",
-     "dayDu": "Bãi đỗ xe đơn vị ở · Nghĩa trang · Bãi đỗ xe (nông thôn) · Nghĩa trang (hiện trạng)",
-     "so": 137
+     "dayDu": "Bãi đỗ xe đơn vị ở · Nghĩa trang · Nghĩa trang (hiện trạng) · Bãi đỗ xe (nông thôn)",
+     "so": 143
     },
     {
      "mau": "#352a7e",
      "ten": "Hạ tầng khác · Hạ tầng khác (hiện trạng) + 5 loại nữa",
      "dayDu": "Hạ tầng khác · Hạ tầng khác (hiện trạng) · Hạ tầng khác đô thị · Hạ tầng kỹ thuật ngoài đô thị (hiện trạng) · Hạ tầng kỹ thuật ngoài đô thị · Hạ tầng khác ngoài đô thị · Hạ tầng khác đô thị (hiện trạng)",
-     "so": 64
+     "so": 70
     },
     {
      "mau": "#858585",
      "ten": "Bãi đỗ xe",
      "dayDu": "Bãi đỗ xe",
-     "so": 48
+     "so": 60
     }
    ]
   },
@@ -267,9 +267,15 @@
    "muc": [
     {
      "mau": "#7000e2",
-     "ten": "Sản xuất công nghiệp · Đất công nghiệp (hiện trạng) + 1 loại nữa",
-     "dayDu": "Sản xuất công nghiệp · Đất công nghiệp (hiện trạng) · Đất công nghiệp",
-     "so": 25
+     "ten": "Sản xuất công nghiệp · Sản xuất công nghiệp (hiện trạng) + 2 loại nữa",
+     "dayDu": "Sản xuất công nghiệp · Sản xuất công nghiệp (hiện trạng) · Đất công nghiệp (hiện trạng) · Đất công nghiệp",
+     "so": 47
+    },
+    {
+     "mau": "#5d5da0",
+     "ten": "Sản xuất vật liệu (hiện trạng) · Sản xuất vật liệu",
+     "dayDu": "Sản xuất vật liệu (hiện trạng) · Sản xuất vật liệu",
+     "so": 2
     }
    ]
   },
@@ -280,13 +286,13 @@
      "mau": "#354428",
      "ten": "Đất quốc phòng (hiện trạng) · Đất quốc phòng",
      "dayDu": "Đất quốc phòng (hiện trạng) · Đất quốc phòng",
-     "so": 27
+     "so": 29
     },
     {
      "mau": "#84a915",
      "ten": "Đất an ninh · Đất an ninh (hiện trạng) + 1 loại nữa",
      "dayDu": "Đất an ninh · Đất an ninh (hiện trạng) · Anninh_CT (hiện trạng)",
-     "so": 25
+     "so": 28
     }
    ]
   },

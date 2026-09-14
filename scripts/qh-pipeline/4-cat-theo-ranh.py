@@ -68,17 +68,25 @@ def nam_trong(x, y, vong):
 
 
 def tim_ranh(tep, ten_level):
-    """Lấy vòng khép kín lớn nhất (nhiều điểm nhất) của level ranh giới."""
+    """Lấy vòng khép kín lớn nhất (KHUNG BAO RỘNG NHẤT) của level ranh giới.
+
+    Trước đây chọn theo "nhiều điểm nhất". Bản vẽ phân khu Cù Hin có HAI vòng ranh cùng đúng
+    1.250 điểm: ranh thật (~12×10 km) và SƠ ĐỒ VỊ TRÍ thu nhỏ ở góc tờ vẽ (~200 m) — chọn theo
+    số điểm là vớ nhầm cái nhỏ, cắt bỏ gần sạch bản đồ. Chọn theo độ rộng thì không nhầm được.
+    """
     d = json.load(open(tep, encoding='utf-8'))
     vong = None
+    rong = -1.0
     for f in d['features']:
         if (f.get('properties') or {}).get('lo') != ten_level:
             continue
         dd = diem_cua(f['geometry'])
         if len(dd) < 4:
             continue                      # mẩu ranh trong ô chú giải, bỏ
-        if vong is None or len(dd) > len(vong):
-            vong = dd
+        X = [p[0] for p in dd]; Y = [p[1] for p in dd]
+        s = (max(X) - min(X)) * (max(Y) - min(Y))
+        if s > rong:
+            vong, rong = dd, s
     return vong
 
 

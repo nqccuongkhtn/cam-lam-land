@@ -122,8 +122,10 @@ def vn2wgs(E, N):
 
 
 # ── Level không phải nội dung quy hoạch (giống bước 2 cũ) ─────────────────────
+# 'gop y' = level 'gop y So nganh' của bản vẽ Cù Hin: khung khoanh chỗ Sở ngành góp ý
+# (chữ nhật xanh lơ/vàng), chỉ là ghi chú lúc thẩm định chứ không phải quy hoạch.
 BO_LEVEL = ('ban kinh', 'bankinh', 'check', 'khong in', 'khungten', 'khung ten',
-            'chugiai', 'chu giai', 'tenbanve', 'ten ban ve')
+            'chugiai', 'chu giai', 'tenbanve', 'ten ban ve', 'gop y')
 KHUNG = (108.5, 11.5, 109.8, 13.2)      # khung Khánh Hoà, loại nét rác văng ra xa
 
 

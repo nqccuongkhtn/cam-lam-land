@@ -2219,7 +2219,7 @@ export default function MapPage() {
                   <button key={t.id} onClick={() => moThuaTim(t)}
                     className="w-full text-left px-3 py-2 hover:bg-amber-50 border-b last:border-b-0 border-slate-100">
                     <span className="block text-xs font-bold text-[#0A2540]">Thửa {t.soThua} · Tờ {t.soTo}
-                      {t.dienTich != null && <span className="font-normal text-slate-500"> · {t.dienTich.toFixed(1)} m²</span>}
+                      {t.dienTich != null && <span className="font-normal text-slate-500"> · {fmtM2(t.dienTich)}</span>}
                     </span>
                     <span className="block text-[10px] text-slate-400 truncate">
                       {t.tenXaCu ? `${t.tenXaCu}${t.huyenCu ? ' · ' + t.huyenCu : ''}` : t.tenXa}
@@ -2499,7 +2499,7 @@ export default function MapPage() {
                         {/* THỬA TRƯỚC, TỜ SAU — quy tắc chung toàn web. */}
                         <div><div className="text-[11px] text-slate-400">Số thửa</div><div className="font-bold text-[#0A2540]">{info.parcel.soThua || '—'}</div></div>
                         <div><div className="text-[11px] text-slate-400">{nhanSoTo}</div><div className="font-bold text-[#0A2540]">{soToChinh || '—'}</div></div>
-                        <div><div className="text-[11px] text-slate-400">Diện tích</div><div className="font-bold text-[#0A2540]">{info.parcel.areaM2 != null ? info.parcel.areaM2.toFixed(1) + ' m²' : '—'}</div></div>
+                        <div><div className="text-[11px] text-slate-400">Diện tích</div><div className="font-bold text-[#0A2540]">{info.parcel.areaM2 != null ? fmtM2(info.parcel.areaM2) : '—'}</div></div>
                       </div>
                       {/* Điện thoại: xã MỚI trước, rồi "trước sáp nhập: xã cũ · huyện cũ · tờ cũ". KHÔNG CẮT CHỮ (trước
                           để truncate nên mất đuôi "tờ mới …" — chủ dự án báo thiếu thông tin), dài thì xuống dòng. */}
@@ -2556,7 +2556,7 @@ export default function MapPage() {
                           {owner && <div className="text-slate-600 mt-1"><span className="text-slate-400">Tên chủ: </span><b className="text-[#0A2540]">{owner}</b></div>}
                           {(code || name) && (
                             <div className="mt-2.5 flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2">
-                              {info.parcel.areaM2 != null && <b className="text-[#0A2540] shrink-0">{info.parcel.areaM2.toFixed(0)} m²</b>}
+                              {info.parcel.areaM2 != null && <b className="text-[#0A2540] shrink-0">{fmtM2(info.parcel.areaM2)}</b>}
                               {code && <span className={`text-[11px] font-extrabold px-2 py-0.5 rounded ${landColor(code)}`}>{code}</span>}
                               {name && <span className="text-slate-600 truncate">{name}</span>}
                             </div>

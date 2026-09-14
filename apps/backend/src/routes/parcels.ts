@@ -53,7 +53,7 @@ function capClause(val: string, params: any[]): string {
 parcelsRouter.get('/search', async (req, res, next) => {
   try {
     const { soto, sothua, xa, cap } = req.query as Record<string, string>;
-    if (!soto && !sothua) return res.status(400).json({ error: 'Cần ít nhất số tờ hoặc số thửa' });
+    if (!soto && !sothua) return res.status(400).json({ error: 'Cần ít nhất số thửa hoặc số tờ' });
     const params: any[] = [];
     const where: string[] = [`l.layer_type IN ('parcel','custom')`];
     if (soto) where.push(numKeyClause(KEYS_TO, soto, params));
@@ -141,7 +141,7 @@ parcelsRouter.get('/at', async (req, res, next) => {
         properties: { to: dc.soTo, thua: dc.soThua, xa: dc.xaMoi || dc.xa, xaCu: tenTruoc,
                       mucDichSuDung: dc.mdsd || '',
                       dienTich_m2: dc.dien_tich == null ? null : Number(dc.dien_tich),
-                      nhan: `Tờ ${dc.soTo}, thửa ${dc.soThua}` } };
+                      nhan: `Thửa ${dc.soThua}, tờ ${dc.soTo}` } };   // thửa trước, tờ sau
       parcel.xa = dc.xaMoi || dc.xa;      // "xa" giờ LUÔN là đơn vị hiện hành
     } else {
       [parcel] = await query(`

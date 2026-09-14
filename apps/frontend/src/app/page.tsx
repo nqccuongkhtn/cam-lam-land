@@ -315,7 +315,7 @@ export default function Home() {
           <div className="p-5 sm:p-8 md:p-12 flex flex-col justify-center">
             <span className="text-[#C8A14B] font-semibold text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] mt-2">Tra cứu quy hoạch & thửa đất chính xác</h2>
-            <p className="text-sm sm:text-base text-slate-500 mt-2 sm:mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số tờ/số thửa/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
+            <p className="text-sm sm:text-base text-slate-500 mt-2 sm:mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số thửa/số tờ/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
             <div className="mt-4 sm:mt-6 flex gap-3">
               <Link href="/map" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-6 py-3 rounded-xl">Mở bản đồ →</Link>
               <Link href="/qr" className="cl-press border border-slate-300 text-[#0A2540] font-semibold px-6 py-3 rounded-xl hover:bg-slate-50">Tra cứu QR</Link>

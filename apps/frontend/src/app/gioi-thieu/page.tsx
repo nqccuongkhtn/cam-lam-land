@@ -4,7 +4,7 @@ export const metadata = { title: 'Giới thiệu | Cam Lâm Land' };
 
 const FEATURES = [
   { p: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10', t: 'Chợ nhà đất Cam Lâm', d: 'Mua bán, cho thuê đất nền, nhà riêng, căn hộ, biệt thự — đăng tin miễn phí, thông tin minh bạch.' },
-  { p: 'M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z M9 3v15 M15 6v15', t: 'Bản đồ quy hoạch', d: 'Tra cứu quy hoạch sử dụng đất trên nền vệ tinh độ nét cao đến z18, theo số tờ/số thửa/xã, toạ độ VN-2000.' },
+  { p: 'M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z M9 3v15 M15 6v15', t: 'Bản đồ quy hoạch', d: 'Tra cứu quy hoạch sử dụng đất trên nền vệ tinh độ nét cao đến z18, theo số thửa/số tờ/xã, toạ độ VN-2000.' },
   { p: 'M3 7V5a2 2 0 0 1 2-2h2 M17 3h2a2 2 0 0 1 2 2v2 M21 17v2a2 2 0 0 1-2 2h-2 M7 21H5a2 2 0 0 1-2-2v-2 M7 12h10', t: 'Tra cứu QR thửa đất', d: 'Quét mã QR để tra cứu nhanh thông tin và ranh giới thửa đất.' },
   { p: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M22 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75', t: 'Tư vấn & Ký gửi', d: 'Tư vấn đầu tư và pháp lý bất động sản; nhận ký gửi mua bán, cho thuê nhà đất.' },
 ];
@@ -12,7 +12,7 @@ const FEATURES = [
 const MILESTONES: [string, string][] = [
   ['Khởi nguồn', 'Bắt đầu từ một doanh nghiệp môi giới bất động sản hoạt động trực tiếp tại Cam Lâm — tích luỹ kinh nghiệm thực tế, am hiểu từng con đường, từng thửa đất và nhu cầu của người dân địa phương.'],
   ['2025', 'Từ trăn trở với thông tin quy hoạch thiếu minh bạch, đội ngũ bắt tay thu thập và số hoá dữ liệu quy hoạch Cam Lâm.'],
-  ['Đầu 2026', 'Hoàn thiện bản đồ quy hoạch trên nền vệ tinh độ nét cao, tra cứu theo số tờ/số thửa/xã và toạ độ VN-2000.'],
+  ['Đầu 2026', 'Hoàn thiện bản đồ quy hoạch trên nền vệ tinh độ nét cao, tra cứu theo số thửa/số tờ/xã và toạ độ VN-2000.'],
   ['Tháng 8/2026', 'Chính thức ra mắt nền tảng Cam Lâm Land: chợ nhà đất trực tuyến, đăng tin miễn phí và tra cứu quy hoạch ngay trên bản đồ.'],
   ['Sau ra mắt', 'Tiếp tục bổ sung tra cứu QR thửa đất, tư vấn đầu tư & pháp lý, tin tức thị trường; không ngừng hoàn thiện và mở rộng.'],
 ];

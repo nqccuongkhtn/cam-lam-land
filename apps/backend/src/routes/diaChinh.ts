@@ -241,7 +241,7 @@ diaChinhRouter.get('/tim', async (req, res) => {
   const thua = String(req.query.thua || '').trim();
   const xaId = String(req.query.xaId || '').trim();
   const cap = String(req.query.cap || '').trim();
-  if (!to && !thua) return res.status(400).json({ error: 'Cần ít nhất số tờ hoặc số thửa.' });
+  if (!to && !thua) return res.status(400).json({ error: 'Cần ít nhất số thửa hoặc số tờ.' });
 
   const dk: string[] = []; const val: any[] = [];
   const soHoa = (v: string) => { const n = v.replace(/[^0-9]/g, '').replace(/^0+/, ''); return n ? Number(n) : NaN; };
@@ -289,7 +289,7 @@ diaChinhRouter.get('/tim', async (req, res) => {
       if (!Number.isNaN(soTo)) { val.push(soTo); dk.push(`d.to_num = $${val.length}`); }
       if (xaId) { val.push(xaId); dk.push(laXaMoi ? `d.xa_moi_id = $${val.length}` : `d.xa_id = $${val.length}`); }
     }
-    if (!dk.length) return res.status(400).json({ error: 'Số tờ / số thửa không hợp lệ.' });
+    if (!dk.length) return res.status(400).json({ error: 'Số thửa / số tờ không hợp lệ.' });
     // Bỏ ĐẤT HẠ TẦNG CÔNG CỘNG (đường sá, sông suối, thuỷ lợi) khỏi kết quả tra cứu — danh sách
     // mã lấy từ CHAN_TRA_CUU bên routes/parcels.ts để hai chỗ không bao giờ lệch nhau.
     // Chỉ bỏ thửa THUẦN một loại; thửa vừa đất ở vừa có phần đường vẫn giữ.

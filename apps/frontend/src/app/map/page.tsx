@@ -2578,27 +2578,54 @@ export default function MapPage() {
                   + phân khu 1/2000) nên đoạn này dài không đoán trước được. Cho nó cuộn riêng thì
                   bảng không cao thêm, mà đầu bảng và hai hàng nút ở đáy vẫn đứng yên. */}
               <div className={`${sheetNho ? 'max-sm:hidden' : ''} px-4 py-1.5 sm:py-2 text-sm flex-1 min-h-[92px] sm:min-h-0 overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#cbd5e1_transparent]`}>
-                {/* ĐIỆN THOẠI: TRANG LƯỚT NGANG, mỗi trang một bản quy hoạch (xem trangQhCuaThua). */}
+                {/* TRANG LƯỚT NGANG, mỗi trang một bản quy hoạch (xem trangQhCuaThua) — CẢ ĐIỆN THOẠI LẪN MÁY TÍNH
+                    (chủ dự án 14/9/2026: web làm giống mobile, kéo qua để xem, kéo tới đâu bản đồ đổi lớp tới đó).
+                    Máy tính không vuốt được nên có thêm: NHẤN GIỮ CHUỘT KÉO NGANG, nút mũi tên ‹ ›, bấm dấu chấm. */}
                 {info.parcel && (() => {
                   const ds = trangQhCuaThua();
                   if (!ds.length) return null;
+                  const toiTrang = (i: number) => { const el = trangQhRef.current; if (el) el.scrollTo({ left: Math.max(0, Math.min(ds.length - 1, i)) * buocTrang(el), behavior: 'smooth' }); };
                   return (
-                    <div className="sm:hidden -mx-4">
+                    <div className="relative -mx-4">
                       {ds.length > 1 && (
-                        <div className="mb-1 flex justify-center gap-1">
+                        <div className="mb-1 flex items-center justify-center gap-1">
                           {ds.map((t, i) => (
-                            <button key={t.muc.id} aria-label={t.tieuDe}
-                              onClick={() => { const el = trangQhRef.current; if (el) el.scrollTo({ left: i * buocTrang(el), behavior: 'smooth' }); }}
-                              className={`h-1 rounded-full transition-all ${i === trangQh ? 'w-6 bg-[#0A2540]' : 'w-3.5 bg-slate-300'}`} />
+                            <button key={t.muc.id} aria-label={t.tieuDe} title={t.tieuDe}
+                              onClick={() => toiTrang(i)}
+                              className={`h-1 rounded-full transition-all ${i === trangQh ? 'w-6 bg-[#0A2540]' : 'w-3.5 bg-slate-300 sm:hover:bg-slate-400'}`} />
                           ))}
                         </div>
                       )}
+                      {/* NÚT ‹ › GỢI Ý LƯỚT (chủ dự án 14/9/2026: "sợ người dùng không biết"): tròn, nổi ở HAI MÉP vùng
+                          quy hoạch, cả điện thoại lẫn máy tính. Trang đầu ẩn ‹, trang cuối ẩn › → biết còn trang phía nào. */}
+                      {ds.length > 1 && trangQh > 0 && (
+                        <button type="button" aria-label="Bản quy hoạch trước" onClick={() => toiTrang(trangQh - 1)}
+                          className="absolute left-1 top-1/2 z-10 grid h-7 w-7 translate-y-[-2px] place-items-center rounded-full border border-slate-200 bg-white/95 text-[18px] font-bold leading-none text-[#0A2540] shadow-md active:bg-slate-100">‹</button>
+                      )}
+                      {ds.length > 1 && trangQh < ds.length - 1 && (
+                        <button type="button" aria-label="Bản quy hoạch sau" onClick={() => toiTrang(trangQh + 1)}
+                          className="absolute right-1 top-1/2 z-10 grid h-7 w-7 translate-y-[-2px] place-items-center rounded-full border border-slate-200 bg-white/95 text-[18px] font-bold leading-none text-[#0A2540] shadow-md active:bg-slate-100">›</button>
+                      )}
                       <div ref={trangQhRef} onScroll={() => { clearTimeout((trangQhRef as any).t); (trangQhRef as any).t = setTimeout(khiLuotTrangQh, 90); }}
-                        className={`flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}>
+                        // KÉO BẰNG CHUỘT (máy tính): tắt tạm "hít trang" trong lúc kéo cho mượt, thả chuột thì trôi về trang gần nhất.
+                        onMouseDown={(e) => {
+                          const el = trangQhRef.current; if (!el || e.button !== 0 || ds.length < 2) return;
+                          const x0 = e.clientX, s0 = el.scrollLeft; let daKeo = false;
+                          el.style.scrollSnapType = 'none'; el.style.cursor = 'grabbing';
+                          const di = (ev: MouseEvent) => { const dx = ev.clientX - x0; if (Math.abs(dx) > 3) daKeo = true; el.scrollLeft = s0 - dx; };
+                          const tha = () => {
+                            window.removeEventListener('mousemove', di); window.removeEventListener('mouseup', tha);
+                            el.style.cursor = '';
+                            const w = buocTrang(el); const i = Math.max(0, Math.min(ds.length - 1, Math.round(el.scrollLeft / w)));
+                            el.scrollTo({ left: i * w, behavior: 'smooth' });
+                            setTimeout(() => { el.style.scrollSnapType = ''; }, 350);
+                            if (daKeo) { const chan = (ce: MouseEvent) => { ce.stopPropagation(); ce.preventDefault(); }; el.addEventListener('click', chan, { capture: true, once: true }); }
+                          };
+                          window.addEventListener('mousemove', di); window.addEventListener('mouseup', tha);
+                        }}
+                        className={`flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain select-none sm:cursor-grab [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}>
                         {ds.map((t) => (
-                          /* Kiểu THẺ NGANG: thẻ hẹp 86% có viền, thẻ sau LÓ MÉP để biết còn bản khác; nhiều loại đất
-                             (> 3) thì xếp 2 CỘT chữ nhỏ → xem đủ mọi loại đất mà bảng vẫn thấp. KHÔNG bỏ loại đất nào. */
-                          <div key={t.muc.id} className="w-full shrink-0 snap-center px-4">
+                          <div key={t.muc.id} className={`w-full shrink-0 snap-center ${ds.length > 1 ? 'px-10' : 'px-4'}`}>{/* px-10: chừa chỗ cho nút ‹ › khỏi che ô diện tích */}
                             {/* Tiêu đề + tên các mảnh phân khu gộp MỘT dòng cho gọn. */}
                             <p className={`truncate font-bold leading-snug text-[#0A2540] text-[13px]`}>{t.tieuDe}{t.phu && <span className="ml-1.5 text-[10.5px] font-normal text-slate-400">{t.phu}</span>}</p>
                             <div className="mt-1 space-y-[3px]">
@@ -2619,8 +2646,9 @@ export default function MapPage() {
                     </div>
                   );
                 })()}
-                {/* MÁY TÍNH: giữ cách liệt kê cũ, từng bản một khối (bảng rộng, không cần lướt). */}
-                <div className="hidden sm:block">
+                {/* Cách liệt kê cũ từng bản một khối (khoiQh) — MÁY TÍNH ĐÃ CHUYỂN SANG TRANG LƯỚT NGANG ở trên
+                    (14/9/2026). Giữ lại ẩn phòng khi cần quay về; muốn bỏ hẳn thì xoá khối này + hàm khoiQh. */}
+                <div className="hidden">
                 {info.parcel && info.overlaps && info.overlaps.length > 0
                   && khoiQh('Quy hoạch chung 2045 · QĐ205', info.overlaps, 'qd205')}
 

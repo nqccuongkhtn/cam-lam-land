@@ -213,6 +213,15 @@ const RASTER_OVERLAYS = [
   { id: 'qh-cuhin', name: 'Quy hoạch phân khu Cù Hin (1/2000)', url: '',
     tiles: ['/tiles/qdcuhinv1/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
     coordinates: [[109.0323, 12.2142], [109.1698, 12.2142], [109.1698, 12.1189], [109.0323, 12.1189]] as [[number, number], [number, number], [number, number], [number, number]] },
+  // ── Phân khu TÂY NAM 1/2000 (nạp 14/9/2026) ──────────────────────────────────────────
+  // Bản gốc: quyhoach2025/Tay Nam da sua - ban cuoi.dxf. Cùng quy trình + bảng màu với 5 bản trên
+  // (25/27 loại đất trùng màu; Đất chưa sử dụng + Đồi núi chỉ bản này có). Chồng ~7% lên QĐ918 ở
+  // rìa phía Tây — đặt SAU QĐ918 nên chỗ chồng hiện theo Tây Nam (bản mới hơn).
+  // Bản vẽ có HAI vòng ranh 2.529 điểm (một vòng là bản sao dịch sang kinh độ 108,6) và một vùng
+  // tô sọc phủ kín trên level ranh giới — xem 4-cat-theo-ranh.py / 1b-doc-dxf.py.
+  { id: 'qh-taynam', name: 'Quy hoạch phân khu Tây Nam (1/2000)', url: '',
+    tiles: ['/tiles/qdtaynamv1/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,
+    coordinates: [[108.9930, 12.1849], [109.1219, 12.1849], [109.1219, 11.9366], [108.9930, 11.9366]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── QĐ893 · quy hoạch SỬ DỤNG ĐẤT đến 2030, phủ TOÀN huyện Cam Lâm cũ ───────
   // Bản này KHÔNG cần lớp nét: nó vốn là các mảng tô kín (nông nghiệp, đất ở, giao thông, mặt
   // nước) chứ không phải bản vẽ nét như ba bản 1/2000 ở trên.
@@ -228,7 +237,7 @@ const RASTER_OVERLAYS = [
 // không vừa, nút đầu và nút cuối bị cắt mất chữ (chủ dự án chụp màn hình báo lỗi 14/9/2026).
 const MUC_QH: { id: string; ten: string; tenNgan: string; gom: string[] }[] = [
   { id: 'qh-qd205', ten: 'Quy hoạch chung 2045 (QĐ205)', tenNgan: 'QH chung 205', gom: ['qh-qd205'] },
-  { id: 'phan-khu', ten: 'Quy hoạch phân khu 1/2000', tenNgan: 'Phân khu 1/2000', gom: ['qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin'] },
+  { id: 'phan-khu', ten: 'Quy hoạch phân khu 1/2000', tenNgan: 'Phân khu 1/2000', gom: ['qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin', 'qh-taynam'] },
   { id: 'qh-qd893', ten: 'Quy hoạch sử dụng đất 2030 (QĐ893)', tenNgan: 'Sử dụng đất 893', gom: ['qh-qd893'] },
 ];
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
@@ -528,7 +537,7 @@ export default function MapPage() {
   // Ảnh PNG QĐ205 là lớp CHÍNH (đúng màu/ký hiệu gốc) — bật mặc định, hiển thị TRÊN lớp vector.
   // Hai lớp phân khu MẶC ĐỊNH TẮT: chúng nằm đè lên vùng QĐ205, bật sẵn cả ba thì màu chồng màu.
   // Người dùng tự tích vào mới hiện.
-  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd918': false, 'qh-cuhin': false, 'qh-qd893': false });
+  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd918': false, 'qh-cuhin': false, 'qh-taynam': false, 'qh-qd893': false });
   const [qhFillOn, setQhFillOn] = useState(false);        // TẮT mặc định — giống Guland: hiển thị bằng ẢNH raster. Bật tay nếu muốn lấp chỗ trống.
   // 'all' = gộp cả 3 kịch bản (phủ kín nhất). Từng kịch bản riêng lẻ chỉ phủ một phần.
   const [qhScenario, setQhScenario] = useState<'all' | 'HT' | '2030' | '2045'>('all');

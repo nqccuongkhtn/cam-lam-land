@@ -268,6 +268,11 @@ def main(vao, ra, bo_mau=(), lay_net=False):
     loi = 0
     for e in hatch:
         lv = e.dxf.get('layer', '') or ''
+        # Vùng tô trên level RANH GIỚI (vd '1-QH_Ranh giới lập quy hoạch' của bản Tây Nam) là lớp
+        # sọc phủ KÍN cả phân khu — đọc vào là cả bản đồ bị một mảng đỏ trùm lên. Chỉ bỏ ở vùng
+        # tô; NÉT ranh vẫn giữ vì bước 4-cat-theo-ranh.py cần nó làm hàng rào.
+        if 'ranh gi' in lv.lower() or lv.upper().startswith('RG'):
+            continue
         if bo_level(lv):
             bo_lv += 1
             continue

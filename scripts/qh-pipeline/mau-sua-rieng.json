@@ -63,6 +63,8 @@
   "→ Chủ dự án chốt: 2 chỗ hồng tím Cam Tân 36/101 + Suối Tân 1/310 (QĐ2076, level",
   "  QH2030_DAT_NDD_Dich vu, số màu 212 — chỉ 3 ô dùng số này) tô CÙNG MÀU ĐẤT DU LỊCH #fb30fc.",
   "  Sau đó chủ dự án: mọi Đất dịch vụ CÙNG MÀU NHAU HẾT → ép cả 4 đồ án về #fb30fc.",
+  "→ 14/9/2026 nạp phân khu Tây Nam, chủ dự án dặn đồng bộ màu với 5 phân khu: Đất rừng phòng hộ",
+  "  của Tây Nam ra #2a7e7e (số màu 129), 5 phân khu kia đều #5da08f → ép về #5da08f.",
   "",
   "Lưu ý khi đổi hệ số làm tươi: mã màu ghi trong bảng này phải QUY ĐỔI THEO, nếu không nó",
   "vẫn giữ màu tính theo hệ số cũ và lệch hẳn so với phần còn lại của bản đồ."
@@ -78,6 +80,7 @@
  "mau": {
   "Cây xanh chuyên dụng": "#d5f7df",
   "Đất dịch vụ": "#fb30fc",
+  "Đất rừng phòng hộ": "#5da08f",
   "Sản xuất công nghiệp": "#7000e2",
   "Đất công nghiệp": "#7000e2",
   "Dân cư nông thôn": "#979763",

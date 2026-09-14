@@ -67,27 +67,41 @@ def nam_trong(x, y, vong):
     return trong
 
 
-def tim_ranh(tep, ten_level):
-    """Lấy vòng khép kín lớn nhất (KHUNG BAO RỘNG NHẤT) của level ranh giới.
+def tim_ranh(tep, ten_level, tep_vung=()):
+    """Chọn vòng ranh CHỨA NHIỀU ĐỐI TƯỢNG NHẤT của các file cần lọc (hoà thì lấy vòng rộng hơn).
 
-    Trước đây chọn theo "nhiều điểm nhất". Bản vẽ phân khu Cù Hin có HAI vòng ranh cùng đúng
-    1.250 điểm: ranh thật (~12×10 km) và SƠ ĐỒ VỊ TRÍ thu nhỏ ở góc tờ vẽ (~200 m) — chọn theo
-    số điểm là vớ nhầm cái nhỏ, cắt bỏ gần sạch bản đồ. Chọn theo độ rộng thì không nhầm được.
+    Đã vấp hai kiểu bản vẽ có NHIỀU vòng ranh giống hệt nhau:
+      · Cù Hin: hai vòng 1.250 điểm — ranh thật (~12×10 km) và SƠ ĐỒ VỊ TRÍ thu nhỏ (~200 m).
+        Chọn theo "nhiều điểm nhất" → vớ cái nhỏ.
+      · Tây Nam: hai vòng 2.529 điểm cùng CỠ, một vòng là bản sao dịch sang tận kinh độ 108,6
+        (chứa 2 vùng tô) còn vòng thật chứa 388. Chọn theo "rộng nhất" → vớ bản sao.
+    Đếm xem vòng nào ôm được nhiều tâm đối tượng nhất thì không nhầm được cả hai kiểu.
     """
     d = json.load(open(tep, encoding='utf-8'))
-    vong = None
-    rong = -1.0
+    ung = []
     for f in d['features']:
         if (f.get('properties') or {}).get('lo') != ten_level:
             continue
         dd = diem_cua(f['geometry'])
         if len(dd) < 4:
             continue                      # mẩu ranh trong ô chú giải, bỏ
+        ung.append(dd)
+    if not ung:
+        return None
+    tam = []
+    for t in tep_vung:
+        if os.path.isfile(t):
+            for f in json.load(open(t, encoding='utf-8')).get('features', []):
+                p = diem_cua(f.get('geometry') or {})
+                if p:
+                    tam.append((sum(a[0] for a in p) / len(p), sum(a[1] for a in p) / len(p)))
+
+    def diem_so(dd):
         X = [p[0] for p in dd]; Y = [p[1] for p in dd]
-        s = (max(X) - min(X)) * (max(Y) - min(Y))
-        if s > rong:
-            vong, rong = dd, s
-    return vong
+        x0, x1, y0, y1 = min(X), max(X), min(Y), max(Y)
+        n = sum(1 for x, y in tam if x0 <= x <= x1 and y0 <= y <= y1 and nam_trong(x, y, dd))
+        return (n, (x1 - x0) * (y1 - y0))
+    return max(ung, key=diem_so)
 
 
 def main():
@@ -114,7 +128,7 @@ def main():
         sys.exit(1)
     tep_ranh = tep_ranh or tep_vao[0]
 
-    vong = tim_ranh(tep_ranh, ten_level)
+    vong = tim_ranh(tep_ranh, ten_level, tep_vao)
     if not vong:
         print('LỖI: không thấy level ranh giới "%s" trong %s' % (ten_level, tep_ranh))
         print('     Mở file ra xem tên level ranh giới là gì rồi truyền qua --level.')

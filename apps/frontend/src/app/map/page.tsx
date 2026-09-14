@@ -1,5 +1,6 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -40,8 +41,26 @@ function OChonCoGo({ nhan, dsMuc, giaTri, khiChon, className, dienThoai = false 
   const dongDangChon = useRef<HTMLButtonElement>(null);
 
   const dong = () => { setMo(false); setGo(''); setDaGo(false); };
+  // Điện thoại: danh sách vẽ TÁCH RA body (portal) và đặt `fixed` ngay TRÊN ô đang gõ. Để trong bảng
+  // đáy thì khung bảng (cuộn được) CẮT MẤT danh sách, chỉ còn thấy 1 dòng (chủ dự án chụp 14/9/2026).
+  const dsRef = useRef<HTMLDivElement>(null);
+  const [viTri, setViTri] = useState<{ left: number; width: number; bottom: number; maxH: number } | null>(null);
   useEffect(() => {
-    const bamRaNgoai = (e: MouseEvent) => { if (boc.current && !boc.current.contains(e.target as Node)) dong(); };
+    if (!dienThoai || !mo) return;
+    const tinh = () => {
+      const r = oNhap.current?.getBoundingClientRect(); if (!r) return;
+      const vv = window.visualViewport;
+      const dinhNhin = vv ? vv.offsetTop : 0;
+      setViTri({ left: r.left, width: r.width, bottom: window.innerHeight - r.top + 4, maxH: Math.max(120, Math.min(300, r.top - dinhNhin - 10)) });
+    };
+    tinh();
+    window.visualViewport?.addEventListener('resize', tinh); window.visualViewport?.addEventListener('scroll', tinh);
+    const t = setInterval(tinh, 250);   // bảng đáy đang trượt theo bàn phím thì ô cũng đổi chỗ
+    return () => { window.visualViewport?.removeEventListener('resize', tinh); window.visualViewport?.removeEventListener('scroll', tinh); clearInterval(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dienThoai, mo]);
+  useEffect(() => {
+    const bamRaNgoai = (e: MouseEvent) => { if (boc.current && !boc.current.contains(e.target as Node) && !(dsRef.current && dsRef.current.contains(e.target as Node))) dong(); };
     document.addEventListener('mousedown', bamRaNgoai);
     return () => document.removeEventListener('mousedown', bamRaNgoai);
   }, []);
@@ -75,25 +94,30 @@ function OChonCoGo({ nhan, dsMuc, giaTri, khiChon, className, dienThoai = false 
         }}
         className={`border rounded-lg pl-2.5 pr-6 w-full bg-white truncate ${dienThoai ? 'py-2 text-[16px]' : 'py-1.5 text-xs'} ${giaTri ? 'border-[#0A2540] font-semibold text-[#0A2540]' : 'border-slate-300'}`} />
       <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[9px]">▼</span>
-      {mo && (
-        <div className={`absolute left-0 right-0 z-50 bg-white border border-slate-200 rounded-lg shadow-xl overflow-y-auto scroll-soft ${dienThoai ? 'bottom-full mb-1 max-h-[38vh]' : 'top-full mt-1 max-h-60'}`}>
-          {giaTri && (
-            <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => chon('')}
-              className="w-full text-left px-2.5 py-1.5 text-[11px] text-slate-400 hover:bg-slate-50 border-b border-slate-100 sticky top-0 bg-white">— Bỏ chọn —</button>
-          )}
-          {loc.length === 0 && <div className="px-2.5 py-2 text-[11px] text-slate-400">Không tìm thấy</div>}
-          {loc.map((m) => (
-            <button key={m.id} type="button" ref={m.id === giaTri ? dongDangChon : undefined}
-              onMouseDown={(e) => e.preventDefault()} onClick={() => chon(m.id)}
-              className={`w-full text-left px-2.5 py-1.5 hover:bg-slate-50 border-b last:border-b-0 border-slate-100 ${m.id === giaTri ? 'bg-amber-50' : ''}`}>
-              <span className={`block text-xs truncate ${m.id === giaTri ? 'font-bold text-[#0A2540]' : 'font-medium text-slate-800'}`}>
-                {m.id === giaTri ? '✓ ' : ''}{m.ten}
-              </span>
-              {m.phu && <span className="block text-[10px] text-slate-400 truncate">{m.phu}</span>}
-            </button>
-          ))}
-        </div>
-      )}
+      {mo && (() => {
+        const ds = (
+          <div ref={dsRef}
+            style={dienThoai && viTri ? { position: 'fixed', left: viTri.left, width: viTri.width, bottom: viTri.bottom, maxHeight: viTri.maxH, zIndex: 90 } : undefined}
+            className={`bg-white border border-slate-200 rounded-lg shadow-xl overflow-y-auto scroll-soft ${dienThoai ? '' : 'absolute left-0 right-0 z-50 top-full mt-1 max-h-60'}`}>
+            {giaTri && (
+              <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => chon('')}
+                className={`w-full text-left px-2.5 text-slate-400 hover:bg-slate-50 border-b border-slate-100 sticky top-0 bg-white ${dienThoai ? 'py-2 text-[13px]' : 'py-1.5 text-[11px]'}`}>— Bỏ chọn —</button>
+            )}
+            {loc.length === 0 && <div className={`px-2.5 py-2 text-slate-400 ${dienThoai ? 'text-[13px]' : 'text-[11px]'}`}>Không tìm thấy</div>}
+            {loc.map((m) => (
+              <button key={m.id} type="button" ref={m.id === giaTri ? dongDangChon : undefined}
+                onMouseDown={(e) => e.preventDefault()} onClick={() => chon(m.id)}
+                className={`w-full text-left px-2.5 hover:bg-slate-50 border-b last:border-b-0 border-slate-100 ${dienThoai ? 'py-2' : 'py-1.5'} ${m.id === giaTri ? 'bg-amber-50' : ''}`}>
+                <span className={`block truncate ${dienThoai ? 'text-[14px]' : 'text-xs'} ${m.id === giaTri ? 'font-bold text-[#0A2540]' : 'font-medium text-slate-800'}`}>
+                  {m.id === giaTri ? '✓ ' : ''}{m.ten}
+                </span>
+                {m.phu && <span className={`block text-slate-400 truncate ${dienThoai ? 'text-[11.5px]' : 'text-[10px]'}`}>{m.phu}</span>}
+              </button>
+            ))}
+          </div>
+        );
+        return dienThoai ? (viTri ? createPortal(ds, document.body) : null) : ds;
+      })()}
     </div>
   );
 }
@@ -112,7 +136,9 @@ const RASTER_OVERLAYS = [
     // Bộ tile render từ DGN (QD205) → z10-18, ĐẦY ĐỦ mọi zone.
     // minzoom = ĐÚNG mức thấp nhất đã cắt (bộ này bắt đầu từ z12). Khai 10 như trước là thừa:
     // ở mức 10–11 trình duyệt đi đòi những ô không hề tồn tại, lần nào cũng nhận 404.
-    tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png'], minzoom: 12, maxzoom: 18,
+    // minzoom 10: 14/9/2026 dựng bù ô ảnh mức 11 (9 ô) + mức 10 (4 ô) bằng cách GHÉP 4 ô mức dưới rồi thu
+    // nhỏ (bộ gốc chỉ có từ mức 12) — để lùi bản đồ ra xa vẫn thấy quy hoạch. Chỉ thêm file, không đụng ô cũ.
+    tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png'], minzoom: 10, maxzoom: 18,
     coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ⚠️ MÀU BẢN ĐỒ QUY HOẠCH LẤY ĐÚNG TỪ BẢN VẼ — ĐỌC KỸ TRƯỚC KHI ĐỔI (13/9/2026)
   // Bốn bộ tile phân khu (qd2076v21 · qd2101v22 · qd2222v22 · qd918v18) dùng BẢNG MÀU AUTOCAD.
@@ -248,8 +274,9 @@ const RASTER_OVERLAYS = [
 // không vừa, nút đầu và nút cuối bị cắt mất chữ (chủ dự án chụp màn hình báo lỗi 14/9/2026).
 // `tenApp` = tên ghi trong BẢNG ĐÁY chọn bản đồ + dòng tên góc trái dưới bản đồ (điện thoại) —
 // viết tắt đúng kiểu app tham chiếu cho gọn MỘT DÒNG (chủ dự án chê chữ to, xuống 2 dòng, 14/9/2026).
-const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: string[] }[] = [
-  { id: 'qh-qd205', ten: 'Quy hoạch chung 2045 (QĐ205)', tenNgan: 'QH chung 205', tenApp: 'Quy hoạch chung 2045', gom: ['qh-qd205'] },
+// `zBay` = mức phóng bay tới khi chọn bản này mà đang nhìn xa hơn (không ghi thì tự tính = minzoom − 1).
+const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: string[]; zBay?: number }[] = [
+  { id: 'qh-qd205', ten: 'Quy hoạch chung 2045 (QĐ205)', tenNgan: 'QH chung 205', tenApp: 'Quy hoạch chung 2045', gom: ['qh-qd205'], zBay: 10 },   // chủ dự án cho thử z10 (14/9/2026)
   { id: 'phan-khu', ten: 'Quy hoạch phân khu 1/2000', tenNgan: 'Phân khu 1/2000', tenApp: 'QHXD Phân khu', gom:['qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin', 'qh-taynam', 'qh-taybac'] },
   { id: 'qh-qd893', ten: 'Quy hoạch sử dụng đất 2030 (QĐ893)', tenNgan: 'Sử dụng đất 893', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-qd893'] },
 ];
@@ -552,13 +579,21 @@ export default function MapPage() {
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
+    // Chiều cao màn hình LÚC CHƯA CÓ BÀN PHÍM. Không so với window.innerHeight được: trên nhiều iPhone,
+    // bàn phím bật lên thì innerHeight CŨNG CO LẠI bằng vùng nhìn thấy → hiệu số ≈ 0 → tưởng chưa có
+    // bàn phím (lần đầu làm bị đúng lỗi này: menu đáy vẫn nổi trên bàn phím, chủ dự án chụp 14/9/2026).
+    let caoGoc = Math.max(window.innerHeight, vv.height);
+    const dangGo = () => !!document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName);
     const tinh = () => {
-      const phanBiChe = window.innerHeight - vv.height;   // bàn phím (và thanh công cụ của nó) chiếm
-      const mo = phanBiChe > 150 && window.innerWidth < 1024 && !!document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+      if (!dangGo()) caoGoc = Math.max(window.innerHeight, vv.height);   // chưa gõ → ghi lại chiều cao đủ
+      const phanBiChe = caoGoc - vv.height;                              // bàn phím (và thanh công cụ của nó) chiếm
+      const mo = phanBiChe > 150 && window.innerWidth < 1024 && dangGo();
       document.documentElement.classList.toggle('cl-ban-phim', mo);
       setBanPhim((c) => {
         if (!mo) return c ? null : c;
-        const moi = { dinh: Math.round(vv.offsetTop + vv.height), caoNhin: Math.round(vv.height) };
+        // Mép trên bàn phím tính theo toạ độ của vật `fixed`: nếu khung trang đã co theo bàn phím thì chính là
+    // đáy khung (innerHeight); nếu không co thì là đáy vùng nhìn thấy (offsetTop + height). Lấy số NHỎ hơn.
+    const moi = { dinh: Math.round(Math.min(window.innerHeight, vv.offsetTop + vv.height)), caoNhin: Math.round(vv.height) };
         return c && c.dinh === moi.dinh && c.caoNhin === moi.caoNhin ? c : moi;
       });
     };
@@ -592,8 +627,15 @@ export default function MapPage() {
     // thanh menu đáy tự ẩn (chủ dự án báo 14/9/2026). Rời trang là trả lại như cũ.
     const html = document.documentElement, body = document.body;
     const cu = [html.style.overflow, html.style.overscrollBehavior, body.style.overflow, body.style.overscrollBehavior];
+    const cuBody = [body.style.position, body.style.top, body.style.left, body.style.right, body.style.width];
     html.style.overflow = 'hidden'; html.style.overscrollBehavior = 'none';
     body.style.overflow = 'hidden'; body.style.overscrollBehavior = 'none';
+    // iPhone (Safari) KHÔNG nghe overflow:hidden khi vuốt — trang dài hơn màn hình dù 1px là vẫn kéo trôi
+    // được, thanh "Cam Lâm Land" trượt mất (chủ dự án chụp lần 2, 14/9/2026). GHIM THÂN TRANG
+    // (position:fixed) là cách chắc ăn duy nhất. Chỉ áp ở màn < 1024px; máy tính không cần.
+    if (window.innerWidth < 1024) {
+      body.style.position = 'fixed'; body.style.top = '0'; body.style.left = '0'; body.style.right = '0'; body.style.width = '100%';
+    }
     html.classList.add('cl-ban-do');   // globals.css: ẩn mọi thanh cuộn xám trên điện thoại
     window.scrollTo(0, 0);
     tinh();
@@ -606,6 +648,7 @@ export default function MapPage() {
     return () => {
       clearTimeout(t1); clearTimeout(t2); window.removeEventListener('resize', tinh); window.visualViewport?.removeEventListener('resize', tinh); ro?.disconnect();
       [html.style.overflow, html.style.overscrollBehavior, body.style.overflow, body.style.overscrollBehavior] = cu;
+      [body.style.position, body.style.top, body.style.left, body.style.right, body.style.width] = cuBody;
       html.classList.remove('cl-ban-do');
     };
   }, []);
@@ -787,7 +830,7 @@ export default function MapPage() {
   // ⚠️ KHÔNG tự thu/dời bản đồ nữa. Trước đây bật lớp ở nơi khác thì bản đồ tự lùi ra cho thấy cả lớp,
   // nhưng từ khi ba bản phân khu được ghép lại thì lớp nào cũng phủ gần kín huyện — tự nhảy khung chỉ
   // làm người xem mất chỗ đang xem.
-  const chonLopQh = useCallback((muc: { gom: string[] }, bat: boolean) => {
+  const chonLopQh = useCallback((muc: { gom: string[]; zBay?: number }, bat: boolean) => {
     const tat: Record<string, boolean> = Object.fromEntries(RASTER_OVERLAYS.map((x) => [x.id, false]));
     if (bat) for (const id of muc.gom) tat[id] = true;
     setOvOn(tat);
@@ -805,7 +848,7 @@ export default function MapPage() {
     // ⚠️ minzoom khai ở trên là mức của BỘ ẢNH (ô 256px). Thư viện bản đồ tính mức phóng theo ô 512px,
     // nên ô ảnh mức N đã hiện ở mức phóng BẢN ĐỒ N−1. Bay tới đúng N là sâu thừa 1 nấc (chủ dự án thấy
     // QĐ205 "zoom hơi sâu", 14/9/2026) → mức nhỏ nhất thấy được ảnh = N − 1.
-    const zThay = zMin - 1;
+    const zThay = muc.zBay ?? zMin - 1;
     const m: any = (window as any).__banDo;
     if (m && zThay > 0 && m.getZoom() < zThay) m.easeTo({ center: tam, zoom: zThay, duration: 900 });
   }, []);
@@ -1704,7 +1747,7 @@ export default function MapPage() {
                   <button key={k} onClick={() => { setTcTab(k); if (k === 'to') setSearchMode('parcel'); else if (k === 'gmap') setSearchMode('gmap'); else if (k === 'toado' && searchMode !== 'latlng') setSearchMode('vn2000'); }}
                     // flex-1: 4 thẻ CHIA ĐỀU bề ngang (trước dồn trái, bên phải hở — chủ dự án báo 14/9/2026)
                     className={`relative flex-1 whitespace-nowrap px-1 py-2.5 text-center text-[13px] ${tcTab === k ? 'font-semibold text-[#0A2540]' : 'text-slate-500'}`}>
-                    {lb}{tcTab === k && <span className="absolute inset-x-2 bottom-0 h-[2.5px] rounded-full bg-[#6c5ce7]" />}
+                    {lb}{tcTab === k && <span className="absolute inset-x-2 bottom-0 h-[2.5px] rounded-full bg-[#C8A14B]" />}
                   </button>
                 ))}
                 <button onClick={() => setTool('none')} aria-label="Đóng" className="grid h-9 w-8 shrink-0 place-items-center text-xl text-slate-400">✕</button>
@@ -1730,7 +1773,7 @@ export default function MapPage() {
                     {ocrBusy && (
                       <div className="mt-2">
                         <div className="mb-1 flex justify-between text-[12px] font-medium text-[#0A2540]"><span>{ocrBusy}</span><span>{ocrPct}%</span></div>
-                        <div className="h-1.5 overflow-hidden rounded-full bg-slate-200"><div className="h-full rounded-full bg-[#6c5ce7] transition-all duration-200" style={{ width: ocrPct + '%' }} /></div>
+                        <div className="h-1.5 overflow-hidden rounded-full bg-slate-200"><div className="h-full rounded-full bg-[#C8A14B] transition-all duration-200" style={{ width: ocrPct + '%' }} /></div>
                       </div>
                     )}
                     {gocTab === 'anh' && (
@@ -1748,7 +1791,7 @@ export default function MapPage() {
                       <div className="mt-2.5">
                         <textarea value={pasteText} onChange={(e) => setPasteText(e.target.value)} rows={5}
                           placeholder={'Dán từ Excel/Word/Zalo, mỗi dòng 1 điểm:\n1  1335000.50  567890.12\n2  1335010.20  567900.35'}
-                          className="w-full rounded-lg border border-slate-300 px-2.5 py-2 font-mono text-[16px] leading-snug outline-none focus:border-[#6c5ce7]" />
+                          className="w-full rounded-lg border border-slate-300 px-2.5 py-2 font-mono text-[16px] leading-snug outline-none focus:border-[#0A2540]" />
                         <button onClick={applyPaste} className="cl-press mt-1.5 w-full rounded-lg bg-[#0A2540] py-2.5 text-[13.5px] font-semibold text-white">Tách số vào bảng</button>
                       </div>
                     )}
@@ -1762,9 +1805,9 @@ export default function MapPage() {
                         <div key={i2} className="grid grid-cols-[18px_1fr_1fr_24px] items-center gap-x-2">
                           <span className="text-[12px] text-slate-400">{i2 + 1}</span>
                           <input value={r.x} onChange={(e) => setRows((rs) => rs.map((v, j2) => (j2 === i2 ? { ...v, x: e.target.value } : v)))} inputMode="decimal" placeholder="1334050.00"
-                            className="w-full min-w-0 border-0 border-b border-slate-200 bg-transparent px-0.5 py-1.5 text-[16px] outline-none focus:border-[#6c5ce7]" />
+                            className="w-full min-w-0 border-0 border-b border-slate-200 bg-transparent px-0.5 py-1.5 text-[16px] outline-none focus:border-[#0A2540]" />
                           <input value={r.y} onChange={(e) => setRows((rs) => rs.map((v, j2) => (j2 === i2 ? { ...v, y: e.target.value } : v)))} inputMode="decimal" placeholder="596100.00"
-                            className="w-full min-w-0 border-0 border-b border-slate-200 bg-transparent px-0.5 py-1.5 text-[16px] outline-none focus:border-[#6c5ce7]" />
+                            className="w-full min-w-0 border-0 border-b border-slate-200 bg-transparent px-0.5 py-1.5 text-[16px] outline-none focus:border-[#0A2540]" />
                           <button onClick={() => setRows((rs) => (rs.length > 1 ? rs.filter((_, j2) => j2 !== i2) : [{ x: '', y: '' }]))} aria-label="Xoá dòng" className="text-lg text-slate-300">✕</button>
                         </div>
                       ))}
@@ -1775,8 +1818,8 @@ export default function MapPage() {
                     </div>
                     </>)}
                     <div className="sticky -bottom-3 -mx-3 mt-2.5 grid grid-cols-[1.35fr_1fr] gap-2 border-t border-slate-100 bg-white px-3 pb-3 pt-2">
-                      <button onClick={() => { const du = pointsFromRows().length >= 3; drawParcel(); if (du) setTool('none'); }} className="cl-press rounded-xl bg-[#6c5ce7] py-2.5 text-[14px] font-semibold text-white">Vẽ & zoom tới thửa ({pointsFromRows().length})</button>
-                      <button onClick={() => { setGocTab('bang'); setRows((rs) => [...rs, { x: '', y: '' }]); }} className="cl-press rounded-xl bg-[#eef0fb] py-2.5 text-[14px] font-semibold text-[#0A2540]">+ Thêm toạ độ</button>
+                      <button onClick={() => { const du = pointsFromRows().length >= 3; drawParcel(); if (du) setTool('none'); }} className="cl-press rounded-xl bg-[#0A2540] py-2.5 text-[14px] font-semibold text-white">Vẽ & zoom tới thửa ({pointsFromRows().length})</button>
+                      <button onClick={() => { setGocTab('bang'); setRows((rs) => [...rs, { x: '', y: '' }]); }} className="cl-press rounded-xl bg-slate-100 py-2.5 text-[14px] font-semibold text-[#0A2540]">+ Thêm toạ độ</button>
                     </div>
                   </div>
                 )}
@@ -1805,12 +1848,12 @@ export default function MapPage() {
                       )],
                       [nhanOSoTo, (
                         <input value={c1} onChange={(e) => setC1(e.target.value)} inputMode="numeric" enterKeyHint="next" placeholder="Nhập số tờ"
-                          className="w-full rounded-lg border border-slate-300 px-2.5 py-2 text-[16px] outline-none focus:border-[#6c5ce7]" />
+                          className="w-full rounded-lg border border-slate-300 px-2.5 py-2 text-[16px] outline-none focus:border-[#0A2540]" />
                       )],
                       ['Số thửa', (
                         <input value={c2} onChange={(e) => setC2(e.target.value)} inputMode="numeric" enterKeyHint="search" placeholder="Nhập số thửa"
                           onKeyDown={(e) => { if (e.key === 'Enter') { (e.target as HTMLInputElement).blur(); doSearch(); setTool('none'); } }}
-                          className="w-full rounded-lg border border-slate-300 px-2.5 py-2 text-[16px] outline-none focus:border-[#6c5ce7]" />
+                          className="w-full rounded-lg border border-slate-300 px-2.5 py-2 text-[16px] outline-none focus:border-[#0A2540]" />
                       )],
                     ] as [string, React.ReactNode][]).map(([nhan, o]) => (
                       <div key={nhan} className="grid grid-cols-[42%_1fr] items-center gap-2">
@@ -1818,7 +1861,7 @@ export default function MapPage() {
                       </div>
                     ))}
                     <button onClick={() => { (document.activeElement as HTMLElement | null)?.blur(); doSearch(); setTool('none'); }}
-                      className="cl-press mt-1 w-full rounded-xl bg-[#6c5ce7] py-2.5 text-[14px] font-semibold text-white">Tra cứu</button>
+                      className="cl-press mt-1 w-full rounded-xl bg-[#0A2540] py-2.5 text-[14px] font-semibold text-white">Tra cứu</button>
                   </div>
                 )}
                 {tcTab === 'toado' && (
@@ -1866,7 +1909,7 @@ export default function MapPage() {
               )}
               {/* Không có nút "Xong": trùng việc với dấu ✕ ở góc (chủ dự án 14/9/2026). Vẽ thửa từ toạ độ
                   đã nằm ở Tra cứu → Góc ranh nên bảng này CHỈ ĐO. */}
-              <button onClick={() => { const m = measure; setMeasure('off'); setMResult(null); requestAnimationFrame(() => setMeasure(m)); }} className="cl-press mt-2.5 w-full rounded-xl bg-[#eef0fb] py-2.5 text-[14px] font-semibold text-[#0A2540]">Đo lại</button>
+              <button onClick={() => { const m = measure; setMeasure('off'); setMResult(null); requestAnimationFrame(() => setMeasure(m)); }} className="cl-press mt-2.5 w-full rounded-xl bg-slate-100 py-2.5 text-[14px] font-semibold text-[#0A2540]">Đo lại</button>
             </div>
           )}
 
@@ -1923,7 +1966,7 @@ export default function MapPage() {
           {qhSheet && (() => {
             const congTac = (bat: boolean, doi: () => void, nhan: string) => (
               <button type="button" role="switch" aria-checked={bat} aria-label={nhan} onClick={doi}
-                className={`relative h-[31px] w-[51px] shrink-0 rounded-full transition-colors duration-200 ${bat ? 'bg-[#34c759]' : 'bg-[#e9e9eb]'}`}>
+                className={`relative h-[31px] w-[51px] shrink-0 rounded-full transition-colors duration-200 ${bat ? 'bg-[#0A2540]' : 'bg-slate-200'}`}>
                 <span className={`absolute top-[2px] left-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-[0_3px_8px_rgba(0,0,0,.15),0_1px_1px_rgba(0,0,0,.16)] transition-transform duration-200 ${bat ? 'translate-x-[20px]' : ''}`} />
               </button>
             );
@@ -1938,8 +1981,8 @@ export default function MapPage() {
                     const bat = o.gom.every((id) => !!ovOn[id]);
                     return (
                       <button key={o.id} onClick={() => { chonLopQh(o, !bat); setQhSheet(false); }}
-                        className={`relative block w-full truncate whitespace-nowrap border-b border-black/10 px-8 py-[11px] text-center text-[14px] text-[#007aff] active:bg-black/5 ${bat ? 'font-medium' : ''}`}>
-                        {bat && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] text-[#007aff]">✓</span>}H.Cam Lâm - {o.tenApp}
+                        className={`relative block w-full truncate whitespace-nowrap border-b border-black/10 px-8 py-[11px] text-center text-[14px] text-[#0A2540] active:bg-black/5 ${bat ? 'font-medium' : ''}`}>
+                        {bat && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] font-bold text-[#C8A14B]">✓</span>}H.Cam Lâm - {o.tenApp}
                       </button>
                     );
                   })}
@@ -1978,7 +2021,7 @@ export default function MapPage() {
                     )}
                   </div>
                 </div>
-                <button onClick={() => setQhSheet(false)} className="mt-2 w-full rounded-[14px] bg-white py-[11px] text-[14px] font-semibold text-[#007aff] shadow-2xl active:bg-[#e5e5ea]">Đóng</button>
+                <button onClick={() => setQhSheet(false)} className="mt-2 w-full rounded-[14px] bg-white py-[11px] text-[14px] font-semibold text-[#0A2540] shadow-2xl active:bg-[#e5e5ea]">Đóng</button>
               </div>
             );
           })()}

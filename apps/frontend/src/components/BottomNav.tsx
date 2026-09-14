@@ -44,6 +44,8 @@ export default function BottomNav() {
   // Cuộn XUỐNG → ẩn thanh (đọc thoải mái); cuộn LÊN → hiện lại; gần đỉnh trang luôn hiện. Như Facebook.
   useEffect(() => {
     lastY.current = window.scrollY;
+    // Trang BẢN ĐỒ: thanh dưới luôn hiện (trang gói trong một khung hình, không cuộn).
+    if (path.startsWith('/map')) { setHidden(false); return; }
     const onScroll = () => {
       if (ticking.current) return;
       ticking.current = true;
@@ -59,7 +61,7 @@ export default function BottomNav() {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [path]);
 
   // Ẩn ở form đăng/sửa tin (khỏi che nút lưu) và trang quản trị.
   const navShown = !(path.startsWith('/sales/post') || path.startsWith('/sales/edit') || path.startsWith('/admin'));

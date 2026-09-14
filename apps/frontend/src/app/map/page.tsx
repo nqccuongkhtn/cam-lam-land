@@ -535,6 +535,46 @@ export default function MapPage() {
   // duyệt. Ai muốn thấy nhà cửa bên dưới thì tự kéo thanh "Độ mờ" xuống.
   const [opacity, setOpacity] = useState(1);
   const [nenOpen, setNenOpen] = useState(false);   // điện thoại: bảng chọn nền nổi trên bản đồ đang mở
+  // ĐO THẬT THANH MENU ĐÁY (điện thoại). Chiều cao của nó khác nhau theo từng đời iPhone (vạch vuốt
+  // về màn hình chính) và theo trình duyệt; đặt cứng "56px + vùng an toàn" thì trên iPhone thật nó vẫn
+  // CHE MẤT nút "Tra cứu" / "Vẽ & zoom tới thửa" ở đáy các bảng (chủ dự án chụp màn hình 14/9/2026).
+  //   menuDe  = phần thanh menu đè lên KHUNG BẢN ĐỒ (px) → cho các bảng đặt `absolute` trong khung
+  //   menuCao = chiều cao thanh menu tính từ đáy MÀN HÌNH (px) → cho bảng đặt `fixed`
+  const khungBanDoRef = useRef<HTMLDivElement>(null);
+  const [menuDo, setMenuDo] = useState<{ de: number; cao: number } | null>(null);
+  useEffect(() => {
+    const tinh = () => {
+      const k = khungBanDoRef.current;
+      const nav = document.querySelector('nav.fixed.bottom-0') as HTMLElement | null;
+      if (!k) return;
+      const coMenu = !!nav && getComputedStyle(nav).display !== 'none';
+      const dinhMenu = coMenu ? nav!.getBoundingClientRect().top : window.innerHeight;
+      const de = Math.max(0, Math.round(k.getBoundingClientRect().bottom - dinhMenu));
+      const cao = Math.max(0, Math.round(window.innerHeight - dinhMenu));
+      setMenuDo((c) => (c && c.de === de && c.cao === cao ? c : { de, cao }));
+    };
+    // KHOÁ CUỘN CẢ TRANG khi ở bản đồ (điện thoại): trang gói trong MỘT khung hình như app, vuốt chỉ
+    // để kéo bản đồ. Không khoá thì trên iPhone cú vuốt làm trang nhích/nảy → thanh "Cam Lâm Land" và
+    // thanh menu đáy tự ẩn (chủ dự án báo 14/9/2026). Rời trang là trả lại như cũ.
+    const html = document.documentElement, body = document.body;
+    const cu = [html.style.overflow, html.style.overscrollBehavior, body.style.overflow, body.style.overscrollBehavior];
+    html.style.overflow = 'hidden'; html.style.overscrollBehavior = 'none';
+    body.style.overflow = 'hidden'; body.style.overscrollBehavior = 'none';
+    html.classList.add('cl-ban-do');   // globals.css: ẩn mọi thanh cuộn xám trên điện thoại
+    window.scrollTo(0, 0);
+    tinh();
+    const t1 = setTimeout(tinh, 400), t2 = setTimeout(tinh, 1500);   // đợi thanh địa chỉ Safari thu gọn xong
+    window.addEventListener('resize', tinh);
+    window.visualViewport?.addEventListener('resize', tinh);
+    const nav = document.querySelector('nav.fixed.bottom-0');
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(tinh) : null;
+    if (ro) { if (nav) ro.observe(nav); if (khungBanDoRef.current) ro.observe(khungBanDoRef.current); }
+    return () => {
+      clearTimeout(t1); clearTimeout(t2); window.removeEventListener('resize', tinh); window.visualViewport?.removeEventListener('resize', tinh); ro?.disconnect();
+      [html.style.overflow, html.style.overscrollBehavior, body.style.overflow, body.style.overscrollBehavior] = cu;
+      html.classList.remove('cl-ban-do');
+    };
+  }, []);
   const [qhSheet, setQhSheet] = useState(false);   // điện thoại: bảng đáy "Chọn bản đồ quy hoạch" đang mở
   const [tcTab, setTcTab] = useState<'goc' | 'to' | 'toado' | 'gmap'>('to'); // thẻ đang mở của bảng đáy Tra cứu
   const [diemGiua, setDiemGiua] = useState(0);     // tăng 1 = thêm điểm đo ở tâm bản đồ (nút "Chọn điểm")
@@ -718,6 +758,19 @@ export default function MapPage() {
     const tat: Record<string, boolean> = Object.fromEntries(RASTER_OVERLAYS.map((x) => [x.id, false]));
     if (bat) for (const id of muc.gom) tat[id] = true;
     setOvOn(tat);
+    // BẬT BẢN QUY HOẠCH MÀ ĐANG NHÌN QUÁ XA (chủ dự án yêu cầu 14/9/2026):
+    // mức phóng hiện tại NHỎ HƠN mức phóng tối thiểu của bản đó (ảnh chưa vẽ ở mức này → nhìn như không có gì)
+    // thì bay tới TÂM VÙNG QUY HOẠCH và phóng đúng tới mức tối thiểu. Đang phóng đủ gần thì giữ nguyên chỗ đang xem.
+    // Bản gộp nhiều mảnh (Phân khu 1/2000): lấy khung bao chung của mọi mảnh, mức tối thiểu nhỏ nhất.
+    if (!bat) return;
+    const cac = RASTER_OVERLAYS.filter((o) => muc.gom.includes(o.id));
+    if (!cac.length) return;
+    const zMin = Math.min(...cac.map((o) => (o as any).minzoom ?? 0));
+    const xs = cac.flatMap((o) => o.coordinates.map((c) => c[0]));
+    const ys = cac.flatMap((o) => o.coordinates.map((c) => c[1]));
+    const tam: [number, number] = [(Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...ys) + Math.max(...ys)) / 2];
+    const m: any = (window as any).__banDo;
+    if (m && zMin > 0 && m.getZoom() < zMin) m.easeTo({ center: tam, zoom: zMin, duration: 900 });
   }, []);
   // ĐẨY BẢN ĐỒ KHI THỬA BỊ BẢNG CHE.
   // Bảng "Thông tin thửa" nằm giữa-dưới, hay đè lên đúng thửa vừa bấm. Hàm này đo vị trí bảng,
@@ -1456,7 +1509,10 @@ export default function MapPage() {
   }, [tool, tcTab]);
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-56px)] overflow-hidden mb-[calc(-48px-env(safe-area-inset-bottom))] md:mb-0">
+    // Cao = màn hình − thanh trên (56px) − phần TAI THỎ phía trên (thanh trên có đệm vùng an toàn).
+    // Trước chỉ trừ 56px nên trên iPhone trang DƯ ra đúng phần tai thỏ → còn chỗ để trượt.
+    <div className="flex flex-col h-[calc(100dvh-56px-env(safe-area-inset-top))] overflow-hidden mb-[calc(-48px-env(safe-area-inset-bottom))] md:mb-0"
+      style={menuDo ? ({ '--menu-de': menuDo.de + 'px', '--menu-cao': menuDo.cao + 'px' } as React.CSSProperties) : undefined}>
       {/* Toolbar tra cứu quy hoạch — dính cố định; desktop đầy đủ, mobile gọn theo nhóm */}
       <div className="bg-white border-b border-slate-200 shrink-0 z-20">
         {/* MÁY TÍNH (lg+): một hàng đầy đủ, tự xuống dòng khi hẹp */}
@@ -1595,7 +1651,7 @@ export default function MapPage() {
           <p className="text-xs text-slate-400 mt-4">💡 Nhấp vào bản đồ để xem toạ độ + lưu sản phẩm + tra cứu thửa/quy hoạch.</p>
         </aside>
 
-        <div className="relative flex-1">
+        <div ref={khungBanDoRef} className="relative flex-1">
           <MapView layers={geoLayers} overlays={overlays} markers={allMarkers} baseMap={baseMap} labels={labels} measureMode={measure}
             focusPoint={focusPoint} flyToPoint={flyPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} onViewport={onViewport} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={1} fitTo={fitTo} textLabels={textLabels}
             routes={dirTuyen} onPickRoute={setDirChon} diaChinhTiles={dcTiles} themDiemGiua={diemGiua} />
@@ -1619,15 +1675,16 @@ export default function MapPage() {
               Nằm sát trên thanh menu đáy, cuộn được, bản đồ vẫn thấy phía trên. Trước đây là khối
               xổ xuống dưới thanh nút trên cùng, đẩy bản đồ và che mất phần đầu. */}
           {tool === 'search' && (
-            <div className="lg:hidden absolute inset-x-0 bottom-[calc(56px+env(safe-area-inset-bottom))] z-30 max-h-[62%] flex flex-col rounded-t-2xl bg-white shadow-[0_-8px_30px_rgba(0,0,0,.18)]">
+            <div className="lg:hidden absolute inset-x-0 bottom-[var(--menu-de,calc(56px+env(safe-area-inset-bottom)))] z-30 max-h-[62%] flex flex-col rounded-t-2xl bg-white shadow-[0_-8px_30px_rgba(0,0,0,.18)]">
               <div className="flex items-center border-b border-slate-200 pl-2 pr-1">
                 {([['goc', 'Góc ranh'], ['to', 'Tờ thửa'], ['toado', 'Toạ độ'], ['gmap', 'Google Maps']] as [typeof tcTab, string][]).map(([k, lb]) => (
                   <button key={k} onClick={() => { setTcTab(k); if (k === 'to') setSearchMode('parcel'); else if (k === 'gmap') setSearchMode('gmap'); else if (k === 'toado' && searchMode !== 'latlng') setSearchMode('vn2000'); }}
-                    className={`relative whitespace-nowrap px-2.5 py-2.5 text-[13px] ${tcTab === k ? 'font-semibold text-[#0A2540]' : 'text-slate-500'}`}>
+                    // flex-1: 4 thẻ CHIA ĐỀU bề ngang (trước dồn trái, bên phải hở — chủ dự án báo 14/9/2026)
+                    className={`relative flex-1 whitespace-nowrap px-1 py-2.5 text-center text-[13px] ${tcTab === k ? 'font-semibold text-[#0A2540]' : 'text-slate-500'}`}>
                     {lb}{tcTab === k && <span className="absolute inset-x-2 bottom-0 h-[2.5px] rounded-full bg-[#6c5ce7]" />}
                   </button>
                 ))}
-                <button onClick={() => setTool('none')} aria-label="Đóng" className="ml-auto grid h-9 w-9 place-items-center text-xl text-slate-400">✕</button>
+                <button onClick={() => setTool('none')} aria-label="Đóng" className="grid h-9 w-8 shrink-0 place-items-center text-xl text-slate-400">✕</button>
               </div>
               <div className="overflow-y-auto overscroll-contain px-3 py-3">
                 {tcTab === 'goc' && (
@@ -1725,7 +1782,7 @@ export default function MapPage() {
               Dấu ngắm giữa bản đồ + nút "Chọn điểm" (thêm điểm ở TÂM bản đồ): chính xác hơn chạm
               tay, vì ngón tay che mất chỗ cần chọn. Bấm thẳng lên bản đồ vẫn thêm điểm như cũ. */}
           {tool === 'measure' && measure !== 'off' && (
-            <div className="lg:hidden absolute inset-x-0 bottom-[calc(56px+env(safe-area-inset-bottom))] z-30 rounded-t-2xl bg-white px-3.5 pb-3 pt-2.5 shadow-[0_-8px_30px_rgba(0,0,0,.18)]">
+            <div className="lg:hidden absolute inset-x-0 bottom-[var(--menu-de,calc(56px+env(safe-area-inset-bottom)))] z-30 rounded-t-2xl bg-white px-3.5 pb-3 pt-2.5 shadow-[0_-8px_30px_rgba(0,0,0,.18)]">
               <div className="flex items-center gap-2">
                 <p className="text-[14px] font-semibold text-slate-700">Hướng dẫn</p>
                 <div className="ml-2 inline-flex rounded-lg bg-slate-100 p-0.5 text-[12.5px]">
@@ -1776,10 +1833,10 @@ export default function MapPage() {
                 núm xám — kéo xuống thấy ngay phần trên đổi màu. Vì thanh xoay -90° nên "to right" của
                 dải màu chính là từ dưới lên. Nền màu vẽ lên chính ô trượt, rãnh để trong suốt. */}
             {(qhFillOn || RASTER_OVERLAYS.some((o) => !!ovOn[o.id])) && (
-              <div className="relative h-40 w-7">
+              <div className="relative h-[123px] w-7">{/* 160px → 2/3 (107px) → +15% (123px), chủ dự án chỉnh 14/9/2026 */}
                 <input type="range" min={0} max={100} value={Math.round(opacity * 100)} onChange={(e) => setOpacity(Number(e.target.value) / 100)} aria-label="Độ đậm lớp quy hoạch"
                   style={{ background: `linear-gradient(to right, #dc2626 ${Math.round(opacity * 100)}%, rgba(255,255,255,.85) ${Math.round(opacity * 100)}%)` }}
-                  className="absolute left-1/2 top-1/2 h-1 w-40 -translate-x-1/2 -translate-y-1/2 -rotate-90 cursor-pointer appearance-none rounded-full shadow-[0_0_2px_rgba(0,0,0,.5)]
+                  className="absolute left-1/2 top-1/2 h-1 w-[123px] -translate-x-1/2 -translate-y-1/2 -rotate-90 cursor-pointer appearance-none rounded-full shadow-[0_0_2px_rgba(0,0,0,.5)]
                     [&::-webkit-slider-runnable-track]:h-1 [&::-webkit-slider-runnable-track]:bg-transparent
                     [&::-webkit-slider-thumb]:-mt-[8px] [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#dc2626] [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md
                     [&::-moz-range-track]:h-1 [&::-moz-range-track]:bg-transparent [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-[#dc2626] [&::-moz-range-thumb]:bg-white" />
@@ -1789,7 +1846,7 @@ export default function MapPage() {
           {/* Tên bản quy hoạch đang bật ở góc trái dưới + dòng "tham khảo" góc phải — như app.
               Ẩn khi đang mở bảng đáy Tra cứu / Thước đo (bị che, lại rối mắt). */}
           {tool !== 'search' && !(tool === 'measure' && measure !== 'off') && (
-            <div className="lg:hidden pointer-events-none absolute inset-x-2 bottom-[calc(60px+env(safe-area-inset-bottom))] z-10 flex items-end justify-between gap-2 text-[11px] text-white [text-shadow:0_0_3px_#000,0_0_2px_#000]">
+            <div className="lg:hidden pointer-events-none absolute inset-x-2 bottom-[calc(var(--menu-de,56px)+4px)] z-10 flex items-end justify-between gap-2 text-[11px] text-white [text-shadow:0_0_3px_#000,0_0_2px_#000]">
               <span className="truncate font-medium">{(() => { const m = MUC_QH.find((o) => o.gom.every((id) => !!ovOn[id])); return m ? `H.Cam Lâm - ${m.tenApp}` : ''; })()}</span>
               <span className="shrink-0 text-right text-[10px] leading-tight opacity-90">Thông tin chỉ mang<br />tính tham khảo</span>
             </div>
@@ -1813,7 +1870,7 @@ export default function MapPage() {
               <p className="sticky top-0 z-10 bg-[#f2f2f7]/90 backdrop-blur px-4 pt-2.5 pb-1 text-[11px] font-medium uppercase tracking-wide text-[#6d6d72]">{chu}</p>
             );
             return (
-              <div className="lg:hidden fixed inset-0 z-[58] flex flex-col justify-end bg-black/35 px-2.5 pb-[calc(68px+env(safe-area-inset-bottom))] animate-[fadeIn_.15s_ease-out]" onClick={() => setQhSheet(false)}>
+              <div className="lg:hidden fixed inset-0 z-[58] flex flex-col justify-end bg-black/35 px-2.5 pb-[calc(var(--menu-cao,calc(56px+env(safe-area-inset-bottom)))+10px)] animate-[fadeIn_.15s_ease-out]" onClick={() => setQhSheet(false)}>
                 <div className="max-h-[62dvh] overflow-y-auto overscroll-contain rounded-[14px] bg-white/95 backdrop-blur-xl shadow-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" onClick={(e) => e.stopPropagation()}>
                   <p className="sticky top-0 z-20 bg-white/90 backdrop-blur px-4 py-2.5 text-center text-[12px] text-[#8a8a8e] border-b border-black/10">Chọn bản đồ quy hoạch</p>
                   {MUC_QH.map((o) => {
@@ -2097,7 +2154,7 @@ export default function MapPage() {
                  · sau khi bảng hiện ra, hàm tranhBiChe() đo vị trí bảng rồi TRƯỢT bản đồ đúng đoạn
                    ngắn nhất để thửa lọt ra ngoài bảng (không đổi mức phóng, không giật).
                id="bang-thua" chính là để đo vị trí bảng. */
-            <div id="bang-thua" className={`absolute left-2 right-2 bottom-[calc(58px+env(safe-area-inset-bottom))] sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:bottom-3 sm:w-96 sm:max-w-[calc(100%-1.5rem)] ${sheetExpanded ? 'max-h-[80%]' : 'max-h-[50%]'} sm:max-h-[42%] flex flex-col overflow-hidden z-20 bg-white rounded-2xl shadow-2xl border border-slate-200 transition-[max-height] duration-300`}>
+            <div id="bang-thua" className={`absolute left-2 right-2 bottom-[calc(var(--menu-de,calc(56px+env(safe-area-inset-bottom)))+4px)] sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:bottom-3 sm:w-96 sm:max-w-[calc(100%-1.5rem)] ${sheetExpanded ? 'max-h-[80%]' : 'max-h-[50%]'} sm:max-h-[42%] flex flex-col overflow-hidden z-20 bg-white rounded-2xl shadow-2xl border border-slate-200 transition-[max-height] duration-300`}>
               <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-slate-100 rounded-t-2xl">
                 <button onClick={() => setSheetExpanded((v) => !v)} className="sm:hidden w-full flex flex-col items-center pt-2 pb-0.5" aria-label={sheetExpanded ? 'Thu gọn' : 'Kéo lên xem đầy đủ'}>
                   <span className="w-10 h-1.5 rounded-full bg-slate-300" />

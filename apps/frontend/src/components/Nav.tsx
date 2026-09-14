@@ -54,7 +54,11 @@ export default function Nav() {
   const router = useRouter();
   const { user, loading, logout } = useAuth();
   const { openLogin } = useLoginGate();
-  const hidden = useHideOnScroll(20); // cuộn xuống ẩn Nav, cuộn lên hiện lại (đồng bộ thanh tìm kiếm)
+  // cuộn xuống ẩn Nav, cuộn lên hiện lại (đồng bộ thanh tìm kiếm).
+  // TRANG BẢN ĐỒ thì KHÔNG BAO GIỜ ẩn: trang đó gói trong một khung hình như app, vuốt là để kéo bản đồ
+  // (trên iPhone cú vuốt vẫn làm trang nhích → thanh "Cam Lâm Land" bị ẩn, chủ dự án báo 14/9/2026).
+  const anKhiCuon = useHideOnScroll(20);
+  const hidden = anKhiCuon && !path.startsWith('/map');
   const isHome = path === '/';
   const [open, setOpen] = useState(false);
   const [acct, setAcct] = useState(false);

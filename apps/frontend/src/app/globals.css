@@ -448,3 +448,11 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 @keyframes clpin-lac    { 0%,100%{ transform:rotate(-7deg) } 50%{ transform:rotate(7deg) } }
 @keyframes clpin-nhay   { 0%,100%{ opacity:1 } 50%{ opacity:.35 } }
 @media (prefers-reduced-motion: reduce){ .clpin{ animation:none !important } }
+
+/* TRANG BẢN ĐỒ trên điện thoại/iPad dọc: ẨN MỌI THANH CUỘN XÁM (trang + các bảng đáy) cho giống app
+   (chủ dự án yêu cầu 14/9/2026). Vẫn cuộn được bình thường, chỉ không vẽ vạch cuộn.
+   Lớp `cl-ban-do` do app/map/page.tsx gắn vào <html> lúc vào trang và gỡ ra lúc rời trang. */
+@media (max-width: 1023px) {
+  html.cl-ban-do, html.cl-ban-do * { scrollbar-width: none; -ms-overflow-style: none; }
+  html.cl-ban-do::-webkit-scrollbar, html.cl-ban-do *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+}

@@ -1,4 +1,4 @@
-const CACHE = 'camlam-v87';   // tăng số này là xoá sạch cache cũ của mọi máy ở lần vào sau
+const CACHE = 'camlam-v88';   // tăng số này là xoá sạch cache cũ của mọi máy ở lần vào sau
 const API_CACHE = 'camlam-api-v1'; // cache RIÊNG cho API công khai (dễ dọn, giới hạn dung lượng)
 const OFFLINE = '/offline.html';
 // Precache khung app để MỞ APP là vẽ ngay (không chờ mạng → hết màn đen ~1s lúc khởi động).

@@ -1438,7 +1438,8 @@ export default function MapPage() {
         : key === 'measure' ? () => { const open = tool !== 'measure'; setPanelOpen(false); setTool(open ? 'measure' : 'none'); setMeasure(open ? 'distance' : 'off'); setMResult(null); }
           : key === 'chugiai' ? () => { napChuGiai(); setPanelOpen(false); setTool(tool === 'chugiai' ? 'none' : 'chugiai'); }
             : () => { setPanelOpen(false); setTool(tool === key ? 'none' : (key as any)); }}
-      className={`relative shrink-0 rounded-full border px-3 py-1.5 text-[12.5px] font-semibold whitespace-nowrap shadow-sm transition active:scale-[.96] ${active ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}>
+      // grow: 4 nút GIÃN ĐỀU kín cả hàng — trước để shrink-0 nên dồn trái, bên phải hở một khúc.
+      className={`relative grow rounded-full border px-2.5 py-1.5 text-[12.5px] font-semibold whitespace-nowrap shadow-sm transition active:scale-[.96] ${active ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}>
       {label}
       {dot && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-orange-500 ring-2 ring-white" />}
     </button>
@@ -1762,10 +1763,13 @@ export default function MapPage() {
                   xem vệ tinh thì nút là ảnh bản đồ đường, và ngược lại (như Google Maps). BẤM LÀ ĐỔI NGAY,
                   không bật bảng chọn. Nền "Địa hình" + "Nhãn & đường" vẫn có ở máy tính.
                 · Thanh độ mờ = một VẠCH DỌC MẢNH màu xanh + núm tròn trắng, không khung, không chữ. */}
-          <div className="lg:hidden absolute right-2.5 top-[42%] -translate-y-1/2 z-10 flex flex-col items-center gap-3">
+          {/* Vị trí ĐO THẬT trên khổ 375px: cụm nút bản đồ (+/− cao 60px ở top 10, nút định vị 31px ở top 80)
+              rộng 31px, cách mép phải 10px, cách nhau 10px → cột này bắt đầu ở 111 + 10 = 121px, cùng bề
+              rộng 31px, nối liền ngay dưới. Trước đặt top 42% nên bị hở một khúc (chủ dự án báo 14/9/2026). */}
+          <div className="lg:hidden absolute right-[10px] top-[121px] z-10 flex w-[31px] flex-col items-center gap-2.5">
             <button onClick={() => setBaseMap(baseMap === 'satellite' ? 'street' : 'satellite')}
               aria-label={baseMap === 'satellite' ? 'Chuyển sang bản đồ đường' : 'Chuyển sang ảnh vệ tinh'}
-              className="cl-press h-9 w-9 overflow-hidden rounded-full border-2 border-white bg-slate-200 bg-cover bg-center shadow-[0_1px_5px_rgba(0,0,0,.35)]"
+              className="cl-press h-[31px] w-[31px] overflow-hidden rounded-full border-2 border-white bg-slate-200 bg-cover bg-center shadow-[0_1px_5px_rgba(0,0,0,.35)]"
               style={{ backgroundImage: `url(https://mt0.google.com/vt/lyrs=${baseMap === 'satellite' ? 'm' : 's'}&x=3289&y=1910&z=12)` }} />
             {/* Thanh ĐỘ MỜ dọc — hiện khi bật BẤT KỲ lớp quy hoạch nào. Kéo LÊN = đậm, XUỐNG = mờ.
                 Màu ĐỎ như bản cũ (chủ dự án 14/9/2026). Phần DƯỚI núm (mức đậm đang chọn) đỏ, phần TRÊN

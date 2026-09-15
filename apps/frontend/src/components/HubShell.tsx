@@ -39,14 +39,21 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
 
+  // Tab ghi trong đường link lúc MỞ TRANG. Phải nhớ lại: công cụ nội bộ (vd ?tab=ma-xac-thuc) chỉ có trong danh
+  // sách SAU KHI tải xong tài khoản. Trước đây đọc link ngay lúc mở → chưa thấy công cụ → rơi về tab đầu
+  // (Cẩm nang) rồi GHI ĐÈ luôn đường link (chủ dự án báo 15/9/2026). Giờ danh sách đổi là thử mở lại tab này.
+  const tabTuLink = useRef<string | null>(null);
   useEffect(() => {
     try {
-      const t = new URLSearchParams(window.location.search).get('tab');
-      if (t && leaves.some((x) => x.key === t && !x.action)) setTab(t);
+      tabTuLink.current = new URLSearchParams(window.location.search).get('tab');
       setCollapsed(localStorage.getItem(storageKey + '_collapsed') === '1');
     } catch { /* */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    const t = tabTuLink.current;
+    if (t && leaves.some((x) => x.key === t && !x.action)) { setTab(t); tabTuLink.current = null; }
+  }, [leaves]);
   // Chọn công cụ từ SHEET Tiện ích ở thanh dưới khi ĐANG ở hub (trang không remount) → nghe sự kiện đổi tab.
   useEffect(() => {
     const onTab = (e: Event) => { const k = (e as CustomEvent<{ key?: string }>).detail?.key; if (k && leaves.some((x) => x.key === k && !x.action)) { setLoading(true); setTab(k); } };

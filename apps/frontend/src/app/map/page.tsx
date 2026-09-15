@@ -138,9 +138,10 @@ function OChonBang({ nhan, tieuDe, dsMuc, giaTri, khiChon }: {
   return (
     <>
       <button type="button" onClick={() => { (document.activeElement as HTMLElement | null)?.blur(); setMo(true); }}
-        // Rộng VỪA CHỮ như app (không kéo hết dòng), dài quá thì cắt bớt bằng dấu "…".
-        className={`inline-flex w-auto max-w-full items-center gap-2 justify-self-start rounded-lg border bg-white px-2.5 py-1.5 text-left text-[15px] ${giaTri ? 'border-slate-300 font-medium text-[#0A2540]' : 'border-slate-300 text-slate-400'}`}>
-        <span className="truncate">{ten || nhan}</span><span className="shrink-0 text-[10px] text-slate-400">▼</span>
+        // KÉO HẾT DÒNG, cao 34px — bằng đúng ô Số thửa / Số tờ bên dưới cho các ô thẳng hàng (chủ dự án 15/9/2026:
+        // "các ô tra cứu chưa đều nhau"; trước rộng vừa chữ nên dài ngắn lởm chởm). Mũi tên ▼ dạt về mép phải.
+        className={`flex h-[34px] w-full items-center gap-2 rounded-lg border bg-white px-2.5 text-left text-[15px] ${giaTri ? 'border-slate-300 font-medium text-[#0A2540]' : 'border-slate-300 text-slate-400'}`}>
+        <span className="min-w-0 flex-1 truncate">{ten || nhan}</span><span className="shrink-0 text-[10px] text-slate-400">▼</span>
       </button>
       {mo && createPortal(
         <div className="fixed inset-0 z-[95] flex flex-col justify-end bg-black/40 px-3 pb-[calc(12px+env(safe-area-inset-bottom))]" onClick={() => setMo(false)}>

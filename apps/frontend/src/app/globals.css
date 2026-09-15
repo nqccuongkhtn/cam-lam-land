@@ -459,4 +459,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
      không để chúng nổi lơ lửng giữa bảng Tra cứu và bàn phím như trước. */
   html.cl-ban-do.cl-ban-phim nav.fixed.bottom-0,
   html.cl-ban-do.cl-ban-phim .cl-fab { display: none !important; }
+  /* Đang mở bảng đáy Tra cứu / Đo (lớp `cl-bang-day`): ẩn bong bóng + lời mời "Có nhà đất cần bán" — nó đè lên ô nhập. */
+  html.cl-ban-do.cl-bang-day .cl-fab,
+  html.cl-ban-do.cl-bang-day .cl-install-cta { display: none !important; }
 }

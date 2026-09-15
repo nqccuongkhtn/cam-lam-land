@@ -675,8 +675,14 @@ export default function MapPage() {
     const veDinh = () => { if (window.innerWidth < 1024 && (window.scrollY !== 0 || document.documentElement.scrollTop !== 0)) window.scrollTo(0, 0); };
     const khiBamO = () => { if (!dangGo()) return; [0, 60, 200, 420].forEach((ms) => setTimeout(veDinh, ms)); };
     document.addEventListener('focusin', khiBamO);
-    window.addEventListener('scroll', veDinh, { passive: true });
-    const tinh = () => {
+    // CHỜ YÊN MỚI XỬ LÝ (chủ dự án 15/9/2026: bấm ô gõ "màn hình rất rung"). Bàn phím trượt lên là Safari bắn
+    // hàng chục sự kiện liên tiếp; trước đây sự kiện nào cũng kéo trang về 0 + dời bảng → Safari lại cuộn tiếp
+    // → giằng co thành rung. Giờ đợi 120ms không còn sự kiện nào (bàn phím đã yên chỗ) mới làm MỘT lần.
+    const hens: any[] = [];
+    const cho = (fn: () => void) => { const i = hens.push(0) - 1; return () => { clearTimeout(hens[i]); hens[i] = setTimeout(fn, 120); }; };
+    const veDinhCho = cho(veDinh);
+    window.addEventListener('scroll', veDinhCho, { passive: true });
+    const tinhNgay = () => {
       if (!dangGo()) caoGoc = Math.max(window.innerHeight, vv.height);   // chưa gõ → ghi lại chiều cao đủ
       else veDinh();
       const phanBiChe = caoGoc - vv.height;                              // bàn phím (và thanh công cụ của nó) chiếm
@@ -692,13 +698,15 @@ export default function MapPage() {
         return c && c.dinh === moi.dinh && c.caoNhin === moi.caoNhin ? c : moi;
       });
     };
+    const tinh = cho(tinhNgay);
     vv.addEventListener('resize', tinh); vv.addEventListener('scroll', tinh);
-    document.addEventListener('focusin', tinh); document.addEventListener('focusout', () => setTimeout(tinh, 50));
+    document.addEventListener('focusin', tinh); document.addEventListener('focusout', tinh);
     return () => {
+      hens.forEach(clearTimeout);
       vv.removeEventListener('resize', tinh); vv.removeEventListener('scroll', tinh);
-      document.removeEventListener('focusin', tinh);
+      document.removeEventListener('focusin', tinh); document.removeEventListener('focusout', tinh);
       document.removeEventListener('focusin', khiBamO);
-      window.removeEventListener('scroll', veDinh);
+      window.removeEventListener('scroll', veDinhCho);
       document.documentElement.classList.remove('cl-ban-phim');
     };
   }, []);
@@ -763,6 +771,15 @@ export default function MapPage() {
   }, []);
   const [qhSheet, setQhSheet] = useState(false);   // điện thoại: bảng đáy "Chọn bản đồ quy hoạch" đang mở
   const [tcTab, setTcTab] = useState<'goc' | 'to' | 'toado' | 'gmap'>('to'); // thẻ đang mở của bảng đáy Tra cứu
+  // Ô số (thửa / tờ) đang gõ bằng BÀN PHÍM SỐ RIÊNG trong bảng Tra cứu điện thoại; null = bàn phím số đóng.
+  const [oSo, setOSo] = useState<'thua' | 'to' | null>(null);
+  const oSoGia = (loai: 'thua' | 'to', giaTri: string, goiY: string) => (
+    <button type="button" onClick={() => { (document.activeElement as HTMLElement | null)?.blur(); setOSo(loai); }}
+      className={`flex h-[34px] w-full items-center rounded-lg border px-2.5 text-left text-[16px] ${oSo === loai ? 'border-[#0A2540] ring-1 ring-[#0A2540]' : 'border-slate-300'}`}>
+      {giaTri ? <span className="text-[#0A2540]">{giaTri}</span> : <span className="text-slate-400">{goiY}</span>}
+      {oSo === loai && <span className="ml-px h-[18px] w-[1.5px] animate-pulse bg-[#0A2540]" />}
+    </button>
+  );
   const [gocTab, setGocTab] = useState<'bang' | 'anh' | 'dan'>('bang'); // 3 thẻ con của Góc ranh
   const [canDelete, setCanDelete] = useState(false);
   // BẢNG CHÚ GIẢI của bản đồ quy hoạch phân khu. Từ 12/9/2026 bốn bản phân khu được tô màu
@@ -917,6 +934,8 @@ export default function MapPage() {
   const [pasteText, setPasteText] = useState('');
   const [drawResult, setDrawResult] = useState<{ n: number; area: number; perim: number; lat: number; lng: number } | null>(null);
   const [tool, setTool] = useState<'none' | 'search' | 'chugiai' | 'measure'>('none'); // bảng công cụ trên mobile
+  useEffect(() => { if (tool !== 'search' || tcTab !== 'to') setOSo(null); }, [tool, tcTab]);
+  useEffect(() => { document.documentElement.classList.toggle('cl-bang-day', tool === 'search' || tool === 'measure'); return () => document.documentElement.classList.remove('cl-bang-day'); }, [tool]);   // globals.css: ẩn bong bóng chat khi bảng đáy mở   // đóng bảng / đổi thẻ → tắt bàn phím số
   // ==== CHỈ ĐƯỜNG NHIỀU TUYẾN ====
   const [dirDen, setDirDen] = useState<Diem | null>(null);     // điểm đến (bấm nút 🧭 là có) — có nó thì bảng chỉ đường mở
   const [dirDi, setDirDi] = useState<Diem | null>(null);       // điểm đi (mặc định lấy vị trí hiện tại)
@@ -2065,22 +2084,36 @@ export default function MapPage() {
                           khiChon={(ma) => { donKetQuaCu(); setC3(ma); const x = dsXaCap.find((y) => y.xaId === ma) || null; if (x) { setHuyenChon(x.huyen); bayToiXa(x); } }} />
                       )],
                       // THỬA TRƯỚC, TỜ SAU (quy tắc chung toàn web): ô số thửa đứng trên, ô số tờ dưới.
-                      ['Số thửa', (
-                        <input value={c2} onChange={(e) => setC2(e.target.value)} inputMode="numeric" enterKeyHint="next" placeholder="Nhập số thửa"
-                          className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-[16px] outline-none focus:border-[#0A2540]" />
-                      )],
-                      [nhanOSoTo, (
-                        <input value={c1} onChange={(e) => setC1(e.target.value)} inputMode="numeric" enterKeyHint="search" placeholder="Nhập số tờ"
-                          onKeyDown={(e) => { if (e.key === 'Enter') { (e.target as HTMLInputElement).blur(); doSearch(); setTool('none'); } }}
-                          className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-[16px] outline-none focus:border-[#0A2540]" />
-                      )],
+                      // Ô SỐ = NÚT GIẢ Ô NHẬP + BÀN PHÍM SỐ RIÊNG trong bảng (chủ dự án 15/9/2026: bấm ô thửa/tờ thì
+                      // "màn hình rất rung", nền phía sau trượt). Bàn phím iPhone bật lên là Safari tự cuộn trang cho
+                      // ô khỏi bị che, trang lại bị ghim đứng yên → hai bên giằng co → rung. Không gọi bàn phím hệ thống
+                      // thì Safari không có gì để cuộn: bảng đứng im, nền đứng im.
+                      ['Số thửa', oSoGia('thua', c2, 'Nhập số thửa')],
+                      [nhanOSoTo, oSoGia('to', c1, 'Nhập số tờ')],
                     ] as [string, React.ReactNode][]).map(([nhan, o]) => (
                       <div key={nhan} className="grid grid-cols-[40%_1fr] items-center gap-2">
                         <span className="text-[13.5px] text-slate-600">{nhan}</span>{o}
                       </div>
                     ))}
-                    <button onClick={() => { (document.activeElement as HTMLElement | null)?.blur(); doSearch(); setTool('none'); }}
-                      className="cl-press mt-1 w-full rounded-xl bg-[#0A2540] py-2.5 text-[14px] font-semibold text-white">Tra cứu</button>
+                    {oSo ? (
+                      <div className="grid grid-cols-4 gap-1.5 pt-1">
+                        {['1', '2', '3', '⌫', '4', '5', '6', '0', '7', '8', '9', 'OK'].map((k) => (
+                          <button key={k} type="button"
+                            onClick={() => {
+                              const doi = oSo === 'thua' ? setC2 : setC1;
+                              if (k === '⌫') doi((v) => v.slice(0, -1));
+                              else if (k === 'OK') { if (oSo === 'thua') setOSo('to'); else { setOSo(null); doSearch(); setTool('none'); } }
+                              else doi((v) => (v.length >= 6 ? v : v + k));
+                            }}
+                            className={`cl-press h-[38px] rounded-lg text-[17px] ${k === 'OK' ? 'bg-[#0A2540] text-[14px] font-semibold text-white' : k === '⌫' ? 'bg-slate-200 text-[#0A2540]' : 'bg-slate-100 font-medium text-[#0A2540]'}`}>
+                            {k === 'OK' ? (oSo === 'thua' ? 'Tiếp' : 'Tra cứu') : k}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <button onClick={() => { (document.activeElement as HTMLElement | null)?.blur(); doSearch(); setTool('none'); }}
+                        className="cl-press mt-1 w-full rounded-xl bg-[#0A2540] py-2.5 text-[14px] font-semibold text-white">Tra cứu</button>
+                    )}
                   </div>
                 )}
                 {tcTab === 'toado' && (

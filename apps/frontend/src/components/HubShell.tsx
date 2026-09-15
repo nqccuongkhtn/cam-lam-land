@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { toolIconSvg as iconSvg } from '@/lib/toolIcons';
 import { useAuth, coVaiTro } from '@/lib/auth';
+import { useLoginGate } from '@/lib/loginGate';
 
 // `vaiTro`: chỉ những tài khoản mang một trong các vai trò này mới THẤY công cụ.
 // Bỏ trống = ai cũng thấy. (Khác với `login` — cái đó chỉ nhắc phải đăng nhập.)
@@ -28,7 +29,7 @@ export function runToolAction(t: HubTool): boolean {
 // Khung "admin dashboard" dùng chung: 1 sidebar; item MẸ có submenu -> bấm là sổ xuống (accordion). Nội dung nhúng qua iframe.
 export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileMenu = false }: { title?: string; subtitle?: string; tools: HubTool[]; storageKey?: string; hideMobileMenu?: boolean }) {
   // Công cụ nội bộ (vd tra mã xác thực) chỉ hiện với tài khoản được cấp quyền.
-  const { user } = useAuth();
+  const { user, loading: dangTaiTk } = useAuth();
   const tools = useMemo(() => locTheoQuyen(tatCa, user), [tatCa, user]);
   const leaves = useMemo(() => tools.flatMap((t) => (t.children?.length ? t.children : [t])), [tools]);
   const parentOf = useMemo(() => { const m: Record<string, string> = {}; tools.forEach((t) => t.children?.forEach((c) => { m[c.key] = t.key; })); return m; }, [tools]);
@@ -43,6 +44,9 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
   // sách SAU KHI tải xong tài khoản. Trước đây đọc link ngay lúc mở → chưa thấy công cụ → rơi về tab đầu
   // (Cẩm nang) rồi GHI ĐÈ luôn đường link (chủ dự án báo 15/9/2026). Giờ danh sách đổi là thử mở lại tab này.
   const tabTuLink = useRef<string | null>(null);
+  // Công cụ link yêu cầu mà tài khoản hiện tại KHÔNG được thấy (chưa đăng nhập / sai tài khoản) → báo rõ.
+  const [biChan, setBiChan] = useState<HubTool | null>(null);
+  const tatCaLa = useMemo(() => tatCa.flatMap((t) => (t.children?.length ? t.children : [t])), [tatCa]);
   useEffect(() => {
     try {
       tabTuLink.current = new URLSearchParams(window.location.search).get('tab');
@@ -52,18 +56,23 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
   }, []);
   useEffect(() => {
     const t = tabTuLink.current;
-    if (t && leaves.some((x) => x.key === t && !x.action)) { setTab(t); tabTuLink.current = null; }
-  }, [leaves]);
+    if (t && leaves.some((x) => x.key === t && !x.action)) { setTab(t); setBiChan(null); tabTuLink.current = null; return; }
+    if (t) setBiChan(tatCaLa.find((x) => x.key === t) || null);
+    // Tab đang mở BIẾN MẤT khỏi danh sách (vd lúc đầu còn nhớ phiên đăng nhập cũ nên thấy "Mã xác thực", máy chủ
+    // báo phiên hết hạn → mất quyền) → về công cụ đầu tiên. Không làm thì khung nội dung rơi vào ô "Cộng đồng"
+    // (ô mở chat, không có trang) và nạp LẠI CHÍNH TRANG TIỆN ÍCH vào trong nó — hub lồng hub (chủ dự án chụp 15/9/2026).
+    setTab((cu) => (leaves.some((x) => x.key === cu && !x.action) ? cu : (leaves.find((x) => !x.action)?.key || cu)));
+  }, [leaves, tatCaLa]);
   // Chọn công cụ từ SHEET Tiện ích ở thanh dưới khi ĐANG ở hub (trang không remount) → nghe sự kiện đổi tab.
   useEffect(() => {
-    const onTab = (e: Event) => { const k = (e as CustomEvent<{ key?: string }>).detail?.key; if (k && leaves.some((x) => x.key === k && !x.action)) { setLoading(true); setTab(k); } };
+    const onTab = (e: Event) => { const k = (e as CustomEvent<{ key?: string }>).detail?.key; if (k && leaves.some((x) => x.key === k && !x.action)) setTab(k); };
     window.addEventListener('cl-hub-tab', onTab as EventListener);
     return () => window.removeEventListener('cl-hub-tab', onTab as EventListener);
   }, [leaves]);
   const didMount = useRef(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   useEffect(() => {
-    setLoading(true); setMobileMenu(false);
+    setMobileMenu(false);   // "đang tải" bật ở effect theo cur.key bên dưới — chỉ khi khung nhúng THẬT SỰ nạp trang khác
     if (didMount.current) { const p = parentOf[tab]; if (p) setExpanded((e) => (e[p] ? e : { ...e, [p]: true })); } // lần đầu: đóng sẵn submenu; chỉ mở khi người dùng điều hướng sau đó
     didMount.current = true;
     try { const u = new URL(window.location.href); u.searchParams.set('tab', tab); window.history.replaceState(null, '', u.toString()); } catch { /* */ }
@@ -91,7 +100,22 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
   }, [tab, leaves]);
 
   const toggle = () => setCollapsed((c) => { const n = !c; try { localStorage.setItem(storageKey + '_collapsed', n ? '1' : '0'); } catch { /* */ } return n; });
-  const cur = useMemo(() => leaves.find((x) => x.key === tab) || leaves[0], [tab, leaves]);
+  // Dự phòng: KHÔNG BAO GIỜ lấy ô có action (vd "Cộng đồng") làm trang hiển thị — nó không có đường dẫn,
+  // khung nhúng sẽ nạp lại chính trang hub vào trong.
+  const cur = useMemo(() => leaves.find((x) => x.key === tab && !x.action) || leaves.find((x) => !x.action) || leaves[0], [tab, leaves]);
+  const { openLogin } = useLoginGate();
+  // Bật "Đang mở…" ĐÚNG lúc khung nhúng đổi trang. Trước bật theo `tab`: tab đổi mà trang hiển thị không đổi (vd tab
+  // công cụ nội bộ bị lùi về Cẩm nang đang mở sẵn) → khung không nạp lại → không có onLoad → kẹt "Đang mở" mãi.
+  useEffect(() => { if (cur?.key) setLoading(true); }, [cur?.key]);
+  // Link mở công cụ nội bộ mà CHƯA đăng nhập → bật luôn CỬA SỔ ĐĂNG NHẬP (chủ dự án 15/9/2026, thay dòng báo vàng).
+  // Đăng nhập xong: danh sách công cụ đổi → effect ở trên tự mở đúng mục. Tắt cửa sổ: ở lại Cẩm nang (tab đầu).
+  // Chờ tải xong tài khoản mới hỏi, không thì người CÓ quyền cũng bị bật cửa sổ trong tích tắc lúc mở trang.
+  const daHoiDangNhap = useRef(false);
+  useEffect(() => {
+    if (!biChan || user || dangTaiTk || daHoiDangNhap.current) return;
+    daHoiDangNhap.current = true;
+    openLogin({ reason: `Mục "${biChan.name}" chỉ dành cho tài khoản được cấp quyền. Đăng nhập để mở.` });
+  }, [biChan, user, dangTaiTk, openLogin]);
   // Ẩn/hiện menu TRÊN + DƯỚI theo cuộn BÊN TRONG iframe (mobile) — như trang chủ/tin đăng.
   const onFrameLoad = () => {
     setLoading(false);
@@ -216,6 +240,13 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
               <a href={cur.path} target="_blank" rel="noreferrer" className="font-bold text-[#C8A14B] hover:underline whitespace-nowrap px-1">Mở toàn trang ↗</a>
             </div>
           </div>
+          {/* Đã đăng nhập mà tài khoản KHÔNG có quyền: cửa sổ đăng nhập không giúp gì → báo một dòng ngắn. */}
+          {biChan && user && (
+            <div className="flex shrink-0 items-center gap-2 border-b border-amber-200 bg-amber-50 px-3 py-2 text-[13px] text-amber-900">
+              <span>🔒 Tài khoản đang đăng nhập chưa được cấp quyền mở <b>{biChan.name}</b>.</span>
+              <button onClick={() => setBiChan(null)} aria-label="Đóng" className="ml-auto text-amber-700">✕</button>
+            </div>
+          )}
           <div className="relative flex-1 min-h-0 bg-white">
             {loading && (
               <div className="absolute inset-0 grid place-items-center bg-white z-10 pointer-events-none">

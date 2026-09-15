@@ -517,7 +517,14 @@ export default function ChatWidget() {
         </div>
       )}
       {/* Bong bóng chat NỔI — hiện trên web & tablet/iPad (sm+, ≥640px); điện thoại (dọc) dùng icon chat trên header. Kèm lời mời gửi bán phía trên. */}
-      <div className={`fixed z-[55] hidden sm:flex flex-col items-end gap-2 select-none pointer-events-none ${bubblePos ? '' : 'cl-fab right-4 md:right-5'}`} style={bubblePos ? { left: bubblePos.x, top: bubblePos.y } : undefined}>
+      {/* Bong bóng đã kéo: dính mép PHẢI thì neo bằng `right` (khung lời mời rộng 210px mọc sang TRÁI), dính mép
+          TRÁI thì neo `left` + canh trái. Trước đây luôn neo `left` theo toạ độ bong bóng 56px → lời mời tràn mất
+          ra ngoài mép phải màn hình. Neo `bottom` để lời mời mọc LÊN trên, bong bóng giữ đúng chỗ đã kéo. */}
+      <div className={`fixed z-[55] hidden sm:flex flex-col gap-2 select-none pointer-events-none ${neo.current?.mep === 'trai' && bubblePos ? 'items-start' : 'items-end'} ${bubblePos ? '' : 'cl-fab right-4 md:right-5'}`}
+        style={bubblePos ? {
+          ...(neo.current?.mep === 'trai' || !neo.current ? { left: bubblePos.x } : { right: khungNhin().W - bubblePos.x - BUB }),
+          bottom: khungNhin().H - bubblePos.y - BUB,
+        } : undefined}>
         {!open && hint && (
           <div className="relative pointer-events-auto bg-white rounded-2xl shadow-xl border border-slate-200 pl-3.5 pr-3 py-2.5 w-[210px] animate-bounce" style={{ animationDuration: '1.5s' }}>
             <button onClick={dismissHint} aria-label="Đóng" className="absolute -top-2 -right-2 w-5 h-5 bg-slate-700 hover:bg-slate-900 text-white rounded-full text-xs grid place-items-center">×</button>

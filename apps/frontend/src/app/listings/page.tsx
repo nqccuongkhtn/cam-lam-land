@@ -299,9 +299,11 @@ function ListingsInner() {
     let parcel: any = null, zoning: any = null;
     try { const r = await api<ParcelInfo>(`/parcels/at?lng=${lng}&lat=${lat}`); parcel = r.parcel; zoning = r.zoning; } catch { /* ignore */ }
     setInfo({ x: vn.x, y: vn.y, lng, lat, parcel, zoning });
-    setFlyPoint({ lng, lat }); // bay tới + zoom cận, pin nằm giữa vùng trống phía trên bảng
+    // KHÔNG bay/phóng sâu ngay khi chấm (chủ dự án 15/9/2026: chấm xong bản đồ phóng tận rừng, mất hết ghim tin).
+    // Chỉ khi bấm "Lưu tin này" mới đưa điểm vào giữa vùng trống phía trên bảng (effect bên dưới).
     setSheetExpanded(true); // mỗi lần chọn điểm mới: mở sẵn để điền
   }
+  useEffect(() => { if (showSave && info) setFlyPoint({ lng: info.lng, lat: info.lat }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [showSave]);
   // Lưu điểm đang xem (từ popup) thành gim cá nhân — hiện ngay trên bản đồ bán & thuê.
   async function saveHere() {
     if (!info || !user) return;
@@ -378,7 +380,7 @@ function ListingsInner() {
             <label className="flex items-center gap-2.5 py-1.5 text-xs font-semibold text-slate-700 cursor-pointer border-t border-slate-100">
               <input type="checkbox" checked={labels} onChange={(e) => setLabels(e.target.checked)} className="accent-red-600 w-4 h-4" /> Nhãn & đường
             </label>
-            <div className="border-t border-slate-100 pt-2 mt-1">
+            <div className="hidden md:block border-t border-slate-100 pt-2 mt-1">{/* điện thoại đổi nền bằng nút tròn bên phải, giống trang Bản đồ */}
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Nền bản đồ</span>
               <div className="flex gap-1.5 mt-1.5">
                 {BASE_THUMBS.map(([b, label, lyr]) => (
@@ -421,8 +423,27 @@ function ListingsInner() {
           </button>
         )}
       </div>
+      {/* ĐIỆN THOẠI: cột nút bên phải GIỐNG HỆT trang Bản đồ (chủ dự án 15/9/2026 "đồng bộ với bên map") —
+          nút tròn ảnh thu nhỏ của nền sẽ chuyển sang (bấm là đổi Vệ tinh ↔ Đường) + thanh độ mờ đỏ mảnh 123px.
+          Toạ độ right 10 / top 121 = ngay dưới cụm +/− và nút định vị của MapView, xem ghi chú trong app/map/page.tsx. */}
+      <div className="md:hidden absolute right-[10px] top-[121px] z-10 flex w-[31px] flex-col items-center gap-2.5">
+        <button onClick={() => setBaseMap(baseMap === 'satellite' ? 'street' : 'satellite')}
+          aria-label={baseMap === 'satellite' ? 'Chuyển sang bản đồ đường' : 'Chuyển sang ảnh vệ tinh'}
+          className="cl-press h-[31px] w-[31px] overflow-hidden rounded-full border-2 border-white bg-slate-200 bg-cover bg-center shadow-[0_1px_5px_rgba(0,0,0,.35)]"
+          style={{ backgroundImage: `url(https://mt0.google.com/vt/lyrs=${baseMap === 'satellite' ? 'm' : 's'}&x=3289&y=1910&z=12)` }} />
+        {qhOn && (
+          <div className="relative h-[123px] w-7">
+            <input type="range" min={0} max={100} value={Math.round(opacity * 100)} onChange={(e) => setOpacity(Number(e.target.value) / 100)} aria-label="Độ đậm lớp quy hoạch"
+              style={{ background: `linear-gradient(to right, #dc2626 ${Math.round(opacity * 100)}%, rgba(255,255,255,.85) ${Math.round(opacity * 100)}%)` }}
+              className="absolute left-1/2 top-1/2 h-1 w-[123px] -translate-x-1/2 -translate-y-1/2 -rotate-90 cursor-pointer appearance-none rounded-full shadow-[0_0_2px_rgba(0,0,0,.5)]
+                [&::-webkit-slider-runnable-track]:h-1 [&::-webkit-slider-runnable-track]:bg-transparent
+                [&::-webkit-slider-thumb]:-mt-[8px] [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#dc2626] [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md
+                [&::-moz-range-track]:h-1 [&::-moz-range-track]:bg-transparent [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-[#dc2626] [&::-moz-range-thumb]:bg-white" />
+          </div>
+        )}
+      </div>
       {qhOn && (
-        <div className="absolute top-1/2 right-3 -translate-y-1/2 z-10 flex flex-col items-center gap-1.5 bg-white/95 backdrop-blur rounded-full border border-slate-200 shadow-lg px-1.5 py-3">
+        <div className="hidden md:flex absolute top-1/2 right-3 -translate-y-1/2 z-10 flex-col items-center gap-1.5 bg-white/95 backdrop-blur rounded-full border border-slate-200 shadow-lg px-1.5 py-3">
           <span className="text-[9px] font-bold text-slate-400">Đậm</span>
           <div className="relative h-28 w-5">
             <input type="range" min={0} max={100} value={Math.round(opacity * 100)} onChange={(e) => setOpacity(Number(e.target.value) / 100)} className="absolute left-1/2 top-1/2 w-28 -translate-x-1/2 -translate-y-1/2 -rotate-90 accent-red-600 cursor-pointer" aria-label="Độ đậm lớp quy hoạch" />
@@ -807,8 +828,9 @@ function ListingsInner() {
         </div>
       )}
 
-      {/* TAB NỔI Danh sách / Bản đồ — CHỈ mobile (thay nút "Xem bản đồ" cũ). Ẩn khi đang mở bảng lưu tin để không đè. */}
-      {!info && !selPlace && !nearEnd && (
+      {/* TAB NỔI Danh sách / Bản đồ — CHỈ mobile (thay nút "Xem bản đồ" cũ). Ẩn khi đang mở BẢNG lưu tin để không đè.
+          Mới chấm một điểm (chỉ có ghim + chip "Lưu tin này") thì VẪN hiện — chủ dự án báo mất nút 15/9/2026. */}
+      {!(info && showSave) && !selPlace && !nearEnd && (
         <div className={`md:hidden fixed left-1/2 z-30 w-max max-w-[92vw] cl-fab-pill transition-opacity duration-200 ${hidden ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
           <div className="cl-glow rounded-full">
             <div className="relative z-[1] flex items-center gap-0.5 rounded-full bg-[#0A2540] shadow-xl p-1">

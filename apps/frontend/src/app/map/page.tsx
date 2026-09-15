@@ -967,7 +967,33 @@ export default function MapPage() {
     // QĐ205 "zoom hơi sâu", 14/9/2026) → mức nhỏ nhất thấy được ảnh = N − 1.
     const zThay = muc.zBay ?? zMin - 1;
     const m: any = (window as any).__banDo;
-    if (m && zThay > 0 && m.getZoom() < zThay) m.easeTo({ center: tam, zoom: zThay, duration: 900 });
+    if (!(m && zThay > 0 && m.getZoom() < zThay)) return;
+    // TẢI TRƯỚC ẢNH QUY HOẠCH rồi mới bay (chủ dự án 15/9/2026: điện thoại mạng chậm, bay tới nơi mà ảnh chưa
+    // về kịp → bản đồ hiện LỖ CHỖ từng mảng vuông). Tính đúng những ô sẽ cần ở mức phóng đích (ảnh 256px nên
+    // mức ô = mức bản đồ + 1, làm tròn như thư viện bản đồ), tải sẵn vào bộ nhớ đệm trình duyệt, xong thì bay.
+    // Chờ tối đa 1,8 giây — mạng quá chậm cũng không bắt người dùng đợi lâu.
+    const urls: string[] = [];
+    for (const o of cac as any[]) {
+      if (!o.tiles?.[0]) continue;
+      const tzDich = Math.max(o.minzoom ?? 0, Math.min(o.maxzoom ?? 18, Math.round(zThay + 1)));
+      // Tải cả mức ngay dưới: trên đường bay bản đồ đi qua mức đó trước, thiếu thì cũng lỗ chỗ.
+      for (const tz of [tzDich - 1, tzDich]) {
+      if (tz < (o.minzoom ?? 0)) continue;
+      const n = 2 ** tz;
+      const ox = (lng: number) => Math.floor(((lng + 180) / 360) * n);
+      const oy = (lat: number) => { const r = (lat * Math.PI) / 180; return Math.floor(((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * n); };
+      const lx = o.coordinates.map((c: number[]) => c[0]), ly = o.coordinates.map((c: number[]) => c[1]);
+      for (let x = ox(Math.min(...lx)); x <= ox(Math.max(...lx)); x++)
+        for (let y = oy(Math.max(...ly)); y <= oy(Math.min(...ly)); y++)
+          urls.push(o.tiles[0].replace('{z}', String(tz)).replace('{x}', String(x)).replace('{y}', String(y)));
+      }
+    }
+    let daBay = false;
+    const bay = () => { if (daBay) return; daBay = true; m.easeTo({ center: tam, zoom: zThay, duration: 900 }); };
+    if (!urls.length || urls.length > 60) { bay(); return; }
+    let con = urls.length;
+    for (const u of urls) { const im = new Image(); im.onload = im.onerror = () => { if (--con <= 0) bay(); }; im.src = u; }
+    setTimeout(bay, 1800);
   }, []);
   // ĐẨY BẢN ĐỒ KHI THỬA BỊ BẢNG CHE.
   // Bảng "Thông tin thửa" nằm giữa-dưới, hay đè lên đúng thửa vừa bấm. Hàm này đo vị trí bảng,
@@ -2249,7 +2275,7 @@ export default function MapPage() {
           )}
           {/* BẢNG ĐẦY ĐỦ khi bấm gim tin lưu — như giỏ hàng */}
           {selPlace && (
-            <div className="absolute bottom-[60px] sm:bottom-3 left-1/2 -translate-x-1/2 w-[360px] max-w-[94%] max-h-[64%] sm:max-h-[72%] overflow-y-auto z-20 bg-white rounded-2xl border-2 border-[#7c3aed]/40 shadow-2xl p-3.5 text-xs">
+            <div className="absolute bottom-[calc(var(--menu-de,calc(56px+env(safe-area-inset-bottom)))+10px)] sm:bottom-3 left-1/2 -translate-x-1/2 w-[360px] max-w-[94%] max-h-[64%] sm:max-h-[72%] overflow-y-auto z-20 bg-white rounded-2xl border-2 border-[#7c3aed]/40 shadow-2xl p-3.5 text-xs">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-1.5">
                   <b className="text-sm" style={{ color: dealColor(selPlace.dealStatus) }}>📌 Tin lưu</b>
@@ -2339,7 +2365,7 @@ export default function MapPage() {
             </div>
           )}
           {focusPoint && (
-            <div className="absolute bottom-[60px] sm:bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-white rounded-full shadow-lg border border-slate-200 pl-4 pr-2 py-1.5 max-w-[92%]">
+            <div className="absolute bottom-[calc(var(--menu-de,calc(56px+env(safe-area-inset-bottom)))+10px)] sm:bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-white rounded-full shadow-lg border border-slate-200 pl-4 pr-2 py-1.5 max-w-[92%]">
               <span className="text-sm font-semibold text-[#0A2540] truncate max-w-[42vw]">📍 {focusPoint.label || 'Vị trí tìm kiếm'}</span>
               <button onClick={() => moChiDuong(focusPoint.lat, focusPoint.lng, focusPoint.label || 'Vị trí tìm kiếm')} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-full px-3.5 py-1.5 whitespace-nowrap">🧭 Chỉ đường</button>
               <button onClick={() => setFocusPoint(null)} className="text-slate-400 hover:text-slate-700 w-7 h-7 grid place-items-center shrink-0">✕</button>

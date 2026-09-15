@@ -179,7 +179,9 @@ const RASTER_OVERLAYS = [
     // ở mức 10–11 trình duyệt đi đòi những ô không hề tồn tại, lần nào cũng nhận 404.
     // minzoom 10: 14/9/2026 dựng bù ô ảnh mức 11 (9 ô) + mức 10 (4 ô) bằng cách GHÉP 4 ô mức dưới rồi thu
     // nhỏ (bộ gốc chỉ có từ mức 12) — để lùi bản đồ ra xa vẫn thấy quy hoạch. Chỉ thêm file, không đụng ô cũ.
-    tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png'], minzoom: 10, maxzoom: 18,
+    // "?v=2" (15/9/2026): ĐỔI ĐỊA CHỈ để điện thoại + Cloudflare bỏ qua câu trả lời "không có ô" đã lỡ nhớ 1 năm
+    // từ hồi chưa cắt bù mức 10–11 (xem map $cache_anh trong nginx/nginx.conf). Đổi bộ ảnh sau này thì tăng số.
+    tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png?v=2'], minzoom: 10, maxzoom: 18,
     coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ⚠️ MÀU BẢN ĐỒ QUY HOẠCH LẤY ĐÚNG TỪ BẢN VẼ — ĐỌC KỸ TRƯỚC KHI ĐỔI (13/9/2026)
   // Bốn bộ tile phân khu (qd2076v21 · qd2101v22 · qd2222v22 · qd918v18) dùng BẢNG MÀU AUTOCAD.
@@ -304,7 +306,7 @@ const RASTER_OVERLAYS = [
   // Bản này KHÔNG cần lớp nét: nó vốn là các mảng tô kín (nông nghiệp, đất ở, giao thông, mặt
   // nước) chứ không phải bản vẽ nét như ba bản 1/2000 ở trên.
   { id: 'qh-qd893', name: 'Quy hoạch sử dụng đất QĐ893 (đến 2030)', url: '',
-    tiles: ['/tiles/qd893v1/{z}/{x}/{y}.png'], minzoom: 8, maxzoom: 18,   // đã cắt bù thêm z8–11 (12/9/2026) để thu nhỏ vẫn thấy
+    tiles: ['/tiles/qd893v1/{z}/{x}/{y}.png?v=2'], minzoom: 8, maxzoom: 18,   // ?v=2: như QĐ205 — bỏ "không có ô" đã nhớ từ trước ngày cắt bù   // đã cắt bù thêm z8–11 (12/9/2026) để thu nhỏ vẫn thấy
     coordinates: [[108.9335, 12.2239], [109.2624, 12.2239], [109.2624, 11.9328], [108.9335, 11.9328]] as [[number, number], [number, number], [number, number], [number, number]] },
 ];
 // MỤC CHỌN trên bảng "Bản đồ quy hoạch". Ba bản phân khu 1/2000 (QĐ2076 phía Bắc · QĐ2101 trung tâm ·

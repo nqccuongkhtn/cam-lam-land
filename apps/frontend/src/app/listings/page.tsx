@@ -30,7 +30,7 @@ const QH = {
   id: 'qh-qd205', url: '/overlays/QD205.png',
   // Bộ tile render từ DGN (QD205) → z10-18, ĐẦY ĐỦ mọi zone.
   // minzoom = ĐÚNG mức thấp nhất đã cắt (z12) — khai 10 là đi đòi ô không tồn tại, nhận 404.
-  tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png'], minzoom: 12, maxzoom: 18,
+  tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png?v=2'], minzoom: 12, maxzoom: 18,   // ?v=2: xem ghi chú ở app/map/page.tsx
   coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]],
 };
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
@@ -299,11 +299,11 @@ function ListingsInner() {
     let parcel: any = null, zoning: any = null;
     try { const r = await api<ParcelInfo>(`/parcels/at?lng=${lng}&lat=${lat}`); parcel = r.parcel; zoning = r.zoning; } catch { /* ignore */ }
     setInfo({ x: vn.x, y: vn.y, lng, lat, parcel, zoning });
-    // KHÔNG bay/phóng sâu ngay khi chấm (chủ dự án 15/9/2026: chấm xong bản đồ phóng tận rừng, mất hết ghim tin).
-    // Chỉ khi bấm "Lưu tin này" mới đưa điểm vào giữa vùng trống phía trên bảng (effect bên dưới).
+    // Chấm điểm là BAY TỚI + phóng cận như cũ (chủ dự án 15/9/2026: "sửa zoom lại như cũ"). Lỗi "mất danh sách và
+    // bản đồ" hôm trước là do nút Danh sách / Bản đồ bị ẩn khi có điểm — đã sửa ở chỗ nút, không liên quan việc phóng.
+    setFlyPoint({ lng, lat });
     setSheetExpanded(true); // mỗi lần chọn điểm mới: mở sẵn để điền
   }
-  useEffect(() => { if (showSave && info) setFlyPoint({ lng: info.lng, lat: info.lat }); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [showSave]);
   // Lưu điểm đang xem (từ popup) thành gim cá nhân — hiện ngay trên bản đồ bán & thuê.
   async function saveHere() {
     if (!info || !user) return;

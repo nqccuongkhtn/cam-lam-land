@@ -171,7 +171,17 @@ function parcelDims(hl: any): any[] {
     // không có số của máy chủ (vd thửa người dùng tự vẽ từ bảng toạ độ).
     const soMayChu = Number(hl.properties?.dienTichChinhThuc);
     const area = (polys.length === 1 && Number.isFinite(soMayChu) && soMayChu > 0) ? soMayChu : ringAreaM2(ring);
-    out.push({ type: 'Feature', properties: { area: (area >= 1000 ? Math.round(area).toLocaleString('vi') : area.toFixed(1)) + ' m²' }, geometry: { type: 'Point', coordinates: [cx, cy] } });
+    // Giữ tối đa 2 số lẻ, có dấu ngăn hàng nghìn — không làm tròn thành số nguyên.
+    const chuDt = area.toLocaleString('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' m²';
+    // Mức phóng TỐI THIỂU để ghi diện tích: chỉ hiện khi bề HẸP của thửa trên màn hình rộng hơn
+    // con chữ. Nhìn xa mà vẫn ghi thì con chữ to hơn cả thửa, che mất số thửa bên cạnh.
+    const latC = cy * Math.PI / 180;
+    const xs = ring.map((p: number[]) => p[0]), ys = ring.map((p: number[]) => p[1]);
+    const rongM = (Math.max(...xs) - Math.min(...xs)) * 111320 * Math.cos(latC);
+    const caoM = (Math.max(...ys) - Math.min(...ys)) * 110540;
+    const hepM = Math.max(1, Math.min(rongM, caoM));
+    const minzDt = Math.log2((chuDt.length * 6.5 + 6) * 156543.03392 * Math.cos(latC) / hepM);
+    out.push({ type: 'Feature', properties: { area: chuDt, minz: Math.round(minzDt * 100) / 100 }, geometry: { type: 'Point', coordinates: [cx, cy] } });
   }
   return out;
 }
@@ -252,6 +262,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     if (!batBuoc && z === zCanhRef.current) return;
     zCanhRef.current = z;
     map.setFilter('hl-edge', ['all', ['has', 'len'], ['<=', ['get', 'minz'], z]] as any);
+    if (map.getLayer('hl-area')) map.setFilter('hl-area', ['all', ['has', 'area'], ['<=', ['get', 'minz'], z]] as any);
   }
 
   useEffect(() => {
@@ -308,7 +319,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       // 'text-allow-overlap' để MẶC ĐỊNH (false) → chữ nào chồng lên chữ khác thì tự giấu bớt.
       // Trước đây bật cho hiện hết nên thửa nhiều đỉnh bị chữ đè lên nhau thành một vệt trắng.
       map.addLayer({ id: 'hl-edge', type: 'symbol', source: 'highlight-dims', filter: ['all', ['has', 'len'], ['<=', ['get', 'minz'], map.getZoom()]], layout: { 'text-field': ['get', 'len'], 'text-size': 12.5, 'text-font': ['Noto Sans Regular'], 'text-rotate': ['get', 'rot'], 'text-rotation-alignment': 'map', 'text-keep-upright': true, 'text-padding': 3 }, paint: { 'text-color': '#0A2540', 'text-halo-color': '#ffffff', 'text-halo-width': 2.6, 'text-halo-blur': 0.2 } });
-      map.addLayer({ id: 'hl-area', type: 'symbol', source: 'highlight-dims', filter: ['has', 'area'], layout: { 'text-field': ['get', 'area'], 'text-size': 14.5, 'text-font': ['Noto Sans Regular'], 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': '#0A2540', 'text-halo-color': '#ffffff', 'text-halo-width': 3, 'text-halo-blur': 0.2 } });
+      map.addLayer({ id: 'hl-area', type: 'symbol', source: 'highlight-dims', filter: ['all', ['has', 'area'], ['<=', ['get', 'minz'], map.getZoom()]], layout: { 'text-field': ['get', 'area'], 'text-size': ['interpolate', ['linear'], ['zoom'], 16, 11, 19, 14], 'text-font': ['Noto Sans Regular'], 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': '#0A2540', 'text-halo-color': '#ffffff', 'text-halo-width': 3, 'text-halo-blur': 0.2 } });
       // HOÀNG SA · TRƯỜNG SA — chồng lên trên cùng, luôn bật. Ảnh nền của nhà cung cấp nước ngoài
       // hay bỏ trống hai quần đảo này; lớp đây vẽ đè lên nên ảnh chụp màn hình bản đồ không bị bắt bẻ.
       themLopBienDao(map);

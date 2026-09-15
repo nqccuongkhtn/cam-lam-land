@@ -1692,6 +1692,19 @@ export default function MapPage() {
     requestAnimationFrame(() => { const el = trangQhRef.current; if (el) el.scrollTo({ left: i * buocTrang(el), behavior: 'auto' }); });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [info]);
+  // Đổi quy hoạch ở bảng "Lớp Q.Hoạch" trong lúc bảng thửa đang mở → bảng thửa lướt theo tới đúng trang đó
+  // (chủ dự án 15/9/2026). Trang đang xem mà lớp của nó vẫn bật thì đứng yên, khỏi nhảy lung tung.
+  useEffect(() => {
+    if (!info?.parcel) return;
+    const ds = trangQhCuaThua();
+    const dangBat = (t: (typeof ds)[number]) => t.muc.gom.every((id) => !!ovOn[id]);
+    if (ds[trangQh] && dangBat(ds[trangQh])) return;
+    const i = ds.findIndex(dangBat);
+    if (i < 0) return;
+    setTrangQh(i);
+    requestAnimationFrame(() => { const el = trangQhRef.current; if (el) el.scrollTo({ left: i * buocTrang(el), behavior: 'smooth' }); });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ovOn]);
   // Một bước lướt = bề rộng một thẻ + khoảng hở (kiểu Thẻ ngang thẻ hẹp hơn khung, các kiểu khác = cả khung).
   function buocTrang(el: HTMLDivElement) {
     const a = el.children[0] as HTMLElement | undefined, b = el.children[1] as HTMLElement | undefined;
@@ -2586,7 +2599,7 @@ export default function MapPage() {
                   if (!ds.length) return null;
                   const toiTrang = (i: number) => { const el = trangQhRef.current; if (el) el.scrollTo({ left: Math.max(0, Math.min(ds.length - 1, i)) * buocTrang(el), behavior: 'smooth' }); };
                   return (
-                    <div className="relative -mx-4">
+                    <div className="group/qh relative -mx-4">
                       {ds.length > 1 && (
                         <div className="mb-1 flex items-center justify-center gap-1">
                           {ds.map((t, i) => (
@@ -2596,15 +2609,22 @@ export default function MapPage() {
                           ))}
                         </div>
                       )}
-                      {/* NÚT ‹ › GỢI Ý LƯỚT (chủ dự án 14/9/2026: "sợ người dùng không biết"): tròn, nổi ở HAI MÉP vùng
-                          quy hoạch, cả điện thoại lẫn máy tính. Trang đầu ẩn ‹, trang cuối ẩn › → biết còn trang phía nào. */}
+                      {/* GỢI Ý LƯỚT KIỂU C (chủ dự án chọn 15/9/2026), CHỈ trên máy tính — điện thoại vuốt tay nên không cần:
+                          • mép bên còn trang thì MỜ DẦN → nhìn là biết nội dung còn chạy tiếp sang bên đó;
+                          • mũi tên mảnh ‹ › nhỏ ở góc phải ngang tiêu đề, CHỈ hiện khi rê chuột vào bảng. */}
                       {ds.length > 1 && trangQh > 0 && (
-                        <button type="button" aria-label="Bản quy hoạch trước" onClick={() => toiTrang(trangQh - 1)}
-                          className="absolute left-1 top-1/2 z-10 grid h-7 w-7 translate-y-[-2px] place-items-center rounded-full border border-slate-200 bg-white/95 text-[18px] font-bold leading-none text-[#0A2540] shadow-md active:bg-slate-100">‹</button>
+                        <div className="pointer-events-none absolute bottom-0 left-0 top-2 z-10 hidden w-8 bg-gradient-to-r from-white to-transparent sm:block" />
                       )}
                       {ds.length > 1 && trangQh < ds.length - 1 && (
-                        <button type="button" aria-label="Bản quy hoạch sau" onClick={() => toiTrang(trangQh + 1)}
-                          className="absolute right-1 top-1/2 z-10 grid h-7 w-7 translate-y-[-2px] place-items-center rounded-full border border-slate-200 bg-white/95 text-[18px] font-bold leading-none text-[#0A2540] shadow-md active:bg-slate-100">›</button>
+                        <div className="pointer-events-none absolute bottom-0 right-0 top-2 z-10 hidden w-8 bg-gradient-to-l from-white to-transparent sm:block" />
+                      )}
+                      {ds.length > 1 && (
+                        <div className="absolute right-3 top-[7px] z-20 hidden items-center gap-0.5 opacity-0 transition-opacity group-hover/qh:opacity-100 sm:flex">
+                          <button type="button" aria-label="Bản quy hoạch trước" disabled={trangQh === 0} onClick={() => toiTrang(trangQh - 1)}
+                            className="grid h-5 w-5 place-items-center rounded text-[16px] leading-none text-[#0A2540] hover:bg-slate-100 disabled:text-slate-300 disabled:hover:bg-transparent">‹</button>
+                          <button type="button" aria-label="Bản quy hoạch sau" disabled={trangQh === ds.length - 1} onClick={() => toiTrang(trangQh + 1)}
+                            className="grid h-5 w-5 place-items-center rounded text-[16px] leading-none text-[#0A2540] hover:bg-slate-100 disabled:text-slate-300 disabled:hover:bg-transparent">›</button>
+                        </div>
                       )}
                       <div ref={trangQhRef} onScroll={() => { clearTimeout((trangQhRef as any).t); (trangQhRef as any).t = setTimeout(khiLuotTrangQh, 90); }}
                         // KÉO BẰNG CHUỘT (máy tính): tắt tạm "hít trang" trong lúc kéo cho mượt, thả chuột thì trôi về trang gần nhất.
@@ -2625,7 +2645,7 @@ export default function MapPage() {
                         }}
                         className={`flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain select-none sm:cursor-grab [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}>
                         {ds.map((t) => (
-                          <div key={t.muc.id} className={`w-full shrink-0 snap-center ${ds.length > 1 ? 'px-10' : 'px-4'}`}>{/* px-10: chừa chỗ cho nút ‹ › khỏi che ô diện tích */}
+                          <div key={t.muc.id} className={`w-full shrink-0 snap-center ${ds.length > 1 ? 'px-4 sm:pr-14' : 'px-4'}`}>{/* sm:pr-14: chừa góc phải cho mũi tên nhỏ khỏi đè tiêu đề */}
                             {/* Tiêu đề + tên các mảnh phân khu gộp MỘT dòng cho gọn. */}
                             <p className={`truncate font-bold leading-snug text-[#0A2540] text-[13px]`}>{t.tieuDe}{t.phu && <span className="ml-1.5 text-[10.5px] font-normal text-slate-400">{t.phu}</span>}</p>
                             <div className="mt-1 space-y-[3px]">

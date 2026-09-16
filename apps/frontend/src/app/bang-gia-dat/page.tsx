@@ -47,6 +47,7 @@ export default function BangGiaDatPage() {
         <a href={PDF_NQ} target="_blank" rel="noreferrer" className="bg-slate-100 hover:bg-slate-200 text-[#0A2540] font-semibold text-[13px] px-3.5 py-2 rounded-lg">📄 Nghị quyết (PDF)</a>
         <a href={PDF_FULL} target="_blank" rel="noreferrer" className="bg-slate-100 hover:bg-slate-200 text-[#0A2540] font-semibold text-[13px] px-3.5 py-2 rounded-lg">📚 Trọn bộ phụ lục</a>
         <a href={QD50} target="_blank" rel="noreferrer" className="bg-slate-100 hover:bg-slate-200 text-[#0A2540] font-semibold text-[13px] px-3.5 py-2 rounded-lg">📊 QĐ 50/2026 (hệ số K)</a>
+        <Link href="/den-bu" className="bg-[#C8A14B]/15 hover:bg-[#C8A14B]/25 text-[#0A2540] font-bold text-[13px] px-3.5 py-2 rounded-lg">💵 Giá đền bù đất nông nghiệp</Link>
       </div>
 
       {/* CÔNG CỤ CHÍNH: bảng tra cứu hiện sẵn + công cụ tính (nhiều tab theo từng Điều) */}

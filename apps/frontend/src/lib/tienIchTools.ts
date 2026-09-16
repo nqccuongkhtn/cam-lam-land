@@ -10,6 +10,7 @@ export const TIEN_ICH_TOOLS: HubTool[] = [
   { key: 'van-ban', name: 'Tra cứu văn bản', desc: 'Văn bản, nghị quyết, quy định nhà đất', icon: '📑', path: '/van-ban' },
   { key: 'bang-gia-dat', name: 'Bảng giá đất', desc: 'Bảng giá đất Khánh Hòa 2026 (NQ 15/2025)', icon: '🏷️', path: '/bang-gia-dat' },
   { key: 'gia-dat', name: 'Giá đất & định giá nhanh', desc: 'Giá tham khảo theo khu vực + tính theo m²', icon: '💰', path: '/gia-dat' },
+  { key: 'den-bu', name: 'Giá đền bù & tính bồi thường', desc: 'Đất nông nghiệp bị thu hồi — giá từng thôn, tính tiền', icon: '💵', path: '/den-bu' },
   { key: 'qr', name: 'Tra cứu QR sổ đỏ', desc: 'Quét mã QR trên giấy tờ thửa đất', icon: '🔎', path: '/qr' },
   { key: 'tra-so-ban-do', name: 'Tra cứu số tờ bản đồ', desc: 'Số tờ bản đồ cũ ↔ mới sau sáp nhập', icon: '🔄', path: '/tra-so-ban-do' },
   { key: 'hop-dong-dat-coc', name: 'Hợp đồng đặt cọc', desc: 'Soạn & in hợp đồng đặt cọc nhà đất', icon: '📝', path: '/hop-dong-dat-coc' },

@@ -690,6 +690,7 @@ export default function MapPage() {
   // với màu thấy trong MicroStation. Mà đây là bản đồ quy hoạch, màu phải đúng bản vẽ được
   // duyệt. Ai muốn thấy nhà cửa bên dưới thì tự kéo thanh "Độ mờ" xuống.
   const [opacity, setOpacity] = useState(1);
+  const [canCuOpen, setCanCuOpen] = useState(false);   // bảng Căn cứ pháp lý (nút dấu hỏi trên bản đồ)
   const [nenOpen, setNenOpen] = useState(false);   // điện thoại: bảng chọn nền nổi trên bản đồ đang mở
   // ĐO THẬT THANH MENU ĐÁY (điện thoại). Chiều cao của nó khác nhau theo từng đời iPhone (vạch vuốt
   // về màn hình chính) và theo trình duyệt; đặt cứng "56px + vùng an toàn" thì trên iPhone thật nó vẫn
@@ -1937,29 +1938,6 @@ export default function MapPage() {
               <div className="flex justify-between text-[11px] text-slate-400 mb-1"><span>Độ mờ</span><span className="font-semibold text-slate-500">{Math.round(opacity * 100)}%</span></div>
               <input type="range" min={0} max={100} value={Math.round(opacity * 100)} onChange={(e) => setOpacity(Number(e.target.value) / 100)} className="w-full accent-emerald-600" />
             </div>
-            {/* CĂN CỨ PHÁP LÝ — quyết định phê duyệt của bản quy hoạch đang bật, bấm vào đọc bản gốc.
-                Đang bật bản nào thì chỉ hiện căn cứ của bản đó; chưa bật gì thì hiện đủ cả danh sách. */}
-            {(() => {
-              const dangBat = Object.keys(CAN_CU_QH).filter((id) => !!ovOn[id]);
-              const ds = dangBat.length ? dangBat : Object.keys(CAN_CU_QH);
-              return (
-                <div className="mt-2">
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1">
-                    Căn cứ pháp lý{dangBat.length ? '' : ` (${ds.length} quyết định)`}
-                  </p>
-                  <div className="space-y-1">
-                    {ds.map((id) => { const c = CAN_CU_QH[id]; return (
-                      <a key={id} href={c.tep} target="_blank" rel="noreferrer"
-                        className="block rounded-lg border border-slate-200 px-2 py-1.5 hover:border-[#0A2540] hover:bg-slate-50">
-                        <span className="block text-[12px] font-bold text-[#0A2540]">📄 Quyết định {c.so} — {c.ngay}</span>
-                        <span className="block text-[11px] leading-snug text-slate-500">{c.coQuan} · {c.ten}</span>
-                      </a>
-                    ); })}
-                  </div>
-                  <p className="mt-1 text-[10.5px] leading-snug text-slate-400">Bấm để mở bản gốc (PDF). Màu trên bản đồ vẽ theo đúng bản vẽ kèm các quyết định này.</p>
-                </div>
-              );
-            })()}
             {/* ── CHÚ GIẢI ─────────────────────────────────────────────────────────────
                 Chỉ hiện khi đang bật một lớp phân khu 1/2000 — bốn bản đó mới là bản được
                 tô theo loại đất. QĐ205 và QĐ893 vẫn giữ màu bản vẽ gốc nên bảng này không
@@ -2302,27 +2280,6 @@ export default function MapPage() {
                       </button>
                     );
                   })}
-                  {(() => {
-                    // Căn cứ pháp lý của bản quy hoạch đang bật — bấm mở bản gốc PDF.
-                    const dangBat = Object.keys(CAN_CU_QH).filter((id) => !!ovOn[id]);
-                    const ds = dangBat.length ? dangBat : Object.keys(CAN_CU_QH);
-                    return (
-                      <>
-                        {tieuDe('Căn cứ pháp lý')}
-                        <div className="bg-[#f2f2f7] px-3 pb-3">
-                          <div className="overflow-hidden rounded-[10px] bg-white">
-                            {ds.map((id) => { const c = CAN_CU_QH[id]; return (
-                              <a key={id} href={c.tep} target="_blank" rel="noreferrer"
-                                className="block border-b border-black/10 px-3 py-2 last:border-b-0 active:bg-black/5">
-                                <span className="block text-[13.5px] font-medium text-[#0A2540]">📄 QĐ {c.so} — {c.ngay}</span>
-                                <span className="block text-[11.5px] leading-snug text-[#8a8a8e]">{c.coQuan} · {c.ten}</span>
-                              </a>
-                            ); })}
-                          </div>
-                        </div>
-                      </>
-                    );
-                  })()}
                   {tieuDe('Lớp dữ liệu')}
                   <div className="bg-[#f2f2f7] px-3 pb-3">
                     <div className="overflow-hidden rounded-[10px] bg-white">
@@ -2391,6 +2348,50 @@ export default function MapPage() {
             // Hàng nút quy hoạch nổi trên bản đồ đã bỏ (14/9/2026) nên về lại top-2 như máy tính.
             <div className="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap bg-[#0A2540]/90 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">🔍 Phóng to để hiện thửa đất</div>
           )}
+          {/* ── NÚT DẤU HỎI: CĂN CỨ PHÁP LÝ ────────────────────────────────────────────
+              Để RIÊNG một nút tròn nổi trên bản đồ (kiểu app VN-2000), KHÔNG gộp vào bảng
+              "Lớp Q.Hoạch". Lý do: bảng lớp là chỗ BẬT/TẮT bản đồ, còn đây là chỗ TRA CỨU
+              xem màu đang nhìn dựa vào quyết định nào — hai việc khác nhau, gộp vào thì
+              bảng lớp dài ra mà người muốn xem căn cứ lại phải mở bảng lớp mới thấy. */}
+          <button
+            onClick={() => setCanCuOpen((v) => !v)}
+            title="Căn cứ pháp lý của bản quy hoạch đang xem"
+            aria-label="Căn cứ pháp lý"
+            className={`absolute right-2 top-2 z-30 grid h-[38px] w-[38px] place-items-center rounded-full border text-[19px] font-bold shadow-[0_4px_14px_rgba(10,37,64,.18)] transition active:scale-95 max-[1023px]:h-[42px] max-[1023px]:w-[42px] ${canCuOpen ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-[#0A2540] hover:bg-slate-50'}`}>
+            ?
+          </button>
+          {canCuOpen && (() => {
+            // Đang bật bản quy hoạch nào thì hiện căn cứ của bản đó; chưa bật gì thì hiện đủ.
+            const dangBat = Object.keys(CAN_CU_QH).filter((id) => !!ovOn[id]);
+            const ds = dangBat.length ? dangBat : Object.keys(CAN_CU_QH);
+            return (
+              <div className="absolute right-2 top-[52px] z-30 w-[380px] max-w-[calc(100%-1rem)] max-h-[70%] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 bg-white shadow-2xl">
+                <div className="sticky top-0 z-10 flex items-center gap-2 border-b bg-white/95 px-3.5 py-2.5 backdrop-blur">
+                  <span className="text-[14px] font-bold text-[#0A2540]">Căn cứ pháp lý</span>
+                  <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-500">{ds.length}</span>
+                  <button onClick={() => setCanCuOpen(false)} aria-label="Đóng" className="ml-auto text-lg leading-none text-slate-400 hover:text-slate-700">✕</button>
+                </div>
+                <p className="px-3.5 pt-2 text-[11.5px] leading-snug text-slate-500">
+                  {dangBat.length ? 'Bản quy hoạch đang hiện trên bản đồ được duyệt theo quyết định dưới đây.'
+                    : 'Bấm vào từng dòng để mở bản gốc (PDF) của quyết định phê duyệt.'}
+                </p>
+                <div className="space-y-1.5 p-3">
+                  {ds.map((id) => { const c = CAN_CU_QH[id]; return (
+                    <a key={id} href={c.tep} target="_blank" rel="noreferrer"
+                      className="block rounded-xl border border-slate-200 px-2.5 py-2 transition hover:border-[#0A2540] hover:bg-slate-50">
+                      <span className="block text-[12.5px] font-bold text-[#0A2540]">📄 Quyết định {c.so} — {c.ngay}</span>
+                      <span className="block text-[11.5px] leading-snug text-slate-500">{c.coQuan}</span>
+                      <span className="mt-0.5 block text-[11.5px] leading-snug text-slate-600">{c.ten}</span>
+                    </a>
+                  ); })}
+                </div>
+                <p className="border-t px-3.5 py-2 text-[10.5px] leading-snug text-slate-400">
+                  Màu trên bản đồ vẽ theo đúng bản vẽ kèm các quyết định này. Thông tin chỉ mang tính tham khảo,
+                  khi làm hồ sơ phải đối chiếu bản gốc.
+                </p>
+              </div>
+            );
+          })()}
           {/* BẢNG ĐẦY ĐỦ khi bấm gim tin lưu — như giỏ hàng */}
           {selPlace && (
             <div className="absolute bottom-[calc(var(--menu-de,calc(56px+env(safe-area-inset-bottom)))+10px)] sm:bottom-3 left-1/2 -translate-x-1/2 w-[360px] max-w-[94%] max-h-[64%] sm:max-h-[72%] overflow-y-auto z-20 bg-white rounded-2xl border-2 border-[#7c3aed]/40 shadow-2xl p-3.5 text-xs">

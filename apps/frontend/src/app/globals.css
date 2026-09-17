@@ -288,6 +288,10 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .maplibregl-ctrl-group button:hover { background-color: #f1f5f9; }
 .maplibregl-ctrl-group button:active { background-color: #e2e8f0; }
 .maplibregl-ctrl-group button + button { border-top-color: #eef2f7; }
+/* Chừa chỗ cho nút "?" (Căn cứ pháp lý) đứng ĐẦU cột nút bên phải bản đồ — như app tham chiếu.
+   Nút "?" đặt ở right-2 top-2, nên cụm zoom/định vị của maplibre phải tụt xuống dưới nó. */
+.maplibregl-ctrl-top-right { margin-top: 44px; }
+@media (hover: none) and (pointer: coarse) { .maplibregl-ctrl-top-right { margin-top: 48px; } }
 
 /* Quảng cáo động — chuyển động mượt (kiểu Znews) */
 @keyframes clKen { from { transform: scale(1.02); } to { transform: scale(1.09); } }

@@ -71,6 +71,9 @@ app.use(cors({
     return cb(null, false); // ngoài allowlist → trình duyệt chặn
   },
   credentials: true,
+  // Cho trình duyệt ĐỌC được hai tiêu đề này khi web và API khác tên miền (Render):
+  // Content-Disposition = tên tệp tải về · X-Da-OCR = đã phải nhận dạng chữ trước khi chuyển đổi.
+  exposedHeaders: ['Content-Disposition', 'X-Da-OCR', 'X-O-Ngo', 'X-Da-Sua'],
 }));
 app.use(securityHeaders);
 app.use(requestLogger); // ghi log request LỖI (5xx) hoặc CHẬM (>2s) ra file access-*.log

@@ -289,9 +289,14 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .maplibregl-ctrl-group button:active { background-color: #e2e8f0; }
 .maplibregl-ctrl-group button + button { border-top-color: #eef2f7; }
 /* Chừa chỗ cho nút "?" (Căn cứ pháp lý) đứng ĐẦU cột nút bên phải bản đồ — như app tham chiếu.
-   Nút "?" đặt ở right-2 top-2, nên cụm zoom/định vị của maplibre phải tụt xuống dưới nó. */
-.maplibregl-ctrl-top-right { margin-top: 44px; }
-@media (hover: none) and (pointer: coarse) { .maplibregl-ctrl-top-right { margin-top: 48px; } }
+   Nút "?" đặt ở right-2 top-2, nên cụm zoom/định vị của maplibre phải tụt xuống dưới nó.
+   ⚠️ Khoảng tụt để trong BIẾN --nut-can-cu, KHÔNG viết số cứng: dưới cụm nút maplibre còn
+   nút ĐỔI NỀN (hình tròn) neo theo toạ độ đo tay. Lần đầu chỉ đẩy cụm maplibre mà quên nút nền
+   nên nút định vị tụt xuống đè đúng chỗ nút nền — nhìn ra "một ô vuông trắng lạ" chen vào
+   (chủ dự án chụp màn hình báo 17/9/2026). Có biến chung thì hai bên luôn dịch bằng nhau. */
+:root { --nut-can-cu: 38px; }
+@media (hover: none) and (pointer: coarse) { :root { --nut-can-cu: 40px; } }
+.maplibregl-ctrl-top-right { margin-top: var(--nut-can-cu); }
 
 /* Quảng cáo động — chuyển động mượt (kiểu Znews) */
 @keyframes clKen { from { transform: scale(1.02); } to { transform: scale(1.09); } }

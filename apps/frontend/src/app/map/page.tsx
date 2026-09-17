@@ -2221,7 +2221,10 @@ export default function MapPage() {
           {/* Vị trí ĐO THẬT trên khổ 375px: cụm nút bản đồ (+/− cao 60px ở top 10, nút định vị 31px ở top 80)
               rộng 31px, cách mép phải 10px, cách nhau 10px → cột này bắt đầu ở 111 + 10 = 121px, cùng bề
               rộng 31px, nối liền ngay dưới. Trước đặt top 42% nên bị hở một khúc (chủ dự án báo 14/9/2026). */}
-          <div className="lg:hidden absolute right-[10px] top-[121px] z-10 flex w-[31px] flex-col items-center gap-2.5">
+          {/* top = 121px đo tay + phần đã đẩy xuống để chừa chỗ nút "?" (biến --nut-can-cu trong
+              globals.css). Phải cộng biến, không để 121px cứng: cụm nút maplibre ở trên đã dịch
+              xuống thì cột này cũng phải dịch theo, không thì nút định vị đè lên nút đổi nền. */}
+          <div className="lg:hidden absolute right-[10px] top-[calc(121px_+_var(--nut-can-cu))] z-10 flex w-[31px] flex-col items-center gap-2.5">
             <button onClick={() => setBaseMap(baseMap === 'satellite' ? 'street' : 'satellite')}
               aria-label={baseMap === 'satellite' ? 'Chuyển sang bản đồ đường' : 'Chuyển sang ảnh vệ tinh'}
               className="cl-press h-[31px] w-[31px] overflow-hidden rounded-full border-2 border-white bg-slate-200 bg-cover bg-center shadow-[0_1px_5px_rgba(0,0,0,.35)]"
@@ -2357,7 +2360,9 @@ export default function MapPage() {
             onClick={() => setCanCuOpen((v) => !v)}
             title="Căn cứ pháp lý của bản quy hoạch đang xem"
             aria-label="Căn cứ pháp lý"
-            className={`absolute right-2 top-2 z-30 grid h-[38px] w-[38px] place-items-center rounded-full border text-[19px] font-bold shadow-[0_4px_14px_rgba(10,37,64,.18)] transition active:scale-95 max-[1023px]:h-[42px] max-[1023px]:w-[42px] ${canCuOpen ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-[#0A2540] hover:bg-slate-50'}`}>
+            // Nhẹ tay: KHÔNG viền, bóng đổ mềm, dấu hỏi mảnh — bản đầu để viền xám + chữ đậm 19px
+            // nhìn "to và thô" hơn hẳn app tham chiếu (chủ dự án chê 17/9/2026).
+            className={`absolute right-2 top-2 z-30 grid h-8 w-8 place-items-center rounded-full text-[15px] font-semibold leading-none shadow-[0_1px_2px_rgba(0,0,0,.10),0_3px_10px_rgba(10,37,64,.14)] transition active:scale-95 max-[1023px]:h-[34px] max-[1023px]:w-[34px] max-[1023px]:text-base ${canCuOpen ? 'bg-[#0A2540] text-white' : 'bg-white text-[#0A2540] hover:bg-slate-50'}`}>
             ?
           </button>
           {canCuOpen && (() => {
@@ -2365,7 +2370,7 @@ export default function MapPage() {
             const dangBat = Object.keys(CAN_CU_QH).filter((id) => !!ovOn[id]);
             const ds = dangBat.length ? dangBat : Object.keys(CAN_CU_QH);
             return (
-              <div className="absolute right-2 top-[52px] z-30 w-[380px] max-w-[calc(100%-1rem)] max-h-[70%] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 bg-white shadow-2xl">
+              <div className="absolute right-2 top-[46px] z-30 w-[380px] max-w-[calc(100%-1rem)] max-h-[70%] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 bg-white shadow-2xl">
                 <div className="sticky top-0 z-10 flex items-center gap-2 border-b bg-white/95 px-3.5 py-2.5 backdrop-blur">
                   <span className="text-[14px] font-bold text-[#0A2540]">Căn cứ pháp lý</span>
                   <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-500">{ds.length}</span>

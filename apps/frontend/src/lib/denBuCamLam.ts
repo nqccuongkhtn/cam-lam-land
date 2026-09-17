@@ -138,3 +138,76 @@ export const GIA_PHUC_HOP: Record<ViTriPH, { cayLauNam: number; cayHangNam: numb
 
 /** Đất chuyên trồng lúa nước canh tác 02 vụ/năm — chỉ chia tiếp giáp đường hay không. */
 export const GIA_LUA_2VU = { tiepGiap: 509800, khongTiepGiap: 417800 };
+
+// ───────────────────────────────────────────────────────────────────────────────────────────
+// BẢNG GIÁ ĐẤT NÔNG NGHIỆP CỦA TỈNH — Nghị quyết 15/2025/NQ-HĐND (áp dụng từ 01/01/2026).
+// ⚠️ ĐÂY MỚI LÀ SỐ DÙNG ĐỂ TÍNH HỖ TRỢ ĐÀO TẠO, CHUYỂN ĐỔI NGHỀ (khoản 1 Điều 109 Luật Đất đai 2024,
+// Điều 22 Nghị định 88/2024/NĐ-CP: "… lần giá đất nông nghiệp cùng loại TRONG BẢNG GIÁ ĐẤT").
+// KHÔNG được lấy giá đất cụ thể để bồi thường (TB 306 hay 4 quyết định khu phức hợp) mà nhân lên:
+// giá bồi thường cao gấp ~10 lần bảng giá, nhân 3–5 lần nữa thì tiền hỗ trợ vọt lên gấp đôi tiền đất —
+// chủ dự án bắt lỗi 16/9/2026. Số dưới đây lấy từ chính bảng giá đang hiển thị ở trang /bang-gia-dat
+// (src/data/camlamBangGia.json — mục "Xã Cam Lâm"), 4 xã vùng Cam Lâm đều cùng mức.
+export const BANG_GIA_NN: Record<'cay' | 'thuysan' | 'rung', { vt1: number; vt2: number; ten: string }> = {
+  cay: { vt1: 54000, vt2: 41400, ten: 'Đất trồng cây hàng năm / cây lâu năm' },
+  thuysan: { vt1: 37800, vt2: 27000, ten: 'Đất nuôi trồng thuỷ sản' },
+  rung: { vt1: 18000, vt2: 12600, ten: 'Đất rừng sản xuất' },
+};
+
+/** Giá 1 m² trong BẢNG GIÁ ĐẤT của tỉnh (không phải giá bồi thường) — dùng tính tiền hỗ trợ chuyển đổi nghề. */
+export function giaBangGiaNN(loai: 'cay' | 'thuysan' | 'rung', viTri: 1 | 2): number {
+  const b = BANG_GIA_NN[loai];
+  return viTri === 1 ? b.vt1 : b.vt2;
+}
+
+// ───────────────────────────────────────────────────────────────────────────────────────────
+// HẠN MỨC GIAO ĐẤT NÔNG NGHIỆP CHO CÁ NHÂN — Điều 176 Luật Đất đai 2024.
+// Tiền hỗ trợ đào tạo, chuyển đổi nghề CHỈ tính cho phần diện tích TRONG hạn mức này
+// (khoản 1 Điều 109 Luật Đất đai 2024 · khoản 3 Điều 22 Nghị định 88/2024/NĐ-CP ·
+//  Điều 13 Quy định kèm QĐ 17/2024/QĐ-UBND Khánh Hoà, sửa bởi QĐ 14/2025/QĐ-UBND).
+// Khánh Hoà KHÔNG thuộc Đông Nam Bộ / đồng bằng sông Cửu Long nên đất trồng cây hằng năm
+// và đất nuôi trồng thuỷ sản là 02 ha. Đất trồng cây lâu năm: 10 ha ở xã đồng bằng,
+// 30 ha ở xã trung du - miền núi. Đất rừng sản xuất là rừng trồng: 30 ha.
+// Vì một dòng giá gộp cả cây lâu năm lẫn cây hằng năm nên PHẢI cho người dùng chọn đúng loại:
+// chọn nhầm cây lâu năm cho thửa trồng lúa là hạn mức vọt từ 2 ha lên 10 ha, tiền hỗ trợ sai gấp 5 lần.
+// Mặc định lấy mức THẤP NHẤT (2 ha) cho an toàn.
+export type HanMuc = { ma: string; ten: string; m2: number };
+export const HAN_MUC: Record<'cay' | 'thuysan' | 'rung', HanMuc[]> = {
+  cay: [
+    { ma: 'hangnam', ten: 'Cây hằng năm / đất trồng lúa — 2 ha', m2: 20000 },
+    { ma: 'launam-db', ten: 'Cây lâu năm, xã đồng bằng — 10 ha', m2: 100000 },
+    { ma: 'launam-mn', ten: 'Cây lâu năm, xã trung du - miền núi — 30 ha', m2: 300000 },
+  ],
+  thuysan: [{ ma: 'ts', ten: 'Nuôi trồng thuỷ sản — 2 ha', m2: 20000 }],
+  rung: [{ ma: 'rung', ten: 'Rừng sản xuất là rừng trồng — 30 ha', m2: 300000 }],
+};
+
+/** Số lần giá đất nông nghiệp dùng tính hỗ trợ chuyển đổi nghề. */
+export const SO_LAN_KHANH_HOA = 3;   // Điều 13 QĐ 17/2024, sửa bởi QĐ 14/2025 — mức ĐANG ÁP DỤNG
+export const SO_LAN_TRAN = 5;        // khoản 3 Điều 22 NĐ 88/2024 — mức trần của Trung ương
+
+// ───────────────────────────────────────────────────────────────────────────────────────────
+// HỖ TRỢ DI CHUYỂN TÀI SẢN KHI PHẢI DI CHUYỂN CHỖ Ở — khoản 1 Điều 8 Quy định kèm
+// QĐ 17/2024/QĐ-UBND, được thay bằng khoản 6 Điều 2 QĐ 14/2025/QĐ-UBND (bản đang có hiệu lực).
+export const DI_CHUYEN = [
+  { ma: 'trong-xa', ten: 'Chuyển đến chỗ ở mới TRONG cùng xã nơi có đất thu hồi', tien: 10000000 },
+  { ma: 'ngoai-xa', ten: 'Chuyển đến chỗ ở mới RA NGOÀI xã nơi có đất thu hồi', tien: 12000000 },
+  { ma: 'mot-phan', ten: 'Thu hồi một phần đất ở, phải phá nhà nhưng đất còn lại vẫn xây nhà được', tien: 5000000 },
+] as const;
+/** Nhà nhiều tầng: cộng thêm 20% mức trên cho MỖI TẦNG tính từ tầng thứ 3 (điểm d khoản 1 Điều 8). */
+export const DI_CHUYEN_THEM_MOI_TANG = 0.2;
+
+/** Thưởng bàn giao mặt bằng trước thời hạn — 5.000.000 đồng (điểm c khoản 1 Điều 14, sửa bởi QĐ 14/2025). */
+export const THUONG_BAN_GIAO = 5000000;
+
+// ───────────────────────────────────────────────────────────────────────────────────────────
+// HỖ TRỢ ỔN ĐỊNH ĐỜI SỐNG — Điều 19 Nghị định 88/2024/NĐ-CP.
+// Một nhân khẩu được hỗ trợ mỗi tháng số tiền bằng 30 kg gạo theo GIÁ TRUNG BÌNH TẠI THỊ TRƯỜNG
+// ĐỊA PHƯƠNG ở thời điểm hỗ trợ. Số tháng phụ thuộc: thu hồi bao nhiêu phần trăm đất nông nghiệp
+// đang dùng, có phải dời nhà đi không, nơi đến có phải vùng kinh tế - xã hội khó khăn không.
+export const GAO_KG_THANG = 30;
+/** Số tháng được hỗ trợ. ty = 'duoi30' | '30-70' | 'tren70'. */
+export function soThangOnDinh(ty: 'duoi30' | '30-70' | 'tren70', diChuyen: boolean, vungKhoKhan: boolean): number {
+  if (ty === 'duoi30') return 0;                       // dưới 30%: do UBND tỉnh quyết, không có mức cứng
+  if (ty === '30-70') return vungKhoKhan && diChuyen ? 24 : diChuyen ? 12 : 6;
+  return vungKhoKhan && diChuyen ? 36 : diChuyen ? 24 : 12;
+}

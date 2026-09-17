@@ -324,6 +324,44 @@ const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: s
   { id: 'phan-khu', ten: 'Quy hoạch phân khu 1/2000', tenNgan: 'Phân khu 1/2000', tenApp: 'QHXD Phân khu', gom:['qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin', 'qh-taynam', 'qh-taybac'] },
   { id: 'qh-qd893', ten: 'Quy hoạch sử dụng đất 2030 (QĐ893)', tenNgan: 'Sử dụng đất 893', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-qd893'] },
 ];
+// CĂN CỨ PHÁP LÝ của từng bản quy hoạch đang chồng lên bản đồ.
+// Người xem hay hỏi "cái màu này dựa vào đâu?" — nên phải chỉ thẳng ra quyết định phê duyệt,
+// và đính luôn bản gốc để bấm vào đọc được, khỏi phải tin lời web.
+// Số hiệu và ngày ĐỌC TỪ CHÍNH BẢN GỐC (trang đầu mỗi quyết định). Riêng QĐ 2101 và QĐ 2222:
+// bản quét đóng dấu ngày bằng tay, chữ số ngày KHÔNG đọc ra được — chỉ ghi "tháng 8/2024" cho
+// đúng sự thật, không đoán. Bản gốc vẫn đính kèm để ai cần thì tự xem.
+const TL_QH = '/tai-lieu/quy-hoach/';
+type CanCu = { so: string; ngay: string; coQuan: string; ten: string; tep: string };
+const CAN_CU_QH: Record<string, CanCu> = {
+  'qh-qd205': { so: '205/QĐ-TTg', ngay: '28/02/2024', coQuan: 'Thủ tướng Chính phủ',
+    ten: 'Phê duyệt Quy hoạch chung đô thị mới Cam Lâm, tỉnh Khánh Hòa đến năm 2045',
+    tep: TL_QH + 'QD-205-QD-TTg-2024-quy-hoach-chung-do-thi-moi-Cam-Lam-2045.pdf' },
+  'qh-qd2076': { so: '2076/QĐ-UBND', ngay: '12/8/2024', coQuan: 'UBND tỉnh Khánh Hòa',
+    ten: 'Phê duyệt đồ án Quy hoạch phân khu (tỷ lệ 1/2000) Phân khu đô thị phía Bắc, đô thị mới Cam Lâm',
+    tep: TL_QH + 'QD-2076-2024-phan-khu-do-thi-phia-Bac.pdf' },
+  'qh-qd2101': { so: '2101/QĐ-UBND', ngay: 'tháng 8/2024', coQuan: 'UBND tỉnh Khánh Hòa',
+    ten: 'Phê duyệt đồ án Quy hoạch phân khu (tỷ lệ 1/2000) Phân khu đô thị trung tâm, đô thị mới Cam Lâm',
+    tep: TL_QH + 'QD-2101-2024-phan-khu-do-thi-trung-tam.pdf' },
+  'qh-qd2222': { so: '2222/QĐ-UBND', ngay: 'tháng 8/2024', coQuan: 'UBND tỉnh Khánh Hòa',
+    ten: 'Phê duyệt đồ án Quy hoạch phân khu (tỷ lệ 1/2000) Phân khu đô thị ven biển, đô thị mới Cam Lâm',
+    tep: TL_QH + 'QD-2222-2024-phan-khu-do-thi-ven-bien.pdf' },
+  'qh-qd918': { so: '918/QĐ-UBND', ngay: '19/3/2026', coQuan: 'UBND tỉnh Khánh Hòa',
+    ten: 'Phê duyệt quy hoạch phân khu (tỷ lệ 1/2000) Phân khu phức hợp phía Tây, đô thị mới Cam Lâm',
+    tep: TL_QH + 'QD-918-2026-phan-khu-phuc-hop-phia-Tay.pdf' },
+  'qh-taybac': { so: '919/QĐ-UBND', ngay: '19/3/2026', coQuan: 'UBND tỉnh Khánh Hòa',
+    ten: 'Phê duyệt quy hoạch phân khu (tỷ lệ 1/2000) Phân khu sinh thái phía Tây Bắc, đô thị mới Cam Lâm',
+    tep: TL_QH + 'QD-919-2026-phan-khu-sinh-thai-Tay-Bac.pdf' },
+  'qh-taynam': { so: '920/QĐ-UBND', ngay: '19/3/2026', coQuan: 'UBND tỉnh Khánh Hòa',
+    ten: 'Phê duyệt quy hoạch phân khu (tỷ lệ 1/2000) Phân khu sinh thái phía Tây Nam, đô thị mới Cam Lâm',
+    tep: TL_QH + 'QD-920-2026-phan-khu-sinh-thai-Tay-Nam.pdf' },
+  'qh-cuhin': { so: '30/QĐ-UBND', ngay: '15/01/2026', coQuan: 'UBND xã Suối Dầu',
+    ten: 'Phê duyệt quy hoạch phân khu (tỷ lệ 1/2000) Phân khu sinh thái núi Cù Hin, đô thị mới Cam Lâm',
+    tep: TL_QH + 'QD-30-2026-phan-khu-sinh-thai-nui-Cu-Hin.pdf' },
+  'qh-qd893': { so: '893/QĐ-UBND', ngay: '04/4/2026', coQuan: 'UBND tỉnh Khánh Hòa',
+    ten: 'Phê duyệt Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 huyện Cam Lâm',
+    tep: 'https://congbaokhanhhoa.gov.vn/vi-vn/noi-dung-van-ban/vanbanid/22060' },
+};
+
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
 // Khung bao [tây, nam, đông, bắc] của một hình GeoJSON bất kỳ (điểm, đường, vùng, nhiều vùng).
 // Dùng để biết thửa đang xem nằm ở đâu mà so với phạm vi từng bản quy hoạch.
@@ -1899,6 +1937,29 @@ export default function MapPage() {
               <div className="flex justify-between text-[11px] text-slate-400 mb-1"><span>Độ mờ</span><span className="font-semibold text-slate-500">{Math.round(opacity * 100)}%</span></div>
               <input type="range" min={0} max={100} value={Math.round(opacity * 100)} onChange={(e) => setOpacity(Number(e.target.value) / 100)} className="w-full accent-emerald-600" />
             </div>
+            {/* CĂN CỨ PHÁP LÝ — quyết định phê duyệt của bản quy hoạch đang bật, bấm vào đọc bản gốc.
+                Đang bật bản nào thì chỉ hiện căn cứ của bản đó; chưa bật gì thì hiện đủ cả danh sách. */}
+            {(() => {
+              const dangBat = Object.keys(CAN_CU_QH).filter((id) => !!ovOn[id]);
+              const ds = dangBat.length ? dangBat : Object.keys(CAN_CU_QH);
+              return (
+                <div className="mt-2">
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1">
+                    Căn cứ pháp lý{dangBat.length ? '' : ` (${ds.length} quyết định)`}
+                  </p>
+                  <div className="space-y-1">
+                    {ds.map((id) => { const c = CAN_CU_QH[id]; return (
+                      <a key={id} href={c.tep} target="_blank" rel="noreferrer"
+                        className="block rounded-lg border border-slate-200 px-2 py-1.5 hover:border-[#0A2540] hover:bg-slate-50">
+                        <span className="block text-[12px] font-bold text-[#0A2540]">📄 Quyết định {c.so} — {c.ngay}</span>
+                        <span className="block text-[11px] leading-snug text-slate-500">{c.coQuan} · {c.ten}</span>
+                      </a>
+                    ); })}
+                  </div>
+                  <p className="mt-1 text-[10.5px] leading-snug text-slate-400">Bấm để mở bản gốc (PDF). Màu trên bản đồ vẽ theo đúng bản vẽ kèm các quyết định này.</p>
+                </div>
+              );
+            })()}
             {/* ── CHÚ GIẢI ─────────────────────────────────────────────────────────────
                 Chỉ hiện khi đang bật một lớp phân khu 1/2000 — bốn bản đó mới là bản được
                 tô theo loại đất. QĐ205 và QĐ893 vẫn giữ màu bản vẽ gốc nên bảng này không
@@ -2241,6 +2302,27 @@ export default function MapPage() {
                       </button>
                     );
                   })}
+                  {(() => {
+                    // Căn cứ pháp lý của bản quy hoạch đang bật — bấm mở bản gốc PDF.
+                    const dangBat = Object.keys(CAN_CU_QH).filter((id) => !!ovOn[id]);
+                    const ds = dangBat.length ? dangBat : Object.keys(CAN_CU_QH);
+                    return (
+                      <>
+                        {tieuDe('Căn cứ pháp lý')}
+                        <div className="bg-[#f2f2f7] px-3 pb-3">
+                          <div className="overflow-hidden rounded-[10px] bg-white">
+                            {ds.map((id) => { const c = CAN_CU_QH[id]; return (
+                              <a key={id} href={c.tep} target="_blank" rel="noreferrer"
+                                className="block border-b border-black/10 px-3 py-2 last:border-b-0 active:bg-black/5">
+                                <span className="block text-[13.5px] font-medium text-[#0A2540]">📄 QĐ {c.so} — {c.ngay}</span>
+                                <span className="block text-[11.5px] leading-snug text-[#8a8a8e]">{c.coQuan} · {c.ten}</span>
+                              </a>
+                            ); })}
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
                   {tieuDe('Lớp dữ liệu')}
                   <div className="bg-[#f2f2f7] px-3 pb-3">
                     <div className="overflow-hidden rounded-[10px] bg-white">

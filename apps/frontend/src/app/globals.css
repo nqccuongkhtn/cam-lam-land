@@ -294,8 +294,14 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
    nút ĐỔI NỀN (hình tròn) neo theo toạ độ đo tay. Lần đầu chỉ đẩy cụm maplibre mà quên nút nền
    nên nút định vị tụt xuống đè đúng chỗ nút nền — nhìn ra "một ô vuông trắng lạ" chen vào
    (chủ dự án chụp màn hình báo 17/9/2026). Có biến chung thì hai bên luôn dịch bằng nhau. */
-:root { --nut-can-cu: 38px; }
-@media (hover: none) and (pointer: coarse) { :root { --nut-can-cu: 40px; } }
+:root { --nut-can-cu: 38px; --cot-nut-day: 155px; }
+/* Trên thiết bị cảm ứng nút maplibre to 42px (xem @media ở cuối tệp) nên cột nút CAO HƠN HẲN.
+   --cot-nut-day = đáy cột nút maplibre, tính thẳng ra:
+     máy tính  = 38 (nút ?) + 10 + 29*2 (zoom) + 10 + 29 (định vị) + 10 = 155px
+     cảm ứng   = 40 (nút ?) + 10 + 42*2 (zoom) + 10 + 42 (định vị) + 10 = 196px
+   Nút ĐỔI NỀN neo vào biến này. Trước đây neo cứng 121px (đo tay hồi nút maplibre còn 31px)
+   nên trên điện thoại nút định vị đè lên nút đổi nền, nhìn ra "ô vuông trắng lạ". */
+@media (hover: none) and (pointer: coarse) { :root { --nut-can-cu: 40px; --cot-nut-day: 196px; } }
 .maplibregl-ctrl-top-right { margin-top: var(--nut-can-cu); }
 
 /* Quảng cáo động — chuyển động mượt (kiểu Znews) */

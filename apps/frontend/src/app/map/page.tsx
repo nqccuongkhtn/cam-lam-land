@@ -1846,7 +1846,12 @@ export default function MapPage() {
     // MỖI LÚC CHỈ MỘT NHÓM MỞ: bấm nhóm nào là đóng bảng "Lớp Q.Hoạch" + tắt đo của nhóm khác.
     // Trước đây mở "Đo - vẽ" mà bảng lớp vẫn nằm đè nửa màn hình (chủ dự án chụp màn hình báo).
     <button onClick={
-      key === 'layers' ? () => { setQhSheet(true); setPanelOpen(false); setTool('none'); setMeasure('off'); setMResult(null); setNenOpen(false); }
+      // ĐANG ĐO thì mở bảng Lớp Q.Hoạch KHÔNG được tắt thước đo (chủ dự án 17/9/2026):
+      // người ta hay đo xong rồi đổi lớp quy hoạch để xem cùng một khoảng đất trên bản khác —
+      // tắt mất là phải đo lại từ đầu. Chỉ người dùng bấm ✕ hay "Xong" mới tắt đo.
+      // Bảng lớp là lớp phủ kín màn hình (z-58) nên để bảng đo nằm dưới cũng không vướng gì;
+      // đóng bảng lớp là thấy lại đúng phép đo đang dở.
+      key === 'layers' ? () => { setQhSheet(true); setPanelOpen(false); setNenOpen(false); if (measure === 'off') { setTool('none'); setMResult(null); } }
         : key === 'measure' ? () => { const open = tool !== 'measure'; setPanelOpen(false); setTool(open ? 'measure' : 'none'); setMeasure(open ? 'distance' : 'off'); setMResult(null); }
           : key === 'chugiai' ? () => { napChuGiai(); setPanelOpen(false); setTool(tool === 'chugiai' ? 'none' : 'chugiai'); }
             : () => { setPanelOpen(false); setTool(tool === key ? 'none' : (key as any)); }}
@@ -2221,10 +2226,10 @@ export default function MapPage() {
           {/* Vị trí ĐO THẬT trên khổ 375px: cụm nút bản đồ (+/− cao 60px ở top 10, nút định vị 31px ở top 80)
               rộng 31px, cách mép phải 10px, cách nhau 10px → cột này bắt đầu ở 111 + 10 = 121px, cùng bề
               rộng 31px, nối liền ngay dưới. Trước đặt top 42% nên bị hở một khúc (chủ dự án báo 14/9/2026). */}
-          {/* top = 121px đo tay + phần đã đẩy xuống để chừa chỗ nút "?" (biến --nut-can-cu trong
-              globals.css). Phải cộng biến, không để 121px cứng: cụm nút maplibre ở trên đã dịch
-              xuống thì cột này cũng phải dịch theo, không thì nút định vị đè lên nút đổi nền. */}
-          <div className="lg:hidden absolute right-[10px] top-[calc(121px_+_var(--nut-can-cu))] z-10 flex w-[31px] flex-col items-center gap-2.5">
+          {/* Neo vào ĐÁY CỘT NÚT maplibre (biến --cot-nut-day trong globals.css) chứ KHÔNG để số cứng.
+              Số cứng 121px cũ đo hồi nút maplibre còn 31px; trên điện thoại nút to 42px nên cột cao
+              hơn 40px, nút định vị tụt xuống đè lên nút đổi nền — chủ dự án thấy "ô vuông trắng lạ". */}
+          <div className="lg:hidden absolute right-[10px] top-[var(--cot-nut-day)] z-10 flex w-[31px] flex-col items-center gap-2.5">
             <button onClick={() => setBaseMap(baseMap === 'satellite' ? 'street' : 'satellite')}
               aria-label={baseMap === 'satellite' ? 'Chuyển sang bản đồ đường' : 'Chuyển sang ảnh vệ tinh'}
               className="cl-press h-[31px] w-[31px] overflow-hidden rounded-full border-2 border-white bg-slate-200 bg-cover bg-center shadow-[0_1px_5px_rgba(0,0,0,.35)]"
@@ -2362,7 +2367,9 @@ export default function MapPage() {
             aria-label="Căn cứ pháp lý"
             // Nhẹ tay: KHÔNG viền, bóng đổ mềm, dấu hỏi mảnh — bản đầu để viền xám + chữ đậm 19px
             // nhìn "to và thô" hơn hẳn app tham chiếu (chủ dự án chê 17/9/2026).
-            className={`absolute right-2 top-2 z-30 grid h-8 w-8 place-items-center rounded-full text-[15px] font-semibold leading-none shadow-[0_1px_2px_rgba(0,0,0,.10),0_3px_10px_rgba(10,37,64,.14)] transition active:scale-95 max-[1023px]:h-[34px] max-[1023px]:w-[34px] max-[1023px]:text-base ${canCuOpen ? 'bg-[#0A2540] text-white' : 'bg-white text-[#0A2540] hover:bg-slate-50'}`}>
+            // Nút GIỮ NGUYÊN MỘT KIỂU dù bảng đang mở hay đóng (chủ dự án 17/9/2026: "dấu ? đừng đổi màu").
+            // Trước đây mở bảng thì nút đảo thành nền xanh chữ trắng — nhấp nháy, rối mắt.
+            className="absolute right-2 top-2 z-30 grid h-8 w-8 place-items-center rounded-full bg-white text-[15px] font-semibold leading-none text-[#0A2540] shadow-[0_1px_2px_rgba(0,0,0,.10),0_3px_10px_rgba(10,37,64,.14)] transition hover:bg-slate-50 active:scale-95 max-[1023px]:h-[34px] max-[1023px]:w-[34px] max-[1023px]:text-base">
             ?
           </button>
           {canCuOpen && (() => {

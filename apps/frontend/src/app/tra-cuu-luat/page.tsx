@@ -59,7 +59,7 @@ type NutSoDo = { ten: string; y: string; chiTiet?: string; dan: { ma: string; so
 // "neo" = SỐ NEO GHI NHỚ: mỗi nhánh gắn một con số để bám vào (3 nhóm đất, 5 điều kiện,
 // 7 bước…). Nhớ con số là gọi ra được cả nhánh — mẹo học cũ mà hiệu quả.
 type NhanhSoDo = { ten: string; icon: string; mau: string; y: string; neo?: string; con: NutSoDo[] };
-type SoDo = { canhBao: string; nhanh: NhanhSoDo[] };
+type SoDo = { nhanh: NhanhSoDo[] };
 // Thẻ học soạn tay cho phần CON SỐ và MỐC THỜI GIAN — thứ bắt buộc phải thuộc lòng.
 type TheSo = { hoi: string; dap: string; nho?: string; chuDe: string; dan?: Dan[] };
 type KhoTheSo = { canhBao: string; the: TheSo[] };
@@ -1125,7 +1125,6 @@ export default function TraCuuLuatPage() {
                   );
                 })}
               </div>
-              <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-[11.5px] leading-snug text-slate-500">{sd.canhBao}</p>
             </>
           ))}
         </div>

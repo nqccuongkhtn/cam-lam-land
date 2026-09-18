@@ -57,6 +57,11 @@ type NutSoDo = { ten: string; y: string; dan: { ma: string; so?: number }[] };
 // 7 bước…). Nhớ con số là gọi ra được cả nhánh — mẹo học cũ mà hiệu quả.
 type NhanhSoDo = { ten: string; icon: string; mau: string; y: string; neo?: string; con: NutSoDo[] };
 type SoDo = { canhBao: string; nhanh: NhanhSoDo[] };
+// Thẻ học soạn tay cho phần CON SỐ và MỐC THỜI GIAN — thứ bắt buộc phải thuộc lòng.
+type TheSo = { hoi: string; dap: string; nho?: string; chuDe: string; dan?: Dan[] };
+type KhoTheSo = { canhBao: string; the: TheSo[] };
+// Một thẻ đã dựng xong, sẵn sàng đưa ra hỏi.
+type TheHoc = { khoa: string; loai: string; chuDe: string; hoi: string; dap: string; nho?: string; dan?: Dan[] };
 
 // DẪN CHIẾU TRONG CHỮ LUẬT — biến thành nút bấm được, kiểu Thư viện pháp luật.
 // Ba dạng, xét theo đúng thứ tự này (dạng dài phải xét trước, không thì bị dạng ngắn ăn mất):
@@ -159,10 +164,13 @@ export default function TraCuuLuatPage() {
   // LÚC SẮP QUÊN. Thẻ nào thuộc thì đẩy xa ra (1 → 3 → 7 → 16 → 35 ngày), thẻ nào quên thì
   // kéo về ôn ngay hôm sau. Tiến độ lưu ngay trong máy người dùng.
   const [cheDoHoc, setCheDoHoc] = useState<'sodo' | 'the'>('sodo');
+  const [theSo2, setTheSo2] = useState<KhoTheSo | null>(null);
+  const [chuDeHoc, setChuDeHoc] = useState('');
   const [kieuSoDo, setKieuSoDo] = useState<'danhsach' | 'khungve'>('danhsach');
   const [phongTo, setPhongTo] = useState(1);
   const [timSoDo, setTimSoDo] = useState('');
-  const [boThe, setBoThe] = useState<Record<string, { hop: number; ngayOn: string }>>({});
+  const [boThe, setBoThe] = useState<Record<string, { de: number; khoang: number; lan: number; ngayOn: string }>>({});
+  const [chuoi, setChuoi] = useState(0);   // chuỗi ngày học liên tiếp
   const [theSo, setTheSo] = useState(0);
   const [datLat, setDatLat] = useState(false);
   const [th, setTh] = useState<KhoTinhHuong | null>(null);
@@ -199,6 +207,7 @@ export default function TraCuuLuatPage() {
     fetch('/luat/giai-thich.json').then((r) => r.json()).then((d: GiaiThich) => setGt(d)).catch(() => {});
     fetch('/luat/so-do.json').then((r) => r.json()).then((d: SoDo) => setSd(d)).catch(() => {});
     fetch('/luat/tinh-huong.json').then((r) => r.json()).then((d: KhoTinhHuong) => setTh(d)).catch(() => {});
+    fetch('/luat/the-so.json').then((r) => r.json()).then((d: KhoTheSo) => setTheSo2(d)).catch(() => {});
   }, [duocXem]);
 
   useEffect(() => {
@@ -230,7 +239,18 @@ export default function TraCuuLuatPage() {
   useEffect(() => { if (the === 'danhmuc' && !dm.length) fetch('/luat/danh-muc.json').then((r) => r.json()).then((d) => setDm(d.vanBan || [])).catch(() => {}); }, [the, dm.length]);
 
   useEffect(() => {
-    try { setBoThe(JSON.parse(localStorage.getItem('luat-the-hoc') || '{}')); } catch { /* */ }
+    try {
+      const t = JSON.parse(localStorage.getItem('luat-the-hoc') || '{}');
+      // Bản cũ lưu kiểu hộp Leitner {hop, ngayOn} -> đổi sang kiểu SM-2, giữ tiến độ đã học.
+      for (const k of Object.keys(t)) {
+        if (t[k] && t[k].hop != null && t[k].de == null) {
+          const h = t[k].hop;
+          t[k] = { de: 2.5, khoang: [1, 3, 7, 16, 35][h - 1] || 1, lan: h, ngayOn: t[k].ngayOn };
+        }
+      }
+      setBoThe(t);
+    } catch { /* */ }
+    try { setChuoi(JSON.parse(localStorage.getItem('luat-chuoi') || '{}').chuoi || 0); } catch { /* */ }
     try { setDaCo(JSON.parse(localStorage.getItem('luat-ho-so') || '{}')); } catch { /* */ }
   }, []);
 
@@ -240,26 +260,98 @@ export default function TraCuuLuatPage() {
     return moi;
   });
 
-  // Khoảng cách ôn theo hộp Leitner: thuộc thì đẩy xa dần, quên thì kéo về hộp 1.
-  const CACH_ON = [1, 3, 7, 16, 35];
   const homNay = () => new Date().toISOString().slice(0, 10);
   const congNgay = (n: number) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
 
-  // Bộ thẻ = những điều đã có giải thích ngắn (39 điều then chốt).
-  const dsThe = useMemo(() => (gt ? Object.keys(gt.muc) : []), [gt]);
-  const theHomNay = useMemo(
-    () => dsThe.filter((k) => !boThe[k] || boThe[k].ngayOn <= homNay()),
-    [dsThe, boThe]);
-  const daThuoc = useMemo(() => dsThe.filter((k) => (boThe[k]?.hop || 0) >= 4).length, [dsThe, boThe]);
+  // ── BỘ SINH THẺ ──
+  // Không soạn thẻ riêng một nơi rồi để nó lệch với nội dung. Thẻ DỰNG THẲNG từ chính dữ
+  // liệu đang hiển thị, nên sửa nội dung ở đâu thì thẻ tự đúng theo ở đó.
+  const dsThe = useMemo<TheHoc[]>(() => {
+    const ra: TheHoc[] = [];
+    // 1. Điều luật có giải thích: hỏi tên điều → đáp là câu "nhớ nhanh" + giải thích.
+    if (gt) {
+      for (const [k, v] of Object.entries(gt.muc)) {
+        const [ma, so] = k.split(':');
+        const d = cacVb[ma]?.dieu.find((z) => z.so === Number(so));
+        const kv = kho.find((z) => z.ma === ma);
+        ra.push({
+          khoa: 'dieu:' + k, loai: 'Điều luật',
+          chuDe: d?.chuongTen ? d.chuongTen.slice(0, 40) : (kv ? nhanNgan(kv.ma, kv.soHieu) : ma),
+          hoi: d ? `${kv ? nhanNgan(kv.ma, kv.soHieu) : ma} · Điều ${so}. ${d.tieuDe} — điều này quy định gì?` :
+            `${kv ? nhanNgan(kv.ma, kv.soHieu) : ma} · Điều ${so} nói gì?`,
+          dap: v.y, nho: v.nho, dan: [{ ma, so: Number(so) }],
+        });
+      }
+    }
+    // 2. Vướng mắc trong tình huống: "gặp chuyện này thì gỡ sao" — dạng hỏi đáp sẵn.
+    if (th) {
+      for (const x of th.ds) {
+        for (const [i, v] of (x.vuongMac || []).entries()) {
+          ra.push({ khoa: `vuong:${x.ma}:${i}`, loai: 'Vướng mắc', chuDe: x.ten.slice(0, 40),
+            hoi: `${x.icon} ${v.gap} — gỡ thế nào?`, dap: v.go, dan: v.dan });
+        }
+        // 3. Bảng liệt kê (16 trường hợp biến động): hỏi có bị ép 30 ngày + thời hạn.
+        for (const r of x.bang?.dong || []) {
+          ra.push({ khoa: `bang:${x.ma}:${r.diem}`, loai: 'Biến động', chuDe: 'Đăng ký biến động',
+            hoi: `Biến động điểm ${r.diem}) ${r.ten} — có phải đăng ký trong 30 ngày không, thời hạn giải quyết bao lâu?`,
+            dap: `${r.batBuoc30 ? '⏰ CÓ — phải đăng ký trong 30 ngày, quá hạn phạt 2–3 triệu.' : 'Không bị ép 30 ngày.'} Thời hạn giải quyết: ${r.thoiHan}.${r.thoiHanThem ? ' ' + r.thoiHanThem : ''}`,
+            nho: r.batBuoc30 ? '30 ngày · ' + r.thoiHan : r.thoiHan, dan: r.dan });
+        }
+      }
+    }
+    // 4. Thẻ con số soạn tay.
+    for (const [i, t] of (theSo2?.the || []).entries()) {
+      ra.push({ khoa: 'so:' + i, loai: 'Con số', chuDe: t.chuDe, hoi: t.hoi, dap: t.dap, nho: t.nho, dan: t.dan });
+    }
+    return ra;
+  }, [gt, th, theSo2, cacVb, kho]);
 
+  const chuDeCo = useMemo(() => [...new Set(dsThe.map((t) => t.chuDe))].sort(), [dsThe]);
+  const theTheoChuDe = useMemo(
+    () => (chuDeHoc ? dsThe.filter((t) => t.chuDe === chuDeHoc) : dsThe), [dsThe, chuDeHoc]);
+
+  // Thẻ tới hạn ôn hôm nay. TRỘN NGẪU NHIÊN (nhưng cố định theo ngày) — học xen kẽ chủ đề
+  // nhớ lâu hơn học dồn một chủ đề, đây là kỹ thuật "interleaving".
+  const theHomNay = useMemo(() => {
+    const ds = theTheoChuDe.filter((t) => !boThe[t.khoa] || (boThe[t.khoa] as any).ngayOn <= homNay());
+    const hat = homNay().split('-').join('');
+    return ds.map((t, i) => ({ t, r: (Number(hat) + i * 2654435761) % 1000003 }))
+      .sort((a, b) => a.r - b.r).map((x) => x.t);
+  }, [theTheoChuDe, boThe]);
+
+  const daThuoc = useMemo(
+    () => theTheoChuDe.filter((t) => ((boThe[t.khoa] as any)?.lan || 0) >= 2).length, [theTheoChuDe, boThe]);
+
+  // ── THUẬT TOÁN GIÃN CÁCH SM-2 (rút gọn) ──
+  // Hơn hẳn kiểu hộp cố định 1-3-7-16-35: mỗi thẻ mang một "độ dễ" riêng, thẻ nào mình hay
+  // quên thì tự giãn chậm lại, thẻ dễ thì giãn nhanh ra. Nhờ vậy số thẻ phải ôn mỗi ngày
+  // ít đi mà vẫn nhớ, không phải ôn đều tay những thứ đã thuộc.
   const traLoiThe = (khoa: string, muc: 'quen' | 'tam' | 'thuoc') => {
     setBoThe((m) => {
-      const cu = m[khoa]?.hop || 1;
-      const hop = muc === 'quen' ? 1 : muc === 'thuoc' ? Math.min(5, cu + 1) : cu;
-      const moi = { ...m, [khoa]: { hop, ngayOn: congNgay(muc === 'quen' ? 1 : CACH_ON[hop - 1]) } };
+      const c: any = m[khoa] || { de: 2.5, khoang: 0, lan: 0 };
+      let de = c.de ?? 2.5, khoang = c.khoang ?? 0, lan = c.lan ?? 0;
+      if (muc === 'quen') {                      // quên hẳn -> học lại từ đầu, hạ độ dễ
+        lan = 0; khoang = 1; de = Math.max(1.3, de - 0.2);
+      } else if (muc === 'tam') {                // lơ mơ -> giãn nhẹ, hạ nhẹ độ dễ
+        lan += 1; khoang = Math.max(1, Math.round((khoang || 1) * 1.2)); de = Math.max(1.3, de - 0.05);
+      } else {                                   // thuộc -> 1 ngày, 6 ngày, rồi nhân độ dễ
+        lan += 1; de = Math.min(2.8, de + 0.1);
+        khoang = lan === 1 ? 1 : lan === 2 ? 6 : Math.round((khoang || 6) * de);
+      }
+      const moi = { ...m, [khoa]: { de, khoang, lan, ngayOn: congNgay(khoang) } as any };
       try { localStorage.setItem('luat-the-hoc', JSON.stringify(moi)); } catch { /* */ }
       return moi;
     });
+    // ghi nhận chuỗi ngày học liên tiếp
+    try {
+      const g = JSON.parse(localStorage.getItem('luat-chuoi') || '{}');
+      if (g.ngay !== homNay()) {
+        g.chuoi = g.ngay === congNgay(-1) ? (g.chuoi || 0) + 1 : 1;
+        g.ngay = homNay();
+        localStorage.setItem('luat-chuoi', JSON.stringify(g));
+        setChuoi(g.chuoi);
+      }
+    } catch { /* */ }
     setDatLat(false);
     setTheSo((i) => i + 1);
   };
@@ -426,8 +518,10 @@ export default function TraCuuLuatPage() {
       </p>
 
       <div className="mt-3 flex gap-1.5">
-        {([['tinhhuong', '🧭 Tình huống'], ['luat', '⚖️ Toàn văn'], ['sodo', '🧠 Sơ đồ tư duy'], ['danhmuc', '📚 Danh mục']] as const).map(([k, l]) => (
-          <button key={k} onClick={() => setThe(k)}
+        {([['tinhhuong', '🧭 Tình huống'], ['luat', '⚖️ Toàn văn'],
+           ['sodo', `🎴 Học thuộc${theHomNay.length ? ` (${theHomNay.length})` : ''}`],
+           ['danhmuc', '📚 Danh mục']] as const).map(([k, l]) => (
+          <button key={k} onClick={() => { setThe(k); if (k === 'sodo') setCheDoHoc('the'); }}
             className={`rounded-full border px-3 py-1.5 text-[12.5px] font-semibold transition ${the === k ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>{l}</button>
         ))}
       </div>
@@ -644,7 +738,7 @@ export default function TraCuuLuatPage() {
         <div className="mt-3">
           {/* Hai cách học, cùng một kho kiến thức: NHÌN TỔNG THỂ (sơ đồ) và NHỚ LÂU (thẻ lật). */}
           <div className="flex gap-1.5">
-            {([['sodo', '🧠 Sơ đồ tổng thể'], ['the', `🎴 Thẻ học thuộc${theHomNay.length ? ` (${theHomNay.length})` : ''}`]] as const).map(([k, l]) => (
+            {([['the', `🎴 Thẻ ôn tập${theHomNay.length ? ` (${theHomNay.length})` : ''}`], ['sodo', '🧠 Sơ đồ tổng thể']] as const).map(([k, l]) => (
               <button key={k} onClick={() => setCheDoHoc(k)}
                 className={`rounded-full border px-3 py-1 text-[12.5px] font-semibold transition ${cheDoHoc === k ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>{l}</button>
             ))}
@@ -653,45 +747,60 @@ export default function TraCuuLuatPage() {
           {cheDoHoc === 'the' && (
             <div className="mt-3">
               <p className="text-[12.5px] leading-snug text-slate-500">
-                Cách học đã được chứng minh: <b>tự nhớ lại trước khi xem đáp án</b>, rồi <b>ôn lại đúng lúc sắp quên</b>.
-                Thẻ nào thuộc thì đẩy xa dần (1 → 3 → 7 → 16 → 35 ngày), thẻ nào quên thì mai ôn lại.
+                Hai kỹ thuật học đã được chứng minh: <b>tự nhớ lại trước khi xem đáp án</b> và <b>ôn đúng lúc sắp quên</b>.
+                Mỗi thẻ mang một <b>độ dễ</b> riêng — thẻ hay quên tự giãn chậm lại, thẻ dễ giãn nhanh ra, nên
+                số thẻ phải ôn mỗi ngày ít đi mà vẫn nhớ.
               </p>
+
               <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px]">
                 <span className="rounded-full bg-sky-50 px-2.5 py-1 font-bold text-sky-700">Hôm nay: {theHomNay.length} thẻ</span>
-                <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-bold text-emerald-700">Đã thuộc: {daThuoc}/{dsThe.length}</span>
-                <div className="h-1.5 min-w-[120px] flex-1 overflow-hidden rounded-full bg-slate-100">
-                  <div className="h-full bg-emerald-500" style={{ width: `${dsThe.length ? (daThuoc / dsThe.length) * 100 : 0}%` }} />
+                <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-bold text-emerald-700">Đã thuộc: {daThuoc}/{theTheoChuDe.length}</span>
+                {chuoi > 1 && <span className="rounded-full bg-amber-50 px-2.5 py-1 font-bold text-amber-700">🔥 {chuoi} ngày liên tiếp</span>}
+                <div className="h-1.5 min-w-[100px] flex-1 overflow-hidden rounded-full bg-slate-100">
+                  <div className="h-full bg-emerald-500 transition-all" style={{ width: `${theTheoChuDe.length ? (daThuoc / theTheoChuDe.length) * 100 : 0}%` }} />
                 </div>
+              </div>
+
+              {/* Chọn chủ đề để ôn tập trung, hoặc để trống thì ôn trộn tất cả. */}
+              <div className="mt-2 flex flex-wrap gap-1">
+                <button onClick={() => { setChuDeHoc(''); setTheSo(0); setDatLat(false); }}
+                  className={`rounded-full border px-2.5 py-1 text-[11.5px] font-semibold ${!chuDeHoc ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>
+                  Tất cả ({dsThe.length})
+                </button>
+                {chuDeCo.map((c) => {
+                  const n = dsThe.filter((t) => t.chuDe === c).length;
+                  return (
+                    <button key={c} onClick={() => { setChuDeHoc(c); setTheSo(0); setDatLat(false); }}
+                      className={`rounded-full border px-2.5 py-1 text-[11.5px] font-semibold ${chuDeHoc === c ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>
+                      {c} ({n})
+                    </button>
+                  );
+                })}
               </div>
 
               {theHomNay.length === 0 ? (
                 <div className="mt-4 rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50/60 p-6 text-center">
                   <p className="text-4xl">✅</p>
-                  <p className="mt-1 text-[14px] font-bold text-emerald-800">Hôm nay ôn xong rồi</p>
-                  <p className="mt-0.5 text-[12.5px] text-slate-500">Mai quay lại, máy tự chọn đúng những thẻ sắp quên.</p>
+                  <p className="mt-1 text-[14px] font-bold text-emerald-800">Ôn xong phần này rồi</p>
+                  <p className="mt-0.5 text-[12.5px] text-slate-500">
+                    Mai quay lại, máy tự chọn đúng những thẻ sắp quên. Muốn học tiếp thì chọn chủ đề khác.
+                  </p>
                 </div>
               ) : (() => {
-                const khoa = theHomNay[theSo % theHomNay.length];
-                const [maT, soT] = khoa.split(':');
-                const g = gt!.muc[khoa];
-                const kv = kho.find((z) => z.ma === maT);
-                const dT = cacVb[maT]?.dieu.find((z) => z.so === Number(soT));
-                if (!cacVb[maT]) taiVb(maT).catch(() => {});
-                const hop = boThe[khoa]?.hop || 1;
+                const t = theHomNay[theSo % theHomNay.length];
+                const c: any = boThe[t.khoa] || {};
                 return (
                   <div className="mt-3">
                     <div className="rounded-2xl border-2 border-slate-200 bg-white p-4">
-                      <div className="flex items-center justify-between text-[11px] font-semibold text-slate-400">
-                        <span>{kv ? nhanNgan(kv.ma, kv.soHieu) : maT} · Điều {soT}</span>
-                        <span>Hộp {hop}/5</span>
+                      <div className="flex flex-wrap items-center justify-between gap-1 text-[11px] font-semibold text-slate-400">
+                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-500">{t.loai} · {t.chuDe}</span>
+                        <span>{c.lan ? `đã ôn ${c.lan} lần · lần sau sau ${c.khoang} ngày` : 'thẻ mới'}</span>
                       </div>
-                      <p className="mt-1.5 text-[16px] font-extrabold leading-snug text-[#0A2540]">
-                        {dT ? dT.tieuDe : `Điều ${soT}`}
-                      </p>
+                      <p className="mt-2 text-[16px] font-extrabold leading-snug text-[#0A2540]">{t.hoi}</p>
                       {!datLat ? (
                         <>
                           <p className="mt-2 text-[13px] italic leading-snug text-slate-500">
-                            Thử tự nói lại trong đầu: điều này quy định gì, con số nào cần nhớ?
+                            Thử tự trả lời trong đầu trước đã — nhớ lại được mới là học, đọc lại thì không.
                           </p>
                           <button onClick={() => setDatLat(true)}
                             className="mt-3 w-full rounded-xl bg-[#0A2540] px-3 py-2.5 text-[14px] font-bold text-white">
@@ -701,25 +810,23 @@ export default function TraCuuLuatPage() {
                       ) : (
                         <>
                           <div className="mt-2 rounded-xl border-2 border-dashed border-sky-300 bg-sky-50/70 p-3">
-                            <p className="text-[13.5px] font-bold text-sky-900">Nhớ nhanh: {g.nho}</p>
-                            <p className="mt-1 text-[13px] leading-relaxed text-slate-700">{g.y}</p>
+                            {t.nho && <p className="text-[13.5px] font-bold text-sky-900">Nhớ nhanh: {t.nho}</p>}
+                            <p className={`text-[13px] leading-relaxed text-slate-700 ${t.nho ? 'mt-1' : ''}`}>{t.dap}</p>
                           </div>
-                          <div className="mt-2 flex flex-wrap gap-1.5">
-                            <NutDan d={{ ma: maT, so: Number(soT) }} />
-                          </div>
+                          {t.dan && <div className="mt-2 flex flex-wrap gap-1">{t.dan.map((d, i2) => <NutDan key={i2} d={d} nho />)}</div>}
                           <p className="mt-3 text-[11.5px] font-semibold text-slate-500">Tự chấm: nhớ được tới đâu?</p>
                           <div className="mt-1 grid grid-cols-3 gap-1.5">
-                            <button onClick={() => traLoiThe(khoa, 'quen')}
+                            <button onClick={() => traLoiThe(t.khoa, 'quen')}
                               className="rounded-xl border-2 border-rose-300 bg-rose-50 px-2 py-2 text-[12.5px] font-bold text-rose-700">
                               Chưa thuộc<span className="block text-[10.5px] font-normal opacity-70">mai ôn lại</span>
                             </button>
-                            <button onClick={() => traLoiThe(khoa, 'tam')}
+                            <button onClick={() => traLoiThe(t.khoa, 'tam')}
                               className="rounded-xl border-2 border-amber-300 bg-amber-50 px-2 py-2 text-[12.5px] font-bold text-amber-700">
-                              Tạm được<span className="block text-[10.5px] font-normal opacity-70">{CACH_ON[hop - 1]} ngày</span>
+                              Tạm được<span className="block text-[10.5px] font-normal opacity-70">giãn nhẹ</span>
                             </button>
-                            <button onClick={() => traLoiThe(khoa, 'thuoc')}
+                            <button onClick={() => traLoiThe(t.khoa, 'thuoc')}
                               className="rounded-xl border-2 border-emerald-300 bg-emerald-50 px-2 py-2 text-[12.5px] font-bold text-emerald-700">
-                              Thuộc rồi<span className="block text-[10.5px] font-normal opacity-70">{CACH_ON[Math.min(4, hop)]} ngày</span>
+                              Thuộc rồi<span className="block text-[10.5px] font-normal opacity-70">giãn xa ra</span>
                             </button>
                           </div>
                         </>
@@ -727,9 +834,11 @@ export default function TraCuuLuatPage() {
                     </div>
                     <div className="mt-2 flex items-center justify-between text-[12px] text-slate-400">
                       <button onClick={() => { setDatLat(false); setTheSo((i) => i + 1); }} className="font-semibold hover:text-slate-700">Để lát nữa →</button>
+                      <span>{(theSo % theHomNay.length) + 1}/{theHomNay.length}</span>
                       <button onClick={() => { if (confirm('Xoá hết tiến độ học thuộc?')) { setBoThe({}); try { localStorage.removeItem('luat-the-hoc'); } catch { /* */ } } }}
                         className="hover:text-rose-600">Học lại từ đầu</button>
                     </div>
+                    {theSo2 && <p className="mt-2 rounded-lg bg-slate-50 px-3 py-2 text-[11px] leading-snug text-slate-500">{theSo2.canhBao}</p>}
                   </div>
                 );
               })()}

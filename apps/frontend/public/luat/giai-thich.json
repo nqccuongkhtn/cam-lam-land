@@ -6,7 +6,7 @@
    "nho": "3 nhóm: nông nghiệp · phi nông nghiệp · chưa sử dụng."
   },
   "ldd2024:10": {
-   "y": "Muốn biết thửa đất là loại gì thì xem giấy tờ trước: sổ đỏ, rồi đến quyết định giao đất / cho thuê đất / cho phép chuyển mục đích. Không có giấy tờ, hoặc giấy ghi một đằng thực tế một nẻo, thì xử theo quy định riêng của Chính phủ (Nghị định 102/2024).",
+   "y": "Muốn biết thửa đất là loại gì thì xem giấy tờ trước: Giấy chứng nhận, rồi đến quyết định giao đất / cho thuê đất / cho phép chuyển mục đích. Không có giấy tờ, hoặc giấy ghi một đằng thực tế một nẻo, thì xử theo quy định riêng của Chính phủ (Nghị định 102/2024).",
    "nho": "Giấy tờ nói trước, hiện trạng nói sau."
   },
   "ldd2024:45": {
@@ -18,7 +18,7 @@
    "nho": "Không có tên trong 31 khoản thì không thu hồi được."
   },
   "ldd2024:91": {
-   "y": "Nguyên tắc gốc của đền bù: bồi thường bằng ĐẤT CÙNG MỤC ĐÍCH trước đã; không có đất mới trả bằng tiền, theo giá đất cụ thể tại thời điểm phê duyệt phương án. Muốn nhận tiền thì phải đăng ký nguyện vọng ngay lúc lập phương án. Điều quan trọng nhất nằm ở khoản 6: phương án bồi thường và việc bố trí tái định cư phải HOÀN THÀNH TRƯỚC khi có quyết định thu hồi đất.",
+   "y": "Nguyên tắc gốc của bồi thường: bồi thường bằng ĐẤT CÙNG MỤC ĐÍCH trước đã; không có đất mới trả bằng tiền, theo giá đất cụ thể tại thời điểm phê duyệt phương án. Muốn nhận tiền thì phải đăng ký nguyện vọng ngay lúc lập phương án. Điều quan trọng nhất nằm ở khoản 6: phương án bồi thường và việc bố trí tái định cư phải HOÀN THÀNH TRƯỚC khi có quyết định thu hồi đất.",
    "nho": "Đất đổi đất trước, tiền sau. Tái định cư xong mới được thu hồi."
   },
   "ldd2024:92": {
@@ -26,7 +26,7 @@
    "nho": "Di dời cả cộng đồng thì có chính sách riêng."
   },
   "ldd2024:95": {
-   "y": "Muốn được bồi thường VỀ ĐẤT phải đủ hai vế. Vế một: đúng đối tượng ở khoản 1 (hộ gia đình, cá nhân không phải đất thuê trả tiền hằng năm; cộng đồng dân cư; tổ chức được giao đất có thu tiền…). Vế hai: có một trong các giấy tờ ở khoản 2 — sổ đỏ, quyết định giao/thuê/chuyển mục đích, giấy tờ theo Điều 137, hoặc đã nhận chuyển quyền hợp pháp mà chưa kịp sang tên.",
+   "y": "Muốn được bồi thường VỀ ĐẤT phải đủ hai vế. Vế một: đúng đối tượng ở khoản 1 (hộ gia đình, cá nhân không phải đất thuê trả tiền hằng năm; cộng đồng dân cư; tổ chức được giao đất có thu tiền…). Vế hai: có một trong các giấy tờ ở khoản 2 — Giấy chứng nhận, quyết định giao/thuê/chuyển mục đích, giấy tờ theo Điều 137, hoặc đã nhận chuyển quyền hợp pháp mà chưa kịp đăng ký biến động.",
    "nho": "Đúng đối tượng + có một loại giấy tờ = được bồi thường về đất."
   },
   "ldd2024:96": {
@@ -54,7 +54,7 @@
    "nho": "Tháo · chở · lắp — cả ba đều được trả."
   },
   "ldd2024:105": {
-   "y": "Bốn trường hợp tài sản trên đất KHÔNG được bồi thường. Đáng nhớ nhất là khoản 2: tài sản tạo lập trái pháp luật, hoặc tạo lập SAU KHI ĐÃ CÓ THÔNG BÁO THU HỒI ĐẤT. Nghĩa là xây thêm, trồng thêm để \"đón đền bù\" thì phần đó mất trắng.",
+   "y": "Bốn trường hợp tài sản trên đất KHÔNG được bồi thường. Đáng nhớ nhất là khoản 2: tài sản tạo lập trái pháp luật, hoặc tạo lập SAU KHI ĐÃ CÓ THÔNG BÁO THU HỒI ĐẤT. Nghĩa là xây thêm, trồng thêm để \"đón tiền bồi thường\" thì phần đó mất trắng.",
    "nho": "Đã có thông báo thu hồi thì xây thêm không được đền."
   },
   "ldd2024:107": {
@@ -98,7 +98,7 @@
    "nho": "Giao sai thẩm quyền: còn gỡ được nếu trước 01/7/2014."
   },
   "ldd2024:141": {
-   "y": "Thửa đất có vườn, ao mà giấy tờ ghi là thổ cư / đất ở: nếu thửa hình thành trước 18/12/1980, hoặc từ 18/12/1980 đến trước 15/10/1993, mà diện tích NHỎ HƠN hạn mức công nhận đất ở thì TOÀN BỘ thửa được xác định là đất ở và không phải nộp tiền sử dụng đất cho phần đó. Lớn hơn hạn mức thì lấy theo diện tích ghi trong giấy tờ. Sổ đã cấp trước 01/7/2004 có thể xin xác định lại diện tích đất ở khi có nhu cầu hoặc khi Nhà nước thu hồi đất.",
+   "y": "Thửa đất có vườn, ao mà giấy tờ ghi là đất ở (giấy tờ đời cũ hay ghi “thổ cư”): nếu thửa hình thành trước 18/12/1980, hoặc từ 18/12/1980 đến trước 15/10/1993, mà diện tích NHỎ HƠN hạn mức công nhận đất ở thì TOÀN BỘ thửa được xác định là đất ở và không phải nộp tiền sử dụng đất cho phần đó. Lớn hơn hạn mức thì lấy theo diện tích ghi trong giấy tờ. Sổ đã cấp trước 01/7/2004 có thể xin xác định lại diện tích đất ở khi có nhu cầu hoặc khi Nhà nước thu hồi đất.",
    "nho": "Đất cũ + nhỏ hơn hạn mức = cả thửa là đất ở."
   },
   "ldd2024:159": {
@@ -107,7 +107,7 @@
   },
   "ldd2024:160": {
    "y": "Giá đất cụ thể mới là giá dùng để TÍNH TIỀN BỒI THƯỜNG KHI NHÀ NƯỚC THU HỒI ĐẤT, và để tính tiền giao đất cho tổ chức, tiền thuê trả một lần, giá khởi điểm đấu giá. Do Chủ tịch UBND tỉnh hoặc Chủ tịch UBND huyện quyết theo từng trường hợp, được thuê tổ chức tư vấn định giá.",
-   "nho": "Đền bù thì dùng GIÁ CỤ THỂ, không phải bảng giá."
+   "nho": "Bồi thường thì dùng GIÁ ĐẤT CỤ THỂ, không phải bảng giá."
   },
   "ldd2024:171": {
    "y": "Danh sách các loại đất KHÔNG CÓ THỜI HẠN: đất ở; đất rừng đặc dụng, rừng phòng hộ; đất quốc phòng, an ninh; đất tín ngưỡng; đất công cộng không có mục đích kinh doanh; đất nghĩa trang… Với người dân thì điều cần nhớ là ĐẤT Ở dùng ổn định lâu dài, không phải đi gia hạn bao giờ.",
@@ -206,7 +206,7 @@
    "nho": "Cãi với CƠ QUAN → khiếu nại. Cãi với NGƯỜI → tranh chấp."
   },
   "nd101-2024:24": {
-   "y": "Điều xử lý phần đất DÔI RA khi đo lại. Hỏi hai câu theo thứ tự: thửa gốc đã có sổ hay mới có giấy tờ theo Điều 137, và phần tăng thêm có nguồn gốc gì. Phần tăng thêm có giấy tờ Điều 137 → công nhận cùng thửa gốc; do mua một phần thửa mà chưa sang tên → đi nhánh nhận chuyển quyền; không có gì → phải đủ điều kiện theo Điều 138, 139 hoặc 140. Điểm quan trọng: KHÔNG phải làm thêm thủ tục chuyển quyền, chuyển mục đích hay hợp thửa cho phần tăng thêm.",
+   "y": "Điều xử lý phần đất DÔI RA khi đo lại. Hỏi hai câu theo thứ tự: thửa gốc đã có Giấy chứng nhận hay mới có giấy tờ theo Điều 137, và phần tăng thêm có nguồn gốc gì. Phần tăng thêm có giấy tờ Điều 137 → công nhận cùng thửa gốc; do mua một phần thửa mà chưa đăng ký biến động → đi nhánh nhận chuyển quyền; không có gì → phải đủ điều kiện theo Điều 138, 139 hoặc 140. Điểm quan trọng: KHÔNG phải làm thêm thủ tục chuyển quyền, chuyển mục đích hay hợp thửa cho phần tăng thêm.",
    "nho": "Hỏi nguồn gốc phần dôi ra; không phải hợp thửa lại."
   },
   "nd101-2024:38": {

@@ -51,7 +51,7 @@
     },
     {
      "hoi": "3. Tôi có đủ điều kiện được bồi thường VỀ ĐẤT không?",
-     "y": "Cần đủ hai vế: đúng đối tượng (hộ gia đình, cá nhân không phải đất thuê trả tiền hằng năm…) VÀ có một trong các giấy tờ: sổ đỏ, quyết định giao/thuê/chuyển mục đích, giấy tờ theo Điều 137, hoặc đã nhận chuyển quyền hợp pháp mà chưa kịp sang tên.",
+     "y": "Cần đủ hai vế: đúng đối tượng (hộ gia đình, cá nhân không phải đất thuê trả tiền hằng năm…) VÀ có một trong các giấy tờ: Giấy chứng nhận, quyết định giao/thuê/chuyển mục đích, giấy tờ theo Điều 137, hoặc đã nhận chuyển quyền hợp pháp mà chưa kịp đăng ký biến động.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -161,7 +161,7 @@
      "nhanh": [
       {
        "neu": "Tài sản dựng lên SAU khi đã có thông báo thu hồi đất",
-       "thi": "Không được bồi thường phần đó. Đừng xây thêm để 'đón đền bù'.",
+       "thi": "Không được bồi thường phần đó. Đừng xây thêm để 'đón tiền bồi thường'.",
        "canh": true,
        "dan": [
         {
@@ -173,7 +173,7 @@
      ]
     },
     {
-     "hoi": "6. Ngoài tiền đền bù còn được HỖ TRỢ gì?",
+     "hoi": "6. Ngoài tiền bồi thường còn được HỖ TRỢ gì?",
      "y": "Sáu khoản: ổn định đời sống · ổn định sản xuất kinh doanh · di dời vật nuôi · đào tạo chuyển nghề và tìm việc · hỗ trợ tái định cư · hỗ trợ tháo dỡ di dời. Tỉnh còn được quyết thêm khoản khác cho từng dự án.",
      "dan": [
       {
@@ -226,7 +226,7 @@
     }
    ],
    "ketLuan": [
-    "Tiền đền bù đất tính theo GIÁ ĐẤT CỤ THỂ do tỉnh/huyện quyết tại thời điểm duyệt phương án — không phải bảng giá đất.",
+    "Tiền bồi thường về đất tính theo GIÁ ĐẤT CỤ THỂ do UBND cấp có thẩm quyền quyết định tại thời điểm phê duyệt phương án — không phải bảng giá đất.",
     "Không đồng ý với phương án thì khiếu nại theo Điều 237; tranh chấp đất đai thì hoà giải ở xã trước (Điều 235).",
     "Mức chi tiết áp dụng ở Khánh Hoà nằm ở Quyết định 17/2024 và Quyết định 14/2025 của UBND tỉnh."
    ],
@@ -786,7 +786,7 @@
    "vuongMac": [
     {
      "gap": "Xã không chịu xác nhận “không tranh chấp”",
-     "go": "Đây là điều kiện bắt buộc của cả Điều 138, 139, 140. Đề nghị xã trả lời BẰNG VĂN BẢN nêu rõ lý do; nếu có tranh chấp thật thì phải đi hoà giải theo Điều 235 trước, xong mới quay lại làm sổ.",
+     "go": "Đây là điều kiện bắt buộc của cả Điều 138, 139, 140. Đề nghị xã trả lời BẰNG VĂN BẢN nêu rõ lý do; nếu có tranh chấp thật thì phải đi hoà giải theo Điều 235 trước, xong mới quay lại xin cấp Giấy chứng nhận.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -903,7 +903,7 @@
        ]
       },
       {
-       "neu": "Phần tăng thêm do MUA một phần thửa của người khác mà chưa sang tên",
+       "neu": "Phần tăng thêm do MUA một phần thửa của người khác mà chưa đăng ký biến động",
        "thi": "Đi theo nhánh nhận chuyển quyền — làm thủ tục cấp sổ cho toàn bộ diện tích đang sử dụng."
       },
       {
@@ -1041,7 +1041,7 @@
   {
    "ma": "len-tho-cu",
    "icon": "🔁",
-   "ten": "Muốn lên thổ cư (chuyển mục đích sang đất ở)",
+   "ten": "Chuyển mục đích sử dụng đất sang đất ở (quen gọi: lên thổ cư)",
    "tom": "Ba câu hỏi: có phải xin phép không · có nằm trong kế hoạch năm không · phải nộp bao nhiêu tiền.",
    "buoc": [
     {
@@ -1363,7 +1363,7 @@
   {
    "ma": "sang-ten",
    "icon": "🤝",
-   "ten": "Muốn bán / sang tên / thế chấp — vướng gì không?",
+   "ten": "Chuyển nhượng, tặng cho, thế chấp quyền sử dụng đất — vướng gì không?",
    "tom": "Một bộ 5 điều kiện dùng chung cho mọi giao dịch. Nhớ một lần là xong.",
    "buoc": [
     {
@@ -1433,7 +1433,7 @@
     }
    ],
    "hoSo": {
-    "nhan": "Hồ sơ sang tên (chuyển nhượng, thừa kế, tặng cho)",
+    "nhan": "Hồ sơ đăng ký biến động do chuyển nhượng, thừa kế, tặng cho",
     "gom": [
      {
       "ten": "Đơn đăng ký biến động đất đai, tài sản gắn liền với đất",
@@ -1988,7 +1988,7 @@
    "ma": "gia-dat",
    "icon": "🏷️",
    "ten": "Tính tiền: dùng bảng giá đất hay giá đất cụ thể?",
-   "tom": "Lẫn hai loại giá này là tính sai tiền. Chỉ cần nhớ: việc của dân dùng bảng giá, đền bù dùng giá cụ thể.",
+   "tom": "Lẫn hai loại giá này là tính sai tiền. Chỉ cần nhớ: việc của dân dùng bảng giá đất, bồi thường dùng giá đất cụ thể.",
    "buoc": [
     {
      "hoi": "1. Việc cần tính là việc gì?",

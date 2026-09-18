@@ -8,7 +8,7 @@
 // (Bản HTML toàn văn trên cổng Chính phủ THIẾU 3 điều mà không báo gì — xem scripts/luat.)
 //
 // Cách bày cho dễ nhớ: cây CHƯƠNG → MỤC → ĐIỀU lấy thẳng từ cấu trúc của chính văn bản,
-// không tự chế "chủ đề" theo cảm tính. Muốn tra nhanh theo việc thật (sổ đỏ, đền bù, tách thửa…)
+// không tự chế "chủ đề" theo cảm tính. Muốn tra nhanh theo việc thật (cấp Giấy chứng nhận, bồi thường, tách thửa…)
 // thì dùng hàng CHỦ ĐỀ NHANH — bản chất là câu tìm sẵn, bấm một cái ra đúng nhóm điều.
 //
 // Kho gồm LUẬT ĐẤT ĐAI 2024 + toàn bộ NGHỊ ĐỊNH HƯỚNG DẪN. Tìm được CẢ KHO một lượt, vì
@@ -41,6 +41,7 @@ type KhoItem = { ma: string; soHieu: string; ngay: string; ten: string; soDieu: 
   nguoiKy?: string; ngayHieuLuc?: string; dan?: string[]; duocDan?: string[];
   // Lược đồ văn bản: bốn loại quan hệ, tính sẵn lúc build từ chính chữ của văn bản.
   canCu?: string[]; laCanCuCho?: string[]; thayThe?: string[]; biThayTheBoi?: string[];
+  suaDoi?: string[]; biSuaDoiBoi?: string[];
   baiBoMotPhan?: { ma: string; phan: string }[]; biBaiBoMotPhanBoi?: string[] };
 // TÌNH HUỐNG = đi theo việc thật, mỗi bước một câu hỏi, có nhánh trả lời, bước nào cũng dẫn nguồn.
 type NhanhTH = { neu: string; thi: string; canh?: boolean; dan?: Dan[] };
@@ -133,7 +134,7 @@ const dauTinhTrang = (d: Dieu) => (d.tinhTrang?.loai === 'het-hieu-luc' ? '⛔ '
 // CHỦ ĐỀ NHANH = câu tìm sẵn theo việc người ta hay hỏi. Không phải phân loại pháp lý,
 // chỉ là lối tắt — nên để nguyên chữ trong luật để tìm cho trúng.
 const CHU_DE: { ten: string; icon: string; tim: string }[] = [
-  { ten: 'Sổ đỏ / cấp giấy chứng nhận', icon: '📗', tim: 'giấy chứng nhận quyền sử dụng đất' },
+  { ten: 'Cấp Giấy chứng nhận', icon: '📗', tim: 'giấy chứng nhận quyền sử dụng đất' },
   { ten: 'Thu hồi đất', icon: '🚧', tim: 'thu hồi đất' },
   { ten: 'Bồi thường, tái định cư', icon: '💵', tim: 'bồi thường' },
   { ten: 'Giá đất, bảng giá đất', icon: '🏷️', tim: 'giá đất' },
@@ -530,13 +531,18 @@ export default function TraCuuLuatPage() {
 
   // Nút dẫn nguồn dùng chung cho mọi chỗ (tình huống, sơ đồ, khung liên kết). Học của
   // NotebookLM: câu nào cũng phải chỉ được ra chỗ lấy, bấm một cái là tới nguyên văn.
+  // Điều đích đã HẾT HIỆU LỰC thì nút phải tự nói ra. Bộ soát liên kết tìm ra 26 chỗ
+  // dẫn tới điều đã bị bãi bỏ — bấm vào đọc rồi làm theo là hỏng cả bộ hồ sơ.
+  const dichHetHieuLuc = (d: Dan) =>
+    !!d.so && cacVb[d.ma]?.dieu.find((z) => z.so === d.so)?.tinhTrang?.loai === 'het-hieu-luc';
   const NutDan = ({ d, nho }: { d: Dan; nho?: boolean }) => {
     const v = kho.find((x) => x.ma === d.ma);
+    const bo = dichHetHieuLuc(d);
     return (
       <button onClick={() => { if (d.so) moDieuHopLy(d.ma, d.so); else { doiVanBan(d.ma); setThe('luat'); } }}
-        title={v ? `${v.ten} — ${v.soHieu}` : d.ma}
-        className={`rounded-md border border-slate-200 bg-white font-semibold text-slate-600 transition hover:border-[#0A2540] hover:text-[#0A2540] ${nho ? 'px-1.5 py-0.5 text-[11px]' : 'px-1.5 py-0.5 text-[11.5px]'}`}>
-        {d.so ? `Điều ${d.so}` : '📄'} · {v ? nhanNgan(v.ma, v.soHieu) : d.ma}
+        title={bo ? `ĐIỀU NÀY ĐÃ HẾT HIỆU LỰC — ${v ? v.ten : d.ma}` : (v ? `${v.ten} — ${v.soHieu}` : d.ma)}
+        className={`rounded-md border font-semibold transition hover:border-[#0A2540] ${bo ? 'border-rose-200 bg-rose-50 text-rose-500 line-through decoration-rose-300' : 'border-slate-200 bg-white text-slate-600 hover:text-[#0A2540]'} ${nho ? 'px-1.5 py-0.5 text-[11px]' : 'px-1.5 py-0.5 text-[11.5px]'}`}>
+        {bo ? '⛔ ' : ''}{d.so ? `Điều ${d.so}` : '📄'} · {v ? nhanNgan(v.ma, v.soHieu) : d.ma}
       </button>
     );
   };
@@ -1301,6 +1307,8 @@ export default function TraCuuLuatPage() {
                 ['Căn cứ ban hành', k?.canCu, 'text-slate-500'],
                 ['Thay thế', k?.thayThe, 'text-rose-600'],
                 ['Bị thay thế bởi', k?.biThayTheBoi, 'text-rose-600'],
+                ['Sửa đổi, bổ sung', k?.suaDoi, 'text-sky-600'],
+                ['Bị sửa đổi, bổ sung bởi', k?.biSuaDoiBoi, 'text-sky-600'],
                 ['Bị bãi bỏ một phần bởi', k?.biBaiBoMotPhanBoi, 'text-amber-600'],
                 ['Được hướng dẫn bởi', k?.laCanCuCho, 'text-emerald-600'],
                 ['Có nhắc tới', k?.dan, 'text-slate-500'],

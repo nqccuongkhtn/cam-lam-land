@@ -43,8 +43,12 @@ type GiayTo = { ten: string; mau?: string; batBuoc?: boolean; y?: string };
 type HoSo = { nhan: string; gom: GiayTo[]; noiNop: string[]; thoiHan: string; ketQua: string;
   dan?: Dan[]; canhBao?: string };
 type VuongMac = { gap: string; go: string; dan?: Dan[] };
+// Bảng liệt kê đầy đủ một nhóm trường hợp (dùng cho 16 trường hợp đăng ký biến động).
+type DongBang = { diem: string; ten: string; moTa: string; batBuoc30: boolean;
+  thoiHan: string; thoiHanThem?: string; cu?: string; dan?: Dan[] };
+type BangTH = { nhan: string; ghiChu: string; cot: string[]; dong: DongBang[] };
 type TinhHuong = { ma: string; icon: string; ten: string; tom: string; buoc: BuocTH[];
-  ketLuan?: string[]; danKetLuan?: Dan[]; hoSo?: HoSo; vuongMac?: VuongMac[] };
+  ketLuan?: string[]; danKetLuan?: Dan[]; hoSo?: HoSo; vuongMac?: VuongMac[]; bang?: BangTH };
 type KhoTinhHuong = { canhBao: string; ds: TinhHuong[] };
 // Giải thích do người làm web viết, KHÔNG phải chữ luật — luôn để trong khung riêng, màu khác.
 type GiaiThich = { canhBao: string; muc: Record<string, { y: string; nho: string }> };
@@ -447,6 +451,7 @@ export default function TraCuuLuatPage() {
                     <p className="mt-1 text-[12.5px] leading-snug text-slate-500">{x.tom}</p>
                     <p className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11.5px] font-semibold">
                       <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-500">{x.buoc.length} bước</span>
+                      {x.bang && <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">📑 đủ {x.bang.dong.length} trường hợp</span>}
                       {x.hoSo && <span className="rounded-full bg-[#0A2540]/10 px-2 py-0.5 text-[#0A2540]">📋 {x.hoSo.gom.length} giấy tờ</span>}
                       {x.vuongMac && <span className="rounded-full bg-rose-50 px-2 py-0.5 text-rose-600">⚠️ {x.vuongMac.length} chỗ hay vướng</span>}
                     </p>
@@ -462,6 +467,44 @@ export default function TraCuuLuatPage() {
                 <button onClick={() => setThChon('')} className="text-[12.5px] font-semibold text-slate-500 hover:text-[#0A2540]">← Chọn tình huống khác</button>
                 <h2 className="mt-1.5 text-[17px] font-extrabold leading-snug text-[#0A2540]">{x.icon} {x.ten}</h2>
                 <p className="mt-0.5 text-[12.5px] leading-snug text-slate-500">{x.tom}</p>
+
+                {/* ── BẢNG LIỆT KÊ ĐẦY ĐỦ ── dùng cho 16 trường hợp đăng ký biến động.
+                    Bày kiểu THẺ chứ không kiểu bảng ngang, vì trên điện thoại bảng ngang
+                    phải kéo qua kéo lại, đọc rất mệt. */}
+                {x.bang && (
+                  <div className="mt-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-[13px] font-extrabold text-[#0A2540]">{x.bang.nhan}</p>
+                      <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[11.5px] font-bold text-rose-700">
+                        {x.bang.dong.filter((z) => z.batBuoc30).length} trường hợp bị ép 30 ngày
+                      </span>
+                    </div>
+                    <p className="mt-1 rounded-xl bg-amber-50 px-2.5 py-2 text-[12px] leading-snug text-amber-900">{x.bang.ghiChu}</p>
+                    <div className="mt-2 space-y-1.5">
+                      {x.bang.dong.map((r) => (
+                        <div key={r.diem}
+                          className={`rounded-xl border-2 p-2.5 ${r.batBuoc30 ? 'border-rose-300 bg-rose-50/40' : 'border-slate-200 bg-white'}`}>
+                          <div className="flex items-start gap-2">
+                            <span className={`mt-0.5 flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg text-[13px] font-extrabold ${r.batBuoc30 ? 'bg-rose-600 text-white' : 'bg-slate-200 text-slate-600'}`}>{r.diem}</span>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[13.5px] font-bold leading-snug text-[#0A2540]">{r.ten}</p>
+                              <p className="mt-0.5 text-[12.5px] leading-snug text-slate-600">{r.moTa}</p>
+                              <div className="mt-1.5 flex flex-wrap gap-1.5 text-[11.5px]">
+                                <span className={`rounded-full px-2 py-0.5 font-bold ${r.batBuoc30 ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                                  {r.batBuoc30 ? '⏰ Phải đăng ký trong 30 ngày' : 'Không bị ép 30 ngày'}
+                                </span>
+                                <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-bold text-emerald-700">⏱ {r.thoiHan}</span>
+                              </div>
+                              {r.thoiHanThem && <p className="mt-1 text-[12px] leading-snug text-slate-500">↳ {r.thoiHanThem}</p>}
+                              {r.cu && <p className="mt-0.5 text-[11.5px] leading-snug text-slate-400">Trước 01/7/2025: {r.cu}</p>}
+                              {r.dan && <div className="mt-1 flex flex-wrap gap-1">{r.dan.map((dd, j) => <NutDan key={j} d={dd} nho />)}</div>}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* ── BỘ HỒ SƠ ── ba ô tóm tắt (bao lâu · nộp đâu · nhận gì) rồi tới danh sách
                     giấy tờ bấm đánh dấu được. Đây mới là thứ dùng để ĐI LÀM VIỆC THẬT. */}

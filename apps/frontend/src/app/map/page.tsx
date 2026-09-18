@@ -2398,8 +2398,7 @@ export default function MapPage() {
                   ); })}
                 </div>
                 <p className="border-t px-3.5 py-2 text-[10.5px] leading-snug text-slate-400">
-                  Màu trên bản đồ vẽ theo đúng bản vẽ kèm các quyết định này. Thông tin chỉ mang tính tham khảo,
-                  khi làm hồ sơ phải đối chiếu bản gốc.
+                  Thông tin chỉ mang tính tham khảo, khi làm hồ sơ phải đối chiếu bản gốc.
                 </p>
               </div>
             );

@@ -1532,6 +1532,459 @@
    ]
   },
   {
+   "ma": "bien-dong",
+   "icon": "🔁",
+   "ten": "Đăng ký biến động — đủ 16 trường hợp",
+   "tom": "Toàn bộ các trường hợp phải đăng ký biến động theo Điều 133, kèm trường hợp nào bắt buộc làm trong 30 ngày và thời hạn giải quyết HIỆN HÀNH.",
+   "bang": {
+    "nhan": "16 trường hợp đăng ký biến động (Điều 133 khoản 1, điểm a → q)",
+    "ghiChu": "Thời hạn giải quyết lấy từ PHỤ LỤC Nghị định 151/2025 (Phần II) — đây mới là bản đang áp dụng. Điều 22 Nghị định 101/2024 đã bị bãi bỏ từ 01/7/2025, số cũ để trong cột riêng chỉ dùng khi tra hồ sơ nộp trước ngày đó. Mọi thời hạn tính từ ngày nhận đủ hồ sơ hợp lệ; KHÔNG tính thời gian xác định và nộp nghĩa vụ tài chính, thời gian niêm yết, đăng tin, giám định. Xã miền núi, hải đảo, vùng khó khăn được cộng thêm.",
+    "cot": [
+     "Điểm",
+     "Trường hợp",
+     "Phải đăng ký trong 30 ngày?",
+     "Thời hạn giải quyết"
+    ],
+    "dong": [
+     {
+      "diem": "a",
+      "ten": "Chuyển nhượng · thừa kế · tặng cho · góp vốn · cho thuê · thế chấp",
+      "moTa": "Người sử dụng đất thực hiện các quyền: chuyển đổi, chuyển nhượng, thừa kế, tặng cho, góp vốn bằng quyền sử dụng đất và tài sản gắn liền với đất; cho thuê, cho thuê lại quyền sử dụng đất.",
+      "batBuoc30": true,
+      "thoiHan": "08 ngày làm việc",
+      "thoiHanThem": "Cho thuê, cho thuê lại trong dự án hạ tầng: 04 ngày · Bán, thừa kế, tặng cho, góp vốn TÀI SẢN trên đất thuê trả tiền hằng năm: 08 ngày · Nhận chuyển nhượng một phần thửa đã có sổ (điểm a khoản 2 Điều 24 NĐ 101): 10 ngày · các trường hợp điểm b, c khoản 2 Điều 24: 20 ngày",
+      "cu": "10 ngày làm việc",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "ldd2024",
+        "so": 45
+       },
+       {
+        "ma": "nd151-2025"
+       }
+      ]
+     },
+     {
+      "diem": "b",
+      "ten": "Đổi tên người sử dụng đất, chủ sở hữu tài sản",
+      "moTa": "Người sử dụng đất, chủ sở hữu tài sản gắn liền với đất được phép đổi tên.",
+      "batBuoc30": true,
+      "thoiHan": "04 ngày làm việc",
+      "cu": "05 ngày làm việc",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "nd151-2025"
+       }
+      ]
+     },
+     {
+      "diem": "c",
+      "ten": "Thay đổi thông tin người sử dụng đất trên sổ",
+      "moTa": "Thay đổi thông tin về người sử dụng đất, chủ sở hữu tài sản trên giấy chứng nhận đã cấp, không thuộc trường hợp đổi tên ở điểm b (ví dụ: đổi số căn cước, đổi địa chỉ thường trú).",
+      "batBuoc30": false,
+      "thoiHan": "04 ngày làm việc",
+      "cu": "05 ngày làm việc",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "nd151-2025"
+       }
+      ]
+     },
+     {
+      "diem": "d",
+      "ten": "Thay đổi ranh giới, mốc giới, kích thước, diện tích, số hiệu, địa chỉ thửa đất",
+      "moTa": "Gồm cả tách thửa, hợp thửa, đo đạc lại làm đổi diện tích, đổi số tờ - số thửa sau sáp nhập đơn vị hành chính.",
+      "batBuoc30": false,
+      "thoiHan": "04 ngày làm việc (đổi số hiệu, địa chỉ thửa)",
+      "thoiHanThem": "Tách thửa, hợp thửa: 12 ngày làm việc · Giảm diện tích do sạt lở tự nhiên: 10 ngày · Xác định lại diện tích đất ở: 20 ngày (15 ngày nếu không có nhu cầu xác định lại)",
+      "cu": "15 ngày làm việc (tách, hợp thửa)",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "ldd2024",
+        "so": 220
+       },
+       {
+        "ma": "ldd2024",
+        "so": 141
+       },
+       {
+        "ma": "nd151-2025"
+       }
+      ]
+     },
+     {
+      "diem": "đ",
+      "ten": "Đăng ký quyền sở hữu tài sản trên thửa đất đã có sổ",
+      "moTa": "Thửa đất đã có Giấy chứng nhận, nay đăng ký thêm quyền sở hữu nhà ở, công trình xây dựng, rừng sản xuất là rừng trồng trên thửa đó.",
+      "batBuoc30": false,
+      "thoiHan": "08 ngày làm việc",
+      "thoiHanThem": "Tài sản đã được chứng nhận trên sổ mà nay đăng ký THAY ĐỔI tài sản: 05 ngày làm việc",
+      "cu": "10 ngày làm việc",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "ldd2024",
+        "so": 148
+       },
+       {
+        "ma": "ldd2024",
+        "so": 149
+       },
+       {
+        "ma": "nd151-2025"
+       }
+      ]
+     },
+     {
+      "diem": "e",
+      "ten": "Chuyển mục đích sử dụng đất",
+      "moTa": "Chuyển mục đích thuộc 7 trường hợp phải xin phép (khoản 1 Điều 121). Trường hợp KHÔNG phải xin phép (khoản 3 Điều 121) thì đăng ký biến động khi có nhu cầu.",
+      "batBuoc30": false,
+      "thoiHan": "07 ngày làm việc (trường hợp khoản 3 Điều 121 — không phải xin phép)",
+      "thoiHanThem": "Trường hợp phải xin phép thì trước hết phải có quyết định cho phép chuyển mục đích, sau đó mới đăng ký biến động.",
+      "cu": "Điều 22 NĐ 101/2024 không nêu riêng",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "ldd2024",
+        "so": 121
+       },
+       {
+        "ma": "ldd2024",
+        "so": 116
+       },
+       {
+        "ma": "nd151-2025"
+       }
+      ]
+     },
+     {
+      "diem": "g",
+      "ten": "Thay đổi thời hạn sử dụng đất",
+      "moTa": "Gia hạn, điều chỉnh thời hạn sử dụng đất; chuyển từ đất có thời hạn sang ổn định lâu dài hoặc ngược lại.",
+      "batBuoc30": false,
+      "thoiHan": "Phụ lục NĐ 151/2025 không nêu riêng cho trường hợp này — theo thủ tục tương ứng",
+      "cu": "Điều 22 NĐ 101/2024 không nêu riêng",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "ldd2024",
+        "so": 172
+       },
+       {
+        "ma": "nd151-2025"
+       }
+      ]
+     },
+     {
+      "diem": "h",
+      "ten": "Thay đổi hình thức giao đất, cho thuê đất, cách nộp tiền",
+      "moTa": "Chuyển từ thuê đất trả tiền hằng năm sang trả một lần, từ giao đất không thu tiền sang có thu tiền, v.v.",
+      "batBuoc30": false,
+      "thoiHan": "Phụ lục NĐ 151/2025 không nêu riêng cho trường hợp này — theo thủ tục tương ứng",
+      "cu": "Điều 22 NĐ 101/2024 không nêu riêng",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "ldd2024",
+        "so": 160
+       },
+       {
+        "ma": "nd103-2024"
+       }
+      ]
+     },
+     {
+      "diem": "i",
+      "ten": "Chia, tách, hợp nhất, sáp nhập tổ chức · thoả thuận của hộ gia đình, vợ chồng, nhóm người",
+      "moTa": "Doanh nghiệp chia tách sáp nhập, chuyển đổi mô hình; hoặc các thành viên hộ gia đình, vợ chồng, nhóm người sử dụng đất chung thoả thuận phân chia lại.",
+      "batBuoc30": true,
+      "thoiHan": "08 ngày làm việc",
+      "cu": "Điều 22 NĐ 101/2024 không nêu riêng",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "nd151-2025"
+       }
+      ]
+     },
+     {
+      "diem": "k",
+      "ten": "Theo kết quả hoà giải thành · bản án · quyết định thi hành án · xử lý nợ thế chấp",
+      "moTa": "Nhận quyền sử dụng đất theo kết quả hoà giải thành về tranh chấp được UBND công nhận; theo thoả thuận trong hợp đồng thế chấp để xử lý nợ; theo quyết định của cơ quan nhà nước, bản án của Toà án, quyết định thi hành án, phán quyết Trọng tài thương mại.",
+      "batBuoc30": true,
+      "thoiHan": "08 ngày làm việc",
+      "thoiHanThem": "Nhận quyền do XỬ LÝ TÀI SẢN THẾ CHẤP: cũng 08 ngày làm việc. Hoà giải thành mà đổi ranh giới, diện tích thì phải đi đăng ký trong 30 NGÀY LÀM VIỆC kể từ ngày nhận văn bản công nhận.",
+      "cu": "08 ngày làm việc",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "ldd2024",
+        "so": 235
+       },
+       {
+        "ma": "ldd2024",
+        "so": 236
+       },
+       {
+        "ma": "nd151-2025"
+       }
+      ]
+     },
+     {
+      "diem": "l",
+      "ten": "Xác lập, thay đổi, chấm dứt quyền đối với thửa đất liền kề",
+      "moTa": "Quyền đi qua, quyền cấp thoát nước, quyền mắc đường dây qua thửa đất của người khác — phải đăng ký thì mới có giá trị với người thứ ba.",
+      "batBuoc30": true,
+      "thoiHan": "05 ngày làm việc",
+      "cu": "07 ngày làm việc",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "ldd2024",
+        "so": 29
+       },
+       {
+        "ma": "nd151-2025"
+       }
+      ]
+     },
+     {
+      "diem": "m",
+      "ten": "Thay đổi những hạn chế quyền của người sử dụng đất",
+      "moTa": "Ví dụ đất nằm trong hành lang an toàn công trình, khu vực bảo vệ, vùng phụ cận — các hạn chế này thay đổi thì phải đăng ký.",
+      "batBuoc30": true,
+      "thoiHan": "05 ngày làm việc",
+      "cu": "07 ngày làm việc",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "ldd2024",
+        "so": 210
+       },
+       {
+        "ma": "nd151-2025"
+       }
+      ]
+     },
+     {
+      "diem": "n",
+      "ten": "Thay đổi về công trình ngầm và đất trên mặt phục vụ công trình ngầm",
+      "moTa": "Thay đổi quyền sử dụng đất xây dựng công trình trên mặt đất phục vụ vận hành, khai thác công trình ngầm; quyền sở hữu công trình ngầm.",
+      "batBuoc30": false,
+      "thoiHan": "10 ngày làm việc",
+      "cu": "15 ngày làm việc",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "ldd2024",
+        "so": 216
+       },
+       {
+        "ma": "nd151-2025"
+       }
+      ]
+     },
+     {
+      "diem": "o",
+      "ten": "Cấp đổi · cấp lại Giấy chứng nhận",
+      "moTa": "Người sử dụng đất yêu cầu cấp đổi sổ (đổi sang mẫu mới, sổ rách hỏng, ghi đủ tên thành viên hộ…) hoặc cấp lại do bị mất.",
+      "batBuoc30": false,
+      "thoiHan": "Cấp đổi: 05 ngày làm việc",
+      "thoiHanThem": "Cấp đổi trường hợp phải trích đo lại: 10 ngày · Cấp đổi đồng loạt theo dự án đo đạc: theo tiến độ dự án · CẤP LẠI do bị mất: 10 ngày làm việc, không tính thời gian niêm yết thông báo mất và đăng tin",
+      "cu": "Cấp đổi 05 ngày / 10 ngày (NĐ 101 Điều 38, 39 — đã bãi bỏ)",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "nd151-2025"
+       }
+      ]
+     },
+     {
+      "diem": "p",
+      "ten": "Thế chấp quyền sử dụng đất, tài sản gắn liền với đất",
+      "moTa": "Khác mọi trường hợp còn lại ở chỗ: chỉ được XÁC NHẬN TRÊN SỔ ĐÃ CẤP, không cấp sổ mới (khoản 2 Điều 133).",
+      "batBuoc30": false,
+      "thoiHan": "Theo pháp luật về đăng ký biện pháp bảo đảm — văn bản đó KHÔNG có trong kho này",
+      "cu": "",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "ldd2024",
+        "so": 45
+       }
+      ]
+     },
+     {
+      "diem": "q",
+      "ten": "Bán, điều chuyển, chuyển nhượng quyền sử dụng đất là TÀI SẢN CÔNG",
+      "moTa": "Theo pháp luật về quản lý, sử dụng tài sản công.",
+      "batBuoc30": true,
+      "thoiHan": "10 ngày làm việc",
+      "cu": "Điều 22 NĐ 101/2024 không nêu riêng",
+      "dan": [
+       {
+        "ma": "ldd2024",
+        "so": 133
+       },
+       {
+        "ma": "nd151-2025"
+       }
+      ]
+     }
+    ]
+   },
+   "buoc": [
+    {
+     "hoi": "1. Việc của tôi có phải đăng ký biến động không?",
+     "y": "Đăng ký biến động chỉ đặt ra khi thửa đất ĐÃ CÓ Giấy chứng nhận. Chưa có sổ thì đi theo đăng ký lần đầu (Điều 132). Xem bảng 16 trường hợp bên dưới để tìm đúng điểm của mình.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 133
+      },
+      {
+       "ma": "ldd2024",
+       "so": 132
+      }
+     ]
+    },
+    {
+     "hoi": "2. Có bị ép thời hạn 30 ngày không?",
+     "y": "CHỈ 7 điểm bị ép: a (chuyển nhượng, thừa kế, tặng cho, góp vốn, cho thuê, thế chấp), b (đổi tên), i (chia tách sáp nhập, thoả thuận hộ gia đình), k (hoà giải thành, bản án, thi hành án), l (quyền với thửa liền kề), m (thay đổi hạn chế quyền), q (tài sản công). Tính từ NGÀY CÓ BIẾN ĐỘNG.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 133
+      }
+     ],
+     "nhanh": [
+      {
+       "neu": "Thừa kế",
+       "thi": "30 ngày tính từ ngày PHÂN CHIA XONG di sản, hoặc từ ngày bản án, quyết định của Toà có hiệu lực — không phải từ ngày người để lại di sản mất."
+      },
+      {
+       "neu": "Thi hành án, bán đấu giá",
+       "thi": "30 ngày tính từ ngày BÀN GIAO tài sản."
+      },
+      {
+       "neu": "Quá 30 ngày chưa đăng ký",
+       "thi": "Bị phạt tiền 2.000.000 – 3.000.000 đồng theo Điều 16 Nghị định 123/2024, và buộc phải đi đăng ký.",
+       "canh": true,
+       "dan": [
+        {
+         "ma": "nd123-2024",
+         "so": 16
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "hoi": "3. Xong thì nhận được gì?",
+     "y": "Được xác nhận thay đổi trên sổ đã cấp, hoặc cấp SỔ MỚI nếu người sử dụng đất có nhu cầu. Riêng trường hợp THẾ CHẤP (điểm p) thì chỉ được xác nhận trên sổ đã cấp, không cấp sổ mới.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 133
+      }
+     ]
+    },
+    {
+     "hoi": "4. Nộp hồ sơ theo mẫu nào?",
+     "y": "Các Mẫu số 01/ĐK → 14/ĐK của Nghị định 101/2024 ĐÃ BỊ BÃI BỎ từ 01/7/2025. Mẫu đang dùng nằm ở Phụ lục Nghị định 151/2025 — mở văn bản đó rồi bấm nút 📎 Phụ lục.",
+     "dan": [
+      {
+       "ma": "nd151-2025"
+      }
+     ],
+     "nhanh": [
+      {
+       "neu": "Đang cầm mẫu cũ",
+       "thi": "Nộp mẫu đã bị bãi bỏ là bị trả hồ sơ — lấy mẫu mới trước khi đi.",
+       "canh": true,
+       "dan": [
+        {
+         "ma": "nd151-2025"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "ketLuan": [
+    "Nhớ một câu: đã có sổ mà có thay đổi thì là BIẾN ĐỘNG; chưa có sổ thì là đăng ký LẦN ĐẦU.",
+    "Bảy điểm a, b, i, k, l, m, q bị ép 30 ngày — quá hạn phạt 2-3 triệu. Bảy chữ này nên thuộc lòng.",
+    "Thời hạn giải quyết từ 01/7/2025 đã RÚT NGẮN so với trước: đăng ký lần đầu 20 → 17 ngày, chuyển nhượng 10 → 08 ngày, công trình ngầm 15 → 10 ngày."
+   ],
+   "danKetLuan": [
+    {
+     "ma": "ldd2024",
+     "so": 133
+    },
+    {
+     "ma": "ldd2024",
+     "so": 132
+    },
+    {
+     "ma": "nd123-2024",
+     "so": 16
+    },
+    {
+     "ma": "nd151-2025"
+    }
+   ]
+  },
+  {
    "ma": "gia-dat",
    "icon": "🏷️",
    "ten": "Tính tiền: dùng bảng giá đất hay giá đất cụ thể?",

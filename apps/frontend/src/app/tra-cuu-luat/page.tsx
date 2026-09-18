@@ -43,11 +43,22 @@ type SoDo = { canhBao: string; nhanh: NhanhSoDo[] };
 //   1. "Điều 5 của Nghị định số 88/2024/NĐ-CP"  -> nhảy tới đúng điều của đúng văn bản
 //   2. "Điều 137 của Luật này" / "Nghị định này" -> nhảy trong chính văn bản đang xem
 //   3. "88/2024/NĐ-CP" đứng một mình              -> mở văn bản đó
+//   4. "Điều 96 của Luật Đất đai" — GỌI TÊN, KHÔNG ghi số hiệu. Đây mới là dạng hay gặp
+//      nhất trong nghị định (đã đo 762 chỗ); thiếu nó là mất gần 2/3 mối nối về luật gốc.
 const RE_DAN = new RegExp(
   'Điều\\s+(\\d{1,3})\\s+(?:của\\s+)?(?:Luật|Nghị định|Thông tư)\\s+(?:số\\s+)?(\\d{1,4}/\\d{4}/[A-ZĐ][A-ZĐ0-9-]*)'
   + '|Điều\\s+(\\d{1,3})(?:\\s+của)?\\s+(?:Luật|Nghị định|Thông tư)\\s+này'
-  + '|(\\d{1,4}/\\d{4}/[A-ZĐ][A-ZĐ0-9-]*)',
+  + '|(\\d{1,4}/\\d{4}/[A-ZĐ][A-ZĐ0-9-]*)'
+  + '|Điều\\s+(\\d{1,3})\\s+(?:của\\s+)?Luật Đất đai(?:\\s+năm\\s+(\\d{4}))?(?!\\s*(?:số|\\d))',
   'g');
+
+// "Luật Đất đai" không ghi số hiệu thì là luật của ĐỜI ĐÓ. Mốc lấy theo NGÀY BAN HÀNH của
+// từng đạo luật, không lấy ngày hiệu lực: nghị định hướng dẫn Luật 2024 đều ký tháng 6-7/2024,
+// tức là trước ngày luật có hiệu lực 01/8/2024.
+const DOI_LUAT: [string, string][] = [['2024-01-18', 'ldd2024'], ['2013-11-29', 'ldd2013'],
+  ['2003-11-26', 'ldd2003'], ['1993-07-14', 'ldd1993'], ['0000-00-00', 'ldd1987']];
+const luatDatDaiLucDo = (ngay: string, nam?: string) =>
+  (nam ? 'ldd' + nam : (DOI_LUAT.find(([moc]) => (ngay || '9999') >= moc) || DOI_LUAT[0])[1]);
 
 const MAU_NHANH: Record<string, string> = {
   slate: 'border-slate-300 bg-slate-50 text-slate-700',
@@ -321,6 +332,10 @@ export default function TraCuuLuatPage() {
       } else if (m[4]) {                        // số hiệu đứng một mình
         const d = docTheoSoHieu(m[4]);
         if (d && d.ma !== maVb) maDich = d.ma;
+      } else if (m[5]) {                        // "Điều N của Luật Đất đai" (không ghi số hiệu)
+        const md = luatDatDaiLucDo(vb?.ngay || '', m[6]);
+        const s = Number(m[5]);
+        if (md !== maVb && kho.some((x) => x.ma === md)) { maDich = md; soDich = s; }
       }
       if (maDich) {
         const md = maDich, sd2 = soDich;

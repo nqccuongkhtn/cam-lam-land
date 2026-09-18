@@ -645,6 +645,13 @@ chạy `docker volume prune`: volume chứa database, lúc container đang tắt
 - **Bật/tắt trang bảo trì** (chỉ ảnh hưởng tên miền thật, `localhost` vẫn vào được):
   `docker exec camlam_nginx touch /etc/nginx/maintenance.on` · tắt: `rm -f` đường dẫn đó.
   Nút trên bảng điều khiển làm sẵn 2 lệnh này.
+- **⚠️ Đừng dùng `grep` chữ tiếng Việt để kiểm tra code đã lên web chưa.** Gói JS sau khi nén lưu chữ
+  **nửa nguyên nửa mã hoá**: `"\uD83D\uDCD6 Đọc bên cạnh \xb7 "` — biểu tượng và vài chữ như `ê`, `·`, `à`
+  bị đổi thành mã `\uXXXX`, các chữ khác giữ nguyên. Tìm bằng chữ thường ra **0** dù code có thật
+  → tưởng chưa build, dựng lại web mấy lần vô ích (mỗi lần ăn vài GB ổ C, đã từng làm sập web vì hết chỗ).
+  **Cách đúng:** tìm bằng phần ASCII chắc chắn không đổi — tên biến/hàm (`docBen`, `moDieuHopLy`),
+  hoặc mã escape của biểu tượng. Chắc nhất là mở trình duyệt bấm thử.
+  (Cùng gốc với bẫy NFD ở phần đọc Excel của Sở: chữ Việt có nhiều cách lưu khác nhau.)
 - **Vector quy hoạch lệch so với ảnh nền** → dựng lại từ file CAD gốc theo `scripts/qh-pipeline/README.md`,
   **đừng chỉnh tay GeoJSON**.
 - **Bị chặn 429 khi đo tải** → tạm đặt `RATE_LIMIT_GLOBAL` rất cao trong `.env`, đo xong nhớ gỡ.

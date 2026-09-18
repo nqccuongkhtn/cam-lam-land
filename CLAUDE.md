@@ -615,6 +615,14 @@ Sáu bước: dừng web cho PostgreSQL đóng sạch → tắt Docker Desktop �
 (`Optimize-VHD`, không có thì `diskpart compact vdisk`) → bật lại Docker → bật lại web + khởi động lại nginx. **Không xoá gì bên trong** — database, ảnh máy, dữ liệu
 địa chính nguyên vẹn. Lần chạy thật: **38,46 GB → lấy lại ~21,6 GB cho ổ C**, mất khoảng 5–10 phút.
 
+**ĐÃ ĐẶT LỊCH TỰ ĐỘNG: 2h sáng mỗi ngày.** Công việc Windows tên
+`CamLamLand - Nen kho Docker 2h sang` gọi `NEN-KHO-DOCKER.ps1 -TuDong` (chạy ẩn, quyền quản trị,
+máy đang ngủ thì tự đánh thức). Nhật ký ghi ra `logs
+en-kho-docker.log`.
+Đặt lại / xem lại bằng cách nháy đúp `DAT-LICH-NEN-KHO.bat`. Bỏ lịch:
+`Unregister-ScheduledTask -TaskName 'CamLamLand - Nen kho Docker 2h sang' -Confirm:$false`.
+Chạy tự động có thêm **bước [0/6] `docker builder prune -af`** — đây mới là thứ làm kho phình ra.
+
 Trước khi nén nhớ `docker compose ... stop` cho PostgreSQL đóng sạch (exit 0). Dọn thêm:
 `docker builder prune -af` (đệm build) và `docker image prune -a` (ảnh không dùng) — **TUYỆT ĐỐI KHÔNG**
 chạy `docker volume prune`: volume chứa database, lúc container đang tắt nó hiện là "không dùng".

@@ -617,8 +617,7 @@ Sáu bước: dừng web cho PostgreSQL đóng sạch → tắt Docker Desktop �
 
 **ĐÃ ĐẶT LỊCH TỰ ĐỘNG: 2h sáng mỗi ngày.** Công việc Windows tên
 `CamLamLand - Nen kho Docker 2h sang` gọi `NEN-KHO-DOCKER.ps1 -TuDong` (chạy ẩn, quyền quản trị,
-máy đang ngủ thì tự đánh thức). Nhật ký ghi ra `logs
-en-kho-docker.log`.
+máy đang ngủ thì tự đánh thức). Nhật ký ghi ra `logs/nen-kho-docker.log`.
 Đặt lại / xem lại bằng cách nháy đúp `DAT-LICH-NEN-KHO.bat`. Bỏ lịch:
 `Unregister-ScheduledTask -TaskName 'CamLamLand - Nen kho Docker 2h sang' -Confirm:$false`.
 Chạy tự động có thêm **bước [0/6] `docker builder prune -af`** — đây mới là thứ làm kho phình ra.

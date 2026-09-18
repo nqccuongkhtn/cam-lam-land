@@ -169,6 +169,10 @@ export default function TraCuuLuatPage() {
   const [kieuSoDo, setKieuSoDo] = useState<'danhsach' | 'khungve'>('danhsach');
   const [phongTo, setPhongTo] = useState(1);
   const [timSoDo, setTimSoDo] = useState('');
+  // Khung vẽ: kéo thả để di chuyển, và "tiêu điểm" = chỉ xem riêng một nhánh.
+  const [dich, setDich] = useState({ x: 0, y: 0 });
+  const [tieuDiem, setTieuDiem] = useState<number | null>(null);
+  const keo = useRef<{ x: number; y: number } | null>(null);
   const [boThe, setBoThe] = useState<Record<string, { de: number; khoang: number; lan: number; ngayOn: string }>>({});
   const [chuoi, setChuoi] = useState(0);   // chuỗi ngày học liên tiếp
   const [theSo, setTheSo] = useState(0);
@@ -869,6 +873,12 @@ export default function TraCuuLuatPage() {
                     <span className="text-[11.5px] font-semibold text-slate-400">{Math.round(phongTo * 100)}%</span>
                     <button onClick={() => setPhongTo((z) => Math.min(1.4, +(z + 0.1).toFixed(2)))}
                       className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-bold text-slate-600">+</button>
+                    <button onClick={() => { setPhongTo(0.6); setDich({ x: 0, y: 0 }); setTieuDiem(null); }}
+                      title="Thu nhỏ để thấy toàn bộ sơ đồ"
+                      className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-600">⤢ Vừa màn hình</button>
+                    <button onClick={() => { setDich({ x: 0, y: 0 }); setPhongTo(1); }}
+                      title="Đưa gốc về giữa"
+                      className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-600">⊙ Về giữa</button>
                     <input value={timSoDo} onChange={(e) => setTimSoDo(e.target.value)}
                       placeholder="Tìm trong sơ đồ…"
                       className="ml-1 min-w-[140px] flex-1 rounded-full border border-slate-200 px-3 py-1 text-[12px] outline-none focus:border-[#0A2540]" />
@@ -877,94 +887,155 @@ export default function TraCuuLuatPage() {
                 )}
               </div>
 
-              {/* ── KHUNG VẼ kiểu Notion: nút bo tròn, đường cong nối, bung/thu từng nhánh ──
-                  Vị trí tính bằng tay: gốc ở giữa bên trái, nhánh toả sang phải, con của nhánh
-                  toả tiếp. Nhánh nào đang thu thì không chiếm chỗ. */}
+              {/* ── KHUNG VẼ SƠ ĐỒ TƯ DUY ──
+                  Toả HAI BÊN quanh gốc như sơ đồ tư duy thật, không dồn hết sang phải
+                  (dồn một bên thì cao gấp đôi, điện thoại phải cuộn mãi).
+                  Ô cao theo ĐỘ DÀI CHỮ nên không cắt cụt chữ nào.
+                  Kéo thả để di chuyển, có nút vừa màn hình, bấm nhánh để xem riêng nhánh đó. */}
               {kieuSoDo === 'khungve' && (() => {
-                // Ô cao hơn hẳn bản trước để chữ KHÔNG bị cắt cụt, và mỗi ô con hiện luôn
-                // các nút "Điều …" bấm được — trước đây chỉ bấm được vào dẫn chiếu đầu tiên.
-                const W0 = 190, W1 = 236, W2 = 300, H1 = 72, H2 = 96, KHE = 12, X1 = 262, X2 = 560;
                 const q = kd(timSoDo.trim());
                 const khop = (t: string) => !q || kd(t).includes(q);
-                let y = 0;
-                const nut: { x: number; y: number; w: number; h: number; cap: number; i: number; j?: number }[] = [];
-                const canh: { x1: number; y1: number; x2: number; y2: number; mau: string }[] = [];
-                const yNhanh: number[] = [];
-                sd.nhanh.forEach((n, i) => {
-                  const mo = !!moNhanh[i];
+                const W1 = 230, W2 = 300, KHE = 10, XC = 210, X1 = 250, X2 = 300;
+
+                // Ô cao theo số dòng chữ thật -> không cắt cụt
+                const caoNhanh = (n: NhanhSoDo) =>
+                  Math.max(58, 26 + Math.ceil(n.ten.length / 24) * 17 + (n.neo ? 16 : 0));
+                const caoCon = (c: NutSoDo) =>
+                  Math.max(62, 22 + Math.ceil(c.ten.length / 30) * 17 + Math.ceil(c.y.length / 40) * 15
+                    + (c.dan.length ? 20 : 0));
+
+                // Nhánh nào đang xem riêng thì chỉ vẽ mình nó
+                const ds = tieuDiem == null ? sd.nhanh.map((n, i) => ({ n, i }))
+                  : [{ n: sd.nhanh[tieuDiem], i: tieuDiem }];
+                // Chia đôi hai bên: nửa đầu sang phải, nửa sau sang trái
+                const nua = Math.ceil(ds.length / 2);
+                const ben: ('phai' | 'trai')[] = ds.map((_, k) => (k < nua ? 'phai' : 'trai'));
+
+                type O = { x: number; y: number; w: number; h: number; cap: 1 | 2; i: number; j?: number; ben: 'phai' | 'trai' };
+                const o: O[] = [];
+                const canh: { x1: number; y1: number; x2: number; y2: number; mau: string; day: number }[] = [];
+                const yN: Record<number, number> = {};
+                const cao: Record<'phai' | 'trai', number> = { phai: 0, trai: 0 };
+
+                ds.forEach(({ n, i }, k) => {
+                  const b = ben[k];
+                  const mo = tieuDiem != null || !!moNhanh[i];
                   const con = mo ? n.con : [];
-                  const yBatDau = y;
-                  con.forEach((_, j) => { nut.push({ x: X2, y, w: W2, h: H2, cap: 2, i, j }); y += H2 + KHE; });
-                  const yN = con.length ? (yBatDau + y - H2 - KHE + (H2 - H1)) / 2 : y;
-                  if (!con.length) y += H1 + KHE;
-                  yNhanh[i] = yN;
-                  nut.push({ x: X1, y: yN, w: W1, h: H1, cap: 1, i });
-                  con.forEach((_, j) => {
-                    const yc = yBatDau + j * (H2 + KHE);
-                    canh.push({ x1: X1 + W1, y1: yN + H1 / 2, x2: X2, y2: yc + H2 / 2, mau: n.mau });
+                  const hN = caoNhanh(n);
+                  const yBd = cao[b];
+                  let yy = yBd;
+                  const yCon: number[] = [];
+                  con.forEach((c) => { yCon.push(yy); yy += caoCon(c) + KHE; });
+                  const yNhanh = con.length ? (yBd + yy - KHE) / 2 - hN / 2 : yBd;
+                  if (!con.length) yy = yBd + hN + KHE;
+                  yN[i] = yNhanh;
+                  const xN = b === 'phai' ? XC + X1 : XC - X1 - W1;
+                  o.push({ x: xN, y: yNhanh, w: W1, h: hN, cap: 1, i, ben: b });
+                  con.forEach((c, j) => {
+                    const xCon = b === 'phai' ? xN + W1 + 60 : xN - 60 - W2;
+                    o.push({ x: xCon, y: yCon[j], w: W2, h: caoCon(c), cap: 2, i, j, ben: b });
+                    canh.push({
+                      x1: b === 'phai' ? xN + W1 : xN, y1: yNhanh + hN / 2,
+                      x2: b === 'phai' ? xCon : xCon + W2, y2: yCon[j] + caoCon(c) / 2,
+                      mau: n.mau, day: 1.6,
+                    });
                   });
-                  y += KHE * 1.6;
+                  cao[b] = yy + KHE;
                 });
-                const H = H1;
-                const yGoc = yNhanh.length ? (yNhanh[0] + yNhanh[yNhanh.length - 1]) / 2 : 0;
-                sd.nhanh.forEach((n, i) => canh.push({ x1: W0, y1: yGoc + H / 2, x2: X1, y2: yNhanh[i] + H / 2, mau: n.mau }));
-                const cao = Math.max(y, yGoc + H) + 20;
-                const rong = X2 + W2 + 20;
+
+                const yGoc = Math.max(cao.phai, cao.trai) / 2 - 34;
+                ds.forEach(({ n, i }, k) => {
+                  const b = ben[k];
+                  canh.push({
+                    x1: b === 'phai' ? XC + 92 : XC - 92, y1: yGoc + 34,
+                    x2: b === 'phai' ? XC + X1 : XC - X1, y2: yN[i] + caoNhanh(n) / 2,
+                    mau: n.mau, day: 3,
+                  });
+                });
+
+                const rongThat = (X1 + W1 + 60 + W2) * 2 + 40;
+                const caoThat = Math.max(cao.phai, cao.trai, yGoc + 90) + 30;
+                const lech = rongThat / 2 - XC;   // dịch để gốc nằm giữa khung
+
                 const cong = (c: { x1: number; y1: number; x2: number; y2: number }) =>
                   `M ${c.x1} ${c.y1} C ${(c.x1 + c.x2) / 2} ${c.y1}, ${(c.x1 + c.x2) / 2} ${c.y2}, ${c.x2} ${c.y2}`;
                 const viMau: Record<string, string> = { slate: '#94a3b8', emerald: '#34d399', amber: '#fbbf24', sky: '#38bdf8', violet: '#a78bfa', rose: '#fb7185', orange: '#fb923c', teal: '#2dd4bf' };
+
                 return (
-                  <div className="mt-3 overflow-auto rounded-2xl border border-slate-200 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:18px_18px]">
-                    <div style={{ width: rong * phongTo, height: cao * phongTo }}>
-                      <div style={{ width: rong, height: cao, transform: `scale(${phongTo})`, transformOrigin: 'top left', position: 'relative' }}>
-                        <svg width={rong} height={cao} className="pointer-events-none absolute inset-0">
-                          {canh.map((c, k2) => <path key={k2} d={cong(c)} fill="none" stroke={viMau[c.mau] || '#94a3b8'} strokeWidth={2} />)}
-                        </svg>
-                        <div className="absolute flex items-center rounded-2xl border-2 border-[#0A2540] bg-[#0A2540] px-3 text-white"
-                          style={{ left: 0, top: yGoc, width: W0, height: H }}>
-                          <span className="text-[13.5px] font-extrabold leading-tight">⚖️ Luật Đất đai 2024</span>
-                        </div>
-                        {nut.map((o, k2) => {
-                          const n = sd.nhanh[o.i];
-                          const mau = MAU_NHANH[n.mau] || MAU_NHANH.slate;
-                          if (o.cap === 1) {
-                            const sang = khop(n.ten + ' ' + n.y + ' ' + (n.neo || '')) ||
-                              n.con.some((c) => khop(c.ten + ' ' + c.y));
-                            return (
-                              <button key={k2} onClick={() => setMoNhanh((m) => ({ ...m, [o.i]: !m[o.i] }))}
-                                className={`absolute flex flex-col justify-center rounded-2xl border-2 px-2.5 text-left transition ${mau} ${sang ? '' : 'opacity-25'}`}
-                                style={{ left: o.x, top: o.y, width: o.w, height: o.h }}>
-                                <span className="text-[13px] font-extrabold leading-tight">{n.icon} {n.ten}</span>
-                                {n.neo && <span className="mt-0.5 inline-block w-fit rounded-full bg-white/80 px-1.5 text-[10.5px] font-bold text-slate-700">🔑 {n.neo}</span>}
-                                <span className="mt-0.5 text-[10.5px] leading-tight opacity-70">{moNhanh[o.i] ? 'thu lại ▴' : `${n.con.length} ý ▾`}</span>
-                              </button>
-                            );
-                          }
-                          const c = n.con[o.j!];
-                          const sang = khop(c.ten + ' ' + c.y);
+                  <div className="relative mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:18px_18px]"
+                    style={{ height: 'min(72vh, 620px)', touchAction: 'none', cursor: keo.current ? 'grabbing' : 'grab' }}
+                    onPointerDown={(e) => { keo.current = { x: e.clientX - dich.x, y: e.clientY - dich.y }; (e.target as HTMLElement).setPointerCapture?.(e.pointerId); }}
+                    onPointerMove={(e) => { if (keo.current) setDich({ x: e.clientX - keo.current.x, y: e.clientY - keo.current.y }); }}
+                    onPointerUp={() => { keo.current = null; }}
+                    onPointerLeave={() => { keo.current = null; }}>
+                    <div style={{ transform: `translate(${dich.x}px, ${dich.y}px) scale(${phongTo})`, transformOrigin: 'top left', width: rongThat, height: caoThat, position: 'relative' }}>
+                      <svg width={rongThat} height={caoThat} className="pointer-events-none absolute inset-0">
+                        {canh.map((c, k2) => (
+                          <path key={k2} d={cong({ x1: c.x1 + lech, y1: c.y1, x2: c.x2 + lech, y2: c.y2 })}
+                            fill="none" stroke={viMau[c.mau] || '#94a3b8'} strokeWidth={c.day} strokeLinecap="round" opacity={0.85} />
+                        ))}
+                      </svg>
+
+                      {/* GỐC */}
+                      <button onClick={() => setTieuDiem(null)}
+                        className="absolute flex flex-col items-center justify-center rounded-2xl border-2 border-[#0A2540] bg-[#0A2540] px-3 text-white shadow-lg"
+                        style={{ left: XC + lech - 92, top: yGoc, width: 184, height: 68 }}>
+                        <span className="text-[13.5px] font-extrabold leading-tight">⚖️ Luật Đất đai 2024</span>
+                        <span className="text-[10.5px] opacity-70">{tieuDiem != null ? 'bấm để xem lại cả sơ đồ' : `${sd.nhanh.length} nhánh`}</span>
+                      </button>
+
+                      {o.map((z, k2) => {
+                        const n = sd.nhanh[z.i];
+                        const mau = MAU_NHANH[n.mau] || MAU_NHANH.slate;
+                        if (z.cap === 1) {
+                          const sang = khop(n.ten + ' ' + n.y + ' ' + (n.neo || '')) || n.con.some((c) => khop(c.ten + ' ' + c.y));
                           return (
-                            <div key={k2}
-                              className={`absolute flex flex-col justify-center rounded-xl border-2 bg-white px-2.5 py-1.5 transition ${sang ? 'border-slate-200' : 'border-slate-100 opacity-25'}`}
-                              style={{ left: o.x, top: o.y, width: o.w, height: o.h }}>
-                              <p className="text-[12.5px] font-bold leading-tight text-[#0A2540]">{c.ten}</p>
-                              <p className="mt-0.5 line-clamp-2 text-[11px] leading-tight text-slate-500">{c.y}</p>
-                              <div className="mt-1 flex flex-wrap gap-1 overflow-hidden">
-                                {c.dan.slice(0, 4).map((d, i2) => {
-                                  const v2 = kho.find((z) => z.ma === d.ma);
-                                  return (
-                                    <button key={i2} onClick={() => { if (d.so) moDieu(d.ma, d.so); else { doiVanBan(d.ma); setThe('luat'); } }}
-                                      title={v2 ? v2.ten : d.ma}
-                                      className="rounded border border-slate-200 bg-slate-50 px-1 text-[10.5px] font-semibold text-slate-600 hover:border-[#0A2540] hover:text-[#0A2540]">
-                                      {d.so ? `Điều ${d.so}` : '📄'} {v2 ? nhanNgan(v2.ma, v2.soHieu).replace('Luật Đất đai ', 'LĐĐ ') : ''}
-                                    </button>
-                                  );
-                                })}
+                            <div key={k2} className={`absolute rounded-2xl border-2 px-2.5 py-1.5 shadow-sm transition ${mau} ${sang ? '' : 'opacity-20'}`}
+                              style={{ left: z.x + lech, top: z.y, width: z.w, minHeight: z.h }}>
+                              <button onClick={() => setMoNhanh((m) => ({ ...m, [z.i]: !m[z.i] }))} className="block w-full text-left">
+                                <span className="block text-[13px] font-extrabold leading-tight">{n.icon} {n.ten}</span>
+                                {n.neo && <span className="mt-0.5 inline-block rounded-full bg-white/80 px-1.5 text-[10.5px] font-bold text-slate-700">🔑 {n.neo}</span>}
+                              </button>
+                              <div className="mt-1 flex items-center gap-1.5 text-[10.5px] opacity-80">
+                                <button onClick={() => setMoNhanh((m) => ({ ...m, [z.i]: !m[z.i] }))} className="font-semibold">
+                                  {(tieuDiem != null || moNhanh[z.i]) ? '▴ thu' : `▾ ${n.con.length} ý`}
+                                </button>
+                                <span>·</span>
+                                <button onClick={() => { setTieuDiem(tieuDiem === z.i ? null : z.i); setDich({ x: 0, y: 0 }); }}
+                                  className="font-semibold underline decoration-dotted">
+                                  {tieuDiem === z.i ? 'xem cả sơ đồ' : 'chỉ xem nhánh này'}
+                                </button>
                               </div>
                             </div>
                           );
-                        })}
-                      </div>
+                        }
+                        const c = n.con[z.j!];
+                        const sang = khop(c.ten + ' ' + c.y);
+                        return (
+                          <div key={k2} className={`absolute rounded-xl border-2 bg-white px-2.5 py-1.5 shadow-sm transition ${sang ? 'border-slate-200' : 'border-slate-100 opacity-20'}`}
+                            style={{ left: z.x + lech, top: z.y, width: z.w, minHeight: z.h }}>
+                            <p className="text-[12.5px] font-bold leading-tight text-[#0A2540]">{c.ten}</p>
+                            <p className="mt-0.5 text-[11px] leading-tight text-slate-500">{c.y}</p>
+                            <div className="mt-1 flex flex-wrap gap-1">
+                              {c.dan.map((d, i2) => {
+                                const v2 = kho.find((z2) => z2.ma === d.ma);
+                                return (
+                                  <button key={i2} onClick={() => { if (d.so) moDieu(d.ma, d.so); else { doiVanBan(d.ma); setThe('luat'); } }}
+                                    title={v2 ? v2.ten : d.ma}
+                                    className="rounded border border-slate-200 bg-slate-50 px-1 text-[10.5px] font-semibold text-slate-600 hover:border-[#0A2540] hover:text-[#0A2540]">
+                                    {d.so ? `Điều ${d.so}` : '📄'} {v2 ? nhanNgan(v2.ma, v2.soHieu).replace('Luật Đất đai ', 'LĐĐ ') : ''}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
+
+                    <p className="pointer-events-none absolute bottom-1.5 left-2 rounded-full bg-white/80 px-2 py-0.5 text-[10.5px] text-slate-500">
+                      Kéo để di chuyển · bấm nhánh để bung/thu
+                    </p>
                   </div>
                 );
               })()}

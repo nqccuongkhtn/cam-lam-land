@@ -2,6 +2,14 @@
 # (mỗi image tự npm install / next build), nên loại khỏi context để build NHANH & nhẹ hơn.
 # GIỮ LẠI: packages/shared, apps/*, db/init, data/cam-lam (đều được COPY).
 
+# ⚠️ BỘ TILE BẢN ĐỒ (1,8 GB) — KHÔNG nướng vào ảnh Docker.
+# Trước đây COPY cả thư mục public vào ảnh, nên SỬA MỘT DÒNG MÃ là Docker chép lại
+# nguyên 1,9 GB thành lớp mới. Mỗi lần dựng ăn ~5 GB ổ C mà kho Docker chỉ phình ra
+# chứ không tự co — đã hai lần làm ổ C cạn kiệt và web sập.
+# Nay gắn thẳng thư mục này vào container bằng volume (xem docker-compose.yml),
+# nội dung phục vụ y hệt mà ảnh nhẹ đi 1,8 GB.
+apps/frontend/public/tiles
+
 # Nặng nhất & luôn an toàn khi loại
 **/node_modules
 **/.next

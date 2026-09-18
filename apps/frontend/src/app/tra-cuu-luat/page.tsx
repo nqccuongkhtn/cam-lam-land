@@ -199,6 +199,8 @@ export default function TraCuuLuatPage() {
   const [datLat, setDatLat] = useState(false);
   const [th, setTh] = useState<KhoTinhHuong | null>(null);
   const [tn, setTn] = useState<KhoTuNgu | null>(null);
+  // 544 thẻ SINH TỰ ĐỘNG từ chính kho luật (dung-the-tu-dong.py) — xem lời giải thích ở đó.
+  const [theTd, setTheTd] = useState<{ the: TheHoc[] } | null>(null);
   // XEM NHANH: bấm vào một dẫn chiếu thì hiện thẻ ngay tại chỗ, KHÔNG nhảy đi mất — đang
   // đọc dở một điều mà bị cuốn sang điều khác là mất mạch. Muốn đọc kỹ thì bấm "Mở hẳn".
   const [xemNhanh, setXemNhanh] = useState<{ ma: string; so: number; x: number; y: number } | null>(null);
@@ -263,6 +265,7 @@ export default function TraCuuLuatPage() {
     fetch('/luat/tinh-huong.json').then((r) => r.json()).then((d: KhoTinhHuong) => setTh(d)).catch(() => {});
     fetch('/luat/the-so.json').then((r) => r.json()).then((d: KhoTheSo) => setTheSo2(d)).catch(() => {});
     fetch('/luat/tu-ngu.json').then((r) => r.json()).then(setTn).catch(() => {});
+    fetch('/luat/the-tu-dong.json').then((r) => r.json()).then(setTheTd).catch(() => {});
   }, [duocXem]);
 
   useEffect(() => {
@@ -365,25 +368,47 @@ export default function TraCuuLuatPage() {
         dan: [{ ma: t.ma, so: t.dieu }],
       });
     }
-    // 5. Thẻ con số soạn tay.
+    // 5. THẺ SINH TỰ ĐỘNG TỪ KHO LUẬT — 544 thẻ, phủ rộng chứ không chỉ 19% như trước:
+    //    "quy định này nằm ở điều nào" · "điều này còn dùng được không" · "bị sửa thế nào"
+    //    · "văn bản này là gì". Hỏi và đáp đều là chữ của luật, không tự diễn giải.
+    for (const t of (theTd?.the || [])) ra.push(t);
+    // 6. Thẻ con số soạn tay.
     for (const [i, t] of (theSo2?.the || []).entries()) {
       ra.push({ khoa: 'so:' + i, loai: 'Con số', chuDe: t.chuDe, hoi: t.hoi, dap: t.dap, nho: t.nho, dan: t.dan });
     }
     return ra;
-  }, [gt, th, theSo2, tn, cacVb, kho]);
+  }, [gt, th, theSo2, tn, theTd, cacVb, kho]);
 
   const chuDeCo = useMemo(() => [...new Set(dsThe.map((t) => t.chuDe))].sort(), [dsThe]);
   const theTheoChuDe = useMemo(
     () => (chuDeHoc ? dsThe.filter((t) => t.chuDe === chuDeHoc) : dsThe), [dsThe, chuDeHoc]);
 
-  // Thẻ tới hạn ôn hôm nay. TRỘN NGẪU NHIÊN (nhưng cố định theo ngày) — học xen kẽ chủ đề
-  // nhớ lâu hơn học dồn một chủ đề, đây là kỹ thuật "interleaving".
+  // ── CHỌN THẺ CHO HÔM NAY ──
+  // Bộ thẻ có hơn 700 cái. Nếu ngày đầu đổ hết ra thì học hai hôm là bỏ, mà đó đúng là
+  // cách hỏng việc thường gặp nhất khi học kiểu thẻ lật. Nên:
+  //   • Thẻ ĐẾN HẠN ÔN thì cho ra HẾT — đây là thứ sắp quên, bỏ qua là mất công học lại.
+  //   • Thẻ MỚI thì mỗi ngày chỉ nhận thêm một số nhất định (Anki để mặc định 20).
+  // Nhờ vậy lượng học mỗi ngày đều tay, và số thẻ đến hạn cũng không dồn cục về sau.
+  const [theMoiMoiNgay, setTheMoiMoiNgay] = useState(20);
   const theHomNay = useMemo(() => {
-    const ds = theTheoChuDe.filter((t) => !boThe[t.khoa] || (boThe[t.khoa] as any).ngayOn <= homNay());
-    const hat = homNay().split('-').join('');
-    return ds.map((t, i) => ({ t, r: (Number(hat) + i * 2654435761) % 1000003 }))
+    const hn = homNay();
+    const daBatDauHomNay = Object.values(boThe).filter((c: any) => c?.batDau === hn).length;
+    const denHan = theTheoChuDe.filter((t) => boThe[t.khoa] && (boThe[t.khoa] as any).ngayOn <= hn);
+    const conNhan = Math.max(0, theMoiMoiNgay - daBatDauHomNay);
+    const moi = theTheoChuDe.filter((t) => !boThe[t.khoa]).slice(0, conNhan);
+    // TRỘN XEN KẼ chủ đề (kỹ thuật "interleaving"): học xen kẽ nhớ lâu hơn học dồn một
+    // chủ đề. Trộn cố định theo ngày để trong ngày thứ tự không nhảy lung tung.
+    const hat = Number(hn.split('-').join(''));
+    return [...denHan, ...moi]
+      .map((t, i2) => ({ t, r: (hat + i2 * 2654435761) % 1000003 }))
       .sort((a, b) => a.r - b.r).map((x) => x.t);
-  }, [theTheoChuDe, boThe]);
+  }, [theTheoChuDe, boThe, theMoiMoiNgay]);
+  // Số thẻ mới còn nhận được hôm nay — hiện lên cho biết còn bao nhiêu là xong phần mới.
+  const theMoiConLai = useMemo(() => {
+    const hn = homNay();
+    const da = Object.values(boThe).filter((c: any) => c?.batDau === hn).length;
+    return Math.max(0, theMoiMoiNgay - da);
+  }, [boThe, theMoiMoiNgay]);
 
   // Coi là THUỘC khi độ bền đã trên 21 ngày — tức là nghỉ 3 tuần vẫn còn nhớ 90%.
   const daThuoc = useMemo(
@@ -445,10 +470,12 @@ export default function TraCuuLuatPage() {
     setBoThe((m) => {
       const c: any = m[khoa];
       const k = tinhThe(c, g);
+      // Lần đầu đụng tới thẻ này là hôm nào — dùng để đếm hạn mức thẻ mới trong ngày.
+      const batDau = c?.batDau || homNay();
       // Bấm "quên" thì cho quay lại NGAY trong buổi học, không đợi hôm sau — nhớ lại được
       // trong cùng buổi mới là học lại, để tới mai là mất công học từ đầu.
       const ngayOn = g === 1 ? homNay() : congNgay(soNgay(k.S));
-      const moi = { ...m, [khoa]: { ...k, ngayOn, mocOn: Date.now() } as any };
+      const moi = { ...m, [khoa]: { ...k, ngayOn, batDau, mocOn: Date.now() } as any };
       try { localStorage.setItem('luat-the-hoc', JSON.stringify(moi)); } catch { /* */ }
       return moi;
     });
@@ -878,6 +905,15 @@ export default function TraCuuLuatPage() {
                   ))}
                 </select>
                 <span className="font-bold text-sky-700">Hôm nay {theHomNay.length}</span>
+                <span className="text-slate-300">·</span>
+                <label className="flex items-center gap-1 text-slate-500" title="Mỗi ngày nhận thêm bao nhiêu thẻ CHƯA HỌC BAO GIỜ. Thẻ đến hạn ôn thì luôn ra hết.">
+                  Thẻ mới/ngày
+                  <select value={theMoiMoiNgay} onChange={(e) => setTheMoiMoiNgay(Number(e.target.value))}
+                    className="rounded border border-slate-200 bg-white px-1 py-0.5 text-[11.5px] font-bold text-[#0A2540] outline-none">
+                    {[5, 10, 20, 30, 50].map((n) => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                  <span className="text-[11px]">(còn {theMoiConLai})</span>
+                </label>
                 <span className="text-slate-300">·</span>
                 <span className="font-bold text-emerald-700">Thuộc {daThuoc}/{theTheoChuDe.length}</span>
                 {theKho > 0 && <><span className="text-slate-300">·</span>

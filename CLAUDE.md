@@ -609,6 +609,23 @@ trong khi dữ liệu thật bên trong chỉ ~6 GB → ổ C còn 0,47 GB → *
 (lỗi WSL bootstrap), toàn bộ web sập**, mà nhìn qua tên miền vẫn thấy trang chủ vì Cloudflare còn cache
 (chỉ `/api/*` trả 502).
 
+**⚠️ GỐC RỄ đã tìm ra (18/9/2026): bộ tile bản đồ 1,8 GB bị nướng vào ảnh Docker.**
+`Dockerfile.prod` làm `COPY apps/frontend ./` — chép cả `public/tiles`. Nên **sửa một dòng mã
+là Docker chép lại nguyên 1,9 GB thành lớp mới**, mỗi lần dựng ăn ~5 GB ổ C. Đo thật: ảnh
+frontend 3,83 GB, trong đó `/app/public` chiếm 1,9 GB mà riêng `tiles` đã 1,8 GB.
+→ Đã vá: `.dockerignore` loại `apps/frontend/public/tiles`, và `docker-compose.yml` gắn thẳng
+thư mục đó vào container bằng volume chỉ-đọc. Phục vụ y hệt (nginx vẫn chuyển `/tiles/` sang
+frontend), ảnh nhẹ đi 1,8 GB, mỗi lần dựng lại chỉ còn tốn vài trăm MB.
+**Thư mục `apps/frontend/public/tiles` phải có sẵn trên ổ đĩa** — không có thì bản đồ mất ảnh
+quy hoạch (volume sẽ gắn vào một thư mục rỗng).
+
+**Chế độ tự co của WSL (`sparseVhd`) KHÔNG dùng được.** WSL 2.7.8 trả lời thẳng:
+*"Sparse VHD support is currently disabled due to potential data corruption"*, muốn bật phải ép
+bằng `--allow-unsafe`. Kho này chứa database thật nên **không ép**.
+Cũng đã xét và loại: dời kho sang ổ F (3,6 TB trống) — F là **ổ cứng rời cắm USB, định dạng
+exFAT**, rút nhầm dây là hỏng database; dời sang ổ D — D chỉ còn 15 GB và nằm chung một SSD
+238 GB với ổ C nên không giải quyết được gì.
+
 **Khắc phục: bấm nút `Nen kho Docker (lay lai cho trong o C)`** trên bảng điều khiển `QUAN-LY-SERVER.vbs`
 (hoặc nháy đúp `NEN-KHO-DOCKER.bat`). Cả hai chạy chung `NEN-KHO-DOCKER.ps1`, tự xin quyền quản trị.
 Sáu bước: dừng web cho PostgreSQL đóng sạch → tắt Docker Desktop → tắt WSL → nén file kho

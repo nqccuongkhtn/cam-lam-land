@@ -136,6 +136,20 @@ services:
       NEXT_PUBLIC_MAP_CENTER_LNG: ${NEXT_PUBLIC_MAP_CENTER_LNG:-109.0917}
       NEXT_PUBLIC_MAP_CENTER_LAT: ${NEXT_PUBLIC_MAP_CENTER_LAT:-12.0771}
       NEXT_PUBLIC_MAP_ZOOM: ${NEXT_PUBLIC_MAP_ZOOM:-12}
+    volumes:
+      # ── BỘ TILE BẢN ĐỒ (1,8 GB) ──
+      # KHÔNG nướng vào ảnh Docker nữa (.dockerignore đã loại) vì mỗi lần sửa một dòng mã
+      # là Docker chép lại nguyên 1,9 GB thành lớp mới → ăn ~5 GB ổ C mỗi lần dựng.
+      #
+      # Dùng VOLUME CỦA DOCKER chứ KHÔNG gắn thẳng thư mục Windows vào đây.
+      # Lý do: trên Docker Desktop, thư mục Windows gắn vào container phải đi qua cầu nối
+      # Windows↔Linux, đọc file nhỏ rất chậm — mà tile chính là hàng nghìn file .png nhỏ.
+      # Volume của Docker nằm ngay trong kho (ext4) nên nhanh y như lúc nằm trong ảnh.
+      # Đo thật trước khi đổi: 5–7 mili-giây một ô tile. Đổi xong phải đo lại cho bằng.
+      #
+      # Nạp lại bộ tile vào volume (chỉ làm khi thay bộ tile mới):
+      #   docker run --rm -v camlam_tiles:/dest camlamgis-frontend:latest sh -c 'cp -a /app/public/tiles/. /dest/'
+      - camlam_tiles:/app/public/tiles:ro
     depends_on:
       - backend
     expose:
@@ -155,6 +169,9 @@ services:
       - backend
 
 volumes:
+  # Bộ tile bản đồ quy hoạch — xem lời giải thích ở service frontend.
+  camlam_tiles:
+
   pgdata:
   uploads:
   logs:

@@ -395,6 +395,60 @@
     {
      "ma": "nd88-2024"
     }
+   ],
+   "vuongMac": [
+    {
+     "gap": "Chưa họp dân, chưa niêm yết mà đã có quyết định thu hồi",
+     "go": "Sai trình tự Điều 87 và vi phạm nguyên tắc Điều 91 (duyệt phương án và bố trí tái định cư phải xong TRƯỚC khi có quyết định thu hồi). Đây là căn cứ khiếu nại.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 87
+      },
+      {
+       "ma": "ldd2024",
+       "so": 91
+      },
+      {
+       "ma": "ldd2024",
+       "so": 237
+      }
+     ]
+    },
+    {
+     "gap": "Quá 30 ngày kể từ khi phương án có hiệu lực mà chưa được trả tiền",
+     "go": "Ngoài tiền bồi thường, cơ quan chi trả còn phải trả thêm khoản do chậm chi trả.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 94
+      }
+     ]
+    },
+    {
+     "gap": "Không đồng ý mức bồi thường, không nhận tiền",
+     "go": "Tiền được gửi vào tài khoản ngân hàng của đơn vị làm bồi thường, không mất đi. Song song đó nộp đơn khiếu nại theo Điều 237 — nhớ khiếu nại KHÔNG làm dừng việc thu hồi.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 94
+      },
+      {
+       "ma": "ldd2024",
+       "so": 237
+      }
+     ]
+    },
+    {
+     "gap": "Tiền bồi thường không đủ mua một suất tái định cư tối thiểu",
+     "go": "Nhà nước phải hỗ trợ thêm cho đủ một suất tối thiểu — đây là quyền, không phải xin.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 111
+      }
+     ]
+    }
    ]
   },
   {
@@ -639,6 +693,119 @@
      "ma": "ldd2024",
      "so": 140
     }
+   ],
+   "hoSo": {
+    "nhan": "Hồ sơ cấp Giấy chứng nhận lần đầu (hộ gia đình, cá nhân)",
+    "gom": [
+     {
+      "ten": "Đơn đăng ký đất đai, tài sản gắn liền với đất",
+      "mau": "Mẫu số 04/ĐK",
+      "batBuoc": true
+     },
+     {
+      "ten": "Một trong các giấy tờ về quyền sử dụng đất theo Điều 137 Luật Đất đai; kèm sơ đồ nhà ở, công trình xây dựng (nếu có)",
+      "batBuoc": true,
+      "y": "Không có giấy tờ nào thì đi theo Điều 138 (dùng ổn định), Điều 139 (có lấn chiếm) hoặc Điều 140 (giao sai thẩm quyền)."
+     },
+     {
+      "ten": "Giấy tờ về việc nhận thừa kế quyền sử dụng đất",
+      "y": "Chỉ khi đất có nguồn gốc thừa kế mà chưa được cấp sổ."
+     },
+     {
+      "ten": "Giấy tờ về giao đất không đúng thẩm quyền, hoặc giấy tờ mua / nhận thanh lý / hoá giá / phân phối nhà ở gắn liền với đất",
+      "y": "Trường hợp theo Điều 140 Luật Đất đai."
+     },
+     {
+      "ten": "Giấy tờ liên quan đến xử phạt vi phạm hành chính về đất đai",
+      "y": "Chỉ khi thửa đất từng bị xử phạt."
+     },
+     {
+      "ten": "Văn bản xác định các thành viên có chung quyền sử dụng đất của hộ gia đình",
+      "y": "Bắt buộc khi người đang sử dụng đất là HỘ GIA ĐÌNH — làm kỹ chỗ này để sau khỏi tranh chấp."
+     },
+     {
+      "ten": "Văn bản thoả thuận hoặc quyết định của Toà án về quyền đối với thửa đất liền kề, kèm sơ đồ",
+      "y": "Chỉ khi thửa đất phải đi nhờ qua đất người khác."
+     },
+     {
+      "ten": "Mảnh trích đo bản đồ địa chính thửa đất",
+      "y": "Nếu có; nơi chưa có bản đồ địa chính thì phải trích đo."
+     },
+     {
+      "ten": "Hồ sơ thiết kế xây dựng đã thẩm định hoặc văn bản chấp thuận nghiệm thu",
+      "y": "Chỉ khi đăng ký luôn quyền sở hữu công trình trên đất."
+     }
+    ],
+    "noiNop": [
+     "Bộ phận Một cửa của tỉnh / huyện / xã",
+     "Văn phòng đăng ký đất đai hoặc Chi nhánh Văn phòng đăng ký đất đai",
+     "Gửi qua bưu chính",
+     "Cổng dịch vụ công Quốc gia hoặc Cổng dịch vụ công của tỉnh"
+    ],
+    "thoiHan": "Đăng ký đất đai lần đầu: không quá 20 NGÀY LÀM VIỆC · Cấp Giấy chứng nhận lần đầu: không quá 03 NGÀY LÀM VIỆC",
+    "ketQua": "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất",
+    "dan": [
+     {
+      "ma": "nd101-2024",
+      "so": 28
+     },
+     {
+      "ma": "nd101-2024",
+      "so": 31
+     },
+     {
+      "ma": "nd101-2024",
+      "so": 36
+     },
+     {
+      "ma": "nd101-2024",
+      "so": 21
+     },
+     {
+      "ma": "nd101-2024",
+      "so": 22
+     }
+    ]
+   },
+   "vuongMac": [
+    {
+     "gap": "Xã không chịu xác nhận “không tranh chấp”",
+     "go": "Đây là điều kiện bắt buộc của cả Điều 138, 139, 140. Đề nghị xã trả lời BẰNG VĂN BẢN nêu rõ lý do; nếu có tranh chấp thật thì phải đi hoà giải theo Điều 235 trước, xong mới quay lại làm sổ.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 138
+      },
+      {
+       "ma": "ldd2024",
+       "so": 235
+      }
+     ]
+    },
+    {
+     "gap": "Đất có nhà ở nhưng chỉ được công nhận một phần là đất ở",
+     "go": "Phần trong HẠN MỨC CÔNG NHẬN ĐẤT Ở mới là đất ở, phần còn lại theo hiện trạng. Nếu thửa hình thành trước 15/10/1993 mà nhỏ hơn hạn mức thì CẢ THỬA là đất ở — đối chiếu kỹ Điều 141.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 141
+      },
+      {
+       "ma": "ldd2024",
+       "so": 138
+      }
+     ]
+    },
+    {
+     "gap": "Sổ đã cấp trước 01/7/2004, nay thấy diện tích đất ở quá ít",
+     "go": "Được quyền xin XÁC ĐỊNH LẠI diện tích đất ở, khi có nhu cầu hoặc khi Nhà nước thu hồi đất. Nhiều người không biết quyền này.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 141
+      }
+     ]
+    }
    ]
   },
   {
@@ -772,6 +939,83 @@
      "ma": "ldd2024",
      "so": 141
     }
+   ],
+   "hoSo": {
+    "nhan": "Hồ sơ cấp đổi Giấy chứng nhận",
+    "gom": [
+     {
+      "ten": "Đơn đăng ký biến động đất đai, tài sản gắn liền với đất",
+      "mau": "Mẫu số 11/ĐK",
+      "batBuoc": true,
+      "y": "Trường hợp sổ ghi “hoộ gia đình” nay muốn ghi đủ tên thành viên thì phải ghi rõ thông tin các thành viên ngay trong đơn."
+     },
+     {
+      "ten": "Giấy chứng nhận đã cấp (bản gốc)",
+      "batBuoc": true
+     },
+     {
+      "ten": "Mảnh trích đo bản đồ địa chính thửa đất",
+      "y": "Chỉ với trường hợp phải trích đo lại (điểm i khoản 1 Điều 38)."
+     }
+    ],
+    "noiNop": [
+     "Bộ phận Một cửa của tỉnh / huyện / xã",
+     "Văn phòng đăng ký đất đai hoặc Chi nhánh Văn phòng đăng ký đất đai",
+     "Gửi qua bưu chính",
+     "Cổng dịch vụ công Quốc gia hoặc Cổng dịch vụ công của tỉnh"
+    ],
+    "thoiHan": "Cấp đổi thông thường: không quá 05 NGÀY LÀM VIỆC · Trường hợp phải trích đo lại: không quá 10 NGÀY LÀM VIỆC · Cấp đổi đồng loạt theo dự án đo đạc: theo tiến độ dự án đã duyệt",
+    "ketQua": "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất (mẫu mới)",
+    "dan": [
+     {
+      "ma": "nd101-2024",
+      "so": 38
+     },
+     {
+      "ma": "nd101-2024",
+      "so": 22
+     },
+     {
+      "ma": "nd101-2024",
+      "so": 24
+     }
+    ]
+   },
+   "vuongMac": [
+    {
+     "gap": "Đo lại thấy diện tích thực tế nhiều hơn trên sổ",
+     "go": "Không phải cứ đo ra bao nhiêu là được công nhận bấy nhiêu. Phải trả lời phần dôi ra có nguồn gốc gì rồi mới biết đi theo Điều 137, 138, 139 hay 140. Nhưng KHÔNG phải làm thêm thủ tục chuyển quyền, chuyển mục đích hay hợp thửa cho phần đó.",
+     "dan": [
+      {
+       "ma": "nd101-2024",
+       "so": 24
+      }
+     ]
+    },
+    {
+     "gap": "Bị yêu cầu làm thủ tục hợp thửa cho phần diện tích tăng thêm",
+     "go": "Nghị định 101/2024 khoản 3 Điều 24 nói rõ là KHÔNG phải làm. Trích thẳng điều khoản này ra.",
+     "dan": [
+      {
+       "ma": "nd101-2024",
+       "so": 24
+      }
+     ]
+    },
+    {
+     "gap": "Sổ ghi “hoộ ông/bà…”, nay các thành viên không thống nhất",
+     "go": "Làm thủ tục cấp đổi để ghi đủ tên các thành viên có chung quyền sử dụng đất — phải có văn bản xác định thành viên. Chưa thống nhất được thì đây là tranh chấp, đi theo Điều 235.",
+     "dan": [
+      {
+       "ma": "nd101-2024",
+       "so": 38
+      },
+      {
+       "ma": "ldd2024",
+       "so": 235
+      }
+     ]
+    }
    ]
   },
   {
@@ -846,6 +1090,91 @@
     {
      "ma": "ldd2024",
      "so": 220
+    }
+   ],
+   "hoSo": {
+    "nhan": "Hồ sơ xin chuyển mục đích sử dụng đất",
+    "gom": [
+     {
+      "ten": "Đơn xin chuyển mục đích sử dụng đất",
+      "batBuoc": true,
+      "y": "Theo mẫu của Nghị định 102/2024 — nộp kèm hồ sơ xin phép."
+     },
+     {
+      "ten": "Giấy chứng nhận đã cấp",
+      "batBuoc": true
+     },
+     {
+      "ten": "Trích lục hoặc trích đo bản đồ địa chính thửa đất",
+      "y": "Nếu chuyển mục đích một PHẦN thửa thì phải có bản vẽ phần xin chuyển."
+     }
+    ],
+    "noiNop": [
+     "Bộ phận Một cửa của tỉnh / huyện / xã",
+     "Văn phòng đăng ký đất đai hoặc Chi nhánh Văn phòng đăng ký đất đai",
+     "Gửi qua bưu chính",
+     "Cổng dịch vụ công Quốc gia hoặc Cổng dịch vụ công của tỉnh"
+    ],
+    "thoiHan": "Theo Nghị định 102/2024 và quy định của UBND tỉnh; phần đăng ký biến động sau khi có quyết định cho phép thì theo Nghị định 101/2024",
+    "ketQua": "Quyết định cho phép chuyển mục đích sử dụng đất, sau đó chỉnh lý / cấp lại Giấy chứng nhận",
+    "dan": [
+     {
+      "ma": "ldd2024",
+      "so": 121
+     },
+     {
+      "ma": "ldd2024",
+      "so": 116
+     },
+     {
+      "ma": "ldd2024",
+      "so": 123
+     },
+     {
+      "ma": "nd102-2024"
+     },
+     {
+      "ma": "nd103-2024"
+     }
+    ]
+   },
+   "vuongMac": [
+    {
+     "gap": "Thửa đất không có tên trong kế hoạch sử dụng đất hằng năm cấp huyện",
+     "go": "Chưa chuyển mục đích được. Phải chờ kỳ kế hoạch sau hoặc đề nghị bổ sung vào kế hoạch.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 116
+      }
+     ]
+    },
+    {
+     "gap": "Chỉ muốn chuyển một phần thửa",
+     "go": "Phải tách thửa trước, và phần tách ra phải bằng hoặc lớn hơn diện tích tối thiểu của LOẠI ĐẤT MỚI.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 220
+      },
+      {
+       "ma": "ldd2024",
+       "so": 121
+      }
+     ]
+    },
+    {
+     "gap": "Tiền sử dụng đất phải nộp cao hơn dự tính",
+     "go": "Hộ gia đình, cá nhân tính theo BẢNG GIÁ ĐẤT; bảng giá mới áp dụng từ 01/01/2026 và điều chỉnh HẰNG NĂM nên số tiền có thể đổi theo năm — nộp hồ sơ sớm trong năm giá còn thấp.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 159
+      },
+      {
+       "ma": "nd103-2024"
+      }
+     ]
     }
    ]
   },
@@ -922,6 +1251,85 @@
      "ma": "ldd2024",
      "so": 220
     }
+   ],
+   "hoSo": {
+    "nhan": "Hồ sơ tách thửa / hợp thửa",
+    "gom": [
+     {
+      "ten": "Đơn đề nghị tách thửa đất, hợp thửa đất",
+      "mau": "Mẫu số 01/ĐK",
+      "batBuoc": true
+     },
+     {
+      "ten": "Bản vẽ tách thửa, hợp thửa",
+      "mau": "Mẫu số 02/ĐK",
+      "batBuoc": true,
+      "y": "Do Văn phòng đăng ký đất đai / Chi nhánh làm, hoặc do đơn vị đo đạc CÓ GIẤY PHÉP hành nghề làm."
+     },
+     {
+      "ten": "Giấy chứng nhận đã cấp",
+      "batBuoc": true,
+      "y": "Nộp bản gốc, hoặc bản sao kèm bản gốc để đối chiếu, hoặc bản sao có công chứng, chứng thực."
+     },
+     {
+      "ten": "Văn bản của cơ quan có thẩm quyền thể hiện nội dung tách thửa, hợp thửa",
+      "y": "Nếu có (ví dụ bản án, quyết định chia tài sản)."
+     }
+    ],
+    "noiNop": [
+     "Bộ phận Một cửa của tỉnh / huyện / xã",
+     "Văn phòng đăng ký đất đai hoặc Chi nhánh Văn phòng đăng ký đất đai",
+     "Gửi qua bưu chính",
+     "Cổng dịch vụ công Quốc gia hoặc Cổng dịch vụ công của tỉnh"
+    ],
+    "thoiHan": "Không quá 15 NGÀY LÀM VIỆC. Trong đó: hồ sơ KHÔNG đủ điều kiện thì trả lại trong 03 ngày làm việc; hồ sơ đủ điều kiện thì xác nhận trong 05 ngày làm việc.",
+    "ketQua": "Bản vẽ được xác nhận; thông tin thửa mới chỉ chính thức sau khi ĐĂNG KÝ BIẾN ĐỘNG và được cấp Giấy chứng nhận",
+    "dan": [
+     {
+      "ma": "nd101-2024",
+      "so": 7
+     },
+     {
+      "ma": "ldd2024",
+      "so": 220
+     },
+     {
+      "ma": "nd101-2024",
+      "so": 22
+     }
+    ]
+   },
+   "vuongMac": [
+    {
+     "gap": "Thửa đủ diện tích nhưng phần tách ra không có đường đi",
+     "go": "Không tách được. Điều kiện “bảo đảm có lối đi, kết nối đường giao thông công cộng” là quy định MỚI của Luật 2024. Cách gỡ: thoả thuận lối đi qua thửa liền kề và lập văn bản để đăng ký quyền với thửa liền kề.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 220
+      }
+     ]
+    },
+    {
+     "gap": "Toà đã chia nhưng phần chia nhỏ hơn diện tích tối thiểu",
+     "go": "Không thực hiện tách thửa được. Thực tế phải thoả thuận quy đổi thành tiền hoặc để đồng sở hữu chung.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 220
+      }
+     ]
+    },
+    {
+     "gap": "Sổ cũ không có sơ đồ thửa hoặc thiếu kích thước cạnh",
+     "go": "Văn phòng đăng ký sẽ yêu cầu bổ sung bản vẽ; nên chủ động thuê đơn vị đo đạc CÓ GIẤY PHÉP lập bản vẽ theo Mẫu số 02/ĐK trước khi nộp cho nhanh.",
+     "dan": [
+      {
+       "ma": "nd101-2024",
+       "so": 7
+      }
+     ]
+    }
    ]
   },
   {
@@ -994,6 +1402,100 @@
     {
      "ma": "ldd2024",
      "so": 46
+    }
+   ],
+   "hoSo": {
+    "nhan": "Hồ sơ sang tên (chuyển nhượng, thừa kế, tặng cho)",
+    "gom": [
+     {
+      "ten": "Đơn đăng ký biến động đất đai, tài sản gắn liền với đất",
+      "mau": "Mẫu số 11/ĐK",
+      "batBuoc": true
+     },
+     {
+      "ten": "Bản GỐC Giấy chứng nhận đã cấp",
+      "batBuoc": true,
+      "y": "Thủ tục biến động có xác nhận thay đổi trên sổ thì bắt buộc nộp bản GỐC, không nhận bản sao."
+     },
+     {
+      "ten": "Hợp đồng chuyển nhượng / tặng cho / văn bản thừa kế đã công chứng hoặc chứng thực",
+      "batBuoc": true
+     },
+     {
+      "ten": "Giấy tờ chứng minh đã hoàn thành nghĩa vụ tài chính, hoặc giấy tờ miễn giảm (nếu có)",
+      "batBuoc": true,
+      "y": "Đang ghi nợ hoặc chậm nộp nghĩa vụ tài chính thì phải trả xong mới được chuyển nhượng (Điều 45)."
+     },
+     {
+      "ten": "Phương án sử dụng đất nông nghiệp được UBND cấp huyện chấp thuận",
+      "y": "Chỉ khi bên nhận là TỔ CHỨC KINH TẾ nhận chuyển nhượng đất nông nghiệp."
+     }
+    ],
+    "noiNop": [
+     "Bộ phận Một cửa của tỉnh / huyện / xã",
+     "Văn phòng đăng ký đất đai hoặc Chi nhánh Văn phòng đăng ký đất đai",
+     "Gửi qua bưu chính",
+     "Cổng dịch vụ công Quốc gia hoặc Cổng dịch vụ công của tỉnh"
+    ],
+    "thoiHan": "Không quá 10 NGÀY LÀM VIỆC (chuyển nhượng, thừa kế, tặng cho, góp vốn) — không tính thời gian xác định nghĩa vụ tài chính và thời gian người dân đi nộp tiền",
+    "ketQua": "Giấy chứng nhận mới đứng tên người nhận, hoặc xác nhận thay đổi trên sổ cũ",
+    "dan": [
+     {
+      "ma": "nd101-2024",
+      "so": 29
+     },
+     {
+      "ma": "nd101-2024",
+      "so": 21
+     },
+     {
+      "ma": "nd101-2024",
+      "so": 22
+     },
+     {
+      "ma": "ldd2024",
+      "so": 45
+     }
+    ]
+   },
+   "vuongMac": [
+    {
+     "gap": "Đang được ghi nợ tiền sử dụng đất",
+     "go": "Phải nộp xong mới được chuyển nhượng, tặng cho, thế chấp, góp vốn (khoản 5 Điều 45).",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 45
+      }
+     ]
+    },
+    {
+     "gap": "Thửa đất đang có tranh chấp",
+     "go": "Không đủ điều kiện giao dịch cho tới khi tranh chấp được giải quyết xong bằng quyết định hoặc bản án đã có hiệu lực.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 45
+      },
+      {
+       "ma": "ldd2024",
+       "so": 236
+      }
+     ]
+    },
+    {
+     "gap": "Người nhận là cá nhân không trực tiếp sản xuất nông nghiệp, mua đất trồng lúa vượt hạn mức",
+     "go": "Phải thành lập tổ chức kinh tế và có phương án sử dụng đất trồng lúa được UBND cấp huyện phê duyệt — trừ khi là người thuộc hàng thừa kế.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 45
+      },
+      {
+       "ma": "ldd2024",
+       "so": 177
+      }
+     ]
     }
    ]
   },
@@ -1229,6 +1731,88 @@
     },
     {
      "ma": "nd123-2024"
+    }
+   ],
+   "hoSo": {
+    "nhan": "Hồ sơ yêu cầu hoà giải tranh chấp đất đai",
+    "gom": [
+     {
+      "ten": "Đơn yêu cầu hoà giải tranh chấp đất đai",
+      "batBuoc": true,
+      "y": "Gửi UBND cấp xã nơi có đất."
+     },
+     {
+      "ten": "Giấy tờ chứng minh nguồn gốc và quá trình sử dụng đất",
+      "batBuoc": true,
+      "y": "Đây là căn cứ SỐ MỘT khi không bên nào có sổ: biên lai thuế, sổ mục kê, bản đồ qua các thời kỳ, xác nhận của người biết việc."
+     },
+     {
+      "ten": "Giấy chứng nhận hoặc giấy tờ theo Điều 137 (nếu có)",
+      "y": "Có sổ thì việc giải quyết thuộc Toà án."
+     },
+     {
+      "ten": "Sơ đồ, ảnh chụp hiện trạng phần đất đang tranh chấp",
+      "y": "Không bắt buộc nhưng rất nên có."
+     }
+    ],
+    "noiNop": [
+     "UBND cấp xã nơi có đất tranh chấp (bắt buộc hoà giải trước)"
+    ],
+    "thoiHan": "Xã phải thông báo cho các bên trong 03 NGÀY LÀM VIỆC · Hoà giải xong trong không quá 30 NGÀY · Sau hoà giải thành, còn 10 NGÀY để các bên gửi ý kiến khác",
+    "ketQua": "Biên bản hoà giải thành hoặc không thành. Hoà giải thành mà đổi ranh giới, diện tích thì trong 30 ngày làm việc phải đi đăng ký biến động.",
+    "dan": [
+     {
+      "ma": "ldd2024",
+      "so": 235
+     },
+     {
+      "ma": "ldd2024",
+      "so": 236
+     },
+     {
+      "ma": "nd102-2024",
+      "so": 105
+     },
+     {
+      "ma": "nd102-2024",
+      "so": 108
+     }
+    ]
+   },
+   "vuongMac": [
+    {
+     "gap": "Nộp đơn lên huyện / toà mà bị trả lại",
+     "go": "Vì chưa hoà giải ở UBND cấp xã. Đây là bước BẮT BUỘC, làm trước đã.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 235
+      }
+     ]
+    },
+    {
+     "gap": "Không bên nào có giấy tờ",
+     "go": "Được chọn nộp đơn lên UBND hoặc khởi kiện ra Toà. Muốn thắng thì gom cho đủ chứng cứ NGUỒN GỐC và QUÁ TRÌNH SỬ DỤNG — đó là căn cứ số một trong 5 căn cứ.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 236
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 108
+      }
+     ]
+    },
+    {
+     "gap": "Có quyết định rồi mà bên kia không thi hành",
+     "go": "Quá 30 ngày thì nộp đơn yêu cầu thi hành tại UBND cấp huyện; 15 ngày sau có quyết định cưỡng chế, thi hành trong 10 ngày. Cưỡng chế chỉ làm trong giờ hành chính.",
+     "dan": [
+      {
+       "ma": "nd102-2024",
+       "so": 108
+      }
+     ]
     }
    ]
   },

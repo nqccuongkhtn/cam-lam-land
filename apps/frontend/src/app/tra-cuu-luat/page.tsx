@@ -24,11 +24,19 @@ type Dieu = { so: number; tieuDe: string; chuong: string; chuongTen: string; muc
 type VanBan = { ma: string; soHieu: string; ngay: string; ten: string; nguon: string; phuLuc?: string; hetHieuLuc?: string; chuong: { so: string; ten: string }[]; dieu: Dieu[] };
 
 type KhoItem = { ma: string; soHieu: string; ngay: string; ten: string; soDieu: number; hetHieuLuc?: string;
-  nguoiKy?: string; ngayHieuLuc?: string; dan?: string[]; duocDan?: string[] };
+  nguoiKy?: string; ngayHieuLuc?: string; dan?: string[]; duocDan?: string[];
+  // Lược đồ văn bản: bốn loại quan hệ, tính sẵn lúc build từ chính chữ của văn bản.
+  canCu?: string[]; laCanCuCho?: string[]; thayThe?: string[]; biThayTheBoi?: string[];
+  baiBoMotPhan?: { ma: string; phan: string }[]; biBaiBoMotPhanBoi?: string[] };
 // TÌNH HUỐNG = đi theo việc thật, mỗi bước một câu hỏi, có nhánh trả lời, bước nào cũng dẫn nguồn.
 type NhanhTH = { neu: string; thi: string; canh?: boolean; dan?: Dan[] };
 type BuocTH = { hoi: string; y: string; dan?: Dan[]; nhanh?: NhanhTH[] };
-type TinhHuong = { ma: string; icon: string; ten: string; tom: string; buoc: BuocTH[]; ketLuan?: string[]; danKetLuan?: Dan[] };
+// BỘ HỒ SƠ: giấy tờ phải nộp, nộp ở đâu, bao lâu, nhận được gì — lấy từ Nghị định 101/2024.
+type GiayTo = { ten: string; mau?: string; batBuoc?: boolean; y?: string };
+type HoSo = { nhan: string; gom: GiayTo[]; noiNop: string[]; thoiHan: string; ketQua: string; dan?: Dan[] };
+type VuongMac = { gap: string; go: string; dan?: Dan[] };
+type TinhHuong = { ma: string; icon: string; ten: string; tom: string; buoc: BuocTH[];
+  ketLuan?: string[]; danKetLuan?: Dan[]; hoSo?: HoSo; vuongMac?: VuongMac[] };
 type KhoTinhHuong = { canhBao: string; ds: TinhHuong[] };
 // Giải thích do người làm web viết, KHÔNG phải chữ luật — luôn để trong khung riêng, màu khác.
 type GiaiThich = { canhBao: string; muc: Record<string, { y: string; nho: string }> };
@@ -137,6 +145,7 @@ export default function TraCuuLuatPage() {
   const [cheDoHoc, setCheDoHoc] = useState<'sodo' | 'the'>('sodo');
   const [kieuSoDo, setKieuSoDo] = useState<'danhsach' | 'khungve'>('danhsach');
   const [phongTo, setPhongTo] = useState(1);
+  const [timSoDo, setTimSoDo] = useState('');
   const [boThe, setBoThe] = useState<Record<string, { hop: number; ngayOn: string }>>({});
   const [theSo, setTheSo] = useState(0);
   const [datLat, setDatLat] = useState(false);
@@ -145,6 +154,9 @@ export default function TraCuuLuatPage() {
   // đọc dở một điều mà bị cuốn sang điều khác là mất mạch. Muốn đọc kỹ thì bấm "Mở hẳn".
   const [xemNhanh, setXemNhanh] = useState<{ ma: string; so: number; x: number; y: number } | null>(null);
   const [thChon, setThChon] = useState<string>('');
+  // Đánh dấu đã chuẩn bị xong từng giấy tờ — lưu trong máy để hôm sau mở lại vẫn còn.
+  const [daCo, setDaCo] = useState<Record<string, boolean>>({});
+  const [moVuong, setMoVuong] = useState<Record<string, boolean>>({});
   const [the, setThe] = useState<'luat' | 'tinhhuong' | 'sodo' | 'danhmuc'>('luat');
   const [dm, setDm] = useState<VanBanNgan[]>([]);
   const [timDm, setTimDm] = useState('');
@@ -203,7 +215,14 @@ export default function TraCuuLuatPage() {
 
   useEffect(() => {
     try { setBoThe(JSON.parse(localStorage.getItem('luat-the-hoc') || '{}')); } catch { /* */ }
+    try { setDaCo(JSON.parse(localStorage.getItem('luat-ho-so') || '{}')); } catch { /* */ }
   }, []);
+
+  const danhDauGiayTo = (khoa: string) => setDaCo((m) => {
+    const moi = { ...m, [khoa]: !m[khoa] };
+    try { localStorage.setItem('luat-ho-so', JSON.stringify(moi)); } catch { /* */ }
+    return moi;
+  });
 
   // Khoảng cách ôn theo hộp Leitner: thuộc thì đẩy xa dần, quên thì kéo về hộp 1.
   const CACH_ON = [1, 3, 7, 16, 35];
@@ -414,7 +433,11 @@ export default function TraCuuLuatPage() {
                     className="rounded-2xl border-2 border-slate-200 bg-white p-3 text-left transition hover:border-[#0A2540]">
                     <p className="text-[15px] font-extrabold leading-snug text-[#0A2540]">{x.icon} {x.ten}</p>
                     <p className="mt-1 text-[12.5px] leading-snug text-slate-500">{x.tom}</p>
-                    <p className="mt-1.5 text-[11.5px] font-semibold text-slate-400">{x.buoc.length} bước →</p>
+                    <p className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11.5px] font-semibold">
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-500">{x.buoc.length} bước</span>
+                      {x.hoSo && <span className="rounded-full bg-[#0A2540]/10 px-2 py-0.5 text-[#0A2540]">📋 {x.hoSo.gom.length} giấy tờ</span>}
+                      {x.vuongMac && <span className="rounded-full bg-rose-50 px-2 py-0.5 text-rose-600">⚠️ {x.vuongMac.length} chỗ hay vướng</span>}
+                    </p>
                   </button>
                 ))}
               </div>
@@ -427,6 +450,63 @@ export default function TraCuuLuatPage() {
                 <button onClick={() => setThChon('')} className="text-[12.5px] font-semibold text-slate-500 hover:text-[#0A2540]">← Chọn tình huống khác</button>
                 <h2 className="mt-1.5 text-[17px] font-extrabold leading-snug text-[#0A2540]">{x.icon} {x.ten}</h2>
                 <p className="mt-0.5 text-[12.5px] leading-snug text-slate-500">{x.tom}</p>
+
+                {/* ── BỘ HỒ SƠ ── ba ô tóm tắt (bao lâu · nộp đâu · nhận gì) rồi tới danh sách
+                    giấy tờ bấm đánh dấu được. Đây mới là thứ dùng để ĐI LÀM VIỆC THẬT. */}
+                {x.hoSo && (() => {
+                  const tong = x.hoSo.gom.length;
+                  const xong = x.hoSo.gom.filter((_, i) => daCo[`${x.ma}:${i}`]).length;
+                  const batBuoc = x.hoSo.gom.filter((g) => g.batBuoc).length;
+                  return (
+                    <div className="mt-3 rounded-2xl border-2 border-[#0A2540]/20 bg-[#0A2540]/[0.03] p-3">
+                      <p className="text-[10.5px] font-bold uppercase tracking-wide text-[#0A2540]">📋 {x.hoSo.nhan}</p>
+                      <div className="mt-2 grid gap-1.5 sm:grid-cols-3">
+                        <div className="rounded-xl bg-white p-2">
+                          <p className="text-[10.5px] font-bold uppercase tracking-wide text-slate-400">⏱ Bao lâu</p>
+                          <p className="mt-0.5 text-[12.5px] font-semibold leading-snug text-slate-700">{x.hoSo.thoiHan}</p>
+                        </div>
+                        <div className="rounded-xl bg-white p-2">
+                          <p className="text-[10.5px] font-bold uppercase tracking-wide text-slate-400">📍 Nộp ở đâu</p>
+                          <ul className="mt-0.5 space-y-0.5">
+                            {x.hoSo.noiNop.map((n, i) => <li key={i} className="text-[12px] leading-snug text-slate-700">• {n}</li>)}
+                          </ul>
+                        </div>
+                        <div className="rounded-xl bg-white p-2">
+                          <p className="text-[10.5px] font-bold uppercase tracking-wide text-slate-400">🎁 Nhận được gì</p>
+                          <p className="mt-0.5 text-[12.5px] font-semibold leading-snug text-slate-700">{x.hoSo.ketQua}</p>
+                        </div>
+                      </div>
+
+                      <div className="mt-2.5 flex items-center gap-2">
+                        <p className="text-[12px] font-bold text-[#0A2540]">Giấy tờ phải chuẩn bị — đã có {xong}/{tong}</p>
+                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200">
+                          <div className="h-full bg-emerald-500 transition-all" style={{ width: `${tong ? (xong / tong) * 100 : 0}%` }} />
+                        </div>
+                        <span className="text-[11px] text-slate-400">{batBuoc} bắt buộc</span>
+                      </div>
+                      <div className="mt-1 space-y-1">
+                        {x.hoSo.gom.map((g, i) => {
+                          const k = `${x.ma}:${i}`;
+                          return (
+                            <button key={i} onClick={() => danhDauGiayTo(k)}
+                              className={`flex w-full items-start gap-2 rounded-xl border px-2.5 py-1.5 text-left transition ${daCo[k] ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                              <span className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md border-2 text-[11px] font-bold ${daCo[k] ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-300 text-transparent'}`}>✓</span>
+                              <span className="min-w-0 flex-1">
+                                <span className={`block text-[13px] font-semibold leading-snug ${daCo[k] ? 'text-emerald-900 line-through decoration-emerald-400' : 'text-slate-700'}`}>
+                                  {g.ten}
+                                  {g.mau && <span className="ml-1.5 rounded bg-[#C8A14B]/20 px-1.5 py-0.5 text-[11px] font-bold text-[#8a6d2f]">{g.mau}</span>}
+                                  {g.batBuoc && <span className="ml-1 text-[11px] font-bold text-rose-600">bắt buộc</span>}
+                                </span>
+                                {g.y && <span className="mt-0.5 block text-[12px] leading-snug text-slate-500">{g.y}</span>}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {x.hoSo.dan && <div className="mt-1.5 flex flex-wrap gap-1">{x.hoSo.dan.map((d, i) => <NutDan key={i} d={d} nho />)}</div>}
+                    </div>
+                  );
+                })()}
 
                 <div className="mt-3 space-y-0">
                   {x.buoc.map((b, i) => (
@@ -453,6 +533,33 @@ export default function TraCuuLuatPage() {
                     </div>
                   ))}
                 </div>
+
+                {/* ── VƯỚNG MẮC THƯỜNG GẶP ── phần người đi làm hồ sơ cần nhất: gặp thì gỡ sao. */}
+                {x.vuongMac && x.vuongMac.length > 0 && (
+                  <div className="mt-1 mb-2 rounded-2xl border-2 border-rose-200 bg-rose-50/50 p-3">
+                    <p className="text-[10.5px] font-bold uppercase tracking-wide text-rose-700">⚠️ Hay vướng chỗ này — và cách gỡ</p>
+                    <div className="mt-1.5 space-y-1">
+                      {x.vuongMac.map((v, i) => {
+                        const k = `${x.ma}#${i}`;
+                        return (
+                          <div key={i} className="overflow-hidden rounded-xl border border-rose-200 bg-white">
+                            <button onClick={() => setMoVuong((m) => ({ ...m, [k]: !m[k] }))}
+                              className="flex w-full items-start gap-2 px-2.5 py-1.5 text-left">
+                              <span className="text-[13px]">{moVuong[k] ? '▾' : '▸'}</span>
+                              <span className="min-w-0 flex-1 text-[13px] font-bold leading-snug text-slate-700">{v.gap}</span>
+                            </button>
+                            {moVuong[k] && (
+                              <div className="border-t border-rose-100 bg-rose-50/40 px-2.5 py-2">
+                                <p className="text-[13px] leading-relaxed text-slate-700"><b className="text-rose-700">Gỡ:</b> {v.go}</p>
+                                {v.dan && <div className="mt-1 flex flex-wrap gap-1">{v.dan.map((d, j) => <NutDan key={j} d={d} nho />)}</div>}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 {x.ketLuan && (
                   <div className="mt-1 rounded-2xl border-2 border-dashed border-[#C8A14B] bg-amber-50/60 p-3">
@@ -591,6 +698,10 @@ export default function TraCuuLuatPage() {
                     <span className="text-[11.5px] font-semibold text-slate-400">{Math.round(phongTo * 100)}%</span>
                     <button onClick={() => setPhongTo((z) => Math.min(1.4, +(z + 0.1).toFixed(2)))}
                       className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-bold text-slate-600">+</button>
+                    <input value={timSoDo} onChange={(e) => setTimSoDo(e.target.value)}
+                      placeholder="Tìm trong sơ đồ…"
+                      className="ml-1 min-w-[140px] flex-1 rounded-full border border-slate-200 px-3 py-1 text-[12px] outline-none focus:border-[#0A2540]" />
+                    {timSoDo && <button onClick={() => setTimSoDo('')} className="text-slate-400">✕</button>}
                   </>
                 )}
               </div>
@@ -599,26 +710,31 @@ export default function TraCuuLuatPage() {
                   Vị trí tính bằng tay: gốc ở giữa bên trái, nhánh toả sang phải, con của nhánh
                   toả tiếp. Nhánh nào đang thu thì không chiếm chỗ. */}
               {kieuSoDo === 'khungve' && (() => {
-                const W0 = 176, W1 = 214, W2 = 246, H = 62, KHE = 12, X1 = 250, X2 = 512;
+                // Ô cao hơn hẳn bản trước để chữ KHÔNG bị cắt cụt, và mỗi ô con hiện luôn
+                // các nút "Điều …" bấm được — trước đây chỉ bấm được vào dẫn chiếu đầu tiên.
+                const W0 = 190, W1 = 236, W2 = 300, H1 = 72, H2 = 96, KHE = 12, X1 = 262, X2 = 560;
+                const q = kd(timSoDo.trim());
+                const khop = (t: string) => !q || kd(t).includes(q);
                 let y = 0;
-                const nut: { x: number; y: number; w: number; cap: number; i: number; j?: number }[] = [];
+                const nut: { x: number; y: number; w: number; h: number; cap: number; i: number; j?: number }[] = [];
                 const canh: { x1: number; y1: number; x2: number; y2: number; mau: string }[] = [];
                 const yNhanh: number[] = [];
                 sd.nhanh.forEach((n, i) => {
                   const mo = !!moNhanh[i];
                   const con = mo ? n.con : [];
                   const yBatDau = y;
-                  con.forEach((_, j) => { nut.push({ x: X2, y, w: W2, cap: 2, i, j }); y += H + KHE; });
-                  const yN = con.length ? (yBatDau + y - H - KHE) / 2 : y;
-                  if (!con.length) y += H + KHE;
+                  con.forEach((_, j) => { nut.push({ x: X2, y, w: W2, h: H2, cap: 2, i, j }); y += H2 + KHE; });
+                  const yN = con.length ? (yBatDau + y - H2 - KHE + (H2 - H1)) / 2 : y;
+                  if (!con.length) y += H1 + KHE;
                   yNhanh[i] = yN;
-                  nut.push({ x: X1, y: yN, w: W1, cap: 1, i });
+                  nut.push({ x: X1, y: yN, w: W1, h: H1, cap: 1, i });
                   con.forEach((_, j) => {
-                    const yc = yBatDau + j * (H + KHE);
-                    canh.push({ x1: X1 + W1, y1: yN + H / 2, x2: X2, y2: yc + H / 2, mau: n.mau });
+                    const yc = yBatDau + j * (H2 + KHE);
+                    canh.push({ x1: X1 + W1, y1: yN + H1 / 2, x2: X2, y2: yc + H2 / 2, mau: n.mau });
                   });
-                  y += KHE * 1.4;
+                  y += KHE * 1.6;
                 });
+                const H = H1;
                 const yGoc = yNhanh.length ? (yNhanh[0] + yNhanh[yNhanh.length - 1]) / 2 : 0;
                 sd.nhanh.forEach((n, i) => canh.push({ x1: W0, y1: yGoc + H / 2, x2: X1, y2: yNhanh[i] + H / 2, mau: n.mau }));
                 const cao = Math.max(y, yGoc + H) + 20;
@@ -641,23 +757,39 @@ export default function TraCuuLuatPage() {
                           const n = sd.nhanh[o.i];
                           const mau = MAU_NHANH[n.mau] || MAU_NHANH.slate;
                           if (o.cap === 1) {
+                            const sang = khop(n.ten + ' ' + n.y + ' ' + (n.neo || '')) ||
+                              n.con.some((c) => khop(c.ten + ' ' + c.y));
                             return (
                               <button key={k2} onClick={() => setMoNhanh((m) => ({ ...m, [o.i]: !m[o.i] }))}
-                                className={`absolute flex flex-col justify-center rounded-2xl border-2 px-2.5 text-left ${mau}`}
-                                style={{ left: o.x, top: o.y, width: o.w, height: H }}>
-                                <span className="truncate text-[13px] font-extrabold leading-tight">{n.icon} {n.ten}</span>
-                                <span className="text-[11px] leading-tight opacity-80">{n.neo ? `🔑 ${n.neo} · ` : ''}{moNhanh[o.i] ? 'thu lại ▴' : `${n.con.length} ý ▾`}</span>
+                                className={`absolute flex flex-col justify-center rounded-2xl border-2 px-2.5 text-left transition ${mau} ${sang ? '' : 'opacity-25'}`}
+                                style={{ left: o.x, top: o.y, width: o.w, height: o.h }}>
+                                <span className="text-[13px] font-extrabold leading-tight">{n.icon} {n.ten}</span>
+                                {n.neo && <span className="mt-0.5 inline-block w-fit rounded-full bg-white/80 px-1.5 text-[10.5px] font-bold text-slate-700">🔑 {n.neo}</span>}
+                                <span className="mt-0.5 text-[10.5px] leading-tight opacity-70">{moNhanh[o.i] ? 'thu lại ▴' : `${n.con.length} ý ▾`}</span>
                               </button>
                             );
                           }
                           const c = n.con[o.j!];
+                          const sang = khop(c.ten + ' ' + c.y);
                           return (
-                            <button key={k2} onClick={() => { const d = c.dan[0]; if (d) { if (d.so) moDieu(d.ma, d.so); else { doiVanBan(d.ma); setThe('luat'); } } }}
-                              className="absolute flex flex-col justify-center rounded-xl border border-slate-200 bg-white px-2.5 text-left hover:border-[#0A2540]"
-                              style={{ left: o.x, top: o.y, width: o.w, height: H }}>
-                              <span className="truncate text-[12.5px] font-bold leading-tight text-[#0A2540]">{c.ten}</span>
-                              <span className="line-clamp-2 text-[11px] leading-tight text-slate-500">{c.y}</span>
-                            </button>
+                            <div key={k2}
+                              className={`absolute flex flex-col justify-center rounded-xl border-2 bg-white px-2.5 py-1.5 transition ${sang ? 'border-slate-200' : 'border-slate-100 opacity-25'}`}
+                              style={{ left: o.x, top: o.y, width: o.w, height: o.h }}>
+                              <p className="text-[12.5px] font-bold leading-tight text-[#0A2540]">{c.ten}</p>
+                              <p className="mt-0.5 line-clamp-2 text-[11px] leading-tight text-slate-500">{c.y}</p>
+                              <div className="mt-1 flex flex-wrap gap-1 overflow-hidden">
+                                {c.dan.slice(0, 4).map((d, i2) => {
+                                  const v2 = kho.find((z) => z.ma === d.ma);
+                                  return (
+                                    <button key={i2} onClick={() => { if (d.so) moDieu(d.ma, d.so); else { doiVanBan(d.ma); setThe('luat'); } }}
+                                      title={v2 ? v2.ten : d.ma}
+                                      className="rounded border border-slate-200 bg-slate-50 px-1 text-[10.5px] font-semibold text-slate-600 hover:border-[#0A2540] hover:text-[#0A2540]">
+                                      {d.so ? `Điều ${d.so}` : '📄'} {v2 ? nhanNgan(v2.ma, v2.soHieu).replace('Luật Đất đai ', 'LĐĐ ') : ''}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
                           );
                         })}
                       </div>
@@ -812,22 +944,39 @@ export default function TraCuuLuatPage() {
                 : <b className="text-emerald-600">Còn hiệu lực</b>}</span>
               <span>{vb.dieu.length} điều{vb.chuong.length ? ` · ${vb.chuong.length} chương` : ''}</span>
             </div>
-            {((k?.dan?.length || 0) > 0 || (k?.duocDan?.length || 0) > 0) && (
-              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-slate-200 pt-1 text-[11px]">
-                {(k?.dan?.length || 0) > 0 && (
-                  <span className="flex flex-wrap items-center gap-1">
-                    <span className="text-slate-500">Dựa trên:</span>
-                    {k!.dan!.map((m) => <NutDan key={m} d={{ ma: m }} nho />)}
-                  </span>
-                )}
-                {(k?.duocDan?.length || 0) > 0 && (
-                  <span className="flex flex-wrap items-center gap-1">
-                    <span className="text-slate-500">Được hướng dẫn / nhắc bởi:</span>
-                    {k!.duocDan!.map((m) => <NutDan key={m} d={{ ma: m }} nho />)}
-                  </span>
-                )}
-              </div>
-            )}
+            {/* LƯỢC ĐỒ: bốn loại quan hệ, xếp theo thứ tự người tra luật cần biết trước. */}
+            {(() => {
+              const hang: [string, string[] | undefined, string][] = [
+                ['Căn cứ ban hành', k?.canCu, 'text-slate-500'],
+                ['Thay thế', k?.thayThe, 'text-rose-600'],
+                ['Bị thay thế bởi', k?.biThayTheBoi, 'text-rose-600'],
+                ['Bị bãi bỏ một phần bởi', k?.biBaiBoMotPhanBoi, 'text-amber-600'],
+                ['Được hướng dẫn bởi', k?.laCanCuCho, 'text-emerald-600'],
+                ['Có nhắc tới', k?.dan, 'text-slate-500'],
+              ];
+              const co = hang.filter(([, ds]) => (ds?.length || 0) > 0);
+              if (!co.length) return null;
+              return (
+                <div className="mt-1 space-y-0.5 border-t border-slate-200 pt-1 text-[11px]">
+                  {co.map(([nhan, ds, mau]) => (
+                    <div key={nhan} className="flex flex-wrap items-center gap-1">
+                      <span className={`font-semibold ${mau}`}>{nhan}:</span>
+                      {ds!.map((m) => <NutDan key={m} d={{ ma: m }} nho />)}
+                    </div>
+                  ))}
+                  {(k?.baiBoMotPhan?.length || 0) > 0 && (
+                    <div className="flex flex-wrap items-start gap-1">
+                      <span className="font-semibold text-amber-600">Bãi bỏ một phần của:</span>
+                      <span className="min-w-0 flex-1 text-slate-500">
+                        {[...new Map(k!.baiBoMotPhan!.map((z) => [z.ma, z])).values()].map((z) => (
+                          <span key={z.ma} className="mr-2 inline-block"><NutDan d={{ ma: z.ma }} nho /></span>
+                        ))}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         );
       })()}

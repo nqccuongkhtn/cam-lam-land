@@ -530,10 +530,22 @@
     },
     {
      "hoi": "4. Sau 01/7/2025 thì ai ký?",
-     "y": "Chính quyền địa phương hai cấp: nhiều việc trước đây của cấp huyện chuyển về cấp xã hoặc lên cấp tỉnh. Nghị định 151/2025 phân định lại toàn bộ thẩm quyền trong lĩnh vực đất đai, kèm phụ lục trình tự thủ tục.",
+     "y": "Chính quyền địa phương hai cấp: nhiều việc trước đây của cấp huyện chuyển về cấp xã hoặc lên cấp tỉnh. Quan trọng hơn: Nghị định 151/2025 còn BÃI BỎ 25 điều của Nghị định 101/2024 (các Điều 21, 22, 28, 29, 38, 39… 60) cùng toàn bộ Mẫu số 01/ĐK → 14/ĐK, và 17 điều của Nghị định 102/2024. Trình tự, thủ tục và mẫu đơn hiện hành nằm ở PHỤ LỤC của Nghị định 151/2025.",
      "dan": [
       {
        "ma": "nd151-2025"
+      }
+     ],
+     "nhanh": [
+      {
+       "neu": "Đang cầm mẫu đơn cũ (01/ĐK, 04/ĐK, 11/ĐK…)",
+       "thi": "Từ 01/7/2025 mấy mẫu đó đã bị bãi bỏ — lấy mẫu mới ở Phụ lục Nghị định 151/2025, nộp mẫu cũ là bị trả hồ sơ.",
+       "canh": true,
+       "dan": [
+        {
+         "ma": "nd151-2025"
+        }
+       ]
       }
      ]
     }
@@ -746,6 +758,9 @@
     "ketQua": "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất",
     "dan": [
      {
+      "ma": "nd151-2025"
+     },
+     {
       "ma": "nd101-2024",
       "so": 28
      },
@@ -765,7 +780,8 @@
       "ma": "nd101-2024",
       "so": 22
      }
-    ]
+    ],
+    "canhBao": "⛔ Nghị định 151/2025 (hiệu lực 01/7/2025) đã BÃI BỎ các Điều 21, 22, 28, 29, 38, 39… và TOÀN BỘ Mẫu số 01/ĐK → 14/ĐK của Nghị định 101/2024. Con số và mẫu đơn dưới đây chỉ còn đúng với hồ sơ nộp TRƯỚC 01/7/2025. Trình tự, thủ tục và mẫu đơn HIỆN HÀNH nằm ở PHỤ LỤC của Nghị định 151/2025 — mở văn bản đó rồi bấm nút 📎 Phụ lục."
    },
    "vuongMac": [
     {
@@ -968,6 +984,9 @@
     "ketQua": "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất (mẫu mới)",
     "dan": [
      {
+      "ma": "nd151-2025"
+     },
+     {
       "ma": "nd101-2024",
       "so": 38
      },
@@ -979,7 +998,8 @@
       "ma": "nd101-2024",
       "so": 24
      }
-    ]
+    ],
+    "canhBao": "⛔ Nghị định 151/2025 (hiệu lực 01/7/2025) đã BÃI BỎ các Điều 21, 22, 28, 29, 38, 39… và TOÀN BỘ Mẫu số 01/ĐK → 14/ĐK của Nghị định 101/2024. Con số và mẫu đơn dưới đây chỉ còn đúng với hồ sơ nộp TRƯỚC 01/7/2025. Trình tự, thủ tục và mẫu đơn HIỆN HÀNH nằm ở PHỤ LỤC của Nghị định 151/2025 — mở văn bản đó rồi bấm nút 📎 Phụ lục."
    },
    "vuongMac": [
     {
@@ -1119,6 +1139,9 @@
     "ketQua": "Quyết định cho phép chuyển mục đích sử dụng đất, sau đó chỉnh lý / cấp lại Giấy chứng nhận",
     "dan": [
      {
+      "ma": "nd151-2025"
+     },
+     {
       "ma": "ldd2024",
       "so": 121
      },
@@ -1136,7 +1159,8 @@
      {
       "ma": "nd103-2024"
      }
-    ]
+    ],
+    "canhBao": "⛔ Nghị định 151/2025 (hiệu lực 01/7/2025) đã BÃI BỎ các Điều 21, 22, 28, 29, 38, 39… và TOÀN BỘ Mẫu số 01/ĐK → 14/ĐK của Nghị định 101/2024. Con số và mẫu đơn dưới đây chỉ còn đúng với hồ sơ nộp TRƯỚC 01/7/2025. Trình tự, thủ tục và mẫu đơn HIỆN HÀNH nằm ở PHỤ LỤC của Nghị định 151/2025 — mở văn bản đó rồi bấm nút 📎 Phụ lục."
    },
    "vuongMac": [
     {
@@ -1286,6 +1310,9 @@
     "ketQua": "Bản vẽ được xác nhận; thông tin thửa mới chỉ chính thức sau khi ĐĂNG KÝ BIẾN ĐỘNG và được cấp Giấy chứng nhận",
     "dan": [
      {
+      "ma": "nd151-2025"
+     },
+     {
       "ma": "nd101-2024",
       "so": 7
      },
@@ -1297,7 +1324,8 @@
       "ma": "nd101-2024",
       "so": 22
      }
-    ]
+    ],
+    "canhBao": "⚠️ Điều 7 Nghị định 101/2024 (trình tự tách thửa) vẫn còn hiệu lực, nhưng các Mẫu số 01/ĐK và 02/ĐK đã bị Nghị định 151/2025 bãi bỏ từ 01/7/2025 — lấy mẫu mới ở Phụ lục Nghị định 151/2025."
    },
    "vuongMac": [
     {
@@ -1441,6 +1469,9 @@
     "ketQua": "Giấy chứng nhận mới đứng tên người nhận, hoặc xác nhận thay đổi trên sổ cũ",
     "dan": [
      {
+      "ma": "nd151-2025"
+     },
+     {
       "ma": "nd101-2024",
       "so": 29
      },
@@ -1456,7 +1487,8 @@
       "ma": "ldd2024",
       "so": 45
      }
-    ]
+    ],
+    "canhBao": "⛔ Nghị định 151/2025 (hiệu lực 01/7/2025) đã BÃI BỎ các Điều 21, 22, 28, 29, 38, 39… và TOÀN BỘ Mẫu số 01/ĐK → 14/ĐK của Nghị định 101/2024. Con số và mẫu đơn dưới đây chỉ còn đúng với hồ sơ nộp TRƯỚC 01/7/2025. Trình tự, thủ tục và mẫu đơn HIỆN HÀNH nằm ở PHỤ LỤC của Nghị định 151/2025 — mở văn bản đó rồi bấm nút 📎 Phụ lục."
    },
    "vuongMac": [
     {

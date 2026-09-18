@@ -20,8 +20,15 @@ import { useAuth, coVaiTro } from '@/lib/auth';
 type Diem = { ky: string; chu: string };
 type Khoan = { so: number; chu: string; diem: Diem[] };
 type Dan = { ma: string; so?: number };
-type Dieu = { so: number; tieuDe: string; chuong: string; chuongTen: string; muc: string | null; mucTen: string; khoan: Khoan[]; dan?: Dan[]; duocDan?: Dan[] };
-type VanBan = { ma: string; soHieu: string; ngay: string; ten: string; nguon: string; phuLuc?: string; hetHieuLuc?: string; chuong: { so: string; ten: string }[]; dieu: Dieu[] };
+// Tình trạng của TỪNG ĐIỀU: đã bị bãi bỏ cả điều, bãi bỏ một phần, hay bị sửa đổi.
+// Thiếu cái này thì người đọc tưởng điều đã hết hiệu lực vẫn còn dùng được — nguy hiểm nhất.
+type TinhTrang = { loai: 'het-hieu-luc' | 'bai-bo-mot-phan' | 'sua-doi'; boi: string;
+  boiDieu?: number; tuNgay: string; phan?: string };
+type Dieu = { so: number; tieuDe: string; chuong: string; chuongTen: string; muc: string | null; mucTen: string;
+  khoan: Khoan[]; dan?: Dan[]; duocDan?: Dan[]; tinhTrang?: TinhTrang };
+type VanBan = { ma: string; soHieu: string; ngay: string; ten: string; nguon: string; phuLuc?: string;
+  hetHieuLuc?: string; chuong: { so: string; ten: string }[]; dieu: Dieu[];
+  mauBiBaiBo?: { boi: string; tuNgay: string; phan: string }[] };
 
 type KhoItem = { ma: string; soHieu: string; ngay: string; ten: string; soDieu: number; hetHieuLuc?: string;
   nguoiKy?: string; ngayHieuLuc?: string; dan?: string[]; duocDan?: string[];
@@ -33,7 +40,8 @@ type NhanhTH = { neu: string; thi: string; canh?: boolean; dan?: Dan[] };
 type BuocTH = { hoi: string; y: string; dan?: Dan[]; nhanh?: NhanhTH[] };
 // BỘ HỒ SƠ: giấy tờ phải nộp, nộp ở đâu, bao lâu, nhận được gì — lấy từ Nghị định 101/2024.
 type GiayTo = { ten: string; mau?: string; batBuoc?: boolean; y?: string };
-type HoSo = { nhan: string; gom: GiayTo[]; noiNop: string[]; thoiHan: string; ketQua: string; dan?: Dan[] };
+type HoSo = { nhan: string; gom: GiayTo[]; noiNop: string[]; thoiHan: string; ketQua: string;
+  dan?: Dan[]; canhBao?: string };
 type VuongMac = { gap: string; go: string; dan?: Dan[] };
 type TinhHuong = { ma: string; icon: string; ten: string; tom: string; buoc: BuocTH[];
   ketLuan?: string[]; danKetLuan?: Dan[]; hoSo?: HoSo; vuongMac?: VuongMac[] };
@@ -96,6 +104,10 @@ const nhanNgan = (ma: string, soHieu: string) => {
   return `NĐ ${so}/${nam}`;
 };
 const ngayVn = (s: string) => (s ? s.split('-').reverse().join('/') : '');
+// Dấu hiệu nhỏ đặt trước tên điều để nhìn danh sách là biết ngay điều nào còn dùng được.
+const dauTinhTrang = (d: Dieu) => (d.tinhTrang?.loai === 'het-hieu-luc' ? '⛔ '
+  : d.tinhTrang?.loai === 'bai-bo-mot-phan' ? '⚠️ '
+  : d.tinhTrang?.loai === 'sua-doi' ? '✏️ ' : '');
 
 // CHỦ ĐỀ NHANH = câu tìm sẵn theo việc người ta hay hỏi. Không phải phân loại pháp lý,
 // chỉ là lối tắt — nên để nguyên chữ trong luật để tìm cho trúng.
@@ -460,6 +472,13 @@ export default function TraCuuLuatPage() {
                   return (
                     <div className="mt-3 rounded-2xl border-2 border-[#0A2540]/20 bg-[#0A2540]/[0.03] p-3">
                       <p className="text-[10.5px] font-bold uppercase tracking-wide text-[#0A2540]">📋 {x.hoSo.nhan}</p>
+                      {/* Nguồn của bộ hồ sơ có thể đã bị văn bản mới bãi bỏ — phải báo ngay
+                          trên đầu, không để ai lỡ nộp mẫu đơn đã bỏ rồi bị trả hồ sơ. */}
+                      {x.hoSo.canhBao && (
+                        <p className="mt-1.5 rounded-xl border-2 border-rose-300 bg-rose-50 px-2.5 py-2 text-[12.5px] font-semibold leading-snug text-rose-800">
+                          {x.hoSo.canhBao}
+                        </p>
+                      )}
                       <div className="mt-2 grid gap-1.5 sm:grid-cols-3">
                         <div className="rounded-xl bg-white p-2">
                           <p className="text-[10.5px] font-bold uppercase tracking-wide text-slate-400">⏱ Bao lâu</p>
@@ -987,6 +1006,31 @@ export default function TraCuuLuatPage() {
           ⛔ {vb.hetHieuLuc}
         </p>
       )}
+      {/* Văn bản còn hiệu lực nhưng MẪU ĐƠN đã bị bãi bỏ — nộp mẫu cũ là bị trả hồ sơ. */}
+      {vb && !vb.hetHieuLuc && (vb.mauBiBaiBo?.length || 0) > 0 && (() => {
+        const m = vb.mauBiBaiBo![0];
+        const kb = kho.find((z) => z.ma === m.boi);
+        return (
+          <p className="mt-1.5 rounded-lg border-2 border-amber-300 bg-amber-50 px-2.5 py-1.5 text-[12.5px] leading-snug text-amber-900">
+            ⚠️ <b>Mẫu đơn của văn bản này đã bị bãi bỏ</b> từ {ngayVn(m.tuNgay)} bởi {kb ? nhanNgan(kb.ma, kb.soHieu) : m.boi} —
+            lấy mẫu mới ở Phụ lục văn bản đó. Phần bị bỏ: <i>{m.phan}</i>
+          </p>
+        );
+      })()}
+      {/* Còn hiệu lực nhưng có điều đã bị bãi bỏ — đếm ra cho người đọc biết trước. */}
+      {vb && !vb.hetHieuLuc && (() => {
+        const bo = vb.dieu.filter((d) => d.tinhTrang?.loai === 'het-hieu-luc').length;
+        const phan = vb.dieu.filter((d) => d.tinhTrang && d.tinhTrang.loai !== 'het-hieu-luc').length;
+        if (!bo && !phan) return null;
+        return (
+          <p className="mt-1 text-[11.5px] leading-snug text-slate-500">
+            Trong văn bản này: {bo > 0 && <><b className="text-rose-600">{bo} điều đã hết hiệu lực ⛔</b></>}
+            {bo > 0 && phan > 0 && ' · '}
+            {phan > 0 && <><b className="text-amber-600">{phan} điều bị sửa đổi / bãi bỏ một phần ⚠️</b></>}
+            {' '}— nhìn dấu ở danh sách bên trái là biết.
+          </p>
+        );
+      })()}
 
       {/* Ô TÌM — gõ không dấu vẫn ra; gõ số thì nhảy thẳng tới điều đó */}
       <div className="sticky top-0 z-10 -mx-3 mt-3 bg-white/95 px-3 py-2 backdrop-blur sm:mx-0 sm:px-0">
@@ -1052,7 +1096,9 @@ export default function TraCuuLuatPage() {
                 : ketQua.map((x) => (
                   <button key={x.ma + ':' + x.d.so} onClick={() => moDieu(x.ma, x.d.so)}
                     className={`block w-full border-b border-slate-100 px-3 py-2 text-left hover:bg-slate-50 ${x.ma === maVb && chon === x.d.so ? 'bg-[#0A2540]/[0.05]' : ''}`}>
-                    <span className="block text-[13px] font-bold text-[#0A2540]">{ghim.includes(khoaGhim(x.ma, x.d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(x.ma, x.d.so)] ? '💡 ' : ''}Điều {x.d.so}. {x.d.tieuDe}</span>
+                    <span className={`block text-[13px] font-bold ${x.d.tinhTrang?.loai === 'het-hieu-luc' ? 'text-slate-400 line-through decoration-rose-300' : 'text-[#0A2540]'}`}>
+                      {ghim.includes(khoaGhim(x.ma, x.d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(x.ma, x.d.so)] ? '💡 ' : ''}{dauTinhTrang(x.d)}Điều {x.d.so}. {x.d.tieuDe}
+                    </span>
                     <span className="block text-[11px] text-slate-400">
                       {timCaKho && <span className="mr-1 rounded bg-slate-100 px-1 font-bold text-slate-500">{nhanNgan(x.ma, cacVb[x.ma]?.soHieu || '')}</span>}
                       {x.d.chuong ? <>Chương {x.d.chuong}{x.d.muc ? ` · Mục ${x.d.muc}` : ''}</> : null}
@@ -1065,7 +1111,9 @@ export default function TraCuuLuatPage() {
               vb.dieu.map((d) => (
                 <button key={d.so} onClick={() => moDieu(vb.ma, d.so)}
                   className={`block w-full border-b border-slate-100 px-3 py-2 text-left text-[12.5px] hover:bg-slate-50 ${chon === d.so ? 'bg-[#0A2540]/[0.05] font-semibold' : 'text-slate-600'}`}>
-                  {ghim.includes(khoaGhim(vb.ma, d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(vb.ma, d.so)] ? '💡 ' : ''}Điều {d.so}. {d.tieuDe}
+                  <span className={d.tinhTrang?.loai === 'het-hieu-luc' ? 'text-slate-400 line-through decoration-rose-300' : ''}>
+                    {ghim.includes(khoaGhim(vb.ma, d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(vb.ma, d.so)] ? '💡 ' : ''}{dauTinhTrang(d)}Điều {d.so}. {d.tieuDe}
+                  </span>
                 </button>
               ))
             ) : (
@@ -1086,7 +1134,9 @@ export default function TraCuuLuatPage() {
                     {mo && ds.map((d) => (
                       <button key={d.so} onClick={() => moDieu(vb.ma, d.so)}
                         className={`block w-full px-3 py-1.5 pl-8 text-left text-[12.5px] hover:bg-slate-50 ${chon === d.so ? 'bg-[#0A2540]/[0.05] font-semibold' : 'text-slate-600'}`}>
-                        {ghim.includes(khoaGhim(vb.ma, d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(vb.ma, d.so)] ? '💡 ' : ''}Điều {d.so}. {d.tieuDe}
+                        <span className={d.tinhTrang?.loai === 'het-hieu-luc' ? 'text-slate-400 line-through decoration-rose-300' : ''}>
+                          {ghim.includes(khoaGhim(vb.ma, d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(vb.ma, d.so)] ? '💡 ' : ''}{dauTinhTrang(d)}Điều {d.so}. {d.tieuDe}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -1131,6 +1181,36 @@ export default function TraCuuLuatPage() {
                   <button onClick={() => chep(dieuDangXem)} title="Sao chép nguyên văn"
                     className="shrink-0 rounded-lg border border-slate-200 px-2 py-1 text-[12px] font-semibold text-slate-500">⧉ Chép</button>
                 </div>
+
+                {/* ── CẢNH BÁO TÌNH TRẠNG ĐIỀU ──
+                    Phải đặt TRƯỚC mọi thứ khác. Nghị định 151/2025 bãi bỏ 25 điều của Nghị
+                    định 101/2024 — đúng những điều nói về hồ sơ, thời hạn, mẫu đơn. Đọc
+                    nguyên văn mà không biết nó đã hết hiệu lực thì làm sai cả bộ hồ sơ. */}
+                {dieuDangXem.tinhTrang && (() => {
+                  const t = dieuDangXem.tinhTrang!;
+                  const kb = kho.find((z) => z.ma === t.boi);
+                  const kieu = t.loai === 'het-hieu-luc'
+                    ? { mau: 'border-rose-400 bg-rose-50', chu: 'text-rose-800', icon: '⛔', nhan: 'ĐIỀU NÀY ĐÃ HẾT HIỆU LỰC' }
+                    : t.loai === 'bai-bo-mot-phan'
+                      ? { mau: 'border-amber-400 bg-amber-50', chu: 'text-amber-800', icon: '⚠️', nhan: 'ĐIỀU NÀY BỊ BÃI BỎ MỘT PHẦN' }
+                      : { mau: 'border-sky-400 bg-sky-50', chu: 'text-sky-800', icon: '✏️', nhan: 'ĐIỀU NÀY ĐÃ BỊ SỬA ĐỔI, BỔ SUNG' };
+                  return (
+                    <div className={`mt-2 rounded-xl border-2 ${kieu.mau} p-2.5`}>
+                      <p className={`text-[12px] font-extrabold ${kieu.chu}`}>
+                        {kieu.icon} {kieu.nhan}{t.tuNgay ? ` TỪ ${ngayVn(t.tuNgay)}` : ''}
+                      </p>
+                      <p className="mt-0.5 text-[12.5px] leading-snug text-slate-700">
+                        Bởi {kb ? <b>{nhanNgan(kb.ma, kb.soHieu)}</b> : t.boi}
+                        {t.boiDieu ? <> — Điều {t.boiDieu}</> : null}
+                        {t.phan ? <> · phần bị động tới: <i>{t.phan}</i></> : null}
+                        {t.loai === 'het-hieu-luc' && ' — chữ dưới đây chỉ dùng để tra hồ sơ thuộc thời kỳ trước đó.'}
+                      </p>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        <NutDan d={{ ma: t.boi, ...(t.boiDieu ? { so: t.boiDieu } : {}) }} nho />
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* KHUNG GIẢI THÍCH — màu khác hẳn, ghi rõ không phải chữ luật, để người đọc
                     không bao giờ lẫn với nguyên văn bên dưới. */}

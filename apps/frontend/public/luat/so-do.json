@@ -21,6 +21,18 @@
       },
       {
        "ma": "nd102-2024"
+      },
+      {
+       "ma": "tt29-2024",
+       "so": 3
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 7
+      },
+      {
+       "ma": "nd123-2024",
+       "so": 6
       }
      ],
      "chiTiet": "Ba nhóm: đất nông nghiệp · đất phi nông nghiệp · đất chưa sử dụng, chia theo mục đích sử dụng (Điều 9). Thửa cụ thể thuộc loại nào thì căn cứ Điều 10 — xét giấy tờ trước, hiện trạng sau."
@@ -36,6 +48,22 @@
       {
        "ma": "ldd2024",
        "so": 172
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 47
+      },
+      {
+       "ma": "nd101-2024",
+       "so": 26
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 33
+      },
+      {
+       "ma": "nd88-2024",
+       "so": 12
       }
      ],
      "chiTiet": "Đất ở là đất sử dụng ổn định lâu dài, không phải xin gia hạn (Điều 171). Đất nông nghiệp của cá nhân có thời hạn 50 năm, hết thời hạn được tiếp tục sử dụng (Điều 172)."
@@ -59,6 +87,22 @@
       {
        "ma": "ldd2024",
        "so": 196
+      },
+      {
+       "ma": "nd88-2024",
+       "so": 12
+      },
+      {
+       "ma": "nd101-2024",
+       "so": 26
+      },
+      {
+       "ma": "nd101-2024",
+       "so": 18
+      },
+      {
+       "ma": "nd103-2024",
+       "so": 10
       }
      ],
      "chiTiet": "Phân biệt cho chắc ba thứ: HẠN MỨC GIAO đất nông nghiệp (Điều 176 — Khánh Hoà 2 ha đất trồng cây hằng năm) · HẠN MỨC NHẬN CHUYỂN QUYỀN sử dụng đất nông nghiệp của cá nhân bằng 15 lần hạn mức giao (Điều 177 — chính là con số dùng khi mua đất nông nghiệp) · hạn mức giao đất ở tại nông thôn và tại đô thị do UBND cấp tỉnh quy định (Điều 195, 196)."
@@ -66,31 +110,12 @@
    ]
   },
   {
-   "ten": "Đăng ký đất đai · Cấp Giấy chứng nhận",
+   "ten": "Cấp Giấy chứng nhận",
    "icon": "📗",
    "mau": "emerald",
    "neo": "4 trường hợp · 3 mốc",
    "y": "Luật gọi là “Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất” — dân quen gọi sổ đỏ, sổ hồng. Bốn trường hợp được xét cấp, tuỳ giấy tờ đang có.",
    "con": [
-    {
-     "ten": "Nguyên tắc đăng ký · Đăng ký lần đầu · Đăng ký biến động",
-     "y": "🔗 Gom 3 điều học 1 lần. Đăng ký đất đai là BẮT BUỘC.",
-     "dan": [
-      {
-       "ma": "ldd2024",
-       "so": 131
-      },
-      {
-       "ma": "ldd2024",
-       "so": 133
-      },
-      {
-       "ma": "ldd2024",
-       "so": 135
-      }
-     ],
-     "chiTiet": "Chưa từng đăng ký thì đăng ký lần đầu; sau đó mọi thay đổi đều là ĐĂNG KÝ BIẾN ĐỘNG (Điều 133) — xem đủ các trường hợp ở thẻ Tình huống. Nguyên tắc đăng ký ở Điều 131, nguyên tắc cấp Giấy chứng nhận ở Điều 135."
-    },
     {
      "ten": "Trường hợp 1 — Đang sử dụng đất CÓ giấy tờ về quyền sử dụng đất",
      "y": "Trường hợp đơn giản nhất: có một trong các loại giấy tờ liệt kê tại Điều 137 là được xét cấp.",
@@ -98,6 +123,14 @@
       {
        "ma": "ldd2024",
        "so": 137
+      },
+      {
+       "ma": "nd101-2024",
+       "so": 24
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 99
       }
      ],
      "chiTiet": "Điểm chung của cả bốn trường hợp: UBND cấp xã xác nhận đất không có tranh chấp, và mốc thời gian sử dụng càng sớm thì càng có lợi."
@@ -109,6 +142,14 @@
       {
        "ma": "ldd2024",
        "so": 138
+      },
+      {
+       "ma": "nd103-2024",
+       "so": 10
+      },
+      {
+       "ma": "nd101-2024",
+       "so": 26
       }
      ],
      "chiTiet": "Phần diện tích nằm trong hạn mức công nhận đất ở thì được công nhận là đất ở; phần vượt hạn mức công nhận theo loại đất đang sử dụng."
@@ -120,6 +161,14 @@
       {
        "ma": "ldd2024",
        "so": 139
+      },
+      {
+       "ma": "nd123-2024",
+       "so": 8
+      },
+      {
+       "ma": "nd101-2024",
+       "so": 25
       }
      ],
      "chiTiet": "Không xét nếu đất đang vướng rừng phòng hộ, rừng đặc dụng, hoặc công trình công cộng."
@@ -131,6 +180,14 @@
       {
        "ma": "ldd2024",
        "so": 140
+      },
+      {
+       "ma": "nd103-2024",
+       "so": 12
+      },
+      {
+       "ma": "nd123-2024",
+       "so": 18
       }
      ],
      "chiTiet": "Vẫn gỡ được nếu đã sử dụng trước 01/7/2014. Tiền sử dụng đất phải nộp khác nhau theo từng mốc."
@@ -142,6 +199,14 @@
       {
        "ma": "ldd2024",
        "so": 141
+      },
+      {
+       "ma": "nd101-2024",
+       "so": 18
+      },
+      {
+       "ma": "nd103-2024",
+       "so": 11
       }
      ],
      "chiTiet": "Và không phải nộp tiền sử dụng đất cho phần đó."
@@ -158,6 +223,435 @@
       }
      ],
      "chiTiet": "Kèm quy định về thành phần và cách lập hồ sơ địa chính."
+    }
+   ]
+  },
+  {
+   "ten": "Đăng ký biến động",
+   "icon": "🔄",
+   "mau": "sky",
+   "neo": "16 trường hợp · 7 cái bắt buộc 30 ngày",
+   "y": "Thửa đã có Giấy chứng nhận rồi, về sau có thay đổi gì thì phải đăng ký biến động. Nhớ kỹ 7 trường hợp bắt buộc làm trong 30 ngày.",
+   "con": [
+    {
+     "ten": "Nguyên tắc đăng ký · Đăng ký lần đầu · Đăng ký biến động",
+     "y": "🔗 Gom 3 điều học 1 lần. Đăng ký đất đai là BẮT BUỘC.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 131
+      },
+      {
+       "ma": "ldd2024",
+       "so": 133
+      },
+      {
+       "ma": "ldd2024",
+       "so": 135
+      },
+      {
+       "ma": "nd101-2024",
+       "so": 18
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 101
+      },
+      {
+       "ma": "nd103-2024",
+       "so": 13
+      },
+      {
+       "ma": "nd88-2024",
+       "so": 6
+      }
+     ],
+     "chiTiet": "Chưa từng đăng ký thì đăng ký lần đầu; sau đó mọi thay đổi đều là ĐĂNG KÝ BIẾN ĐỘNG (Điều 133) — xem đủ các trường hợp ở thẻ Tình huống. Nguyên tắc đăng ký ở Điều 131, nguyên tắc cấp Giấy chứng nhận ở Điều 135."
+    },
+    {
+     "ten": "Đăng ký biến động — 16 trường hợp",
+     "y": "Khoản 1 Điều 133 liệt kê 16 điểm (a → q). Thửa đã có Giấy chứng nhận, về sau có thay đổi gì là đăng ký biến động.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 133
+      },
+      {
+       "ma": "nd101-2024",
+       "so": 18
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 101
+      }
+     ],
+     "chiTiet": "Hay gặp nhất: thực hiện quyền chuyển đổi, chuyển nhượng, thừa kế, tặng cho, thế chấp, góp vốn (điểm a) · đổi tên (điểm b) · thay đổi thông tin người sử dụng đất (điểm c) · thay đổi ranh giới, kích thước, diện tích, số hiệu, địa chỉ thửa đất (điểm d) · đăng ký quyền sở hữu tài sản gắn liền với đất (điểm đ) · chuyển mục đích sử dụng đất (điểm e) · thay đổi thời hạn sử dụng đất (điểm g) · cấp đổi, cấp lại Giấy chứng nhận (điểm n) · thế chấp (điểm p)."
+    },
+    {
+     "ten": "Bảy trường hợp BẮT BUỘC trong 30 ngày",
+     "y": "🔑 Khoản 3 Điều 133: chỉ 7 điểm a, b, i, k, l, m, q phải đăng ký trong 30 ngày kể từ ngày có biến động.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 133
+      },
+      {
+       "ma": "nd123-2024"
+      },
+      {
+       "ma": "nd101-2024",
+       "so": 18
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 101
+      }
+     ],
+     "chiTiet": "Bảy chữ cái này phải thuộc lòng — quá hạn bị xử phạt theo Nghị định 123/2024. Chín trường hợp còn lại không bị ràng thời hạn 30 ngày, nhưng chưa đăng ký thì chưa thực hiện được quyền."
+    },
+    {
+     "ten": "Giấy chứng nhận đã cấp thì xử lý thế nào",
+     "y": "Điều 134: xác nhận thay đổi trên giấy đã cấp, hoặc cấp mới Giấy chứng nhận — tuỳ trường hợp.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 134
+      },
+      {
+       "ma": "tt10-2024"
+      },
+      {
+       "ma": "tt10-2024",
+       "so": 1
+      }
+     ],
+     "chiTiet": "Cách ghi từng mục khi xác nhận biến động nằm ở Thông tư 10/2024."
+    },
+    {
+     "ten": "Trình tự, hồ sơ, thời hạn giải quyết",
+     "y": "Nghị định 101/2024 quy định trình tự đăng ký biến động, cấp đổi, cấp lại.",
+     "dan": [
+      {
+       "ma": "nd101-2024"
+      },
+      {
+       "ma": "nd151-2025"
+      }
+     ],
+     "chiTiet": "⚠️ Nghị định 151/2025 (hiệu lực 01/7/2025) đã bãi bỏ một loạt điều của Nghị định 101/2024 về nơi nộp hồ sơ, thời hạn giải quyết và toàn bộ Mẫu 01/ĐK → 14/ĐK. Thời hạn và mẫu đơn hiện hành phải lấy ở Phụ lục Nghị định 151/2025, đừng dùng bản cũ."
+    }
+   ]
+  },
+  {
+   "ten": "Thu hồi đất",
+   "icon": "🚧",
+   "mau": "rose",
+   "neo": "3 nhóm căn cứ",
+   "y": "Nhà nước lấy lại đất trong những trường hợp nào, theo trình tự nào.",
+   "con": [
+    {
+     "ten": "1. Các trường hợp Nhà nước thu hồi đất",
+     "y": "🔗 Gom 3 điều học 1 lần: quốc phòng - an ninh · phát triển kinh tế - xã hội · do vi phạm.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 78
+      },
+      {
+       "ma": "ldd2024",
+       "so": 79
+      },
+      {
+       "ma": "ldd2024",
+       "so": 81
+      },
+      {
+       "ma": "tt29-2024",
+       "so": 43
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 34
+      },
+      {
+       "ma": "nd151-2025",
+       "so": 7
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 30
+      },
+      {
+       "ma": "nd123-2024",
+       "so": 17
+      }
+     ],
+     "chiTiet": "Quốc phòng, an ninh (Điều 78) · phát triển kinh tế - xã hội vì lợi ích quốc gia, công cộng — danh sách ĐÓNG 31 trường hợp ở khoản 1 đến khoản 31 Điều 79, ngoài 31 trường hợp đó thì Quốc hội phải sửa luật · do vi phạm pháp luật về đất đai (Điều 81)."
+    },
+    {
+     "ten": "2. Căn cứ, điều kiện thu hồi đất",
+     "y": "Điều 80: có trong kế hoạch sử dụng đất hằng năm cấp huyện và đã có quyết định phê duyệt dự án — thiếu một trong hai là chưa được thu hồi.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 80
+      },
+      {
+       "ma": "nd102-2024"
+      }
+     ],
+     "chiTiet": "Riêng dự án phải thu hồi theo tiến độ thì căn cứ vào tiến độ đã duyệt."
+    },
+    {
+     "ten": "3. Thu hồi do VI PHẠM pháp luật đất đai",
+     "y": "Điều 81: nhóm căn cứ thứ ba, khác hẳn hai nhóm trên — đây là chế tài, không có bồi thường về đất.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 81
+      },
+      {
+       "ma": "nd102-2024"
+      },
+      {
+       "ma": "nd123-2024"
+      }
+     ],
+     "chiTiet": "Hay gặp nhất: không đưa đất vào sử dụng hoặc chậm đưa đất vào sử dụng (khoản 8, khoản 9). Trình tự xử lý ở Nghị định 102/2024."
+    },
+    {
+     "ten": "4. Thu hồi do CHẤM DỨT sử dụng, tự nguyện trả lại, có nguy cơ đe doạ tính mạng",
+     "y": "Điều 82: nhóm không phải thu hồi vì dự án cũng không phải do vi phạm.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 82
+      }
+     ]
+    },
+    {
+     "ten": "5. Thẩm quyền và thông báo thu hồi đất",
+     "y": "Điều 83 (ai ra quyết định) và Điều 85 (phải thông báo trước) — thông báo thu hồi đất là mốc pháp lý quan trọng.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 83
+      },
+      {
+       "ma": "ldd2024",
+       "so": 85
+      },
+      {
+       "ma": "ldd2024",
+       "so": 105
+      },
+      {
+       "ma": "nd151-2025"
+      }
+     ],
+     "chiTiet": "Sau ngày có thông báo thu hồi đất mà xây thêm, trồng thêm thì phần đó không được bồi thường (Điều 105)."
+    },
+    {
+     "ten": "6. Trình tự, thủ tục thu hồi đất",
+     "y": "Điều 87: toàn bộ các bước từ thông báo → kiểm đếm → lập phương án → phê duyệt → chi trả → bàn giao đất.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 87
+      },
+      {
+       "ma": "ldd2024",
+       "so": 88
+      },
+      {
+       "ma": "ldd2024",
+       "so": 89
+      },
+      {
+       "ma": "nd88-2024"
+      }
+     ],
+     "chiTiet": "Cưỡng chế kiểm đếm ở Điều 88, cưỡng chế thu hồi ở Điều 89 — chỉ dùng khi đã đủ điều kiện luật định."
+    },
+    {
+     "ten": "7. Trưng dụng đất",
+     "y": "Điều 90: khác THU HỒI — trưng dụng chỉ dùng đất trong thời gian ngắn rồi trả lại, có bồi thường thiệt hại.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 90
+      }
+     ],
+     "chiTiet": "Thời hạn trưng dụng không quá 30 ngày, trường hợp đặc biệt được gia hạn."
+    }
+   ]
+  },
+  {
+   "ten": "Bồi thường, hỗ trợ, tái định cư",
+   "icon": "💰",
+   "mau": "amber",
+   "neo": "6 bước",
+   "y": "Phần dày nhất của luật. Dùng đúng chữ: luật gọi là BỒI THƯỜNG, không phải “đền bù”. Đi theo 7 bước này là không sót khoản nào.",
+   "con": [
+    {
+     "ten": "2. Nguyên tắc bồi thường, hỗ trợ, tái định cư",
+     "y": "Bồi thường bằng đất cùng loại trước, không có đất thì mới bằng tiền.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 91
+      },
+      {
+       "ma": "nd151-2025",
+       "so": 5
+      }
+     ],
+     "chiTiet": "Phương án bồi thường, hỗ trợ, tái định cư phải được phê duyệt XONG TRƯỚC khi có quyết định thu hồi đất."
+    },
+    {
+     "ten": "3. Điều kiện được bồi thường về đất",
+     "y": "🔗 Gom 3 điều học 1 lần: đủ điều kiện · không đủ · vẫn còn chi phí đầu tư vào đất.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 95
+      },
+      {
+       "ma": "ldd2024",
+       "so": 101
+      },
+      {
+       "ma": "ldd2024",
+       "so": 107
+      },
+      {
+       "ma": "nd88-2024",
+       "so": 1
+      },
+      {
+       "ma": "nd103-2024",
+       "so": 16
+      }
+     ],
+     "chiTiet": "Đủ điều kiện thì theo Điều 95. Không đủ thì Điều 101, nhưng vẫn được bồi thường chi phí đầu tư vào đất còn lại theo Điều 107."
+    },
+    {
+     "ten": "4. Bồi thường về ĐẤT",
+     "y": "🔗 Gom 4 điều học 1 lần, chia theo loại đất bị thu hồi.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 96
+      },
+      {
+       "ma": "ldd2024",
+       "so": 98
+      },
+      {
+       "ma": "ldd2024",
+       "so": 99
+      },
+      {
+       "ma": "ldd2024",
+       "so": 100
+      },
+      {
+       "ma": "nd88-2024",
+       "so": 1
+      }
+     ],
+     "chiTiet": "Đất nông nghiệp của hộ gia đình, cá nhân — chỉ phần trong hạn mức (Điều 96) · đất ở (Điều 98) · đất phi nông nghiệp không phải đất ở của hộ gia đình, cá nhân (Điều 99) · của tổ chức (Điều 100)."
+    },
+    {
+     "ten": "5. Bồi thường về TÀI SẢN gắn liền với đất",
+     "y": "🔗 Gom 4 điều học 1 lần. Nhà tính theo giá XÂY MỚI, không trừ khấu hao.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 102
+      },
+      {
+       "ma": "ldd2024",
+       "so": 103
+      },
+      {
+       "ma": "ldd2024",
+       "so": 104
+      },
+      {
+       "ma": "ldd2024",
+       "so": 105
+      },
+      {
+       "ma": "nd88-2024",
+       "so": 1
+      }
+     ],
+     "chiTiet": "Nhà, công trình xây dựng (Điều 102) · cây trồng, vật nuôi (Điều 103) · chi phí di chuyển tài sản (Điều 104) · trường hợp KHÔNG được bồi thường, ví dụ xây thêm sau khi đã có thông báo thu hồi đất (Điều 105)."
+    },
+    {
+     "ten": "6. Hỗ trợ khi Nhà nước thu hồi đất",
+     "y": "Sáu loại hỗ trợ tại khoản 1 Điều 108.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 108
+      },
+      {
+       "ma": "ldd2024",
+       "so": 109
+      },
+      {
+       "ma": "nd88-2024",
+       "so": 1
+      },
+      {
+       "ma": "nd151-2025",
+       "so": 10
+      },
+      {
+       "ma": "nd151-2025",
+       "so": 14
+      }
+     ],
+     "chiTiet": "Ổn định đời sống · ổn định sản xuất, kinh doanh · di dời vật nuôi · đào tạo, chuyển đổi nghề và tìm kiếm việc làm · tái định cư · tháo dỡ, phá dỡ, di dời. Riêng hỗ trợ đào tạo, chuyển đổi nghề (Điều 109) không quá 05 lần giá đất nông nghiệp cùng loại trong bảng giá đất; mức cụ thể do UBND cấp tỉnh quyết định, Khánh Hoà đang áp dụng 3 lần."
+    },
+    {
+     "ten": "7. Tái định cư",
+     "y": "Phương án tái định cư phải niêm yết công khai ít nhất 15 ngày.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 110
+      },
+      {
+       "ma": "ldd2024",
+       "so": 111
+      },
+      {
+       "ma": "nd151-2025",
+       "so": 12
+      },
+      {
+       "ma": "nd88-2024",
+       "so": 1
+      },
+      {
+       "ma": "nd151-2025",
+       "so": 5
+      }
+     ],
+     "chiTiet": "Tiền bồi thường không đủ mua suất tái định cư tối thiểu thì Nhà nước hỗ trợ cho đủ (Điều 111)."
+    },
+    {
+     "ten": "Quy định chi tiết và mức áp dụng tại Khánh Hoà",
+     "y": "Nghị định 88/2024 quy định chi tiết về bồi thường, hỗ trợ, tái định cư.",
+     "dan": [
+      {
+       "ma": "nd88-2024"
+      }
+     ],
+     "chiTiet": "Mức cụ thể ở Quyết định 17/2024 và Quyết định 14/2025 của UBND tỉnh Khánh Hoà."
     }
    ]
   },
@@ -183,6 +677,26 @@
       {
        "ma": "ldd2024",
        "so": 123
+      },
+      {
+       "ma": "tt29-2024",
+       "so": 28
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 19
+      },
+      {
+       "ma": "nd103-2024",
+       "so": 6
+      },
+      {
+       "ma": "tt29-2024",
+       "so": 43
+      },
+      {
+       "ma": "nd151-2025",
+       "so": 5
       }
      ],
      "chiTiet": "Trường hợp phải được cơ quan nhà nước cho phép (Điều 121) · căn cứ để cho phép, tức phải có trong kế hoạch sử dụng đất hằng năm cấp huyện (Điều 116) · ai có thẩm quyền cho phép (Điều 123)."
@@ -194,6 +708,14 @@
       {
        "ma": "ldd2024",
        "so": 220
+      },
+      {
+       "ma": "nd88-2024",
+       "so": 11
+      },
+      {
+       "ma": "nd101-2024",
+       "so": 7
       }
      ],
      "chiTiet": "Diện tích tối thiểu do UBND cấp tỉnh quy định, mỗi địa phương một mức."
@@ -205,6 +727,10 @@
       {
        "ma": "ldd2024",
        "so": 218
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 99
       }
      ],
      "chiTiet": "Áp dụng cho đất nông nghiệp hoặc đất ở. Phải lập phương án sử dụng đất kết hợp trình cơ quan có thẩm quyền phê duyệt."
@@ -216,6 +742,14 @@
       {
        "ma": "ldd2024",
        "so": 219
+      },
+      {
+       "ma": "nd151-2025",
+       "so": 5
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 100
       }
      ],
      "chiTiet": "Dùng khi chỉnh trang khu dân cư. Cốt lõi là sự đồng thuận của người sử dụng đất trong khu vực."
@@ -236,6 +770,14 @@
       {
        "ma": "ldd2024",
        "so": 45
+      },
+      {
+       "ma": "nd123-2024",
+       "so": 17
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 78
       }
      ],
      "chiTiet": "Có Giấy chứng nhận · đất không có tranh chấp · quyền sử dụng đất không bị kê biên hoặc áp dụng biện pháp khác để bảo đảm thi hành án · còn trong thời hạn sử dụng đất · không bị áp dụng biện pháp khẩn cấp tạm thời. Nợ nghĩa vụ tài chính thì phải nộp xong trước."
@@ -267,6 +809,14 @@
       {
        "ma": "ldd2024",
        "so": 159
+      },
+      {
+       "ma": "nd103-2024",
+       "so": 5
+      },
+      {
+       "ma": "nd151-2025",
+       "so": 8
       }
      ],
      "chiTiet": "Dùng để tính tiền sử dụng đất khi công nhận quyền sử dụng đất, khi cho phép chuyển mục đích; tính thuế, lệ phí và tiền xử phạt."
@@ -278,6 +828,14 @@
       {
        "ma": "ldd2024",
        "so": 160
+      },
+      {
+       "ma": "nd103-2024",
+       "so": 5
+      },
+      {
+       "ma": "nd151-2025",
+       "so": 5
       }
      ],
      "chiTiet": "Còn dùng để tính tiền giao đất cho tổ chức và giá khởi điểm đấu giá quyền sử dụng đất."
@@ -304,150 +862,6 @@
    ]
   },
   {
-   "ten": "Thu hồi đất · Bồi thường, hỗ trợ, tái định cư",
-   "icon": "🚧",
-   "mau": "rose",
-   "neo": "7 bước",
-   "y": "Phần dày nhất của luật. Dùng đúng chữ: luật gọi là BỒI THƯỜNG, không phải “đền bù”. Đi theo 7 bước này là không sót khoản nào.",
-   "con": [
-    {
-     "ten": "1. Các trường hợp Nhà nước thu hồi đất",
-     "y": "🔗 Gom 3 điều học 1 lần: quốc phòng - an ninh · phát triển kinh tế - xã hội · do vi phạm.",
-     "dan": [
-      {
-       "ma": "ldd2024",
-       "so": 78
-      },
-      {
-       "ma": "ldd2024",
-       "so": 79
-      },
-      {
-       "ma": "ldd2024",
-       "so": 81
-      }
-     ],
-     "chiTiet": "Quốc phòng, an ninh (Điều 78) · phát triển kinh tế - xã hội vì lợi ích quốc gia, công cộng — danh sách ĐÓNG 31 trường hợp ở khoản 1 đến khoản 31 Điều 79, ngoài 31 trường hợp đó thì Quốc hội phải sửa luật · do vi phạm pháp luật về đất đai (Điều 81)."
-    },
-    {
-     "ten": "2. Nguyên tắc bồi thường, hỗ trợ, tái định cư",
-     "y": "Bồi thường bằng đất cùng loại trước, không có đất thì mới bằng tiền.",
-     "dan": [
-      {
-       "ma": "ldd2024",
-       "so": 91
-      }
-     ],
-     "chiTiet": "Phương án bồi thường, hỗ trợ, tái định cư phải được phê duyệt XONG TRƯỚC khi có quyết định thu hồi đất."
-    },
-    {
-     "ten": "3. Điều kiện được bồi thường về đất",
-     "y": "🔗 Gom 3 điều học 1 lần: đủ điều kiện · không đủ · vẫn còn chi phí đầu tư vào đất.",
-     "dan": [
-      {
-       "ma": "ldd2024",
-       "so": 95
-      },
-      {
-       "ma": "ldd2024",
-       "so": 101
-      },
-      {
-       "ma": "ldd2024",
-       "so": 107
-      }
-     ],
-     "chiTiet": "Đủ điều kiện thì theo Điều 95. Không đủ thì Điều 101, nhưng vẫn được bồi thường chi phí đầu tư vào đất còn lại theo Điều 107."
-    },
-    {
-     "ten": "4. Bồi thường về ĐẤT",
-     "y": "🔗 Gom 4 điều học 1 lần, chia theo loại đất bị thu hồi.",
-     "dan": [
-      {
-       "ma": "ldd2024",
-       "so": 96
-      },
-      {
-       "ma": "ldd2024",
-       "so": 98
-      },
-      {
-       "ma": "ldd2024",
-       "so": 99
-      },
-      {
-       "ma": "ldd2024",
-       "so": 100
-      }
-     ],
-     "chiTiet": "Đất nông nghiệp của hộ gia đình, cá nhân — chỉ phần trong hạn mức (Điều 96) · đất ở (Điều 98) · đất phi nông nghiệp không phải đất ở của hộ gia đình, cá nhân (Điều 99) · của tổ chức (Điều 100)."
-    },
-    {
-     "ten": "5. Bồi thường về TÀI SẢN gắn liền với đất",
-     "y": "🔗 Gom 4 điều học 1 lần. Nhà tính theo giá XÂY MỚI, không trừ khấu hao.",
-     "dan": [
-      {
-       "ma": "ldd2024",
-       "so": 102
-      },
-      {
-       "ma": "ldd2024",
-       "so": 103
-      },
-      {
-       "ma": "ldd2024",
-       "so": 104
-      },
-      {
-       "ma": "ldd2024",
-       "so": 105
-      }
-     ],
-     "chiTiet": "Nhà, công trình xây dựng (Điều 102) · cây trồng, vật nuôi (Điều 103) · chi phí di chuyển tài sản (Điều 104) · trường hợp KHÔNG được bồi thường, ví dụ xây thêm sau khi đã có thông báo thu hồi đất (Điều 105)."
-    },
-    {
-     "ten": "6. Hỗ trợ khi Nhà nước thu hồi đất",
-     "y": "Sáu loại hỗ trợ tại khoản 1 Điều 108.",
-     "dan": [
-      {
-       "ma": "ldd2024",
-       "so": 108
-      },
-      {
-       "ma": "ldd2024",
-       "so": 109
-      }
-     ],
-     "chiTiet": "Ổn định đời sống · ổn định sản xuất, kinh doanh · di dời vật nuôi · đào tạo, chuyển đổi nghề và tìm kiếm việc làm · tái định cư · tháo dỡ, phá dỡ, di dời. Riêng hỗ trợ đào tạo, chuyển đổi nghề (Điều 109) không quá 05 lần giá đất nông nghiệp cùng loại trong bảng giá đất; mức cụ thể do UBND cấp tỉnh quyết định, Khánh Hoà đang áp dụng 3 lần."
-    },
-    {
-     "ten": "7. Tái định cư",
-     "y": "Phương án tái định cư phải niêm yết công khai ít nhất 15 ngày.",
-     "dan": [
-      {
-       "ma": "ldd2024",
-       "so": 110
-      },
-      {
-       "ma": "ldd2024",
-       "so": 111
-      }
-     ],
-     "chiTiet": "Tiền bồi thường không đủ mua suất tái định cư tối thiểu thì Nhà nước hỗ trợ cho đủ (Điều 111)."
-    },
-    {
-     "ten": "Quy định chi tiết và mức áp dụng tại Khánh Hoà",
-     "y": "Nghị định 88/2024 quy định chi tiết về bồi thường, hỗ trợ, tái định cư.",
-     "dan": [
-      {
-       "ma": "nd88-2024"
-      }
-     ],
-     "chiTiet": "Mức cụ thể ở Quyết định 17/2024 và Quyết định 14/2025 của UBND tỉnh Khánh Hoà."
-    }
-   ]
-  },
-  {
    "ten": "Giải quyết tranh chấp · Xử phạt vi phạm hành chính",
    "icon": "⚖️",
    "mau": "orange",
@@ -461,6 +875,14 @@
       {
        "ma": "ldd2024",
        "so": 235
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 105
+      },
+      {
+       "ma": "nd151-2025",
+       "so": 17
       }
      ],
      "chiTiet": "Chưa hoà giải ở xã thì chưa khởi kiện hay đề nghị giải quyết ở đâu được."
@@ -472,6 +894,10 @@
       {
        "ma": "ldd2024",
        "so": 236
+      },
+      {
+       "ma": "nd151-2025",
+       "so": 5
       }
      ],
      "chiTiet": "Giấy tờ quy định tại Điều 137 cũng được coi như có Giấy chứng nhận khi xác định thẩm quyền."
@@ -540,6 +966,10 @@
       },
       {
        "ma": "nd102-2024"
+      },
+      {
+       "ma": "nd102-2024",
+       "so": 70
       }
      ],
      "chiTiet": "Nếu chạm vào di tích, khu bảo tồn, cảng biển thì phải do Quốc hội hoặc Thủ tướng Chính phủ chấp thuận. Chi tiết nay ở Nghị định 102/2024 (Nghị định 42/2024 đã hết hiệu lực)."

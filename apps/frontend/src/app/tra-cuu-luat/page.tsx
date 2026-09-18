@@ -81,7 +81,7 @@ type LoTrinh = { chang: Chang2[]; theoDieu: Record<string, number[]>; theoVanBan
 type TheSo = { hoi: string; dap: string; nho?: string; chuDe: string; dan?: Dan[] };
 type KhoTheSo = { canhBao: string; the: TheSo[] };
 // Một thẻ đã dựng xong, sẵn sàng đưa ra hỏi.
-type TheHoc = { khoa: string; loai: string; chuDe: string; hoi: string; dap: string; nho?: string; dan?: Dan[] };
+type TheHoc = { khoa: string; loai: string; chuDe: string; hoi: string; dap: string; nho?: string; dan?: Dan[] ; truc?: number };
 
 // DẪN CHIẾU TRONG CHỮ LUẬT — biến thành nút bấm được, kiểu Thư viện pháp luật.
 // Ba dạng, xét theo đúng thứ tự này (dạng dài phải xét trước, không thì bị dạng ngắn ăn mất):
@@ -423,7 +423,11 @@ export default function TraCuuLuatPage() {
     const daBatDauHomNay = Object.values(boThe).filter((c: any) => c?.batDau === hn).length;
     const denHan = theTheoChuDe.filter((t) => boThe[t.khoa] && (boThe[t.khoa] as any).ngayOn <= hn);
     const conNhan = Math.max(0, theMoiMoiNgay - daBatDauHomNay);
-    const moi = theTheoChuDe.filter((t) => !boThe[t.khoa]).slice(0, conNhan);
+    // THẺ TRỤC HỌC TRƯỚC: điều bị nhiều điều khác dẫn tới là trục của cả mảng
+    // (Điều 9 Phân loại đất bị dẫn tới 36 lần). Học trục trước rồi mới học chi tiết thì
+    // mới có chỗ móc kiến thức vào; học lộn ngược là học vẹt.
+    const moi = theTheoChuDe.filter((t) => !boThe[t.khoa])
+      .sort((a, b) => (b.truc || 0) - (a.truc || 0)).slice(0, conNhan);
     // XẾP THEO CHẶNG rồi mới trộn TRONG TỪNG CHẶNG.
     // Trộn tất tay như trước thì học xen kẽ đúng là nhớ lâu hơn, nhưng xen kẽ giữa những
     // thứ CHẲNG LIÊN QUAN GÌ NHAU thì chỉ thành chắp vá. Xen kẽ có tác dụng khi các thứ
@@ -431,7 +435,8 @@ export default function TraCuuLuatPage() {
     const hat = Number(hn.split('-').join(''));
     return [...denHan, ...moi]
       .map((t, i2) => ({ t, c: changCua(t), r: (hat + i2 * 2654435761) % 1000003 }))
-      .sort((a, b) => (a.c - b.c) || (a.r - b.r)).map((x) => x.t);
+      .sort((a, b) => (a.c - b.c) || ((b.t.truc || 0) - (a.t.truc || 0)) || (a.r - b.r))
+      .map((x) => x.t);
   }, [theTheoChuDe, boThe, theMoiMoiNgay, lt]);
   // Số thẻ mới còn nhận được hôm nay — hiện lên cho biết còn bao nhiêu là xong phần mới.
   const theMoiConLai = useMemo(() => {

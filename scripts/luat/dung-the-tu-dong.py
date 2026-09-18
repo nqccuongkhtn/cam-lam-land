@@ -61,6 +61,8 @@ def lam(thu_muc):
         p = os.path.join(thu_muc, x['ma'] + '.json')
         if os.path.exists(p):
             vb[x['ma']] = json.load(open(p, encoding='utf-8'))
+    p_cd = os.path.join(thu_muc, 'chuoi-doc.json')
+    cd = json.load(open(p_cd, encoding='utf-8')) if os.path.exists(p_cd) else {'chuoi': {}, 'truc': {}}
 
     the = []
 
@@ -160,6 +162,35 @@ def lam(thu_muc):
                     'dan': [{'ma': ma, 'so': d['so']}, {'ma': sd['boi'], 'so': sd['boiDieu']}],
                 })
 
+    # ── 3b. CHUỖI DỌC: điều luật này được văn bản nào hướng dẫn ──────────────
+    # Đọc xong Điều 137 vẫn chưa làm được hồ sơ, vì trình tự nằm ở Nghị định 101/2024,
+    # mẫu giấy ở Thông tư 10/2024, tiền ở Nghị định 103/2024. Đây là thứ phải nhớ nhất
+    # mà trước giờ cả kho chưa dạy.
+    for khoa, ds in (cd.get('chuoi') or {}).items():
+        ma0, so0 = khoa.split(':')
+        d0 = next((z for z in vb.get(ma0, {}).get('dieu', []) if str(z['so']) == so0), None)
+        if not d0:
+            continue
+        tie = (d0.get('tieuDe') or '').strip()
+        tong = sum(len(y['dieu']) for y in ds)
+        if tong < 2:
+            continue                       # chỉ 1 chỗ hướng dẫn thì chưa thành chuỗi
+        mo = ' · '.join('%s Điều %s' % (y['nhan'], ', '.join(str(z) for z in y['dieu'][:6]))
+                        for y in ds[:4])
+        dan = [{'ma': ma0, 'so': int(so0)}]
+        for y in ds[:3]:
+            for z in y['dieu'][:2]:
+                dan.append({'ma': y['ma'], 'so': z})
+        the.append({
+            'khoa': 'chuoi:' + khoa, 'loai': 'Chuỗi dọc',
+            'chuDe': 'Luật → Nghị định → Thông tư',
+            'hoi': 'Điều %s Luật Đất đai 2024 (%s) được hướng dẫn chi tiết ở những văn bản nào?'
+                   % (so0, tie),
+            'dap': 'Có %d văn bản hướng dẫn, tổng %d điều: %s.' % (len(ds), tong, mo),
+            'nho': '%d văn bản hướng dẫn' % len(ds),
+            'dan': dan[:7],
+        })
+
     # ── 4. Văn bản này là gì ─────────────────────────────────────────────────
     for x in kho:
         nhan = nhan_ngan(x['ma'], x['soHieu'])
@@ -174,6 +205,14 @@ def lam(thu_muc):
             'nho': '%s · %s' % (x['soHieu'], ngay_vn(x.get('ngayHieuLuc') or x['ngay'])),
             'dan': [{'ma': x['ma']}],
         })
+
+    # ── ĐIỂM TRỤC cho từng thẻ ──
+    # Điều bị nhiều điều khác dẫn tới là TRỤC của cả mảng. Học trục trước rồi mới học chi
+    # tiết thì mới có chỗ móc kiến thức vào; học lộn ngược là học vẹt.
+    for t in the:
+        d0 = (t.get('dan') or [{}])[0]
+        k0 = '%s:%s' % (d0.get('ma'), d0.get('so')) if d0.get('so') else ''
+        t['truc'] = (cd.get('truc') or {}).get(k0, [0, 0])[0]
 
     ra = os.path.join(thu_muc, 'the-tu-dong.json')
     json.dump({'the': the}, open(ra, 'w', encoding='utf-8'), ensure_ascii=False)

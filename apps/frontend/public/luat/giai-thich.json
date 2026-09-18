@@ -156,6 +156,78 @@
   "ldd2024:236": {
    "y": "CÓ SỔ (hoặc có giấy tờ theo Điều 137, hoặc tranh chấp về tài sản gắn liền với đất) thì TOÀ ÁN giải quyết. KHÔNG CÓ SỔ thì được chọn một trong hai: nộp đơn lên UBND, hoặc khởi kiện ra Toà. Chọn UBND thì tranh chấp giữa hộ gia đình, cá nhân, cộng đồng dân cư với nhau do Chủ tịch UBND cấp huyện giải quyết; có tổ chức hoặc yếu tố nước ngoài thì lên cấp tỉnh.",
    "nho": "Có sổ → Toà. Không sổ → chọn UBND hoặc Toà."
+  },
+  "ldd2024:85": {
+   "y": "Con số phải thuộc: thông báo thu hồi đất phải gửi tới từng người CHẬM NHẤT 90 NGÀY với đất nông nghiệp và 180 NGÀY với đất phi nông nghiệp, trước khi ra quyết định thu hồi. Dân đồng ý bàn giao sớm thì được thu hồi trước hạn. Khi quyết định thu hồi có hiệu lực và phương án đã công bố công khai thì phải chấp hành.",
+   "nho": "90 ngày đất nông nghiệp · 180 ngày đất phi nông nghiệp."
+  },
+  "ldd2024:87": {
+   "y": "Toàn bộ quy trình giải phóng mặt bằng nằm ở đây, 6 nhịp: họp dân trước → ra thông báo thu hồi, gửi từng người và niêm yết → điều tra, đo đạc, kiểm đếm, thống kê thiệt hại → lập phương án, niêm yết công khai, thẩm định → phê duyệt phương án → chi trả và bàn giao. UBND CẤP XÃ nơi có đất là đầu mối của gần như mọi bước.",
+   "nho": "Họp dân → thông báo → kiểm đếm → lập & niêm yết → duyệt → chi trả."
+  },
+  "ldd2024:88": {
+   "y": "Không phối hợp cho đo đạc, kiểm đếm thì bị ra quyết định KIỂM ĐẾM BẮT BUỘC, không chấp hành nữa thì cưỡng chế kiểm đếm. Đây là bước riêng, khác hẳn cưỡng chế thu hồi đất ở Điều 89.",
+   "nho": "Cưỡng chế kiểm đếm ≠ cưỡng chế thu hồi."
+  },
+  "ldd2024:94": {
+   "y": "Trong 30 NGÀY kể từ ngày quyết định phê duyệt phương án có hiệu lực, cơ quan làm bồi thường phải chi trả xong; chậm thì phải trả thêm khoản do chậm chi trả. Người dân không nhận tiền, hoặc đất đang tranh chấp, thì tiền được gửi vào tài khoản ngân hàng của đơn vị làm bồi thường — không mất đi.",
+   "nho": "30 ngày phải trả tiền; chậm thì phải bù thêm."
+  },
+  "ldd2024:135": {
+   "y": "Nguyên tắc cấp sổ: thửa đất nào cấp một sổ đó; đất do nhiều người chung quyền thì ghi đủ tên hoặc cấp cho mỗi người một sổ; tài sản gắn liền với đất chỉ chứng nhận khi có yêu cầu. Nắm nguyên tắc này trước khi đi vào từng trường hợp cụ thể ở các Điều 137-150.",
+   "nho": "Mỗi thửa một sổ; chung quyền thì ghi đủ tên."
+  },
+  "ldd2024:136": {
+   "y": "Ai ký sổ: cấp lần đầu và cấp cho tổ chức thuộc thẩm quyền cơ quan cấp tỉnh; cấp cho hộ gia đình, cá nhân và các trường hợp đăng ký biến động thuộc cơ quan cấp huyện / Văn phòng đăng ký đất đai. Sau 01/7/2025 (chính quyền hai cấp) phải tra lại ở Nghị định 151/2025.",
+   "nho": "Tổ chức → tỉnh. Dân → huyện / Văn phòng đăng ký."
+  },
+  "ldd2024:152": {
+   "y": "Ba việc khác nhau, hay bị gọi lẫn: ĐÍNH CHÍNH (sổ ghi sai thông tin do lỗi của cơ quan), THU HỒI sổ đã cấp (cấp không đúng quy định, cấp trùng, đất bị Nhà nước thu hồi…), HUỶ sổ. Bị đòi thu hồi sổ thì phải xem rơi đúng vào trường hợp nào của điều này, không được thu hồi tuỳ tiện.",
+   "nho": "Đính chính ≠ thu hồi ≠ huỷ sổ."
+  },
+  "ldd2024:253": {
+   "y": "Chuyển tiếp về quy hoạch, kế hoạch sử dụng đất khi Luật 2024 có hiệu lực (01/8/2024): quy hoạch, kế hoạch đã được duyệt theo luật cũ thì tiếp tục thực hiện cho hết kỳ, không phải làm lại.",
+   "nho": "Quy hoạch đã duyệt thì chạy tiếp hết kỳ."
+  },
+  "ldd2024:254": {
+   "y": "Điều quan trọng nhất cho hồ sơ thu hồi vắt qua mốc 01/8/2024, và nó chia theo VIỆC ĐÃ LÀM TỚI ĐÂU chứ không theo ngày nộp hồ sơ. Đã có quyết định thu hồi mà CHƯA duyệt phương án → làm tiếp theo LUẬT MỚI. Đã duyệt phương án rồi mà chưa thực hiện → theo PHƯƠNG ÁN CŨ. Có Khung chính sách của Thủ tướng mà địa phương chưa duyệt phương án → chọn cái CÓ LỢI HƠN cho dân.",
+   "nho": "Chưa duyệt phương án → luật mới. Duyệt rồi → phương án cũ."
+  },
+  "ldd2024:255": {
+   "y": "Chuyển tiếp về giao đất, cho thuê đất, chuyển mục đích: hồ sơ hợp lệ đã nộp trước ngày Luật 2024 có hiệu lực mà chưa giải quyết xong thì tiếp tục giải quyết theo quy định tại thời điểm nộp — đây là chỗ hay phải viện dẫn khi hồ sơ tồn đọng.",
+   "nho": "Hồ sơ nộp trước 01/8/2024 xử theo luật lúc nộp."
+  },
+  "ldd2024:260": {
+   "y": "Gom các trường hợp chuyển tiếp còn lại, trong đó có những trường hợp đã trả tiền thuê đất cho cả thời gian thuê trước 01/7/2004, và trường hợp nhận chuyển nhượng dự án bất động sản mà chưa xong thủ tục đất đai. Gặp hồ sơ cũ khó xếp loại thì tra điều này trước.",
+   "nho": "Điều 'vét' cho mọi hồ sơ cũ khó xếp."
+  },
+  "ldd2024:237": {
+   "y": "Khiếu nại, khởi kiện quyết định hành chính về đất đai (quyết định thu hồi, phương án bồi thường, từ chối cấp sổ…) đi theo pháp luật khiếu nại và tố tụng hành chính — KHÁC hẳn tranh chấp đất đai giữa dân với dân ở Điều 235-236. Nhầm đường là mất thời gian và có thể hết thời hiệu.",
+   "nho": "Cãi với CƠ QUAN → khiếu nại. Cãi với NGƯỜI → tranh chấp."
+  },
+  "nd101-2024:24": {
+   "y": "Điều xử lý phần đất DÔI RA khi đo lại. Hỏi hai câu theo thứ tự: thửa gốc đã có sổ hay mới có giấy tờ theo Điều 137, và phần tăng thêm có nguồn gốc gì. Phần tăng thêm có giấy tờ Điều 137 → công nhận cùng thửa gốc; do mua một phần thửa mà chưa sang tên → đi nhánh nhận chuyển quyền; không có gì → phải đủ điều kiện theo Điều 138, 139 hoặc 140. Điểm quan trọng: KHÔNG phải làm thêm thủ tục chuyển quyền, chuyển mục đích hay hợp thửa cho phần tăng thêm.",
+   "nho": "Hỏi nguồn gốc phần dôi ra; không phải hợp thửa lại."
+  },
+  "nd101-2024:38": {
+   "y": "Tám trường hợp được cấp đổi sổ, đáng nhớ nhất: đổi sổ cấp trước 01/8/2024 sang mẫu mới; sổ ghi 'hộ gia đình' nay ghi đủ tên các thành viên; sổ chỉ đứng tên vợ hoặc chồng nay ghi cả hai; mục đích sử dụng trên sổ khác phân loại đất của Luật 2024; vị trí thửa trên sổ không đúng thực tế. Hồ sơ: Đơn Mẫu số 11/ĐK + sổ đã cấp.",
+   "nho": "Đơn Mẫu 11/ĐK + sổ cũ. Đổi sang mẫu mới là quyền, không bắt buộc."
+  },
+  "nd101-2024:39": {
+   "y": "Cấp LẠI sổ do bị mất — khác cấp đổi. Phải khai báo, niêm yết thông báo mất, chờ đủ thời hạn rồi mới được cấp lại.",
+   "nho": "Mất sổ → cấp lại. Rách, sai thông tin → cấp đổi."
+  },
+  "nd102-2024:105": {
+   "y": "Thủ tục hoà giải ở xã, có mốc ngày rõ ràng: 03 NGÀY LÀM VIỆC kể từ ngày nhận đơn xã phải thông báo cho các bên và cho Văn phòng đăng ký đất đai; xã phải thẩm tra nguồn gốc, quá trình sử dụng, hiện trạng; lập Hội đồng hoà giải; họp có mặt các bên. Sau khi hoà giải thành, trong 10 NGÀY nếu có bên gửi ý kiến khác thì phải họp lại Hội đồng.",
+   "nho": "3 ngày thông báo · 10 ngày để đổi ý sau hoà giải thành."
+  },
+  "nd102-2024:108": {
+   "y": "Hai phần: (1) NĂM CĂN CỨ để phân xử khi không bên nào có giấy tờ — chứng cứ nguồn gốc và quá trình sử dụng đứng đầu; (2) trình tự CƯỠNG CHẾ thi hành quyết định giải quyết tranh chấp: quá 30 ngày không chấp hành thì nộp đơn yêu cầu thi hành ở UBND cấp huyện, 15 ngày sau có quyết định cưỡng chế, thi hành trong 10 ngày. Cưỡng chế chỉ làm trong giờ hành chính, không làm ban đêm, ngày nghỉ, ngày lễ.",
+   "nho": "Không giấy tờ thì thắng bằng CHỨNG CỨ NGUỒN GỐC."
+  },
+  "nd88-2024:31": {
+   "y": "Chuyển tiếp của nghị định bồi thường: phương án đã phê duyệt trước ngày nghị định có hiệu lực thì thực hiện tiếp theo phương án đó; chưa phê duyệt thì áp dụng nghị định mới. Đây là chỗ phải soi khi dự án kéo dài qua hai đời quy định.",
+   "nho": "Chưa duyệt phương án thì theo nghị định mới."
   }
  }
 }

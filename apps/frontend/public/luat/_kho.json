@@ -5,7 +5,15 @@
   "ngay": "2024-01-18",
   "ten": "Luật Đất đai",
   "soDieu": 260,
-  "kb": 805
+  "nguoiKy": "Vương Đình Huệ",
+  "ngayHieuLuc": "2025-01-01",
+  "kb": 805,
+  "dan": [],
+  "duocDan": [
+   "nd102-2024",
+   "nd123-2024",
+   "nd71-2024"
+  ]
  },
  {
   "ma": "nd42-2024",
@@ -13,7 +21,13 @@
   "ngay": "2024-04-16",
   "ten": "Về hoạt động lấn biển",
   "soDieu": 12,
-  "kb": 39
+  "nguoiKy": "Trần Hồng Hà",
+  "ngayHieuLuc": "",
+  "kb": 39,
+  "dan": [],
+  "duocDan": [
+   "nd102-2024"
+  ]
  },
  {
   "ma": "nd71-2024",
@@ -21,7 +35,17 @@
   "ngay": "2024-06-27",
   "ten": "Quy định về giá đất",
   "soDieu": 40,
-  "kb": 214
+  "nguoiKy": "Trần Hồng Hà",
+  "ngayHieuLuc": "",
+  "kb": 214,
+  "dan": [
+   "ldd2024"
+  ],
+  "duocDan": [
+   "nd123-2024",
+   "nd151-2025",
+   "tt12-2024"
+  ]
  },
  {
   "ma": "l43-2024",
@@ -29,7 +53,11 @@
   "ngay": "2024-06-29",
   "ten": "Luật sửa đổi, bổ sung một số điều của Luật Đất đai số 31/2024/QH15, Luật Nhà ở số 27/2023/QH15, Luật Kinh doanh bất động sản số 29/2023/QH15 và Luật Các tổ chức tín dụng số 32/2024/QH15",
   "soDieu": 5,
-  "kb": 5
+  "nguoiKy": "Trần Thanh Mẫn",
+  "ngayHieuLuc": "2024-08-01",
+  "kb": 5,
+  "dan": [],
+  "duocDan": []
  },
  {
   "ma": "nd88-2024",
@@ -37,7 +65,14 @@
   "ngay": "2024-07-15",
   "ten": "Quy định về bồi thường, hỗ trợ, tái định cư khi Nhà nước thu hồi đất",
   "soDieu": 32,
-  "kb": 117
+  "nguoiKy": "Trần Hồng Hà",
+  "ngayHieuLuc": "2024-08-01",
+  "kb": 117,
+  "dan": [],
+  "duocDan": [
+   "nd103-2024",
+   "nd151-2025"
+  ]
  },
  {
   "ma": "nd101-2024",
@@ -45,7 +80,15 @@
   "ngay": "2024-07-29",
   "ten": "Quy định về điều tra cơ bản đất đai; đăng ký, cấp Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất và Hệ thống thông tin đất đai",
   "soDieu": 68,
-  "kb": 414
+  "nguoiKy": "Trần Hồng Hà",
+  "ngayHieuLuc": "2024-08-01",
+  "kb": 414,
+  "dan": [],
+  "duocDan": [
+   "nd123-2024",
+   "nd151-2025",
+   "tt26-2024"
+  ]
  },
  {
   "ma": "nd102-2024",
@@ -53,7 +96,20 @@
   "ngay": "2024-07-30",
   "ten": "Quy định chi tiết thi hành một số điều của Luật Đất đai",
   "soDieu": 113,
-  "kb": 617
+  "nguoiKy": "Trần Hồng Hà",
+  "ngayHieuLuc": "2024-08-01",
+  "kb": 617,
+  "dan": [
+   "ldd2024",
+   "nd42-2024"
+  ],
+  "duocDan": [
+   "nd123-2024",
+   "nd151-2025",
+   "tt10-2024",
+   "tt26-2024",
+   "tt29-2024"
+  ]
  },
  {
   "ma": "nd103-2024",
@@ -61,7 +117,13 @@
   "ngay": "2024-07-30",
   "ten": "Quy định về tiền sử dụng đất, tiền thuê đất",
   "soDieu": 54,
-  "kb": 358
+  "nguoiKy": "Trần Hồng Hà",
+  "ngayHieuLuc": "2024-08-01",
+  "kb": 358,
+  "dan": [
+   "nd88-2024"
+  ],
+  "duocDan": []
  },
  {
   "ma": "tt10-2024",
@@ -69,7 +131,13 @@
   "ngay": "2024-07-31",
   "ten": "Quy định về hồ sơ địa chính, Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất",
   "soDieu": 45,
-  "kb": 244
+  "nguoiKy": "Lê Minh Ngân",
+  "ngayHieuLuc": "2024-08-01",
+  "kb": 244,
+  "dan": [
+   "nd102-2024"
+  ],
+  "duocDan": []
  },
  {
   "ma": "nd104-2024",
@@ -77,7 +145,11 @@
   "ngay": "2024-07-31",
   "ten": "Quy định về Quỹ phát triển đất",
   "soDieu": 27,
-  "kb": 70
+  "nguoiKy": "Lê Minh Khái",
+  "ngayHieuLuc": "2024-08-01",
+  "kb": 70,
+  "dan": [],
+  "duocDan": []
  },
  {
   "ma": "tt12-2024",
@@ -85,7 +157,13 @@
   "ngay": "2024-07-31",
   "ten": "Quy định chi tiết về đào tạo, bồi dưỡng, cập nhật kiến thức cho cá nhân hành nghề tư vấn định giá đất; khung chương trình đào tạo, bồi dưỡng nghiệp vụ về giá đất",
   "soDieu": 9,
-  "kb": 38
+  "nguoiKy": "Lê Minh Ngân",
+  "ngayHieuLuc": "",
+  "kb": 38,
+  "dan": [
+   "nd71-2024"
+  ],
+  "duocDan": []
  },
  {
   "ma": "nd123-2024",
@@ -93,7 +171,16 @@
   "ngay": "2024-10-04",
   "ten": "Quy định về xử phạt vi phạm hành chính trong lĩnh vực đất đai",
   "soDieu": 36,
-  "kb": 109
+  "nguoiKy": "Trần Hồng Hà",
+  "ngayHieuLuc": "2024-10-04",
+  "kb": 109,
+  "dan": [
+   "ldd2024",
+   "nd101-2024",
+   "nd102-2024",
+   "nd71-2024"
+  ],
+  "duocDan": []
  },
  {
   "ma": "tt25-2024",
@@ -101,7 +188,11 @@
   "ngay": "2024-11-26",
   "ten": "Quy định về quy trình xây dựng cơ sở dữ liệu quốc gia về đất đai",
   "soDieu": 142,
-  "kb": 205
+  "nguoiKy": "Lê Minh Ngân",
+  "ngayHieuLuc": "2025-01-10",
+  "kb": 205,
+  "dan": [],
+  "duocDan": []
  },
  {
   "ma": "tt26-2024",
@@ -109,7 +200,14 @@
   "ngay": "2024-11-26",
   "ten": "Quy định kỹ thuật về đo đạc lập bản đồ địa chính",
   "soDieu": 29,
-  "kb": 248
+  "nguoiKy": "Lê Minh Ngân",
+  "ngayHieuLuc": "2025-01-15",
+  "kb": 248,
+  "dan": [
+   "nd101-2024",
+   "nd102-2024"
+  ],
+  "duocDan": []
  },
  {
   "ma": "tt29-2024",
@@ -117,7 +215,13 @@
   "ngay": "2024-12-12",
   "ten": "Quy định kỹ thuật về lập, điều chỉnh quy hoạch, kế hoạch sử dụng đất",
   "soDieu": 65,
-  "kb": 129
+  "nguoiKy": "Lê Minh Ngân",
+  "ngayHieuLuc": "",
+  "kb": 129,
+  "dan": [
+   "nd102-2024"
+  ],
+  "duocDan": []
  },
  {
   "ma": "nd151-2025",
@@ -125,15 +229,15 @@
   "ngay": "2025-06-12",
   "ten": "Quy định về phân định thẩm quyền của chính quyền địa phương 02 cấp, phân quyền, phân cấp trong lĩnh vực đất đai",
   "soDieu": 23,
-  "kb": 616
- },
- {
-  "ma": "ldd2013",
-  "soHieu": "45/2013/QH13",
-  "ngay": "2013-11-29",
-  "ten": "Luật Đất đai (bản năm 2013)",
-  "soDieu": 212,
-  "kb": 454,
-  "hetHieuLuc": "Hết hiệu lực từ 01/8/2024 — đã được thay bằng Luật Đất đai 2024 (31/2024/QH15). Giữ lại ở đây CHỈ để đối chiếu cũ ↔ mới."
+  "nguoiKy": "Nguyễn Hòa Bình",
+  "ngayHieuLuc": "2025-07-01",
+  "kb": 616,
+  "dan": [
+   "nd101-2024",
+   "nd102-2024",
+   "nd71-2024",
+   "nd88-2024"
+  ],
+  "duocDan": []
  }
 ]

@@ -19,15 +19,23 @@ import { useAuth, coVaiTro } from '@/lib/auth';
 
 type Diem = { ky: string; chu: string };
 type Khoan = { so: number; chu: string; diem: Diem[] };
-type Dieu = { so: number; tieuDe: string; chuong: string; chuongTen: string; muc: string | null; mucTen: string; khoan: Khoan[] };
+type Dan = { ma: string; so?: number };
+type Dieu = { so: number; tieuDe: string; chuong: string; chuongTen: string; muc: string | null; mucTen: string; khoan: Khoan[]; dan?: Dan[]; duocDan?: Dan[] };
 type VanBan = { ma: string; soHieu: string; ngay: string; ten: string; nguon: string; phuLuc?: string; hetHieuLuc?: string; chuong: { so: string; ten: string }[]; dieu: Dieu[] };
 
-type KhoItem = { ma: string; soHieu: string; ngay: string; ten: string; soDieu: number; hetHieuLuc?: string };
+type KhoItem = { ma: string; soHieu: string; ngay: string; ten: string; soDieu: number; hetHieuLuc?: string;
+  nguoiKy?: string; ngayHieuLuc?: string; dan?: string[]; duocDan?: string[] };
+// TÌNH HUỐNG = đi theo việc thật, mỗi bước một câu hỏi, có nhánh trả lời, bước nào cũng dẫn nguồn.
+type NhanhTH = { neu: string; thi: string; canh?: boolean; dan?: Dan[] };
+type BuocTH = { hoi: string; y: string; dan?: Dan[]; nhanh?: NhanhTH[] };
+type TinhHuong = { ma: string; icon: string; ten: string; tom: string; buoc: BuocTH[]; ketLuan?: string[]; danKetLuan?: Dan[] };
+type KhoTinhHuong = { canhBao: string; ds: TinhHuong[] };
 // Giải thích do người làm web viết, KHÔNG phải chữ luật — luôn để trong khung riêng, màu khác.
 type GiaiThich = { canhBao: string; muc: Record<string, { y: string; nho: string }> };
-type DoiChieu = { canhBao: string; moi: string; cu: string; cap: Record<string, { cu: number[]; y: string }> };
 type NutSoDo = { ten: string; y: string; dan: { ma: string; so?: number }[] };
-type NhanhSoDo = { ten: string; icon: string; mau: string; y: string; con: NutSoDo[] };
+// "neo" = SỐ NEO GHI NHỚ: mỗi nhánh gắn một con số để bám vào (3 nhóm đất, 5 điều kiện,
+// 7 bước…). Nhớ con số là gọi ra được cả nhánh — mẹo học cũ mà hiệu quả.
+type NhanhSoDo = { ten: string; icon: string; mau: string; y: string; neo?: string; con: NutSoDo[] };
 type SoDo = { canhBao: string; nhanh: NhanhSoDo[] };
 
 // DẪN CHIẾU TRONG CHỮ LUẬT — biến thành nút bấm được, kiểu Thư viện pháp luật.
@@ -106,10 +114,25 @@ export default function TraCuuLuatPage() {
   const [chiGhim, setChiGhim] = useState(false);
   const [gt, setGt] = useState<GiaiThich | null>(null);
   const [chiGt, setChiGt] = useState(false);
-  const [dc, setDc] = useState<DoiChieu | null>(null);
   const [sd, setSd] = useState<SoDo | null>(null);
   const [moNhanh, setMoNhanh] = useState<Record<number, boolean>>({ 0: true });
-  const [the, setThe] = useState<'luat' | 'sodo' | 'danhmuc'>('luat');
+  const [moChuDe, setMoChuDe] = useState(false);
+  // ── HỌC THUỘC BẰNG THẺ LẬT + LẶP LẠI NGẮT QUÃNG ──
+  // Hai kỹ thuật học đã được chứng minh: TỰ NHỚ LẠI trước khi xem đáp án, và ÔN LẠI ĐÚNG
+  // LÚC SẮP QUÊN. Thẻ nào thuộc thì đẩy xa ra (1 → 3 → 7 → 16 → 35 ngày), thẻ nào quên thì
+  // kéo về ôn ngay hôm sau. Tiến độ lưu ngay trong máy người dùng.
+  const [cheDoHoc, setCheDoHoc] = useState<'sodo' | 'the'>('sodo');
+  const [kieuSoDo, setKieuSoDo] = useState<'danhsach' | 'khungve'>('danhsach');
+  const [phongTo, setPhongTo] = useState(1);
+  const [boThe, setBoThe] = useState<Record<string, { hop: number; ngayOn: string }>>({});
+  const [theSo, setTheSo] = useState(0);
+  const [datLat, setDatLat] = useState(false);
+  const [th, setTh] = useState<KhoTinhHuong | null>(null);
+  // XEM NHANH: bấm vào một dẫn chiếu thì hiện thẻ ngay tại chỗ, KHÔNG nhảy đi mất — đang
+  // đọc dở một điều mà bị cuốn sang điều khác là mất mạch. Muốn đọc kỹ thì bấm "Mở hẳn".
+  const [xemNhanh, setXemNhanh] = useState<{ ma: string; so: number; x: number; y: number } | null>(null);
+  const [thChon, setThChon] = useState<string>('');
+  const [the, setThe] = useState<'luat' | 'tinhhuong' | 'sodo' | 'danhmuc'>('luat');
   const [dm, setDm] = useState<VanBanNgan[]>([]);
   const [timDm, setTimDm] = useState('');
   const [locLoai, setLocLoai] = useState('');
@@ -133,8 +156,8 @@ export default function TraCuuLuatPage() {
     if (!duocXem) return;
     fetch('/luat/_kho.json').then((r) => r.json()).then((ds: KhoItem[]) => setKho(ds)).catch(() => {});
     fetch('/luat/giai-thich.json').then((r) => r.json()).then((d: GiaiThich) => setGt(d)).catch(() => {});
-    fetch('/luat/doi-chieu.json').then((r) => r.json()).then((d: DoiChieu) => setDc(d)).catch(() => {});
     fetch('/luat/so-do.json').then((r) => r.json()).then((d: SoDo) => setSd(d)).catch(() => {});
+    fetch('/luat/tinh-huong.json').then((r) => r.json()).then((d: KhoTinhHuong) => setTh(d)).catch(() => {});
   }, [duocXem]);
 
   useEffect(() => {
@@ -164,6 +187,34 @@ export default function TraCuuLuatPage() {
   // Danh mục văn bản: cào cả dải mã văn bản của Hệ thống văn bản Chính phủ rồi lọc theo từ khoá đất đai
   // (xem scripts/luat/cao-van-ban-dat-dai.py) — nên KHÔNG SÓT như cách dùng ô tìm kiếm của trang gốc.
   useEffect(() => { if (the === 'danhmuc' && !dm.length) fetch('/luat/danh-muc.json').then((r) => r.json()).then((d) => setDm(d.vanBan || [])).catch(() => {}); }, [the, dm.length]);
+
+  useEffect(() => {
+    try { setBoThe(JSON.parse(localStorage.getItem('luat-the-hoc') || '{}')); } catch { /* */ }
+  }, []);
+
+  // Khoảng cách ôn theo hộp Leitner: thuộc thì đẩy xa dần, quên thì kéo về hộp 1.
+  const CACH_ON = [1, 3, 7, 16, 35];
+  const homNay = () => new Date().toISOString().slice(0, 10);
+  const congNgay = (n: number) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+
+  // Bộ thẻ = những điều đã có giải thích ngắn (39 điều then chốt).
+  const dsThe = useMemo(() => (gt ? Object.keys(gt.muc) : []), [gt]);
+  const theHomNay = useMemo(
+    () => dsThe.filter((k) => !boThe[k] || boThe[k].ngayOn <= homNay()),
+    [dsThe, boThe]);
+  const daThuoc = useMemo(() => dsThe.filter((k) => (boThe[k]?.hop || 0) >= 4).length, [dsThe, boThe]);
+
+  const traLoiThe = (khoa: string, muc: 'quen' | 'tam' | 'thuoc') => {
+    setBoThe((m) => {
+      const cu = m[khoa]?.hop || 1;
+      const hop = muc === 'quen' ? 1 : muc === 'thuoc' ? Math.min(5, cu + 1) : cu;
+      const moi = { ...m, [khoa]: { hop, ngayOn: congNgay(muc === 'quen' ? 1 : CACH_ON[hop - 1]) } };
+      try { localStorage.setItem('luat-the-hoc', JSON.stringify(moi)); } catch { /* */ }
+      return moi;
+    });
+    setDatLat(false);
+    setTheSo((i) => i + 1);
+  };
 
   const khoaGhim = (ma: string, so: number) => `${ma}:${so}`;
   const doiGhim = (ma: string, so: number) => setGhim((g) => {
@@ -238,6 +289,19 @@ export default function TraCuuLuatPage() {
   // từng ký tự — chỉ gạch chân, không thêm bớt chữ nào.
   const docTheoSoHieu = (so: string) => kho.find((x) => x.soHieu === so);
 
+  // Nút dẫn nguồn dùng chung cho mọi chỗ (tình huống, sơ đồ, khung liên kết). Học của
+  // NotebookLM: câu nào cũng phải chỉ được ra chỗ lấy, bấm một cái là tới nguyên văn.
+  const NutDan = ({ d, nho }: { d: Dan; nho?: boolean }) => {
+    const v = kho.find((x) => x.ma === d.ma);
+    return (
+      <button onClick={() => { if (d.so) moDieu(d.ma, d.so); else { doiVanBan(d.ma); setThe('luat'); } }}
+        title={v ? `${v.ten} — ${v.soHieu}` : d.ma}
+        className={`rounded-md border border-slate-200 bg-white font-semibold text-slate-600 transition hover:border-[#0A2540] hover:text-[#0A2540] ${nho ? 'px-1.5 py-0.5 text-[11px]' : 'px-1.5 py-0.5 text-[11.5px]'}`}>
+        {d.so ? `Điều ${d.so}` : '📄'} · {v ? nhanNgan(v.ma, v.soHieu) : d.ma}
+      </button>
+    );
+  };
+
   const noiDung = (chu: string): React.ReactNode => {
     if (!chu) return chu;
     const ra: React.ReactNode[] = [];
@@ -259,8 +323,14 @@ export default function TraCuuLuatPage() {
       if (maDich) {
         const md = maDich, sd2 = soDich;
         ra.push(
-          <button key={`l${m.index}`} onClick={() => (sd2 ? moDieu(md, sd2) : doiVanBan(md))}
-            title={sd2 ? `Tới Điều ${sd2}` : 'Mở văn bản này'}
+          <button key={`l${m.index}`}
+            onClick={(e) => {
+              if (!sd2) { doiVanBan(md); return; }
+              taiVb(md).catch(() => {});
+              const r = (e.target as HTMLElement).getBoundingClientRect();
+              setXemNhanh({ ma: md, so: sd2, x: r.left, y: r.bottom });
+            }}
+            title={sd2 ? `Xem nhanh Điều ${sd2}` : 'Mở văn bản này'}
             className="font-semibold text-sky-700 underline decoration-sky-300 underline-offset-2 hover:decoration-sky-600">
             {m[0]}
           </button>,
@@ -300,34 +370,286 @@ export default function TraCuuLuatPage() {
         <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[11px] font-bold text-rose-700">Nội bộ</span>
       </div>
       <p className="mt-1 text-[12.5px] leading-snug text-slate-500">
-        {kho.length ? <>Kho có <b className="text-[#0A2540]">{kho.length} văn bản</b> · <b className="text-[#0A2540]">{tongDieu} điều</b> —
-          Luật Đất đai 2024 và các nghị định hướng dẫn. Nguyên văn lấy từ bản PDF ký số đăng Công báo Chính phủ.</> : 'Đang tải…'}
+        {kho.length ? <><b className="text-[#0A2540]">{kho.length} văn bản</b> · <b className="text-[#0A2540]">{tongDieu} điều</b> · nguyên văn từ bản PDF ký số Công báo</> : 'Đang tải…'}
       </p>
 
       <div className="mt-3 flex gap-1.5">
-        {([['luat', '⚖️ Toàn văn luật & nghị định'], ['sodo', '🧠 Sơ đồ tư duy'], ['danhmuc', '📚 Danh mục văn bản đất đai']] as const).map(([k, l]) => (
+        {([['tinhhuong', '🧭 Tình huống'], ['luat', '⚖️ Toàn văn'], ['sodo', '🧠 Sơ đồ tư duy'], ['danhmuc', '📚 Danh mục']] as const).map(([k, l]) => (
           <button key={k} onClick={() => setThe(k)}
             className={`rounded-full border px-3 py-1.5 text-[12.5px] font-semibold transition ${the === k ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>{l}</button>
         ))}
       </div>
 
+      {/* ── TÌNH HUỐNG: đi theo VIỆC THẬT, mỗi bước một câu hỏi, có nhánh trả lời ──
+          Đây là cách người làm nghề dùng luật: không ai đọc từ Điều 1 tới Điều 260, mà
+          bắt đầu từ "tôi đang gặp chuyện gì". Mỗi bước đều kèm nút dẫn tới điều gốc. */}
+      {the === 'tinhhuong' && (
+        <div className="mt-3">
+          {!th ? <p className="text-slate-400">Đang tải…</p> : !thChon ? (
+            <>
+              <p className="text-[12.5px] leading-snug text-slate-500">
+                Chọn đúng chuyện bạn đang gặp. Mỗi tình huống là một chuỗi câu hỏi — trả lời tới đâu,
+                luật chỉ tới đó.
+              </p>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                {th.ds.map((x) => (
+                  <button key={x.ma} onClick={() => setThChon(x.ma)}
+                    className="rounded-2xl border-2 border-slate-200 bg-white p-3 text-left transition hover:border-[#0A2540]">
+                    <p className="text-[15px] font-extrabold leading-snug text-[#0A2540]">{x.icon} {x.ten}</p>
+                    <p className="mt-1 text-[12.5px] leading-snug text-slate-500">{x.tom}</p>
+                    <p className="mt-1.5 text-[11.5px] font-semibold text-slate-400">{x.buoc.length} bước →</p>
+                  </button>
+                ))}
+              </div>
+              <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-[11.5px] leading-snug text-slate-500">{th.canhBao}</p>
+            </>
+          ) : (() => {
+            const x = th.ds.find((k) => k.ma === thChon)!;
+            return (
+              <>
+                <button onClick={() => setThChon('')} className="text-[12.5px] font-semibold text-slate-500 hover:text-[#0A2540]">← Chọn tình huống khác</button>
+                <h2 className="mt-1.5 text-[17px] font-extrabold leading-snug text-[#0A2540]">{x.icon} {x.ten}</h2>
+                <p className="mt-0.5 text-[12.5px] leading-snug text-slate-500">{x.tom}</p>
+
+                <div className="mt-3 space-y-0">
+                  {x.buoc.map((b, i) => (
+                    <div key={i} className="relative pl-7">
+                      {/* đường dọc nối các bước — nhìn là biết đi theo thứ tự */}
+                      {i < x.buoc.length - 1 && <span className="absolute left-[11px] top-7 h-full w-0.5 bg-slate-200" />}
+                      <span className="absolute left-0 top-1 flex h-[22px] w-[22px] items-center justify-center rounded-full bg-[#0A2540] text-[11px] font-bold text-white">{i + 1}</span>
+                      <div className="pb-4">
+                        <p className="text-[14.5px] font-bold leading-snug text-[#0A2540]">{b.hoi}</p>
+                        <p className="mt-0.5 text-[13.5px] leading-relaxed text-slate-600">{b.y}</p>
+                        {b.dan && <div className="mt-1 flex flex-wrap gap-1">{b.dan.map((d, j) => <NutDan key={j} d={d} />)}</div>}
+                        {b.nhanh && b.nhanh.length > 0 && (
+                          <div className="mt-2 space-y-1.5">
+                            {b.nhanh.map((n, j) => (
+                              <div key={j} className={`rounded-xl border-l-4 px-2.5 py-1.5 ${n.canh ? 'border-rose-400 bg-rose-50' : 'border-emerald-400 bg-emerald-50'}`}>
+                                <p className="text-[12.5px] font-bold text-slate-700">{n.canh ? '⚠️' : '→'} Nếu {n.neu}</p>
+                                <p className="mt-0.5 text-[13px] leading-snug text-slate-600">{n.thi}</p>
+                                {n.dan && <div className="mt-1 flex flex-wrap gap-1">{n.dan.map((d, k2) => <NutDan key={k2} d={d} />)}</div>}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {x.ketLuan && (
+                  <div className="mt-1 rounded-2xl border-2 border-dashed border-[#C8A14B] bg-amber-50/60 p-3">
+                    <p className="text-[10.5px] font-bold uppercase tracking-wide text-amber-700">📌 Chốt lại</p>
+                    <ul className="mt-1 space-y-1">
+                      {x.ketLuan.map((k, i) => <li key={i} className="text-[13.5px] leading-relaxed text-slate-700">• {k}</li>)}
+                    </ul>
+                    {x.danKetLuan && <div className="mt-1.5 flex flex-wrap gap-1">{x.danKetLuan.map((d, j) => <NutDan key={j} d={d} />)}</div>}
+                  </div>
+                )}
+                <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-[11.5px] leading-snug text-slate-500">{th.canhBao}</p>
+              </>
+            );
+          })()}
+        </div>
+      )}
+
       {/* ── SƠ ĐỒ TƯ DUY: gom cả bộ luật thành 8 nhánh việc thật, mỗi ô dẫn thẳng tới điều gốc ── */}
       {the === 'sodo' && (
         <div className="mt-3">
-          {!sd ? <p className="text-slate-400">Đang tải sơ đồ…</p> : (
-            <>
+          {/* Hai cách học, cùng một kho kiến thức: NHÌN TỔNG THỂ (sơ đồ) và NHỚ LÂU (thẻ lật). */}
+          <div className="flex gap-1.5">
+            {([['sodo', '🧠 Sơ đồ tổng thể'], ['the', `🎴 Thẻ học thuộc${theHomNay.length ? ` (${theHomNay.length})` : ''}`]] as const).map(([k, l]) => (
+              <button key={k} onClick={() => setCheDoHoc(k)}
+                className={`rounded-full border px-3 py-1 text-[12.5px] font-semibold transition ${cheDoHoc === k ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>{l}</button>
+            ))}
+          </div>
+
+          {cheDoHoc === 'the' && (
+            <div className="mt-3">
               <p className="text-[12.5px] leading-snug text-slate-500">
+                Cách học đã được chứng minh: <b>tự nhớ lại trước khi xem đáp án</b>, rồi <b>ôn lại đúng lúc sắp quên</b>.
+                Thẻ nào thuộc thì đẩy xa dần (1 → 3 → 7 → 16 → 35 ngày), thẻ nào quên thì mai ôn lại.
+              </p>
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px]">
+                <span className="rounded-full bg-sky-50 px-2.5 py-1 font-bold text-sky-700">Hôm nay: {theHomNay.length} thẻ</span>
+                <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-bold text-emerald-700">Đã thuộc: {daThuoc}/{dsThe.length}</span>
+                <div className="h-1.5 min-w-[120px] flex-1 overflow-hidden rounded-full bg-slate-100">
+                  <div className="h-full bg-emerald-500" style={{ width: `${dsThe.length ? (daThuoc / dsThe.length) * 100 : 0}%` }} />
+                </div>
+              </div>
+
+              {theHomNay.length === 0 ? (
+                <div className="mt-4 rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50/60 p-6 text-center">
+                  <p className="text-4xl">✅</p>
+                  <p className="mt-1 text-[14px] font-bold text-emerald-800">Hôm nay ôn xong rồi</p>
+                  <p className="mt-0.5 text-[12.5px] text-slate-500">Mai quay lại, máy tự chọn đúng những thẻ sắp quên.</p>
+                </div>
+              ) : (() => {
+                const khoa = theHomNay[theSo % theHomNay.length];
+                const [maT, soT] = khoa.split(':');
+                const g = gt!.muc[khoa];
+                const kv = kho.find((z) => z.ma === maT);
+                const dT = cacVb[maT]?.dieu.find((z) => z.so === Number(soT));
+                if (!cacVb[maT]) taiVb(maT).catch(() => {});
+                const hop = boThe[khoa]?.hop || 1;
+                return (
+                  <div className="mt-3">
+                    <div className="rounded-2xl border-2 border-slate-200 bg-white p-4">
+                      <div className="flex items-center justify-between text-[11px] font-semibold text-slate-400">
+                        <span>{kv ? nhanNgan(kv.ma, kv.soHieu) : maT} · Điều {soT}</span>
+                        <span>Hộp {hop}/5</span>
+                      </div>
+                      <p className="mt-1.5 text-[16px] font-extrabold leading-snug text-[#0A2540]">
+                        {dT ? dT.tieuDe : `Điều ${soT}`}
+                      </p>
+                      {!datLat ? (
+                        <>
+                          <p className="mt-2 text-[13px] italic leading-snug text-slate-500">
+                            Thử tự nói lại trong đầu: điều này quy định gì, con số nào cần nhớ?
+                          </p>
+                          <button onClick={() => setDatLat(true)}
+                            className="mt-3 w-full rounded-xl bg-[#0A2540] px-3 py-2.5 text-[14px] font-bold text-white">
+                            Lật thẻ xem đáp án
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <div className="mt-2 rounded-xl border-2 border-dashed border-sky-300 bg-sky-50/70 p-3">
+                            <p className="text-[13.5px] font-bold text-sky-900">Nhớ nhanh: {g.nho}</p>
+                            <p className="mt-1 text-[13px] leading-relaxed text-slate-700">{g.y}</p>
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            <NutDan d={{ ma: maT, so: Number(soT) }} />
+                          </div>
+                          <p className="mt-3 text-[11.5px] font-semibold text-slate-500">Tự chấm: nhớ được tới đâu?</p>
+                          <div className="mt-1 grid grid-cols-3 gap-1.5">
+                            <button onClick={() => traLoiThe(khoa, 'quen')}
+                              className="rounded-xl border-2 border-rose-300 bg-rose-50 px-2 py-2 text-[12.5px] font-bold text-rose-700">
+                              Chưa thuộc<span className="block text-[10.5px] font-normal opacity-70">mai ôn lại</span>
+                            </button>
+                            <button onClick={() => traLoiThe(khoa, 'tam')}
+                              className="rounded-xl border-2 border-amber-300 bg-amber-50 px-2 py-2 text-[12.5px] font-bold text-amber-700">
+                              Tạm được<span className="block text-[10.5px] font-normal opacity-70">{CACH_ON[hop - 1]} ngày</span>
+                            </button>
+                            <button onClick={() => traLoiThe(khoa, 'thuoc')}
+                              className="rounded-xl border-2 border-emerald-300 bg-emerald-50 px-2 py-2 text-[12.5px] font-bold text-emerald-700">
+                              Thuộc rồi<span className="block text-[10.5px] font-normal opacity-70">{CACH_ON[Math.min(4, hop)]} ngày</span>
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    <div className="mt-2 flex items-center justify-between text-[12px] text-slate-400">
+                      <button onClick={() => { setDatLat(false); setTheSo((i) => i + 1); }} className="font-semibold hover:text-slate-700">Để lát nữa →</button>
+                      <button onClick={() => { if (confirm('Xoá hết tiến độ học thuộc?')) { setBoThe({}); try { localStorage.removeItem('luat-the-hoc'); } catch { /* */ } } }}
+                        className="hover:text-rose-600">Học lại từ đầu</button>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
+          {cheDoHoc === 'sodo' && (!sd ? <p className="mt-3 text-slate-400">Đang tải sơ đồ…</p> : (
+            <>
+              <p className="mt-3 text-[12.5px] leading-snug text-slate-500">
                 Gom cả bộ luật thành <b>{sd.nhanh.length} nhánh việc thật</b>. Ý nào nhiều điều nói cùng một chuyện
                 thì gộp làm một ô. Bấm vào nút <b>Điều …</b> là nhảy thẳng sang nguyên văn.
               </p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                {([['danhsach', '☰ Danh sách'], ['khungve', '🕸 Khung vẽ']] as const).map(([k, l]) => (
+                  <button key={k} onClick={() => setKieuSoDo(k)}
+                    className={`rounded-full border px-2.5 py-1 text-[12px] font-semibold transition ${kieuSoDo === k ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>{l}</button>
+                ))}
+                <span className="mx-1 h-4 w-px bg-slate-200" />
                 <button onClick={() => setMoNhanh(Object.fromEntries(sd.nhanh.map((_, i) => [i, true])))}
                   className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-600">Mở hết</button>
                 <button onClick={() => setMoNhanh({})}
                   className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-600">Thu hết</button>
+                {kieuSoDo === 'khungve' && (
+                  <>
+                    <span className="mx-1 h-4 w-px bg-slate-200" />
+                    <button onClick={() => setPhongTo((z) => Math.max(0.5, +(z - 0.1).toFixed(2)))}
+                      className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-bold text-slate-600">−</button>
+                    <span className="text-[11.5px] font-semibold text-slate-400">{Math.round(phongTo * 100)}%</span>
+                    <button onClick={() => setPhongTo((z) => Math.min(1.4, +(z + 0.1).toFixed(2)))}
+                      className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-bold text-slate-600">+</button>
+                  </>
+                )}
               </div>
 
-              <div className="mt-3 space-y-2.5">
+              {/* ── KHUNG VẼ kiểu Notion: nút bo tròn, đường cong nối, bung/thu từng nhánh ──
+                  Vị trí tính bằng tay: gốc ở giữa bên trái, nhánh toả sang phải, con của nhánh
+                  toả tiếp. Nhánh nào đang thu thì không chiếm chỗ. */}
+              {kieuSoDo === 'khungve' && (() => {
+                const W0 = 176, W1 = 214, W2 = 246, H = 62, KHE = 12, X1 = 250, X2 = 512;
+                let y = 0;
+                const nut: { x: number; y: number; w: number; cap: number; i: number; j?: number }[] = [];
+                const canh: { x1: number; y1: number; x2: number; y2: number; mau: string }[] = [];
+                const yNhanh: number[] = [];
+                sd.nhanh.forEach((n, i) => {
+                  const mo = !!moNhanh[i];
+                  const con = mo ? n.con : [];
+                  const yBatDau = y;
+                  con.forEach((_, j) => { nut.push({ x: X2, y, w: W2, cap: 2, i, j }); y += H + KHE; });
+                  const yN = con.length ? (yBatDau + y - H - KHE) / 2 : y;
+                  if (!con.length) y += H + KHE;
+                  yNhanh[i] = yN;
+                  nut.push({ x: X1, y: yN, w: W1, cap: 1, i });
+                  con.forEach((_, j) => {
+                    const yc = yBatDau + j * (H + KHE);
+                    canh.push({ x1: X1 + W1, y1: yN + H / 2, x2: X2, y2: yc + H / 2, mau: n.mau });
+                  });
+                  y += KHE * 1.4;
+                });
+                const yGoc = yNhanh.length ? (yNhanh[0] + yNhanh[yNhanh.length - 1]) / 2 : 0;
+                sd.nhanh.forEach((n, i) => canh.push({ x1: W0, y1: yGoc + H / 2, x2: X1, y2: yNhanh[i] + H / 2, mau: n.mau }));
+                const cao = Math.max(y, yGoc + H) + 20;
+                const rong = X2 + W2 + 20;
+                const cong = (c: { x1: number; y1: number; x2: number; y2: number }) =>
+                  `M ${c.x1} ${c.y1} C ${(c.x1 + c.x2) / 2} ${c.y1}, ${(c.x1 + c.x2) / 2} ${c.y2}, ${c.x2} ${c.y2}`;
+                const viMau: Record<string, string> = { slate: '#94a3b8', emerald: '#34d399', amber: '#fbbf24', sky: '#38bdf8', violet: '#a78bfa', rose: '#fb7185', orange: '#fb923c', teal: '#2dd4bf' };
+                return (
+                  <div className="mt-3 overflow-auto rounded-2xl border border-slate-200 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:18px_18px]">
+                    <div style={{ width: rong * phongTo, height: cao * phongTo }}>
+                      <div style={{ width: rong, height: cao, transform: `scale(${phongTo})`, transformOrigin: 'top left', position: 'relative' }}>
+                        <svg width={rong} height={cao} className="pointer-events-none absolute inset-0">
+                          {canh.map((c, k2) => <path key={k2} d={cong(c)} fill="none" stroke={viMau[c.mau] || '#94a3b8'} strokeWidth={2} />)}
+                        </svg>
+                        <div className="absolute flex items-center rounded-2xl border-2 border-[#0A2540] bg-[#0A2540] px-3 text-white"
+                          style={{ left: 0, top: yGoc, width: W0, height: H }}>
+                          <span className="text-[13.5px] font-extrabold leading-tight">⚖️ Luật Đất đai 2024</span>
+                        </div>
+                        {nut.map((o, k2) => {
+                          const n = sd.nhanh[o.i];
+                          const mau = MAU_NHANH[n.mau] || MAU_NHANH.slate;
+                          if (o.cap === 1) {
+                            return (
+                              <button key={k2} onClick={() => setMoNhanh((m) => ({ ...m, [o.i]: !m[o.i] }))}
+                                className={`absolute flex flex-col justify-center rounded-2xl border-2 px-2.5 text-left ${mau}`}
+                                style={{ left: o.x, top: o.y, width: o.w, height: H }}>
+                                <span className="truncate text-[13px] font-extrabold leading-tight">{n.icon} {n.ten}</span>
+                                <span className="text-[11px] leading-tight opacity-80">{n.neo ? `🔑 ${n.neo} · ` : ''}{moNhanh[o.i] ? 'thu lại ▴' : `${n.con.length} ý ▾`}</span>
+                              </button>
+                            );
+                          }
+                          const c = n.con[o.j!];
+                          return (
+                            <button key={k2} onClick={() => { const d = c.dan[0]; if (d) { if (d.so) moDieu(d.ma, d.so); else { doiVanBan(d.ma); setThe('luat'); } } }}
+                              className="absolute flex flex-col justify-center rounded-xl border border-slate-200 bg-white px-2.5 text-left hover:border-[#0A2540]"
+                              style={{ left: o.x, top: o.y, width: o.w, height: H }}>
+                              <span className="truncate text-[12.5px] font-bold leading-tight text-[#0A2540]">{c.ten}</span>
+                              <span className="line-clamp-2 text-[11px] leading-tight text-slate-500">{c.y}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              <div className={`mt-3 space-y-2.5 ${kieuSoDo === 'khungve' ? 'hidden' : ''}`}>
                 {sd.nhanh.map((n, i) => {
                   const mo = !!moNhanh[i];
                   const mau = MAU_NHANH[n.mau] || MAU_NHANH.slate;
@@ -337,7 +659,10 @@ export default function TraCuuLuatPage() {
                         className={`flex w-full items-start gap-2 px-3 py-2.5 text-left ${mau}`}>
                         <span className="text-[20px] leading-none">{n.icon}</span>
                         <span className="min-w-0 flex-1">
-                          <span className="block text-[14.5px] font-extrabold leading-snug">{n.ten}</span>
+                          <span className="block text-[14.5px] font-extrabold leading-snug">
+                            {n.ten}
+                            {n.neo && <span className="ml-1.5 rounded-full bg-white/80 px-1.5 py-0.5 align-middle text-[11px] font-bold text-slate-700">🔑 {n.neo}</span>}
+                          </span>
                           <span className="block text-[12px] leading-snug opacity-80">{n.y}</span>
                         </span>
                         <span className="shrink-0 text-[13px] opacity-60">{mo ? '▾' : '▸'}</span>
@@ -372,7 +697,7 @@ export default function TraCuuLuatPage() {
               </div>
               <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-[11.5px] leading-snug text-slate-500">{sd.canhBao}</p>
             </>
-          )}
+          ))}
         </div>
       )}
 
@@ -421,30 +746,73 @@ export default function TraCuuLuatPage() {
       )}
 
       {the === 'luat' && <>
-      {/* ── CHỌN VĂN BẢN: một hàng cuộn ngang, mỗi nút một văn bản ── */}
-      <div className="-mx-3 mt-3 overflow-x-auto px-3 sm:mx-0 sm:px-0">
-        <div className="flex w-max gap-1.5 pb-1">
-          {kho.map((x) => (
-            <button key={x.ma} onClick={() => doiVanBan(x.ma)} title={`${x.ten} — ${x.soHieu}, ngày ${ngayVn(x.ngay)}`}
-              className={`shrink-0 rounded-xl border px-2.5 py-1.5 text-left transition ${maVb === x.ma ? 'border-[#0A2540] bg-[#0A2540]' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
-              <span className={`block text-[12.5px] font-bold ${maVb === x.ma ? 'text-white' : x.hetHieuLuc ? 'text-rose-700' : 'text-[#0A2540]'}`}>
-                {x.hetHieuLuc ? '⛔ ' : ''}{nhanNgan(x.ma, x.soHieu)}
-              </span>
-              <span className={`block text-[10.5px] ${maVb === x.ma ? 'text-white/70' : 'text-slate-400'}`}>
-                {x.hetHieuLuc ? 'hết hiệu lực' : `${x.soDieu} điều`}
-              </span>
-            </button>
-          ))}
-        </div>
+      {/* ── CHỌN VĂN BẢN: MỘT Ô SỔ XUỐNG ──
+          Trước đây bày 17 cái nút thành hàng cuộn ngang -> nhìn rối, lại phải kéo mới
+          thấy hết. Nay gom vào một ô sổ xuống, chia nhóm Luật / Nghị định / Thông tư. */}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <select value={maVb} onChange={(e) => doiVanBan(e.target.value)}
+          className="min-w-[260px] flex-1 rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-[14px] font-semibold text-[#0A2540] outline-none focus:border-[#0A2540]">
+          {([['Luật', (x: KhoItem) => !x.hetHieuLuc && x.soHieu.includes('/QH')],
+             ['Nghị định', (x: KhoItem) => x.soHieu.includes('NĐ-CP')],
+             ['Thông tư', (x: KhoItem) => x.soHieu.includes('/TT-')],
+             ['Đã hết hiệu lực', (x: KhoItem) => !!x.hetHieuLuc]] as const).map(([nhom, loc]) => {
+            const ds = kho.filter(loc);
+            if (!ds.length) return null;
+            return (
+              <optgroup key={nhom} label={nhom}>
+                {ds.map((x) => (
+                  <option key={x.ma} value={x.ma}>
+                    {x.hetHieuLuc ? '⛔ ' : ''}{nhanNgan(x.ma, x.soHieu)} — {x.ten.length > 58 ? x.ten.slice(0, 58) + '…' : x.ten} ({x.soDieu} điều)
+                  </option>
+                ))}
+              </optgroup>
+            );
+          })}
+        </select>
+        {vb?.phuLuc && (
+          <button onClick={() => { setXemPhuLuc((v) => !v); setChon(null); oNoiDung.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}
+            className={`shrink-0 rounded-xl border-2 px-2.5 py-2 text-[12.5px] font-semibold ${xemPhuLuc ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>
+            📎 Phụ lục
+          </button>
+        )}
       </div>
-      {vb && (
-        <p className="mt-1.5 text-[12px] leading-snug text-slate-500">
-          <b className="text-[#0A2540]">{vb.ten}</b> — số {vb.soHieu}, ngày {ngayVn(vb.ngay)} · {vb.dieu.length} điều
-          {vb.chuong.length ? `, ${vb.chuong.length} chương` : ''}.
-          {vb.phuLuc ? <button onClick={() => { setXemPhuLuc((v) => !v); setChon(null); oNoiDung.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}
-            className="ml-1.5 rounded-md border border-slate-200 px-1.5 py-0.5 text-[11px] font-semibold text-slate-600">📎 Phụ lục</button> : null}
-        </p>
-      )}
+      {/* ── HỘP THUỘC TÍNH + LƯỢC ĐỒ VĂN BẢN ──
+          Thư viện pháp luật để hộp này ngay đầu trang vì người tra luật nhìn nó trước cả
+          nội dung: ai ký, hiệu lực từ bao giờ, còn hay hết hiệu lực. Ở đây thêm LƯỢC ĐỒ
+          tính sẵn: văn bản này dựa trên văn bản nào, và văn bản nào hướng dẫn nó. */}
+      {vb && (() => {
+        const k = kho.find((x) => x.ma === maVb);
+        return (
+          <div className="mt-1.5 rounded-xl border border-slate-200 bg-slate-50/70 px-2.5 py-2">
+            <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[11.5px] text-slate-500">
+              <span>Số hiệu: <b className="text-slate-700">{vb.soHieu}</b></span>
+              <span>Ban hành: <b className="text-slate-700">{ngayVn(vb.ngay)}</b></span>
+              {k?.ngayHieuLuc && <span>Hiệu lực: <b className="text-slate-700">{ngayVn(k.ngayHieuLuc)}</b></span>}
+              {k?.nguoiKy && <span>Người ký: <b className="text-slate-700">{k.nguoiKy}</b></span>}
+              <span>Tình trạng: {vb.hetHieuLuc
+                ? <b className="text-rose-600">Hết hiệu lực</b>
+                : <b className="text-emerald-600">Còn hiệu lực</b>}</span>
+              <span>{vb.dieu.length} điều{vb.chuong.length ? ` · ${vb.chuong.length} chương` : ''}</span>
+            </div>
+            {((k?.dan?.length || 0) > 0 || (k?.duocDan?.length || 0) > 0) && (
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-slate-200 pt-1 text-[11px]">
+                {(k?.dan?.length || 0) > 0 && (
+                  <span className="flex flex-wrap items-center gap-1">
+                    <span className="text-slate-500">Dựa trên:</span>
+                    {k!.dan!.map((m) => <NutDan key={m} d={{ ma: m }} nho />)}
+                  </span>
+                )}
+                {(k?.duocDan?.length || 0) > 0 && (
+                  <span className="flex flex-wrap items-center gap-1">
+                    <span className="text-slate-500">Được hướng dẫn / nhắc bởi:</span>
+                    {k!.duocDan!.map((m) => <NutDan key={m} d={{ ma: m }} nho />)}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })()}
       {/* Văn bản hết hiệu lực vẫn giữ trong kho để đối chiếu — phải báo thật to, không để
           người dùng tra nhầm rồi tưởng là luật đang áp dụng. */}
       {vb?.hetHieuLuc && (
@@ -458,34 +826,47 @@ export default function TraCuuLuatPage() {
         <div className="flex items-center gap-2 rounded-xl border-2 border-slate-200 px-3 py-2 focus-within:border-[#0A2540]">
           <span className="text-slate-400">🔍</span>
           <input value={tim} onChange={(e) => setTim(e.target.value)}
-            placeholder="Gõ từ khoá (không dấu cũng được) hoặc số điều — ví dụ: thu hoi dat, 75, bảng giá đất"
+            placeholder="Gõ từ khoá hoặc số điều — vd: thu hoi dat, 75"
             className="w-full bg-transparent text-[15px] outline-none" />
           {tim && <button onClick={() => setTim('')} className="text-slate-400 hover:text-slate-700">✕</button>}
         </div>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {/* Nhiều việc luật chỉ nói một câu rồi "Chính phủ quy định chi tiết" -> chữ thật nằm ở nghị định.
-              Nút này tìm một lượt cả luật lẫn nghị định. */}
-          <button onClick={() => setTimCaKho((v) => !v)}
-            className={`rounded-full border px-2.5 py-1 text-[12px] font-bold transition ${timCaKho ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-emerald-300 bg-emerald-50 text-emerald-700'}`}>
-            {dangTaiKho ? '⏳ Đang mở cả kho…' : `🔎 Tìm cả ${kho.length || ''} văn bản${timCaKho ? ' ✓' : ''}`}
+        {/* MỘT HÀNG NÚT NHỎ, không xuống dòng lung tung. 14 chủ đề nhanh giấu sau nút
+            "Chủ đề" — bấm mới xổ ra, nhìn đỡ rối hẳn. */}
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <button onClick={() => setMoChuDe((v) => !v)}
+            className={`rounded-full border px-2.5 py-1 text-[12px] font-bold transition ${moChuDe ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>
+            🔖 Chủ đề {moChuDe ? '▴' : '▾'}
           </button>
-          {CHU_DE.map((c) => (
-            <button key={c.ten} onClick={() => { setTim(c.tim); setChiGhim(false); setChon(null); setXemPhuLuc(false); }}
-              className={`rounded-full border px-2.5 py-1 text-[12px] font-medium transition ${kd(tim) === kd(c.tim) ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}>
-              {c.icon} {c.ten}
-            </button>
-          ))}
-          <button onClick={() => { setChiGhim((v) => !v); setChon(null); setXemPhuLuc(false); }}
+          {/* Nhiều việc luật chỉ nói một câu rồi "Chính phủ quy định chi tiết" -> chữ thật nằm ở nghị định. */}
+          <button onClick={() => setTimCaKho((v) => !v)} title="Tìm một lượt trong cả luật lẫn nghị định, thông tư"
+            className={`rounded-full border px-2.5 py-1 text-[12px] font-bold transition ${timCaKho ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-emerald-300 bg-emerald-50 text-emerald-700'}`}>
+            {dangTaiKho ? '⏳ đang mở…' : `🔎 Cả kho${timCaKho ? ' ✓' : ''}`}
+          </button>
+          <button onClick={() => { setChiGhim((v) => !v); setChon(null); setXemPhuLuc(false); }} title="Chỉ hiện những điều đã ghim"
             className={`rounded-full border px-2.5 py-1 text-[12px] font-bold transition ${chiGhim ? 'border-amber-500 bg-amber-500 text-white' : 'border-amber-300 bg-amber-50 text-amber-700'}`}>
-            ⭐ Điều đã ghim ({ghim.length})
+            ⭐ {ghim.length}
           </button>
           {gt && (
-            <button onClick={() => { setChiGt((v) => !v); setChon(null); setXemPhuLuc(false); }}
+            <button onClick={() => { setChiGt((v) => !v); setChon(null); setXemPhuLuc(false); }} title="Chỉ hiện những điều có giải thích ngắn"
               className={`rounded-full border px-2.5 py-1 text-[12px] font-bold transition ${chiGt ? 'border-sky-600 bg-sky-600 text-white' : 'border-sky-300 bg-sky-50 text-sky-700'}`}>
-              💡 Điều có giải thích ({Object.keys(gt.muc).length})
+              💡 {Object.keys(gt.muc).length}
             </button>
           )}
+          {(tim || chiGhim || chiGt) && (
+            <button onClick={() => { setTim(''); setChiGhim(false); setChiGt(false); }}
+              className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-500">✕ Bỏ lọc</button>
+          )}
         </div>
+        {moChuDe && (
+          <div className="mt-1.5 flex flex-wrap gap-1.5 rounded-xl bg-slate-50 p-2">
+            {CHU_DE.map((c) => (
+              <button key={c.ten} onClick={() => { setTim(c.tim); setChiGhim(false); setChiGt(false); setChon(null); setXemPhuLuc(false); setMoChuDe(false); }}
+                className={`rounded-full border px-2.5 py-1 text-[12px] font-medium transition ${kd(tim) === kd(c.tim) ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}>
+                {c.icon} {c.ten}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {dangTai && <p className="mt-6 text-slate-400">Đang tải toàn văn…</p>}
@@ -599,57 +980,6 @@ export default function TraCuuLuatPage() {
                   </div>
                 )}
 
-                {/* KHUNG ĐỐI CHIẾU CŨ ↔ MỚI — chỉ hiện khi có cặp đã soi tay. */}
-                {(() => {
-                  if (!dc) return null;
-                  const laMoi = vb.ma === dc.moi;
-                  const laCu = vb.ma === dc.cu;
-                  if (!laMoi && !laCu) return null;
-                  // Chiều mới -> cũ tra thẳng; chiều cũ -> mới phải dò ngược.
-                  const cap = laMoi ? dc.cap[String(dieuDangXem.so)] : null;
-                  const nguoc = laCu
-                    ? Object.entries(dc.cap).filter(([, v]) => v.cu.includes(dieuDangXem.so))
-                    : [];
-                  if (!cap && nguoc.length === 0) return null;
-                  const maKia = laMoi ? dc.cu : dc.moi;
-                  const nhanKia = laMoi ? 'Luật Đất đai 2013' : 'Luật Đất đai 2024';
-                  return (
-                    <div className="mt-2.5 rounded-xl border-2 border-dashed border-violet-300 bg-violet-50/60 p-3">
-                      <p className="text-[10.5px] font-bold uppercase tracking-wide text-violet-700">
-                        🔀 So với {nhanKia} — người làm web lập, không phải bảng đối chiếu chính thức
-                      </p>
-                      {laMoi && cap && (
-                        <>
-                          <p className="mt-1 text-[13.5px] leading-relaxed text-slate-700">{cap.y}</p>
-                          <div className="mt-1.5 flex flex-wrap gap-1.5">
-                            {cap.cu.length === 0
-                              ? <span className="rounded-lg bg-white px-2 py-1 text-[12px] font-semibold text-violet-800">Luật 2013 không có điều tương ứng</span>
-                              : cap.cu.map((s) => (
-                                <button key={s} onClick={() => moDieu(maKia, s)}
-                                  className="rounded-lg border border-violet-300 bg-white px-2 py-1 text-[12px] font-semibold text-violet-800 hover:bg-violet-100">
-                                  Điều {s} (2013) →
-                                </button>
-                              ))}
-                          </div>
-                        </>
-                      )}
-                      {laCu && nguoc.length > 0 && (
-                        <>
-                          <p className="mt-1 text-[13.5px] leading-relaxed text-slate-700">{nguoc[0][1].y}</p>
-                          <div className="mt-1.5 flex flex-wrap gap-1.5">
-                            {nguoc.map(([s]) => (
-                              <button key={s} onClick={() => moDieu(maKia, Number(s))}
-                                className="rounded-lg border border-violet-300 bg-white px-2 py-1 text-[12px] font-semibold text-violet-800 hover:bg-violet-100">
-                                Điều {s} (2024) →
-                              </button>
-                            ))}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  );
-                })()}
-
                 <p className="mt-3 text-[10.5px] font-bold uppercase tracking-wide text-slate-400">Nguyên văn</p>
                 <div className="mt-1 space-y-2.5 text-[14px] leading-relaxed text-slate-800">
                   {dieuDangXem.khoan.map((k, i) => (
@@ -668,6 +998,31 @@ export default function TraCuuLuatPage() {
                   ))}
                 </div>
 
+                {/* ── LIÊN KẾT HAI CHIỀU ──
+                    Luật đất đai nhắc chéo nhau chằng chịt: luật nói một câu rồi "Chính phủ
+                    quy định chi tiết", chữ thật nằm ở nghị định; nghị định lại viện ngược về
+                    "khoản 3 Điều 96 của Luật Đất đai". Không thấy sợi dây đó thì học mãi vẫn
+                    rời rạc. Máy đọc chữ của từng điều rồi dựng sẵn cả hai chiều. */}
+                {((dieuDangXem.dan?.length || 0) > 0 || (dieuDangXem.duocDan?.length || 0) > 0) && (
+                  <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
+                    <p className="text-[10.5px] font-bold uppercase tracking-wide text-slate-500">🔗 Liên kết</p>
+                    {(dieuDangXem.dan?.length || 0) > 0 && (
+                      <div className="mt-1">
+                        <p className="text-[11.5px] font-semibold text-slate-500">Điều này dẫn tới:</p>
+                        <div className="mt-0.5 flex flex-wrap gap-1">{dieuDangXem.dan!.map((d, i) => <NutDan key={i} d={d} nho />)}</div>
+                      </div>
+                    )}
+                    {(dieuDangXem.duocDan?.length || 0) > 0 && (
+                      <div className="mt-1.5">
+                        <p className="text-[11.5px] font-semibold text-slate-500">
+                          Được {dieuDangXem.duocDan!.length} chỗ khác dẫn tới{dieuDangXem.duocDan!.some((d) => d.ma !== vb.ma) ? ' (có cả nghị định, thông tư hướng dẫn)' : ''}:
+                        </p>
+                        <div className="mt-0.5 flex flex-wrap gap-1">{dieuDangXem.duocDan!.map((d, i) => <NutDan key={i} d={d} nho />)}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <p className="mt-4 border-t pt-2 text-[11px] leading-snug text-slate-400">
                   Nguyên văn {vb.ten} (số {vb.soHieu}, ngày {ngayVn(vb.ngay)}) — {vb.nguon}. Chữ giữ nguyên, không rút gọn.
                 </p>
@@ -677,6 +1032,46 @@ export default function TraCuuLuatPage() {
         </div>
       )}
       </>}
+
+      {/* ── THẺ XEM NHANH ── nổi ngay dưới chỗ vừa bấm, đọc xong đóng lại là về chỗ cũ. */}
+      {xemNhanh && (() => {
+        const v = cacVb[xemNhanh.ma];
+        const d = v?.dieu.find((z) => z.so === xemNhanh.so);
+        const k = kho.find((z) => z.ma === xemNhanh.ma);
+        return (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setXemNhanh(null)} />
+            <div className="fixed z-50 w-[min(92vw,420px)] rounded-2xl border-2 border-sky-300 bg-white p-3 shadow-xl"
+              style={{ left: Math.max(8, Math.min(xemNhanh.x, (typeof window !== 'undefined' ? window.innerWidth : 800) - 440)),
+                       top: Math.min(xemNhanh.y + 6, (typeof window !== 'undefined' ? window.innerHeight : 600) - 260) }}>
+              <div className="flex items-start gap-2">
+                <p className="min-w-0 flex-1 text-[10.5px] font-bold uppercase tracking-wide text-sky-700">
+                  👁 Xem nhanh · {k ? nhanNgan(k.ma, k.soHieu) : xemNhanh.ma}
+                </p>
+                <button onClick={() => setXemNhanh(null)} className="shrink-0 text-slate-400 hover:text-slate-700">✕</button>
+              </div>
+              {!d ? <p className="mt-1 text-[13px] text-slate-400">Đang mở…</p> : (
+                <>
+                  <p className="mt-0.5 text-[14px] font-extrabold leading-snug text-[#0A2540]">Điều {d.so}. {d.tieuDe}</p>
+                  <div className="mt-1 max-h-[38vh] space-y-1 overflow-y-auto text-[13px] leading-relaxed text-slate-700">
+                    {d.khoan.slice(0, 4).map((x, i) => (
+                      <p key={i} className="whitespace-pre-line">
+                        {x.so ? <b className="text-[#0A2540]">{x.so}. </b> : null}
+                        {x.chu.length > 460 ? x.chu.slice(0, 460) + '…' : x.chu}
+                      </p>
+                    ))}
+                    {d.khoan.length > 4 && <p className="text-[12px] italic text-slate-400">…còn {d.khoan.length - 4} khoản nữa</p>}
+                  </div>
+                  <button onClick={() => { moDieu(xemNhanh.ma, xemNhanh.so); setXemNhanh(null); }}
+                    className="mt-2 w-full rounded-lg bg-[#0A2540] px-3 py-1.5 text-[12.5px] font-bold text-white">
+                    Mở hẳn điều này →
+                  </button>
+                </>
+              )}
+            </div>
+          </>
+        );
+      })()}
     </div>
   );
 }

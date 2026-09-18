@@ -46,6 +46,12 @@ RE_NGAY_LUAT = re.compile(r'thông qua\s+ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})\
 RE_XEM_TIEP = re.compile(r'\(\s*Xem tiếp Công báo số\s*([\d\s+]+)\)')
 RE_DAU_TRANG = re.compile(r'CÔNG BÁO/\s*Số\s*([\d\s+]+)/')
 RE_TIEP_THEO = re.compile(r'^\(\s*Tiếp theo Công báo số[^)]*\)\s*$')
+# NGƯỜI KÝ và NGÀY HIỆU LỰC — hai trường Thư viện pháp luật luôn hiện ở hộp thuộc tính,
+# người tra luật nhìn vào đó trước cả nội dung. Lấy máy từ chính bản gốc, không gõ tay.
+RE_KHOI_KY = re.compile(r'(TM\. CHÍNH PHỦ|KT\. THỦ TƯỚNG CHÍNH PHỦ|THỦ TƯỚNG CHÍNH PHỦ'
+                        r'|CHỦ TỊCH QUỐC HỘI|KT\. BỘ TRƯỞNG|BỘ TRƯỞNG)')
+RE_TEN_NGUOI = re.compile(r'^[A-ZĐÀ-Ỹ][a-zđà-ỹ]+(?: [A-ZĐÀ-Ỹ][a-zđà-ỹ]+){1,4}$')
+RE_HIEU_LUC = re.compile(r'có hiệu lực (?:thi hành )?(?:kể )?từ ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})\s+năm\s+(\d{4})')
 CUOI_OK = re.compile(r'hiệu lực|trách nhiệm (thi hành|thực hiện)|tổ chức thực hiện'
                      r'|điều khoản (thi hành|chuyển tiếp)|quy định chi tiết', re.I)
 
@@ -130,6 +136,29 @@ HET_HIEU_LUC = {
 }
 
 
+def doc_nguoi_ky(t):
+    """Tên người ký nằm ngay dưới khối chức danh IN HOA ở cuối văn bản."""
+    dong = [d.strip() for d in t.split('\n') if d.strip()]
+    vt = [i for i, d in enumerate(dong) if RE_KHOI_KY.match(d)]
+    for i in reversed(vt):
+        for d in dong[i + 1:i + 6]:
+            if RE_TEN_NGUOI.match(d):
+                return d
+    return ''
+
+
+def doc_hieu_luc(vb):
+    """Ngày có hiệu lực lấy từ chính điều "Hiệu lực thi hành" của văn bản."""
+    for d in vb['dieu']:
+        if 'hiệu lực' not in d['tieuDe'].lower():
+            continue
+        chu = ' '.join(k['chu'] + ' ' + ' '.join(x['chu'] for x in k['diem']) for k in d['khoan'])
+        m = RE_HIEU_LUC.search(chu)
+        if m:
+            return '%04d-%02d-%02d' % (int(m.group(3)), int(m.group(2)), int(m.group(1)))
+    return ''
+
+
 def lam(cac_tep, so_mong, ma, ra_dir):
     t, loi = noi_cac_phan(list(cac_tep))
     so, ngay, ten = doc_dau(t)
@@ -139,6 +168,8 @@ def lam(cac_tep, so_mong, ma, ra_dir):
     vb = tachpdf.tach(t, ma, so or so_mong, ngay, ten,
                       'Công báo Chính phủ (bản PDF ký số, có lớp chữ) — congbao.chinhphu.vn')
     vb['soPhan'] = len(cac_tep)
+    vb['nguoiKy'] = doc_nguoi_ky(t)
+    vb['ngayHieuLuc'] = doc_hieu_luc(vb)
     if ma in HET_HIEU_LUC:
         vb['hetHieuLuc'] = HET_HIEU_LUC[ma]
     ds = [d['so'] for d in vb['dieu']]
@@ -161,6 +192,7 @@ def lam(cac_tep, so_mong, ma, ra_dir):
         return None
     json.dump(vb, open(os.path.join(ra_dir, ma + '.json'), 'w', encoding='utf-8'), ensure_ascii=False)
     ra = {'ma': ma, 'soHieu': vb['soHieu'], 'ngay': ngay, 'ten': ten, 'soDieu': len(ds),
+          'nguoiKy': vb['nguoiKy'], 'ngayHieuLuc': vb['ngayHieuLuc'],
           'kb': os.path.getsize(os.path.join(ra_dir, ma + '.json')) // 1024}
     if ma in HET_HIEU_LUC:
         ra['hetHieuLuc'] = HET_HIEU_LUC[ma]
@@ -206,6 +238,23 @@ if __name__ == '__main__':
     # Thứ tự hiện trên web: LUẬT ĐẤT ĐAI 2024 đứng đầu (văn bản gốc đang áp dụng),
     # rồi tới các văn bản hướng dẫn theo ngày, cuối cùng mới tới văn bản hết hiệu lực.
     xong.sort(key=lambda x: (0 if x['ma'] == 'ldd2024' else (2 if x.get('hetHieuLuc') else 1), x['ngay']))
+    # Chủ dự án chốt: KHÔNG làm phần đối chiếu luật mới với luật cũ. Luật Đất đai 2013
+    # vẫn tách ra và giữ tệp (khỏi phải làm lại nếu sau này cần), nhưng KHÔNG đưa vào danh
+    # sách hiện trên web — để giao diện gọn và người học chỉ tập trung vào luật đang áp dụng.
+    xong = [x for x in xong if x['ma'] != 'ldd2013']
+
+    # ── LƯỢC ĐỒ VĂN BẢN (học của Thư viện pháp luật) ──
+    # Văn bản nào NHẮC TỚI văn bản nào. Đọc thẳng trong chữ luật: hễ thấy số hiệu của một
+    # văn bản khác trong kho là ghi một mối nối. Nhờ vậy biết ngay "nghị định nào hướng dẫn
+    # điều này" và ngược lại "nghị định này dựa trên luật nào", khỏi phải đoán.
+    theo_so = {x['soHieu']: x['ma'] for x in xong}
+    for x in xong:
+        vb = json.load(open(os.path.join(ra_dir, x['ma'] + '.json'), encoding='utf-8'))
+        chu = ' '.join(k['chu'] + ' ' + ' '.join(y['chu'] for y in k['diem'])
+                       for d in vb['dieu'] for k in d['khoan'])
+        x['dan'] = sorted({m for so, m in theo_so.items() if m != x['ma'] and so in chu})
+    for x in xong:
+        x['duocDan'] = sorted({y['ma'] for y in xong if x['ma'] in y['dan']})
     json.dump(xong, open(os.path.join(ra_dir, '_kho.json'), 'w', encoding='utf-8'),
               ensure_ascii=False, indent=1)
     print('ghi duoc %d/%d van ban' % (len(xong), len(BANG)))

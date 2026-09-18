@@ -71,6 +71,12 @@ type SoDo = { nhanh: NhanhSoDo[] };
 // Từ ngữ do CHÍNH LUẬT định nghĩa (điều "Giải thích từ ngữ"), rút bằng dung-tu-dien.py.
 type TuNgu = { tu: string; nghia: string; ma: string; soHieu: string; dieu: number; khoan: number };
 type KhoTuNgu = { tu: TuNgu[]; danGian: Record<string, string> };
+// LỘ TRÌNH HỌC: 9 chặng, xếp theo vòng đời một thửa đất. Xem dung-lo-trinh.py.
+type Chang = { so: number; ten: string; icon: string; mau: string; moTa: string };
+type Chang2 = Chang & { trongTam?: boolean };
+// theoDieu: MỘT điều có thể thuộc NHIỀU chặng — vì các điều liên kết chéo nhau,
+// vd Điều 45 (quyền giao dịch) bị cả chặng đăng ký biến động lẫn chặng giao dịch kéo vào.
+type LoTrinh = { chang: Chang2[]; theoDieu: Record<string, number[]>; theoVanBan: Record<string, number> };
 // Thẻ học soạn tay cho phần CON SỐ và MỐC THỜI GIAN — thứ bắt buộc phải thuộc lòng.
 type TheSo = { hoi: string; dap: string; nho?: string; chuDe: string; dan?: Dan[] };
 type KhoTheSo = { canhBao: string; the: TheSo[] };
@@ -201,6 +207,7 @@ export default function TraCuuLuatPage() {
   const [tn, setTn] = useState<KhoTuNgu | null>(null);
   // 544 thẻ SINH TỰ ĐỘNG từ chính kho luật (dung-the-tu-dong.py) — xem lời giải thích ở đó.
   const [theTd, setTheTd] = useState<{ the: TheHoc[] } | null>(null);
+  const [lt, setLt] = useState<LoTrinh | null>(null);
   // XEM NHANH: bấm vào một dẫn chiếu thì hiện thẻ ngay tại chỗ, KHÔNG nhảy đi mất — đang
   // đọc dở một điều mà bị cuốn sang điều khác là mất mạch. Muốn đọc kỹ thì bấm "Mở hẳn".
   const [xemNhanh, setXemNhanh] = useState<{ ma: string; so: number; x: number; y: number } | null>(null);
@@ -266,6 +273,7 @@ export default function TraCuuLuatPage() {
     fetch('/luat/the-so.json').then((r) => r.json()).then((d: KhoTheSo) => setTheSo2(d)).catch(() => {});
     fetch('/luat/tu-ngu.json').then((r) => r.json()).then(setTn).catch(() => {});
     fetch('/luat/the-tu-dong.json').then((r) => r.json()).then(setTheTd).catch(() => {});
+    fetch('/luat/lo-trinh.json').then((r) => r.json()).then(setLt).catch(() => {});
   }, [duocXem]);
 
   useEffect(() => {
@@ -379,9 +387,29 @@ export default function TraCuuLuatPage() {
     return ra;
   }, [gt, th, theSo2, tn, theTd, cacVb, kho]);
 
-  const chuDeCo = useMemo(() => [...new Set(dsThe.map((t) => t.chuDe))].sort(), [dsThe]);
+  // ── THẺ NÀY THUỘC CHẶNG NÀO ──
+  // Tra theo ĐIỀU mà thẻ dẫn tới. Không dựa vào "chủ đề" nữa vì chủ đề trước đây sinh ra
+  // từ tên chương, tên tình huống, tên nhóm số… nên có tới 33 cái rời rạc, học kiểu đó là
+  // chắp vá: hôm nay một mẩu bồi thường, mai một mẩu tách thửa, không nối được vào nhau.
+  const cacChang = (t: TheHoc): number[] => {
+    if (!lt) return [0];
+    const ra = new Set<number>();
+    // CHỈ xét điều ĐẦU TIÊN của thẻ — đó là điều chính của thẻ. Mấy điều sau là "học kèm",
+    // gom cả vào thì thẻ nào cũng thuộc mọi chặng, phân chặng thành vô nghĩa.
+    const d0 = (t.dan || [])[0];
+    if (d0) {
+      const k = d0.so ? `${d0.ma}:${d0.so}` : '';
+      for (const c of (lt.theoDieu[k] || [])) ra.add(c);
+      if (!ra.size && lt.theoVanBan[d0.ma] !== undefined) ra.add(lt.theoVanBan[d0.ma]);
+    }
+    return ra.size ? [...ra].sort((x, y) => x - y) : [0];
+  };
+  const changCua = (t: TheHoc): number => cacChang(t)[0];
+  const changCo = useMemo(() => lt?.chang || [], [lt]);
+  // chuDeHoc giờ mang số CHẶNG ('' = học cả lộ trình, theo đúng thứ tự chặng)
   const theTheoChuDe = useMemo(
-    () => (chuDeHoc ? dsThe.filter((t) => t.chuDe === chuDeHoc) : dsThe), [dsThe, chuDeHoc]);
+    () => (chuDeHoc === '' ? dsThe : dsThe.filter((t) => cacChang(t).includes(Number(chuDeHoc)))),
+    [dsThe, chuDeHoc, lt]);
 
   // ── CHỌN THẺ CHO HÔM NAY ──
   // Bộ thẻ có hơn 700 cái. Nếu ngày đầu đổ hết ra thì học hai hôm là bỏ, mà đó đúng là
@@ -396,13 +424,15 @@ export default function TraCuuLuatPage() {
     const denHan = theTheoChuDe.filter((t) => boThe[t.khoa] && (boThe[t.khoa] as any).ngayOn <= hn);
     const conNhan = Math.max(0, theMoiMoiNgay - daBatDauHomNay);
     const moi = theTheoChuDe.filter((t) => !boThe[t.khoa]).slice(0, conNhan);
-    // TRỘN XEN KẼ chủ đề (kỹ thuật "interleaving"): học xen kẽ nhớ lâu hơn học dồn một
-    // chủ đề. Trộn cố định theo ngày để trong ngày thứ tự không nhảy lung tung.
+    // XẾP THEO CHẶNG rồi mới trộn TRONG TỪNG CHẶNG.
+    // Trộn tất tay như trước thì học xen kẽ đúng là nhớ lâu hơn, nhưng xen kẽ giữa những
+    // thứ CHẲNG LIÊN QUAN GÌ NHAU thì chỉ thành chắp vá. Xen kẽ có tác dụng khi các thứ
+    // đem trộn cùng một mảng việc và dễ lẫn với nhau — đúng bằng phạm vi một chặng.
     const hat = Number(hn.split('-').join(''));
     return [...denHan, ...moi]
-      .map((t, i2) => ({ t, r: (hat + i2 * 2654435761) % 1000003 }))
-      .sort((a, b) => a.r - b.r).map((x) => x.t);
-  }, [theTheoChuDe, boThe, theMoiMoiNgay]);
+      .map((t, i2) => ({ t, c: changCua(t), r: (hat + i2 * 2654435761) % 1000003 }))
+      .sort((a, b) => (a.c - b.c) || (a.r - b.r)).map((x) => x.t);
+  }, [theTheoChuDe, boThe, theMoiMoiNgay, lt]);
   // Số thẻ mới còn nhận được hôm nay — hiện lên cho biết còn bao nhiêu là xong phần mới.
   const theMoiConLai = useMemo(() => {
     const hn = homNay();
@@ -898,11 +928,14 @@ export default function TraCuuLuatPage() {
                   màu và một hàng chip chủ đề dài dằng dặc, nhìn rối mà chẳng dùng tới. */}
               <div className="flex flex-wrap items-center gap-2 text-[12px]">
                 <select value={chuDeHoc} onChange={(e) => { setChuDeHoc(e.target.value); setTheSo(0); setDatLat(false); }}
-                  className="rounded-lg border-2 border-slate-200 bg-white px-2 py-1 text-[12.5px] font-semibold text-[#0A2540] outline-none">
-                  <option value="">Tất cả chủ đề ({dsThe.length} thẻ)</option>
-                  {chuDeCo.map((c) => (
-                    <option key={c} value={c}>{c} ({dsThe.filter((t) => t.chuDe === c).length})</option>
-                  ))}
+                  title="Học lần lượt theo chặng, hết chặng này sang chặng khác — thay vì bốc mỗi nơi một ít"
+                  className="max-w-[300px] rounded-lg border-2 border-slate-200 bg-white px-2 py-1 text-[12.5px] font-semibold text-[#0A2540] outline-none">
+                  <option value="">Cả lộ trình, theo thứ tự chặng ({dsThe.length} thẻ)</option>
+                  {changCo.map((c) => {
+                    const ds2 = dsThe.filter((t) => cacChang(t).includes(c.so));
+                    const xong = ds2.filter((t) => ((boThe[t.khoa] as any)?.S || 0) >= 21).length;
+                    return <option key={c.so} value={String(c.so)}>{c.trongTam ? '★ ' : ''}{c.icon} Chặng {c.so + 1}. {c.ten} — {xong}/{ds2.length}</option>;
+                  })}
                 </select>
                 <span className="font-bold text-sky-700">Hôm nay {theHomNay.length}</span>
                 <span className="text-slate-300">·</span>

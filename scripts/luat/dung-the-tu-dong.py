@@ -18,9 +18,13 @@ Chạy:  python dung-the-tu-dong.py <thu-muc-json>
 """
 import sys, os, re, json
 
-# Chỉ sinh thẻ tiêu đề điều cho những văn bản người dùng thật sự tra hằng ngày.
-# Sinh cho cả 1.468 điều thì loãng, mà phần lớn là điều kỹ thuật không ai tra tới.
-VB_CHINH = ['ldd2024', 'nd101-2024', 'nd102-2024', 'nd88-2024', 'nd103-2024', 'nd71-2024']
+# Sinh thẻ cho MỌI văn bản CÒN HIỆU LỰC. Trước đây chỉ lấy 6 văn bản nên Thông tư
+# 10/2024 (45 điều: mẫu Giấy chứng nhận, cách ghi từng mục, hồ sơ địa chính) chỉ có
+# đúng 1 thẻ — mà đó lại là thứ dùng hằng ngày khi làm hồ sơ cấp giấy.
+# Văn bản đã hết hiệu lực thì không sinh thẻ tra điều (học chữ đã bỏ là học sai),
+# chúng chỉ xuất hiện ở nhóm thẻ "điều này còn dùng được không".
+def van_ban_chinh(kho):
+    return [x['ma'] for x in kho if not x.get('biThayTheBoi')]
 
 # Điều "thủ tục" của mọi văn bản — không có nội dung để học
 BO_QUA = re.compile(r'^(Hiệu lực thi hành|Điều khoản thi hành|Trách nhiệm thi hành|'
@@ -63,7 +67,7 @@ def lam(thu_muc):
     # ── 1. Quy định này nằm ở điều nào ───────────────────────────────────────
     # Hỏi ngược từ NỘI DUNG sang SỐ ĐIỀU — đây mới là việc người làm nghề cần:
     # gặp một vướng mắc thì phải biết mở điều nào ra đọc.
-    for ma in VB_CHINH:
+    for ma in van_ban_chinh(kho):
         if ma not in vb:
             continue
         nhan = nhan_ngan(ma, K[ma]['soHieu'])
@@ -76,13 +80,31 @@ def lam(thu_muc):
             if gt.get('%s:%s' % (ma, d['so'])):
                 continue                      # đã có thẻ soạn tay giải thích kỹ hơn
             chuong = (d.get('chuongTen') or '').strip()
+            # ── HỌC KÈM ──
+            # Chủ dự án nói đúng: "điều chương này nhưng liên kết tới chương khác, chúng nó
+            # đều liên kết với nhau". Nên mỗi thẻ kéo theo tối đa 4 điều mà nó DẪN TỚI —
+            # đọc Điều 95 (điều kiện được bồi thường) là thấy ngay nó ném sang Điều 101
+            # (không được bồi thường) và Điều 107 (chi phí đầu tư còn lại).
+            kem, dan = [], [{'ma': ma, 'so': d['so']}]
+            for z in (d.get('dan') or []):
+                if not z.get('so') or (z['ma'] == ma and z['so'] == d['so']):
+                    continue
+                if len(kem) >= 4:
+                    break
+                nh2 = nhan_ngan(z['ma'], K[z['ma']]['soHieu']) if z['ma'] in K else z['ma']
+                nhan_kem = 'Điều %s' % z['so'] + ('' if z['ma'] == ma else ' %s' % nh2)
+                if nhan_kem in kem:
+                    continue
+                kem.append(nhan_kem)
+                dan.append({'ma': z['ma'], 'so': z['so']})
             the.append({
                 'khoa': 'dieu-o-dau:%s:%s' % (ma, d['so']), 'loai': 'Tra điều',
                 'chuDe': (chuong[:44] if chuong else nhan),
                 'hoi': 'Quy định về “%s” nằm ở điều nào của %s?' % (tie, nhan),
-                'dap': 'Điều %s %s.%s' % (d['so'], nhan, (' Thuộc %s.' % chuong) if chuong else ''),
+                'dap': ('Điều %s %s.%s' % (d['so'], nhan, (' Thuộc %s.' % chuong) if chuong else ''))
+                       + (' Điều này dẫn tới: %s — đọc kèm mới đủ.' % ', '.join(kem) if kem else ''),
                 'nho': 'Điều %s' % d['so'],
-                'dan': [{'ma': ma, 'so': d['so']}],
+                'dan': dan,
             })
 
     # ── 2. Điều này còn dùng được không ──────────────────────────────────────

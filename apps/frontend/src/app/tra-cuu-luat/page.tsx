@@ -25,10 +25,17 @@ type Dan = { ma: string; so?: number };
 type TinhTrang = { loai: 'het-hieu-luc' | 'bai-bo-mot-phan' | 'sua-doi'; boi: string;
   boiDieu?: number; tuNgay: string; phan?: string };
 type Dieu = { so: number; tieuDe: string; chuong: string; chuongTen: string; muc: string | null; mucTen: string;
-  khoan: Khoan[]; dan?: Dan[]; duocDan?: Dan[]; tinhTrang?: TinhTrang };
+  khoan: Khoan[]; dan?: Dan[]; duocDan?: Dan[]; tinhTrang?: TinhTrang;
+  suaDoi?: SuaDoi[]; suaDoiCho?: { ma: string; soHieu: string; loai: string; phamVi: string }[] };
+// Một lần điều này bị sửa: ai sửa, sửa phần nào, từ ngày nào, và NGUYÊN VĂN đoạn mới.
+type SuaDoi = { loai: 'sua-doi' | 'bo-sung' | 'bai-bo' | 'thay-the'; boi: string; boiDieu: number;
+  boiKhoan: number; tuNgay: string; phamVi: string; khoan?: number; noiDungMoi?: string };
+// Điều ĐẺ RA VỀ SAU (Điều 22a, 78b…): bản gốc không có, do luật sửa đổi thêm vào.
+type DieuThem = { so: string; sauDieu: number; boi: string; boiDieu: number; boiKhoan: number;
+  tuNgay: string; noiDungMoi: string };
 type VanBan = { ma: string; soHieu: string; ngay: string; ten: string; nguon: string; phuLuc?: string;
   hetHieuLuc?: string; chuong: { so: string; ten: string }[]; dieu: Dieu[];
-  mauBiBaiBo?: { boi: string; tuNgay: string; phan: string }[] };
+  mauBiBaiBo?: { boi: string; tuNgay: string; phan: string }[]; boSungThem?: DieuThem[] };
 
 type KhoItem = { ma: string; soHieu: string; ngay: string; ten: string; soDieu: number; hetHieuLuc?: string;
   nguoiKy?: string; ngayHieuLuc?: string; dan?: string[]; duocDan?: string[];
@@ -117,9 +124,11 @@ const nhanNgan = (ma: string, soHieu: string) => {
 };
 const ngayVn = (s: string) => (s ? s.split('-').reverse().join('/') : '');
 // Dấu hiệu nhỏ đặt trước tên điều để nhìn danh sách là biết ngay điều nào còn dùng được.
+// Dấu đứng đầu tên điều trong danh sách — nhìn lướt là biết điều nào còn dùng được.
+// ⛔ hết hiệu lực · ⚠️ bị bãi bỏ một phần · ✏️ đã bị sửa đổi, bổ sung.
 const dauTinhTrang = (d: Dieu) => (d.tinhTrang?.loai === 'het-hieu-luc' ? '⛔ '
   : d.tinhTrang?.loai === 'bai-bo-mot-phan' ? '⚠️ '
-  : d.tinhTrang?.loai === 'sua-doi' ? '✏️ ' : '');
+  : (d.tinhTrang?.loai === 'sua-doi' || (d.suaDoi?.length || 0) > 0) ? '✏️ ' : '');
 
 // CHỦ ĐỀ NHANH = câu tìm sẵn theo việc người ta hay hỏi. Không phải phân loại pháp lý,
 // chỉ là lối tắt — nên để nguyên chữ trong luật để tìm cho trúng.
@@ -177,7 +186,10 @@ export default function TraCuuLuatPage() {
   const [tieuDiem, setTieuDiem] = useState<number | null>(null);
   const keo = useRef<{ x: number; y: number } | null>(null);
   const khungVe = useRef<HTMLDivElement | null>(null);
-  const [boThe, setBoThe] = useState<Record<string, { de: number; khoang: number; lan: number; ngayOn: string }>>({});
+  // Thẻ: S = độ bền (ngày), D = độ khó 1..10, lan = số lần ôn, sai = số lần quên.
+  const [boThe, setBoThe] = useState<Record<string, any>>({});
+  const [goThu, setGoThu] = useState('');        // ô gõ thử đáp án
+  const [batGo, setBatGo] = useState(false);     // bật chế độ gõ thay vì chỉ lật thẻ
   const [chuoi, setChuoi] = useState(0);   // chuỗi ngày học liên tiếp
   const [theSo, setTheSo] = useState(0);
   const [datLat, setDatLat] = useState(false);
@@ -189,6 +201,8 @@ export default function TraCuuLuatPage() {
   // ngăn bên, sơ đồ giữ nguyên phía sau — đóng ngăn là về đúng chỗ đang xem dở.
   // Trước đây bấm một cái là nhảy thẳng sang thẻ "Toàn văn", mất sạch chỗ đang đứng.
   const [docBen, setDocBen] = useState<{ ma: string; so: number } | null>(null);
+  const [moSuaDoi, setMoSuaDoi] = useState<Record<string, boolean>>({});
+  const [moLuocDo, setMoLuocDo] = useState(false);
   const [thChon, setThChon] = useState<string>('');
   // Đánh dấu đã chuẩn bị xong từng giấy tờ — lưu trong máy để hôm sau mở lại vẫn còn.
   const [daCo, setDaCo] = useState<Record<string, boolean>>({});
@@ -354,41 +368,85 @@ export default function TraCuuLuatPage() {
       .sort((a, b) => a.r - b.r).map((x) => x.t);
   }, [theTheoChuDe, boThe]);
 
+  // Coi là THUỘC khi độ bền đã trên 21 ngày — tức là nghỉ 3 tuần vẫn còn nhớ 90%.
   const daThuoc = useMemo(
-    () => theTheoChuDe.filter((t) => ((boThe[t.khoa] as any)?.lan || 0) >= 2).length, [theTheoChuDe, boThe]);
+    () => theTheoChuDe.filter((t) => ((boThe[t.khoa] as any)?.S || 0) >= 21).length, [theTheoChuDe, boThe]);
+  // THẺ KHÓ (Anki gọi là 'leech'): quên từ 4 lần trở lên. Học kiểu cũ mãi không vào thì
+  // phải quay lại đọc nguyên văn điều đó, chứ lật thẻ thêm cũng vô ích.
+  const theKho = useMemo(
+    () => theTheoChuDe.filter((t) => ((boThe[t.khoa] as any)?.sai || 0) >= 4).length, [theTheoChuDe, boThe]);
 
-  // ── THUẬT TOÁN GIÃN CÁCH SM-2 (rút gọn) ──
-  // Hơn hẳn kiểu hộp cố định 1-3-7-16-35: mỗi thẻ mang một "độ dễ" riêng, thẻ nào mình hay
-  // quên thì tự giãn chậm lại, thẻ dễ thì giãn nhanh ra. Nhờ vậy số thẻ phải ôn mỗi ngày
-  // ít đi mà vẫn nhớ, không phải ôn đều tay những thứ đã thuộc.
-  const traLoiThe = (khoa: string, muc: 'quen' | 'tam' | 'thuoc') => {
+  // ── THUẬT TOÁN ÔN TẬP: FSRS ──
+  // Trước đây dùng SM-2 (thuật toán của SuperMemo năm 1987, Anki dùng mấy chục năm).
+  // Nay đổi sang FSRS — thứ Anki đã lấy làm mặc định từ 2023 vì ĐO ĐƯỢC là tốt hơn hẳn:
+  // cùng mức nhớ thì số thẻ phải ôn giảm rõ rệt, vì nó không đoán mò mà TÍNH RA xác suất
+  // mình còn nhớ thẻ đó tới đâu.
+  //
+  // Mỗi thẻ mang 2 con số thay vì 1:
+  //   S (độ bền) = bao nhiêu ngày nữa thì khả năng nhớ tụt xuống 90%.
+  //   D (độ khó) = 1..10, thẻ càng khó thì độ bền càng lên chậm.
+  // Khả năng còn nhớ sau t ngày:  R = (1 + 19/81 · t/S) ^ (-0.5)   — đường quên thực nghiệm.
+  // Hẹn ngày ôn = đúng lúc R tụt về 90%, tức là ÔN NGAY TRƯỚC KHI QUÊN. Ôn sớm hơn là phí
+  // công, ôn muộn hơn là mất luôn.
+  //
+  // Bốn nút tự chấm (giống Anki) chứ không phải ba: FSRS cần phân biệt "khó nhưng vẫn nhớ"
+  // với "nhớ bình thường" thì mới tính đúng. Mỗi nút hiện sẵn LẦN SAU ÔN KHI NÀO.
+  const W = [0.4872, 1.4003, 3.7145, 13.8206, 5.1618, 1.2298, 0.8975, 0.031, 1.6474,
+             0.1367, 1.0461, 2.1072, 0.0793, 0.3246, 1.587, 0.2272, 2.8755];
+  const DECAY = -0.5, NHAN = 19 / 81;
+  const kep = (x: number, a: number, b: number) => Math.min(b, Math.max(a, x));
+  // Khả năng còn nhớ sau t ngày với độ bền S
+  const conNho = (t: number, S: number) => Math.pow(1 + NHAN * t / Math.max(S, 0.1), DECAY);
+  // Số ngày tới lúc khả năng nhớ tụt về 90%
+  const soNgay = (S: number) => Math.max(1, Math.round((S / NHAN) * (Math.pow(0.9, 1 / DECAY) - 1)));
+
+  /** Tính trạng thái mới của thẻ sau khi tự chấm. g: 1 quên · 2 khó · 3 được · 4 dễ */
+  const tinhThe = (c: any, g: number) => {
+    const D0 = (x: number) => kep(W[4] - (x - 3) * W[5], 1, 10);
+    if (!c || !c.lan) return { S: W[g - 1], D: D0(g), lan: 1, sai: g === 1 ? 1 : 0 };
+    const t = Math.max(0, Math.round((Date.now() - (c.mocOn || Date.now())) / 86400000));
+    const S = Math.max(c.S || 1, 0.1), D = kep(c.D || 5, 1, 10), R = conNho(t, S);
+    let Sm: number;
+    if (g === 1) {
+      Sm = W[11] * Math.pow(D, -W[12]) * (Math.pow(S + 1, W[13]) - 1) * Math.exp(W[14] * (1 - R));
+    } else {
+      Sm = S * (1 + Math.exp(W[8]) * (11 - D) * Math.pow(S, -W[9])
+        * (Math.exp(W[10] * (1 - R)) - 1) * (g === 2 ? W[15] : 1) * (g === 4 ? W[16] : 1));
+    }
+    // độ khó trôi dần về mức trung bình, không để một lần bấm làm lệch hẳn
+    const Dm = kep(W[7] * D0(3) + (1 - W[7]) * (D - W[6] * (g - 3)), 1, 10);
+    return { S: kep(Sm, 0.1, 36500), D: Dm, lan: (c.lan || 0) + 1, sai: (c.sai || 0) + (g === 1 ? 1 : 0) };
+  };
+
+  /** Lần sau ôn sau bao nhiêu ngày nếu bấm nút này — hiện sẵn lên nút cho đỡ bấm mò. */
+  const hienNgay = (c: any, g: number) => {
+    const n = soNgay(tinhThe(c, g).S);
+    return g === 1 ? 'ôn lại hôm nay' : n < 30 ? `${n} ngày` : n < 365 ? `${Math.round(n / 30)} tháng` : `${(n / 365).toFixed(1)} năm`;
+  };
+
+  const traLoiThe = (khoa: string, g: number) => {
     setBoThe((m) => {
-      const c: any = m[khoa] || { de: 2.5, khoang: 0, lan: 0 };
-      let de = c.de ?? 2.5, khoang = c.khoang ?? 0, lan = c.lan ?? 0;
-      if (muc === 'quen') {                      // quên hẳn -> học lại từ đầu, hạ độ dễ
-        lan = 0; khoang = 1; de = Math.max(1.3, de - 0.2);
-      } else if (muc === 'tam') {                // lơ mơ -> giãn nhẹ, hạ nhẹ độ dễ
-        lan += 1; khoang = Math.max(1, Math.round((khoang || 1) * 1.2)); de = Math.max(1.3, de - 0.05);
-      } else {                                   // thuộc -> 1 ngày, 6 ngày, rồi nhân độ dễ
-        lan += 1; de = Math.min(2.8, de + 0.1);
-        khoang = lan === 1 ? 1 : lan === 2 ? 6 : Math.round((khoang || 6) * de);
-      }
-      const moi = { ...m, [khoa]: { de, khoang, lan, ngayOn: congNgay(khoang) } as any };
+      const c: any = m[khoa];
+      const k = tinhThe(c, g);
+      // Bấm "quên" thì cho quay lại NGAY trong buổi học, không đợi hôm sau — nhớ lại được
+      // trong cùng buổi mới là học lại, để tới mai là mất công học từ đầu.
+      const ngayOn = g === 1 ? homNay() : congNgay(soNgay(k.S));
+      const moi = { ...m, [khoa]: { ...k, ngayOn, mocOn: Date.now() } as any };
       try { localStorage.setItem('luat-the-hoc', JSON.stringify(moi)); } catch { /* */ }
       return moi;
     });
-    // ghi nhận chuỗi ngày học liên tiếp
     try {
-      const g = JSON.parse(localStorage.getItem('luat-chuoi') || '{}');
-      if (g.ngay !== homNay()) {
-        g.chuoi = g.ngay === congNgay(-1) ? (g.chuoi || 0) + 1 : 1;
-        g.ngay = homNay();
-        localStorage.setItem('luat-chuoi', JSON.stringify(g));
-        setChuoi(g.chuoi);
+      const g2 = JSON.parse(localStorage.getItem('luat-chuoi') || '{}');
+      if (g2.ngay !== homNay()) {
+        g2.chuoi = g2.ngay === congNgay(-1) ? (g2.chuoi || 0) + 1 : 1;
+        g2.ngay = homNay();
+        localStorage.setItem('luat-chuoi', JSON.stringify(g2));
+        setChuoi(g2.chuoi);
       }
     } catch { /* */ }
     setDatLat(false);
-    setTheSo((i) => i + 1);
+    setGoThu('');
+    setTheSo((i2) => i2 + 1);
   };
 
   const khoaGhim = (ma: string, so: number) => `${ma}:${so}`;
@@ -787,36 +845,30 @@ export default function TraCuuLuatPage() {
 
           {cheDoHoc === 'the' && (
             <div className="mt-3">
-              <p className="text-[12.5px] leading-snug text-slate-500">
-                Hai kỹ thuật học đã được chứng minh: <b>tự nhớ lại trước khi xem đáp án</b> và <b>ôn đúng lúc sắp quên</b>.
-                Mỗi thẻ mang một <b>độ dễ</b> riêng — thẻ hay quên tự giãn chậm lại, thẻ dễ giãn nhanh ra, nên
-                số thẻ phải ôn mỗi ngày ít đi mà vẫn nhớ.
-              </p>
-
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px]">
-                <span className="rounded-full bg-sky-50 px-2.5 py-1 font-bold text-sky-700">Hôm nay: {theHomNay.length} thẻ</span>
-                <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-bold text-emerald-700">Đã thuộc: {daThuoc}/{theTheoChuDe.length}</span>
-                {chuoi > 1 && <span className="rounded-full bg-amber-50 px-2.5 py-1 font-bold text-amber-700">🔥 {chuoi} ngày liên tiếp</span>}
-                <div className="h-1.5 min-w-[100px] flex-1 overflow-hidden rounded-full bg-slate-100">
+              {/* MỘT DÒNG TRẠNG THÁI duy nhất — trước đây chỗ này có 2 đoạn chữ dài, 4 ô
+                  màu và một hàng chip chủ đề dài dằng dặc, nhìn rối mà chẳng dùng tới. */}
+              <div className="flex flex-wrap items-center gap-2 text-[12px]">
+                <select value={chuDeHoc} onChange={(e) => { setChuDeHoc(e.target.value); setTheSo(0); setDatLat(false); }}
+                  className="rounded-lg border-2 border-slate-200 bg-white px-2 py-1 text-[12.5px] font-semibold text-[#0A2540] outline-none">
+                  <option value="">Tất cả chủ đề ({dsThe.length} thẻ)</option>
+                  {chuDeCo.map((c) => (
+                    <option key={c} value={c}>{c} ({dsThe.filter((t) => t.chuDe === c).length})</option>
+                  ))}
+                </select>
+                <span className="font-bold text-sky-700">Hôm nay {theHomNay.length}</span>
+                <span className="text-slate-300">·</span>
+                <span className="font-bold text-emerald-700">Thuộc {daThuoc}/{theTheoChuDe.length}</span>
+                {theKho > 0 && <><span className="text-slate-300">·</span>
+                  <span className="font-bold text-rose-600" title="Thẻ quên từ 4 lần trở lên — nên mở lại điều gốc đọc kỹ">Khó {theKho}</span></>}
+                {chuoi > 1 && <><span className="text-slate-300">·</span><span className="font-bold text-amber-600">🔥 {chuoi} ngày</span></>}
+                <div className="h-1.5 min-w-[80px] flex-1 overflow-hidden rounded-full bg-slate-100">
                   <div className="h-full bg-emerald-500 transition-all" style={{ width: `${theTheoChuDe.length ? (daThuoc / theTheoChuDe.length) * 100 : 0}%` }} />
                 </div>
-              </div>
-
-              {/* Chọn chủ đề để ôn tập trung, hoặc để trống thì ôn trộn tất cả. */}
-              <div className="mt-2 flex flex-wrap gap-1">
-                <button onClick={() => { setChuDeHoc(''); setTheSo(0); setDatLat(false); }}
-                  className={`rounded-full border px-2.5 py-1 text-[11.5px] font-semibold ${!chuDeHoc ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>
-                  Tất cả ({dsThe.length})
+                <button onClick={() => setBatGo((v) => !v)}
+                  title="Gõ đáp án bằng tay nhớ chắc hơn hẳn chỉ lật thẻ rồi gật đầu"
+                  className={`rounded-full border px-2.5 py-1 text-[11.5px] font-semibold ${batGo ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-500'}`}>
+                  ⌨ Gõ đáp án
                 </button>
-                {chuDeCo.map((c) => {
-                  const n = dsThe.filter((t) => t.chuDe === c).length;
-                  return (
-                    <button key={c} onClick={() => { setChuDeHoc(c); setTheSo(0); setDatLat(false); }}
-                      className={`rounded-full border px-2.5 py-1 text-[11.5px] font-semibold ${chuDeHoc === c ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>
-                      {c} ({n})
-                    </button>
-                  );
-                })}
               </div>
 
               {theHomNay.length === 0 ? (
@@ -830,56 +882,76 @@ export default function TraCuuLuatPage() {
               ) : (() => {
                 const t = theHomNay[theSo % theHomNay.length];
                 const c: any = boThe[t.khoa] || {};
+                const kho4 = (c.sai || 0) >= 4;
+                // Chấm bài gõ: so số chữ trùng nhau, gõ ý đúng là được, không bắt đúng từng chữ.
+                const chamGo = () => {
+                  const tach = (x: string) => new Set(kd(x).split(/[^a-z0-9]+/).filter((z) => z.length > 2));
+                  const a = tach(goThu), b = tach(t.dap + ' ' + (t.nho || ''));
+                  if (!a.size) return 0;
+                  let n = 0; a.forEach((w) => { if (b.has(w)) n += 1; });
+                  return Math.round((n / Math.max(a.size, 1)) * 100);
+                };
                 return (
                   <div className="mt-3">
                     <div className="rounded-2xl border-2 border-slate-200 bg-white p-4">
                       <div className="flex flex-wrap items-center justify-between gap-1 text-[11px] font-semibold text-slate-400">
                         <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-500">{t.loai} · {t.chuDe}</span>
-                        <span>{c.lan ? `đã ôn ${c.lan} lần · lần sau sau ${c.khoang} ngày` : 'thẻ mới'}</span>
+                        <span>{c.lan ? `đã ôn ${c.lan} lần · nhớ chắc ~${Math.round(c.S || 0)} ngày` : 'thẻ mới'}</span>
                       </div>
+                      {kho4 && (
+                        <p className="mt-1.5 rounded-lg bg-rose-50 px-2 py-1 text-[11.5px] font-semibold text-rose-700">
+                          Thẻ này đã quên {c.sai} lần — nên mở điều gốc đọc lại một lượt rồi hãy ôn tiếp.
+                        </p>
+                      )}
                       <p className="mt-2 text-[16px] font-extrabold leading-snug text-[#0A2540]">{t.hoi}</p>
                       {!datLat ? (
                         <>
-                          <p className="mt-2 text-[13px] italic leading-snug text-slate-500">
-                            Thử tự trả lời trong đầu trước đã — nhớ lại được mới là học, đọc lại thì không.
-                          </p>
+                          {batGo ? (
+                            <textarea value={goThu} onChange={(e) => setGoThu(e.target.value)} rows={3}
+                              placeholder="Gõ câu trả lời theo trí nhớ… (gõ đúng ý là được, không cần đúng từng chữ)"
+                              className="mt-2 w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-[13px] outline-none focus:border-[#0A2540]" />
+                          ) : (
+                            <p className="mt-2 text-[13px] italic leading-snug text-slate-500">
+                              Tự trả lời trong đầu trước đã — nhớ lại được mới là học, đọc lại thì không.
+                            </p>
+                          )}
                           <button onClick={() => setDatLat(true)}
                             className="mt-3 w-full rounded-xl bg-[#0A2540] px-3 py-2.5 text-[14px] font-bold text-white">
-                            Lật thẻ xem đáp án
+                            Xem đáp án
                           </button>
                         </>
                       ) : (
                         <>
+                          {batGo && goThu.trim() && (
+                            <p className="mt-2 rounded-lg bg-slate-50 px-2.5 py-1.5 text-[12px] text-slate-600">
+                              Bài gõ của mình trúng <b className={chamGo() >= 60 ? 'text-emerald-700' : 'text-amber-700'}>{chamGo()}%</b> số ý chính.
+                            </p>
+                          )}
                           <div className="mt-2 rounded-xl border-2 border-dashed border-sky-300 bg-sky-50/70 p-3">
                             {t.nho && <p className="text-[13.5px] font-bold text-sky-900">Nhớ nhanh: {t.nho}</p>}
                             <p className={`text-[13px] leading-relaxed text-slate-700 ${t.nho ? 'mt-1' : ''}`}>{t.dap}</p>
                           </div>
                           {t.dan && <div className="mt-2 flex flex-wrap gap-1">{t.dan.map((d, i2) => <NutDan key={i2} d={d} nho />)}</div>}
-                          <p className="mt-3 text-[11.5px] font-semibold text-slate-500">Tự chấm: nhớ được tới đâu?</p>
-                          <div className="mt-1 grid grid-cols-3 gap-1.5">
-                            <button onClick={() => traLoiThe(t.khoa, 'quen')}
-                              className="rounded-xl border-2 border-rose-300 bg-rose-50 px-2 py-2 text-[12.5px] font-bold text-rose-700">
-                              Chưa thuộc<span className="block text-[10.5px] font-normal opacity-70">mai ôn lại</span>
-                            </button>
-                            <button onClick={() => traLoiThe(t.khoa, 'tam')}
-                              className="rounded-xl border-2 border-amber-300 bg-amber-50 px-2 py-2 text-[12.5px] font-bold text-amber-700">
-                              Tạm được<span className="block text-[10.5px] font-normal opacity-70">giãn nhẹ</span>
-                            </button>
-                            <button onClick={() => traLoiThe(t.khoa, 'thuoc')}
-                              className="rounded-xl border-2 border-emerald-300 bg-emerald-50 px-2 py-2 text-[12.5px] font-bold text-emerald-700">
-                              Thuộc rồi<span className="block text-[10.5px] font-normal opacity-70">giãn xa ra</span>
-                            </button>
+                          <div className="mt-3 grid grid-cols-4 gap-1.5">
+                            {([[1, 'Quên', 'border-rose-300 bg-rose-50 text-rose-700'],
+                               [2, 'Khó', 'border-amber-300 bg-amber-50 text-amber-700'],
+                               [3, 'Được', 'border-sky-300 bg-sky-50 text-sky-700'],
+                               [4, 'Dễ', 'border-emerald-300 bg-emerald-50 text-emerald-700']] as const).map(([g, nhan, mau]) => (
+                              <button key={g} onClick={() => traLoiThe(t.khoa, g)}
+                                className={`rounded-xl border-2 px-1 py-2 text-[12.5px] font-bold ${mau}`}>
+                                {nhan}<span className="block text-[10px] font-normal opacity-70">{hienNgay(c, g)}</span>
+                              </button>
+                            ))}
                           </div>
                         </>
                       )}
                     </div>
                     <div className="mt-2 flex items-center justify-between text-[12px] text-slate-400">
-                      <button onClick={() => { setDatLat(false); setTheSo((i) => i + 1); }} className="font-semibold hover:text-slate-700">Để lát nữa →</button>
+                      <button onClick={() => { setDatLat(false); setGoThu(''); setTheSo((i2) => i2 + 1); }} className="font-semibold hover:text-slate-700">Để lát nữa →</button>
                       <span>{(theSo % theHomNay.length) + 1}/{theHomNay.length}</span>
                       <button onClick={() => { if (confirm('Xoá hết tiến độ học thuộc?')) { setBoThe({}); try { localStorage.removeItem('luat-the-hoc'); } catch { /* */ } } }}
                         className="hover:text-rose-600">Học lại từ đầu</button>
                     </div>
-                    {theSo2 && <p className="mt-2 rounded-lg bg-slate-50 px-3 py-2 text-[11px] leading-snug text-slate-500">{theSo2.canhBao}</p>}
                   </div>
                 );
               })()}
@@ -897,11 +969,13 @@ export default function TraCuuLuatPage() {
                   <button key={k} onClick={() => setKieuSoDo(k)}
                     className={`rounded-full border px-2.5 py-1 text-[12px] font-semibold transition ${kieuSoDo === k ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>{l}</button>
                 ))}
-                <span className="mx-1 h-4 w-px bg-slate-200" />
-                <button onClick={() => setMoNhanh(Object.fromEntries(sd.nhanh.map((_, i) => [i, true])))}
-                  className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-600">Mở hết</button>
-                <button onClick={() => setMoNhanh({})}
-                  className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-600">Thu hết</button>
+                {kieuSoDo === 'danhsach' && <>
+                  <span className="mx-1 h-4 w-px bg-slate-200" />
+                  <button onClick={() => setMoNhanh(Object.fromEntries(sd.nhanh.map((_, i) => [i, true])))}
+                    className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-600">Mở hết</button>
+                  <button onClick={() => setMoNhanh({})}
+                    className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-600">Thu hết</button>
+                </>}
                 {kieuSoDo === 'khungve' && (
                   <>
                     <span className="mx-1 h-4 w-px bg-slate-200" />
@@ -911,11 +985,8 @@ export default function TraCuuLuatPage() {
                     <button onClick={() => setPhongTo((z) => Math.min(2, +(z + 0.1).toFixed(2)))}
                       className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-bold text-slate-600">+</button>
                     <button onClick={() => { setPhongTo(0.6); setDich({ x: 0, y: 0 }); setTieuDiem(null); }}
-                      title="Thu nhỏ để thấy toàn bộ sơ đồ"
+                      title="Thu nhỏ để thấy toàn bộ sơ đồ, đưa gốc về giữa"
                       className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-600">⤢ Vừa màn hình</button>
-                    <button onClick={() => { setDich({ x: 0, y: 0 }); setPhongTo(1); }}
-                      title="Đưa gốc về giữa"
-                      className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-600">⊙ Về giữa</button>
                     <input value={timSoDo} onChange={(e) => setTimSoDo(e.target.value)}
                       placeholder="Tìm trong sơ đồ…"
                       className="ml-1 min-w-[140px] flex-1 rounded-full border border-slate-200 px-3 py-1 text-[12px] outline-none focus:border-[#0A2540]" />
@@ -1236,8 +1307,19 @@ export default function TraCuuLuatPage() {
               ];
               const co = hang.filter(([, ds]) => (ds?.length || 0) > 0);
               if (!co.length) return null;
+              // THU LẠI CHO ĐỠ RỐI: lược đồ có khi liệt kê cả chục văn bản, để bung sẵn thì
+              // đầu trang dày đặc chữ, người đọc chưa kịp thấy nội dung điều luật đã ngợp.
+              // Mặc định chỉ hiện một dòng, cần thì bấm mở.
+              const demQh = co.reduce((n, [, ds]) => n + (ds?.length || 0), 0) + (k?.baiBoMotPhan?.length || 0);
+              if (!moLuocDo) return (
+                <button onClick={() => setMoLuocDo(true)}
+                  className="mt-1 border-t border-slate-200 pt-1 text-[11px] font-semibold text-slate-500 hover:text-[#0A2540]">
+                  🔗 Lược đồ văn bản — {demQh} quan hệ với văn bản khác ▾
+                </button>
+              );
               return (
                 <div className="mt-1 space-y-0.5 border-t border-slate-200 pt-1 text-[11px]">
+                  <button onClick={() => setMoLuocDo(false)} className="font-semibold text-slate-500 hover:text-[#0A2540]">🔗 Lược đồ văn bản ▴</button>
                   {co.map(([nhan, ds, mau]) => (
                     <div key={nhan} className="flex flex-wrap items-center gap-1">
                       <span className={`font-semibold ${mau}`}>{nhan}:</span>
@@ -1281,7 +1363,8 @@ export default function TraCuuLuatPage() {
       {/* Còn hiệu lực nhưng có điều đã bị bãi bỏ — đếm ra cho người đọc biết trước. */}
       {vb && !vb.hetHieuLuc && (() => {
         const bo = vb.dieu.filter((d) => d.tinhTrang?.loai === 'het-hieu-luc').length;
-        const phan = vb.dieu.filter((d) => d.tinhTrang && d.tinhTrang.loai !== 'het-hieu-luc').length;
+        const phan = vb.dieu.filter((d) => d.tinhTrang && d.tinhTrang.loai !== 'het-hieu-luc').length
+          + vb.dieu.filter((d) => !d.tinhTrang && (d.suaDoi?.length || 0) > 0).length;
         if (!bo && !phan) return null;
         return (
           <p className="mt-1 text-[11.5px] leading-snug text-slate-500">
@@ -1346,6 +1429,10 @@ export default function TraCuuLuatPage() {
 
       {vb && (
         <div className="mt-3 grid gap-3 lg:grid-cols-[360px_1fr]">
+          {/* Điều ĐẺ RA VỀ SAU: Luật sửa đổi 1998/2001 thêm hẳn Điều 22a, 78b… vào Luật 1993.
+              Bản gốc 1993 không có mấy điều này, mà chèn chữ vào giữa nguyên văn là sửa luật
+              gốc — không được phép. Nên hiện thành dòng gạch đứt nối ngay sau điều liền trước,
+              bấm vào thì mở đúng khoản của luật sửa đổi, nơi có nguyên văn của nó. */}
           {/* ── CỘT TRÁI: cây chương → điều, hoặc kết quả tìm ── */}
           <div className="max-h-[70vh] overflow-y-auto rounded-xl border border-slate-200 bg-white">
             <p className="sticky top-0 z-10 border-b bg-slate-50/95 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-500 backdrop-blur">
@@ -1370,12 +1457,20 @@ export default function TraCuuLuatPage() {
               // Văn bản ngắn không chia chương (Luật 43/2024, Nghị định 42/2024) — liệt kê
               // thẳng từng điều. Không có nhánh này thì cột trái trống trơn.
               vb.dieu.map((d) => (
-                <button key={d.so} onClick={() => moDieu(vb.ma, d.so)}
+                <div key={d.so}>
+                <button onClick={() => moDieu(vb.ma, d.so)}
                   className={`block w-full border-b border-slate-100 px-3 py-2 text-left text-[12.5px] hover:bg-slate-50 ${chon === d.so ? 'bg-[#0A2540]/[0.05] font-semibold' : 'text-slate-600'}`}>
                   <span className={d.tinhTrang?.loai === 'het-hieu-luc' ? 'text-slate-400 line-through decoration-rose-300' : ''}>
                     {ghim.includes(khoaGhim(vb.ma, d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(vb.ma, d.so)] ? '💡 ' : ''}{dauTinhTrang(d)}Điều {d.so}. {d.tieuDe}
                   </span>
                 </button>
+                {(vb.boSungThem || []).filter((z) => z.sauDieu === Number(d.so)).map((z) => (
+                  <button key={z.so} onClick={() => moDieu(z.boi, z.boiDieu)}
+                    className="block w-full border-b border-slate-100 px-3 py-1.5 pl-3 text-left text-[12px] text-violet-700 hover:bg-violet-50">
+                    ➕ Điều {z.so} <span className="text-[10.5px] text-slate-400">— bổ sung năm {(z.tuNgay || '').slice(0, 4)}</span>
+                  </button>
+                ))}
+                </div>
               ))
             ) : (
               vb.chuong.map((c) => {
@@ -1393,12 +1488,20 @@ export default function TraCuuLuatPage() {
                       <span className="shrink-0 rounded-full bg-slate-100 px-1.5 text-[10.5px] font-semibold text-slate-500">{ds.length}</span>
                     </button>
                     {mo && ds.map((d) => (
-                      <button key={d.so} onClick={() => moDieu(vb.ma, d.so)}
+                      <div key={d.so}>
+                      <button onClick={() => moDieu(vb.ma, d.so)}
                         className={`block w-full px-3 py-1.5 pl-8 text-left text-[12.5px] hover:bg-slate-50 ${chon === d.so ? 'bg-[#0A2540]/[0.05] font-semibold' : 'text-slate-600'}`}>
                         <span className={d.tinhTrang?.loai === 'het-hieu-luc' ? 'text-slate-400 line-through decoration-rose-300' : ''}>
                           {ghim.includes(khoaGhim(vb.ma, d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(vb.ma, d.so)] ? '💡 ' : ''}{dauTinhTrang(d)}Điều {d.so}. {d.tieuDe}
                         </span>
                       </button>
+                      {(vb.boSungThem || []).filter((z) => z.sauDieu === Number(d.so)).map((z) => (
+                  <button key={z.so} onClick={() => moDieu(z.boi, z.boiDieu)}
+                    className="block w-full border-b border-slate-100 px-3 py-1.5 pl-8 text-left text-[12px] text-violet-700 hover:bg-violet-50">
+                    ➕ Điều {z.so} <span className="text-[10.5px] text-slate-400">— bổ sung năm {(z.tuNgay || '').slice(0, 4)}</span>
+                  </button>
+                ))}
+                      </div>
                     ))}
                   </div>
                 );
@@ -1472,6 +1575,57 @@ export default function TraCuuLuatPage() {
                     </div>
                   );
                 })()}
+
+                {/* ── ĐIỀU NÀY ĐÃ BỊ SỬA ĐỔI BỞI AI ──
+                    Thư viện pháp luật làm đúng một việc rất quý: mở điều nào bị sửa là hiện
+                    ngay dòng "Khoản 2 Điều 251 được sửa đổi bởi khoản 1 Điều 1 Luật 43/2024",
+                    bấm vào bung ra NGUYÊN VĂN đoạn mới. Đọc chữ cũ mà không thấy chữ mới thì
+                    hiểu sai hẳn — nên đây là phần phải có.
+                    Một điều có thể bị sửa NHIỀU LẦN (Điều 19 Luật 1993 bị sửa cả năm 1998 lẫn
+                    2001) nên xếp theo ngày, mới nhất lên trên. */}
+                {(dieuDangXem.suaDoi?.length || 0) > 0 && (
+                  <div className="mt-2 space-y-1.5">
+                    {[...dieuDangXem.suaDoi!].sort((x, y) => (y.tuNgay || '').localeCompare(x.tuNgay || '')).map((sd2, i3) => {
+                      const kb = kho.find((z) => z.ma === sd2.boi);
+                      const mo = moSuaDoi[`${dieuDangXem.so}:${i3}`];
+                      const dong = sd2.loai === 'thay-the' ? 'Cụm từ tại điều này được thay'
+                        : sd2.loai === 'bo-sung' ? `${sd2.phamVi} được bổ sung`
+                          : `${sd2.phamVi} được sửa đổi, bổ sung`;
+                      return (
+                        <div key={i3} className="rounded-xl border-l-4 border-sky-400 bg-sky-50/70 px-2.5 py-2">
+                          <p className="text-[12.5px] leading-snug text-slate-700">
+                            <b className="text-sky-800">{dong}</b> bởi <b>khoản {sd2.boiKhoan} Điều {sd2.boiDieu}</b>{' '}
+                            {kb ? <b>{nhanNgan(kb.ma, kb.soHieu)}</b> : sd2.boi}
+                            {sd2.tuNgay ? <> · có hiệu lực từ <b>{ngayVn(sd2.tuNgay)}</b></> : null}
+                          </p>
+                          <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                            {sd2.noiDungMoi && (
+                              <button onClick={() => setMoSuaDoi((m) => ({ ...m, [`${dieuDangXem.so}:${i3}`]: !m[`${dieuDangXem.so}:${i3}`] }))}
+                                className="rounded-lg border border-sky-300 bg-white px-2 py-0.5 text-[11.5px] font-bold text-sky-700">
+                                {mo ? '▴ Thu lại' : '▾ Xem nguyên văn đoạn mới'}
+                              </button>
+                            )}
+                            <NutDan d={{ ma: sd2.boi, so: sd2.boiDieu }} nho />
+                          </div>
+                          {mo && sd2.noiDungMoi && (
+                            <div className="mt-1.5 whitespace-pre-line rounded-lg border border-sky-200 bg-white px-2.5 py-2 text-[13px] leading-relaxed text-slate-800">
+                              {sd2.noiDungMoi}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Điều này ĐI SỬA ai — nhìn từ phía luật sửa đổi. */}
+                {(dieuDangXem.suaDoiCho?.length || 0) > 0 && (
+                  <p className="mt-2 rounded-xl border-l-4 border-violet-400 bg-violet-50/70 px-2.5 py-2 text-[12.5px] leading-snug text-slate-700">
+                    <b className="text-violet-800">Điều này sửa đổi, bổ sung</b>{' '}
+                    {[...new Set(dieuDangXem.suaDoiCho!.map((z) => z.soHieu).filter(Boolean))].join(' · ')}
+                    {' — '}{dieuDangXem.suaDoiCho!.length} nội dung.
+                  </p>
+                )}
 
                 {/* KHUNG GIẢI THÍCH — màu khác hẳn, ghi rõ không phải chữ luật, để người đọc
                     không bao giờ lẫn với nguyên văn bên dưới. */}

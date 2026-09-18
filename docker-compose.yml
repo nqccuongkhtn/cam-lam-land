@@ -162,6 +162,9 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./nginx:/usr/share/nginx/maintenance:ro
+      # Bộ tile bản đồ: để NGINX PHỤC VỤ THẲNG, không chuyển qua Next.js nữa.
+      # Đo thật: qua Next.js mất 12-16 mili-giây một ô; nginx đọc file tĩnh nhanh hơn hẳn.
+      - camlam_tiles:/usr/share/nginx/tiles:ro
     ports:
       - "${NGINX_PORT:-80}:80"
     depends_on:

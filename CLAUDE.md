@@ -619,6 +619,21 @@ frontend), ảnh nhẹ đi 1,8 GB, mỗi lần dựng lại chỉ còn tốn và
 **Thư mục `apps/frontend/public/tiles` phải có sẵn trên ổ đĩa** — không có thì bản đồ mất ảnh
 quy hoạch (volume sẽ gắn vào một thư mục rỗng).
 
+**Bộ tile do NGINX phục vụ thẳng, không qua Next.js nữa.** `location /tiles/` dùng `alias`
+đọc file từ volume `camlam_tiles` gắn vào nginx. Đo thật 3 lần trên cùng máy:
+**nằm trong ảnh Docker 5–7 ms/ô · gắn volume rồi chuyển tiếp qua Next.js 12–16 ms · nginx đọc
+thẳng 1,4–2,4 ms** — nhanh gấp 3 lần cả bản gốc, vì bớt hẳn một chặng và một tiến trình Node.
+⚠️ Tên volume trong Docker có **tiền tố tên dự án**: khai `camlam_tiles` trong compose thì
+volume thật tên `camlamgis_camlam_tiles`. Nạp nhầm vào `camlam_tiles` là nginx trả 404 hết.
+Nạp lại bộ tile:
+```bash
+docker run --rm -v camlamgis_camlam_tiles:/dest camlamgis-frontend:latest sh -c 'cp -a /app/public/tiles/. /dest/'
+```
+
+**⚠️ `.wslconfig`: KHÔNG đặt `swap=0`.** Đã đặt nhầm và trả giá ngay — hai lần dựng lại web bị
+giết giữa chừng vì "máy hết bộ nhớ" (máy 15,7 GB RAM, `next build` ăn rất nhiều). Nay để
+`swap=6GB` và đặt file tràn ở `D:\wsl-swap` cho đỡ ăn vào ổ C.
+
 **Chế độ tự co của WSL (`sparseVhd`) KHÔNG dùng được.** WSL 2.7.8 trả lời thẳng:
 *"Sparse VHD support is currently disabled due to potential data corruption"*, muốn bật phải ép
 bằng `--allow-unsafe`. Kho này chứa database thật nên **không ép**.

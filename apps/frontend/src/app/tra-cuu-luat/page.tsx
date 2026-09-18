@@ -67,8 +67,10 @@ const kd = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ
 // Nhãn ngắn hiện trên nút chọn văn bản: "31/2024/QH15" -> "Luật Đất đai 2024",
 // "88/2024/NĐ-CP" -> "NĐ 88/2024", "10/2024/TT-BTNMT" -> "TT 10/2024".
 const nhanNgan = (ma: string, soHieu: string) => {
-  if (ma === 'ldd2024') return 'Luật Đất đai 2024';
-  if (ma === 'ldd2013') return 'Luật Đất đai 2013';
+  // Luật Đất đai qua các đời: gọi thẳng theo NĂM cho dễ nhận, số hiệu cũ (3-LCT/HĐNN8,
+  // 24-L/CTN) chẳng ai nhớ nổi.
+  if (ma.startsWith('ldd')) return 'Luật Đất đai ' + ma.slice(3);
+  if (ma.startsWith('lsd')) return 'Luật sửa đổi ' + ma.slice(3);
   const [so, nam, loai] = (soHieu || '').split('/');
   if (loai && loai.startsWith('QH')) return `Luật ${so}/${nam}`;
   if (loai && loai.startsWith('TT')) return `TT ${so}/${nam}`;
@@ -752,10 +754,11 @@ export default function TraCuuLuatPage() {
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <select value={maVb} onChange={(e) => doiVanBan(e.target.value)}
           className="min-w-[260px] flex-1 rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-[14px] font-semibold text-[#0A2540] outline-none focus:border-[#0A2540]">
-          {([['Luật', (x: KhoItem) => !x.hetHieuLuc && x.soHieu.includes('/QH')],
-             ['Nghị định', (x: KhoItem) => x.soHieu.includes('NĐ-CP')],
-             ['Thông tư', (x: KhoItem) => x.soHieu.includes('/TT-')],
-             ['Đã hết hiệu lực', (x: KhoItem) => !!x.hetHieuLuc]] as const).map(([nhom, loc]) => {
+          {([['Đang áp dụng — Luật', (x: KhoItem) => !x.hetHieuLuc && x.soHieu.includes('/QH')],
+             ['Đang áp dụng — Nghị định', (x: KhoItem) => !x.hetHieuLuc && x.soHieu.includes('NĐ-CP')],
+             ['Đang áp dụng — Thông tư', (x: KhoItem) => !x.hetHieuLuc && x.soHieu.includes('/TT-')],
+             ['⛔ Luật đời cũ (đã hết hiệu lực) — tra hồ sơ thời kỳ đó',
+              (x: KhoItem) => !!x.hetHieuLuc]] as const).map(([nhom, loc]) => {
             const ds = kho.filter(loc);
             if (!ds.length) return null;
             return (

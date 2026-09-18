@@ -35,14 +35,18 @@ _spec = importlib.util.spec_from_file_location(
 tachpdf = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(tachpdf)
 
-RE_SO = re.compile(r'Số:\s*([0-9]{1,4}\s*/\s*[0-9]{4}\s*/\s*[A-ZĐ][A-ZĐ\-]*)')
+RE_SO = re.compile(r'Số:\s*([0-9]{1,4}\s*/\s*[0-9]{4}\s*/\s*[A-ZĐ][A-ZĐ0-9\-]*)')
 # Ngày ban hành nằm ở dòng ký "Hà Nội, ngày ... tháng ... năm ...". Phải bám vào chữ
 # "Hà Nội," chứ lấy "ngày ... tháng ... năm ..." đầu tiên là vớ phải ngày của văn bản
 # được viện dẫn trong phần "Căn cứ" (đã vấp: Luật 43/2024 ra nhầm ngày 17/11/2020).
 RE_NGAY = re.compile(r'Hà Nội,\s*ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})\s+năm\s+(\d{4})')
 # LUẬT thì không ký kiểu "Hà Nội, ngày..." mà ghi ở cuối: "...kỳ họp thứ 7 thông qua
 # ngày 29 tháng 6 năm 2024." -> đó mới là ngày ban hành của luật.
-RE_NGAY_LUAT = re.compile(r'thông qua\s+ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})\s+năm\s+(\d{4})')
+# Phải bám vào cả cụm "Luật này ... được Quốc hội ... thông qua ngày ...". Bắt trống
+# chữ "thông qua ngày" là vớ nhầm: Luật Đất đai 1993 có câu "thay thế Luật đất đai đã
+# được Quốc hội khoá VIII thông qua ngày 29 tháng 12 năm 1987" -> ra nhầm năm 1987.
+RE_NGAY_LUAT = re.compile(r'Luật này (?:đã )?được Quốc hội[^.]{0,220}?thông qua\s+'
+                          r'ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})\s+năm\s+(\d{4})')
 RE_XEM_TIEP = re.compile(r'\(\s*Xem tiếp Công báo số\s*([\d\s+]+)\)')
 RE_DAU_TRANG = re.compile(r'CÔNG BÁO/\s*Số\s*([\d\s+]+)/')
 RE_TIEP_THEO = re.compile(r'^\(\s*Tiếp theo Công báo số[^)]*\)\s*$')
@@ -53,7 +57,7 @@ RE_KHOI_KY = re.compile(r'(TM\. CHÍNH PHỦ|KT\. THỦ TƯỚNG CHÍNH PHỦ|TH
 RE_TEN_NGUOI = re.compile(r'^[A-ZĐÀ-Ỹ][a-zđà-ỹ]+(?: [A-ZĐÀ-Ỹ][a-zđà-ỹ]+){1,4}$')
 RE_HIEU_LUC = re.compile(r'có hiệu lực (?:thi hành )?(?:kể )?từ ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})\s+năm\s+(\d{4})')
 CUOI_OK = re.compile(r'hiệu lực|trách nhiệm (thi hành|thực hiện)|tổ chức thực hiện'
-                     r'|điều khoản (thi hành|chuyển tiếp)|quy định chi tiết', re.I)
+                     r'|điều khoản (thi hành|chuyển tiếp)|quy định chi tiết|hướng dẫn thi hành', re.I)
 
 
 def chuan_so(s):
@@ -122,17 +126,31 @@ def doc_dau(t):
 TEN_RIENG = {
     'ldd2024': 'Luật Đất đai',
     'ldd2013': 'Luật Đất đai (bản năm 2013)',
+    'ldd2003': 'Luật Đất đai (bản năm 2003)',
+    'ldd1993': 'Luật Đất đai (bản năm 1993)',
+    'ldd1987': 'Luật Đất đai (bản năm 1987)',
+    'lsd1998': 'Luật sửa đổi, bổ sung một số điều của Luật Đất đai (năm 1998)',
+    'lsd2001': 'Luật sửa đổi, bổ sung một số điều của Luật Đất đai (năm 2001)',
     'l43-2024': ('Luật sửa đổi, bổ sung một số điều của Luật Đất đai số 31/2024/QH15, '
                  'Luật Nhà ở số 27/2023/QH15, Luật Kinh doanh bất động sản số 29/2023/QH15 '
                  'và Luật Các tổ chức tín dụng số 32/2024/QH15'),
 }
 
 
-# Văn bản đã HẾT HIỆU LỰC nhưng vẫn giữ trong kho để đối chiếu cũ ↔ mới. Phải ghi rõ ra
-# giao diện, không để người dùng tra nhầm rồi tưởng là luật đang áp dụng.
+# LUẬT ĐẤT ĐAI QUA CÁC ĐỜI — vẫn giữ trong kho để TRA CỨU, vì hồ sơ cũ phải áp luật của
+# đúng thời điểm đó (đất dùng từ 1993 thì xét theo luật 1993, hồ sơ 2010 xét theo luật 2003…).
+# Phải ghi rõ ĐÃ HẾT HIỆU LỰC ra giao diện, không để tra nhầm tưởng là luật đang áp dụng.
 HET_HIEU_LUC = {
-    'ldd2013': 'Hết hiệu lực từ 01/8/2024 — đã được thay bằng Luật Đất đai 2024 (31/2024/QH15). '
-               'Giữ lại ở đây CHỈ để đối chiếu cũ ↔ mới.',
+    'ldd2013': 'ĐÃ HẾT HIỆU LỰC từ 01/8/2024 (thay bằng Luật Đất đai 2024). '
+               'Giữ lại để tra hồ sơ thuộc thời kỳ này.',
+    'ldd2003': 'ĐÃ HẾT HIỆU LỰC từ 01/7/2014 (thay bằng Luật Đất đai 2013). '
+               'Giữ lại để tra hồ sơ thuộc thời kỳ này.',
+    'ldd1993': 'ĐÃ HẾT HIỆU LỰC từ 01/7/2004 (thay bằng Luật Đất đai 2003). '
+               'Giữ lại để tra hồ sơ thuộc thời kỳ này.',
+    'ldd1987': 'ĐÃ HẾT HIỆU LỰC từ 15/10/1993 (thay bằng Luật Đất đai 1993). '
+               'Giữ lại để tra hồ sơ thuộc thời kỳ này.',
+    'lsd1998': 'ĐÃ HẾT HIỆU LỰC — sửa đổi Luật Đất đai 1993, hết hiệu lực cùng luật đó từ 01/7/2004.',
+    'lsd2001': 'ĐÃ HẾT HIỆU LỰC — sửa đổi Luật Đất đai 1993, hết hiệu lực cùng luật đó từ 01/7/2004.',
 }
 
 
@@ -147,15 +165,28 @@ def doc_nguoi_ky(t):
     return ''
 
 
+# Ngày hiệu lực đọc từ chính điều "Hiệu lực thi hành" của văn bản — nhưng có văn bản bị
+# văn bản KHÁC sửa ngày hiệu lực, máy đọc trong ruột nó thì không thấy. Khai riêng ở đây,
+# ghi rõ căn cứ, để không hiện sai ngày lên giao diện.
+HIEU_LUC_RIENG = {
+    # Luật Đất đai 2024 tự ghi hiệu lực 01/01/2025, nhưng Luật 43/2024/QH15 đã sửa
+    # khoản 1 Điều 252 thành 01/8/2024 — đây mới là ngày đang áp dụng.
+    'ldd2024': '2024-08-01',
+}
+
+
 def doc_hieu_luc(vb):
     """Ngày có hiệu lực lấy từ chính điều "Hiệu lực thi hành" của văn bản."""
-    for d in vb['dieu']:
-        if 'hiệu lực' not in d['tieuDe'].lower():
-            continue
-        chu = ' '.join(k['chu'] + ' ' + ' '.join(x['chu'] for x in k['diem']) for k in d['khoan'])
-        m = RE_HIEU_LUC.search(chu)
-        if m:
-            return '%04d-%02d-%02d' % (int(m.group(3)), int(m.group(2)), int(m.group(1)))
+    # Lượt 1: điều có tiêu đề nhắc "hiệu lực" — chắc ăn nhất.
+    # Lượt 2 (luật lối cũ không có tiêu đề điều): soi thân MỌI điều, lấy chỗ đầu tiên.
+    for chi_tieu_de in (True, False):
+        for d in vb['dieu']:
+            if chi_tieu_de and 'hiệu lực' not in d['tieuDe'].lower():
+                continue
+            chu = ' '.join(k['chu'] + ' ' + ' '.join(x['chu'] for x in k['diem']) for k in d['khoan'])
+            m = RE_HIEU_LUC.search(chu)
+            if m:
+                return '%04d-%02d-%02d' % (int(m.group(3)), int(m.group(2)), int(m.group(1)))
     return ''
 
 
@@ -169,7 +200,7 @@ def lam(cac_tep, so_mong, ma, ra_dir):
                       'Công báo Chính phủ (bản PDF ký số, có lớp chữ) — congbao.chinhphu.vn')
     vb['soPhan'] = len(cac_tep)
     vb['nguoiKy'] = doc_nguoi_ky(t)
-    vb['ngayHieuLuc'] = doc_hieu_luc(vb)
+    vb['ngayHieuLuc'] = HIEU_LUC_RIENG.get(ma) or doc_hieu_luc(vb)
     if ma in HET_HIEU_LUC:
         vb['hetHieuLuc'] = HET_HIEU_LUC[ma]
     ds = [d['so'] for d in vb['dieu']]
@@ -180,8 +211,12 @@ def lam(cac_tep, so_mong, ma, ra_dir):
         if thieu:
             loi.append('thieu dieu %s' % thieu[:12])
         cuoi = max(vb['dieu'], key=lambda d: d['so'])
-        if not CUOI_OK.search(cuoi['tieuDe']):
-            loi.append('dieu cuoi KHONG phai dieu khoan thi hanh: "%s"' % cuoi['tieuDe'][:60])
+        # Luật lối cũ (1993) điều KHÔNG có tiêu đề -> soi vào THÂN điều cuối thay vì tiêu đề.
+        # Điều 89 Luật 1993 là "Chính phủ quy định chi tiết thi hành Luật này." — đúng là
+        # điều khoản thi hành, chỉ là không có tiêu đề để mà soi.
+        soi = cuoi['tieuDe'] or ' '.join(k['chu'] for k in cuoi['khoan'])
+        if not CUOI_OK.search(soi):
+            loi.append('dieu cuoi KHONG phai dieu khoan thi hanh: "%s"' % soi[:60])
     if not ngay:
         loi.append('khong doc duoc ngay ban hanh')
     tt = 'OK ' if not loi else '[!]'
@@ -203,6 +238,11 @@ def lam(cac_tep, so_mong, ma, ra_dir):
 BANG = {
     'ldd2024': ('31/2024/QH15', 'ldd2024'),
     'ldd2013': ('45/2013/QH13', 'ldd2013'),
+    'ldd2003': ('13/2003/QH11', 'ldd2003'),
+    'ldd1993': ('24-L/CTN', 'ldd1993'),
+    'ldd1987': ('3-LCT/HĐNN8', 'ldd1987'),
+    'lsd1998': ('10/1998/QH10', 'lsd1998'),
+    'lsd2001': ('25/2001/QH10', 'lsd2001'),
     '10-2024-TT-BTNMT': ('10/2024/TT-BTNMT', 'tt10-2024'),
     '12-2024-TT-BTNMT': ('12/2024/TT-BTNMT', 'tt12-2024'),
     '25-2024-TT-BTNMT': ('25/2024/TT-BTNMT', 'tt25-2024'),
@@ -237,12 +277,14 @@ if __name__ == '__main__':
             xong.append(kq)
     # Thứ tự hiện trên web: LUẬT ĐẤT ĐAI 2024 đứng đầu (văn bản gốc đang áp dụng),
     # rồi tới các văn bản hướng dẫn theo ngày, cuối cùng mới tới văn bản hết hiệu lực.
-    xong.sort(key=lambda x: (0 if x['ma'] == 'ldd2024' else (2 if x.get('hetHieuLuc') else 1), x['ngay']))
-    # Chủ dự án chốt: KHÔNG làm phần đối chiếu luật mới với luật cũ. Luật Đất đai 2013
-    # vẫn tách ra và giữ tệp (khỏi phải làm lại nếu sau này cần), nhưng KHÔNG đưa vào danh
-    # sách hiện trên web — để giao diện gọn và người học chỉ tập trung vào luật đang áp dụng.
-    xong = [x for x in xong if x['ma'] != 'ldd2013']
-
+    # Thứ tự hiện trên web: LUẬT ĐẤT ĐAI 2024 đứng đầu (văn bản gốc đang áp dụng), rồi
+    # tới các văn bản hướng dẫn theo ngày, cuối cùng là luật các đời cũ xếp từ mới về cũ
+    # (tra hồ sơ cũ thì thường lùi dần từng đời một).
+    xong.sort(key=lambda x: (0 if x['ma'] == 'ldd2024' else (2 if x.get('hetHieuLuc') else 1),
+                            x['ngay'] if not x.get('hetHieuLuc') else '')) 
+    cu_ = [x for x in xong if x.get('hetHieuLuc')]
+    cu_.sort(key=lambda x: x['ngay'], reverse=True)
+    xong = [x for x in xong if not x.get('hetHieuLuc')] + cu_
     # ── LƯỢC ĐỒ VĂN BẢN (học của Thư viện pháp luật) ──
     # Văn bản nào NHẮC TỚI văn bản nào. Đọc thẳng trong chữ luật: hễ thấy số hiệu của một
     # văn bản khác trong kho là ghi một mối nối. Nhờ vậy biết ngay "nghị định nào hướng dẫn

@@ -31,9 +31,17 @@ RE_PHULUC = re.compile(r'^(PHỤ LỤC|Phụ lục)(\s+[IVXLC]+|\s+\d+)?\s*$')
 RE_KY = re.compile(r'^(TM\. CHÍNH PHỦ|KT\. THỦ TƯỚNG CHÍNH PHỦ|THỦ TƯỚNG CHÍNH PHỦ'
                    r'|CHỦ TỊCH QUỐC HỘI|KT\. BỘ TRƯỞNG|BỘ TRƯỞNG|Nơi nhận\s*:)\s*$')
 RE_DIEU = re.compile(r'^Điều\s+(\d{1,3})\s*\.\s*(.*)$')
+# LỐI VIẾT CŨ (Luật Đất đai 1993): điều KHÔNG có dấu chấm và KHÔNG có tiêu đề, cả dòng
+# chỉ vỏn vẹn "Điều 1". Phải khớp TRỌN DÒNG mới tính, không thì mọi chỗ nhắc "Điều 5"
+# giữa câu đều bị hiểu là mở điều mới.
+RE_DIEU_CU = re.compile(r'^Điều\s+(\d{1,3})\s*$')
+# Chương cũng hai lối: "Chương I" (mới) và "Chương 1:" (cũ).
 RE_CHUONG = re.compile(r'^Chương\s+([IVXLC]+)\s*$')
+RE_CHUONG_CU = re.compile(r'^Chương\s+(\d{1,2})\s*:?\s*$')
 RE_MUC = re.compile(r'^Mục\s+(\d+)\s*$')
-RE_KHOAN = re.compile(r'^(\d{1,2})\s*\.\s+(.*)$')
+# Khoản: lối mới "1. ", lối cũ (Luật 1993) "1- ". Dạng gạch KHÔNG cho khoảng trắng
+# trước gạch, nếu không thì câu kiểu "5 - 10 năm" bị hiểu nhầm là khoản 5.
+RE_KHOAN = re.compile(r'^(\d{1,2})(?:\s*\.|-)\s+(.*)$')
 RE_DIEM = re.compile(r'^([a-zđ])\s*\)\s+(.*)$')
 RE_GACH = re.compile(r'^[-–]\s+(.*)$')
 # ĐOẠN TRÍCH TRONG NGOẶC KÉP: các điều "sửa đổi, bổ sung ... như sau:" chép nguyên
@@ -46,7 +54,8 @@ RE_DONG_NGOAC = re.compile(r'[”"]\s*[.;,]?\s*$')
 # Từ nối đứng cuối dòng => câu chưa xong, dòng sau chắc chắn là phần nối tiếp
 NOI_DO = re.compile(r'\b(theo|của|và|số|về|tại|cho|do|với|các|một|những|từ|đối|trong|khi|mà|hoặc)\s*$', re.I)
 # Dòng MỞ ĐẦU một mục cấu trúc -> không được nối vào dòng trước
-MOC = (RE_DIEU, RE_CHUONG, RE_MUC, RE_KHOAN, RE_DIEM, RE_GACH, RE_PHULUC, RE_KY, RE_MO_NGOAC)
+MOC = (RE_DIEU, RE_DIEU_CU, RE_CHUONG, RE_CHUONG_CU, RE_MUC, RE_KHOAN, RE_DIEM,
+       RE_GACH, RE_PHULUC, RE_KY, RE_MO_NGOAC)
 
 
 def don(txt):
@@ -68,7 +77,7 @@ def don(txt):
             # -> câu chưa xong, chắc chắn vẫn là tiêu đề bị xuống dòng, phải nối.
             # (Luật Đất đai 2024 Điều 245 dính đúng chỗ này: dòng sau là "Luật số
             # 21/2017/QH14..." viết hoa nên bị hiểu nhầm là câu mới.)
-            if RE_DIEU.match(truoc) and d[:1].isupper() and not NOI_DO.search(truoc):
+            if (RE_DIEU.match(truoc) or RE_DIEU_CU.match(truoc)) and d[:1].isupper() and not NOI_DO.search(truoc):
                 ra.append(d)
             elif truoc.endswith(('.', ';', ':')) and d[:1].isupper():
                 ra.append(d)
@@ -108,7 +117,7 @@ def cat_phu_luc(dong):
         if RE_PHULUC.match(d) or RE_KY.match(d):
             cat = i
             break
-        m = RE_DIEU.match(d)
+        m = RE_DIEU.match(d) or RE_DIEU_CU.match(d)
         if m:
             s = int(m.group(1))
             if s <= mx:
@@ -143,12 +152,12 @@ def tach(txt, ma, so_hieu, ngay, ten, nguon):
     hien = None
     while i < n:
         d = dong[i]
-        m = RE_CHUONG.match(d)
+        m = RE_CHUONG.match(d) or RE_CHUONG_CU.match(d)
         if m:
             ch_hien = m.group(1)
             # Tên chương IN HOA, dài thì xuống 2-3 dòng -> gộp hết các dòng IN HOA liền sau.
             j, ch_ten = i + 1, ''
-            while j < n and dong[j].strip() and dong[j].strip() == dong[j].strip().upper()                     and not RE_DIEU.match(dong[j]) and not RE_MUC.match(dong[j]) and len(ch_ten) < 160:
+            while j < n and dong[j].strip() and dong[j].strip() == dong[j].strip().upper()                     and not RE_DIEU.match(dong[j]) and not RE_DIEU_CU.match(dong[j]) and not RE_MUC.match(dong[j]) and len(ch_ten) < 160:
                 ch_ten = (ch_ten + ' ' + dong[j].strip()).strip()
                 j += 1
             mu_hien, mu_ten = None, ''
@@ -159,25 +168,27 @@ def tach(txt, ma, so_hieu, ngay, ten, nguon):
         if m:
             mu_hien = m.group(1)
             j, mu_ten = i + 1, ''
-            while j < n and dong[j].strip() and dong[j].strip() == dong[j].strip().upper()                     and not RE_DIEU.match(dong[j]) and len(mu_ten) < 160:
+            while j < n and dong[j].strip() and dong[j].strip() == dong[j].strip().upper()                     and not RE_DIEU.match(dong[j]) and not RE_DIEU_CU.match(dong[j]) and len(mu_ten) < 160:
                 mu_ten = (mu_ten + ' ' + dong[j].strip()).strip()
                 j += 1
             i = j
             continue
         m = RE_DIEU.match(d)
-        if m:
-            tieu = m.group(2).strip()
+        cu = None if m else RE_DIEU_CU.match(d)
+        if m or cu:
+            # Lối cũ không có tiêu đề -> để trống, đừng hút câu đầu của thân bài vào.
+            tieu = m.group(2).strip() if m else ''
             # Tiêu đề điều DÀI có thể bị xuống dòng. Phân biệt "tiêu đề xuống dòng" với "dòng đầu
             # của phần thân": phần thân luôn bắt đầu bằng CHỮ HOA (câu mới), còn tiêu đề bị ngắt
             # thì dòng sau bắt đầu bằng chữ thường / con số / dấu ngoặc.
             # Không có luật này thì điều nào KHÔNG CHIA KHOẢN (vd Điều 1, Điều 12) bị nuốt luôn
             # cả phần thân vào tiêu đề — đã đo: 14 điều bị vậy.
             j = i + 1
-            while (j < n and not any(r.match(dong[j]) for r in MOC) and len(tieu) < 320
+            while (m and j < n and not any(r.match(dong[j]) for r in MOC) and len(tieu) < 320
                    and dong[j][:1] and not dong[j][:1].isupper()):
                 tieu = (tieu + ' ' + dong[j].strip()).strip()
                 j += 1
-            hien = {'so': int(m.group(1)), 'tieuDe': tieu, 'chuong': ch_hien, 'chuongTen': ch_ten,
+            hien = {'so': int((m or cu).group(1)), 'tieuDe': tieu, 'chuong': ch_hien, 'chuongTen': ch_ten,
                     'muc': mu_hien, 'mucTen': mu_ten, 'khoan': []}
             dieu.append(hien)
             i = j

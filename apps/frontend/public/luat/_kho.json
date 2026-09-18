@@ -6,9 +6,12 @@
   "ten": "Luật Đất đai",
   "soDieu": 260,
   "nguoiKy": "Vương Đình Huệ",
-  "ngayHieuLuc": "2025-01-01",
+  "ngayHieuLuc": "2024-08-01",
   "kb": 805,
-  "dan": [],
+  "dan": [
+   "ldd2003",
+   "ldd2013"
+  ],
   "duocDan": [
    "nd102-2024",
    "nd123-2024",
@@ -56,7 +59,9 @@
   "nguoiKy": "Trần Thanh Mẫn",
   "ngayHieuLuc": "2024-08-01",
   "kb": 5,
-  "dan": [],
+  "dan": [
+   "ldd2013"
+  ],
   "duocDan": []
  },
  {
@@ -100,6 +105,7 @@
   "ngayHieuLuc": "2024-08-01",
   "kb": 617,
   "dan": [
+   "ldd2013",
    "ldd2024",
    "nd42-2024"
   ],
@@ -175,6 +181,7 @@
   "ngayHieuLuc": "2024-10-04",
   "kb": 109,
   "dan": [
+   "ldd2013",
    "ldd2024",
    "nd101-2024",
    "nd102-2024",
@@ -238,6 +245,94 @@
    "nd71-2024",
    "nd88-2024"
   ],
+  "duocDan": []
+ },
+ {
+  "ma": "ldd2013",
+  "soHieu": "45/2013/QH13",
+  "ngay": "2013-11-29",
+  "ten": "Luật Đất đai (bản năm 2013)",
+  "soDieu": 212,
+  "nguoiKy": "Nguyễn Sinh Hùng",
+  "ngayHieuLuc": "2014-07-01",
+  "kb": 454,
+  "hetHieuLuc": "ĐÃ HẾT HIỆU LỰC từ 01/8/2024 (thay bằng Luật Đất đai 2024). Giữ lại để tra hồ sơ thuộc thời kỳ này.",
+  "dan": [
+   "ldd2003"
+  ],
+  "duocDan": [
+   "l43-2024",
+   "ldd2024",
+   "nd102-2024",
+   "nd123-2024"
+  ]
+ },
+ {
+  "ma": "ldd2003",
+  "soHieu": "13/2003/QH11",
+  "ngay": "2003-11-26",
+  "ten": "Luật Đất đai (bản năm 2003)",
+  "soDieu": 146,
+  "nguoiKy": "Nguyễn Văn An",
+  "ngayHieuLuc": "2004-07-01",
+  "kb": 273,
+  "hetHieuLuc": "ĐÃ HẾT HIỆU LỰC từ 01/7/2014 (thay bằng Luật Đất đai 2013). Giữ lại để tra hồ sơ thuộc thời kỳ này.",
+  "dan": [],
+  "duocDan": [
+   "ldd2013",
+   "ldd2024"
+  ]
+ },
+ {
+  "ma": "lsd2001",
+  "soHieu": "25/2001/QH10",
+  "ngay": "2001-06-29",
+  "ten": "Luật sửa đổi, bổ sung một số điều của Luật Đất đai (năm 2001)",
+  "soDieu": 2,
+  "nguoiKy": "",
+  "ngayHieuLuc": "2001-10-01",
+  "kb": 14,
+  "hetHieuLuc": "ĐÃ HẾT HIỆU LỰC — sửa đổi Luật Đất đai 1993, hết hiệu lực cùng luật đó từ 01/7/2004.",
+  "dan": [],
+  "duocDan": []
+ },
+ {
+  "ma": "lsd1998",
+  "soHieu": "10/1998/QH10",
+  "ngay": "1998-12-02",
+  "ten": "Luật sửa đổi, bổ sung một số điều của Luật Đất đai (năm 1998)",
+  "soDieu": 2,
+  "nguoiKy": "Nông Đức Mạnh",
+  "ngayHieuLuc": "1999-01-01",
+  "kb": 19,
+  "hetHieuLuc": "ĐÃ HẾT HIỆU LỰC — sửa đổi Luật Đất đai 1993, hết hiệu lực cùng luật đó từ 01/7/2004.",
+  "dan": [],
+  "duocDan": []
+ },
+ {
+  "ma": "ldd1993",
+  "soHieu": "24-L/CTN",
+  "ngay": "1993-07-14",
+  "ten": "Luật Đất đai (bản năm 1993)",
+  "soDieu": 89,
+  "nguoiKy": "",
+  "ngayHieuLuc": "1993-10-15",
+  "kb": 68,
+  "hetHieuLuc": "ĐÃ HẾT HIỆU LỰC từ 01/7/2004 (thay bằng Luật Đất đai 2003). Giữ lại để tra hồ sơ thuộc thời kỳ này.",
+  "dan": [],
+  "duocDan": []
+ },
+ {
+  "ma": "ldd1987",
+  "soHieu": "3-LCT/HĐNN8",
+  "ngay": "1987-12-29",
+  "ten": "Luật Đất đai (bản năm 1987)",
+  "soDieu": 57,
+  "nguoiKy": "",
+  "ngayHieuLuc": "",
+  "kb": 51,
+  "hetHieuLuc": "ĐÃ HẾT HIỆU LỰC từ 15/10/1993 (thay bằng Luật Đất đai 1993). Giữ lại để tra hồ sơ thuộc thời kỳ này.",
+  "dan": [],
   "duocDan": []
  }
 ]

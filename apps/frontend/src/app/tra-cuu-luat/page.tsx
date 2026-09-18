@@ -52,7 +52,10 @@ type TinhHuong = { ma: string; icon: string; ten: string; tom: string; buoc: Buo
 type KhoTinhHuong = { canhBao: string; ds: TinhHuong[] };
 // Giải thích do người làm web viết, KHÔNG phải chữ luật — luôn để trong khung riêng, màu khác.
 type GiaiThich = { canhBao: string; muc: Record<string, { y: string; nho: string }> };
-type NutSoDo = { ten: string; y: string; dan: { ma: string; so?: number }[] };
+// y = câu cốt lõi, ngắn, để in lên khung vẽ cho gọn.
+// chiTiet = phần giải thích dài, chỉ hiện ở kiểu Danh sách (nơi có chỗ đọc) — nhét hết vào
+// khung vẽ thì ô cao gấp đôi, cuộn mãi không hết, học khó hơn chứ không dễ hơn.
+type NutSoDo = { ten: string; y: string; chiTiet?: string; dan: { ma: string; so?: number }[] };
 // "neo" = SỐ NEO GHI NHỚ: mỗi nhánh gắn một con số để bám vào (3 nhóm đất, 5 điều kiện,
 // 7 bước…). Nhớ con số là gọi ra được cả nhánh — mẹo học cũ mà hiệu quả.
 type NhanhSoDo = { ten: string; icon: string; mau: string; y: string; neo?: string; con: NutSoDo[] };
@@ -173,6 +176,7 @@ export default function TraCuuLuatPage() {
   const [dich, setDich] = useState({ x: 0, y: 0 });
   const [tieuDiem, setTieuDiem] = useState<number | null>(null);
   const keo = useRef<{ x: number; y: number } | null>(null);
+  const khungVe = useRef<HTMLDivElement | null>(null);
   const [boThe, setBoThe] = useState<Record<string, { de: number; khoang: number; lan: number; ngayOn: string }>>({});
   const [chuoi, setChuoi] = useState(0);   // chuỗi ngày học liên tiếp
   const [theSo, setTheSo] = useState(0);
@@ -190,6 +194,29 @@ export default function TraCuuLuatPage() {
   const [daCo, setDaCo] = useState<Record<string, boolean>>({});
   const [moVuong, setMoVuong] = useState<Record<string, boolean>>({});
   const [the, setThe] = useState<'luat' | 'tinhhuong' | 'sodo' | 'danhmuc'>('luat');
+  // CUỘN CHUỘT ĐỂ PHÓNG TO / THU NHỎ sơ đồ. Phóng quanh ĐÚNG CHỖ CON TRỎ đang chỉ
+  // (không phải quanh góc trên trái), nên nhìn tới đâu phóng tới đó, khỏi phải kéo lại.
+  // Phải gắn tay bằng addEventListener: React để sự kiện cuộn ở chế độ "không chặn được",
+  // không chặn thì cuộn chuột làm trôi cả trang thay vì phóng sơ đồ.
+  const xemSd = useRef({ phongTo: 1, dich: { x: 0, y: 0 } });
+  xemSd.current = { phongTo, dich };
+  useEffect(() => {
+    const el = khungVe.current;
+    if (!el) return;
+    const cuon = (e: WheelEvent) => {
+      e.preventDefault();
+      const o = el.getBoundingClientRect();
+      const cx = e.clientX - o.left, cy = e.clientY - o.top;
+      const { phongTo: z1, dich: d1 } = xemSd.current;
+      const z2 = Math.min(2, Math.max(0.35, +(z1 * (e.deltaY < 0 ? 1.12 : 1 / 1.12)).toFixed(3)));
+      if (z2 === z1) return;
+      const k = z2 / z1;
+      setPhongTo(z2);
+      setDich({ x: cx - (cx - d1.x) * k, y: cy - (cy - d1.y) * k });
+    };
+    el.addEventListener('wheel', cuon, { passive: false });
+    return () => el.removeEventListener('wheel', cuon);
+  }, [the, kieuSoDo]);
   const [dm, setDm] = useState<VanBanNgan[]>([]);
   const [timDm, setTimDm] = useState('');
   const [locLoai, setLocLoai] = useState('');
@@ -878,10 +905,10 @@ export default function TraCuuLuatPage() {
                 {kieuSoDo === 'khungve' && (
                   <>
                     <span className="mx-1 h-4 w-px bg-slate-200" />
-                    <button onClick={() => setPhongTo((z) => Math.max(0.5, +(z - 0.1).toFixed(2)))}
+                    <button onClick={() => setPhongTo((z) => Math.max(0.35, +(z - 0.1).toFixed(2)))}
                       className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-bold text-slate-600">−</button>
                     <span className="text-[11.5px] font-semibold text-slate-400">{Math.round(phongTo * 100)}%</span>
-                    <button onClick={() => setPhongTo((z) => Math.min(1.4, +(z + 0.1).toFixed(2)))}
+                    <button onClick={() => setPhongTo((z) => Math.min(2, +(z + 0.1).toFixed(2)))}
                       className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-bold text-slate-600">+</button>
                     <button onClick={() => { setPhongTo(0.6); setDich({ x: 0, y: 0 }); setTieuDiem(null); }}
                       title="Thu nhỏ để thấy toàn bộ sơ đồ"
@@ -972,7 +999,8 @@ export default function TraCuuLuatPage() {
                 const viMau: Record<string, string> = { slate: '#94a3b8', emerald: '#34d399', amber: '#fbbf24', sky: '#38bdf8', violet: '#a78bfa', rose: '#fb7185', orange: '#fb923c', teal: '#2dd4bf' };
 
                 return (
-                  <div className="relative mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:18px_18px]"
+                  <div ref={khungVe}
+                    className="relative mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:18px_18px]"
                     style={{ height: 'min(72vh, 620px)', touchAction: 'none', cursor: keo.current ? 'grabbing' : 'grab' }}
                     onPointerDown={(e) => { keo.current = { x: e.clientX - dich.x, y: e.clientY - dich.y }; (e.target as HTMLElement).setPointerCapture?.(e.pointerId); }}
                     onPointerMove={(e) => { if (keo.current) setDich({ x: e.clientX - keo.current.x, y: e.clientY - keo.current.y }); }}
@@ -998,7 +1026,7 @@ export default function TraCuuLuatPage() {
                         const n = sd.nhanh[z.i];
                         const mau = MAU_NHANH[n.mau] || MAU_NHANH.slate;
                         if (z.cap === 1) {
-                          const sang = khop(n.ten + ' ' + n.y + ' ' + (n.neo || '')) || n.con.some((c) => khop(c.ten + ' ' + c.y));
+                          const sang = khop(n.ten + ' ' + n.y + ' ' + (n.neo || '')) || n.con.some((c) => khop(c.ten + ' ' + c.y + ' ' + (c.chiTiet || '')));
                           return (
                             <div key={k2} className={`absolute rounded-2xl border-2 px-2.5 py-1.5 shadow-sm transition ${mau} ${sang ? '' : 'opacity-20'}`}
                               style={{ left: z.x + lech, top: z.y, width: z.w, minHeight: z.h }}>
@@ -1020,7 +1048,7 @@ export default function TraCuuLuatPage() {
                           );
                         }
                         const c = n.con[z.j!];
-                        const sang = khop(c.ten + ' ' + c.y);
+                        const sang = khop(c.ten + ' ' + c.y + ' ' + (c.chiTiet || ''));
                         return (
                           <div key={k2} className={`absolute rounded-xl border-2 bg-white px-2.5 py-1.5 shadow-sm transition ${sang ? 'border-slate-200' : 'border-slate-100 opacity-20'}`}
                             style={{ left: z.x + lech, top: z.y, width: z.w, minHeight: z.h }}>
@@ -1044,7 +1072,7 @@ export default function TraCuuLuatPage() {
                     </div>
 
                     <p className="pointer-events-none absolute bottom-1.5 left-2 rounded-full bg-white/80 px-2 py-0.5 text-[10.5px] text-slate-500">
-                      Kéo để di chuyển · bấm nhánh để bung/thu
+                      Kéo để di chuyển · cuộn chuột để phóng to / thu nhỏ · bấm nhánh để bung/thu
                     </p>
                   </div>
                 );
@@ -1077,6 +1105,7 @@ export default function TraCuuLuatPage() {
                               <span className={`absolute left-0 top-[14px] h-px w-3 ${mau.split(' ')[0].replace('border-', 'bg-')}`} />
                               <p className="text-[13.5px] font-bold leading-snug text-[#0A2540]">{c.ten}</p>
                               <p className="text-[12.5px] leading-snug text-slate-500">{c.y}</p>
+                              {c.chiTiet && <p className="mt-1 text-[12px] leading-snug text-slate-400">{c.chiTiet}</p>}
                               <div className="mt-1 flex flex-wrap gap-1">
                                 {c.dan.map((d, k2) => {
                                   const tenVb = kho.find((x) => x.ma === d.ma);

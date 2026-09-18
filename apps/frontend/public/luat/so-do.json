@@ -1,26 +1,21 @@
 {
- "canhBao": "Sơ đồ này do người làm web gom lại cho dễ nhớ, KHÔNG PHẢI văn bản luật. Mỗi ô đều có nút dẫn thẳng tới điều luật gốc — bấm vào đọc nguyên văn.",
+ "canhBao": "Sơ đồ này do người làm web gom lại cho dễ nhớ, KHÔNG PHẢI văn bản luật. Tên mỗi ô đặt theo đúng thuật ngữ và tiêu đề điều của Luật Đất đai 2024; câu bên dưới là lời giải thích cho dễ hiểu. Ô mở đầu bằng 🔗 là đã gom nhiều điều lại để học một lần. Kiểu Danh sách hiện thêm phần giải thích dài; kiểu Khung vẽ chỉ in câu cốt lõi cho gọn. Mỗi ô đều có nút dẫn thẳng tới điều luật gốc — bấm vào đọc nguyên văn.",
  "nhanh": [
   {
-   "ten": "Đất là gì, của ai, được bao lâu",
+   "ten": "Phân loại đất · Thời hạn · Hạn mức",
    "icon": "🗂️",
    "mau": "slate",
-   "y": "Nền của mọi việc còn lại. Biết loại đất và thời hạn là biết được phép làm gì trên thửa đó.",
+   "neo": "3 nhóm · 2 thời hạn · 3 hạn mức",
+   "y": "Nền của mọi việc còn lại. Biết loại đất, thời hạn và hạn mức là biết thửa đó được phép làm gì.",
    "con": [
     {
-     "ten": "3 nhóm đất",
-     "y": "Nông nghiệp · phi nông nghiệp · chưa sử dụng. Chia theo mục đích sử dụng.",
+     "ten": "Phân loại đất · Xác định loại đất",
+     "y": "🔗 Gom 2 điều học 1 lần: 3 nhóm đất (Điều 9) và căn cứ xác định loại đất (Điều 10).",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 9
-      }
-     ]
-    },
-    {
-     "ten": "Thửa này là loại gì",
-     "y": "Xem giấy tờ trước, hiện trạng sau.",
-     "dan": [
+      },
       {
        "ma": "ldd2024",
        "so": 10
@@ -28,11 +23,12 @@
       {
        "ma": "nd102-2024"
       }
-     ]
+     ],
+     "chiTiet": "Ba nhóm: đất nông nghiệp · đất phi nông nghiệp · đất chưa sử dụng, chia theo mục đích sử dụng (Điều 9). Thửa cụ thể thuộc loại nào thì căn cứ Điều 10 — xét giấy tờ trước, hiện trạng sau."
     },
     {
-     "ten": "Lâu dài hay có thời hạn",
-     "y": "Đất ở là lâu dài, không phải gia hạn. Đất nông nghiệp của cá nhân 50 năm, hết hạn vẫn dùng tiếp.",
+     "ten": "Đất sử dụng ổn định lâu dài · Đất sử dụng có thời hạn",
+     "y": "🔗 Gom 2 điều học 1 lần — một cặp đối nhau, nhớ cái này là nhớ luôn cái kia.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -42,11 +38,12 @@
        "ma": "ldd2024",
        "so": 172
       }
-     ]
+     ],
+     "chiTiet": "Đất ở là đất sử dụng ổn định lâu dài, không phải xin gia hạn (Điều 171). Đất nông nghiệp của cá nhân có thời hạn 50 năm, hết thời hạn được tiếp tục sử dụng (Điều 172)."
     },
     {
-     "ten": "Được bao nhiêu là tối đa",
-     "y": "Hạn mức GIAO (Khánh Hoà 2 ha cây hằng năm) khác hạn mức NHẬN CHUYỂN QUYỀN (15 lần hạn mức giao).",
+     "ten": "Hạn mức sử dụng đất",
+     "y": "🔗 Gom 4 điều học 1 lần — trước đây nằm rải ở hai nhánh khác nhau.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -55,13 +52,7 @@
       {
        "ma": "ldd2024",
        "so": 177
-      }
-     ]
-    },
-    {
-     "ten": "Đất ở nông thôn / đô thị",
-     "y": "Hạn mức giao đất ở do UBND tỉnh quyết, hai nơi hai mức.",
-     "dan": [
+      },
       {
        "ma": "ldd2024",
        "so": 195
@@ -70,70 +61,95 @@
        "ma": "ldd2024",
        "so": 196
       }
-     ]
+     ],
+     "chiTiet": "Phân biệt cho chắc ba thứ: HẠN MỨC GIAO đất nông nghiệp (Điều 176 — Khánh Hoà 2 ha đất trồng cây hằng năm) · HẠN MỨC NHẬN CHUYỂN QUYỀN sử dụng đất nông nghiệp của cá nhân bằng 15 lần hạn mức giao (Điều 177 — chính là con số dùng khi mua đất nông nghiệp) · hạn mức giao đất ở tại nông thôn và tại đô thị do UBND cấp tỉnh quy định (Điều 195, 196)."
     }
-   ],
-   "neo": "3 nhóm đất"
+   ]
   },
   {
-   "ten": "Làm sổ đỏ",
+   "ten": "Đăng ký đất đai · Cấp Giấy chứng nhận",
    "icon": "📗",
    "mau": "emerald",
-   "y": "Bốn cửa vào, tuỳ giấy tờ trong tay. Điểm chung: xã xác nhận không tranh chấp, và mốc thời gian càng sớm càng có lợi.",
+   "neo": "4 cửa · 3 mốc",
+   "y": "Luật gọi là “Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất” — dân quen gọi sổ đỏ, sổ hồng. Bốn cửa vào tuỳ giấy tờ đang có.",
    "con": [
     {
-     "ten": "Có giấy tờ",
-     "y": "Cửa dễ nhất — có một trong các loại giấy tờ tại Điều 137 là xét cấp.",
+     "ten": "Nguyên tắc đăng ký · Đăng ký lần đầu · Đăng ký biến động",
+     "y": "🔗 Gom 3 điều học 1 lần. Đăng ký đất đai là BẮT BUỘC.",
+     "dan": [
+      {
+       "ma": "ldd2024",
+       "so": 131
+      },
+      {
+       "ma": "ldd2024",
+       "so": 133
+      },
+      {
+       "ma": "ldd2024",
+       "so": 135
+      }
+     ],
+     "chiTiet": "Chưa từng đăng ký thì đăng ký lần đầu; sau đó mọi thay đổi đều là ĐĂNG KÝ BIẾN ĐỘNG (Điều 133) — xem đủ các trường hợp ở thẻ Tình huống. Nguyên tắc đăng ký ở Điều 131, nguyên tắc cấp Giấy chứng nhận ở Điều 135."
+    },
+    {
+     "ten": "Cửa 1 — Đang sử dụng đất CÓ giấy tờ về quyền sử dụng đất",
+     "y": "Cửa dễ nhất: có một trong các loại giấy tờ liệt kê tại Điều 137 là được xét cấp.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 137
       }
-     ]
+     ],
+     "chiTiet": "Điểm chung của cả bốn cửa: UBND cấp xã xác nhận đất không có tranh chấp, và mốc thời gian sử dụng càng sớm thì càng có lợi."
     },
     {
-     "ten": "Không có giấy tờ",
-     "y": "Ba mốc: trước 18/12/1980 · 1980→15/10/1993 · 1993→01/7/2014. Phần trong hạn mức công nhận là đất ở.",
+     "ten": "Cửa 2 — KHÔNG có giấy tờ, không vi phạm pháp luật về đất đai",
+     "y": "Ba mốc phải thuộc lòng: trước 18/12/1980 · 18/12/1980 → trước 15/10/1993 · 15/10/1993 → trước 01/7/2014.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 138
       }
-     ]
+     ],
+     "chiTiet": "Phần diện tích nằm trong hạn mức công nhận đất ở thì được công nhận là đất ở; phần vượt hạn mức công nhận theo loại đất đang sử dụng."
     },
     {
-     "ten": "Có lấn, chiếm trước 01/7/2014",
-     "y": "Vẫn còn cửa nếu không vướng rừng phòng hộ, rừng đặc dụng, công trình công cộng. Từ 01/7/2014 trở đi thì không.",
+     "ten": "Cửa 3 — Có VI PHẠM pháp luật đất đai trước ngày 01/7/2014",
+     "y": "Lấn, chiếm trước 01/7/2014 thì vẫn còn cửa; từ 01/7/2014 trở đi thì không.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 139
       }
-     ]
+     ],
+     "chiTiet": "Không xét nếu đất đang vướng rừng phòng hộ, rừng đặc dụng, hoặc công trình công cộng."
     },
     {
-     "ten": "Đất giao không đúng thẩm quyền",
-     "y": "Xã, hợp tác xã giao ngày trước — chia theo 4 mốc, vẫn gỡ được nếu trước 01/7/2014.",
+     "ten": "Cửa 4 — Đất được GIAO KHÔNG ĐÚNG THẨM QUYỀN",
+     "y": "Đất do xã, hợp tác xã giao ngày trước — chia theo 4 mốc thời gian.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 140
       }
-     ]
+     ],
+     "chiTiet": "Vẫn gỡ được nếu đã sử dụng trước 01/7/2014. Tiền sử dụng đất phải nộp khác nhau theo từng mốc."
     },
     {
-     "ten": "Thửa có vườn, ao: đất ở bao nhiêu",
-     "y": "Đất cũ mà nhỏ hơn hạn mức công nhận thì CẢ THỬA là đất ở, không phải nộp tiền.",
+     "ten": "Xác định diện tích đất ở khi công nhận quyền sử dụng đất",
+     "y": "Thửa có vườn, ao: đất dùng trước 18/12/1980 mà nhỏ hơn hạn mức công nhận thì CẢ THỬA là đất ở.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 141
       }
-     ]
+     ],
+     "chiTiet": "Và không phải nộp tiền sử dụng đất cho phần đó."
     },
     {
-     "ten": "Mẫu sổ, hồ sơ địa chính",
-     "y": "Cách ghi từng mục trên Giấy chứng nhận, sơ đồ thửa, phần ghi chú.",
+     "ten": "Mẫu Giấy chứng nhận · Hồ sơ địa chính",
+     "y": "Cách ghi từng mục trên Giấy chứng nhận, sơ đồ thửa đất, phần ghi chú.",
      "dan": [
       {
        "ma": "tt10-2024"
@@ -141,20 +157,21 @@
       {
        "ma": "nd101-2024"
       }
-     ]
+     ],
+     "chiTiet": "Kèm quy định về thành phần và cách lập hồ sơ địa chính."
     }
-   ],
-   "neo": "4 cửa · 3 mốc"
+   ]
   },
   {
-   "ten": "Muốn thay đổi trên thửa đất",
+   "ten": "Chuyển mục đích · Tách, hợp thửa · Sử dụng đa mục đích",
    "icon": "🔁",
    "mau": "amber",
-   "y": "Bốn việc hay làm nhất. Ba việc đầu phải xin phép hoặc phải đủ điều kiện; việc thứ tư là điểm mới của Luật 2024.",
+   "neo": "4 việc",
+   "y": "Bốn việc hay làm nhất trên một thửa đất. Hai việc đầu phải xin phép hoặc đủ điều kiện; hai việc sau là điểm mới của Luật Đất đai 2024.",
    "con": [
     {
-     "ten": "Chuyển mục đích",
-     "y": "7 trường hợp phải xin phép — nhớ nhất: nông nghiệp → phi nông nghiệp. Phải có tên trong kế hoạch sử dụng đất năm của huyện.",
+     "ten": "Chuyển mục đích sử dụng đất",
+     "y": "🔗 Gom 3 điều học 1 lần. Nhớ nhất: đất nông nghiệp sang phi nông nghiệp là phải xin phép.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -168,130 +185,135 @@
        "ma": "ldd2024",
        "so": 123
       }
-     ]
+     ],
+     "chiTiet": "Trường hợp phải được cơ quan nhà nước cho phép (Điều 121) · căn cứ để cho phép, tức phải có trong kế hoạch sử dụng đất hằng năm cấp huyện (Điều 116) · ai có thẩm quyền cho phép (Điều 123)."
     },
     {
-     "ten": "Tách thửa, hợp thửa",
-     "y": "Phải có LỐI ĐI ra đường công cộng + đủ diện tích tối thiểu của tỉnh.",
+     "ten": "Tách thửa đất, hợp thửa đất",
+     "y": "Hai điều kiện cứng: có LỐI ĐI ra đường giao thông công cộng và đủ diện tích tối thiểu.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 220
       }
-     ]
+     ],
+     "chiTiet": "Diện tích tối thiểu do UBND cấp tỉnh quy định, mỗi địa phương một mức."
     },
     {
-     "ten": "Dùng kết hợp nhiều mục đích",
-     "y": "MỚI: làm thêm thương mại, dịch vụ trên đất nông nghiệp / đất ở mà loại đất trên sổ giữ nguyên. Phải lập phương án trình duyệt.",
+     "ten": "Sử dụng đất kết hợp đa mục đích",
+     "y": "Điểm MỚI: làm thêm thương mại, dịch vụ mà loại đất ghi trên Giấy chứng nhận giữ nguyên.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 218
       }
-     ]
+     ],
+     "chiTiet": "Áp dụng cho đất nông nghiệp hoặc đất ở. Phải lập phương án sử dụng đất kết hợp trình cơ quan có thẩm quyền phê duyệt."
     },
     {
-     "ten": "Góp đất, chỉnh trang lại",
-     "y": "MỚI: cả khu tự nguyện góp đất rồi chia lại. Cốt lõi là đồng thuận.",
+     "ten": "Góp quyền sử dụng đất, điều chỉnh lại đất đai",
+     "y": "Điểm MỚI: cả khu tự nguyện góp quyền sử dụng đất rồi điều chỉnh lại ranh giới.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 219
       }
-     ]
+     ],
+     "chiTiet": "Dùng khi chỉnh trang khu dân cư. Cốt lõi là sự đồng thuận của người sử dụng đất trong khu vực."
     }
-   ],
-   "neo": "4 việc"
+   ]
   },
   {
-   "ten": "Mua bán, cho thuê, thế chấp",
+   "ten": "Quyền của người sử dụng đất khi giao dịch",
    "icon": "🤝",
    "mau": "sky",
-   "y": "Tất cả các quyền này dùng CHUNG một bộ 5 điều kiện — nhớ một lần dùng cho mọi giao dịch.",
+   "neo": "5 điều kiện",
+   "y": "Chuyển đổi, chuyển nhượng, cho thuê, cho thuê lại, thừa kế, tặng cho, thế chấp, góp vốn — tất cả dùng CHUNG một bộ điều kiện, nhớ một lần dùng cho mọi giao dịch.",
    "con": [
     {
-     "ten": "5 điều kiện chung",
-     "y": "Có sổ · không tranh chấp · không kê biên · còn thời hạn · không bị phong toả. Nợ nghĩa vụ tài chính phải trả xong.",
+     "ten": "Điều kiện thực hiện các quyền của người sử dụng đất",
+     "y": "Năm điều kiện tại khoản 1 Điều 45 — học một lần dùng cho mọi loại giao dịch.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 45
       }
-     ]
+     ],
+     "chiTiet": "Có Giấy chứng nhận · đất không có tranh chấp · quyền sử dụng đất không bị kê biên hoặc áp dụng biện pháp khác để bảo đảm thi hành án · còn trong thời hạn sử dụng đất · không bị áp dụng biện pháp khẩn cấp tạm thời. Nợ nghĩa vụ tài chính thì phải nộp xong trước."
     },
     {
-     "ten": "Mua đất nông nghiệp tối đa bao nhiêu",
-     "y": "15 lần hạn mức giao. Cá nhân không trực tiếp sản xuất mà mua đất lúa quá hạn mức thì phải lập tổ chức kinh tế.",
+     "ten": "Hạn mức nhận chuyển quyền sử dụng đất nông nghiệp",
+     "y": "🔗 Đã gom sang ô “Hạn mức sử dụng đất” ở nhánh đầu tiên — tối đa 15 lần hạn mức giao.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 177
-      },
-      {
-       "ma": "ldd2024",
-       "so": 176
       }
-     ]
+     ],
+     "chiTiet": "Cá nhân không trực tiếp sản xuất nông nghiệp mà nhận chuyển nhượng đất trồng lúa quá hạn mức giao thì phải thành lập tổ chức kinh tế và có phương án sử dụng đất trồng lúa được duyệt."
     }
-   ],
-   "neo": "5 điều kiện"
+   ]
   },
   {
-   "ten": "Giá đất",
+   "ten": "Tài chính về đất đai · Giá đất",
    "icon": "🏷️",
    "mau": "violet",
-   "y": "Chỉ cần phân biệt HAI loại giá. Lẫn hai cái này là tính sai tiền.",
+   "neo": "2 loại giá",
+   "y": "Chỉ cần phân biệt cho chắc HAI loại giá. Lẫn hai cái này là tính sai tiền.",
    "con": [
     {
-     "ten": "Bảng giá đất — việc của dân",
-     "y": "Tính tiền sử dụng đất khi công nhận / chuyển mục đích, tính thuế, lệ phí, tiền phạt. Từ 01/01/2026 sửa HẰNG NĂM.",
+     "ten": "Bảng giá đất",
+     "y": "Loại giá đụng tới dân nhiều nhất. Từ 01/01/2026 được điều chỉnh HẰNG NĂM.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 159
       }
-     ]
+     ],
+     "chiTiet": "Dùng để tính tiền sử dụng đất khi công nhận quyền sử dụng đất, khi cho phép chuyển mục đích; tính thuế, lệ phí và tiền xử phạt."
     },
     {
-     "ten": "Giá đất cụ thể — tiền đền bù",
-     "y": "Dùng để tính tiền bồi thường khi thu hồi đất, tiền giao đất cho tổ chức, giá khởi điểm đấu giá.",
+     "ten": "Giá đất cụ thể",
+     "y": "Loại giá dùng khi Nhà nước thu hồi đất — tức tiền bồi thường.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 160
       }
-     ]
+     ],
+     "chiTiet": "Còn dùng để tính tiền giao đất cho tổ chức và giá khởi điểm đấu giá quyền sử dụng đất."
     },
     {
-     "ten": "Cách tính chi tiết",
-     "y": "Phương pháp định giá, trình tự, hội đồng thẩm định giá.",
+     "ten": "Phương pháp định giá đất",
+     "y": "Các phương pháp định giá và trình tự định giá.",
      "dan": [
       {
        "ma": "nd71-2024"
       }
-     ]
+     ],
+     "chiTiet": "Kèm quy định về hội đồng thẩm định bảng giá đất và hội đồng thẩm định giá đất cụ thể."
     },
     {
      "ten": "Tiền sử dụng đất, tiền thuê đất",
-     "y": "Nộp bao nhiêu khi được giao đất, chuyển mục đích, thuê đất.",
+     "y": "Phải nộp bao nhiêu khi được giao đất, chuyển mục đích, thuê đất.",
      "dan": [
       {
        "ma": "nd103-2024"
       }
      ]
     }
-   ],
-   "neo": "2 loại giá"
+   ]
   },
   {
-   "ten": "Nhà nước thu hồi đất — đền bù",
+   "ten": "Thu hồi đất · Bồi thường, hỗ trợ, tái định cư",
    "icon": "🚧",
    "mau": "rose",
-   "y": "Phần dày nhất của luật. Cứ đi theo 5 câu hỏi này là không sót khoản nào.",
+   "neo": "7 bước",
+   "y": "Phần dày nhất của luật. Dùng đúng chữ: luật gọi là BỒI THƯỜNG, không phải “đền bù”. Đi theo 7 bước này là không sót khoản nào.",
    "con": [
     {
-     "ten": "1. Vì sao được thu hồi",
-     "y": "Quốc phòng - an ninh (Điều 78); phát triển KTXH — danh sách ĐÓNG 31 trường hợp (Điều 79); do vi phạm (Điều 81).",
+     "ten": "1. Các trường hợp Nhà nước thu hồi đất",
+     "y": "🔗 Gom 3 điều học 1 lần: quốc phòng - an ninh · phát triển kinh tế - xã hội · do vi phạm.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -305,21 +327,23 @@
        "ma": "ldd2024",
        "so": 81
       }
-     ]
+     ],
+     "chiTiet": "Quốc phòng, an ninh (Điều 78) · phát triển kinh tế - xã hội vì lợi ích quốc gia, công cộng — danh sách ĐÓNG 31 trường hợp ở khoản 1 đến khoản 31 Điều 79, ngoài 31 trường hợp đó thì Quốc hội phải sửa luật · do vi phạm pháp luật về đất đai (Điều 81)."
     },
     {
-     "ten": "2. Nguyên tắc xuyên suốt",
-     "y": "Đất đổi đất trước, không có đất mới trả tiền. Phương án đền bù và tái định cư phải XONG TRƯỚC khi có quyết định thu hồi.",
+     "ten": "2. Nguyên tắc bồi thường, hỗ trợ, tái định cư",
+     "y": "Bồi thường bằng đất cùng loại trước, không có đất thì mới bằng tiền.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 91
       }
-     ]
+     ],
+     "chiTiet": "Phương án bồi thường, hỗ trợ, tái định cư phải được phê duyệt XONG TRƯỚC khi có quyết định thu hồi đất."
     },
     {
-     "ten": "3. Có được đền bù về ĐẤT không",
-     "y": "Đủ điều kiện → Điều 95. Không được → Điều 101, nhưng vẫn còn chi phí đầu tư vào đất (Điều 107).",
+     "ten": "3. Điều kiện được bồi thường về đất",
+     "y": "🔗 Gom 3 điều học 1 lần: đủ điều kiện · không đủ · vẫn còn chi phí đầu tư vào đất.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -333,11 +357,12 @@
        "ma": "ldd2024",
        "so": 107
       }
-     ]
+     ],
+     "chiTiet": "Đủ điều kiện thì theo Điều 95. Không đủ thì Điều 101, nhưng vẫn còn cửa được bồi thường chi phí đầu tư vào đất còn lại theo Điều 107."
     },
     {
-     "ten": "4. Đền bù theo loại đất",
-     "y": "Đất nông nghiệp (chỉ phần trong hạn mức) · đất ở · đất phi nông nghiệp không phải đất ở.",
+     "ten": "4. Bồi thường về ĐẤT",
+     "y": "🔗 Gom 4 điều học 1 lần, chia theo loại đất bị thu hồi.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -355,11 +380,12 @@
        "ma": "ldd2024",
        "so": 100
       }
-     ]
+     ],
+     "chiTiet": "Đất nông nghiệp của hộ gia đình, cá nhân — chỉ phần trong hạn mức (Điều 96) · đất ở (Điều 98) · đất phi nông nghiệp không phải đất ở của hộ gia đình, cá nhân (Điều 99) · của tổ chức (Điều 100)."
     },
     {
-     "ten": "5. Đền bù TÀI SẢN trên đất",
-     "y": "Nhà ở tính giá XÂY MỚI, không trừ cũ · cây trồng, vật nuôi · chi phí di chuyển. Xây thêm sau khi có thông báo thu hồi thì không được đền.",
+     "ten": "5. Bồi thường về TÀI SẢN gắn liền với đất",
+     "y": "🔗 Gom 4 điều học 1 lần. Nhà tính theo giá XÂY MỚI, không trừ khấu hao.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -377,11 +403,12 @@
        "ma": "ldd2024",
        "so": 105
       }
-     ]
+     ],
+     "chiTiet": "Nhà, công trình xây dựng (Điều 102) · cây trồng, vật nuôi (Điều 103) · chi phí di chuyển tài sản (Điều 104) · trường hợp KHÔNG được bồi thường, ví dụ xây thêm sau khi đã có thông báo thu hồi đất (Điều 105)."
     },
     {
-     "ten": "6. Các khoản HỖ TRỢ",
-     "y": "6 khoản (Điều 108). Hỗ trợ chuyển nghề trần 5 lần giá đất nông nghiệp — tỉnh quyết mức thật, Khánh Hoà đang 3 lần.",
+     "ten": "6. Hỗ trợ khi Nhà nước thu hồi đất",
+     "y": "Sáu loại hỗ trợ tại khoản 1 Điều 108.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -391,11 +418,12 @@
        "ma": "ldd2024",
        "so": 109
       }
-     ]
+     ],
+     "chiTiet": "Ổn định đời sống · ổn định sản xuất, kinh doanh · di dời vật nuôi · đào tạo, chuyển đổi nghề và tìm kiếm việc làm · tái định cư · tháo dỡ, phá dỡ, di dời. Riêng hỗ trợ đào tạo, chuyển đổi nghề (Điều 109) không quá 05 lần giá đất nông nghiệp cùng loại trong bảng giá đất; mức cụ thể do UBND cấp tỉnh quyết định, Khánh Hoà đang áp dụng 3 lần."
     },
     {
      "ten": "7. Tái định cư",
-     "y": "Niêm yết ít nhất 15 ngày. Tiền đền bù không đủ mua suất tối thiểu thì Nhà nước bù cho đủ.",
+     "y": "Phương án tái định cư phải niêm yết công khai ít nhất 15 ngày.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -405,67 +433,71 @@
        "ma": "ldd2024",
        "so": 111
       }
-     ]
+     ],
+     "chiTiet": "Tiền bồi thường không đủ mua suất tái định cư tối thiểu thì Nhà nước hỗ trợ cho đủ (Điều 111)."
     },
     {
-     "ten": "Chi tiết và mức ở Khánh Hoà",
-     "y": "Nghị định 88/2024 hướng dẫn chi tiết; mức cụ thể ở Quyết định 17/2024 và Quyết định 14/2025 của UBND tỉnh Khánh Hoà.",
+     "ten": "Quy định chi tiết và mức áp dụng tại Khánh Hoà",
+     "y": "Nghị định 88/2024 quy định chi tiết về bồi thường, hỗ trợ, tái định cư.",
      "dan": [
       {
        "ma": "nd88-2024"
       }
-     ]
+     ],
+     "chiTiet": "Mức cụ thể ở Quyết định 17/2024 và Quyết định 14/2025 của UBND tỉnh Khánh Hoà."
     }
-   ],
-   "neo": "7 bước"
+   ]
   },
   {
-   "ten": "Khi có tranh chấp, vi phạm",
+   "ten": "Giải quyết tranh chấp · Xử phạt vi phạm hành chính",
    "icon": "⚖️",
    "mau": "orange",
-   "y": "Một quy tắc quyết định mọi thứ: CÓ SỔ hay KHÔNG CÓ SỔ.",
+   "neo": "1 câu hỏi: có Giấy chứng nhận?",
+   "y": "Một câu hỏi quyết định đi đâu: thửa đất CÓ hay KHÔNG CÓ Giấy chứng nhận (hoặc giấy tờ tại Điều 137).",
    "con": [
     {
-     "ten": "Bắt buộc hoà giải ở xã trước",
-     "y": "Không quá 30 ngày, phải có biên bản. Chưa hoà giải ở xã thì chưa đưa đi đâu được.",
+     "ten": "Hòa giải tranh chấp đất đai",
+     "y": "Bắt buộc hoà giải tại UBND cấp xã trước, không quá 30 ngày, phải lập biên bản.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 235
       }
-     ]
+     ],
+     "chiTiet": "Chưa hoà giải ở xã thì chưa khởi kiện hay đề nghị giải quyết ở đâu được."
     },
     {
-     "ten": "Ai giải quyết",
-     "y": "Có sổ → Toà án. Không sổ → chọn UBND hoặc Toà án.",
+     "ten": "Thẩm quyền giải quyết tranh chấp đất đai",
+     "y": "Có Giấy chứng nhận → Toà án nhân dân. Không có → được CHỌN UBND hoặc Toà án.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 236
       }
-     ]
+     ],
+     "chiTiet": "Giấy tờ quy định tại Điều 137 cũng được coi như có Giấy chứng nhận khi xác định thẩm quyền."
     },
     {
-     "ten": "Bị xử phạt thế nào",
-     "y": "Mức phạt từng hành vi trong lĩnh vực đất đai.",
+     "ten": "Xử phạt vi phạm hành chính trong lĩnh vực đất đai",
+     "y": "Mức phạt và biện pháp khắc phục hậu quả cho từng hành vi.",
      "dan": [
       {
        "ma": "nd123-2024"
       }
      ]
     }
-   ],
-   "neo": "1 câu hỏi: có sổ?"
+   ]
   },
   {
-   "ten": "Quy hoạch & phần kỹ thuật",
+   "ten": "Quy hoạch, kế hoạch sử dụng đất · Kỹ thuật, dữ liệu đất đai",
    "icon": "🗺️",
    "mau": "teal",
-   "y": "Phần dùng cho công việc bản đồ, đo đạc, dữ liệu — không phải việc của dân thường.",
+   "neo": "5 việc chuyên môn",
+   "y": "Phần dùng cho công việc bản đồ, đo đạc, dữ liệu và thẩm quyền — không phải việc thường ngày của người sử dụng đất.",
    "con": [
     {
-     "ten": "Kỹ thuật lập quy hoạch, kế hoạch sử dụng đất",
-     "y": "Chỉ tiêu, ký hiệu, cách lập và điều chỉnh.",
+     "ten": "Quy định kỹ thuật lập quy hoạch, kế hoạch sử dụng đất",
+     "y": "Hệ thống chỉ tiêu, ký hiệu, trình tự lập và điều chỉnh.",
      "dan": [
       {
        "ma": "tt29-2024"
@@ -473,8 +505,8 @@
      ]
     },
     {
-     "ten": "Đo đạc lập bản đồ địa chính",
-     "y": "Quy định kỹ thuật: độ chính xác, số tờ, số thửa, biên tập bản đồ.",
+     "ten": "Đo đạc, lập bản đồ địa chính",
+     "y": "Quy định kỹ thuật: độ chính xác, đánh số tờ bản đồ, số thửa, biên tập bản đồ.",
      "dan": [
       {
        "ma": "tt26-2024"
@@ -482,8 +514,8 @@
      ]
     },
     {
-     "ten": "Cơ sở dữ liệu đất đai",
-     "y": "Quy trình xây dựng cơ sở dữ liệu quốc gia về đất đai.",
+     "ten": "Cơ sở dữ liệu quốc gia về đất đai",
+     "y": "Quy trình xây dựng, cập nhật và khai thác cơ sở dữ liệu.",
      "dan": [
       {
        "ma": "tt25-2024"
@@ -491,8 +523,8 @@
      ]
     },
     {
-     "ten": "Thẩm quyền sau khi bỏ cấp huyện",
-     "y": "Từ 01/7/2025 chính quyền 2 cấp — việc nào chuyển cho xã, việc nào lên tỉnh.",
+     "ten": "Phân định thẩm quyền khi thực hiện chính quyền địa phương 2 cấp",
+     "y": "Từ 01/7/2025 không còn cấp huyện — việc nào về xã, việc nào lên tỉnh.",
      "dan": [
       {
        "ma": "nd151-2025"
@@ -500,8 +532,8 @@
      ]
     },
     {
-     "ten": "Lấn biển",
-     "y": "Phải lập thành dự án đầu tư; chạm vào di tích, khu bảo tồn, cảng biển thì Quốc hội hoặc Thủ tướng mới cho. Chi tiết nay ở Nghị định 102/2024 (Nghị định 42/2024 đã hết hiệu lực).",
+     "ten": "Hoạt động lấn biển",
+     "y": "Phải lập thành dự án đầu tư.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -510,10 +542,10 @@
       {
        "ma": "nd102-2024"
       }
-     ]
+     ],
+     "chiTiet": "Nếu chạm vào di tích, khu bảo tồn, cảng biển thì phải do Quốc hội hoặc Thủ tướng Chính phủ chấp thuận. Chi tiết nay ở Nghị định 102/2024 (Nghị định 42/2024 đã hết hiệu lực)."
     }
-   ],
-   "neo": "5 việc kỹ thuật"
+   ]
   }
  ]
 }

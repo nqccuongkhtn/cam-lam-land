@@ -19,8 +19,22 @@ from urllib.request import urlopen, Request
 GOC = 'https://congbao.chinhphu.vn'
 UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36',
       'Referer': GOC + '/'}
-LOAI = {'NĐ-CP': 'nghi-dinh-l1', 'TT-BTNMT': 'thong-tu-l3', 'TT-BNNMT': 'thong-tu-l3',
-        'TT-BTC': 'thong-tu-l3', 'QH15': 'luat-l13', 'QH14': 'luat-l13'}
+def danh_sach_loai(duoi):
+    """'45/2013/QH13' -> phần đuôi 'QH13' -> danh sách 'luat-l13' trên Công báo.
+
+    Phải tra theo ĐẦU CHỮ chứ đừng khớp cứng từng mã: bảng cũ chỉ liệt kê QH15, QH14
+    nên gặp QH13 (Luật Đất đai 2013) là trượt xuống nhánh mặc định rồi đi lục nhầm
+    danh sách QUYẾT ĐỊNH — quét 220 trang vẫn báo "không thấy". Đã vấp thật."""
+    d = (duoi or '').upper()
+    if d.startswith('QH'):
+        return 'luat-l13'
+    if d.startswith('NĐ-CP') or d.startswith('ND-CP'):
+        return 'nghi-dinh-l1'
+    if d.startswith('TT'):
+        return 'thong-tu-l3'
+    if d.startswith('NQ'):
+        return 'nghi-quyet-l6'
+    return 'quyet-dinh-l2'
 RA = os.environ.get('KHO_CB', os.path.join(os.path.dirname(os.path.abspath(__file__)), '_congbao'))
 
 
@@ -49,10 +63,7 @@ def slug(so_hieu):
 
 def tim_duong(so_hieu, toi_da_trang=int(os.environ.get("CB_TRANG", "220"))):
     """Lật danh sách theo loại, tìm đường dẫn văn bản có số hiệu này."""
-    duoi = so_hieu.split('/')[-1]
-    ds = LOAI.get(duoi)
-    if not ds:
-        ds = 'nghi-quyet-l6' if 'NQ' in duoi else 'quyet-dinh-l2'
+    ds = danh_sach_loai(so_hieu.split('/')[-1])
     can = slug(so_hieu)
     hut = 0                     # số trang liên tiếp lấy về rỗng
     for p in range(1, toi_da_trang + 1):
@@ -91,7 +102,10 @@ def tep_pdf(duong):
     vào không biết là thiếu, vì phần lấy được vẫn liên tục 1..60. Đã vấp thật
     với 4 nghị định. Nay lấy HẾT, sắp theo số Công báo rồi nối lại."""
     t = lay(duong).decode('utf-8', 'replace')
-    ds = sorted(set(re.findall(r'https?://congbaocdn\.chinhphu\.vn/[^"\'<> ]+\.pdf', t)))
+    # Văn bản CŨ (2013) đặt tên tệp KHÔNG CÓ ĐUÔI .pdf: '.../5391/6773-1-201310111012-452013qh13pdf'
+    # — chữ "pdf" dính liền, không có dấu chấm. Bắt buộc phải nhận cả kiểu này, nếu không thì
+    # Luật Đất đai 2013 tìm ra trang mà báo "không thấy tệp PDF".
+    ds = sorted(set(re.findall(r'https?://congbaocdn\.chinhphu\.vn/CongBaoCP/VanBan/[^"\'<>\s]+', t)))
 
     def so_cb(u):
         # tên tệp dạng '51166-1-2024913-914101-2024-nd-cp.pdf' -> số Công báo 913

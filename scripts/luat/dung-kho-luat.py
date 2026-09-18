@@ -17,6 +17,15 @@ TỰ KIỂM, in ra hết, tệp nào trượt thì KHÔNG ghi ra web:
   3. Số điều phải liên tục 1..N, không đứt quãng.
   4. Điều cuối phải là điều khoản thi hành / hiệu lực (dấu hiệu văn bản không bị cụt).
 
+CHƯA ĐƯA LÊN WEB ĐƯỢC (để đây cho lần sau, đừng mất công tìm lại):
+  · 112/2024/NĐ-CP (đất trồng lúa) — Công báo KHÔNG đăng (có 111, có 113, nhảy qua 112);
+    bản trên datafiles.chinhphu.vn là ảnh quét, bóc ra đúng 205 ký tự.
+  · 09/2024/TT-BTNMT — bản PDF ký số tải được có lớp chữ thật nhưng THIẾU điều khoản
+    thi hành (tìm khắp 627 nghìn ký tự không có chữ "Hiệu lực thi hành") -> bản cụt.
+  · 23/2025/TT-BNNMT — thông tư SỬA ĐỔI, chép nguyên cả Chương V của thông tư khác vào
+    trong ngoặc kép, mang theo "Điều 34..42" của văn bản kia; tách ra bị đứt số điều.
+Cả ba vẫn tra được ở thẻ "Danh mục văn bản đất đai" kèm đường tải bản gốc.
+
 Chạy:  python dung-kho-luat.py <thu-muc-txt> <thu-muc-ra>
 """
 import sys, os, re, json, glob, importlib.util
@@ -38,7 +47,7 @@ RE_XEM_TIEP = re.compile(r'\(\s*Xem tiếp Công báo số\s*([\d\s+]+)\)')
 RE_DAU_TRANG = re.compile(r'CÔNG BÁO/\s*Số\s*([\d\s+]+)/')
 RE_TIEP_THEO = re.compile(r'^\(\s*Tiếp theo Công báo số[^)]*\)\s*$')
 CUOI_OK = re.compile(r'hiệu lực|trách nhiệm (thi hành|thực hiện)|tổ chức thực hiện'
-                     r'|điều khoản (thi hành|chuyển tiếp)', re.I)
+                     r'|điều khoản (thi hành|chuyển tiếp)|quy định chi tiết', re.I)
 
 
 def chuan_so(s):
@@ -106,9 +115,18 @@ def doc_dau(t):
 # theo bản PDF ký số, chỉ đổi mỗi chữ hoa/thường chứ không đổi lời.
 TEN_RIENG = {
     'ldd2024': 'Luật Đất đai',
+    'ldd2013': 'Luật Đất đai (bản năm 2013)',
     'l43-2024': ('Luật sửa đổi, bổ sung một số điều của Luật Đất đai số 31/2024/QH15, '
                  'Luật Nhà ở số 27/2023/QH15, Luật Kinh doanh bất động sản số 29/2023/QH15 '
                  'và Luật Các tổ chức tín dụng số 32/2024/QH15'),
+}
+
+
+# Văn bản đã HẾT HIỆU LỰC nhưng vẫn giữ trong kho để đối chiếu cũ ↔ mới. Phải ghi rõ ra
+# giao diện, không để người dùng tra nhầm rồi tưởng là luật đang áp dụng.
+HET_HIEU_LUC = {
+    'ldd2013': 'Hết hiệu lực từ 01/8/2024 — đã được thay bằng Luật Đất đai 2024 (31/2024/QH15). '
+               'Giữ lại ở đây CHỈ để đối chiếu cũ ↔ mới.',
 }
 
 
@@ -121,6 +139,8 @@ def lam(cac_tep, so_mong, ma, ra_dir):
     vb = tachpdf.tach(t, ma, so or so_mong, ngay, ten,
                       'Công báo Chính phủ (bản PDF ký số, có lớp chữ) — congbao.chinhphu.vn')
     vb['soPhan'] = len(cac_tep)
+    if ma in HET_HIEU_LUC:
+        vb['hetHieuLuc'] = HET_HIEU_LUC[ma]
     ds = [d['so'] for d in vb['dieu']]
     if not ds:
         loi.append('khong tach duoc dieu nao')
@@ -140,13 +160,17 @@ def lam(cac_tep, so_mong, ma, ra_dir):
     if loi:
         return None
     json.dump(vb, open(os.path.join(ra_dir, ma + '.json'), 'w', encoding='utf-8'), ensure_ascii=False)
-    return {'ma': ma, 'soHieu': vb['soHieu'], 'ngay': ngay, 'ten': ten, 'soDieu': len(ds),
-            'kb': os.path.getsize(os.path.join(ra_dir, ma + '.json')) // 1024}
+    ra = {'ma': ma, 'soHieu': vb['soHieu'], 'ngay': ngay, 'ten': ten, 'soDieu': len(ds),
+          'kb': os.path.getsize(os.path.join(ra_dir, ma + '.json')) // 1024}
+    if ma in HET_HIEU_LUC:
+        ra['hetHieuLuc'] = HET_HIEU_LUC[ma]
+    return ra
 
 
 # tên gốc của tệp -> (số hiệu mong đợi, mã dùng trên web)
 BANG = {
     'ldd2024': ('31/2024/QH15', 'ldd2024'),
+    'ldd2013': ('45/2013/QH13', 'ldd2013'),
     '10-2024-TT-BTNMT': ('10/2024/TT-BTNMT', 'tt10-2024'),
     '12-2024-TT-BTNMT': ('12/2024/TT-BTNMT', 'tt12-2024'),
     '25-2024-TT-BTNMT': ('25/2024/TT-BTNMT', 'tt25-2024'),
@@ -179,7 +203,9 @@ if __name__ == '__main__':
         kq = lam(cac, so, ma, ra_dir)
         if kq:
             xong.append(kq)
-    xong.sort(key=lambda x: x['ngay'])
+    # Thứ tự hiện trên web: LUẬT ĐẤT ĐAI 2024 đứng đầu (văn bản gốc đang áp dụng),
+    # rồi tới các văn bản hướng dẫn theo ngày, cuối cùng mới tới văn bản hết hiệu lực.
+    xong.sort(key=lambda x: (0 if x['ma'] == 'ldd2024' else (2 if x.get('hetHieuLuc') else 1), x['ngay']))
     json.dump(xong, open(os.path.join(ra_dir, '_kho.json'), 'w', encoding='utf-8'),
               ensure_ascii=False, indent=1)
     print('ghi duoc %d/%d van ban' % (len(xong), len(BANG)))

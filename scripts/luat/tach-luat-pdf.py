@@ -91,9 +91,21 @@ def cat_phu_luc(dong):
       · dòng tiêu đề "Phụ lục" đứng một mình;
       · số điều TỤT LÙI (đang Điều 12 lại quay về Điều 1) — chắc chắn đã ra khỏi thân.
     """
-    cat, mx = None, 0
+    cat, mx, trong_ngoac = None, 0, False
     for i, d in enumerate(dong):
-        if RE_PHULUC.match(d.strip()) or RE_KY.match(d.strip()):
+        d = d.strip()
+        # Bỏ qua mọi thứ nằm trong ĐOẠN TRÍCH ngoặc kép: các thông tư sửa đổi chép nguyên
+        # cả chương của thông tư khác vào trong ngoặc, mang theo "Điều 34., 35., …" của
+        # văn bản kia. Không bỏ qua thì tới "Điều 10. Hiệu lực thi hành" của chính nó lại
+        # bị hiểu là số điều tụt lùi -> cắt mất 3 điều cuối (đã vấp ở Thông tư 23/2025).
+        if trong_ngoac:
+            if RE_DONG_NGOAC.search(d):
+                trong_ngoac = False
+            continue
+        if RE_MO_NGOAC.match(d):
+            trong_ngoac = not bool(RE_DONG_NGOAC.search(d))
+            continue
+        if RE_PHULUC.match(d) or RE_KY.match(d):
             cat = i
             break
         m = RE_DIEU.match(d)

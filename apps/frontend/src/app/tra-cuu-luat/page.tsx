@@ -343,8 +343,8 @@ export default function TraCuuLuatPage() {
         // 3. Bảng liệt kê (16 trường hợp biến động): hỏi có bị ép 30 ngày + thời hạn.
         for (const r of x.bang?.dong || []) {
           ra.push({ khoa: `bang:${x.ma}:${r.diem}`, loai: 'Biến động', chuDe: 'Đăng ký biến động',
-            hoi: `Biến động điểm ${r.diem}) ${r.ten} — có phải đăng ký trong 30 ngày không, thời hạn giải quyết bao lâu?`,
-            dap: `${r.batBuoc30 ? '⏰ CÓ — phải đăng ký trong 30 ngày, quá hạn phạt 2–3 triệu.' : 'Không bị ép 30 ngày.'} Thời hạn giải quyết: ${r.thoiHan}.${r.thoiHanThem ? ' ' + r.thoiHanThem : ''}`,
+            hoi: `Đăng ký biến động theo điểm ${r.diem}) ${r.ten} — có bắt buộc đăng ký trong thời hạn 30 ngày không, thời hạn giải quyết bao lâu?`,
+            dap: `${r.batBuoc30 ? '⏰ CÓ — phải đăng ký biến động trong thời hạn 30 ngày, quá hạn bị phạt 2–3 triệu đồng.' : 'Không bắt buộc đăng ký trong thời hạn 30 ngày.'} Thời hạn giải quyết: ${r.thoiHan}.${r.thoiHanThem ? ' ' + r.thoiHanThem : ''}`,
             nho: r.batBuoc30 ? '30 ngày · ' + r.thoiHan : r.thoiHan, dan: r.dan });
         }
       }

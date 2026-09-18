@@ -69,7 +69,7 @@
       },
       {
        "neu": "Không đủ điều kiện",
-       "thi": "Không được bồi thường về ĐẤT (Điều 101) — nhưng KHÔNG mất trắng: vẫn được bồi thường chi phí đã đầu tư vào đất (san lấp, cải tạo), bồi thường tài sản trên đất, và các khoản hỗ trợ. Xem tiếp bước 5, 6.",
+       "thi": "Không được bồi thường về ĐẤT (Điều 101) — nhưng KHÔNG mất hết quyền lợi: vẫn được bồi thường chi phí đã đầu tư vào đất (san lấp, cải tạo), bồi thường tài sản trên đất, và các khoản hỗ trợ. Xem tiếp bước 5, 6.",
        "dan": [
         {
          "ma": "ldd2024",
@@ -161,7 +161,7 @@
      "nhanh": [
       {
        "neu": "Tài sản dựng lên SAU khi đã có thông báo thu hồi đất",
-       "thi": "Không được bồi thường phần đó. Đừng xây thêm để 'đón tiền bồi thường'.",
+       "thi": "Không được bồi thường phần đó. Đừng xây thêm để được bồi thường thêm.",
        "canh": true,
        "dan": [
         {
@@ -454,12 +454,12 @@
   {
    "ma": "moc-ho-so",
    "icon": "📅",
-   "ten": "Hồ sơ vắt qua các MỐC — áp luật cũ hay luật mới?",
+   "ten": "Hồ sơ bắt đầu trước ngày luật mới có hiệu lực — áp dụng luật cũ hay luật mới?",
    "tom": "Ba mốc thật sự có trong văn bản: 01/7/2014 · 01/8/2024 · 01/7/2025. Nhầm mốc là áp sai luật.",
    "buoc": [
     {
      "hoi": "1. Ba mốc đó là gì?",
-     "y": "01/7/2014 = ngày Luật Đất đai 2013 có hiệu lực — mốc xét cấp sổ cho đất lấn chiếm và đất giao sai thẩm quyền (nhắc 62 lần trong kho). 01/8/2024 = ngày Luật Đất đai 2024 có hiệu lực, do Luật 43/2024 dời sớm lại từ 01/01/2025 — mốc chuyển tiếp hồ sơ. 01/7/2025 = bỏ cấp huyện, chính quyền hai cấp, thẩm quyền đổi theo Nghị định 151/2025.",
+     "y": "01/7/2014 = ngày Luật Đất đai 2013 có hiệu lực — mốc xét cấp Giấy chứng nhận cho đất lấn chiếm và đất giao sai thẩm quyền (nhắc 62 lần trong kho). 01/8/2024 = ngày Luật Đất đai 2024 có hiệu lực, do Luật 43/2024 dời sớm lại từ 01/01/2025 — mốc chuyển tiếp hồ sơ. 01/7/2025 = bỏ cấp huyện, chính quyền hai cấp, thẩm quyền đổi theo Nghị định 151/2025.",
      "dan": [
       {
        "ma": "l43-2024",
@@ -500,7 +500,7 @@
     },
     {
      "hoi": "3. Hồ sơ CẤP SỔ — mốc nào chi phối?",
-     "y": "Không phải ngày nộp hồ sơ, mà là THỜI ĐIỂM SỬ DỤNG ĐẤT: trước 18/12/1980 · 18/12/1980→trước 15/10/1993 · 15/10/1993→trước 01/7/2014. Riêng đất lấn chiếm và đất giao sai thẩm quyền thì mốc chặn là 01/7/2014: từ ngày đó trở đi không cấp sổ.",
+     "y": "Không phải ngày nộp hồ sơ, mà là THỜI ĐIỂM SỬ DỤNG ĐẤT: trước 18/12/1980 · 18/12/1980→trước 15/10/1993 · 15/10/1993→trước 01/7/2014. Riêng đất lấn chiếm và đất giao sai thẩm quyền thì mốc chặn là 01/7/2014: từ ngày đó trở đi không cấp Giấy chứng nhận.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -517,8 +517,8 @@
      ],
      "nhanh": [
       {
-       "neu": "Muốn đổi sổ cũ sang mẫu mới",
-       "thi": "Sổ cấp trước 01/8/2024 được cấp đổi sang mẫu Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất — theo nhu cầu, không bắt buộc.",
+       "neu": "Muốn đổi Giấy chứng nhận cũ sang mẫu mới",
+       "thi": "Giấy chứng nhận cấp trước 01/8/2024 được cấp đổi sang mẫu Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất — theo nhu cầu, không bắt buộc.",
        "dan": [
         {
          "ma": "nd101-2024",
@@ -551,7 +551,7 @@
     }
    ],
    "ketLuan": [
-    "Nguyên tắc chung: hồ sơ thu hồi xét theo VIỆC ĐÃ LÀM TỚI ĐÂU · hồ sơ cấp sổ xét theo THỜI ĐIỂM SỬ DỤNG ĐẤT · thẩm quyền xét theo NGÀY KÝ.",
+    "Nguyên tắc chung: hồ sơ thu hồi xét theo VIỆC ĐÃ LÀM TỚI ĐÂU · hồ sơ cấp Giấy chứng nhận xét theo THỜI ĐIỂM SỬ DỤNG ĐẤT · thẩm quyền xét theo NGÀY KÝ.",
     "Mốc 01/7/2024 KHÔNG xuất hiện trong bất kỳ văn bản nào của kho — ai nhắc mốc này thì nhiều khả năng đang nói nhầm 01/7/2014 hoặc 01/8/2024."
    ],
    "danKetLuan": [
@@ -580,8 +580,8 @@
   {
    "ma": "so-do",
    "icon": "📗",
-   "ten": "Đất đang ở mà không có sổ — có làm được sổ không?",
-   "tom": "Bốn cửa, chọn đúng cửa theo giấy tờ và nguồn gốc đất. Mốc thời gian quyết định tất cả.",
+   "ten": "Đất đang ở mà không có Giấy chứng nhận — có được cấp Giấy chứng nhận không?",
+   "tom": "Bốn trường hợp, chọn đúng cửa theo giấy tờ và nguồn gốc đất. Mốc thời gian quyết định tất cả.",
    "buoc": [
     {
      "hoi": "1. Trong tay có giấy tờ gì không?",
@@ -595,7 +595,7 @@
      "nhanh": [
       {
        "neu": "CÓ một trong các giấy tờ đó",
-       "thi": "Cửa dễ nhất — nộp hồ sơ xin cấp sổ theo Điều 137. Nếu thửa có vườn, ao thì xem thêm bước 4 để biết bao nhiêu mét là ĐẤT Ở."
+       "thi": "Trường hợp đơn giản nhất — nộp hồ sơ đề nghị cấp Giấy chứng nhận theo Điều 137. Nếu thửa có vườn, ao thì xem thêm bước 4 để biết bao nhiêu mét là ĐẤT Ở."
       },
       {
        "neu": "KHÔNG có giấy tờ nào",
@@ -605,7 +605,7 @@
     },
     {
      "hoi": "2. Không giấy tờ — đất có nguồn gốc sạch không?",
-     "y": "Nếu đang dùng ổn định, KHÔNG vi phạm, KHÔNG phải đất giao sai thẩm quyền thì vẫn được cấp sổ, chia theo ba mốc: trước 18/12/1980 · từ 18/12/1980 đến trước 15/10/1993 · từ 15/10/1993 đến trước 01/7/2014. Điều kiện chung: UBND cấp xã xác nhận KHÔNG CÓ TRANH CHẤP.",
+     "y": "Nếu đang dùng ổn định, KHÔNG vi phạm, KHÔNG phải đất giao sai thẩm quyền thì vẫn được cấp Giấy chứng nhận, chia theo ba mốc: trước 18/12/1980 · từ 18/12/1980 đến trước 15/10/1993 · từ 15/10/1993 đến trước 01/7/2014. Điều kiện chung: UBND cấp xã xác nhận KHÔNG CÓ TRANH CHẤP.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -623,7 +623,7 @@
       },
       {
        "neu": "Do xã / hợp tác xã giao ngày trước (không đúng thẩm quyền)",
-       "thi": "Theo Điều 140 — chia theo 4 mốc, vẫn gỡ được nếu trước 01/7/2014. Được cấp sổ vẫn phải nộp tiền sử dụng đất.",
+       "thi": "Theo Điều 140 — chia theo 4 mốc, vẫn gỡ được nếu trước 01/7/2014. Được cấp Giấy chứng nhận vẫn phải nộp tiền sử dụng đất.",
        "dan": [
         {
          "ma": "ldd2024",
@@ -634,8 +634,8 @@
      ]
     },
     {
-     "hoi": "3. Đất có lấn, chiếm — còn cửa không?",
-     "y": "Còn, nếu việc lấn chiếm xảy ra TRƯỚC ngày 01/7/2014, nay đang sản xuất nông nghiệp hoặc làm nhà ở, và KHÔNG vướng quy hoạch rừng phòng hộ, rừng đặc dụng hay công trình hạ tầng công cộng.",
+     "hoi": "3. Đất có lấn, chiếm thì có được cấp Giấy chứng nhận không?",
+     "y": "Được, nếu việc lấn chiếm xảy ra TRƯỚC ngày 01/7/2014, nay đang sản xuất nông nghiệp hoặc làm nhà ở, và KHÔNG vướng quy hoạch rừng phòng hộ, rừng đặc dụng hay công trình hạ tầng công cộng.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -645,7 +645,7 @@
      "nhanh": [
       {
        "neu": "Lấn chiếm TỪ 01/7/2014 trở đi",
-       "thi": "Dứt khoát KHÔNG được cấp sổ và bị xử lý vi phạm.",
+       "thi": "Dứt khoát KHÔNG được cấp Giấy chứng nhận và bị xử lý vi phạm.",
        "canh": true,
        "dan": [
         {
@@ -655,7 +655,7 @@
       },
       {
        "neu": "Đất tự khai hoang, không tranh chấp",
-       "thi": "Được cấp sổ trong hạn mức giao đất nông nghiệp do tỉnh quy định."
+       "thi": "Được cấp Giấy chứng nhận trong hạn mức giao đất nông nghiệp do tỉnh quy định."
       }
      ]
     },
@@ -670,14 +670,14 @@
      ],
      "nhanh": [
       {
-       "neu": "Sổ đã cấp trước 01/7/2004",
+       "neu": "Giấy chứng nhận đã cấp trước 01/7/2004",
        "thi": "Được quyền xin XÁC ĐỊNH LẠI diện tích đất ở — khi có nhu cầu hoặc khi Nhà nước thu hồi đất. Nhiều người không biết quyền này."
       }
      ]
     },
     {
      "hoi": "5. Nộp hồ sơ ở đâu, mẫu nào?",
-     "y": "Trình tự, thủ tục đăng ký và cấp Giấy chứng nhận nằm ở Nghị định 101/2024; mẫu sổ, cách ghi từng mục, hồ sơ địa chính nằm ở Thông tư 10/2024.",
+     "y": "Trình tự, thủ tục đăng ký và cấp Giấy chứng nhận nằm ở Nghị định 101/2024; mẫu Giấy chứng nhận, cách ghi từng mục, hồ sơ địa chính nằm ở Thông tư 10/2024.",
      "dan": [
       {
        "ma": "nd101-2024"
@@ -689,8 +689,8 @@
     }
    ],
    "ketLuan": [
-    "Mốc 01/7/2014 là ranh giới quan trọng nhất: trước đó còn cửa gỡ, sau đó thì không.",
-    "Mọi cửa đều cần UBND cấp xã xác nhận không có tranh chấp — làm việc này trước tiên."
+    "Mốc 01/7/2014 là ranh giới quan trọng nhất: trước đó còn được xem xét, sau đó thì không.",
+    "Mọi trường hợp đều cần UBND cấp xã xác nhận không có tranh chấp — làm việc này trước tiên."
    ],
    "danKetLuan": [
     {
@@ -721,7 +721,7 @@
      },
      {
       "ten": "Giấy tờ về việc nhận thừa kế quyền sử dụng đất",
-      "y": "Chỉ khi đất có nguồn gốc thừa kế mà chưa được cấp sổ."
+      "y": "Chỉ khi đất có nguồn gốc thừa kế mà chưa được cấp Giấy chứng nhận."
      },
      {
       "ten": "Giấy tờ về giao đất không đúng thẩm quyền, hoặc giấy tờ mua / nhận thanh lý / hoá giá / phân phối nhà ở gắn liền với đất",
@@ -733,7 +733,7 @@
      },
      {
       "ten": "Văn bản xác định các thành viên có chung quyền sử dụng đất của hộ gia đình",
-      "y": "Bắt buộc khi người đang sử dụng đất là HỘ GIA ĐÌNH — làm kỹ chỗ này để sau khỏi tranh chấp."
+      "y": "Bắt buộc khi người đang sử dụng đất là HỘ GIA ĐÌNH — làm kỹ chỗ này để tránh tranh chấp về sau."
      },
      {
       "ten": "Văn bản thoả thuận hoặc quyết định của Toà án về quyền đối với thửa đất liền kề, kèm sơ đồ",
@@ -813,7 +813,7 @@
      ]
     },
     {
-     "gap": "Sổ đã cấp trước 01/7/2004, nay thấy diện tích đất ở quá ít",
+     "gap": "Giấy chứng nhận đã cấp trước 01/7/2004, nay thấy diện tích đất ở quá ít",
      "go": "Được quyền xin XÁC ĐỊNH LẠI diện tích đất ở, khi có nhu cầu hoặc khi Nhà nước thu hồi đất. Nhiều người không biết quyền này.",
      "dan": [
       {
@@ -827,8 +827,8 @@
   {
    "ma": "cap-doi",
    "icon": "🔄",
-   "ten": "Cấp đổi sổ · đo lại thấy DIỆN TÍCH TĂNG THÊM",
-   "tom": "Hai việc hay bị lẫn: cấp đổi sổ (đổi phôi, sửa thông tin) khác hẳn xử lý phần đất dôi ra khi đo lại.",
+   "ten": "Cấp đổi Giấy chứng nhận · đo lại thấy DIỆN TÍCH TĂNG THÊM",
+   "tom": "Hai việc hay bị lẫn: cấp đổi Giấy chứng nhận (đổi phôi, sửa thông tin) khác hẳn xử lý phần đất dôi ra khi đo lại.",
    "buoc": [
     {
      "hoi": "1. Việc của tôi là CẤP ĐỔI hay xử lý DIỆN TÍCH TĂNG THÊM?",
@@ -846,7 +846,7 @@
     },
     {
      "hoi": "2. CẤP ĐỔI — thuộc trường hợp nào?",
-     "y": "Nghị định 101/2024 liệt kê: muốn đổi sổ cấp trước 01/8/2024 sang mẫu mới; sổ bị ố, nhoè, rách, hư hỏng; một sổ cấp chung nhiều thửa nay tách riêng từng thửa; mục đích sử dụng ghi trên sổ khác với phân loại đất của Luật 2024; vị trí thửa trên sổ không đúng thực tế; sổ chỉ ghi tên vợ hoặc chồng nay muốn ghi cả hai; sổ ghi “hoộ gia đình” nay muốn ghi đủ tên các thành viên; thay đổi địa chỉ thửa đất.",
+     "y": "Nghị định 101/2024 liệt kê: muốn đổi Giấy chứng nhận cấp trước 01/8/2024 sang mẫu mới; Giấy chứng nhận bị ố, nhoè, rách, hư hỏng; một Giấy chứng nhận cấp chung nhiều thửa nay tách riêng từng thửa; mục đích sử dụng ghi trên Giấy chứng nhận khác với phân loại đất của Luật 2024; vị trí thửa trên Giấy chứng nhận không đúng thực tế; Giấy chứng nhận chỉ ghi tên vợ hoặc chồng nay muốn ghi cả hai; Giấy chứng nhận ghi “hoộ gia đình” nay muốn ghi đủ tên các thành viên; thay đổi địa chỉ thửa đất.",
      "dan": [
       {
        "ma": "nd101-2024",
@@ -855,11 +855,11 @@
      ],
      "nhanh": [
       {
-       "neu": "Sổ ghi “hoộ ông/bà…” mà nay muốn ghi rõ từng người",
+       "neu": "Giấy chứng nhận ghi “hoộ ông/bà…” mà nay muốn ghi rõ từng người",
        "thi": "Được cấp đổi để ghi đầy đủ tên các thành viên có chung quyền sử dụng đất — làm sớm cho đỡ tranh chấp về sau."
       },
       {
-       "neu": "Sổ chỉ đứng tên một người mà là tài sản chung vợ chồng",
+       "neu": "Giấy chứng nhận chỉ đứng tên một người mà là tài sản chung vợ chồng",
        "thi": "Được cấp đổi để ghi cả hai tên."
       }
      ]
@@ -879,8 +879,8 @@
      ]
     },
     {
-     "hoi": "4. DIỆN TÍCH TĂNG THÊM — thửa gốc đã có sổ chưa?",
-     "y": "Nghị định 101/2024 Điều 24 chia hai nhánh lớn: thửa gốc mới có GIẤY TỜ theo Điều 137, hay thửa gốc ĐÃ CÓ SỔ. Mỗi nhánh lại xét riêng nguồn gốc của phần đất dôi ra.",
+     "hoi": "4. DIỆN TÍCH TĂNG THÊM — thửa gốc đã có Giấy chứng nhận chưa?",
+     "y": "Nghị định 101/2024 Điều 24 chia hai nhánh lớn: thửa gốc mới có GIẤY TỜ theo Điều 137, hay thửa gốc ĐÃ CÓ GIẤY CHỨNG NHẬN. Mỗi nhánh lại xét riêng nguồn gốc của phần đất dôi ra.",
      "dan": [
       {
        "ma": "nd101-2024",
@@ -894,7 +894,7 @@
      "nhanh": [
       {
        "neu": "Phần tăng thêm CÓ giấy tờ theo Điều 137",
-       "thi": "Cấp sổ cho cả thửa gốc lẫn phần tăng thêm; diện tích đất ở xác định theo Điều 141.",
+       "thi": "Cấp Giấy chứng nhận cho cả thửa gốc lẫn phần tăng thêm; diện tích đất ở xác định theo Điều 141.",
        "dan": [
         {
          "ma": "ldd2024",
@@ -904,11 +904,11 @@
       },
       {
        "neu": "Phần tăng thêm do MUA một phần thửa của người khác mà chưa đăng ký biến động",
-       "thi": "Đi theo nhánh nhận chuyển quyền — làm thủ tục cấp sổ cho toàn bộ diện tích đang sử dụng."
+       "thi": "Đi theo nhánh nhận chuyển quyền — làm thủ tục cấp Giấy chứng nhận cho toàn bộ diện tích đang sử dụng."
       },
       {
        "neu": "Phần tăng thêm KHÔNG có giấy tờ gì",
-       "thi": "Phải đủ điều kiện cấp sổ theo Điều 138, 139 hoặc 140 (dùng ổn định / lấn chiếm trước 01/7/2014 / giao sai thẩm quyền) thì mới được công nhận.",
+       "thi": "Phải đủ điều kiện cấp Giấy chứng nhận theo Điều 138, 139 hoặc 140 (dùng ổn định / lấn chiếm trước 01/7/2014 / giao sai thẩm quyền) thì mới được công nhận.",
        "dan": [
         {
          "ma": "ldd2024",
@@ -928,7 +928,7 @@
     },
     {
      "hoi": "5. Có phải làm thêm thủ tục hợp thửa, chuyển mục đích không?",
-     "y": "KHÔNG. Nghị định 101/2024 nói rõ: người đề nghị cấp sổ trong các trường hợp diện tích tăng thêm nêu trên KHÔNG phải làm thủ tục chuyển quyền, chuyển mục đích hay hợp thửa đối với phần tăng thêm.",
+     "y": "KHÔNG. Nghị định 101/2024 nói rõ: người đề nghị cấp Giấy chứng nhận trong các trường hợp diện tích tăng thêm nêu trên KHÔNG phải làm thủ tục chuyển quyền, chuyển mục đích hay hợp thửa đối với phần tăng thêm.",
      "dan": [
       {
        "ma": "nd101-2024",
@@ -963,7 +963,7 @@
       "ten": "Đơn đăng ký biến động đất đai, tài sản gắn liền với đất",
       "mau": "Mẫu số 11/ĐK",
       "batBuoc": true,
-      "y": "Trường hợp sổ ghi “hoộ gia đình” nay muốn ghi đủ tên thành viên thì phải ghi rõ thông tin các thành viên ngay trong đơn."
+      "y": "Trường hợp Giấy chứng nhận ghi “hoộ gia đình” nay muốn ghi đủ tên thành viên thì phải ghi rõ thông tin các thành viên ngay trong đơn."
      },
      {
       "ten": "Giấy chứng nhận đã cấp (bản gốc)",
@@ -1003,7 +1003,7 @@
    },
    "vuongMac": [
     {
-     "gap": "Đo lại thấy diện tích thực tế nhiều hơn trên sổ",
+     "gap": "Đo lại thấy diện tích thực tế nhiều hơn trên Giấy chứng nhận",
      "go": "Không phải cứ đo ra bao nhiêu là được công nhận bấy nhiêu. Phải trả lời phần dôi ra có nguồn gốc gì rồi mới biết đi theo Điều 137, 138, 139 hay 140. Nhưng KHÔNG phải làm thêm thủ tục chuyển quyền, chuyển mục đích hay hợp thửa cho phần đó.",
      "dan": [
       {
@@ -1023,7 +1023,7 @@
      ]
     },
     {
-     "gap": "Sổ ghi “hoộ ông/bà…”, nay các thành viên không thống nhất",
+     "gap": "Giấy chứng nhận ghi “hoộ ông/bà…”, nay các thành viên không thống nhất",
      "go": "Làm thủ tục cấp đổi để ghi đủ tên các thành viên có chung quyền sử dụng đất — phải có văn bản xác định thành viên. Chưa thống nhất được thì đây là tranh chấp, đi theo Điều 235.",
      "dan": [
       {
@@ -1210,7 +1210,7 @@
    "buoc": [
     {
      "hoi": "1. Thửa đất có đủ 4 điều kiện chung chưa?",
-     "y": "Đã có sổ · còn thời hạn sử dụng · không tranh chấp, không bị kê biên, không bị áp dụng biện pháp khẩn cấp tạm thời · và phải BẢO ĐẢM CÓ LỐI ĐI nối được ra đường giao thông công cộng, có cấp nước, thoát nước.",
+     "y": "Đã có Giấy chứng nhận · còn thời hạn sử dụng · không tranh chấp, không bị kê biên, không bị áp dụng biện pháp khẩn cấp tạm thời · và phải BẢO ĐẢM CÓ LỐI ĐI nối được ra đường giao thông công cộng, có cấp nước, thoát nước.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -1349,8 +1349,8 @@
      ]
     },
     {
-     "gap": "Sổ cũ không có sơ đồ thửa hoặc thiếu kích thước cạnh",
-     "go": "Văn phòng đăng ký sẽ yêu cầu bổ sung bản vẽ; nên chủ động thuê đơn vị đo đạc CÓ GIẤY PHÉP lập bản vẽ theo Mẫu số 02/ĐK trước khi nộp cho nhanh.",
+     "gap": "Giấy chứng nhận cũ không có sơ đồ thửa hoặc thiếu kích thước cạnh",
+     "go": "Văn phòng đăng ký sẽ yêu cầu bổ sung bản vẽ; nên chủ động thuê đơn vị đo đạc CÓ GIẤY PHÉP lập bản vẽ theo Mẫu số 02/ĐK trước khi nộp để rút ngắn thời gian giải quyết.",
      "dan": [
       {
        "ma": "nd101-2024",
@@ -1363,12 +1363,12 @@
   {
    "ma": "sang-ten",
    "icon": "🤝",
-   "ten": "Chuyển nhượng, tặng cho, thế chấp quyền sử dụng đất — vướng gì không?",
+   "ten": "Chuyển nhượng, tặng cho, thế chấp quyền sử dụng đất — cần đủ những điều kiện gì?",
    "tom": "Một bộ 5 điều kiện dùng chung cho mọi giao dịch. Nhớ một lần là xong.",
    "buoc": [
     {
      "hoi": "1. Đủ 5 điều kiện chung chưa?",
-     "y": "Có sổ · đất không có tranh chấp (hoặc tranh chấp đã giải quyết xong) · không bị kê biên để thi hành án · còn trong thời hạn sử dụng đất · không bị áp dụng biện pháp khẩn cấp tạm thời.",
+     "y": "Có Giấy chứng nhận · đất không có tranh chấp (hoặc tranh chấp đã giải quyết xong) · không bị kê biên để thi hành án · còn trong thời hạn sử dụng đất · không bị áp dụng biện pháp khẩn cấp tạm thời.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -1382,8 +1382,8 @@
        "canh": true
       },
       {
-       "neu": "Thừa kế mà chưa có sổ",
-       "thi": "Người nhận thừa kế được thực hiện quyền khi có sổ HOẶC khi đủ điều kiện được cấp sổ."
+       "neu": "Thừa kế mà chưa có Giấy chứng nhận",
+       "thi": "Người nhận thừa kế được thực hiện quyền khi có Giấy chứng nhận HOẶC khi đủ điều kiện được cấp Giấy chứng nhận."
       }
      ]
     },
@@ -1443,7 +1443,7 @@
      {
       "ten": "Bản GỐC Giấy chứng nhận đã cấp",
       "batBuoc": true,
-      "y": "Thủ tục biến động có xác nhận thay đổi trên sổ thì bắt buộc nộp bản GỐC, không nhận bản sao."
+      "y": "Thủ tục biến động có xác nhận thay đổi trên Giấy chứng nhận thì bắt buộc nộp bản GỐC, không nhận bản sao."
      },
      {
       "ten": "Hợp đồng chuyển nhượng / tặng cho / văn bản thừa kế đã công chứng hoặc chứng thực",
@@ -1466,7 +1466,7 @@
      "Cổng dịch vụ công Quốc gia hoặc Cổng dịch vụ công của tỉnh"
     ],
     "thoiHan": "Không quá 10 NGÀY LÀM VIỆC (chuyển nhượng, thừa kế, tặng cho, góp vốn) — không tính thời gian xác định nghĩa vụ tài chính và thời gian người dân đi nộp tiền",
-    "ketQua": "Giấy chứng nhận mới đứng tên người nhận, hoặc xác nhận thay đổi trên sổ cũ",
+    "ketQua": "Giấy chứng nhận mới đứng tên người nhận, hoặc xác nhận thay đổi trên Giấy chứng nhận cũ",
     "dan": [
      {
       "ma": "nd151-2025"
@@ -1552,7 +1552,7 @@
       "moTa": "Người sử dụng đất thực hiện các quyền: chuyển đổi, chuyển nhượng, thừa kế, tặng cho, góp vốn bằng quyền sử dụng đất và tài sản gắn liền với đất; cho thuê, cho thuê lại quyền sử dụng đất.",
       "batBuoc30": true,
       "thoiHan": "08 ngày làm việc",
-      "thoiHanThem": "Cho thuê, cho thuê lại trong dự án hạ tầng: 04 ngày · Bán, thừa kế, tặng cho, góp vốn TÀI SẢN trên đất thuê trả tiền hằng năm: 08 ngày · Nhận chuyển nhượng một phần thửa đã có sổ (điểm a khoản 2 Điều 24 NĐ 101): 10 ngày · các trường hợp điểm b, c khoản 2 Điều 24: 20 ngày",
+      "thoiHanThem": "Cho thuê, cho thuê lại trong dự án hạ tầng: 04 ngày · Bán, thừa kế, tặng cho, góp vốn TÀI SẢN trên đất thuê trả tiền hằng năm: 08 ngày · Nhận chuyển nhượng một phần thửa đã có Giấy chứng nhận (điểm a khoản 2 Điều 24 NĐ 101): 10 ngày · các trường hợp điểm b, c khoản 2 Điều 24: 20 ngày",
       "cu": "10 ngày làm việc",
       "dan": [
        {
@@ -1587,7 +1587,7 @@
      },
      {
       "diem": "c",
-      "ten": "Thay đổi thông tin người sử dụng đất trên sổ",
+      "ten": "Thay đổi thông tin người sử dụng đất trên Giấy chứng nhận",
       "moTa": "Thay đổi thông tin về người sử dụng đất, chủ sở hữu tài sản trên giấy chứng nhận đã cấp, không thuộc trường hợp đổi tên ở điểm b (ví dụ: đổi số căn cước, đổi địa chỉ thường trú).",
       "batBuoc30": false,
       "thoiHan": "04 ngày làm việc",
@@ -1630,11 +1630,11 @@
      },
      {
       "diem": "đ",
-      "ten": "Đăng ký quyền sở hữu tài sản trên thửa đất đã có sổ",
+      "ten": "Đăng ký quyền sở hữu tài sản trên thửa đất đã có Giấy chứng nhận",
       "moTa": "Thửa đất đã có Giấy chứng nhận, nay đăng ký thêm quyền sở hữu nhà ở, công trình xây dựng, rừng sản xuất là rừng trồng trên thửa đó.",
       "batBuoc30": false,
       "thoiHan": "08 ngày làm việc",
-      "thoiHanThem": "Tài sản đã được chứng nhận trên sổ mà nay đăng ký THAY ĐỔI tài sản: 05 ngày làm việc",
+      "thoiHanThem": "Tài sản đã được chứng nhận trên Giấy chứng nhận mà nay đăng ký THAY ĐỔI tài sản: 05 ngày làm việc",
       "cu": "10 ngày làm việc",
       "dan": [
        {
@@ -1831,7 +1831,7 @@
      {
       "diem": "o",
       "ten": "Cấp đổi · cấp lại Giấy chứng nhận",
-      "moTa": "Người sử dụng đất yêu cầu cấp đổi sổ (đổi sang mẫu mới, sổ rách hỏng, ghi đủ tên thành viên hộ…) hoặc cấp lại do bị mất.",
+      "moTa": "Người sử dụng đất yêu cầu cấp đổi Giấy chứng nhận (đổi sang mẫu mới, Giấy chứng nhận rách hỏng, ghi đủ tên thành viên hộ…) hoặc cấp lại do bị mất.",
       "batBuoc30": false,
       "thoiHan": "Cấp đổi: 05 ngày làm việc",
       "thoiHanThem": "Cấp đổi trường hợp phải trích đo lại: 10 ngày · Cấp đổi đồng loạt theo dự án đo đạc: theo tiến độ dự án · CẤP LẠI do bị mất: 10 ngày làm việc, không tính thời gian niêm yết thông báo mất và đăng tin",
@@ -1849,7 +1849,7 @@
      {
       "diem": "p",
       "ten": "Thế chấp quyền sử dụng đất, tài sản gắn liền với đất",
-      "moTa": "Khác mọi trường hợp còn lại ở chỗ: chỉ được XÁC NHẬN TRÊN SỔ ĐÃ CẤP, không cấp sổ mới (khoản 2 Điều 133).",
+      "moTa": "Khác mọi trường hợp còn lại ở chỗ: chỉ được XÁC NHẬN TRÊN SỔ ĐÃ CẤP, không cấp Giấy chứng nhận mới (khoản 2 Điều 133).",
       "batBuoc30": false,
       "thoiHan": "Theo pháp luật về đăng ký biện pháp bảo đảm — văn bản đó KHÔNG có trong kho này",
       "cu": "",
@@ -1886,7 +1886,7 @@
    "buoc": [
     {
      "hoi": "1. Việc của tôi có phải đăng ký biến động không?",
-     "y": "Đăng ký biến động chỉ đặt ra khi thửa đất ĐÃ CÓ Giấy chứng nhận. Chưa có sổ thì đi theo đăng ký lần đầu (Điều 132). Xem bảng 16 trường hợp bên dưới để tìm đúng điểm của mình.",
+     "y": "Đăng ký biến động chỉ đặt ra khi thửa đất ĐÃ CÓ Giấy chứng nhận. Chưa có Giấy chứng nhận thì đi theo đăng ký lần đầu (Điều 132). Xem bảng 16 trường hợp bên dưới để tìm đúng điểm của mình.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -1899,8 +1899,8 @@
      ]
     },
     {
-     "hoi": "2. Có bị ép thời hạn 30 ngày không?",
-     "y": "CHỈ 7 điểm bị ép: a (chuyển nhượng, thừa kế, tặng cho, góp vốn, cho thuê, thế chấp), b (đổi tên), i (chia tách sáp nhập, thoả thuận hộ gia đình), k (hoà giải thành, bản án, thi hành án), l (quyền với thửa liền kề), m (thay đổi hạn chế quyền), q (tài sản công). Tính từ NGÀY CÓ BIẾN ĐỘNG.",
+     "hoi": "2. Có bắt buộc đăng ký trong thời hạn 30 ngày không?",
+     "y": "CHỈ 7 điểm bắt buộc trong thời hạn 30 ngày: a (chuyển nhượng, thừa kế, tặng cho, góp vốn, cho thuê, thế chấp), b (đổi tên), i (chia tách sáp nhập, thoả thuận hộ gia đình), k (hoà giải thành, bản án, thi hành án), l (quyền với thửa liền kề), m (thay đổi hạn chế quyền), q (tài sản công). Tính từ NGÀY CÓ BIẾN ĐỘNG.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -1931,7 +1931,7 @@
     },
     {
      "hoi": "3. Xong thì nhận được gì?",
-     "y": "Được xác nhận thay đổi trên sổ đã cấp, hoặc cấp SỔ MỚI nếu người sử dụng đất có nhu cầu. Riêng trường hợp THẾ CHẤP (điểm p) thì chỉ được xác nhận trên sổ đã cấp, không cấp sổ mới.",
+     "y": "Được xác nhận thay đổi trên Giấy chứng nhận đã cấp, hoặc cấp SỔ MỚI nếu người sử dụng đất có nhu cầu. Riêng trường hợp THẾ CHẤP (điểm p) thì chỉ được xác nhận trên Giấy chứng nhận đã cấp, không cấp Giấy chứng nhận mới.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -1962,8 +1962,8 @@
     }
    ],
    "ketLuan": [
-    "Nhớ một câu: đã có sổ mà có thay đổi thì là BIẾN ĐỘNG; chưa có sổ thì là đăng ký LẦN ĐẦU.",
-    "Bảy điểm a, b, i, k, l, m, q bị ép 30 ngày — quá hạn phạt 2-3 triệu. Bảy chữ này nên thuộc lòng.",
+    "Nhớ một câu: đã có Giấy chứng nhận mà có thay đổi thì là BIẾN ĐỘNG; chưa có Giấy chứng nhận thì là đăng ký LẦN ĐẦU.",
+    "Bảy điểm a, b, i, k, l, m, q bắt buộc đăng ký trong thời hạn 30 ngày — quá hạn bị phạt 2-3 triệu đồng. Bảy chữ này nên thuộc lòng.",
     "Thời hạn giải quyết từ 01/7/2025 đã RÚT NGẮN so với trước: đăng ký lần đầu 20 → 17 ngày, chuyển nhượng 10 → 08 ngày, công trình ngầm 15 → 10 ngày."
    ],
    "danKetLuan": [
@@ -2064,7 +2064,7 @@
    "ma": "tranh-chap",
    "icon": "⚖️",
    "ten": "Tranh chấp đất đai — ranh giới, thừa kế, đòi lại đất",
-   "tom": "Một câu hỏi quyết định tất cả: CÓ SỔ hay KHÔNG CÓ SỔ. Kèm mốc ngày của từng bước.",
+   "tom": "Một câu hỏi quyết định tất cả: CÓ GIẤY CHỨNG NHẬN hay KHÔNG CÓ GIẤY CHỨNG NHẬN. Kèm mốc ngày của từng bước.",
    "buoc": [
     {
      "hoi": "1. Bắt buộc làm gì trước tiên?",
@@ -2115,7 +2115,7 @@
     },
     {
      "hoi": "2. Hoà giải không thành — ai giải quyết?",
-     "y": "Có sổ (hoặc có giấy tờ theo Điều 137, hoặc tranh chấp về tài sản gắn liền với đất) thì TOÀ ÁN giải quyết. Không có sổ thì được CHỌN: nộp đơn lên UBND, hoặc khởi kiện ra Toà án.",
+     "y": "Có Giấy chứng nhận (hoặc có giấy tờ theo Điều 137, hoặc tranh chấp về tài sản gắn liền với đất) thì TOÀ ÁN giải quyết. Không có Giấy chứng nhận thì được CHỌN: nộp đơn lên UBND, hoặc khởi kiện ra Toà án.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -2144,7 +2144,7 @@
      ],
      "nhanh": [
       {
-       "neu": "Muốn thắng khi không có sổ",
+       "neu": "Muốn thắng khi không có Giấy chứng nhận",
        "thi": "Căn cứ số 1 là quan trọng nhất: gom cho đủ chứng cứ nguồn gốc và quá trình sử dụng — biên lai thuế, xác nhận của hàng xóm, ảnh cũ, sổ mục kê, bản đồ qua các thời kỳ.",
        "dan": [
         {
@@ -2157,7 +2157,7 @@
     },
     {
      "hoi": "3. Hoà giải THÀNH mà đổi ranh giới, diện tích?",
-     "y": "Trong 30 ngày làm việc kể từ ngày nhận văn bản công nhận kết quả hoà giải thành, các bên phải đi làm thủ tục đăng ký biến động. Không làm là kết quả hoà giải không vào được sổ.",
+     "y": "Trong 30 ngày làm việc kể từ ngày nhận văn bản công nhận kết quả hoà giải thành, các bên phải đi làm thủ tục đăng ký biến động. Không làm là kết quả hoà giải không vào được Giấy chứng nhận.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -2229,11 +2229,11 @@
      {
       "ten": "Giấy tờ chứng minh nguồn gốc và quá trình sử dụng đất",
       "batBuoc": true,
-      "y": "Đây là căn cứ SỐ MỘT khi không bên nào có sổ: biên lai thuế, sổ mục kê, bản đồ qua các thời kỳ, xác nhận của người biết việc."
+      "y": "Đây là căn cứ SỐ MỘT khi không bên nào có Giấy chứng nhận: biên lai thuế, sổ mục kê, bản đồ qua các thời kỳ, xác nhận của người biết việc."
      },
      {
       "ten": "Giấy chứng nhận hoặc giấy tờ theo Điều 137 (nếu có)",
-      "y": "Có sổ thì việc giải quyết thuộc Toà án."
+      "y": "Có Giấy chứng nhận thì việc giải quyết thuộc Toà án."
      },
      {
       "ten": "Sơ đồ, ảnh chụp hiện trạng phần đất đang tranh chấp",
@@ -2362,7 +2362,7 @@
     },
     {
      "hoi": "4. Có được làm thêm gì trên đất nông nghiệp không?",
-     "y": "Có — điểm MỚI của Luật 2024: đất nông nghiệp được dùng KẾT HỢP với thương mại, dịch vụ, chăn nuôi, trồng dược liệu mà loại đất trên sổ vẫn giữ nguyên. Nhưng phải lập phương án trình cơ quan có thẩm quyền duyệt và nộp đủ nghĩa vụ tài chính.",
+     "y": "Có — điểm MỚI của Luật 2024: đất nông nghiệp được dùng KẾT HỢP với thương mại, dịch vụ, chăn nuôi, trồng dược liệu mà loại đất trên Giấy chứng nhận vẫn giữ nguyên. Nhưng phải lập phương án trình cơ quan có thẩm quyền duyệt và nộp đủ nghĩa vụ tài chính.",
      "dan": [
       {
        "ma": "ldd2024",

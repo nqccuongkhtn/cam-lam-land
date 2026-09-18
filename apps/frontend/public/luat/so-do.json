@@ -69,8 +69,8 @@
    "ten": "Đăng ký đất đai · Cấp Giấy chứng nhận",
    "icon": "📗",
    "mau": "emerald",
-   "neo": "4 cửa · 3 mốc",
-   "y": "Luật gọi là “Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất” — dân quen gọi sổ đỏ, sổ hồng. Bốn cửa vào tuỳ giấy tờ đang có.",
+   "neo": "4 trường hợp · 3 mốc",
+   "y": "Luật gọi là “Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất” — dân quen gọi sổ đỏ, sổ hồng. Bốn trường hợp được xét cấp, tuỳ giấy tờ đang có.",
    "con": [
     {
      "ten": "Nguyên tắc đăng ký · Đăng ký lần đầu · Đăng ký biến động",
@@ -92,18 +92,18 @@
      "chiTiet": "Chưa từng đăng ký thì đăng ký lần đầu; sau đó mọi thay đổi đều là ĐĂNG KÝ BIẾN ĐỘNG (Điều 133) — xem đủ các trường hợp ở thẻ Tình huống. Nguyên tắc đăng ký ở Điều 131, nguyên tắc cấp Giấy chứng nhận ở Điều 135."
     },
     {
-     "ten": "Cửa 1 — Đang sử dụng đất CÓ giấy tờ về quyền sử dụng đất",
-     "y": "Cửa dễ nhất: có một trong các loại giấy tờ liệt kê tại Điều 137 là được xét cấp.",
+     "ten": "Trường hợp 1 — Đang sử dụng đất CÓ giấy tờ về quyền sử dụng đất",
+     "y": "Trường hợp đơn giản nhất: có một trong các loại giấy tờ liệt kê tại Điều 137 là được xét cấp.",
      "dan": [
       {
        "ma": "ldd2024",
        "so": 137
       }
      ],
-     "chiTiet": "Điểm chung của cả bốn cửa: UBND cấp xã xác nhận đất không có tranh chấp, và mốc thời gian sử dụng càng sớm thì càng có lợi."
+     "chiTiet": "Điểm chung của cả bốn trường hợp: UBND cấp xã xác nhận đất không có tranh chấp, và mốc thời gian sử dụng càng sớm thì càng có lợi."
     },
     {
-     "ten": "Cửa 2 — KHÔNG có giấy tờ, không vi phạm pháp luật về đất đai",
+     "ten": "Trường hợp 2 — KHÔNG có giấy tờ, không vi phạm pháp luật về đất đai",
      "y": "Ba mốc phải thuộc lòng: trước 18/12/1980 · 18/12/1980 → trước 15/10/1993 · 15/10/1993 → trước 01/7/2014.",
      "dan": [
       {
@@ -114,8 +114,8 @@
      "chiTiet": "Phần diện tích nằm trong hạn mức công nhận đất ở thì được công nhận là đất ở; phần vượt hạn mức công nhận theo loại đất đang sử dụng."
     },
     {
-     "ten": "Cửa 3 — Có VI PHẠM pháp luật đất đai trước ngày 01/7/2014",
-     "y": "Lấn, chiếm trước 01/7/2014 thì vẫn còn cửa; từ 01/7/2014 trở đi thì không.",
+     "ten": "Trường hợp 3 — Có VI PHẠM pháp luật đất đai trước ngày 01/7/2014",
+     "y": "Lấn, chiếm trước ngày 01/7/2014 thì vẫn được xem xét cấp Giấy chứng nhận; từ ngày đó trở đi thì không.",
      "dan": [
       {
        "ma": "ldd2024",
@@ -125,7 +125,7 @@
      "chiTiet": "Không xét nếu đất đang vướng rừng phòng hộ, rừng đặc dụng, hoặc công trình công cộng."
     },
     {
-     "ten": "Cửa 4 — Đất được GIAO KHÔNG ĐÚNG THẨM QUYỀN",
+     "ten": "Trường hợp 4 — Đất được GIAO KHÔNG ĐÚNG THẨM QUYỀN",
      "y": "Đất do xã, hợp tác xã giao ngày trước — chia theo 4 mốc thời gian.",
      "dan": [
       {
@@ -357,7 +357,7 @@
        "so": 107
       }
      ],
-     "chiTiet": "Đủ điều kiện thì theo Điều 95. Không đủ thì Điều 101, nhưng vẫn còn cửa được bồi thường chi phí đầu tư vào đất còn lại theo Điều 107."
+     "chiTiet": "Đủ điều kiện thì theo Điều 95. Không đủ thì Điều 101, nhưng vẫn được bồi thường chi phí đầu tư vào đất còn lại theo Điều 107."
     },
     {
      "ten": "4. Bồi thường về ĐẤT",

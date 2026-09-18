@@ -10,8 +10,8 @@
    "nho": "Giấy tờ nói trước, hiện trạng nói sau."
   },
   "ldd2024:45": {
-   "y": "Muốn bán, cho thuê, tặng, để thừa kế, thế chấp hay góp vốn bằng đất thì phải đủ 5 điều: có sổ; không tranh chấp (hoặc tranh chấp đã được giải quyết xong); không bị kê biên để thi hành án; còn trong thời hạn sử dụng đất; không bị áp dụng biện pháp khẩn cấp tạm thời. Ai đang được ghi nợ nghĩa vụ tài chính thì phải trả xong mới được làm.",
-   "nho": "Có sổ · không tranh chấp · không kê biên · còn hạn · không bị phong toả."
+   "y": "Muốn bán, cho thuê, tặng, để thừa kế, thế chấp hay góp vốn bằng đất thì phải đủ 5 điều: có Giấy chứng nhận; không tranh chấp (hoặc tranh chấp đã được giải quyết xong); không bị kê biên để thi hành án; còn trong thời hạn sử dụng đất; không bị áp dụng biện pháp khẩn cấp tạm thời. Ai đang được ghi nợ nghĩa vụ tài chính thì phải trả xong mới được làm.",
+   "nho": "Có Giấy chứng nhận · không tranh chấp · không kê biên · còn hạn · không bị phong toả."
   },
   "ldd2024:79": {
    "y": "Đây là danh sách ĐÓNG gồm 31 trường hợp Nhà nước được thu hồi đất vì lợi ích quốc gia, công cộng: đường sá, thuỷ lợi, điện, trường, trạm, chợ, khu công nghiệp, khu đô thị, tái định cư, lấn biển… Dự án không có tên trong danh sách thì không thu hồi đất được; muốn thêm phải sửa luật (khoản 32).",
@@ -38,7 +38,7 @@
    "nho": "Đất ở: đất · nhà · tiền · đất khác."
   },
   "ldd2024:101": {
-   "y": "Bốn nhóm không được bồi thường về đất: đất thuộc khoản 1 Điều 107 (giao không thu tiền, thuê trả tiền hằng năm…); đất do cơ quan nhà nước quản lý; đất bị thu hồi do vi phạm (Điều 81, 82); và đất không đủ điều kiện cấp sổ. Lưu ý: không được bồi thường VỀ ĐẤT không có nghĩa là mất trắng — vẫn có thể được bồi thường chi phí đầu tư vào đất (Điều 107), bồi thường tài sản trên đất và các khoản hỗ trợ.",
+   "y": "Bốn nhóm không được bồi thường về đất: đất thuộc khoản 1 Điều 107 (giao không thu tiền, thuê trả tiền hằng năm…); đất do cơ quan nhà nước quản lý; đất bị thu hồi do vi phạm (Điều 81, 82); và đất không đủ điều kiện cấp Giấy chứng nhận. Lưu ý: không được bồi thường VỀ ĐẤT không có nghĩa là mất hết quyền lợi — vẫn có thể được bồi thường chi phí đầu tư vào đất (Điều 107), bồi thường tài sản trên đất và các khoản hỗ trợ.",
    "nho": "Không bồi thường đất ≠ không được gì."
   },
   "ldd2024:102": {
@@ -54,7 +54,7 @@
    "nho": "Tháo · chở · lắp — cả ba đều được trả."
   },
   "ldd2024:105": {
-   "y": "Bốn trường hợp tài sản trên đất KHÔNG được bồi thường. Đáng nhớ nhất là khoản 2: tài sản tạo lập trái pháp luật, hoặc tạo lập SAU KHI ĐÃ CÓ THÔNG BÁO THU HỒI ĐẤT. Nghĩa là xây thêm, trồng thêm để \"đón tiền bồi thường\" thì phần đó mất trắng.",
+   "y": "Bốn trường hợp tài sản trên đất KHÔNG được bồi thường. Đáng nhớ nhất là khoản 2: tài sản tạo lập trái pháp luật, hoặc tạo lập SAU KHI ĐÃ CÓ THÔNG BÁO THU HỒI ĐẤT. Nghĩa là xây thêm, trồng thêm để được bồi thường thêm thì phần đó không được bồi thường.",
    "nho": "Đã có thông báo thu hồi thì xây thêm không được đền."
   },
   "ldd2024:107": {
@@ -90,15 +90,15 @@
    "nho": "Ba mốc 1980 · 1993 · 2014 — dùng càng lâu càng lợi."
   },
   "ldd2024:139": {
-   "y": "Lấn, chiếm TRƯỚC ngày 01/7/2014 mà nay đang sản xuất nông nghiệp hoặc làm nhà ở, không thuộc quy hoạch rừng phòng hộ, rừng đặc dụng hay công trình hạ tầng công cộng, thì vẫn có cửa được cấp sổ. Đất tự khai hoang không tranh chấp cũng được cấp trong hạn mức do tỉnh quy định. Nhưng lấn, chiếm TỪ 01/7/2014 TRỞ ĐI thì dứt khoát không cấp sổ và bị xử lý.",
-   "nho": "Mốc 01/7/2014: trước còn cửa, sau thì không."
+   "y": "Lấn, chiếm TRƯỚC ngày 01/7/2014 mà nay đang sản xuất nông nghiệp hoặc làm nhà ở, không thuộc quy hoạch rừng phòng hộ, rừng đặc dụng hay công trình hạ tầng công cộng, thì vẫn có cửa được cấp Giấy chứng nhận. Đất tự khai hoang không tranh chấp cũng được cấp trong hạn mức do tỉnh quy định. Nhưng lấn, chiếm TỪ 01/7/2014 TRỞ ĐI thì dứt khoát không cấp Giấy chứng nhận và bị xử lý.",
+   "nho": "Mốc 01/7/2014: vi phạm trước ngày này thì còn được xem xét, từ ngày này trở đi thì không."
   },
   "ldd2024:140": {
-   "y": "Đất ngày trước do xã, hợp tác xã… giao không đúng thẩm quyền thì nay vẫn được xét cấp sổ, chia theo mốc: trước 15/10/1993; từ 15/10/1993 đến trước 01/7/2004; từ 01/7/2004 đến trước 01/7/2014; và từ 01/7/2014 đến trước ngày Luật này có hiệu lực. Từ 01/7/2014 trở đi mà giao sai thẩm quyền thì không cấp sổ, trừ trường hợp ở khoản 4. Được cấp sổ vẫn phải nộp tiền sử dụng đất.",
+   "y": "Đất ngày trước do xã, hợp tác xã… giao không đúng thẩm quyền thì nay vẫn được xét cấp Giấy chứng nhận, chia theo mốc: trước 15/10/1993; từ 15/10/1993 đến trước 01/7/2004; từ 01/7/2004 đến trước 01/7/2014; và từ 01/7/2014 đến trước ngày Luật này có hiệu lực. Từ 01/7/2014 trở đi mà giao sai thẩm quyền thì không cấp Giấy chứng nhận, trừ trường hợp ở khoản 4. Được cấp Giấy chứng nhận vẫn phải nộp tiền sử dụng đất.",
    "nho": "Giao sai thẩm quyền: còn gỡ được nếu trước 01/7/2014."
   },
   "ldd2024:141": {
-   "y": "Thửa đất có vườn, ao mà giấy tờ ghi là đất ở (giấy tờ đời cũ hay ghi “thổ cư”): nếu thửa hình thành trước 18/12/1980, hoặc từ 18/12/1980 đến trước 15/10/1993, mà diện tích NHỎ HƠN hạn mức công nhận đất ở thì TOÀN BỘ thửa được xác định là đất ở và không phải nộp tiền sử dụng đất cho phần đó. Lớn hơn hạn mức thì lấy theo diện tích ghi trong giấy tờ. Sổ đã cấp trước 01/7/2004 có thể xin xác định lại diện tích đất ở khi có nhu cầu hoặc khi Nhà nước thu hồi đất.",
+   "y": "Thửa đất có vườn, ao mà giấy tờ ghi là đất ở (giấy tờ đời cũ hay ghi “thổ cư”): nếu thửa hình thành trước 18/12/1980, hoặc từ 18/12/1980 đến trước 15/10/1993, mà diện tích NHỎ HƠN hạn mức công nhận đất ở thì TOÀN BỘ thửa được xác định là đất ở và không phải nộp tiền sử dụng đất cho phần đó. Lớn hơn hạn mức thì lấy theo diện tích ghi trong giấy tờ. Giấy chứng nhận đã cấp trước 01/7/2004 có thể xin xác định lại diện tích đất ở khi có nhu cầu hoặc khi Nhà nước thu hồi đất.",
    "nho": "Đất cũ + nhỏ hơn hạn mức = cả thửa là đất ở."
   },
   "ldd2024:159": {
@@ -138,24 +138,24 @@
    "nho": "Đô thị và nông thôn có hai hạn mức khác nhau."
   },
   "ldd2024:218": {
-   "y": "Điểm mới của Luật 2024: một thửa được dùng KẾT HỢP nhiều mục đích — đất nông nghiệp kết hợp thương mại, dịch vụ, chăn nuôi, trồng dược liệu; đất ở kết hợp nông nghiệp, thương mại, dịch vụ… Điều kiện: không làm đổi loại đất đã ghi trên sổ, không làm mất khả năng quay lại mục đích chính, không ảnh hưởng thửa liền kề, nộp đủ nghĩa vụ tài chính, và phải LẬP PHƯƠNG ÁN trình cơ quan có thẩm quyền duyệt.",
-   "nho": "Làm thêm được, nhưng loại đất trên sổ vẫn giữ nguyên."
+   "y": "Điểm mới của Luật 2024: một thửa được dùng KẾT HỢP nhiều mục đích — đất nông nghiệp kết hợp thương mại, dịch vụ, chăn nuôi, trồng dược liệu; đất ở kết hợp nông nghiệp, thương mại, dịch vụ… Điều kiện: không làm đổi loại đất đã ghi trên Giấy chứng nhận, không làm mất khả năng quay lại mục đích chính, không ảnh hưởng thửa liền kề, nộp đủ nghĩa vụ tài chính, và phải LẬP PHƯƠNG ÁN trình cơ quan có thẩm quyền duyệt.",
+   "nho": "Làm thêm được, nhưng loại đất trên Giấy chứng nhận vẫn giữ nguyên."
   },
   "ldd2024:219": {
    "y": "Cách làm mới: những người có đất trong một khu tự nguyện GÓP ĐẤT lại để sắp xếp, chỉnh trang rồi chia lại — dùng cho dồn điền đổi thửa, chỉnh trang khu dân cư nông thôn và đô thị. Điều kiện cốt lõi là SỰ ĐỒNG THUẬN của người sử dụng đất, không phải cưỡng chế.",
    "nho": "Góp đất chỉnh trang — phải đồng thuận."
   },
   "ldd2024:220": {
-   "y": "Điều kiện chung để tách hoặc hợp thửa: đã có sổ; còn thời hạn sử dụng; không tranh chấp, không bị kê biên; và phải BẢO ĐẢM CÓ LỐI ĐI nối được ra đường giao thông công cộng, có cấp nước, thoát nước. Tách thửa còn phải đạt DIỆN TÍCH TỐI THIỂU do UBND TỈNH quy định cho từng loại đất. Chuyển mục đích một phần thửa thì phải tách thửa. Chia đất theo bản án của Toà mà không đủ điều kiện tách thì không tách được.",
+   "y": "Điều kiện chung để tách hoặc hợp thửa: đã có Giấy chứng nhận; còn thời hạn sử dụng; không tranh chấp, không bị kê biên; và phải BẢO ĐẢM CÓ LỐI ĐI nối được ra đường giao thông công cộng, có cấp nước, thoát nước. Tách thửa còn phải đạt DIỆN TÍCH TỐI THIỂU do UBND TỈNH quy định cho từng loại đất. Chuyển mục đích một phần thửa thì phải tách thửa. Chia đất theo bản án của Toà mà không đủ điều kiện tách thì không tách được.",
    "nho": "Có lối đi + đủ diện tích tối thiểu của tỉnh."
   },
   "ldd2024:235": {
    "y": "BẮT BUỘC hoà giải tại UBND CẤP XÃ nơi có đất trước khi đưa tranh chấp lên cơ quan có thẩm quyền. Chủ tịch xã lập Hội đồng hoà giải, làm xong trong không quá 30 ngày kể từ ngày nhận đơn, và phải có biên bản ghi rõ hoà giải thành hay không thành. Hoà giải thành mà có thay đổi ranh giới, diện tích, người sử dụng đất thì trong 30 ngày làm việc các bên phải đi làm thủ tục đăng ký.",
-   "nho": "Chưa hoà giải ở xã thì chưa đưa đi đâu được."
+   "nho": "Chưa hoà giải tại UBND cấp xã thì chưa khởi kiện hoặc đề nghị giải quyết ở đâu được."
   },
   "ldd2024:236": {
-   "y": "CÓ SỔ (hoặc có giấy tờ theo Điều 137, hoặc tranh chấp về tài sản gắn liền với đất) thì TOÀ ÁN giải quyết. KHÔNG CÓ SỔ thì được chọn một trong hai: nộp đơn lên UBND, hoặc khởi kiện ra Toà. Chọn UBND thì tranh chấp giữa hộ gia đình, cá nhân, cộng đồng dân cư với nhau do Chủ tịch UBND cấp huyện giải quyết; có tổ chức hoặc yếu tố nước ngoài thì lên cấp tỉnh.",
-   "nho": "Có sổ → Toà. Không sổ → chọn UBND hoặc Toà."
+   "y": "CÓ GIẤY CHỨNG NHẬN (hoặc có giấy tờ theo Điều 137, hoặc tranh chấp về tài sản gắn liền với đất) thì TOÀ ÁN giải quyết. KHÔNG CÓ GIẤY CHỨNG NHẬN thì được chọn một trong hai: nộp đơn lên UBND, hoặc khởi kiện ra Toà. Chọn UBND thì tranh chấp giữa hộ gia đình, cá nhân, cộng đồng dân cư với nhau do Chủ tịch UBND cấp huyện giải quyết; có tổ chức hoặc yếu tố nước ngoài thì lên cấp tỉnh.",
+   "nho": "Có Giấy chứng nhận → Toà. Không có Giấy chứng nhận → chọn UBND hoặc Toà."
   },
   "ldd2024:85": {
    "y": "Con số phải thuộc: thông báo thu hồi đất phải gửi tới từng người CHẬM NHẤT 90 NGÀY với đất nông nghiệp và 180 NGÀY với đất phi nông nghiệp, trước khi ra quyết định thu hồi. Dân đồng ý bàn giao sớm thì được thu hồi trước hạn. Khi quyết định thu hồi có hiệu lực và phương án đã công bố công khai thì phải chấp hành.",
@@ -174,23 +174,23 @@
    "nho": "30 ngày phải trả tiền; chậm thì phải bù thêm."
   },
   "ldd2024:135": {
-   "y": "Nguyên tắc cấp sổ: thửa đất nào cấp một sổ đó; đất do nhiều người chung quyền thì ghi đủ tên hoặc cấp cho mỗi người một sổ; tài sản gắn liền với đất chỉ chứng nhận khi có yêu cầu. Nắm nguyên tắc này trước khi đi vào từng trường hợp cụ thể ở các Điều 137-150.",
-   "nho": "Mỗi thửa một sổ; chung quyền thì ghi đủ tên."
+   "y": "Nguyên tắc cấp Giấy chứng nhận: Giấy chứng nhận được cấp theo TỪNG THỬA ĐẤT; đất do nhiều người chung quyền thì ghi đủ tên hoặc cấp cho mỗi người một Giấy chứng nhận; tài sản gắn liền với đất chỉ chứng nhận khi có yêu cầu. Nắm nguyên tắc này trước khi đi vào từng trường hợp cụ thể ở các Điều 137-150.",
+   "nho": "Cấp theo từng thửa đất; chung quyền thì ghi đủ tên."
   },
   "ldd2024:136": {
-   "y": "Ai ký sổ: cấp lần đầu và cấp cho tổ chức thuộc thẩm quyền cơ quan cấp tỉnh; cấp cho hộ gia đình, cá nhân và các trường hợp đăng ký biến động thuộc cơ quan cấp huyện / Văn phòng đăng ký đất đai. Sau 01/7/2025 (chính quyền hai cấp) phải tra lại ở Nghị định 151/2025.",
+   "y": "Ai ký Giấy chứng nhận: cấp lần đầu và cấp cho tổ chức thuộc thẩm quyền cơ quan cấp tỉnh; cấp cho hộ gia đình, cá nhân và các trường hợp đăng ký biến động thuộc cơ quan cấp huyện / Văn phòng đăng ký đất đai. Sau 01/7/2025 (chính quyền hai cấp) phải tra lại ở Nghị định 151/2025.",
    "nho": "Tổ chức → tỉnh. Dân → huyện / Văn phòng đăng ký."
   },
   "ldd2024:152": {
-   "y": "Ba việc khác nhau, hay bị gọi lẫn: ĐÍNH CHÍNH (sổ ghi sai thông tin do lỗi của cơ quan), THU HỒI sổ đã cấp (cấp không đúng quy định, cấp trùng, đất bị Nhà nước thu hồi…), HUỶ sổ. Bị đòi thu hồi sổ thì phải xem rơi đúng vào trường hợp nào của điều này, không được thu hồi tuỳ tiện.",
-   "nho": "Đính chính ≠ thu hồi ≠ huỷ sổ."
+   "y": "Ba việc khác nhau, hay bị gọi lẫn: ĐÍNH CHÍNH (Giấy chứng nhận ghi sai thông tin do lỗi của cơ quan), THU HỒI Giấy chứng nhận đã cấp (cấp không đúng quy định, cấp trùng, đất bị Nhà nước thu hồi…), HUỶ Giấy chứng nhận. Bị đòi thu hồi Giấy chứng nhận thì phải xem rơi đúng vào trường hợp nào của điều này, không được thu hồi tuỳ tiện.",
+   "nho": "Đính chính ≠ thu hồi ≠ huỷ Giấy chứng nhận."
   },
   "ldd2024:253": {
    "y": "Chuyển tiếp về quy hoạch, kế hoạch sử dụng đất khi Luật 2024 có hiệu lực (01/8/2024): quy hoạch, kế hoạch đã được duyệt theo luật cũ thì tiếp tục thực hiện cho hết kỳ, không phải làm lại.",
-   "nho": "Quy hoạch đã duyệt thì chạy tiếp hết kỳ."
+   "nho": "Quy hoạch đã được phê duyệt thì tiếp tục thực hiện đến hết kỳ quy hoạch."
   },
   "ldd2024:254": {
-   "y": "Điều quan trọng nhất cho hồ sơ thu hồi vắt qua mốc 01/8/2024, và nó chia theo VIỆC ĐÃ LÀM TỚI ĐÂU chứ không theo ngày nộp hồ sơ. Đã có quyết định thu hồi mà CHƯA duyệt phương án → làm tiếp theo LUẬT MỚI. Đã duyệt phương án rồi mà chưa thực hiện → theo PHƯƠNG ÁN CŨ. Có Khung chính sách của Thủ tướng mà địa phương chưa duyệt phương án → chọn cái CÓ LỢI HƠN cho dân.",
+   "y": "Điều quan trọng nhất cho hồ sơ thu hồi đất bắt đầu trước ngày 01/8/2024 mà chưa giải quyết xong, và nó chia theo VIỆC ĐÃ LÀM TỚI ĐÂU chứ không theo ngày nộp hồ sơ. Đã có quyết định thu hồi mà CHƯA duyệt phương án → làm tiếp theo LUẬT MỚI. Đã duyệt phương án rồi mà chưa thực hiện → theo PHƯƠNG ÁN CŨ. Có Khung chính sách của Thủ tướng mà địa phương chưa duyệt phương án → chọn cái CÓ LỢI HƠN cho dân.",
    "nho": "Chưa duyệt phương án → luật mới. Duyệt rồi → phương án cũ."
   },
   "ldd2024:255": {
@@ -202,20 +202,20 @@
    "nho": "Điều 'vét' cho mọi hồ sơ cũ khó xếp."
   },
   "ldd2024:237": {
-   "y": "Khiếu nại, khởi kiện quyết định hành chính về đất đai (quyết định thu hồi, phương án bồi thường, từ chối cấp sổ…) đi theo pháp luật khiếu nại và tố tụng hành chính — KHÁC hẳn tranh chấp đất đai giữa dân với dân ở Điều 235-236. Nhầm đường là mất thời gian và có thể hết thời hiệu.",
-   "nho": "Cãi với CƠ QUAN → khiếu nại. Cãi với NGƯỜI → tranh chấp."
+   "y": "Khiếu nại, khởi kiện quyết định hành chính về đất đai (quyết định thu hồi, phương án bồi thường, từ chối cấp Giấy chứng nhận…) đi theo pháp luật khiếu nại và tố tụng hành chính — KHÁC hẳn tranh chấp đất đai giữa dân với dân ở Điều 235-236. Nhầm đường là mất thời gian và có thể hết thời hiệu.",
+   "nho": "Bất đồng với CƠ QUAN NHÀ NƯỚC → khiếu nại. Bất đồng với NGƯỜI SỬ DỤNG ĐẤT khác → tranh chấp đất đai."
   },
   "nd101-2024:24": {
    "y": "Điều xử lý phần đất DÔI RA khi đo lại. Hỏi hai câu theo thứ tự: thửa gốc đã có Giấy chứng nhận hay mới có giấy tờ theo Điều 137, và phần tăng thêm có nguồn gốc gì. Phần tăng thêm có giấy tờ Điều 137 → công nhận cùng thửa gốc; do mua một phần thửa mà chưa đăng ký biến động → đi nhánh nhận chuyển quyền; không có gì → phải đủ điều kiện theo Điều 138, 139 hoặc 140. Điểm quan trọng: KHÔNG phải làm thêm thủ tục chuyển quyền, chuyển mục đích hay hợp thửa cho phần tăng thêm.",
    "nho": "Hỏi nguồn gốc phần dôi ra; không phải hợp thửa lại."
   },
   "nd101-2024:38": {
-   "y": "Tám trường hợp được cấp đổi sổ, đáng nhớ nhất: đổi sổ cấp trước 01/8/2024 sang mẫu mới; sổ ghi 'hộ gia đình' nay ghi đủ tên các thành viên; sổ chỉ đứng tên vợ hoặc chồng nay ghi cả hai; mục đích sử dụng trên sổ khác phân loại đất của Luật 2024; vị trí thửa trên sổ không đúng thực tế. Hồ sơ: Đơn Mẫu số 11/ĐK + sổ đã cấp.",
-   "nho": "Đơn Mẫu 11/ĐK + sổ cũ. Đổi sang mẫu mới là quyền, không bắt buộc."
+   "y": "Tám trường hợp được cấp đổi Giấy chứng nhận, đáng nhớ nhất: đổi Giấy chứng nhận cấp trước 01/8/2024 sang mẫu mới; Giấy chứng nhận ghi 'hộ gia đình' nay ghi đủ tên các thành viên; Giấy chứng nhận chỉ đứng tên vợ hoặc chồng nay ghi cả hai; mục đích sử dụng trên Giấy chứng nhận khác phân loại đất của Luật 2024; vị trí thửa trên Giấy chứng nhận không đúng thực tế. Hồ sơ: Đơn Mẫu số 11/ĐK + Giấy chứng nhận đã cấp.",
+   "nho": "Đơn Mẫu 11/ĐK + Giấy chứng nhận cũ. Đổi sang mẫu mới là quyền, không bắt buộc."
   },
   "nd101-2024:39": {
-   "y": "Cấp LẠI sổ do bị mất — khác cấp đổi. Phải khai báo, niêm yết thông báo mất, chờ đủ thời hạn rồi mới được cấp lại.",
-   "nho": "Mất sổ → cấp lại. Rách, sai thông tin → cấp đổi."
+   "y": "Cấp LẠI Giấy chứng nhận do bị mất — khác cấp đổi. Phải khai báo, niêm yết thông báo mất, chờ đủ thời hạn rồi mới được cấp lại.",
+   "nho": "Mất Giấy chứng nhận → cấp lại. Rách, sai thông tin → cấp đổi."
   },
   "nd102-2024:105": {
    "y": "Thủ tục hoà giải ở xã, có mốc ngày rõ ràng: 03 NGÀY LÀM VIỆC kể từ ngày nhận đơn xã phải thông báo cho các bên và cho Văn phòng đăng ký đất đai; xã phải thẩm tra nguồn gốc, quá trình sử dụng, hiện trạng; lập Hội đồng hoà giải; họp có mặt các bên. Sau khi hoà giải thành, trong 10 NGÀY nếu có bên gửi ý kiến khác thì phải họp lại Hội đồng.",

@@ -15,14 +15,21 @@ Chạy:  python tach-luat-pdf.py <chu.txt> <ma> <so-hieu> <ngay> "<ten>" <ra.jso
 """
 import sys, os, re, json
 
-RAC = re.compile(r'^\s*(CÔNG BÁO/Số.*|\d{1,4})\s*$')          # tiêu đề trang + số trang
+# Tiêu đề trang + số trang. Chú ý khoảng trắng sau dấu gạch: có bản in "CÔNG BÁO/Số 915",
+# bản khác lại "CÔNG BÁO/ Số 59 + 60" — thiếu \s* là dòng tiêu đề trang chui thẳng vào
+# giữa thân điều (đã vấp ở Thông tư 26 và 29/2024).
+RAC = re.compile(r'^\s*(CÔNG BÁO/\s*Số.*|\d{1,4})\s*$')
 # Dòng tiêu đề PHỤ LỤC đứng một mình ("Phụ lục", "Phụ lục I", "PHỤ LỤC II").
 # Phải đứng MỘT MÌNH mới tính: trong thân bài có đầy câu "...tại Phụ lục I ban hành
 # kèm theo Nghị định này" — cắt ở đó là mất nửa văn bản.
 RE_PHULUC = re.compile(r'^(PHỤ LỤC|Phụ lục)(\s+[IVXLC]+|\s+\d+)?\s*$')
 # Khối chữ ký cuối văn bản ("TM. CHÍNH PHỦ", "Nơi nhận:", "CHỦ TỊCH QUỐC HỘI"...).
 # Hết văn bản ở đây; không cắt thì cả khối chữ ký + phụ lục chui vào điều cuối cùng.
-RE_KY = re.compile(r'^(TM\.\s|KT\.\s|Nơi nhận\s*:|CHỦ TỊCH QUỐC HỘI|THỦ TƯỚNG CHÍNH PHỦ|BỘ TRƯỞNG)\b')
+# Phải khớp TRỌN DÒNG. Nếu chỉ khớp phần đầu dòng thì dính bẫy: Thông tư 10/2024 hướng dẫn
+# cách ghi Giấy chứng nhận có in sẵn dòng mẫu "TM. ỦY BAN NHÂN DÂN… (ghi tên đơn vị…)"
+# NẰM TRONG THÂN Điều 38 — cắt ở đó là mất trắng 7 điều cuối (38/45).
+RE_KY = re.compile(r'^(TM\. CHÍNH PHỦ|KT\. THỦ TƯỚNG CHÍNH PHỦ|THỦ TƯỚNG CHÍNH PHỦ'
+                   r'|CHỦ TỊCH QUỐC HỘI|KT\. BỘ TRƯỞNG|BỘ TRƯỞNG|Nơi nhận\s*:)\s*$')
 RE_DIEU = re.compile(r'^Điều\s+(\d{1,3})\s*\.\s*(.*)$')
 RE_CHUONG = re.compile(r'^Chương\s+([IVXLC]+)\s*$')
 RE_MUC = re.compile(r'^Mục\s+(\d+)\s*$')

@@ -35,9 +35,10 @@ RE_NGAY = re.compile(r'Hà Nội,\s*ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})\s+nă
 # ngày 29 tháng 6 năm 2024." -> đó mới là ngày ban hành của luật.
 RE_NGAY_LUAT = re.compile(r'thông qua\s+ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})\s+năm\s+(\d{4})')
 RE_XEM_TIEP = re.compile(r'\(\s*Xem tiếp Công báo số\s*([\d\s+]+)\)')
-RE_DAU_TRANG = re.compile(r'CÔNG BÁO/Số\s*([\d\s+]+)/')
+RE_DAU_TRANG = re.compile(r'CÔNG BÁO/\s*Số\s*([\d\s+]+)/')
 RE_TIEP_THEO = re.compile(r'^\(\s*Tiếp theo Công báo số[^)]*\)\s*$')
-CUOI_OK = re.compile(r'hiệu lực|trách nhiệm (thi hành|thực hiện)|điều khoản (thi hành|chuyển tiếp)', re.I)
+CUOI_OK = re.compile(r'hiệu lực|trách nhiệm (thi hành|thực hiện)|tổ chức thực hiện'
+                     r'|điều khoản (thi hành|chuyển tiếp)', re.I)
 
 
 def chuan_so(s):
@@ -146,6 +147,11 @@ def lam(cac_tep, so_mong, ma, ra_dir):
 # tên gốc của tệp -> (số hiệu mong đợi, mã dùng trên web)
 BANG = {
     'ldd2024': ('31/2024/QH15', 'ldd2024'),
+    '10-2024-TT-BTNMT': ('10/2024/TT-BTNMT', 'tt10-2024'),
+    '12-2024-TT-BTNMT': ('12/2024/TT-BTNMT', 'tt12-2024'),
+    '25-2024-TT-BTNMT': ('25/2024/TT-BTNMT', 'tt25-2024'),
+    '26-2024-TT-BTNMT': ('26/2024/TT-BTNMT', 'tt26-2024'),
+    '29-2024-TT-BTNMT': ('29/2024/TT-BTNMT', 'tt29-2024'),
     '71-2024-N-CP': ('71/2024/NĐ-CP', 'nd71-2024'),
     '88-2024-N-CP': ('88/2024/NĐ-CP', 'nd88-2024'),
     '101-2024-N-CP': ('101/2024/NĐ-CP', 'nd101-2024'),

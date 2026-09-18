@@ -1,0 +1,161 @@
+{
+ "canhBao": "ĐÂY KHÔNG PHẢI VĂN BẢN LUẬT. Phần này do người làm web viết lại cho dễ hiểu, dùng để học và nhớ nhanh. Khi làm hồ sơ, tranh luận hay ra quyết định thì phải căn cứ NGUYÊN VĂN ở khung bên cạnh, không được trích phần này.",
+ "muc": {
+  "ldd2024:9": {
+   "y": "Cả nước chỉ có 3 nhóm đất: nông nghiệp, phi nông nghiệp, chưa sử dụng — mọi loại đất cụ thể đều nằm trong một nhóm. Chia nhóm theo MỤC ĐÍCH SỬ DỤNG, không theo ai đang dùng hay đất tốt xấu.",
+   "nho": "3 nhóm: nông nghiệp · phi nông nghiệp · chưa sử dụng."
+  },
+  "ldd2024:10": {
+   "y": "Muốn biết thửa đất là loại gì thì xem giấy tờ trước: sổ đỏ, rồi đến quyết định giao đất / cho thuê đất / cho phép chuyển mục đích. Không có giấy tờ, hoặc giấy ghi một đằng thực tế một nẻo, thì xử theo quy định riêng của Chính phủ (Nghị định 102/2024).",
+   "nho": "Giấy tờ nói trước, hiện trạng nói sau."
+  },
+  "ldd2024:45": {
+   "y": "Muốn bán, cho thuê, tặng, để thừa kế, thế chấp hay góp vốn bằng đất thì phải đủ 5 điều: có sổ; không tranh chấp (hoặc tranh chấp đã được giải quyết xong); không bị kê biên để thi hành án; còn trong thời hạn sử dụng đất; không bị áp dụng biện pháp khẩn cấp tạm thời. Ai đang được ghi nợ nghĩa vụ tài chính thì phải trả xong mới được làm.",
+   "nho": "Có sổ · không tranh chấp · không kê biên · còn hạn · không bị phong toả."
+  },
+  "ldd2024:79": {
+   "y": "Đây là danh sách ĐÓNG gồm 31 trường hợp Nhà nước được thu hồi đất vì lợi ích quốc gia, công cộng: đường sá, thuỷ lợi, điện, trường, trạm, chợ, khu công nghiệp, khu đô thị, tái định cư, lấn biển… Dự án không có tên trong danh sách thì không thu hồi đất được; muốn thêm phải sửa luật (khoản 32).",
+   "nho": "Không có tên trong 31 khoản thì không thu hồi được."
+  },
+  "ldd2024:91": {
+   "y": "Nguyên tắc gốc của đền bù: bồi thường bằng ĐẤT CÙNG MỤC ĐÍCH trước đã; không có đất mới trả bằng tiền, theo giá đất cụ thể tại thời điểm phê duyệt phương án. Muốn nhận tiền thì phải đăng ký nguyện vọng ngay lúc lập phương án. Điều quan trọng nhất nằm ở khoản 6: phương án bồi thường và việc bố trí tái định cư phải HOÀN THÀNH TRƯỚC khi có quyết định thu hồi đất.",
+   "nho": "Đất đổi đất trước, tiền sau. Tái định cư xong mới được thu hồi."
+  },
+  "ldd2024:92": {
+   "y": "Dành cho các trường hợp đặc biệt: dự án do Quốc hội, Thủ tướng quyết mà phải di dời cả cộng đồng dân cư; tổ chức bị thu hồi đất nhưng không được bồi thường về đất; đơn vị vũ trang phải chuyển đi chỗ khác. Chi tiết giao Chính phủ quy định (Nghị định 88/2024).",
+   "nho": "Di dời cả cộng đồng thì có chính sách riêng."
+  },
+  "ldd2024:95": {
+   "y": "Muốn được bồi thường VỀ ĐẤT phải đủ hai vế. Vế một: đúng đối tượng ở khoản 1 (hộ gia đình, cá nhân không phải đất thuê trả tiền hằng năm; cộng đồng dân cư; tổ chức được giao đất có thu tiền…). Vế hai: có một trong các giấy tờ ở khoản 2 — sổ đỏ, quyết định giao/thuê/chuyển mục đích, giấy tờ theo Điều 137, hoặc đã nhận chuyển quyền hợp pháp mà chưa kịp sang tên.",
+   "nho": "Đúng đối tượng + có một loại giấy tờ = được bồi thường về đất."
+  },
+  "ldd2024:96": {
+   "y": "Đất nông nghiệp đủ điều kiện thì được bồi thường bằng đất nông nghiệp, hoặc tiền, hoặc đất khác mục đích, hoặc nhà ở. Nhưng diện tích được bồi thường chỉ tính phần TRONG HẠN MỨC (Điều 176, 177) cộng phần được thừa kế. Phần nhận chuyển nhượng vượt hạn mức trước ngày 01/7/2014 xử theo Nghị định 88/2024.",
+   "nho": "Chỉ bồi thường phần trong hạn mức + phần thừa kế."
+  },
+  "ldd2024:98": {
+   "y": "Đất ở đủ điều kiện thì được bồi thường bằng đất ở, hoặc nhà ở, hoặc tiền, hoặc đất khác mục đích — bốn cách, chọn theo quỹ đất của địa phương và nguyện vọng đã đăng ký. Chi tiết nằm ở Nghị định 88/2024.",
+   "nho": "Đất ở: đất · nhà · tiền · đất khác."
+  },
+  "ldd2024:101": {
+   "y": "Bốn nhóm không được bồi thường về đất: đất thuộc khoản 1 Điều 107 (giao không thu tiền, thuê trả tiền hằng năm…); đất do cơ quan nhà nước quản lý; đất bị thu hồi do vi phạm (Điều 81, 82); và đất không đủ điều kiện cấp sổ. Lưu ý: không được bồi thường VỀ ĐẤT không có nghĩa là mất trắng — vẫn có thể được bồi thường chi phí đầu tư vào đất (Điều 107), bồi thường tài sản trên đất và các khoản hỗ trợ.",
+   "nho": "Không bồi thường đất ≠ không được gì."
+  },
+  "ldd2024:102": {
+   "y": "Nhà ở và công trình phục vụ đời sống của hộ gia đình, cá nhân phải tháo dỡ thì được bồi thường bằng GIÁ TRỊ XÂY MỚI của công trình có tiêu chuẩn tương đương — không trừ hao mòn — và chủ nhà vẫn được lấy vật liệu cũ. Nhà, công trình khác thì chỉ tính giá xây mới khi phần còn lại không còn đạt tiêu chuẩn kỹ thuật, ngoài ra bồi thường theo thiệt hại thực tế. Đơn giá do UBND tỉnh ban hành và phải xem xét điều chỉnh khi thị trường biến động.",
+   "nho": "Nhà ở: tính theo giá XÂY MỚI, không trừ cũ."
+  },
+  "ldd2024:103": {
+   "y": "Cây hằng năm: tính bằng giá trị một vụ, lấy năng suất của vụ CAO NHẤT trong 3 năm liền kề trước đó. Cây lâu năm đang cho thu hoạch: tính phần sản lượng còn lại tương ứng số năm còn lại của chu kỳ. Cây chưa thu hoạch mà di chuyển được thì trả chi phí di chuyển và thiệt hại do phải trồng lại. Chủ cây, chủ vật nuôi được tự thu hồi trước khi bàn giao đất.",
+   "nho": "Cây hằng năm: một vụ, lấy năm được mùa nhất trong 3 năm."
+  },
+  "ldd2024:104": {
+   "y": "Phải di dời tài sản thì được trả chi phí tháo dỡ, vận chuyển và lắp đặt lại; riêng máy móc, dây chuyền sản xuất còn được bồi thường cả phần thiệt hại do tháo lắp. Mức cụ thể do UBND tỉnh quy định (Khánh Hoà: Quyết định 17/2024).",
+   "nho": "Tháo · chở · lắp — cả ba đều được trả."
+  },
+  "ldd2024:105": {
+   "y": "Bốn trường hợp tài sản trên đất KHÔNG được bồi thường. Đáng nhớ nhất là khoản 2: tài sản tạo lập trái pháp luật, hoặc tạo lập SAU KHI ĐÃ CÓ THÔNG BÁO THU HỒI ĐẤT. Nghĩa là xây thêm, trồng thêm để \"đón đền bù\" thì phần đó mất trắng.",
+   "nho": "Đã có thông báo thu hồi thì xây thêm không được đền."
+  },
+  "ldd2024:107": {
+   "y": "Những trường hợp không được bồi thường về đất — đất giao không thu tiền, đất thuê trả tiền hằng năm, đất công ích do xã cho thuê, đất nhận khoán, phần đất nông nghiệp giao vượt hạn mức… — thì vẫn được trả lại CHI PHÍ ĐÃ BỎ RA ĐẦU TƯ VÀO ĐẤT: san lấp mặt bằng, cải tạo độ màu mỡ, thau chua rửa mặn, gia cố nền.",
+   "nho": "Không được đền đất thì còn được đền công cải tạo đất."
+  },
+  "ldd2024:108": {
+   "y": "Ngoài tiền bồi thường còn 6 khoản HỖ TRỢ: ổn định đời sống; ổn định sản xuất, kinh doanh; di dời vật nuôi; đào tạo, chuyển đổi nghề và tìm việc làm; hỗ trợ tái định cư; hỗ trợ tháo dỡ, di dời. UBND tỉnh còn được quyết thêm khoản hỗ trợ khác cho từng dự án cụ thể.",
+   "nho": "6 khoản hỗ trợ, tỉnh được quyết thêm."
+  },
+  "ldd2024:109": {
+   "y": "Hộ gia đình, cá nhân TRỰC TIẾP SẢN XUẤT NÔNG NGHIỆP bị thu hồi đất nông nghiệp mà không có đất để bồi thường thì được hỗ trợ bằng tiền KHÔNG QUÁ 5 LẦN giá đất nông nghiệp cùng loại trong bảng giá đất, tính trên diện tích thu hồi nhưng không vượt hạn mức giao đất của địa phương. \"Không quá 5 lần\" là MỨC TRẦN của luật, còn mức thật do UBND tỉnh quyết — Khánh Hoà đang áp dụng 3 lần. Người thuộc diện bảo trợ xã hội, thương binh, gia đình liệt sĩ cũng được hưởng.",
+   "nho": "Trần 5 lần, tỉnh quyết mức thật — Khánh Hoà 3 lần."
+  },
+  "ldd2024:111": {
+   "y": "Phương án bố trí tái định cư phải được niêm yết công khai ÍT NHẤT 15 NGÀY tại trụ sở xã và nơi sinh hoạt chung của khu dân cư. Giá đất tính tiền sử dụng đất tại khu tái định cư lấy theo BẢNG GIÁ ĐẤT tại thời điểm phê duyệt phương án. Nếu tiền bồi thường đất ở không đủ so với giá trị một suất tái định cư tối thiểu thì Nhà nước hỗ trợ thêm cho đủ (khoản 8).",
+   "nho": "Không đủ tiền mua suất tối thiểu thì Nhà nước bù cho đủ."
+  },
+  "ldd2024:116": {
+   "y": "Giao đất, cho thuê đất qua đấu giá thì căn cứ là văn bản phê duyệt kết quả trúng đấu giá; qua đấu thầu thì là văn bản phê duyệt kết quả lựa chọn nhà đầu tư. Không đấu giá, không đấu thầu thì căn cứ vào KẾ HOẠCH SỬ DỤNG ĐẤT HẰNG NĂM CẤP HUYỆN. Riêng hộ gia đình, cá nhân xin chuyển đất nông nghiệp trong khu dân cư, hoặc đất nông nghiệp cùng thửa với đất ở, sang đất ở thì có căn cứ riêng ở khoản 5.",
+   "nho": "Không đấu giá thì phải có tên trong kế hoạch sử dụng đất năm."
+  },
+  "ldd2024:121": {
+   "y": "Bảy trường hợp phải XIN PHÉP mới được chuyển mục đích. Liên quan tới dân nhiều nhất là hai trường hợp: chuyển đất nông nghiệp sang đất phi nông nghiệp, và chuyển đất phi nông nghiệp không phải đất ở sang đất ở. Chuyển xong phải nộp nghĩa vụ tài chính và từ đó áp dụng chế độ của loại đất MỚI. Trường hợp không nằm trong 7 khoản đó thì không phải xin phép.",
+   "nho": "Nông nghiệp → phi nông nghiệp: luôn phải xin phép."
+  },
+  "ldd2024:123": {
+   "y": "Cá nhân xin giao đất, thuê đất, chuyển mục đích thì UBND CẤP HUYỆN quyết. Tổ chức trong nước, tổ chức tôn giáo, người gốc Việt Nam ở nước ngoài, doanh nghiệp có vốn nước ngoài thì UBND CẤP TỈNH quyết. Xã chỉ được cho thuê đất công ích. Thẩm quyền này KHÔNG được phân cấp, KHÔNG được uỷ quyền. Lưu ý: từ khi bỏ cấp huyện, việc phân lại thẩm quyền nằm ở Nghị định 151/2025 — tra ở văn bản đó.",
+   "nho": "Dân → huyện. Tổ chức → tỉnh. Không được uỷ quyền."
+  },
+  "ldd2024:138": {
+   "y": "Đất đang dùng ổn định, không có giấy tờ, không vi phạm, không phải đất giao sai thẩm quyền thì VẪN ĐƯỢC CẤP SỔ. Chia theo ba mốc thời gian: trước 18/12/1980; từ 18/12/1980 đến trước 15/10/1993; từ 15/10/1993 đến trước 01/7/2014 — dùng càng sớm càng có lợi. Điều kiện chung: UBND cấp xã xác nhận không có tranh chấp. Phần trong hạn mức công nhận đất ở thì được công nhận là đất ở, phần còn lại xác định theo hiện trạng.",
+   "nho": "Ba mốc 1980 · 1993 · 2014 — dùng càng lâu càng lợi."
+  },
+  "ldd2024:139": {
+   "y": "Lấn, chiếm TRƯỚC ngày 01/7/2014 mà nay đang sản xuất nông nghiệp hoặc làm nhà ở, không thuộc quy hoạch rừng phòng hộ, rừng đặc dụng hay công trình hạ tầng công cộng, thì vẫn có cửa được cấp sổ. Đất tự khai hoang không tranh chấp cũng được cấp trong hạn mức do tỉnh quy định. Nhưng lấn, chiếm TỪ 01/7/2014 TRỞ ĐI thì dứt khoát không cấp sổ và bị xử lý.",
+   "nho": "Mốc 01/7/2014: trước còn cửa, sau thì không."
+  },
+  "ldd2024:140": {
+   "y": "Đất ngày trước do xã, hợp tác xã… giao không đúng thẩm quyền thì nay vẫn được xét cấp sổ, chia theo mốc: trước 15/10/1993; từ 15/10/1993 đến trước 01/7/2004; từ 01/7/2004 đến trước 01/7/2014; và từ 01/7/2014 đến trước ngày Luật này có hiệu lực. Từ 01/7/2014 trở đi mà giao sai thẩm quyền thì không cấp sổ, trừ trường hợp ở khoản 4. Được cấp sổ vẫn phải nộp tiền sử dụng đất.",
+   "nho": "Giao sai thẩm quyền: còn gỡ được nếu trước 01/7/2014."
+  },
+  "ldd2024:141": {
+   "y": "Thửa đất có vườn, ao mà giấy tờ ghi là thổ cư / đất ở: nếu thửa hình thành trước 18/12/1980, hoặc từ 18/12/1980 đến trước 15/10/1993, mà diện tích NHỎ HƠN hạn mức công nhận đất ở thì TOÀN BỘ thửa được xác định là đất ở và không phải nộp tiền sử dụng đất cho phần đó. Lớn hơn hạn mức thì lấy theo diện tích ghi trong giấy tờ. Sổ đã cấp trước 01/7/2004 có thể xin xác định lại diện tích đất ở khi có nhu cầu hoặc khi Nhà nước thu hồi đất.",
+   "nho": "Đất cũ + nhỏ hơn hạn mức = cả thửa là đất ở."
+  },
+  "ldd2024:159": {
+   "y": "Bảng giá đất là bảng dùng cho việc của DÂN: tính tiền sử dụng đất khi công nhận đất ở, khi hộ gia đình - cá nhân chuyển mục đích; tính thuế, lệ phí, tiền phạt; tính tiền thuê đất trả hằng năm. Bảng giá mới do HĐND tỉnh quyết, công bố áp dụng từ 01/01/2026 và từ đó ĐIỀU CHỈNH HẰNG NĂM chứ không còn giữ 5 năm như trước.",
+   "nho": "Bảng giá = việc của dân. Từ 2026 sửa mỗi năm."
+  },
+  "ldd2024:160": {
+   "y": "Giá đất cụ thể mới là giá dùng để TÍNH TIỀN BỒI THƯỜNG KHI NHÀ NƯỚC THU HỒI ĐẤT, và để tính tiền giao đất cho tổ chức, tiền thuê trả một lần, giá khởi điểm đấu giá. Do Chủ tịch UBND tỉnh hoặc Chủ tịch UBND huyện quyết theo từng trường hợp, được thuê tổ chức tư vấn định giá.",
+   "nho": "Đền bù thì dùng GIÁ CỤ THỂ, không phải bảng giá."
+  },
+  "ldd2024:171": {
+   "y": "Danh sách các loại đất KHÔNG CÓ THỜI HẠN: đất ở; đất rừng đặc dụng, rừng phòng hộ; đất quốc phòng, an ninh; đất tín ngưỡng; đất công cộng không có mục đích kinh doanh; đất nghĩa trang… Với người dân thì điều cần nhớ là ĐẤT Ở dùng ổn định lâu dài, không phải đi gia hạn bao giờ.",
+   "nho": "Đất ở = lâu dài, không phải gia hạn."
+  },
+  "ldd2024:172": {
+   "y": "Ngoài các loại ở Điều 171 thì đều có thời hạn. Đất nông nghiệp giao cho cá nhân trực tiếp sản xuất: 50 năm, hết hạn mà vẫn đang dùng thì được tiếp tục, KHÔNG phải làm thủ tục gia hạn. Thuê đất nông nghiệp tối đa 50 năm. Đất cho dự án đầu tư thì theo thời hạn của dự án, có mức trần. Các trường hợp còn lại muốn gia hạn phải nộp hồ sơ CHẬM NHẤT 6 THÁNG trước khi hết hạn.",
+   "nho": "Xin gia hạn chậm nhất 6 tháng trước khi hết hạn."
+  },
+  "ldd2024:176": {
+   "y": "Hạn mức Nhà nước GIAO đất nông nghiệp cho cá nhân trực tiếp sản xuất: đất trồng cây hằng năm, nuôi trồng thuỷ sản, làm muối không quá 2 ha mỗi loại (riêng Đông Nam Bộ và đồng bằng sông Cửu Long là 3 ha) — Khánh Hoà thuộc mức 2 ha. Cây lâu năm: không quá 10 ha với xã, phường ở đồng bằng và 30 ha với xã ở trung du, miền núi. Đất do nhận chuyển nhượng, thuê, thừa kế, tặng cho, nhận khoán thì KHÔNG tính vào hạn mức này.",
+   "nho": "Khánh Hoà: 2 ha cây hằng năm. Đất mua không tính vào hạn mức giao."
+  },
+  "ldd2024:177": {
+   "y": "Cá nhân được nhận chuyển nhượng, nhận tặng cho đất nông nghiệp tối đa 15 LẦN hạn mức giao đất của loại đất đó — rộng hơn hẳn luật cũ. UBND tỉnh quy định mức cụ thể cho địa phương mình.",
+   "nho": "Trần 15 lần hạn mức giao."
+  },
+  "ldd2024:190": {
+   "y": "Lấn biển được Nhà nước khuyến khích nhưng phải lập thành DỰ ÁN ĐẦU TƯ, phù hợp quy hoạch và đánh giá đầy đủ về kinh tế - xã hội - môi trường. Nếu có phần diện tích chạm vào di tích, di sản thiên nhiên, vườn quốc gia, khu bảo tồn biển, cảng cá, khu vực cảng biển, cửa sông hay đất quốc phòng thì phải được QUỐC HỘI hoặc THỦ TƯỚNG chấp thuận chủ trương đầu tư. Chi tiết ở Nghị định 42/2024.",
+   "nho": "Lấn biển phải có dự án, không ai tự làm được."
+  },
+  "ldd2024:195": {
+   "y": "Đất ở tại nông thôn là đất làm nhà VÀ các mục đích khác phục vụ đời sống trong cùng một thửa. Hạn mức giao đất ở cho cá nhân do UBND TỈNH quy định theo quỹ đất từng nơi. Luật hướng tới tận dụng đất trong khu dân cư sẵn có, hạn chế mở rộng khu dân cư lấn vào đất nông nghiệp.",
+   "nho": "Hạn mức đất ở do tỉnh quyết."
+  },
+  "ldd2024:196": {
+   "y": "Đất ở tại đô thị cũng là đất làm nhà và mục đích phục vụ đời sống trong cùng thửa; hạn mức giao do UBND TỈNH quy định, thường khác mức ở nông thôn. Chuyển đất ở sang đất sản xuất, kinh doanh phải phù hợp quy hoạch và đúng quy định về trật tự, an toàn, môi trường.",
+   "nho": "Đô thị và nông thôn có hai hạn mức khác nhau."
+  },
+  "ldd2024:218": {
+   "y": "Điểm mới của Luật 2024: một thửa được dùng KẾT HỢP nhiều mục đích — đất nông nghiệp kết hợp thương mại, dịch vụ, chăn nuôi, trồng dược liệu; đất ở kết hợp nông nghiệp, thương mại, dịch vụ… Điều kiện: không làm đổi loại đất đã ghi trên sổ, không làm mất khả năng quay lại mục đích chính, không ảnh hưởng thửa liền kề, nộp đủ nghĩa vụ tài chính, và phải LẬP PHƯƠNG ÁN trình cơ quan có thẩm quyền duyệt.",
+   "nho": "Làm thêm được, nhưng loại đất trên sổ vẫn giữ nguyên."
+  },
+  "ldd2024:219": {
+   "y": "Cách làm mới: những người có đất trong một khu tự nguyện GÓP ĐẤT lại để sắp xếp, chỉnh trang rồi chia lại — dùng cho dồn điền đổi thửa, chỉnh trang khu dân cư nông thôn và đô thị. Điều kiện cốt lõi là SỰ ĐỒNG THUẬN của người sử dụng đất, không phải cưỡng chế.",
+   "nho": "Góp đất chỉnh trang — phải đồng thuận."
+  },
+  "ldd2024:220": {
+   "y": "Điều kiện chung để tách hoặc hợp thửa: đã có sổ; còn thời hạn sử dụng; không tranh chấp, không bị kê biên; và phải BẢO ĐẢM CÓ LỐI ĐI nối được ra đường giao thông công cộng, có cấp nước, thoát nước. Tách thửa còn phải đạt DIỆN TÍCH TỐI THIỂU do UBND TỈNH quy định cho từng loại đất. Chuyển mục đích một phần thửa thì phải tách thửa. Chia đất theo bản án của Toà mà không đủ điều kiện tách thì không tách được.",
+   "nho": "Có lối đi + đủ diện tích tối thiểu của tỉnh."
+  },
+  "ldd2024:235": {
+   "y": "BẮT BUỘC hoà giải tại UBND CẤP XÃ nơi có đất trước khi đưa tranh chấp lên cơ quan có thẩm quyền. Chủ tịch xã lập Hội đồng hoà giải, làm xong trong không quá 30 ngày kể từ ngày nhận đơn, và phải có biên bản ghi rõ hoà giải thành hay không thành. Hoà giải thành mà có thay đổi ranh giới, diện tích, người sử dụng đất thì trong 30 ngày làm việc các bên phải đi làm thủ tục đăng ký.",
+   "nho": "Chưa hoà giải ở xã thì chưa đưa đi đâu được."
+  },
+  "ldd2024:236": {
+   "y": "CÓ SỔ (hoặc có giấy tờ theo Điều 137, hoặc tranh chấp về tài sản gắn liền với đất) thì TOÀ ÁN giải quyết. KHÔNG CÓ SỔ thì được chọn một trong hai: nộp đơn lên UBND, hoặc khởi kiện ra Toà. Chọn UBND thì tranh chấp giữa hộ gia đình, cá nhân, cộng đồng dân cư với nhau do Chủ tịch UBND cấp huyện giải quyết; có tổ chức hoặc yếu tố nước ngoài thì lên cấp tỉnh.",
+   "nho": "Có sổ → Toà. Không sổ → chọn UBND hoặc Toà."
+  }
+ }
+}

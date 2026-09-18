@@ -64,6 +64,14 @@
   "kb": 358
  },
  {
+  "ma": "tt10-2024",
+  "soHieu": "10/2024/TT-BTNMT",
+  "ngay": "2024-07-31",
+  "ten": "Quy định về hồ sơ địa chính, Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất",
+  "soDieu": 45,
+  "kb": 244
+ },
+ {
   "ma": "nd104-2024",
   "soHieu": "104/2024/NĐ-CP",
   "ngay": "2024-07-31",
@@ -72,12 +80,44 @@
   "kb": 70
  },
  {
+  "ma": "tt12-2024",
+  "soHieu": "12/2024/TT-BTNMT",
+  "ngay": "2024-07-31",
+  "ten": "Quy định chi tiết về đào tạo, bồi dưỡng, cập nhật kiến thức cho cá nhân hành nghề tư vấn định giá đất; khung chương trình đào tạo, bồi dưỡng nghiệp vụ về giá đất",
+  "soDieu": 9,
+  "kb": 38
+ },
+ {
   "ma": "nd123-2024",
   "soHieu": "123/2024/NĐ-CP",
   "ngay": "2024-10-04",
   "ten": "Quy định về xử phạt vi phạm hành chính trong lĩnh vực đất đai",
   "soDieu": 36,
   "kb": 109
+ },
+ {
+  "ma": "tt25-2024",
+  "soHieu": "25/2024/TT-BTNMT",
+  "ngay": "2024-11-26",
+  "ten": "Quy định về quy trình xây dựng cơ sở dữ liệu quốc gia về đất đai",
+  "soDieu": 142,
+  "kb": 205
+ },
+ {
+  "ma": "tt26-2024",
+  "soHieu": "26/2024/TT-BTNMT",
+  "ngay": "2024-11-26",
+  "ten": "Quy định kỹ thuật về đo đạc lập bản đồ địa chính",
+  "soDieu": 29,
+  "kb": 248
+ },
+ {
+  "ma": "tt29-2024",
+  "soHieu": "29/2024/TT-BTNMT",
+  "ngay": "2024-12-12",
+  "ten": "Quy định kỹ thuật về lập, điều chỉnh quy hoạch, kế hoạch sử dụng đất",
+  "soDieu": 65,
+  "kb": 129
  },
  {
   "ma": "nd151-2025",

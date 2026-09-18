@@ -19,8 +19,8 @@ from urllib.request import urlopen, Request
 GOC = 'https://congbao.chinhphu.vn'
 UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36',
       'Referer': GOC + '/'}
-LOAI = {'NĐ-CP': 'nghi-dinh-l1', 'TT-BTNMT': 'thong-tu-l3', 'TT-BTC': 'thong-tu-l3',
-        'TT-BNNMT': 'thong-tu-l3', 'QH15': 'luat-l13', 'QH14': 'luat-l13'}
+LOAI = {'NĐ-CP': 'nghi-dinh-l1', 'TT-BTNMT': 'thong-tu-l3', 'TT-BNNMT': 'thong-tu-l3',
+        'TT-BTC': 'thong-tu-l3', 'QH15': 'luat-l13', 'QH14': 'luat-l13'}
 RA = os.environ.get('KHO_CB', os.path.join(os.path.dirname(os.path.abspath(__file__)), '_congbao'))
 
 
@@ -37,26 +37,42 @@ def lay(url, lan=3):
 
 
 def slug(so_hieu):
-    """'88/2024/NĐ-CP' -> 'nghi-dinh-so-88-2024-nd-cp' (phần đầu của đường dẫn Công báo)."""
+    """'88/2024/NĐ-CP' -> '88-2024-nd-cp' (phần đuôi của đường dẫn Công báo).
+
+    CHÚ Ý SỐ 0 ĐỨNG ĐẦU: bản gốc ghi 'Thông tư số 09/2024/TT-BTNMT' nhưng đường dẫn
+    Công báo lại là 'thong-tu-so-9-2024-tt-btnmt' — bỏ số 0. Không bỏ theo thì tìm
+    mãi không ra (đã vấp, quét 90 trang vẫn trượt cả 4 thông tư)."""
     s = so_hieu.replace('Đ', 'd').replace('đ', 'd')
     s = re.sub(r'[^0-9A-Za-z]+', '-', s).strip('-').lower()
-    return s
+    return re.sub(r'^0+(?=\d)', '', s)
 
 
-def tim_duong(so_hieu, toi_da_trang=90):
+def tim_duong(so_hieu, toi_da_trang=int(os.environ.get("CB_TRANG", "220"))):
     """Lật danh sách theo loại, tìm đường dẫn văn bản có số hiệu này."""
     duoi = so_hieu.split('/')[-1]
     ds = LOAI.get(duoi)
     if not ds:
         ds = 'nghi-quyet-l6' if 'NQ' in duoi else 'quyet-dinh-l2'
     can = slug(so_hieu)
+    hut = 0                     # số trang liên tiếp lấy về rỗng
     for p in range(1, toi_da_trang + 1):
         # Phân trang của Công báo là /trang-N.htm chứ KHÔNG phải ?page=N — dùng ?page= thì
         # trang nào cũng trả về y hệt trang 1, tìm mãi không ra (đã vấp).
         duong = '%s/van-ban-dang-cong-bao/%s.htm' % (GOC, ds) if p == 1 else '%s/van-ban-dang-cong-bao/%s/trang-%d.htm' % (GOC, ds, p)
         t = lay(duong).decode('utf-8', 'replace')
         if not t:
-            break
+            # MỘT trang lỗi mạng KHÔNG được coi là hết danh sách. Trước đây cứ trang nào
+            # lấy về rỗng là dừng luôn -> tìm Luật Đất đai 2013 (nằm ở trang 27) mà báo
+            # "không thấy", vì lỡ đứt mạng ở một trang nào đó trước đó. Phải rỗng liên
+            # tiếp 3 trang mới tin là hết.
+            hut += 1
+            if hut >= 6:
+                sys.stderr.write('  [!] %s: 6 trang lien tiep khong lay duoc (bi chan?), dung o trang %d\n' % (so_hieu, p))
+                break
+            time.sleep(2.0 * hut)        # bị chặn thì nghỉ dài dần rồi thử tiếp
+            continue
+        hut = 0
+        time.sleep(0.25)                 # quét thưa tay cho khỏi bị chặn
         for u in sorted(set(re.findall(r'href="(/van-ban/[^"#]+\.htm)"', t))):
             # PHAI so ca cum '-so-<so hieu>' chu khong so moi so hieu: tim '71-2024-nd-cp'
             # thi no khop luon vao '171-2024-nd-cp' -> tai nham Nghi dinh 171 ve ma tuong la 71.

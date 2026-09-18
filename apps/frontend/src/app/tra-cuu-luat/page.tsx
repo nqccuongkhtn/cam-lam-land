@@ -23,16 +23,21 @@ type Dieu = { so: number; tieuDe: string; chuong: string; chuongTen: string; muc
 type VanBan = { ma: string; soHieu: string; ngay: string; ten: string; nguon: string; phuLuc?: string; chuong: { so: string; ten: string }[]; dieu: Dieu[] };
 
 type KhoItem = { ma: string; soHieu: string; ngay: string; ten: string; soDieu: number };
+// Giải thích do người làm web viết, KHÔNG phải chữ luật — luôn để trong khung riêng, màu khác.
+type GiaiThich = { canhBao: string; muc: Record<string, { y: string; nho: string }> };
 type VanBanNgan = { id: number; loai: string; so: string; ten: string; tep: string[]; link: string };
 
 // Bỏ dấu để gõ "dat dai" vẫn ra "đất đai".
 const kd = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
 
-// Nhãn ngắn hiện trên nút chọn văn bản: "31/2024/QH15" -> "Luật Đất đai 2024", "88/2024/NĐ-CP" -> "NĐ 88/2024".
+// Nhãn ngắn hiện trên nút chọn văn bản: "31/2024/QH15" -> "Luật Đất đai 2024",
+// "88/2024/NĐ-CP" -> "NĐ 88/2024", "10/2024/TT-BTNMT" -> "TT 10/2024".
 const nhanNgan = (ma: string, soHieu: string) => {
   if (ma === 'ldd2024') return 'Luật Đất đai 2024';
+  if (ma === 'ldd2013') return 'Luật Đất đai 2013';
   const [so, nam, loai] = (soHieu || '').split('/');
   if (loai && loai.startsWith('QH')) return `Luật ${so}/${nam}`;
+  if (loai && loai.startsWith('TT')) return `TT ${so}/${nam}`;
   return `NĐ ${so}/${nam}`;
 };
 const ngayVn = (s: string) => (s ? s.split('-').reverse().join('/') : '');
@@ -73,6 +78,8 @@ export default function TraCuuLuatPage() {
   const [moChuong, setMoChuong] = useState<Record<string, boolean>>({});
   const [ghim, setGhim] = useState<string[]>([]);
   const [chiGhim, setChiGhim] = useState(false);
+  const [gt, setGt] = useState<GiaiThich | null>(null);
+  const [chiGt, setChiGt] = useState(false);
   const [the, setThe] = useState<'luat' | 'danhmuc'>('luat');
   const [dm, setDm] = useState<VanBanNgan[]>([]);
   const [timDm, setTimDm] = useState('');
@@ -96,6 +103,7 @@ export default function TraCuuLuatPage() {
   useEffect(() => {
     if (!duocXem) return;
     fetch('/luat/_kho.json').then((r) => r.json()).then((ds: KhoItem[]) => setKho(ds)).catch(() => {});
+    fetch('/luat/giai-thich.json').then((r) => r.json()).then((d: GiaiThich) => setGt(d)).catch(() => {});
   }, [duocXem]);
 
   useEffect(() => {
@@ -151,6 +159,7 @@ export default function TraCuuLuatPage() {
     // Tìm cả kho: xếp theo thứ tự văn bản trong danh mục để kết quả không nhảy lung tung.
     let ds = timCaKho ? kho.flatMap((x) => chiMuc[x.ma] || []) : (chiMuc[maVb] || []);
     if (chiGhim) ds = ds.filter((x) => ghim.includes(khoaGhim(x.ma, x.d.so)));
+    if (chiGt) ds = ds.filter((x) => !!gt?.muc[khoaGhim(x.ma, x.d.so)]);
     if (!q) return ds;
     // Gõ "điều 75" hay "75" -> nhảy thẳng tới điều đó
     const soDieu = /^(?:dieu\s*)?(\d{1,3})$/.exec(q);
@@ -160,7 +169,7 @@ export default function TraCuuLuatPage() {
       if (t.length) return t;
     }
     return ds.filter((x) => x.kho.includes(q));
-  }, [chiMuc, tim, chiGhim, ghim, timCaKho, maVb, kho]);
+  }, [chiMuc, tim, chiGhim, chiGt, gt, ghim, timCaKho, maVb, kho]);
 
   const dieuDangXem = useMemo(() => (vb && chon != null ? vb.dieu.find((d) => d.so === chon) || null : null), [vb, chon]);
 
@@ -320,6 +329,12 @@ export default function TraCuuLuatPage() {
             className={`rounded-full border px-2.5 py-1 text-[12px] font-bold transition ${chiGhim ? 'border-amber-500 bg-amber-500 text-white' : 'border-amber-300 bg-amber-50 text-amber-700'}`}>
             ⭐ Điều đã ghim ({ghim.length})
           </button>
+          {gt && (
+            <button onClick={() => { setChiGt((v) => !v); setChon(null); setXemPhuLuc(false); }}
+              className={`rounded-full border px-2.5 py-1 text-[12px] font-bold transition ${chiGt ? 'border-sky-600 bg-sky-600 text-white' : 'border-sky-300 bg-sky-50 text-sky-700'}`}>
+              💡 Điều có giải thích ({Object.keys(gt.muc).length})
+            </button>
+          )}
         </div>
       </div>
 
@@ -331,15 +346,15 @@ export default function TraCuuLuatPage() {
           {/* ── CỘT TRÁI: cây chương → điều, hoặc kết quả tìm ── */}
           <div className="max-h-[70vh] overflow-y-auto rounded-xl border border-slate-200 bg-white">
             <p className="sticky top-0 z-10 border-b bg-slate-50/95 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-500 backdrop-blur">
-              {tim || chiGhim ? `${ketQua.length} điều khớp${timCaKho ? ' · cả kho' : ''}` : `${vb.chuong.length} chương · ${vb.dieu.length} điều`}
+              {tim || chiGhim || chiGt ? `${ketQua.length} điều khớp${timCaKho ? ' · cả kho' : ''}` : `${vb.chuong.length} chương · ${vb.dieu.length} điều`}
             </p>
-            {tim || chiGhim ? (
+            {tim || chiGhim || chiGt ? (
               ketQua.length === 0
                 ? <p className="p-3 text-[13px] text-slate-400">Không tìm thấy điều nào. Thử từ khoá khác, gõ số điều, hoặc bật <b>Tìm cả kho</b>.</p>
                 : ketQua.map((x) => (
                   <button key={x.ma + ':' + x.d.so} onClick={() => moDieu(x.ma, x.d.so)}
                     className={`block w-full border-b border-slate-100 px-3 py-2 text-left hover:bg-slate-50 ${x.ma === maVb && chon === x.d.so ? 'bg-[#0A2540]/[0.05]' : ''}`}>
-                    <span className="block text-[13px] font-bold text-[#0A2540]">{ghim.includes(khoaGhim(x.ma, x.d.so)) ? '⭐ ' : ''}Điều {x.d.so}. {x.d.tieuDe}</span>
+                    <span className="block text-[13px] font-bold text-[#0A2540]">{ghim.includes(khoaGhim(x.ma, x.d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(x.ma, x.d.so)] ? '💡 ' : ''}Điều {x.d.so}. {x.d.tieuDe}</span>
                     <span className="block text-[11px] text-slate-400">
                       {timCaKho && <span className="mr-1 rounded bg-slate-100 px-1 font-bold text-slate-500">{nhanNgan(x.ma, cacVb[x.ma]?.soHieu || '')}</span>}
                       {x.d.chuong ? <>Chương {x.d.chuong}{x.d.muc ? ` · Mục ${x.d.muc}` : ''}</> : null}
@@ -364,7 +379,7 @@ export default function TraCuuLuatPage() {
                     {mo && ds.map((d) => (
                       <button key={d.so} onClick={() => moDieu(vb.ma, d.so)}
                         className={`block w-full px-3 py-1.5 pl-8 text-left text-[12.5px] hover:bg-slate-50 ${chon === d.so ? 'bg-[#0A2540]/[0.05] font-semibold' : 'text-slate-600'}`}>
-                        {ghim.includes(khoaGhim(vb.ma, d.so)) ? '⭐ ' : ''}Điều {d.so}. {d.tieuDe}
+                        {ghim.includes(khoaGhim(vb.ma, d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(vb.ma, d.so)] ? '💡 ' : ''}Điều {d.so}. {d.tieuDe}
                       </button>
                     ))}
                   </div>
@@ -410,7 +425,23 @@ export default function TraCuuLuatPage() {
                     className="shrink-0 rounded-lg border border-slate-200 px-2 py-1 text-[12px] font-semibold text-slate-500">⧉ Chép</button>
                 </div>
 
-                <div className="mt-3 space-y-2.5 text-[14px] leading-relaxed text-slate-800">
+                {/* KHUNG GIẢI THÍCH — màu khác hẳn, ghi rõ không phải chữ luật, để người đọc
+                    không bao giờ lẫn với nguyên văn bên dưới. */}
+                {gt?.muc[khoaGhim(vb.ma, dieuDangXem.so)] && (
+                  <div className="mt-3 rounded-xl border-2 border-dashed border-sky-300 bg-sky-50/70 p-3">
+                    <p className="text-[10.5px] font-bold uppercase tracking-wide text-sky-700">
+                      💡 Giải thích nhanh — KHÔNG PHẢI VĂN BẢN LUẬT
+                    </p>
+                    <p className="mt-1 text-[13.5px] leading-relaxed text-slate-700">{gt.muc[khoaGhim(vb.ma, dieuDangXem.so)].y}</p>
+                    <p className="mt-1.5 rounded-lg bg-white/80 px-2 py-1 text-[13px] font-semibold text-sky-800">
+                      Nhớ nhanh: {gt.muc[khoaGhim(vb.ma, dieuDangXem.so)].nho}
+                    </p>
+                    <p className="mt-1.5 text-[10.5px] leading-snug text-slate-400">{gt.canhBao}</p>
+                  </div>
+                )}
+
+                <p className="mt-3 text-[10.5px] font-bold uppercase tracking-wide text-slate-400">Nguyên văn</p>
+                <div className="mt-1 space-y-2.5 text-[14px] leading-relaxed text-slate-800">
                   {dieuDangXem.khoan.map((k, i) => (
                     <div key={i}>
                       <p className="whitespace-pre-line">

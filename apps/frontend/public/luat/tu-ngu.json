@@ -1,0 +1,601 @@
+{
+ "tu": [
+  {
+   "tu": "Bản đồ hiện trạng sử dụng đất",
+   "nghia": "bản đồ thể hiện sự phân bố các loại đất tại một thời điểm xác định, được lập theo từng đơn vị hành chính các cấp, theo từng vùng kinh tế - xã hội.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 2
+  },
+  {
+   "tu": "Bản đồ hành chính",
+   "nghia": "bản đồ thể hiện ranh giới các đơn vị hành chính kèm theo địa danh và một số yếu tố chính về tự nhiên, kinh tế, xã hội.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 10
+  },
+  {
+   "tu": "Bản đồ quy hoạch sử dụng đất",
+   "nghia": "bản đồ được lập tại thời điểm đầu kỳ quy hoạch, thể hiện nội dung phân bố các loại đất tại thời điểm cuối kỳ quy hoạch của quy hoạch đó.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 3
+  },
+  {
+   "tu": "Bản đồ địa chính",
+   "nghia": "bản đồ thể hiện các thửa đất và các đối tượng địa lý có liên quan, lập theo đơn vị hành chính cấp xã hoặc theo đơn vị hành chính cấp huyện nơi không thành lập đơn vị hành chính cấp xã, được cơ quan nhà nước có thẩm quyền xác nhận.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 1
+  },
+  {
+   "tu": "Bản đồ địa giới hành chính",
+   "nghia": "bản đồ thể hiện các mốc địa giới hành chính và các yếu tố địa vật, địa hình có liên quan đến mốc địa giới hành chính.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 9
+  },
+  {
+   "tu": "Bảo vệ, cải tạo, phục hồi đất",
+   "nghia": "việc áp dụng các biện pháp quản lý, kỹ thuật, cơ giới, sinh học, hữu cơ tác động vào đất để xử lý đất bị ô nhiễm, phục hồi đất bị thoái hóa.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 4
+  },
+  {
+   "tu": "Bồi thường khi Nhà nước thu hồi đất",
+   "nghia": "việc Nhà nước trả lại giá trị quyền sử dụng đất đối với diện tích đất bị thu hồi cho người bị thu hồi đất.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 6
+  },
+  {
+   "tu": "Bồi thường về đất",
+   "nghia": "việc Nhà nước trả lại giá trị quyền sử dụng đất của diện tích đất thu hồi cho người có đất thu hồi.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 5
+  },
+  {
+   "tu": "Chi phí đầu tư vào đất còn lại",
+   "nghia": "chi phí hợp lý mà người sử dụng đất đã đầu tư trực tiếp vào đất phù hợp với mục đích sử dụng đất nhưng đến thời điểm Nhà nước thu hồi đất còn chưa thu hồi hết.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 7
+  },
+  {
+   "tu": "Chiếm đất",
+   "nghia": "việc sử dụng đất do Nhà nước đã quản lý mà chưa được cơ quan nhà nước có thẩm quyền cho phép hoặc sử dụng đất của người sử dụng đất hợp pháp khác mà chưa được người đó cho phép.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 9
+  },
+  {
+   "tu": "Chuyển mục đích sử dụng đất",
+   "nghia": "việc người sử dụng đất được thay đổi từ mục đích sử dụng đất này sang mục đích sử dụng đất khác theo quy định của Luật này.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 11
+  },
+  {
+   "tu": "Chuyển nhượng trên thị trường",
+   "nghia": "chuyển nhượng quyền sử dụng đất hoặc chuyển nhượng quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất khi đã thực hiện thủ tục về thuế, phí, lệ phí tại cơ quan thuế hoặc đã đăng ký biến động tại văn phòng đăng ký đất đai hoặc đã ký hợp đồng chuyển nhượng giữa chủ đầu tư dự án bất động sản, nhà ở thương mại với khách hàng theo quy định của pháp luật.",
+   "ma": "nd71-2024",
+   "soHieu": "71/2024/NĐ-CP",
+   "dieu": 3,
+   "khoan": 1
+  },
+  {
+   "tu": "Chuyển quyền sử dụng đất",
+   "nghia": "việc chuyển giao quyền sử dụng đất từ người này sang người khác thông qua hình thức chuyển đổi, chuyển nhượng, thừa kế, tặng cho quyền sử dụng đất, góp vốn bằng quyền sử dụng đất.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 12
+  },
+  {
+   "tu": "Chỉ tiêu sử dụng đất",
+   "nghia": "diện tích đất của từng loại đất được xác định trong quy hoạch, kế hoạch sử dụng đất các cấp do cơ quan nhà nước có thẩm quyền xác định để phân bổ trong quá trình lập quy hoạch, kế hoạch sử dụng đất.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 8
+  },
+  {
+   "tu": "Chủ đầu tư dự án đầu tư có sử dụng đất",
+   "nghia": "nhà đầu tư theo quy định của pháp luật về đầu tư, pháp luật có liên quan đã được lựa chọn để thực hiện dự án đầu tư có sử dụng đất và được giao đất, cho thuê đất, chuyển mục đích sử dụng đất theo quy định của Luật này.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 10
+  },
+  {
+   "tu": "Cá nhân trực tiếp sản xuất nông nghiệp",
+   "nghia": "cá nhân đã được Nhà nước giao đất, cho thuê đất, công nhận quyền sử dụng đất nông nghiệp; nhận chuyển quyền sử dụng đất nông nghiệp mà có thu nhập từ sản xuất nông nghiệp trên đất đó theo quy định của Chính phủ.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 6
+  },
+  {
+   "tu": "Cơ sở dữ liệu quốc gia về đất đai",
+   "nghia": "tập hợp các cơ sở dữ liệu đất đai trong đó dữ liệu được sắp xếp, tổ chức để truy cập, khai thác, chia sẻ, quản lý và cập nhật thông qua phương tiện điện tử.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 14
+  },
+  {
+   "tu": "Cơ sở dữ liệu đất đai",
+   "nghia": "tập hợp các dữ liệu đất đai được sắp xếp, tổ chức để truy cập, khai thác, quản lý và cập nhật thông qua phương tiện điện tử.",
+   "ma": "ldd2013",
+   "soHieu": "45/2013/QH13",
+   "dieu": 3,
+   "khoan": 23
+  },
+  {
+   "tu": "Cộng đồng dân cư",
+   "nghia": "cộng đồng người Việt Nam sinh sống trên cùng địa bàn thôn, làng, ấp, bản, bon, buôn, phum, sóc, tổ dân phố và điểm dân cư tương tự có cùng phong tục, tập quán hoặc có chung dòng họ trên lãnh thổ nước Cộng hòa xã hội chủ nghĩa Việt Nam.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 13
+  },
+  {
+   "tu": "Gia hạn sử dụng đất",
+   "nghia": "việc cơ quan nhà nước có thẩm quyền cho phép tiếp tục sử dụng đất khi hết thời hạn theo mục đích đang sử dụng theo quy định của Luật này.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 18
+  },
+  {
+   "tu": "Giá quyền sử dụng đất",
+   "nghia": "số tiền tính trên một đơn vị diện tích đất do Nhà nước quy định hoặc được hình thành trong giao dịch về quyền sử dụng đất.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 23
+  },
+  {
+   "tu": "Giá trị quyền sử dụng đất",
+   "nghia": "giá trị bằng tiền của quyền sử dụng đất đối với một diện tích đất, loại đất tại thời điểm được xác định với thời hạn sử dụng đã được xác định.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 20
+  },
+  {
+   "tu": "Giá đất",
+   "nghia": "giá trị của quyền sử dụng đất tính bằng tiền trên một đơn vị diện tích đất.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 19
+  },
+  {
+   "tu": "Giấy chứng nhận quyền sử dụng đất",
+   "nghia": "giấy chứng nhận do cơ quan nhà nước có thẩm quyền cấp cho người sử dụng đất để bảo hộ quyền và lợi ích hợp pháp của người sử dụng đất.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 20
+  },
+  {
+   "tu": "Góp vốn bằng quyền sử dụng đất",
+   "nghia": "sự thỏa thuận giữa các bên về chuyển quyền sử dụng đất thông qua việc góp quyền sử dụng đất để tạo thành vốn điều lệ của tổ chức kinh tế, bao gồm góp vốn để thành lập tổ chức kinh tế hoặc góp thêm vốn điều lệ của tổ chức kinh tế đã được thành lập.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 22
+  },
+  {
+   "tu": "Hệ thống thông tin quốc gia về đất đai",
+   "nghia": "hệ thống tổng hợp các yếu tố hạ tầng kỹ thuật công nghệ thông tin, phần mềm, dữ liệu được xây dựng thành một hệ thống tập trung, thống nhất trên phạm vi cả nước để quản lý, vận hành, cập nhật, khai thác thông tin đất đai.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 23
+  },
+  {
+   "tu": "Hệ thống thông tin đất đai",
+   "nghia": "hệ thống tổng hợp các yếu tố hạ tầng kỹ thuật công nghệ thông tin, phần mềm, dữ liệu và quy trình, thủ tục được xây dựng để thu thập, lưu trữ, cập nhật, xử lý, phân tích, tổng hợp và truy xuất thông tin đất đai.",
+   "ma": "ldd2013",
+   "soHieu": "45/2013/QH13",
+   "dieu": 3,
+   "khoan": 22
+  },
+  {
+   "tu": "Hồ sơ địa chính",
+   "nghia": "hồ sơ phục vụ quản lý nhà nước đối với việc sử dụng đất.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 12
+  },
+  {
+   "tu": "Hồ sơ địa giới hành chính",
+   "nghia": "hồ sơ phục vụ quản lý nhà nước đối với địa giới hành chính.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 8
+  },
+  {
+   "tu": "Hỗ trợ khi Nhà nước thu hồi đất",
+   "nghia": "chính sách của Nhà nước nhằm trợ giúp cho người có đất thu hồi, chủ sở hữu tài sản gắn liền với đất để ổn định đời sống, sản xuất và phát triển ngoài các khoản đã bồi thường theo quy định của Luật này.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 24
+  },
+  {
+   "tu": "Hộ gia đình sử dụng đất",
+   "nghia": "những người có quan hệ hôn nhân, huyết thống, nuôi dưỡng theo quy định của pháp luật về hôn nhân và gia đình, đang sống chung và có quyền sử dụng đất chung tại thời điểm được Nhà nước giao đất, cho thuê đất, công nhận quyền sử dụng đất, nhận chuyển quyền sử dụng đất trước ngày Luật này có hiệu lực thi hành.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 25
+  },
+  {
+   "tu": "Hộ gia đình, cá nhân trực tiếp sản xuất nông nghiệp",
+   "nghia": "hộ gia đình, cá nhân đã được Nhà nước giao, cho thuê, công nhận quyền sử dụng đất nông nghiệp; nhận chuyển quyền sử dụng đất nông nghiệp và có nguồn thu nhập ổn định từ sản xuất nông nghiệp trên đất đó.",
+   "ma": "ldd2013",
+   "soHieu": "45/2013/QH13",
+   "dieu": 3,
+   "khoan": 30
+  },
+  {
+   "tu": "Hợp tác sản xuất, kinh doanh bằng quyền sử dụng đất",
+   "nghia": "sự thỏa thuận giữa các bên, theo đó người sử dụng đất dùng quyền sử dụng đất của mình để hợp tác sản xuất, kinh doanh mà không làm thay đổi quyền sử dụng đất của người sử dụng đất.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 26
+  },
+  {
+   "tu": "Hủy hoại đất",
+   "nghia": "hành vi làm biến dạng địa hình, làm suy giảm chất lượng đất, gây ô nhiễm đất mà làm mất hoặc giảm khả năng sử dụng đất theo mục đích đã được xác định.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 27
+  },
+  {
+   "tu": "Khu đất cần định giá",
+   "nghia": "tập hợp các thửa đất trong cùng một khu vực, dự án có sử dụng đất cần định giá.",
+   "ma": "nd71-2024",
+   "soHieu": "71/2024/NĐ-CP",
+   "dieu": 3,
+   "khoan": 2
+  },
+  {
+   "tu": "Kiểm kê đất đai",
+   "nghia": "việc Nhà nước tổ chức điều tra, tổng hợp, đánh giá trên hồ sơ địa chính và trên thực địa về hiện trạng sử dụng đất tại thời điểm kiểm kê và biến động đất đai giữa 02 lần kiểm kê.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 29
+  },
+  {
+   "tu": "Kế hoạch sử dụng đất",
+   "nghia": "việc phân kỳ quy hoạch sử dụng đất theo thời gian để thực hiện.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 28
+  },
+  {
+   "tu": "Lấn biển",
+   "nghia": "việc mở rộng diện tích đất trong phạm vi từ đường mép nước biển thấp nhất trung bình trong nhiều năm về phía biển thuộc vùng biển Việt Nam.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 30
+  },
+  {
+   "tu": "Lấn đất",
+   "nghia": "việc người sử dụng đất chuyển dịch mốc giới hoặc ranh giới thửa đất để mở rộng diện tích đất sử dụng mà không được cơ quan nhà nước có thẩm quyền cho phép hoặc không được người sử dụng hợp pháp diện tích đất bị lấn đó cho phép.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 31
+  },
+  {
+   "tu": "Nhà nước cho thuê quyền sử dụng đất",
+   "nghia": "việc cơ quan nhà nước có thẩm quyền ban hành quyết định cho thuê đất cho đối tượng có nhu cầu sử dụng đất.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 32
+  },
+  {
+   "tu": "Nhà nước cho thuê đất",
+   "nghia": "việc Nhà nước trao quyền sử dụng đất bằng hợp đồng cho đối tượng có nhu cầu sử dụng đất.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 2
+  },
+  {
+   "tu": "Nhà nước công nhận quyền sử dụng đất",
+   "nghia": "việc cơ quan nhà nước có thẩm quyền cấp Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất lần đầu cho người đang sử dụng đất ổn định đối với thửa đất xác định theo quy định của Luật này.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 33
+  },
+  {
+   "tu": "Nhà nước giao quyền sử dụng đất",
+   "nghia": "việc cơ quan nhà nước có thẩm quyền ban hành quyết định giao đất cho đối tượng có nhu cầu sử dụng đất.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 34
+  },
+  {
+   "tu": "Nhà nước giao đất",
+   "nghia": "việc Nhà nước trao quyền sử dụng đất bằng quyết định hành chính cho đối tượng có nhu cầu sử dụng đất.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 1
+  },
+  {
+   "tu": "Nhà nước thu hồi đất",
+   "nghia": "việc cơ quan nhà nước có thẩm quyền ban hành quyết định thu lại quyền sử dụng đất của người sử dụng đất hoặc thu lại đất của người đang sử dụng đất hoặc thu lại đất đang được Nhà nước giao quản lý.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 35
+  },
+  {
+   "tu": "Nhận chuyển quyền sử dụng đất",
+   "nghia": "việc xác lập quyền sử dụng đất do được người khác chuyển quyền sử dụng đất theo quy định của pháp luật thông qua các hình thức chuyển đổi, chuyển nhượng, thừa kế, tặng cho quyền sử dụng đất hoặc góp vốn bằng quyền sử dụng đất mà hình thành pháp nhân mới.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 4
+  },
+  {
+   "tu": "Quy hoạch sử dụng đất",
+   "nghia": "việc phân bổ chỉ tiêu sử dụng đất và khoanh vùng đất đai cho các mục đích phát triển kinh tế - xã hội, quốc phòng, an ninh, bảo vệ môi trường và thích ứng với biến đổi khí hậu trên cơ sở tiềm năng đất đai và nhu cầu sử dụng đất của các ngành, lĩnh vực đối với từng đơn vị hành chính cho thời kỳ xác định.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 36
+  },
+  {
+   "tu": "Quyền thuê trong hợp đồng thuê đất",
+   "nghia": "quyền của người sử dụng đất được hình thành khi Nhà nước cho thuê đất thu tiền thuê đất hằng năm. Người sử dụng đất được chuyển nhượng quyền thuê trong hợp đồng thuê đất; người nhận chuyển nhượng quyền thuê trong hợp đồng thuê đất được kế thừa các quyền và nghĩa vụ của người sử dụng đất theo quy định của Luật này và quy định khác của pháp luật có liên quan.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 37
+  },
+  {
+   "tu": "Sổ mục kê đất đai",
+   "nghia": "sổ được lập cho từng đơn vị xã, phường, thị trấn để ghi các thửa đất và các thông tin về thửa đất đó.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 15
+  },
+  {
+   "tu": "Sổ theo dõi biến động đất đai",
+   "nghia": "sổ được lập để theo dõi các trường hợp có thay đổi trong sử dụng đất gồm thay đổi kích thước và hình dạng thửa đất, người sử dụng đất, mục đích sử dụng đất, thời hạn sử dụng đất, quyền và nghĩa vụ của người sử dụng đất.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 16
+  },
+  {
+   "tu": "Sổ địa chính",
+   "nghia": "sổ được lập cho từng đơn vị xã, phường, thị trấn để ghi người sử dụng đất và các thông tin về sử dụng đất của người đó.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 14
+  },
+  {
+   "tu": "Sử dụng đất ổn định",
+   "nghia": "việc sử dụng đất vào một mục đích chính nhất định kể từ thời điểm bắt đầu sử dụng đất vào mục đích đó đến thời điểm cơ quan nhà nước có thẩm quyền xem xét việc sử dụng đất ổn định.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 38
+  },
+  {
+   "tu": "Thoái hóa đất",
+   "nghia": "tình trạng đất bị thay đổi đặc tính, tính chất vốn có ban đầu theo chiều hướng xấu do tác động của điều kiện tự nhiên, con người.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 40
+  },
+  {
+   "tu": "Thu hồi đất",
+   "nghia": "việc Nhà nước ra quyết định hành chính để thu lại quyền sử dụng đất hoặc thu lại đất đã giao cho tổ chức, Uỷ ban nhân dân xã, phường, thị trấn quản lý theo quy định của Luật này.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 5
+  },
+  {
+   "tu": "Thống kê đất đai",
+   "nghia": "việc Nhà nước tổng hợp, đánh giá trên hồ sơ địa chính về hiện trạng sử dụng đất tại thời điểm thống kê và biến động đất đai giữa 02 lần thống kê.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 41
+  },
+  {
+   "tu": "Thửa đất",
+   "nghia": "phần diện tích đất được giới hạn bởi ranh giới mô tả trên hồ sơ địa chính hoặc được xác định trên thực địa.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 42
+  },
+  {
+   "tu": "Thửa đất chuẩn",
+   "nghia": "thửa đất có các đặc tính về diện tích, hình thể, kích thước mang tính đại diện cho các thửa đất trong vùng giá trị, được chọn làm thửa đất chuẩn để định giá cho các thửa đất khác trong vùng giá trị.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 43
+  },
+  {
+   "tu": "Thửa đất so sánh",
+   "nghia": "thửa đất có cùng mục đích sử dụng đất, tương đồng nhất định về các yếu tố ảnh hưởng đến giá đất với thửa đất cần định giá đã chuyển nhượng trên thị trường, trúng đấu giá quyền sử dụng đất mà người trúng đấu giá đã hoàn thành nghĩa vụ tài chính theo quyết định trúng đấu giá.",
+   "ma": "nd71-2024",
+   "soHieu": "71/2024/NĐ-CP",
+   "dieu": 3,
+   "khoan": 3
+  },
+  {
+   "tu": "Tiền sử dụng đất",
+   "nghia": "số tiền mà người sử dụng đất phải trả cho Nhà nước khi được Nhà nước giao đất có thu tiền sử dụng đất, cho phép chuyển mục đích sử dụng đất hoặc các trường hợp sử dụng đất mà phải nộp tiền sử dụng đất theo quy định của pháp luật.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 44
+  },
+  {
+   "tu": "Tiền thuê đất",
+   "nghia": "số tiền mà người sử dụng đất phải trả cho Nhà nước khi được Nhà nước cho thuê đất, cho phép chuyển mục đích sử dụng đất để cho thuê đất hoặc các trường hợp sử dụng đất mà phải nộp tiền thuê đất theo quy định của pháp luật.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 45
+  },
+  {
+   "tu": "Tranh chấp đất đai",
+   "nghia": "tranh chấp về quyền, nghĩa vụ của người sử dụng đất giữa hai hoặc nhiều bên trong quan hệ đất đai.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 47
+  },
+  {
+   "tu": "Tái định cư",
+   "nghia": "việc Nhà nước thực hiện bồi thường bằng đất ở hoặc bằng nhà ở tại khu tái định cư hoặc địa điểm khác phù hợp cho người có đất thu hồi hoặc hỗ trợ bằng giao đất ở, nhà ở tái định cư cho người không đủ điều kiện bồi thường về đất ở theo quy định của Luật này nhưng không còn chỗ ở nào khác.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 39
+  },
+  {
+   "tu": "Tổ chức kinh tế có vốn đầu tư nước ngoài",
+   "nghia": "tổ chức kinh tế phải đáp ứng điều kiện và thực hiện thủ tục đầu tư quy định đối với nhà đầu tư nước ngoài theo quy định của Luật Đầu tư để thực hiện dự án có sử dụng đất.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 46
+  },
+  {
+   "tu": "Tổ chức sự nghiệp công",
+   "nghia": "tổ chức do các cơ quan có thẩm quyền của Nhà nước, tổ chức chính trị, tổ chức chính trị - xã hội thành lập, có chức năng thực hiện các hoạt động dịch vụ công do ngân sách nhà nước chi trả.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 28
+  },
+  {
+   "tu": "Tổ chức sự nghiệp công lập",
+   "nghia": "tổ chức do cơ quan có thẩm quyền của Nhà nước, tổ chức chính trị, tổ chức chính trị - xã hội thành lập, có chức năng thực hiện các hoạt động dịch vụ công theo quy định của pháp luật.",
+   "ma": "ldd2013",
+   "soHieu": "45/2013/QH13",
+   "dieu": 3,
+   "khoan": 26
+  },
+  {
+   "tu": "Tổ chức thực hiện định giá đất",
+   "nghia": "tổ chức hoạt động tư vấn xác định giá đất quy định tại khoản 3 Điều 162 Luật Đất đai được cơ quan có chức năng quản lý đất đai thuê hoặc giao nhiệm vụ thực hiện tư vấn định giá đất.",
+   "ma": "nd71-2024",
+   "soHieu": "71/2024/NĐ-CP",
+   "dieu": 3,
+   "khoan": 4
+  },
+  {
+   "tu": "Vùng giá trị",
+   "nghia": "khu vực các thửa đất liền kề nhau, có cùng mục đích sử dụng và có các yếu tố tương đồng về vị trí, khả năng sinh lợi, điều kiện kết cấu hạ tầng và yếu tố khác ảnh hưởng đến giá đất.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 48
+  },
+  {
+   "tu": "Vùng phụ cận",
+   "nghia": "vùng đất tiếp giáp với các điểm kết nối giao thông và các tuyến giao thông có tiềm năng phát triển theo quy hoạch.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 49
+  },
+  {
+   "tu": "Điều chỉnh thời hạn sử dụng đất",
+   "nghia": "việc cơ quan nhà nước có thẩm quyền cho phép thay đổi thời hạn sử dụng đất trong quá trình sử dụng đất.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 17
+  },
+  {
+   "tu": "Đăng ký quyền sử dụng đất",
+   "nghia": "việc ghi nhận quyền sử dụng đất hợp pháp đối với một thửa đất xác định vào hồ sơ địa chính nhằm xác lập quyền và nghĩa vụ của người sử dụng đất.",
+   "ma": "ldd2003",
+   "soHieu": "13/2003/QH11",
+   "dieu": 4,
+   "khoan": 19
+  },
+  {
+   "tu": "Đăng ký đất đai, tài sản gắn liền với đất",
+   "nghia": "việc người sử dụng đất, người sở hữu tài sản gắn liền với đất, người được giao quản lý đất kê khai quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất với cơ quan nhà nước có thẩm quyền để được ghi nhận theo quy định của Luật này.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 15
+  },
+  {
+   "tu": "Đất đang có tranh chấp",
+   "nghia": "thửa đất có tranh chấp đất đai mà đang trong quá trình được cơ quan có thẩm quyền giải quyết.",
+   "ma": "ldd2024",
+   "soHieu": "31/2024/QH15",
+   "dieu": 3,
+   "khoan": 16
+  },
+  {
+   "tu": "Đất để xây dựng công trình ngầm",
+   "nghia": "phần đất để xây dựng công trình trong lòng đất mà công trình này không phải là phần ngầm của công trình xây dựng trên mặt đất.",
+   "ma": "ldd2013",
+   "soHieu": "45/2013/QH13",
+   "dieu": 3,
+   "khoan": 28
+  }
+ ],
+ "danGian": {
+  "sổ đỏ": "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất",
+  "sổ hồng": "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất",
+  "đền bù": "bồi thường về đất",
+  "sang tên": "đăng ký biến động",
+  "lên thổ cư": "chuyển mục đích sử dụng đất sang đất ở",
+  "tách sổ": "tách thửa đất",
+  "giấy tay": "giấy tờ về quyền sử dụng đất",
+  "cắm sổ": "thế chấp quyền sử dụng đất",
+  "bìa đỏ": "Giấy chứng nhận quyền sử dụng đất",
+  "nhà nước lấy đất": "Nhà nước thu hồi đất",
+  "giá đền bù": "giá đất cụ thể"
+ }
+}

@@ -68,6 +68,9 @@ type NutSoDo = { ten: string; y: string; chiTiet?: string; dan: { ma: string; so
 // 7 bước…). Nhớ con số là gọi ra được cả nhánh — mẹo học cũ mà hiệu quả.
 type NhanhSoDo = { ten: string; icon: string; mau: string; y: string; neo?: string; con: NutSoDo[] };
 type SoDo = { nhanh: NhanhSoDo[] };
+// Từ ngữ do CHÍNH LUẬT định nghĩa (điều "Giải thích từ ngữ"), rút bằng dung-tu-dien.py.
+type TuNgu = { tu: string; nghia: string; ma: string; soHieu: string; dieu: number; khoan: number };
+type KhoTuNgu = { tu: TuNgu[]; danGian: Record<string, string> };
 // Thẻ học soạn tay cho phần CON SỐ và MỐC THỜI GIAN — thứ bắt buộc phải thuộc lòng.
 type TheSo = { hoi: string; dap: string; nho?: string; chuDe: string; dan?: Dan[] };
 type KhoTheSo = { canhBao: string; the: TheSo[] };
@@ -195,6 +198,7 @@ export default function TraCuuLuatPage() {
   const [theSo, setTheSo] = useState(0);
   const [datLat, setDatLat] = useState(false);
   const [th, setTh] = useState<KhoTinhHuong | null>(null);
+  const [tn, setTn] = useState<KhoTuNgu | null>(null);
   // XEM NHANH: bấm vào một dẫn chiếu thì hiện thẻ ngay tại chỗ, KHÔNG nhảy đi mất — đang
   // đọc dở một điều mà bị cuốn sang điều khác là mất mạch. Muốn đọc kỹ thì bấm "Mở hẳn".
   const [xemNhanh, setXemNhanh] = useState<{ ma: string; so: number; x: number; y: number } | null>(null);
@@ -258,6 +262,7 @@ export default function TraCuuLuatPage() {
     fetch('/luat/so-do.json').then((r) => r.json()).then((d: SoDo) => setSd(d)).catch(() => {});
     fetch('/luat/tinh-huong.json').then((r) => r.json()).then((d: KhoTinhHuong) => setTh(d)).catch(() => {});
     fetch('/luat/the-so.json').then((r) => r.json()).then((d: KhoTheSo) => setTheSo2(d)).catch(() => {});
+    fetch('/luat/tu-ngu.json').then((r) => r.json()).then(setTn).catch(() => {});
   }, [duocXem]);
 
   useEffect(() => {
@@ -349,12 +354,23 @@ export default function TraCuuLuatPage() {
         }
       }
     }
-    // 4. Thẻ con số soạn tay.
+    // 4. TỪ NGỮ DO LUẬT ĐỊNH NGHĨA — học chữ gốc thì đọc điều nào cũng hiểu, và viết ra
+    //    cũng không còn dùng chữ tự nghĩ. Hỏi và đáp đều là NGUYÊN VĂN của luật.
+    for (const [i, t] of (tn?.tu || []).entries()) {
+      ra.push({
+        khoa: 'tu:' + i, loai: 'Từ ngữ', chuDe: 'Từ ngữ pháp lý',
+        hoi: `Luật định nghĩa “${t.tu}” là gì?`,
+        dap: `${t.tu} là ${t.nghia}`,
+        nho: `${nhanNgan(t.ma, t.soHieu)} · Điều ${t.dieu} khoản ${t.khoan}`,
+        dan: [{ ma: t.ma, so: t.dieu }],
+      });
+    }
+    // 5. Thẻ con số soạn tay.
     for (const [i, t] of (theSo2?.the || []).entries()) {
       ra.push({ khoa: 'so:' + i, loai: 'Con số', chuDe: t.chuDe, hoi: t.hoi, dap: t.dap, nho: t.nho, dan: t.dan });
     }
     return ra;
-  }, [gt, th, theSo2, cacVb, kho]);
+  }, [gt, th, theSo2, tn, cacVb, kho]);
 
   const chuDeCo = useMemo(() => [...new Set(dsThe.map((t) => t.chuDe))].sort(), [dsThe]);
   const theTheoChuDe = useMemo(

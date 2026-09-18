@@ -181,6 +181,10 @@ export default function TraCuuLuatPage() {
   // XEM NHANH: bấm vào một dẫn chiếu thì hiện thẻ ngay tại chỗ, KHÔNG nhảy đi mất — đang
   // đọc dở một điều mà bị cuốn sang điều khác là mất mạch. Muốn đọc kỹ thì bấm "Mở hẳn".
   const [xemNhanh, setXemNhanh] = useState<{ ma: string; so: number; x: number; y: number } | null>(null);
+  // NGĂN ĐỌC BÊN CẠNH: đang xem sơ đồ hay tình huống mà bấm vào một điều thì mở điều đó ở
+  // ngăn bên, sơ đồ giữ nguyên phía sau — đóng ngăn là về đúng chỗ đang xem dở.
+  // Trước đây bấm một cái là nhảy thẳng sang thẻ "Toàn văn", mất sạch chỗ đang đứng.
+  const [docBen, setDocBen] = useState<{ ma: string; so: number } | null>(null);
   const [thChon, setThChon] = useState<string>('');
   // Đánh dấu đã chuẩn bị xong từng giấy tờ — lưu trong máy để hôm sau mở lại vẫn còn.
   const [daCo, setDaCo] = useState<Record<string, boolean>>({});
@@ -408,6 +412,12 @@ export default function TraCuuLuatPage() {
     setXemPhuLuc(false); setChon(so); setThe('luat');
     oNoiDung.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
+  // Đang ở thẻ nào thì mở kiểu đó: ở "Toàn văn" thì nhảy tới điều luôn; ở sơ đồ, tình
+  // huống, thẻ học thì mở NGĂN BÊN để không mất chỗ đang xem.
+  const moDieuHopLy = (ma: string, so: number) => {
+    if (the === 'luat') moDieu(ma, so);
+    else { taiVb(ma).catch(() => {}); setDocBen({ ma, so }); }
+  };
 
   // Tô vàng chỗ khớp từ khoá trong nguyên văn (chỉ tô, không đổi chữ).
   const toVang = (chu: string) => {
@@ -438,7 +448,7 @@ export default function TraCuuLuatPage() {
   const NutDan = ({ d, nho }: { d: Dan; nho?: boolean }) => {
     const v = kho.find((x) => x.ma === d.ma);
     return (
-      <button onClick={() => { if (d.so) moDieu(d.ma, d.so); else { doiVanBan(d.ma); setThe('luat'); } }}
+      <button onClick={() => { if (d.so) moDieuHopLy(d.ma, d.so); else { doiVanBan(d.ma); setThe('luat'); } }}
         title={v ? `${v.ten} — ${v.soHieu}` : d.ma}
         className={`rounded-md border border-slate-200 bg-white font-semibold text-slate-600 transition hover:border-[#0A2540] hover:text-[#0A2540] ${nho ? 'px-1.5 py-0.5 text-[11px]' : 'px-1.5 py-0.5 text-[11.5px]'}`}>
         {d.so ? `Điều ${d.so}` : '📄'} · {v ? nhanNgan(v.ma, v.soHieu) : d.ma}
@@ -1020,7 +1030,7 @@ export default function TraCuuLuatPage() {
                               {c.dan.map((d, i2) => {
                                 const v2 = kho.find((z2) => z2.ma === d.ma);
                                 return (
-                                  <button key={i2} onClick={() => { if (d.so) moDieu(d.ma, d.so); else { doiVanBan(d.ma); setThe('luat'); } }}
+                                  <button key={i2} onClick={() => { if (d.so) moDieuHopLy(d.ma, d.so); else { doiVanBan(d.ma); setThe('luat'); } }}
                                     title={v2 ? v2.ten : d.ma}
                                     className="rounded border border-slate-200 bg-slate-50 px-1 text-[10.5px] font-semibold text-slate-600 hover:border-[#0A2540] hover:text-[#0A2540]">
                                     {d.so ? `Điều ${d.so}` : '📄'} {v2 ? nhanNgan(v2.ma, v2.soHieu).replace('Luật Đất đai ', 'LĐĐ ') : ''}
@@ -1071,7 +1081,7 @@ export default function TraCuuLuatPage() {
                                 {c.dan.map((d, k2) => {
                                   const tenVb = kho.find((x) => x.ma === d.ma);
                                   return (
-                                    <button key={k2} onClick={() => { if (d.so) moDieu(d.ma, d.so); else { doiVanBan(d.ma); setThe('luat'); } }}
+                                    <button key={k2} onClick={() => { if (d.so) moDieuHopLy(d.ma, d.so); else { doiVanBan(d.ma); setThe('luat'); } }}
                                       className="rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[11.5px] font-semibold text-slate-600 hover:border-[#0A2540] hover:text-[#0A2540]">
                                       {d.so ? `Điều ${d.so}` : '📄'} {tenVb ? nhanNgan(tenVb.ma, tenVb.soHieu) : d.ma}
                                     </button>
@@ -1502,6 +1512,115 @@ export default function TraCuuLuatPage() {
         </div>
       )}
       </>}
+
+      {/* ── NGĂN ĐỌC BÊN CẠNH ──
+          Máy tính: trượt ra bên phải. Điện thoại: đẩy lên từ đáy.
+          Sơ đồ / tình huống vẫn nằm nguyên phía sau, đóng ngăn là về đúng chỗ đang xem dở. */}
+      {docBen && (() => {
+        const v = cacVb[docBen.ma];
+        const d = v?.dieu.find((z) => z.so === docBen.so);
+        const kb = kho.find((z) => z.ma === docBen.ma);
+        const g = gt?.muc[`${docBen.ma}:${docBen.so}`];
+        const tt = d?.tinhTrang;
+        return (
+          <>
+            <div className="fixed inset-0 z-40 bg-black/20" onClick={() => setDocBen(null)} />
+            <div className="fixed inset-x-0 bottom-0 z-50 flex max-h-[78vh] flex-col rounded-t-2xl border-t-2 border-[#0A2540] bg-white shadow-2xl
+                            sm:inset-y-0 sm:left-auto sm:right-0 sm:max-h-none sm:w-[min(94vw,480px)] sm:rounded-none sm:rounded-l-2xl sm:border-l-2 sm:border-t-0">
+              <div className="flex items-start gap-2 border-b bg-slate-50 px-3 py-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10.5px] font-bold uppercase tracking-wide text-slate-400">
+                    📖 Đọc bên cạnh · {kb ? nhanNgan(kb.ma, kb.soHieu) : docBen.ma}
+                  </p>
+                  <p className="text-[14.5px] font-extrabold leading-snug text-[#0A2540]">
+                    {d ? <>Điều {d.so}. {d.tieuDe}</> : <>Điều {docBen.so}</>}
+                  </p>
+                </div>
+                <button onClick={() => setDocBen(null)} title="Đóng, về lại chỗ đang xem"
+                  className="shrink-0 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[13px] font-bold text-slate-500 hover:text-slate-800">✕</button>
+              </div>
+
+              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-2.5">
+                {!d ? <p className="text-[13px] text-slate-400">Đang mở…</p> : (
+                  <>
+                    {tt && (
+                      <p className={`mb-2 rounded-xl border-2 px-2.5 py-1.5 text-[12px] font-bold leading-snug ${
+                        tt.loai === 'het-hieu-luc' ? 'border-rose-400 bg-rose-50 text-rose-800'
+                          : tt.loai === 'bai-bo-mot-phan' ? 'border-amber-400 bg-amber-50 text-amber-800'
+                            : 'border-sky-400 bg-sky-50 text-sky-800'}`}>
+                        {tt.loai === 'het-hieu-luc' ? '⛔ ĐIỀU NÀY ĐÃ HẾT HIỆU LỰC'
+                          : tt.loai === 'bai-bo-mot-phan' ? '⚠️ BỊ BÃI BỎ MỘT PHẦN' : '✏️ ĐÃ BỊ SỬA ĐỔI'}
+                        {tt.tuNgay ? ` TỪ ${ngayVn(tt.tuNgay)}` : ''}
+                        {(() => { const kz = kho.find((z) => z.ma === tt.boi); return kz ? ` — bởi ${nhanNgan(kz.ma, kz.soHieu)}` : ''; })()}
+                      </p>
+                    )}
+                    {g && (
+                      <div className="mb-2 rounded-xl border-2 border-dashed border-sky-300 bg-sky-50/70 p-2.5">
+                        <p className="text-[10.5px] font-bold uppercase tracking-wide text-sky-700">💡 Giải thích nhanh — không phải văn bản luật</p>
+                        <p className="mt-0.5 text-[13px] font-bold text-sky-900">Nhớ nhanh: {g.nho}</p>
+                        <p className="mt-0.5 text-[12.5px] leading-relaxed text-slate-700">{g.y}</p>
+                      </div>
+                    )}
+                    <p className="text-[10.5px] font-bold uppercase tracking-wide text-slate-400">Nguyên văn</p>
+                    <div className="mt-1 space-y-2 text-[13.5px] leading-relaxed text-slate-800">
+                      {d.khoan.map((k, i) => (
+                        <div key={i}>
+                          <p className="whitespace-pre-line">{k.so ? <b className="text-[#0A2540]">{k.so}. </b> : null}{k.chu}</p>
+                          {k.diem.length > 0 && (
+                            <div className="mt-1 space-y-1 pl-3.5">
+                              {k.diem.map((x, j) => <p key={j} className="whitespace-pre-line"><b className="text-slate-500">{x.ky}) </b>{x.chu}</p>)}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    {((d.dan?.length || 0) > 0 || (d.duocDan?.length || 0) > 0) && (
+                      <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/70 p-2">
+                        <p className="text-[10.5px] font-bold uppercase tracking-wide text-slate-500">🔗 Liên kết</p>
+                        {(d.dan?.length || 0) > 0 && (
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            <span className="text-[11px] font-semibold text-slate-500">Dẫn tới:</span>
+                            {d.dan!.map((z, i) => (
+                              <button key={i} onClick={() => z.so && setDocBen({ ma: z.ma, so: z.so })}
+                                className="rounded border border-slate-200 bg-white px-1.5 text-[11px] font-semibold text-slate-600 hover:border-[#0A2540]">
+                                {z.so ? `Điều ${z.so}` : '📄'} {(() => { const kz = kho.find((y) => y.ma === z.ma); return kz ? nhanNgan(kz.ma, kz.soHieu) : z.ma; })()}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        {(d.duocDan?.length || 0) > 0 && (
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            <span className="text-[11px] font-semibold text-slate-500">Được {d.duocDan!.length} chỗ dẫn tới:</span>
+                            {d.duocDan!.slice(0, 10).map((z, i) => (
+                              <button key={i} onClick={() => z.so && setDocBen({ ma: z.ma, so: z.so })}
+                                className="rounded border border-slate-200 bg-white px-1.5 text-[11px] font-semibold text-slate-600 hover:border-[#0A2540]">
+                                {z.so ? `Điều ${z.so}` : '📄'} {(() => { const kz = kho.find((y) => y.ma === z.ma); return kz ? nhanNgan(kz.ma, kz.soHieu) : z.ma; })()}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              <div className="flex gap-1.5 border-t bg-slate-50 px-3 py-2">
+                <button onClick={() => { const b = docBen; setDocBen(null); if (b) moDieu(b.ma, b.so); }}
+                  className="flex-1 rounded-lg bg-[#0A2540] px-3 py-1.5 text-[12.5px] font-bold text-white">
+                  Mở hẳn ở Toàn văn →
+                </button>
+                <button onClick={() => docBen && doiGhim(docBen.ma, docBen.so)}
+                  className={`rounded-lg border px-2.5 py-1.5 text-[12.5px] font-semibold ${docBen && ghim.includes(khoaGhim(docBen.ma, docBen.so)) ? 'border-amber-400 bg-amber-50 text-amber-700' : 'border-slate-200 bg-white text-slate-500'}`}>
+                  {docBen && ghim.includes(khoaGhim(docBen.ma, docBen.so)) ? '⭐' : '☆'}
+                </button>
+                <button onClick={() => setDocBen(null)}
+                  className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[12.5px] font-semibold text-slate-500">Đóng</button>
+              </div>
+            </div>
+          </>
+        );
+      })()}
 
       {/* ── THẺ XEM NHANH ── nổi ngay dưới chỗ vừa bấm, đọc xong đóng lại là về chỗ cũ. */}
       {xemNhanh && (() => {

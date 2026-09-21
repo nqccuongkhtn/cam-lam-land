@@ -77,6 +77,9 @@ type Chang2 = Chang & { trongTam?: boolean };
 // theoDieu: MỘT điều có thể thuộc NHIỀU chặng — vì các điều liên kết chéo nhau,
 // vd Điều 45 (quyền giao dịch) bị cả chặng đăng ký biến động lẫn chặng giao dịch kéo vào.
 type LoTrinh = { chang: Chang2[]; theoDieu: Record<string, number[]>; theoVanBan: Record<string, number> };
+// Chuỗi dọc: điều của Luật Đất đai 2024 -> những điều của nghị định, thông tư hướng dẫn nó.
+type ChuoiDoc = { chuoi: Record<string, { ma: string; nhan: string; dieu: number[] }[]>;
+  truc: Record<string, number[]> };
 // Thẻ học soạn tay cho phần CON SỐ và MỐC THỜI GIAN — thứ bắt buộc phải thuộc lòng.
 type TheSo = { hoi: string; dap: string; nho?: string; chuDe: string; dan?: Dan[] };
 type KhoTheSo = { canhBao: string; the: TheSo[] };
@@ -209,6 +212,7 @@ export default function TraCuuLuatPage() {
   // 544 thẻ SINH TỰ ĐỘNG từ chính kho luật (dung-the-tu-dong.py) — xem lời giải thích ở đó.
   const [theTd, setTheTd] = useState<{ the: TheHoc[] } | null>(null);
   const [lt, setLt] = useState<LoTrinh | null>(null);
+  const [cd, setCd] = useState<ChuoiDoc | null>(null);
   // XEM NHANH: bấm vào một dẫn chiếu thì hiện thẻ ngay tại chỗ, KHÔNG nhảy đi mất — đang
   // đọc dở một điều mà bị cuốn sang điều khác là mất mạch. Muốn đọc kỹ thì bấm "Mở hẳn".
   const [xemNhanh, setXemNhanh] = useState<{ ma: string; so: number; x: number; y: number } | null>(null);
@@ -303,6 +307,7 @@ export default function TraCuuLuatPage() {
     fetch('/luat/tu-ngu.json').then((r) => r.json()).then(setTn).catch(() => {});
     fetch('/luat/the-tu-dong.json').then((r) => r.json()).then(setTheTd).catch(() => {});
     fetch('/luat/lo-trinh.json').then((r) => r.json()).then(setLt).catch(() => {});
+    fetch('/luat/chuoi-doc.json').then((r) => r.json()).then(setCd).catch(() => {});
   }, [duocXem]);
 
   useEffect(() => {
@@ -1873,6 +1878,48 @@ export default function TraCuuLuatPage() {
                     </div>
                   ))}
                 </div>
+
+                {/* ── ĐIỀU NÀY ĐƯỢC HƯỚNG DẪN Ở ĐÂU ──
+                    Chữ luật thường chỉ nêu nguyên tắc, còn làm hồ sơ thật thì phải mở nghị định,
+                    thông tư. Đọc Điều 137 xong vẫn chưa làm được gì nếu không biết trình tự nằm ở
+                    Nghị định 101/2024, mẫu giấy ở Thông tư 10/2024, tiền ở Nghị định 103/2024.
+                    Dữ liệu lấy từ chính bản đồ dẫn chiếu (dung-chuoi-doc.py), không phải tự khai. */}
+                {(() => {
+                  const ds = cd?.chuoi['ldd2024:' + dieuDangXem.so];
+                  if (maVb !== 'ldd2024' || !ds?.length) return null;
+                  return (
+                    <div className="mt-2 rounded-xl border-l-4 border-teal-400 bg-teal-50/70 px-2.5 py-2">
+                      <p className="text-[12.5px] font-bold text-teal-800">
+                        📎 Điều này được hướng dẫn chi tiết ở {ds.length} văn bản dưới luật
+                      </p>
+                      <div className="mt-1 space-y-1">
+                        {ds.map((v) => (
+                          <div key={v.ma} className="flex flex-wrap items-center gap-1">
+                            <span className="text-[11.5px] font-semibold text-slate-500">{v.nhan}:</span>
+                            {v.dieu.slice(0, 8).map((so) => <NutDan key={so} d={{ ma: v.ma, so }} nho />)}
+                            {v.dieu.length > 8 && <span className="text-[11px] text-slate-400">+{v.dieu.length - 8}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Chiều ngược lại: đang đọc một điều của nghị định / thông tư thì cho biết nó
+                    hướng dẫn cho điều nào của luật — để lúc nào cũng lần ngược về gốc được. */}
+                {(() => {
+                  if (maVb === 'ldd2024' || !cd) return null;
+                  const goc = Object.entries(cd.chuoi)
+                    .filter(([, v]) => v.some((x) => x.ma === maVb && x.dieu.includes(dieuDangXem.so)))
+                    .map(([k]) => Number(k.split(':')[1]));
+                  if (!goc.length) return null;
+                  return (
+                    <p className="mt-2 flex flex-wrap items-center gap-1 rounded-xl border-l-4 border-teal-400 bg-teal-50/70 px-2.5 py-2 text-[12.5px]">
+                      <b className="text-teal-800">📎 Điều này hướng dẫn cho</b>
+                      {goc.slice(0, 6).map((so) => <NutDan key={so} d={{ ma: 'ldd2024', so }} nho />)}
+                    </p>
+                  );
+                })()}
 
                 {/* ── LIÊN KẾT HAI CHIỀU ──
                     Luật đất đai nhắc chéo nhau chằng chịt: luật nói một câu rồi "Chính phủ

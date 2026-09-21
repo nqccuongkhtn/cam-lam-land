@@ -1748,21 +1748,25 @@ export default function TraCuuLuatPage() {
               </div>
             ) : (
               <article>
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                <p className="line-clamp-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400 sm:line-clamp-none">
                   {vb.soHieu}
                   {dieuDangXem.chuong ? <> · Chương {dieuDangXem.chuong} — {dieuDangXem.chuongTen}</> : null}
                   {dieuDangXem.muc ? <> · Mục {dieuDangXem.muc} — {dieuDangXem.mucTen}</> : null}
                 </p>
-                <div className="mt-1 flex items-start gap-2">
-                  <h2 className="min-w-0 flex-1 text-[17px] font-extrabold leading-snug text-[#0A2540]">
+                {/* Điện thoại: hai nút Ghim/Chép XUỐNG DÒNG DƯỚI tiêu đề.
+                    Để chen ngang thì tiêu đề dài bị ép vào cột hẹp, xuống 9 dòng. */}
+                <div className="mt-1 flex flex-col items-start gap-1.5 sm:flex-row sm:items-start sm:gap-2">
+                  <h2 className="order-first min-w-0 flex-1 text-[17px] font-extrabold leading-snug text-[#0A2540]">
                     Điều {dieuDangXem.so}. {toVang(dieuDangXem.tieuDe)}
                   </h2>
+                  <span className="flex shrink-0 gap-1.5">
                   <button onClick={() => doiGhim(vb.ma, dieuDangXem.so)} title="Ghim để học lại"
                     className={`shrink-0 rounded-lg border px-2 py-1 text-[12px] font-semibold ${ghim.includes(khoaGhim(vb.ma, dieuDangXem.so)) ? 'border-amber-400 bg-amber-50 text-amber-700' : 'border-slate-200 text-slate-500'}`}>
                     {ghim.includes(khoaGhim(vb.ma, dieuDangXem.so)) ? '⭐ Đã ghim' : '☆ Ghim'}
                   </button>
                   <button onClick={() => chep(dieuDangXem)} title="Sao chép nguyên văn"
                     className="shrink-0 rounded-lg border border-slate-200 px-2 py-1 text-[12px] font-semibold text-slate-500">⧉ Chép</button>
+                  </span>
                 </div>
 
                 {/* ── CẢNH BÁO TÌNH TRẠNG ĐIỀU ──
@@ -1846,39 +1850,6 @@ export default function TraCuuLuatPage() {
                   </p>
                 )}
 
-                {/* KHUNG GIẢI THÍCH — màu khác hẳn, ghi rõ không phải chữ luật, để người đọc
-                    không bao giờ lẫn với nguyên văn bên dưới. */}
-                {gt?.muc[khoaGhim(vb.ma, dieuDangXem.so)] && (
-                  <div className="mt-3 rounded-xl border-2 border-dashed border-sky-300 bg-sky-50/70 p-3">
-                    <p className="text-[10.5px] font-bold uppercase tracking-wide text-sky-700">
-                      💡 Giải thích nhanh — KHÔNG PHẢI VĂN BẢN LUẬT
-                    </p>
-                    <p className="mt-1 text-[13.5px] leading-relaxed text-slate-700">{gt.muc[khoaGhim(vb.ma, dieuDangXem.so)].y}</p>
-                    <p className="mt-1.5 rounded-lg bg-white/80 px-2 py-1 text-[13px] font-semibold text-sky-800">
-                      Nhớ nhanh: {gt.muc[khoaGhim(vb.ma, dieuDangXem.so)].nho}
-                    </p>
-                    <p className="mt-1.5 text-[10.5px] leading-snug text-slate-400">{gt.canhBao}</p>
-                  </div>
-                )}
-
-                <p className="mt-3 text-[10.5px] font-bold uppercase tracking-wide text-slate-400">Nguyên văn</p>
-                <div className="mt-1 space-y-2.5 text-[14px] leading-relaxed text-slate-800">
-                  {dieuDangXem.khoan.map((k, i) => (
-                    <div key={i}>
-                      <p className="whitespace-pre-line">
-                        {k.so ? <b className="text-[#0A2540]">{k.so}. </b> : null}{noiDung(k.chu)}
-                      </p>
-                      {k.diem.length > 0 && (
-                        <div className="mt-1 space-y-1 pl-4">
-                          {k.diem.map((x, j) => (
-                            <p key={j} className="whitespace-pre-line"><b className="text-slate-500">{x.ky}) </b>{noiDung(x.chu)}</p>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
                 {/* ── ĐIỀU NÀY ĐƯỢC HƯỚNG DẪN Ở ĐÂU ──
                     Chữ luật thường chỉ nêu nguyên tắc, còn làm hồ sơ thật thì phải mở nghị định,
                     thông tư. Đọc Điều 137 xong vẫn chưa làm được gì nếu không biết trình tự nằm ở
@@ -1920,6 +1891,39 @@ export default function TraCuuLuatPage() {
                     </p>
                   );
                 })()}
+
+                {/* KHUNG GIẢI THÍCH — màu khác hẳn, ghi rõ không phải chữ luật, để người đọc
+                    không bao giờ lẫn với nguyên văn bên dưới. */}
+                {gt?.muc[khoaGhim(vb.ma, dieuDangXem.so)] && (
+                  <div className="mt-3 rounded-xl border-2 border-dashed border-sky-300 bg-sky-50/70 p-3">
+                    <p className="text-[10.5px] font-bold uppercase tracking-wide text-sky-700">
+                      💡 Giải thích nhanh — KHÔNG PHẢI VĂN BẢN LUẬT
+                    </p>
+                    <p className="mt-1 text-[13.5px] leading-relaxed text-slate-700">{gt.muc[khoaGhim(vb.ma, dieuDangXem.so)].y}</p>
+                    <p className="mt-1.5 rounded-lg bg-white/80 px-2 py-1 text-[13px] font-semibold text-sky-800">
+                      Nhớ nhanh: {gt.muc[khoaGhim(vb.ma, dieuDangXem.so)].nho}
+                    </p>
+                    <p className="mt-1.5 text-[10.5px] leading-snug text-slate-400">{gt.canhBao}</p>
+                  </div>
+                )}
+
+                <p className="mt-3 text-[10.5px] font-bold uppercase tracking-wide text-slate-400">Nguyên văn</p>
+                <div className="mt-1 space-y-2.5 text-[14px] leading-relaxed text-slate-800">
+                  {dieuDangXem.khoan.map((k, i) => (
+                    <div key={i}>
+                      <p className="whitespace-pre-line">
+                        {k.so ? <b className="text-[#0A2540]">{k.so}. </b> : null}{noiDung(k.chu)}
+                      </p>
+                      {k.diem.length > 0 && (
+                        <div className="mt-1 space-y-1 pl-4">
+                          {k.diem.map((x, j) => (
+                            <p key={j} className="whitespace-pre-line"><b className="text-slate-500">{x.ky}) </b>{noiDung(x.chu)}</p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
 
                 {/* ── LIÊN KẾT HAI CHIỀU ──
                     Luật đất đai nhắc chéo nhau chằng chịt: luật nói một câu rồi "Chính phủ

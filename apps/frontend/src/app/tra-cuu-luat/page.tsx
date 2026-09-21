@@ -200,6 +200,7 @@ export default function TraCuuLuatPage() {
   const [boThe, setBoThe] = useState<Record<string, any>>({});
   const [goThu, setGoThu] = useState('');        // ô gõ thử đáp án
   const [batGo, setBatGo] = useState(false);     // bật chế độ gõ thay vì chỉ lật thẻ
+  const [moCaiDat, setMoCaiDat] = useState(false);   // bảng cài đặt của màn hình học
   const [chuoi, setChuoi] = useState(0);   // chuỗi ngày học liên tiếp
   const [theSo, setTheSo] = useState(0);
   const [datLat, setDatLat] = useState(false);
@@ -962,43 +963,65 @@ export default function TraCuuLuatPage() {
 
           {cheDoHoc === 'the' && (
             <div className="mt-3">
-              {/* MỘT DÒNG TRẠNG THÁI duy nhất — trước đây chỗ này có 2 đoạn chữ dài, 4 ô
-                  màu và một hàng chip chủ đề dài dằng dặc, nhìn rối mà chẳng dùng tới. */}
-              <div className="flex flex-wrap items-center gap-2 text-[12px]">
-                <select value={chuDeHoc} onChange={(e) => { setChuDeHoc(e.target.value); setTheSo(0); setDatLat(false); }}
-                  title="Học lần lượt theo chặng, hết chặng này sang chặng khác — thay vì bốc mỗi nơi một ít"
-                  className="max-w-[300px] rounded-lg border-2 border-slate-200 bg-white px-2 py-1 text-[12.5px] font-semibold text-[#0A2540] outline-none">
-                  <option value="">Cả lộ trình, theo thứ tự chặng ({dsThe.length} thẻ)</option>
-                  {changCo.map((c) => {
-                    const ds2 = dsThe.filter((t) => cacChang(t).includes(c.so));
-                    const xong = ds2.filter((t) => ((boThe[t.khoa] as any)?.S || 0) >= 21).length;
-                    return <option key={c.so} value={String(c.so)}>{c.trongTam ? '★ ' : ''}{c.icon} Chặng {c.so + 1}. {c.ten} — {xong}/{ds2.length}</option>;
-                  })}
-                </select>
-                <span className="font-bold text-sky-700">Hôm nay {theHomNay.length}</span>
+              {/* ── ĐANG HỌC: chỉ để lại thứ cần nhìn ──
+                  Thanh tiến độ mảnh trên đỉnh · một dòng số liệu · nút ⚙ cho phần cài đặt.
+                  Trước đây chỗ này là 3 hàng dày đặc: ô chọn chặng dài, "Thẻ mới/ngày [20]
+                  (còn 20)", "Thuộc 0/1186" kèm thanh, nút "Gõ đáp án" — đẩy thẻ học xuống
+                  tận giữa màn hình. */}
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                <div className="h-full rounded-full bg-emerald-500 transition-all"
+                  style={{ width: `${theTheoChuDe.length ? (daThuoc / theTheoChuDe.length) * 100 : 0}%` }} />
+              </div>
+              <div className="mt-1.5 flex items-center gap-2 text-[12px]">
+                <span className="font-bold text-sky-700">Còn {theHomNay.length} thẻ hôm nay</span>
                 <span className="text-slate-300">·</span>
-                <label className="flex items-center gap-1 text-slate-500" title="Mỗi ngày nhận thêm bao nhiêu thẻ CHƯA HỌC BAO GIỜ. Thẻ đến hạn ôn thì luôn ra hết.">
-                  Thẻ mới/ngày
-                  <select value={theMoiMoiNgay} onChange={(e) => setTheMoiMoiNgay(Number(e.target.value))}
-                    className="rounded border border-slate-200 bg-white px-1 py-0.5 text-[11.5px] font-bold text-[#0A2540] outline-none">
-                    {[5, 10, 20, 30, 50].map((n) => <option key={n} value={n}>{n}</option>)}
-                  </select>
-                  <span className="text-[11px]">(còn {theMoiConLai})</span>
-                </label>
-                <span className="text-slate-300">·</span>
-                <span className="font-bold text-emerald-700">Thuộc {daThuoc}/{theTheoChuDe.length}</span>
+                <span className="font-semibold text-emerald-700">thuộc {daThuoc}/{theTheoChuDe.length}</span>
                 {theKho > 0 && <><span className="text-slate-300">·</span>
-                  <span className="font-bold text-rose-600" title="Thẻ quên từ 4 lần trở lên — nên mở lại điều gốc đọc kỹ">Khó {theKho}</span></>}
-                {chuoi > 1 && <><span className="text-slate-300">·</span><span className="font-bold text-amber-600">🔥 {chuoi} ngày</span></>}
-                <div className="h-1.5 min-w-[80px] flex-1 overflow-hidden rounded-full bg-slate-100">
-                  <div className="h-full bg-emerald-500 transition-all" style={{ width: `${theTheoChuDe.length ? (daThuoc / theTheoChuDe.length) * 100 : 0}%` }} />
-                </div>
-                <button onClick={() => setBatGo((v) => !v)}
-                  title="Gõ đáp án bằng tay nhớ chắc hơn hẳn chỉ lật thẻ rồi gật đầu"
-                  className={`rounded-full border px-2.5 py-1 text-[11.5px] font-semibold ${batGo ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-500'}`}>
-                  ⌨ Gõ đáp án
+                  <span className="font-semibold text-rose-600" title="Thẻ quên từ 4 lần trở lên — nên mở lại điều gốc đọc kỹ">khó {theKho}</span></>}
+                {chuoi > 1 && <span className="font-semibold text-amber-600">🔥 {chuoi}</span>}
+                <button onClick={() => setMoCaiDat((v) => !v)}
+                  title="Chọn chặng, số thẻ mới mỗi ngày, cách học"
+                  className={`ml-auto shrink-0 rounded-full border px-2.5 py-1 text-[12px] font-semibold ${moCaiDat ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-500'}`}>
+                  ⚙ Cài đặt
                 </button>
               </div>
+
+              {moCaiDat && (
+                <div className="mt-2 space-y-2 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
+                  <label className="block">
+                    <span className="text-[11.5px] font-semibold text-slate-500">Học chặng nào</span>
+                    <select value={chuDeHoc} onChange={(e) => { setChuDeHoc(e.target.value); setTheSo(0); setDatLat(false); }}
+                      className="mt-0.5 block w-full rounded-lg border-2 border-slate-200 bg-white px-2 py-1.5 text-[12.5px] font-semibold text-[#0A2540] outline-none">
+                      <option value="">Cả lộ trình, theo thứ tự chặng ({dsThe.length} thẻ)</option>
+                      {changCo.map((c) => {
+                        const ds2 = dsThe.filter((t) => cacChang(t).includes(c.so));
+                        const xong = ds2.filter((t) => ((boThe[t.khoa] as any)?.S || 0) >= 21).length;
+                        return <option key={c.so} value={String(c.so)}>{c.trongTam ? '★ ' : ''}{c.icon} Chặng {c.so + 1}. {c.ten} — {xong}/{ds2.length}</option>;
+                      })}
+                    </select>
+                  </label>
+                  <div className="flex flex-wrap items-center gap-2 text-[12px]">
+                    <label className="flex items-center gap-1 text-slate-500"
+                      title="Mỗi ngày nhận thêm bao nhiêu thẻ CHƯA HỌC BAO GIỜ. Thẻ đến hạn ôn thì luôn ra hết.">
+                      Thẻ mới mỗi ngày
+                      <select value={theMoiMoiNgay} onChange={(e) => setTheMoiMoiNgay(Number(e.target.value))}
+                        className="rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[12px] font-bold text-[#0A2540] outline-none">
+                        {[5, 10, 20, 30, 50].map((n) => <option key={n} value={n}>{n}</option>)}
+                      </select>
+                      <span className="text-[11px]">(còn {theMoiConLai})</span>
+                    </label>
+                    <button onClick={() => setBatGo((v) => !v)}
+                      title="Gõ đáp án bằng tay nhớ chắc hơn hẳn chỉ lật thẻ rồi gật đầu"
+                      className={`rounded-full border px-2.5 py-1 text-[11.5px] font-semibold ${batGo ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-500'}`}>
+                      ⌨ Gõ đáp án
+                    </button>
+                    <button onClick={() => { if (confirm('Xoá hết tiến độ học thuộc?')) { setBoThe({}); try { localStorage.removeItem('luat-the-hoc'); } catch { /* */ } } }}
+                      className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11.5px] font-semibold text-rose-500">
+                      Học lại từ đầu
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {theHomNay.length === 0 ? (
                 <div className="mt-4 rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50/60 p-6 text-center">
@@ -1020,9 +1043,12 @@ export default function TraCuuLuatPage() {
                   let n = 0; a.forEach((w) => { if (b.has(w)) n += 1; });
                   return Math.round((n / Math.max(a.size, 1)) * 100);
                 };
+                // Thẻ CAO ĐẦY MÀN HÌNH như app học bài: trước đây thẻ nhỏ nằm trên cùng,
+                // bỏ trống hơn nửa màn hình phía dưới, mà nút "Xem đáp án" lại nằm tít trên
+                // cao — ngón cái với không tới. 100dvh trừ phần đầu trang và thanh đáy.
                 return (
-                  <div className="mt-3">
-                    <div className="rounded-2xl border-2 border-slate-200 bg-white p-4">
+                  <div className="mt-3 flex flex-col lg:block" style={{ minHeight: 'calc(100dvh - 210px)' }}>
+                    <div className="flex flex-1 flex-col rounded-2xl border-2 border-slate-200 bg-white p-4">
                       <div className="flex flex-wrap items-center justify-between gap-1 text-[11px] font-semibold text-slate-400">
                         <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-500">{t.loai} · {t.chuDe}</span>
                         <span>{c.lan ? `đã ôn ${c.lan} lần · nhớ chắc ~${Math.round(c.S || 0)} ngày` : 'thẻ mới'}</span>
@@ -1032,7 +1058,7 @@ export default function TraCuuLuatPage() {
                           Thẻ này đã quên {c.sai} lần — nên mở điều gốc đọc lại một lượt rồi hãy ôn tiếp.
                         </p>
                       )}
-                      <p className="mt-2 text-[16px] font-extrabold leading-snug text-[#0A2540]">{t.hoi}</p>
+                      <p className="mt-2 text-[17px] font-extrabold leading-snug text-[#0A2540]">{t.hoi}</p>
                       {!datLat ? (
                         <>
                           {batGo ? (
@@ -1040,12 +1066,12 @@ export default function TraCuuLuatPage() {
                               placeholder="Gõ câu trả lời theo trí nhớ… (gõ đúng ý là được, không cần đúng từng chữ)"
                               className="mt-2 w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-[13px] outline-none focus:border-[#0A2540]" />
                           ) : (
-                            <p className="mt-2 text-[13px] italic leading-snug text-slate-500">
+                            <p className="my-4 text-[13px] italic leading-snug text-slate-500">
                               Tự trả lời trong đầu trước đã — nhớ lại được mới là học, đọc lại thì không.
                             </p>
                           )}
                           <button onClick={() => setDatLat(true)}
-                            className="mt-3 w-full rounded-xl bg-[#0A2540] px-3 py-2.5 text-[14px] font-bold text-white">
+                            className="mt-auto w-full rounded-xl bg-[#0A2540] px-3 py-3 text-[15px] font-bold text-white">
                             Xem đáp án
                           </button>
                         </>
@@ -1061,7 +1087,8 @@ export default function TraCuuLuatPage() {
                             <p className={`text-[13px] leading-relaxed text-slate-700 ${t.nho ? 'mt-1' : ''}`}>{t.dap}</p>
                           </div>
                           {t.dan && <div className="mt-2 flex flex-wrap gap-1">{t.dan.map((d, i2) => <NutDan key={i2} d={d} nho />)}</div>}
-                          <div className="mt-3 grid grid-cols-4 gap-1.5">
+                          {/* Dính đáy: đáp án dài thì cuộn, nhưng 4 nút luôn trong tầm ngón cái. */}
+                          <div className="sticky bottom-0 -mx-4 mt-3 grid grid-cols-4 gap-1.5 bg-white/95 px-4 pb-1 pt-2 backdrop-blur">
                             {([[1, 'Quên', 'border-rose-300 bg-rose-50 text-rose-700'],
                                [2, 'Khó', 'border-amber-300 bg-amber-50 text-amber-700'],
                                [3, 'Được', 'border-sky-300 bg-sky-50 text-sky-700'],
@@ -1078,8 +1105,7 @@ export default function TraCuuLuatPage() {
                     <div className="mt-2 flex items-center justify-between text-[12px] text-slate-400">
                       <button onClick={() => { setDatLat(false); setGoThu(''); setTheSo((i2) => i2 + 1); }} className="font-semibold hover:text-slate-700">Để lát nữa →</button>
                       <span>{(theSo % theHomNay.length) + 1}/{theHomNay.length}</span>
-                      <button onClick={() => { if (confirm('Xoá hết tiến độ học thuộc?')) { setBoThe({}); try { localStorage.removeItem('luat-the-hoc'); } catch { /* */ } } }}
-                        className="hover:text-rose-600">Học lại từ đầu</button>
+                      <span className="text-slate-300">{t.loai}</span>
                     </div>
                   </div>
                 );

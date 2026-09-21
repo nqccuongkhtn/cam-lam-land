@@ -231,7 +231,7 @@ export default function TraCuuLuatPage() {
   // không chặn thì cuộn chuột làm trôi cả trang thay vì phóng sơ đồ.
   const xemSd = useRef({ phongTo: 1, dich: { x: 0, y: 0 } });
   // Kích thước sơ đồ do phần vẽ tính ra, gửi ngược lên đây để canh cho vừa khung.
-  const coSd = useRef({ rong: 0, cao: 0 });
+  const coSd = useRef({ rong: 0, cao: 0, x0: 0, y0: 0 });
   const daCanh = useRef('');
   xemSd.current = { phongTo, dich };
   useEffect(() => {
@@ -262,9 +262,12 @@ export default function TraCuuLuatPage() {
       const khoa = `${el.clientWidth}:${tieuDiem}`;
       if (daCanh.current === khoa) return;
       daCanh.current = khoa;
-      const z = Math.min(1, Math.max(0.35, (el.clientWidth - 16) / coSd.current.rong));
+      // Xem riêng một nhánh thì cho phóng tới 1,6 lần — chữ mới đủ to để đọc trên điện thoại.
+      const tran = tieuDiem != null ? 1.6 : 1;
+      const z = Math.min(tran, Math.max(0.3, (el.clientWidth - 16) / coSd.current.rong));
       setPhongTo(+z.toFixed(3));
-      setDich({ x: (el.clientWidth - coSd.current.rong * z) / 2, y: 8 });
+      setDich({ x: (el.clientWidth - coSd.current.rong * z) / 2 - coSd.current.x0 * z,
+                y: Math.max(8, (el.clientHeight - coSd.current.cao * z) / 2) - coSd.current.y0 * z });
     };
     const t = setTimeout(canh, 60);
     window.addEventListener('resize', canh);
@@ -762,7 +765,7 @@ export default function TraCuuLuatPage() {
                   <button key={x.ma} onClick={() => setThChon(x.ma)}
                     className="rounded-2xl border-2 border-slate-200 bg-white p-3 text-left transition hover:border-[#0A2540]">
                     <p className="text-[15px] font-extrabold leading-snug text-[#0A2540]">{x.icon} {x.ten}</p>
-                    <p className="mt-1 text-[12.5px] leading-snug text-slate-500">{x.tom}</p>
+                    <p className="mt-1 hidden text-[12.5px] leading-snug text-slate-500 lg:block">{x.tom}</p>
                     <p className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11.5px] font-semibold">
                       <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-500">{x.buoc.length} bước</span>
                       {x.bang && <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">📑 đủ {x.bang.dong.length} trường hợp</span>}
@@ -1086,7 +1089,7 @@ export default function TraCuuLuatPage() {
 
           {cheDoHoc === 'sodo' && (!sd ? <p className="mt-3 text-slate-400">Đang tải sơ đồ…</p> : (
             <>
-              <p className="mt-3 text-[12.5px] leading-snug text-slate-500">
+              <p className="mt-3 hidden text-[12.5px] leading-snug text-slate-500 lg:block">
                 Gom cả bộ luật thành <b>{sd.nhanh.length} nhánh việc thật</b>. Ý nào nhiều điều nói cùng một chuyện
                 thì gộp làm một ô. Bấm vào nút <b>Điều …</b> là nhảy thẳng sang nguyên văn.
               </p>
@@ -1120,6 +1123,21 @@ export default function TraCuuLuatPage() {
                   </>
                 )}
               </div>
+
+              {/* Hàng nhánh: thu cả sơ đồ cho vừa màn hình điện thoại thì chữ chỉ còn 35%,
+                  nhìn được tổng thể nhưng không đọc nổi và bấm cũng không trúng. Nên thêm
+                  hàng này để nhảy thẳng vào một nhánh — lúc đó sơ đồ tự phóng cho vừa đúng
+                  nhánh đó, chữ đọc được. Bấm lại nhánh đang xem là về lại toàn cảnh. */}
+              {kieuSoDo === 'khungve' && (
+                <div className="mt-2 -mx-3 flex gap-1.5 overflow-x-auto px-3 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {sd.nhanh.map((n, i) => (
+                    <button key={n.ten} onClick={() => setTieuDiem(tieuDiem === i ? null : i)}
+                      className={`shrink-0 whitespace-nowrap rounded-full border px-2.5 py-1 text-[11.5px] font-semibold transition ${tieuDiem === i ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>
+                      {n.icon} {n.ten.split(' · ')[0].slice(0, 22)}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* ── KHUNG VẼ SƠ ĐỒ TƯ DUY ──
                   Toả HAI BÊN quanh gốc như sơ đồ tư duy thật, không dồn hết sang phải
@@ -1190,7 +1208,26 @@ export default function TraCuuLuatPage() {
                 const rongThat = (X1 + W1 + 60 + W2) * 2 + 40;
                 const caoThat = Math.max(cao.phai, cao.trai, yGoc + 90) + 30;
                 const lech = rongThat / 2 - XC;   // dịch để gốc nằm giữa khung
-                coSd.current = { rong: rongThat, cao: caoThat };   // báo lên để tự canh cho vừa khung
+                // ĐO ĐÚNG VÙNG CÓ CHỮ, không lấy bề rộng danh nghĩa của khung.
+                // rongThat là một công thức CỐ ĐỊNH, không co theo nội dung — nên lúc xem riêng
+                // một nhánh, khung vẫn "rộng 2.400px" và mức phóng vẫn 35%, nhánh đó bé tí nằm
+                // giữa một khoảng trống mênh mông. Đo theo hộp thật thì xem nhánh nào cũng vừa khít.
+                // Xem riêng một nhánh thì chỉ canh theo CỘT NỘI DUNG (các ô con), bỏ qua ô gốc
+                // và ô tên nhánh nằm bên trái. Sơ đồ trải ngang ba tầng: gốc → nhánh → nội dung,
+                // cộng cả ba thì rộng hơn 1.000px, máy 390px thu lại còn 35% — chữ không đọc nổi.
+                // Lấy riêng cột nội dung rộng ~300px thì phóng lên hơn 100%, đọc được ngay.
+                // Ô gốc vẫn vẽ, kéo sang trái một tí là thấy.
+                const con2 = o.filter((z) => z.cap === 2);
+                const dung = tieuDiem != null && con2.length ? con2 : o;
+                const mX = dung.map((z) => z.x + lech), mY = dung.map((z) => z.y);
+                const goc = tieuDiem != null && con2.length ? [] : [XC + lech - 92];
+                const x0 = Math.min(...mX, ...goc) - 12;
+                const x1 = Math.max(...dung.map((z) => z.x + lech + z.w),
+                                    ...(goc.length ? [XC + lech + 92] : [])) + 12;
+                const y0 = Math.min(...mY, ...(goc.length ? [yGoc] : [])) - 12;
+                const y1 = Math.max(...dung.map((z) => z.y + z.h),
+                                    ...(goc.length ? [yGoc + 68] : [])) + 12;
+                coSd.current = { rong: x1 - x0, cao: y1 - y0, x0, y0 };
 
                 const cong = (c: { x1: number; y1: number; x2: number; y2: number }) =>
                   `M ${c.x1} ${c.y1} C ${(c.x1 + c.x2) / 2} ${c.y1}, ${(c.x1 + c.x2) / 2} ${c.y2}, ${c.x2} ${c.y2}`;

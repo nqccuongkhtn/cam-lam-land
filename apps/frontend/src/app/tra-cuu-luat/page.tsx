@@ -217,6 +217,9 @@ export default function TraCuuLuatPage() {
   const [docBen, setDocBen] = useState<{ ma: string; so: number } | null>(null);
   const [moSuaDoi, setMoSuaDoi] = useState<Record<string, boolean>>({});
   const [moLuocDo, setMoLuocDo] = useState(false);
+  const [moThuocTinh, setMoThuocTinh] = useState(false);
+  // Điện thoại: danh sách điều đang bung ra hay đã thu lại (máy tính không dùng tới).
+  const [moDs, setMoDs] = useState(false);
   const [thChon, setThChon] = useState<string>('');
   // Đánh dấu đã chuẩn bị xong từng giấy tờ — lưu trong máy để hôm sau mở lại vẫn còn.
   const [daCo, setDaCo] = useState<Record<string, boolean>>({});
@@ -227,6 +230,9 @@ export default function TraCuuLuatPage() {
   // Phải gắn tay bằng addEventListener: React để sự kiện cuộn ở chế độ "không chặn được",
   // không chặn thì cuộn chuột làm trôi cả trang thay vì phóng sơ đồ.
   const xemSd = useRef({ phongTo: 1, dich: { x: 0, y: 0 } });
+  // Kích thước sơ đồ do phần vẽ tính ra, gửi ngược lên đây để canh cho vừa khung.
+  const coSd = useRef({ rong: 0, cao: 0 });
+  const daCanh = useRef('');
   xemSd.current = { phongTo, dich };
   useEffect(() => {
     const el = khungVe.current;
@@ -245,6 +251,25 @@ export default function TraCuuLuatPage() {
     el.addEventListener('wheel', cuon, { passive: false });
     return () => el.removeEventListener('wheel', cuon);
   }, [the, kieuSoDo]);
+
+  // TỰ CANH CHO VỪA KHUNG mỗi khi mở khung vẽ, đổi nhánh đang xem, hoặc xoay máy.
+  // Chỉ canh MỘT LẦN cho mỗi tình huống (daCanh) để không giật khi người dùng đang kéo.
+  useEffect(() => {
+    if (the !== 'sodo' || cheDoHoc !== 'sodo' || kieuSoDo !== 'khungve') return;
+    const canh = () => {
+      const el = khungVe.current;
+      if (!el || !coSd.current.rong) return;
+      const khoa = `${el.clientWidth}:${tieuDiem}`;
+      if (daCanh.current === khoa) return;
+      daCanh.current = khoa;
+      const z = Math.min(1, Math.max(0.35, (el.clientWidth - 16) / coSd.current.rong));
+      setPhongTo(+z.toFixed(3));
+      setDich({ x: (el.clientWidth - coSd.current.rong * z) / 2, y: 8 });
+    };
+    const t = setTimeout(canh, 60);
+    window.addEventListener('resize', canh);
+    return () => { clearTimeout(t); window.removeEventListener('resize', canh); };
+  }, [the, cheDoHoc, kieuSoDo, tieuDiem, sd]);
   const [dm, setDm] = useState<VanBanNgan[]>([]);
   const [timDm, setTimDm] = useState('');
   const [locLoai, setLocLoai] = useState('');
@@ -498,7 +523,7 @@ export default function TraCuuLuatPage() {
   /** Lần sau ôn sau bao nhiêu ngày nếu bấm nút này — hiện sẵn lên nút cho đỡ bấm mò. */
   const hienNgay = (c: any, g: number) => {
     const n = soNgay(tinhThe(c, g).S);
-    return g === 1 ? 'ôn lại hôm nay' : n < 30 ? `${n} ngày` : n < 365 ? `${Math.round(n / 30)} tháng` : `${(n / 365).toFixed(1)} năm`;
+    return g === 1 ? 'lát ôn lại' : n < 30 ? `${n} ngày` : n < 365 ? `${Math.round(n / 30)} tháng` : `${(n / 365).toFixed(1)} năm`;
   };
 
   const traLoiThe = (khoa: string, g: number) => {
@@ -574,6 +599,7 @@ export default function TraCuuLuatPage() {
   const moDieu = (ma: string, so: number) => {
     if (ma !== maVb) { setMaVb(ma); setMoChuong({}); }
     setXemPhuLuc(false); setChon(so); setThe('luat');
+    setMoDs(false);        // điện thoại: chọn xong thì thu danh sách, nhường màn hình cho nội dung
     oNoiDung.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
   // Đang ở thẻ nào thì mở kiểu đó: ở "Toàn văn" thì nhảy tới điều luôn; ở sơ đồ, tình
@@ -691,21 +717,32 @@ export default function TraCuuLuatPage() {
   const tongDieu = kho.reduce((s, x) => s + x.soDieu, 0);
 
   return (
-    <div className="mx-auto max-w-6xl px-3 py-4 sm:px-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <h1 className="text-lg font-extrabold text-[#0A2540] sm:text-2xl">⚖️ Tra cứu &amp; học Luật Đất đai</h1>
-        <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[11px] font-bold text-rose-700">Nội bộ</span>
+    <div className="mx-auto max-w-6xl px-3 pb-24 pt-3 sm:px-4 lg:pb-4 lg:pt-4">
+      {/* Điện thoại: tên trang + số liệu gộp vào MỘT DÒNG. Máy tính vẫn để hai dòng như cũ. */}
+      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+        <h1 className="text-[16px] font-extrabold text-[#0A2540] sm:text-2xl">⚖️ Luật Đất đai</h1>
+        <span className="rounded-full bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-700">Nội bộ</span>
+        <span className="text-[11.5px] text-slate-500 lg:hidden">
+          {kho.length ? <>{kho.length} văn bản · {tongDieu} điều</> : 'Đang tải…'}
+        </span>
       </div>
-      <p className="mt-1 text-[12.5px] leading-snug text-slate-500">
+      <p className="mt-1 hidden text-[12.5px] leading-snug text-slate-500 lg:block">
         {kho.length ? <><b className="text-[#0A2540]">{kho.length} văn bản</b> · <b className="text-[#0A2540]">{tongDieu} điều</b> · nguyên văn từ bản PDF ký số Công báo</> : 'Đang tải…'}
       </p>
 
-      <div className="mt-3 flex gap-1.5">
+      {/* Màn hình điện thoại 390px không đủ cho 4 thẻ -> cho TRƯỢT NGANG, đừng để xuống
+          dòng thành hai hàng chen chúc. -mx-3 px-3 để vuốt được sát mép máy. */}
+      <div className="mt-3 -mx-3 hidden gap-1.5 overflow-x-auto px-3 pb-1 lg:flex [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {([['tinhhuong', '🧭 Tình huống'], ['luat', '⚖️ Toàn văn'],
-           ['sodo', `🎴 Học thuộc${theHomNay.length ? ` (${theHomNay.length})` : ''}`],
+           ['the', `🎴 Thẻ ôn tập${theHomNay.length ? ` (${theHomNay.length})` : ''}`],
+           ['sodo', '🧠 Sơ đồ'],
            ['danhmuc', '📚 Danh mục']] as const).map(([k, l]) => (
-          <button key={k} onClick={() => { setThe(k); if (k === 'sodo') setCheDoHoc('the'); }}
-            className={`rounded-full border px-3 py-1.5 text-[12.5px] font-semibold transition ${the === k ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>{l}</button>
+          <button key={k} onClick={() => {
+            if (k === 'the') { setThe('sodo'); setCheDoHoc('the'); }
+            else if (k === 'sodo') { setThe('sodo'); setCheDoHoc('sodo'); }
+            else setThe(k);
+          }}
+            className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-[12.5px] font-semibold transition ${(k === 'the' ? the === 'sodo' && cheDoHoc === 'the' : k === 'sodo' ? the === 'sodo' && cheDoHoc === 'sodo' : the === k) ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>{l}</button>
         ))}
       </div>
 
@@ -919,13 +956,6 @@ export default function TraCuuLuatPage() {
       {/* ── SƠ ĐỒ TƯ DUY: gom cả bộ luật thành 8 nhánh việc thật, mỗi ô dẫn thẳng tới điều gốc ── */}
       {the === 'sodo' && (
         <div className="mt-3">
-          {/* Hai cách học, cùng một kho kiến thức: NHÌN TỔNG THỂ (sơ đồ) và NHỚ LÂU (thẻ lật). */}
-          <div className="flex gap-1.5">
-            {([['the', `🎴 Thẻ ôn tập${theHomNay.length ? ` (${theHomNay.length})` : ''}`], ['sodo', '🧠 Sơ đồ tổng thể']] as const).map(([k, l]) => (
-              <button key={k} onClick={() => setCheDoHoc(k)}
-                className={`rounded-full border px-3 py-1 text-[12.5px] font-semibold transition ${cheDoHoc === k ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>{l}</button>
-            ))}
-          </div>
 
           {cheDoHoc === 'the' && (
             <div className="mt-3">
@@ -1034,8 +1064,8 @@ export default function TraCuuLuatPage() {
                                [3, 'Được', 'border-sky-300 bg-sky-50 text-sky-700'],
                                [4, 'Dễ', 'border-emerald-300 bg-emerald-50 text-emerald-700']] as const).map(([g, nhan, mau]) => (
                               <button key={g} onClick={() => traLoiThe(t.khoa, g)}
-                                className={`rounded-xl border-2 px-1 py-2 text-[12.5px] font-bold ${mau}`}>
-                                {nhan}<span className="block text-[10px] font-normal opacity-70">{hienNgay(c, g)}</span>
+                                className={`flex min-h-[54px] flex-col items-center justify-center rounded-xl border-2 px-0.5 py-1.5 text-[12.5px] font-bold leading-tight ${mau}`}>
+                                {nhan}<span className="mt-0.5 block text-[10px] font-normal leading-tight opacity-70">{hienNgay(c, g)}</span>
                               </button>
                             ))}
                           </div>
@@ -1080,12 +1110,12 @@ export default function TraCuuLuatPage() {
                     <span className="text-[11.5px] font-semibold text-slate-400">{Math.round(phongTo * 100)}%</span>
                     <button onClick={() => setPhongTo((z) => Math.min(2, +(z + 0.1).toFixed(2)))}
                       className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-bold text-slate-600">+</button>
-                    <button onClick={() => { setPhongTo(0.6); setDich({ x: 0, y: 0 }); setTieuDiem(null); }}
-                      title="Thu nhỏ để thấy toàn bộ sơ đồ, đưa gốc về giữa"
+                    <button onClick={() => { setTieuDiem(null); daCanh.current = ''; }}
+                      title="Thu cho vừa khung và đưa gốc về giữa"
                       className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-600">⤢ Vừa màn hình</button>
                     <input value={timSoDo} onChange={(e) => setTimSoDo(e.target.value)}
                       placeholder="Tìm trong sơ đồ…"
-                      className="ml-1 min-w-[140px] flex-1 rounded-full border border-slate-200 px-3 py-1 text-[12px] outline-none focus:border-[#0A2540]" />
+                      className="ml-1 min-w-0 flex-1 rounded-full border border-slate-200 px-3 py-1 text-[12px] outline-none focus:border-[#0A2540]" />
                     {timSoDo && <button onClick={() => setTimSoDo('')} className="text-slate-400">✕</button>}
                   </>
                 )}
@@ -1160,6 +1190,7 @@ export default function TraCuuLuatPage() {
                 const rongThat = (X1 + W1 + 60 + W2) * 2 + 40;
                 const caoThat = Math.max(cao.phai, cao.trai, yGoc + 90) + 30;
                 const lech = rongThat / 2 - XC;   // dịch để gốc nằm giữa khung
+                coSd.current = { rong: rongThat, cao: caoThat };   // báo lên để tự canh cho vừa khung
 
                 const cong = (c: { x1: number; y1: number; x2: number; y2: number }) =>
                   `M ${c.x1} ${c.y1} C ${(c.x1 + c.x2) / 2} ${c.y1}, ${(c.x1 + c.x2) / 2} ${c.y2}, ${c.x2} ${c.y2}`;
@@ -1305,8 +1336,8 @@ export default function TraCuuLuatPage() {
             hoặc tải thẳng tệp PDF ký số.
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
-            <input value={timDm} onChange={(e) => setTimDm(e.target.value)} placeholder="Tìm trong danh mục (gõ không dấu cũng được)…"
-              className="min-w-[240px] flex-1 rounded-xl border-2 border-slate-200 px-3 py-2 text-[14px] outline-none focus:border-[#0A2540]" />
+            <input value={timDm} onChange={(e) => setTimDm(e.target.value)} placeholder="Tìm trong danh mục…"
+              className="min-w-0 flex-1 rounded-xl border-2 border-slate-200 px-3 py-2 text-[14px] outline-none focus:border-[#0A2540]" />
             <select value={locLoai} onChange={(e) => setLocLoai(e.target.value)} className="rounded-xl border-2 border-slate-200 px-2 py-2 text-[14px]">
               <option value="">Tất cả loại</option>
               {[...new Set(dm.map((x) => x.loai))].sort().map((l) => <option key={l} value={l}>{l}</option>)}
@@ -1347,7 +1378,7 @@ export default function TraCuuLuatPage() {
           thấy hết. Nay gom vào một ô sổ xuống, chia nhóm Luật / Nghị định / Thông tư. */}
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <select value={maVb} onChange={(e) => doiVanBan(e.target.value)}
-          className="min-w-[260px] flex-1 rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-[14px] font-semibold text-[#0A2540] outline-none focus:border-[#0A2540]">
+          className="min-w-0 flex-1 rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-[14px] font-semibold text-[#0A2540] outline-none focus:border-[#0A2540]">
           {([['Đang áp dụng — Luật', (x: KhoItem) => !x.hetHieuLuc && x.soHieu.includes('/QH')],
              ['Đang áp dụng — Nghị định', (x: KhoItem) => !x.hetHieuLuc && x.soHieu.includes('NĐ-CP')],
              ['Đang áp dụng — Thông tư', (x: KhoItem) => !x.hetHieuLuc && x.soHieu.includes('/TT-')],
@@ -1381,7 +1412,16 @@ export default function TraCuuLuatPage() {
         const k = kho.find((x) => x.ma === maVb);
         return (
           <div className="mt-1.5 rounded-xl border border-slate-200 bg-slate-50/70 px-2.5 py-2">
-            <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[11.5px] text-slate-500">
+            {/* Điện thoại: gấp lại, chỉ hiện dòng quan trọng nhất là CÒN HAY HẾT HIỆU LỰC.
+                Sáu mục thuộc tính dàn ngang chiếm 3 dòng mà lúc tra cứu ít khi cần tới. */}
+            <button onClick={() => setMoThuocTinh((v) => !v)}
+              className="flex w-full items-center justify-between text-[12px] lg:hidden">
+              <span className="font-semibold text-slate-600">
+                {vb.soHieu} · {vb.hetHieuLuc ? <b className="text-rose-600">Hết hiệu lực</b> : <b className="text-emerald-600">Còn hiệu lực</b>}
+              </span>
+              <span className="text-slate-400">{moThuocTinh ? 'thu ▴' : 'chi tiết ▾'}</span>
+            </button>
+            <div className={`flex-wrap gap-x-4 gap-y-0.5 text-[11.5px] text-slate-500 ${moThuocTinh ? 'mt-1.5 flex' : 'hidden lg:flex'}`}>
               <span>Số hiệu: <b className="text-slate-700">{vb.soHieu}</b></span>
               <span>Ban hành: <b className="text-slate-700">{ngayVn(vb.ngay)}</b></span>
               {k?.ngayHieuLuc && <span>Hiệu lực: <b className="text-slate-700">{ngayVn(k.ngayHieuLuc)}</b></span>}
@@ -1469,7 +1509,7 @@ export default function TraCuuLuatPage() {
             Trong văn bản này: {bo > 0 && <><b className="text-rose-600">{bo} điều đã hết hiệu lực ⛔</b></>}
             {bo > 0 && phan > 0 && ' · '}
             {phan > 0 && <><b className="text-amber-600">{phan} điều bị sửa đổi / bãi bỏ một phần ⚠️</b></>}
-            {' '}— nhìn dấu ở danh sách bên trái là biết.
+            {' '}— nhìn dấu ở danh sách là biết.
           </p>
         );
       })()}
@@ -1479,7 +1519,7 @@ export default function TraCuuLuatPage() {
         <div className="flex items-center gap-2 rounded-xl border-2 border-slate-200 px-3 py-2 focus-within:border-[#0A2540]">
           <span className="text-slate-400">🔍</span>
           <input value={tim} onChange={(e) => setTim(e.target.value)}
-            placeholder="Gõ từ khoá hoặc số điều — vd: thu hoi dat, 75"
+            placeholder="Gõ từ khoá hoặc số điều…"
             className="w-full bg-transparent text-[15px] outline-none" />
           {tim && <button onClick={() => setTim('')} className="text-slate-400 hover:text-slate-700">✕</button>}
         </div>
@@ -1531,8 +1571,21 @@ export default function TraCuuLuatPage() {
               Bản gốc 1993 không có mấy điều này, mà chèn chữ vào giữa nguyên văn là sửa luật
               gốc — không được phép. Nên hiện thành dòng gạch đứt nối ngay sau điều liền trước,
               bấm vào thì mở đúng khoản của luật sửa đổi, nơi có nguyên văn của nó. */}
-          {/* ── CỘT TRÁI: cây chương → điều, hoặc kết quả tìm ── */}
-          <div className="max-h-[70vh] overflow-y-auto rounded-xl border border-slate-200 bg-white">
+          {/* ── CỘT TRÁI: cây chương → điều, hoặc kết quả tìm ──
+              TRÊN ĐIỆN THOẠI (dưới lg) chỉ hiện MỘT trong hai: đang đọc một điều thì thu
+              danh sách lại thành một nút, bấm mới bung ra. Trước đây danh sách chiếm 70%
+              màn hình và nằm ngay trên nội dung, đọc xong muốn chọn điều khác phải cuộn
+              ngược cả màn hình — rất khó dùng. Máy tính màn rộng thì vẫn để hai cột. */}
+          {dieuDangXem && !moDs && (
+            <button onClick={() => setMoDs(true)}
+              className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left lg:hidden">
+              <span className="text-[13px] font-bold text-[#0A2540]">📋 Danh sách điều</span>
+              <span className="text-[12px] text-slate-400">
+                {tim || chiGhim || chiGt ? `${ketQua.length} điều khớp` : `${vb.dieu.length} điều`} ▾
+              </span>
+            </button>
+          )}
+          <div className={`max-h-[70vh] overflow-y-auto rounded-xl border border-slate-200 bg-white ${dieuDangXem && !moDs ? 'hidden lg:block' : ''}`}>
             <p className="sticky top-0 z-10 border-b bg-slate-50/95 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-500 backdrop-blur">
               {tim || chiGhim || chiGt ? `${ketQua.length} điều khớp${timCaKho ? ' · cả kho' : ''}` : `${vb.chuong.length ? vb.chuong.length + ' chương · ' : ''}${vb.dieu.length} điều`}
             </p>
@@ -1621,7 +1674,7 @@ export default function TraCuuLuatPage() {
             ) : !dieuDangXem ? (
               <div className="py-10 text-center text-slate-400">
                 <p className="text-4xl">⚖️</p>
-                <p className="mt-2 text-sm">Chọn một điều ở cột bên trái, hoặc gõ từ khoá để tìm.</p>
+                <p className="mt-2 text-sm">Chọn một điều trong danh sách, hoặc gõ từ khoá để tìm.</p>
                 <p className="mt-1 text-[12px]">Mẹo: gõ thẳng <b>số điều</b> (ví dụ <b>79</b>) là nhảy tới ngay.</p>
                 <p className="mt-1 text-[12px]">Việc nào luật ghi &ldquo;Chính phủ quy định chi tiết&rdquo; thì bật <b>Tìm cả kho</b> để ra luôn nghị định.</p>
               </div>
@@ -1885,7 +1938,7 @@ export default function TraCuuLuatPage() {
                 )}
               </div>
 
-              <div className="flex gap-1.5 border-t bg-slate-50 px-3 py-2">
+              <div className="flex gap-1.5 border-t bg-slate-50 px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
                 <button onClick={() => { const b = docBen; setDocBen(null); if (b) moDieu(b.ma, b.so); }}
                   className="flex-1 rounded-lg bg-[#0A2540] px-3 py-1.5 text-[12.5px] font-bold text-white">
                   Mở hẳn ở Toàn văn →
@@ -1901,6 +1954,41 @@ export default function TraCuuLuatPage() {
           </>
         );
       })()}
+
+      {/* ── THANH ĐIỀU HƯỚNG DƯỚI ĐÁY — chỉ trên điện thoại ──
+          Ngón cái với tới được, không phải với lên đỉnh màn hình. Đây là cách mọi app
+          điện thoại làm, và là lý do bỏ hàng thẻ ở đầu trang đi. */}
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur lg:hidden"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <div className="mx-auto flex max-w-lg">
+          {([['tinhhuong', '🧭', 'Tình huống', false],
+             ['luat', '⚖️', 'Toàn văn', false],
+             ['the', '🎴', 'Thẻ ôn', true],
+             ['sodo', '🧠', 'Sơ đồ', false],
+             ['danhmuc', '📚', 'Danh mục', false]] as const).map(([k, ic, nhan, dem]) => {
+            const dang = k === 'the' ? (the === 'sodo' && cheDoHoc === 'the')
+              : k === 'sodo' ? (the === 'sodo' && cheDoHoc === 'sodo') : the === k;
+            return (
+              <button key={k} onClick={() => {
+                if (k === 'the') { setThe('sodo'); setCheDoHoc('the'); }
+                else if (k === 'sodo') { setThe('sodo'); setCheDoHoc('sodo'); }
+                else setThe(k as typeof the);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+                className={`relative flex flex-1 flex-col items-center gap-0.5 py-2 text-[10.5px] font-semibold ${dang ? 'text-[#0A2540]' : 'text-slate-400'}`}>
+                <span className="text-[19px] leading-none">{ic}</span>
+                {nhan}
+                {dem && theHomNay.length > 0 && (
+                  <span className="absolute right-[18%] top-1 rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white">
+                    {theHomNay.length}
+                  </span>
+                )}
+                {dang && <span className="absolute inset-x-4 top-0 h-0.5 rounded-full bg-[#0A2540]" />}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
 
       {/* ── THẺ XEM NHANH ── nổi ngay dưới chỗ vừa bấm, đọc xong đóng lại là về chỗ cũ. */}
       {xemNhanh && (() => {

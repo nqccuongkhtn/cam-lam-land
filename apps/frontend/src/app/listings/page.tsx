@@ -832,8 +832,13 @@ function ListingsInner() {
               sticky vào trong là vô tác dụng, cột vẫn cuộn mất như thường.
               Chặn chiều cao bằng màn hình + cho tự cuộn, để cột dài vẫn xem hết được.
               Không đè chân trang: cột chỉ trượt trong phạm vi hàng, hàng kết thúc
-              trước chân trang. */}
-          <div className="mt-0 hidden self-start lg:sticky lg:top-20 lg:block lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto lg:pr-1 cl-cot-ben">{sidebar}</div>
+              trước chân trang.
+              CON SỐ 173px LẤY TỪ ĐÂU: trang này có HAI thanh dính chồng nhau —
+              thanh đầu trang cao 57px, thanh lọc ("Lọc / Tin xác thực / Loại hình…")
+              dính tiếp từ 56 tới 165px. Đo thật trên máy chứ không ước. Lúc đầu để
+              80px nên cột chui xuống dưới thanh lọc, đỉnh cột bị che mất.
+              ĐỔI CHIỀU CAO THANH LỌC THÌ PHẢI SỬA LẠI HAI CON SỐ Ở ĐÂY. */}
+          <div className="mt-0 hidden self-start lg:sticky lg:top-[173px] lg:block lg:max-h-[calc(100dvh-185px)] lg:overflow-y-auto lg:pr-1 cl-cot-ben">{sidebar}</div>
         </div>
       )}
 

@@ -9222,7 +9222,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                   {camKeys.map((k, i) => (
                     <button key={i} onPointerDown={(e) => beginKfDrag(k, e)} onClick={(e) => { e.stopPropagation(); gotoKeyframe(k); }}
                       onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setCamKeys(camKeys.filter((_, j) => j !== i)); }}
-                      className="absolute top-1/2 z-20 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[2px]"
+                      className="absolute top-1/2 z-20 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-sm"
                       style={{ left: `${(k.t / Math.max(1, duration)) * 100}%`, background: k.ease === 'hold' ? '#f59e0b' : '#c4b5fd', boxShadow: '0 0 0 1.5px #4c1d95', cursor: 'ew-resize', touchAction: 'none' }}
                       title={`Khung tại ${k.t.toFixed(1)}s · ${EASES.find((x) => x.key === (k.ease || 'smooth'))?.name} — kéo để dời · bấm để xem · chuột phải để xoá`} />
                   ))}

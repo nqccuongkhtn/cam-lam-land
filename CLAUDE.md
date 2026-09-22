@@ -690,6 +690,21 @@ sửa tin là trang giá tự đúng theo.
 theo loại hình (nguồn + giấy phép ghi ở `tin-mau/NGUON-ANH.txt`). Có ảnh chụp thật thì thay
 thẳng vào, giữ nguyên tên file.
 
+## Độ bo tròn góc — CHỈ CÓ MỘT THANG
+
+Khai ở **`apps/frontend/tailwind.config.js`**, mục `borderRadius`. Đo thật trên
+batdongsan.com.vn (22/9/2026) thấy họ chỉ dùng **4 mức: 0 · 4px · 8px · tròn hẳn**
+(4px cho thẻ tin, ảnh trong thẻ và nút — đây là mức chủ đạo). Giao diện mình trước
+đó dùng **13 mức khác nhau trên 2065 chỗ** nên nhìn lộn xộn.
+
+Cách gom: **không sửa tay 2065 chỗ** (dễ sót, dễ làm hỏng) mà đổi ý nghĩa các mức
+ngay trong `tailwind.config.js` → `rounded-md` và `rounded` = 4px, `rounded-lg`,
+`rounded-xl`, `rounded-2xl` = 8px, `rounded-full` = tròn. Tên class giữ nguyên hết.
+⚠️ **Ở dự án này `rounded-xl` KHÔNG phải 12px và `rounded-2xl` KHÔNG phải 16px**
+như mặc định của Tailwind. Muốn trả về như cũ thì xoá khối `borderRadius` đó.
+Mấy chỗ ghi thẳng số (`rounded-[11px]`…) đã đổi hết, **đừng viết kiểu đó nữa**
+vì nó không đi qua cấu hình nên lại lệch thang.
+
 ## Những chỗ hay vấp
 
 - **Bản đồ trống / tin "đang tải" mãi** → backend chưa lên: `docker compose logs backend`.

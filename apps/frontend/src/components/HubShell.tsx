@@ -158,7 +158,7 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
                 <button
                   onClick={() => { if (runToolAction(t)) return; if (kids) { if (collapsed) { toggle(); setExpanded((e) => ({ ...e, [t.key]: true })); } else setExpanded((e) => ({ ...e, [t.key]: !e[t.key] })); } else setTab(t.key); }}
                   className={`group relative w-full text-left flex items-center ${collapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-2.5 border-l-[3px] transition ${on || childActive ? 'border-[#C8A14B] bg-[#C8A14B]/10' : 'border-transparent hover:bg-slate-50'}`}>
-                  <span className={`grid place-items-center w-9 h-9 rounded-[11px] shrink-0 transition-all ${on || childActive ? 'bg-[#C8A14B] text-[#0A2540] shadow-sm shadow-[#C8A14B]/40' : 'bg-[#0A2540] text-[#C8A14B] group-hover:bg-[#0d3a6b]'}`} dangerouslySetInnerHTML={{ __html: iconSvg(t.key) }} />
+                  <span className={`grid place-items-center w-9 h-9 rounded shrink-0 transition-all ${on || childActive ? 'bg-[#C8A14B] text-[#0A2540] shadow-sm shadow-[#C8A14B]/40' : 'bg-[#0A2540] text-[#C8A14B] group-hover:bg-[#0d3a6b]'}`} dangerouslySetInnerHTML={{ __html: iconSvg(t.key) }} />
                   {!collapsed && (
                     <span className="min-w-0 flex-1">
                       <span className={`block font-bold text-[13.5px] leading-tight ${on || childActive ? 'text-[#0A2540]' : 'text-slate-700'}`}>{t.name}{t.login && <span className="ml-1 text-[10px] font-semibold text-slate-400">🔒</span>}</span>

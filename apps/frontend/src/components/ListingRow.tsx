@@ -73,7 +73,7 @@ function ListingRow({ l, href }: { l: Listing; href?: string }) {
     </button>
   );
   const tierBadge = l.tier && l.tier !== 'normal' && (
-    <span className={`inline-flex items-center gap-0.5 text-white text-[9px] leading-none font-bold tracking-wide px-1.5 py-[3px] rounded-[3px] shadow-sm ${TIER_BADGE[l.tier] || 'bg-[#C8A14B]'}`}>
+    <span className={`inline-flex items-center gap-0.5 text-white text-[9px] leading-none font-bold tracking-wide px-1.5 py-[3px] rounded-sm shadow-sm ${TIER_BADGE[l.tier] || 'bg-[#C8A14B]'}`}>
       {l.tier === 'diamond' && <svg viewBox="0 0 24 24" fill="currentColor" className="w-2 h-2 shrink-0"><path d="M6 2h12l4 6-10 14L2 8z" /></svg>}
       {(TIER_LABEL[l.tier] || 'VIP').toUpperCase()}
     </span>

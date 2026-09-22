@@ -2277,7 +2277,7 @@ export default function MapPage() {
             );
             return (
               <div className="lg:hidden fixed inset-0 z-[58] flex flex-col justify-end bg-black/35 px-2.5 pb-[calc(var(--menu-cao,calc(56px+env(safe-area-inset-bottom)))+10px)] animate-[fadeIn_.15s_ease-out]" onClick={() => setQhSheet(false)}>
-                <div className="max-h-[62dvh] overflow-y-auto overscroll-contain rounded-[14px] bg-white/95 backdrop-blur-xl shadow-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" onClick={(e) => e.stopPropagation()}>
+                <div className="max-h-[62dvh] overflow-y-auto overscroll-contain rounded-lg bg-white/95 backdrop-blur-xl shadow-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" onClick={(e) => e.stopPropagation()}>
                   <p className="sticky top-0 z-20 bg-white/90 backdrop-blur px-4 py-2.5 text-center text-[12px] text-[#8a8a8e] border-b border-black/10">Chọn bản đồ quy hoạch</p>
                   {MUC_QH.map((o) => {
                     const bat = o.gom.every((id) => !!ovOn[id]);
@@ -2290,10 +2290,10 @@ export default function MapPage() {
                   })}
                   {tieuDe('Lớp dữ liệu')}
                   <div className="bg-[#f2f2f7] px-3 pb-3">
-                    <div className="overflow-hidden rounded-[10px] bg-white">
+                    <div className="overflow-hidden rounded bg-white">
                       {ranhXa && (
                         <div className="flex min-h-[42px] items-center gap-3 border-b border-black/10 px-3 py-1.5 last:border-b-0">
-                          <span className="h-3 w-3 shrink-0 rounded-[3px] bg-[#C8A14B]" />
+                          <span className="h-3 w-3 shrink-0 rounded-sm bg-[#C8A14B]" />
                           <span className="min-w-0 flex-1 truncate text-[14px] text-black">Ranh giới xã</span>
                           {congTac(ranhOn, () => setRanhOn(!ranhOn), 'Ranh giới xã')}
                         </div>
@@ -2305,7 +2305,7 @@ export default function MapPage() {
                         const bat = visible[l.slug] ?? false;
                         return (
                           <div key={l.slug} className="flex min-h-[42px] items-center gap-3 border-b border-black/10 px-3 py-1.5 last:border-b-0">
-                            <span className="h-3 w-3 shrink-0 rounded-[3px]" style={{ background: (l.style?.color as string) || DEFAULT_COLORS[l.layerType] }} />
+                            <span className="h-3 w-3 shrink-0 rounded-sm" style={{ background: (l.style?.color as string) || DEFAULT_COLORS[l.layerType] }} />
                             <span className="min-w-0 flex-1">
                               <span className="block truncate text-[14px] text-black">{l.name}</span>
                               {l.featureCount ? <span className="block text-[11px] text-[#8a8a8e]">{l.featureCount} đối tượng</span> : null}
@@ -2317,13 +2317,13 @@ export default function MapPage() {
                     </div>
                     {user && (
                       <button onClick={() => { setQhSheet(false); setPanelOpen(true); }}
-                        className="mt-3 flex w-full items-center justify-between rounded-[10px] bg-white px-3 py-3 text-[14px] text-black active:bg-black/5">
+                        className="mt-3 flex w-full items-center justify-between rounded bg-white px-3 py-3 text-[14px] text-black active:bg-black/5">
                         <span>📌 Sản phẩm đã lưu ({places.length})</span><span className="text-[#c7c7cc] text-xl leading-none">›</span>
                       </button>
                     )}
                   </div>
                 </div>
-                <button onClick={() => setQhSheet(false)} className="mt-2 w-full rounded-[14px] bg-white py-[11px] text-[14px] font-semibold text-[#0A2540] shadow-2xl active:bg-[#e5e5ea]">Đóng</button>
+                <button onClick={() => setQhSheet(false)} className="mt-2 w-full rounded-lg bg-white py-[11px] text-[14px] font-semibold text-[#0A2540] shadow-2xl active:bg-[#e5e5ea]">Đóng</button>
               </div>
             );
           })()}

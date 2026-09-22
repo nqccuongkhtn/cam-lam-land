@@ -497,27 +497,42 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
    hiệu ứng lại phóng thêm 8% nữa — hai lần phóng chồng nhau làm ảnh nhoè hẳn.
    Nay chỉ TRÔI NGANG rất chậm trong phần ảnh đã bị cắt: vẫn có chuyển động,
    mà không phóng to thêm một chút nào nên không mất nét. */
-@keyframes cl-hero {
-    0%   { opacity: 0; background-position: 48% 50%; }
-    3%   { opacity: 1; }
-   30%   { opacity: 1; }
-   36%   { opacity: 0; background-position: 52% 50%; }
-  100%   { opacity: 0; background-position: 48% 50%; }
+/* ══ BANNER ĐỘNG ĐẦU TRANG CHỦ ═══════════════════════════════════════════════
+   Chạy bằng thư viện Swiper (xem components/HeroBanner.tsx). Phần CSS ở đây chỉ
+   lo hai việc: ảnh trôi nhẹ, và chữ hiện dần khi đổi slide.
+
+   ⚠️ KHÔNG DÙNG HIỆU ỨNG PHÓNG TO (Ken Burns). Đã thử và hỏng, chủ dự án cũng đã
+   phàn nàn: "ảnh bạn zoom phóng to quá thành ra nó bị nhoè". Phóng thêm dù chỉ 8%
+   cũng là kéo giãn ảnh ra to hơn kích thước thật => mất nét.
+   Thay bằng TRÔI DỌC: ảnh 1920x640 đặt trong khung dẹt hơn nên bị cắt bớt chiều
+   cao, tức là còn dư khoảng 115px chưa nhìn thấy. Cho ảnh trôi chậm trong khoảng
+   dư đó là có chuyển động mà KHÔNG phóng to một chút nào. */
+@keyframes cl-hero-troi {
+  from { object-position: 50% 44%; }
+  to   { object-position: 50% 56%; }
 }
-.cl-hero-anh {
-  position: absolute; inset: 0;
-  background-size: cover; background-position: 50% 50%;
-  opacity: 0;
-  animation: cl-hero 18s infinite linear;
-  will-change: opacity, background-position;
+.cl-hero-swiper,
+.cl-hero-swiper .swiper-wrapper,
+.cl-hero-swiper .swiper-slide { height: 100%; }
+.cl-hero-swiper .swiper-slide img {
+  width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%;
 }
-.cl-hero-anh:nth-child(1) { animation-delay: 0s; }
-.cl-hero-anh:nth-child(2) { animation-delay: 6s; }
-.cl-hero-anh:nth-child(3) { animation-delay: 12s; }
-/* Người dùng đã tắt hiệu ứng chuyển động trong hệ điều hành thì để yên một tấm. */
+/* Chỉ ảnh của slide ĐANG HIỆN mới trôi — slide đang nằm chờ thì đứng yên cho đỡ tốn máy. */
+.cl-hero-swiper .swiper-slide-active img {
+  animation: cl-hero-troi var(--lau, 7s) linear forwards;
+}
+
+/* Chữ hiện dần lần lượt khi CHUYỂN slide. Slide đầu tiên KHÔNG chạy hiệu ứng —
+   chữ phải có ngay từ lúc trang vừa hiện, không để trống chờ JS. */
+@keyframes cl-hero-len {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+.cl-hero-chu > * { animation: cl-hero-len .5s var(--ease) both; }
+
 @media (prefers-reduced-motion: reduce) {
-  .cl-hero-anh { animation: none; }
-  .cl-hero-anh:nth-child(1) { opacity: 1; }
+  .cl-hero-swiper .swiper-slide-active img { animation: none; }
+  .cl-hero-chu > * { animation: none; }
 }
 
 /* ── HÀNG CHIP LOẠI HÌNH TRÊN ẢNH BÌA ──────────────────────────────────────

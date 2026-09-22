@@ -620,12 +620,8 @@ function ListingsInner() {
       ) : null}
       <h1 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">{mine ? 'Giỏ hàng của bạn' : title}</h1>
       <p className="text-sm text-slate-500 mt-0.5">{loading ? 'Đang tìm…' : <>Hiện có <b className="text-[#0A2540]">{shown.length}</b> bất động sản.</>}</p>
-      {/* Chip tiện ích: 1 hàng cuộn ngang gọn trên điện thoại, tự xuống dòng ở desktop */}
-      <div className="flex flex-nowrap sm:flex-wrap gap-2 mt-2 mb-3 overflow-x-auto sm:overflow-visible no-scrollbar">
-        <Link href="/gia-dat" className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 bg-[#C8A14B]/10 text-[#0A2540] font-bold text-sm px-3 py-1.5 rounded-full hover:bg-[#C8A14B]/20">💰 Giá đất &amp; định giá</Link>
-        <Link href="/cam-nang" className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 bg-[#0A2540]/[0.06] text-[#0A2540] font-bold text-sm px-3 py-1.5 rounded-full hover:bg-[#0A2540]/10">📚 Cẩm nang pháp lý</Link>
-        {user && <Link href="/sales/khach" className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 bg-[#7c3aed]/10 text-[#7c3aed] font-bold text-sm px-3 py-1.5 rounded-full hover:bg-[#7c3aed]/20">👥 CRM khách hàng</Link>}
-      </div>
+      {/* ĐÃ BỎ hàng chip "Giá đất & định giá · Cẩm nang pháp lý · CRM khách hàng":
+          ba mục này đã có trong trang Tiện ích rồi, để đây là trùng. Đừng thêm lại. */}
     </>
   );
 

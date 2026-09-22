@@ -17,7 +17,8 @@
     "pmtiles": "^3.0.6",
     "qrcode": "^1.5.4",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "swiper": "^11"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

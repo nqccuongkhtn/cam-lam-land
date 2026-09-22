@@ -265,7 +265,14 @@ export default function ListingDetail() {
               <div className="h-72 rounded-xl overflow-hidden">
                 <MapView center={[l.lng, l.lat]} zoom={15} baseMap="satellite" markers={[{ lng: l.lng, lat: l.lat, popupHtml: `<b>${l.title}</b>` }]} className="h-full w-full" />
               </div>
-              <a href={`https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lng}`} target="_blank" rel="noreferrer" className="cl-press mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#0A2540] py-2.5 font-bold text-white hover:bg-[#0d3a6b]">🧭 Chỉ đường đến bất động sản</a>
+              <a href={`https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lng}`} target="_blank" rel="noreferrer" className="cl-press mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#0A2540] py-2.5 font-bold text-white hover:bg-[#0d3a6b]">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+                  strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="m15.4 8.6-2 5.4-5.4 2 2-5.4z" />
+                </svg>
+                Chỉ đường đến bất động sản
+              </a>
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
@@ -276,7 +283,13 @@ export default function ListingDetail() {
                 <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Ngày đăng</p><p className="font-bold text-[#0A2540] text-sm">{created ? created.toLocaleDateString('vi-VN') : '—'}</p></div>
                 <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Hết hạn hiển thị</p><p className="font-bold text-[#0A2540] text-sm">{expiry ? expiry.toLocaleDateString('vi-VN') : 'Không giới hạn'}</p></div>
               </div>
-              <p className="text-xs text-slate-400 mt-3">🕒 {postedLabel(l.createdAt)}</p>
+              <p className="mt-3 flex items-center gap-1.5 text-xs text-slate-400">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+                  strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" /><path d="M12 7v5.2l3.2 1.9" />
+                </svg>
+                {postedLabel(l.createdAt)}
+              </p>
             </div>
 
             {/* Liên kết chéo → Cẩm nang pháp lý (tăng lượt xem bảng dịch vụ).
@@ -288,7 +301,17 @@ export default function ListingDetail() {
                 đặc — vẫn nổi để bấm mà không phá nhịp trang. Đừng đổi lại nền tối. */}
             <Link href="/cam-nang"
               className="group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-[#C8A14B]/60 hover:shadow-lg sm:p-5">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#0A2540]/[0.06] text-xl">📚</span>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#0A2540]/[0.06] text-[#0A2540]">
+                {/* Tờ giấy có dấu tích — thủ tục đã xong. Vẽ bằng nét, ăn theo màu
+                    chữ, đồng bộ với các biểu tượng khác của web. Đừng thay bằng
+                    emoji: emoji nhiều màu, lạc hẳn giữa khối navy/xám. */}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+                  strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6" aria-hidden="true">
+                  <path d="M6 3h8.5L19 7.5V21H6z" />
+                  <path d="M14 3v4.5h4.5" />
+                  <path d="m9 14.2 2 2 4-4.2" />
+                </svg>
+              </span>
               <span className="min-w-0 flex-1">
                 <span className="block font-bold text-[#0A2540]">Thủ tục pháp lý khi mua bán đất</span>
                 <span className="block text-[13px] text-slate-500">Sang tên sổ đỏ, thuế phí, kiểm tra sổ, mẫu hợp đồng đặt cọc — tư vấn miễn phí.</span>

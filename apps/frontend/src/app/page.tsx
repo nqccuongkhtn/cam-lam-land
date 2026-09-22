@@ -182,26 +182,55 @@ export default function Home() {
           <div className="cl-hero-anh" style={{ backgroundImage: 'url(/hero/hero-2.webp)' }} />
           <div className="cl-hero-anh" style={{ backgroundImage: 'url(/hero/hero-3.webp)' }} />
         </div>
-        {/* Ảnh nền nhiều chi tiết (nhà, cây, hồ bơi) nên chữ chìm vào ảnh, đọc mệt.
-            Phủ đậm hơn ở nửa trái nơi đặt chữ, và thêm một lớp tối nhẹ từ dưới lên
-            cho hàng chip ở đáy tách khỏi nền. */}
-        {/* Lần trước làm lớp phủ nhạt đi thì chữ chìm vào ảnh, đọc không ra.
-            Đậm lại ở nửa trái nơi đặt chữ, nửa phải vẫn để thấy rõ cảnh biển. */}
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/82 via-slate-900/48 to-slate-900/12" />
-        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-slate-900/40 to-transparent" />
+        {/* ══ LỚP PHỦ TỐI CHO CHỮ ĐỌC ĐƯỢC ═══════════════════════════════════
+            Ảnh bìa là bãi biển nắng: cát trắng, nước sáng, nhà resort trắng. Chữ
+            trắng đặt trần lên đó thì mờ tịt, câu dưới gần như mất hẳn. Nên phải có
+            lớp phủ tối, đậm ở nửa TRÁI nơi đặt chữ, nhạt dần sang phải để vẫn khoe
+            được cảnh biển.
+
+            ⚠️ BẪY ĐÃ VẤP — ĐỌC KỸ TRƯỚC KHI SỬA:
+            Trước đây viết bằng class Tailwind `from-slate-900/82 via-slate-900/48
+            to-slate-900/12`. Nhìn code thì thấy có lớp phủ, nhưng NGOÀI WEB KHÔNG
+            CÓ GÌ CẢ. Lý do: Tailwind chỉ sinh ra các mức mờ nằm trong bảng có sẵn
+            (…/40, /50, /60, /70, /75, /80, /90…). Mấy số 82, 48, 12 là tự bịa nên
+            nó LẶNG LẼ BỎ QUA, không báo lỗi gì — `background-image` tính ra `none`.
+            Chữ nằm trần trên ảnh suốt nhiều lần dựng lại mà không ai thấy nguyên nhân.
+            → Nay ghi THẲNG màu bằng style, Tailwind không đụng vào được nữa.
+              Muốn sửa độ đậm thì chỉnh số trong này, đừng quay lại dùng class.
+
+            Ba lớp:
+              1. Phủ đều rất nhẹ — dịu bớt mấy mảng nắng gắt, kéo luôn thanh menu
+                 trên cùng khỏi chìm vào nhà trắng.
+              2. Trái → phải — nơi đặt chữ đậm nhất.
+              3. Đáy — cho hàng chip loại hình tách khỏi nền. */}
+        {/* Bỏ khối chữ lớn rồi nên phủ NHẸ HẲN ĐI — để ảnh biển Bãi Dài thoáng ra.
+            Giờ trên ảnh chỉ còn ba thứ là chữ trắng: thanh menu trên cùng, nút
+            Bán/Cho thuê, và hàng chip loại hình ở đáy. Ô tìm kiếm nền trắng nên
+            không cần phủ. Vậy chỉ cần tối hai đầu, giữa để nguyên cho sáng. */}
+        <div className="absolute inset-0" style={{ background: 'rgba(8,20,36,0.18)' }} />
+        {/* Đầu trang — cho thanh menu và logo không chìm vào mấy toà nhà trắng. */}
+        <div
+          className="absolute inset-x-0 top-0 h-40"
+          style={{ background: 'linear-gradient(to bottom, rgba(8,20,36,0.52), rgba(8,20,36,0))' }}
+        />
+        {/* Đáy — cho hàng chip loại hình tách khỏi nền cát sáng. */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-36"
+          style={{ background: 'linear-gradient(to top, rgba(8,20,36,0.52), rgba(8,20,36,0))' }}
+        />
         <div className="relative mx-auto max-w-7xl px-3 sm:px-4 pt-[calc(5rem_+_env(safe-area-inset-top))] sm:pt-24 md:pt-28 pb-16 sm:pb-24 text-white">
-          <p className="text-[#FFD56A] font-semibold tracking-wide drop-shadow">★ Nền tảng bất động sản & quy hoạch Cam Lâm</p>
-          {/* 60px là quá khổ — tiêu đề xuống 2 dòng, chữ "bạn" nằm trơ trọi một mình.
-              Hạ 40px thì gọn MỘT DÒNG. Các trang rao bán lớn để 32-40px.
-              ⚠️ ĐÃ THỬ VÀ HỎNG: nén luôn chiều cao khối và khoảng cách giữa các dòng
-              cho "gọn" — chủ dự án nói CÀNG DÀY CÀNG RỐI. Đúng: năm tầng nội dung xếp
-              sát nhau thì mắt không biết nghỉ ở đâu. Đã trả lại khoảng thở như cũ,
-              chỉ giữ phần hạ cỡ chữ. Đừng nén lại. */}
-          <h1 className="text-[28px] sm:text-[34px] md:text-[40px] font-extrabold mt-3 max-w-3xl leading-[1.12] drop-shadow-[0_3px_18px_rgba(0,0,0,0.55)]">Tìm ngôi nhà mơ ước <span className="text-[#FFD56A]">của bạn</span></h1>
-          <p className="mt-3 sm:mt-4 text-slate-100 text-sm sm:text-lg max-w-2xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">Khám phá hàng ngàn bất động sản cao cấp và tra cứu quy hoạch chính xác trên toàn khu vực.</p>
+          {/* ĐÃ BỎ khối chữ lớn ở ảnh bìa (dòng "★ Nền tảng…", tiêu đề "Tìm ngôi nhà mơ ước
+              của bạn" và câu mô tả bên dưới) — chủ dự án thấy RỐI, muốn để ảnh biển cho thoáng
+              và vào thẳng ô tìm kiếm. Đừng tự ý thêm lại.
+
+              CHỈ GIỮ LẠI thẻ <h1> nhưng ẨN ĐI cho máy tìm kiếm đọc: mỗi trang web cần đúng một
+              thẻ h1 nói trang này về cái gì, bỏ hẳn thì Google mất chỗ bám và trang chủ tụt hạng.
+              Lớp "sr-only" của Tailwind là ẩn khỏi mắt người nhưng máy đọc màn hình và Google
+              vẫn thấy — KHÔNG phải display:none (cái đó Google coi là giấu chữ, bị phạt). */}
+          <h1 className="sr-only">Mua bán nhà đất và tra cứu bản đồ quy hoạch Cam Lâm, Khánh Hòa</h1>
 
           {/* Bán / Cho thuê */}
-          <div className="mt-7 inline-flex bg-white/15 backdrop-blur rounded-full p-1 border border-white/25">
+          <div className="inline-flex bg-white/15 backdrop-blur rounded-full p-1 border border-white/25">
             <button onClick={() => setHeroDeal('sale')} className={`px-5 py-1.5 rounded-full text-sm font-bold transition ${heroDeal === 'sale' ? 'bg-white text-[#0A2540]' : 'text-white/90 hover:text-white'}`}>Nhà đất bán</button>
             <button onClick={() => setHeroDeal('rent')} className={`px-5 py-1.5 rounded-full text-sm font-bold transition ${heroDeal === 'rent' ? 'bg-white text-[#0A2540]' : 'text-white/90 hover:text-white'}`}>Cho thuê</button>
           </div>
@@ -231,7 +260,7 @@ export default function Home() {
           <div className="mt-5 flex flex-wrap gap-2">
             {CATS.map((c) => (
               <Link key={c.t} href={`/listings?propertyType=${c.t}`}
-                className="bg-white/10 hover:bg-[#C8A14B] hover:text-[#0A2540] hover:border-[#C8A14B] backdrop-blur border border-white/25 rounded-full px-4 py-1.5 text-sm font-semibold transition active:scale-[.97]">
+                className="cl-chip-hero backdrop-blur border rounded-full px-4 py-1.5 text-sm font-semibold transition active:scale-[.97]">
                 {c.icon} {PROPERTY_LABELS[c.t]}
               </Link>
             ))}

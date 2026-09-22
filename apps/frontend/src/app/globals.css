@@ -519,3 +519,21 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
   .cl-hero-anh { animation: none; }
   .cl-hero-anh:nth-child(1) { opacity: 1; }
 }
+
+/* ── HÀNG CHIP LOẠI HÌNH TRÊN ẢNH BÌA ──────────────────────────────────────
+   Trước để nền trắng mờ (bg-white/10): chữ trắng trên nền trắng mờ, mà ba tấm
+   ảnh bìa thay phiên nhau nên có tấm nền là cát trắng → chữ gần như mất.
+   Đã ĐO thật: trên tấm hero-3 độ tương phản chỉ còn 2,8 (mức đọc được tối thiểu
+   là 4,5). Đổi sang nền TỐI thì đo lại được 8,9 và không còn phụ thuộc ảnh nào
+   đang chạy — ảnh sau này thay tấm khác cũng không hỏng.
+   Viết ở đây chứ không viết bằng class Tailwind vì các mức mờ lẻ (kiểu /55) bị
+   Tailwind bỏ qua trong im lặng — đã vấp một lần, xem ghi chú ở app/page.tsx. */
+.cl-chip-hero {
+  background: rgba(8, 20, 36, 0.55);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+.cl-chip-hero:hover {
+  background: #c8a14b;
+  border-color: #c8a14b;
+  color: #0a2540;
+}

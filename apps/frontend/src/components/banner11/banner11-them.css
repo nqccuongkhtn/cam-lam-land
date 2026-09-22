@@ -154,3 +154,14 @@
     min-height: 400px;
   }
 }
+
+
+/* ── CHỈNH RIÊNG TỪNG MẪU CHO HỢP BANNER ĐÃ HẠ THẤP ─────────────────────────
+   Banner nay thấp hơn khổ thiết kế nên vài chỗ của mẫu rơi không đúng ý. Mấy
+   luật dưới đây chỉnh riêng từng chỗ đó. */
+
+/* Mẫu 1: đôi người đang chạy che mất mặt biển — dịch sang phải vào khoảng trống
+   của phần đồ hoạ. */
+@media (min-width: 1101px) {
+  .cl-b11 .rb-couple { transform: translateX(7%) }
+}

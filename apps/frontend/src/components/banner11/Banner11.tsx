@@ -279,7 +279,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
          Điện thoại KHÔNG nhân (để 1): ở màn nhỏ bản thiết kế đã có bố cục riêng,
          chữ vốn đã nhỏ, thu thêm nữa là không đọc được. */
       const rongMh = window.innerWidth;
-      const tiLeChu = rongMh >= 1101 ? 0.85 : rongMh >= 761 ? 0.9 : 1;
+      const tiLeChu = rongMh >= 1101 ? 0.76 : rongMh >= 761 ? 0.84 : 1;
       b.style.setProperty('--u', String((w / KHO_GOC) * tiLeChu));
       khung.classList.add('san-sang');   // đo xong mới cho nội dung banner hiện ra
 
@@ -395,7 +395,18 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
       if (muonChay) chay();
     };
     const dsAnh = anhCuaMau(mau.html);
-    if (!dsAnh.length) xong();
+    /* Ảnh của mẫu sau luôn được tải trước (xem phần "tải trước" ở trên), nên
+       phần lớn lúc đổi mẫu là ảnh đã nằm sẵn trong máy. Kiểm tra ngay: nếu đủ
+       cả rồi thì CHẠY LIỀN, khỏi chờ một nhịp.
+       ⚠️ Đừng bỏ đoạn này: chờ một nhịp thì trong lúc mẫu mới trượt vào, chữ và
+       nút chưa kịp hiện — người dùng thấy một khung trống trượt ngang qua, đúng
+       cái lỗi "hiệu ứng chuyển vẫn lỗi" mà chủ dự án báo. */
+    const daCoSan = dsAnh.length > 0 && dsAnh.every((u) => {
+      const im = new Image();
+      im.src = u;
+      return im.complete;
+    });
+    if (!dsAnh.length || daCoSan) xong();
     else {
       b.classList.add('loading');
       let con = dsAnh.length;
@@ -477,7 +488,11 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
           <RuotBanner
             key={dangRa}
             html={MAU_BANNER[dangRa].html}
-            lop={`cl-b11 absolute inset-0 z-10 ${huongLuot > 0 ? 'cl-b11-ra-trai' : 'cl-b11-ra-phai'}${it ? ' static' : ''}`}
+            /* `static` LUÔN bật cho mẫu đang trượt ra: mọi chữ trong mẫu đều
+               bắt đầu ở trạng thái trong suốt rồi mới hiện dần, nên nếu không
+               ép hiện đủ thì lúc trượt ra nó thành một khung trống trượt ngang
+               qua màn hình. */
+            lop={`cl-b11 absolute inset-0 z-10 static ${huongLuot > 0 ? 'cl-b11-ra-trai' : 'cl-b11-ra-phai'}`}
             nhan={khongGan}
           />
         )}

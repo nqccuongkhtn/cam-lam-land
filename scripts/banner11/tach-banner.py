@@ -49,12 +49,12 @@ DOI_ANH = {
     14: {'19439393': '/banner11/un-1662514737720-2000.webp'},
     # Mẫu 15 "Phác thảo nhà trên đất trống": bản gốc là ảnh xóm làng nhìn từ cao.
     # Đã thử 2 ảnh kho miễn phí, chủ dự án chê "phèn quá, không sang".
-    # Nay dùng ẢNH FLYCAM THẬT khu Golden Bay (Bãi Dài) — đất đã phân lô, đường
-    # đã làm, biển phía sau: đúng cảnh "đất trống chờ xây nhà" của chính vùng này.
-    # ⚠️ Ảnh lấy từ trang duancamranh.vn, KHÔNG phải ảnh kho miễn phí. Chủ dự án
-    #    xác nhận có quyền dùng ("có quyền dùng cứ lấy đi"). Nếu sau này đổi ý
-    #    hoặc bên giữ bản quyền có ý kiến thì thay lại bằng ảnh kho miễn phí.
-    15: {'37114048': '/banner11/golden-bay-lo-dat.webp'},
+    # Đã thử ảnh flycam khu Golden Bay nhưng ảnh gốc chỉ 1200×600, phóng lên khổ
+    # banner là vỡ nhoè — chủ dự án nói "rất tệ".
+    # Nay dùng ảnh LÔ ĐẤT CỎ XANH TRÊN GÒ NHÌN RA BIỂN (1920×2692, rất nét):
+    # sang, đúng chất đất ven biển, lại có khoảng cỏ trống để đặt hình phác thảo
+    # căn nhà lên. Có ảnh flycam THẬT độ phân giải cao của Cam Lâm thì thay vào.
+    15: {'37114048': '/banner11/un-1760016400107-2000.webp'},
 }
 # ⚠️ ĐỪNG ĐỔI ẢNH CỦA CÁC MẪU NÀY. Đã thử và hỏng nặng.
 #    Rất nhiều mẫu có NÉT VẼ TAY BÁM THEO ĐÚNG TẤM ẢNH GỐC:

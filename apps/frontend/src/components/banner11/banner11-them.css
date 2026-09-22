@@ -118,3 +118,28 @@
    Cách chặn: giấu phần nội dung cho tới khi đo xong (mã chạy gắn lớp
    `san-sang`). Nền tối của banner vẫn hiện ngay nên không thấy khoảng trắng. */
 .cl-b11:not(.san-sang) .banner > * { visibility: hidden }
+
+/* ── DẢI TRỐNG DƯỚI THANH MENU + CHIỀU CAO BANNER ───────────────────────────
+   ⚠️ PHẢI ĐẶT BẰNG CSS, ĐỪNG ĐẶT BẰNG MÃ CHẠY. Đã vấp: đặt bằng mã chạy thì
+   trang hiện ra với chiều cao cũ rồi mới bị sửa → banner NHẢY một cái xuống rồi
+   mới về đúng chỗ. Viết trong CSS thì đúng ngay từ khung hình đầu tiên.
+
+   ⚠️ CŨNG ĐỪNG DÙNG `padding-bottom` phần trăm để tạo chiều cao. Đã thử và vỡ
+   hẳn bố cục: mấy lớp ảnh trong mẫu dùng `height:100%`, tính theo ô chứa nên ra
+   sai, ảnh tụt hẳn xuống đáy. Tính thẳng chiều cao là chắc nhất:
+       chiều cao = bề ngang × (620/1920) + bề dày dải trống
+   (620/1920 = 0,322917 là đúng khổ bản thiết kế). */
+@media (min-width: 1101px) {
+  .cl-b11 .banner {
+    --thanh: 124px;
+    aspect-ratio: auto; min-height: 0;
+    height: calc(min(100vw, 1920px) * 0.322917 + 124px);
+  }
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .cl-b11 .banner {
+    --thanh: 116px;
+    aspect-ratio: auto; min-height: 0;
+    height: calc(100vw * 0.395833 + 116px);   /* 760/1920 — màn vừa cho cao hơn cho cân */
+  }
+}

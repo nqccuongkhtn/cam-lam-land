@@ -56,12 +56,25 @@ DOI_ANH = {
 #    Muốn dùng ảnh thật của Cam Lâm thì phải VẼ LẠI nét cho khớp từng tấm ảnh
 #    mới — làm được nhưng là việc riêng cho từng mẫu, không đổi một dòng là xong.
 
+# ── BỎ HẲN MỘT SỐ MẪU: [số thứ tự mẫu, ...] ─────────────────────────────────
+#    Chủ dự án yêu cầu "banner nào hiệu ứng trùng thì gộp lại".
+BO_MAU = [
+    8,   # "Cung đường ven biển" — trùng nội dung với mẫu 16 (cũng nói về đường
+         #   về Cam Lâm). Giữ mẫu 16 vì hiệu ứng VẼ ĐƯỜNG chạy trên chính con
+         #   đường trong ảnh, hợp với ý "cung đường ven biển" hơn hẳn; chữ của
+         #   mẫu 8 được chuyển sang mẫu 16 (xem SUA_CHU).
+]
+
 # ── SỬA CHỮ: {số thứ tự mẫu: [(chữ cũ, chữ mới), ...]} ───────────────────────
 SUA_CHU = {
-    # (đang để trống)
-    # Đã từng đổi chữ "Ảnh flycam" của mẫu 10 thành "Bản đồ quy hoạch" cho hợp
-    # với ảnh nền mới — nhưng ảnh nền đã trả lại ảnh flycam gốc (xem ghi chú ở
-    # DOI_ANH) nên chữ cũng phải trả lại cho đúng sự thật.
+    # Mẫu 16 nhận luôn nội dung "Cung đường ven biển" của mẫu 8 vừa bỏ.
+    16: [
+        ('Kết nối thuận tiện', 'Kết nối'),
+        ('Mọi cung đường', 'Cung đường'),
+        ('đều dẫn về nhà', 'ven biển'),
+        ('Tuyến đường ven biển hiện ngay trên ảnh thật, dễ hình dung từng khúc quanh.',
+         'Vừa đi vừa ngắm núi, ngắm biển – đường về Cam Lâm đẹp như một bức tranh.'),
+    ],
 }
 
 # ── THAY CẢ MỘT ĐOẠN MÃ (dùng khi đổi ảnh không đủ) ─────────────────────────
@@ -202,6 +215,11 @@ def luat_day_xuong(css: str) -> str:
             continue
         if re.search(r'(?:^|;)bottom:', than):        # lớp chạy suốt chiều cao
             continue
+        # ⚠️ BỎ QUA khối căn giữa theo chiều dọc (top tính bằng %, kèm translate).
+        #    Banner đã cao thêm nên mấy khối đó TỰ XUỐNG theo tỉ lệ rồi; đẩy thêm
+        #    nữa là rơi hẳn xuống đáy, lệch hết bố cục (đã vấp ở mẫu 11).
+        if re.search(r'(?:^|;)top:\s*\d+(?:\.\d+)?%', than):
+            continue
         for x in sel.split(','):
             x = x.strip()
             if x and x not in ten:
@@ -235,6 +253,9 @@ def main():
 
     can_tai, mau = {}, []
     for so, html in enumerate(khoi, 1):
+        if so in BO_MAU:
+            print(f'  · bỏ mẫu {so} ({ten[so - 1]}) — trùng với mẫu khác')
+            continue
         for cu, moi in THAY_DOAN.get(so, []):
             if cu not in html:
                 print(f'  ⚠ mẫu {so}: không tìm thấy đoạn cần thay (bản thiết kế đã đổi?)')

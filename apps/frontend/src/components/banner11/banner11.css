@@ -1,5 +1,5 @@
 /* ============================================================================
- *  19 MẪU BANNER ĐỘNG CHO TRANG CHỦ  —  phần hình thức (CSS)
+ *  18 MẪU BANNER ĐỘNG CHO TRANG CHỦ  —  phần hình thức (CSS)
  * ----------------------------------------------------------------------------
  *  ⚠️ FILE NÀY SINH TỰ ĐỘNG, ĐỪNG SỬA TAY.
  *     Sửa bản thiết kế `docs/thiet-ke/banner-anh-cam-lam.html` rồi chạy:
@@ -635,8 +635,6 @@
  * Lớp ảnh nền KHÔNG bị đẩy nên vẫn phủ kín, banner vẫn là một tấm ảnh liền.
  * ═════════════════════════════════════════════════════════════════════════ */
 .cl-b11 .brand-tab,
-.cl-b11 .banner.img-failed::after,
-.cl-b11 .banner.loading::after,
 .cl-b11 .rb-couple,
 .cl-b11 .rb-text,
 .cl-b11 .sp-logo,
@@ -656,7 +654,6 @@
 .cl-b11 .ui-text,
 .cl-b11 .ui-chat,
 .cl-b11 .hud .rec,
-.cl-b11 .hud .cross,
 .cl-b11 .fl-text,
 .cl-b11 .b-text,
 .cl-b11 .b10-seal { margin-top: var(--thanh, 0px) }

@@ -274,20 +274,6 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
       b.style.setProperty('--u', String(w / KHO_GOC));
       khung.classList.add('san-sang');   // đo xong mới cho nội dung banner hiện ra
 
-      /* ── DẢI TRỐNG NGAY DƯỚI THANH MENU ĐỂ ĐẶT Ô TÌM KIẾM ───────────────
-         Mỗi mẫu bố cục một kiểu, nên không có chỗ nào sẵn trống ở cả 19 mẫu —
-         đặt ô tìm kiếm vào bất cứ đâu cũng có mẫu bị che chữ. Cách giải: kéo
-         banner CAO THÊM đúng bề dày dải rồi đẩy TOÀN BỘ khối chữ của mẫu xuống
-         bấy nhiêu (luật đẩy do bộ tách tự sinh, xem cuối banner11.css).
-         Nhờ vậy giữ nguyên 100% thiết kế của từng mẫu, chỉ dời xuống một chút,
-         mà mẫu nào cũng có một dải trống y như nhau.
-         Điện thoại KHÔNG chừa dải: màn nhỏ ô tìm kiếm nằm hẳn dưới banner. */
-      const rongManHinh = window.innerWidth;
-      const thanh = rongManHinh >= 1101 ? 124 : rongManHinh >= 761 ? 116 : 0;
-      const tiLe = rongManHinh >= 1101 ? 620 : 760;      // khổ thiết kế 1920×620
-      b.style.setProperty('--thanh', thanh + 'px');
-      b.style.height = thanh ? Math.round((w * tiLe) / KHO_GOC + thanh) + 'px' : '';
-
       /* Điện thoại: vài mẫu khai sẵn khung cắt ảnh riêng (data-vbm) để chủ thể
          nằm phía trên, không bị khối chữ che. Không đổi thì trên màn nhỏ chỉ
          thấy nửa cái thuyền, nửa cái nhà. */
@@ -539,7 +525,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
           onBlurCapture={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDangTim(false); }}
           /* Đặt ở DẢI TRỐNG NGAY DƯỚI THANH MENU (top-[62px]) — chỗ này đã được
              chừa sẵn cho mọi mẫu nên không bao giờ đè lên chữ của banner. */
-          className={`mx-auto max-w-[1180px] px-3 pb-6 pt-4 transition-all duration-500 sm:px-4 md:absolute md:inset-x-0 md:top-[62px] md:z-30 md:pb-0 md:pt-0 ${dangTim ? 'md:opacity-100' : 'md:opacity-[.74]'}`}
+          className={`mx-auto max-w-[1180px] px-3 pb-6 pt-4 transition-all duration-500 sm:px-4 md:absolute md:inset-x-0 md:top-[62px] md:z-30 md:pb-0 md:pt-0 ${dangTim ? 'md:opacity-100 md:blur-0' : 'md:opacity-[.42] md:blur-[.6px]'}`}
         >
           {children}
         </div>

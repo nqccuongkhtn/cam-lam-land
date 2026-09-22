@@ -1,6 +1,5 @@
 'use client';
 import { useEffect } from 'react';
-import { HinhThuaDat } from './LogoMark';
 
 /**
  * Màn hình chờ (splash) khi MỞ APP đã cài (standalone).
@@ -23,8 +22,10 @@ export default function AppSplash() {
     <div id="app-splash" aria-hidden>
       <div className="cl-splash-card">
         <div className="cl-splash-tile">
-          <svg width="60" height="60" viewBox="0 0 44 44" aria-hidden="true">
-            <HinhThuaDat day={2.6} />
+          <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#C8A14B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 10.5 12 3l9 7.5" />
+            <path d="M5 9.3V20h14V9.3" />
+            <circle cx="12" cy="13.6" r="1.5" fill="#C8A14B" stroke="none" />
           </svg>
         </div>
         <div className="cl-splash-brand">Cam Lâm Land</div>

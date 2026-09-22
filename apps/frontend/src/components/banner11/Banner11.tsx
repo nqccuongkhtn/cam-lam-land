@@ -24,6 +24,7 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import './banner11.css';
 import './banner11-them.css';
 import { MAU_BANNER } from './mauBanner';
+import { HINH_DUNG_CHUNG } from './hinhDungChung';
 
 /* Banner gốc thiết kế ở khổ ngang 1920px. Mọi kích thước bên trong nhân với
    `--u` = bề ngang thật / 1920, nên banner co giãn mà bố cục không vỡ. */
@@ -176,7 +177,10 @@ const RuotBanner = memo(
 
 export default function Banner11({ children }: { children?: React.ReactNode }) {
   const [chiSo, setChiSo] = useState(0);
-  const [tamDung, setTamDung] = useState(false);
+  /* Không còn nút tạm dừng trên giao diện (chủ dự án muốn tối giản hết mức).
+     Vẫn giữ biến này vì banner còn tự dừng khi chuyển sang tab khác hoặc khi bị
+     cuộn ra khỏi màn hình — đó là phần tiết kiệm pin, đừng gỡ. */
+  const [tamDung] = useState(false);
   const [it, setIt] = useState(false);        // máy đặt "giảm chuyển động"
   /* ⚠️ DÙNG STATE CHỨ KHÔNG DÙNG useRef để giữ thẻ bọc banner.
      Đã vấp: với useRef + `key` đổi mỗi lần sang mẫu, có lúc hiệu ứng chạy trước
@@ -185,6 +189,21 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
      Dùng state thì lúc thẻ gắn vào trang React tự chạy lại, không hụt lần nào. */
   const [boc, setBoc] = useState<HTMLDivElement | null>(null);
   const hen = useRef<number>(0);
+  /* Hai mũi tên chuyển mẫu chỉ hiện khi CHUỘT ĐANG DI CHUYỂN trong banner.
+     Chuột đứng im 1,6 giây là ẩn đi — để banner sạch hết mức. */
+  const [hienNut, setHienNut] = useState(false);
+  const henNut = useRef<number>(0);
+  const [coChamTay, setCoChamTay] = useState(false);
+  useEffect(() => {
+    /* Máy cảm ứng không có chuột nên không bao giờ có sự kiện rê chuột →
+       phải cho hiện sẵn, nếu không người dùng điện thoại không đổi mẫu được. */
+    setCoChamTay(window.matchMedia?.('(hover: none)').matches ?? false);
+  }, []);
+  const reChuot = useCallback(() => {
+    setHienNut(true);
+    clearTimeout(henNut.current);
+    henNut.current = window.setTimeout(() => setHienNut(false), 1600);
+  }, []);
 
   const mau = MAU_BANNER[chiSo];
   const sang = useCallback((i: number) => setChiSo((i + MAU_BANNER.length) % MAU_BANNER.length), []);
@@ -226,6 +245,16 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
          requestAnimationFrame, vì tab ẩn thì requestAnimationFrame không chạy. */
       if (!w) { clearTimeout(doHen); doHen = window.setTimeout(doLaiCo, 250); return; }
       b.style.setProperty('--u', String(w / KHO_GOC));
+
+      /* Điện thoại: vài mẫu khai sẵn khung cắt ảnh riêng (data-vbm) để chủ thể
+         nằm phía trên, không bị khối chữ che. Không đổi thì trên màn nhỏ chỉ
+         thấy nửa cái thuyền, nửa cái nhà. */
+      const manNho = window.innerWidth <= 760;
+      b.querySelectorAll<SVGElement>('svg[data-vbm]').forEach((sv) => {
+        if (!sv.dataset.vbGoc) sv.dataset.vbGoc = sv.getAttribute('viewBox') || '';
+        sv.setAttribute('viewBox', manNho ? (sv.dataset.vbm || '') : sv.dataset.vbGoc);
+      });
+
       if (b.classList.contains('st-duo')) {
         b.style.setProperty('--du-skew', (-Math.atan(.14 * w / h) * 180 / Math.PI).toFixed(2) + 'deg');
       }
@@ -244,6 +273,11 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
           if (p < 1) requestAnimationFrame(nhip);
         };
         requestAnimationFrame(nhip);
+      },
+      /* chạy lại chấm di chuyển theo đường (mẫu 16) */
+      motion: (el: HTMLElement) => {
+        const m = el.querySelector('animateMotion') as any;
+        if (m && m.beginElement) { try { m.beginElement(); } catch { /* trình duyệt cũ */ } }
       },
       /* lần lượt đưa một tấm polaroid lên trước (mẫu 6) */
       polfocus: (_el: HTMLElement, bb: any) => {
@@ -382,13 +416,21 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
 
   return (
     <section className="relative" aria-label="Giới thiệu Cam Lâm Land">
+      {/* Hình dùng chung cho mọi mẫu (ngôi sao, vầng sáng…). Các mẫu gọi tới nó
+          bằng <use href="#star"> — thiếu khối này là đốm sáng mất sạch mà
+          KHÔNG báo lỗi gì. Khối svg này rộng 0 cao 0, không hiện gì cả. */}
+      <div aria-hidden className="sr-only" dangerouslySetInnerHTML={{ __html: HINH_DUNG_CHUNG }} />
       {/* ── BANNER TRÀN SÁT VIỀN, NẰM DƯỚI THANH MENU ────────────────────────
           Thanh menu của web ở đầu trang vốn trong suốt (chỉ hiện nền khi cuộn
           xuống), nên cho banner chạy lên tận mép trên là menu nằm lồng trong
           banner đúng như ảnh bìa của các trang bất động sản lớn.
           Chặn bề ngang ở 1920px vì bản gốc vẽ trên khổ 1920×620 — rộng hơn nữa
           thì chữ và nút phình to quá cỡ chứ không đẹp thêm. */}
-      <div className="relative mx-auto w-full max-w-[1920px]">
+      <div
+        className="relative mx-auto w-full max-w-[1920px]"
+        onPointerMove={reChuot}
+        onPointerLeave={() => { clearTimeout(henNut.current); setHienNut(false); }}
+      >
         <RuotBanner key={chiSo} html={mau.html} lop={`cl-b11 cl-b11-vao${it ? ' static' : ''}`} nhan={setBoc} />
 
         {/* Vệt tối mỏng ở mép trên: menu chữ trắng, mà nhiều mẫu banner có nền
@@ -400,48 +442,34 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
             "Nhà đất bán · Cho thuê · Dự án" rơi trúng nền sáng là mất hút. */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-20 hidden h-44 bg-gradient-to-t from-black/60 via-black/25 to-transparent md:block" />
 
-        {/* Nút chuyển mẫu + chấm chọn mẫu — gom hết lên GÓC TRÊN BÊN PHẢI.
-            Trước để ở đáy banner, nhưng nay ô tìm kiếm đã chiếm chỗ đó, mà ở màn
-            nhỏ bản thiết kế cũng dồn chữ xuống đáy → để dưới là đè lên nhau.
-            Top-14 cho khỏi chui vào thanh menu. Nút 32px để bấm bằng ngón tay. */}
-        <div className="absolute right-2 top-14 z-30 flex flex-col items-end gap-1.5 sm:right-3">
-          <div className="flex items-center gap-1">
-            <button onClick={() => sang(chiSo - 1)} aria-label="Mẫu trước"
-              className="grid h-8 w-8 place-items-center rounded-full bg-black/40 text-white backdrop-blur hover:bg-black/60">‹</button>
-            <button onClick={() => setTamDung((v) => !v)} aria-label={tamDung ? 'Chạy tiếp' : 'Tạm dừng'}
-              className="grid h-8 w-8 place-items-center rounded-full bg-black/40 text-[11px] text-white backdrop-blur hover:bg-black/60">
-              {tamDung ? '▶' : '❚❚'}
-            </button>
-            <button onClick={() => sang(chiSo + 1)} aria-label="Mẫu sau"
-              className="grid h-8 w-8 place-items-center rounded-full bg-black/40 text-white backdrop-blur hover:bg-black/60">›</button>
-          </div>
-          <div className="hidden items-center gap-1 rounded-full bg-black/40 px-2 py-1 backdrop-blur sm:flex">
-            {MAU_BANNER.map((m, i) => (
-              <button key={i} onClick={() => sang(i)} aria-label={`Xem mẫu ${i + 1}: ${m.ten}`} aria-current={i === chiSo}
-                className={`h-1.5 rounded-full transition-all ${i === chiSo ? 'w-5 bg-white' : 'w-1.5 bg-white/50 hover:bg-white/90'}`} />
-            ))}
-          </div>
-        </div>
+        {/* ── HAI MŨI TÊN CHUYỂN MẪU ───────────────────────────────────────
+            Tối giản hết mức: chỉ hai mũi tên nhỏ nép vào hai mép banner, và
+            chỉ hiện ra KHI CHUỘT ĐANG DI CHUYỂN trong banner. Chuột đứng im
+            1,6 giây hoặc đưa ra ngoài là tự ẩn.
+            Máy cảm ứng (điện thoại, máy tính bảng) thì hiện sẵn, vì ở đó không
+            bao giờ có sự kiện rê chuột. */}
+        {[['trai', -1, '‹'], ['phai', 1, '›']].map(([ben, huong, dau]) => (
+          <button
+            key={ben as string}
+            onClick={() => sang(chiSo + (huong as number))}
+            aria-label={huong === -1 ? 'Mẫu trước' : 'Mẫu sau'}
+            className={`absolute top-1/2 z-30 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-black/30 text-lg text-white/90 backdrop-blur transition-opacity duration-300 hover:bg-black/55 hover:text-white ${ben === 'trai' ? 'left-2' : 'right-2'} ${hienNut || coChamTay ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+          >{dau as string}</button>
+        ))}
 
         {/* Vệt tối mép dưới cho liền mạch xuống dải tìm kiếm bên dưới. */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 bg-gradient-to-t from-black/35 to-transparent" />
       </div>
 
-      {/* ── Ô TÌM KIẾM NỔI Ở MÉP DƯỚI BANNER ────────────────────────────────
-          ⚠️ BA CÁCH ĐÃ THỬ VÀ BỊ LOẠI, đừng làm lại:
-          1) Đè hẳn vào trong banner → che mất chữ của chính banner (mẫu nào
-             cũng có chữ hoặc nút nằm sát đáy).
-          2) Đặt trên một dải xanh riêng bên dưới → hai bên ô tìm kiếm thừa hai
-             mảng xanh trống hoác, nhìn chắp vá.
-          3) Kéo ô tìm kiếm dài hết chiều ngang cho hết chỗ trống → chủ dự án
-             không chấp nhận, ô dài quá nhìn mất cân.
-          Nay: ô tìm kiếm NỔI LÊN đúng mép dưới banner, chỉ đè vào một dải mỏng.
-          Hai bên nó là nền trang bình thường chứ không phải mảng xanh → không
-          còn chỗ trống nào. */}
+      {/* ── Ô TÌM KIẾM NẰM DƯỚI BANNER ───────────────────────────────────────
+          ⚠️ BỐN CÁCH ĐÃ THỬ VÀ BỊ LOẠI — đừng làm lại:
+          1) Đè hẳn vào trong banner        → che mất chữ của chính banner.
+          2) Dải xanh riêng bên dưới        → hai bên thừa mảng xanh trống hoác.
+          3) Kéo dài hết chiều ngang        → chủ dự án không chấp nhận.
+          4) Kéo cao banner chừa dải ở đáy  → ô tìm kiếm nằm ở đáy ảnh vẫn xấu.
+          Nay để hẳn XUỐNG DƯỚI banner trên nền trang, không đè gì cả. */}
       {children ? (
-        <div className="relative z-30 mx-auto mt-3 max-w-[1180px] px-3 pb-6 sm:px-4 md:-mt-14">  {/* ⚠️ CHỈ đè lên banner ở màn máy tính (md trở lên). Màn điện thoại bản
-                thiết kế dồn hết chữ và nút của banner xuống đáy — đè lên là che
-                mất đúng chỗ đó, đã thử và bị che nút "Nhận thông tin". */}
+        <div className="mx-auto max-w-[1180px] px-3 pb-6 pt-4 sm:px-4">
           {children}
         </div>
       ) : null}

@@ -1,17 +1,14 @@
 /* ============================================================================
- *  11 MẪU BANNER ĐỘNG CHO TRANG CHỦ  —  phần hình thức (CSS)
+ *  19 MẪU BANNER ĐỘNG CHO TRANG CHỦ  —  phần hình thức (CSS)
  * ----------------------------------------------------------------------------
- *  ⚠️ FILE NÀY SINH TỰ ĐỘNG từ bản thiết kế gốc của chủ dự án
- *     (banner-anh-cam-lam.html). ĐỪNG sửa tay từng dòng ở đây — sửa bản gốc rồi
- *     tách lại, nếu không lần sau cập nhật là mất hết công sửa.
+ *  ⚠️ FILE NÀY SINH TỰ ĐỘNG, ĐỪNG SỬA TAY.
+ *     Sửa bản thiết kế `docs/thiet-ke/banner-anh-cam-lam.html` rồi chạy:
+ *         python scripts/banner11/tach-banner.py
+ *     Phần viết thêm của dự án nằm ở `banner11-them.css` (không bị ghi đè).
  *
- *  MỌI LUẬT ĐÃ ĐƯỢC BỌC TRONG `.cl-b11`. Lý do: bản gốc dùng những tên lớp rất
- *  chung như `.banner`, `.cta`, `.layer`, `.static` — mà web mình ĐÃ CÓ `.cta`
- *  và `.static` ở chỗ khác. Để nguyên thì banner sẽ bóp méo các trang khác,
- *  hoặc ngược lại. Bọc lại thì hai bên không đụng nhau.
- *
- *  Ảnh: đã tải về `public/banner11/`, KHÔNG gọi thẳng sang máy chủ Unsplash /
- *  Pexels nữa — web thật không được phụ thuộc máy chủ của người khác.
+ *  Mọi luật đã được bọc trong `.cl-b11` cho khỏi đụng tên lớp với phần còn lại
+ *  của web (bản gốc dùng .banner, .cta, .layer, .static — web đã có .cta,
+ *  .static ở chỗ khác).
  * ========================================================================== */
 
 .cl-b11{--slow:1;--qio:cubic-bezier(.455,.03,.515,.955);--oexpo:cubic-bezier(.16,1,.3,1);--oback:cubic-bezier(.34,1.56,.64,1);--amber:#fbbf24;--navy:#0b1d36}
@@ -406,3 +403,226 @@
 .cl-b11.static .draw, .cl-b11.static .fl-measure .dim{stroke-dashoffset:0!important}.cl-b11.static .lines .li{transform:none!important}
 .cl-b11.static .kc-full, .cl-b11.static .a-flare, .cl-b11.static .spark, .cl-b11.static .fl-scan, .cl-b11.static .typing, .cl-b11.static .ui-toast, .cl-b11.static .du-anim{display:none}
 .cl-b11.static .dp-text{transform:none!important}
+
+/* ============ Dùng chung với bộ B ============ */
+/* ============ Dùng chung cho bộ B ============ */
+.cl-b11 .b-text{position:absolute;left:calc(var(--u)*120px);top:calc(var(--u)*118px);z-index:9;max-width:calc(var(--u)*760px)}
+.cl-b11 .b-text.right{left:auto;right:calc(var(--u)*100px);max-width:calc(var(--u)*560px)}
+.cl-b11 .b-title .li{white-space:nowrap}
+.cl-b11 .b-title{margin:calc(var(--u)*10px) 0 0;font-size:max(24px,calc(var(--u)*62px));line-height:1.04;font-weight:900;letter-spacing:-.02em;color:#fff}
+.cl-b11 .b-sub{margin:calc(var(--u)*16px) 0 calc(var(--u)*26px);font-size:max(12px,calc(var(--u)*23px));line-height:1.45;color:#e2e8f0;max-width:calc(var(--u)*500px)}
+.cl-b11 .grad-l{background:linear-gradient(90deg,rgba(3,8,18,.84) 0%,rgba(3,8,18,.55) 30%,rgba(3,8,18,0) 56%);pointer-events:none;z-index:5}
+.cl-b11 .grad-r{background:linear-gradient(270deg,rgba(3,8,18,.84) 0%,rgba(3,8,18,.55) 30%,rgba(3,8,18,0) 56%);pointer-events:none;z-index:5}
+.cl-b11 .sp-grid{position:absolute;inset:0;background-image:var(--grid);background-size:calc(var(--u)*128px) calc(var(--u)*128px);background-position:calc(var(--u)*-8px) calc(var(--u)*-2px)}
+.cl-b11 .fireflies{pointer-events:none;width:100%;height:100%;display:block}
+.cl-b11 .chip{display:inline-flex;align-items:center;gap:calc(var(--u)*10px);padding:calc(var(--u)*9px) calc(var(--u)*18px);border-radius:99px;background:rgba(2,6,23,.62);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-weight:600;font-size:max(10px,calc(var(--u)*18px));white-space:nowrap}
+.cl-b11 .chip i{width:calc(var(--u)*14px);height:calc(var(--u)*14px);min-width:8px;min-height:8px;border-radius:4px;display:inline-block}
+
+/* ============ B1. Chủ thể vượt khung ============ */
+.cl-b11 .st-b1{background:#070b16;--grid:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cpath d='M64 0V128M0 64H128' stroke='rgba(255,255,255,0.06)' stroke-width='1' stroke-dasharray='5 7'/%3E%3Cpath d='M57 64H71M64 57V71' stroke='rgba(251,191,36,0.45)' stroke-width='2.2'/%3E%3C/svg%3E")}
+.cl-b11 .b1-bg{background:radial-gradient(70% 110% at 78% 40%,#1c2a4a 0%,#0c1427 55%,#060912 100%)}
+.cl-b11 .b1-rings rect{opacity:0;transform-box:fill-box;transform-origin:50% 70%}
+.cl-b11 .b1-rings.go .r3{animation:b1Ring calc(900ms*var(--slow)) var(--oexpo) both}
+.cl-b11 .b1-rings.go .r2{animation:b1Ring calc(900ms*var(--slow)) var(--oexpo) calc(90ms*var(--slow)) both}
+.cl-b11 .b1-rings.go .r1{animation:b1Ring calc(900ms*var(--slow)) var(--oexpo) calc(180ms*var(--slow)) both}
+@keyframes b1Ring{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+.cl-b11 .b1-frame{opacity:0}
+.cl-b11 .b1-frame.go{animation:b1Frame calc(900ms*var(--slow)) var(--oexpo) both}
+@keyframes b1Frame{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}
+.cl-b11 .b1-spire{opacity:0;transform:translateY(190px)}
+.cl-b11 .b1-spire.go{animation:b1Rise calc(1400ms*var(--slow)) var(--oexpo) both}
+@keyframes b1Rise{from{opacity:1;transform:translateY(190px)}to{opacity:1;transform:none}}
+.cl-b11 .b1-shine{transform:translateX(-300px)}
+.cl-b11 .b1-shine.go{animation:b1Shine calc(1500ms*var(--slow)) var(--qio) both}
+@keyframes b1Shine{from{transform:translateX(-300px)}to{transform:translateX(420px)}}
+.cl-b11 .st-b1 .kicker{color:#fbbf24}
+.cl-b11 .cta.gold{background:linear-gradient(90deg,#fde68a,#d4a24c);color:#1c1204}
+
+/* ============ B2. Rọi sáng một tòa nhà ============ */
+.cl-b11 .st-b2{background:#050b18}
+.cl-b11 .b2-dim{opacity:0}
+.cl-b11 .b2-dim.go{animation:b2Dim calc(1200ms*var(--slow)) ease-out both}
+@keyframes b2Dim{from{opacity:0}to{opacity:.66}}
+.cl-b11 .b2-glow{opacity:0}
+.cl-b11 .b2-glow.go{animation:b2Glow calc(2400ms*var(--slow)) ease-in-out infinite alternate}
+@keyframes b2Glow{from{opacity:.25}to{opacity:.8}}
+.cl-b11 .b2-scan{opacity:0}
+.cl-b11 .b2-scan.go{animation:b2Scan calc(2200ms*var(--slow)) var(--qio) both}
+@keyframes b2Scan{0%{opacity:0;transform:translateY(0)}15%{opacity:1}85%{opacity:1}100%{opacity:0;transform:translateY(-230px)}}
+.cl-b11 .b2-pin{opacity:0}
+.cl-b11 .b2-pin.go{animation:fxPop calc(600ms*var(--slow)) var(--oback) both}
+.cl-b11 .b2-pin .pulse{transform-box:fill-box;transform-origin:50% 50%;animation:b2Pulse calc(1800ms*var(--slow)) ease-out infinite}
+@keyframes b2Pulse{from{opacity:.8;transform:scale(.4)}to{opacity:0;transform:scale(1.6)}}
+.cl-b11 .b2-mk{opacity:0}
+.cl-b11 .b2-mk.go{animation:fxFade calc(700ms*var(--slow)) ease-out both}
+.cl-b11 .st-b2 .kicker{color:#fde68a}
+
+/* ============ B3. Tuyến đường chạy trên đường thật ============ */
+.cl-b11 .st-b3{background:#0b1a10}
+.cl-b11 .b3-route{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.cl-b11 .grp.go .b3-route{animation-timing-function:linear!important}
+.cl-b11 .b3-car{opacity:0}
+.cl-b11 .b3-car.go{opacity:1}
+.cl-b11 .b3-pin{opacity:0}
+.cl-b11 .b3-pin.go{animation:fxPop calc(600ms*var(--slow)) var(--oback) both}
+.cl-b11 .b3-pin .pulse{transform-box:fill-box;transform-origin:50% 50%;animation:b2Pulse calc(1800ms*var(--slow)) ease-out infinite}
+.cl-b11 .st-b3 .kicker{color:#a5f3fc}
+
+/* ============ B4. Điểm chạm nội thất ============ */
+.cl-b11 .st-b4{background:radial-gradient(90% 120% at 20% 50%,#2a1d12 0%,#15100b 60%,#0d0906 100%)}
+.cl-b11 .b4-card{position:absolute;left:calc(var(--u)*780px);right:calc(var(--u)*60px);top:calc(var(--u)*50px);bottom:calc(var(--u)*50px);border-radius:calc(var(--u)*28px);overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.45),0 0 0 1px rgba(253,230,190,.25);opacity:0}
+.cl-b11 .b4-card.go{animation:b4Card calc(1000ms*var(--slow)) var(--oexpo) both}
+@keyframes b4Card{from{opacity:0;transform:translateX(6%) scale(.97)}to{opacity:1;transform:none}}
+.cl-b11 .b4-card svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.cl-b11 .b4-warm{opacity:0;mix-blend-mode:multiply}
+.cl-b11 .b4-warm.go{animation:b4Warm calc(1400ms*var(--slow)) ease-out both}
+@keyframes b4Warm{from{opacity:0}to{opacity:.45}}
+.cl-b11 .b4-lamp{opacity:0;mix-blend-mode:screen}
+.cl-b11 .b4-lamp.go{animation:b4Lamp calc(1400ms*var(--slow)) ease-out both,b4Flick calc(3800ms*var(--slow)) ease-in-out calc(1400ms*var(--slow)) infinite alternate}
+@keyframes b4Lamp{0%{opacity:0}30%{opacity:.5}45%{opacity:.2}100%{opacity:1}}
+@keyframes b4Flick{from{opacity:1}to{opacity:.82}}
+.cl-b11 .hs{opacity:0}
+.cl-b11 .hs.go{animation:fxPop calc(500ms*var(--slow)) var(--oback) both}
+.cl-b11 .hs .ring{transform-box:fill-box;transform-origin:50% 50%;animation:b2Pulse calc(1600ms*var(--slow)) ease-out infinite}
+.cl-b11 .tip{opacity:0}
+.cl-b11 .tip.go{animation:tipIn calc(420ms*var(--slow)) var(--oexpo) both}
+@keyframes tipIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.cl-b11 .tip.go.out{animation:fxOut calc(300ms*var(--slow)) linear both!important}
+.cl-b11 .st-b4 .kicker{color:#fdba74}
+.cl-b11 .cta.warm{background:linear-gradient(90deg,#fdba74,#f59e0b);color:#1c1204}
+
+/* ============ B5. Phác thảo nhà trên đất trống ============ */
+.cl-b11 .st-b5{background:#16230f}
+.cl-b11 .b5-grid{opacity:0}
+.cl-b11 .b5-grid.go{animation:fxFade calc(700ms*var(--slow)) ease-out both}
+.cl-b11 .b5-plot{fill:none;stroke:#fde68a;stroke-width:1.6;stroke-dasharray:5 4;opacity:0}
+.cl-b11 .b5-plot.go{animation:fxFade calc(600ms*var(--slow)) ease-out both}
+.cl-b11 .b5-wire path{fill:none;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+.cl-b11 .b5-face{opacity:0}
+.cl-b11 .b5-face.go{animation:b5Face calc(900ms*var(--slow)) ease-out both}
+@keyframes b5Face{from{opacity:0}to{opacity:1}}
+.cl-b11 .b5-tag{opacity:0}
+.cl-b11 .b5-tag.go{animation:tipIn calc(500ms*var(--slow)) var(--oexpo) both}
+.cl-b11 .st-b5 .kicker{color:#bef264}
+
+/* ============ B6. Ảnh thật → bản đồ quy hoạch ============ */
+.cl-b11 .st-b6{background:#0f172a}
+.cl-b11 .b6-map{position:absolute;inset:0;overflow:hidden;z-index:2;transform:translateX(-100%);will-change:transform}
+.cl-b11 .b6-inner{position:absolute;inset:0;transform:translateX(100%);will-change:transform}
+.cl-b11 .b6-map svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.cl-b11 .b6-map.go{animation:b6Out calc(8200ms*var(--slow)) linear both}
+.cl-b11 .b6-map.go .b6-inner{animation:b6In calc(8200ms*var(--slow)) linear both}
+@keyframes b6Out{0%{transform:translateX(-100%);opacity:1;animation-timing-function:var(--qio)}32%{transform:translateX(0);opacity:1}82%{transform:translateX(0);opacity:1}100%{transform:translateX(0);opacity:0}}
+@keyframes b6In{0%{transform:translateX(100%);animation-timing-function:var(--qio)}32%{transform:translateX(0)}100%{transform:translateX(0)}}
+.cl-b11 .b6-scan{position:absolute;top:0;bottom:0;left:0;width:calc(var(--u)*6px);min-width:3px;margin-left:calc(var(--u)*-3px);background:linear-gradient(180deg,transparent,#fef3c7 20%,#fef3c7 80%,transparent);box-shadow:0 0 24px 8px rgba(253,224,71,.45);z-index:3;opacity:0}
+.cl-b11 .b6-scan.go{animation:b6Scan calc(8200ms*var(--slow)) linear both}
+@keyframes b6Scan{0%{left:0;opacity:1;animation-timing-function:var(--qio)}32%{left:100%;opacity:1}33%{opacity:0}100%{left:100%;opacity:0}}
+.cl-b11 .b6-legend{position:absolute;right:calc(var(--u)*60px);bottom:calc(var(--u)*50px);z-index:9;display:flex;flex-direction:column;align-items:flex-end;gap:calc(var(--u)*10px)}
+.cl-b11 .b6-legend .chip{opacity:0}
+.cl-b11 .b6-legend .chip.go{animation:tipIn calc(450ms*var(--slow)) var(--oexpo) both}
+.cl-b11 .b6-legend .chip.go.out{animation:fxOut calc(400ms*var(--slow)) linear both!important}
+.cl-b11 .st-b6 .kicker{color:#fdba74}
+
+/* ============ B7. Sương trôi trên núi ============ */
+.cl-b11 .st-b7{background:#9fb6d8}
+.cl-b11 .b7-img{background-position:50% 58%;transform:scale(1.06);translate:calc(var(--px,0)*-.35px) calc(var(--py,0)*-.25px);animation:kbSlow calc(30s*var(--slow)) ease-in-out infinite alternate}
+.cl-b11 .b7-fog{position:absolute;left:-45%;width:95%;border-radius:50%;pointer-events:none;z-index:3;background:radial-gradient(50% 50% at 50% 50%,rgba(255,255,255,.75),rgba(255,255,255,.35) 45%,rgba(255,255,255,0) 72%);filter:blur(calc(var(--u)*14px));opacity:var(--o);animation:b7Drift calc(var(--d)*var(--slow)) linear calc(var(--dl)*var(--slow)) infinite;translate:calc(var(--px,0)*var(--dp)*1px) calc(var(--py,0)*var(--dp)*.4px)}
+@keyframes b7Drift{from{transform:translateX(0)}to{transform:translateX(200%)}}
+.cl-b11 .st-b7 .b-text{translate:calc(var(--px,0)*.5px) calc(var(--py,0)*.3px)}
+.cl-b11 .st-b7 .kicker{color:#fef08a}
+
+/* ============ B8. Mặt nước gợn sóng ============ */
+.cl-b11 .st-b8{background:radial-gradient(90% 120% at 15% 50%,#0f3b3a 0%,#072523 60%,#041615 100%)}
+.cl-b11 .b8-panel{position:absolute;left:calc(var(--u)*700px);right:0;top:0;bottom:0;clip-path:polygon(12% 0,100% 0,100% 100%,12% 100%,8.4% 90%,5.4% 80%,3% 70%,1.3% 60%,.3% 50%,1.3% 40%,3% 30%,5.4% 20%,8.4% 10%);opacity:0}
+.cl-b11 .b8-panel.go{animation:b4Card calc(1000ms*var(--slow)) var(--oexpo) both}
+.cl-b11 .b8-panel svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.cl-b11 .b8-edge{position:absolute;left:calc(var(--u)*700px);right:0;top:0;bottom:0;pointer-events:none;z-index:4;opacity:0}
+.cl-b11 .b8-edge.go{animation:fxFade calc(800ms*var(--slow)) ease-out both}
+.cl-b11 .b8-sp{opacity:0}
+.cl-b11 .b8-sp.go{animation:b8Tw calc(1600ms*var(--slow)) ease-in-out both}
+@keyframes b8Tw{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1)}}
+.cl-b11 .b8-sp{transform-box:fill-box;transform-origin:50% 50%;mix-blend-mode:screen}
+.cl-b11 .st-b8 .kicker{color:#5eead4}
+
+/* ============ B9. Tia nắng từ mặt trời thật ============ */
+.cl-b11 .st-b9{background:#2a1a08}
+.cl-b11 .b9-rays{opacity:0;mix-blend-mode:screen}
+.cl-b11 .b9-rays.go{animation:fxFade calc(2000ms*var(--slow)) ease-out both}
+.cl-b11 .b9-glow{mix-blend-mode:screen;transform-box:fill-box;transform-origin:50% 50%;animation:b9Breath calc(5000ms*var(--slow)) ease-in-out infinite alternate}
+@keyframes b9Breath{from{opacity:.7;transform:scale(.95)}to{opacity:1;transform:scale(1.06)}}
+.cl-b11 .b9-flare{opacity:0;mix-blend-mode:screen}
+.cl-b11 .b9-flare.go{animation:fxFade calc(1500ms*var(--slow)) ease-out both}
+.cl-b11 .st-b9 .kicker{color:#fcd34d}
+.cl-b11 .cta.sun{background:linear-gradient(90deg,#fcd34d,#f59e0b);color:#1c1204}
+
+/* ============ B10. Nét cọ vẽ ra ảnh ============ */
+.cl-b11 .st-b10{background:#f3ebdd;color:#3b2a1a}
+.cl-b11 .b10-paper{background:radial-gradient(120% 120% at 30% 40%,#fbf6ec 0%,#f3ebdd 55%,#e9dcc6 100%)}
+.cl-b11 .b10-sketch{opacity:0}
+.cl-b11 .b10-sketch.go{animation:b10Sk calc(1200ms*var(--slow)) ease-out both}
+@keyframes b10Sk{from{opacity:0}to{opacity:.62}}
+.cl-b11 .b10-color.go.out{animation:fxOut calc(900ms*var(--slow)) linear both!important}
+.cl-b11 .b10-text{color:#3b2a1a}
+.cl-b11 .b10-text .b-title{color:#2b1d10}
+.cl-b11 .b10-text .b-sub{color:#5b4632}
+.cl-b11 .b10-text .kicker{color:#b45309}
+.cl-b11 .b10-seal{position:absolute;left:calc(var(--u)*470px);top:calc(var(--u)*80px);z-index:9;width:calc(var(--u)*96px);height:calc(var(--u)*96px);min-width:44px;min-height:44px;border:calc(var(--u)*4px) solid #b91c1c;border-radius:calc(var(--u)*10px);color:#b91c1c;display:grid;place-items:center;text-align:center;font:700 max(10px,calc(var(--u)*22px))/1.05 "Dancing Script",cursive;transform:rotate(-8deg);opacity:0;mix-blend-mode:multiply}
+.cl-b11 .b10-seal.go{animation:b10Stamp calc(520ms*var(--slow)) var(--oback) both}
+@keyframes b10Stamp{from{opacity:0;transform:rotate(-8deg) scale(1.6)}to{opacity:.88;transform:rotate(-8deg) scale(1)}}
+.cl-b11 .cta.ink{background:#2b1d10;color:#fbf6ec}
+
+/* ============ Mobile ============ */
+@media (max-width:760px){
+  .cl-b11 .b-text, .cl-b11 .b-text.right{left:18px;right:18px;top:auto;bottom:18px;max-width:none!important}
+  .cl-b11 .b-title .li{white-space:normal}
+  .cl-b11 .b-sub{max-width:none}
+  .cl-b11 .grad-l, .cl-b11 .grad-r{background:linear-gradient(0deg,rgba(3,8,18,.92) 0%,rgba(3,8,18,.6) 48%,rgba(3,8,18,0) 78%)!important}
+  .cl-b11 .b-text.m-top{top:18px;bottom:auto}
+  .cl-b11 .grad-l.m-top{background:linear-gradient(180deg,rgba(3,8,18,.92) 0%,rgba(3,8,18,.6) 48%,rgba(3,8,18,0) 78%)!important}
+  .cl-b11 .b2-mk, .cl-b11 .b6-legend, .cl-b11 .tip, .cl-b11 .b5-tag{display:none}
+  .cl-b11 .b4-card{left:0;right:0;top:0;bottom:0;border-radius:0}
+  .cl-b11 .st-b4 .b-text{z-index:10}
+  .cl-b11 .st-b4::after, .cl-b11 .st-b8::after{content:"";position:absolute;inset:0;z-index:5;background:linear-gradient(0deg,rgba(10,6,3,.92) 0%,rgba(10,6,3,.5) 50%,rgba(10,6,3,0) 78%);pointer-events:none}
+  .cl-b11 .b8-panel, .cl-b11 .b8-edge{left:0;clip-path:none}.cl-b11 .b8-edge{display:none}
+  .cl-b11 .b10-seal{left:auto;right:16px;top:16px}
+  .cl-b11 .st-b10 .b-text{background:rgba(251,246,236,.9);padding:14px;border-radius:14px}
+}
+
+/* ============ Giảm chuyển động ============ */
+.cl-b11.static .banner *, .cl-b11.static .banner *::before, .cl-b11.static .banner *::after{animation:none!important;transition:none!important}
+.cl-b11.static [data-at]{opacity:1!important;transform:none!important}
+.cl-b11.static .draw{stroke-dashoffset:0!important}.cl-b11.static .lines .li{transform:none!important}
+.cl-b11.static .b6-map, .cl-b11.static .b6-inner{transform:none!important}
+.cl-b11.static .b1-shine, .cl-b11.static .b2-scan, .cl-b11.static .b6-scan, .cl-b11.static .b8-sp, .cl-b11.static .tip{display:none}
+
+/* ============ Kiểu 12–19 (chuyển kỹ thuật bộ B sang ảnh Cam Lâm) ============ */
+.cl-b11 .st-c13{background:#1d1206}
+.cl-b11 .c13-bg{background:radial-gradient(80% 120% at 28% 45%,#4a2a0c 0%,#24160a 55%,#130b04 100%)}
+.cl-b11 .c13-card, .cl-b11 .c16-card{position:absolute;border-radius:calc(var(--u)*28px);overflow:hidden;opacity:0;z-index:2}
+.cl-b11 .c13-card{left:calc(var(--u)*60px);top:calc(var(--u)*50px);bottom:calc(var(--u)*50px);width:calc(var(--u)*1120px);box-shadow:0 30px 60px rgba(0,0,0,.5),0 0 0 1px rgba(253,224,171,.28)}
+.cl-b11 .c16-card{right:calc(var(--u)*60px);top:calc(var(--u)*40px);bottom:calc(var(--u)*40px);width:calc(var(--u)*1040px);box-shadow:0 30px 60px rgba(0,0,0,.45),0 0 0 1px rgba(165,243,252,.28)}
+.cl-b11 .c13-card.go, .cl-b11 .c16-card.go{animation:b4Card calc(1000ms*var(--slow)) var(--oexpo) both}
+.cl-b11 .c13-card svg, .cl-b11 .c16-card svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.cl-b11 .st-c13 .fireflies{z-index:3}
+.cl-b11 .st-c13 .kicker{color:#fcd34d}
+.cl-b11 .st-c16{background:#062a2e}
+.cl-b11 .c16-bg{background:radial-gradient(90% 120% at 20% 50%,#0e4d52 0%,#073034 55%,#041c1f 100%)}
+.cl-b11 .st-c16 .kicker{color:#a5f3fc}
+.cl-b11 .st-c18{background:#050c1c;--grid:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cpath d='M64 0V128M0 64H128' stroke='rgba(255,255,255,0.06)' stroke-width='1' stroke-dasharray='5 7'/%3E%3Cpath d='M57 64H71M64 57V71' stroke='rgba(125,211,252,0.5)' stroke-width='2.2'/%3E%3C/svg%3E")}
+.cl-b11 .c18-bg{background:radial-gradient(70% 110% at 78% 40%,#12305a 0%,#0a1a33 55%,#050c1c 100%)}
+.cl-b11 .c18-patch{opacity:0}
+.cl-b11 .c18-patch.go{opacity:1}
+.cl-b11 .c18-patch.go.out{animation:fxOut calc(600ms*var(--slow)) linear both!important}
+.cl-b11 .c18-plane{opacity:0;transform-box:view-box;transform-origin:1364px 214px;filter:drop-shadow(0 14px 12px rgba(0,0,0,.35))}
+.cl-b11 .c18-plane.go{animation:c18Fly calc(2800ms*var(--slow)) cubic-bezier(.55,0,.9,.55) both}
+@keyframes c18Fly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:1;transform:translate(-600px,-380px) scale(1.6)}}
+.cl-b11 .st-c18 .kicker{color:#7dd3fc}
+.cl-b11 .cta.sky{background:linear-gradient(90deg,#7dd3fc,#3b82f6);color:#fff}
+.cl-b11 .c15-wire path{stroke-width:.8}
+.cl-b11 .c15-plot{stroke-width:.9;stroke-dasharray:3 2.4}
+@media (max-width:760px){
+  .cl-b11 .c13-card, .cl-b11 .c16-card{left:0;right:0;top:0;bottom:0;width:auto;border-radius:0}
+  .cl-b11 .st-c13::after, .cl-b11 .st-c16::after, .cl-b11 .st-c18::after{content:"";position:absolute;inset:0;z-index:5;background:linear-gradient(0deg,rgba(3,8,18,.92) 0%,rgba(3,8,18,.5) 50%,rgba(3,8,18,0) 78%);pointer-events:none}
+  .cl-b11 .st-c13 .b-text, .cl-b11 .st-c16 .b-text, .cl-b11 .st-c18 .b-text{z-index:10}
+}
+.cl-b11.static .c18-patch, .cl-b11.static .c18-plane{display:none}

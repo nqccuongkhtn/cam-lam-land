@@ -488,23 +488,28 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .cl-cot-ben::-webkit-scrollbar-track { background: transparent; }
 
 /* ── ẢNH ĐẦU TRANG CHẠY LUÂN PHIÊN ──
-   Ba tấm Bãi Dài thật của Cam Lâm thay nhau, mỗi tấm hiện 6 giây, chuyển mờ dần
-   1 giây, kèm phóng chậm (kiểu Ken Burns) cho ảnh có hồn chứ không đứng chết.
-   LÀM BẰNG CSS THUẦN, không dùng JavaScript: không phải vẽ lại giao diện mỗi
-   6 giây, không tốn pin, và ảnh vẫn chạy cả khi phần mã chưa tải xong. */
+   Ba tấm Bãi Dài thật của Cam Lâm thay nhau, mỗi tấm hiện 6 giây, chuyển mờ dần.
+   LÀM BẰNG CSS THUẦN, không JavaScript: không vẽ lại giao diện mỗi 6 giây, không
+   tốn pin, ảnh vẫn chạy cả khi phần mã chưa tải xong.
+
+   ⚠️ KHÔNG DÙNG HIỆU ỨNG PHÓNG TO (Ken Burns) NỮA.
+   Đã thử và hỏng: ảnh gốc 1280px vốn đã phải phóng lên 1920 để phủ kín màn hình,
+   hiệu ứng lại phóng thêm 8% nữa — hai lần phóng chồng nhau làm ảnh nhoè hẳn.
+   Nay chỉ TRÔI NGANG rất chậm trong phần ảnh đã bị cắt: vẫn có chuyển động,
+   mà không phóng to thêm một chút nào nên không mất nét. */
 @keyframes cl-hero {
-    0%   { opacity: 0; transform: scale(1.00); }
+    0%   { opacity: 0; background-position: 48% 50%; }
     3%   { opacity: 1; }
    30%   { opacity: 1; }
-   36%   { opacity: 0; transform: scale(1.08); }
-  100%   { opacity: 0; transform: scale(1.00); }
+   36%   { opacity: 0; background-position: 52% 50%; }
+  100%   { opacity: 0; background-position: 48% 50%; }
 }
 .cl-hero-anh {
   position: absolute; inset: 0;
-  background-size: cover; background-position: center;
+  background-size: cover; background-position: 50% 50%;
   opacity: 0;
-  animation: cl-hero 18s infinite cubic-bezier(.4,0,.2,1);
-  will-change: opacity, transform;
+  animation: cl-hero 18s infinite linear;
+  will-change: opacity, background-position;
 }
 .cl-hero-anh:nth-child(1) { animation-delay: 0s; }
 .cl-hero-anh:nth-child(2) { animation-delay: 6s; }

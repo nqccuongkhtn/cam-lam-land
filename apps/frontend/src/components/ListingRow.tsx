@@ -90,10 +90,11 @@ function ListingRow({ l, href }: { l: Listing; href?: string }) {
   );
   const locRow = <div className="text-[13px] text-slate-500 mt-1 flex items-center gap-1 truncate"><IPin /> <span className="truncate">{l.ward ?? 'Cam Lâm'}, Khánh Hòa</span></div>;
   const agentFooter = (
-    <div className="mt-2 pt-2 border-t border-slate-100 flex items-center gap-2">
+    // Chân thẻ: bớt khoảng cách và thu ảnh đại diện 32 -> 28px cho thẻ gọn lại.
+    <div className="mt-1.5 pt-1.5 border-t border-slate-100 flex items-center gap-2">
       {avatar
-        ? <img src={avatar} alt="" className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0" />
-        : <span className="w-8 h-8 rounded-full bg-[#0A2540] text-white grid place-items-center text-xs font-extrabold shrink-0">{String(agentName)[0]?.toUpperCase() || 'C'}</span>}
+        ? <img src={avatar} alt="" className="w-7 h-7 rounded-full object-cover border border-slate-200 shrink-0" />
+        : <span className="w-7 h-7 rounded-full bg-[#0A2540] text-white grid place-items-center text-xs font-extrabold shrink-0">{String(agentName)[0]?.toUpperCase() || 'C'}</span>}
       <div className="flex-1 min-w-0">
         <div className="text-[13px] font-semibold text-slate-700 truncate">{agentName}</div>
         <div className="text-[11px] text-slate-400">{posted}</div>
@@ -142,7 +143,10 @@ function ListingRow({ l, href }: { l: Listing; href?: string }) {
         {heroMosaic ? (
           /* KIM CƯƠNG: hero mosaic 1 lớn + 4 nhỏ (2×2), chi tiết bên dưới, full width */
           <>
-            <div className="flex gap-0.5 h-[248px]">
+            {/* Ảnh 248px làm một thẻ tin cao 438px — màn hình chỉ thấy 2,2 tin.
+                Các trang rao bán lớn để thẻ khoảng 300-330px, thấy 3 tin một màn.
+                Hạ xuống 196px. Đã đo trước sau chứ không ước. */}
+            <div className="flex gap-0.5 h-[196px]">
               <div className={`relative bg-slate-100 ${mThumbs.length ? 'flex-[1.9]' : 'flex-1'}`}>
                 <img src={img0} alt={l.title} onError={(e) => { (e.currentTarget as HTMLImageElement).src = NO_IMG; }} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
                 <Watermark name={agentName} avatar={avatar} />
@@ -160,7 +164,7 @@ function ListingRow({ l, href }: { l: Listing; href?: string }) {
                 </div>
               )}
             </div>
-            <div className="p-3">
+            <div className="px-3 pb-2.5 pt-2">
               {verified && <div className="mb-1"><Verified /></div>}
               <h3 className={`text-[15px] ${titleCls}`}>{l.title}</h3>
               {priceRow(true)}

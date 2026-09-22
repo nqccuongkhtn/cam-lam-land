@@ -783,13 +783,15 @@ function ListingsInner() {
     <div className={`bg-slate-50 ${mapView ? 'flex flex-col h-[calc(100dvh-56px-env(safe-area-inset-top))] overflow-hidden mb-[calc(-48px-env(safe-area-inset-bottom))] md:mb-0 md:block md:h-auto md:min-h-[calc(100dvh-56px)] md:overflow-visible' : 'min-h-[calc(100dvh-56px)]'}`}>
       {/* THANH TÌM KIẾM + CHIP LỌC */}
       <div className={`bg-white border-b border-slate-200 z-20 ${mapView ? 'shrink-0 md:sticky md:top-14' : 'cl-listbar'}`}>
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 space-y-2">
+        {/* Thanh này cao 109px, cộng thanh đầu trang 57px là 166px chắn trước nội dung.
+            Các trang rao bán lớn để khoảng 100-110px cho cả hai. Bớt khoảng đệm. */}
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-1.5 space-y-1.5">
           <div className="flex items-center gap-2">
             {/* Khi cuộn xuống (Nav ẩn) → hiện LOGO NHỎ bên trái để vẫn nhận diện & về trang chủ */}
             {hidden && !mapView && <Link href="/" aria-label="Trang chủ" className="md:hidden shrink-0"><span className="w-9 h-9 rounded-xl bg-[#0A2540] grid place-items-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C8A14B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.3V20h14V9.3" /><circle cx="12" cy="13.6" r="1.4" fill="#C8A14B" stroke="none" /></svg></span></Link>}
             <label className="flex items-center gap-2 flex-1 min-w-0 bg-slate-50 rounded-full border border-slate-200 px-4 focus-within:border-[#0A2540]">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-4 h-4 text-slate-400 shrink-0"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
-              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && showMine(false)} onFocus={(e) => { if (window.innerWidth < 768) { e.currentTarget.blur(); setSearchOpen(true); } }} className="py-2.5 w-full outline-none text-sm bg-transparent" placeholder="Khu vực, từ khoá, dự án…" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && showMine(false)} onFocus={(e) => { if (window.innerWidth < 768) { e.currentTarget.blur(); setSearchOpen(true); } }} className="py-2 w-full outline-none text-sm bg-transparent" placeholder="Khu vực, từ khoá, dự án…" />
             </label>
             {/* MOBILE: nút Bộ lọc GỌN ngay trong hàng tìm kiếm (mở bottom-sheet) — 1 hàng cho gọn */}
             {!mapView && (
@@ -835,10 +837,10 @@ function ListingsInner() {
               trước chân trang.
               CON SỐ 173px LẤY TỪ ĐÂU: trang này có HAI thanh dính chồng nhau —
               thanh đầu trang cao 57px, thanh lọc ("Lọc / Tin xác thực / Loại hình…")
-              dính tiếp từ 56 tới 165px. Đo thật trên máy chứ không ước. Lúc đầu để
+              dính tiếp từ 56 tới 154px. Đo thật trên máy chứ không ước. Lúc đầu để
               80px nên cột chui xuống dưới thanh lọc, đỉnh cột bị che mất.
               ĐỔI CHIỀU CAO THANH LỌC THÌ PHẢI SỬA LẠI HAI CON SỐ Ở ĐÂY. */}
-          <div className="mt-0 hidden self-start lg:sticky lg:top-[173px] lg:block lg:max-h-[calc(100dvh-185px)] lg:overflow-y-auto lg:pr-1 cl-cot-ben">{sidebar}</div>
+          <div className="mt-0 hidden self-start lg:sticky lg:top-[162px] lg:block lg:max-h-[calc(100dvh-174px)] lg:overflow-y-auto lg:pr-1 cl-cot-ben">{sidebar}</div>
         </div>
       )}
 

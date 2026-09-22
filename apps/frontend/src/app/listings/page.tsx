@@ -752,7 +752,7 @@ function ListingsInner() {
   const sidebar = (
     // Cột lọc chạy theo trang, dừng lại trước chân trang. Xem lời giải thích đầy đủ
     // ở trang chi tiết tin (ListingDetailClient.tsx).
-    <aside className="shrink-0 space-y-4 lg:w-80 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto lg:pr-1 cl-cot-ben">
+    <aside className="shrink-0 space-y-4 lg:w-80">
       <div className="bg-white rounded-xl border border-slate-200 p-4">
         <div className="flex items-center justify-between">
           <div><p className="text-sm font-bold text-[#0A2540]">Mặt bằng giá khu vực</p><p className="text-xs text-slate-400">Cam Lâm · 12 tháng qua</p></div>
@@ -826,7 +826,14 @@ function ListingsInner() {
       {!mapView && (
         <div className="max-w-7xl mx-auto px-3 sm:px-4 pt-5 pb-24 md:py-5 lg:flex lg:gap-6 lg:items-start">
           <div className="flex-1 min-w-0">{listHeader}{listItems}<div ref={endRef} aria-hidden className="h-px" /></div>
-          <div className="hidden lg:block mt-0">{sidebar}</div>
+          {/* Lớp dính phải đặt Ở ĐÂY chứ không phải trên <aside> bên trong.
+              <aside> nằm lọt trong thẻ bọc này; thẻ bọc mới là ô của hàng flex, mà ô
+              cao đúng bằng nội dung thì bên trong không còn chỗ nào để trượt — đặt
+              sticky vào trong là vô tác dụng, cột vẫn cuộn mất như thường.
+              Chặn chiều cao bằng màn hình + cho tự cuộn, để cột dài vẫn xem hết được.
+              Không đè chân trang: cột chỉ trượt trong phạm vi hàng, hàng kết thúc
+              trước chân trang. */}
+          <div className="mt-0 hidden self-start lg:sticky lg:top-20 lg:block lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto lg:pr-1 cl-cot-ben">{sidebar}</div>
         </div>
       )}
 

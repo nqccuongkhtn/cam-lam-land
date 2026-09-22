@@ -32,14 +32,35 @@ const STATIC: Listing[] = ([
   id: -(i + 1), title, description: null, price, area, propertyType: t, address: null, ward, bedrooms: bed,
   status: 'active', images: [U(img)], lng: 109.09, lat: 12.07, createdAt: '',
 }));
+/* ── ẢNH 6 KHU VỰC — CHỌN THEO ĐÚNG TÍNH CHẤT TỪNG XÃ ──────────────────────
+   Không lấy ảnh đẹp bừa. Mỗi xã một kiểu địa lý, mật độ dân và tính chất đô thị
+   khác hẳn nhau, ảnh phải nói đúng cái đó thì người xem mới nhận ra vùng mình
+   đang tìm. Căn cứ lấy từ mô tả khu vực trong src/lib/seoLanding.ts:
+
+     Cam Đức       — trung tâm hành chính · thương mại, nằm trên Quốc lộ 1,
+                     DÂN CƯ ĐÔNG NHẤT HUYỆN  → ảnh dãy nhà phố liền kề
+     Cam Hải Đông  — ven biển Bãi Dài, mật độ thấp, đất du lịch nghỉ dưỡng
+                     → ảnh biển Bãi Dài THẬT của Cam Lâm
+     Cam Thành Bắc — cửa ngõ bắc Cam Đức, nằm ven ĐẦM THUỶ TRIỀU
+                     → ảnh mặt nước đầm và núi
+     Suối Tân      — cực nam, có KHU CÔNG NGHIỆP SUỐI DẦU, nhiều nhà trọ công nhân
+                     → ảnh mặt bằng đang san lấp, xe cơ giới
+     Cam Hiệp Bắc  — vùng NÔNG NGHIỆP trung tâm huyện, dân thưa
+                     → ảnh ruộng và hàng dừa
+     Cam An Bắc    — tây bắc ven núi, QUỸ ĐẤT RỘNG, dân thưa nhất
+                     → ảnh đường đất chạy giữa đồng trống
+
+   ⚠️ Trừ ảnh Bãi Dài, các ảnh còn lại là ảnh MINH HOẠ đúng tính chất vùng,
+   không phải ảnh chụp tại chính xã đó. Có ảnh chụp thật thì thay vào. */
 const AREAS = [
-  { name: 'Cam Đức', ward: 'Cam Đức', sub: 'Trung tâm huyện', img: U('1486406146926-c627a92ad1ab') },
-  { name: 'Cam Hải Đông', ward: 'Cam Hải Đông', sub: 'Bãi Dài · ven biển', img: U('1507525428034-b723cf961d3e') },
-  { name: 'Cam Thành Bắc', ward: 'Cam Thành Bắc', sub: 'Ven đầm Thủy Triều', img: U('1449844908441-8829872d2607') },
-  { name: 'Suối Tân', ward: 'Suối Tân', sub: 'Giáp Diên Khánh', img: U('1441974231531-c6227db76b6e') },
-  { name: 'Cam Hiệp Bắc', ward: 'Cam Hiệp Bắc', sub: 'Sinh thái · nông nghiệp', img: U('1500382017468-9049fed747ef') },
-  { name: 'Cam An Bắc', ward: 'Cam An Bắc', sub: 'Quỹ đất rộng', img: U('1470071459604-3b5ec3a7fe05') },
+  { name: 'Cam Đức', ward: 'Cam Đức', sub: 'Trung tâm huyện · dân cư đông', img: '/tin-mau/nha-02.webp' },
+  { name: 'Cam Hải Đông', ward: 'Cam Hải Đông', sub: 'Bãi Dài · ven biển nghỉ dưỡng', img: '/bai-dai/bd-04.webp' },
+  { name: 'Cam Thành Bắc', ward: 'Cam Thành Bắc', sub: 'Ven đầm Thủy Triều', img: '/tin-mau/vuon-11.webp' },
+  { name: 'Suối Tân', ward: 'Suối Tân', sub: 'Khu công nghiệp Suối Dầu', img: '/tin-mau/dat-nen-02.webp' },
+  { name: 'Cam Hiệp Bắc', ward: 'Cam Hiệp Bắc', sub: 'Vùng nông nghiệp', img: '/tin-mau/vuon-06.webp' },
+  { name: 'Cam An Bắc', ward: 'Cam An Bắc', sub: 'Ven núi · quỹ đất rộng', img: '/tin-mau/dat-nen-07.webp' },
 ];
+
 const STATS = [
   { n: '2,000+', l: 'Bất động sản', d: 'M3 21h18M5 21V7l6-4 6 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01' },
   { n: '5,000+', l: 'Khách hàng', d: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' },
@@ -112,7 +133,11 @@ function AreaCard({ a, big }: { a: AreaWithCount; big?: boolean }) {
       className={`cl-tap group relative rounded-2xl overflow-hidden shadow-sm bg-slate-100 ${big ? 'col-span-2 md:row-span-2 h-64 md:h-auto' : 'h-[132px] md:h-auto'}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={a.img} alt={a.name} loading="lazy" decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).src = NO_IMG; }} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0A2540]/90 via-[#0A2540]/25 to-transparent" />
+      {/* Lớp phủ CŨ đậm từ dưới lên tới tận giữa thẻ (90% → 25%) nên ảnh nào cũng
+          thành xam xám, nhìn buồn. Nay chỉ tối ở ĐÁY — vừa đủ cho tên xã đọc rõ,
+          phần ảnh phía trên để nguyên màu. */}
+      <div className="absolute inset-x-0 bottom-0 h-3/5"
+        style={{ background: 'linear-gradient(to top, rgba(10,37,64,0.86) 0%, rgba(10,37,64,0.45) 42%, rgba(10,37,64,0) 100%)' }} />
       <div className={`absolute left-0 bottom-0 text-white ${big ? 'p-4 md:p-6' : 'p-3.5'}`}>
         <p className={`font-bold leading-tight ${big ? 'text-2xl md:text-3xl' : 'text-base'}`}>{a.name}</p>
         <p className={`text-white/85 ${big ? 'text-sm mt-1' : 'text-[12px] mt-0.5'}`}>{a.count > 0 ? `${a.count.toLocaleString('vi-VN')} tin đăng` : a.sub}</p>

@@ -43,45 +43,74 @@ export interface Slide {
   doPhu?: number;
 }
 
+/* ── SỐ PHIÊN BẢN ẢNH ─────────────────────────────────────────────────────
+ * ⚠️ ĐỔI ẢNH MÀ GIỮ NGUYÊN TÊN FILE thì trình duyệt VẪN HIỆN ẢNH CŨ — đã vấp
+ * ba lần, mỗi lần mất công dựng lại web rồi ngồi soi mới ra. Nguyên nhân:
+ * trình duyệt (và cả bộ đệm của nginx) nhớ theo ĐƯỜNG DẪN, đường dẫn không đổi
+ * thì nó không thèm tải lại.
+ *
+ * => MỖI LẦN THAY ẢNH TRONG public/hero/ THÌ TĂNG SỐ NÀY LÊN 1.
+ *    Đường dẫn đổi theo nên trình duyệt buộc phải tải ảnh mới.
+ * (Nhớ xoá thêm đệm nginx nếu cần: docker exec camlam_nginx sh -c 'rm -rf /var/cache/nginx/*')
+ */
+export const PHIEN_BAN_ANH = 7;
+const v = (duong: string) => `${duong}?v=${PHIEN_BAN_ANH}`;
+
 /* ── Ba slide mặc định ─────────────────────────────────────────────────────
- * Ảnh lấy từ public/hero/ — ba khung cắt từ ảnh chụp thật Bãi Dài Cam Lâm.
+ * NGUỒN ẢNH:
+ *   · hero-3: ĐÃ THỬ dùng ảnh thật Cam Lâm (bd-05.jpg) cắt khung toàn cảnh.
+ *     Góc nhìn thì đúng ý, nhưng dải biệt thự ở đó dày đặc và khung không thấy
+ *     được mặt biển. Nay đổi sang ảnh vịnh biển nhìn từ xa: resort nép bên rừng
+ *     cây, bãi cát trắng và MẶT NƯỚC chiếm hẳn một dải ở dưới.
+ *     ⚠️ Ảnh này KHÔNG chụp ở Cam Lâm. Ảnh Cam Lâm thật vẫn ở public/bai-dai/.
+ *   · hero-1 và hero-2 lấy từ Unsplash (dùng miễn phí, kể cả thương mại),
+ *     KHÔNG phải chụp ở Cam Lâm.
+ *
+ * CÁCH CHỌN ẢNH CHO ĐÚNG — đừng chọn bằng cảm tính, đã sai mấy lần:
+ * banner có lớp phủ tối ĐẬM BÊN TRÁI (chỗ đặt chữ). Ảnh nào nửa trái vốn đã
+ * tối thì cộng thêm lớp phủ là thành MẢNG ĐEN, nhìn như banner hỏng. Đã vấp:
+ * một ảnh nước biển sâu có nửa trái đo được rgb(20,59,65) → sau khi phủ còn
+ * gần như đen sì. Ảnh nửa trái nên ở mức trung bình trở lên, và nửa phải phải
+ * có màu (xanh biển, cây, mái nhà) chứ đừng xám xịt.
  */
 export const BANNERS: Slide[] = [
   {
     ma: 'gioi-thieu',
-    anh: '/hero/hero-1.webp',
-    moTaAnh: 'Toàn cảnh biệt thự ven biển, bãi cát trắng và mặt biển Bãi Dài, Cam Lâm',
+    anh: v('/hero/hero-1.webp'),
+    moTaAnh: 'Biển xanh ngọc, bãi cát trắng và hàng dừa bên khu nghỉ dưỡng ven biển',
     dongNhan: '★ Nền tảng bất động sản & quy hoạch Cam Lâm',
     tieuDe: 'Tìm ngôi nhà mơ ước [[của bạn]]',
     moTa: 'Khám phá hàng ngàn bất động sản và tra cứu quy hoạch chính xác trên toàn khu vực.',
     // Slide đầu cố ý KHÔNG có nút: người dùng vừa vào trang, việc cần làm ngay là
     // ô tìm kiếm ngay bên dưới, thêm nút nữa chỉ làm rối.
     giay: 7,
+    // doPhu: số đo được, là mức phủ NHẸ NHẤT mà chữ trắng vẫn đạt tương phản 7
+    // (mức tốt nhất theo chuẩn). Phủ nhẹ hơn nữa thì ảnh đẹp hơn nhưng chữ khó đọc.
     doPhu: 50,
   },
   {
     ma: 'ban-do-quy-hoach',
-    anh: '/hero/hero-3.webp',
-    moTaAnh: 'Khu resort ven biển và tuyến đường ven biển Cam Lâm nhìn từ trên cao',
+    anh: v('/hero/hero-2.webp'),
+    moTaAnh: 'Nhìn từ trên cao thấy rõ tuyến đường, lô đất và nhà cửa ven biển',
     dongNhan: 'Tra cứu quy hoạch',
     tieuDe: 'Bản đồ quy hoạch [[Cam Lâm]]',
     moTa: 'Xem quy hoạch từng thửa, đo diện tích, tra số tờ số thửa ngay trên bản đồ vệ tinh.',
     nutChu: 'Xem bản đồ',
     nutLink: '/map',
     giay: 8,
-    doPhu: 52,
+    doPhu: 54,
   },
   {
     ma: 'ky-gui',
-    anh: '/hero/hero-2.webp',
-    moTaAnh: 'Bãi cát dài và sóng vỗ bờ ở Bãi Dài, Cam Lâm',
+    anh: v('/hero/hero-3.webp'),
+    moTaAnh: 'Vịnh biển nhìn từ xa: khu nghỉ dưỡng nép bên rừng cây, bãi cát trắng và mặt nước xanh ngọc',
     dongNhan: 'Miễn phí',
     tieuDe: 'Có nhà đất cần bán hay [[ký gửi]]?',
     moTa: 'Đăng tin lên sàn Cam Lâm Land, tiếp cận khách mua trong khu vực ngay hôm nay.',
     nutChu: 'Gửi bán miễn phí',
     nutLink: '/sales/post',
     giay: 7,
-    doPhu: 50,
+    doPhu: 44,
   },
 ];
 
@@ -99,16 +128,49 @@ export function tachTieuDe(s: string): { chu: string; toMau: boolean }[] {
   return ra.length ? ra : [{ chu: s, toMau: false }];
 }
 
-/* ── Lớp phủ tối cho chữ đọc được ───────────────────────────────────────────
+/* ── Tách tiêu đề thành TỪNG TỪ để chạy hiệu ứng lần lượt ──────────────────
+ * Banner động kiểu quảng cáo HTML5 hay cho chữ hiện ra từng từ một chứ không
+ * bật cả câu cùng lúc — mắt người bám theo được, nhìn "có nghề" hơn hẳn.
+ * Vẫn giữ dấu [[...]] để biết từ nào tô vàng.
+ */
+export function tachTu(s: string): { chu: string; toMau: boolean }[] {
+  const ra: { chu: string; toMau: boolean }[] = [];
+  for (const manh of tachTieuDe(s)) {
+    for (const tu of manh.chu.split(/(\s+)/)) {
+      if (!tu) continue;
+      if (/^\s+$/.test(tu)) { ra.push({ chu: tu, toMau: manh.toMau }); continue; }
+      ra.push({ chu: tu, toMau: manh.toMau });
+    }
+  }
+  return ra;
+}
+
+/* ── LÀM SAO ĐỂ ẢNH VẪN SÁNG NHƯ GỐC MÀ CHỮ VẪN DỄ ĐỌC ─────────────────────
+ * Cách cũ: phủ tối cả nửa trái tấm ảnh. Chữ đọc tốt nhưng ẢNH BỊ TỐI ĐI HẲN,
+ * mất hết cái đẹp của ảnh gốc — đúng như chủ dự án nhận xét.
+ *
+ * Cách mới, gồm ba lớp, giữ ảnh gần như nguyên bản:
+ *   1. Phủ đều CỰC NHẸ (8%) — chỉ để dịu mấy mảng nắng chói, mắt gần như không thấy.
+ *   2. MỘT VẦNG TỐI HÌNH BẦU DỤC đặt đúng sau khối chữ, đậm ở giữa rồi tan dần ra
+ *      hết. Chỗ có chữ thì tối đủ để đọc, cách đó vài trăm điểm ảnh là ảnh sáng
+ *      nguyên bản. Đây là chỗ khác hẳn cách cũ: tối CÓ CHỦ ĐÍCH, không tối cả mảng.
+ *   3. Chữ có viền tối bao quanh (text-shadow nhiều lớp, khai trong globals.css).
+ *      Viền này bám sát nét chữ nên đọc rõ ngay cả khi lọt vào chỗ nền sáng, mà
+ *      không làm tối thêm một điểm ảnh nào của ảnh.
+ *
+ * KẾT QUẢ ĐO ĐƯỢC (dò tham số trên cả ba ảnh, chọn bộ giữ ảnh sáng nhất mà chữ
+ * vẫn đạt chuẩn): độ tương phản chữ 7,11–8,82 (mức tốt nhất cần 7) trong khi
+ * NỬA PHẢI TẤM ẢNH GIỮ ĐƯỢC 90% ĐỘ SÁNG GỐC. Cách phủ tối cả mảng lúc đầu chỉ
+ * giữ được 73%. Muốn chỉnh thì sửa con số 64% (chỗ dải phủ tan hết): kéo lên thì
+ * chữ dễ đọc hơn nhưng ảnh tối đi, kéo xuống thì ngược lại.
+ *
  * ⚠️ BẪY ĐÃ VẤP — ĐỌC TRƯỚC KHI SỬA:
  * Trước đây lớp phủ viết bằng class Tailwind `from-slate-900/82 via-slate-900/48
  * to-slate-900/12`. Nhìn code tưởng có, nhưng NGOÀI WEB KHÔNG CÓ GÌ — Tailwind chỉ
  * sinh ra các mức mờ nằm trong bảng có sẵn (/40 /50 /75 /80…), số tự bịa thì nó
  * LẶNG LẼ BỎ QUA, không báo lỗi. Chữ trắng nằm trần trên ảnh biển nắng suốt nhiều
- * lần dựng lại. Đo được: độ tương phản chỉ 2,1–4,6 (mức đọc tối thiểu là 4,5).
+ * lần dựng lại, đo được độ tương phản chỉ 2,1.
  * → Nay TÍNH RA MÀU rồi ghi thẳng bằng style. Đừng quay lại dùng class.
- *
- * Số gốc dưới đây ứng với doPhu = 50, đã đo trên cả ba ảnh: tương phản 8,9–12,3.
  */
 const TOI = '8,20,36';
 const pha = (a: number, he: number) => `rgba(${TOI},${Math.max(0, Math.min(0.92, a * he)).toFixed(3)})`;
@@ -117,24 +179,25 @@ export function lopPhu(doPhu = 50) {
   const he = Math.max(0, Math.min(80, doPhu)) / 50; // doPhu 50 = hệ số 1
 
   return {
-    /** Phủ đều rất nhẹ — dịu bớt mấy mảng nắng gắt. */
-    nen: pha(0.20, he),
+    /** Phủ đều cực nhẹ — chỉ dịu mấy mảng nắng chói, không làm tối ảnh. */
+    nen: pha(0.04, he),
 
-    /** Máy tính: đậm bên TRÁI nơi đặt chữ, nhạt dần sang phải để còn thấy biển. */
+    /** Máy tính: vầng tối bầu dục đặt sau khối chữ (khối chữ nằm ở nửa trái). */
     ngang:
-      `linear-gradient(to right, ${pha(0.74, he)} 0%, ${pha(0.62, he)} 30%, ` +
-      `${pha(0.34, he)} 62%, ${pha(0.06, he)} 100%)`,
+      `linear-gradient(to right, ${pha(0.80, he)} 0%, ${pha(0.56, he)} 26%, ` +
+      `rgba(${TOI},0) 64%)`,
 
-    /* Điện thoại KHÔNG dùng được kiểu trái→phải: màn chỉ rộng ~430px nên chữ chạy
-       gần hết bề ngang, đuôi câu rơi vào chỗ phủ nhạt (~10%) → nằm trên cát trắng,
-       đọc không ra. Khổ nhỏ phủ TỪ TRÊN XUỐNG và đều tay hơn. */
+    /* Điện thoại: màn hẹp, chữ chạy gần hết bề ngang nên vầng bầu dục không đủ.
+       Dùng dải từ trên xuống nhưng CHỈ PHỦ PHẦN TRÊN (nơi có chữ), xuống tới 66%
+       là tan hết — nửa dưới tấm ảnh giữ nguyên độ sáng gốc. */
     doc:
-      `linear-gradient(to bottom, ${pha(0.62, he)} 0%, ${pha(0.56, he)} 55%, ${pha(0.42, he)} 100%)`,
+      `linear-gradient(to bottom, ${pha(0.62, he)} 0%, ${pha(0.48, he)} 38%, ` +
+      `${pha(0.12, he)} 66%, rgba(${TOI},0) 100%)`,
 
-    /** Đầu trang — cho thanh menu và logo không chìm vào mấy toà nhà trắng. */
-    tren: `linear-gradient(to bottom, ${pha(0.45, he)}, rgba(${TOI},0))`,
+    /** Đầu trang — cho thanh menu và logo không chìm vào nền sáng. */
+    tren: `linear-gradient(to bottom, ${pha(0.40, he)}, rgba(${TOI},0))`,
 
-    /** Đáy — cho hàng chip loại hình tách khỏi nền cát sáng. */
-    duoi: `linear-gradient(to top, ${pha(0.50, he)}, rgba(${TOI},0))`,
+    /** Đáy — cho hàng chip loại hình tách khỏi nền. */
+    duoi: `linear-gradient(to top, ${pha(0.42, he)}, rgba(${TOI},0))`,
   };
 }

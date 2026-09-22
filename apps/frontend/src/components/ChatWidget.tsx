@@ -696,7 +696,7 @@ export default function ChatWidget() {
                       <span className="block text-[9px] text-slate-500 truncate">Admin: Nguyễn Quốc Cường · <a href="tel:0988888888" className="font-semibold text-[#0A2540]">0988 888 888</a></span>
                     </span>
                     <button onClick={() => setGameOpen((v) => !v)} className="shrink-0 flex items-center gap-1 rounded-full bg-[#0A2540] pl-2 pr-2.5 py-1 text-[10px] font-bold text-white hover:brightness-110">
-                      <span>🎮</span><span className="text-[#C8A14B]">Game trúng quà</span><span>{gameOpen ? '▴' : '▾'}</span>
+                      <span>🎮</span><span className="text-[#C8A14B]">Game giải trí</span><span>{gameOpen ? '▴' : '▾'}</span>
                     </button>
                   </div>
                   {gameOpen && <div className="px-2 pb-2"><FlappyMini maxH={168} /></div>}

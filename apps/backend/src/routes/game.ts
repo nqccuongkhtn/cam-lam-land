@@ -36,15 +36,15 @@ gameRouter.post('/score', async (req, res, next) => {
       [name, phone, 'Khách chơi mini-game Cam Lâm Land — quan tâm định giá đất / tư vấn.']
     ).catch(() => {});
 
-    // Hạng tuần của người này (theo điểm cao nhất trong tuần, tính theo SĐT).
+    // Hạng của người này — TÍNH TỪ TRƯỚC TỚI GIỜ, không chia theo tuần/tháng.
+    // (Chủ dự án bỏ cách xếp theo tuần: bảng cứ reset thì người chơi mất công leo lại,
+    //  và game này chỉ để giải trí chứ không còn chương trình trao thưởng nữa.)
     const rankRows = await query(
       `SELECT (
          SELECT COUNT(*) FROM (
-           SELECT MAX(score) AS best FROM game_scores
-            WHERE created_at >= date_trunc('week', now()) GROUP BY phone
+           SELECT MAX(score) AS best FROM game_scores GROUP BY phone
          ) t
-         WHERE t.best > (SELECT COALESCE(MAX(score),0) FROM game_scores
-                          WHERE phone = $1 AND created_at >= date_trunc('week', now()))
+         WHERE t.best > (SELECT COALESCE(MAX(score),0) FROM game_scores WHERE phone = $1)
        ) + 1 AS rank`,
       [phone]
     ).catch(() => [] as any[]);
@@ -54,14 +54,14 @@ gameRouter.post('/score', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// GET /api/game/leaderboard — Top 10 tuần này (điểm cao nhất mỗi SĐT). CÔNG KHAI, che bớt SĐT.
+// GET /api/game/leaderboard — Top 10 TỪ TRƯỚC TỚI GIỜ (điểm cao nhất mỗi SĐT).
+// CÔNG KHAI, che bớt SĐT. Không lọc theo tuần/tháng nữa.
 gameRouter.get('/leaderboard', async (_req, res, next) => {
   try {
     const rows = await query(
       `SELECT name, phone, score FROM (
          SELECT DISTINCT ON (phone) name, phone, score
            FROM game_scores
-          WHERE created_at >= date_trunc('week', now())
           ORDER BY phone, score DESC, created_at DESC
        ) t
        ORDER BY score DESC, name LIMIT 10`);

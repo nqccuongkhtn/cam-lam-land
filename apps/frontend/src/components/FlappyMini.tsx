@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { submitScore } from '@/lib/game';
 
-// Bản mini nhúng trong ô chat cộng đồng — chạm để bay, ghi điểm chung bảng xếp hạng tuần.
+// Bản mini nhúng trong ô chat cộng đồng — chạm để bay, ghi điểm chung bảng xếp hạng (tính từ trước tới giờ).
+// ⚠️ ĐÂY LÀ GAME GIẢI TRÍ, KHÔNG có quà/thưởng. Chủ dự án đã bỏ phần trúng thưởng —
+//    đừng thêm lại, hứa quà trên web là phát sinh nghĩa vụ phải trao thật.
 export default function FlappyMini({ maxH = 180 }: { maxH?: number }) {
   const { user } = useAuth();
   const prefillRef = useRef(false);
@@ -141,15 +143,15 @@ export default function FlappyMini({ maxH = 180 }: { maxH?: number }) {
                 <div className="w-full max-w-[230px] mt-1.5 space-y-1.5">
                   <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Họ tên *" className="w-full rounded-md px-2.5 py-1.5 text-[12px] text-[#0A2540] outline-none" />
                   <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Số điện thoại *" inputMode="tel" className="w-full rounded-md px-2.5 py-1.5 text-[12px] text-[#0A2540] outline-none" />
-                  <button onClick={submit} disabled={busy} className="w-full bg-[#C8A14B] hover:brightness-105 disabled:opacity-60 text-[#0A2540] font-extrabold py-1.5 rounded-md text-[12px]">{busy ? 'Đang gửi…' : '🏆 Ghi tên nhận thưởng'}</button>
+                  <button onClick={submit} disabled={busy} className="w-full bg-[#C8A14B] hover:brightness-105 disabled:opacity-60 text-[#0A2540] font-extrabold py-1.5 rounded-md text-[12px]">{busy ? 'Đang gửi…' : '🏆 Ghi tên lên bảng'}</button>
                   <button onClick={playAgain} className="w-full bg-white/15 hover:bg-white/25 text-white font-semibold py-1 rounded-md text-[11px]">↻ Chơi lại</button>
                 </div>
               </>
             ) : (
               <>
                 <div className="text-[13px] font-extrabold">🎉 Đã ghi tên!</div>
-                <div className="text-[11px] text-slate-200 mt-0.5">Bạn <b className="text-[#C8A14B]">{sent.score}</b> điểm{sent.rank ? <> · hạng <b className="text-[#C8A14B]">#{sent.rank}</b></> : null} tuần này.</div>
-                <div className="text-[10px] text-slate-300 mt-0.5 px-2">Vào Top 3 cuối tuần sẽ được gọi trao thưởng!</div>
+                <div className="text-[11px] text-slate-200 mt-0.5">Bạn <b className="text-[#C8A14B]">{sent.score}</b> điểm{sent.rank ? <> · hạng <b className="text-[#C8A14B]">#{sent.rank}</b></> : null}.</div>
+                <div className="text-[10px] text-slate-300 mt-0.5 px-2">Cố thêm điểm để leo hạng nhé!</div>
                 <button onClick={playAgain} className="mt-2 bg-[#C8A14B] text-[#0A2540] font-extrabold py-1.5 px-4 rounded-md text-[12px]">↻ Chơi lại</button>
               </>
             )}

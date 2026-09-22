@@ -11,7 +11,7 @@ const DISCOVER: [string, string][] = [
   ['Nhà đất theo khu vực', '/nha-dat'],
   ['Góp vốn đầu tư (CamInvest)', '/dau-tu'],
   ['Tin tức', '/tin-tuc'],
-  ['🎮 Chơi game trúng quà tuần', '/game'],
+  ['🎮 Game giải trí', '/game'],
 ];
 const TOOLS: [string, string][] = [
   ['🧰 Tiện ích (tất cả công cụ)', '/tien-ich'],

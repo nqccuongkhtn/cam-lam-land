@@ -508,31 +508,123 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
    cao, tức là còn dư khoảng 115px chưa nhìn thấy. Cho ảnh trôi chậm trong khoảng
    dư đó là có chuyển động mà KHÔNG phóng to một chút nào. */
 @keyframes cl-hero-troi {
-  from { object-position: 50% 44%; }
-  to   { object-position: 50% 56%; }
+  from { transform: scale(1.001) translate3d(0, 0, 0); }
+  to   { transform: scale(1.065) translate3d(-1.1%, -1.4%, 0); }
 }
 .cl-hero-swiper,
 .cl-hero-swiper .swiper-wrapper,
 .cl-hero-swiper .swiper-slide { height: 100%; }
 .cl-hero-swiper .swiper-slide img {
   width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%;
+  transform-origin: 50% 50%;
+  /* ⚠️ ĐỪNG THÊM `will-change: transform` VÀO ĐÂY.
+     Đã thêm và HỎNG NẶNG: ảnh biến mất sạch, banner chỉ còn một mảng xám phẳng,
+     trong khi soi code thì mọi thứ vẫn "đúng" (ảnh tải xong, opacity 1, đúng kích
+     thước) nên rất khó tìm. Lý do: will-change bắt trình duyệt tách ảnh thành một
+     lớp vẽ riêng, mà lớp đó nằm trong hiệu ứng mờ chồng của Swiper lại không được
+     vẽ ra. Bỏ dòng đó đi là ảnh hiện lại ngay.
+     Cách tìm ra: tạm ẩn lớp Swiper thì thấy ảnh nền dự phòng hiện bình thường
+     => biết thủ phạm nằm trong lớp Swiper chứ không phải ở ảnh. */
 }
 /* Chỉ ảnh của slide ĐANG HIỆN mới trôi — slide đang nằm chờ thì đứng yên cho đỡ tốn máy. */
 .cl-hero-swiper .swiper-slide-active img {
   animation: cl-hero-troi var(--lau, 7s) linear forwards;
 }
 
-/* Chữ hiện dần lần lượt khi CHUYỂN slide. Slide đầu tiên KHÔNG chạy hiệu ứng —
-   chữ phải có ngay từ lúc trang vừa hiện, không để trống chờ JS. */
-@keyframes cl-hero-len {
-  from { opacity: 0; transform: translateY(10px); }
+/* Viền tối bám sát nét chữ — cách này làm chữ đọc rõ trên nền sáng mà KHÔNG
+   phải làm tối ảnh thêm một điểm ảnh nào. Bốn lớp bóng ngắn bao quanh nét chữ,
+   cộng một lớp bóng toả rộng cho có chiều sâu. */
+.cl-bn-vien {
+  text-shadow:
+    0 1px 2px rgba(0,0,0,.55),
+    0 -1px 2px rgba(0,0,0,.45),
+    1px 0 2px rgba(0,0,0,.45),
+    -1px 0 2px rgba(0,0,0,.45),
+    0 4px 18px rgba(0,0,0,.6);
+}
+
+/* ══ HIỆU ỨNG CHỮ KIỂU QUẢNG CÁO HTML5 ═══════════════════════════════════════
+   Không bật cả câu cùng lúc mà cho từng phần hiện LẦN LƯỢT — mắt người bám theo
+   được, nhìn có nghề hơn hẳn. Mỗi phần tử tự nhận độ trễ riêng qua animation-delay
+   ghi thẳng trong HeroBanner.tsx.
+
+   Slide ĐẦU TIÊN không chạy hiệu ứng: chữ phải có ngay lúc trang vừa hiện, không
+   để trống chờ JS (ảnh hưởng tốc độ tải và bị nhảy bố cục). */
+
+/* Trôi lên + hiện dần — dùng cho dòng nhỏ, câu mô tả, nút bấm. */
+@keyframes cl-bn-len {
+  from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: none; }
 }
-.cl-hero-chu > * { animation: cl-hero-len .5s var(--ease) both; }
+/* Trượt từ trái sang — dùng cho dòng nhãn trên cùng. */
+@keyframes cl-bn-trai {
+  from { opacity: 0; transform: translateX(-18px); }
+  to   { opacity: 1; transform: none; }
+}
+/* Từng TỪ của tiêu đề bật lên. */
+@keyframes cl-bn-tu {
+  from { opacity: 0; transform: translateY(18px) skewY(3deg); }
+  to   { opacity: 1; transform: none; }
+}
+/* Gạch chân vàng tự kẻ từ trái sang phải dưới cụm chữ được tô màu. */
+@keyframes cl-bn-gach {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+/* Nút bấm loé sáng một nhịp cho người dùng để ý. */
+@keyframes cl-bn-loe {
+  0%, 60%, 100% { box-shadow: 0 6px 18px rgba(200,161,75,.35); }
+  80%           { box-shadow: 0 6px 30px rgba(200,161,75,.85); }
+}
+/* Ngôi sao nhỏ ở dòng nhãn nhấp nháy rất nhẹ. */
+@keyframes cl-bn-nhay {
+  0%, 100% { opacity: .55; transform: scale(.88); }
+  50%      { opacity: 1;   transform: scale(1.12); }
+}
+/* Vệt sáng quét ngang ảnh một lần mỗi slide — giống ánh nắng loé trên mặt nước. */
+@keyframes cl-bn-quet {
+  0%        { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
+  12%, 22%  { opacity: .5; }
+  45%, 100% { transform: translateX(220%) skewX(-18deg); opacity: 0; }
+}
+
+.cl-bn-nhan   { animation: cl-bn-trai .55s var(--ease) both; }
+.cl-bn-tu     { display: inline-block; animation: cl-bn-tu .5s var(--ease) both; }
+.cl-bn-mota   { animation: cl-bn-len .55s var(--ease) both; }
+.cl-bn-nut    { animation: cl-bn-len .5s var(--ease) both; }
+.cl-bn-nut:hover { animation: cl-bn-loe 1.6s ease-in-out infinite; }
+.cl-bn-sao    { display: inline-block; animation: cl-bn-nhay 2.4s ease-in-out infinite; }
+.cl-bn-gach   { transform-origin: left center; animation: cl-bn-gach .5s var(--ease) both; }
+.cl-bn-quet   { animation: cl-bn-quet 5.5s var(--ease) 1.2s 1 both; }
+
+/* Chữ vàng sáng lên theo nhịp.
+   ⚠️ ĐÃ THỬ CÁCH KHÁC VÀ HỎNG: lúc đầu làm vệt sáng chạy qua chữ bằng
+   `background-clip: text` + `-webkit-text-fill-color: transparent`. Kết quả là
+   CHỮ BIẾN MẤT HẲN, chỉ còn cái gạch chân — vì thẻ h2 bọc ngoài có drop-shadow,
+   mà Chrome dựng chữ cắt theo nền bên trong một lớp lọc thì hỏng.
+   Cách này dùng `filter` nên không đụng gì tới cách dựng chữ, chắc ăn. */
+@keyframes cl-bn-lanh {
+  0%, 100% { filter: none; }
+  50%      { filter: brightness(1.22) drop-shadow(0 0 12px rgba(255,213,106,.5)); }
+}
+.cl-bn-lanh { animation: cl-bn-lanh 3.4s ease-in-out 1.3s infinite; }
+
+/* Sóng chạy ở mép dưới banner — hai lớp chạy lệch tốc độ cho có chiều sâu.
+   Dải sóng vẽ rộng gấp đôi khung rồi trượt sang trái đúng một nửa, nên nối
+   vòng lại liền mạch, không thấy chỗ ghép. */
+@keyframes cl-bn-song { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.cl-bn-song { width: 200%; animation: cl-bn-song var(--toc, 16s) linear infinite; }
+
+/* Thanh chạy trên chấm tròn, cho biết còn bao lâu thì sang banner sau. */
+@keyframes cl-bn-dem { from { width: 0%; } to { width: 100%; } }
+.cl-bn-dem { animation: cl-bn-dem var(--lau, 7s) linear both; }
 
 @media (prefers-reduced-motion: reduce) {
   .cl-hero-swiper .swiper-slide-active img { animation: none; }
-  .cl-hero-chu > * { animation: none; }
+  .cl-bn-nhan, .cl-bn-tu, .cl-bn-mota, .cl-bn-nut, .cl-bn-sao,
+  .cl-bn-gach, .cl-bn-quet, .cl-bn-dem, .cl-bn-lanh, .cl-bn-song {
+    animation: none !important; opacity: 1; transform: none;
+  }
 }
 
 /* ── HÀNG CHIP LOẠI HÌNH TRÊN ẢNH BÌA ──────────────────────────────────────

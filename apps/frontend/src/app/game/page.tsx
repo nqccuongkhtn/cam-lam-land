@@ -142,8 +142,11 @@ export default function GamePage() {
       <div className="max-w-2xl mx-auto px-3 sm:px-4 py-5">
         <div className="rounded-2xl bg-[#0A2540] text-white p-4 sm:p-5 shadow-sm">
           <div className="flex items-center gap-2 text-[#C8A14B] font-extrabold text-sm">🏆 THI TUẦN · BAY CÙNG CAM LÂM LAND</div>
-          <h1 className="text-xl sm:text-2xl font-extrabold mt-1">Chơi game — Top 3 tuần nhận quà</h1>
-          <p className="text-slate-200 text-sm mt-1">Top 3 điểm cao mỗi tuần nhận <b className="text-[#C8A14B]">Định giá đất</b> hoặc <b className="text-[#C8A14B]">Phiếu tư vấn</b> <b>MIỄN PHÍ</b>. Ghi tên lên bảng để nhận thưởng.</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold mt-1">Game giải trí</h1>
+          {/* ĐÃ BỎ phần thưởng/quà tuần theo yêu cầu chủ dự án — đây chỉ là game giải
+              trí cho vui, KHÔNG phải chương trình trúng thưởng. Đừng thêm lại:
+              hứa quà trên web là phát sinh nghĩa vụ phải trao thật. */}
+          <p className="text-slate-200 text-sm mt-1">Chơi cho vui lúc chờ. Ghi tên lên bảng xếp hạng nếu muốn so điểm với mọi người.</p>
         </div>
 
         <div className="mt-4 grid lg:grid-cols-5 gap-4 items-start">
@@ -161,10 +164,10 @@ export default function GamePage() {
                         <div className="text-lg font-extrabold">Kết thúc!</div>
                         <div className="text-sm text-slate-200">Bạn được <b className="text-[#C8A14B] text-base">{over}</b> điểm</div>
                         <div className="w-full max-w-[280px] mt-3 space-y-2">
-                          <p className="text-[12px] text-slate-300 text-center">{user ? <>Xác nhận thông tin tài khoản để <b>ghi tên lên bảng</b> & nhận thưởng nếu vào Top tuần:</> : <>Nhập tên + SĐT để <b>ghi tên lên bảng</b> & nhận thưởng nếu vào Top tuần:</>}</p>
+                          <p className="text-[12px] text-slate-300 text-center">{user ? <>Xác nhận thông tin tài khoản để <b>ghi tên lên bảng xếp hạng</b>:</> : <>Nhập tên để <b>ghi tên lên bảng xếp hạng</b>:</>}</p>
                           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Họ tên *" className="w-full rounded-lg px-3 py-2 text-sm text-[#0A2540] outline-none" />
                           <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Số điện thoại *" inputMode="tel" className="w-full rounded-lg px-3 py-2 text-sm text-[#0A2540] outline-none" />
-                          <button onClick={submit} disabled={busy} className="w-full bg-[#C8A14B] hover:brightness-105 disabled:opacity-60 text-[#0A2540] font-extrabold py-2.5 rounded-lg text-sm">{busy ? 'Đang gửi…' : '🏆 Ghi tên & nhận thưởng'}</button>
+                          <button onClick={submit} disabled={busy} className="w-full bg-[#C8A14B] hover:brightness-105 disabled:opacity-60 text-[#0A2540] font-extrabold py-2.5 rounded-lg text-sm">{busy ? 'Đang gửi…' : '🏆 Ghi tên lên bảng'}</button>
                           <button onClick={playAgain} className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-2 rounded-lg text-sm">↻ Chơi lại</button>
                         </div>
                       </>
@@ -172,8 +175,8 @@ export default function GamePage() {
                       <>
                         <div className="text-2xl">🎉</div>
                         <div className="text-lg font-extrabold mt-1">Đã ghi tên!</div>
-                        <div className="text-sm text-slate-200 text-center mt-1">Bạn <b className="text-[#C8A14B]">{sent.score}</b> điểm{sent.rank ? <> · đang hạng <b className="text-[#C8A14B]">#{sent.rank}</b> tuần này</> : null}.</div>
-                        <div className="text-[12px] text-slate-300 text-center mt-1">Vào Top 3 cuối tuần, đội ngũ Cam Lâm Land sẽ gọi trao thưởng. Cố thêm điểm nhé!</div>
+                        <div className="text-sm text-slate-200 text-center mt-1">Bạn <b className="text-[#C8A14B]">{sent.score}</b> điểm{sent.rank ? <> · đang hạng <b className="text-[#C8A14B]">#{sent.rank}</b></> : null}.</div>
+                        <div className="text-[12px] text-slate-300 text-center mt-1">Cố thêm điểm để leo hạng nhé!</div>
                         <button onClick={playAgain} className="mt-3 bg-[#C8A14B] text-[#0A2540] font-extrabold py-2.5 px-6 rounded-lg text-sm">↻ Chơi lại, phá kỷ lục</button>
                       </>
                     )}
@@ -187,11 +190,11 @@ export default function GamePage() {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-3.5">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="font-extrabold text-[#0A2540]">🏆 Bảng xếp hạng tuần</h2>
+                <h2 className="font-extrabold text-[#0A2540]">🏆 Bảng xếp hạng</h2>
                 <button onClick={() => getLeaderboard().then(setLb).catch(() => {})} className="text-[11px] font-bold text-[#C8A14B]">Làm mới</button>
               </div>
               {lb.length === 0 ? (
-                <p className="text-slate-400 text-sm py-6 text-center">Chưa có ai ghi điểm tuần này.<br />Chơi và ghi tên để dẫn đầu!</p>
+                <p className="text-slate-400 text-sm py-6 text-center">Chưa có ai ghi điểm.<br />Chơi và ghi tên để dẫn đầu!</p>
               ) : (
                 <div className="space-y-1.5">
                   {lb.map((r) => (
@@ -203,7 +206,8 @@ export default function GamePage() {
                   ))}
                 </div>
               )}
-              <p className="text-[11px] text-slate-400 mt-2.5 text-center">Bảng làm mới mỗi tuần (T2 hàng tuần). Top 3 nhận quà.</p>
+              {/* Bảng KHÔNG reset theo tuần/tháng nữa — xếp hạng từ trước tới giờ. */}
+              <p className="text-[11px] text-slate-400 mt-2.5 text-center">Xếp hạng tính từ trước tới giờ.</p>
             </div>
             <Link href="/listings" className="mt-3 block text-center bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold py-2.5 rounded-xl text-sm">🏠 Xem nhà đất Cam Lâm</Link>
           </div>

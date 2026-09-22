@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth, type AuthUser, laAdmin } from '@/lib/auth';
 import PasswordInput from '@/components/PasswordInput';
-import { dangNhapVanTay, mayCoVanTay, loiDeHieu } from '@/lib/vanTay';
+import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, type TinhTrangVanTay } from '@/lib/vanTay';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,11 +13,12 @@ export default function LoginPage() {
   const [email, setEmail] = useState(''); const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(true);
   const [err, setErr] = useState(''); const [busy, setBusy] = useState(false);
-  // Máy có vân tay/khuôn mặt thì mới hiện nút — máy bàn không có thì đừng bày ra
-  // cho người dùng bấm rồi báo lỗi.
-  const [coVanTay, setCoVanTay] = useState(false);
+  // ⚠️ TRƯỚC ĐÂY: máy nào không dùng được thì ẨN LUÔN nút vân tay. Nhìn vào chỉ thấy
+  // ô email/mật khẩu nên tưởng web chưa làm tính năng này. Nay LUÔN HIỆN phần đó,
+  // máy nào chưa dùng được thì nói rõ vì sao và phải làm gì.
+  const [vanTay, setVanTay] = useState<TinhTrangVanTay | null>(null);
   const [busyVt, setBusyVt] = useState(false);
-  useEffect(() => { mayCoVanTay().then(setCoVanTay).catch(() => {}); }, []);
+  useEffect(() => { kiemTraVanTay().then(setVanTay).catch(() => {}); }, []);
 
   async function vaoBangVanTay() {
     setErr(''); setBusyVt(true);
@@ -51,13 +52,14 @@ export default function LoginPage() {
           </label>
           <button disabled={busy} className="cl-press w-full bg-[#0A2540] hover:bg-[#0d2f54] disabled:opacity-60 text-white font-bold py-2.5 rounded-lg">{busy ? 'Đang đăng nhập…' : 'Đăng nhập'}</button>
         </form>
-        {coVanTay && (
+        {vanTay && (
           <>
             <div className="my-4 flex items-center gap-3">
               <span className="h-px flex-1 bg-slate-200" /><span className="text-[12px] text-slate-400">hoặc</span><span className="h-px flex-1 bg-slate-200" />
             </div>
-            <button type="button" onClick={vaoBangVanTay} disabled={busyVt}
-              className="cl-press flex w-full items-center justify-center gap-2 rounded-lg border-2 border-[#0A2540] py-2.5 font-bold text-[#0A2540] disabled:opacity-60">
+            <button type="button" onClick={vaoBangVanTay} disabled={busyVt || !vanTay.dung}
+              title={vanTay.dung ? undefined : vanTay.loiNhan}
+              className="cl-press flex w-full items-center justify-center gap-2 rounded-lg border-2 border-[#0A2540] py-2.5 font-bold text-[#0A2540] disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" className="h-5 w-5">
                 <path d="M12 4c-3 0-5.5 1.8-5.5 5v2.5" /><path d="M12 4c3 0 5.5 1.8 5.5 5v5" />
                 <path d="M9.2 9.5A2.8 2.8 0 0 1 12 7a2.8 2.8 0 0 1 2.8 2.5v6" />
@@ -65,10 +67,16 @@ export default function LoginPage() {
               </svg>
               {busyVt ? 'Đang xác minh…' : 'Đăng nhập bằng vân tay / khuôn mặt'}
             </button>
-            <p className="mt-2 text-center text-[11.5px] leading-snug text-slate-400">
-              Vân tay và khuôn mặt <b>không rời khỏi máy của bạn</b> — máy chủ chỉ giữ khoá công khai.
-              Cần đăng nhập bằng mật khẩu một lần rồi bật ở trang Tài khoản.
-            </p>
+            {vanTay.dung ? (
+              <p className="mt-2 text-center text-[11.5px] leading-snug text-slate-400">
+                Vân tay và khuôn mặt <b>không rời khỏi máy của bạn</b> — máy chủ chỉ giữ khoá công khai.
+                Cần đăng nhập bằng mật khẩu một lần rồi bật ở trang Tài khoản.
+              </p>
+            ) : (
+              <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-[11.5px] leading-snug text-amber-800">
+                <b>Máy này chưa dùng được.</b> {vanTay.loiNhan}
+              </p>
+            )}
           </>
         )}
         <p className="text-sm text-slate-500 mt-4 text-center">Chưa có tài khoản? <Link href="/register" className="text-[#0A2540] font-bold hover:text-[#C8A14B]">Đăng ký ngay</Link></p>

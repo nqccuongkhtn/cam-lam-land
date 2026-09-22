@@ -29,6 +29,38 @@ export async function mayCoVanTay(): Promise<boolean> {
   } catch { return false; }
 }
 
+/* ── VÌ SAO MÁY NÀY CHƯA DÙNG ĐƯỢC ───────────────────────────────────────────
+ * Trước đây trang đăng nhập chỉ hỏi "có dùng được không" rồi ẨN LUÔN cái nút nếu
+ * không. Hậu quả: chủ dự án mở trang, không thấy gì, tưởng tính năng chưa làm —
+ * trong khi thật ra máy bàn chưa cài Windows Hello nên trình duyệt báo không có.
+ * Nay trả về LÝ DO để màn hình nói rõ cho người dùng biết phải làm gì.
+ */
+export type TinhTrangVanTay =
+  | { dung: true }
+  | { dung: false; ly_do: 'trinh-duyet' | 'khong-https' | 'chua-cai'; loiNhan: string };
+
+export async function kiemTraVanTay(): Promise<TinhTrangVanTay> {
+  try {
+    if (!(window as any).PublicKeyCredential)
+      return { dung: false, ly_do: 'trinh-duyet',
+        loiNhan: 'Trình duyệt này chưa hỗ trợ. Dùng Chrome, Edge hoặc Safari bản mới giúp.' };
+
+    if (!window.isSecureContext)
+      return { dung: false, ly_do: 'khong-https',
+        loiNhan: 'Chỉ dùng được khi vào bằng địa chỉ https. Vào bằng tên miền của web thay vì địa chỉ IP trong mạng nội bộ.' };
+
+    const f = (window as any).PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable;
+    const co = typeof f === 'function' ? await f.call((window as any).PublicKeyCredential) : false;
+    if (!co)
+      return { dung: false, ly_do: 'chua-cai',
+        loiNhan: 'Máy này chưa cài vân tay hoặc nhận diện khuôn mặt. Điện thoại có Face ID / vân tay thì dùng được ngay; máy tính Windows cần bật Windows Hello trong Cài đặt → Tài khoản.' };
+
+    return { dung: true };
+  } catch {
+    return { dung: false, ly_do: 'trinh-duyet', loiNhan: 'Máy hoặc trình duyệt này chưa dùng được.' };
+  }
+}
+
 /** Đăng ký vân tay cho máy đang dùng (phải đang đăng nhập bằng mật khẩu trước). */
 export async function themVanTay(tenMay?: string): Promise<void> {
   const { khoa, options } = await api<{ khoa: string; options: any }>(

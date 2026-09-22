@@ -53,64 +53,85 @@ export interface Slide {
  *    Đường dẫn đổi theo nên trình duyệt buộc phải tải ảnh mới.
  * (Nhớ xoá thêm đệm nginx nếu cần: docker exec camlam_nginx sh -c 'rm -rf /var/cache/nginx/*')
  */
-export const PHIEN_BAN_ANH = 9;
+export const PHIEN_BAN_ANH = 10;
 const v = (duong: string) => `${duong}?v=${PHIEN_BAN_ANH}`;
 
-/* ── Ba slide mặc định ─────────────────────────────────────────────────────
- * NGUỒN ẢNH:
- *   · hero-3: ĐÃ THỬ dùng ảnh thật Cam Lâm (bd-05.jpg) cắt khung toàn cảnh.
- *     Góc nhìn thì đúng ý, nhưng dải biệt thự ở đó dày đặc và khung không thấy
- *     được mặt biển. Nay đổi sang ảnh vịnh biển nhìn từ xa: resort nép bên rừng
- *     cây, bãi cát trắng và MẶT NƯỚC chiếm hẳn một dải ở dưới.
- *     ⚠️ Ảnh này KHÔNG chụp ở Cam Lâm. Ảnh Cam Lâm thật vẫn ở public/bai-dai/.
- *   · hero-1 và hero-2 lấy từ Unsplash (dùng miễn phí, kể cả thương mại),
- *     KHÔNG phải chụp ở Cam Lâm.
+/* ── NĂM SLIDE ────────────────────────────────────────────────────────────
+ * Ảnh do chủ dự án tự chọn (số 6, 9, 13, 10, 17 trong trang /chon-anh/tat-ca.jpg).
+ * Mỗi tấm ghép với thông điệp HỢP VỚI NỘI DUNG ẢNH, và mỗi nút bấm đều dẫn tới
+ * một trang CÓ THẬT trên web — không đặt nút cho vui.
+ *
+ * ⚠️ ẢNH KHÔNG PHẢI CHỤP Ở CAM LÂM (lấy từ Unsplash, dùng miễn phí kể cả thương
+ *    mại). Ảnh chụp thật Bãi Dài vẫn ở public/bai-dai/, muốn dùng thì trỏ sang đó.
  *
  * CÁCH CHỌN ẢNH CHO ĐÚNG — đừng chọn bằng cảm tính, đã sai mấy lần:
- * banner có lớp phủ tối ĐẬM BÊN TRÁI (chỗ đặt chữ). Ảnh nào nửa trái vốn đã
- * tối thì cộng thêm lớp phủ là thành MẢNG ĐEN, nhìn như banner hỏng. Đã vấp:
- * một ảnh nước biển sâu có nửa trái đo được rgb(20,59,65) → sau khi phủ còn
- * gần như đen sì. Ảnh nửa trái nên ở mức trung bình trở lên, và nửa phải phải
- * có màu (xanh biển, cây, mái nhà) chứ đừng xám xịt.
+ * banner có dải phủ tối ĐẬM BÊN TRÁI (chỗ đặt chữ). Ảnh nào nửa trái vốn đã tối
+ * thì cộng thêm lớp phủ là thành MẢNG ĐEN, nhìn như banner hỏng. Đã vấp: một ảnh
+ * nước biển sâu có nửa trái đo được rgb(20,59,65) → sau khi phủ gần như đen sì.
+ *
+ * doPhu: ĐÃ ĐO cho từng ảnh — là mức phủ NHẸ NHẤT (ảnh sáng nhất) mà chữ trắng
+ * vẫn đạt độ tương phản 7 (mức tốt nhất theo chuẩn). Đổi ảnh thì phải đo lại.
  */
 export const BANNERS: Slide[] = [
   {
     ma: 'gioi-thieu',
     anh: v('/hero/hero-1.webp'),
-    moTaAnh: 'Biển xanh ngọc, bãi cát trắng và hàng dừa bên khu nghỉ dưỡng ven biển',
+    moTaAnh: 'Thị trấn ven vịnh nhìn từ trên cao: khách sạn, nhà cửa và đồi cây xanh',
     dongNhan: '★ Nền tảng bất động sản & quy hoạch Cam Lâm',
     tieuDe: 'Tìm ngôi nhà mơ ước [[của bạn]]',
     moTa: 'Khám phá hàng ngàn bất động sản và tra cứu quy hoạch chính xác trên toàn khu vực.',
     // Slide đầu cố ý KHÔNG có nút: người dùng vừa vào trang, việc cần làm ngay là
     // ô tìm kiếm ngay bên dưới, thêm nút nữa chỉ làm rối.
     giay: 7,
-    // doPhu: số đo được, là mức phủ NHẸ NHẤT mà chữ trắng vẫn đạt tương phản 7
-    // (mức tốt nhất theo chuẩn). Phủ nhẹ hơn nữa thì ảnh đẹp hơn nhưng chữ khó đọc.
-    doPhu: 50,
+    doPhu: 24,
   },
   {
     ma: 'ban-do-quy-hoach',
     anh: v('/hero/hero-2.webp'),
-    moTaAnh: 'Nhìn từ trên cao thấy rõ tuyến đường, lô đất và nhà cửa ven biển',
+    moTaAnh: 'Vịnh biển lớn với bãi cát dài, khu đô thị và dãy núi phía sau',
     dongNhan: 'Tra cứu quy hoạch',
     tieuDe: 'Bản đồ quy hoạch [[Cam Lâm]]',
     moTa: 'Xem quy hoạch từng thửa, đo diện tích, tra số tờ số thửa ngay trên bản đồ vệ tinh.',
     nutChu: 'Xem bản đồ',
     nutLink: '/map',
     giay: 8,
-    doPhu: 54,
+    doPhu: 44,
   },
   {
     ma: 'ky-gui',
     anh: v('/hero/hero-3.webp'),
-    moTaAnh: 'Vịnh biển nhìn từ xa: khu nghỉ dưỡng nép bên rừng cây, bãi cát trắng và mặt nước xanh ngọc',
+    moTaAnh: 'Thuyền thúng của ngư dân trên bãi biển, thành phố phía xa',
     dongNhan: 'Miễn phí',
     tieuDe: 'Có nhà đất cần bán hay [[ký gửi]]?',
     moTa: 'Đăng tin lên sàn Cam Lâm Land, tiếp cận khách mua trong khu vực ngay hôm nay.',
     nutChu: 'Gửi bán miễn phí',
     nutLink: '/sales/post',
     giay: 7,
+    doPhu: 56,
+  },
+  {
+    ma: 'so-to-ban-do',
+    anh: v('/hero/hero-4.webp'),
+    moTaAnh: 'Khu dân cư nằm trên đồi cây xanh ven biển nhìn từ trên cao',
+    dongNhan: 'Sau sáp nhập xã',
+    tieuDe: 'Số tờ bản đồ đã [[đổi số]]',
+    moTa: 'Tra số tờ cũ ↔ số tờ mới của bốn xã Cam Lâm, khỏi lo tìm nhầm thửa.',
+    nutChu: 'Tra số tờ bản đồ',
+    nutLink: '/tra-so-ban-do',
+    giay: 8,
     doPhu: 44,
+  },
+  {
+    ma: 'gia-dat',
+    anh: v('/hero/hero-5.webp'),
+    moTaAnh: 'Nước biển xanh ngọc, bãi cát trắng và hàng dừa bên khu nghỉ dưỡng',
+    dongNhan: 'Cập nhật liên tục',
+    tieuDe: 'Giá đất [[từng khu vực]] Cam Lâm',
+    moTa: 'Xem mặt bằng giá theo xã, theo loại hình để biết mình mua bán đã hợp lý chưa.',
+    nutChu: 'Xem giá khu vực',
+    nutLink: '/gia-dat',
+    giay: 7,
+    doPhu: 48,
   },
 ];
 

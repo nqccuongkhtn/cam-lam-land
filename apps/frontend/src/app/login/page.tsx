@@ -1,10 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth, type AuthUser, laAdmin } from '@/lib/auth';
 import PasswordInput from '@/components/PasswordInput';
+import { dangNhapVanTay, mayCoVanTay, loiDeHieu } from '@/lib/vanTay';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,6 +13,20 @@ export default function LoginPage() {
   const [email, setEmail] = useState(''); const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(true);
   const [err, setErr] = useState(''); const [busy, setBusy] = useState(false);
+  // Máy có vân tay/khuôn mặt thì mới hiện nút — máy bàn không có thì đừng bày ra
+  // cho người dùng bấm rồi báo lỗi.
+  const [coVanTay, setCoVanTay] = useState(false);
+  const [busyVt, setBusyVt] = useState(false);
+  useEffect(() => { mayCoVanTay().then(setCoVanTay).catch(() => {}); }, []);
+
+  async function vaoBangVanTay() {
+    setErr(''); setBusyVt(true);
+    try {
+      const r = await dangNhapVanTay(email.trim() || undefined);
+      login(r.token, r.user as AuthUser, true);
+      router.push(laAdmin(r.user) ? '/admin' : '/');
+    } catch (e: any) { setErr(loiDeHieu(e)); } finally { setBusyVt(false); }
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setErr(''); setBusy(true);
@@ -36,6 +51,26 @@ export default function LoginPage() {
           </label>
           <button disabled={busy} className="cl-press w-full bg-[#0A2540] hover:bg-[#0d2f54] disabled:opacity-60 text-white font-bold py-2.5 rounded-lg">{busy ? 'Đang đăng nhập…' : 'Đăng nhập'}</button>
         </form>
+        {coVanTay && (
+          <>
+            <div className="my-4 flex items-center gap-3">
+              <span className="h-px flex-1 bg-slate-200" /><span className="text-[12px] text-slate-400">hoặc</span><span className="h-px flex-1 bg-slate-200" />
+            </div>
+            <button type="button" onClick={vaoBangVanTay} disabled={busyVt}
+              className="cl-press flex w-full items-center justify-center gap-2 rounded-lg border-2 border-[#0A2540] py-2.5 font-bold text-[#0A2540] disabled:opacity-60">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" className="h-5 w-5">
+                <path d="M12 4c-3 0-5.5 1.8-5.5 5v2.5" /><path d="M12 4c3 0 5.5 1.8 5.5 5v5" />
+                <path d="M9.2 9.5A2.8 2.8 0 0 1 12 7a2.8 2.8 0 0 1 2.8 2.5v6" />
+                <path d="M12 10v5.5" /><path d="M6.5 14v2.5" /><path d="M17.5 17v2" /><path d="M9.2 13v5" />
+              </svg>
+              {busyVt ? 'Đang xác minh…' : 'Đăng nhập bằng vân tay / khuôn mặt'}
+            </button>
+            <p className="mt-2 text-center text-[11.5px] leading-snug text-slate-400">
+              Vân tay và khuôn mặt <b>không rời khỏi máy của bạn</b> — máy chủ chỉ giữ khoá công khai.
+              Cần đăng nhập bằng mật khẩu một lần rồi bật ở trang Tài khoản.
+            </p>
+          </>
+        )}
         <p className="text-sm text-slate-500 mt-4 text-center">Chưa có tài khoản? <Link href="/register" className="text-[#0A2540] font-bold hover:text-[#C8A14B]">Đăng ký ngay</Link></p>
       </div>
     </div>

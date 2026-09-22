@@ -478,3 +478,11 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
   html.cl-ban-do.cl-bang-day .cl-fab,
   html.cl-ban-do.cl-bang-day .cl-install-cta { display: none !important; }
 }
+
+/* ── CỘT BÊN PHẢI CHẠY THEO TRANG (tin đăng, bộ lọc) ──
+   Cột tự cuộn riêng khi nội dung cao hơn màn hình. Thanh cuộn để mảnh và mờ,
+   không thì giữa trang mọc ra một vạch xám đậm nhìn rất chướng. */
+.cl-cot-ben { scrollbar-width: thin; scrollbar-color: rgba(148,163,184,.45) transparent; }
+.cl-cot-ben::-webkit-scrollbar { width: 6px; }
+.cl-cot-ben::-webkit-scrollbar-thumb { background: rgba(148,163,184,.45); border-radius: 9999px; }
+.cl-cot-ben::-webkit-scrollbar-track { background: transparent; }

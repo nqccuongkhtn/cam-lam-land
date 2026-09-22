@@ -750,7 +750,9 @@ function ListingsInner() {
   );
 
   const sidebar = (
-    <aside className="lg:w-80 shrink-0 space-y-4">
+    // Cột lọc chạy theo trang, dừng lại trước chân trang. Xem lời giải thích đầy đủ
+    // ở trang chi tiết tin (ListingDetailClient.tsx).
+    <aside className="shrink-0 space-y-4 lg:w-80 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto lg:pr-1 cl-cot-ben">
       <div className="bg-white rounded-xl border border-slate-200 p-4">
         <div className="flex items-center justify-between">
           <div><p className="text-sm font-bold text-[#0A2540]">Mặt bằng giá khu vực</p><p className="text-xs text-slate-400">Cam Lâm · 12 tháng qua</p></div>

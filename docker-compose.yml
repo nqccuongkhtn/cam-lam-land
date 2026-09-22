@@ -55,6 +55,11 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-camlam_gis}
       BACKEND_PORT: 4000
       JWT_SECRET: ${JWT_SECRET:-please_change_this_to_a_long_random_string}
+      # Đăng nhập bằng vân tay / khuôn mặt (passkey). Khoá do máy người dùng sinh ra
+      # được GẮN CHẶT vào một tên miền — đây chính là thứ chặn trang giả mạo xin chữ ký.
+      # Sai tên miền là trình duyệt từ chối, không có cách nào lách.
+      WEBAUTHN_RP_ID: ${WEBAUTHN_RP_ID:-localhost}
+      WEBAUTHN_ORIGINS: ${WEBAUTHN_ORIGINS:-}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@camlam.local}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin12345}

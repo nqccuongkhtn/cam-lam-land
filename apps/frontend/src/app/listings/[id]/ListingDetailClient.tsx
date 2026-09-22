@@ -290,7 +290,16 @@ export default function ListingDetail() {
             </Link>
           </div>
 
-          <div className="lg:sticky lg:top-20 space-y-5">
+          {/* CỘT PHẢI CHẠY THEO TRANG.
+              Trước đây đã có lg:sticky mà vẫn đứng yên, vì hai lẽ:
+              1. Nó là một ô của lưới (grid). Ô lưới mặc định bị KÉO CAO BẰNG cả hàng,
+                 đã lấp đầy chỗ rồi thì không còn chỗ nào mà trượt — phải self-start.
+              2. Nội dung cột cao hơn màn hình thì dính cũng vô nghĩa, vì phải cuộn hết
+                 cột mới tới đáy nó. Nên chặn chiều cao đúng bằng màn hình và cho cột
+                 tự cuộn riêng.
+              Không đè lên chân trang: cột dính chỉ trượt trong phạm vi lưới, mà lưới
+              kết thúc trước chân trang. */}
+          <div className="space-y-5 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto lg:pr-1 cl-cot-ben">
             <div className="rounded-2xl overflow-hidden shadow-[0_10px_34px_rgba(13,138,128,0.28)] bg-gradient-to-b from-[#13a99c] to-[#0b7d72]">
               <div className="flex items-center justify-center gap-1.5 px-4 py-3">
                 <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="12" cy="8" r="6" /><path d="M15.5 13.6 17 22l-5-3-5 3 1.5-8.4" /></svg>

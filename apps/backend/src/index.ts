@@ -9,6 +9,7 @@ import { ensureAdmin } from './lib/ensureAdmin.ts';
 import { bootstrap } from './lib/bootstrap.ts';
 import { migrate } from './lib/migrate.ts';
 import { authRouter } from './routes/auth.ts';
+import { passkeyRouter } from './routes/passkey.ts';
 import { listingsRouter } from './routes/listings.ts';
 import { layersRouter } from './routes/layers.ts';
 import { parcelsRouter } from './routes/parcels.ts';
@@ -112,6 +113,11 @@ app.get('/api/config', (_req, res) => {
 // Chống brute-force: CHỈ tính POST (đăng nhập/đăng ký). GET /auth/me (kiểm tra phiên mỗi lần tải trang) KHÔNG bị tính → refresh nhiều không bị khoá. Email admin luôn được bỏ qua.
 const AUTH_SKIP_EMAILS = new Set([env.adminEmail.toLowerCase(), ...((process.env.RATE_LIMIT_SKIP_EMAILS || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean))]);
 app.use('/api/auth', rateLimit({ windowMs: 10 * 60 * 1000, max: 60, key: 'auth', skip: (req) => req.method !== 'POST' || AUTH_SKIP_EMAILS.has(String((req.body as any)?.email || '').trim().toLowerCase()), message: 'Quá nhiều lần thử đăng nhập/đăng ký. Vui lòng đợi vài phút rồi thử lại.' }), authRouter);
+// Đăng nhập bằng vân tay / khuôn mặt (passkey). Đặt TRƯỚC /api/auth để không dính
+// bộ đếm số lần thử của đăng nhập mật khẩu — mỗi lần chạm vân tay là một lượt gọi,
+// mà thao tác này không đoán mò được nên không cần siết như mật khẩu.
+app.use('/api/passkey', rateLimit({ windowMs: 10 * 60 * 1000, max: 120, key: 'passkey',
+  message: 'Thử vân tay quá nhiều lần. Đợi vài phút rồi thử lại.' }), passkeyRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/layers', layersRouter);
 // Bấm vào thửa để xem thông tin: người thật bấm nhiều lắm cũng vài lần mỗi giây, còn máy cào

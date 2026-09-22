@@ -553,5 +553,33 @@ export async function migrate(): Promise<void> {
   await pool.query(`CREATE INDEX IF NOT EXISTS chat_thu_hoi_idx ON chat_messages (room, deleted_at) WHERE deleted_at IS NOT NULL`).catch(() => {});
   // Quyền gửi ảnh/PDF của KHÁCH: mặc định TẮT, admin tự mở cho từng người trong khung chat.
   await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS chat_upload BOOLEAN NOT NULL DEFAULT false`).catch((e: any) => console.error('[migrate] users chat_upload lỗi:', e?.message || e));
+  // ── ĐĂNG NHẬP BẰNG VÂN TAY / KHUÔN MẶT (passkey — chuẩn WebAuthn) ──
+  // Máy chủ CHỈ giữ KHOÁ CÔNG KHAI. Vân tay và khuôn mặt không bao giờ rời khỏi máy
+  // của người dùng, cũng không gửi lên đây — điện thoại chỉ dùng chúng để mở khoá
+  // khoá riêng nằm trong chip bảo mật của máy, rồi ký một thử thách ngẫu nhiên.
+  // Nghĩa là dù máy chủ có bị lấy sạch database cũng không ai đăng nhập thay được.
+  await pool.query(`CREATE TABLE IF NOT EXISTS webauthn_credentials (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    cred_id TEXT NOT NULL UNIQUE,          -- mã khoá, dạng base64url
+    public_key BYTEA NOT NULL,             -- khoá công khai
+    counter BIGINT NOT NULL DEFAULT 0,     -- bộ đếm chống dùng lại chữ ký cũ
+    transports TEXT,                       -- 'internal', 'usb', 'nfc'…
+    ten_may TEXT,                          -- tên do người dùng đặt: "iPhone của tôi"
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    last_used TIMESTAMPTZ)`)
+    .catch((e: any) => console.error('[migrate] webauthn_credentials lỗi:', e?.message || e));
+  await pool.query(`CREATE INDEX IF NOT EXISTS webauthn_user_idx ON webauthn_credentials (user_id)`).catch(() => {});
+  // Thử thách ngẫu nhiên của mỗi lần đăng ký / đăng nhập. Sống rất ngắn (5 phút) và
+  // DÙNG MỘT LẦN — đây là thứ chặn kẻ khác phát lại chữ ký cũ.
+  await pool.query(`CREATE TABLE IF NOT EXISTS webauthn_challenges (
+    id BIGSERIAL PRIMARY KEY,
+    khoa TEXT NOT NULL UNIQUE,             -- khoá phiên, gửi kèm cho trình duyệt
+    challenge TEXT NOT NULL,
+    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+    expires_at TIMESTAMPTZ NOT NULL)`)
+    .catch((e: any) => console.error('[migrate] webauthn_challenges lỗi:', e?.message || e));
+  await pool.query(`CREATE INDEX IF NOT EXISTS webauthn_challenge_het_idx ON webauthn_challenges (expires_at)`).catch(() => {});
+
   console.log('[migrate] schema up to date');
 }

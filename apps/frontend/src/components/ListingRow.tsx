@@ -118,7 +118,10 @@ function ListingRow({ l, href }: { l: Listing; href?: string }) {
 
   return (
     <Link href={href ?? `/listings/${l.id}`}
-      className={`cl-tap group block bg-white rounded-xl border transition overflow-hidden hover:shadow-md hover:border-slate-300 ${frameCls}`}>
+      // BO GÓC 4px, KHÔNG BO ẢNH — đo tận nơi trên batdongsan.com.vn:
+      //   thẻ bo 4px · ảnh bo 0px · bóng rất nhạt rgba(44,44,44,.04) 0 4px 6px
+      // Mình đang để rounded-xl (12px) nên góc ảnh bị cắt cong, nhìn mềm và "web mẫu".
+      className={`cl-tap group block bg-white rounded border transition overflow-hidden hover:shadow-[0_4px_6px_rgba(44,44,44,0.10)] hover:border-slate-300 ${frameCls}`}>
 
       {/* ══════════ MOBILE — MỌI TIN đều ảnh bìa lớn 16:9; tin thường hiện 1 ảnh, VIP thêm dải ảnh phụ ══════════ */}
       <div className="md:hidden">
@@ -147,10 +150,12 @@ function ListingRow({ l, href }: { l: Listing; href?: string }) {
                   thẻ thường của họ  313px, ảnh 141px
                   thẻ VIP của họ     484-504px, ảnh 141-284px
                   chữ nội dung 14px · giá 16px  (mình 14/13px · giá 15px — tương đương)
-                Thẻ mình lúc đầu 438px với ảnh 248px. Hạ ảnh xuống 168px thì thẻ còn
-                khoảng 350px — vẫn trội hơn thẻ thường của họ (đúng, vì đây là thẻ VIP)
-                nhưng không còn nặng nề như trước. */}
-            <div className="flex gap-0.5 h-[168px]">
+                Thẻ mình lúc đầu 438px với ảnh 248px.
+                Đã thử 168px -> ẢNH BÉ QUÁ, dải ảnh nhìn bẹp, chủ dự án bảo không giống.
+                Chốt 220px: thẻ còn khoảng 385px, ảnh vẫn ra tấm ra món, mà nhẹ hơn hẳn
+                438px lúc đầu. Phần tiết kiệm còn lại lấy ở chân thẻ và thanh lọc chứ
+                không lấy tiếp ở ảnh. */}
+            <div className="flex gap-0.5 h-[220px]">
               <div className={`relative bg-slate-100 ${mThumbs.length ? 'flex-[1.9]' : 'flex-1'}`}>
                 <img src={img0} alt={l.title} onError={(e) => { (e.currentTarget as HTMLImageElement).src = NO_IMG; }} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
                 <Watermark name={agentName} avatar={avatar} />

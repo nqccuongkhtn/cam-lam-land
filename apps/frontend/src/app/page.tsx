@@ -168,34 +168,50 @@ export default function Home() {
     <div className="bg-slate-50">
       {/* HERO */}
       <section className="relative">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${U('1564013799919-ab600027ffc6')})` }} />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/35 to-slate-900/10" />
-        <div className="relative mx-auto max-w-7xl px-3 sm:px-4 pt-[calc(5rem_+_env(safe-area-inset-top))] sm:pt-24 md:pt-28 pb-16 sm:pb-24 text-white">
+        {/* BA TẤM BÃI DÀI THẬT CỦA CAM LÂM thay nhau, không dùng ảnh nhà mẫu trên mạng.
+            Ảnh nhà mẫu nước ngoài thì trang nào cũng có, mà lại chẳng nói được đây là
+            Cam Lâm. Ba tấm này chụp chính Bãi Dài: toàn cảnh resort ven biển · vịnh
+            nước ngọc có biệt thự ven bờ · bờ biển nhìn từ trên cao.
+            Đã nén xuống webp 1920px: 139 + 94 + 63 KB, nhẹ hơn một tấm gốc. */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="cl-hero-anh" style={{ backgroundImage: 'url(/hero/hero-1.webp)' }} />
+          <div className="cl-hero-anh" style={{ backgroundImage: 'url(/hero/hero-2.webp)' }} />
+          <div className="cl-hero-anh" style={{ backgroundImage: 'url(/hero/hero-3.webp)' }} />
+        </div>
+        {/* Ảnh nền nhiều chi tiết (nhà, cây, hồ bơi) nên chữ chìm vào ảnh, đọc mệt.
+            Phủ đậm hơn ở nửa trái nơi đặt chữ, và thêm một lớp tối nhẹ từ dưới lên
+            cho hàng chip ở đáy tách khỏi nền. */}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/85 via-slate-900/55 to-slate-900/20" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-900/55 to-transparent" />
+        <div className="relative mx-auto max-w-7xl px-3 sm:px-4 pt-[calc(4.5rem_+_env(safe-area-inset-top))] sm:pt-20 md:pt-20 pb-10 sm:pb-14 text-white">
           <p className="text-[#FFD56A] font-semibold tracking-wide drop-shadow">★ Nền tảng bất động sản & quy hoạch Cam Lâm</p>
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold mt-3 max-w-3xl leading-[1.1] drop-shadow-[0_3px_18px_rgba(0,0,0,0.55)]">Tìm ngôi nhà mơ ước <span className="text-[#FFD56A]">của bạn</span></h1>
-          <p className="mt-3 sm:mt-4 text-slate-100 text-sm sm:text-lg max-w-2xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">Khám phá hàng ngàn bất động sản cao cấp và tra cứu quy hoạch chính xác trên toàn khu vực.</p>
+          {/* 60px là quá khổ — đo trên các trang rao bán lớn thì tiêu đề đầu trang
+              nằm khoảng 32-40px, mà batdongsan.com.vn còn không dùng tiêu đề lớn ở
+              đầu trang. Hạ xuống 40px cho cân với phần còn lại. */}
+          <h1 className="text-[28px] sm:text-[34px] md:text-[40px] font-extrabold mt-3 max-w-3xl leading-[1.12] drop-shadow-[0_3px_18px_rgba(0,0,0,0.55)]">Tìm ngôi nhà mơ ước <span className="text-[#FFD56A]">của bạn</span></h1>
+          <p className="mt-2 text-slate-100 text-sm sm:text-base max-w-xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">Khám phá hàng ngàn bất động sản cao cấp và tra cứu quy hoạch chính xác trên toàn khu vực.</p>
 
           {/* Bán / Cho thuê */}
-          <div className="mt-7 inline-flex bg-white/15 backdrop-blur rounded-full p-1 border border-white/25">
+          <div className="mt-4 inline-flex bg-white/15 backdrop-blur rounded-full p-1 border border-white/25">
             <button onClick={() => setHeroDeal('sale')} className={`px-5 py-1.5 rounded-full text-sm font-bold transition ${heroDeal === 'sale' ? 'bg-white text-[#0A2540]' : 'text-white/90 hover:text-white'}`}>Nhà đất bán</button>
             <button onClick={() => setHeroDeal('rent')} className={`px-5 py-1.5 rounded-full text-sm font-bold transition ${heroDeal === 'rent' ? 'bg-white text-[#0A2540]' : 'text-white/90 hover:text-white'}`}>Cho thuê</button>
           </div>
 
           {/* Search card */}
-          <div className="mt-3 bg-white rounded-xl sm:rounded-2xl shadow-2xl p-2 sm:p-3 max-w-5xl grid md:grid-cols-[1.3fr_1fr_1fr_auto] gap-2">
+          <div className="mt-2.5 bg-white rounded-lg shadow-2xl p-2 max-w-4xl grid md:grid-cols-[1.3fr_1fr_1fr_auto] gap-2">
             <label className="flex items-center gap-2 px-3 rounded-xl border border-slate-200 focus-within:border-[#0A2540]">
               <Ic d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" />
-              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder={searchHint || 'Khu vực, dự án…'} className="py-3 w-full outline-none text-slate-800 text-sm" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder={searchHint || 'Khu vực, dự án…'} className="py-2.5 w-full outline-none text-slate-800 text-sm" />
             </label>
             <label className="flex items-center gap-2 px-3 rounded-xl border border-slate-200">
               <Ic d="M3 11l9-8 9 8M5 10v10h14V10" />
-              <select value={type} onChange={(e) => setType(e.target.value as PropertyType)} className="py-3 w-full outline-none text-slate-700 text-sm bg-transparent">
+              <select value={type} onChange={(e) => setType(e.target.value as PropertyType)} className="py-2.5 w-full outline-none text-slate-700 text-sm bg-transparent">
                 <option value="">Loại hình</option>{CATS.map((c) => <option key={c.t} value={c.t}>{PROPERTY_LABELS[c.t]}</option>)}
               </select>
             </label>
             <label className="flex items-center gap-2 px-3 rounded-xl border border-slate-200">
               <Ic d="M20.6 13.4 12 22l-9-9V3h8z M7 7h.01" />
-              <select value={max} onChange={(e) => setMax(e.target.value)} className="py-3 w-full outline-none text-slate-700 text-sm bg-transparent">
+              <select value={max} onChange={(e) => setMax(e.target.value)} className="py-2.5 w-full outline-none text-slate-700 text-sm bg-transparent">
                 <option value="">Mức giá</option><option value="1">Dưới 1 tỷ</option><option value="3">Dưới 3 tỷ</option><option value="5">Dưới 5 tỷ</option><option value="10">Dưới 10 tỷ</option>
               </select>
             </label>
@@ -215,7 +231,7 @@ export default function Home() {
       </section>
 
       {/* TIN TỨC & QUY HOẠCH — kiểu batdongsan */}
-      <section className="mx-auto max-w-7xl px-3 sm:px-4 py-6 sm:py-10">
+      <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
         <div className="flex items-center gap-5 border-b border-slate-200 mb-5 overflow-x-auto">
           {Object.keys(NEWS).map((t) => (
             <button key={t} onClick={() => setNewsTab(t)} className={`pb-2.5 text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${newsTab === t ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500 hover:text-[#0A2540]'}`}>{t}</button>
@@ -264,7 +280,7 @@ export default function Home() {
       </section>
 
       {/* FEATURED — kiểu batdongsan */}
-      <section className="mx-auto max-w-7xl px-3 sm:px-4 py-6 sm:py-10">
+      <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
         <div className="flex items-center justify-between mb-4 sm:mb-6 flex-wrap gap-2">
           <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">Bất động sản dành cho bạn</h2>
           <div className="flex items-center gap-3 text-sm font-semibold text-[#0A2540]">
@@ -295,7 +311,7 @@ export default function Home() {
       <PromoBanner />
 
       {/* BĐS THEO ĐỊA ĐIỂM — ô lớn + lưới + số tin (kiểu batdongsan) */}
-      <section className="mx-auto max-w-7xl px-3 sm:px-4 py-6 sm:py-10">
+      <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
         <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-4 sm:mb-6">Bất động sản theo địa điểm</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 md:grid-rows-2 gap-3 md:gap-4 md:h-[420px]">
           <AreaCard a={bigArea} big />
@@ -310,7 +326,7 @@ export default function Home() {
       <FeaturedPartners />
 
       {/* PLANNING PROMO — dưới Tiện ích & Doanh nghiệp tiêu biểu */}
-      <section className="mx-auto max-w-7xl px-3 sm:px-4 py-6 sm:py-10">
+      <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
         <div className="grid md:grid-cols-2 rounded-xl sm:rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-sm">
           <div className="p-5 sm:p-8 md:p-12 flex flex-col justify-center">
             <span className="text-[#C8A14B] font-semibold text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>

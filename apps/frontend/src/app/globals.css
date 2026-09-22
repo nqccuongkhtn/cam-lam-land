@@ -486,3 +486,31 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .cl-cot-ben::-webkit-scrollbar { width: 6px; }
 .cl-cot-ben::-webkit-scrollbar-thumb { background: rgba(148,163,184,.45); border-radius: 9999px; }
 .cl-cot-ben::-webkit-scrollbar-track { background: transparent; }
+
+/* ── ẢNH ĐẦU TRANG CHẠY LUÂN PHIÊN ──
+   Ba tấm Bãi Dài thật của Cam Lâm thay nhau, mỗi tấm hiện 6 giây, chuyển mờ dần
+   1 giây, kèm phóng chậm (kiểu Ken Burns) cho ảnh có hồn chứ không đứng chết.
+   LÀM BẰNG CSS THUẦN, không dùng JavaScript: không phải vẽ lại giao diện mỗi
+   6 giây, không tốn pin, và ảnh vẫn chạy cả khi phần mã chưa tải xong. */
+@keyframes cl-hero {
+    0%   { opacity: 0; transform: scale(1.00); }
+    3%   { opacity: 1; }
+   30%   { opacity: 1; }
+   36%   { opacity: 0; transform: scale(1.08); }
+  100%   { opacity: 0; transform: scale(1.00); }
+}
+.cl-hero-anh {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  opacity: 0;
+  animation: cl-hero 18s infinite cubic-bezier(.4,0,.2,1);
+  will-change: opacity, transform;
+}
+.cl-hero-anh:nth-child(1) { animation-delay: 0s; }
+.cl-hero-anh:nth-child(2) { animation-delay: 6s; }
+.cl-hero-anh:nth-child(3) { animation-delay: 12s; }
+/* Người dùng đã tắt hiệu ứng chuyển động trong hệ điều hành thì để yên một tấm. */
+@media (prefers-reduced-motion: reduce) {
+  .cl-hero-anh { animation: none; }
+  .cl-hero-anh:nth-child(1) { opacity: 1; }
+}

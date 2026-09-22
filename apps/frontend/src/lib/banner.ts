@@ -53,7 +53,7 @@ export interface Slide {
  *    Đường dẫn đổi theo nên trình duyệt buộc phải tải ảnh mới.
  * (Nhớ xoá thêm đệm nginx nếu cần: docker exec camlam_nginx sh -c 'rm -rf /var/cache/nginx/*')
  */
-export const PHIEN_BAN_ANH = 7;
+export const PHIEN_BAN_ANH = 9;
 const v = (duong: string) => `${duong}?v=${PHIEN_BAN_ANH}`;
 
 /* ── Ba slide mặc định ─────────────────────────────────────────────────────

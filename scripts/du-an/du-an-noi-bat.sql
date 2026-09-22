@@ -39,7 +39,9 @@ INSERT INTO featured_projects (name, status, scale, location, image_url, sort) V
  'Đang bồi thường · tái định cư',
  '10.350 ha · vốn 285.267 tỷ · liên danh Vinhomes',
  'Huyện Cam Lâm và TP Cam Ranh',
- NULL, 10),
+ -- Ảnh: KHÔNG dùng phối cảnh của chủ đầu tư (có bản quyền). Đây là ảnh chụp
+ -- thật dải Bãi Dài — nằm trong vùng dự án, nên dùng là trung thực.
+ '/bai-dai/bd-05.jpg', 10),
 
 -- 2) Golden Bay giai đoạn 1 — Hưng Thịnh. 79 ha, Bắc bán đảo Cam Ranh.
 --    Nguồn: trang dự án của Hưng Thịnh và các sàn phân phối.

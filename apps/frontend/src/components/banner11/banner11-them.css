@@ -131,15 +131,26 @@
    (620/1920 = 0,322917 là đúng khổ bản thiết kế). */
 @media (min-width: 1101px) {
   .cl-b11 .banner {
-    --thanh: 124px;
+    --thanh: 104px;
     aspect-ratio: auto; min-height: 0;
-    height: calc(min(100vw, 1920px) * 0.322917 + 124px);
+    /* ⚠️ BANNER CỐ Ý THẤP HƠN KHỔ THIẾT KẾ — đọc kỹ trước khi sửa.
+       Bản thiết kế vẽ trên khổ 1920×620. Để nguyên thì trên màn rộng banner cao
+       hơn 700px, chiếm gần hết màn hình — chủ dự án nói "đẹp đủ nhưng chiếm quá
+       nhiều diện tích".
+       Đo thật trên các mẫu: chữ, nút, thẻ của mẫu đều nằm gọn trong khoảng 440
+       đơn vị đầu; hơn 170 đơn vị cuối gần như mẫu nào cũng để trống. Nên lấy
+       450/1920 thay cho 620/1920 — cắt đúng phần trống, KHÔNG cắt vào nội dung
+       và KHÔNG bóp méo tỉ lệ chữ (chữ vẫn tính theo bề ngang như cũ).
+       Muốn thấp/cao hơn nữa thì chỉnh con số 0.234375 (= 450/1920) này. */
+    height: calc(min(100vw, 1920px) * 0.234375 + 104px);
+    min-height: 400px;
   }
 }
 @media (min-width: 761px) and (max-width: 1100px) {
   .cl-b11 .banner {
-    --thanh: 116px;
+    --thanh: 100px;
     aspect-ratio: auto; min-height: 0;
-    height: calc(100vw * 0.395833 + 116px);   /* 760/1920 — màn vừa cho cao hơn cho cân */
+    height: calc(100vw * 0.30 + 100px);   /* màn vừa: cao hơn một chút cho cân */   /* 760/1920 — màn vừa cho cao hơn cho cân */
+    min-height: 400px;
   }
 }

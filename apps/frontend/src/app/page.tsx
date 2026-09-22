@@ -232,11 +232,11 @@ export default function Home() {
               ⚠️ Vì sao KHÔNG để thẻ trắng như trước: banner có 18 mẫu, mẫu nền
               sáng mẫu nền tối. Thẻ trắng rơi trúng mẫu nền sáng là chìm nghỉm,
               rơi trúng mẫu nền tối thì chói loà. Khung kính tối hợp với cả hai. */}
-          <div className="rounded-2xl border border-white/15 bg-black/45 p-2.5 shadow-2xl backdrop-blur-md sm:p-3">
-            <div className="mb-2 flex items-center justify-center gap-1">
+          <div className="rounded-2xl border border-white/15 bg-black/45 p-2 shadow-2xl backdrop-blur-md">
+            <div className="mb-1.5 flex items-center justify-center gap-1">
               {([['sale', 'Nhà đất bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
                 <button key={k} onClick={() => setHeroDeal(k)}
-                  className={`rounded-full px-4 py-1.5 text-sm font-bold transition ${heroDeal === k ? 'bg-white text-[#0A2540]' : 'text-white/85 hover:bg-white/10 hover:text-white'}`}>{ten}</button>
+                  className={`rounded-full px-3.5 py-1 text-[13px] font-bold transition ${heroDeal === k ? 'bg-white text-[#0A2540]' : 'text-white/85 hover:bg-white/10 hover:text-white'}`}>{ten}</button>
               ))}
             </div>
 
@@ -245,21 +245,21 @@ export default function Home() {
             <div className="grid w-full gap-2 md:grid-cols-[1.5fr_1fr_1fr_auto]">
             <label className="flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3 focus-within:border-[#C8A14B]">
               <Ic d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" />
-              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder={heroDeal === 'project' ? 'Tên dự án: Golden Bay, Khu đô thị mới Cam Lâm…' : (searchHint || 'Khu vực, dự án…')} className="py-3 w-full outline-none text-slate-800 text-sm" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder={heroDeal === 'project' ? 'Tên dự án: Golden Bay, Khu đô thị mới Cam Lâm…' : (searchHint || 'Khu vực, dự án…')} className="w-full py-2.5 text-sm text-slate-800 outline-none" />
             </label>
             <label className="flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3">
               <Ic d="M3 11l9-8 9 8M5 10v10h14V10" />
-              <select value={type} onChange={(e) => setType(e.target.value as PropertyType)} className="py-3 w-full outline-none text-slate-700 text-sm bg-transparent">
+              <select value={type} onChange={(e) => setType(e.target.value as PropertyType)} className="w-full bg-transparent py-2.5 text-sm text-slate-700 outline-none">
                 <option value="">Loại hình</option>{CATS.map((c) => <option key={c.t} value={c.t}>{PROPERTY_LABELS[c.t]}</option>)}
               </select>
             </label>
             <label className="flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3">
               <Ic d="M20.6 13.4 12 22l-9-9V3h8z M7 7h.01" />
-              <select value={max} onChange={(e) => setMax(e.target.value)} className="py-3 w-full outline-none text-slate-700 text-sm bg-transparent">
+              <select value={max} onChange={(e) => setMax(e.target.value)} className="w-full bg-transparent py-2.5 text-sm text-slate-700 outline-none">
                 <option value="">Mức giá</option><option value="1">Dưới 1 tỷ</option><option value="3">Dưới 3 tỷ</option><option value="5">Dưới 5 tỷ</option><option value="10">Dưới 10 tỷ</option>
               </select>
             </label>
-              <button onClick={search} className="cl-press whitespace-nowrap rounded-xl bg-red-600 px-7 py-3 font-bold text-white shadow-lg shadow-red-600/30 hover:bg-red-700">Tìm kiếm</button>
+              <button onClick={search} className="cl-press whitespace-nowrap rounded-xl bg-red-600 px-6 py-2.5 font-bold text-white shadow-lg shadow-red-600/30 hover:bg-red-700">Tìm kiếm</button>
             </div>
           </div>
 

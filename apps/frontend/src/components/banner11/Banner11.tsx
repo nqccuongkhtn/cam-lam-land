@@ -271,7 +271,16 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
          Nên phải hẹn đo lại — dùng setTimeout chứ KHÔNG dùng
          requestAnimationFrame, vì tab ẩn thì requestAnimationFrame không chạy. */
       if (!w) { clearTimeout(doHen); doHen = window.setTimeout(doLaiCo, 250); return; }
-      b.style.setProperty('--u', String(w / KHO_GOC));
+      /* ── CỠ CHỮ, CỠ NÚT CỦA MẪU ────────────────────────────────────────
+         `--u` là hệ số nhân cho mọi kích thước bên trong mẫu.
+         Bình thường `--u` = bề ngang / 1920 (đúng khổ thiết kế). Nhưng banner
+         nay đã được hạ thấp (cắt phần trống ở đáy) nên chữ và nút của bản thiết
+         kế trông to quá so với khung → nhân thêm một hệ số cho nhỏ lại vừa mắt.
+         Điện thoại KHÔNG nhân (để 1): ở màn nhỏ bản thiết kế đã có bố cục riêng,
+         chữ vốn đã nhỏ, thu thêm nữa là không đọc được. */
+      const rongMh = window.innerWidth;
+      const tiLeChu = rongMh >= 1101 ? 0.85 : rongMh >= 761 ? 0.9 : 1;
+      b.style.setProperty('--u', String((w / KHO_GOC) * tiLeChu));
       khung.classList.add('san-sang');   // đo xong mới cho nội dung banner hiện ra
 
       /* Điện thoại: vài mẫu khai sẵn khung cắt ảnh riêng (data-vbm) để chủ thể
@@ -506,9 +515,8 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
         {/* Vệt tối mép dưới cho chữ trong ô tìm kiếm nổi lên khỏi ảnh. */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-20 hidden h-40 bg-gradient-to-t from-black/55 via-black/20 to-transparent md:block" />
 
-        {/* Lớp làm tối CẢ BANNER khi người dùng đụng vào ô tìm kiếm. */}
-        <div aria-hidden
-          className={`pointer-events-none absolute inset-0 z-20 hidden bg-[#04101f] transition-opacity duration-500 md:block ${dangTim ? 'opacity-[.62]' : 'opacity-0'}`} />
+        {/* ⚠️ ĐÃ BỎ lớp làm tối cả banner khi chạm vào ô tìm kiếm — chủ dự án
+            thấy không cần, chỉ cần chính khung tìm kiếm rõ lên là đủ. */}
       {/* ── Ô TÌM KIẾM NẰM TRONG BANNER, BÌNH THƯỜNG THÌ MỜ ────────────────
           Ý của chủ dự án: để ô tìm kiếm ngay trong banner nhưng ĐỂ MỜ, khi nào
           người dùng rê chuột vào hoặc bắt đầu gõ thì ô rõ hẳn lên và banner mờ

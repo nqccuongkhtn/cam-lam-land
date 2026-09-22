@@ -658,6 +658,38 @@ Trước khi nén nhớ `docker compose ... stop` cho PostgreSQL đóng sạch (
 `docker builder prune -af` (đệm build) và `docker image prune -a` (ảnh không dùng) — **TUYỆT ĐỐI KHÔNG**
 chạy `docker volume prune`: volume chứa database, lúc container đang tắt nó hiện là "không dùng".
 
+## Tin đăng mẫu (dữ liệu để xem thử giao diện)
+
+58 tin Cam Lâm **sát giá thị trường thật**, nằm ở `scripts/tin-mau/` — đọc
+`scripts/tin-mau/README.md`. Nạp lại bất cứ lúc nào:
+
+```bash
+node scripts/tin-mau/nap-tin-mau.mjs > nap-tin.sql
+docker compose exec -T postgis psql -U camlam -d camlam_gis < nap-tin.sql
+```
+
+Giá đặt theo giá rao **thật** đo trên batdongsan.com.vn ngày 22/9/2026, chia theo từng xã,
+và tôn trọng quy luật **lô càng to giá mỗi m² càng rẻ** (Cam Hải Đông: lô 194m² = 47,9 tr/m²
+nhưng lô 9.000m² chỉ 3 tr/m²). Trước đó database có 347 tin sinh ngẫu nhiên từ lúc đo tải,
+giá vô lý (biệt thự Suối Cát 71m² giá 15,9 tỷ = 224 tr/m²) và **cả 355 tin chỉ dùng chung
+5 tấm ảnh Unsplash** nên mọi thẻ tin nhìn y hệt nhau.
+
+Script **giữ nguyên tin thật**, chỉ xoá tin của tài khoản `demo-agent-*@camlam.local`.
+Trang `/gia-dat` tính mặt bằng giá **từ chính tin đăng**, nên tin sai thì trang giá cũng sai —
+sửa tin là trang giá tự đúng theo.
+
+⚠️ **Ba chỗ dễ vấp** (đã vấp cả ba):
+1. **Tin hạng `normal` tự ẩn sau 7 ngày** nếu không được đẩy (`routes/listings.ts`). Rải ngày
+   đăng trong 45 ngày ⇒ nạp 58 tin mà ngoài web chỉ thấy 27. Tin thường phải đăng trong 6 ngày trở lại.
+2. **Thêm ảnh vào `apps/frontend/public/` xong phải dựng lại frontend** (`up -d --build frontend`
+   rồi `restart nginx`), vì bản chạy thật đóng gói `public/` vào ảnh Docker — chép file vào thôi thì vẫn 404.
+3. **Đổi nội dung ảnh mà giữ nguyên tên file** ⇒ trình duyệt vẫn hiện ảnh cũ (web là PWA,
+   Service Worker giữ ảnh). Phải xoá cache hoặc Ctrl+Shift+R.
+
+Ảnh: `public/bai-dai/` là ảnh Bãi Dài **thật** của Cam Lâm; `public/tin-mau/` là ảnh minh hoạ
+theo loại hình (nguồn + giấy phép ghi ở `tin-mau/NGUON-ANH.txt`). Có ảnh chụp thật thì thay
+thẳng vào, giữ nguyên tên file.
+
 ## Những chỗ hay vấp
 
 - **Bản đồ trống / tin "đang tải" mãi** → backend chưa lên: `docker compose logs backend`.

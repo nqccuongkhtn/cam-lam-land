@@ -1,0 +1,20 @@
+ẢNH DÙNG CHO TIN ĐĂNG MẪU (dữ liệu thử)
+========================================
+
+Đây là ảnh MINH HOẠ cho các tin đăng mẫu, KHÔNG phải ảnh chụp đúng thửa đất thật.
+Dùng để xem thử giao diện web cho giống thực tế.
+
+Nguồn: Unsplash (unsplash.com) — giấy phép Unsplash License:
+  dùng được miễn phí, kể cả mục đích thương mại, không bắt buộc ghi nguồn.
+  Ảnh tải ngày 22/9/2026, đã đổi sang WebP 1000px cho nhẹ.
+
+Ảnh BIỂN BÃI DÀI thật của Cam Lâm nằm ở thư mục khác: public/bai-dai/
+
+Cách đặt tên:
+  dat-nen-*    đất nền, đất thổ cư  (đường đất, lô trống, ruộng gần xóm)
+  vuon-*       đất vườn, đất nông nghiệp  (vườn dừa, ruộng, đồng cỏ)
+  nha-*        nhà phố, nhà riêng
+  biet-thu-*   biệt thự nghỉ dưỡng
+  mat-bang-*   mặt bằng kinh doanh, nhà mặt tiền
+
+Khi có ảnh chụp thật của Cam Lâm thì thay thẳng vào đây, giữ nguyên tên file.

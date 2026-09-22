@@ -1,3 +1,10 @@
+-- ⚠️ ĐÂY LÀ 8 TIN MẪU ĐỜI ĐẦU, chỉ chạy MỘT LẦN lúc tạo mới container PostgreSQL.
+--    Bộ tin mẫu ĐANG DÙNG là 58 tin Cam Lâm sát giá thị trường thật, nằm ở
+--    scripts/tin-mau/ — xem scripts/tin-mau/README.md.
+--    Chạy bộ đó xong là 8 tin dưới đây bị xoá đi (chúng dùng ảnh picsum ngẫu nhiên).
+--    KHÔNG đưa bộ tin mới vào file này được, vì file này chạy TRƯỚC migrate.ts nên
+--    lúc đó bảng listings chưa có các cột deal, tier, contact_name, verified...
+
 -- ============================================================================
 --  Demo real-estate listings around Cam Lâm, Khánh Hòa (WGS84 points)
 --  (Admin user is created by the backend on boot; GIS layers by the worker.)

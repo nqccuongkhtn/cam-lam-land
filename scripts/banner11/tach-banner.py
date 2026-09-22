@@ -78,6 +78,19 @@ BO_MAU = [
 
 # ── SỬA CHỮ: {số thứ tự mẫu: [(chữ cũ, chữ mới), ...]} ───────────────────────
 SUA_CHU = {
+    # Mẫu 19: nền nay là bản đồ quy hoạch THẬT và ranh thửa THẬT của web, nên
+    # phần chú giải phải nói đúng thứ đang hiện, không còn "LUC · Đất trồng lúa"
+    # vẽ tay nữa.
+    # ⚠️ Thứ tự các dòng ở đây CÓ QUAN TRỌNG: thay xong dòng trên thì dòng dưới
+    #    sẽ chạy trên kết quả đã thay. Trước đây để "Cây xanh"→"Ranh thửa thật"
+    #    rồi "Ranh thửa"→"Ảnh vệ tinh" nên nó thay chồng thành "Ảnh vệ tinh thật".
+    19: [
+        ('LUC · Đất trồng lúa', 'Bản đồ quy hoạch'),
+        ('Cây xanh', 'Ảnh vệ tinh'),
+        ('Ranh thửa', 'Ranh thửa thật'),
+        ('Ảnh đồng lúa Cam Lâm chuyển thành bản đồ quy hoạch',
+         'Ảnh thật chuyển thành bản đồ quy hoạch Cam Lâm'),
+    ],
     # Mẫu 14 đã đổi sang ảnh tháp gạch, không còn mái ngói nào → sửa chữ cho
     # khớp ảnh. Vẫn viết chung chung, không nêu tên di tích (xem ghi chú DOI_ANH).
     14: [
@@ -113,9 +126,20 @@ ANH_GIA_BAN_DO = ('<image href="https://images.pexels.com/photos/35995788/pexels
                   'preserveAspectRatio="none" filter="url(#c19Plan)"/>')
 ANH_BAN_DO_THAT = ('<image href="/banner11/qh-cam-lam-rong.webp" x="0" y="40" width="1000" height="323" '
                    'preserveAspectRatio="xMidYMid slice"/>')
+#    Mẫu 19 còn một chỗ giả nữa: RANH THỬA và mấy chữ "LUC" là VẼ TAY men theo
+#    bờ ruộng trong tấm ảnh gốc. Nay nền đã là bản đồ quy hoạch thật nên mấy nét
+#    đó nằm lạc lõng, cắt ngang bản đồ, nhìn rất sai.
+#    Thay bằng RANH THỬA THẬT: lớp ảnh dựng từ bảng `dia_chinh` (900 thửa ở vùng
+#    Cam Hải Đông – Bãi Dài), chồng khít với bản đồ quy hoạch vì cùng một khung
+#    toạ độ. Xem scripts/banner11/dung-anh-mau19.py.
+RANH_VE_TAY = ''' <g fill="none" stroke="#7a3e12" stroke-width="2.6" stroke-linejoin="round" opacity=".9"><path d="M700 108L750 148L800 181L850 214L900 247L950 284L1000 318L1000 420L950 437L900 453L850 469L800 486L760 506L710 524L650 502L600 486L560 474L500 458L460 444L400 430L370 421L346 390L362 366L378 330L434 292L500 254L550 226L600 185L650 150Z"/><path d="M258 8L320 26L407 50L500 70L580 82L640 92L700 108L650 150L600 185L550 226L500 254L434 292L378 330L321 298L258 264L201 236L150 198L148 150L140 120L134 101L158 72L205 40Z"/><path d="M700 108L730 86L760 72L800 60L850 50L900 45L1000 38L1000 318L950 284L900 247L850 214L800 181L750 148Z"/><path d="M370 421L400 430L460 444L500 458L560 474L600 486L650 502L710 524L722 550L740 598L760 635L790 675L820 715L840 750L350 750L330 675L312 625L300 580L285 524L282 475L300 455L330 430Z"/><path d="M710 524L760 506L800 486L850 469L900 453L950 437L1000 420L1000 750L840 750L820 715L790 675L760 635L740 598L722 550Z"/><path d="M0 207L60 203L100 202L150 198L201 236L258 264L321 298L378 330L362 366L346 390L300 412L250 432L202 452L150 457L100 467L50 482L0 497Z"/><path d="M0 497L50 482L100 467L150 457L202 452L230 520L254 600L275 680L290 750L0 750Z"/></g>
+        <g font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="800" fill="#7a3e12" text-anchor="middle" style="paint-order:stroke;stroke:rgba(255,250,220,.85);stroke-width:4px"><text x="692" y="340">LUC</text><text x="376" y="157">LUC</text><text x="892" y="146">LUC</text><text x="148" y="341">LUC</text></g> '''.strip()
+RANH_THAT = ('<image href="/banner11/m19-ranh-thua.webp" x="0" y="40" width="1000" height="323" '
+             'preserveAspectRatio="xMidYMid slice" opacity=".92"/>')
+
 THAY_DOAN = {
     9: [(BAN_DO_VE_TAY, BAN_DO_THAT)],
-    19: [(ANH_GIA_BAN_DO, ANH_BAN_DO_THAT)],
+    19: [(ANH_GIA_BAN_DO, ANH_BAN_DO_THAT), (RANH_VE_TAY, RANH_THAT)],
     12: [
         ('scale="10"', 'scale="4"'),                       # gợn nhẹ hẳn đi
         ('offset=".15" stop-color="#fff"', 'offset=".58" stop-color="#fff"'),  # chừa phần có thuyền

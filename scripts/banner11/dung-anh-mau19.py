@@ -176,7 +176,7 @@ def main():
     but = ImageDraw.Draw(lop)
     for d in diem_vung:
         if len(d) >= 4:
-            but.line(d + [d[0]], fill=(255, 241, 170, 235), width=2)
+            but.line(d + [d[0]], fill=(255, 250, 205, 255), width=3)   # dày và sáng cho nổi trên bản đồ
     p3 = os.path.join(RA_ANH, 'm19-ranh-thua.webp')
     lop.save(p3, 'WEBP', quality=88, method=6, lossless=False)
     print(f'  ✓ {os.path.basename(p3)}  {os.path.getsize(p3)//1024} KB  ({len(diem_vung)} thửa)')

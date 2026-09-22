@@ -128,7 +128,7 @@ export default function FeaturedProjects() {
   }
 
   return (
-    <section className="mx-auto max-w-7xl px-3 sm:px-4 py-7 sm:py-10">
+    <section id="du-an-noi-bat" className="mx-auto max-w-7xl px-3 sm:px-4 py-7 sm:py-10 scroll-mt-20">
       <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
         <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">Dự án bất động sản nổi bật</h2>
         <div className="flex items-center gap-2 shrink-0">

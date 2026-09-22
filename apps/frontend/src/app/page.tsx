@@ -9,7 +9,11 @@ import HomeUtilities from '@/components/HomeUtilities';
 import PromoBanner from '@/components/PromoBanner';
 import FeaturedPartners from '@/components/FeaturedPartners';
 import FeaturedProjects from '@/components/FeaturedProjects';
-import HeroBanner from '@/components/HeroBanner';
+/* Banner đầu trang: 11 mẫu động do chủ dự án thiết kế (components/banner11).
+   ⚠️ Bản banner CŨ (5 ảnh + chữ chạy) vẫn còn nguyên ở components/HeroBanner.tsx
+   và đã cất bản dự phòng ở backup/banner-slide-2026-09-22 + nhãn git
+   `banner-slide-v1`. Muốn quay lại thì đổi lại dòng import này là xong. */
+import Banner11 from '@/components/banner11/Banner11';
 import SiteFooter from '@/components/SiteFooter';
 import { useFlags } from '@/lib/flags';
 
@@ -32,33 +36,40 @@ const STATIC: Listing[] = ([
   id: -(i + 1), title, description: null, price, area, propertyType: t, address: null, ward, bedrooms: bed,
   status: 'active', images: [U(img)], lng: 109.09, lat: 12.07, createdAt: '',
 }));
-/* ── ẢNH 6 KHU VỰC — CHỌN THEO ĐÚNG TÍNH CHẤT TỪNG XÃ ──────────────────────
+/* ── ẢNH 14 XÃ/THỊ TRẤN CAM LÂM — CHỌN THEO ĐÚNG TÍNH CHẤT TỪNG NƠI ─────────
+   Khai đủ 14 xã, NHƯNG NGOÀI TRANG CHỦ CHỈ HIỆN 5 Ô. Ba ô đầu ghim cứng, hai ô
+   cuối tự xoay theo xã đang có nhiều tin đăng nhất (xem chỗ `GHIM` bên dưới).
+   Khai dư ra như vậy để xã nào lên cũng CÓ SẴN ẢNH ĐÚNG VÙNG, khỏi phải sửa code.
+
    Không lấy ảnh đẹp bừa. Mỗi xã một kiểu địa lý, mật độ dân và tính chất đô thị
    khác hẳn nhau, ảnh phải nói đúng cái đó thì người xem mới nhận ra vùng mình
-   đang tìm. Căn cứ lấy từ mô tả khu vực trong src/lib/seoLanding.ts:
+   đang tìm. Căn cứ lấy từ mô tả khu vực trong src/lib/seoLanding.ts.
 
-     Cam Đức       — trung tâm hành chính · thương mại, nằm trên Quốc lộ 1,
-                     DÂN CƯ ĐÔNG NHẤT HUYỆN  → ảnh dãy nhà phố liền kề
-     Cam Hải Đông  — ven biển Bãi Dài, mật độ thấp, đất du lịch nghỉ dưỡng
-                     → ảnh biển Bãi Dài THẬT của Cam Lâm
-     Cam Thành Bắc — cửa ngõ bắc Cam Đức, nằm ven ĐẦM THUỶ TRIỀU
-                     → ảnh mặt nước đầm và núi
-     Suối Tân      — cực nam, có KHU CÔNG NGHIỆP SUỐI DẦU, nhiều nhà trọ công nhân
-                     → ảnh mặt bằng đang san lấp, xe cơ giới
-     Cam Hiệp Bắc  — vùng NÔNG NGHIỆP trung tâm huyện, dân thưa
-                     → ảnh ruộng và hàng dừa
-     Cam An Bắc    — tây bắc ven núi, QUỸ ĐẤT RỘNG, dân thưa nhất
-                     → ảnh đường đất chạy giữa đồng trống
-
-   ⚠️ Trừ ảnh Bãi Dài, các ảnh còn lại là ảnh MINH HOẠ đúng tính chất vùng,
-   không phải ảnh chụp tại chính xã đó. Có ảnh chụp thật thì thay vào. */
+   ⚠️ Trừ ảnh Bãi Dài là ảnh chụp THẬT của Cam Lâm, các ảnh còn lại là ảnh MINH HOẠ
+   đúng tính chất vùng, không phải ảnh chụp tại chính xã đó. Có ảnh thật thì thay
+   thẳng vào, giữ nguyên tên file. */
 const AREAS = [
-  { name: 'Cam Đức', ward: 'Cam Đức', sub: 'Trung tâm huyện · dân cư đông', img: '/tin-mau/nha-02.webp' },
-  { name: 'Cam Hải Đông', ward: 'Cam Hải Đông', sub: 'Bãi Dài · ven biển nghỉ dưỡng', img: '/bai-dai/bd-04.webp' },
-  { name: 'Cam Thành Bắc', ward: 'Cam Thành Bắc', sub: 'Ven đầm Thủy Triều', img: '/tin-mau/vuon-11.webp' },
-  { name: 'Suối Tân', ward: 'Suối Tân', sub: 'Khu công nghiệp Suối Dầu', img: '/tin-mau/dat-nen-02.webp' },
-  { name: 'Cam Hiệp Bắc', ward: 'Cam Hiệp Bắc', sub: 'Vùng nông nghiệp', img: '/tin-mau/vuon-06.webp' },
-  { name: 'Cam An Bắc', ward: 'Cam An Bắc', sub: 'Ven núi · quỹ đất rộng', img: '/tin-mau/dat-nen-07.webp' },
+  // ── VEN BIỂN — mật độ thấp, đất du lịch nghỉ dưỡng ──
+  { name: 'Cam Hải Đông', ward: 'Cam Hải Đông', sub: 'Bãi Dài · ven biển nghỉ dưỡng', img: '/bai-dai/bd-04.webp' },   // ảnh Bãi Dài THẬT
+  { name: 'Cam Hải Tây', ward: 'Cam Hải Tây', sub: 'Nối Cam Đức ra biển', img: '/tin-mau/dat-nen-01.webp' },   // lối mòn ra phía mặt nước — xã nằm giữa Cam Đức và biển
+  // ── TRUNG TÂM — dân cư đông, trên Quốc lộ 1 ──
+  { name: 'Cam Đức', ward: 'Cam Đức', sub: 'Trung tâm huyện · dân cư đông', img: '/tin-mau/nha-02.webp' },             // dãy nhà phố liền kề
+  { name: 'Cam Thành Bắc', ward: 'Cam Thành Bắc', sub: 'Ven đầm Thủy Triều', img: '/tin-mau/vuon-11.webp' },           // mặt nước đầm + núi
+  // ── BẮC HUYỆN — ven đầm, nuôi trồng thuỷ sản ──
+  { name: 'Cam Hòa', ward: 'Cam Hòa', sub: 'Ven đầm · nuôi trồng thủy sản', img: '/tin-mau/vuon-08.webp' },   // mặt nước đầm — xã ven đầm, nuôi trồng thuỷ sản
+  { name: 'Cam Tân', ward: 'Cam Tân', sub: 'Giáp Ninh Hòa · đồng ruộng', img: '/tin-mau/vuon-09.webp' },
+  // ── NÔNG NGHIỆP TRUNG TÂM — dân thưa ──
+  { name: 'Cam Hiệp Bắc', ward: 'Cam Hiệp Bắc', sub: 'Vùng nông nghiệp', img: '/tin-mau/vuon-06.webp' },               // ruộng + hàng dừa
+  { name: 'Cam Hiệp Nam', ward: 'Cam Hiệp Nam', sub: 'Đất nông nghiệp · thổ cư rộng', img: '/tin-mau/vuon-10.webp' },   // thung lũng có xóm nhà + ruộng
+  // ── TÂY BẮC VEN NÚI — quỹ đất rộng, dân thưa nhất ──
+  { name: 'Cam An Bắc', ward: 'Cam An Bắc', sub: 'Ven núi · quỹ đất rộng', img: '/tin-mau/dat-nen-07.webp' },          // đường đất giữa đồng trống
+  { name: 'Cam An Nam', ward: 'Cam An Nam', sub: 'Gò đồi · giá mềm', img: '/tin-mau/dat-nen-06.webp' },   // đồng cỏ gò đồi, lối mòn — quỹ đất rộng
+  // ── MIỀN TÂY — gò đồi, trang trại, đất rừng ──
+  { name: 'Cam Phước Tây', ward: 'Cam Phước Tây', sub: 'Gò đồi · trang trại', img: '/tin-mau/vuon-14.webp' },   // vườn dừa có lối đi — vùng trang trại
+  { name: 'Sơn Tân', ward: 'Sơn Tân', sub: 'Xã miền núi · đất rừng', img: '/tin-mau/vuon-05.webp' },
+  // ── CỰC NAM — trên Quốc lộ 1, có khu công nghiệp ──
+  { name: 'Suối Cát', ward: 'Suối Cát', sub: 'Trên Quốc lộ 1 · dân đông', img: '/tin-mau/nha-05.webp' },          // xóm nhà mái ngói ven quốc lộ — KHÔNG lấy ảnh nhà liền kề, trùng kiểu với Cam Đức
+  { name: 'Suối Tân', ward: 'Suối Tân', sub: 'Khu công nghiệp Suối Dầu', img: '/tin-mau/dat-nen-02.webp' },            // mặt bằng san lấp, xe cơ giới
 ];
 
 const STATS = [
@@ -153,7 +164,7 @@ export default function Home() {
   const [marketNews, setMarketNews] = useState<{ title: string; url: string; img?: string; date?: string; source?: string }[]>([]);
   const [featuredNews, setFeaturedNews] = useState<{ title: string; url: string; img?: string; date?: string; source?: string }[]>([]);
   const [marketLoading, setMarketLoading] = useState(true);
-  const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Thị trường BĐS'); /* mở trang chủ là thấy TIN THỊ TRƯỜNG trước */ const [heroDeal, setHeroDeal] = useState<'sale' | 'rent'>('sale');
+  const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Thị trường BĐS'); /* mở trang chủ là thấy TIN THỊ TRƯỜNG trước */ const [heroDeal, setHeroDeal] = useState<'sale' | 'rent' | 'project'>('sale');
   const searchHint = useTypingHint(SEARCH_HINTS);
   useEffect(() => { api<{ listings: Listing[] }>('/listings?limit=20').then((d) => setListings(d.listings || [])).catch(() => {}); }, []);
   const [areaCounts, setAreaCounts] = useState<Record<string, number>>({});
@@ -176,6 +187,14 @@ export default function Home() {
   }, []);
 
   function search() {
+    /* Chọn "Dự án" mà chưa gõ gì thì đưa thẳng xuống mục Dự án nổi bật ngay
+       trang này — tìm rỗng chỉ ra một danh sách tin đăng lộn xộn, không ích gì.
+       ⚠️ Web CHƯA có trang riêng cho dự án; mỗi dự án hiện đang tra bằng chính
+       tên của nó trong kho tin đăng. Khi nào làm trang /du-an thì sửa ở đây. */
+    if (heroDeal === 'project' && !q.trim()) {
+      document.getElementById('du-an-noi-bat')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
     const p = new URLSearchParams();
     if (type) p.set('propertyType', type); if (max) p.set('maxPrice', String(Number(max) * 1e9)); if (q) p.set('q', q);
     if (heroDeal === 'rent') p.set('deal', 'rent');
@@ -187,24 +206,38 @@ export default function Home() {
     : newsTab === 'Tin nổi bật' ? (featuredNews.length ? featuredNews.slice(0, 8) : NEWS['Tin nổi bật'])
     : NEWS[newsTab];
   const marketLoadingNow = marketLoading && ((newsTab === 'Thị trường BĐS' && !marketNews.length) || (newsTab === 'Tin nổi bật' && !featuredNews.length));
-  const areasRanked: AreaWithCount[] = [...AREAS].map((a) => ({ ...a, count: areaCounts[a.ward] || 0 })).sort((x, y) => y.count - x.count);
-  const bigArea = areasRanked[0]; const gridAreas = areasRanked.slice(1, 5);
+  /* ── CHỌN 5 KHU VỰC HIỆN RA TRANG CHỦ ───────────────────────────────────
+     Ba xã dưới đây GHIM CỨNG, luôn hiện đúng thứ tự này dù tin đăng nhiều ít
+     thế nào — chủ dự án đã chốt. Xã đầu tiên là THẺ LỚN bên trái.
+     Hai ô còn lại để TỰ XOAY: trong 11 xã kia, xã nào đang nhiều tin đăng nhất
+     thì lên. Nhờ vậy trang chủ luôn dẫn người xem tới chỗ đang có hàng.
+     ⚠️ Muốn đổi 3 xã ghim thì sửa đúng dòng này, tên phải khớp cột `ward`. */
+  const GHIM = ['Cam Hải Đông', 'Cam Đức', 'Cam Thành Bắc'];
+  const kemSoTin = (a: (typeof AREAS)[number]): AreaWithCount => ({ ...a, count: areaCounts[a.ward] || 0 });
+  const dsGhim = GHIM.map((w) => AREAS.find((a) => a.ward === w)).filter(Boolean).map((a) => kemSoTin(a!));
+  const dsXoay = AREAS.filter((a) => !GHIM.includes(a.ward)).map(kemSoTin)
+    .sort((x, y) => y.count - x.count || x.name.localeCompare(y.name, 'vi'));
+  /* Ghim trước, xoay sau, cắt đúng 5 — bố cục lưới chỉ có 5 ô. */
+  const khuVuc: AreaWithCount[] = [...dsGhim, ...dsXoay].slice(0, 5);
+  const bigArea = khuVuc[0]; const gridAreas = khuVuc.slice(1);
 
   return (
     <div className="bg-slate-50">
       {/* HERO */}
-      <HeroBanner>
-          {/* Bán / Cho thuê */}
-          <div className="inline-flex bg-white/15 backdrop-blur rounded-full p-1 border border-white/25">
-            <button onClick={() => setHeroDeal('sale')} className={`px-5 py-1.5 rounded-full text-sm font-bold transition ${heroDeal === 'sale' ? 'bg-white text-[#0A2540]' : 'text-white/90 hover:text-white'}`}>Nhà đất bán</button>
-            <button onClick={() => setHeroDeal('rent')} className={`px-5 py-1.5 rounded-full text-sm font-bold transition ${heroDeal === 'rent' ? 'bg-white text-[#0A2540]' : 'text-white/90 hover:text-white'}`}>Cho thuê</button>
+      <Banner11>
+          {/* Nhà đất bán · Cho thuê · Dự án */}
+          <div className="inline-flex rounded-full border border-white/25 bg-black/35 p-1 backdrop-blur">
+            {([['sale', 'Nhà đất bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
+              <button key={k} onClick={() => setHeroDeal(k)}
+                className={`rounded-full px-4 py-1.5 text-sm font-bold transition sm:px-5 ${heroDeal === k ? 'bg-white text-[#0A2540]' : 'text-white/90 hover:text-white'}`}>{ten}</button>
+            ))}
           </div>
 
           {/* Search card */}
           <div className="mt-3 bg-white rounded-xl shadow-2xl p-2 sm:p-3 max-w-5xl grid md:grid-cols-[1.3fr_1fr_1fr_auto] gap-2">
             <label className="flex items-center gap-2 px-3 rounded-xl border border-slate-200 focus-within:border-[#0A2540]">
               <Ic d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" />
-              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder={searchHint || 'Khu vực, dự án…'} className="py-3 w-full outline-none text-slate-800 text-sm" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder={heroDeal === 'project' ? 'Tên dự án: Golden Bay, Khu đô thị mới Cam Lâm…' : (searchHint || 'Khu vực, dự án…')} className="py-3 w-full outline-none text-slate-800 text-sm" />
             </label>
             <label className="flex items-center gap-2 px-3 rounded-xl border border-slate-200">
               <Ic d="M3 11l9-8 9 8M5 10v10h14V10" />
@@ -221,16 +254,7 @@ export default function Home() {
             <button onClick={search} className="cl-press bg-red-600 hover:bg-red-700 text-white font-bold px-7 py-3 rounded-xl whitespace-nowrap shadow-lg shadow-red-600/30">Tìm kiếm</button>
           </div>
 
-          {/* Quick categories */}
-          <div className="mt-5 flex flex-wrap gap-2">
-            {CATS.map((c) => (
-              <Link key={c.t} href={`/listings?propertyType=${c.t}`}
-                className="cl-chip-hero backdrop-blur border rounded-full px-4 py-1.5 text-sm font-semibold transition active:scale-[.97]">
-                {c.icon} {PROPERTY_LABELS[c.t]}
-              </Link>
-            ))}
-          </div>
-      </HeroBanner>
+      </Banner11>
 
       {/* TIN TỨC & QUY HOẠCH — kiểu batdongsan */}
       <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
@@ -316,7 +340,7 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
         <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-4 sm:mb-6">Bất động sản theo địa điểm</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 md:grid-rows-2 gap-3 md:gap-4 md:h-[420px]">
-          <AreaCard a={bigArea} big />
+          {bigArea && <AreaCard a={bigArea} big />}
           {gridAreas.map((a) => <AreaCard key={a.ward} a={a} />)}
         </div>
       </section>

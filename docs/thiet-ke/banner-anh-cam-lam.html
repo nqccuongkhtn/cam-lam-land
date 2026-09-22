@@ -1,0 +1,1041 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banner ảnh thật Cam Lâm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<!--
+  11 banner lồng ghép ảnh thật (Cam Lâm và khu vực lân cận) với đồ họa động.
+  Học từ 2 banner trên batdongsan.com.vn:
+    - Ambience (Gamuda): ảnh cắt cong + dải lụa dẫn mắt + người đi dạo + khối liên hệ + CTA viên thuốc + tab thương hiệu.
+    - Agent Awards: khối bo góc lồng nhiều lớp, khoảng tối "góc lõm", lưới nét đứt có dấu +, đốm sáng, vệt sáng, CTA đập tim.
+  Ảnh: Unsplash (Unsplash License) và Pexels (Pexels License), tải trực tiếp từ máy chủ của họ khi mở trang.
+  Nội dung chữ, số điện thoại, diện tích, số thửa trong banner đều là MẪU.
+  Khi chạy thật nên dùng ảnh của chính bất động sản/dự án để không gây hiểu nhầm cho người mua.
+-->
+<style>
+:root{--slow:1;--qio:cubic-bezier(.455,.03,.515,.955);--oexpo:cubic-bezier(.16,1,.3,1);--oback:cubic-bezier(.34,1.56,.64,1);--amber:#fbbf24;--navy:#0b1d36}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:#070b14;color:#e5e7eb}
+
+/* ============ Trang ============ */
+.top{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 20px;background:rgba(7,11,20,.93);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid #1e293b}
+.top strong{color:#fff;font-size:15px;margin-right:6px}
+.btn{border:1px solid #334155;background:#1e293b;color:#e5e7eb;border-radius:8px;padding:7px 12px;cursor:pointer;font:inherit;font-size:13px}
+.btn:hover{border-color:#64748b}
+.btn[aria-pressed="true"]{background:var(--amber);color:#111827;border-color:var(--amber)}
+.toc{display:flex;flex-wrap:wrap;gap:6px;width:100%}
+.toc a{font-size:12px;color:#cbd5e1;text-decoration:none;padding:4px 10px;border:1px solid #1e293b;border-radius:99px}
+.toc a:hover{border-color:var(--amber);color:#fff}
+main{max-width:1440px;margin:0 auto;padding:18px 20px 70px}
+.intro{margin:4px 0 22px;color:#94a3b8;font-size:14px;line-height:1.65}
+.intro b{color:#e2e8f0}
+.item{margin:0 0 42px;scroll-margin-top:120px}
+.item-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 10px}
+.item-head h2{margin:0;font-size:19px;color:#fff}
+.num{color:var(--amber);font-variant-numeric:tabular-nums}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:11.5px;color:#93c5fd;background:#0f1d33;border:1px solid #1e3a5f;border-radius:99px;padding:2px 8px}
+.item-head .btn{margin-left:auto}
+.notes{margin:10px 2px 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:4px 20px;font-size:12.5px;color:#94a3b8;line-height:1.5}
+.notes b{color:var(--amber);font-weight:600}
+.credit{margin:8px 2px 0;font-size:12px;color:#64748b}
+.credit a{color:#93c5fd}
+
+/* ============ Khung banner chung ============ */
+.banner{position:relative;width:100%;aspect-ratio:1920/620;min-height:380px;overflow:hidden;isolation:isolate;border-radius:14px;background:#050a14;color:#fff;--u:1}
+.banner:not(.running) *,.banner:not(.running) *::before,.banner:not(.running) *::after{animation-play-state:paused!important}
+.layer{position:absolute;inset:0}
+.banner h3{text-wrap:balance}
+.fill-svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.bgimg{position:absolute;inset:0;background-size:cover;background-position:center}
+.cta{position:relative;display:inline-flex;align-items:center;gap:.5em;padding:calc(var(--u)*18px) calc(var(--u)*40px);border-radius:999px;background:#fff;color:var(--navy);font-weight:700;font-size:max(13px,calc(var(--u)*24px));text-decoration:none;box-shadow:0 10px 30px rgba(0,0,0,.25);transform-origin:50% 50%;white-space:nowrap;overflow:hidden}
+.cta.navy{background:var(--navy);color:#fff}
+.cta.grad{background:linear-gradient(90deg,#0ea5e9,#6366f1);color:#fff;box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 12px 28px rgba(79,70,229,.35)}
+.cta.shine::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);transform:translateX(-130%);animation:shine calc(3200ms*var(--slow)) ease-in-out calc(2200ms*var(--slow)) infinite}
+@keyframes shine{0%{transform:translateX(-130%)}40%,100%{transform:translateX(130%)}}
+.cta:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+.kicker{display:inline-block;font-size:max(11px,calc(var(--u)*18px));letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:#7dd3fc}
+.photo-cap{position:absolute;right:calc(var(--u)*18px);bottom:calc(var(--u)*12px);z-index:30;font-size:max(9px,calc(var(--u)*13px));color:rgba(255,255,255,.75);text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.photo-cap.dark{color:rgba(11,29,54,.7);text-shadow:none}
+.brand-tab{position:absolute;right:0;top:0;z-index:25;padding:calc(var(--u)*14px) calc(var(--u)*36px);background:#dc2626;color:#fff;font-weight:900;font-size:max(11px,calc(var(--u)*24px));letter-spacing:.02em;border-bottom-left-radius:calc(var(--u)*30px);box-shadow:0 8px 20px rgba(0,0,0,.2)}
+
+.img-warn{display:none;margin:0 0 18px;padding:12px 16px;border-radius:12px;background:#422006;border:1px solid #b45309;color:#fde68a;font-size:14px;line-height:1.6}
+.img-warn b{color:#fff}
+.has-img-fail .img-warn{display:block}
+.banner.img-failed::after{content:"Ảnh bị chặn trong khung xem trước — tải file về, mở bằng Chrome để xem ảnh";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:60;font-size:13px;font-weight:600;color:#fff;background:rgba(127,29,29,.85);padding:8px 16px;border-radius:99px;pointer-events:none;white-space:nowrap}
+.banner.loading::after{content:"Đang tải ảnh…";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:60;font-size:13px;font-weight:600;color:#fff;background:rgba(2,6,23,.65);padding:8px 16px;border-radius:99px;pointer-events:none}
+
+/* Hiệu ứng dùng chung */
+[data-at]{animation-fill-mode:both}
+.fx-fade{opacity:0}.fx-fade.go{animation:fxFade calc(700ms*var(--slow)) ease-out both}
+.fx-up{opacity:0}.fx-up.go{animation:fxUp calc(800ms*var(--slow)) var(--oexpo) both}
+.fx-pop{opacity:0}.fx-pop.go{animation:fxPop calc(600ms*var(--slow)) var(--oback) both}
+.fx-left{opacity:0}.fx-left.go{animation:fxLeft calc(900ms*var(--slow)) var(--oexpo) both}
+@keyframes fxFade{from{opacity:0}to{opacity:1}}
+@keyframes fxUp{from{opacity:0;transform:translateY(calc(var(--u)*26px))}to{opacity:1;transform:none}}
+@keyframes fxPop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes fxLeft{from{opacity:0;transform:translateX(calc(var(--u)*-60px))}to{opacity:1;transform:none}}
+@keyframes fxOut{from{opacity:1}to{opacity:0}}
+.punchq{opacity:0;transform-origin:30% 60%}
+.punchq.go{animation:punchQ calc(625ms*var(--slow)) both}
+@keyframes punchQ{0%{opacity:0;transform:scale(1.077);animation-timing-function:var(--qio)}60%{opacity:1;transform:scale(.9495);animation-timing-function:linear}100%{opacity:1;transform:scale(1)}}
+/* chừa chỗ cho dấu chồng (ể, ẩ, ỗ…) và chân chữ; margin âm giữ nguyên bố cục */
+.lines .line{display:block;overflow:hidden;padding:.32em 0 .16em;margin:-.32em 0 -.16em}
+.lines .li{display:inline-block;transform:translateY(110%)}
+.lines.go .li{animation:liUp calc(900ms*var(--slow)) var(--oexpo) both;animation-delay:calc(var(--i,0)*120ms*var(--slow))}
+@keyframes liUp{from{transform:translateY(110%)}to{transform:none}}
+.draw{stroke-dasharray:1;stroke-dashoffset:1}
+.grp.go .draw,.draw.go{animation:drawLine calc(var(--dur,1200)*1ms*var(--slow)) var(--qio) both;animation-delay:calc(var(--d,0)*1ms*var(--slow))}
+@keyframes drawLine{to{stroke-dashoffset:0}}
+.kb-slow{animation:kbSlow calc(22s*var(--slow)) ease-in-out infinite alternate}
+@keyframes kbSlow{from{transform:scale(1.02)}to{transform:scale(1.12)}}
+.nudge.go{animation:nudge calc(417ms*var(--slow)) linear both}
+@keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(calc(var(--u)*8px))}}
+.spark{position:absolute;width:calc(var(--u)*90px);height:calc(var(--u)*90px);margin:calc(var(--u)*-45px) 0 0 calc(var(--u)*-45px);opacity:0;pointer-events:none;mix-blend-mode:screen;overflow:visible;z-index:12}
+@supports (mix-blend-mode:plus-lighter){.spark{mix-blend-mode:plus-lighter}}
+.spark.go{animation:spark calc(700ms*var(--slow)) linear both}
+@keyframes spark{0%{opacity:0;transform:scale(.33) rotate(0)}18%{opacity:.64;transform:scale(.57) rotate(40deg)}60%{opacity:1;transform:scale(1.46) rotate(134deg)}100%{opacity:0;transform:scale(1.06) rotate(165deg)}}
+
+/* ============ A1. Ảnh cắt cong + dải lụa ============ */
+.st-rib{background:linear-gradient(115deg,#e0f2fe 0%,#bae6fd 42%,#a5f3fc 72%,#ccfbf1 100%);color:var(--navy)}
+.rb-wrap{position:absolute;inset:0;clip-path:inset(0 100% 0 0)}
+.rb-wrap.go{animation:rbReveal calc(1100ms*var(--slow)) var(--qio) both}
+@keyframes rbReveal{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.rb-photo{position:absolute;left:0;top:0;bottom:0;width:62%;overflow:hidden;clip-path:polygon(0 0,80.0% 0%,83.0% 5%,85.8% 10%,88.3% 15%,90.5% 20%,92.2% 25%,93.4% 30%,94.0% 35%,94.1% 40%,93.8% 45%,93.0% 50%,91.9% 55%,90.6% 60%,89.2% 65%,87.7% 70%,86.2% 75%,84.8% 80%,83.5% 85%,82.3% 90%,81.1% 95%,80.0% 100%,0 100%)}
+.rb-photo .bgimg{background-position:40% 62%}
+.rb-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(8,47,73,.55),rgba(8,47,73,0) 50%),linear-gradient(90deg,rgba(8,47,73,.25),transparent 60%)}
+.rb-edge{position:absolute;left:0;top:0;bottom:0;width:62%;pointer-events:none;opacity:0}
+.rb-edge.go{animation:fxFade calc(800ms*var(--slow)) ease-out both}
+.rb-ribbon{position:absolute;inset:0;width:100%;height:100%;clip-path:inset(0 100% 0 0);pointer-events:none}
+.rb-ribbon.go{animation:rbReveal calc(1500ms*var(--slow)) var(--qio) both}
+.rb-big{position:absolute;left:calc(var(--u)*110px);bottom:calc(var(--u)*80px);margin:0;font-size:max(24px,calc(var(--u)*70px));line-height:1.02;font-weight:900;color:#fff;text-shadow:0 6px 24px rgba(8,47,73,.5);letter-spacing:-.01em}
+.rb-couple{position:absolute;left:calc(var(--u)*945px);top:calc(var(--u)*244px);width:calc(var(--u)*360px);height:calc(var(--u)*298px);opacity:0;z-index:4}
+.rb-couple.go{animation:walkIn calc(1600ms*var(--slow)) var(--oexpo) both}
+@keyframes walkIn{from{opacity:0;transform:translateX(calc(var(--u)*-90px))}to{opacity:1;transform:none}}
+.rb-couple svg{width:100%;height:100%;overflow:visible}
+.rb-couple .bob{animation:cplBob calc(1100ms*var(--slow)) ease-in-out infinite alternate}
+@keyframes cplBob{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+.rb-text{position:absolute;right:calc(var(--u)*70px);top:calc(var(--u)*110px);width:calc(var(--u)*520px);z-index:6}
+.rb-kicker{color:#0369a1}
+.rb-title{margin:calc(var(--u)*10px) 0 0;font-size:max(26px,calc(var(--u)*80px));line-height:1.02;font-weight:900;letter-spacing:-.02em;color:var(--navy);display:inline-block}
+.rb-contact{margin-top:calc(var(--u)*26px);display:grid;gap:calc(var(--u)*12px)}
+.rb-row{display:flex;align-items:center;gap:calc(var(--u)*14px);font-weight:800;font-size:max(12px,calc(var(--u)*27px));color:var(--navy)}
+.rb-ico{flex:none;width:calc(var(--u)*46px);height:calc(var(--u)*46px);min-width:22px;min-height:22px;border-radius:50%;background:var(--navy);display:grid;place-items:center}
+.rb-ico svg{width:55%;height:55%;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rb-cta{margin-top:calc(var(--u)*28px)}
+
+/* ============ A2 + A11. Khối bo góc lồng lớp ============ */
+.st-step{--c0:#062a33;--c1:#0b3d4a;--c2:#0f5566;--c3:#137086;--c4:#1a8ca6;background:#03141b}
+.st-step.red{--c0:#5a0606;--c1:#8a0b0b;--c2:#b30f0f;--c3:#d41414;--c4:#ee1c1c;background:#170304}
+.sp-dark{position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,0,0,.55) 30%,transparent 100%),radial-gradient(70% 90% at 90% 110%,rgba(255,255,255,.08),transparent 60%)}
+.st-step.red .sp-dark{background:linear-gradient(105deg,#1a0303 20%,#4a0707 70%,#7a0c0c 100%)}
+.st-step:not(.red) .sp-dark{background:linear-gradient(105deg,#021016 20%,#062a33 70%,#0b3d4a 100%)}
+.sp-grid{position:absolute;inset:0;background-image:var(--grid);background-size:calc(var(--u)*128px) calc(var(--u)*128px);background-position:calc(var(--u)*-8px) calc(var(--u)*-2px)}
+.st-step{--grid:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cpath d='M64 0V128M0 64H128' stroke='rgba(255,255,255,0.07)' stroke-width='1' stroke-dasharray='5 7'/%3E%3Cpath d='M57 64H71M64 57V71' stroke='rgba(94,234,212,0.5)' stroke-width='2.2'/%3E%3C/svg%3E")}
+.st-step.red{--grid:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cpath d='M64 0V128M0 64H128' stroke='rgba(255,255,255,0.07)' stroke-width='1' stroke-dasharray='5 7'/%3E%3Cpath d='M57 64H71M64 57V71' stroke='rgba(255,70,70,0.6)' stroke-width='2.2'/%3E%3C/svg%3E")}
+.shape{position:absolute;overflow:hidden}
+.shape .rg{position:absolute}
+.s-tl{left:0;top:0;width:calc(var(--u)*450px);height:calc(var(--u)*262px)}
+.s-bl{left:0;bottom:0;width:calc(var(--u)*450px);height:calc(var(--u)*348px)}
+.s-top{left:calc(var(--u)*462px);top:0;right:0;height:calc(var(--u)*290px)}
+.s-tl .rg{left:0;top:0}
+.s-tl .rg:nth-child(1){right:0;bottom:0;border-bottom-right-radius:calc(var(--u)*170px);background:var(--c0)}
+.s-tl .rg:nth-child(2){right:calc(var(--u)*26px);bottom:calc(var(--u)*26px);border-bottom-right-radius:calc(var(--u)*144px);background:var(--c1)}
+.s-tl .rg:nth-child(3){right:calc(var(--u)*52px);bottom:calc(var(--u)*52px);border-bottom-right-radius:calc(var(--u)*118px);background:var(--c2)}
+.s-tl .rg:nth-child(4){right:calc(var(--u)*78px);bottom:calc(var(--u)*78px);border-bottom-right-radius:calc(var(--u)*92px);background:linear-gradient(135deg,var(--c3),var(--c4))}
+.s-bl .rg{left:0;bottom:0}
+.s-bl .rg:nth-child(1){right:0;top:0;border-top-right-radius:calc(var(--u)*170px);background:var(--c0)}
+.s-bl .rg:nth-child(2){right:calc(var(--u)*26px);top:calc(var(--u)*26px);border-top-right-radius:calc(var(--u)*144px);background:var(--c1)}
+.s-bl .rg:nth-child(3){right:calc(var(--u)*52px);top:calc(var(--u)*52px);border-top-right-radius:calc(var(--u)*118px);background:var(--c2)}
+.s-bl .rg:nth-child(4){right:calc(var(--u)*78px);top:calc(var(--u)*78px);border-top-right-radius:calc(var(--u)*92px);background:linear-gradient(45deg,var(--c3),var(--c4))}
+.s-top .rg{right:0;top:0}
+.s-top .rg:nth-child(1){left:0;bottom:0;border-bottom-left-radius:calc(var(--u)*170px);background:var(--c0)}
+.s-top .rg:nth-child(2){left:calc(var(--u)*26px);bottom:calc(var(--u)*26px);border-bottom-left-radius:calc(var(--u)*144px);background:var(--c1)}
+.s-top .rg:nth-child(3){left:calc(var(--u)*52px);bottom:calc(var(--u)*52px);border-bottom-left-radius:calc(var(--u)*118px);background:var(--c2)}
+.s-top .rg:nth-child(4){left:calc(var(--u)*78px);bottom:calc(var(--u)*78px);border-bottom-left-radius:calc(var(--u)*92px);background:linear-gradient(100deg,var(--c4),var(--c3) 60%,var(--c2));overflow:hidden}
+.s-top .rg:nth-child(4) .bgimg{background-position:center 58%}
+.s-top .rg:nth-child(4)::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(3,20,27,.55),rgba(3,20,27,0) 60%),linear-gradient(90deg,rgba(6,42,51,.55),transparent 45%)}
+.shape{opacity:0}
+.s-tl.go{animation:inLeft calc(900ms*var(--slow)) var(--oexpo) both}
+.s-bl.go{animation:inUp calc(900ms*var(--slow)) var(--oexpo) both}
+.s-top.go{animation:inDown calc(1000ms*var(--slow)) var(--oexpo) both}
+@keyframes inLeft{from{opacity:0;transform:translateX(-40%)}to{opacity:1;transform:none}}
+@keyframes inUp{from{opacity:0;transform:translateY(40%)}to{opacity:1;transform:none}}
+@keyframes inDown{from{opacity:0;transform:translateY(-45%)}to{opacity:1;transform:none}}
+.shape .rg:nth-child(2),.shape .rg:nth-child(3){animation:breathe calc(4200ms*var(--slow)) ease-in-out infinite alternate}
+.shape .rg:nth-child(3){animation-delay:calc(-1400ms*var(--slow))}
+@keyframes breathe{from{filter:brightness(1)}to{filter:brightness(1.18)}}
+.sp-logo{position:absolute;left:calc(var(--u)*70px);top:calc(var(--u)*140px);z-index:3;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*8px);color:#fff;font-weight:800;font-size:max(11px,calc(var(--u)*24px));text-align:center;width:calc(var(--u)*230px)}
+.sp-logo small{font-weight:500;opacity:.85;font-size:.75em}
+.sp-logo svg{width:calc(var(--u)*78px);height:calc(var(--u)*78px);fill:none;stroke:#fff;stroke-width:3;stroke-linejoin:round}
+.sp-content{position:absolute;left:calc(var(--u)*590px);top:calc(var(--u)*330px);z-index:4;max-width:calc(var(--u)*820px)}
+.sp-title{margin:0;font-weight:700;font-size:max(24px,calc(var(--u)*62px));line-height:1.12;letter-spacing:-.01em;display:inline-block;transform-origin:50% 50%}
+.a-punch{opacity:0}.a-punch.go{animation:punch calc(375ms*var(--slow)) linear both}
+@keyframes punch{0%{opacity:0;transform:scale(1.188)}44.44%{opacity:1;transform:scale(.9026)}100%{opacity:1;transform:scale(1)}}
+.sp-slogan-wrap{position:relative;display:inline-block;margin-top:calc(var(--u)*22px)}
+.sp-slogan{margin:0;display:flex;align-items:center;gap:calc(var(--u)*16px);font-size:max(12px,calc(var(--u)*26px));font-weight:500;color:rgba(255,255,255,.9)}
+.sp-slogan .dash{flex:none;width:calc(var(--u)*60px);height:2px;background:#fff}
+.st-step.red .sp-slogan .dash{background:#ff3b3b}
+.a-slide{opacity:0}.a-slide.go{animation:slideOver calc(333ms*var(--slow)) linear both}
+@keyframes slideOver{0%{opacity:0;transform:translateX(calc(var(--u)*-80px))}62.5%{opacity:1;transform:translateX(calc(var(--u)*28px))}100%{opacity:1;transform:translateX(0)}}
+.sp-track{position:absolute;left:0;right:-30%;top:calc(100% + var(--u)*14px);height:1px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.25) 0 6px,transparent 6px 12px)}
+.flare{position:absolute;left:calc(var(--u)*-150px);top:calc(100% + var(--u)*14px - var(--u)*40px);width:calc(var(--u)*300px);height:calc(var(--u)*80px);opacity:0;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(closest-side,#fff,rgba(255,248,230,.85) 14%,rgba(255,221,160,.28) 40%,transparent 72%) center/34% 100% no-repeat,linear-gradient(90deg,transparent,rgba(255,255,255,.95) 50%,transparent) center/100% 5% no-repeat}
+.a-flare.go{animation:flare calc(1292ms*var(--slow)) linear both}
+@keyframes flare{0%{opacity:.03;transform:translateX(0) scale(1,.44)}22.58%{opacity:1;transform:translateX(calc(var(--u)*167px)) scale(1,1)}80.65%{opacity:1;transform:translateX(calc(var(--u)*268px)) scale(1.1,1.1)}100%{opacity:0;transform:translateX(calc(var(--u)*410px)) scale(1.01,.58)}}
+.sp-cta{position:absolute;right:calc(var(--u)*150px);top:calc(var(--u)*420px);z-index:4}
+.a-cta{opacity:0}.a-cta.go{animation:ctaIn calc(292ms*var(--slow)) linear both}
+@keyframes ctaIn{0%{opacity:0}14.3%{opacity:.14}100%{opacity:1}}
+.a-beat.go{animation:beat calc(583ms*var(--slow)) linear both}
+@keyframes beat{0%{transform:scale(1.062)}35.7%{transform:scale(1)}71.4%{transform:scale(1.056)}100%{transform:scale(1)}}
+.st-step.red .cta{color:#9f1239}
+/* A2 bản ảnh: chữ bên trái, ảnh bên phải có mép lượn sóng + 3 dải sóng song song phía sau */
+.pp{position:absolute;inset:0;pointer-events:none;z-index:1}
+.pp-defs{position:absolute;width:0;height:0}
+.pb,.pp-img,.pp-edge{position:absolute;top:0;bottom:0;width:100%;clip-path:url(#ppWave)}
+.pb{left:calc(var(--u)*var(--k)*-36px)}
+.pb[style*="--k:3"]{background:var(--c1)}
+.pb[style*="--k:2"]{background:var(--c2);animation:breathe calc(4200ms*var(--slow)) ease-in-out infinite alternate}
+.pb[style*="--k:1"]{background:linear-gradient(160deg,var(--c4),var(--c3));animation:breathe calc(4200ms*var(--slow)) ease-in-out calc(-1400ms*var(--slow)) infinite alternate}
+.pp-img{left:0;right:auto;overflow:hidden;background:var(--c3)}
+.pp-edge{left:0;clip-path:none;height:100%;overflow:visible}
+/* khung ảnh chỉ nằm bên phải mép sóng; cắt vùng thuyền đánh cá + mặt nước + đồi (hàng 26–64% của ảnh, cột 28–88%) */
+.pp-img .sr-img{left:32%}
+.sr-img{background-size:auto 263%;background-position:70% 42%;animation:srKb calc(16s*var(--slow)) ease-in-out infinite alternate}
+@keyframes srKb{from{transform:scale(1)}to{transform:scale(1.05)}}
+.pp-img::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,20,27,.35),transparent 22%);pointer-events:none}
+.sr-chip{position:absolute;right:calc(var(--u)*32px);bottom:calc(var(--u)*28px);z-index:2;padding:calc(var(--u)*8px) calc(var(--u)*18px);border-radius:99px;background:rgba(3,20,27,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#e0f2fe;font-size:max(10px,calc(var(--u)*18px));font-weight:600}
+.pp{opacity:0}
+.pp.go{animation:inRight calc(1100ms*var(--slow)) var(--oexpo) both}
+@keyframes inRight{from{opacity:0;transform:translateX(22%)}to{opacity:1;transform:none}}
+.pp-logo{position:absolute;left:calc(var(--u)*140px);top:calc(var(--u)*56px);z-index:4;display:flex;align-items:center;gap:calc(var(--u)*14px);color:#fff;font-weight:800;font-size:max(11px,calc(var(--u)*24px));line-height:1.1}
+.pp-logo small{display:block;font-weight:500;font-size:.7em;opacity:.8;margin-top:2px}
+.pp-logo svg{width:calc(var(--u)*54px);height:calc(var(--u)*54px);fill:none;stroke:#5eead4;stroke-width:4;stroke-linejoin:round}
+.st-step.photo .sp-content{left:calc(var(--u)*140px);top:calc(var(--u)*176px);max-width:calc(var(--u)*640px)}
+.st-step.photo .sp-title{font-size:max(28px,calc(var(--u)*84px));line-height:1.02}
+.st-step.photo .sp-slogan{font-size:max(12px,calc(var(--u)*24px));gap:calc(var(--u)*12px)}
+
+.st-step.photo .sp-track{right:auto;width:calc(var(--u)*470px)}
+.st-step.photo .sp-slogan .dash{width:calc(var(--u)*44px)}
+.sp-kicker{color:#5eead4;margin-bottom:calc(var(--u)*14px)}
+.sp-cta2{margin-top:calc(var(--u)*46px)}
+
+/* canvas là phần tử thay thế: inset:0 không kéo giãn được, phải đặt width/height 100% */
+.fireflies{pointer-events:none;width:100%;height:100%;display:block}
+
+/* ============ A3. Chữ khổng lồ chứa ảnh ============ */
+.st-knock{background:radial-gradient(80% 120% at 50% 40%,#1a1410,#060504 70%)}
+.kc-wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;transform-origin:50% 46%;z-index:3}
+.kc-wrap.go{animation:zoomThrough calc(1150ms*var(--slow)) cubic-bezier(.7,0,.84,0) both}
+@keyframes zoomThrough{0%{transform:scale(1);opacity:1}82%{opacity:1}100%{transform:scale(15);opacity:0}}
+.kc-text{margin:-.22em 0 0;padding:.22em .04em 0;white-space:nowrap;font-weight:900;font-size:max(40px,calc(var(--u)*240px));line-height:.9;letter-spacing:-.04em;color:transparent;background-image:var(--img);background-size:cover;background-position:30% 55%;-webkit-background-clip:text;background-clip:text;opacity:0;animation:kcPan calc(9s*var(--slow)) ease-in-out infinite alternate}
+.kc-text.go{animation:kcIn calc(1300ms*var(--slow)) var(--oexpo) both,kcPan calc(9s*var(--slow)) ease-in-out infinite alternate}
+@keyframes kcIn{from{opacity:0;letter-spacing:.12em;transform:translateY(12%)}to{opacity:1;letter-spacing:-.04em;transform:none}}
+@keyframes kcPan{from{background-position:20% 60%}to{background-position:80% 45%}}
+.kc-sub{margin:calc(var(--u)*14px) 0 0;font-size:max(12px,calc(var(--u)*25px));color:#fcd9b8;letter-spacing:.04em}
+.kc-cta{margin-top:calc(var(--u)*22px)}
+.kc-full{position:absolute;inset:0;z-index:2;clip-path:circle(0% at 50% 46%)}
+.kc-full.go{animation:kcOpen calc(1100ms*var(--slow)) var(--oexpo) calc(700ms*var(--slow)) both}
+@keyframes kcOpen{from{clip-path:circle(0% at 50% 46%)}to{clip-path:circle(80% at 50% 46%)}}
+.kc-full.go.out{animation:kcClose calc(700ms*var(--slow)) ease-in both}
+@keyframes kcClose{from{clip-path:circle(80% at 50% 46%);opacity:1}to{clip-path:circle(80% at 50% 46%);opacity:0}}
+.kc-full .bgimg{background-position:center 70%;animation:kbSlow calc(14s*var(--slow)) ease-in-out infinite alternate}
+.kc-cap{position:absolute;left:50%;bottom:calc(var(--u)*60px);transform:translateX(-50%);margin:0;font-family:"Dancing Script",cursive;font-size:max(22px,calc(var(--u)*62px));color:#fff;text-shadow:0 4px 18px rgba(0,0,0,.5);white-space:nowrap}
+
+/* ============ A4. Chữ nằm sau núi ============ */
+.st-depth{background:#6aa5d8}
+.dp-sky{animation:dpSky calc(24s*var(--slow)) ease-in-out infinite alternate;transform-origin:500px 70px}
+@keyframes dpSky{from{transform:translateX(-10px) scale(1.03)}to{transform:translateX(10px) scale(1.05)}}
+.dp-text{transform:translateY(135px);opacity:0}
+.dp-text.go{animation:dpRise calc(1900ms*var(--slow)) var(--oexpo) both}
+@keyframes dpRise{from{transform:translateY(135px);opacity:1}to{transform:none;opacity:1}}
+.dp-shade{background:linear-gradient(0deg,rgba(2,25,12,.8) 0%,rgba(2,25,12,.35) 30%,transparent 55%);pointer-events:none}
+.dp-content{position:absolute;left:calc(var(--u)*120px);bottom:calc(var(--u)*60px);right:calc(var(--u)*120px);display:flex;align-items:flex-end;justify-content:space-between;gap:20px;z-index:4}
+.dp-sub{margin:calc(var(--u)*8px) 0 0;font-size:max(13px,calc(var(--u)*28px));font-weight:600;color:#ecfccb;text-shadow:0 2px 12px rgba(0,0,0,.4)}
+.dp-kicker{color:#bef264}
+
+/* ============ A5. Ảnh 2 màu -> màu thật ============ */
+.st-duo{background:#0b1d36}
+.du-duo{filter:grayscale(1) contrast(1.06) brightness(.9)}
+@property --wx{syntax:'<percentage>';inherits:true;initial-value:100%}
+.du-anim{--wx:100%}
+.du-anim.go{animation:duWipe calc(10000ms*var(--slow)) linear both}
+@keyframes duWipe{0%{--wx:100%;animation-timing-function:var(--qio)}14%{--wx:36%}32%{--wx:36%;animation-timing-function:var(--qio)}46%{--wx:-28%}90%{--wx:-28%;animation-timing-function:var(--qio)}100%{--wx:100%}}
+.du-color{clip-path:polygon(calc(var(--wx) + 14%) 0,100% 0,100% 100%,var(--wx) 100%)}
+.du-edge{position:absolute;top:-10%;bottom:-10%;left:calc(var(--wx) + 7%);width:calc(var(--u)*10px);min-width:4px;margin-left:calc(var(--u)*-5px);background:linear-gradient(90deg,transparent,rgba(255,236,190,.95),transparent);box-shadow:0 0 30px 10px rgba(251,191,36,.45);transform:skewX(var(--du-skew,-23.4deg));pointer-events:none;z-index:3}
+.du-shade{background:linear-gradient(90deg,rgba(11,29,54,.72) 0%,rgba(11,29,54,.35) 36%,transparent 55%)}
+.du-content{position:absolute;left:calc(var(--u)*120px);top:calc(var(--u)*130px);z-index:5;max-width:calc(var(--u)*600px)}
+.du-title{margin:calc(var(--u)*10px) 0 0;font-size:max(28px,calc(var(--u)*88px));line-height:1;font-weight:900;letter-spacing:-.02em}
+.du-title .hl{color:var(--amber)}
+.du-sub{margin:calc(var(--u)*16px) 0 calc(var(--u)*26px);font-size:max(12px,calc(var(--u)*24px));color:#e2e8f0}
+
+/* ============ A6. Polaroid ============ */
+.st-pol{background:#efe7da;color:var(--navy)}
+.pl-paper{background-image:radial-gradient(rgba(120,90,60,.13) 1.1px,transparent 1.3px),linear-gradient(120deg,rgba(255,255,255,.5),rgba(0,0,0,.04));background-size:calc(var(--u)*22px) calc(var(--u)*22px),100% 100%}
+.pl-text{position:absolute;left:calc(var(--u)*120px);top:calc(var(--u)*110px);max-width:calc(var(--u)*700px);z-index:3}
+.pl-kicker{color:#b45309}
+.pl-title .li{white-space:nowrap}
+.pl-title{margin:calc(var(--u)*10px) 0 0;font-size:max(24px,calc(var(--u)*60px));line-height:1.04;font-weight:900;letter-spacing:-.02em}
+.pl-title em{font-family:"Dancing Script",cursive;font-style:normal;font-weight:700;color:#b45309;font-size:1.12em}
+.pl-sub{margin:calc(var(--u)*14px) 0 calc(var(--u)*26px);font-size:max(12px,calc(var(--u)*23px));color:#475569}
+.pol{position:absolute;width:calc(var(--u)*300px);padding:calc(var(--u)*14px) calc(var(--u)*14px) calc(var(--u)*56px);background:#fff;box-shadow:0 18px 40px rgba(60,40,20,.2);transform:rotate(var(--r));opacity:0;transition:scale .3s;z-index:2}
+.pol.go{animation:polDrop calc(950ms*var(--slow)) var(--oback) both,polFloat calc(var(--f,7s)*var(--slow)) ease-in-out calc(950ms*var(--slow)) infinite alternate}
+@keyframes polDrop{from{opacity:0;transform:translateY(calc(var(--u)*-420px)) rotate(calc(var(--r) - 24deg))}to{opacity:1;transform:rotate(var(--r))}}
+@keyframes polFloat{from{opacity:1;transform:rotate(var(--r)) translateY(0)}to{opacity:1;transform:rotate(calc(var(--r) + 2deg)) translateY(calc(var(--u)*-8px))}}
+.pol:hover,.pol.focus{scale:1.08;z-index:9}
+.pol .ph{display:block;width:100%;aspect-ratio:1.12;background-size:cover;background-position:center}
+.pol b{position:absolute;left:0;right:0;bottom:calc(var(--u)*10px);text-align:center;font-family:"Dancing Script",cursive;font-weight:700;font-size:max(12px,calc(var(--u)*28px));color:#334155;white-space:nowrap}
+.tape{position:absolute;top:calc(var(--u)*-14px);left:50%;width:calc(var(--u)*110px);height:calc(var(--u)*30px);margin-left:calc(var(--u)*-55px);background:rgba(250,235,190,.8);transform:rotate(-4deg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+
+/* ============ A7. Ô tròn + vòng quay ============ */
+.st-bub{background:radial-gradient(60% 90% at 72% 50%,#f0f9ff,#dbeafe 55%,#bfdbfe 100%);color:var(--navy)}
+.bb-paths path{fill:none;stroke:rgba(30,64,175,.28);stroke-width:2;stroke-dasharray:1}
+.bb-circle{position:absolute;border-radius:50%;overflow:hidden;box-shadow:0 20px 50px rgba(30,58,138,.28);border:calc(var(--u)*8px) solid #fff;opacity:0}
+.bb-circle.go{animation:bubIn calc(900ms*var(--slow)) var(--oback) both,bubBob calc(var(--f,6s)*var(--slow)) ease-in-out calc(900ms*var(--slow)) infinite alternate}
+@keyframes bubIn{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+@keyframes bubBob{from{opacity:1;transform:translateY(0)}to{opacity:1;transform:translateY(calc(var(--u)*-10px))}}
+.bb-big{left:calc(var(--u)*1115px);top:calc(var(--u)*55px);width:calc(var(--u)*510px);height:calc(var(--u)*510px)}
+.bb-big .bgimg{background-position:center 30%}
+.bb-s1{left:calc(var(--u)*960px);top:calc(var(--u)*370px);width:calc(var(--u)*200px);height:calc(var(--u)*200px);--f:5s}
+.bb-s2{left:calc(var(--u)*1620px);top:calc(var(--u)*40px);width:calc(var(--u)*170px);height:calc(var(--u)*170px);--f:7s}
+.bb-rings{position:absolute;left:calc(var(--u)*1050px);top:calc(var(--u)*-10px);width:calc(var(--u)*640px);height:calc(var(--u)*640px);overflow:visible;pointer-events:none}
+.bb-rings circle{fill:none;stroke:#3b82f6;stroke-width:2}
+.ring-a{stroke-dasharray:6 10;transform-origin:320px 320px;animation:spinR calc(40s*var(--slow)) linear infinite;opacity:.55}
+.ring-b{stroke-dasharray:2 14;transform-origin:320px 320px;animation:spinR calc(60s*var(--slow)) linear infinite reverse;opacity:.45}
+@keyframes spinR{to{transform:rotate(360deg)}}
+.bb-orbit{position:absolute;left:calc(var(--u)*1050px);top:calc(var(--u)*-10px);width:calc(var(--u)*640px);height:calc(var(--u)*640px);animation:spinR calc(16s*var(--slow)) linear infinite;pointer-events:none}
+.bb-plane{position:absolute;left:50%;top:calc(var(--u)*10px);width:calc(var(--u)*56px);height:calc(var(--u)*56px);margin-left:calc(var(--u)*-28px);transform:rotate(90deg);filter:drop-shadow(0 6px 10px rgba(30,58,138,.35))}
+.bb-text{position:absolute;left:calc(var(--u)*130px);top:calc(var(--u)*120px);max-width:calc(var(--u)*760px);z-index:3}
+.bb-kicker{color:#1d4ed8}
+.bb-title{margin:calc(var(--u)*10px) 0 0;font-size:max(26px,calc(var(--u)*74px));line-height:1.04;font-weight:900;letter-spacing:-.02em}
+.bb-sub{margin:calc(var(--u)*14px) 0 calc(var(--u)*26px);font-size:max(12px,calc(var(--u)*23px));color:#334155;max-width:calc(var(--u)*640px)}
+
+/* ============ A8. Cắt lát ============ */
+.st-slice{background:#0b1d36}
+.sl-b .bgimg{background-position:center 55%;animation:kbSlow calc(18s*var(--slow)) ease-in-out infinite alternate}
+.sl{position:absolute;top:0;bottom:0;left:calc(var(--i)*12.5%);width:12.5%;overflow:hidden;transform:translateY(calc(var(--dir)*105%))}
+.sl i{position:absolute;top:0;bottom:0;left:calc(var(--i)*-100%);width:800%;background-size:cover;background-position:center 60%}
+.sl-a.go .sl{animation:slIn calc(950ms*var(--slow)) var(--oexpo) both;animation-delay:calc(var(--i)*70ms*var(--slow))}
+.sl-a.go.out .sl{animation:slOut calc(800ms*var(--slow)) cubic-bezier(.7,0,.84,0) both;animation-delay:calc(var(--i)*60ms*var(--slow))}
+@keyframes slIn{from{transform:translateY(calc(var(--dir)*105%))}to{transform:none}}
+@keyframes slOut{from{transform:none}to{transform:translateY(calc(var(--dir)*-105%))}}
+.sl-panel{position:absolute;left:0;top:0;bottom:0;width:calc(var(--u)*700px);min-width:260px;background:#fff;color:var(--navy);clip-path:polygon(0 0,100% 0,84% 100%,0 100%);padding:calc(var(--u)*110px) calc(var(--u)*150px) 0 calc(var(--u)*110px);z-index:4;transform:translateX(-100%)}
+.sl-panel.go{animation:panelIn calc(1000ms*var(--slow)) var(--oexpo) both}
+@keyframes panelIn{from{transform:translateX(-100%)}to{transform:none}}
+.sl-kicker{color:#0369a1}
+.sl-title{margin:calc(var(--u)*10px) 0 0;font-size:max(24px,calc(var(--u)*66px));line-height:1.05;font-weight:900;letter-spacing:-.02em}
+.sl-sub{margin:calc(var(--u)*14px) 0 calc(var(--u)*26px);font-size:max(12px,calc(var(--u)*22px));color:#475569;max-width:calc(var(--u)*420px)}
+.sl-tag{position:absolute;right:calc(var(--u)*28px);top:calc(var(--u)*24px);z-index:5;padding:calc(var(--u)*8px) calc(var(--u)*16px);border-radius:99px;background:rgba(11,29,54,.65);font-size:max(10px,calc(var(--u)*17px));font-weight:600}
+
+/* ============ A9. Thẻ kính UI trên ảnh ============ */
+.st-ui{background:#0f172a}
+.ui-img{background-position:center 42%}
+.ui-shade{background:linear-gradient(90deg,rgba(2,6,23,.72) 0%,rgba(2,6,23,.35) 40%,transparent 62%)}
+.ui-text{position:absolute;left:calc(var(--u)*120px);top:calc(var(--u)*140px);z-index:5;max-width:calc(var(--u)*640px)}
+.ui-title{margin:calc(var(--u)*10px) 0 0;font-size:max(26px,calc(var(--u)*72px));line-height:1.04;font-weight:900;letter-spacing:-.02em}
+.ui-sub{margin:calc(var(--u)*14px) 0 calc(var(--u)*26px);font-size:max(12px,calc(var(--u)*23px));color:#e2e8f0}
+.glass{position:absolute;z-index:6;border-radius:calc(var(--u)*22px);background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.45);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3);box-shadow:0 18px 40px rgba(2,6,23,.25);color:#fff;translate:calc(var(--px,0)*var(--dp,.5)*1px) calc(var(--py,0)*var(--dp,.5)*1px)}
+.glass.pop{opacity:0}
+.glass.pop.go{animation:glassIn calc(700ms*var(--slow)) var(--oback) both,glassBob calc(var(--f,6s)*var(--slow)) ease-in-out calc(700ms*var(--slow)) infinite alternate}
+@keyframes glassIn{from{opacity:0;transform:scale(.8) translateY(calc(var(--u)*20px))}to{opacity:1;transform:none}}
+@keyframes glassBob{from{opacity:1;transform:translateY(0)}to{opacity:1;transform:translateY(calc(var(--u)*-8px))}}
+.ui-listing{right:calc(var(--u)*400px);top:calc(var(--u)*70px);width:calc(var(--u)*480px);padding:calc(var(--u)*16px);display:flex;gap:calc(var(--u)*14px);align-items:center;--dp:.6;--f:6s}
+.ui-thumb{flex:none;width:calc(var(--u)*120px);height:calc(var(--u)*96px);border-radius:calc(var(--u)*14px);background-size:cover;background-position:center}
+.ui-listing b{display:block;font-size:max(11px,calc(var(--u)*23px))}
+.ui-listing span{display:block;font-size:max(10px,calc(var(--u)*18px));opacity:.9;margin-top:calc(var(--u)*4px)}
+.ui-price{display:inline-block;margin-top:calc(var(--u)*8px);padding:calc(var(--u)*3px) calc(var(--u)*12px);border-radius:99px;background:var(--amber);color:#111827;font-weight:800;font-size:max(10px,calc(var(--u)*17px))}
+.ui-map{right:calc(var(--u)*120px);top:calc(var(--u)*300px);width:calc(var(--u)*300px);padding:calc(var(--u)*12px);--dp:1;--f:7s}
+.ui-map svg{display:block;width:100%;height:auto;border-radius:calc(var(--u)*12px)}
+.ui-map p{margin:calc(var(--u)*8px) calc(var(--u)*4px) calc(var(--u)*2px);font-size:max(10px,calc(var(--u)*17px));font-weight:600}
+.ui-chat{position:absolute;right:calc(var(--u)*470px);top:calc(var(--u)*300px);width:calc(var(--u)*430px);z-index:6;display:flex;flex-direction:column;gap:calc(var(--u)*10px);translate:calc(var(--px,0)*.8px) calc(var(--py,0)*.8px)}
+.bub{max-width:88%;padding:calc(var(--u)*12px) calc(var(--u)*18px);border-radius:calc(var(--u)*20px);font-size:max(11px,calc(var(--u)*21px));font-weight:600;opacity:0;box-shadow:0 10px 24px rgba(2,6,23,.2)}
+.bub.me{align-self:flex-end;background:#2563eb;color:#fff;border-bottom-right-radius:calc(var(--u)*6px)}
+.bub.bot{align-self:flex-start;background:#fff;color:var(--navy);border-bottom-left-radius:calc(var(--u)*6px)}
+.bub.go{animation:fxPop calc(500ms*var(--slow)) var(--oback) both}
+.typing{align-self:flex-start;display:flex;gap:5px;padding:calc(var(--u)*14px) calc(var(--u)*18px);border-radius:calc(var(--u)*20px);background:#fff;opacity:0}
+.typing.go{animation:fxFade calc(250ms*var(--slow)) ease-out both}
+.typing.go.out{display:none}
+.typing i{width:7px;height:7px;border-radius:50%;background:#94a3b8;animation:dot calc(900ms*var(--slow)) ease-in-out infinite}
+.typing i:nth-child(2){animation-delay:calc(150ms*var(--slow))}.typing i:nth-child(3){animation-delay:calc(300ms*var(--slow))}
+@keyframes dot{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-4px);opacity:1}}
+.ui-toast{left:calc(var(--u)*620px);top:calc(var(--u)*20px);width:calc(var(--u)*400px);padding:calc(var(--u)*10px) calc(var(--u)*16px);display:flex;align-items:center;gap:10px;font-size:max(10px,calc(var(--u)*18px));font-weight:600;--dp:.3;opacity:0}
+.ui-toast.go{animation:toastIn calc(600ms*var(--slow)) var(--oback) both}
+@keyframes toastIn{from{opacity:0;transform:translateY(-140%)}to{opacity:1;transform:none}}
+.ui-toast svg{width:18px;height:18px;flex:none;fill:none;stroke:#fde68a;stroke-width:2}
+
+/* ============ A10. Bản đồ trên ảnh flycam ============ */
+.st-fly{background:#1a2e05}
+.fl-parcels path{fill:none;stroke:#fff;stroke-width:2.2;stroke-linejoin:round;opacity:.9}
+.fl-fill path{opacity:0}
+.fl-fill.go path{animation:flFill calc(700ms*var(--slow)) ease-out both;animation-delay:calc(var(--d,0)*1ms*var(--slow))}
+@keyframes flFill{from{opacity:0}to{opacity:1}}
+.fl-lbl{opacity:0}
+.fl-lbl.go{animation:fxFade calc(500ms*var(--slow)) ease-out both}
+.fl-hl{fill:rgba(251,191,36,.25);stroke:#fbbf24;stroke-width:4;opacity:0}
+.fl-hl.go{animation:hlPulse calc(1800ms*var(--slow)) ease-in-out infinite}
+@keyframes hlPulse{0%,100%{opacity:.5}50%{opacity:1}}
+.fl-measure path{fill:none;stroke:#fff;stroke-width:2.5}
+.fl-measure .dim{stroke-dasharray:1;stroke-dashoffset:1}
+.fl-measure{opacity:0}
+.fl-measure.go{animation:fxFade calc(300ms*var(--slow)) ease-out both}
+.fl-measure.go .dim{animation:drawLine calc(1100ms*var(--slow)) var(--qio) both}
+.fl-card{opacity:0;transform-box:fill-box;transform-origin:0% 100%}
+.fl-card.go{animation:cardPop calc(520ms*var(--slow)) var(--oback) both}
+@keyframes cardPop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+.fl-scan{opacity:0}
+.fl-scan.go{animation:flScan calc(2400ms*var(--slow)) var(--qio) both}
+@keyframes flScan{0%{opacity:0;transform:translateY(190px)}12%{opacity:1}88%{opacity:1}100%{opacity:0;transform:translateY(560px)}}
+.fl-shade{background:linear-gradient(90deg,rgba(10,20,5,.85) 0%,rgba(10,20,5,.55) 34%,rgba(10,20,5,0) 58%);pointer-events:none}
+.hud{position:absolute;inset:calc(var(--u)*22px);pointer-events:none;z-index:7}
+.hud i{position:absolute;width:calc(var(--u)*46px);height:calc(var(--u)*46px);border:2px solid rgba(255,255,255,.85)}
+.hud i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0}.hud i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0}
+.hud i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0}.hud i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0}
+.hud .rec{position:absolute;right:calc(var(--u)*70px);top:calc(var(--u)*8px);font:600 max(10px,calc(var(--u)*17px))/1 ui-monospace,Menlo,Consolas,monospace;color:#fff;letter-spacing:.06em}
+.hud .rec::before{content:"";display:inline-block;width:.7em;height:.7em;border-radius:50%;background:#ef4444;margin-right:.5em;vertical-align:-.05em;animation:blink calc(1s*var(--slow)) steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.hud .cross{position:absolute;left:50%;top:50%;width:calc(var(--u)*40px);height:calc(var(--u)*40px);margin:calc(var(--u)*-20px) 0 0 calc(var(--u)*-20px);opacity:.7}
+.hud .cross::before,.hud .cross::after{content:"";position:absolute;background:#fff}
+.hud .cross::before{left:50%;top:0;bottom:0;width:1.5px}.hud .cross::after{top:50%;left:0;right:0;height:1.5px}
+.fl-text{position:absolute;left:calc(var(--u)*120px);top:calc(var(--u)*130px);z-index:8;max-width:calc(var(--u)*650px)}
+.fl-kicker{color:#bef264}
+.fl-title{margin:calc(var(--u)*10px) 0 0;font-size:max(26px,calc(var(--u)*70px));line-height:1.04;font-weight:900;letter-spacing:-.02em}
+.fl-sub{margin:calc(var(--u)*14px) 0 calc(var(--u)*26px);font-size:max(12px,calc(var(--u)*22px));color:#ecfccb}
+
+/* Thoát (data-out) */
+.go.out:not(.custom-out){animation:fxOut calc(417ms*var(--slow)) linear both!important}
+
+/* ============ Mobile ============ */
+@media (max-width:760px){
+  .top{position:static}.toc{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}.toc a{flex:none}
+  .du-content,.bb-text,.ui-text,.fl-text,.pl-text,.sp-content,.bb-sub,.sl-sub,.rb-text{max-width:none}
+  .dp-text text{font-size:46px;transform:translate(15px,-1px)}
+  .rb-photo,.rb-edge{width:100%}
+  .rb-text{left:20px;right:20px;top:auto;bottom:18px;width:auto;background:rgba(224,242,254,.9);padding:14px;border-radius:14px}
+  .rb-big{left:20px;bottom:auto;top:40px}.rb-couple{display:none}
+  .sp-content{left:20px;right:20px;top:auto;bottom:78px}.sp-cta{left:20px;right:auto;top:auto;bottom:20px}.sp-logo{display:none}
+  .s-tl,.s-bl{width:40%}.s-top{left:42%;height:40%}
+  .pb,.pp-edge{display:none}.pp-img{left:0;width:100%;clip-path:none}.pp-img .sr-img{left:0;background-size:auto 175%;background-position:44% 46%}.pp-logo{left:14px;top:12px;padding:6px 12px 6px 8px;border-radius:12px;background:rgba(3,20,27,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .pp-img::after{background:linear-gradient(0deg,rgba(3,20,27,.94) 0%,rgba(3,20,27,.55) 55%,rgba(3,20,27,.15))}
+  .st-step.photo .sp-content{left:20px;right:20px;top:auto;bottom:22px;z-index:5;max-width:none}.sr-chip{top:14px;bottom:auto;right:14px}
+  .dp-content{left:20px;right:20px;bottom:20px;flex-direction:column;align-items:flex-start}
+  .du-content{left:20px;right:20px;top:26px}
+  .pl-text{left:20px;right:20px;top:20px}.pol{width:120px;padding:6px 6px 26px}.pol b{font-size:12px}
+  .p1{left:4%!important;top:52%!important}.p2{left:30%!important;top:58%!important}.p3{left:55%!important;top:50%!important}.p4{left:76%!important;top:60%!important}
+  .bb-text{left:20px;right:20px;top:20px}.bb-big{left:auto;right:-60px;top:auto;bottom:-40px;width:230px;height:230px}.bb-s1,.bb-s2,.bb-rings,.bb-orbit{display:none}
+  .sl-panel{width:78%;padding:26px 50px 0 20px}
+  .ui-text{left:20px;right:20px;top:20px}.ui-listing,.ui-map{display:none}.ui-chat{right:16px;left:auto;top:auto;bottom:16px;width:70%}.ui-toast{display:none}
+  .fl-text{left:20px;right:20px;top:24px}.fl-shade{background:linear-gradient(90deg,rgba(10,20,5,.9),rgba(10,20,5,.5))}.fl-card,.fl-measure,.fl-lbl{display:none}
+}
+
+/* ============ Giảm chuyển động ============ */
+.static .banner *,.static .banner *::before,.static .banner *::after{animation:none!important;transition:none!important}
+.static [data-at]{opacity:1!important;transform:none!important;clip-path:none!important}
+.static .draw,.static .fl-measure .dim{stroke-dashoffset:0!important}.static .lines .li{transform:none!important}
+.static .kc-full,.static .a-flare,.static .spark,.static .fl-scan,.static .typing,.static .ui-toast,.static .du-anim{display:none}
+.static .dp-text{transform:none!important}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <strong>Banner ảnh thật Cam Lâm · lồng ghép đồ họa</strong>
+  <button class="btn" id="slowmo" type="button" aria-pressed="false">🐢 Chậm 4 lần</button>
+  <button class="btn" id="replayAll" type="button">↻ Phát lại tất cả</button>
+  <nav class="toc" aria-label="Danh sách kiểu">
+    <a href="#a1">1 · Cắt cong + dải lụa</a><a href="#a2">2 · Ảnh mép lượn sóng</a><a href="#a3">3 · Chữ chứa ảnh</a><a href="#a4">4 · Chữ sau núi</a><a href="#a5">5 · Đen trắng → màu thật</a>
+    <a href="#a6">6 · Polaroid</a><a href="#a7">7 · Ô tròn quay</a><a href="#a8">8 · Cắt lát</a><a href="#a9">9 · Thẻ kính UI</a><a href="#a10">10 · Bản đồ trên flycam</a><a href="#a11">11 · Thuần đồ họa</a>
+  </nav>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="sg" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff"/><stop offset=".22" stop-color="#fff" stop-opacity=".9"/><stop offset=".6" stop-color="#ffe7ad" stop-opacity=".22"/><stop offset="1" stop-color="#ffe7ad" stop-opacity="0"/></radialGradient>
+    <symbol id="star" viewBox="-50 -50 100 100"><circle r="24" fill="url(#sg)"/><path d="M0-50C3-8 8-3 50 0C8 3 3 8 0 50C-3 8-8 3-50 0C-8-3-3-8 0-50Z" fill="#fff"/></symbol>
+    <filter id="duoNA" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values=".2126 .7152 .0722 0 0 .2126 .7152 .0722 0 0 .2126 .7152 .0722 0 0 0 0 0 1 0"/>
+      <feComponentTransfer><feFuncR type="table" tableValues=".043 .984"/><feFuncG type="table" tableValues=".114 .749"/><feFuncB type="table" tableValues=".212 .141"/></feComponentTransfer>
+    </filter>
+  </defs>
+</svg>
+
+<main>
+<p class="img-warn" role="status"><b>Ảnh chưa hiện?</b> Khung xem trước (ví dụ trong ứng dụng Claude) chặn ảnh tải từ Unsplash/Pexels. Hãy tải file này về máy rồi mở bằng Chrome hoặc Edge (cần có mạng) để thấy đầy đủ ảnh thật.</p>
+<p class="intro">11 hướng lồng ghép ảnh thật với đồ họa động, học từ 2 banner trên batdongsan: <b>Ambience</b> (ảnh cắt cong, dải lụa dẫn mắt, người đi dạo, khối liên hệ, tab thương hiệu) và <b>Agent Awards</b> (khối bo góc lồng lớp, lưới nét đứt, đốm sáng, vệt sáng, CTA đập tim). Ảnh lấy từ Unsplash và Pexels, tải trực tiếp khi mở trang nên cần có mạng; lần đầu mở có thể chờ vài giây, banner chỉ bắt đầu chạy khi ảnh đã tải xong. Tác giả và địa điểm thật của từng ảnh ghi ở dòng nguồn dưới mỗi banner (ảnh ngoài Cam Lâm ghi là khu vực lân cận). Mọi nội dung chữ, số liệu, số thửa đều là mẫu.</p>
+
+<!-- ============ A1 ============ -->
+<section class="item" id="a1">
+  <div class="item-head"><h2><span class="num">1</span> · Ảnh cắt cong + dải lụa</h2>
+    <div class="tags"><span class="tag">Curved photo mask</span><span class="tag">Ribbon lead-in</span><span class="tag">Real people cut-out</span><span class="tag">Contact block</span><span class="tag">Brand tab</span></div>
+    <button class="btn replay" type="button">↻ Phát lại</button></div>
+  <div class="banner st-rib" data-cycle="10000">
+    <div class="rb-wrap" data-at="0" data-once>
+      <div class="rb-photo"><i class="bgimg kb-slow" style="background-image:url('https://images.unsplash.com/photo-1660299072487-959142eea200?w=2000&q=75&auto=format&fit=crop')"></i></div>
+    </div>
+    <svg class="rb-edge" data-at="900" data-once viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M80 0L83 5L85.8 10L88.3 15L90.5 20L92.2 25L93.4 30L94 35L94.1 40L93.8 45L93 50L91.9 55L90.6 60L89.2 65L87.7 70L86.2 75L84.8 80L83.5 85L82.3 90L81.1 95L80 100" fill="none" stroke="#fff" stroke-width="3" vector-effect="non-scaling-stroke"/></svg>
+    <svg class="rb-ribbon" data-at="500" data-once viewBox="0 0 1920 620" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="ribG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".5" stop-color="#a5f3fc" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity=".25"/></linearGradient>
+        <linearGradient id="ribShine" x1="-.3" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+          <animate attributeName="x1" values="-.3;1.1" dur="3.2s" repeatCount="indefinite"/><animate attributeName="x2" values="0;1.4" dur="3.2s" repeatCount="indefinite"/></linearGradient>
+      </defs>
+      <path d="M1000 640C1120 520 1210 470 1400 470S1780 520 1940 400L1940 452C1790 560 1620 526 1420 522S1150 560 1060 640Z" fill="url(#ribG)"/>
+      <path d="M1000 640C1120 520 1210 470 1400 470S1780 520 1940 400" fill="none" stroke="url(#ribShine)" stroke-width="5"/>
+      <path d="M1030 640C1140 548 1230 505 1410 500S1760 548 1940 428" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.5"/>
+    </svg>
+    <h3 class="rb-big lines" data-at="1000" data-once><span class="line"><span class="li" style="--i:0">Biển xanh</span></span><span class="line"><span class="li" style="--i:1">nắng vàng</span></span></h3>
+    <!-- Cặp đôi ảnh thật: ảnh gốc Unsplash + mask SVG (viền tách nền bằng AI, vector hóa ~5 KB) -->
+    <div class="rb-couple" data-at="1600" data-once aria-hidden="true">
+      <svg viewBox="60 280 1220 1010" preserveAspectRatio="xMidYMax meet">
+        <defs>
+          <filter id="cplFe" x="-2%" y="-2%" width="104%" height="104%"><feGaussianBlur stdDeviation="1.4"/></filter>
+          <mask id="cplMk" maskUnits="userSpaceOnUse" x="0" y="0" width="2000" height="1333"><path fill="#fff" filter="url(#cplFe)" transform="matrix(0.2 0 0 -0.2 60 1280)" d="M1947 4860 c-20 -11 -43 -20 -50 -20 -7 0 -19 -6 -25 -12 -7 -7 -28 -11 -46 -10 -19 2 -37 -1 -41 -7 -3 -7 2 -11 14 -11 29 0 35 -17 11 -30 -47 -25 -90 -80 -90 -115 0 -18 -4 -36 -9 -39 -14 -9 -1 -160 15 -169 8 -4 14 -15 14 -23 0 -24 81 -98 91 -83 6 11 9 10 14 -4 4 -9 30 -33 59 -54 55 -39 95 -81 96 -99 1 -55 -81 -119 -207 -159 l-82 -27 -26 -56 c-15 -33 -51 -83 -84 -117 -32 -33 -80 -89 -107 -125 -27 -36 -83 -99 -125 -140 -41 -41 -108 -119 -148 -173 -39 -54 -87 -107 -106 -119 -35 -20 -44 -41 -25 -53 27 -16 -27 -121 -68 -131 -26 -7 -44 -36 -36 -58 4 -11 -16 -38 -59 -83 -84 -88 -97 -115 -97 -201 0 -84 23 -118 80 -117 32 0 35 3 38 33 3 28 6 31 26 26 20 -5 28 2 51 43 15 26 34 55 42 64 8 9 17 49 22 88 6 57 12 75 29 87 12 8 22 25 22 37 0 38 49 97 81 97 32 0 109 85 109 120 0 18 35 54 185 193 106 97 235 198 236 184 2 -17 3 -11 -41 -179 -22 -85 -40 -168 -40 -184 -1 -21 -20 -52 -73 -115 -100 -119 -128 -177 -134 -282 l-6 -83 44 -37 c23 -20 46 -37 49 -37 4 0 15 27 24 60 19 67 18 66 51 44 16 -11 36 -14 55 -11 28 6 31 3 60 -57 16 -35 30 -69 30 -74 0 -6 8 -17 19 -24 23 -17 136 -215 144 -254 3 -16 0 -51 -8 -79 -7 -27 -16 -117 -20 -200 -11 -247 -32 -375 -62 -375 -7 0 -13 -7 -13 -15 0 -8 -7 -15 -15 -15 -50 0 -345 -250 -345 -293 0 -31 -134 -186 -204 -235 -26 -19 -52 -44 -58 -57 -13 -30 -35 -35 -69 -19 -35 17 -69 -4 -62 -39 4 -20 -3 -27 -49 -47 -29 -13 -71 -27 -93 -30 -37 -5 -40 -8 -43 -39 -6 -62 7 -97 73 -195 35 -52 83 -128 105 -168 49 -87 115 -157 191 -204 65 -39 89 -42 114 -14 17 19 17 23 -9 102 -62 197 -58 328 10 328 21 0 17 16 -11 38 -32 25 -20 59 28 82 18 8 34 24 35 35 6 29 38 61 110 109 68 45 313 253 441 374 43 39 81 72 86 72 4 0 32 20 61 45 28 25 54 45 57 45 3 0 -2 -26 -10 -57 -12 -46 -13 -72 -4 -133 5 -41 13 -106 16 -145 4 -38 13 -90 20 -115 7 -25 16 -72 19 -104 4 -35 16 -75 29 -95 18 -29 22 -53 24 -124 1 -49 6 -94 12 -100 12 -15 16 -109 6 -159 -7 -34 -5 -38 20 -44 50 -12 133 3 193 37 83 47 139 75 212 107 113 50 160 122 110 172 -23 23 -29 23 -85 10 -46 -10 -114 2 -130 23 -5 8 -29 24 -52 36 -28 14 -45 30 -49 46 -4 15 -16 28 -30 31 -28 7 -31 41 -14 135 7 35 7 136 2 284 -8 229 -8 230 16 300 48 135 32 329 -52 650 -14 52 -11 131 13 385 6 63 16 183 22 265 6 83 16 177 21 210 6 33 13 119 17 192 6 134 14 163 35 129 6 -11 41 -53 79 -94 37 -41 67 -78 67 -82 0 -4 30 -31 68 -61 37 -29 70 -59 74 -65 14 -22 127 -84 152 -84 29 0 231 -118 259 -151 9 -12 17 -31 17 -43 0 -12 13 -42 28 -67 21 -32 26 -51 21 -69 -4 -14 -7 -31 -8 -37 -2 -22 75 -53 148 -59 80 -8 161 22 309 111 35 22 61 28 151 35 125 10 199 33 285 89 34 22 72 44 86 49 14 5 50 26 80 46 52 34 110 49 94 25 -5 -8 -1 -8 14 0 32 17 39 14 47 -21 4 -18 9 -40 12 -48 26 -89 11 -144 -61 -232 -25 -31 -46 -61 -46 -66 0 -5 -25 -32 -55 -61 -54 -52 -115 -157 -115 -199 0 -54 -37 -175 -76 -247 -27 -51 -60 -138 -89 -240 -26 -88 -58 -178 -71 -201 -29 -49 -37 -75 -65 -204 -26 -117 -44 -165 -79 -210 -15 -20 -37 -54 -48 -76 -24 -47 -37 -59 -73 -67 -48 -12 -73 -40 -74 -86 -1 -28 -8 -47 -23 -62 -13 -11 -26 -34 -29 -51 -8 -41 -24 -44 -87 -18 l-53 23 -54 -25 c-30 -14 -75 -43 -101 -65 -25 -22 -59 -44 -75 -47 -34 -9 -55 -25 -47 -37 3 -5 9 -35 14 -66 8 -49 16 -64 50 -95 42 -39 43 -41 40 -102 -1 -21 3 -42 9 -45 5 -4 15 -47 21 -96 14 -112 60 -214 103 -229 42 -15 57 7 72 115 17 117 30 162 62 216 28 48 41 52 81 24 30 -22 183 -54 228 -49 34 4 63 54 75 131 5 27 10 51 11 53 12 11 304 -94 409 -147 62 -31 161 -52 222 -47 56 4 65 -13 48 -94 -7 -35 -22 -78 -33 -95 -24 -40 -18 -49 41 -76 45 -20 131 -27 386 -31 98 -1 149 20 170 70 25 61 3 85 -93 98 -79 11 -150 58 -132 86 19 29 11 50 -17 50 -21 1 -35 11 -55 41 -27 38 -28 42 -28 182 0 187 29 389 75 525 20 57 19 178 -1 233 -9 25 -20 103 -25 179 -4 74 -11 178 -15 231 -6 85 -4 102 14 140 11 24 40 109 64 189 46 156 50 203 33 385 -8 90 2 126 49 182 35 42 46 42 46 -2 0 -74 31 -114 224 -292 53 -49 61 -53 106 -53 45 0 53 -4 97 -47 27 -27 64 -60 83 -74 34 -26 34 -26 17 -52 -26 -40 -21 -47 33 -47 62 0 74 18 68 105 -4 61 -5 63 -67 125 -71 71 -82 94 -83 163 0 60 -33 137 -94 222 -49 70 -61 77 -104 69 -25 -6 -31 -3 -42 22 -6 16 -17 36 -24 44 -6 8 -14 26 -17 40 -3 14 -14 52 -25 85 -12 33 -25 103 -31 155 -19 171 -39 205 -134 235 -62 19 -72 32 -29 37 21 2 30 11 39 41 7 21 27 58 44 83 l30 45 -9 117 c-6 64 -8 140 -5 168 9 88 -43 129 -212 168 -38 9 -81 16 -95 16 -26 0 -212 -91 -245 -120 -11 -9 -40 -20 -65 -24 -24 -4 -50 -12 -57 -18 -7 -5 -19 -8 -26 -5 -16 6 -13 -157 3 -219 8 -34 -7 -124 -22 -124 -4 0 -8 -33 -8 -74 0 -73 -1 -75 -32 -97 -18 -13 -51 -40 -73 -61 -82 -79 -216 -156 -273 -158 -13 0 -42 -8 -65 -19 -23 -10 -66 -24 -95 -31 -83 -19 -133 -63 -157 -136 -25 -77 -28 -79 -121 -138 l-76 -49 -42 21 c-40 20 -65 40 -212 172 -40 36 -104 90 -142 120 -48 38 -69 61 -68 75 1 20 -42 63 -189 185 -142 119 -272 301 -294 411 -13 67 -59 155 -112 213 -37 41 -45 55 -38 69 13 23 3 37 -25 37 -18 0 -25 7 -31 33 -20 81 -20 168 0 180 25 13 17 34 -26 67 -33 27 -39 37 -35 59 6 29 -42 84 -118 135 -22 15 -47 37 -55 50 -45 68 -108 134 -149 158 -56 33 -57 33 -105 8z m2663 -898 c0 -26 -27 -44 -48 -33 -35 19 -28 41 13 41 19 0 35 -4 35 -8z m-55 -58 c46 -30 28 -108 -19 -86 -22 10 -26 18 -26 57 0 49 8 54 45 29z m5 -121 c0 -8 -5 -24 -11 -35 -14 -25 -29 -8 -29 34 0 21 4 25 20 21 11 -3 20 -12 20 -20z m-3560 -991 c0 -5 -7 -17 -15 -28 -15 -19 -20 -8 -9 20 6 17 24 22 24 8z"/></mask>
+          <radialGradient id="cplSh"><stop offset="0" stop-color="#0b1d36" stop-opacity=".38"/><stop offset="1" stop-color="#0b1d36" stop-opacity="0"/></radialGradient>
+        </defs>
+        <ellipse cx="660" cy="1252" rx="580" ry="30" fill="url(#cplSh)"/>
+        <g class="bob"><image href="https://images.unsplash.com/photo-1689172420464-f87a8a3971ea?w=1600&amp;q=80&amp;auto=format&amp;fit=crop" width="2000" height="1333" mask="url(#cplMk)"/></g>
+      </svg>
+    </div>
+    <svg class="spark" data-at="2400,6400" style="left:55%;top:92%" aria-hidden="true"><use href="#star"/></svg>
+    <svg class="spark" data-at="2600,6600" style="left:97%;top:88%" aria-hidden="true"><use href="#star"/></svg>
+    <div class="rb-text">
+      <span class="kicker rb-kicker fx-up" data-at="900" data-once>Cam Lâm · Khánh Hòa</span><br>
+      <h3 class="rb-title punchq" data-at="1100" data-once>Sống cạnh<br>Bãi Dài</h3>
+      <div class="rb-contact">
+        <div class="rb-row fx-left" data-at="1500" data-once><span class="rb-ico"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>0988 888 888</div>
+        <div class="rb-row fx-left" data-at="1650" data-once><span class="rb-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></span>batdongsancamlam.dpdns.org</div>
+      </div>
+      <div class="rb-cta fx-up" data-at="1900" data-once><a class="cta grad shine nudge" data-at="3000,6000,9000" href="#">Nhận thông tin <span aria-hidden="true">→</span></a></div>
+    </div>
+    <div class="brand-tab fx-fade" data-at="300" data-once>CAM LÂM LAND</div>
+  </div>
+  <ul class="notes">
+    <li><b>0 s</b> ảnh lộ từ trái sang (1,1 s); mép ảnh là đường cong chữ S cắt bằng clip-path polygon</li>
+    <li><b>0,5 s</b> dải lụa trắng–xanh lộ dần 1,5 s, có vệt bóng chạy dọc liên tục 3,2 s</li>
+    <li><b>1,1 s</b> tiêu đề "đập" kiểu Gamuda (1,077 → 0,95 → 1, quadInOut)</li>
+    <li><b>1,6 s</b> cặp đôi ảnh thật đi vào theo dải lụa, có bóng đổ mềm dưới chân</li>
+    <li><b>1,5–1,9 s</b> dòng liên hệ trượt vào, nút CTA gradient có vệt sáng và hích nhẹ mỗi 3 s</li>
+    <li><b>Tách người</b> tách nền bằng AI (mô hình ISNet chạy ngay trong trình duyệt), vector hóa viền thành đường mask ~5 KB rồi đặt lên ảnh gốc: không cần file PNG riêng, viền được làm mềm 1,4 px</li>
+  </ul>
+  <p class="credit">Ảnh: <a href="https://unsplash.com/photos/GYW6hT1dvio" target="_blank" rel="noopener">Huy (@huykutis), Unsplash</a> — "Long Beach in Cam Ranh", địa điểm ghi: Cam Ranh. Bãi Dài chạy dọc Cam Ranh – Cam Lâm → ghi là khu vực lân cận. Cặp đôi: <a href="https://unsplash.com/photos/QRE8T3GhTCg" target="_blank" rel="noopener">Mai Phuoc, Unsplash</a> (Nha Trang, Khánh Hòa).</p>
+</section>
+
+<!-- ============ A2 ============ -->
+<section class="item" id="a2">
+  <div class="item-head"><h2><span class="num">2</span> · Ảnh mép lượn sóng + dải sóng lồng lớp</h2>
+    <div class="tags"><span class="tag">Wavy photo edge</span><span class="tag">Layered wave bands</span><span class="tag">Grid + particles</span><span class="tag">Light sweep</span><span class="tag">Heartbeat CTA</span></div>
+    <button class="btn replay" type="button">↻ Phát lại</button></div>
+  <div class="banner st-step photo" data-cycle="5708">
+    <div class="sp-dark"></div><div class="sp-grid"></div>
+    <canvas class="layer fireflies" data-x0=".03" data-x1=".47" aria-hidden="true"></canvas>
+    <!-- mép ảnh lượn sóng: 1 clipPath (đơn vị theo khung phần tử) dùng chung cho ảnh và 3 dải màu, sóng chạy chậm bằng SMIL -->
+    <svg class="pp-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
+      <clipPath id="ppWave" clipPathUnits="objectBoundingBox"><path d="M0.5623 0.0000C0.5595 0.0104 0.5519 0.0417 0.5455 0.0625C0.5392 0.0833 0.5311 0.1042 0.5239 0.1250C0.5167 0.1458 0.5086 0.1667 0.5022 0.1875C0.4958 0.2083 0.4899 0.2292 0.4855 0.2500C0.4811 0.2708 0.4782 0.2917 0.4758 0.3125C0.4734 0.3333 0.4727 0.3542 0.4711 0.3750C0.4696 0.3958 0.4688 0.4167 0.4664 0.4375C0.4640 0.4583 0.4611 0.4792 0.4567 0.5000C0.4524 0.5208 0.4464 0.5417 0.4400 0.5625C0.4337 0.5833 0.4256 0.6042 0.4184 0.6250C0.4112 0.6458 0.4031 0.6667 0.3967 0.6875C0.3903 0.7083 0.3844 0.7292 0.3800 0.7500C0.3756 0.7708 0.3727 0.7917 0.3703 0.8125C0.3679 0.8333 0.3672 0.8542 0.3656 0.8750C0.3641 0.8958 0.3633 0.9167 0.3609 0.9375C0.3585 0.9583 0.3529 0.9896 0.3513 1.0000L1.2 1L1.2 0Z"><animate attributeName="d" dur="9s" repeatCount="indefinite" values="M0.5623 0.0000C0.5595 0.0104 0.5519 0.0417 0.5455 0.0625C0.5392 0.0833 0.5311 0.1042 0.5239 0.1250C0.5167 0.1458 0.5086 0.1667 0.5022 0.1875C0.4958 0.2083 0.4899 0.2292 0.4855 0.2500C0.4811 0.2708 0.4782 0.2917 0.4758 0.3125C0.4734 0.3333 0.4727 0.3542 0.4711 0.3750C0.4696 0.3958 0.4688 0.4167 0.4664 0.4375C0.4640 0.4583 0.4611 0.4792 0.4567 0.5000C0.4524 0.5208 0.4464 0.5417 0.4400 0.5625C0.4337 0.5833 0.4256 0.6042 0.4184 0.6250C0.4112 0.6458 0.4031 0.6667 0.3967 0.6875C0.3903 0.7083 0.3844 0.7292 0.3800 0.7500C0.3756 0.7708 0.3727 0.7917 0.3703 0.8125C0.3679 0.8333 0.3672 0.8542 0.3656 0.8750C0.3641 0.8958 0.3633 0.9167 0.3609 0.9375C0.3585 0.9583 0.3529 0.9896 0.3513 1.0000L1.2 1L1.2 0Z;M0.5587 0.0000C0.5571 0.0104 0.5535 0.0417 0.5491 0.0625C0.5447 0.0833 0.5388 0.1042 0.5324 0.1250C0.5260 0.1458 0.5179 0.1667 0.5107 0.1875C0.5035 0.2083 0.4954 0.2292 0.4890 0.2500C0.4826 0.2708 0.4767 0.2917 0.4723 0.3125C0.4679 0.3333 0.4650 0.3542 0.4626 0.3750C0.4602 0.3958 0.4595 0.4167 0.4579 0.4375C0.4564 0.4583 0.4556 0.4792 0.4532 0.5000C0.4508 0.5208 0.4480 0.5417 0.4436 0.5625C0.4392 0.5833 0.4333 0.6042 0.4269 0.6250C0.4205 0.6458 0.4124 0.6667 0.4052 0.6875C0.3980 0.7083 0.3899 0.7292 0.3835 0.7500C0.3771 0.7708 0.3712 0.7917 0.3668 0.8125C0.3624 0.8333 0.3595 0.8542 0.3571 0.8750C0.3547 0.8958 0.3540 0.9167 0.3524 0.9375C0.3509 0.9583 0.3485 0.9896 0.3477 1.0000L1.2 1L1.2 0Z;M0.5503 0.0000C0.5495 0.0104 0.5479 0.0417 0.5455 0.0625C0.5432 0.0833 0.5403 0.1042 0.5359 0.1250C0.5315 0.1458 0.5256 0.1667 0.5192 0.1875C0.5128 0.2083 0.5047 0.2292 0.4975 0.2500C0.4903 0.2708 0.4822 0.2917 0.4758 0.3125C0.4694 0.3333 0.4635 0.3542 0.4591 0.3750C0.4547 0.3958 0.4518 0.4167 0.4495 0.4375C0.4471 0.4583 0.4463 0.4792 0.4447 0.5000C0.4432 0.5208 0.4424 0.5417 0.4400 0.5625C0.4377 0.5833 0.4348 0.6042 0.4304 0.6250C0.4260 0.6458 0.4201 0.6667 0.4137 0.6875C0.4073 0.7083 0.3992 0.7292 0.3920 0.7500C0.3848 0.7708 0.3767 0.7917 0.3703 0.8125C0.3639 0.8333 0.3580 0.8542 0.3536 0.8750C0.3492 0.8958 0.3463 0.9167 0.3440 0.9375C0.3416 0.9583 0.3400 0.9896 0.3392 1.0000L1.2 1L1.2 0Z;M0.5418 0.0000C0.5410 0.0104 0.5386 0.0417 0.5371 0.0625C0.5355 0.0833 0.5348 0.1042 0.5324 0.1250C0.5300 0.1458 0.5271 0.1667 0.5227 0.1875C0.5183 0.2083 0.5124 0.2292 0.5060 0.2500C0.4996 0.2708 0.4915 0.2917 0.4843 0.3125C0.4771 0.3333 0.4690 0.3542 0.4626 0.3750C0.4562 0.3958 0.4503 0.4167 0.4459 0.4375C0.4415 0.4583 0.4387 0.4792 0.4363 0.5000C0.4339 0.5208 0.4331 0.5417 0.4316 0.5625C0.4300 0.5833 0.4293 0.6042 0.4269 0.6250C0.4245 0.6458 0.4216 0.6667 0.4172 0.6875C0.4128 0.7083 0.4069 0.7292 0.4005 0.7500C0.3941 0.7708 0.3860 0.7917 0.3788 0.8125C0.3716 0.8333 0.3635 0.8542 0.3571 0.8750C0.3507 0.8958 0.3448 0.9167 0.3404 0.9375C0.3360 0.9583 0.3324 0.9896 0.3308 1.0000L1.2 1L1.2 0Z;M0.5383 0.0000C0.5366 0.0104 0.5310 0.0417 0.5286 0.0625C0.5262 0.0833 0.5254 0.1042 0.5239 0.1250C0.5223 0.1458 0.5216 0.1667 0.5192 0.1875C0.5168 0.2083 0.5139 0.2292 0.5095 0.2500C0.5051 0.2708 0.4992 0.2917 0.4928 0.3125C0.4864 0.3333 0.4783 0.3542 0.4711 0.3750C0.4639 0.3958 0.4558 0.4167 0.4495 0.4375C0.4431 0.4583 0.4371 0.4792 0.4327 0.5000C0.4284 0.5208 0.4255 0.5417 0.4231 0.5625C0.4207 0.5833 0.4199 0.6042 0.4184 0.6250C0.4168 0.6458 0.4161 0.6667 0.4137 0.6875C0.4113 0.7083 0.4084 0.7292 0.4040 0.7500C0.3996 0.7708 0.3937 0.7917 0.3873 0.8125C0.3809 0.8333 0.3728 0.8542 0.3656 0.8750C0.3584 0.8958 0.3503 0.9167 0.3440 0.9375C0.3376 0.9583 0.3300 0.9896 0.3272 1.0000L1.2 1L1.2 0Z;M0.5418 0.0000C0.5390 0.0104 0.5295 0.0417 0.5251 0.0625C0.5207 0.0833 0.5178 0.1042 0.5154 0.1250C0.5130 0.1458 0.5123 0.1667 0.5107 0.1875C0.5091 0.2083 0.5084 0.2292 0.5060 0.2500C0.5036 0.2708 0.5007 0.2917 0.4963 0.3125C0.4919 0.3333 0.4860 0.3542 0.4796 0.3750C0.4732 0.3958 0.4652 0.4167 0.4579 0.4375C0.4507 0.4583 0.4427 0.4792 0.4363 0.5000C0.4299 0.5208 0.4240 0.5417 0.4196 0.5625C0.4152 0.5833 0.4123 0.6042 0.4099 0.6250C0.4075 0.6458 0.4068 0.6667 0.4052 0.6875C0.4036 0.7083 0.4029 0.7292 0.4005 0.7500C0.3981 0.7708 0.3952 0.7917 0.3908 0.8125C0.3864 0.8333 0.3805 0.8542 0.3741 0.8750C0.3677 0.8958 0.3597 0.9167 0.3524 0.9375C0.3452 0.9583 0.3344 0.9896 0.3308 1.0000L1.2 1L1.2 0Z;M0.5503 0.0000C0.5466 0.0104 0.5350 0.0417 0.5286 0.0625C0.5222 0.0833 0.5163 0.1042 0.5119 0.1250C0.5075 0.1458 0.5046 0.1667 0.5022 0.1875C0.4998 0.2083 0.4991 0.2292 0.4975 0.2500C0.4959 0.2708 0.4952 0.2917 0.4928 0.3125C0.4904 0.3333 0.4875 0.3542 0.4831 0.3750C0.4787 0.3958 0.4728 0.4167 0.4664 0.4375C0.4600 0.4583 0.4520 0.4792 0.4447 0.5000C0.4375 0.5208 0.4295 0.5417 0.4231 0.5625C0.4167 0.5833 0.4108 0.6042 0.4064 0.6250C0.4020 0.6458 0.3991 0.6667 0.3967 0.6875C0.3943 0.7083 0.3936 0.7292 0.3920 0.7500C0.3904 0.7708 0.3897 0.7917 0.3873 0.8125C0.3849 0.8333 0.3820 0.8542 0.3776 0.8750C0.3732 0.8958 0.3673 0.9167 0.3609 0.9375C0.3545 0.9583 0.3429 0.9896 0.3392 1.0000L1.2 1L1.2 0Z;M0.5587 0.0000C0.5551 0.0104 0.5443 0.0417 0.5371 0.0625C0.5298 0.0833 0.5218 0.1042 0.5154 0.1250C0.5090 0.1458 0.5031 0.1667 0.4987 0.1875C0.4943 0.2083 0.4914 0.2292 0.4890 0.2500C0.4866 0.2708 0.4859 0.2917 0.4843 0.3125C0.4827 0.3333 0.4820 0.3542 0.4796 0.3750C0.4772 0.3958 0.4743 0.4167 0.4699 0.4375C0.4655 0.4583 0.4596 0.4792 0.4532 0.5000C0.4468 0.5208 0.4388 0.5417 0.4316 0.5625C0.4243 0.5833 0.4163 0.6042 0.4099 0.6250C0.4035 0.6458 0.3976 0.6667 0.3932 0.6875C0.3888 0.7083 0.3859 0.7292 0.3835 0.7500C0.3811 0.7708 0.3804 0.7917 0.3788 0.8125C0.3772 0.8333 0.3765 0.8542 0.3741 0.8750C0.3717 0.8958 0.3688 0.9167 0.3644 0.9375C0.3600 0.9583 0.3505 0.9896 0.3477 1.0000L1.2 1L1.2 0Z;M0.5623 0.0000C0.5595 0.0104 0.5519 0.0417 0.5455 0.0625C0.5392 0.0833 0.5311 0.1042 0.5239 0.1250C0.5167 0.1458 0.5086 0.1667 0.5022 0.1875C0.4958 0.2083 0.4899 0.2292 0.4855 0.2500C0.4811 0.2708 0.4782 0.2917 0.4758 0.3125C0.4734 0.3333 0.4727 0.3542 0.4711 0.3750C0.4696 0.3958 0.4688 0.4167 0.4664 0.4375C0.4640 0.4583 0.4611 0.4792 0.4567 0.5000C0.4524 0.5208 0.4464 0.5417 0.4400 0.5625C0.4337 0.5833 0.4256 0.6042 0.4184 0.6250C0.4112 0.6458 0.4031 0.6667 0.3967 0.6875C0.3903 0.7083 0.3844 0.7292 0.3800 0.7500C0.3756 0.7708 0.3727 0.7917 0.3703 0.8125C0.3679 0.8333 0.3672 0.8542 0.3656 0.8750C0.3641 0.8958 0.3633 0.9167 0.3609 0.9375C0.3585 0.9583 0.3529 0.9896 0.3513 1.0000L1.2 1L1.2 0Z"/></path></clipPath>
+    </defs></svg>
+    <div class="pp" data-at="0" data-once>
+      <i class="pb" style="--k:3"></i><i class="pb" style="--k:2"></i><i class="pb" style="--k:1"></i>
+      <div class="pp-img"><i class="bgimg sr-img" style="background-image:url('https://images.pexels.com/photos/38767143/pexels-photo-38767143.jpeg?auto=compress&cs=tinysrgb&w=2000')"></i></div>
+      <svg class="pp-edge" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true"><path d="M0.5623 0.0000C0.5595 0.0104 0.5519 0.0417 0.5455 0.0625C0.5392 0.0833 0.5311 0.1042 0.5239 0.1250C0.5167 0.1458 0.5086 0.1667 0.5022 0.1875C0.4958 0.2083 0.4899 0.2292 0.4855 0.2500C0.4811 0.2708 0.4782 0.2917 0.4758 0.3125C0.4734 0.3333 0.4727 0.3542 0.4711 0.3750C0.4696 0.3958 0.4688 0.4167 0.4664 0.4375C0.4640 0.4583 0.4611 0.4792 0.4567 0.5000C0.4524 0.5208 0.4464 0.5417 0.4400 0.5625C0.4337 0.5833 0.4256 0.6042 0.4184 0.6250C0.4112 0.6458 0.4031 0.6667 0.3967 0.6875C0.3903 0.7083 0.3844 0.7292 0.3800 0.7500C0.3756 0.7708 0.3727 0.7917 0.3703 0.8125C0.3679 0.8333 0.3672 0.8542 0.3656 0.8750C0.3641 0.8958 0.3633 0.9167 0.3609 0.9375C0.3585 0.9583 0.3529 0.9896 0.3513 1.0000" fill="none" stroke="rgba(224,255,250,.9)" stroke-width="3" vector-effect="non-scaling-stroke"><animate attributeName="d" dur="9s" repeatCount="indefinite" values="M0.5623 0.0000C0.5595 0.0104 0.5519 0.0417 0.5455 0.0625C0.5392 0.0833 0.5311 0.1042 0.5239 0.1250C0.5167 0.1458 0.5086 0.1667 0.5022 0.1875C0.4958 0.2083 0.4899 0.2292 0.4855 0.2500C0.4811 0.2708 0.4782 0.2917 0.4758 0.3125C0.4734 0.3333 0.4727 0.3542 0.4711 0.3750C0.4696 0.3958 0.4688 0.4167 0.4664 0.4375C0.4640 0.4583 0.4611 0.4792 0.4567 0.5000C0.4524 0.5208 0.4464 0.5417 0.4400 0.5625C0.4337 0.5833 0.4256 0.6042 0.4184 0.6250C0.4112 0.6458 0.4031 0.6667 0.3967 0.6875C0.3903 0.7083 0.3844 0.7292 0.3800 0.7500C0.3756 0.7708 0.3727 0.7917 0.3703 0.8125C0.3679 0.8333 0.3672 0.8542 0.3656 0.8750C0.3641 0.8958 0.3633 0.9167 0.3609 0.9375C0.3585 0.9583 0.3529 0.9896 0.3513 1.0000;M0.5587 0.0000C0.5571 0.0104 0.5535 0.0417 0.5491 0.0625C0.5447 0.0833 0.5388 0.1042 0.5324 0.1250C0.5260 0.1458 0.5179 0.1667 0.5107 0.1875C0.5035 0.2083 0.4954 0.2292 0.4890 0.2500C0.4826 0.2708 0.4767 0.2917 0.4723 0.3125C0.4679 0.3333 0.4650 0.3542 0.4626 0.3750C0.4602 0.3958 0.4595 0.4167 0.4579 0.4375C0.4564 0.4583 0.4556 0.4792 0.4532 0.5000C0.4508 0.5208 0.4480 0.5417 0.4436 0.5625C0.4392 0.5833 0.4333 0.6042 0.4269 0.6250C0.4205 0.6458 0.4124 0.6667 0.4052 0.6875C0.3980 0.7083 0.3899 0.7292 0.3835 0.7500C0.3771 0.7708 0.3712 0.7917 0.3668 0.8125C0.3624 0.8333 0.3595 0.8542 0.3571 0.8750C0.3547 0.8958 0.3540 0.9167 0.3524 0.9375C0.3509 0.9583 0.3485 0.9896 0.3477 1.0000;M0.5503 0.0000C0.5495 0.0104 0.5479 0.0417 0.5455 0.0625C0.5432 0.0833 0.5403 0.1042 0.5359 0.1250C0.5315 0.1458 0.5256 0.1667 0.5192 0.1875C0.5128 0.2083 0.5047 0.2292 0.4975 0.2500C0.4903 0.2708 0.4822 0.2917 0.4758 0.3125C0.4694 0.3333 0.4635 0.3542 0.4591 0.3750C0.4547 0.3958 0.4518 0.4167 0.4495 0.4375C0.4471 0.4583 0.4463 0.4792 0.4447 0.5000C0.4432 0.5208 0.4424 0.5417 0.4400 0.5625C0.4377 0.5833 0.4348 0.6042 0.4304 0.6250C0.4260 0.6458 0.4201 0.6667 0.4137 0.6875C0.4073 0.7083 0.3992 0.7292 0.3920 0.7500C0.3848 0.7708 0.3767 0.7917 0.3703 0.8125C0.3639 0.8333 0.3580 0.8542 0.3536 0.8750C0.3492 0.8958 0.3463 0.9167 0.3440 0.9375C0.3416 0.9583 0.3400 0.9896 0.3392 1.0000;M0.5418 0.0000C0.5410 0.0104 0.5386 0.0417 0.5371 0.0625C0.5355 0.0833 0.5348 0.1042 0.5324 0.1250C0.5300 0.1458 0.5271 0.1667 0.5227 0.1875C0.5183 0.2083 0.5124 0.2292 0.5060 0.2500C0.4996 0.2708 0.4915 0.2917 0.4843 0.3125C0.4771 0.3333 0.4690 0.3542 0.4626 0.3750C0.4562 0.3958 0.4503 0.4167 0.4459 0.4375C0.4415 0.4583 0.4387 0.4792 0.4363 0.5000C0.4339 0.5208 0.4331 0.5417 0.4316 0.5625C0.4300 0.5833 0.4293 0.6042 0.4269 0.6250C0.4245 0.6458 0.4216 0.6667 0.4172 0.6875C0.4128 0.7083 0.4069 0.7292 0.4005 0.7500C0.3941 0.7708 0.3860 0.7917 0.3788 0.8125C0.3716 0.8333 0.3635 0.8542 0.3571 0.8750C0.3507 0.8958 0.3448 0.9167 0.3404 0.9375C0.3360 0.9583 0.3324 0.9896 0.3308 1.0000;M0.5383 0.0000C0.5366 0.0104 0.5310 0.0417 0.5286 0.0625C0.5262 0.0833 0.5254 0.1042 0.5239 0.1250C0.5223 0.1458 0.5216 0.1667 0.5192 0.1875C0.5168 0.2083 0.5139 0.2292 0.5095 0.2500C0.5051 0.2708 0.4992 0.2917 0.4928 0.3125C0.4864 0.3333 0.4783 0.3542 0.4711 0.3750C0.4639 0.3958 0.4558 0.4167 0.4495 0.4375C0.4431 0.4583 0.4371 0.4792 0.4327 0.5000C0.4284 0.5208 0.4255 0.5417 0.4231 0.5625C0.4207 0.5833 0.4199 0.6042 0.4184 0.6250C0.4168 0.6458 0.4161 0.6667 0.4137 0.6875C0.4113 0.7083 0.4084 0.7292 0.4040 0.7500C0.3996 0.7708 0.3937 0.7917 0.3873 0.8125C0.3809 0.8333 0.3728 0.8542 0.3656 0.8750C0.3584 0.8958 0.3503 0.9167 0.3440 0.9375C0.3376 0.9583 0.3300 0.9896 0.3272 1.0000;M0.5418 0.0000C0.5390 0.0104 0.5295 0.0417 0.5251 0.0625C0.5207 0.0833 0.5178 0.1042 0.5154 0.1250C0.5130 0.1458 0.5123 0.1667 0.5107 0.1875C0.5091 0.2083 0.5084 0.2292 0.5060 0.2500C0.5036 0.2708 0.5007 0.2917 0.4963 0.3125C0.4919 0.3333 0.4860 0.3542 0.4796 0.3750C0.4732 0.3958 0.4652 0.4167 0.4579 0.4375C0.4507 0.4583 0.4427 0.4792 0.4363 0.5000C0.4299 0.5208 0.4240 0.5417 0.4196 0.5625C0.4152 0.5833 0.4123 0.6042 0.4099 0.6250C0.4075 0.6458 0.4068 0.6667 0.4052 0.6875C0.4036 0.7083 0.4029 0.7292 0.4005 0.7500C0.3981 0.7708 0.3952 0.7917 0.3908 0.8125C0.3864 0.8333 0.3805 0.8542 0.3741 0.8750C0.3677 0.8958 0.3597 0.9167 0.3524 0.9375C0.3452 0.9583 0.3344 0.9896 0.3308 1.0000;M0.5503 0.0000C0.5466 0.0104 0.5350 0.0417 0.5286 0.0625C0.5222 0.0833 0.5163 0.1042 0.5119 0.1250C0.5075 0.1458 0.5046 0.1667 0.5022 0.1875C0.4998 0.2083 0.4991 0.2292 0.4975 0.2500C0.4959 0.2708 0.4952 0.2917 0.4928 0.3125C0.4904 0.3333 0.4875 0.3542 0.4831 0.3750C0.4787 0.3958 0.4728 0.4167 0.4664 0.4375C0.4600 0.4583 0.4520 0.4792 0.4447 0.5000C0.4375 0.5208 0.4295 0.5417 0.4231 0.5625C0.4167 0.5833 0.4108 0.6042 0.4064 0.6250C0.4020 0.6458 0.3991 0.6667 0.3967 0.6875C0.3943 0.7083 0.3936 0.7292 0.3920 0.7500C0.3904 0.7708 0.3897 0.7917 0.3873 0.8125C0.3849 0.8333 0.3820 0.8542 0.3776 0.8750C0.3732 0.8958 0.3673 0.9167 0.3609 0.9375C0.3545 0.9583 0.3429 0.9896 0.3392 1.0000;M0.5587 0.0000C0.5551 0.0104 0.5443 0.0417 0.5371 0.0625C0.5298 0.0833 0.5218 0.1042 0.5154 0.1250C0.5090 0.1458 0.5031 0.1667 0.4987 0.1875C0.4943 0.2083 0.4914 0.2292 0.4890 0.2500C0.4866 0.2708 0.4859 0.2917 0.4843 0.3125C0.4827 0.3333 0.4820 0.3542 0.4796 0.3750C0.4772 0.3958 0.4743 0.4167 0.4699 0.4375C0.4655 0.4583 0.4596 0.4792 0.4532 0.5000C0.4468 0.5208 0.4388 0.5417 0.4316 0.5625C0.4243 0.5833 0.4163 0.6042 0.4099 0.6250C0.4035 0.6458 0.3976 0.6667 0.3932 0.6875C0.3888 0.7083 0.3859 0.7292 0.3835 0.7500C0.3811 0.7708 0.3804 0.7917 0.3788 0.8125C0.3772 0.8333 0.3765 0.8542 0.3741 0.8750C0.3717 0.8958 0.3688 0.9167 0.3644 0.9375C0.3600 0.9583 0.3505 0.9896 0.3477 1.0000;M0.5623 0.0000C0.5595 0.0104 0.5519 0.0417 0.5455 0.0625C0.5392 0.0833 0.5311 0.1042 0.5239 0.1250C0.5167 0.1458 0.5086 0.1667 0.5022 0.1875C0.4958 0.2083 0.4899 0.2292 0.4855 0.2500C0.4811 0.2708 0.4782 0.2917 0.4758 0.3125C0.4734 0.3333 0.4727 0.3542 0.4711 0.3750C0.4696 0.3958 0.4688 0.4167 0.4664 0.4375C0.4640 0.4583 0.4611 0.4792 0.4567 0.5000C0.4524 0.5208 0.4464 0.5417 0.4400 0.5625C0.4337 0.5833 0.4256 0.6042 0.4184 0.6250C0.4112 0.6458 0.4031 0.6667 0.3967 0.6875C0.3903 0.7083 0.3844 0.7292 0.3800 0.7500C0.3756 0.7708 0.3727 0.7917 0.3703 0.8125C0.3679 0.8333 0.3672 0.8542 0.3656 0.8750C0.3641 0.8958 0.3633 0.9167 0.3609 0.9375C0.3585 0.9583 0.3529 0.9896 0.3513 1.0000"/></path></svg>
+    </div>
+    <div class="pp-logo fx-fade" data-at="300" data-once><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M10 40L40 14l30 26"/><path d="M18 34v32h44V34"/><path d="M32 66V48h16v18"/></svg><span>Cam Lâm Land<small>Nhà đất &amp; quy hoạch</small></span></div>
+    <div class="sp-content">
+      <span class="kicker sp-kicker fx-up" data-at="700" data-once>Cam Lâm · Khánh Hòa</span>
+      <h3 class="sp-title a-punch" data-at="900" data-once>Làng biển<br>bình yên</h3><br>
+      <div class="sp-slogan-wrap"><p class="sp-slogan a-slide" data-at="1480" data-once><span class="dash"></span>Gần biển · Gần cảng · Gần sân bay</p><span class="sp-track" aria-hidden="true"></span><span class="flare a-flare" data-at="1650" aria-hidden="true"></span></div>
+      <div class="sp-cta2 a-cta" data-at="2020" data-once><a class="cta a-beat" data-at="2600,3650" href="#">Khám phá thêm</a></div>
+    </div>
+  </div>
+  <ul class="notes">
+    <li><b>Bố cục</b> chữ bên trái trên nền tối có lưới + hạt sáng; ảnh bên phải có mép lượn sóng chạy chéo từ dưới trái lên trên phải như một bờ biển, phía sau là 3 dải sóng song song đậm dần</li>
+    <li><b>Sóng chạy</b> mép ảnh, viền trắng và 3 dải cùng dùng 1 clipPath nên luôn song song; sóng trôi chậm một vòng 9 s</li>
+    <li><b>Ảnh thật</b> chiếm hơn nửa banner (1060×620), thấy trọn bến thuyền và núi; chỉ phóng rất nhẹ 1 → 1,05 trong 16 s</li>
+    <li><b>0 s</b> ảnh cùng 3 dải sóng trượt vào từ phải; 2 dải trong "thở" sáng lên nhẹ; logo hiện ở góc trên trái</li>
+    <li><b>0,9 s</b> tiêu đề đập, <b>1,48 s</b> slogan trượt, <b>1,65 s</b> vệt sáng, <b>2,6 s</b> CTA đập tim (nhịp Agent Awards)</li>
+    <li>Nền lưới nét đứt ô 128u có dấu + màu ở giao điểm; khoảng 120 hạt sáng li ti bay lên như banner gốc (70% chấm 1–2 px, 25% chấm có quầng, 5% đốm lớn)</li>
+  </ul>
+  <p class="credit">Ảnh: <a href="https://www.pexels.com/photo/scenic-fishing-harbor-in-vietnam-with-boats-38767143/" target="_blank" rel="noopener">Thái Thiện Thanh, Pexels</a> — cảng cá, địa điểm ghi: Cam Ranh.</p>
+</section>
+
+<!-- ============ A3 ============ -->
+<section class="item" id="a3">
+  <div class="item-head"><h2><span class="num">3</span> · Chữ khổng lồ chứa ảnh</h2>
+    <div class="tags"><span class="tag">Photo-in-text knockout</span><span class="tag">background-clip: text</span><span class="tag">Zoom-through transition</span><span class="tag">Circle reveal</span></div>
+    <button class="btn replay" type="button">↻ Phát lại</button></div>
+  <div class="banner st-knock" data-cycle="9000" style="--img:url('https://images.unsplash.com/photo-1630471300276-e454cff47e02?w=2000&q=75&auto=format&fit=crop')">
+    <div class="kc-full custom-out" data-at="5200" data-out="8300"><i class="bgimg" style="background-image:var(--img)"></i><p class="kc-cap">Hoàng hôn trên vịnh</p></div>
+    <div class="kc-wrap" data-at="5200">
+      <h3 class="kc-text" data-at="150">HOÀNG HÔN</h3>
+      <p class="kc-sub fx-up" data-at="900" data-out="5000">Những buổi chiều bình yên bên biển Cam Lâm</p>
+      <div class="kc-cta fx-pop" data-at="1300" data-out="5000"><a class="cta" href="#">Xem khu vực <span aria-hidden="true">→</span></a></div>
+    </div>
+  </div>
+  <ul class="notes">
+    <li><b>0,15 s</b> chữ khổng lồ hiện ra, khoảng chữ khép lại; ảnh hoàng hôn trôi chậm bên trong nét chữ</li>
+    <li><b>Kỹ thuật</b> background-image + background-clip: text, nền đen để chữ nổi</li>
+    <li><b>5,2 s</b> "lao xuyên qua chữ": chữ phóng 15 lần và mờ đi (ease-in mạnh)</li>
+    <li><b>5,9 s</b> ảnh đầy đủ mở ra từ tâm (clip-path circle), dòng chữ viết tay xuất hiện</li>
+    <li><b>8,3 s</b> ảnh mờ đi, vòng mới bắt đầu lại từ chữ (chu kỳ 9 s)</li>
+    <li>Hợp cho slide thương hiệu, sự kiện, tên dự án ngắn</li>
+  </ul>
+  <p class="credit">Ảnh: <a href="https://unsplash.com/photos/ql0eZmafwq0" target="_blank" rel="noopener">Dũng Huỳnh, Unsplash</a> — địa điểm ghi: vịnh Cam Ranh.</p>
+</section>
+
+<!-- ============ A4 ============ -->
+<section class="item" id="a4">
+  <div class="item-head"><h2><span class="num">4</span> · Chữ nằm sau núi</h2>
+    <div class="tags"><span class="tag">Depth text (text behind subject)</span><span class="tag">SVG clip layers</span><span class="tag">Cinemagraph sky</span><span class="tag">Rise from behind</span></div>
+    <button class="btn replay" type="button">↻ Phát lại</button></div>
+  <div class="banner st-depth" data-cycle="10000">
+    <svg class="fill-svg" viewBox="0 0 1000 301" preserveAspectRatio="xMidYMid slice" aria-label="Chữ CAM LÂM nằm sau dãy núi">
+      <defs>
+        <clipPath id="ridgeClip"><path d="M0 145L23 142L54 140L99 143L130 139L176 145L191 147L260 148L298 154L329 148L360 151L398 147L436 145L482 146L513 150L551 147L574 140L593 134L612 132L635 133L658 137L681 145L711 150L742 147L780 140L818 137L864 136L910 134L956 135L1000 136V301H0Z"/></clipPath>
+        <clipPath id="skyClip"><path d="M0 0H1000V136L956 135L910 134L864 136L818 137L780 140L742 147L711 150L681 145L658 137L635 133L612 132L593 134L574 140L551 147L513 150L482 146L436 145L398 147L360 151L329 148L298 154L260 148L191 147L176 145L130 139L99 143L54 140L23 142L0 145Z"/></clipPath>
+        <linearGradient id="dpG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#fef3c7"/></linearGradient>
+        <filter id="dpShadow" x="-10%" y="-20%" width="120%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0b1d36" flood-opacity=".35"/></filter>
+      </defs>
+      <image href="https://images.pexels.com/photos/14024133/pexels-photo-14024133.jpeg?auto=compress&cs=tinysrgb&w=2400" width="1000" height="301" preserveAspectRatio="none"/>
+      <g clip-path="url(#skyClip)"><image class="dp-sky" href="https://images.pexels.com/photos/14024133/pexels-photo-14024133.jpeg?auto=compress&cs=tinysrgb&w=2400" width="1000" height="301" preserveAspectRatio="none"/></g>
+      <g class="dp-text" data-at="500" data-once filter="url(#dpShadow)"><text x="485" y="151" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="118" font-weight="900" letter-spacing="-3" word-spacing="14" fill="url(#dpG)">CAM LÂM</text></g>
+      <g clip-path="url(#ridgeClip)"><image href="https://images.pexels.com/photos/14024133/pexels-photo-14024133.jpeg?auto=compress&cs=tinysrgb&w=2400" width="1000" height="301" preserveAspectRatio="none"/></g>
+    </svg>
+    <div class="layer dp-shade"></div>
+    <div class="dp-content">
+      <div><span class="kicker dp-kicker fx-up" data-at="1500" data-once>Tựa sơn · hướng hải</span>
+        <p class="dp-sub fx-up" data-at="1700" data-once>Lưng tựa núi xanh, mặt hướng biển lớn – Cam Lâm, đất lành để an cư và thịnh vượng</p></div>
+      <div class="fx-pop" data-at="2100" data-once><a class="cta" href="#">Khám phá <span aria-hidden="true">→</span></a></div>
+    </div>
+  </div>
+  <ul class="notes">
+    <li><b>3 lớp SVG</b> ảnh đầy đủ → chữ → bản sao ảnh cắt theo đường sống núi đặt lên trên, nên chữ như nằm sau núi</li>
+    <li><b>Đường sống núi</b> vẽ tay 32 điểm theo ảnh; cùng hệ tọa độ SVG nên luôn khớp khi co giãn</li>
+    <li><b>0,5 s</b> chữ trồi lên từ sau núi như mặt trời mọc (1,9 s, expo-out); chân chữ đặt đúng đường chân trời để đỉnh núi che một phần chữ Â, M mà vẫn đọc rõ</li>
+    <li><b>Liên tục</b> riêng phần trời được dịch và phóng rất chậm → mây như trôi, núi đứng yên (cinemagraph)</li>
+    <li>Làm được với mọi ảnh có tiền cảnh rõ: núi, tòa nhà, hàng cây, người</li>
+    <li>Ảnh toàn cảnh tỉ lệ 3,3:1 gần bằng tỉ lệ banner nên gần như không bị cắt</li>
+  </ul>
+  <p class="credit">Ảnh: <a href="https://www.pexels.com/photo/an-aerial-shot-of-mountains-covered-with-trees-14024133/" target="_blank" rel="noopener">Quang Nguyen Vinh, Pexels</a> — ảnh không ghi địa điểm (kết quả tìm "Khánh Hòa"), phỏng đoán khu vực lân cận.</p>
+</section>
+
+<!-- ============ A5 ============ -->
+<section class="item" id="a5">
+  <div class="item-head"><h2><span class="num">5</span> · Ảnh đen trắng → màu thật</h2>
+    <div class="tags"><span class="tag">Black &amp; white → color</span><span class="tag">Diagonal wipe</span><span class="tag">Glowing edge</span><span class="tag">Split screen</span></div>
+    <button class="btn replay" type="button">↻ Phát lại</button></div>
+  <div class="banner st-duo" data-cycle="10000">
+    <i class="bgimg du-duo kb-slow" style="background-image:url('https://images.pexels.com/photos/29924313/pexels-photo-29924313.jpeg?auto=compress&cs=tinysrgb&w=2000');background-position:center 62%"></i>
+    <div class="layer du-anim custom-out" data-at="0">
+      <div class="layer du-color"><i class="bgimg kb-slow" style="background-image:url('https://images.pexels.com/photos/29924313/pexels-photo-29924313.jpeg?auto=compress&cs=tinysrgb&w=2000');background-position:center 62%"></i></div>
+      <i class="du-edge" aria-hidden="true"></i>
+    </div>
+    <div class="layer du-shade"></div>
+    <div class="du-content">
+      <span class="kicker fx-up" data-at="300" data-once style="color:#fde68a">Biển xanh · ghềnh đá · nắng vàng</span>
+      <h3 class="du-title lines" data-at="500" data-once><span class="line"><span class="li" style="--i:0">Màu thật</span></span><span class="line"><span class="li hl" style="--i:1">của biển</span></span></h3>
+      <p class="du-sub fx-up" data-at="1000" data-once>Nước trong, đá đẹp, trời xanh –<br>thiên nhiên còn nguyên vẹn ngay gần nhà bạn.</p>
+      <div class="fx-pop" data-at="1400" data-once><a class="cta" href="#">Xem tin ven biển <span aria-hidden="true">→</span></a></div>
+    </div>
+  </div>
+  <ul class="notes">
+    <li><b>Hai lớp ảnh</b> lớp dưới đen trắng (CSS grayscale), lớp trên màu thật; đường cắt chéo có viền sáng</li>
+    <li><b>0 → 1,4 s</b> đường cắt chéo quét từ phải vào giữa → nửa đen trắng, nửa màu thật</li>
+    <li><b>3,2 → 4,6 s</b> mở hết ra màu thật và giữ đến 9 s; <b>9 → 10 s</b> thu về đen trắng, lặp lại</li>
+    <li>Chữ nằm trên nửa đen trắng có phủ tối nên luôn dễ đọc</li>
+    <li>Câu chuyện "màu thật của biển" hiện ra đúng lúc ảnh chuyển từ đen trắng sang màu</li>
+    <li>Toàn bộ chuyển cảnh nằm trong 1 keyframe dài 10 s, không cần JS</li>
+  </ul>
+  <p class="credit">Ảnh: <a href="https://www.pexels.com/photo/scenic-rocky-beach-in-cam-ranh-vietnam-29924313/" target="_blank" rel="noopener">Đi Ngao Du, Pexels</a> — địa điểm ghi: Thành phố Cam Ranh.</p>
+</section>
+
+<!-- ============ A6 ============ -->
+<section class="item" id="a6">
+  <div class="item-head"><h2><span class="num">6</span> · Cắt dán polaroid</h2>
+    <div class="tags"><span class="tag">Photo collage</span><span class="tag">Drop + bounce</span><span class="tag">Idle float</span><span class="tag">Spotlight rotation</span><span class="tag">Handwritten captions</span></div>
+    <button class="btn replay" type="button">↻ Phát lại</button></div>
+  <div class="banner st-pol" data-cycle="8000">
+    <div class="layer pl-paper"></div>
+    <div class="pl-text">
+      <span class="kicker pl-kicker fx-up" data-at="100" data-once>Cuộc sống ở Cam Lâm</span>
+      <h3 class="pl-title lines" data-at="250" data-once><span class="line"><span class="li" style="--i:0">Những ngày bình yên</span></span><span class="line"><span class="li" style="--i:1">ở <em>Cam Lâm</em></span></span></h3>
+      <p class="pl-sub fx-up" data-at="800" data-once>Sáng ra đồng, chiều ra biển, đi đâu cũng gần – cuộc sống thong thả giữa thiên nhiên trong lành.</p>
+      <div class="fx-pop" data-at="1200" data-once><a class="cta navy" href="#">Xem khu vực <span aria-hidden="true">→</span></a></div>
+    </div>
+    <div class="pol p1" style="--r:-7deg;--f:7s;left:44%;top:9%" data-at="300" data-once><i class="tape"></i><i class="ph" style="background-image:url('https://images.pexels.com/photos/35995788/pexels-photo-35995788.jpeg?auto=compress&cs=tinysrgb&w=800')"></i><b>Mùa gặt Cam Lâm</b></div>
+    <div class="pol p2" style="--r:5deg;--f:6s;left:58%;top:34%" data-at="480" data-once><i class="tape"></i><i class="ph" style="background-image:url('https://images.pexels.com/photos/16762187/pexels-photo-16762187.jpeg?auto=compress&cs=tinysrgb&w=800')"></i><b>Ra khơi</b></div>
+    <div class="pol p3" style="--r:-3deg;--f:8s;left:69%;top:5%" data-at="660" data-once><i class="tape"></i><i class="ph" style="background-image:url('https://images.pexels.com/photos/31312494/pexels-photo-31312494.jpeg?auto=compress&cs=tinysrgb&w=800');background-size:112%"></i><b>Đồi ven biển</b></div>
+    <div class="pol p4" style="--r:8deg;--f:6.5s;left:81%;top:28%" data-at="840" data-once><i class="tape"></i><i class="ph" style="background-image:url('https://images.unsplash.com/photo-1580698872460-261e00561f35?w=800&q=70&auto=format&fit=crop');background-position:center 30%"></i><b>Máy bay hạ cánh</b></div>
+    <i class="hook" data-at="3000,5500" data-hook="polfocus" hidden></i>
+  </div>
+  <ul class="notes">
+    <li><b>0,3 → 0,84 s</b> 4 tấm ảnh rơi xuống lần lượt (cách 180 ms), xoay −24° rồi nảy về góc nghiêng riêng</li>
+    <li><b>Sau đó</b> mỗi tấm trôi nhẹ, xoay thêm 2° với chu kỳ khác nhau (6–8 s) nên không đồng loạt</li>
+    <li><b>3 s · 5,5 s</b> lần lượt đưa một tấm lên trước và phóng 1,08 (spotlight)</li>
+    <li>Băng dính giấy, viền trắng, chú thích viết tay tạo cảm giác "ảnh thật của người thật"</li>
+    <li>Rê chuột lên một tấm để nhấc nó lên</li>
+    <li>Hợp để giới thiệu khu vực, đời sống, tiện ích xung quanh</li>
+  </ul>
+  <p class="credit">Ảnh: <a href="https://www.pexels.com/photo/aerial-view-of-rice-fields-in-cam-lam-vietnam-35995788/" target="_blank" rel="noopener">Hữu Thịnh 79</a> (đồng lúa, địa điểm ghi: <b>Cam Lâm</b>), <a href="https://www.pexels.com/photo/motorboat-on-wavy-sea-coast-16762187/" target="_blank" rel="noopener">Bắp Studio</a> (vịnh Cam Ranh), <a href="https://www.pexels.com/photo/scenic-coastal-view-of-cam-ranh-vietnam-31312494/" target="_blank" rel="noopener">Linh Bo</a> (Cam Ranh) — Pexels; <a href="https://unsplash.com/photos/Jorrzdrn3C0" target="_blank" rel="noopener">Tony Pham</a> (bãi biển cạnh sân bay Cam Ranh) — Unsplash.</p>
+</section>
+
+<!-- ============ A7 ============ -->
+<section class="item" id="a7">
+  <div class="item-head"><h2><span class="num">7</span> · Ô tròn + vòng quay</h2>
+    <div class="tags"><span class="tag">Circle photo bubbles</span><span class="tag">Rotating dashed rings</span><span class="tag">Orbiting icon</span><span class="tag">Flight path draw</span></div>
+    <button class="btn replay" type="button">↻ Phát lại</button></div>
+  <div class="banner st-bub" data-cycle="12000">
+    <svg class="fill-svg bb-paths" viewBox="0 0 1920 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g class="grp" data-at="300" data-once>
+        <path class="draw" pathLength="1" style="--dur:1800" d="M-40 560C300 420 600 540 980 380S1500 60 1960 120"/>
+        <path class="draw" pathLength="1" style="--d:300;--dur:1800" d="M-40 470C360 330 700 470 1040 300S1560 -20 1960 40"/>
+      </g>
+    </svg>
+    <svg class="bb-rings" viewBox="0 0 640 640" aria-hidden="true"><circle class="ring-a" cx="320" cy="320" r="292"/><circle class="ring-b" cx="320" cy="320" r="312"/></svg>
+    <div class="bb-circle bb-big" data-at="200" data-once style="--f:6s"><i class="bgimg" style="background-image:url('https://images.unsplash.com/photo-1580698872460-261e00561f35?w=1200&q=75&auto=format&fit=crop')"></i></div>
+    <div class="bb-orbit" aria-hidden="true"><svg class="bb-plane" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" fill="#1d4ed8"/></svg></div>
+    <div class="bb-circle bb-s1" data-at="600" data-once><i class="bgimg" style="background-image:url('https://images.unsplash.com/photo-1597334315458-01a0d58ba0ec?w=600&q=75&auto=format&fit=crop');background-position:center 52%"></i></div>
+    <div class="bb-circle bb-s2" data-at="800" data-once><i class="bgimg" style="background-image:url('https://images.pexels.com/photos/27606028/pexels-photo-27606028.jpeg?auto=compress&cs=tinysrgb&w=600')"></i></div>
+    <div class="bb-text">
+      <span class="kicker bb-kicker fx-up" data-at="100" data-once>Vị trí</span>
+      <h3 class="bb-title lines" data-at="250" data-once><span class="line"><span class="li" style="--i:0">Kết nối</span></span><span class="line"><span class="li" style="--i:1">sân bay quốc tế</span></span></h3>
+      <p class="bb-sub fx-up" data-at="800" data-once>Từ Cam Lâm ra sân bay quốc tế chỉ một quãng đường ngắn, đi lại và đón khách đều thuận tiện.</p>
+      <div class="fx-pop" data-at="1200" data-once><a class="cta navy shine" href="#">Xem khu vực <span aria-hidden="true">→</span></a></div>
+    </div>
+  </div>
+  <ul class="notes">
+    <li><b>0,2 / 0,6 / 0,8 s</b> 3 ô tròn bật ra (back-out) rồi nhấp nhô nhẹ với chu kỳ khác nhau</li>
+    <li><b>0,3 s</b> 2 đường bay nét đứt tự vẽ trên nền trời</li>
+    <li><b>Liên tục</b> 2 vòng nét đứt quay ngược chiều (40 s / 60 s), máy bay nhỏ bay vòng quanh ảnh (16 s)</li>
+    <li>Ảnh dọc (máy bay hạ cánh) cắt tròn vừa khít, không cần ảnh ngang</li>
+    <li>Viền trắng dày + bóng đổ làm ảnh tách khỏi nền như sticker</li>
+    <li>Hợp để nói về vị trí, kết nối, tiện ích xung quanh</li>
+  </ul>
+  <p class="credit">Ảnh: <a href="https://unsplash.com/photos/Jorrzdrn3C0" target="_blank" rel="noopener">Tony Pham</a> ("Sunset vibes", sân bay Cam Ranh, Cam Nghĩa) và <a href="https://unsplash.com/photos/6FuwHPJjwEk" target="_blank" rel="noopener">Tony Pham</a> (nhà ga quốc tế Cam Ranh) — Unsplash; <a href="https://www.pexels.com/photo/a-sandy-beach-with-mountains-in-the-background-27606028/" target="_blank" rel="noopener">Dương Nhân</a> (Cam Ranh) — Pexels.</p>
+</section>
+
+<!-- ============ A8 ============ -->
+<section class="item" id="a8">
+  <div class="item-head"><h2><span class="num">8</span> · Ảnh cắt lát ráp lại</h2>
+    <div class="tags"><span class="tag">Slice reveal</span><span class="tag">Staggered strips</span><span class="tag">Two-photo transition</span><span class="tag">Angled panel</span></div>
+    <button class="btn replay" type="button">↻ Phát lại</button></div>
+  <div class="banner st-slice" data-cycle="10000">
+    <div class="layer sl-b"><i class="bgimg" style="background-image:url('https://images.pexels.com/photos/27606028/pexels-photo-27606028.jpeg?auto=compress&cs=tinysrgb&w=2000')"></i></div>
+    <div class="layer sl-a custom-out" data-at="0" data-out="5000">
+      <div class="sl" style="--i:0;--dir:-1"><i style="background-image:url('https://images.pexels.com/photos/13415305/pexels-photo-13415305.png?auto=compress&cs=tinysrgb&w=2000')"></i></div>
+      <div class="sl" style="--i:1;--dir:1"><i style="background-image:url('https://images.pexels.com/photos/13415305/pexels-photo-13415305.png?auto=compress&cs=tinysrgb&w=2000')"></i></div>
+      <div class="sl" style="--i:2;--dir:-1"><i style="background-image:url('https://images.pexels.com/photos/13415305/pexels-photo-13415305.png?auto=compress&cs=tinysrgb&w=2000')"></i></div>
+      <div class="sl" style="--i:3;--dir:1"><i style="background-image:url('https://images.pexels.com/photos/13415305/pexels-photo-13415305.png?auto=compress&cs=tinysrgb&w=2000')"></i></div>
+      <div class="sl" style="--i:4;--dir:-1"><i style="background-image:url('https://images.pexels.com/photos/13415305/pexels-photo-13415305.png?auto=compress&cs=tinysrgb&w=2000')"></i></div>
+      <div class="sl" style="--i:5;--dir:1"><i style="background-image:url('https://images.pexels.com/photos/13415305/pexels-photo-13415305.png?auto=compress&cs=tinysrgb&w=2000')"></i></div>
+      <div class="sl" style="--i:6;--dir:-1"><i style="background-image:url('https://images.pexels.com/photos/13415305/pexels-photo-13415305.png?auto=compress&cs=tinysrgb&w=2000')"></i></div>
+      <div class="sl" style="--i:7;--dir:1"><i style="background-image:url('https://images.pexels.com/photos/13415305/pexels-photo-13415305.png?auto=compress&cs=tinysrgb&w=2000')"></i></div>
+    </div>
+    <div class="sl-panel" data-at="150" data-once>
+      <span class="kicker sl-kicker">Kết nối</span>
+      <h3 class="sl-title">Cung đường<br>ven biển</h3>
+      <p class="sl-sub">Vừa đi vừa ngắm núi, ngắm biển – đường về Cam Lâm đẹp như một bức tranh.</p>
+      <a class="cta navy" href="#">Xem tuyến đường <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+  <ul class="notes">
+    <li><b>0 s</b> 8 lát ảnh con đường ven biển trượt vào so le: lát chẵn từ dưới, lát lẻ từ trên, trễ 70 ms mỗi lát</li>
+    <li><b>5 s</b> các lát rút đi theo hướng ngược lại (ease-in mạnh) để lộ ảnh thứ hai: bãi cát và núi</li>
+    <li><b>10 s</b> vòng lặp: lát ảnh 1 trượt vào che ảnh 2</li>
+    <li><b>Kỹ thuật</b> mỗi lát là 1 khung hẹp chứa ảnh rộng gấp 8 lần, dịch trái theo chỉ số lát → ghép lại liền mạch</li>
+    <li><b>0,15 s</b> tấm trắng cắt chéo trượt vào từ trái chứa chữ, không cần phủ tối ảnh</li>
+    <li>Số lát và hướng trượt chỉnh bằng biến --i, --dir</li>
+  </ul>
+  <p class="credit">Ảnh: <a href="https://www.pexels.com/photo/an-aerial-shot-of-a-highway-by-the-ocean-13415305/" target="_blank" rel="noopener">Đào Thân, Pexels</a> (không ghi địa điểm — phỏng đoán đường ven biển Khánh Hòa) và <a href="https://www.pexels.com/photo/a-sandy-beach-with-mountains-in-the-background-27606028/" target="_blank" rel="noopener">Dương Nhân, Pexels</a> (Cam Ranh).</p>
+</section>
+
+<!-- ============ A9 ============ -->
+<section class="item" id="a9">
+  <div class="item-head"><h2><span class="num">9</span> · Thẻ kính UI nổi trên ảnh</h2>
+    <div class="tags"><span class="tag">Glassmorphism cards</span><span class="tag">Chat bubbles + typing</span><span class="tag">Toast notification</span><span class="tag">Mouse parallax</span></div>
+    <button class="btn replay" type="button">↻ Phát lại</button></div>
+  <div class="banner st-ui" data-cycle="12000">
+    <i class="bgimg ui-img kb-slow" style="background-image:url('https://images.pexels.com/photos/27606028/pexels-photo-27606028.jpeg?auto=compress&cs=tinysrgb&w=2000')"></i>
+    <div class="layer ui-shade"></div>
+    <div class="ui-text">
+      <span class="kicker fx-up" data-at="100" data-once style="color:#bae6fd">Tìm đất ven biển</span>
+      <h3 class="ui-title lines" data-at="250" data-once><span class="line"><span class="li" style="--i:0">Hỏi là có</span></span><span class="line"><span class="li" style="--i:1">câu trả lời</span></span></h3>
+      <p class="ui-sub fx-up" data-at="800" data-once>Tìm đất, xem bản đồ, nhắn tư vấn – mọi thứ gói gọn trong một chạm.</p>
+      <div class="fx-pop" data-at="1200" data-once><a class="cta" href="#">Nhắn tư vấn <span aria-hidden="true">→</span></a></div>
+    </div>
+    <div class="glass ui-toast" data-at="600" data-out="4400"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>Có 3 tin đăng mới gần biển hôm nay</div>
+    <div class="glass pop ui-listing" data-at="900" data-once><i class="ui-thumb" style="background-image:url('https://images.pexels.com/photos/29924313/pexels-photo-29924313.jpeg?auto=compress&cs=tinysrgb&w=400')"></i><div><b>Đất ven biển · 250 m²</b><span>Khu vực Cam Lâm, Khánh Hòa</span><em class="ui-price">Liên hệ</em></div></div>
+    <div class="ui-chat">
+      <div class="bub me" data-at="1700" data-out="11300">Lô này còn không ạ?</div>
+      <div class="typing custom-out" data-at="2300" data-out="3400"><i></i><i></i><i></i></div>
+      <div class="bub bot" data-at="3400" data-out="11300">Còn ạ, mời anh chị đi xem đất.</div>
+    </div>
+    <div class="glass pop ui-map" data-at="1300" data-once>
+      <svg viewBox="0 0 276 150" aria-hidden="true"><rect width="276" height="150" fill="#e0f2fe"/><path d="M0 110C60 96 120 120 180 100S250 70 276 76V150H0Z" fill="#7dd3fc"/><path d="M0 70H276M90 0V150M190 0V150" stroke="#fff" stroke-width="6"/><path d="M30 20h40v34H30zM110 16h60v38h-60zM200 20h56v34h-56z" fill="#bbf7d0"/><g transform="translate(140 76)"><circle r="16" fill="#2563eb" opacity=".2"/><path d="M0 8C-6 1-10-4-10-10a10 10 0 0 1 20 0c0 6-4 11-10 18z" fill="#2563eb"/><circle cy="-10" r="4" fill="#fff"/></g></svg>
+      <p>Cách biển khoảng 300 m</p>
+    </div>
+  </div>
+  <ul class="notes">
+    <li><b>0,6 s</b> thông báo trượt xuống từ trên (toast), tự ẩn ở 4,4 s</li>
+    <li><b>0,9 / 1,3 s</b> thẻ tin đăng và thẻ bản đồ bật ra dạng kính mờ (backdrop-filter blur 14px)</li>
+    <li><b>1,7 s</b> tin nhắn khách → <b>2,3 s</b> dấu "đang gõ" → <b>3,4 s</b> câu trả lời</li>
+    <li><b>Chuột</b> các thẻ dịch theo chiều sâu khác nhau (thẻ bản đồ gần hơn, dịch nhiều hơn)</li>
+    <li>Mọi thẻ nhấp nhô nhẹ với chu kỳ riêng để trông "sống"</li>
+    <li>Hợp để quảng bá tính năng: nhắn tin, bản đồ, thông báo tin mới</li>
+  </ul>
+  <p class="credit">Ảnh nền: <a href="https://www.pexels.com/photo/a-sandy-beach-with-mountains-in-the-background-27606028/" target="_blank" rel="noopener">Dương Nhân, Pexels</a> (Cam Ranh); ảnh nhỏ: <a href="https://www.pexels.com/photo/scenic-rocky-beach-in-cam-ranh-vietnam-29924313/" target="_blank" rel="noopener">Đi Ngao Du, Pexels</a>.</p>
+</section>
+
+<!-- ============ A10 ============ -->
+<section class="item" id="a10">
+  <div class="item-head"><h2><span class="num">10</span> · Bản đồ vẽ lên ảnh flycam</h2>
+    <div class="tags"><span class="tag">Parcel overlay on aerial</span><span class="tag">Line drawing</span><span class="tag">Drone HUD</span><span class="tag">Measure count-up</span><span class="tag">Scan line</span></div>
+    <button class="btn replay" type="button">↻ Phát lại</button></div>
+  <div class="banner st-fly" data-cycle="11000">
+    <svg class="fill-svg" viewBox="0 0 1000 750" preserveAspectRatio="xMidYMid slice" aria-label="Ảnh flycam đồng lúa Cam Lâm có vẽ ranh thửa">
+      <defs><linearGradient id="flScanG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bef264" stop-opacity="0"/><stop offset=".5" stop-color="#bef264" stop-opacity=".45"/><stop offset="1" stop-color="#bef264" stop-opacity="0"/></linearGradient></defs>
+      <image href="https://images.pexels.com/photos/35995788/pexels-photo-35995788.jpeg?auto=compress&cs=tinysrgb&w=2000" width="1000" height="750" preserveAspectRatio="none"/>
+      <rect width="1000" height="750" fill="rgba(0,0,0,.12)"/>
+      <!-- Ranh thửa dò theo bờ ruộng thật trong ảnh (hệ tọa độ 1000×750 = ảnh 2000×1500 / 2) -->
+      <g class="fl-fill" data-at="1700" data-once>
+        <path style="--d:0" fill="rgba(250,204,21,.2)" d="M258 8L320 26L407 50L500 70L580 82L640 92L700 108L650 150L600 185L550 226L500 254L434 292L378 330L321 298L258 264L201 236L150 198L148 150L140 120L134 101L158 72L205 40Z"/>
+        <path style="--d:120" fill="rgba(190,242,100,.2)" d="M700 108L730 86L760 72L800 60L850 50L900 45L1000 38L1000 318L950 284L900 247L850 214L800 181L750 148Z"/>
+        <path style="--d:240" fill="rgba(190,242,100,.2)" d="M0 207L60 203L100 202L150 198L201 236L258 264L321 298L378 330L362 366L346 390L300 412L250 432L202 452L150 457L100 467L50 482L0 497Z"/>
+        <path style="--d:360" fill="rgba(250,204,21,.2)" d="M370 421L400 430L460 444L500 458L560 474L600 486L650 502L710 524L722 550L740 598L760 635L790 675L820 715L840 750L350 750L330 675L312 625L300 580L285 524L282 475L300 455L330 430Z"/>
+        <path style="--d:480" fill="rgba(190,242,100,.2)" d="M710 524L760 506L800 486L850 469L900 453L950 437L1000 420L1000 750L840 750L820 715L790 675L760 635L740 598L722 550Z"/>
+        <path style="--d:600" fill="rgba(250,204,21,.2)" d="M0 497L50 482L100 467L150 457L202 452L230 520L254 600L275 680L290 750L0 750Z"/>
+      </g>
+      <g class="grp fl-parcels" data-at="500" data-once>
+        <path class="draw" pathLength="1" style="--d:0;--dur:1000" d="M700 108L750 148L800 181L850 214L900 247L950 284L1000 318L1000 420L950 437L900 453L850 469L800 486L760 506L710 524L650 502L600 486L560 474L500 458L460 444L400 430L370 421L346 390L362 366L378 330L434 292L500 254L550 226L600 185L650 150Z"/>
+        <path class="draw" pathLength="1" style="--d:120;--dur:1000" d="M258 8L320 26L407 50L500 70L580 82L640 92L700 108L650 150L600 185L550 226L500 254L434 292L378 330L321 298L258 264L201 236L150 198L148 150L140 120L134 101L158 72L205 40Z"/>
+        <path class="draw" pathLength="1" style="--d:240;--dur:1000" d="M700 108L730 86L760 72L800 60L850 50L900 45L1000 38L1000 318L950 284L900 247L850 214L800 181L750 148Z"/>
+        <path class="draw" pathLength="1" style="--d:360;--dur:1000" d="M370 421L400 430L460 444L500 458L560 474L600 486L650 502L710 524L722 550L740 598L760 635L790 675L820 715L840 750L350 750L330 675L312 625L300 580L285 524L282 475L300 455L330 430Z"/>
+        <path class="draw" pathLength="1" style="--d:480;--dur:1000" d="M710 524L760 506L800 486L850 469L900 453L950 437L1000 420L1000 750L840 750L820 715L790 675L760 635L740 598L722 550Z"/>
+        <path class="draw" pathLength="1" style="--d:600;--dur:1000" d="M0 207L60 203L100 202L150 198L201 236L258 264L321 298L378 330L362 366L346 390L300 412L250 432L202 452L150 457L100 467L50 482L0 497Z"/>
+        <path class="draw" pathLength="1" style="--d:720;--dur:1000" d="M0 497L50 482L100 467L150 457L202 452L230 520L254 600L275 680L290 750L0 750Z"/>
+      </g>
+      <path class="fl-hl" data-at="2600" data-once d="M700 108L750 148L800 181L850 214L900 247L950 284L1000 318L1000 420L950 437L900 453L850 469L800 486L760 506L710 524L650 502L600 486L560 474L500 458L460 444L400 430L370 421L346 390L362 366L378 330L434 292L500 254L550 226L600 185L650 150Z"/>
+      <g class="fl-lbl" data-at="2300" data-once font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="800" fill="#fff" text-anchor="middle" style="paint-order:stroke;stroke:rgba(0,0,0,.45);stroke-width:4px">
+        <text x="440" y="250">Thửa 126</text><text x="560" y="515">Thửa 134</text><text x="900" y="510">Thửa 135</text>
+      </g>
+      <!-- Nét kích thước song song cạnh thửa, cách cạnh 14 đơn vị, 2 vạch chặn vuông góc -->
+      <g class="fl-measure" data-at="3300" data-once>
+        <path class="dim" pathLength="1" d="M705 511L945 424"/>
+        <path class="tick" d="M707.7 518.5L702.3 503.5M947.7 431.5L942.3 416.5"/>
+        <text class="count-txt" x="818" y="449" transform="rotate(-19.9 818 449)" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="800" fill="#fff" text-anchor="middle" style="paint-order:stroke;stroke:rgba(0,0,0,.55);stroke-width:5px" data-count="14" data-pre="≈ " data-suf=" m">≈ 14 m</text>
+      </g>
+      <g class="fl-card" data-at="3000" data-once font-family="Inter, system-ui, sans-serif">
+        <rect x="748" y="248" width="240" height="104" rx="14" fill="rgba(15,23,42,.88)" stroke="rgba(251,191,36,.6)"/>
+        <text x="766" y="281" fill="#fde68a" font-size="21" font-weight="800">Thửa 128 · Tờ 7</text>
+        <text x="766" y="310" fill="#e2e8f0" font-size="16">Đất trồng lúa (LUC)</text>
+        <text x="766" y="336" fill="#e2e8f0" font-size="16">Diện tích ~600 m²</text>
+      </g>
+      <g class="fl-scan" data-at="4800"><rect x="0" y="-40" width="1000" height="80" fill="url(#flScanG)"/><rect x="0" y="-1" width="1000" height="2" fill="#d9f99d"/></g>
+    </svg>
+    <div class="layer fl-shade"></div>
+    <div class="hud" aria-hidden="true"><i></i><i></i><i></i><i></i><span class="rec">REC · ALT 30 m</span><span class="cross"></span></div>
+    <div class="fl-text">
+      <span class="kicker fl-kicker fx-up" data-at="100" data-once>Ảnh flycam · Cam Lâm</span>
+      <h3 class="fl-title lines" data-at="250" data-once><span class="line"><span class="li" style="--i:0">Xem ranh thửa</span></span><span class="line"><span class="li" style="--i:1">trên ảnh thật</span></span></h3>
+      <p class="fl-sub fx-up" data-at="800" data-once>Ranh thửa, loại đất và kích thước hiện ngay trên ảnh chụp từ trên cao, nhìn là hiểu.</p>
+      <div class="fx-pop" data-at="1200" data-once><a class="cta" href="#">Mở bản đồ <span aria-hidden="true">→</span></a></div>
+    </div>
+  </div>
+  <ul class="notes">
+    <li><b>Ảnh</b> đồng lúa Cam Lâm chụp bằng flycam (địa điểm ghi đúng Cam Lâm)</li>
+    <li><b>0,5 s</b> 7 ranh thửa tự vẽ, dò tay theo từng dải cỏ bờ ruộng trong ảnh (lưới tọa độ phóng to 2–3 lần), trễ 120 ms mỗi thửa</li>
+    <li><b>1,7 s</b> tô màu nhạt: vàng = lúa chín chưa gặt, xanh = ruộng khác; <b>2,3 s</b> hiện số thửa</li>
+    <li><b>2,6 s</b> thửa đang gặt (có máy gặt và người) nhấp nháy viền vàng; <b>3,0 s</b> thẻ thông tin bật ra</li>
+    <li><b>3,3 s</b> nét kích thước kiểu bản vẽ CAD chạy dọc cạnh thửa, số mét đếm dần. Chiều dài ≈ 14 m đo trên ảnh theo tỉ lệ: máy gặt (dài ~5 m) chiếm ~92 đơn vị ảnh → ~0,054 m/đơn vị; <b>4,8 s</b> tia quét dọc</li>
+    <li><b>HUD</b> góc khung, chữ thập, REC nhấp nháy tạo cảm giác đang xem flycam</li>
+  </ul>
+  <p class="credit">Ảnh: <a href="https://www.pexels.com/photo/aerial-view-of-rice-fields-in-cam-lam-vietnam-35995788/" target="_blank" rel="noopener">Hữu Thịnh 79, Pexels</a> — "rice fields and farmers at work in Cam Lâm". Số thửa, tờ bản đồ là mẫu, không phải dữ liệu địa chính thật; chiều dài cạnh và diện tích ước lượng từ tỉ lệ ảnh (sai số có thể vài mét).</p>
+</section>
+
+<!-- ============ A11 ============ -->
+<section class="item" id="a11">
+  <div class="item-head"><h2><span class="num">11</span> · Thuần đồ họa khối lồng lớp</h2>
+    <div class="tags"><span class="tag">Pure graphic</span><span class="tag">Stepped rounded panels</span><span class="tag">Grid + plus markers</span><span class="tag">Fireflies</span><span class="tag">Heartbeat CTA</span></div>
+    <button class="btn replay" type="button">↻ Phát lại</button></div>
+  <div class="banner st-step red" data-cycle="5708">
+    <div class="sp-dark"></div><div class="sp-grid"></div>
+    <canvas class="layer fireflies" aria-hidden="true"></canvas>
+    <div class="shape s-tl" data-at="0" data-once><i class="rg"></i><i class="rg"></i><i class="rg"></i><i class="rg"></i></div>
+    <div class="shape s-bl" data-at="120" data-once><i class="rg"></i><i class="rg"></i><i class="rg"></i><i class="rg"></i>
+      <div class="sp-logo"><svg viewBox="0 0 80 80"><path d="M10 40L40 14l30 26"/><path d="M18 34v32h44V34"/><path d="M32 66V48h16v18"/></svg>Cam Lâm Land<small>Nhà đất &amp; quy hoạch</small></div></div>
+    <div class="shape s-top" data-at="240" data-once><i class="rg"></i><i class="rg"></i><i class="rg"></i><i class="rg"></i></div>
+    <div class="sp-content">
+      <h3 class="sp-title a-punch" data-at="900" data-once>Bản đồ quy hoạch<br>Cam Lâm trong tầm tay</h3><br>
+      <div class="sp-slogan-wrap"><p class="sp-slogan a-slide" data-at="1480" data-once><span class="dash"></span>Tra cứu nhanh · Dễ dùng · Mọi lúc</p><span class="sp-track" aria-hidden="true"></span><span class="flare a-flare" data-at="1650" aria-hidden="true"></span></div>
+    </div>
+    <div class="sp-cta a-cta" data-at="2020" data-once><a class="cta a-beat" data-at="2600,3650" href="#">Khám phá thêm</a></div>
+  </div>
+  <ul class="notes">
+    <li><b>Học từ Agent Awards</b> 3 khối bo góc lồng 4 lớp, khoảng tối góc lõm, lưới nét đứt ô 128u dấu + đỏ, khoảng 120 hạt sáng li ti bay lên (mật độ theo bản gốc)</li>
+    <li><b>Khác bản gốc</b> khối làm bằng CSS (không phải ảnh PNG) nên sắc nét ở mọi kích thước, đổi màu bằng 5 biến</li>
+    <li><b>Nhịp</b> giữ đúng timeline gốc: tiêu đề đập 0,9 s, slogan 1,48 s, vệt sáng 1,65 s, CTA đập tim 2,6 s và 3,65 s</li>
+    <li><b>Lớp giữa</b> "thở" sáng lên 18% theo chu kỳ 4,2 s, lệch pha nhau</li>
+    <li>Đổi .red sang lớp màu khác (xanh ngọc, vàng…) là có bộ nhận diện mới</li>
+    <li>Không cần ảnh nên tải cực nhẹ, hợp làm slide mặc định</li>
+  </ul>
+</section>
+</main>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) document.body.classList.add('static');
+  const slow = () => parseFloat(getComputedStyle(root).getPropertyValue('--slow')) || 1;
+  const hooks = {};
+
+  /* ---------- Bộ lập lịch timeline ---------- */
+  class Timeline {
+    constructor(b) { this.b = b; this.timers = []; this.items = [...b.querySelectorAll('[data-at]')]; }
+    start() {
+      this.stop();
+      this.items.forEach(el => el.classList.remove('go', 'out', 'focus'));
+      void this.b.offsetWidth;
+      if (reduced) return;
+      const k = slow(); const len = +this.b.dataset.cycle * k;
+      const cycle = first => {
+        this.items.forEach(el => {
+          const once = el.hasAttribute('data-once');
+          if (once && !first) return;
+          if (!once) el.classList.remove('go', 'out');
+          el.dataset.at.split(',').forEach(at => this.timers.push(setTimeout(() => this.fire(el), +at * k)));
+          if (el.dataset.out) this.timers.push(setTimeout(() => el.classList.add('out'), +el.dataset.out * k));
+        });
+        this.timers.push(setTimeout(() => cycle(false), len));
+      };
+      cycle(true);
+    }
+    fire(el) {
+      el.classList.remove('go', 'out'); void el.getBoundingClientRect(); el.classList.add('go');
+      (el.dataset.hook || '').split(' ').forEach(n => hooks[n] && hooks[n](el, this.b));
+      el.querySelectorAll('.count-txt').forEach(t => hooks.countTxt(t));
+    }
+    stop() { this.timers.forEach(clearTimeout); this.timers = []; }
+  }
+
+  /* ---------- Hạt sáng bay lên (A2, A11) ----------
+     Mật độ theo banner gốc Agent Awards: ~1 hạt / 4.000 px² vùng từ 23% bề ngang sang phải (~120 hạt ở khổ 1400 px).
+     70% là chấm li ti 1–2 px, 25% chấm nhỏ có quầng, 5% đốm sáng lớn; bay lên 38–50 px/s (theo khung cao 560). */
+  class Fireflies {
+    constructor(canvas) {
+      this.c = canvas; this.x = canvas.getContext('2d'); this.p = []; this.on = false;
+      this.x0 = parseFloat(canvas.dataset.x0 || .23); this.x1 = parseFloat(canvas.dataset.x1 || 1);
+      const s = document.createElement('canvas'); s.width = s.height = 64; const g = s.getContext('2d');
+      const r = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+      r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(.1, 'rgba(255,252,245,.95)'); r.addColorStop(.28, 'rgba(255,238,215,.38)'); r.addColorStop(.6, 'rgba(255,228,200,.08)'); r.addColorStop(1, 'rgba(255,228,200,0)');
+      g.fillStyle = r; g.fillRect(0, 0, 64, 64); this.sprite = s;
+    }
+    resize() {
+      const d = Math.min(2, devicePixelRatio || 1); this.w = this.c.clientWidth; this.h = this.c.clientHeight; this.k = this.h / 560;
+      this.c.width = Math.round(this.w * d); this.c.height = Math.round(this.h * d); this.x.setTransform(d, 0, 0, d, 0, 0);
+      this.max = Math.max(32, Math.min(200, Math.round(this.w * (this.x1 - this.x0) * this.h / 4000)));
+    }
+    make(prewarm) {
+      const r = Math.random(), kind = r < .7 ? 0 : r < .95 ? 1 : 2;
+      const size = kind === 0 ? 6 + Math.random() * 4 : kind === 1 ? 11 + Math.random() * 7 : 22 + Math.random() * 12;
+      return { kind, x: (this.x0 + Math.random() * (this.x1 - this.x0)) * this.w, y: prewarm ? Math.random() * this.h : this.h + Math.random() * this.h * .1,
+        vy: (38 + Math.random() * 12) * this.k * (kind === 0 ? .7 + Math.random() * .5 : 1), dx: (Math.random() - .5) * 10 * this.k,
+        size: size * this.k, a: kind === 0 ? .6 + Math.random() * .4 : .8 + Math.random() * .2,
+        phase: Math.random() * 1.25, spd: .7 + Math.random() * .7, top: this.h * Math.random() * .3 };
+    }
+    twinkle(t) { const f = (t % 1.25) * 24; if (f < 2) return .3077 + .1539 * f; if (f < 3) return .6154 - .1515 * (f - 2); if (f < 4) return .4639 + 1.1387 * (f - 3); if (f < 5) return 1.6026 - .6229 * (f - 4); if (f < 6) return .9797; return .3569; }
+    start() {
+      if (this.on || reduced) return; this.on = true; this.resize();
+      this.p = []; for (let i = 0; i < this.max; i++) this.p.push(this.make(true));
+      this.last = performance.now(); this.t0 = this.last;
+      const loop = t => { if (!this.on) return; this.step(t); this.raf = requestAnimationFrame(loop); }; this.raf = requestAnimationFrame(loop);
+    }
+    stop() { this.on = false; cancelAnimationFrame(this.raf); if (this.w) this.x.clearRect(0, 0, this.w, this.h); }
+    step(t) {
+      const dt = Math.min(.05, (t - this.last) / 1000) / slow(); this.last = t; const x = this.x; x.clearRect(0, 0, this.w, this.h);
+      const intro = Math.min(1, (t - this.t0) / (900 * slow()));      // cả đàn hạt hiện dần trong 0,9 s đầu
+      const band = this.h * .1; x.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < this.p.length; i++) {
+        let q = this.p[i]; q.y -= q.vy * dt; q.x += q.dx * dt; q.phase += dt * q.spd;
+        if (q.y < q.top - 4 || q.x < -20 || q.x > this.w + 20) { q = this.p[i] = this.make(false); }
+        const fadeIn = Math.min(1, (this.h - q.y) / band + .15), fadeOut = Math.min(1, Math.max(0, (q.y - q.top) / band));
+        const tw = this.twinkle(q.phase), a = q.a * fadeIn * fadeOut * intro * Math.min(1, .45 + tw * .55);
+        if (a <= .01) continue;
+        const d = q.size * (q.kind === 0 ? .8 + tw * .25 : .7 + tw * .35);
+        x.globalAlpha = a; x.drawImage(this.sprite, q.x - d / 2, q.y - d / 2, d, d);
+      }
+      x.globalAlpha = 1; x.globalCompositeOperation = 'source-over';
+    }
+  }
+
+  /* ---------- Hook: đếm số trong chữ SVG (A10) ---------- */
+  hooks.countTxt = t => {
+    const target = +t.dataset.count, pre = t.dataset.pre || '', suf = t.dataset.suf || '', dur = 1100 * slow(), t0 = performance.now();
+    const tick = n => { const p = Math.min(1, (n - t0) / dur); const e = 1 - Math.pow(1 - p, 3); t.textContent = pre + Math.round(target * e) + suf; if (p < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  };
+  /* ---------- Hook: đưa lần lượt 1 tấm polaroid lên trước (A6) ---------- */
+  hooks.polfocus = (el, b) => {
+    const cards = [...b.querySelectorAll('.pol')]; if (!cards.length) return;
+    b._pf = ((b._pf ?? -1) + 1) % cards.length;
+    cards.forEach(c => c.classList.remove('focus')); const c = cards[b._pf]; c.classList.add('focus');
+    setTimeout(() => c.classList.remove('focus'), 2200 * slow());
+  };
+
+  /* ---------- Parallax chuột cho thẻ kính (A9) ---------- */
+  function parallax(b) {
+    let raf, tx = 0, ty = 0, cx = 0, cy = 0, lastMove = -1e9;
+    const onMove = e => { const r = b.getBoundingClientRect(); tx = ((e.clientX - r.left) / r.width - .5) * 2; ty = ((e.clientY - r.top) / r.height - .5) * 2; lastMove = performance.now(); };
+    const step = t => { if (t - lastMove > 1500) { tx = Math.sin(t / 2600) * .5; ty = Math.cos(t / 3400) * .3; } cx += (tx - cx) * .06; cy += (ty - cy) * .06; b.style.setProperty('--px', (cx * -26).toFixed(2)); b.style.setProperty('--py', (cy * -14).toFixed(2)); raf = requestAnimationFrame(step); };
+    return { start() { if (reduced) return; b.addEventListener('pointermove', onMove); raf = requestAnimationFrame(step); }, stop() { b.removeEventListener('pointermove', onMove); cancelAnimationFrame(raf); } };
+  }
+
+  /* ---------- Gắn vào từng banner ---------- */
+  const banners = [...document.querySelectorAll('.banner')];
+  banners.forEach(b => {
+    b._tl = new Timeline(b); const eng = [];
+    const cv = b.querySelector('.fireflies'); if (cv) { const ff = new Fireflies(cv); eng.push({ start: () => ff.start(), stop: () => ff.stop(), resize: () => ff.on && ff.resize() }); }
+    if (b.classList.contains('st-ui')) eng.push(parallax(b));
+    const svgs = [...b.querySelectorAll('svg')];
+    eng.push({ start() { svgs.forEach(s => s.unpauseAnimations && s.unpauseAnimations()); }, stop() { svgs.forEach(s => s.pauseAnimations && s.pauseAnimations()); } });
+    b._eng = eng;
+    new ResizeObserver(() => {
+      const w = b.clientWidth, h = b.clientHeight || 1;
+      b.style.setProperty('--u', w / 1920);
+      if (b.classList.contains('st-duo')) b.style.setProperty('--du-skew', (-Math.atan(.14 * w / h) * 180 / Math.PI).toFixed(2) + 'deg');
+      eng.forEach(e => e.resize && e.resize());
+    }).observe(b);
+    const rb = b.closest('.item').querySelector('.replay'); if (rb) rb.addEventListener('click', () => restart(b));
+  });
+  function run(b) { b.classList.add('running'); b._tl.start(); b._eng.forEach(e => e.start()); }
+  function halt(b) { b.classList.remove('running'); b._tl.stop(); b._eng.forEach(e => e.stop()); }
+  function restart(b) { halt(b); void b.offsetWidth; run(b); }
+  /* Tải trước ảnh của từng banner: timeline chỉ chạy khi ảnh đã về (tối đa chờ 6 s) */
+  const urlRe = /url\(['"]?([^'")]+)['"]?\)/g;
+  banners.forEach(b => {
+    const set = new Set();
+    [b, ...b.querySelectorAll('[style*="url("]')].forEach(el => { for (const m of (el.getAttribute('style') || '').matchAll(urlRe)) set.add(m[1]); });
+    b.querySelectorAll('image[href]').forEach(im => set.add(im.getAttribute('href')));
+    const urls = [...set].filter(u => /^https?:/.test(u));
+    if (!urls.length) { b._ready = true; return; }
+    b.classList.add('loading');
+    let left = urls.length;
+    const done = () => { if (b._ready) return; b._ready = true; b.classList.remove('loading'); if (b._want) run(b); };
+    urls.forEach(u => { const im = new Image(); im.onload = () => { if (--left === 0) done(); }; im.onerror = () => { b.classList.add('img-failed'); document.body.classList.add('has-img-fail'); if (--left === 0) done(); }; im.src = u; });
+    setTimeout(done, 6000);
+  });
+  const io = new IntersectionObserver(entries => entries.forEach(en => {
+    const b = en.target;
+    b._want = en.isIntersecting;
+    if (en.isIntersecting && b._ready && !b.classList.contains('running')) run(b);
+    else if (!en.isIntersecting && b.classList.contains('running')) halt(b);
+  }), { threshold: .3 });
+  banners.forEach(b => io.observe(b));
+  document.addEventListener('visibilitychange', () => banners.filter(b => b.classList.contains('running')).forEach(b => document.hidden ? b._eng.forEach(e => e.stop()) : b._eng.forEach(e => e.start())));
+  const slowBtn = document.getElementById('slowmo');
+  slowBtn.addEventListener('click', () => { const on = slowBtn.getAttribute('aria-pressed') !== 'true'; slowBtn.setAttribute('aria-pressed', on); root.style.setProperty('--slow', on ? 4 : 1); banners.filter(b => b.classList.contains('running')).forEach(restart); });
+  document.getElementById('replayAll').addEventListener('click', () => banners.filter(b => b.classList.contains('running')).forEach(restart));
+})();
+</script>
+</body>
+</html>

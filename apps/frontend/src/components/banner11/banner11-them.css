@@ -1,0 +1,58 @@
+/* ============================================================================
+ *  PHẦN THÊM CỦA DỰ ÁN cho 11 mẫu banner
+ * ----------------------------------------------------------------------------
+ *  Để riêng ra đây, KHÔNG viết chung vào `banner11.css` — file kia sinh tự động
+ *  từ bản thiết kế gốc, tách lại một cái là bay hết những gì viết thêm vào đó.
+ * ========================================================================== */
+
+/* Mẫu mới hiện ra êm, không đập vào mắt */
+@keyframes cl-b11-vao { from { opacity: 0 } to { opacity: 1 } }
+.cl-b11-vao { animation: cl-b11-vao .45s ease-out both }
+
+/* Banner chạy sát mép màn hình như ảnh bìa nên KHÔNG bo góc.
+   (Bản thiết kế gốc bo 14px vì nó nằm trong trang trưng bày có lề hai bên.) */
+.cl-b11 .banner { border-radius: 0 }
+
+/* ── ĐIỆN THOẠI ───────────────────────────────────────────────────────────
+   90% người xem dùng điện thoại nên phần này quan trọng hơn cả bản máy tính.
+
+   Bản gốc để `min-height:380px`: trên máy điện thoại ngang 390px thì banner
+   thành gần như hình vuông, chữ bị dồn cục. Hạ xuống 300px cho thoáng, vẫn đủ
+   chỗ cho bố cục dọc mà bản thiết kế đã lo sẵn ở mục "Mobile". */
+/* ĐIỆN THOẠI: khổ 1920×620 của bản gốc mà ép vào màn ngang 390px thì banner chỉ
+   cao 126px — chữ và nút không có chỗ. Bản thiết kế đã xếp lại nội dung theo
+   chiều dọc cho màn nhỏ, nên ở đây cho banner cao lên gần vuông. */
+@media (max-width: 760px) {
+  .cl-b11 .banner { min-height: 300px; aspect-ratio: 5 / 4 }
+}
+@media (max-width: 420px) {
+  .cl-b11 .banner { min-height: 290px; aspect-ratio: 4 / 4.2 }
+}
+/* MÀN VỪA (máy tính bảng, laptop nhỏ): 3,1:1 là quá dẹt, chữ bé tí.
+   Kéo cao lên một chút cho cân. */
+@media (min-width: 761px) and (max-width: 1100px) {
+  .cl-b11 .banner { aspect-ratio: 1920 / 760 }
+}
+
+/* Màn nhỏ: bỏ mấy hiệu ứng nặng máy nhất (bóng đổ lớn, làm mờ nền).
+   Điện thoại tầm trung chạy backdrop-filter là tụt khung hình thấy rõ. */
+@media (max-width: 760px) {
+  .cl-b11 .glass { backdrop-filter: none !important; -webkit-backdrop-filter: none !important }
+}
+
+/* ── BỎ TAB THƯƠNG HIỆU GÓC TRÊN BÊN PHẢI CỦA MẪU ───────────────────────────
+   Bản thiết kế gốc là trang trưng bày, mỗi banner đứng một mình nên cần gắn tên
+   thương hiệu vào góc. Đưa lên web thì banner nằm ngay dưới thanh menu, mà menu
+   đã có sẵn tên "Cam Lâm Land" ở góc trái và nút "Đăng tin / Tài khoản" ở góc
+   phải — cái tab đỏ này đâm thẳng vào đó, vừa chồng lên nút vừa lặp lại tên. */
+.cl-b11 .brand-tab { display: none }
+
+/* Chữ trên thanh menu màu trắng, mà mấy mẫu banner có nền trời rất sáng ngay
+   mép trên. Vệt tối đã có ở lớp ngoài, thêm chút nữa cho chắc ở màn rộng. */
+@media (min-width: 761px) {
+  .cl-b11 .banner::before {
+    content: ""; position: absolute; inset: 0 0 auto 0; height: 96px; z-index: 22;
+    background: linear-gradient(to bottom, rgba(0,0,0,.38), rgba(0,0,0,.12) 60%, transparent);
+    pointer-events: none;
+  }
+}

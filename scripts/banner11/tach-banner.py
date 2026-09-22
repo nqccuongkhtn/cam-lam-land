@@ -42,7 +42,19 @@ THU_MUC_ANH = os.path.join(GOC, 'apps', 'frontend', 'public', 'banner11')
 #    Mã ảnh = phần nhận dạng trong địa chỉ Unsplash/Pexels.
 #    Để trống một mẫu = giữ nguyên ảnh của bản thiết kế (sẽ tải về máy chủ mình).
 DOI_ANH = {
-    # (đang để trống — xem ghi chú bên dưới)
+    # Mẫu 14 "Nét xưa": bản gốc là cổng thành mái ngói (không rõ ở đâu). Chủ dự
+    # án muốn nói về di tích Chăm → đổi sang ảnh THÁP GẠCH KIỂU CHĂM.
+    # ⚠️ Ảnh lấy từ kho ảnh miễn phí, KHÔNG xác minh được chụp ở đâu, nên chữ
+    #    trên banner viết chung chung, tuyệt đối không ghi tên di tích cụ thể.
+    14: {'19439393': '/banner11/un-1662514737720-2000.webp'},
+    # Mẫu 15 "Phác thảo nhà trên đất trống": bản gốc là ảnh xóm làng nhìn từ cao.
+    # Đã thử 2 ảnh kho miễn phí, chủ dự án chê "phèn quá, không sang".
+    # Nay dùng ẢNH FLYCAM THẬT khu Golden Bay (Bãi Dài) — đất đã phân lô, đường
+    # đã làm, biển phía sau: đúng cảnh "đất trống chờ xây nhà" của chính vùng này.
+    # ⚠️ Ảnh lấy từ trang duancamranh.vn, KHÔNG phải ảnh kho miễn phí. Chủ dự án
+    #    xác nhận có quyền dùng ("có quyền dùng cứ lấy đi"). Nếu sau này đổi ý
+    #    hoặc bên giữ bản quyền có ý kiến thì thay lại bằng ảnh kho miễn phí.
+    15: {'37114048': '/banner11/golden-bay-lo-dat.webp'},
 }
 # ⚠️ ĐỪNG ĐỔI ẢNH CỦA CÁC MẪU NÀY. Đã thử và hỏng nặng.
 #    Rất nhiều mẫu có NÉT VẼ TAY BÁM THEO ĐÚNG TẤM ẢNH GỐC:
@@ -66,7 +78,15 @@ BO_MAU = [
 
 # ── SỬA CHỮ: {số thứ tự mẫu: [(chữ cũ, chữ mới), ...]} ───────────────────────
 SUA_CHU = {
-    # (đang để trống — giữ nguyên chữ của bản thiết kế)
+    # Mẫu 14 đã đổi sang ảnh tháp gạch, không còn mái ngói nào → sửa chữ cho
+    # khớp ảnh. Vẫn viết chung chung, không nêu tên di tích (xem ghi chú DOI_ANH).
+    14: [
+        ('trong từng mái ngói', 'trong từng viên gạch'),
+        ('Những công trình mang dấu ấn thời gian, đẹp như tranh vẽ tay.',
+         'Tháp cổ rêu phong, dấu tích người xưa còn in trên từng lớp gạch.'),
+        ('Cổng thành cổ mái ngói hiện ra qua những nét cọ',
+         'Tháp gạch cổ hiện ra qua những nét cọ'),
+    ],
 }
 
 # ── THAY CẢ MỘT ĐOẠN MÃ (dùng khi đổi ảnh không đủ) ─────────────────────────
@@ -81,8 +101,21 @@ BAN_DO_THAT = ('<image href="/banner11/qh-cam-lam.webp" x="0" y="0" width="276" 
 #    Mẫu 12 làm gợn sóng cả dải nước — mà mấy chiếc thuyền cũng nằm trong dải đó
 #    nên bị uốn éo theo, chủ dự án nói nhìn khó chịu. Hạ độ gợn xuống và cho gợn
 #    chỉ bắt đầu ở nửa dưới của dải (chỗ mặt nước trống, không có thuyền).
+#    Mẫu 19 "Ảnh thật → bản đồ quy hoạch": bản gốc GIẢ bản đồ bằng cách chạy một
+#    bộ lọc màu lên chính tấm ảnh. Mà web mình CÓ BẢN ĐỒ QUY HOẠCH THẬT (dựng từ
+#    file CAD gốc của tỉnh, đang chạy ở trang bản đồ) — dùng chính nó thì vừa
+#    đúng sự thật, vừa khoe được sản phẩm, lại sạch bản quyền.
+#    Nên: lớp ảnh thứ hai đổi thành BẢN ĐỒ THẬT và bỏ bộ lọc giả đi.
+#    ⚠️ Phải viết theo ĐỊA CHỈ ẢNH GỐC, vì bước thay đoạn chạy TRƯỚC bước đổi
+#       đường dẫn ảnh về máy chủ mình.
+ANH_GIA_BAN_DO = ('<image href="https://images.pexels.com/photos/35995788/pexels-photo-35995788.jpeg'
+                  '?auto=compress&cs=tinysrgb&w=2000" width="1000" height="750" '
+                  'preserveAspectRatio="none" filter="url(#c19Plan)"/>')
+ANH_BAN_DO_THAT = ('<image href="/banner11/qh-cam-lam-rong.webp" x="0" y="40" width="1000" height="323" '
+                   'preserveAspectRatio="xMidYMid slice"/>')
 THAY_DOAN = {
     9: [(BAN_DO_VE_TAY, BAN_DO_THAT)],
+    19: [(ANH_GIA_BAN_DO, ANH_BAN_DO_THAT)],
     12: [
         ('scale="10"', 'scale="4"'),                       # gợn nhẹ hẳn đi
         ('offset=".15" stop-color="#fff"', 'offset=".58" stop-color="#fff"'),  # chừa phần có thuyền

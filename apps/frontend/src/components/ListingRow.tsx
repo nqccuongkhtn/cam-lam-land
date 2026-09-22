@@ -81,7 +81,7 @@ function ListingRow({ l, href }: { l: Listing; href?: string }) {
   const countBadge = nImg > 1 && <span className="absolute top-2 right-2 z-[2] bg-black/55 backdrop-blur text-white text-[11px] font-medium px-1.5 py-0.5 rounded-md">📷 {nImg}</span>;
   const priceRow = (big = false) => (
     <div className={`flex items-center flex-wrap gap-x-2 gap-y-0.5 mt-1.5`}>
-      <span className={`text-red-600 font-extrabold leading-none ${big ? 'text-base' : ''}`}>{priceLabel(l.price, l.deal)}</span>
+      <span className={`text-red-600 font-extrabold leading-none ${big ? 'text-[17px]' : 'text-[15px]'}`}>{priceLabel(l.price, l.deal)}</span>
       {l.area != null && <span className="text-slate-700 text-sm">· {l.area} m²</span>}
       {perM2 != null && l.deal !== 'rent' && <span className="text-slate-400 text-[13px]">· {perM2.toFixed(1).replace('.', ',')} tr/m²</span>}
       {l.bedrooms != null && <span className="text-slate-500 text-[13px]">· 🛏 {l.bedrooms}</span>}
@@ -143,10 +143,14 @@ function ListingRow({ l, href }: { l: Listing; href?: string }) {
         {heroMosaic ? (
           /* KIM CƯƠNG: hero mosaic 1 lớn + 4 nhỏ (2×2), chi tiết bên dưới, full width */
           <>
-            {/* Ảnh 248px làm một thẻ tin cao 438px — màn hình chỉ thấy 2,2 tin.
-                Các trang rao bán lớn để thẻ khoảng 300-330px, thấy 3 tin một màn.
-                Hạ xuống 196px. Đã đo trước sau chứ không ước. */}
-            <div className="flex gap-0.5 h-[196px]">
+            {/* CHIỀU CAO ẢNH — đã đo tận nơi trên batdongsan.com.vn rồi mới chọn:
+                  thẻ thường của họ  313px, ảnh 141px
+                  thẻ VIP của họ     484-504px, ảnh 141-284px
+                  chữ nội dung 14px · giá 16px  (mình 14/13px · giá 15px — tương đương)
+                Thẻ mình lúc đầu 438px với ảnh 248px. Hạ ảnh xuống 168px thì thẻ còn
+                khoảng 350px — vẫn trội hơn thẻ thường của họ (đúng, vì đây là thẻ VIP)
+                nhưng không còn nặng nề như trước. */}
+            <div className="flex gap-0.5 h-[168px]">
               <div className={`relative bg-slate-100 ${mThumbs.length ? 'flex-[1.9]' : 'flex-1'}`}>
                 <img src={img0} alt={l.title} onError={(e) => { (e.currentTarget as HTMLImageElement).src = NO_IMG; }} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
                 <Watermark name={agentName} avatar={avatar} />

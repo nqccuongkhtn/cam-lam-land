@@ -59,18 +59,18 @@ export default function LoginPage() {
           </label>
           <button disabled={busy} className="cl-press w-full bg-[#0A2540] hover:bg-[#0d2f54] disabled:opacity-60 text-white font-bold py-2.5 rounded-lg">{busy ? 'Đang đăng nhập…' : 'Đăng nhập'}</button>
         </form>
-        {/* Nút vân tay để GỌN: không chiếm cả bề ngang, chữ ngắn, bỏ đoạn giải thích
-            dài phía dưới (phần đó đã nói trong bảng thông báo và trang Tài khoản). */}
+        {/* Nút vân tay: CHỈ CÒN BIỂU TƯỢNG cho gọn. Vẫn có aria-label và title để
+            người dùng rê chuột thấy chữ, và máy đọc màn hình đọc được. */}
         <div className="mt-4 flex items-center justify-center">
           <button type="button" onClick={vaoBangVanTay} disabled={busyVt}
-            title="Đăng nhập bằng vân tay hoặc khuôn mặt"
-            className="cl-press inline-flex items-center gap-1.5 rounded-full border border-slate-300 px-3.5 py-1.5 text-[13px] font-semibold text-[#0A2540] hover:border-[#0A2540] disabled:opacity-60">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" className="h-4 w-4">
+            aria-label="Đăng nhập bằng vân tay hoặc khuôn mặt"
+            title="Đăng nhập bằng vân tay / khuôn mặt"
+            className="cl-press grid h-11 w-11 place-items-center rounded-full border border-slate-300 text-[#0A2540] hover:border-[#0A2540] hover:bg-slate-50 disabled:opacity-60">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" className="h-6 w-6">
               <path d="M12 4c-3 0-5.5 1.8-5.5 5v2.5" /><path d="M12 4c3 0 5.5 1.8 5.5 5v5" />
               <path d="M9.2 9.5A2.8 2.8 0 0 1 12 7a2.8 2.8 0 0 1 2.8 2.5v6" />
               <path d="M12 10v5.5" /><path d="M6.5 14v2.5" /><path d="M17.5 17v2" /><path d="M9.2 13v5" />
             </svg>
-            {busyVt ? 'Đang xác minh…' : 'Vân tay / khuôn mặt'}
           </button>
         </div>
 

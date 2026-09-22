@@ -266,10 +266,10 @@ export default function ListingDetail() {
                 <MapView center={[l.lng, l.lat]} zoom={15} baseMap="satellite" markers={[{ lng: l.lng, lat: l.lat, popupHtml: `<b>${l.title}</b>` }]} className="h-full w-full" />
               </div>
               <a href={`https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lng}`} target="_blank" rel="noreferrer" className="cl-press mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#0A2540] py-2.5 font-bold text-white hover:bg-[#0d3a6b]">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
                   strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
                   <circle cx="12" cy="12" r="9" />
-                  <path d="m15.4 8.6-2 5.4-5.4 2 2-5.4z" />
+                  <path d="m15.4 8.6-2 5.4-5.4 2 2-5.4z" fill="currentColor" />
                 </svg>
                 Chỉ đường đến bất động sản
               </a>
@@ -283,8 +283,8 @@ export default function ListingDetail() {
                 <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Ngày đăng</p><p className="font-bold text-[#0A2540] text-sm">{created ? created.toLocaleDateString('vi-VN') : '—'}</p></div>
                 <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Hết hạn hiển thị</p><p className="font-bold text-[#0A2540] text-sm">{expiry ? expiry.toLocaleDateString('vi-VN') : 'Không giới hạn'}</p></div>
               </div>
-              <p className="mt-3 flex items-center gap-1.5 text-xs text-slate-400">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+              <p className="mt-3 flex items-center gap-1.5 text-xs text-slate-500">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
                   strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5" aria-hidden="true">
                   <circle cx="12" cy="12" r="9" /><path d="M12 7v5.2l3.2 1.9" />
                 </svg>
@@ -301,15 +301,24 @@ export default function ListingDetail() {
                 đặc — vẫn nổi để bấm mà không phá nhịp trang. Đừng đổi lại nền tối. */}
             <Link href="/cam-nang"
               className="group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-[#C8A14B]/60 hover:shadow-lg sm:p-5">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#0A2540]/[0.06] text-[#0A2540]">
-                {/* Tờ giấy có dấu tích — thủ tục đã xong. Vẽ bằng nét, ăn theo màu
-                    chữ, đồng bộ với các biểu tượng khác của web. Đừng thay bằng
-                    emoji: emoji nhiều màu, lạc hẳn giữa khối navy/xám. */}
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
-                  strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6" aria-hidden="true">
-                  <path d="M6 3h8.5L19 7.5V21H6z" />
-                  <path d="M14 3v4.5h4.5" />
-                  <path d="m9 14.2 2 2 4-4.2" />
+              {/* Ô biểu tượng: NỀN NAVY ĐẶC + biểu tượng VÀNG — y như logo trên thanh
+                  menu, nên nhìn là thấy cùng một nhà.
+                  ⚠️ Bản đầu để nền xanh nhạt 6% + nét mảnh 1.8 → chủ dự án nói
+                  "nhạt nhòa quá". Đúng: nét mảnh màu tối trên nền gần trắng thì ở
+                  cỡ 24px gần như chìm. Nền đặc + nét dày 2.2 mới đủ chắc. */}
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#0A2540]">
+                {/* ⚠️ HAI LẦN TRƯỚC ĐỀU BỊ CHÊ "NHẠT NHÒA", lý do:
+                      lần 1 — nền xanh nhạt 6% + nét rỗng mảnh 1.8 → chìm hẳn;
+                      lần 2 — nền navy đặc rồi nhưng biểu tượng vẫn là NÉT RỖNG,
+                              ở cỡ 24px mấy nét mảnh vẫn không đủ "ăn" mắt.
+                    Nay vẽ HÌNH ĐẶC: tờ giấy tô kín màu vàng, dấu tích khoét
+                    thủng bằng màu nền. Mảng đặc bao giờ cũng chắc hơn nét rỗng
+                    ở cỡ nhỏ. Đừng quay lại kiểu nét rỗng mảnh. */}
+                <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
+                  <path fill="#C8A14B" d="M6 2.6h7.6L19.4 8.4V21.4H6z" />
+                  <path fill="#e0c07d" d="M13.6 2.6 19.4 8.4h-5.8z" />
+                  <path fill="none" stroke="#0A2540" strokeWidth="2.4"
+                    strokeLinecap="round" strokeLinejoin="round" d="m9.1 14.5 2.2 2.2 4.3-4.5" />
                 </svg>
               </span>
               <span className="min-w-0 flex-1">

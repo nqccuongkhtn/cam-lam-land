@@ -266,12 +266,7 @@ export default function ListingDetail() {
                 <MapView center={[l.lng, l.lat]} zoom={15} baseMap="satellite" markers={[{ lng: l.lng, lat: l.lat, popupHtml: `<b>${l.title}</b>` }]} className="h-full w-full" />
               </div>
               <a href={`https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lng}`} target="_blank" rel="noreferrer" className="cl-press mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#0A2540] py-2.5 font-bold text-white hover:bg-[#0d3a6b]">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
-                  strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="m15.4 8.6-2 5.4-5.4 2 2-5.4z" fill="currentColor" />
-                </svg>
-                Chỉ đường đến bất động sản
+                🧭 Chỉ đường đến bất động sản
               </a>
             </div>
 
@@ -283,13 +278,7 @@ export default function ListingDetail() {
                 <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Ngày đăng</p><p className="font-bold text-[#0A2540] text-sm">{created ? created.toLocaleDateString('vi-VN') : '—'}</p></div>
                 <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Hết hạn hiển thị</p><p className="font-bold text-[#0A2540] text-sm">{expiry ? expiry.toLocaleDateString('vi-VN') : 'Không giới hạn'}</p></div>
               </div>
-              <p className="mt-3 flex items-center gap-1.5 text-xs text-slate-500">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
-                  strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" /><path d="M12 7v5.2l3.2 1.9" />
-                </svg>
-                {postedLabel(l.createdAt)}
-              </p>
+              <p className="mt-3 text-xs text-slate-400">🕒 {postedLabel(l.createdAt)}</p>
             </div>
 
             {/* Liên kết chéo → Cẩm nang pháp lý (tăng lượt xem bảng dịch vụ).
@@ -306,21 +295,16 @@ export default function ListingDetail() {
                   ⚠️ Bản đầu để nền xanh nhạt 6% + nét mảnh 1.8 → chủ dự án nói
                   "nhạt nhòa quá". Đúng: nét mảnh màu tối trên nền gần trắng thì ở
                   cỡ 24px gần như chìm. Nền đặc + nét dày 2.2 mới đủ chắc. */}
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#0A2540]">
-                {/* ⚠️ HAI LẦN TRƯỚC ĐỀU BỊ CHÊ "NHẠT NHÒA", lý do:
-                      lần 1 — nền xanh nhạt 6% + nét rỗng mảnh 1.8 → chìm hẳn;
-                      lần 2 — nền navy đặc rồi nhưng biểu tượng vẫn là NÉT RỖNG,
-                              ở cỡ 24px mấy nét mảnh vẫn không đủ "ăn" mắt.
-                    Nay vẽ HÌNH ĐẶC: tờ giấy tô kín màu vàng, dấu tích khoét
-                    thủng bằng màu nền. Mảng đặc bao giờ cũng chắc hơn nét rỗng
-                    ở cỡ nhỏ. Đừng quay lại kiểu nét rỗng mảnh. */}
-                <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
-                  <path fill="#C8A14B" d="M6 2.6h7.6L19.4 8.4V21.4H6z" />
-                  <path fill="#e0c07d" d="M13.6 2.6 19.4 8.4h-5.8z" />
-                  <path fill="none" stroke="#0A2540" strokeWidth="2.4"
-                    strokeLinecap="round" strokeLinejoin="round" d="m9.1 14.5 2.2 2.2 4.3-4.5" />
-                </svg>
-              </span>
+              {/* ⚠️ ĐỪNG THAY EMOJI NÀY BẰNG BIỂU TƯỢNG VẼ NÉT.
+                  Đã thử ba lần và LẦN NÀO CŨNG TỆ HƠN:
+                    1. nét rỗng mảnh trên nền nhạt  -> chìm, bị chê "nhạt nhòa"
+                    2. nền navy đặc + nét rỗng vàng -> vẫn "nhạt nhòa"
+                    3. nền navy đặc + hình tô đặc   -> thành cục tối nặng, "xấu hơn"
+                  Lý do gốc: CẢ WEB NÀY VỐN DÙNG EMOJI (trang Tiện ích, trang Văn
+                  bản, chân trang…). Thay bằng biểu tượng vẽ nét chính là làm nó
+                  LỆCH khỏi phần còn lại, ngược hẳn mục đích "cho đồng bộ".
+                  Emoji đủ rõ, đủ màu, và giống mọi chỗ khác. Để yên. */}
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-50 text-xl ring-1 ring-slate-100">📚</span>
               <span className="min-w-0 flex-1">
                 <span className="block font-bold text-[#0A2540]">Thủ tục pháp lý khi mua bán đất</span>
                 <span className="block text-[13px] text-slate-500">Sang tên sổ đỏ, thuế phí, kiểm tra sổ, mẫu hợp đồng đặt cọc — tư vấn miễn phí.</span>

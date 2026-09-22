@@ -1,5 +1,5 @@
 /* ============================================================================
- *  18 MẪU BANNER ĐỘNG CHO TRANG CHỦ  —  phần hình thức (CSS)
+ *  19 MẪU BANNER ĐỘNG CHO TRANG CHỦ  —  phần hình thức (CSS)
  * ----------------------------------------------------------------------------
  *  ⚠️ FILE NÀY SINH TỰ ĐỘNG, ĐỪNG SỬA TAY.
  *     Sửa bản thiết kế `docs/thiet-ke/banner-anh-cam-lam.html` rồi chạy:
@@ -627,34 +627,17 @@
 }
 .cl-b11.static .c18-patch, .cl-b11.static .c18-plane{display:none}
 
-/* ══ CHỪA DẢI TRỐNG DƯỚI THANH MENU CHO Ô TÌM KIẾM ═══════════════════════
- * SINH TỰ ĐỘNG — xem hàm luat_day_xuong() trong scripts/banner11/tach-banner.py
- * Mỗi mẫu bố cục một kiểu nên không có chỗ nào sẵn trống ở mọi mẫu. Cách giải:
- * kéo banner cao thêm `--thanh` px rồi đẩy TẤT CẢ khối nội dung xuống đúng bấy
- * nhiêu → mẫu nào cũng có một dải trống y như nhau ngay dưới thanh menu.
- * Lớp ảnh nền KHÔNG bị đẩy nên vẫn phủ kín, banner vẫn là một tấm ảnh liền.
+/* ══ CHỪA DẢI TRỐNG Ở ĐÁY BANNER CHO KHUNG TÌM KIẾM ══════════════════════
+ * SINH TỰ ĐỘNG — xem hàm luat_chua_dai() trong scripts/banner11/tach-banner.py
+ * Banner được kéo cao thêm `--thanh` px; phần cao thêm rơi xuống đáy và thành
+ * chỗ đặt khung tìm kiếm, dùng chung cho cả 19 mẫu.
+ * Ảnh nền tự phủ xuống dải đó (chúng dùng inset:0) nên banner vẫn là một tấm
+ * ảnh liền. Chỉ vài khối chữ neo theo MÉP DƯỚI là phải nâng lên bấy nhiêu.
  * ═════════════════════════════════════════════════════════════════════════ */
-.cl-b11 .brand-tab,
-.cl-b11 .rb-couple,
-.cl-b11 .rb-text,
-.cl-b11 .sp-logo,
-.cl-b11 .sp-content,
-.cl-b11 .sp-track,
-.cl-b11 .flare,
-.cl-b11 .sp-cta,
-.cl-b11 .pp-logo,
-.cl-b11 .du-content,
-.cl-b11 .pl-text,
-.cl-b11 .tape,
-.cl-b11 .bb-rings,
-.cl-b11 .bb-orbit,
-.cl-b11 .bb-plane,
-.cl-b11 .bb-text,
-.cl-b11 .sl-tag,
-.cl-b11 .ui-text,
-.cl-b11 .ui-chat,
-.cl-b11 .hud .rec,
-.cl-b11 .fl-text,
-.cl-b11 .b-text,
-.cl-b11 .b10-seal { margin-top: var(--thanh, 0px) }
+.cl-b11 .photo-cap,
+.cl-b11 .rb-big,
+.cl-b11 .sr-chip,
+.cl-b11 .kc-cap,
+.cl-b11 .dp-content,
+.cl-b11 .b6-legend { margin-bottom: var(--thanh, 0px) }
 

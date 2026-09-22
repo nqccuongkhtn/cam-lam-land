@@ -225,38 +225,42 @@ export default function Home() {
     <div className="bg-slate-50">
       {/* HERO */}
       <Banner11>
-          {/* Nhà đất bán · Cho thuê · Dự án */}
-          {/* Nền XANH ĐẶC chứ không phải nền mờ: hàng nút này nằm vắt ngang mép dưới
-              banner, nửa trên đè lên ảnh, nửa dưới nằm trên nền trang màu sáng —
-              nền mờ thì chữ trắng rơi xuống phần sáng là mất hút. */}
-          <div className="inline-flex rounded-full border border-white/15 bg-[#0A2540] p-1 shadow-lg">
-            {([['sale', 'Nhà đất bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
-              <button key={k} onClick={() => setHeroDeal(k)}
-                className={`rounded-full px-4 py-1.5 text-sm font-bold transition sm:px-5 ${heroDeal === k ? 'bg-white text-[#0A2540]' : 'text-white/90 hover:text-white'}`}>{ten}</button>
-            ))}
-          </div>
+          {/* ── KHUNG TÌM KIẾM KIỂU KHUNG KÍNH TỐI ──────────────────────────────
+              Làm theo cách batdongsan.com.vn đang dùng (chủ dự án chỉ trang đó để
+              tham khảo): cả tab lẫn ô nhập nằm TRONG MỘT KHUNG KÍNH TỐI MỜ, đặt
+              giữa banner.
+              ⚠️ Vì sao KHÔNG để thẻ trắng như trước: banner có 18 mẫu, mẫu nền
+              sáng mẫu nền tối. Thẻ trắng rơi trúng mẫu nền sáng là chìm nghỉm,
+              rơi trúng mẫu nền tối thì chói loà. Khung kính tối hợp với cả hai. */}
+          <div className="rounded-2xl border border-white/15 bg-black/45 p-2.5 shadow-2xl backdrop-blur-md sm:p-3">
+            <div className="mb-2 flex items-center justify-center gap-1">
+              {([['sale', 'Nhà đất bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
+                <button key={k} onClick={() => setHeroDeal(k)}
+                  className={`rounded-full px-4 py-1.5 text-sm font-bold transition ${heroDeal === k ? 'bg-white text-[#0A2540]' : 'text-white/85 hover:bg-white/10 hover:text-white'}`}>{ten}</button>
+              ))}
+            </div>
 
           {/* Search card */}
-          {/* KHÔNG đặt lại max-w-5xl: ô tìm kiếm phải kéo dài hết chiều ngang của
-              dải xanh, nếu không hai bên thừa hai mảng trống nhìn rất chắp vá. */}
-          <div className="mt-3 grid w-full gap-2 rounded-xl bg-white p-2 shadow-2xl sm:p-3 md:grid-cols-[1.4fr_1fr_1fr_auto]">
-            <label className="flex items-center gap-2 px-3 rounded-xl border border-slate-200 focus-within:border-[#0A2540]">
+            {/* Hàng ô nhập — nằm ngay trong khung kính, không có thẻ trắng riêng */}
+            <div className="grid w-full gap-2 md:grid-cols-[1.5fr_1fr_1fr_auto]">
+            <label className="flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3 focus-within:border-[#C8A14B]">
               <Ic d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" />
               <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder={heroDeal === 'project' ? 'Tên dự án: Golden Bay, Khu đô thị mới Cam Lâm…' : (searchHint || 'Khu vực, dự án…')} className="py-3 w-full outline-none text-slate-800 text-sm" />
             </label>
-            <label className="flex items-center gap-2 px-3 rounded-xl border border-slate-200">
+            <label className="flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3">
               <Ic d="M3 11l9-8 9 8M5 10v10h14V10" />
               <select value={type} onChange={(e) => setType(e.target.value as PropertyType)} className="py-3 w-full outline-none text-slate-700 text-sm bg-transparent">
                 <option value="">Loại hình</option>{CATS.map((c) => <option key={c.t} value={c.t}>{PROPERTY_LABELS[c.t]}</option>)}
               </select>
             </label>
-            <label className="flex items-center gap-2 px-3 rounded-xl border border-slate-200">
+            <label className="flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3">
               <Ic d="M20.6 13.4 12 22l-9-9V3h8z M7 7h.01" />
               <select value={max} onChange={(e) => setMax(e.target.value)} className="py-3 w-full outline-none text-slate-700 text-sm bg-transparent">
                 <option value="">Mức giá</option><option value="1">Dưới 1 tỷ</option><option value="3">Dưới 3 tỷ</option><option value="5">Dưới 5 tỷ</option><option value="10">Dưới 10 tỷ</option>
               </select>
             </label>
-            <button onClick={search} className="cl-press bg-red-600 hover:bg-red-700 text-white font-bold px-7 py-3 rounded-xl whitespace-nowrap shadow-lg shadow-red-600/30">Tìm kiếm</button>
+              <button onClick={search} className="cl-press whitespace-nowrap rounded-xl bg-red-600 px-7 py-3 font-bold text-white shadow-lg shadow-red-600/30 hover:bg-red-700">Tìm kiếm</button>
+            </div>
           </div>
 
       </Banner11>

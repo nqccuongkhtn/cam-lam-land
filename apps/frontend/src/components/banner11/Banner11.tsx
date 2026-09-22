@@ -523,9 +523,12 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
           onPointerLeave={() => setDangTim(false)}
           onFocusCapture={() => setDangTim(true)}
           onBlurCapture={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDangTim(false); }}
-          /* Đặt ở DẢI TRỐNG NGAY DƯỚI THANH MENU (top-[62px]) — chỗ này đã được
-             chừa sẵn cho mọi mẫu nên không bao giờ đè lên chữ của banner. */
-          className={`mx-auto max-w-[1180px] px-3 pb-6 pt-4 transition-all duration-500 sm:px-4 md:absolute md:inset-x-0 md:top-[62px] md:z-30 md:pb-0 md:pt-0 ${dangTim ? 'md:opacity-100 md:blur-0' : 'md:opacity-[.42] md:blur-[.6px]'}`}
+          /* Đặt ở DẢI TRỐNG Ở ĐÁY banner — dải này chừa sẵn cho cả 19 mẫu nên
+             không bao giờ đè lên chữ.
+             ⚠️ Vì sao đáy chứ không phải trên: gần như mọi mẫu neo chữ theo mép
+             TRÊN, nên đáy là chỗ trống nhất và chừa ở đáy thì không phải động
+             vào bố cục phía trên — giữ được thiết kế gốc sát nhất. */
+          className={`mx-auto max-w-[980px] px-3 pb-6 pt-4 transition-all duration-500 sm:px-4 md:absolute md:inset-x-0 md:bottom-4 md:z-30 md:pb-0 md:pt-0 ${dangTim ? 'md:opacity-100' : 'md:opacity-[.82]'}`}
         >
           {children}
         </div>

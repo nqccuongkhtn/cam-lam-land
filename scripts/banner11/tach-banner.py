@@ -59,22 +59,14 @@ DOI_ANH = {
 # ── BỎ HẲN MỘT SỐ MẪU: [số thứ tự mẫu, ...] ─────────────────────────────────
 #    Chủ dự án yêu cầu "banner nào hiệu ứng trùng thì gộp lại".
 BO_MAU = [
-    8,   # "Cung đường ven biển" — trùng nội dung với mẫu 16 (cũng nói về đường
-         #   về Cam Lâm). Giữ mẫu 16 vì hiệu ứng VẼ ĐƯỜNG chạy trên chính con
-         #   đường trong ảnh, hợp với ý "cung đường ven biển" hơn hẳn; chữ của
-         #   mẫu 8 được chuyển sang mẫu 16 (xem SUA_CHU).
+    # (đang để trống — chủ dự án muốn giữ đủ 19 mẫu)
+    # Đã từng bỏ mẫu 8 "Cung đường ven biển" vì trùng nội dung với mẫu 16, nhưng
+    # chủ dự án dặn giữ nguyên đủ 19 mẫu, giống bản thiết kế nhất có thể.
 ]
 
 # ── SỬA CHỮ: {số thứ tự mẫu: [(chữ cũ, chữ mới), ...]} ───────────────────────
 SUA_CHU = {
-    # Mẫu 16 nhận luôn nội dung "Cung đường ven biển" của mẫu 8 vừa bỏ.
-    16: [
-        ('Kết nối thuận tiện', 'Kết nối'),
-        ('Mọi cung đường', 'Cung đường'),
-        ('đều dẫn về nhà', 'ven biển'),
-        ('Tuyến đường ven biển hiện ngay trên ảnh thật, dễ hình dung từng khúc quanh.',
-         'Vừa đi vừa ngắm núi, ngắm biển – đường về Cam Lâm đẹp như một bức tranh.'),
-    ],
+    # (đang để trống — giữ nguyên chữ của bản thiết kế)
 }
 
 # ── THAY CẢ MỘT ĐOẠN MÃ (dùng khi đổi ảnh không đủ) ─────────────────────────
@@ -187,22 +179,28 @@ def boc_css(css: str) -> str:
 
 
 
-def luat_day_xuong(css: str) -> str:
+def luat_chua_dai(css: str) -> str:
     """
-    Sinh luật CSS đẩy các khối NỘI DUNG của mọi mẫu xuống, để chừa một dải trống
-    cố định ngay dưới thanh menu cho ô tìm kiếm.
+    Sinh luật CSS chừa một DẢI TRỐNG Ở ĐÁY banner, dùng chung cho cả 19 mẫu, để
+    đặt khung tìm kiếm mà không đè lên chữ và che ảnh ít nhất có thể.
 
-    VÌ SAO PHẢI SINH TỰ ĐỘNG, KHÔNG KHAI TAY:
-    Mỗi mẫu bố cục một kiểu. Đặt ô tìm kiếm ở một chỗ cố định thì mẫu này vừa,
-    mẫu kia đè lên chữ — chủ dự án đã gặp đúng chuyện đó. Chừa sẵn một dải trống
-    NHƯ NHAU ở mọi mẫu mới giải được gốc vấn đề. Mà danh sách khối nội dung thì
-    mỗi lần bản thiết kế sửa lại khác, nên phải tự dò.
+    VÌ SAO CHỪA Ở ĐÁY CHỨ KHÔNG PHẢI Ở TRÊN:
+    Gần như mọi mẫu đều neo chữ theo MÉP TRÊN (tiêu đề, mô tả, nút bấm đều tính
+    từ trên xuống). Nên đáy là chỗ trống nhất, và chừa ở đáy thì KHÔNG PHẢI ĐỘNG
+    vào bố cục phía trên — giữ được thiết kế gốc sát nhất.
+    (Đã thử chừa ở TRÊN: phải đẩy 47 khối chữ xuống, mẫu nào cũng lệch đi một
+    chút so với bản thiết kế, có mẫu lệch hẳn.)
 
-    CÁCH DÒ: lấy những luật vừa `position:absolute` vừa có `top:`.
-    BỎ QUA luật có CẢ `top:` lẫn `bottom:` — đó là lớp ảnh nền / lớp phủ chạy
-    suốt chiều cao, đẩy xuống là hở một mảng ở đỉnh banner.
-    Phần dành cho điện thoại (@media max-width:760px) để yên, vì ở màn nhỏ ô tìm
-    kiếm nằm hẳn dưới banner, không cần chừa dải.
+    CÁCH LÀM: banner cao thêm `--thanh` px (xem banner11-them.css). Phần cao
+    thêm rơi xuống đáy; ảnh nền tự phủ xuống theo vì chúng dùng `inset: 0`.
+    Chỉ còn vài khối chữ neo theo MÉP DƯỚI là bị tụt vào dải đó → nâng chúng lên
+    đúng bấy nhiêu.
+
+    CÁCH DÒ khối cần nâng: `position:absolute` + có `bottom:` + KHÔNG có `top:`
+    (có cả hai nghĩa là lớp chạy suốt chiều cao — ảnh nền, viền — phải để yên).
+    Bỏ qua selector lồng sâu (vd `.pol b`): đó là chữ nằm trong một thẻ con của
+    mẫu, nâng lên là vỡ chính thẻ đó chứ không liên quan đáy banner.
+    Phần dành cho điện thoại để yên: màn nhỏ đặt khung tìm kiếm hẳn dưới banner.
     """
     khong = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
     khong = re.sub(r'@media \(max-width:760px\)\{.*?\n\}', '', khong, flags=re.S)
@@ -211,32 +209,30 @@ def luat_day_xuong(css: str) -> str:
         sel, than = m.group(1).strip(), m.group(2)
         if 'position:absolute' not in than:
             continue
-        if not re.search(r'(?:^|;)top:', than):
+        if not re.search(r'(?:^|;)bottom:', than):
             continue
-        if re.search(r'(?:^|;)bottom:', than):        # lớp chạy suốt chiều cao
-            continue
-        # ⚠️ BỎ QUA khối căn giữa theo chiều dọc (top tính bằng %, kèm translate).
-        #    Banner đã cao thêm nên mấy khối đó TỰ XUỐNG theo tỉ lệ rồi; đẩy thêm
-        #    nữa là rơi hẳn xuống đáy, lệch hết bố cục (đã vấp ở mẫu 11).
-        if re.search(r'(?:^|;)top:\s*\d+(?:\.\d+)?%', than):
+        if re.search(r'(?:^|;)top:', than):          # lớp chạy suốt chiều cao
             continue
         for x in sel.split(','):
             x = x.strip()
-            if x and x not in ten:
-                ten.append(x)
+            if not x or x in ten:
+                continue
+            if len(x.split()) > 2:                   # lồng sâu, vd ".cl-b11 .pol b"
+                continue
+            ten.append(x)
     if not ten:
         return ''
     ds = ',\n'.join(ten)
     dau = (
-        '\n\n/* ══ CHỪA DẢI TRỐNG DƯỚI THANH MENU CHO Ô TÌM KIẾM ═══════════════════════\n'
-        ' * SINH TỰ ĐỘNG — xem hàm luat_day_xuong() trong scripts/banner11/tach-banner.py\n'
-        ' * Mỗi mẫu bố cục một kiểu nên không có chỗ nào sẵn trống ở mọi mẫu. Cách giải:\n'
-        ' * kéo banner cao thêm `--thanh` px rồi đẩy TẤT CẢ khối nội dung xuống đúng bấy\n'
-        ' * nhiêu → mẫu nào cũng có một dải trống y như nhau ngay dưới thanh menu.\n'
-        ' * Lớp ảnh nền KHÔNG bị đẩy nên vẫn phủ kín, banner vẫn là một tấm ảnh liền.\n'
+        '\n\n/* ══ CHỪA DẢI TRỐNG Ở ĐÁY BANNER CHO KHUNG TÌM KIẾM ══════════════════════\n'
+        ' * SINH TỰ ĐỘNG — xem hàm luat_chua_dai() trong scripts/banner11/tach-banner.py\n'
+        ' * Banner được kéo cao thêm `--thanh` px; phần cao thêm rơi xuống đáy và thành\n'
+        ' * chỗ đặt khung tìm kiếm, dùng chung cho cả 19 mẫu.\n'
+        ' * Ảnh nền tự phủ xuống dải đó (chúng dùng inset:0) nên banner vẫn là một tấm\n'
+        ' * ảnh liền. Chỉ vài khối chữ neo theo MÉP DƯỚI là phải nâng lên bấy nhiêu.\n'
         ' * ═════════════════════════════════════════════════════════════════════════ */\n'
     )
-    return dau + ds + ' { margin-top: var(--thanh, 0px) }\n'
+    return dau + ds + ' { margin-bottom: var(--thanh, 0px) }\n'
 
 
 def main():
@@ -316,7 +312,7 @@ def main():
 
 ''' % len(mau)
     io.open(os.path.join(THU_MUC_RA, 'banner11.css'), 'w', encoding='utf-8', newline='\n').write(
-        dau_de + ra_css.strip() + luat_day_xuong(ra_css) + '\n')
+        dau_de + ra_css.strip() + luat_chua_dai(ra_css) + '\n')
 
     dau_ts = '''/* ============================================================================
  *  %d MẪU BANNER ĐỘNG — phần nội dung (mã HTML của từng mẫu)

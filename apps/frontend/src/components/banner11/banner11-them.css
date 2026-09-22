@@ -119,7 +119,7 @@
    `san-sang`). Nền tối của banner vẫn hiện ngay nên không thấy khoảng trắng. */
 .cl-b11:not(.san-sang) .banner > * { visibility: hidden }
 
-/* ── DẢI TRỐNG DƯỚI THANH MENU + CHIỀU CAO BANNER ───────────────────────────
+/* ── DẢI TRỐNG Ở ĐÁY BANNER + CHIỀU CAO BANNER ──────────────────────────────
    ⚠️ PHẢI ĐẶT BẰNG CSS, ĐỪNG ĐẶT BẰNG MÃ CHẠY. Đã vấp: đặt bằng mã chạy thì
    trang hiện ra với chiều cao cũ rồi mới bị sửa → banner NHẢY một cái xuống rồi
    mới về đúng chỗ. Viết trong CSS thì đúng ngay từ khung hình đầu tiên.

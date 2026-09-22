@@ -226,7 +226,10 @@ export default function Home() {
       {/* HERO */}
       <Banner11>
           {/* Nhà đất bán · Cho thuê · Dự án */}
-          <div className="inline-flex rounded-full border border-white/25 bg-black/35 p-1 backdrop-blur">
+          {/* Nền XANH ĐẶC chứ không phải nền mờ: hàng nút này nằm vắt ngang mép dưới
+              banner, nửa trên đè lên ảnh, nửa dưới nằm trên nền trang màu sáng —
+              nền mờ thì chữ trắng rơi xuống phần sáng là mất hút. */}
+          <div className="inline-flex rounded-full border border-white/15 bg-[#0A2540] p-1 shadow-lg">
             {([['sale', 'Nhà đất bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
               <button key={k} onClick={() => setHeroDeal(k)}
                 className={`rounded-full px-4 py-1.5 text-sm font-bold transition sm:px-5 ${heroDeal === k ? 'bg-white text-[#0A2540]' : 'text-white/90 hover:text-white'}`}>{ten}</button>
@@ -234,7 +237,9 @@ export default function Home() {
           </div>
 
           {/* Search card */}
-          <div className="mt-3 bg-white rounded-xl shadow-2xl p-2 sm:p-3 max-w-5xl grid md:grid-cols-[1.3fr_1fr_1fr_auto] gap-2">
+          {/* KHÔNG đặt lại max-w-5xl: ô tìm kiếm phải kéo dài hết chiều ngang của
+              dải xanh, nếu không hai bên thừa hai mảng trống nhìn rất chắp vá. */}
+          <div className="mt-3 grid w-full gap-2 rounded-xl bg-white p-2 shadow-2xl sm:p-3 md:grid-cols-[1.4fr_1fr_1fr_auto]">
             <label className="flex items-center gap-2 px-3 rounded-xl border border-slate-200 focus-within:border-[#0A2540]">
               <Ic d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" />
               <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder={heroDeal === 'project' ? 'Tên dự án: Golden Bay, Khu đô thị mới Cam Lâm…' : (searchHint || 'Khu vực, dự án…')} className="py-3 w-full outline-none text-slate-800 text-sm" />

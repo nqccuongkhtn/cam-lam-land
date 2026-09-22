@@ -5,10 +5,6 @@
  *  từ bản thiết kế gốc, tách lại một cái là bay hết những gì viết thêm vào đó.
  * ========================================================================== */
 
-/* Mẫu mới hiện ra êm, không đập vào mắt */
-@keyframes cl-b11-vao { from { opacity: 0 } to { opacity: 1 } }
-.cl-b11-vao { animation: cl-b11-vao .45s ease-out both }
-
 /* Banner chạy sát mép màn hình như ảnh bìa nên KHÔNG bo góc.
    (Bản thiết kế gốc bo 14px vì nó nằm trong trang trưng bày có lề hai bên.) */
 .cl-b11 .banner { border-radius: 0 }
@@ -40,12 +36,40 @@
   .cl-b11 .glass { backdrop-filter: none !important; -webkit-backdrop-filter: none !important }
 }
 
-/* ── BỎ TAB THƯƠNG HIỆU GÓC TRÊN BÊN PHẢI CỦA MẪU ───────────────────────────
-   Bản thiết kế gốc là trang trưng bày, mỗi banner đứng một mình nên cần gắn tên
-   thương hiệu vào góc. Đưa lên web thì banner nằm ngay dưới thanh menu, mà menu
-   đã có sẵn tên "Cam Lâm Land" ở góc trái và nút "Đăng tin / Tài khoản" ở góc
-   phải — cái tab đỏ này đâm thẳng vào đó, vừa chồng lên nút vừa lặp lại tên. */
-.cl-b11 .brand-tab { display: none }
+/* ── BỎ PHẦN THƯƠNG HIỆU RIÊNG CỦA TỪNG MẪU ─────────────────────────────────
+   Bản thiết kế gốc là trang trưng bày: mỗi banner đứng một mình nên mẫu nào
+   cũng tự gắn thêm tên và logo "Cam Lâm Land" vào góc.
+   Đưa lên web thì banner nằm NGAY DƯỚI thanh menu — mà menu đã có sẵn logo và
+   tên ở góc trái, nút "Đăng tin / Tài khoản" ở góc phải. Để nguyên thì:
+     · logo của mẫu nằm ngay dưới logo của web → hai logo chồng nhau, trùng tên;
+     · tab đỏ góc phải đâm thẳng vào nút "Đăng tin".
+   Nên ẩn hết phần thương hiệu của mẫu, giữ lại của web. */
+.cl-b11 .brand-tab,
+.cl-b11 .pp-logo,
+.cl-b11 .sp-logo { display: none !important }
+
+/* ── ĐẨY MẤY CHI TIẾT SÁT MÉP TRÊN XUỐNG DƯỚI THANH MENU ────────────────────
+   Thanh menu cao 56px và nằm đè lên banner. Mấy thứ bản gốc đặt sát mép trên
+   (thông báo nhỏ, nhãn góc, chiếc máy bay…) rơi đúng vào sau menu, chữ chồng
+   chữ đọc không ra. Dùng margin-top để đẩy xuống — với phần tử đặt tuyệt đối
+   thì margin vẫn có tác dụng, mà không phải tính lại toạ độ của bản gốc. */
+@media (min-width: 761px) {
+  .cl-b11 .ui-toast,
+  .cl-b11 .sl-tag,
+  .cl-b11 .bb-plane,
+  .cl-b11 .hud { margin-top: 62px }
+}
+
+/* ── HIỆU ỨNG TRƯỢT KHI ĐỔI MẪU ─────────────────────────────────────────────
+   Mẫu mới trượt từ phải sang, không phải hiện ra đột ngột. */
+@keyframes cl-b11-truot {
+  from { opacity: 0; transform: translate3d(6%, 0, 0) }
+  to   { opacity: 1; transform: none }
+}
+.cl-b11-vao { animation: cl-b11-truot .6s cubic-bezier(.16, 1, .3, 1) both }
+@media (prefers-reduced-motion: reduce) {
+  .cl-b11-vao { animation: none }
+}
 
 /* Chữ trên thanh menu màu trắng, mà mấy mẫu banner có nền trời rất sáng ngay
    mép trên. Vệt tối đã có ở lớp ngoài, thêm chút nữa cho chắc ở màn rộng. */

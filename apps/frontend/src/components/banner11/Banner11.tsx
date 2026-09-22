@@ -381,7 +381,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
   }, [boc, chiSo, tamDung, it, sang]);
 
   return (
-    <section className="relative bg-[#0A2540]" aria-label="Giới thiệu Cam Lâm Land">
+    <section className="relative" aria-label="Giới thiệu Cam Lâm Land">
       {/* ── BANNER TRÀN SÁT VIỀN, NẰM DƯỚI THANH MENU ────────────────────────
           Thanh menu của web ở đầu trang vốn trong suốt (chỉ hiện nền khi cuộn
           xuống), nên cho banner chạy lên tận mép trên là menu nằm lồng trong
@@ -395,39 +395,56 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
             sáng ngay chỗ đó → không có vệt này là đọc không ra tên menu. */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-20 h-24 bg-gradient-to-b from-black/50 via-black/20 to-transparent" />
 
-        {/* Nút chuyển mẫu — đặt đè lên góc dưới bên phải banner cho gọn.
-            Nút 32px để bấm bằng ngón tay vẫn trúng. */}
-        {/* Điện thoại: đưa nút lên góc TRÊN. Ở màn nhỏ bản thiết kế dồn hết chữ
-            và nút của banner xuống đáy, để nút điều khiển ở dưới là đè lên đúng
-            chỗ đó. Top-14 để không chui vào thanh menu. */}
-        <div className="absolute right-2 top-14 z-30 flex items-center gap-1 sm:bottom-3 sm:right-3 sm:top-auto">
-          <button onClick={() => sang(chiSo - 1)} aria-label="Mẫu trước"
-            className="grid h-8 w-8 place-items-center rounded-full bg-black/35 text-white backdrop-blur hover:bg-black/55">‹</button>
-          <button onClick={() => setTamDung((v) => !v)} aria-label={tamDung ? 'Chạy tiếp' : 'Tạm dừng'}
-            className="grid h-8 w-8 place-items-center rounded-full bg-black/35 text-[11px] text-white backdrop-blur hover:bg-black/55">
-            {tamDung ? '▶' : '❚❚'}
-          </button>
-          <button onClick={() => sang(chiSo + 1)} aria-label="Mẫu sau"
-            className="grid h-8 w-8 place-items-center rounded-full bg-black/35 text-white backdrop-blur hover:bg-black/55">›</button>
+        {/* Vệt tối ở mép DƯỚI — chỉ màn máy tính, vì chỉ ở đó ô tìm kiếm mới nằm
+            đè vào trong banner. Không có vệt này thì hàng chữ trắng
+            "Nhà đất bán · Cho thuê · Dự án" rơi trúng nền sáng là mất hút. */}
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-20 hidden h-44 bg-gradient-to-t from-black/60 via-black/25 to-transparent md:block" />
+
+        {/* Nút chuyển mẫu + chấm chọn mẫu — gom hết lên GÓC TRÊN BÊN PHẢI.
+            Trước để ở đáy banner, nhưng nay ô tìm kiếm đã chiếm chỗ đó, mà ở màn
+            nhỏ bản thiết kế cũng dồn chữ xuống đáy → để dưới là đè lên nhau.
+            Top-14 cho khỏi chui vào thanh menu. Nút 32px để bấm bằng ngón tay. */}
+        <div className="absolute right-2 top-14 z-30 flex flex-col items-end gap-1.5 sm:right-3">
+          <div className="flex items-center gap-1">
+            <button onClick={() => sang(chiSo - 1)} aria-label="Mẫu trước"
+              className="grid h-8 w-8 place-items-center rounded-full bg-black/40 text-white backdrop-blur hover:bg-black/60">‹</button>
+            <button onClick={() => setTamDung((v) => !v)} aria-label={tamDung ? 'Chạy tiếp' : 'Tạm dừng'}
+              className="grid h-8 w-8 place-items-center rounded-full bg-black/40 text-[11px] text-white backdrop-blur hover:bg-black/60">
+              {tamDung ? '▶' : '❚❚'}
+            </button>
+            <button onClick={() => sang(chiSo + 1)} aria-label="Mẫu sau"
+              className="grid h-8 w-8 place-items-center rounded-full bg-black/40 text-white backdrop-blur hover:bg-black/60">›</button>
+          </div>
+          <div className="hidden items-center gap-1 rounded-full bg-black/40 px-2 py-1 backdrop-blur sm:flex">
+            {MAU_BANNER.map((m, i) => (
+              <button key={i} onClick={() => sang(i)} aria-label={`Xem mẫu ${i + 1}: ${m.ten}`} aria-current={i === chiSo}
+                className={`h-1.5 rounded-full transition-all ${i === chiSo ? 'w-5 bg-white' : 'w-1.5 bg-white/50 hover:bg-white/90'}`} />
+            ))}
+          </div>
         </div>
 
-        {/* Chấm báo đang ở mẫu nào — góc dưới bên trái */}
-        <div className="absolute bottom-3 left-3 z-30 hidden flex-wrap items-center gap-1.5 sm:flex">
-          {MAU_BANNER.map((m, i) => (
-            <button key={i} onClick={() => sang(i)} aria-label={`Xem mẫu ${i + 1}: ${m.ten}`} aria-current={i === chiSo}
-              className={`h-1.5 rounded-full transition-all ${i === chiSo ? 'w-5 bg-white' : 'w-1.5 bg-white/45 hover:bg-white/80'}`} />
-          ))}
-        </div>
+        {/* Vệt tối mép dưới cho liền mạch xuống dải tìm kiếm bên dưới. */}
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 bg-gradient-to-t from-black/35 to-transparent" />
       </div>
 
-      {/* Ô tìm kiếm chỉ ĐÈ LÊN đáy banner ở màn MÁY TÍNH cho liền khối.
-          Điện thoại thì KHÔNG đè: ở màn nhỏ bản thiết kế dồn hết chữ và nút của
-          banner xuống đáy, kéo ô tìm kiếm lên là che mất đúng chỗ đó. */}
+      {/* ── Ô TÌM KIẾM NỔI Ở MÉP DƯỚI BANNER ────────────────────────────────
+          ⚠️ BA CÁCH ĐÃ THỬ VÀ BỊ LOẠI, đừng làm lại:
+          1) Đè hẳn vào trong banner → che mất chữ của chính banner (mẫu nào
+             cũng có chữ hoặc nút nằm sát đáy).
+          2) Đặt trên một dải xanh riêng bên dưới → hai bên ô tìm kiếm thừa hai
+             mảng xanh trống hoác, nhìn chắp vá.
+          3) Kéo ô tìm kiếm dài hết chiều ngang cho hết chỗ trống → chủ dự án
+             không chấp nhận, ô dài quá nhìn mất cân.
+          Nay: ô tìm kiếm NỔI LÊN đúng mép dưới banner, chỉ đè vào một dải mỏng.
+          Hai bên nó là nền trang bình thường chứ không phải mảng xanh → không
+          còn chỗ trống nào. */}
       {children ? (
-        <div className="relative z-30 mx-auto mt-3 max-w-[1280px] px-3 pb-5 text-white sm:px-4 md:-mt-14 md:mt-0 md:pb-8">
+        <div className="relative z-30 mx-auto mt-3 max-w-[1180px] px-3 pb-6 sm:px-4 md:-mt-14">  {/* ⚠️ CHỈ đè lên banner ở màn máy tính (md trở lên). Màn điện thoại bản
+                thiết kế dồn hết chữ và nút của banner xuống đáy — đè lên là che
+                mất đúng chỗ đó, đã thử và bị che nút "Nhận thông tin". */}
           {children}
         </div>
-      ) : <div className="pb-3" />}
+      ) : null}
     </section>
   );
 }

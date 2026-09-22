@@ -265,7 +265,7 @@ export default function ListingDetail() {
               <div className="h-72 rounded-xl overflow-hidden">
                 <MapView center={[l.lng, l.lat]} zoom={15} baseMap="satellite" markers={[{ lng: l.lng, lat: l.lat, popupHtml: `<b>${l.title}</b>` }]} className="h-full w-full" />
               </div>
-              <a href={`https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lng}`} target="_blank" rel="noreferrer" className="mt-2 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl">🧭 Chỉ đường đến bất động sản</a>
+              <a href={`https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lng}`} target="_blank" rel="noreferrer" className="cl-press mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#0A2540] py-2.5 font-bold text-white hover:bg-[#0d3a6b]">🧭 Chỉ đường đến bất động sản</a>
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
@@ -279,14 +279,21 @@ export default function ListingDetail() {
               <p className="text-xs text-slate-400 mt-3">🕒 {postedLabel(l.createdAt)}</p>
             </div>
 
-            {/* Liên kết chéo → Cẩm nang pháp lý (tăng lượt xem bảng dịch vụ) */}
-            <Link href="/cam-nang" className="flex items-center gap-3 bg-gradient-to-br from-[#0A2540] to-[#0d3a6b] text-white rounded-2xl p-4 hover:shadow-lg transition">
-              <span className="text-3xl shrink-0">📚</span>
-              <span className="flex-1 min-w-0">
-                <span className="block font-bold">Thủ tục pháp lý khi mua bán đất</span>
-                <span className="block text-[13px] text-white/75">Sang tên sổ đỏ, thuế phí, kiểm tra sổ, mẫu hợp đồng đặt cọc — tư vấn miễn phí.</span>
+            {/* Liên kết chéo → Cẩm nang pháp lý (tăng lượt xem bảng dịch vụ).
+                ⚠️ TRƯỚC ĐÂY khối này để nền navy đậm, chữ trắng, nút vàng — lạc hẳn
+                giữa một trang mà MỌI khối khác đều là thẻ TRẮNG, viền xám nhạt,
+                tiêu đề màu navy. Nhìn như dán nhầm từ trang khác sang.
+                Nay dùng đúng bộ áo chung của trang: thẻ trắng + viền slate-200 +
+                bo góc rounded-2xl + tiêu đề navy. Nút viền navy, rê chuột thì tô
+                đặc — vẫn nổi để bấm mà không phá nhịp trang. Đừng đổi lại nền tối. */}
+            <Link href="/cam-nang"
+              className="group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-[#C8A14B]/60 hover:shadow-lg sm:p-5">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#0A2540]/[0.06] text-xl">📚</span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-bold text-[#0A2540]">Thủ tục pháp lý khi mua bán đất</span>
+                <span className="block text-[13px] text-slate-500">Sang tên sổ đỏ, thuế phí, kiểm tra sổ, mẫu hợp đồng đặt cọc — tư vấn miễn phí.</span>
               </span>
-              <span className="bg-[#C8A14B] text-[#0A2540] font-bold px-4 py-2 rounded-lg text-sm shrink-0 whitespace-nowrap">Xem →</span>
+              <span className="shrink-0 whitespace-nowrap rounded-lg border border-[#0A2540] px-4 py-2 text-sm font-bold text-[#0A2540] transition group-hover:bg-[#0A2540] group-hover:text-white">Xem →</span>
             </Link>
           </div>
 

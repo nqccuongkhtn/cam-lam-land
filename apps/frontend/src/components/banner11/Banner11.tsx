@@ -192,6 +192,14 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
   /* Hai mũi tên chuyển mẫu chỉ hiện khi CHUỘT ĐANG DI CHUYỂN trong banner.
      Chuột đứng im 1,6 giây là ẩn đi — để banner sạch hết mức. */
   const [hienNut, setHienNut] = useState(false);
+  /* Mẫu ĐANG TRƯỢT RA. Giữ nó lại trong trang thêm một nhịp để hai mẫu cùng
+     chạy ngang qua nhau — có vậy mới ra động tác "lướt". Xong thì bỏ. */
+  const [dangRa, setDangRa] = useState<number | null>(null);
+  /* Đang đụng vào ô tìm kiếm (rê chuột vào hoặc đang gõ). Lúc đó ô tìm kiếm rõ
+     hẳn lên còn banner mờ xuống, để người dùng tập trung vào việc tìm. */
+  const [dangTim, setDangTim] = useState(false);
+  const [huongLuot, setHuongLuot] = useState(1);
+  const henRa = useRef<number>(0);
   const henNut = useRef<number>(0);
   const [coChamTay, setCoChamTay] = useState(false);
   useEffect(() => {
@@ -206,7 +214,26 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
   }, []);
 
   const mau = MAU_BANNER[chiSo];
-  const sang = useCallback((i: number) => setChiSo((i + MAU_BANNER.length) % MAU_BANNER.length), []);
+  const sang = useCallback((i: number) => {
+    setChiSo((cu) => {
+      const moi = (i + MAU_BANNER.length) % MAU_BANNER.length;
+      if (moi === cu) return cu;
+      /* Đi tới hay đi lui: tính theo đường ngắn nhất để mũi tên "‹" luôn trượt
+         ngược chiều với "›", kể cả lúc vòng từ mẫu cuối về mẫu đầu. */
+      const tien = (moi - cu + MAU_BANNER.length) % MAU_BANNER.length;
+      setHuongLuot(tien <= MAU_BANNER.length / 2 ? 1 : -1);
+      setDangRa(cu);
+      return moi;
+    });
+  }, []);
+  /* Dọn mẫu cũ sau khi trượt xong. Đúng bằng thời lượng hiệu ứng trong CSS. */
+  useEffect(() => {
+    if (dangRa === null) return;
+    clearTimeout(henRa.current);
+    henRa.current = window.setTimeout(() => setDangRa(null), 700);
+    return () => clearTimeout(henRa.current);
+  }, [dangRa, chiSo]);
+  const khongGan = useCallback(() => {}, []);
 
   useEffect(() => { setIt(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false); }, []);
 
@@ -245,6 +272,21 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
          requestAnimationFrame, vì tab ẩn thì requestAnimationFrame không chạy. */
       if (!w) { clearTimeout(doHen); doHen = window.setTimeout(doLaiCo, 250); return; }
       b.style.setProperty('--u', String(w / KHO_GOC));
+      khung.classList.add('san-sang');   // đo xong mới cho nội dung banner hiện ra
+
+      /* ── DẢI TRỐNG NGAY DƯỚI THANH MENU ĐỂ ĐẶT Ô TÌM KIẾM ───────────────
+         Mỗi mẫu bố cục một kiểu, nên không có chỗ nào sẵn trống ở cả 19 mẫu —
+         đặt ô tìm kiếm vào bất cứ đâu cũng có mẫu bị che chữ. Cách giải: kéo
+         banner CAO THÊM đúng bề dày dải rồi đẩy TOÀN BỘ khối chữ của mẫu xuống
+         bấy nhiêu (luật đẩy do bộ tách tự sinh, xem cuối banner11.css).
+         Nhờ vậy giữ nguyên 100% thiết kế của từng mẫu, chỉ dời xuống một chút,
+         mà mẫu nào cũng có một dải trống y như nhau.
+         Điện thoại KHÔNG chừa dải: màn nhỏ ô tìm kiếm nằm hẳn dưới banner. */
+      const rongManHinh = window.innerWidth;
+      const thanh = rongManHinh >= 1101 ? 124 : rongManHinh >= 761 ? 116 : 0;
+      const tiLe = rongManHinh >= 1101 ? 620 : 760;      // khổ thiết kế 1920×620
+      b.style.setProperty('--thanh', thanh + 'px');
+      b.style.height = thanh ? Math.round((w * tiLe) / KHO_GOC + thanh) + 'px' : '';
 
       /* Điện thoại: vài mẫu khai sẵn khung cắt ảnh riêng (data-vbm) để chủ thể
          nằm phía trên, không bị khối chữ che. Không đổi thì trên màn nhỏ chỉ
@@ -427,11 +469,29 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
           Chặn bề ngang ở 1920px vì bản gốc vẽ trên khổ 1920×620 — rộng hơn nữa
           thì chữ và nút phình to quá cỡ chứ không đẹp thêm. */}
       <div
-        className="relative mx-auto w-full max-w-[1920px]"
+        className="relative mx-auto w-full max-w-[1920px] overflow-hidden"
         onPointerMove={reChuot}
         onPointerLeave={() => { clearTimeout(henNut.current); setHienNut(false); }}
       >
-        <RuotBanner key={chiSo} html={mau.html} lop={`cl-b11 cl-b11-vao${it ? ' static' : ''}`} nhan={setBoc} />
+        {/* ── HAI MẪU CÙNG CÓ MẶT LÚC ĐANG LƯỚT ─────────────────────────────
+            Mẫu cũ nằm đè lên trên và trượt ra, mẫu mới trượt vào từ phía kia.
+            ⚠️ Phải để ĐÚNG `key` là số thứ tự mẫu: nhờ vậy React giữ nguyên thẻ
+            của mẫu cũ (giữ luôn mọi hiệu ứng nó đang chạy dở) thay vì dựng lại
+            từ đầu — dựng lại thì mẫu cũ hiện ra trống trơn lúc trượt. */}
+        {dangRa !== null && dangRa !== chiSo && (
+          <RuotBanner
+            key={dangRa}
+            html={MAU_BANNER[dangRa].html}
+            lop={`cl-b11 absolute inset-0 z-10 ${huongLuot > 0 ? 'cl-b11-ra-trai' : 'cl-b11-ra-phai'}${it ? ' static' : ''}`}
+            nhan={khongGan}
+          />
+        )}
+        <RuotBanner
+          key={chiSo}
+          html={mau.html}
+          lop={`cl-b11 ${huongLuot > 0 ? 'cl-b11-vao-phai' : 'cl-b11-vao-trai'}${it ? ' static' : ''}`}
+          nhan={setBoc}
+        />
 
         {/* Vệt tối mỏng ở mép trên: menu chữ trắng, mà nhiều mẫu banner có nền
             sáng ngay chỗ đó → không có vệt này là đọc không ra tên menu. */}
@@ -457,22 +517,34 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
           >{dau as string}</button>
         ))}
 
-        {/* Vệt tối mép dưới cho liền mạch xuống dải tìm kiếm bên dưới. */}
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 bg-gradient-to-t from-black/35 to-transparent" />
-      </div>
+        {/* Vệt tối mép dưới cho chữ trong ô tìm kiếm nổi lên khỏi ảnh. */}
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-20 hidden h-40 bg-gradient-to-t from-black/55 via-black/20 to-transparent md:block" />
 
-      {/* ── Ô TÌM KIẾM NẰM DƯỚI BANNER ───────────────────────────────────────
-          ⚠️ BỐN CÁCH ĐÃ THỬ VÀ BỊ LOẠI — đừng làm lại:
-          1) Đè hẳn vào trong banner        → che mất chữ của chính banner.
-          2) Dải xanh riêng bên dưới        → hai bên thừa mảng xanh trống hoác.
-          3) Kéo dài hết chiều ngang        → chủ dự án không chấp nhận.
-          4) Kéo cao banner chừa dải ở đáy  → ô tìm kiếm nằm ở đáy ảnh vẫn xấu.
-          Nay để hẳn XUỐNG DƯỚI banner trên nền trang, không đè gì cả. */}
+        {/* Lớp làm tối CẢ BANNER khi người dùng đụng vào ô tìm kiếm. */}
+        <div aria-hidden
+          className={`pointer-events-none absolute inset-0 z-20 hidden bg-[#04101f] transition-opacity duration-500 md:block ${dangTim ? 'opacity-[.62]' : 'opacity-0'}`} />
+      {/* ── Ô TÌM KIẾM NẰM TRONG BANNER, BÌNH THƯỜNG THÌ MỜ ────────────────
+          Ý của chủ dự án: để ô tìm kiếm ngay trong banner nhưng ĐỂ MỜ, khi nào
+          người dùng rê chuột vào hoặc bắt đầu gõ thì ô rõ hẳn lên và banner mờ
+          xuống. Nhờ vậy lúc chỉ ngắm banner thì ô tìm kiếm không giành chỗ,
+          lúc cần tìm thì nó nổi bật hẳn.
+          ⚠️ Chỉ làm vậy ở màn MÁY TÍNH. Điện thoại không có chuột để rê, mà bản
+          thiết kế lại dồn hết chữ của banner xuống đáy — nên ở màn nhỏ ô tìm
+          kiếm vẫn nằm hẳn bên dưới banner, rõ sẵn. */}
       {children ? (
-        <div className="mx-auto max-w-[1180px] px-3 pb-6 pt-4 sm:px-4">
+        <div
+          onPointerEnter={() => setDangTim(true)}
+          onPointerLeave={() => setDangTim(false)}
+          onFocusCapture={() => setDangTim(true)}
+          onBlurCapture={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDangTim(false); }}
+          /* Đặt ở DẢI TRỐNG NGAY DƯỚI THANH MENU (top-[62px]) — chỗ này đã được
+             chừa sẵn cho mọi mẫu nên không bao giờ đè lên chữ của banner. */
+          className={`mx-auto max-w-[1180px] px-3 pb-6 pt-4 transition-all duration-500 sm:px-4 md:absolute md:inset-x-0 md:top-[62px] md:z-30 md:pb-0 md:pt-0 ${dangTim ? 'md:opacity-100' : 'md:opacity-[.74]'}`}
+        >
           {children}
         </div>
       ) : null}
+      </div>
     </section>
   );
 }

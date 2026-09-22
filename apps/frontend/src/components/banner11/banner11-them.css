@@ -60,15 +60,43 @@
   .cl-b11 .hud { margin-top: 62px }
 }
 
-/* ── HIỆU ỨNG TRƯỢT KHI ĐỔI MẪU ─────────────────────────────────────────────
-   Mẫu mới trượt từ phải sang, không phải hiện ra đột ngột. */
-@keyframes cl-b11-truot {
-  from { opacity: 0; transform: translate3d(6%, 0, 0) }
-  to   { opacity: 1; transform: none }
+/* ── HIỆU ỨNG LƯỚT KHI ĐỔI MẪU ──────────────────────────────────────────────
+   Hai mẫu cùng chạy ngang qua nhau: mẫu cũ trượt ra một bên, mẫu mới trượt vào
+   từ bên kia — giống lướt ảnh trên điện thoại.
+   ⚠️ Trước đây chỉ cho mẫu mới dịch vào 6% nên gần như không ai thấy, chủ dự án
+   báo "vẫn mất hiệu ứng lướt". Nay trượt trọn cả bề ngang. */
+@keyframes cl-b11-vao-phai { from { transform: translate3d(100%, 0, 0) } to { transform: none } }
+@keyframes cl-b11-vao-trai { from { transform: translate3d(-100%, 0, 0) } to { transform: none } }
+@keyframes cl-b11-ra-trai  { from { transform: none } to { transform: translate3d(-100%, 0, 0) } }
+@keyframes cl-b11-ra-phai  { from { transform: none } to { transform: translate3d(100%, 0, 0) } }
+
+.cl-b11-vao-phai { animation: cl-b11-vao-phai .68s cubic-bezier(.22, 1, .28, 1) both }
+.cl-b11-vao-trai { animation: cl-b11-vao-trai .68s cubic-bezier(.22, 1, .28, 1) both }
+.cl-b11-ra-trai  { animation: cl-b11-ra-trai  .68s cubic-bezier(.22, 1, .28, 1) both }
+.cl-b11-ra-phai  { animation: cl-b11-ra-phai  .68s cubic-bezier(.22, 1, .28, 1) both }
+
+/* ── VỆT SÁNG QUÉT QUA KHI MẪU MỚI VỪA VÀO ──────────────────────────────────
+   Lấy ý từ vệt sáng của bản thiết kế (mẫu 2 và 11 có sẵn), nhưng dùng chung
+   cho MỌI mẫu để lúc đổi mẫu nào cũng có một nhịp sáng loé — nối hai mẫu lại
+   cho liền mạch. Chỉ chạy một lần, không lặp, để không rối mắt. */
+@keyframes cl-b11-quet {
+  0%   { transform: translate3d(-140%, 0, 0) skewX(-18deg); opacity: 0 }
+  22%  { opacity: .55 }
+  100% { transform: translate3d(140%, 0, 0) skewX(-18deg); opacity: 0 }
 }
-.cl-b11-vao { animation: cl-b11-truot .6s cubic-bezier(.16, 1, .3, 1) both }
+.cl-b11-vao-phai::after,
+.cl-b11-vao-trai::after {
+  content: ""; position: absolute; inset: 0 auto 0 0; width: 38%;
+  z-index: 40; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .34) 45%, transparent);
+  animation: cl-b11-quet 1.05s cubic-bezier(.4, 0, .2, 1) .18s both;
+}
+.cl-b11 { position: relative }
+
+/* Máy đặt "giảm chuyển động" thì đổi mẫu không trượt, không quét. */
 @media (prefers-reduced-motion: reduce) {
-  .cl-b11-vao { animation: none }
+  .cl-b11-vao-phai, .cl-b11-vao-trai, .cl-b11-ra-trai, .cl-b11-ra-phai { animation: none }
+  .cl-b11-vao-phai::after, .cl-b11-vao-trai::after { display: none }
 }
 
 /* Chữ trên thanh menu màu trắng, mà mấy mẫu banner có nền trời rất sáng ngay
@@ -80,3 +108,13 @@
     pointer-events: none;
   }
 }
+
+
+/* ── CHỐNG BANNER "NHẢY" LÚC MỚI TẢI TRANG ──────────────────────────────────
+   Mọi cỡ chữ, cỡ nút trong banner tính theo biến `--u` = bề ngang / 1920, mà
+   biến đó do mã chạy đặt SAU khi trang hiện ra. Trong khoảnh khắc đầu --u còn
+   bằng 1, tức banner vẽ theo khổ thiết kế 1920px trong cái khung hẹp hơn nhiều
+   → chữ to đùng rồi mới thu lại đúng chỗ, nhìn như giật một cái.
+   Cách chặn: giấu phần nội dung cho tới khi đo xong (mã chạy gắn lớp
+   `san-sang`). Nền tối của banner vẫn hiện ngay nên không thấy khoảng trắng. */
+.cl-b11:not(.san-sang) .banner > * { visibility: hidden }

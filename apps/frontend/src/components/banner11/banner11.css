@@ -227,7 +227,7 @@
 /* ============ A5. Ảnh 2 màu -> màu thật ============ */
 .cl-b11 .st-duo{background:#0b1d36}
 .cl-b11 .du-duo{filter:grayscale(1) contrast(1.06) brightness(.9)}
-.cl-b11 @property --wx{syntax:'<percentage>';inherits:true;initial-value:100%}
+@property --wx{syntax:'<percentage>';inherits:true;initial-value:100%}
 .cl-b11 .du-anim{--wx:100%}
 .cl-b11 .du-anim.go{animation:duWipe calc(10000ms*var(--slow)) linear both}
 @keyframes duWipe{0%{--wx:100%;animation-timing-function:var(--qio)}14%{--wx:36%}32%{--wx:36%;animation-timing-function:var(--qio)}46%{--wx:-28%}90%{--wx:-28%;animation-timing-function:var(--qio)}100%{--wx:100%}}
@@ -626,3 +626,38 @@
   .cl-b11 .st-c13 .b-text, .cl-b11 .st-c16 .b-text, .cl-b11 .st-c18 .b-text{z-index:10}
 }
 .cl-b11.static .c18-patch, .cl-b11.static .c18-plane{display:none}
+
+/* ══ CHỪA DẢI TRỐNG DƯỚI THANH MENU CHO Ô TÌM KIẾM ═══════════════════════
+ * SINH TỰ ĐỘNG — xem hàm luat_day_xuong() trong scripts/banner11/tach-banner.py
+ * Mỗi mẫu bố cục một kiểu nên không có chỗ nào sẵn trống ở mọi mẫu. Cách giải:
+ * kéo banner cao thêm `--thanh` px rồi đẩy TẤT CẢ khối nội dung xuống đúng bấy
+ * nhiêu → mẫu nào cũng có một dải trống y như nhau ngay dưới thanh menu.
+ * Lớp ảnh nền KHÔNG bị đẩy nên vẫn phủ kín, banner vẫn là một tấm ảnh liền.
+ * ═════════════════════════════════════════════════════════════════════════ */
+.cl-b11 .brand-tab,
+.cl-b11 .banner.img-failed::after,
+.cl-b11 .banner.loading::after,
+.cl-b11 .rb-couple,
+.cl-b11 .rb-text,
+.cl-b11 .sp-logo,
+.cl-b11 .sp-content,
+.cl-b11 .sp-track,
+.cl-b11 .flare,
+.cl-b11 .sp-cta,
+.cl-b11 .pp-logo,
+.cl-b11 .du-content,
+.cl-b11 .pl-text,
+.cl-b11 .tape,
+.cl-b11 .bb-rings,
+.cl-b11 .bb-orbit,
+.cl-b11 .bb-plane,
+.cl-b11 .bb-text,
+.cl-b11 .sl-tag,
+.cl-b11 .ui-text,
+.cl-b11 .ui-chat,
+.cl-b11 .hud .rec,
+.cl-b11 .hud .cross,
+.cl-b11 .fl-text,
+.cl-b11 .b-text,
+.cl-b11 .b10-seal { margin-top: var(--thanh, 0px) }
+

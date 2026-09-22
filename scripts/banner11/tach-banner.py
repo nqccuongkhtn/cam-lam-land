@@ -42,21 +42,26 @@ THU_MUC_ANH = os.path.join(GOC, 'apps', 'frontend', 'public', 'banner11')
 #    Mã ảnh = phần nhận dạng trong địa chỉ Unsplash/Pexels.
 #    Để trống một mẫu = giữ nguyên ảnh của bản thiết kế (sẽ tải về máy chủ mình).
 DOI_ANH = {
-    10: {'35995788': '/banner11/qh-cam-lam.webp'},      # bản đồ quy hoạch THẬT thay ảnh flycam
-    12: {'1655776040426': '/bai-dai/bd-12.webp'},       # mặt nước gợn sóng → biển Bãi Dài thật
-    14: {'19439393': '/bai-dai/bd-03.webp'},            # nét cọ vẽ ra ảnh → Bãi Dài thật
-    15: {'37114048': '/tin-mau/dat-nen-08.webp'},       # phác thảo nhà → đất trống
-    16: {'33794744': '/tin-mau/dat-nen-03.webp'},       # tuyến đường → con đường
-    17: {'1654930453993': '/tin-mau/nha-01.webp'},      # rọi sáng toà nhà → nhà
-    19: {'35995788': '/tin-mau/vuon-06.webp'},          # ảnh thật → bản đồ QH: cần ảnh ruộng
+    # (đang để trống — xem ghi chú bên dưới)
 }
-# Mẫu 13 chủ dự án dặn GIỮ NGUYÊN ảnh gốc (tia nắng bình minh) → không khai ở đây.
-# Mẫu 18 cũng giữ: ảnh đó là người đã tách nền, thay bằng ảnh thường là mất hẳn
-# hiệu ứng "chủ thể vượt khung".
+# ⚠️ ĐỪNG ĐỔI ẢNH CỦA CÁC MẪU NÀY. Đã thử và hỏng nặng.
+#    Rất nhiều mẫu có NÉT VẼ TAY BÁM THEO ĐÚNG TẤM ẢNH GỐC:
+#      · mẫu 10 vẽ ranh thửa men theo bờ ruộng trong ảnh flycam;
+#      · mẫu 16 vẽ tuyến đường men theo con đường thật trong ảnh;
+#      · mẫu 15 đặt hình phác thảo căn nhà đúng vào khoảng đất trống;
+#      · mẫu 12 làm gợn sóng đúng dải mặt nước, đốm sáng đặt đúng chỗ;
+#      · mẫu 17 rọi đèn đúng vào toà nhà;
+#      · mẫu 19 dùng bộ lọc chỉnh riêng cho ảnh ruộng lúa.
+#    Thay ảnh khác là mấy nét vẽ đó trỏ vào chỗ trống, nhìn loạn hết.
+#    Muốn dùng ảnh thật của Cam Lâm thì phải VẼ LẠI nét cho khớp từng tấm ảnh
+#    mới — làm được nhưng là việc riêng cho từng mẫu, không đổi một dòng là xong.
 
 # ── SỬA CHỮ: {số thứ tự mẫu: [(chữ cũ, chữ mới), ...]} ───────────────────────
 SUA_CHU = {
-    10: [('Ảnh flycam · Cam Lâm', 'Bản đồ quy hoạch · Cam Lâm')],
+    # (đang để trống)
+    # Đã từng đổi chữ "Ảnh flycam" của mẫu 10 thành "Bản đồ quy hoạch" cho hợp
+    # với ảnh nền mới — nhưng ảnh nền đã trả lại ảnh flycam gốc (xem ghi chú ở
+    # DOI_ANH) nên chữ cũng phải trả lại cho đúng sự thật.
 }
 
 # ── THAY CẢ MỘT ĐOẠN MÃ (dùng khi đổi ảnh không đủ) ─────────────────────────
@@ -68,7 +73,16 @@ BAN_DO_VE_TAY = ('<rect width="276" height="150" fill="#e0f2fe"/>'
                  '<g transform="translate(140 76)">')
 BAN_DO_THAT = ('<image href="/banner11/qh-cam-lam.webp" x="0" y="0" width="276" height="150" '
                'preserveAspectRatio="xMidYMid slice"/><g transform="translate(126 82)">')
-THAY_DOAN = {9: [(BAN_DO_VE_TAY, BAN_DO_THAT)]}
+#    Mẫu 12 làm gợn sóng cả dải nước — mà mấy chiếc thuyền cũng nằm trong dải đó
+#    nên bị uốn éo theo, chủ dự án nói nhìn khó chịu. Hạ độ gợn xuống và cho gợn
+#    chỉ bắt đầu ở nửa dưới của dải (chỗ mặt nước trống, không có thuyền).
+THAY_DOAN = {
+    9: [(BAN_DO_VE_TAY, BAN_DO_THAT)],
+    12: [
+        ('scale="10"', 'scale="4"'),                       # gợn nhẹ hẳn đi
+        ('offset=".15" stop-color="#fff"', 'offset=".58" stop-color="#fff"'),  # chừa phần có thuyền
+    ],
+}
 
 
 def ten_anh_tai_ve(u: str) -> str:
@@ -140,7 +154,13 @@ def boc_css(css: str) -> str:
                         break
                 e += 1
             than, s = txt[j + 1:e], sel.strip()
-            if s.startswith('@keyframes') or s.startswith('@-webkit-keyframes') or s.startswith('@font-face'):
+            # ⚠️ @property PHẢI ĐỂ NGUYÊN. Bọc nó thành ".cl-b11 @property --wx"
+            #    là CSS sai, trình duyệt bỏ qua → biến --wx không được khai báo
+            #    kiểu → hiệu ứng nào chạy bằng cách biến đổi biến đó sẽ NHẢY
+            #    GIẬT từng nấc chứ không trượt mượt (mẫu 5 "đen trắng → màu thật"
+            #    đứng im một chỗ, đã vấp đúng lỗi này).
+            if s.startswith(('@keyframes', '@-webkit-keyframes', '@font-face',
+                             '@property', '@counter-style', '@page')):
                 ra.append(dau + sel + '{' + than + '}')
             elif s.startswith('@media') or s.startswith('@supports'):
                 ra.append(dau + sel + '{' + di(than) + '}')
@@ -151,6 +171,54 @@ def boc_css(css: str) -> str:
 
     ra = di(css)
     return re.sub(r'/\*__C(\d+)__\*/', lambda m: chuthich[int(m.group(1))], ra)
+
+
+
+def luat_day_xuong(css: str) -> str:
+    """
+    Sinh luật CSS đẩy các khối NỘI DUNG của mọi mẫu xuống, để chừa một dải trống
+    cố định ngay dưới thanh menu cho ô tìm kiếm.
+
+    VÌ SAO PHẢI SINH TỰ ĐỘNG, KHÔNG KHAI TAY:
+    Mỗi mẫu bố cục một kiểu. Đặt ô tìm kiếm ở một chỗ cố định thì mẫu này vừa,
+    mẫu kia đè lên chữ — chủ dự án đã gặp đúng chuyện đó. Chừa sẵn một dải trống
+    NHƯ NHAU ở mọi mẫu mới giải được gốc vấn đề. Mà danh sách khối nội dung thì
+    mỗi lần bản thiết kế sửa lại khác, nên phải tự dò.
+
+    CÁCH DÒ: lấy những luật vừa `position:absolute` vừa có `top:`.
+    BỎ QUA luật có CẢ `top:` lẫn `bottom:` — đó là lớp ảnh nền / lớp phủ chạy
+    suốt chiều cao, đẩy xuống là hở một mảng ở đỉnh banner.
+    Phần dành cho điện thoại (@media max-width:760px) để yên, vì ở màn nhỏ ô tìm
+    kiếm nằm hẳn dưới banner, không cần chừa dải.
+    """
+    khong = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
+    khong = re.sub(r'@media \(max-width:760px\)\{.*?\n\}', '', khong, flags=re.S)
+    ten = []
+    for m in re.finditer(r'(\.cl-b11 [^{@]*)\{([^}]*)\}', khong):
+        sel, than = m.group(1).strip(), m.group(2)
+        if 'position:absolute' not in than:
+            continue
+        if not re.search(r'(?:^|;)top:', than):
+            continue
+        if re.search(r'(?:^|;)bottom:', than):        # lớp chạy suốt chiều cao
+            continue
+        for x in sel.split(','):
+            x = x.strip()
+            if x and x not in ten:
+                ten.append(x)
+    if not ten:
+        return ''
+    ds = ',\n'.join(ten)
+    dau = (
+        '\n\n/* ══ CHỪA DẢI TRỐNG DƯỚI THANH MENU CHO Ô TÌM KIẾM ═══════════════════════\n'
+        ' * SINH TỰ ĐỘNG — xem hàm luat_day_xuong() trong scripts/banner11/tach-banner.py\n'
+        ' * Mỗi mẫu bố cục một kiểu nên không có chỗ nào sẵn trống ở mọi mẫu. Cách giải:\n'
+        ' * kéo banner cao thêm `--thanh` px rồi đẩy TẤT CẢ khối nội dung xuống đúng bấy\n'
+        ' * nhiêu → mẫu nào cũng có một dải trống y như nhau ngay dưới thanh menu.\n'
+        ' * Lớp ảnh nền KHÔNG bị đẩy nên vẫn phủ kín, banner vẫn là một tấm ảnh liền.\n'
+        ' * ═════════════════════════════════════════════════════════════════════════ */\n'
+    )
+    return dau + ds + ' { margin-top: var(--thanh, 0px) }\n'
 
 
 def main():
@@ -226,7 +294,8 @@ def main():
  * ========================================================================== */
 
 ''' % len(mau)
-    io.open(os.path.join(THU_MUC_RA, 'banner11.css'), 'w', encoding='utf-8', newline='\n').write(dau_de + ra_css.strip() + '\n')
+    io.open(os.path.join(THU_MUC_RA, 'banner11.css'), 'w', encoding='utf-8', newline='\n').write(
+        dau_de + ra_css.strip() + luat_day_xuong(ra_css) + '\n')
 
     dau_ts = '''/* ============================================================================
  *  %d MẪU BANNER ĐỘNG — phần nội dung (mã HTML của từng mẫu)

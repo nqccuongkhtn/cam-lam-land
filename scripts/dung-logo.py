@@ -42,8 +42,10 @@ NET_SANG = (250, 251, 252)     # trang nga  — dung tren nen toi
 TROI_SANG = (229, 188, 98)
 NET_TOI = (19, 52, 89)         # navy goc   — dung tren nen sang
 TROI_TOI = (198, 158, 73)
-# CHU LONG "CL" TO MAU DO cho logo do don dieu — do lay dung mau nut "Dang
-# nhap"/"Dang tin" cua web (#DC2626 / red-600), de ca trang nhin lien mach.
+# ⛔ DA TAT: tung to chu long "CL" mau do (dung mau nut "Dang nhap") cho logo
+#    do don dieu, nhung chu du an xem roi noi "mau do khong hop" -> tat di.
+#    Bat lai thi doi DUNG_DO = True.
+DUNG_DO = False
 DO_SANG = (239, 68, 68)        # tren nen toi thi do hoi sang cho noi
 DO_TOI = (220, 38, 38)         # tren nen sang thi do dam hon
 # Khung chua RIENG chu CL trong bieu tuong (do tren anh goc 749x501).
@@ -104,7 +106,8 @@ def main():
                                  (RA_TOI, NET_TOI, TROI_TOI, DO_TOI)):
         r = rgb.copy()
         r[xanh] = net
-        r[xanh & vung_cl] = do
+        if DUNG_DO:
+            r[xanh & vung_cl] = do
         r[(~xanh) & (alp > 0.04)] = troi
         out = Image.fromarray(np.dstack([r.astype(np.uint8), (alp * 255).astype(np.uint8)]), 'RGBA')
         bb = out.getbbox()
@@ -128,7 +131,8 @@ def main():
         # mặt trời (phần vốn màu vàng) nằm lọt trong khung cắt thì xoá hẳn đi
         a2[(~x2) & (a2 > 0.04)] = 0
         r[x2] = net
-        r[x2 & vcl] = do
+        if DUNG_DO:
+            r[x2 & vcl] = do
         out = Image.fromarray(np.dstack([r.astype(np.uint8), (a2 * 255).astype(np.uint8)]), 'RGBA')
         bb = out.getbbox()
         if bb:

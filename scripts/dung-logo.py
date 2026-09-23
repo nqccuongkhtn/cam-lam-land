@@ -25,8 +25,12 @@ from PIL import Image
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 RA = os.path.join(GOC, 'apps', 'frontend', 'public', 'logo-cam-lam.webp')
 
-VANG_NET = (200, 161, 75)      # #C8A14B  — vang thuong hieu
-VANG_TROI = (240, 205, 130)    # mat troi de sang hon cho tach bach
+# ⚠️ NET VE DE MAU TRANG, KHONG PHAI VANG.
+#    Da thu de vang (#C8A14B) tren nen navy: net vang o co 30px bi hoa vao nen,
+#    nhin "tho" — chu du an nhan xet dung. Trang tren navy tuong phan manh hon
+#    han nen giu duoc het net manh; rieng mat troi van de vang lam diem nhan.
+NET = (248, 250, 252)          # trang nga
+TROI = (227, 185, 95)          # vang mat troi
 KHO = 288
 
 
@@ -58,15 +62,19 @@ def main():
 
     c = np.asarray(im.crop(khung)).astype(np.float32)
 
-    # 2. Nen den -> trong suot (do sang chinh la do duc)
-    alp = np.clip((c.max(axis=2) - 14) / 46.0, 0, 1)
-    k = np.where(alp[..., None] > 0.05, np.minimum(1.0 / np.maximum(alp[..., None], 0.05), 3.0), 1.0)
+    # 2. Nen den -> trong suot.
+    #    ⚠️ DOC MUOT, DUNG CAT DUT. Truoc day dung nguong 14->60 rat gat nen vien
+    #    chu va vien mai bi rang cua, logo nhin tho. Nay doc thoai tu 8 den 48
+    #    va them gamma 0,85 cho vien mem dan.
+    L = c.max(axis=2)
+    alp = np.clip((L - 8) / 40.0, 0, 1) ** 0.85
+    k = np.where(alp[..., None] > 0.04, np.minimum(1.0 / np.maximum(alp[..., None], 0.04), 4.0), 1.0)
     rgb = np.clip(c * k, 0, 255)
 
-    # 3. Net navy -> vang; phan von da vang (mat troi) -> vang sang hon
+    # 3. Net navy -> trang; phan von da vang (mat troi) -> vang mat troi
     xanh = rgb[:, :, 2] > rgb[:, :, 0] + 12
-    rgb[xanh] = VANG_NET
-    rgb[(~xanh) & (alp > 0.05)] = VANG_TROI
+    rgb[xanh] = NET
+    rgb[(~xanh) & (alp > 0.04)] = TROI
 
     out = Image.fromarray(np.dstack([rgb.astype(np.uint8), (alp * 255).astype(np.uint8)]), 'RGBA')
     # ⚠️ CẮT SÁT, ĐỪNG ĐỘN THÀNH HÌNH VUÔNG.

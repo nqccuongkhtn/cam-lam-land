@@ -40,8 +40,8 @@ function Logo({ light }: { light: boolean }) {
           ⚠️ NỀN KHUNG GIỮ MÀU NAVY — đó là màu chủ đạo của web, chủ dự án dặn
              giữ. Logo gốc vẽ bằng chính màu navy nên đặt thẳng lên là chìm
              nghỉm; vì vậy tệp `logo-cam-lam.webp` đã được ĐỔI MÀU NÉT sang
-             vàng thương hiệu (#C8A14B), riêng mặt trời để vàng sáng hơn cho
-             tách bạch. Muốn dựng lại tệp này thì xem
+             TRẮNG NGÀ, riêng mặt trời giữ màu vàng làm điểm nhấn. (Đã thử để
+             nét màu vàng: ở cỡ 30px nét vàng hoà vào nền navy, nhìn thô.) Muốn dựng lại tệp này thì xem
              scripts/dung-logo.py.
           ⚠️ KHUNG HƠI BÈ NGANG (54×36) LÀ CỐ Ý: biểu tượng vốn bè ngang
              (tỉ lệ 1,52). Nhét vào khung vuông thì phải thu nhỏ lại, ở cỡ 36px

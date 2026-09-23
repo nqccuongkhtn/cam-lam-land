@@ -1,0 +1,18 @@
+NGUỒN GỐC BỘ HÌNH XE 3D
+=======================
+Các ảnh .png trong thư mục này do máy tự dựng (render) từ bộ model 3D "Car Kit" của Kenney.
+
+  Tác giả : Kenney (kenney.nl)
+  Bộ      : Car Kit — 3D · Transport, 45 model
+  Giấy phép: Creative Commons CC0 1.0 (hiến tặng vào phạm vi công cộng)
+
+CC0 nghĩa là: dùng thoải mái cho mọi mục đích, KỂ CẢ THƯƠNG MẠI, không cần xin phép,
+không bắt buộc ghi công. Kenney có nói "ghi công thì quý" nên ta ghi ở đây cho phải phép.
+
+Cách dựng: nạp file .glb bằng three.js, đặt máy quay nhìn từ trên xuống nghiêng nhẹ,
+xuất ảnh 512×512 nền trong suốt. Muốn dựng lại hoặc thêm xe thì lấy bộ gốc ở
+https://kenney.nl/assets/car-kit
+
+BỔ SUNG (cùng tác giả, cùng giấy phép CC0):
+  · Watercraft Kit — tàu thuyền   https://kenney.nl/assets/watercraft-kit
+  · Train Kit      — tàu hoả      https://kenney.nl/assets/train-kit

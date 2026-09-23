@@ -161,8 +161,14 @@ function anhCuaMau(html: string): string[] {
    Nên với màn dưới 761px: bỏ hai tầng sâu, chỉ giữ tầng toàn cảnh (tiết kiệm
    ~640 KB), và CSS hạ độ phóng xuống cho vừa với một tầng ảnh. */
 const LOP_NANG = /<g class="m19-l[23]"[\s\S]*?<\/g><\/g>/g;
-function lamNhe(html: string, hep: boolean): string {
-  return hep ? html.replace(LOP_NANG, '') : html;
+/* Bộ ảnh thu nhỏ cho điện thoại nằm ở `/banner11/dt/`, cùng tên file, bề ngang
+   tối đa 900 điểm ảnh. Dựng bằng scripts/banner11/nen-anh-dien-thoai.py —
+   THÊM/ĐỔI ảnh banner thì nhớ chạy lại script đó, không là điện thoại mất ảnh.
+   Đo thật: 6,8 MB → 2,0 MB cho cả bộ, tức nhẹ đi 71%. */
+const ANH_DT = /\/banner11\/(?!dt\/)([^"')]+?)\.(?:webp|png|jpe?g)/g;
+function lamNhe(html: string, hep: boolean | null): string {
+  if (!hep) return html;
+  return html.replace(LOP_NANG, '').replace(ANH_DT, '/banner11/dt/$1.webp');
 }
 
 /* ── Khung chứa mã HTML của một mẫu banner ────────────────────────────────────
@@ -189,8 +195,15 @@ const RuotBanner = memo(
 
 export default function Banner11({ children }: { children?: React.ReactNode }) {
   const [chiSo, setChiSo] = useState(0);
-  /* Màn hình hẹp (điện thoại) → bỏ bớt lớp ảnh nặng, xem lamNhe() ở trên. */
-  const [hep, setHep] = useState(false);
+  /* Màn hình hẹp (điện thoại) → dùng bộ ảnh nhỏ, bỏ bớt lớp nặng (xem lamNhe).
+     ⚠️ GIÁ TRỊ BAN ĐẦU PHẢI LÀ `null`, ĐỪNG ĐỂ `false`.
+        Để `false` thì lượt dựng đầu tiên đã nhét mã có ĐƯỜNG DẪN ẢNH GỐC vào
+        trang, trình duyệt lao đi tải ngay; một nhịp sau mới biết là điện thoại
+        rồi đổi sang ảnh nhỏ — hoá ra tải CẢ HAI bộ, nặng gấp đôi (đo thật: lòi
+        ra 2 tấm ảnh gốc gần 450 KB).
+        Với `null` thì lượt đầu để trống, đo xong mới dựng. Không thấy chớp, vì
+        banner vốn đã bị ẩn (`:not(.san-sang)`) cho tới khi mã chạy xong. */
+  const [hep, setHep] = useState<boolean | null>(null);
   useEffect(() => {
     const do_ = () => setHep(window.innerWidth < 761);
     do_();
@@ -283,12 +296,16 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
     const mangYeu = /^(slow-)?2g$|^3g$/.test(mang?.effectiveType || '');
     if (tietKiem || mangYeu) return;
     const sau = MAU_BANNER[(chiSo + 1) % MAU_BANNER.length];
-    const id = window.setTimeout(() => { anhCuaMau(sau.html).forEach((u) => { const im = new Image(); im.src = u; }); }, 1200);
+    const id = window.setTimeout(() => { anhCuaMau(lamNhe(sau.html, hep)).forEach((u) => { const im = new Image(); im.src = u; }); }, 1200);
     return () => clearTimeout(id);
-  }, [chiSo]);
+  }, [chiSo, hep]);
 
   /* ── Dựng và chạy mẫu đang hiện ──────────────────────────────────────────── */
   useEffect(() => {
+    /* Chưa đo xong bề ngang màn hình thì ruột banner còn rỗng — chưa có gì để
+       chạy. Đo xong `hep` đổi, hiệu ứng này chạy lại (hep nằm trong danh sách
+       phụ thuộc bên dưới). */
+    if (hep === null) return;
     const khung = boc;
     if (!khung) return;
     const b = khung.querySelector<HTMLElement>('.banner');
@@ -443,7 +460,10 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
       b.classList.remove('loading');
       if (muonChay) chay();
     };
-    const dsAnh = anhCuaMau(mau.html);
+    /* ⚠️ Phải lấy danh sách ảnh từ bản ĐÃ LÀM NHẸ, không phải bản gốc — nếu
+       không thì trên điện thoại vừa tải ảnh nhỏ (do mã trang dùng) vừa tải
+       ảnh gốc (do chỗ này tải trước), thành ra nặng gấp đôi. */
+    const dsAnh = anhCuaMau(lamNhe(mau.html, hep));
     /* Ảnh của mẫu sau luôn được tải trước (xem phần "tải trước" ở trên), nên
        phần lớn lúc đổi mẫu là ảnh đã nằm sẵn trong máy. Kiểm tra ngay: nếu đủ
        cả rồi thì CHẠY LIỀN, khỏi chờ một nhịp.
@@ -493,7 +513,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
       window.removeEventListener('resize', doLaiCo);
       document.removeEventListener('visibilitychange', xemLai);
     };
-  }, [boc, chiSo, tamDung, it, mau.html]);
+  }, [boc, chiSo, tamDung, it, mau.html, hep]);
 
   /* ── Hết một vòng thì sang mẫu sau ───────────────────────────────────────── */
   useEffect(() => {
@@ -536,7 +556,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
         {dangRa !== null && dangRa !== chiSo && (
           <RuotBanner
             key={dangRa}
-            html={lamNhe(MAU_BANNER[dangRa].html, hep)}
+            html={hep === null ? '' : lamNhe(MAU_BANNER[dangRa].html, hep)}
             /* `static` LUÔN bật cho mẫu đang trượt ra: mọi chữ trong mẫu đều
                bắt đầu ở trạng thái trong suốt rồi mới hiện dần, nên nếu không
                ép hiện đủ thì lúc trượt ra nó thành một khung trống trượt ngang
@@ -547,7 +567,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
         )}
         <RuotBanner
           key={chiSo}
-          html={lamNhe(mau.html, hep)}
+          html={hep === null ? '' : lamNhe(mau.html, hep)}
           lop={`cl-b11 ${huongLuot > 0 ? 'cl-b11-vao-phai' : 'cl-b11-vao-trai'}`}
           nhan={setBoc}
         />

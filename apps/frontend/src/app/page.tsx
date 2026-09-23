@@ -274,7 +274,9 @@ export default function Home() {
 
       {/* TIN TỨC & QUY HOẠCH — kiểu batdongsan */}
       <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
-        <div className="flex items-center gap-5 border-b border-slate-200 mb-5 overflow-x-auto">
+        {/* `no-scrollbar`: trên điện thoại dải tab này dài hơn màn nên trình duyệt
+            vẽ một thanh cuộn xám ngay dưới, nhìn rất thô. Vuốt vẫn cuộn được. */}
+        <div className="flex items-center gap-5 border-b border-slate-200 mb-5 overflow-x-auto no-scrollbar">
           {Object.keys(NEWS).map((t) => (
             <button key={t} onClick={() => setNewsTab(t)} className={`pb-2.5 text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${newsTab === t ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500 hover:text-[#0A2540]'}`}>{t}</button>
           ))}

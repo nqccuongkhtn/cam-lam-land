@@ -19,10 +19,26 @@
    cao 126px — chữ và nút không có chỗ. Bản thiết kế đã xếp lại nội dung theo
    chiều dọc cho màn nhỏ, nên ở đây cho banner cao lên gần vuông. */
 @media (max-width: 760px) {
-  .cl-b11 .banner { min-height: 300px; aspect-ratio: 5 / 4 }
+  .cl-b11 .banner { min-height: 268px; aspect-ratio: 7 / 5 }
 }
 @media (max-width: 420px) {
-  .cl-b11 .banner { min-height: 290px; aspect-ratio: 4 / 4.2 }
+  .cl-b11 .banner { min-height: 262px; aspect-ratio: 5 / 4 }
+}
+
+/* ══ ĐIỆN THOẠI: CHỮ TRONG BANNER PHẢI XUỐNG DƯỚI THANH MENU ═══════════════
+   Bản thiết kế đặt mấy khối chữ ở `top: 18–40px`. Trên web, banner nằm NGAY
+   DƯỚI thanh menu cao 56px (cộng thêm phần tai thỏ), nên chữ chui thẳng vào
+   sau logo — nhìn chồng chữ. Đẩy hết xuống dưới thanh menu.
+   ⚠️ Đừng chỉnh từng mẫu một trong banner11.css: file đó do
+      scripts/banner11/tach-banner.py sinh lại, sửa tay là mất. */
+@media (max-width: 760px) {
+  .cl-b11 .rb-big { top: calc(76px + env(safe-area-inset-top, 0px)) }
+  .cl-b11 .du-content,
+  .cl-b11 .pl-text,
+  .cl-b11 .bb-text,
+  .cl-b11 .ui-text,
+  .cl-b11 .fl-text,
+  .cl-b11 .b-text.m-top { top: calc(68px + env(safe-area-inset-top, 0px)) }
 }
 /* MÀN VỪA (máy tính bảng, laptop nhỏ): 3,1:1 là quá dẹt, chữ bé tí.
    Kéo cao lên một chút cho cân. */
@@ -288,16 +304,8 @@
 .cl-b11 .banner.static .m19-phong { animation: none !important; transform: scale(32) !important }
 .cl-b11 .banner.static .m19-l1, .cl-b11 .banner.static .m19-l2 { opacity: 0 !important }
 .cl-b11 .banner.static .m19-l3 { opacity: 1 !important }
-}
-/* Thửa được chọn nhấp nháy nhẹ cho dễ thấy khi đã phóng gần */
-.cl-b11 .st-b6 .b6-map.go .m19-thua {
-  animation: cl-b11-thua calc(8200ms * var(--slow, 1)) ease-in-out both;
-}
-@keyframes cl-b11-thua {
-  0%, 45% { opacity: 0 }
-  60%     { opacity: 1 }
-  100%    { opacity: .9 }
-}
+/* (Thửa đích nay được VẼ SẴN vào tầng ảnh gần nhất nên không còn lớp `m19-thua`
+    riêng để nhấp nháy nữa.) */
 /* Máy đặt "giảm chuyển động": không phóng, hiện nguyên bản đồ */
 .cl-b11 .banner.static .m19-phong { animation: none !important; transform: none !important }
 .cl-b11 .banner.static .m19-thua { opacity: .9 !important }
@@ -388,3 +396,54 @@
    ⚠️ CSS không cho vẽ đường cong thật trong clip-path theo phần trăm, nên cách
       duy nhất là lấy dày điểm. Đừng rút bớt cho "gọn". */
 .cl-b11 .banner .rb-photo { clip-path: polygon(0 0,80.00% 0%,80.41% 1%,80.99% 2%,81.67% 3%,82.36% 4%,83.00% 5%,83.58% 6%,84.15% 7%,84.71% 8%,85.26% 9%,85.80% 10%,86.32% 11%,86.84% 12%,87.34% 13%,87.82% 14%,88.30% 15%,88.77% 16%,89.23% 17%,89.67% 18%,90.10% 19%,90.50% 20%,90.88% 21%,91.24% 22%,91.58% 23%,91.90% 24%,92.20% 25%,92.48% 26%,92.74% 27%,92.99% 28%,93.21% 29%,93.40% 30%,93.57% 31%,93.71% 32%,93.82% 33%,93.92% 34%,94.00% 35%,94.06% 36%,94.10% 37%,94.11% 38%,94.11% 39%,94.10% 40%,94.07% 41%,94.03% 42%,93.98% 43%,93.90% 44%,93.80% 45%,93.68% 46%,93.53% 47%,93.37% 48%,93.19% 49%,93.00% 50%,92.80% 51%,92.59% 52%,92.37% 53%,92.14% 54%,91.90% 55%,91.65% 56%,91.40% 57%,91.14% 58%,90.87% 59%,90.60% 60%,90.33% 61%,90.05% 62%,89.77% 63%,89.49% 64%,89.20% 65%,88.91% 66%,88.61% 67%,88.30% 68%,88.00% 69%,87.70% 70%,87.40% 71%,87.10% 72%,86.79% 73%,86.49% 74%,86.20% 75%,85.91% 76%,85.63% 77%,85.35% 78%,85.07% 79%,84.80% 80%,84.53% 81%,84.27% 82%,84.01% 83%,83.75% 84%,83.50% 85%,83.25% 86%,83.01% 87%,82.78% 88%,82.54% 89%,82.30% 90%,82.06% 91%,81.82% 92%,81.57% 93%,81.33% 94%,81.10% 95%,80.86% 96%,80.60% 97%,80.36% 98%,80.15% 99%,80.0% 100%,0 100%) }
+
+
+/* ══ ĐIỆN THOẠI: MẪU 19 CHỈ CÒN MỘT TẦNG ẢNH ═══════════════════════════════
+   Banner11.tsx đã gỡ hai tầng ảnh sâu khi màn dưới 761px (đỡ ~640 KB tải về).
+   Còn một tầng thì không phóng 32 lần được nữa — phóng thế là nhoè. Hạ xuống
+   2,6 lần, vừa đủ thấy động tác "đi vào gần hơn". */
+@media (max-width: 760px) {
+  .cl-b11 .st-b6 .b6-map.go .m19-phong { animation-name: cl-b11-phong-nhe }
+  .cl-b11 .st-b6 .b6-map.go .m19-l1 { animation: none; opacity: 1 }
+  .cl-b11 .banner.static .m19-phong { transform: scale(2.6) !important }
+  .cl-b11 .banner.static .m19-l1 { opacity: 1 !important }
+  @keyframes cl-b11-phong-nhe {
+    0%   { transform: scale(1) }
+    100% { transform: scale(2.6) }
+  }
+}
+
+
+/* ══ MÁY TÍNH BẢNG (761–1100px): CHỮ CŨNG BỊ THANH MENU ĐÈ ═════════════════
+   Khổ này KHÔNG rơi vào khối "điện thoại" (≤760px) của bản thiết kế, nên vẫn
+   dùng chỗ đặt của bản máy tính. Mà banner ở khổ này thấp hơn hẳn, chữ lại đặt
+   theo tỉ lệ --u nên rơi lên khoảng y ≈ 40px — chui vào sau thanh menu cao 56px.
+   Đẩy mấy khối chữ neo theo MÉP TRÊN xuống thêm một đoạn. */
+@media (min-width: 761px) and (max-width: 1100px) {
+  .cl-b11 .rb-text,
+  .cl-b11 .bb-text,
+  .cl-b11 .ui-text,
+  .cl-b11 .fl-text,
+  .cl-b11 .pl-text,
+  .cl-b11 .du-content,
+  .cl-b11 .b-text.m-top { margin-top: 30px }
+  /* Khổ này ô chữ bên phải của mẫu 1 hẹp lại, dòng địa chỉ web dài bị cụt —
+     hạ cỡ chữ cho vừa. */
+  .cl-b11 .rb-row { font-size: max(10px, calc(var(--u) * 21px)) }
+  /* Khổ này đôi người chạy đè lên cụm chữ bên phải (ô chữ hẹp lại nhưng khối
+     người vẫn ở chỗ cũ) — ẩn đi cho gọn, giống khổ điện thoại. */
+  .cl-b11 .rb-couple { display: none }
+}
+
+/* ══ ĐIỆN THOẠI, MẪU 1: TIÊU ĐỀ VÀ Ô CHỮ ĐỪNG CHỒNG NHAU ═══════════════════
+   Banner trên điện thoại nay chỉ cao 300px, mà tiêu đề "Biển xanh nắng vàng"
+   neo mép trên còn ô thông tin neo mép dưới — hai cái đụng nhau. Thu tiêu đề
+   và ô chữ nhỏ lại cho đủ chỗ cả hai. */
+@media (max-width: 760px) {
+  .cl-b11 .rb-big { top: calc(62px + env(safe-area-inset-top, 0px)); font-size: 20px; line-height: 1.06 }
+  .cl-b11 .rb-text { padding: 8px 11px; bottom: 10px }
+  .cl-b11 .rb-title { font-size: 20px; line-height: 1.05 }
+  .cl-b11 .rb-contact { margin-top: 3px }
+  .cl-b11 .rb-row { font-size: 11px; margin: 2px 0 }
+  .cl-b11 .rb-cta { margin-top: 6px }
+}

@@ -153,6 +153,18 @@ function anhCuaMau(html: string): string[] {
   return [...ra].filter((u) => u.startsWith('/') || /^https?:/.test(u));
 }
 
+/* ── Bỏ bớt lớp ảnh nặng khi màn hình nhỏ ───────────────────────────────────
+   Mẫu 19 xếp BA TẦNG ảnh bản đồ chồng lên nhau để phóng từ toàn cảnh Cam Lâm
+   vào một thửa đất mà tầng nào cũng nét. Ba tầng đó nặng gần 800 KB — trên máy
+   tính thì không sao, nhưng trên điện thoại dùng 3G/4G là chờ rất lâu, mà màn
+   hình bé cũng chẳng nhìn ra khác biệt.
+   Nên với màn dưới 761px: bỏ hai tầng sâu, chỉ giữ tầng toàn cảnh (tiết kiệm
+   ~640 KB), và CSS hạ độ phóng xuống cho vừa với một tầng ảnh. */
+const LOP_NANG = /<g class="m19-l[23]"[\s\S]*?<\/g><\/g>/g;
+function lamNhe(html: string, hep: boolean): string {
+  return hep ? html.replace(LOP_NANG, '') : html;
+}
+
 /* ── Khung chứa mã HTML của một mẫu banner ────────────────────────────────────
    ⚠️ PHẢI TÁCH RA RIÊNG VÀ BỌC `memo`. Đã vấp lỗi rất khó tìm: trang chủ có vài
    thứ tự cập nhật theo giây (dòng chữ gợi ý gõ trong ô tìm kiếm…), mỗi lần đó là
@@ -177,6 +189,14 @@ const RuotBanner = memo(
 
 export default function Banner11({ children }: { children?: React.ReactNode }) {
   const [chiSo, setChiSo] = useState(0);
+  /* Màn hình hẹp (điện thoại) → bỏ bớt lớp ảnh nặng, xem lamNhe() ở trên. */
+  const [hep, setHep] = useState(false);
+  useEffect(() => {
+    const do_ = () => setHep(window.innerWidth < 761);
+    do_();
+    window.addEventListener('resize', do_);
+    return () => window.removeEventListener('resize', do_);
+  }, []);
   /* Không còn nút tạm dừng trên giao diện (chủ dự án muốn tối giản hết mức).
      Vẫn giữ biến này vì banner còn tự dừng khi chuyển sang tab khác hoặc khi bị
      cuộn ra khỏi màn hình — đó là phần tiết kiệm pin, đừng gỡ. */
@@ -516,7 +536,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
         {dangRa !== null && dangRa !== chiSo && (
           <RuotBanner
             key={dangRa}
-            html={MAU_BANNER[dangRa].html}
+            html={lamNhe(MAU_BANNER[dangRa].html, hep)}
             /* `static` LUÔN bật cho mẫu đang trượt ra: mọi chữ trong mẫu đều
                bắt đầu ở trạng thái trong suốt rồi mới hiện dần, nên nếu không
                ép hiện đủ thì lúc trượt ra nó thành một khung trống trượt ngang
@@ -527,7 +547,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
         )}
         <RuotBanner
           key={chiSo}
-          html={mau.html}
+          html={lamNhe(mau.html, hep)}
           lop={`cl-b11 ${huongLuot > 0 ? 'cl-b11-vao-phai' : 'cl-b11-vao-trai'}`}
           nhan={setBoc}
         />

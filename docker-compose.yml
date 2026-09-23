@@ -83,6 +83,12 @@ services:
       BANK_ID: ${BANK_ID:-}
       BANK_ACCOUNT: ${BANK_ACCOUNT:-}
       BANK_NAME: ${BANK_NAME:-}
+      # ── Kho hồ sơ: chìa khoá cho script tự đẩy file lên ──
+      # ⚠️ ĐÃ VẤP: khai KHO_TOKEN trong .env nhưng QUÊN chuyền vào container này.
+      #    Backend đọc process.env.KHO_TOKEN thấy rỗng nên TẮT HẲN đường "máy tự
+      #    tải lên" → script TAI-LEN-KHO.ps1 đẩy file lên bị từ chối, mà thông báo
+      #    lại chỉ nói "chưa đăng nhập" nên rất dễ tưởng sai chìa khoá.
+      KHO_TOKEN: ${KHO_TOKEN:-}
       # ── Khác ──
       CORS_ORIGINS: ${CORS_ORIGINS:-}
       PG_POOL_MAX: ${PG_POOL_MAX:-12}

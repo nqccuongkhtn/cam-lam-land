@@ -73,7 +73,7 @@ export const TIN = [
         'Mặt tiền đại lộ 8 làn nối sân bay Cam Ranh – Nha Trang',
         'Đất đã lên thổ cư toàn bộ, xây dựng được ngay',
         'Xung quanh là các khu nghỉ dưỡng đang hoạt động'],
-    hang: 'diamond', nguoi: 1, anh: [`${B}/bd-05.jpg`, `${B}/bd-02.jpg`, `${T}/dat-nen-01.webp`],
+    hang: 'diamond', nguoi: 1, anh: [`${B}/bd-05.webp`, `${B}/bd-02.webp`, `${T}/dat-nen-01.webp`],
   },
   {
     xa: 'Cam Hải Đông', loai: 'land', dt: 520, giaTr: 12740, mt: 16, huong: 'Đông',
@@ -83,7 +83,7 @@ export const TIN = [
         'Diện tích lớn, tách được 3 nền hoặc làm homestay',
         'Cách Đại lộ Nguyễn Tất Thành khoảng 600m',
         'Giá mềm hơn hẳn các lô mặt tiền cùng khu'],
-    hang: 'gold', nguoi: 2, anh: [`${T}/dat-nen-03.webp`, `${B}/bd-10.jpg`, `${T}/dat-nen-06.webp`],
+    hang: 'gold', nguoi: 2, anh: [`${T}/dat-nen-03.webp`, `${B}/bd-10.webp`, `${T}/dat-nen-06.webp`],
   },
   {
     xa: 'Cam Hải Đông', loai: 'land', dt: 100, giaTr: 2050, mt: 5, huong: 'Nam',
@@ -103,7 +103,7 @@ export const TIN = [
         'Mặt tiền đường đất rộng 6m, xe tải vào được',
         'Quỹ đất lớn còn lại rất ít ở khu vực này',
         'Hợp làm trang trại nghỉ dưỡng hoặc giữ dài hạn'],
-    hang: 'gold', nguoi: 2, anh: [`${T}/vuon-05.webp`, `${T}/vuon-03.webp`, `${B}/bd-11.jpg`],
+    hang: 'gold', nguoi: 2, anh: [`${T}/vuon-05.webp`, `${T}/vuon-03.webp`, `${B}/bd-11.webp`],
   },
   {
     xa: 'Cam Hải Đông', loai: 'farm', dt: 8500, giaTr: 35700, mt: 60, huong: 'Đông Bắc',
@@ -113,7 +113,7 @@ export const TIN = [
         'Mặt tiền 60m, cực hiếm ở dải ven biển Cam Lâm',
         'Phù hợp làm khu nghỉ dưỡng nhỏ hoặc phân lô',
         'Giá chỉ 4,2 triệu/m² vì bán trọn thửa'],
-    hang: 'diamond', nguoi: 2, anh: [`${T}/vuon-08.webp`, `${B}/bd-06.png`, `${T}/vuon-12.webp`],
+    hang: 'diamond', nguoi: 2, anh: [`${T}/vuon-08.webp`, `${B}/bd-06.webp`, `${T}/vuon-12.webp`],
   },
   {
     xa: 'Cam Hải Đông', loai: 'villa', dt: 320, giaTr: 16500, pn: 4, wc: 4, mt: 12, huong: 'Đông',
@@ -123,7 +123,7 @@ export const TIN = [
         'Cách biển Bãi Dài khoảng 300m',
         'Đang cho thuê du lịch, doanh thu ổn định',
         'Sổ hồng riêng từng căn'],
-    hang: 'diamond', nguoi: 2, anh: [`${T}/biet-thu-01.webp`, `${T}/biet-thu-03.webp`, `${T}/biet-thu-05.webp`, `${B}/bd-02.jpg`],
+    hang: 'diamond', nguoi: 2, anh: [`${T}/biet-thu-01.webp`, `${T}/biet-thu-03.webp`, `${T}/biet-thu-05.webp`, `${B}/bd-02.webp`],
   },
   {
     xa: 'Cam Hải Đông', loai: 'house', dt: 180, giaTr: 12600, pn: 5, wc: 5, mt: 8, huong: 'Đông Nam',
@@ -133,7 +133,7 @@ export const TIN = [
         'Cách đại lộ 150m, khách du lịch ra vào thuận tiện',
         'Bàn giao cả nội thất và khách đang thuê',
         'Chủ cần bán nhanh để xoay vốn'],
-    hang: 'gold', nguoi: 2, anh: [`${T}/nha-01.webp`, `${T}/biet-thu-07.webp`, `${B}/bd-11.jpg`],
+    hang: 'gold', nguoi: 2, anh: [`${T}/nha-01.webp`, `${T}/biet-thu-07.webp`, `${B}/bd-11.webp`],
   },
   {
     xa: 'Cam Hải Đông', loai: 'commercial', dt: 250, giaTr: 13750, mt: 12, huong: 'Đông',
@@ -143,7 +143,7 @@ export const TIN = [
         'Hợp mở nhà hàng, cà phê, cửa hàng tiện lợi',
         'Ngay tuyến khách từ sân bay Cam Ranh đi Nha Trang',
         'Đất thổ cư, xây dựng tự do'],
-    hang: 'gold', nguoi: 2, anh: [`${T}/mat-bang-01.webp`, `${B}/bd-10.jpg`],
+    hang: 'gold', nguoi: 2, anh: [`${T}/mat-bang-01.webp`, `${B}/bd-10.webp`],
   },
   {
     xa: 'Cam Hải Đông', loai: 'land', dt: 160, giaTr: 5600, mt: 8, huong: 'Tây Nam',
@@ -655,7 +655,7 @@ export const TIN = [
         'Cách biển Bãi Dài khoảng 300m',
         'Đầy đủ nội thất, dọn vào ở ngay',
         'Thuê theo tháng hoặc theo mùa du lịch'],
-    hang: 'gold', nguoi: 2, anh: [`${T}/biet-thu-02.webp`, `${T}/biet-thu-04.webp`, `${B}/bd-02.jpg`],
+    hang: 'gold', nguoi: 2, anh: [`${T}/biet-thu-02.webp`, `${T}/biet-thu-04.webp`, `${B}/bd-02.webp`],
   },
   {
     deal: 'rent', xa: 'Cam Đức', loai: 'commercial', dt: 80, giaTr: 8, mt: 4, huong: 'Bắc',

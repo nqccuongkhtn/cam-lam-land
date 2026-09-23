@@ -41,7 +41,7 @@ INSERT INTO featured_projects (name, status, scale, location, image_url, sort) V
  'Huyện Cam Lâm và TP Cam Ranh',
  -- Ảnh: KHÔNG dùng phối cảnh của chủ đầu tư (có bản quyền). Đây là ảnh chụp
  -- thật dải Bãi Dài — nằm trong vùng dự án, nên dùng là trung thực.
- '/bai-dai/bd-05.jpg', 10),
+ '/bai-dai/bd-05.webp', 10),
 
 -- 2) Golden Bay giai đoạn 1 — Hưng Thịnh. 79 ha, Bắc bán đảo Cam Ranh.
 --    Nguồn: trang dự án của Hưng Thịnh và các sàn phân phối.
@@ -65,7 +65,7 @@ INSERT INTO featured_projects (name, status, scale, location, image_url, sort) V
  'Đang hoạt động',
  '29,3 ha · nghỉ dưỡng biển · CĐT Trần Thái Cam Ranh',
  'Khu 4 Bắc bán đảo Cam Ranh, xã Cam Hải Đông',
- '/bai-dai/bd-02.jpg', 40),
+ '/bai-dai/bd-02.webp', 40),
 
 -- 5) Mövenpick Resort Cam Ranh — khu nghỉ dưỡng 5 sao ĐANG HOẠT ĐỘNG trên dải Bãi Dài.
 --    Địa chỉ: Lô D12, Đại lộ Nguyễn Tất Thành, xã Cam Hải Đông, huyện Cam Lâm.
@@ -77,7 +77,7 @@ INSERT INTO featured_projects (name, status, scale, location, image_url, sort) V
  'Đang hoạt động',
  '500 phòng hướng biển · 118 biệt thự có hồ bơi riêng',
  'Lô D12 Đại lộ Nguyễn Tất Thành, xã Cam Hải Đông',
- '/bai-dai/bd-10.jpg', 50);
+ '/bai-dai/bd-10.webp', 50);
 
 COMMIT;
 

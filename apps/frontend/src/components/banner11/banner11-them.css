@@ -197,3 +197,36 @@
   opacity: 1 !important;
   transform: none !important;
 }
+
+/* ══ MẪU 7 "KẾT NỐI SÂN BAY QUỐC TẾ" ════════════════════════════════════════
+   Hai chỉnh theo yêu cầu của chủ dự án. */
+
+/* 1. Trời đang xám xịt vì ảnh chụp lúc nhiều mây — kéo màu cho trong xanh hơn.
+      Chỉ chỉnh màu, không đổi ảnh, nên vẫn là ảnh thật. */
+.cl-b11 .st-bub .bb-big .bgimg {
+  filter: saturate(1.45) brightness(1.1) contrast(1.06) hue-rotate(-8deg);
+}
+
+/* 2. Máy bay: bản gốc cho nó QUAY VÒNG quanh khung tròn. Chủ dự án muốn nó BAY
+      VƯỢT RA NGOÀI KHUNG như hiệu ứng "chủ thể vượt khung".
+      Nên tắt vòng quay, cho máy bay bay chéo từ dưới trái lên trên phải, xuyên
+      qua mép khung tròn rồi ra khỏi banner, lặp lại. */
+.cl-b11 .st-bub .bb-orbit { animation: none !important; left: 0; top: 0; width: 100%; height: 100% }
+.cl-b11 .st-bub .bb-plane {
+  left: calc(var(--u) * 980px);
+  top: calc(var(--u) * 470px);
+  width: calc(var(--u) * 74px);
+  height: calc(var(--u) * 74px);
+  margin-left: 0;
+  z-index: 6;
+  transform: translate(0, 0) rotate(-34deg);
+  animation: cl-b11-bay calc(7.5s * var(--slow, 1)) cubic-bezier(.36, 0, .5, 1) infinite;
+}
+@keyframes cl-b11-bay {
+  0%   { opacity: 0; transform: translate(-6%, 8%) rotate(-34deg) scale(.7) }
+  10%  { opacity: 1 }
+  78%  { opacity: 1 }
+  100% { opacity: 0; transform: translate(640%, -520%) rotate(-34deg) scale(1.45) }
+}
+/* Máy đặt "giảm chuyển động": máy bay đứng yên ở giữa đường bay, không nhấp nháy */
+.cl-b11 .banner.static .bb-plane { animation: none !important; opacity: 1 }

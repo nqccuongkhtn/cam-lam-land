@@ -30,19 +30,20 @@ from PIL import Image, ImageFilter
 
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 RA = os.path.join(GOC, 'apps', 'frontend', 'public', 'banner11')
-ANH = os.path.join(RA, 'px-28143540-2000.webp')
+ANH = os.path.join(RA, 'mia-goldcoast-800.webp')
 
 # Khung dò: toà nhà kính nằm giữa, hai mép trái/phải chỉ có trời.
 # ⚠️ Cắt ngang ở y=1050 vì xuống thấp hơn là núi (trái) và dãy nhà (phải) lấn
 #    vào mép — hết trời để đo thì phép tách sai ngay. Chỗ cắt này vẫn nằm SÂU
 #    DƯỚI mép trên khung ảnh nên không lộ đường cắt.
-KHUNG = (0, 150, 700, 1050)
-MEP = 70
+KHUNG = (110, 95, 700, 335)
+MEP = 80
 NGUONG_TRONG, NGUONG_DUC = 26.0, 62.0
+LOC_XANH = True     # xem ghi chú ở bước lọc màu xanh trời bên dưới
 
 # Cách đặt tấm ảnh trong bản thiết kế (phải khớp với THAY_DOAN[18] của
-# tach-banner.py): ảnh 2000×3000 vẽ vào ô 1000×1500 rồi translate(tx ty) scale(s)
-TX, TY, S = 1055.0, -65.7, 0.71
+# tach-banner.py): ảnh 800×1200 vẽ vào ô 1000×1500 rồi translate(tx ty) scale(s)
+TX, TY, S = 1050.0, -25.6, 0.72
 
 
 def main():
@@ -50,17 +51,44 @@ def main():
     patch = np.asarray(im.crop(KHUNG), dtype=np.float32)
     h, w, _ = patch.shape
 
-    trai = np.median(patch[:, :MEP, :], axis=1)
-    phai = np.median(patch[:, -MEP:, :], axis=1)
-    k = np.ones(9, dtype=np.float32) / 9.0
+    # ── Dựng "bản đồ màu trời" ───────────────────────────────────────────────
+    # ⚠️ Cách cũ (mỗi hàng nội suy thẳng từ mép trái sang mép phải) chỉ đúng khi
+    #    trời chuyển màu theo CHIỀU NGANG. Trời trong ảnh mới chuyển màu theo
+    #    đường chéo (góc trên trái xanh đậm, góc dưới phải nhạt) nên nội suy
+    #    thẳng sai tới 30–40 đơn vị → mảng trời bị tính nhầm thành toà nhà, cắt
+    #    ra dính cả một vầng trời quanh nhà.
+    #    Nay khớp một mặt cong bậc hai theo cả x và y, chỉ dùng điểm ở HAI MÉP và
+    #    DẢI TRÊN CÙNG (những chỗ chắc chắn là trời) để khớp.
+    ys_, xs_ = np.mgrid[0:h, 0:w].astype(np.float32)
+    xn, yn = xs_ / w, ys_ / h
+    A_full = np.stack([np.ones_like(xn), xn, yn, xn * xn, xn * yn, yn * yn], axis=-1)
+    chac_troi = np.zeros((h, w), dtype=bool)
+    chac_troi[:, :MEP] = True
+    chac_troi[:, -MEP:] = True
+    chac_troi[:max(6, h // 14), :] = True
+    A = A_full[chac_troi]                      # (n, 6)
+    troi = np.empty_like(patch)
     for c in range(3):
-        trai[:, c] = np.convolve(np.pad(trai[:, c], 4, mode='edge'), k, 'valid')
-        phai[:, c] = np.convolve(np.pad(phai[:, c], 4, mode='edge'), k, 'valid')
-    t = np.linspace(0.0, 1.0, w, dtype=np.float32)[None, :, None]
-    troi = trai[:, None, :] * (1 - t) + phai[:, None, :] * t
+        he_so, *_ = np.linalg.lstsq(A, patch[:, :, c][chac_troi], rcond=None)
+        troi[:, :, c] = A_full @ he_so
 
     lech = np.sqrt(((patch - troi) ** 2).sum(axis=2))
     a = np.clip((lech - NGUONG_TRONG) / (NGUONG_DUC - NGUONG_TRONG), 0.0, 1.0)
+
+    # ── Chốt chặn thứ hai: LOẠI MÀU XANH TRỜI ────────────────────────────────
+    # Chỉ so với "bản đồ màu trời" là chưa đủ: ở góc trên bên phải, trời nhạt
+    # gần bằng màu tường toà nhà nên máy không tách được, cắt ra dính một vầng
+    # trời quanh nhà (đã nhìn thấy tận mắt).
+    # Nhưng có một thứ phân biệt rất chắc: TRỜI THÌ XANH, tức kênh Lam cao hơn
+    # kênh Đỏ nhiều; còn tường nhà gần như trung tính (Đỏ ≈ Lam).
+    #   · trời đậm:  Đỏ − Lam ≈ −65     · trời nhạt: Đỏ − Lam ≈ −55
+    #   · tường sáng: Đỏ − Lam ≈ −5     · tường khuất: ≈ −10
+    # Nhân thêm hệ số này thì mọi mảng còn ra màu trời đều bị xoá sạch.
+    # ⚠️ Chỉ dùng được khi chủ thể KHÔNG phải kính xanh. Toà nhà kính xanh thì
+    #    tắt chốt này đi (đặt LOC_XANH = False), nếu không cắt mất cả mặt kính.
+    if LOC_XANH:
+        do_tru_lam = patch[:, :, 0] - patch[:, :, 2]
+        a = a * np.clip((do_tru_lam + 35.0) / 20.0, 0.0, 1.0)
 
     # giữ mảng liền lớn nhất — bỏ mấy vệt mây sáng và ngôi sao lẻ
     dac = a > 0.55
@@ -108,15 +136,15 @@ def main():
                                    out.width, out.height))
 
     # ── Toạ độ để dán vào bản thiết kế ───────────────────────────────────────
-    k2 = S / 2.0   # ảnh 2000 điểm ảnh ngang vẽ vào ô rộng 1000
+    k2 = S * 1000.0 / 800.0   # ảnh 800 điểm ảnh ngang vẽ vào ô rộng 1000
     X, Y = TX + k2 * u0, TY + k2 * v0
     W, H = k2 * (u1 - u0), k2 * (v1 - v0)
     print('')
     print('== DAN VAO tach-banner.py ==')
     print('<image href="/banner11/m18-toanha.webp" x="%.1f" y="%.1f" width="%.1f" height="%.1f"/>'
           % (X, Y, W, H))
-    print('Dinh toa nha o y=%.1f (mep tren khung anh la y=110) => nho ra %.0f don vi'
-          % (Y, 110 - Y))
+    print('Dinh toa nha o y=%.1f (mep tren khung anh la y=200) => nho ra %.0f don vi'
+          % (Y, 200 - Y))
 
     thu = Image.new('RGB', out.size, (11, 36, 71))
     thu.paste(out, (0, 0), out)

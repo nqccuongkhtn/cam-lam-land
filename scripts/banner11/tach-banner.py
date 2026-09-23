@@ -190,17 +190,18 @@ RANH_THAT = ('<image href="/banner11/m19-ranh-thua.webp" x="0" y="40" '
              '</g>')
 
 #    Mẫu 18 "Chủ thể vượt khung": ảnh trong khung đổi sang ảnh ĐÔ THỊ VEN BIỂN
-#    Nha Trang, trong ảnh có một TOÀ NHÀ KÍNH rất cao đứng tách hẳn trên nền
-#    trời — đúng thứ cần cho hiệu ứng vượt khung (chủ dự án chê tấm cũ: toà nhà
-#    lùn, nhô ra có 18 đơn vị, "chưa thực sự làm nổi bật được hiệu ứng").
-#    Ảnh mới là ảnh DỌC 2000×3000 nên phải tính lại toàn bộ chỗ đặt — để nguyên
+#    Nha Trang (Gold Coast), chụp ngước lên nên toà tháp vươn cao và thon —
+#    đúng thứ cần cho hiệu ứng vượt khung. Chính chủ dự án chọn tấm này.
+#    Trước đó đã thử hai tấm khác: tấm đầu toà nhà lùn, nhô ra có 18 đơn vị
+#    ("chưa thực sự làm nổi bật được hiệu ứng"); tấm thứ hai khá hơn nhưng chủ
+#    dự án vẫn muốn đổi.
+#    Ảnh là ảnh DỌC 800×1200 nên phải tính lại toàn bộ chỗ đặt — để nguyên
 #    thông số cũ là ảnh bị kéo dãn méo mó.
 #    Cách chọn ba số translate/scale (đừng sửa bừa, tính lại theo lối này):
 #      · muốn ảnh phủ kín khung rộng 700 ⇒ scale ≥ 0,70;
-#      · chọn 0,71, đặt tx = 1055 ⇒ ảnh trải X 1055–1765, phủ khung 1060–1760;
-#      · đỉnh toà nhà trong ảnh ở v = 185 ⇒ ty = −0,355 × 185 ≈ −65,7 thì đỉnh
-#        rơi đúng y = 0, tức nhô ra khỏi mép khung (y = 110) đúng 110 đơn vị —
-#        mức tối đa còn nhìn thấy, vì trên y = 0 là bị cắt.
+#      · chọn 0,72, đặt tx = 1050 ⇒ ảnh trải X 1050–1770, phủ khung 1060–1760;
+#      · đỉnh toà tháp trong ảnh ở v ≈ 124 ⇒ ty ≈ −106,6 thì đỉnh rơi sát mép
+#        trên khung nhìn, nhô ra khỏi mép khung ảnh (y = 110) khoảng 96 đơn vị.
 _A18_CU = ('https://images.unsplash.com/photo-1580698872460-261e00561f35'
            '?w=1600&q=80&auto=format&fit=crop" width="1000" height="1472.5" '
            'preserveAspectRatio="none" transform="translate({t} -471.5) scale(1.0769)"')
@@ -211,8 +212,8 @@ _A18_CU = ('https://images.unsplash.com/photo-1580698872460-261e00561f35'
 # ⚠️ Ba con số tx/ty/scale này phải KHỚP với TX/TY/S trong
 #    scripts/banner11/tach-toa-nha-mau18.py — đổi một bên thì chạy lại bên kia,
 #    lệch là ảnh cắt rời không nằm khít lên ảnh trong khung.
-_A18_MOI = ('/banner11/px-28143540-2000.webp" width="1000" height="1500" '
-            'preserveAspectRatio="none" transform="translate({t} -65.7) scale(0.71)"')
+_A18_MOI = ('/banner11/mia-goldcoast-800.webp" width="1000" height="1500" '
+            'preserveAspectRatio="none" transform="translate({t} -25.6) scale(0.72)"')
 _MAY_BAY = ('<g class="c18-plane" data-at="1500"><g mask="url(#c18PlaneMask)">'
             '<image href="https://images.unsplash.com/photo-1580698872460-261e00561f35'
             '?w=1600&q=80&auto=format&fit=crop" width="1000" height="1472.5" '
@@ -233,8 +234,8 @@ _MAT_NA_MOI = ''
 # Nay dùng ảnh ĐÃ CẮT THEO ĐÚNG BÓNG toà nhà (nền trong suốt), do
 # scripts/banner11/tach-toa-nha-mau18.py dựng ra. Chỗ đặt cũng do script đó tính.
 _TOA_NHA = ('<g class="c18-plane" data-at="1500">'
-            '<image href="/banner11/m18-toanha.webp" x="1094.8" y="6.7" '
-            'width="167.9" height="300.3"/></g>')
+            '<image href="/banner11/m18-toanha.webp" x="1325.4" y="95.0" '
+            'width="171.0" height="180.9"/></g>')
 
 #    Mẫu 15: hình phác thảo căn nhà nằm sát ĐÁY khổ thiết kế (y 693–746 trong
 #    khung nhìn 524–750). Banner nay thấp hơn khổ gốc, lại có khung tìm kiếm ở
@@ -300,10 +301,33 @@ THAY_DOAN = {
          ('Phác thảo ngôi nhà trên lô đất trống cạnh đầm nuôi',
           'Phác thảo căn nhà 3 tầng có sân vườn trên lô đất trống')],
     18: [
+    # ── HẠ CẢ KHUNG ẢNH XUỐNG 90 ĐƠN VỊ ────────────────────────────────────
+    # ⚠️ LÝ DO — chỗ này không nhìn bản thiết kế mà đoán được:
+    #    banner nằm NGAY DƯỚI thanh menu của web, mà thanh menu che mất khoảng
+    #    60 điểm ảnh trên cùng. Bản thiết kế đặt mép trên khung ảnh ở y = 110,
+    #    tính ra chỉ còn ~19 đơn vị trống phía trên → toà nhà nhô ra bao nhiêu
+    #    cũng bị thanh menu nuốt, nhìn như không có hiệu ứng gì.
+    #    Hạ khung xuống 90 đơn vị (mép trên còn y = 200) thì phần nhô ra có hẳn
+    #    ~105 đơn vị trống để phô ra. Ba khung trang trí phía sau hạ theo đúng
+    #    bấy nhiêu, chiều cao rút lại để đáy vẫn nằm nguyên chỗ cũ.
+    ('<rect x="1060" y="110" width="700" height="470" rx="48"/>',
+     '<rect x="1060" y="200" width="700" height="380" rx="48"/>'),
+    ('<rect x="1060" y="110" width="700" height="470" rx="48" fill="none"',
+     '<rect x="1060" y="200" width="700" height="380" rx="48" fill="none"'),
+    ('<rect class="r3" x="988" y="38" width="844" height="614" rx="120"',
+     '<rect class="r3" x="988" y="128" width="844" height="524" rx="120"'),
+    ('<rect class="r2" x="1012" y="62" width="796" height="566" rx="96"',
+     '<rect class="r2" x="1012" y="152" width="796" height="476" rx="96"'),
+    ('<rect class="r1" x="1036" y="86" width="748" height="518" rx="72"',
+     '<rect class="r1" x="1036" y="176" width="748" height="428" rx="72"'),
+    ('<mask id="c18PatchMask" maskUnits="userSpaceOnUse" x="1150" y="90" width="440" height="260">'
+     '<rect x="1223" y="145" width="280" height="139" rx="40"',
+     '<mask id="c18PatchMask" maskUnits="userSpaceOnUse" x="1150" y="180" width="440" height="260">'
+     '<rect x="1223" y="235" width="280" height="139" rx="40"'),
         (_MAY_BAY, _TOA_NHA),
-        (_A18_CU.format(t='736.9'), _A18_MOI.format(t='1055')),
-        (_A18_CU.format(t='1026.9'), _A18_MOI.format(t='1345')),
-        (_A18_CU.format(t='446.9'), _A18_MOI.format(t='765')),
+        (_A18_CU.format(t='736.9'), _A18_MOI.format(t='1050')),
+        (_A18_CU.format(t='1026.9'), _A18_MOI.format(t='1340')),
+        (_A18_CU.format(t='446.9'), _A18_MOI.format(t='760')),
     ],
     19: [(ANH_THAT_MAU19_CU, ANH_THAT_MAU19_MOI),
          (ANH_GIA_BAN_DO, ANH_BAN_DO_THAT), (RANH_VE_TAY, RANH_THAT)],

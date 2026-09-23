@@ -237,8 +237,16 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
 
   useEffect(() => { setIt(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false); }, []);
 
-  /* ── Tải trước ảnh của mẫu KẾ TIẾP, để lúc chuyển không bị trắng một nhịp ── */
+  /* ── Tải trước ảnh của mẫu KẾ TIẾP, để lúc chuyển không bị trắng một nhịp ──
+     ⚠️ KHÔNG tải trước khi máy đang tiết kiệm dữ liệu hoặc mạng yếu (2G/3G).
+     Phần lớn người xem dùng điện thoại, nhiều người dùng 3G hoặc gói dữ liệu
+     hạn chế — tải sẵn cả tấm ảnh mà họ có thể không xem tới là phí tiền của họ.
+     Mạng yếu thì đành chờ một nhịp lúc đổi mẫu, đổi lại không tốn dữ liệu. */
   useEffect(() => {
+    const mang = (navigator as any).connection;
+    const tietKiem = mang?.saveData === true;
+    const mangYeu = /^(slow-)?2g$|^3g$/.test(mang?.effectiveType || '');
+    if (tietKiem || mangYeu) return;
     const sau = MAU_BANNER[(chiSo + 1) % MAU_BANNER.length];
     const id = window.setTimeout(() => { anhCuaMau(sau.html).forEach((u) => { const im = new Image(); im.src = u; }); }, 1200);
     return () => clearTimeout(id);

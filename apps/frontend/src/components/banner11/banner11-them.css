@@ -230,3 +230,38 @@
 }
 /* Máy đặt "giảm chuyển động": máy bay đứng yên ở giữa đường bay, không nhấp nháy */
 .cl-b11 .banner.static .bb-plane { animation: none !important; opacity: 1 }
+
+/* ══ MẪU 19: PHÓNG DẦN TỪ XA VÀO MỘT THỬA ĐẤT ═══════════════════════════════
+   Chủ dự án muốn mẫu này kể đúng việc web làm: nhìn từ xa, rồi phóng dần vào
+   tới từng thửa. Bản đồ quy hoạch và lớp ranh thửa (đều là dữ liệu thật của
+   web) được bọc chung trong nhóm `m19-phong`, nhóm này phóng to dần trong suốt
+   một vòng chạy.
+   Tâm phóng 55% ngang / 44% dọc chính là chỗ Thửa 132 · Tờ 19 (2.967 m², đất
+   trồng cây lâu năm) — toạ độ do scripts/banner11/dung-anh-mau19.py tính ra. */
+.cl-b11 .st-b6 .m19-phong { transform-origin: 55% 44%; }
+.cl-b11 .st-b6 .b6-map.go .m19-phong {
+  animation: cl-b11-phong calc(8200ms * var(--slow, 1)) cubic-bezier(.34, 0, .2, 1) both;
+}
+@keyframes cl-b11-phong {
+  0%   { transform: scale(1) }
+  18%  { transform: scale(1.04) }
+  100% { transform: scale(2.35) }
+}
+/* Thửa được chọn nhấp nháy nhẹ cho dễ thấy khi đã phóng gần */
+.cl-b11 .st-b6 .b6-map.go .m19-thua {
+  animation: cl-b11-thua calc(8200ms * var(--slow, 1)) ease-in-out both;
+}
+@keyframes cl-b11-thua {
+  0%, 45% { opacity: 0 }
+  60%     { opacity: 1 }
+  100%    { opacity: .9 }
+}
+/* Máy đặt "giảm chuyển động": không phóng, hiện nguyên bản đồ */
+.cl-b11 .banner.static .m19-phong { animation: none !important; transform: none !important }
+.cl-b11 .banner.static .m19-thua { opacity: .9 !important }
+
+
+/* Mẫu 15: bỏ nhãn chữ cạnh căn nhà (chủ dự án thấy không cần).
+   Ẩn bằng CSS chứ không xoá khỏi mã: chữ đó nằm trong bản thiết kế gốc, xoá đi
+   thì lần sau tách lại từ bản gốc là nó hiện ra lần nữa. */
+.cl-b11 .st-b5 .b5-tag { display: none }

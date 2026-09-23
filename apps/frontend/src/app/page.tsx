@@ -233,10 +233,18 @@ export default function Home() {
               sáng mẫu nền tối. Thẻ trắng rơi trúng mẫu nền sáng là chìm nghỉm,
               rơi trúng mẫu nền tối thì chói loà. Khung kính tối hợp với cả hai. */}
           <div className="rounded-2xl border border-white/15 bg-black/45 p-2 shadow-2xl backdrop-blur-md">
-            <div className="mb-1.5 flex items-center justify-center gap-1">
+            {/* Tab kiểu GẠCH CHÂN ĐỎ, làm theo đúng ảnh chủ dự án gửi (giống
+                batdongsan.com.vn): chữ trắng, tab đang chọn in đậm và có một
+                nét đỏ mảnh bên dưới. Không dùng nút bo tròn nền trắng nữa —
+                nền trắng làm nặng mắt và che mất ảnh banner phía sau. */}
+            <div className="mb-2 flex items-center justify-center gap-6 sm:gap-8">
               {([['sale', 'Nhà đất bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
                 <button key={k} onClick={() => setHeroDeal(k)}
-                  className={`rounded-full px-3.5 py-1 text-[13px] font-bold transition ${heroDeal === k ? 'bg-white text-[#0A2540]' : 'text-white/85 hover:bg-white/10 hover:text-white'}`}>{ten}</button>
+                  className={`relative pb-1.5 text-[13px] transition sm:text-sm ${heroDeal === k ? 'font-extrabold text-white' : 'font-semibold text-white/75 hover:text-white'}`}>
+                  {ten}
+                  <span aria-hidden
+                    className={`absolute inset-x-0 -bottom-0.5 h-[2px] rounded-full bg-red-500 transition-opacity ${heroDeal === k ? 'opacity-100' : 'opacity-0'}`} />
+                </button>
               ))}
             </div>
 

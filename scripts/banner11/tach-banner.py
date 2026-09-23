@@ -32,6 +32,13 @@ import json
 import os
 import re
 import sys
+import importlib.util as _iu
+
+# Nạp bộ vẽ căn nhà 3 tầng của mẫu 15 (file có dấu gạch ngang nên phải nạp kiểu này)
+_spec = _iu.spec_from_file_location('ve_nha_mau15',
+                                    os.path.join(os.path.dirname(os.path.abspath(__file__)), 've-nha-mau15.py'))
+_ve_nha = _iu.module_from_spec(_spec); _spec.loader.exec_module(_ve_nha)
+NHA15_MAT, NHA15_NET = _ve_nha.sinh()
 
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 FILE_THIET_KE = os.path.join(GOC, 'docs', 'thiet-ke', 'banner-anh-cam-lam.html')
@@ -117,6 +124,11 @@ SUA_CHU = {
 #    chiếc máy bay của mẫu 18 dài gần 3.000 ký tự).
 THAY_BIEU_THUC = {
     18: [(r'<mask id="c18PlaneMask".*?</mask>', '__MAT_NA_MOI__')],
+    # Mẫu 15: thay căn nhà 1 trệt của bản thiết kế bằng NHÀ 3 TẦNG CÓ SÂN VƯỜN.
+    # Hình do scripts/banner11/ve-nha-mau15.py tính ra từ chính hình bình hành
+    # của lô đất, nên nhà đứng khít trên đất chứ không lệch.
+    15: [(r'<g class="b5-face".*?</g>', '__NHA15_MAT__'),
+         (r'<g class="grp b5-wire c15-wire".*?</g>', '__NHA15_NET__')],
 }
 
 # ── THAY CẢ MỘT ĐOẠN MÃ (dùng khi đổi ảnh không đủ) ─────────────────────────
@@ -141,7 +153,11 @@ BAN_DO_THAT = ('<image href="/banner11/qh-cam-lam.webp" x="0" y="0" width="276" 
 ANH_GIA_BAN_DO = ('<image href="https://images.pexels.com/photos/35995788/pexels-photo-35995788.jpeg'
                   '?auto=compress&cs=tinysrgb&w=2000" width="1000" height="750" '
                   'preserveAspectRatio="none" filter="url(#c19Plan)"/>')
-ANH_BAN_DO_THAT = ('<image href="/banner11/qh-cam-lam-rong.webp" x="0" y="40" width="1000" height="323" '
+# Bọc bản đồ + ranh thửa vào một nhóm để PHÓNG DẦN vào thửa đất (xem CSS
+# `m19-phong` trong banner11-them.css). Thửa được chọn: Thửa 132 · Tờ 19 ·
+# 2.967 m² · CLN, nằm ở 55% ngang / 44% dọc của khung — đó cũng là tâm phóng.
+ANH_BAN_DO_THAT = ('<g class="m19-phong">'
+                   '<image href="/banner11/qh-cam-lam-rong.webp" x="0" y="40" width="1000" height="323" '
                    'preserveAspectRatio="xMidYMid slice"/>')
 #    Mẫu 19 còn một chỗ giả nữa: RANH THỬA và mấy chữ "LUC" là VẼ TAY men theo
 #    bờ ruộng trong tấm ảnh gốc. Nay nền đã là bản đồ quy hoạch thật nên mấy nét
@@ -152,7 +168,11 @@ ANH_BAN_DO_THAT = ('<image href="/banner11/qh-cam-lam-rong.webp" x="0" y="40" wi
 RANH_VE_TAY = ''' <g fill="none" stroke="#7a3e12" stroke-width="2.6" stroke-linejoin="round" opacity=".9"><path d="M700 108L750 148L800 181L850 214L900 247L950 284L1000 318L1000 420L950 437L900 453L850 469L800 486L760 506L710 524L650 502L600 486L560 474L500 458L460 444L400 430L370 421L346 390L362 366L378 330L434 292L500 254L550 226L600 185L650 150Z"/><path d="M258 8L320 26L407 50L500 70L580 82L640 92L700 108L650 150L600 185L550 226L500 254L434 292L378 330L321 298L258 264L201 236L150 198L148 150L140 120L134 101L158 72L205 40Z"/><path d="M700 108L730 86L760 72L800 60L850 50L900 45L1000 38L1000 318L950 284L900 247L850 214L800 181L750 148Z"/><path d="M370 421L400 430L460 444L500 458L560 474L600 486L650 502L710 524L722 550L740 598L760 635L790 675L820 715L840 750L350 750L330 675L312 625L300 580L285 524L282 475L300 455L330 430Z"/><path d="M710 524L760 506L800 486L850 469L900 453L950 437L1000 420L1000 750L840 750L820 715L790 675L760 635L740 598L722 550Z"/><path d="M0 207L60 203L100 202L150 198L201 236L258 264L321 298L378 330L362 366L346 390L300 412L250 432L202 452L150 457L100 467L50 482L0 497Z"/><path d="M0 497L50 482L100 467L150 457L202 452L230 520L254 600L275 680L290 750L0 750Z"/></g>
         <g font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="800" fill="#7a3e12" text-anchor="middle" style="paint-order:stroke;stroke:rgba(255,250,220,.85);stroke-width:4px"><text x="692" y="340">LUC</text><text x="376" y="157">LUC</text><text x="892" y="146">LUC</text><text x="148" y="341">LUC</text></g> '''.strip()
 RANH_THAT = ('<image href="/banner11/m19-ranh-thua.webp" x="0" y="40" width="1000" height="323" '
-             'preserveAspectRatio="xMidYMid slice" opacity=".92"/>')
+             'preserveAspectRatio="xMidYMid slice" opacity=".92"/>'
+             # Thửa được chọn: tô sáng lên để mắt biết đang phóng vào đâu
+             '<path class="m19-thua" d="M543.0 177.1L554.1 177.2L554.1 184.7L543.0 184.7Z" '
+             'fill="rgba(253,224,71,.32)" stroke="#fde047" stroke-width=".9"/>'
+             '</g>')
 
 #    Mẫu 18 "Chủ thể vượt khung": ảnh trong khung đổi sang ảnh ĐÔ THỊ VEN BIỂN.
 #    Ảnh mới là ảnh NGANG còn ảnh cũ là ảnh DỌC nên phải tính lại chỗ đặt — để
@@ -187,7 +207,15 @@ _TOA_NHA = ('<g class="c18-plane" data-at="1500"><g mask="url(#c18PlaneMask)">'
 #    LÊN CAO hơn trong banner, thoát khỏi chỗ khung tìm kiếm.
 THAY_DOAN = {
     9: [(BAN_DO_VE_TAY, BAN_DO_THAT)],
-    15: [('viewBox="250 524 700 226"', 'viewBox="250 572 700 226"')],
+    # ⚠️ Đổi khung nhìn thì PHẢI kéo ảnh cao theo. Ảnh đặt bằng height="750",
+    #    mà khung nhìn mới chạy tới y=792 → phần 750–792 là khoảng TRỐNG, banner
+    #    hở một dải ở đáy. Nên đổi luôn height thành 820.
+    15: [('viewBox="250 524 700 226"', 'viewBox="250 566 700 226"'),
+         ('width="1000" height="750" preserveAspectRatio="none"',
+          'width="1000" height="820" preserveAspectRatio="none"'),
+         ('Nhà 1 trệt, mái thái', 'Nhà 3 tầng · có sân vườn'),
+         ('Phác thảo ngôi nhà trên lô đất trống cạnh đầm nuôi',
+          'Phác thảo căn nhà 3 tầng có sân vườn trên lô đất trống')],
     18: [
         (_MAY_BAY, _TOA_NHA),
         (_A18_CU.format(t='736.9'), _A18_MOI.format(t='1000')),
@@ -375,6 +403,10 @@ def main():
         for mau_tim, doan in THAY_BIEU_THUC.get(so, []):
             if doan == '__MAT_NA_MOI__':
                 doan = _MAT_NA_MOI
+            elif doan == '__NHA15_MAT__':
+                doan = NHA15_MAT
+            elif doan == '__NHA15_NET__':
+                doan = NHA15_NET
             html, n = re.subn(mau_tim, lambda _m: doan, html, flags=re.S)
             if not n:
                 print(f'  ⚠ mẫu {so}: biểu thức "{mau_tim[:40]}" không khớp chỗ nào')

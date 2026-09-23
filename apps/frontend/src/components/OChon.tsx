@@ -30,8 +30,33 @@ export default function OChon({
   lop?: string;
 }) {
   const [mo, setMo] = useState(false);
+  const [len, setLen] = useState(false);    // bảng sổ LÊN TRÊN thay vì xuống dưới
   const [soi, setSoi] = useState(-1);       // dòng đang rê tới bằng bàn phím
   const boc = useRef<HTMLDivElement | null>(null);
+
+  /* ── SỔ XUỐNG HAY SỔ LÊN? ──────────────────────────────────────────────────
+     ⚠️ LỖI ĐÃ GẶP: ô này nằm trong khung tìm kiếm, mà khung tìm kiếm nằm ở ĐÁY
+     banner — banner lại cắt cụt mọi thứ tràn ra ngoài (overflow: hidden). Sổ
+     xuống thì bảng chọn chui ra ngoài banner và bị cắt gần hết, chỉ còn một dải
+     xám trống với cái mũi tên cuộn, nhìn như web hỏng.
+     Nên trước khi mở phải đo: dưới ô còn bao nhiêu chỗ TRONG CÁI KHUNG ĐANG
+     CẮT (không phải trong màn hình). Thiếu chỗ thì sổ ngược lên trên. */
+  const doChoTrong = useCallback(() => {
+    const el = boc.current;
+    if (!el) return;
+    let cha: HTMLElement | null = el.parentElement;
+    let day = window.innerHeight;
+    while (cha) {
+      const o = getComputedStyle(cha);
+      if (o.overflow !== 'visible' || o.overflowY !== 'visible') {
+        day = Math.min(day, cha.getBoundingClientRect().bottom);
+        break;
+      }
+      cha = cha.parentElement;
+    }
+    const r = el.getBoundingClientRect();
+    setLen(day - r.bottom < 240 && r.top > 240);
+  }, []);
 
   const dang = dsChon.find((m) => m.gt === giaTri);
 
@@ -50,11 +75,12 @@ export default function OChon({
   }, [mo]);
 
   const chon = useCallback((v: string) => { doiGiaTri(v); setMo(false); }, [doiGiaTri]);
+  const bat = useCallback(() => { doChoTrong(); setMo((v) => !v); }, [doChoTrong]);
 
   const banPhim = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') { setMo(false); return; }
     if (!mo && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown')) {
-      e.preventDefault(); setMo(true); setSoi(dsChon.findIndex((m) => m.gt === giaTri)); return;
+      e.preventDefault(); doChoTrong(); setMo(true); setSoi(dsChon.findIndex((m) => m.gt === giaTri)); return;
     }
     if (!mo) return;
     if (e.key === 'ArrowDown') { e.preventDefault(); setSoi((i) => Math.min(i + 1, dsChon.length - 1)); }
@@ -64,7 +90,7 @@ export default function OChon({
 
   return (
     <div ref={boc} className={`relative ${lop}`}>
-      <button type="button" onClick={() => setMo((v) => !v)} onKeyDown={banPhim}
+      <button type="button" onClick={bat} onKeyDown={banPhim}
         aria-haspopup="listbox" aria-expanded={mo}
         className="flex h-full w-full items-center gap-2 rounded-xl border border-white/20 bg-white px-3 py-2.5 text-left">
         {icon}
@@ -80,7 +106,8 @@ export default function OChon({
 
       {mo && (
         <div role="listbox"
-          className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 max-h-64 overflow-auto rounded-xl border border-slate-200 bg-white py-1 shadow-xl shadow-slate-900/15">
+          className={`absolute left-0 right-0 z-50 max-h-64 overflow-auto rounded-xl border border-slate-200 bg-white py-1 shadow-xl shadow-slate-900/15 ${
+            len ? 'bottom-[calc(100%+6px)]' : 'top-[calc(100%+6px)]'}`}>
           <button type="button" onClick={() => chon('')}
             className={`flex min-h-[44px] w-full items-center px-3 text-left text-sm ${!giaTri ? 'bg-[#0A2540]/5 font-semibold text-[#0A2540]' : 'text-slate-600 hover:bg-slate-50'}`}>
             {nhan}

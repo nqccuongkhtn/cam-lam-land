@@ -488,15 +488,20 @@
 }
 
 
-/* ══ MẪU 9: DÒNG THÔNG BÁO ĐỪNG ĐỨNG LẺ LOI ════════════════════════════════
+/* ══ MẪU 9: CHỖ ĐẶT DÒNG THÔNG BÁO ════════════════════════════════════════
    Bản thiết kế đặt dòng "Có 3 tin đăng mới gần biển hôm nay" ở giữa mép trên
-   (left 620, top 20). Trên web, chỗ đó vừa nằm sau thanh menu, vừa tách hẳn
-   khỏi cụm thẻ bên phải — nhìn rời rạc, đúng như chủ dự án nhận xét.
-   Nay xếp nó vào CỤM BÊN PHẢI, ngay dưới thẻ tin đăng, thẳng hàng với thẻ đó:
-     thẻ tin đăng  (top 70)  →  dòng thông báo (top 182)  →  khung chat + bản đồ (top 300) */
+   (left 620, top 20) — trên web chỗ đó nằm sau thanh menu, lại tách hẳn khỏi
+   cụm thẻ bên phải, nhìn rời rạc.
+   ⚠️ ĐÃ THỬ dồn nó vào cụm bên phải (dưới thẻ tin đăng): vẫn bị khung chat đè
+      lên, vì cụm bên phải đã có ba thứ xếp sát nhau rồi — không còn chỗ.
+   Nay đưa xuống DƯỚI CỤM CHỮ BÊN TRÁI: chỗ đó trống hẳn, cách cụm thẻ bên phải
+   rất xa, và đọc cũng thuận (một dòng thông báo nằm dưới lời giới thiệu).
+   Mốc: cụm chữ kết thúc khoảng y = 400, khung tìm kiếm bắt đầu khoảng y = 597,
+   nên đặt ở y = 430 là nằm gọn giữa hai thứ đó. */
 .cl-b11 .st-ui .ui-toast {
-  left: auto;
-  right: calc(var(--u) * 480px);
-  top: calc(var(--u) * 182px);
-  width: calc(var(--u) * 390px);
+  left: calc(var(--u) * 120px);
+  right: auto;
+  top: calc(var(--u) * 430px);
+  width: max-content;
+  max-width: calc(var(--u) * 560px);
 }

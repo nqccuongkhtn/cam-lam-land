@@ -113,6 +113,11 @@ SUA_CHU = {
     # quan tâm: chỗ đó có gì quanh mình.
     17: [('Dự án được đánh dấu ngay trên ảnh thật, thấy rõ sông, cầu và phố phường xung quanh.',
           'Sát mặt sông, cạnh cầu lớn, xung quanh là phố đã có người ở — đi lại, mua bán đều thuận.')],
+    # Chủ dự án khoanh đỏ dòng "ẢNH FLYCAM · CAM LÂM" và dặn đổi thành ảnh quy
+    # hoạch. Chỉ đổi CHỮ, giữ nguyên tấm ảnh flycam — vì ranh thửa của mẫu này
+    # vẽ tay bám theo đúng bờ ruộng trong ảnh, đổi ảnh là nét trỏ vào chỗ trống
+    # (đã thử bản nền bản đồ quy hoạch, chủ dự án không dùng).
+    10: [('Ảnh flycam · Cam Lâm', 'Ảnh quy hoạch · Cam Lâm')],
     # Mẫu 14 đã đổi sang ảnh tháp gạch, không còn mái ngói nào → sửa chữ cho
     # khớp ảnh. Vẫn viết chung chung, không nêu tên di tích (xem ghi chú DOI_ANH).
     14: [
@@ -205,7 +210,7 @@ _A18_CU = ('https://images.unsplash.com/photo-1580698872460-261e00561f35'
 #    scripts/banner11/tach-toa-nha-mau18.py — đổi một bên thì chạy lại bên kia,
 #    lệch là ảnh cắt rời không nằm khít lên ảnh trong khung.
 _A18_MOI = ('/banner11/mia-goldcoast-800.webp" width="1000" height="1500" '
-            'preserveAspectRatio="none" transform="translate({t} 28.1) scale(0.375)"')
+            'preserveAspectRatio="none" transform="translate({t} 30.6) scale(0.448)"')
 _MAY_BAY = ('<g class="c18-plane" data-at="1500"><g mask="url(#c18PlaneMask)">'
             '<image href="https://images.unsplash.com/photo-1580698872460-261e00561f35'
             '?w=1600&q=80&auto=format&fit=crop" width="1000" height="1472.5" '
@@ -225,14 +230,22 @@ _MAT_NA_MOI = ''
 # cả mảng trời đêm quanh toà nhà → nhìn ra một khối vuông tối đè lên nền banner.
 # Nay dùng ảnh ĐÃ CẮT THEO ĐÚNG BÓNG toà nhà (nền trong suốt), do
 # scripts/banner11/tach-toa-nha-mau18.py dựng ra. Chỗ đặt cũng do script đó tính.
-_TOA_NHA = ('<g class="c18-plane" data-at="1500">'
-            '<image href="/banner11/m18-toanha.webp" x="1433.4" y="90.9" '
-            'width="89.1" height="94.2"/></g>')
+# ⚠️ CẮT PHẦN NHÔ RA — đây là mẹo làm hết vết ghép:
+#    ảnh cắt rời chồng lên chính tấm ảnh trong khung, nếu để nguyên thì lúc nó
+#    TRƯỢT LÊN (hiệu ứng vươn cao) sẽ thấy hai lớp lệch nhau, nhìn rất giả.
+#    Nay bọc trong một khung cắt chỉ giữ phần TRÊN mép khung ảnh (y < 261), nên
+#    toà nhà như mọc dần ra khỏi khung, không bao giờ lộ chỗ nối.
+_TOA_NHA = ('<g class="c18-plane" data-at="1500" clip-path="url(#c18Tren)">'
+            '<image href="/banner11/m18-toanha.webp" x="1350.6" y="105.6" '
+            'width="186.5" height="171.4"/></g>')
 
 #    Mẫu 15: hình phác thảo căn nhà nằm sát ĐÁY khổ thiết kế (y 693–746 trong
 #    khung nhìn 524–750). Banner nay thấp hơn khổ gốc, lại có khung tìm kiếm ở
 #    đáy → căn nhà bị che mất. Dời khung nhìn xuống 48 đơn vị, tức là đẩy căn nhà
 #    LÊN CAO hơn trong banner, thoát khỏi chỗ khung tìm kiếm.
+NET_CU_1 = '<path d="M80 0L83 5L85.8 10L88.3 15L90.5 20L92.2 25L93.4 30L94 35L94.1 40L93.8 45L93 50L91.9 55L90.6 60L89.2 65L87.7 70L86.2 75L84.8 80L83.5 85L82.3 90L81.1 95L80 100" fill="none" stroke="#fff" stroke-width="3" vector-effect="non-scaling-stroke"/>'
+NET_MOI_1 = '<path d="M80.00 0C80.50 0.83 82.03 3.33 83.00 5C83.97 6.67 84.92 8.33 85.80 10C86.68 11.67 87.52 13.33 88.30 15C89.08 16.67 89.85 18.33 90.50 20C91.15 21.67 91.72 23.33 92.20 25C92.68 26.67 93.10 28.33 93.40 30C93.70 31.67 93.88 33.33 94.00 35C94.12 36.67 94.13 38.33 94.10 40C94.07 41.67 93.98 43.33 93.80 45C93.62 46.67 93.32 48.33 93.00 50C92.68 51.67 92.30 53.33 91.90 55C91.50 56.67 91.05 58.33 90.60 60C90.15 61.67 89.68 63.33 89.20 65C88.72 66.67 88.20 68.33 87.70 70C87.20 71.67 86.68 73.33 86.20 75C85.72 76.67 85.25 78.33 84.80 80C84.35 81.67 83.92 83.33 83.50 85C83.08 86.67 82.70 88.33 82.30 90C81.90 91.67 81.48 93.33 81.10 95C80.72 96.67 80.18 99.17 80.00 100" fill="none" stroke="#fff" stroke-width="3" vector-effect="non-scaling-stroke"/>'
+
 NET_CU_12 = '<path d="M12 0L8.4 10L5.4 20L3 30L1.3 40L.3 50L1.3 60L3 70L5.4 80L8.4 90L12 100" fill="none" stroke="#5eead4" stroke-width="2.5" vector-effect="non-scaling-stroke"/>'
 NET_MOI_12 = '<path d="M12.00 0C11.41 1.67 9.58 6.67 8.49 10.00C7.40 13.33 6.38 16.67 5.47 20.00C4.55 23.33 3.71 26.67 3.00 30.00C2.29 33.33 1.64 36.67 1.19 40.00C0.74 43.33 0.30 46.67 0.30 50.00C0.30 53.33 0.74 56.67 1.19 60.00C1.64 63.33 2.29 66.67 3.00 70.00C3.71 73.33 4.55 76.67 5.47 80.00C6.38 83.33 7.40 86.67 8.49 90.00C9.58 93.33 11.41 98.33 12.00 100.00" fill="none" stroke="#5eead4" stroke-width="2.5" vector-effect="non-scaling-stroke"/>'
 
@@ -268,6 +281,44 @@ _F_MAU10 = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mau10-noidu
 SVG_MAU10 = io.open(_F_MAU10, encoding='utf-8').read().strip() if os.path.exists(_F_MAU10) else ''
 
 THAY_DOAN = {
+    # Mẫu 1: mép cong của tấm ảnh — bản gốc vẽ bằng 21 đoạn thẳng nên nhìn ra
+    # khớp nối. Đổi sang một đường cong Bézier thật, cùng hình dáng.
+    1: [(NET_CU_1, NET_MOI_1)],
+    # ── MẪU 10 ─────────────────────────────────────────────────────────────
+    # Thẻ thông tin thửa: bản thiết kế để 240×104 ở góc trên phải (x 748, y 248
+    # trong khung nhìn 1000×750). Trên web, chỗ đó đúng vào nút "Đăng tin" và
+    # "Admin" của thanh menu → chữ chồng lên nhau. Thu nhỏ còn 186×80 và hạ
+    # xuống dưới cho thoáng.
+    10: [
+        # ⚠️ DẢI NHÌN THẤY CỦA MẪU NÀY RẤT HẸP — tính ra mới biết, nhìn bản thiết
+        #    kế không thấy: khung nhìn là 1000×750 nhưng cắt kiểu "slice" trên
+        #    banner 1905×554 nên chỉ THẤY dải y ≈ 229…521, lại còn bị khung tìm
+        #    kiếm che từ y ≈ 466 xuống. Tức mọi thứ phải nằm gọn trong y 240…460.
+        #    Bản thiết kế đặt thẻ và mấy nhãn ở y 250, 510, 515 → rơi ra ngoài
+        #    dải đó, cái thì chui sau thanh menu, cái thì nấp sau khung tìm kiếm.
+        # Thẻ thông tin: thu nhỏ và đưa về y 300 (dưới dòng "REC · ALT", trên
+        # khung tìm kiếm).
+        ('<rect x="748" y="248" width="240" height="104" rx="14"',
+         '<rect x="742" y="300" width="186" height="80" rx="11"'),
+        ('<text x="766" y="281" fill="#fde68a" font-size="21"',
+         '<text x="756" y="327" fill="#fde68a" font-size="16"'),
+        ('<text x="766" y="310" fill="#e2e8f0" font-size="16">Đất trồng lúa (LUC)</text>',
+         '<text x="756" y="349" fill="#e2e8f0" font-size="12.5">Đất trồng lúa (LUC)</text>'),
+        ('<text x="766" y="336" fill="#e2e8f0" font-size="16">Diện tích ~600 m²</text>',
+         '<text x="756" y="369" fill="#e2e8f0" font-size="12.5">Diện tích ~600 m²</text>'),
+        # Ba nhãn số thửa: dời vào giữa ba thửa CÒN NHÌN THẤY được
+        ('<text x="440" y="250">Thửa 126</text><text x="560" y="515">Thửa 134</text>'
+         '<text x="900" y="510">Thửa 135</text>',
+         '<text x="300" y="272">Thửa 126</text><text x="170" y="352">Thửa 134</text>'
+         '<text x="872" y="268">Thửa 135</text>'),
+        # Nét đo: dời lên cạnh trên của thửa được tô sáng, nằm trong dải nhìn thấy
+        ('<path class="dim" pathLength="1" d="M705 511L945 424"/>',
+         '<path class="dim" pathLength="1" d="M492.6 242.1L370.6 318.1"/>'),
+        ('<path class="tick" d="M707.7 518.5L702.3 503.5M947.7 431.5L942.3 416.5"/>',
+         '<path class="tick" d="M496.3 248.0L488.9 236.2M374.3 324.0L366.9 312.2"/>'),
+        ('<text class="count-txt" x="818" y="449" transform="rotate(-19.9 818 449)"',
+         '<text class="count-txt" x="432" y="276" transform="rotate(-31.9 432 276)"'),
+    ],
     # ── MẪU 7: CHIẾC MÁY BAY THẬT TRONG ẢNH PHẢI BAY ĐƯỢC ───────────────────
     # Chủ dự án chỉ thẳng vào chiếc máy bay trong ảnh: "vẫn chưa làm cho nó bay".
     # Chiếc máy bay vector nhỏ vẫn chạy vòng quanh viền nét đứt (đó là thứ khác,
@@ -303,27 +354,29 @@ THAY_DOAN = {
     # Bản thiết kế để khung NẰM NGANG (700×470). Toà nhà trong ảnh lại cao và
     # thon (cao gấp đôi bề ngang) nên khung ngang chỉ lọt được một khúc thân
     # nhà — chủ dự án muốn "thấy từ nền đường lên đỉnh toà nhà".
-    # Nay đổi thành KHUNG ĐỨNG 368×430 đặt bên phải: lọt trọn từ mặt đường,
-    # khối đế, thân tháp, lên tới gần đỉnh; phần chóp còn lại nhô ra ngoài khung
-    # làm hiệu ứng vượt khung.
-    # ⚠️ Mép trên khung để ở y = 150 chứ không cao hơn: banner nằm dưới thanh
-    #    menu, phần trên y ≈ 91 bị menu che, phải chừa chỗ cho chóp nhà nhô ra.
+    # Nay khung 443×325 đặt bên phải, mép trên hạ xuống y = 260.
+    # Vì sao hạ thấp thế: KHÔNG cần nhét cả toà nhà vào trong khung — toà nhà
+    # vẫn thấy trọn vẹn, chỉ là PHẦN TRÊN nằm ngoài khung. Cắt thấp thì phần nhô
+    # ra tới 160 đơn vị (trước chỉ 33–59), hiệu ứng mới đã mắt.
+    # ⚠️ Mép trên khung không được cao hơn ~y = 250: banner nằm dưới thanh menu,
+    #    phần trên y ≈ 91 bị menu che, phải chừa đủ chỗ cho phần nhô ra.
     ('<rect x="1060" y="110" width="700" height="470" rx="48"/>',
-     '<rect x="1292" y="150" width="368" height="430" rx="40"/>'),
+     '<rect x="1230" y="260" width="443" height="325" rx="34"/>'
+     '</clipPath><clipPath id="c18Tren"><rect x="1150" y="0" width="700" height="261"/>'),
     ('<rect x="1060" y="110" width="700" height="470" rx="48" fill="none"',
-     '<rect x="1292" y="150" width="368" height="430" rx="40" fill="none"'),
+     '<rect x="1230" y="260" width="443" height="325" rx="34" fill="none"'),
     ('<rect class="r3" x="988" y="38" width="844" height="614" rx="120"',
-     '<rect class="r3" x="1240" y="98" width="472" height="534" rx="80"'),
+     '<rect class="r3" x="1180" y="210" width="543" height="425" rx="70"'),
     ('<rect class="r2" x="1012" y="62" width="796" height="566" rx="96"',
-     '<rect class="r2" x="1258" y="116" width="436" height="498" rx="66"'),
+     '<rect class="r2" x="1197" y="227" width="509" height="391" rx="58"'),
     ('<rect class="r1" x="1036" y="86" width="748" height="518" rx="72"',
-     '<rect class="r1" x="1275" y="133" width="402" height="464" rx="52"'),
+     '<rect class="r1" x="1214" y="244" width="475" height="357" rx="46"'),
     # ⛔ Bỏ hẳn nhóm `c18-patch`: bản thiết kế chồng hai bản sao ảnh lệch nhau
     #    qua một mặt nạ bo tròn để tạo cảm giác "phố nhân đôi". Với tấm ảnh này
     #    nó hiện ra đúng một ô chữ nhật lệch hàng giữa thân toà nhà, nhìn như
     #    lỗi hiển thị (chủ dự án đã bắt lỗi).
         (_MAY_BAY, _TOA_NHA),
-        (_A18_CU.format(t='736.9'), _A18_MOI.format(t='1290')),
+        (_A18_CU.format(t='736.9'), _A18_MOI.format(t='1228')),
         # (Hai bản sao ảnh của nhóm `c18-patch` đã bị xoá nên không còn gì để
         #  thay — xem THAY_BIEU_THUC[18].)
     ],

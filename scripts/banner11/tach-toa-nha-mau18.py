@@ -36,14 +36,14 @@ ANH = os.path.join(RA, 'mia-goldcoast-800.webp')
 # ⚠️ Cắt ngang ở y=1050 vì xuống thấp hơn là núi (trái) và dãy nhà (phải) lấn
 #    vào mép — hết trời để đo thì phép tách sai ngay. Chỗ cắt này vẫn nằm SÂU
 #    DƯỚI mép trên khung ảnh nên không lộ đường cắt.
-KHUNG = (110, 95, 700, 335)
+KHUNG = (110, 95, 700, 440)
 MEP = 80
 NGUONG_TRONG, NGUONG_DUC = 26.0, 62.0
 LOC_XANH = True     # xem ghi chú ở bước lọc màu xanh trời bên dưới
 
 # Cách đặt tấm ảnh trong bản thiết kế (phải khớp với THAY_DOAN[18] của
 # tach-banner.py): ảnh 800×1200 vẽ vào ô 1000×1500 rồi translate(tx ty) scale(s)
-TX, TY, S = 1290.0, 28.1, 0.375
+TX, TY, S = 1228.0, 30.6, 0.448
 
 
 def main():
@@ -63,8 +63,11 @@ def main():
     xn, yn = xs_ / w, ys_ / h
     A_full = np.stack([np.ones_like(xn), xn, yn, xn * xn, xn * yn, yn * yn], axis=-1)
     chac_troi = np.zeros((h, w), dtype=bool)
-    chac_troi[:, :MEP] = True
-    chac_troi[:, -MEP:] = True
+    # ⚠️ Chỉ coi hai mép là trời ở PHẦN TRÊN. Xuống thấp là có nhà bên cạnh lấn
+    #    vào mép, lấy cả vào thì mặt cong khớp sai, cắt hỏng ngay.
+    cao_troi = int(h * 0.55)
+    chac_troi[:cao_troi, :MEP] = True
+    chac_troi[:cao_troi, -MEP:] = True
     chac_troi[:max(6, h // 14), :] = True
     A = A_full[chac_troi]                      # (n, 6)
     troi = np.empty_like(patch)
@@ -143,8 +146,8 @@ def main():
     print('== DAN VAO tach-banner.py ==')
     print('<image href="/banner11/m18-toanha.webp" x="%.1f" y="%.1f" width="%.1f" height="%.1f"/>'
           % (X, Y, W, H))
-    print('Dinh toa nha o y=%.1f (mep tren khung anh la y=150) => nho ra %.0f don vi'
-          % (Y, 150 - Y))
+    print('Dinh toa nha o y=%.1f (mep tren khung anh la y=260) => nho ra %.0f don vi'
+          % (Y, 260 - Y))
 
     thu = Image.new('RGB', out.size, (11, 36, 71))
     thu.paste(out, (0, 0), out)

@@ -193,12 +193,19 @@
 /* Mẫu 18: bản gốc cho chiếc máy bay BAY VÚT ĐI (lao chéo lên rồi to dần).
    Nay là toà nhà cao tầng nên đổi thành động tác VƯƠN LÊN — nhô dần lên khỏi
    khung ảnh rồi đứng yên, hợp với toà nhà hơn. */
+/* Toà nhà MỌC DẦN RA khỏi mép khung ảnh.
+   Phần nhô ra đã được cắt sẵn bằng khung cắt `c18Tren` (chỉ giữ phần trên mép
+   khung) nên lúc nó trượt lên, mắt chỉ thấy toà nhà cao dần lên chứ không thấy
+   hai lớp ảnh lệch nhau — đây là chỗ trước đây nhìn "chưa thật".
+   Đi chậm và dài hơi hơn (2,4 giây) cho ra vẻ bề thế. */
 @keyframes cl-b11-vuon {
-  0%   { opacity: 0; transform: translateY(46px) }
-  60%  { opacity: 1 }
+  0%   { opacity: .25; transform: translateY(170px) }
+  35%  { opacity: 1 }
   100% { opacity: 1; transform: translateY(0) }
 }
-.cl-b11 .c18-plane.go { animation: cl-b11-vuon 1.4s cubic-bezier(.16, 1, .3, 1) both !important }
+.cl-b11 .c18-plane.go {
+  animation: cl-b11-vuon calc(2.4s * var(--slow, 1)) cubic-bezier(.22, .9, .25, 1) both !important;
+}
 
 /* ⚠️ Bản thiết kế ẩn `.c18-plane` khi banner ở chế độ ĐỨNG YÊN, vì chỗ đó vốn
    là chiếc máy bay đang bay — đứng yên thì chiếc máy bay lơ lửng nhìn vô lý.
@@ -329,3 +336,27 @@
 .cl-b11 .st-c16 image {
   filter: saturate(1.42) brightness(1.08) contrast(1.05) hue-rotate(-6deg);
 }
+
+
+/* ══ MẪU 15: NÉT PHÁC THẢO MỜ ĐI KHI CĂN NHÀ THẬT HIỆN LÊN ═════════════════
+   Bản thiết kế vẽ nét phác thảo SAU khối nhà, nên nét nằm đè lên trên. Hồi còn
+   là hình vẽ thì không sao; nay khối nhà là ẢNH CHỤP THẬT, để mấy nét xanh
+   vàng vắt ngang mặt nhà nhìn rất rối.
+   Nên cho nét vẽ xong thì mờ dần đi, chỉ còn thoáng như dấu vết bản vẽ. */
+@keyframes cl-b11-net-mo {
+  0%, 45%   { opacity: 1 }
+  62%, 100% { opacity: .18 }
+}
+.cl-b11 .st-b5 .c15-wire.go {
+  animation: cl-b11-net-mo calc(7s * var(--slow, 1)) linear both;
+}
+
+
+/* ══ MẪU 1: MÉP CONG CỦA TẤM ẢNH PHẢI MƯỢT ═════════════════════════════════
+   Cùng bệnh với mẫu 12: bản thiết kế cắt mép bằng đa giác 21 điểm, cách nhau 5%
+   chiều cao → trên màn rộng thấy rõ từng đoạn thẳng nối nhau.
+   Nay nội suy đúng đường cong đó bằng spline Catmull-Rom rồi lấy mẫu MỖI 1%
+   (103 điểm) → mắt không còn thấy khớp nối.
+   ⚠️ CSS không cho vẽ đường cong thật trong clip-path theo phần trăm, nên cách
+      duy nhất là lấy dày điểm. Đừng rút bớt cho "gọn". */
+.cl-b11 .banner .rb-photo { clip-path: polygon(0 0,80.00% 0%,80.41% 1%,80.99% 2%,81.67% 3%,82.36% 4%,83.00% 5%,83.58% 6%,84.15% 7%,84.71% 8%,85.26% 9%,85.80% 10%,86.32% 11%,86.84% 12%,87.34% 13%,87.82% 14%,88.30% 15%,88.77% 16%,89.23% 17%,89.67% 18%,90.10% 19%,90.50% 20%,90.88% 21%,91.24% 22%,91.58% 23%,91.90% 24%,92.20% 25%,92.48% 26%,92.74% 27%,92.99% 28%,93.21% 29%,93.40% 30%,93.57% 31%,93.71% 32%,93.82% 33%,93.92% 34%,94.00% 35%,94.06% 36%,94.10% 37%,94.11% 38%,94.11% 39%,94.10% 40%,94.07% 41%,94.03% 42%,93.98% 43%,93.90% 44%,93.80% 45%,93.68% 46%,93.53% 47%,93.37% 48%,93.19% 49%,93.00% 50%,92.80% 51%,92.59% 52%,92.37% 53%,92.14% 54%,91.90% 55%,91.65% 56%,91.40% 57%,91.14% 58%,90.87% 59%,90.60% 60%,90.33% 61%,90.05% 62%,89.77% 63%,89.49% 64%,89.20% 65%,88.91% 66%,88.61% 67%,88.30% 68%,88.00% 69%,87.70% 70%,87.40% 71%,87.10% 72%,86.79% 73%,86.49% 74%,86.20% 75%,85.91% 76%,85.63% 77%,85.35% 78%,85.07% 79%,84.80% 80%,84.53% 81%,84.27% 82%,84.01% 83%,83.75% 84%,83.50% 85%,83.25% 86%,83.01% 87%,82.78% 88%,82.54% 89%,82.30% 90%,82.06% 91%,81.82% 92%,81.57% 93%,81.33% 94%,81.10% 95%,80.86% 96%,80.60% 97%,80.36% 98%,80.15% 99%,80.0% 100%,0 100%) }

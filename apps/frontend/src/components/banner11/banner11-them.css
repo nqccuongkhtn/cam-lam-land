@@ -489,19 +489,21 @@
 
 
 /* ══ MẪU 9: CHỖ ĐẶT DÒNG THÔNG BÁO ════════════════════════════════════════
-   Bản thiết kế đặt dòng "Có 3 tin đăng mới gần biển hôm nay" ở giữa mép trên
-   (left 620, top 20) — trên web chỗ đó nằm sau thanh menu, lại tách hẳn khỏi
-   cụm thẻ bên phải, nhìn rời rạc.
-   ⚠️ ĐÃ THỬ dồn nó vào cụm bên phải (dưới thẻ tin đăng): vẫn bị khung chat đè
-      lên, vì cụm bên phải đã có ba thứ xếp sát nhau rồi — không còn chỗ.
-   Nay đưa xuống DƯỚI CỤM CHỮ BÊN TRÁI: chỗ đó trống hẳn, cách cụm thẻ bên phải
-   rất xa, và đọc cũng thuận (một dòng thông báo nằm dưới lời giới thiệu).
-   Mốc: cụm chữ kết thúc khoảng y = 400, khung tìm kiếm bắt đầu khoảng y = 597,
-   nên đặt ở y = 430 là nằm gọn giữa hai thứ đó. */
+   Bản thiết kế đặt dòng "Có 3 tin đăng mới gần biển hôm nay" ở left 620,
+   top 20 — trên web chỗ đó chui sau thanh menu.
+   ⚠️ ĐÃ THỬ HAI CHỖ KHÁC, ĐỀU HỎNG:
+      · dồn vào cụm thẻ bên phải (dưới thẻ tin đăng) → khung chat đè lên;
+      · đưa xuống dưới cụm chữ bên trái → chủ dự án thấy lạc chỗ.
+   Nay đặt ở khoảng trống GIỮA THANH MENU VÀ THẺ TIN ĐĂNG, đúng chỗ chủ dự án
+   khoanh: ngay dưới mép thanh menu (menu hết ở khoảng y = 76) và bên trái thẻ
+   tin đăng (thẻ đó bắt đầu ở x = 1646).
+   ⚠️ Neo theo MÉP PHẢI chứ đừng neo mép trái: cụm thẻ bên phải cũng neo mép
+      phải, neo cùng kiểu thì màn rộng hẹp gì hai bên cũng giữ nguyên khoảng
+      cách với nhau. */
 .cl-b11 .st-ui .ui-toast {
-  left: calc(var(--u) * 120px);
-  right: auto;
-  top: calc(var(--u) * 430px);
+  left: auto;
+  right: calc(var(--u) * 1120px);
+  top: calc(var(--u) * 88px);
   width: max-content;
-  max-width: calc(var(--u) * 560px);
+  max-width: calc(var(--u) * 520px);
 }

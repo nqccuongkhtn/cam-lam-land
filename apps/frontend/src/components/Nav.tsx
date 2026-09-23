@@ -46,9 +46,9 @@ function Logo({ light }: { light: boolean }) {
              bản NÉT NAVY đúng màu gốc. Một bản màu thì kiểu gì cũng có một
              trạng thái bị chìm. Dựng hai tệp bằng scripts/dung-logo.py. */}
       <img
-        src={light ? '/logo-gon.webp' : '/logo-gon-toi.webp'}
-        alt="" aria-hidden="true" width={69} height={44}
-        className="h-11 w-[69px] shrink-0 object-contain" />
+        src={light ? '/logo-cam-lam.webp' : '/logo-cam-lam-toi.webp'}
+        alt="" aria-hidden="true" width={67} height={44}
+        className="h-11 w-[67px] shrink-0 object-contain" />
       <span className="leading-tight">
         <span className={`font-extrabold block text-lg tracking-tight ${light ? 'text-white' : 'text-[#0A2540]'}`}>Cam Lâm <span className="text-[#C8A14B]">Land</span></span>
         <span className={`hidden lg:block whitespace-nowrap text-[10px] font-medium tracking-wide ${light ? 'text-white/75' : 'text-slate-400'}`}>Nhà đất &amp; quy hoạch</span>

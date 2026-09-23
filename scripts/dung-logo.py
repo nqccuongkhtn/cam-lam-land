@@ -20,7 +20,7 @@ import os
 import sys
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 RA = os.path.join(GOC, 'apps', 'frontend', 'public', 'logo-cam-lam.webp')          # nen TOI
@@ -39,9 +39,29 @@ GON_NGANG, GON_DOC = 0.81, 0.735
 #    trang khi cuon xuong. Mot ban mau thi kieu gi cung co mot trang thai bi
 #    chim. Nen dung ra hai tep: net trang cho nen toi, net navy cho nen sang.
 NET_SANG = (250, 251, 252)     # trang nga  — dung tren nen toi
-TROI_SANG = (229, 188, 98)
 NET_TOI = (19, 52, 89)         # navy goc   — dung tren nen sang
+TROI_SANG = (229, 188, 98)
 TROI_TOI = (198, 158, 73)
+
+# ── VANG KEM: cho logo do trang trơ, nhung KHONG phoi het ──────────────────
+# Chu du an: "phoi them mau vang kem nhe vao de do trang nhung k phai phoi het
+# lam cho no nghe thuat". Nen lam kieu CHUYEN MAU DUNG: phan tren cua ngoi nha
+# giu trang nga, cang xuong gan bai cat cang ngả sang kem — nhin nhu nang chieu
+# len tuong nha. Hai phan ba tren van trang nen chu CL doc ro nhu cu.
+KEM = (238, 214, 164)
+# Chuyen mau bat dau o 60% chieu cao va an het trong 20% tiep theo.
+KEM_TU, KEM_DAI = 0.60, 0.20
+
+# ── LAM DAY NET NHA ────────────────────────────────────────────────────────
+# ⚠️ Chu du an: "net nha hoi manh so voi phan con lai nhin logo bi yeu".
+#    Dung — do song bien va mat troi la MANG DAC, con ngoi nha chi la NET VIEN
+#    day ~33/749 = 4,4% be ngang, thu ve 67px thi con chua toi 3 cham -> nhin
+#    mong manh han so voi mang cat vang ben duoi.
+#    Cach chua: no net nha ra (phep gian anh), roi lam mem vien lai.
+#    ⚠️ DUNG QUA 9. Da thu: 11 la nut chu "C" bat dau bit lai, 15 thi chu CL
+#       dinh liền vao tuong, khong doc duoc nua. 7 la vua dep.
+DAY_NET = 7
+
 # ⛔ DA TAT: tung to chu long "CL" mau do (dung mau nut "Dang nhap") cho logo
 #    do don dieu, nhung chu du an xem roi noi "mau do khong hop" -> tat di.
 #    Bat lai thi doi DUNG_DO = True.
@@ -52,6 +72,39 @@ DO_TOI = (220, 38, 38)         # tren nen sang thi do dam hon
 # Trong khung nay khong dinh net nao cua mai hay tuong — da kiem tra tung canh.
 CL_KHUNG = (122, 163, 470, 381)
 KHO = 288
+
+
+def no_net(a):
+    """No net nha ra cho day dan roi lam mem vien lai (xem chu thich DAY_NET)."""
+    if DAY_NET < 3:
+        return a
+    im = Image.fromarray((a * 255).astype(np.uint8), 'L')
+    im = im.filter(ImageFilter.MaxFilter(DAY_NET)).filter(ImageFilter.GaussianBlur(0.6))
+    return np.asarray(im).astype(np.float32) / 255.0
+
+
+def ghep(a_nha, a_vang, yy, cao_goc, net, kem, troi, do, vung_cl):
+    """Ghep net nha (co chuyen mau trang -> kem) len tren song bien mau vang."""
+    t = np.clip((yy - cao_goc * KEM_TU) / (cao_goc * KEM_DAI), 0, 1)[..., None]
+    mau = np.array(net, np.float32) * (1 - t) + np.array(kem, np.float32) * t
+    if do is not None:
+        mau = np.where(vung_cl[..., None], np.array(do, np.float32), mau)
+    # Cho nao net nha day hon thi net nha nam TREN, con lai la song/mat troi.
+    tren = (a_nha >= a_vang)[..., None]
+    r = np.where(tren, mau, np.array(troi, np.float32))
+    a = np.clip(np.maximum(a_nha, a_vang), 0, 1)
+    return Image.fromarray(np.dstack([r.astype(np.uint8), (a * 255).astype(np.uint8)]), 'RGBA')
+
+
+def ghi(out, duong):
+    bb = out.getbbox()
+    if bb:
+        out = out.crop(bb)
+    rong = int(round(KHO * out.width / out.height))
+    out = out.resize((rong, KHO), Image.LANCZOS)
+    out.save(duong, 'WEBP', quality=94, method=6)
+    print('OK %s  %d KB  (%dx%d)'
+          % (os.path.basename(duong), os.path.getsize(duong) // 1024, rong, KHO))
 
 
 def main():
@@ -91,7 +144,7 @@ def main():
     k = np.where(alp[..., None] > 0.04, np.minimum(1.0 / np.maximum(alp[..., None], 0.04), 4.0), 1.0)
     rgb = np.clip(c * k, 0, 255)
 
-    # 3. Doi mau net: mot ban cho nen toi, mot ban cho nen sang
+    # 3. Tach rieng HAI MANG: net nha (von mau navy) va song + mat troi (von vang)
     xanh = rgb[:, :, 2] > rgb[:, :, 0] + 12
 
     # ⚠️ CẮT SÁT, ĐỪNG ĐỘN THÀNH HÌNH VUÔNG.
@@ -102,47 +155,25 @@ def main():
     vung_cl = ((xx >= CL_KHUNG[0]) & (xx <= CL_KHUNG[2])
                & (yy >= CL_KHUNG[1]) & (yy <= CL_KHUNG[3]))
 
-    for duong, net, troi, do in ((RA, NET_SANG, TROI_SANG, DO_SANG),
-                                 (RA_TOI, NET_TOI, TROI_TOI, DO_TOI)):
-        r = rgb.copy()
-        r[xanh] = net
-        if DUNG_DO:
-            r[xanh & vung_cl] = do
-        r[(~xanh) & (alp > 0.04)] = troi
-        out = Image.fromarray(np.dstack([r.astype(np.uint8), (alp * 255).astype(np.uint8)]), 'RGBA')
-        bb = out.getbbox()
-        if bb:
-            out = out.crop(bb)
-        rong = int(round(KHO * out.width / out.height))
-        out = out.resize((rong, KHO), Image.LANCZOS)
-        out.save(duong, 'WEBP', quality=94, method=6)
-        print('OK %s  %d KB  (%dx%d)'
-              % (os.path.basename(duong), os.path.getsize(duong) // 1024, rong, KHO))
+    a_nha = no_net(alp * xanh)       # net nha da no day
+    a_vang = alp * (~xanh)           # song bien + mat troi, giu nguyen
+
+    for duong, net, kem, troi, do in (
+            (RA, NET_SANG, KEM, TROI_SANG, DO_SANG),
+            (RA_TOI, NET_TOI, NET_TOI, TROI_TOI, DO_TOI)):
+        out = ghep(a_nha, a_vang, yy, H, net, kem, troi,
+                   do if DUNG_DO else None, vung_cl)
+        ghi(out, duong)
 
     # ── Bản RÚT GỌN: cắt lấy phần ngôi nhà, bỏ mặt trời và sóng ─────────────
-    cao = int(H * GON_DOC)
-    rongc = int(W * GON_NGANG)
-    for duong, net, troi, do in ((RA_GON, NET_SANG, TROI_SANG, DO_SANG),
-                                 (RA_GON_TOI, NET_TOI, TROI_TOI, DO_TOI)):
-        r = rgb[:cao, :rongc].copy()
-        a2 = alp[:cao, :rongc].copy()
-        x2 = xanh[:cao, :rongc]
-        vcl = vung_cl[:cao, :rongc]
-        # mặt trời (phần vốn màu vàng) nằm lọt trong khung cắt thì xoá hẳn đi
-        a2[(~x2) & (a2 > 0.04)] = 0
-        r[x2] = net
-        if DUNG_DO:
-            r[x2 & vcl] = do
-        out = Image.fromarray(np.dstack([r.astype(np.uint8), (a2 * 255).astype(np.uint8)]), 'RGBA')
-        bb = out.getbbox()
-        if bb:
-            out = out.crop(bb)
-        rong = int(round(KHO * out.width / out.height))
-        out = out.resize((rong, KHO), Image.LANCZOS)
-        out.save(duong, 'WEBP', quality=94, method=6)
-        print('OK %s  %d KB  (%dx%d)  ti le %.3f'
-              % (os.path.basename(duong), os.path.getsize(duong) // 1024, rong, KHO, rong / KHO))
-    print('OK %s  %d KB' % (os.path.basename(RA), os.path.getsize(RA) // 1024))
+    cao, rongc = int(H * GON_DOC), int(W * GON_NGANG)
+    for duong, net, kem, troi, do in (
+            (RA_GON, NET_SANG, KEM, TROI_SANG, DO_SANG),
+            (RA_GON_TOI, NET_TOI, NET_TOI, TROI_TOI, DO_TOI)):
+        out = ghep(a_nha[:cao, :rongc], np.zeros((cao, rongc), np.float32),
+                   yy[:cao, :rongc], H, net, kem, troi,
+                   do if DUNG_DO else None, vung_cl[:cao, :rongc])
+        ghi(out, duong)
 
 
 if __name__ == '__main__':

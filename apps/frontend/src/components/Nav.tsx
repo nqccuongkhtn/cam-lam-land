@@ -39,16 +39,20 @@ function Logo({ light }: { light: boolean }) {
           ⚠️ BỎ HẲN CÁI KHUNG VUÔNG. Logo này có tới bốn chi tiết; nhét vào
              khung 36px thì hình vẽ chỉ còn ~30px, chi tiết dính vào nhau —
              chủ dự án nhận xét "nhìn rối", "thô". Bỏ khung thì logo được dùng
-             trọn chiều cao thanh menu (44px), to hơn gần một nửa, các nét tách
-             bạch hẳn ra.
+             gần trọn chiều cao thanh menu, các nét tách bạch hẳn ra.
+          ⚠️ CAO 38px, ĐỪNG TỰ Ý ĐỔI. Đã đi một vòng: 36px có khung → rối;
+             44px không khung → chủ dự án bảo "cho logo nhỏ lại"; 38px là mức
+             đang dùng. Nét ngôi nhà đã được làm dày (xem scripts/dung-logo.py)
+             nên thu nhỏ chừng này vẫn đọc rõ. Đổi chiều cao thì phải đổi CẢ bề
+             ngang cho đúng tỉ lệ 1,51 — để lệch là logo bị bóp méo.
           ⚠️ HAI TỆP MÀU, đổi theo trạng thái thanh menu: nền tối (trong suốt
              trên banner) dùng bản NÉT TRẮNG, nền trắng (khi cuộn xuống) dùng
              bản NÉT NAVY đúng màu gốc. Một bản màu thì kiểu gì cũng có một
              trạng thái bị chìm. Dựng hai tệp bằng scripts/dung-logo.py. */}
       <img
         src={light ? '/logo-cam-lam.webp' : '/logo-cam-lam-toi.webp'}
-        alt="" aria-hidden="true" width={67} height={44}
-        className="h-11 w-[67px] shrink-0 object-contain" />
+        alt="" aria-hidden="true" width={57} height={38}
+        className="h-[38px] w-[57px] shrink-0 object-contain" />
       <span className="leading-tight">
         <span className={`font-extrabold block text-lg tracking-tight ${light ? 'text-white' : 'text-[#0A2540]'}`}>Cam Lâm <span className="text-[#C8A14B]">Land</span></span>
         <span className={`hidden lg:block whitespace-nowrap text-[10px] font-medium tracking-wide ${light ? 'text-white/75' : 'text-slate-400'}`}>Nhà đất &amp; quy hoạch</span>

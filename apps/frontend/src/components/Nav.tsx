@@ -6,6 +6,7 @@ import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import { useHideOnScroll } from '@/lib/hideOnScroll';
 import { apiBase } from '@/lib/api';
+import LogoLe from '@/components/LogoLe';
 
 /* ── LOGO NGÀY LỄ ───────────────────────────────────────────────────────────
    Ngày thường dùng logo gốc; tới dịp lễ (Tết, Quốc khánh, Trung thu, Noel…)
@@ -81,12 +82,7 @@ function Logo({ light }: { light: boolean }) {
           "LOGO NGÀY LỄ" trong app/globals.css). Ngày thường không bọc gì cả,
           để thanh menu nhẹ đúng như cũ. Ba thẻ <i> là ba đốm lấp lánh. */}
       {le ? (
-        <span className="cl-logo-le" data-le={le}>
-          <img src={`/logo-le/${le}${light ? '' : '-toi'}.webp`}
-            alt="" aria-hidden="true" width={48} height={32}
-            className="h-8 w-12 shrink-0 object-contain" />
-          <i aria-hidden /><i aria-hidden /><i aria-hidden />
-        </span>
+        <LogoLe ma={le} light={light} cao={32} />
       ) : (
         <img
           src={light ? '/logo-cam-lam.webp' : '/logo-cam-lam-toi.webp'}

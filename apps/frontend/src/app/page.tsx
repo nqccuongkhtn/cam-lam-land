@@ -167,7 +167,19 @@ export default function Home() {
   const [marketLoading, setMarketLoading] = useState(true);
   const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Thị trường BĐS'); /* mở trang chủ là thấy TIN THỊ TRƯỜNG trước */ const [heroDeal, setHeroDeal] = useState<'sale' | 'rent' | 'project'>('sale');
   const searchHint = useTypingHint(SEARCH_HINTS);
-  useEffect(() => { api<{ listings: Listing[] }>('/listings?limit=20').then((d) => setListings(d.listings || [])).catch(() => {}); }, []);
+  /* ⚠️ MỤC "Bất động sản dành cho bạn" PHẢI ĐỔI THEO TAB ĐANG CHỌN ở khung
+     tìm kiếm. Trước đây nó chỉ gọi /listings?limit=20 đúng một lần lúc mở
+     trang, nên bấm sang "Cho thuê" thì khung tìm kiếm đổi mà danh sách bên
+     dưới vẫn y nguyên tin BÁN — chủ dự án bắt lỗi "chỗ baner chưa chuyển theo".
+     Nay tab đổi là gọi lại: 'rent' lấy tin cho thuê, còn lại lấy tin bán. */
+  useEffect(() => {
+    const p = heroDeal === 'rent' ? '/listings?limit=20&deal=rent' : '/listings?limit=20';
+    let huy = false;
+    api<{ listings: Listing[] }>(p)
+      .then((d) => { if (!huy) setListings(d.listings || []); })
+      .catch(() => {});
+    return () => { huy = true; };
+  }, [heroDeal]);
   const [areaCounts, setAreaCounts] = useState<Record<string, number>>({});
   useEffect(() => { api<{ areas: { ward: string; count: number }[] }>('/listings/areas').then((d) => { const m: Record<string, number> = {}; (d.areas || []).forEach((a) => { m[a.ward] = a.count; }); setAreaCounts(m); }).catch(() => {}); }, []);
   useEffect(() => {
@@ -341,7 +353,10 @@ export default function Home() {
       {/* FEATURED — kiểu batdongsan */}
       <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
         <div className="flex items-center justify-between mb-4 sm:mb-6 flex-wrap gap-2">
-          <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">Bất động sản dành cho bạn</h2>
+          <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">
+            {heroDeal === 'rent' ? 'Nhà đất cho thuê dành cho bạn'
+              : heroDeal === 'project' ? 'Dự án dành cho bạn' : 'Bất động sản dành cho bạn'}
+          </h2>
           <div className="flex items-center gap-3 text-sm font-semibold text-[#0A2540]">
             <Link href="/listings" className="hover:text-red-600">Tin bán mới nhất</Link>
             <span className="text-slate-300">|</span>

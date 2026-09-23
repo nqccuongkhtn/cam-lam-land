@@ -33,6 +33,7 @@ Chạy:  python scripts/dung-logo-ngay-le.py
 import math
 import os
 
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -782,22 +783,34 @@ def bo_hoa(d, cx, cy, r, canh, nhuy, la):
 # Hàm nhận (d, m); `m` là BẢNG MÀU của nền đang dựng (tối hay sáng).
 
 def ve_tet(d, m):
-    """Tết Nguyên đán — logo QUAN TRỌNG NHẤT trong năm.
+    """Tết Nguyên đán — logo quan trọng nhất trong năm.
 
-    Ba thứ làm nên "cái hồn của Tết", xếp theo thứ tự dễ nhận ra ở cỡ nhỏ:
-      1. TẤM BIỂN Đỏ HÌNH THOI — mảng đặc to nhất, góc cạnh rõ;
-      2. BÔNG MAI VÀNG nằm giữa tấm biển — vàng trên đỏ, tương phản mạnh nhất;
-      3. BÁNH CHƯNG XANH ở chân — màu xanh lá duy nhất trong cả bộ logo lễ
-         nên nhìn phát là biết Tết, không lẫn với dịp nào khác.
-    ⚠️ Đã thử hai kiểu trước đó — rải nhiều bông hoa nhỏ, rồi hai bông to —
-       cả hai đều bị chê. Vấn đề là cành hoa không có mảng đặc nào đủ to để
-       níu mắt; tấm biển đỏ thì có.
+    Ba thứ làm nên cái hồn của Tết, chu du an chot huong A:
+      1. CÀNH MAI VÀNG mọc từ bên phải, VƯƠN QUA MÁI NHÀ sang trái —
+         cành đan vào ngôi nhà thành một bố cục, không phải món đồ dán thêm;
+      2. MẶT TRỜI CHUYỂN Đỏ VIỀN VÀNG (làm ở hàm doi_mat_troi, không vẽ ở đây);
+      3. BÁNH CHƯNG XANH ở góc — màu xanh lá duy nhất trong cả bộ logo lễ,
+         nhìn là biết Tết chứ không lẫn dịp nào khác.
+
+    ⚠️ CÀNH VẼ THON DẦN TỪ GỐC LÊN NGỌN. Vẽ một nét đều chệm một độ dày
+       thì ra cái que chứ không ra cành cây — chủ dự án đã chê một lần.
+    ⚠️ BỐN BÔNG, KHÔNG HƠN. Rải nhiều bông nhỏ thì thu về 32 điểm ảnh nhìn
+       như confetti vãi lộn xộn.
+    ⚠️ KHÔNG ĐỂ HOA ĐÈ LÊN CHỮ "CL" — chữ lồng là phần nhận diện.
     """
-    banh_chung(d, 316, 116, 54, m['xanh'], m['kem'])
-    bien_tet(d, 382, 62, 56, m['do_tet'], m['vang_sang'])
-    for i in range(5):
-        canh_nhon(d, 382, 62, -90 + i * 72, 34, 14, m['vang_sang'])
-    d.ellipse([382 - 10, 62 - 10, 382 + 10, 62 + 10], fill=m['do'])
+    # cành chính: thon dần, đi từ gốc phải vượt qua đỉnh mái sang trái
+    khuc = [(424, 156), (386, 116), (330, 80), (256, 46), (176, 26), (108, 18)]
+    for k in range(len(khuc) - 1):
+        d.line([khuc[k], khuc[k + 1]], fill=m['nau'], width=max(3, 11 - k * 1.6))
+    d.line([(330, 80), (352, 36)], fill=m['nau'], width=5)      # nhánh phụ
+    d.line([(256, 46), (244, 12)], fill=m['nau'], width=4)
+
+    for cx, cy, r in ((104, 16, 32), (244, 8, 25), (352, 30, 27), (404, 104, 21)):
+        for i in range(5):
+            canh_nhon(d, cx, cy, -90 + i * 72, r, r * 0.42, m['vang_sang'])
+        d.ellipse([cx - r * 0.30, cy - r * 0.30, cx + r * 0.30, cy + r * 0.30], fill=m['do_tet'])
+
+    banh_chung(d, 408, 138, 50, m['xanh'], m['kem'])
 
 
 def ve_tet_duong(d, m):
@@ -1061,6 +1074,26 @@ DIP = [
 ]
 
 
+def doi_mat_troi(anh, mau_troi, do, vien):
+    """ĐỔI MẦU MẶT TRỜI ngay trên ảnh logo gốc (dùng cho Tết).
+
+    Mặt trời trong logo là mảng DUY NHẤT mang màu vàng đồng (mọi nét khác
+    là trắng ngà hoặc navy), nên đổi màu chỉ cần dò theo MÀU — không phải
+    biết nó nằm ở đâu, không phải vẽ đè lên (vẽ đè thì che mất đụn cát
+    đang nằm trước mặt trời).
+    Phần rìa (màu pha giữa vàng và nền) để nguyên làm viền vàng sẵn.
+    """
+    a = np.asarray(anh).astype(np.int16)
+    rgb = a[:, :, :3]
+    d2 = np.abs(rgb - np.array(mau_troi, np.int16)).sum(axis=2)
+    loi = d2 < 40            # lõi mặt trời: đúng màu vàng đồng
+    ria = (d2 >= 40) & (d2 < 130) & (a[:, :, 3] > 40)   # vành pha màu quanh lõi
+    r = a.copy()
+    r[loi, :3] = do
+    r[ria, :3] = vien
+    return Image.fromarray(r.astype(np.uint8), 'RGBA')
+
+
 def _ve_phong(d, ve, m, lop=None):
     """Gọi hàm vẽ nhưng mọi toạ độ tự được nhân lên PHONG lần.
 
@@ -1108,12 +1141,24 @@ def lam(nen_toi: bool):
     goc = Image.open(os.path.join(CONG, ten_goc)).convert('RGBA')
     m = MAU_NEN_TOI if nen_toi else MAU_NEN_SANG
     ra = {}
+    mau_troi = (230, 187, 97) if nen_toi else (199, 158, 74)
     for ma, _ten, ve in DIP:
         lop = Image.new('RGBA', (goc.width * PHONG, goc.height * PHONG), (0, 0, 0, 0))
         _ve_phong(ImageDraw.Draw(lop), ve, m, lop)
-        anh = goc.copy()
-        anh.alpha_composite(lop.resize(goc.size, Image.LANCZOS))
-        ra[ma] = anh
+        # Tết: mặt trời chuyển ĐỎ viền vàng (chủ dự án chốt hướng A)
+        nen = doi_mat_troi(goc, mau_troi, m['do_tet'], m['vang_sang']) if ma == 'tet' else goc.copy()
+        tt = lop.resize(goc.size, Image.LANCZOS)
+        anh = nen.copy()
+        anh.alpha_composite(tt)
+        # ⚠️ GHI RA BA TỆP chứ không phải một:
+        #    · <mã>      — ảnh ghép sẵn, dùng để xem trước và làm bản dự phòng;
+        #    · <mã>-nen  — phần NGÔI NHÀ (có sửa nền nếu dịp đó cần, vd mặt
+        #                  trời đỏ ngày Tết);
+        #    · <mã>-tt   — phần TRANG TRÍ, nền trong suốt.
+        #    Tách ra vì chủ dự án dặn: NGÔI NHÀ LÀ BIỂU TƯỢNG CỦA WEB, không
+        #    được lắc — kể cả trong logo ngày lễ. Chỉ phần trang trí mới động.
+        #    Ghép sẵn thành một ảnh thì không tách hai chuyển động ra được.
+        ra[ma] = (anh, nen, tt)
     return ra
 
 
@@ -1135,8 +1180,8 @@ def _xem_thu(toi, sang):
         d.rectangle([300, y, 660, y + H - 2], fill=(10, 37, 64))
         d.line([(0, y + H - 1), (W, y + H - 1)], fill=(226, 232, 240))
         d.text((18, y + 48), ten, fill=(20, 30, 45), font=font)
-        a = toi[ma] if ma else Image.open(os.path.join(CONG, 'logo-cam-lam.webp')).convert('RGBA')
-        b = sang[ma] if ma else Image.open(os.path.join(CONG, 'logo-cam-lam-toi.webp')).convert('RGBA')
+        a = toi[ma][0] if ma else Image.open(os.path.join(CONG, 'logo-cam-lam.webp')).convert('RGBA')
+        b = sang[ma][0] if ma else Image.open(os.path.join(CONG, 'logo-cam-lam-toi.webp')).convert('RGBA')
         for anh, x0 in ((a, 330), (b, 700)):
             for kho, dx in ((74, 0), (32, 120)):
                 w = round(kho * anh.width / anh.height)
@@ -1148,13 +1193,67 @@ def _xem_thu(toi, sang):
     print('\nAnh xem thu:', p)
 
 
+def ve_xe_tuan_loc():
+    """Vẽ CHIẾC XE TUẦN LỘC ra một tệp riêng (không nằm trong logo).
+
+    Ngày Giáng sinh, ngoài thanh menu sẽ có ông già Noel cưỡi xe tuần lộc
+    chạy ngang qua logo rồi biến mất — hai phút mới chạy một lần.
+    ⚠️ ĐỂ RIÊNG MỘT TỆP, đừng vẽ vào logo: nó phải chạy ngang qua màn
+       hình, còn logo thì đứng yên một chỗ.
+    """
+    W, H = 150, 88
+    lop = Image.new('RGBA', (W * PHONG, H * PHONG), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lop)
+    k = PHONG
+    NAU = (138, 94, 52)
+    NAU_D = (104, 68, 36)
+    DO = (201, 42, 42)
+    TRANG = (250, 251, 252)
+    VANG = (247, 208, 110)
+
+    # ── tuần lộc (bên trái, đang phi) ──
+    d.ellipse([18 * k, 42 * k, 58 * k, 62 * k], fill=NAU)                 # thân
+    d.ellipse([8 * k, 32 * k, 26 * k, 46 * k], fill=NAU)                  # đầu
+    d.polygon([(10 * k, 34 * k), (2 * k, 22 * k), (12 * k, 28 * k)], fill=NAU_D)   # sừng
+    d.polygon([(18 * k, 32 * k), (14 * k, 18 * k), (24 * k, 27 * k)], fill=NAU_D)
+    for x0, x1 in ((22, 16), (32, 28), (44, 48), (52, 58)):               # chân
+        d.line([(x0 * k, 58 * k), (x1 * k, 74 * k)], fill=NAU_D, width=int(3.4 * k))
+    d.polygon([(56 * k, 46 * k), (68 * k, 38 * k), (62 * k, 52 * k)], fill=NAU_D)  # đuôi
+    # dây kéo
+    d.line([(52 * k, 52 * k), (78 * k, 56 * k)], fill=NAU_D, width=int(2.2 * k))
+
+    # ── xe trượt ──
+    d.polygon([(78 * k, 46 * k), (128 * k, 46 * k), (122 * k, 68 * k), (84 * k, 68 * k)], fill=DO)
+    d.line([(76 * k, 70 * k), (132 * k, 70 * k)], fill=VANG, width=int(3 * k))
+    d.line([(132 * k, 70 * k), (140 * k, 62 * k)], fill=VANG, width=int(3 * k))
+    # ── ông già Noel ──
+    d.polygon([(92 * k, 46 * k), (116 * k, 46 * k), (112 * k, 26 * k), (96 * k, 26 * k)], fill=DO)
+    d.ellipse([96 * k, 18 * k, 114 * k, 36 * k], fill=(246, 214, 186))     # mặt
+    d.ellipse([94 * k, 28 * k, 116 * k, 44 * k], fill=TRANG)              # râu
+    d.polygon([(94 * k, 22 * k), (116 * k, 22 * k), (108 * k, 10 * k)], fill=DO)   # mũ
+    d.ellipse([102 * k, 4 * k, 114 * k, 16 * k], fill=TRANG)              # chóp mũ
+    d.line([(92 * k, 24 * k), (116 * k, 24 * k)], fill=TRANG, width=int(4 * k))    # vành mũ
+    # túi quà
+    d.polygon([(118 * k, 46 * k), (140 * k, 46 * k), (136 * k, 30 * k), (122 * k, 30 * k)], fill=VANG)
+
+    out = lop.resize((W, H), Image.LANCZOS)
+    p = os.path.join(RA, 'noel-xe.webp')
+    out.save(p, 'WEBP', quality=94, method=6)
+    print('OK %-11s %-22s %d KB' % ('noel-xe', 'Xe tuan loc Giang sinh',
+                                    os.path.getsize(p) // 1024))
+
+
 def main():
     os.makedirs(RA, exist_ok=True)
     toi, sang = lam(True), lam(False)
     for ma, ten, _ in DIP:
-        toi[ma].save(os.path.join(RA, ma + '.webp'), 'WEBP', quality=94, method=6)
-        sang[ma].save(os.path.join(RA, ma + '-toi.webp'), 'WEBP', quality=94, method=6)
+        for bo, duoi in ((toi, ''), (sang, '-toi')):
+            anh, nen, tt = bo[ma]
+            anh.save(os.path.join(RA, ma + duoi + '.webp'), 'WEBP', quality=94, method=6)
+            nen.save(os.path.join(RA, ma + '-nen' + duoi + '.webp'), 'WEBP', quality=94, method=6)
+            tt.save(os.path.join(RA, ma + '-tt' + duoi + '.webp'), 'WEBP', quality=94, method=6)
         print('OK %-11s %-22s %d KB' % (ma, ten, os.path.getsize(os.path.join(RA, ma + '.webp')) // 1024))
+    ve_xe_tuan_loc()
     _xem_thu(toi, sang)
 
 

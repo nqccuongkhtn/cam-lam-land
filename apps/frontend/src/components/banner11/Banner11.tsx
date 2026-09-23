@@ -622,7 +622,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
              ⚠️ Vì sao đáy chứ không phải trên: gần như mọi mẫu neo chữ theo mép
              TRÊN, nên đáy là chỗ trống nhất và chừa ở đáy thì không phải động
              vào bố cục phía trên — giữ được thiết kế gốc sát nhất. */
-          className={`mx-auto max-w-[980px] px-3 pb-6 pt-4 transition-all duration-500 sm:px-4 md:absolute md:inset-x-0 md:bottom-4 md:z-30 md:pb-0 md:pt-0 ${dangTim ? 'md:opacity-100' : 'md:opacity-[.82]'}`}
+          className={`cl-b11-tim mx-auto max-w-[980px] transition-all duration-500 md:absolute md:inset-x-0 md:bottom-4 md:z-30 ${dangTim ? 'md:opacity-100' : 'md:opacity-[.82]'}`}
         >
           {children}
         </div>

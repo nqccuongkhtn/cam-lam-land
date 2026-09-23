@@ -582,3 +582,28 @@
 @media (max-width: 760px) {
   .cl-b11 .dp-may .m3, .cl-b11 .dp-may .m4 { display: none }
 }
+
+/* ══ ĐIỆN THOẠI: KHUNG TÌM KIẾM DÍNH LIỀN VỚI BANNER ════════════════════════
+   Ở màn máy tính ô tìm kiếm nằm ĐÈ LÊN đáy banner. Ở màn nhỏ thì không đè
+   được (mọi mẫu banner đều dồn chữ xuống đáy), nên nó phải nằm HẲN BÊN DƯỚI.
+   ⚠️ Nhưng bên dưới trên nền TRẮNG của trang thì nhìn thành hai khối rời
+      nhau — chủ dự án nhận xét "đang hơi rời rạc". Nay đổ nền navy cho đúng
+      dải đó, bo tròn hai góc dưới: banner và ô tìm kiếm thành MỘT khối liền,
+      ảnh ở trên, ô tìm kiếm ở dưới.
+   ⚠️ margin-top: -1px là để bịt sợi tóc trắng giữa hai khối do trình duyệt
+      làm tròn số lẻ khi phóng to/thu nhỏ trang. */
+.cl-b11-tim { padding: 0 12px 24px }
+@media (max-width: 767px) {
+  .cl-b11-tim {
+    margin-top: -1px;
+    background: #0A2540;
+    padding: 10px 10px 14px;
+    border-radius: 0 0 18px 18px;
+  }
+  /* Banner bớt cao lại một chút cho gần tỉ lệ bên máy tính, và bỏ bo góc dưới
+     vì góc dưới giờ là của khung tìm kiếm. */
+  .cl-b11 .banner { aspect-ratio: 5 / 3; border-bottom-left-radius: 0; border-bottom-right-radius: 0 }
+}
+@media (min-width: 768px) {
+  .cl-b11-tim { padding: 0 16px }
+}

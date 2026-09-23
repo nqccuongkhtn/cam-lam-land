@@ -421,7 +421,7 @@ THAY_DOAN = {
      '<rect x="1230" y="260" width="443" height="325" rx="34"/>'
      '</clipPath><clipPath id="c18Tren"><rect x="1150" y="0" width="700" height="261"/></clipPath>'
      '<mask id="c18Toa" maskUnits="userSpaceOnUse" x="1330" y="85" width="230" height="215">'
-     '<image href="/banner11/m18-matna.webp" x="1350.6" y="105.6" width="186.5" height="171.4"/></mask>'
+     '<image href="/banner11/m18-matna.webp" x="1228.0" y="105.6" width="448.0" height="152.3"/></mask>'
      '<clipPath id="c18Bo">'),
     ('<rect x="1060" y="110" width="700" height="470" rx="48" fill="none"',
      '<rect x="1230" y="260" width="443" height="325" rx="34" fill="none"'),

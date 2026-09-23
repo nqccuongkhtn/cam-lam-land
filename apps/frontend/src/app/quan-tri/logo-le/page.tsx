@@ -22,6 +22,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import { useAuth, laAdmin } from '@/lib/auth';
+import LogoLe from '@/components/LogoLe';
 
 type Dip = {
   id: number; ma: string; ten: string; kieu: 'duong' | 'am' | 'ngay';
@@ -166,10 +167,9 @@ export default function LichLogoLePage() {
                   ${o.ma ? 'border-[#C8A14B]/60 bg-[#C8A14B]/10' : 'border-slate-100 hover:bg-slate-50'}
                   ${nay ? 'ring-2 ring-[#0A2540]' : ''}`}>
                 <span className={`text-[11px] font-bold ${o.ma ? 'text-[#0A2540]' : 'text-slate-400'}`}>{d}</span>
-                {o.ma && (
-                  <img src={`/logo-le/${o.ma}-toi.webp`} alt="" aria-hidden
-                    className="mt-0.5 h-6 w-auto max-w-[88%] object-contain" />
-                )}
+                {/* Hiện ĐÚNG hiệu ứng động sẽ chạy ngoài web, để xem trước
+                    ngay trong lịch — khỏi phải chờ tới ngày mới biết nó ra sao. */}
+                {o.ma && <span className="mt-0.5"><LogoLe ma={o.ma} light={false} cao={24} /></span>}
               </button>
             );
           })}
@@ -185,7 +185,7 @@ export default function LichLogoLePage() {
       <div className="mt-3 space-y-2">
         {dips.map((d) => (
           <div key={d.id} className={`flex items-center gap-3 rounded-lg border p-3 ${d.bat ? 'border-slate-200 bg-white' : 'border-slate-100 bg-slate-50 opacity-60'}`}>
-            <img src={`/logo-le/${d.ma}-toi.webp`} alt="" aria-hidden className="h-8 w-12 shrink-0 object-contain" />
+            <LogoLe ma={d.ma} light={false} cao={32} />
             <div className="min-w-0 flex-1">
               <div className="truncate font-bold text-[#0A2540]">{d.ten}</div>
               <div className="truncate text-xs text-slate-500">
@@ -232,7 +232,7 @@ export default function LichLogoLePage() {
                 <button key={b.ma} onClick={() => setSua({ ...sua, ma: b.ma, ten: sua.ten || b.ten.split('—')[0].trim() })}
                   className={`flex items-center gap-2 rounded-md border p-2 text-left text-xs
                     ${sua.ma === b.ma ? 'border-[#C8A14B] bg-[#C8A14B]/10 font-bold' : 'border-slate-200 hover:bg-slate-50'}`}>
-                  <img src={`/logo-le/${b.ma}-toi.webp`} alt="" aria-hidden className="h-7 w-10 shrink-0 object-contain" />
+                  <LogoLe ma={b.ma} light={false} cao={28} />
                   <span className="min-w-0 flex-1 leading-tight text-slate-600">{b.ten}</span>
                 </button>
               ))}

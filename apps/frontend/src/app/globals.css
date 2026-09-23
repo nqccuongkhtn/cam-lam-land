@@ -646,52 +646,22 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 }
 
 /* ══ LOGO NGÀY LỄ — HIỆU ỨNG ĐỘNG ═══════════════════════════════════════════
-   Ngày thường logo đứng yên. Tới dịp lễ (xem trang /quan-tri/logo-le) thì
-   thanh menu đổi sang bản logo có trang trí VÀ chạy một hiệu ứng nhẹ.
-
-   ⚠️ NHẸ THÔI, ĐỪNG LÀM QUÁ. Logo nằm ở thanh menu, đi theo người dùng suốt
-      mọi trang — nhấp nháy mạnh là gây khó chịu, xem lâu thành mỏi mắt. Nên:
-      biên độ nhỏ (nhích 1–2 chấm), nhịp chậm (3–5 giây), và CHỈ chạy khi chuột
-      không rê vào (rê vào thì dừng, cho người ta bấm cho chuẩn).
+   Ngày thường logo ĐỨNG YÊN TUYỆT ĐỐI — nó là ngôi nhà, biểu tượng của web,
+   phải đứng vững (chủ dự án dặn rõ). Chỉ logo NGÀY LỄ mới động, và cũng chỉ
+   động rất nhẹ vì nó đi theo người xem suốt mọi trang.
+   Markup do components/LogoLe.tsx sinh ra; dùng chung cho thanh menu và trang
+   quản lý lịch, sửa ở đây là hai nơi cùng đổi.
    ⚠️ Máy đặt "giảm chuyển động" thì tắt hết — luật chung của dự án. */
-.cl-logo-le { position: relative; display: inline-flex; }
-.cl-logo-le img { animation: clLogoTho 4.2s var(--ease, ease-in-out) infinite; }
-.cl-logo-le:hover img { animation-play-state: paused; }
-@keyframes clLogoTho {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50%      { transform: translateY(-1.5px) rotate(-1.2deg); }
+.cl-logo-le { position: relative; display: inline-flex; flex: none; }
+.cl-logo-le img { animation: clLogoLac 4.2s ease-in-out infinite; transform-origin: 50% 12%; }
+.cl-logo-le:hover img, .cl-logo-le:hover i { animation-play-state: paused; }
+@keyframes clLogoLac {
+  0%, 100% { transform: rotate(-1.8deg); }
+  50%      { transform: rotate(1.8deg); }
 }
-
-/* Ba đốm lấp lánh quanh logo: to nhỏ và lệch nhịp nhau cho tự nhiên.
-   Dùng ::before/::after của hai thẻ span nên không thêm ảnh, không tốn mạng. */
-.cl-logo-le i {
-  position: absolute; width: 4px; height: 4px; border-radius: 50%;
-  background: #FFD98A; box-shadow: 0 0 6px 1px rgba(255, 217, 138, .9);
-  opacity: 0; pointer-events: none;
-  animation: clLogoLapLanh 3.4s ease-in-out infinite;
-}
-.cl-logo-le i:nth-child(1) { top: -2px;  right: 2px;  animation-delay: 0s; }
-.cl-logo-le i:nth-child(2) { top: 40%;   right: -3px; width: 3px; height: 3px; animation-delay: 1.1s; }
-.cl-logo-le i:nth-child(3) { bottom: 1px; right: 30%; width: 3px; height: 3px; animation-delay: 2.2s; }
-@keyframes clLogoLapLanh {
-  0%, 70%, 100% { opacity: 0; transform: scale(.4); }
-  80%           { opacity: 1; transform: scale(1.15); }
-  90%           { opacity: .5; transform: scale(.8); }
-}
-
-/* Mấy dịp có nhịp riêng cho hợp không khí:
-     Tết và Trung thu  — đung đưa như đèn lồng treo, biên độ lớn hơn chút
-     Giáng sinh        — nảy nhẹ như bông tuyết rơi xuống rồi bật lên
-     Quốc khánh · 30/4 · 3/2 · 22/12 — cờ bay: nghiêng qua lại đều đặn */
+/* Tết và Trung thu lắc rộng hơn chút — như đèn lồng treo trước gió. */
 .cl-logo-le[data-le="tet"] img,
-.cl-logo-le[data-le="trung-thu"] img,
-.cl-logo-le[data-le="ong-tao"] img { animation-duration: 3.4s; }
-@keyframes clLogoDungDua {
-  0%, 100% { transform: rotate(-2.4deg); }
-  50%      { transform: rotate(2.4deg); }
-}
-.cl-logo-le[data-le="tet"] img,
-.cl-logo-le[data-le="trung-thu"] img { animation-name: clLogoDungDua; transform-origin: 50% 0; }
+.cl-logo-le[data-le="trung-thu"] img { animation-duration: 3.4s; }
 @keyframes clLogoNay {
   0%, 100% { transform: translateY(0); }
   45%      { transform: translateY(-2.5px); }
@@ -709,11 +679,11 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .cl-logo-le[data-le="dien-bien"] img,
 .cl-logo-le[data-le="quan-doi"] img { animation-name: clLogoCoBay; animation-duration: 3.2s; }
 
-/* Ngày tưởng niệm thì KHÔNG nhún nhảy, chỉ sáng lên rất chậm.
-   Nhún nhảy trong ngày Thương binh Liệt sĩ hay sinh nhật Bác là vô duyên. */
+/* Ngày tưởng niệm: KHÔNG nhún nhảy, chỉ sáng lên rất chậm. Nhún nhảy trong
+   ngày Thương binh Liệt sĩ hay sinh nhật Bác là vô duyên. */
 @keyframes clLogoSangDan {
   0%, 100% { filter: brightness(1); }
-  50%      { filter: brightness(1.18); }
+  50%      { filter: brightness(1.16); }
 }
 .cl-logo-le[data-le="tri-an"] img,
 .cl-logo-le[data-le="sen"] img,
@@ -722,12 +692,50 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .cl-logo-le[data-le="nhang"] img {
   animation-name: clLogoSangDan; animation-duration: 5s; transform: none;
 }
-.cl-logo-le[data-le="tri-an"] i,
-.cl-logo-le[data-le="sen"] i,
-.cl-logo-le[data-le="vu-lan"] i,
-.cl-logo-le[data-le="nhang"] i { display: none; }
+
+/* ── Ba đốm lấp lánh quanh logo ─────────────────────────────────────────── */
+.cl-logo-le > i {
+  position: absolute; width: 4px; height: 4px; border-radius: 50%;
+  background: #FFD98A; box-shadow: 0 0 6px 1px rgba(255, 217, 138, .9);
+  opacity: 0; pointer-events: none;
+  animation: clLogoLapLanh 3.4s ease-in-out infinite;
+}
+.cl-logo-le > i:nth-of-type(1) { top: -2px;   right: 2px;  animation-delay: 0s; }
+.cl-logo-le > i:nth-of-type(2) { top: 40%;    right: -3px; width: 3px; height: 3px; animation-delay: 1.1s; }
+.cl-logo-le > i:nth-of-type(3) { bottom: 1px; right: 30%;  width: 3px; height: 3px; animation-delay: 2.2s; }
+@keyframes clLogoLapLanh {
+  0%, 70%, 100% { opacity: 0; transform: scale(.4); }
+  80%           { opacity: 1; transform: scale(1.15); }
+  90%           { opacity: .5; transform: scale(.8); }
+}
+
+/* ── PHÁO BÔNG (chỉ ngày Tết) ───────────────────────────────────────────────
+   Ba quả nổ lệch nhau cả về CHỖ lẫn về THỜI ĐIỂM, mỗi quả 12 đốm màu bay toả
+   đều rồi rơi xuống và tắt. Chu kỳ 7,2 giây nên phần lớn thời gian bầu trời
+   trống — pháo nổ liên tục thì rối mắt và nhìn ra ngay là hoạt hình lặp.
+   ⚠️ KHÔNG DÙNG CANVAS. Canvas phải chạy vòng lặp vẽ liên tục, mà logo nằm
+      trên mọi trang → hao pin điện thoại vô ích. Thẻ + CSS thì trình duyệt
+      chạy trên card đồ hoạ, gần như không tốn gì.
+   ⚠️ pointer-events: none để pháo không nuốt mất cú bấm vào logo. */
+.cl-phao { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+.cl-phao-qua {
+  position: absolute; width: 0; height: 0;
+  animation: clPhaoHien 7.2s linear infinite;
+}
+.cl-phao-qua i {
+  position: absolute; left: 0; top: 0; width: 3px; height: 3px; border-radius: 50%;
+  opacity: 0; animation: clPhaoBay 7.2s ease-out infinite;
+}
+@keyframes clPhaoHien { 0%, 100% { opacity: 1 } }
+@keyframes clPhaoBay {
+  0%   { transform: translate(0, 0) scale(.5); opacity: 0; }
+  4%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  16%  { transform: translate(var(--dx), var(--dy)) scale(1); opacity: 1; }
+  24%  { transform: translate(var(--dx), calc(var(--dy) + 9px)) scale(.55); opacity: 0; }
+  100% { transform: translate(var(--dx), calc(var(--dy) + 9px)) scale(.4); opacity: 0; }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .cl-logo-le img, .cl-logo-le i { animation: none !important; }
-  .cl-logo-le i { display: none; }
+  .cl-logo-le img, .cl-logo-le > i, .cl-phao-qua, .cl-phao-qua i { animation: none !important; }
+  .cl-logo-le > i, .cl-phao { display: none; }
 }

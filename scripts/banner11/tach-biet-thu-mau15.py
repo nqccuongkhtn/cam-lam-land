@@ -78,8 +78,11 @@ RANH = [
     (150, 565), (118, 513), (95, 486), (63, 448), (25, 408), (-10, 370),
     (-10, 340),
 ]
-MEM = 4.0            # độ mềm của viền cắt (điểm ảnh) — nhỏ hơn trước để mép
+MEM = 4.0            # độ mềm của viền cắt ở PHẦN TRÊN (điểm ảnh) — nhỏ để mép
                      # tường rào còn sắc, không bị nhoè thành vệt trắng
+# Hai mốc chuyển từ viền sắc sang viền tan (toạ độ y trên ảnh gốc 800×615):
+# từ 430 bắt đầu mềm dần, tới 560 thì tan hẳn vào cỏ.
+TAN_TU, TAN_DEN = 430.0, 560.0
 
 # ── BA GÓC LÔ ĐẤT, đọc trên CHÍNH tấm ảnh gốc này (toạ độ 800×615) ──────────
 # Dùng để vẽ nét phác thảo lô đất trong ve-nha-mau15.py cho KHỚP hàng rào thật.
@@ -126,7 +129,25 @@ def main():
 
     mat_na = Image.new('L', (w, h), 0)
     ImageDraw.Draw(mat_na).polygon(RANH, fill=255)
-    mat_na = mat_na.filter(ImageFilter.GaussianBlur(MEM))
+
+    # ── VIỀN CẮT: CỨNG Ở TRÊN, TAN DẦN Ở DƯỚI ────────────────────────────────
+    # ⚠️ Chủ dự án: "cắt nhà đang làm xấu mất cái nhà". Lý do: viền cắt đều một
+    #    độ mềm khắp nơi, nên dải vỉa hè và tường rào phía dưới thành một hình
+    #    thang xám có cạnh thẳng băng nằm chình ình trên bãi cỏ — nhìn ra ngay
+    #    là "một miếng ảnh dán vào", chứ không phải căn nhà đứng trên đất.
+    #    Nay: phần TRÊN (mái, tường, hàng rào) vẫn cắt sắc để căn nhà rõ nét;
+    #    phần DƯỚI (vỉa hè, mặt đường) thì TAN DẦN vào cỏ — không còn cạnh nào
+    #    để mắt bắt. Ảnh nền banner cũng là bãi cỏ nên chỗ tan biến rất khéo.
+    sac = mat_na.filter(ImageFilter.GaussianBlur(MEM))
+    tan = mat_na.filter(ImageFilter.GaussianBlur(MEM * 7))
+    import numpy as _np
+    yy = _np.arange(h, dtype=_np.float32)[:, None]
+    # 0 ở phía trên (dùng bản sắc) → 1 ở phía dưới (dùng bản tan)
+    pha = _np.clip((yy - TAN_TU) / max(1.0, TAN_DEN - TAN_TU), 0, 1)
+    tron = _np.asarray(sac, _np.float32) * (1 - pha) + _np.asarray(tan, _np.float32) * pha
+    # càng xuống thấp càng mờ hẳn đi, mười phần trăm cuối thì tắt hẳn
+    mo = _np.clip((h - 1 - yy) / max(1.0, h * 0.14), 0, 1)
+    mat_na = Image.fromarray((tron * mo).astype('uint8'), 'L')
 
     out = Image.merge('RGBA', (*im.split(), mat_na))
     # cắt sát phần còn nhìn thấy cho file nhẹ

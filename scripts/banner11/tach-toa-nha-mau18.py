@@ -119,15 +119,44 @@ def main():
     giu = giu.filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(1.0))
     a = a * (np.asarray(giu, dtype=np.float32) / 255.0)
 
-    # Mép DƯỚI phải đặc hoàn toàn: toà nhà còn tiếp tục xuống dưới, cắt mềm ở đó
-    # là lộ ra một vệt mờ ngay chỗ nối với phần ảnh trong khung.
+    # ── CHỖ NỐI VỚI KHUNG ẢNH ────────────────────────────────────────────────
+    # ⚠️ ĐÃ THỬ VÀ HỎNG: "mở dần mặt nạ cho đặc hoàn toàn ở đáy" để hai bên mép
+    #    khung giống nhau. Hậu quả là MẢNG TRỜI của tấm ảnh cũng thành đặc, nổi
+    #    lên thành một vệt xanh nhạt hình tam giác ngay phía trên khung — chủ dự
+    #    án khoanh đỏ đúng chỗ đó. ĐỪNG LÀM LẠI.
+    #    Chỗ nối nay xử lý ở BẢN VẼ chứ không phải ở mặt nạ: thêm một dải bóng
+    #    mờ ngay trên mép khung (xem DAI_NOI trong scripts/banner11/tach-banner.py).
+    # Mép DƯỚI vẫn phải đặc: toà nhà còn tiếp xuống dưới, cắt mềm ở đó là lộ
+    # một vệt mờ ngay chỗ nối.
     a[-6:, :] = np.maximum(a[-6:, :], a[-7:-6, :])
 
-    ys, xs = np.nonzero(a > 0.06)
-    y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
-    u0, v0 = KHUNG[0] + x0, KHUNG[1] + y0
-    u1, v1 = KHUNG[0] + x1, KHUNG[1] + y1
-    print('Toa nha trong anh goc: (%d,%d)-(%d,%d)  %dx%d' % (u0, v0, u1, v1, x1 - x0, y1 - y0))
+    # ── MẶT NẠ PHẢI PHỦ HẾT BỀ NGANG KHUNG, VÀ TAN DẦN LÊN TRÊN ─────────────
+    # ⚠️ ĐÂY LÀ LỜI GIẢI CUỐI CHO LỖI "KHỚP NỐI" (chủ dự án nhắc 5 lần).
+    #    Trước đây mặt nạ chỉ rộng bằng bóng toà nhà (167 đơn vị), trong khi
+    #    khung ảnh rộng 443. Nên ngay mép khung: phía trên chỉ có một cột nhà
+    #    rộng 167, phía dưới là cả tấm ảnh rộng 443 — mắt thấy ngay một đường
+    #    gãy, và không cách nào chữa bằng cách chỉnh viền.
+    #    Nay mặt nạ phủ HẾT bề ngang khung. Ở sát mép khung nó ĐẶC HOÀN TOÀN,
+    #    nên trên và dưới mép là MỘT tấm ảnh liền, không có chỗ nào để gãy.
+    #    Càng lên cao mặt nạ càng loãng, bầu trời tan vào nền banner, chỉ còn
+    #    lại toà nhà (vì chỗ toà nhà thì mặt nạ vẫn đặc do phép tách ở trên).
+    #    Đoạn tan dài 104 điểm ảnh (~58 đơn vị bản vẽ) — đủ dài để mắt không
+    #    bắt được chỗ bắt đầu, đủ ngắn để không nuốt mất phần thân toà nhà.
+    DAY_DAC = 406       # hàng ảnh gốc ứng với mép trên khung (design y ≈ 258)
+    BAT_TAN = 302       # từ hàng này trở lên là trời đã tan hết
+
+    full = np.zeros((1200, 800), np.float32)
+    full[KHUNG[1]:KHUNG[1] + a.shape[0], KHUNG[0]:KHUNG[0] + a.shape[1]] = a
+    yy = np.arange(1200, dtype=np.float32)[:, None]
+    tan = np.clip((yy - BAT_TAN) / float(DAY_DAC - BAT_TAN), 0, 1)
+    full = np.maximum(full, tan)
+
+    ys = np.nonzero(full[:DAY_DAC].max(axis=1) > 0.06)[0]
+    y0, y1 = int(ys.min()), DAY_DAC
+    x0, x1 = 0, 800
+    a = full[y0:y1, x0:x1]
+    u0, v0, u1, v1 = x0, y0, x1, y1
+    print('Mat na phu (%d,%d)-(%d,%d)  %dx%d' % (u0, v0, u1, v1, x1 - x0, y1 - y0))
 
     # ── Ghi ra MẶT NẠ chứ không phải ảnh cắt ────────────────────────────────
     # ⚠️ TRƯỚC ĐÂY ghi ra ảnh toà nhà đã cắt rồi đặt đè lên tấm ảnh trong khung.
@@ -137,7 +166,7 @@ def main():
     #    Nay chỉ ghi ra MẶT NẠ (trắng = toà nhà, trong suốt = trời). Bản thiết
     #    kế sẽ dùng CHÍNH tấm ảnh trong khung, cùng một phép đặt, rồi khoét theo
     #    mặt nạ này → hai phần là MỘT ảnh duy nhất, không thể lệch được nữa.
-    alp = (a[y0:y1, x0:x1] * 255).astype(np.uint8)
+    alp = (a * 255).astype(np.uint8)
     trang = np.full(alp.shape + (3,), 255, dtype=np.uint8)
     out = Image.fromarray(np.dstack([trang, alp]), 'RGBA')
     out = out.resize((out.width * 2, out.height * 2), Image.LANCZOS)

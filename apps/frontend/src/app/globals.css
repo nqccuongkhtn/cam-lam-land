@@ -644,3 +644,90 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
   border-color: #c8a14b;
   color: #0a2540;
 }
+
+/* ══ LOGO NGÀY LỄ — HIỆU ỨNG ĐỘNG ═══════════════════════════════════════════
+   Ngày thường logo đứng yên. Tới dịp lễ (xem trang /quan-tri/logo-le) thì
+   thanh menu đổi sang bản logo có trang trí VÀ chạy một hiệu ứng nhẹ.
+
+   ⚠️ NHẸ THÔI, ĐỪNG LÀM QUÁ. Logo nằm ở thanh menu, đi theo người dùng suốt
+      mọi trang — nhấp nháy mạnh là gây khó chịu, xem lâu thành mỏi mắt. Nên:
+      biên độ nhỏ (nhích 1–2 chấm), nhịp chậm (3–5 giây), và CHỈ chạy khi chuột
+      không rê vào (rê vào thì dừng, cho người ta bấm cho chuẩn).
+   ⚠️ Máy đặt "giảm chuyển động" thì tắt hết — luật chung của dự án. */
+.cl-logo-le { position: relative; display: inline-flex; }
+.cl-logo-le img { animation: clLogoTho 4.2s var(--ease, ease-in-out) infinite; }
+.cl-logo-le:hover img { animation-play-state: paused; }
+@keyframes clLogoTho {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-1.5px) rotate(-1.2deg); }
+}
+
+/* Ba đốm lấp lánh quanh logo: to nhỏ và lệch nhịp nhau cho tự nhiên.
+   Dùng ::before/::after của hai thẻ span nên không thêm ảnh, không tốn mạng. */
+.cl-logo-le i {
+  position: absolute; width: 4px; height: 4px; border-radius: 50%;
+  background: #FFD98A; box-shadow: 0 0 6px 1px rgba(255, 217, 138, .9);
+  opacity: 0; pointer-events: none;
+  animation: clLogoLapLanh 3.4s ease-in-out infinite;
+}
+.cl-logo-le i:nth-child(1) { top: -2px;  right: 2px;  animation-delay: 0s; }
+.cl-logo-le i:nth-child(2) { top: 40%;   right: -3px; width: 3px; height: 3px; animation-delay: 1.1s; }
+.cl-logo-le i:nth-child(3) { bottom: 1px; right: 30%; width: 3px; height: 3px; animation-delay: 2.2s; }
+@keyframes clLogoLapLanh {
+  0%, 70%, 100% { opacity: 0; transform: scale(.4); }
+  80%           { opacity: 1; transform: scale(1.15); }
+  90%           { opacity: .5; transform: scale(.8); }
+}
+
+/* Mấy dịp có nhịp riêng cho hợp không khí:
+     Tết và Trung thu  — đung đưa như đèn lồng treo, biên độ lớn hơn chút
+     Giáng sinh        — nảy nhẹ như bông tuyết rơi xuống rồi bật lên
+     Quốc khánh · 30/4 · 3/2 · 22/12 — cờ bay: nghiêng qua lại đều đặn */
+.cl-logo-le[data-le="tet"] img,
+.cl-logo-le[data-le="trung-thu"] img,
+.cl-logo-le[data-le="ong-tao"] img { animation-duration: 3.4s; }
+@keyframes clLogoDungDua {
+  0%, 100% { transform: rotate(-2.4deg); }
+  50%      { transform: rotate(2.4deg); }
+}
+.cl-logo-le[data-le="tet"] img,
+.cl-logo-le[data-le="trung-thu"] img { animation-name: clLogoDungDua; transform-origin: 50% 0; }
+@keyframes clLogoNay {
+  0%, 100% { transform: translateY(0); }
+  45%      { transform: translateY(-2.5px); }
+  70%      { transform: translateY(.5px); }
+}
+.cl-logo-le[data-le="noel"] img { animation-name: clLogoNay; animation-duration: 2.8s; }
+@keyframes clLogoCoBay {
+  0%, 100% { transform: skewX(0deg); }
+  35%      { transform: skewX(-3.5deg); }
+  70%      { transform: skewX(2deg); }
+}
+.cl-logo-le[data-le="quoc-khanh"] img,
+.cl-logo-le[data-le="30-4"] img,
+.cl-logo-le[data-le="dang"] img,
+.cl-logo-le[data-le="dien-bien"] img,
+.cl-logo-le[data-le="quan-doi"] img { animation-name: clLogoCoBay; animation-duration: 3.2s; }
+
+/* Ngày tưởng niệm thì KHÔNG nhún nhảy, chỉ sáng lên rất chậm.
+   Nhún nhảy trong ngày Thương binh Liệt sĩ hay sinh nhật Bác là vô duyên. */
+@keyframes clLogoSangDan {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.18); }
+}
+.cl-logo-le[data-le="tri-an"] img,
+.cl-logo-le[data-le="sen"] img,
+.cl-logo-le[data-le="gio-to"] img,
+.cl-logo-le[data-le="vu-lan"] img,
+.cl-logo-le[data-le="nhang"] img {
+  animation-name: clLogoSangDan; animation-duration: 5s; transform: none;
+}
+.cl-logo-le[data-le="tri-an"] i,
+.cl-logo-le[data-le="sen"] i,
+.cl-logo-le[data-le="vu-lan"] i,
+.cl-logo-le[data-le="nhang"] i { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cl-logo-le img, .cl-logo-le i { animation: none !important; }
+  .cl-logo-le i { display: none; }
+}

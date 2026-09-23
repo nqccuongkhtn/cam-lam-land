@@ -457,23 +457,6 @@ def chum_mimosa(d, cx, cy, r, mau, dam, la):
         canh_nhon(d, cx, cy + r * 0.55, goc, r * 1.15, r * 0.16, la)
 
 
-def banh_u(d, cx, cy, w, h, la, la_dam, lat):
-    """Bánh ú tro: khối tam giác gói lá, có lạt buộc chéo."""
-    d.polygon([(cx, cy - h * 0.55), (cx + w * 0.50, cy + h * 0.45),
-               (cx - w * 0.50, cy + h * 0.45)], fill=la)
-    # mặt bên tối hơn cho ra khối
-    d.polygon([(cx, cy - h * 0.55), (cx + w * 0.50, cy + h * 0.45),
-               (cx + w * 0.06, cy + h * 0.45)], fill=la_dam)
-    # gân lá
-    for dx in (-0.26, -0.10):
-        d.line([(cx + w * dx * 0.35, cy - h * 0.20), (cx + w * dx, cy + h * 0.42)],
-               fill=la_dam, width=max(1, h * 0.04))
-    # lạt buộc
-    d.line([(cx - w * 0.44, cy + h * 0.16), (cx + w * 0.44, cy + h * 0.16)],
-           fill=lat, width=max(2, h * 0.07))
-    d.line([(cx, cy - h * 0.52), (cx, cy + h * 0.45)], fill=lat, width=max(2, h * 0.06))
-
-
 def nam_tay(d, cx, cy, w, h, mau, ranh):
     """Nắm tay giơ lên — biểu tượng ngày Quốc tế Lao động."""
     d.rounded_rectangle([cx - w * 0.22, cy + h * 0.16, cx + w * 0.22, cy + h * 0.86],
@@ -540,6 +523,113 @@ def dan_chan_dung(lop, cx, cy, cao, mau):
     to = Image.new('RGBA', anh.size, tuple(mau) + (255,))
     to.putalpha(anh.getchannel('A'))
     lop.alpha_composite(to, (int(cx * PHONG - w / 2), int(cy * PHONG - h / 2)))
+
+
+def ca_chep_bay(d, cx, cy, w, h, than, vay, mat):
+    """Cá chép vượt sóng: thân CONG, đuôi xoè to, vây lưng dựng.
+
+    ⚠️ Thân phải CONG chứ không phải hình bầu dục nằm ngang. Bản trước vẽ
+       bầu dục nên nhìn ra con cá cảnh, không ra cá chép đang vượt.
+    """
+    than_diem = []
+    N = 26
+    for i in range(N + 1):                       # mép lưng
+        t = i / N
+        than_diem.append((cx - w * 0.46 + w * 0.92 * t,
+                          cy - h * 0.34 * math.sin(math.pi * t) - h * 0.10 * t))
+    for i in range(N, -1, -1):                   # mép bụng
+        t = i / N
+        than_diem.append((cx - w * 0.46 + w * 0.92 * t,
+                          cy + h * 0.30 * math.sin(math.pi * t) - h * 0.10 * t))
+    d.polygon(than_diem, fill=than)
+    d.polygon([(cx + w * 0.42, cy - h * 0.16), (cx + w * 0.78, cy - h * 0.62),
+               (cx + w * 0.74, cy + h * 0.22), (cx + w * 0.40, cy + h * 0.02)], fill=than)
+    d.polygon([(cx - w * 0.10, cy - h * 0.34), (cx + w * 0.14, cy - h * 0.76),
+               (cx + w * 0.22, cy - h * 0.26)], fill=vay)
+    d.polygon([(cx - w * 0.08, cy + h * 0.28), (cx + w * 0.10, cy + h * 0.62),
+               (cx + w * 0.18, cy + h * 0.22)], fill=vay)
+    d.ellipse([cx - w * 0.40, cy - h * 0.16, cx - w * 0.26, cy - h * 0.02], fill=mat)
+
+
+def banh_u(d, cx, cy, w, h, la, la_dam, lat):
+    """Bánh ú tro: khối tam giác BÈ, đáy phẳng, có lạt buộc chéo.
+
+    ⚠️ ĐÁY PHẢI RỘNG HƠN CHIỀU CAO. Bản trước vẽ tam giác cao và nhọn, thu
+       nhỏ lại nhìn y như cái cây thông — chủ dự án bảo làm lại.
+    """
+    d.polygon([(cx, cy - h * 0.50), (cx + w * 0.58, cy + h * 0.42),
+               (cx - w * 0.58, cy + h * 0.42)], fill=la)
+    d.polygon([(cx, cy - h * 0.50), (cx + w * 0.58, cy + h * 0.42),
+               (cx + w * 0.08, cy + h * 0.42)], fill=la_dam)
+    # ⚠️ LẠT NGANG THÔI, ĐỬNG KẲ LẠT DỌC XUỐNG TẬN ĐÁY. Vệt dọc giữa một
+    #    hình tam giác xanh trông hệt thân cây — chiếc bánh thành cây thông.
+    d.line([(cx - w * 0.44, cy + h * 0.06), (cx + w * 0.44, cy + h * 0.06)],
+           fill=lat, width=max(3, h * 0.11))
+    d.line([(cx - w * 0.30, cy + h * 0.26), (cx + w * 0.30, cy + h * 0.26)],
+           fill=lat, width=max(3, h * 0.09))
+    # nếp gấp lá ở chóp
+    d.line([(cx, cy - h * 0.46), (cx - w * 0.16, cy - h * 0.10)],
+           fill=la_dam, width=max(2, h * 0.06))
+
+
+def bieu_tuong_nu(d, cx, cy, r, mau, dam):
+    """Biểu tượng nữ ♀ — vòng tròn dày và chữ thập bên dưới."""
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=mau)
+    d.ellipse([cx - r * 0.56, cy - r * 0.56, cx + r * 0.56, cy + r * 0.56], fill=dam)
+    d.rectangle([cx - r * 0.20, cy + r * 0.82, cx + r * 0.20, cy + r * 2.30], fill=mau)
+    d.rectangle([cx - r * 0.72, cy + r * 1.42, cx + r * 0.72, cy + r * 1.80], fill=mau)
+
+
+def tay_bat(d, cx, cy, w, h, mau, khe):
+    """Hai bàn tay nắm nhau — vẽ ĐẬM, có khe tối tách hai bàn tay."""
+    d.polygon([(cx - w * 0.58, cy - h * 0.30), (cx - w * 0.04, cy - h * 0.30),
+               (cx + w * 0.08, cy + h * 0.06), (cx - w * 0.46, cy + h * 0.06)], fill=mau)
+    d.polygon([(cx + w * 0.58, cy + h * 0.34), (cx + w * 0.04, cy + h * 0.34),
+               (cx - w * 0.08, cy - h * 0.02), (cx + w * 0.46, cy - h * 0.02)], fill=mau)
+    d.ellipse([cx - w * 0.28, cy - h * 0.34, cx + w * 0.28, cy + h * 0.38], fill=mau)
+    d.line([(cx - w * 0.30, cy + h * 0.16), (cx + w * 0.26, cy - h * 0.14)],
+           fill=khe, width=max(2, h * 0.09))
+    d.line([(cx - w * 0.22, cy - h * 0.16), (cx + w * 0.10, cy - h * 0.30)],
+           fill=khe, width=max(2, h * 0.07))
+
+
+def chiec_cup(d, cx, cy, w, h, mau, dam):
+    """Chiếc cúp vô địch — ngày Doanh nhân.
+
+    ⚠️ ĐÃ BỎ CÁI BẮT TAY. Vẽ hai bàn tay nắm nhau thì dù đậm cỡ nào, thu
+       về 32 điểm ảnh cũng chỉ còn một dải vàng nằm ngang — chủ dự án bảo
+       làm lại. Chiếc cúp có bóng đứng rất riêng (miệng rộng, hai quai,
+       chân đế), nhìn phát là biết.
+    """
+    d.polygon([(cx - w * 0.34, cy - h * 0.42), (cx + w * 0.34, cy - h * 0.42),
+               (cx + w * 0.20, cy + h * 0.10), (cx - w * 0.20, cy + h * 0.10)], fill=mau)
+    for dau in (-1, 1):
+        d.ellipse([cx + dau * w * 0.30 - w * 0.22, cy - h * 0.40,
+                   cx + dau * w * 0.30 + w * 0.22, cy - h * 0.02], outline=mau,
+                  width=max(3, h * 0.09))
+    d.rectangle([cx - w * 0.07, cy + h * 0.06, cx + w * 0.07, cy + h * 0.26], fill=mau)
+    d.polygon([(cx - w * 0.26, cy + h * 0.44), (cx + w * 0.26, cy + h * 0.44),
+               (cx + w * 0.18, cy + h * 0.24), (cx - w * 0.18, cy + h * 0.24)], fill=mau)
+    d.rectangle([cx - w * 0.34, cy + h * 0.44, cx + w * 0.34, cy + h * 0.58], fill=dam)
+    sao(d, cx, cy - h * 0.20, w * 0.17, dam)
+
+
+def bien_tet(d, cx, cy, r, do, vien):
+    """Tấm biển Tết hình thoi nền đỏ viền vàng — thứ treo trước cửa ngày Tết.
+
+    Hình thoi đỏ là mảng đặc, góc cạnh rõ, nên ở cỡ 32 điểm ảnh vẫn
+    đọc ra ngay — khác hẳn mấy chùm hoa nhỏ dễ lem.
+    """
+    d.polygon([(cx, cy - r), (cx + r, cy), (cx, cy + r), (cx - r, cy)], fill=vien)
+    k = r * 0.86
+    d.polygon([(cx, cy - k), (cx + k, cy), (cx, cy + k), (cx - k, cy)], fill=do)
+
+
+def banh_chung(d, cx, cy, w, la, lat):
+    """Bánh chưng: vuông xanh, có hai sợi lạt buộc chữ thập."""
+    d.rectangle([cx - w / 2, cy - w / 2, cx + w / 2, cy + w / 2], fill=la)
+    d.line([(cx - w / 2, cy), (cx + w / 2, cy)], fill=lat, width=max(2, w * 0.13))
+    d.line([(cx, cy - w / 2), (cx, cy + w / 2)], fill=lat, width=max(2, w * 0.13))
 
 
 def canh_nhon(d, cx, cy, goc, dai, rong, mau):
@@ -692,19 +782,22 @@ def bo_hoa(d, cx, cy, r, canh, nhuy, la):
 # Hàm nhận (d, m); `m` là BẢNG MÀU của nền đang dựng (tối hay sáng).
 
 def ve_tet(d, m):
-    """Tết Nguyên đán: CÀNH ĐÀO hồng và CÀNH MAI vàng.
+    """Tết Nguyên đán — logo QUAN TRỌNG NHẤT trong năm.
 
-    Chủ dự án nhắc "thêm hoa mai và đào vào, hiện thiếu" — bản trước chỉ
-    có mai. Để cả hai thì ai ở vùng nào cũng thấy Tết của mình.
-    ⚠️ ÍT BÔNG NHƯNG TO. Để sáu bông nhỏ như bản trước thì thu về 32 điểm
-       ảnh nhìn như mấy hạt confetti rắc lộn xộn.
+    Ba thứ làm nên "cái hồn của Tết", xếp theo thứ tự dễ nhận ra ở cỡ nhỏ:
+      1. TẤM BIỂN Đỏ HÌNH THOI — mảng đặc to nhất, góc cạnh rõ;
+      2. BÔNG MAI VÀNG nằm giữa tấm biển — vàng trên đỏ, tương phản mạnh nhất;
+      3. BÁNH CHƯNG XANH ở chân — màu xanh lá duy nhất trong cả bộ logo lễ
+         nên nhìn phát là biết Tết, không lẫn với dịp nào khác.
+    ⚠️ Đã thử hai kiểu trước đó — rải nhiều bông hoa nhỏ, rồi hai bông to —
+       cả hai đều bị chê. Vấn đề là cành hoa không có mảng đặc nào đủ to để
+       níu mắt; tấm biển đỏ thì có.
     """
-    d.line([(302, 146), (330, 100), (338, 66)], fill=m['nau'], width=8)
-    d.line([(436, 146), (408, 100), (400, 66)], fill=m['nau'], width=8)
-    hoa_nhieu_canh(d, 332, 52, 34, 5, m['hong'], m['kem'], m['vang_sang'])
-    hoa_nhieu_canh(d, 406, 52, 34, 5, m['vang_sang'], m['vang'], m['do_tet'])
-    hoa_nhieu_canh(d, 306, 98, 22, 5, m['hong'], m['kem'], m['vang_sang'])
-    hoa_nhieu_canh(d, 432, 98, 22, 5, m['vang_sang'], m['vang'], m['do_tet'])
+    banh_chung(d, 316, 116, 54, m['xanh'], m['kem'])
+    bien_tet(d, 382, 62, 56, m['do_tet'], m['vang_sang'])
+    for i in range(5):
+        canh_nhon(d, 382, 62, -90 + i * 72, 34, 14, m['vang_sang'])
+    d.ellipse([382 - 10, 62 - 10, 382 + 10, 62 + 10], fill=m['do'])
 
 
 def ve_tet_duong(d, m):
@@ -715,14 +808,17 @@ def ve_tet_duong(d, m):
 
 
 def ve_gio_to(d, m):
-    """Giỗ Tổ Hùng Vương: TƯỢNG VUA HÙNG, sau lưng là vệt trống đồng.
+    """Giỗ Tổ Hùng Vương: tượng Vua Hùng trên nền TRỐNG ĐỒNG.
 
-    Đã đi hai vòng: lần đầu vẽ ngôi sao trống đồng (biểu tượng chung của văn
-    hoá Đông Sơn, không riêng ngày Giỗ Tổ), lần hai vẽ Đền Hùng. Chủ dự án
-    gửi ảnh mẫu tượng đồng Vua Hùng và chốt lấy tượng.
+    ⚠️ Phải có cái đĩa trống đồng phía sau. Để tượng đứng trơ trên nền trong
+       thì khối tượng quá mảnh, thu nhỏ lại nhìn ra cái đuốc — chủ dự án đã
+       bảo làm lại một lần vì thế. Đĩa tròn đỏ cho tượng một cái nền chắc,
+       ở cỡ 32 điểm ảnh vẫn ra một huy hiệu tròn rõ ràng.
     """
-    tia(d, 368, 58, 40, 62, m['vang'], so=14, day=5)
-    tuong_vua_hung(d, 368, 148, 132, m['vang_sang'], m['vang'])
+    d.ellipse([368 - 60, 72 - 60, 368 + 60, 72 + 60], fill=m['do_tet'])
+    tia(d, 368, 72, 30, 56, m['vang'], so=16, day=5)
+    d.ellipse([368 - 60, 72 - 60, 368 + 60, 72 + 60], outline=m['vang'], width=5)
+    tuong_vua_hung(d, 368, 132, 116, m['vang_sang'], m['vang'])
 
 
 def ve_quoc_khanh(d, m):
@@ -731,18 +827,16 @@ def ve_quoc_khanh(d, m):
 
 
 def ve_trung_thu(d, m):
-    """Trung thu: TRĂNG RẰM tròn vành vạnh, hai lồng đèn đỏ hai bên.
+    """Trung thu: lồng đèn đỏ treo, vài ngôi sao nhỏ.
 
-    ⚠️ MẶT TRĂNG PHẢI MÀU KEM, đừng lấy màu nét. Trên nền sáng thì màu nét
-       là navy — thành ra "mặt trăng đen", nhìn rất lạ.
+    ⚠️ ĐÂY LÀ BẢN ĐẦU TIÊN và chủ dự án chốt giữ nó: "trung thu bạn làm
+       lại logo như ban đầu là được rồi đừng sửa nữa". Đã thử thêm mặt trăng
+       to ở giữa — bị chê. ĐỪNG SỬA NỮA.
+    Mặt trăng chính là vầng mặt trời sẵn có trong logo.
     """
-    d.ellipse([368 - 46, 60 - 46, 368 + 46, 60 + 46], fill=m['vang_sang'])
-    d.ellipse([368 - 39, 60 - 39, 368 + 39, 60 + 39], fill=m['kem'])
-    for dx, dy, r in ((-0.30, -0.22, 0.17), (0.26, 0.10, 0.13), (-0.08, 0.32, 0.11)):
-        d.ellipse([368 + 39 * dx - 39 * r, 60 + 39 * dy - 39 * r,
-                   368 + 39 * dx + 39 * r, 60 + 39 * dy + 39 * r], fill=m['vang'])
-    long_den(d, m, 310, 44, 32, 38, m['do_tet'])
-    long_den(d, m, 426, 78, 28, 34, m['do_tet'])
+    long_den(d, m, 372, 76, 62, 74, m['do_tet'])
+    for x, y in ((310, 30), (426, 34), (304, 106)):
+        sao(d, x, y, 13, m['vang_sang'])
 
 
 def ve_noel(d, m):
@@ -757,14 +851,15 @@ def ve_noel(d, m):
 
 
 def ve_phu_nu(d, m):
-    """8/3 Quốc tế Phụ nữ: chùm hoa MIMOSA vàng.
+    """8/3 Quốc tế Phụ nữ: biểu tượng ♀ lồng trong vành hoa.
 
-    ⚠️ ĐỪNG DÙNG HOA HỒNG Ở ĐÂY. Bản trước 8/3 là bông hồng, mà 20/10 cũng có
-       bông hồng bên cạnh chiếc nón lá — chủ dự án nhìn phát ra ngay "2 ngày
-       này cùng 1 icon". Mimosa là hoa gắn với ngày 8/3 trên khắp thế giới,
-       lại vàng rực nên đứng cạnh nón lá không thể lẫn.
+    ⚠️ Chùm mimosa (bản trước) toàn chấm nhỏ, thu lại nhìn như bụi cỏ — chủ
+       dự án bảo làm lại. Biểu tượng ♀ thì chỉ có hai mảng lớn (vòng tròn và
+       chữ thập), ở cỡ 32 điểm ảnh vẫn đọc ra ngay.
     """
-    chum_mimosa(d, 366, 66, 34, m['vang_sang'], m['vang'], m['xanh'])
+    for i in range(8):
+        canh_nhon(d, 366, 52, -90 + i * 45, 52, 15, m['hong'])
+    bieu_tuong_nu(d, 366, 52, 30, m['vang_sang'], m['do_tet'])
 
 
 def ve_nha_giao(d, m):
@@ -801,19 +896,23 @@ def ve_thieu_nhi(d, m):
 
 
 def ve_doanh_nhan(d, m):
-    """13/10 Doanh nhân Việt Nam: cái bắt tay vàng."""
-    bat_tay(d, 366, 72, 126, 58, m['vang_sang'], m['nau'])
+    """13/10 Doanh nhân Việt Nam: biểu đồ tăng trưởng.
+
+    Đã qua ba kiểu: biểu đồ mảnh → cái bắt tay → chiếc cúp. Chủ dự án chốt
+    quay về BIỂU ĐỒ nhưng phải đậm: ba cột đặc cao dần + mũi tên vọt lên.
+    ⚠️ CỘT PHẢI DÀY và mũi tên phải TO hơn cột. Bản đầu cột mảnh, mũi tên
+       bé — thu về 32 điểm ảnh chỉ còn mấy vạch vàng rời rạc.
+    """
+    for bx, bh in ((0.0, 0.40), (0.36, 0.66), (0.72, 0.94)):
+        d.rectangle([300 + bx * 128, 140 - bh * 96, 300 + bx * 128 + 32, 140], fill=m['vang'])
+    d.line([(306, 96), (420, 36)], fill=m['do_tet'], width=11)
+    d.polygon([(436, 28), (396, 34), (414, 62)], fill=m['do_tet'])
 
 
 def ve_ong_tao(d, m):
-    """Ông Công ông Táo (23 tháng Chạp): cá chép vượt sóng.
-
-    Ảnh mẫu có cả ông Táo ngồi trên lưng cá; vẽ cả hai thì ở cỡ 32 điểm
-    ảnh thành một cục. Giữ con cá chép đỏ và thêm sóng nước cho rõ ý
-    "cá chép hóa rồng, đưa ông Táo về trời".
-    """
-    song_nuoc(d, 368, 122, 128, 26, m['kem'])
-    ca_chep(d, 366, 66, 54, m['do_tet'], m['net'])
+    """Ông Công ông Táo (23 tháng Chạp): cá chép vàng vượt sóng."""
+    song_nuoc(d, 368, 128, 136, 28, m['kem'])
+    ca_chep_bay(d, 362, 62, 128, 86, m['do_tet'], m['vang_sang'], m['net'])
 
 
 def ve_lao_dong(d, m):
@@ -919,9 +1018,16 @@ def ve_hoa_cuc(d, m):
 
 
 def ve_doan_ngo(d, m):
-    """Tết Đoan Ngọ (5/5 âm): hai chiếc bánh ú tro."""
-    banh_u(d, 344, 92, 62, 74, m['xanh'], m['nau'], m['kem'])
-    banh_u(d, 404, 104, 50, 60, m['xanh'], m['nau'], m['kem'])
+    """Tết Đoan Ngọ (5/5 âm): chiếc bánh ú tro bè ngang, buộc hai sợi lạt.
+
+    ⚠️ ĐÁY RỘNG GẤP RƯHI CHIỀU CAO và KHÔNG ĐỂ LÁ CHĨA RA HAI BÊN.
+       Đã vẽ ba lần: tam giác cao → ra cây thông; thêm lá hai bên → ra
+       cánh buồm. Chỉ còn một khối tam giác bè với hai sợi lạt ngang.
+    """
+    d.polygon([(368, 44), (444, 128), (292, 128)], fill=m['xanh'])
+    d.polygon([(368, 44), (444, 128), (374, 128)], fill=m['nau'])
+    d.line([(304, 104), (432, 104)], fill=m['kem'], width=10)
+    d.line([(318, 122), (418, 122)], fill=m['kem'], width=8)
 
 
 # mã · tên hiển thị · hàm vẽ
@@ -974,9 +1080,15 @@ def _ve_phong(d, ve, m, lop=None):
         return [(x * PHONG, y * PHONG) for x, y in xy]
 
     d.line = lambda xy, **k: g_line(nhan(xy), **{**k, 'width': max(1, round(k.get('width', 1) * PHONG))})
-    d.polygon = lambda xy, **k: g_poly(nhan(xy), **k)
-    d.ellipse = lambda xy, **k: g_ell(nhan(xy), **k)
-    d.rectangle = lambda xy, **k: g_rect(nhan(xy), **k)
+    # ⚠️ NHỚ NHÂN CẢ `width`. Mấy hàm này cũng nhận `width` (nét viền), quên
+    #    nhân thì viền mảnh dính một phần tư, mà PIL lại đòi số nguyên nên còn
+    #    báo lỗi "float object cannot be interpreted as an integer".
+    def rong(k):
+        return {**k, 'width': int(max(1, round(k['width'] * PHONG)))} if 'width' in k else k
+
+    d.polygon = lambda xy, **k: g_poly(nhan(xy), **rong(k))
+    d.ellipse = lambda xy, **k: g_ell(nhan(xy), **rong(k))
+    d.rectangle = lambda xy, **k: g_rect(nhan(xy), **rong(k))
     d.rounded_rectangle = lambda xy, **k: g_rr(nhan(xy), **{**k, 'radius': k.get('radius', 0) * PHONG})
     d.arc = lambda xy, start, end, **k: g_arc(nhan(xy), start, end,
                                               **{**k, 'width': int(max(1, k.get('width', 1) * PHONG))})

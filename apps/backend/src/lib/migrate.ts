@@ -603,7 +603,7 @@ export async function migrate(): Promise<void> {
   //    rỗng). Nên ghi số đợt vào app_config: đợt nào chưa chạy thì chạy, chạy
   //    rồi thì thôi. Quản trị viên xoá dịp nào thì nó không bị nạp lại, vì
   //    đợt đó đã đánh dấu xong.
-  const DOT_LICH_LE = 4;
+  const DOT_LICH_LE = 5;
   const dotCu = await pool.query(`SELECT (value->>'dot')::int AS dot FROM app_config WHERE key='logo_le_seed'`)
     .then((r: any) => Number(r.rows?.[0]?.dot || 0)).catch(() => 0);
   if (dotCu < DOT_LICH_LE) {
@@ -666,6 +666,12 @@ export async function migrate(): Promise<void> {
       await pool.query(
         `UPDATE logo_le SET ten='Giải phóng miền Nam 30/4', sau=0
           WHERE ma='30-4' AND kieu='duong' AND thang=4 AND ngay=30`).catch(() => {});
+    }
+    if (dotCu < 5) {
+      // Chủ dự án: "ngày 8/3 bạn lấy logo của ngày 20/10 luôn đi" — hai ngày
+      // đều là ngày của phụ nữ, dùng chung chiếc nón lá và bông hồng.
+      await pool.query(`UPDATE logo_le SET ma='hoa-cuc'
+                         WHERE kieu='duong' AND thang=3 AND ngay=8`).catch(() => {});
     }
     if (dotCu < 4) {
       // Đổi tên cho khớp hình mới (rằm tháng Giêng nay là chè trôi nước).

@@ -77,11 +77,22 @@ function Logo({ light }: { light: boolean }) {
              trên banner) dùng bản NÉT TRẮNG, nền trắng (khi cuộn xuống) dùng
              bản NÉT NAVY đúng màu gốc. Một bản màu thì kiểu gì cũng có một
              trạng thái bị chìm. Dựng hai tệp bằng scripts/dung-logo.py. */}
-      <img
-        src={le ? `/logo-le/${le}${light ? '' : '-toi'}.webp`
-                : (light ? '/logo-cam-lam.webp' : '/logo-cam-lam-toi.webp')}
-        alt="" aria-hidden="true" width={48} height={32}
-        className="h-8 w-12 shrink-0 object-contain" />
+      {/* Ngày lễ thì bọc thêm một lớp để chạy hiệu ứng động (xem khối
+          "LOGO NGÀY LỄ" trong app/globals.css). Ngày thường không bọc gì cả,
+          để thanh menu nhẹ đúng như cũ. Ba thẻ <i> là ba đốm lấp lánh. */}
+      {le ? (
+        <span className="cl-logo-le" data-le={le}>
+          <img src={`/logo-le/${le}${light ? '' : '-toi'}.webp`}
+            alt="" aria-hidden="true" width={48} height={32}
+            className="h-8 w-12 shrink-0 object-contain" />
+          <i aria-hidden /><i aria-hidden /><i aria-hidden />
+        </span>
+      ) : (
+        <img
+          src={light ? '/logo-cam-lam.webp' : '/logo-cam-lam-toi.webp'}
+          alt="" aria-hidden="true" width={48} height={32}
+          className="h-8 w-12 shrink-0 object-contain" />
+      )}
       <span className="leading-tight">
         <span className={`font-extrabold block text-lg tracking-tight ${light ? 'text-white' : 'text-[#0A2540]'}`}>Cam Lâm <span className="text-[#C8A14B]">Land</span></span>
         <span className={`hidden lg:block whitespace-nowrap text-[10px] font-medium tracking-wide ${light ? 'text-white/75' : 'text-slate-400'}`}>Nhà đất &amp; quy hoạch</span>

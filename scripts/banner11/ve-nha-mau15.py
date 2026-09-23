@@ -32,17 +32,45 @@ chỉ cần sửa 3 điểm P0/P1/P3 ở đây rồi chạy lại.
    căn nhà sẽ đứng lệch ra ngoài khung lô.
 """
 
+import os
+
+# ── CHỖ ĐẶT ẢNH KHU ĐẤT TRÊN BẢN VẼ ────────────────────────────────────────
+# Khung nhìn của mẫu là viewBox="250 566 700 226", cắt kiểu slice nên phần
+# THẤY ĐƯỢC chỉ là y ≈ 577…781; đáy banner còn bị khung tìm kiếm cao ~38 đơn vị
+# che, nên nội dung phải nằm trên y ≈ 735.
+# CỠ ẢNH ăn theo ảnh nền: hàng dừa trong ảnh nền cao chừng 40 đơn vị, nên khu
+# đất rộng ~126 đơn vị là vừa mắt — đúng bằng khung đỏ chủ dự án khoanh. Để 225
+# như lần đầu thì căn nhà to lấn át cả cánh đồng, nhìn không thật.
+ANH_X, ANH_Y = 636.9, 599.0
+ANH_W, ANH_H = 126.2, 91.0
+
 # ── Hình bình hành của lô đất ───────────────────────────────────────────────
-# Chỗ mới: khoảng cỏ trống, phẳng và sáng, ở giữa ảnh (chủ dự án khoanh đỏ).
-# ⚠️ BỐN GÓC NÀY LÀ HÀNG RÀO THẬT TRONG ẢNH, không phải con số ướm mắt.
-#    Đọc từ ảnh đã cắt (800×577): góc trước (108,505), góc phải (745,318),
-#    góc trái (18,388); rồi đổi sang toạ độ bản vẽ theo đúng chỗ đặt ảnh
-#    (ANH_X/ANH_Y/ANH_W/ANH_H trong hàm sinh()). Nhờ vậy nét phác thảo nằm
-#    KHỚP lên hàng rào của căn nhà trong ảnh.
-#    Đổi ảnh hoặc đổi chỗ đặt ảnh thì phải tính lại ba điểm này.
-P0 = (653.9, 678.6)        # góc trước (gần người xem)
-P1 = (754.4, 649.2)        # góc phải
-P3 = (639.7, 660.2)        # góc trái
+# ⚠️ BA GÓC NÀY KHÔNG CHÉP TAY NỮA. Chúng là HÀNG RÀO THẬT trong ảnh, do
+#    scripts/banner11/tach-biet-thu-mau15.py đọc trên ảnh gốc rồi ghi ra
+#    banner11/m15-khung.json cùng lúc với việc cắt ảnh. Ở đây chỉ quy đổi từ
+#    điểm ảnh sang toạ độ bản vẽ theo đúng chỗ đặt ảnh ở trên.
+#    Lý do: trước đây chép tay ba con số sang. Cắt lại ảnh cho chuẩn hơn một
+#    cái là khung ảnh đổi, nét phác thảo lệch hẳn khỏi hàng rào mà không có
+#    dấu hiệu gì báo — đúng lỗi "vẽ chưa khớp" chủ dự án từng nhắc.
+def _doc_goc():
+    """Đổi ba góc lô từ điểm ảnh trong ảnh đã cắt sang toạ độ bản vẽ."""
+    import json
+    p = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                     '..', '..', 'apps', 'frontend', 'public', 'banner11',
+                     'm15-khung.json')
+    with open(os.path.abspath(p), encoding='utf-8') as f:
+        k = json.load(f)
+    # SVG đặt ảnh bằng preserveAspectRatio="xMidYMax meet": thu cho vừa khung,
+    # căn giữa theo chiều ngang, dán đáy xuống mép dưới khung.
+    ti = min(ANH_W / k['rong'], ANH_H / k['cao'])
+    ox = ANH_X + (ANH_W - k['rong'] * ti) / 2
+    oy = ANH_Y + (ANH_H - k['cao'] * ti)
+    doi = lambda p: (ox + p[0] * ti, oy + p[1] * ti)
+    g = k['goc']
+    return doi(g['truoc']), doi(g['phai']), doi(g['trai'])
+
+
+P0, P1, P3 = _doc_goc()    # góc trước (gần người xem) · góc phải · góc trái
 P2 = (P1[0] + P3[0] - P0[0], P1[1] + P3[1] - P0[1])   # góc sau (tự suy ra)
 
 U = (P1[0] - P0[0], P1[1] - P0[1])
@@ -128,11 +156,6 @@ def sinh():
       · đáy ảnh đặt ở y = 690, tức mép trước lô đất, để căn nhà đứng trên đúng
         khoảng cỏ phẳng giữa ảnh.
     """
-    # Ảnh khu đất thật: 780×555 điểm ảnh ⇒ tỉ lệ ngang/dọc 1,4054
-    # (gồm cả nhà, sân vườn, nhà để xe, hàng rào và mặt đường trước nhà)
-    ANH_X, ANH_Y = 636.9, 599.0
-    ANH_W, ANH_H = 126.2, 91.0
-
     mat = []
     # ── Sân cỏ của lô (chỉ một lớp xanh nhạt, phần còn lại ảnh nhà đã có sẵn) ─
     mat.append('<path d="%s" fill="%s" opacity=".22"/>'

@@ -507,3 +507,68 @@
   width: max-content;
   max-width: calc(var(--u) * 520px);
 }
+
+/* ══ MẪU 4 "TỰA SƠN · HƯỚNG HẢI": MÂY TRÔI ═══════════════════════════════════
+   Bản thiết kế chỉ cho lớp trời nhích qua nhích lại 10 điểm ảnh, nhìn ra như
+   ảnh bị rung chứ không ra mây trôi. Chủ dự án muốn mây "di chuyển một cách
+   hữu tình" — nên vẽ thêm bốn đám mây riêng (xem MAY_MAU4 trong
+   scripts/banner11/tach-banner.py) và cho trôi ở đây.
+
+   CÁCH CHO TRÔI — hai lớp lồng nhau, đừng gộp làm một:
+     · lớp ngoài .may  → trôi NGANG, mỗi đám một tốc độ (--d);
+     · lớp trong .bong → bồng bềnh LÊN XUỐNG rất nhẹ, lệch nhịp nhau.
+   Gộp hai chuyển động vào một transform thì phải viết keyframe riêng cho từng
+   đám, sửa một cái là sửa bốn chỗ.
+
+   ⚠️ ĐỘ TRỄ ÂM (--k) LÀ THỨ QUAN TRỌNG NHẤT. Không có nó thì bốn đám cùng
+      xuất phát từ mép trái một lượt, người xem thấy rõ "một hàng mây" chạy
+      qua — giả ngay. Trễ âm = mây đã trôi sẵn từ trước khi banner hiện ra.
+   ⚠️ Mây đi RẤT CHẬM (62–126 giây một vòng) mới ra dáng mây. Dưới 30 giây là
+      thành khói bay, nhìn sốt ruột. */
+/* ── 1. CHÍNH BẦU TRỜI TRONG ẢNH CŨNG PHẢI TRÔI ──────────────────────────────
+   Trong ảnh đã có sẵn mây thật. Bản thiết kế phóng lớp trời lên 3–5% rồi đẩy
+   qua lại 10 điểm ảnh trong 24 giây — ít quá, nhìn chỉ như ảnh hơi rung.
+   Nay phóng 12% (đủ chỗ để đẩy mà không hở mép) và đẩy ±55 đơn vị trong 70
+   giây: trên màn hình rộng 1905 là đi được hơn 200 chấm, mây thật trôi thấy rõ
+   mà vẫn thong thả.
+   ⚠️ Phóng bao nhiêu thì đẩy tối đa bấy nhiêu: ảnh rộng 1000, phóng 12% là dôi
+      ra 60 mỗi bên → đẩy quá 60 là HỞ MÉP, lòi ra một vệt trống bên rìa trời. */
+.cl-b11 .dp-sky {
+  animation: cl-b11-troi calc(70s * var(--slow, 1)) ease-in-out infinite alternate;
+  transform-origin: 500px 70px;
+}
+@keyframes cl-b11-troi {
+  from { transform: translateX(-55px) scale(1.12) }
+  to   { transform: translateX(55px) scale(1.12) }
+}
+
+/* ── 2. Mấy đám mây vẽ thêm, trôi chậm hơn lớp trời nên có chiều sâu ─────── */
+.cl-b11 .dp-may { opacity: .58 }
+.cl-b11 .dp-may ellipse { fill: #fff }
+.cl-b11 .dp-may .may {
+  animation: cl-b11-may calc(var(--d) * var(--slow, 1)) linear infinite;
+  animation-delay: calc(var(--d) * var(--k) * -1);
+}
+.cl-b11 .dp-may .bong {
+  animation: cl-b11-may-bong calc(13s * var(--slow, 1)) ease-in-out infinite alternate;
+  animation-delay: calc(-13s * var(--k));
+}
+@keyframes cl-b11-may {
+  from { transform: translate(-300px, var(--y)) scale(var(--s)) }
+  to   { transform: translate(1300px, var(--y)) scale(var(--s)) }
+}
+@keyframes cl-b11-may-bong {
+  from { transform: translateY(-3px) }
+  to   { transform: translateY(3px) }
+}
+/* Máy đặt "giảm chuyển động" thì mây đứng yên — nhưng vẫn hiện, vì không có
+   mây thì bầu trời trống trơn. */
+@media (prefers-reduced-motion: reduce) {
+  .cl-b11 .dp-may .may, .cl-b11 .dp-may .bong { animation: none }
+  .cl-b11 .dp-may .may { transform: translate(400px, var(--y)) scale(var(--s)) }
+}
+/* Điện thoại: bỏ bớt hai đám cho nhẹ máy (làm nhoè ảnh là việc tốn sức nhất
+   trong cả mẫu này), hai đám còn lại vẫn đủ thấy trời có mây trôi. */
+@media (max-width: 760px) {
+  .cl-b11 .dp-may .m3, .cl-b11 .dp-may .m4 { display: none }
+}

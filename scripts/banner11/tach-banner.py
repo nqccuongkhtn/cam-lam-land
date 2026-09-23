@@ -39,6 +39,12 @@ _spec = _iu.spec_from_file_location('ve_nha_mau15',
                                     os.path.join(os.path.dirname(os.path.abspath(__file__)), 've-nha-mau15.py'))
 _ve_nha = _iu.module_from_spec(_spec); _spec.loader.exec_module(_ve_nha)
 NHA15_MAT, NHA15_NET = _ve_nha.sinh()
+# Hình bình hành lô đất của mẫu 15 — LẤY THẲNG từ bộ vẽ, không chép tay.
+# (Bộ vẽ lại đọc từ banner11/m15-khung.json do lúc cắt ảnh sinh ra.)
+_p0, _p1, _p3 = _ve_nha.P0, _ve_nha.P1, _ve_nha.P3
+_p2 = (_p1[0] + _p3[0] - _p0[0], _p1[1] + _p3[1] - _p0[1])
+LO15 = 'd="M%.1f %.1fL%.1f %.1fL%.1f %.1fL%.1f %.1fZ"' % (
+    _p0[0], _p0[1], _p1[0], _p1[1], _p2[0], _p2[1], _p3[0], _p3[1])
 
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 FILE_THIET_KE = os.path.join(GOC, 'docs', 'thiet-ke', 'banner-anh-cam-lam.html')
@@ -291,6 +297,44 @@ ANH_THAT_MAU19_MOI = '<image href="/banner11/m19-vetinh.webp" x="0" y="40" width
 _F_MAU10 = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mau10-noidung.html')
 SVG_MAU10 = io.open(_F_MAU10, encoding='utf-8').read().strip() if os.path.exists(_F_MAU10) else ''
 
+# ── MẪU 4 "TỰA SƠN · HƯỚNG HẢI": thêm MÂY TRÔI ─────────────────────────────
+# Bản thiết kế chỉ cho riêng phần TRỜI dịch qua dịch lại 10 điểm ảnh (lớp
+# .dp-sky) — gọi là "cinemagraph" nhưng nhìn thật ra chỉ thấy ảnh hơi rung,
+# không ai nhận ra là mây đang trôi. Chủ dự án muốn "mây di chuyển một cách
+# hữu tình".
+#
+# Nên vẽ thêm mấy đám mây RIÊNG, thả trôi ngang trên nền trời:
+#   · mỗi đám là 4–5 hình bầu dục chồng nhau cho ra dáng mây, làm nhoè đi
+#     (feGaussianBlur) nên mép mây mềm như mây thật, không ra hình bầu dục;
+#   · bốn đám ở bốn độ cao và bốn cỡ khác nhau, trôi với bốn tốc độ khác nhau
+#     (đám ở xa nhỏ và chậm, đám gần to và nhanh hơn) → có chiều sâu;
+#   · mỗi đám còn bồng bềnh lên xuống rất nhẹ, lệch nhịp nhau.
+#
+# ⚠️ PHẢI CẮT THEO #skyClip. Không cắt thì mây trôi đè cả lên dãy núi và lên
+#    chữ CAM LÂM — hỏng hẳn ý "chữ nằm sau núi".
+# ⚠️ ĐẶT TRƯỚC nhóm .dp-text trong mã, tức mây nằm DƯỚI chữ.
+def _may(rx, ry, ds):
+    """Một đám mây = mấy hình bầu dục chồng nhau."""
+    return ''.join('<ellipse cx="%d" cy="%d" rx="%d" ry="%d"/>' % (x, y, rx * a, ry * b)
+                   for x, y, a, b in ds)
+
+
+_MAY_1 = _may(1, 1, [(0, 0, 78, 19), (-52, 6, 52, 14), (46, 7, 58, 13), (2, -12, 40, 16)])
+_MAY_2 = _may(1, 1, [(0, 0, 62, 15), (-40, 5, 40, 11), (38, 5, 44, 10), (0, -9, 30, 12)])
+_MAY_3 = _may(1, 1, [(0, 0, 96, 22), (-64, 8, 62, 16), (58, 8, 68, 15), (4, -15, 48, 19)])
+_MAY_4 = _may(1, 1, [(0, 0, 46, 12), (-30, 4, 30, 9), (28, 4, 32, 8)])
+
+MAY_MAU4 = (
+    '<g class="dp-may" clip-path="url(#skyClip)" filter="url(#dpMayMo)" aria-hidden="true">'
+    '<g class="may m1" style="--y:34px;--s:1;--d:74s;--k:.05"><g class="bong">' + _MAY_1 + '</g></g>'
+    '<g class="may m2" style="--y:58px;--s:.72;--d:96s;--k:.46"><g class="bong">' + _MAY_2 + '</g></g>'
+    '<g class="may m3" style="--y:18px;--s:1.25;--d:126s;--k:.72"><g class="bong">' + _MAY_3 + '</g></g>'
+    '<g class="may m4" style="--y:80px;--s:.6;--d:62s;--k:.28"><g class="bong">' + _MAY_4 + '</g></g>'
+    '</g>')
+
+MAY_LOC_MAU4 = ('<filter id="dpMayMo" x="-40%" y="-120%" width="180%" height="340%">'
+                '<feGaussianBlur stdDeviation="6.5"/></filter>')
+
 THAY_DOAN = {
     # Mẫu 1: mép cong của tấm ảnh — bản gốc vẽ bằng 21 đoạn thẳng nên nhìn ra
     # khớp nối. Đổi sang một đường cong Bézier thật, cùng hình dáng.
@@ -341,6 +385,8 @@ THAY_DOAN = {
     #   background-position: center 30% ⇒ lệch dọc −72,3;
     #   máy bay trong ảnh ở (567, 712) ⇒ trong ô tròn là (241,0 ; 230,3);
     #   ô tròn đặt ở (1115, 55) ⇒ cộng lại ra (1356 ; 285).
+    4: [('<linearGradient id="dpG"', MAY_LOC_MAU4 + '<linearGradient id="dpG"'),
+        ('<g class="dp-text" data-at="500"', MAY_MAU4 + '<g class="dp-text" data-at="500"')],
     7: [(NEN_MAU7_CU, NEN_MAU7_MOI)],
     9: [(BAN_DO_VE_TAY, BAN_DO_THAT)],
     # ⚠️ Đổi khung nhìn thì PHẢI kéo ảnh cao theo. Ảnh đặt bằng height="750",
@@ -348,10 +394,9 @@ THAY_DOAN = {
     #    hở một dải ở đáy. Nên đổi luôn height thành 820.
     15: [('viewBox="250 524 700 226"', 'viewBox="250 566 700 226"'),
          # Lô đất dời lên khoảng cỏ trống ở giữa ảnh (chủ dự án khoanh đỏ) và to
-         # hơn bản gốc. Bốn góc mới lấy từ P0/P1/P2/P3 của ve-nha-mau15.py —
-         # sửa bên đó thì sửa cả ở đây, lệch là nhà đứng ra ngoài lô.
-         ('d="M601.8 745.9L651 723.6L621.7 699.4L572.5 721.6Z"',
-          'd="M653.9 678.6L754.4 649.2L740.2 630.8L639.7 660.2Z"'),
+         # hơn bản gốc. Bốn góc lấy THẲNG từ ve-nha-mau15.py (biến LO15 ở đầu
+         # file) nên không bao giờ lệch với căn nhà nữa.
+         ('d="M601.8 745.9L651 723.6L621.7 699.4L572.5 721.6Z"', LO15),
          ('width="1000" height="750" preserveAspectRatio="none"',
           'width="1000" height="820" preserveAspectRatio="none"'),
          ('Nhà 1 trệt, mái thái', 'Nhà 3 tầng · có sân vườn'),

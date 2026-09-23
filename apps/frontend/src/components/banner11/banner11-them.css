@@ -245,21 +245,49 @@
 /* Máy đặt "giảm chuyển động": máy bay đứng yên một chỗ trên vòng, không quay */
 .cl-b11 .banner.static .bb-orbit { animation: none !important }
 
-/* ══ MẪU 19: PHÓNG DẦN TỪ XA VÀO MỘT THỬA ĐẤT ═══════════════════════════════
-   Chủ dự án muốn mẫu này kể đúng việc web làm: nhìn từ xa, rồi phóng dần vào
-   tới từng thửa. Bản đồ quy hoạch và lớp ranh thửa (đều là dữ liệu thật của
-   web) được bọc chung trong nhóm `m19-phong`, nhóm này phóng to dần trong suốt
-   một vòng chạy.
-   Tâm phóng 55% ngang / 44% dọc chính là chỗ Thửa 132 · Tờ 19 (2.967 m², đất
-   trồng cây lâu năm) — toạ độ do scripts/banner11/dung-anh-mau19.py tính ra. */
-.cl-b11 .st-b6 .m19-phong { transform-origin: 40.0% 56.1%; }
+/* ══ MẪU 19: PHÓNG TỪ TOÀN CẢNH CAM LÂM VÀO MỘT THỬA ĐẤT ═══════════════════
+   Ba TẦNG ảnh chồng lên nhau, cùng tâm là thửa đất đích (xem
+   scripts/banner11/dung-anh-mau19.py):
+     · m19-l1 — cả huyện Cam Lâm  (~36 km ngang, vẽ đúng cỡ khung)
+     · m19-l2 — vùng Cam Đức      (~4,5 km, vẽ nhỏ 1/8 rồi phóng lên 8 lần)
+     · m19-l3 — quanh thửa đất    (~1,1 km, vẽ nhỏ 1/32 rồi phóng lên 32 lần)
+   Nhóm ngoài phóng đều từ 1 lên 32 lần; mỗi tầng chỉ hiện đúng lúc nó ĐANG
+   Ở CỠ THẬT của nó nên tầng nào cũng nét.
+   ⚠️ ĐỪNG gộp lại thành một ảnh rồi phóng: phóng 32 lần trên một ảnh là nhoè
+      hết, chủ dự án đã nhận xét "ảnh nền bản đồ rất mờ".
+   ⚠️ Tâm phóng 500 × 201,5 là TÂM KHUNG NHÌN — cả ba tầng đều lấy thửa đất làm
+      tâm khi dựng, nên đổi tâm ở đây là lệch hết. */
+.cl-b11 .st-b6 .m19-phong { transform-box: view-box; transform-origin: 500px 201.5px }
 .cl-b11 .st-b6 .b6-map.go .m19-phong {
-  animation: cl-b11-phong calc(8200ms * var(--slow, 1)) cubic-bezier(.34, 0, .2, 1) both;
+  animation: cl-b11-phong calc(8200ms * var(--slow, 1)) linear both;
 }
+/* Phóng theo cấp số nhân (mỗi 10% thời gian là gấp rưỡi) — mắt thấy tốc độ
+   phóng đều đặn, chứ phóng tuyến tính thì lúc đầu rất nhanh rồi chậm dần. */
 @keyframes cl-b11-phong {
   0%   { transform: scale(1) }
-  18%  { transform: scale(1.04) }
-  100% { transform: scale(2.35) }
+  10%  { transform: scale(1.41) }
+  20%  { transform: scale(2) }
+  30%  { transform: scale(2.83) }
+  40%  { transform: scale(4) }
+  50%  { transform: scale(5.66) }
+  60%  { transform: scale(8) }
+  70%  { transform: scale(11.3) }
+  80%  { transform: scale(16) }
+  90%  { transform: scale(22.6) }
+  100% { transform: scale(32) }
+}
+/* Chuyển tầng: mờ tầng cũ đi đúng lúc tầng mới về cỡ thật của nó */
+.cl-b11 .st-b6 .m19-l2, .cl-b11 .st-b6 .m19-l3 { opacity: 0 }
+.cl-b11 .st-b6 .b6-map.go .m19-l1 { animation: cl-b11-m19-t1 calc(8200ms * var(--slow, 1)) linear both }
+.cl-b11 .st-b6 .b6-map.go .m19-l2 { animation: cl-b11-m19-t2 calc(8200ms * var(--slow, 1)) linear both }
+.cl-b11 .st-b6 .b6-map.go .m19-l3 { animation: cl-b11-m19-t3 calc(8200ms * var(--slow, 1)) linear both }
+@keyframes cl-b11-m19-t1 { 0%, 32% { opacity: 1 } 48%, 100% { opacity: 0 } }
+@keyframes cl-b11-m19-t2 { 0%, 32% { opacity: 0 } 48%, 72% { opacity: 1 } 86%, 100% { opacity: 0 } }
+@keyframes cl-b11-m19-t3 { 0%, 72% { opacity: 0 } 86%, 100% { opacity: 1 } }
+/* Máy đặt "giảm chuyển động": đứng yên ở tầng gần nhất cho thấy rõ thửa đất */
+.cl-b11 .banner.static .m19-phong { animation: none !important; transform: scale(32) !important }
+.cl-b11 .banner.static .m19-l1, .cl-b11 .banner.static .m19-l2 { opacity: 0 !important }
+.cl-b11 .banner.static .m19-l3 { opacity: 1 !important }
 }
 /* Thửa được chọn nhấp nháy nhẹ cho dễ thấy khi đã phóng gần */
 .cl-b11 .st-b6 .b6-map.go .m19-thua {

@@ -169,8 +169,17 @@ ANH_GIA_BAN_DO = ('<image href="https://images.pexels.com/photos/35995788/pexels
 # `m19-phong` trong banner11-them.css). Thửa được chọn: Thửa 132 · Tờ 19 ·
 # 2.967 m² · CLN, nằm ở 55% ngang / 44% dọc của khung — đó cũng là tâm phóng.
 ANH_BAN_DO_THAT = ('<g class="m19-phong">'
-                   '<image href="/banner11/m19-quyhoach.webp" x="0" y="40" '
-                   'width="1000" height="323" preserveAspectRatio="none"/>')
+                   '<g class="m19-l1"><image href="/banner11/m19-qh1.webp" '
+                   'x="0" y="40" width="1000" height="323" '
+                   'preserveAspectRatio="none"/></g>'
+                   '<g class="m19-l2" transform="translate(500 201.5) scale(0.125) '
+                   'translate(-500 -201.5)"><image href="/banner11/m19-qh2.webp" '
+                   'x="0" y="40" width="1000" height="323" '
+                   'preserveAspectRatio="none"/></g>'
+                   '<g class="m19-l3" transform="translate(500 201.5) scale(0.03125) '
+                   'translate(-500 -201.5)"><image href="/banner11/m19-qh3.webp" '
+                   'x="0" y="40" width="1000" height="323" '
+                   'preserveAspectRatio="none"/></g>')
 #    Mẫu 19 còn một chỗ giả nữa: RANH THỬA và mấy chữ "LUC" là VẼ TAY men theo
 #    bờ ruộng trong tấm ảnh gốc. Nay nền đã là bản đồ quy hoạch thật nên mấy nét
 #    đó nằm lạc lõng, cắt ngang bản đồ, nhìn rất sai.
@@ -179,12 +188,9 @@ ANH_BAN_DO_THAT = ('<g class="m19-phong">'
 #    toạ độ. Xem scripts/banner11/dung-anh-mau19.py.
 RANH_VE_TAY = ''' <g fill="none" stroke="#7a3e12" stroke-width="2.6" stroke-linejoin="round" opacity=".9"><path d="M700 108L750 148L800 181L850 214L900 247L950 284L1000 318L1000 420L950 437L900 453L850 469L800 486L760 506L710 524L650 502L600 486L560 474L500 458L460 444L400 430L370 421L346 390L362 366L378 330L434 292L500 254L550 226L600 185L650 150Z"/><path d="M258 8L320 26L407 50L500 70L580 82L640 92L700 108L650 150L600 185L550 226L500 254L434 292L378 330L321 298L258 264L201 236L150 198L148 150L140 120L134 101L158 72L205 40Z"/><path d="M700 108L730 86L760 72L800 60L850 50L900 45L1000 38L1000 318L950 284L900 247L850 214L800 181L750 148Z"/><path d="M370 421L400 430L460 444L500 458L560 474L600 486L650 502L710 524L722 550L740 598L760 635L790 675L820 715L840 750L350 750L330 675L312 625L300 580L285 524L282 475L300 455L330 430Z"/><path d="M710 524L760 506L800 486L850 469L900 453L950 437L1000 420L1000 750L840 750L820 715L790 675L760 635L740 598L722 550Z"/><path d="M0 207L60 203L100 202L150 198L201 236L258 264L321 298L378 330L362 366L346 390L300 412L250 432L202 452L150 457L100 467L50 482L0 497Z"/><path d="M0 497L50 482L100 467L150 457L202 452L230 520L254 600L275 680L290 750L0 750Z"/></g>
         <g font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="800" fill="#7a3e12" text-anchor="middle" style="paint-order:stroke;stroke:rgba(255,250,220,.85);stroke-width:4px"><text x="692" y="340">LUC</text><text x="376" y="157">LUC</text><text x="892" y="146">LUC</text><text x="148" y="341">LUC</text></g> '''.strip()
-RANH_THAT = ('<image href="/banner11/m19-ranh-thua.webp" x="0" y="40" '
-             'width="1000" height="323" preserveAspectRatio="none" opacity=".95"/>'
-             # Thửa được chọn: tô sáng lên để mắt biết đang phóng vào đâu
-             '<path class="m19-thua" d="M402.4 223.6L397.2 223.7L397.6 218.7L401.5 218.4L402.1 220.1Z" '
-             'fill="rgba(253,224,71,.32)" stroke="#fde047" stroke-width=".9"/>'
-             '</g>')
+# Ranh thửa nay đã được VẼ SẴN vào tầng ảnh gần nhất (m19-qh3) nên ở đây chỉ
+# cần đóng nhóm phóng lại.
+RANH_THAT = '</g>'
 
 #    Mẫu 18 "Chủ thể vượt khung": ảnh trong khung đổi sang ảnh ĐÔ THỊ VEN BIỂN
 #    Nha Trang (Gold Coast), chụp ngước lên nên toà tháp vươn cao và thon —
@@ -226,18 +232,23 @@ _MAY_BAY = ('<g class="c18-plane" data-at="1500"><g mask="url(#c18PlaneMask)">'
 # Mặt nạ c18PlaneMask của bản thiết kế nay không ai dùng nữa (xem _TOA_NHA),
 # nên bỏ hẳn cho gọn.
 _MAT_NA_MOI = ''
-# Phần vượt khung KHÔNG còn dùng mặt nạ chữ nhật nữa. Mặt nạ chữ nhật lôi theo
-# cả mảng trời đêm quanh toà nhà → nhìn ra một khối vuông tối đè lên nền banner.
-# Nay dùng ảnh ĐÃ CẮT THEO ĐÚNG BÓNG toà nhà (nền trong suốt), do
-# scripts/banner11/tach-toa-nha-mau18.py dựng ra. Chỗ đặt cũng do script đó tính.
-# ⚠️ CẮT PHẦN NHÔ RA — đây là mẹo làm hết vết ghép:
-#    ảnh cắt rời chồng lên chính tấm ảnh trong khung, nếu để nguyên thì lúc nó
-#    TRƯỢT LÊN (hiệu ứng vươn cao) sẽ thấy hai lớp lệch nhau, nhìn rất giả.
-#    Nay bọc trong một khung cắt chỉ giữ phần TRÊN mép khung ảnh (y < 261), nên
-#    toà nhà như mọc dần ra khỏi khung, không bao giờ lộ chỗ nối.
-_TOA_NHA = ('<g class="c18-plane" data-at="1500" clip-path="url(#c18Tren)">'
-            '<image href="/banner11/m18-toanha.webp" x="1350.6" y="105.6" '
-            'width="186.5" height="171.4"/></g>')
+# ⚠️ PHẦN NHÔ RA DÙNG CHÍNH TẤM ẢNH TRONG KHUNG, CHỈ KHOÉT THEO MẶT NẠ
+#    Đây là chỗ đã sửa ba lần mới xong. Hai cách trước đều lộ vết ghép:
+#      · cách 1: mặt nạ hình chữ nhật → lôi theo cả mảng trời, thành ô vuông tối;
+#      · cách 2: cắt toà nhà ra thành ẢNH RIÊNG rồi đặt đè lên → hai lớp là hai
+#        tấm ảnh khác nhau (một cái đã cắt rồi phóng to lại), lệch nhau vài phần
+#        trăm là mắt thấy ngay chỗ nối.
+#    Cách đang dùng: vẫn là MỘT tấm ảnh duy nhất, đặt đúng một phép
+#    translate/scale, chỉ khác là bản nhô ra bị khoét theo mặt nạ hình toà nhà.
+#    Hai phần vốn là một ảnh nên KHÔNG THỂ lệch.
+#    Lớp ngoài `c18Tren` cắt ngang ở mép khung ảnh và ĐỨNG YÊN; lớp trong mới là
+#    lớp chạy hiệu ứng vươn lên — nhìn như toà nhà mọc dần ra khỏi khung, xong
+#    thì khít tuyệt đối.
+_TOA_NHA = ('<g clip-path="url(#c18Tren)">'
+            '<g class="c18-plane" data-at="1500" mask="url(#c18Toa)">'
+            '<image href="/banner11/mia-goldcoast-800.webp" width="1000" height="1500" '
+            'preserveAspectRatio="none" transform="translate(1228 30.6) scale(0.448)"/>'
+            '</g></g>')
 
 #    Mẫu 15: hình phác thảo căn nhà nằm sát ĐÁY khổ thiết kế (y 693–746 trong
 #    khung nhìn 524–750). Banner nay thấp hơn khổ gốc, lại có khung tìm kiếm ở
@@ -362,7 +373,10 @@ THAY_DOAN = {
     #    phần trên y ≈ 91 bị menu che, phải chừa đủ chỗ cho phần nhô ra.
     ('<rect x="1060" y="110" width="700" height="470" rx="48"/>',
      '<rect x="1230" y="260" width="443" height="325" rx="34"/>'
-     '</clipPath><clipPath id="c18Tren"><rect x="1150" y="0" width="700" height="261"/>'),
+     '</clipPath><clipPath id="c18Tren"><rect x="1150" y="0" width="700" height="261"/></clipPath>'
+     '<mask id="c18Toa" maskUnits="userSpaceOnUse" x="1330" y="85" width="230" height="215">'
+     '<image href="/banner11/m18-matna.webp" x="1350.6" y="105.6" width="186.5" height="171.4"/></mask>'
+     '<clipPath id="c18Bo">'),
     ('<rect x="1060" y="110" width="700" height="470" rx="48" fill="none"',
      '<rect x="1230" y="260" width="443" height="325" rx="34" fill="none"'),
     ('<rect class="r3" x="988" y="38" width="844" height="614" rx="120"',

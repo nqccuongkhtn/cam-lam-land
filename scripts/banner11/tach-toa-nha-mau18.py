@@ -129,12 +129,20 @@ def main():
     u1, v1 = KHUNG[0] + x1, KHUNG[1] + y1
     print('Toa nha trong anh goc: (%d,%d)-(%d,%d)  %dx%d' % (u0, v0, u1, v1, x1 - x0, y1 - y0))
 
-    rgb = patch[y0:y1, x0:x1].astype(np.uint8)
+    # ── Ghi ra MẶT NẠ chứ không phải ảnh cắt ────────────────────────────────
+    # ⚠️ TRƯỚC ĐÂY ghi ra ảnh toà nhà đã cắt rồi đặt đè lên tấm ảnh trong khung.
+    #    Hai lớp là hai ảnh khác nhau (một cái đã cắt và phóng to lại), nên chỗ
+    #    nối giữa phần nhô ra và phần trong khung cứ bị lệch một chút — chủ dự
+    #    án bắt lỗi mấy lần "chỗ ghép nhìn chưa thật".
+    #    Nay chỉ ghi ra MẶT NẠ (trắng = toà nhà, trong suốt = trời). Bản thiết
+    #    kế sẽ dùng CHÍNH tấm ảnh trong khung, cùng một phép đặt, rồi khoét theo
+    #    mặt nạ này → hai phần là MỘT ảnh duy nhất, không thể lệch được nữa.
     alp = (a[y0:y1, x0:x1] * 255).astype(np.uint8)
-    out = Image.fromarray(np.dstack([rgb, alp]), 'RGBA')
+    trang = np.full(alp.shape + (3,), 255, dtype=np.uint8)
+    out = Image.fromarray(np.dstack([trang, alp]), 'RGBA')
     out = out.resize((out.width * 2, out.height * 2), Image.LANCZOS)
-    p = os.path.join(RA, 'm18-toanha.webp')
-    out.save(p, 'WEBP', quality=92, method=6)
+    p = os.path.join(RA, 'm18-matna.webp')
+    out.save(p, 'WEBP', quality=92, method=6, lossless=True)
     print('OK %s  %d KB  %dx%d' % (os.path.basename(p), os.path.getsize(p) // 1024,
                                    out.width, out.height))
 
@@ -144,14 +152,14 @@ def main():
     W, H = k2 * (u1 - u0), k2 * (v1 - v0)
     print('')
     print('== DAN VAO tach-banner.py ==')
-    print('<image href="/banner11/m18-toanha.webp" x="%.1f" y="%.1f" width="%.1f" height="%.1f"/>'
+    print('<image href="/banner11/m18-matna.webp" x="%.1f" y="%.1f" width="%.1f" height="%.1f"/>'
           % (X, Y, W, H))
     print('Dinh toa nha o y=%.1f (mep tren khung anh la y=260) => nho ra %.0f don vi'
           % (Y, 260 - Y))
 
     thu = Image.new('RGB', out.size, (11, 36, 71))
     thu.paste(out, (0, 0), out)
-    thu.save(os.path.join(RA, '_xem-m18-toanha.png'))
+    thu.save(os.path.join(RA, '_xem-m18-matna.png'))
 
 
 if __name__ == '__main__':

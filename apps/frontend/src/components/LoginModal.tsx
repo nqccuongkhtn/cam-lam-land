@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth, type AuthUser } from '@/lib/auth';
 import PasswordInput from './PasswordInput';
+import LogoAnh from '@/components/LogoAnh';
 
 /**
  * Popup ĐĂNG NHẬP dùng chung — hiện đè lên trang (không rời trang).
@@ -48,7 +49,7 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
           <button onClick={onClose} aria-label="Đóng" className="absolute top-3 right-3 w-8 h-8 grid place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 text-lg leading-none">✕</button>
           <div className="flex items-center gap-2.5">
             <span className="w-11 h-11 rounded-xl bg-[#0A2540] grid place-items-center shrink-0">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C8A14B" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.3V20h14V9.3" /><circle cx="12" cy="13.6" r="1.5" fill="#C8A14B" stroke="none" /></svg>
+              <LogoAnh cao={26} nenToi />
             </span>
             <div>
               <div className="font-extrabold text-[#0A2540] leading-tight">Cam Lâm <span className="text-[#C8A14B]">Land</span></div>

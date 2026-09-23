@@ -42,6 +42,13 @@ export const BAN_LOGO: { ma: string; ten: string }[] = [
   { ma: 'trung-thu', ten: 'Trung thu — lồng đèn' },
   { ma: 'noel', ten: 'Giáng sinh — mũ ông già Noel' },
   { ma: 'phu-nu', ten: '8/3 và 20/10 — hoa hồng' },
+  { ma: 'tri-an', ten: 'Tri ân 27/7 · Vu Lan — hoa sen' },
+  { ma: 'nha-giao', ten: 'Nhà giáo 20/11 — quyển sách' },
+  { ma: 'quan-doi', ten: 'Quân đội 22/12 — sao vàng' },
+  { ma: 'gia-dinh', ten: 'Ngày Gia đình — trái tim' },
+  { ma: 'thieu-nhi', ten: 'Thiếu nhi 1/6 — bóng bay' },
+  { ma: 'doanh-nhan', ten: 'Doanh nhân 13/10 — biểu đồ đi lên' },
+  { ma: 'ong-tao', ten: 'Ông Công ông Táo — cá chép' },
 ];
 
 type Dip = {

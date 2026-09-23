@@ -597,21 +597,56 @@ export async function migrate(): Promise<void> {
     bat BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now())`)
     .catch((e: any) => console.error('[migrate] logo_le lỗi:', e?.message || e));
-  // Nạp sẵn 8 dịp thường gặp — CHỈ khi bảng còn rỗng, để không ghi đè lịch
-  // quản trị viên đã sửa.
-  await pool.query(`INSERT INTO logo_le (ma, ten, kieu, thang, ngay, truoc, sau, uu_tien)
-    SELECT * FROM (VALUES
-      ('tet',        'Tết Nguyên đán',        'am',    1,  1, 7, 7, 90),
-      ('tet-duong',  'Tết Dương lịch',        'duong', 1,  1, 1, 1, 40),
-      ('gio-to',     'Giỗ Tổ Hùng Vương',     'am',    3, 10, 1, 1, 60),
-      ('30-4',       'Giải phóng miền Nam',   'duong', 4, 30, 1, 2, 70),
-      ('quoc-khanh', 'Quốc khánh 2/9',        'duong', 9,  2, 2, 2, 80),
-      ('trung-thu',  'Tết Trung thu',         'am',    8, 15, 3, 1, 50),
-      ('noel',       'Giáng sinh',            'duong',12, 25, 2, 1, 30),
-      ('phu-nu',     'Phụ nữ Việt Nam 20/10', 'duong',10, 20, 0, 0, 20)
-    ) AS v(ma, ten, kieu, thang, ngay, truoc, sau, uu_tien)
-    WHERE NOT EXISTS (SELECT 1 FROM logo_le)`)
-    .catch((e: any) => console.error('[migrate] nạp lịch logo lễ lỗi:', e?.message || e));
+  // ── NẠP SẴN LỊCH NGÀY LỄ ─────────────────────────────────────────────────
+  // ⚠️ NẠP THEO ĐỢT, KHÔNG NẠP LẠI CÁI ĐÃ CÓ. Nếu cứ "bảng rỗng thì nạp" thì
+  //    sau này bổ sung thêm dịp mới sẽ KHÔNG BAO GIỜ vào được (bảng đâu còn
+  //    rỗng). Nên ghi số đợt vào app_config: đợt nào chưa chạy thì chạy, chạy
+  //    rồi thì thôi. Quản trị viên xoá dịp nào thì nó không bị nạp lại, vì
+  //    đợt đó đã đánh dấu xong.
+  const DOT_LICH_LE = 2;
+  const dotCu = await pool.query(`SELECT (value->>'dot')::int AS dot FROM app_config WHERE key='logo_le_seed'`)
+    .then((r: any) => Number(r.rows?.[0]?.dot || 0)).catch(() => 0);
+  if (dotCu < DOT_LICH_LE) {
+    // (mã logo, tên dịp, kiểu, tháng, ngày, hiện sớm, còn hiện, ưu tiên, đợt)
+    const LICH: [string, string, string, number, number, number, number, number, number][] = [
+      // ── đợt 1: các dịp lớn ──
+      ['tet', 'Tết Nguyên đán', 'am', 1, 1, 7, 7, 90, 1],
+      ['ong-tao', 'Ông Công ông Táo (23 tháng Chạp)', 'am', 12, 23, 1, 1, 85, 2],
+      ['quoc-khanh', 'Quốc khánh 2/9', 'duong', 9, 2, 2, 2, 80, 1],
+      ['30-4', 'Giải phóng miền Nam 30/4 · Quốc tế Lao động 1/5', 'duong', 4, 30, 1, 2, 70, 1],
+      ['gio-to', 'Giỗ Tổ Hùng Vương', 'am', 3, 10, 1, 1, 60, 1],
+      ['trung-thu', 'Tết Trung thu', 'am', 8, 15, 3, 1, 50, 1],
+      ['tri-an', 'Lễ Vu Lan (rằm tháng Bảy)', 'am', 7, 15, 1, 1, 46, 2],
+      ['tri-an', 'Thương binh Liệt sĩ 27/7', 'duong', 7, 27, 1, 1, 45, 2],
+      ['tet-duong', 'Tết Dương lịch', 'duong', 1, 1, 1, 1, 40, 1],
+      ['tri-an', 'Rằm tháng Giêng', 'am', 1, 15, 0, 0, 38, 2],
+      ['quoc-khanh', 'Giải phóng Khánh Hoà 2/4', 'duong', 4, 2, 0, 1, 36, 2],
+      ['noel', 'Giáng sinh', 'duong', 12, 25, 2, 1, 30, 1],
+      ['quoc-khanh', 'Sinh nhật Bác 19/5', 'duong', 5, 19, 0, 0, 30, 2],
+      ['quan-doi', 'Quân đội nhân dân 22/12', 'duong', 12, 22, 1, 1, 26, 2],
+      ['quoc-khanh', 'Thành lập Đảng 3/2', 'duong', 2, 3, 0, 0, 25, 2],
+      ['quoc-khanh', 'Chiến thắng Điện Biên Phủ 7/5', 'duong', 5, 7, 0, 0, 25, 2],
+      ['phu-nu', 'Phụ nữ Việt Nam 20/10', 'duong', 10, 20, 0, 0, 20, 1],
+      ['phu-nu', 'Quốc tế Phụ nữ 8/3', 'duong', 3, 8, 0, 0, 20, 2],
+      ['nha-giao', 'Nhà giáo Việt Nam 20/11', 'duong', 11, 20, 0, 0, 18, 2],
+      ['doanh-nhan', 'Doanh nhân Việt Nam 13/10', 'duong', 10, 13, 0, 0, 16, 2],
+      ['gia-dinh', 'Ngày Gia đình Việt Nam 28/6', 'duong', 6, 28, 0, 0, 15, 2],
+      ['thieu-nhi', 'Quốc tế Thiếu nhi 1/6', 'duong', 6, 1, 0, 0, 15, 2],
+    ];
+    for (const [ma, ten, kieu, thang, ngay, truoc, sau, uu, dot] of LICH) {
+      if (dot <= dotCu) continue;
+      await pool.query(
+        `INSERT INTO logo_le (ma, ten, kieu, thang, ngay, truoc, sau, uu_tien)
+         SELECT $1,$2,$3,$4,$5,$6,$7,$8
+          WHERE NOT EXISTS (SELECT 1 FROM logo_le WHERE ma=$1 AND kieu=$3 AND thang=$4 AND ngay=$5)`,
+        [ma, ten, kieu, thang, ngay, truoc, sau, uu])
+        .catch((e: any) => console.error('[migrate] nạp dịp lễ', ten, 'lỗi:', e?.message || e));
+    }
+    await pool.query(`INSERT INTO app_config (key, value) VALUES ('logo_le_seed', jsonb_build_object('dot', $1::int))
+                      ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`,
+      [DOT_LICH_LE]).catch(() => {});
+    console.log('[migrate] lịch logo ngày lễ: đã nạp tới đợt', DOT_LICH_LE);
+  }
 
   console.log('[migrate] schema up to date');
 }

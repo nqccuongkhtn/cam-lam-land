@@ -35,35 +35,52 @@ export async function uploadGis(form: FormData): Promise<any> {
 // => DB nhẹ, upload nhanh, tải trang nhẹ. Trình duyệt cũ không hỗ trợ WebP thì tự dùng JPEG. Ảnh nhỏ sẵn giữ nguyên.
 // ĐÓNG DẤU MỜ "Cam Lâm Land" vào GIỮA ảnh — nung thẳng vào ảnh ngay khi upload nên bám theo ảnh ở
 // mọi nơi (thẻ tin, xem ảnh lớn, mở URL gốc). Rất mờ để không phá ảnh, đủ để chống lấy ảnh.
-function drawWatermark(ctx: CanvasRenderingContext2D, w: number, h: number) {
+// ⚠️ LOGO TRONG DẤU MỜ LẤY TỪ ĐÚNG TỆP LOGO CỦA WEB, không vẽ lại bằng mã.
+//    Trước đây chỗ này vẽ tay một ngôi nhà bằng lệnh canvas. Hệ quả: đổi logo
+//    của web thì dấu mờ nung lên ảnh tin đăng vẫn là ngôi nhà cũ — mà ảnh đã
+//    nung rồi thì không sửa lại được nữa. Nay đọc thẳng /logo-cam-lam.webp nên
+//    chỉ cần chạy scripts/dong-bo-logo.py là chỗ này theo luôn.
+//    Dùng bản NÉT SÁNG vì dấu mờ là nét trắng đặt lên ảnh chụp.
+let _logoDauMo: Promise<HTMLImageElement | null> | null = null;
+function napLogoDauMo(): Promise<HTMLImageElement | null> {
+  if (_logoDauMo) return _logoDauMo;
+  _logoDauMo = new Promise((res) => {
+    const im = new Image();
+    im.onload = () => res(im);
+    im.onerror = () => res(null);     // thiếu tệp thì vẫn đóng dấu chữ, không chặn upload
+    im.src = '/logo-cam-lam.webp';
+  });
+  return _logoDauMo;
+}
+
+function drawWatermark(ctx: CanvasRenderingContext2D, w: number, h: number,
+                       logo: HTMLImageElement | null) {
   const text = 'Cam Lâm Land';
   const fs = Math.max(13, Math.round(Math.min(w, h) * 0.075));
   ctx.save();
   ctx.translate(w / 2, h / 2);
   ctx.font = `800 ${fs}px Arial, "Segoe UI", sans-serif`;
   const textW = ctx.measureText(text).width;
-  const k = fs / 22;                 // scale để BỀ NGANG ngôi nhà ≈ fs
-  const houseW = fs, gap = fs * 0.3;
-  const gx = -(houseW + gap + textW) / 2;   // mép trái cụm — LOGO + chữ trên CÙNG 1 HÀNG
-  // ── LOGO ngôi nhà (bên trái, căn giữa dọc với chữ) ──
-  ctx.save();
-  ctx.translate(gx - 11 * k, -22 * k);
-  ctx.scale(k, k);
-  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  const house = (col: string, lw: number) => {
-    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = lw;
-    ctx.beginPath(); ctx.moveTo(11, 21.5); ctx.lineTo(22, 12); ctx.lineTo(33, 21.5); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(14.2, 20); ctx.lineTo(14.2, 31.4); ctx.lineTo(29.8, 31.4); ctx.lineTo(29.8, 20); ctx.stroke();
-    ctx.beginPath(); ctx.arc(22, 25.6, 2.5, 0, Math.PI * 2); ctx.fill();
-  };
-  house('rgba(0,0,0,0.12)', 4.6);          // viền tối nhạt (đọc được trên nền sáng)
-  house('rgba(255,255,255,0.22)', 2.6);    // logo trắng mờ
-  ctx.restore();
+  // Logo cao bằng cỡ chữ; bề ngang ăn theo đúng tỉ lệ của tệp, không ghi cứng
+  // (đổi logo khác tỉ lệ là chỗ này tự co giãn theo).
+  const logoH = fs * 1.15;
+  const logoW = logo ? logoH * (logo.naturalWidth / logo.naturalHeight) : 0;
+  const gap = logo ? fs * 0.34 : 0;
+  const gx = -(logoW + gap + textW) / 2;   // mép trái cụm — LOGO + chữ trên CÙNG 1 HÀNG
+  if (logo) {
+    ctx.save();
+    // bóng tối mảnh phía sau cho logo đọc được cả trên ảnh nền sáng
+    ctx.shadowColor = 'rgba(0,0,0,0.35)';
+    ctx.shadowBlur = Math.max(2, fs * 0.22);
+    ctx.globalAlpha = 0.3;
+    ctx.drawImage(logo, gx, -logoH / 2, logoW, logoH);
+    ctx.restore();
+  }
   // ── CHỮ "Cam Lâm Land" (bên PHẢI logo, cùng hàng) ──
   ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
   ctx.lineWidth = Math.max(1.5, fs * 0.06);
-  ctx.strokeStyle = 'rgba(0,0,0,0.11)'; ctx.strokeText(text, gx + houseW + gap, 0);   // viền tối nhạt
-  ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.fillText(text, gx + houseW + gap, 0);  // chữ trắng RẤT MỜ
+  ctx.strokeStyle = 'rgba(0,0,0,0.11)'; ctx.strokeText(text, gx + logoW + gap, 0);   // viền tối nhạt
+  ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.fillText(text, gx + logoW + gap, 0);  // chữ trắng RẤT MỜ
   ctx.restore();
 }
 async function compressImage(file: File, maxDim = 1400, targetKB = 280, watermark = true): Promise<File> {
@@ -78,7 +95,7 @@ async function compressImage(file: File, maxDim = 1400, targetKB = 280, watermar
     const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
     const ctx = cv.getContext('2d'); if (!ctx) return file;
     (ctx as any).imageSmoothingQuality = 'high'; ctx.drawImage(img, 0, 0, w, h);
-    if (watermark) drawWatermark(ctx, w, h); // nung dấu mờ vào giữa ảnh
+    if (watermark) drawWatermark(ctx, w, h, await napLogoDauMo()); // nung dấu mờ vào giữa ảnh
     const enc = (type: string, q: number) => new Promise<Blob | null>((res) => cv.toBlob((b) => res(b), type, q));
     let type = 'image/webp', q = 0.82;
     let blob = await enc(type, q);

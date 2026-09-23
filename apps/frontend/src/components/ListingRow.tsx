@@ -6,6 +6,7 @@ import { displayViews, viewedReal } from '@/lib/views';
 import { thumbUrl, NO_IMG } from '@/lib/api';
 import { inCompare, toggleCompare } from '@/lib/compare';
 import { useLoginGate } from '@/lib/loginGate';
+import LogoAnh from '@/components/LogoAnh';
 
 function IPin() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="2.5" /></svg>; }
 function Verified() { return <span className="inline-flex items-center gap-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-1.5 py-0.5 rounded leading-none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-2.5 h-2.5"><path d="M20 6 9 17l-5-5" /></svg>XÁC THỰC</span>; }
@@ -19,7 +20,7 @@ function Watermark({ name, avatar }: { name?: string; avatar?: string }) {
         : <span className="w-5 h-5 rounded-full bg-white/25 grid place-items-center shrink-0"><svg viewBox="0 0 24 24" className="w-3 h-3" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M4 10.5 12 4l8 6.5" /><path d="M6 9.5V20h12V9.5" /></svg></span>}
       <span className="text-white/90 text-[11px] font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] truncate max-w-[46%]">{name || 'Cam Lâm Land'}</span>
       <span className="ml-auto flex items-center gap-1 opacity-85 shrink-0">
-        <svg viewBox="0 0 44 44" className="w-3.5 h-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]"><path d="M11 21.5 L22 12 L33 21.5" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" /><path d="M14.2 20 V31.4 H29.8 V20" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        <LogoAnh cao={14} nenToi lop="drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]" />
         <span className="text-white/85 text-[9.5px] font-black tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">Cam Lâm Land</span>
       </span>
     </div>

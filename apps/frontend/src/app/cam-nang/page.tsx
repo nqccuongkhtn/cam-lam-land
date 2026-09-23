@@ -5,6 +5,7 @@ import GuideList from './GuideList';
 import ShareRow from '@/components/ShareRow';
 import LegalConsultCTA from '@/components/LegalConsultCTA';
 import ServicesSection from '@/components/ServicesSection';
+import LogoAnh from '@/components/LogoAnh';
 
 export const metadata: Metadata = {
   title: 'Cẩm nang pháp lý nhà đất Cam Lâm, Khánh Hòa',
@@ -22,7 +23,7 @@ export default function CamNangPage() {
       {/* Tiêu đề gọn + nhận diện thương hiệu (dễ nhớ, không rối) */}
       <div className="flex items-center gap-3">
         <span className="grid place-items-center w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#0A2540] shrink-0">
-          <svg viewBox="0 0 44 44" className="w-6 h-6"><path d="M11 21.5 L22 12 L33 21.5" fill="none" stroke="#C8A14B" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" /><path d="M14.2 20 V31.4 H29.8 V20" fill="none" stroke="#C8A14B" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" /><circle cx="22" cy="25.6" r="2.5" fill="#C8A14B" /></svg>
+          <LogoAnh cao={24} nenToi />
         </span>
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] leading-tight">Cẩm nang pháp lý nhà đất</h1>

@@ -417,12 +417,14 @@
    vàng vắt ngang mặt nhà nhìn rất rối.
    Nên cho nét vẽ xong thì mờ dần đi, chỉ còn thoáng như dấu vết bản vẽ. */
 @keyframes cl-b11-net-mo {
-  0%, 45%   { opacity: 1 }
-  62%, 100% { opacity: .18 }
+  0%, 32%   { opacity: .85 }
+  50%, 100% { opacity: .12 }
 }
 .cl-b11 .st-b5 .c15-wire.go {
   animation: cl-b11-net-mo calc(7s * var(--slow, 1)) linear both;
 }
+/* Nét mảnh lại cho khỏi cắt ngang mặt căn nhà */
+.cl-b11 .st-b5 .c15-wire path { stroke-width: .55 }
 
 
 /* ══ MẪU 1: MÉP CONG CỦA TẤM ẢNH PHẢI MƯỢT ═════════════════════════════════

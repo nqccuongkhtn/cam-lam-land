@@ -23,14 +23,17 @@ import numpy as np
 from PIL import Image
 
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-RA = os.path.join(GOC, 'apps', 'frontend', 'public', 'logo-cam-lam.webp')
+RA = os.path.join(GOC, 'apps', 'frontend', 'public', 'logo-cam-lam.webp')          # nen TOI
+RA_TOI = os.path.join(GOC, 'apps', 'frontend', 'public', 'logo-cam-lam-toi.webp')  # nen SANG
 
-# ⚠️ NET VE DE MAU TRANG, KHONG PHAI VANG.
-#    Da thu de vang (#C8A14B) tren nen navy: net vang o co 30px bi hoa vao nen,
-#    nhin "tho" — chu du an nhan xet dung. Trang tren navy tuong phan manh hon
-#    han nen giu duoc het net manh; rieng mat troi van de vang lam diem nhan.
-NET = (248, 250, 252)          # trang nga
-TROI = (227, 185, 95)          # vang mat troi
+# ⚠️ DUNG HAI BAN MAU, KHONG PHAI MOT.
+#    Thanh menu co hai trang thai: trong suot tren nen banner (toi) va mau
+#    trang khi cuon xuong. Mot ban mau thi kieu gi cung co mot trang thai bi
+#    chim. Nen dung ra hai tep: net trang cho nen toi, net navy cho nen sang.
+NET_SANG = (250, 251, 252)     # trang nga  — dung tren nen toi
+TROI_SANG = (229, 188, 98)
+NET_TOI = (19, 52, 89)         # navy goc   — dung tren nen sang
+TROI_TOI = (198, 158, 73)
 KHO = 288
 
 
@@ -71,25 +74,25 @@ def main():
     k = np.where(alp[..., None] > 0.04, np.minimum(1.0 / np.maximum(alp[..., None], 0.04), 4.0), 1.0)
     rgb = np.clip(c * k, 0, 255)
 
-    # 3. Net navy -> trang; phan von da vang (mat troi) -> vang mat troi
+    # 3. Doi mau net: mot ban cho nen toi, mot ban cho nen sang
     xanh = rgb[:, :, 2] > rgb[:, :, 0] + 12
-    rgb[xanh] = NET
-    rgb[(~xanh) & (alp > 0.04)] = TROI
 
-    out = Image.fromarray(np.dstack([rgb.astype(np.uint8), (alp * 255).astype(np.uint8)]), 'RGBA')
     # ⚠️ CẮT SÁT, ĐỪNG ĐỘN THÀNH HÌNH VUÔNG.
-    #    Biểu tượng bè ngang (730×480). Độn cho vuông là phí mất hơn một phần ba
-    #    chiều cao, hình vẽ bị thu nhỏ lại và ở khung 36px nhìn rối tung — chủ
-    #    dự án đã nhận xét "logo nhỏ nên hơi rối".
-    #    Giữ đúng tỉ lệ thật, khung trên web sẽ làm hơi bè ngang cho khớp.
-    khung2 = out.getbbox()
-    if khung2:
-        out = out.crop(khung2)
-    w, h = out.size
-    rong = int(round(KHO * w / h))
-    out = out.resize((rong, KHO), Image.LANCZOS)
-    out.save(RA, 'WEBP', quality=94, method=6)
-    print('Ti le ngang/doc = %.3f' % (rong / KHO))
+    #    Biểu tượng bè ngang (tỉ lệ ~1,52). Độn cho vuông là phí mất hơn một
+    #    phần ba chiều cao, hình vẽ bị thu nhỏ và nhìn rối.
+    for duong, net, troi in ((RA, NET_SANG, TROI_SANG), (RA_TOI, NET_TOI, TROI_TOI)):
+        r = rgb.copy()
+        r[xanh] = net
+        r[(~xanh) & (alp > 0.04)] = troi
+        out = Image.fromarray(np.dstack([r.astype(np.uint8), (alp * 255).astype(np.uint8)]), 'RGBA')
+        bb = out.getbbox()
+        if bb:
+            out = out.crop(bb)
+        rong = int(round(KHO * out.width / out.height))
+        out = out.resize((rong, KHO), Image.LANCZOS)
+        out.save(duong, 'WEBP', quality=94, method=6)
+        print('OK %s  %d KB  (%dx%d)'
+              % (os.path.basename(duong), os.path.getsize(duong) // 1024, rong, KHO))
     print('OK %s  %d KB' % (os.path.basename(RA), os.path.getsize(RA) // 1024))
 
 

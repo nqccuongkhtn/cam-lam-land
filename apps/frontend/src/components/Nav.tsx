@@ -32,25 +32,23 @@ function NavIco({ href }: { href: string }) {
 function Logo({ light }: { light: boolean }) {
   return (
     <Link href="/" className="flex items-center gap-2.5 shrink-0">
-      {/* ĐÚNG LOGO CHỦ DỰ ÁN GỬI, không phải hình vẽ lại.
-          Lấy thẳng từ tệp gốc, cắt riêng phần biểu tượng (ngôi nhà + chữ lồng
-          CL + mặt trời + sóng) và BỎ hai dòng chữ "CAM LÂM / NHÀ ĐẤT" ở dưới —
-          chỗ đó đã có tên thương hiệu viết chữ ngay bên cạnh. Nền đen của tệp
-          gốc đã được đổi thành trong suốt.
-          ⚠️ NỀN KHUNG GIỮ MÀU NAVY — đó là màu chủ đạo của web, chủ dự án dặn
-             giữ. Logo gốc vẽ bằng chính màu navy nên đặt thẳng lên là chìm
-             nghỉm; vì vậy tệp `logo-cam-lam.webp` đã được ĐỔI MÀU NÉT sang
-             TRẮNG NGÀ, riêng mặt trời giữ màu vàng làm điểm nhấn. (Đã thử để
-             nét màu vàng: ở cỡ 30px nét vàng hoà vào nền navy, nhìn thô.) Muốn dựng lại tệp này thì xem
-             scripts/dung-logo.py.
-          ⚠️ KHUNG HƠI BÈ NGANG (54×36) LÀ CỐ Ý: biểu tượng vốn bè ngang
-             (tỉ lệ 1,52). Nhét vào khung vuông thì phải thu nhỏ lại, ở cỡ 36px
-             nhìn rối tung — chủ dự án đã nhận xét đúng chỗ này. Khung bè theo
-             đúng tỉ lệ thì hình vẽ to lên được gần một nửa, rõ hẳn. */}
-      <span className="grid h-9 w-[54px] shrink-0 place-items-center rounded-xl border border-[#C8A14B]/45 bg-gradient-to-br from-[#123459] to-[#081B30]">
-        <img src="/logo-cam-lam.webp" alt="" aria-hidden="true" width={46} height={30}
-          className="h-[30px] w-[46px] object-contain" />
-      </span>
+      {/* ĐÚNG LOGO CHỦ DỰ ÁN GỬI, lấy thẳng từ tệp gốc: cắt riêng phần biểu
+          tượng (ngôi nhà + chữ lồng CL + mặt trời + sóng), bỏ hai dòng chữ
+          "CAM LÂM / NHÀ ĐẤT" ở dưới vì đã có tên thương hiệu viết chữ bên cạnh.
+
+          ⚠️ BỎ HẲN CÁI KHUNG VUÔNG. Logo này có tới bốn chi tiết; nhét vào
+             khung 36px thì hình vẽ chỉ còn ~30px, chi tiết dính vào nhau —
+             chủ dự án nhận xét "nhìn rối", "thô". Bỏ khung thì logo được dùng
+             trọn chiều cao thanh menu (44px), to hơn gần một nửa, các nét tách
+             bạch hẳn ra.
+          ⚠️ HAI TỆP MÀU, đổi theo trạng thái thanh menu: nền tối (trong suốt
+             trên banner) dùng bản NÉT TRẮNG, nền trắng (khi cuộn xuống) dùng
+             bản NÉT NAVY đúng màu gốc. Một bản màu thì kiểu gì cũng có một
+             trạng thái bị chìm. Dựng hai tệp bằng scripts/dung-logo.py. */}
+      <img
+        src={light ? '/logo-cam-lam.webp' : '/logo-cam-lam-toi.webp'}
+        alt="" aria-hidden="true" width={67} height={44}
+        className="h-11 w-[67px] shrink-0 object-contain" />
       <span className="leading-tight">
         <span className={`font-extrabold block text-lg tracking-tight ${light ? 'text-white' : 'text-[#0A2540]'}`}>Cam Lâm <span className="text-[#C8A14B]">Land</span></span>
         <span className={`hidden lg:block whitespace-nowrap text-[10px] font-medium tracking-wide ${light ? 'text-white/75' : 'text-slate-400'}`}>Nhà đất &amp; quy hoạch</span>

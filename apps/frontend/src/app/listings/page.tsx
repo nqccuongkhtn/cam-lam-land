@@ -17,6 +17,7 @@ import type { BaseMap, ImageOverlay } from '@/components/MapView';
 import { wgs84ToVn2000 } from '@/lib/vn2000';
 import BottomSheet from '@/components/BottomSheet';
 import { usePullToRefresh } from '@/lib/usePullToRefresh';
+import LogoAnh from '@/components/LogoAnh';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false, loading: () => <div className="h-full w-full grid place-items-center bg-slate-100 text-slate-400 text-sm animate-pulse">Đang tải bản đồ…</div> });
 // Khoảng giá theo tỷ (bán) — cho thuê dùng phần lẻ của tỷ để load() giữ nguyên hệ số ×1e9 (3 triệu = 0.003 tỷ).
@@ -784,7 +785,7 @@ function ListingsInner() {
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-1.5 space-y-1.5">
           <div className="flex items-center gap-2">
             {/* Khi cuộn xuống (Nav ẩn) → hiện LOGO NHỎ bên trái để vẫn nhận diện & về trang chủ */}
-            {hidden && !mapView && <Link href="/" aria-label="Trang chủ" className="md:hidden shrink-0"><span className="w-9 h-9 rounded-xl bg-[#0A2540] grid place-items-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C8A14B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.3V20h14V9.3" /><circle cx="12" cy="13.6" r="1.4" fill="#C8A14B" stroke="none" /></svg></span></Link>}
+            {hidden && !mapView && <Link href="/" aria-label="Trang chủ" className="md:hidden shrink-0"><span className="w-9 h-9 rounded-xl bg-[#0A2540] grid place-items-center"><LogoAnh cao={18} nenToi /></span></Link>}
             <label className="flex items-center gap-2 flex-1 min-w-0 bg-slate-50 rounded-full border border-slate-200 px-4 focus-within:border-[#0A2540]">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-4 h-4 text-slate-400 shrink-0"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
               <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && showMine(false)} onFocus={(e) => { if (window.innerWidth < 768) { e.currentTarget.blur(); setSearchOpen(true); } }} className="py-2 w-full outline-none text-sm bg-transparent" placeholder="Khu vực, từ khoá, dự án…" />

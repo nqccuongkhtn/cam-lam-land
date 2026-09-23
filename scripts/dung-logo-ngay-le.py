@@ -188,6 +188,101 @@ def ca_chep(d, cx, cy, r, mau, net):
     d.ellipse([cx - r * 0.80, cy - r * 0.18, cx - r * 0.52, cy + r * 0.10], fill=net)
 
 
+def banh_rang(d, cx, cy, r, mau, lo):
+    """Banh rang - ngay Quoc te Lao dong."""
+    for i in range(8):
+        g = math.radians(i * 45)
+        dx, dy = math.cos(g), math.sin(g)
+        w = r * 0.20
+        d.polygon([(cx + dx * r * 0.82 - dy * w, cy + dy * r * 0.82 + dx * w),
+                   (cx + dx * r * 1.26 - dy * w * 0.62, cy + dy * r * 1.26 + dx * w * 0.62),
+                   (cx + dx * r * 1.26 + dy * w * 0.62, cy + dy * r * 1.26 - dx * w * 0.62),
+                   (cx + dx * r * 0.82 + dy * w, cy + dy * r * 0.82 - dx * w)], fill=mau)
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=mau)
+    d.ellipse([cx - r * 0.40, cy - r * 0.40, cx + r * 0.40, cy + r * 0.40], fill=lo)
+
+
+def bua_liem(d, cx, cy, r, mau):
+    """Bua va liem tren co Dang.
+
+    Ve DAC va TO, dung ve net manh: thu ve 32px la net manh bien mat, chi con
+    mot vet vang khong ra hinh gi.
+    """
+    d.line([(cx - r * 0.95, cy - r * 0.10), (cx - r * 0.30, cy - r * 0.95)],
+           fill=mau, width=r * 0.26)
+    d.line([(cx - r * 0.95, cy - r * 0.10), (cx + r * 0.20, cy + r * 0.55)],
+           fill=mau, width=r * 0.26)
+    d.line([(cx - r * 0.72, cy + r * 0.80), (cx + r * 0.58, cy - r * 0.36)],
+           fill=mau, width=r * 0.24)
+    d.polygon([(cx + r * 0.32, cy - r * 0.66), (cx + r * 0.98, cy - r * 0.32),
+               (cx + r * 0.74, cy + r * 0.06), (cx + r * 0.12, cy - r * 0.28)], fill=mau)
+
+
+def chim_bo_cau(d, cx, cy, r, than, mo, la):
+    """Chim bo cau ngam canh - 30/4 thong nhat, hoa binh."""
+    d.ellipse([cx - r * 0.95, cy - r * 0.38, cx + r * 0.45, cy + r * 0.42], fill=than)
+    d.polygon([(cx + r * 0.30, cy), (cx + r * 1.20, cy - r * 0.58),
+               (cx + r * 1.08, cy + r * 0.30)], fill=than)
+    d.ellipse([cx - r * 1.26, cy - r * 0.64, cx - r * 0.70, cy - r * 0.08], fill=than)
+    d.polygon([(cx - r * 1.24, cy - r * 0.42), (cx - r * 1.74, cy - r * 0.26),
+               (cx - r * 1.22, cy - r * 0.12)], fill=mo)
+    d.polygon([(cx - r * 0.58, cy - r * 0.18), (cx + r * 0.18, cy - r * 1.08),
+               (cx + r * 0.38, cy - r * 0.10)], fill=mo)
+    for i in range(3):
+        d.ellipse([cx - r * 2.00 - i * r * 0.26, cy - r * 0.08 + i * r * 0.16,
+                   cx - r * 1.58 - i * r * 0.26, cy + r * 0.20 + i * r * 0.16], fill=la)
+
+
+def ngon_nen(d, cx, cy, r, than, lua, quang):
+    """Ngon nen tri an - 27/7."""
+    d.ellipse([cx - r * 1.35, cy - r * 1.60, cx + r * 1.35, cy + r * 0.20], fill=quang)
+    d.rounded_rectangle([cx - r * 0.42, cy - r * 0.15, cx + r * 0.42, cy + r * 1.50],
+                        radius=r * 0.18, fill=than)
+    d.polygon([(cx, cy - r * 1.34), (cx + r * 0.38, cy - r * 0.52),
+               (cx, cy - r * 0.20), (cx - r * 0.38, cy - r * 0.52)], fill=lua)
+
+
+def hoa_dang(d, cx, cy, r, canh, lua, nuoc):
+    """Den hoa dang tha tren mat nuoc - le Vu Lan."""
+    for i in range(5):
+        g = math.radians(-162 + i * 42)
+        dx, dy = math.cos(g), math.sin(g)
+        d.polygon([(cx, cy),
+                   (cx + dx * r * 1.05 - dy * r * 0.24, cy + dy * r * 1.05 + dx * r * 0.24),
+                   (cx + dx * r * 1.32, cy + dy * r * 1.32),
+                   (cx + dx * r * 1.05 + dy * r * 0.24, cy + dy * r * 1.05 - dx * r * 0.24)],
+                  fill=canh)
+    d.polygon([(cx, cy - r * 1.34), (cx + r * 0.36, cy - r * 0.48),
+               (cx, cy - r * 0.16), (cx - r * 0.36, cy - r * 0.48)], fill=lua)
+    for i, w in enumerate((1.5, 1.1, 0.72)):
+        y = cy + r * (0.62 + i * 0.34)
+        d.line([(cx - r * w, y), (cx + r * w, y)], fill=nuoc, width=max(2, r * 0.16))
+
+
+def ba_nen_nhang(d, cx, cy, r, than, dau, khoi):
+    """Ba nen nhang dang chay - ram thang Gieng."""
+    for i, dx in enumerate((-0.62, 0.0, 0.62)):
+        x = cx + r * dx
+        cao = r * (1.6 if i == 1 else 1.34)
+        d.line([(x, cy + r * 0.9), (x + r * dx * 0.22, cy - cao)],
+               fill=than, width=max(2, r * 0.17))
+        d.ellipse([x + r * dx * 0.22 - r * 0.18, cy - cao - r * 0.18,
+                   x + r * dx * 0.22 + r * 0.18, cy - cao + r * 0.18], fill=dau)
+    for dx, dy, rr in ((-0.10, -2.10, 0.24), (0.34, -2.50, 0.18), (-0.36, -2.70, 0.14)):
+        d.ellipse([cx + r * dx - r * rr, cy + r * dy - r * rr,
+                   cx + r * dx + r * rr, cy + r * dy + r * rr], fill=khoi)
+
+
+def bo_hoa(d, cx, cy, r, canh, nhuy, la):
+    """Bo hoa cuc - ngay Phu nu Viet Nam 20/10."""
+    d.line([(cx, cy + r * 2.4), (cx - r * 0.2, cy + r * 0.5)], fill=la, width=max(2, r * 0.22))
+    d.ellipse([cx - r * 1.15, cy + r * 0.95, cx - r * 0.20, cy + r * 1.55], fill=la)
+    d.ellipse([cx + r * 0.20, cy + r * 1.15, cx + r * 1.15, cy + r * 1.75], fill=la)
+    hoa(d, cx - r * 0.74, cy + r * 0.10, r * 0.80, canh, nhuy, canh=8)
+    hoa(d, cx + r * 0.78, cy + r * 0.30, r * 0.72, canh, nhuy, canh=8)
+    hoa(d, cx, cy - r * 0.60, r * 0.92, canh, nhuy, canh=8)
+
+
 # ── Từng dịp: vẽ gì lên logo ────────────────────────────────────────────────
 # Hàm nhận (d, m); `m` là BẢNG MÀU của nền đang dựng (tối hay sáng).
 
@@ -291,23 +386,79 @@ def ve_ong_tao(d, m):
     ca_chep(d, 366, 74, 58, m['vang_sang'], m['net'])
 
 
+def ve_lao_dong(d, m):
+    """1/5 Quoc te Lao dong: banh rang."""
+    banh_rang(d, 366, 72, 40, m['vang'], m['do_tet'])
+
+
+def ve_dang(d, m):
+    """3/2 Thanh lap Dang: co do bua liem."""
+    d.rectangle([322, 12, 328, 138], fill=m['kem'])
+    d.polygon([(328, 20), (430, 12), (430, 84), (328, 92)], fill=m['do'])
+    bua_liem(d, 380, 52, 28, m['vang_co'])
+
+
+def ve_30_4(d, m):
+    """30/4 Thong nhat dat nuoc: chim bo cau ngam canh."""
+    chim_bo_cau(d, 382, 66, 32, m['net'], m['vang_sang'], m['xanh'])
+
+
+def ve_dien_bien(d, m):
+    """7/5 Chien thang Dien Bien Phu: hoa ban Tay Bac."""
+    hoa(d, 368, 66, 46, m['net'], m['hong'])
+    d.line([(368, 110), (358, 142)], fill=m['xanh'], width=6)
+
+
+def ve_sen(d, m):
+    """19/5 sinh nhat Bac: doa sen hong."""
+    hoa_sen(d, 368, 66, 52, m['hong'], m['vang_sang'])
+    d.line([(368, 104), (368, 142)], fill=m['xanh'], width=6)
+
+
+def ve_nen(d, m):
+    """27/7 Thuong binh Liet si: ngon nen tri an."""
+    ngon_nen(d, 368, 72, 30, m['net'], m['vang_sang'], m['do_tet'])
+
+
+def ve_vu_lan(d, m):
+    """Le Vu Lan: den hoa dang tha tren nuoc."""
+    hoa_dang(d, 366, 60, 30, m['hong'], m['vang_sang'], m['kem'])
+
+
+def ve_nhang(d, m):
+    """Ram thang Gieng: ba nen nhang."""
+    ba_nen_nhang(d, 368, 100, 26, m['nau'], m['do_tet'], m['kem'])
+
+
+def ve_hoa_cuc(d, m):
+    """20/10 Phu nu Viet Nam: bo hoa cuc vang."""
+    bo_hoa(d, 366, 54, 30, m['vang_sang'], m['do_tet'], m['xanh'])
+
+
 # mã · tên hiển thị · hàm vẽ
 DIP = [
     ('tet',        'Tết Nguyên đán',      ve_tet),
     ('tet-duong',  'Tết Dương lịch 1/1',  ve_tet_duong),
     ('gio-to',     'Giỗ Tổ Hùng Vương',   ve_gio_to),
-    ('30-4',       '30/4 và 1/5',         ve_30_4),
+    ('30-4',       '30/4 Thống nhất',     ve_30_4),
     ('quoc-khanh', 'Quốc khánh 2/9',      ve_quoc_khanh),
     ('trung-thu',  'Tết Trung thu',       ve_trung_thu),
     ('noel',       'Giáng sinh 24-25/12', ve_noel),
-    ('phu-nu',     '8/3 và 20/10',        ve_phu_nu),
-    ('tri-an',     'Tri ân 27/7 · Vu Lan', ve_tri_an),
+    ('phu-nu',     'Quốc tế Phụ nữ 8/3',  ve_phu_nu),
+    ('tri-an',     'Tri ân 27/7 (nến)',    ve_nen),
     ('nha-giao',   'Nhà giáo 20/11',      ve_nha_giao),
     ('quan-doi',   'Quân đội 22/12',      ve_quan_doi),
     ('gia-dinh',   'Gia đình Việt Nam',   ve_gia_dinh),
     ('thieu-nhi',  'Thiếu nhi 1/6',       ve_thieu_nhi),
     ('doanh-nhan', 'Doanh nhân 13/10',    ve_doanh_nhan),
     ('ong-tao',    'Ông Công ông Táo',    ve_ong_tao),
+    ('lao-dong',   'Quốc tế Lao động 1/5', ve_lao_dong),
+    ('dang',       'Thành lập Đảng 3/2',  ve_dang),
+    ('dien-bien',  'Điện Biên Phủ 7/5',   ve_dien_bien),
+    ('sen',        'Sinh nhật Bác 19/5',  ve_sen),
+    ('vu-lan',     'Lễ Vu Lan',           ve_vu_lan),
+    ('nhang',      'Rằm tháng Giêng',     ve_nhang),
+    ('hoa-cuc',    'Phụ nữ Việt Nam 20/10', ve_hoa_cuc),
 ]
 
 

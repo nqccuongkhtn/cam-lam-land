@@ -1,0 +1,26 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Xem thử phân khu Cù Hin</title>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>html,body,#m{margin:0;height:100%;font-family:Arial,sans-serif}
+#b{position:absolute;top:10px;left:10px;z-index:2;background:#0A2540;color:#fff;padding:10px 12px;border-radius:8px;font-size:14px;max-width:320px}
+#b label{display:block;margin-top:6px;cursor:pointer}</style></head><body>
+<div id="b"><b>XEM THỬ — Phân khu Cù Hin 1/2000</b><br><small>Trang tạm để duyệt, web chính chưa đổi</small>
+<label><input type="checkbox" id="c1" checked> Cù Hin (bản vẽ thử)</label>
+<label><input type="checkbox" id="c2" checked> 4 phân khu cũ (để so chỗ giáp ranh)</label>
+<label>Độ đậm Cù Hin <input type="range" id="o" min="20" max="100" value="85"></label></div>
+<div id="m"></div>
+<script>
+const cu=['qd2076v21','qd2101v22','qd2222v22','qd918v18'];
+const src={g:{type:'raster',tiles:['https://mt0.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'],tileSize:256,maxzoom:20},
+  ch:{type:'raster',tiles:[location.origin+'/xem/cuhin/{z}/{x}/{y}.png'],tileSize:256,minzoom:12,maxzoom:17}};
+const lay=[{id:'g',type:'raster',source:'g'}];
+cu.forEach(v=>{src[v]={type:'raster',tiles:[location.origin+'/tiles/'+v+'/{z}/{x}/{y}.png'],tileSize:256,minzoom:8,maxzoom:18};
+  lay.push({id:v,type:'raster',source:v,paint:{'raster-opacity':0.6}})});
+lay.push({id:'ch',type:'raster',source:'ch',paint:{'raster-opacity':0.85}});
+const map=new maplibregl.Map({container:'m',style:{version:8,sources:src,layers:lay},center:[109.11,12.168],zoom:13,maxZoom:19});
+map.addControl(new maplibregl.NavigationControl());
+c1.onchange=()=>map.setLayoutProperty('ch','visibility',c1.checked?'visible':'none');
+c2.onchange=()=>cu.forEach(v=>map.setLayoutProperty(v,'visibility',c2.checked?'visible':'none'));
+o.oninput=()=>map.setPaintProperty('ch','raster-opacity',o.value/100);
+</script></body></html>

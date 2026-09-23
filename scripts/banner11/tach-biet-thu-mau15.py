@@ -87,6 +87,22 @@ MEM = 4.0            # độ mềm của viền cắt (điểm ảnh) — nhỏ 
 #    Script này tự quy đổi sang toạ độ bản vẽ rồi ghi ra m15-khung.json —
 #    bên kia chỉ việc đọc. Trước đây chép tay con số sang, đổi cách cắt ảnh
 #    một cái là nét vẽ lệch khỏi hàng rào mà không ai biết.
+# ── ĐƯỜNG HÀNG RÀO THẬT, đọc trên ảnh gốc (toạ độ 800×615) ─────────────────
+# Đây là CHÂN TƯỜNG RÀO nhìn thấy trong ảnh: từ chỗ tường bên trái chạy ra khỏi
+# khung, xuống góc gần người xem nhất, rồi vòng theo tường mặt trước sang phải.
+#
+# ⚠️ VÌ SAO PHẢI CÓ DANH SÁCH NÀY. Trước đây nét phác thảo lô đất vẽ bằng một
+#    HÌNH BÌNH HÀNH suy ra từ ba góc. Nhưng lô đất nhìn chéo trong ảnh KHÔNG
+#    phải hình bình hành phẳng: góc thứ tư nằm khuất sau căn nhà. Hệ quả là
+#    cạnh xa của hình bình hành cắt ngang qua căn biệt thự — nhìn đúng như
+#    "căn nhà bị cắt cụt ngủn" mà chủ dự án nhận xét.
+#    Bám theo đúng chân tường thật thì nét không bao giờ đi qua nhà nữa.
+VIEN_LO = [
+    (0, 352), (25, 408), (63, 448), (95, 486), (118, 513), (150, 565),
+    (178, 592),                     # góc tường gần người xem nhất
+    (307, 552), (407, 495), (512, 457), (625, 417), (640, 420),
+]
+
 GOC_LO = {
     'truoc': (172, 585),   # góc tường rào gần người xem nhất (góc trái phía dưới)
     'phai':  (640, 420),   # góc phải, chỗ tường rào mặt trước gặp ranh bên phải
@@ -124,8 +140,9 @@ def main():
     # ve-nha-mau15.py đặt nét phác thảo đúng chỗ.
     import json
     goc = {k: [v[0] - khung[0], v[1] - khung[1]] for k, v in GOC_LO.items()}
+    vien = [[x - khung[0], y - khung[1]] for x, y in VIEN_LO]
     with open(os.path.join(RA, 'm15-khung.json'), 'w', encoding='utf-8') as f:
-        json.dump({'rong': out.width, 'cao': out.height, 'goc': goc}, f,
+        json.dump({'rong': out.width, 'cao': out.height, 'goc': goc, 'vien': vien}, f,
                   ensure_ascii=False, indent=1)
     print('Ba goc lo trong anh da cat:', goc)
     print('OK %s  %d KB  %dx%d' % (os.path.basename(p), os.path.getsize(p) // 1024,

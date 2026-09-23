@@ -603,7 +603,7 @@ export async function migrate(): Promise<void> {
   //    rỗng). Nên ghi số đợt vào app_config: đợt nào chưa chạy thì chạy, chạy
   //    rồi thì thôi. Quản trị viên xoá dịp nào thì nó không bị nạp lại, vì
   //    đợt đó đã đánh dấu xong.
-  const DOT_LICH_LE = 2;
+  const DOT_LICH_LE = 3;
   const dotCu = await pool.query(`SELECT (value->>'dot')::int AS dot FROM app_config WHERE key='logo_le_seed'`)
     .then((r: any) => Number(r.rows?.[0]?.dot || 0)).catch(() => 0);
   if (dotCu < DOT_LICH_LE) {
@@ -632,6 +632,8 @@ export async function migrate(): Promise<void> {
       ['doanh-nhan', 'Doanh nhân Việt Nam 13/10', 'duong', 10, 13, 0, 0, 16, 2],
       ['gia-dinh', 'Ngày Gia đình Việt Nam 28/6', 'duong', 6, 28, 0, 0, 15, 2],
       ['thieu-nhi', 'Quốc tế Thiếu nhi 1/6', 'duong', 6, 1, 0, 0, 15, 2],
+      // ── đợt 3: tách riêng những dịp trước đây dùng chung một hình ──
+      ['lao-dong', 'Quốc tế Lao động 1/5', 'duong', 5, 1, 0, 0, 68, 3],
     ];
     for (const [ma, ten, kieu, thang, ngay, truoc, sau, uu, dot] of LICH) {
       if (dot <= dotCu) continue;
@@ -641,6 +643,28 @@ export async function migrate(): Promise<void> {
           WHERE NOT EXISTS (SELECT 1 FROM logo_le WHERE ma=$1 AND kieu=$3 AND thang=$4 AND ngay=$5)`,
         [ma, ten, kieu, thang, ngay, truoc, sau, uu])
         .catch((e: any) => console.error('[migrate] nạp dịp lễ', ten, 'lỗi:', e?.message || e));
+    }
+    // ĐỢT 3 — ĐỔI HÌNH cho những dịp đang dùng chung logo.
+    // ⚠️ Chủ dự án xem xong bảng logo lễ và bảo "nhiều lễ bạn vẽ logo trùng nhau
+    //    quá" — đúng, 5 dịp dùng chung lá cờ và 3 dịp dùng chung bông sen.
+    //    Nay mỗi dịp một hình riêng. Đây là UPDATE chứ không phải INSERT, vì
+    //    những dịp này đã nạp từ đợt trước rồi.
+    if (dotCu < 3) {
+      const DOI: [string, string, number, number][] = [
+        ['dang', 'duong', 2, 3],        // 3/2 → cờ Đảng
+        ['dien-bien', 'duong', 5, 7],   // 7/5 → hoa ban
+        ['sen', 'duong', 5, 19],        // 19/5 → đoá sen
+        ['hoa-cuc', 'duong', 10, 20],   // 20/10 → bó hoa cúc
+        ['vu-lan', 'am', 7, 15],        // Vu Lan → đèn hoa đăng
+        ['nhang', 'am', 1, 15],         // rằm tháng Giêng → ba nén nhang
+      ];
+      for (const [ma, kieu, thang, ngay] of DOI) {
+        await pool.query(`UPDATE logo_le SET ma=$1 WHERE kieu=$2 AND thang=$3 AND ngay=$4`,
+          [ma, kieu, thang, ngay]).catch(() => {});
+      }
+      await pool.query(
+        `UPDATE logo_le SET ten='Giải phóng miền Nam 30/4', sau=0
+          WHERE ma='30-4' AND kieu='duong' AND thang=4 AND ngay=30`).catch(() => {});
     }
     await pool.query(`INSERT INTO app_config (key, value) VALUES ('logo_le_seed', jsonb_build_object('dot', $1::int))
                       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`,

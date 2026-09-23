@@ -39,12 +39,9 @@ _spec = _iu.spec_from_file_location('ve_nha_mau15',
                                     os.path.join(os.path.dirname(os.path.abspath(__file__)), 've-nha-mau15.py'))
 _ve_nha = _iu.module_from_spec(_spec); _spec.loader.exec_module(_ve_nha)
 NHA15_MAT, NHA15_NET = _ve_nha.sinh()
-# Hình bình hành lô đất của mẫu 15 — LẤY THẲNG từ bộ vẽ, không chép tay.
-# (Bộ vẽ lại đọc từ banner11/m15-khung.json do lúc cắt ảnh sinh ra.)
-_p0, _p1, _p3 = _ve_nha.P0, _ve_nha.P1, _ve_nha.P3
-_p2 = (_p1[0] + _p3[0] - _p0[0], _p1[1] + _p3[1] - _p0[1])
-LO15 = 'd="M%.1f %.1fL%.1f %.1fL%.1f %.1fL%.1f %.1fZ"' % (
-    _p0[0], _p0[1], _p1[0], _p1[1], _p2[0], _p2[1], _p3[0], _p3[1])
+# Hình lô đất của mẫu 15 — LẤY THẲNG từ bộ vẽ, không chép tay.
+# (Bộ vẽ lại đọc hàng rào thật từ banner11/m15-khung.json do lúc cắt ảnh sinh ra.)
+LO15 = 'd="%s"' % _ve_nha.duong_lo()
 
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 FILE_THIET_KE = os.path.join(GOC, 'docs', 'thiet-ke', 'banner-anh-cam-lam.html')

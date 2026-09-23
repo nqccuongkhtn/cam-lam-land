@@ -116,7 +116,12 @@ export default function HopDongDatCoc() {
   const sigH = nCo > 0 ? 60 + nCo * 24 : 64; // chiều cao chỗ ký — cao thêm khi có nhiều người đồng sở hữu cùng ký
 
   // ───────── BÌA CUỐN HỒ SƠ (in cả cuốn) — sang trọng · tài lộc; TÊN SALES là chính, logo Cam Lâm Land nhỏ ─────────
-  const clHouse = (sz: number) => (<svg viewBox="0 0 44 44" width={sz} height={sz}><path d="M11 21.5 L22 12 L33 21.5" fill="none" stroke="#C8A14B" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" /><path d="M14.2 20 V31.4 H29.8 V20" fill="none" stroke="#C8A14B" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" /><circle cx="22" cy="25.6" r="2.4" fill="#C8A14B" /></svg>);
+  // ⚠️ Logo lấy từ ĐÚNG TỆP logo của web, không vẽ lại bằng SVG — xem chú
+  //    thích trong components/LogoAnh.tsx. Bìa hợp đồng in ra giấy nên dùng
+  //    bản nét sáng đặt trên nền navy đậm.
+  const clHouse = (sz: number) => (<img src="/logo-cam-lam.webp" alt="" aria-hidden
+    width={Math.round(sz * 1.51)} height={sz}
+    style={{ width: Math.round(sz * 1.51), height: sz, objectFit: 'contain' }} />);
   // (Đã bỏ hoa văn góc — dùng khung vàng đôi tối giản, sang trọng hiện đại.)
   const clMedal = () => (
     <svg viewBox="0 0 150 150" width="116" height="116">
@@ -349,7 +354,10 @@ export default function HopDongDatCoc() {
           </div>
           <div style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '2.5px solid #0A2540', paddingBottom: '8px' }}>
-              <svg viewBox="0 0 44 44" width="46" height="46"><rect width="44" height="44" rx="11" fill="#0A2540" /><path d="M11 21.5 L22 12 L33 21.5" fill="none" stroke="#C8A14B" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /><path d="M14.2 20 V31.4 H29.8 V20" fill="none" stroke="#C8A14B" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /><circle cx="22" cy="25.6" r="2.5" fill="#C8A14B" /></svg>
+              <span style={{ display: 'grid', placeItems: 'center', width: 46, height: 46, borderRadius: 11, background: '#0A2540' }}>
+                <img src="/logo-cam-lam.webp" alt="" aria-hidden width={36} height={24}
+                  style={{ width: 36, height: 24, objectFit: 'contain' }} />
+              </span>
               <div style={{ flex: 1 }}>
                 <div style={{ fontFamily: 'Arial, sans-serif', fontWeight: 800, fontSize: '18px', color: '#0A2540' }}>CAM LÂM LAND</div>
                 <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '11px', color: '#555' }}>Sàn Bất động sản &amp; Bản đồ quy hoạch Cam Lâm, Khánh Hòa · Hotline {HOTLINE}</div>

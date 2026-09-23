@@ -67,10 +67,12 @@ def _doc_goc():
     oy = ANH_Y + (ANH_H - k['cao'] * ti)
     doi = lambda p: (ox + p[0] * ti, oy + p[1] * ti)
     g = k['goc']
-    return doi(g['truoc']), doi(g['phai']), doi(g['trai'])
+    vien = [doi(p) for p in k.get('vien') or []]
+    # Chiều cao tường rào: đo trên ảnh gốc khoảng 30 điểm ảnh.
+    return doi(g['truoc']), doi(g['phai']), doi(g['trai']), vien, 30 * ti
 
 
-P0, P1, P3 = _doc_goc()    # góc trước (gần người xem) · góc phải · góc trái
+P0, P1, P3, VIEN, CAO_RAO = _doc_goc()   # góc trước · góc phải · góc trái · hàng rào
 P2 = (P1[0] + P3[0] - P0[0], P1[1] + P3[1] - P0[1])   # góc sau (tự suy ra)
 
 U = (P1[0] - P0[0], P1[1] - P0[1])
@@ -172,32 +174,38 @@ def sinh():
 
     nhom_mat = '<g class="b5-face" data-at="3300" data-once>' + ''.join(mat) + '</g>'
 
-    # ── Nét phác thảo: CHỈ ranh lô + hàng rào ───────────────────────────────
-    # ⚠️ ĐỪNG vẽ thêm khối hộp căn nhà ở đây. Căn nhà nay là ẢNH CHỤP THẬT, mà
-    #    nét vẽ lại nằm ĐÈ LÊN TRÊN ảnh (bản thiết kế xếp nét sau khối nhà) —
-    #    hộp vẽ tay không bao giờ trùng được với căn nhà trong ảnh, nhìn ra ngay
-    #    là "vẽ chưa khớp". Ranh lô thì khớp được, vì bốn góc lấy đúng từ hàng
-    #    rào trong ảnh.
+    # ── Nét phác thảo: BÁM THEO HÀNG RÀO THẬT TRONG ẢNH ────────────────────
+    # ⚠️ ĐỪNG vẽ khối hộp căn nhà ở đây. Căn nhà nay là ẢNH CHỤP THẬT, mà nét
+    #    vẽ nằm ĐÈ LÊN TRÊN ảnh — hộp vẽ tay không bao giờ trùng được với căn
+    #    nhà trong ảnh, nhìn ra ngay là "vẽ chưa khớp".
+    # ⚠️ VÀ ĐỪNG vẽ hình bình hành bốn góc như bản trước. Lô đất nhìn chéo
+    #    không phải hình bình hành phẳng (góc thứ tư khuất sau nhà), nên cạnh
+    #    xa của hình bình hành CẮT NGANG QUA CĂN BIỆT THỰ — chủ dự án xem xong
+    #    bảo "cắt nhìn cái nhà nó cụt ngủn". Nay nét đi đúng chân tường rào
+    #    thật (danh sách VIEN, đọc từ chính tấm ảnh) nên không bao giờ cắt nhà.
     net = []
-    net.append('<path class="draw" pathLength="1" style="--dur:900" stroke="#67e8f9" d="%s"/>'
-               % ds(d(0, 0), d(1, 0), d(1, 1), d(0, 1)))
-    z_rao = TANG * 0.30
+    net.append('<path class="draw" pathLength="1" style="--dur:900" stroke="#67e8f9" '
+               'fill="none" d="%s"/>' % mo(*VIEN))
     net.append('<path class="draw" pathLength="1" style="--d:800;--dur:900" stroke="#fde68a" '
-               'opacity=".85" d="%s"/>'
-               % mo(d(0, 0, z_rao), d(1, 0, z_rao), d(1, 1, z_rao), d(0, 1, z_rao), d(0, 0, z_rao)))
-    tru = ''.join('M%.1f %.1fL%.1f %.1f'
-                  % (d(a_, b_)[0], d(a_, b_)[1], d(a_, b_, z_rao)[0], d(a_, b_, z_rao)[1])
-                  for a_, b_ in ((0, 0), (1, 0), (1, 1), (0, 1)))
+               'fill="none" opacity=".85" d="%s"/>'
+               % mo(*[(x, y - CAO_RAO) for x, y in VIEN]))
+    # Trụ tường: dựng ở vài điểm dọc hàng rào cho ra dáng hàng rào có trụ.
+    tru = ''.join('M%.1f %.1fL%.1f %.1f' % (x, y, x, y - CAO_RAO)
+                  for x, y in VIEN[::3])
     net.append('<path class="draw" pathLength="1" style="--d:1700;--dur:600" stroke="#fde68a" '
-               'opacity=".8" d="%s"/>' % tru)
+               'fill="none" opacity=".8" d="%s"/>' % tru)
     nhom_net = ('<g class="grp b5-wire c15-wire" data-at="1000" data-once>'
                 + ''.join(net) + '</g>')
     return nhom_mat, nhom_net
 
 
 def duong_lo():
-    """Đường vẽ hình lô đất — dán vào THAY_DOAN[15] của tach-banner.py."""
-    return ds(P0, P1, P2, P3)
+    """Hình lô đất — dán vào THAY_DOAN[15] của tach-banner.py.
+
+    Đi theo hàng rào thật rồi khép lại, chứ không phải hình bình hành bốn góc
+    (xem chú thích dài trong sinh()).
+    """
+    return 'M' + 'L'.join('%.1f %.1f' % (x, y) for x, y in VIEN) + 'Z' 
 
 
 if __name__ == '__main__':

@@ -16,6 +16,7 @@ NÓ LÀM NHỮNG GÌ
        public/icons/icon-192.png · icon-512.png · icon-512-maskable.png · apple-180.png
   3. 17 ảnh màn hình chờ khi mở ứng dụng trên iPhone/iPad: public/splash/*.png
   4. bộ logo NGÀY LỄ (cành mai Tết, cờ Tổ quốc, mũ Noel…): public/logo-le/*.webp
+  5. nhúng logo vào hai trang tĩnh: public/offline.html và nginx/maintenance.html
 
 VÌ SAO GOM VỀ MỘT LỆNH
 Logo nằm rải ở hơn hai chục chỗ: thanh menu, icon ứng dụng, màn hình chờ, dấu
@@ -157,6 +158,42 @@ def lam_splash(logo):
     print('  splash: %d anh' % len(SPLASH))
 
 
+def nhung_trang_tinh(logo):
+    """Nhúng thẳng logo (dạng base64) vào trang bảo trì và trang mất mạng.
+
+    ⚠️ HAI TRANG NÀY KHÔNG ĐƯỢC TRỎ VÀO ĐƯỜNG DẪN ẢNH. Chúng hiện ra đúng lúc
+       web đang hỏng: trang bảo trì thì container frontend đã tắt (nginx không
+       lấy được tệp nào từ đó), trang mất mạng thì máy người dùng đang offline.
+       Trỏ /logo-cam-lam.webp là lúc cần nhất lại hỏng ảnh.
+       Nên nhúng thẳng nội dung ảnh vào trang — nặng thêm ~30 KB, đổi lại
+       chắc chắn hiện.
+    """
+    import base64
+    import io as _io
+    nho = logo.copy()
+    nho.thumbnail((160, 160), Image.LANCZOS)      # 25px trên màn hình → 160 là dư nét
+    b = _io.BytesIO()
+    nho.save(b, 'WEBP', quality=88, method=6)
+    uri = 'data:image/webp;base64,' + base64.b64encode(b.getvalue()).decode()
+    for p in (os.path.join(CONG, 'offline.html'),
+              os.path.join(GOC, 'nginx', 'maintenance.html')):
+        if not os.path.exists(p):
+            print('  bo qua (khong thay):', p)
+            continue
+        s = open(p, encoding='utf-8').read()
+        i = s.find('<!-- LOGO-BAT-DAU')
+        j = s.find('<!-- LOGO-KET-THUC -->')
+        if i < 0 or j < 0:
+            print('  bo qua (khong thay dau nhan LOGO-BAT-DAU):', os.path.basename(p))
+            continue
+        k = s.index('<img class="lg"', i)
+        e = s.index('>', k) + 1
+        moi = '<img class="lg" alt="" aria-hidden="true" src="%s">' % uri
+        s = s[:k] + moi + s[e:]
+        open(p, 'w', encoding='utf-8', newline='\n').write(s)
+        print('  nhung logo vao %-18s (%d KB)' % (os.path.basename(p), len(uri) // 1024))
+
+
 def main():
     # 1. Ảnh gốc mới (nếu có) → dựng lại hai tệp logo chính
     if len(sys.argv) > 1:
@@ -174,7 +211,9 @@ def main():
     lam_icon(logo)
     print('3. Anh man hinh cho iPhone/iPad')
     lam_splash(logo)
-    print('4. Logo ngay le')
+    print('4. Nhung logo vao trang bao tri / mat mang')
+    nhung_trang_tinh(logo)
+    print('5. Logo ngay le')
     r = subprocess.run([sys.executable, os.path.join(GOC, 'scripts', 'dung-logo-ngay-le.py')],
                        capture_output=True, text=True, encoding='utf-8', errors='replace')
     print('  ' + (r.stdout or r.stderr or '').strip().replace('\n', '\n  '))

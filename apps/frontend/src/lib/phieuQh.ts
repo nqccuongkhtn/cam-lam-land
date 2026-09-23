@@ -46,8 +46,19 @@ function qhColor(lo: string): string {
   return '#a78bfa';                                                        // tím — khác
 }
 
-// Logo Cam Lâm Land (đồng bộ với logo trên web/Nav) — dùng cho đầu phiếu.
-const NAV_LOGO = `<svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="clNavy" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#123459"/><stop offset="1" stop-color="#081B30"/></linearGradient></defs><rect width="44" height="44" rx="12" fill="url(#clNavy)"/><rect x="1.2" y="1.2" width="41.6" height="41.6" rx="10.8" fill="none" stroke="#C8A14B" stroke-opacity="0.45" stroke-width="1.2"/><path d="M11 21.5 L22 12 L33 21.5" fill="none" stroke="#C8A14B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.2 20 V31.4 H29.8 V20" fill="none" stroke="#C8A14B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="22" cy="25.6" r="2.5" fill="#C8A14B"/></svg>`;
+// ⚠️ LOGO LẤY TỪ ĐÚNG TỆP LOGO CỦA WEB, không vẽ lại bằng SVG.
+//    Trước đây chỗ này vẽ tay một ngôi nhà bằng SVG — đổi logo của web là
+//    phiếu trích lục vẫn in ra logo cũ mà không ai để ý.
+//    Vẫn giữ một bản vẽ dự phòng phía sau: phiếu hay được in ở nơi mạng chập
+//    chờn, tệp ảnh không tải kịp thì đầu phiếu trống hoác, nhìn như phiếu giả.
+function navLogo(origin: string): string {
+  return `<span class="lgbox"><img src="${origin}/logo-cam-lam.webp" alt=""`
+    + ` onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`
+    + `<svg class="fb" style="display:none" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">`
+    + `<path d="M11 21.5 L22 12 L33 21.5" fill="none" stroke="#C8A14B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`
+    + `<path d="M14.2 20 V31.4 H29.8 V20" fill="none" stroke="#C8A14B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`
+    + `<circle cx="22" cy="25.6" r="2.5" fill="#C8A14B"/></svg></span>`;
+}
 
 function star(cx: number, cy: number, r: number): string {
   let p = '';
@@ -395,6 +406,10 @@ function buildHtml(o: PhieuOpts): string {
   .hd { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-bottom: 1.5px solid #0A2540; padding-bottom: 5px; }
   .brand { display: flex; gap: 8px; align-items: center; }
   .logo { width: 42px; height: 42px; flex: none; } .logo img, .logo svg, .logo .fb { width: 42px; height: 42px; display: block; } .logo img { mix-blend-mode: multiply; }
+  /* Ô logo đầu phiếu: nền navy bo góc, bên trong là ảnh logo nét sáng. */
+  .lgbox { display: grid; place-items: center; width: 42px; height: 42px;
+           border-radius: 11px; background: #0A2540; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .lgbox img, .lgbox svg { width: 33px !important; height: 22px !important; object-fit: contain; mix-blend-mode: normal !important; }
   .bname { font-weight: 800; color: #0A2540; font-size: 13px; }
   .bsub { font-size: 9px; color: #444; }
   .qrbox { text-align: center; font-size: 8px; color: #555; }
@@ -451,7 +466,7 @@ function buildHtml(o: PhieuOpts): string {
   <div class="toolbar"><button onclick="try{window.close()}catch(e){}setTimeout(function(){if(!window.closed){if(history.length>1){history.back()}else{location.href='/map'}}},200)" style="background:#fff;color:#0A2540">← Quay lại</button><button onclick="window.print()">🖨 In / Lưu PDF (1 trang A4)</button><span>Chỉ cần điền mục 1 (người yêu cầu) và mục 4 (mục đích SDĐ) trước khi in</span></div>
   <div class="wrap"><div class="sheet">
     <div class="hd">
-      <div class="brand"><span class="logo">${NAV_LOGO}</span><div><div class="bname">${SITE.ten}</div><div class="bsub">${SITE.mota} · ☎ ${SITE.hotline} · ${SITE.domain}</div></div></div>
+      <div class="brand">${navLogo(origin)}<div><div class="bname">${SITE.ten}</div><div class="bsub">${SITE.mota} · ☎ ${SITE.hotline} · ${SITE.domain}</div></div></div>
       <div class="qrbox"><img id="qr" src="${qrSrc}" alt="QR" onerror="this.style.display='none'"><div>Quét mở thửa</div></div>
     </div>
 

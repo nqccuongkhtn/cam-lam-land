@@ -230,7 +230,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
   useEffect(() => {
     if (dangRa === null) return;
     clearTimeout(henRa.current);
-    henRa.current = window.setTimeout(() => setDangRa(null), 520);   // khớp với thời lượng hiệu ứng trượt trong CSS
+    henRa.current = window.setTimeout(() => setDangRa(null), 660);   // khớp với thời lượng hiệu ứng trượt trong CSS
     return () => clearTimeout(henRa.current);
   }, [dangRa, chiSo]);
   const khongGan = useCallback(() => {}, []);
@@ -498,7 +498,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
                bắt đầu ở trạng thái trong suốt rồi mới hiện dần, nên nếu không
                ép hiện đủ thì lúc trượt ra nó thành một khung trống trượt ngang
                qua màn hình. */
-            lop={`cl-b11 absolute inset-0 z-10 ${huongLuot > 0 ? 'cl-b11-ra-trai' : 'cl-b11-ra-phai'}`}
+            lop={`cl-b11 cl-b11-lop-tren ${huongLuot > 0 ? 'cl-b11-ra-trai' : 'cl-b11-ra-phai'}`}
             nhan={khongGan}
           />
         )}

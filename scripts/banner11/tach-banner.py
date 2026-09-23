@@ -78,6 +78,16 @@ BO_MAU = [
 
 # ── SỬA CHỮ: {số thứ tự mẫu: [(chữ cũ, chữ mới), ...]} ───────────────────────
 SUA_CHU = {
+    # Mẫu 18 nay nói về ĐÔ THỊ MỚI (toà nhà cao tầng vượt khung), không còn nói
+    # về sân bay nữa — phần sân bay đã có mẫu 7 lo rồi, để cả hai là trùng ý.
+    18: [
+        ('Cửa ngõ hàng không', 'Đô thị mới'),
+        ('Bay xa hơn', 'Vươn cao'),
+        ('từ Cam Lâm', 'giữa lòng Cam Lâm'),
+        ('Sân bay quốc tế chỉ cách một quãng ngắn, đi công tác, du lịch hay đón người thân đều thuận tiện.',
+         'Nhà cao tầng, hạ tầng mới đang hình thành trên vùng đất quy hoạch thành đô thị.'),
+        ('Máy bay bay ra khỏi khung ảnh', 'Toà nhà cao tầng vươn ra khỏi khung ảnh'),
+    ],
     # Mẫu 19: nền nay là bản đồ quy hoạch THẬT và ranh thửa THẬT của web, nên
     # phần chú giải phải nói đúng thứ đang hiện, không còn "LUC · Đất trồng lúa"
     # vẽ tay nữa.
@@ -137,8 +147,53 @@ RANH_VE_TAY = ''' <g fill="none" stroke="#7a3e12" stroke-width="2.6" stroke-line
 RANH_THAT = ('<image href="/banner11/m19-ranh-thua.webp" x="0" y="40" width="1000" height="323" '
              'preserveAspectRatio="xMidYMid slice" opacity=".92"/>')
 
+#    Mẫu 18 "Chủ thể vượt khung": đổi MÁY BAY thành TOÀ NHÀ CAO TẦNG (chủ dự án
+#    yêu cầu). Chiếc máy bay trong bản gốc là hình vẽ vector dùng làm mặt nạ, nên
+#    toà nhà cũng vẽ vector — luôn khớp, khỏi đi tìm ảnh toà nhà đã tách nền.
+#    Ảnh trong khung đổi sang ảnh đô thị ven biển; ảnh mới là ảnh NGANG còn ảnh cũ
+#    là ảnh DỌC nên phải tính lại chỗ đặt, để nguyên thông số cũ là ảnh méo.
+_A18_CU = ('https://images.unsplash.com/photo-1580698872460-261e00561f35'
+           '?w=1600&q=80&auto=format&fit=crop" width="1000" height="1472.5" '
+           'preserveAspectRatio="none" transform="translate({t} -471.5) scale(1.0769)"')
+_A18_MOI = ('/banner11/un-1775300382637-2000.webp" width="1000" height="666.7" '
+            'preserveAspectRatio="none" transform="translate({t} 40) scale(0.85)"')
+_MAY_BAY = ('<g class="c18-plane" data-at="1500"><g mask="url(#c18PlaneMask)">'
+            '<image href="https://images.unsplash.com/photo-1580698872460-261e00561f35'
+            '?w=1600&q=80&auto=format&fit=crop" width="1000" height="1472.5" '
+            'preserveAspectRatio="none" transform="translate(736.9 -471.5) scale(1.0769)"/></g></g>')
+# ⚠️ Toạ độ đã HẠ XUỐNG 46 đơn vị so với lần đầu. Banner nay thấp hơn khổ thiết
+#    kế (cắt bớt trên/dưới) nên đỉnh toà nhà đặt cao quá là bị cắt mất.
+_O_SO = (''.join(f'<rect x="{x}" y="{y}" width="14" height="10" rx="2"/>'
+                 for y in range(102, 346, 26) for x in (1334, 1360, 1386, 1412))
+         + ''.join(f'<rect x="{x}" y="{y}" width="11" height="8" rx="2"/>'
+                   for y in range(164, 346, 26) for x in (1272, 1294))
+         + ''.join(f'<rect x="{x}" y="{y}" width="11" height="8" rx="2"/>'
+                   for y in range(200, 346, 26) for x in (1462, 1486)))
+# ⚠️ Toà nhà phải vẽ bằng MÀU SÁNG. Đã thử màu xanh đậm và nó chìm nghỉm: nền
+#    banner là xanh rất tối, còn ảnh trong khung là ảnh thành phố ban đêm —
+#    hình tối trên nền tối thì không ai thấy gì.
+_TOA_NHA = ('<g class="c18-plane" data-at="1500" filter="url(#c18Bong)">'
+            '<g>'
+            '<rect x="1318" y="74" width="132" height="292" rx="8" fill="#eaf4ff"/>'
+            '<rect x="1318" y="74" width="132" height="14" rx="7" fill="#38bdf8"/>'
+            '<rect x="1376" y="48" width="10" height="28" fill="#38bdf8"/>'
+            '<rect x="1258" y="142" width="62" height="224" rx="6" fill="#cfe4fb"/>'
+            '<rect x="1448" y="178" width="74" height="188" rx="6" fill="#cfe4fb"/>'
+            '</g><g fill="#1d4ed8" opacity=".55">' + _O_SO + '</g></g>')
+# Bóng đổ cho toà nhà tách hẳn khỏi nền
+_BONG = ('<filter id="c18Bong" x="-30%" y="-30%" width="160%" height="160%">'
+         '<feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#04101f" flood-opacity=".55"/>'
+         '</filter>')
+
 THAY_DOAN = {
     9: [(BAN_DO_VE_TAY, BAN_DO_THAT)],
+    18: [
+        ('<filter id="c18Feather"', _BONG + '<filter id="c18Feather"'),
+        (_MAY_BAY, _TOA_NHA),
+        (_A18_CU.format(t='736.9'), _A18_MOI.format(t='1000')),
+        (_A18_CU.format(t='1026.9'), _A18_MOI.format(t='1290')),
+        (_A18_CU.format(t='446.9'), _A18_MOI.format(t='710')),
+    ],
     19: [(ANH_GIA_BAN_DO, ANH_BAN_DO_THAT), (RANH_VE_TAY, RANH_THAT)],
     12: [
         ('scale="10"', 'scale="4"'),                       # gợn nhẹ hẳn đi

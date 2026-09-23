@@ -63,17 +63,21 @@
 /* ── HIỆU ỨNG LƯỚT KHI ĐỔI MẪU ──────────────────────────────────────────────
    Hai mẫu cùng chạy ngang qua nhau: mẫu cũ trượt ra một bên, mẫu mới trượt vào
    từ bên kia — giống lướt ảnh trên điện thoại.
-   ⚠️ Trước đây chỉ cho mẫu mới dịch vào 6% nên gần như không ai thấy, chủ dự án
-   báo "vẫn mất hiệu ứng lướt". Nay trượt trọn cả bề ngang. */
+   ⚠️ HAI LẦN ĐÃ VẤP, đừng làm lại:
+   1) Chỉ cho mẫu mới dịch vào 6% — gần như không ai thấy.
+   2) Dùng đường cong `cubic-bezier(.22,1,.28,1)`: đo thật thì ở 69% thời gian
+      banner đã đi hết 97% quãng đường — mắt nhìn ra một cú GIẬT chứ không phải
+      trượt. Nay dùng `cubic-bezier(.5,0,.25,1)`: chậm ở đầu, nhanh ở giữa, êm ở
+      cuối — đúng cảm giác lướt. */
 @keyframes cl-b11-vao-phai { from { transform: translate3d(100%, 0, 0) } to { transform: none } }
 @keyframes cl-b11-vao-trai { from { transform: translate3d(-100%, 0, 0) } to { transform: none } }
 @keyframes cl-b11-ra-trai  { from { transform: none } to { transform: translate3d(-100%, 0, 0) } }
 @keyframes cl-b11-ra-phai  { from { transform: none } to { transform: translate3d(100%, 0, 0) } }
 
-.cl-b11-vao-phai { animation: cl-b11-vao-phai .48s cubic-bezier(.22, 1, .28, 1) both }
-.cl-b11-vao-trai { animation: cl-b11-vao-trai .48s cubic-bezier(.22, 1, .28, 1) both }
-.cl-b11-ra-trai  { animation: cl-b11-ra-trai  .48s cubic-bezier(.22, 1, .28, 1) both }
-.cl-b11-ra-phai  { animation: cl-b11-ra-phai  .48s cubic-bezier(.22, 1, .28, 1) both }
+.cl-b11-vao-phai { animation: cl-b11-vao-phai .62s cubic-bezier(.5, 0, .25, 1) both }
+.cl-b11-vao-trai { animation: cl-b11-vao-trai .62s cubic-bezier(.5, 0, .25, 1) both }
+.cl-b11-ra-trai  { animation: cl-b11-ra-trai  .62s cubic-bezier(.5, 0, .25, 1) both }
+.cl-b11-ra-phai  { animation: cl-b11-ra-phai  .62s cubic-bezier(.5, 0, .25, 1) both }
 
 /* ── VỆT SÁNG QUÉT QUA KHI MẪU MỚI VỪA VÀO ──────────────────────────────────
    Lấy ý từ vệt sáng của bản thiết kế (mẫu 2 và 11 có sẵn), nhưng dùng chung
@@ -91,7 +95,15 @@
   background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .34) 45%, transparent);
   animation: cl-b11-quet 1.05s cubic-bezier(.4, 0, .2, 1) .18s both;
 }
+/* ⚠️ ĐÂY LÀ CHỖ ĐÃ GÂY LỖI CHUYỂN BANNER — đọc kỹ.
+   `.cl-b11 { position: relative }` này đè mất lớp `absolute` của Tailwind (hai
+   bên cùng độ ưu tiên, bên nào khai sau thì thắng — và file này khai sau).
+   Hậu quả: lúc đổi mẫu, mẫu cũ đáng lẽ nằm ĐÈ LÊN mẫu mới thì lại nằm XẾP TRÊN
+   nó, đẩy banner tụt hẳn xuống và chừa một mảng trắng to ở đầu trang.
+   Nên mẫu đang trượt ra dùng lớp riêng `cl-b11-lop-tren` bên dưới, không dùng
+   lớp của Tailwind nữa. */
 .cl-b11 { position: relative }
+.cl-b11-lop-tren { position: absolute !important; inset: 0; z-index: 10 }
 
 /* Máy đặt "giảm chuyển động" thì đổi mẫu không trượt, không quét. */
 @media (prefers-reduced-motion: reduce) {
@@ -164,4 +176,24 @@
    của phần đồ hoạ. */
 @media (min-width: 1101px) {
   .cl-b11 .rb-couple { transform: translateX(7%) }
+}
+
+/* Mẫu 18: bản gốc cho chiếc máy bay BAY VÚT ĐI (lao chéo lên rồi to dần).
+   Nay là toà nhà cao tầng nên đổi thành động tác VƯƠN LÊN — nhô dần lên khỏi
+   khung ảnh rồi đứng yên, hợp với toà nhà hơn. */
+@keyframes cl-b11-vuon {
+  0%   { opacity: 0; transform: translateY(46px) }
+  60%  { opacity: 1 }
+  100% { opacity: 1; transform: translateY(0) }
+}
+.cl-b11 .c18-plane.go { animation: cl-b11-vuon 1.4s cubic-bezier(.16, 1, .3, 1) both !important }
+
+/* ⚠️ Bản thiết kế ẩn `.c18-plane` khi banner ở chế độ ĐỨNG YÊN, vì chỗ đó vốn
+   là chiếc máy bay đang bay — đứng yên thì chiếc máy bay lơ lửng nhìn vô lý.
+   Nay chỗ đó là TOÀ NHÀ CAO TẦNG, tức là nội dung chính của mẫu, ẩn đi là mất
+   hẳn. Nên bắt nó hiện lại. */
+.cl-b11 .banner.static .c18-plane {
+  display: block !important;
+  opacity: 1 !important;
+  transform: none !important;
 }

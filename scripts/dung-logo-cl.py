@@ -2,7 +2,11 @@
 """
 DUNG TEP LOGO "CL" (MAU 7) CHO THANH MENU
 ==========================================
-Chu du an chon MAU 7 trong bang 10 mau gui qua chat: chu long **CL** —
+⛔ KHONG PHAI BAN DANG CHAY. Chu du an thu mau 7 roi doi y, quay ve logo
+   ngoi nha (scripts/dung-logo.py). Giu file nay lai de muon xem lai mau 7
+   thi chay mot lenh la co, khoi cat anh lai tu dau.
+
+Chu du an tung chon MAU 7 trong bang 10 mau gui qua chat: chu long **CL** —
 chu C la vanh trang khuyet mau navy, chu L nam long trong do mau vang dong.
 Yeu cau: **bo hai dong chu "CAM LAM / NHA DAT"**, chi lay rieng hinh chu long.
 

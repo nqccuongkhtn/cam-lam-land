@@ -113,14 +113,6 @@ SUA_CHU = {
     # quan tâm: chỗ đó có gì quanh mình.
     17: [('Dự án được đánh dấu ngay trên ảnh thật, thấy rõ sông, cầu và phố phường xung quanh.',
           'Sát mặt sông, cạnh cầu lớn, xung quanh là phố đã có người ở — đi lại, mua bán đều thuận.')],
-    # Mẫu 10 nay là BẢN ĐỒ QUY HOẠCH chứ không còn là ảnh flycam, nên chữ phải
-    # nói đúng thứ đang hiện. Dòng chữ nhỏ ở góc cũng đổi: "REC · ALT 30 m" là
-    # ký hiệu đang quay phim, để lại thì sai hẳn.
-    10: [('Ảnh flycam · Cam Lâm', 'Bản đồ quy hoạch · Cam Lâm'),
-         ('trên ảnh thật', 'trên bản đồ quy hoạch'),
-         ('Ranh thửa, loại đất và kích thước hiện ngay trên ảnh chụp từ trên cao, nhìn là hiểu.',
-          'Ranh thửa, loại đất và kích thước hiện ngay trên bản đồ quy hoạch, nhìn là hiểu.'),
-         ('REC · ALT 30 m', 'QĐ 205 · TỈ LỆ 1:2000')],
     # Mẫu 14 đã đổi sang ảnh tháp gạch, không còn mái ngói nào → sửa chữ cho
     # khớp ảnh. Vẫn viết chung chung, không nêu tên di tích (xem ghi chú DOI_ANH).
     14: [
@@ -136,9 +128,9 @@ SUA_CHU = {
 #    Dùng khi đoạn cần thay quá dài để chép nguyên văn vào đây (vd mặt nạ hình
 #    chiếc máy bay của mẫu 18 dài gần 3.000 ký tự).
 THAY_BIEU_THUC = {
-    # Thay nguyên cả khối <svg class="fill-svg"> của mẫu 10 (xem SVG_MAU10)
-    10: [(r'<svg class="fill-svg" viewBox="0 0 1000 750".*?</svg>', '__SVG_MAU10__')],
-    18: [(r'<mask id="c18PlaneMask".*?</mask>', '__MAT_NA_MOI__')],
+    # Xoá nhóm `c18-patch` của mẫu 18 (xem lý do ở THAY_DOAN[18])
+    18: [(r'<g class="c18-patch[^>]*>.*?</g></g>', ''),
+         (r'<mask id="c18PlaneMask".*?</mask>', '__MAT_NA_MOI__')],
     # Mẫu 15: thay căn nhà 1 trệt của bản thiết kế bằng NHÀ 3 TẦNG CÓ SÂN VƯỜN.
     # Hình do scripts/banner11/ve-nha-mau15.py tính ra từ chính hình bình hành
     # của lô đất, nên nhà đứng khít trên đất chứ không lệch.
@@ -213,7 +205,7 @@ _A18_CU = ('https://images.unsplash.com/photo-1580698872460-261e00561f35'
 #    scripts/banner11/tach-toa-nha-mau18.py — đổi một bên thì chạy lại bên kia,
 #    lệch là ảnh cắt rời không nằm khít lên ảnh trong khung.
 _A18_MOI = ('/banner11/mia-goldcoast-800.webp" width="1000" height="1500" '
-            'preserveAspectRatio="none" transform="translate({t} -25.6) scale(0.72)"')
+            'preserveAspectRatio="none" transform="translate({t} 28.1) scale(0.375)"')
 _MAY_BAY = ('<g class="c18-plane" data-at="1500"><g mask="url(#c18PlaneMask)">'
             '<image href="https://images.unsplash.com/photo-1580698872460-261e00561f35'
             '?w=1600&q=80&auto=format&fit=crop" width="1000" height="1472.5" '
@@ -234,8 +226,8 @@ _MAT_NA_MOI = ''
 # Nay dùng ảnh ĐÃ CẮT THEO ĐÚNG BÓNG toà nhà (nền trong suốt), do
 # scripts/banner11/tach-toa-nha-mau18.py dựng ra. Chỗ đặt cũng do script đó tính.
 _TOA_NHA = ('<g class="c18-plane" data-at="1500">'
-            '<image href="/banner11/m18-toanha.webp" x="1325.4" y="95.0" '
-            'width="171.0" height="180.9"/></g>')
+            '<image href="/banner11/m18-toanha.webp" x="1433.4" y="90.9" '
+            'width="89.1" height="94.2"/></g>')
 
 #    Mẫu 15: hình phác thảo căn nhà nằm sát ĐÁY khổ thiết kế (y 693–746 trong
 #    khung nhìn 524–750). Banner nay thấp hơn khổ gốc, lại có khung tìm kiếm ở
@@ -254,7 +246,13 @@ NEN_MAU7_MOI = '<div class="bb-circle bb-big" data-at="200" data-once style="--f
 ANH_THAT_MAU19_CU = '<image href="https://images.pexels.com/photos/35995788/pexels-photo-35995788.jpeg?auto=compress&cs=tinysrgb&w=2000" width="1000" height="750" preserveAspectRatio="none"/>'
 ANH_THAT_MAU19_MOI = '<image href="/banner11/m19-vetinh.webp" x="0" y="40" width="1000" height="323" preserveAspectRatio="none"/>'
 
-# ── MẪU 10: BẢN ĐỒ QUY HOẠCH + RANH THỬA THẬT ──────────────────────────────
+# ── MẪU 10: GIỮ NGUYÊN BẢN THIẾT KẾ (ảnh flycam + ranh vẽ tay) ─────────────
+# ⛔ ĐỪNG BẬT LẠI BẢN "BẢN ĐỒ QUY HOẠCH". Đã dựng xong, đưa lên xem, và CHỦ DỰ
+#    ÁN TỪ CHỐI HAI LẦN: lần đầu "cái này giữ như cũ", lần sau "lại đưa qua mẫu
+#    này, tôi bảo giữ mẫu cũ mà". Mã dựng vẫn để lại đây và ở
+#    scripts/banner11/dung-anh-mau10.py phòng khi sau này cần, nhưng KHÔNG được
+#    tự ý thêm lại vào THAY_BIEU_THUC/SUA_CHU nếu chủ dự án chưa yêu cầu.
+# ── (mô tả bản đã dựng, hiện KHÔNG dùng) ───────────────────────────────────
 # Bản thiết kế vẽ ranh thửa BẰNG TAY lên một tấm ảnh flycam đồng lúa. Chủ dự án
 # muốn "ảnh quy hoạch chứ không phải ảnh flycam", và "zoom nhỏ ảnh để thấy thửa
 # đầy đủ hơn" (ảnh cũ phóng quá to nên thửa nào cũng bị mép banner cắt cụt).
@@ -301,33 +299,33 @@ THAY_DOAN = {
          ('Phác thảo ngôi nhà trên lô đất trống cạnh đầm nuôi',
           'Phác thảo căn nhà 3 tầng có sân vườn trên lô đất trống')],
     18: [
-    # ── HẠ CẢ KHUNG ẢNH XUỐNG 90 ĐƠN VỊ ────────────────────────────────────
-    # ⚠️ LÝ DO — chỗ này không nhìn bản thiết kế mà đoán được:
-    #    banner nằm NGAY DƯỚI thanh menu của web, mà thanh menu che mất khoảng
-    #    60 điểm ảnh trên cùng. Bản thiết kế đặt mép trên khung ảnh ở y = 110,
-    #    tính ra chỉ còn ~19 đơn vị trống phía trên → toà nhà nhô ra bao nhiêu
-    #    cũng bị thanh menu nuốt, nhìn như không có hiệu ứng gì.
-    #    Hạ khung xuống 90 đơn vị (mép trên còn y = 200) thì phần nhô ra có hẳn
-    #    ~105 đơn vị trống để phô ra. Ba khung trang trí phía sau hạ theo đúng
-    #    bấy nhiêu, chiều cao rút lại để đáy vẫn nằm nguyên chỗ cũ.
+    # ── KHUNG ẢNH ĐỔI THÀNH KHUNG ĐỨNG ─────────────────────────────────────
+    # Bản thiết kế để khung NẰM NGANG (700×470). Toà nhà trong ảnh lại cao và
+    # thon (cao gấp đôi bề ngang) nên khung ngang chỉ lọt được một khúc thân
+    # nhà — chủ dự án muốn "thấy từ nền đường lên đỉnh toà nhà".
+    # Nay đổi thành KHUNG ĐỨNG 368×430 đặt bên phải: lọt trọn từ mặt đường,
+    # khối đế, thân tháp, lên tới gần đỉnh; phần chóp còn lại nhô ra ngoài khung
+    # làm hiệu ứng vượt khung.
+    # ⚠️ Mép trên khung để ở y = 150 chứ không cao hơn: banner nằm dưới thanh
+    #    menu, phần trên y ≈ 91 bị menu che, phải chừa chỗ cho chóp nhà nhô ra.
     ('<rect x="1060" y="110" width="700" height="470" rx="48"/>',
-     '<rect x="1060" y="200" width="700" height="380" rx="48"/>'),
+     '<rect x="1292" y="150" width="368" height="430" rx="40"/>'),
     ('<rect x="1060" y="110" width="700" height="470" rx="48" fill="none"',
-     '<rect x="1060" y="200" width="700" height="380" rx="48" fill="none"'),
+     '<rect x="1292" y="150" width="368" height="430" rx="40" fill="none"'),
     ('<rect class="r3" x="988" y="38" width="844" height="614" rx="120"',
-     '<rect class="r3" x="988" y="128" width="844" height="524" rx="120"'),
+     '<rect class="r3" x="1240" y="98" width="472" height="534" rx="80"'),
     ('<rect class="r2" x="1012" y="62" width="796" height="566" rx="96"',
-     '<rect class="r2" x="1012" y="152" width="796" height="476" rx="96"'),
+     '<rect class="r2" x="1258" y="116" width="436" height="498" rx="66"'),
     ('<rect class="r1" x="1036" y="86" width="748" height="518" rx="72"',
-     '<rect class="r1" x="1036" y="176" width="748" height="428" rx="72"'),
-    ('<mask id="c18PatchMask" maskUnits="userSpaceOnUse" x="1150" y="90" width="440" height="260">'
-     '<rect x="1223" y="145" width="280" height="139" rx="40"',
-     '<mask id="c18PatchMask" maskUnits="userSpaceOnUse" x="1150" y="180" width="440" height="260">'
-     '<rect x="1223" y="235" width="280" height="139" rx="40"'),
+     '<rect class="r1" x="1275" y="133" width="402" height="464" rx="52"'),
+    # ⛔ Bỏ hẳn nhóm `c18-patch`: bản thiết kế chồng hai bản sao ảnh lệch nhau
+    #    qua một mặt nạ bo tròn để tạo cảm giác "phố nhân đôi". Với tấm ảnh này
+    #    nó hiện ra đúng một ô chữ nhật lệch hàng giữa thân toà nhà, nhìn như
+    #    lỗi hiển thị (chủ dự án đã bắt lỗi).
         (_MAY_BAY, _TOA_NHA),
-        (_A18_CU.format(t='736.9'), _A18_MOI.format(t='1050')),
-        (_A18_CU.format(t='1026.9'), _A18_MOI.format(t='1340')),
-        (_A18_CU.format(t='446.9'), _A18_MOI.format(t='760')),
+        (_A18_CU.format(t='736.9'), _A18_MOI.format(t='1290')),
+        # (Hai bản sao ảnh của nhóm `c18-patch` đã bị xoá nên không còn gì để
+        #  thay — xem THAY_BIEU_THUC[18].)
     ],
     19: [(ANH_THAT_MAU19_CU, ANH_THAT_MAU19_MOI),
          (ANH_GIA_BAN_DO, ANH_BAN_DO_THAT), (RANH_VE_TAY, RANH_THAT)],

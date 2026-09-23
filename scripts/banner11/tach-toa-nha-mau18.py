@@ -43,7 +43,7 @@ LOC_XANH = True     # xem ghi chú ở bước lọc màu xanh trời bên dư�
 
 # Cách đặt tấm ảnh trong bản thiết kế (phải khớp với THAY_DOAN[18] của
 # tach-banner.py): ảnh 800×1200 vẽ vào ô 1000×1500 rồi translate(tx ty) scale(s)
-TX, TY, S = 1050.0, -25.6, 0.72
+TX, TY, S = 1290.0, 28.1, 0.375
 
 
 def main():
@@ -143,8 +143,8 @@ def main():
     print('== DAN VAO tach-banner.py ==')
     print('<image href="/banner11/m18-toanha.webp" x="%.1f" y="%.1f" width="%.1f" height="%.1f"/>'
           % (X, Y, W, H))
-    print('Dinh toa nha o y=%.1f (mep tren khung anh la y=200) => nho ra %.0f don vi'
-          % (Y, 200 - Y))
+    print('Dinh toa nha o y=%.1f (mep tren khung anh la y=150) => nho ra %.0f don vi'
+          % (Y, 150 - Y))
 
     thu = Image.new('RGB', out.size, (11, 36, 71))
     thu.paste(out, (0, 0), out)

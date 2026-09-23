@@ -315,19 +315,9 @@
 .cl-b11 .banner.static .c7-maybay { animation: none !important; transform: none !important }
 
 
-/* ══ MẪU 10: ĐỔI MÀU NÉT CHO HỢP NỀN BẢN ĐỒ SÁNG ═══════════════════════════
-   Bản thiết kế vẽ ranh thửa màu TRẮNG vì nền là ảnh flycam tối. Nay nền là bản
-   đồ quy hoạch nền sáng → nét trắng mất hút. Đổi sang xanh đậm, nhãn chữ đổi
-   sang chữ tối viền trắng.
-   Cụm chữ bên trái vẫn đọc được vì lớp `.fl-shade` phủ tối nửa trái. */
-.cl-b11 .st-fly { background: #eef2f6 }
-.cl-b11 .st-fly .fl-parcels path { stroke: #1e3a8a; stroke-width: 2.4; opacity: .95 }
-.cl-b11 .st-fly .fl-hl { fill: rgba(251, 191, 36, .3); stroke: #b45309; stroke-width: 4.5 }
-.cl-b11 .st-fly .fl-measure path { stroke: #7f1d1d; stroke-width: 3 }
-.cl-b11 .st-fly .hud i { border-color: rgba(15, 23, 42, .5) }
-.cl-b11 .st-fly .hud .rec { color: #0f172a }
-.cl-b11 .st-fly .hud .cross::before,
-.cl-b11 .st-fly .hud .cross::after { background: #0f172a }
+/* (Mẫu 10 GIỮ NGUYÊN bản thiết kế — không có luật riêng nào ở đây.
+   ⛔ Từng có một bộ luật đổi màu nét cho nền bản đồ sáng; chủ dự án đã từ chối
+      bản bản-đồ-quy-hoạch hai lần nên đã gỡ. Đừng thêm lại.) */
 
 
 /* ══ MẪU 16 "MỌI CUNG ĐƯỜNG ĐỀU DẪN VỀ NHÀ": kéo màu cho ra BIỂN MÙA HÈ ══════

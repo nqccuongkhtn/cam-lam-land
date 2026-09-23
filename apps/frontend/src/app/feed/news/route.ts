@@ -51,7 +51,15 @@ const T_NEAR = /(Cam\s*Ranh|Nha\s*Trang|Ninh\s*Hòa|Ninh\s*Hoa)/i;
 const T_KH = /(Khánh\s*Hòa|Khanh\s*Hoa|Diên\s*Khánh|Vạn\s*Ninh|Trường\s*Sa|Khánh\s*Sơn|Khánh\s*Vĩnh)/i;
 const tierOf = (t: string): number => (T_CAMLAM.test(t) ? 3 : T_NEAR.test(t) ? 2 : T_KH.test(t) ? 1 : 0);
 
-const decode = (s: string): string => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ').trim();
+/* ⚠️ PHẢI GIẢI MÃ CẢ KÝ TỰ DẠNG SỐ (&#xE1; &#225;). Báo hay viết tiếng Việt
+   kiểu này trong thẻ meta; thiếu bước đó thì bài đăng lên đầy "Ph&#xE1;p
+   lu&#x1EAD;t" — đã thấy tận mắt một lần. */
+const decode = (s: string): string => s
+  .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+  .replace(/&#x([0-9a-f]+);/gi, (_m, h) => String.fromCodePoint(parseInt(h, 16)))
+  .replace(/&#(\d+);/g, (_m, n) => String.fromCodePoint(Number(n)))
+  .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
+  .replace(/&#39;/g, "'").replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ').trim();
 const strip = (s: string): string => s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 const vnSlug = (s: string): string => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60).replace(/-+$/, '');
 const shortHash = (s: string): string => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h.toString(); }; // đuôi slug = SỐ
@@ -112,7 +120,13 @@ let lastErr: string | null = null;
 
 const newsPrompt = (title: string, full: string): string => `Bạn là biên tập viên một toà soạn tin tức bất động sản. Biên tập lại bài dưới đây thành một bài hoàn chỉnh bằng tiếng Việt, đúng chuẩn báo chí.
 
+TRƯỚC TIÊN — KIỂM TRA ĐẦU VÀO  (bước này làm trước, đừng bỏ)
+- Đọc phần NỘI DUNG BÀI GỐC. Nếu nó KHÔNG phải một bài báo hoàn chỉnh — chỉ là thực đơn trang web, danh sách chuyên mục, dòng "Đăng nhập / Quảng cáo / Xem thêm", hoặc có dưới 3 đoạn văn thật — thì TRẢ VỀ ĐÚNG MỘT DÒNG: KHÔNG ĐỦ
+  (Viết bài từ mớ đó là ra một bài vô nghĩa. Thà không có bài còn hơn có bài rác.)
+- Nếu bài gốc còn sót thực đơn, tên chuyên mục, dòng giờ đăng, tên tác giả, dòng "Ảnh: …" ở đầu hay cuối thì BỎ HẲN mấy thứ đó, chỉ lấy phần nội dung thật.
+
 CÁCH DỰNG BÀI
+- GIỮ ĐỦ Ý: mỗi đoạn có nội dung của bài gốc đều phải có mặt trong bản biên tập. Được gộp hai đoạn cùng ý làm một, nhưng KHÔNG được bỏ mất một ý nào. Bài gốc có 8 đoạn mà bản biên tập còn 2 đoạn là hỏng.
 - Đoạn đầu là SAPO: 2–3 câu, trả lời ngay chuyện gì xảy ra, ở đâu, khi nào, cơ quan/đơn vị nào quyết định. Đừng mở bài vòng vo.
 - Các đoạn sau xếp theo mức quan trọng giảm dần (tháp ngược): cắt đoạn cuối đi bài vẫn đọc được.
 - Mỗi đoạn 2–4 câu, cách nhau MỘT DÒNG TRỐNG. Câu trung bình dưới 25 chữ.
@@ -152,6 +166,8 @@ RÀ SOÁT LẠI TRƯỚC KHI TRẢ VỀ  (đây là bước của thư ký toà 
 
 TRẢ VỀ
 - Chỉ phần thân bài. Không thêm tiêu đề, không viết "Tóm tắt:", "Bài viết:", không chú thích cuối bài.
+- Không mở đầu bằng tên chuyên mục, ngày giờ đăng hay tên tác giả.
+- Nếu đã kết luận ở bước KIỂM TRA ĐẦU VÀO là không đủ, chỉ trả về đúng: KHÔNG ĐỦ
 
 TIÊU ĐỀ BÀI GỐC: ${title}
 
@@ -238,12 +254,30 @@ async function fetchArticle(url: string): Promise<{ text: string; images: string
        mấy thẻ <article> nhỏ cho "tin liên quan" NẰM TRƯỚC thân bài → lấy trúng
        cái rỗng, trích ra 0 đoạn, bài đăng lên chỉ còn đúng câu tóm tắt lặp lại.
        Nay gom TẤT CẢ ứng viên rồi chọn cái nào trích ra được NHIỀU CHỮ NHẤT. */
+    /* Một ĐOẠN VĂN THẬT khác một dòng menu ở chỗ nào?
+       ⚠️ Đã vấp: chỉ đếm số chữ thì cả trang báo (kể cả thực đơn "Podcast /
+          YouTube / Cần biết / Quảng cáo / Tất cả chuyên mục…") lại nhiều chữ
+          hơn thân bài → bài đăng lên mở đầu bằng nguyên cái thực đơn.
+       Nên đoạn văn phải thoả:
+         · có câu hoàn chỉnh (có dấu chấm/hỏi/than ở giữa hoặc ở cuối);
+         · không phải kiểu menu — menu thì chữ nào cũng viết hoa. */
+    const laDoanVan = (t: string): boolean => {
+      if (t.length < 45) return false;
+      if (!/[.!?…]["»)\]]?\s*$/.test(t) && !/[.!?]\s/.test(t)) return false;
+      const tu = t.split(/\s+/);
+      if (tu.length < 8) return false;
+      const hoa = tu.filter((w) => /^[A-ZÀ-Ỹ]/.test(w)).length;
+      if (hoa / tu.length > 0.42) return false;
+      return true;
+    };
     const doanTu = (kh: string): string[] => {
       const ra: string[] = [];
       for (const m of kh.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)) {
         const t = strip(decode(m[1]));
-        if (t.length >= 45 && !/^(theo |nguồn|ảnh\s*:|video\s*:|xem thêm|đọc thêm|>>)/i.test(t)
-            && !/[Ảả]nh\s*:\s*\S/.test(t) && !/^[Nn]guồn\s*:\s*\S/.test(t)) ra.push(t);
+        if (!laDoanVan(t)) continue;
+        if (/^(theo |nguồn|ảnh\s*:|video\s*:|xem thêm|đọc thêm|>>)/i.test(t)) continue;
+        if (/[Ảả]nh\s*:\s*\S/.test(t) || /^[Nn]guồn\s*:\s*\S/.test(t)) continue;
+        ra.push(t);
       }
       return ra;
     };
@@ -262,23 +296,30 @@ async function fetchArticle(url: string): Promise<{ text: string; images: string
       }
       return cat < kh.length ? kh.slice(0, cat) : kh;
     };
-    const ungVien: string[] = [];
-    for (const m of html.matchAll(/<article[\s\S]*?<\/article>/gi)) ungVien.push(m[0]);
-    for (const m of html.matchAll(/<div[^>]+(?:id|class)=["'][^"']*(?:detail-content|detail-cmain|afcbc-body|article-body|fck_detail|contentdetail|news-content|main-?content|entry-content|the-article-body|content_detail|singular-content)[^"']*["'][\s\S]*$/gi)) ungVien.push(m[0]);
-    ungVien.push(html);
+    /* Gom ứng viên theo THỨ TỰ ƯU TIÊN, cả trang là hạng bét.
+       Trong cùng một hạng thì cái nào ra nhiều đoạn văn thật hơn thì thắng. */
+    const hang: string[][] = [[], [], []];
+    for (const m of html.matchAll(/<div[^>]+(?:id|class)=["'][^"']*(?:detail-content|detail-cmain|afcbc-body|article-body|fck_detail|contentdetail|news-content|entry-content|the-article-body|content_detail|singular-content)[^"']*["'][\s\S]*$/gi)) hang[0].push(m[0]);
+    for (const m of html.matchAll(/<article[\s\S]*?<\/article>/gi)) hang[1].push(m[0]);
+    hang[2].push(html);
     let scope = '';
-    let nhieuNhat = -1;
-    for (const uv of ungVien) {
-      const c = catDuoi(uv);
-      const n = doanTu(c).join(' ').length;
-      if (n > nhieuNhat) { nhieuNhat = n; scope = c; }
+    let paras: string[] = [];
+    for (const nhom of hang) {
+      let tot: string[] = [];
+      let totKh = '';
+      for (const uv of nhom) {
+        const c = catDuoi(uv);
+        const ds = doanTu(c);
+        if (ds.join(' ').length > tot.join(' ').length) { tot = ds; totKh = c; }
+      }
+      if (tot.length >= 2) { paras = tot; scope = totKh; break; }
     }
+    if (!paras.length) { scope = catDuoi(html); paras = doanTu(scope); }
     const bodyImgs: string[] = [];
     for (const m of scope.matchAll(/<img[^>]+>/gi)) {
       const src = (m[0].match(/(?:data-src|data-original|src)=["']([^"' ]+)/i) || [])[1];
       if (src && cleanImg(src)) bodyImgs.push(src);
     }
-    const paras = doanTu(scope);
     // og:image (đại diện chuẩn) LÊN ĐẦU, rồi mới đến ảnh trong thân bài.
     return { text: paras.join('\n\n').slice(0, 7000), images: Array.from(new Set([...metaImgs, ...bodyImgs])).slice(0, 6) };
   } catch { return { text: '', images: [] }; }
@@ -387,7 +428,7 @@ export async function GET(req: Request) {
     const sample = await rewrite('Kiểm tra hệ thống tin tức', 'Hạ tầng giao thông khu vực Cam Lâm, Khánh Hòa đang được đầu tư phát triển mạnh, với nhiều dự án đường ven biển và kết nối sân bay Cam Ranh.');
     return NextResponse.json({
       hasGeminiKey: !!GEMINI_KEY, geminiModel: GEMINI_MODEL, disableThinking: NO_THINK, hasClaudeKey: !!AI_KEY,
-      stored: store.length, testRewriteOk: !!sample, testRewriteLen: sample ? sample.length : 0,
+      stored: store.length, chuaBienTap: store.filter((a: any) => a.aiOk === false).length, testRewriteOk: !!sample, testRewriteLen: sample ? sample.length : 0,
       testRewritePreview: sample ? sample.slice(0, 300) : null, lastError: lastErr,
     });
   }
@@ -421,13 +462,44 @@ async function refreshFeed(slot: number): Promise<void> {
   await Promise.allSettled(fresh.map(async (a) => {
     const art = await fetchArticle(a.url);
     const full = art.text && art.text.length > 200 ? art.text : (a.summary || a.title);
-    a.body = dropCaptions((await rewrite(a.title, full)) || full);
+    /* AI trả "KHÔNG ĐỦ" nghĩa là phần bóc được từ bài gốc không phải bài báo
+       thật (thực đơn trang web, trang chặn…). Lúc đó ĐỪNG đăng mớ đó lên —
+       lấy câu tóm tắt của RSS còn hơn. */
+    const viet = await rewrite(a.title, full);
+    const hong = !viet || /^KHÔNG ĐỦ\s*$/i.test(viet.trim());
+    a.body = dropCaptions(hong ? (art.text && art.text.length > 200 ? art.text : (a.summary || a.title)) : viet);
+    a.aiOk = !hong;   // false = chưa biên tập được (hết lượt AI, AI báo lỗi…)
     const imgs = dedupeImages([...art.images, a.image].filter((u): u is string => !!u && cleanImg(u))).slice(0, 3); // og:image (đại diện chuẩn) LÊN ĐẦU, ảnh RSS làm dự phòng
     a.images = imgs;
     a.image = imgs[0] || null;
     a.slug = `${vnSlug(a.title) || 'tin'}-${shortHash(a.url)}`; // mô tả + đuôi SỐ
   }));
   for (const a of fresh) byUrl.set(a.url, a);
+
+  /* ── BIÊN TẬP LẠI NHỮNG BÀI LẦN TRƯỚC CHƯA QUA ĐƯỢC AI ──────────────────
+     ⚠️ Vì sao cần: khoá Gemini bản miễn phí có hạn mức theo ngày. Hết lượt thì
+     bài lấy về lúc đó chỉ đăng lại NGUYÊN VĂN bài gốc. Trước đây mỗi bài chỉ
+     được xử lý ĐÚNG MỘT LẦN (lúc mới về), nên bài đó nằm nguyên văn mãi mãi dù
+     hôm sau hạn mức đã được cấp lại.
+     Nay mỗi lượt làm mới sẽ thử biên tập lại vài bài còn thiếu. Làm ít một
+     (RA_SOAT bài) cho khỏi đốt hết hạn mức vào việc cũ. */
+  const RA_SOAT = 5;
+  const canSua = [...byUrl.values()]
+    .filter((a) => !a.pin && a.slug && a.aiOk === false)
+    .sort((a, b) => +new Date(b.publishedAt) - +new Date(a.publishedAt))
+    .slice(0, RA_SOAT);
+  if (canSua.length) {
+    await Promise.allSettled(canSua.map(async (a) => {
+      const art = await fetchArticle(a.url);
+      const full = art.text && art.text.length > 200 ? art.text : (a.summary || a.title);
+      const viet = await rewrite(a.title, full);
+      if (viet && !/^KHÔNG ĐỦ\s*$/i.test(viet.trim())) {
+        a.body = dropCaptions(viet);
+        a.aiOk = true;
+      }
+    }));
+  }
+
   const weekAgo = Date.now() - 7 * 86400000;
   const localKeep = Date.now() - 60 * 86400000; // tin Khánh Hòa (tier≥1) GIỮ 60 ngày
   const rotating = [...byUrl.values()]

@@ -34,9 +34,15 @@ chỉ cần sửa 3 điểm P0/P1/P3 ở đây rồi chạy lại.
 
 # ── Hình bình hành của lô đất ───────────────────────────────────────────────
 # Chỗ mới: khoảng cỏ trống, phẳng và sáng, ở giữa ảnh (chủ dự án khoanh đỏ).
-P0 = (676.0, 690.0)        # góc trước (gần người xem)
-P1 = (762.0, 668.0)        # góc phải
-P3 = (649.0, 660.0)        # góc trái
+# ⚠️ BỐN GÓC NÀY LÀ HÀNG RÀO THẬT TRONG ẢNH, không phải con số ướm mắt.
+#    Đọc từ ảnh đã cắt (800×577): góc trước (108,505), góc phải (745,318),
+#    góc trái (18,388); rồi đổi sang toạ độ bản vẽ theo đúng chỗ đặt ảnh
+#    (ANH_X/ANH_Y/ANH_W/ANH_H trong hàm sinh()). Nhờ vậy nét phác thảo nằm
+#    KHỚP lên hàng rào của căn nhà trong ảnh.
+#    Đổi ảnh hoặc đổi chỗ đặt ảnh thì phải tính lại ba điểm này.
+P0 = (653.9, 678.6)        # góc trước (gần người xem)
+P1 = (754.4, 649.2)        # góc phải
+P3 = (639.7, 660.2)        # góc trái
 P2 = (P1[0] + P3[0] - P0[0], P1[1] + P3[1] - P0[1])   # góc sau (tự suy ra)
 
 U = (P1[0] - P0[0], P1[1] - P0[1])
@@ -124,8 +130,8 @@ def sinh():
     """
     # Ảnh khu đất thật: 780×555 điểm ảnh ⇒ tỉ lệ ngang/dọc 1,4054
     # (gồm cả nhà, sân vườn, nhà để xe, hàng rào và mặt đường trước nhà)
-    ANH_X, ANH_Y = 637.1, 599.0
-    ANH_W, ANH_H = 125.8, 91.0
+    ANH_X, ANH_Y = 636.9, 599.0
+    ANH_W, ANH_H = 126.2, 91.0
 
     mat = []
     # ── Sân cỏ của lô (chỉ một lớp xanh nhạt, phần còn lại ảnh nhà đã có sẵn) ─
@@ -143,24 +149,24 @@ def sinh():
 
     nhom_mat = '<g class="b5-face" data-at="3300" data-once>' + ''.join(mat) + '</g>'
 
-    # ── Nét phác thảo: ranh lô + khối nhà + hàng rào (vẽ dần trước khi ảnh hiện)
+    # ── Nét phác thảo: CHỈ ranh lô + hàng rào ───────────────────────────────
+    # ⚠️ ĐỪNG vẽ thêm khối hộp căn nhà ở đây. Căn nhà nay là ẢNH CHỤP THẬT, mà
+    #    nét vẽ lại nằm ĐÈ LÊN TRÊN ảnh (bản thiết kế xếp nét sau khối nhà) —
+    #    hộp vẽ tay không bao giờ trùng được với căn nhà trong ảnh, nhìn ra ngay
+    #    là "vẽ chưa khớp". Ranh lô thì khớp được, vì bốn góc lấy đúng từ hàng
+    #    rào trong ảnh.
     net = []
-    net.append('<path class="draw" pathLength="1" style="--dur:700" stroke="#67e8f9" d="%s"/>'
-               % ds(d(0.02, 0.02), d(0.98, 0.02), d(0.98, 0.98), d(0.02, 0.98)))
-    H = TANG * 2.2
-    canh = ''.join('M%.1f %.1fL%.1f %.1f' % (p[0], p[1], q[0], q[1])
-                   for p, q in ((d(A0, B0), d(A0, B0, H)), (d(A1, B0), d(A1, B0, H)),
-                                (d(A1, B1), d(A1, B1, H)), (d(A0, B1), d(A0, B1, H))))
-    net.append('<path class="draw" pathLength="1" style="--d:500;--dur:600" stroke="#f8fafc" '
-               'opacity=".9" d="%s"/>' % canh)
-    net.append('<path class="draw" pathLength="1" style="--d:1100;--dur:600" stroke="#f8fafc" '
-               'opacity=".9" d="%s"/>'
-               % ds(d(A0, B0, H), d(A1, B0, H), d(A1, B1, H), d(A0, B1, H)))
-    z_rao = TANG * 0.38
-    net.append('<path class="draw" pathLength="1" style="--d:1700;--dur:800" stroke="#fde68a" '
-               'opacity=".9" d="%s"/>'
-               % mo(d(0.02, 0.02, z_rao), d(0.98, 0.02, z_rao), d(0.98, 0.98, z_rao),
-                    d(0.02, 0.98, z_rao), d(0.02, 0.02, z_rao)))
+    net.append('<path class="draw" pathLength="1" style="--dur:900" stroke="#67e8f9" d="%s"/>'
+               % ds(d(0, 0), d(1, 0), d(1, 1), d(0, 1)))
+    z_rao = TANG * 0.30
+    net.append('<path class="draw" pathLength="1" style="--d:800;--dur:900" stroke="#fde68a" '
+               'opacity=".85" d="%s"/>'
+               % mo(d(0, 0, z_rao), d(1, 0, z_rao), d(1, 1, z_rao), d(0, 1, z_rao), d(0, 0, z_rao)))
+    tru = ''.join('M%.1f %.1fL%.1f %.1f'
+                  % (d(a_, b_)[0], d(a_, b_)[1], d(a_, b_, z_rao)[0], d(a_, b_, z_rao)[1])
+                  for a_, b_ in ((0, 0), (1, 0), (1, 1), (0, 1)))
+    net.append('<path class="draw" pathLength="1" style="--d:1700;--dur:600" stroke="#fde68a" '
+               'opacity=".8" d="%s"/>' % tru)
     nhom_net = ('<g class="grp b5-wire c15-wire" data-at="1000" data-once>'
                 + ''.join(net) + '</g>')
     return nhom_mat, nhom_net

@@ -322,13 +322,10 @@ THAY_DOAN = {
          '<text x="900" y="510">Thửa 135</text>',
          '<text x="300" y="272">Thửa 126</text><text x="170" y="352">Thửa 134</text>'
          '<text x="872" y="268">Thửa 135</text>'),
-        # Nét đo: dời lên cạnh trên của thửa được tô sáng, nằm trong dải nhìn thấy
-        ('<path class="dim" pathLength="1" d="M705 511L945 424"/>',
-         '<path class="dim" pathLength="1" d="M492.6 242.1L370.6 318.1"/>'),
-        ('<path class="tick" d="M707.7 518.5L702.3 503.5M947.7 431.5L942.3 416.5"/>',
-         '<path class="tick" d="M496.3 248.0L488.9 236.2M374.3 324.0L366.9 312.2"/>'),
-        ('<text class="count-txt" x="818" y="449" transform="rotate(-19.9 818 449)"',
-         '<text class="count-txt" x="432" y="276" transform="rotate(-31.9 432 276)"'),
+        # ⚠️ NÉT ĐO "≈ 14 m" GIỮ NGUYÊN CHỖ CỦA BẢN THIẾT KẾ (cạnh dưới bên phải
+        #    của thửa được tô sáng). Đã có lần dời nó lên cạnh trên cho khỏi bị
+        #    khung tìm kiếm che bớt, nhưng chủ dự án khoanh đỏ đúng chỗ cũ và
+        #    dặn để lại như cũ. Đừng dời nữa.
     ],
     # ── MẪU 7: CHIẾC MÁY BAY THẬT TRONG ẢNH PHẢI BAY ĐƯỢC ───────────────────
     # Chủ dự án chỉ thẳng vào chiếc máy bay trong ảnh: "vẫn chưa làm cho nó bay".
@@ -354,7 +351,7 @@ THAY_DOAN = {
          # hơn bản gốc. Bốn góc mới lấy từ P0/P1/P2/P3 của ve-nha-mau15.py —
          # sửa bên đó thì sửa cả ở đây, lệch là nhà đứng ra ngoài lô.
          ('d="M601.8 745.9L651 723.6L621.7 699.4L572.5 721.6Z"',
-          'd="M676.0 690.0L762.0 668.0L735.0 638.0L649.0 660.0Z"'),
+          'd="M653.9 678.6L754.4 649.2L740.2 630.8L639.7 660.2Z"'),
          ('width="1000" height="750" preserveAspectRatio="none"',
           'width="1000" height="820" preserveAspectRatio="none"'),
          ('Nhà 1 trệt, mái thái', 'Nhà 3 tầng · có sân vườn'),

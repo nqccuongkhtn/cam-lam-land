@@ -10,8 +10,8 @@ hàng xóm, mặt đường) thành một ảnh nền trong suốt:
 
   apps/frontend/public/banner11/m15-bietthu.webp
 
-CÁCH LÀM: giữ trọn khung ảnh (nhà + sân vườn + hàng rào + mặt đường), chỉ làm
-MỜ DẦN bốn mép để tấm ảnh chìm vào bãi cỏ của banner. Xem ghi chú trong main().
+CÁCH LÀM: cắt theo ĐƯỜNG RANH của khu đất (hàng rào + mép mái), không cắt kiểu
+hình chữ nhật — xem biến RANH và ghi chú trong main().
 
 ⚠️ ĐỔI ẢNH thì phải chỉnh lại KHUNG bên dưới và chạy lại script.
 
@@ -19,58 +19,59 @@ Chạy:  python scripts/banner11/tach-biet-thu-mau15.py
 """
 import os
 
-import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter
 
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 RA = os.path.join(GOC, 'apps', 'frontend', 'public', 'banner11')
 ANH = os.path.join(RA, 'h3-villa-tan-co-dien.webp')
 
-# Khung cắt: lấy TRỌN khu đất — nhà, sân vườn, nhà để xe, hàng rào và mặt
-# đường trước nhà. Chừa bớt mép trái (toàn cây) và mép phải (nhà hàng xóm).
-KHUNG = (34, 78, 772, 612)
 
-# Bề rộng vùng mờ ở mỗi mép, tính theo phần chiều rộng/chiều cao của khung.
-VIEN_TRAI, VIEN_PHAI = 0.12, 0.11
-VIEN_TREN, VIEN_DUOI = 0.17, 0.06
 
+
+
+# Ranh khu đất, dò bằng mắt trên ảnh gốc 800×615 (đã kẻ lưới để soi).
+# Đi theo HÀNG RÀO và mép mái, cố ý chừa ra:
+#   · rặng cây và cột điện phía trên bên trái (ngoài khu đất);
+#   · căn nhà hàng xóm bên phải (mái xám, bắt đầu từ x ≈ 645);
+# và cố ý giữ lại: căn nhà, nhà để xe, sân lát đá, hàng rào, dải cỏ và mặt
+# đường trước nhà (chủ dự án dặn "lấy được đường thì đưa vào luôn").
+RANH = [
+    (340, 58), (640, 55), (640, 300), (700, 332), (795, 392),
+    (795, 612), (110, 612), (8, 470), (8, 262), (300, 250),
+]
+MEM = 7.0            # độ mềm của viền cắt (điểm ảnh)
 
 
 def main():
-    """Lấy TRỌN khu đất: căn nhà + sân vườn + hàng rào + mặt đường trước nhà.
+    """Cắt khu đất theo đúng đường ranh, không cắt kiểu hình chữ nhật.
 
-    ⚠️ ĐÃ ĐỔI CÁCH LÀM MỘT LẦN: bản đầu chỉ cắt riêng căn nhà bằng mẹo "cây cỏ
-       thì xanh lá". Chủ dự án xem rồi dặn "lấy cả nhà và sân vườn vào, lấy được
-       đường thì đưa vào luôn". Mà sân vườn thì cũng xanh lá — dùng lại mẹo cũ là
-       xoá mất luôn cái sân. Nên nay giữ NGUYÊN cả khung ảnh, chỉ làm MỜ DẦN
-       viền ngoài để tấm ảnh chìm vào bãi cỏ của banner, không lộ mép chữ nhật.
+    ⚠️ ĐÃ ĐỔI CÁCH LÀM HAI LẦN:
+       · lần 1 — mẹo "cây cỏ thì xanh lá": tách được riêng căn nhà nhưng XOÁ
+         mất cả sân vườn, mà chủ dự án lại muốn có sân vườn;
+       · lần 2 — cắt hình chữ nhật rồi làm mờ bốn mép: giữ được sân vườn nhưng
+         lôi theo rặng cây, cột điện và căn nhà hàng xóm ở hai góc trên;
+       · lần này — cắt theo ĐƯỜNG RANH khu đất (biến RANH ở trên), viền làm mềm
+         để tấm ảnh chìm vào bãi cỏ của banner.
     """
     im = Image.open(ANH).convert('RGB')
-    patch = im.crop(KHUNG)
-    w, h = patch.size
+    w, h = im.size
 
-    # ── Viền mờ dần: trong lòng ảnh đục hẳn, ra tới mép thì trong suốt ───────
-    # Mỗi mép mờ theo một bề rộng riêng: mép TRÊN nhiều cây nên mờ sâu hơn,
-    # mép DƯỚI là mặt đường nên chỉ mờ nhẹ cho khỏi cụt.
-    x = np.linspace(0.0, 1.0, w, dtype=np.float32)[None, :]
-    y = np.linspace(0.0, 1.0, h, dtype=np.float32)[:, None]
+    mat_na = Image.new('L', (w, h), 0)
+    ImageDraw.Draw(mat_na).polygon(RANH, fill=255)
+    mat_na = mat_na.filter(ImageFilter.GaussianBlur(MEM))
 
-    def ram(t, rong):
-        return np.clip(t / max(rong, 1e-6), 0.0, 1.0)
-
-    a = (ram(x, VIEN_TRAI) * ram(1 - x, VIEN_PHAI)
-         * ram(y, VIEN_TREN) * ram(1 - y, VIEN_DUOI))
-    a = a ** 1.8                                   # mờ dịu hơn ở gần mép
-    alp = Image.fromarray((a * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(4))
-
-    out = Image.merge('RGBA', (*patch.split(), alp))
+    out = Image.merge('RGBA', (*im.split(), mat_na))
+    # cắt sát phần còn nhìn thấy cho file nhẹ
+    khung = out.getbbox()
+    out = out.crop(khung)
     p = os.path.join(RA, 'm15-bietthu.webp')
     out.save(p, 'WEBP', quality=90, method=6)
+    print('Khung sau khi cat sat:', khung)
     print('OK %s  %d KB  %dx%d' % (os.path.basename(p), os.path.getsize(p) // 1024,
                                    out.width, out.height))
     print('TI LE ngang/doc = %.4f' % (out.width / out.height))
 
-    thu = Image.new('RGB', out.size, (86, 128, 58))     # nền cỏ giống ảnh banner
+    thu = Image.new('RGB', out.size, (110, 150, 70))    # nền cỏ giống ảnh banner
     thu.paste(out, (0, 0), out)
     thu.save(os.path.join(RA, '_xem-m15-bietthu.png'))
 

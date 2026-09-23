@@ -209,18 +209,33 @@
 /* Mẫu 18: bản gốc cho chiếc máy bay BAY VÚT ĐI (lao chéo lên rồi to dần).
    Nay là toà nhà cao tầng nên đổi thành động tác VƯƠN LÊN — nhô dần lên khỏi
    khung ảnh rồi đứng yên, hợp với toà nhà hơn. */
-/* Toà nhà MỌC DẦN RA khỏi mép khung ảnh.
-   Phần nhô ra đã được cắt sẵn bằng khung cắt `c18Tren` (chỉ giữ phần trên mép
-   khung) nên lúc nó trượt lên, mắt chỉ thấy toà nhà cao dần lên chứ không thấy
-   hai lớp ảnh lệch nhau — đây là chỗ trước đây nhìn "chưa thật".
-   Đi chậm và dài hơi hơn (2,4 giây) cho ra vẻ bề thế. */
-@keyframes cl-b11-vuon {
-  0%   { opacity: .25; transform: translateY(170px) }
-  35%  { opacity: 1 }
-  100% { opacity: 1; transform: translateY(0) }
+/* ══ TOÀ NHÀ MỌC DẦN RA KHỎI KHUNG — LỘ DẦN, KHÔNG TRƯỢT ═══════════════════
+   ⚠️ ĐÂY LÀ LẦN SỬA THỨ TƯ CỦA CHỖ NÀY, đọc kỹ kẻo làm lại cái sai cũ.
+   Ba cách trước đều bị chủ dự án bắt lỗi "chỗ khớp nối nhìn chưa thật":
+     1. mặt nạ hình chữ nhật  → lôi theo mảng trời, thành ô vuông tối;
+     2. cắt toà nhà ra ảnh riêng rồi đặt đè → hai tấm ảnh khác nhau, lệch nhau;
+     3. vẫn một tấm ảnh (khoét theo mặt nạ) nhưng cho nó TRƯỢT LÊN → trong suốt
+        2,4 giây trượt, phần nhô ra đang ở chỗ khác với phần trong khung, nên
+        ngay mép khung có một vết gãy. Chính chỗ chủ dự án khoanh đỏ.
+   Cách đúng: ẢNH ĐỨNG YÊN TUYỆT ĐỐI, chỉ mở rộng dần KHUNG CẮT từ mép khung
+   ảnh lên trên — mắt thấy toà nhà cao dần lên, mà hai phần luôn là một ảnh
+   liền, không đời nào lệch.
+   ⚠️ Đừng đặt giá trị mặc định height:0 cho ô cắt: trình duyệt nào không chạy
+      được hiệu ứng trên thuộc tính hình học của SVG sẽ giấu luôn phần nhô ra.
+      Để nguyên thuộc tính trong mã (y=0, height=261) rồi chỉ chạy hiệu ứng;
+      máy không hỗ trợ thì coi như hiện sẵn, vẫn đúng. */
+@keyframes cl-b11-moc {
+  from { y: 261px; height: 0px }
+  to   { y: 0px;   height: 261px }
+}
+.cl-b11 .banner.running #c18Tren rect {
+  animation: cl-b11-moc calc(2.2s * var(--slow, 1)) cubic-bezier(.22, .9, .25, 1)
+             calc(1.5s * var(--slow, 1)) both;
 }
 .cl-b11 .c18-plane.go {
-  animation: cl-b11-vuon calc(2.4s * var(--slow, 1)) cubic-bezier(.22, .9, .25, 1) both !important;
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
 }
 
 /* ⚠️ Bản thiết kế ẩn `.c18-plane` khi banner ở chế độ ĐỨNG YÊN, vì chỗ đó vốn
@@ -292,18 +307,40 @@
   90%  { transform: scale(22.6) }
   100% { transform: scale(32) }
 }
-/* Chuyển tầng: mờ tầng cũ đi đúng lúc tầng mới về cỡ thật của nó */
-.cl-b11 .st-b6 .m19-l2, .cl-b11 .st-b6 .m19-l3 { opacity: 0 }
+/* Chuyển tầng: mờ tầng cũ đi đúng lúc tầng mới về cỡ thật của nó.
+   ⚠️ PHẢI ẨN HẲN (`visibility: hidden`) tầng đã mờ, không chỉ để `opacity: 0`.
+      Lý do: nhóm ngoài phóng tới 32 lần, nên một tầng ảnh 1920 điểm ảnh bị kéo
+      thành hơn 61.000 điểm ảnh. Trình duyệt vẫn phải vẽ lại tấm khổng lồ đó dù
+      nó trong suốt → giật hình. Ẩn hẳn thì mỗi lúc chỉ còn MỘT tầng phải vẽ,
+      chạy mượt hẳn. (`visibility` đổi theo kiểu bật/tắt, không mờ dần, nên đặt
+      mốc lệch 0,01% để nó tắt ĐÚNG lúc vừa mờ hết.) */
+.cl-b11 .st-b6 .m19-l2, .cl-b11 .st-b6 .m19-l3 { opacity: 0; visibility: hidden }
+.cl-b11 .st-b6 .m19-phong,
+.cl-b11 .st-b6 .m19-l1, .cl-b11 .st-b6 .m19-l2, .cl-b11 .st-b6 .m19-l3 { will-change: transform, opacity }
 .cl-b11 .st-b6 .b6-map.go .m19-l1 { animation: cl-b11-m19-t1 calc(8200ms * var(--slow, 1)) linear both }
 .cl-b11 .st-b6 .b6-map.go .m19-l2 { animation: cl-b11-m19-t2 calc(8200ms * var(--slow, 1)) linear both }
 .cl-b11 .st-b6 .b6-map.go .m19-l3 { animation: cl-b11-m19-t3 calc(8200ms * var(--slow, 1)) linear both }
-@keyframes cl-b11-m19-t1 { 0%, 32% { opacity: 1 } 48%, 100% { opacity: 0 } }
-@keyframes cl-b11-m19-t2 { 0%, 32% { opacity: 0 } 48%, 72% { opacity: 1 } 86%, 100% { opacity: 0 } }
-@keyframes cl-b11-m19-t3 { 0%, 72% { opacity: 0 } 86%, 100% { opacity: 1 } }
+@keyframes cl-b11-m19-t1 {
+  0%, 32%     { opacity: 1; visibility: visible }
+  48%         { opacity: 0; visibility: visible }
+  48.01%,100% { opacity: 0; visibility: hidden }
+}
+@keyframes cl-b11-m19-t2 {
+  0%, 31.99%  { opacity: 0; visibility: hidden }
+  32%         { opacity: 0; visibility: visible }
+  48%, 72%    { opacity: 1; visibility: visible }
+  86%         { opacity: 0; visibility: visible }
+  86.01%,100% { opacity: 0; visibility: hidden }
+}
+@keyframes cl-b11-m19-t3 {
+  0%, 71.99%  { opacity: 0; visibility: hidden }
+  72%         { opacity: 0; visibility: visible }
+  86%, 100%   { opacity: 1; visibility: visible }
+}
 /* Máy đặt "giảm chuyển động": đứng yên ở tầng gần nhất cho thấy rõ thửa đất */
 .cl-b11 .banner.static .m19-phong { animation: none !important; transform: scale(32) !important }
-.cl-b11 .banner.static .m19-l1, .cl-b11 .banner.static .m19-l2 { opacity: 0 !important }
-.cl-b11 .banner.static .m19-l3 { opacity: 1 !important }
+.cl-b11 .banner.static .m19-l1, .cl-b11 .banner.static .m19-l2 { opacity: 0 !important; visibility: hidden !important }
+.cl-b11 .banner.static .m19-l3 { opacity: 1 !important; visibility: visible !important }
 /* (Thửa đích nay được VẼ SẴN vào tầng ảnh gần nhất nên không còn lớp `m19-thua`
     riêng để nhấp nháy nữa.) */
 /* Máy đặt "giảm chuyển động": không phóng, hiện nguyên bản đồ */
@@ -404,7 +441,7 @@
    2,6 lần, vừa đủ thấy động tác "đi vào gần hơn". */
 @media (max-width: 760px) {
   .cl-b11 .st-b6 .b6-map.go .m19-phong { animation-name: cl-b11-phong-nhe }
-  .cl-b11 .st-b6 .b6-map.go .m19-l1 { animation: none; opacity: 1 }
+  .cl-b11 .st-b6 .b6-map.go .m19-l1 { animation: none; opacity: 1; visibility: visible }
   .cl-b11 .banner.static .m19-phong { transform: scale(2.6) !important }
   .cl-b11 .banner.static .m19-l1 { opacity: 1 !important }
   @keyframes cl-b11-phong-nhe {

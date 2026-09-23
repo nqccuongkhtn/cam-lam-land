@@ -49,15 +49,29 @@ import subprocess
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 RA_ANH = os.path.join(GOC, 'apps', 'frontend', 'public', 'banner11')
 
-RONG, CAO = 1920, 620         # khổ mỗi tầng ảnh
+RONG, CAO = 1920, 620         # khổ khung banner (đơn vị bản vẽ)
+
+# ⚠️ LỚP QUY HOẠCH DỰNG TO HƠN KHUNG 1,5 LẦN.
+#    Lý do: mỗi tầng chỉ NÉT ĐÚNG MỘT CỠ — cỡ mà nó được dựng. Nhưng
+#    hiệu ứng phóng chạy liên tục từ 1 lên 32 lần, nên giữa hai tầng bao
+#    giờ cũng có lúc ảnh đang bị kéo to gấp 2–3 lần — đúng lúc đó nhìn mờ.
+#    Dựng sẵn to hơn 1,5 lần là có chỗ để kéo mà không hụt điểm ảnh.
+#    Không dựng to hơn nữa vì tệp nặng thêm, mà banner còn phải tải trên
+#    điện thoại.
+NET = 1.5
+RONG_QH, CAO_QH = int(RONG * NET), int(CAO * NET)
 # Thửa đất đích: Thửa 354 · Tờ 11, khu trung tâm Cam Đức, ~4.788 m², đất ở + CLN
 TAM_LON, TAM_LAT = 109.14956, 12.06930
 
 # Ba tầng: (tên file, mức phóng của khung, mức phóng lấy tile quy hoạch,
-#           gấp mấy lần tầng 1). Tile lấy DÀY HƠN khung một bậc cho nét gạch mịn.
+#           gấp mấy lần tầng 1).
+# ⚠️ TILE LẤY Ở MỨC PHÓNG SÂU HƠN KHUNG rồi thu nhỏ lại. Hai cái lợi: nét gạch
+#    mịn hơn, và CHỮ GHI CHÚ TRÊN TILE nhỏ lại theo. Bản trước tầng 2 lấy tile
+#    z17 cho khung z16 (chỉ sâu 1 bậc) nên giữa bản đồ có một chữ "CH" đen
+#    to tướng — ký hiệu loại đất, đúng ra chỉ bằng đầu ngón tay.
 TANG = [
     ('m19-qh1', 13, 15, 1),
-    ('m19-qh2', 16, 17, 8),
+    ('m19-qh2', 16, 18, 8),
     ('m19-qh3', 18, 18, 32),
 ]
 VE_TINH = 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2020_3857/default/g/{z}/{y}/{x}.jpg'
@@ -99,7 +113,7 @@ def ghep_tile(z, x0, y0, rong, cao, nen, doc_anh):
     return im, co
 
 
-def ve_ranh_thua(anh, z, x0, y0):
+def ve_ranh_thua(anh, z, x0, y0, net=1.0):
     """Vẽ ranh thửa thật lên tầng gần nhất, tô sáng thửa ở giữa khung."""
     from PIL import ImageDraw
     n = 2 ** z * 256
@@ -126,10 +140,10 @@ def ve_ranh_thua(anh, z, x0, y0):
 
     def sang_khung(lon, lat):
         px, py = diem_anh(lon, lat, z)
-        return px - x0, py - y0
+        return (px - x0) * net, (py - y0) * net
 
     but = ImageDraw.Draw(anh, 'RGBA')
-    giua = (RONG / 2, CAO / 2)
+    giua = (RONG * net / 2, CAO * net / 2)
     chinh, gan_nhat = None, 1e9
     for d in dong:
         p = d.split('\t')
@@ -144,7 +158,7 @@ def ve_ranh_thua(anh, z, x0, y0):
         xs = [sang_khung(lo, la) for lo, la in vong]
         if len(xs) < 4:
             continue
-        but.line(xs + [xs[0]], fill=(120, 53, 15, 235), width=2)
+        but.line(xs + [xs[0]], fill=(120, 53, 15, 235), width=max(2, round(2 * net)))
         cx = sum(a for a, _ in xs) / len(xs)
         cy = sum(b for _, b in xs) / len(xs)
         xa = (cx - giua[0]) ** 2 + (cy - giua[1]) ** 2
@@ -153,11 +167,12 @@ def ve_ranh_thua(anh, z, x0, y0):
 
     if chinh:
         so_to, so_thua, dt, mdsd, xs, cx, cy = chinh
-        but.polygon(xs, fill=(253, 224, 71, 95), outline=(202, 138, 4, 255), width=4)
+        but.polygon(xs, fill=(253, 224, 71, 95), outline=(202, 138, 4, 255),
+                    width=max(3, round(4 * net)))
         print('  THUA TO SANG: Thua %s · To %s · %s m2 · %s'
               % (so_thua, so_to, dt, mdsd or 'chua ro'))
-        print('  Tam thua trong khung: %.0f,%.0f = %.1f%% , %.1f%%'
-              % (cx, cy, cx / RONG * 100, cy / CAO * 100))
+        print('  Tam thua trong khung: %.1f%% , %.1f%%'
+              % (cx / (RONG * net) * 100, cy / (CAO * net) * 100))
     return anh
 
 
@@ -202,18 +217,23 @@ def main():
         k = 2 ** (z_qh - z)
         qh, co = ghep_tile(z_qh, x0 * k, y0 * k, RONG * k, CAO * k,
                            ('RGBA', (0, 0, 0, 0)), doc_quyhoach)
-        if k != 1:
-            qh = qh.resize((RONG, CAO), Image.LANCZOS)
+        if (qh.width, qh.height) != (RONG_QH, CAO_QH):
+            qh = qh.resize((RONG_QH, CAO_QH), Image.LANCZOS)
 
-        # nền giấy: ảnh vệ tinh làm nhạt hẳn cho màu quy hoạch nổi lên
-        nen = ImageEnhance.Color(ve).enhance(0.18)
-        nen = ImageEnhance.Brightness(nen).enhance(1.55)
-        nen = Image.blend(nen, Image.new('RGB', nen.size, (255, 255, 255)), 0.45)
-        ban_do = nen.convert('RGBA')
+        # ── NỀN GIẤY PHẰNG, KHÔNG DÙNG ẢNH VỆ TINH ────────────────────────
+        # ⚠️ ĐÂY CHÍNH LÀ CHỖ TỪ NG MỜ. Bản trước lấy chính ảnh vệ tinh làm
+        #    nền rồi làm nhạt đi. Ảnh Sentinel-2 chụp 10 m một điểm ảnh, mà
+        #    tầng 2 (­~4,5 km) và tầng 3 (~1,1 km) cần tới 2,4 m và 0,6 m một
+        #    điểm ảnh — tức phải kéo to 4 lần và 16 lần. Kéo từng đó thì chỉ
+        #    còn mấy vệt xanh xám nhoè, nằm ngay dưới nét quy hoạch — đúng
+        #    cái chủ dự án bảo "lấy bản đồ vẫn chưa mượt, rất mờ".
+        #    Bản đồ quy hoạch thật in trên GIẤY TRẮNG, không có ảnh chụp bên
+        #    dưới. Nền phẳng thì phóng bao nhiêu lần cũng không thể mờ.
+        ban_do = Image.new('RGBA', (RONG_QH, CAO_QH), (249, 247, 242, 255))
         ban_do.alpha_composite(qh)
 
         if lan == 32:
-            ban_do = ve_ranh_thua(ban_do, z, x0, y0)
+            ban_do = ve_ranh_thua(ban_do, z, x0, y0, NET)
 
         p = os.path.join(RA_ANH, ten + '.webp')
         ban_do.convert('RGB').save(p, 'WEBP', quality=84, method=6)

@@ -320,15 +320,21 @@
 .cl-b11 .st-b6 .b6-map.go .m19-l1 { animation: cl-b11-m19-t1 calc(8200ms * var(--slow, 1)) linear both }
 .cl-b11 .st-b6 .b6-map.go .m19-l2 { animation: cl-b11-m19-t2 calc(8200ms * var(--slow, 1)) linear both }
 .cl-b11 .st-b6 .b6-map.go .m19-l3 { animation: cl-b11-m19-t3 calc(8200ms * var(--slow, 1)) linear both }
+/* ⚠️ ĐỔI TẦNG Ở ĐÚNG CHỖ NÀO MỚI NÉT. Mỗi tầng chỉ nét ở đúng cỡ nó được
+   dựng: tầng 1 nét ở 1 lần, tầng 2 ở 8 lần, tầng 3 ở 32 lần. Nên chỗ đổi
+   tầng phải rơi vào GIỮA hai cỡ đó (trung bình nhân): giữa 1 và 8 là 2,83
+   lần — rơi vào mốc 30% thời gian; giữa 8 và 32 là 16 lần — mốc 80%.
+   Bản trước đổi tầng ở mốc 40%, tức để tầng 1 bị kéo to tới 4,6 lần rồi mới
+   nhường chỗ — đúng lúc đó nhìn mờ nhất. */
 @keyframes cl-b11-m19-t1 {
-  0%, 32%     { opacity: 1; visibility: visible }
-  48%         { opacity: 0; visibility: visible }
-  48.01%,100% { opacity: 0; visibility: hidden }
+  0%, 22%     { opacity: 1; visibility: visible }
+  38%         { opacity: 0; visibility: visible }
+  38.01%,100% { opacity: 0; visibility: hidden }
 }
 @keyframes cl-b11-m19-t2 {
-  0%, 31.99%  { opacity: 0; visibility: hidden }
-  32%         { opacity: 0; visibility: visible }
-  48%, 72%    { opacity: 1; visibility: visible }
+  0%, 21.99%  { opacity: 0; visibility: hidden }
+  22%         { opacity: 0; visibility: visible }
+  38%, 72%    { opacity: 1; visibility: visible }
   86%         { opacity: 0; visibility: visible }
   86.01%,100% { opacity: 0; visibility: hidden }
 }

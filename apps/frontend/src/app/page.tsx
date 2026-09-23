@@ -240,7 +240,7 @@ export default function Home() {
                 nền trắng làm nặng mắt và che mất ảnh banner phía sau. */}
             <div className="mb-2 flex items-center justify-center gap-6 sm:gap-8">
               {([['sale', 'Nhà đất bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
-                <button key={k} onClick={() => setHeroDeal(k)}
+                <button key={k} onClick={() => { setHeroDeal(k); setMax(''); }}
                   className={`relative pb-1.5 text-[13px] transition sm:text-sm ${heroDeal === k ? 'font-extrabold text-white' : 'font-semibold text-white/75 hover:text-white'}`}>
                   {ten}
                   <span aria-hidden
@@ -251,10 +251,13 @@ export default function Home() {
 
           {/* Search card */}
             {/* Hàng ô nhập — nằm ngay trong khung kính, không có thẻ trắng riêng */}
-            <div className="grid w-full gap-2 md:grid-cols-[1.5fr_1fr_1fr_auto]">
+            <div className={`grid w-full gap-2 ${heroDeal === 'project'
+              ? 'md:grid-cols-[2.5fr_1fr_auto]' : 'md:grid-cols-[1.5fr_1fr_1fr_auto]'}`}>
             <label className="flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3 focus-within:border-[#C8A14B]">
               <Ic d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" />
-              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder={heroDeal === 'project' ? 'Tên dự án: Golden Bay, Khu đô thị mới Cam Lâm…' : (searchHint || 'Khu vực, dự án…')} className="w-full py-2.5 text-sm text-slate-800 outline-none" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder={heroDeal === 'project' ? 'Tên dự án: Golden Bay, Khu đô thị mới Cam Lâm…'
+                : heroDeal === 'rent' ? 'Thuê nhà, phòng trọ, mặt bằng… ở khu vực nào?'
+                : (searchHint || 'Khu vực, dự án…')} className="w-full py-2.5 text-sm text-slate-800 outline-none" />
             </label>
             {/* Hai ô sổ xuống dùng OChon chứ không dùng <select> của trình duyệt:
                 bảng sổ xuống của <select> do hệ điều hành vẽ, không chỉnh được,
@@ -262,11 +265,23 @@ export default function Home() {
             <OChon giaTri={type} doiGiaTri={(v) => setType(v as PropertyType)} nhan="Loại hình"
               icon={<Ic d="M3 11l9-8 9 8M5 10v10h14V10" />}
               dsChon={CATS.map((c) => ({ gt: c.t, ten: PROPERTY_LABELS[c.t] }))} />
-            <OChon giaTri={max} doiGiaTri={setMax} nhan="Mức giá"
-              icon={<Ic d="M20.6 13.4 12 22l-9-9V3h8z M7 7h.01" />}
-              dsChon={[{ gt: '1', ten: 'Dưới 1 tỷ' }, { gt: '3', ten: 'Dưới 3 tỷ' },
-                       { gt: '5', ten: 'Dưới 5 tỷ' }, { gt: '10', ten: 'Dưới 10 tỷ' }]} />
-              <button onClick={search} className="cl-press whitespace-nowrap rounded-xl bg-red-600 px-6 py-2.5 font-bold text-white shadow-lg shadow-red-600/30 hover:bg-red-700">Tìm kiếm</button>
+            {/* ⚠️ BẢNG GIÁ ĐỔI THEO TẮB. Chủ dự án bấm sang "Cho thuê" rồi bảo
+                "hình như chưa hoạt động" — đúng, vì trước đó bấm xong mọi thứ
+                vẫn y nguyên: vẫn "Dưới 1 tỷ, dưới 3 tỷ…" trong khi nhà cho thuê
+                tính bằng triệu mỗi tháng. Nay mỗi tắb một bảng giá riêng, và tắb
+                "Dự án" thì bỏ hẳn ô giá (dự án không tra theo giá). */}
+            {heroDeal !== 'project' && (
+              <OChon giaTri={max} doiGiaTri={setMax} nhan="Mức giá"
+                icon={<Ic d="M20.6 13.4 12 22l-9-9V3h8z M7 7h.01" />}
+                dsChon={heroDeal === 'rent'
+                  ? [{ gt: '0.003', ten: 'Dưới 3 triệu/tháng' }, { gt: '0.005', ten: 'Dưới 5 triệu/tháng' },
+                     { gt: '0.01', ten: 'Dưới 10 triệu/tháng' }, { gt: '0.03', ten: 'Dưới 30 triệu/tháng' }]
+                  : [{ gt: '1', ten: 'Dưới 1 tỷ' }, { gt: '3', ten: 'Dưới 3 tỷ' },
+                     { gt: '5', ten: 'Dưới 5 tỷ' }, { gt: '10', ten: 'Dưới 10 tỷ' }]} />
+            )}
+              <button onClick={search} className="cl-press whitespace-nowrap rounded-xl bg-red-600 px-6 py-2.5 font-bold text-white shadow-lg shadow-red-600/30 hover:bg-red-700">
+                {heroDeal === 'rent' ? 'Tìm thuê' : heroDeal === 'project' ? 'Xem dự án' : 'Tìm kiếm'}
+              </button>
             </div>
           </div>
 

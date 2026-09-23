@@ -188,6 +188,56 @@ def ca_chep(d, cx, cy, r, mau, net):
     d.ellipse([cx - r * 0.80, cy - r * 0.18, cx - r * 0.52, cy + r * 0.10], fill=net)
 
 
+def den_tho(d, cx, cy, w, h, mau, dam):
+    """Mái đền kiểu Việt: hai tầng mái cong, thân đền có cửa vòm, bậc thềm.
+
+    ⚠️ ĐUÔI MÁI PHẢI CONG LÊN. Bỏ chi tiết đó thì còn lại mấy hình thang
+       xếp chồng, nhìn ra ngôi nhà chứ không ra đền — mà trong logo đã có
+       sẵn một ngôi nhà rồi, thành ra hai ngôi nhà cạnh nhau.
+    """
+    def mai(nua_rong, y_duoi, y_tren, nua_tren):
+        d.polygon([(cx - w * nua_rong, cy + h * y_duoi),
+                   (cx - w * nua_tren, cy + h * y_tren),
+                   (cx + w * nua_tren, cy + h * y_tren),
+                   (cx + w * nua_rong, cy + h * y_duoi)], fill=mau)
+        # hai đuôi mái hất cong lên
+        for dau in (-1, 1):
+            d.polygon([(cx + dau * w * nua_rong, cy + h * y_duoi),
+                       (cx + dau * w * (nua_rong + 0.16), cy + h * (y_duoi - 0.16)),
+                       (cx + dau * w * (nua_rong - 0.02), cy + h * (y_duoi + 0.05))], fill=mau)
+
+    mai(0.40, -0.22, -0.46, 0.22)        # mái trên
+    mai(0.62, 0.08, -0.16, 0.40)         # mái dưới
+    d.rectangle([cx - w * 0.30, cy + h * 0.10, cx + w * 0.30, cy + h * 0.46], fill=mau)
+    d.ellipse([cx - w * 0.15, cy + h * 0.14, cx + w * 0.15, cy + h * 0.44], fill=dam)
+    d.rectangle([cx - w * 0.15, cy + h * 0.29, cx + w * 0.15, cy + h * 0.46], fill=dam)
+    d.rectangle([cx - w * 0.50, cy + h * 0.46, cx + w * 0.50, cy + h * 0.54], fill=mau)
+    d.rectangle([cx - w * 0.62, cy + h * 0.54, cx + w * 0.62, cy + h * 0.62], fill=mau)
+
+
+def nha_tranh(d, cx, cy, w, h, tranh, vach, cot):
+    """Ngôi nhà tranh năm gian kiểu làng quê xứ Nghệ — nơi Bác sinh ra.
+
+    Mái tranh DÀY, THẤP và XỐ XUỐNG gần tới hè, vuông vắn chứ không nhọn
+    như mái ngói — nhờ thế mà không bị nhìn lẫn với ngôi nhà sẵn có trong
+    logo (mà ngôi nhà kia là nét viền, còn cái này là mảng đặc).
+    """
+    # mái tranh: hình thang rất bè, nóc hơi bầu
+    d.polygon([(cx - w * 0.60, cy + h * 0.10), (cx - w * 0.30, cy - h * 0.34),
+               (cx + w * 0.30, cy - h * 0.34), (cx + w * 0.60, cy + h * 0.10)], fill=tranh)
+    d.ellipse([cx - w * 0.32, cy - h * 0.44, cx + w * 0.32, cy - h * 0.24], fill=tranh)
+    # vách và hiên
+    d.rectangle([cx - w * 0.46, cy + h * 0.10, cx + w * 0.46, cy + h * 0.44], fill=vach)
+    # cột hiên
+    for dx in (-0.34, -0.11, 0.11, 0.34):
+        d.rectangle([cx + w * dx - w * 0.035, cy + h * 0.10,
+                     cx + w * dx + w * 0.035, cy + h * 0.44], fill=cot)
+    # cửa giữa
+    d.rectangle([cx - w * 0.08, cy + h * 0.18, cx + w * 0.08, cy + h * 0.44], fill=cot)
+    # thềm đất
+    d.rectangle([cx - w * 0.56, cy + h * 0.44, cx + w * 0.56, cy + h * 0.52], fill=cot)
+
+
 def canh_nhon(d, cx, cy, goc, dai, rong, mau):
     """Một CÁNH HOA nhọn đầu, mọc từ (cx,cy) hướng theo `goc` (độ).
 
@@ -356,10 +406,15 @@ def ve_tet_duong(d, m):
 
 
 def ve_gio_to(d, m):
-    """Giỗ Tổ Hùng Vương: ngôi sao trống đồng."""
-    tia(d, 366, 72, 20, 54, m['vang'], so=14, day=6)
-    d.ellipse([366 - 26, 72 - 26, 366 + 26, 72 + 26], fill=m['vang_sang'])
-    sao(d, 366, 72, 19, m['do_tet'], canh=14, trong=0.55)
+    """Giỗ Tổ Hùng Vương: ĐỀN HÙNG.
+
+    Chủ dự án dặn "cái này nên để Hùng Vương vào". Ngôi sao trống đồng
+    (bản đầu) là biểu tượng chung của văn hoá Đông Sơn, ai cũng dùng được;
+    còn Đền Hùng thì chỉ có một, nhìn là biết ngày Giỗ Tổ.
+    Sau lưng đền vẽ vệt trống đồng mờ cho đủ ý "nguồn cội".
+    """
+    tia(d, 366, 44, 30, 54, m['vang'], so=14, day=5)
+    den_tho(d, 366, 72, 108, 96, m['vang_sang'], m['do_tet'])
 
 
 def ve_quoc_khanh(d, m):
@@ -472,10 +527,19 @@ def ve_dien_bien(d, m):
 
 
 def ve_sen(d, m):
-    """19/5 sinh nhật Bác: đoá sen hồng nở trên cuống."""
-    d.line([(368, 142), (368, 84)], fill=m['xanh'], width=7)
-    la_cay(d, 368, 120, 205, 42, m['xanh'])
-    hoa_nhieu_canh(d, 368, 62, 52, 7, m['hong'], m['net'], m['vang_sang'])
+    """19/5 sinh nhật Bác: ngôi nhà tranh Làng Sen + hai bông sen.
+
+    ⚠️ KHÔNG VẼ CHÂN DUNG BÁC VÀO LOGO. Chủ dự án có yêu cầu, nhưng:
+       1. Ảnh lãnh tụ không dùng cho mục đích thương mại — mà logo một sàn
+          bất động sản thì đúng là nhận diện thương mại;
+       2. logo chỉ hiện ở cỡ 32 điểm ảnh, khuôn mặt thành một vệt nhoè —
+          vừa không ai nhận ra, vừa thành thiếu tôn trọng.
+    Làng Sen là NƠI BÁC SINH RA nên hợp với ngày sinh hơn hẳn Lăng Bác
+    (bản trước), lại vẽ rõ được ở cỡ nhỏ.
+    """
+    hoa_nhieu_canh(d, 318, 104, 26, 7, m['hong'], m['kem'], m['vang_sang'])
+    hoa_nhieu_canh(d, 416, 110, 22, 7, m['hong'], m['kem'], m['vang_sang'])
+    nha_tranh(d, 366, 60, 118, 96, m['vang'], m['net'], m['nau'])
 
 
 def ve_nen(d, m):

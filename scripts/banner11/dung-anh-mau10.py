@@ -292,23 +292,27 @@ def main():
     ten_dat = TEN_DAT.get(ma, 'Loại đất %s' % ma if ma else 'Chưa rõ loại đất')
     dt_chu = format(int(round(chinh['dt'])), ',d').replace(',', '.')
 
-    # thẻ thông tin: đặt bên phải thửa chính, né mép khung
-    the_x = min(RONG - 268, max(chinh['x'] + 70, RONG * 0.62))
-    the_y = max(16, chinh['y'] - 150)
+    # Thẻ thông tin thửa.
+    # ⚠️ ĐỪNG đặt sát mép trên: banner nằm ngay dưới thanh menu của web, thẻ để
+    #    cao là chồng lên nút "Đăng tin"/"Admin" (chủ dự án đã bắt lỗi một lần).
+    #    Nên ghim thẻ xuống NỬA DƯỚI khung và làm nhỏ lại.
+    T_RONG, T_CAO = 196, 82
+    the_x = min(RONG - T_RONG - 24, max(chinh['x'] + 60, RONG * 0.60))
+    the_y = min(CAO - T_CAO - 70, max(CAO * 0.42, chinh['y'] - 40))
     the = ('<g class="fl-card" data-at="3000" data-once '
            'font-family="Inter, system-ui, sans-serif">'
-           '<rect x="%.0f" y="%.0f" width="252" height="104" rx="14" '
+           '<rect x="%.0f" y="%.0f" width="%d" height="%d" rx="11" '
            'fill="rgba(15,23,42,.9)" stroke="rgba(251,191,36,.65)"/>'
-           '<text x="%.0f" y="%.0f" fill="#fde68a" font-size="21" font-weight="800">'
+           '<text x="%.0f" y="%.0f" fill="#fde68a" font-size="16" font-weight="800">'
            'Thửa %s · Tờ %s</text>'
-           '<text x="%.0f" y="%.0f" fill="#e2e8f0" font-size="16">%s (%s)</text>'
-           '<text x="%.0f" y="%.0f" fill="#e2e8f0" font-size="16">Diện tích %s m²</text>'
+           '<text x="%.0f" y="%.0f" fill="#e2e8f0" font-size="12.5">%s (%s)</text>'
+           '<text x="%.0f" y="%.0f" fill="#e2e8f0" font-size="12.5">Diện tích %s m²</text>'
            '</g>'
-           % (the_x, the_y, the_x + 18, the_y + 34, chinh['thua'], chinh['to'],
-              the_x + 18, the_y + 63, ten_dat, ma or '—', the_x + 18, the_y + 89, dt_chu))
+           % (the_x, the_y, T_RONG, T_CAO, the_x + 14, the_y + 26, chinh['thua'], chinh['to'],
+              the_x + 14, the_y + 48, ten_dat, ma or '—', the_x + 14, the_y + 68, dt_chu))
 
     do_chu = ('<text class="count-txt" x="%.0f" y="%.0f" transform="rotate(%.1f %.0f %.0f)" '
-              'font-family="Inter, system-ui, sans-serif" font-size="21" font-weight="800" '
+              'font-family="Inter, system-ui, sans-serif" font-size="17" font-weight="800" '
               'fill="#fff" text-anchor="middle" '
               'style="paint-order:stroke;stroke:rgba(15,23,42,.6);stroke-width:5px" '
               'data-count="%d" data-pre="≈ " data-suf=" m">≈ %d m</text>'
@@ -327,7 +331,7 @@ def main():
         '<g class="grp fl-parcels" data-at="500" data-once>%s</g>'
         '<path class="fl-hl" data-at="2600" data-once d="%s"/>'
         '<g class="fl-lbl" data-at="2300" data-once font-family="Inter, system-ui, sans-serif" '
-        'font-size="19" font-weight="800" fill="#0f172a" text-anchor="middle" '
+        'font-size="16" font-weight="800" fill="#0f172a" text-anchor="middle" '
         'style="paint-order:stroke;stroke:rgba(255,255,255,.85);stroke-width:4px">%s</g>'
         '<g class="fl-measure" data-at="3300" data-once>%s%s</g>'
         '%s'

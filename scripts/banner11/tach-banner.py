@@ -113,6 +113,14 @@ SUA_CHU = {
     # quan tâm: chỗ đó có gì quanh mình.
     17: [('Dự án được đánh dấu ngay trên ảnh thật, thấy rõ sông, cầu và phố phường xung quanh.',
           'Sát mặt sông, cạnh cầu lớn, xung quanh là phố đã có người ở — đi lại, mua bán đều thuận.')],
+    # Mẫu 10 nay là BẢN ĐỒ QUY HOẠCH chứ không còn là ảnh flycam, nên chữ phải
+    # nói đúng thứ đang hiện. Dòng chữ nhỏ ở góc cũng đổi: "REC · ALT 30 m" là
+    # ký hiệu đang quay phim, để lại thì sai hẳn.
+    10: [('Ảnh flycam · Cam Lâm', 'Bản đồ quy hoạch · Cam Lâm'),
+         ('trên ảnh thật', 'trên bản đồ quy hoạch'),
+         ('Ranh thửa, loại đất và kích thước hiện ngay trên ảnh chụp từ trên cao, nhìn là hiểu.',
+          'Ranh thửa, loại đất và kích thước hiện ngay trên bản đồ quy hoạch, nhìn là hiểu.'),
+         ('REC · ALT 30 m', 'QĐ 205 · TỈ LỆ 1:2000')],
     # Mẫu 14 đã đổi sang ảnh tháp gạch, không còn mái ngói nào → sửa chữ cho
     # khớp ảnh. Vẫn viết chung chung, không nêu tên di tích (xem ghi chú DOI_ANH).
     14: [
@@ -128,6 +136,8 @@ SUA_CHU = {
 #    Dùng khi đoạn cần thay quá dài để chép nguyên văn vào đây (vd mặt nạ hình
 #    chiếc máy bay của mẫu 18 dài gần 3.000 ký tự).
 THAY_BIEU_THUC = {
+    # Thay nguyên cả khối <svg class="fill-svg"> của mẫu 10 (xem SVG_MAU10)
+    10: [(r'<svg class="fill-svg" viewBox="0 0 1000 750".*?</svg>', '__SVG_MAU10__')],
     18: [(r'<mask id="c18PlaneMask".*?</mask>', '__MAT_NA_MOI__')],
     # Mẫu 15: thay căn nhà 1 trệt của bản thiết kế bằng NHÀ 3 TẦNG CÓ SÂN VƯỜN.
     # Hình do scripts/banner11/ve-nha-mau15.py tính ra từ chính hình bình hành
@@ -175,7 +185,7 @@ RANH_VE_TAY = ''' <g fill="none" stroke="#7a3e12" stroke-width="2.6" stroke-line
 RANH_THAT = ('<image href="/banner11/m19-ranh-thua.webp" x="0" y="40" '
              'width="1000" height="323" preserveAspectRatio="none" opacity=".95"/>'
              # Thửa được chọn: tô sáng lên để mắt biết đang phóng vào đâu
-             '<path class="m19-thua" d="M543.0 177.1L554.1 177.2L554.1 184.7L543.0 184.7Z" '
+             '<path class="m19-thua" d="M402.4 223.6L397.2 223.7L397.6 218.7L401.5 218.4L402.1 220.1Z" '
              'fill="rgba(253,224,71,.32)" stroke="#fde047" stroke-width=".9"/>'
              '</g>')
 
@@ -243,12 +253,7 @@ NEN_MAU7_MOI = '<div class="bb-circle bb-big" data-at="200" data-once style="--f
 ANH_THAT_MAU19_CU = '<image href="https://images.pexels.com/photos/35995788/pexels-photo-35995788.jpeg?auto=compress&cs=tinysrgb&w=2000" width="1000" height="750" preserveAspectRatio="none"/>'
 ANH_THAT_MAU19_MOI = '<image href="/banner11/m19-vetinh.webp" x="0" y="40" width="1000" height="323" preserveAspectRatio="none"/>'
 
-# ── MẪU 10: ĐANG GIỮ NGUYÊN BẢN THIẾT KẾ (ảnh flycam + ranh vẽ tay) ────────
-# ⚠️ ĐÃ THỬ đổi sang bản đồ quy hoạch + ranh thửa thật và CHỦ DỰ ÁN KHÔNG DÙNG:
-#    xem xong bản mới, chủ dự án dặn "cái này giữ như cũ". Nên phần thay thế đã
-#    được gỡ khỏi THAY_BIEU_THUC/SUA_CHU. Mã dựng vẫn giữ lại đây và ở
-#    scripts/banner11/dung-anh-mau10.py, muốn bật lại thì thêm hai mục đó vào.
-# ── (mô tả bản đã dựng) ────────────────────────────────────────────────────
+# ── MẪU 10: BẢN ĐỒ QUY HOẠCH + RANH THỬA THẬT ──────────────────────────────
 # Bản thiết kế vẽ ranh thửa BẰNG TAY lên một tấm ảnh flycam đồng lúa. Chủ dự án
 # muốn "ảnh quy hoạch chứ không phải ảnh flycam", và "zoom nhỏ ảnh để thấy thửa
 # đầy đủ hơn" (ảnh cũ phóng quá to nên thửa nào cũng bị mép banner cắt cụt).

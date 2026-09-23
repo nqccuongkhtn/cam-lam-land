@@ -245,7 +245,7 @@
    một vòng chạy.
    Tâm phóng 55% ngang / 44% dọc chính là chỗ Thửa 132 · Tờ 19 (2.967 m², đất
    trồng cây lâu năm) — toạ độ do scripts/banner11/dung-anh-mau19.py tính ra. */
-.cl-b11 .st-b6 .m19-phong { transform-origin: 55% 44%; }
+.cl-b11 .st-b6 .m19-phong { transform-origin: 40.0% 56.1%; }
 .cl-b11 .st-b6 .b6-map.go .m19-phong {
   animation: cl-b11-phong calc(8200ms * var(--slow, 1)) cubic-bezier(.34, 0, .2, 1) both;
 }
@@ -315,6 +315,27 @@
 .cl-b11 .banner.static .c7-maybay { animation: none !important; transform: none !important }
 
 
-/* (Mẫu 10 giữ nguyên bản thiết kế — không có luật riêng nào ở đây nữa.
-   Từng có một bộ luật đổi màu nét cho nền bản đồ sáng, nhưng chủ dự án
-   dặn giữ bản cũ nên đã gỡ.) */
+/* ══ MẪU 10: ĐỔI MÀU NÉT CHO HỢP NỀN BẢN ĐỒ SÁNG ═══════════════════════════
+   Bản thiết kế vẽ ranh thửa màu TRẮNG vì nền là ảnh flycam tối. Nay nền là bản
+   đồ quy hoạch nền sáng → nét trắng mất hút. Đổi sang xanh đậm, nhãn chữ đổi
+   sang chữ tối viền trắng.
+   Cụm chữ bên trái vẫn đọc được vì lớp `.fl-shade` phủ tối nửa trái. */
+.cl-b11 .st-fly { background: #eef2f6 }
+.cl-b11 .st-fly .fl-parcels path { stroke: #1e3a8a; stroke-width: 2.4; opacity: .95 }
+.cl-b11 .st-fly .fl-hl { fill: rgba(251, 191, 36, .3); stroke: #b45309; stroke-width: 4.5 }
+.cl-b11 .st-fly .fl-measure path { stroke: #7f1d1d; stroke-width: 3 }
+.cl-b11 .st-fly .hud i { border-color: rgba(15, 23, 42, .5) }
+.cl-b11 .st-fly .hud .rec { color: #0f172a }
+.cl-b11 .st-fly .hud .cross::before,
+.cl-b11 .st-fly .hud .cross::after { background: #0f172a }
+
+
+/* ══ MẪU 16 "MỌI CUNG ĐƯỜNG ĐỀU DẪN VỀ NHÀ": kéo màu cho ra BIỂN MÙA HÈ ══════
+   Ảnh gốc chụp lúc trời hơi xám, nhìn nguội. Chủ dự án muốn "ảnh tươi lên,
+   vùng biển mùa hè" — nên kéo độ bão hoà, sáng và ngả xanh một chút.
+   Chỉ chỉnh MÀU chứ không đổi ảnh: nét vẽ tuyến đường của mẫu này bám theo
+   đúng con đường thật trong tấm ảnh, đổi ảnh là nét trỏ vào chỗ trống. */
+.cl-b11 .st-c16 .bgimg,
+.cl-b11 .st-c16 image {
+  filter: saturate(1.42) brightness(1.08) contrast(1.05) hue-rotate(-6deg);
+}

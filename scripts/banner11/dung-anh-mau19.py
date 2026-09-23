@@ -43,10 +43,18 @@ import subprocess
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 RA_ANH = os.path.join(GOC, 'apps', 'frontend', 'public', 'banner11')
 
-Z = 16                      # mức phóng để lấy ô bản đồ
-RONG, CAO = 2560, 827       # khung tính toán
-RA_RONG, RA_CAO = 1920, 620  # khổ ghi ra (thu nhỏ không làm đổi vùng đất)
-TAM_LON, TAM_LAT = 109.1815, 12.0985      # giữa vùng Cam Hải Đông – Bãi Dài
+# ── Chọn mức phóng: chỗ này quyết định ẢNH VỆ TINH NÉT HAY MỜ ──────────────
+# Ảnh Sentinel-2 chụp ở 10 m một điểm ảnh. Muốn nó nét thì khung phải RỘNG:
+# khung càng hẹp, một điểm ảnh gốc bị kéo ra càng to, càng nhoè.
+#   · khung 6 km / 1920 px  → 3,1 m/px, phải phóng 3,2 lần → nhoè (bản cũ, bị chê)
+#   · khung 12 km / 2560 px → 4,7 m/px, chỉ phóng 2,1 lần → nét hơn hẳn
+# Chủ dự án cũng muốn "zoom từ bản đồ toàn cảnh vào", nên khung rộng lại đúng ý:
+# mở đầu là cảnh toàn vùng, hiệu ứng phóng dần mới đi vào chi tiết.
+Z = 15                      # mức phóng của khung (4,67 m/điểm ảnh ở vĩ độ 12)
+Z_QH = 16                   # tile quy hoạch lấy ở mức DÀY HƠN rồi thu lại → nét
+RONG, CAO = 2560, 827       # khung tính toán ≈ 12 km × 3,9 km ngoài thực địa
+RA_RONG, RA_CAO = 2560, 827  # ghi ra đúng khổ đó, không thu nhỏ nữa
+TAM_LON, TAM_LAT = 109.1400, 12.0700      # trải từ đầm Thuỷ Triều sang Cam Đức
 VE_TINH = 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2020_3857/default/g/{z}/{y}/{x}.jpg'
 
 
@@ -101,7 +109,7 @@ def main():
     # "ảnh chụp từ trên cao" chứ không thành một mảng xanh lờ nhờ
     vt = ImageEnhance.Color(vt).enhance(1.25)
     vt = ImageEnhance.Contrast(vt).enhance(1.12)
-    vt = vt.filter(ImageFilter.UnsharpMask(radius=3, percent=90, threshold=2))
+    vt = vt.filter(ImageFilter.UnsharpMask(radius=2, percent=130, threshold=2))
     p1 = os.path.join(RA_ANH, 'm19-vetinh.webp')
     vt.save(p1, 'WEBP', quality=80, method=6)
     print('  OK %s  %d KB' % (os.path.basename(p1), os.path.getsize(p1) // 1024))
@@ -110,18 +118,26 @@ def main():
     # Ghi ra ảnh ĐỤC: ảnh vệ tinh làm nhạt hẳn đi rồi phủ nét quy hoạch lên trên.
     # Như vậy lúc lau qua, mắt thấy rõ "ảnh thật → bản đồ" chứ không phải chỉ
     # thấy thêm vài nét vẽ.
-    qh = Image.new('RGBA', ((tx1 - tx0 + 1) * 256, (ty1 - ty0 + 1) * 256), (0, 0, 0, 0))
+    # Tile quy hoạch lấy ở mức Z_QH (dày gấp đôi) rồi mới thu về khung → nét chữ
+    # và nét gạch của bản đồ không bị răng cưa.
+    k = 2 ** (Z_QH - Z)
+    qx0, qy0 = x0 * k, y0 * k
+    qrong, qcao = RONG * k, CAO * k
+    qtx0, qty0 = int(qx0 // 256), int(qy0 // 256)
+    qtx1, qty1 = int((qx0 + qrong) // 256), int((qy0 + qcao) // 256)
+    qh = Image.new('RGBA', ((qtx1 - qtx0 + 1) * 256, (qty1 - qty0 + 1) * 256), (0, 0, 0, 0))
     co = 0
-    for tx in range(tx0, tx1 + 1):
-        for ty in range(ty0, ty1 + 1):
+    for tx in range(qtx0, qtx1 + 1):
+        for ty in range(qty0, qty1 + 1):
             f = os.path.join(GOC, 'apps', 'frontend', 'public', 'tiles', 'qd205v11',
-                             str(Z), str(tx), '%d.png' % ty)
+                             str(Z_QH), str(tx), '%d.png' % ty)
             if os.path.exists(f):
                 qh.alpha_composite(Image.open(f).convert('RGBA'),
-                                   ((tx - tx0) * 256, (ty - ty0) * 256))
+                                   ((tx - qtx0) * 256, (ty - qty0) * 256))
                 co += 1
-    qh = qh.crop((int(x0 - tx0 * 256), int(y0 - ty0 * 256),
-                  int(x0 - tx0 * 256) + RONG, int(y0 - ty0 * 256) + CAO))
+    qh = qh.crop((int(qx0 - qtx0 * 256), int(qy0 - qty0 * 256),
+                  int(qx0 - qtx0 * 256) + qrong, int(qy0 - qty0 * 256) + qcao))
+    qh = qh.resize((RONG, CAO), Image.LANCZOS)
 
     nen = thu_nho(ve)
     nen = ImageEnhance.Color(nen).enhance(0.18)
@@ -167,7 +183,7 @@ def main():
         px, py = diem_anh(lon, lat, Z)
         return (px - x0) * RA_RONG / RONG, (py - y0) * RA_CAO / CAO
 
-    diem_vung, to_nhat, lon_nhat = [], None, 0
+    diem_vung, to_nhat, lon_nhat = [], None, 0.0   # lon_nhat: khoảng cách gần nhất tới tâm phóng
     for d in dong:
         p = d.split('\t')
         if len(p) < 5:
@@ -185,8 +201,14 @@ def main():
                 continue
             diem_vung.append([(a, b) for a, b in xs])
             try:
-                if float(dt) > lon_nhat and 300 < float(dt) < 3000:
-                    lon_nhat = float(dt)
+                # Chọn thửa để phóng vào: KHÔNG lấy thửa to nhất (nó hay nằm sát
+                # mép khung, phóng vào là ra ngoài ảnh), mà lấy thửa cỡ vừa nằm
+                # GẦN TÂM PHÓNG nhất (55% ngang, 44% dọc — chỗ hiệu ứng nhắm tới).
+                _x = sum(a for a, _ in xs) / len(xs)
+                _y = sum(b for _, b in xs) / len(xs)
+                _xa = ((_x - RA_RONG * 0.55) ** 2 + (_y - RA_CAO * 0.44) ** 2) ** 0.5
+                if _xa < (lon_nhat if lon_nhat else 1e9) and 600 < float(dt) < 4000:
+                    lon_nhat = _xa
                     d_svg = ''.join(('M' if i == 0 else 'L') + '%.1f %.1f' % (a, b)
                                     for i, (a, b) in enumerate(xs)) + 'Z'
                     to_nhat = {'to': so_to, 'thua': so_thua, 'dt': dt, 'mdsd': mdsd, 'd': d_svg,

@@ -207,8 +207,23 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
        phải cho hiện sẵn, nếu không người dùng điện thoại không đổi mẫu được. */
     setCoChamTay(window.matchMedia?.('(hover: none)').matches ?? false);
   }, []);
+  /* Chuột đang nằm TRÊN chính hai mũi tên → không được đếm giờ ẩn. Người dùng
+     rê tới nút rồi giữ yên để bấm, mà nút biến mất dưới con trỏ thì rất khó
+     chịu. Chỉ đếm giờ khi chuột ở CHỖ KHÁC trong banner. */
+  const treNut = useRef(false);
   const reChuot = useCallback(() => {
     setHienNut(true);
+    clearTimeout(henNut.current);
+    if (treNut.current) return;
+    henNut.current = window.setTimeout(() => setHienNut(false), 1600);
+  }, []);
+  const vaoNut = useCallback(() => {
+    treNut.current = true;
+    clearTimeout(henNut.current);
+    setHienNut(true);
+  }, []);
+  const roiNut = useCallback(() => {
+    treNut.current = false;
     clearTimeout(henNut.current);
     henNut.current = window.setTimeout(() => setHienNut(false), 1600);
   }, []);
@@ -491,7 +506,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
       <div
         className="relative mx-auto w-full max-w-[1920px] overflow-hidden"
         onPointerMove={reChuot}
-        onPointerLeave={() => { clearTimeout(henNut.current); setHienNut(false); }}
+        onPointerLeave={() => { treNut.current = false; clearTimeout(henNut.current); setHienNut(false); }}
       >
         {/* ── HAI MẪU CÙNG CÓ MẶT LÚC ĐANG LƯỚT ─────────────────────────────
             Mẫu cũ nằm đè lên trên và trượt ra, mẫu mới trượt vào từ phía kia.
@@ -536,6 +551,8 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
           <button
             key={ben as string}
             onClick={() => sang(chiSo + (huong as number))}
+            onPointerEnter={vaoNut}
+            onPointerLeave={roiNut}
             aria-label={huong === -1 ? 'Mẫu trước' : 'Mẫu sau'}
             className={`absolute top-1/2 z-30 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-black/30 text-lg text-white/90 backdrop-blur transition-opacity duration-300 hover:bg-black/55 hover:text-white ${ben === 'trai' ? 'left-2' : 'right-2'} ${hienNut || coChamTay ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
           >{dau as string}</button>

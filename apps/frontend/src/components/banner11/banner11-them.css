@@ -172,10 +172,22 @@
    Banner nay thấp hơn khổ thiết kế nên vài chỗ của mẫu rơi không đúng ý. Mấy
    luật dưới đây chỉnh riêng từng chỗ đó. */
 
-/* Mẫu 1: đôi người đang chạy che mất mặt biển — dịch sang phải vào khoảng trống
-   của phần đồ hoạ. */
-@media (min-width: 1101px) {
-  .cl-b11 .rb-couple { transform: translateX(7%) }
+/* Mẫu 1: đôi người đang chạy che mất mặt biển — dời hẳn sang khoảng trống của
+   phần đồ hoạ (mảng xanh nhạt bên phải), đứng lọt giữa mép ảnh và cụm chữ
+   "Sống cạnh Bãi Dài".
+
+   ⚠️ BẪY ĐÃ VẤP HAI LẦN: chỗ này KHÔNG dời được bằng `transform`.
+      Bản thiết kế cho khối người chạy hiệu ứng `walkIn` với `animation-fill-mode:
+      both` — mà giá trị do hiệu ứng đặt ra LUÔN THẮNG luật CSS thường, nên
+      `transform: translateX(...)` viết ở đây bị nuốt hoàn toàn (soi trong trình
+      duyệt thấy `transform: none`). Vì vậy dời bằng `left`, thứ mà hiệu ứng
+      không đụng tới.
+
+   Con số: bản gốc left = 945 đơn vị thiết kế. Cần dời thêm 520 đơn vị thì tâm
+   khối người rơi đúng khoảng trống (đo thật trên màn 1905px, --u = 0,754).
+   ⚠️ Đừng đẩy quá 1500: quá đà là chồng lên cụm chữ bên phải. */
+@media (min-width: 761px) {
+  .cl-b11 .rb-couple { left: calc(var(--u) * 1464px) }
 }
 
 /* Mẫu 18: bản gốc cho chiếc máy bay BAY VÚT ĐI (lao chéo lên rồi to dần).
@@ -207,29 +219,24 @@
   filter: saturate(1.45) brightness(1.1) contrast(1.06) hue-rotate(-8deg);
 }
 
-/* 2. Máy bay: bản gốc cho nó QUAY VÒNG quanh khung tròn. Chủ dự án muốn nó BAY
-      VƯỢT RA NGOÀI KHUNG như hiệu ứng "chủ thể vượt khung".
-      Nên tắt vòng quay, cho máy bay bay chéo từ dưới trái lên trên phải, xuyên
-      qua mép khung tròn rồi ra khỏi banner, lặp lại. */
-.cl-b11 .st-bub .bb-orbit { animation: none !important; left: 0; top: 0; width: 100%; height: 100% }
+/* 2. Máy bay BAY VÒNG THEO VÒNG TRÒN NÉT ĐỨT ở ngoài — đúng như bản thiết kế.
+      (Có một dạo đổi thành bay chéo vượt khung, nhưng chủ dự án muốn giữ vòng
+      bay quanh viền nét đứt, nên trả lại.)
+      Chỉ chỉnh ba thứ cho dễ nhìn hơn bản gốc:
+        · máy bay to hơn một chút (banner nay thấp nên 56px trông bé quá);
+        · nổi lên trên khung ảnh tròn để lúc bay qua không bị ảnh che;
+        · vòng bay chậm lại cho đỡ chóng mặt.
+      ⚠️ ĐỪNG đặt `animation: none` cho `.bb-orbit` — đó chính là thứ làm máy bay
+      chạy vòng; tắt nó là máy bay đứng chết một chỗ. */
+.cl-b11 .st-bub .bb-orbit { z-index: 6; animation-duration: calc(20s * var(--slow, 1)) }
 .cl-b11 .st-bub .bb-plane {
-  left: calc(var(--u) * 980px);
-  top: calc(var(--u) * 470px);
-  width: calc(var(--u) * 74px);
-  height: calc(var(--u) * 74px);
-  margin-left: 0;
-  z-index: 6;
-  transform: translate(0, 0) rotate(-34deg);
-  animation: cl-b11-bay calc(7.5s * var(--slow, 1)) cubic-bezier(.36, 0, .5, 1) infinite;
+  width: calc(var(--u) * 72px);
+  height: calc(var(--u) * 72px);
+  margin-left: calc(var(--u) * -36px);
+  top: calc(var(--u) * -6px);
 }
-@keyframes cl-b11-bay {
-  0%   { opacity: 0; transform: translate(-6%, 8%) rotate(-34deg) scale(.7) }
-  10%  { opacity: 1 }
-  78%  { opacity: 1 }
-  100% { opacity: 0; transform: translate(640%, -520%) rotate(-34deg) scale(1.45) }
-}
-/* Máy đặt "giảm chuyển động": máy bay đứng yên ở giữa đường bay, không nhấp nháy */
-.cl-b11 .banner.static .bb-plane { animation: none !important; opacity: 1 }
+/* Máy đặt "giảm chuyển động": máy bay đứng yên một chỗ trên vòng, không quay */
+.cl-b11 .banner.static .bb-orbit { animation: none !important }
 
 /* ══ MẪU 19: PHÓNG DẦN TỪ XA VÀO MỘT THỬA ĐẤT ═══════════════════════════════
    Chủ dự án muốn mẫu này kể đúng việc web làm: nhìn từ xa, rồi phóng dần vào
@@ -265,3 +272,49 @@
    Ẩn bằng CSS chứ không xoá khỏi mã: chữ đó nằm trong bản thiết kế gốc, xoá đi
    thì lần sau tách lại từ bản gốc là nó hiện ra lần nữa. */
 .cl-b11 .st-b5 .b5-tag { display: none }
+
+
+/* ══ MẪU 12: MÉP LƯỢN CỦA TẤM ẢNH PHẢI CONG MƯỢT ════════════════════════════
+   Bản thiết kế cắt mép bằng một đa giác chỉ có 11 điểm, cách nhau 10% chiều
+   cao. Trên màn rộng, 10% chiều cao là mấy chục điểm ảnh → nhìn ra ngay mấy
+   đoạn thẳng ngắn nối vào nhau, đúng như chủ dự án nhận xét.
+   Nay tính lại đúng đường cong đó (x = 0,3 + 11,7 × u^1,6) nhưng lấy 50 điểm,
+   cách nhau 2% → mắt không còn thấy khớp nối.
+   ⚠️ CSS chưa cho vẽ đường cong thật trong clip-path theo phần trăm, nên cách
+      duy nhất là lấy dày điểm. Đừng rút bớt điểm cho "gọn". */
+.cl-b11 .banner .b8-panel { clip-path: polygon(12% 0,100% 0,100% 100%,12% 100%,11.26% 98%,10.54% 96%,9.84% 94%,9.15% 92%,8.49% 90%,7.84% 88%,7.22% 86%,6.61% 84%,6.03% 82%,5.47% 80%,4.93% 78%,4.41% 76%,3.92% 74%,3.45% 72%,3.00% 70%,2.58% 68%,2.19% 66%,1.83% 64%,1.49% 62%,1.19% 60%,0.92% 58%,0.69% 56%,0.51% 54%,0.37% 52%,0.30% 50%,0.37% 48%,0.51% 46%,0.69% 44%,0.92% 42%,1.19% 40%,1.49% 38%,1.83% 36%,2.19% 34%,2.58% 32%,3.00% 30%,3.45% 28%,3.92% 26%,4.41% 24%,4.93% 22%,5.47% 20%,6.03% 18%,6.61% 16%,7.22% 14%,7.84% 12%,8.49% 10%,9.15% 8%,9.84% 6%,10.54% 4%,11.26% 2%) }
+
+
+/* ── Mẫu 7: chiếc máy bay THẬT cắt ra từ ảnh, bay vượt khỏi khung tròn ──────
+   Ảnh nền của ô tròn đã được xoá máy bay (m7-troi.webp), nên chiếc bay ở đây là
+   chiếc duy nhất. Chỗ đặt và cỡ tính theo khổ thiết kế — xem ghi chú trong
+   scripts/banner11/tach-banner.py mục THAY_DOAN[7]. */
+.cl-b11 .st-bub .c7-maybay {
+  position: absolute;
+  left: calc(var(--u) * 1356px);
+  top: calc(var(--u) * 285px);
+  width: calc(var(--u) * 112px);
+  height: auto;
+  z-index: 7;
+  pointer-events: none;
+  filter: drop-shadow(0 calc(var(--u) * 10px) calc(var(--u) * 16px) rgba(12, 42, 74, .35));
+  animation: cl-b11-m7bay calc(9s * var(--slow, 1)) cubic-bezier(.45, 0, .25, 1) infinite;
+}
+/* ⚠️ HƯỚNG BAY PHẢI ĐÚNG VỚI HƯỚNG MŨI MÁY BAY TRONG ẢNH.
+   Trong tấm ảnh gốc, mũi máy bay chếch lên phía TRÁI, đuôi ở dưới bên phải.
+   Lần đầu cho nó bay sang phải nên hoá ra bay giật lùi — chủ dự án bắt lỗi
+   ngay. Nay bay lên phía TRÊN BÊN TRÁI, đúng hướng mũi.
+   Đường bay cũng chọn sao cho lúc ra khỏi khung thì né cụm chữ bên trái (cụm
+   chữ bắt đầu từ y = 120 đơn vị, máy bay lúc đó đã lên tới y ≈ −45). */
+@keyframes cl-b11-m7bay {
+  0%, 16%   { transform: translate(0, 0) scale(1); opacity: 1 }
+  74%       { transform: translate(calc(var(--u) * -400px), calc(var(--u) * -215px)) scale(1.45); opacity: 1 }
+  88%, 100% { transform: translate(calc(var(--u) * -600px), calc(var(--u) * -330px)) scale(1.7); opacity: 0 }
+}
+/* Máy đặt "giảm chuyển động": đỗ yên đúng chỗ cũ trong ảnh, nhìn như ảnh gốc */
+.cl-b11 .banner.static .c7-maybay { animation: none !important; transform: none !important }
+
+
+/* (Mẫu 10 giữ nguyên bản thiết kế — không có luật riêng nào ở đây nữa.
+   Từng có một bộ luật đổi màu nét cho nền bản đồ sáng, nhưng chủ dự án
+   dặn giữ bản cũ nên đã gỡ.) */

@@ -202,20 +202,52 @@ async function fetchArticle(url: string): Promise<{ text: string; images: string
       if (cleanImg(c)) metaImgs.push(c);
     }
     html = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ').replace(/<header[\s\S]*?<\/header>/gi, ' ').replace(/<footer[\s\S]*?<\/footer>/gi, ' ');
-    let scope = (html.match(/<article[\s\S]*?<\/article>/i) || [])[0];
-    if (!scope) { const m = html.match(/<div[^>]+(?:id|class)=["'][^"']*(detail-content|article-body|fck_detail|contentdetail|news-content|main-?content|entry-content|the-article-body|content_detail)[^"']*["'][\s\S]*$/i); scope = m ? m[0] : html; }
-    const cut = scope.search(/Vận hành bởi|VCCorp|class=["'][^"']*(relate|relation|footer|tag-list|share|box-category|comment|widget)/i);
-    if (cut > 600) scope = scope.slice(0, cut);
+    /* ⚠️ CHỌN ĐÚNG KHỐI NỘI DUNG — chỗ này từng làm hỏng cả loạt bài.
+       Trước đây lấy THẺ <article> ĐẦU TIÊN. Nhiều báo (tuoitre.vn là một) đặt
+       mấy thẻ <article> nhỏ cho "tin liên quan" NẰM TRƯỚC thân bài → lấy trúng
+       cái rỗng, trích ra 0 đoạn, bài đăng lên chỉ còn đúng câu tóm tắt lặp lại.
+       Nay gom TẤT CẢ ứng viên rồi chọn cái nào trích ra được NHIỀU CHỮ NHẤT. */
+    const doanTu = (kh: string): string[] => {
+      const ra: string[] = [];
+      for (const m of kh.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)) {
+        const t = strip(decode(m[1]));
+        if (t.length >= 45 && !/^(theo |nguồn|ảnh\s*:|video\s*:|xem thêm|đọc thêm|>>)/i.test(t)
+            && !/[Ảả]nh\s*:\s*\S/.test(t) && !/^[Nn]guồn\s*:\s*\S/.test(t)) ra.push(t);
+      }
+      return ra;
+    };
+    /* Cắt phần đuôi (tin liên quan, thẻ, chia sẻ, bình luận).
+       ⚠️ BẪY ĐÃ VẤP: nhiều báo CHÈN hộp "tin liên quan" vào GIỮA thân bài
+       (tuoitre.vn chèn ngay sau đoạn đầu). Cắt ngay ở lần khớp đầu tiên là mất
+       gần hết bài — bài đăng lên chỉ còn 1–2 đoạn.
+       Nay: chỉ cắt theo tên lớp khi nó nằm ở PHẦN CUỐI (sau 60% độ dài); còn
+       "Vận hành bởi"/"VCCorp" là chân trang thật nên cắt ở đâu cũng được. */
+    const catDuoi = (kh: string): string => {
+      const chan = kh.search(/Vận hành bởi|VCCorp/i);
+      let cat = chan > 600 ? chan : kh.length;
+      const re = /class=["'][^"']*(relate|relation|footer|tag-list|share|box-category|comment|widget)/gi;
+      for (const m of kh.matchAll(re)) {
+        if (m.index !== undefined && m.index > kh.length * 0.6) { cat = Math.min(cat, m.index); break; }
+      }
+      return cat < kh.length ? kh.slice(0, cat) : kh;
+    };
+    const ungVien: string[] = [];
+    for (const m of html.matchAll(/<article[\s\S]*?<\/article>/gi)) ungVien.push(m[0]);
+    for (const m of html.matchAll(/<div[^>]+(?:id|class)=["'][^"']*(?:detail-content|detail-cmain|afcbc-body|article-body|fck_detail|contentdetail|news-content|main-?content|entry-content|the-article-body|content_detail|singular-content)[^"']*["'][\s\S]*$/gi)) ungVien.push(m[0]);
+    ungVien.push(html);
+    let scope = '';
+    let nhieuNhat = -1;
+    for (const uv of ungVien) {
+      const c = catDuoi(uv);
+      const n = doanTu(c).join(' ').length;
+      if (n > nhieuNhat) { nhieuNhat = n; scope = c; }
+    }
     const bodyImgs: string[] = [];
     for (const m of scope.matchAll(/<img[^>]+>/gi)) {
       const src = (m[0].match(/(?:data-src|data-original|src)=["']([^"' ]+)/i) || [])[1];
       if (src && cleanImg(src)) bodyImgs.push(src);
     }
-    const paras: string[] = [];
-    for (const m of scope.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)) {
-      const t = strip(decode(m[1]));
-      if (t.length >= 45 && !/^(theo |nguồn|ảnh\s*:|video\s*:|xem thêm|đọc thêm|>>)/i.test(t) && !/[Ảả]nh\s*:\s*\S/.test(t) && !/^[Nn]guồn\s*:\s*\S/.test(t)) paras.push(t);
-    }
+    const paras = doanTu(scope);
     // og:image (đại diện chuẩn) LÊN ĐẦU, rồi mới đến ảnh trong thân bài.
     return { text: paras.join('\n\n').slice(0, 7000), images: Array.from(new Set([...metaImgs, ...bodyImgs])).slice(0, 6) };
   } catch { return { text: '', images: [] }; }

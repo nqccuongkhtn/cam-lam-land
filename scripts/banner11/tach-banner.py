@@ -108,6 +108,11 @@ SUA_CHU = {
         ('Ảnh đồng lúa Cam Lâm chuyển thành bản đồ quy hoạch',
          'Ảnh thật chuyển thành bản đồ quy hoạch Cam Lâm'),
     ],
+    # Mẫu 17: câu giới thiệu cũ đi giải thích CÁCH LÀM ("dự án được đánh dấu
+    # ngay trên ảnh thật…") — khách đọc chẳng để làm gì. Đổi thành nói cái khách
+    # quan tâm: chỗ đó có gì quanh mình.
+    17: [('Dự án được đánh dấu ngay trên ảnh thật, thấy rõ sông, cầu và phố phường xung quanh.',
+          'Sát mặt sông, cạnh cầu lớn, xung quanh là phố đã có người ở — đi lại, mua bán đều thuận.')],
     # Mẫu 14 đã đổi sang ảnh tháp gạch, không còn mái ngói nào → sửa chữ cho
     # khớp ảnh. Vẫn viết chung chung, không nêu tên di tích (xem ghi chú DOI_ANH).
     14: [
@@ -157,8 +162,8 @@ ANH_GIA_BAN_DO = ('<image href="https://images.pexels.com/photos/35995788/pexels
 # `m19-phong` trong banner11-them.css). Thửa được chọn: Thửa 132 · Tờ 19 ·
 # 2.967 m² · CLN, nằm ở 55% ngang / 44% dọc của khung — đó cũng là tâm phóng.
 ANH_BAN_DO_THAT = ('<g class="m19-phong">'
-                   '<image href="/banner11/qh-cam-lam-rong.webp" x="0" y="40" width="1000" height="323" '
-                   'preserveAspectRatio="xMidYMid slice"/>')
+                   '<image href="/banner11/m19-quyhoach.webp" x="0" y="40" '
+                   'width="1000" height="323" preserveAspectRatio="none"/>')
 #    Mẫu 19 còn một chỗ giả nữa: RANH THỬA và mấy chữ "LUC" là VẼ TAY men theo
 #    bờ ruộng trong tấm ảnh gốc. Nay nền đã là bản đồ quy hoạch thật nên mấy nét
 #    đó nằm lạc lõng, cắt ngang bản đồ, nhìn rất sai.
@@ -167,21 +172,37 @@ ANH_BAN_DO_THAT = ('<g class="m19-phong">'
 #    toạ độ. Xem scripts/banner11/dung-anh-mau19.py.
 RANH_VE_TAY = ''' <g fill="none" stroke="#7a3e12" stroke-width="2.6" stroke-linejoin="round" opacity=".9"><path d="M700 108L750 148L800 181L850 214L900 247L950 284L1000 318L1000 420L950 437L900 453L850 469L800 486L760 506L710 524L650 502L600 486L560 474L500 458L460 444L400 430L370 421L346 390L362 366L378 330L434 292L500 254L550 226L600 185L650 150Z"/><path d="M258 8L320 26L407 50L500 70L580 82L640 92L700 108L650 150L600 185L550 226L500 254L434 292L378 330L321 298L258 264L201 236L150 198L148 150L140 120L134 101L158 72L205 40Z"/><path d="M700 108L730 86L760 72L800 60L850 50L900 45L1000 38L1000 318L950 284L900 247L850 214L800 181L750 148Z"/><path d="M370 421L400 430L460 444L500 458L560 474L600 486L650 502L710 524L722 550L740 598L760 635L790 675L820 715L840 750L350 750L330 675L312 625L300 580L285 524L282 475L300 455L330 430Z"/><path d="M710 524L760 506L800 486L850 469L900 453L950 437L1000 420L1000 750L840 750L820 715L790 675L760 635L740 598L722 550Z"/><path d="M0 207L60 203L100 202L150 198L201 236L258 264L321 298L378 330L362 366L346 390L300 412L250 432L202 452L150 457L100 467L50 482L0 497Z"/><path d="M0 497L50 482L100 467L150 457L202 452L230 520L254 600L275 680L290 750L0 750Z"/></g>
         <g font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="800" fill="#7a3e12" text-anchor="middle" style="paint-order:stroke;stroke:rgba(255,250,220,.85);stroke-width:4px"><text x="692" y="340">LUC</text><text x="376" y="157">LUC</text><text x="892" y="146">LUC</text><text x="148" y="341">LUC</text></g> '''.strip()
-RANH_THAT = ('<image href="/banner11/m19-ranh-thua.webp" x="0" y="40" width="1000" height="323" '
-             'preserveAspectRatio="xMidYMid slice" opacity=".92"/>'
+RANH_THAT = ('<image href="/banner11/m19-ranh-thua.webp" x="0" y="40" '
+             'width="1000" height="323" preserveAspectRatio="none" opacity=".95"/>'
              # Thửa được chọn: tô sáng lên để mắt biết đang phóng vào đâu
              '<path class="m19-thua" d="M543.0 177.1L554.1 177.2L554.1 184.7L543.0 184.7Z" '
              'fill="rgba(253,224,71,.32)" stroke="#fde047" stroke-width=".9"/>'
              '</g>')
 
-#    Mẫu 18 "Chủ thể vượt khung": ảnh trong khung đổi sang ảnh ĐÔ THỊ VEN BIỂN.
-#    Ảnh mới là ảnh NGANG còn ảnh cũ là ảnh DỌC nên phải tính lại chỗ đặt — để
-#    nguyên thông số cũ là ảnh bị kéo dãn méo mó.
+#    Mẫu 18 "Chủ thể vượt khung": ảnh trong khung đổi sang ảnh ĐÔ THỊ VEN BIỂN
+#    Nha Trang, trong ảnh có một TOÀ NHÀ KÍNH rất cao đứng tách hẳn trên nền
+#    trời — đúng thứ cần cho hiệu ứng vượt khung (chủ dự án chê tấm cũ: toà nhà
+#    lùn, nhô ra có 18 đơn vị, "chưa thực sự làm nổi bật được hiệu ứng").
+#    Ảnh mới là ảnh DỌC 2000×3000 nên phải tính lại toàn bộ chỗ đặt — để nguyên
+#    thông số cũ là ảnh bị kéo dãn méo mó.
+#    Cách chọn ba số translate/scale (đừng sửa bừa, tính lại theo lối này):
+#      · muốn ảnh phủ kín khung rộng 700 ⇒ scale ≥ 0,70;
+#      · chọn 0,71, đặt tx = 1055 ⇒ ảnh trải X 1055–1765, phủ khung 1060–1760;
+#      · đỉnh toà nhà trong ảnh ở v = 185 ⇒ ty = −0,355 × 185 ≈ −65,7 thì đỉnh
+#        rơi đúng y = 0, tức nhô ra khỏi mép khung (y = 110) đúng 110 đơn vị —
+#        mức tối đa còn nhìn thấy, vì trên y = 0 là bị cắt.
 _A18_CU = ('https://images.unsplash.com/photo-1580698872460-261e00561f35'
            '?w=1600&q=80&auto=format&fit=crop" width="1000" height="1472.5" '
            'preserveAspectRatio="none" transform="translate({t} -471.5) scale(1.0769)"')
-_A18_MOI = ('/banner11/un-1775300382637-2000.webp" width="1000" height="666.7" '
-            'preserveAspectRatio="none" transform="translate({t} 40) scale(0.85)"')
+# Khung ảnh mới: phóng to hơn (1,05 thay vì 0,85) và kéo ảnh LÊN (ty = −42,4)
+# để đỉnh toà nhà nhô hẳn ra ngoài mép khung. Trước đây toà nhà chỉ nhô ra 18
+# đơn vị — chủ dự án nói "chưa thực sự làm nổi bật được hiệu ứng". Nay nhô ra
+# 93 đơn vị, gấp hơn 5 lần.
+# ⚠️ Ba con số tx/ty/scale này phải KHỚP với TX/TY/S trong
+#    scripts/banner11/tach-toa-nha-mau18.py — đổi một bên thì chạy lại bên kia,
+#    lệch là ảnh cắt rời không nằm khít lên ảnh trong khung.
+_A18_MOI = ('/banner11/px-28143540-2000.webp" width="1000" height="1500" '
+            'preserveAspectRatio="none" transform="translate({t} -65.7) scale(0.71)"')
 _MAY_BAY = ('<g class="c18-plane" data-at="1500"><g mask="url(#c18PlaneMask)">'
             '<image href="https://images.unsplash.com/photo-1580698872460-261e00561f35'
             '?w=1600&q=80&auto=format&fit=crop" width="1000" height="1472.5" '
@@ -194,23 +215,80 @@ _MAY_BAY = ('<g class="c18-plane" data-at="1500"><g mask="url(#c18PlaneMask)">'
 #    phần ảnh NẰM NGOÀI khung. Chủ thể thành ra "vượt khung" mà vẫn là ảnh thật.
 #    Đã soi ảnh trong đúng hệ toạ độ của banner: toà nhà khách sạn cao nhất nằm
 #    ở x 1691–1768, phần thân vươn lên trên mép khung (mép khung ở y = 110).
-_MAT_NA_MOI = ('<mask id="c18PlaneMask" maskUnits="userSpaceOnUse" '
-               'x="1660" y="30" width="150" height="110">'
-               '<rect x="1691" y="34" width="77" height="82" fill="#fff"/></mask>')
-_TOA_NHA = ('<g class="c18-plane" data-at="1500"><g mask="url(#c18PlaneMask)">'
-            '<image href="/banner11/un-1775300382637-2000.webp" width="1000" height="666.7" '
-            'preserveAspectRatio="none" transform="translate(1000 40) scale(0.85)"/></g></g>')
+# Mặt nạ c18PlaneMask của bản thiết kế nay không ai dùng nữa (xem _TOA_NHA),
+# nên bỏ hẳn cho gọn.
+_MAT_NA_MOI = ''
+# Phần vượt khung KHÔNG còn dùng mặt nạ chữ nhật nữa. Mặt nạ chữ nhật lôi theo
+# cả mảng trời đêm quanh toà nhà → nhìn ra một khối vuông tối đè lên nền banner.
+# Nay dùng ảnh ĐÃ CẮT THEO ĐÚNG BÓNG toà nhà (nền trong suốt), do
+# scripts/banner11/tach-toa-nha-mau18.py dựng ra. Chỗ đặt cũng do script đó tính.
+_TOA_NHA = ('<g class="c18-plane" data-at="1500">'
+            '<image href="/banner11/m18-toanha.webp" x="1094.8" y="6.7" '
+            'width="167.9" height="300.3"/></g>')
 
 #    Mẫu 15: hình phác thảo căn nhà nằm sát ĐÁY khổ thiết kế (y 693–746 trong
 #    khung nhìn 524–750). Banner nay thấp hơn khổ gốc, lại có khung tìm kiếm ở
 #    đáy → căn nhà bị che mất. Dời khung nhìn xuống 48 đơn vị, tức là đẩy căn nhà
 #    LÊN CAO hơn trong banner, thoát khỏi chỗ khung tìm kiếm.
+NET_CU_12 = '<path d="M12 0L8.4 10L5.4 20L3 30L1.3 40L.3 50L1.3 60L3 70L5.4 80L8.4 90L12 100" fill="none" stroke="#5eead4" stroke-width="2.5" vector-effect="non-scaling-stroke"/>'
+NET_MOI_12 = '<path d="M12.00 0C11.41 1.67 9.58 6.67 8.49 10.00C7.40 13.33 6.38 16.67 5.47 20.00C4.55 23.33 3.71 26.67 3.00 30.00C2.29 33.33 1.64 36.67 1.19 40.00C0.74 43.33 0.30 46.67 0.30 50.00C0.30 53.33 0.74 56.67 1.19 60.00C1.64 63.33 2.29 66.67 3.00 70.00C3.71 73.33 4.55 76.67 5.47 80.00C6.38 83.33 7.40 86.67 8.49 90.00C9.58 93.33 11.41 98.33 12.00 100.00" fill="none" stroke="#5eead4" stroke-width="2.5" vector-effect="non-scaling-stroke"/>'
+
+NEN_MAU7_CU = '<div class="bb-circle bb-big" data-at="200" data-once style="--f:6s"><i class="bgimg" style="background-image:url(\'https://images.unsplash.com/photo-1580698872460-261e00561f35?w=1200&q=75&auto=format&fit=crop\')"></i></div>'
+NEN_MAU7_MOI = '<div class="bb-circle bb-big" data-at="200" data-once style="--f:6s"><i class="bgimg" style="background-image:url(\'/banner11/m7-troi.webp\')"></i></div>\n    <img class="c7-maybay" src="/banner11/m7-maybay.webp" alt="" aria-hidden="true">'
+
+# Mẫu 19, lớp "ảnh thật": bản gốc dùng ảnh đồng lúa mua ở kho ảnh — chẳng liên
+# quan gì tới vùng đất của bản đồ quy hoạch bên cạnh, chủ dự án nhìn phát ra
+# ngay "không khớp". Nay là ẢNH VỆ TINH ĐÚNG VÙNG ĐÓ, do
+# scripts/banner11/dung-anh-mau19.py dựng cùng lượt với bản đồ và ranh thửa.
+ANH_THAT_MAU19_CU = '<image href="https://images.pexels.com/photos/35995788/pexels-photo-35995788.jpeg?auto=compress&cs=tinysrgb&w=2000" width="1000" height="750" preserveAspectRatio="none"/>'
+ANH_THAT_MAU19_MOI = '<image href="/banner11/m19-vetinh.webp" x="0" y="40" width="1000" height="323" preserveAspectRatio="none"/>'
+
+# ── MẪU 10: ĐANG GIỮ NGUYÊN BẢN THIẾT KẾ (ảnh flycam + ranh vẽ tay) ────────
+# ⚠️ ĐÃ THỬ đổi sang bản đồ quy hoạch + ranh thửa thật và CHỦ DỰ ÁN KHÔNG DÙNG:
+#    xem xong bản mới, chủ dự án dặn "cái này giữ như cũ". Nên phần thay thế đã
+#    được gỡ khỏi THAY_BIEU_THUC/SUA_CHU. Mã dựng vẫn giữ lại đây và ở
+#    scripts/banner11/dung-anh-mau10.py, muốn bật lại thì thêm hai mục đó vào.
+# ── (mô tả bản đã dựng) ────────────────────────────────────────────────────
+# Bản thiết kế vẽ ranh thửa BẰNG TAY lên một tấm ảnh flycam đồng lúa. Chủ dự án
+# muốn "ảnh quy hoạch chứ không phải ảnh flycam", và "zoom nhỏ ảnh để thấy thửa
+# đầy đủ hơn" (ảnh cũ phóng quá to nên thửa nào cũng bị mép banner cắt cụt).
+# Nay cả khối SVG được dựng lại bằng scripts/banner11/dung-anh-mau10.py:
+#   · nền là tile quy hoạch QĐ205 của chính web, phủ trên ảnh vệ tinh đã làm
+#     nhạt như giấy in bản đồ;
+#   · ranh thửa là RANH THẬT lấy từ bảng `dia_chinh`, và chỉ lấy những thửa nằm
+#     TRỌN trong khung — đúng ý "thấy thửa đầy đủ";
+#   · số tờ, số thửa, loại đất, diện tích, số mét cạnh đều là số thật.
+# Script ghi sẵn kết quả ra `mau10-noidung.html` để chỗ này chỉ việc đọc — nhờ
+# vậy dựng banner không cần mở database.
+_F_MAU10 = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mau10-noidung.html')
+SVG_MAU10 = io.open(_F_MAU10, encoding='utf-8').read().strip() if os.path.exists(_F_MAU10) else ''
+
 THAY_DOAN = {
+    # ── MẪU 7: CHIẾC MÁY BAY THẬT TRONG ẢNH PHẢI BAY ĐƯỢC ───────────────────
+    # Chủ dự án chỉ thẳng vào chiếc máy bay trong ảnh: "vẫn chưa làm cho nó bay".
+    # Chiếc máy bay vector nhỏ vẫn chạy vòng quanh viền nét đứt (đó là thứ khác,
+    # chủ dự án cũng muốn giữ) — nhưng chiếc máy bay THẬT thì phải bay vượt ra
+    # khỏi khung tròn, giống hiệu ứng "chủ thể vượt khung".
+    # Cách làm: scripts/banner11/tach-may-bay-mau7.py tách chiếc máy bay ra thành
+    # ảnh nền trong suốt (m7-maybay.webp) VÀ dựng lại tấm ảnh nền đã xoá máy bay
+    # (m7-troi.webp). Không xoá thì lúc máy bay cắt rời bay lên sẽ lòi ra chiếc
+    # máy bay gốc nằm im → thành hai chiếc.
+    # Chỗ đặt (1356, 285) trong khổ thiết kế là tính ra chứ không ướm mắt:
+    #   ảnh 1200×1767 đặt kiểu cover vào ô tròn 510×510 ⇒ tỉ lệ 0,425;
+    #   background-position: center 30% ⇒ lệch dọc −72,3;
+    #   máy bay trong ảnh ở (567, 712) ⇒ trong ô tròn là (241,0 ; 230,3);
+    #   ô tròn đặt ở (1115, 55) ⇒ cộng lại ra (1356 ; 285).
+    7: [(NEN_MAU7_CU, NEN_MAU7_MOI)],
     9: [(BAN_DO_VE_TAY, BAN_DO_THAT)],
     # ⚠️ Đổi khung nhìn thì PHẢI kéo ảnh cao theo. Ảnh đặt bằng height="750",
     #    mà khung nhìn mới chạy tới y=792 → phần 750–792 là khoảng TRỐNG, banner
     #    hở một dải ở đáy. Nên đổi luôn height thành 820.
     15: [('viewBox="250 524 700 226"', 'viewBox="250 566 700 226"'),
+         # Lô đất dời lên khoảng cỏ trống ở giữa ảnh (chủ dự án khoanh đỏ) và to
+         # hơn bản gốc. Bốn góc mới lấy từ P0/P1/P2/P3 của ve-nha-mau15.py —
+         # sửa bên đó thì sửa cả ở đây, lệch là nhà đứng ra ngoài lô.
+         ('d="M601.8 745.9L651 723.6L621.7 699.4L572.5 721.6Z"',
+          'd="M676.0 690.0L762.0 668.0L735.0 638.0L649.0 660.0Z"'),
          ('width="1000" height="750" preserveAspectRatio="none"',
           'width="1000" height="820" preserveAspectRatio="none"'),
          ('Nhà 1 trệt, mái thái', 'Nhà 3 tầng · có sân vườn'),
@@ -218,13 +296,17 @@ THAY_DOAN = {
           'Phác thảo căn nhà 3 tầng có sân vườn trên lô đất trống')],
     18: [
         (_MAY_BAY, _TOA_NHA),
-        (_A18_CU.format(t='736.9'), _A18_MOI.format(t='1000')),
-        (_A18_CU.format(t='1026.9'), _A18_MOI.format(t='1290')),
-        (_A18_CU.format(t='446.9'), _A18_MOI.format(t='710')),
+        (_A18_CU.format(t='736.9'), _A18_MOI.format(t='1055')),
+        (_A18_CU.format(t='1026.9'), _A18_MOI.format(t='1345')),
+        (_A18_CU.format(t='446.9'), _A18_MOI.format(t='765')),
     ],
-    19: [(ANH_GIA_BAN_DO, ANH_BAN_DO_THAT), (RANH_VE_TAY, RANH_THAT)],
+    19: [(ANH_THAT_MAU19_CU, ANH_THAT_MAU19_MOI),
+         (ANH_GIA_BAN_DO, ANH_BAN_DO_THAT), (RANH_VE_TAY, RANH_THAT)],
     12: [
         ('scale="10"', 'scale="4"'),                       # gợn nhẹ hẳn đi
+        # Mép lượn: bản gốc vẽ bằng 11 đoạn thẳng nên nhìn ra khớp nối. Đổi sang
+        # một đường cong Bézier thật, cùng hình dáng nhưng liền mạch.
+        (NET_CU_12, NET_MOI_12),
         ('offset=".15" stop-color="#fff"', 'offset=".58" stop-color="#fff"'),  # chừa phần có thuyền
     ],
 }
@@ -401,7 +483,12 @@ def main():
             print(f'  · bỏ mẫu {so} ({ten[so - 1]}) — trùng với mẫu khác')
             continue
         for mau_tim, doan in THAY_BIEU_THUC.get(so, []):
-            if doan == '__MAT_NA_MOI__':
+            if doan == '__SVG_MAU10__':
+                if not SVG_MAU10:
+                    raise SystemExit('Thiếu scripts/banner11/mau10-noidung.html — '
+                                     'chạy: python scripts/banner11/dung-anh-mau10.py')
+                doan = SVG_MAU10
+            elif doan == '__MAT_NA_MOI__':
                 doan = _MAT_NA_MOI
             elif doan == '__NHA15_MAT__':
                 doan = NHA15_MAT

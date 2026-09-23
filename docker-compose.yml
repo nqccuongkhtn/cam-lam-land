@@ -141,6 +141,16 @@ services:
       NEXT_PUBLIC_MAP_CENTER_LNG: ${NEXT_PUBLIC_MAP_CENTER_LNG:-109.0917}
       NEXT_PUBLIC_MAP_CENTER_LAT: ${NEXT_PUBLIC_MAP_CENTER_LAT:-12.0771}
       NEXT_PUBLIC_MAP_ZOOM: ${NEXT_PUBLIC_MAP_ZOOM:-12}
+      # ── AI BIÊN TẬP TIN TỨC ──
+      # Trang /feed/news tự tải bài gốc rồi nhờ AI biên tập lại. KHÔNG có khoá ở
+      # đây thì nó lặng lẽ bỏ qua bước biên tập và chỉ đăng lại đúng câu tóm tắt
+      # của RSS → bài ra rất ngắn, đọc như lặp lại tiêu đề.
+      # ⚠️ Khoá phải đặt ở CHÍNH service frontend này, không phải ở backend:
+      #    /feed/news chạy trong tiến trình Next.js chứ không qua backend.
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      AI_MODEL: ${AI_MODEL:-}
     volumes:
       # ── BỘ TILE BẢN ĐỒ (1,8 GB) ──
       # KHÔNG nướng vào ảnh Docker nữa (.dockerignore đã loại) vì mỗi lần sửa một dòng mã

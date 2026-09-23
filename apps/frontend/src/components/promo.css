@@ -1,0 +1,133 @@
+/* ============================================================================
+ *  BANNER QUẢNG CÁO HTML5 ĐỘNG  —  phần hình thức
+ * ----------------------------------------------------------------------------
+ *  Dùng cho khối quảng cáo giữa trang chủ (PromoBanner.tsx).
+ *  Mọi hiệu ứng viết bằng CSS thuần, không dùng thư viện nào — nhẹ và chạy mượt
+ *  cả trên điện thoại yếu.
+ *
+ *  BỐN QUY TẮC GIỮ CHO NHẸ MÁY — đừng bỏ:
+ *   1. Chỉ chạy hiệu ứng bằng `transform` và `opacity`. Hai thứ này trình duyệt
+ *      giao cho card đồ hoạ, không bắt tính lại bố cục cả trang.
+ *   2. Máy đặt "giảm chuyển động" thì đứng yên hoàn toàn.
+ *   3. Banner bị cuộn khỏi màn hình hoặc đổi tab thì mã chạy tự gỡ lớp `chay`,
+ *      mọi hiệu ứng dừng theo (xem PromoBanner.tsx).
+ *   4. Màn nhỏ bỏ bớt mấy vòng tròn trang trí.
+ * ========================================================================== */
+
+.cl-qc {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  color: #fff;
+  isolation: isolate;
+}
+
+/* ── Nền: dải màu tự trôi chậm ───────────────────────────────────────────── */
+.cl-qc-nen {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: 220% 220%;
+  transition: background-image .6s ease;
+}
+.cl-qc.chay .cl-qc-nen { animation: cl-qc-troi 14s ease-in-out infinite }
+@keyframes cl-qc-troi {
+  0%, 100% { background-position: 0% 50% }
+  50%      { background-position: 100% 50% }
+}
+
+/* ── Vòng tròn trang trí trôi lững lờ ────────────────────────────────────── */
+.cl-qc-tron {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .12);
+  z-index: 1;
+  pointer-events: none;
+}
+.cl-qc.chay .cl-qc-tron { animation: cl-qc-noi var(--lau, 9s) ease-in-out infinite alternate }
+@keyframes cl-qc-noi {
+  from { transform: translate3d(0, 0, 0) scale(1) }
+  to   { transform: translate3d(-14px, 12px, 0) scale(1.08) }
+}
+
+/* ── Vệt sáng quét ngang ─────────────────────────────────────────────────── */
+.cl-qc-quet {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 26%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, .22) 48%, transparent);
+  transform: translate3d(-150%, 0, 0) skewX(-14deg);
+}
+.cl-qc.chay .cl-qc-quet { animation: cl-qc-quet 6.5s ease-in-out 1.4s infinite }
+@keyframes cl-qc-quet {
+  0%        { transform: translate3d(-150%, 0, 0) skewX(-14deg) }
+  38%, 100% { transform: translate3d(520%, 0, 0) skewX(-14deg) }
+}
+
+/* ── Chữ hiện lần lượt ───────────────────────────────────────────────────── */
+.cl-qc-chu > * { opacity: 0 }
+.cl-qc.chay .cl-qc-chu > * { animation: cl-qc-len .62s cubic-bezier(.16, 1, .3, 1) both }
+.cl-qc.chay .cl-qc-chu > :nth-child(1) { animation-delay: .06s }
+.cl-qc.chay .cl-qc-chu > :nth-child(2) { animation-delay: .18s }
+.cl-qc.chay .cl-qc-chu > :nth-child(3) { animation-delay: .30s }
+@keyframes cl-qc-len {
+  from { opacity: 0; transform: translate3d(0, 14px, 0) }
+  to   { opacity: 1; transform: none }
+}
+
+/* ── Nút bấm: nảy nhẹ rồi thỉnh thoảng loé sáng ──────────────────────────── */
+.cl-qc-nut { position: relative; overflow: hidden; opacity: 0 }
+.cl-qc.chay .cl-qc-nut { animation: cl-qc-bat .55s cubic-bezier(.34, 1.56, .64, 1) .42s both }
+@keyframes cl-qc-bat {
+  from { opacity: 0; transform: scale(.82) }
+  to   { opacity: 1; transform: none }
+}
+.cl-qc.chay .cl-qc-nut::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 38%, rgba(255, 255, 255, .55) 50%, transparent 62%);
+  transform: translate3d(-130%, 0, 0);
+  animation: cl-qc-loe 3.4s ease-in-out 2s infinite;
+}
+@keyframes cl-qc-loe {
+  0%        { transform: translate3d(-130%, 0, 0) }
+  45%, 100% { transform: translate3d(130%, 0, 0) }
+}
+
+/* ── Hình vẽ bên phải ────────────────────────────────────────────────────── */
+.cl-qc-hinh { opacity: 0 }
+.cl-qc.chay .cl-qc-hinh { animation: cl-qc-hien .7s cubic-bezier(.16, 1, .3, 1) .3s both }
+@keyframes cl-qc-hien {
+  from { opacity: 0; transform: translate3d(18px, 10px, 0) scale(.9) }
+  to   { opacity: 1; transform: none }
+}
+/* tên lửa bay lên xuống, cúp lắc nhẹ, ghim bản đồ nhún */
+.cl-qc.chay .cl-qc-bay  { animation: cl-qc-bay 2.8s ease-in-out infinite alternate }
+.cl-qc.chay .cl-qc-lac  { animation: cl-qc-lac 3.4s ease-in-out infinite alternate }
+.cl-qc.chay .cl-qc-nhun { animation: cl-qc-nhun 2.2s ease-in-out infinite }
+@keyframes cl-qc-bay  { from { transform: translateY(4px) } to { transform: translateY(-8px) } }
+@keyframes cl-qc-lac  { from { transform: rotate(-4deg) }  to { transform: rotate(4deg) } }
+@keyframes cl-qc-nhun { 0%, 100% { transform: translateY(0) } 45% { transform: translateY(-7px) } }
+
+/* ── Lúc đổi slide: nội dung trượt nhẹ sang ──────────────────────────────── */
+.cl-qc-vao { animation: cl-qc-truot .5s cubic-bezier(.5, 0, .25, 1) both }
+@keyframes cl-qc-truot {
+  from { opacity: 0; transform: translate3d(26px, 0, 0) }
+  to   { opacity: 1; transform: none }
+}
+
+/* ── Màn nhỏ: bỏ vòng tròn trang trí cho đỡ tốn máy ──────────────────────── */
+@media (max-width: 640px) {
+  .cl-qc-tron { display: none }
+}
+
+/* ── Máy đặt "giảm chuyển động": đứng yên, nhưng vẫn hiện đủ nội dung ────── */
+@media (prefers-reduced-motion: reduce) {
+  .cl-qc *,
+  .cl-qc *::after { animation: none !important; transform: none !important }
+  .cl-qc-chu > *, .cl-qc-nut, .cl-qc-hinh { opacity: 1 !important }
+  .cl-qc-quet { display: none }
+}

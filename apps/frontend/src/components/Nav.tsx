@@ -32,17 +32,26 @@ function NavIco({ href }: { href: string }) {
 function Logo({ light }: { light: boolean }) {
   return (
     <Link href="/" className="flex items-center gap-2.5 shrink-0">
+      {/* Biểu tượng NÉT VẼ NGÔI NHÀ, không có khung vuông nền, không có chấm
+          tròn ở giữa — chủ dự án gửi ảnh mẫu và dặn bỏ hai thứ đó.
+          ⚠️ GIỮ NGUYÊN MÀU VÀNG THƯƠNG HIỆU (#C8A14B). Ảnh mẫu vẽ màu xanh lá
+             nhưng chủ dự án dặn rõ "màu sắc như hiện tại, không đổi qua màu
+             xanh" — chỉ lấy HÌNH DÁNG của ảnh mẫu thôi. */}
       <svg viewBox="0 0 44 44" className="w-9 h-9 shrink-0" aria-hidden="true">
         <defs><linearGradient id="clNavy" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#123459" /><stop offset="1" stopColor="#081B30" /></linearGradient></defs>
+        {/* Khung vuông bo góc màu navy + viền vàng: GIỮ NGUYÊN, chủ dự án nhắc
+            khi bị bỏ mất. Chỉ đổi phần hình ngôi nhà bên trong. */}
         <rect width="44" height="44" rx="12" fill="url(#clNavy)" />
         <rect x="1.2" y="1.2" width="41.6" height="41.6" rx="10.8" fill="none" stroke="#C8A14B" strokeOpacity="0.45" strokeWidth="1.2" />
-        <path d="M11 21.5 L22 12 L33 21.5" fill="none" stroke="#C8A14B" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M14.2 20 V31.4 H29.8 V20" fill="none" stroke="#C8A14B" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx="22" cy="25.6" r="2.5" fill="#C8A14B" />
+        <g fill="none" stroke="#C8A14B" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10.5 21.8 L22 12 L33.5 21.8" />
+          <path d="M13.6 20.2 V32.2 H30.4 V20.2" />
+          <path d="M19.2 32.2 V25.6 H24.8 V32.2" />
+        </g>
       </svg>
       <span className="leading-tight">
         <span className={`font-extrabold block text-lg tracking-tight ${light ? 'text-white' : 'text-[#0A2540]'}`}>Cam Lâm <span className="text-[#C8A14B]">Land</span></span>
-        <span className={`hidden lg:block whitespace-nowrap text-[10px] font-medium tracking-wide ${light ? 'text-white/75' : 'text-slate-400'}`}>Phát triển bởi Nguyễn Quốc Cường</span>
+        <span className={`hidden lg:block whitespace-nowrap text-[10px] font-medium tracking-wide ${light ? 'text-white/75' : 'text-slate-400'}`}>Nhà đất &amp; quy hoạch</span>
       </span>
     </Link>
   );

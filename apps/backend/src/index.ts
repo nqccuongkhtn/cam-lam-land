@@ -20,6 +20,7 @@ import { adminRouter } from './routes/admin.ts';
 import { qrRouter } from './routes/qr.ts';
 import { mapAdsRouter } from './routes/mapAds.ts';
 import { partnersRouter } from './routes/partners.ts';
+import { logoLeRouter } from './routes/logoLe.ts';
 import { projectsRouter } from './routes/projects.ts';
 import { consignmentsRouter } from './routes/consignments.ts';
 import { investRouter } from './routes/invest.ts';
@@ -130,6 +131,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api/qr', qrRouter);
 app.use('/api/map-ads', mapAdsRouter);
 app.use('/api/partners', partnersRouter);
+app.use('/api/logo-le', logoLeRouter); // LỊCH ĐỔI LOGO NGÀY LỄ (dùng tạm — dễ gỡ)
 app.use('/api/projects', projectsRouter);
 app.use('/api/consignments', consignmentsRouter);
 app.use('/api/newsletter', newsletterRouter);

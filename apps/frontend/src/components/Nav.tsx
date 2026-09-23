@@ -5,6 +5,31 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import { useHideOnScroll } from '@/lib/hideOnScroll';
+import { apiBase } from '@/lib/api';
+
+/* ── LOGO NGÀY LỄ ───────────────────────────────────────────────────────────
+   Ngày thường dùng logo gốc; tới dịp lễ (Tết, Quốc khánh, Trung thu, Noel…)
+   thì đổi sang bản có trang trí. Lịch do quản trị viên đặt ở
+   /quan-tri/logo-le, máy chủ trả về mã bản logo của HÔM NAY.
+
+   ⚠️ GỌI BẰNG fetch TRẦN, KHÔNG kèm thẻ đăng nhập. Có thẻ đăng nhập là nginx
+      bỏ qua bộ nhớ đệm (luật chung của dự án: dữ liệu riêng tư không bao giờ
+      được cache) → mỗi lần mở trang lại hỏi thẳng máy chủ, phí một vòng gọi
+      cho một thứ cả ngày mới đổi một lần. Không thẻ thì nginx giữ 10 phút.
+   ⚠️ Hỏng thì im lặng dùng logo thường — logo là thứ không được phép làm
+      vỡ thanh menu. */
+function useLogoLe(): string | null {
+  const [ma, setMa] = useState<string | null>(null);
+  useEffect(() => {
+    let huy = false;
+    fetch(`${apiBase}/logo-le/hom-nay`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => { if (!huy && j?.ma) setMa(String(j.ma)); })
+      .catch(() => {});
+    return () => { huy = true; };
+  }, []);
+  return ma;
+}
 
 const links = [
   { href: '/', label: 'Trang chủ' },
@@ -30,6 +55,7 @@ function NavIco({ href }: { href: string }) {
 }
 
 function Logo({ light }: { light: boolean }) {
+  const le = useLogoLe();
   return (
     <Link href="/" className="flex items-center gap-2.5 shrink-0">
       {/* ĐÚNG LOGO CHỦ DỰ ÁN GỬI, lấy thẳng từ tệp gốc: cắt riêng phần biểu
@@ -52,7 +78,8 @@ function Logo({ light }: { light: boolean }) {
              bản NÉT NAVY đúng màu gốc. Một bản màu thì kiểu gì cũng có một
              trạng thái bị chìm. Dựng hai tệp bằng scripts/dung-logo.py. */}
       <img
-        src={light ? '/logo-cam-lam.webp' : '/logo-cam-lam-toi.webp'}
+        src={le ? `/logo-le/${le}${light ? '' : '-toi'}.webp`
+                : (light ? '/logo-cam-lam.webp' : '/logo-cam-lam-toi.webp')}
         alt="" aria-hidden="true" width={48} height={32}
         className="h-8 w-12 shrink-0 object-contain" />
       <span className="leading-tight">

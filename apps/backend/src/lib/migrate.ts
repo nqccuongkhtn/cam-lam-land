@@ -581,5 +581,37 @@ export async function migrate(): Promise<void> {
     .catch((e: any) => console.error('[migrate] webauthn_challenges lỗi:', e?.message || e));
   await pool.query(`CREATE INDEX IF NOT EXISTS webauthn_challenge_het_idx ON webauthn_challenges (expires_at)`).catch(() => {});
 
+  // ── LỊCH ĐỔI LOGO THEO NGÀY LỄ (dùng tạm — dễ gỡ) ────────────────────────
+  // Ngày thường dùng logo gốc; tới dịp lễ thì thanh menu đổi sang bản logo có
+  // trang trí. Bảng này chỉ giữ LỊCH, còn tệp ảnh nằm ở public/logo-le/.
+  await pool.query(`CREATE TABLE IF NOT EXISTS logo_le (
+    id BIGSERIAL PRIMARY KEY,
+    ma TEXT NOT NULL,                      -- mã bản logo: /logo-le/<ma>.webp
+    ten TEXT NOT NULL,                     -- tên dịp, hiện trong trang quản lý
+    kieu TEXT NOT NULL DEFAULT 'duong',    -- 'duong' | 'am' | 'ngay'
+    thang INT, ngay INT,                   -- ngày chính (kiểu 'duong' và 'am')
+    tu DATE, den DATE,                     -- khoảng ngày cụ thể (kiểu 'ngay')
+    truoc INT NOT NULL DEFAULT 0,          -- hiện sớm trước ngày chính mấy ngày
+    sau INT NOT NULL DEFAULT 0,            -- còn hiện sau ngày chính mấy ngày
+    uu_tien INT NOT NULL DEFAULT 0,        -- trùng ngày thì số lớn hơn thắng
+    bat BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now())`)
+    .catch((e: any) => console.error('[migrate] logo_le lỗi:', e?.message || e));
+  // Nạp sẵn 8 dịp thường gặp — CHỈ khi bảng còn rỗng, để không ghi đè lịch
+  // quản trị viên đã sửa.
+  await pool.query(`INSERT INTO logo_le (ma, ten, kieu, thang, ngay, truoc, sau, uu_tien)
+    SELECT * FROM (VALUES
+      ('tet',        'Tết Nguyên đán',        'am',    1,  1, 7, 7, 90),
+      ('tet-duong',  'Tết Dương lịch',        'duong', 1,  1, 1, 1, 40),
+      ('gio-to',     'Giỗ Tổ Hùng Vương',     'am',    3, 10, 1, 1, 60),
+      ('30-4',       'Giải phóng miền Nam',   'duong', 4, 30, 1, 2, 70),
+      ('quoc-khanh', 'Quốc khánh 2/9',        'duong', 9,  2, 2, 2, 80),
+      ('trung-thu',  'Tết Trung thu',         'am',    8, 15, 3, 1, 50),
+      ('noel',       'Giáng sinh',            'duong',12, 25, 2, 1, 30),
+      ('phu-nu',     'Phụ nữ Việt Nam 20/10', 'duong',10, 20, 0, 0, 20)
+    ) AS v(ma, ten, kieu, thang, ngay, truoc, sau, uu_tien)
+    WHERE NOT EXISTS (SELECT 1 FROM logo_le)`)
+    .catch((e: any) => console.error('[migrate] nạp lịch logo lễ lỗi:', e?.message || e));
+
   console.log('[migrate] schema up to date');
 }

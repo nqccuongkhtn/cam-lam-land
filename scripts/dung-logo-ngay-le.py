@@ -517,6 +517,31 @@ def song_nuoc(d, cx, cy, w, h, mau):
         d.line(diem, fill=mau, width=max(2, h * 0.22))
 
 
+# ── CHÂN DUNG BÁC (ngày 19/5) ──────────────────────────────────────────────
+# Hình khắc hai tông, do scripts/tao-chan-dung-bac.py đổi từ ảnh chân dung
+# chính thức chủ dự án gửi. Nét là màu trắng nên tô lại màu nào cũng được.
+# ⚠️ Đây là hình DÁN VÀO, không vẽ bằng hình khối như mọi dịp khác — khuôn mặt
+#    người thì không dựng bằng đa giác được.
+_CHAN_DUNG = os.path.join(GOC, 'scripts', 'anh', 'chan-dung-bac.png')
+
+
+def dan_chan_dung(lop, cx, cy, cao, mau):
+    """Dán hình khắc chân dung vào lớp trang trí, tô theo màu cho trước.
+
+    Toạ độ ghi theo cỡ THẬT (435×288) giống mọi hàm vẽ khác; ở đây tự nhân
+    lên PHONG vì hàm này dán ảnh chứ không đi qua bộ bọc _ve_phong().
+    """
+    if not os.path.exists(_CHAN_DUNG):
+        return
+    anh = Image.open(_CHAN_DUNG).convert('RGBA')
+    h = int(cao * PHONG)
+    w = max(1, round(h * anh.width / anh.height))
+    anh = anh.resize((w, h), Image.LANCZOS)
+    to = Image.new('RGBA', anh.size, tuple(mau) + (255,))
+    to.putalpha(anh.getchannel('A'))
+    lop.alpha_composite(to, (int(cx * PHONG - w / 2), int(cy * PHONG - h / 2)))
+
+
 def canh_nhon(d, cx, cy, goc, dai, rong, mau):
     """Một CÁNH HOA nhọn đầu, mọc từ (cx,cy) hướng theo `goc` (độ).
 
@@ -838,20 +863,17 @@ def ve_dien_bien(d, m):
     sao(d, 411, 47, 13, m['vang_co'])
 
 
-def ve_sen(d, m):
-    """19/5 sinh nhật Bác: ngôi nhà tranh Làng Sen + hai bông sen.
+def ve_sen(d, m, lop=None):
+    """19/5 sinh nhật Bác: CHÂN DUNG BÁC (hình khắc) và một đoá sen.
 
-    ⚠️ KHÔNG VẼ CHÂN DUNG BÁC VÀO LOGO. Chủ dự án có yêu cầu, nhưng:
-       1. Ảnh lãnh tụ không dùng cho mục đích thương mại — mà logo một sàn
-          bất động sản thì đúng là nhận diện thương mại;
-       2. logo chỉ hiện ở cỡ 32 điểm ảnh, khuôn mặt thành một vệt nhoè —
-          vừa không ai nhận ra, vừa thành thiếu tôn trọng.
-    Làng Sen là NƠI BÁC SINH RA nên hợp với ngày sinh hơn hẳn Lăng Bác
-    (bản trước), lại vẽ rõ được ở cỡ nhỏ.
+    Chủ dự án gửi ảnh chân dung chính thức và dặn để ảnh Bác vào. Ảnh chụp
+    thu về cỡ logo thì nhoè, nên đổi thành HÌNH KHẮC HAI TÔNG kiểu tranh cổ
+    động (xem scripts/tao-chan-dung-bac.py) — thu nhỏ vẫn còn đường nét.
+    Chân dung để TO gần hết chiều cao logo, vì đây là thứ chính của ngày này.
     """
-    hoa_nhieu_canh(d, 318, 104, 26, 7, m['hong'], m['kem'], m['vang_sang'])
-    hoa_nhieu_canh(d, 416, 110, 22, 7, m['hong'], m['kem'], m['vang_sang'])
-    nha_tranh(d, 366, 60, 118, 96, m['vang'], m['net'], m['nau'])
+    hoa_nhieu_canh(d, 320, 126, 26, 7, m['hong'], m['kem'], m['vang_sang'])
+    if lop is not None:
+        dan_chan_dung(lop, 380, 76, 148, m['net'] if m['net'] != NAVY else m['do'])
 
 
 def ve_nen(d, m):
@@ -933,7 +955,7 @@ DIP = [
 ]
 
 
-def _ve_phong(d, ve, m):
+def _ve_phong(d, ve, m, lop=None):
     """Gọi hàm vẽ nhưng mọi toạ độ tự được nhân lên PHONG lần.
 
     Nhờ vậy trong mấy hàm vẽ ở trên cứ ghi toạ độ theo cỡ THẬT (435×288) cho
@@ -959,7 +981,10 @@ def _ve_phong(d, ve, m):
     d.arc = lambda xy, start, end, **k: g_arc(nhan(xy), start, end,
                                               **{**k, 'width': int(max(1, k.get('width', 1) * PHONG))})
     try:
-        ve(d, m)
+        if 'lop' in ve.__code__.co_varnames[:ve.__code__.co_argcount]:
+            ve(d, m, lop)
+        else:
+            ve(d, m)
     finally:
         d.line, d.polygon, d.ellipse, d.rectangle, d.rounded_rectangle, d.arc = (
             g_line, g_poly, g_ell, g_rect, g_rr, g_arc)
@@ -973,7 +998,7 @@ def lam(nen_toi: bool):
     ra = {}
     for ma, _ten, ve in DIP:
         lop = Image.new('RGBA', (goc.width * PHONG, goc.height * PHONG), (0, 0, 0, 0))
-        _ve_phong(ImageDraw.Draw(lop), ve, m)
+        _ve_phong(ImageDraw.Draw(lop), ve, m, lop)
         anh = goc.copy()
         anh.alpha_composite(lop.resize(goc.size, Image.LANCZOS))
         ra[ma] = anh

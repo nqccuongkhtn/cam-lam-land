@@ -66,8 +66,14 @@ RANH = [
     #    nhà lạ dính bên phải.
     (634, 125), (635, 170), (633, 205), (630, 262), (630, 305),
     (634, 360), (640, 420),
-    # ── chân tường rào mặt trước (chừa ~20 điểm ảnh vỉa hè) ──
-    (630, 437), (515, 477), (410, 515), (310, 572), (195, 612),
+    # ── RA TỚI MÉP ĐƯỜNG: lấy trọn vỉa hè, dải cỏ và viên bó vỉa ───────────
+    # ⚠️ Cắt sát chân tường thì mất hết vỉa hè lẫn mặt đường — chủ dự án xem
+    #    xong bảo "cắt thiếu hàng rào sân vườn và đường". Nay đi theo VIÊN BÓ
+    #    VỈA (mép đường), nên nhìn ra ngay là căn nhà có đường chạy trước mặt.
+    # ⚠️ Vẫn dừng ở x ≈ 642: bên phải đó có cô gái đạp xe ngồi ngay mép đường,
+    #    lấy sang là banner có người đạp xe lơ lửng giữa bãi cỏ.
+    #    Lòng đường nhựa (cùng chiếc ô tô trên đó) nằm DƯỚI đường cắt này.
+    (642, 492), (540, 530), (415, 587), (350, 615), (190, 615), (168, 592),
     # ── chân tường rào bên trái (chừa ~12 điểm ảnh) ──
     (150, 565), (118, 513), (95, 486), (63, 448), (25, 408), (-10, 370),
     (-10, 340),

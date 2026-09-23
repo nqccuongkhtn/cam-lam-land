@@ -308,6 +308,9 @@ SVG_MAU10 = io.open(_F_MAU10, encoding='utf-8').read().strip() if os.path.exists
 #     (feGaussianBlur) nên mép mây mềm như mây thật, không ra hình bầu dục;
 #   · bốn đám ở bốn độ cao và bốn cỡ khác nhau, trôi với bốn tốc độ khác nhau
 #     (đám ở xa nhỏ và chậm, đám gần to và nhanh hơn) → có chiều sâu;
+#   · tốc độ 38–66 giây một vòng (đi hết bề ngang banner trong 19–33 giây). Lần đầu để 62–126 giây cho "thật", chủ dự án
+#     xem xong bảo "chưa đủ để thấy" — banner chỉ hiện vài giây rồi chuyển mẫu,
+#     mây nhích mấy chấm thì không ai nhận ra;
 #   · mỗi đám còn bồng bềnh lên xuống rất nhẹ, lệch nhịp nhau.
 #
 # ⚠️ PHẢI CẮT THEO #skyClip. Không cắt thì mây trôi đè cả lên dãy núi và lên
@@ -319,17 +322,21 @@ def _may(rx, ry, ds):
                    for x, y, a, b in ds)
 
 
-_MAY_1 = _may(1, 1, [(0, 0, 78, 19), (-52, 6, 52, 14), (46, 7, 58, 13), (2, -12, 40, 16)])
-_MAY_2 = _may(1, 1, [(0, 0, 62, 15), (-40, 5, 40, 11), (38, 5, 44, 10), (0, -9, 30, 12)])
-_MAY_3 = _may(1, 1, [(0, 0, 96, 22), (-64, 8, 62, 16), (58, 8, 68, 15), (4, -15, 48, 19)])
-_MAY_4 = _may(1, 1, [(0, 0, 46, 12), (-30, 4, 30, 9), (28, 4, 32, 8)])
+# ⚠️ MÂY PHẢI MỎNG. Lần đầu vẽ dày, chủ dự án bảo "phần mây đang hơi dày, bạn
+#    giảm bớt" — mây dày đè lên cả dãy núi phía sau, nhìn như vệt sơn trắng.
+#    Nay bề dày (bán kính đứng) chỉ còn chừng hai phần ba, và bớt một hình bầu
+#    dục ở mỗi đám cho thưa ra.
+_MAY_1 = _may(1, 1, [(0, 0, 80, 12), (-54, 4, 52, 9), (48, 5, 58, 8)])
+_MAY_2 = _may(1, 1, [(0, 0, 64, 10), (-42, 3, 40, 7), (40, 3, 44, 6)])
+_MAY_3 = _may(1, 1, [(0, 0, 98, 14), (-66, 5, 62, 10), (60, 5, 68, 9)])
+_MAY_4 = _may(1, 1, [(0, 0, 48, 8), (-31, 3, 30, 6), (29, 3, 32, 5)])
 
 MAY_MAU4 = (
     '<g class="dp-may" clip-path="url(#skyClip)" filter="url(#dpMayMo)" aria-hidden="true">'
-    '<g class="may m1" style="--y:34px;--s:1;--d:74s;--k:.05"><g class="bong">' + _MAY_1 + '</g></g>'
-    '<g class="may m2" style="--y:58px;--s:.72;--d:96s;--k:.46"><g class="bong">' + _MAY_2 + '</g></g>'
-    '<g class="may m3" style="--y:18px;--s:1.25;--d:126s;--k:.72"><g class="bong">' + _MAY_3 + '</g></g>'
-    '<g class="may m4" style="--y:80px;--s:.6;--d:62s;--k:.28"><g class="bong">' + _MAY_4 + '</g></g>'
+    '<g class="may m1" style="--y:34px;--s:1;--d:44s;--k:.05"><g class="bong">' + _MAY_1 + '</g></g>'
+    '<g class="may m2" style="--y:58px;--s:.72;--d:54s;--k:.46"><g class="bong">' + _MAY_2 + '</g></g>'
+    '<g class="may m3" style="--y:18px;--s:1.25;--d:66s;--k:.72"><g class="bong">' + _MAY_3 + '</g></g>'
+    '<g class="may m4" style="--y:80px;--s:.6;--d:38s;--k:.28"><g class="bong">' + _MAY_4 + '</g></g>'
     '</g>')
 
 MAY_LOC_MAU4 = ('<filter id="dpMayMo" x="-40%" y="-120%" width="180%" height="340%">'

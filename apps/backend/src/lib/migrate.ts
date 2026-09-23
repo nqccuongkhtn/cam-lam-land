@@ -603,7 +603,7 @@ export async function migrate(): Promise<void> {
   //    rỗng). Nên ghi số đợt vào app_config: đợt nào chưa chạy thì chạy, chạy
   //    rồi thì thôi. Quản trị viên xoá dịp nào thì nó không bị nạp lại, vì
   //    đợt đó đã đánh dấu xong.
-  const DOT_LICH_LE = 3;
+  const DOT_LICH_LE = 4;
   const dotCu = await pool.query(`SELECT (value->>'dot')::int AS dot FROM app_config WHERE key='logo_le_seed'`)
     .then((r: any) => Number(r.rows?.[0]?.dot || 0)).catch(() => 0);
   if (dotCu < DOT_LICH_LE) {
@@ -634,6 +634,7 @@ export async function migrate(): Promise<void> {
       ['thieu-nhi', 'Quốc tế Thiếu nhi 1/6', 'duong', 6, 1, 0, 0, 15, 2],
       // ── đợt 3: tách riêng những dịp trước đây dùng chung một hình ──
       ['lao-dong', 'Quốc tế Lao động 1/5', 'duong', 5, 1, 0, 0, 68, 3],
+      ['doan-ngo', 'Tết Đoan Ngọ (mồng 5 tháng Năm)', 'am', 5, 5, 0, 0, 44, 4],
     ];
     for (const [ma, ten, kieu, thang, ngay, truoc, sau, uu, dot] of LICH) {
       if (dot <= dotCu) continue;
@@ -656,7 +657,7 @@ export async function migrate(): Promise<void> {
         ['sen', 'duong', 5, 19],        // 19/5 → đoá sen
         ['hoa-cuc', 'duong', 10, 20],   // 20/10 → bó hoa cúc
         ['vu-lan', 'am', 7, 15],        // Vu Lan → đèn hoa đăng
-        ['nhang', 'am', 1, 15],         // rằm tháng Giêng → ba nén nhang
+        ['nhang', 'am', 1, 15],         // rằm tháng Giêng → bát chè trôi nước
       ];
       for (const [ma, kieu, thang, ngay] of DOI) {
         await pool.query(`UPDATE logo_le SET ma=$1 WHERE kieu=$2 AND thang=$3 AND ngay=$4`,
@@ -665,6 +666,11 @@ export async function migrate(): Promise<void> {
       await pool.query(
         `UPDATE logo_le SET ten='Giải phóng miền Nam 30/4', sau=0
           WHERE ma='30-4' AND kieu='duong' AND thang=4 AND ngay=30`).catch(() => {});
+    }
+    if (dotCu < 4) {
+      // Đổi tên cho khớp hình mới (rằm tháng Giêng nay là chè trôi nước).
+      await pool.query(`UPDATE logo_le SET ten='Tết Nguyên tiêu (rằm tháng Giêng)'
+                         WHERE ma='nhang' AND kieu='am' AND thang=1 AND ngay=15`).catch(() => {});
     }
     await pool.query(`INSERT INTO app_config (key, value) VALUES ('logo_le_seed', jsonb_build_object('dot', $1::int))
                       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`,

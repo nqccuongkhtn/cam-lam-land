@@ -69,12 +69,19 @@ def main():
     rgb[(~xanh) & (alp > 0.05)] = VANG_TROI
 
     out = Image.fromarray(np.dstack([rgb.astype(np.uint8), (alp * 255).astype(np.uint8)]), 'RGBA')
+    # ⚠️ CẮT SÁT, ĐỪNG ĐỘN THÀNH HÌNH VUÔNG.
+    #    Biểu tượng bè ngang (730×480). Độn cho vuông là phí mất hơn một phần ba
+    #    chiều cao, hình vẽ bị thu nhỏ lại và ở khung 36px nhìn rối tung — chủ
+    #    dự án đã nhận xét "logo nhỏ nên hơi rối".
+    #    Giữ đúng tỉ lệ thật, khung trên web sẽ làm hơi bè ngang cho khớp.
+    khung2 = out.getbbox()
+    if khung2:
+        out = out.crop(khung2)
     w, h = out.size
-    canh = max(w, h)
-    vuong = Image.new('RGBA', (canh, canh), (0, 0, 0, 0))
-    vuong.paste(out, ((canh - w) // 2, (canh - h) // 2), out)
-    vuong = vuong.resize((KHO, KHO), Image.LANCZOS)
-    vuong.save(RA, 'WEBP', quality=94, method=6)
+    rong = int(round(KHO * w / h))
+    out = out.resize((rong, KHO), Image.LANCZOS)
+    out.save(RA, 'WEBP', quality=94, method=6)
+    print('Ti le ngang/doc = %.3f' % (rong / KHO))
     print('OK %s  %d KB' % (os.path.basename(RA), os.path.getsize(RA) // 1024))
 
 

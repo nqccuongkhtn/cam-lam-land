@@ -42,10 +42,14 @@ function Logo({ light }: { light: boolean }) {
              nghỉm; vì vậy tệp `logo-cam-lam.webp` đã được ĐỔI MÀU NÉT sang
              vàng thương hiệu (#C8A14B), riêng mặt trời để vàng sáng hơn cho
              tách bạch. Muốn dựng lại tệp này thì xem
-             scripts/dung-logo.py. */}
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-[#C8A14B]/45 bg-gradient-to-br from-[#123459] to-[#081B30]">
-        <img src="/logo-cam-lam.webp" alt="" aria-hidden="true" width={30} height={30}
-          className="h-[30px] w-[30px] object-contain" />
+             scripts/dung-logo.py.
+          ⚠️ KHUNG HƠI BÈ NGANG (54×36) LÀ CỐ Ý: biểu tượng vốn bè ngang
+             (tỉ lệ 1,52). Nhét vào khung vuông thì phải thu nhỏ lại, ở cỡ 36px
+             nhìn rối tung — chủ dự án đã nhận xét đúng chỗ này. Khung bè theo
+             đúng tỉ lệ thì hình vẽ to lên được gần một nửa, rõ hẳn. */}
+      <span className="grid h-9 w-[54px] shrink-0 place-items-center rounded-xl border border-[#C8A14B]/45 bg-gradient-to-br from-[#123459] to-[#081B30]">
+        <img src="/logo-cam-lam.webp" alt="" aria-hidden="true" width={46} height={30}
+          className="h-[30px] w-[46px] object-contain" />
       </span>
       <span className="leading-tight">
         <span className={`font-extrabold block text-lg tracking-tight ${light ? 'text-white' : 'text-[#0A2540]'}`}>Cam Lâm <span className="text-[#C8A14B]">Land</span></span>

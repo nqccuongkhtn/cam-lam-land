@@ -484,3 +484,17 @@
   .cl-b11 .rb-row { font-size: 11px; margin: 2px 0 }
   .cl-b11 .rb-cta { margin-top: 6px }
 }
+
+
+/* ══ MẪU 9: DÒNG THÔNG BÁO ĐỪNG ĐỨNG LẺ LOI ════════════════════════════════
+   Bản thiết kế đặt dòng "Có 3 tin đăng mới gần biển hôm nay" ở giữa mép trên
+   (left 620, top 20). Trên web, chỗ đó vừa nằm sau thanh menu, vừa tách hẳn
+   khỏi cụm thẻ bên phải — nhìn rời rạc, đúng như chủ dự án nhận xét.
+   Nay xếp nó vào CỤM BÊN PHẢI, ngay dưới thẻ tin đăng, thẳng hàng với thẻ đó:
+     thẻ tin đăng  (top 70)  →  dòng thông báo (top 182)  →  khung chat + bản đồ (top 300) */
+.cl-b11 .st-ui .ui-toast {
+  left: auto;
+  right: calc(var(--u) * 480px);
+  top: calc(var(--u) * 182px);
+  width: calc(var(--u) * 390px);
+}

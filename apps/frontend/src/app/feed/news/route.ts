@@ -57,13 +57,39 @@ const vnSlug = (s: string): string => s.normalize('NFD').replace(/[̀-ͯ]/g, '')
 const shortHash = (s: string): string => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h.toString(); }; // đuôi slug = SỐ
 
 // ── AI viết lại: ưu tiên Gemini (MIỄN PHÍ - GEMINI_API_KEY), nếu không thì Claude (ANTHROPIC_API_KEY). Không có key nào thì để tóm tắt nguồn. ──
-const GEMINI_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+/* ── Khoá và model của Gemini ────────────────────────────────────────────────
+   ⚠️ ĐÃ VẤP: một tấm bài đăng lên chỉ có đúng câu tóm tắt, tưởng lỗi prompt.
+   Thật ra là hai chuyện khác:
+     1. khoá Gemini chỉ khai cho container BACKEND, còn trang tin chạy trong
+        container FRONTEND nên không thấy khoá → bỏ hẳn bước biên tập (đã sửa
+        trong docker-compose.yml);
+     2. chỉ thử ĐÚNG MỘT model. Gemini hay trả 503 "đang quá tải" — gặp đúng
+        lúc đó là bài nào cũng trượt.
+   Nay gom mọi khoá khai được và thử LẦN LƯỢT từng model cho tới khi có bài.
+   Biến `GEMINI_MODELS` trong .env của dự án đang chứa MỘT KHOÁ chứ không phải
+   danh sách model (khai nhầm ô), nên ở đây tự phân loại: giá trị nào có chữ
+   "gemini" thì coi là model, còn lại coi là khoá. */
+const tachDS = (v?: string): string[] =>
+  (v || '').split(',').map((x) => x.trim()).filter(Boolean);
+
+const GEMINI_KEYS: string[] = [...new Set([
+  ...tachDS(process.env.GEMINI_API_KEYS),
+  ...tachDS(process.env.GEMINI_API_KEY),
+  ...tachDS(process.env.GEMINI_MODELS).filter((x) => !/gemini/i.test(x)),
+])];
+const GEMINI_MODELS: string[] = [...new Set([
+  ...tachDS(process.env.GEMINI_MODEL).filter((x) => /gemini/i.test(x)),
+  ...tachDS(process.env.GEMINI_MODELS).filter((x) => /gemini/i.test(x)),
+  'gemini-2.5-flash',
+  'gemini-2.0-flash',
+  'gemini-2.5-flash-lite',
+])];
+const GEMINI_KEY = GEMINI_KEYS[0];
+const GEMINI_MODEL = GEMINI_MODELS[0];
 const AI_KEY = process.env.ANTHROPIC_API_KEY;
 const AI_MODEL = process.env.AI_MODEL || 'claude-haiku-4-5-20251001';
 const NO_THINK = /(^|[^0-9])(2\.5|3\.)/.test(GEMINI_MODEL) || GEMINI_MODEL.includes('flash-latest') || GEMINI_MODEL.includes('pro-latest');
 let lastErr: string | null = null;
-
 /* ── CÂU LỆNH BIÊN TẬP TIN ─────────────────────────────────────────────────
  * Viết theo đúng nghiệp vụ một biên tập viên toà soạn, không phải "viết lại cho
  * khác chữ". Mỗi quy tắc dưới đây đều có lý do, ghi luôn để sau khỏi sửa bừa:
@@ -83,6 +109,7 @@ let lastErr: string | null = null;
  *  · KHÔNG KHEN CHÊ, KHÔNG KHUYÊN ĐẦU TƯ: tin là tin. Khuyên mua bán trên trang
  *    bất động sản là tự rước trách nhiệm pháp lý.
  */
+
 const newsPrompt = (title: string, full: string): string => `Bạn là biên tập viên một toà soạn tin tức bất động sản. Biên tập lại bài dưới đây thành một bài hoàn chỉnh bằng tiếng Việt, đúng chuẩn báo chí.
 
 CÁCH DỰNG BÀI
@@ -133,28 +160,32 @@ ${full}`;
 
 async function rewrite(title: string, full: string): Promise<string | null> {
   const prompt = newsPrompt(title, full);
-  if (GEMINI_KEY) {
-    try {
-      const genCfg: any = { maxOutputTokens: 4096, temperature: 0.7 };
-      if (NO_THINK) genCfg.thinkingConfig = { thinkingBudget: 0 };
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-goog-api-key': GEMINI_KEY },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: genCfg }),
-        signal: AbortSignal.timeout(28000),
-      });
-      if (res.ok) {
-        const j: any = await res.json();
-        const txt = j?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-        if (txt) { lastErr = null; return txt; }
-        lastErr = 'Gemini trả rỗng (finishReason=' + (j?.candidates?.[0]?.finishReason || '?') + ')';
-      } else {
-        lastErr = 'Gemini HTTP ' + res.status + ': ' + (await res.text().catch(() => '')).slice(0, 200);
-      }
-    } catch (e: any) { lastErr = 'Gemini lỗi: ' + (e?.message || String(e)); }
-  } else {
-    lastErr = 'Chưa cấu hình GEMINI_API_KEY';
+  for (const khoa of GEMINI_KEYS) {
+    for (const model of GEMINI_MODELS) {
+      try {
+        const genCfg: any = { maxOutputTokens: 4096, temperature: 0.7 };
+        if (NO_THINK) genCfg.thinkingConfig = { thinkingBudget: 0 };
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-goog-api-key': khoa },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: genCfg }),
+          signal: AbortSignal.timeout(28000),
+        });
+        if (res.ok) {
+          const j: any = await res.json();
+          const txt = j?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+          if (txt) { lastErr = null; return txt; }
+          lastErr = `Gemini ${model} trả rỗng (finishReason=${j?.candidates?.[0]?.finishReason || '?'})`;
+        } else {
+          lastErr = `Gemini ${model} HTTP ${res.status}: ` + (await res.text().catch(() => '')).slice(0, 160);
+          /* 400/403/404 là sai khoá hoặc sai tên model → thử model khác cũng vô
+             ích với khoá này; 429/503 là quá tải → thử model khác thì lại có cửa. */
+          if (res.status === 400 || res.status === 403 || res.status === 404) continue;
+        }
+      } catch (e: any) { lastErr = `Gemini ${model} lỗi: ` + (e?.message || String(e)); }
+    }
   }
+  if (!GEMINI_KEYS.length) lastErr = 'Chưa cấu hình GEMINI_API_KEY';
   if (AI_KEY) {
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {

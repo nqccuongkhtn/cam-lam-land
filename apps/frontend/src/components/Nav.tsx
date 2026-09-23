@@ -37,10 +37,13 @@ function Logo({ light }: { light: boolean }) {
           CL + mặt trời + sóng) và BỎ hai dòng chữ "CAM LÂM / NHÀ ĐẤT" ở dưới —
           chỗ đó đã có tên thương hiệu viết chữ ngay bên cạnh. Nền đen của tệp
           gốc đã được đổi thành trong suốt.
-          ⚠️ KHUNG PHẢI NỀN TRẮNG: logo vẽ bằng màu navy, đặt lên khung navy như
-             trước là chìm nghỉm, gần như không thấy gì. Viền vàng thương hiệu
-             giữ nguyên cho vẫn ra dáng cái khung như chủ dự án muốn. */}
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-[#C8A14B]/50 bg-white shadow-sm">
+          ⚠️ NỀN KHUNG GIỮ MÀU NAVY — đó là màu chủ đạo của web, chủ dự án dặn
+             giữ. Logo gốc vẽ bằng chính màu navy nên đặt thẳng lên là chìm
+             nghỉm; vì vậy tệp `logo-cam-lam.webp` đã được ĐỔI MÀU NÉT sang
+             vàng thương hiệu (#C8A14B), riêng mặt trời để vàng sáng hơn cho
+             tách bạch. Muốn dựng lại tệp này thì xem
+             scripts/dung-logo.py. */}
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-[#C8A14B]/45 bg-gradient-to-br from-[#123459] to-[#081B30]">
         <img src="/logo-cam-lam.webp" alt="" aria-hidden="true" width={30} height={30}
           className="h-[30px] w-[30px] object-contain" />
       </span>

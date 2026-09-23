@@ -148,6 +148,8 @@ services:
       # ⚠️ Khoá phải đặt ở CHÍNH service frontend này, không phải ở backend:
       #    /feed/news chạy trong tiến trình Next.js chứ không qua backend.
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_API_KEYS: ${GEMINI_API_KEYS:-}
+      GEMINI_MODELS: ${GEMINI_MODELS:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       AI_MODEL: ${AI_MODEL:-}

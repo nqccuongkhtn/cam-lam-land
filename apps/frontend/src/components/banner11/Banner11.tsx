@@ -230,7 +230,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
   useEffect(() => {
     if (dangRa === null) return;
     clearTimeout(henRa.current);
-    henRa.current = window.setTimeout(() => setDangRa(null), 700);
+    henRa.current = window.setTimeout(() => setDangRa(null), 520);   // khớp với thời lượng hiệu ứng trượt trong CSS
     return () => clearTimeout(henRa.current);
   }, [dangRa, chiSo]);
   const khongGan = useCallback(() => {}, []);
@@ -281,7 +281,12 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
       const rongMh = window.innerWidth;
       const tiLeChu = rongMh >= 1101 ? 0.76 : rongMh >= 761 ? 0.84 : 1;
       b.style.setProperty('--u', String((w / KHO_GOC) * tiLeChu));
-      khung.classList.add('san-sang');   // đo xong mới cho nội dung banner hiện ra
+      /* ⚠️ GẮN VÀO THẺ BANNER, KHÔNG gắn vào thẻ bọc ngoài.
+         Thẻ bọc ngoài do React dựng: mỗi lần React vẽ lại (vd lúc đổi mẫu, thẻ
+         cũ được đổi class để trượt ra) là nó GHI ĐÈ class, mọi lớp mình gắn
+         thêm bằng mã chạy đều bay mất. Mất `san-sang` thì toàn bộ chữ trong
+         banner bị ẩn → đúng cái lỗi "mẫu cũ trượt ra chỉ còn khung trống". */
+      b.classList.add('san-sang');
 
       /* Điện thoại: vài mẫu khai sẵn khung cắt ảnh riêng (data-vbm) để chủ thể
          nằm phía trên, không bị khối chữ che. Không đổi thì trên màn nhỏ chỉ
@@ -327,6 +332,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
       },
     };
 
+    if (it) b.classList.add('static');   // máy đặt "giảm chuyển động"
     const lich = new LichChay(b);
     const cv = b.querySelector<HTMLCanvasElement>('.fireflies');
     const hat = cv ? new HatSang(cv) : null;
@@ -356,7 +362,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
       if (dangChay || it) return;
       dangChay = true;
       doLaiCo();                             // đo lại lần nữa cho chắc
-      khung.classList.remove('static');      // trả lại chế độ chạy hiệu ứng
+      b.classList.remove('static');          // trả lại chế độ chạy hiệu ứng
       b.classList.add('running');
       lich.chay(hooks);
       hat?.batDau();
@@ -370,7 +376,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
          qua quá nhanh, hoặc bấm tạm dừng ngay — thì cái nhìn thấy là MỘT Ô TỐI
          RỖNG, trông y như web hỏng. Bật chế độ "đứng yên" thì banner hiện đủ
          nội dung như một tấm banner tĩnh, chỉ không có chuyển động. */
-      if (!daHienNoiDung()) khung.classList.add('static');
+      if (!daHienNoiDung()) b.classList.add('static');
       if (!dangChay) return;
       dangChay = false;
       b.classList.remove('running');
@@ -492,14 +498,14 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
                bắt đầu ở trạng thái trong suốt rồi mới hiện dần, nên nếu không
                ép hiện đủ thì lúc trượt ra nó thành một khung trống trượt ngang
                qua màn hình. */
-            lop={`cl-b11 absolute inset-0 z-10 static ${huongLuot > 0 ? 'cl-b11-ra-trai' : 'cl-b11-ra-phai'}`}
+            lop={`cl-b11 absolute inset-0 z-10 ${huongLuot > 0 ? 'cl-b11-ra-trai' : 'cl-b11-ra-phai'}`}
             nhan={khongGan}
           />
         )}
         <RuotBanner
           key={chiSo}
           html={mau.html}
-          lop={`cl-b11 ${huongLuot > 0 ? 'cl-b11-vao-phai' : 'cl-b11-vao-trai'}${it ? ' static' : ''}`}
+          lop={`cl-b11 ${huongLuot > 0 ? 'cl-b11-vao-phai' : 'cl-b11-vao-trai'}`}
           nhan={setBoc}
         />
 

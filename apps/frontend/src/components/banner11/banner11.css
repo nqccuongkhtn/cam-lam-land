@@ -398,11 +398,11 @@
 }
 
 /* ============ Giảm chuyển động ============ */
-.cl-b11.static .banner *, .cl-b11.static .banner *::before, .cl-b11.static .banner *::after{animation:none!important;transition:none!important}
-.cl-b11.static [data-at]{opacity:1!important;transform:none!important;clip-path:none!important}
-.cl-b11.static .draw, .cl-b11.static .fl-measure .dim{stroke-dashoffset:0!important}.cl-b11.static .lines .li{transform:none!important}
-.cl-b11.static .kc-full, .cl-b11.static .a-flare, .cl-b11.static .spark, .cl-b11.static .fl-scan, .cl-b11.static .typing, .cl-b11.static .ui-toast, .cl-b11.static .du-anim{display:none}
-.cl-b11.static .dp-text{transform:none!important}
+.cl-b11 .banner.static  *, .cl-b11 .banner.static  *::before, .cl-b11 .banner.static  *::after{animation:none!important;transition:none!important}
+.cl-b11 .banner.static [data-at]{opacity:1!important;transform:none!important;clip-path:none!important}
+.cl-b11 .banner.static .draw, .cl-b11 .banner.static .fl-measure .dim{stroke-dashoffset:0!important}.cl-b11 .banner.static .lines .li{transform:none!important}
+.cl-b11 .banner.static .kc-full, .cl-b11 .banner.static .a-flare, .cl-b11 .banner.static .spark, .cl-b11 .banner.static .fl-scan, .cl-b11 .banner.static .typing, .cl-b11 .banner.static .ui-toast, .cl-b11 .banner.static .du-anim{display:none}
+.cl-b11 .banner.static .dp-text{transform:none!important}
 
 /* ============ Dùng chung với bộ B ============ */
 /* ============ Dùng chung cho bộ B ============ */
@@ -589,11 +589,11 @@
 }
 
 /* ============ Giảm chuyển động ============ */
-.cl-b11.static .banner *, .cl-b11.static .banner *::before, .cl-b11.static .banner *::after{animation:none!important;transition:none!important}
-.cl-b11.static [data-at]{opacity:1!important;transform:none!important}
-.cl-b11.static .draw{stroke-dashoffset:0!important}.cl-b11.static .lines .li{transform:none!important}
-.cl-b11.static .b6-map, .cl-b11.static .b6-inner{transform:none!important}
-.cl-b11.static .b1-shine, .cl-b11.static .b2-scan, .cl-b11.static .b6-scan, .cl-b11.static .b8-sp, .cl-b11.static .tip{display:none}
+.cl-b11 .banner.static  *, .cl-b11 .banner.static  *::before, .cl-b11 .banner.static  *::after{animation:none!important;transition:none!important}
+.cl-b11 .banner.static [data-at]{opacity:1!important;transform:none!important}
+.cl-b11 .banner.static .draw{stroke-dashoffset:0!important}.cl-b11 .banner.static .lines .li{transform:none!important}
+.cl-b11 .banner.static .b6-map, .cl-b11 .banner.static .b6-inner{transform:none!important}
+.cl-b11 .banner.static .b1-shine, .cl-b11 .banner.static .b2-scan, .cl-b11 .banner.static .b6-scan, .cl-b11 .banner.static .b8-sp, .cl-b11 .banner.static .tip{display:none}
 
 /* ============ Kiểu 12–19 (chuyển kỹ thuật bộ B sang ảnh Cam Lâm) ============ */
 .cl-b11 .st-c13{background:#1d1206}
@@ -625,7 +625,7 @@
   .cl-b11 .st-c13::after, .cl-b11 .st-c16::after, .cl-b11 .st-c18::after{content:"";position:absolute;inset:0;z-index:5;background:linear-gradient(0deg,rgba(3,8,18,.92) 0%,rgba(3,8,18,.5) 50%,rgba(3,8,18,0) 78%);pointer-events:none}
   .cl-b11 .st-c13 .b-text, .cl-b11 .st-c16 .b-text, .cl-b11 .st-c18 .b-text{z-index:10}
 }
-.cl-b11.static .c18-patch, .cl-b11.static .c18-plane{display:none}
+.cl-b11 .banner.static .c18-patch, .cl-b11 .banner.static .c18-plane{display:none}
 
 /* ══ CHỪA DẢI TRỐNG Ở ĐÁY BANNER CHO KHUNG TÌM KIẾM ══════════════════════
  * SINH TỰ ĐỘNG — xem hàm luat_chua_dai() trong scripts/banner11/tach-banner.py

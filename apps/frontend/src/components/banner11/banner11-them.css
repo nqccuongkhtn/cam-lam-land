@@ -70,10 +70,10 @@
 @keyframes cl-b11-ra-trai  { from { transform: none } to { transform: translate3d(-100%, 0, 0) } }
 @keyframes cl-b11-ra-phai  { from { transform: none } to { transform: translate3d(100%, 0, 0) } }
 
-.cl-b11-vao-phai { animation: cl-b11-vao-phai .68s cubic-bezier(.22, 1, .28, 1) both }
-.cl-b11-vao-trai { animation: cl-b11-vao-trai .68s cubic-bezier(.22, 1, .28, 1) both }
-.cl-b11-ra-trai  { animation: cl-b11-ra-trai  .68s cubic-bezier(.22, 1, .28, 1) both }
-.cl-b11-ra-phai  { animation: cl-b11-ra-phai  .68s cubic-bezier(.22, 1, .28, 1) both }
+.cl-b11-vao-phai { animation: cl-b11-vao-phai .48s cubic-bezier(.22, 1, .28, 1) both }
+.cl-b11-vao-trai { animation: cl-b11-vao-trai .48s cubic-bezier(.22, 1, .28, 1) both }
+.cl-b11-ra-trai  { animation: cl-b11-ra-trai  .48s cubic-bezier(.22, 1, .28, 1) both }
+.cl-b11-ra-phai  { animation: cl-b11-ra-phai  .48s cubic-bezier(.22, 1, .28, 1) both }
 
 /* ── VỆT SÁNG QUÉT QUA KHI MẪU MỚI VỪA VÀO ──────────────────────────────────
    Lấy ý từ vệt sáng của bản thiết kế (mẫu 2 và 11 có sẵn), nhưng dùng chung
@@ -117,7 +117,7 @@
    → chữ to đùng rồi mới thu lại đúng chỗ, nhìn như giật một cái.
    Cách chặn: giấu phần nội dung cho tới khi đo xong (mã chạy gắn lớp
    `san-sang`). Nền tối của banner vẫn hiện ngay nên không thấy khoảng trắng. */
-.cl-b11:not(.san-sang) .banner > * { visibility: hidden }
+.cl-b11 .banner:not(.san-sang) > * { visibility: hidden }
 
 /* ── DẢI TRỐNG Ở ĐÁY BANNER + CHIỀU CAO BANNER ──────────────────────────────
    ⚠️ PHẢI ĐẶT BẰNG CSS, ĐỪNG ĐẶT BẰNG MÃ CHẠY. Đã vấp: đặt bằng mã chạy thì

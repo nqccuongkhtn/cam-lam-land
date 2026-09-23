@@ -186,7 +186,15 @@ def boc_css(css: str) -> str:
             if x == ':root':
                 ra.append('.cl-b11')
             elif x.startswith('.static'):
-                ra.append('.cl-b11.static' + x[len('.static'):])
+                # ⚠️ Lớp "static" (chế độ đứng yên) phải nằm trên CHÍNH THẺ BANNER,
+                #    không nằm trên thẻ bọc ngoài. Lý do: thẻ bọc ngoài do React
+                #    dựng, mỗi lần React vẽ lại là nó GHI ĐÈ toàn bộ class của thẻ
+                #    đó — mọi lớp mình gắn thêm bằng mã chạy đều bay mất. Thẻ
+                #    banner thì nằm trong phần HTML dựng thẳng, React không đụng.
+                con = x[len('.static'):].strip()
+                if con.startswith('.banner'):
+                    con = con[len('.banner'):]
+                ra.append('.cl-b11 .banner.static ' + con if con else '.cl-b11 .banner.static')
             else:
                 ra.append('.cl-b11 ' + x)
         return ', '.join(ra)

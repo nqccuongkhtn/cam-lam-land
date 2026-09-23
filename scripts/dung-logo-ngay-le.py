@@ -188,6 +188,53 @@ def ca_chep(d, cx, cy, r, mau, net):
     d.ellipse([cx - r * 0.80, cy - r * 0.18, cx - r * 0.52, cy + r * 0.10], fill=net)
 
 
+def canh_nhon(d, cx, cy, goc, dai, rong, mau):
+    """Một CÁNH HOA nhọn đầu, mọc từ (cx,cy) hướng theo `goc` (độ).
+
+    ⚠️ ĐỪNG VẼ CÁNH HOA BẰNG HÌNH TRÒN. Bản đầu xếp mấy hình tròn quanh một
+       nhuỵ cho nhanh — thu nhỏ lại thì thành một cục lổn nhổn, chủ dự án xem
+       xong bảo mấy logo hoa "chưa đẹp". Cánh hoa thật thì THON và NHỌN ĐẦU,
+       nên ở đây dựng bằng đường cong hình hạnh nhân: bề ngang phình ở giữa
+       (theo hàm sin) rồi thóp lại về hai đầu.
+    """
+    g = math.radians(goc)
+    dx, dy = math.cos(g), math.sin(g)
+    nx, ny = -dy, dx
+    N = 16
+    tren, duoi = [], []
+    for i in range(N + 1):
+        t = i / N
+        w = rong * math.sin(math.pi * t) ** 0.78
+        x, y = cx + dx * dai * t, cy + dy * dai * t
+        tren.append((x + nx * w, y + ny * w))
+        duoi.append((x - nx * w, y - ny * w))
+    d.polygon(tren + duoi[::-1], fill=mau)
+
+
+def hoa_nhieu_canh(d, cx, cy, r, so, mau, mau_trong, nhuy, lech=0.0):
+    """Bông hoa hai lớp cánh nhọn — dùng cho sen, ban, cúc."""
+    for i in range(so):
+        canh_nhon(d, cx, cy, -90 + lech + i * 360.0 / so, r, r * 0.30, mau)
+    for i in range(so):
+        canh_nhon(d, cx, cy, -90 + lech + 180.0 / so + i * 360.0 / so,
+                  r * 0.72, r * 0.24, mau_trong)
+    d.ellipse([cx - r * 0.20, cy - r * 0.20, cx + r * 0.20, cy + r * 0.20], fill=nhuy)
+
+
+def hoa_hong(d, cx, cy, r, ngoai, trong, tam):
+    """Bông hồng: mấy lớp cánh ôm dần vào giữa."""
+    for i in range(5):
+        canh_nhon(d, cx, cy, -90 + i * 72, r, r * 0.40, ngoai)
+    for i in range(5):
+        canh_nhon(d, cx, cy, -54 + i * 72, r * 0.66, r * 0.34, trong)
+    d.ellipse([cx - r * 0.30, cy - r * 0.30, cx + r * 0.30, cy + r * 0.30], fill=ngoai)
+    d.ellipse([cx - r * 0.19, cy - r * 0.19, cx + r * 0.19, cy + r * 0.19], fill=tam)
+
+
+def la_cay(d, cx, cy, goc, dai, mau):
+    canh_nhon(d, cx, cy, goc, dai, dai * 0.30, mau)
+
+
 def banh_rang(d, cx, cy, r, mau, lo):
     """Banh rang - ngay Quoc te Lao dong."""
     for i in range(8):
@@ -203,19 +250,23 @@ def banh_rang(d, cx, cy, r, mau, lo):
 
 
 def bua_liem(d, cx, cy, r, mau):
-    """Bua va liem tren co Dang.
+    """Búa và liềm trên cờ Đảng.
 
-    Ve DAC va TO, dung ve net manh: thu ve 32px la net manh bien mat, chi con
-    mot vet vang khong ra hinh gi.
+    ⚠️ VẼ ĐẶC VÀ TO, chiếm gần hết lá cờ. Bản đầu vẽ bằng mấy nét mảnh, thu về
+       32px là mất hết chi tiết, chỉ còn một vệt vàng nhoè — chủ dự án bảo
+       "chưa đẹp". Nay: lưỡi liềm là một vành cung DÀY, búa là khối đặc.
     """
-    d.line([(cx - r * 0.95, cy - r * 0.10), (cx - r * 0.30, cy - r * 0.95)],
-           fill=mau, width=r * 0.26)
-    d.line([(cx - r * 0.95, cy - r * 0.10), (cx + r * 0.20, cy + r * 0.55)],
-           fill=mau, width=r * 0.26)
-    d.line([(cx - r * 0.72, cy + r * 0.80), (cx + r * 0.58, cy - r * 0.36)],
-           fill=mau, width=r * 0.24)
-    d.polygon([(cx + r * 0.32, cy - r * 0.66), (cx + r * 0.98, cy - r * 0.32),
-               (cx + r * 0.74, cy + r * 0.06), (cx + r * 0.12, cy - r * 0.28)], fill=mau)
+    # lưỡi liềm: vành cung dày, ôm từ trái xuống dưới sang phải
+    d.arc([cx - r * 1.05, cy - r * 1.05, cx + r * 1.05, cy + r * 1.05],
+          start=95, end=300, fill=mau, width=max(3, r * 0.30))
+    # chuôi liềm
+    d.line([(cx - r * 0.06, cy + r * 1.02), (cx + r * 0.52, cy + r * 1.16)],
+           fill=mau, width=max(3, r * 0.26))
+    # cán búa (chéo) + đầu búa
+    d.line([(cx - r * 0.86, cy + r * 0.86), (cx + r * 0.36, cy - r * 0.36)],
+           fill=mau, width=max(3, r * 0.26))
+    d.polygon([(cx + r * 0.16, cy - r * 0.62), (cx + r * 0.86, cy - r * 0.18),
+               (cx + r * 0.60, cy + r * 0.22), (cx - r * 0.10, cy - r * 0.22)], fill=mau)
 
 
 def chim_bo_cau(d, cx, cy, r, than, mo, la):
@@ -311,11 +362,6 @@ def ve_gio_to(d, m):
     sao(d, 366, 72, 19, m['do_tet'], canh=14, trong=0.55)
 
 
-def ve_30_4(d, m):
-    """30/4 – 1/5: lá cờ Tổ quốc."""
-    co_to_quoc(d, m, 330, 26, 96, 64)
-
-
 def ve_quoc_khanh(d, m):
     """Quốc khánh 2/9: cờ Tổ quốc, to hơn một chút."""
     co_to_quoc(d, m, 318, 20, 112, 74, nghieng=0.3)
@@ -340,28 +386,43 @@ def ve_noel(d, m):
 
 
 def ve_phu_nu(d, m):
-    """8/3 và 20/10: một bông hoa hồng."""
-    d.line([(372, 128), (372, 66)], fill=m['xanh'], width=7)
-    d.ellipse([334, 92, 372, 112], fill=m['xanh'])
-    hoa(d, 372, 54, 36, m['hong'], m['vang_sang'], canh=6)
-
-
-def ve_tri_an(d, m):
-    """27/7 Thương binh Liệt sĩ · Vu Lan · rằm tháng Giêng: hoa sen."""
-    hoa_sen(d, 368, 70, 52, m['kem'], m['do_tet'])
-    d.line([(368, 108), (368, 140)], fill=m['xanh'], width=6)
+    """8/3 Quốc tế Phụ nữ: một bông hồng có cành lá."""
+    d.line([(374, 136), (374, 76)], fill=m['xanh'], width=7)
+    la_cay(d, 374, 112, 200, 40, m['xanh'])
+    la_cay(d, 374, 100, -20, 34, m['xanh'])
+    hoa_hong(d, 374, 56, 38, m['hong'], m['do_tet'], m['vang_sang'])
 
 
 def ve_nha_giao(d, m):
-    """20/11 Nhà giáo Việt Nam: quyển sách mở + một bông hoa."""
-    quyen_sach(d, 364, 92, 108, 62, m['vang'], m['vang_sang'])
-    hoa(d, 410, 34, 24, m['hong'], m['vang_sang'], canh=6)
+    """20/11 Nhà giáo Việt Nam: quyển sách mở, có gáy và trang giấy.
+
+    ⚠️ Phải thấy GÁY SÁCH ở giữa và trang giấy trắng, nếu không nó chỉ là hai
+       mảng màu ghép lại, nhìn y như lá cờ — lỗi của bản đầu.
+    """
+    # bìa sách
+    d.polygon([(302, 84), (368, 62), (368, 132), (302, 148)], fill=m['vang'])
+    d.polygon([(434, 84), (368, 62), (368, 132), (434, 148)], fill=m['vang'])
+    # trang giấy
+    d.polygon([(312, 86), (364, 69), (364, 126), (312, 140)], fill=m['net'])
+    d.polygon([(424, 86), (372, 69), (372, 126), (424, 140)], fill=m['net'])
+    # gáy sách
+    d.polygon([(364, 66), (372, 66), (372, 132), (364, 132)], fill=m['nau'])
+    # dòng chữ trên trang
+    for i in range(3):
+        y = 92 + i * 15
+        d.line([(320, y + 4), (356, y - 6)], fill=m['nau'], width=3)
+        d.line([(380, y - 6), (416, y + 4)], fill=m['nau'], width=3)
 
 
 def ve_quan_doi(d, m):
-    """22/12 Quân đội Nhân dân: ngôi sao vàng trên nền đỏ."""
-    d.ellipse([368 - 48, 72 - 48, 368 + 48, 72 + 48], fill=m['do_tet'])
-    sao(d, 368, 72, 38, m['vang_co'])
+    """22/12 Quân đội nhân dân: sao vàng năm cánh trong vành đỏ.
+
+    ⚠️ Ngôi sao phải CHIẾM GẦN HẾT vành đỏ. Bản đầu để sao nhỏ giữa một đĩa đỏ
+       to, thu nhỏ lại chỉ thấy một chấm đỏ — không ra ngôi sao.
+    """
+    d.ellipse([368 - 52, 70 - 52, 368 + 52, 70 + 52], fill=m['do_tet'])
+    d.ellipse([368 - 52, 70 - 52, 368 + 52, 70 + 52], outline=m['vang'], width=5)
+    sao(d, 368, 70, 46, m['vang_co'])
 
 
 def ve_gia_dinh(d, m):
@@ -392,10 +453,10 @@ def ve_lao_dong(d, m):
 
 
 def ve_dang(d, m):
-    """3/2 Thanh lap Dang: co do bua liem."""
-    d.rectangle([322, 12, 328, 138], fill=m['kem'])
-    d.polygon([(328, 20), (430, 12), (430, 84), (328, 92)], fill=m['do'])
-    bua_liem(d, 380, 52, 28, m['vang_co'])
+    """3/2 Thành lập Đảng: cờ đỏ búa liềm."""
+    d.rectangle([318, 8, 325, 140], fill=m['kem'])
+    d.polygon([(325, 16), (434, 8), (434, 86), (325, 94)], fill=m['do'])
+    bua_liem(d, 380, 50, 30, m['vang_co'])
 
 
 def ve_30_4(d, m):
@@ -404,15 +465,17 @@ def ve_30_4(d, m):
 
 
 def ve_dien_bien(d, m):
-    """7/5 Chien thang Dien Bien Phu: hoa ban Tay Bac."""
-    hoa(d, 368, 66, 46, m['net'], m['hong'])
-    d.line([(368, 110), (358, 142)], fill=m['xanh'], width=6)
+    """7/5 Chiến thắng Điện Biên Phủ: hoa ban Tây Bắc (5 cánh, nhuỵ hồng)."""
+    d.line([(366, 140), (366, 86)], fill=m['xanh'], width=6)
+    la_cay(d, 366, 118, 200, 36, m['xanh'])
+    hoa_nhieu_canh(d, 366, 62, 48, 5, m['net'], m['kem'], m['hong'], lech=18)
 
 
 def ve_sen(d, m):
-    """19/5 sinh nhat Bac: doa sen hong."""
-    hoa_sen(d, 368, 66, 52, m['hong'], m['vang_sang'])
-    d.line([(368, 104), (368, 142)], fill=m['xanh'], width=6)
+    """19/5 sinh nhật Bác: đoá sen hồng nở trên cuống."""
+    d.line([(368, 142), (368, 84)], fill=m['xanh'], width=7)
+    la_cay(d, 368, 120, 205, 42, m['xanh'])
+    hoa_nhieu_canh(d, 368, 62, 52, 7, m['hong'], m['net'], m['vang_sang'])
 
 
 def ve_nen(d, m):
@@ -431,11 +494,20 @@ def ve_nhang(d, m):
 
 
 def ve_hoa_cuc(d, m):
-    """20/10 Phu nu Viet Nam: bo hoa cuc vang."""
-    bo_hoa(d, 366, 54, 30, m['vang_sang'], m['do_tet'], m['xanh'])
+    """20/10 Phụ nữ Việt Nam: bó hoa cúc vàng — cánh mảnh, nhiều cánh."""
+    for x0, y0, g in ((352, 130, 250), (380, 132, 290)):
+        d.line([(x0, y0), (366, 92)], fill=m['xanh'], width=6)
+    la_cay(d, 362, 118, 200, 36, m['xanh'])
+    la_cay(d, 372, 124, -18, 32, m['xanh'])
+    hoa_nhieu_canh(d, 332, 74, 30, 12, m['vang'], m['vang_sang'], m['do_tet'])
+    hoa_nhieu_canh(d, 404, 82, 27, 12, m['vang'], m['vang_sang'], m['do_tet'])
+    hoa_nhieu_canh(d, 368, 44, 36, 14, m['vang_sang'], m['vang'], m['do_tet'])
 
 
 # mã · tên hiển thị · hàm vẽ
+# ⚠️ MỖI DỊP MỘT HÌNH RIÊNG. Đừng cho hai dịp dùng chung một bản: chủ dự án
+#    xem bảng logo và bảo "nhiều lễ bạn vẽ logo trùng nhau quá".
+#    Ngoại lệ duy nhất: lá cờ Tổ quốc dùng cho cả 2/9 và 2/4.
 DIP = [
     ('tet',        'Tết Nguyên đán',      ve_tet),
     ('tet-duong',  'Tết Dương lịch 1/1',  ve_tet_duong),
@@ -470,6 +542,10 @@ def _ve_phong(d, ve, m):
     """
     g_line, g_poly = d.line, d.polygon
     g_ell, g_rect, g_rr = d.ellipse, d.rectangle, d.rounded_rectangle
+    # ⚠️ NHỚ BỌC CẢ arc. Quên một hàm là hàm đó vẽ ở TOẠ ĐỘ CHƯA NHÂN, tức
+    #    bằng 1/4 chỗ đúng → hình rơi tít lên góc trên trái, trông như logo
+    #    dính vết bẩn. Đã vấp đúng thế với lưỡi liềm của cờ Đảng.
+    g_arc = d.arc
 
     def nhan(xy):
         if isinstance(xy[0], (int, float)):
@@ -481,11 +557,13 @@ def _ve_phong(d, ve, m):
     d.ellipse = lambda xy, **k: g_ell(nhan(xy), **k)
     d.rectangle = lambda xy, **k: g_rect(nhan(xy), **k)
     d.rounded_rectangle = lambda xy, **k: g_rr(nhan(xy), **{**k, 'radius': k.get('radius', 0) * PHONG})
+    d.arc = lambda xy, start, end, **k: g_arc(nhan(xy), start, end,
+                                              **{**k, 'width': int(max(1, k.get('width', 1) * PHONG))})
     try:
         ve(d, m)
     finally:
-        d.line, d.polygon, d.ellipse, d.rectangle, d.rounded_rectangle = (
-            g_line, g_poly, g_ell, g_rect, g_rr)
+        d.line, d.polygon, d.ellipse, d.rectangle, d.rounded_rectangle, d.arc = (
+            g_line, g_poly, g_ell, g_rect, g_rr, g_arc)
 
 
 def lam(nen_toi: bool):

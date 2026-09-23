@@ -40,10 +40,12 @@ function Logo({ light }: { light: boolean }) {
              khung 36px thì hình vẽ chỉ còn ~30px, chi tiết dính vào nhau —
              chủ dự án nhận xét "nhìn rối", "thô". Bỏ khung thì logo được dùng
              gần trọn chiều cao thanh menu, các nét tách bạch hẳn ra.
-          ⚠️ CAO 38px, ĐỪNG TỰ Ý ĐỔI. Đã đi một vòng: 36px có khung → rối;
-             44px không khung → chủ dự án bảo "cho logo nhỏ lại"; 38px là mức
-             đang dùng. Nét ngôi nhà đã được làm dày (xem scripts/dung-logo.py)
-             nên thu nhỏ chừng này vẫn đọc rõ. Đổi chiều cao thì phải đổi CẢ bề
+          ⚠️ CAO 32px, ĐỪNG TỰ Ý ĐỔI. Đã đi một vòng dài: 36px CÓ KHUNG → chủ
+             dự án bảo "rối", "thô"; bỏ khung phóng lên 44px → "cho logo nhỏ
+             lại"; 38px → "nhỏ hơn nữa"; 32px là mức đang dùng, nhỏ hơn chữ
+             "Cam Lâm Land" bên cạnh nên chữ mới là thứ đập vào mắt trước.
+             Nét ngôi nhà đã được làm dày (xem scripts/dung-logo.py) nên thu
+             tới cỡ này vẫn đọc rõ từng nét. Đổi chiều cao thì phải đổi CẢ bề
              ngang cho đúng tỉ lệ 1,51 — để lệch là logo bị bóp méo.
           ⚠️ HAI TỆP MÀU, đổi theo trạng thái thanh menu: nền tối (trong suốt
              trên banner) dùng bản NÉT TRẮNG, nền trắng (khi cuộn xuống) dùng
@@ -51,8 +53,8 @@ function Logo({ light }: { light: boolean }) {
              trạng thái bị chìm. Dựng hai tệp bằng scripts/dung-logo.py. */}
       <img
         src={light ? '/logo-cam-lam.webp' : '/logo-cam-lam-toi.webp'}
-        alt="" aria-hidden="true" width={57} height={38}
-        className="h-[38px] w-[57px] shrink-0 object-contain" />
+        alt="" aria-hidden="true" width={48} height={32}
+        className="h-8 w-12 shrink-0 object-contain" />
       <span className="leading-tight">
         <span className={`font-extrabold block text-lg tracking-tight ${light ? 'text-white' : 'text-[#0A2540]'}`}>Cam Lâm <span className="text-[#C8A14B]">Land</span></span>
         <span className={`hidden lg:block whitespace-nowrap text-[10px] font-medium tracking-wide ${light ? 'text-white/75' : 'text-slate-400'}`}>Nhà đất &amp; quy hoạch</span>

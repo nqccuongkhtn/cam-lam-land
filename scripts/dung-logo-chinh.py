@@ -4,7 +4,7 @@ DỰNG LOGO CHÍNH THỨC CỦA WEB
 =============================
 Chủ dự án đã chọn trong trang xem thử (/logo-thu/xem.html):
 
-    hình  = "Chữ C đặc khoét L"   (mẫu 6, cắt từ ảnh mẫu chủ dự án gửi)
+    hình  = "Khung vuông · chữ C"  (mẫu 3, cắt từ ảnh mẫu chủ dự án gửi)
     phối  = "Gold sáng"           (nét chuyển từ vàng kem xuống vàng đồng)
     khung = ô vuông navy bo góc, như logo web vẫn dùng
 
@@ -30,7 +30,11 @@ import os
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 CONG = os.path.join(GOC, 'apps', 'frontend', 'public')
 
-HINH = 'mau6'         # Chữ C đặc khoét L
+# ⚠️ ĐỔI LOGO THÌ CHỈ SỬA HAI DÒNG NÀY rồi chạy lại script, sau đó chạy
+#    scripts/dong-bo-logo.py. Mã hình lấy trong scripts/phoi-mau-logo.py
+#    (mau1…mau6), mã phối cũng ở đó (co-dien · anh-kim · gold-ngoc ·
+#    gold-hong · gold-duong · gold-sang).
+HINH = 'mau3'         # Khung vuông · chữ C
 PHOI = 'gold-sang'    # nét chuyển vàng kem → vàng đồng
 KHO = 256
 

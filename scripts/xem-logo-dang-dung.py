@@ -42,17 +42,21 @@ def nen_banner(w, h):
 
 
 def main():
-    logo = Image.open(os.path.join(CONG, 'logo-cam-lam.webp')).convert('RGBA')
-    NEN = [('Trên banner (thanh menu trong suốt)', nen_banner),
-           ('Thanh menu trắng (khi cuộn xuống)', lambda w, h: Image.new('RGB', (w, h), (255, 255, 255))),
-           ('Nền navy đặc', lambda w, h: Image.new('RGB', (w, h), (10, 37, 64)))]
+    # ⚠️ HAI TỆP KHÁC NHAU (viền dày/mảnh) — mỗi nền phải lấy đúng tệp của
+    #    nền đó, lấy nhầm là xem không ra cái đang chạy thật.
+    sang = Image.open(os.path.join(CONG, 'logo-cam-lam.webp')).convert('RGBA')
+    toi = Image.open(os.path.join(CONG, 'logo-cam-lam-toi.webp')).convert('RGBA')
+    NEN = [('Trên banner (menu trong suốt)', nen_banner, sang),
+           ('Thanh menu trắng (khi cuộn xuống)',
+            lambda w, h: Image.new('RGB', (w, h), (255, 255, 255)), toi),
+           ('Nền navy đặc', lambda w, h: Image.new('RGB', (w, h), (10, 37, 64)), sang)]
 
     W = 20 + COT * len(NEN)
     sheet = Image.new('RGB', (W, 34 + HANG + 26), (246, 247, 249))
     d = ImageDraw.Draw(sheet)
     ft, fn = _font(15, True), _font(14)
 
-    for j, (ten, lam) in enumerate(NEN):
+    for j, (ten, lam, logo) in enumerate(NEN):
         x = 10 + j * COT
         d.text((x + 6, 8), ten, fill=(20, 30, 45), font=ft)
         o = (COT - 16, HANG - 16)

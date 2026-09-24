@@ -26,8 +26,16 @@ logo chính của web:
        nền giữ đúng navy #0A2540, mà viền vàng thì nổi trên MỌI nền.
    Ba độ dày viền xem ở /logo-thu/so-vien.png, đổi thì sửa VIEN_GOLD bên dưới.
 
-⚠️ HAI TỆP GIỐNG HỆT NHAU. Ô vuông navy tự mang nền nên đặt ở đâu cũng đọc
-   được; vẫn ghi ra hai tên vì khắp nơi trong mã đang gọi theo hai tên đó.
+⚠️ HAI TỆP KHÁC NHAU Ở BỀ DÀY VIỀN — đừng gộp lại làm một.
+   Thanh menu có hai trạng thái và nhu cầu ngược nhau:
+     · trên banner (nền tối): ô navy chìm vào nền → cần viền vàng rõ;
+     · thanh menu trắng (khi cuộn xuống): ô navy vốn đã tương phản mạnh với
+       nền trắng, viền dày ở đây thành thừa và nặng nề — chủ dự án dặn
+       "khi nền trắng thì làm viền mảnh như gốc".
+   Nên logo-cam-lam.webp viền VIEN_GOLD, còn logo-cam-lam-toi.webp viền
+   VIEN_GOLD_TRANG mảnh hơn hẳn.
+   (Trước đây hai tệp giống hệt nhau nên chép qua chép lại cũng không sao;
+    từ nay chúng KHÁC nhau, chỗ nào lấy nhầm tệp là sai trạng thái.)
 
 ⚠️ CHẠY XONG PHẢI CHẠY TIẾP scripts/dong-bo-logo.py — chính nó mới dựng lại
    icon cài ứng dụng, 17 ảnh màn hình chờ, logo ngày lễ và nhúng logo vào hai
@@ -51,7 +59,11 @@ HINH = 'mau6m2'       # nguyên bản, bào mỏng 2,5% (scripts/ve-lai-mau6.py)
 # Đặt None thì không vẽ viền, khi đó mới dùng tới PHOI bên dưới.
 # ⚠️ Đừng quá 0.07 — dày hơn nữa thì phần navy còn quá ít, nhìn như cái
 #    khung ảnh chứ không ra logo.
-VIEN_GOLD = 0.045
+VIEN_GOLD = 0.030       # cho logo-cam-lam.webp      — nền TỐI (trên banner)
+# Bản dùng trên thanh menu TRẮNG: chỉ một sợi chỉ vàng cho có, như logo gốc.
+# ⚠️ Đừng để 0 hẳn: mép ô navy trên nền trắng sẽ cứng và hơi thô; một sợi
+#    vàng mảnh làm mép dịu lại mà nhìn vẫn là logo cũ.
+VIEN_GOLD_TRANG = 0.013  # cho logo-cam-lam-toi.webp  — nền SÁNG (menu trắng)
 # Chỉ dùng khi VIEN_GOLD = None. Mã phối lấy ở scripts/phoi-mau-logo.py
 # (co-dien · anh-kim · gold-ngoc · gold-hong · gold-duong · gold-sang) hoặc ở
 # scripts/logo-sang-hon.py (sang0…sang3 — bốn mức sáng của nền ô vuông).
@@ -84,15 +96,16 @@ def tim_phoi(bo, ma: str):
 
 def main():
     bo = nap('phoi-mau-logo.py', 'phoi_mau_logo')
-    if VIEN_GOLD:
-        anh = nap('logo-vien-gold.py', 'logo_vien_gold').dung(
-            bo, HINH, VIEN_GOLD, KHO, CHIEM)
-    else:
-        anh = bo.dung_o(HINH, tim_phoi(bo, PHOI), KHO, CHIEM)
-    for ten in ('logo-cam-lam.webp', 'logo-cam-lam-toi.webp'):
+    vg = nap('logo-vien-gold.py', 'logo_vien_gold')
+    #  tệp                       bề dày viền       dùng ở đâu
+    bo_tep = (('logo-cam-lam.webp', VIEN_GOLD, 'nen toi - tren banner'),
+              ('logo-cam-lam-toi.webp', VIEN_GOLD_TRANG, 'nen sang - menu trang'))
+    for ten, day, o_dau in bo_tep:
+        anh = vg.dung(bo, HINH, day, KHO, CHIEM) if day             else bo.dung_o(HINH, tim_phoi(bo, PHOI), KHO, CHIEM)
         p = os.path.join(CONG, ten)
         anh.save(p, 'WEBP', quality=95, method=6)
-        print('OK %-22s %dx%d  %d KB' % (ten, KHO, KHO, os.path.getsize(p) // 1024))
+        print('OK %-22s vien %.1f%%  %d KB   (%s)'
+              % (ten, (day or 0) * 100, os.path.getsize(p) // 1024, o_dau))
     print('\nNho chay tiep:  python scripts/dong-bo-logo.py')
 
 

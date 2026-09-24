@@ -1153,7 +1153,12 @@ def lam(nen_toi: bool):
        tiết ló sang mép ô vuông một chút cho đỡ rời (cờ cắm, cành mai) thì
        vẫn phải chừa nguyên phần ngôi nhà.
     """
-    o = Image.open(os.path.join(CONG, 'logo-cam-lam.webp')).convert('RGBA')
+    # ⚠️ LẤY ĐÚNG TỆP LOGO CỦA NỀN ĐANG DỰNG. Hai tệp logo nay KHÁC nhau ở
+    #    bề dày viền vàng (dày cho nền tối, mảnh cho nền trắng) — trước kia
+    #    chúng giống hệt nhau nên chỗ này lấy cứng một tệp cũng không sao,
+    #    giờ lấy cứng là bản nền trắng đeo viền dày của bản nền tối.
+    o = Image.open(os.path.join(
+        CONG, 'logo-cam-lam.webp' if nen_toi else 'logo-cam-lam-toi.webp')).convert('RGBA')
     o = o.resize((O_VUONG, O_VUONG), Image.LANCZOS)
     goc = Image.new('RGBA', (RONG_LE, O_VUONG), (0, 0, 0, 0))
     goc.alpha_composite(o, (0, 0))

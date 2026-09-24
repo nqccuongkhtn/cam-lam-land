@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Xem thử logo — Cam Lâm Land</title>
+<!--
+  TRANG XEM THỬ LOGO — mở bằng điện thoại cũng được
+  ================================================
+  Gom hết vào MỘT đường dẫn để chủ dự án không phải mở từng tấm:
+    · 6 mẫu logo cắt từ ảnh mẫu (scripts/cat-logo-mau.py)
+    · 36 bản phối màu, đặt trong khung navy (scripts/phoi-mau-logo.py)
+    · 23 logo ngày lễ đang chạy (scripts/dung-logo-ngay-le.py)
+
+  ⚠️ TRANG TĨNH, KHÔNG PHẢI TRANG CỦA WEB. Nó nằm trong public/ nên nginx phục
+     vụ thẳng, không đi qua Next.js — sửa xong phải dựng lại frontend mới thấy.
+  ⚠️ Mỗi hình đều kèm bản CỠ THẬT 32px. Bản to thì cái nào cũng đẹp; chỉ ở cỡ
+     thật mới biết cái nào thu nhỏ là mất nét.
+-->
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0 0 48px;
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f6f7f9; color: #0f1c2e;
+  }
+  header {
+    background: #0A2540; color: #fff; padding: 18px 16px;
+    padding-top: calc(18px + env(safe-area-inset-top, 0px));
+  }
+  header h1 { margin: 0; font-size: 19px; }
+  header p { margin: 6px 0 0; font-size: 13px; color: #b9c6d6; }
+  h2 {
+    margin: 26px 16px 4px; font-size: 16px; color: #0A2540;
+    border-left: 4px solid #C8A14B; padding-left: 9px;
+  }
+  .ghi { margin: 0 16px 12px; font-size: 13px; color: #64748b; }
+
+  /* Bảng phối màu: cuộn ngang trên điện thoại, cột tên dính bên trái */
+  .cuon { overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 0 0 6px; }
+  table { border-collapse: collapse; margin: 0 16px; }
+  th, td { padding: 8px 6px; text-align: center; }
+  th { font-size: 12px; font-weight: 700; color: #475569; white-space: nowrap; }
+  td.ten, th.ten {
+    position: sticky; left: 0; background: #f6f7f9; text-align: left;
+    font-size: 12.5px; font-weight: 600; white-space: nowrap; padding-right: 12px;
+    box-shadow: 2px 0 0 #e2e8f0;
+  }
+  tr + tr td { border-top: 1px solid #e8ecf1; }
+  .o { display: flex; align-items: flex-end; gap: 6px; justify-content: center; }
+  .o img.to { width: 76px; height: 76px; border-radius: 16px; }
+  .o img.be { width: 32px; height: 32px; border-radius: 7px; }
+
+  /* Lưới đơn (6 mẫu, logo ngày lễ) */
+  .luoi { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+          gap: 10px; margin: 0 16px; }
+  .the { background: #fff; border: 1px solid #e6eaef; border-radius: 12px; padding: 10px; }
+  .the .hai { display: flex; gap: 8px; }
+  .the .nua { flex: 1; border-radius: 9px; padding: 9px 6px; text-align: center; }
+  .the .toi { background: #0A2540; }
+  .the .sang { background: #fff; border: 1px solid #eef1f5; }
+  .the img.lon { height: 46px; width: auto; max-width: 100%; }
+  .the img.nho { height: 22px; width: auto; margin-top: 5px; opacity: .95; }
+  .the .nhan { margin-top: 8px; font-size: 12.5px; font-weight: 600; color: #334155; }
+  .the .ma { font-size: 11px; color: #94a3b8; }
+  .dam { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Xem thử logo — Cam Lâm Land</h1>
+  <p>Mỗi hình đều kèm bản <b>cỡ thật 32px</b> — đó là cỡ logo hiện trên thanh menu.
+     Bản to thì cái nào cũng đẹp, cỡ thật mới biết cái nào mất nét.</p>
+</header>
+
+<h2>1 · Sáu mẫu logo (cắt từ ảnh mẫu)</h2>
+<p class="ghi">Cắt thẳng từ ảnh chủ dự án gửi, đã bỏ hai dòng chữ bên dưới và đổi sang màu thương hiệu.</p>
+<div class="luoi" id="sau-mau"></div>
+
+<h2>2 · Ba mươi sáu bản phối màu</h2>
+<p class="ghi">Đặt trong khung navy bo góc giống logo thật. <b>Nền navy và nét vàng đồng giữ nguyên làm chủ đạo</b> — chỉ đổi điểm nhấn cho trẻ trung hơn. Vuốt ngang để xem hết các cột.</p>
+<div class="cuon"><table id="bang-phoi"></table></div>
+
+<h2>3 · Logo ngày lễ đang chạy</h2>
+<p class="ghi">Ô vuông logo bên trái, trang trí của từng dịp bên phải. Lịch đổi đặt ở trang quản trị.</p>
+<div class="luoi" id="ngay-le"></div>
+
+<script>
+/* ── Dữ liệu ──────────────────────────────────────────────────────────────
+   Khai ở đây cho gọn; thêm mẫu mới thì thêm một dòng.
+   ⚠️ Tên tệp phải khớp với tên script Python ghi ra, đừng đổi một bên.      */
+const SAU_MAU = [
+  ['mau1', 'Vòng tròn · chữ C'],
+  ['mau2', 'Trăng khuyết · chữ C'],
+  ['mau3', 'Khung vuông · chữ C'],
+  ['mau4', 'Khiên · chữ lồng CL'],
+  ['mau5', 'Vòng tròn · C lồng L'],
+  ['mau6', 'Chữ C đặc khoét L'],
+];
+const PHOI = [
+  ['co-dien', 'Cổ điển'], ['anh-kim', 'Vàng ánh kim'], ['gold-ngoc', 'Gold + ngọc'],
+  ['gold-hong', 'Gold + hồng'], ['gold-duong', 'Gold + xanh dương'], ['gold-sang', 'Gold sáng'],
+];
+const NGAY_LE = [
+  ['tet', 'Tết Nguyên đán'], ['tet-duong', 'Tết Dương lịch'],
+  ['gio-to', 'Giỗ Tổ Hùng Vương'], ['30-4', '30/4 Thống nhất'],
+  ['quoc-khanh', 'Quốc khánh 2/9'], ['lao-dong', 'Quốc tế Lao động 1/5'],
+  ['trung-thu', 'Tết Trung thu'], ['noel', 'Giáng sinh'],
+  ['phu-nu', 'Quốc tế Phụ nữ 8/3'], ['hoa-cuc', 'Phụ nữ Việt Nam 20/10'],
+  ['tri-an', 'Thương binh Liệt sĩ 27/7'], ['nha-giao', 'Nhà giáo 20/11'],
+  ['quan-doi', 'Quân đội 22/12'], ['gia-dinh', 'Ngày Gia đình 28/6'],
+  ['thieu-nhi', 'Thiếu nhi 1/6'], ['doanh-nhan', 'Doanh nhân 13/10'],
+  ['ong-tao', 'Ông Công ông Táo'], ['dang', 'Thành lập Đảng 3/2'],
+  ['dien-bien', 'Điện Biên Phủ 7/5'], ['sen', 'Sinh nhật Bác 19/5'],
+  ['vu-lan', 'Lễ Vu Lan'], ['nhang', 'Tết Nguyên tiêu'],
+  ['doan-ngo', 'Tết Đoan Ngọ'],
+];
+
+function the(duongDanToi, duongDanSang, nhan, ma) {
+  return `<div class="the">
+    <div class="hai">
+      <div class="nua toi">
+        <img class="lon" src="${duongDanToi}" alt="">
+        <br><img class="nho" src="${duongDanToi}" alt="">
+      </div>
+      <div class="nua sang">
+        <img class="lon" src="${duongDanSang}" alt="">
+        <br><img class="nho" src="${duongDanSang}" alt="">
+      </div>
+    </div>
+    <div class="nhan">${nhan}</div>
+    <div class="ma">${ma}</div>
+  </div>`;
+}
+
+document.getElementById('sau-mau').innerHTML = SAU_MAU
+  .map(([m, t]) => the(`/logo-thu/${m}.webp`, `/logo-thu/${m}-toi.webp`, t, m)).join('');
+
+document.getElementById('ngay-le').innerHTML = NGAY_LE
+  .map(([m, t]) => the(`/logo-le/${m}.webp`, `/logo-le/${m}-toi.webp`, t, m)).join('');
+
+document.getElementById('bang-phoi').innerHTML =
+  '<tr><th class="ten">Mẫu</th>' + PHOI.map(([, t]) => `<th>${t}</th>`).join('') + '</tr>'
+  + SAU_MAU.map(([m, t]) => '<tr><td class="ten">' + t + '</td>'
+      + PHOI.map(([p]) => `<td><div class="o">
+            <img class="to" src="/logo-thu/phoi/${m}-${p}.webp" alt="">
+            <img class="be" src="/logo-thu/phoi/${m}-${p}.webp" alt=""></div></td>`).join('')
+      + '</tr>').join('');
+</script>
+</body>
+</html>

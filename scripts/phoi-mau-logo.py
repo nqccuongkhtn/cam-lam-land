@@ -9,13 +9,14 @@ không chỉ vàng đồng.
 Nguyên liệu: mấy tấm mặt nạ đã cắt sẵn ở apps/frontend/public/logo-thu/
 (do scripts/cat-logo-mau.py sinh ra từ ảnh mẫu chủ dự án gửi).
 
-SÁU BẢN PHỐI
-  1. Cổ điển      — nền navy, nét vàng đồng (đúng bộ màu web đang dùng)
-  2. Vàng cam     — nền navy, nét chuyển vàng sang cam, ấm hơn
-  3. TikTok       — nền đen, nét trắng, có bóng xanh ngọc và hồng lệch nhau
-  4. Biển xanh    — nền navy, nét chuyển xanh ngọc sang xanh dương
-  5. Hoàng hôn    — nền trắng, nét chuyển hồng sang cam
-  6. Chanh        — nền navy đậm, nét vàng chanh
+SÁU BẢN PHỐI — nền NAVY và nét VÀNG ĐỒNG giữ nguyên làm chủ đạo, chỉ đổi
+điểm nhấn cho trẻ trung hơn:
+  1. Cổ điển          — vàng đồng đặc, viền vàng mờ (đúng bộ màu đang dùng)
+  2. Vàng ánh kim     — nét chuyển sắc trong dải vàng, như kim loại bắt sáng
+  3. Gold + ngọc      — nét vàng, có bóng xanh ngọc lệch hai phía (kiểu TikTok)
+  4. Gold + hồng      — nét vàng, bóng hồng san hô lệch hai phía
+  5. Gold + xanh dương— nét vàng, viền trong của khung đổi sang xanh dương
+  6. Gold sáng        — nét chuyển từ vàng kem xuống vàng đồng
 
 ⚠️ MỖI Ô ĐỀU KÈM CỠ THẬT 32 ĐIỂM ẢNH. Bản to thì phối màu nào cũng đẹp; chỉ
    ở cỡ thật mới thấy bản nào bị nhoè, bản nào nét vẫn tách bạch. Riêng kiểu
@@ -47,18 +48,24 @@ MAU = [
 ]
 
 # (mã, tên, màu nền, màu viền trong, kiểu tô nét)
-#   kiểu tô: ('dac', màu) · ('chuyen', màu trên, màu dưới) · ('tiktok',)
+#   kiểu tô: ('dac', màu) · ('chuyen', màu trên, màu dưới) · ('bong', màu nét, màu bóng)
+#
+# ⚠️ NAVY VÀ VÀNG ĐỒNG LÀ CHỦ ĐẠO — chủ dự án chốt rồi, đừng đổi nền hay đổi
+#    màu nét chính. Muốn "trẻ trung" thì chỉ được thêm ĐIỂM NHẤN: bóng lệch
+#    màu, viền trong đổi màu, hoặc cho nét chuyển sắc trong dải vàng. Bản
+#    trước đổi hẳn sang nền đen / nền trắng / nét xanh lá — lạc khỏi nhận diện.
+NEN = (10, 37, 64)          # navy của web
+GOLD = (200, 161, 75)       # vàng đồng của web
+
 PHOI = [
-    ('co-dien', 'Cổ điển', (10, 37, 64), (200, 161, 75, 115), ('dac', (200, 161, 75))),
-    ('vang-cam', 'Vàng cam', (10, 37, 64), (240, 170, 90, 110),
-     ('chuyen', (250, 214, 130), (224, 138, 60))),
-    ('tiktok', 'TikTok', (11, 11, 15), (255, 255, 255, 60), ('tiktok',)),
-    ('bien-xanh', 'Biển xanh', (10, 37, 64), (94, 234, 212, 110),
-     ('chuyen', (125, 240, 220), (59, 130, 246))),
-    ('hoang-hon', 'Hoàng hôn', (250, 250, 250), (251, 113, 133, 90),
-     ('chuyen', (251, 113, 133), (245, 158, 11))),
-    ('chanh', 'Chanh', (7, 27, 47), (190, 242, 100, 110),
-     ('chuyen', (217, 249, 157), (132, 204, 22))),
+    ('co-dien', 'Cổ điển', NEN, GOLD + (115,), ('dac', GOLD)),
+    ('anh-kim', 'Vàng ánh kim', NEN, (243, 217, 164, 120),
+     ('chuyen', (245, 222, 170), (176, 124, 40))),
+    ('gold-ngoc', 'Gold + ngọc', NEN, (37, 244, 238, 90), ('bong', GOLD, (37, 244, 238))),
+    ('gold-hong', 'Gold + hồng', NEN, (255, 107, 107, 90), ('bong', GOLD, (255, 107, 107))),
+    ('gold-duong', 'Gold + xanh dương', NEN, (59, 130, 246, 120), ('dac', GOLD)),
+    ('gold-sang', 'Gold sáng', NEN, (255, 233, 176, 120),
+     ('chuyen', (255, 236, 186), (200, 161, 75))),
 ]
 
 
@@ -92,22 +99,24 @@ def to_net(mn: Image.Image, kieu) -> Image.Image:
         im = Image.fromarray(np.dstack([rgb.astype(np.uint8),
                                         np.asarray(mn)]), 'RGBA')
         return im
-    # ── kiểu TikTok: ba lớp lệch nhau, xanh ngọc và hồng nằm dưới, trắng trên ──
-    # ⚠️ Độ lệch tính theo CẠNH ẢNH (2,2%) chứ không ghi số cứng: ghi cứng thì
-    #    ở bản 32 điểm ảnh ba lớp chồng khít lên nhau, mất sạch hiệu ứng.
-    lech = max(2, int(w * 0.022))
+    # ── kiểu 'bóng lệch': nét VÀNG nằm trên, một bóng màu nhấn lệch phía sau ──
+    # Đây là cách mượn từ hiệu ứng chữ của TikTok nhưng GIỮ VÀNG LÀM CHÍNH:
+    # màu nhấn chỉ ló ra một viền mỏng ở hai phía, đủ tạo cảm giác trẻ mà vẫn
+    # là logo vàng trên nền navy.
+    # ⚠️ Độ lệch tính theo CẠNH ẢNH (2%) chứ không ghi số cứng: ghi cứng thì ở
+    #    bản 32 điểm ảnh hai lớp chồng khít lên nhau, mất sạch hiệu ứng.
+    net, nhan = kieu[1], kieu[2]
+    lech = max(2, int(w * 0.020))
     ra = Image.new('RGBA', (w, h), (0, 0, 0, 0))
-    for mau, dx, dy in (((37, 244, 238), -lech, -lech), ((254, 44, 85), lech, lech)):
-        lop = Image.new('RGBA', (w, h), mau + (0,))
+    for dx, dy in ((-lech, -lech), (lech, lech)):
+        lop = Image.new('RGBA', (w, h), tuple(nhan) + (0,))
         lop.putalpha(mn)
-        ra.alpha_composite(lop, (0, 0) if False else (0, 0))
-        ra.alpha_composite(Image.new('RGBA', (w, h), (0, 0, 0, 0)))
         tam = Image.new('RGBA', (w, h), (0, 0, 0, 0))
         tam.paste(lop, (dx, dy), lop)
         ra.alpha_composite(tam)
-    trang = Image.new('RGBA', (w, h), (255, 255, 255, 0))
-    trang.putalpha(mn)
-    ra.alpha_composite(trang)
+    tren = Image.new('RGBA', (w, h), tuple(net) + (0,))
+    tren.putalpha(mn)
+    ra.alpha_composite(tren)
     return ra
 
 

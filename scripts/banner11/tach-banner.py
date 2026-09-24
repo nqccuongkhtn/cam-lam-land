@@ -64,6 +64,11 @@ DOI_ANH = {
     # Nay dùng ảnh LÔ ĐẤT CỎ XANH TRÊN GÒ NHÌN RA BIỂN (1920×2692, rất nét):
     # sang, đúng chất đất ven biển, lại có khoảng cỏ trống để đặt hình phác thảo
     # căn nhà lên. Có ảnh flycam THẬT độ phân giải cao của Cam Lâm thì thay vào.
+    # ⚠️ MẪU 15 KHÔNG CÒN DÙNG ẢNH CÁNH ĐỒNG NỮA. Nền của mẫu này nay là
+    #    CHÍNH TẤM ẢNH PHỐI CẢNH BIỆT THỰ, do nhóm b5-face vẽ ra (xem
+    #    ve-nha-mau15.py). Ảnh nền gốc của bản thiết kế bị đẩy xuống dưới và
+    #    không nhìn thấy, nên để trỏ vào ảnh nào cũng được — giữ nguyên cho
+    #    khỏi phải sửa chỗ khác, nhưng ĐỪNG tưởng nó là ảnh đang hiện.
     15: {'37114048': '/banner11/un-1760016400107-2000.webp'},
 }
 # ⚠️ ĐỪNG ĐỔI ẢNH CỦA CÁC MẪU NÀY. Đã thử và hỏng nặng.

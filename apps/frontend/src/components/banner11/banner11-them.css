@@ -671,3 +671,36 @@
   .cl-b11-tim { padding-top: 14px !important }
 }
 @media (min-width: 768px) { .cl-b11-duoi { display: none } }
+
+/* ══ MẪU 15: BẢN VẼ 2D "VẼ DẦN" RỒI ẢNH THẬT HIỆN LÊN ═══════════════════════
+   Mạch chuyện: bản vẽ 2D lộ dần từ trái sang phải như đang được vẽ, rồi ảnh
+   thật của lô đất hiện lên đè vào — đúng câu "Hình dung ngôi nhà trên đất
+   của bạn".
+
+   ⚠️ KHÔNG DÙNG ĐƯỢC stroke-dasharray như bản thiết kế gốc. Hiệu ứng "vẽ dần"
+      của mấy mẫu kia chạy trên ĐƯỜNG VECTOR; ở đây bản vẽ là một tấm ẢNH (do
+      máy dò nét từ chính ảnh chụp, nhờ vậy mới khớp tuyệt đối với ảnh thật).
+      Với ảnh thì phải che bớt rồi mở dần — clip-path inset.
+   ⚠️ Che từ PHẢI sang (inset ô thứ hai = mép phải), mở về 0 → nét lộ ra từ
+      trái sang phải, đúng chiều tay người vẽ.
+   ⚠️ Phải có forwards: hết hiệu ứng mà không giữ trạng thái cuối thì bản vẽ
+      bật lại về "chưa vẽ", nhấp nháy một cái rất khó chịu. */
+.cl-b11 .m15-ve { clip-path: inset(0 100% 0 0); }
+.cl-b11 .b5-wire.go .m15-ve {
+  animation: m15VeNet 1.6s cubic-bezier(.25,.6,.3,1) forwards,
+             m15NetNhat 1s ease-out 2.5s forwards;
+}
+@keyframes m15VeNet { to { clip-path: inset(0 0 0 0); } }
+/* Vẽ xong thì nét NHẠT BỚT, không tắt hẳn: để nguyên nét trắng đậm phủ kín
+   cả tấm ảnh thì rối và che mất chi tiết nhà; tắt hẳn thì mất luôn ý "phác
+   thảo ngay trên ảnh chụp thực tế" ghi ở dòng mô tả của mẫu. Còn 45% là vừa:
+   nhìn vẫn ra bản vẽ mà ảnh thật vẫn rõ. */
+@keyframes m15NetNhat { to { opacity: .45; } }
+/* ⚠️ KHÔNG LÀM ẢNH XÁM RỒI LÊN MÀU NỮA. Đã thử: ảnh phối cảnh này chụp lúc
+   chạng vạng, bản thân đã tối và ít màu — phủ thêm grayscale + giảm sáng thì
+   suốt mấy giây đầu banner nhìn như ảnh hỏng, mà lúc lên màu cũng chẳng thấy
+   khác bao nhiêu. Bỏ đi cho chắc: nét vẽ lộ dần trước, rồi ảnh hiện lên —
+   thế là đủ kể câu chuyện "phác thảo → nhà thật". */
+@media (prefers-reduced-motion: reduce) {
+  .cl-b11 .m15-ve { clip-path: none; animation: none !important; }
+}

@@ -41,8 +41,15 @@ import os
 # CỠ ẢNH ăn theo ảnh nền: hàng dừa trong ảnh nền cao chừng 40 đơn vị, nên khu
 # đất rộng ~126 đơn vị là vừa mắt — đúng bằng khung đỏ chủ dự án khoanh. Để 225
 # như lần đầu thì căn nhà to lấn át cả cánh đồng, nhìn không thật.
-ANH_X, ANH_Y = 636.9, 599.0
-ANH_W, ANH_H = 126.2, 91.0
+# ⚠️ TỈ LỆ PHẢI ĐÚNG TỈ LỆ TỆP ẢNH (1014×818 → 1,239). Ghi sai thì thẻ <image>
+#    với preserveAspectRatio="meet" sẽ chừa viền trống một bên, và quan trọng
+#    hơn: lớp nét và lớp ảnh thật lệch nhau.
+ANH_X = 636.9            # mép trái ảnh
+ANH_DAY = 690.0          # ĐÁY ảnh — mép trước lô đất, đặt trên khoảng cỏ phẳng
+ANH_W = 126.2
+ANH_H = round(ANH_W * 818 / 1014, 1)
+# Giữ lại cho mấy hàm cũ (_doc_goc, duong_lo) vẫn chạy được.
+ANH_Y = ANH_DAY - ANH_H
 
 # ── Hình bình hành của lô đất ───────────────────────────────────────────────
 # ⚠️ BA GÓC NÀY KHÔNG CHÉP TAY NỮA. Chúng là HÀNG RÀO THẬT trong ảnh, do
@@ -135,77 +142,73 @@ def cay(a, b, cao=None, tan=None, mau=CO):
                ngon[0] - tan * 0.5, ngon[1] + tan * 0.35, tan * 0.7, mau))
 
 
+# ── CHỖ ĐẶT HAI LỚP ẢNH TRÊN BẢN VẼ ────────────────────────────────────────
+# Ảnh gốc 1200×840. Đặt bằng preserveAspectRatio="none" NHƯNG khung khai đúng
+# tỉ lệ 1200/840 → không méo một chút nào, mà mình lại tự quyết định được
+# phần nào của ảnh lọt vào khung nhìn.
+#   khung nhìn của mẫu: viewBox="250 566 700 226"
+#   tỉ lệ thu: 700/1200 = 0,583  →  cao 840 × 0,583 = 490
+#   Khung nhìn chỉ cao 226 đơn vị mà ảnh thu về cao 490 → chỉ thấy được một
+#   DẢI NGANG 388 hàng của ảnh gốc. Không thể thấy cả tấm: ảnh tỉ lệ 1,43 mà
+#   khung banner tỉ lệ 3,1, muốn thấy hết thì ảnh phải thu nhỏ tới mức không
+#   phủ kín bề ngang nữa.
+#   NEN_Y = 512 → thấy hàng 92…480, tức là thân nhà, ban công, mái hiên, lối
+#   xe và chiếc ô tô. Đây là phần "ra hình căn nhà" nhất.
+#   Kéo NEN_Y XUỐNG thì thấy nhiều phần trên (nóc mái, cây cối); kéo LÊN thì
+#   thấy nhiều sân hơn nhưng cụt mái.
+# ⚠️ HAI LỚP PHẢI DÙNG ĐÚNG BỐN SỐ NÀY. Lệch một đơn vị là bản vẽ không trùng
+#    ảnh — mà khớp chính là lý do tồn tại của cách làm này.
+NEN_X, NEN_Y = 250.0, 512.0
+NEN_W, NEN_H = 700.0, 490.0
+KHUNG_ANH = ('x="%.1f" y="%.1f" width="%.1f" height="%.1f" '
+             'preserveAspectRatio="none"' % (NEN_X, NEN_Y, NEN_W, NEN_H))
+
+
 def sinh():
-    """Trả về (nhóm mặt, nhóm nét) để tach-banner.py ghép vào mẫu 15.
+    """Trả về (nhóm nền + ảnh thật, nhóm bản vẽ 2D) cho mẫu 15.
 
-    ⚠️ ĐÃ ĐỔI CÁCH LÀM: trước đây vẽ căn nhà bằng vector. Chủ dự án xem rồi chê
-       "vẽ đang sơ sài quá", "chưa rõ 3D lắm", và dặn **để ẢNH THẬT vào**.
-       Nay phần khối nhà là ẢNH CHỤP THẬT một căn biệt thự tân cổ điển, đã cắt
-       nền trong suốt bằng scripts/banner11/tach-biet-thu-mau15.py.
-       Phần vẽ tay chỉ còn: nét phác thảo lô đất + hàng rào (chạy hiệu ứng "vẽ
-       dần" trước), rồi căn nhà thật hiện lên đè vào — đúng mạch chuyện
-       "phác thảo ngôi nhà trên đất của bạn".
+    ⚠️ ĐÃ ĐỔI CÁCH LÀM BỐN LẦN — ghi lại để đừng quay về đường cũ:
+       · Đời 1: vẽ căn nhà bằng vector → "vẽ đang sơ sài quá".
+       · Đời 2: ảnh thật căn biệt thự + nét phác thảo VẼ TAY bám hàng rào →
+         vẫn lệch, vì nét và ảnh dựng từ hai nguồn khác nhau.
+       · Đời 3: cắt lô đất khỏi ảnh rồi dán lên một tấm ảnh cánh đồng khác →
+         chủ dự án hỏi thẳng "sao không lấy nền là ảnh đó luôn".
+       · Đời 4 (nay): CHÍNH TẤM ẢNH ĐÓ LÀM NỀN CẢ BANNER, bản vẽ 2D phủ đúng
+         lên trên. Chủ dự án chốt: "ghé vào nó sẽ khớp 100%".
 
-    Cách tính chỗ đặt ảnh (đừng ướm mắt, tính lại theo lối này nếu đổi ảnh):
-      · khung nhìn của mẫu là `viewBox="250 566 700 226"`, cắt kiểu slice nên
-        phần THẤY ĐƯỢC chỉ là y ≈ 577…781;
-      · đáy banner còn bị khung tìm kiếm cao ~38 đơn vị che → nội dung phải nằm
-        trên y ≈ 735;
-      · CỠ ẢNH phải ăn theo ảnh nền: trong ảnh nền có hàng dừa cao chừng 40
-        đơn vị, nên khu đất rộng ~128 đơn vị là vừa mắt — đúng bằng khung đỏ
-        chủ dự án khoanh. Để 225 đơn vị như lần trước thì căn nhà to lấn át cả
-        cánh đồng, nhìn không thật.
-      · đáy ảnh đặt ở y = 690, tức mép trước lô đất, để căn nhà đứng trên đúng
-        khoảng cỏ phẳng giữa ảnh.
+    Hai tệp do scripts/banner11/tach-lo-dat-mau15.py dựng, CÙNG KHỔ 1200×840:
+        /banner11/m15-nen.webp  ảnh nền (nguyên tấm)
+        /banner11/m15-net.webp  bản vẽ 2D, máy dò nét từ chính tấm ảnh đó
+    Cùng khổ + cùng khung đặt ⇒ khớp tuyệt đối, không còn chỗ cho sai lệch.
+
+    Mạch chuyện: nền hiện ra xám và mờ → bản vẽ 2D lộ dần từ trái sang như
+    đang vẽ → nền sáng có màu trở lại, bản vẽ nhạt đi.
     """
-    mat = []
-    # ── Sân cỏ của lô (chỉ một lớp xanh nhạt, phần còn lại ảnh nhà đã có sẵn) ─
-    mat.append('<path d="%s" fill="%s" opacity=".22"/>'
-               % (ds(d(0.02, 0.02), d(0.98, 0.02), d(0.98, 0.98), d(0.02, 0.98)), CO))
-    # ── Bóng đổ dưới chân nhà cho căn nhà "dính" xuống đất ───────────────────
-    tam = d(0.5, 0.42)
-    mat.append('<ellipse cx="%.1f" cy="%.1f" rx="%.1f" ry="%.1f" fill="#0f172a" opacity=".22"/>'
-               % (tam[0], tam[1] + TANG * 0.10, DAI_U * 0.52, DAI_U * 0.17))
-    # ── CĂN BIỆT THỰ THẬT ────────────────────────────────────────────────────
-    mat.append('<image href="/banner11/m15-bietthu.webp" x="%.1f" y="%.1f" '
-               'width="%.1f" height="%.1f" preserveAspectRatio="xMidYMax meet"/>'
-               % (ANH_X, ANH_Y, ANH_W, ANH_H))
-    # (Không vẽ thêm cây nữa: ảnh khu đất đã có sẵn cây, hàng rào và lối đi.)
+    # Lớp NỀN: chính tấm ảnh, ban đầu xám rồi lên màu (lớp .m15-nen trong
+    # banner11-them.css lo phần đổi màu).
+    nhom_mat = ('<g class="b5-face" data-at="3300" data-once>'
+                '<image class="m15-nen" href="/banner11/m15-nen.webp" %s/>'
+                '</g>' % KHUNG_ANH)
 
-    nhom_mat = '<g class="b5-face" data-at="3300" data-once>' + ''.join(mat) + '</g>'
-
-    # ── Nét phác thảo: BÁM THEO HÀNG RÀO THẬT TRONG ẢNH ────────────────────
-    # ⚠️ ĐỪNG vẽ khối hộp căn nhà ở đây. Căn nhà nay là ẢNH CHỤP THẬT, mà nét
-    #    vẽ nằm ĐÈ LÊN TRÊN ảnh — hộp vẽ tay không bao giờ trùng được với căn
-    #    nhà trong ảnh, nhìn ra ngay là "vẽ chưa khớp".
-    # ⚠️ VÀ ĐỪNG vẽ hình bình hành bốn góc như bản trước. Lô đất nhìn chéo
-    #    không phải hình bình hành phẳng (góc thứ tư khuất sau nhà), nên cạnh
-    #    xa của hình bình hành CẮT NGANG QUA CĂN BIỆT THỰ — chủ dự án xem xong
-    #    bảo "cắt nhìn cái nhà nó cụt ngủn". Nay nét đi đúng chân tường rào
-    #    thật (danh sách VIEN, đọc từ chính tấm ảnh) nên không bao giờ cắt nhà.
-    net = []
-    net.append('<path class="draw" pathLength="1" style="--dur:900" stroke="#67e8f9" '
-               'fill="none" d="%s"/>' % mo(*VIEN))
-    net.append('<path class="draw" pathLength="1" style="--d:800;--dur:900" stroke="#fde68a" '
-               'fill="none" opacity=".85" d="%s"/>'
-               % mo(*[(x, y - CAO_RAO) for x, y in VIEN]))
-    # Trụ tường: dựng ở vài điểm dọc hàng rào cho ra dáng hàng rào có trụ.
-    tru = ''.join('M%.1f %.1fL%.1f %.1f' % (x, y, x, y - CAO_RAO)
-                  for x, y in VIEN[::3])
-    net.append('<path class="draw" pathLength="1" style="--d:1700;--dur:600" stroke="#fde68a" '
-               'fill="none" opacity=".8" d="%s"/>' % tru)
+    # Lớp BẢN VẼ 2D. Hiệu ứng "vẽ dần" của bản thiết kế dùng stroke-dasharray
+    # — chỉ chạy được với đường vector. Đây là ẢNH nên phải che bớt rồi mở dần
+    # (lớp .m15-ve trong banner11-them.css).
     nhom_net = ('<g class="grp b5-wire c15-wire" data-at="1000" data-once>'
-                + ''.join(net) + '</g>')
+                '<image class="m15-ve" href="/banner11/m15-net.webp" %s/>'
+                '</g>' % KHUNG_ANH)
     return nhom_mat, nhom_net
 
 
 def duong_lo():
     """Hình lô đất — dán vào THAY_DOAN[15] của tach-banner.py.
 
-    Đi theo hàng rào thật rồi khép lại, chứ không phải hình bình hành bốn góc
-    (xem chú thích dài trong sinh()).
+    ⚠️ NAY TRẢ VỀ ĐƯỜNG RỖNG, CỐ Ý. Ranh giới lô đất đã nằm sẵn TRONG bản vẽ
+       2D (/banner11/m15-lo-net.webp — xem tach-lo-dat-mau15.py, chỗ vẽ thêm
+       đường RANH). Vẽ thêm một đường lô bằng SVG ở đây là có HAI đường ranh
+       chồng nhau mà không trùng nhau, nhìn ra ngay là lệch.
+       Vẫn giữ hàm để tach-banner.py khỏi phải sửa, chỉ cho nó vẽ ra hư không.
     """
-    return 'M' + 'L'.join('%.1f %.1f' % (x, y) for x, y in VIEN) + 'Z' 
+    return 'M0 0' 
 
 
 if __name__ == '__main__':

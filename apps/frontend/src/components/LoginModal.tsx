@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import { useAuth, type AuthUser } from '@/lib/auth';
 import PasswordInput from './PasswordInput';
 import LogoAnh from '@/components/LogoAnh';
+import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, type TinhTrangVanTay } from '@/lib/vanTay';
 
 /**
  * Popup ĐĂNG NHẬP dùng chung — hiện đè lên trang (không rời trang).
@@ -18,6 +19,32 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
+  /* ⚠️ Ô ĐĂNG NHẬP BẬT LÊN CŨNG PHẢI CÓ VÂN TAY / KHUÔN MẶT.
+     Trước đây chỉ trang /login mới có nút này, còn popup thì không — mà
+     hầu hết người dùng gặp popup chứ ít khi vào thẳng /login, nên nhìn vào
+     tưởng web chưa làm. Chủ dự án báo đúng chỗ này.
+     Nút LÚC NÀO CŨNG HIỆN: máy chưa dùng được thì bấm vào hiện bảng nói rõ
+     vì sao và phải làm gì, chứ ẩn nút đi là người dùng không biết đường nào. */
+  const [vanTay, setVanTay] = useState<TinhTrangVanTay | null>(null);
+  const [busyVt, setBusyVt] = useState(false);
+  const [baoVanTay, setBaoVanTay] = useState('');
+
+  useEffect(() => {
+    if (!open) return;
+    kiemTraVanTay().then(setVanTay).catch(() => {});
+  }, [open]);
+
+  async function vaoBangVanTay() {
+    const tt = vanTay ?? await kiemTraVanTay();
+    if (!vanTay) setVanTay(tt);
+    if (!tt.dung) { setBaoVanTay(tt.loiNhan); return; }
+    setErr(''); setBusyVt(true);
+    try {
+      const r = await dangNhapVanTay(email.trim() || undefined);
+      login(r.token, r.user as AuthUser, true);
+      onSuccess();
+    } catch (e: any) { setBaoVanTay(loiDeHieu(e)); } finally { setBusyVt(false); }
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -67,6 +94,21 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
             </label>
             <button disabled={busy} className="cl-press w-full bg-[#0A2540] hover:bg-[#0d2f54] disabled:opacity-60 text-white font-bold py-2.5 rounded-lg">{busy ? 'Đang đăng nhập…' : 'Đăng nhập'}</button>
           </form>
+          {/* Nút vân tay / khuôn mặt — giống hệt trang /login cho đồng bộ. */}
+          <div className="mt-3 flex items-center gap-3">
+            <span className="h-px flex-1 bg-slate-200" />
+            <button type="button" onClick={vaoBangVanTay} disabled={busyVt}
+              aria-label="Đăng nhập bằng vân tay hoặc khuôn mặt"
+              title="Đăng nhập bằng vân tay / khuôn mặt"
+              className="cl-press grid h-11 w-11 place-items-center rounded-full border border-slate-300 text-[#0A2540] hover:border-[#0A2540] hover:bg-slate-50 disabled:opacity-60">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" className="h-6 w-6">
+                <path d="M12 4c-3 0-5.5 1.8-5.5 5v2.5" /><path d="M12 4c3 0 5.5 1.8 5.5 5v5" />
+                <path d="M9.2 9.5A2.8 2.8 0 0 1 12 7a2.8 2.8 0 0 1 2.8 2.5v6" />
+                <path d="M12 10v5.5" /><path d="M6.5 14v2.5" /><path d="M17.5 17v2" /><path d="M9.2 13v5" />
+              </svg>
+            </button>
+            <span className="h-px flex-1 bg-slate-200" />
+          </div>
           <div className="mt-4 flex items-center justify-between gap-2 text-sm">
             <button type="button" onClick={() => setShowForgot((v) => !v)} className="font-medium text-slate-500 hover:text-[#0A2540]">Quên mật khẩu?</button>
             <span className="text-slate-500">Chưa có tài khoản? <Link href="/register" onClick={onClose} className="font-bold text-[#0A2540] hover:text-[#C8A14B]">Đăng ký</Link></span>
@@ -74,6 +116,31 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
           {showForgot && <p className="mt-2 rounded-lg bg-slate-50 p-2.5 text-[13px] leading-relaxed text-slate-500">Hiện chưa hỗ trợ tự đặt lại mật khẩu online. Vui lòng liên hệ <a href="tel:0988888888" className="font-bold text-[#0A2540]">0988 888 888</a> (gọi/Zalo) để được cấp lại mật khẩu.</p>}
         </div>
       </div>
+
+      {/* Bảng báo khi máy chưa dùng được vân tay.
+          ⚠️ Dùng bảng tự vẽ chứ KHÔNG dùng alert() của trình duyệt: alert()
+             khoá cả trang, trên điện thoại nhìn thô và không xuống dòng được.
+          ⚠️ z-index phải CAO HƠN chính ô đăng nhập, nếu không bảng nằm lọt
+             phía sau, bấm nút mà tưởng không có gì xảy ra. */}
+      {baoVanTay && (
+        <div role="dialog" aria-modal="true" aria-label="Thông báo đăng nhập bằng vân tay"
+          className="fixed inset-0 z-[90] grid place-items-center bg-black/45 px-4"
+          onClick={() => setBaoVanTay('')}>
+          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-amber-100 text-xl">🔒</span>
+              <div className="min-w-0">
+                <h2 className="font-extrabold text-[#0A2540]">Máy này chưa dùng được vân tay</h2>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">{baoVanTay}</p>
+              </div>
+            </div>
+            <button type="button" onClick={() => setBaoVanTay('')}
+              className="cl-press mt-4 w-full rounded-lg bg-[#0A2540] py-2.5 font-bold text-white">
+              Đã hiểu
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

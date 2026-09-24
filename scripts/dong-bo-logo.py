@@ -153,6 +153,23 @@ def lam_splash(logo):
     print('  splash: %d anh' % len(SPLASH))
 
 
+def don_logo_cu(logo):
+    """Ghi đè hai tệp logo cũ còn sót lại trong public/.
+
+    logo-gon.webp / logo-gon-toi.webp là bản "rút gọn" của LOGO NGÔI NHÀ đời
+    trước (do scripts/dung-logo.py sinh ra). Nay không còn chỗ nào trong mã
+    trỏ tới chúng, nhưng để nguyên thì trong kho vẫn còn hình logo cũ — lần
+    sau ai mở ra dùng lại là web có hai logo khác nhau cùng lúc.
+    Nên ghi đè bằng logo hiện hành, giữ tên tệp để đường dẫn cũ (nếu còn nằm
+    trong bộ nhớ đệm trình duyệt của ai đó) cũng trả về logo đúng.
+    """
+    for ten in ('logo-gon.webp', 'logo-gon-toi.webp'):
+        p = os.path.join(CONG, ten)
+        logo.save(p, 'WEBP', lossless=True, quality=100, method=6)
+        print('  ghi de logo cu %-20s (%d KB)' % (ten, os.path.getsize(p) // 1024))
+
+
+
 def nhung_trang_tinh(logo):
     """Nhúng thẳng logo (dạng base64) vào trang bảo trì và trang mất mạng.
 
@@ -188,6 +205,23 @@ def nhung_trang_tinh(logo):
         open(p, 'w', encoding='utf-8', newline='\n').write(s)
         print('  nhung logo vao %-18s (%d KB)' % (os.path.basename(p), len(uri) // 1024))
 
+    # ── Phiếu trích lục quy hoạch ──
+    # Phiếu in ra giấy, hay in ở nơi mạng chập chờn. Nhúng luôn tấm logo vào
+    # mã để nếu tệp ảnh không tải kịp thì phiếu vẫn có logo ĐÚNG, thay vì rơi
+    # về một hình vẽ tay đã lỗi thời (đã vấp: web đổi logo mà phiếu vẫn in
+    # ngôi nhà cũ suốt một thời gian dài).
+    pq = os.path.join(GOC, 'apps', 'frontend', 'src', 'lib', 'phieuQh.ts')
+    if os.path.exists(pq):
+        s = open(pq, encoding='utf-8').read()
+        i = s.find('const LOGO_DUPHONG = ')
+        if i < 0:
+            print('  bo qua phieuQh.ts (khong thay LOGO_DUPHONG)')
+        else:
+            e = s.index(chr(10), i)
+            s = s[:i] + "const LOGO_DUPHONG = '%s';" % uri + s[e:]
+            open(pq, 'w', encoding='utf-8', newline=chr(10)).write(s)
+            print('  nhung logo vao %-18s (%d KB)' % ('phieuQh.ts', len(uri) // 1024))
+
 
 def main():
     # 1. Ảnh gốc mới (nếu có) → dựng lại hai tệp logo chính
@@ -207,6 +241,7 @@ def main():
     print('3. Anh man hinh cho iPhone/iPad')
     lam_splash(logo)
     print('4. Nhung logo vao trang bao tri / mat mang')
+    don_logo_cu(logo)
     nhung_trang_tinh(logo)
     print('5. Logo ngay le')
     r = subprocess.run([sys.executable, os.path.join(GOC, 'scripts', 'dung-logo-ngay-le.py')],

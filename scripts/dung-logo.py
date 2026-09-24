@@ -1,4 +1,23 @@
 # -*- coding: utf-8 -*-
+# ╔══════════════════════════════════════════════════════════════════════════╗
+# ║  ⛔ SCRIPT NÀY ĐÃ NGHỈ HƯU — ĐỪNG CHẠY                                   ║
+# ╠══════════════════════════════════════════════════════════════════════════╣
+# ║  Nó dựng LOGO NGÔI NHÀ đời trước. Web nay dùng logo chữ lồng "C khoét L" ║
+# ║  trong ô vuông navy có viền vàng. Chạy script này là GHI ĐÈ logo mới      ║
+# ║  bằng logo cũ, mà nó ghi thẳng vào public/logo-cam-lam.webp nên hỏng      ║
+# ║  toàn bộ: thanh menu, icon ứng dụng, màn hình chờ, dấu mờ trên ảnh tin…   ║
+# ║                                                                          ║
+# ║  MUỐN DỰNG LOGO THÌ CHẠY:   python scripts/dung-logo-chinh.py            ║
+# ║                             python scripts/dong-bo-logo.py               ║
+# ║                                                                          ║
+# ║  Giữ tệp lại làm tư liệu (cách vẽ ngôi nhà, cách làm dày nét), không xoá. ║
+# ╚══════════════════════════════════════════════════════════════════════════╝
+import sys
+if __name__ == '__main__':
+    sys.exit('DUNG LAI: script nay dung LOGO CU, chay la ghi de logo moi.
+'
+             'Dung logo bang:  python scripts/dung-logo-chinh.py'
+             '  roi  python scripts/dong-bo-logo.py')
 """
 DUNG TEP LOGO CHO THANH MENU
 =============================

@@ -119,9 +119,12 @@ export default function HopDongDatCoc() {
   // ⚠️ Logo lấy từ ĐÚNG TỆP logo của web, không vẽ lại bằng SVG — xem chú
   //    thích trong components/LogoAnh.tsx. Bìa hợp đồng in ra giấy nên dùng
   //    bản nét sáng đặt trên nền navy đậm.
+  // ⚠️ LOGO NAY LÀ Ô VUÔNG (1:1). Trước đây là logo ngôi nhà nằm ngang nên
+  //    chỗ này nhân 1,51 cho bề ngang; giữ con số đó với logo vuông thì khung
+  //    rộng gấp rưỡi mà hình vẫn vuông bé tí, nhìn lệch hẳn sang trái.
   const clHouse = (sz: number) => (<img src="/logo-cam-lam.webp" alt="" aria-hidden
-    width={Math.round(sz * 1.51)} height={sz}
-    style={{ width: Math.round(sz * 1.51), height: sz, objectFit: 'contain' }} />);
+    width={sz} height={sz}
+    style={{ width: sz, height: sz, objectFit: 'contain' }} />);
   // (Đã bỏ hoa văn góc — dùng khung vàng đôi tối giản, sang trọng hiện đại.)
   const clMedal = () => (
     <svg viewBox="0 0 150 150" width="116" height="116">
@@ -354,10 +357,10 @@ export default function HopDongDatCoc() {
           </div>
           <div style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '2.5px solid #0A2540', paddingBottom: '8px' }}>
-              <span style={{ display: 'grid', placeItems: 'center', width: 46, height: 46, borderRadius: 11, background: '#0A2540' }}>
-                <img src="/logo-cam-lam.webp" alt="" aria-hidden width={36} height={24}
-                  style={{ width: 36, height: 24, objectFit: 'contain' }} />
-              </span>
+              {/* ⚠️ KHÔNG BỌC LOGO TRONG MỘT Ô NAVY NỮA: bản thân logo đã là
+                  ô vuông navy bo góc, bọc thêm thành hai khung lồng nhau. */}
+              <img src="/logo-cam-lam.webp" alt="" aria-hidden width={46} height={46}
+                style={{ width: 46, height: 46, borderRadius: 11, objectFit: 'contain' }} />
               <div style={{ flex: 1 }}>
                 <div style={{ fontFamily: 'Arial, sans-serif', fontWeight: 800, fontSize: '18px', color: '#0A2540' }}>CAM LÂM LAND</div>
                 <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '11px', color: '#555' }}>Sàn Bất động sản &amp; Bản đồ quy hoạch Cam Lâm, Khánh Hòa · Hotline {HOTLINE}</div>

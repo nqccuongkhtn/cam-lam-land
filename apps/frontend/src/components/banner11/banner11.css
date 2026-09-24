@@ -138,7 +138,7 @@
 @keyframes breathe{from{filter:brightness(1)}to{filter:brightness(1.18)}}
 .cl-b11 .sp-logo{position:absolute;left:calc(var(--u)*70px);top:calc(var(--u)*140px);z-index:3;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*8px);color:#fff;font-weight:800;font-size:max(11px,calc(var(--u)*24px));text-align:center;width:calc(var(--u)*230px)}
 .cl-b11 .sp-logo small{font-weight:500;opacity:.85;font-size:.75em}
-.cl-b11 .sp-logo svg{width:calc(var(--u)*78px);height:calc(var(--u)*78px);fill:none;stroke:#fff;stroke-width:3;stroke-linejoin:round}
+.cl-b11 .sp-logo img{width:calc(var(--u)*78px);height:calc(var(--u)*78px);object-fit:contain;display:block}
 .cl-b11 .sp-content{position:absolute;left:calc(var(--u)*590px);top:calc(var(--u)*330px);z-index:4;max-width:calc(var(--u)*820px)}
 .cl-b11 .sp-title{margin:0;font-weight:700;font-size:max(24px,calc(var(--u)*62px));line-height:1.12;letter-spacing:-.01em;display:inline-block;transform-origin:50% 50%}
 .cl-b11 .a-punch{opacity:0}.cl-b11 .a-punch.go{animation:punch calc(375ms*var(--slow)) linear both}
@@ -180,7 +180,7 @@
 @keyframes inRight{from{opacity:0;transform:translateX(22%)}to{opacity:1;transform:none}}
 .cl-b11 .pp-logo{position:absolute;left:calc(var(--u)*140px);top:calc(var(--u)*56px);z-index:4;display:flex;align-items:center;gap:calc(var(--u)*14px);color:#fff;font-weight:800;font-size:max(11px,calc(var(--u)*24px));line-height:1.1}
 .cl-b11 .pp-logo small{display:block;font-weight:500;font-size:.7em;opacity:.8;margin-top:2px}
-.cl-b11 .pp-logo svg{width:calc(var(--u)*54px);height:calc(var(--u)*54px);fill:none;stroke:#5eead4;stroke-width:4;stroke-linejoin:round}
+.cl-b11 .pp-logo img{width:calc(var(--u)*54px);height:calc(var(--u)*54px);object-fit:contain;display:block}
 .cl-b11 .st-step.photo .sp-content{left:calc(var(--u)*140px);top:calc(var(--u)*176px);max-width:calc(var(--u)*640px)}
 .cl-b11 .st-step.photo .sp-title{font-size:max(28px,calc(var(--u)*84px));line-height:1.02}
 .cl-b11 .st-step.photo .sp-slogan{font-size:max(12px,calc(var(--u)*24px));gap:calc(var(--u)*12px)}

@@ -59,11 +59,11 @@ HINH = 'mau6m2'       # nguyên bản, bào mỏng 2,5% (scripts/ve-lai-mau6.py)
 # Đặt None thì không vẽ viền, khi đó mới dùng tới PHOI bên dưới.
 # ⚠️ Đừng quá 0.07 — dày hơn nữa thì phần navy còn quá ít, nhìn như cái
 #    khung ảnh chứ không ra logo.
-VIEN_GOLD = 0.020       # cho logo-cam-lam.webp      — nền TỐI (trên banner)
+VIEN_GOLD = 0.013       # cho logo-cam-lam.webp      — nền TỐI (trên banner)
 # Bản dùng trên thanh menu TRẮNG: chỉ một sợi chỉ vàng cho có, như logo gốc.
 # ⚠️ Đừng để 0 hẳn: mép ô navy trên nền trắng sẽ cứng và hơi thô; một sợi
 #    vàng mảnh làm mép dịu lại mà nhìn vẫn là logo cũ.
-VIEN_GOLD_TRANG = 0.010  # cho logo-cam-lam-toi.webp  — nền SÁNG (menu trắng)
+VIEN_GOLD_TRANG = 0.007  # cho logo-cam-lam-toi.webp  — nền SÁNG (menu trắng)
 # Chỉ dùng khi VIEN_GOLD = None. Mã phối lấy ở scripts/phoi-mau-logo.py
 # (co-dien · anh-kim · gold-ngoc · gold-hong · gold-duong · gold-sang) hoặc ở
 # scripts/logo-sang-hon.py (sang0…sang3 — bốn mức sáng của nền ô vuông).

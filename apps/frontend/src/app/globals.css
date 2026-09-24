@@ -653,31 +653,74 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
    quản lý lịch, sửa ở đây là hai nơi cùng đổi.
    ⚠️ Máy đặt "giảm chuyển động" thì tắt hết — luật chung của dự án. */
 .cl-logo-le { position: relative; display: inline-flex; flex: none; }
-.cl-logo-le img { animation: clLogoLac 4.2s ease-in-out infinite; transform-origin: 50% 12%; }
-.cl-logo-le:hover img, .cl-logo-le:hover i { animation-play-state: paused; }
+
+/* ⚠️ HAI LỚP CHỒNG NHAU, chỉ lớp trên được động.
+      .cl-le-nen = Ô VUÔNG LOGO  → ĐỨNG YÊN TUYỆT ĐỐI, không hiệu ứng nào
+                                    được chạm vào (chủ dự án dặn đi dặn lại:
+                                    ô vuông là biểu tượng của web, không lắc);
+      .cl-le-tt  = phần TRANG TRÍ → mọi hiệu ứng nằm ở đây.
+   Trước đây chỉ có MỘT tấm ảnh ghép sẵn và cả tấm cùng lắc — tức là ô vuông
+   logo lắc theo. Đừng gộp lại làm một lần nữa. */
+.cl-logo-le img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: contain; }
+.cl-le-nen { animation: none !important; transform: none !important; }
+.cl-le-tt  { animation: clLogoLac 4.2s ease-in-out infinite; transform-origin: 74% 82%; }
+.cl-logo-le:hover .cl-le-tt, .cl-logo-le:hover i { animation-play-state: paused; }
 @keyframes clLogoLac {
-  0%, 100% { transform: rotate(-1.8deg); }
-  50%      { transform: rotate(1.8deg); }
+  0%, 100% { transform: rotate(-2.4deg); }
+  50%      { transform: rotate(2.4deg); }
 }
-/* Tết và Trung thu lắc rộng hơn chút — như đèn lồng treo trước gió. */
-.cl-logo-le[data-le="tet"] img,
-.cl-logo-le[data-le="trung-thu"] img { animation-duration: 3.4s; }
+/* Tết và Trung thu lắc rộng hơn chút — như cành mai, đèn lồng trước gió. */
+.cl-logo-le[data-le="tet"] .cl-le-tt,
+.cl-logo-le[data-le="trung-thu"] .cl-le-tt { animation-duration: 3.4s; }
 @keyframes clLogoNay {
   0%, 100% { transform: translateY(0); }
   45%      { transform: translateY(-2.5px); }
   70%      { transform: translateY(.5px); }
 }
-.cl-logo-le[data-le="noel"] img { animation-name: clLogoNay; animation-duration: 2.8s; }
-@keyframes clLogoCoBay {
-  0%, 100% { transform: skewX(0deg); }
-  35%      { transform: skewX(-3.5deg); }
-  70%      { transform: skewX(2deg); }
+.cl-logo-le[data-le="noel"] .cl-le-tt { animation-name: clLogoNay; animation-duration: 2.8s; }
+
+/* ── VẪY CỜ ─────────────────────────────────────────────────────────────────
+   Chủ dự án: "như người cầm cờ vẫy qua lại chiến thắng".
+   Nên KHÔNG dùng skew (skew làm lá cờ méo như bị kéo giãn) mà XOAY quanh
+   CHÂN CỘT CỜ — giống hệt động tác cầm cán cờ phất sang hai bên. Gốc xoay
+   đặt ở 78%/86% vì trang trí nằm hẳn ở nửa phải khung, chân cột cờ chạm đáy.
+   ⚠️ Biên độ 6 độ là vừa: rộng hơn thì ở cỡ thật 32px lá cờ quét ra ngoài
+      khung, bị thanh menu cắt mất một góc. */
+@keyframes clLogoVayCo {
+  0%, 100% { transform: rotate(-6deg); }
+  50%      { transform: rotate(6deg); }
 }
-.cl-logo-le[data-le="quoc-khanh"] img,
-.cl-logo-le[data-le="30-4"] img,
-.cl-logo-le[data-le="dang"] img,
-.cl-logo-le[data-le="dien-bien"] img,
-.cl-logo-le[data-le="quan-doi"] img { animation-name: clLogoCoBay; animation-duration: 3.2s; }
+.cl-logo-le.co-vay .cl-le-tt {
+  animation-name: clLogoVayCo; animation-duration: 2.2s;
+  transform-origin: 78% 86%;
+}
+/* Điện Biên Phủ — lá cờ trên nóc hầm, phất mạnh và chậm rãi hơn, đúng kiểu
+   cắm cờ chiến thắng. */
+.cl-logo-le[data-le="dien-bien"] .cl-le-tt {
+  animation-duration: 2.8s; transform-origin: 82% 78%;
+}
+
+/* ── ÔNG GIÀ NOEL CƯỠI XE TUẦN LỘC (chỉ Giáng sinh) ─────────────────────────
+   Chủ dự án: "hiện ra 1 chổ chạy qua 1 chỗ sẽ bị ẩn như kiểu có lỗ không
+   gian đi ra và đi vào, 2 phút ổng sẽ chạy 1 lần".
+   Nên chu kỳ để đúng 120 giây, mà xe chỉ hiện trong ~4 giây đầu (3,3% chu kỳ)
+   rồi tắt hẳn — còn lại 116 giây bầu trời trống.
+   ⚠️ Ảnh xe nằm ở /logo-le/noel-xe.webp, do scripts/dung-logo-ngay-le.py vẽ.
+      Đổi tên tệp bên đó thì phải sửa cả dòng background-image dưới đây. */
+.cl-noel-xe {
+  position: absolute; left: 0; top: 8%;
+  width: 46%; height: 46%;
+  background: url('/logo-le/noel-xe.webp') center/contain no-repeat;
+  opacity: 0; pointer-events: none;
+  animation: clNoelXe 120s linear infinite;
+}
+@keyframes clNoelXe {
+  0%    { transform: translateX(-40%) translateY(4px) scale(.85); opacity: 0; }
+  0.6%  { transform: translateX(0) translateY(0) scale(1); opacity: 1; }
+  2.6%  { transform: translateX(115%) translateY(-5px) scale(1); opacity: 1; }
+  3.3%  { transform: translateX(150%) translateY(-8px) scale(.85); opacity: 0; }
+  100%  { transform: translateX(150%) translateY(-8px) scale(.85); opacity: 0; }
+}
 
 /* Ngày tưởng niệm: KHÔNG nhún nhảy, chỉ sáng lên rất chậm. Nhún nhảy trong
    ngày Thương binh Liệt sĩ hay sinh nhật Bác là vô duyên. */
@@ -685,11 +728,11 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
   0%, 100% { filter: brightness(1); }
   50%      { filter: brightness(1.16); }
 }
-.cl-logo-le[data-le="tri-an"] img,
-.cl-logo-le[data-le="sen"] img,
-.cl-logo-le[data-le="gio-to"] img,
-.cl-logo-le[data-le="vu-lan"] img,
-.cl-logo-le[data-le="nhang"] img {
+.cl-logo-le[data-le="tri-an"] .cl-le-tt,
+.cl-logo-le[data-le="sen"] .cl-le-tt,
+.cl-logo-le[data-le="gio-to"] .cl-le-tt,
+.cl-logo-le[data-le="vu-lan"] .cl-le-tt,
+.cl-logo-le[data-le="nhang"] .cl-le-tt {
   animation-name: clLogoSangDan; animation-duration: 5s; transform: none;
 }
 
@@ -736,6 +779,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cl-logo-le img, .cl-logo-le > i, .cl-phao-qua, .cl-phao-qua i { animation: none !important; }
-  .cl-logo-le > i, .cl-phao { display: none; }
+  .cl-logo-le img, .cl-logo-le > i, .cl-phao-qua, .cl-phao-qua i,
+  .cl-noel-xe { animation: none !important; }
+  .cl-logo-le > i, .cl-phao, .cl-noel-xe { display: none; }
 }

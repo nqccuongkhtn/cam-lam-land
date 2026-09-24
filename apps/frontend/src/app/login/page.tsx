@@ -70,14 +70,13 @@ export default function LoginPage() {
                 mấy vòng cung lồng nhau, thu về 24px thành một cục xoắn khó
                 hiểu, mà phần lớn người dùng mở web bằng điện thoại thì cái
                 họ gặp là NHẬN DIỆN KHUÔN MẶT chứ không phải vân tay.
-                Nay dùng đúng ký hiệu Face ID: bốn ngoặc góc + khuôn mặt.
+                Nay dùng đúng ký hiệu Face ID: bốn ngoặc góc + hình người.
                 Bốn ngoặc góc mới là thứ ai cũng nhận ra ngay, đừng bỏ. */}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
               <path d="M3 8.5V6a3 3 0 0 1 3-3h2.5" /><path d="M15.5 3H18a3 3 0 0 1 3 3v2.5" />
               <path d="M21 15.5V18a3 3 0 0 1-3 3h-2.5" /><path d="M8.5 21H6a3 3 0 0 1-3-3v-2.5" />
-              <path d="M9 9.6v1.9" /><path d="M15 9.6v1.9" />
-              <path d="M12 9.6v3.3a.9.9 0 0 1-.9.9h-.45" />
-              <path d="M8.9 16.3c.9.85 1.95 1.25 3.1 1.25s2.2-.4 3.1-1.25" />
+              <circle cx="12" cy="10.3" r="2.6" />
+              <path d="M7.7 17.6a4.7 4.7 0 0 1 8.6 0" />
             </svg>
           </button>
         </div>

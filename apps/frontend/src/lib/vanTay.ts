@@ -41,23 +41,26 @@ export type TinhTrangVanTay =
 
 export async function kiemTraVanTay(): Promise<TinhTrangVanTay> {
   try {
+    // ⚠️ VIẾT NGẮN NHƯ APP. Chủ dự án: "ghi đơn giản như app thôi, đừng dùng
+    //    từ ngữ AI". Mỗi câu một ý, không giải thích dài dòng, không liệt kê
+    //    điều kiện. Người dùng chỉ cần biết PHẢI LÀM GÌ TIẾP.
     if (!(window as any).PublicKeyCredential)
       return { dung: false, ly_do: 'trinh-duyet',
-        loiNhan: 'Trình duyệt này chưa hỗ trợ. Dùng Chrome, Edge hoặc Safari bản mới giúp.' };
+        loiNhan: 'Trình duyệt này không hỗ trợ. Thử Chrome, Edge hoặc Safari.' };
 
     if (!window.isSecureContext)
       return { dung: false, ly_do: 'khong-https',
-        loiNhan: 'Chỉ dùng được khi vào bằng địa chỉ https. Vào bằng tên miền của web thay vì địa chỉ IP trong mạng nội bộ.' };
+        loiNhan: 'Cần mở web bằng địa chỉ https.' };
 
     const f = (window as any).PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable;
     const co = typeof f === 'function' ? await f.call((window as any).PublicKeyCredential) : false;
     if (!co)
       return { dung: false, ly_do: 'chua-cai',
-        loiNhan: 'Máy này chưa cài vân tay hoặc nhận diện khuôn mặt. Điện thoại có Face ID / vân tay thì dùng được ngay; máy tính Windows cần bật Windows Hello trong Cài đặt → Tài khoản.' };
+        loiNhan: 'Hãy bật Face ID, vân tay hoặc Windows Hello trong Cài đặt của máy.' };
 
     return { dung: true };
   } catch {
-    return { dung: false, ly_do: 'trinh-duyet', loiNhan: 'Máy hoặc trình duyệt này chưa dùng được.' };
+    return { dung: false, ly_do: 'trinh-duyet', loiNhan: 'Máy này không dùng được.' };
   }
 }
 
@@ -106,10 +109,10 @@ export function tenMayMacDinh(): string {
 export function loiDeHieu(e: any): string {
   const t = String(e?.name || '') + ' ' + String(e?.message || '');
   if (/NotAllowedError|cancel|abort/i.test(t))
-    return 'Bạn đã huỷ, hoặc máy chờ quá lâu. Bấm lại rồi chạm vân tay giúp.';
+    return 'Đã huỷ. Bấm lại để thử.';
   if (/InvalidStateError/i.test(t))
-    return 'Máy này đã đăng ký vân tay cho tài khoản rồi.';
+    return 'Máy này đã đăng ký rồi.';
   if (/NotSupportedError|SecurityError/i.test(t))
-    return 'Máy hoặc trình duyệt này chưa dùng được vân tay. Cần mở trang bằng https.';
-  return e?.message || 'Không xác minh được. Thử lại giúp.';
+    return 'Máy này không dùng được.';
+  return e?.message || 'Không nhận được. Thử lại.';
 }

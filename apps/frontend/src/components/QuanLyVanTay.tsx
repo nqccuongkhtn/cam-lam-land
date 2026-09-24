@@ -31,13 +31,13 @@ export default function QuanLyVanTay() {
     setErr(''); setMsg(''); setBusy(true);
     try {
       await themVanTay(tenMayMacDinh());
-      setMsg('Đã bật. Lần sau vào trang đăng nhập, bấm "Đăng nhập bằng vân tay / khuôn mặt" là xong.');
+      setMsg('Đã bật cho máy này.');
       await nap();
     } catch (e: any) { setErr(loiDeHieu(e)); } finally { setBusy(false); }
   }
 
   async function xoa(id: number, ten: string) {
-    if (!confirm(`Gỡ vân tay của "${ten}"? Máy đó sẽ phải đăng nhập lại bằng mật khẩu.`)) return;
+    if (!confirm(`Gỡ "${ten}"? Máy đó sẽ phải nhập mật khẩu.`)) return;
     setErr(''); setMsg('');
     try { await xoaVanTay(id); setMsg('Đã gỡ.'); await nap(); }
     catch (e: any) { setErr(e?.message || 'Không gỡ được'); }
@@ -45,17 +45,17 @@ export default function QuanLyVanTay() {
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
-      <h2 className="text-[15px] font-extrabold text-[#0A2540]">🔐 Đăng nhập bằng vân tay · khuôn mặt</h2>
+      {/* ⚠️ CHỮ NGẮN NHƯ APP. Chủ dự án dặn "ghi đơn giản như app thôi, đừng
+          dùng từ ngữ AI": mỗi câu một ý, không giải thích cơ chế, không kể
+          điều kiện kỹ thuật. Người dùng chỉ cần biết bật để làm gì. */}
+      <h2 className="text-[15px] font-extrabold text-[#0A2540]">🔐 Đăng nhập bằng khuôn mặt · vân tay</h2>
       <p className="mt-1 text-[12.5px] leading-snug text-slate-500">
-        Bật rồi thì lần sau chỉ cần chạm vân tay là vào, khỏi gõ mật khẩu.
-        <b className="text-slate-600"> Vân tay và khuôn mặt không rời khỏi máy này</b> — máy chủ chỉ
-        giữ một khoá công khai, không đọc được vân tay của ai. Phải bật riêng trên từng máy.
+        Bật rồi thì khỏi gõ mật khẩu. Bật riêng cho từng máy.
       </p>
 
       {!co && (
         <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-[12.5px] leading-snug text-amber-800">
-          Máy hoặc trình duyệt này chưa dùng được. Cần máy có vân tay / khuôn mặt (Face ID, Touch ID,
-          Windows Hello) và trang phải mở bằng <b>https</b>.
+          Máy này chưa dùng được.
         </p>
       )}
 

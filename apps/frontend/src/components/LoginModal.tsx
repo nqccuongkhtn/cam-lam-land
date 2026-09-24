@@ -130,14 +130,14 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
           ⚠️ z-index phải CAO HƠN chính ô đăng nhập, nếu không bảng nằm lọt
              phía sau, bấm nút mà tưởng không có gì xảy ra. */}
       {baoVanTay && (
-        <div role="dialog" aria-modal="true" aria-label="Thông báo đăng nhập bằng vân tay"
+        <div role="dialog" aria-modal="true" aria-label="Thông báo đăng nhập bằng khuôn mặt"
           className="fixed inset-0 z-[90] grid place-items-center bg-black/45 px-4"
           onClick={() => setBaoVanTay('')}>
           <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start gap-3">
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-amber-100 text-xl">🔒</span>
               <div className="min-w-0">
-                <h2 className="font-extrabold text-[#0A2540]">Máy này chưa dùng được vân tay</h2>
+                <h2 className="font-extrabold text-[#0A2540]">Chưa dùng được</h2>
                 <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">{baoVanTay}</p>
               </div>
             </div>

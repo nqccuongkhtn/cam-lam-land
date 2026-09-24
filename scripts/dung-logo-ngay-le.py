@@ -735,21 +735,68 @@ def banh_rang(d, cx, cy, r, mau, lo):
 def bua_liem(d, cx, cy, r, mau):
     """Búa và liềm trên cờ Đảng.
 
-    ⚠️ VẼ ĐẶC VÀ TO, chiếm gần hết lá cờ. Bản đầu vẽ bằng mấy nét mảnh, thu về
-       32px là mất hết chi tiết, chỉ còn một vệt vàng nhoè — chủ dự án bảo
-       "chưa đẹp". Nay: lưỡi liềm là một vành cung DÀY, búa là khối đặc.
+    ⚠️ BẢN TRƯỚC VẼ SAI (chủ dự án chụp ảnh báo 24/9/2026). Lưỡi liềm dựng
+       bằng d.arc() — một vành cung DÀY ĐỀU ôm gần kín vòng tròn — nên thu
+       nhỏ lại nhìn ra chữ "C" có gạch ngang, không ra cái liềm.
+       Lưỡi liềm thật là hình TRĂNG KHUYẾT: dày ở giữa lưng, vuốt NHỌN dần
+       về hai đầu mũi. Ở đây dựng đúng cách vẽ trăng khuyết — lấy phần thừa
+       ra giữa HAI ĐƯỜNG TRÒN LỆCH TÂM — nên về cỡ 32 điểm ảnh vẫn ra dáng.
+       Miệng liềm mở lên phía TRÊN–PHẢI, cái búa nằm gọn trong lòng miệng
+       đó, đúng bố cục búa liềm chuẩn.
     """
-    # lưỡi liềm: vành cung dày, ôm từ trái xuống dưới sang phải
-    d.arc([cx - r * 1.05, cy - r * 1.05, cx + r * 1.05, cy + r * 1.05],
-          start=95, end=300, fill=mau, width=max(3, r * 0.30))
-    # chuôi liềm
-    d.line([(cx - r * 0.06, cy + r * 1.02), (cx + r * 0.52, cy + r * 1.16)],
-           fill=mau, width=max(3, r * 0.26))
-    # cán búa (chéo) + đầu búa
-    d.line([(cx - r * 0.86, cy + r * 0.86), (cx + r * 0.36, cy - r * 0.36)],
-           fill=mau, width=max(3, r * 0.26))
-    d.polygon([(cx + r * 0.16, cy - r * 0.62), (cx + r * 0.86, cy - r * 0.18),
-               (cx + r * 0.60, cy + r * 0.22), (cx - r * 0.10, cy - r * 0.22)], fill=mau)
+    # ── LƯỠI LIỀM — vành trăng khuyết ──
+    R = r * 1.16                        # vòng ngoài của lưỡi
+    ri = R * 0.80                       # vòng trong (phần khoét đi)
+    ox, oy = R * 0.30, -R * 0.30        # lệch tâm về phía trên–phải
+    kc = math.hypot(ox, oy)
+    ux, uy = ox / kc, oy / kc
+    a = (R * R - ri * ri + kc * kc) / (2 * kc)
+    h = math.sqrt(max(0.0, R * R - a * a))
+    px, py = cx + a * ux, cy + a * uy
+    g1 = (px - h * uy, py + h * ux)     # hai đầu mũi liềm
+    g2 = (px + h * uy, py - h * ux)
+    xa = math.atan2(-uy, -ux)           # hướng lưng liềm (dày nhất)
+
+    def _cung(tx, ty, bk, p1, p2):
+        """Các điểm trên cung tròn đi từ p1 sang p2, vòng qua phía lưng liềm."""
+        quay = lambda t: t % (2 * math.pi)
+        b1 = quay(math.atan2(p1[1] - ty, p1[0] - tx))
+        b2 = quay(math.atan2(p2[1] - ty, p2[0] - tx))
+        bx = quay(xa)
+        do_dai = quay(b2 - b1)
+        if quay(bx - b1) > do_dai:      # đi chiều kia mới qua lưng liềm
+            b1, b2 = b2, b1
+            do_dai = quay(b2 - b1)
+            dao = True
+        else:
+            dao = False
+        n = 44
+        ds = [(tx + bk * math.cos(b1 + do_dai * i / n),
+               ty + bk * math.sin(b1 + do_dai * i / n)) for i in range(n + 1)]
+        return ds[::-1] if dao else ds
+
+    d.polygon(_cung(cx, cy, R, g1, g2) + _cung(cx + ox, cy + oy, ri, g1, g2)[::-1],
+              fill=mau)
+
+    # ── CHUÔI LIỀM — nối ra từ đầu mũi phía DƯỚI–PHẢI ──
+    mui = g1 if (g1[0] + g1[1]) > (g2[0] + g2[1]) else g2
+    d.line([mui, (mui[0] + r * 0.34, mui[1] + r * 0.50)],
+           fill=mau, width=max(3, int(r * 0.24)))
+
+    # ── CÁI BÚA — cán chéo từ dưới–trái lên trên–phải, đầu búa khối đặc ──
+    dx, dy = 0.7071, -0.7071            # hướng chéo 45 độ lên phải
+    goc_x, goc_y = cx - R * 0.74, cy + R * 0.74          # chuôi cán
+    dau_x, dau_y = cx + R * 0.46, cy - R * 0.46          # chỗ gắn đầu búa
+    d.line([(goc_x, goc_y), (dau_x, dau_y)], fill=mau, width=max(4, int(r * 0.34)))
+    # đầu búa: khối chữ nhật vuông góc với cán
+    nx, ny = -dy, dx                    # pháp tuyến của cán
+    dai, day = R * 0.72, R * 0.36
+    d.polygon([
+        (dau_x - nx * day - dx * dai * 0.18, dau_y - ny * day - dy * dai * 0.18),
+        (dau_x + nx * day - dx * dai * 0.18, dau_y + ny * day - dy * dai * 0.18),
+        (dau_x + nx * day + dx * dai, dau_y + ny * day + dy * dai),
+        (dau_x - nx * day + dx * dai, dau_y - ny * day + dy * dai),
+    ], fill=mau)
 
 
 def chim_bo_cau(d, cx, cy, r, than, mo, la):

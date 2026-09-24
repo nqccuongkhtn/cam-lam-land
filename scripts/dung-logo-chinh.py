@@ -4,7 +4,7 @@ DỰNG LOGO CHÍNH THỨC CỦA WEB
 =============================
 Chủ dự án đã chọn trong trang xem thử (/logo-thu/xem.html):
 
-    hình  = "Khung vuông · chữ C"  (mẫu 3, cắt từ ảnh mẫu chủ dự án gửi)
+    hình  = "Khiên · chữ lồng CL"  (mẫu 4, cắt từ ảnh mẫu chủ dự án gửi)
     phối  = "Gold sáng"           (nét chuyển từ vàng kem xuống vàng đồng)
     khung = ô vuông navy bo góc, như logo web vẫn dùng
 
@@ -34,7 +34,7 @@ CONG = os.path.join(GOC, 'apps', 'frontend', 'public')
 #    scripts/dong-bo-logo.py. Mã hình lấy trong scripts/phoi-mau-logo.py
 #    (mau1…mau6), mã phối cũng ở đó (co-dien · anh-kim · gold-ngoc ·
 #    gold-hong · gold-duong · gold-sang).
-HINH = 'mau3'         # Khung vuông · chữ C
+HINH = 'mau4'         # Khiên · chữ lồng CL
 PHOI = 'gold-sang'    # nét chuyển vàng kem → vàng đồng
 KHO = 256
 

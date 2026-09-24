@@ -56,7 +56,11 @@ export async function kiemTraVanTay(): Promise<TinhTrangVanTay> {
     const co = typeof f === 'function' ? await f.call((window as any).PublicKeyCredential) : false;
     if (!co)
       return { dung: false, ly_do: 'chua-cai',
-        loiNhan: 'Hãy bật Face ID, vân tay hoặc Windows Hello trong Cài đặt của máy.' };
+        // ⚠️ ĐỪNG GỌI TÊN CÔNG NGHỆ. Câu trước ghi "Windows Hello" — chủ dự
+        //    án hỏi lại "Windows Hello là cái gì". Người dùng không cần biết
+        //    tên hãng đặt; họ chỉ cần biết phải mở Cài đặt của máy và bật
+        //    mở khoá bằng khuôn mặt hay vân tay.
+        loiNhan: 'Máy này chưa bật mở khoá bằng khuôn mặt hoặc vân tay. Bật trong Cài đặt của máy.' };
 
     return { dung: true };
   } catch {

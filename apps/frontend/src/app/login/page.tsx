@@ -64,7 +64,7 @@ export default function LoginPage() {
         <div className="mt-4 flex items-center justify-center">
           <button type="button" onClick={vaoBangVanTay} disabled={busyVt}
             aria-label="Đăng nhập bằng khuôn mặt hoặc vân tay"
-            title="Đăng nhập bằng khuôn mặt / vân tay (Face ID, Windows Hello)"
+            title="Đăng nhập bằng khuôn mặt hoặc vân tay"
             className="cl-press grid h-11 w-11 place-items-center rounded-full border border-slate-300 text-[#0A2540] hover:border-[#0A2540] hover:bg-slate-50 disabled:opacity-60">
             {/* ⚠️ LOGO FACE ID, KHÔNG PHẢI VÂN TAY. Bản trước vẽ vân tay —
                 mấy vòng cung lồng nhau, thu về 24px thành một cục xoắn khó

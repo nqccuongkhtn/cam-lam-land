@@ -126,9 +126,15 @@ def dung_o(ma: str, phoi, kho: int = KHO, chiem: float = CHIEM) -> Image.Image:
     d = ImageDraw.Draw(im)
     r = int(kho * BO_GOC)
     d.rounded_rectangle([0, 0, kho - 1, kho - 1], radius=r, fill=tuple(nen) + (255,))
-    d.rounded_rectangle([kho * 0.045, kho * 0.045, kho * 0.955, kho * 0.955],
-                        radius=int(r * 0.82), outline=tuple(vien),
-                        width=max(1, int(kho * 0.007)))
+    # ⚠️ VIỀN TRONG SUỐT HOÀN TOÀN THÌ ĐỪNG VẼ. ImageDraw GHI ĐÈ cả độ đục
+    #    chứ không chồng màu lên, nên vẽ một đường màu (0,0,0,0) là KHOÉT
+    #    THỦNG một rãnh trong suốt xuyên qua lớp navy. Ở cỡ nhỏ không thấy,
+    #    nhưng phóng lên làm icon cài ứng dụng thì rãnh đó hiện thành một
+    #    vạch trắng chạy vòng quanh logo — đã vấp đúng lỗi này.
+    if len(vien) < 4 or vien[3] > 0:
+        d.rounded_rectangle([kho * 0.045, kho * 0.045, kho * 0.955, kho * 0.955],
+                            radius=int(r * 0.82), outline=tuple(vien),
+                            width=max(1, int(kho * 0.007)))
     mn = doc_mat_na(ma)
     c = int(kho * chiem)
     mn = mn.resize((c, c), Image.LANCZOS)

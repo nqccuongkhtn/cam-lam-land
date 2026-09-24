@@ -59,11 +59,11 @@ HINH = 'mau6m2'       # nguyên bản, bào mỏng 2,5% (scripts/ve-lai-mau6.py)
 # Đặt None thì không vẽ viền, khi đó mới dùng tới PHOI bên dưới.
 # ⚠️ Đừng quá 0.07 — dày hơn nữa thì phần navy còn quá ít, nhìn như cái
 #    khung ảnh chứ không ra logo.
-VIEN_GOLD = 0.030       # cho logo-cam-lam.webp      — nền TỐI (trên banner)
+VIEN_GOLD = 0.020       # cho logo-cam-lam.webp      — nền TỐI (trên banner)
 # Bản dùng trên thanh menu TRẮNG: chỉ một sợi chỉ vàng cho có, như logo gốc.
 # ⚠️ Đừng để 0 hẳn: mép ô navy trên nền trắng sẽ cứng và hơi thô; một sợi
 #    vàng mảnh làm mép dịu lại mà nhìn vẫn là logo cũ.
-VIEN_GOLD_TRANG = 0.013  # cho logo-cam-lam-toi.webp  — nền SÁNG (menu trắng)
+VIEN_GOLD_TRANG = 0.010  # cho logo-cam-lam-toi.webp  — nền SÁNG (menu trắng)
 # Chỉ dùng khi VIEN_GOLD = None. Mã phối lấy ở scripts/phoi-mau-logo.py
 # (co-dien · anh-kim · gold-ngoc · gold-hong · gold-duong · gold-sang) hoặc ở
 # scripts/logo-sang-hon.py (sang0…sang3 — bốn mức sáng của nền ô vuông).
@@ -103,7 +103,11 @@ def main():
     for ten, day, o_dau in bo_tep:
         anh = vg.dung(bo, HINH, day, KHO, CHIEM) if day             else bo.dung_o(HINH, tim_phoi(bo, PHOI), KHO, CHIEM)
         p = os.path.join(CONG, ten)
-        anh.save(p, 'WEBP', quality=95, method=6)
+        # ⚠️ GHI KHÔNG NÉN MẤT DỮ LIỆU (lossless). Nén thường ở mức 95 làm
+        #    navy #0A2540 lệch thành #0A2641 — mắt không thấy, nhưng chủ dự
+        #    án dặn "nền navy đừng làm sáng" nên để màu ra đúng tuyệt đối.
+        #    Logo là mảng màu phẳng nên lossless vẫn rất nhẹ.
+        anh.save(p, 'WEBP', lossless=True, quality=100, method=6)
         print('OK %-22s vien %.1f%%  %d KB   (%s)'
               % (ten, (day or 0) * 100, os.path.getsize(p) // 1024, o_dau))
     print('\nNho chay tiep:  python scripts/dong-bo-logo.py')

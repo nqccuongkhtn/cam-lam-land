@@ -7,8 +7,8 @@ Chủ dự án đã chọn trong trang xem thử (/logo-thu/xem.html):
     hình  = "Chữ C đặc khoét L" — NGUYÊN BẢN đã cắt, chỉ BÀO MỎNG NÉT 2,5%
             (chủ dự án chốt: giữ nguyên bản, chỉ làm cho nét mỏng lại.
              Bốn mức mỏng xem ở /logo-thu/so-mau6.png)
-    phối  = "Sáng vừa"            (nền ô vuông navy SÁNG HƠN navy gốc một bậc,
-             nét vàng cũng sáng lên theo — xem scripts/logo-sang-hon.py)
+    phối  = nền navy GỐC #0A2540 + **viền vàng gold sáng ôm mép ngoài**
+             (xem scripts/logo-vien-gold.py)
     khung = ô vuông navy bo góc, như logo web vẫn dùng
 
 Script này lấy đúng hai thứ đó từ scripts/phoi-mau-logo.py rồi ghi ra hai tệp
@@ -17,11 +17,14 @@ logo chính của web:
     apps/frontend/public/logo-cam-lam.webp        (dùng trên nền tối)
     apps/frontend/public/logo-cam-lam-toi.webp    (dùng trên nền sáng)
 
-⚠️ VÌ SAO NỀN Ô VUÔNG KHÔNG PHẢI NAVY GỐC #0A2540. Thanh menu trang chủ phủ
-   một lớp đen mờ lên banner, ô vuông navy gốc nằm lên đó là tan vào nền —
-   chủ dự án nhận xét "logo hơi tối so với nền". Nâng nền ô vuông lên
-   #1A426E thì ô tách hẳn ra mà vẫn là navy. Bốn mức sáng xem ở
-   /logo-thu/so-sang.png, đổi mức thì sửa PHOI bên dưới.
+⚠️ VÌ SAO CÓ VIỀN VÀNG. Thanh menu trang chủ phủ một lớp đen mờ lên banner,
+   ô vuông navy nằm lên đó là tan vào nền — chủ dự án nhận xét "logo hơi tối
+   so với nền". Đã thử hai cách:
+     · nâng sáng nền ô vuông (scripts/logo-sang-hon.py) — được, nhưng phải
+       bịa ra một sắc navy mới không đúng màu thương hiệu;
+     · **thêm viền vàng gold sáng ôm mép ngoài** — chủ dự án chốt cách này:
+       nền giữ đúng navy #0A2540, mà viền vàng thì nổi trên MỌI nền.
+   Ba độ dày viền xem ở /logo-thu/so-vien.png, đổi thì sửa VIEN_GOLD bên dưới.
 
 ⚠️ HAI TỆP GIỐNG HỆT NHAU. Ô vuông navy tự mang nền nên đặt ở đâu cũng đọc
    được; vẫn ghi ra hai tên vì khắp nơi trong mã đang gọi theo hai tên đó.
@@ -44,10 +47,15 @@ CONG = os.path.join(GOC, 'apps', 'frontend', 'public')
 #    (mau1…mau6), mã phối cũng ở đó (co-dien · anh-kim · gold-ngoc ·
 #    gold-hong · gold-duong · gold-sang).
 HINH = 'mau6m2'       # nguyên bản, bào mỏng 2,5% (scripts/ve-lai-mau6.py)
-# Mã phối lấy ở scripts/phoi-mau-logo.py (co-dien · anh-kim · gold-ngoc ·
-# gold-hong · gold-duong · gold-sang) HOẶC ở scripts/logo-sang-hon.py
-# (sang0 · sang1 · sang2 · sang3 — bốn mức sáng của nền ô vuông).
-PHOI = 'sang2'        # nền navy sáng vừa #1A426E, nét vàng sáng theo
+# Bề dày viền vàng tính theo cạnh ô: 0.030 mảnh · 0.045 vừa · 0.062 dày.
+# Đặt None thì không vẽ viền, khi đó mới dùng tới PHOI bên dưới.
+# ⚠️ Đừng quá 0.07 — dày hơn nữa thì phần navy còn quá ít, nhìn như cái
+#    khung ảnh chứ không ra logo.
+VIEN_GOLD = 0.045
+# Chỉ dùng khi VIEN_GOLD = None. Mã phối lấy ở scripts/phoi-mau-logo.py
+# (co-dien · anh-kim · gold-ngoc · gold-hong · gold-duong · gold-sang) hoặc ở
+# scripts/logo-sang-hon.py (sang0…sang3 — bốn mức sáng của nền ô vuông).
+PHOI = 'gold-sang'
 KHO = 256
 # Hình chiếm bao nhiêu phần cạnh ô vuông (mặc định của bảng phối là 0,62).
 # Nét đã bào mỏng nên để rộng hơn một chút cho cân khung.
@@ -76,8 +84,11 @@ def tim_phoi(bo, ma: str):
 
 def main():
     bo = nap('phoi-mau-logo.py', 'phoi_mau_logo')
-    phoi = tim_phoi(bo, PHOI)
-    anh = bo.dung_o(HINH, phoi, KHO, CHIEM)
+    if VIEN_GOLD:
+        anh = nap('logo-vien-gold.py', 'logo_vien_gold').dung(
+            bo, HINH, VIEN_GOLD, KHO, CHIEM)
+    else:
+        anh = bo.dung_o(HINH, tim_phoi(bo, PHOI), KHO, CHIEM)
     for ten in ('logo-cam-lam.webp', 'logo-cam-lam-toi.webp'):
         p = os.path.join(CONG, ten)
         anh.save(p, 'WEBP', quality=95, method=6)

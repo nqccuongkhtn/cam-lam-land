@@ -135,7 +135,6 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
           onClick={() => setBaoVanTay('')}>
           <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start gap-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-amber-100 text-xl">🔒</span>
               <div className="min-w-0">
                 <h2 className="font-extrabold text-[#0A2540]">Chưa dùng được</h2>
                 <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">{baoVanTay}</p>

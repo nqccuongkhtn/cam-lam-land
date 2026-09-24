@@ -717,17 +717,21 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 }
 .cl-le-co {
   animation: clCoBayGio 1.9s ease-in-out infinite;
-  transform-origin: 74% 28%;        /* mép trái lá cờ, chỗ buộc vào cán */
+  /* Gốc biến hình = MÉP TRÁI lá cờ, chỗ buộc vào cán. Bốn con số dưới đây
+     ĐO TỪ CHÍNH TỆP ẢNH (khung bao của <mã>-co.webp trên khổ 560×288), không
+     phải ước lượng. Xếp lại trang trí là phải đo lại — đặt sai chỗ thì cờ
+     xoay quanh giữa lá, trông như bị vặn chứ không phải bay. */
+  transform-origin: 62% 38%;
 }
 /* Cụm trang trí của mấy dịp có cờ thì ĐỨNG YÊN HẲN — mọi chuyển động dồn hết
    vào lá cờ. Cán cờ mà lắc thì lại hỏng đúng như bản trước. */
 .cl-logo-le.co-vay .cl-le-tt { animation: none; transform: none; }
 /* Điện Biên Phủ: cờ cắm trên nóc hầm, gió trên cao — phất rộng và chậm hơn. */
 .cl-logo-le[data-le="dien-bien"] .cl-le-co {
-  animation-duration: 2.4s; transform-origin: 82% 22%;
+  animation-duration: 2.4s; transform-origin: 76% 32%;
 }
-.cl-logo-le[data-le="dang"] .cl-le-co { transform-origin: 72% 10%; }
-.cl-logo-le[data-le="30-4"] .cl-le-co { transform-origin: 76% 18%; }
+.cl-logo-le[data-le="dang"] .cl-le-co { transform-origin: 63% 35%; }
+.cl-logo-le[data-le="30-4"] .cl-le-co { transform-origin: 65% 31%; }
 
 /* ── ÔNG GIÀ NOEL CƯỠI XE TUẦN LỘC (chỉ Giáng sinh) ─────────────────────────
    Chủ dự án: "hiện ra 1 chổ chạy qua 1 chỗ sẽ bị ẩn như kiểu có lỗ không

@@ -84,7 +84,9 @@ export default function LogoLe({
   light: boolean;
   cao?: number;
 }) {
-  const rong = Math.round(cao * 1.51);
+  /* ⚠️ PHẢI KHỚP RONG_LE / O_VUONG trong scripts/dung-logo-ngay-le.py
+     (560 / 288). Đổi một bên mà quên bên kia là ảnh bị bóp méo. */
+  const rong = Math.round(cao * (560 / 288));
   const duoi = light ? '' : '-toi';          // nền tối dùng bản nét sáng
   const o = { width: rong, height: cao };
   /* ⚠️ Ô BỌC CHỈ RỘNG BẰNG Ô VUÔNG LOGO, KHÔNG PHẢI BẰNG CẢ TẤM ẢNH.

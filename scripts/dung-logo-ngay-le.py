@@ -896,9 +896,17 @@ def ve_noel(d, m):
     ⚠️ Mũ phải TO và ĐÈ LÊN mái. Lần đầu vẽ mũ nhỏ đặt hờ phía trên đỉnh mái,
        thu về 32px chỉ còn một chấm đỏ, không ai hiểu là cái mũ.
     """
-    mu_noel(d, m, 128, 0, 96, 42)
-    bong_tuyet(d, 374, 50, 30, m['net'], day=6)
-    bong_tuyet(d, 424, 112, 19, m['net'], day=4)
+    # ⚠️ MŨ ĐỘI LÊN CHỮ CL, không phải đặt hờ trên mép ô vuông.
+    #    Chữ CL chiếm khoảng x 49…239, y 49…239 trong ô vuông 288. Đặt mũ
+    #    chớm xuống y ≈ 26 và lệch phải một chút là nó ngồi đúng trên đỉnh
+    #    nét cong chữ C, nhìn như đội mũ thật.
+    #    Đây là dịp DUY NHẤT trang trí được đè lên ô vuông (chủ dự án chỉ
+    #    định riêng), nên nó cũng là dịp duy nhất không bị _xep_lai() dồn
+    #    sang phải.
+    mu_noel(d, m, 96, 26, 118, 52)
+    bong_tuyet(d, 400, 60, 34, m['net'], day=6)
+    bong_tuyet(d, 470, 132, 22, m['net'], day=4)
+    bong_tuyet(d, 352, 152, 17, m['net'], day=3)
 
 
 def ve_phu_nu(d, m):
@@ -1189,7 +1197,22 @@ def _ve_phong(d, ve, m, lop=None):
 # Khung của một tấm logo lễ: ô vuông logo bên TRÁI, khoảng trống trang trí
 # bên PHẢI. Giữ đúng tỉ lệ 435×288 như trước để thanh menu không phải đổi.
 O_VUONG = 288            # cạnh ô vuông logo (cũng là chiều cao cả tấm)
-RONG_LE = 435            # bề ngang cả tấm
+# ⚠️ BỀ NGANG NỚI RỘNG TỪ 435 LÊN 560. Trang trí nay được xếp lại thành một
+#    cụm gọn ĐỨNG BÊN PHẢI ô vuông (chủ dự án chốt "chọn hướng bên phải ô
+#    vuông"), cao bằng 60% ô vuông — ở khổ 435 thì cụm đó rộng hơn chỗ còn
+#    lại nên bị cắt cụt mất một mép.
+#    ⚠️ ĐỔI SỐ NÀY THÌ PHẢI ĐỔI CẢ TI_LE_LE trong components/LogoLe.tsx —
+#       bên đó tính bề ngang thẻ ảnh theo đúng tỉ lệ này. Lệch là méo hình.
+RONG_LE = 560            # bề ngang cả tấm
+# ⚠️ DẢI TRANG TRÍ BẮT ĐẦU NGAY SÁT MÉP Ô VUÔNG (x = 294, ô vuông hết ở 288).
+#    Khe hở giữa logo và chữ ngoài web chỉ có 10 điểm ảnh, nên trang trí đặt
+#    càng xa ô vuông thì càng lấn sâu vào chữ "Cam". Ép sát mép là cách duy
+#    nhất giảm phần chồng lên chữ mà vẫn giữ trang trí ở BÊN PHẢI ô vuông
+#    (chủ dự án chốt hướng này).
+# ⚠️ Cao 0,50 cạnh ô vuông chứ đừng to hơn: to hơn thì bề ngang cũng nở ra
+#    theo và lại ăn sang chữ.
+DAI_TT = (294, 512)      # dải dành cho trang trí (x từ … đến …)
+CAO_TT = 0.50            # chiều cao cụm trang trí / cạnh ô vuông
 
 
 def lam(nen_toi: bool):
@@ -1234,8 +1257,54 @@ def lam(nen_toi: bool):
         if ma in DIP_CO_CO:
             co = _lop_rieng(ve, m, goc.size, 'chi-co')
             tt = _lop_rieng(ve, m, goc.size, 'khong-co')
+        # Dồn về khuôn chuẩn bên phải ô vuông.
+        # ⚠️ GIÁNG SINH LÀ NGOẠI LỆ: chủ dự án muốn CÁI MŨ ĐỘI LÊN CHỮ CL,
+        #    tức là mũ phải nằm TRÊN Ô VUÔNG chứ không dồn sang phải. Dồn
+        #    cả cụm thì mũ bay sang bên cạnh, hết ra ông già Noel.
+        if ma != 'noel':
+            tt, co = _xep_lai(tt, co)
+        anh = nen.copy()
+        anh.alpha_composite(tt)
+        if co is not None:
+            anh.alpha_composite(co)
         ra[ma] = (anh, nen, tt, co)
     return ra
+
+
+def _xep_lai(tt: Image.Image, co: Image.Image | None):
+    """Dồn cụm trang trí về một khuôn CHUẨN nằm bên phải ô vuông.
+
+    Vì sao phải làm: mỗi dịp vẽ một kiểu, hình to nhỏ và đặt cao thấp khác
+    nhau — xếp cạnh ô vuông thì cái chồm lên chữ, cái lại tụt xuống dưới,
+    nhìn cả bộ không ra một nhà. Ở đây đo khung thật của từng hình rồi thu
+    phóng và đặt lại vào đúng một chỗ, nên 23 dịp cùng một chuẩn.
+
+    ⚠️ LÁ CỜ PHẢI ĐI CÙNG MỘT PHÉP BIẾN HÌNH với phần còn lại. Đo khung
+       trên ẢNH GỘP (trang trí + cờ) rồi áp y hệt cho cả hai — tính riêng
+       từng tấm là cờ rời khỏi cán.
+    """
+    gop = tt.copy()
+    if co is not None:
+        gop.alpha_composite(co)
+    bb = gop.getbbox()
+    if not bb:
+        return tt, co
+    cao = int(O_VUONG * CAO_TT)
+    rong = max(1, round(cao * (bb[2] - bb[0]) / (bb[3] - bb[1])))
+    toi_da = DAI_TT[1] - DAI_TT[0]
+    if rong > toi_da:                      # hình nằm ngang quá thì co theo bề ngang
+        rong, cao = toi_da, max(1, round(toi_da * (bb[3] - bb[1]) / (bb[2] - bb[0])))
+    x = DAI_TT[0] + (toi_da - rong) // 2
+    y = (O_VUONG - cao) // 2
+
+    def dat(anh):
+        if anh is None:
+            return None
+        ra = Image.new('RGBA', (RONG_LE, O_VUONG), (0, 0, 0, 0))
+        ra.alpha_composite(anh.crop(bb).resize((rong, cao), Image.LANCZOS), (x, y))
+        return ra
+
+    return dat(tt), dat(co)
 
 
 def _lop_rieng(ve, m, kho, phan: str) -> Image.Image:

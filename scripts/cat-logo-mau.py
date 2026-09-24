@@ -47,14 +47,29 @@ O_HINH = {
     '125': (153, 538, 250, 650),     # vầng trăng khuyết ôm chữ C
     '126': (158, 524, 264, 626),     # khung vuông hở góc, chữ C
 }
+O_HINH.update({
+    '127': (222, 196, 418, 452),     # ⚠️ toạ độ đọc TRÊN ẢNH GỐC 640×640, đừng
+                                     #    đọc trên bản đã thu nhỏ để kẻ lưới —
+                                     #    lần đầu đọc nhầm, cắt mất nửa khiên     # chữ lồng CL trong tấm khiên
+    '128': (80, 76, 384, 384),       # vòng tròn C lồng chữ L
+    '129': (330, 330, 1180, 1230),   # chữ C đặc khoét chữ L
+})
 O_MAC_DINH = (86, 522, 340, 640)
+
+# Ngưỡng "lệch xa màu nền bao nhiêu thì tính là nét", cộng ba kênh màu.
+# ⚠️ Ba tấm 127/128/129 có ĐÓNG DẤU CHÌM xám nhạt chạy ngang giữa hình. Để
+#    ngưỡng thấp như mấy tấm kia thì dấu chìm cũng bị tính là nét, logo dính
+#    nguyên chữ "shutterstock" mờ mờ. Nâng ngưỡng lên thì chỉ nét ĐEN ĐẬM mới
+#    lọt, dấu chìm rơi hết.
+NGUONG = {'127': 150.0, '128': 380.0, '129': 380.0}
+NGUONG_MAC_DINH = 38.0
 KHO = 320          # cạnh tệp xuất ra
 
 NAVY = (10, 37, 64)
 VANG = (200, 161, 75)
 
 
-def lay_mat_na(im: Image.Image) -> Image.Image:
+def lay_mat_na(im: Image.Image, nguong: float = 38.0) -> Image.Image:
     """Dò xem chỗ nào là NÉT LOGO, trả về mặt nạ xám (255 = nét).
 
     Nền của ô có thể rất sáng (ảnh 2) hoặc rất tối (ảnh 1, 3), nên không đặt
@@ -68,7 +83,7 @@ def lay_mat_na(im: Image.Image) -> Image.Image:
     nen = np.median(vien, axis=0)
     lech = np.abs(a - nen).sum(axis=2)
     # Chuẩn hoá rồi lấy dốc mềm: nét đậm ăn trọn, mép nét mờ dần cho khỏi răng cưa
-    m = np.clip((lech - 38) / 70.0, 0, 1)
+    m = np.clip((lech - nguong) / max(20.0, nguong * 1.2), 0, 1)
     return Image.fromarray((m * 255).astype(np.uint8), 'L')
 
 
@@ -127,7 +142,7 @@ def main():
     for i, p in enumerate(sys.argv[1:], 1):
         ten_anh = os.path.splitext(os.path.basename(p))[0]
         im = Image.open(p).convert('RGB').crop(O_HINH.get(ten_anh, O_MAC_DINH))
-        mn = lam_tron(lay_mat_na(im))
+        mn = lam_tron(lay_mat_na(im, NGUONG.get(ten_anh, NGUONG_MAC_DINH)))
         bb = mn.getbbox()
         if bb:
             mn = mn.crop(bb)

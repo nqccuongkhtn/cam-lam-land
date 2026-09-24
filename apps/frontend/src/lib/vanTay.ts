@@ -114,5 +114,12 @@ export function loiDeHieu(e: any): string {
     return 'Máy này đã đăng ký rồi.';
   if (/NotSupportedError|SecurityError/i.test(t))
     return 'Máy này không dùng được.';
+  // ⚠️ PHÂN BIỆT HAI VIỆC KHÁC HẲN NHAU:
+  //    · máy chưa có Face ID/vân tay  → bật trong Cài đặt CỦA MÁY;
+  //    · máy có rồi nhưng chưa bật cho tài khoản → bật trong TÀI KHOẢN của
+  //      web (trang /account). Chủ dự án nhắc: "cài đặt trong cài đặt của
+  //      tài khoản chứ nhỉ" — đúng, và trước đây câu báo lỗi không nói ra.
+  if (/chưa bật|chưa được đăng ký|404/i.test(t))
+    return 'Máy này chưa bật. Vào Tài khoản để bật.';
   return e?.message || 'Không nhận được. Thử lại.';
 }

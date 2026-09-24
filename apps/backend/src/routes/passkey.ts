@@ -112,7 +112,7 @@ passkeyRouter.post('/dang-ky/xong', authRequired, async (req: AuthedRequest, res
     const { khoa, response, tenMay } = req.body ?? {};
     const tt = await layThuThach(khoa);
     if (!tt || Number(tt.user_id) !== Number(me.id))
-      return res.status(400).json({ error: 'Phiên đăng ký đã hết hạn, bấm lại giúp' });
+      return res.status(400).json({ error: 'Hết hạn. Bấm lại.' });
 
     const kq = await verifyRegistrationResponse({
       response,
@@ -122,7 +122,7 @@ passkeyRouter.post('/dang-ky/xong', authRequired, async (req: AuthedRequest, res
       requireUserVerification: true,
     });
     if (!kq.verified || !kq.registrationInfo)
-      return res.status(400).json({ error: 'Không xác minh được. Thử lại giúp.' });
+      return res.status(400).json({ error: 'Không nhận được. Thử lại.' });
 
     const { credential } = kq.registrationInfo;
     await query(
@@ -165,13 +165,16 @@ passkeyRouter.post('/dang-nhap/xong', async (req, res, next) => {
   try {
     const { khoa, response } = req.body ?? {};
     const tt = await layThuThach(khoa);
-    if (!tt) return res.status(400).json({ error: 'Phiên đăng nhập đã hết hạn, bấm lại giúp' });
+    if (!tt) return res.status(400).json({ error: 'Hết hạn. Bấm lại.' });
 
     const credId = String(response?.id || '');
     const [c] = await query(
       `SELECT c.*, u.* , c.id AS cred_row_id FROM webauthn_credentials c
        JOIN users u ON u.id = c.user_id WHERE c.cred_id = $1`, [credId]);
-    if (!c) return res.status(404).json({ error: 'Máy này chưa được đăng ký vân tay' });
+    // ⚠️ Câu này phải chỉ rõ CHỖ BẬT. Máy có Face ID rồi vẫn chưa đăng nhập
+    //    được nếu chưa bật cho tài khoản — mà chỗ bật nằm trong Tài khoản
+    //    của web, không phải Cài đặt của máy. Chủ dự án nhắc đúng chỗ này.
+    if (!c) return res.status(404).json({ error: 'Máy này chưa bật. Vào Tài khoản để bật.' });
     if (c.status && c.status !== 'active')
       return res.status(403).json({ error: 'Tài khoản đang bị khoá' });
 
@@ -188,7 +191,7 @@ passkeyRouter.post('/dang-nhap/xong', async (req, res, next) => {
         transports: c.transports ? String(c.transports).split(',') as any : undefined,
       },
     });
-    if (!kq.verified) return res.status(401).json({ error: 'Không xác minh được vân tay' });
+    if (!kq.verified) return res.status(401).json({ error: 'Không nhận được. Thử lại.' });
 
     // Bộ đếm phải TĂNG. Không tăng nghĩa là có người phát lại chữ ký cũ → chặn.
     const moi = Number(kq.authenticationInfo.newCounter || 0);

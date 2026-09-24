@@ -1204,15 +1204,17 @@ O_VUONG = 288            # cạnh ô vuông logo (cũng là chiều cao cả t�
 #    ⚠️ ĐỔI SỐ NÀY THÌ PHẢI ĐỔI CẢ TI_LE_LE trong components/LogoLe.tsx —
 #       bên đó tính bề ngang thẻ ảnh theo đúng tỉ lệ này. Lệch là méo hình.
 RONG_LE = 560            # bề ngang cả tấm
-# ⚠️ DẢI TRANG TRÍ BẮT ĐẦU NGAY SÁT MÉP Ô VUÔNG (x = 294, ô vuông hết ở 288).
-#    Khe hở giữa logo và chữ ngoài web chỉ có 10 điểm ảnh, nên trang trí đặt
-#    càng xa ô vuông thì càng lấn sâu vào chữ "Cam". Ép sát mép là cách duy
-#    nhất giảm phần chồng lên chữ mà vẫn giữ trang trí ở BÊN PHẢI ô vuông
-#    (chủ dự án chốt hướng này).
-# ⚠️ Cao 0,50 cạnh ô vuông chứ đừng to hơn: to hơn thì bề ngang cũng nở ra
-#    theo và lại ăn sang chữ.
-DAI_TT = (294, 512)      # dải dành cho trang trí (x từ … đến …)
-CAO_TT = 0.50            # chiều cao cụm trang trí / cạnh ô vuông
+# ⚠️ HAI CON SỐ NÀY LẤY ĐÚNG THEO MẪU C CHỦ DỰ ÁN ĐÃ DUYỆT
+#    (ảnh /logo-thu/so-bo-cuc-le.png, hàng "C · Chờm nhẹ vào chữ"):
+#      · trang trí cao bằng 0,62 cạnh ô vuông;
+#      · đặt cách mép ô vuông NỬA KHOẢNG HỞ logo–chữ (khe hở 10px → 5px,
+#        quy ra khổ 288 là 42 đơn vị → bắt đầu ở x = 288 + 42 = 330).
+#    ⚠️ ĐỪNG TỰ THU NHỎ LẠI. Tôi đã từng tự ý kéo xuống 0,50 và dời sát mép
+#       (294) cho "đỡ đè vào chữ" — chủ dự án nhận ra ngay: "phần trang trí
+#       chưa đúng như đã trao đổi". Chờm lên chữ là CHỦ Ý của mẫu C, chủ dự
+#       án đã đồng ý ("nếu đè lên chữ thì cho đè luôn").
+DAI_TT = (330, 552)      # dải dành cho trang trí (x từ … đến …)
+CAO_TT = 0.62            # chiều cao cụm trang trí / cạnh ô vuông
 
 
 def lam(nen_toi: bool):

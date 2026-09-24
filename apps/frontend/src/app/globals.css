@@ -721,17 +721,17 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
      ĐO TỪ CHÍNH TỆP ẢNH (khung bao của <mã>-co.webp trên khổ 560×288), không
      phải ước lượng. Xếp lại trang trí là phải đo lại — đặt sai chỗ thì cờ
      xoay quanh giữa lá, trông như bị vặn chứ không phải bay. */
-  transform-origin: 62% 38%;
+  transform-origin: 67% 35%;
 }
 /* Cụm trang trí của mấy dịp có cờ thì ĐỨNG YÊN HẲN — mọi chuyển động dồn hết
    vào lá cờ. Cán cờ mà lắc thì lại hỏng đúng như bản trước. */
 .cl-logo-le.co-vay .cl-le-tt { animation: none; transform: none; }
 /* Điện Biên Phủ: cờ cắm trên nóc hầm, gió trên cao — phất rộng và chậm hơn. */
 .cl-logo-le[data-le="dien-bien"] .cl-le-co {
-  animation-duration: 2.4s; transform-origin: 76% 32%;
+  animation-duration: 2.4s; transform-origin: 84% 27%;
 }
-.cl-logo-le[data-le="dang"] .cl-le-co { transform-origin: 63% 35%; }
-.cl-logo-le[data-le="30-4"] .cl-le-co { transform-origin: 65% 31%; }
+.cl-logo-le[data-le="dang"] .cl-le-co { transform-origin: 67% 32%; }
+.cl-logo-le[data-le="30-4"] .cl-le-co { transform-origin: 69% 26%; }
 
 /* ── ÔNG GIÀ NOEL CƯỠI XE TUẦN LỘC (chỉ Giáng sinh) ─────────────────────────
    Chủ dự án: "hiện ra 1 chổ chạy qua 1 chỗ sẽ bị ẩn như kiểu có lỗ không

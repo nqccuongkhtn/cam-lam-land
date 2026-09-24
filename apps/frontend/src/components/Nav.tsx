@@ -86,8 +86,8 @@ function Logo({ light }: { light: boolean }) {
       ) : (
         <img
           src={light ? '/logo-cam-lam.webp' : '/logo-cam-lam-toi.webp'}
-          alt="" aria-hidden="true" width={48} height={32}
-          className="h-8 w-12 shrink-0 object-contain" />
+          alt="" aria-hidden="true" width={34} height={34}
+          className="h-[34px] w-[34px] shrink-0 object-contain" />
       )}
       <span className="leading-tight">
         <span className={`font-extrabold block text-lg tracking-tight ${light ? 'text-white' : 'text-[#0A2540]'}`}>Cam Lâm <span className="text-[#C8A14B]">Land</span></span>

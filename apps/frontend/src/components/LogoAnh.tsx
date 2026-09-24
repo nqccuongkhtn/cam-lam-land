@@ -25,8 +25,9 @@
  *  cao, nên không bao giờ bị bóp méo.
  * ========================================================================== */
 
-/** Tỉ lệ ngang/dọc của tệp logo (435×288). Đổi logo khác tỉ lệ thì sửa ở đây. */
-export const TI_LE_LOGO = 1.51;
+/** Tỉ lệ ngang/dọc của tệp logo. Logo hiện tại là Ô VUÔNG (ngôi nhà vàng trên
+ *  nền navy bo góc) nên tỉ lệ đúng bằng 1. Đổi logo khác tỉ lệ thì sửa ở đây. */
+export const TI_LE_LOGO = 1;
 
 export default function LogoAnh({
   cao = 32, nenToi = false, lop = '',
@@ -40,6 +41,8 @@ export default function LogoAnh({
   const rong = Math.round(cao * TI_LE_LOGO);
   return (
     <img
+      /* Ô vuông navy tự có nền nên hai tệp giống hệt nhau — vẫn giữ hai tên
+         để chỗ nào đang gọi cũng chạy được. */
       src={nenToi ? '/logo-cam-lam.webp' : '/logo-cam-lam-toi.webp'}
       alt="" aria-hidden="true"
       width={rong} height={cao}

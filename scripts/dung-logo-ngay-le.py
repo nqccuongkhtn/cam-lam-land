@@ -785,32 +785,32 @@ def bo_hoa(d, cx, cy, r, canh, nhuy, la):
 def ve_tet(d, m):
     """Tết Nguyên đán — logo quan trọng nhất trong năm.
 
-    Ba thứ làm nên cái hồn của Tết, chu du an chot huong A:
-      1. CÀNH MAI VÀNG mọc từ bên phải, VƯƠN QUA MÁI NHÀ sang trái —
-         cành đan vào ngôi nhà thành một bố cục, không phải món đồ dán thêm;
-      2. MẶT TRỜI CHUYỂN Đỏ VIỀN VÀNG (làm ở hàm doi_mat_troi, không vẽ ở đây);
-      3. BÁNH CHƯNG XANH ở góc — màu xanh lá duy nhất trong cả bộ logo lễ,
-         nhìn là biết Tết chứ không lẫn dịp nào khác.
+    ⚠️ CÀNH MAI MỌC TỪ NGÔI NHÀ RA PHÍA PHẢI — chỉ MỘT nhánh.
+       Bản trước vẽ ngược: cành mọc từ bên phải vượt qua mái sang trái,
+       thành ra cành đè lên cả ngôi nhà — chủ dự án bảo "bạn làm ngược".
+       Mọc từ nhà ra phải thì cành nằm trọn trong khoảng trống góc phải,
+       không chạm vào ngôi nhà lẫn chữ lồng CL.
+    Hai thứ còn lại làm nên cái hồn của Tết:
+      · MẶT TRỜI CHUYỂN Đỏ VIỀN VÀNG (làm ở hàm doi_mat_troi);
+      · BÁNH CHƯNG XANH — màu xanh lá duy nhất trong cả bộ logo lễ.
 
-    ⚠️ CÀNH VẼ THON DẦN TỪ GỐC LÊN NGỌN. Vẽ một nét đều chệm một độ dày
-       thì ra cái que chứ không ra cành cây — chủ dự án đã chê một lần.
-    ⚠️ BỐN BÔNG, KHÔNG HƠN. Rải nhiều bông nhỏ thì thu về 32 điểm ảnh nhìn
-       như confetti vãi lộn xộn.
-    ⚠️ KHÔNG ĐỂ HOA ĐÈ LÊN CHỮ "CL" — chữ lồng là phần nhận diện.
+    ⚠️ CÀNH THON DẦN TỪ GỐC LÊN NGỌN, nét đều một độ dày thì ra cái que.
+    ⚠️ BỐN BÔNG, KHÔNG HƠN — nhiều bông nhỏ thu về 32 điểm ảnh nhìn như
+       confetti vãi lộn xộn.
     """
-    # cành chính: thon dần, đi từ gốc phải vượt qua đỉnh mái sang trái
-    khuc = [(424, 156), (386, 116), (330, 80), (256, 46), (176, 26), (108, 18)]
+    # cành: gốc ở sát mép ô vuông, vươn chéo lên sang PHẢI rồi rủ xuống
+    khuc = [(258, 62), (300, 40), (344, 28), (386, 34), (414, 58)]
     for k in range(len(khuc) - 1):
-        d.line([khuc[k], khuc[k + 1]], fill=m['nau'], width=max(3, 11 - k * 1.6))
-    d.line([(330, 80), (352, 36)], fill=m['nau'], width=5)      # nhánh phụ
-    d.line([(256, 46), (244, 12)], fill=m['nau'], width=4)
+        d.line([khuc[k], khuc[k + 1]], fill=m['nau'], width=max(3, 10 - k * 1.6))
+    d.line([(344, 28), (356, 4)], fill=m['nau'], width=5)      # nhánh nhỏ chĩa lên
+    d.line([(386, 34), (420, 24)], fill=m['nau'], width=4)
 
-    for cx, cy, r in ((104, 16, 32), (244, 8, 25), (352, 30, 27), (404, 104, 21)):
+    for cx, cy, r in ((356, 6, 22), (392, 12, 26), (424, 54, 24), (302, 26, 19)):
         for i in range(5):
             canh_nhon(d, cx, cy, -90 + i * 72, r, r * 0.42, m['vang_sang'])
         d.ellipse([cx - r * 0.30, cy - r * 0.30, cx + r * 0.30, cy + r * 0.30], fill=m['do_tet'])
 
-    banh_chung(d, 408, 138, 50, m['xanh'], m['kem'])
+    banh_chung(d, 408, 128, 52, m['xanh'], m['kem'])
 
 
 def ve_tet_duong(d, m):
@@ -1135,29 +1135,44 @@ def _ve_phong(d, ve, m, lop=None):
             g_line, g_poly, g_ell, g_rect, g_rr, g_arc)
 
 
+# Khung của một tấm logo lễ: ô vuông logo bên TRÁI, khoảng trống trang trí
+# bên PHẢI. Giữ đúng tỉ lệ 435×288 như trước để thanh menu không phải đổi.
+O_VUONG = 288            # cạnh ô vuông logo (cũng là chiều cao cả tấm)
+RONG_LE = 435            # bề ngang cả tấm
+
+
 def lam(nen_toi: bool):
-    """Dựng cả bộ logo lễ cho MỘT nền (True = thanh menu nền tối)."""
-    ten_goc = 'logo-cam-lam.webp' if nen_toi else 'logo-cam-lam-toi.webp'
-    goc = Image.open(os.path.join(CONG, ten_goc)).convert('RGBA')
+    """Dựng cả bộ logo lễ cho MỘT nền (True = thanh menu nền tối).
+
+    ⚠️ NỀN GIỜ LÀ Ô VUÔNG NAVY, KHÔNG PHẢI ẢNH LOGO CHỤP NỮA. Chủ dự án chốt
+       quay về logo gốc: ô vuông navy, ngôi nhà vàng có chấm tròn ở giữa.
+       Ô vuông tự có nền nên hai bản sáng/tối giống hệt nhau; chỉ MÀU TRANG
+       TRÍ là đổi theo nền của thanh menu.
+    ⚠️ TRANG TRÍ NẰM Ở KHOẢNG TRỐNG BÊN PHẢI Ô VUÔNG (x ≈ 290…435), không vẽ
+       đè lên ô vuông: ô vuông là nhận diện, che vào là hỏng. Vài dịp có chi
+       tiết ló sang mép ô vuông một chút cho đỡ rời (cờ cắm, cành mai) thì
+       vẫn phải chừa nguyên phần ngôi nhà.
+    """
+    o = Image.open(os.path.join(CONG, 'logo-cam-lam.webp')).convert('RGBA')
+    o = o.resize((O_VUONG, O_VUONG), Image.LANCZOS)
+    goc = Image.new('RGBA', (RONG_LE, O_VUONG), (0, 0, 0, 0))
+    goc.alpha_composite(o, (0, 0))
+
     m = MAU_NEN_TOI if nen_toi else MAU_NEN_SANG
     ra = {}
-    mau_troi = (230, 187, 97) if nen_toi else (199, 158, 74)
     for ma, _ten, ve in DIP:
         lop = Image.new('RGBA', (goc.width * PHONG, goc.height * PHONG), (0, 0, 0, 0))
         _ve_phong(ImageDraw.Draw(lop), ve, m, lop)
-        # Tết: mặt trời chuyển ĐỎ viền vàng (chủ dự án chốt hướng A)
-        nen = doi_mat_troi(goc, mau_troi, m['do_tet'], m['vang_sang']) if ma == 'tet' else goc.copy()
+        nen = goc.copy()
         tt = lop.resize(goc.size, Image.LANCZOS)
         anh = nen.copy()
         anh.alpha_composite(tt)
         # ⚠️ GHI RA BA TỆP chứ không phải một:
         #    · <mã>      — ảnh ghép sẵn, dùng để xem trước và làm bản dự phòng;
-        #    · <mã>-nen  — phần NGÔI NHÀ (có sửa nền nếu dịp đó cần, vd mặt
-        #                  trời đỏ ngày Tết);
+        #    · <mã>-nen  — phần Ô VUÔNG LOGO;
         #    · <mã>-tt   — phần TRANG TRÍ, nền trong suốt.
         #    Tách ra vì chủ dự án dặn: NGÔI NHÀ LÀ BIỂU TƯỢNG CỦA WEB, không
         #    được lắc — kể cả trong logo ngày lễ. Chỉ phần trang trí mới động.
-        #    Ghép sẵn thành một ảnh thì không tách hai chuyển động ra được.
         ra[ma] = (anh, nen, tt)
     return ra
 

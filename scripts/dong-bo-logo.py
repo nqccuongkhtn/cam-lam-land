@@ -86,30 +86,27 @@ def _dat_giua(nen, anh, tam_x, tam_y, cao):
 
 
 def lam_icon(logo):
-    """Bốn tệp icon: ô vuông bo góc nền navy, logo vàng kem ở giữa.
+    """Bốn tệp icon.
 
-    ⚠️ BẢN 'maskable' PHẢI KHÁC. Android cắt icon maskable theo hình của máy
-       (tròn, giọt nước, vuông bo…) và chỉ chắc chắn giữ lại VÒNG TRÒN GIỮA
-       chiếm 80% cạnh. Nên bản này: nền phủ KÍN (không bo góc, không viền, vì
-       viền sẽ bị cắt mất một phần trông rất lỗi) và logo nhỏ lại còn 46% cạnh.
+    ⚠️ LOGO GIỜ ĐÃ LÀ MỘT Ô VUÔNG NAVY BO GÓC rồi, nên KHÔNG đặt nó lên một ô
+       vuông navy nữa — làm thế thành hai lớp khung lồng nhau, nhìn rất dở.
+       Icon thường = chính tấm logo phóng to hết cỡ.
+    ⚠️ Riêng bản 'maskable': Android cắt icon theo hình của máy (tròn, giọt
+       nước…) và chỉ chắc chắn giữ lại vòng tròn giữa chiếm 80% cạnh. Nên bản
+       này phải đổ nền navy KÍN cả ô rồi đặt logo nhỏ lại ở giữa, nếu không
+       góc bo của logo bị cắt mất một phần trông như lỗi.
     """
     ra = os.path.join(CONG, 'icons')
     os.makedirs(ra, exist_ok=True)
-    viec = [('icon-192.png', 192, False), ('icon-512.png', 512, False),
-            ('apple-180.png', 180, False), ('icon-512-maskable.png', 512, True)]
-    for ten, kho, mask in viec:
+    for ten, kho, mask in (('icon-192.png', 192, False), ('icon-512.png', 512, False),
+                           ('apple-180.png', 180, False), ('icon-512-maskable.png', 512, True)):
         im = Image.new('RGBA', (kho, kho), (0, 0, 0, 0))
-        d = ImageDraw.Draw(im)
         if mask:
-            d.rectangle([0, 0, kho, kho], fill=NAVY + (255,))
-            _dat_giua(im, logo, kho / 2, kho / 2, round(kho * 0.30))
+            ImageDraw.Draw(im).rectangle([0, 0, kho, kho], fill=NAVY + (255,))
+            _dat_giua(im, logo, kho / 2, kho / 2, round(kho * 0.62))
         else:
-            r = round(kho * 0.22)
-            d.rounded_rectangle([0, 0, kho - 1, kho - 1], radius=r, fill=NAVY + (255,))
-            d.rounded_rectangle([kho * 0.045, kho * 0.045, kho * 0.955, kho * 0.955],
-                                radius=r * 0.82, outline=VANG + (120,),
-                                width=max(1, round(kho * 0.006)))
-            _dat_giua(im, logo, kho / 2, kho / 2, round(kho * 0.40))
+            s2 = logo.resize((kho, kho), Image.LANCZOS)
+            im.alpha_composite(s2)
         im.save(os.path.join(ra, ten))
         print('  icon %-24s %dx%d' % (ten, kho, kho))
 
@@ -129,11 +126,9 @@ def lam_splash(logo):
         im = Image.new('RGB', (w, h), NAVY)
         d = ImageDraw.Draw(im)
         tam_y = round(h * 0.42)
-        o = round(w * 0.30)                      # cạnh ô bo góc quanh logo
-        d.rounded_rectangle([w / 2 - o / 2, tam_y - o / 2, w / 2 + o / 2, tam_y + o / 2],
-                            radius=o * 0.26, outline=VANG,
-                            width=max(2, round(w * 0.004)))
-        _dat_giua(im, logo, w / 2, tam_y, round(o * 0.52))
+        # ⚠️ Không vẽ thêm khung bo góc nữa — logo tự đã là một ô vuông bo góc.
+        o = round(w * 0.30)
+        _dat_giua(im, logo, w / 2, tam_y, o)
 
         f1 = _font(round(w * 0.072))
         f2 = _font(round(w * 0.030), dam=False)

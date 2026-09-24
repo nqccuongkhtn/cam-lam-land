@@ -72,6 +72,43 @@ def lam_sach() -> Image.Image:
     return o
 
 
+def lam_mong(muc: float) -> Image.Image:
+    """Giữ NGUYÊN BẢN đã cắt, chỉ LÀM MỎNG NÉT đi.
+
+    Chủ dự án chốt: "nguyên bản, chỉ làm cho C đặc khoét L mỏng lại".
+    Cách làm: bào đều nét từ mọi phía (phép co ảnh MinFilter) — vành chữ C
+    mảnh lại, và khe giữa chữ C với chữ L cũng rộng ra theo, nên ở cỡ nhỏ
+    chữ L còn dễ đọc hơn bản gốc.
+
+    `muc` = bào bao nhiêu phần cạnh ảnh (0,02 = 2%).
+
+    ⚠️ ĐỪNG BÀO QUÁ 4%. Chữ L trong lòng chữ C vốn đã mảnh; bào sâu quá thì
+       chân chữ L đứt rời, nhìn thành một vệt gãy.
+    ⚠️ Bào ở cỡ LỚN rồi mới thu về, không bào ở cỡ thật — bào ở cỡ thật thì
+       mỗi bước bào là cả một điểm ảnh, nét cụt từng nấc.
+    """
+    mn = Image.open(os.path.join(RA, 'mau6.webp')).convert('RGBA').getchannel('A')
+    n = KHO * 2
+    mn = mn.resize((n, n), Image.LANCZOS)
+    k = int(n * muc) // 2 * 2 + 1            # MinFilter đòi số lẻ
+    if k >= 3:
+        mn = mn.filter(ImageFilter.MinFilter(k))
+    mn = mn.filter(ImageFilter.GaussianBlur(n * 0.003))
+    a = np.asarray(mn).astype(np.float32) / 255.0
+    a = np.clip((a - 0.45) / 0.16, 0, 1)
+    mn = Image.fromarray((a * 255).astype(np.uint8), 'L')
+    bb = mn.getbbox()
+    if bb:
+        mn = mn.crop(bb)
+    o = Image.new('L', (KHO, KHO), 0)
+    c = int(KHO * 0.96)
+    r = max(1, round(c * mn.width / mn.height))
+    if r > c:
+        r, c = c, max(1, round(c * mn.height / mn.width))
+    o.paste(mn.resize((r, c), Image.LANCZOS), ((KHO - r) // 2, (KHO - c) // 2))
+    return o
+
+
 # ── B · VẼ LẠI BẰNG HÌNH HỌC ───────────────────────────────────────────────
 def ve_lai() -> Image.Image:
     """Dựng lại chữ C đặc khoét chữ L bằng hình tròn và hình chữ nhật.
@@ -155,35 +192,39 @@ def dung_o(mn: Image.Image, kho: int = 256, chiem: float = 0.68) -> Image.Image:
 
 
 def main():
-    bo = {'mau6a': lam_sach(), 'mau6b': ve_lai()}
-    for ten, mn in bo.items():
-        im = Image.new('RGBA', mn.size, GOLD_DUOI + (0,))
-        im.putalpha(mn)
-        im.save(os.path.join(RA, ten + '.webp'), 'WEBP', quality=95, method=6)
-        print('OK %s' % ten)
+    # Bốn mức mỏng để chủ dự án chọn — nguyên bản và ba mức bào dần
+    MUC = [('mau6', 'Nguyên bản', None),
+           ('mau6m1', 'Mỏng nhẹ (1,5%)', 0.015),
+           ('mau6m2', 'Mỏng vừa (2,5%)', 0.025),
+           ('mau6m3', 'Mỏng nhiều (3,5%)', 0.035)]
+    bo = {}
+    for ten, _nhan, muc in MUC:
+        mn = (Image.open(os.path.join(RA, 'mau6.webp')).convert('RGBA').getchannel('A')
+              if muc is None else lam_mong(muc))
+        bo[ten] = mn
+        if muc is not None:
+            im = Image.new('RGBA', mn.size, GOLD_DUOI + (0,))
+            im.putalpha(mn)
+            im.save(os.path.join(RA, ten + '.webp'), 'WEBP', quality=95, method=6)
+            print('OK %s' % ten)
 
     try:
         f = ImageFont.truetype('C:/Windows/Fonts/segoeui.ttf', 22)
     except Exception:
         f = ImageFont.load_default()
     H, W = 150, 860
-    hang = [('mau6', 'Bản đang dùng (cắt thẳng)'),
-            ('mau6a', 'A · Làm sạch bản cắt'),
-            ('mau6b', 'B · Vẽ lại bằng hình học')]
-    sheet = Image.new('RGB', (W, H * len(hang)), (255, 255, 255))
+    sheet = Image.new('RGB', (W, H * len(MUC)), (255, 255, 255))
     d = ImageDraw.Draw(sheet)
-    for i, (ten, nhan) in enumerate(hang):
+    for i, (ten, nhan, _m) in enumerate(MUC):
         y = i * H
         d.rectangle([300, y, 600, y + H - 2], fill=NAVY)
         d.line([(0, y + H - 1), (W, y + H - 1)], fill=(230, 235, 240))
         d.text((16, y + 62), nhan, fill=(20, 30, 45), font=f)
-        mn = (Image.open(os.path.join(RA, 'mau6.webp')).convert('RGBA').getchannel('A')
-              if ten == 'mau6' else bo[ten])
-        im = dung_o(mn, 256, 0.62 if ten == 'mau6' else 0.68)
+        im = dung_o(bo[ten], 256, 0.66)
         for x0 in (330, 640):
             for kho, dx in ((96, 0), (34, 116)):
-                s = im.resize((kho, kho), Image.LANCZOS)
-                sheet.paste(s, (x0 + dx, y + (H - kho) // 2), s)
+                s2 = im.resize((kho, kho), Image.LANCZOS)
+                sheet.paste(s2, (x0 + dx, y + (H - kho) // 2), s2)
     p = os.path.join(RA, 'so-mau6.png')
     sheet.save(p)
     print('Anh so sanh:', p)

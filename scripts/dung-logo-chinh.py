@@ -4,9 +4,9 @@ DỰNG LOGO CHÍNH THỨC CỦA WEB
 =============================
 Chủ dự án đã chọn trong trang xem thử (/logo-thu/xem.html):
 
-    hình  = "Chữ C đặc khoét L"   — bản VẼ LẠI BẰNG HÌNH HỌC (mau6b)
-            (chủ dự án chốt dáng này rồi dặn thiết kế lại cho đẹp hơn;
-             xem hai phương án ở /logo-thu/so-mau6.png)
+    hình  = "Chữ C đặc khoét L" — NGUYÊN BẢN đã cắt, chỉ BÀO MỎNG NÉT 2,5%
+            (chủ dự án chốt: giữ nguyên bản, chỉ làm cho nét mỏng lại.
+             Bốn mức mỏng xem ở /logo-thu/so-mau6.png)
     phối  = "Gold sáng"           (nét chuyển từ vàng kem xuống vàng đồng)
     khung = ô vuông navy bo góc, như logo web vẫn dùng
 
@@ -36,12 +36,12 @@ CONG = os.path.join(GOC, 'apps', 'frontend', 'public')
 #    scripts/dong-bo-logo.py. Mã hình lấy trong scripts/phoi-mau-logo.py
 #    (mau1…mau6), mã phối cũng ở đó (co-dien · anh-kim · gold-ngoc ·
 #    gold-hong · gold-duong · gold-sang).
-HINH = 'mau6b'        # Chữ C đặc khoét L — bản vẽ lại (scripts/ve-lai-mau6.py)
+HINH = 'mau6m2'       # nguyên bản, bào mỏng 2,5% (scripts/ve-lai-mau6.py)
 PHOI = 'gold-sang'    # nét chuyển vàng kem → vàng đồng
 KHO = 256
-# Hình chiếm bao nhiêu phần cạnh ô vuông. Bản vẽ lại nét dày nên để rộng hơn
-# mặc định (0,62) một chút cho cân khung.
-CHIEM = 0.68
+# Hình chiếm bao nhiêu phần cạnh ô vuông (mặc định của bảng phối là 0,62).
+# Nét đã bào mỏng nên để rộng hơn một chút cho cân khung.
+CHIEM = 0.66
 
 
 def nap_bo_phoi():

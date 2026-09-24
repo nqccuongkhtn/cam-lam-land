@@ -98,13 +98,21 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
           <div className="mt-3 flex items-center gap-3">
             <span className="h-px flex-1 bg-slate-200" />
             <button type="button" onClick={vaoBangVanTay} disabled={busyVt}
-              aria-label="Đăng nhập bằng vân tay hoặc khuôn mặt"
-              title="Đăng nhập bằng vân tay / khuôn mặt"
+              aria-label="Đăng nhập bằng khuôn mặt hoặc vân tay"
+              title="Đăng nhập bằng khuôn mặt / vân tay (Face ID, Windows Hello)"
               className="cl-press grid h-11 w-11 place-items-center rounded-full border border-slate-300 text-[#0A2540] hover:border-[#0A2540] hover:bg-slate-50 disabled:opacity-60">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" className="h-6 w-6">
-                <path d="M12 4c-3 0-5.5 1.8-5.5 5v2.5" /><path d="M12 4c3 0 5.5 1.8 5.5 5v5" />
-                <path d="M9.2 9.5A2.8 2.8 0 0 1 12 7a2.8 2.8 0 0 1 2.8 2.5v6" />
-                <path d="M12 10v5.5" /><path d="M6.5 14v2.5" /><path d="M17.5 17v2" /><path d="M9.2 13v5" />
+              {/* ⚠️ LOGO FACE ID, KHÔNG PHẢI VÂN TAY. Bản trước vẽ vân tay —
+                  mấy vòng cung lồng nhau, thu về 24px thành một cục xoắn khó
+                  hiểu, mà phần lớn người dùng mở web bằng điện thoại thì cái
+                  họ gặp là NHẬN DIỆN KHUÔN MẶT chứ không phải vân tay.
+                  Nay dùng đúng ký hiệu Face ID: bốn ngoặc góc + khuôn mặt.
+                  Bốn ngoặc góc mới là thứ ai cũng nhận ra ngay, đừng bỏ. */}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                <path d="M3 8.5V6a3 3 0 0 1 3-3h2.5" /><path d="M15.5 3H18a3 3 0 0 1 3 3v2.5" />
+                <path d="M21 15.5V18a3 3 0 0 1-3 3h-2.5" /><path d="M8.5 21H6a3 3 0 0 1-3-3v-2.5" />
+                <path d="M9 9.6v1.9" /><path d="M15 9.6v1.9" />
+                <path d="M12 9.6v3.3a.9.9 0 0 1-.9.9h-.45" />
+                <path d="M8.9 16.3c.9.85 1.95 1.25 3.1 1.25s2.2-.4 3.1-1.25" />
               </svg>
             </button>
             <span className="h-px flex-1 bg-slate-200" />

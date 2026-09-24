@@ -120,7 +120,7 @@ def to_net(mn: Image.Image, kieu) -> Image.Image:
     return ra
 
 
-def dung_o(ma: str, phoi, kho: int = KHO) -> Image.Image:
+def dung_o(ma: str, phoi, kho: int = KHO, chiem: float = CHIEM) -> Image.Image:
     _mp, _tp, nen, vien, kieu = phoi
     im = Image.new('RGBA', (kho, kho), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -130,7 +130,7 @@ def dung_o(ma: str, phoi, kho: int = KHO) -> Image.Image:
                         radius=int(r * 0.82), outline=tuple(vien),
                         width=max(1, int(kho * 0.007)))
     mn = doc_mat_na(ma)
-    c = int(kho * CHIEM)
+    c = int(kho * chiem)
     mn = mn.resize((c, c), Image.LANCZOS)
     net = to_net(mn, kieu)
     im.alpha_composite(net, ((kho - c) // 2, (kho - c) // 2))

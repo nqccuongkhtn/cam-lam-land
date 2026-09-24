@@ -4,7 +4,9 @@ DỰNG LOGO CHÍNH THỨC CỦA WEB
 =============================
 Chủ dự án đã chọn trong trang xem thử (/logo-thu/xem.html):
 
-    hình  = "Khiên · chữ lồng CL"  (mẫu 4, cắt từ ảnh mẫu chủ dự án gửi)
+    hình  = "Chữ C đặc khoét L"   — bản VẼ LẠI BẰNG HÌNH HỌC (mau6b)
+            (chủ dự án chốt dáng này rồi dặn thiết kế lại cho đẹp hơn;
+             xem hai phương án ở /logo-thu/so-mau6.png)
     phối  = "Gold sáng"           (nét chuyển từ vàng kem xuống vàng đồng)
     khung = ô vuông navy bo góc, như logo web vẫn dùng
 
@@ -34,9 +36,12 @@ CONG = os.path.join(GOC, 'apps', 'frontend', 'public')
 #    scripts/dong-bo-logo.py. Mã hình lấy trong scripts/phoi-mau-logo.py
 #    (mau1…mau6), mã phối cũng ở đó (co-dien · anh-kim · gold-ngoc ·
 #    gold-hong · gold-duong · gold-sang).
-HINH = 'mau4'         # Khiên · chữ lồng CL
+HINH = 'mau6b'        # Chữ C đặc khoét L — bản vẽ lại (scripts/ve-lai-mau6.py)
 PHOI = 'gold-sang'    # nét chuyển vàng kem → vàng đồng
 KHO = 256
+# Hình chiếm bao nhiêu phần cạnh ô vuông. Bản vẽ lại nét dày nên để rộng hơn
+# mặc định (0,62) một chút cho cân khung.
+CHIEM = 0.68
 
 
 def nap_bo_phoi():
@@ -51,7 +56,7 @@ def nap_bo_phoi():
 def main():
     bo = nap_bo_phoi()
     phoi = next(p for p in bo.PHOI if p[0] == PHOI)
-    anh = bo.dung_o(HINH, phoi, KHO)
+    anh = bo.dung_o(HINH, phoi, KHO, CHIEM)
     for ten in ('logo-cam-lam.webp', 'logo-cam-lam-toi.webp'):
         p = os.path.join(CONG, ten)
         anh.save(p, 'WEBP', quality=95, method=6)

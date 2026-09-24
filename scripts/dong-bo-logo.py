@@ -131,26 +131,59 @@ def lam_splash(logo):
         _dat_giua(im, logo, w / 2, tam_y, o)
 
         f1 = _font(round(w * 0.072))
-        f2 = _font(round(w * 0.030), dam=False)
         y = tam_y + o * 0.62 + w * 0.03
         d.text((w / 2, y), TEN, font=f1, fill=VANG, anchor='ma')
-        # mô tả dài → tự xuống dòng cho vừa 78% bề ngang
-        toi_da = w * 0.78
-        dong, cur = [], ''
-        for tu in PHU.split():
-            thu = (cur + ' ' + tu).strip()
-            if d.textlength(thu, font=f2) > toi_da and cur:
-                dong.append(cur)
-                cur = tu
-            else:
-                cur = thu
-        dong.append(cur)
+        # ⚠️ DÒNG MÔ TẢ PHẢI NẰM GỌN MỘT DÒNG — chủ dự án xem ảnh chụp và bảo
+        #    "cho chữ Cam Lâm, Khánh Hòa về cùng 1 dòng". Bản trước tự ngắt
+        #    dòng nên tên tỉnh rơi xuống hàng hai, nhìn rất cụt.
+        #    Cách làm: thu nhỏ dần cỡ chữ cho tới khi vừa 88% bề ngang. Không
+        #    ghi cứng một cỡ được vì bộ này có cả iPhone 750px lẫn iPad 2048px.
+        toi_da = w * 0.88
+        co = round(w * 0.030)
+        while co > 8:
+            f2 = _font(co, dam=False)
+            if d.textlength(PHU, font=f2) <= toi_da:
+                break
+            co -= 1
         y += w * 0.095
-        for t in dong:
-            d.text((w / 2, y), t, font=f2, fill=CHU_PHU, anchor='ma')
-            y += w * 0.042
+        d.text((w / 2, y), PHU, font=f2, fill=CHU_PHU, anchor='ma')
         im.save(os.path.join(ra, ten + '.png'))
     print('  splash: %d anh' % len(SPLASH))
+
+
+def danh_dau_icon_moi():
+    """Gắn số hiệu bản vào đường dẫn icon trong manifest.webmanifest.
+
+    ⚠️ VÌ SAO PHẢI LÀM. Người dùng "Thêm vào màn hình chính" xong thì HỆ ĐIỀU
+       HÀNH chụp lại icon và giữ luôn — đổi nội dung tệp mà giữ nguyên tên thì
+       icon ngoài màn hình vẫn là cái cũ, có khi hàng tháng trời. Chủ dự án
+       báo đúng lỗi này: "logo icon lưu ra ngoài màn hình vẫn chưa đổi".
+       Đổi đường dẫn (thêm ?v=…) thì trình duyệt coi là icon MỚI và tải lại.
+
+    Số hiệu lấy từ chính nội dung tệp icon nên logo không đổi thì số không
+    đổi — chạy script nhiều lần cũng không sinh bản mới vô ích.
+
+    ⚠️ ICON ĐÃ CÀI SẴN TRÊN MÁY VẪN PHẢI GỠ RỒI CÀI LẠI. Cái này chỉ giúp
+       người cài MỚI và người vào bằng trình duyệt thấy đúng logo ngay.
+    """
+    import hashlib
+    import re
+    mf = os.path.join(CONG, 'manifest.webmanifest')
+    if not os.path.exists(mf):
+        print('  bo qua (khong thay manifest.webmanifest)')
+        return
+    h = hashlib.sha1()
+    for ten in ('icon-192.png', 'icon-512.png', 'icon-512-maskable.png'):
+        p = os.path.join(CONG, 'icons', ten)
+        if os.path.exists(p):
+            h.update(open(p, 'rb').read())
+    ma = h.hexdigest()[:8]
+    s = open(mf, encoding='utf-8').read()
+    s = re.sub(r'"/icons/(icon-[\w-]+\.png)(\?v=[0-9a-f]+)?"',
+               lambda m: '"/icons/%s?v=%s"' % (m.group(1), ma), s)
+    open(mf, 'w', encoding='utf-8', newline=chr(10)).write(s)
+    print('  danh dau icon ban  %s  (manifest.webmanifest)' % ma)
+
 
 
 def don_logo_cu(logo):
@@ -242,6 +275,7 @@ def main():
     lam_splash(logo)
     print('4. Nhung logo vao trang bao tri / mat mang')
     don_logo_cu(logo)
+    danh_dau_icon_moi()
     nhung_trang_tinh(logo)
     print('5. Logo ngay le')
     r = subprocess.run([sys.executable, os.path.join(GOC, 'scripts', 'dung-logo-ngay-le.py')],

@@ -48,7 +48,9 @@ html.splash-done #app-splash{display:none!important}
 .cl-splash-card{transform:translateY(-6%);display:flex;flex-direction:column;align-items:center}
 .cl-splash-tile{width:118px;height:118px;border-radius:28px;border:1.5px solid rgba(200,161,75,.5);display:grid;place-items:center;box-shadow:0 10px 34px rgba(0,0,0,.4);animation:clSplashPop .5s cubic-bezier(0.22,1,0.36,1) both}
 .cl-splash-brand{margin-top:26px;font-size:30px;font-weight:900;color:#C8A14B;letter-spacing:.4px}
-.cl-splash-sub{margin-top:8px;font-size:15px;line-height:1.5;color:#cbd5e1;text-align:center;max-width:300px;padding:0 24px}
+/* Một dòng, không ngắt: chủ dự án muốn 'Cam Lâm, Khánh Hòa' nằm cùng dòng
+   với phần đầu. Cỡ chữ 12.5px để câu 45 ký tự vẫn vừa màn hẹp nhất (320px). */
+.cl-splash-sub{margin-top:8px;font-size:12.5px;line-height:1.5;color:#cbd5e1;text-align:center;white-space:nowrap;padding:0 12px}
 .cl-splash-dots{position:absolute;bottom:calc(48px + env(safe-area-inset-bottom));display:flex;gap:7px}
 @keyframes clSplashPop{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:none}}
 .cl-splash-dot{width:7px;height:7px;border-radius:50%;background:#C8A14B;opacity:.35;animation:clSplashDot 1s ease-in-out infinite}

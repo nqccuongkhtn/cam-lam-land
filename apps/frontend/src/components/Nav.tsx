@@ -89,7 +89,13 @@ function Logo({ light }: { light: boolean }) {
           alt="" aria-hidden="true" width={34} height={34}
           className="h-[34px] w-[34px] shrink-0 object-contain" />
       )}
-      <span className="leading-tight">
+      {/* ⚠️ KÉO KHỐI CHỮ LÊN 1,5px Ở MÀN RỘNG. Khối chữ có hai dòng: dòng
+          tên cỡ lớn và dòng "Nhà đất & quy hoạch" cỡ 10px. Canh giữa theo
+          chiều cao thì về mặt SỐ ĐO là đúng, nhưng mắt nhìn vẫn thấy khối
+          chữ thấp hơn logo một chút — vì dòng dưới có nhiều chữ thò xuống
+          (g, q, y) làm trọng tâm chữ tụt xuống. Chủ dự án nhận ra đúng chỗ
+          này. Chỉ kéo ở màn ≥1024px vì dòng thứ hai chỉ hiện từ cỡ đó. */}
+      <span className="leading-tight lg:-translate-y-[1.5px]">
         <span className={`font-extrabold block text-lg tracking-tight ${light ? 'text-white' : 'text-[#0A2540]'}`}>Cam Lâm <span className="text-[#C8A14B]">Land</span></span>
         <span className={`hidden lg:block whitespace-nowrap text-[10px] font-medium tracking-wide ${light ? 'text-white/75' : 'text-slate-400'}`}>Nhà đất &amp; quy hoạch</span>
       </span>

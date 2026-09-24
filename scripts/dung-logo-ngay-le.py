@@ -53,17 +53,27 @@ TRANG = (250, 251, 252)
 NAVY = (19, 52, 89)
 VANG_CO = (255, 222, 0)      # ngôi sao trên cờ — luôn nằm trên nền đỏ nên không đổi
 
+# ⚠️ MÀU PHẢI TƯƠI. Chủ dự án xem bộ logo và nhận xét "màu hoa mai trang trí
+#    và màu vua hùng chưa tươi, màu doanh nhân cũng vậy". Ba chỗ đó đều lấy
+#    màu từ `vang`, `vang_sang` và `do_tet` — nên chỉnh ở đây là cả ba cùng
+#    tươi lên, khỏi sửa từng hàm vẽ.
+#    Cách chỉnh: KÉO ĐỘ BÃO HOÀ LÊN chứ không chỉ làm sáng. Vàng cũ
+#    (229,188,98) lệch sang nâu vì kênh xanh lam còn cao; hạ kênh lam xuống
+#    và nâng kênh đỏ thì ra vàng rực. Đỏ cũng vậy.
+#    ⚠️ ĐỪNG kéo tiếp nữa: quá mức thì trên nền navy màu bị "cháy", mất hết
+#       sắc độ và nhìn như hình dán rẻ tiền.
 MAU_NEN_TOI = dict(
     net=TRANG,
-    vang=(229, 188, 98), vang_sang=(247, 208, 110), kem=(238, 214, 164),
-    nau=(120, 72, 40), do=(218, 37, 29), do_tet=(201, 42, 42),
-    hong=(236, 112, 140), xanh=(86, 140, 74), vang_co=VANG_CO,
+    vang=(248, 199, 72), vang_sang=(255, 221, 92), kem=(245, 222, 170),
+    nau=(146, 90, 46), do=(232, 42, 32), do_tet=(228, 46, 46),
+    hong=(244, 118, 146), xanh=(96, 156, 80), vang_co=VANG_CO,
 )
+# Nền sáng (thanh menu trắng): cùng sắc nhưng đậm hơn cho đọc rõ trên trắng.
 MAU_NEN_SANG = dict(
     net=NAVY,
-    vang=(166, 116, 24), vang_sang=(191, 138, 30), kem=(178, 133, 58),
-    nau=(92, 56, 30), do=(200, 28, 22), do_tet=(178, 30, 30),
-    hong=(211, 64, 104), xanh=(56, 104, 48), vang_co=VANG_CO,
+    vang=(198, 138, 16), vang_sang=(216, 156, 20), kem=(186, 140, 60),
+    nau=(96, 58, 30), do=(210, 28, 20), do_tet=(206, 30, 30),
+    hong=(220, 62, 108), xanh=(62, 116, 52), vang_co=VANG_CO,
 )
 
 def sao(d, cx, cy, r, mau, canh=5, trong=0.42, xoay=-90):
@@ -93,9 +103,37 @@ def tia(d, cx, cy, r1, r2, mau, so=12, day=3.0, xoay=0.0):
                 (cx + r2 * math.cos(g), cy + r2 * math.sin(g))], fill=mau, width=day)
 
 
+# ── LÁ CỜ VẼ RIÊNG MỘT LỚP ──────────────────────────────────────────────────
+# Chủ dự án: "lá cờ nó vẫy trong gió chứ không phải lắc qua lắc lại".
+# Muốn mặt cờ gợn sóng thì phải làm hiệu ứng CHỈ TRÊN MẶT CỜ — cán cờ, xe
+# tăng, nóc hầm, bóng chiến sĩ phải đứng yên. Nên mỗi dịp có cờ được vẽ
+# LÀM HAI LẦN với biến PHAN_VE khác nhau, ra hai tấm ảnh:
+#     <mã>-tt.webp  mọi thứ TRỪ mặt cờ   → đứng yên
+#     <mã>-co.webp  CHỈ mặt cờ           → gợn sóng
+# Trước đây chỉ có một lớp nên hiệu ứng phải xoay cả cụm — thành ra cả cán
+# cờ lẫn người cầm cùng lắc, đúng cái chủ dự án chê.
+PHAN_VE = 'het'          # 'het' | 'khong-co' (bỏ mặt cờ) | 'chi-co' (chỉ mặt cờ)
+
+# Những dịp có LÁ CỜ trong phần trang trí. Thêm cờ vào dịp nào thì thêm mã dịp
+# đó vào đây, đồng thời thêm vào CO_VAY bên components/LogoLe.tsx — thiếu một
+# trong hai chỗ là cờ đứng im.
+DIP_CO_CO = ('quoc-khanh', 'dang', '30-4', 'dien-bien')
+
+
+def _ve_phan_khac() -> bool:
+    return PHAN_VE != 'chi-co'
+
+
+def _ve_mat_co() -> bool:
+    return PHAN_VE != 'khong-co'
+
+
 def co_to_quoc(d, m, x, y, rong, cao, nghieng=0.0):
     """Lá cờ đỏ sao vàng: nền đỏ, ngôi sao vàng năm cánh đặt chính giữa."""
-    d.rectangle([x - rong * 0.06, y - cao * 0.30, x - rong * 0.02, y + cao * 1.55], fill=m['kem'])
+    if _ve_phan_khac():          # cán cờ — thuộc phần ĐỨNG YÊN
+        d.rectangle([x - rong * 0.06, y - cao * 0.30, x - rong * 0.02, y + cao * 1.55], fill=m['kem'])
+    if not _ve_mat_co():
+        return
     b = cao * 0.10 * (1 + nghieng)          # mặt cờ hơi lượn cho đỡ cứng
     d.polygon([(x, y), (x + rong, y - b), (x + rong, y + cao - b), (x, y + cao)], fill=m['do'])
     sao(d, x + rong * 0.5, y + cao * 0.5 - b * 0.5, cao * 0.34, m['vang_co'])
@@ -934,13 +972,20 @@ def ve_lao_dong(d, m):
     Theo ảnh mẫu chủ dự án gửi (những người thợ giơ nắm tay). Bản trước
     chỉ có bánh răng — đúng "lao động" nhưng thiếu khí thế.
     """
-    banh_rang(d, 402, 50, 30, m['vang'], m['do_tet'])
+    # ⚠️ DÙNG SẮC SÁNG NHẤT. Bánh răng vẽ bằng `vang` thường thì nằm cạnh
+    #    nắm tay `vang_sang` nên trông xỉn hẳn đi — chủ dự án bảo "màu quốc
+    #    tế lao động cũng tươi lên". Cho cả hai cùng sắc sáng, lấy lỗ trục
+    #    đỏ làm điểm nhấn.
+    banh_rang(d, 402, 50, 30, m['vang_sang'], m['do'])
     nam_tay(d, 352, 76, 74, 84, m['vang_sang'], m['nau'])
 
 
 def ve_dang(d, m):
     """3/2 Thành lập Đảng: cờ đỏ búa liềm."""
-    d.rectangle([318, 8, 325, 140], fill=m['kem'])
+    if _ve_phan_khac():
+        d.rectangle([318, 8, 325, 140], fill=m['kem'])          # cán cờ
+    if not _ve_mat_co():
+        return
     d.polygon([(325, 16), (434, 8), (434, 86), (325, 94)], fill=m['do'])
     bua_liem(d, 380, 50, 30, m['vang_co'])
 
@@ -951,10 +996,13 @@ def ve_30_4(d, m):
     Theo ảnh mẫu chủ dự án gửi. Bản trước vẽ chim bồ câu — đúng ý hoà
     bình nhưng không ai nhìn ra ngày 30/4.
     """
-    d.line([(330, 104), (338, 28)], fill=m['nau'], width=5)
+    if _ve_phan_khac():
+        d.line([(330, 104), (338, 28)], fill=m['nau'], width=5)   # cán cờ
+        xe_tang(d, 366, 106, 122, 62, m['xanh'], m['nau'], m['net'])
+    if not _ve_mat_co():
+        return
     d.polygon([(338, 28), (402, 16), (396, 52), (334, 62)], fill=m['do'])
     sao(d, 368, 36, 13, m['vang_co'])
-    xe_tang(d, 366, 106, 122, 62, m['xanh'], m['nau'], m['net'])
 
 
 def ve_dien_bien(d, m):
@@ -966,11 +1014,14 @@ def ve_dien_bien(d, m):
     ⚠️ RÚT GỌN CÒN BA MẢNG: mái hầm · hai bóng chiến sĩ · lá cờ. Vẽ đủ chi
        tiết như ảnh gốc thì ở cỡ 32 điểm ảnh chỉ còn một vệt lổn nhổn.
     """
-    noc_ham(d, 368, 136, 142, 40, m['xanh'], m['net'])
-    chien_si(d, 396, 80, 30, m['xanh'])
-    chien_si(d, 344, 78, 32, m['xanh'], giuong_co=True)
-    # cán cờ chếch lên phải, cờ đỏ sao vàng tung bay
-    d.line([(358, 90), (396, 24)], fill=m['nau'], width=5)
+    if _ve_phan_khac():
+        noc_ham(d, 368, 136, 142, 40, m['xanh'], m['net'])
+        chien_si(d, 396, 80, 30, m['xanh'])
+        chien_si(d, 344, 78, 32, m['xanh'], giuong_co=True)
+        d.line([(358, 90), (396, 24)], fill=m['nau'], width=5)    # cán cờ
+    if not _ve_mat_co():
+        return
+    # mặt cờ đỏ sao vàng — lớp duy nhất được gợn sóng
     d.polygon([(396, 26), (432, 40), (424, 70), (390, 58)], fill=m['do'])
     sao(d, 411, 47, 13, m['vang_co'])
 
@@ -1178,8 +1229,30 @@ def lam(nen_toi: bool):
         #    · <mã>-tt   — phần TRANG TRÍ, nền trong suốt.
         #    Tách ra vì chủ dự án dặn: NGÔI NHÀ LÀ BIỂU TƯỢNG CỦA WEB, không
         #    được lắc — kể cả trong logo ngày lễ. Chỉ phần trang trí mới động.
-        ra[ma] = (anh, nen, tt)
+        # Dịp có cờ: vẽ lại hai lần để tách MẶT CỜ ra một lớp riêng.
+        co = None
+        if ma in DIP_CO_CO:
+            co = _lop_rieng(ve, m, goc.size, 'chi-co')
+            tt = _lop_rieng(ve, m, goc.size, 'khong-co')
+        ra[ma] = (anh, nen, tt, co)
     return ra
+
+
+def _lop_rieng(ve, m, kho, phan: str) -> Image.Image:
+    """Vẽ trang trí ở một 'phần' nhất định rồi thu về đúng cỡ.
+
+    ⚠️ Phải ĐẶT LẠI PHAN_VE về 'het' sau khi vẽ xong. Quên thì mọi dịp vẽ
+       sau đó cũng bị cắt mất phần — mà không báo lỗi gì cả, chỉ là logo
+       thiếu chi tiết.
+    """
+    global PHAN_VE
+    PHAN_VE = phan
+    try:
+        lop = Image.new('RGBA', (kho[0] * PHONG, kho[1] * PHONG), (0, 0, 0, 0))
+        _ve_phong(ImageDraw.Draw(lop), ve, m, lop)
+        return lop.resize(kho, Image.LANCZOS)
+    finally:
+        PHAN_VE = 'het'
 
 
 def _xem_thu(toi, sang):
@@ -1268,10 +1341,12 @@ def main():
     toi, sang = lam(True), lam(False)
     for ma, ten, _ in DIP:
         for bo, duoi in ((toi, ''), (sang, '-toi')):
-            anh, nen, tt = bo[ma]
+            anh, nen, tt, co = bo[ma]
             anh.save(os.path.join(RA, ma + duoi + '.webp'), 'WEBP', quality=94, method=6)
             nen.save(os.path.join(RA, ma + '-nen' + duoi + '.webp'), 'WEBP', quality=94, method=6)
             tt.save(os.path.join(RA, ma + '-tt' + duoi + '.webp'), 'WEBP', quality=94, method=6)
+            if co is not None:
+                co.save(os.path.join(RA, ma + '-co' + duoi + '.webp'), 'WEBP', quality=94, method=6)
         print('OK %-11s %-22s %d KB' % (ma, ten, os.path.getsize(os.path.join(RA, ma + '.webp')) // 1024))
     ve_xe_tuan_loc()
     _xem_thu(toi, sang)

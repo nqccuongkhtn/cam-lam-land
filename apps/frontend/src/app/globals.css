@@ -664,7 +664,8 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .cl-logo-le img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: contain; }
 .cl-le-nen { animation: none !important; transform: none !important; }
 .cl-le-tt  { animation: clLogoLac 4.2s ease-in-out infinite; transform-origin: 74% 82%; }
-.cl-logo-le:hover .cl-le-tt, .cl-logo-le:hover i { animation-play-state: paused; }
+.cl-logo-le:hover .cl-le-tt, .cl-logo-le:hover .cl-le-co,
+.cl-logo-le:hover i { animation-play-state: paused; }
 @keyframes clLogoLac {
   0%, 100% { transform: rotate(-2.4deg); }
   50%      { transform: rotate(2.4deg); }
@@ -679,26 +680,46 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 }
 .cl-logo-le[data-le="noel"] .cl-le-tt { animation-name: clLogoNay; animation-duration: 2.8s; }
 
-/* ── VẪY CỜ ─────────────────────────────────────────────────────────────────
-   Chủ dự án: "như người cầm cờ vẫy qua lại chiến thắng".
-   Nên KHÔNG dùng skew (skew làm lá cờ méo như bị kéo giãn) mà XOAY quanh
-   CHÂN CỘT CỜ — giống hệt động tác cầm cán cờ phất sang hai bên. Gốc xoay
-   đặt ở 78%/86% vì trang trí nằm hẳn ở nửa phải khung, chân cột cờ chạm đáy.
-   ⚠️ Biên độ 6 độ là vừa: rộng hơn thì ở cỡ thật 32px lá cờ quét ra ngoài
-      khung, bị thanh menu cắt mất một góc. */
-@keyframes clLogoVayCo {
-  0%, 100% { transform: rotate(-6deg); }
-  50%      { transform: rotate(6deg); }
+/* ── LÁ CỜ BAY TRONG GIÓ ────────────────────────────────────────────────────
+   Chủ dự án: "lá cờ nó vẫy trong gió chứ không phải lắc qua lắc lại".
+   Bản trước xoay cả cụm trang trí quanh chân cột — thành ra cán cờ, xe tăng,
+   bóng chiến sĩ cùng lắc theo, nhìn như cả bức tranh bị rung chứ không phải
+   cờ bay. Sai từ gốc: hiệu ứng đặt nhầm lớp.
+
+   Nay mặt cờ nằm RIÊNG một lớp (.cl-le-co) nên làm được đúng kiểu vải phất:
+     · scaleX co giãn nhẹ  → mặt cờ lúc căng ra lúc cuộn lại;
+     · skewY đảo chiều     → mép trên và mép dưới lượn ngược nhau, đó chính là
+                             cái làm mắt nhận ra "gợn sóng" chứ không phải
+                             "xoay";
+     · translate rất nhỏ   → bù lại cho mép cờ khỏi rời khỏi cán.
+   Gốc biến hình đặt ở MÉP TRÁI lá cờ (chỗ buộc vào cán) — vải chỉ bay ở
+   phía đuôi, chỗ buộc thì đứng yên, đúng như cờ thật.
+
+   ⚠️ ĐỪNG DÙNG rotate. Xoay là động tác CẦM CÁN PHẤT, không phải vải bay.
+   ⚠️ Biên độ để nhỏ: ở cỡ thật 32px lá cờ chỉ rộng chừng 8px, quá tay là
+      thành rung giật.
+   ⚠️ Chu kỳ lẻ (1,9s) cho khác chu kỳ lắc của trang trí (2,2s) — hai lớp
+      trùng chu kỳ thì nhìn lại ra "cả cụm cùng động". */
+@keyframes clCoBayGio {
+  0%   { transform: skewY(0deg) scaleX(1);      }
+  25%  { transform: skewY(2.6deg) scaleX(.965) translateX(.5%); }
+  50%  { transform: skewY(0deg) scaleX(1.015);  }
+  75%  { transform: skewY(-2.6deg) scaleX(.965) translateX(.5%); }
+  100% { transform: skewY(0deg) scaleX(1);      }
 }
-.cl-logo-le.co-vay .cl-le-tt {
-  animation-name: clLogoVayCo; animation-duration: 2.2s;
-  transform-origin: 78% 86%;
+.cl-le-co {
+  animation: clCoBayGio 1.9s ease-in-out infinite;
+  transform-origin: 74% 28%;        /* mép trái lá cờ, chỗ buộc vào cán */
 }
-/* Điện Biên Phủ — lá cờ trên nóc hầm, phất mạnh và chậm rãi hơn, đúng kiểu
-   cắm cờ chiến thắng. */
-.cl-logo-le[data-le="dien-bien"] .cl-le-tt {
-  animation-duration: 2.8s; transform-origin: 82% 78%;
+/* Cụm trang trí của mấy dịp có cờ thì ĐỨNG YÊN HẲN — mọi chuyển động dồn hết
+   vào lá cờ. Cán cờ mà lắc thì lại hỏng đúng như bản trước. */
+.cl-logo-le.co-vay .cl-le-tt { animation: none; transform: none; }
+/* Điện Biên Phủ: cờ cắm trên nóc hầm, gió trên cao — phất rộng và chậm hơn. */
+.cl-logo-le[data-le="dien-bien"] .cl-le-co {
+  animation-duration: 2.4s; transform-origin: 82% 22%;
 }
+.cl-logo-le[data-le="dang"] .cl-le-co { transform-origin: 72% 10%; }
+.cl-logo-le[data-le="30-4"] .cl-le-co { transform-origin: 76% 18%; }
 
 /* ── ÔNG GIÀ NOEL CƯỠI XE TUẦN LỘC (chỉ Giáng sinh) ─────────────────────────
    Chủ dự án: "hiện ra 1 chổ chạy qua 1 chỗ sẽ bị ẩn như kiểu có lỗ không
@@ -780,6 +801,6 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 
 @media (prefers-reduced-motion: reduce) {
   .cl-logo-le img, .cl-logo-le > i, .cl-phao-qua, .cl-phao-qua i,
-  .cl-noel-xe { animation: none !important; }
+  .cl-le-co, .cl-noel-xe { animation: none !important; }
   .cl-logo-le > i, .cl-phao, .cl-noel-xe { display: none; }
 }

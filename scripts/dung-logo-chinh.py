@@ -47,6 +47,8 @@ Chạy:  python scripts/dung-logo-chinh.py
 import importlib.util
 import os
 
+from PIL import Image
+
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 CONG = os.path.join(GOC, 'apps', 'frontend', 'public')
 
@@ -100,6 +102,18 @@ def main():
     #  tệp                       bề dày viền       dùng ở đâu
     bo_tep = (('logo-cam-lam.webp', VIEN_GOLD, 'nen toi - tren banner'),
               ('logo-cam-lam-toi.webp', VIEN_GOLD_TRANG, 'nen sang - menu trang'))
+    # ── Tệp thứ ba: CHỈ NÉT VÀNG, nền trong suốt ──
+    # Dùng ở màn hình chờ khi mở ứng dụng: ở đó logo đã nằm trong một KHUNG
+    # BO GÓC VIỀN VÀNG sẵn, nên đặt cả ô vuông có viền vào nữa thì thành hai
+    # khung vàng lồng nhau — chủ dự án xem ảnh chụp và bảo "bỏ viền gold nhỏ
+    # ở trong".
+    net = bo.to_net(bo.doc_mat_na(HINH).resize((KHO, KHO), Image.LANCZOS),
+                    tim_phoi(bo, 'gold-sang')[4])
+    pn = os.path.join(CONG, 'logo-dau.webp')
+    net.save(pn, 'WEBP', lossless=True, quality=100, method=6)
+    print('OK %-22s chi net vang  %d KB   (man hinh cho)'
+          % ('logo-dau.webp', os.path.getsize(pn) // 1024))
+
     for ten, day, o_dau in bo_tep:
         anh = vg.dung(bo, HINH, day, KHO, CHIEM) if day             else bo.dung_o(HINH, tim_phoi(bo, PHOI), KHO, CHIEM)
         p = os.path.join(CONG, ten)

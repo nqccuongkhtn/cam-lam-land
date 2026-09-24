@@ -1,6 +1,5 @@
 'use client';
 import { useEffect } from 'react';
-import LogoAnh from '@/components/LogoAnh';
 
 /**
  * Màn hình chờ (splash) khi MỞ APP đã cài (standalone).
@@ -23,8 +22,13 @@ export default function AppSplash() {
     <div id="app-splash" aria-hidden>
       <div className="cl-splash-card">
         <div className="cl-splash-tile">
-          {/* Logo lấy từ tệp — xem chú thích trong components/LogoAnh.tsx */}
-          <LogoAnh cao={54} nenToi />
+          {/* ⚠️ DÙNG BẢN CHỈ CÓ NÉT VÀNG (/logo-dau.webp), không dùng logo
+              đầy đủ. Khung .cl-splash-tile bên ngoài đã là một ô bo góc viền
+              vàng rồi; đặt logo đầy đủ vào thì thành HAI KHUNG VÀNG LỒNG
+              NHAU — chủ dự án xem ảnh chụp màn hình và bảo bỏ cái viền nhỏ
+              bên trong đi. Tệp này do scripts/dung-logo-chinh.py dựng. */}
+          <img src="/logo-dau.webp" alt="" aria-hidden="true"
+            width={62} height={62} style={{ width: 62, height: 62 }} />
         </div>
         <div className="cl-splash-brand">Cam Lâm Land</div>
         <div className="cl-splash-sub">Nhà đất &amp; Bản đồ quy hoạch Cam Lâm, Khánh Hòa</div>

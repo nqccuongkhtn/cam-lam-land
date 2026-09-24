@@ -607,3 +607,67 @@
 @media (min-width: 768px) {
   .cl-b11-tim { padding: 0 16px }
 }
+
+/* ══ ĐIỆN THOẠI: CHỮ RA KHỎI ẢNH, XUỐNG HẲN BÊN DƯỚI ════════════════════════
+   Chủ dự án chỉ sang app batdongsan.com: banner ở đó là MỘT TẤM ẢNH SẠCH,
+   chữ và nút nằm hẳn bên dưới. Màn điện thoại chỉ ~390px mà bản thiết kế vẽ
+   trên khổ 1920px, nên chữ trong ảnh co lại còn bé xíu và rơi trúng chỗ ảnh
+   rối → "bị đè", đọc không ra.
+
+   Chữ dựng lại thành khối gọn bên dưới (components/Banner11.tsx đọc thẳng từ
+   mẫu đang chạy nên không phải khai lại nội dung ở đâu cả).
+
+   ⚠️ CHỈ ẨN Ở MÀN ≤767px. Màn máy tính giữ nguyên thiết kế gốc.
+   ⚠️ KHÔNG ẨN .kc-text (mẫu "Chữ khổng lồ chứa ảnh"): ở mẫu đó CHỮ CHÍNH LÀ
+      HÌNH, ẩn đi là mất trắng cả mẫu. Bù lại khối dưới tự bỏ dòng tiêu đề cho
+      khỏi lặp — xem `giuTieuDe` trong Banner11.tsx.
+   ⚠️ Đừng sửa mấy lớp này trong banner11.css: file đó do
+      scripts/banner11/tach-banner.py sinh lại, sửa tay là mất. */
+@media (max-width: 767px) {
+  .cl-b11 .rb-text, .cl-b11 .rb-big, .cl-b11 .sp-content,
+  .cl-b11 .du-content, .cl-b11 .pl-text, .cl-b11 .bb-text,
+  .cl-b11 .ui-text, .cl-b11 .fl-text, .cl-b11 .b-text,
+  .cl-b11 .sl-panel, .cl-b11 .dp-content,
+  .cl-b11 .kc-cap, .cl-b11 .kc-sub, .cl-b11 .kc-cta,
+  .cl-b11 .sp-cta, .cl-b11 .sp-cta2, .cl-b11 .rb-cta,
+  .cl-b11 .brand-tab { display: none !important }
+
+  /* Ảnh về đúng khổ ngang như bản máy tính (chủ dự án: "cho tỷ lệ ngang và
+     cao của baner như tỷ lệ trên máy tính"). Không còn chữ nằm trong ảnh nên
+     không cần kéo cao gần vuông nữa. */
+  .cl-b11 .banner {
+    aspect-ratio: 16 / 10 !important; min-height: 0 !important;
+    border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+  }
+
+  /* Vệt tối ở mép dưới ảnh cho chỗ nối sang khối chữ đỡ gắt. */
+  .cl-b11-duoi {
+    background: #0A2540; color: #fff;
+    margin: 0 auto; padding: 14px 16px 4px; max-width: 980px;
+    position: relative;
+  }
+  .cl-b11-duoi::before {
+    content: ''; position: absolute; left: 0; right: 0; top: -26px; height: 26px;
+    background: linear-gradient(to top, #0A2540, rgba(10, 37, 64, 0));
+    pointer-events: none;
+  }
+  .cl-b11-duoi-nho {
+    display: block; font-size: 11px; font-weight: 700; letter-spacing: .16em;
+    text-transform: uppercase; color: #C8A14B; margin-bottom: 4px;
+  }
+  .cl-b11-duoi h2 {
+    margin: 0; font-size: 22px; line-height: 1.2; font-weight: 800; color: #fff;
+  }
+  .cl-b11-duoi p {
+    margin: 6px 0 0; font-size: 13.5px; line-height: 1.45; color: rgba(255, 255, 255, .8);
+  }
+  .cl-b11-duoi-nut {
+    display: inline-block; margin-top: 12px; padding: 9px 18px;
+    border-radius: 4px; background: #C8A14B; color: #0A2540;
+    font-size: 14px; font-weight: 800; text-decoration: none;
+  }
+  /* Khối chữ và khung tìm kiếm phải là MỘT mảng navy liền — không có khe hở,
+     không bo góc ở chỗ giáp nhau. Đây là chỗ chủ dự án chê "đang hơi rời rạc". */
+  .cl-b11-tim { padding-top: 14px !important }
+}
+@media (min-width: 768px) { .cl-b11-duoi { display: none } }

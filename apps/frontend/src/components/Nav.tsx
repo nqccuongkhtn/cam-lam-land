@@ -81,8 +81,11 @@ function Logo({ light }: { light: boolean }) {
       {/* Ngày lễ thì bọc thêm một lớp để chạy hiệu ứng động (xem khối
           "LOGO NGÀY LỄ" trong app/globals.css). Ngày thường không bọc gì cả,
           để thanh menu nhẹ đúng như cũ. Ba thẻ <i> là ba đốm lấp lánh. */}
+      {/* ⚠️ LOGO LỄ PHẢI CÙNG 34px VỚI LOGO NGÀY THƯỜNG. Để lệch (trước đây
+          32) thì ngày lễ ô vuông logo nhỏ hơn ngày thường một chút — nhìn
+          thoáng qua tưởng logo bị thụt xuống. */}
       {le ? (
-        <LogoLe ma={le} light={light} cao={32} />
+        <LogoLe ma={le} light={light} cao={34} />
       ) : (
         <img
           src={light ? '/logo-cam-lam.webp' : '/logo-cam-lam-toi.webp'}

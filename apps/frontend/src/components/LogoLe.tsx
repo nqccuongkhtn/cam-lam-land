@@ -87,9 +87,18 @@ export default function LogoLe({
   const rong = Math.round(cao * 1.51);
   const duoi = light ? '' : '-toi';          // nền tối dùng bản nét sáng
   const o = { width: rong, height: cao };
+  /* ⚠️ Ô BỌC CHỈ RỘNG BẰNG Ô VUÔNG LOGO, KHÔNG PHẢI BẰNG CẢ TẤM ẢNH.
+     Tấm ảnh logo lễ rộng gấp 1,51 lần ô vuông (ô vuông bên trái, trang trí
+     bên phải). Nếu ô bọc rộng bằng cả tấm thì ngày lễ chữ "Cam Lâm Land" bị
+     đẩy sang phải, khoảng cách logo–chữ rộng hẳn ra so với ngày thường —
+     chủ dự án nhìn ra ngay chỗ này.
+     Nay ô bọc vuông đúng bằng logo, hai tấm ảnh nằm tuyệt đối và TRÀN RA
+     PHÍA PHẢI mà không chiếm chỗ. Trang trí có chờm vào chữ thì kệ, chủ dự
+     án bảo "nếu đè lên chữ thì cho đè luôn" — và chữ vẫn nằm trên trang trí
+     nên đọc không bị vướng. */
   return (
     <span className={`cl-logo-le${CO_VAY.has(ma) ? ' co-vay' : ''}`}
-      data-le={ma} style={o}>
+      data-le={ma} style={{ width: cao, height: cao }}>
       {/* Lớp 1 — Ô VUÔNG LOGO. Không hiệu ứng nào được chạm vào lớp này. */}
       <img className="cl-le-nen" src={`/logo-le/${ma}-nen${duoi}.webp`}
         alt="" aria-hidden="true" width={rong} height={cao} style={o} />

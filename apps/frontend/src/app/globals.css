@@ -661,7 +661,15 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
       .cl-le-tt  = phần TRANG TRÍ → mọi hiệu ứng nằm ở đây.
    Trước đây chỉ có MỘT tấm ảnh ghép sẵn và cả tấm cùng lắc — tức là ô vuông
    logo lắc theo. Đừng gộp lại làm một lần nữa. */
-.cl-logo-le img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: contain; }
+/* ⚠️ ĐỪNG ĐẶT width:100%. Ô bọc chỉ rộng bằng Ô VUÔNG logo (xem chú thích
+   trong LogoLe.tsx), còn tấm ảnh rộng gấp 1,51 lần — bề rộng thật do thẻ ảnh
+   tự khai bằng style. Ép 100% ở đây là bóp méo cả trang trí. */
+/* ⚠️ PHẢI CÓ max-width: none. Luật chung của giao diện là
+   `img { max-width: 100% }`; ô bọc nay chỉ rộng 34px (bằng ô vuông logo) nên
+   luật đó BÓP tấm ảnh 51px về 34px, rồi object-fit thu nhỏ tiếp cho vừa —
+   ô vuông logo còn 22,5px, nhìn bé hẳn so với ngày thường. Đã vấp đúng lỗi
+   này: chủ dự án hỏi ngay "sao bạn làm cho logo bị nhỏ lại rồi". */
+.cl-logo-le img { position: absolute; left: 0; top: 0; max-width: none; object-fit: contain; }
 .cl-le-nen { animation: none !important; transform: none !important; }
 .cl-le-tt  { animation: clLogoLac 4.2s ease-in-out infinite; transform-origin: 74% 82%; }
 .cl-logo-le:hover .cl-le-tt, .cl-logo-le:hover .cl-le-co,
@@ -738,9 +746,9 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 @keyframes clNoelXe {
   0%    { transform: translateX(-40%) translateY(4px) scale(.85); opacity: 0; }
   0.6%  { transform: translateX(0) translateY(0) scale(1); opacity: 1; }
-  2.6%  { transform: translateX(115%) translateY(-5px) scale(1); opacity: 1; }
-  3.3%  { transform: translateX(150%) translateY(-8px) scale(.85); opacity: 0; }
-  100%  { transform: translateX(150%) translateY(-8px) scale(.85); opacity: 0; }
+  2.6%  { transform: translateX(200%) translateY(-5px) scale(1); opacity: 1; }
+  3.3%  { transform: translateX(260%) translateY(-8px) scale(.85); opacity: 0; }
+  100%  { transform: translateX(260%) translateY(-8px) scale(.85); opacity: 0; }
 }
 
 /* Ngày tưởng niệm: KHÔNG nhún nhảy, chỉ sáng lên rất chậm. Nhún nhảy trong

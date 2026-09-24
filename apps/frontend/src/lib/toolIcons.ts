@@ -13,16 +13,18 @@ const ICONS: Record<string, string> = {
   'tra-cuu': '<path d="M12 22a7 7 0 0 0 7-7c0-5-4-7-4-11 0 0-3 2-3 6 0 0-2-1-2-3 0 0-5 3-5 8a7 7 0 0 0 7 7z"/>',
   'crm': '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="3.5"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>',
   'cong-dong': '<path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/><path d="M8 11h.01M12 11h.01M16 11h.01"/>',
-  // ⚠️ BÁNH RĂNG VẼ LẠI CHO RA BÁNH RĂNG. Bản cũ chép kiểu "settings" có
-  //    tám cái tai bo tròn xoắn vào nhau — phóng to thì còn đoán được, thu
-  //    về 16-20px như trong thanh bên thì thành một CỤC TRÒN LỔN NHỔN.
-  //    Chủ dự án: "bánh răng hiện tại nhìn có ra cái bánh răng đâu".
-  //    Nay dựng đúng kiểu bánh răng máy: vành ngoài tròn + lỗ trục ở giữa +
-  //    tám cái răng thẳng chìa đều ra ngoài. Ở cỡ nhỏ mắt vẫn đếm được răng
-  //    nên nhận ra ngay.
-  //    ⚠️ Răng chỉ dài tới bán kính 9,5 (tâm 12): dài hơn thì với nét 1,7 và
-  //       đầu nét bo tròn là chạm mép khung 24, bị cắt cụt đầu răng.
-  'admin': '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.9"/><path d="M18.9 12h2.6M16.9 16.9l1.8 1.8M12 18.9v2.6M7.1 16.9l-1.8 1.8M5.1 12H2.5M7.1 7.1 5.3 5.3M12 5.1V2.5M16.9 7.1l1.8-1.8"/>',
+  // ⚠️ BÁNH RĂNG ĐẶC, KHÔNG PHẢI NÉT. Đã đi hai vòng:
+  //    · bản đầu chép kiểu "settings" tám cái tai bo tròn xoắn vào nhau —
+  //      thu về 16px thành một cục lổn nhổn;
+  //    · bản sau vẽ bằng nét (vành tròn + tám vạch) — rõ hơn nhưng vẫn mảnh.
+  //    Chủ dự án gửi ảnh mẫu và chốt kiểu ĐẶC. Hình dựng bằng công thức: 8
+  //    răng, chân ở bán kính 6,45, đỉnh 9,35, răng THON LẠI Ở ĐỈNH (nửa bề
+  //    rộng 0,275 ở chân → 0,155 ở đỉnh) đúng như răng máy thật; lỗ trục
+  //    khoét bằng fill-rule="evenodd".
+  //    ⚠️ Thẻ này tự khai fill và stroke, KHÔNG theo fill="none" của thẻ svg
+  //       bao ngoài — bỏ hai thuộc tính đó là bánh răng biến mất.
+  //    ⚠️ Đỉnh răng dừng ở 9,35: xa hơn là chạm mép khung 24, bị cắt cụt.
+  'admin': '<path fill="currentColor" stroke="none" fill-rule="evenodd" d="M10.25 5.79L10.56 2.76L13.44 2.76L13.75 5.79A6.45 6.45 0 0 1 15.15 6.37L17.51 4.45L19.55 6.49L17.63 8.85A6.45 6.45 0 0 1 18.21 10.25L21.24 10.56L21.24 13.44L18.21 13.75A6.45 6.45 0 0 1 17.63 15.15L19.55 17.51L17.51 19.55L15.15 17.63A6.45 6.45 0 0 1 13.75 18.21L13.44 21.24L10.56 21.24L10.25 18.21A6.45 6.45 0 0 1 8.85 17.63L6.49 19.55L4.45 17.51L6.37 15.15A6.45 6.45 0 0 1 5.79 13.75L2.76 13.44L2.76 10.56L5.79 10.25A6.45 6.45 0 0 1 6.37 8.85L4.45 6.49L6.49 4.45L8.85 6.37A6.45 6.45 0 0 1 10.25 5.79ZM12 8.85A3.15 3.15 0 1 0 12 15.15A3.15 3.15 0 1 0 12 8.85Z"/>',
   'consignments': '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/>',
   'invest-leads': '<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>',
   'map-ads': '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',

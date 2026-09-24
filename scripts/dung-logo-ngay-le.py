@@ -34,7 +34,7 @@ import math
 import os
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 CONG = os.path.join(GOC, 'apps', 'frontend', 'public')
@@ -131,7 +131,13 @@ def _ve_mat_co() -> bool:
 def co_to_quoc(d, m, x, y, rong, cao, nghieng=0.0):
     """Lá cờ đỏ sao vàng: nền đỏ, ngôi sao vàng năm cánh đặt chính giữa."""
     if _ve_phan_khac():          # cán cờ — thuộc phần ĐỨNG YÊN
-        d.rectangle([x - rong * 0.06, y - cao * 0.30, x - rong * 0.02, y + cao * 1.55], fill=m['kem'])
+        # ⚠️ CÁN NGẮN THÔI. Bản trước cán dài gần gấp đôi lá cờ (từ -0,30 đến
+        #    +1,55 lần chiều cao cờ). Khi cụm trang trí bị thu vào một khuôn
+        #    nhỏ thì cả cụm co theo CHIỀU CAO, nên lá cờ chỉ còn hơn nửa khuôn
+        #    mà cán chiếm hết phần còn lại — nhìn như lá cờ bị TUỘT lên đỉnh
+        #    một cây sào (chủ dự án: "cờ bị tuột à"). Nay cán chỉ nhô lên một
+        #    chút và thò xuống vừa phải, lá cờ chiếm gần hết khuôn.
+        d.rectangle([x - rong * 0.06, y - cao * 0.16, x - rong * 0.02, y + cao * 1.06], fill=m['kem'])
     if not _ve_mat_co():
         return
     b = cao * 0.10 * (1 + nghieng)          # mặt cờ hơi lượn cho đỡ cứng
@@ -733,21 +739,23 @@ def banh_rang(d, cx, cy, r, mau, lo):
 
 
 def bua_liem(d, cx, cy, r, mau):
-    """Búa và liềm trên cờ Đảng.
+    """Búa và liềm trên cờ Đảng — dựng theo ĐÚNG ảnh mẫu chủ dự án gửi.
 
-    ⚠️ BẢN TRƯỚC VẼ SAI (chủ dự án chụp ảnh báo 24/9/2026). Lưỡi liềm dựng
-       bằng d.arc() — một vành cung DÀY ĐỀU ôm gần kín vòng tròn — nên thu
-       nhỏ lại nhìn ra chữ "C" có gạch ngang, không ra cái liềm.
-       Lưỡi liềm thật là hình TRĂNG KHUYẾT: dày ở giữa lưng, vuốt NHỌN dần
-       về hai đầu mũi. Ở đây dựng đúng cách vẽ trăng khuyết — lấy phần thừa
-       ra giữa HAI ĐƯỜNG TRÒN LỆCH TÂM — nên về cỡ 32 điểm ảnh vẫn ra dáng.
-       Miệng liềm mở lên phía TRÊN–PHẢI, cái búa nằm gọn trong lòng miệng
-       đó, đúng bố cục búa liềm chuẩn.
+    Bố cục của mẫu (đừng đảo lại):
+      · LƯỠI LIỀM là vành trăng khuyết nằm bên PHẢI, miệng mở sang TRÁI;
+        mũi trên chĩa lên đỉnh, mũi dưới hạ xuống phía dưới–trái;
+      · CHUÔI LIỀM nối tiếp mũi dưới, là một thanh dày gập xuống dưới–trái;
+      · CÁI BÚA nằm chéo: đầu búa ở TRÊN–TRÁI, cán xuyên qua lòng liềm và
+        thò ra ở DƯỚI–PHẢI.
+
+    ⚠️ Hai bản trước đều sai: bản đầu vẽ liềm bằng d.arc() nên ra vành cung
+       dày đều, thu nhỏ nhìn thành chữ "C" có gạch ngang; bản sau vẽ được
+       trăng khuyết nhưng đặt ngược (miệng mở lên trên–phải, búa ở trên–phải).
     """
-    # ── LƯỠI LIỀM — vành trăng khuyết ──
-    R = r * 1.16                        # vòng ngoài của lưỡi
-    ri = R * 0.80                       # vòng trong (phần khoét đi)
-    ox, oy = R * 0.30, -R * 0.30        # lệch tâm về phía trên–phải
+    # ── LƯỠI LIỀM — vành trăng khuyết, miệng mở sang TRÁI ──
+    R = r * 0.96                        # vòng ngoài của lưỡi
+    ri = R * 0.78                       # vòng trong (phần khoét đi)
+    ox, oy = -R * 0.34, R * 0.04        # lệch tâm sang trái => lưng liềm ở bên phải
     kc = math.hypot(ox, oy)
     ux, uy = ox / kc, oy / kc
     a = (R * R - ri * ri + kc * kc) / (2 * kc)
@@ -758,13 +766,12 @@ def bua_liem(d, cx, cy, r, mau):
     xa = math.atan2(-uy, -ux)           # hướng lưng liềm (dày nhất)
 
     def _cung(tx, ty, bk, p1, p2):
-        """Các điểm trên cung tròn đi từ p1 sang p2, vòng qua phía lưng liềm."""
+        """Điểm trên cung tròn đi từ p1 sang p2, vòng qua phía lưng liềm."""
         quay = lambda t: t % (2 * math.pi)
         b1 = quay(math.atan2(p1[1] - ty, p1[0] - tx))
         b2 = quay(math.atan2(p2[1] - ty, p2[0] - tx))
-        bx = quay(xa)
         do_dai = quay(b2 - b1)
-        if quay(bx - b1) > do_dai:      # đi chiều kia mới qua lưng liềm
+        if quay(quay(xa) - b1) > do_dai:
             b1, b2 = b2, b1
             do_dai = quay(b2 - b1)
             dao = True
@@ -778,24 +785,25 @@ def bua_liem(d, cx, cy, r, mau):
     d.polygon(_cung(cx, cy, R, g1, g2) + _cung(cx + ox, cy + oy, ri, g1, g2)[::-1],
               fill=mau)
 
-    # ── CHUÔI LIỀM — nối ra từ đầu mũi phía DƯỚI–PHẢI ──
-    mui = g1 if (g1[0] + g1[1]) > (g2[0] + g2[1]) else g2
-    d.line([mui, (mui[0] + r * 0.34, mui[1] + r * 0.50)],
-           fill=mau, width=max(3, int(r * 0.24)))
+    # ── CHUÔI LIỀM — thanh dày gập xuống dưới–trái, nối từ mũi DƯỚI ──
+    mui = g1 if g1[1] > g2[1] else g2
+    day_c = max(3, int(r * 0.26))
+    goi = (mui[0] - r * 0.30, mui[1] + r * 0.26)
+    d.line([mui, goi], fill=mau, width=day_c)
+    d.line([goi, (goi[0] - r * 0.40, goi[1] - r * 0.02)], fill=mau, width=day_c)
 
-    # ── CÁI BÚA — cán chéo từ dưới–trái lên trên–phải, đầu búa khối đặc ──
-    dx, dy = 0.7071, -0.7071            # hướng chéo 45 độ lên phải
-    goc_x, goc_y = cx - R * 0.74, cy + R * 0.74          # chuôi cán
-    dau_x, dau_y = cx + R * 0.46, cy - R * 0.46          # chỗ gắn đầu búa
-    d.line([(goc_x, goc_y), (dau_x, dau_y)], fill=mau, width=max(4, int(r * 0.34)))
-    # đầu búa: khối chữ nhật vuông góc với cán
-    nx, ny = -dy, dx                    # pháp tuyến của cán
-    dai, day = R * 0.72, R * 0.36
+    # ── CÁI BÚA — đầu ở TRÊN–TRÁI, cán xuyên xuống DƯỚI–PHẢI ──
+    dx, dy = 0.7071, 0.7071             # hướng cán: chéo xuống phải
+    nx, ny = 0.7071, -0.7071            # vuông góc với cán
+    hx, hy = cx - R * 0.50, cy - R * 0.50           # tâm đầu búa
+    d.line([(hx, hy), (cx + R * 0.72, cy + R * 0.72)],
+           fill=mau, width=max(3, int(r * 0.24)))
+    dai, day = R * 0.52, R * 0.25       # nửa chiều dài / nửa bề dày đầu búa
     d.polygon([
-        (dau_x - nx * day - dx * dai * 0.18, dau_y - ny * day - dy * dai * 0.18),
-        (dau_x + nx * day - dx * dai * 0.18, dau_y + ny * day - dy * dai * 0.18),
-        (dau_x + nx * day + dx * dai, dau_y + ny * day + dy * dai),
-        (dau_x - nx * day + dx * dai, dau_y - ny * day + dy * dai),
+        (hx - nx * dai - dx * day, hy - ny * dai - dy * day),
+        (hx + nx * dai - dx * day, hy + ny * dai - dy * day),
+        (hx + nx * dai + dx * day, hy + ny * dai + dy * day),
+        (hx - nx * dai + dx * day, hy - ny * dai + dy * day),
     ], fill=mau)
 
 
@@ -1038,7 +1046,7 @@ def ve_lao_dong(d, m):
 def ve_dang(d, m):
     """3/2 Thành lập Đảng: cờ đỏ búa liềm."""
     if _ve_phan_khac():
-        d.rectangle([318, 8, 325, 140], fill=m['kem'])          # cán cờ
+        d.rectangle([318, 8, 325, 106], fill=m['kem'])          # cán cờ (ngắn, xem co_to_quoc)
     if not _ve_mat_co():
         return
     d.polygon([(325, 16), (434, 8), (434, 86), (325, 94)], fill=m['do'])
@@ -1286,6 +1294,7 @@ def lam(nen_toi: bool):
     goc = Image.new('RGBA', (RONG_LE, O_VUONG), (0, 0, 0, 0))
     goc.alpha_composite(o, (0, 0))
 
+    mau_o = _mau_nen_o(o)
     m = MAU_NEN_TOI if nen_toi else MAU_NEN_SANG
     ra = {}
     for ma, _ten, ve in DIP:
@@ -1312,11 +1321,52 @@ def lam(nen_toi: bool):
         #    cả cụm thì mũ bay sang bên cạnh, hết ra ông già Noel.
         if ma != 'noel':
             tt, co = _xep_lai(tt, co)
+        # Trang trí đè lên ô vuông thì XOÁ SỢI VIỀN VÀNG ở đúng chỗ bị đè
+        # (chủ dự án dặn). Không đụng gì khi trang trí nằm ngoài ô vuông.
+        nen = _khoet_vien(nen, tt, co, mau_o)
         anh = nen.copy()
         anh.alpha_composite(tt)
         if co is not None:
             anh.alpha_composite(co)
         ra[ma] = (anh, nen, tt, co)
+    return ra
+
+
+def _mau_nen_o(o: Image.Image):
+    """Màu nền của ô vuông logo — navy ở bản nền tối, trắng ở bản nền sáng.
+
+    Lấy màu ĐẶC xuất hiện nhiều nhất trong ô vuông chứ không ghi cứng, để đổi
+    tệp logo khác màu thì chỗ này tự theo.
+    """
+    dem = {}
+    px = o.load()
+    for y in range(0, o.height, 3):
+        for x in range(0, o.width, 3):
+            r, g, b, a = px[x, y]
+            if a > 250:
+                dem[(r, g, b)] = dem.get((r, g, b), 0) + 1
+    return max(dem, key=dem.get) if dem else (10, 37, 64)
+
+
+def _khoet_vien(nen: Image.Image, tt: Image.Image, co: Image.Image | None, mau):
+    """Xoá SỢI VIỀN VÀNG của ô vuông ở đúng chỗ trang trí đè lên.
+
+    Chủ dự án: "những chỗ trang trí đè thì xoá phần viền vàng chỗ đó đi".
+    Để nguyên thì sợi viền vàng chui qua sau hình trang trí, chỗ hình mỏng nó
+    lại ló ra — nhìn rối, mà ở cỡ 32 điểm ảnh thì thành một vệt vàng lem.
+
+    ⚠️ KHÔNG khoét thủng ô vuông. Chỉ đổi chỗ bị đè về đúng MÀU NỀN của ô,
+       còn hình dáng bo tròn giữ y nguyên (lấy lại lớp trong suốt của ảnh gốc).
+       Khoét thủng thì nhìn xuyên qua thấy màu thanh menu, ô vuông bị mẻ góc.
+    """
+    gop = tt.copy()
+    if co is not None:
+        gop.alpha_composite(co)
+    mat_na = gop.split()[3].point(lambda v: 255 if v > 40 else 0)
+    mat_na = mat_na.filter(ImageFilter.MaxFilter(9))   # nới ra ~4 điểm cho hở đều
+    ra = nen.copy()
+    ra.paste(Image.new('RGBA', ra.size, tuple(mau) + (255,)), (0, 0), mat_na)
+    ra.putalpha(nen.split()[3])                        # giữ nguyên dáng bo tròn
     return ra
 
 

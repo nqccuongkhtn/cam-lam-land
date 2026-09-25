@@ -1277,7 +1277,11 @@ def ve_sen(d, m, lop=None):
     #    tấm hình, nên hình nằm SÁT mép phải ô vuông thay vì bị đẩy ra giữa
     #    khuôn — xem HOP_RIENG['sen'].
     if lop is not None:
-        dan_chan_dung(lop, 380, 90, 148, m['do'], vien=m['net'])   # 90: cho hở mép trên
+        # ⚠️ BỎ VIỀN + PHA ĐỎ NHẠT BỚT 22% (25/9/2026, chủ dự án: "bác hồ hơi
+        #    đậm quá"). Viền màu nét ôm quanh từng nét khắc làm cả khối đặc
+        #    lại — lần trước mới làm mảnh viền, vẫn chưa đủ.
+        do_nhat = tuple(round(c + (255 - c) * 0.22) for c in m['do'][:3])
+        dan_chan_dung(lop, 380, 90, 148, do_nhat)   # 90: cho hở mép trên
 
 def ve_nen(d, m):
     """27/7 Thương binh Liệt sĩ: ngôi sao vàng và tấm băng đỏ "Tổ quốc ghi công".

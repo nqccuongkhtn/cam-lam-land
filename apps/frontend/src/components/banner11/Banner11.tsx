@@ -235,6 +235,8 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
   const henRa = useRef<number>(0);
   const henNut = useRef<number>(0);
   const [coChamTay, setCoChamTay] = useState(false);
+  /** Chỗ đặt ngón tay lúc bắt đầu vuốt banner. */
+  const diemCham = useRef<{ x: number; y: number } | null>(null);
   useEffect(() => {
     /* Máy cảm ứng không có chuột nên không bao giờ có sự kiện rê chuột →
        phải cho hiện sẵn, nếu không người dùng điện thoại không đổi mẫu được. */
@@ -549,6 +551,17 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
       <div
         className="relative mx-auto w-full max-w-[1920px] overflow-hidden"
         onPointerMove={reChuot}
+        /* VUỐT NGANG để đổi mẫu (máy cảm ứng). Chỉ tính khi vuốt ĐỦ XA (>40px)
+           và NGANG nhiều hơn DỌC — vuốt dọc là người dùng đang cuộn trang,
+           không được đổi mẫu. */
+        onTouchStart={(e) => { const t = e.touches[0]; diemCham.current = { x: t.clientX, y: t.clientY }; }}
+        onTouchEnd={(e) => {
+          const d = diemCham.current; diemCham.current = null;
+          if (!d) return;
+          const t = e.changedTouches[0];
+          const dx = t.clientX - d.x, dy = t.clientY - d.y;
+          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) sang(chiSo + (dx < 0 ? 1 : -1));
+        }}
         onPointerLeave={() => { treNut.current = false; clearTimeout(henNut.current); setHienNut(false); }}
       >
         {/* ── HAI MẪU CÙNG CÓ MẶT LÚC ĐANG LƯỚT ─────────────────────────────
@@ -597,9 +610,16 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
             onPointerEnter={vaoNut}
             onPointerLeave={roiNut}
             aria-label={huong === -1 ? 'Mẫu trước' : 'Mẫu sau'}
-            className={`absolute top-1/2 z-30 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-black/30 text-lg text-white/90 backdrop-blur transition-opacity duration-300 hover:bg-black/55 hover:text-white ${ben === 'trai' ? 'left-2' : 'right-2'} ${hienNut || coChamTay ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+            /* max-[760px]:hidden — điện thoại bỏ hai mũi tên (che nút của mẫu),
+               thay bằng vuốt ngang + hàng chấm ở dưới. */
+            className={`absolute top-1/2 z-30 grid h-9 w-9 -translate-y-1/2 max-[760px]:hidden place-items-center rounded-full bg-black/30 text-lg text-white/90 backdrop-blur transition-opacity duration-300 hover:bg-black/55 hover:text-white ${ben === 'trai' ? 'left-2' : 'right-2'} ${hienNut || coChamTay ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
           >{dau as string}</button>
         ))}
+
+        {/* Hàng chấm cho điện thoại: đang ở mẫu nào (ẩn ở màn rộng, xem CSS). */}
+        <div aria-hidden className="cl-b11-cham">
+          {MAU_BANNER.map((_, i) => <i key={i} className={i === chiSo ? 'dang' : ''} />)}
+        </div>
 
         {/* Vệt tối mép dưới cho chữ trong ô tìm kiếm nổi lên khỏi ảnh. */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-20 hidden h-40 bg-gradient-to-t from-black/55 via-black/20 to-transparent md:block" />

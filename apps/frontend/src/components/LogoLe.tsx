@@ -124,7 +124,10 @@ export default function LogoLe({
       {/* Giáng sinh: ông già Noel cưỡi xe tuần lộc chạy ngang qua, 2 phút một
           lần, hiện ra một chỗ rồi biến mất ở chỗ khác như chui qua cửa không
           gian (chủ dự án mô tả đúng như vậy). */}
-      {ma === 'noel' && <b className="cl-noel-xe" aria-hidden />}
+      {/* ⚠️ Ảnh xe gắn số phiên bản NGAY TẠI ĐÂY (globals.css không đọc được
+          số đó) — không có thì Cloudflare cứ phát xe cũ (đã vấp 25/9/2026). */}
+      {ma === 'noel' && <b className="cl-noel-xe" aria-hidden
+        style={{ backgroundImage: `url(${anh('noel-xe')})` }} />}
       {!TRANG_NGHIEM.has(ma) && (<><i aria-hidden /><i aria-hidden /><i aria-hidden /></>)}
       {CO_PHAO.has(ma) && <PhaoBong />}
     </span>

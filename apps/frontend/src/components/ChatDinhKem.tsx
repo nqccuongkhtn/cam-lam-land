@@ -118,7 +118,7 @@ export default function ChatDinhKem({ fileId, fileName, fileMime, fileSize, mine
         <p className={`text-[11px] ${mine ? 'text-white/60' : 'text-slate-400'}`}>{coChu(fileSize) || 'PDF'}</p>
         <div className="flex gap-1.5 mt-1.5">
           <button onClick={() => moTep(false)} disabled={dangTai}
-            className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition disabled:opacity-50 ${mine ? 'bg-white/20 hover:bg-white/30 text-white' : 'bg-[#0B4045] hover:bg-[#0e5157] text-white'}`}>{dangTai ? 'Đang mở…' : 'Mở'}</button>
+            className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition disabled:opacity-50 ${mine ? 'bg-white/20 hover:bg-white/30 text-white' : 'bg-[#0A2540] hover:bg-[#0d2f54] text-white'}`}>{dangTai ? 'Đang mở…' : 'Mở'}</button>
           <button onClick={() => moTep(true)} disabled={dangTai}
             className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition disabled:opacity-50 ${mine ? 'bg-white/10 hover:bg-white/20 text-white/90' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'}`}>⬇ Tải về</button>
         </div>

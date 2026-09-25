@@ -89,7 +89,7 @@ export default function PdfEditorPage() {
       {tool === 'edit' && pages.length > 0 && <div className="bg-amber-50 px-3 py-1 text-center text-xs text-amber-700">Chế độ <b>Sửa chữ</b> — bấm thẳng vào chữ cần sửa rồi gõ. <b>Chỉ chữ bạn thay đổi</b> mới được cập nhật, phần còn lại giữ nguyên 100% bản gốc. Cuộn xem mọi trang.</div>}
       {!pages.length ? (
         <div onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) addFile(f, false); }} className="m-auto flex w-[92%] max-w-xl flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-white p-16 text-center">
-          <div className="text-5xl">📄</div><p className="text-lg font-bold text-[#0B4045]">Kéo thả PDF vào đây, hoặc bấm “Mở PDF”</p>
+          <div className="text-5xl">📄</div><p className="text-lg font-bold text-[#0A2540]">Kéo thả PDF vào đây, hoặc bấm “Mở PDF”</p>
           <p className="text-sm text-slate-500">Trang giữ nguyên như gốc; sửa đúng ô bạn bấm, thêm chữ/ảnh/chữ ký, bôi trắng, vẽ. Nút 🧰 Công cụ: ảnh↔PDF, đánh số, dấu mờ, nén… Cuộn xem mọi trang.</p>
           <button onClick={() => fileRef.current?.click()} className="mt-2 rounded-lg bg-red-600 px-6 py-2.5 font-bold text-white">Mở PDF</button>
         </div>
@@ -105,7 +105,7 @@ export default function PdfEditorPage() {
                 onDragEnd={() => { thumbDrag.current = null; setThumbOver(null); }}
                 onDrop={() => { if (thumbDrag.current != null) { moveThumb(thumbDrag.current, i); thumbDrag.current = null; } setThumbOver(null); }}
                 onClick={() => pageEls.current[pg.id]?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                className={`group relative mb-2 cursor-move rounded border-2 ${thumbOver === i ? 'border-emerald-500' : 'border-transparent hover:border-[#0B4045]'}`}>
+                className={`group relative mb-2 cursor-move rounded border-2 ${thumbOver === i ? 'border-emerald-500' : 'border-transparent hover:border-[#0A2540]'}`}>
                 {thumbs[pg.id] ? <img src={thumbs[pg.id]} alt="" className="w-full rounded" /> : <div className="grid h-24 place-items-center bg-slate-100 text-xs text-slate-400">…</div>}
                 <span className="absolute left-1 top-1 rounded bg-black/60 px-1 text-[10px] text-white">{i + 1}</span>
                 <div className="cl-pdf-thumb-actions absolute right-1 top-1 flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
@@ -138,7 +138,7 @@ export default function PdfEditorPage() {
           </div>
         </div>
       )}
-      {busy && <div className="fixed inset-0 z-50 grid place-items-center bg-black/30 text-white"><div className="rounded-lg bg-[#0B4045] px-6 py-3 font-semibold">{busy}</div></div>}
+      {busy && <div className="fixed inset-0 z-50 grid place-items-center bg-black/30 text-white"><div className="rounded-lg bg-[#0A2540] px-6 py-3 font-semibold">{busy}</div></div>}
       {xemTo !== null && (
         <XemTo pages={pages} index={xemTo} docs={docs.current} onRotate={rotate} onClose={() => setXemTo(null)} />
       )}

@@ -39,12 +39,12 @@ export const metadata: Metadata = {
      (lấy 8 ký tự đầu md5 của apple-180.png) và số trong manifest.webmanifest. */
   icons: { icon: '/icons/icon-192.png?v=c5b77735', shortcut: '/icons/icon-192.png?v=c5b77735', apple: '/icons/apple-180.png?v=f6114d8f' },
 };
-export const viewport: Viewport = { themeColor: '#0B4045', viewportFit: 'cover' };
+export const viewport: Viewport = { themeColor: '#0A2540', viewportFit: 'cover' };
 
 // CSS splash NHÚNG THẲNG vào <head> — không chờ tải globals.css → phủ navy + splash ngay khung hình đầu (hết màn đen).
 const SPLASH_CSS = `
-html.pwa-app{background:#0B4045}
-#app-splash{display:none;position:fixed;inset:0;z-index:99999;background:#0B4045;flex-direction:column;align-items:center;justify-content:center;opacity:1;transition:opacity .55s ease}
+html.pwa-app{background:#0A2540}
+#app-splash{display:none;position:fixed;inset:0;z-index:99999;background:#0A2540;flex-direction:column;align-items:center;justify-content:center;opacity:1;transition:opacity .55s ease}
 @media (display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui){#app-splash{display:flex}}
 html.pwa-app #app-splash{display:flex}
 #app-splash.is-hide{opacity:0;pointer-events:none}

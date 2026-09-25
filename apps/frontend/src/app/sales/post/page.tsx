@@ -81,7 +81,7 @@ export default function PostListing() {
 
   if (loading || !user) return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
 
-  const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:border-[#0B4045] outline-none';
+  const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:border-[#0A2540] outline-none';
   const lbl = 'block text-sm font-semibold text-slate-700 mb-1';
   async function aiDescribe() {
     setAiBusy(true);
@@ -101,24 +101,24 @@ export default function PostListing() {
     <div className="bg-slate-50 min-h-[calc(100dvh-56px)] py-5 sm:py-8">
       <form onSubmit={submit} className="mx-auto max-w-3xl px-3 sm:px-4 space-y-4 sm:space-y-5">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0B4045]">Đăng tin bất động sản</h1>
-          <Link href="/sales" className="text-sm font-semibold text-slate-500 hover:text-[#0B4045]">← Tin của tôi</Link>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540]">Đăng tin bất động sản</h1>
+          <Link href="/sales" className="text-sm font-semibold text-slate-500 hover:text-[#0A2540]">← Tin của tôi</Link>
         </div>
 
         {flags.services_live && (
-        <Link href="/dichvu" className="block bg-gradient-to-r from-[#0B4045] to-[#10355f] text-white rounded-2xl p-4 hover:brightness-110 transition">
+        <Link href="/dichvu" className="block bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white rounded-2xl p-4 hover:brightness-110 transition">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="font-bold">🚀 Đăng nhiều tin hơn & đẩy tin lên VIP</p>
               <p className="text-sm text-slate-300 mt-0.5">Miễn phí 1 tin/tháng — mua gói để đăng thêm và làm nổi bật tin.</p>
             </div>
-            <span className="bg-[#C8A14B] text-[#0B4045] font-bold px-4 py-2 rounded-xl whitespace-nowrap shrink-0">Xem bảng giá →</span>
+            <span className="bg-[#C8A14B] text-[#0A2540] font-bold px-4 py-2 rounded-xl whitespace-nowrap shrink-0">Xem bảng giá →</span>
           </div>
         </Link>
         )}
 
         <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
-          <h2 className="font-bold text-[#0B4045]">Thông tin chính</h2>
+          <h2 className="font-bold text-[#0A2540]">Thông tin chính</h2>
           <div>
             <label className={lbl}>Nhu cầu *</label>
             <div className="inline-flex rounded-xl border border-slate-300 overflow-hidden">
@@ -145,7 +145,7 @@ export default function PostListing() {
         </section>
 
         <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
-          <h2 className="font-bold text-[#0B4045]">Chi tiết</h2>
+          <h2 className="font-bold text-[#0A2540]">Chi tiết</h2>
           <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
             <div><label className={lbl}>Phòng ngủ</label><input className={inp} type="number" min="0" value={f.bedrooms} onChange={(e) => set('bedrooms', e.target.value)} /></div>
             <div><label className={lbl}>Phòng tắm</label><input className={inp} type="number" min="0" value={f.bathrooms} onChange={(e) => set('bathrooms', e.target.value)} /></div>
@@ -155,7 +155,7 @@ export default function PostListing() {
         </section>
 
         <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
-          <h2 className="font-bold text-[#0B4045]">Vị trí</h2>
+          <h2 className="font-bold text-[#0A2540]">Vị trí</h2>
           <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
             <div><label className={lbl}>Xã / Phường</label><select className={inp} value={f.ward} onChange={(e) => set('ward', e.target.value)}><option value="">— Chọn xã —</option><optgroup label="Xã hiện nay (sau sáp nhập)">{WARDS_NEW.map((w) => <option key={w} value={w}>{w}</option>)}</optgroup><optgroup label="Xã/thị trấn cũ">{WARDS_OLD.map((w) => <option key={w} value={w}>{w}</option>)}</optgroup></select></div>
             <div><label className={lbl}>Địa chỉ cụ thể</label><input className={inp} value={f.address} onChange={(e) => set('address', e.target.value)} placeholder="Đường, thôn…" /></div>
@@ -172,7 +172,7 @@ export default function PostListing() {
         </section>
 
         <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-3">
-          <h2 className="font-bold text-[#0B4045]">Hình ảnh</h2>
+          <h2 className="font-bold text-[#0A2540]">Hình ảnh</h2>
           <label className="flex items-center justify-center gap-2 border-2 border-dashed border-slate-300 rounded-xl py-5 sm:py-6 cursor-pointer hover:border-[#C8A14B] text-sm text-slate-500 font-semibold">
             <input type="file" accept="image/*" multiple onChange={onFiles} className="hidden" />
             {uploading ? 'Đang tải ảnh…' : '＋ Chọn ảnh từ máy (tải lên trực tiếp)'}
@@ -192,15 +192,15 @@ export default function PostListing() {
 
         <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="font-bold text-[#0B4045]">Mô tả & liên hệ</h2>
-            <button type="button" onClick={aiDescribe} disabled={aiBusy} className="text-xs font-bold text-[#0B4045] bg-[#C8A14B]/20 hover:bg-[#C8A14B]/30 border border-[#C8A14B]/40 rounded-lg px-3 py-1.5 disabled:opacity-60 whitespace-nowrap">{aiBusy ? 'Đang viết…' : '✨ AI viết mô tả'}</button>
+            <h2 className="font-bold text-[#0A2540]">Mô tả & liên hệ</h2>
+            <button type="button" onClick={aiDescribe} disabled={aiBusy} className="text-xs font-bold text-[#0A2540] bg-[#C8A14B]/20 hover:bg-[#C8A14B]/30 border border-[#C8A14B]/40 rounded-lg px-3 py-1.5 disabled:opacity-60 whitespace-nowrap">{aiBusy ? 'Đang viết…' : '✨ AI viết mô tả'}</button>
           </div>
           <textarea className={`${inp} min-h-[120px]`} value={f.description} onChange={(e) => set('description', e.target.value)} placeholder="Mô tả chi tiết bất động sản…" />
           <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
             <div><label className={lbl}>Tên liên hệ</label><input className={`${inp} bg-slate-100 text-slate-500 cursor-not-allowed`} value={user?.fullName || user?.email || ''} readOnly title="Tên liên hệ lấy theo tài khoản, không sửa được" /><p className="text-[11px] text-slate-400 mt-1">Theo tên tài khoản của bạn.</p></div>
             <div><label className={lbl}>SĐT liên hệ</label>
               <div className={`${inp} bg-slate-50 text-slate-600 flex items-center`}>{user.phone || 'Chưa có SĐT trong tài khoản'}</div>
-              <p className="text-xs text-slate-400 mt-1">Tự dùng SĐT của tài khoản. Đổi tại <Link href="/account" className="text-[#0B4045] font-semibold">Tài khoản</Link>.</p>
+              <p className="text-xs text-slate-400 mt-1">Tự dùng SĐT của tài khoản. Đổi tại <Link href="/account" className="text-[#0A2540] font-semibold">Tài khoản</Link>.</p>
             </div>
           </div>
         </section>

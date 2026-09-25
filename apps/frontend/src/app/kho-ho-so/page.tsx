@@ -13,7 +13,7 @@ export default function KhoHoSoChuyenHuong() {
   return (
     <main className="mx-auto max-w-xl px-4 py-16 text-center">
       <p className="text-sm text-slate-500">Kho danh mục hồ sơ đã chuyển vào trang <b>Lập danh mục hồ sơ</b>. Đang đưa bạn sang…</p>
-      <a href="/lap-danh-muc?tab=kho" className="mt-3 inline-block rounded-lg px-4 py-2 text-sm font-bold text-white" style={{ background: '#0B4045' }}>Bấm vào đây nếu chờ lâu</a>
+      <a href="/lap-danh-muc?tab=kho" className="mt-3 inline-block rounded-lg px-4 py-2 text-sm font-bold text-white" style={{ background: '#0A2540' }}>Bấm vào đây nếu chờ lâu</a>
     </main>
   );
 }

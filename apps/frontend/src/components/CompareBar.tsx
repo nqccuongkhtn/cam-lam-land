@@ -44,7 +44,7 @@ export default function CompareBar() {
               </div>
             ))}
           </div>
-          <button onClick={() => setOpen(true)} className="cl-press bg-[#0B4045] hover:bg-[#0e5157] text-white font-bold text-sm px-4 py-2.5 rounded-xl whitespace-nowrap shrink-0">So sánh ({items.length})</button>
+          <button onClick={() => setOpen(true)} className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold text-sm px-4 py-2.5 rounded-xl whitespace-nowrap shrink-0">So sánh ({items.length})</button>
           <button onClick={clearCompare} className="text-slate-400 hover:text-red-600 text-sm px-2 shrink-0">Xoá</button>
         </div>
       </div>
@@ -54,7 +54,7 @@ export default function CompareBar() {
           <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
           <div className="relative bg-white w-full max-w-3xl rounded-2xl shadow-2xl max-h-[92vh] overflow-auto scroll-soft">
             <div className="sticky top-0 bg-white px-5 py-3 border-b border-slate-100 flex items-center justify-between z-10">
-              <h3 className="font-extrabold text-[#0B4045]">So sánh bất động sản ({items.length})</h3>
+              <h3 className="font-extrabold text-[#0A2540]">So sánh bất động sản ({items.length})</h3>
               <button onClick={() => setOpen(false)} aria-label="Đóng" className="text-slate-400 hover:text-slate-700 text-2xl leading-none">×</button>
             </div>
             <div className="p-3 overflow-x-auto">
@@ -67,7 +67,7 @@ export default function CompareBar() {
                         <Link href={`/listings/${l.id}`} className="block group">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={l.images?.[0] ?? NO_IMG} alt="" loading="lazy" decoding="async" className="w-full h-20 object-cover rounded-lg mb-1" />
-                          <span className="font-semibold text-[#0B4045] line-clamp-2 text-xs leading-snug group-hover:text-red-700">{l.title}</span>
+                          <span className="font-semibold text-[#0A2540] line-clamp-2 text-xs leading-snug group-hover:text-red-700">{l.title}</span>
                         </Link>
                       </th>
                     ))}

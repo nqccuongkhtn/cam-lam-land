@@ -22,14 +22,14 @@ export default function AreaMap({ center, zoom = 12.5, points = [], moreHref, ti
   // Không set tier → hiện dạng PIN GIÁ luôn thấy (đẹp cho bản xem trước khu vực).
   const markers: MarkerSpec[] = points.map((p) => ({
     lng: p.lng, lat: p.lat, label: p.label,
-    popupHtml: `<a href="/listings/${p.id}" style="font-weight:700;color:#0B4045">${esc(p.title)}</a><br/><b style="color:#dc2626">${esc(p.label)}</b>`,
+    popupHtml: `<a href="/listings/${p.id}" style="font-weight:700;color:#0A2540">${esc(p.title)}</a><br/><b style="color:#dc2626">${esc(p.label)}</b>`,
   }));
   return (
     <div ref={ref} className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-100" style={{ height: 300 }}>
       {show
         ? <MapView center={center} zoom={zoom} markers={markers} className="w-full h-full" />
         : <div className="w-full h-full grid place-items-center text-slate-400 text-sm">🗺️ {title || 'Bản đồ khu vực'}</div>}
-      {moreHref && <Link href={moreHref} className="absolute z-[5] bottom-3 right-3 bg-[#0B4045] text-white text-[12px] font-bold px-3 py-1.5 rounded-lg shadow-lg">Mở bản đồ đầy đủ →</Link>}
+      {moreHref && <Link href={moreHref} className="absolute z-[5] bottom-3 right-3 bg-[#0A2540] text-white text-[12px] font-bold px-3 py-1.5 rounded-lg shadow-lg">Mở bản đồ đầy đủ →</Link>}
     </div>
   );
 }

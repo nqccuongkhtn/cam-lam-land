@@ -10,10 +10,10 @@ import { getToken } from '@/lib/token';
 import { toast } from '@/lib/toast';
 import KhoDanhMuc from '@/components/KhoDanhMuc';
 
-const NAVY = '#0B4045', GOLD = '#C8A14B';
+const NAVY = '#0A2540', GOLD = '#C8A14B';
 const fmt = (n: number) => (n || 0).toLocaleString('vi-VN') + 'đ';
 // Nút của thanh chuyển tab — nút đang chọn nền trắng nổi lên, giống trang Tra cứu số tờ bản đồ.
-const nutTab = (on: boolean) => `flex-1 rounded-md px-2 py-2 text-[12px] sm:text-sm font-bold transition ${on ? 'bg-white text-[#0B4045] shadow-sm' : 'text-slate-500 hover:text-[#0B4045]'}`;
+const nutTab = (on: boolean) => `flex-1 rounded-md px-2 py-2 text-[12px] sm:text-sm font-bold transition ${on ? 'bg-white text-[#0A2540] shadow-sm' : 'text-slate-500 hover:text-[#0A2540]'}`;
 const authHead = () => ({ Authorization: `Bearer ${getToken() || ''}` });
 
 // Một "bộ hồ sơ" = 1 tệp PDF khách mang tới.

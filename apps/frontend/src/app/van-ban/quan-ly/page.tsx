@@ -116,7 +116,7 @@ export default function QuanLyVanBan() {
   if (!canManage) return (
     <div className="mx-auto max-w-lg px-4 py-16 text-center">
       <div className="text-4xl mb-3">🔒</div>
-      <p className="font-extrabold text-[#0B4045] text-lg">Chỉ dành cho người quản lý văn bản</p>
+      <p className="font-extrabold text-[#0A2540] text-lg">Chỉ dành cho người quản lý văn bản</p>
       <p className="text-sm text-slate-500 mt-1.5">Trang này chỉ dành cho tài khoản có quyền <b>Quản lý văn bản</b> hoặc <b>Quản trị</b>.</p>
       {!user && <button onClick={() => openLogin()} className="mt-5 bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-lg">Đăng nhập</button>}
       <div className="mt-4"><Link href="/van-ban" className="text-[#C8A14B] font-semibold">← Về trang tra cứu văn bản</Link></div>
@@ -138,20 +138,20 @@ export default function QuanLyVanBan() {
     <div className="mx-auto max-w-6xl px-3 sm:px-6 py-5 sm:py-8">
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0B4045]">Quản lý văn bản</h1>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540]">Quản lý văn bản</h1>
           <p className="text-sm text-slate-500 mt-1">Thêm, sửa, xoá văn bản và link tải. <Link href="/van-ban" className="text-[#C8A14B] font-semibold">Xem trang tra cứu →</Link></p>
         </div>
         <div className="flex gap-2">
-          <button onClick={sync} disabled={busy} className="border border-slate-300 text-[#0B4045] font-semibold px-4 py-2.5 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50">🔄 Đồng bộ Công báo</button>
-          <button onClick={() => { setForm({ ...empty }); setMsg(''); }} className="bg-[#0B4045] hover:bg-[#10585e] text-white font-bold px-4 py-2.5 rounded-lg text-sm">＋ Thêm văn bản</button>
+          <button onClick={sync} disabled={busy} className="border border-slate-300 text-[#0A2540] font-semibold px-4 py-2.5 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50">🔄 Đồng bộ Công báo</button>
+          <button onClick={() => { setForm({ ...empty }); setMsg(''); }} className="bg-[#0A2540] hover:bg-[#0d3a6b] text-white font-bold px-4 py-2.5 rounded-lg text-sm">＋ Thêm văn bản</button>
         </div>
       </div>
 
-      {msg && <div className="mt-4 text-sm font-semibold text-[#0B4045] bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">{msg}</div>}
+      {msg && <div className="mt-4 text-sm font-semibold text-[#0A2540] bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">{msg}</div>}
 
       {form && (
         <div className="mt-4 bg-white border border-slate-200 rounded-2xl p-4 sm:p-5">
-          <p className="font-bold text-[#0B4045] mb-3">{form.id ? 'Sửa văn bản' : 'Thêm văn bản mới'}</p>
+          <p className="font-bold text-[#0A2540] mb-3">{form.id ? 'Sửa văn bản' : 'Thêm văn bản mới'}</p>
           <div className="grid sm:grid-cols-2 gap-3">
             <label className="text-sm">Số ký hiệu<input className={inp} value={form.soKyHieu} onChange={(e) => F('soKyHieu', e.target.value)} placeholder="VD: 893/QĐ-UBND" /></label>
             <label className="text-sm">Ngày ban hành<input type="date" className={inp} value={form.ngay} onChange={(e) => F('ngay', e.target.value)} /></label>
@@ -165,7 +165,7 @@ export default function QuanLyVanBan() {
             <label className="text-sm flex items-center gap-2 mt-6"><input type="checkbox" checked={form.noiBat} onChange={(e) => F('noiBat', e.target.checked)} /> Văn bản nổi bật</label>
           </div>
           <div className="flex gap-2 mt-4">
-            <button disabled={busy} onClick={save} className="bg-[#C8A14B] hover:bg-[#b8923f] text-[#0B4045] font-bold px-5 py-2.5 rounded-lg text-sm disabled:opacity-50">{busy ? 'Đang lưu…' : 'Lưu'}</button>
+            <button disabled={busy} onClick={save} className="bg-[#C8A14B] hover:bg-[#b8923f] text-[#0A2540] font-bold px-5 py-2.5 rounded-lg text-sm disabled:opacity-50">{busy ? 'Đang lưu…' : 'Lưu'}</button>
             <button onClick={() => setForm(null)} className="border border-slate-300 text-slate-600 font-semibold px-4 py-2.5 rounded-lg text-sm">Huỷ</button>
           </div>
         </div>
@@ -175,7 +175,7 @@ export default function QuanLyVanBan() {
         <button onClick={() => { setChuDe('all'); reset(); }}
           className={`text-left rounded-2xl border p-3 sm:p-4 transition ${chuDe === 'all' ? 'border-[#C8A14B] bg-[#C8A14B]/10 ring-1 ring-[#C8A14B]/30' : 'border-slate-200 bg-white hover:border-[#C8A14B] hover:shadow-sm'}`}>
           <div className="text-2xl leading-none">🗂️</div>
-          <div className="font-bold text-[#0B4045] mt-2 leading-tight">Văn bản chung</div>
+          <div className="font-bold text-[#0A2540] mt-2 leading-tight">Văn bản chung</div>
           <div className="text-[12px] text-slate-500 mt-1 leading-snug">Tất cả văn bản đất đai & dự án — tỉnh và cả nước</div>
           <div className="text-[11px] font-semibold text-[#C8A14B] mt-2">{(docs || []).length} văn bản →</div>
         </button>
@@ -185,7 +185,7 @@ export default function QuanLyVanBan() {
             <button key={c} onClick={() => { setChuDe(on ? 'all' : c); reset(); }}
               className={`text-left rounded-2xl border p-3 sm:p-4 transition ${on ? 'border-[#C8A14B] bg-[#C8A14B]/10 ring-1 ring-[#C8A14B]/30' : 'border-slate-200 bg-white hover:border-[#C8A14B] hover:shadow-sm'}`}>
               <div className="text-2xl leading-none">{CHUDE_META[c].icon}</div>
-              <div className="font-bold text-[#0B4045] mt-2 leading-tight">{c}</div>
+              <div className="font-bold text-[#0A2540] mt-2 leading-tight">{c}</div>
               <div className="text-[12px] text-slate-500 mt-1 leading-snug">{CHUDE_META[c].desc}</div>
               <div className="text-[11px] font-semibold text-[#C8A14B] mt-2">{COUNT(c)} văn bản →</div>
             </button>
@@ -212,11 +212,11 @@ export default function QuanLyVanBan() {
       </div>
 
       <div className="flex items-center justify-between gap-3 mt-4 mb-3">
-        <p className="text-sm text-slate-500"><b className="text-[#0B4045]">{filtered.length}</b> văn bản{chuDe !== 'all' ? ` · ${chuDe}` : ''}</p>
+        <p className="text-sm text-slate-500"><b className="text-[#0A2540]">{filtered.length}</b> văn bản{chuDe !== 'all' ? ` · ${chuDe}` : ''}</p>
         <div className="flex items-center gap-1 text-[13px]">
           <span className="text-slate-400 hidden sm:inline">Sắp xếp:</span>
-          <button onClick={() => { setSort('moi'); reset(); }} className={`px-2.5 py-1 rounded-lg font-semibold ${sort === 'moi' ? 'bg-slate-100 text-[#0B4045]' : 'text-slate-400 hover:text-[#0B4045]'}`}>Mới nhất</button>
-          <button onClick={() => { setSort('tai'); reset(); }} className={`px-2.5 py-1 rounded-lg font-semibold ${sort === 'tai' ? 'bg-slate-100 text-[#0B4045]' : 'text-slate-400 hover:text-[#0B4045]'}`}>Tải nhiều</button>
+          <button onClick={() => { setSort('moi'); reset(); }} className={`px-2.5 py-1 rounded-lg font-semibold ${sort === 'moi' ? 'bg-slate-100 text-[#0A2540]' : 'text-slate-400 hover:text-[#0A2540]'}`}>Mới nhất</button>
+          <button onClick={() => { setSort('tai'); reset(); }} className={`px-2.5 py-1 rounded-lg font-semibold ${sort === 'tai' ? 'bg-slate-100 text-[#0A2540]' : 'text-slate-400 hover:text-[#0A2540]'}`}>Tải nhiều</button>
         </div>
       </div>
 
@@ -232,7 +232,7 @@ export default function QuanLyVanBan() {
         <div className="overflow-x-auto border border-slate-200 rounded-2xl">
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="bg-[#0B4045] text-white">
+              <tr className="bg-[#0A2540] text-white">
                 <th className={`${th} w-10 text-center hidden sm:table-cell`}>STT</th>
                 <th className={th}>Số ký hiệu</th>
                 <th className={`${th} hidden sm:table-cell`}>Ngày</th>
@@ -247,7 +247,7 @@ export default function QuanLyVanBan() {
                 <tr key={d.id} className="border-t border-slate-100 even:bg-slate-50/60 hover:bg-amber-50/50 transition-colors">
                   <td className={`${td} text-center text-slate-400 hidden sm:table-cell`}>{(cur - 1) * PER + i + 1}</td>
                   <td className={td}>
-                    <span className="font-mono font-semibold text-[#0B4045] whitespace-nowrap">{d.soKyHieu || '—'}</span>
+                    <span className="font-mono font-semibold text-[#0A2540] whitespace-nowrap">{d.soKyHieu || '—'}</span>
                     {d.noiBat && <span className="ml-1 text-[#C8A14B]" title="Nổi bật">★</span>}
                     {d.linkGoc && <a href={d.linkGoc} target="_blank" rel="noreferrer" className="ml-1 text-[#C8A14B] text-xs align-middle" title="Mở nguồn">↗</a>}
                   </td>
@@ -255,12 +255,12 @@ export default function QuanLyVanBan() {
                   <td className={`${td} hidden md:table-cell`}><span className={`text-[11px] font-semibold rounded px-1.5 py-0.5 whitespace-nowrap ${CHUDE_COLOR[d.chuDe] || CHUDE_COLOR['Khác']}`}>{d.chuDe}</span></td>
                   <td className={`${td} text-slate-500 hidden lg:table-cell`}>{d.coQuan}</td>
                   <td className={td}>
-                    <span className="text-[#0B4045] leading-snug">{d.trichYeu}</span>
+                    <span className="text-[#0A2540] leading-snug">{d.trichYeu}</span>
                     <span className="block text-[11px] text-slate-400 mt-1 md:hidden">{[fmtNgay(d.ngay), d.coQuan, d.chuDe].filter(Boolean).join(' · ')}</span>
                   </td>
                   <td className={`${td} text-center`}>
                     <div className="inline-flex flex-col gap-1">
-                      <button onClick={() => openEdit(d)} className="text-[12px] font-semibold text-[#0B4045] border border-slate-200 hover:bg-slate-50 rounded-md px-2.5 py-1">Sửa</button>
+                      <button onClick={() => openEdit(d)} className="text-[12px] font-semibold text-[#0A2540] border border-slate-200 hover:bg-slate-50 rounded-md px-2.5 py-1">Sửa</button>
                       <button onClick={() => del(d)} className="text-[12px] font-semibold text-red-600 border border-red-200 hover:bg-red-50 rounded-md px-2.5 py-1">Xoá</button>
                     </div>
                   </td>
@@ -276,7 +276,7 @@ export default function QuanLyVanBan() {
           <button onClick={() => setPage(cur - 1)} disabled={cur === 1} className="min-w-9 h-9 px-2 grid place-items-center rounded-lg border border-slate-200 text-slate-600 text-sm font-semibold hover:border-[#C8A14B] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-slate-200">‹</button>
           {pageWindow(cur, totalPages).map((p, i) => p === '…'
             ? <span key={'e' + i} className="px-1 text-slate-400">…</span>
-            : <button key={p} onClick={() => setPage(p as number)} className={`min-w-9 h-9 px-2 grid place-items-center rounded-lg text-sm font-semibold border ${p === cur ? 'bg-[#0B4045] text-white border-[#0B4045]' : 'border-slate-200 text-slate-600 hover:border-[#C8A14B]'}`}>{p}</button>)}
+            : <button key={p} onClick={() => setPage(p as number)} className={`min-w-9 h-9 px-2 grid place-items-center rounded-lg text-sm font-semibold border ${p === cur ? 'bg-[#0A2540] text-white border-[#0A2540]' : 'border-slate-200 text-slate-600 hover:border-[#C8A14B]'}`}>{p}</button>)}
           <button onClick={() => setPage(cur + 1)} disabled={cur === totalPages} className="min-w-9 h-9 px-2 grid place-items-center rounded-lg border border-slate-200 text-slate-600 text-sm font-semibold hover:border-[#C8A14B] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-slate-200">›</button>
         </nav>
       )}

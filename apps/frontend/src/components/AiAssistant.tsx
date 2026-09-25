@@ -31,28 +31,28 @@ export default function AiAssistant() {
   return (
     <>
       {!open && (
-        <button onClick={() => setOpen(true)} aria-label="Trợ lý AI" className="fixed bottom-[72px] left-4 md:bottom-5 md:left-5 z-[55] flex items-center gap-2 bg-[#0B4045] hover:bg-[#0e5157] text-white font-bold pl-3 pr-4 py-2.5 rounded-full shadow-2xl border border-[#C8A14B]/40">
+        <button onClick={() => setOpen(true)} aria-label="Trợ lý AI" className="fixed bottom-[72px] left-4 md:bottom-5 md:left-5 z-[55] flex items-center gap-2 bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold pl-3 pr-4 py-2.5 rounded-full shadow-2xl border border-[#C8A14B]/40">
           <span className="text-lg">🤖</span><span className="hidden sm:inline text-sm">Trợ lý AI</span>
         </button>
       )}
       {open && (
         <div className="fixed bottom-[72px] md:bottom-5 left-3 sm:left-5 z-[56] w-[94vw] max-w-sm h-[70vh] max-h-[560px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
-          <div className="flex items-center justify-between bg-[#0B4045] text-white px-4 py-3">
+          <div className="flex items-center justify-between bg-[#0A2540] text-white px-4 py-3">
             <div className="flex items-center gap-2"><span className="text-lg">🤖</span><div><p className="font-bold leading-tight text-sm">Trợ lý Cam Lâm Land</p><p className="text-[11px] text-slate-300">Tư vấn nhà đất & quy hoạch</p></div></div>
             <button onClick={() => setOpen(false)} aria-label="Đóng" className="text-slate-300 hover:text-white text-2xl leading-none">×</button>
           </div>
           <div className="flex-1 overflow-y-auto p-3 space-y-2.5 bg-slate-50">
             {msgs.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm whitespace-pre-line ${m.role === 'user' ? 'bg-[#0B4045] text-white' : 'bg-white border border-slate-200 text-slate-700'}`}>{m.content}</div>
+                <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm whitespace-pre-line ${m.role === 'user' ? 'bg-[#0A2540] text-white' : 'bg-white border border-slate-200 text-slate-700'}`}>{m.content}</div>
               </div>
             ))}
             {busy && <div className="flex justify-start"><div className="bg-white border border-slate-200 rounded-2xl px-3 py-2 text-sm text-slate-400">Đang trả lời…</div></div>}
             <div ref={endRef} />
           </div>
           <div className="p-2.5 border-t border-slate-200 flex gap-2">
-            <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Nhập câu hỏi…" className="flex-1 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-[#0B4045]" />
-            <button onClick={send} disabled={busy} className="cl-press bg-[#0B4045] hover:bg-[#0e5157] disabled:opacity-60 text-white font-bold px-4 rounded-xl text-sm">Gửi</button>
+            <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Nhập câu hỏi…" className="flex-1 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-[#0A2540]" />
+            <button onClick={send} disabled={busy} className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] disabled:opacity-60 text-white font-bold px-4 rounded-xl text-sm">Gửi</button>
           </div>
           <p className="text-[10px] text-slate-400 text-center pb-1.5">Trả lời bởi AI — vui lòng xác minh thông tin quan trọng.</p>
         </div>

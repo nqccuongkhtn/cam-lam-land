@@ -48,7 +48,7 @@ export default function QuanLyVanTay() {
       {/* ⚠️ CHỮ NGẮN NHƯ APP. Chủ dự án dặn "ghi đơn giản như app thôi, đừng
           dùng từ ngữ AI": mỗi câu một ý, không giải thích cơ chế, không kể
           điều kiện kỹ thuật. Người dùng chỉ cần biết bật để làm gì. */}
-      <h2 className="text-[15px] font-extrabold text-[#0B4045]">🔐 Đăng nhập bằng khuôn mặt · vân tay</h2>
+      <h2 className="text-[15px] font-extrabold text-[#0A2540]">🔐 Đăng nhập bằng khuôn mặt · vân tay</h2>
       <p className="mt-1 text-[12.5px] leading-snug text-slate-500">
         Bật rồi thì khỏi gõ mật khẩu. Bật riêng cho từng máy.
       </p>
@@ -67,7 +67,7 @@ export default function QuanLyVanTay() {
           {ds.map((m) => (
             <li key={m.id} className="flex items-center gap-2 px-3 py-2">
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-[13px] font-bold text-[#0B4045]">{m.ten_may || 'Máy không tên'}</span>
+                <span className="block truncate text-[13px] font-bold text-[#0A2540]">{m.ten_may || 'Máy không tên'}</span>
                 <span className="block text-[11.5px] text-slate-400">
                   Bật ngày {ngayVn(m.created_at)}
                   {m.last_used ? ` · dùng lần cuối ${ngayVn(m.last_used)}` : ' · chưa dùng lần nào'}
@@ -83,7 +83,7 @@ export default function QuanLyVanTay() {
       )}
 
       <button onClick={them} disabled={!co || busy}
-        className="cl-press mt-3 w-full rounded-lg bg-[#0B4045] py-2.5 font-bold text-white disabled:opacity-50">
+        className="cl-press mt-3 w-full rounded-lg bg-[#0A2540] py-2.5 font-bold text-white disabled:opacity-50">
         {busy ? 'Đang chờ xác nhận trên máy…' : ds.length ? 'Bật thêm cho máy khác' : 'Bật cho máy này'}
       </button>
     </div>

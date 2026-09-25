@@ -127,18 +127,18 @@ export function OverlayView({ o, vp, zoom, sel, tool, onDown, onMoveP, onUpP, on
   if (o.kind === 'text' || o.kind === 'edit') {
     const dirty = o.kind === 'edit' ? cur !== o.orig : true;
     const [sx, sy] = vp.convertToViewportPoint(o.x, o.y); const fpx = o.size * zoom;
-    const border = sel ? '1px solid #0B4045' : '1px dashed transparent';
+    const border = sel ? '1px solid #0A2540' : '1px dashed transparent';
     return (
       <div className="absolute inset-0" style={{ pointerEvents: 'none' }}>
         {o.kind === 'edit' && dirty && (() => { const [wx, wy] = vp.convertToViewportPoint(o.wx, o.wy + o.wh); return <div className="absolute" style={{ left: wx, top: wy, width: o.ww * zoom, height: o.wh * zoom, background: rs(o.bg) }} />; })()}
         <div style={{ position: 'absolute', left: sx, top: sy - fpx * 0.80, pointerEvents: peText }}>
-          {sel && tool === 'select' && <div onPointerDown={onDown} onPointerMove={onMoveP} onPointerUp={onUpP} title="Kéo di chuyển" style={{ position: 'absolute', left: -16, top: -6, width: 13, height: 13, cursor: 'move', background: '#0B4045', borderRadius: 3 }} />}
+          {sel && tool === 'select' && <div onPointerDown={onDown} onPointerMove={onMoveP} onPointerUp={onUpP} title="Kéo di chuyển" style={{ position: 'absolute', left: -16, top: -6, width: 13, height: 13, cursor: 'move', background: '#0A2540', borderRadius: 3 }} />}
           <div ref={editRef} contentEditable suppressContentEditableWarning spellCheck={false} onFocus={onSelect} onInput={(e) => setCur(e.currentTarget.innerText)} onBlur={(e) => onText(e.currentTarget.innerText)} style={{ fontSize: fpx, lineHeight: 1.0, color: dirty ? rs(o.color) : 'transparent', caretColor: rs(o.color), border, padding: 0, fontFamily: famCss(o.fam), fontWeight: o.bold ? 700 : 400, fontStyle: o.italic ? 'italic' : 'normal', whiteSpace: 'pre', outline: 'none', cursor: 'text', minWidth: 8 }} />
         </div>
       </div>
     );
   }
-  const [tlx, tly] = vp.convertToViewportPoint(o.x, o.y + (o.h || 0)); const w = (o.w || 0) * zoom, h = (o.h || 0) * zoom; const border = sel ? '1.5px solid #0B4045' : '1px dashed transparent';
+  const [tlx, tly] = vp.convertToViewportPoint(o.x, o.y + (o.h || 0)); const w = (o.w || 0) * zoom, h = (o.h || 0) * zoom; const border = sel ? '1.5px solid #0A2540' : '1px dashed transparent';
   return (
     <div onPointerDown={onDown} onPointerMove={onMoveP} onPointerUp={onUpP} onClick={(e) => { e.stopPropagation(); onSelect(); }} className="absolute" style={{ left: tlx, top: tly, width: w, height: h, cursor: tool === 'select' ? 'move' : 'default', border, pointerEvents: peShape }}>
       {o.kind === 'white' && <div className="h-full w-full bg-white" />}
@@ -150,18 +150,18 @@ export function OverlayView({ o, vp, zoom, sel, tool, onDown, onMoveP, onUpP, on
 }
 export function DragPreview({ drag, vp }: any) {
   if (!drag) return null;
-  if (drag.kind === 'draw' && drag.pts?.length > 1) { const pts = drag.pts.map((p: number[]) => vp.convertToViewportPoint(p[0], p[1])); const d = pts.map((p: number[], i: number) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join(' '); return <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"><path d={d} fill="none" stroke="#0B4045" strokeWidth={2} strokeLinecap="round" /></svg>; }
+  if (drag.kind === 'draw' && drag.pts?.length > 1) { const pts = drag.pts.map((p: number[]) => vp.convertToViewportPoint(p[0], p[1])); const d = pts.map((p: number[], i: number) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join(' '); return <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"><path d={d} fill="none" stroke="#0A2540" strokeWidth={2} strokeLinecap="round" /></svg>; }
   if (drag.px == null) return null; const x = Math.min(drag.x0, drag.cx), y = Math.min(drag.y0, drag.cy), w = Math.abs(drag.cx - drag.x0), h = Math.abs(drag.cy - drag.y0);
   const bg = drag.kind === 'white' ? 'rgba(255,255,255,0.85)' : drag.kind === 'highlight' ? 'rgba(255,235,59,0.35)' : 'transparent';
-  return <div className="absolute border border-[#0B4045]" style={{ left: x, top: y, width: w, height: h, background: bg }} />;
+  return <div className="absolute border border-[#0A2540]" style={{ left: x, top: y, width: w, height: h, background: bg }} />;
 }
 export function SignPad({ onClose, onDone }: { onClose: () => void; onDone: (d: string) => void }) {
   const ref = useRef<HTMLCanvasElement | null>(null); const drawing = useRef(false);
-  useEffect(() => { const ctx = ref.current!.getContext('2d')!; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = '#0B4045'; }, []);
+  useEffect(() => { const ctx = ref.current!.getContext('2d')!; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = '#0A2540'; }, []);
   const pos = (e: React.PointerEvent) => { const r = ref.current!.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40">
-      <div className="rounded-xl bg-white p-4 shadow-2xl"><p className="mb-2 font-bold text-[#0B4045]">Ký tên (kéo chuột)</p>
+      <div className="rounded-xl bg-white p-4 shadow-2xl"><p className="mb-2 font-bold text-[#0A2540]">Ký tên (kéo chuột)</p>
         <canvas ref={ref} width={420} height={160} className="touch-none rounded border bg-white" onPointerDown={(e) => { drawing.current = true; const [x, y] = pos(e); const c = ref.current!.getContext('2d')!; c.beginPath(); c.moveTo(x, y); }} onPointerMove={(e) => { if (!drawing.current) return; const [x, y] = pos(e); const c = ref.current!.getContext('2d')!; c.lineTo(x, y); c.stroke(); }} onPointerUp={() => (drawing.current = false)} onPointerLeave={() => (drawing.current = false)} />
         <div className="mt-3 flex justify-end gap-2"><button onClick={() => { const c = ref.current!; c.getContext('2d')!.clearRect(0, 0, c.width, c.height); }} className="rounded border px-3 py-1.5 text-sm">Xoá</button><button onClick={onClose} className="rounded border px-3 py-1.5 text-sm">Huỷ</button><button onClick={() => onDone(ref.current!.toDataURL('image/png'))} className="rounded bg-emerald-600 px-4 py-1.5 text-sm font-bold text-white">Chèn</button></div>
       </div>

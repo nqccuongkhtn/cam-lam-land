@@ -104,14 +104,14 @@ export default function OChon({
       style={{ position: 'fixed', left: cho?.left, top: cho?.top, width: cho?.width, maxHeight: CAO_TOI_DA }}
       className="z-[100] overflow-auto rounded-xl border border-slate-200 bg-white py-1 shadow-xl shadow-slate-900/20">
       <button type="button" onClick={() => chon('')}
-        className={`flex min-h-[44px] w-full items-center px-3 text-left text-sm ${!giaTri ? 'bg-[#0B4045]/5 font-semibold text-[#0B4045]' : 'text-slate-600 hover:bg-slate-50'}`}>
+        className={`flex min-h-[44px] w-full items-center px-3 text-left text-sm ${!giaTri ? 'bg-[#0A2540]/5 font-semibold text-[#0A2540]' : 'text-slate-600 hover:bg-slate-50'}`}>
         {nhan}
       </button>
       {dsChon.map((m, i) => (
         <button key={m.gt} type="button" role="option" aria-selected={m.gt === giaTri}
           onClick={() => chon(m.gt)} onMouseEnter={() => setSoi(i)}
           className={`flex min-h-[44px] w-full items-center gap-2 px-3 text-left text-sm ${
-            m.gt === giaTri ? 'bg-[#0B4045]/5 font-semibold text-[#0B4045]'
+            m.gt === giaTri ? 'bg-[#0A2540]/5 font-semibold text-[#0A2540]'
               : soi === i ? 'bg-slate-50 text-slate-700' : 'text-slate-700 hover:bg-slate-50'}`}>
           <span className="flex-1">{m.ten}</span>
           {m.gt === giaTri && (

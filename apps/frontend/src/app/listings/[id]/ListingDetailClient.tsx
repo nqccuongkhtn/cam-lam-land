@@ -157,7 +157,7 @@ export default function ListingDetail() {
   return (
     <div className="bg-slate-50 min-h-[calc(100dvh-56px)]">
       <div className="mx-auto max-w-6xl px-3 sm:px-4 py-4 sm:py-5">
-        <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0B4045]">Trang chủ</Link> › <Link href="/listings" className="hover:text-[#0B4045]">Nhà đất</Link> › <span className="text-slate-600">{l.ward || 'Cam Lâm'}</span></div>
+        <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <Link href="/listings" className="hover:text-[#0A2540]">Nhà đất</Link> › <span className="text-slate-600">{l.ward || 'Cam Lâm'}</span></div>
 
         <div className="grid lg:grid-cols-3 gap-5">
           <div className="lg:col-span-2 space-y-5">
@@ -207,7 +207,7 @@ export default function ListingDetail() {
                   <span><b>Tin đã hết hạn hiển thị.</b> Tin này không còn trong danh sách tìm kiếm và thông tin có thể đã cũ. Vui lòng liên hệ để xác nhận còn hàng và đúng giá trước khi giao dịch.</span>
                 </div>
               )}
-              <h1 className="text-xl md:text-2xl font-extrabold text-[#0B4045] leading-snug mt-2">{l.title}</h1>
+              <h1 className="text-xl md:text-2xl font-extrabold text-[#0A2540] leading-snug mt-2">{l.title}</h1>
               {/* GIÁ ngay dưới tiêu đề — điểm nhấn chính */}
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mt-2">
                 <span className="text-2xl md:text-3xl font-extrabold text-red-600 leading-none">{priceLabel(l.price, l.deal)}</span>
@@ -219,19 +219,19 @@ export default function ListingDetail() {
                 {heroStats.filter(([, , v]) => v != null && v !== '').map(([d, label, val]) => (
                   <div key={label} className="flex items-center gap-2.5">
                     <span className="grid place-items-center w-9 h-9 rounded-lg bg-white border border-slate-100 text-[#C8A14B] shrink-0"><Ic d={d as string} /></span>
-                    <div className="min-w-0"><p className="text-[11px] text-slate-400 leading-none">{label}</p><p className="font-bold text-[#0B4045] text-sm mt-1 leading-tight truncate">{String(val)}</p></div>
+                    <div className="min-w-0"><p className="text-[11px] text-slate-400 leading-none">{label}</p><p className="font-bold text-[#0A2540] text-sm mt-1 leading-tight truncate">{String(val)}</p></div>
                   </div>
                 ))}
               </div>
               {/* Hành động phụ: chia sẻ + so sánh giá khu vực */}
               <div className="flex items-stretch gap-2 mt-4 pt-4 border-t border-slate-100">
-                <button onClick={share} className="cl-press shrink-0 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#0B4045] border border-slate-200 rounded-lg px-3 py-1.5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" /></svg> Chia sẻ</button>
+                <button onClick={share} className="cl-press shrink-0 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#0A2540] border border-slate-200 rounded-lg px-3 py-1.5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" /></svg> Chia sẻ</button>
                 <Link href={`/listings?ward=${encodeURIComponent(l.ward || '')}`} className="cl-press flex-1 min-w-0 inline-flex items-center justify-center gap-1.5 bg-emerald-50 text-emerald-700 text-sm font-semibold rounded-lg px-3 py-1.5 hover:bg-emerald-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 shrink-0"><path d="M3 17l6-6 4 4 8-8" /><path d="M14 7h7v7" /></svg> <span className="truncate">Giá khu vực {l.ward || 'Cam Lâm'}</span></Link>
               </div>
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
-              <h2 className="text-lg font-bold text-[#0B4045] mb-2">Thông tin mô tả</h2>
+              <h2 className="text-lg font-bold text-[#0A2540] mb-2">Thông tin mô tả</h2>
               <p className="text-slate-700 whitespace-pre-line leading-relaxed">{l.description ?? 'Đang cập nhật.'}</p>
             </div>
 
@@ -239,7 +239,7 @@ export default function ListingDetail() {
               <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 sm:p-5">
                 <div className="flex items-center gap-2.5">
                   <span className="w-10 h-10 rounded-full bg-emerald-600 text-white grid place-items-center shrink-0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M20 6 9 17l-5-5" /></svg></span>
-                  <div><p className="font-extrabold text-[#0B4045]">Tin xác thực bởi Cam Lâm Land</p><p className="text-[13px] text-slate-500">Đội ngũ Cam Lâm Land đã kiểm chứng thực tế</p></div>
+                  <div><p className="font-extrabold text-[#0A2540]">Tin xác thực bởi Cam Lâm Land</p><p className="text-[13px] text-slate-500">Đội ngũ Cam Lâm Land đã kiểm chứng thực tế</p></div>
                 </div>
                 <div className="mt-3 grid sm:grid-cols-3 gap-x-4 gap-y-2 text-sm text-slate-700">
                   {['Có sổ đỏ / hợp đồng mua bán', 'Đúng địa chỉ, hình ảnh & đặc điểm', 'Trong khoảng giá thị trường'].map((t, i) => (
@@ -250,33 +250,33 @@ export default function ListingDetail() {
             )}
 
             <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
-              <h2 className="text-lg font-bold text-[#0B4045] mb-3">Đặc điểm bất động sản</h2>
+              <h2 className="text-lg font-bold text-[#0A2540] mb-3">Đặc điểm bất động sản</h2>
               <div className="grid sm:grid-cols-2 sm:gap-x-8">
                 {specs.filter(([, v]) => v != null && v !== '').map(([k, v]) => (
                   <div key={k} className="flex items-center justify-between gap-4 border-b border-slate-100 py-2.5 text-sm">
-                    <span className="text-slate-500">{k}</span><b className="text-[#0B4045] text-right">{String(v)}</b>
+                    <span className="text-slate-500">{k}</span><b className="text-[#0A2540] text-right">{String(v)}</b>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 p-3">
-              <h2 className="font-bold text-[#0B4045] mb-2 px-2">Vị trí trên bản đồ</h2>
+              <h2 className="font-bold text-[#0A2540] mb-2 px-2">Vị trí trên bản đồ</h2>
               <div className="h-72 rounded-xl overflow-hidden">
                 <MapView center={[l.lng, l.lat]} zoom={15} baseMap="satellite" markers={[{ lng: l.lng, lat: l.lat, popupHtml: `<b>${l.title}</b>` }]} className="h-full w-full" />
               </div>
-              <a href={`https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lng}`} target="_blank" rel="noreferrer" className="cl-press mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#0B4045] py-2.5 font-bold text-white hover:bg-[#10585e]">
+              <a href={`https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lng}`} target="_blank" rel="noreferrer" className="cl-press mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#0A2540] py-2.5 font-bold text-white hover:bg-[#0d3a6b]">
                 🧭 Chỉ đường đến bất động sản
               </a>
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
-              <h2 className="font-bold text-[#0B4045] mb-3">Thông tin tin đăng</h2>
+              <h2 className="font-bold text-[#0A2540] mb-3">Thông tin tin đăng</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Mã tin</p><p className="font-bold text-[#0B4045] text-sm">{code}</p></div>
-                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Loại tin</p><p className="font-bold text-[#0B4045] text-sm">{typeLabel}</p></div>
-                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Ngày đăng</p><p className="font-bold text-[#0B4045] text-sm">{created ? created.toLocaleDateString('vi-VN') : '—'}</p></div>
-                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Hết hạn hiển thị</p><p className="font-bold text-[#0B4045] text-sm">{expiry ? expiry.toLocaleDateString('vi-VN') : 'Không giới hạn'}</p></div>
+                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Mã tin</p><p className="font-bold text-[#0A2540] text-sm">{code}</p></div>
+                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Loại tin</p><p className="font-bold text-[#0A2540] text-sm">{typeLabel}</p></div>
+                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Ngày đăng</p><p className="font-bold text-[#0A2540] text-sm">{created ? created.toLocaleDateString('vi-VN') : '—'}</p></div>
+                <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[11px] text-slate-400">Hết hạn hiển thị</p><p className="font-bold text-[#0A2540] text-sm">{expiry ? expiry.toLocaleDateString('vi-VN') : 'Không giới hạn'}</p></div>
               </div>
               <p className="mt-3 text-xs text-slate-400">🕒 {postedLabel(l.createdAt)}</p>
             </div>
@@ -306,10 +306,10 @@ export default function ListingDetail() {
                   Emoji đủ rõ, đủ màu, và giống mọi chỗ khác. Để yên. */}
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-50 text-xl ring-1 ring-slate-100">📚</span>
               <span className="min-w-0 flex-1">
-                <span className="block font-bold text-[#0B4045]">Thủ tục pháp lý khi mua bán đất</span>
+                <span className="block font-bold text-[#0A2540]">Thủ tục pháp lý khi mua bán đất</span>
                 <span className="block text-[13px] text-slate-500">Sang tên sổ đỏ, thuế phí, kiểm tra sổ, mẫu hợp đồng đặt cọc — tư vấn miễn phí.</span>
               </span>
-              <span className="shrink-0 whitespace-nowrap rounded-lg border border-[#0B4045] px-4 py-2 text-sm font-bold text-[#0B4045] transition group-hover:bg-[#0B4045] group-hover:text-white">Xem →</span>
+              <span className="shrink-0 whitespace-nowrap rounded-lg border border-[#0A2540] px-4 py-2 text-sm font-bold text-[#0A2540] transition group-hover:bg-[#0A2540] group-hover:text-white">Xem →</span>
             </Link>
           </div>
 
@@ -337,12 +337,12 @@ export default function ListingDetail() {
                     {l.posterAvatar ? <img src={l.posterAvatar} alt="" className="w-[52px] h-[52px] rounded-full object-cover ring-2 ring-[#13a99c]/25" /> : <div className="w-[52px] h-[52px] rounded-full bg-gradient-to-br from-[#123459] to-[#081B30] text-[#C8A14B] grid place-items-center text-xl font-extrabold ring-2 ring-[#13a99c]/25">{(l.contactName || 'C').charAt(0).toUpperCase()}</div>}
                     <span className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-[#13a99c] grid place-items-center ring-2 ring-white"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="w-2.5 h-2.5"><path d="M20 6 9 17l-5-5" /></svg></span>
                   </div>
-                  <p className="font-extrabold text-[#0B4045] text-[16px] leading-snug">{l.contactName || 'Cam Lâm Land'}</p>
+                  <p className="font-extrabold text-[#0A2540] text-[16px] leading-snug">{l.contactName || 'Cam Lâm Land'}</p>
                 </div>
                 {agentInfo && (
                   <div className="mt-3 grid grid-cols-2 text-center">
-                    <div className="border-r border-slate-100 px-2"><p className="text-[11px] text-slate-400 leading-tight">Tham gia Cam Lâm Land</p><p className="font-extrabold text-[#0B4045] text-[17px] mt-1 leading-none">{joinLabel(agentInfo.createdAt) ?? '—'}</p></div>
-                    <div className="px-2"><p className="text-[11px] text-slate-400 leading-tight">Tin đăng đang có</p><p className="font-extrabold text-[#0B4045] text-[17px] mt-1 leading-none">{agentInfo.activeCount}{agentInfo.activeCount >= 60 ? '+' : ''}</p></div>
+                    <div className="border-r border-slate-100 px-2"><p className="text-[11px] text-slate-400 leading-tight">Tham gia Cam Lâm Land</p><p className="font-extrabold text-[#0A2540] text-[17px] mt-1 leading-none">{joinLabel(agentInfo.createdAt) ?? '—'}</p></div>
+                    <div className="px-2"><p className="text-[11px] text-slate-400 leading-tight">Tin đăng đang có</p><p className="font-extrabold text-[#0A2540] text-[17px] mt-1 leading-none">{agentInfo.activeCount}{agentInfo.activeCount >= 60 ? '+' : ''}</p></div>
                   </div>
                 )}
                 {l.createdBy && (
@@ -350,7 +350,7 @@ export default function ListingDetail() {
                 )}
               </div>
               <div className="px-2 pt-2.5 pb-2.5 space-y-2">
-                <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#0B4045] font-bold py-2.5 rounded-lg shadow-sm text-[14px]"><svg viewBox="0 0 24 24" fill="#0068FF" className="w-5 h-5"><path d="M12 2C6.5 2 2 5.8 2 10.5c0 2.6 1.4 4.9 3.6 6.4-.1.9-.5 2.2-1.2 3.1 1.4-.2 2.8-.8 3.9-1.5 1.1.3 2.4.5 3.7.5 5.5 0 10-3.8 10-8.5S17.5 2 12 2z" /></svg> Chat qua Zalo</a>
+                <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#0A2540] font-bold py-2.5 rounded-lg shadow-sm text-[14px]"><svg viewBox="0 0 24 24" fill="#0068FF" className="w-5 h-5"><path d="M12 2C6.5 2 2 5.8 2 10.5c0 2.6 1.4 4.9 3.6 6.4-.1.9-.5 2.2-1.2 3.1 1.4-.2 2.8-.8 3.9-1.5 1.1.3 2.4.5 3.7.5 5.5 0 10-3.8 10-8.5S17.5 2 12 2z" /></svg> Chat qua Zalo</a>
                 {full ? (
                   <a href={`tel:${full.replace(/\s/g, '')}`} className="flex items-center justify-center gap-2 bg-[#075e56] hover:bg-[#064f48] text-white font-extrabold text-[15px] py-2.5 rounded-lg shadow-sm"><IPhone /> {full}</a>
                 ) : (
@@ -367,7 +367,7 @@ export default function ListingDetail() {
             </div>
             {areas.length > 0 && (
               <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
-                <h3 className="font-bold text-[#0B4045] mb-3">Mua bán nhà đất tại Cam Lâm</h3>
+                <h3 className="font-bold text-[#0A2540] mb-3">Mua bán nhà đất tại Cam Lâm</h3>
                 <div className="grid grid-cols-1">
                   {areas.slice(0, 10).map((a) => (
                     <Link key={a.ward} href={`/listings?ward=${encodeURIComponent(a.ward)}`} className="flex items-center justify-between py-1.5 text-sm text-slate-600 hover:text-red-700 border-b border-slate-50 last:border-0"><span>Nhà đất {a.ward}</span><span className="text-slate-400">({a.count})</span></Link>
@@ -381,7 +381,7 @@ export default function ListingDetail() {
 
         {(similarLoading || similar.length > 0) && (
           <div className="mt-6 sm:mt-8">
-            <h2 className="text-xl font-extrabold text-[#0B4045] mb-3 sm:mb-4">Bất động sản cùng khu vực</h2>
+            <h2 className="text-xl font-extrabold text-[#0A2540] mb-3 sm:mb-4">Bất động sản cùng khu vực</h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {similarLoading
                 ? Array.from({ length: 4 }).map((_, i) => (
@@ -397,7 +397,7 @@ export default function ListingDetail() {
 
         {recent.length > 0 && (
           <div className="mt-6 sm:mt-8">
-            <h2 className="text-xl font-extrabold text-[#0B4045] mb-3 sm:mb-4 flex items-center gap-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#C8A14B]"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>Đã xem gần đây</h2>
+            <h2 className="text-xl font-extrabold text-[#0A2540] mb-3 sm:mb-4 flex items-center gap-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#C8A14B]"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>Đã xem gần đây</h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">{recent.slice(0, 4).map((s) => <ListingCard key={s.id} l={s} />)}</div>
           </div>
         )}
@@ -407,8 +407,8 @@ export default function ListingDetail() {
         <div className="fixed inset-0 z-[100] bg-black flex flex-col select-none">
           <div className="relative flex items-center justify-center shrink-0" style={{ paddingTop: 'calc(0.5rem + env(safe-area-inset-top))', paddingBottom: '0.5rem' }}>
             <div className="flex rounded-lg overflow-hidden bg-white/10 text-[13px] font-bold">
-              <button onClick={() => setLbView('img')} className={`flex items-center gap-1.5 px-4 py-1.5 transition ${lbView === 'img' ? 'bg-white text-[#0B4045]' : 'text-white/80 hover:text-white'}`}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></svg> Hình ảnh</button>
-              <button onClick={() => setLbView('map')} className={`flex items-center gap-1.5 px-4 py-1.5 transition ${lbView === 'map' ? 'bg-white text-[#0B4045]' : 'text-white/80 hover:text-white'}`}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M9 20l-5.5 2.5V6L9 3.5m0 16.5 6-2.5M9 20V3.5m6 14 5.5 2.5V6L15 3.5m0 14V3.5m0 0L9 6" /></svg> Bản đồ</button>
+              <button onClick={() => setLbView('img')} className={`flex items-center gap-1.5 px-4 py-1.5 transition ${lbView === 'img' ? 'bg-white text-[#0A2540]' : 'text-white/80 hover:text-white'}`}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></svg> Hình ảnh</button>
+              <button onClick={() => setLbView('map')} className={`flex items-center gap-1.5 px-4 py-1.5 transition ${lbView === 'map' ? 'bg-white text-[#0A2540]' : 'text-white/80 hover:text-white'}`}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M9 20l-5.5 2.5V6L9 3.5m0 16.5 6-2.5M9 20V3.5m6 14 5.5 2.5V6L15 3.5m0 14V3.5m0 0L9 6" /></svg> Bản đồ</button>
             </div>
             {lbView === 'img' && <span className="absolute left-4 text-white/70 text-sm font-medium">{active + 1} / {imgs.length}</span>}
             <div className="absolute right-2 flex items-center gap-1">

@@ -53,12 +53,12 @@ export default function InstallPrompt() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/icons/icon-192.png" alt="Cam Lâm Land" className="w-12 h-12 rounded-xl shrink-0 border border-slate-200 object-cover" />
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-[#0B4045] text-sm leading-tight">Cài Cam Lâm Land vào máy</p>
+          <p className="font-bold text-[#0A2540] text-sm leading-tight">Cài Cam Lâm Land vào máy</p>
           {ios ? (
             <p className="text-[12px] text-slate-500 mt-0.5 leading-snug">
-              Bấm <b className="text-[#0B4045]">Chia sẻ</b>
-              <svg viewBox="0 0 24 24" className="inline w-3.5 h-3.5 mx-0.5 -mt-0.5" fill="none" stroke="#0B4045" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 15V3M8 7l4-4 4 4" /><path d="M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6" /></svg>
-              ở dưới → chọn <b className="text-[#0B4045]">“Thêm vào MH chính”</b>
+              Bấm <b className="text-[#0A2540]">Chia sẻ</b>
+              <svg viewBox="0 0 24 24" className="inline w-3.5 h-3.5 mx-0.5 -mt-0.5" fill="none" stroke="#0A2540" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 15V3M8 7l4-4 4 4" /><path d="M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6" /></svg>
+              ở dưới → chọn <b className="text-[#0A2540]">“Thêm vào MH chính”</b>
             </p>
           ) : (
             <p className="text-[12px] text-slate-500 mt-0.5 leading-snug">Mở nhanh như app, chạy toàn màn hình, không cần trình duyệt.</p>

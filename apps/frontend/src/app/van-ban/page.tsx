@@ -20,11 +20,11 @@ export default function VanBanPage() {
     <div className="mx-auto max-w-7xl px-3 sm:px-6 py-5 sm:py-8">
       {/* Tiêu đề + nhận diện thương hiệu (đồng bộ trang Cẩm nang) */}
       <div className="flex items-center gap-3">
-        <span className="grid place-items-center w-11 h-11 rounded-2xl bg-[#0B4045] shrink-0">
+        <span className="grid place-items-center w-11 h-11 rounded-2xl bg-[#0A2540] shrink-0">
           <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="#C8A14B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" /><path d="M9 9h1M9 13h6M9 17h6" /></svg>
         </span>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0B4045] leading-tight">Tra cứu văn bản</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] leading-tight">Tra cứu văn bản</h1>
           <p className="text-[13px] font-semibold text-[#C8A14B]">Cam Lâm Land · Văn bản Cam Lâm &amp; pháp luật nhà đất</p>
         </div>
       </div>
@@ -34,15 +34,15 @@ export default function VanBanPage() {
 
       {/* Cổng thông tin điện tử Khánh Hòa */}
       <section className="mt-8 sm:mt-10">
-        <h2 className="text-lg sm:text-xl font-extrabold text-[#0B4045]">Cổng thông tin điện tử Khánh Hòa</h2>
+        <h2 className="text-lg sm:text-xl font-extrabold text-[#0A2540]">Cổng thông tin điện tử Khánh Hòa</h2>
         <p className="text-sm text-slate-500 mt-1 mb-3 sm:mb-4">Tra cứu văn bản, quy hoạch, dự án và thủ tục trực tiếp tại các cổng chính thống của tỉnh, sở ngành và xã/phường.</p>
         <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
           {PORTALS.map((g) => (
             <div key={g.nhom} className="bg-white border border-slate-200 rounded-2xl p-4">
-              <p className="font-bold text-[#0B4045] text-sm mb-2.5">{g.nhom}</p>
+              <p className="font-bold text-[#0A2540] text-sm mb-2.5">{g.nhom}</p>
               <div className="flex flex-wrap gap-2">
                 {g.items.map(([name, url]) => (
-                  <a key={url} href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[13px] text-[#0B4045] bg-slate-50 hover:bg-[#C8A14B]/15 border border-slate-200 hover:border-[#C8A14B] rounded-lg px-2.5 py-1.5 transition">{name} ↗</a>
+                  <a key={url} href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[13px] text-[#0A2540] bg-slate-50 hover:bg-[#C8A14B]/15 border border-slate-200 hover:border-[#C8A14B] rounded-lg px-2.5 py-1.5 transition">{name} ↗</a>
                 ))}
               </div>
             </div>

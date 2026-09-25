@@ -114,7 +114,7 @@ export default function LichLogoLePage() {
   if (!laAdmin(user)) return (
     <div className="mx-auto max-w-lg px-4 py-16 text-center">
       <div className="mb-3 text-4xl">🔒</div>
-      <p className="text-lg font-extrabold text-[#0B4045]">Chỉ quản trị viên</p>
+      <p className="text-lg font-extrabold text-[#0A2540]">Chỉ quản trị viên</p>
       <div className="mt-4"><Link href="/quan-tri" className="font-semibold text-[#C8A14B]">← Về bảng quản trị</Link></div>
     </div>
   );
@@ -126,7 +126,7 @@ export default function LichLogoLePage() {
       <div className="mb-1 text-sm">
         <Link href="/quan-tri" className="font-semibold text-slate-400 hover:text-[#C8A14B]">← Quản trị</Link>
       </div>
-      <h1 className="text-2xl font-extrabold text-[#0B4045]">🎏 Lịch đổi logo ngày lễ</h1>
+      <h1 className="text-2xl font-extrabold text-[#0A2540]">🎏 Lịch đổi logo ngày lễ</h1>
       <p className="mt-1 text-sm text-slate-500">
         Ngày thường web dùng logo gốc. Tới những ngày dưới đây, logo trên thanh menu tự đổi
         sang bản có trang trí. Bấm vào một ngày để thêm dịp mới.
@@ -140,7 +140,7 @@ export default function LichLogoLePage() {
           <button onClick={() => doiThang(-1)} aria-label="Tháng trước"
             className="h-9 w-9 rounded-md border border-slate-200 text-slate-500 hover:bg-slate-50">‹</button>
           <div className="text-center">
-            <div className="text-base font-extrabold text-[#0B4045]">Tháng {Number(tm)} · {ty}</div>
+            <div className="text-base font-extrabold text-[#0A2540]">Tháng {Number(tm)} · {ty}</div>
             <button onClick={() => setThang(thangCua(new Date()))}
               className="text-xs font-semibold text-[#C8A14B]">về tháng này</button>
           </div>
@@ -165,8 +165,8 @@ export default function LichLogoLePage() {
                 title={o.ten || 'Chưa có dịp nào — bấm để thêm'}
                 className={`relative flex aspect-square flex-col items-center justify-center rounded-md border text-sm
                   ${o.ma ? 'border-[#C8A14B]/60 bg-[#C8A14B]/10' : 'border-slate-100 hover:bg-slate-50'}
-                  ${nay ? 'ring-2 ring-[#0B4045]' : ''}`}>
-                <span className={`text-[11px] font-bold ${o.ma ? 'text-[#0B4045]' : 'text-slate-400'}`}>{d}</span>
+                  ${nay ? 'ring-2 ring-[#0A2540]' : ''}`}>
+                <span className={`text-[11px] font-bold ${o.ma ? 'text-[#0A2540]' : 'text-slate-400'}`}>{d}</span>
                 {/* Hiện ĐÚNG hiệu ứng động sẽ chạy ngoài web, để xem trước
                     ngay trong lịch — khỏi phải chờ tới ngày mới biết nó ra sao. */}
                 {o.ma && <span className="mt-0.5"><LogoLe ma={o.ma} light={false} cao={24} /></span>}
@@ -178,16 +178,16 @@ export default function LichLogoLePage() {
 
       {/* ── Danh sách dịp ────────────────────────────────────────────────── */}
       <div className="mt-6 flex items-center justify-between">
-        <h2 className="font-extrabold text-[#0B4045]">Các dịp đã đặt ({dips.length})</h2>
+        <h2 className="font-extrabold text-[#0A2540]">Các dịp đã đặt ({dips.length})</h2>
         <button onClick={() => setSua({ ...MOI })}
-          className="rounded-md bg-[#0B4045] px-4 py-2 text-sm font-bold text-white hover:bg-[#0d3057]">+ Thêm dịp</button>
+          className="rounded-md bg-[#0A2540] px-4 py-2 text-sm font-bold text-white hover:bg-[#0d3057]">+ Thêm dịp</button>
       </div>
       <div className="mt-3 space-y-2">
         {dips.map((d) => (
           <div key={d.id} className={`flex items-center gap-3 rounded-lg border p-3 ${d.bat ? 'border-slate-200 bg-white' : 'border-slate-100 bg-slate-50 opacity-60'}`}>
             <LogoLe ma={d.ma} light={false} cao={32} />
             <div className="min-w-0 flex-1">
-              <div className="truncate font-bold text-[#0B4045]">{d.ten}</div>
+              <div className="truncate font-bold text-[#0A2540]">{d.ten}</div>
               <div className="truncate text-xs text-slate-500">
                 {d.kieu === 'ngay'
                   ? `${d.tu}${d.den && d.den !== d.tu ? ' → ' + d.den : ''}`
@@ -217,7 +217,7 @@ export default function LichLogoLePage() {
           onClick={(e) => { if (e.target === e.currentTarget) setSua(null); }}>
           <div className="max-h-[92vh] w-full max-w-lg overflow-auto rounded-t-2xl bg-white p-5 sm:rounded-lg">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-extrabold text-[#0B4045]">{sua.id ? 'Sửa dịp' : 'Thêm dịp'}</h3>
+              <h3 className="font-extrabold text-[#0A2540]">{sua.id ? 'Sửa dịp' : 'Thêm dịp'}</h3>
               <button onClick={() => setSua(null)} className="h-8 w-8 rounded-md text-slate-400 hover:bg-slate-100">✕</button>
             </div>
 
@@ -243,7 +243,7 @@ export default function LichLogoLePage() {
               {(['duong', 'am', 'ngay'] as const).map((k) => (
                 <button key={k} onClick={() => setSua({ ...sua, kieu: k })}
                   className={`block w-full rounded-md border px-3 py-2 text-left text-sm
-                    ${sua.kieu === k ? 'border-[#0B4045] bg-[#0B4045]/5 font-bold text-[#0B4045]' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+                    ${sua.kieu === k ? 'border-[#0A2540] bg-[#0A2540]/5 font-bold text-[#0A2540]' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
                   {KIEU[k]}
                 </button>
               ))}

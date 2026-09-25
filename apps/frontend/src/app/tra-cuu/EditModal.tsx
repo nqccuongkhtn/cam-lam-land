@@ -9,7 +9,7 @@ import { SHORT } from './parts';
 import { useLockBody } from '@/lib/useLockBody';
 
 const Sec = ({ children }: any) => <div className="col-span-2 mt-1 border-t pt-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">{children}</div>;
-const Sub = ({ children }: any) => <div className="col-span-2 mt-1.5 flex items-center gap-1.5 rounded-md bg-slate-100 px-2 py-1 text-[12px] font-bold text-[#0B4045]">{children}</div>;
+const Sub = ({ children }: any) => <div className="col-span-2 mt-1.5 flex items-center gap-1.5 rounded-md bg-slate-100 px-2 py-1 text-[12px] font-bold text-[#0A2540]">{children}</div>;
 const fmtDate = (s: string) => { const d = String(s).replace(/\D/g, '').slice(0, 8); let o = d.slice(0, 2); if (d.length > 2) o += '/' + d.slice(2, 4); if (d.length > 4) o += '/' + d.slice(4, 8); return o; };
 const splitM = (s: any) => String(s ?? '').split(/[,\n]/).map((x) => x.trim());
 
@@ -77,7 +77,7 @@ export function EditModal({ initial, onClose, canManage, loggedIn, srcList, newS
       <div className="flex max-h-full w-full max-w-lg flex-col overflow-hidden rounded-xl bg-white shadow-2xl">
         {/* Header CỐ ĐỊNH — không cuộn theo form */}
         <div className="flex shrink-0 items-start justify-between gap-2 border-b border-slate-100 px-5 pt-5 pb-3">
-          <p className="text-lg font-bold text-[#0B4045]">{isEdit ? '✎ Sửa bản ghi danh sách nóng' : '➕ Thêm vào danh sách nóng'}</p>
+          <p className="text-lg font-bold text-[#0A2540]">{isEdit ? '✎ Sửa bản ghi danh sách nóng' : '➕ Thêm vào danh sách nóng'}</p>
           <button type="button" onClick={onClose} aria-label="Đóng" className="-mr-1 -mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-lg text-lg leading-none text-slate-400 hover:bg-slate-100 hover:text-slate-600">✕</button>
         </div>
         {/* Thân form CUỘN */}

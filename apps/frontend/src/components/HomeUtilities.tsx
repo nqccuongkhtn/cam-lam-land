@@ -36,7 +36,7 @@ const CUNG: Record<number, { ten: string; hanh: string; nhom: 'Đông' | 'Tây' 
 const HUONG_DONG = ['Bắc', 'Nam', 'Đông', 'Đông Nam'];
 const HUONG_TAY = ['Tây', 'Tây Bắc', 'Đông Bắc', 'Tây Nam'];
 
-const inp = 'w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0B4045]';
+const inp = 'w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]';
 const lbl = 'block text-xs font-semibold text-slate-500 mb-1';
 
 export default function HomeUtilities() {
@@ -49,14 +49,14 @@ export default function HomeUtilities() {
   ] as const;
   return (
     <section className="mx-auto max-w-7xl px-3 sm:px-4 py-7 sm:py-10">
-      <h2 className="text-xl md:text-2xl font-extrabold text-[#0B4045] mb-4 sm:mb-6">Hỗ trợ tiện ích</h2>
+      <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-4 sm:mb-6">Hỗ trợ tiện ích</h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4">
         {TOOLS.map((tl) => (
           <button key={tl.k} onClick={() => setOpen(tl.k)}
             className="group flex items-center gap-2.5 sm:gap-3 bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 text-left hover:border-[#C8A14B] hover:shadow-md transition">
-            <span className="w-11 h-11 grid place-items-center rounded-xl bg-slate-50 text-2xl group-hover:bg-[#0B4045]/5 shrink-0">{tl.icon}</span>
+            <span className="w-11 h-11 grid place-items-center rounded-xl bg-slate-50 text-2xl group-hover:bg-[#0A2540]/5 shrink-0">{tl.icon}</span>
             <span className="min-w-0">
-              <span className="block font-bold text-[#0B4045] text-sm leading-tight">{tl.t}</span>
+              <span className="block font-bold text-[#0A2540] text-sm leading-tight">{tl.t}</span>
               <span className="block text-[11px] text-slate-400 mt-0.5 truncate">{tl.d}</span>
             </span>
           </button>
@@ -80,7 +80,7 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white px-5 py-4 border-b border-slate-100 flex items-center justify-between z-10">
-          <h3 className="font-extrabold text-[#0B4045]">{title}</h3>
+          <h3 className="font-extrabold text-[#0A2540]">{title}</h3>
           <button onClick={onClose} aria-label="Đóng" className="text-slate-400 hover:text-slate-700 text-2xl leading-none">×</button>
         </div>
         <div className="p-5">{children}</div>
@@ -134,7 +134,7 @@ function CostTool() {
         <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm space-y-1.5">
           <div className="flex justify-between"><span className="text-slate-500">Diện tích xây dựng</span><b>{fmt(dtxd)} m²</b></div>
           <div className="flex justify-between"><span className="text-slate-500">Đơn giá ({loai === 'tho' ? 'xây thô' : 'trọn gói'})</span><b>{fmt(donGia)} đ/m²</b></div>
-          <div className="flex justify-between text-lg pt-1.5 border-t border-slate-200"><span className="font-bold text-[#0B4045]">Tạm tính</span><b className="text-red-600">{fmtVnd(tong)}</b></div>
+          <div className="flex justify-between text-lg pt-1.5 border-t border-slate-200"><span className="font-bold text-[#0A2540]">Tạm tính</span><b className="text-red-600">{fmtVnd(tong)}</b></div>
         </div>
       )}
       <p className="text-[11px] text-slate-400">DTXD ≈ (móng 50% + số tầng + mái 30%) × diện tích sàn. Đơn giá tham khảo 2025.</p>
@@ -186,7 +186,7 @@ function LoanTool() {
                 <div className="flex justify-between"><span className="text-slate-500">Tháng cuối (giảm dần)</span><b>{fmtVnd(out.thangCuoi!)}</b></div>
               </>}
           <div className="flex justify-between"><span className="text-slate-500">Tổng lãi</span><b>{fmtVnd(out.tongLai)}</b></div>
-          <div className="flex justify-between pt-1.5 border-t border-slate-200"><span className="font-bold text-[#0B4045]">Tổng phải trả</span><b className="text-[#0B4045]">{fmtVnd(out.tong)}</b></div>
+          <div className="flex justify-between pt-1.5 border-t border-slate-200"><span className="font-bold text-[#0A2540]">Tổng phải trả</span><b className="text-[#0A2540]">{fmtVnd(out.tong)}</b></div>
           {tnN > 0 && (
             <div className={`flex justify-between pt-1.5 border-t border-slate-200 ${pctTN <= 40 ? 'text-emerald-600' : 'text-red-600'}`}>
               <span className="font-semibold">Trả góp / thu nhập</span><b>{Math.round(pctTN)}% {pctTN <= 40 ? '· an toàn ✓' : '· khá cao ⚠'}</b>
@@ -213,7 +213,7 @@ function FsTool() {
       </div>
       {cung && (
         <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm space-y-2.5">
-          <p className="text-center">Cung mệnh: <b className="text-[#0B4045]">{cung.ten}</b> ({cung.hanh}) · <b>{cung.nhom} tứ mệnh</b></p>
+          <p className="text-center">Cung mệnh: <b className="text-[#0A2540]">{cung.ten}</b> ({cung.hanh}) · <b>{cung.nhom} tứ mệnh</b></p>
           <div><p className="text-xs font-semibold text-emerald-600 mb-1">Hướng nhà TỐT nên chọn:</p><div className="flex flex-wrap gap-1.5">{tot.map((h) => <span key={h} className="bg-emerald-100 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full">{h}</span>)}</div></div>
           <div><p className="text-xs font-semibold text-red-600 mb-1">Hướng nên TRÁNH:</p><div className="flex flex-wrap gap-1.5">{xau.map((h) => <span key={h} className="bg-red-50 text-red-600 text-xs px-2.5 py-1 rounded-full">{h}</span>)}</div></div>
         </div>

@@ -100,18 +100,18 @@ export default function BottomNav() {
       {/* SHEET Tiện ích — bấm tab "Tiện ích" ở thanh dưới thì trồi lên (giống lưới trong trang Tiện ích) */}
       {toolsOpen && (
         <div className="md:hidden fixed inset-0 z-[60]" role="dialog" aria-label="Tiện ích">
-          <div className="absolute inset-0 bg-[#0B4045]/30 cl-sheet-fade" onClick={() => setToolsOpen(false)} aria-hidden="true" />
+          <div className="absolute inset-0 bg-[#0A2540]/30 cl-sheet-fade" onClick={() => setToolsOpen(false)} aria-hidden="true" />
           <div className="absolute inset-x-0 bottom-0 rounded-t-2xl border-t border-slate-200 bg-white px-3 pt-2 shadow-2xl cl-sheet-up" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
             <div className="mx-auto mb-2 h-1 w-9 rounded-full bg-slate-300" />
             <div className="mb-1 flex items-center justify-between px-1">
-              <span className="text-[13px] font-bold text-[#0B4045]">🧰 Tiện ích</span>
+              <span className="text-[13px] font-bold text-[#0A2540]">🧰 Tiện ích</span>
               <button type="button" onClick={() => setToolsOpen(false)} aria-label="Đóng" className="grid h-8 w-8 place-items-center rounded-full text-slate-400 active:bg-slate-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]"><path d="M18 6 6 18M6 6l12 12" /></svg></button>
             </div>
             <div className="grid grid-cols-4 gap-1">
               {/* Công cụ nội bộ chỉ hiện với tài khoản được cấp quyền — lọc y như trang Tiện ích. */}
               {locTheoQuyen(TIEN_ICH_TOOLS, user).map((t) => {
                 const cls = 'flex flex-col items-center gap-1.5 rounded-xl px-1 py-2.5 active:bg-slate-50';
-                const inner = (<><span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#0B4045] text-[#C8A14B]" dangerouslySetInnerHTML={{ __html: toolIconSvg(t.key, 22) }} /><span className="line-clamp-2 text-center text-[10px] leading-[1.15] text-slate-600">{t.name}</span></>);
+                const inner = (<><span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#0A2540] text-[#C8A14B]" dangerouslySetInnerHTML={{ __html: toolIconSvg(t.key, 22) }} /><span className="line-clamp-2 text-center text-[10px] leading-[1.15] text-slate-600">{t.name}</span></>);
                 return t.action
                   ? <button key={t.key} type="button" onClick={() => { runToolAction(t); setToolsOpen(false); }} className={cls}>{inner}</button>
                   : <Link key={t.key} href={`/tien-ich?tab=${t.key}`} onClick={() => { window.dispatchEvent(new CustomEvent('cl-hub-tab', { detail: { key: t.key } })); setToolsOpen(false); }} className={cls}>{inner}</Link>;

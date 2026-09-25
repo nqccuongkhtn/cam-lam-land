@@ -68,6 +68,13 @@ def doi(txt):
 
 
 def main():
+    import sys
+    # `--nguoc`: đổi NGƯỢC về navy (chủ dự án thử màu cổ vịt rồi bảo trả lại
+    # navy, 25/9/2026). Đảo bảng rồi chạy như thường.
+    if '--nguoc' in sys.argv:
+        global DOI_HEX, DOI_RGB
+        DOI_HEX = {v: k for k, v in DOI_HEX.items()}
+        DOI_RGB = {v: k for k, v in DOI_RGB.items()}
     tong = so_file = 0
     for goc, thu_muc, tep in os.walk(FE):
         thu_muc[:] = [t for t in thu_muc if t not in BO_QUA]

@@ -66,7 +66,7 @@ export default function ImageCropper({ file, size = 512, title = 'Cân chỉnh �
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60" onClick={onCancel} />
       <div className="relative bg-white rounded-2xl shadow-2xl p-5 w-full max-w-xs">
-        <h3 className="font-extrabold text-[#0B4045] mb-3 text-center">{title}</h3>
+        <h3 className="font-extrabold text-[#0A2540] mb-3 text-center">{title}</h3>
         <div className="relative mx-auto overflow-hidden bg-slate-900 select-none touch-none cursor-grab active:cursor-grabbing"
           style={{ width: VIEW, height: VIEW, borderRadius: round ? '50%' : 12 }}
           onMouseDown={down} onMouseMove={move} onMouseUp={up} onMouseLeave={up}
@@ -74,7 +74,7 @@ export default function ImageCropper({ file, size = 512, title = 'Cân chỉnh �
           {img && <img src={img.src} alt="" draggable={false} style={{ position: 'absolute', left: pos.x, top: pos.y, width: img.width * scale, height: img.height * scale, maxWidth: 'none' }} />}
           <div className="absolute inset-0 pointer-events-none ring-2 ring-white/70" style={{ borderRadius: round ? '50%' : 12 }} />
         </div>
-        <input type="range" min={minScale} max={minScale * 4} step="0.001" value={scale} onChange={(e) => zoom(Number(e.target.value))} className="w-full mt-3 accent-[#0B4045]" />
+        <input type="range" min={minScale} max={minScale * 4} step="0.001" value={scale} onChange={(e) => zoom(Number(e.target.value))} className="w-full mt-3 accent-[#0A2540]" />
         <p className="text-[11px] text-slate-400 text-center">Kéo để di chuyển · trượt để phóng to</p>
         <div className="flex gap-2 mt-3">
           <button disabled={busy} onClick={done} className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold py-2.5 rounded-xl">{busy ? 'Đang xử lý…' : 'Dùng ảnh này'}</button>

@@ -11,7 +11,7 @@ import { apiBase } from '@/lib/api';
 import { getToken } from '@/lib/token';
 import { toast } from '@/lib/toast';
 
-const NAVY = '#0B4045', GOLD = '#C8A14B';
+const NAVY = '#0A2540', GOLD = '#C8A14B';
 const authHead = () => ({ Authorization: `Bearer ${getToken() || ''}` });
 
 type ThuMuc = { slug: string; ten: string; icon: string; so_file: number; tong_bytes: number };
@@ -687,7 +687,7 @@ function CuaSoXem({ file, onClose, onTai }: { file: FileKho; onClose: () => void
   const hang = sheets[sheet]?.hang || [];
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-5" style={{ background: 'rgba(11,64,69,.55)' }} onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-5" style={{ background: 'rgba(10,37,64,.55)' }} onClick={onClose}>
       <div className="flex max-h-full w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
         {/* Thanh trên: tên file + nút tải về + nút đóng */}
         <div className="flex items-center gap-2 border-b px-3 py-2" style={{ borderColor: '#e9edf3' }}>

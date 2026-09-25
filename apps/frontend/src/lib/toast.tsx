@@ -27,7 +27,7 @@ export const useToast = () => useContext(Ctx);
 const STYLE: Record<Kind, { ring: string; icon: string; badge: string; bar: string }> = {
   error: { ring: 'border-red-200', icon: '✕', badge: 'bg-red-100 text-red-600', bar: 'bg-red-500' },
   success: { ring: 'border-emerald-200', icon: '✓', badge: 'bg-emerald-100 text-emerald-600', bar: 'bg-emerald-500' },
-  info: { ring: 'border-slate-200', icon: 'i', badge: 'bg-[#0B4045]/10 text-[#0B4045]', bar: 'bg-[#0B4045]' },
+  info: { ring: 'border-slate-200', icon: 'i', badge: 'bg-[#0A2540]/10 text-[#0A2540]', bar: 'bg-[#0A2540]' },
 };
 
 function Card({ t, onClose }: { t: Item; onClose: () => void }) {

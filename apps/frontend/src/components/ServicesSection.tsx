@@ -66,7 +66,7 @@ export default function ServicesSection({ className = '' }: { className?: string
         dangerouslySetInnerHTML={{ __html: JSON.stringify(duLieuCoCauTruc) }} />
 
       <div className="text-center">
-        <h2 className="text-xl sm:text-2xl font-extrabold uppercase tracking-tight text-[#0B4045]">Dịch vụ của chúng tôi</h2>
+        <h2 className="text-xl sm:text-2xl font-extrabold uppercase tracking-tight text-[#0A2540]">Dịch vụ của chúng tôi</h2>
         <p className="mt-1 text-[13px] sm:text-sm font-bold text-[#C8A14B]">Nhanh chóng · Chính xác · Uy tín · Trách nhiệm</p>
         <p className="mx-auto mt-2 max-w-2xl text-[13px] sm:text-sm text-slate-500">Cam Lâm Land hỗ trợ trọn gói thủ tục pháp lý và hồ sơ đất đai tại Cam Lâm – Khánh Hòa, giúp bạn giao dịch an toàn, nhanh gọn, đúng luật.</p>
       </div>

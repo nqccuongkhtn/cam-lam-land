@@ -98,7 +98,7 @@ export default function TraCuuPage() {
   const onSaved = (rec: Added) => { setAdded((x) => { const i = x.findIndex((y) => y.id === rec.id); if (i >= 0) { const n = [...x]; n[i] = rec; return n; } return [rec, ...x]; }); if (rec.nguon) setSheets((s) => (s.some((y: any) => y.name === rec.nguon) ? s : [...s, { name: rec.nguon }])); setEdit(null); };
 
   if (authLoading) return <div style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }} className="grid place-items-center bg-white text-slate-400">Đang kiểm tra quyền truy cập…</div>;
-  if (!canManage) return <div style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }} className="grid place-items-center bg-white p-8 text-center"><div className="max-w-sm"><div className="mb-2 text-5xl">🔒</div><p className="text-lg font-bold text-[#0B4045]">Danh sách nóng</p><p className="mt-1.5 text-sm leading-relaxed text-slate-500">Mục nội bộ, chỉ dành cho tài khoản đã được cấp quyền.{user ? ' Tài khoản của bạn chưa có quyền — vui lòng liên hệ quản trị viên.' : ' Vui lòng đăng nhập bằng tài khoản có quyền, hoặc liên hệ quản trị viên.'}</p><div className="mt-4 flex justify-center gap-2">{!user && <button onClick={() => openLogin()} className="rounded-lg bg-red-600 px-5 py-2 text-sm font-bold text-white hover:bg-red-700">Đăng nhập</button>}<a href="/" target="_top" className="rounded-lg border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Về trang chủ</a></div></div></div>;
+  if (!canManage) return <div style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }} className="grid place-items-center bg-white p-8 text-center"><div className="max-w-sm"><div className="mb-2 text-5xl">🔒</div><p className="text-lg font-bold text-[#0A2540]">Danh sách nóng</p><p className="mt-1.5 text-sm leading-relaxed text-slate-500">Mục nội bộ, chỉ dành cho tài khoản đã được cấp quyền.{user ? ' Tài khoản của bạn chưa có quyền — vui lòng liên hệ quản trị viên.' : ' Vui lòng đăng nhập bằng tài khoản có quyền, hoặc liên hệ quản trị viên.'}</p><div className="mt-4 flex justify-center gap-2">{!user && <button onClick={() => openLogin()} className="rounded-lg bg-red-600 px-5 py-2 text-sm font-bold text-white hover:bg-red-700">Đăng nhập</button>}<a href="/" target="_top" className="rounded-lg border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Về trang chủ</a></div></div></div>;
   if (err) return <div style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }} className="grid place-items-center bg-white p-8 text-center text-red-600 font-semibold">{err}</div>;
 
   return (
@@ -106,13 +106,13 @@ export default function TraCuuPage() {
       <div className="border-b bg-white px-3 py-2 shadow-sm">
         <div className="mb-2 flex items-center gap-2">
           {!embedded && <button onClick={() => { window.location.href = '/'; }} aria-label="Đóng" className="shrink-0 rounded px-2 py-1.5 text-sm hover:bg-slate-100">✕</button>}
-          <b className="min-w-0 flex-1 truncate text-[#0B4045]">🔥 Danh sách nóng</b>
+          <b className="min-w-0 flex-1 truncate text-[#0A2540]">🔥 Danh sách nóng</b>
           <button onClick={() => setGuide(true)} aria-label="Hướng dẫn" title="Hướng dẫn" className="shrink-0 rounded border px-2.5 py-1.5 text-sm hover:bg-slate-50">❓<span className="hidden sm:inline"> Hướng dẫn</span></button>
           <button onClick={() => setEdit({})} className="shrink-0 rounded bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-700">+ Thêm<span className="hidden sm:inline"> vào danh sách nóng</span></button>
         </div>
         <div className="mb-2 flex items-center gap-2">
           <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Gõ tên chủ / nội dung… (không cần dấu)" className="min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm" />
-          <button onClick={() => setAdvOpen((v) => !v)} className={`shrink-0 rounded-lg border px-3 py-2 text-sm ${advOpen || advActive ? 'border-[#0B4045] bg-[#0B4045] text-white' : 'text-slate-600 hover:bg-slate-50'}`}>⚙<span className="hidden sm:inline"> Nâng cao</span>{advActive ? ' •' : ''}</button>
+          <button onClick={() => setAdvOpen((v) => !v)} className={`shrink-0 rounded-lg border px-3 py-2 text-sm ${advOpen || advActive ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'text-slate-600 hover:bg-slate-50'}`}>⚙<span className="hidden sm:inline"> Nâng cao</span>{advActive ? ' •' : ''}</button>
           {hasFilter && <button onClick={() => { setQ(''); setQth(''); setQto(''); setQxa(''); setQsrc(''); setQten(''); setQskh(''); setQcq(''); setQgt(''); setQns(''); setQdc(''); setQgcn(''); }} className="shrink-0 rounded-lg border px-2 py-2 text-sm text-slate-500">Xoá lọc</button>}
         </div>
         {(advOpen || advActive) && <div className="mb-2 rounded-lg border border-slate-200 bg-slate-50 p-2.5">
@@ -131,7 +131,7 @@ export default function TraCuuPage() {
           </div>
         </div>}
         <div className="-mx-3 flex gap-1.5 overflow-x-auto px-3 no-scrollbar">
-          <button onClick={() => setQsrc('')} className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${!qsrc ? 'bg-[#0B4045] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>Tất cả · {counts['TỔNG']?.toLocaleString('vi')}</button>
+          <button onClick={() => setQsrc('')} className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${!qsrc ? 'bg-[#0A2540] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>Tất cả · {counts['TỔNG']?.toLocaleString('vi')}</button>
           {groups.map((g: any) => { const sv = sevOf(g.s); const active = qsrc === g.s; return <button key={g.s} onClick={() => setQsrc(active ? '' : g.s)} className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${active ? chipCls[sv.c] : chipSoft[sv.c] + ' hover:brightness-95'}`}>{SHORT[g.s] || g.s} · {(counts[g.s] || 0).toLocaleString('vi')}</button>; })}
           {customSheets.map(([s, n]: any) => { const active = qsrc === s; return (
             <span key={s} className="relative shrink-0">
@@ -145,7 +145,7 @@ export default function TraCuuPage() {
       {loading ? <div className="grid flex-1 place-items-center text-slate-500">{loading}</div> : (
         <>
           <div className="flex items-center gap-3 border-b bg-white px-3 py-1.5 text-sm">
-            {hasFilter ? <span>Tìm thấy <b className="text-[#0B4045]">{total.toLocaleString('vi')}</b> kết quả</span> : <span>Toàn bộ <b className="text-[#0B4045]">{total.toLocaleString('vi')}</b> bản ghi{qsrc ? ` · ${SHORT[qsrc] || qsrc}` : ''}</span>}
+            {hasFilter ? <span>Tìm thấy <b className="text-[#0A2540]">{total.toLocaleString('vi')}</b> kết quả</span> : <span>Toàn bộ <b className="text-[#0A2540]">{total.toLocaleString('vi')}</b> bản ghi{qsrc ? ` · ${SHORT[qsrc] || qsrc}` : ''}</span>}
             {hasRed && <span className="font-bold text-red-600">⚠ Có NGĂN CHẶN giao dịch!</span>}
             <span className="ml-auto text-xs text-slate-400">Đã hiện {Math.min(limit, total).toLocaleString('vi')}<span className="hidden sm:inline"> — cuộn để xem tiếp</span></span>
           </div>

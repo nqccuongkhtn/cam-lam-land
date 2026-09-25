@@ -100,9 +100,9 @@ export default function FlappyMini({ maxH = 180 }: { maxH?: number }) {
       ctx!.fillStyle = '#fff'; ctx!.beginPath(); ctx!.arc(bird.r * 0.32, -bird.r * 0.3, bird.r * 0.3, 0, 6.2832); ctx!.fill();
       ctx!.fillStyle = '#12324f'; ctx!.beginPath(); ctx!.arc(bird.r * 0.42, -bird.r * 0.3, bird.r * 0.15, 0, 6.2832); ctx!.fill();
       ctx!.restore();
-      ctx!.fillStyle = '#0B4045'; ctx!.font = '800 ' + Math.round(H * 0.13) + 'px -apple-system,"Segoe UI",Roboto,sans-serif'; ctx!.textAlign = 'center'; ctx!.textBaseline = 'top';
+      ctx!.fillStyle = '#0A2540'; ctx!.font = '800 ' + Math.round(H * 0.13) + 'px -apple-system,"Segoe UI",Roboto,sans-serif'; ctx!.textAlign = 'center'; ctx!.textBaseline = 'top';
       ctx!.fillText(String(score), W / 2, H * 0.07);
-      if (state === 'ready') { ctx!.fillStyle = 'rgba(8,16,28,0.05)'; ctx!.fillRect(0, 0, W, H); ctx!.fillStyle = '#0B4045'; ctx!.font = '600 11px -apple-system,"Segoe UI",Roboto,sans-serif'; ctx!.fillText('Chạm vào đây để bắt đầu', W / 2, H * 0.6); }
+      if (state === 'ready') { ctx!.fillStyle = 'rgba(8,16,28,0.05)'; ctx!.fillRect(0, 0, W, H); ctx!.fillStyle = '#0A2540'; ctx!.font = '600 11px -apple-system,"Segoe UI",Roboto,sans-serif'; ctx!.fillText('Chạm vào đây để bắt đầu', W / 2, H * 0.6); }
     }
     function loop(now: number) { const dt = last ? Math.min((now - last) / 16.667, 2.4) : 1; last = now; update(dt); draw(); raf = requestAnimationFrame(loop); }
 
@@ -141,9 +141,9 @@ export default function FlappyMini({ maxH = 180 }: { maxH?: number }) {
               <>
                 <div className="text-[13px] font-extrabold">Kết thúc · <span className="text-[#C8A14B]">{over}</span> điểm</div>
                 <div className="w-full max-w-[230px] mt-1.5 space-y-1.5">
-                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Họ tên *" className="w-full rounded-md px-2.5 py-1.5 text-[12px] text-[#0B4045] outline-none" />
-                  <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Số điện thoại *" inputMode="tel" className="w-full rounded-md px-2.5 py-1.5 text-[12px] text-[#0B4045] outline-none" />
-                  <button onClick={submit} disabled={busy} className="w-full bg-[#C8A14B] hover:brightness-105 disabled:opacity-60 text-[#0B4045] font-extrabold py-1.5 rounded-md text-[12px]">{busy ? 'Đang gửi…' : '🏆 Ghi tên lên bảng'}</button>
+                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Họ tên *" className="w-full rounded-md px-2.5 py-1.5 text-[12px] text-[#0A2540] outline-none" />
+                  <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Số điện thoại *" inputMode="tel" className="w-full rounded-md px-2.5 py-1.5 text-[12px] text-[#0A2540] outline-none" />
+                  <button onClick={submit} disabled={busy} className="w-full bg-[#C8A14B] hover:brightness-105 disabled:opacity-60 text-[#0A2540] font-extrabold py-1.5 rounded-md text-[12px]">{busy ? 'Đang gửi…' : '🏆 Ghi tên lên bảng'}</button>
                   <button onClick={playAgain} className="w-full bg-white/15 hover:bg-white/25 text-white font-semibold py-1 rounded-md text-[11px]">↻ Chơi lại</button>
                 </div>
               </>
@@ -152,7 +152,7 @@ export default function FlappyMini({ maxH = 180 }: { maxH?: number }) {
                 <div className="text-[13px] font-extrabold">🎉 Đã ghi tên!</div>
                 <div className="text-[11px] text-slate-200 mt-0.5">Bạn <b className="text-[#C8A14B]">{sent.score}</b> điểm{sent.rank ? <> · hạng <b className="text-[#C8A14B]">#{sent.rank}</b></> : null}.</div>
                 <div className="text-[10px] text-slate-300 mt-0.5 px-2">Cố thêm điểm để leo hạng nhé!</div>
-                <button onClick={playAgain} className="mt-2 bg-[#C8A14B] text-[#0B4045] font-extrabold py-1.5 px-4 rounded-md text-[12px]">↻ Chơi lại</button>
+                <button onClick={playAgain} className="mt-2 bg-[#C8A14B] text-[#0A2540] font-extrabold py-1.5 px-4 rounded-md text-[12px]">↻ Chơi lại</button>
               </>
             )}
           </div>
@@ -160,7 +160,7 @@ export default function FlappyMini({ maxH = 180 }: { maxH?: number }) {
       </div>
       <div className="flex items-center justify-between px-0.5 pt-1 text-[10px] text-slate-500">
         <span>Vào ván: chạm khung · rồi chạm đâu cũng bay · Kỷ lục: <b className="text-[#C8A14B]">{best}</b></span>
-        <Link href="/game" className="font-bold text-[#0B4045] hover:underline">Bảng xếp hạng ↗</Link>
+        <Link href="/game" className="font-bold text-[#0A2540] hover:underline">Bảng xếp hạng ↗</Link>
       </div>
     </div>
   );

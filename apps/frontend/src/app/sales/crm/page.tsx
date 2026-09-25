@@ -33,7 +33,7 @@ export default function CrmBoardPage() {
 
   const Card = ({ it }: { it: Interest }) => (
     <div className="bg-white rounded-lg border border-slate-200 p-2 text-xs shadow-sm">
-      <p className="font-bold text-[#0B4045] line-clamp-1">{titleOf(it)}</p>
+      <p className="font-bold text-[#0A2540] line-clamp-1">{titleOf(it)}</p>
       <p className="text-slate-500">{it.price ? <b className="text-red-600">{it.price}</b> : null}{it.area ? ` · ${it.area}m²` : ''}{it.ward ? ` · ${it.ward}` : ''}</p>
       <p className="mt-0.5">🧑 Khách: <b>{it.custName || '—'}</b>{it.custPhone ? <> · <a href={`tel:${it.custPhone}`} className="text-emerald-600 font-semibold">{it.custPhone}</a></> : null}{it.interest ? <span className="ml-1 text-[9px] font-bold text-amber-600">Quan tâm {it.interest}</span> : null}</p>
       {adminAll && it.salesName ? <p className="text-[10px] text-slate-400">👤 Sales: {it.salesName}</p> : null}
@@ -55,21 +55,21 @@ export default function CrmBoardPage() {
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-5">
         <div className="flex items-center gap-2 mb-3">
           <div>
-            <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold text-[#0B4045]">Pipeline chốt deal</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold text-[#0A2540]">Pipeline chốt deal</h1>
             <p className="text-xs text-slate-500">Mỗi thẻ là 1 khách quan tâm 1 tin. Đổi ô “Giai đoạn” trong thẻ để chuyển cột (Mới → … → Đã chốt).</p>
           </div>
           {laAdmin(user) && (
             <label className="flex items-center gap-1 text-xs font-semibold text-slate-600 cursor-pointer bg-white border border-slate-200 rounded-full px-2.5 py-1.5"><input type="checkbox" checked={adminAll} onChange={(e) => setAdminAll(e.target.checked)} className="accent-[#7c3aed]" /> Toàn đội</label>
           )}
           <div className="ml-auto inline-flex rounded-full bg-white border border-slate-200 p-1 text-xs sm:text-sm font-bold shrink-0">
-            <Link href="/sales/khach" className="px-2.5 sm:px-3.5 py-1 rounded-full text-slate-600 hover:text-[#0B4045]">Khách hàng</Link>
+            <Link href="/sales/khach" className="px-2.5 sm:px-3.5 py-1 rounded-full text-slate-600 hover:text-[#0A2540]">Khách hàng</Link>
             <span className="px-2.5 sm:px-3.5 py-1 rounded-full bg-[#7c3aed] text-white">Pipeline</span>
           </div>
         </div>
 
         {/* Dashboard tổng hợp */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1.5 sm:gap-2 mb-3 sm:mb-4">
-          {[['Khách', stats?.customers ?? 0, '#0B4045'], ['Nhu cầu', stats?.needs ?? 0, '#d97706'], ['Quan tâm', stats?.interests ?? 0, '#7c3aed'],
+          {[['Khách', stats?.customers ?? 0, '#0A2540'], ['Nhu cầu', stats?.needs ?? 0, '#d97706'], ['Quan tâm', stats?.interests ?? 0, '#7c3aed'],
           ['Mới', statCount('Mới'), dealColor('Mới')], ['Thương lượng', statCount('Thương lượng'), dealColor('Thương lượng')],
           ['Đã chốt', stats?.closed ?? 0, '#16a34a'], ['Cần chăm', stats?.dueFollow ?? 0, '#dc2626']].map(([label, n, color]) => (
             <div key={label as string} className="bg-white rounded-xl border border-slate-200 p-2 sm:p-2.5 text-center">
@@ -86,7 +86,7 @@ export default function CrmBoardPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {due.map((it) => (
                 <div key={it.id} className="bg-white rounded-lg border border-red-100 p-2 text-xs flex items-center justify-between">
-                  <div className="min-w-0"><b className="text-[#0B4045] line-clamp-1">{it.custName || 'Khách'}</b><span className="text-slate-500 line-clamp-1">{titleOf(it)} · hẹn {fmtDate(it.followUpAt)}</span></div>
+                  <div className="min-w-0"><b className="text-[#0A2540] line-clamp-1">{it.custName || 'Khách'}</b><span className="text-slate-500 line-clamp-1">{titleOf(it)} · hẹn {fmtDate(it.followUpAt)}</span></div>
                   {it.custPhone ? <a href={`tel:${it.custPhone}`} className="shrink-0 bg-emerald-600 text-white font-bold px-2.5 py-1 rounded-lg">📞 Gọi</a> : null}
                 </div>
               ))}

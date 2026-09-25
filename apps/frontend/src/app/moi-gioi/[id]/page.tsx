@@ -44,7 +44,7 @@ export default function AgentProfilePage() {
   return (
     <div className="bg-slate-50 min-h-[100dvh]">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0B4045] to-[#081B30] text-white">
+      <div className="bg-gradient-to-br from-[#0A2540] to-[#081B30] text-white">
         <div className="max-w-5xl mx-auto px-3 sm:px-4 py-5 sm:py-10 flex items-center gap-3 sm:gap-5">
           {agent.avatar
             ? <img src={agent.avatar} alt="" className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover ring-4 ring-[#C8A14B]/40" />
@@ -52,7 +52,7 @@ export default function AgentProfilePage() {
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl sm:text-3xl font-extrabold truncate">{agent.name || 'Người đăng tin'}</h1>
-              {laAdmin(agent) && <span className="bg-[#C8A14B] text-[#0B4045] text-[11px] font-bold px-2 py-0.5 rounded-full">Chính chủ sàn</span>}
+              {laAdmin(agent) && <span className="bg-[#C8A14B] text-[#0A2540] text-[11px] font-bold px-2 py-0.5 rounded-full">Chính chủ sàn</span>}
               {(agent as any).rating > 0 && <span className="inline-flex items-center gap-0.5 bg-white/10 rounded-full px-2 py-0.5 text-[13px] font-bold" title="Đánh giá bởi Cam Lâm Land"><span className="text-[#FFD56A]">★</span> {Number((agent as any).rating).toFixed(1)}<span className="text-white/50 font-normal">/5</span></span>}
             </div>
             <p className="text-white/60 text-sm mt-1">Người đăng tin · Cam Lâm Land{agent.createdAt ? ' · ' + joinedLabel(agent.createdAt) : ''}</p>
@@ -67,13 +67,13 @@ export default function AgentProfilePage() {
           <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-[#0068FF] hover:bg-[#0058d6] text-white font-bold py-2.5 rounded-xl">💬 Chat qua Zalo</a>
           {agent.phone
             ? <a href={`tel:${agent.phone.replace(/\s/g, '')}`} className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold py-2.5 rounded-xl">📞 Gọi ngay</a>
-            : <Link href="/login" className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-[#0B4045] text-white font-bold py-2.5 rounded-xl">🔒 Đăng nhập để xem số</Link>}
+            : <Link href="/login" className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-[#0A2540] text-white font-bold py-2.5 rounded-xl">🔒 Đăng nhập để xem số</Link>}
         </div>
       </div>
 
       {/* Active listings */}
       <div className="max-w-5xl mx-auto px-3 sm:px-4 py-5 sm:py-6">
-        <h2 className="text-lg font-extrabold text-[#0B4045] mb-3">Tin đang hiển thị ({active.length})</h2>
+        <h2 className="text-lg font-extrabold text-[#0A2540] mb-3">Tin đang hiển thị ({active.length})</h2>
         {active.length
           ? <div className="space-y-3">{active.map((l) => <ListingRow key={l.id} l={l} />)}</div>
           : <p className="text-slate-400 text-sm bg-white rounded-xl border border-slate-200 p-6 text-center">Hiện chưa có tin đang bán.</p>}

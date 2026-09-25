@@ -4,11 +4,10 @@ module.exports = {
   theme: {
     extend: {
       // Brand tokens: use bg-navy / text-gold / border-navy / bg-navy/5 ...
-      // Additive: existing arbitrary values (bg-[#0B4045]) still work; migrate gradually.
+      // Additive: existing arbitrary values (bg-[#0A2540]) still work; migrate gradually.
       colors: {
-        // ⚠️ Tên vẫn là 'navy' cho khỏi sửa hàng trăm chỗ, nhưng MÀU ĐÃ ĐỔI sang xanh cổ vịt
-        //    #0B4045 (25/9/2026, xem scripts/doi-mau-chu-dao.py).
-        navy: '#0B4045', // màu chủ đạo (nền chính, tiêu đề)
+        // (25/9/2026 đã thử đổi sang xanh cổ vịt rồi trả lại navy — scripts/doi-mau-chu-dao.py, chạy --nguoc)
+        navy: '#0A2540', // màu chủ đạo (nền chính, tiêu đề)
         gold: '#C8A14B', // brand gold accent
       },
     },

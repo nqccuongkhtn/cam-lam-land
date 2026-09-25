@@ -95,7 +95,7 @@ function ListingRow({ l, href }: { l: Listing; href?: string }) {
     <div className="mt-1.5 pt-1.5 border-t border-slate-100 flex items-center gap-2">
       {avatar
         ? <img src={avatar} alt="" className="w-7 h-7 rounded-full object-cover border border-slate-200 shrink-0" />
-        : <span className="w-7 h-7 rounded-full bg-[#0B4045] text-white grid place-items-center text-xs font-extrabold shrink-0">{String(agentName)[0]?.toUpperCase() || 'C'}</span>}
+        : <span className="w-7 h-7 rounded-full bg-[#0A2540] text-white grid place-items-center text-xs font-extrabold shrink-0">{String(agentName)[0]?.toUpperCase() || 'C'}</span>}
       <div className="flex-1 min-w-0">
         <div className="text-[13px] font-semibold text-slate-700 truncate">{agentName}</div>
         <div className="text-[11px] text-slate-400">{posted}</div>

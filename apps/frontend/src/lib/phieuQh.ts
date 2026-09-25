@@ -322,7 +322,7 @@ function buildSvg(
 
   // Tâm thửa: mục đích SDĐ + số thửa / diện tích (kiểu phân số như mẫu), đặt trong vùng đất.
   const code = esc(extra.code || ''), sth = esc(extra.soThua || '');
-  if (code) els += `<text x="${num(LX, 1)}" y="${num(LY - 12, 1)}" font-size="8.5" font-weight="700" fill="#0B4045" text-anchor="middle" dominant-baseline="central" style="paint-order:stroke;stroke:#fff;stroke-width:3.5">${code}</text>`;
+  if (code) els += `<text x="${num(LX, 1)}" y="${num(LY - 12, 1)}" font-size="8.5" font-weight="700" fill="#0A2540" text-anchor="middle" dominant-baseline="central" style="paint-order:stroke;stroke:#fff;stroke-width:3.5">${code}</text>`;
   if (sth) els += `<text x="${num(LX, 1)}" y="${num(LY - 1, 1)}" font-size="10.5" font-weight="700" fill="#111" text-anchor="middle" dominant-baseline="central" style="paint-order:stroke;stroke:#fff;stroke-width:3.5">${sth}</text>`;
   els += `<line x1="${num(LX - 17, 1)}" y1="${num(LY + 4, 1)}" x2="${num(LX + 17, 1)}" y2="${num(LY + 4, 1)}" stroke="#111" stroke-width="0.8"/>`;
   els += `<text x="${num(LX, 1)}" y="${num(LY + 11, 1)}" font-size="9" fill="#111" text-anchor="middle" dominant-baseline="central" style="paint-order:stroke;stroke:#fff;stroke-width:3.5">${numVi(areaM2, 1)}</text>`;
@@ -402,34 +402,34 @@ function buildHtml(o: PhieuOpts): string {
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body { font-family: 'Times New Roman', serif; color: #111; font-size: 11px; line-height: 1.32; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .toolbar { background: #0B4045; color: #fff; padding: 7px 12px; display: flex; gap: 10px; align-items: center; justify-content: center; }
-  .toolbar button { background: #C8A14B; color: #0B4045; font-weight: 700; border: none; border-radius: 8px; padding: 7px 18px; cursor: pointer; font-size: 13px; }
+  .toolbar { background: #0A2540; color: #fff; padding: 7px 12px; display: flex; gap: 10px; align-items: center; justify-content: center; }
+  .toolbar button { background: #C8A14B; color: #0A2540; font-weight: 700; border: none; border-radius: 8px; padding: 7px 18px; cursor: pointer; font-size: 13px; }
   .toolbar span { font-size: 11px; opacity: .85; }
   .wrap { max-width: 190mm; margin: 0 auto; padding: 8px; }
   .sheet { transform-origin: top center; }
-  .hd { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-bottom: 1.5px solid #0B4045; padding-bottom: 5px; }
+  .hd { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-bottom: 1.5px solid #0A2540; padding-bottom: 5px; }
   .brand { display: flex; gap: 8px; align-items: center; }
   .logo { width: 42px; height: 42px; flex: none; } .logo img, .logo svg, .logo .fb { width: 42px; height: 42px; display: block; } .logo img { mix-blend-mode: multiply; }
   /* Ô logo đầu phiếu: nền navy bo góc, bên trong là ảnh logo nét sáng. */
   .lgbox { display: grid; place-items: center; width: 42px; height: 42px;
-           border-radius: 11px; background: #0B4045; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+           border-radius: 11px; background: #0A2540; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .lgbox img, .lgbox svg { width: 33px !important; height: 22px !important; object-fit: contain; mix-blend-mode: normal !important; }
-  .bname { font-weight: 800; color: #0B4045; font-size: 13px; }
+  .bname { font-weight: 800; color: #0A2540; font-size: 13px; }
   .bsub { font-size: 9px; color: #444; }
   .qrbox { text-align: center; font-size: 8px; color: #555; }
   .qrbox img { width: 52px; height: 52px; display: block; }
-  h1 { text-align: center; font-size: 14px; margin: 7px 0 1px; text-transform: uppercase; color: #0B4045; font-weight: 800; }
+  h1 { text-align: center; font-size: 14px; margin: 7px 0 1px; text-transform: uppercase; color: #0A2540; font-weight: 800; }
   .sub { text-align: center; font-size: 9.5px; font-style: italic; color: #555; }
   .ma { text-align: center; font-size: 9px; color: #b45309; font-family: Consolas, monospace; margin-top: 1px; }
   ol.fld { margin: 6px 0 3px; padding-left: 18px; }
   ol.fld li { margin: 1.5px 0; }
   .warn { font-style: italic; font-size: 10px; color: #7a1010; margin: 2px 0 4px; }
   input.e { border: none; border-bottom: 1px dotted #888; font-family: inherit; font-size: inherit; padding: 0 2px; min-width: 70px; background: transparent; }
-  input.e:focus { outline: none; border-bottom-color: #0B4045; }
-  .sec { font-weight: 700; color: #0B4045; border-left: 3px solid #C8A14B; padding-left: 5px; margin: 7px 0 3px; font-size: 11px; text-transform: uppercase; }
+  input.e:focus { outline: none; border-bottom-color: #0A2540; }
+  .sec { font-weight: 700; color: #0A2540; border-left: 3px solid #C8A14B; padding-left: 5px; margin: 7px 0 3px; font-size: 11px; text-transform: uppercase; }
   table { width: 100%; border-collapse: collapse; }
   th, td { border: 0.7px solid #444; padding: 2px 5px; font-size: 10px; vertical-align: top; }
-  th { background: #0B4045; color: #fff; font-weight: 600; }
+  th { background: #0A2540; color: #fff; font-weight: 600; }
   td.c { text-align: center; } td.r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .tcoord th, .tcoord td { font-size: 8.5px; padding: 1px 4px; line-height: 1.25; }
   .kh { display: inline-grid; place-items: center; width: 15px; height: 15px; border: 1px solid #111; border-radius: 50%; font-size: 9px; font-weight: 700; line-height: 1; }
@@ -439,7 +439,7 @@ function buildHtml(o: PhieuOpts): string {
   .grid2 > div:last-child { flex: 4; }
   .diagram { border: 0.8px solid #94a3b8; border-radius: 5px; padding: 3px; background: #fff; }
   .zoomctl { position: absolute; top: 5px; left: 5px; display: flex; flex-direction: column; gap: 3px; z-index: 6; }
-  .zoomctl button { width: 23px; height: 23px; border: 1px solid #cbd5e1; background: rgba(255,255,255,.92); border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 800; color: #0B4045; line-height: 1; padding: 0; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .zoomctl button { width: 23px; height: 23px; border: 1px solid #cbd5e1; background: rgba(255,255,255,.92); border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 800; color: #0A2540; line-height: 1; padding: 0; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
   .zoomctl button:hover { border-color: #C8A14B; color: #C8A14B; }
   .northind { position: absolute; top: 3px; right: 7px; display: flex; flex-direction: column; align-items: center; z-index: 5; line-height: 1; }
   .northind b { font-size: 10px; font-weight: 800; color: #111; margin-top: 1px; }
@@ -451,7 +451,7 @@ function buildHtml(o: PhieuOpts): string {
   .legend { display: flex; flex-wrap: wrap; gap: 2px 8px; margin: 3px 1px 0; font-size: 8.5px; color: #333; }
   .legend span { display: inline-flex; align-items: center; gap: 3px; }
   .legend i { width: 10px; height: 10px; border-radius: 2px; border: 0.5px solid #999; display: inline-block; flex: none; }
-  .qhb b { color: #0B4045; }
+  .qhb b { color: #0A2540; }
   .disc { margin-top: 6px; font-size: 9px; color: #444; border: 1px dashed #b45309; background: #fffbeb; border-radius: 5px; padding: 4px 7px; }
   .ghichu { border: 0.8px solid #94a3b8; border-radius: 5px; min-height: 34px; padding: 4px 6px; margin-top: 4px; font-size: 10px; }
   .sign { display: flex; justify-content: space-around; gap: 6px; margin-top: 8px; text-align: center; }
@@ -467,7 +467,7 @@ function buildHtml(o: PhieuOpts): string {
   @media print { .toolbar { display: none; } input.e { border-bottom: none; } .wrap { padding: 0; } .noprint { display: none !important; } }
 </style></head>
 <body>
-  <div class="toolbar"><button onclick="try{window.close()}catch(e){}setTimeout(function(){if(!window.closed){if(history.length>1){history.back()}else{location.href='/map'}}},200)" style="background:#fff;color:#0B4045">← Quay lại</button><button onclick="window.print()">🖨 In / Lưu PDF (1 trang A4)</button><span>Chỉ cần điền mục 1 (người yêu cầu) và mục 4 (mục đích SDĐ) trước khi in</span></div>
+  <div class="toolbar"><button onclick="try{window.close()}catch(e){}setTimeout(function(){if(!window.closed){if(history.length>1){history.back()}else{location.href='/map'}}},200)" style="background:#fff;color:#0A2540">← Quay lại</button><button onclick="window.print()">🖨 In / Lưu PDF (1 trang A4)</button><span>Chỉ cần điền mục 1 (người yêu cầu) và mục 4 (mục đích SDĐ) trước khi in</span></div>
   <div class="wrap"><div class="sheet">
     <div class="hd">
       <div class="brand">${navLogo(origin)}<div><div class="bname">${SITE.ten}</div><div class="bsub">${SITE.mota} · ☎ ${SITE.hotline} · ${SITE.domain}</div></div></div>

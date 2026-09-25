@@ -13,7 +13,7 @@ type Tool = { id: string; name: string; desc: string; icon: string; input: 'pdf'
 type Cat = { cat: string; color: string; tools: Tool[] };
 
 const CATS: Cat[] = [
-  { cat: 'Chỉnh sửa & xem', color: 'text-[#0B4045]', tools: [
+  { cat: 'Chỉnh sửa & xem', color: 'text-[#0A2540]', tools: [
     { id: 'edit', name: 'Sửa chữ PDF', desc: 'Mở & sửa trực tiếp chữ trên file, thêm chữ/ảnh/ký tên', icon: '✍️', input: 'pdf', engine: 'edit' },
   ] },
   { cat: 'Trang & sắp xếp', color: 'text-sky-700', tools: [
@@ -143,7 +143,7 @@ function FilePreview({ files, input, cheDo = 'xem', kieuChon = 'giu', gocTrang, 
   const chonChan = () => datMang(new Set(Array.from({ length: pageN }, (_, i) => i).filter((i) => i % 2 === 1)));
 
   if (input === 'images') return <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{files.map((f, i) => <div key={i} className="overflow-hidden rounded-lg border bg-slate-50"><img src={URL.createObjectURL(f)} alt="" className="h-28 w-full object-contain" /><div className="truncate px-1.5 py-1 text-[10px] text-slate-400">{f.name}</div></div>)}</div>;
-  if (input.startsWith('office')) return <div className="flex items-center gap-3 rounded-lg border bg-slate-50 p-4"><span className="text-4xl">📄</span><div className="min-w-0"><p className="truncate font-semibold text-[#0B4045]">{files[0]?.name}</p><p className="text-xs text-slate-400">{files[0] && fmtSize(files[0].size)} · Tệp Office không xem trước được, bấm xử lý để chuyển sang PDF.</p></div></div>;
+  if (input.startsWith('office')) return <div className="flex items-center gap-3 rounded-lg border bg-slate-50 p-4"><span className="text-4xl">📄</span><div className="min-w-0"><p className="truncate font-semibold text-[#0A2540]">{files[0]?.name}</p><p className="text-xs text-slate-400">{files[0] && fmtSize(files[0].size)} · Tệp Office không xem trước được, bấm xử lý để chuyển sang PDF.</p></div></div>;
 
   const SRC = 'S1';
   const luoi = ['grid-cols-4 gap-1.5 sm:grid-cols-6 md:grid-cols-8', 'grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5', 'grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4'][co];
@@ -220,7 +220,7 @@ function FilePreview({ files, input, cheDo = 'xem', kieuChon = 'giu', gocTrang, 
             </div>
 
             {/* Số thứ tự trang (ở chế độ sắp xếp là SỐ THỨ TỰ MỚI — nhìn số này là biết tệp tải về xếp thế nào) */}
-            <span className="absolute left-1 top-1 z-10 grid h-5 min-w-[20px] place-items-center rounded-full bg-[#0B4045]/85 px-1 text-[10px] font-bold text-white">{i + 1}</span>
+            <span className="absolute left-1 top-1 z-10 grid h-5 min-w-[20px] place-items-center rounded-full bg-[#0A2540]/85 px-1 text-[10px] font-bold text-white">{i + 1}</span>
             {/* Dấu tích ở chế độ chọn — nhìn thấy cả khi không rê chuột */}
             {cheDo === 'chon' && (
               <span className={`absolute right-1 top-1 z-10 grid h-5 w-5 place-items-center rounded-full border-2 text-[11px] font-black shadow
@@ -332,7 +332,7 @@ function MultiFileManager({ input, files, rots, onReorder, onDelete, onRotate, o
               </>
             ) : (
               <div className="relative overflow-hidden rounded-lg border bg-slate-50">
-                <span className="absolute left-1 top-1 z-10 grid h-5 min-w-[20px] place-items-center rounded-full bg-[#0B4045]/85 px-1 text-[10px] font-bold text-white">{i + 1}</span>
+                <span className="absolute left-1 top-1 z-10 grid h-5 min-w-[20px] place-items-center rounded-full bg-[#0A2540]/85 px-1 text-[10px] font-bold text-white">{i + 1}</span>
                 <button onMouseDown={stop} onClick={(e) => { stop(e); onDelete(i); }} title="Xoá" className="absolute right-1 top-1 z-10 grid h-6 w-6 place-items-center rounded-full bg-white/90 text-xs font-bold text-red-600 shadow hover:bg-red-50">✕</button>
                 {thumbs.get(f)
                   ? <div onClick={(e) => { stop(e); window.open(urlFor(f), '_blank'); }} title="Bấm để xem tệp" className="grid h-32 cursor-pointer place-items-center overflow-hidden bg-white"><img src={thumbs.get(f)} draggable={false} alt="" className="max-h-32 max-w-full object-contain" /></div>
@@ -554,7 +554,7 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
     <div className="flex flex-col bg-slate-100" style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }}>
       <div className="flex items-center gap-2 border-b bg-white px-4 py-2.5 shadow-sm">
         {!embedded && <button onClick={() => { window.location.href = '/'; }} title="Thoát" className="rounded px-2 py-1.5 text-sm hover:bg-slate-100">✕</button>}
-        {active ? <button onClick={back} className="rounded px-2 py-1 text-sm font-medium hover:bg-slate-100">← Tất cả công cụ</button> : <b className="text-[#0B4045]">🧰 Công cụ PDF</b>}
+        {active ? <button onClick={back} className="rounded px-2 py-1 text-sm font-medium hover:bg-slate-100">← Tất cả công cụ</button> : <b className="text-[#0A2540]">🧰 Công cụ PDF</b>}
         {!active && <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm công cụ…" className="ml-2 w-32 flex-1 rounded-lg border px-3 py-1.5 text-sm sm:w-56 sm:flex-none" />}
       </div>
 
@@ -563,16 +563,16 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
           <div className="mx-auto max-w-3xl">
             <div className="mb-4 flex items-center gap-3">
               <span className="grid h-12 w-12 place-items-center rounded-xl bg-slate-100 text-2xl">{active.icon}</span>
-              <div><p className="text-lg font-bold text-[#0B4045]">{active.name}</p><p className="text-sm text-slate-500">{active.desc}</p></div>
+              <div><p className="text-lg font-bold text-[#0A2540]">{active.name}</p><p className="text-sm text-slate-500">{active.desc}</p></div>
               {active.engine === 'server' && <span className="ml-auto rounded-full bg-violet-100 px-2.5 py-0.5 text-[11px] font-semibold text-violet-700">Xử lý máy chủ</span>}
             </div>
 
             {multiOf(active) ? (
               /* Ảnh→PDF / Ghép PDF: MỘT hộp gồm ảnh + chọn thư mục, luôn hiện (kể cả khi trống) */
-              <div onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)} onDrop={dropFiles} className={`mb-3 rounded-2xl border bg-white p-3 transition ${drag ? 'border-[#0B4045] ring-2 ring-[#0B4045]/20' : ''}`}>
+              <div onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)} onDrop={dropFiles} className={`mb-3 rounded-2xl border bg-white p-3 transition ${drag ? 'border-[#0A2540] ring-2 ring-[#0A2540]/20' : ''}`}>
                 {!files.length ? (
-                  <div onClick={() => openPicker()} className={`flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed px-6 py-10 text-center transition ${drag ? 'border-[#0B4045] bg-slate-50' : 'border-slate-300 hover:border-[#0B4045] hover:bg-slate-50'}`}>
-                    <div className="text-4xl">⬆️</div><p className="text-base font-semibold text-[#0B4045]">Kéo thả {typeLabel(active)} vào đây</p><p className="text-sm text-slate-400">bấm để chọn từ máy · hoặc <b className="font-semibold text-slate-500">dán ảnh (Ctrl+V)</b></p>
+                  <div onClick={() => openPicker()} className={`flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed px-6 py-10 text-center transition ${drag ? 'border-[#0A2540] bg-slate-50' : 'border-slate-300 hover:border-[#0A2540] hover:bg-slate-50'}`}>
+                    <div className="text-4xl">⬆️</div><p className="text-base font-semibold text-[#0A2540]">Kéo thả {typeLabel(active)} vào đây</p><p className="text-sm text-slate-400">bấm để chọn từ máy · hoặc <b className="font-semibold text-slate-500">dán ảnh (Ctrl+V)</b></p>
                   </div>
                 ) : (
                   <MultiFileManager input={active.input} files={files} rots={rots} onReorder={moveItem} onDelete={delItem} onRotate={rotItem} onAdd={() => openPicker(true)} onClear={clearAll} />
@@ -603,8 +603,8 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
                     {useDir && (
                       <div className="mt-2.5 space-y-2.5 pl-7">
                         <div className="flex flex-wrap items-center gap-2 text-sm">
-                          <button type="button" onClick={chooseDir} className="inline-flex w-32 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[#0B4045] px-3 py-1.5 text-xs font-semibold text-[#0B4045] hover:bg-slate-50">📁 {dirName ? 'Đổi thư mục' : 'Chọn thư mục'}</button>
-                          {dirName ? <b className="break-all text-[#0B4045]">📁 {dirName}</b> : <span className="text-[11px] text-emerald-600">Chưa chọn — sẽ tự động lưu vào Downloads</span>}
+                          <button type="button" onClick={chooseDir} className="inline-flex w-32 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[#0A2540] px-3 py-1.5 text-xs font-semibold text-[#0A2540] hover:bg-slate-50">📁 {dirName ? 'Đổi thư mục' : 'Chọn thư mục'}</button>
+                          {dirName ? <b className="break-all text-[#0A2540]">📁 {dirName}</b> : <span className="text-[11px] text-emerald-600">Chưa chọn — sẽ tự động lưu vào Downloads</span>}
                         </div>
                         {active.id !== 'compress' && (
                           <div className="flex items-center gap-2 text-sm text-slate-600">
@@ -621,13 +621,13 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
                 </div>
               </div>
             ) : !files.length ? (
-              <div onClick={() => openPicker()} onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)} onDrop={(e) => { e.preventDefault(); setDrag(false); takeFiles(e.dataTransfer.files); }} className={`flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed px-6 py-12 text-center transition ${drag ? 'border-[#0B4045] bg-slate-50' : 'border-slate-300 hover:border-[#0B4045] hover:bg-slate-50'}`}>
-                <div className="text-5xl">⬆️</div><p className="text-lg font-semibold text-[#0B4045]">Kéo thả {typeLabel(active)} vào đây</p><p className="text-sm text-slate-400">bấm để chọn từ máy</p>
+              <div onClick={() => openPicker()} onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)} onDrop={(e) => { e.preventDefault(); setDrag(false); takeFiles(e.dataTransfer.files); }} className={`flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed px-6 py-12 text-center transition ${drag ? 'border-[#0A2540] bg-slate-50' : 'border-slate-300 hover:border-[#0A2540] hover:bg-slate-50'}`}>
+                <div className="text-5xl">⬆️</div><p className="text-lg font-semibold text-[#0A2540]">Kéo thả {typeLabel(active)} vào đây</p><p className="text-sm text-slate-400">bấm để chọn từ máy</p>
               </div>
             ) : (
               <div>
                 <div className="mb-3 flex items-center gap-2 rounded-lg border bg-white px-3 py-2 text-sm">
-                  <span className="text-lg">📄</span><span className="min-w-0 flex-1 truncate font-medium text-[#0B4045]">{files[0].name}</span>
+                  <span className="text-lg">📄</span><span className="min-w-0 flex-1 truncate font-medium text-[#0A2540]">{files[0].name}</span>
                   <button onClick={() => openPicker(false)} className="rounded-lg border px-3 py-1 text-xs font-medium hover:bg-slate-50">Chọn tệp khác</button>
                 </div>
                 <div className="mb-3 rounded-xl border bg-white p-3">
@@ -652,8 +652,8 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
                       {([['giong', 'Giống hệt bản gốc', 'Nhìn y như tờ PDF, đúng từng vị trí chữ. Nhược: mỗi đoạn nằm trong một khung riêng, sửa chữ rất cực.'],
                          ['chay', 'Chữ chảy — dễ sửa', 'Chữ xếp thành dòng như văn bản Word thường, sửa/chèn/xoá thoải mái. Nhược: không giữ đúng từng vị trí trên trang.']] as [string, string, string][]).map(([k, ten, mo]) => (
                         <button key={k} onClick={() => setKieuWord(k as any)}
-                          className={`rounded-xl border p-2.5 text-left transition ${kieuWord === k ? 'border-[#0B4045] bg-white ring-2 ring-[#0B4045]/20' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
-                          <span className="block text-[13px] font-bold text-[#0B4045]">{ten}</span>
+                          className={`rounded-xl border p-2.5 text-left transition ${kieuWord === k ? 'border-[#0A2540] bg-white ring-2 ring-[#0A2540]/20' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                          <span className="block text-[13px] font-bold text-[#0A2540]">{ten}</span>
                           <span className="mt-0.5 block text-[11.5px] leading-snug text-slate-500">{mo}</span>
                         </button>
                       ))}
@@ -714,11 +714,11 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
                           {compressRows.map((r, i) => (
                             <tr key={i} className={`border-t ${compressSel.has(i) ? 'bg-emerald-50/40' : ''}`}>
                               <td className="px-2 py-2 text-center"><input type="checkbox" checked={compressSel.has(i)} onChange={() => setCompressSel((s) => { const n = new Set(s); if (n.has(i)) n.delete(i); else n.add(i); return n; })} className="h-4 w-4 align-middle accent-emerald-600" /></td>
-                              <td className="max-w-[120px] truncate px-2 py-2 text-[#0B4045]" title={r.name}>{r.name}</td>
+                              <td className="max-w-[120px] truncate px-2 py-2 text-[#0A2540]" title={r.name}>{r.name}</td>
                               <td className="px-2 py-2 text-right tabular-nums text-slate-500">{mb(r.before)}</td>
-                              <td className="px-2 py-2 text-right font-semibold tabular-nums text-[#0B4045]">{mb(r.after)}</td>
+                              <td className="px-2 py-2 text-right font-semibold tabular-nums text-[#0A2540]">{mb(r.after)}</td>
                               <td className="px-2 py-2 text-right font-bold tabular-nums text-emerald-600">−{pctDown(r.before, r.after)}%</td>
-                              <td className="px-2 py-2"><div className="flex justify-end gap-1"><button onClick={() => window.open(r.url, '_blank')} className="rounded-lg border px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50">Xem</button><button onClick={() => saveRow(r)} className="rounded-lg border px-2 py-1 text-xs font-semibold text-[#0B4045] hover:bg-slate-50">Tải</button></div></td>
+                              <td className="px-2 py-2"><div className="flex justify-end gap-1"><button onClick={() => window.open(r.url, '_blank')} className="rounded-lg border px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50">Xem</button><button onClick={() => saveRow(r)} className="rounded-lg border px-2 py-1 text-xs font-semibold text-[#0A2540] hover:bg-slate-50">Tải</button></div></td>
                             </tr>
                           ))}
                         </tbody>
@@ -727,7 +727,7 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
                             <td className="px-2 py-2" />
                             <td className="px-2 py-2 text-xs font-bold text-slate-600">Tổng {compressRows.length} tệp</td>
                             <td className="px-2 py-2 text-right text-xs font-semibold tabular-nums text-slate-500">{mb(compressRows.reduce((s, r) => s + r.before, 0))}</td>
-                            <td className="px-2 py-2 text-right text-xs font-bold tabular-nums text-[#0B4045]">{mb(compressRows.reduce((s, r) => s + r.after, 0))}</td>
+                            <td className="px-2 py-2 text-right text-xs font-bold tabular-nums text-[#0A2540]">{mb(compressRows.reduce((s, r) => s + r.after, 0))}</td>
                             <td className="px-2 py-2 text-right text-xs font-bold tabular-nums text-emerald-600">−{pctDown(compressRows.reduce((s, r) => s + r.before, 0), compressRows.reduce((s, r) => s + r.after, 0))}%</td>
                             <td className="px-2 py-2" />
                           </tr>
@@ -749,9 +749,9 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
                     <div className="max-h-64 divide-y overflow-auto">
                       {outFiles.map((r, i) => (
                         <div key={i} className="flex items-center gap-2 px-3 py-2 text-sm">
-                          <span className="min-w-0 flex-1 truncate text-[#0B4045]" title={r.name}>{r.name}</span>
+                          <span className="min-w-0 flex-1 truncate text-[#0A2540]" title={r.name}>{r.name}</span>
                           <button onClick={() => window.open(r.url, '_blank')} className="rounded-lg border px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50">Xem</button>
-                          <button onClick={() => taiRa(r)} className="rounded-lg border px-2 py-1 text-xs font-semibold text-[#0B4045] hover:bg-slate-50">Tải</button>
+                          <button onClick={() => taiRa(r)} className="rounded-lg border px-2 py-1 text-xs font-semibold text-[#0A2540] hover:bg-slate-50">Tải</button>
                         </div>
                       ))}
                     </div>
@@ -773,7 +773,7 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
           <div key={c.cat} className="mb-5">
             <p className={`mb-2 text-xs font-bold uppercase tracking-wide ${c.color}`}>{c.cat}</p>
             <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
-              {c.tools.map((t) => <button key={t.id} onClick={() => enter(t)} title={t.desc} className={`flex items-start gap-2.5 rounded-xl border p-3.5 text-left transition hover:border-[#0B4045] hover:bg-slate-50 ${t.engine === 'edit' ? 'border-[#C8A14B] bg-[#C8A14B]/5' : ''}`}><span className="text-2xl leading-none">{t.icon}</span><span className="min-w-0"><span className="block text-sm font-semibold text-[#0B4045]">{t.name}</span><span className="block truncate text-xs text-slate-400">{t.desc}</span></span></button>)}
+              {c.tools.map((t) => <button key={t.id} onClick={() => enter(t)} title={t.desc} className={`flex items-start gap-2.5 rounded-xl border p-3.5 text-left transition hover:border-[#0A2540] hover:bg-slate-50 ${t.engine === 'edit' ? 'border-[#C8A14B] bg-[#C8A14B]/5' : ''}`}><span className="text-2xl leading-none">{t.icon}</span><span className="min-w-0"><span className="block text-sm font-semibold text-[#0A2540]">{t.name}</span><span className="block truncate text-xs text-slate-400">{t.desc}</span></span></button>)}
             </div>
           </div>
         ))}

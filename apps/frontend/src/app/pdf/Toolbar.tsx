@@ -10,12 +10,12 @@ export function Toolbar({ tool, setTool, selText, updateSel, color, setColor, fo
     <div className="flex flex-wrap items-center gap-1.5 border-b bg-white px-3 py-2 shadow-sm">
       {!embedded && <button onClick={() => { window.location.href = '/'; }} title="Thoát" className="mr-1 rounded px-2 py-1.5 text-sm hover:bg-slate-100">✕</button>}
       <button onClick={onTools} title="Về danh sách công cụ" className="mr-1 rounded px-2 py-1.5 text-sm hover:bg-slate-100">←</button>
-      <b className="mr-2 text-[#0B4045]">📄 PDF Editor</b>
+      <b className="mr-2 text-[#0A2540]">📄 PDF Editor</b>
       <button onClick={onOpenPdf} className="rounded bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-700">Mở PDF</button>
       <button onClick={onMergePdf} disabled={!hasPages} className="rounded border px-3 py-1.5 text-sm disabled:opacity-40">Ghép PDF</button>
       <button onClick={onTools} className="rounded border px-3 py-1.5 text-sm hover:bg-slate-50">🧰 Công cụ</button>
       <span className="mx-1 h-6 w-px bg-slate-200" />
-      {TOOLS.map((t) => <button key={t.k} onClick={() => { setTool(t.k); if (t.k === 'image') onImageTool(); if (t.k === 'sign') onSign(); }} className={`rounded px-2.5 py-1.5 text-sm font-medium ${tool === t.k ? 'bg-[#0B4045] text-white' : 'hover:bg-slate-100'}`}>{t.icon} {t.label}</button>)}
+      {TOOLS.map((t) => <button key={t.k} onClick={() => { setTool(t.k); if (t.k === 'image') onImageTool(); if (t.k === 'sign') onSign(); }} className={`rounded px-2.5 py-1.5 text-sm font-medium ${tool === t.k ? 'bg-[#0A2540] text-white' : 'hover:bg-slate-100'}`}>{t.icon} {t.label}</button>)}
       <span className="mx-1 h-6 w-px bg-slate-200" />
       <input type="color" value={color} onChange={(e) => { setColor(e.target.value); if (selText) updateSel({ color: fromHex(e.target.value) }); }} className="h-7 w-8 cursor-pointer rounded border" title="Màu" />
       <select value={selText ? selText.o.fam : 'serif'} onChange={(e) => { if (selText) updateSel({ fam: e.target.value }); }} disabled={!selText} title="Phông chữ (chọn ô chữ để đổi cho khớp file)" className="rounded border px-1 py-1 text-sm disabled:opacity-40"><option value="serif">Times New Roman</option><option value="sans">Arial</option><option value="tahoma">Tahoma</option><option value="calibri">Calibri</option><option value="verdana">Verdana</option></select>

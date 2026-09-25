@@ -15,7 +15,7 @@ const so = (s: string) => {
 };
 const khongDau = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase();
 // Ô nhập: chữ 16px để iPhone không tự phóng to trang khi bấm vào ô.
-const O = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-[16px] outline-none focus:border-[#0B4045]';
+const O = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-[16px] outline-none focus:border-[#0A2540]';
 const TL = '/tai-lieu/';
 
 type DongTinh = { ten: string; dv: string; gia: number; sl: number };
@@ -82,7 +82,7 @@ export default function DenBuClient() {
     <button key={i} onClick={() => themMuc(m)} className="block w-full border-b border-slate-100 px-3 py-2 text-left last:border-b-0 hover:bg-slate-50 active:bg-slate-100">
       <span className="block text-[13.5px] font-semibold leading-snug text-slate-700">{[m.phu, m.ten].filter(Boolean).join(' · ')}</span>
       {m.ketCau && <span className="mt-0.5 block text-[11.5px] leading-snug text-slate-400">{m.ketCau}</span>}
-      <span className="mt-0.5 block text-[12.5px] font-bold text-[#0B4045]">{tien(m.gia)} / {m.dv}
+      <span className="mt-0.5 block text-[12.5px] font-bold text-[#0A2540]">{tien(m.gia)} / {m.dv}
         <span className="ml-1 font-normal text-slate-400">· {(m.pl ? TEN_PL[m.pl]?.split('—')[1] || m.nhom : m.nhom).toLowerCase().trim()}</span></span>
     </button>
   );
@@ -158,12 +158,12 @@ export default function DenBuClient() {
   const [moTong, setMoTong] = useState(true);   // thanh tổng tiền dính đáy: mở sẵn phần chi tiết
   const nut = (k: typeof tab, nhan: string) => (
     <button key={k} onClick={() => setTab(k)}
-      className={`cl-press whitespace-nowrap rounded-full px-3.5 py-2 text-[13px] font-semibold ${tab === k ? 'bg-[#0B4045] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>{nhan}</button>
+      className={`cl-press whitespace-nowrap rounded-full px-3.5 py-2 text-[13px] font-semibold ${tab === k ? 'bg-[#0A2540] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>{nhan}</button>
   );
 
   return (
     <div className="mx-auto max-w-3xl px-3 py-5 sm:px-4 sm:py-8">
-      <h1 className="text-xl font-extrabold text-[#0B4045] sm:text-3xl">Đền bù khi Nhà nước thu hồi đất — Cam Lâm</h1>
+      <h1 className="text-xl font-extrabold text-[#0A2540] sm:text-3xl">Đền bù khi Nhà nước thu hồi đất — Cam Lâm</h1>
       <p className="mt-2 text-sm leading-relaxed text-slate-600">
         Tra giá đất bồi thường theo <b>từng thôn / từng dự án</b>, đơn giá <b>nhà và công trình</b>, rồi tính nhanh tổng tiền. Số liệu lấy nguyên từ văn bản của cơ quan nhà nước — bấm nút để xem bản gốc.
       </p>
@@ -177,12 +177,12 @@ export default function DenBuClient() {
         <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <p className="text-[13px] font-bold uppercase tracking-wide text-slate-400">Thửa đất nằm trong dự án nào</p>
           <div className="mt-2 grid gap-2 sm:grid-cols-2">
-            <button onClick={() => setDuAn('camlam')} className={`cl-press rounded-xl border p-3 text-left ${duAn === 'camlam' ? 'border-[#0B4045] bg-[#0B4045]/[0.04]' : 'border-slate-200'}`}>
-              <b className="text-[14px] text-[#0B4045]">Khu đô thị mới Cam Lâm</b>
+            <button onClick={() => setDuAn('camlam')} className={`cl-press rounded-xl border p-3 text-left ${duAn === 'camlam' ? 'border-[#0A2540] bg-[#0A2540]/[0.04]' : 'border-slate-200'}`}>
+              <b className="text-[14px] text-[#0A2540]">Khu đô thị mới Cam Lâm</b>
               <span className="mt-0.5 block text-[12px] text-slate-500">Theo bảng giá đất MỚI (NQ 15/2025) · {DEN_BU_NGUON.vanBan}</span>
             </button>
-            <button onClick={() => setDuAn('phuchop')} className={`cl-press rounded-xl border p-3 text-left ${duAn === 'phuchop' ? 'border-[#0B4045] bg-[#0B4045]/[0.04]' : 'border-slate-200'}`}>
-              <b className="text-[14px] text-[#0B4045]">4 khu đô thị phức hợp <span className="text-[11px] font-normal text-amber-700">(bảng giá cũ)</span></b>
+            <button onClick={() => setDuAn('phuchop')} className={`cl-press rounded-xl border p-3 text-left ${duAn === 'phuchop' ? 'border-[#0A2540] bg-[#0A2540]/[0.04]' : 'border-slate-200'}`}>
+              <b className="text-[14px] text-[#0A2540]">4 khu đô thị phức hợp <span className="text-[11px] font-normal text-amber-700">(bảng giá cũ)</span></b>
               <span className="mt-0.5 block text-[12px] text-slate-500">Suối Tân · Cam Thượng · Cam Tân · Cam Hòa — quyết định 23/9/2025</span>
             </button>
           </div>
@@ -193,7 +193,7 @@ export default function DenBuClient() {
               <div className="mt-2 flex flex-wrap gap-2">
                 {(['cay', 'thuysan', 'rung'] as LoaiDat[]).map((k) => (
                   <button key={k} onClick={() => { setLoai(k); const d = dsThon(k); if (!d.includes(thon)) setThon(d[0]); }}
-                    className={`cl-press rounded-full px-3.5 py-2 text-[13px] font-semibold ${loai === k ? 'bg-[#0B4045] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>
+                    className={`cl-press rounded-full px-3.5 py-2 text-[13px] font-semibold ${loai === k ? 'bg-[#0A2540] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>
                     {TEN_NGAN_LOAI_DAT[k]}
                   </button>
                 ))}
@@ -213,7 +213,7 @@ export default function DenBuClient() {
                     {dsThonLoc.length === 0 && <p className="px-3 py-2.5 text-[13px] text-slate-400">Không có thôn nào khớp “{timThon}”.</p>}
                     {dsThonLoc.map((t) => (
                       <button key={t} onMouseDown={(e) => { e.preventDefault(); setThon(t); setMoThon(false); setTimThon(''); }}
-                        className={`block w-full border-b border-slate-100 px-3 py-2.5 text-left text-[14px] last:border-b-0 hover:bg-slate-50 ${t === thonDung ? 'bg-amber-50/70 font-semibold text-[#0B4045]' : 'text-slate-700'}`}>
+                        className={`block w-full border-b border-slate-100 px-3 py-2.5 text-left text-[14px] last:border-b-0 hover:bg-slate-50 ${t === thonDung ? 'bg-amber-50/70 font-semibold text-[#0A2540]' : 'text-slate-700'}`}>
                         {t === thonDung && <span className="mr-1 text-[#C8A14B]">✓</span>}{t}
                       </button>
                     ))}
@@ -228,7 +228,7 @@ export default function DenBuClient() {
                   const g = giaDenBu(thonDung, loai, v);
                   return (
                     <button key={v} onClick={() => setViTri(v)}
-                      className={`cl-press flex-1 rounded-lg px-3 py-2 text-[14px] font-semibold ${viTri === v ? 'bg-[#0B4045] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>
+                      className={`cl-press flex-1 rounded-lg px-3 py-2 text-[14px] font-semibold ${viTri === v ? 'bg-[#0A2540] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>
                       Vị trí {v}
                       <span className={`mt-0.5 block text-[11.5px] font-normal ${viTri === v ? 'text-white/80' : 'text-slate-400'}`}>{g == null ? 'không ghi giá' : tien(g) + '/m²'}</span>
                     </button>
@@ -241,12 +241,12 @@ export default function DenBuClient() {
             <>
               <p className="mt-4 text-[13px] font-bold uppercase tracking-wide text-slate-400">Phương án bồi thường được duyệt khi nào</p>
               <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                <button onClick={() => setPhBanGia('cu')} className={`cl-press rounded-xl border p-3 text-left ${phBanGia === 'cu' ? 'border-[#0B4045] bg-[#0B4045]/[0.04]' : 'border-slate-200'}`}>
-                  <b className="text-[13.5px] text-[#0B4045]">Trước 01/01/2026</b>
+                <button onClick={() => setPhBanGia('cu')} className={`cl-press rounded-xl border p-3 text-left ${phBanGia === 'cu' ? 'border-[#0A2540] bg-[#0A2540]/[0.04]' : 'border-slate-200'}`}>
+                  <b className="text-[13.5px] text-[#0A2540]">Trước 01/01/2026</b>
                   <span className="mt-0.5 block text-[12px] text-slate-500">Tiền hỗ trợ tính theo bảng giá đất CŨ (QĐ 04/2020, sửa bởi QĐ 23/2025)</span>
                 </button>
-                <button onClick={() => setPhBanGia('moi')} className={`cl-press rounded-xl border p-3 text-left ${phBanGia === 'moi' ? 'border-[#0B4045] bg-[#0B4045]/[0.04]' : 'border-slate-200'}`}>
-                  <b className="text-[13.5px] text-[#0B4045]">Từ 01/01/2026</b>
+                <button onClick={() => setPhBanGia('moi')} className={`cl-press rounded-xl border p-3 text-left ${phBanGia === 'moi' ? 'border-[#0A2540] bg-[#0A2540]/[0.04]' : 'border-slate-200'}`}>
+                  <b className="text-[13.5px] text-[#0A2540]">Từ 01/01/2026</b>
                   <span className="mt-0.5 block text-[12px] text-slate-500">Tiền hỗ trợ tính theo bảng giá đất MỚI (Nghị quyết 15/2025)</span>
                 </button>
               </div>
@@ -263,7 +263,7 @@ export default function DenBuClient() {
               <div className="mt-2 flex flex-wrap gap-2">
                 {([['cayLauNam', 'Cây lâu năm'], ['cayHangNam', 'Cây hằng năm'], ['lua', 'Lúa nước 2 vụ'], ['rung', 'Rừng sản xuất'], ['thuySan', 'Nuôi trồng thuỷ sản']] as const).map(([k, n]) => (
                   <button key={k} onClick={() => setPhLoai(k)}
-                    className={`cl-press rounded-full px-3.5 py-2 text-[13px] font-semibold ${phLoai === k ? 'bg-[#0B4045] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>{n}</button>
+                    className={`cl-press rounded-full px-3.5 py-2 text-[13px] font-semibold ${phLoai === k ? 'bg-[#0A2540] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>{n}</button>
                 ))}
               </div>
               <p className="mt-4 text-[13px] font-bold uppercase tracking-wide text-slate-400">Vị trí thửa đất so với đường</p>
@@ -272,7 +272,7 @@ export default function DenBuClient() {
                   const g = phLoai === 'lua' ? (k.endsWith('tiep') ? GIA_LUA_2VU.tiepGiap : GIA_LUA_2VU.khongTiepGiap) : GIA_PHUC_HOP[k][phLoai];
                   return (
                     <button key={k} onClick={() => setPhVt(k)}
-                      className={`cl-press rounded-lg border px-3 py-2 text-left text-[13.5px] ${phVt === k ? 'border-[#0B4045] bg-[#0B4045]/[0.04] font-semibold text-[#0B4045]' : 'border-slate-200 text-slate-600'}`}>
+                      className={`cl-press rounded-lg border px-3 py-2 text-left text-[13.5px] ${phVt === k ? 'border-[#0A2540] bg-[#0A2540]/[0.04] font-semibold text-[#0A2540]' : 'border-slate-200 text-slate-600'}`}>
                       {TEN_VI_TRI_PH[k]}
                       <span className="ml-1 text-[12px] font-normal text-slate-400">— {g == null ? 'không ghi giá' : tien(g) + '/m²'}</span>
                     </button>
@@ -291,9 +291,9 @@ export default function DenBuClient() {
               <p className="text-[14px] text-slate-600">Văn bản <b>không ghi giá</b> cho trường hợp này. Hãy chọn lại loại đất / vị trí, hoặc hỏi hội đồng bồi thường.</p>
             ) : (
               <>
-                <p className="text-[14px] text-slate-600">Giá đền bù 1 m²: <b className="text-[#0B4045]">{tien(giaM2)}</b></p>
+                <p className="text-[14px] text-slate-600">Giá đền bù 1 m²: <b className="text-[#0A2540]">{tien(giaM2)}</b></p>
                 <p className="mt-1 text-[15px] text-slate-600">Tiền bồi thường về đất:
-                  <b className="ml-1.5 text-[18px] text-[#0B4045]">{dienTich > 0 ? tien(tienDat) : '—'}</b></p>
+                  <b className="ml-1.5 text-[18px] text-[#0A2540]">{dienTich > 0 ? tien(tienDat) : '—'}</b></p>
                 {dienTich > 0 && <p className="mt-0.5 text-[12px] text-slate-500">{tien(giaM2)} × {dienTich.toLocaleString('vi-VN')} m²</p>}
               </>
             )}
@@ -301,15 +301,15 @@ export default function DenBuClient() {
 
           <div className="mt-3 flex flex-wrap gap-2">
             {duAn === 'camlam'
-              ? <a href={TL + 'TB-306-gia-dat-boi-thuong-Cam-Lam-07-5-2026.pdf'} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 px-3 py-1.5 text-[12.5px] font-semibold text-[#0B4045] hover:bg-slate-200">📄 {DEN_BU_NGUON.vanBan}</a>
+              ? <a href={TL + 'TB-306-gia-dat-boi-thuong-Cam-Lam-07-5-2026.pdf'} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 px-3 py-1.5 text-[12.5px] font-semibold text-[#0A2540] hover:bg-slate-200">📄 {DEN_BU_NGUON.vanBan}</a>
               : DU_AN_PHUC_HOP.map((d) => (
-                <a key={d.ma} href={TL + d.tep} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 px-3 py-1.5 text-[12.5px] font-semibold text-[#0B4045] hover:bg-slate-200">📄 {d.ten.replace('Khu đô thị phức hợp ', 'QĐ ' + d.ma + ' — ')}</a>
+                <a key={d.ma} href={TL + d.tep} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 px-3 py-1.5 text-[12.5px] font-semibold text-[#0A2540] hover:bg-slate-200">📄 {d.ten.replace('Khu đô thị phức hợp ', 'QĐ ' + d.ma + ' — ')}</a>
               ))}
           </div>
 
           {duAn === 'camlam' && (
             <details className="group mt-3 overflow-hidden rounded-xl border border-slate-200">
-              <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2.5 text-[13.5px] font-bold text-[#0B4045] hover:bg-slate-50">
+              <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2.5 text-[13.5px] font-bold text-[#0A2540] hover:bg-slate-50">
                 <span>Xem cả bảng {GIA_NONG_NGHIEP.length} khu vực</span><span className="text-[#C8A14B] transition-transform group-open:rotate-180">▾</span>
               </summary>
               <div className="overflow-x-auto px-3 pb-3">
@@ -323,18 +323,18 @@ export default function DenBuClient() {
                     {GIA_NONG_NGHIEP.map((r) => (
                       <tr key={r[0]} className="border-t border-slate-100">
                         <td className="py-1.5 pr-2 text-slate-700">{r[0]}</td>
-                        {r.slice(1).map((v, i) => <td key={i} className="px-2 py-1.5 text-right tabular-nums text-[#0B4045]">{v == null ? '—' : (v as number).toLocaleString('vi-VN')}</td>)}
+                        {r.slice(1).map((v, i) => <td key={i} className="px-2 py-1.5 text-right tabular-nums text-[#0A2540]">{v == null ? '—' : (v as number).toLocaleString('vi-VN')}</td>)}
                       </tr>
                     ))}
                   </tbody>
                 </table>
-                <p className="mt-3 font-bold text-[#0B4045]">Đất rừng sản xuất</p>
+                <p className="mt-3 font-bold text-[#0A2540]">Đất rừng sản xuất</p>
                 <table className="w-full min-w-[320px] text-[12.5px]"><tbody>
                   {GIA_RUNG_SAN_XUAT.map((r) => (
                     <tr key={r[0]} className="border-t border-slate-100">
                       <td className="py-1.5 pr-2 text-slate-700">{r[0]}</td>
-                      <td className="px-2 py-1.5 text-right tabular-nums text-[#0B4045]">{r[1].toLocaleString('vi-VN')}</td>
-                      <td className="py-1.5 pl-2 text-right tabular-nums text-[#0B4045]">{r[2].toLocaleString('vi-VN')}</td>
+                      <td className="px-2 py-1.5 text-right tabular-nums text-[#0A2540]">{r[1].toLocaleString('vi-VN')}</td>
+                      <td className="py-1.5 pl-2 text-right tabular-nums text-[#0A2540]">{r[2].toLocaleString('vi-VN')}</td>
                     </tr>
                   ))}
                 </tbody></table>
@@ -357,11 +357,11 @@ export default function DenBuClient() {
             {loc(mucs, tim).map(theMuc)}
             {mucs.length > 0 && loc(mucs, tim).length === 0 && <p className="p-3 text-[13px] text-slate-400">Không tìm thấy hạng mục nào.</p>}
           </div>
-          <p className="mt-1.5 text-[12px] leading-snug text-slate-500">Bấm một hạng mục là cộng vào bảng tính. Bản gốc: <a href={TL + 'QD-08-2026-don-gia-boi-thuong-nha-cong-trinh.pdf'} target="_blank" rel="noreferrer" className="font-semibold text-[#0B4045] underline">QĐ 08/2026 (PDF)</a>. Nhà, công trình xây theo giấy phép có thời hạn mà giấy phép đã hết hạn thì <b>chỉ được hỗ trợ 20%</b> mức trên (Điều 3 QĐ 08/2026).</p>
+          <p className="mt-1.5 text-[12px] leading-snug text-slate-500">Bấm một hạng mục là cộng vào bảng tính. Bản gốc: <a href={TL + 'QD-08-2026-don-gia-boi-thuong-nha-cong-trinh.pdf'} target="_blank" rel="noreferrer" className="font-semibold text-[#0A2540] underline">QĐ 08/2026 (PDF)</a>. Nhà, công trình xây theo giấy phép có thời hạn mà giấy phép đã hết hạn thì <b>chỉ được hỗ trợ 20%</b> mức trên (Điều 3 QĐ 08/2026).</p>
 
           {dongs.length > 0 && (
             <div className="mt-3 rounded-xl bg-slate-50 p-3">
-              <p className="text-[13px] font-bold text-[#0B4045]">Hạng mục đã chọn</p>
+              <p className="text-[13px] font-bold text-[#0A2540]">Hạng mục đã chọn</p>
               {dongs.map((d, i) => (
                 <div key={i} className="mt-2 flex items-start gap-2 border-t border-slate-200 pt-2 first:border-t-0 first:pt-0">
                   <div className="min-w-0 flex-1">
@@ -373,7 +373,7 @@ export default function DenBuClient() {
                   <button onClick={() => setDongs((a) => a.filter((_, j) => j !== i))} aria-label="Bỏ" className="shrink-0 px-1 text-slate-400">✕</button>
                 </div>
               ))}
-              <p className="mt-2 border-t border-slate-200 pt-2 text-[14px] text-slate-600">Cộng nhà &amp; công trình: <b className="text-[#0B4045]">{tien(tienNha)}</b></p>
+              <p className="mt-2 border-t border-slate-200 pt-2 text-[14px] text-slate-600">Cộng nhà &amp; công trình: <b className="text-[#0A2540]">{tien(tienNha)}</b></p>
             </div>
           )}
         </div>
@@ -383,11 +383,11 @@ export default function DenBuClient() {
       {tab === 'khac' && (
         <div className="mt-3 space-y-3">
           <div className="rounded-2xl border border-slate-200 bg-white p-4">
-            <p className="font-bold text-[#0B4045]">Hỗ trợ cho người có đất bị thu hồi</p>
+            <p className="font-bold text-[#0A2540]">Hỗ trợ cho người có đất bị thu hồi</p>
             <p className="mt-1 text-[12.5px] leading-snug text-slate-500">Mức cụ thể do UBND tỉnh quy định và ghi trong phương án bồi thường của dự án — điền vào đây để cộng vào tổng.</p>
 
             <div className="mt-3 rounded-xl bg-slate-50 p-3">
-              <p className="text-[13.5px] font-semibold text-[#0B4045]">Hỗ trợ đào tạo, chuyển đổi nghề &amp; tìm kiếm việc làm</p>
+              <p className="text-[13.5px] font-semibold text-[#0A2540]">Hỗ trợ đào tạo, chuyển đổi nghề &amp; tìm kiếm việc làm</p>
               <p className="mt-0.5 text-[12px] leading-snug text-slate-500">= <b>giá đất nông nghiệp trong BẢNG GIÁ ĐẤT của nhà nước</b> (không phải giá bồi thường) × diện tích <b>trong hạn mức</b> × số lần.
                 Khánh Hòa đang áp dụng <b>03 lần</b> — nguyên văn Điều 13: “<i>bằng 03 lần giá đất nông nghiệp cùng loại trong Bảng giá đất hiện hành… đối với toàn bộ diện tích đất nông nghiệp thu hồi nhưng không vượt quá hạn mức giao đất nông nghiệp</i>”
                 (khoản 10 Điều 2 <b>QĐ 14/2025/QĐ-UBND</b> sửa Điều 13 QĐ 17/2024). Con số 5 lần chỉ là <b>mức trần</b> Trung ương cho phép (khoản 3 Điều 22 NĐ 88/2024), <b>không phải mức tỉnh chi trả</b>.</p>
@@ -399,26 +399,26 @@ export default function DenBuClient() {
                 <span className="text-[12.5px] text-slate-600">Số lần:</span>
                 {[String(SO_LAN_KHANH_HOA), String(SO_LAN_TRAN)].map((k) => (
                   <button key={k} onClick={() => setHeSoNghe(k)}
-                    className={`cl-press rounded-full px-3 py-1.5 text-[13px] font-bold ${heSoNghe === k ? 'bg-[#0B4045] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>
+                    className={`cl-press rounded-full px-3 py-1.5 text-[13px] font-bold ${heSoNghe === k ? 'bg-[#0A2540] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>
                     × {k} lần{k === String(SO_LAN_KHANH_HOA) ? ' — Khánh Hòa đang áp dụng' : ' — trần của Nghị định'}
                   </button>
                 ))}
               </div>
               <div className="mt-2 rounded-lg border border-slate-200 bg-white px-3 py-2">
                 <p className="text-[12px] leading-snug text-slate-500">
-                  {dungBangGiaMoi ? (<>Lấy theo <b>BẢNG GIÁ ĐẤT của tỉnh</b> — Nghị quyết 15/2025/NQ-HĐND (KHÔNG phải giá bồi thường): <b className="text-[#0B4045]">{BANG_GIA_NN[loaiBG].ten}</b></>)
-                    : (<>Phương án duyệt <b>trước 01/01/2026</b> → lấy <b>bảng giá đất cũ</b> (QĐ 04/2020, sửa bởi QĐ 23/2025). Web chưa có bảng này, hãy điền giá ghi trong phương án: <b className="text-[#0B4045]">{BANG_GIA_NN[loaiBG].ten}</b></>)}
+                  {dungBangGiaMoi ? (<>Lấy theo <b>BẢNG GIÁ ĐẤT của tỉnh</b> — Nghị quyết 15/2025/NQ-HĐND (KHÔNG phải giá bồi thường): <b className="text-[#0A2540]">{BANG_GIA_NN[loaiBG].ten}</b></>)
+                    : (<>Phương án duyệt <b>trước 01/01/2026</b> → lấy <b>bảng giá đất cũ</b> (QĐ 04/2020, sửa bởi QĐ 23/2025). Web chưa có bảng này, hãy điền giá ghi trong phương án: <b className="text-[#0A2540]">{BANG_GIA_NN[loaiBG].ten}</b></>)}
                 </p>
                 <div className="mt-1.5 flex flex-wrap items-center gap-2">
                   {duAn !== 'camlam' && dungBangGiaMoi && (
                     <select value={vtBG} onChange={(e) => setVtBG(Number(e.target.value) as 1 | 2)}
-                      className="rounded-lg border border-slate-300 px-2 py-1.5 text-[14px] outline-none focus:border-[#0B4045]">
+                      className="rounded-lg border border-slate-300 px-2 py-1.5 text-[14px] outline-none focus:border-[#0A2540]">
                       <option value={1}>Vị trí 1</option><option value={2}>Vị trí 2</option>
                     </select>
                   )}
                   <input value={giaNNTay} onChange={(e) => setGiaNNTay(e.target.value)} inputMode="decimal"
                     placeholder={giaTuBangGia ? giaTuBangGia.toLocaleString('vi-VN') : 'nhập giá theo bảng giá cũ'}
-                    className="w-32 rounded-lg border border-slate-300 px-2.5 py-1.5 text-right text-[16px] outline-none focus:border-[#0B4045]" />
+                    className="w-32 rounded-lg border border-slate-300 px-2.5 py-1.5 text-right text-[16px] outline-none focus:border-[#0A2540]" />
                   <span className="text-[12.5px] text-slate-500">đ/m² {so(giaNNTay) > 0 ? '(bạn tự nhập)' : dungBangGiaMoi ? `(bảng giá mới, vị trí ${duAn === 'camlam' ? viTri : vtBG})` : '(chưa có — cần điền)'}</span>
                 </div>
                 <p className={`mt-1 text-[11.5px] leading-snug text-slate-400 ${dungBangGiaMoi ? '' : 'hidden'}`}>
@@ -443,14 +443,14 @@ export default function DenBuClient() {
               )}
               {!truSxNn && <p className="mt-1.5 text-[12px] text-slate-500">Không phải hộ trực tiếp sản xuất nông nghiệp → khoản này bằng 0.</p>}
               {tienNghe > 0 && (
-                <p className="mt-1.5 text-[13px] text-slate-600">→ <b className="text-[#0B4045]">{tien(tienNghe)}</b>
+                <p className="mt-1.5 text-[13px] text-slate-600">→ <b className="text-[#0A2540]">{tien(tienNghe)}</b>
                   <span className="ml-1 text-[12px] text-slate-400">({tien(giaNN)} × {dtTinhNghe.toLocaleString('vi-VN')} m² × {heSo})</span></p>
               )}
             </div>
 
             {/* ── Hỗ trợ ổn định đời sống — Điều 19 Nghị định 88/2024/NĐ-CP ── */}
             <div className="mt-3 rounded-xl bg-slate-50 p-3">
-              <p className="text-[13.5px] font-semibold text-[#0B4045]">Hỗ trợ ổn định đời sống</p>
+              <p className="text-[13.5px] font-semibold text-[#0A2540]">Hỗ trợ ổn định đời sống</p>
               <p className="mt-0.5 text-[12px] leading-snug text-slate-500">
                 Mỗi nhân khẩu, mỗi tháng được số tiền bằng <b>30 kg gạo</b> theo <b>giá trung bình tại thị trường địa phương</b> ở thời điểm hỗ trợ
                 (Điều 19 Nghị định 88/2024/NĐ-CP). Số tháng tuỳ theo thu hồi bao nhiêu phần đất nông nghiệp đang dùng và có phải dời nhà không.
@@ -475,14 +475,14 @@ export default function DenBuClient() {
                   <input type="checkbox" checked={vungKhoKhan} onChange={(e) => setVungKhoKhan(e.target.checked)} className="h-4 w-4" /> Chuyển đến vùng kinh tế - xã hội khó khăn</label>
               </div>
               {thangOnDinh > 0
-                ? <p className="mt-1.5 text-[13px] text-slate-600">→ <b className="text-[#0B4045]">{tien(tienOnDinh)}</b>
+                ? <p className="mt-1.5 text-[13px] text-slate-600">→ <b className="text-[#0A2540]">{tien(tienOnDinh)}</b>
                     <span className="ml-1 text-[12px] text-slate-400">({so(soKhau) || 0} khẩu × {GAO_KG_THANG} kg × {tien(so(giaGao))} × {thangOnDinh} tháng)</span></p>
                 : <p className="mt-1.5 text-[12px] text-slate-500">Thu hồi dưới 30% thì Nghị định không ấn định số tháng — lấy theo phương án bồi thường của dự án rồi điền vào ô “Khoản khác”.</p>}
             </div>
 
             {/* ── Bồi thường chi phí di chuyển tài sản — khoản 1 Điều 8 (QĐ 14/2025) ── */}
             <div className="mt-3 rounded-xl bg-slate-50 p-3">
-              <p className="text-[13.5px] font-semibold text-[#0B4045]">Bồi thường chi phí di chuyển tài sản (khi phải dời chỗ ở)</p>
+              <p className="text-[13.5px] font-semibold text-[#0A2540]">Bồi thường chi phí di chuyển tài sản (khi phải dời chỗ ở)</p>
               <p className="mt-0.5 text-[12px] leading-snug text-slate-500">Khoản 1 Điều 8 Quy định kèm QĐ 17/2024, được thay bằng <b>khoản 6 Điều 2 QĐ 14/2025/QĐ-UBND</b>.</p>
               <select value={maDiChuyen} onChange={(e) => setMaDiChuyen(e.target.value)} className={`${O} mt-2`}>
                 <option value="">Không phải di chuyển chỗ ở</option>
@@ -499,14 +499,14 @@ export default function DenBuClient() {
                 </label>
               )}
               {tienDiChuyen > 0 && (
-                <p className="mt-1.5 text-[13px] text-slate-600">→ <b className="text-[#0B4045]">{tien(tienDiChuyen)}</b>
+                <p className="mt-1.5 text-[13px] text-slate-600">→ <b className="text-[#0A2540]">{tien(tienDiChuyen)}</b>
                   <span className="ml-1 text-[12px] text-slate-400">({mucDiChuyen!.tien.toLocaleString('vi-VN')} đ{tangThem > 0 ? ` + ${tangThem} tầng × 20%` : ''}{tuLoChoO ? ' × 2 vì tự lo chỗ ở' : ''})</span></p>
               )}
             </div>
 
             {/* ── Hỗ trợ ổn định sản xuất, kinh doanh — Điều 11 QĐ 17/2024 ── */}
             <div className="mt-3 rounded-xl bg-slate-50 p-3">
-              <p className="text-[13.5px] font-semibold text-[#0B4045]">Hỗ trợ ổn định sản xuất, kinh doanh</p>
+              <p className="text-[13.5px] font-semibold text-[#0A2540]">Hỗ trợ ổn định sản xuất, kinh doanh</p>
               <p className="mt-0.5 text-[12px] leading-snug text-slate-500">
                 Dành cho <b>tổ chức kinh tế, hộ/cá nhân sản xuất kinh doanh, doanh nghiệp có vốn nước ngoài</b>:
                 hỗ trợ bằng tiền <b>30% một năm thu nhập sau thuế</b>, lấy theo thu nhập bình quân <b>03 năm liền kề trước đó</b>
@@ -516,7 +516,7 @@ export default function DenBuClient() {
               </p>
               <label className="mt-2 block text-[12.5px] text-slate-600">Thu nhập sau thuế bình quân 1 năm (đồng)
                 <input value={thuNhapNam} onChange={(e) => setThuNhapNam(e.target.value)} inputMode="decimal" placeholder="lấy bình quân 3 năm gần nhất" className={`${O} mt-1`} /></label>
-              {tienSxkd > 0 && <p className="mt-1.5 text-[13px] text-slate-600">→ <b className="text-[#0B4045]">{tien(tienSxkd)}</b> <span className="text-[12px] text-slate-400">(30% × {tien(so(thuNhapNam))})</span></p>}
+              {tienSxkd > 0 && <p className="mt-1.5 text-[13px] text-slate-600">→ <b className="text-[#0A2540]">{tien(tienSxkd)}</b> <span className="text-[12px] text-slate-400">(30% × {tien(so(thuNhapNam))})</span></p>}
             </div>
 
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -530,7 +530,7 @@ export default function DenBuClient() {
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-4">
-            <p className="font-bold text-[#0B4045]">Đơn giá một số chi phí — Quyết định 12/2026/QĐ-UBND</p>
+            <p className="font-bold text-[#0A2540]">Đơn giá một số chi phí — Quyết định 12/2026/QĐ-UBND</p>
             <p className="mt-1 text-[12.5px] leading-snug text-slate-600">Ngày 24/02/2026 của UBND tỉnh Khánh Hòa, gồm 4 phụ lục:</p>
             <ul className="mt-1.5 list-disc space-y-0.5 pl-5 text-[13px] text-slate-600">
               <li>Phụ lục I — Đơn giá tự xây dựng, cải tạo, sửa chữa, nâng cấp công trình.</li>
@@ -546,10 +546,10 @@ export default function DenBuClient() {
             </div>
             <p className="mt-1.5 text-[12px] leading-snug text-slate-500">Số lấy từ bản Word đăng trên Công báo tỉnh Khánh Hòa (không phải bản scan), bấm để cộng vào bảng tính.</p>
             <div className="mt-2 flex flex-wrap gap-2">
-              <a href={TL + 'QD-12-2026-don-gia-boi-thuong-ho-tro-chi-phi.pdf'} target="_blank" rel="noreferrer" className="rounded-lg bg-[#0B4045] px-3 py-1.5 text-[12.5px] font-bold text-white">📄 QĐ 12/2026 (PDF)</a>
-              <a href={TL + '2093-SXD-huong-dan-ap-dung-QD08-QD12.pdf'} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 px-3 py-1.5 text-[12.5px] font-semibold text-[#0B4045] hover:bg-slate-200">📑 Hướng dẫn áp dụng của Sở Xây dựng</a>
-              <a href={TL + 'QD-17-2024-quy-dinh-boi-thuong-ho-tro-tai-dinh-cu.pdf'} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 px-3 py-1.5 text-[12.5px] font-semibold text-[#0B4045] hover:bg-slate-200">📑 QĐ 17/2024 — quy định gốc của tỉnh</a>
-              <a href={TL + 'QD-14-2025-sua-doi-boi-thuong-ho-tro-tai-dinh-cu.pdf'} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 px-3 py-1.5 text-[12.5px] font-semibold text-[#0B4045] hover:bg-slate-200">📑 QĐ 14/2025 — bản sửa đang áp dụng</a>
+              <a href={TL + 'QD-12-2026-don-gia-boi-thuong-ho-tro-chi-phi.pdf'} target="_blank" rel="noreferrer" className="rounded-lg bg-[#0A2540] px-3 py-1.5 text-[12.5px] font-bold text-white">📄 QĐ 12/2026 (PDF)</a>
+              <a href={TL + '2093-SXD-huong-dan-ap-dung-QD08-QD12.pdf'} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 px-3 py-1.5 text-[12.5px] font-semibold text-[#0A2540] hover:bg-slate-200">📑 Hướng dẫn áp dụng của Sở Xây dựng</a>
+              <a href={TL + 'QD-17-2024-quy-dinh-boi-thuong-ho-tro-tai-dinh-cu.pdf'} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 px-3 py-1.5 text-[12.5px] font-semibold text-[#0A2540] hover:bg-slate-200">📑 QĐ 17/2024 — quy định gốc của tỉnh</a>
+              <a href={TL + 'QD-14-2025-sua-doi-boi-thuong-ho-tro-tai-dinh-cu.pdf'} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 px-3 py-1.5 text-[12.5px] font-semibold text-[#0A2540] hover:bg-slate-200">📑 QĐ 14/2025 — bản sửa đang áp dụng</a>
             </div>
           </div>
         </div>
@@ -558,7 +558,7 @@ export default function DenBuClient() {
       {/* ───────────────── ④ CĂN CỨ ───────────────── */}
       {tab === 'cancu' && (
         <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4">
-          <p className="font-bold text-[#0B4045]">Người bị thu hồi đất nông nghiệp được nhận những khoản gì?</p>
+          <p className="font-bold text-[#0A2540]">Người bị thu hồi đất nông nghiệp được nhận những khoản gì?</p>
           <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-[13px] leading-relaxed text-slate-600">
             <li><b>Tiền bồi thường về đất</b> = diện tích thu hồi × giá đất cụ thể được phê duyệt cho dự án.</li>
             <li><b>Bồi thường nhà, công trình xây dựng</b> gắn liền với đất — đơn giá tại QĐ 08/2026/QĐ-UBND.</li>
@@ -577,7 +577,7 @@ export default function DenBuClient() {
           <p className="mt-2.5 text-[12.5px] leading-snug text-slate-500">
             Quy định chung của tỉnh Khánh Hòa: <b>Quyết định 17/2024/QĐ-UBND</b> ngày 29/8/2024, sửa đổi bởi <b>Quyết định 14/2025/QĐ-UBND</b>.
           </p>
-          <p className="mt-3 text-[13px] font-bold text-[#0B4045]">Văn bản gốc (bấm để xem)</p>
+          <p className="mt-3 text-[13px] font-bold text-[#0A2540]">Văn bản gốc (bấm để xem)</p>
           <div className="mt-1.5 flex flex-wrap gap-2">
             {[['TB-306-gia-dat-boi-thuong-Cam-Lam-07-5-2026.pdf', 'TB 306/TB-HĐTĐ — giá đất KĐT mới Cam Lâm'],
               ['QD-2952-gia-dat-boi-thuong-KDT-Suoi-Tan.pdf', 'QĐ 2952 — KĐT phức hợp Suối Tân'],
@@ -587,13 +587,13 @@ export default function DenBuClient() {
               ['QD-08-2026-don-gia-boi-thuong-nha-cong-trinh.pdf', 'QĐ 08/2026 — đơn giá nhà, công trình'],
               ['QD-12-2026-don-gia-boi-thuong-ho-tro-chi-phi.pdf', 'QĐ 12/2026 — đơn giá một số chi phí'],
               ['2093-SXD-huong-dan-ap-dung-QD08-QD12.pdf', 'CV 2093/SXD — hướng dẫn áp dụng QĐ 08 & 12']].map(([f, n]) => (
-              <a key={f} href={TL + f} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 px-3 py-1.5 text-[12.5px] font-semibold text-[#0B4045] hover:bg-slate-200">📄 {n}</a>
+              <a key={f} href={TL + f} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 px-3 py-1.5 text-[12.5px] font-semibold text-[#0A2540] hover:bg-slate-200">📄 {n}</a>
             ))}
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Link href="/bang-gia-dat" className="rounded-lg bg-slate-100 px-3.5 py-2 text-[13px] font-semibold text-[#0B4045] hover:bg-slate-200">📊 Bảng giá đất 2026</Link>
-            <Link href="/van-ban" className="rounded-lg bg-slate-100 px-3.5 py-2 text-[13px] font-semibold text-[#0B4045] hover:bg-slate-200">📑 Tra cứu văn bản</Link>
-            <Link href="/map" className="rounded-lg bg-slate-100 px-3.5 py-2 text-[13px] font-semibold text-[#0B4045] hover:bg-slate-200">🗺️ Bản đồ quy hoạch</Link>
+            <Link href="/bang-gia-dat" className="rounded-lg bg-slate-100 px-3.5 py-2 text-[13px] font-semibold text-[#0A2540] hover:bg-slate-200">📊 Bảng giá đất 2026</Link>
+            <Link href="/van-ban" className="rounded-lg bg-slate-100 px-3.5 py-2 text-[13px] font-semibold text-[#0A2540] hover:bg-slate-200">📑 Tra cứu văn bản</Link>
+            <Link href="/map" className="rounded-lg bg-slate-100 px-3.5 py-2 text-[13px] font-semibold text-[#0A2540] hover:bg-slate-200">🗺️ Bản đồ quy hoạch</Link>
           </div>
         </div>
       )}
@@ -602,7 +602,7 @@ export default function DenBuClient() {
           Chủ dự án 16/9/2026: tách tab cho rõ nhưng đừng để phải cuộn tìm tổng tiền.
           16/9/2026 chốt: KHÔNG dính đáy che nội dung — để nằm hẳn cuối trang, bấm để mở/thu chi tiết. */}
       <div className="mt-4">
-        <button onClick={() => setMoTong((v) => !v)} className="w-full rounded-2xl bg-[#0B4045] p-3.5 text-left text-white shadow-[0_8px_30px_rgba(11,64,69,.35)]">
+        <button onClick={() => setMoTong((v) => !v)} className="w-full rounded-2xl bg-[#0A2540] p-3.5 text-left text-white shadow-[0_8px_30px_rgba(10,37,64,.35)]">
           <div className="flex items-center gap-3">
             <div className="min-w-0 flex-1">
               <p className="text-[11.5px] uppercase tracking-wide text-white/70">Tổng tiền dự kiến</p>

@@ -109,7 +109,7 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
 };
 
 function Ic({ d }: { d: string }) {
-  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#0B4045]/60 shrink-0"><path d={d} /></svg>;
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#0A2540]/60 shrink-0"><path d={d} /></svg>;
 }
 
 const SEARCH_HINTS = [
@@ -149,7 +149,7 @@ function AreaCard({ a, big }: { a: AreaWithCount; big?: boolean }) {
           thành xam xám, nhìn buồn. Nay chỉ tối ở ĐÁY — vừa đủ cho tên xã đọc rõ,
           phần ảnh phía trên để nguyên màu. */}
       <div className="absolute inset-x-0 bottom-0 h-3/5"
-        style={{ background: 'linear-gradient(to top, rgba(11,64,69,0.86) 0%, rgba(11,64,69,0.45) 42%, rgba(11,64,69,0) 100%)' }} />
+        style={{ background: 'linear-gradient(to top, rgba(10,37,64,0.86) 0%, rgba(10,37,64,0.45) 42%, rgba(10,37,64,0) 100%)' }} />
       <div className={`absolute left-0 bottom-0 text-white ${big ? 'p-4 md:p-6' : 'p-3.5'}`}>
         <p className={`font-bold leading-tight ${big ? 'text-2xl md:text-3xl' : 'text-base'}`}>{a.name}</p>
         <p className={`text-white/85 ${big ? 'text-sm mt-1' : 'text-[12px] mt-0.5'}`}>{a.count > 0 ? `${a.count.toLocaleString('vi-VN')} tin đăng` : a.sub}</p>
@@ -320,7 +320,7 @@ export default function Home() {
             vẽ một thanh cuộn xám ngay dưới, nhìn rất thô. Vuốt vẫn cuộn được. */}
         <div className="flex items-center gap-5 border-b border-slate-200 mb-5 overflow-x-auto no-scrollbar">
           {Object.keys(NEWS).map((t) => (
-            <button key={t} onClick={() => setNewsTab(t)} className={`pb-2.5 text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${newsTab === t ? 'border-red-600 text-[#0B4045]' : 'border-transparent text-slate-500 hover:text-[#0B4045]'}`}>{t}</button>
+            <button key={t} onClick={() => setNewsTab(t)} className={`pb-2.5 text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${newsTab === t ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500 hover:text-[#0A2540]'}`}>{t}</button>
           ))}
           <Link href="/tin-tuc" className="ml-auto text-red-600 text-sm font-semibold whitespace-nowrap shrink-0">Xem thêm →</Link>
         </div>
@@ -339,7 +339,7 @@ export default function Home() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={feat.img} alt={feat.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
               </div>
-              <h3 className="font-extrabold text-[#0B4045] mt-3 text-lg leading-snug line-clamp-2 group-hover:text-red-600">{feat.title}</h3>
+              <h3 className="font-extrabold text-[#0A2540] mt-3 text-lg leading-snug line-clamp-2 group-hover:text-red-600">{feat.title}</h3>
               {feat.date && <p className="text-xs text-slate-400 mt-2">🕒 {feat.date}{feat.source ? ` · ${feat.source}` : ''}</p>}
             </a>
           ); })()}
@@ -356,10 +356,10 @@ export default function Home() {
               <p className="text-xs text-white/80 mt-1.5 leading-snug">Tra cứu quy hoạch, mua bán nhà đất, nền vệ tinh — tất cả tại một nơi.</p>
               <span className="inline-block mt-3 bg-white text-[#a3121b] text-xs font-bold px-3 py-1.5 rounded">Khám phá ngay →</span>
             </Link>
-            <Link href="/sales/post" className="block rounded-xl bg-gradient-to-br from-[#0B4045] to-[#0e5157] text-white p-5 hover:brightness-110 transition active:scale-[.98]">
+            <Link href="/sales/post" className="block rounded-xl bg-gradient-to-br from-[#0A2540] to-[#0d2f54] text-white p-5 hover:brightness-110 transition active:scale-[.98]">
               <p className="text-[11px] tracking-wide text-[#C8A14B] font-semibold">MIỄN PHÍ</p>
               <p className="font-extrabold text-lg mt-1 leading-tight">Đăng tin — tiếp cận khách mua ngay</p>
-              <span className="inline-block mt-3 bg-[#C8A14B] text-[#0B4045] text-xs font-bold px-3 py-1.5 rounded">Đăng tin ngay →</span>
+              <span className="inline-block mt-3 bg-[#C8A14B] text-[#0A2540] text-xs font-bold px-3 py-1.5 rounded">Đăng tin ngay →</span>
             </Link>
           </div>
         </div>
@@ -368,11 +368,11 @@ export default function Home() {
       {/* FEATURED — kiểu batdongsan */}
       <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
         <div className="flex items-center justify-between mb-4 sm:mb-6 flex-wrap gap-2">
-          <h2 className="text-xl md:text-2xl font-extrabold text-[#0B4045]">
+          <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">
             {heroDeal === 'rent' ? 'Nhà đất cho thuê dành cho bạn'
               : heroDeal === 'project' ? 'Dự án dành cho bạn' : 'Bất động sản dành cho bạn'}
           </h2>
-          <div className="flex items-center gap-3 text-sm font-semibold text-[#0B4045]">
+          <div className="flex items-center gap-3 text-sm font-semibold text-[#0A2540]">
             <Link href="/listings" className="hover:text-red-600">Tin bán mới nhất</Link>
             <span className="text-slate-300">|</span>
             <Link href="/listings?deal=rent" className="hover:text-red-600">Tin cho thuê mới nhất</Link>
@@ -383,12 +383,12 @@ export default function Home() {
         </div>
         <div className="mt-6 sm:mt-8 text-center">
           {featured.length > 8 ? (
-            <button onClick={() => setExpanded((v) => !v)} className="inline-flex items-center gap-1.5 border border-slate-300 hover:border-[#0B4045] hover:text-[#0B4045] text-slate-600 font-semibold rounded-full px-7 py-2.5 bg-white transition">
+            <button onClick={() => setExpanded((v) => !v)} className="inline-flex items-center gap-1.5 border border-slate-300 hover:border-[#0A2540] hover:text-[#0A2540] text-slate-600 font-semibold rounded-full px-7 py-2.5 bg-white transition">
               {expanded ? 'Thu gọn' : 'Mở rộng'}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6" /></svg>
             </button>
           ) : (
-            <Link href="/listings" className="inline-flex items-center gap-1.5 border border-slate-300 hover:border-[#0B4045] text-[#0B4045] font-semibold rounded-full px-7 py-2.5 bg-white">Xem tất cả →</Link>
+            <Link href="/listings" className="inline-flex items-center gap-1.5 border border-slate-300 hover:border-[#0A2540] text-[#0A2540] font-semibold rounded-full px-7 py-2.5 bg-white">Xem tất cả →</Link>
           )}
         </div>
       </section>
@@ -401,7 +401,7 @@ export default function Home() {
 
       {/* BĐS THEO ĐỊA ĐIỂM — ô lớn + lưới + số tin (kiểu batdongsan) */}
       <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
-        <h2 className="text-xl md:text-2xl font-extrabold text-[#0B4045] mb-4 sm:mb-6">Bất động sản theo địa điểm</h2>
+        <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-4 sm:mb-6">Bất động sản theo địa điểm</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 md:grid-rows-2 gap-3 md:gap-4 md:h-[420px]">
           {bigArea && <AreaCard a={bigArea} big />}
           {gridAreas.map((a) => <AreaCard key={a.ward} a={a} />)}
@@ -419,11 +419,11 @@ export default function Home() {
         <div className="grid md:grid-cols-2 rounded-xl sm:rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-sm">
           <div className="p-5 sm:p-8 md:p-12 flex flex-col justify-center">
             <span className="text-[#C8A14B] font-semibold text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B4045] mt-2">Tra cứu quy hoạch & thửa đất chính xác</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] mt-2">Tra cứu quy hoạch & thửa đất chính xác</h2>
             <p className="text-sm sm:text-base text-slate-500 mt-2 sm:mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số thửa/số tờ/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
             <div className="mt-4 sm:mt-6 flex gap-3">
-              <Link href="/map" className="cl-press bg-[#0B4045] hover:bg-[#0e5157] text-white font-semibold px-6 py-3 rounded-xl">Mở bản đồ →</Link>
-              <Link href="/qr" className="cl-press border border-slate-300 text-[#0B4045] font-semibold px-6 py-3 rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
+              <Link href="/map" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-6 py-3 rounded-xl">Mở bản đồ →</Link>
+              <Link href="/qr" className="cl-press border border-slate-300 text-[#0A2540] font-semibold px-6 py-3 rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
             </div>
           </div>
           <div className="bg-slate-100 flex items-center justify-center min-h-[280px] p-2">
@@ -438,12 +438,12 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-3 sm:px-4 pb-8 sm:pb-12">
         <div className="rounded-2xl border border-slate-200 bg-white px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-center sm:text-left">
-            <p className="font-bold text-[#0B4045]">📣 Quảng cáo cùng Cam Lâm Land</p>
+            <p className="font-bold text-[#0A2540]">📣 Quảng cáo cùng Cam Lâm Land</p>
             <p className="text-sm text-slate-500 mt-0.5">Đưa thương hiệu, dự án của bạn đến khách quan tâm bất động sản Cam Lâm — banner, logo trên bản đồ, đẩy tin nổi bật.</p>
           </div>
           <div className="flex gap-2 shrink-0">
-            <Link href="/dichvu" className="border border-slate-300 text-[#0B4045] font-semibold px-5 py-2.5 rounded-xl hover:bg-slate-50 text-sm whitespace-nowrap">Xem dịch vụ</Link>
-            <a href="tel:0988888888" className="cl-press bg-[#0B4045] hover:bg-[#0e5157] text-white font-semibold px-5 py-2.5 rounded-xl text-sm whitespace-nowrap">Liên hệ quảng cáo</a>
+            <Link href="/dichvu" className="border border-slate-300 text-[#0A2540] font-semibold px-5 py-2.5 rounded-xl hover:bg-slate-50 text-sm whitespace-nowrap">Xem dịch vụ</Link>
+            <a href="tel:0988888888" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-5 py-2.5 rounded-xl text-sm whitespace-nowrap">Liên hệ quảng cáo</a>
           </div>
         </div>
       </section>

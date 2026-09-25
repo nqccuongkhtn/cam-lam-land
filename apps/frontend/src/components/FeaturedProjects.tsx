@@ -37,7 +37,7 @@ function ProjectCard({ p, isAdmin, onDelete }: { p: Project; isAdmin: boolean; o
         </div>
         <div className="p-3.5">
           {p.status ? <span className={`inline-block text-[11px] font-semibold px-2 py-0.5 rounded ${chipClass(p.status)}`}>{p.status}</span> : null}
-          <h3 className="font-bold text-[#0B4045] line-clamp-1 group-hover:text-red-700 mt-1.5">{p.name}</h3>
+          <h3 className="font-bold text-[#0A2540] line-clamp-1 group-hover:text-red-700 mt-1.5">{p.name}</h3>
           {p.scale ? <p className="text-[13px] text-slate-700 mt-1 font-medium truncate">{p.scale}</p> : null}
           {p.location ? <p className="mt-1 flex items-center gap-1 text-[13px] text-slate-500"><IPin /> <span className="truncate">{p.location}</span></p> : null}
         </div>
@@ -130,16 +130,16 @@ export default function FeaturedProjects() {
   return (
     <section id="du-an-noi-bat" className="mx-auto max-w-7xl px-3 sm:px-4 py-7 sm:py-10 scroll-mt-20">
       <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
-        <h2 className="text-xl md:text-2xl font-extrabold text-[#0B4045]">Dự án bất động sản nổi bật</h2>
+        <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">Dự án bất động sản nổi bật</h2>
         <div className="flex items-center gap-2 shrink-0">
-          {isAdmin ? <button onClick={() => setAddOpen(true)} className="inline-flex items-center gap-1.5 bg-[#0B4045] hover:bg-[#0e5157] text-white text-sm font-semibold px-4 py-2 rounded-xl">＋ Thêm dự án</button> : null}
+          {isAdmin ? <button onClick={() => setAddOpen(true)} className="inline-flex items-center gap-1.5 bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-semibold px-4 py-2 rounded-xl">＋ Thêm dự án</button> : null}
           <Link href="/listings" className="text-red-600 font-semibold text-sm hover:underline whitespace-nowrap">Xem thêm →</Link>
         </div>
       </div>
 
       <div className="relative">
         <button onClick={() => nudge(-1)} aria-label="Xem trước"
-          className="hidden sm:grid absolute left-0 top-[34%] -translate-y-1/2 z-10 w-10 h-10 place-items-center rounded-full bg-white/95 backdrop-blur border border-slate-200 shadow-md text-slate-500 hover:text-[#0B4045] hover:shadow-lg text-xl leading-none transition">‹</button>
+          className="hidden sm:grid absolute left-0 top-[34%] -translate-y-1/2 z-10 w-10 h-10 place-items-center rounded-full bg-white/95 backdrop-blur border border-slate-200 shadow-md text-slate-500 hover:text-[#0A2540] hover:shadow-lg text-xl leading-none transition">‹</button>
 
         <div ref={scrollerRef}
           onMouseEnter={() => { hoverRef.current = true; }}
@@ -156,7 +156,7 @@ export default function FeaturedProjects() {
         </div>
 
         <button onClick={() => nudge(1)} aria-label="Xem tiếp"
-          className="hidden sm:grid absolute right-0 top-[34%] -translate-y-1/2 z-10 w-10 h-10 place-items-center rounded-full bg-white/95 backdrop-blur border border-slate-200 shadow-md text-slate-500 hover:text-[#0B4045] hover:shadow-lg text-xl leading-none transition">›</button>
+          className="hidden sm:grid absolute right-0 top-[34%] -translate-y-1/2 z-10 w-10 h-10 place-items-center rounded-full bg-white/95 backdrop-blur border border-slate-200 shadow-md text-slate-500 hover:text-[#0A2540] hover:shadow-lg text-xl leading-none transition">›</button>
       </div>
 
       {isAdmin && addOpen ? (
@@ -164,18 +164,18 @@ export default function FeaturedProjects() {
           <div className="absolute inset-0 bg-black/50" onClick={() => setAddOpen(false)} />
           <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-5 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-extrabold text-[#0B4045]">Thêm dự án nổi bật</h3>
+              <h3 className="font-extrabold text-[#0A2540]">Thêm dự án nổi bật</h3>
               <button onClick={() => setAddOpen(false)} aria-label="Dong" className="text-slate-400 hover:text-slate-700 text-2xl leading-none">×</button>
             </div>
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1">Tên dự án *</label>
-                <input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="VD: KN Paradise" className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0B4045]" />
+                <input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="VD: KN Paradise" className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 mb-1">Trạng thái</label>
-                  <select value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })} className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0B4045]">
+                  <select value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })} className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]">
                     <option>Đang mở bán</option>
                     <option>Sắp mở bán</option>
                     <option>Đang thu hồi bồi thường</option>
@@ -185,16 +185,16 @@ export default function FeaturedProjects() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 mb-1">Quy mô / giá</label>
-                  <input value={f.scale} onChange={(e) => setF({ ...f, scale: e.target.value })} placeholder="VD: 39,5 ha" className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0B4045]" />
+                  <input value={f.scale} onChange={(e) => setF({ ...f, scale: e.target.value })} placeholder="VD: 39,5 ha" className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]" />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1">Vị trí</label>
-                <input value={f.location} onChange={(e) => setF({ ...f, location: e.target.value })} placeholder="VD: Cam Đức, Cam Lâm" className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0B4045]" />
+                <input value={f.location} onChange={(e) => setF({ ...f, location: e.target.value })} placeholder="VD: Cam Đức, Cam Lâm" className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1">Link ảnh</label>
-                <input value={f.imageUrl} onChange={(e) => setF({ ...f, imageUrl: e.target.value })} placeholder="https://.../anh.jpg" className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0B4045]" />
+                <input value={f.imageUrl} onChange={(e) => setF({ ...f, imageUrl: e.target.value })} placeholder="https://.../anh.jpg" className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]" />
               </div>
             </div>
             <div className="flex gap-2 mt-4">

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import LegalConsultCTA from '@/components/LegalConsultCTA';
 import ServicesSection from '@/components/ServicesSection';
 
-const inp = 'w-full min-w-0 border border-slate-300 rounded-lg px-3 py-2.5 sm:py-2 text-base sm:text-sm outline-none focus:border-[#0B4045]';
+const inp = 'w-full min-w-0 border border-slate-300 rounded-lg px-3 py-2.5 sm:py-2 text-base sm:text-sm outline-none focus:border-[#0A2540]';
 const lbl = 'block text-[12px] font-semibold text-slate-500 mb-1';
 const HOTLINE = '0988 888 888';
 const today = new Date().toISOString().slice(0, 10);
@@ -199,13 +199,13 @@ export default function HopDongDatCoc() {
       <div style={{ position: 'absolute', inset: '10.5mm', border: '0.8px solid #C8A14B', opacity: 0.9 }} />
       <div style={{ position: 'absolute', inset: '17mm', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>{clHouse(15)}<span style={{ letterSpacing: '3px', fontSize: '9.5px', color: '#9c7a2f', fontWeight: 700, fontFamily: 'Arial, sans-serif' }}>CAM LÂM LAND</span></div>
-        <div style={{ marginTop: '4mm', fontSize: '25px', fontWeight: 800, color: '#0B4045', letterSpacing: '1px', lineHeight: 1.15 }}>HỢP ĐỒNG ĐẶT CỌC<br />NHÀ ĐẤT</div>
+        <div style={{ marginTop: '4mm', fontSize: '25px', fontWeight: 800, color: '#0A2540', letterSpacing: '1px', lineHeight: 1.15 }}>HỢP ĐỒNG ĐẶT CỌC<br />NHÀ ĐẤT</div>
         <div style={{ marginTop: '2.5mm', display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '20mm', height: '1.5px', background: '#C8A14B' }} /><span style={{ width: '7px', height: '7px', background: '#C8A14B', transform: 'rotate(45deg)' }} /><span style={{ width: '20mm', height: '1.5px', background: '#C8A14B' }} /></div>
         <div style={{ marginTop: '2mm' }}>{ttImg ? <img src="/than-tai.png" alt="Thần Tài" onError={() => setTtImg(false)} style={{ width: '81mm', height: 'auto', display: 'block' }} /> : clThanTai(195)}</div>
         <div style={{ marginTop: '3mm', fontSize: '20px', fontStyle: 'italic', fontWeight: 700, color: '#c0161d' }}>Giữ Chặt Tài Lộc — Chốt Cọc Thành Công</div>
         <div style={{ flex: 1 }} />
         <div style={{ width: '124mm', paddingTop: '3mm', borderTop: '1.5px solid #C8A14B' }}>
-          <div style={{ fontSize: '23px', fontWeight: 800, color: '#0B4045', letterSpacing: '0.5px' }}>{salesN || 'HỌ VÀ TÊN CỦA BẠN'}</div>
+          <div style={{ fontSize: '23px', fontWeight: 800, color: '#0A2540', letterSpacing: '0.5px' }}>{salesN || 'HỌ VÀ TÊN CỦA BẠN'}</div>
           <div style={{ fontSize: '11.5px', letterSpacing: '1.5px', color: '#9c7a2f', fontFamily: 'Arial, sans-serif', textTransform: 'uppercase', marginTop: '1mm' }}>{(f.salesTitle || '').trim() || 'Chuyên viên Tư vấn Bất động sản'}</div>
           {(f.salesSlogan || '').trim() && <div style={{ fontSize: '11.5px', fontStyle: 'italic', color: '#c0161d', marginTop: '0.8mm' }}>“{f.salesSlogan}”</div>}
           <div style={{ fontSize: '12px', color: '#3a2d12', marginTop: '1.5mm', fontFamily: 'Arial, sans-serif' }}>📞 {salesP || HOTLINE} · batdongsancamlam.dpdns.org</div>
@@ -219,14 +219,14 @@ export default function HopDongDatCoc() {
       <div style={{ position: 'absolute', inset: '10.5mm', border: '0.8px solid #C8A14B', opacity: 0.9 }} />
       <div style={{ position: 'absolute', inset: '20mm', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
         <div style={{ flex: 0.6 }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>{clHouse(34)}<span style={{ fontSize: '26px', fontWeight: 800, color: '#0B4045', fontFamily: 'Arial, sans-serif', letterSpacing: '1px' }}>CAM LÂM LAND</span></div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>{clHouse(34)}<span style={{ fontSize: '26px', fontWeight: 800, color: '#0A2540', fontFamily: 'Arial, sans-serif', letterSpacing: '1px' }}>CAM LÂM LAND</span></div>
         <div style={{ marginTop: '2mm', fontSize: '12px', color: '#9c7a2f', fontFamily: 'Arial, sans-serif', letterSpacing: '1px' }}>Sàn Bất động sản &amp; Bản đồ quy hoạch Cam Lâm, Khánh Hòa</div>
         <div style={{ marginTop: '12mm', fontSize: '17px', fontWeight: 700, color: '#b23b3b' }}>Vạn sự hanh thông — Tài lộc vượng phát</div>
         <div style={{ marginTop: '3mm', fontSize: '12.5px', color: '#3a2d12', maxWidth: '120mm', lineHeight: 1.6 }}>Cảm ơn Quý khách đã tin tưởng. Kính chúc Quý khách <b>an cư lạc nghiệp</b>, giao dịch <b>thuận buồm xuôi gió</b>, gia đạo bình an, tài lộc dồi dào.</div>
         <div style={{ marginTop: '7mm' }}>{ttImg2 ? <img src="/than-tai-sau.png" alt="Thần Tài" onError={() => setTtImg2(false)} style={{ width: '55mm', height: 'auto', display: 'block' }} /> : clMedal()}</div>
         <div style={{ flex: 1 }} />
         <div style={{ borderTop: '1px solid #C8A14B', paddingTop: '4mm', width: '112mm', fontSize: '12px', color: '#3a2d12', fontFamily: 'Arial, sans-serif' }}>
-          <div><b style={{ color: '#0B4045' }}>{salesN || 'Chuyên viên tư vấn'}</b>{salesP ? ` · 📞 ${salesP}` : ''}</div>
+          <div><b style={{ color: '#0A2540' }}>{salesN || 'Chuyên viên tư vấn'}</b>{salesP ? ` · 📞 ${salesP}` : ''}</div>
           <div style={{ marginTop: '1mm', color: '#6a5220' }}>Hotline {HOTLINE} · Zalo {HOTLINE} · batdongsancamlam.dpdns.org</div>
         </div>
       </div>
@@ -243,23 +243,23 @@ export default function HopDongDatCoc() {
       <datalist id="dl-benTra"><option value="Bên A" /><option value="Bên B" /><option value="Bên A và Bên B (mỗi bên 50%)" /></datalist>
 
       <div className="no-print">
-        <h1 className="text-xl sm:text-2xl font-extrabold text-[#0B4045]">📝 Hợp đồng đặt cọc</h1>
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540]">📝 Hợp đồng đặt cọc</h1>
         <p className="text-[13px] text-slate-500 mt-1">Điền thông tin rồi bấm <b>Xuất PDF / In</b>. Soạn theo <b>Điều 328 Bộ luật Dân sự 2015</b> &amp; Luật Đất đai 2024. <span className="text-amber-700">Mẫu tham khảo — nên công chứng/chứng thực &amp; nhờ luật sư rà cho giao dịch cụ thể.</span></p>
 
         <div className="mt-3 sm:mt-4 bg-white border border-slate-200 rounded-2xl p-4 space-y-4">
           <div>
-            <p className="font-bold text-[#0B4045] mb-2">🗓️ Thời gian &amp; địa điểm lập</p>
+            <p className="font-bold text-[#0A2540] mb-2">🗓️ Thời gian &amp; địa điểm lập</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-2">{field('ngayLap', 'Ngày lập', { type: 'date' })}{field('noiLap', 'Nơi lập')}</div>
           </div>
           <div>
-            <p className="font-bold text-[#0B4045] mb-2">🅰️ Bên nhận đặt cọc (BÊN A – Bên bán)</p>
+            <p className="font-bold text-[#0A2540] mb-2">🅰️ Bên nhận đặt cọc (BÊN A – Bên bán)</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-2">
               {field('aTen', 'Họ tên (người đứng tên 1)', { w: 'sm:col-span-2', ph: 'NGUYỄN VĂN A' })}{field('aSinh', 'Ngày sinh', { type: 'date' })}{field('aSdt', 'Điện thoại', { phone: true })}
               {field('aCccd', 'CMND/CCCD số', { cccd: true })}{field('aCccdNgay', 'Ngày cấp', { type: 'date' })}{field('aCccdNoi', 'Nơi cấp', { w: 'sm:col-span-2', list: 'dl-cccd' })}
               {field('aDiaChi', 'Địa chỉ thường trú', { w: 'sm:col-span-2' })}
             </div>
             <div className="mt-3">
-              <p className="text-[13px] font-semibold text-[#0B4045]">➕ Đồng sở hữu — nhiều người cùng đứng tên Bên A <span className="font-normal text-[12px] text-slate-400">(tài sản chung phải đủ chữ ký TẤT CẢ người đứng tên — Điều 35 Luật HN&amp;GĐ; thiếu 1 người có thể vô hiệu)</span></p>
+              <p className="text-[13px] font-semibold text-[#0A2540]">➕ Đồng sở hữu — nhiều người cùng đứng tên Bên A <span className="font-normal text-[12px] text-slate-400">(tài sản chung phải đủ chữ ký TẤT CẢ người đứng tên — Điều 35 Luật HN&amp;GĐ; thiếu 1 người có thể vô hiệu)</span></p>
               {Array.from({ length: nCo }).map((_, idx) => {
                 const n = idx + 2;
                 return (
@@ -271,13 +271,13 @@ export default function HopDongDatCoc() {
                 );
               })}
               <div className="flex gap-2 mt-2">
-                <button type="button" onClick={() => setNCo((v) => Math.min(4, v + 1))} disabled={nCo >= 4} className="text-[13px] font-bold text-[#0B4045] border border-[#C8A14B]/60 rounded-lg px-3 py-1.5 disabled:opacity-40">➕ Thêm người đứng tên</button>
+                <button type="button" onClick={() => setNCo((v) => Math.min(4, v + 1))} disabled={nCo >= 4} className="text-[13px] font-bold text-[#0A2540] border border-[#C8A14B]/60 rounded-lg px-3 py-1.5 disabled:opacity-40">➕ Thêm người đứng tên</button>
                 {nCo > 0 && <button type="button" onClick={() => setNCo((v) => Math.max(0, v - 1))} className="text-[13px] font-semibold text-slate-500 border border-slate-300 rounded-lg px-3 py-1.5">➖ Bớt người cuối</button>}
               </div>
             </div>
           </div>
           <div>
-            <p className="font-bold text-[#0B4045] mb-2">🅱️ Bên đặt cọc (BÊN B – Bên mua)</p>
+            <p className="font-bold text-[#0A2540] mb-2">🅱️ Bên đặt cọc (BÊN B – Bên mua)</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-2">
               {field('bTen', 'Họ tên', { w: 'sm:col-span-2', ph: 'TRẦN THỊ B' })}{field('bSinh', 'Ngày sinh', { type: 'date' })}{field('bSdt', 'Điện thoại', { phone: true })}
               {field('bCccd', 'CMND/CCCD số', { cccd: true })}{field('bCccdNgay', 'Ngày cấp', { type: 'date' })}{field('bCccdNoi', 'Nơi cấp', { w: 'sm:col-span-2', list: 'dl-cccd' })}
@@ -285,7 +285,7 @@ export default function HopDongDatCoc() {
             </div>
           </div>
           <div>
-            <label className="flex items-start gap-2 cursor-pointer font-bold text-[#0B4045] mb-2"><input type="checkbox" checked={hasBenC} onChange={(e) => setHasBenC(e.target.checked)} className="w-4 h-4 mt-0.5 shrink-0 accent-[#0B4045]" /><span>🤝 Bên làm chứng (BÊN C – Môi giới) <span className="font-normal text-[12px] text-slate-400">(mặc định có — bỏ tick nếu không cần)</span></span></label>
+            <label className="flex items-start gap-2 cursor-pointer font-bold text-[#0A2540] mb-2"><input type="checkbox" checked={hasBenC} onChange={(e) => setHasBenC(e.target.checked)} className="w-4 h-4 mt-0.5 shrink-0 accent-[#0A2540]" /><span>🤝 Bên làm chứng (BÊN C – Môi giới) <span className="font-normal text-[12px] text-slate-400">(mặc định có — bỏ tick nếu không cần)</span></span></label>
             {hasBenC && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-2">
                 {field('cTen', 'Họ tên môi giới', { w: 'sm:col-span-2', ph: 'NGUYỄN VĂN C' })}
@@ -299,7 +299,7 @@ export default function HopDongDatCoc() {
             )}
           </div>
           <div>
-            <p className="font-bold text-[#0B4045] mb-2">🏠 Bất động sản đặt cọc</p>
+            <p className="font-bold text-[#0A2540] mb-2">🏠 Bất động sản đặt cọc</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-2">
               {field('bdsDiaChi', 'Địa chỉ thửa đất', { w: 'sm:col-span-2', ph: 'Thôn/xã…, Cam Lâm, Khánh Hòa' })}
               {field('thuaSo', 'Thửa đất số')}{field('toBanDo', 'Tờ bản đồ số')}{field('dienTich', 'Diện tích (m²)', { area: true, ph: 'VD: 100 hoặc 1.234,5' })}{field('mucDich', 'Mục đích SD', { list: 'dl-mucdich' })}
@@ -307,7 +307,7 @@ export default function HopDongDatCoc() {
             </div>
           </div>
           <div>
-            <p className="font-bold text-[#0B4045] mb-2">💰 Giá &amp; tiền cọc</p>
+            <p className="font-bold text-[#0A2540] mb-2">💰 Giá &amp; tiền cọc</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-2">
               {field('gia', 'Giá chuyển nhượng (đ)', { money: true, ph: 'VD: 2.000.000.000' })}{field('coc', 'Tiền đặt cọc (đ)', { money: true, ph: 'VD: 200.000.000' })}
               {field('hanNgay', 'Thời hạn ký HĐ công chứng (ngày)', { num: true, w: 'sm:col-span-2' })}
@@ -317,7 +317,7 @@ export default function HopDongDatCoc() {
             {f.coc && <p className="text-[12px] text-slate-500">Cọc bằng chữ: <b>{docTien(f.coc)}</b></p>}
           </div>
           <div className="space-y-3">
-            <label className="flex items-start gap-2 cursor-pointer font-bold text-[#0B4045]"><input type="checkbox" checked={editDieu} onChange={(e) => setEditDieu(e.target.checked)} className="w-4 h-4 mt-0.5 shrink-0 accent-[#0B4045]" /><span>✍️ Sửa nội dung Điều 5 &amp; 6 <span className="font-normal text-[12px] text-slate-400">(không tick thì dùng mẫu mặc định chuẩn luật)</span></span></label>
+            <label className="flex items-start gap-2 cursor-pointer font-bold text-[#0A2540]"><input type="checkbox" checked={editDieu} onChange={(e) => setEditDieu(e.target.checked)} className="w-4 h-4 mt-0.5 shrink-0 accent-[#0A2540]" /><span>✍️ Sửa nội dung Điều 5 &amp; 6 <span className="font-normal text-[12px] text-slate-400">(không tick thì dùng mẫu mặc định chuẩn luật)</span></span></label>
             {editDieu && (<>
               {area('dieu5', 'Điều 5 — Xử lý tiền đặt cọc')}
               {area('dieu6', 'Điều 6 — Cam kết của các bên', 6)}
@@ -325,7 +325,7 @@ export default function HopDongDatCoc() {
           </div>
           {/* Bìa cuốn hồ sơ — tùy chọn, mang thương hiệu cá nhân của sales */}
           <div className="space-y-3">
-            <label className="flex items-start gap-2 cursor-pointer font-bold text-[#0B4045]"><input type="checkbox" checked={inBia} onChange={(e) => setInBia(e.target.checked)} className="w-4 h-4 mt-0.5 shrink-0 accent-[#C8A14B]" /><span>📕 In kèm bìa hồ sơ (in cả cuốn) <span className="font-normal text-[12px] text-slate-400">— bìa 2 mặt sang trọng, mang tên &amp; thương hiệu cá nhân của bạn</span></span></label>
+            <label className="flex items-start gap-2 cursor-pointer font-bold text-[#0A2540]"><input type="checkbox" checked={inBia} onChange={(e) => setInBia(e.target.checked)} className="w-4 h-4 mt-0.5 shrink-0 accent-[#C8A14B]" /><span>📕 In kèm bìa hồ sơ (in cả cuốn) <span className="font-normal text-[12px] text-slate-400">— bìa 2 mặt sang trọng, mang tên &amp; thương hiệu cá nhân của bạn</span></span></label>
             {inBia && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-2 rounded-xl border border-[#C8A14B]/40 bg-[#faf6ea] p-3">
                 {field('salesName', 'Tên bạn (in LỚN trên bìa)', { w: 'sm:col-span-2', ph: 'NGUYỄN VĂN A' })}
@@ -337,7 +337,7 @@ export default function HopDongDatCoc() {
               </div>
             )}
           </div>
-          <button onClick={() => window.print()} className="w-full bg-[#0B4045] hover:bg-[#0e5157] text-white font-bold py-3 rounded-xl shadow-lg">🖨️ Xuất PDF / In {inBia ? 'cả cuốn (kèm bìa)' : 'hợp đồng'}</button>
+          <button onClick={() => window.print()} className="w-full bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold py-3 rounded-xl shadow-lg">🖨️ Xuất PDF / In {inBia ? 'cả cuốn (kèm bìa)' : 'hợp đồng'}</button>
         </div>
       </div>
 
@@ -350,19 +350,19 @@ export default function HopDongDatCoc() {
         <div style={{ position: 'relative' }}>
           <div aria-hidden style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
             {[0, 1, 2, 3, 4, 5].map((r) => (
-              <div key={r} style={{ transform: 'rotate(-28deg)', whiteSpace: 'nowrap', textAlign: 'center', marginTop: r === 0 ? '150px' : '200px', color: 'rgba(11,64,69,0.05)', fontSize: '40px', fontWeight: 900, letterSpacing: '5px' }}>
+              <div key={r} style={{ transform: 'rotate(-28deg)', whiteSpace: 'nowrap', textAlign: 'center', marginTop: r === 0 ? '150px' : '200px', color: 'rgba(10,37,64,0.05)', fontSize: '40px', fontWeight: 900, letterSpacing: '5px' }}>
                 CAM LÂM LAND · CAM LÂM LAND
               </div>
             ))}
           </div>
           <div style={{ position: 'relative', zIndex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '2.5px solid #0B4045', paddingBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '2.5px solid #0A2540', paddingBottom: '8px' }}>
               {/* ⚠️ KHÔNG BỌC LOGO TRONG MỘT Ô NAVY NỮA: bản thân logo đã là
                   ô vuông navy bo góc, bọc thêm thành hai khung lồng nhau. */}
               <img src="/logo-cam-lam.webp" alt="" aria-hidden width={46} height={46}
                 style={{ width: 46, height: 46, borderRadius: 11, objectFit: 'contain' }} />
               <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: 'Arial, sans-serif', fontWeight: 800, fontSize: '18px', color: '#0B4045' }}>CAM LÂM LAND</div>
+                <div style={{ fontFamily: 'Arial, sans-serif', fontWeight: 800, fontSize: '18px', color: '#0A2540' }}>CAM LÂM LAND</div>
                 <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '11px', color: '#555' }}>Sàn Bất động sản &amp; Bản đồ quy hoạch Cam Lâm, Khánh Hòa · Hotline {HOTLINE}</div>
                 <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '9.5px', fontStyle: 'italic', color: '#9a7b3a' }}>Nội dung do bên mua và bên bán chủ động thỏa thuận, thực hiện</div>
               </div>
@@ -455,7 +455,7 @@ export default function HopDongDatCoc() {
             </tr></tbody></table>
 
             <div style={{ marginTop: '10px', borderTop: '1px dashed #999', paddingTop: '6px', fontFamily: 'Arial, sans-serif', fontSize: '10px', color: '#888', textAlign: 'center' }}>
-              <b style={{ color: '#0B4045' }}>Cam Lâm Land</b> · {HOTLINE} · batdongsancamlam.dpdns.org — <i>Khuyến nghị công chứng khi giao dịch.</i>
+              <b style={{ color: '#0A2540' }}>Cam Lâm Land</b> · {HOTLINE} · batdongsancamlam.dpdns.org — <i>Khuyến nghị công chứng khi giao dịch.</i>
             </div>
           </div>
         </div>

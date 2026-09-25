@@ -43,21 +43,21 @@ export default function Account() {
   }
 
   if (loading || !user) return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
-  const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:border-[#0B4045] outline-none';
+  const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:border-[#0A2540] outline-none';
   const lbl = 'block text-sm font-semibold text-slate-700 mb-1';
 
   return (
     <div className="bg-slate-50 min-h-[calc(100dvh-56px)] py-5 sm:py-8">
       <div className="mx-auto max-w-2xl px-3 sm:px-4 space-y-4 sm:space-y-5">
-        <h1 className="text-xl sm:text-2xl font-extrabold text-[#0B4045]">Tài khoản của tôi</h1>
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540]">Tài khoản của tôi</h1>
 
         <form onSubmit={saveInfo} className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
           <div className="flex items-center gap-3 sm:gap-4">
             {avatar
               ? <img src={avatar} alt="" className="w-20 h-20 rounded-full object-cover ring-2 ring-[#C8A14B]/40" />
-              : <div className="w-20 h-20 rounded-full bg-[#0B4045] text-[#C8A14B] grid place-items-center text-2xl font-extrabold">{(fullName || user.email || 'U').charAt(0).toUpperCase()}</div>}
+              : <div className="w-20 h-20 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-2xl font-extrabold">{(fullName || user.email || 'U').charAt(0).toUpperCase()}</div>}
             <div>
-              <label className="inline-block bg-[#0B4045] hover:bg-[#0e5157] text-white text-sm font-semibold px-4 py-2 rounded-lg cursor-pointer">
+              <label className="inline-block bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-semibold px-4 py-2 rounded-lg cursor-pointer">
                 <input type="file" accept="image/*" onChange={onAvatar} className="hidden" />
                 {uploading ? 'Đang tải…' : 'Đổi ảnh đại diện'}
               </label>
@@ -72,10 +72,10 @@ export default function Account() {
         </form>
 
         <form onSubmit={savePw} className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
-          <h2 className="font-bold text-[#0B4045]">Đổi mật khẩu</h2>
+          <h2 className="font-bold text-[#0A2540]">Đổi mật khẩu</h2>
           <div><label className={lbl}>Mật khẩu hiện tại</label><PasswordInput value={curPw} onChange={(e) => setCurPw(e.target.value)} autoComplete="current-password" /></div>
           <div><label className={lbl}>Mật khẩu mới (≥ 6 ký tự)</label><PasswordInput value={newPw} onChange={(e) => setNewPw(e.target.value)} autoComplete="new-password" /></div>
-          <button disabled={busy || !curPw || !newPw} className="cl-press bg-[#0B4045] hover:bg-[#0e5157] disabled:opacity-60 text-white font-bold px-6 py-2.5 rounded-xl">Đổi mật khẩu</button>
+          <button disabled={busy || !curPw || !newPw} className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] disabled:opacity-60 text-white font-bold px-6 py-2.5 rounded-xl">Đổi mật khẩu</button>
         </form>
 
         <QuanLyVanTay />

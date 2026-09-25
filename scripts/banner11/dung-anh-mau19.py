@@ -74,7 +74,16 @@ TANG = [
     ('m19-qh2', 16, 18, 8),
     ('m19-qh3', 18, 18, 32),
 ]
-VE_TINH = 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2020_3857/default/g/{z}/{y}/{x}.jpg'
+# ⚠️ ĐỔI NGUỒN 25/9/2026: Sentinel-2 (10 m/điểm ảnh) quá mờ — ghép bao nhiêu ô
+#    cũng không nét hơn được. Nay dùng Esri World Imagery (dưới 1 m/điểm ảnh).
+#    Esri cho dùng PHI THƯƠNG MẠI kèm GHI NGUỒN (chủ dự án: web đang học làm,
+#    chưa kinh doanh). Dòng ghi nguồn nằm ở banner11-them.css (.st-b6::after) —
+#    ĐỪNG XOÁ. Khi web bắt đầu thu tiền thật thì phải đổi nguồn ảnh khác.
+VE_TINH = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+# Tầng 1 lấy ở mức phóng sâu hơn khung bao nhiêu bậc rồi thu nhỏ lại (2 = gấp 4)
+SAU_VT = 2
+# Ảnh vệ tinh ghi ra rộng gấp mấy lần khung 1920 (cho màn nét cao)
+NET_VT = 1.5
 
 
 def diem_anh(lon, lat, z):
@@ -176,6 +185,56 @@ def ve_ranh_thua(anh, z, x0, y0, net=1.0):
     return anh
 
 
+SENTINEL = 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2020_3857/default/g/{z}/{y}/{x}.jpg'
+
+
+def va_bien_va_may(vt, z, Image, ImageFilter):
+    """Vá MẶT BIỂN và MÂY của ảnh Esri bằng ảnh Sentinel-2 "không mây".
+
+    ⚠️ Ảnh Esri nét nhưng ghép từ nhiều lần chụp: mặt biển loang lổ từng mảng
+       xám, có chỗ nắng chói trắng xoá; trên núi còn vài cụm mây. Ảnh Sentinel-2
+       cloudless thì mờ nhưng biển xanh đều và không mây. Nên: đất liền lấy Esri,
+       biển + mây lấy Sentinel, chỗ nối làm mềm cho khỏi lộ đường ghép.
+    """
+    import numpy as np
+    zz = z + 1
+    cx, cy = diem_anh(TAM_LON, TAM_LAT, zz)
+    f_doc = lambda zz_, tx, ty: _doc_url(SENTINEL, zz_, tx, ty, Image)
+    s2, _ = ghep_tile(zz, cx - RONG, cy - CAO, RONG * 2, CAO * 2, ('RGB', (12, 30, 50)), f_doc)
+    s2 = s2.resize(vt.size, Image.LANCZOS)
+    a = np.asarray(s2).astype(np.int16)
+    b = np.asarray(vt).astype(np.int16)
+    # nước theo ảnh Sentinel: xanh dương/xanh lục trội hơn đỏ rõ rệt
+    nuoc = (a[..., 2] > a[..., 0] + 18) & (a[..., 1] > a[..., 0] + 5)
+    # mây theo ảnh Esri: rất sáng, gần như không màu — chỉ xét nửa trái (vùng núi)
+    #   để không đụng bãi cát trắng ven biển
+    sang = b.min(axis=2) > 150
+    xam = (b.max(axis=2) - b.min(axis=2)) < 45
+    ranh = int(b.shape[1] * 0.42)
+    may = sang & xam
+    may[:, ranh:] = False
+    # vùng núi bên trái không có biển → không vá "nước" ở đó (hồ giữ ảnh Esri)
+    nuoc[:, :ranh] = False
+    m_nuoc = Image.fromarray((nuoc * 255).astype('uint8'))
+    m_nuoc = m_nuoc.filter(ImageFilter.MinFilter(9)).filter(ImageFilter.MaxFilter(9))
+    # mây: nở rộng ra để ăn luôn viền mây và bóng mây xám quanh nó
+    m_may = Image.fromarray((may * 255).astype('uint8')).filter(ImageFilter.MaxFilter(31))
+    from PIL import ImageChops
+    m = ImageChops.lighter(m_nuoc, m_may).filter(ImageFilter.GaussianBlur(10))
+    return Image.composite(s2, vt, m)
+
+
+def _doc_url(mau, z, tx, ty, Image):
+    f = os.path.join(RA_ANH, '_tam-s2-%d-%d-%d.jpg' % (z, tx, ty))
+    if not os.path.exists(f):
+        subprocess.run(['curl', '-sS', '--max-time', '60', '-o', f,
+                        mau.format(z=z, x=tx, y=ty)], capture_output=True)
+    try:
+        return Image.open(f).convert('RGB')
+    except Exception:
+        return None
+
+
 def main():
     try:
         from PIL import Image, ImageEnhance, ImageFilter
@@ -215,14 +274,18 @@ def main():
             #    Lấy mức 14 (9,3 m/điểm, đúng bằng độ nét gốc của Sentinel-2)
             #    trên khung rộng gấp đôi rồi thu về đúng khổ: mỗi điểm ảnh cuối
             #    cùng là trung bình của 4 điểm thật — sắc nét hẳn, lại hết nhiễu.
-            zz = z + 1
+            # Esri nét tới mức phóng 17+, nên lấy sâu hơn SAU_VT bậc (mức 15 ≈
+            # 4,7 m/điểm) trên khung rộng gấp 2^SAU_VT lần rồi thu về khổ ra.
+            kk = 2 ** SAU_VT
+            zz = z + SAU_VT
             cx2, cy2 = diem_anh(TAM_LON, TAM_LAT, zz)
-            ve2, _ = ghep_tile(zz, cx2 - RONG, cy2 - CAO, RONG * 2, CAO * 2,
+            ve2, _ = ghep_tile(zz, cx2 - RONG * kk // 2, cy2 - CAO * kk // 2, RONG * kk, CAO * kk,
                                ('RGB', (12, 30, 50)), doc_vetinh)
-            vt = ve2.resize((RONG, CAO), Image.LANCZOS)
-            vt = ImageEnhance.Color(vt).enhance(1.3)
-            vt = ImageEnhance.Contrast(vt).enhance(1.16)
-            vt = vt.filter(ImageFilter.UnsharpMask(radius=1.4, percent=150, threshold=2))
+            vt = ve2.resize((int(RONG * NET_VT), int(CAO * NET_VT)), Image.LANCZOS)
+            vt = va_bien_va_may(vt, z, Image, ImageFilter)
+            vt = ImageEnhance.Color(vt).enhance(1.15)
+            vt = ImageEnhance.Contrast(vt).enhance(1.08)
+            vt = vt.filter(ImageFilter.UnsharpMask(radius=1.0, percent=80, threshold=2))
             p = os.path.join(RA_ANH, 'm19-vetinh.webp')
             vt.save(p, 'WEBP', quality=90, method=6)
             print('  OK %s  %d KB' % (os.path.basename(p), os.path.getsize(p) // 1024))

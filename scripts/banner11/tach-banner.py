@@ -91,6 +91,14 @@ BO_MAU = [
     # chủ dự án dặn giữ nguyên đủ 19 mẫu, giống bản thiết kế nhất có thể.
 ]
 
+# ── THỨ TỰ HIỆN RA WEB: [số mẫu, số mẫu, ...] ───────────────────────────────
+#    Bản thiết kế xếp 19 mẫu theo thứ tự nào thì đánh số theo đúng thứ tự đó.
+#    Muốn đổi chỗ trên web thì SỬA DANH SÁCH NÀY, đừng sửa bản thiết kế —
+#    số mẫu còn được dùng ở BO_MAU, SUA_CHU, DOI_ANH… sửa bản thiết kế là
+#    lệch hết mấy chỗ kia.
+#    25/9/2026 — chủ dự án: "dời banner số 4 lên vị trí 2, dời 15 lên vị trí 4".
+THU_TU = [1, 4, 2, 15, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19]
+
 # ── SỬA CHỮ: {số thứ tự mẫu: [(chữ cũ, chữ mới), ...]} ───────────────────────
 SUA_CHU = {
     # Mẫu 18 nay nói về ĐÔ THỊ MỚI (toà nhà cao tầng vượt khung), không còn nói
@@ -622,7 +630,7 @@ def main():
     if len(khoi) != len(ten):
         raise SystemExit(f'Số mẫu ({len(khoi)}) khác số tiêu đề ({len(ten)}) — bản thiết kế có gì lạ')
 
-    can_tai, mau = {}, []
+    can_tai, mau, so_mau = {}, [], []
     for so, html in enumerate(khoi, 1):
         if so in BO_MAU:
             print(f'  · bỏ mẫu {so} ({ten[so - 1]}) — trùng với mẫu khác')
@@ -662,6 +670,16 @@ def main():
             html = html.replace(u, thay)
         lop = re.search(r'class="banner ([^"]*)"', html).group(1)
         mau.append({'lop': lop, 'ten': ten[so - 1], 'html': html})
+        so_mau.append(so)
+
+    # ── Xếp lại theo THU_TU ──────────────────────────────────────────────────
+    if THU_TU:
+        if sorted(THU_TU) != sorted(so_mau):
+            raise SystemExit('THU_TU phải liệt kê đúng %d mẫu đang giữ: %s'
+                             % (len(so_mau), sorted(so_mau)))
+        cho = {s: i for i, s in enumerate(so_mau)}
+        mau = [mau[cho[s]] for s in THU_TU]
+        print('  · xếp lại thứ tự: ' + ' → '.join(str(s) for s in THU_TU))
 
     # ── Ảnh còn thiếu trên máy chủ mình ──────────────────────────────────────
     thieu = {u: f for u, f in can_tai.items() if not os.path.exists(os.path.join(THU_MUC_ANH, f))}

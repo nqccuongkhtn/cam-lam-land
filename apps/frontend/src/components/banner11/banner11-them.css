@@ -774,15 +774,20 @@
   }
 
   /* 2) phóng khối chữ chính, neo đúng góc */
+  /* ⚠️ PHÓNG BẰNG --u, KHÔNG DÙNG `scale`. Safari vẽ chữ thành ảnh ở cỡ gốc rồi
+     mới phóng lên → chữ NHÒE (chủ dự án: "đọc được nhưng cứ nhòa"). Nhân --u thì
+     cỡ chữ, khoảng cách bên trong khối to ra thật, chữ vẽ nét ở cỡ thật.
+     --u0 = --u gốc của banner (mã chạy đặt), để khỏi tự tham chiếu. */
+  .cl-b11 .banner { --u0: var(--u) }
   .cl-b11 :is(.rb-text, .rb-big, .sp-content, .sp-cta, .du-content, .pl-text,
-              .bb-text, .ui-text, .fl-text, .b-text, .kc-cap, .dp-content) { scale: var(--S) }
+              .bb-text, .ui-text, .fl-text, .b-text, .kc-cap, .dp-content) { --u: calc(var(--u0) * var(--S)) }
   .cl-b11 :is(.rb-text, .sp-cta, .b-text.right) { transform-origin: 100% 0 }
   .cl-b11 :is(.sp-content, .du-content, .pl-text, .bb-text, .ui-text, .fl-text,
               .b-text:not(.right)) { transform-origin: 0 0 }
   .cl-b11 :is(.rb-big, .dp-content) { transform-origin: 0 100% }
   .cl-b11 .kc-cap { transform-origin: 50% 100% }
   /* khối trải từ mép trái sang mép phải: thu bề ngang để phóng xong vẫn vừa */
-  .cl-b11 .dp-content { right: auto !important; width: calc((100% - var(--u) * 240px) / var(--S)) }
+  .cl-b11 .dp-content { right: auto !important; width: calc(100% - var(--u0) * 240px) }
 
   /* 3) chữ nhỏ nâng thêm; chỗ xuống dòng */
   .cl-b11 :is(.cta, [class*="-sub"], [class*="-slogan"]) { --san-nho: .45 }
@@ -797,7 +802,7 @@
 
   /* 4) thẻ minh hoạ */
   .cl-b11 :is(.photo-cap, .sr-chip, .pol, .sl-tag, .ui-listing, .ui-map, .ui-chat,
-              .ui-toast, .hud .rec, .chip, .b10-seal, .sp-logo, .pp-logo) { scale: 1.5 }
+              .ui-toast, .hud .rec, .chip, .b10-seal, .sp-logo, .pp-logo) { --u: calc(var(--u0) * 1.5) }
 }
 
 /* ══ ĐIỆN THOẠI: CHỈNH RIÊNG TỪNG MẪU ════════════════════════════════════════
@@ -818,14 +823,17 @@
   .cl-b11 .pp-edge path { stroke-width: 1.2px }
 
   /* Mẫu "Làng biển bình yên", "Thuần đồ hoạ": khối chữ đặt theo tỉ lệ máy tính */
-  .cl-b11 .st-step.red { --S: 1.7 }
-  .cl-b11 .st-step.red .sp-content { left: 30vw !important; top: calc(var(--dinh) + 4vw) !important }
-  .cl-b11 .st-step.red .sp-cta { top: auto !important; bottom: calc(var(--thanh) + 6vw) !important; left: 30vw !important; right: auto !important; transform-origin: 0 100% !important }
+  /* Chữ đặt vào Ô TRỐNG DUY NHẤT (góc dưới–phải, giữa khối trên và khối trái) —
+     chủ dự án khoanh đúng chỗ đó: "các khối quá hở, còn 1 khối không hở thì đưa
+     chữ xuống đó". --uu là --u của các khối (xem mục khối lồng lớp). */
+  .cl-b11 .st-step.red { --S: 1.45 }
+  .cl-b11 .st-step.red .sp-content { left: calc(var(--uu) * 450px + 6vw) !important; right: auto !important; top: calc(max(var(--dinh), var(--uu) * 290px) + 4vw) !important }
+  .cl-b11 .st-step.red .sp-cta { left: calc(var(--uu) * 450px + 6vw) !important; right: auto !important; top: auto !important; bottom: calc(var(--thanh) + 5vw) !important }
 
   /* Mẫu polaroid: 4 ảnh xếp SO LE như máy tính (cao – thấp – cao – thấp, chồng
      mép nhau), gói trong nửa phải, dưới menu. Chủ dự án chê bản xếp lưới 2×2
      "xấu" và bản đầu "dày, đè chữ". */
-  .cl-b11 .st-pol .pol { scale: 1.1 !important; transform-origin: 0 0; margin-top: 0 !important }
+  .cl-b11 .st-pol .pol { --u: calc(var(--u0) * 1.65) !important; margin-top: 0 !important }
   /* p1 lùi trái 1,5%: chú thích "Mùa gặt Cam Lâm" dài nhất, đuôi chữ bị tấm p2
      đè lên (chủ dự án: "mất chữ m"). */
   .cl-b11 .st-pol .p1 { left: 47.5% !important; top: calc(var(--dinh) + 7vw) !important }
@@ -872,7 +880,6 @@
 
   /* Mẫu "Nét xưa": đẩy cả khung ảnh sang phải (GIỮ bề rộng, thu hẹp là mất
      đường xé giấy) để chữ tối nằm trên nền giấy; con dấu theo khối chữ */
-  .cl-b11 .st-b10 > .fill-svg { left: 44vw !important; width: 100% !important }
   .cl-b11 .st-b10 .b10-seal { left: calc(var(--u) * 662px) !important; top: calc(var(--u) * 59px + var(--dinh)) !important }
 }
 
@@ -921,11 +928,11 @@
        tầng 2: thẻ tin (trái) + thẻ bản đồ (phải), không chạm nhau;
        tầng 3: hai bong bóng hội thoại.
      Toạ độ theo vw vì banner điện thoại rộng đúng bằng màn hình. */
-  .cl-b11 .st-ui .ui-toast { display: flex !important; left: auto !important; right: 2.5vw !important; top: calc(var(--dinh) + 1vw) !important; max-width: none !important; width: max-content !important; gap: 4px !important; scale: 1.5; transform-origin: 100% 0 }
+  .cl-b11 .st-ui .ui-toast { display: flex !important; left: auto !important; right: 2.5vw !important; top: calc(var(--dinh) + 1vw) !important; max-width: none !important; width: max-content !important; gap: 4px !important }
   /* (cỡ biểu tượng chuông: xem mục THẺ THÔNG BÁO KIỂU IPHONE cuối file) */
-  .cl-b11 .st-ui .ui-listing { right: auto !important; left: 47.5vw !important; top: calc(var(--dinh) + 12vw) !important; scale: 1.5; transform-origin: 0 0 }
-  .cl-b11 .st-ui .ui-map { right: 2vw !important; top: calc(var(--dinh) + 12vw) !important; scale: 1.5; transform-origin: 100% 0 }
-  .cl-b11 .st-ui .ui-chat { right: auto !important; left: 49vw !important; top: calc(var(--dinh) + 27vw) !important; scale: 1.5; transform-origin: 0 0 }
+  .cl-b11 .st-ui .ui-listing { right: auto !important; left: 47.5vw !important; top: calc(var(--dinh) + 12vw) !important }
+  .cl-b11 .st-ui .ui-map { right: 2vw !important; top: calc(var(--dinh) + 12vw) !important }
+  .cl-b11 .st-ui .ui-chat { right: auto !important; left: 49vw !important; top: calc(var(--dinh) + 27vw) !important }
 }
 
 /* Mẫu "Mọi cung đường": ảnh con đường to ra lấp khoảng trống giữa chữ và ảnh
@@ -1002,8 +1009,8 @@
   /* "Hoàng hôn": cụm chữ căn giữa PHẦN DƯỚI MENU và to 1,45 lần (trước dính sát menu, chữ nhỏ không đọc được). */
   .cl-b11 .st-knock .kc-wrap { inset: var(--dinh) 0 var(--thanh) 0; scale: 1.45 }
   /* "Nét xưa" + "Thuyền về bến": dòng mô tả rộng ra, không bẻ vụn 2–3 chữ một dòng. */
-  .cl-b11 .st-b10 .b10-text .b-sub { max-width: none !important; width: calc(40vw / var(--S)) }
-  .cl-b11 .st-b8 .b-sub { max-width: none !important; width: calc(44vw / var(--S)) }
+  .cl-b11 .st-b10 .b10-text .b-sub { max-width: none !important; width: 40vw }
+  .cl-b11 .st-b8 .b-sub { max-width: none !important; width: 44vw }
 }
 /* "Thuyền về bến": đường sáng cyan không vắt qua thanh menu (cả máy tính, chủ dự án khoanh). */
 .cl-b11 .b8-edge { clip-path: inset(var(--dinh, 64px) 0 0 0) }
@@ -1030,4 +1037,26 @@
   grid-column:1;grid-row:1 / span 2;
   width:calc(var(--u)*46px)!important;height:calc(var(--u)*46px)!important;padding:calc(var(--u)*10px);box-sizing:border-box;
   border-radius:22%;background:linear-gradient(145deg,#0A2540,#16395f);stroke:#E2C275!important;
+}
+
+@media (max-width: 760px) {
+  /* "Thuyền về bến": đường cyan thành VIỀN SÁNG ôm mép ảnh như viền nắng mẫu 1
+     (chủ dự án: "đường xanh lỗi, chưa có điểm nhấn như đường trắng mẫu 1").
+     Khung SVG ép cao đúng banner cho nét trùng mép ảnh cong; mờ dần ở hai đầu,
+     tắt hẳn ở vùng thanh menu. */
+  .cl-b11 .b8-edge {
+    height: 100% !important; clip-path: none !important;
+    -webkit-mask-image: linear-gradient(to bottom, transparent calc(var(--dinh) - 10px), #000 calc(var(--dinh) + 30px), #000 70%, transparent 97%);
+    mask-image: linear-gradient(to bottom, transparent calc(var(--dinh) - 10px), #000 calc(var(--dinh) + 30px), #000 70%, transparent 97%);
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, .9)) drop-shadow(0 0 6px rgba(94, 234, 212, .95)) drop-shadow(0 0 14px rgba(45, 212, 191, .6));
+  }
+  .cl-b11 .b8-edge path { stroke-width: 2px }
+  /* "Làng biển": tiêu đề và khẩu hiệu mỗi thứ một hàng; khẩu hiệu to hơn (trước mờ nhỏ). */
+  .cl-b11 .st-step.photo :is(.sp-title, .sp-slogan-wrap) { display: block }
+  .cl-b11 .st-step.photo .sp-slogan { --san-nho: .42 }
+  /* "Nét xưa": ảnh tháp phủ kín (khung nhìn riêng KHUNG_DT trong Banner11.tsx), các
+     nét cọ giãn cao 1,75 lần cho quét HẾT chiều cao banner điện thoại — trước chỉ
+     quét 4/7, phần dưới tháp không bao giờ hiện màu (chủ dự án: "vẽ thiếu"). */
+  .cl-b11 .st-b10 > .fill-svg { left: 0 !important; width: 100% !important }
+  .cl-b11 .st-b10 mask .grp { transform: scale(1, 1.75); transform-origin: 0 0 }
 }

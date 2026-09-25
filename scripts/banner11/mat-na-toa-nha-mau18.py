@@ -52,13 +52,29 @@ def main():
     ys, xs = np.nonzero(giua)
     y0 = ys.min()
     x0 = xs[ys == y0][0] + w // 3
-    giu = lab == lab[y0, x0]
+    # ⚠️ GIỮ MỌI TOÀ NHÀ chạm xuống mép khung (cả toà thấp bên trái), không
+    #    chỉ toà có chóp. Rồi LẤP KÍN TỪNG HÀNG của từng toà: mặt tường khuất
+    #    nắng giữa các gờ trắng màu xanh xám, bị nhận nhầm là trời → khoét ra
+    #    thành khe, lộ nền xanh banner (chủ dự án: "toà nhà cao bị mất ảnh ra
+    #    nền xanh", 25/9/2026). Giữa hai gờ của một toà thì chắc chắn là tường.
+    hang = lab[HANG_KHUNG]
+    ma = {int(v) for v in np.unique(hang) if v} | {int(lab[y0, x0])}
+    giu = np.zeros_like(nha)
+    for v in ma:
+        k = lab == v
+        if k.sum() < 800:
+            continue
+        giu |= k
+    # Lấp KHE HẸP theo chiều ngang (< 25 điểm ảnh): khe giữa các gờ tường chỉ
+    # ~10 điểm ảnh, còn khoảng trời giữa toà thấp bên trái và toà chính ~45 —
+    # lấp hết cả hàng như bản trước là lấp luôn mảng trời đó (đã vấp).
+    giu = ndimage.binary_closing(giu, structure=np.ones((1, 25), bool))
     giu = ndimage.binary_fill_holes(giu)
     giu[HANG_KHUNG + 12:, :] = True      # dưới mép khung: trắng hết cho khỏi hở
     m = Image.fromarray((giu * 255).astype('uint8')).filter(ImageFilter.GaussianBlur(0.8))
     # webp KHÔNG NÉN MẤT (lossless): nén thường là mép mặt nạ lem, lộ viền trời.
     # Giữ đuôi .webp vì bản điện thoại tự đổi đường dẫn sang dt/…webp.
-    p = os.path.join(RA, 'm18-matna-v2.webp')  # ⚠️ đổi tên mỗi lần dựng lại (v3, v4…): Cloudflare + trình duyệt giữ ảnh theo tên file
+    p = os.path.join(RA, 'm18-matna-v4.webp')  # ⚠️ đổi tên mỗi lần dựng lại (v3, v4…): Cloudflare + trình duyệt giữ ảnh theo tên file
     m.save(p, 'WEBP', lossless=True)
     print('OK', p, m.size, 'chop toa nha o', (int(x0), int(y0)))
     # ảnh xem thử: toà nhà trên nền navy

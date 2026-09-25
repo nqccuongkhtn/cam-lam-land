@@ -745,13 +745,18 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
   width: 46%; height: 46%;
   background: url('/logo-le/noel-xe.webp') center/contain no-repeat;
   opacity: 0; pointer-events: none;
-  animation: clNoelXe 120s linear infinite;
+  /* ⚠️ CỨ 5 GIÂY CHẠY MỘT LẦN (chủ dự án 25/9/2026). Trước để 120 giây —
+     hai phút mới thấy xe một lần, hầu như không ai kịp thấy.
+     Xe chạy hết khoảng 2,6 giây rồi nghỉ 2,4 giây, nên phải chỉnh lại cả
+     mốc phần trăm: ở vòng 120 giây thì 3,3% đã là 4 giây, còn ở vòng 5
+     giây thì 3,3% chỉ là 0,16 giây — xe vụt qua không kịp nhìn. */
+  animation: clNoelXe 5s linear infinite;
 }
 @keyframes clNoelXe {
   0%    { transform: translateX(-40%) translateY(4px) scale(.85); opacity: 0; }
-  0.6%  { transform: translateX(0) translateY(0) scale(1); opacity: 1; }
-  2.6%  { transform: translateX(200%) translateY(-5px) scale(1); opacity: 1; }
-  3.3%  { transform: translateX(260%) translateY(-8px) scale(.85); opacity: 0; }
+  6%    { transform: translateX(0) translateY(0) scale(1); opacity: 1; }
+  44%   { transform: translateX(200%) translateY(-5px) scale(1); opacity: 1; }
+  52%   { transform: translateX(260%) translateY(-8px) scale(.85); opacity: 0; }
   100%  { transform: translateX(260%) translateY(-8px) scale(.85); opacity: 0; }
 }
 

@@ -29,6 +29,11 @@ TEP = os.path.join(RA, 'm18-matna.webp')
 LUU = os.path.join(RA, '_m18-matna-truoc-khi-vet.webp')   # bản cũ, giữ để lỡ cần lùi
 
 
+def a_hang(a, y):
+    """Một hàng của mặt nạ (tách ra cho dễ đọc)."""
+    return a[y]
+
+
 def doan_trang(hang):
     """Các đoạn trắng liền nhau trong một hàng: [(đầu, cuối), …]."""
     ds, dau = [], None
@@ -45,6 +50,7 @@ def doan_trang(hang):
 def main():
     im = Image.open(TEP).convert('L')
     a = np.asarray(im) > 128
+    a_mask = a
     h, w = a.shape
     if not os.path.exists(LUU):
         im.save(LUU, 'WEBP', quality=92, method=6)
@@ -84,11 +90,28 @@ def main():
         c = max(t[1] for t in cham)
         giu[y, d:c] = True
 
-    # ── Từ chân trời xuống: KHÔNG tin vệt trắng nữa ──
-    # Chỉ nối tiếp hai mép toà nhà theo đúng độ dốc nó đang có, nở ra rất chậm.
-    # Làm vậy thì bóng toà nhà liền mạch xuống tận mép khung ảnh (không hở),
-    # mà dãy nhà thấp hai bên không bị lôi ra thành khối chữ nhật.
-    doc = max(0.4, (c - d) * 0.0015)      # mỗi hàng nở thêm bấy nhiêu điểm mỗi bên
+    # ── Từ chân trời xuống: nối tiếp hai mép theo ĐỘ DỐC ─────────────────
+    # ⚠️ Đã thử hai bản đều hỏng:
+    #    (a) bỏ hẳn vệt trắng, nối theo độ dốc RẤT CHẬM (0,4–0,6 điểm/hàng)
+    #        → toà nhà thật nở nhanh hơn thế nên ngay trên mép khung bóng
+    #          toà nhà bị BÓP HẸP, lộ ra một bậc gãy đúng chỗ nối;
+    #    (b) bám theo vệt trắng và chỉ chặn nở quá 14 điểm/hàng
+    #        → dãy nhà thấp hai bên nở từ từ nên vẫn lọt, khối chữ nhật
+    #          trời xanh hiện lại y như cũ.
+    # Cách dùng ở đây: vẫn nối theo độ dốc, nhưng ĐỘ DỐC TÍNH NGƯỢC từ bề
+    # ngang toà nhà ĐO ĐƯỢC ở ngay trên chân trời — đo ở ba hàng cuối cùng
+    # còn tin được rồi lấy nhịp nở trung bình, nên bám đúng dáng toà nhà mà
+    # không dính dãy nhà hai bên.
+    n_do = 24
+    y0 = max(hang_dau + 1, chan_troi - n_do)
+    rong0 = None
+    for y in range(y0, chan_troi):
+        dt = [(p, q) for p, q in doan_trang(a[y]) if giu[y].any() and giu[y, p:q].any()]
+        if dt:
+            rong0 = max(q for _, q in dt) - min(p for p, _ in dt)
+            break
+    rong1 = c - d
+    doc = 0.5 if (rong0 is None or chan_troi - y0 <= 0) else         max(0.5, (rong1 - rong0) / (2.0 * max(1, chan_troi - y0)))
     fd, fc = float(d), float(c)
     for y in range(chan_troi, h):
         fd -= doc

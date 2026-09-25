@@ -207,11 +207,24 @@ def main():
 
         if lan == 1:
             # tầng 1 kiêm luôn lớp "ảnh thật" — đây là cảnh mở đầu, chỉnh cho tươi
-            vt = ImageEnhance.Color(ve).enhance(1.3)
-            vt = ImageEnhance.Contrast(vt).enhance(1.14)
-            vt = vt.filter(ImageFilter.UnsharpMask(radius=2, percent=110, threshold=2))
+            # ⚠️ CHỤP Ở MỨC PHÓNG SÂU HƠN MỘT BẬC RỒI THU NHỎ LẠI ("chụp gấp đôi
+            #    rồi ép xuống"). Khung tầng 1 ở mức phóng 13, mỗi điểm ảnh ôm
+            #    18,7 m ngoài thực địa — trong khi ảnh Sentinel-2 gốc chụp 10 m
+            #    một điểm. Lấy đúng mức 13 là vứt mất một nửa độ chi tiết mà
+            #    máy chủ có, ảnh ra nhoè (chủ dự án: "quá mờ").
+            #    Lấy mức 14 (9,3 m/điểm, đúng bằng độ nét gốc của Sentinel-2)
+            #    trên khung rộng gấp đôi rồi thu về đúng khổ: mỗi điểm ảnh cuối
+            #    cùng là trung bình của 4 điểm thật — sắc nét hẳn, lại hết nhiễu.
+            zz = z + 1
+            cx2, cy2 = diem_anh(TAM_LON, TAM_LAT, zz)
+            ve2, _ = ghep_tile(zz, cx2 - RONG, cy2 - CAO, RONG * 2, CAO * 2,
+                               ('RGB', (12, 30, 50)), doc_vetinh)
+            vt = ve2.resize((RONG, CAO), Image.LANCZOS)
+            vt = ImageEnhance.Color(vt).enhance(1.3)
+            vt = ImageEnhance.Contrast(vt).enhance(1.16)
+            vt = vt.filter(ImageFilter.UnsharpMask(radius=1.4, percent=150, threshold=2))
             p = os.path.join(RA_ANH, 'm19-vetinh.webp')
-            vt.save(p, 'WEBP', quality=82, method=6)
+            vt.save(p, 'WEBP', quality=90, method=6)
             print('  OK %s  %d KB' % (os.path.basename(p), os.path.getsize(p) // 1024))
 
         k = 2 ** (z_qh - z)

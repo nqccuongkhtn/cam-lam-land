@@ -77,9 +77,12 @@ MAU_NEN_TOI = dict(
 # Nền sáng (thanh menu trắng): cùng sắc nhưng đậm hơn cho đọc rõ trên trắng.
 MAU_NEN_SANG = dict(
     net=NAVY,
-    # Nền TRẮNG thì chỉ nhích sáng một chút thôi: sáng quá là vàng chìm
-    # vào nền trắng, nhìn không ra hình.
-    vang=(214, 150, 12), vang_sang=(232, 170, 16), kem=(196, 148, 62),
+    # ⚠️ NỀN TRẮNG CŨNG PHẢI TƯƠI. Bản trước chỉ nhích sáng một chút vì sợ
+    #    vàng chìm vào nền trắng — kết quả là trên trang quản lý (nền trắng)
+    #    nhìn vẫn xỉn (chủ dự án: "màu những chỗ cần tươi hình như chưa sửa
+    #    vẫn mờ mờ"). Cách đúng không phải làm NHẠT đi mà đẩy về phía CAM:
+    #    cam vàng đậm vẫn tươi mà đặt trên trắng vẫn đọc rõ từng nét.
+    vang=(242, 150, 0), vang_sang=(255, 176, 12), kem=(210, 160, 70),
     nau=(96, 58, 30), do=(210, 28, 20), do_tet=(206, 30, 30),
     hong=(220, 62, 108), xanh=(62, 116, 52), vang_co=VANG_CO,
 )
@@ -481,11 +484,19 @@ def phao_hoa(d, cx, cy, r, so, mau, mau2, day=3.0):
 
 
 def bat_che(d, cx, cy, w, h, bat, bat_dam, vien):
-    """Bát chè trôi nước — món của Tết Nguyên tiêu (rằm tháng Giêng)."""
+    """Bát chè trôi nước — món của Tết Nguyên tiêu (rằm tháng Giêng).
+
+    ⚠️ VIÊN TRÔI NƯỚC LUÔN MÀU TRẮNG, đừng lấy theo màu nét của nền. Bản
+       trước dùng `vien` (tức m['net']) nên ở bản cho NỀN TRẮNG màu nét là
+       navy — viên chè navy nằm trong bát đỏ sẫm, hai màu cùng độ tối nên
+       nhìn thành một khối đỏ đặc, không thấy chè đâu (chủ dự án: "phần thức
+       ăn trong tô bị trùng màu nên không thấy"). Chè trôi nước ngoài đời
+       vốn trắng, mà trắng thì nổi trên mọi màu bát.
+    """
     # ba viên trôi nước nhô trên miệng bát
     for dx, dy, r in ((-0.22, -0.12, 0.20), (0.22, -0.12, 0.20), (0.0, -0.22, 0.23)):
         d.ellipse([cx + w * dx - w * r, cy + h * dy - h * r * 1.5,
-                   cx + w * dx + w * r, cy + h * dy + h * r * 1.5], fill=vien)
+                   cx + w * dx + w * r, cy + h * dy + h * r * 1.5], fill=TRANG)
     # thân bát: hình thang đáy nhỏ
     d.polygon([(cx - w * 0.50, cy), (cx + w * 0.50, cy),
                (cx + w * 0.26, cy + h * 0.62), (cx - w * 0.26, cy + h * 0.62)], fill=bat)
@@ -987,8 +998,11 @@ def ve_tet(d, m, lop=None):
     #    nên mép phải cụm phải ≤ 378. Gốc cành đặt ở 202 (nằm trên nét chữ C)
     #    cộng bề ngang 176 là vừa chạm 378 — "vừa đụng" đúng như chủ dự án
     #    nói, không đè lên chữ.
+    # ⚠️ CHỐT: CHỈ GIỮ CÀNH MAI, không có mâm hoa quả (chủ dự án 25/9/2026:
+    #    "thống nhất logo tết nguyên đán chỉ giữ cành mai"). Đã đưa mâm vào
+    #    rồi bỏ, rồi lại đưa vào — nay chốt là bỏ hẳn. Ảnh scripts/anh/
+    #    tet-mam.png vẫn giữ, cần thì lấy lại dùng chỗ khác. ĐỪNG THÊM LẠI.
     dan_anh(lop, 'tet-mai.png', 202, 168, rong=176, lat=True, xoay=40, neo='duoi-trai')
-    dan_anh(lop, 'tet-mam.png', 268, 208, cao=104)
 
 
 def ve_tet_duong(d, m):
@@ -1010,10 +1024,11 @@ def ve_gio_to(d, m):
        bảo làm lại một lần vì thế. Đĩa tròn đỏ cho tượng một cái nền chắc,
        ở cỡ 32 điểm ảnh vẫn ra một huy hiệu tròn rõ ràng.
     """
-    d.ellipse([368 - 60, 72 - 60, 368 + 60, 72 + 60], fill=m['do_tet'])
-    tia(d, 368, 72, 30, 56, m['vang'], so=16, day=5)
-    d.ellipse([368 - 60, 72 - 60, 368 + 60, 72 + 60], outline=m['vang'], width=5)
-    tuong_vua_hung(d, 368, 132, 116, m['vang_sang'], m['vang'])
+    # ⚠️ Hạ cả cụm xuống 12 cho hở mép trên tấm — xem ghi chú ở ve_gia_dinh.
+    d.ellipse([368 - 60, 93 - 60, 368 + 60, 93 + 60], fill=m['do_tet'])
+    tia(d, 368, 93, 30, 56, m['vang'], so=16, day=5)
+    d.ellipse([368 - 60, 93 - 60, 368 + 60, 93 + 60], outline=m['vang'], width=5)
+    tuong_vua_hung(d, 368, 153, 116, m['vang_sang'], m['vang'])
 
 
 def ve_quoc_khanh(d, m):
@@ -1071,8 +1086,8 @@ def ve_phu_nu(d, m):
        chữ thập), ở cỡ 32 điểm ảnh vẫn đọc ra ngay.
     """
     for i in range(8):
-        canh_nhon(d, 366, 52, -90 + i * 45, 52, 15, m['hong'])
-    bieu_tuong_nu(d, 366, 52, 30, m['vang_sang'], m['do_tet'])
+        canh_nhon(d, 366, 64, -90 + i * 45, 52, 15, m['hong'])   # 64 chứ không phải 52: cho hở mép trên
+    bieu_tuong_nu(d, 366, 64, 30, m['vang_sang'], m['do_tet'])
 
 
 def ve_nha_giao(d, m):
@@ -1098,8 +1113,12 @@ def ve_quan_doi(d, m):
 
 def ve_gia_dinh(d, m):
     """28/6 Ngày Gia đình Việt Nam: trái tim trên nóc nhà."""
-    trai_tim(d, 185, 34, 40, m['do_tet'])
-    trai_tim(d, 372, 62, 26, m['hong'])
+    # ⚠️ ĐỪNG ĐỂ HÌNH CHẠM MÉP TRÊN CỦA TẤM (y = 0). Trái tim to trước đây
+    #    vẽ ở tâm y = 34 với bán kính 40, tức đỉnh tim nằm ở y = -5 — bị tấm
+    #    ảnh CẮT PHẲNG mất chỏm trước cả khi máy dồn vào khuôn, nên dồn xong
+    #    vẫn cụt (chủ dự án: "trái tim bị cụt"). Hạ xuống cho hở mép.
+    trai_tim(d, 185, 52, 40, m['do_tet'])
+    trai_tim(d, 372, 80, 26, m['hong'])
 
 
 def ve_thieu_nhi(d, m):
@@ -1128,7 +1147,7 @@ def ve_ong_tao(d, m):
     #    0,7 điểm ảnh ở cỡ thật — mất hẳn, cá thành ra bơi giữa không khí
     #    (chủ dự án: "mờ"). Nay h=42 và cá to hơn một nấc.
     song_nuoc(d, 366, 136, 152, 42, m['kem'])
-    ca_chep_bay(d, 360, 60, 150, 100, m['do_tet'], m['vang_sang'], m['net'])
+    ca_chep_bay(d, 360, 86, 150, 100, m['do_tet'], m['vang_sang'], m['net'])   # 74: cho hở mép trên
 
 
 def ve_lao_dong(d, m):
@@ -1212,7 +1231,7 @@ def ve_sen(d, m, lop=None):
     """
     hoa_nhieu_canh(d, 320, 126, 26, 7, m['hong'], m['kem'], m['vang_sang'])
     if lop is not None:
-        dan_chan_dung(lop, 380, 76, 148, m['net'])
+        dan_chan_dung(lop, 380, 90, 148, m['net'])   # 90: cho hở mép trên
 
 def ve_nen(d, m):
     """27/7 Thương binh Liệt sĩ: ngôi sao vàng và tấm băng đỏ "Tổ quốc ghi công".
@@ -1245,7 +1264,7 @@ def ve_nhang(d, m):
     #    bị sai"). Nay một bát to, ba viên trôi nước trắng nổi rõ, một bông
     #    hoa duy nhất để điểm xuyết.
     bat_che(d, 366, 76, 152, 100, m['do_tet'], m['do'], m['net'])
-    hoa_nhieu_canh(d, 296, 30, 28, 5, m['hong'], m['kem'], m['vang_sang'])
+    hoa_nhieu_canh(d, 296, 44, 28, 5, m['hong'], m['kem'], m['vang_sang'])   # 44: cho hở mép trên
 
 
 def ve_hoa_cuc(d, m):
@@ -1392,6 +1411,13 @@ HOP_TT = (194, 0, 343, 149)   # khuôn trang trí: trái, trên, phải, dưới
 #   · noel — cái mũ phải đội đúng lên chữ CL;
 #   · tet  — chân gốc cành mai phải dính vào mép phải ô vuông.
 KHONG_DON = ('noel', 'tet')
+# Dịp nào cần KHUÔN RIÊNG thì khai ở đây, không khai thì dùng HOP_TT chung.
+#   · sen — chủ dự án 25/9/2026: "dời hẳn Bác ra khoảng trắng để thấy rõ,
+#     không bị logo đè nữa". Ô vuông logo hết ở x = 288, nên khuôn của Bác
+#     bắt đầu từ 292, tức nằm TRỌN ngoài ô vuông.
+HOP_RIENG = {
+    'sen': (292, 6, 406, 120),
+}
 #    (25/9/2026 chủ dự án cho TO THÊM 20%: cạnh khuôn 124 → 149, giữ nguyên
 #     tâm theo chiều ngang. Mép phải 343 quy ra cỡ thật là 38,1 điểm ảnh, mà
 #     chữ "Cam Lâm Land" bắt đầu ở ~42 — vẫn chưa chạm chữ.)
@@ -1445,7 +1471,7 @@ def lam(nen_toi: bool):
         #    tức là mũ phải nằm TRÊN Ô VUÔNG chứ không dồn sang phải. Dồn
         #    cả cụm thì mũ bay sang bên cạnh, hết ra ông già Noel.
         if ma not in KHONG_DON:
-            tt, co = _xep_lai(tt, co)
+            tt, co = _xep_lai(tt, co, HOP_RIENG.get(ma, HOP_TT))
         # Trang trí đè lên ô vuông thì XOÁ SỢI VIỀN VÀNG ở đúng chỗ bị đè
         # (chủ dự án dặn). Không đụng gì khi trang trí nằm ngoài ô vuông.
         nen = _khoet_vien(nen, tt, co, mau_o)
@@ -1495,7 +1521,7 @@ def _khoet_vien(nen: Image.Image, tt: Image.Image, co: Image.Image | None, mau):
     return ra
 
 
-def _xep_lai(tt: Image.Image, co: Image.Image | None):
+def _xep_lai(tt: Image.Image, co: Image.Image | None, hop=None):
     """Dồn cụm trang trí vào đúng KHUÔN CHUẨN ở góc trên phải ô vuông (HOP_TT).
 
     Vì sao phải làm: mỗi dịp vẽ một kiểu, hình to nhỏ và đặt cao thấp khác
@@ -1515,7 +1541,7 @@ def _xep_lai(tt: Image.Image, co: Image.Image | None):
     bb = gop.getbbox()
     if not bb:
         return tt, co
-    x0, y0, x1, y1 = HOP_TT
+    x0, y0, x1, y1 = hop or HOP_TT
     kw, kh = x1 - x0, y1 - y0
     w0, h0 = bb[2] - bb[0], bb[3] - bb[1]
     ti = min(kw / w0, kh / h0)

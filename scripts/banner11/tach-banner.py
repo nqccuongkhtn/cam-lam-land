@@ -621,6 +621,18 @@ def luat_chua_dai(css: str) -> str:
     return dau + ds + ' { margin-bottom: var(--thanh, 0px) }\n'
 
 
+def co_toi_thieu_html(mau):
+    """Cỡ tối thiểu ghi THẲNG trong mã HTML của mẫu (style="font-size:max(24px,…)")
+    cũng phải nhân var(--san) như trong CSS — không thì trên điện thoại tiêu đề
+    mẫu "Nét xưa" to gấp đôi, tràn khỏi màn hình (đã vấp 25/9/2026)."""
+    for m in mau:
+        m['html'] = re.sub(r'max\(\s*([\d.]+)px\s*,',
+                           lambda x: 'max(calc(%spx * var(%s, 1)),'
+                           % (x.group(1), '--san-nho' if float(x.group(1)) <= 16 else '--san'),
+                           m['html'])
+    return mau
+
+
 def dong_bo_dien_thoai(css: str) -> str:
     """ĐIỆN THOẠI DÙNG ĐÚNG BỐ CỤC MÁY TÍNH, chỉ thu nhỏ lại (25/9/2026).
 
@@ -650,7 +662,9 @@ def dong_bo_dien_thoai(css: str) -> str:
     #       `.cl-b11 .xxx`). Khối lồng bên trong thẻ khác (giá trong thẻ tin,
     #       chấm đỏ của ô quay phim…) toạ độ tính theo thẻ cha, dời là lệch.
     #    ⚠️ `(?<![-\w])` để không đụng margin-top/padding-top.
-    lot_ben_trong = {'.cl-b11 .ui-price'}
+    # .bb-plane nằm TRONG .bb-orbit (bay theo vòng quỹ đạo): vòng đã dời thì
+    # máy bay tự dời theo, dời thêm là lệch gấp đôi (đã vấp).
+    lot_ben_trong = {'.cl-b11 .ui-price', '.cl-b11 .bb-plane'}
 
     def doi_top(m):
         sel, than = m.group(1), m.group(2)
@@ -798,7 +812,7 @@ export interface MauBanner {
 
 export const MAU_BANNER: MauBanner[] = ''' % len(mau)
     io.open(os.path.join(THU_MUC_RA, 'mauBanner.ts'), 'w', encoding='utf-8', newline='\n').write(
-        dau_ts + json.dumps(mau, ensure_ascii=False, indent=2) + ';\n')
+        dau_ts + json.dumps(co_toi_thieu_html(mau), ensure_ascii=False, indent=2) + ';\n')
 
     io.open(os.path.join(THU_MUC_RA, 'hinhDungChung.ts'), 'w', encoding='utf-8', newline='\n').write(
         '''/* ============================================================================

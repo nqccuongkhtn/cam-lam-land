@@ -274,7 +274,7 @@
 .cl-b11 .ring-b{stroke-dasharray:2 14;transform-origin:320px 320px;animation:spinR calc(60s*var(--slow)) linear infinite reverse;opacity:.45}
 @keyframes spinR{to{transform:rotate(360deg)}}
 .cl-b11 .bb-orbit{position:absolute;left:calc(var(--u)*1050px);top:calc(var(--u)*-10px);width:calc(var(--u)*640px);height:calc(var(--u)*640px);animation:spinR calc(16s*var(--slow)) linear infinite;pointer-events:none}
-.cl-b11 .bb-plane{position:absolute;left:50%;top:calc(var(--u)*10px + var(--dinh, 0px));width:calc(var(--u)*56px);height:calc(var(--u)*56px);margin-left:calc(var(--u)*-28px);transform:rotate(90deg);filter:drop-shadow(0 6px 10px rgba(30,58,138,.35))}
+.cl-b11 .bb-plane{position:absolute;left:50%;top:calc(var(--u)*10px);width:calc(var(--u)*56px);height:calc(var(--u)*56px);margin-left:calc(var(--u)*-28px);transform:rotate(90deg);filter:drop-shadow(0 6px 10px rgba(30,58,138,.35))}
 .cl-b11 .bb-text{position:absolute;left:calc(var(--u)*130px);top:calc(var(--u)*120px + var(--dinh, 0px));max-width:calc(var(--u)*760px);z-index:3}
 .cl-b11 .bb-kicker{color:#1d4ed8}
 .cl-b11 .bb-title{margin:calc(var(--u)*10px) 0 0;font-size:max(calc(26px * var(--san, 1)),calc(var(--u)*74px));line-height:1.04;font-weight:900;letter-spacing:-.02em}

@@ -69,10 +69,12 @@
    (thông báo nhỏ, nhãn góc, chiếc máy bay…) rơi đúng vào sau menu, chữ chồng
    chữ đọc không ra. Dùng margin-top để đẩy xuống — với phần tử đặt tuyệt đối
    thì margin vẫn có tác dụng, mà không phải tính lại toạ độ của bản gốc. */
+/* ⚠️ KHÔNG có .bb-plane ở đây: máy bay xanh nằm BÊN TRONG vòng quỹ đạo (.bb-orbit)
+   và bay theo vòng đó — đẩy nó xuống 62px là nó lọt vào trong vòng, bay đè lên ảnh
+   thay vì bay trên đường nét đứt (chủ dự án phát hiện 25/9/2026). */
 @media (min-width: 761px) {
   .cl-b11 .ui-toast,
   .cl-b11 .sl-tag,
-  .cl-b11 .bb-plane,
   .cl-b11 .hud { margin-top: 62px }
 }
 
@@ -723,103 +725,137 @@
 
 
 /* ══ ĐIỆN THOẠI = MÁY TÍNH THU NHỎ (25/9/2026) ═════════════════════════════
-   Chủ dự án: banner điện thoại "vẽ không giống máy tính", "đồng bộ 2 bản
-   giống nhau 100%", "làm to chữ xíu nhưng phải giữ giống gần như tuyệt đối".
+   Chủ dự án: banner điện thoại phải "giống máy tính gần như tuyệt đối", chữ
+   to hơn một chút cho đọc được, "xuống dòng một cách hợp lý", và không một
+   chữ nào nằm sau thanh menu.
 
-   Trước đây điện thoại có bố cục RIÊNG: chữ dời xuống đáy hoặc ra hẳn ngoài
-   ảnh, đôi người chạy bị ẩn… Nay bỏ hết (các khối ghi "ĐÃ TẮT" ở trên, cùng
-   các khối điện thoại trong banner11.css — xem dong_bo_dien_thoai() trong
-   scripts/banner11/tach-banner.py). Điện thoại dùng ĐÚNG luật máy tính, mọi
-   thứ tính theo --u nên tự co lại cùng một tỉ lệ.
+   Trước đây điện thoại có bố cục RIÊNG (chữ dời xuống đáy, ra ngoài ảnh…). Nay
+   bỏ hết — các khối ghi "ĐÃ TẮT" ở trên, cùng các khối điện thoại trong
+   banner11.css (xem dong_bo_dien_thoai() trong scripts/banner11/tach-banner.py).
 
-   Những chỗ phải chỉnh riêng cho điện thoại:
-   1) --u nhân 0,76 Y NHƯ máy tính (Banner11.tsx) → bố cục ngang giữ nguyên.
-      ⚠️ Đã thử nhân to hơn (0,9) cho chữ to: đôi người chạy đè lên chữ ngay,
-         vì đường cong của ảnh tính theo PHẦN TRĂM còn đôi người theo --u.
-         Muốn chữ to thì chỉnh --san / --san-nho, ĐỪNG động vào hệ số đó.
-   2) THANH MENU TRONG SUỐT NẰM ĐÈ lên đầu banner như cũ (chủ dự án dặn giữ,
-      lướt xuống mới đổi màu). Banner cao THÊM đúng phần menu (--dinh), và
-      mọi khối chữ neo mép trên tự dời xuống --dinh (dong_bo_dien_thoai() đã
-      gắn sẵn `+ var(--dinh, 0px)` vào banner11.css) → ảnh tràn lên sau menu,
-      chữ nằm dưới menu. Máy tính không đặt --dinh nên không đổi gì.
-   3) CHIỀU CAO phần dưới menu = 0,40 × bề ngang — cao hơn tỉ lệ máy tính
-      (0,31). Chủ dự án: "tăng chiều cao của banner lên sẽ có thêm không gian
-      để làm to chữ", "tỷ lệ hơi nhỏ so với các chức năng khác".
-   4) --san / --san-nho: cỡ TỐI THIỂU của chữ lớn / chữ nhỏ nhân hệ số này.
-      Để 1 thì chữ to gấp đôi tỉ lệ, tràn khỏi ô; để 0 thì số điện thoại chỉ
-      còn 3px. Chữ nhỏ (≤16px ở bản gốc: nhãn, dòng mô tả, chữ trên nút) được
-      nâng mạnh hơn vì theo đúng tỉ lệ nó chỉ còn 4–5px.
-      Đổi số này thì đo lại cả 19 mẫu ở khổ 390px xem có chữ nào tràn đáy.
-   5) font-size của khung: chữ gốc 16px của trang làm mỗi dòng trong ô chữ
-      cao tối thiểu 16px → ô chữ cao gấp rưỡi, tràn đáy. Cho co theo --u. */
+   CÁCH LÀM (đã thử từng mẫu trong Chrome ở khổ 390px, đặt cạnh bản 1400px):
+   1) --u nhân 0,76 Y NHƯ máy tính (Banner11.tsx) → vị trí ngang giữ nguyên.
+   2) MỌI CHỮ VỀ ĐÚNG TỈ LỆ máy tính (--san = --san-nho = 0: bỏ cỡ tối thiểu),
+      rồi PHÓNG CẢ KHỐI CHỮ lên --S lần bằng thuộc tính `scale` (không phải
+      `transform` — transform đang bị hiệu ứng xuất hiện chiếm, đè vào là mất
+      hiệu ứng), neo đúng góc mà bản máy tính neo. Nhờ vậy BÊN TRONG khối y hệt
+      máy tính: cùng chỗ xuống dòng, cùng khoảng cách — chỉ to hơn.
+      ⚠️ ĐỪNG quay lại cách nâng cỡ tối thiểu cho từng chữ: chữ to lên mà ô
+         chứa giữ nguyên → xuống dòng lung tung, chữ đè lên nhau (đã vấp).
+   3) Nhãn nhỏ, dòng mô tả, chữ trên nút: nâng thêm (--san-nho .45) vì theo tỉ
+      lệ chúng chỉ còn 3–4px. Nhãn, tiêu đề, nút, khẩu hiệu KHÔNG được tự bẻ
+      dòng (chỉ xuống dòng đúng chỗ bản máy tính xuống dòng); đoạn mô tả thì bỏ
+      chỗ ngắt cứng <br> rồi để tự ngắt theo khung (Banner11.tsx chèn một dấu
+      cách sau mỗi <br> để bỏ đi không dính chữ: "xanh –thiên").
+   4) THẺ MINH HOẠ (thẻ tin, bong bóng chat, polaroid, con dấu…): chữ theo tỉ
+      lệ + phóng cả thẻ 1,5 lần. Chủ dự án: "thu nhỏ quá thì không thấy gì".
+   5) THANH MENU TRONG SUỐT ĐÈ lên đầu banner như cũ. Banner cao thêm đúng phần
+      menu (--dinh); khối neo mép trên tự dời xuống --dinh (banner11.css đã gắn
+      sẵn `+ var(--dinh, 0px)`). Đáy chừa dải --thanh như máy tính (ở máy tính
+      dải đó là chỗ ô tìm kiếm) để khối neo mép dưới nằm đúng tầm.
+   6) Mẫu nào ảnh/khung minh hoạ bị phóng lệch vì banner điện thoại cao hơn tỉ
+      lệ máy tính thì chỉnh RIÊNG ở cuối file — mỗi dòng có ghi lý do.
+   Đổi bất cứ số nào ở đây: mở trang ở khổ 390px, xem đủ 19 mẫu. */
 @media (max-width: 760px) {
   .cl-b11 .banner {
     --dinh: calc(56px + env(safe-area-inset-top, 0px));
-    --san: .5;
-    --san-nho: .62;
+    --thanh: 12vw;
+    --san: 0;
+    --san-nho: 0;
+    --S: 1.55;
     aspect-ratio: auto !important; min-height: 0 !important;
     height: calc(var(--dinh) + 100vw * 0.40) !important;
+    /* chữ gốc 16px của trang làm mỗi dòng trong ô chữ cao tối thiểu 16px → co theo --u */
     font-size: calc(var(--u) * 21px);
     border-radius: 0;
   }
+
+  /* 2) phóng khối chữ chính, neo đúng góc */
+  .cl-b11 :is(.rb-text, .rb-big, .sp-content, .sp-cta, .du-content, .pl-text,
+              .bb-text, .ui-text, .fl-text, .b-text, .kc-cap, .dp-content) { scale: var(--S) }
+  .cl-b11 :is(.rb-text, .sp-cta, .b-text.right) { transform-origin: 100% 0 }
+  .cl-b11 :is(.sp-content, .du-content, .pl-text, .bb-text, .ui-text, .fl-text,
+              .b-text:not(.right)) { transform-origin: 0 0 }
+  .cl-b11 :is(.rb-big, .dp-content) { transform-origin: 0 100% }
+  .cl-b11 .kc-cap { transform-origin: 50% 100% }
+  /* khối trải từ mép trái sang mép phải: thu bề ngang để phóng xong vẫn vừa */
+  .cl-b11 .dp-content { right: auto !important; width: calc((100% - var(--u) * 240px) / var(--S)) }
+
+  /* 3) chữ nhỏ nâng thêm; chỗ xuống dòng */
+  .cl-b11 :is(.kicker, .cta, [class*="-sub"], [class*="-slogan"]) { --san-nho: .45 }
+  .cl-b11 [class*="-slogan"] { --san-nho: .34 }
+  .cl-b11 :is(.kicker, h3, .cta, [class*="-slogan"]) { white-space: nowrap !important }
+  .cl-b11 :is(p, [class*="-sub"]) br { display: none }
+  .cl-b11 :is(p, [class*="-sub"]) { text-wrap: pretty }
+  .cl-b11 .rb-row { --san-nho: 0 }
+
+  /* 4) thẻ minh hoạ */
+  .cl-b11 :is(.photo-cap, .sr-chip, .pol, .sl-tag, .ui-listing, .ui-map, .ui-chat,
+              .ui-toast, .hud .rec, .chip, .b10-seal, .sp-logo, .pp-logo) { scale: 1.5 }
 }
 
-/* ══ ĐIỆN THOẠI, MẪU "CAM LÂM" (st-depth): THU CHỮ LỚN ═════════════════════
-   Chữ "CAM LÂM" vẽ CHUNG một khối SVG với dãy núi (để chữ nằm sau núi), khối
-   đó phủ kín banner theo kiểu "cắt cho vừa" (slice). Banner điện thoại cao hơn
-   tỉ lệ máy tính (1,8 so với 3,2) nên khối bị phóng ~1,8 lần → chữ to quá, bị
-   cắt hai bên và chui lên sau thanh menu (chủ dự án: "chữ cam lâm hơi to").
-   Chỉ thu CHỮ (đơn vị của khung vẽ 1000×301, bản gốc 118); núi giữ nguyên.
-   Bản thiết kế gốc cũng làm y như vậy cho màn nhỏ (46). 64 = chữ chiếm
-   khoảng 85% bề ngang phần núi còn nhìn thấy. */
+/* ══ ĐIỆN THOẠI: CHỈNH RIÊNG TỪNG MẪU ════════════════════════════════════════
+   Mỗi dòng đã thử trong Chrome, đặt cạnh bản máy tính. */
 @media (max-width: 760px) {
-  .cl-b11 .dp-text text { font-size: 64px }
-}
+  /* Mẫu 1 "Sống cạnh Bãi Dài": khối chữ phóng ít hơn và đôi người lùi sang
+     trái một chút, không thì chân cô gái đè lên chữ "Sống". */
+  .cl-b11 .rb-text { --S: 1.35; width: calc(var(--u) * 520px) !important }
+  .cl-b11 .rb-couple { left: calc(var(--u) * 1330px) !important }
 
-/* ══ MÁY CẢM ỨNG: HÀNG CHẤM THAY HAI MŨI TÊN ═══════════════════════════════
-   Hai mũi tên tròn nằm giữa hai mép banner che mất nút của mẫu (chủ dự án:
-   "hai nút <> che nút"). Máy cảm ứng nay VUỐT NGANG để đổi mẫu (Banner11.tsx),
-   chỉ còn hàng chấm nhỏ sát đáy cho biết đang ở mẫu nào — giống batdongsan. */
-/* ⚠️ Chỉ ở màn ≤760px. Đặt theo MÉP TRÊN = đúng chiều cao banner điện thoại
-   (--dinh + 0,40 × bề ngang, xem mục "ĐIỆN THOẠI = MÁY TÍNH THU NHỎ"): khung
-   bọc ngoài còn chứa cả ô tìm kiếm bên dưới nên KHÔNG dùng bottom được.
-   Đổi chiều cao banner thì đổi luôn ở đây. */
-.cl-b11-cham { display: none }
-@media (max-width: 760px) { .cl-b11-cham {
-  display: flex;
-  position: absolute; left: 0; right: 0; z-index: 30;
-  top: calc(56px + env(safe-area-inset-top, 0px) + 40vw - 10px);
-  justify-content: center; gap: 4px; pointer-events: none;
-} }
-.cl-b11-cham i {
-  width: 4px; height: 4px; border-radius: 9999px;
-  background: rgba(255, 255, 255, .45); box-shadow: 0 0 2px rgba(0, 0, 0, .5);
-  transition: width .3s, background-color .3s;
-}
-.cl-b11-cham i.dang { width: 12px; background: #fff }
+  /* Mẫu 2 "CAM LÂM": chữ vẽ chung SVG với núi, khung SVG phủ kín banner nên bị
+     phóng ~1,8 lần (banner điện thoại cao hơn tỉ lệ máy tính) → thu riêng chữ
+     (đơn vị khung vẽ 1000×301, gốc 118). 70 = gần kín bề ngang như máy tính. */
+  .cl-b11 .dp-text text { font-size: 70px }
 
-/* ══ ĐIỆN THOẠI: MẤY KHỐI KHÔNG NEO BẰNG `top` NÊN PHẢI DỜI TAY ════════════
-   dong_bo_dien_thoai() chỉ tự dời được khối có `top:calc(var(--u)*…)`. Đo cả
-   19 mẫu ở khổ 390px thấy còn mấy khối nằm dưới thanh menu / tràn mép:
-     · mẫu "Cung đường ven biển": chữ nằm trong tấm nền trắng bên trái, đẩy
-       xuống bằng PADDING-TOP của tấm đó (110 đơn vị ở bản gốc);
-     · mẫu "flycam": khung ngắm + chữ REC neo bằng `inset`;
-     · mẫu ảnh polaroid: các tấm ảnh đặt theo PHẦN TRĂM chiều cao → dời thêm
-       bằng margin-top (transform đã dùng để xoay ảnh, đè vào là mất xoay);
-     · mẫu "Sống cạnh Bãi Dài": số điện thoại + địa chỉ web to hơn tỉ lệ nên
-       tràn mép phải ~40px → cho ô chữ tự nở sang TRÁI (ô neo mép phải,
-       bề ngang tự co theo chữ). */
-@media (max-width: 760px) {
-  .cl-b11 .sl-panel { padding-top: calc(var(--u) * 110px + var(--dinh)) }
-  .cl-b11 .hud { top: calc(var(--u) * 22px + var(--dinh)) }
-  .cl-b11 .pol { margin-top: calc(var(--dinh) * .7) }
-  .cl-b11 .rb-text { width: auto; min-width: calc(var(--u) * 520px) }
-}
+  /* Mẫu "Làng biển bình yên", "Thuần đồ hoạ": khối chữ đặt theo tỉ lệ máy tính */
+  .cl-b11 .st-step.red { --S: 1.35 }
+  .cl-b11 .st-step.red .sp-content { top: calc(var(--dinh) + 5vw) !important }
+  .cl-b11 .st-step.red .sp-cta { top: calc(var(--dinh) + 8vw) !important }
 
-/* ⚠️ QUY TẮC CHUNG CHO ĐIỆN THOẠI (chủ dự án 25/9/2026): phần banner nằm SAU
-   THANH MENU (cao --dinh) CHỈ ĐƯỢC LÀ ẢNH, không một chữ nào. Luật nào ở file
-   này tự đặt lại `top` cho một khối chữ thì PHẢI cộng thêm var(--dinh) —
-   không thì nó đè lên luật tự dời của banner11.css và chữ chui sau menu. */
-@media (max-width: 760px) {
+  /* Mẫu polaroid: 4 ảnh xếp SO LE như máy tính (cao – thấp – cao – thấp, chồng
+     mép nhau), gói trong nửa phải, dưới menu. Chủ dự án chê bản xếp lưới 2×2
+     "xấu" và bản đầu "dày, đè chữ". */
+  .cl-b11 .st-pol .pol { scale: 1.1 !important; transform-origin: 0 0; margin-top: 0 !important }
+  .cl-b11 .st-pol .p1 { left: 49% !important;   top: calc(var(--dinh) + 7vw) !important }
+  .cl-b11 .st-pol .p2 { left: 61.5% !important; top: calc(var(--dinh) + 16vw) !important }
+  .cl-b11 .st-pol .p3 { left: 73% !important;   top: calc(var(--dinh) + 5vw) !important }
+  .cl-b11 .st-pol .p4 { left: 84.5% !important; top: calc(var(--dinh) + 14vw) !important }
+
+  /* Mẫu "Kết nối sân bay": cụm ô tròn dời sang phải (khối chữ phóng to chiếm
+     chỗ), to thêm 30% quanh tâm ô lớn; hai ô nhỏ dời ra xa tâm theo cùng tỉ lệ.
+     ⚠️ Máy bay xanh nằm TRONG .bb-orbit — đừng dời riêng nó, dời là lệch gấp đôi. */
+  .cl-b11 .st-bub :is(.bb-rings, .bb-circle, .bb-orbit) { margin-left: 22vw }
+  .cl-b11 .st-bub :is(.bb-rings, .bb-orbit) { margin-top: var(--dinh) }
+  .cl-b11 .st-bub :is(.bb-rings, .bb-big, .bb-orbit, .bb-s1, .bb-s2) { scale: 1.3 }
+  .cl-b11 .st-bub .bb-s1 { margin-left: calc(22vw - 3.7vw); margin-top: 1.9vw }
+  .cl-b11 .st-bub .bb-s2 { margin-left: calc(22vw + 4vw); margin-top: -2.1vw }
+  .cl-b11 .st-bub .bb-paths { top: var(--dinh) !important; height: calc(100% - var(--dinh)) !important }
+
+  /* Mẫu "Cung đường ven biển": tấm nền trắng rộng thêm 1,5 lần, chữ trong đó
+     phóng theo (zoom — tấm này tràn cả chiều cao nên không dùng scale được). */
+  .cl-b11 .sl-panel { width: calc(var(--u) * 700px * 1.5) !important; padding-top: calc(var(--u) * 110px + var(--dinh)) }
+  .cl-b11 .sl-panel :is(.sl-title, .sl-sub, .kicker, .cta) { zoom: 1.5 }
+
+  /* Mẫu "Hỏi là có câu trả lời": mỗi thẻ to ra về phía còn trống */
+  .cl-b11 .ui-listing { transform-origin: 100% 0 }
+  .cl-b11 .ui-chat { transform-origin: 100% 50% }
+  .cl-b11 .ui-map { transform-origin: 0 50% }
+  .cl-b11 .ui-toast { transform-origin: 50% 0 }
   .cl-b11 .st-ui .ui-toast { top: calc(var(--u) * 88px + var(--dinh)) }
+
+  /* Mẫu flycam: khung ngắm + chữ REC */
+  .cl-b11 .hud { top: calc(var(--u) * 22px + var(--dinh)) }
+
+  /* Mẫu "Mặt nước": mép ảnh dời phải theo tỉ lệ phóng chữ để chữ nằm trọn
+     trong dải tối */
+  .cl-b11 .st-b8 :is(.b8-panel, .b8-edge) { left: calc(var(--u) * 700px * 1.5) !important }
+
+  /* Mẫu "Nắng sớm": ảnh người làm muối to ra lấp khoảng trống giữa ảnh và chữ
+     (chủ dự án khoanh chỗ trống, chê ảnh nhỏ) */
+  .cl-b11 .st-c13 .c13-card { width: 57vw !important; top: calc(var(--dinh) + 1vw) !important; bottom: 2.5vw !important }
+
+  /* Mẫu "Nét xưa": đẩy cả khung ảnh sang phải (GIỮ bề rộng, thu hẹp là mất
+     đường xé giấy) để chữ tối nằm trên nền giấy; con dấu theo khối chữ */
+  .cl-b11 .st-b10 > .fill-svg { left: 29vw !important; width: 100% !important }
+  .cl-b11 .st-b10 .b10-seal { left: calc(var(--u) * 662px) !important; top: calc(var(--u) * 59px + var(--dinh)) !important }
 }

@@ -41,15 +41,29 @@ def main():
         p = os.path.join(VAO, f)
         if os.path.isdir(p):
             continue
+        # ⚠️ ẢNH MẶT NẠ (tên có "matna") CHÉP NGUYÊN, KHÔNG THU/NÉN. Mẫu 18 dùng
+        #    nó để cắt toà nhà ra khỏi nền rồi cho "mọc" vượt khung; nén còn
+        #    chất lượng 70 thì phần nền quanh toà nhà lệch màu với nền banner →
+        #    lộ một mảng chữ nhật sáng ngay chỗ cắt (chủ dự án: "vẫn còn lỗi
+        #    chỗ cắt"). Chỉ bản điện thoại bị, vì bản máy tính dùng ảnh gốc.
+        if 'matna' in f:
+            import shutil
+            shutil.copyfile(p, os.path.join(RA, f))
+            continue
         im = Image.open(p)
         # giữ nền trong suốt nếu ảnh có (mặt nạ toà nhà, máy bay cắt rời…)
         trong = im.mode in ('RGBA', 'LA') or (im.mode == 'P' and 'transparency' in im.info)
         im = im.convert('RGBA' if trong else 'RGB')
-        if im.width > TOI_DA_NGANG:
-            im = im.resize((TOI_DA_NGANG, max(1, round(im.height * TOI_DA_NGANG / im.width))),
+        # ⚠️ ẢNH MẪU 19 (tên "m19-…") GIỮ TỚI 1920px, NÉN NHẸ TAY. Banner điện
+        #    thoại cao ~212px mà ảnh này dẹt 3:1 → phải kéo giãn cho kín chiều
+        #    cao, lại còn phóng 2,6 lần làm hiệu ứng "bay vào gần". Thu còn
+        #    900px thì vỡ nét (chủ dự án: "ảnh bản đồ vệ tinh rất mờ").
+        rong_max, chat = (1920, 82) if f.startswith('m19-') else (TOI_DA_NGANG, CHAT_LUONG)
+        if im.width > rong_max:
+            im = im.resize((rong_max, max(1, round(im.height * rong_max / im.width))),
                            Image.LANCZOS)
         ra = os.path.join(RA, os.path.splitext(f)[0] + '.webp')
-        im.save(ra, 'WEBP', quality=CHAT_LUONG, method=6)
+        im.save(ra, 'WEBP', quality=chat, method=6)
         a, b = os.path.getsize(p) // 1024, os.path.getsize(ra) // 1024
         cu += a
         moi += b

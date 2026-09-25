@@ -168,8 +168,20 @@ const LOP_NANG = /<g class="m19-l[23]"[\s\S]*?<\/g><\/g>/g;
 const ANH_DT = /\/banner11\/(?!dt\/)([^"')]+?)\.(?:webp|png|jpe?g)/g;
 function lamNhe(html: string, hep: boolean | null): string {
   if (!hep) return html;
-  return html.replace(LOP_NANG, '').replace(ANH_DT, '/banner11/dt/$1.webp');
+  /* Chèn một dấu cách SAU mỗi <br>: điện thoại ẩn chỗ ngắt cứng trong đoạn mô
+     tả để chữ tự ngắt theo khung (banner11-them.css), mà ẩn <br> thì hai chữ
+     hai bên dính liền ("xanh –thiên"). Ở tiêu đề (giữ <br>) dấu cách đầu dòng
+     tự bị trình duyệt bỏ qua nên không lệch gì. */
+  return html.replace(LOP_NANG, '').replace(ANH_DT, '/banner11/dt/$1.webp')
+    .replace(/<br\s*\/?>/g, '<br> ');
 }
+
+/** Khung nhìn riêng cho ĐIỆN THOẠI của ảnh phủ kín (svg.fill-svg), theo lớp
+ *  của mẫu. Tỉ lệ khung ~1,77 cho khớp banner điện thoại (xem Banner11 → doLaiCo). */
+const KHUNG_DT: Record<string, string> = {
+  'st-b2': '0 20 760 430',        // "Nổi bật giữa lòng phố": toà nhà về 1/3 trái
+  'st-c18': '620 -57 1300 734',   // "Vươn cao": khung ảnh về bên phải như máy tính
+};
 
 /* ── Khung chứa mã HTML của một mẫu banner ────────────────────────────────────
    ⚠️ PHẢI TÁCH RA RIÊNG VÀ BỌC `memo`. Đã vấp lỗi rất khó tìm: trang chủ có vài
@@ -355,11 +367,17 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
       /* Điện thoại: vài mẫu khai sẵn khung cắt ảnh riêng (data-vbm) để chủ thể
          nằm phía trên, không bị khối chữ che. Không đổi thì trên màn nhỏ chỉ
          thấy nửa cái thuyền, nửa cái nhà. */
-      /* ⚠️ Nay điện thoại dùng bố cục máy tính nên LUÔN giữ khung cắt gốc. */
-      const manNho = false;
-      b.querySelectorAll<SVGElement>('svg[data-vbm]').forEach((sv) => {
+      /* ⚠️ Khung cắt `data-vbm` của bản thiết kế là cho bố cục điện thoại CŨ
+         (đã bỏ) nên không dùng nữa. Thay vào đó mấy mẫu có KHUNG NHÌN RIÊNG CHO
+         ĐIỆN THOẠI (KHUNG_DT, đã thử trong Chrome cạnh bản máy tính): banner
+         điện thoại cao hơn tỉ lệ máy tính nên ảnh "phủ kín" bị phóng to và cắt
+         mất hai bên — toà nhà dồn vào giữa, đè lên chữ. Khung riêng lùi ra xa
+         cho chủ thể về đúng chỗ, đúng cỡ như bản máy tính. */
+      const manNho = window.innerWidth <= 760;
+      b.querySelectorAll<SVGElement>(':scope > svg.fill-svg').forEach((sv) => {
         if (!sv.dataset.vbGoc) sv.dataset.vbGoc = sv.getAttribute('viewBox') || '';
-        sv.setAttribute('viewBox', manNho ? (sv.dataset.vbm || '') : sv.dataset.vbGoc);
+        const rieng = Object.keys(KHUNG_DT).find((lop) => b.classList.contains(lop));
+        sv.setAttribute('viewBox', manNho && rieng ? KHUNG_DT[rieng] : sv.dataset.vbGoc);
       });
 
       if (b.classList.contains('st-duo')) {
@@ -611,16 +629,13 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
             onPointerLeave={roiNut}
             aria-label={huong === -1 ? 'Mẫu trước' : 'Mẫu sau'}
             /* max-[760px]:hidden — điện thoại bỏ hai mũi tên (che nút của mẫu),
-               thay bằng vuốt ngang + hàng chấm ở dưới. */
+               thay bằng vuốt ngang (không cần dấu hiệu gì). */
             className={`absolute top-1/2 z-30 grid h-9 w-9 -translate-y-1/2 max-[760px]:hidden place-items-center rounded-full bg-black/30 text-lg text-white/90 backdrop-blur transition-opacity duration-300 hover:bg-black/55 hover:text-white ${ben === 'trai' ? 'left-2' : 'right-2'} ${hienNut || coChamTay ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
           >{dau as string}</button>
         ))}
 
-        {/* Hàng chấm cho điện thoại: đang ở mẫu nào (ẩn ở màn rộng, xem CSS). */}
-        <div aria-hidden className="cl-b11-cham">
-          {MAU_BANNER.map((_, i) => <i key={i} className={i === chiSo ? 'dang' : ''} />)}
-        </div>
-
+        {/* ⚠️ KHÔNG CÓ HÀNG CHẤM trên điện thoại: chủ dự án bỏ (25/9/2026) —
+            "người dùng lướt bằng tay được, không cần dấu hiệu nhận biết". */}
         {/* Vệt tối mép dưới cho chữ trong ô tìm kiếm nổi lên khỏi ảnh. */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-20 hidden h-40 bg-gradient-to-t from-black/55 via-black/20 to-transparent md:block" />
 

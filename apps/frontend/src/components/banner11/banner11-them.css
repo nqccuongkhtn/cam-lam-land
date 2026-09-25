@@ -1091,3 +1091,12 @@
   /* "Làng biển": chữ sát trái hơn cho khẩu hiệu khỏi đụng mép sóng. */
   .cl-b11 .st-step.photo .sp-content { left: 3.5vw !important }
 }
+
+/* "Cung đường ven biển": TRẢ VỀ KIỂU CHỮ TRƯỚC LẦN SỬA CHỮ (chủ dự án 25/9/2026:
+   "kiểu chữ cũ đẹp và đỡ thô hơn"). Chỉ mẫu này; các mẫu khác giữ cách mới. */
+@media (max-width: 760px) {
+  .cl-b11 .sl-panel :is(.sl-title, .sl-sub, .kicker, .cta) { zoom: 1.5 }
+  .cl-b11 .sl-panel :is(.cta, .sl-sub) { --san-nho: .45 }
+  .cl-b11 .sl-panel .kicker { --san-nho: .36 }
+  .cl-b11 .sl-panel { padding-top: calc(var(--u) * 110px + var(--dinh)) !important }
+}

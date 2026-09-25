@@ -912,10 +912,18 @@
     margin-left: 22vw; margin-top: var(--dinh);
     scale: 1.3; transform-origin: calc(var(--u) * 14px) calc(var(--u) * 25px);
   }
-  /* Mẫu "Hỏi là có": dòng thông báo (quả chuông) không còn chỗ, đè lên thẻ tin
-     (chủ dự án: "bị chồng chỗ thông báo") → ẩn trên điện thoại, như bản thiết
-     kế gốc cũng ẩn ở màn nhỏ. */
-  .cl-b11 .st-ui .ui-toast { display: none !important }
+  /* Mẫu "Hỏi là có": CỘT PHẢI XẾP LẠI thành tầng, không để thẻ đè nhau
+     (chủ dự án: "bị chồng chỗ thông báo", rồi hỏi "con thông báo em bỏ đâu" —
+     tức là phải GIỮ thông báo, chỉ sắp cho gọn). Đã thử trong Chrome ở 390px:
+       tầng 1: thông báo (quả chuông) sát mép phải, ngay dưới menu;
+       tầng 2: thẻ tin (trái) + thẻ bản đồ (phải), không chạm nhau;
+       tầng 3: hai bong bóng hội thoại.
+     Toạ độ theo vw vì banner điện thoại rộng đúng bằng màn hình. */
+  .cl-b11 .st-ui .ui-toast { display: flex !important; left: auto !important; right: 2.5vw !important; top: calc(var(--dinh) + 1vw) !important; max-width: none !important; width: max-content !important; gap: 4px !important; scale: 1.5; transform-origin: 100% 0 }
+  .cl-b11 .st-ui .ui-toast svg { width: 9px !important; height: 9px !important; flex: none }
+  .cl-b11 .st-ui .ui-listing { right: auto !important; left: 47.5vw !important; top: calc(var(--dinh) + 12vw) !important; scale: 1.5; transform-origin: 0 0 }
+  .cl-b11 .st-ui .ui-map { right: 2vw !important; top: calc(var(--dinh) + 12vw) !important; scale: 1.5; transform-origin: 100% 0 }
+  .cl-b11 .st-ui .ui-chat { right: auto !important; left: 49vw !important; top: calc(var(--dinh) + 27vw) !important; scale: 1.5; transform-origin: 0 0 }
 }
 
 /* Mẫu "Mọi cung đường": ảnh con đường to ra lấp khoảng trống giữa chữ và ảnh

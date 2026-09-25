@@ -554,7 +554,10 @@ export default function ChatWidget() {
             <div className="flex items-center justify-between px-4 pt-3">
               <b className="flex items-center gap-2">Cam Lâm Land {tab !== 'sell' && <span className={`w-2 h-2 rounded-full ${live ? 'bg-emerald-400' : 'bg-slate-400'}`} />}</b>
               <div className="flex items-center gap-3">
-                <button onClick={toggleNotify} title={notify ? 'Tắt báo tin nhắn' : 'Bật báo tin nhắn'} className="text-white/70 hover:text-white text-base leading-none">{notify ? '🔔' : '🔕'}</button>
+                <button onClick={toggleNotify} title={notify ? 'Tắt báo tin nhắn' : 'Bật báo tin nhắn'} className={`grid h-8 w-8 place-items-center rounded-[9px] border border-white/25 transition ${notify ? 'bg-white/15 text-[#E2C275]' : 'bg-white/5 text-white/45'} hover:bg-white/25`}>
+                  {/* Chuông kiểu biểu tượng ứng dụng, khớp thẻ thông báo iPhone (.cl-tb). Tắt báo thì có gạch chéo. */}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-[17px] w-[17px]"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0" />{!notify && <path d="M3 3l18 18" />}</svg>
+                </button>
                 <button onClick={() => setOpen(false)} aria-label="Đóng" title="Đóng" className="text-white/80 hover:text-white text-xl leading-none">✕</button>
               </div>
             </div>

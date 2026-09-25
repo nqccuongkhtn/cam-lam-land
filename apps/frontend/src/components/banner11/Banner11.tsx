@@ -197,7 +197,7 @@ function lamNhe(html: string, hep: boolean | null): string {
 const KHUNG_DT: Record<string, string> = {
   'st-b2': '0 20 760 430',        // "Nổi bật giữa lòng phố": toà nhà về 1/3 trái
   'st-c18': '540 -57 1300 734',   // "Vươn cao": khung ảnh về bên phải như máy tính
-  'st-b10': '-520 -70 1260 720',   // "Nét xưa": thấy cả ĐỈNH THÁP (chủ dự án dặn), chữ trên nền giấy bên trái
+  'st-b10': '-520 -160 1260 760',   // "Nét xưa": thấy cả ĐỈNH THÁP (chủ dự án dặn), chữ trên nền giấy bên trái
 };
 
 /* ── Khung chứa mã HTML của một mẫu banner ────────────────────────────────────

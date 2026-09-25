@@ -1071,3 +1071,10 @@
   .cl-b11 .du-content { top: calc(var(--dinh) + 2vw) !important }
   .cl-b11 .st-step.photo .sp-content { top: calc(var(--dinh) + 3vw) !important }
 }
+
+@media (max-width: 760px) {
+  /* Khoảng thở đáy: đo tự động 19 mẫu thấy "Cung đường", "Hình dung ngôi nhà",
+     "Nắng sớm", "Vươn cao" có nút nằm sát/chạm đáy → đưa khối chữ lên gần menu. */
+  .cl-b11 .b-text:not(.m-top) { top: calc(var(--dinh) + 3vw) !important }
+  .cl-b11 .sl-panel { padding-top: calc(var(--dinh) + 3vw) !important }
+}

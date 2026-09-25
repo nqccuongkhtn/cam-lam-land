@@ -1083,3 +1083,11 @@
   /* Polaroid: chữ sát lề trái hơn cho khỏi đụng ảnh "Mùa gặt Cam Lâm" (chủ dự án chỉ). */
   .cl-b11 .st-pol .pl-text { left: 3.5vw !important }
 }
+
+@media (max-width: 760px) {
+  /* Flycam: nét ranh thửa 2,2 đơn vị khung vẽ → điện thoại chỉ còn <1px, gần như
+     biến mất (chủ dự án: "trên web vẽ rất đủ nét, điện thoại thiếu nét"). */
+  .cl-b11 .fl-parcels path { stroke-width: 5.5 }
+  /* "Làng biển": chữ sát trái hơn cho khẩu hiệu khỏi đụng mép sóng. */
+  .cl-b11 .st-step.photo .sp-content { left: 3.5vw !important }
+}

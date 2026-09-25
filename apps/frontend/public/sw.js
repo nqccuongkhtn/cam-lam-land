@@ -1,4 +1,4 @@
-const CACHE = 'camlam-v89';   // tăng số này là xoá sạch cache cũ của mọi máy ở lần vào sau
+const CACHE = 'camlam-v90';   // tăng số này là xoá sạch cache cũ của mọi máy ở lần vào sau
 const API_CACHE = 'camlam-api-v1'; // cache RIÊNG cho API công khai (dễ dọn, giới hạn dung lượng)
 const OFFLINE = '/offline.html';
 // Precache khung app để MỞ APP là vẽ ngay (không chờ mạng → hết màn đen ~1s lúc khởi động).
@@ -70,8 +70,24 @@ self.addEventListener('fetch', (e) => {
   // ĐIỀU HƯỚNG TRANG (mở app / đổi trang): trả CACHE TỨC THÌ rồi cập nhật ngầm (stale-while-revalidate).
   // Đây là mấu chốt hết cảnh màn đen: WebView có HTML ngay → splash nhúng sẵn hiện lập tức.
   if (req.mode === 'navigate') {
-    const net = fetch(req).then((res) => {
-      if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {}); }
+    /* ⚠️ BẢN CŨ "DÍNH" TRÊN IPHONE (25/9/2026): trang lưu sẵn hiện ngay cho nhanh, bản
+       mới chỉ lưu ngầm → người dùng LUÔN chậm một bản so với web thật (sửa xong mà
+       iPhone vẫn thấy lỗi cũ). Nay: bản mới tải về mà KHÁC bản đang hiện (khác dấu
+       phiên bản của gói giao diện) thì báo trang tự tải lại một lần. */
+    const dau = (html) => (html.match(/\/_next\/static\/css\/[a-z0-9]+\.css/g) || []).join(',');
+    const net = fetch(req).then(async (res) => {
+      if (res && res.ok) {
+        const copy = res.clone();
+        const cache = await caches.open(CACHE);
+        const cu = await cache.match(req);
+        const [a, b] = await Promise.all([cu ? cu.clone().text().catch(() => '') : '', res.clone().text().catch(() => '')]);
+        await cache.put(req, copy).catch(() => {});
+        if (cu && dau(a) && dau(b) && dau(a) !== dau(b)) {
+          const kh = await self.clients.get(e.resultingClientId || e.clientId).catch(() => null);
+          const ds = kh ? [kh] : await self.clients.matchAll({ type: 'window' });
+          ds.forEach((c) => c.postMessage({ loai: 'ban-moi' }));
+        }
+      }
       return res;
     }).catch(() => null);
     e.waitUntil(net); // giữ SW sống để việc cập nhật ngầm hoàn tất

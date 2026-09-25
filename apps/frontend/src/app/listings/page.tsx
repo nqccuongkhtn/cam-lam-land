@@ -785,8 +785,12 @@ function ListingsInner() {
       <div className={`bg-white border-b border-slate-200 z-20 ${mapView ? 'shrink-0 md:sticky md:top-14' : 'cl-listbar'}`}>
         {/* Thanh này cao 109px, cộng thanh đầu trang 57px là 166px chắn trước nội dung.
             Các trang rao bán lớn để khoảng 100-110px cho cả hai. Bớt khoảng đệm. */}
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-1.5 space-y-1.5">
-          <div className="flex items-center gap-2">
+        {/* ⚠️ LÚC THU GỌN (cuộn xuống, thanh menu ẩn) logo nhỏ ở đây phải nằm ĐÚNG CHỖ logo
+            của thanh menu: cùng lề trái 16px (px-4) và cùng tâm dọc 28px (py-1.5 = 6px + hàng
+            cao 44px). Trước để lề 12px, hàng 40px → logo nhảy sang trái + lên trên mỗi lần
+            thanh menu ẩn/hiện (chủ dự án: "logo bị dựt"). */}
+        <div className={`max-w-7xl mx-auto ${hidden && !mapView ? 'px-4' : 'px-3'} sm:px-4 py-1.5 space-y-1.5`}>
+          <div className={`flex items-center gap-2 ${hidden && !mapView ? 'min-h-[44px]' : ''}`}>
             {/* Khi cuộn xuống (Nav ẩn) → hiện LOGO NHỎ bên trái để vẫn nhận diện & về trang chủ */}
             {/* ⚠️ LOGO NHỎ NÀY PHẢI GIỐNG HỆT LOGO Ở THANH MENU CHÍNH.
                 Bản trước nhét logo 18px vào một ô vuông navy 36px, lại dùng

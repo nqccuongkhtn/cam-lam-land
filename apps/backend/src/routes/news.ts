@@ -85,7 +85,8 @@ export async function refreshNews(force = false): Promise<number> {
       }
     } catch { /* nguồn lỗi -> bỏ qua, dùng nguồn khác */ }
   }
-  await query(`DELETE FROM news WHERE id NOT IN (SELECT id FROM news ORDER BY published_at DESC LIMIT 80)`).catch(() => {});
+  // Giữ tin 30 ngày rồi mới xoá (chủ dự án dặn 25/9/2026; trước giữ 80 bài mới nhất bất kể ngày).
+  await query(`DELETE FROM news WHERE published_at < now() - interval '30 days'`).catch(() => {});
   return n;
 }
 

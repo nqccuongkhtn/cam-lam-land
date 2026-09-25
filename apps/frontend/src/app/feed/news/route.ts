@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-// Lấy tin BĐS từ nguồn uy tín, tải NGUYÊN bài gốc + ảnh, AI viết lại thành bài đầy đủ (độ dài ~ bài gốc), lưu 7 ngày, làm mới mỗi 2 giờ.
+// Lấy tin BĐS từ nguồn uy tín, tải NGUYÊN bài gốc + ảnh, AI viết lại thành bài đầy đủ (độ dài ~ bài gốc), lưu 30 ngày (tin Khánh Hòa 60 ngày), làm mới mỗi 2 giờ.
 export const dynamic = 'force-dynamic';
 
 // Ảnh Bãi Dài Cam Lâm chủ site thả vào public/bai-dai/. Tên có 'hero'/'cam-lam' → TIN ĐẦU TIÊN (luôn trên cùng); còn lại XOAY VÒNG theo ngày.
@@ -500,12 +500,17 @@ async function refreshFeed(slot: number): Promise<void> {
     }));
   }
 
-  const weekAgo = Date.now() - 7 * 86400000;
-  const localKeep = Date.now() - 60 * 86400000; // tin Khánh Hòa (tier≥1) GIỮ 60 ngày
+  /* ⚠️ GIỮ TIN 30 NGÀY rồi mới xoá (chủ dự án dặn 25/9/2026; trước chỉ 7 ngày).
+     Tin Khánh Hòa (tier≥1) giữ lâu hơn: 60 ngày.
+     Trần số bài phải ĐỦ LỚN cho 30 ngày tin: mỗi ngày vào khoảng 10–15 bài,
+     để trần 75 như trước là kho đầy sau ~1 tuần, tin cũ bị đẩy ra sớm dù
+     chưa tới 30 ngày. */
+  const thangTruoc = Date.now() - 30 * 86400000;
+  const localKeep = Date.now() - 60 * 86400000;
   const rotating = [...byUrl.values()]
-    .filter((a) => !a.pin && a.slug && +new Date(a.publishedAt) >= ((a.tier || 0) >= 1 ? localKeep : weekAgo))
+    .filter((a) => !a.pin && a.slug && +new Date(a.publishedAt) >= ((a.tier || 0) >= 1 ? localKeep : thangTruoc))
     .sort((a, b) => (b.local ? 1 : 0) - (a.local ? 1 : 0) || +new Date(b.publishedAt) - +new Date(a.publishedAt))
-    .slice(0, 75);
+    .slice(0, 600);
   store = [...PINNED, ...rotating]; // bài GHIM luôn đứng đầu
   luuKho(rotating);                  // ghi ra đĩa để lần khởi động sau còn nguyên
   if (fetched.length) lastSlot = slot;

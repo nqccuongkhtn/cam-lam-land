@@ -829,7 +829,7 @@
      chủ dự án khoanh đúng chỗ đó: "các khối quá hở, còn 1 khối không hở thì đưa
      chữ xuống đó". --uu là --u của các khối (xem mục khối lồng lớp). */
   .cl-b11 .st-step.red { --S: 1.45 }
-  .cl-b11 .st-step.red .sp-content { left: calc(var(--uu) * 450px + 6vw) !important; right: auto !important; top: calc(max(var(--dinh), var(--uu) * 290px) + 4vw) !important }
+  .cl-b11 .st-step.red .sp-content { left: calc(var(--uu) * 450px + 6vw) !important; right: auto !important; top: calc(var(--uu) * 290px + 10vw) !important }
   .cl-b11 .st-step.red .sp-cta { left: calc(var(--uu) * 450px + 6vw) !important; right: auto !important; top: auto !important; bottom: calc(var(--thanh) + 5vw) !important }
 
   /* Mẫu polaroid: 4 ảnh xếp SO LE như máy tính (cao – thấp – cao – thấp, chồng
@@ -860,7 +860,7 @@
   /* Mẫu "Cung đường ven biển": tấm nền trắng rộng thêm 1,5 lần, chữ trong đó
      phóng theo (zoom — tấm này tràn cả chiều cao nên không dùng scale được). */
   .cl-b11 .sl-panel { width: calc(var(--u) * 700px * 1.5) !important; padding-top: calc(var(--u) * 110px + var(--dinh)) }
-  .cl-b11 .sl-panel :is(.sl-title, .sl-sub, .kicker, .cta) { zoom: 1.5 }
+  .cl-b11 .sl-panel :is(.sl-title, .sl-sub, .kicker, .cta) { zoom: 1.2 }
 
   /* Mẫu "Hỏi là có câu trả lời": mỗi thẻ to ra về phía còn trống */
   .cl-b11 .ui-listing { transform-origin: 100% 0 }
@@ -1063,4 +1063,11 @@
      quét 4/7, phần dưới tháp không bao giờ hiện màu (chủ dự án: "vẽ thiếu"). */
   .cl-b11 .st-b10 > .fill-svg { left: 0 !important; width: 100% !important }
   .cl-b11 .st-b10 mask .grp { transform: scale(1, 1.75); transform-origin: 0 0 }
+}
+
+@media (max-width: 760px) {
+  /* Khối chữ neo mép trên mà nội dung dài (4 dòng + nút) thì đẩy sát menu hơn
+     cho nút không rơi khỏi đáy banner (chủ dự án: "đọc được chữ rồi mất nút"). */
+  .cl-b11 .du-content { top: calc(var(--dinh) + 2vw) !important }
+  .cl-b11 .st-step.photo .sp-content { top: calc(var(--dinh) + 3vw) !important }
 }

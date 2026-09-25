@@ -58,7 +58,7 @@ def main():
     m = Image.fromarray((giu * 255).astype('uint8')).filter(ImageFilter.GaussianBlur(0.8))
     # webp KHÔNG NÉN MẤT (lossless): nén thường là mép mặt nạ lem, lộ viền trời.
     # Giữ đuôi .webp vì bản điện thoại tự đổi đường dẫn sang dt/…webp.
-    p = os.path.join(RA, 'm18-matna.webp')
+    p = os.path.join(RA, 'm18-matna-v2.webp')  # ⚠️ đổi tên mỗi lần dựng lại (v3, v4…): Cloudflare + trình duyệt giữ ảnh theo tên file
     m.save(p, 'WEBP', lossless=True)
     print('OK', p, m.size, 'chop toa nha o', (int(x0), int(y0)))
     # ảnh xem thử: toà nhà trên nền navy

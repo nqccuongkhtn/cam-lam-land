@@ -1189,7 +1189,9 @@ def ve_ong_tao(d, m, lop=None):
     # Ảnh bản 2 (ông Táo cầm câu đối cưỡi cá vàng) gần VUÔNG, hẹp hơn ảnh
     # cũ nên cùng chiều cao thì nhìn bé đi. Chủ dự án dặn "quan trọng là thấy
     # con cá và ông Táo" → cho cao 172, sát mép trên (đỉnh mũ ở y≈6).
-    dan_anh(lop, 'ong-tao.png', 374, 92, cao=172)
+    # ⚠️ LẬT NGANG: ảnh gốc cá quay đầu sang TRÁI; chủ dự án dặn cho cá chép
+    #    bơi từ trái qua phải (đầu cá hướng sang PHẢI, đi ra xa ô vuông logo).
+    dan_anh(lop, 'ong-tao.png', 374, 92, cao=172, lat=True)
 
 def ve_lao_dong(d, m):
     """1/5 Quốc tế Lao động: nắm tay giơ cao trước bánh răng.

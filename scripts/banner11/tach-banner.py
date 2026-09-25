@@ -641,7 +641,34 @@ def dong_bo_dien_thoai(css: str) -> str:
     Chạy nhiều lần vẫn an toàn (đã đổi rồi thì không khớp mẫu nữa).
     """
     css = css.replace('@media (max-width:760px){', '@media (max-width:0px){')
-    css = re.sub(r'max\(\s*([\d.]+)px\s*,', r'max(calc(\1px * var(--san, 1)),', css)
+
+    # 3) KHỐI NEO MÉP TRÊN dời xuống thêm `var(--dinh, 0px)`. Điện thoại cho
+    #    thanh menu TRONG SUỐT nằm đè lên đầu banner (chủ dự án: "phần trên vẫn
+    #    trong suốt, khi nào lướt mới thay đổi như cũ") → ảnh vẫn tràn lên sau
+    #    menu, còn chữ phải xuống dưới menu. Máy tính không đặt --dinh nên y cũ.
+    #    ⚠️ Chỉ dời khối nằm THẲNG trong banner (bộ chọn đúng 2 tầng
+    #       `.cl-b11 .xxx`). Khối lồng bên trong thẻ khác (giá trong thẻ tin,
+    #       chấm đỏ của ô quay phim…) toạ độ tính theo thẻ cha, dời là lệch.
+    #    ⚠️ `(?<![-\w])` để không đụng margin-top/padding-top.
+    lot_ben_trong = {'.cl-b11 .ui-price'}
+
+    def doi_top(m):
+        sel, than = m.group(1), m.group(2)
+        # bỏ lời ghi chú /* … */ dính phía trước bộ chọn
+        cac = [s.strip() for s in sel.split('*/')[-1].split(',')]
+        thang = all(len(s.split()) == 2 and s not in lot_ben_trong for s in cac) \
+            or sel.split('*/')[-1].strip() == '.cl-b11 .st-step.photo .sp-content'
+        if thang:
+            than = re.sub(r'(?<![-\w])top:calc\(var\(--u\)\*([\d.]+)px\)',
+                          r'top:calc(var(--u)*\1px + var(--dinh, 0px))', than)
+        return sel + '{' + than + '}'
+    css = re.sub(r'([^{}]+)\{([^{}]*)\}', doi_top, css)
+    # Cỡ tối thiểu ≤16px là CHỮ NHỎ (nhãn, dòng mô tả, chữ trên nút) → dùng
+    # --san-nho để nâng mạnh hơn; còn lại (tiêu đề lớn) dùng --san. Trên điện
+    # thoại chữ nhỏ theo đúng tỉ lệ chỉ còn 4–5px, nhìn không ra (đã đo).
+    css = re.sub(r'max\(\s*([\d.]+)px\s*,',
+                 lambda m: 'max(calc(%spx * var(%s, 1)),'
+                 % (m.group(1), '--san-nho' if float(m.group(1)) <= 16 else '--san'), css)
     # `(?<!\()` để KHÔNG đụng vào điều kiện @media (min-width:761px)
     css = re.sub(r'(?<!\()(min-(?:width|height)):\s*([\d.]+)px',
                  r'\1:calc(\2px * var(--san, 1))', css)

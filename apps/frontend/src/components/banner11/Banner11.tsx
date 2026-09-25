@@ -535,7 +535,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
   }, [boc, chiSo, tamDung, it, sang]);
 
   return (
-    <section className="cl-b11-khung-ngoai relative" aria-label="Giới thiệu Cam Lâm Land">
+    <section className="relative" aria-label="Giới thiệu Cam Lâm Land">
       {/* Hình dùng chung cho mọi mẫu (ngôi sao, vầng sáng…). Các mẫu gọi tới nó
           bằng <use href="#star"> — thiếu khối này là đốm sáng mất sạch mà
           KHÔNG báo lỗi gì. Khối svg này rộng 0 cao 0, không hiện gì cả. */}

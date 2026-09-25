@@ -732,31 +732,34 @@
    scripts/banner11/tach-banner.py). Điện thoại dùng ĐÚNG luật máy tính, mọi
    thứ tính theo --u nên tự co lại cùng một tỉ lệ.
 
-   Ba chỗ phải chỉnh riêng — và chỉ ba chỗ này:
-   1) CHIỀU CAO: bằng đúng tỉ lệ banner trên màn máy tính 1400px (432/1400),
-      nên chữ và hình rơi đúng chỗ như trên máy tính.
-      ⚠️ --u ở điện thoại cũng nhân 0,76 như máy tính (Banner11.tsx). Đã thử
-         nhân to hơn (0,9) cho chữ to: đôi người chạy đè lên chữ ngay, vì
-         đường cong của ảnh tính theo PHẦN TRĂM còn đôi người tính theo --u.
-   2) --san: cỡ TỐI THIỂU của chữ/nút nhân hệ số này. 1 thì chữ to gấp đôi
-      tỉ lệ, tràn khỏi ô; 0 thì số điện thoại chỉ còn 3px. 0,36 = tiêu đề lớn
-      đúng tỉ lệ, chữ nhỏ to hơn tỉ lệ một chút cho đọc được.
-      Muốn chữ to/nhỏ hơn nữa thì chỉnh số này, thử ở khổ 390px.
-   3) font-size của khung: chữ gốc 16px của trang làm mỗi dòng trong ô chữ
-      cao tối thiểu 16px → ô chữ cao gấp rưỡi, tràn đáy. Cho co theo --u.
-
-   THANH MENU: máy tính cho menu nằm ĐÈ lên đầu banner (đã chừa sẵn chỗ).
-   Điện thoại banner chỉ cao ~120px, menu 56px đè vào là mất nửa banner →
-   đẩy banner xuống dưới menu, dải sau menu tô navy liền với khung tìm kiếm. */
+   Những chỗ phải chỉnh riêng cho điện thoại:
+   1) --u nhân 0,76 Y NHƯ máy tính (Banner11.tsx) → bố cục ngang giữ nguyên.
+      ⚠️ Đã thử nhân to hơn (0,9) cho chữ to: đôi người chạy đè lên chữ ngay,
+         vì đường cong của ảnh tính theo PHẦN TRĂM còn đôi người theo --u.
+         Muốn chữ to thì chỉnh --san / --san-nho, ĐỪNG động vào hệ số đó.
+   2) THANH MENU TRONG SUỐT NẰM ĐÈ lên đầu banner như cũ (chủ dự án dặn giữ,
+      lướt xuống mới đổi màu). Banner cao THÊM đúng phần menu (--dinh), và
+      mọi khối chữ neo mép trên tự dời xuống --dinh (dong_bo_dien_thoai() đã
+      gắn sẵn `+ var(--dinh, 0px)` vào banner11.css) → ảnh tràn lên sau menu,
+      chữ nằm dưới menu. Máy tính không đặt --dinh nên không đổi gì.
+   3) CHIỀU CAO phần dưới menu = 0,40 × bề ngang — cao hơn tỉ lệ máy tính
+      (0,31). Chủ dự án: "tăng chiều cao của banner lên sẽ có thêm không gian
+      để làm to chữ", "tỷ lệ hơi nhỏ so với các chức năng khác".
+   4) --san / --san-nho: cỡ TỐI THIỂU của chữ lớn / chữ nhỏ nhân hệ số này.
+      Để 1 thì chữ to gấp đôi tỉ lệ, tràn khỏi ô; để 0 thì số điện thoại chỉ
+      còn 3px. Chữ nhỏ (≤16px ở bản gốc: nhãn, dòng mô tả, chữ trên nút) được
+      nâng mạnh hơn vì theo đúng tỉ lệ nó chỉ còn 4–5px.
+      Đổi số này thì đo lại cả 19 mẫu ở khổ 390px xem có chữ nào tràn đáy.
+   5) font-size của khung: chữ gốc 16px của trang làm mỗi dòng trong ô chữ
+      cao tối thiểu 16px → ô chữ cao gấp rưỡi, tràn đáy. Cho co theo --u. */
 @media (max-width: 760px) {
   .cl-b11 .banner {
-    --san: .36;
-    aspect-ratio: 1400 / 432 !important; min-height: 0 !important; height: auto !important;
+    --dinh: calc(56px + env(safe-area-inset-top, 0px));
+    --san: .5;
+    --san-nho: .62;
+    aspect-ratio: auto !important; min-height: 0 !important;
+    height: calc(var(--dinh) + 100vw * 0.40) !important;
     font-size: calc(var(--u) * 21px);
     border-radius: 0;
-  }
-  .cl-b11-khung-ngoai {
-    padding-top: calc(56px + env(safe-area-inset-top, 0px));
-    background: #0A2540;
   }
 }

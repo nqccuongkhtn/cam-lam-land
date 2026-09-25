@@ -829,8 +829,8 @@
      chủ dự án khoanh đúng chỗ đó: "các khối quá hở, còn 1 khối không hở thì đưa
      chữ xuống đó". --uu là --u của các khối (xem mục khối lồng lớp). */
   .cl-b11 .st-step.red { --S: 1.45 }
-  .cl-b11 .st-step.red .sp-content { left: calc(var(--uu) * 450px + 6vw) !important; right: auto !important; top: calc(var(--uu) * 290px + 10vw) !important }
-  .cl-b11 .st-step.red .sp-cta { left: calc(var(--uu) * 450px + 6vw) !important; right: auto !important; top: auto !important; bottom: calc(var(--thanh) + 5vw) !important }
+  .cl-b11 .st-step.red .sp-content { left: calc(var(--uu) * 450px + 6vw) !important; right: auto !important; top: max(calc(var(--dinh) + 2vw), calc(var(--uu) * 290px + 4vw)) !important }
+  .cl-b11 .st-step.red .sp-cta { left: calc(var(--uu) * 450px + 6vw) !important; right: auto !important; top: auto !important; bottom: calc(var(--thanh) + 2vw) !important }
 
   /* Mẫu polaroid: 4 ảnh xếp SO LE như máy tính (cao – thấp – cao – thấp, chồng
      mép nhau), gói trong nửa phải, dưới menu. Chủ dự án chê bản xếp lưới 2×2
@@ -1077,4 +1077,9 @@
      "Nắng sớm", "Vươn cao" có nút nằm sát/chạm đáy → đưa khối chữ lên gần menu. */
   .cl-b11 .b-text:not(.m-top) { top: calc(var(--dinh) + 3vw) !important }
   .cl-b11 .sl-panel { padding-top: calc(var(--dinh) + 3vw) !important }
+}
+
+@media (max-width: 760px) {
+  /* Polaroid: chữ sát lề trái hơn cho khỏi đụng ảnh "Mùa gặt Cam Lâm" (chủ dự án chỉ). */
+  .cl-b11 .st-pol .pl-text { left: 3.5vw !important }
 }

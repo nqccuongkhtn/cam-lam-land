@@ -960,7 +960,8 @@
      tai thỏ; khoảng trên tô màu trời lấy từ mép trên ảnh cho liền.
      Máy không tai thỏ: env() = 0 → không đổi gì. */
   .cl-b11 .st-depth { background: rgb(158, 184, 221) }
-  .cl-b11 .st-depth > .fill-svg { top: env(safe-area-inset-top, 0px); height: calc(100% - env(safe-area-inset-top, 0px)) }
+  /* Nâng lên 8px (≈1,3 mm trên iPhone) so với bản đầu — chủ dự án dặn. */
+  .cl-b11 .st-depth > .fill-svg { top: calc(env(safe-area-inset-top, 0px) - 8px); height: calc(100% - env(safe-area-inset-top, 0px) + 8px) }
 
   /* Mẫu "Sống cạnh Bãi Dài": đôi người to thêm 10% (chủ dự án dặn), đứng yên chân. */
   .cl-b11 .rb-couple { scale: 1.1; transform-origin: 50% 100% }

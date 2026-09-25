@@ -981,4 +981,10 @@
    làm như bản web được à"). Điện thoại khung vuông chỉ cao 1,17 lần banner nên
    nét cong gập lại, trông lệch → ép cao 2 lần banner cho giống máy tính.
    ⚠️ Đừng ép 100% cho "bám mép ảnh" — đã thử, chủ dự án bảo không giống web. */
-@media (max-width: 760px) { .cl-b11 .rb-edge { height: 200% } }
+@media (max-width: 760px) {
+  .cl-b11 .rb-edge { height: 200% }
+  /* Nét 3px cố định (non-scaling-stroke) — trên màn máy tính rộng nó mảnh, còn
+     điện thoại nhỏ hơn 3,6 lần thì trông thô. Hạ theo tỉ lệ (chủ dự án: "trên
+     web mỏng hơn, nhìn nghệ thuật hơn"). */
+  .cl-b11 .rb-edge path { stroke-width: 1.2px }
+}

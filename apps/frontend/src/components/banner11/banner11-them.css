@@ -946,3 +946,7 @@
    · Dấu câu: xem DAU_CAU trong scripts/banner11/tach-banner.py — không dùng
      gạch ngang nối hai ý, mỗi ý là một câu có dấu chấm. */
 .cl-b11 :is(p, [class*="-sub"]) { text-wrap: pretty }
+/* Mỗi câu của dòng mô tả là một khối riêng (tachCau trong Banner11.tsx): câu
+   mới luôn bắt đầu dòng mới, câu dài thì chia dòng CÂN nhau thay vì để đuôi
+   cụt một hai chữ. */
+.cl-b11 .cl-cau { display: block; text-wrap: balance }

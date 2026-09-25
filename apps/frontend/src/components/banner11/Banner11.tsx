@@ -167,7 +167,19 @@ const LOP_NANG = /<g class="m19-l[23]"[\s\S]*?<\/g><\/g>/g;
    THÊM/ĐỔI ảnh banner thì nhớ chạy lại script đó, không là điện thoại mất ảnh.
    Đo thật: 6,8 MB → 2,0 MB cho cả bộ, tức nhẹ đi 71%. */
 const ANH_DT = /\/banner11\/(?!dt\/)([^"')]+?)\.(?:webp|png|jpe?g)/g;
+/** Dòng mô tả có nhiều câu (ngăn bằng <br>): bọc MỖI CÂU thành một khối riêng
+ *  để trình duyệt cân dòng từng câu (xem .cl-cau trong banner11-them.css).
+ *  Để nguyên <br> thì trình duyệt coi cả đoạn là một khối, câu sau hay bị
+ *  ngắt lệch: dòng trên dài, dòng dưới cụt một hai chữ. */
+function tachCau(html: string): string {
+  return html.replace(/(<p class="[^"]*-sub[^"]*"[^>]*>)([\s\S]*?)(<\/p>)/g, (_m, mo, ruot, dong) =>
+    /<br\s*\/?>/.test(ruot)
+      ? mo + ruot.split(/\s*<br\s*\/?>\s*/).map((c: string) => `<span class="cl-cau">${c}</span>`).join('') + dong
+      : _m);
+}
+
 function lamNhe(html: string, hep: boolean | null): string {
+  html = tachCau(html);
   if (!hep) return html;
   /* Chèn một dấu cách SAU mỗi <br>: điện thoại ẩn chỗ ngắt cứng trong đoạn mô
      tả để chữ tự ngắt theo khung (banner11-them.css), mà ẩn <br> thì hai chữ

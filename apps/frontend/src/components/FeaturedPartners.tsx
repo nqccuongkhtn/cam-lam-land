@@ -9,7 +9,7 @@ function Wordmark({ name }: { name: string }) {
   const n = name.trim().toLowerCase();
   if (n === 'cam lâm land') {
     return (
-      <span className="font-extrabold text-[26px] md:text-3xl leading-none tracking-tight whitespace-nowrap"><span className="text-[#0A2540]">Cam Lâm</span> <span className="text-[#C8A14B]">Land</span></span>
+      <span className="font-extrabold text-[26px] md:text-3xl leading-none tracking-tight whitespace-nowrap"><span className="text-[#0B4045]">Cam Lâm</span> <span className="text-[#C8A14B]">Land</span></span>
     );
   }
   if (n === 'vingroup') {
@@ -96,14 +96,14 @@ export default function FeaturedPartners() {
   return (
     <section className="mx-auto max-w-7xl px-3 sm:px-4 py-7 sm:py-10">
       <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
-        <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">Doanh nghiệp tiêu biểu</h2>
+        <h2 className="text-xl md:text-2xl font-extrabold text-[#0B4045]">Doanh nghiệp tiêu biểu</h2>
         {isAdmin ? (
-          <button onClick={() => setAddOpen(true)} className="shrink-0 inline-flex items-center gap-1.5 bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-semibold px-4 py-2 rounded-xl">＋ Thêm doanh nghiệp</button>
+          <button onClick={() => setAddOpen(true)} className="shrink-0 inline-flex items-center gap-1.5 bg-[#0B4045] hover:bg-[#0e5157] text-white text-sm font-semibold px-4 py-2 rounded-xl">＋ Thêm doanh nghiệp</button>
         ) : null}
       </div>
 
       <div className="relative">
-        <button onClick={() => nudge(-1)} aria-label="Xem trước" className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 grid place-items-center rounded-full bg-white border border-slate-300 shadow-sm text-slate-500 hover:text-[#0A2540] hover:border-[#0A2540] text-lg leading-none">‹</button>
+        <button onClick={() => nudge(-1)} aria-label="Xem trước" className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 grid place-items-center rounded-full bg-white border border-slate-300 shadow-sm text-slate-500 hover:text-[#0B4045] hover:border-[#0B4045] text-lg leading-none">‹</button>
         <div ref={scrollerRef} onMouseEnter={() => { hoverRef.current = true; }} onMouseLeave={() => { hoverRef.current = false; }}
           className="overflow-x-auto px-7 md:px-10 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <div className="flex gap-3 md:gap-4 w-max py-1">
@@ -112,7 +112,7 @@ export default function FeaturedPartners() {
             ))}
           </div>
         </div>
-        <button onClick={() => nudge(1)} aria-label="Xem tiếp" className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 grid place-items-center rounded-full bg-white border border-slate-300 shadow-sm text-slate-500 hover:text-[#0A2540] hover:border-[#0A2540] text-lg leading-none">›</button>
+        <button onClick={() => nudge(1)} aria-label="Xem tiếp" className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 grid place-items-center rounded-full bg-white border border-slate-300 shadow-sm text-slate-500 hover:text-[#0B4045] hover:border-[#0B4045] text-lg leading-none">›</button>
       </div>
 
       {isAdmin && addOpen ? (
@@ -120,13 +120,13 @@ export default function FeaturedPartners() {
           <div className="absolute inset-0 bg-black/50" onClick={() => setAddOpen(false)} />
           <div className="relative bg-white w-full max-w-sm rounded-2xl shadow-2xl p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-extrabold text-[#0A2540]">Thêm doanh nghiệp</h3>
+              <h3 className="font-extrabold text-[#0B4045]">Thêm doanh nghiệp</h3>
               <button onClick={() => setAddOpen(false)} aria-label="Dong" className="text-slate-400 hover:text-slate-700 text-2xl leading-none">×</button>
             </div>
             <label className="block text-xs font-semibold text-slate-500 mb-1">Tên doanh nghiệp *</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="VD: Novaland" className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0A2540] mb-3" />
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="VD: Novaland" className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0B4045] mb-3" />
             <label className="block text-xs font-semibold text-slate-500 mb-1">Link logo (không bắt buộc)</label>
-            <input value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://.../logo.png" className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]" />
+            <input value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://.../logo.png" className="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#0B4045]" />
             <p className="text-[11px] text-slate-400 mt-1">Bỏ trống link thì hiển thị bằng chữ.</p>
             <div className="flex gap-2 mt-4">
               <button onClick={() => setAddOpen(false)} className="flex-1 border border-slate-300 rounded-xl py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">Huỷ</button>

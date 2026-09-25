@@ -15,7 +15,7 @@ export default function DesignSystemPage() {
 
       <Section title="Màu thương hiệu">
         <div className="flex flex-wrap gap-3">
-          <Swatch name="navy" hex="#0A2540" className="bg-navy" />
+          <Swatch name="navy" hex="#0B4045" className="bg-navy" />
           <Swatch name="gold" hex="#C8A14B" className="bg-gold" />
         </div>
       </Section>

@@ -33,7 +33,7 @@ export default function GuideList({ items }: { items: Item[] }) {
       <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
         {shown.map((g) => (
           <Link key={g.slug} href={`/cam-nang/${g.slug}`} className="block rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 transition hover:border-[#C8A14B] hover:shadow-sm">
-            <h2 className="text-base sm:text-lg font-bold leading-snug text-[#0A2540]">{g.title}</h2>
+            <h2 className="text-base sm:text-lg font-bold leading-snug text-[#0B4045]">{g.title}</h2>
             <p className="mt-1.5 text-[13px] sm:text-sm text-slate-500">{g.desc}</p>
             <span className="mt-2.5 inline-block text-[13px] sm:text-sm font-semibold text-[#C8A14B]">Đọc tiếp →</span>
           </Link>
@@ -45,7 +45,7 @@ export default function GuideList({ items }: { items: Item[] }) {
           <button onClick={() => go(cur - 1)} disabled={cur === 1} aria-label="Trang trước" className={`${box} border-slate-200 text-slate-600 hover:border-[#C8A14B] disabled:cursor-not-allowed disabled:opacity-40`}>‹</button>
           {nums.map((p, i) => p === '…'
             ? <span key={`e${i}`} className="px-1 text-slate-400">…</span>
-            : <button key={p} onClick={() => go(p)} aria-current={p === cur ? 'page' : undefined} className={`${box} ${p === cur ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 text-slate-600 hover:border-[#C8A14B] hover:text-[#0A2540]'}`}>{p}</button>)}
+            : <button key={p} onClick={() => go(p)} aria-current={p === cur ? 'page' : undefined} className={`${box} ${p === cur ? 'border-[#0B4045] bg-[#0B4045] text-white' : 'border-slate-200 text-slate-600 hover:border-[#C8A14B] hover:text-[#0B4045]'}`}>{p}</button>)}
           <button onClick={() => go(cur + 1)} disabled={cur === totalPages} aria-label="Trang sau" className={`${box} border-slate-200 text-slate-600 hover:border-[#C8A14B] disabled:cursor-not-allowed disabled:opacity-40`}>›</button>
         </nav>
       )}

@@ -97,7 +97,7 @@ function ChuSlide({ s, hien, chayHieuUng }: { s: Slide; hien: boolean; chayHieuU
       {s.nutChu && s.nutLink ? (
         <div className="mt-4">
           <Link href={s.nutLink}
-            className={`cl-press pointer-events-auto inline-flex items-center gap-1.5 rounded bg-[#C8A14B] px-5 py-2.5 text-sm font-bold text-[#0A2540] shadow-lg hover:bg-[#d8b45e] ${hu('cl-bn-nut')}`}
+            className={`cl-press pointer-events-auto inline-flex items-center gap-1.5 rounded bg-[#C8A14B] px-5 py-2.5 text-sm font-bold text-[#0B4045] shadow-lg hover:bg-[#d8b45e] ${hu('cl-bn-nut')}`}
             style={{ animationDelay: `${treCuoi + 0.2}s` }}>
             {s.nutChu} <span aria-hidden>→</span>
           </Link>

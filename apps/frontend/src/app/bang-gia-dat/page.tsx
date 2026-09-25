@@ -25,7 +25,7 @@ const QD50 = 'https://cdn.thuvienphapluat.vn/uploads/tintuc/2026/07/09/qd50.pdf'
 function Acc({ title, children }: { title: string; children: ReactNode }) {
   return (
     <details className="group rounded-2xl border border-slate-200 bg-white overflow-hidden">
-      <summary className="cursor-pointer list-none px-4 py-3 font-bold text-[#0A2540] flex items-center justify-between hover:bg-slate-50">
+      <summary className="cursor-pointer list-none px-4 py-3 font-bold text-[#0B4045] flex items-center justify-between hover:bg-slate-50">
         <span>{title}</span>
         <span className="text-[#C8A14B] transition-transform group-open:rotate-180">▾</span>
       </summary>
@@ -38,14 +38,14 @@ export default function BangGiaDatPage() {
   return (
     <>
     <div className="mx-auto max-w-3xl px-3 sm:px-4 py-5 sm:py-8">
-      <h1 className="text-xl sm:text-3xl font-extrabold text-[#0A2540]">Bảng giá đất Khánh Hòa 2026 — Cam Lâm</h1>
+      <h1 className="text-xl sm:text-3xl font-extrabold text-[#0B4045]">Bảng giá đất Khánh Hòa 2026 — Cam Lâm</h1>
       <p className="text-slate-600 mt-2 text-sm leading-relaxed">Giá đất <b>Nhà nước</b> theo Nghị quyết 15/2025/NQ-HĐND (áp dụng <b>01/01/2026</b>) — dùng tính thuế, phí, tiền sử dụng đất, bồi thường. Tra đúng tuyến đường, tính ngay giá trị thửa.</p>
 
       <div className="mt-3 flex flex-wrap gap-2">
-        <a href={OFFICIAL} target="_blank" rel="noreferrer" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold text-[13px] px-3.5 py-2 rounded-lg">🔎 CSDL giá đất tỉnh</a>
-        <a href={PDF_NQ} target="_blank" rel="noreferrer" className="bg-slate-100 hover:bg-slate-200 text-[#0A2540] font-semibold text-[13px] px-3.5 py-2 rounded-lg">📄 Nghị quyết (PDF)</a>
-        <a href={PDF_FULL} target="_blank" rel="noreferrer" className="bg-slate-100 hover:bg-slate-200 text-[#0A2540] font-semibold text-[13px] px-3.5 py-2 rounded-lg">📚 Trọn bộ phụ lục</a>
-        <a href={QD50} target="_blank" rel="noreferrer" className="bg-slate-100 hover:bg-slate-200 text-[#0A2540] font-semibold text-[13px] px-3.5 py-2 rounded-lg">📊 QĐ 50/2026 (hệ số K)</a>
+        <a href={OFFICIAL} target="_blank" rel="noreferrer" className="cl-press bg-[#0B4045] hover:bg-[#0e5157] text-white font-bold text-[13px] px-3.5 py-2 rounded-lg">🔎 CSDL giá đất tỉnh</a>
+        <a href={PDF_NQ} target="_blank" rel="noreferrer" className="bg-slate-100 hover:bg-slate-200 text-[#0B4045] font-semibold text-[13px] px-3.5 py-2 rounded-lg">📄 Nghị quyết (PDF)</a>
+        <a href={PDF_FULL} target="_blank" rel="noreferrer" className="bg-slate-100 hover:bg-slate-200 text-[#0B4045] font-semibold text-[13px] px-3.5 py-2 rounded-lg">📚 Trọn bộ phụ lục</a>
+        <a href={QD50} target="_blank" rel="noreferrer" className="bg-slate-100 hover:bg-slate-200 text-[#0B4045] font-semibold text-[13px] px-3.5 py-2 rounded-lg">📊 QĐ 50/2026 (hệ số K)</a>
       </div>
 
       {/* CÔNG CỤ CHÍNH: bảng tra cứu hiện sẵn + công cụ tính (nhiều tab theo từng Điều) */}
@@ -55,10 +55,10 @@ export default function BangGiaDatPage() {
 
       {/* QUY ĐỊNH ĐẦY ĐỦ — gom vào mục xổ ra cho gọn */}
       <div className="mt-6 space-y-2.5">
-        <h2 className="text-lg font-bold text-[#0A2540]">Quy định &amp; cách tính đầy đủ</h2>
+        <h2 className="text-lg font-bold text-[#0B4045]">Quy định &amp; cách tính đầy đủ</h2>
 
         <div className="rounded-2xl border border-[#C8A14B]/40 bg-[#C8A14B]/[0.06] p-4">
-          <p className="font-bold text-[#0A2540]">🧭 Cách tính giá trị thửa — 6 bước</p>
+          <p className="font-bold text-[#0B4045]">🧭 Cách tính giá trị thửa — 6 bước</p>
           <p className="text-[13px] text-slate-600 mt-1"><b>Đơn giá</b> = Giá nền × tỷ lệ loại đất × điều chỉnh đặc biệt (× hệ số chiều sâu nếu thửa sâu). <b>Giá trị</b> = Đơn giá × diện tích, rồi cộng các loại đất trong thửa.</p>
           <ol className="text-[13px] text-slate-600 mt-2 space-y-1 list-decimal pl-5">
             <li><b>Tra giá nền</b> theo tuyến đường + vị trí (VT1–VT5) ở bảng trên — bấm vào ô giá để đưa xuống công cụ tính.</li>
@@ -69,10 +69,10 @@ export default function BangGiaDatPage() {
             <li><b>Tiền sử dụng đất / bồi thường / đấu giá:</b> nhân thêm <b>hệ số điều chỉnh giá đất</b> = Hệ số biến động thị trường × Hệ số quy hoạch × Hệ số yếu tố ảnh hưởng (Cam Lâm: hệ số biến động thị trường = 1,6).</li>
           </ol>
           <div className="mt-3 rounded-xl bg-white border border-slate-200 p-3 text-[13px] text-slate-600">
-            <p className="font-bold text-[#0A2540]">Ví dụ: thửa 300 m² = 100 m² đất ở + 200 m² vườn</p>
+            <p className="font-bold text-[#0B4045]">Ví dụ: thửa 300 m² = 100 m² đất ở + 200 m² vườn</p>
             <p className="mt-1">• Đất ở (VT1 Bà Huyện Thanh Quan = 2.390.960 đ/m²): 2.390.960 × 100 = <b>239.096.000 đ</b></p>
             <p>• Vườn (cây lâu năm 54.000 đ/m²): 54.000 × 200 = <b>10.800.000 đ</b></p>
-            <p className="mt-1 text-[#0A2540] font-bold">→ Tổng ≈ 249,9 triệu · bình quân 832.987 đ/m²</p>
+            <p className="mt-1 text-[#0B4045] font-bold">→ Tổng ≈ 249,9 triệu · bình quân 832.987 đ/m²</p>
           </div>
           <p className="text-[12px] text-slate-500 mt-2">Chuyển mục đích nông nghiệp → đất ở (vườn ao liền kề): <b>Tiền nộp = (giá đất ở − giá đất nông nghiệp) × diện tích × tỷ lệ thu</b> — 30% trong hạn mức · 50% vượt ≤1 lần · 100% vượt &gt;1 lần.</p>
         </div>
@@ -84,7 +84,7 @@ export default function BangGiaDatPage() {
               <tbody>
                 {XA_MOI.map(([m, c]) => (
                   <tr key={m} className="border-t border-slate-100 first:border-t-0 align-top">
-                    <td className="py-2 px-3 font-bold text-[#0A2540] whitespace-nowrap">{m}</td>
+                    <td className="py-2 px-3 font-bold text-[#0B4045] whitespace-nowrap">{m}</td>
                     <td className="py-2 px-3 text-slate-600">{c}</td>
                   </tr>
                 ))}
@@ -94,12 +94,12 @@ export default function BangGiaDatPage() {
         </Acc>
 
         <Acc title="📐 Xác định vị trí & hệ số (Điều 3–4)">
-          <p className="font-bold text-[#0A2540] mb-1">Điều 3 — Đất nông nghiệp (2 vị trí)</p>
+          <p className="font-bold text-[#0B4045] mb-1">Điều 3 — Đất nông nghiệp (2 vị trí)</p>
           <ul className="space-y-1 mb-3">
             <li>• <b>Vị trí 1:</b> thửa trong phạm vi <b>350m</b> từ mép (hoặc lề trong) quốc lộ, tỉnh lộ, hương lộ, đường liên xã, liên thôn, kênh chính hồ thủy lợi — chỉ cần một phần thửa nằm trong 350m thì <b>cả thửa</b> tính VT1. Ngoài ra VT1 còn gồm: đất trồng lúa <b>2 vụ/năm</b>; đất làm muối cách đường nội đồng ≤100m &amp; đường nội đồng ≥6m.</li>
             <li>• <b>Vị trí 2:</b> các thửa còn lại.</li>
           </ul>
-          <p className="font-bold text-[#0A2540] mb-1">Điều 4 — Đất phi nông nghiệp</p>
+          <p className="font-bold text-[#0B4045] mb-1">Điều 4 — Đất phi nông nghiệp</p>
           <p className="font-semibold text-slate-700">a) Trong xã (không ven trục): 2 khu vực × 3 vị trí</p>
           <ul className="space-y-1 mb-2">
             <li>• <b>Khu vực 1:</b> trung tâm xã/cụm xã (gần UBND, trường, chợ, trạm y tế, khu TMDV, du lịch, KCN/CCN, đầu mối giao thông…) — sinh lợi cao nhất. <b>Khu vực 2:</b> các khu vực còn lại.</li>
@@ -129,7 +129,7 @@ export default function BangGiaDatPage() {
         </Acc>
 
         <Acc title="⚖️ Trường hợp đặc biệt & giáp ranh (Điều 5–6)">
-          <p className="font-bold text-[#0A2540] mb-1">Điều 6 — Một số trường hợp đặc biệt</p>
+          <p className="font-bold text-[#0B4045] mb-1">Điều 6 — Một số trường hợp đặc biệt</p>
           <p className="mb-2 rounded-lg bg-amber-50 border border-amber-200 px-2.5 py-1.5 text-[12px] text-amber-900"><b>Quy tắc khi có nhiều hệ số:</b> hệ số nhiều mặt tiền / giáp biển <b>đã gộp sẵn</b> — chọn đúng 1 tổ hợp, KHÔNG tự nhân từng cái. Nhiều yếu tố ảnh hưởng (KYTAHGD) hoặc nhiều cách xác định giá cho cùng vị trí → <b>lấy cao nhất</b>. Chỉ nhân giữa các nhóm KHÁC nhau: giá nền × tỷ lệ loại đất × điều chỉnh, rồi × hệ số K (= biến động thị trường × quy hoạch × yếu tố ảnh hưởng).</p>
           <ul className="space-y-1 mb-3">
             <li>• <b>2 mặt tiền</b> (2 đường hoặc 2 hẻm): lấy giá bên <b>cao hơn ×1,1</b>.</li>
@@ -141,7 +141,7 @@ export default function BangGiaDatPage() {
             <li>• <b>Nền thấp trũng hơn mặt đường:</b> giảm theo tỷ lệ % quy định theo khu vực &amp; độ trũng.</li>
             <li>• <b>Chưa quy định</b> / không áp được tương đương: UBND cấp xã báo cáo UBND tỉnh quyết định.</li>
           </ul>
-          <p className="font-bold text-[#0A2540] mb-1">Điều 5 — Giá đất giáp ranh</p>
+          <p className="font-bold text-[#0B4045] mb-1">Điều 5 — Giá đất giáp ranh</p>
           <p className="font-semibold text-slate-700">1) Giữa các đường phố / đoạn đường phố (đô thị)</p>
           <ul className="space-y-1 mb-2">
             <li>• Cùng trục chia đoạn giá khác nhau: thửa trong <b>20m</b> giáp ranh của đoạn giá thấp → tính <b>bình quân</b> giá 2 đoạn.</li>
@@ -174,7 +174,7 @@ export default function BangGiaDatPage() {
             <div className="bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-500 uppercase">Giá KCN/CCN vùng Cam Lâm — SXKD (đồng/m²)</div>
             <table className="w-full text-[13px]"><tbody>
               {[['KCN Suối Dầu (xã Cam Lâm)', '≈ 415.860 *'], ['CCN Trảng É 1 (Suối Dầu & Cam Lâm)', '234.000'], ['CCN Trảng É 2 (Suối Dầu & Cam Lâm)', '234.000']].map(([n, g]) => (
-                <tr key={n} className="border-t border-slate-100"><td className="py-1.5 px-3 text-slate-600">{n}</td><td className="py-1.5 px-3 text-right font-bold text-[#0A2540] whitespace-nowrap">{g}</td></tr>
+                <tr key={n} className="border-t border-slate-100"><td className="py-1.5 px-3 text-slate-600">{n}</td><td className="py-1.5 px-3 text-right font-bold text-[#0B4045] whitespace-nowrap">{g}</td></tr>
               ))}
             </tbody></table>
           </div>
@@ -192,14 +192,14 @@ export default function BangGiaDatPage() {
         </Acc>
 
         <Acc title="📏 Hạn mức đất (Quyết định 28/2024/QĐ-UBND)">
-          <p className="font-bold text-[#0A2540] mb-1">Hạn mức giao đất ở (Điều 3)</p>
+          <p className="font-bold text-[#0B4045] mb-1">Hạn mức giao đất ở (Điều 3)</p>
           <ul className="space-y-1 mb-3">
             <li>• Phường (Nha Trang, Cam Ranh, Ninh Hòa): <b>150 m²</b>.</li>
             <li>• Thị trấn cũ Diên Khánh, Vạn Ninh, Cam Đức (nay thuộc Cam Lâm): <b>180 m²</b>.</li>
             <li>• Thị trấn cũ Khánh Sơn, Khánh Vĩnh: <b>200 m²</b>.</li>
             <li>• <b>Xã đồng bằng</b> (4 xã Cam Lâm / Suối Dầu / Cam Hiệp / Cam An): <b>400 m²</b>. Xã miền núi / hải đảo: <b>1.000 m²</b>.</li>
           </ul>
-          <p className="font-bold text-[#0A2540] mb-1">Hạn mức công nhận đất ở (Điều 4)</p>
+          <p className="font-bold text-[#0B4045] mb-1">Hạn mức công nhận đất ở (Điều 4)</p>
           <ul className="space-y-1">
             <li>• Thửa hình thành <b>trước 18/12/1980</b>: bằng <b>5 lần</b> hạn mức giao đất ở (không quá diện tích thửa).</li>
             <li>• Từ 18/12/1980 – trước 15/10/1993: phường 300 · TT Cam Đức/Diên Khánh/Vạn Ninh 360 · TT Khánh Sơn/Khánh Vĩnh 400 · xã Khánh Sơn/Khánh Vĩnh &amp; hải đảo 500 · các xã còn lại <b>400 m²</b>.</li>

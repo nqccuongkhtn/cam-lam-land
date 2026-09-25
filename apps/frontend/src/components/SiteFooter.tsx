@@ -70,7 +70,7 @@ function SectionTitle({ children, className = '' }: { children: ReactNode; class
 
 export default function SiteFooter() {
   return (
-    <footer className="bg-[#0A2540] text-slate-300">
+    <footer className="bg-[#0B4045] text-slate-300">
       {/* Số liệu — 4 mục đều nhau */}
       <div className="mx-auto max-w-7xl px-3 sm:px-4 pt-8 sm:pt-12 pb-8 sm:pb-10 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 border-b border-white/10">
         {STATS.map((s) => (

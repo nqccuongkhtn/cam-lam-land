@@ -103,9 +103,9 @@ export default function GamePage() {
       ctx!.fillStyle = '#fff'; ctx!.beginPath(); ctx!.arc(bird.r * 0.32, -bird.r * 0.28, bird.r * 0.28, 0, 6.2832); ctx!.fill();
       ctx!.fillStyle = '#12324f'; ctx!.beginPath(); ctx!.arc(bird.r * 0.40, -bird.r * 0.28, bird.r * 0.14, 0, 6.2832); ctx!.fill();
       ctx!.restore();
-      ctx!.fillStyle = '#0A2540'; ctx!.font = '800 ' + Math.round(H * 0.09) + 'px -apple-system,"Segoe UI",Roboto,sans-serif'; ctx!.textAlign = 'center'; ctx!.textBaseline = 'top';
+      ctx!.fillStyle = '#0B4045'; ctx!.font = '800 ' + Math.round(H * 0.09) + 'px -apple-system,"Segoe UI",Roboto,sans-serif'; ctx!.textAlign = 'center'; ctx!.textBaseline = 'top';
       ctx!.fillText(String(score), W / 2, H * 0.06);
-      if (state === 'ready') { ctx!.fillStyle = 'rgba(8,16,28,0.05)'; ctx!.fillRect(0, 0, W, H); ctx!.fillStyle = '#0A2540'; ctx!.font = '600 13px -apple-system,"Segoe UI",Roboto,sans-serif'; ctx!.fillText('Chạm vào khung để bắt đầu', W / 2, H * 0.62); }
+      if (state === 'ready') { ctx!.fillStyle = 'rgba(8,16,28,0.05)'; ctx!.fillRect(0, 0, W, H); ctx!.fillStyle = '#0B4045'; ctx!.font = '600 13px -apple-system,"Segoe UI",Roboto,sans-serif'; ctx!.fillText('Chạm vào khung để bắt đầu', W / 2, H * 0.62); }
     }
     function loop(now: number) { const dt = last ? Math.min((now - last) / 16.667, 2.4) : 1; last = now; update(dt); draw(); raf = requestAnimationFrame(loop); }
 
@@ -140,7 +140,7 @@ export default function GamePage() {
   return (
     <div className="bg-slate-50 min-h-[calc(100dvh-56px)]">
       <div className="max-w-2xl mx-auto px-3 sm:px-4 py-5">
-        <div className="rounded-2xl bg-[#0A2540] text-white p-4 sm:p-5 shadow-sm">
+        <div className="rounded-2xl bg-[#0B4045] text-white p-4 sm:p-5 shadow-sm">
           <div className="flex items-center gap-2 text-[#C8A14B] font-extrabold text-sm">🏆 THI TUẦN · BAY CÙNG CAM LÂM LAND</div>
           <h1 className="text-xl sm:text-2xl font-extrabold mt-1">Game giải trí</h1>
           {/* ĐÃ BỎ phần thưởng/quà tuần theo yêu cầu chủ dự án — đây chỉ là game giải
@@ -165,9 +165,9 @@ export default function GamePage() {
                         <div className="text-sm text-slate-200">Bạn được <b className="text-[#C8A14B] text-base">{over}</b> điểm</div>
                         <div className="w-full max-w-[280px] mt-3 space-y-2">
                           <p className="text-[12px] text-slate-300 text-center">{user ? <>Xác nhận thông tin tài khoản để <b>ghi tên lên bảng xếp hạng</b>:</> : <>Nhập tên để <b>ghi tên lên bảng xếp hạng</b>:</>}</p>
-                          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Họ tên *" className="w-full rounded-lg px-3 py-2 text-sm text-[#0A2540] outline-none" />
-                          <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Số điện thoại *" inputMode="tel" className="w-full rounded-lg px-3 py-2 text-sm text-[#0A2540] outline-none" />
-                          <button onClick={submit} disabled={busy} className="w-full bg-[#C8A14B] hover:brightness-105 disabled:opacity-60 text-[#0A2540] font-extrabold py-2.5 rounded-lg text-sm">{busy ? 'Đang gửi…' : '🏆 Ghi tên lên bảng'}</button>
+                          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Họ tên *" className="w-full rounded-lg px-3 py-2 text-sm text-[#0B4045] outline-none" />
+                          <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Số điện thoại *" inputMode="tel" className="w-full rounded-lg px-3 py-2 text-sm text-[#0B4045] outline-none" />
+                          <button onClick={submit} disabled={busy} className="w-full bg-[#C8A14B] hover:brightness-105 disabled:opacity-60 text-[#0B4045] font-extrabold py-2.5 rounded-lg text-sm">{busy ? 'Đang gửi…' : '🏆 Ghi tên lên bảng'}</button>
                           <button onClick={playAgain} className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-2 rounded-lg text-sm">↻ Chơi lại</button>
                         </div>
                       </>
@@ -177,7 +177,7 @@ export default function GamePage() {
                         <div className="text-lg font-extrabold mt-1">Đã ghi tên!</div>
                         <div className="text-sm text-slate-200 text-center mt-1">Bạn <b className="text-[#C8A14B]">{sent.score}</b> điểm{sent.rank ? <> · đang hạng <b className="text-[#C8A14B]">#{sent.rank}</b></> : null}.</div>
                         <div className="text-[12px] text-slate-300 text-center mt-1">Cố thêm điểm để leo hạng nhé!</div>
-                        <button onClick={playAgain} className="mt-3 bg-[#C8A14B] text-[#0A2540] font-extrabold py-2.5 px-6 rounded-lg text-sm">↻ Chơi lại, phá kỷ lục</button>
+                        <button onClick={playAgain} className="mt-3 bg-[#C8A14B] text-[#0B4045] font-extrabold py-2.5 px-6 rounded-lg text-sm">↻ Chơi lại, phá kỷ lục</button>
                       </>
                     )}
                   </div>
@@ -190,7 +190,7 @@ export default function GamePage() {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-3.5">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="font-extrabold text-[#0A2540]">🏆 Bảng xếp hạng</h2>
+                <h2 className="font-extrabold text-[#0B4045]">🏆 Bảng xếp hạng</h2>
                 <button onClick={() => getLeaderboard().then(setLb).catch(() => {})} className="text-[11px] font-bold text-[#C8A14B]">Làm mới</button>
               </div>
               {lb.length === 0 ? (
@@ -200,8 +200,8 @@ export default function GamePage() {
                   {lb.map((r) => (
                     <div key={r.rank} className={`flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 ${r.rank <= 3 ? 'bg-[#C8A14B]/12 border border-[#C8A14B]/30' : 'bg-slate-50'}`}>
                       <span className={`w-6 text-center font-extrabold ${r.rank <= 3 ? 'text-[#C8A14B]' : 'text-slate-400'}`}>{r.rank <= 3 ? ['🥇', '🥈', '🥉'][r.rank - 1] : r.rank}</span>
-                      <span className="flex-1 min-w-0 truncate font-semibold text-[#0A2540] text-sm">{r.name} <span className="text-slate-400 font-normal">· {r.phone}</span></span>
-                      <span className="font-extrabold text-[#0A2540] tabular-nums">{r.score}</span>
+                      <span className="flex-1 min-w-0 truncate font-semibold text-[#0B4045] text-sm">{r.name} <span className="text-slate-400 font-normal">· {r.phone}</span></span>
+                      <span className="font-extrabold text-[#0B4045] tabular-nums">{r.score}</span>
                     </div>
                   ))}
                 </div>
@@ -209,7 +209,7 @@ export default function GamePage() {
               {/* Bảng KHÔNG reset theo tuần/tháng nữa — xếp hạng từ trước tới giờ. */}
               <p className="text-[11px] text-slate-400 mt-2.5 text-center">Xếp hạng tính từ trước tới giờ.</p>
             </div>
-            <Link href="/listings" className="mt-3 block text-center bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold py-2.5 rounded-xl text-sm">🏠 Xem nhà đất Cam Lâm</Link>
+            <Link href="/listings" className="mt-3 block text-center bg-[#0B4045] hover:bg-[#0e5157] text-white font-bold py-2.5 rounded-xl text-sm">🏠 Xem nhà đất Cam Lâm</Link>
           </div>
         </div>
       </div>

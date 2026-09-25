@@ -90,7 +90,7 @@ function moneyVN(n: number): string {
   if (n >= 1e6) return (n / 1e6).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' triệu';
   return nf.format(Math.round(n)) + ' đ';
 }
-const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]';
+const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0B4045]';
 const lbl = 'text-xs font-bold text-slate-600';
 
 export default function BangGiaSection() {
@@ -132,10 +132,10 @@ function TraCuu({ onPick }: { onPick: (p: number, l: string) => void }) {
   return (
     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <div className="p-3 sm:p-5">
-        <h3 className="font-extrabold text-[#0A2540] text-sm sm:text-lg">🔎 Bảng giá đất ở chính thức</h3>
+        <h3 className="font-extrabold text-[#0B4045] text-sm sm:text-lg">🔎 Bảng giá đất ở chính thức</h3>
         <p className="text-[13px] text-slate-500 mt-1">Theo NQ 15/2025 (đồng/m²). Chọn xã, gõ tên đường; <b>bấm ô giá (VT1–VT5)</b> để đưa xuống công cụ tính.</p>
         <div className="flex flex-wrap gap-1.5 mt-3">
-          {XA.map((x) => <button key={x} onClick={() => { setXa(x); setSel(''); setKv(''); }} className={`px-3 py-1.5 rounded-full text-[13px] font-bold ${xa === x ? 'bg-[#0A2540] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{x.replace('Xã ', '')}</button>)}
+          {XA.map((x) => <button key={x} onClick={() => { setXa(x); setSel(''); setKv(''); }} className={`px-3 py-1.5 rounded-full text-[13px] font-bold ${xa === x ? 'bg-[#0B4045] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{x.replace('Xã ', '')}</button>)}
         </div>
         {diaBans.length > 0 && (
           <select value={kv} onChange={(e) => setKv(e.target.value)} className={`${inp} mt-2 bg-white`}>
@@ -155,14 +155,14 @@ function TraCuu({ onPick }: { onPick: (p: number, l: string) => void }) {
                   rows.map((r, i) => (
                     <tr key={i} className="border-t border-slate-100 odd:bg-slate-50/40 align-top">
                       <td className="py-1.5 px-2">
-                        <div className="font-semibold text-[#0A2540] leading-tight">{r.duong || <span className="text-slate-400 font-normal">(theo đoạn)</span>}</div>
+                        <div className="font-semibold text-[#0B4045] leading-tight">{r.duong || <span className="text-slate-400 font-normal">(theo đoạn)</span>}</div>
                         {(r.tu || r.den) && <div className="text-[11px] text-slate-500 leading-tight">{r.tu || '—'} → {r.den || '—'}</div>}
                         {r.diaBan && <div className="text-[10px] text-slate-400">{r.diaBan}</div>}
                       </td>
                       {r.vt.map((v, ci) => {
                         if (v == null) return <td key={ci} className="py-1.5 px-1.5 text-right text-slate-300">—</td>;
                         const key = `${xa}|${i}|${ci}`; const on = sel === key;
-                        return <td key={ci} className="p-0 text-right"><button onClick={() => { setSel(key); onPick(v, `${r.duong || 'Đoạn'} · ${VTL[ci]}`); }} title="Bấm để đưa giá xuống công cụ" className={`w-full px-1.5 py-1.5 text-right tabular-nums whitespace-nowrap ${on ? 'bg-[#C8A14B] text-[#0A2540] font-extrabold' : 'text-[#0A2540] hover:bg-amber-50 font-semibold'}`}>{fmt(v)}</button></td>;
+                        return <td key={ci} className="p-0 text-right"><button onClick={() => { setSel(key); onPick(v, `${r.duong || 'Đoạn'} · ${VTL[ci]}`); }} title="Bấm để đưa giá xuống công cụ" className={`w-full px-1.5 py-1.5 text-right tabular-nums whitespace-nowrap ${on ? 'bg-[#C8A14B] text-[#0B4045] font-extrabold' : 'text-[#0B4045] hover:bg-amber-50 font-semibold'}`}>{fmt(v)}</button></td>;
                       })}
                     </tr>
                   ))}
@@ -179,8 +179,8 @@ function TraCuu({ onPick }: { onPick: (p: number, l: string) => void }) {
               {d.datNongNghiep.map((n, i) => (
                 <tr key={i} className="border-t border-slate-100">
                   <td className="py-1.5 px-3 text-slate-600">{n.loai}</td>
-                  <td className="py-1.5 px-3 text-right"><button onClick={() => onPick(n.vt1 || 0, `${n.loai} · VT1`)} className="font-semibold text-[#0A2540] tabular-nums hover:text-[#C8A14B]">{fmt(n.vt1)}</button></td>
-                  <td className="py-1.5 px-3 text-right"><button onClick={() => onPick(n.vt2 || 0, `${n.loai} · VT2`)} className="tabular-nums text-[#0A2540] hover:text-[#C8A14B]">{fmt(n.vt2)}</button></td>
+                  <td className="py-1.5 px-3 text-right"><button onClick={() => onPick(n.vt1 || 0, `${n.loai} · VT1`)} className="font-semibold text-[#0B4045] tabular-nums hover:text-[#C8A14B]">{fmt(n.vt1)}</button></td>
+                  <td className="py-1.5 px-3 text-right"><button onClick={() => onPick(n.vt2 || 0, `${n.loai} · VT2`)} className="tabular-nums text-[#0B4045] hover:text-[#C8A14B]">{fmt(n.vt2)}</button></td>
                 </tr>
               ))}
             </tbody>
@@ -193,7 +193,7 @@ function TraCuu({ onPick }: { onPick: (p: number, l: string) => void }) {
 
 function TinhGia({ picked }: { picked: { price: number; label: string } | null }) {
   const [mode, setMode] = useState<'gia' | 'chuyen'>('gia');
-  const tab = (m: string) => `flex-1 py-3 ${mode === m ? 'text-[#0A2540] border-b-2 border-[#C8A14B]' : 'text-slate-400 hover:text-slate-600'}`;
+  const tab = (m: string) => `flex-1 py-3 ${mode === m ? 'text-[#0B4045] border-b-2 border-[#C8A14B]' : 'text-slate-400 hover:text-slate-600'}`;
   return (
     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <div className="flex text-[13px] font-bold border-b border-slate-100 text-center">
@@ -264,7 +264,7 @@ function DinhGia({ picked }: { picked: { price: number; label: string } | null }
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[13px] font-bold text-[#0A2540]">Các hạng mục đất trong thửa</span>
+        <span className="text-[13px] font-bold text-[#0B4045]">Các hạng mục đất trong thửa</span>
         <span className="text-[11px] text-slate-400 shrink-0">Nhiều loại đất? Thêm từng phần.</span>
       </div>
       {picked && (
@@ -273,7 +273,7 @@ function DinhGia({ picked }: { picked: { price: number; label: string } | null }
 
       {/* Công cụ giáp ranh / 2 mặt tiền (Điều 5–6) — gộp thẳng vào đây */}
       <details className="rounded-xl border border-slate-200 overflow-hidden">
-        <summary className="cursor-pointer list-none px-3 py-2 text-[13px] font-bold text-[#0A2540] bg-slate-50 flex items-center justify-between">🔗 Tính giá giáp ranh / 2 mặt tiền (Điều 5–6)<span className="text-[#C8A14B] text-[11px]">mở ▾</span></summary>
+        <summary className="cursor-pointer list-none px-3 py-2 text-[13px] font-bold text-[#0B4045] bg-slate-50 flex items-center justify-between">🔗 Tính giá giáp ranh / 2 mặt tiền (Điều 5–6)<span className="text-[#C8A14B] text-[11px]">mở ▾</span></summary>
         <div className="p-3 space-y-2">
           <select value={grKieu} onChange={(e) => setGrKieu(e.target.value)} className={`${inp} bg-white`}>{GHEP.map((g) => <option key={g.key} value={g.key}>{g.label}</option>)}</select>
           <div className="grid grid-cols-2 gap-2">
@@ -281,9 +281,9 @@ function DinhGia({ picked }: { picked: { price: number; label: string } | null }
             <input value={grB ? nf.format(gb) : ''} onChange={(e) => setGrB(onlyDigits(e.target.value))} inputMode="numeric" placeholder="Giá B / đường 2" className={inp} />
           </div>
           {grRes > 0 && (
-            <div className="flex items-center gap-2 rounded-lg bg-[#0A2540] text-white px-3 py-2">
+            <div className="flex items-center gap-2 rounded-lg bg-[#0B4045] text-white px-3 py-2">
               <span className="text-[13px]">Giá áp dụng: <b className="text-[#C8A14B]">{fmt(grRes)} đ/m²</b></span>
-              <button onClick={() => add({ giaStr: String(Math.round(grRes)), note: 'Giáp ranh/2MT', loai: 'o' })} className="ml-auto bg-[#C8A14B] text-[#0A2540] font-bold text-[11px] px-2.5 py-1 rounded-md">＋ Thêm phần</button>
+              <button onClick={() => add({ giaStr: String(Math.round(grRes)), note: 'Giáp ranh/2MT', loai: 'o' })} className="ml-auto bg-[#C8A14B] text-[#0B4045] font-bold text-[11px] px-2.5 py-1 rounded-md">＋ Thêm phần</button>
             </div>
           )}
         </div>
@@ -296,7 +296,7 @@ function DinhGia({ picked }: { picked: { price: number; label: string } | null }
             <div className="flex items-center gap-2">
               <span className="text-[11px] font-extrabold text-[#C8A14B]">Phần {idx + 1}</span>
               {it.note && <span className="text-[10px] text-slate-400 truncate">· {it.note}</span>}
-              <span className="ml-auto text-[12px] font-bold text-[#0A2540]">{moneyVN(value)}</span>
+              <span className="ml-auto text-[12px] font-bold text-[#0B4045]">{moneyVN(value)}</span>
               {items.length > 1 && <button onClick={() => del(it.id)} className="text-red-400 hover:text-red-600 text-sm shrink-0">✕</button>}
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -319,12 +319,12 @@ function DinhGia({ picked }: { picked: { price: number; label: string } | null }
               )}
             </div>
             {L.base === 'o' && (
-              <label className="flex items-center gap-2 text-[11px] text-slate-500 cursor-pointer"><input type="checkbox" checked={it.depth} onChange={(e) => upd(it.id, { depth: e.target.checked })} className="w-3.5 h-3.5 accent-[#0A2540]" />Đất ở ven trục chính, chiều sâu lớn (Điều 4c): ≤30m ×1 · &gt;30–60 ×0,6 · &gt;60–100 ×0,4 · &gt;100 ×0,3</label>
+              <label className="flex items-center gap-2 text-[11px] text-slate-500 cursor-pointer"><input type="checkbox" checked={it.depth} onChange={(e) => upd(it.id, { depth: e.target.checked })} className="w-3.5 h-3.5 accent-[#0B4045]" />Đất ở ven trục chính, chiều sâu lớn (Điều 4c): ≤30m ×1 · &gt;30–60 ×0,6 · &gt;60–100 ×0,4 · &gt;100 ×0,3</label>
             )}
             <div className="rounded-lg bg-slate-50 border border-slate-200 p-2 space-y-1">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[11px] font-bold text-slate-600">Giá trị sau hệ số điều chỉnh — phần này (bồi thường / đấu giá)</span>
-                <span className="text-[12px] font-bold text-[#0A2540] shrink-0">= {moneyVN(value * mbdtt * qh * (L.base === 'nn' ? (it.yt || 1) : 1))}</span>
+                <span className="text-[12px] font-bold text-[#0B4045] shrink-0">= {moneyVN(value * mbdtt * qh * (L.base === 'nn' ? (it.yt || 1) : 1))}</span>
               </div>
               {L.base === 'nn' ? (
                 <label className="block"><span className={lbl}>Hệ số yếu tố ảnh hưởng đến giá đất</span><select value={it.yt} onChange={(e) => upd(it.id, { yt: Number(e.target.value) })} className={`${inp} mt-1 bg-white`}>{KYT_OPTS.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}</select></label>
@@ -335,10 +335,10 @@ function DinhGia({ picked }: { picked: { price: number; label: string } | null }
           </div>
         );
       })}
-      <button onClick={() => add()} className="w-full border border-dashed border-slate-300 rounded-lg py-2 text-[13px] font-semibold text-slate-500 hover:text-[#0A2540] hover:border-[#0A2540]">＋ Thêm loại đất khác trong thửa</button>
+      <button onClick={() => add()} className="w-full border border-dashed border-slate-300 rounded-lg py-2 text-[13px] font-semibold text-slate-500 hover:text-[#0B4045] hover:border-[#0B4045]">＋ Thêm loại đất khác trong thửa</button>
 
       {total > 0 ? (
-        <div className="rounded-xl bg-[#0A2540] text-white p-4">
+        <div className="rounded-xl bg-[#0B4045] text-white p-4">
           <div className="text-[12px] space-y-0.5 pb-3 mb-3 border-b border-white/10">
             {calc.filter((x) => x.value > 0).map(({ it, value }, i) => {
               const L = LOAI.find((x) => x.key === it.loai)!;
@@ -353,8 +353,8 @@ function DinhGia({ picked }: { picked: { price: number; label: string } | null }
           {useK && (
             <div className="mt-3 space-y-2 border-t border-white/10 pt-3">
               <p className="text-[11px] text-slate-300"><b className="text-white">Hệ số điều chỉnh giá đất</b> = Hệ số biến động thị trường × Hệ số quy hoạch × Hệ số yếu tố ảnh hưởng (nhập ở từng phần trên). <b className="text-[#C8A14B]">Nhiều yếu tố ảnh hưởng cùng áp cho một phần → lấy hệ số CAO NHẤT, không nhân dồn</b> (QĐ 50). Dùng khi bồi thường / đấu giá / dự án.</p>
-              <label className="block"><span className="text-[11px] text-slate-300">Hệ số biến động thị trường (theo khu vực — chung cả thửa)</span><select value={mbdtt} onChange={(e) => setMbdtt(Number(e.target.value))} className={`${inp} mt-1 bg-white text-[#0A2540]`}>{KMBDTT_OPTS.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}</select></label>
-              <label className="block"><span className="text-[11px] text-slate-300">Hệ số quy hoạch (chung cả thửa)</span><select value={qh} onChange={(e) => setQh(Number(e.target.value))} className={`${inp} mt-1 bg-white text-[#0A2540]`}>{KQH_OPTS.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}</select></label>
+              <label className="block"><span className="text-[11px] text-slate-300">Hệ số biến động thị trường (theo khu vực — chung cả thửa)</span><select value={mbdtt} onChange={(e) => setMbdtt(Number(e.target.value))} className={`${inp} mt-1 bg-white text-[#0B4045]`}>{KMBDTT_OPTS.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}</select></label>
+              <label className="block"><span className="text-[11px] text-slate-300">Hệ số quy hoạch (chung cả thửa)</span><select value={qh} onChange={(e) => setQh(Number(e.target.value))} className={`${inp} mt-1 bg-white text-[#0B4045]`}>{KQH_OPTS.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}</select></label>
               <div className="flex items-center justify-between rounded-lg bg-white/[0.08] border border-white/10 px-3 py-2">
                 <span className="text-[13px] font-bold text-slate-100">Tổng sau hệ số điều chỉnh giá đất</span>
                 <span className="text-xl font-extrabold text-[#C8A14B]">{moneyVN(totalK)}</span>
@@ -409,12 +409,12 @@ function ChuyenMucDich({ picked }: { picked: { price: number; label: string } | 
       {picked && (
         <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-[12px] mt-2">
           <span className="min-w-0 flex-1 truncate text-amber-900">Giá vừa chọn: <b>{fmt(picked.price)} đ/m²</b> · {picked.label}</span>
-          <button onClick={() => setOStr(String(picked.price))} className="shrink-0 bg-[#0A2540] text-white font-bold text-[11px] px-2 py-1 rounded-md">→ Đất ở</button>
+          <button onClick={() => setOStr(String(picked.price))} className="shrink-0 bg-[#0B4045] text-white font-bold text-[11px] px-2 py-1 rounded-md">→ Đất ở</button>
           <button onClick={() => setNStr(String(picked.price))} className="shrink-0 bg-slate-600 text-white font-bold text-[11px] px-2 py-1 rounded-md">→ Đất nông nghiệp</button>
         </div>
       )}
       <details className="mt-2 rounded-xl border border-slate-200 overflow-hidden">
-        <summary className="cursor-pointer list-none px-3 py-2 text-[13px] font-bold text-[#0A2540] bg-slate-50 flex items-center justify-between">🔗 Tính giá đất ở giáp ranh / 2 mặt tiền (Điều 5–6)<span className="text-[#C8A14B] text-[11px]">mở ▾</span></summary>
+        <summary className="cursor-pointer list-none px-3 py-2 text-[13px] font-bold text-[#0B4045] bg-slate-50 flex items-center justify-between">🔗 Tính giá đất ở giáp ranh / 2 mặt tiền (Điều 5–6)<span className="text-[#C8A14B] text-[11px]">mở ▾</span></summary>
         <div className="p-3 space-y-2">
           <select value={grK} onChange={(e) => setGrK(e.target.value)} className={`${inp} bg-white`}>{GHEP.map((g) => <option key={g.key} value={g.key}>{g.label}</option>)}</select>
           <div className="grid grid-cols-2 gap-2">
@@ -422,9 +422,9 @@ function ChuyenMucDich({ picked }: { picked: { price: number; label: string } | 
             <input value={grB ? nf.format(gb) : ''} onChange={(e) => setGrB(onlyDigits(e.target.value))} inputMode="numeric" placeholder="Giá B / đường 2" className={inp} />
           </div>
           {grRes > 0 && (
-            <div className="flex items-center gap-2 rounded-lg bg-[#0A2540] text-white px-3 py-2">
+            <div className="flex items-center gap-2 rounded-lg bg-[#0B4045] text-white px-3 py-2">
               <span className="text-[13px]">Giá đất ở: <b className="text-[#C8A14B]">{fmt(grRes)} đ/m²</b></span>
-              <button onClick={() => setOStr(String(Math.round(grRes)))} className="ml-auto bg-[#C8A14B] text-[#0A2540] font-bold text-[11px] px-2.5 py-1 rounded-md">→ Dùng làm giá đất ở</button>
+              <button onClick={() => setOStr(String(Math.round(grRes)))} className="ml-auto bg-[#C8A14B] text-[#0B4045] font-bold text-[11px] px-2.5 py-1 rounded-md">→ Dùng làm giá đất ở</button>
             </div>
           )}
         </div>
@@ -454,7 +454,7 @@ function ChuyenMucDich({ picked }: { picked: { price: number; label: string } | 
       )}
       <p className="text-[11px] text-slate-400 mt-2">Mức thu <b>30/50/100%</b> (30% trong hạn mức · 50% vượt ≤1 lần · 100% vượt &gt;1 lần) chỉ áp cho <b>đất vườn, ao trong thửa có nhà ở / nguồn gốc vườn ao liền kề</b>, và <b>chỉ 1 lần duy nhất cho mỗi hộ</b> trên 1 thửa tự chọn (kể cả có nhiều thửa ở nhiều tỉnh) — NQ 254/2025/QH15 &amp; NĐ 50/2026/NĐ-CP, hiệu lực 31/01/2026. Đất nông nghiệp khác hoặc đã hưởng ưu đãi: thu <b>100% chênh lệch</b>. Số nộp thực tế do cơ quan thuế quyết định.</p>
       {r ? (
-        <div className="mt-3 rounded-xl bg-[#0A2540] text-white p-4">
+        <div className="mt-3 rounded-xl bg-[#0B4045] text-white p-4">
           <div className="text-[11px] uppercase tracking-wide text-slate-300">Tiền sử dụng đất phải nộp (ước tính)</div>
           <div className="text-2xl font-extrabold text-[#C8A14B]">{moneyVN(r.total)}</div>
           <div className="text-[11px] text-slate-300">Chênh lệch giá: {fmt(r.diff)} đ/m²</div>
@@ -465,9 +465,9 @@ function ChuyenMucDich({ picked }: { picked: { price: number; label: string } | 
             <summary className="cursor-pointer list-none px-3 py-2 text-[12px] font-bold flex items-center justify-between">📊 Áp hệ số điều chỉnh giá đất (QĐ 50/2026) — dự án / ngoài hạn mức<span className="text-[#C8A14B] text-[11px]">mở ▾</span></summary>
             <div className="p-3 pt-1 space-y-2">
               <p className="text-[11px] text-slate-300">Hộ gia đình trong hạn mức thường hệ số = 1. Áp cho dự án / thu hồi / đấu giá. Hệ số điều chỉnh giá đất = Hệ số biến động thị trường × Hệ số quy hoạch × Hệ số yếu tố ảnh hưởng (3 ô chọn dưới đây theo thứ tự).</p>
-              <select value={mbdtt} onChange={(e) => setMbdtt(Number(e.target.value))} className={`${inp} bg-white text-[#0A2540]`}>{KMBDTT_OPTS.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}</select>
-              <select value={qh} onChange={(e) => setQh(Number(e.target.value))} className={`${inp} bg-white text-[#0A2540]`}>{KQH_OPTS.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}</select>
-              <select value={yt} onChange={(e) => setYt(Number(e.target.value))} className={`${inp} bg-white text-[#0A2540]`}>{KYT_OPTS.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}</select>
+              <select value={mbdtt} onChange={(e) => setMbdtt(Number(e.target.value))} className={`${inp} bg-white text-[#0B4045]`}>{KMBDTT_OPTS.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}</select>
+              <select value={qh} onChange={(e) => setQh(Number(e.target.value))} className={`${inp} bg-white text-[#0B4045]`}>{KQH_OPTS.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}</select>
+              <select value={yt} onChange={(e) => setYt(Number(e.target.value))} className={`${inp} bg-white text-[#0B4045]`}>{KYT_OPTS.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}</select>
               <div className="flex items-center justify-between border-t border-white/10 pt-2"><span className="text-[12px] text-slate-300">Tiền nộp sau hệ số điều chỉnh (× {K.toLocaleString('vi-VN', { maximumFractionDigits: 3 })})</span><span className="text-lg font-extrabold text-[#C8A14B]">{moneyVN(r.total * K)}</span></div>
             </div>
           </details>

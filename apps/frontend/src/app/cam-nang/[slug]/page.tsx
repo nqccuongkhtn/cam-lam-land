@@ -41,16 +41,16 @@ export default function GuidePage({ params }: { params: { slug: string } }) {
     <div className="mx-auto max-w-3xl px-3 py-5 sm:px-4 sm:py-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(jsonld) }} />
       <nav className="text-sm text-slate-400 mb-3">
-        <Link href="/cam-nang" className="hover:text-[#0A2540]">Cẩm nang</Link> <span className="mx-1">/</span> <span className="text-slate-500">{g.title}</span>
+        <Link href="/cam-nang" className="hover:text-[#0B4045]">Cẩm nang</Link> <span className="mx-1">/</span> <span className="text-slate-500">{g.title}</span>
       </nav>
 
       <article>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] leading-tight">{g.title}</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0B4045] leading-tight">{g.title}</h1>
         <p className="text-sm sm:text-base text-slate-600 mt-3 leading-relaxed">{g.intro}</p>
 
         {g.body.map((b, i) => (
           <section key={i} className="mt-5">
-            <h2 className="text-lg font-bold text-[#0A2540] mb-2">{b.h}</h2>
+            <h2 className="text-lg font-bold text-[#0B4045] mb-2">{b.h}</h2>
             {b.p && <p className="text-sm sm:text-base text-slate-600 leading-relaxed">{b.p}</p>}
             {b.list && (
               <ul className="mt-1 space-y-1.5">
@@ -77,10 +77,10 @@ export default function GuidePage({ params }: { params: { slug: string } }) {
 
       {others.length > 0 && (
         <div className="mt-6 sm:mt-8">
-          <h2 className="font-bold text-[#0A2540] mb-2">Bài viết khác</h2>
+          <h2 className="font-bold text-[#0B4045] mb-2">Bài viết khác</h2>
           <ul className="space-y-1.5">
             {others.map((o) => (
-              <li key={o.slug}><Link href={`/cam-nang/${o.slug}`} className="text-[#0A2540] hover:text-[#C8A14B] font-semibold text-sm">→ {o.title}</Link></li>
+              <li key={o.slug}><Link href={`/cam-nang/${o.slug}`} className="text-[#0B4045] hover:text-[#C8A14B] font-semibold text-sm">→ {o.title}</Link></li>
             ))}
           </ul>
         </div>

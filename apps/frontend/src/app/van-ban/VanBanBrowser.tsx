@@ -117,7 +117,7 @@ export default function VanBanBrowser() {
         <button onClick={() => { setChuDe('all'); reset(); }}
           className={`text-left rounded-2xl border p-3 sm:p-4 transition ${chuDe === 'all' ? 'border-[#C8A14B] bg-[#C8A14B]/10 ring-1 ring-[#C8A14B]/30' : 'border-slate-200 bg-white hover:border-[#C8A14B] hover:shadow-sm'}`}>
           <div className="text-2xl leading-none">🗂️</div>
-          <div className="font-bold text-[#0A2540] mt-2 leading-tight">Văn bản chung</div>
+          <div className="font-bold text-[#0B4045] mt-2 leading-tight">Văn bản chung</div>
           <div className="text-[12px] text-slate-500 mt-1 leading-snug">Tất cả văn bản đất đai & dự án — tỉnh và cả nước</div>
           <div className="text-[11px] font-semibold text-[#C8A14B] mt-2">{(docs || []).length} văn bản →</div>
         </button>
@@ -127,7 +127,7 @@ export default function VanBanBrowser() {
             <button key={c} onClick={() => { setChuDe(on ? 'all' : c); reset(); }}
               className={`text-left rounded-2xl border p-3 sm:p-4 transition ${on ? 'border-[#C8A14B] bg-[#C8A14B]/10 ring-1 ring-[#C8A14B]/30' : 'border-slate-200 bg-white hover:border-[#C8A14B] hover:shadow-sm'}`}>
               <div className="text-2xl leading-none">{CHUDE_META[c].icon}</div>
-              <div className="font-bold text-[#0A2540] mt-2 leading-tight">{c}</div>
+              <div className="font-bold text-[#0B4045] mt-2 leading-tight">{c}</div>
               <div className="text-[12px] text-slate-500 mt-1 leading-snug">{CHUDE_META[c].desc}</div>
               <div className="text-[11px] font-semibold text-[#C8A14B] mt-2">{COUNT(c)} văn bản →</div>
             </button>
@@ -154,11 +154,11 @@ export default function VanBanBrowser() {
       </div>
 
       <div className="flex items-center justify-between gap-3 mt-4 mb-3">
-        <p className="text-sm text-slate-500"><b className="text-[#0A2540]">{filtered.length}</b> văn bản{chuDe !== 'all' ? ` · ${chuDe}` : ''}</p>
+        <p className="text-sm text-slate-500"><b className="text-[#0B4045]">{filtered.length}</b> văn bản{chuDe !== 'all' ? ` · ${chuDe}` : ''}</p>
         <div className="flex items-center gap-1 text-[13px]">
           <span className="text-slate-400 hidden sm:inline">Sắp xếp:</span>
-          <button onClick={() => { setSort('moi'); reset(); }} className={`px-2.5 py-1 rounded-lg font-semibold ${sort === 'moi' ? 'bg-slate-100 text-[#0A2540]' : 'text-slate-400 hover:text-[#0A2540]'}`}>Mới nhất</button>
-          <button onClick={() => { setSort('tai'); reset(); }} className={`px-2.5 py-1 rounded-lg font-semibold ${sort === 'tai' ? 'bg-slate-100 text-[#0A2540]' : 'text-slate-400 hover:text-[#0A2540]'}`}>Tải nhiều</button>
+          <button onClick={() => { setSort('moi'); reset(); }} className={`px-2.5 py-1 rounded-lg font-semibold ${sort === 'moi' ? 'bg-slate-100 text-[#0B4045]' : 'text-slate-400 hover:text-[#0B4045]'}`}>Mới nhất</button>
+          <button onClick={() => { setSort('tai'); reset(); }} className={`px-2.5 py-1 rounded-lg font-semibold ${sort === 'tai' ? 'bg-slate-100 text-[#0B4045]' : 'text-slate-400 hover:text-[#0B4045]'}`}>Tải nhiều</button>
         </div>
       </div>
 
@@ -176,7 +176,7 @@ export default function VanBanBrowser() {
         <div className="overflow-x-auto border border-slate-200 rounded-2xl">
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="bg-[#0A2540] text-white">
+              <tr className="bg-[#0B4045] text-white">
                 <th className={`${th} w-10 text-center hidden sm:table-cell`}>STT</th>
                 <th className={th}>Số ký hiệu</th>
                 <th className={`${th} text-center hidden md:table-cell`}>Lượt tải</th>
@@ -190,14 +190,14 @@ export default function VanBanBrowser() {
               {vis.map((d, i) => (
                 <tr key={d.id} className="border-t border-slate-100 even:bg-slate-50/60 hover:bg-amber-50/50 transition-colors">
                   <td className={`${td} text-center text-slate-400 hidden sm:table-cell`}>{(cur - 1) * PER + i + 1}</td>
-                  <td className={td}><span className="font-mono font-semibold text-[#0A2540] whitespace-nowrap">{d.soKyHieu}</span></td>
+                  <td className={td}><span className="font-mono font-semibold text-[#0B4045] whitespace-nowrap">{d.soKyHieu}</span></td>
                   <td className={`${td} text-center text-slate-500 hidden md:table-cell whitespace-nowrap`}>{d.luotTai != null ? d.luotTai.toLocaleString('vi-VN') : '—'}</td>
                   <td className={`${td} text-slate-500 whitespace-nowrap hidden sm:table-cell`}>{fmtNgay(d.ngay)}</td>
                   <td className={`${td} text-slate-500 hidden lg:table-cell`}>{d.coQuan}</td>
                   <td className={td}>
                     {d.coFile
-                      ? <button onClick={() => taiPdf(d)} className="text-left text-[#0A2540] hover:text-[#C8A14B] font-medium leading-snug">{d.trichYeu}</button>
-                      : <span className="text-[#0A2540] leading-snug">{d.trichYeu}</span>}
+                      ? <button onClick={() => taiPdf(d)} className="text-left text-[#0B4045] hover:text-[#C8A14B] font-medium leading-snug">{d.trichYeu}</button>
+                      : <span className="text-[#0B4045] leading-snug">{d.trichYeu}</span>}
                     <span className="block text-[11px] text-slate-400 mt-1 sm:hidden">{fmtNgay(d.ngay)} · {d.coQuan}{d.luotTai != null ? ` · ${d.luotTai.toLocaleString('vi-VN')} lượt tải` : ''}</span>
                   </td>
                   <td className={`${td} text-center`}>
@@ -217,7 +217,7 @@ export default function VanBanBrowser() {
           <button onClick={() => setPage(cur - 1)} disabled={cur === 1} className="min-w-9 h-9 px-2 grid place-items-center rounded-lg border border-slate-200 text-slate-600 text-sm font-semibold hover:border-[#C8A14B] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-slate-200">‹</button>
           {pageWindow(cur, totalPages).map((p, i) => p === '…'
             ? <span key={'e' + i} className="px-1 text-slate-400">…</span>
-            : <button key={p} onClick={() => setPage(p as number)} className={`min-w-9 h-9 px-2 grid place-items-center rounded-lg text-sm font-semibold border ${p === cur ? 'bg-[#0A2540] text-white border-[#0A2540]' : 'border-slate-200 text-slate-600 hover:border-[#C8A14B]'}`}>{p}</button>)}
+            : <button key={p} onClick={() => setPage(p as number)} className={`min-w-9 h-9 px-2 grid place-items-center rounded-lg text-sm font-semibold border ${p === cur ? 'bg-[#0B4045] text-white border-[#0B4045]' : 'border-slate-200 text-slate-600 hover:border-[#C8A14B]'}`}>{p}</button>)}
           <button onClick={() => setPage(cur + 1)} disabled={cur === totalPages} className="min-w-9 h-9 px-2 grid place-items-center rounded-lg border border-slate-200 text-slate-600 text-sm font-semibold hover:border-[#C8A14B] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-slate-200">›</button>
         </nav>
       )}

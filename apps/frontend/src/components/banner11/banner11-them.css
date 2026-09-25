@@ -599,7 +599,7 @@
 @media (max-width: 767px) {
   .cl-b11-tim {
     margin-top: -1px;
-    background: #0A2540;
+    background: #0B4045;
     padding: 10px 10px 14px;
     border-radius: 0 0 18px 18px;
   }
@@ -657,8 +657,8 @@
     display: flex; flex-direction: column; justify-content: flex-end;
     padding: 0 14px 12px; color: #fff; pointer-events: none;
     /* vệt tối chỉ ở nửa dưới, nửa trên ảnh vẫn sáng nguyên */
-    background: linear-gradient(to top, rgba(10, 37, 64, .92) 0%,
-                rgba(10, 37, 64, .55) 32%, rgba(10, 37, 64, 0) 62%);
+    background: linear-gradient(to top, rgba(11, 64, 69, .92) 0%,
+                rgba(11, 64, 69, .55) 32%, rgba(11, 64, 69, 0) 62%);
   }
   .cl-b11-duoi-nho {
     display: block; font-size: 10.5px; font-weight: 700; letter-spacing: .14em;
@@ -681,7 +681,7 @@
   .cl-b11-duoi-nut {
     position: absolute; right: 14px; bottom: 12px; pointer-events: auto;
     padding: 6px 12px; border-radius: 9999px;
-    background: #fff; color: #0A2540;
+    background: #fff; color: #0B4045;
     font-size: 12.5px; font-weight: 700; text-decoration: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
   }
@@ -1029,5 +1029,5 @@
 .cl-b11 .st-ui .ui-toast svg{
   grid-column:1;grid-row:1 / span 2;
   width:calc(var(--u)*46px)!important;height:calc(var(--u)*46px)!important;padding:calc(var(--u)*10px);box-sizing:border-box;
-  border-radius:22%;background:linear-gradient(145deg,#0A2540,#16395f);stroke:#E2C275!important;
+  border-radius:22%;background:linear-gradient(145deg,#0B4045,#16395f);stroke:#E2C275!important;
 }

@@ -49,7 +49,7 @@ function VerifiedPromo({ count, onView }: { count: number; onView: () => void })
       <div className="flex items-center gap-2.5">
         <span className="w-9 h-9 rounded-full bg-emerald-600 text-white grid place-items-center shrink-0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M20 6 9 17l-5-5" /></svg></span>
         <div>
-          <p className="font-extrabold text-[#0A2540] leading-tight">Tin xác thực bởi Cam Lâm Land</p>
+          <p className="font-extrabold text-[#0B4045] leading-tight">Tin xác thực bởi Cam Lâm Land</p>
           <p className="text-[12px] text-slate-500">Đội ngũ Cam Lâm Land đã kiểm chứng thực tế</p>
         </div>
       </div>
@@ -73,7 +73,7 @@ function Fgrp({ label, children }: { label: string; children: React.ReactNode })
 // Chip chọn trong bottom-sheet (sáng lên khi đang chọn).
 function Fchip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button onClick={onClick} className={`cl-press rounded-full border px-3.5 py-2 text-sm font-semibold transition ${on ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 text-slate-600 active:bg-slate-50'}`}>{children}</button>
+    <button onClick={onClick} className={`cl-press rounded-full border px-3.5 py-2 text-sm font-semibold transition ${on ? 'border-[#0B4045] bg-[#0B4045] text-white' : 'border-slate-200 text-slate-600 active:bg-slate-50'}`}>{children}</button>
   );
 }
 
@@ -99,11 +99,11 @@ function Pagination({ page, total, onPage }: { page: number; total: number; onPa
   const nav = 'w-9 h-9 grid place-items-center rounded-lg font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed';
   return (
     <div className="mt-6 flex items-center justify-center gap-1.5 flex-wrap">
-      <button disabled={page <= 1} onClick={() => onPage(page - 1)} className={`${nav} bg-white border border-slate-200 text-slate-600 hover:border-[#0A2540]`} aria-label="Trang trước">‹</button>
+      <button disabled={page <= 1} onClick={() => onPage(page - 1)} className={`${nav} bg-white border border-slate-200 text-slate-600 hover:border-[#0B4045]`} aria-label="Trang trước">‹</button>
       {items.map((n, i) => n === '…'
         ? <span key={`e${i}`} className="px-1.5 text-slate-400">…</span>
-        : <button key={n} onClick={() => onPage(n)} className={`${nav} ${n === page ? 'bg-[#0A2540] text-white' : 'bg-white border border-slate-200 text-slate-700 hover:border-[#0A2540]'}`}>{n}</button>)}
-      <button disabled={page >= total} onClick={() => onPage(page + 1)} className={`${nav} bg-white border border-slate-200 text-slate-600 hover:border-[#0A2540]`} aria-label="Trang sau">›</button>
+        : <button key={n} onClick={() => onPage(n)} className={`${nav} ${n === page ? 'bg-[#0B4045] text-white' : 'bg-white border border-slate-200 text-slate-700 hover:border-[#0B4045]'}`}>{n}</button>)}
+      <button disabled={page >= total} onClick={() => onPage(page + 1)} className={`${nav} bg-white border border-slate-200 text-slate-600 hover:border-[#0B4045]`} aria-label="Trang sau">›</button>
     </div>
   );
 }
@@ -240,7 +240,7 @@ function ListingsInner() {
     lng: l.lng, lat: l.lat,
     tier: l.tier || 'normal',              // MapView: VIP → pill giá; tin thường → chấm (rê chuột/zoom cận hiện giá)
     label: priceLabel(l.price, l.deal),
-    popupHtml: `<a href="/listings/${l.id}" style="font-weight:700;color:#0A2540">${l.title}</a><br/><b style="color:#dc2626">${priceLabel(l.price, l.deal)}</b>`,
+    popupHtml: `<a href="/listings/${l.id}" style="font-weight:700;color:#0B4045">${l.title}</a><br/><b style="color:#dc2626">${priceLabel(l.price, l.deal)}</b>`,
   })), [listings]);
   // Gim tin lưu (teardrop tím kiểu Google Maps). Bấm gim → mở BẢNG THÔNG TIN React riêng (selPlace).
   const placeMarkers = useMemo(() => drafts.map((p) => ({
@@ -357,7 +357,7 @@ function ListingsInner() {
     try { await removeInterest(id); setInterests((a) => a.filter((x) => x.id !== id)); } catch (e: any) { alert(e.message); }
   }
 
-  const chip = 'appearance-none bg-white border border-slate-300 rounded-full pl-3 sm:pl-3.5 pr-7 sm:pr-8 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:border-[#0A2540] cursor-pointer bg-[length:14px] bg-no-repeat';
+  const chip = 'appearance-none bg-white border border-slate-300 rounded-full pl-3 sm:pl-3.5 pr-7 sm:pr-8 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:border-[#0B4045] cursor-pointer bg-[length:14px] bg-no-repeat';
   const chevron = { backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")", backgroundPosition: 'right 10px center' };
   const inpc = 'border border-slate-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-[#7c3aed]'; // ô nhập tin lưu
 
@@ -367,7 +367,7 @@ function ListingsInner() {
       {/* TAB quản lý marker — bỏ nút "Tin đăng" (mặc định đã là tin đăng); chỉ hiện cho người đăng nhập */}
       {user && (
         <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-0.5 rounded-full border border-slate-200 shadow-lg bg-white/95 backdrop-blur p-1 text-[11px] sm:text-xs font-bold whitespace-nowrap">
-          <button onClick={() => { if (mapLayer === 'mine') { setMapLayer('all'); if (mine) showMine(false); } else { setMapLayer('mine'); showMine(true); } }} className={`px-3 py-1.5 rounded-full transition ${mapLayer === 'mine' ? 'bg-[#0A2540] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'}`}>Giỏ của tôi</button>
+          <button onClick={() => { if (mapLayer === 'mine') { setMapLayer('all'); if (mine) showMine(false); } else { setMapLayer('mine'); showMine(true); } }} className={`px-3 py-1.5 rounded-full transition ${mapLayer === 'mine' ? 'bg-[#0B4045] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'}`}>Giỏ của tôi</button>
           <button onClick={() => { if (mapLayer === 'saved') { setMapLayer('all'); if (mine) showMine(false); } else { setMapLayer('saved'); loadDrafts(); } }} className={`px-3 py-1.5 rounded-full transition ${mapLayer === 'saved' ? 'bg-[#7c3aed] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'}`}>📌 Tin lưu{drafts.length ? ` (${drafts.length})` : ''}</button>
         </div>
       )}
@@ -375,7 +375,7 @@ function ListingsInner() {
         {layerOpen ? (
           <div className="w-[250px] bg-white/95 backdrop-blur rounded-2xl border border-slate-200 shadow-xl p-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-extrabold text-[#0A2540]">Lớp bản đồ</span>
+              <span className="text-xs font-extrabold text-[#0B4045]">Lớp bản đồ</span>
               <button onClick={() => setLayerOpen(false)} className="text-slate-400 hover:text-slate-700 w-6 h-6 grid place-items-center rounded-lg hover:bg-slate-100 text-sm leading-none">✕</button>
             </div>
             <label className="flex items-center gap-2.5 py-1.5 text-xs font-semibold text-slate-700 cursor-pointer">
@@ -398,7 +398,7 @@ function ListingsInner() {
           </div>
         ) : (
           <button onClick={() => setLayerOpen(true)} title="Lớp bản đồ" className="flex items-center gap-2 bg-white/95 backdrop-blur rounded-full border border-slate-200 shadow-lg pl-2.5 pr-3 py-2 hover:bg-slate-50">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0A2540" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></svg>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0B4045" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></svg>
             <span className="text-xs font-bold text-slate-700 hidden sm:inline">Lớp bản đồ</span>
             {qhOn && <span className="w-1.5 h-1.5 rounded-full bg-red-600" />}
           </button>
@@ -409,7 +409,7 @@ function ListingsInner() {
         {showFilters ? (
           <div className="w-[240px] max-w-[calc(100vw-1.5rem)] bg-white/95 backdrop-blur rounded-2xl border border-slate-200 shadow-xl p-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-extrabold text-[#0A2540]">⚙ Lọc tin{activeFilters > 0 ? ` (${activeFilters})` : ''}</span>
+              <span className="text-xs font-extrabold text-[#0B4045]">⚙ Lọc tin{activeFilters > 0 ? ` (${activeFilters})` : ''}</span>
               <button onClick={() => setShowFilters(false)} className="text-slate-400 hover:text-slate-700 w-6 h-6 grid place-items-center rounded-lg hover:bg-slate-100 text-sm leading-none">✕</button>
             </div>
             <div className="flex flex-col gap-2">
@@ -421,7 +421,7 @@ function ListingsInner() {
           </div>
         ) : (
           <button onClick={() => setShowFilters(true)} title="Lọc tin" className="flex items-center gap-2 bg-white/95 backdrop-blur rounded-full border border-slate-200 shadow-lg pl-2.5 pr-3 py-2 hover:bg-slate-50">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A2540" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B4045" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
             <span className="text-xs font-bold text-slate-700">Lọc</span>
             {activeFilters > 0 && <span className="bg-red-600 text-white rounded-full min-w-[18px] h-[18px] px-1 grid place-items-center text-[10px] font-extrabold">{activeFilters}</span>}
           </button>
@@ -453,7 +453,7 @@ function ListingsInner() {
             <input type="range" min={0} max={100} value={Math.round(opacity * 100)} onChange={(e) => setOpacity(Number(e.target.value) / 100)} className="absolute left-1/2 top-1/2 w-28 -translate-x-1/2 -translate-y-1/2 -rotate-90 accent-red-600 cursor-pointer" aria-label="Độ đậm lớp quy hoạch" />
           </div>
           <span className="text-[9px] font-bold text-slate-400">Mờ</span>
-          <span className="text-[10px] font-extrabold text-[#0A2540]">{Math.round(opacity * 100)}%</span>
+          <span className="text-[10px] font-extrabold text-[#0B4045]">{Math.round(opacity * 100)}%</span>
         </div>
       )}
       {info && showSave && (
@@ -464,7 +464,7 @@ function ListingsInner() {
               <span className="text-[10px] font-bold text-slate-400 mt-0.5">{sheetExpanded ? '▼ Thu gọn' : '▲ Kéo lên điền đầy đủ'}</span>
             </button>
             <div className="flex items-center justify-between">
-              <b className="text-[#0A2540] text-sm">📍 Điểm đã chọn</b>
+              <b className="text-[#0B4045] text-sm">📍 Điểm đã chọn</b>
               <button onClick={() => setInfo(null)} className="text-slate-400 hover:text-slate-700 text-base leading-none">✕</button>
             </div>
           </div>
@@ -521,9 +521,9 @@ function ListingsInner() {
               </>)}
             </div>
           ) : (
-            <button onClick={() => openLogin({ reason: 'Đăng nhập để lưu điểm/tin trên bản đồ.' })} className="mt-2.5 w-full block text-center bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold py-2 rounded-lg text-xs">🔒 Đăng nhập để lưu tin</button>
+            <button onClick={() => openLogin({ reason: 'Đăng nhập để lưu điểm/tin trên bản đồ.' })} className="mt-2.5 w-full block text-center bg-[#0B4045] hover:bg-[#0e5157] text-white font-bold py-2 rounded-lg text-xs">🔒 Đăng nhập để lưu tin</button>
           )}
-          <Link href="/map" className="mt-2.5 inline-block text-[#0A2540] font-semibold hover:text-red-600">Mở công cụ bản đồ đầy đủ →</Link>
+          <Link href="/map" className="mt-2.5 inline-block text-[#0B4045] font-semibold hover:text-red-600">Mở công cụ bản đồ đầy đủ →</Link>
           </div>
         </div>
       )}
@@ -544,7 +544,7 @@ function ListingsInner() {
               ))}
             </div>
           )}
-          <p className="font-bold text-[#0A2540] text-sm">{selPlace.features || (selPlace.parcel ? `Thửa ${selPlace.parcel}${selPlace.sheet ? ', Tờ ' + selPlace.sheet : ''}` : (selPlace.note || 'Tin lưu'))}</p>
+          <p className="font-bold text-[#0B4045] text-sm">{selPlace.features || (selPlace.parcel ? `Thửa ${selPlace.parcel}${selPlace.sheet ? ', Tờ ' + selPlace.sheet : ''}` : (selPlace.note || 'Tin lưu'))}</p>
           <div className="mt-1.5 space-y-1 text-slate-600">
             {(selPlace.parcel || selPlace.sheet || selPlace.ward) ? <div>🗺 {[selPlace.parcel && `Thửa ${selPlace.parcel}`, selPlace.sheet && `Tờ ${selPlace.sheet}`, selPlace.ward].filter(Boolean).join(' · ')}</div> : null}
             {(selPlace.price || selPlace.area) ? <div>{selPlace.price ? <>💰 <b className="text-red-600">{selPlace.price}</b></> : null}{selPlace.area ? <span className="text-slate-500"> · {selPlace.area} m²</span> : null}</div> : null}
@@ -604,26 +604,26 @@ function ListingsInner() {
       {/* HÀNG 1: bán/thuê (trái) + sắp xếp (phải) — gộp chung 1 dòng cho gọn */}
       <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
         <div className="inline-flex rounded-full bg-slate-100 p-1 shrink-0">
-          <button onClick={() => switchDeal('sale')} className={`px-3 sm:px-4 py-1.5 rounded-full text-sm font-bold transition ${deal === 'sale' ? 'bg-red-600 text-white shadow' : 'text-slate-600 hover:text-[#0A2540]'}`}><span className="sm:hidden">Bán</span><span className="hidden sm:inline">Nhà đất bán</span></button>
-          <button onClick={() => switchDeal('rent')} className={`px-3 sm:px-4 py-1.5 rounded-full text-sm font-bold transition ${deal === 'rent' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-[#0A2540]'}`}>Cho thuê</button>
+          <button onClick={() => switchDeal('sale')} className={`px-3 sm:px-4 py-1.5 rounded-full text-sm font-bold transition ${deal === 'sale' ? 'bg-red-600 text-white shadow' : 'text-slate-600 hover:text-[#0B4045]'}`}><span className="sm:hidden">Bán</span><span className="hidden sm:inline">Nhà đất bán</span></button>
+          <button onClick={() => switchDeal('rent')} className={`px-3 sm:px-4 py-1.5 rounded-full text-sm font-bold transition ${deal === 'rent' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-[#0B4045]'}`}>Cho thuê</button>
         </div>
         <label className="flex items-center gap-1.5 text-sm text-slate-500 shrink-0 min-w-0">
           <span className="hidden sm:inline">Sắp xếp</span>
-          <select value={sort} onChange={(e) => setSort(e.target.value)} className="border border-slate-200 rounded-lg px-2 py-1.5 text-sm bg-white font-semibold text-[#0A2540] outline-none cursor-pointer max-w-full">
+          <select value={sort} onChange={(e) => setSort(e.target.value)} className="border border-slate-200 rounded-lg px-2 py-1.5 text-sm bg-white font-semibold text-[#0B4045] outline-none cursor-pointer max-w-full">
             <option value="default">Mặc định</option><option value="newest">Mới nhất</option><option value="price-asc">Giá thấp→cao</option><option value="price-desc">Giá cao→thấp</option>
           </select>
         </label>
       </div>
       {/* Breadcrumb: ẩn trên điện thoại cho đỡ rối, hiện lại từ màn lớn */}
-      <div className="hidden sm:block text-xs text-slate-400 mb-1"><Link href="/" className="hover:text-[#0A2540]">{deal === 'rent' ? 'Cho thuê' : 'Bán'}</Link> › <span className="hover:text-[#0A2540]">Khánh Hòa</span> › <span className="text-slate-600">Cam Lâm</span></div>
+      <div className="hidden sm:block text-xs text-slate-400 mb-1"><Link href="/" className="hover:text-[#0B4045]">{deal === 'rent' ? 'Cho thuê' : 'Bán'}</Link> › <span className="hover:text-[#0B4045]">Khánh Hòa</span> › <span className="text-slate-600">Cam Lâm</span></div>
       {user ? (
         <div className="flex rounded-xl border border-slate-200 overflow-hidden w-fit mb-1">
-          <button onClick={() => showMine(false)} className={`px-3.5 py-1.5 text-sm font-bold ${!mine ? 'bg-[#0A2540] text-white' : 'text-slate-600'}`}>Tất cả</button>
-          <button onClick={() => showMine(true)} className={`px-3.5 py-1.5 text-sm font-bold ${mine ? 'bg-[#0A2540] text-white' : 'text-slate-600'}`}>🧺 Giỏ của tôi</button>
+          <button onClick={() => showMine(false)} className={`px-3.5 py-1.5 text-sm font-bold ${!mine ? 'bg-[#0B4045] text-white' : 'text-slate-600'}`}>Tất cả</button>
+          <button onClick={() => showMine(true)} className={`px-3.5 py-1.5 text-sm font-bold ${mine ? 'bg-[#0B4045] text-white' : 'text-slate-600'}`}>🧺 Giỏ của tôi</button>
         </div>
       ) : null}
-      <h1 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">{mine ? 'Giỏ hàng của bạn' : title}</h1>
-      <p className="text-sm text-slate-500 mt-0.5">{loading ? 'Đang tìm…' : <>Hiện có <b className="text-[#0A2540]">{shown.length}</b> bất động sản.</>}</p>
+      <h1 className="text-xl md:text-2xl font-extrabold text-[#0B4045]">{mine ? 'Giỏ hàng của bạn' : title}</h1>
+      <p className="text-sm text-slate-500 mt-0.5">{loading ? 'Đang tìm…' : <>Hiện có <b className="text-[#0B4045]">{shown.length}</b> bất động sản.</>}</p>
       {/* ĐÃ BỎ hàng chip "Giá đất & định giá · Cẩm nang pháp lý · CRM khách hàng":
           ba mục này đã có trong trang Tiện ích rồi, để đây là trùng. Đừng thêm lại. */}
     </>
@@ -669,7 +669,7 @@ function ListingsInner() {
                 <span className="absolute top-1.5 left-1.5 z-10 bg-[#7c3aed] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">TIN LƯU</span>
               </div>
               <div className="flex-1 min-w-0 py-2 pr-2 flex flex-col">
-                <p className="font-bold text-[#0A2540] text-sm line-clamp-1">{d.features || (d.parcel ? `Thửa ${d.parcel}${d.sheet ? ', Tờ ' + d.sheet : ''}` : (d.note || 'Tin lưu'))}{d.dealStatus ? <span className="ml-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white align-middle" style={{ backgroundColor: dealColor(d.dealStatus) }}>{d.dealStatus}</span> : null}</p>
+                <p className="font-bold text-[#0B4045] text-sm line-clamp-1">{d.features || (d.parcel ? `Thửa ${d.parcel}${d.sheet ? ', Tờ ' + d.sheet : ''}` : (d.note || 'Tin lưu'))}{d.dealStatus ? <span className="ml-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white align-middle" style={{ backgroundColor: dealColor(d.dealStatus) }}>{d.dealStatus}</span> : null}</p>
                 <p className="text-sm mt-0.5">{d.price ? <span className="text-red-600 font-extrabold">{d.price}</span> : <span className="text-slate-400">Chưa có giá</span>}{d.area ? <span className="text-slate-500 font-medium"> · {d.area} m²</span> : null}</p>
                 <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">📍 {d.lat.toFixed(5)}, {d.lng.toFixed(5)}</p>
                 <div className="flex gap-1.5 mt-auto pt-1.5">
@@ -708,8 +708,8 @@ function ListingsInner() {
                       {vip && <span className="absolute top-2 right-2 z-[5] bg-[#C8A14B] text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow">★ VIP</span>}
                     </div>
                     <div className="flex gap-1.5">
-                      <Link href={`/sales/edit/${l.id}`} className="flex-1 text-center bg-white border border-slate-200 text-[#0A2540] text-xs font-bold py-1.5 rounded-lg hover:border-[#C8A14B]">✏️ Sửa</Link>
-                      <Link href={`/sales/leads/${l.id}`} className="flex-1 text-center bg-white border border-slate-200 text-[#0A2540] text-xs font-bold py-1.5 rounded-lg hover:border-[#C8A14B]">👁 Khách</Link>
+                      <Link href={`/sales/edit/${l.id}`} className="flex-1 text-center bg-white border border-slate-200 text-[#0B4045] text-xs font-bold py-1.5 rounded-lg hover:border-[#C8A14B]">✏️ Sửa</Link>
+                      <Link href={`/sales/leads/${l.id}`} className="flex-1 text-center bg-white border border-slate-200 text-[#0B4045] text-xs font-bold py-1.5 rounded-lg hover:border-[#C8A14B]">👁 Khách</Link>
                       <button onClick={() => del(l.id)} className="flex-1 bg-white border border-red-200 text-red-600 text-xs font-bold py-1.5 rounded-lg hover:bg-red-50">🗑 Xoá</button>
                     </div>
                   </div>
@@ -755,24 +755,24 @@ function ListingsInner() {
     <aside className="shrink-0 space-y-4 lg:w-80">
       <div className="bg-white rounded-xl border border-slate-200 p-4">
         <div className="flex items-center justify-between">
-          <div><p className="text-sm font-bold text-[#0A2540]">Mặt bằng giá khu vực</p><p className="text-xs text-slate-400">Cam Lâm · 12 tháng qua</p></div>
+          <div><p className="text-sm font-bold text-[#0B4045]">Mặt bằng giá khu vực</p><p className="text-xs text-slate-400">Cam Lâm · 12 tháng qua</p></div>
           <svg viewBox="0 0 90 36" className="w-24 h-9 text-emerald-500"><path d="M0 28 L15 24 L30 26 L45 16 L60 18 L75 8 L90 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </div>
         <button onClick={() => goMapView(true)} className="mt-2 text-xs font-bold text-emerald-600 hover:text-emerald-700">📈 Xem vị trí trên bản đồ →</button>
       </div>
       <div className="bg-white rounded-xl border border-slate-200 p-4">
-        <p className="font-bold text-[#0A2540] mb-1.5">Lọc theo khoảng giá</p>
+        <p className="font-bold text-[#0B4045] mb-1.5">Lọc theo khoảng giá</p>
         <div className="flex flex-col">
           {PRICE_RANGES.map(([label, mn, mx]) => (
-            <button key={label} onClick={() => { setMin(mn); setMax(mx); load({ min: mn, max: mx }); }} className={`text-left py-1.5 text-sm border-b border-slate-50 last:border-0 ${min === mn && max === mx ? 'text-red-600 font-bold' : 'text-slate-600 hover:text-[#0A2540]'}`}>{label}</button>
+            <button key={label} onClick={() => { setMin(mn); setMax(mx); load({ min: mn, max: mx }); }} className={`text-left py-1.5 text-sm border-b border-slate-50 last:border-0 ${min === mn && max === mx ? 'text-red-600 font-bold' : 'text-slate-600 hover:text-[#0B4045]'}`}>{label}</button>
           ))}
         </div>
       </div>
       <div className="bg-white rounded-xl border border-slate-200 p-4">
-        <p className="font-bold text-[#0A2540] mb-1.5">Lọc theo diện tích</p>
+        <p className="font-bold text-[#0B4045] mb-1.5">Lọc theo diện tích</p>
         <div className="flex flex-col">
           {AREA_RANGES.map(([label, mn, mx]) => (
-            <button key={label} onClick={() => setAreaRange({ min: mn, max: mx })} className={`text-left py-1.5 text-sm border-b border-slate-50 last:border-0 ${areaRange.min === mn && areaRange.max === mx ? 'text-red-600 font-bold' : 'text-slate-600 hover:text-[#0A2540]'}`}>{label}</button>
+            <button key={label} onClick={() => setAreaRange({ min: mn, max: mx })} className={`text-left py-1.5 text-sm border-b border-slate-50 last:border-0 ${areaRange.min === mn && areaRange.max === mx ? 'text-red-600 font-bold' : 'text-slate-600 hover:text-[#0B4045]'}`}>{label}</button>
           ))}
         </div>
       </div>
@@ -804,28 +804,28 @@ function ListingsInner() {
                       width={34} height={34} className="h-[34px] w-[34px] object-contain" />}
               </Link>
             )}
-            <label className="flex items-center gap-2 flex-1 min-w-0 bg-slate-50 rounded-full border border-slate-200 px-4 focus-within:border-[#0A2540]">
+            <label className="flex items-center gap-2 flex-1 min-w-0 bg-slate-50 rounded-full border border-slate-200 px-4 focus-within:border-[#0B4045]">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-4 h-4 text-slate-400 shrink-0"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
               <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && showMine(false)} onFocus={(e) => { if (window.innerWidth < 768) { e.currentTarget.blur(); setSearchOpen(true); } }} className="py-2 w-full outline-none text-sm bg-transparent" placeholder="Khu vực, từ khoá, dự án…" />
             </label>
             {/* MOBILE: nút Bộ lọc GỌN ngay trong hàng tìm kiếm (mở bottom-sheet) — 1 hàng cho gọn */}
             {!mapView && (
-              <button onClick={() => setFilterOpen(true)} aria-label="Bộ lọc" className="cl-press md:hidden relative shrink-0 w-10 h-10 grid place-items-center rounded-full border border-slate-200 text-[#0A2540]">
+              <button onClick={() => setFilterOpen(true)} aria-label="Bộ lọc" className="cl-press md:hidden relative shrink-0 w-10 h-10 grid place-items-center rounded-full border border-slate-200 text-[#0B4045]">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-5 h-5"><path d="M3 5h18M6 12h12M10 19h4" /></svg>
                 {activeFilters > 0 && <span className="absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 grid place-items-center rounded-full bg-red-600 text-white text-[10px] font-extrabold leading-none">{activeFilters}</span>}
               </button>
             )}
             <button onClick={() => showMine(false)} className={`bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-full text-sm whitespace-nowrap ${hidden && !mapView ? 'hidden md:block' : ''}`}>Tìm kiếm</button>
-            <button onClick={() => goMapView(!mapView)} aria-label={mapView ? 'Đóng bản đồ' : 'Xem bản đồ'} className={`hidden md:flex items-center gap-1.5 font-bold px-3 sm:px-4 py-2.5 rounded-full text-sm whitespace-nowrap shrink-0 ${mapView ? 'bg-[#0A2540] text-white' : 'bg-teal-600 hover:bg-teal-700 text-white'}`}>
+            <button onClick={() => goMapView(!mapView)} aria-label={mapView ? 'Đóng bản đồ' : 'Xem bản đồ'} className={`hidden md:flex items-center gap-1.5 font-bold px-3 sm:px-4 py-2.5 rounded-full text-sm whitespace-nowrap shrink-0 ${mapView ? 'bg-[#0B4045] text-white' : 'bg-teal-600 hover:bg-teal-700 text-white'}`}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M9 20l-5.5 2.5V6L9 3.5m0 16.5 6 -2.5M9 20V3.5m6 14 5.5 2.5V6L15 3.5m0 14V3.5m0 0L9 6" /></svg>
               <span className="hidden sm:inline">{mapView ? 'Đóng bản đồ' : 'Xem bản đồ'}</span>
             </button>
             {/* Khi cuộn xuống (Nav ẩn) → nút ☰ mở menu ngay tại đây */}
-            {hidden && !mapView && <button onClick={() => window.dispatchEvent(new Event('open-nav-menu'))} aria-label="Menu" className="md:hidden shrink-0 w-9 h-9 grid place-items-center rounded-lg border border-slate-200 text-[#0A2540]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-5 h-5"><path d="M3 6h18M3 12h18M3 18h18" /></svg></button>}
+            {hidden && !mapView && <button onClick={() => window.dispatchEvent(new Event('open-nav-menu'))} aria-label="Menu" className="md:hidden shrink-0 w-9 h-9 grid place-items-center rounded-lg border border-slate-200 text-[#0B4045]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-5 h-5"><path d="M3 6h18M3 12h18M3 18h18" /></svg></button>}
           </div>
           {/* Hàng chip lọc — CHỈ desktop (mobile đã gộp nút Bộ lọc vào hàng tìm kiếm ở trên) */}
           <div ref={filterRef} className="hidden md:flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 bg-[#0A2540] text-white rounded-full px-3.5 py-2 text-sm font-semibold shrink-0">⚙ Lọc{activeFilters > 0 && <span className="bg-white text-[#0A2540] rounded-full w-5 h-5 grid place-items-center text-xs font-extrabold">{activeFilters}</span>}</span>
+            <span className="inline-flex items-center gap-1.5 bg-[#0B4045] text-white rounded-full px-3.5 py-2 text-sm font-semibold shrink-0">⚙ Lọc{activeFilters > 0 && <span className="bg-white text-[#0B4045] rounded-full w-5 h-5 grid place-items-center text-xs font-extrabold">{activeFilters}</span>}</span>
             <button onClick={() => setVerified((v) => !v)} className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-semibold shrink-0 border ${verified ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-white border-slate-300 text-slate-600'}`}>✓ Tin xác thực</button>
             <select value={type} onChange={(e) => { setType(e.target.value as PropertyType); load({ type: e.target.value }); }} className={`${chip} shrink-0`} style={chevron}>{TYPES.map((t) => <option key={t} value={t}>{t ? PROPERTY_LABELS[t as PropertyType] : 'Loại hình'}</option>)}</select>
             <select value={`${min}|${max}`} onChange={(e) => { const [mn, mx] = e.target.value.split('|'); setMin(mn); setMax(mx); load({ min: mn, max: mx }); }} className={`${chip} shrink-0`} style={chevron}>{PRICE_RANGES.map(([label, mn, mx]) => <option key={label} value={`${mn}|${mx}`}>{label}</option>)}</select>
@@ -864,12 +864,12 @@ function ListingsInner() {
       {!(info && showSave) && !selPlace && !nearEnd && (
         <div className={`md:hidden fixed left-1/2 z-30 w-max max-w-[92vw] cl-fab-pill transition-opacity duration-200 ${hidden ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
           <div className="cl-glow rounded-full">
-            <div className="relative z-[1] flex items-center gap-0.5 rounded-full bg-[#0A2540] shadow-xl p-1">
-              <button onClick={() => goMapView(false)} className={`flex items-center gap-1.5 px-4 py-1.5 text-[13px] font-extrabold rounded-full transition ${!mapView ? 'bg-[#C8A14B] text-[#0A2540] shadow' : 'text-white/85'}`}>
+            <div className="relative z-[1] flex items-center gap-0.5 rounded-full bg-[#0B4045] shadow-xl p-1">
+              <button onClick={() => goMapView(false)} className={`flex items-center gap-1.5 px-4 py-1.5 text-[13px] font-extrabold rounded-full transition ${!mapView ? 'bg-[#C8A14B] text-[#0B4045] shadow' : 'text-white/85'}`}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="w-3.5 h-3.5"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" /></svg>
                 Danh sách
               </button>
-              <button onClick={() => goMapView(true)} className={`flex items-center gap-1.5 px-4 py-1.5 text-[13px] font-extrabold rounded-full transition ${mapView ? 'bg-[#C8A14B] text-[#0A2540] shadow' : 'text-white/85'}`}>
+              <button onClick={() => goMapView(true)} className={`flex items-center gap-1.5 px-4 py-1.5 text-[13px] font-extrabold rounded-full transition ${mapView ? 'bg-[#C8A14B] text-[#0B4045] shadow' : 'text-white/85'}`}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><path d="M9 20l-5.5 2.5V6L9 3.5m0 16.5 6 -2.5M9 20V3.5m6 14 5.5 2.5V6L15 3.5m0 14V3.5m0 0L9 6" /></svg>
                 Bản đồ
               </button>
@@ -881,7 +881,7 @@ function ListingsInner() {
       {!mapView && (
         <div className="md:hidden fixed left-1/2 -translate-x-1/2 z-[60] pointer-events-none" style={{ top: refreshing ? 84 : 14 + pull * 0.7, opacity: refreshing || pull > 4 ? 1 : 0, transition: refreshing ? 'top .25s ease, opacity .2s' : 'opacity .15s' }}>
           <div className="grid h-9 w-9 place-items-center rounded-full bg-white shadow-lg ring-1 ring-slate-200">
-            <svg className={`h-5 w-5 text-[#0A2540] ${refreshing ? 'animate-spin' : ''}`} style={{ transform: refreshing ? undefined : `rotate(${pull * 3}deg)` }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.36" /><path d="M21 3.5V9h-5.5" /></svg>
+            <svg className={`h-5 w-5 text-[#0B4045] ${refreshing ? 'animate-spin' : ''}`} style={{ transform: refreshing ? undefined : `rotate(${pull * 3}deg)` }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.36" /><path d="M21 3.5V9h-5.5" /></svg>
           </div>
         </div>
       )}

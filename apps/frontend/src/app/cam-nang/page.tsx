@@ -22,11 +22,11 @@ export default function CamNangPage() {
     <div className="mx-auto max-w-4xl px-3 py-5 sm:px-4 sm:py-8">
       {/* Tiêu đề gọn + nhận diện thương hiệu (dễ nhớ, không rối) */}
       <div className="flex items-center gap-3">
-        <span className="grid place-items-center w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#0A2540] shrink-0">
+        <span className="grid place-items-center w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#0B4045] shrink-0">
           <LogoAnh cao={24} nenToi />
         </span>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] leading-tight">Cẩm nang pháp lý nhà đất</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0B4045] leading-tight">Cẩm nang pháp lý nhà đất</h1>
           <p className="text-[13px] font-semibold text-[#C8A14B]">Cam Lâm Land · Pháp lý minh bạch — Giao dịch an tâm</p>
         </div>
       </div>

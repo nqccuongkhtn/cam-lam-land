@@ -129,8 +129,8 @@ export default function QrPage() {
                     <div key={i} className="flex items-center justify-between gap-2 py-1.5">
                       <dt className="whitespace-nowrap text-slate-500">{label}</dt>
                       <dd className="flex min-w-0 items-center gap-1.5">
-                        <span className="break-all text-right font-semibold text-[#0A2540]">{fmtVal(val)}</span>
-                        <button onClick={() => { navigator.clipboard.writeText(val).catch(() => {}); }} title="Sao chép trường này" className="shrink-0 rounded p-1 text-slate-400 transition hover:bg-slate-100 hover:text-[#0A2540]">
+                        <span className="break-all text-right font-semibold text-[#0B4045]">{fmtVal(val)}</span>
+                        <button onClick={() => { navigator.clipboard.writeText(val).catch(() => {}); }} title="Sao chép trường này" className="shrink-0 rounded p-1 text-slate-400 transition hover:bg-slate-100 hover:text-[#0B4045]">
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15V5a2 2 0 0 1 2-2h10" /></svg>
                         </button>
                       </dd>
@@ -153,12 +153,12 @@ export default function QrPage() {
           <div className="flex flex-col sm:flex-row gap-2">
             <button
               onClick={() => { try { navigator.clipboard.writeText(code); setCopied(true); } catch {} setShowEmbed(true); }}
-              className="flex-1 bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold py-3 rounded-xl text-sm">
+              className="flex-1 bg-[#0B4045] hover:bg-[#0e5157] text-white font-bold py-3 rounded-xl text-sm">
               🔎 Tra cứu ngay tại đây
             </button>
             <button
               onClick={() => { try { navigator.clipboard.writeText(code); setCopied(true); } catch {} window.open(VBDLIS_URL, '_blank', 'noopener'); }}
-              className="flex-1 sm:flex-none bg-white border border-[#0A2540] text-[#0A2540] hover:bg-slate-50 font-semibold py-3 px-4 rounded-xl text-sm">
+              className="flex-1 sm:flex-none bg-white border border-[#0B4045] text-[#0B4045] hover:bg-slate-50 font-semibold py-3 px-4 rounded-xl text-sm">
               Mở tab mới ↗
             </button>
           </div>
@@ -168,7 +168,7 @@ export default function QrPage() {
             <div className="mt-3">
               <div className="mb-1.5 flex items-center justify-between">
                 <span className="text-[11px] text-slate-400">Cổng chính thức nhúng bên dưới — dán mã (đã copy), tick xác thực rồi Tìm kiếm.</span>
-                <button onClick={() => setShowEmbed(false)} className="text-xs text-slate-500 hover:text-[#0A2540]">Ẩn ✕</button>
+                <button onClick={() => setShowEmbed(false)} className="text-xs text-slate-500 hover:text-[#0B4045]">Ẩn ✕</button>
               </div>
               <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50" style={{ height: '78vh', minHeight: 480 }}>
                 <iframe src={VBDLIS_URL} title="Cổng tra cứu QR VBĐLIS" className="absolute inset-0 h-full w-full" referrerPolicy="no-referrer" />

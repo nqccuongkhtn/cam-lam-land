@@ -65,8 +65,8 @@ export default function ServicesPage() {
   const RailCard = ({ a }: { a: any }) => (
     <a href={`tel:${a.phone}`} className="block bg-white rounded-xl border border-slate-200 p-3 text-center hover:shadow-md transition">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      {a.image ? <img src={a.image} alt="" className="w-16 h-16 rounded-full object-cover mx-auto ring-2 ring-[#C8A14B]/40" /> : <div className="w-16 h-16 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-xl font-extrabold mx-auto">{(a.name || 'C').charAt(0).toUpperCase()}</div>}
-      <p className="font-bold text-[#0A2540] text-sm mt-2 line-clamp-2 leading-tight">{a.name}</p>
+      {a.image ? <img src={a.image} alt="" className="w-16 h-16 rounded-full object-cover mx-auto ring-2 ring-[#C8A14B]/40" /> : <div className="w-16 h-16 rounded-full bg-[#0B4045] text-[#C8A14B] grid place-items-center text-xl font-extrabold mx-auto">{(a.name || 'C').charAt(0).toUpperCase()}</div>}
+      <p className="font-bold text-[#0B4045] text-sm mt-2 line-clamp-2 leading-tight">{a.name}</p>
       <p className="text-red-600 font-bold text-sm mt-0.5">{a.phone}</p>
       <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wide">Quảng cáo</p>
     </a>
@@ -84,17 +84,17 @@ export default function ServicesPage() {
         {p.popular && <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-[#C8A14B] text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full whitespace-nowrap shadow">PHỔ BIẾN</span>}
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: ACCENT[k] }} />
-          <p className="font-bold text-[#0A2540]">{p.name}</p>
+          <p className="font-bold text-[#0B4045]">{p.name}</p>
         </div>
-        <p className="text-2xl md:text-[28px] font-extrabold text-[#0A2540] mt-3 leading-none">{p.price > 0 ? fmt(p.price) : 'Liên hệ'}</p>
+        <p className="text-2xl md:text-[28px] font-extrabold text-[#0B4045] mt-3 leading-none">{p.price > 0 ? fmt(p.price) : 'Liên hệ'}</p>
         <p className="text-xs text-slate-400 mt-1.5">{p.days} ngày{perTin ? ` · ~${perTin.toLocaleString('vi-VN')}đ/tin` : p.boosts ? ` · ${p.boosts} lượt đẩy` : ''}</p>
         <ul className="mt-4 space-y-2 flex-1 text-sm text-slate-600">
           {p.perks.map((t) => <li key={t} className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5 shrink-0">✓</span>{t}</li>)}
         </ul>
         {p.price <= 0 ? (
-          <a href="tel:0988888888" className="mt-5 w-full font-bold py-2.5 rounded-xl transition text-center bg-[#0A2540] text-white hover:bg-[#0d2f54]">Gọi để kích hoạt</a>
+          <a href="tel:0988888888" className="mt-5 w-full font-bold py-2.5 rounded-xl transition text-center bg-[#0B4045] text-white hover:bg-[#0e5157]">Gọi để kích hoạt</a>
         ) : (
-        <button onClick={() => buy(p)} disabled={busy === p.id} className={`mt-5 w-full font-bold py-2.5 rounded-xl transition ${p.popular ? 'bg-[#0A2540] text-white hover:bg-[#0d2f54]' : 'bg-slate-100 text-[#0A2540] hover:bg-[#0A2540] hover:text-white'}`}>{busy === p.id ? 'Đang tạo…' : 'Mua ngay'}</button>
+        <button onClick={() => buy(p)} disabled={busy === p.id} className={`mt-5 w-full font-bold py-2.5 rounded-xl transition ${p.popular ? 'bg-[#0B4045] text-white hover:bg-[#0e5157]' : 'bg-slate-100 text-[#0B4045] hover:bg-[#0B4045] hover:text-white'}`}>{busy === p.id ? 'Đang tạo…' : 'Mua ngay'}</button>
         )}
       </div>
     );
@@ -105,17 +105,17 @@ export default function ServicesPage() {
     <div className="bg-slate-50 min-h-[calc(100dvh-56px)] grid place-items-center px-4 text-center">
       <div>
         <div className="text-5xl">🛠️</div>
-        <h1 className="text-2xl font-extrabold text-[#0A2540] mt-3">Dịch vụ sắp ra mắt</h1>
-        <p className="text-slate-500 mt-2 max-w-sm mx-auto text-sm">Bảng giá & gói dịch vụ đang được hoàn thiện. Cần hỗ trợ, vui lòng liên hệ admin <a href="tel:0988888888" className="text-[#0A2540] font-bold underline">0988 888 888</a>.</p>
+        <h1 className="text-2xl font-extrabold text-[#0B4045] mt-3">Dịch vụ sắp ra mắt</h1>
+        <p className="text-slate-500 mt-2 max-w-sm mx-auto text-sm">Bảng giá & gói dịch vụ đang được hoàn thiện. Cần hỗ trợ, vui lòng liên hệ admin <a href="tel:0988888888" className="text-[#0B4045] font-bold underline">0988 888 888</a>.</p>
       </div>
     </div>
   );
   return (
     <div className="bg-slate-50 min-h-[calc(100dvh-56px)]">
       {!flags.services_live && isAdmin && <div className="bg-amber-100 border-b border-amber-300 text-amber-800 text-sm font-semibold text-center py-2 px-4">⚠️ Trang đang ẩn với khách — bật “Dịch vụ” ở Quản trị để công khai.</div>}
-      <div className="bg-[#0A2540] text-white">
+      <div className="bg-[#0B4045] text-white">
         <div className="max-w-5xl mx-auto px-4 py-12 text-center">
-          <span className="inline-block bg-[#C8A14B] text-[#0A2540] text-xs font-extrabold px-3 py-1 rounded-full">⚡ ƯU ĐÃI RA MẮT</span>
+          <span className="inline-block bg-[#C8A14B] text-[#0B4045] text-xs font-extrabold px-3 py-1 rounded-full">⚡ ƯU ĐÃI RA MẮT</span>
           <h1 className="text-3xl md:text-4xl font-extrabold mt-3">Bảng giá dịch vụ</h1>
           <p className="mt-2 text-slate-300 max-w-xl mx-auto text-sm">Đăng nhiều tin hơn & đẩy tin lên hạng VIP. Thanh toán tự động, kích hoạt tức thì.</p>
           <div className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-xs text-slate-400">
@@ -134,17 +134,17 @@ export default function ServicesPage() {
           </div>
         )}
 
-        <h2 className="text-xl font-extrabold text-[#0A2540] mb-1">Gói đăng tin</h2>
+        <h2 className="text-xl font-extrabold text-[#0B4045] mb-1">Gói đăng tin</h2>
         <p className="text-sm text-slate-500 mb-5">Miễn phí 1 tin/tháng · mua gói để đăng thêm (đăng càng nhiều, giá mỗi tin càng rẻ).</p>
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5 mb-12 items-stretch">{postPkgs.map((p) => <Card key={p.id} p={p} />)}</div>
 
-        <h2 className="text-xl font-extrabold text-[#0A2540] mb-1">Gói đẩy tin VIP</h2>
+        <h2 className="text-xl font-extrabold text-[#0B4045] mb-1">Gói đẩy tin VIP</h2>
         <p className="text-sm text-slate-500 mb-5">Tin nổi bật trên đầu danh sách & bản đồ. Hạng cao được hệ thống tự làm nổi thường xuyên hơn.</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 items-stretch">{boostPkgs.map((p) => <Card key={p.id} p={p} />)}</div>
 
         {videoPkgs.length > 0 && (
           <>
-            <h2 className="text-xl font-extrabold text-[#0A2540] mb-1 mt-12">🎬 Gói Tạo video bản đồ</h2>
+            <h2 className="text-xl font-extrabold text-[#0B4045] mb-1 mt-12">🎬 Gói Tạo video bản đồ</h2>
             <p className="text-sm text-slate-500 mb-5">
               Biến mỗi mảnh đất thành một đoạn phim giới thiệu: khoanh lô, vẽ tuyến, bay camera trên ảnh vệ tinh rồi xuất MP4 1080p.
               {videoDays > 0 && <b className="text-emerald-600"> Gói của bạn còn {videoDays} ngày.</b>}
@@ -154,30 +154,30 @@ export default function ServicesPage() {
         )}
 
         <div className="mt-12 bg-white rounded-2xl border border-slate-200 p-6">
-          <h3 className="text-xl font-extrabold text-[#0A2540]">💳 Phương thức thanh toán</h3>
+          <h3 className="text-xl font-extrabold text-[#0B4045]">💳 Phương thức thanh toán</h3>
           <p className="text-slate-500 text-sm mt-1">Chuyển khoản ngân hàng qua mã VietQR — hệ thống <b>tự động kích hoạt gói</b> ngay khi nhận được tiền.</p>
           <div className="mt-4 grid md:grid-cols-2 gap-5 items-start">
             <div className="text-sm space-y-1.5 bg-slate-50 rounded-xl p-4 border border-slate-100">
-              <div className="flex justify-between"><span className="text-slate-500">Ngân hàng</span><b className="text-[#0A2540]">{bank.bankId}</b></div>
-              <div className="flex justify-between"><span className="text-slate-500">Số tài khoản</span><b className="text-[#0A2540]">{bank.account}</b></div>
-              <div className="flex justify-between"><span className="text-slate-500">Chủ tài khoản</span><b className="text-[#0A2540]">{bank.name}</b></div>
+              <div className="flex justify-between"><span className="text-slate-500">Ngân hàng</span><b className="text-[#0B4045]">{bank.bankId}</b></div>
+              <div className="flex justify-between"><span className="text-slate-500">Số tài khoản</span><b className="text-[#0B4045]">{bank.account}</b></div>
+              <div className="flex justify-between"><span className="text-slate-500">Chủ tài khoản</span><b className="text-[#0B4045]">{bank.name}</b></div>
               {bank.demo && <p className="text-[11px] text-amber-600 pt-1 border-t border-slate-200 mt-1">* Số TK đang ở chế độ thử nghiệm — liên hệ admin trước khi chuyển khoản.</p>}
             </div>
             <ol className="text-sm text-slate-600 space-y-2.5">
-              <li className="flex gap-2"><b className="text-[#0A2540] shrink-0">1.</b> Chọn gói bên trên rồi bấm <b>Chọn gói</b>.</li>
-              <li className="flex gap-2"><b className="text-[#0A2540] shrink-0">2.</b> Quét <b>mã VietQR</b> hiện ra, hoặc chuyển khoản đúng <b>số tiền + nội dung</b>.</li>
-              <li className="flex gap-2"><b className="text-[#0A2540] shrink-0">3.</b> Gói <b>tự kích hoạt</b> trong vài phút sau khi nhận tiền (hoặc admin xác nhận).</li>
+              <li className="flex gap-2"><b className="text-[#0B4045] shrink-0">1.</b> Chọn gói bên trên rồi bấm <b>Chọn gói</b>.</li>
+              <li className="flex gap-2"><b className="text-[#0B4045] shrink-0">2.</b> Quét <b>mã VietQR</b> hiện ra, hoặc chuyển khoản đúng <b>số tiền + nội dung</b>.</li>
+              <li className="flex gap-2"><b className="text-[#0B4045] shrink-0">3.</b> Gói <b>tự kích hoạt</b> trong vài phút sau khi nhận tiền (hoặc admin xác nhận).</li>
             </ol>
           </div>
         </div>
 
         <div className="mt-6 rounded-2xl bg-white border border-slate-200 p-6 md:flex items-center gap-6">
           <div className="flex-1">
-            <h3 className="text-xl font-extrabold text-[#0A2540]">🗺️ Quảng cáo logo trên bản đồ</h3>
+            <h3 className="text-xl font-extrabold text-[#0B4045]">🗺️ Quảng cáo logo trên bản đồ</h3>
             <p className="text-slate-500 mt-1.5 text-sm max-w-xl">Đặt logo doanh nghiệp / sales ngay trên bản đồ quy hoạch — độc quyền theo xã. Hiện <b>liên hệ trực tiếp admin</b> để tư vấn vị trí & gói.</p>
           </div>
           <div className="mt-4 md:mt-0 flex flex-col gap-2 shrink-0 w-full md:w-auto">
-            <a href="tel:0988888888" className="bg-[#0A2540] text-white font-bold px-6 py-2.5 rounded-xl text-center">📞 0988 888 888</a>
+            <a href="tel:0988888888" className="bg-[#0B4045] text-white font-bold px-6 py-2.5 rounded-xl text-center">📞 0988 888 888</a>
             <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="bg-[#0068FF] text-white font-bold px-6 py-2.5 rounded-xl text-center">Chat Zalo</a>
           </div>
         </div>
@@ -191,13 +191,13 @@ export default function ServicesPage() {
             {paid ? (
               <div className="text-center py-6">
                 <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 grid place-items-center mx-auto text-3xl font-bold">✓</div>
-                <p className="font-extrabold text-[#0A2540] mt-4 text-lg">Thanh toán thành công!</p>
+                <p className="font-extrabold text-[#0B4045] mt-4 text-lg">Thanh toán thành công!</p>
                 <p className="text-sm text-slate-500 mt-1">Gói <b>{order.package.name}</b> đã được kích hoạt.</p>
-                <button onClick={() => { setOrder(null); loadMine(); }} className="mt-5 bg-[#0A2540] text-white font-bold px-6 py-2.5 rounded-xl">Xong</button>
+                <button onClick={() => { setOrder(null); loadMine(); }} className="mt-5 bg-[#0B4045] text-white font-bold px-6 py-2.5 rounded-xl">Xong</button>
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-between mb-2"><b className="text-[#0A2540]">Thanh toán {order.package.name}</b><button onClick={() => setOrder(null)} className="text-slate-400 text-xl leading-none">✕</button></div>
+                <div className="flex items-center justify-between mb-2"><b className="text-[#0B4045]">Thanh toán {order.package.name}</b><button onClick={() => setOrder(null)} className="text-slate-400 text-xl leading-none">✕</button></div>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={qrUrl} alt="VietQR" className="w-full rounded-xl border border-slate-200" />
                 <div className="mt-3 text-sm space-y-1 bg-slate-50 rounded-xl p-3">

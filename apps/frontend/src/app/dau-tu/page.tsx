@@ -23,9 +23,9 @@ export default function DauTuPage() {
   return (
     <div className="bg-slate-50 min-h-[calc(100dvh-56px)]">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#0A2540] to-[#0d3a6b] text-white">
+      <div className="bg-gradient-to-br from-[#0B4045] to-[#10585e] text-white">
         <div className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-12">
-          <span className="inline-block bg-[#C8A14B] text-[#0A2540] font-extrabold text-xs px-3 py-1 rounded-full mb-3">CamInvest</span>
+          <span className="inline-block bg-[#C8A14B] text-[#0B4045] font-extrabold text-xs px-3 py-1 rounded-full mb-3">CamInvest</span>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight">Góp vốn đầu tư bất động sản cùng Cam Lâm Land</h1>
           <p className="text-sm sm:text-base text-white/85 mt-3 max-w-2xl">Hình thức uỷ thác đầu tư: nhà đầu tư góp vốn cùng Cam Lâm Land mua những bất động sản tiềm năng tại Cam Lâm – Khánh Hòa, được cam kết lợi nhuận theo thời gian góp vốn.</p>
         </div>
@@ -35,7 +35,7 @@ export default function DauTuPage() {
         {/* Nội dung */}
         <div className="lg:col-span-3 space-y-5">
           <div className="bg-white rounded-2xl border border-slate-200 p-5">
-            <h2 className="font-extrabold text-[#0A2540] text-lg mb-3">CamInvest hoạt động thế nào?</h2>
+            <h2 className="font-extrabold text-[#0B4045] text-lg mb-3">CamInvest hoạt động thế nào?</h2>
             <ul className="space-y-2 text-slate-700 text-sm">
               <li className="flex gap-2"><span className="text-[#C8A14B] font-bold">•</span><span><b>Cam kết trả lãi suất</b> cho nhà đầu tư theo thời gian góp vốn — kỳ hạn càng dài, lợi nhuận càng cao.</span></li>
               <li className="flex gap-2"><span className="text-[#C8A14B] font-bold">•</span><span><b>Gói đầu tư đa dạng</b>, từ <b>*</b> trở lên.</span></li>
@@ -44,7 +44,7 @@ export default function DauTuPage() {
           </div>
 
           <div className="bg-white rounded-2xl border border-slate-200 p-5">
-            <h3 className="font-extrabold text-[#0A2540] mb-1">Bảng ví dụ minh hoạ</h3>
+            <h3 className="font-extrabold text-[#0B4045] mb-1">Bảng ví dụ minh hoạ</h3>
             <p className="text-sm text-slate-500 mb-3">Gói đầu tư: <b>*</b></p>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -58,7 +58,7 @@ export default function DauTuPage() {
                 <tbody>
                   {TENURES.map((t) => (
                     <tr key={t} className="border-b border-slate-100 last:border-0">
-                      <td className="py-2.5 font-semibold text-[#0A2540]">{t}</td>
+                      <td className="py-2.5 font-semibold text-[#0B4045]">{t}</td>
                       <td className="py-2.5 text-right text-slate-400">*</td>
                       <td className="py-2.5 text-right text-slate-400">*</td>
                     </tr>
@@ -79,7 +79,7 @@ export default function DauTuPage() {
         {/* Form đăng ký */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-2xl border border-slate-200 p-5 lg:sticky lg:top-20">
-            <h2 className="font-extrabold text-[#0A2540] text-lg mb-1">Đăng ký nhận tư vấn</h2>
+            <h2 className="font-extrabold text-[#0B4045] text-lg mb-1">Đăng ký nhận tư vấn</h2>
             <p className="text-sm text-slate-500 mb-4">Để lại thông tin, đội ngũ Cam Lâm Land sẽ liên hệ tư vấn gói góp vốn phù hợp.</p>
             {done ? (
               <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl p-4 text-sm font-semibold text-center">
@@ -87,16 +87,16 @@ export default function DauTuPage() {
               </div>
             ) : (
               <form onSubmit={submit} className="space-y-3">
-                <input value={f.name} onChange={(e) => set('name', e.target.value)} required maxLength={80} placeholder="Họ và tên *" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]" />
-                <input value={f.phone} onChange={(e) => set('phone', e.target.value)} required type="tel" inputMode="tel" pattern="[0-9+ .()-]{8,15}" maxLength={20} placeholder="Số điện thoại *" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]" />
-                <input value={f.amount} onChange={(e) => set('amount', e.target.value)} placeholder="Số tiền dự kiến góp (tuỳ chọn)" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]" />
-                <select value={f.tenure} onChange={(e) => set('tenure', e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0A2540] text-slate-600">
+                <input value={f.name} onChange={(e) => set('name', e.target.value)} required maxLength={80} placeholder="Họ và tên *" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0B4045]" />
+                <input value={f.phone} onChange={(e) => set('phone', e.target.value)} required type="tel" inputMode="tel" pattern="[0-9+ .()-]{8,15}" maxLength={20} placeholder="Số điện thoại *" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0B4045]" />
+                <input value={f.amount} onChange={(e) => set('amount', e.target.value)} placeholder="Số tiền dự kiến góp (tuỳ chọn)" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0B4045]" />
+                <select value={f.tenure} onChange={(e) => set('tenure', e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0B4045] text-slate-600">
                   <option value="">Kỳ hạn quan tâm (tuỳ chọn)</option>
                   {TENURES.map((t) => <option key={t} value={t}>{t}</option>)}
                 </select>
-                <textarea value={f.note} onChange={(e) => set('note', e.target.value)} rows={3} placeholder="Ghi chú (tuỳ chọn)" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0A2540]" />
+                <textarea value={f.note} onChange={(e) => set('note', e.target.value)} rows={3} placeholder="Ghi chú (tuỳ chọn)" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#0B4045]" />
                 {err && <p className="text-sm text-red-600">{err}</p>}
-                <button disabled={busy} className="w-full bg-[#C8A14B] hover:bg-[#b8923f] disabled:opacity-60 text-[#0A2540] font-extrabold py-3 rounded-xl text-sm">{busy ? 'Đang gửi…' : 'Gửi đăng ký'}</button>
+                <button disabled={busy} className="w-full bg-[#C8A14B] hover:bg-[#b8923f] disabled:opacity-60 text-[#0B4045] font-extrabold py-3 rounded-xl text-sm">{busy ? 'Đang gửi…' : 'Gửi đăng ký'}</button>
                 <p className="text-[11px] text-slate-400 text-center">Thông tin của bạn được bảo mật, chỉ dùng để tư vấn.</p>
               </form>
             )}

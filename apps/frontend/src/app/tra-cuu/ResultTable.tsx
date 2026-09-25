@@ -33,7 +33,7 @@ function DocViewer({ url, onClose }: any) {
   return (
     <div className="fixed inset-0 z-[70] flex bg-black/70 p-2 sm:p-4" onClick={onClose}>
       <div className="mx-auto flex h-full w-full max-w-5xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center gap-2 bg-[#0A2540] px-3 py-2 text-white">
+        <div className="flex items-center gap-2 bg-[#0B4045] px-3 py-2 text-white">
           <span className="text-lg">🗂️</span><p className="min-w-0 flex-1 truncate text-sm font-semibold">Công văn · Kho lưu trữ Cam Lâm Land</p>
           <a href={href} target="_blank" rel="noopener noreferrer" className="rounded px-2 py-1 text-xs hover:bg-white/15">Mở tab mới ↗</a>
           <button onClick={onClose} className="rounded px-2 py-1 text-lg leading-none hover:bg-white/15">✕</button>
@@ -137,7 +137,7 @@ function RecordModal({ row, canManage, isAdmin, onEdit, onDel, onExpire, onClose
     <div className={`fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-3 ${embed ? 'pb-3' : 'pb-24'} sm:p-4 sm:pb-4`} onClick={onClose}>
       {danger && <style>{`@keyframes dangerPulse{0%,100%{border-color:#fca5a5;box-shadow:0 0 12px 3px rgba(220,38,38,.4)}50%{border-color:#dc2626;box-shadow:0 0 52px 16px rgba(220,38,38,.92)}}`}</style>}
       <div className={`flex max-h-full w-full max-w-3xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl ${danger ? 'border-2 border-red-500' : ''}`} style={danger ? { animation: 'dangerPulse 0.95s ease-in-out infinite' } : undefined} onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center gap-2 bg-[#0A2540] px-4 py-2.5 text-white">
+        <div className="flex items-center gap-2 bg-[#0B4045] px-4 py-2.5 text-white">
           <span className="text-lg">📄</span>
           <p className="font-semibold">Chi tiết bản ghi</p>
           <span className={`rounded px-2 py-0.5 text-[11px] font-bold ${chipCls[row.sev]}`}>{a ? (SEV_LABEL[row.sev] || 'Thường') : (row.badge || row.srcShort)}</span>
@@ -148,7 +148,7 @@ function RecordModal({ row, canManage, isAdmin, onEdit, onDel, onExpire, onClose
           {a ? <AddedForm a={a} /> : <GenericForm pairs={row.pairs} />}
           {row.link && (
             <div className="mt-3">
-              <p className="mb-1.5 text-sm font-semibold text-[#0A2540]">📎 Tệp / công văn đính kèm</p>
+              <p className="mb-1.5 text-sm font-semibold text-[#0B4045]">📎 Tệp / công văn đính kèm</p>
               <div className="flex items-center gap-2 rounded-lg border border-dashed border-slate-300 px-3 py-2 text-sm">
                 <span className="text-lg">📄</span><span className="min-w-0 flex-1 truncate text-slate-600">Công văn liên quan</span>
                 <button onClick={() => openDoc(row.link)} className="rounded bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700 hover:bg-sky-100">Xem tại đây</button>
@@ -158,13 +158,13 @@ function RecordModal({ row, canManage, isAdmin, onEdit, onDel, onExpire, onClose
         </div>
         <div className="flex flex-wrap items-center gap-2 border-t bg-slate-50 px-4 py-2.5">
           {a && canManage && <>
-            <button onClick={() => { onEdit(a); onClose(); }} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-[#0A2540] hover:bg-slate-50">✎ Sửa</button>
+            <button onClick={() => { onEdit(a); onClose(); }} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-[#0B4045] hover:bg-slate-50">✎ Sửa</button>
             {a.hetHieuLucAt
               ? <button onClick={() => { onExpire(a.id, true); onClose(); }} className="rounded-lg border border-emerald-200 bg-white px-3 py-1.5 text-sm font-medium text-emerald-700 hover:bg-emerald-50">↺ Khôi phục hiệu lực</button>
               : <button onClick={() => { onExpire(a.id, false); onClose(); }} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100">⊘ Đánh dấu hết hiệu lực</button>}
             {isAdmin && <button onClick={() => { onDel(a.id); onClose(); }} className="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50">🗑 Xoá</button>}
           </>}
-          <button onClick={onClose} className="ml-auto rounded-lg bg-[#0A2540] px-5 py-1.5 text-sm font-bold text-white">Đóng</button>
+          <button onClick={onClose} className="ml-auto rounded-lg bg-[#0B4045] px-5 py-1.5 text-sm font-bold text-white">Đóng</button>
         </div>
       </div>
     </div>
@@ -179,7 +179,7 @@ function ResultCard({ row, onOpen, openDoc }: any) {
       <div className="flex items-start gap-2">
         <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${exp ? 'bg-slate-400 text-white' : chipCls[row.sev]}`}>{row.srcShort}</span>
         <div className="min-w-0 flex-1">
-          <p className={`font-semibold leading-snug ${exp ? 'text-slate-400' : 'text-[#0A2540]'}`} style={{ whiteSpace: 'pre-line' }}>{row.ten || <span className="text-slate-300">(chưa có tên)</span>}</p>
+          <p className={`font-semibold leading-snug ${exp ? 'text-slate-400' : 'text-[#0B4045]'}`} style={{ whiteSpace: 'pre-line' }}>{row.ten || <span className="text-slate-300">(chưa có tên)</span>}</p>
           <p className={`mt-0.5 text-xs ${exp ? 'text-slate-400' : 'text-slate-500'}`}>{[th && 'Thửa ' + th, to && 'tờ ' + to, row.xa].filter(Boolean).join(' · ') || '—'}</p>
         </div>
         <span className={`shrink-0 text-lg leading-none ${exp ? 'text-slate-300' : 'text-[#C8A14B]'}`}>›</span>
@@ -218,8 +218,8 @@ export function ResultTable({ shownRows, total, limit, openKey, setOpenKey, canM
               return (
                 <tr key={row.key} className={`cursor-pointer align-top ${zebra}`} onClick={() => setOpenKey(row.key)}>
                   <td className="px-2 py-2"><span className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${exp ? 'bg-slate-400 text-white' : chipCls[row.sev]}`}>{row.srcShort}</span>{exp ? <div className="mt-0.5 text-[10px] font-bold text-slate-500">HẾT HIỆU LỰC</div> : <>{row.badge && row.sev === 'red' && <div className="mt-0.5 text-[10px] font-bold text-red-600">⚠ {row.badge}</div>}{row.added && <div className="mt-0.5 text-[10px] font-bold text-emerald-600">● Mới thêm</div>}</>}</td>
-                  <td className={`px-2 py-2 font-semibold ${exp ? 'text-slate-400' : 'text-[#0A2540]'}`} style={{ whiteSpace: 'pre-line' }}>{row.ten || <span className="text-slate-300">—</span>}</td>
-                  <td className={`px-2 py-2 font-bold ${exp ? 'text-slate-400' : 'text-[#0A2540]'}`} style={{ whiteSpace: 'pre-line' }}>{row.thua}</td>
+                  <td className={`px-2 py-2 font-semibold ${exp ? 'text-slate-400' : 'text-[#0B4045]'}`} style={{ whiteSpace: 'pre-line' }}>{row.ten || <span className="text-slate-300">—</span>}</td>
+                  <td className={`px-2 py-2 font-bold ${exp ? 'text-slate-400' : 'text-[#0B4045]'}`} style={{ whiteSpace: 'pre-line' }}>{row.thua}</td>
                   <td className="px-2 py-2" style={{ whiteSpace: 'pre-line' }}>{row.to}</td>
                   <td className="px-2 py-2">{row.xa}</td>
                   <td className={`px-2 py-2 ${exp ? 'text-slate-400' : 'text-slate-600'}`}><div className="line-clamp-2" style={{ whiteSpace: 'pre-line' }}>{row.detail ? <Linkify text={row.detail} /> : <span className="text-slate-300">—</span>}</div>{exp && <div className="mt-0.5 text-[11px] text-slate-400">Hết hiệu lực {new Date(row.expiredAt).toLocaleDateString('vi-VN')}{row.expiredBy ? ' · ' + row.expiredBy : ''}</div>}{row.link && <button onClick={(e) => { e.stopPropagation(); openDoc(row.link); }} className="text-xs font-medium text-sky-600 underline">📎 Công văn đính kèm</button>}</td>

@@ -30,8 +30,8 @@ export default function Admin() {
   if (!user) return null;
   if (!coVaiTro(user, 'admin', 'gis')) return (
     <div className="mx-auto max-w-md px-4 py-20 text-center">
-      <p className="text-xl font-bold text-[#0A2540]">Không có quyền truy cập</p>
-      <p className="text-slate-500 mt-2 text-sm">Trang này chỉ dành cho admin / biên tập bản đồ. <Link href="/" target="_top" className="text-[#0A2540] font-semibold underline">Về trang chủ</Link></p>
+      <p className="text-xl font-bold text-[#0B4045]">Không có quyền truy cập</p>
+      <p className="text-slate-500 mt-2 text-sm">Trang này chỉ dành cho admin / biên tập bản đồ. <Link href="/" target="_top" className="text-[#0B4045] font-semibold underline">Về trang chủ</Link></p>
     </div>
   );
   const isGis = coVaiTro(user, 'gis') && !laAdmin(user);   // chỉ có mỗi vai trò GIS → rút gọn màn hình
@@ -39,12 +39,12 @@ export default function Admin() {
   return (
     <div className={`mx-auto max-w-6xl px-4 ${embedded ? 'py-4' : 'py-6'}`}>
       {!embedded && <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-extrabold text-[#0A2540]">{isGis ? 'Quản lý bản đồ GIS' : 'Bảng điều khiển quản trị'}</h1>
+        <h1 className="text-2xl font-extrabold text-[#0B4045]">{isGis ? 'Quản lý bản đồ GIS' : 'Bảng điều khiển quản trị'}</h1>
         <button onClick={() => { logout(); router.replace('/login'); }} className="text-sm text-slate-500 hover:text-slate-800">Đăng xuất</button>
       </div>}
       {!embedded && <div className="flex gap-1 border-b mb-5 overflow-x-auto">
         {shownTabs.map(([t, l]) => (
-          <button key={t} onClick={() => setTab(t)} className={`px-4 py-2 text-sm font-semibold border-b-2 whitespace-nowrap ${tab === t ? 'border-[#C8A14B] text-[#0A2540]' : 'border-transparent text-slate-500'}`}>{l}</button>
+          <button key={t} onClick={() => setTab(t)} className={`px-4 py-2 text-sm font-semibold border-b-2 whitespace-nowrap ${tab === t ? 'border-[#C8A14B] text-[#0B4045]' : 'border-transparent text-slate-500'}`}>{l}</button>
         ))}
       </div>}
       {tab === 'overview' && !isGis && <Overview />}
@@ -76,15 +76,15 @@ function AdsManager() {
 
       <div className="bg-white rounded-2xl border border-slate-200 p-4 flex items-center justify-between gap-4">
         <div>
-          <p className="font-bold text-[#0A2540]">🗺️ Quảng cáo trên bản đồ</p>
+          <p className="font-bold text-[#0B4045]">🗺️ Quảng cáo trên bản đồ</p>
           <p className="text-sm text-slate-500 mt-0.5">Logo ghim điểm / chữ mờ trên bản đồ quy hoạch — đang chạy <b>{mapCount ?? '…'}</b> quảng cáo.</p>
         </div>
-        <Link href="/map-ads" className="shrink-0 bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-4 py-2 rounded-xl text-sm whitespace-nowrap">Quản lý →</Link>
+        <Link href="/map-ads" className="shrink-0 bg-[#0B4045] hover:bg-[#0e5157] text-white font-bold px-4 py-2 rounded-xl text-sm whitespace-nowrap">Quản lý →</Link>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 p-4">
         <div className="flex items-center justify-between">
-          <p className="font-bold text-[#0A2540]">📢 Banner trang Tin tức (2 bên)</p>
+          <p className="font-bold text-[#0B4045]">📢 Banner trang Tin tức (2 bên)</p>
           <button onClick={() => setAd((a: any) => ({ ...a, enabled: a.enabled === false }))} aria-label="Bật/tắt" className={`w-12 h-7 rounded-full relative transition ${on ? 'bg-emerald-500' : 'bg-slate-300'}`}><span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-all ${on ? 'left-6' : 'left-1'}`} /></button>
         </div>
         <p className="text-xs text-slate-500 mt-1">Banner dọc cao như batdongsan. Nhập nhiều ảnh (mỗi dòng 1 URL) để chạy động (slideshow + zoom). Ảnh đứng, vd 600×1400.</p>
@@ -95,7 +95,7 @@ function AdsManager() {
             <input value={ad.title || ''} onChange={(e) => setF('title', e.target.value)} placeholder="Tiêu đề" className={inp} />
             <input value={ad.sub || ''} onChange={(e) => setF('sub', e.target.value)} placeholder="Mô tả ngắn" className={inp} />
             <input value={ad.cta || ''} onChange={(e) => setF('cta', e.target.value)} placeholder="Chữ nút" className={inp} />
-            <div className="flex items-center gap-3"><button onClick={save} className="bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-4 py-2 rounded-xl text-sm">Lưu</button>{adMsg && <span className="text-xs font-medium text-slate-600">{adMsg}</span>}</div>
+            <div className="flex items-center gap-3"><button onClick={save} className="bg-[#0B4045] hover:bg-[#0e5157] text-white font-bold px-4 py-2 rounded-xl text-sm">Lưu</button>{adMsg && <span className="text-xs font-medium text-slate-600">{adMsg}</span>}</div>
           </div>
           <div>
             <p className="text-[11px] text-slate-400 mb-1.5 text-center">Xem trước</p>
@@ -107,14 +107,14 @@ function AdsManager() {
                   <div className="absolute inset-x-0 bottom-0 p-2 pt-8 bg-gradient-to-t from-black/85 to-transparent text-white text-center">
                     <p className="font-extrabold text-xs leading-tight">{ad.title}</p>
                     {ad.sub && <p className="text-[10px] text-white/90 mt-0.5">{ad.sub}</p>}
-                    <span className="mt-1.5 block bg-[#C8A14B] text-[#0A2540] text-[11px] font-bold py-1 rounded">{ad.cta || 'Xem'} →</span>
+                    <span className="mt-1.5 block bg-[#C8A14B] text-[#0B4045] text-[11px] font-bold py-1 rounded">{ad.cta || 'Xem'} →</span>
                   </div>
                 </>
               ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0A2540] to-[#10355f] text-white p-2 flex flex-col justify-center text-center">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0B4045] to-[#10355f] text-white p-2 flex flex-col justify-center text-center">
                   <p className="font-extrabold text-sm">{ad.title}</p>
                   {ad.sub && <p className="text-[10px] text-white/80 mt-1">{ad.sub}</p>}
-                  <span className="mt-2 inline-block bg-[#C8A14B] text-[#0A2540] text-[11px] font-bold px-2 py-1 rounded">{ad.cta || 'Xem'} →</span>
+                  <span className="mt-2 inline-block bg-[#C8A14B] text-[#0B4045] text-[11px] font-bold px-2 py-1 rounded">{ad.cta || 'Xem'} →</span>
                 </div>
               )}
             </div>
@@ -123,7 +123,7 @@ function AdsManager() {
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 p-4">
-        <p className="font-bold text-[#0A2540]">📣 Banner liên hệ quảng cáo (trang chủ)</p>
+        <p className="font-bold text-[#0B4045]">📣 Banner liên hệ quảng cáo (trang chủ)</p>
         <p className="text-sm text-slate-500 mt-0.5">Hiện ở cuối trang chủ khi <b>Dịch vụ</b> đang bật. Bật/tắt ở tab <b>Cấu hình</b>.</p>
       </div>
     </div>
@@ -148,7 +148,7 @@ function Config() {
       {ITEMS.map(([key, title, desc]) => (
         <div key={key} className="bg-white rounded-2xl border border-slate-200 p-4 flex items-start justify-between gap-4">
           <div>
-            <p className="font-bold text-[#0A2540]">{title}</p>
+            <p className="font-bold text-[#0B4045]">{title}</p>
             <p className="text-sm text-slate-500 mt-0.5">{desc}</p>
           </div>
           <button onClick={() => toggle(key, !flags[key])} disabled={busy === key} aria-label="Bật/tắt"
@@ -158,7 +158,7 @@ function Config() {
         </div>
       ))}
       <div className="bg-white rounded-2xl border border-slate-200 p-4">
-        <p className="font-bold text-[#0A2540]">📰 Tin tức thị trường (trang chủ)</p>
+        <p className="font-bold text-[#0B4045]">📰 Tin tức thị trường (trang chủ)</p>
         <p className="text-sm text-slate-500 mt-0.5">Tự lấy bài BĐS từ nguồn uy tín (VnExpress, CafeF, Báo Xây dựng) và hiển thị ở tab “Thị trường BĐS” — chạy sẵn trong web, không cần thao tác.</p>
       </div>
       <p className="text-xs text-slate-400">{flags.services_live ? '🟢 Dịch vụ đang công khai với khách.' : '🔒 Dịch vụ đang ẩn — chỉ admin xem được.'}</p>
@@ -166,10 +166,10 @@ function Config() {
   );
 }
 function Stat({ label, value, sub }: { label: string; value: any; sub?: string }) {
-  return <div className="bg-white rounded-2xl border border-slate-200 p-4"><p className="text-2xl md:text-3xl font-extrabold text-[#0A2540]">{value}</p><p className="text-sm text-slate-500">{label}</p>{sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}</div>;
+  return <div className="bg-white rounded-2xl border border-slate-200 p-4"><p className="text-2xl md:text-3xl font-extrabold text-[#0B4045]">{value}</p><p className="text-sm text-slate-500">{label}</p>{sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}</div>;
 }
 function Row({ k, v }: { k: string; v: number }) {
-  return <div className="flex justify-between text-sm py-1 border-b border-slate-50"><span className="text-slate-600">{k}</span><b className="text-[#0A2540]">{v}</b></div>;
+  return <div className="flex justify-between text-sm py-1 border-b border-slate-50"><span className="text-slate-600">{k}</span><b className="text-[#0B4045]">{v}</b></div>;
 }
 const OCR_LABELS: Record<string, string> = { gemini: 'Gemini AI', groq: 'Groq (Llama 4)', openrouter: 'OpenRouter', ocrspace: 'OCR.space', self: 'Máy nội bộ', tesseract: 'Tesseract (máy chủ)' };
 const OCR_LIMITS: Record<string, string> = { gemini: 'nhiều model', groq: '14.400 / ngày', openrouter: '~200 / ngày', ocrspace: '500 / ngày', self: 'không giới hạn', tesseract: 'không giới hạn' };
@@ -181,14 +181,14 @@ function OcrUsage() {
   const dmy = (s: string) => (s ? s.split('-').reverse().join('/') : '');
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-4">
-      <h3 className="font-bold text-[#0A2540] mb-1">📊 Lượt đọc toạ độ (OCR) hôm nay · {dmy(d.ymd)}</h3>
+      <h3 className="font-bold text-[#0B4045] mb-1">📊 Lượt đọc toạ độ (OCR) hôm nay · {dmy(d.ymd)}</h3>
       <p className="text-xs text-slate-400 mb-3">Reset mỗi ngày (giờ VN). Theo dõi để không vượt hạn miễn phí của từng nguồn.</p>
       <table className="w-full text-sm">
         <thead className="text-left text-slate-500"><tr><th className="py-1">Nguồn AI</th><th className="py-1 text-right">Đã dùng</th><th className="py-1 text-right">Giới hạn free/ngày</th></tr></thead>
         <tbody>
           {['gemini', 'groq', 'openrouter', 'ocrspace', 'self', 'tesseract'].map((eng) => {
             const c = today.find((r) => r.engine === eng)?.count ?? 0;
-            return <tr key={eng} className="border-t border-slate-50"><td className="py-1.5 text-slate-600">{OCR_LABELS[eng]}</td><td className="py-1.5 text-right font-bold text-[#0A2540]">{c}</td><td className="py-1.5 text-right text-slate-400 text-xs">{OCR_LIMITS[eng]}</td></tr>;
+            return <tr key={eng} className="border-t border-slate-50"><td className="py-1.5 text-slate-600">{OCR_LABELS[eng]}</td><td className="py-1.5 text-right font-bold text-[#0B4045]">{c}</td><td className="py-1.5 text-right text-slate-400 text-xs">{OCR_LIMITS[eng]}</td></tr>;
           })}
         </tbody>
       </table>
@@ -196,7 +196,7 @@ function OcrUsage() {
         <div className="mt-3 pt-3 border-t border-slate-100">
           <p className="text-xs font-semibold text-slate-500 mb-1.5">7 ngày gần đây (tổng/ngày)</p>
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600">
-            {d.last7.map((r: any) => <span key={r.ymd}>{dmy(String(r.ymd).slice(5))}: <b className="text-[#0A2540]">{r.total}</b></span>)}
+            {d.last7.map((r: any) => <span key={r.ymd}>{dmy(String(r.ymd).slice(5))}: <b className="text-[#0B4045]">{r.total}</b></span>)}
           </div>
         </div>
       )}
@@ -215,7 +215,7 @@ function Overview() {
   );
   return (
     <div className="space-y-5">
-      <Link href="/admin/traffic" className="flex items-center justify-between bg-gradient-to-r from-[#0A2540] to-[#16324f] text-white rounded-2xl p-4 hover:opacity-95">
+      <Link href="/admin/traffic" className="flex items-center justify-between bg-gradient-to-r from-[#0B4045] to-[#16324f] text-white rounded-2xl p-4 hover:opacity-95">
         <div>
           <p className="font-bold text-lg">📊 Lượt truy cập web</p>
           <p className="text-white/70 text-sm">Chi tiết: đang xem, theo ngày, top trang, nguồn truy cập</p>
@@ -230,8 +230,8 @@ function Overview() {
         <Stat label="Ảnh trong CSDL" value={s.images.total} sub={`${(Number(s.images.bytes) / 1048576).toFixed(1)} MB`} />
       </div>
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-2xl border border-slate-200 p-4"><h3 className="font-bold text-[#0A2540] mb-2">Tin theo loại hình</h3>{s.byType.map((r: any) => <Row key={r.type} k={PROPERTY_LABELS[r.type as keyof typeof PROPERTY_LABELS] || r.type} v={r.n} />)}</div>
-        <div className="bg-white rounded-2xl border border-slate-200 p-4"><h3 className="font-bold text-[#0A2540] mb-2">Tin theo xã</h3>{s.byWard.map((r: any) => <Row key={r.ward} k={r.ward} v={r.n} />)}</div>
+        <div className="bg-white rounded-2xl border border-slate-200 p-4"><h3 className="font-bold text-[#0B4045] mb-2">Tin theo loại hình</h3>{s.byType.map((r: any) => <Row key={r.type} k={PROPERTY_LABELS[r.type as keyof typeof PROPERTY_LABELS] || r.type} v={r.n} />)}</div>
+        <div className="bg-white rounded-2xl border border-slate-200 p-4"><h3 className="font-bold text-[#0B4045] mb-2">Tin theo xã</h3>{s.byWard.map((r: any) => <Row key={r.ward} k={r.ward} v={r.n} />)}</div>
       </div>
       <OcrUsage />
     </div>
@@ -254,14 +254,14 @@ function DemoData() {
     catch (e: any) { setMsg('Lỗi: ' + e.message); } finally { setBusy(''); }
   }
   return (
-    <div className="bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white rounded-2xl p-4">
+    <div className="bg-gradient-to-r from-[#0B4045] to-[#10355f] text-white rounded-2xl p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="font-bold">🧪 Dữ liệu mẫu để kiểm thử</p>
           <p className="text-sm text-white/70 mt-0.5">Tạo nhanh 347 tin (179 bán + 168 thuê, giá sát thị trường, đủ loại + VIP, 80% ở xã ven biển/trung tâm) + 168 chat cộng đồng (~10 người) + nhiều luồng hỗ trợ/tư vấn + khách gửi bán + đăng ký đầu tư. Xoá sạch khi test xong.</p>
         </div>
         <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-          <button onClick={seed} disabled={!!busy} className="flex-1 sm:flex-none whitespace-nowrap bg-[#C8A14B] hover:bg-[#b8923f] disabled:opacity-60 text-[#0A2540] font-bold px-4 py-2 rounded-xl">{busy === 'seed' ? 'Đang tạo…' : '＋ Tạo 347 tin mẫu'}</button>
+          <button onClick={seed} disabled={!!busy} className="flex-1 sm:flex-none whitespace-nowrap bg-[#C8A14B] hover:bg-[#b8923f] disabled:opacity-60 text-[#0B4045] font-bold px-4 py-2 rounded-xl">{busy === 'seed' ? 'Đang tạo…' : '＋ Tạo 347 tin mẫu'}</button>
           <button onClick={clearAll} disabled={!!busy} className="flex-1 sm:flex-none whitespace-nowrap bg-white/10 hover:bg-white/20 disabled:opacity-60 border border-white/30 text-white font-bold px-4 py-2 rounded-xl">{busy === 'clear' ? 'Đang xoá…' : 'Xoá dữ liệu mẫu'}</button>
         </div>
       </div>
@@ -317,8 +317,8 @@ function OVaiTro({ u, luu }: { u: any; luu: (roles: string[]) => void }) {
         className="w-full flex items-center justify-between gap-2 border border-slate-300 rounded-lg px-2 py-1 text-xs bg-white hover:border-slate-400">
         <span className="truncate">
           {daChon.length === 0 ? <span className="text-slate-400">Khách thường</span>
-            : daChon.length === 1 ? <span className="font-semibold text-[#0A2540]">{daChon[0][1]} {daChon[0][2].split(' — ')[0]}</span>
-            : <span className="font-semibold text-[#0A2540]">{daChon.map(([, i]) => i).join(' ')} {daChon.length} vai trò</span>}
+            : daChon.length === 1 ? <span className="font-semibold text-[#0B4045]">{daChon[0][1]} {daChon[0][2].split(' — ')[0]}</span>
+            : <span className="font-semibold text-[#0B4045]">{daChon.map(([, i]) => i).join(' ')} {daChon.length} vai trò</span>}
         </span>
         <span className="text-slate-400 text-[10px]">▾</span>
       </button>
@@ -328,12 +328,12 @@ function OVaiTro({ u, luu }: { u: any; luu: (roles: string[]) => void }) {
             const on = dang.includes(v);
             return (
               <button key={v} onClick={() => bat(v)}
-                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-left transition ${on ? 'bg-[#0A2540]/5' : 'hover:bg-slate-50'}`}>
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-left transition ${on ? 'bg-[#0B4045]/5' : 'hover:bg-slate-50'}`}>
                 <span className={`w-4 h-4 shrink-0 rounded border flex items-center justify-center text-[10px] font-bold ${on
-                  ? (v === 'admin' ? 'bg-[#C8A14B] border-[#C8A14B] text-white' : 'bg-[#0A2540] border-[#0A2540] text-white')
+                  ? (v === 'admin' ? 'bg-[#C8A14B] border-[#C8A14B] text-white' : 'bg-[#0B4045] border-[#0B4045] text-white')
                   : 'border-slate-300 text-transparent'}`}>✓</span>
                 <span>{icon}</span>
-                <span className={on ? 'font-semibold text-[#0A2540]' : 'text-slate-600'}>{ten}</span>
+                <span className={on ? 'font-semibold text-[#0B4045]' : 'text-slate-600'}>{ten}</span>
               </button>
             );
           })}
@@ -359,7 +359,7 @@ function OVaiTro({ u, luu }: { u: any; luu: (roles: string[]) => void }) {
         <tbody>
           {rows.map((u) => (
             <tr key={u.id} className="border-t">
-              <td className="p-2"><div className="font-semibold text-[#0A2540]">{u.fullName || u.email}</div><div className="text-xs text-slate-400">{u.email} · {u.phone || '—'}</div></td>
+              <td className="p-2"><div className="font-semibold text-[#0B4045]">{u.fullName || u.email}</div><div className="text-xs text-slate-400">{u.email} · {u.phone || '—'}</div></td>
               <td className="p-2"><OVaiTro u={u} luu={(roles) => upd(u.id, { roles })} /></td>
               <td className="p-2"><select value={u.tier} onChange={(e) => upd(u.id, { tier: e.target.value })} className={sel}><option value="free">Free</option><option value="paid">Trả phí</option></select></td>
               <td className="p-2"><select value={u.status} onChange={(e) => { const status = e.target.value; if (status === 'suspended' && !confirm(`Khoá tài khoản ${u.email}? Người dùng sẽ không đăng nhập được.`)) return; upd(u.id, { status }); }} className={sel}><option value="active">Hoạt động</option><option value="suspended">Khoá</option></select></td>
@@ -367,7 +367,7 @@ function OVaiTro({ u, luu }: { u: any; luu: (roles: string[]) => void }) {
               <td className="p-2"><button onClick={() => upd(u.id, { isAdvisor: !u.isAdvisor })} className={`px-2.5 py-1 rounded-full text-xs font-bold ${u.isAdvisor ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'}`} title="Cho phép tài khoản này trả lời kênh Tư vấn đầu tư">{u.isAdvisor ? '✓ Tư vấn' : 'Tắt'}</button> <select value={String(u.rating ?? 0)} onChange={(e) => upd(u.id, { rating: Number(e.target.value) })} title="Chấm sao môi giới (Cam Lâm Land)" className={sel}><option value="0">☆ chưa</option><option value="3">★★★</option><option value="3.5">★★★½</option><option value="4">★★★★</option><option value="4.5">★★★★½</option><option value="5">★★★★★</option></select></td>
             </tr>
           ))}
-          {loading ? <tr><td colSpan={6} className="p-6 text-center text-slate-400"><span className="inline-block w-5 h-5 border-2 border-slate-200 border-t-[#0A2540] rounded-full animate-spin align-[-3px]" /> Đang tải…</td></tr> : rows.length === 0 ? <tr><td colSpan={6} className="p-4 text-slate-500">Không tìm thấy người dùng.</td></tr> : null}
+          {loading ? <tr><td colSpan={6} className="p-6 text-center text-slate-400"><span className="inline-block w-5 h-5 border-2 border-slate-200 border-t-[#0B4045] rounded-full animate-spin align-[-3px]" /> Đang tải…</td></tr> : rows.length === 0 ? <tr><td colSpan={6} className="p-4 text-slate-500">Không tìm thấy người dùng.</td></tr> : null}
         </tbody>
       </table>
       </div>
@@ -394,13 +394,13 @@ function ListingsAdmin() {
         <tbody>
           {rows.map((l) => (
             <tr key={l.id} className="border-t">
-              <td className="p-2"><div className="font-semibold text-[#0A2540] truncate max-w-[280px]">{l.title}</div><div className="text-xs text-slate-400">{formatVnd(l.price)} · {l.ward || 'Cam Lâm'}</div></td>
+              <td className="p-2"><div className="font-semibold text-[#0B4045] truncate max-w-[280px]">{l.title}</div><div className="text-xs text-slate-400">{formatVnd(l.price)} · {l.ward || 'Cam Lâm'}</div></td>
               <td className="p-2"><select value={l.status} onChange={(e) => patch(l.id, { status: e.target.value })} className="border border-slate-300 rounded px-1.5 py-1 text-xs"><option value="active">Hiển thị</option><option value="pending">Chờ duyệt</option><option value="hidden">Ẩn</option><option value="sold">Đã bán</option></select></td>
-              <td className="p-2 whitespace-nowrap"><select value={l.tier || 'normal'} onChange={(e) => patch(l.id, { tier: e.target.value })} className="border border-slate-300 rounded px-1.5 py-1 text-xs"><option value="normal">Thường</option><option value="silver">VIP Bạc</option><option value="gold">VIP Vàng</option><option value="diamond">VIP Kim cương</option></select><button onClick={() => patch(l.id, { bump: true })} title="Đẩy lên đầu" className="ml-1.5 text-xs font-bold px-2 py-1 rounded bg-[#0A2540] text-white hover:bg-[#0d2f54]">↑ Đẩy</button></td>
-              <td className="p-2 text-right whitespace-nowrap"><button onClick={() => patch(l.id, { verified: !l.verified })} title="Xác thực bởi Cam Lâm Land" className={`text-xs font-bold px-2 py-1 rounded mr-2 ${l.verified ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}>{l.verified ? '✔ Đã XT' : 'Xác thực'}</button><Link href={`/listings/${l.id}`} className="text-xs text-[#0A2540] font-semibold mr-3">Xem</Link><button onClick={() => del(l.id)} className="text-xs text-red-600 font-semibold">Xoá</button></td>
+              <td className="p-2 whitespace-nowrap"><select value={l.tier || 'normal'} onChange={(e) => patch(l.id, { tier: e.target.value })} className="border border-slate-300 rounded px-1.5 py-1 text-xs"><option value="normal">Thường</option><option value="silver">VIP Bạc</option><option value="gold">VIP Vàng</option><option value="diamond">VIP Kim cương</option></select><button onClick={() => patch(l.id, { bump: true })} title="Đẩy lên đầu" className="ml-1.5 text-xs font-bold px-2 py-1 rounded bg-[#0B4045] text-white hover:bg-[#0e5157]">↑ Đẩy</button></td>
+              <td className="p-2 text-right whitespace-nowrap"><button onClick={() => patch(l.id, { verified: !l.verified })} title="Xác thực bởi Cam Lâm Land" className={`text-xs font-bold px-2 py-1 rounded mr-2 ${l.verified ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}>{l.verified ? '✔ Đã XT' : 'Xác thực'}</button><Link href={`/listings/${l.id}`} className="text-xs text-[#0B4045] font-semibold mr-3">Xem</Link><button onClick={() => del(l.id)} className="text-xs text-red-600 font-semibold">Xoá</button></td>
             </tr>
           ))}
-          {loading ? <tr><td colSpan={4} className="p-6 text-center text-slate-400"><span className="inline-block w-5 h-5 border-2 border-slate-200 border-t-[#0A2540] rounded-full animate-spin align-[-3px]" /> Đang tải…</td></tr> : rows.length === 0 ? <tr><td colSpan={4} className="p-4 text-slate-500">Chưa có tin nào.</td></tr> : null}
+          {loading ? <tr><td colSpan={4} className="p-6 text-center text-slate-400"><span className="inline-block w-5 h-5 border-2 border-slate-200 border-t-[#0B4045] rounded-full animate-spin align-[-3px]" /> Đang tải…</td></tr> : rows.length === 0 ? <tr><td colSpan={4} className="p-4 text-slate-500">Chưa có tin nào.</td></tr> : null}
         </tbody>
       </table>
     </div>
@@ -418,14 +418,14 @@ function UploadGis() {
   }
   return (
     <div className="max-w-lg bg-white border border-slate-200 rounded-xl p-5">
-      <h2 className="font-bold text-[#0A2540] mb-3">Tải lên dữ liệu bản đồ</h2>
+      <h2 className="font-bold text-[#0B4045] mb-3">Tải lên dữ liệu bản đồ</h2>
       <p className="text-sm text-slate-500 mb-3">Nạp trực tiếp <b>.geojson</b>, <b>Shapefile nén .zip</b> hoặc <b>DGN</b> — toạ độ <b>VN-2000/WGS84</b> đều được (tự quy đổi). DGN <b>V8 tự đổi qua mạng</b>; file DGN được xử lý nền, xem tiến độ ở danh sách import.</p>
       <input type="file" accept=".dgn,.shp,.zip,.geojson,.json" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="mb-3 block w-full text-sm" />
       <input className="border border-slate-300 rounded-md px-3 py-2 w-full mb-2 text-sm" placeholder="Tên lớp (vd: Quy hoạch 2030)" value={name} onChange={(e) => setName(e.target.value)} />
       <select className="border border-slate-300 rounded-md px-3 py-2 w-full mb-3 text-sm" value={layerType} onChange={(e) => setLayerType(e.target.value)}>
         <option value="parcel">Thửa đất</option><option value="zoning">Quy hoạch</option><option value="admin">Ranh giới hành chính</option><option value="road">Giao thông</option><option value="custom">Khác</option>
       </select>
-      <button onClick={submit} className="bg-[#0A2540] hover:bg-[#0d2f54] text-white px-4 py-2 rounded-md text-sm font-semibold">Tải lên & xử lý</button>
+      <button onClick={submit} className="bg-[#0B4045] hover:bg-[#0e5157] text-white px-4 py-2 rounded-md text-sm font-semibold">Tải lên & xử lý</button>
       {msg && <p className="text-sm mt-3">{msg}</p>}
     </div>
   );
@@ -476,12 +476,12 @@ function Payments() {
           {rows.map((p) => (
             <tr key={p.id} className="border-t">
               <td className="p-2">{p.id}</td>
-              <td className="p-2"><div className="font-semibold text-[#0A2540]">{p.userName}</div><div className="text-xs text-slate-400">{p.email}</div></td>
+              <td className="p-2"><div className="font-semibold text-[#0B4045]">{p.userName}</div><div className="text-xs text-slate-400">{p.email}</div></td>
               <td className="p-2 uppercase">{p.packageId}</td>
               <td className="p-2 font-bold text-red-600">{fmt(p.amount)}</td>
               <td className="p-2 font-mono text-xs">{p.note}</td>
               <td className={`p-2 font-semibold ${p.status === 'paid' ? 'text-emerald-700' : 'text-amber-600'}`}>{p.status === 'paid' ? 'Đã thanh toán' : 'Chờ thanh toán'}</td>
-              <td className="p-2 text-right">{p.status !== 'paid' && <button onClick={() => confirm(p.id)} className="text-xs font-bold text-white bg-[#0A2540] hover:bg-[#0d2f54] rounded px-2.5 py-1">✓ Xác nhận</button>}</td>
+              <td className="p-2 text-right">{p.status !== 'paid' && <button onClick={() => confirm(p.id)} className="text-xs font-bold text-white bg-[#0B4045] hover:bg-[#0e5157] rounded px-2.5 py-1">✓ Xác nhận</button>}</td>
             </tr>
           ))}
           {rows.length === 0 && <tr><td colSpan={7} className="p-4 text-slate-500">Chưa có đơn nào.</td></tr>}

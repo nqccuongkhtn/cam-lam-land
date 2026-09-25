@@ -92,7 +92,7 @@ function OChonCoGo({ nhan, dsMuc, giaTri, khiChon, className, dienThoai = false 
           if (e.key === 'Enter' && loc.length) { e.preventDefault(); chon(loc[0].id); (e.target as HTMLInputElement).blur(); }
           if (e.key === 'Escape') dong();
         }}
-        className={`border rounded-lg pl-2.5 pr-6 w-full bg-white truncate ${dienThoai ? 'py-2 text-[16px]' : 'py-1.5 text-xs'} ${giaTri ? 'border-[#0A2540] font-semibold text-[#0A2540]' : 'border-slate-300'}`} />
+        className={`border rounded-lg pl-2.5 pr-6 w-full bg-white truncate ${dienThoai ? 'py-2 text-[16px]' : 'py-1.5 text-xs'} ${giaTri ? 'border-[#0B4045] font-semibold text-[#0B4045]' : 'border-slate-300'}`} />
       <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[9px]">▼</span>
       {mo && (() => {
         const ds = (
@@ -108,7 +108,7 @@ function OChonCoGo({ nhan, dsMuc, giaTri, khiChon, className, dienThoai = false 
               <button key={m.id} type="button" ref={m.id === giaTri ? dongDangChon : undefined}
                 onMouseDown={(e) => e.preventDefault()} onClick={() => chon(m.id)}
                 className={`w-full text-left px-2.5 hover:bg-slate-50 border-b last:border-b-0 border-slate-100 ${dienThoai ? 'py-2' : 'py-1.5'} ${m.id === giaTri ? 'bg-amber-50' : ''}`}>
-                <span className={`block truncate ${dienThoai ? 'text-[14px]' : 'text-xs'} ${m.id === giaTri ? 'font-bold text-[#0A2540]' : 'font-medium text-slate-800'}`}>
+                <span className={`block truncate ${dienThoai ? 'text-[14px]' : 'text-xs'} ${m.id === giaTri ? 'font-bold text-[#0B4045]' : 'font-medium text-slate-800'}`}>
                   {m.id === giaTri ? '✓ ' : ''}{m.ten}
                 </span>
                 {m.phu && <span className={`block text-slate-400 truncate ${dienThoai ? 'text-[11.5px]' : 'text-[10px]'}`}>{m.phu}</span>}
@@ -140,7 +140,7 @@ function OChonBang({ nhan, tieuDe, dsMuc, giaTri, khiChon }: {
       <button type="button" onClick={() => { (document.activeElement as HTMLElement | null)?.blur(); setMo(true); }}
         // KÉO HẾT DÒNG, cao 34px — bằng đúng ô Số thửa / Số tờ bên dưới cho các ô thẳng hàng (chủ dự án 15/9/2026:
         // "các ô tra cứu chưa đều nhau"; trước rộng vừa chữ nên dài ngắn lởm chởm). Mũi tên ▼ dạt về mép phải.
-        className={`flex h-[34px] w-full items-center gap-2 rounded-lg border bg-white px-2.5 text-left text-[15px] ${giaTri ? 'border-slate-300 font-medium text-[#0A2540]' : 'border-slate-300 text-slate-400'}`}>
+        className={`flex h-[34px] w-full items-center gap-2 rounded-lg border bg-white px-2.5 text-left text-[15px] ${giaTri ? 'border-slate-300 font-medium text-[#0B4045]' : 'border-slate-300 text-slate-400'}`}>
         <span className="min-w-0 flex-1 truncate">{ten || nhan}</span><span className="shrink-0 text-[10px] text-slate-400">▼</span>
       </button>
       {mo && createPortal(
@@ -153,12 +153,12 @@ function OChonBang({ nhan, tieuDe, dsMuc, giaTri, khiChon }: {
                 onClick={() => { khiChon(m.id); setMo(false); }}
                 className={`relative block w-full border-b border-slate-100 px-10 py-3 text-center last:border-b-0 active:bg-slate-100 ${m.id === giaTri ? 'bg-amber-50/60' : ''}`}>
                 {m.id === giaTri && <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-[#C8A14B]">✓</span>}
-                <span className={`block truncate text-[16px] ${m.id === giaTri ? 'font-semibold text-[#0A2540]' : 'text-[#0A2540]'}`}>{m.ten}</span>
+                <span className={`block truncate text-[16px] ${m.id === giaTri ? 'font-semibold text-[#0B4045]' : 'text-[#0B4045]'}`}>{m.ten}</span>
                 {m.phu && <span className="block truncate text-[11.5px] text-slate-400">{m.phu}</span>}
               </button>
             ))}
           </div>
-          <button type="button" onClick={() => setMo(false)} className="mt-2 w-full rounded-2xl bg-white py-3 text-[16px] font-semibold text-[#0A2540] shadow-2xl active:bg-slate-100">Đóng</button>
+          <button type="button" onClick={() => setMo(false)} className="mt-2 w-full rounded-2xl bg-white py-3 text-[16px] font-semibold text-[#0B4045] shadow-2xl active:bg-slate-100">Đóng</button>
         </div>, document.body)}
     </>
   );
@@ -817,9 +817,9 @@ export default function MapPage() {
   const [oSo, setOSo] = useState<'thua' | 'to' | null>(null);
   const oSoGia = (loai: 'thua' | 'to', giaTri: string, goiY: string) => (
     <button type="button" onClick={() => { (document.activeElement as HTMLElement | null)?.blur(); setOSo(loai); }}
-      className={`flex h-[34px] w-full items-center rounded-lg border px-2.5 text-left text-[16px] ${oSo === loai ? 'border-[#0A2540] ring-1 ring-[#0A2540]' : 'border-slate-300'}`}>
-      {giaTri ? <span className="text-[#0A2540]">{giaTri}</span> : <span className="text-slate-400">{goiY}</span>}
-      {oSo === loai && <span className="ml-px h-[18px] w-[1.5px] animate-pulse bg-[#0A2540]" />}
+      className={`flex h-[34px] w-full items-center rounded-lg border px-2.5 text-left text-[16px] ${oSo === loai ? 'border-[#0B4045] ring-1 ring-[#0B4045]' : 'border-slate-300'}`}>
+      {giaTri ? <span className="text-[#0B4045]">{giaTri}</span> : <span className="text-slate-400">{goiY}</span>}
+      {oSo === loai && <span className="ml-px h-[18px] w-[1.5px] animate-pulse bg-[#0B4045]" />}
     </button>
   );
   const [gocTab, setGocTab] = useState<'bang' | 'anh' | 'dan'>('bang'); // 3 thẻ con của Góc ranh
@@ -1690,7 +1690,7 @@ export default function MapPage() {
         </>
       )}
       {/* Điện thoại (full): tra xong đóng bảng đáy để thấy kết quả trên bản đồ. */}
-      <button onClick={() => { doSearch(); if (full) setTool('none'); }} className={`cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white px-4 rounded-lg font-bold whitespace-nowrap ${full ? 'w-full mt-1.5 py-2.5 text-sm' : 'py-1.5 text-xs'}`}>Tra cứu</button>
+      <button onClick={() => { doSearch(); if (full) setTool('none'); }} className={`cl-press bg-[#0B4045] hover:bg-[#0e5157] text-white px-4 rounded-lg font-bold whitespace-nowrap ${full ? 'w-full mt-1.5 py-2.5 text-sm' : 'py-1.5 text-xs'}`}>Tra cứu</button>
     </div>
   );
   // dt = true: đang vẽ cho ĐIỆN THOẠI. Chỉ ở điện thoại mới gộp "Vẽ thửa từ toạ độ" vào
@@ -1766,9 +1766,9 @@ export default function MapPage() {
   };
   // Chữ trên ô màu: nền tối thì chữ trắng, nền sáng thì chữ đen (tính theo độ sáng cảm nhận).
   const chuTrenMau = (hex: string) => {
-    const m = /^#?([0-9a-f]{6})$/i.exec(hex || ''); if (!m) return '#0A2540';
+    const m = /^#?([0-9a-f]{6})$/i.exec(hex || ''); if (!m) return '#0B4045';
     const n = parseInt(m[1], 16); const r = n >> 16, g = (n >> 8) & 255, b = n & 255;
-    return 0.299 * r + 0.587 * g + 0.114 * b < 140 ? '#fff' : '#0A2540';
+    return 0.299 * r + 0.587 * g + 0.114 * b < 140 ? '#fff' : '#0B4045';
   };
   // Mở bảng thửa: nhảy tới trang của bản quy hoạch ĐANG BẬT (nếu thửa có), không thì trang đầu.
   useEffect(() => {
@@ -1856,7 +1856,7 @@ export default function MapPage() {
           : key === 'chugiai' ? () => { napChuGiai(); setPanelOpen(false); setTool(tool === 'chugiai' ? 'none' : 'chugiai'); }
             : () => { setPanelOpen(false); setTool(tool === key ? 'none' : (key as any)); }}
       // grow: 4 nút GIÃN ĐỀU kín cả hàng — trước để shrink-0 nên dồn trái, bên phải hở một khúc.
-      className={`relative grow rounded-full border px-2.5 py-1.5 text-[12.5px] font-semibold whitespace-nowrap shadow-sm transition active:scale-[.96] ${active ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}>
+      className={`relative grow rounded-full border px-2.5 py-1.5 text-[12.5px] font-semibold whitespace-nowrap shadow-sm transition active:scale-[.96] ${active ? 'border-[#0B4045] bg-[#0B4045] text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}>
       {label}
       {dot && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-orange-500 ring-2 ring-white" />}
     </button>
@@ -1917,7 +1917,7 @@ export default function MapPage() {
           <p className="text-xs text-slate-500 mb-2.5">Cam Lâm, Khánh Hòa · EPSG:4326</p>
           {/* Máy tính: giữ nguyên nút này ở bảng lớp như cũ. Điện thoại thì nó đã nằm trong
               nhóm "Đo - vẽ" ở thanh trên rồi, để thêm ở đây là thừa. */}
-          <button onClick={() => setDrawOpen(true)} className="cl-press hidden lg:flex w-full mb-3 items-center justify-center gap-2 bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-bold py-2.5 rounded-lg">✏️ Vẽ thửa từ toạ độ</button>
+          <button onClick={() => setDrawOpen(true)} className="cl-press hidden lg:flex w-full mb-3 items-center justify-center gap-2 bg-[#0B4045] hover:bg-[#0e5157] text-white text-sm font-bold py-2.5 rounded-lg">✏️ Vẽ thửa từ toạ độ</button>
           {/* Ô chọn nền bản đồ nằm ở đây vì trên điện thoại nhóm 'Bản đồ' ở thanh trên đã được
               nhường chỗ cho Chú giải. Máy tính vẫn có ô này ở thanh trên, để đây thêm cũng không
               thừa: người dùng hay mở bảng lớp rồi mới nghĩ đến chuyện đổi nền. */}
@@ -2032,7 +2032,7 @@ export default function MapPage() {
                   // số thửa/tờ vừa gõ DÍNH sang ô toạ độ và ô link (chủ dự án báo lỗi 14/9/2026).
                   <button key={k} onClick={() => { if (k !== tcTab) { setC1(''); setC2(''); } setTcTab(k); if (k === 'to') setSearchMode('parcel'); else if (k === 'gmap') setSearchMode('gmap'); else if (k === 'toado' && searchMode !== 'latlng') setSearchMode('vn2000'); }}
                     // flex-1: 4 thẻ CHIA ĐỀU bề ngang (trước dồn trái, bên phải hở — chủ dự án báo 14/9/2026)
-                    className={`relative flex-1 whitespace-nowrap px-1 py-2.5 text-center text-[13px] ${tcTab === k ? 'font-semibold text-[#0A2540]' : 'text-slate-500'}`}>
+                    className={`relative flex-1 whitespace-nowrap px-1 py-2.5 text-center text-[13px] ${tcTab === k ? 'font-semibold text-[#0B4045]' : 'text-slate-500'}`}>
                     {lb}{tcTab === k && <span className="absolute inset-x-2 bottom-0 h-[2.5px] rounded-full bg-[#C8A14B]" />}
                   </button>
                 ))}
@@ -2053,19 +2053,19 @@ export default function MapPage() {
                         đây ngoài ghi "Kiểm tra" trong ghi "Vẽ & zoom" mà cùng một việc). */}
                     <div className="grid grid-cols-3 rounded-lg bg-slate-100 p-0.5 text-[12.5px]">
                       {([['bang', 'Nhập toạ độ'], ['anh', 'Chụp / Ảnh'], ['dan', 'Nhập hàng loạt']] as [typeof gocTab, string][]).map(([k, lb]) => (
-                        <button key={k} onClick={() => setGocTab(k)} className={`whitespace-nowrap rounded-md py-1.5 ${gocTab === k ? 'bg-white font-semibold text-[#0A2540] shadow-sm' : 'text-slate-500'}`}>{lb}</button>
+                        <button key={k} onClick={() => setGocTab(k)} className={`whitespace-nowrap rounded-md py-1.5 ${gocTab === k ? 'bg-white font-semibold text-[#0B4045] shadow-sm' : 'text-slate-500'}`}>{lb}</button>
                       ))}
                     </div>
                     {ocrBusy && (
                       <div className="mt-2">
-                        <div className="mb-1 flex justify-between text-[12px] font-medium text-[#0A2540]"><span>{ocrBusy}</span><span>{ocrPct}%</span></div>
+                        <div className="mb-1 flex justify-between text-[12px] font-medium text-[#0B4045]"><span>{ocrBusy}</span><span>{ocrPct}%</span></div>
                         <div className="h-1.5 overflow-hidden rounded-full bg-slate-200"><div className="h-full rounded-full bg-[#C8A14B] transition-all duration-200" style={{ width: ocrPct + '%' }} /></div>
                       </div>
                     )}
                     {gocTab === 'anh' && (
                       <div className="mt-2.5">
                         <div className="grid grid-cols-2 gap-2">
-                          <button onClick={startCam} className="cl-press flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-[#0A2540] py-4 text-[13px] font-semibold text-[#0A2540]"><span className="text-xl">📷</span>Chụp bằng camera</button>
+                          <button onClick={startCam} className="cl-press flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-[#0B4045] py-4 text-[13px] font-semibold text-[#0B4045]"><span className="text-xl">📷</span>Chụp bằng camera</button>
                           <label className="cl-press flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-slate-300 py-4 text-[13px] font-semibold text-slate-600">
                             <input type="file" accept="image/*,.txt,.csv" onChange={onCoordFile} className="hidden" /><span className="text-xl">🖼️</span>Chọn ảnh / tệp
                           </label>
@@ -2077,8 +2077,8 @@ export default function MapPage() {
                       <div className="mt-2.5">
                         <textarea value={pasteText} onChange={(e) => setPasteText(e.target.value)} rows={5}
                           placeholder={'Dán từ Excel/Word/Zalo, mỗi dòng 1 điểm:\n1  1335000.50  567890.12\n2  1335010.20  567900.35'}
-                          className="w-full rounded-lg border border-slate-300 px-2.5 py-2 font-mono text-[16px] leading-snug outline-none focus:border-[#0A2540]" />
-                        <button onClick={applyPaste} className="cl-press mt-1.5 w-full rounded-lg bg-[#0A2540] py-2.5 text-[13.5px] font-semibold text-white">Tách số vào bảng</button>
+                          className="w-full rounded-lg border border-slate-300 px-2.5 py-2 font-mono text-[16px] leading-snug outline-none focus:border-[#0B4045]" />
+                        <button onClick={applyPaste} className="cl-press mt-1.5 w-full rounded-lg bg-[#0B4045] py-2.5 text-[13.5px] font-semibold text-white">Tách số vào bảng</button>
                       </div>
                     )}
                     {gocTab === 'bang' && ocrOk > 0 && (
@@ -2091,9 +2091,9 @@ export default function MapPage() {
                         <div key={i2} className="grid grid-cols-[18px_1fr_1fr_24px] items-center gap-x-2">
                           <span className="text-[12px] text-slate-400">{i2 + 1}</span>
                           <input value={r.x} onChange={(e) => setRows((rs) => rs.map((v, j2) => (j2 === i2 ? { ...v, x: e.target.value } : v)))} inputMode="decimal" placeholder="1334050.00"
-                            className="w-full min-w-0 border-0 border-b border-slate-200 bg-transparent px-0.5 py-1.5 text-[16px] outline-none focus:border-[#0A2540]" />
+                            className="w-full min-w-0 border-0 border-b border-slate-200 bg-transparent px-0.5 py-1.5 text-[16px] outline-none focus:border-[#0B4045]" />
                           <input value={r.y} onChange={(e) => setRows((rs) => rs.map((v, j2) => (j2 === i2 ? { ...v, y: e.target.value } : v)))} inputMode="decimal" placeholder="596100.00"
-                            className="w-full min-w-0 border-0 border-b border-slate-200 bg-transparent px-0.5 py-1.5 text-[16px] outline-none focus:border-[#0A2540]" />
+                            className="w-full min-w-0 border-0 border-b border-slate-200 bg-transparent px-0.5 py-1.5 text-[16px] outline-none focus:border-[#0B4045]" />
                           <button onClick={() => setRows((rs) => (rs.length > 1 ? rs.filter((_, j2) => j2 !== i2) : [{ x: '', y: '' }]))} aria-label="Xoá dòng" className="text-lg text-slate-300">✕</button>
                         </div>
                       ))}
@@ -2104,8 +2104,8 @@ export default function MapPage() {
                     </div>
                     </>)}
                     <div className="sticky -bottom-3 -mx-3 mt-2.5 grid grid-cols-[1.35fr_1fr] gap-2 border-t border-slate-100 bg-white px-3 pb-3 pt-2">
-                      <button onClick={() => { const du = pointsFromRows().length >= 3; drawParcel(); if (du) setTool('none'); }} className="cl-press rounded-xl bg-[#0A2540] py-2.5 text-[14px] font-semibold text-white">Vẽ & zoom tới thửa ({pointsFromRows().length})</button>
-                      <button onClick={() => { setGocTab('bang'); setRows((rs) => [...rs, { x: '', y: '' }]); }} className="cl-press rounded-xl bg-slate-100 py-2.5 text-[14px] font-semibold text-[#0A2540]">+ Thêm toạ độ</button>
+                      <button onClick={() => { const du = pointsFromRows().length >= 3; drawParcel(); if (du) setTool('none'); }} className="cl-press rounded-xl bg-[#0B4045] py-2.5 text-[14px] font-semibold text-white">Vẽ & zoom tới thửa ({pointsFromRows().length})</button>
+                      <button onClick={() => { setGocTab('bang'); setRows((rs) => [...rs, { x: '', y: '' }]); }} className="cl-press rounded-xl bg-slate-100 py-2.5 text-[14px] font-semibold text-[#0B4045]">+ Thêm toạ độ</button>
                     </div>
                   </div>
                 )}
@@ -2152,14 +2152,14 @@ export default function MapPage() {
                               else if (k === 'OK') { if (oSo === 'thua') setOSo('to'); else { setOSo(null); doSearch(); setTool('none'); } }
                               else doi((v) => (v.length >= 6 ? v : v + k));
                             }}
-                            className={`cl-press h-[38px] rounded-lg text-[17px] ${k === 'OK' ? 'bg-[#0A2540] text-[14px] font-semibold text-white' : k === '⌫' ? 'bg-slate-200 text-[#0A2540]' : 'bg-slate-100 font-medium text-[#0A2540]'}`}>
+                            className={`cl-press h-[38px] rounded-lg text-[17px] ${k === 'OK' ? 'bg-[#0B4045] text-[14px] font-semibold text-white' : k === '⌫' ? 'bg-slate-200 text-[#0B4045]' : 'bg-slate-100 font-medium text-[#0B4045]'}`}>
                             {k === 'OK' ? (oSo === 'thua' ? 'Tiếp' : 'Tra cứu') : k}
                           </button>
                         ))}
                       </div>
                     ) : (
                       <button onClick={() => { (document.activeElement as HTMLElement | null)?.blur(); doSearch(); setTool('none'); }}
-                        className="cl-press mt-1 w-full rounded-xl bg-[#0A2540] py-2.5 text-[14px] font-semibold text-white">Tra cứu</button>
+                        className="cl-press mt-1 w-full rounded-xl bg-[#0B4045] py-2.5 text-[14px] font-semibold text-white">Tra cứu</button>
                     )}
                   </div>
                 )}
@@ -2167,7 +2167,7 @@ export default function MapPage() {
                   <div>
                     <div className="mb-2 inline-flex rounded-lg bg-slate-100 p-0.5 text-[13px]">
                       {([['vn2000', 'VN-2000 (X, Y)'], ['latlng', 'Kinh / vĩ độ']] as const).map(([k, lb]) => (
-                        <button key={k} onClick={() => { if (k !== searchMode) { setC1(''); setC2(''); } setSearchMode(k); }} className={`rounded-md px-3 py-1.5 ${searchMode === k ? 'bg-white font-semibold text-[#0A2540] shadow-sm' : 'text-slate-500'}`}>{lb}</button>
+                        <button key={k} onClick={() => { if (k !== searchMode) { setC1(''); setC2(''); } setSearchMode(k); }} className={`rounded-md px-3 py-1.5 ${searchMode === k ? 'bg-white font-semibold text-[#0B4045] shadow-sm' : 'text-slate-500'}`}>{lb}</button>
                       ))}
                     </div>
                     {searchCtrl(true, true)}
@@ -2193,7 +2193,7 @@ export default function MapPage() {
                 <p className="text-[14px] font-semibold text-slate-700">Hướng dẫn</p>
                 <div className="ml-2 inline-flex rounded-lg bg-slate-100 p-0.5 text-[12.5px]">
                   {([['distance', 'Đo dài'], ['area', 'Diện tích']] as const).map(([k, lb]) => (
-                    <button key={k} onClick={() => { setMeasure(k); setMResult(null); }} className={`rounded-md px-2.5 py-1 ${measure === k ? 'bg-white font-semibold text-[#0A2540] shadow-sm' : 'text-slate-500'}`}>{lb}</button>
+                    <button key={k} onClick={() => { setMeasure(k); setMResult(null); }} className={`rounded-md px-2.5 py-1 ${measure === k ? 'bg-white font-semibold text-[#0B4045] shadow-sm' : 'text-slate-500'}`}>{lb}</button>
                   ))}
                 </div>
                 <button onClick={() => { setMeasure('off'); setMResult(null); setTool('none'); }} aria-label="Đóng" className="ml-auto grid h-8 w-8 place-items-center text-xl text-slate-400">✕</button>
@@ -2208,7 +2208,7 @@ export default function MapPage() {
               )}
               {/* Không có nút "Xong": trùng việc với dấu ✕ ở góc (chủ dự án 14/9/2026). Vẽ thửa từ toạ độ
                   đã nằm ở Tra cứu → Góc ranh nên bảng này CHỈ ĐO. */}
-              <button onClick={() => { const m = measure; setMeasure('off'); setMResult(null); requestAnimationFrame(() => setMeasure(m)); }} className="cl-press mt-2.5 w-full rounded-xl bg-slate-100 py-2.5 text-[14px] font-semibold text-[#0A2540]">Đo lại</button>
+              <button onClick={() => { const m = measure; setMeasure('off'); setMResult(null); requestAnimationFrame(() => setMeasure(m)); }} className="cl-press mt-2.5 w-full rounded-xl bg-slate-100 py-2.5 text-[14px] font-semibold text-[#0B4045]">Đo lại</button>
             </div>
           )}
 
@@ -2268,7 +2268,7 @@ export default function MapPage() {
           {qhSheet && (() => {
             const congTac = (bat: boolean, doi: () => void, nhan: string) => (
               <button type="button" role="switch" aria-checked={bat} aria-label={nhan} onClick={doi}
-                className={`relative h-[31px] w-[51px] shrink-0 rounded-full transition-colors duration-200 ${bat ? 'bg-[#0A2540]' : 'bg-slate-200'}`}>
+                className={`relative h-[31px] w-[51px] shrink-0 rounded-full transition-colors duration-200 ${bat ? 'bg-[#0B4045]' : 'bg-slate-200'}`}>
                 <span className={`absolute top-[2px] left-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-[0_3px_8px_rgba(0,0,0,.15),0_1px_1px_rgba(0,0,0,.16)] transition-transform duration-200 ${bat ? 'translate-x-[20px]' : ''}`} />
               </button>
             );
@@ -2283,7 +2283,7 @@ export default function MapPage() {
                     const bat = o.gom.every((id) => !!ovOn[id]);
                     return (
                       <button key={o.id} onClick={() => { chonLopQh(o, !bat); setQhSheet(false); }}
-                        className={`relative block w-full truncate whitespace-nowrap border-b border-black/10 px-8 py-[11px] text-center text-[14px] text-[#0A2540] active:bg-black/5 ${bat ? 'font-medium' : ''}`}>
+                        className={`relative block w-full truncate whitespace-nowrap border-b border-black/10 px-8 py-[11px] text-center text-[14px] text-[#0B4045] active:bg-black/5 ${bat ? 'font-medium' : ''}`}>
                         {bat && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] font-bold text-[#C8A14B]">✓</span>}H.Cam Lâm - {o.tenApp}
                       </button>
                     );
@@ -2323,7 +2323,7 @@ export default function MapPage() {
                     )}
                   </div>
                 </div>
-                <button onClick={() => setQhSheet(false)} className="mt-2 w-full rounded-lg bg-white py-[11px] text-[14px] font-semibold text-[#0A2540] shadow-2xl active:bg-[#e5e5ea]">Đóng</button>
+                <button onClick={() => setQhSheet(false)} className="mt-2 w-full rounded-lg bg-white py-[11px] text-[14px] font-semibold text-[#0B4045] shadow-2xl active:bg-[#e5e5ea]">Đóng</button>
               </div>
             );
           })()}
@@ -2332,7 +2332,7 @@ export default function MapPage() {
               lại có bộ số tờ/số thửa riêng — trùng số là chuyện bình thường. ── */}
           {ketQuaTim.length > 1 && (
             <div className="absolute top-2 left-2 z-20 w-64 max-w-[calc(100%-1rem)] bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden">
-              <div className="flex items-center justify-between px-3 py-2 bg-[#0A2540] text-white">
+              <div className="flex items-center justify-between px-3 py-2 bg-[#0B4045] text-white">
                 <span className="text-xs font-bold">Tìm thấy {ketQuaTim.length} thửa trùng số</span>
                 <button onClick={() => setKetQuaTim([])} aria-label="Đóng" className="text-white/70 hover:text-white text-base leading-none">✕</button>
               </div>
@@ -2340,7 +2340,7 @@ export default function MapPage() {
                 {ketQuaTim.map((t) => (
                   <button key={t.id} onClick={() => moThuaTim(t)}
                     className="w-full text-left px-3 py-2 hover:bg-amber-50 border-b last:border-b-0 border-slate-100">
-                    <span className="block text-xs font-bold text-[#0A2540]">Thửa {t.soThua} · Tờ {t.soTo}
+                    <span className="block text-xs font-bold text-[#0B4045]">Thửa {t.soThua} · Tờ {t.soTo}
                       {t.dienTich != null && <span className="font-normal text-slate-500"> · {fmtM2(t.dienTich)}</span>}
                     </span>
                     <span className="block text-[10px] text-slate-400 truncate">
@@ -2354,7 +2354,7 @@ export default function MapPage() {
           )}
           {zoomNow > 0 && zoomNow < PARCEL_SHOW_ZOOM && (
             // Hàng nút quy hoạch nổi trên bản đồ đã bỏ (14/9/2026) nên về lại top-2 như máy tính.
-            <div className="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap bg-[#0A2540]/90 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">🔍 Phóng to để hiện thửa đất</div>
+            <div className="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap bg-[#0B4045]/90 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">🔍 Phóng to để hiện thửa đất</div>
           )}
           {/* ── NÚT DẤU HỎI: CĂN CỨ PHÁP LÝ ────────────────────────────────────────────
               Để RIÊNG một nút tròn nổi trên bản đồ (kiểu app VN-2000), KHÔNG gộp vào bảng
@@ -2369,7 +2369,7 @@ export default function MapPage() {
             // nhìn "to và thô" hơn hẳn app tham chiếu (chủ dự án chê 17/9/2026).
             // Nút GIỮ NGUYÊN MỘT KIỂU dù bảng đang mở hay đóng (chủ dự án 17/9/2026: "dấu ? đừng đổi màu").
             // Trước đây mở bảng thì nút đảo thành nền xanh chữ trắng — nhấp nháy, rối mắt.
-            className="absolute right-2 top-2 z-30 grid h-8 w-8 place-items-center rounded-full bg-white text-[15px] font-semibold leading-none text-[#0A2540] shadow-[0_1px_2px_rgba(0,0,0,.10),0_3px_10px_rgba(10,37,64,.14)] transition hover:bg-slate-50 active:scale-95 max-[1023px]:h-[34px] max-[1023px]:w-[34px] max-[1023px]:text-base">
+            className="absolute right-2 top-2 z-30 grid h-8 w-8 place-items-center rounded-full bg-white text-[15px] font-semibold leading-none text-[#0B4045] shadow-[0_1px_2px_rgba(0,0,0,.10),0_3px_10px_rgba(11,64,69,.14)] transition hover:bg-slate-50 active:scale-95 max-[1023px]:h-[34px] max-[1023px]:w-[34px] max-[1023px]:text-base">
             ?
           </button>
           {canCuOpen && (() => {
@@ -2379,7 +2379,7 @@ export default function MapPage() {
             return (
               <div className="absolute right-2 top-[46px] z-30 w-[380px] max-w-[calc(100%-1rem)] max-h-[70%] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 bg-white shadow-2xl">
                 <div className="sticky top-0 z-10 flex items-center gap-2 border-b bg-white/95 px-3.5 py-2.5 backdrop-blur">
-                  <span className="text-[14px] font-bold text-[#0A2540]">Căn cứ pháp lý</span>
+                  <span className="text-[14px] font-bold text-[#0B4045]">Căn cứ pháp lý</span>
                   <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-500">{ds.length}</span>
                   <button onClick={() => setCanCuOpen(false)} aria-label="Đóng" className="ml-auto text-lg leading-none text-slate-400 hover:text-slate-700">✕</button>
                 </div>
@@ -2390,8 +2390,8 @@ export default function MapPage() {
                 <div className="space-y-1.5 p-3">
                   {ds.map((id) => { const c = CAN_CU_QH[id]; return (
                     <a key={id} href={c.tep} target="_blank" rel="noreferrer"
-                      className="block rounded-xl border border-slate-200 px-2.5 py-2 transition hover:border-[#0A2540] hover:bg-slate-50">
-                      <span className="block text-[12.5px] font-bold text-[#0A2540]">📄 Quyết định {c.so} — {c.ngay}</span>
+                      className="block rounded-xl border border-slate-200 px-2.5 py-2 transition hover:border-[#0B4045] hover:bg-slate-50">
+                      <span className="block text-[12.5px] font-bold text-[#0B4045]">📄 Quyết định {c.so} — {c.ngay}</span>
                       <span className="block text-[11.5px] leading-snug text-slate-500">{c.coQuan}</span>
                       <span className="mt-0.5 block text-[11.5px] leading-snug text-slate-600">{c.ten}</span>
                     </a>
@@ -2421,7 +2421,7 @@ export default function MapPage() {
                   ))}
                 </div>
               )}
-              <p className="font-bold text-[#0A2540] text-sm">{selPlace.features || selPlace.note || (selPlace.parcel ? `Thửa ${selPlace.parcel}` : 'Tin lưu')}</p>
+              <p className="font-bold text-[#0B4045] text-sm">{selPlace.features || selPlace.note || (selPlace.parcel ? `Thửa ${selPlace.parcel}` : 'Tin lưu')}</p>
               <div className="mt-1.5 space-y-1 text-slate-600">
                 {(selPlace.parcel || selPlace.sheet || selPlace.ward) ? <div>🗺 {[selPlace.parcel && `Thửa ${selPlace.parcel}`, selPlace.sheet && `Tờ ${selPlace.sheet}`, selPlace.ward].filter(Boolean).join(' · ')}</div> : null}
                 {(selPlace.price || selPlace.area) ? <div>{selPlace.price ? <>💰 <b className="text-red-600">{selPlace.price}</b></> : null}{selPlace.area ? <span className="text-slate-500"> · {selPlace.area} m²</span> : null}</div> : null}
@@ -2489,14 +2489,14 @@ export default function MapPage() {
             </div>
           )}
           {dirNhat && (
-            <div className="absolute top-3 left-1/2 z-30 -translate-x-1/2 rounded-full bg-[#0A2540] px-4 py-2 text-sm font-bold text-white shadow-lg">
+            <div className="absolute top-3 left-1/2 z-30 -translate-x-1/2 rounded-full bg-[#0B4045] px-4 py-2 text-sm font-bold text-white shadow-lg">
               Bấm lên bản đồ để chọn {dirNhat === 'di' ? 'điểm đi' : 'điểm đến'}
               <button onClick={() => setDirNhat(null)} className="ml-3 text-white/70 hover:text-white">✕</button>
             </div>
           )}
           {focusPoint && (
             <div className="absolute bottom-[calc(var(--menu-de,calc(56px+env(safe-area-inset-bottom)))+10px)] sm:bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-white rounded-full shadow-lg border border-slate-200 pl-4 pr-2 py-1.5 max-w-[92%]">
-              <span className="text-sm font-semibold text-[#0A2540] truncate max-w-[42vw]">📍 {focusPoint.label || 'Vị trí tìm kiếm'}</span>
+              <span className="text-sm font-semibold text-[#0B4045] truncate max-w-[42vw]">📍 {focusPoint.label || 'Vị trí tìm kiếm'}</span>
               <button onClick={() => moChiDuong(focusPoint.lat, focusPoint.lng, focusPoint.label || 'Vị trí tìm kiếm')} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-full px-3.5 py-1.5 whitespace-nowrap">🧭 Chỉ đường</button>
               <button onClick={() => setFocusPoint(null)} className="text-slate-400 hover:text-slate-700 w-7 h-7 grid place-items-center shrink-0">✕</button>
             </div>
@@ -2504,7 +2504,7 @@ export default function MapPage() {
           {drawResult && (
             <div className="absolute top-3 left-3 z-10 bg-white rounded-xl shadow-xl border border-slate-200 p-3 text-sm max-w-[250px]">
               <div className="flex justify-between items-center mb-1">
-                <b className="text-[#0A2540]">📐 Thửa đất đã vẽ</b>
+                <b className="text-[#0B4045]">📐 Thửa đất đã vẽ</b>
                 <button onClick={() => { setDrawResult(null); setHighlight(null); }} className="text-slate-400 hover:text-slate-700">✕</button>
               </div>
               <p className="text-slate-600">Số điểm: <b>{drawResult.n}</b></p>
@@ -2518,21 +2518,21 @@ export default function MapPage() {
               <div className="absolute inset-0 bg-black/50" onClick={() => setDrawOpen(false)} />
               <div className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl max-h-[92vh] overflow-y-auto scroll-soft">
                 <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white z-10">
-                  <h3 className="font-extrabold text-[#0A2540] text-lg">Vẽ ranh thửa từ toạ độ VN-2000</h3>
+                  <h3 className="font-extrabold text-[#0B4045] text-lg">Vẽ ranh thửa từ toạ độ VN-2000</h3>
                   <button onClick={() => setDrawOpen(false)} className="text-slate-400 hover:text-slate-700 text-2xl leading-none">×</button>
                 </div>
                 <div className="flex border-b border-slate-100 px-3">
                   {([['table', '⌗ Nhập bảng'], ['import', '📷 Chụp / Ảnh']] as [typeof drawTab, string][]).map(([k, lb]) => (
-                    <button key={k} onClick={() => { setDrawTab(k); setOcrOk(0); }} className={`px-3 py-2.5 text-sm font-semibold border-b-2 ${drawTab === k ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500'}`}>{lb}</button>
+                    <button key={k} onClick={() => { setDrawTab(k); setOcrOk(0); }} className={`px-3 py-2.5 text-sm font-semibold border-b-2 ${drawTab === k ? 'border-red-600 text-[#0B4045]' : 'border-transparent text-slate-500'}`}>{lb}</button>
                   ))}
                 </div>
                 <div className="p-5 space-y-3">
                   {drawTab === 'table' && (
                     <div className="space-y-2">
                       <div className="rounded-lg border border-[#C8A14B]/40 bg-[#C8A14B]/[0.06] p-2.5">
-                        <p className="text-xs font-bold text-[#0A2540] mb-1.5">📋 Dán nhanh toạ độ (chính xác 100%, không cần chụp)</p>
-                        <textarea value={pasteText} onChange={(e) => setPasteText(e.target.value)} rows={3} placeholder={'Dán từ Excel/Word/Zalo, mỗi dòng 1 điểm:\n1  1335000.50  567890.12\n2  1335010.20  567900.35'} className="w-full border border-slate-300 rounded-lg px-2.5 py-2 text-xs font-mono outline-none focus:border-[#0A2540]" />
-                        <button onClick={applyPaste} className="mt-1.5 w-full bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold py-2 rounded-lg text-sm">Tách số vào bảng ↓</button>
+                        <p className="text-xs font-bold text-[#0B4045] mb-1.5">📋 Dán nhanh toạ độ (chính xác 100%, không cần chụp)</p>
+                        <textarea value={pasteText} onChange={(e) => setPasteText(e.target.value)} rows={3} placeholder={'Dán từ Excel/Word/Zalo, mỗi dòng 1 điểm:\n1  1335000.50  567890.12\n2  1335010.20  567900.35'} className="w-full border border-slate-300 rounded-lg px-2.5 py-2 text-xs font-mono outline-none focus:border-[#0B4045]" />
+                        <button onClick={applyPaste} className="mt-1.5 w-full bg-[#0B4045] hover:bg-[#0e5157] text-white font-bold py-2 rounded-lg text-sm">Tách số vào bảng ↓</button>
                       </div>
                       {ocrOk > 0 && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg px-3 py-2">✅ Đã nhận {ocrOk} điểm{ocrEngine ? ' · nguồn: ' + engineLabel(ocrEngine) : ''}{ocrEngine && ocrEngine !== 'paste' ? ' đang trong giai đoạn thử nghiệm' : ''}. Vui lòng kiểm tra lại số rồi bấm “Vẽ & zoom tới thửa”.</div>}
                       <div className="grid grid-cols-[26px_1fr_1fr_26px] gap-2 text-xs font-semibold text-slate-500 px-1"><span>#</span><span>X (Bắc)</span><span>Y (Đông)</span><span /></div>
@@ -2549,7 +2549,7 @@ export default function MapPage() {
                         ))}
                       </div>
                       <div className="flex items-center gap-3">
-                        <button onClick={() => setRows((rs) => [...rs, { x: '', y: '' }])} className="text-sm font-semibold text-[#0A2540]">+ Thêm điểm</button>
+                        <button onClick={() => setRows((rs) => [...rs, { x: '', y: '' }])} className="text-sm font-semibold text-[#0B4045]">+ Thêm điểm</button>
                         <button onClick={() => setRows([{ x: '596100.0', y: '1334050.0' }, { x: '596150.0', y: '1334035.0' }, { x: '596138.0', y: '1333985.0' }, { x: '596088.0', y: '1334000.0' }])} className="text-xs text-slate-400 underline">Điền ví dụ</button>
                       </div>
                     </div>
@@ -2557,15 +2557,15 @@ export default function MapPage() {
                   {drawTab === 'import' && (
                     <div className="space-y-2">
                       <div className="grid grid-cols-2 gap-2">
-                        <button onClick={startCam} className="flex flex-col items-center justify-center gap-1 border-2 border-[#0A2540] rounded-xl py-6 text-sm font-bold text-[#0A2540] hover:bg-slate-50"><span className="text-2xl">📷</span>Chụp bằng camera</button>
+                        <button onClick={startCam} className="flex flex-col items-center justify-center gap-1 border-2 border-[#0B4045] rounded-xl py-6 text-sm font-bold text-[#0B4045] hover:bg-slate-50"><span className="text-2xl">📷</span>Chụp bằng camera</button>
                         <label className="flex flex-col items-center justify-center gap-1 border-2 border-dashed border-slate-300 rounded-xl py-6 cursor-pointer hover:border-[#C8A14B] text-sm font-bold text-slate-600 text-center">
                           <input type="file" accept="image/*,.txt,.csv" onChange={onCoordFile} className="hidden" /><span className="text-2xl">🖼️</span>Tải ảnh / tệp
                         </label>
                       </div>
                       {ocrBusy && (
                         <div className="pt-1">
-                          <div className="flex items-center justify-between text-sm text-[#0A2540] font-semibold mb-1"><span>{ocrBusy}</span><span>{ocrPct}%</span></div>
-                          <div className="h-2 rounded-full bg-slate-200 overflow-hidden"><div className="h-full bg-[#0A2540] rounded-full transition-all duration-200 ease-out" style={{ width: ocrPct + '%' }} /></div>
+                          <div className="flex items-center justify-between text-sm text-[#0B4045] font-semibold mb-1"><span>{ocrBusy}</span><span>{ocrPct}%</span></div>
+                          <div className="h-2 rounded-full bg-slate-200 overflow-hidden"><div className="h-full bg-[#0B4045] rounded-full transition-all duration-200 ease-out" style={{ width: ocrPct + '%' }} /></div>
                         </div>
                       )}
                       <p className="text-[11px] text-slate-400">Chụp/chọn ảnh bảng toạ độ rõ nét (hoặc tệp .txt/.csv). Hệ thống tự tách số → đưa vào tab &quot;Nhập bảng&quot; để bạn kiểm tra trước khi vẽ.</p>
@@ -2617,7 +2617,7 @@ export default function MapPage() {
                   <span className="hidden sm:inline text-[10px] font-bold text-slate-400 mt-1">{sheetExpanded ? '▼ Thu gọn' : '▲ Kéo lên xem đầy đủ'}</span>
                 </button>
                 <div className="flex justify-between items-center px-4 py-0 sm:py-1.5 absolute right-0 top-0 sm:static sm:w-full">
-                  <h3 className="hidden sm:block font-extrabold text-[#0A2540] text-[15px]">Thông tin thửa</h3>
+                  <h3 className="hidden sm:block font-extrabold text-[#0B4045] text-[15px]">Thông tin thửa</h3>
                   <button onClick={() => setInfo(null)} className="text-slate-400 hover:text-slate-700 w-7 h-7 grid place-items-center rounded-lg hover:bg-slate-100 text-lg leading-none">✕</button>
                 </div>
               </div>
@@ -2660,15 +2660,15 @@ export default function MapPage() {
                       {/* Điện thoại: MỘT DÒNG như app — "Tờ 149 · Thửa 83 · 1.255,9 m²". Máy tính giữ 3 ô.
                           CHỌN THỬA TRÊN BẢN ĐỒ LUÔN HIỆN SỐ TỜ MỚI TRƯỚC (chủ dự án 14/9/2026), bất kể đang ở lớp
                           3 cấp hay 2 cấp; số tờ cũ + xã cũ ghi ở dòng dưới. Xã chưa có bảng tra thì chỉ có số tờ đang có. */}
-                      <div className={`sm:hidden font-bold leading-snug text-[#0A2540] pr-8 text-[15px]`}>
+                      <div className={`sm:hidden font-bold leading-snug text-[#0B4045] pr-8 text-[15px]`}>
                         Thửa {info.parcel.soThua || '—'} · Tờ {toMoi || toCu || '—'}
                         {info.parcel.areaM2 != null && <> · <span className="font-normal text-slate-500">Diện tích</span> <span className="whitespace-nowrap">{fmtM2(info.parcel.areaM2)}</span></>}
                       </div>
                       <div className="hidden sm:grid grid-cols-3 gap-2">
                         {/* THỬA TRƯỚC, TỜ SAU — quy tắc chung toàn web. */}
-                        <div><div className="text-[11px] text-slate-400">Số thửa</div><div className="font-bold text-[#0A2540]">{info.parcel.soThua || '—'}</div></div>
-                        <div><div className="text-[11px] text-slate-400">{nhanSoTo}</div><div className="font-bold text-[#0A2540]">{soToChinh || '—'}</div></div>
-                        <div><div className="text-[11px] text-slate-400">Diện tích</div><div className="font-bold text-[#0A2540]">{info.parcel.areaM2 != null ? fmtM2(info.parcel.areaM2) : '—'}</div></div>
+                        <div><div className="text-[11px] text-slate-400">Số thửa</div><div className="font-bold text-[#0B4045]">{info.parcel.soThua || '—'}</div></div>
+                        <div><div className="text-[11px] text-slate-400">{nhanSoTo}</div><div className="font-bold text-[#0B4045]">{soToChinh || '—'}</div></div>
+                        <div><div className="text-[11px] text-slate-400">Diện tích</div><div className="font-bold text-[#0B4045]">{info.parcel.areaM2 != null ? fmtM2(info.parcel.areaM2) : '—'}</div></div>
                       </div>
                       {/* Điện thoại: xã MỚI trước, rồi "trước sáp nhập: xã cũ · huyện cũ · tờ cũ". KHÔNG CẮT CHỮ (trước
                           để truncate nên mất đuôi "tờ mới …" — chủ dự án báo thiếu thông tin), dài thì xuống dòng. */}
@@ -2692,12 +2692,12 @@ export default function MapPage() {
                       {xemXaCu ? (
                         <>
                           {khuCu
-                            ? <div className="text-slate-600 mt-1"><b className="text-[#0A2540]">{khuCu}</b></div>
-                            : (khuMoi && <div className="text-slate-600 mt-1"><b className="text-[#0A2540]">{khuMoi}</b></div>)}
+                            ? <div className="text-slate-600 mt-1"><b className="text-[#0B4045]">{khuCu}</b></div>
+                            : (khuMoi && <div className="text-slate-600 mt-1"><b className="text-[#0B4045]">{khuMoi}</b></div>)}
                           {khuMoi && khuCu && (
                             <div className="text-slate-500 text-[11px] mt-0.5">
                               <span className="text-slate-400">Khu vực mới: </span>{khuMoi}
-                              {toMoi && toMoi !== toCu && <> · <span className="text-slate-400">tờ mới </span><b className="text-[#0A2540]">{toMoi}</b></>}
+                              {toMoi && toMoi !== toCu && <> · <span className="text-slate-400">tờ mới </span><b className="text-[#0B4045]">{toMoi}</b></>}
                             </div>
                           )}
                           {thieuBangTra && <div className="hidden sm:block text-slate-400 text-[10px] mt-0.5">Xã mới chưa có bảng tra số tờ</div>}
@@ -2705,13 +2705,13 @@ export default function MapPage() {
                       ) : (
                         /* ── XEM THEO LỚP 2 CẤP: tên xã MỚI lên trước, tên cũ + số tờ cũ ghi ở dưới ── */
                         <>
-                          {khuMoi && <div className="text-slate-600 mt-1"><b className="text-[#0A2540]">{khuMoi}</b></div>}
+                          {khuMoi && <div className="text-slate-600 mt-1"><b className="text-[#0B4045]">{khuMoi}</b></div>}
                           {(khuCu || toMoi) && (
                             <div className="text-slate-500 text-[11px] mt-0.5">
                               <span className="text-slate-400">Trước sáp nhập: </span>{khuCu || '—'}
                               {/* Xã nào sáp nhập mà số tờ GIỮ NGUYÊN (vd Vạn Ninh, Ninh Hoà) thì tờ mới
                                   trùng tờ cũ — ghi lại lần nữa chỉ tổ rối, nên bỏ. */}
-                              {toMoi && toCu && toMoi !== toCu && <> · <span className="text-slate-400">tờ cũ </span><b className="text-[#0A2540]">{toCu}</b></>}
+                              {toMoi && toCu && toMoi !== toCu && <> · <span className="text-slate-400">tờ cũ </span><b className="text-[#0B4045]">{toCu}</b></>}
                             </div>
                           )}
                           {thieuBangTra && <div className="hidden sm:block text-slate-400 text-[10px] mt-0.5">Xã này chưa có bảng tra số tờ mới — số đang hiện là số tờ cũ</div>}
@@ -2722,10 +2722,10 @@ export default function MapPage() {
                           muốn xem cho đủ, bắt bấm thêm một nút nữa chỉ tổ vướng. */}
                       {true && (
                         <div className="mt-1">
-                          {owner && <div className="text-slate-600 mt-1"><span className="text-slate-400">Tên chủ: </span><b className="text-[#0A2540]">{owner}</b></div>}
+                          {owner && <div className="text-slate-600 mt-1"><span className="text-slate-400">Tên chủ: </span><b className="text-[#0B4045]">{owner}</b></div>}
                           {(code || name) && (
                             <div className="mt-2.5 flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2">
-                              {info.parcel.areaM2 != null && <b className="text-[#0A2540] shrink-0">{fmtM2(info.parcel.areaM2)}</b>}
+                              {info.parcel.areaM2 != null && <b className="text-[#0B4045] shrink-0">{fmtM2(info.parcel.areaM2)}</b>}
                               {code && <span className={`text-[11px] font-extrabold px-2 py-0.5 rounded ${landColor(code)}`}>{code}</span>}
                               {name && <span className="text-slate-600 truncate">{name}</span>}
                             </div>
@@ -2739,7 +2739,7 @@ export default function MapPage() {
                      cố tình không trả về thửa (xem CHAN_TRA_CUU ở routes/parcels.ts). Nói thẳng
                      đó là gì, đừng báo "không có dữ liệu" vì dữ liệu thì có, chỉ là chưa mở tra cứu. */
                   (info as any).khongTraCuu
-                    ? <p className="text-slate-500">Điểm này nằm trong <b className="text-[#0A2540]">{(info as any).khongTraCuu}</b> — tạm thời chưa mở tra cứu thửa.</p>
+                    ? <p className="text-slate-500">Điểm này nằm trong <b className="text-[#0B4045]">{(info as any).khongTraCuu}</b> — tạm thời chưa mở tra cứu thửa.</p>
                     : <p className="text-slate-500">Không có dữ liệu thửa tại điểm này{clickVN ? ` · ${clickVN.lat.toFixed(6)}, ${clickVN.lng.toFixed(6)}` : ''}.</p>
                 )}
               </div>
@@ -2761,7 +2761,7 @@ export default function MapPage() {
                           {ds.map((t, i) => (
                             <button key={t.muc.id} aria-label={t.tieuDe} title={t.tieuDe}
                               onClick={() => toiTrang(i)}
-                              className={`h-1 rounded-full transition-all ${i === trangQh ? 'w-6 bg-[#0A2540]' : 'w-3.5 bg-slate-300 sm:hover:bg-slate-400'}`} />
+                              className={`h-1 rounded-full transition-all ${i === trangQh ? 'w-6 bg-[#0B4045]' : 'w-3.5 bg-slate-300 sm:hover:bg-slate-400'}`} />
                           ))}
                         </div>
                       )}
@@ -2777,9 +2777,9 @@ export default function MapPage() {
                       {ds.length > 1 && (
                         <div className="absolute right-3 top-[7px] z-20 hidden items-center gap-0.5 opacity-0 transition-opacity group-hover/qh:opacity-100 sm:flex">
                           <button type="button" aria-label="Bản quy hoạch trước" disabled={trangQh === 0} onClick={() => toiTrang(trangQh - 1)}
-                            className="grid h-5 w-5 place-items-center rounded text-[16px] leading-none text-[#0A2540] hover:bg-slate-100 disabled:text-slate-300 disabled:hover:bg-transparent">‹</button>
+                            className="grid h-5 w-5 place-items-center rounded text-[16px] leading-none text-[#0B4045] hover:bg-slate-100 disabled:text-slate-300 disabled:hover:bg-transparent">‹</button>
                           <button type="button" aria-label="Bản quy hoạch sau" disabled={trangQh === ds.length - 1} onClick={() => toiTrang(trangQh + 1)}
-                            className="grid h-5 w-5 place-items-center rounded text-[16px] leading-none text-[#0A2540] hover:bg-slate-100 disabled:text-slate-300 disabled:hover:bg-transparent">›</button>
+                            className="grid h-5 w-5 place-items-center rounded text-[16px] leading-none text-[#0B4045] hover:bg-slate-100 disabled:text-slate-300 disabled:hover:bg-transparent">›</button>
                         </div>
                       )}
                       <div ref={trangQhRef} onScroll={() => { clearTimeout((trangQhRef as any).t); (trangQhRef as any).t = setTimeout(khiLuotTrangQh, 90); }}
@@ -2803,7 +2803,7 @@ export default function MapPage() {
                         {ds.map((t) => (
                           <div key={t.muc.id} className={`w-full shrink-0 snap-center ${ds.length > 1 ? 'px-4 sm:pr-14' : 'px-4'}`}>{/* sm:pr-14: chừa góc phải cho mũi tên nhỏ khỏi đè tiêu đề */}
                             {/* Tiêu đề + tên các mảnh phân khu gộp MỘT dòng cho gọn. */}
-                            <p className={`truncate font-bold leading-snug text-[#0A2540] text-[13px]`}>{t.tieuDe}{t.phu && <span className="ml-1.5 text-[10.5px] font-normal text-slate-400">{t.phu}</span>}</p>
+                            <p className={`truncate font-bold leading-snug text-[#0B4045] text-[13px]`}>{t.tieuDe}{t.phu && <span className="ml-1.5 text-[10.5px] font-normal text-slate-400">{t.phu}</span>}</p>
                             <div className="mt-1 space-y-[3px]">
                               {t.areas.map((a) => {
                                 const mau = mauQh?.[t.bangMau]?.[a.type] || '#e2e8f0';
@@ -2925,7 +2925,7 @@ export default function MapPage() {
                       const areas = (info.overlaps && info.overlaps.length) ? info.overlaps : qhAreasFromVector(ring); finish(areas.length ? areas : []);
                     }}
                     id="nut-phieu-qh"
-                    className="min-w-0 whitespace-nowrap px-1 sm:px-0 sm:mb-1.5 sm:w-full flex items-center justify-center gap-1.5 sm:gap-2 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold bg-[#0A2540] hover:bg-[#0d3a6b] text-white">
+                    className="min-w-0 whitespace-nowrap px-1 sm:px-0 sm:mb-1.5 sm:w-full flex items-center justify-center gap-1.5 sm:gap-2 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold bg-[#0B4045] hover:bg-[#10585e] text-white">
                     🖨<span className="sm:hidden">Phiếu QH</span><span className="hidden sm:inline">Xuất phiếu kiểm tra quy hoạch</span>
                   </button>
                 )}

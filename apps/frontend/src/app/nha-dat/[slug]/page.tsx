@@ -136,15 +136,15 @@ export default async function Page({ params }: { params: { slug: string } }) {
         </nav>
 
         {/* Hero */}
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] leading-tight">{h1}, Khánh Hòa</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0B4045] leading-tight">{h1}, Khánh Hòa</h1>
         <p className="mt-2 text-[14px] sm:text-[15px] text-slate-600 leading-relaxed max-w-3xl">{intro}</p>
 
         {/* Thống kê + CTA */}
         <div className="mt-4 flex flex-wrap items-center gap-2.5">
-          <span className="inline-flex items-center gap-1.5 bg-[#0A2540] text-white text-[13px] font-bold px-3 py-1.5 rounded-full">🏠 {count} tin đang có</span>
+          <span className="inline-flex items-center gap-1.5 bg-[#0B4045] text-white text-[13px] font-bold px-3 py-1.5 rounded-full">🏠 {count} tin đang có</span>
           {minPrice > 0 && <span className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-800 border border-amber-200 text-[13px] font-bold px-3 py-1.5 rounded-full">Giá từ {formatVnd(minPrice)}</span>}
           <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 text-[13px] font-semibold px-3 py-1.5 rounded-full">📍 {p.area ? p.area.region : 'toàn huyện Cam Lâm'}</span>
-          <Link href={filterHref} className="ml-auto inline-flex items-center gap-1.5 bg-[#C8A14B] hover:bg-[#b8923f] text-[#0A2540] text-[13px] font-extrabold px-4 py-2 rounded-xl shadow">🗺️ Xem trên bản đồ →</Link>
+          <Link href={filterHref} className="ml-auto inline-flex items-center gap-1.5 bg-[#C8A14B] hover:bg-[#b8923f] text-[#0B4045] text-[13px] font-extrabold px-4 py-2 rounded-xl shadow">🗺️ Xem trên bản đồ →</Link>
         </div>
 
         {/* Bản đồ khu vực (tải khi cuộn tới) */}
@@ -153,14 +153,14 @@ export default async function Page({ params }: { params: { slug: string } }) {
         </div>
 
         {/* Danh sách tin */}
-        <h2 className="mt-5 sm:mt-7 text-lg sm:text-xl font-bold text-[#0A2540]">{typeLabel} {p.area ? `tại ${areaShort}` : 'tại Cam Lâm'} mới nhất</h2>
+        <h2 className="mt-5 sm:mt-7 text-lg sm:text-xl font-bold text-[#0B4045]">{typeLabel} {p.area ? `tại ${areaShort}` : 'tại Cam Lâm'} mới nhất</h2>
         {shown.length > 0 ? (
           <>
             <div className="mt-3 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3">
               {shown.map((l) => <ListingCard key={l.id} l={l} />)}
             </div>
             <div className="mt-4 text-center">
-              <Link href={filterHref} className="inline-flex items-center gap-2 bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-5 py-2.5 rounded-xl">Xem tất cả {typeLabel.toLowerCase()} {areaShort} →</Link>
+              <Link href={filterHref} className="inline-flex items-center gap-2 bg-[#0B4045] hover:bg-[#0e5157] text-white font-bold px-5 py-2.5 rounded-xl">Xem tất cả {typeLabel.toLowerCase()} {areaShort} →</Link>
             </div>
           </>
         ) : (
@@ -168,14 +168,14 @@ export default async function Page({ params }: { params: { slug: string } }) {
             <p className="text-slate-600">Hiện chưa có tin <b>{lo}</b> tại <b>{areaShort}</b> phù hợp.</p>
             <p className="text-[13px] text-slate-500 mt-1">Bạn có thể xem trên bản đồ, tìm các khu vực lân cận bên dưới, hoặc đăng tin miễn phí.</p>
             <div className="mt-3 flex flex-wrap justify-center gap-2">
-              <Link href={filterHref} className="bg-[#C8A14B] text-[#0A2540] font-bold px-4 py-2 rounded-xl text-sm">Xem bản đồ khu vực</Link>
-              <Link href="/sales/post" className="bg-[#0A2540] text-white font-bold px-4 py-2 rounded-xl text-sm">Đăng tin miễn phí</Link>
+              <Link href={filterHref} className="bg-[#C8A14B] text-[#0B4045] font-bold px-4 py-2 rounded-xl text-sm">Xem bản đồ khu vực</Link>
+              <Link href="/sales/post" className="bg-[#0B4045] text-white font-bold px-4 py-2 rounded-xl text-sm">Đăng tin miễn phí</Link>
             </div>
           </div>
         )}
 
         {/* Giá đất khu vực */}
-        <section className="mt-6 sm:mt-8 bg-gradient-to-br from-[#0A2540] to-[#0d3a6b] text-white rounded-2xl p-5 sm:p-6">
+        <section className="mt-6 sm:mt-8 bg-gradient-to-br from-[#0B4045] to-[#10585e] text-white rounded-2xl p-5 sm:p-6">
           <h2 className="text-lg sm:text-xl font-extrabold">Giá đất {areaShort} & bảng giá tham khảo</h2>
           <p className="text-white/85 text-[14px] mt-2 max-w-2xl">Giá đất ở tại Cam Lâm dao động khoảng <b className="text-[#FFD56A]">{trieu(PRICE.min)} – {trieu(PRICE.max)} triệu đồng/m²</b> tùy vị trí (theo bảng giá đất tỉnh Khánh Hòa). Tra cứu giá chính thức từng tuyến đường và định giá nhanh thửa đất của bạn:</p>
           <div className="mt-3 flex flex-wrap gap-2.5">
@@ -187,17 +187,17 @@ export default async function Page({ params }: { params: { slug: string } }) {
 
         {/* Về khu vực / loại hình */}
         <section className="mt-6 sm:mt-8">
-          <h2 className="text-lg sm:text-xl font-bold text-[#0A2540]">Về {p.area ? areaShort : `${typeLabel.toLowerCase()} tại Cam Lâm`}</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-[#0B4045]">Về {p.area ? areaShort : `${typeLabel.toLowerCase()} tại Cam Lâm`}</h2>
           <p className="mt-2 text-[14px] text-slate-600 leading-relaxed max-w-3xl">{p.area ? p.area.blurb : p.type?.blurb} {p.type ? p.type.blurb : ''} Cam Lâm nằm giữa TP. Nha Trang và sân bay quốc tế Cam Ranh, hạ tầng giao thông ngày càng hoàn thiện (Quốc lộ 1, cao tốc, đường ven biển) — là khu vực bất động sản giàu tiềm năng của Khánh Hòa.</p>
         </section>
 
         {/* FAQ */}
         <section className="mt-6 sm:mt-8">
-          <h2 className="text-lg sm:text-xl font-bold text-[#0A2540]">Câu hỏi thường gặp</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-[#0B4045]">Câu hỏi thường gặp</h2>
           <div className="mt-3 space-y-2.5">
             {faqs.map((f, i) => (
               <details key={i} className="bg-white border border-slate-200 rounded-xl p-4 group">
-                <summary className="font-semibold text-[#0A2540] cursor-pointer list-none flex items-center justify-between gap-2">{f.q}<span className="text-[#C8A14B] group-open:rotate-45 transition">＋</span></summary>
+                <summary className="font-semibold text-[#0B4045] cursor-pointer list-none flex items-center justify-between gap-2">{f.q}<span className="text-[#C8A14B] group-open:rotate-45 transition">＋</span></summary>
                 <p className="mt-2 text-[14px] text-slate-600 leading-relaxed">{f.a}</p>
               </details>
             ))}
@@ -208,14 +208,14 @@ export default async function Page({ params }: { params: { slug: string } }) {
         <section className="mt-6 sm:mt-8 border-t border-slate-200 pt-5 sm:pt-6">
           {p.area && (
             <div className="mb-5">
-              <h3 className="text-[15px] font-bold text-[#0A2540] mb-2">Loại hình khác tại {areaShort}</h3>
+              <h3 className="text-[15px] font-bold text-[#0B4045] mb-2">Loại hình khác tại {areaShort}</h3>
               <div className="flex flex-wrap gap-2">
                 {otherTypes.map((x) => <Link key={x.href} href={x.href} className="text-[13px] bg-slate-100 hover:bg-[#C8A14B]/20 text-slate-700 px-3 py-1.5 rounded-full">{x.label}</Link>)}
               </div>
             </div>
           )}
           <div>
-            <h3 className="text-[15px] font-bold text-[#0A2540] mb-2">{p.type ? `${typeLabel} ở khu vực khác` : 'Nhà đất theo khu vực'}</h3>
+            <h3 className="text-[15px] font-bold text-[#0B4045] mb-2">{p.type ? `${typeLabel} ở khu vực khác` : 'Nhà đất theo khu vực'}</h3>
             <div className="flex flex-wrap gap-2">
               {otherAreas.map((x) => <Link key={x.href} href={x.href} className="text-[13px] bg-slate-100 hover:bg-[#C8A14B]/20 text-slate-700 px-3 py-1.5 rounded-full">{x.label}</Link>)}
             </div>

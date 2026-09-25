@@ -123,7 +123,7 @@ export default function TuVanPage() {
   if (!allowed) return (
     <div className="max-w-md mx-auto px-4 py-8 sm:p-12 text-center">
       <p className="text-5xl">🔒</p>
-      <p className="font-bold text-[#0A2540] mt-3 text-lg">Khu vực dành cho tư vấn viên</p>
+      <p className="font-bold text-[#0B4045] mt-3 text-lg">Khu vực dành cho tư vấn viên</p>
       <p className="text-slate-500 text-sm mt-1">Bạn cần được admin cấp quyền “Tư vấn đầu tư & Pháp lý” để vào trang này.</p>
       <Link href="/" className="inline-block mt-5 text-sm font-semibold text-red-600">← Về trang chủ</Link>
     </div>
@@ -136,7 +136,7 @@ export default function TuVanPage() {
     <div className="max-w-6xl mx-auto px-3 py-5">
       <div className="flex items-center justify-between mb-4 gap-3">
         <div>
-          <h1 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">💰 Quản trị Tư vấn đầu tư & Pháp lý</h1>
+          <h1 className="text-xl md:text-2xl font-extrabold text-[#0B4045]">💰 Quản trị Tư vấn đầu tư & Pháp lý</h1>
           <p className="text-sm text-slate-500">Khách chưa được trả lời xếp lên đầu, ai nhắn trước ưu tiên trước.</p>
         </div>
         <span className="shrink-0 bg-red-50 text-red-600 font-bold text-sm rounded-full px-3 py-1.5">{waitingCount} đang chờ</span>
@@ -152,7 +152,7 @@ export default function TuVanPage() {
                 <button key={r.room} onClick={() => setRoom(r.room)} className={`w-full text-left px-3 py-2.5 border-b border-slate-50 hover:bg-slate-50 ${act ? 'bg-amber-50' : ''}`}>
                   <div className="flex items-center gap-2">
                     <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${r.waiting ? 'bg-red-500' : 'bg-emerald-500'}`} />
-                    <span className="font-semibold text-[#0A2540] text-sm truncate flex-1">{r.name}</span>
+                    <span className="font-semibold text-[#0B4045] text-sm truncate flex-1">{r.name}</span>
                     {(r.unread || 0) > 0 && <span className="shrink-0 min-w-[18px] h-[18px] px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full">{r.unread}</span>}
                   </div>
                   <div className="flex items-center justify-between mt-0.5 pl-4 gap-2">
@@ -170,7 +170,7 @@ export default function TuVanPage() {
             <>
               <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2 flex-wrap">
                 <span className={`w-2 h-2 rounded-full ${active?.online ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                <b className="text-[#0A2540]">{active?.name || 'Khách'}</b>
+                <b className="text-[#0B4045]">{active?.name || 'Khách'}</b>
                 {active?.phone ? <a href={`tel:${active.phone}`} className="text-red-600 text-sm font-semibold">📞 {active.phone}</a> : null}
                 {active?.waiting && <span className="text-[11px] font-bold text-red-500">⏳ đang chờ {waitText(active.waitingSince)}</span>}
                 {isAdmin && peerUpload !== null && (
@@ -199,7 +199,7 @@ export default function TuVanPage() {
                           )}
                         </span>
                       )}
-                      <div className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${mine ? 'bg-[#0A2540] text-white' : 'bg-white border border-slate-200'}`}>
+                      <div className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${mine ? 'bg-[#0B4045] text-white' : 'bg-white border border-slate-200'}`}>
                         {!mine && <p className="text-[11px] font-bold text-[#C8A14B] mb-0.5">{m.name}</p>}
                         {coTep
                           ? <ChatDinhKem fileId={m.fileId} fileName={m.fileName} fileMime={m.fileMime} fileSize={m.fileSize} mine={mine} />
@@ -216,7 +216,7 @@ export default function TuVanPage() {
                     <button onClick={() => tepRef.current?.click()} disabled={dangGuiTep} title="Gửi ảnh hoặc tệp PDF (tối đa 10MB)" className="shrink-0 w-9 h-9 grid place-items-center rounded-full border border-slate-300 text-lg hover:bg-slate-100 disabled:opacity-50">{dangGuiTep ? '⏳' : '📎'}</button>
                   </>
                 )}
-                <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') send(); }} placeholder="Nhập câu trả lời…" className="flex-1 border border-slate-300 rounded-full px-4 py-2 text-sm outline-none focus:border-[#0A2540]" />
+                <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') send(); }} placeholder="Nhập câu trả lời…" className="flex-1 border border-slate-300 rounded-full px-4 py-2 text-sm outline-none focus:border-[#0B4045]" />
                 <button onClick={send} className="cl-press bg-red-600 hover:bg-red-700 text-white font-bold px-5 rounded-full text-sm">Gửi</button>
               </div>
             </>

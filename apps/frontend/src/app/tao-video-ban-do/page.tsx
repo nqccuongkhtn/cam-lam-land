@@ -16,7 +16,7 @@ import { choMotKhung, type SoKhung } from '@/lib/video/settle';
 import { nayAnhDocDuongBay } from '@/lib/video/warm';
 import { dangKyTaiAnhCoThuLai, boc } from '@/lib/video/tileProtocol';
 
-const NAVY = '#0A2540', GOLD = '#C8A14B';
+const NAVY = '#0B4045', GOLD = '#C8A14B';
 // Bảng màu giao diện tối — dùng cho các bảng cài đặt (sang, đỡ chói mắt khi làm việc lâu).
 const INK = '#e7eef7';        // chữ chính
 const INK2 = '#94a7bd';       // chữ phụ
@@ -262,7 +262,7 @@ function makeArrowIcon(col: string, icon: string): any {
   x.fillStyle = col; x.shadowColor = 'rgba(0,0,0,.55)'; x.shadowBlur = 8; x.shadowOffsetY = 2; x.fill();
   x.shadowColor = 'transparent';
   x.lineWidth = 3.4; x.strokeStyle = 'rgba(255,255,255,.9)'; x.stroke();
-  drawGlyph(x, icon, m, m, 17, '#0A2540');
+  drawGlyph(x, icon, m, m, 17, '#0B4045');
   return x.getImageData(0, 0, S, S);
 }
 // 8 KIỂU THẺ CHÚ THÍCH (học từ MapEffect, vẽ bằng bản đồ nên vào thẳng video)
@@ -286,9 +286,9 @@ const CO_SHAPES: { key: string; name: string; note: string }[] = [
   { key: 'vienday', name: 'Viền dày nổi khối', note: 'Viền trắng dày bao ngoài như biển hiệu — đọc được từ rất xa' },
 ];
 const CO_STYLES: Record<string, { col: string; bg: string; fg: string }> = {
-  gold: { col: '#C8A14B', bg: '#0A2540', fg: '#ffd98a' },
+  gold: { col: '#C8A14B', bg: '#0B4045', fg: '#ffd98a' },
   white: { col: '#ffffff', bg: '#12283f', fg: '#ffffff' },
-  navy: { col: '#38bdf8', bg: '#08243c', fg: '#dbeafe' },
+  navy: { col: '#38bdf8', bg: '#083338', fg: '#dbeafe' },
   red: { col: '#ff3b30', bg: '#3b0a08', fg: '#ffd9d6' },
 };
 // Ảnh NỀN CO GIÃN cho thẻ chữ: MapLibre kéo giãn phần giữa nên khung luôn ôm khít chữ ở mọi mức phóng.
@@ -619,7 +619,7 @@ const WIDGETS: Widget[] = [
 ];
 // Vẽ một khối dựng sẵn lên canvas. p = tiến độ hiện ra (0→1), el = giây đã trôi (cho phần chạy dần).
 function drawWidget(ctx: CanvasRenderingContext2D, kind: string, cx: number, cy: number, w: number, d: any, p: number, el: number) {
-  const GOLD = '#C8A14B', NAVY = '#0A2540';
+  const GOLD = '#C8A14B', NAVY = '#0B4045';
   if (kind === 'hopvien' || kind === 'ngoacgoc' || kind === 'thanhngang' || kind === 'khunggia' || kind === 'haivachthe') {
     const x = ctx;
     const nhaIcon = (X: number, Y: number, r: number, mau: string) => {   // icon ngôi nhà đơn giản, vẽ tay
@@ -725,7 +725,7 @@ function drawWidget(ctx: CanvasRenderingContext2D, kind: string, cx: number, cy:
       x.beginPath(); x.moveTo(ix + r * 0.15, iy - r * 0.8); x.quadraticCurveTo(ix + r * 0.8, iy - r * 0.6, ix + r * 0.85, iy - r * 0.15); x.stroke();
     }
     x.restore();
-    x.fillStyle = '#0A2540'; x.font = '800 ' + Math.round(H * 0.44) + 'px Arial, sans-serif';
+    x.fillStyle = '#0B4045'; x.font = '800 ' + Math.round(H * 0.44) + 'px Arial, sans-serif';
     x.textAlign = 'left'; x.textBaseline = 'middle';
     x.fillText(String(d?.t1 || ''), X + O + H * 0.34, cy + 1);
     return;
@@ -1257,10 +1257,10 @@ const PIN_FAMILIES: PinFamily[] = [
   { key: 'phatsangkhoet', name: 'Vị trí của bạn', note: 'Ghim phát sáng khoét lỗ giữa, nhịp như nhịp tim', shape: 'neonhole', color: 'auto', anim: 'nhiptim', demo: ['nha', 'sao', 'dot'] },
   { key: 'giotkinh', name: 'Giọt kính trong', note: 'Kính mờ nhìn xuyên thấy bản đồ — nhẹ và sang', shape: 'giotkinh', color: '#38bdf8', anim: 'toasang', demo: ['bien', 'resort', 'congvien'], tones: ['#38bdf8', '#C8A14B', '#a855f7', '#22c55e'] },
   { key: 'mensu', name: 'Huy hiệu men sứ', note: 'Vành trắng dày, ruột bóng như huy hiệu cài áo', shape: 'mensu', color: '#e11d48', anim: 'nhun', demo: ['nha', 'ubnd', 'benhvien'], tones: ['#e11d48', '#C8A14B', '#2563eb', '#0f766e'] },
-  { key: 'nhantrang', name: 'Nhãn tên · nền trắng', note: 'Tên tiện ích nằm ngay trong ghim — nhìn ra dáng nhãn địa điểm', shape: 'nhantrang', color: '#0A2540', anim: 'nhun', demo: ['truong', 'cho', 'bien'], tones: ['#0A2540', '#e11d48', '#2563eb', '#16a34a'] },
+  { key: 'nhantrang', name: 'Nhãn tên · nền trắng', note: 'Tên tiện ích nằm ngay trong ghim — nhìn ra dáng nhãn địa điểm', shape: 'nhantrang', color: '#0B4045', anim: 'nhun', demo: ['truong', 'cho', 'bien'], tones: ['#0B4045', '#e11d48', '#2563eb', '#16a34a'] },
   { key: 'thechip', name: 'Chip nổi', note: 'Chip nhỏ bo tròn nổi phía trên, mũi nhọn chỉ xuống điểm — gọn, ít che ảnh nền', shape: 'thechip', color: '#C8A14B', anim: 'nhun', demo: ['cafe', 'anuong', 'sieuthi'], tones: ['#C8A14B', '#38bdf8', '#e11d48', '#22c55e'] },
   { key: 'thanhduoi', name: 'Thanh dưới chấm', note: 'Chấm neo ở trên, thanh chữ nằm dưới — kiểu chú thích ảnh báo chí', shape: 'thanhduoi', color: '#38bdf8', anim: 'nhun', demo: ['bien', 'nui', 'congvien'], tones: ['#38bdf8', '#C8A14B', '#f472b6', '#22c55e'] },
-  { key: 'thevuong', name: 'Thẻ vuông', note: 'Ô biểu tượng nằm trên, tên nằm dưới, nền trắng — đứng đắn và dễ đọc nhất', shape: 'thevuong', color: '#0A2540', anim: 'nhun', demo: ['truong', 'benhvien', 'ubnd'], tones: ['#0A2540', '#e11d48', '#2563eb', '#16a34a'] },
+  { key: 'thevuong', name: 'Thẻ vuông', note: 'Ô biểu tượng nằm trên, tên nằm dưới, nền trắng — đứng đắn và dễ đọc nhất', shape: 'thevuong', color: '#0B4045', anim: 'nhun', demo: ['truong', 'benhvien', 'ubnd'], tones: ['#0B4045', '#e11d48', '#2563eb', '#16a34a'] },
   { key: 'nhanvienthuoc', name: 'Nhãn viên thuốc', note: 'Nhãn bo tròn hai đầu, chấm màu bên trái — nhẹ nhàng, hiện đại, ít che ảnh', shape: 'nhanvienthuoc', color: '#2563eb', anim: 'nhun', demo: ['bien', 'cafe', 'congvien'], tones: ['#2563eb', '#C8A14B', '#e11d48', '#16a34a'] },
   { key: 'bienrao', name: 'Biển rao bán', note: 'Tấm tôn sơn màu — chọn cách gắn: hai chân, một cột, treo xích hay đỉnh vòm', shape: 'bienrao', color: '#e11d48', anim: 'nhun', demo: ['nha', 'toanha', 'dulich'], tones: ['#e11d48', '#C8A14B', '#2563eb', '#16a34a'] },
   { key: 'huyhieuten', name: 'Huy hiệu có tên', note: 'Đĩa kim loại có ánh sáng hắt, tên gắn trong khung ngay dưới — trang trọng', shape: 'huyhieuten', color: '#C8A14B', anim: 'nhun', demo: ['truong', 'ubnd', 'chua'], tones: ['#C8A14B', '#5eb0e5', '#e11d48', '#16a34a'] },
@@ -1318,7 +1318,7 @@ function pickIcon(lowName: string): string {
   for (const [key, words] of ICON_GUESS) if (words.some((w) => t.includes(w))) return key;
   return 'sao';
 }
-const PIN_COLORS: [string, string][] = [['#C8A14B', 'Vàng'], ['#ff3b30', 'Đỏ'], ['#3b82f6', 'Xanh dương'], ['#22c55e', 'Xanh lá'], ['#ffffff', 'Trắng'], ['#0A2540', 'Xanh đêm']];
+const PIN_COLORS: [string, string][] = [['#C8A14B', 'Vàng'], ['#ff3b30', 'Đỏ'], ['#3b82f6', 'Xanh dương'], ['#22c55e', 'Xanh lá'], ['#ffffff', 'Trắng'], ['#0B4045', 'Xanh đêm']];
 // BIỂU TƯỢNG TIỆN ÍCH — dùng bộ icon **Lucide** (lucide.dev, giấy phép ISC, miễn phí cả khi bán hàng).
 // Dữ liệu nét được chép sẵn vào đây nên KHÔNG phải tải gì lúc chạy và máy nào cũng hiện y hệt
 // (trước đây dùng emoji thì nhiều máy ra ô vuông đen, còn tự vẽ tay thì nét thô, tỉ lệ lệch nhau).
@@ -1536,7 +1536,7 @@ const GHIM_CO_TEN = ['huyhieuten', 'calloutvang', 'okinh', 'bienrao', 'biencot',
 const laGhimCoTen = (shape: string) => shape.startsWith('nhan') || GHIM_CO_TEN.includes(shape);
 
 const NHAN_KIEU: Record<string, { nen: string; chu: string; vien: string; dam?: boolean }> = {
-  trang:  { nen: '#ffffff', chu: '#0A2540', vien: 'rgba(10,37,64,.14)' },   // trắng sạch, chữ xanh đêm
+  trang:  { nen: '#ffffff', chu: '#0B4045', vien: 'rgba(11,64,69,.14)' },   // trắng sạch, chữ xanh đêm
   toi:    { nen: 'rgba(9,20,34,.92)', chu: '#ffffff', vien: 'rgba(255,255,255,.18)' },
   mau:    { nen: '', chu: '#ffffff', vien: 'rgba(255,255,255,.9)', dam: true },  // nền chính là màu ghim
 };
@@ -1588,7 +1588,7 @@ function makeLabelPin2(color: string, icon: string, label: string, kieu: string,
       x.fillStyle = 'rgba(255,255,255,.96)'; x.beginPath(); x.roundRect(0.5, 0.5, W - 1, H - 1, 10); x.fill(); x.restore();
       x.fillStyle = color; x.beginPath(); x.roundRect(W / 2 - OC / 2, 6, OC, OC - 4, 9); x.fill();
       drawGlyph(x, icon, W / 2, 6 + (OC - 4) / 2, 13, '#ffffff');
-      x.fillStyle = '#0A2540'; x.font = '700 20px Arial, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.fillStyle = '#0B4045'; x.font = '700 20px Arial, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
       x.fillText(chu, W / 2, H - 15);
       x.strokeStyle = color; x.lineWidth = 2.2; x.beginPath(); x.moveTo(W / 2, H); x.lineTo(W / 2, H + 11); x.stroke();
       x.beginPath(); x.arc(W / 2, H + 13, 3, 0, Math.PI * 2); x.fillStyle = color; x.fill();
@@ -1640,10 +1640,10 @@ function makeLabelPin2(color: string, icon: string, label: string, kieu: string,
       const x = c.getContext('2d'); if (!x) return null; x.scale(PIN_HD, PIN_HD);
       x.save(); x.shadowColor = 'rgba(6,14,26,.5)'; x.shadowBlur = 12; x.shadowOffsetY = 5;
       x.fillStyle = '#ffffff'; x.beginPath(); x.roundRect(0.5, 0.5, W - 1, H - 1, H / 2); x.fill(); x.restore();
-      x.strokeStyle = 'rgba(10,37,64,.16)'; x.lineWidth = 1.2; x.beginPath(); x.roundRect(0.5, 0.5, W - 1, H - 1, H / 2); x.stroke();
+      x.strokeStyle = 'rgba(11,64,69,.16)'; x.lineWidth = 1.2; x.beginPath(); x.roundRect(0.5, 0.5, W - 1, H - 1, H / 2); x.stroke();
       x.beginPath(); x.arc(H / 2, H / 2, H * 0.34, 0, Math.PI * 2); x.fillStyle = color; x.fill();
       drawGlyph(x, icon, H / 2, H / 2, H * 0.2, '#ffffff');
-      x.fillStyle = '#0A2540'; x.font = '800 22px Arial, sans-serif'; x.textAlign = 'left'; x.textBaseline = 'middle';
+      x.fillStyle = '#0B4045'; x.font = '800 22px Arial, sans-serif'; x.textAlign = 'left'; x.textBaseline = 'middle';
       x.fillText(chu, H * 0.94, H / 2 + 1);
       x.strokeStyle = color; x.lineWidth = 2.4; x.beginPath(); x.moveTo(W / 2, H); x.lineTo(W / 2, H + CHAN - 4); x.stroke();
       x.beginPath(); x.arc(W / 2, H + CHAN - 1, 3.2, 0, Math.PI * 2); x.fillStyle = color; x.fill();
@@ -1751,7 +1751,7 @@ function makeLabelPin2(color: string, icon: string, label: string, kieu: string,
     x.fillStyle = gs; x.fillRect(cx - DIA, cyD - DIA / 2, DIA * 2, DIA * 0.62); x.restore();
     x.strokeStyle = 'rgba(255,255,255,.75)'; x.lineWidth = 1.7; x.beginPath(); x.arc(cx, cyD, DIA / 2, 0, Math.PI * 2); x.stroke();
     x.strokeStyle = 'rgba(0,0,0,.32)'; x.lineWidth = 1; x.beginPath(); x.arc(cx, cyD, DIA / 2 - 5, 0, Math.PI * 2); x.stroke();
-    drawGlyph(x, icon, cx, cyD, 15, '#0A2540');
+    drawGlyph(x, icon, cx, cyD, 15, '#0B4045');
     return x.getImageData(0, 0, c.width, c.height);   // ImageData TRẦN — đúng kiểu mà cả bản đồ lẫn ô xem trước đều cần
   }
 
@@ -1776,8 +1776,8 @@ function makeLabelPin2(color: string, icon: string, label: string, kieu: string,
     g.addColorStop(0, 'rgba(255,255,255,.45)'); g.addColorStop(0.45, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(0,0,0,.30)');
     x.fillStyle = g; x.fillRect(0, 0, W, H + DUOI); x.restore();
     x.strokeStyle = 'rgba(255,255,255,.62)'; x.lineWidth = 1.4; duong(); x.stroke();
-    drawGlyph(x, icon, 30, H / 2, 13, '#0A2540');
-    x.fillStyle = '#0A2540'; x.font = '700 21px Arial, sans-serif'; x.textAlign = 'left'; x.textBaseline = 'middle';
+    drawGlyph(x, icon, 30, H / 2, 13, '#0B4045');
+    x.fillStyle = '#0B4045'; x.font = '700 21px Arial, sans-serif'; x.textAlign = 'left'; x.textBaseline = 'middle';
     x.fillText(chu, 52, H / 2 + 1);
     return x.getImageData(0, 0, c.width, c.height);   // ImageData TRẦN — đúng kiểu mà cả bản đồ lẫn ô xem trước đều cần
   }
@@ -1833,7 +1833,7 @@ function makeLabelPin(color: string, icon: string, label: string, kieu = 'trang'
   const cxI = PAD + ICO / 2, cyI = H / 2;
   x.beginPath(); x.arc(cxI, cyI, ICO / 2, 0, Math.PI * 2);
   x.fillStyle = K.dam ? 'rgba(255,255,255,.22)' : color; x.fill();
-  drawGlyph(x, icon, cxI, cyI, ICO * 0.32, K.dam ? '#ffffff' : (color === '#ffffff' ? '#0A2540' : '#ffffff'));
+  drawGlyph(x, icon, cxI, cyI, ICO * 0.32, K.dam ? '#ffffff' : (color === '#ffffff' ? '#0B4045' : '#ffffff'));
   x.font = '700 24px Arial, sans-serif'; x.textAlign = 'left'; x.textBaseline = 'middle';
   x.fillStyle = K.chu; x.fillText(chu, PAD + ICO + 10, cyI + 1);
   return x.getImageData(0, 0, c.width, c.height);
@@ -1865,7 +1865,7 @@ function veAnhGhim(shape: string, color: string, icon: string): any {
   const x = c.getContext('2d'); if (!x) return null;
   x.scale(PIN_HD, PIN_HD);
   const light = color === '#ffffff';
-  const ink = light ? '#0A2540' : '#ffffff';
+  const ink = light ? '#0B4045' : '#ffffff';
   const deep = shade(color, -52), soft = shade(color, 52);   // dùng cho kiểu Vòng khuyên
   const tipY = H - pad * 0.5;                                   // mũi ghim = đúng vị trí trên bản đồ
   const cx = W / 2, cyBody = round ? H / 2 : (H - pad) * 0.39, rBody = W / 2 - pad;
@@ -1961,12 +1961,12 @@ function veAnhGhim(shape: string, color: string, icon: string): any {
     const r = rBody, cy = cyBody, rr = r * 0.3;
     const khoi = (dx = 0, dy = 0) => { const l = cx - r + dx, rt = cx + r + dx, tp = cy - r + dy, bt = cy + r + dy;
       x.beginPath(); x.moveTo(l + rr, tp); x.arcTo(rt, tp, rt, bt, rr); x.arcTo(rt, bt, l, bt, rr); x.arcTo(l, bt, l, tp, rr); x.arcTo(l, tp, rt, tp, rr); x.closePath(); };
-    x.beginPath(); x.moveTo(cx - r * 0.3 + 5, cy + r + 5); x.lineTo(cx + r * 0.3 + 5, cy + r + 5); x.lineTo(cx + 5, tipY); x.closePath(); x.fillStyle = '#0b1220'; x.fill();
-    khoi(5, 5); x.fillStyle = '#0b1220'; x.fill();                       // bóng cứng, không nhoè
+    x.beginPath(); x.moveTo(cx - r * 0.3 + 5, cy + r + 5); x.lineTo(cx + r * 0.3 + 5, cy + r + 5); x.lineTo(cx + 5, tipY); x.closePath(); x.fillStyle = '#06201f'; x.fill();
+    khoi(5, 5); x.fillStyle = '#06201f'; x.fill();                       // bóng cứng, không nhoè
     x.beginPath(); x.moveTo(cx - r * 0.3, cy + r); x.lineTo(cx + r * 0.3, cy + r); x.lineTo(cx, tipY - 5); x.closePath();
-    x.fillStyle = color; x.fill(); x.lineWidth = 3.4; x.strokeStyle = '#0b1220'; x.stroke();
-    khoi(); x.fillStyle = color; x.fill(); khoi(); x.lineWidth = 3.6; x.strokeStyle = '#0b1220'; x.stroke();
-    drawGlyph(x, icon, cx, cy, r * 0.54, '#0b1220');
+    x.fillStyle = color; x.fill(); x.lineWidth = 3.4; x.strokeStyle = '#06201f'; x.stroke();
+    khoi(); x.fillStyle = color; x.fill(); khoi(); x.lineWidth = 3.6; x.strokeStyle = '#06201f'; x.stroke();
+    drawGlyph(x, icon, cx, cy, r * 0.54, '#06201f');
     return x.getImageData(0, 0, c.width, c.height);
   }
   // NÉT MẢNH TỐI GIẢN (lối bản đồ Mapbox sáng): nền TRẮNG, viền màu mảnh, biểu tượng cùng màu viền.
@@ -2034,7 +2034,7 @@ function veAnhGhim(shape: string, color: string, icon: string): any {
     gm.addColorStop(0, shade(color, 26)); gm.addColorStop(0.55, color); gm.addColorStop(1, shade(color, -26));
     x.beginPath(); x.arc(cx, cyBody, rBody * 0.84, 0, Math.PI * 2); x.fillStyle = gm; x.fill();
     x.beginPath(); x.arc(cx, cyBody, rBody * 0.84, 0, Math.PI * 2); x.lineWidth = 1.1; x.strokeStyle = 'rgba(6,14,26,.2)'; x.stroke();
-    drawGlyph(x, icon, cx, cyBody, rBody * 0.56, light ? '#0A2540' : '#ffffff');
+    drawGlyph(x, icon, cx, cyBody, rBody * 0.56, light ? '#0B4045' : '#ffffff');
     return x.getImageData(0, 0, c.width, c.height);
   }
   if (shape === 'ring') {                                        // vòng khuyên: chỉ viền, nhìn xuyên qua
@@ -2046,7 +2046,7 @@ function veAnhGhim(shape: string, color: string, icon: string): any {
     x.beginPath(); x.arc(cx, cyBody, rBody * 0.99, 0, Math.PI * 2); x.lineWidth = 3; x.strokeStyle = 'rgba(255,255,255,.92)'; x.stroke();
     x.beginPath(); x.arc(cx, cyBody, rBody * 0.73, 0, Math.PI * 2); x.lineWidth = 2.4; x.strokeStyle = 'rgba(255,255,255,.9)'; x.stroke();
     x.beginPath(); x.arc(cx, cyBody, rBody * 0.6, 0, Math.PI * 2); x.fillStyle = light ? 'rgba(255,255,255,.9)' : 'rgba(8,18,30,.72)'; x.fill();
-    drawGlyph(x, icon, cx, cyBody, rBody * 0.42, light ? '#0A2540' : '#ffffff');
+    drawGlyph(x, icon, cx, cyBody, rBody * 0.42, light ? '#0B4045' : '#ffffff');
     return x.getImageData(0, 0, c.width, c.height);
   }
 
@@ -2071,10 +2071,10 @@ function veAnhGhim(shape: string, color: string, icon: string): any {
   x.fillStyle = g; x.fill();
 
   // ③ VÒNG TRẮNG bao ngoài + một nét tối cực mảnh phía ngoài cùng để tách khỏi nền sáng chói.
-  body(); x.lineWidth = 5.2; x.strokeStyle = light ? 'rgba(10,37,64,.55)' : 'rgba(255,255,255,.96)'; x.stroke();
+  body(); x.lineWidth = 5.2; x.strokeStyle = light ? 'rgba(11,64,69,.55)' : 'rgba(255,255,255,.96)'; x.stroke();
   body(); x.lineWidth = 1.1; x.strokeStyle = 'rgba(6,14,26,.22)'; x.stroke();
   // Kiểu "Vương miện" giữ thêm một vòng mảnh bên trong cho ra chất sang.
-  if (shape === 'lux') { body(0.78); x.lineWidth = 1.4; x.strokeStyle = light ? 'rgba(10,37,64,.28)' : 'rgba(255,255,255,.5)'; x.stroke(); }
+  if (shape === 'lux') { body(0.78); x.lineWidth = 1.4; x.strokeStyle = light ? 'rgba(11,64,69,.28)' : 'rgba(255,255,255,.5)'; x.stroke(); }
 
   // ④ Biểu tượng: to, nét dày, màu tương phản thẳng với thân — không bóng, không viền.
   //    Nền màu đã đủ đậm nên chữ trắng tự nổi; ghim màu trắng thì đảo lại chữ xanh đêm.
@@ -2980,7 +2980,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
       try {
         const mod: any = await import('qrcode');
         const QR = mod.default || mod;
-        const url: string = await QR.toDataURL(property.qrData, { margin: 1, width: 260, color: { dark: '#0A2540', light: '#ffffff' } });
+        const url: string = await QR.toDataURL(property.qrData, { margin: 1, width: 260, color: { dark: '#0B4045', light: '#ffffff' } });
         if (!alive) return;
         setQrUrl(url); const img = new Image(); img.onload = () => { qrImgRef.current = img; }; img.src = url;
       } catch (e) { console.warn('[qr]', e); }
@@ -3723,7 +3723,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
       map.addLayer({ id: 'zone-fill', type: 'fill', source: 'zone', paint: { 'fill-color': '#38bdf8', 'fill-opacity': 0.18 } });
       map.addLayer({ id: 'zone-glow', type: 'line', source: 'zone', paint: { 'line-color': '#7dd3fc', 'line-width': 14, 'line-opacity': 0.25, 'line-blur': 8 } });
       map.addLayer({ id: 'zone-line', type: 'line', source: 'zone', paint: { 'line-color': '#38bdf8', 'line-width': 3 }, layout: { 'line-cap': 'round', 'line-join': 'round' } });
-      map.addLayer({ id: 'zone-label', type: 'symbol', source: 'zone', layout: { 'text-field': ['get', 'name'], 'text-font': ['Noto Sans Bold'], 'text-size': 20, 'symbol-placement': 'point' }, paint: { 'text-color': '#e0f2fe', 'text-halo-color': '#0A2540', 'text-halo-width': 3 } });
+      map.addLayer({ id: 'zone-label', type: 'symbol', source: 'zone', layout: { 'text-field': ['get', 'name'], 'text-font': ['Noto Sans Bold'], 'text-size': 20, 'symbol-placement': 'point' }, paint: { 'text-color': '#e0f2fe', 'text-halo-color': '#0B4045', 'text-halo-width': 3 } });
       map.addSource('parcel', { type: 'geojson', data: fc([]) });
       // Quầng sáng PHỤ của lô — nằm dưới cùng, rộng và nhoè; tắt sẵn, bật bằng ô tick trong bảng Lô đất.
       map.addLayer({ id: 'parcel-glow2', type: 'line', source: 'parcel', paint: { 'line-color': GOLD, 'line-width': 0, 'line-opacity': 0, 'line-blur': 10 }, layout: { 'line-cap': 'round', 'line-join': 'round' } });
@@ -3743,7 +3743,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
       map.addSource('routehead', { type: 'geojson', data: fc([]) });
       map.addLayer({ id: 'route-line', type: 'line', source: 'route', paint: { 'line-color': '#ff5a2c', 'line-width': 6 }, layout: { 'line-cap': 'round', 'line-join': 'round' } });
       // Chấm sáng chạy ở đầu tuyến (như đầu mũi tên đang tiến tới)
-      map.addLayer({ id: 'route-name', type: 'symbol', source: 'route', layout: { 'symbol-placement': 'line', 'symbol-spacing': 480, 'text-field': ['get', 'ten'], 'text-font': ['Noto Sans Bold'], 'text-size': 22, 'text-letter-spacing': 0.1, 'text-transform': 'uppercase', 'text-keep-upright': true, 'text-allow-overlap': false }, paint: { 'text-color': '#ffffff', 'text-halo-color': '#0A2540', 'text-halo-width': 2.8 } });
+      map.addLayer({ id: 'route-name', type: 'symbol', source: 'route', layout: { 'symbol-placement': 'line', 'symbol-spacing': 480, 'text-field': ['get', 'ten'], 'text-font': ['Noto Sans Bold'], 'text-size': 22, 'text-letter-spacing': 0.1, 'text-transform': 'uppercase', 'text-keep-upright': true, 'text-allow-overlap': false }, paint: { 'text-color': '#ffffff', 'text-halo-color': '#0B4045', 'text-halo-width': 2.8 } });
       // CHẤM SÁNG ĐẦU TUYẾN đọc CHUNG nguồn 'route' với nét tuyến. Trước để nguồn riêng ('routehead'),
       // maplibre xử lý mỗi nguồn một đường riêng nên hai bên cập nhật lệch nhau vài khung hình —
       // mắt thấy thành HAI CHẤM cách nhau. Chung một nguồn thì một lần gửi là cả hai cùng nhảy.
@@ -3769,12 +3769,12 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
       map.addLayer({ id: 'marker-dot', type: 'circle', source: 'markers', filter: ['==', ['get', 'shape'], 'radar'], paint: { 'circle-radius': 6, 'circle-color': ['get', 'color'], 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2 } });
       // GHIM GIỌT NƯỚC: ảnh tự vẽ, cắm đúng điểm (đáy ghim chạm toạ độ).
       map.addLayer({ id: 'marker-pin', type: 'symbol', source: 'markers', filter: ['==', ['get', 'kind'], 'pin'], layout: { 'icon-image': ['get', 'img'], 'icon-size': 0.5, 'icon-anchor': ['case', ['in', ['get', 'shape'], ['literal', ['dot', 'badge', 'hex', 'ring']]], 'center', 'bottom'], 'icon-allow-overlap': true, 'icon-offset': ['array', 'number', 2, ['get', 'off']] } as any, paint: { 'icon-opacity': ['get', 'op'] } as any });
-      map.addLayer({ id: 'marker-label', type: 'symbol', source: 'markers', layout: { 'text-field': ['get', 'label'], 'text-font': ['Noto Sans Regular'], 'text-size': 16, 'text-offset': ['case', ['==', ['get', 'kind'], 'pin'], ['literal', [0, -3.6]], ['literal', [0, -1.4]]], 'text-anchor': 'bottom', 'text-allow-overlap': true }, paint: { 'text-color': '#ffffff', 'text-halo-color': '#0A2540', 'text-halo-width': 2.5, 'text-opacity': ['get', 'op'] } });
+      map.addLayer({ id: 'marker-label', type: 'symbol', source: 'markers', layout: { 'text-field': ['get', 'label'], 'text-font': ['Noto Sans Regular'], 'text-size': 16, 'text-offset': ['case', ['==', ['get', 'kind'], 'pin'], ['literal', [0, -3.6]], ['literal', [0, -1.4]]], 'text-anchor': 'bottom', 'text-allow-overlap': true }, paint: { 'text-color': '#ffffff', 'text-halo-color': '#0B4045', 'text-halo-width': 2.5, 'text-opacity': ['get', 'op'] } });
       // Bán kính (vòng tròn km) — polygon + viền + nhãn giữa.
       map.addSource('radius', { type: 'geojson', data: fc([]) });
       map.addLayer({ id: 'radius-fill', type: 'fill', source: 'radius', paint: { 'fill-color': '#3b82f6', 'fill-opacity': 0.12 } });
       map.addLayer({ id: 'radius-line', type: 'line', source: 'radius', paint: { 'line-color': '#3b82f6', 'line-width': 2.5, 'line-dasharray': [2, 1.5] } });
-      map.addLayer({ id: 'radius-label', type: 'symbol', source: 'radius', layout: { 'text-field': ['get', 'label'], 'text-font': ['Noto Sans Bold'], 'text-size': 15, 'text-allow-overlap': true }, paint: { 'text-color': '#dbeafe', 'text-halo-color': '#0A2540', 'text-halo-width': 2.5 } });
+      map.addLayer({ id: 'radius-label', type: 'symbol', source: 'radius', layout: { 'text-field': ['get', 'label'], 'text-font': ['Noto Sans Bold'], 'text-size': 15, 'text-allow-overlap': true }, paint: { 'text-color': '#dbeafe', 'text-halo-color': '#0B4045', 'text-halo-width': 2.5 } });
       // Khoảng cách (A→B) — đường + nhãn giữa đoạn.
       map.addSource('dist', { type: 'geojson', data: fc([]) });
       map.addLayer({ id: 'dist-line', type: 'line', source: 'dist', paint: { 'line-color': '#facc15', 'line-width': 3, 'line-dasharray': [1.5, 1] }, layout: { 'line-cap': 'round' } });
@@ -3807,14 +3807,14 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
           ['case', ['!=', ['get', 'gia'], ''], ['concat', '\n', ['get', 'gia']], ''], { 'font-scale': 1.06, 'text-color': ['get', 'col'] }
         ], 'text-font': ['Noto Sans Bold'], 'text-size': ['case', ['==', ['get', 'thin'], 1], 14, 16], 'text-line-height': 1.25, 'text-letter-spacing': ['case', ['==', ['get', 'thin'], 1], 0.16, 0], 'text-transform': ['case', ['==', ['get', 'thin'], 1], 'uppercase', 'none'], 'text-allow-overlap': true, 'text-anchor': 'center' }, paint: { 'text-color': ['get', 'fg'], 'text-halo-color': ['get', 'bg'], 'text-halo-width': 1.2 } });
       // Nhãn nhỏ phía trên thẻ (loại tiện ích: KHÁCH SẠN, TRƯỜNG HỌC…) — chi tiết làm thẻ trông cao cấp hẳn.
-      map.addLayer({ id: 'callout-cat', type: 'symbol', source: 'callout', filter: ['all', ['==', ['get', 'kind'], 'card'], ['has', 'cat']], layout: { 'text-field': ['get', 'cat'], 'text-font': ['Noto Sans Regular'], 'text-size': 10, 'text-letter-spacing': 0.24, 'text-transform': 'uppercase', 'text-offset': [0, -2.1], 'text-anchor': 'bottom', 'text-allow-overlap': true }, paint: { 'text-color': ['get', 'col'], 'text-halo-color': '#04101c', 'text-halo-width': 2 } });
+      map.addLayer({ id: 'callout-cat', type: 'symbol', source: 'callout', filter: ['all', ['==', ['get', 'kind'], 'card'], ['has', 'cat']], layout: { 'text-field': ['get', 'cat'], 'text-font': ['Noto Sans Regular'], 'text-size': 10, 'text-letter-spacing': 0.24, 'text-transform': 'uppercase', 'text-offset': [0, -2.1], 'text-anchor': 'bottom', 'text-allow-overlap': true }, paint: { 'text-color': ['get', 'col'], 'text-halo-color': '#041a1c', 'text-halo-width': 2 } });
       // Sóng lan toả tại điểm neo (kiểu 'wave')
       [1, 2].forEach((i) => map.addLayer({ id: 'callout-wave' + i, type: 'circle', source: 'callout', filter: ['all', ['==', ['get', 'kind'], 'anchor'], ['==', ['get', 'shape'], 'wave']], paint: { 'circle-radius': 10, 'circle-color': ['get', 'col'], 'circle-opacity': 0.2, 'circle-stroke-color': ['get', 'col'], 'circle-stroke-width': 2, 'circle-stroke-opacity': 0.6 } }));
       // Đỉnh (vertex) để SỬA — chỉ hiện ở chế độ ✎ Sửa đỉnh.
       // ── SỐ ĐO LÔ ĐẤT: độ dài từng cạnh in dọc cạnh + diện tích in giữa lô ──
       map.addSource('losodo', { type: 'geojson', data: fc([]) });
-      map.addLayer({ id: 'lo-canh', type: 'symbol', source: 'losodo', filter: ['==', ['geometry-type'], 'LineString'], layout: { 'symbol-placement': 'line-center', 'text-field': ['get', 'd'], 'text-font': ['Noto Sans Bold'], 'text-size': 16, 'text-allow-overlap': true, 'text-ignore-placement': true, 'text-keep-upright': true }, paint: { 'text-color': '#ffffff', 'text-halo-color': '#0A2540', 'text-halo-width': 2.6 } });
-      map.addLayer({ id: 'lo-dt', type: 'symbol', source: 'losodo', filter: ['==', ['geometry-type'], 'Point'], layout: { 'text-field': ['get', 'dt'], 'text-font': ['Noto Sans Bold'], 'text-size': 22, 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': '#ffffff', 'text-halo-color': '#0A2540', 'text-halo-width': 3 } });
+      map.addLayer({ id: 'lo-canh', type: 'symbol', source: 'losodo', filter: ['==', ['geometry-type'], 'LineString'], layout: { 'symbol-placement': 'line-center', 'text-field': ['get', 'd'], 'text-font': ['Noto Sans Bold'], 'text-size': 16, 'text-allow-overlap': true, 'text-ignore-placement': true, 'text-keep-upright': true }, paint: { 'text-color': '#ffffff', 'text-halo-color': '#0B4045', 'text-halo-width': 2.6 } });
+      map.addLayer({ id: 'lo-dt', type: 'symbol', source: 'losodo', filter: ['==', ['geometry-type'], 'Point'], layout: { 'text-field': ['get', 'dt'], 'text-font': ['Noto Sans Bold'], 'text-size': 22, 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': '#ffffff', 'text-halo-color': '#0B4045', 'text-halo-width': 3 } });
       // ── MŨI TÊN CHỈ HƯỚNG: quầng sáng → vạch → đầu nhọn → tên chỗ ──
       map.addSource('arrow', { type: 'geojson', data: fc([]) });
       // ══ BÓNG ĐỔ CHO MŨI TÊN ══
@@ -3830,11 +3830,11 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
       map.addLayer({ id: 'arrow-dash', type: 'line', source: 'arrow', filter: ['all', ['==', ['geometry-type'], 'LineString'], ['==', ['get', 'dash'], 1]], paint: { 'line-color': ['get', 'col'], 'line-width': 5.5, 'line-opacity': 0.98, 'line-dasharray': [1.6, 1.5] }, layout: { 'line-cap': 'butt', 'line-join': 'round' } });
       map.addLayer({ id: 'arrow-head', type: 'symbol', source: 'arrow', filter: ['==', ['get', 'kind'], 'head'], layout: { 'icon-image': ['get', 'head'], 'icon-size': 0.55, 'icon-allow-overlap': true, 'icon-ignore-placement': true, 'icon-rotation-alignment': 'map', 'icon-rotate': ['get', 'rot'] } as any, paint: {} as any });
       map.addLayer({ id: 'arrow-icon', type: 'symbol', source: 'arrow', filter: ['all', ['==', ['get', 'kind'], 'head'], ['==', ['get', 'co'], 1]], layout: { 'icon-image': ['get', 'ico'], 'icon-size': 0.5, 'icon-offset': [0, 62], 'icon-allow-overlap': true, 'icon-ignore-placement': true } as any, paint: {} as any });
-      map.addLayer({ id: 'arrow-label', type: 'symbol', source: 'arrow', filter: ['==', ['get', 'kind'], 'head'], layout: { 'text-field': ['get', 'label'], 'text-font': ['Noto Sans Bold'], 'text-size': 19, 'text-offset': ['case', ['==', ['get', 'co'], 1], ['literal', [0, 3.3]], ['literal', [0, 1.5]]], 'text-anchor': 'top', 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': ['get', 'tcol'], 'text-halo-color': '#0A2540', 'text-halo-width': 2.6 } });
+      map.addLayer({ id: 'arrow-label', type: 'symbol', source: 'arrow', filter: ['==', ['get', 'kind'], 'head'], layout: { 'text-field': ['get', 'label'], 'text-font': ['Noto Sans Bold'], 'text-size': 19, 'text-offset': ['case', ['==', ['get', 'co'], 1], ['literal', [0, 3.3]], ['literal', [0, 1.5]]], 'text-anchor': 'top', 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': ['get', 'tcol'], 'text-halo-color': '#0B4045', 'text-halo-width': 2.6 } });
       // ── HOÀNG SA · TRƯỜNG SA: luôn chồng lên trên cùng, mọi video xuất ra đều có ──
       themLopBienDao(map);
       map.addSource('verts', { type: 'geojson', data: fc([]) });
-      map.addLayer({ id: 'vert-dots', type: 'circle', source: 'verts', paint: { 'circle-radius': 7, 'circle-color': '#ffffff', 'circle-stroke-color': '#0A2540', 'circle-stroke-width': 3 } });
+      map.addLayer({ id: 'vert-dots', type: 'circle', source: 'verts', paint: { 'circle-radius': 7, 'circle-color': '#ffffff', 'circle-stroke-color': '#0B4045', 'circle-stroke-width': 3 } });
       // BẦU TRỜI/CHÂN TRỜI (như các web bản đồ pro): lấp vùng chân trời khi nghiêng cao → không còn khoảng trắng. Vẽ trong canvas nên vào cả video.
       try { if (typeof (map as any).setSky === 'function') (map as any).setSky({ 'sky-color': '#8fb4e0', 'sky-horizon-blend': 0.7, 'horizon-color': '#d6e2ee', 'horizon-fog-blend': 0.6, 'fog-color': '#eef4fa', 'fog-ground-blend': 0.1, 'atmosphere-blend': 0.5 }); } catch (e) { console.warn('[sky]', e); }
       setTimeout(() => map.resize(), 200); // đảm bảo bản đồ lấp đầy khung 16:9
@@ -4660,7 +4660,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
       let di = 0, giua = c[Math.floor(c.length / 2)];
       for (let k = 1; k < c.length; k++) { di += kc(c[k - 1], c[k]); if (di >= tong / 2) { giua = c[k]; break; } }
       const el = document.createElement('div');
-      el.style.cssText = `font:700 11px/1 system-ui,Arial,sans-serif;padding:4px 8px;border-radius:999px;white-space:nowrap;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.4);${i === chon ? 'background:#38bdf8;color:#08243c;' : 'background:#fff;color:#3c4043;'}`;
+      el.style.cssText = `font:700 11px/1 system-ui,Arial,sans-serif;padding:4px 8px;border-radius:999px;white-space:nowrap;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.4);${i === chon ? 'background:#38bdf8;color:#083338;' : 'background:#fff;color:#3c4043;'}`;
       el.textContent = docThoiGian(t.thoiGian);
       el.addEventListener('click', (ev) => { ev.stopPropagation(); const cur = dsTuyenRef.current; if (cur) { setTuyenChon(i); apTuyen(cur, i); } });
       nhanLoiRef.current.push(new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat(giua).addTo(m));
@@ -7250,9 +7250,9 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
   const inChart = playhead >= clips.chart[0] && playhead <= clips.chart[0] + clips.chart[1];
   const so = objects.find((o) => o.id === selObj) || null; // object đang chọn (cho inspector)
   return (
-    <div className={'cl-video-tool overflow-hidden rounded-2xl shadow-lg' + (thuGonDuoi ? ' cl-rong-khung' : '')} style={{ background: '#0f1e30', zoom: isFs || mobile ? 1 : uiScale, ['--cl-zoom' as any]: isFs || mobile ? 1 : uiScale } as any}>
+    <div className={'cl-video-tool overflow-hidden rounded-2xl shadow-lg' + (thuGonDuoi ? ' cl-rong-khung' : '')} style={{ background: '#0c2a2d', zoom: isFs || mobile ? 1 : uiScale, ['--cl-zoom' as any]: isFs || mobile ? 1 : uiScale } as any}>
       {/* THANH TRÊN */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3" style={{ background: '#0b1826' }}>
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3" style={{ background: '#072a2d' }}>
         <div className="flex items-center gap-2 font-bold text-white">🎬 Tạo video bản đồ <span className="text-[11px] font-normal" style={{ color: saveState === 'saved' ? '#7bd88f' : '#94a3b8' }}>{saveState === 'saving' ? '· Đang lưu…' : saveState === 'saved' ? '· Đã lưu' : ''}</span></div>
         <div className="cl-tb-nut flex items-center gap-3">
           <div className="cl-tb-kho flex overflow-hidden rounded-lg border" style={{ borderColor: '#2a3f57' }}>
@@ -7272,7 +7272,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
       </div>
 
       {/* KỊCH BẢN: 1 dự án → 5 video (dùng chung bản đồ + thông tin, mỗi kịch bản chữ/khổ/nhạc/hiệu ứng riêng) */}
-      <div className="flex items-center gap-2 overflow-x-auto px-4 py-2" style={{ background: '#0d2033', borderTop: '1px solid #1b3149' }}>
+      <div className="flex items-center gap-2 overflow-x-auto px-4 py-2" style={{ background: '#082f33', borderTop: '1px solid #1b3149' }}>
         <span className="shrink-0 text-[11px] font-bold uppercase tracking-wide text-slate-400">Kịch bản:</span>
         {scripts.map((s, i) => (
           // Thẻ 06 tự ẩn khi đang mở chính nó — ô sổ xuống bên cạnh đã ghi tên rồi, để cả hai là trùng.
@@ -7398,7 +7398,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
         {!ready && <div className="pointer-events-none absolute inset-0 grid place-items-center text-sm text-slate-400">Đang tải bản đồ vệ tinh…</div>}
         {/* ==== BẢNG CHỌN LỐI ĐI (sau khi bấm "Lấy đường thật A→B") ==== */}
         {dsTuyen && (
-          <div className="absolute left-2 top-2 z-20 w-[212px] overflow-hidden rounded-xl border border-white/10 bg-[#0d2033]/92 shadow-2xl backdrop-blur">
+          <div className="absolute left-2 top-2 z-20 w-[212px] overflow-hidden rounded-xl border border-white/10 bg-[#082f33]/92 shadow-2xl backdrop-blur">
             <div className="flex items-center justify-between px-3 py-2 text-[12px] font-bold text-white">
               <span>🚗 Chọn lối đi ({dsTuyen.length})</span>
               <button onClick={() => { route.current = tuyenCu.current; drawRoute(tuyenVe()); bumpGeom(); xoaLoiPhu(); setDsTuyen(null); }}
@@ -7554,14 +7554,14 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
         {/* Xem trước chữ/logo theo MẪU BỐ CỤC (khớp video) */}
         {/* Dải tối chia nhiều chặng cho tan vào ảnh (đúng như lúc xuất video, không thấy mép cắt ngang) */}
         {tracksOn.text && inText && (layout === 'bottomLeft' || layout === 'bottomCenter') && (
-          <div className={`pointer-events-none absolute inset-x-0 bottom-0 px-4 pb-4 pt-16 ${layout === 'bottomCenter' ? 'text-center' : ''}`} style={{ background: 'linear-gradient(0deg, rgba(10,37,64,.9) 0%, rgba(10,37,64,.54) 22%, rgba(10,37,64,.25) 45%, rgba(10,37,64,0) 100%)' }}>
+          <div className={`pointer-events-none absolute inset-x-0 bottom-0 px-4 pb-4 pt-16 ${layout === 'bottomCenter' ? 'text-center' : ''}`} style={{ background: 'linear-gradient(0deg, rgba(11,64,69,.9) 0%, rgba(11,64,69,.54) 22%, rgba(11,64,69,.25) 45%, rgba(11,64,69,0) 100%)' }}>
             {title && <span className={`mb-1.5 block h-[3px] rounded-full ${layout === 'bottomCenter' ? 'mx-auto' : ''}`} style={{ width: 46, background: GOLD }} />}
             {title && <div className="text-lg font-bold text-white sm:text-2xl" style={{ textShadow: '0 3px 16px rgba(2,8,18,.62)' }}>{title}</div>}
             {sub && <div className="text-sm font-semibold sm:text-base" style={{ color: GOLD }}>{sub}</div>}
           </div>
         )}
         {tracksOn.text && inText && layout === 'topLeft' && (
-          <div className="pointer-events-none absolute inset-x-0 top-0 px-4 pb-16 pt-4" style={{ background: 'linear-gradient(180deg, rgba(10,37,64,.9) 0%, rgba(10,37,64,.42) 45%, rgba(10,37,64,0) 100%)' }}>
+          <div className="pointer-events-none absolute inset-x-0 top-0 px-4 pb-16 pt-4" style={{ background: 'linear-gradient(180deg, rgba(11,64,69,.9) 0%, rgba(11,64,69,.42) 45%, rgba(11,64,69,0) 100%)' }}>
             {title && <span className="mb-1.5 block h-[3px] rounded-full" style={{ width: 46, background: GOLD }} />}
             {title && <div className="text-lg font-bold text-white sm:text-2xl" style={{ textShadow: '0 3px 16px rgba(2,8,18,.62)' }}>{title}</div>}
             {sub && <div className="text-sm font-semibold sm:text-base" style={{ color: GOLD }}>{sub}</div>}
@@ -7610,7 +7610,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
           const iOn = intro.on && intro.dur > 0 && playhead < intro.dur;
           const oOn = outro.on && outro.dur > 0 && playhead > duration - outro.dur;
           const c = iOn ? intro : oOn ? outro : null; if (!c) return null;
-          const bgCss: Record<string, string> = { navy: 'radial-gradient(circle at 50% 42%, #12395e, #050f1b)', gold: 'linear-gradient(135deg,#1b1405,#3d2d0a,#120d03)', grid: '#04101c', contour: 'linear-gradient(#07182a,#0d2b45)', paper: 'linear-gradient(#f3ead6,#ded2b8)', black: '#05080c' };
+          const bgCss: Record<string, string> = { navy: 'radial-gradient(circle at 50% 42%, #12395e, #050f1b)', gold: 'linear-gradient(135deg,#1b1405,#3d2d0a,#120d03)', grid: '#041a1c', contour: 'linear-gradient(#07182a,#0d2b45)', paper: 'linear-gradient(#f3ead6,#ded2b8)', black: '#05080c' };
           return (
             <div className="pointer-events-none absolute inset-0 z-20 grid place-items-center overflow-hidden text-center" style={{ background: bgCss[c.bg] || bgCss.navy }}>
               {c.img && <img src={c.img} alt="" className="absolute inset-0 h-full w-full object-cover opacity-50" />}
@@ -7698,7 +7698,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
             )}
             {/* Số khung mỗi giây — 24 là chuẩn điện ảnh, render nhanh hơn 1/5 */}
             {renderKy && (
-              <span className="flex items-center gap-0.5 rounded-xl p-0.5" style={{ background: '#0d2033', boxShadow: 'inset 0 0 0 1px #1b3149' }}>
+              <span className="flex items-center gap-0.5 rounded-xl p-0.5" style={{ background: '#082f33', boxShadow: 'inset 0 0 0 1px #1b3149' }}>
                 {[[30, '30 hình/s', 'Mượt nhất — chuẩn cho video mạng xã hội'], [24, '24 hình/s', 'Chuẩn điện ảnh, hơi "phim" hơn — render NHANH HƠN 1/5 vì ít khung hơn']].map(([v, ten, mo]) => (
                   <button key={String(v)} onClick={() => setFpsQuay(Number(v))} title={String(mo)}
                     className="rounded-lg px-2 py-2 text-[12px] font-bold"
@@ -7707,7 +7707,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
               </span>
             )}
             {/* 2D / 3D — để ngoài này cho dễ đổi, khỏi vào bảng cài đặt */}
-            <span className="flex items-center gap-0.5 rounded-xl p-0.5" style={{ background: '#0d2033', boxShadow: 'inset 0 0 0 1px #1b3149' }}>
+            <span className="flex items-center gap-0.5 rounded-xl p-0.5" style={{ background: '#082f33', boxShadow: 'inset 0 0 0 1px #1b3149' }}>
               {([['auto', 'Tự động', 'Cảnh xa để phẳng cho nhẹ, cảnh gần và cảnh đèo mới dựng núi 3D — cân bằng nhất'],
                  ['2d', '2D', 'Không dựng núi. Nhẹ nhất, chạy mượt trên mọi máy, ảnh không bị kéo méo'],
                  ['3d', '3D', 'Núi nổi khối SUỐT video, không đổi qua lại nên không có chỗ nào khựng — nên dùng cái này']] as [string, string, string][]).map(([v, ten, mo]) => (
@@ -7730,7 +7730,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
             {/* ══ GÓC CAMERA & ĐỊNH VỊ ══ Đặt ở hàng nút dưới khung xem trước: hàng này còn rất nhiều
                 chỗ trống nên KHÔNG tốn thêm dòng nào, mà cũng không bị hàng công cụ bản đồ cắt mất. */}
             <span className="ml-auto flex flex-wrap items-center gap-1.5 text-[11px]">
-              <span className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg px-2 py-1" style={{ background: '#0d2033', boxShadow: 'inset 0 0 0 1px #1b3149' }}>
+              <span className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg px-2 py-1" style={{ background: '#082f33', boxShadow: 'inset 0 0 0 1px #1b3149' }}>
                 <span className="font-mono text-[11px] font-bold" style={{ color: GOLD }} title="Độ ngả của camera: 0° là nhìn thẳng từ trên xuống, 85° gần như nằm ngang">⛰{Math.round(gocNgoai.pitch)}°</span>
                 <span className="font-mono text-[11px] font-bold" style={{ color: GOLD }} title="Hướng bản đồ: 0° là hướng Bắc ở phía trên">🧭{Math.round(gocNgoai.bearing)}°</span>
                 <button onClick={() => chinhGoc(8, 0)} className="rounded px-1.5 py-1 font-bold text-slate-200 hover:bg-white/10" title="Ngả camera xuống thấp hơn (thấy xa hơn, có chiều sâu)">⛰＋</button>
@@ -7754,7 +7754,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
         </div>
 
         {/* ② BẢNG CÀI ĐẶT — mỗi lúc CHỈ hiện đúng bảng của việc đang làm */}
-        <div className="cl-mb-sheet w-full shrink-0 space-y-3 overflow-y-auto p-3 lg:order-2 lg:max-h-full lg:w-[336px]" style={{ background: '#0b1826', borderRight: '1px solid #16283d' }}>
+        <div className="cl-mb-sheet w-full shrink-0 space-y-3 overflow-y-auto p-3 lg:order-2 lg:max-h-full lg:w-[336px]" style={{ background: '#072a2d', borderRight: '1px solid #16283d' }}>
                     {(() => {
             const T: Record<string, [string, string]> = {
               duan: ['🏡', 'Thông tin dự án'], chu: ['✏️', 'Chữ & lời thoại'], lodat: ['✨', 'Lô đất'], the: ['💬', 'Thẻ chú thích'],
@@ -8038,7 +8038,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
               </div>
               {/* KIỂU BAY của kịch bản 06 — gộp 5 thẻ cũ (06→10) vào một danh sách sổ xuống cho gọn */}
               {(scripts[activeScript]?.key === 'chiduong' || laDanDuong(camStyle || scripts[activeScript]?.key || '')) && (
-                <div className="mb-2 rounded-lg p-2" style={{ background: '#0d2033', border: '1px solid #24405c' }}>
+                <div className="mb-2 rounded-lg p-2" style={{ background: '#082f33', border: '1px solid #24405c' }}>
                   <div className="mb-1 text-[12px] font-bold" style={{ color: GOLD }}>🎬 Kiểu quay dẫn đường</div>
                   {/* Ô này từng để giá trị dạng "cd_cao@12" (thời còn menu con) — giờ bỏ menu con rồi mà
                       giá trị vẫn kiểu cũ nên KHÔNG khớp mục nào, ô hiện nhầm "06 · Dẫn đường" trong khi
@@ -8077,7 +8077,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                     <input type="checkbox" checked={bienOn} onChange={(e) => setBienOn(e.target.checked)} /> 🌊 Cảnh ven biển
                   </label>
                   {bienOn && (
-                    <div className="mt-1 rounded-lg p-2" style={{ background: '#0d2033', border: '1px solid #24405c' }}>
+                    <div className="mt-1 rounded-lg p-2" style={{ background: '#082f33', border: '1px solid #24405c' }}>
                       <div className="text-[11px] text-slate-400">
                         Camera ngoái mũi ra biển cho nửa khung hình luôn có mặt nước, và <b style={{ color: '#7dd3fc' }}>1–2 lần</b> trong video
                         <b style={{ color: '#7dd3fc' }}> bay vọt lên cao, xoay TRỰC DIỆN ra biển suốt 12 giây</b> — con đường nằm ngang
@@ -8090,14 +8090,14 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                         {[[90, 'Đông ▶'], [270, '◀ Tây'], [0, 'Bắc ▲'], [180, 'Nam ▼']].map(([g, ten]) => (
                           <button key={String(g)} onClick={() => setBienHuong(Number(g))}
                             className="rounded px-2 py-0.5 text-[11px] font-semibold"
-                            style={{ background: bienHuong === g ? '#38bdf8' : '#12283c', color: bienHuong === g ? '#08243c' : '#cbd5e1' }}>{ten}</button>
+                            style={{ background: bienHuong === g ? '#38bdf8' : '#12283c', color: bienHuong === g ? '#083338' : '#cbd5e1' }}>{ten}</button>
                         ))}
                       </div>
                       <div className="mt-1 text-[11px] text-slate-500">Khánh Hoà thì để <b style={{ color: '#7dd3fc' }}>Đông</b> — biển luôn nằm bên phải khi đi từ Cam Lâm ra Nha Trang.</div>
                       {/* CHỐT 2 KHUNG NGẮM BIỂN — rồi tự kéo chỉnh cho vừa ý */}
                       <button onClick={chotKhungBien} disabled={warming || rec || previewing}
                         className="mt-2 w-full rounded-lg py-1.5 text-[12px] font-bold disabled:opacity-50"
-                        style={{ background: '#38bdf8', color: '#08243c' }}>
+                        style={{ background: '#38bdf8', color: '#083338' }}>
                         {warming ? '⏳ Đang dò biển…' : '🎯 Chốt 2 khung ngắm biển'}
                       </button>
                       <div className="mt-1 text-[11px] text-slate-500">
@@ -8113,7 +8113,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                     <input type="checkbox" checked={deoOn} onChange={(e) => setDeoOn(e.target.checked)} /> 🏔️ Cảnh đèo núi – biển
                   </label>
                   {deoOn && (
-                    <div className="mt-1 rounded-lg p-2" style={{ background: '#0d2033', border: '1px solid #3d3520' }}>
+                    <div className="mt-1 rounded-lg p-2" style={{ background: '#082f33', border: '1px solid #3d3520' }}>
                       <div className="text-[11px] text-slate-400">
                         Dành cho cung đường vượt đèo sát biển (đèo Cù Hin, Đại Lãnh…). Tới đoạn đèo, camera
                         <b style={{ color: '#fcd34d' }}> ra ngoài biển 2,4 km, đứng chếch một bên rồi quay vào bờ</b> — khung có
@@ -8146,7 +8146,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                 </select>
               </div>
               {/* NGẮM THỬA ĐẤT — chỉ có tác dụng với các kịch bản/kiểu camera Dẫn đường */}
-              <div className="mt-2 rounded-lg p-2" style={{ background: '#0d2033', border: '1px solid #24405c' }}>
+              <div className="mt-2 rounded-lg p-2" style={{ background: '#082f33', border: '1px solid #24405c' }}>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-slate-400">🏞 Ngắm thửa đất</span>
                   <b className="ml-auto text-xs" style={{ color: GOLD }}>{ngamLo === 0 ? 'bỏ qua' : ngamLo.toFixed(1) + ' giây'}</b>
@@ -8171,7 +8171,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                     </div>
                   </div>
                   {/* THANH THỜI GIAN NGAY TRONG BẢNG CAMERA — khỏi phải với xuống dòng thời gian phía dưới */}
-                  <div className="mb-1.5 rounded-lg p-1.5" style={{ background: '#0d2033', border: '1px solid #24405c' }}>
+                  <div className="mb-1.5 rounded-lg p-1.5" style={{ background: '#082f33', border: '1px solid #24405c' }}>
                     <div className="flex items-center gap-1 text-[11px] text-slate-400">
                       <span className="font-semibold">⏱ Đang xem giây</span>
                       <b className="font-mono" style={{ color: GOLD }}>{playhead.toFixed(1)}s / {duration}s</b>
@@ -8297,7 +8297,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                 <>
                   <input value={so.text || ''} onChange={(e) => updateObj(so.id, { text: e.target.value })} className="w-full rounded-lg border px-2 py-1 text-sm" style={{ borderColor: LINE }} />
                   <div className="mt-2 flex items-center gap-2 text-xs"><span className="w-10 text-slate-400">Cỡ</span><input type="range" min={16} max={180} value={so.size || 48} onChange={(e) => updateObj(so.id, { size: Number(e.target.value) })} className="flex-1" /></div>
-                  <div className="mt-1 flex items-center gap-1.5 text-xs"><span className="text-slate-400">Màu</span>{['#ffffff', '#C8A14B', '#ff3b30', '#22c55e', '#3b82f6', '#0A2540'].map((c) => <button key={c} onClick={() => updateObj(so.id, { color: c })} className="h-5 w-5 rounded-full border-2" style={{ background: c, borderColor: so.color === c ? GOLD : LINE }} />)}<label className="ml-auto flex items-center gap-1"><input type="checkbox" checked={!!so.bg} onChange={(e) => updateObj(so.id, { bg: e.target.checked })} /> Nền</label></div>
+                  <div className="mt-1 flex items-center gap-1.5 text-xs"><span className="text-slate-400">Màu</span>{['#ffffff', '#C8A14B', '#ff3b30', '#22c55e', '#3b82f6', '#0B4045'].map((c) => <button key={c} onClick={() => updateObj(so.id, { color: c })} className="h-5 w-5 rounded-full border-2" style={{ background: c, borderColor: so.color === c ? GOLD : LINE }} />)}<label className="ml-auto flex items-center gap-1"><input type="checkbox" checked={!!so.bg} onChange={(e) => updateObj(so.id, { bg: e.target.checked })} /> Nền</label></div>
                   <div className="mt-1 flex gap-1 text-xs">{([['400', 'Thường'], ['700', 'Đậm'], ['800', 'Rất đậm']] as const).map(([w, n]) => <button key={w} onClick={() => updateObj(so.id, { weight: Number(w) })} className="rounded px-2 py-0.5 font-semibold" style={btn(so.weight === Number(w))}>{n}</button>)}</div>
                   <div className="mt-2 text-[11px] font-bold text-slate-400">Phông chữ</div>
                   <div className="mt-1 grid grid-cols-4 gap-1">
@@ -8391,7 +8391,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                               <button key={i} onClick={() => updateObj(so.id, { chot: (so.chot || []).filter((z) => z !== c) })}
                                 title="Bấm để xoá chốt này"
                                 className="rounded-md px-1.5 py-0.5 text-[10px] font-mono"
-                                style={{ background: '#0b1826', color: '#94a3b8', boxShadow: '0 0 0 1px ' + LINE }}>
+                                style={{ background: '#072a2d', color: '#94a3b8', boxShadow: '0 0 0 1px ' + LINE }}>
                                 {c.t.toFixed(1)}s · {ten} {gt} ✕
                               </button>
                             );
@@ -8490,7 +8490,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                 {CHU_KIEU.map((k) => (
                   <button key={k.key} onClick={() => setChuKieu(k.key)} title={k.note}
                     className="overflow-hidden rounded-lg px-1 py-1.5 text-center transition hover:-translate-y-px"
-                    style={chuKieu === k.key ? { background: 'rgba(200,161,75,.16)', boxShadow: '0 0 0 1.5px ' + GOLD } : { background: '#0b1826', boxShadow: '0 0 0 1px ' + LINE }}>
+                    style={chuKieu === k.key ? { background: 'rgba(200,161,75,.16)', boxShadow: '0 0 0 1.5px ' + GOLD } : { background: '#072a2d', boxShadow: '0 0 0 1px ' + LINE }}>
                     <span className="block text-[15px] font-extrabold leading-tight" style={
                       k.key === 'vangkim' ? { background: 'linear-gradient(180deg,#fff3c4,#e6c46a 42%,#a67c25 62%,#f0d68a)', WebkitBackgroundClip: 'text', color: 'transparent' }
                       : k.key === 'vang24k' ? { background: 'linear-gradient(180deg,#fff8d8,#ffd75e 35%,#b8860b 66%,#ffe9a3)', WebkitBackgroundClip: 'text', color: 'transparent', filter: 'drop-shadow(0 0 6px rgba(255,196,60,.75))' }
@@ -8531,7 +8531,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
               <div className="mb-1.5 flex items-center gap-2">
                 <span className="text-[11px] font-bold" style={{ color: INK }}>🏷️ Thẻ thương hiệu</span>
                 <span className="text-[10px] text-slate-500">{LOGO_STYLES.length} kiểu</span>
-                <select value={logoPos} onChange={(e) => setLogoPos(e.target.value)} className="ml-auto rounded-lg px-1.5 py-1 text-[11px]" style={{ background: '#0d2033', border: '1px solid ' + LINE, color: INK }} title="Đặt thẻ ở góc nào của khung hình">
+                <select value={logoPos} onChange={(e) => setLogoPos(e.target.value)} className="ml-auto rounded-lg px-1.5 py-1 text-[11px]" style={{ background: '#082f33', border: '1px solid ' + LINE, color: INK }} title="Đặt thẻ ở góc nào của khung hình">
                   <option value="auto">Tự né chỗ có chữ</option>
                   <option value="tt">Góc trên · trái</option>
                   <option value="tp">Góc trên · phải</option>
@@ -8543,7 +8543,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                 {LOGO_STYLES.map((L) => (
                   <button key={L.key} onClick={() => setLogoStyle(L.key)} title={L.note}
                     className="overflow-hidden rounded-xl p-1.5 text-left transition hover:-translate-y-px"
-                    style={{ background: logoStyle === L.key ? 'linear-gradient(180deg, rgba(200,161,75,.16), rgba(200,161,75,.03))' : '#0b1826', boxShadow: logoStyle === L.key ? '0 0 0 1.5px ' + GOLD + ', 0 10px 26px -14px rgba(200,161,75,.7)' : '0 0 0 1px ' + LINE }}>
+                    style={{ background: logoStyle === L.key ? 'linear-gradient(180deg, rgba(200,161,75,.16), rgba(200,161,75,.03))' : '#072a2d', boxShadow: logoStyle === L.key ? '0 0 0 1.5px ' + GOLD + ', 0 10px 26px -14px rgba(200,161,75,.7)' : '0 0 0 1px ' + LINE }}>
                     <span className="grid h-11 w-full place-items-center overflow-hidden rounded-lg" style={{ background: 'linear-gradient(135deg, #43603f 0%, #6f7f5c 45%, #2b5670 100%)' }}>
                       <LogoBadge style={L.key} cao={22} />
                     </span>
@@ -8609,7 +8609,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                 {XE_LIST.map((v) => (
                   <button key={v.key} onClick={() => addXe(v.key)} title={v.note}
                     className="overflow-hidden rounded-xl p-1.5 text-center transition hover:-translate-y-px"
-                    style={{ background: '#0b1826', boxShadow: '0 0 0 1px ' + LINE }}>
+                    style={{ background: '#072a2d', boxShadow: '0 0 0 1px ' + LINE }}>
                     <span className="grid h-14 w-full place-items-center overflow-hidden rounded-lg" style={{ background: 'linear-gradient(135deg, #43603f 0%, #6f7f5c 45%, #2b5670 100%)' }}>
                       <XeLive kind={v.key} co={0.42} />
                     </span>
@@ -8635,7 +8635,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                     {VAT_3D.filter((v) => v.nhom === nhom).map((v) => (
                       <button key={v.key} onClick={() => addVat(v.key)} title={v.name}
                         className="overflow-hidden rounded-lg p-1 text-center transition hover:-translate-y-px"
-                        style={{ background: '#0b1826', boxShadow: '0 0 0 1px ' + LINE }}>
+                        style={{ background: '#072a2d', boxShadow: '0 0 0 1px ' + LINE }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={'/vat3d/' + v.key + '.png'} alt={v.name} loading="lazy" className="mx-auto h-9 w-9 object-contain" />
                         <span className="mt-0.5 block truncate text-[9px] font-semibold" style={{ color: INK }}>{v.name}</span>
@@ -8662,7 +8662,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                     {dsCo.filter((c) => !timCo.trim() || c.ten.toLowerCase().includes(timCo.trim().toLowerCase()) || c.ma.includes(timCo.trim().toLowerCase())).slice(0, 120).map((c) => (
                       <button key={c.ma} onClick={() => { addImageFromSrc('/co/' + c.ma + '.svg'); toast.success('Đã thêm cờ ' + c.ten + ' — kéo thả để đặt chỗ'); }}
                         title={c.ten} className="overflow-hidden rounded-lg p-1 text-center transition hover:-translate-y-px"
-                        style={{ background: '#0b1826', boxShadow: '0 0 0 1px ' + LINE }}>
+                        style={{ background: '#072a2d', boxShadow: '0 0 0 1px ' + LINE }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={'/co/' + c.ma + '.svg'} alt={c.ten} loading="lazy" className="h-8 w-full rounded object-cover" />
                         <span className="mt-0.5 block truncate text-[9px] font-semibold" style={{ color: INK }}>{c.ten}</span>
@@ -8800,7 +8800,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                   {GRADES.map((g) => (
                     <button key={g.key} onClick={() => setGrade(g.key)} title={g.note}
                       className="overflow-hidden rounded-xl p-1.5 text-left transition hover:-translate-y-px"
-                      style={{ background: grade === g.key ? 'linear-gradient(180deg, rgba(200,161,75,.16), rgba(200,161,75,.03))' : '#0b1826', boxShadow: grade === g.key ? '0 0 0 1.5px ' + GOLD + ', 0 10px 26px -14px rgba(200,161,75,.7)' : '0 0 0 1px ' + LINE }}>
+                      style={{ background: grade === g.key ? 'linear-gradient(180deg, rgba(200,161,75,.16), rgba(200,161,75,.03))' : '#072a2d', boxShadow: grade === g.key ? '0 0 0 1.5px ' + GOLD + ', 0 10px 26px -14px rgba(200,161,75,.7)' : '0 0 0 1px ' + LINE }}>
                       {/* Ô xem trước: một mảnh "ảnh vệ tinh" giả lập, phủ đúng lớp màu của tông đó */}
                       <span className="relative block h-11 w-full overflow-hidden rounded-lg" style={{ background: 'linear-gradient(135deg, #4a6b52 0%, #7d8f6a 42%, #2f5d7a 100%)' }}>
                         {g.dam > 0 && <span className="absolute inset-0" style={{ background: 'linear-gradient(180deg, ' + g.tren + ', ' + g.duoi + ')', mixBlendMode: g.tron as any, opacity: g.dam }} />}
@@ -8991,7 +8991,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                       return (
                         <button key={t.key} onClick={() => setChartType(t.key)} title={t.note}
                           className="overflow-hidden rounded-xl p-1.5 text-left transition hover:-translate-y-px"
-                          style={{ background: dung ? 'linear-gradient(180deg, rgba(200,161,75,.16), rgba(200,161,75,.03))' : '#0b1826', boxShadow: dung ? '0 0 0 1.5px ' + GOLD + ', 0 10px 26px -14px rgba(200,161,75,.7)' : '0 0 0 1px ' + LINE }}>
+                          style={{ background: dung ? 'linear-gradient(180deg, rgba(200,161,75,.16), rgba(200,161,75,.03))' : '#072a2d', boxShadow: dung ? '0 0 0 1.5px ' + GOLD + ', 0 10px 26px -14px rgba(200,161,75,.7)' : '0 0 0 1px ' + LINE }}>
                           <span className="block overflow-hidden rounded-lg"><ChartPreview type={t.key} w={104} h={62} /></span>
                           <span className="mt-1 block text-[11px] font-bold leading-tight" style={{ color: dung ? GOLD : INK }}>{t.name}</span>
                           <span className="block text-[9px] leading-tight text-slate-500">{t.note}</span>
@@ -9089,7 +9089,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                 onChange={(e) => setGoDai(e.target.value.replace(/[^0-9]/g, '').slice(0, 3))}
                 onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
                 onBlur={() => { const v = Number(goDai); setGoDai(null); if (goDai !== null && goDai !== '' && v >= 1) datThoiLuong(v); }}
-                className="w-16 rounded-lg px-2 py-1 text-center font-mono text-sm font-bold" style={{ background: '#0d2033', border: '1px solid ' + LINE, color: INK }} title="Gõ số giây rồi bấm Enter (từ 3 đến 120)" />
+                className="w-16 rounded-lg px-2 py-1 text-center font-mono text-sm font-bold" style={{ background: '#082f33', border: '1px solid ' + LINE, color: INK }} title="Gõ số giây rồi bấm Enter (từ 3 đến 120)" />
               <span className="text-xs text-slate-400">giây</span>
               <span className="ml-auto text-[10px] text-slate-500">tối đa 120s</span>
             </div>
@@ -9144,12 +9144,12 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
       {/* TIMELINE — kéo clip để dời, kéo cạnh để co giãn; điều khiển KHI phần tử hiện trong video */}
       {/* Nút gọi lại dòng thời gian khi đang thu gọn */}
       {thuGonDuoi && (
-        <div className="shrink-0 px-4 py-1.5 text-center" style={{ background: '#0b1826', borderTop: '1px solid #1b3149' }}>
+        <div className="shrink-0 px-4 py-1.5 text-center" style={{ background: '#072a2d', borderTop: '1px solid #1b3149' }}>
           <button onClick={() => setThuGonDuoi(false)} className="rounded-lg px-3 py-1 text-[11px] font-bold" style={{ background: GOLD, color: NAVY }}>⌃ Mở lại dòng thời gian</button>
           <span className="ml-2 text-[11px] text-slate-400">Đang phóng to khung hình — {playhead.toFixed(1)}s / {duration}s</span>
         </div>
       )}
-      <div className="cl-mb-tl shrink-0 px-4 py-3" style={{ background: '#0b1826', borderTop: '1px solid #1b3149', display: thuGonDuoi ? 'none' : undefined }}>
+      <div className="cl-mb-tl shrink-0 px-4 py-3" style={{ background: '#072a2d', borderTop: '1px solid #1b3149', display: thuGonDuoi ? 'none' : undefined }}>
         <div className="cl-tl-hang mb-2 flex flex-wrap items-center gap-x-3 gap-y-2">
           <button onClick={() => { if (previewing) togglePause(); else preview(); }} disabled={!ready || rec || exporting || busyAll} className="cl-btn-vang rounded-xl px-3.5 py-1.5 text-xs font-bold transition" style={previewing && !paused ? { background: '#64748b', color: '#e2e8f0' } : { background: 'linear-gradient(180deg, #dcb768, ' + GOLD + ')', color: NAVY, boxShadow: '0 8px 20px -10px rgba(200,161,75,.9)' }}
             title="Phím cách: chạy ↔ tạm dừng">{!previewing ? '▶ Chạy thử' : paused ? '▶ Chạy tiếp' : '⏸ Tạm dừng'}</button>
@@ -9170,7 +9170,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
               onChange={(e) => setGoDai(e.target.value.replace(/[^0-9]/g, '').slice(0, 3))}
               onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
               onBlur={() => { const v = Number(goDai); setGoDai(null); if (goDai !== null && goDai !== '' && v >= 1) datThoiLuong(v); }}
-              className="w-14 rounded px-1 py-0.5 text-center font-mono text-xs font-bold" style={{ background: '#0d2033', border: '1px solid #24405c', color: GOLD }} />
+              className="w-14 rounded px-1 py-0.5 text-center font-mono text-xs font-bold" style={{ background: '#082f33', border: '1px solid #24405c', color: GOLD }} />
             <span className="text-[11px] text-slate-400">giây</span>
             {[15, 30, 60].map((v) => <button key={v} onClick={() => datThoiLuong(v)} disabled={previewing || rec} className="rounded px-1.5 py-0.5 text-[10px] font-semibold text-slate-300 disabled:opacity-40" style={{ background: '#1b3149' }}>{v}s</button>)}
           </div>
@@ -9204,7 +9204,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
           </div>
           {scenes.length > 0 && (
             <div className="cl-tl-scenes relative mb-1 h-5">
-              {scenes.map((s, i) => { const st = sceneStart(i); const w = (s.dur / Math.max(1, duration)) * 100; return <button key={s.id} onPointerDown={(e) => { e.stopPropagation(); setPlayhead(+st.toFixed(1)); }} className="absolute inset-y-0 overflow-hidden whitespace-nowrap rounded px-1 text-left text-[9px] font-semibold text-white" style={{ left: `${(st / Math.max(1, duration)) * 100}%`, width: `${w}%`, background: i % 2 ? '#3b4b63' : '#2c3a4f', borderRight: '1px solid #0b1826' }} title={s.name}>{s.name}</button>; })}
+              {scenes.map((s, i) => { const st = sceneStart(i); const w = (s.dur / Math.max(1, duration)) * 100; return <button key={s.id} onPointerDown={(e) => { e.stopPropagation(); setPlayhead(+st.toFixed(1)); }} className="absolute inset-y-0 overflow-hidden whitespace-nowrap rounded px-1 text-left text-[9px] font-semibold text-white" style={{ left: `${(st / Math.max(1, duration)) * 100}%`, width: `${w}%`, background: i % 2 ? '#3b4b63' : '#2c3a4f', borderRight: '1px solid #072a2d' }} title={s.name}>{s.name}</button>; })}
             </div>
           )}
           {/* Mỗi hàng: [mã, tên hiện ra, màu thanh clip, biểu tượng in trong thanh clip] */}
@@ -9290,7 +9290,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
         </div>
 
         {/* ====== KHUNG HÌNH CAMERA (KEYFRAME) — chỉnh bằng số ngay dưới dòng thời gian ====== */}
-        <div className="mt-2 rounded-lg p-2" style={{ background: '#0d2033', boxShadow: 'inset 0 0 0 1px #1b3149' }}>
+        <div className="mt-2 rounded-lg p-2" style={{ background: '#082f33', boxShadow: 'inset 0 0 0 1px #1b3149' }}>
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-bold" style={{ color: '#c4b5fd' }}>🎥 Khung hình camera</span>
             <span className="text-[11px] text-slate-400">{camKeys.length} khung</span>
@@ -9376,7 +9376,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                     <label className="flex items-center gap-1">
                       <span className="w-11 shrink-0 font-semibold">⏱ Giây</span>
                       <input type="range" min={i > 0 ? arr[i - 1].t + 0.1 : 0} max={i < arr.length - 1 ? arr[i + 1].t - 0.1 : Math.max(1, duration)} step={0.1} value={k.t} onChange={(e) => tweakKf(k.t, { t: Number(e.target.value) })} className="min-w-0 flex-1" style={{ accentColor: '#c4b5fd' }} title="Kéo để dời khung này sớm hơn / muộn hơn (chỉ chạy được trong khoảng giữa hai khung kế bên)" />
-                      <input type="number" step={0.1} min={0} max={duration} value={k.t} onChange={(e) => tweakKf(k.t, { t: Number(e.target.value) })} className="w-12 shrink-0 rounded px-1 py-0.5 text-[11px]" style={{ background: '#0d2033', border: '1px solid #24405c', color: INK }} title="Hoặc gõ thẳng số giây" />
+                      <input type="number" step={0.1} min={0} max={duration} value={k.t} onChange={(e) => tweakKf(k.t, { t: Number(e.target.value) })} className="w-12 shrink-0 rounded px-1 py-0.5 text-[11px]" style={{ background: '#082f33', border: '1px solid #24405c', color: INK }} title="Hoặc gõ thẳng số giây" />
                     </label>
                     {([['zoom', '🔍 Phóng', 8, 20, 0.1, ''], ['pitch', '📐 Nghiêng', 0, 85, 1, '°'], ['bearing', '🧭 Xoay', -180, 180, 1, '°']] as const).map(([kk, lb, mn, mx, st, unit]) => (
                       <label key={kk} className="flex items-center gap-1">
@@ -9386,7 +9386,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                       </label>
                     ))}
                   </div>
-                  <select value={k.ease || 'smooth'} onChange={(e) => editKf(k.t, { ease: e.target.value })} className="mt-1 w-full rounded px-1 py-0.5 text-[10px]" style={{ background: '#0d2033', border: '1px solid #24405c', color: INK }} title="Cách bay từ khung này sang khung kế tiếp">
+                  <select value={k.ease || 'smooth'} onChange={(e) => editKf(k.t, { ease: e.target.value })} className="mt-1 w-full rounded px-1 py-0.5 text-[10px]" style={{ background: '#082f33', border: '1px solid #24405c', color: INK }} title="Cách bay từ khung này sang khung kế tiếp">
                     {EASES.map((x) => <option key={x.key} value={x.key}>{x.name} — {x.note}</option>)}
                   </select>
                   <details className="mt-1">
@@ -9394,7 +9394,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                     {([['easeZoom', 'Phóng to'], ['easePitch', 'Nghiêng'], ['easeBearing', 'Xoay']] as const).map(([kk, lb]) => (
                       <label key={kk} className="mt-1 flex items-center gap-1 text-[10px] text-slate-400">
                         <span className="w-12 shrink-0">{lb}</span>
-                        <select value={(k as any)[kk] || ''} onChange={(e) => editKf(k.t, { [kk]: e.target.value || undefined } as any)} className="min-w-0 flex-1 rounded px-1 py-0.5 text-[10px]" style={{ background: '#0d2033', border: '1px solid #24405c', color: INK }}>
+                        <select value={(k as any)[kk] || ''} onChange={(e) => editKf(k.t, { [kk]: e.target.value || undefined } as any)} className="min-w-0 flex-1 rounded px-1 py-0.5 text-[10px]" style={{ background: '#082f33', border: '1px solid #24405c', color: INK }}>
                           <option value="">theo kiểu chung</option>
                           {EASES.map((x) => <option key={x.key} value={x.key}>{x.name}</option>)}
                         </select>
@@ -9423,7 +9423,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
             <div className="grid min-h-0 flex-1 grid-cols-2 gap-2 overflow-y-auto pr-1 sm:grid-cols-3">
               {WIDGETS.map((w) => (
                 <button key={w.key} onClick={() => { if (so && so.type === 'widget') { updateObj(so.id, { wk: w.key, wd: { ...w.d } }); toast.success('Đã đổi mẫu'); } else addWidget(w.key); setWPicker(false); }}
-                  className="rounded-xl p-2 text-left" style={{ background: '#0b1826', boxShadow: '0 0 0 1px ' + LINE }}>
+                  className="rounded-xl p-2 text-left" style={{ background: '#072a2d', boxShadow: '0 0 0 1px ' + LINE }}>
                   <WidgetPreview kind={w.key} data={w.d} />
                   <div className="mt-1 text-xs font-bold" style={{ color: INK }}>{w.name}</div>
                   <div className="text-[10px] leading-tight text-slate-400">{w.note}</div>
@@ -9568,7 +9568,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                       {RADAR_FX.map((r) => (
                         <button key={r.key} onClick={() => camRadar(r)} title={r.note}
                           className="rounded-2xl p-2 text-center transition hover:-translate-y-px"
-                          style={{ background: radarFx === r.key ? 'linear-gradient(180deg, rgba(200,161,75,.16), rgba(200,161,75,.03))' : '#0b1826', boxShadow: radarFx === r.key ? '0 0 0 1.5px ' + GOLD + ', 0 10px 26px -14px rgba(200,161,75,.7)' : '0 0 0 1px ' + LINE }}>
+                          style={{ background: radarFx === r.key ? 'linear-gradient(180deg, rgba(200,161,75,.16), rgba(200,161,75,.03))' : '#072a2d', boxShadow: radarFx === r.key ? '0 0 0 1.5px ' + GOLD + ', 0 10px 26px -14px rgba(200,161,75,.7)' : '0 0 0 1px ' + LINE }}>
                           <span className="mx-auto block w-fit"><PinStage size={78}><RadarPreview kind={r.key} color={pinTone || fam.color} size={60} /></PinStage></span>
                           <span className="mt-1.5 block text-[11px] font-bold" style={{ color: radarFx === r.key ? GOLD : INK }}>{r.name}</span>
                           <span className="block text-[10px] leading-tight text-slate-400">{r.note}</span>
@@ -9582,7 +9582,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                         return (
                           <button key={ic.key} onClick={() => camGhim(ic.key, ic.name)} title={'Cắm ghim ' + ic.name}
                             className="rounded-2xl p-1.5 text-center transition hover:-translate-y-px"
-                            style={{ background: dang ? 'linear-gradient(180deg, rgba(200,161,75,.16), rgba(200,161,75,.03))' : '#0b1826', boxShadow: dang ? '0 0 0 1.5px ' + GOLD + ', 0 10px 26px -14px rgba(200,161,75,.7)' : '0 0 0 1px ' + LINE }}>
+                            style={{ background: dang ? 'linear-gradient(180deg, rgba(200,161,75,.16), rgba(200,161,75,.03))' : '#072a2d', boxShadow: dang ? '0 0 0 1.5px ' + GOLD + ', 0 10px 26px -14px rgba(200,161,75,.7)' : '0 0 0 1px ' + LINE }}>
                             <span className="mx-auto block w-fit"><PinStage size={72}><PinPreview shape={fam.shape} color={mauCua(fam, ic.key)} icon={ic.key} size={54} /></PinStage></span>
                             <span className="mt-1 block truncate text-[10px] font-semibold leading-tight" style={{ color: dang ? GOLD : INK }}>{ic.name}</span>
                           </button>
@@ -9709,7 +9709,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
             <div className="grid min-h-0 flex-1 grid-cols-2 gap-2 overflow-y-auto pr-1 sm:grid-cols-3">
               {CO_SHAPES.map((x) => (
                 <button key={x.key} onClick={() => { setCalloutShape(x.key); callouts.current = callouts.current.map((c) => ({ ...c, shape: x.key })); drawCallouts(); setCalloutVer((v) => v + 1); setCoPicker(false); toast.success('Đã đổi kiểu thẻ: ' + x.name); }}
-                  className="rounded-xl p-2 text-left" style={{ background: '#0b1826', boxShadow: calloutShape === x.key ? '0 0 0 2px ' + GOLD : '0 0 0 1px ' + LINE }}>
+                  className="rounded-xl p-2 text-left" style={{ background: '#072a2d', boxShadow: calloutShape === x.key ? '0 0 0 2px ' + GOLD : '0 0 0 1px ' + LINE }}>
                   <CoPreview shape={x.key} col={CO_STYLES[calloutStyle]?.col || '#C8A14B'} />
                   <div className="mt-1 text-[11px] font-bold" style={{ color: calloutShape === x.key ? GOLD : INK }}>{x.name}</div>
                   <div className="text-[10px] leading-tight text-slate-400">{x.note}</div>
@@ -9748,7 +9748,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
       {fxPicker && (
         <>
           <div className="fixed inset-0 z-40" style={{ background: 'rgba(3,8,14,.72)' }} onClick={() => setFxPicker(false)} />
-          <div className="fixed left-1/2 top-1/2 z-50 flex max-h-[86vh] w-[min(760px,94vw)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-2xl p-4 shadow-2xl" style={{ background: '#0f1e30', border: '1px solid #24405c' }}>
+          <div className="fixed left-1/2 top-1/2 z-50 flex max-h-[86vh] w-[min(760px,94vw)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-2xl p-4 shadow-2xl" style={{ background: '#0c2a2d', border: '1px solid #24405c' }}>
             <div className="mb-2 flex items-center gap-3">
               <div className="text-base font-bold text-white">✨ Chọn mẫu chữ động {fxFor && <span style={{ color: GOLD }}>— cho dòng chữ trên bản đồ</span>}</div>
               <span className="text-xs text-slate-400">{TEXTANIMS.length} mẫu · bấm để dùng ngay</span>
@@ -9766,7 +9766,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                       {items.map((x) => (
                         <button key={x.key} onClick={() => { if (fxFor) updateObj(fxFor, { fx: x.key }); else setTextAnim(x.key); setFxPicker(false); setFxFor(null); toast.success('Đã chọn mẫu: ' + x.name); }}
                           className="overflow-hidden rounded-xl p-1 text-left transition"
-                          style={{ background: '#0b1826', boxShadow: (fxFor ? (objects.find((o) => o.id === fxFor)?.fx || 'none') : textAnim) === x.key ? '0 0 0 2px ' + GOLD : '0 0 0 1px #24405c' }}>
+                          style={{ background: '#072a2d', boxShadow: (fxFor ? (objects.find((o) => o.id === fxFor)?.fx || 'none') : textAnim) === x.key ? '0 0 0 2px ' + GOLD : '0 0 0 1px #24405c' }}>
                           <FxPreview anim={x.key} text="Tên Dự Án" />
                           <div className="px-1 py-1 text-[11px] font-semibold" style={{ color: textAnim === x.key ? GOLD : '#cbd5e1' }}>{x.name}</div>
                         </button>
@@ -10582,7 +10582,7 @@ function drawBG(ctx: CanvasRenderingContext2D, W: number, H: number, kind: strin
     return;
   }
   if (kind === 'grid') {
-    ctx.fillStyle = '#04101c'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#041a1c'; ctx.fillRect(0, 0, W, H);
     ctx.strokeStyle = 'rgba(56,189,248,0.35)'; ctx.lineWidth = Math.max(1, 2 * k);
     const step = 90 * k, off = (t * 26) % step;
     for (let x = -step + off; x < W + step; x += step) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 60 * k, H); ctx.stroke(); }
@@ -10761,7 +10761,7 @@ const HO_MAU: [string, [string, string, string]][] = [
   ['Hồng', ['#be185d', '#ec4899', '#f9a8d4']],
   ['Nâu đất', ['#78350f', '#b45309', '#fcd34d']],
 ];
-const MAU_TRUNG_TINH = ['#ffffff', '#e2e8f0', '#94a3b8', '#475569', '#0A2540', '#0b1220'];
+const MAU_TRUNG_TINH = ['#ffffff', '#e2e8f0', '#94a3b8', '#475569', '#0B4045', '#06201f'];
 const MAU_NHANH = ['#C8A14B', '#ef4444', '#3b82f6', '#22c55e'];   // bày sẵn ngoài cho bấm một phát là xong
 // Màu sáng hay tối? Dùng để chọn màu cho dấu tích ở giữa chấm màu đang chọn (trắng trên nền tối, xanh đêm trên nền sáng).
 function mauSang(hex: string): boolean {
@@ -10811,7 +10811,7 @@ function BangMau({ mau, doiMau, goiY, nhanGoiY, nhan }: { mau: string; doiMau: (
           <div className="flex items-center gap-2">
             <input type="color" value={/^#[0-9a-fA-F]{6}$/.test(mau || '') ? mau : '#C8A14B'} onChange={(e) => chon(e.target.value)} className="h-8 w-11 shrink-0 cursor-pointer rounded-lg border-0 bg-transparent p-0" title="Mở bảng pha màu của máy" />
             <input value={go || (mau || '').toUpperCase()} onChange={(e) => { const v = e.target.value; setGo(v); const t = v.trim(); if (/^#[0-9a-fA-F]{6}$/.test(t)) { chon(t); setGo(''); } }} onBlur={() => setGo('')}
-              placeholder="#C8A14B" className="w-28 rounded-lg px-2 py-1 font-mono text-[11px]" style={{ background: '#0d2033', border: '1px solid ' + LINE, color: INK }} title="Gõ mã màu 6 ký tự, vd #C8A14B" />
+              placeholder="#C8A14B" className="w-28 rounded-lg px-2 py-1 font-mono text-[11px]" style={{ background: '#082f33', border: '1px solid ' + LINE, color: INK }} title="Gõ mã màu 6 ký tự, vd #C8A14B" />
             <span className="text-[10px] leading-tight text-slate-500">Gõ mã màu hoặc bấm ô vuông để pha màu bất kỳ.</span>
           </div>
         </div>
@@ -11262,7 +11262,7 @@ function drawXe(x: CanvasRenderingContext2D, kind: string, L: number, mau: strin
     x.strokeStyle = 'rgba(238,244,250,.62)'; x.lineWidth = p(3.6); x.lineCap = 'round';
     for (let i = 0; i < 4; i++) { x.save(); x.rotate((Math.PI / 2) * i); x.beginPath(); x.moveTo(0, 0); x.lineTo(0, -p(46)); x.stroke(); x.restore(); }
     x.restore();
-    x.beginPath(); x.arc(0, 0, p(5), 0, Math.PI * 2); x.fillStyle = '#0b1220'; x.fill();
+    x.beginPath(); x.arc(0, 0, p(5), 0, Math.PI * 2); x.fillStyle = '#06201f'; x.fill();
     x.save(); x.translate(0, p(52)); x.rotate(el * 22);                        // cánh quạt đuôi
     x.strokeStyle = 'rgba(226,232,240,.5)'; x.lineWidth = p(2.6); x.beginPath(); x.moveTo(-p(11), 0); x.lineTo(p(11), 0); x.stroke(); x.restore();
   } else {                                                                     // NGƯỜI ĐI BỘ (nhìn từ trên: đầu + hai vai)
@@ -11404,7 +11404,7 @@ function CoPreview({ shape, col }: { shape: string; col: string }) {
       // thẻ chữ
       x.font = '700 10px Arial, sans-serif'; const tx = 'DỰ ÁN', tw = x.measureText(tx).width;
       const bx = B[0] - 4, by = B[1] - 9, bw = tw + 14, bh = 18;
-      x.strokeStyle = col; x.lineWidth = 1.4; x.fillStyle = 'rgba(10,37,64,.9)';
+      x.strokeStyle = col; x.lineWidth = 1.4; x.fillStyle = 'rgba(11,64,69,.9)';
       if (shape === 'pill') { x.beginPath(); x.roundRect ? x.roundRect(bx, by, bw, bh, 9) : x.rect(bx, by, bw, bh); x.fill(); x.stroke(); }
       else if (shape === 'frame') { x.fillRect(bx, by, bw, bh); const L = 6; x.beginPath(); [[bx, by, 1, 1], [bx + bw, by, -1, 1], [bx, by + bh, 1, -1], [bx + bw, by + bh, -1, -1]].forEach(([cx, cy, sx, sy]) => { x.moveTo(cx + sx * L, cy); x.lineTo(cx, cy); x.lineTo(cx, cy + sy * L); }); x.stroke(); }
       else if (shape === 'bracket') { x.fillRect(bx, by, bw, bh); const L = 5; x.beginPath(); x.moveTo(bx + L, by); x.lineTo(bx, by); x.lineTo(bx, by + bh); x.lineTo(bx + L, by + bh); x.moveTo(bx + bw - L, by); x.lineTo(bx + bw, by); x.lineTo(bx + bw, by + bh); x.lineTo(bx + bw - L, by + bh); x.stroke(); }
@@ -11427,7 +11427,7 @@ function FxPreview({ anim, text = 'Tên Dự Án', size = 26 }: { anim: string; 
     let raf = 0; const t0 = gioHieuUng();
     const loop = () => {
       const t = ((gioHieuUng() - t0) / 1000) % 2.6;
-      const g = ctx.createLinearGradient(0, 0, 0, c.height); g.addColorStop(0, '#123047'); g.addColorStop(1, '#0b1826');
+      const g = ctx.createLinearGradient(0, 0, 0, c.height); g.addColorStop(0, '#123047'); g.addColorStop(1, '#072a2d');
       ctx.fillStyle = g; ctx.fillRect(0, 0, c.width, c.height);
       ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
       paintTextFx(ctx, text, c.width / 2, c.height / 2 + size * 0.36, size, 700, '#ffffff', anim, Math.min(1, t / 1.15));
@@ -11536,7 +11536,7 @@ function paintTextFx(ctx: CanvasRenderingContext2D, text: string, x: number, y: 
     ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = Math.max(1, size * 0.028); ctx.stroke();
   }
   if (anim === 'ribbon') { ctx.fillStyle = GOLD; roundRect(ctx, ax - padX, y - size - padY * 0.15, (w + padX * 2) * _ap, size + padY * 1.9, size * 0.12); ctx.fill(); }
-  if (anim === 'boxLeft') { ctx.fillStyle = 'rgba(10,37,64,0.82)'; roundRect(ctx, ax - padX, y - size - padY * 0.15, w + padX * 2, size + padY * 1.9, size * 0.1); ctx.fill(); ctx.fillStyle = GOLD; ctx.fillRect(ax - padX, y - size - padY * 0.15, size * 0.14, (size + padY * 1.9)); }
+  if (anim === 'boxLeft') { ctx.fillStyle = 'rgba(11,64,69,0.82)'; roundRect(ctx, ax - padX, y - size - padY * 0.15, w + padX * 2, size + padY * 1.9, size * 0.1); ctx.fill(); ctx.fillStyle = GOLD; ctx.fillRect(ax - padX, y - size - padY * 0.15, size * 0.14, (size + padY * 1.9)); }
   if (anim === 'darkgold') { ctx.fillStyle = 'rgba(6,12,20,0.86)'; roundRect(ctx, ax - padX, y - size - padY * 0.15, w + padX * 2, size + padY * 1.9, size * 0.16); ctx.fill(); ctx.strokeStyle = GOLD; ctx.lineWidth = Math.max(1, size * 0.05); ctx.stroke(); }
   if (anim === 'underline') { ctx.fillStyle = GOLD; ctx.fillRect(ax, y + size * 0.24, w * _ap, Math.max(2, size * 0.09)); }
   // Viên thuốc: bo tròn hết cỡ, nền tối, viền vàng mảnh
@@ -11554,7 +11554,7 @@ function paintTextFx(ctx: CanvasRenderingContext2D, text: string, x: number, y: 
   // Sọc chéo vàng chạy sau chữ
   if (anim === 'stripe') {
     ctx.save(); ctx.beginPath(); ctx.rect(ax - padX, y - size - padY * 0.15, (w + padX * 2) * _ap, size + padY * 1.9); ctx.clip();
-    ctx.fillStyle = 'rgba(10,37,64,.8)'; ctx.fillRect(ax - padX, y - size - padY * 0.15, w + padX * 2, size + padY * 1.9);
+    ctx.fillStyle = 'rgba(11,64,69,.8)'; ctx.fillRect(ax - padX, y - size - padY * 0.15, w + padX * 2, size + padY * 1.9);
     ctx.fillStyle = 'rgba(200,161,75,.32)';
     for (let sx = ax - padX - size * 2; sx < ax + w + padX; sx += size * 0.62) { ctx.beginPath(); ctx.moveTo(sx, y + size * 0.75); ctx.lineTo(sx + size * 0.5, y - size * 1.05); ctx.lineTo(sx + size * 0.66, y - size * 1.05); ctx.lineTo(sx + size * 0.16, y + size * 0.75); ctx.closePath(); ctx.fill(); }
     ctx.restore();
@@ -11577,7 +11577,7 @@ function paintTextFx(ctx: CanvasRenderingContext2D, text: string, x: number, y: 
   if (anim === 'neon') { ctx.shadowColor = color; ctx.shadowBlur = size * 0.6; }
   if (anim === 'fire') { ctx.shadowColor = '#ff7a18'; ctx.shadowBlur = size * 0.55; }
   // ── màu chữ ──
-  let fill: string | CanvasGradient = anim === 'ribbon' ? '#0A2540' : color;
+  let fill: string | CanvasGradient = anim === 'ribbon' ? '#0B4045' : color;
   if (anim === 'gold' || anim === 'gold24') {
     const g = ctx.createLinearGradient(0, y - size, 0, y + size * 0.28);
     if (anim === 'gold24') { g.addColorStop(0, '#fff8d0'); g.addColorStop(0.4, '#ffd257'); g.addColorStop(0.62, '#b57e18'); g.addColorStop(1, '#ffe08a'); }
@@ -11649,7 +11649,7 @@ function badgeSize(ctx: CanvasRenderingContext2D, style: string, k: number): { w
 // Vẽ thẻ, góc trên-trái của thẻ đặt tại (x, y).
 function drawBadge(ctx: CanvasRenderingContext2D, style: string, x: number, y: number, k: number) {
   const px = (n: number) => n * k;
-  const GOLD = '#C8A14B', NAVY = '#0A2540';
+  const GOLD = '#C8A14B', NAVY = '#0B4045';
   const s = badgeSize(ctx, style, k);
   ctx.save();
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
@@ -11722,7 +11722,7 @@ function LogoBadge({ style, cao = 30 }: { style: string; cao?: number }) {
 }
 
 function drawOverlay(ctx: CanvasRenderingContext2D, W: number, H: number, layout: Layout, title: string, sub: string, logo: boolean, anim = 'fade', ap = 1, lStyle = 'vienthuoc', lPos = 'auto', kieuTo = 'thuong') {
-  const GOLD = '#C8A14B', NAVY = 'rgba(10,37,64,'; const k = Math.min(W, H) / 1080;
+  const GOLD = '#C8A14B', NAVY = 'rgba(11,64,69,'; const k = Math.min(W, H) / 1080;
   const px = (n: number) => Math.round(n * k);
   // DẢI TỐI DƯỚI CHỮ — trước đây là một dải chuyển sắc thẳng nên nhìn thấy rõ "mép" cắt ngang khung hình.
   // Giờ chia 5 chặng theo đường cong (đậm dần chậm ở trên, nhanh ở dưới) → tan vào ảnh, không thấy mép.

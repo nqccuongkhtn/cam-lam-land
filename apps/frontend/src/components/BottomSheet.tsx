@@ -18,7 +18,7 @@ export default function BottomSheet({ open, onClose, title, children, footer }: 
         <div className="grid shrink-0 place-items-center pb-1 pt-2"><span className="h-1.5 w-10 rounded-full bg-slate-300" /></div>
         {title && (
           <div className="flex shrink-0 items-center justify-between border-b border-slate-100 px-4 pb-2">
-            <b className="text-[15px] text-[#0A2540]">{title}</b>
+            <b className="text-[15px] text-[#0B4045]">{title}</b>
             <button onClick={onClose} aria-label="Đóng" className="cl-press grid h-8 w-8 place-items-center rounded-lg text-slate-400 hover:bg-slate-100">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
             </button>

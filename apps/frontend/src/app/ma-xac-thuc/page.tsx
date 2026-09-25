@@ -87,19 +87,19 @@ export default function MaXacThucPage() {
   if (!duocXem) return (
     <div className="max-w-lg mx-auto p-6 mt-10 text-center">
       <div className="text-5xl mb-3">🔒</div>
-      <h1 className="text-xl font-bold text-[#0A2540] mb-2">Trang dành riêng cho người được cấp quyền</h1>
+      <h1 className="text-xl font-bold text-[#0B4045] mb-2">Trang dành riêng cho người được cấp quyền</h1>
       <p className="text-slate-500 mb-5">
         Đây là mã xác thực 2 lớp của các tài khoản dùng chung trong cơ quan. Muốn xem, nhờ quản trị viên
         cấp quyền <b>“Tra mã xác thực”</b> cho tài khoản của bạn.
       </p>
-      <Link href="/" className="inline-block px-4 py-2 rounded-lg bg-[#0A2540] text-white font-semibold">Về trang chủ</Link>
+      <Link href="/" className="inline-block px-4 py-2 rounded-lg bg-[#0B4045] text-white font-semibold">Về trang chủ</Link>
     </div>
   );
 
   return (
     <div className="max-w-3xl mx-auto p-4 sm:p-6">
       <div className="flex items-start justify-between gap-3 mb-1">
-        <h1 className="text-xl sm:text-2xl font-bold text-[#0A2540]">🔐 Mã xác thực 2 lớp</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-[#0B4045]">🔐 Mã xác thực 2 lớp</h1>
         {quanTri && (
           <button onClick={() => setMoThem((v) => !v)} className="shrink-0 px-3 py-1.5 rounded-lg border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50">
             {moThem ? 'Đóng' : '＋ Thêm tài khoản'}
@@ -120,7 +120,7 @@ export default function MaXacThucPage() {
             className="w-full rounded-lg border border-slate-200 p-2 text-[13px] font-mono" />
           <div className="mt-2 flex gap-2">
             <button onClick={themTaiKhoan} disabled={dangLuu || !oThem.trim()}
-              className="px-4 py-2 rounded-lg bg-[#0A2540] text-white text-sm font-semibold disabled:opacity-50">
+              className="px-4 py-2 rounded-lg bg-[#0B4045] text-white text-sm font-semibold disabled:opacity-50">
               {dangLuu ? 'Đang lưu…' : 'Lưu'}
             </button>
             <span className="text-[12px] text-slate-400 self-center">Chuỗi bí mật được mã hoá trước khi lưu.</span>
@@ -153,11 +153,11 @@ export default function MaXacThucPage() {
         {ds.map((t) => (
           <div key={t.id} className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-white">
             <div className="min-w-0 flex-1">
-              <div className="font-bold text-[#0A2540] truncate">{t.ten}</div>
+              <div className="font-bold text-[#0B4045] truncate">{t.ten}</div>
               <div className="text-[12px] text-slate-400 truncate">{[t.heThong, t.ghiChu].filter(Boolean).join(' · ') || '—'}</div>
             </div>
             <button onClick={() => chep(t)} title="Bấm để chép mã"
-              className="shrink-0 font-mono text-2xl sm:text-3xl font-bold tracking-[0.15em] text-[#0A2540] hover:text-[#00a2ff]">
+              className="shrink-0 font-mono text-2xl sm:text-3xl font-bold tracking-[0.15em] text-[#0B4045] hover:text-[#00a2ff]">
               {t.ma ? `${t.ma.slice(0, 3)} ${t.ma.slice(3)}` : '——— ———'}
             </button>
             <span className={`shrink-0 w-14 text-[11px] font-semibold ${daChep === t.id ? 'text-green-600' : 'text-slate-300'}`}>

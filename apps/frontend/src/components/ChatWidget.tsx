@@ -27,7 +27,7 @@ function renderWithMentions(body: string, names: string[], myName: string): any 
   while ((m = re.exec(body)) !== null) {
     if (m.index > last) out.push(body.slice(last, m.index));
     const isMe = !!myName && m[1].toLowerCase() === myName.toLowerCase();
-    out.push(<span key={i++} className={`font-semibold rounded px-0.5 ${isMe ? 'bg-[#C8A14B] text-[#0A2540]' : 'text-blue-600'}`}>@{m[1]}</span>);
+    out.push(<span key={i++} className={`font-semibold rounded px-0.5 ${isMe ? 'bg-[#C8A14B] text-[#0B4045]' : 'text-blue-600'}`}>@{m[1]}</span>);
     last = m.index + m[0].length;
   }
   if (last < body.length) out.push(body.slice(last));
@@ -494,24 +494,26 @@ export default function ChatWidget() {
           onPointerUp={() => { if (Math.abs(dragX) > 70) setToast(null); dragStart.current = null; setDragX(0); }}
           onPointerCancel={() => { dragStart.current = null; setDragX(0); }}>
           <div onClick={() => { if (draggedRef.current) { draggedRef.current = false; return; } openFromToast(toast); }}
-            className="cursor-pointer bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 flex items-center gap-3">
-            {toast.avatar ? <img src={toast.avatar} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" /> : <span className="w-10 h-10 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center font-bold shrink-0">{(toast.name || '?').charAt(0).toUpperCase()}</span>}
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold text-[#0A2540] truncate">💬 {toast.name}</p>
-              <p className="text-xs text-slate-500 truncate">{toast.body}</p>
+            className="cl-tb cursor-pointer">
+            {/* Kiểu thông báo iPhone dùng chung (.cl-tb, globals.css) */}
+            <span className="cl-tb-icon">{toast.avatar ? <img src={toast.avatar} alt="" /> : (toast.name || '?').charAt(0).toUpperCase()}</span>
+            <div className="cl-tb-than">
+              <p className="cl-tb-dau"><span>Tin nhắn</span><span className="gio">bây giờ</span></p>
+              <p className="cl-tb-tieu-de truncate">{toast.name}</p>
+              <p className="cl-tb-noi-dung truncate">{toast.body}</p>
             </div>
-            <button onClick={(e) => { e.stopPropagation(); setToast(null); }} className="text-slate-300 hover:text-slate-500 text-lg leading-none shrink-0">×</button>
           </div>
         </div>
       )}
       {/* Popup MỜI GỌI gửi bán (ĐIỆN THOẠI dọc) — mobile không có bong bóng nên hiện lời mời độc lập ở góc dưới. Bấm → mở form Gửi bán. */}
       {!open && hint && (
         <div className="fixed z-[55] cl-fab right-4 md:right-5 pointer-events-none sm:hidden">
-          <div className="relative pointer-events-auto bg-white rounded-2xl shadow-xl border border-slate-200 pl-3.5 pr-3 py-2.5 w-[210px] animate-bounce" style={{ animationDuration: '1.5s' }}>
+          <div className="relative pointer-events-auto cl-tb !block w-[230px] animate-bounce" style={{ animationDuration: '1.5s' }}>
             <button onClick={dismissHint} aria-label="Đóng" className="absolute -top-2 -right-2 w-5 h-5 bg-slate-700 hover:bg-slate-900 text-white rounded-full text-xs grid place-items-center">×</button>
             <button onClick={() => { primeAudio(); setTab('sell'); setOpen(true); dismissHint(); }} className="text-left w-full">
-              <p className="font-bold text-[#0A2540] text-sm leading-snug">🏷️ Có nhà đất cần bán / ký gửi?</p>
-              <p className="text-xs text-slate-500 mt-0.5">Bấm vào đây để gửi bán — miễn phí!</p>
+              <p className="cl-tb-dau"><span>Cam Lâm Land</span><span className="gio">bây giờ</span></p>
+              <p className="cl-tb-tieu-de">Có nhà đất cần bán / ký gửi?</p>
+              <p className="cl-tb-noi-dung">Bấm vào đây để gửi bán, miễn phí.</p>
             </button>
           </div>
         </div>
@@ -526,17 +528,18 @@ export default function ChatWidget() {
           bottom: khungNhin().H - bubblePos.y - BUB,
         } : undefined}>
         {!open && hint && (
-          <div className="relative pointer-events-auto bg-white rounded-2xl shadow-xl border border-slate-200 pl-3.5 pr-3 py-2.5 w-[210px] animate-bounce" style={{ animationDuration: '1.5s' }}>
+          <div className="relative pointer-events-auto cl-tb !block w-[230px] animate-bounce" style={{ animationDuration: '1.5s' }}>
             <button onClick={dismissHint} aria-label="Đóng" className="absolute -top-2 -right-2 w-5 h-5 bg-slate-700 hover:bg-slate-900 text-white rounded-full text-xs grid place-items-center">×</button>
             <button onClick={() => { primeAudio(); setTab('sell'); setOpen(true); dismissHint(); }} className="text-left w-full">
-              <p className="font-bold text-[#0A2540] text-sm leading-snug">🏷️ Có nhà đất cần bán / ký gửi?</p>
-              <p className="text-xs text-slate-500 mt-0.5">Bấm vào đây để gửi bán — miễn phí!</p>
+              <p className="cl-tb-dau"><span>Cam Lâm Land</span><span className="gio">bây giờ</span></p>
+              <p className="cl-tb-tieu-de">Có nhà đất cần bán / ký gửi?</p>
+              <p className="cl-tb-noi-dung">Bấm vào đây để gửi bán, miễn phí.</p>
             </button>
           </div>
         )}
         <button onPointerDown={bubbleDown} onPointerMove={bubbleMove} onPointerUp={bubbleUp} onPointerCancel={() => { bubbleDrag.current = null; }} style={{ touchAction: 'none' }}
           onClick={() => { if (bubbleMoved.current) { bubbleMoved.current = false; return; } primeAudio(); if (!open) setTab('advisory'); setOpen((o) => !o); }} aria-label="Tin nhắn & gửi bán" title="Bấm để mở · Giữ và kéo để di chuyển"
-          className="relative pointer-events-auto w-14 h-14 grid place-items-center bg-[#0A2540] hover:bg-[#0d2f54] text-white rounded-full shadow-2xl shadow-black/40 ring-2 ring-white/40 transition hover:scale-105 active:scale-95 cursor-grab active:cursor-grabbing">
+          className="relative pointer-events-auto w-14 h-14 grid place-items-center bg-[#0B4045] hover:bg-[#0e5157] text-white rounded-full shadow-2xl shadow-black/40 ring-2 ring-white/40 transition hover:scale-105 active:scale-95 cursor-grab active:cursor-grabbing">
           {open ? <span className="text-2xl leading-none">×</span> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z" /></svg>}
           {!open && unread > 0 && <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 grid place-items-center bg-red-600 text-white text-[11px] font-bold rounded-full ring-2 ring-white">{unread > 99 ? '99+' : unread}</span>}
         </button>
@@ -547,7 +550,7 @@ export default function ChatWidget() {
         {/* Lớp phủ CHỈ chặn thao tác lớp dưới (trang + thanh dưới) khi chat mở; đóng chat bằng nút ✕ (bấm ra ngoài KHÔNG đóng). */}
         <div className="fixed inset-0 z-[55] bg-black/30" aria-hidden="true" />
         <div className={`fixed z-[56] bg-white shadow-2xl flex flex-col overflow-hidden inset-0 pt-[env(safe-area-inset-top)] sm:inset-auto sm:pt-0 sm:bottom-5 sm:right-5 sm:w-[94vw] ${twoPane ? 'sm:max-w-[680px]' : 'sm:max-w-sm'} sm:h-[70vh] sm:max-h-[580px] sm:rounded-2xl sm:border sm:border-slate-200`}>
-          <div className="bg-gradient-to-r from-[#0A2540] to-[#10355f] text-white shrink-0">
+          <div className="bg-gradient-to-r from-[#0B4045] to-[#10355f] text-white shrink-0">
             <div className="flex items-center justify-between px-4 pt-3">
               <b className="flex items-center gap-2">Cam Lâm Land {tab !== 'sell' && <span className={`w-2 h-2 rounded-full ${live ? 'bg-emerald-400' : 'bg-slate-400'}`} />}</b>
               <div className="flex items-center gap-3">
@@ -560,18 +563,18 @@ export default function ChatWidget() {
                 Cộng đồng{unreadComm > 0 && tab !== 'community' && <span className="absolute top-1 right-1.5 w-2 h-2 bg-red-500 rounded-full" />}
               </button>
               <button onClick={() => setTab('support')} className={`relative flex-1 py-2 border-b-2 ${tab === 'support' ? 'border-[#C8A14B] text-white' : 'border-transparent text-white/55'}`}>
-                Liên hệ admin{unreadSupp > 0 && tab !== 'support' && <span className="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#0A2540]">{unreadSupp > 99 ? '99+' : unreadSupp}</span>}
+                Liên hệ admin{unreadSupp > 0 && tab !== 'support' && <span className="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#0B4045]">{unreadSupp > 99 ? '99+' : unreadSupp}</span>}
               </button>
               <button onClick={() => setTab((t) => (t === 'sell' || t === 'advisory') ? t : 'sell')} className={`relative flex-1 py-2 border-b-2 ${(tab === 'sell' || tab === 'advisory') ? 'border-[#C8A14B] text-white' : 'border-transparent text-white/55'}`}>
-                Ký gửi & Tư vấn{unreadAdv > 0 && tab !== 'advisory' && <span className="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#0A2540]">{unreadAdv > 99 ? '99+' : unreadAdv}</span>}
+                Ký gửi & Tư vấn{unreadAdv > 0 && tab !== 'advisory' && <span className="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#0B4045]">{unreadAdv > 99 ? '99+' : unreadAdv}</span>}
               </button>
             </div>
             {(tab === 'sell' || tab === 'advisory') && (
               <div className="flex gap-2 px-2 pb-2">
-                <button onClick={() => setTab('sell')} className={`relative flex-1 py-1.5 rounded-full text-[12px] font-bold transition ${tab === 'sell' ? 'bg-white text-[#0A2540]' : 'bg-white/10 text-white/70 hover:bg-white/20'}`}>
+                <button onClick={() => setTab('sell')} className={`relative flex-1 py-1.5 rounded-full text-[12px] font-bold transition ${tab === 'sell' ? 'bg-white text-[#0B4045]' : 'bg-white/10 text-white/70 hover:bg-white/20'}`}>
                   Gửi bán
                 </button>
-                <button onClick={() => setTab('advisory')} className={`relative flex-1 py-1.5 rounded-full text-[12px] font-bold transition ${tab === 'advisory' ? 'bg-white text-[#0A2540]' : 'bg-white/10 text-white/70 hover:bg-white/20'}`}>
+                <button onClick={() => setTab('advisory')} className={`relative flex-1 py-1.5 rounded-full text-[12px] font-bold transition ${tab === 'advisory' ? 'bg-white text-[#0B4045]' : 'bg-white/10 text-white/70 hover:bg-white/20'}`}>
                   Tư vấn đầu tư & Pháp lý{unreadAdv > 0 && tab !== 'advisory' && <span className="absolute -top-0.5 right-1.5 min-w-[15px] h-[15px] px-1 grid place-items-center bg-red-500 text-white text-[9px] font-bold rounded-full">{unreadAdv > 99 ? '99+' : unreadAdv}</span>}
                 </button>
               </div>
@@ -583,9 +586,9 @@ export default function ChatWidget() {
               {sent ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 grid place-items-center mx-auto text-3xl font-bold">✓</div>
-                  <p className="font-bold text-[#0A2540] mt-4 text-lg">Đã gửi thông tin!</p>
+                  <p className="font-bold text-[#0B4045] mt-4 text-lg">Đã gửi thông tin!</p>
                   <p className="text-sm text-slate-500 mt-1">Cam Lâm Land sẽ liên hệ bạn sớm nhất.</p>
-                  <button onClick={() => { setSent(false); setSf({ name: '', phone: '', propertyType: '', ward: '', address: '', area: '', priceExpect: '', description: '' }); }} className="mt-5 bg-[#0A2540] text-white font-bold px-6 py-2.5 rounded-xl">Gửi tin khác</button>
+                  <button onClick={() => { setSent(false); setSf({ name: '', phone: '', propertyType: '', ward: '', address: '', area: '', priceExpect: '', description: '' }); }} className="mt-5 bg-[#0B4045] text-white font-bold px-6 py-2.5 rounded-xl">Gửi tin khác</button>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -606,7 +609,7 @@ export default function ChatWidget() {
                   <textarea className={`${inp} min-h-[70px]`} value={sf.description} onChange={(e) => setS('description', e.target.value)} placeholder="Mô tả thêm (hướng, pháp lý…)" />
                   {serr && <p className="text-sm text-red-600 font-semibold">{serr}</p>}
                   <button disabled={busy} onClick={submitSell} className="cl-press w-full bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold py-3 rounded-xl">{busy ? 'Đang gửi…' : 'Gửi thông tin'}</button>
-                  <p className="text-[11px] text-slate-400 text-center">Hoặc gọi <a href="tel:0988888888" className="font-bold text-[#0A2540]">0988 888 888</a></p>
+                  <p className="text-[11px] text-slate-400 text-center">Hoặc gọi <a href="tel:0988888888" className="font-bold text-[#0B4045]">0988 888 888</a></p>
                 </div>
               )}
             </div>
@@ -614,7 +617,7 @@ export default function ChatWidget() {
             <div className="flex-1 grid place-items-center p-6 text-center">
               <div>
                 <p className="text-slate-500 text-sm">Đăng nhập để chat cộng đồng & nhắn admin.</p>
-                <Link href="/login" className="inline-block mt-3 bg-[#0A2540] text-white font-bold px-5 py-2.5 rounded-xl text-sm">Đăng nhập</Link>
+                <Link href="/login" className="inline-block mt-3 bg-[#0B4045] text-white font-bold px-5 py-2.5 rounded-xl text-sm">Đăng nhập</Link>
               </div>
             </div>
           ) : (
@@ -626,7 +629,7 @@ export default function ChatWidget() {
                       <p className="text-[11px] font-bold text-slate-500">{tab === 'advisory' ? '💰 Tư vấn đầu tư & Pháp lý' : '💬 Hội thoại'} ({(tab === 'advisory' ? advRooms : rooms).length})</p>
                       {tab === 'advisory' && <a href="/tu-van" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-red-600 hover:underline shrink-0">Trang quản trị ↗</a>}
                     </div>
-                    <input value={roomQ} onChange={(e) => setRoomQ(e.target.value)} placeholder="🔍 Tìm khách…" className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm outline-none focus:border-[#0A2540]" />
+                    <input value={roomQ} onChange={(e) => setRoomQ(e.target.value)} placeholder="🔍 Tìm khách…" className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm outline-none focus:border-[#0B4045]" />
                   </div>
                   <div className="flex-1 overflow-y-auto scroll-soft">
                     {roomList.length === 0 && newUsers.length === 0 ? <p className="p-3 text-xs text-slate-400">{roomQ ? 'Không tìm thấy khách.' : 'Chưa có khách nhắn.'}</p> : (
@@ -636,11 +639,11 @@ export default function ChatWidget() {
                           return (
                             <button key={r.room} onClick={() => { setRoom(r.room); setPickedName(r.name); setPickedPhone(r.phone || ''); }} className={`w-full flex items-center gap-2 px-2.5 py-2 text-left border-b border-slate-50 hover:bg-slate-50 ${active ? 'bg-slate-100' : ''}`}>
                               <span className="relative shrink-0">
-                                <span className="w-9 h-9 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-sm font-bold">{(r.name || '?').charAt(0).toUpperCase()}</span>
+                                <span className="w-9 h-9 rounded-full bg-[#0B4045] text-[#C8A14B] grid place-items-center text-sm font-bold">{(r.name || '?').charAt(0).toUpperCase()}</span>
                                 <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-white ${r.online ? 'bg-emerald-500' : 'bg-slate-300'}`} />
                               </span>
                               <span className="min-w-0 flex-1">
-                                <span className="block text-sm font-semibold text-[#0A2540] truncate">{r.name}</span>
+                                <span className="block text-sm font-semibold text-[#0B4045] truncate">{r.name}</span>
                                 <span className="block text-[11px] text-slate-400 truncate">{r.lastBody || '—'}</span>
                               </span>
                               {(r.unread || 0) > 0 && <span className="shrink-0 min-w-[18px] h-[18px] px-1 grid place-items-center bg-red-500 text-white text-[10px] font-bold rounded-full">{(r.unread || 0) > 99 ? '99+' : r.unread}</span>}
@@ -657,7 +660,7 @@ export default function ChatWidget() {
                                 <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-white ${u.online ? 'bg-emerald-500' : 'bg-slate-300'}`} />
                               </span>
                               <span className="min-w-0 flex-1">
-                                <span className="block text-sm font-semibold text-[#0A2540] truncate">{u.name}</span>
+                                <span className="block text-sm font-semibold text-[#0B4045] truncate">{u.name}</span>
                                 <span className="block text-[11px] text-emerald-600 truncate">Bấm để nhắn lần đầu</span>
                               </span>
                             </button>
@@ -674,7 +677,7 @@ export default function ChatWidget() {
                     <button onClick={() => setRoom('')} className="sm:hidden w-7 h-7 grid place-items-center rounded-full hover:bg-slate-100 text-slate-600">←</button>
                     <button onClick={() => setListOpen((v) => !v)} title="Thu gọn danh sách" className="hidden sm:grid w-7 h-7 place-items-center rounded-full hover:bg-slate-100 text-slate-600">☰</button>
                     <div className="min-w-0 leading-tight">
-                      <b className="text-sm text-[#0A2540] truncate flex items-center gap-1.5"><span className={`w-2 h-2 rounded-full ${activeOnline ? 'bg-emerald-500' : 'bg-slate-300'}`} />{activeName}</b>
+                      <b className="text-sm text-[#0B4045] truncate flex items-center gap-1.5"><span className={`w-2 h-2 rounded-full ${activeOnline ? 'bg-emerald-500' : 'bg-slate-300'}`} />{activeName}</b>
                       <span className="text-[11px] flex items-center gap-1.5">
                         {activePhone ? <a href={`tel:${activePhone}`} className="text-red-600 font-semibold">📞 {activePhone}</a> : null}
                         <span className={activeOnline ? 'text-emerald-600 font-semibold' : 'text-slate-400'}>{activeOnline ? '● Đang online' : '○ Ngoại tuyến'}</span>
@@ -692,10 +695,10 @@ export default function ChatWidget() {
                 <div className="shrink-0 border-b border-slate-100 bg-slate-50">
                   <div className="flex items-center gap-2 px-2.5 py-1">
                     <span className="min-w-0 flex-1 leading-tight">
-                      <span className="block text-[11px] font-bold text-[#0A2540] truncate">👥 Cộng đồng Cam Lâm Land</span>
-                      <span className="block text-[9px] text-slate-500 truncate">Admin: Nguyễn Quốc Cường · <a href="tel:0988888888" className="font-semibold text-[#0A2540]">0988 888 888</a></span>
+                      <span className="block text-[11px] font-bold text-[#0B4045] truncate">👥 Cộng đồng Cam Lâm Land</span>
+                      <span className="block text-[9px] text-slate-500 truncate">Admin: Nguyễn Quốc Cường · <a href="tel:0988888888" className="font-semibold text-[#0B4045]">0988 888 888</a></span>
                     </span>
-                    <button onClick={() => setGameOpen((v) => !v)} className="shrink-0 flex items-center gap-1 rounded-full bg-[#0A2540] pl-2 pr-2.5 py-1 text-[10px] font-bold text-white hover:brightness-110">
+                    <button onClick={() => setGameOpen((v) => !v)} className="shrink-0 flex items-center gap-1 rounded-full bg-[#0B4045] pl-2 pr-2.5 py-1 text-[10px] font-bold text-white hover:brightness-110">
                       <span>🎮</span><span className="text-[#C8A14B]">Game giải trí</span><span>{gameOpen ? '▴' : '▾'}</span>
                     </button>
                   </div>
@@ -704,7 +707,7 @@ export default function ChatWidget() {
               )}
                 {tab === 'advisory' && !twoPane && (
                 <div className="px-3 py-2 bg-amber-50 border-b border-amber-100 shrink-0 text-center">
-                  <p className="text-[11px] font-bold text-[#0A2540]">💰 Tư vấn đầu tư & pháp lý BĐS Cam Lâm</p>
+                  <p className="text-[11px] font-bold text-[#0B4045]">💰 Tư vấn đầu tư & pháp lý BĐS Cam Lâm</p>
                   <p className="text-[10px] text-slate-500">Đội ngũ chuyên viên tư vấn đầu tư & pháp lý sẽ phản hồi sớm nhất.</p>
                 </div>
               )}
@@ -735,8 +738,8 @@ export default function ChatWidget() {
                                 )}
                               </span>
                             )}
-                            {!mine && (dAvatar ? <img src={dAvatar} alt="" className="w-7 h-7 rounded-full object-cover shrink-0 bg-white border border-slate-200" /> : <span className="w-7 h-7 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-[11px] font-bold shrink-0">{(dName || '?').charAt(0).toUpperCase()}</span>)}
-                            <div className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${mine ? 'bg-[#0A2540] text-white rounded-br-sm' : 'bg-white border border-slate-200 rounded-bl-sm'}`}>
+                            {!mine && (dAvatar ? <img src={dAvatar} alt="" className="w-7 h-7 rounded-full object-cover shrink-0 bg-white border border-slate-200" /> : <span className="w-7 h-7 rounded-full bg-[#0B4045] text-[#C8A14B] grid place-items-center text-[11px] font-bold shrink-0">{(dName || '?').charAt(0).toUpperCase()}</span>)}
+                            <div className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${mine ? 'bg-[#0B4045] text-white rounded-br-sm' : 'bg-white border border-slate-200 rounded-bl-sm'}`}>
                               {!mine && <p className="text-[11px] font-bold text-[#C8A14B] mb-0.5">{dName}</p>}
                               {coTep
                                 ? <ChatDinhKem fileId={m.fileId} fileName={m.fileName} fileMime={m.fileMime} fileSize={m.fileSize} mine={mine} />
@@ -789,8 +792,8 @@ export default function ChatWidget() {
                         <div className="mb-1.5 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden max-h-44 overflow-y-auto">
                           {mentionList.map((n) => (
                             <button key={n} type="button" onMouseDown={(e) => { e.preventDefault(); pickMention(n); }} className="w-full text-left px-3 py-2 text-sm hover:bg-slate-100 flex items-center gap-2">
-                              <span className="w-6 h-6 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-[10px] font-bold shrink-0">{n.charAt(0).toUpperCase()}</span>
-                              <b className="text-[#0A2540] truncate">{n}</b>
+                              <span className="w-6 h-6 rounded-full bg-[#0B4045] text-[#C8A14B] grid place-items-center text-[10px] font-bold shrink-0">{n.charAt(0).toUpperCase()}</span>
+                              <b className="text-[#0B4045] truncate">{n}</b>
                             </button>
                           ))}
                         </div>
@@ -803,7 +806,7 @@ export default function ChatWidget() {
                                 Emoji 📎 cũ mỗi máy hiện một kiểu và bị mờ trên màn hình nét cao. */}
                             <button onClick={() => tepRef.current?.click()} disabled={dangGuiTep}
                               title="Gửi ảnh hoặc tệp PDF (tối đa 10MB) — hoặc kéo thả tệp vào khung chat"
-                              className="cl-press shrink-0 w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-slate-500 hover:text-[#0A2540] hover:bg-slate-50 hover:border-slate-300 transition disabled:opacity-50">
+                              className="cl-press shrink-0 w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-slate-500 hover:text-[#0B4045] hover:bg-slate-50 hover:border-slate-300 transition disabled:opacity-50">
                               {dangGuiTep ? (
                                 <svg viewBox="0 0 24 24" width="17" height="17" className="animate-spin" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
                                   <path d="M21 12a9 9 0 1 1-6.2-8.6" />
@@ -823,7 +826,7 @@ export default function ChatWidget() {
                             {dangDinhVi ? '…' : '📍'}
                           </button>
                         )}
-                        <input ref={msgInputRef} value={text} onChange={(e) => { setText(e.target.value); if (warn) setWarn(''); }} onKeyDown={(e) => { if (e.key === 'Enter') { if (mentionList.length) { e.preventDefault(); pickMention(mentionList[0]); } else send(); } }} placeholder="Nhập tin nhắn…  (gõ @ để nhắc tên)" className="flex-1 border border-slate-300 rounded-full px-3.5 py-2 text-sm outline-none focus:border-[#0A2540]" />
+                        <input ref={msgInputRef} value={text} onChange={(e) => { setText(e.target.value); if (warn) setWarn(''); }} onKeyDown={(e) => { if (e.key === 'Enter') { if (mentionList.length) { e.preventDefault(); pickMention(mentionList[0]); } else send(); } }} placeholder="Nhập tin nhắn…  (gõ @ để nhắc tên)" className="flex-1 border border-slate-300 rounded-full px-3.5 py-2 text-sm outline-none focus:border-[#0B4045]" />
                         <button onClick={send} className="cl-press bg-red-600 hover:bg-red-700 text-white rounded-full px-4 py-2 text-sm font-bold shrink-0">Gửi</button>
                       </div>
                     </div>

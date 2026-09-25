@@ -11,7 +11,7 @@ import {
 
 const inpc = 'w-full border border-slate-200 rounded-lg px-2.5 py-2 text-sm outline-none focus:border-[#7c3aed]';
 const dealColor = (s?: string | null) => s === 'Đã chốt' ? '#16a34a' : s === 'Thương lượng' ? '#ea580c' : s === 'Đang tư vấn' ? '#0891b2' : s === 'Không thành' ? '#9ca3af' : '#7c3aed';
-const AV_COLORS = ['#0A2540', '#475569', '#7c3aed'];
+const AV_COLORS = ['#0B4045', '#475569', '#7c3aed'];
 const avatarColor = (s: string) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return AV_COLORS[h % AV_COLORS.length]; };
 const initials = (name: string) => { const p = (name || '').trim().split(/\s+/).filter(Boolean); if (!p.length) return '?'; return (p.length > 1 ? p[0][0] + p[p.length - 1][0] : p[0].slice(0, 2)).toUpperCase(); };
 const STAGE_ORDER = ['Không thành', 'Mới', 'Đang tư vấn', 'Thương lượng', 'Đã chốt'];
@@ -127,7 +127,7 @@ export default function CrmKhachPage() {
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-5">
         <div className={`flex items-center justify-between mb-3 ${sel ? 'hidden lg:flex' : ''}`}>
           <div>
-            <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold text-[#0A2540]">CRM Khách hàng</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold text-[#0B4045]">CRM Khách hàng</h1>
             <p className="text-sm text-slate-500 hidden sm:block">Quản lý khách, nhu cầu và các tin họ quan tâm — chốt deal hiệu quả.</p>
           </div>
           <div className="flex items-center gap-2">
@@ -143,7 +143,7 @@ export default function CrmKhachPage() {
             <div key={label as string} className="bg-white rounded-xl border border-slate-200 shadow-sm px-2 sm:px-3 py-2 sm:py-2.5 flex items-center gap-1.5 sm:gap-2.5">
               <span className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg grid place-items-center text-base sm:text-lg shrink-0 bg-slate-100">{ic as string}</span>
               <div className="min-w-0">
-                <div className="text-base sm:text-lg font-extrabold leading-none text-[#0A2540]">{n as number}</div>
+                <div className="text-base sm:text-lg font-extrabold leading-none text-[#0B4045]">{n as number}</div>
                 <div className="text-[10px] sm:text-[11px] text-slate-500 font-semibold truncate">{label as string}</div>
               </div>
             </div>
@@ -153,7 +153,7 @@ export default function CrmKhachPage() {
         {showAdd && (
           <div className="bg-white rounded-xl border border-slate-200 p-3 mb-3">
             <div className="flex items-center justify-between mb-2">
-              <b className="text-sm text-[#0A2540]">{editCustId ? '✎ Sửa thông tin khách' : '＋ Thêm khách mới'}</b>
+              <b className="text-sm text-[#0B4045]">{editCustId ? '✎ Sửa thông tin khách' : '＋ Thêm khách mới'}</b>
               <button onClick={() => { setShowAdd(false); setEditCustId(null); }} className="text-slate-400 hover:text-slate-600 w-7 h-7 grid place-items-center rounded-lg hover:bg-slate-100 text-base leading-none">✕</button>
             </div>
             <div className="grid sm:grid-cols-2 gap-2">
@@ -178,7 +178,7 @@ export default function CrmKhachPage() {
                 const cnt = s === null ? list.length : list.filter((c) => (c.dealStage || 'Mới') === s).length;
                 const active = stageFilter === s;
                 return (
-                  <button key={s || 'all'} onClick={() => setStageFilter(s)} className={`text-[11px] font-bold px-2.5 py-1 rounded-full border transition ${active ? 'text-white border-transparent shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}`} style={active ? { background: s ? dealColor(s) : '#0A2540' } : undefined}>{s || 'Tất cả'} <span className={active ? 'opacity-80' : 'text-slate-400'}>{cnt}</span></button>
+                  <button key={s || 'all'} onClick={() => setStageFilter(s)} className={`text-[11px] font-bold px-2.5 py-1 rounded-full border transition ${active ? 'text-white border-transparent shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}`} style={active ? { background: s ? dealColor(s) : '#0B4045' } : undefined}>{s || 'Tất cả'} <span className={active ? 'opacity-80' : 'text-slate-400'}>{cnt}</span></button>
                 );
               })}
             </div>
@@ -190,7 +190,7 @@ export default function CrmKhachPage() {
                   <span className="w-10 h-10 rounded-full grid place-items-center text-white font-bold text-sm shrink-0 shadow-sm" style={{ background: avatarColor(c.name || String(c.id)) }}>{initials(c.name || 'K')}</span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <b className="text-[#0A2540] truncate">{c.name || 'Khách chưa đặt tên'}</b>
+                      <b className="text-[#0B4045] truncate">{c.name || 'Khách chưa đặt tên'}</b>
                       <span className="text-[11px] text-slate-400 shrink-0 truncate max-w-[40%]">{adminAll && c.salesName ? `👤 ${c.salesName}` : c.source}</span>
                     </div>
                     <div className="text-sm text-slate-500 truncate">{c.phone ? <span className="text-[#7c3aed] font-semibold">{c.phone}</span> : 'Chưa có SĐT'}</div>
@@ -226,7 +226,7 @@ export default function CrmKhachPage() {
                     <span className="w-14 h-14 rounded-2xl grid place-items-center text-white font-extrabold text-xl shrink-0 shadow" style={{ background: avatarColor(detail.customer.name || String(detail.customer.id)) }}>{initials(detail.customer.name || 'K')}</span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h2 className="text-lg font-extrabold text-[#0A2540]">{detail.customer.name || 'Khách'}</h2>
+                        <h2 className="text-lg font-extrabold text-[#0B4045]">{detail.customer.name || 'Khách'}</h2>
                         {(() => { const st = custStage(detail.interests); return st ? <span className="text-[11px] font-bold text-white px-2 py-0.5 rounded-full" style={{ backgroundColor: dealColor(st) }}>{st}</span> : null; })()}
                       </div>
                       <p className="text-sm text-slate-600 mt-0.5">{detail.customer.phone ? <a href={`tel:${detail.customer.phone}`} className="text-[#7c3aed] font-bold">📞 {detail.customer.phone}</a> : 'Chưa có SĐT'}{detail.customer.source ? <span className="ml-1.5 text-[11px] bg-slate-100 text-slate-500 font-semibold px-2 py-0.5 rounded-full align-middle">{detail.customer.source}</span> : null}</p>
@@ -245,7 +245,7 @@ export default function CrmKhachPage() {
                         {stages.map((s, i) => (
                           <div key={s} className="flex-1 min-w-0">
                             <div className="h-1.5 rounded-full" style={{ background: i <= idx ? dealColor(s) : '#e2e8f0' }} />
-                            <span className={`block text-[10px] font-semibold mt-1 truncate ${i <= idx ? 'text-[#0A2540]' : 'text-slate-400'}`}>{s}</span>
+                            <span className={`block text-[10px] font-semibold mt-1 truncate ${i <= idx ? 'text-[#0B4045]' : 'text-slate-400'}`}>{s}</span>
                           </div>
                         ))}
                       </div>
@@ -271,7 +271,7 @@ export default function CrmKhachPage() {
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         {([['🎯', 'Nhu cầu', detail.needs.length, '#d97706'], ['🏠', 'Tin quan tâm', detail.interests.length, '#16a34a'], ['🕑', 'Lần chăm sóc', detail.activities.length, '#64748b'], ['🗓', 'Hẹn chờ', detail.appointments.filter((a) => (a.status || 'Chờ') === 'Chờ').length, '#2563eb']] as const).map(([ic, lb, n, c]) => (
                           <div key={lb} className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5">
-                            <div className="text-xl font-extrabold text-[#0A2540]">{n}</div>
+                            <div className="text-xl font-extrabold text-[#0B4045]">{n}</div>
                             <div className="text-[11px] text-slate-500 font-semibold">{ic} {lb}</div>
                           </div>
                         ))}
@@ -285,7 +285,7 @@ export default function CrmKhachPage() {
                       {(() => { const up = detail.appointments.filter((a) => (a.status || 'Chờ') === 'Chờ').slice().sort((a, b) => (a.appointAt || '').localeCompare(b.appointAt || ''))[0]; return up ? (
                         <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                           <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-0.5">Lịch công chứng sắp tới</p>
-                          <p className="text-sm text-[#0A2540] font-bold">{up.appointAt ? new Date(up.appointAt).toLocaleString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''}</p>
+                          <p className="text-sm text-[#0B4045] font-bold">{up.appointAt ? new Date(up.appointAt).toLocaleString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''}</p>
                           {up.location ? <p className="text-xs text-slate-600 mt-0.5">📍 {up.location}</p> : null}
                         </div>
                       ) : null; })()}
@@ -304,7 +304,7 @@ export default function CrmKhachPage() {
                                 </div>
                                 <div className="min-w-0 flex-1 pb-0.5">
                                   <div className="flex items-baseline gap-2 flex-wrap">
-                                    <b className="text-[13px] text-[#0A2540]">{a.kind}</b>
+                                    <b className="text-[13px] text-[#0B4045]">{a.kind}</b>
                                     <span className="text-[11px] font-semibold text-slate-500">{fmtWhen(a.createdAt)}</span>
                                     <span className="text-[10px] text-slate-400">{fmtDateTime(a.createdAt)}</span>
                                   </div>
@@ -327,12 +327,12 @@ export default function CrmKhachPage() {
                   {tab === 'needs' && (
                     <div>
                       <div className="flex items-center justify-between mb-2.5">
-                        <p className="text-sm font-bold text-[#0A2540]">Nhu cầu của khách</p>
+                        <p className="text-sm font-bold text-[#0B4045]">Nhu cầu của khách</p>
                         <button onClick={() => { setEditNeedId(null); setNf({ dealType: '', propType: '', budget: '', areaNeed: '', location: '', status: '', note: '' }); setShowNeed((v) => !v); }} className="text-[#7c3aed] font-bold text-sm">＋ Thêm nhu cầu</button>
                       </div>
                       {showNeed && (
                         <div className="bg-slate-50 rounded-lg p-2.5 mb-2">
-                          <b className="block text-xs text-[#0A2540] mb-1.5">{editNeedId ? '✎ Sửa nhu cầu' : '＋ Nhu cầu mới'}</b>
+                          <b className="block text-xs text-[#0B4045] mb-1.5">{editNeedId ? '✎ Sửa nhu cầu' : '＋ Nhu cầu mới'}</b>
                           <div className="grid sm:grid-cols-2 gap-1.5">
                           <select value={nf.dealType} onChange={(e) => setNf({ ...nf, dealType: e.target.value })} className={`${inpc} bg-white`}><option value="">Nhu cầu…</option><option>Mua</option><option>Thuê</option><option>Bán</option><option>Ký gửi</option></select>
                           <input value={nf.propType} onChange={(e) => setNf({ ...nf, propType: e.target.value })} placeholder="Loại BĐS (đất nền, nhà phố…)" className={inpc} />
@@ -370,7 +370,7 @@ export default function CrmKhachPage() {
 
                   {tab === 'interests' && (
                     <div>
-                      <p className="text-sm font-bold text-[#0A2540] mb-2.5">Tin BĐS khách đang quan tâm</p>
+                      <p className="text-sm font-bold text-[#0B4045] mb-2.5">Tin BĐS khách đang quan tâm</p>
                       {detail.interests.length === 0 ? <p className="text-slate-400 text-sm">Chưa gắn tin nào. Vào bản đồ, bấm 1 tin đã lưu → ＋ Thêm khách.</p> : null}
                       <div className="space-y-1.5">
                         {detail.interests.map((it) => (
@@ -438,7 +438,7 @@ export default function CrmKhachPage() {
                             <div className="flex-1 min-w-0 pb-3">
                               <div className="flex items-center justify-between gap-2">
                                 <div className="flex items-baseline gap-2 flex-wrap min-w-0">
-                                  <b className="text-[13px] text-[#0A2540]">{a.kind}</b>
+                                  <b className="text-[13px] text-[#0B4045]">{a.kind}</b>
                                   <span className="text-[11px] text-slate-400">{fmtWhen(a.createdAt)} · {fmtDateTime(a.createdAt)}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 shrink-0">
@@ -467,7 +467,7 @@ export default function CrmKhachPage() {
                   {tab === 'appt' && (
                     <div>
                       <div className="flex items-center justify-between mb-2.5">
-                        <p className="text-sm font-bold text-[#0A2540]">Lịch hẹn công chứng</p>
+                        <p className="text-sm font-bold text-[#0B4045]">Lịch hẹn công chứng</p>
                         <button onClick={() => setShowAp((v) => !v)} className="text-[#7c3aed] font-bold text-sm">＋ Đặt lịch</button>
                       </div>
                       {showAp && (
@@ -515,7 +515,7 @@ function SectionHead({ ic, color, title, count, action }: { ic: string; color: s
     <div className="flex items-center justify-between mb-2">
       <div className="flex items-center gap-2 min-w-0">
         <span className="w-7 h-7 rounded-lg grid place-items-center text-sm shrink-0" style={{ background: color + '18' }}>{ic}</span>
-        <span className="text-sm font-extrabold text-[#0A2540] truncate">{title}</span>
+        <span className="text-sm font-extrabold text-[#0B4045] truncate">{title}</span>
         <span className="text-[11px] font-bold text-white rounded-full px-1.5 min-w-[18px] text-center shrink-0" style={{ background: color }}>{count}</span>
       </div>
       {action}

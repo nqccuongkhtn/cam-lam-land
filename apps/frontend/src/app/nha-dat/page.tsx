@@ -29,7 +29,7 @@ const ld = {
 };
 
 function Chip({ href, children }: { href: string; children: React.ReactNode }) {
-  return <Link href={href} className="text-[13px] bg-white border border-slate-200 hover:border-[#C8A14B] hover:text-[#0A2540] text-slate-700 px-3 py-1.5 rounded-full transition">{children}</Link>;
+  return <Link href={href} className="text-[13px] bg-white border border-slate-200 hover:border-[#C8A14B] hover:text-[#0B4045] text-slate-700 px-3 py-1.5 rounded-full transition">{children}</Link>;
 }
 
 export default function NhaDatHub() {
@@ -42,16 +42,16 @@ export default function NhaDatHub() {
           <span className="text-slate-700 font-medium">Nhà đất Cam Lâm</span>
         </nav>
 
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] leading-tight">Nhà đất Cam Lâm, Khánh Hòa</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0B4045] leading-tight">Nhà đất Cam Lâm, Khánh Hòa</h1>
         <p className="mt-2 text-[14px] sm:text-[15px] text-slate-600 leading-relaxed max-w-3xl">Chọn <b>khu vực</b> hoặc <b>loại hình</b> để xem tin đăng mới nhất, giá đất khu vực và vị trí trên bản đồ quy hoạch. Cam Lâm Land phủ toàn bộ 14 xã/thị trấn và điểm nóng Bãi Dài — mua bán, cho thuê đất nền, nhà phố, biệt thự, mặt bằng, phòng trọ…</p>
 
         {/* Khu vực */}
         <section className="mt-7">
-          <h2 className="text-lg sm:text-xl font-bold text-[#0A2540]">Nhà đất theo khu vực</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-[#0B4045]">Nhà đất theo khu vực</h2>
           <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
             {AREAS.map((a) => (
               <Link key={a.slug} href={`/nha-dat/${a.slug}`} className="block bg-white border border-slate-200 rounded-2xl p-3.5 hover:border-[#C8A14B] hover:shadow-sm transition">
-                <div className="font-bold text-[#0A2540] flex items-center gap-1.5">{a.coastal ? '🌊' : '📍'} {a.name}</div>
+                <div className="font-bold text-[#0B4045] flex items-center gap-1.5">{a.coastal ? '🌊' : '📍'} {a.name}</div>
                 <div className="text-[12px] text-slate-500 mt-0.5 line-clamp-2">{a.region}</div>
               </Link>
             ))}
@@ -60,7 +60,7 @@ export default function NhaDatHub() {
 
         {/* Loại hình mua bán */}
         <section className="mt-6 sm:mt-8">
-          <h2 className="text-lg sm:text-xl font-bold text-[#0A2540]">Mua bán theo loại hình</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-[#0B4045]">Mua bán theo loại hình</h2>
           <div className="mt-3 flex flex-wrap gap-2">
             {saleTypes.map((t) => <Chip key={t.slug} href={`/nha-dat/${t.slug}`}>{t.label} Cam Lâm</Chip>)}
           </div>
@@ -68,7 +68,7 @@ export default function NhaDatHub() {
 
         {/* Cho thuê */}
         <section className="mt-6 sm:mt-8">
-          <h2 className="text-lg sm:text-xl font-bold text-[#0A2540]">Cho thuê</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-[#0B4045]">Cho thuê</h2>
           <div className="mt-3 flex flex-wrap gap-2">
             {rentTypes.map((t) => <Chip key={t.slug} href={`/nha-dat/${t.slug}`}>{t.label} Cam Lâm</Chip>)}
           </div>
@@ -76,13 +76,13 @@ export default function NhaDatHub() {
 
         {/* Khu vực nổi bật × loại hình chính (giúp Google bò sâu tới tổ hợp) */}
         <section className="mt-6 sm:mt-8">
-          <h2 className="text-lg sm:text-xl font-bold text-[#0A2540]">Tìm nhanh theo khu vực nổi bật</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-[#0B4045]">Tìm nhanh theo khu vực nổi bật</h2>
           <div className="mt-3 space-y-4">
             {['cam-duc', 'cam-hai-dong', 'bai-dai', 'suoi-tan'].map((as) => {
               const a = AREAS.find((x) => x.slug === as); if (!a) return null;
               return (
                 <div key={as}>
-                  <div className="font-semibold text-[#0A2540] text-[14px] mb-1.5">{a.name}</div>
+                  <div className="font-semibold text-[#0B4045] text-[14px] mb-1.5">{a.name}</div>
                   <div className="flex flex-wrap gap-2">
                     {saleTypes.slice(0, 8).map((t) => <Chip key={t.slug} href={`/nha-dat/${t.slug}-${a.slug}`}>{t.label} {a.name}</Chip>)}
                   </div>
@@ -93,7 +93,7 @@ export default function NhaDatHub() {
         </section>
 
         {/* Công cụ */}
-        <section className="mt-6 sm:mt-8 bg-gradient-to-br from-[#0A2540] to-[#0d3a6b] text-white rounded-2xl p-5 sm:p-6">
+        <section className="mt-6 sm:mt-8 bg-gradient-to-br from-[#0B4045] to-[#10585e] text-white rounded-2xl p-5 sm:p-6">
           <h2 className="text-lg sm:text-xl font-extrabold">Công cụ hỗ trợ giao dịch</h2>
           <div className="mt-3 flex flex-wrap gap-2.5">
             <Link href="/bang-gia-dat" className="bg-white/15 hover:bg-white/25 font-bold px-4 py-2 rounded-xl text-sm">📊 Bảng giá đất Khánh Hòa</Link>

@@ -30,20 +30,20 @@ export default function GiaDatClient() {
 
   return (
     <div className="mx-auto max-w-4xl px-3 sm:px-4 py-6 sm:py-8">
-      <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540]">Giá đất khu vực Cam Lâm</h1>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0B4045]">Giá đất khu vực Cam Lâm</h1>
       <p className="text-slate-600 text-sm sm:text-base mt-2 mb-4 sm:mb-5 max-w-2xl">Giá <b>tham khảo</b> (trung vị) tính từ các tin đang rao trên Cam Lâm Land theo từng xã. Đây <b>không phải giá đất nhà nước</b> mà là mặt bằng rao bán thực tế để bạn ước lượng nhanh.</p>
 
       {/* Lọc loại BĐS */}
       <div className="flex flex-wrap gap-2 mb-5">
         {TYPES.map((t) => (
-          <button key={t || 'all'} onClick={() => setType(t)} className={`px-3 py-1.5 rounded-full text-sm font-semibold ${type === t ? 'bg-[#0A2540] text-white' : 'bg-white border border-slate-200 text-slate-600'}`}>
+          <button key={t || 'all'} onClick={() => setType(t)} className={`px-3 py-1.5 rounded-full text-sm font-semibold ${type === t ? 'bg-[#0B4045] text-white' : 'bg-white border border-slate-200 text-slate-600'}`}>
             {t === '' ? 'Tất cả' : PROPERTY_LABELS[t]}
           </button>
         ))}
       </div>
 
       {/* Định giá nhanh */}
-      <div className="bg-[#0A2540] text-white rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6">
+      <div className="bg-[#0B4045] text-white rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6">
         <h2 className="font-extrabold text-lg mb-1">⚡ Định giá nhanh</h2>
         <p className="text-white/70 text-sm mb-3">Chọn khu vực + nhập diện tích để ước lượng giá trị theo mặt bằng rao bán.</p>
         <div className="grid sm:grid-cols-2 gap-3">
@@ -65,7 +65,7 @@ export default function GiaDatClient() {
       </div>
 
       {/* Bảng giá theo khu vực */}
-      <h2 className="font-bold text-[#0A2540] mb-2">Giá trung vị theo khu vực {type && <span className="text-slate-400 font-normal">· {PROPERTY_LABELS[type as PropertyType]}</span>}</h2>
+      <h2 className="font-bold text-[#0B4045] mb-2">Giá trung vị theo khu vực {type && <span className="text-slate-400 font-normal">· {PROPERTY_LABELS[type as PropertyType]}</span>}</h2>
       {loading ? (
         <p className="text-slate-400 text-sm py-8 text-center">Đang tải…</p>
       ) : sorted.length === 0 ? (
@@ -75,7 +75,7 @@ export default function GiaDatClient() {
           {sorted.map((a) => (
             <div key={a.ward} className="bg-white border border-slate-200 rounded-xl p-3">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="font-bold text-[#0A2540]">{a.ward}</span>
+                <span className="font-bold text-[#0B4045]">{a.ward}</span>
                 <span className="font-extrabold text-[#C8A14B]">{perM2(a.medPerM2)}</span>
               </div>
               <div className="h-2 rounded-full bg-slate-100 overflow-hidden">

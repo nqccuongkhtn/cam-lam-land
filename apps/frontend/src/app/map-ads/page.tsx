@@ -88,14 +88,14 @@ export default function MapAdsPage() {
     <div className="bg-slate-50 min-h-[calc(100dvh-56px)] py-5 sm:py-8">
       <div className="mx-auto max-w-5xl px-3 sm:px-4 space-y-4 sm:space-y-5">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540]">Quảng cáo trên bản đồ</h1>
-          <Link href="/admin" className="text-sm font-semibold text-slate-500 hover:text-[#0A2540]">← Quản trị</Link>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0B4045]">Quảng cáo trên bản đồ</h1>
+          <Link href="/admin" className="text-sm font-semibold text-slate-500 hover:text-[#0B4045]">← Quản trị</Link>
         </div>
         <p className="text-sm text-slate-500">Quảng cáo <b>độc quyền theo xã</b>: mỗi xã chỉ 1 người trong thời hạn gói, không bán đại trà. Logo hiển thị thưa tại các điểm bạn ghim trên bản đồ.</p>
 
         <div className="grid lg:grid-cols-2 gap-4 sm:gap-5">
           <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
-            <h2 className="font-bold text-[#0A2540]">{editingId ? `Sửa quảng cáo #${editingId}` : 'Tạo quảng cáo'}</h2>
+            <h2 className="font-bold text-[#0B4045]">{editingId ? `Sửa quảng cáo #${editingId}` : 'Tạo quảng cáo'}</h2>
             <div className="grid sm:grid-cols-2 gap-3">
               <div><label className={lbl}>Tên sales *</label><input className={inp} value={name} onChange={(e) => setName(e.target.value)} placeholder="Nguyễn Quốc Cường" /></div>
               <div><label className={lbl}>SĐT *</label><input className={inp} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0988…" /></div>
@@ -103,8 +103,8 @@ export default function MapAdsPage() {
             <div>
               <label className={lbl}>Kiểu hiển thị trên bản đồ</label>
               <div className="grid grid-cols-2 gap-2 mt-1">
-                <button type="button" onClick={() => setAdStyle('seal')} className={`px-3 py-2 rounded-lg border text-sm font-semibold ${adStyle === 'seal' ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-300 text-slate-600 hover:bg-slate-50'}`}>🟡 Logo tròn (avatar)</button>
-                <button type="button" onClick={() => setAdStyle('text')} className={`px-3 py-2 rounded-lg border text-sm font-semibold ${adStyle === 'text' ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-300 text-slate-600 hover:bg-slate-50'}`}>🔤 Chữ mờ (tên + SĐT)</button>
+                <button type="button" onClick={() => setAdStyle('seal')} className={`px-3 py-2 rounded-lg border text-sm font-semibold ${adStyle === 'seal' ? 'border-[#0B4045] bg-[#0B4045] text-white' : 'border-slate-300 text-slate-600 hover:bg-slate-50'}`}>🟡 Logo tròn (avatar)</button>
+                <button type="button" onClick={() => setAdStyle('text')} className={`px-3 py-2 rounded-lg border text-sm font-semibold ${adStyle === 'text' ? 'border-[#0B4045] bg-[#0B4045] text-white' : 'border-slate-300 text-slate-600 hover:bg-slate-50'}`}>🔤 Chữ mờ (tên + SĐT)</button>
               </div>
               <p className="text-[11px] text-slate-400 mt-1">{adStyle === 'text' ? 'Tên & SĐT hiện mờ trực tiếp trên nền bản đồ (không cần ảnh).' : 'Huy hiệu tròn: ảnh ở giữa, tên & SĐT cong quanh viền.'}</p>
             </div>
@@ -112,7 +112,7 @@ export default function MapAdsPage() {
             <div>
               <label className={lbl}>Ảnh / avatar nhận diện</label>
               <div className="flex items-center gap-4 mt-2">
-                <svg width="118" height="118" viewBox="0 0 100 100" style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,.3))' }}><defs><clipPath id="cpv"><circle cx="50" cy="50" r="28" /></clipPath><path id="tpv" d="M 11 50 A 39 39 0 0 1 89 50" /><path id="bpv" d="M 4 50 A 46 46 0 0 0 96 50" /></defs><circle cx="50" cy="50" r="49" fill="#0A2540" /><circle cx="50" cy="50" r="47.5" fill="none" stroke="#C8A14B" strokeWidth="1" />{imageUrl ? <image href={imageUrl} x="18" y="18" width="64" height="64" clipPath="url(#cpv)" preserveAspectRatio="xMidYMid slice" /> : <text x="50" y="51" textAnchor="middle" dominantBaseline="middle" fontSize="26" fontWeight="800" fill="#C8A14B">{(name || 'C').charAt(0).toUpperCase()}</text>}<circle cx="50" cy="50" r="29" fill="none" stroke="#C8A14B" strokeWidth="1.4" /><text fontSize="11" fontWeight="800" fill="#fff"><textPath href="#tpv" startOffset="50%" textAnchor="middle" textLength="96" lengthAdjust="spacingAndGlyphs">{(name || 'Tên sales').slice(0, 26)}</textPath></text><text fontSize="11" fontWeight="800" fill="#fff"><textPath href="#bpv" startOffset="50%" textAnchor="middle" textLength="96" lengthAdjust="spacingAndGlyphs">{phone || 'SĐT'}</textPath></text><text x="7.5" y="50" textAnchor="middle" dominantBaseline="central" fontSize="8" fill="#C8A14B">★</text><text x="92.5" y="50" textAnchor="middle" dominantBaseline="central" fontSize="8" fill="#C8A14B">★</text></svg>
+                <svg width="118" height="118" viewBox="0 0 100 100" style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,.3))' }}><defs><clipPath id="cpv"><circle cx="50" cy="50" r="28" /></clipPath><path id="tpv" d="M 11 50 A 39 39 0 0 1 89 50" /><path id="bpv" d="M 4 50 A 46 46 0 0 0 96 50" /></defs><circle cx="50" cy="50" r="49" fill="#0B4045" /><circle cx="50" cy="50" r="47.5" fill="none" stroke="#C8A14B" strokeWidth="1" />{imageUrl ? <image href={imageUrl} x="18" y="18" width="64" height="64" clipPath="url(#cpv)" preserveAspectRatio="xMidYMid slice" /> : <text x="50" y="51" textAnchor="middle" dominantBaseline="middle" fontSize="26" fontWeight="800" fill="#C8A14B">{(name || 'C').charAt(0).toUpperCase()}</text>}<circle cx="50" cy="50" r="29" fill="none" stroke="#C8A14B" strokeWidth="1.4" /><text fontSize="11" fontWeight="800" fill="#fff"><textPath href="#tpv" startOffset="50%" textAnchor="middle" textLength="96" lengthAdjust="spacingAndGlyphs">{(name || 'Tên sales').slice(0, 26)}</textPath></text><text fontSize="11" fontWeight="800" fill="#fff"><textPath href="#bpv" startOffset="50%" textAnchor="middle" textLength="96" lengthAdjust="spacingAndGlyphs">{phone || 'SĐT'}</textPath></text><text x="7.5" y="50" textAnchor="middle" dominantBaseline="central" fontSize="8" fill="#C8A14B">★</text><text x="92.5" y="50" textAnchor="middle" dominantBaseline="central" fontSize="8" fill="#C8A14B">★</text></svg>
                 <label className="bg-white border border-slate-300 px-3 py-2 rounded-lg text-sm cursor-pointer hover:bg-slate-50">{uploading ? 'Đang tải…' : '🖼️ Tải ảnh'}<input type="file" accept="image/*" onChange={onFile} className="hidden" /></label>
                 {imageUrl && <button onClick={() => setImageUrl(null)} className="text-xs text-red-600">Xoá ảnh</button>}
               </div>
@@ -125,7 +125,7 @@ export default function MapAdsPage() {
                   const locked = taken.has(w) && !wards.includes(w);
                   return (
                     <label key={w} className={`flex items-center gap-1.5 text-sm ${locked ? 'text-slate-300 cursor-not-allowed' : 'cursor-pointer'}`}>
-                      <input type="checkbox" disabled={locked} checked={wards.includes(w)} onChange={() => toggleWard(w)} className="accent-[#0A2540]" />
+                      <input type="checkbox" disabled={locked} checked={wards.includes(w)} onChange={() => toggleWard(w)} className="accent-[#0B4045]" />
                       <span>{w}{locked && <span className="text-[10px] text-red-400 ml-0.5">(đã thuê)</span>}</span>
                     </label>
                   );
@@ -148,32 +148,32 @@ export default function MapAdsPage() {
           </section>
 
           <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-3">
-            <h2 className="font-bold text-[#0A2540]">{adStyle === 'text' ? <>Xem trước chữ mờ <span className="font-normal text-slate-400 text-sm">(tự phủ khắp bản đồ)</span></> : <>Ghim điểm hiển thị <span className="font-normal text-slate-400 text-sm">(bấm vào bản đồ)</span></>}</h2>
+            <h2 className="font-bold text-[#0B4045]">{adStyle === 'text' ? <>Xem trước chữ mờ <span className="font-normal text-slate-400 text-sm">(tự phủ khắp bản đồ)</span></> : <>Ghim điểm hiển thị <span className="font-normal text-slate-400 text-sm">(bấm vào bản đồ)</span></>}</h2>
             <div className="relative h-80 rounded-xl overflow-hidden border border-slate-200">
               <MapView baseMap="satellite" initialBounds={QH_BOUNDS} adMarkers={preview} onMapClick={(lng, lat) => { if (adStyle !== 'text') setPoints((p) => [...p, { lng, lat }]); }} className="absolute inset-0 h-full w-full" />
             </div>
             <div className="flex items-center justify-between text-sm">
               {adStyle === 'text'
-                ? <span className="text-slate-500">Chữ <b className="text-[#0A2540]">{name || 'tên'}</b> + SĐT sẽ hiện mờ lặp khắp bản đồ như watermark chống sao chép — không cần ghim điểm.</span>
-                : <><span className="text-slate-500"><b className="text-[#0A2540]">{points.length}</b> điểm đã ghim · xem trước logo ngay trên bản đồ</span>{points.length > 0 && <button onClick={() => setPoints([])} className="text-red-600 font-semibold">Xoá hết điểm</button>}</>}
+                ? <span className="text-slate-500">Chữ <b className="text-[#0B4045]">{name || 'tên'}</b> + SĐT sẽ hiện mờ lặp khắp bản đồ như watermark chống sao chép — không cần ghim điểm.</span>
+                : <><span className="text-slate-500"><b className="text-[#0B4045]">{points.length}</b> điểm đã ghim · xem trước logo ngay trên bản đồ</span>{points.length > 0 && <button onClick={() => setPoints([])} className="text-red-600 font-semibold">Xoá hết điểm</button>}</>}
             </div>
           </section>
         </div>
 
         <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
-          <h2 className="font-bold text-[#0A2540] mb-3">Quảng cáo đang có ({list.length})</h2>
+          <h2 className="font-bold text-[#0B4045] mb-3">Quảng cáo đang có ({list.length})</h2>
           {list.length === 0 ? <p className="text-sm text-slate-400">Chưa có quảng cáo nào.</p> : (
             <div className="space-y-2">
               {list.map((a) => (
                 <div key={a.id} className={`flex items-center gap-3 border rounded-xl p-3 ${editingId === a.id ? 'border-[#C8A14B] bg-amber-50/50' : 'border-slate-100'}`}>
-                  <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-[#C8A14B]/40 shrink-0 bg-[#0A2540] grid place-items-center text-[#C8A14B] font-bold">{a.imageUrl ? <img src={a.imageUrl} alt="" className="w-full h-full object-cover" /> : (a.advertiserName || 'C').charAt(0)}</div>
+                  <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-[#C8A14B]/40 shrink-0 bg-[#0B4045] grid place-items-center text-[#C8A14B] font-bold">{a.imageUrl ? <img src={a.imageUrl} alt="" className="w-full h-full object-cover" /> : (a.advertiserName || 'C').charAt(0)}</div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-[#0A2540] text-sm truncate">{a.advertiserName} · <span className="text-red-600">{a.advertiserPhone}</span></p>
+                    <p className="font-bold text-[#0B4045] text-sm truncate">{a.advertiserName} · <span className="text-red-600">{a.advertiserPhone}</span></p>
                     <p className="text-xs text-slate-500 truncate">{(a.wards || []).join(', ')}</p>
                     <p className="text-[11px] text-slate-400"><span className={`inline-block mr-1.5 px-1.5 py-0.5 rounded font-bold ${a.style === 'text' ? 'bg-sky-100 text-sky-700' : 'bg-amber-100 text-amber-700'}`}>{a.style === 'text' ? 'Chữ mờ' : 'Logo ghim'}</span>{(a.points || []).length} điểm · {a.package} · {a.active ? <span className="text-emerald-600 font-semibold">Đang chạy</span> : <span>Hết hạn</span>} · đến {new Date(a.expiresAt).toLocaleDateString('vi-VN')}</p>
                   </div>
                   <div className="flex flex-col items-end gap-1 shrink-0">
-                    <button onClick={() => startEdit(a)} className="text-slate-600 hover:text-[#0A2540] text-sm font-semibold">✏️ Sửa</button>
+                    <button onClick={() => startEdit(a)} className="text-slate-600 hover:text-[#0B4045] text-sm font-semibold">✏️ Sửa</button>
                     <button onClick={() => del(a.id)} className="text-slate-400 hover:text-red-600 text-sm">🗑 Xoá</button>
                   </div>
                 </div>

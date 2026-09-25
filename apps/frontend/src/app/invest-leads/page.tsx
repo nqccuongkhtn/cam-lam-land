@@ -32,14 +32,14 @@ export default function InvestLeadsPage() {
     <div className="bg-slate-50 min-h-[calc(100dvh-56px)] py-5 sm:py-8">
       <div className="mx-auto max-w-5xl px-3 sm:px-4">
         <div className="flex items-center justify-between mb-1">
-          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0A2540]">Đăng ký góp vốn CamInvest ({items.length})</h1>
-          <Link href="/admin" className="text-sm font-semibold text-slate-500 hover:text-[#0A2540]">← Quản trị</Link>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0B4045]">Đăng ký góp vốn CamInvest ({items.length})</h1>
+          <Link href="/admin" className="text-sm font-semibold text-slate-500 hover:text-[#0B4045]">← Quản trị</Link>
         </div>
         <p className="text-sm text-slate-500 mb-4">Khách để lại thông tin qua trang &quot;Góp vốn đầu tư&quot; (/dau-tu) — liên hệ tư vấn gói góp vốn.</p>
 
         <div className="flex flex-wrap gap-2 mb-4">
           {[['all', 'Tất cả'], ['new', 'Mới'], ['contacted', 'Đã liên hệ'], ['done', 'Hoàn tất']].map(([k, lb]) => (
-            <button key={k} onClick={() => setFilter(k)} className={`px-3 py-1.5 rounded-full text-sm font-semibold ${filter === k ? 'bg-[#0A2540] text-white' : 'bg-white border border-slate-200 text-slate-600'}`}>
+            <button key={k} onClick={() => setFilter(k)} className={`px-3 py-1.5 rounded-full text-sm font-semibold ${filter === k ? 'bg-[#0B4045] text-white' : 'bg-white border border-slate-200 text-slate-600'}`}>
               {lb}{k !== 'all' && <span className="ml-1 opacity-70">{items.filter((i) => i.status === k).length}</span>}
             </button>
           ))}
@@ -52,7 +52,7 @@ export default function InvestLeadsPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-[#0A2540]">{i.name}</span>
+                      <span className="font-bold text-[#0B4045]">{i.name}</span>
                       <a href={`tel:${i.phone}`} className="text-red-600 font-bold text-sm">📞 {i.phone}</a>
                       <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${STATUS[i.status]?.cls || 'bg-slate-100'}`}>{STATUS[i.status]?.label || i.status}</span>
                     </div>

@@ -64,9 +64,9 @@ function ChiaSe({ tieuDe, gon }: { tieuDe: string; gon?: boolean }) {
   const nut = 'inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-[13px] font-bold transition';
   return (
     <div className={`flex flex-wrap items-center gap-2 ${gon ? '' : 'rounded-2xl border border-slate-200 bg-white p-3 sm:p-4'}`}>
-      {!gon && <span className="mr-1 text-sm font-bold text-[#0A2540]">Chia sẻ bài này:</span>}
+      {!gon && <span className="mr-1 text-sm font-bold text-[#0B4045]">Chia sẻ bài này:</span>}
       {coMayChiaSe && (
-        <button onClick={mayChiaSe} className={`${nut} bg-[#0A2540] text-white hover:bg-[#0d2f54]`} aria-label="Chia sẻ">
+        <button onClick={mayChiaSe} className={`${nut} bg-[#0B4045] text-white hover:bg-[#0e5157]`} aria-label="Chia sẻ">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" /></svg>
           Chia sẻ
         </button>
@@ -80,7 +80,7 @@ function ChiaSe({ tieuDe, gon }: { tieuDe: string; gon?: boolean }) {
         className={`${nut} ${coMayChiaSe ? 'hidden sm:inline-flex' : ''} bg-[#0068FF] text-white hover:brightness-110`} aria-label="Chia sẻ qua Zalo">
         <span className="font-black tracking-tight">Zalo</span>
       </button>
-      <button onClick={chep} className={`${nut} ${daChep ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-[#0A2540] hover:bg-slate-200'}`} aria-label="Sao chép đường dẫn">
+      <button onClick={chep} className={`${nut} ${daChep ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-[#0B4045] hover:bg-slate-200'}`} aria-label="Sao chép đường dẫn">
         {daChep ? (
           <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>Đã chép</>
         ) : (
@@ -102,14 +102,14 @@ function RelatedList({ items }: { items: Article[] }) {
   if (!items.length) return null;
   return (
     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-      <p className="px-4 py-2.5 border-b-2 border-red-600 font-extrabold text-[#0A2540] text-sm uppercase tracking-tight">Tin liên quan</p>
+      <p className="px-4 py-2.5 border-b-2 border-red-600 font-extrabold text-[#0B4045] text-sm uppercase tracking-tight">Tin liên quan</p>
       <div className="divide-y divide-slate-100">
         {items.map((n) => (
           <Link key={n.slug} href={`/tin-tuc/${n.slug}`} className="group flex gap-3 items-start p-3 hover:bg-slate-50">
             <div className="w-20 h-14 rounded-lg overflow-hidden bg-slate-100 shrink-0">
               {n.image ? <img src={n.image} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full grid place-items-center text-slate-300">📰</div>}
             </div>
-            <p className="text-[13px] font-semibold text-[#0A2540] leading-snug line-clamp-3 group-hover:text-red-600">{decodeEntities(n.title)}</p>
+            <p className="text-[13px] font-semibold text-[#0B4045] leading-snug line-clamp-3 group-hover:text-red-600">{decodeEntities(n.title)}</p>
           </Link>
         ))}
       </div>
@@ -154,7 +154,7 @@ export default function NewsReaderClient() {
   if (!a) return (
     <div className="mx-auto max-w-5xl px-4 py-16 text-center">
       <p className="text-5xl">🗞️</p>
-      <p className="text-lg font-bold text-[#0A2540] mt-3">Bài viết không còn được lưu</p>
+      <p className="text-lg font-bold text-[#0B4045] mt-3">Bài viết không còn được lưu</p>
       <p className="text-slate-500 mt-1 text-sm">Tin tức chỉ được lưu trong 7 ngày.</p>
       <div className="mt-5"><Link href="/tin-tuc" className="text-sm font-semibold text-red-600">← Tất cả tin tức</Link></div>
     </div>
@@ -178,15 +178,15 @@ export default function NewsReaderClient() {
   return (
     <div className="bg-slate-50 min-h-[calc(100dvh-56px)]">
       <div className="mx-auto max-w-6xl px-3 py-4 sm:px-4 sm:py-6">
-        <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <Link href="/tin-tuc" className="hover:text-[#0A2540]">Tin tức</Link> › <span className="text-slate-600">Bài viết</span></div>
+        <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0B4045]">Trang chủ</Link> › <Link href="/tin-tuc" className="hover:text-[#0B4045]">Tin tức</Link> › <span className="text-slate-600">Bài viết</span></div>
 
         {showAd(ad) && <div className="mb-5"><BillboardAd ad={ad} /></div>}
 
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
           <article className="min-w-0">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#0A2540] leading-tight">{decodeEntities(a.title)}</h1>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#0B4045] leading-tight">{decodeEntities(a.title)}</h1>
             <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-sm text-slate-400 mt-3">
-              <span className="font-semibold text-[#0A2540]">Cam Lâm Land</span>
+              <span className="font-semibold text-[#0B4045]">Cam Lâm Land</span>
               {date && <span>· 🕒 {date}</span>}
               <span className="ml-auto text-[11px] bg-slate-100 text-slate-500 rounded-full px-2 py-0.5">Biên tập</span>
             </div>
@@ -195,14 +195,14 @@ export default function NewsReaderClient() {
 
             {hero && <WmImg src={hero} alt={a.title} wrap="mt-5" img="max-h-[460px]" />}
 
-            {a.summary && <p className="mt-5 text-[17px] font-semibold text-[#0A2540] leading-relaxed">{decodeEntities(a.summary)}</p>}
+            {a.summary && <p className="mt-5 text-[17px] font-semibold text-[#0B4045] leading-relaxed">{decodeEntities(a.summary)}</p>}
 
             <div className="mt-4 text-slate-700 leading-relaxed text-[16px] sm:text-[18px] space-y-4">{body}</div>
 
             <div className="mt-6 sm:mt-8 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
               <p className="text-sm text-slate-600">Bài do Cam Lâm Land biên tập, dựa trên thông tin từ <b>{a.source || 'báo chí'}</b>. Xem bản gốc đầy đủ tại nguồn:</p>
-              <a href={a.url} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-2 bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-5 py-2.5 rounded-xl">Đọc bản gốc tại {a.source || 'nguồn'} →</a>
-              <p className="text-[11px] text-slate-400 mt-3">Nguồn: <a href={a.url} target="_blank" rel="noreferrer" className="underline break-all hover:text-[#0A2540]">{a.url}</a></p>
+              <a href={a.url} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-2 bg-[#0B4045] hover:bg-[#0e5157] text-white font-bold px-5 py-2.5 rounded-xl">Đọc bản gốc tại {a.source || 'nguồn'} →</a>
+              <p className="text-[11px] text-slate-400 mt-3">Nguồn: <a href={a.url} target="_blank" rel="noreferrer" className="underline break-all hover:text-[#0B4045]">{a.url}</a></p>
             </div>
 
             <div className="mt-5"><ChiaSe tieuDe={decodeEntities(a.title)} /></div>

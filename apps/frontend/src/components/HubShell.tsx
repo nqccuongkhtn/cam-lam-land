@@ -158,15 +158,15 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
                 <button
                   onClick={() => { if (runToolAction(t)) return; if (kids) { if (collapsed) { toggle(); setExpanded((e) => ({ ...e, [t.key]: true })); } else setExpanded((e) => ({ ...e, [t.key]: !e[t.key] })); } else setTab(t.key); }}
                   className={`group relative w-full text-left flex items-center ${collapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-2.5 border-l-[3px] transition ${on || childActive ? 'border-[#C8A14B] bg-[#C8A14B]/10' : 'border-transparent hover:bg-slate-50'}`}>
-                  <span className={`grid place-items-center w-9 h-9 rounded shrink-0 transition-all ${on || childActive ? 'bg-[#C8A14B] text-[#0A2540] shadow-sm shadow-[#C8A14B]/40' : 'bg-[#0A2540] text-[#C8A14B] group-hover:bg-[#0d3a6b]'}`} dangerouslySetInnerHTML={{ __html: iconSvg(t.key) }} />
+                  <span className={`grid place-items-center w-9 h-9 rounded shrink-0 transition-all ${on || childActive ? 'bg-[#C8A14B] text-[#0B4045] shadow-sm shadow-[#C8A14B]/40' : 'bg-[#0B4045] text-[#C8A14B] group-hover:bg-[#10585e]'}`} dangerouslySetInnerHTML={{ __html: iconSvg(t.key) }} />
                   {!collapsed && (
                     <span className="min-w-0 flex-1">
-                      <span className={`block font-bold text-[13.5px] leading-tight ${on || childActive ? 'text-[#0A2540]' : 'text-slate-700'}`}>{t.name}{t.login && <span className="ml-1 text-[10px] font-semibold text-slate-400">🔒</span>}</span>
+                      <span className={`block font-bold text-[13.5px] leading-tight ${on || childActive ? 'text-[#0B4045]' : 'text-slate-700'}`}>{t.name}{t.login && <span className="ml-1 text-[10px] font-semibold text-slate-400">🔒</span>}</span>
                       <span className="block text-[11px] text-slate-400 leading-snug mt-0.5">{t.desc}</span>
                     </span>
                   )}
                   {!collapsed && kids && <svg viewBox="0 0 24 24" className={`w-4 h-4 shrink-0 text-slate-400 transition-transform ${isExp ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M6 9l6 6 6-6" /></svg>}
-                  {collapsed && <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded-lg bg-[#0A2540] px-3 py-1.5 text-xs font-bold text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">{t.name}</span>}
+                  {collapsed && <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded-lg bg-[#0B4045] px-3 py-1.5 text-xs font-bold text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">{t.name}</span>}
                 </button>
                 {/* Submenu sổ xuống ngay trong sidebar */}
                 {!collapsed && kids && isExp && (
@@ -175,7 +175,7 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
                       const cOn = c.key === tab;
                       return (
                         <button key={c.key} onClick={() => setTab(c.key)}
-                          className={`w-full text-left flex items-center gap-2 pl-3 pr-3 py-2 border-l-2 -ml-px transition ${cOn ? 'border-[#C8A14B] text-[#0A2540] font-semibold bg-[#C8A14B]/10' : 'border-transparent text-slate-500 hover:text-[#0A2540] hover:bg-slate-50'}`}>
+                          className={`w-full text-left flex items-center gap-2 pl-3 pr-3 py-2 border-l-2 -ml-px transition ${cOn ? 'border-[#C8A14B] text-[#0B4045] font-semibold bg-[#C8A14B]/10' : 'border-transparent text-slate-500 hover:text-[#0B4045] hover:bg-slate-50'}`}>
                           <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${cOn ? 'bg-[#C8A14B]' : 'bg-slate-300'}`} />
                           <span className="text-[13px] leading-tight">{c.name}</span>
                         </button>
@@ -195,8 +195,8 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
           <div className="md:hidden relative shrink-0 bg-white border-b border-slate-200">
             <div className="flex items-center gap-2 px-3 py-2">
               <button onClick={() => setMobileMenu((v) => !v)} className="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-left active:bg-slate-50">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[#0A2540] text-[#C8A14B]" dangerouslySetInnerHTML={{ __html: iconSvg(cur.key, 16) }} />
-                <b className="min-w-0 flex-1 truncate text-[13px] text-[#0A2540]">{cur.name}</b>
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[#0B4045] text-[#C8A14B]" dangerouslySetInnerHTML={{ __html: iconSvg(cur.key, 16) }} />
+                <b className="min-w-0 flex-1 truncate text-[13px] text-[#0B4045]">{cur.name}</b>
                 <svg viewBox="0 0 24 24" className={`w-4 h-4 shrink-0 text-slate-400 transition-transform ${mobileMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M6 9l6 6 6-6" /></svg>
               </button>
               <button onClick={() => { setLoading(true); setReloadN((n) => n + 1); }} title="Tải lại" aria-label="Tải lại" className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-lg border border-slate-200 text-slate-500 active:bg-slate-50">↻</button>
@@ -211,8 +211,8 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
                       const on = t.key === tab;
                       return (
                         <button key={t.key} onClick={() => { setMobileMenu(false); if (runToolAction(t)) return; setTab(t.key); }} className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left ${on ? 'bg-[#C8A14B]/15' : 'hover:bg-slate-50'}`}>
-                          <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ${on ? 'bg-[#C8A14B] text-[#0A2540]' : 'bg-[#0A2540] text-[#C8A14B]'}`} dangerouslySetInnerHTML={{ __html: iconSvg(t.key, 16) }} />
-                          <span className="min-w-0 flex-1"><b className={`block truncate text-[13px] ${on ? 'text-[#0A2540]' : 'text-slate-700'}`}>{t.name}{t.login && <span className="ml-1 text-[10px] text-slate-400">🔒</span>}</b><span className="block truncate text-[11px] text-slate-400">{t.desc}</span></span>
+                          <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ${on ? 'bg-[#C8A14B] text-[#0B4045]' : 'bg-[#0B4045] text-[#C8A14B]'}`} dangerouslySetInnerHTML={{ __html: iconSvg(t.key, 16) }} />
+                          <span className="min-w-0 flex-1"><b className={`block truncate text-[13px] ${on ? 'text-[#0B4045]' : 'text-slate-700'}`}>{t.name}{t.login && <span className="ml-1 text-[10px] text-slate-400">🔒</span>}</b><span className="block truncate text-[11px] text-slate-400">{t.desc}</span></span>
                         </button>
                       );
                     }
@@ -220,7 +220,7 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
                       <div key={t.key} className="mt-1 first:mt-0">
                         <p className="flex items-center gap-1.5 px-2.5 pb-1 pt-2 text-[11px] font-bold uppercase tracking-wide text-slate-400"><span className="[&_svg]:h-3.5 [&_svg]:w-3.5" dangerouslySetInnerHTML={{ __html: iconSvg(t.key, 13) }} />{t.name}</p>
                         {kids.map((c) => { const on = c.key === tab; return (
-                          <button key={c.key} onClick={() => { setTab(c.key); setMobileMenu(false); }} className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 pl-3.5 text-left ${on ? 'bg-[#C8A14B]/15 font-semibold text-[#0A2540]' : 'text-slate-600 hover:bg-slate-50'}`}>
+                          <button key={c.key} onClick={() => { setTab(c.key); setMobileMenu(false); }} className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 pl-3.5 text-left ${on ? 'bg-[#C8A14B]/15 font-semibold text-[#0B4045]' : 'text-slate-600 hover:bg-slate-50'}`}>
                             <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${on ? 'bg-[#C8A14B]' : 'bg-slate-300'}`} />
                             <span className="truncate text-[13px]">{c.name}</span>
                           </button>
@@ -234,9 +234,9 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
           </div>
           )}
           <div className="hidden md:flex items-center justify-between gap-2 px-3 py-1.5 bg-white border-b border-slate-200 text-[12px]">
-            <span className="flex items-center gap-1.5 text-slate-500 truncate"><span className="text-[#0A2540] shrink-0" dangerouslySetInnerHTML={{ __html: iconSvg(cur.key, 15) }} /> <b className="text-[#0A2540]">{cur.name}</b><span className="hidden sm:inline text-slate-400"> — {cur.desc}</span></span>
+            <span className="flex items-center gap-1.5 text-slate-500 truncate"><span className="text-[#0B4045] shrink-0" dangerouslySetInnerHTML={{ __html: iconSvg(cur.key, 15) }} /> <b className="text-[#0B4045]">{cur.name}</b><span className="hidden sm:inline text-slate-400"> — {cur.desc}</span></span>
             <div className="flex items-center gap-1 shrink-0">
-              <button onClick={() => { setLoading(true); setReloadN((n) => n + 1); }} className="font-semibold text-slate-500 hover:text-[#0A2540] px-2 py-1 rounded-lg hover:bg-slate-100">↻ Tải lại</button>
+              <button onClick={() => { setLoading(true); setReloadN((n) => n + 1); }} className="font-semibold text-slate-500 hover:text-[#0B4045] px-2 py-1 rounded-lg hover:bg-slate-100">↻ Tải lại</button>
               <a href={cur.path} target="_blank" rel="noreferrer" className="font-bold text-[#C8A14B] hover:underline whitespace-nowrap px-1">Mở toàn trang ↗</a>
             </div>
           </div>
@@ -251,7 +251,7 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
             {loading && (
               <div className="absolute inset-0 grid place-items-center bg-white z-10 pointer-events-none">
                 <div className="flex flex-col items-center gap-2 text-slate-400">
-                  <div className="w-8 h-8 border-[3px] border-slate-200 border-t-[#0A2540] rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-[3px] border-slate-200 border-t-[#0B4045] rounded-full animate-spin" />
                   <span className="text-sm">Đang mở {cur.name}…</span>
                 </div>
               </div>

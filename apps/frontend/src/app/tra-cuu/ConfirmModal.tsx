@@ -8,7 +8,7 @@ export function ConfirmModal({ title, message, confirmLabel = 'Xoá', danger = t
   return (
     <div className="fixed inset-0 z-[60] grid place-items-center bg-black/40 p-4" onClick={busy ? undefined : onCancel}>
       <div className="w-full max-w-sm rounded-xl bg-white p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <p className="mb-1 text-base font-bold text-[#0A2540]">{title || 'Xác nhận'}</p>
+        <p className="mb-1 text-base font-bold text-[#0B4045]">{title || 'Xác nhận'}</p>
         <p className="mb-4 text-sm text-slate-600" style={{ whiteSpace: 'pre-line' }}>{message}</p>
         <div className="flex justify-end gap-2">
           <button onClick={onCancel} disabled={busy} className="rounded border px-4 py-1.5 text-sm disabled:opacity-40">Huỷ</button>

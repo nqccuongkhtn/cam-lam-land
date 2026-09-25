@@ -22,30 +22,32 @@ export const toast = {
 const Ctx = createContext(toast);
 export const useToast = () => useContext(Ctx);
 
+// (Bảng màu cũ theo loại — giữ để tham khảo, kiểu mới không dùng nữa)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const STYLE: Record<Kind, { ring: string; icon: string; badge: string; bar: string }> = {
   error: { ring: 'border-red-200', icon: '✕', badge: 'bg-red-100 text-red-600', bar: 'bg-red-500' },
   success: { ring: 'border-emerald-200', icon: '✓', badge: 'bg-emerald-100 text-emerald-600', bar: 'bg-emerald-500' },
-  info: { ring: 'border-slate-200', icon: 'i', badge: 'bg-[#0A2540]/10 text-[#0A2540]', bar: 'bg-[#0A2540]' },
+  info: { ring: 'border-slate-200', icon: 'i', badge: 'bg-[#0B4045]/10 text-[#0B4045]', bar: 'bg-[#0B4045]' },
 };
 
 function Card({ t, onClose }: { t: Item; onClose: () => void }) {
-  const s = STYLE[t.kind];
   const [show, setShow] = useState(false);
   useEffect(() => { const r = requestAnimationFrame(() => setShow(true)); return () => cancelAnimationFrame(r); }, []);
+  /* Kiểu thông báo iPhone dùng chung (.cl-tb trong globals.css). Loại lỗi /
+     thành công chỉ thể hiện ở tiêu đề (đỏ khi lỗi) và dấu nhỏ ở dòng trên. */
+  const nhan = t.kind === 'error' ? 'Lỗi' : t.kind === 'success' ? 'Xong' : 'Thông báo';
   return (
     <div
       role="alert"
-      className={`pointer-events-auto w-full max-w-md overflow-hidden rounded-xl border ${s.ring} bg-white shadow-xl transition-all duration-300 ${show ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'}`}
+      className={`cl-tb pointer-events-auto w-full max-w-md transition-all duration-300 ${t.kind === 'error' ? 'cl-tb-loi' : ''} ${show ? 'translate-y-0 opacity-100' : '-translate-y-3 opacity-0'}`}
+      onClick={onClose}
     >
-      <div className="flex items-start gap-3 p-3.5">
-        <span className={`mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full text-sm font-bold ${s.badge}`}>{s.icon}</span>
-        <div className="min-w-0 flex-1">
-          {t.title && <p className="text-sm font-bold text-[#0A2540]">{t.title}</p>}
-          <p className="break-words text-sm leading-snug text-slate-600">{t.msg}</p>
-        </div>
-        <button onClick={onClose} aria-label="Đóng" className="-mr-1 -mt-1 grid h-7 w-7 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600">✕</button>
+      <span className="cl-tb-icon"><img src="/icons/icon-192.png?v=c5b77735" alt="" /></span>
+      <div className="cl-tb-than">
+        <p className="cl-tb-dau"><span>Cam Lâm Land · {nhan}</span><span className="gio">bây giờ</span></p>
+        {t.title && <p className="cl-tb-tieu-de">{t.title}</p>}
+        <p className={`${t.title ? 'cl-tb-noi-dung' : 'cl-tb-tieu-de font-semibold'} break-words`}>{t.msg}</p>
       </div>
-      <div className={`h-1 ${s.bar} opacity-70`} />
     </div>
   );
 }

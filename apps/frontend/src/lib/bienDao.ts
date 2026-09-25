@@ -96,7 +96,7 @@ export function themLopBienDao(map: any): void {
       paint: {
         'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, 1.8, 6, 3.4, 9, 5.5],
         'circle-color': '#ffffff',
-        'circle-stroke-color': '#0A2540',
+        'circle-stroke-color': '#0B4045',
         'circle-stroke-width': 1.2,
       },
     });
@@ -108,7 +108,7 @@ export function themLopBienDao(map: any): void {
         'text-field': ['get', 'ten'], 'text-font': ['Noto Sans Regular'], 'text-size': 12,
         'text-offset': [0, 0.9], 'text-anchor': 'top',
       },
-      paint: { 'text-color': '#ffffff', 'text-halo-color': '#0A2540', 'text-halo-width': 2.2 },
+      paint: { 'text-color': '#ffffff', 'text-halo-color': '#0B4045', 'text-halo-width': 2.2 },
     });
     // TÊN HAI QUẦN ĐẢO — luôn hiện ở mọi mức phóng, cho chèn đè lên nhau cũng phải hiện.
     map.addLayer({
@@ -119,7 +119,7 @@ export function themLopBienDao(map: any): void {
         'text-size': ['interpolate', ['linear'], ['zoom'], 2, 11, 4, 14, 6, 19, 9, 26],
         'text-line-height': 1.25, 'text-allow-overlap': true, 'text-ignore-placement': true,
       },
-      paint: { 'text-color': '#ffffff', 'text-halo-color': '#0A2540', 'text-halo-width': 3 },
+      paint: { 'text-color': '#ffffff', 'text-halo-color': '#0B4045', 'text-halo-width': 3 },
     });
   } catch (e) {
     console.warn('[bien dao]', e);

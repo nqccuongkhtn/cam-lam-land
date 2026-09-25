@@ -30,11 +30,11 @@ export default function LegalConsultCTA({ topic, className }: { topic?: string; 
         <div className="text-center py-2">
           <div className="w-11 h-11 rounded-full bg-emerald-100 text-emerald-600 grid place-items-center mx-auto text-2xl font-bold">✓</div>
           <p className="font-extrabold text-emerald-700 mt-2">Đã nhận yêu cầu tư vấn!</p>
-          <p className="text-sm text-slate-500 mt-0.5">Cam Lâm Land sẽ gọi lại sớm nhất. Cần gấp: <a href="tel:0988888888" className="font-bold text-[#0A2540]">0988 888 888</a>.</p>
+          <p className="text-sm text-slate-500 mt-0.5">Cam Lâm Land sẽ gọi lại sớm nhất. Cần gấp: <a href="tel:0988888888" className="font-bold text-[#0B4045]">0988 888 888</a>.</p>
         </div>
       ) : (
         <>
-          <p className="font-extrabold text-[#0A2540] flex items-center gap-2">📋 Cần sang tên sổ đỏ / xử lý pháp lý?</p>
+          <p className="font-extrabold text-[#0B4045] flex items-center gap-2">📋 Cần sang tên sổ đỏ / xử lý pháp lý?</p>
           <p className="text-[13px] text-slate-500 mt-0.5">Để lại số điện thoại — <b className="text-emerald-700">tư vấn miễn phí</b>, đội ngũ Cam Lâm Land gọi lại &amp; báo phí trọn gói.</p>
           <div className="mt-3 grid sm:grid-cols-[1fr_1fr_auto] gap-2">
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Họ tên (tuỳ chọn)" className={inp} />

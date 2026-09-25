@@ -26,7 +26,7 @@ export default function QuanTriPage() {
   if (!canManage) return (
     <div className="mx-auto max-w-lg px-4 py-16 text-center">
       <div className="text-4xl mb-3">🔒</div>
-      <p className="font-extrabold text-[#0A2540] text-lg">Khu vực quản lý</p>
+      <p className="font-extrabold text-[#0B4045] text-lg">Khu vực quản lý</p>
       <p className="text-sm text-slate-500 mt-1.5">Chỉ dành cho tài khoản <b>quản trị / quản lý</b>.</p>
       {!user && <button onClick={() => openLogin()} className="mt-5 bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-lg">Đăng nhập</button>}
       <div className="mt-4"><Link href="/" className="text-[#C8A14B] font-semibold">← Về trang chủ</Link></div>

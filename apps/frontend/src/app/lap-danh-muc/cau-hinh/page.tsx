@@ -7,7 +7,7 @@ import { apiBase } from '@/lib/api';
 import { getToken } from '@/lib/token';
 import { toast } from '@/lib/toast';
 
-const NAVY = '#0A2540';
+const NAVY = '#0B4045';
 const authHead = () => ({ Authorization: `Bearer ${getToken() || ''}` });
 
 export default function CauHinhPage() {

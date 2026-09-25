@@ -1229,7 +1229,10 @@ def ve_sen(d, m, lop=None):
        Đã thử rồi bỏ: nét đỏ thẳng trên navy (tối quá không thấy) và nét đỏ
        đặt trên huy hiệu tròn nền kem (rõ nhưng không ưng). ĐỪNG SỬA NỮA.
     """
-    hoa_nhieu_canh(d, 320, 126, 26, 7, m['hong'], m['kem'], m['vang_sang'])
+    # ⚠️ BỎ HẲN ĐOÁ SEN (chủ dự án 25/9/2026: "bỏ hoa sen đi cho Bác Hồ sát
+    #    lại logo"). Còn mỗi chân dung thì khuôn hẹp lại vừa đúng bề ngang
+    #    tấm hình, nên hình nằm SÁT mép phải ô vuông thay vì bị đẩy ra giữa
+    #    khuôn — xem HOP_RIENG['sen'].
     if lop is not None:
         dan_chan_dung(lop, 380, 90, 148, m['net'])   # 90: cho hở mép trên
 
@@ -1421,7 +1424,7 @@ KHONG_DON = ('noel', 'tet')
 #     không bị logo đè nữa". Ô vuông logo hết ở x = 288, nên khuôn của Bác
 #     bắt đầu từ 292, tức nằm TRỌN ngoài ô vuông.
 HOP_RIENG = {
-    'sen': (292, 6, 406, 120),
+    'sen': (290, 2, 376, 134),
 }
 #    (25/9/2026 chủ dự án cho TO THÊM 20%: cạnh khuôn 124 → 149, giữ nguyên
 #     tâm theo chiều ngang. Mép phải 343 quy ra cỡ thật là 38,1 điểm ảnh, mà
@@ -1479,7 +1482,11 @@ def lam(nen_toi: bool):
             tt, co = _xep_lai(tt, co, HOP_RIENG.get(ma, HOP_TT))
         # Trang trí đè lên ô vuông thì XOÁ SỢI VIỀN VÀNG ở đúng chỗ bị đè
         # (chủ dự án dặn). Không đụng gì khi trang trí nằm ngoài ô vuông.
-        nen = _khoet_vien(nen, tt, co, mau_o)
+        # ⚠️ GIÁNG SINH KHÔNG KHOÉT. Cái mũ cố tình đội lên chữ CL, mà khoét
+        #    thì đúng chỗ mũ đè lên sẽ bị xoá mất nét chữ (chủ dự án: "chữ C
+        #    và L bạn đừng xoá mất, cứ để nằm dưới mũ Giáng sinh như hiện tại").
+        if ma != 'noel':
+            nen = _khoet_vien(nen, tt, co, mau_o)
         anh = nen.copy()
         anh.alpha_composite(tt)
         if co is not None:
@@ -1655,7 +1662,13 @@ def ve_xe_tuan_loc():
     # túi quà
     d.polygon([(118 * k, 46 * k), (140 * k, 46 * k), (136 * k, 30 * k), (122 * k, 30 * k)], fill=VANG)
 
-    out = lop.resize((W, H), Image.LANCZOS)
+    # ⚠️ LẬT NGANG CẢ TẤM. Hình vẽ ở trên: tuần lộc bên TRÁI và quay mặt sang
+    #    TRÁI, xe trượt bên phải. Nhưng hiệu ứng cho xe chạy từ TRÁI SANG PHẢI
+    #    (xem @keyframes clNoelXe), nên để nguyên thì tuần lộc đi lùi phía sau
+    #    còn ông già Noel đi trước — nhìn thành "ông già Noel kéo tuần lộc",
+    #    đúng như chủ dự án hỏi lại. Lật ngang là tuần lộc ra trước, quay mặt
+    #    đúng hướng chạy, kéo xe phía sau.
+    out = lop.resize((W, H), Image.LANCZOS).transpose(Image.FLIP_LEFT_RIGHT)
     p = os.path.join(RA, 'noel-xe.webp')
     out.save(p, 'WEBP', quality=94, method=6)
     print('OK %-11s %-22s %d KB' % ('noel-xe', 'Xe tuan loc Giang sinh',

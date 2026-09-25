@@ -789,7 +789,7 @@ function ListingsInner() {
             của thanh menu: cùng lề trái 16px (px-4) và cùng tâm dọc 28px (py-1.5 = 6px + hàng
             cao 44px). Trước để lề 12px, hàng 40px → logo nhảy sang trái + lên trên mỗi lần
             thanh menu ẩn/hiện (chủ dự án: "logo bị dựt"). */}
-        <div className={`max-w-7xl mx-auto ${hidden && !mapView ? 'px-4' : 'px-3'} sm:px-4 py-1.5 space-y-1.5`}>
+        <div className={`max-w-7xl mx-auto ${hidden && !mapView ? 'px-4 pt-[9px] pb-1.5' : 'px-3 py-1.5'} sm:px-4 sm:py-1.5 space-y-1.5`}>
           <div className={`flex items-center gap-2 ${hidden && !mapView ? 'min-h-[44px]' : ''}`}>
             {/* Khi cuộn xuống (Nav ẩn) → hiện LOGO NHỎ bên trái để vẫn nhận diện & về trang chủ */}
             {/* ⚠️ LOGO NHỎ NÀY PHẢI GIỐNG HỆT LOGO Ở THANH MENU CHÍNH.

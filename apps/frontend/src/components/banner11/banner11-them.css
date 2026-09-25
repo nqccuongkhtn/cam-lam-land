@@ -975,25 +975,17 @@
   }
 }
 
-/* Mẫu "Sống cạnh Bãi Dài": đường viền trắng là SVG khung 100×100 — trình duyệt
-   giữ tỉ lệ VUÔNG nên ở máy tính nó cao ~2 lần banner, chỉ nửa trên lộ ra:
-   thành một nét cắt chéo qua mép ảnh cong. Đó là cái chủ dự án THÍCH ("không
-   làm như bản web được à"). Điện thoại khung vuông chỉ cao 1,17 lần banner nên
-   nét cong gập lại, trông lệch → ép cao 2 lần banner cho giống máy tính.
-   ⚠️ Đừng ép 100% cho "bám mép ảnh" — đã thử, chủ dự án bảo không giống web. */
+/* Mẫu "Sống cạnh Bãi Dài" — ĐIỆN THOẠI: đường trắng thành VIỀN NẮNG ôm đúng
+   mép ảnh cong (chủ dự án chọn, 25/9/2026: nét trắng chạy riêng "cảm giác
+   thừa"). Ép khung SVG cao đúng banner để nét trùng mép ảnh; sáng ở giữa, nhạt
+   dần hai đầu; toả sáng vàng nhạt như nắng rọi lên mép tranh.
+   ⚠️ MÁY TÍNH GIỮ NGUYÊN nét cắt chéo cũ (chủ dự án dặn "bản web vẫn để như cũ"). */
 @media (max-width: 760px) {
-  .cl-b11 .rb-edge { height: 200% }
-  /* Nét 3px cố định (non-scaling-stroke) — trên màn máy tính rộng nó mảnh, còn
-     điện thoại nhỏ hơn 3,6 lần thì trông thô. Hạ theo tỉ lệ (chủ dự án: "trên
-     web mỏng hơn, nhìn nghệ thuật hơn"). */
-  .cl-b11 .rb-edge path { stroke-width: 1.2px }
-  /* Nét chạy xuống TỚI CHỖ GẶP DẢI UỐN LƯỢN (rb-ribbon) mới mờ đi, nhìn như nối
-     vào gốc dải đó (chủ dự án dặn). Trước cho mờ sớm từ 30% — chê xấu.
-     Khung SVG cao 2 lần banner nên ở đáy
-     nét đang dựng thẳng, tách khỏi mép ảnh cong, cụt ngang (chủ dự án khoanh).
-     Mốc 46% của khung = 92% chiều cao banner. */
   .cl-b11 .rb-edge {
-    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 43.5%, transparent 47.5%);
-    mask-image: linear-gradient(to bottom, #000 0, #000 43.5%, transparent 47.5%);
+    height: 100%;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 4%, #000 38%, #000 62%, transparent 96%);
+    mask-image: linear-gradient(to bottom, transparent 4%, #000 38%, #000 62%, transparent 96%);
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 1)) drop-shadow(0 0 6px rgba(255, 210, 120, .95)) drop-shadow(0 0 14px rgba(255, 190, 90, .6));
   }
+  .cl-b11 .rb-edge path { stroke-width: 2px }
 }

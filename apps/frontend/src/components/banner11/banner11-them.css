@@ -640,31 +640,50 @@
     border-bottom-left-radius: 0; border-bottom-right-radius: 0;
   }
 
-  /* Vệt tối ở mép dưới ảnh cho chỗ nối sang khối chữ đỡ gắt. */
+  /* ══ CHỮ NẰM TRONG ẢNH, ĐÈ LÊN PHẦN ĐÁY (25/9/2026) ══════════════════
+     Bản trước đẩy chữ xuống HẲN DƯỚI ảnh → banner cao lê thê, chủ dự án
+     chê "phần chữ bạn đang đưa ra ngoài" và chỉ sang banner của web
+     batdongsan: chữ nằm gọn trong ảnh, góc dưới–trái, nút nhỏ nép góc phải.
+     Vẫn là khối chữ tự dựng (cỡ chữ cho điện thoại), không phải chữ của bản
+     thiết kế 1920px — chữ đó co lại bé xíu, đọc không ra.
+
+     ⚠️ Khối này nằm trong khung chung với cả ô tìm kiếm, nên KHÔNG dùng
+        bottom:0 được (đáy khung là đáy ô tìm kiếm). Thay vào đó cho nó một
+        hộp CÙNG TỈ LỆ 16/10 với ảnh, đặt từ mép trên → trùng khít khung ảnh,
+        rồi dồn chữ xuống đáy hộp. Đổi tỉ lệ ảnh ở trên thì đổi luôn ở đây. */
   .cl-b11-duoi {
-    background: #0A2540; color: #fff;
-    margin: 0 auto; padding: 14px 16px 4px; max-width: 980px;
-    position: relative;
-  }
-  .cl-b11-duoi::before {
-    content: ''; position: absolute; left: 0; right: 0; top: -26px; height: 26px;
-    background: linear-gradient(to top, #0A2540, rgba(10, 37, 64, 0));
-    pointer-events: none;
+    position: absolute; left: 0; right: 0; top: 0; z-index: 25;
+    aspect-ratio: 16 / 10;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 14px 12px; color: #fff; pointer-events: none;
+    /* vệt tối chỉ ở nửa dưới, nửa trên ảnh vẫn sáng nguyên */
+    background: linear-gradient(to top, rgba(10, 37, 64, .92) 0%,
+                rgba(10, 37, 64, .55) 32%, rgba(10, 37, 64, 0) 62%);
   }
   .cl-b11-duoi-nho {
-    display: block; font-size: 11px; font-weight: 700; letter-spacing: .16em;
-    text-transform: uppercase; color: #C8A14B; margin-bottom: 4px;
+    display: block; font-size: 10.5px; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: #E2C275; margin-bottom: 2px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .6);
   }
   .cl-b11-duoi h2 {
-    margin: 0; font-size: 22px; line-height: 1.2; font-weight: 800; color: #fff;
+    margin: 0; font-size: 21px; line-height: 1.15; font-weight: 800; color: #fff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, .55);
+    /* chừa chỗ bên phải cho nút */
+    padding-right: 118px;
   }
   .cl-b11-duoi p {
-    margin: 6px 0 0; font-size: 13.5px; line-height: 1.45; color: rgba(255, 255, 255, .8);
+    margin: 3px 0 0; font-size: 12.5px; line-height: 1.35; color: rgba(255, 255, 255, .88);
+    padding-right: 118px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .6);
   }
+  /* Nút nhỏ kiểu viên thuốc trắng, nép góc dưới–phải như bên batdongsan. */
   .cl-b11-duoi-nut {
-    display: inline-block; margin-top: 12px; padding: 9px 18px;
-    border-radius: 4px; background: #C8A14B; color: #0A2540;
-    font-size: 14px; font-weight: 800; text-decoration: none;
+    position: absolute; right: 14px; bottom: 12px; pointer-events: auto;
+    padding: 6px 12px; border-radius: 9999px;
+    background: #fff; color: #0A2540;
+    font-size: 12.5px; font-weight: 700; text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
   }
   /* Khối chữ và khung tìm kiếm phải là MỘT mảng navy liền — không có khe hở,
      không bo góc ở chỗ giáp nhau. Đây là chỗ chủ dự án chê "đang hơi rời rạc". */

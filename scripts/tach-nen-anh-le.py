@@ -22,67 +22,93 @@ from PIL import Image
 
 GOC = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 RA = os.path.join(GOC, 'scripts', 'anh')
-NGUON = os.path.join(os.path.expanduser('~'), '.claude', 'image-cache',
-                     '100d2661-4499-430f-ad1a-b814e9751851')
 
-# (tệp nguồn, tên tệp ra, sai số màu cho phép)
-# ⚠️ Sai số để 22 thôi. Để 40 thì ĐỒNG TIỀN VÀNG sau đầu cá (màu vàng
-#    nhạt, gần giống nền cam) bị ăn mất gần hết.
-VIEC = [('30.png', 'ong-tao.png', 22)]
+# ẢNH ÔNG TÁO (bản 2, 25/9/2026): ông Táo cầm câu đối cưỡi cá chép vàng.
+# Ảnh gốc lưu hẳn trong dự án (scripts/anh/ong-tao-goc-2.png) — bản 1 đọc
+# thẳng từ thư mục tạm của Claude nên mất ảnh gốc là không dựng lại được.
+#
+# Ảnh này nền có HAI màu: cam + vòng tròn và mây TRẮNG, lại có dòng chữ trắng.
+# Nên "màu nền" không phải một điểm mà là cả DẢI MÀU từ cam đến trắng (gồm
+# luôn mấy điểm ảnh pha lẫn ở mép vòng tròn). Loang từ mép vào vẫn giữ được
+# lòng trắng MẮT cá và mắt ông Táo vì chúng nằm lọt trong hình.
+# ⚠️ Sai số 20. Da mặt ông Táo (255,224,178) chỉ cách dải cam–trắng ~33,
+#    để sai số cao hơn là mặt bị ăn thủng.
+#
+# Sau khi loang còn sót vài mảng của vòng tròn trắng bị dải lụa quây kín
+# (không nối ra mép nên loang không tới). Ghi rõ toạ độ góc trên–trái của
+# từng mảng để xoá — đừng xoá "mọi mảng trắng to", vì làm thế thì mất luôn
+# lòng trắng mắt cá (đã vấp).
+VIEC = [dict(vao=os.path.join(RA, 'ong-tao-goc-2.png'), ra='ong-tao.png',
+             nen=((240, 103, 34), (255, 255, 255)), sai_so=20,
+             xoa_them={(244, 212), (473, 243), (452, 400), (433, 425)})]
 
 
-def tach(duong_vao, duong_ra, sai_so):
+def tach(duong_vao, duong_ra, nen, sai_so, xoa_them=()):
+    from scipy import ndimage
     im = Image.open(duong_vao).convert('RGBA')
-    a = np.asarray(im).astype(np.int16)
+    a = np.asarray(im).astype(float)
     h, w = a.shape[:2]
 
-    # Màu nền = màu hay gặp nhất ở bốn góc.
-    goc = [tuple(a[y, x, :3]) for y, x in
-           ((2, 2), (2, w - 3), (h - 3, 2), (h - 3, w - 3))]
-    nen_mau = max(set(goc), key=goc.count)
-
-    lech = np.abs(a[..., :3] - np.array(nen_mau)).sum(axis=2)
+    # Độ lệch của mỗi điểm so với DẢI MÀU NỀN (đoạn thẳng từ màu 1 đến màu 2).
+    c0 = np.array(nen[0], float); c1 = np.array(nen[1], float)
+    v = c1 - c0
+    t = np.clip(((a[..., :3] - c0) @ v) / max(v @ v, 1), 0, 1)
+    lech = np.abs(a[..., :3] - (c0 + t[..., None] * v)).sum(axis=2)
     giong = lech <= sai_so
 
-    nen = np.zeros_like(giong)
+    # Loang từ mép vào: chỉ xoá phần nền nối liền ra được mép.
+    xoa = np.zeros_like(giong)
     hang_doi = deque()
-    for x in range(w):
-        for y in (0, h - 1):
-            if giong[y, x] and not nen[y, x]:
-                nen[y, x] = True; hang_doi.append((y, x))
     for y in range(h):
-        for x in (0, w - 1):
-            if giong[y, x] and not nen[y, x]:
-                nen[y, x] = True; hang_doi.append((y, x))
+        for x in range(w):
+            if (y in (0, h - 1) or x in (0, w - 1)) and giong[y, x]:
+                xoa[y, x] = True; hang_doi.append((y, x))
     while hang_doi:
         y, x = hang_doi.popleft()
         for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
             ny, nx = y + dy, x + dx
-            if 0 <= ny < h and 0 <= nx < w and giong[ny, nx] and not nen[ny, nx]:
-                nen[ny, nx] = True
+            if 0 <= ny < h and 0 <= nx < w and giong[ny, nx] and not xoa[ny, nx]:
+                xoa[ny, nx] = True
                 hang_doi.append((ny, nx))
 
+    # Bỏ mấy mẩu lẻ (dòng chữ, chấm mây) — chỉ giữ các khối to.
+    lab, n = ndimage.label(~xoa)
+    if n:
+        co = ndimage.sum(np.ones_like(lab), lab, range(1, n + 1))
+        xoa |= ~np.isin(lab, 1 + np.where(co >= 0.02 * co.max())[0])
+
+    # Xoá thêm các mảng trắng bị quây kín, chỉ đích danh theo góc trên–trái.
+    if xoa_them:
+        trang = a[..., :3].min(axis=2) >= 235
+        lt, _ = ndimage.label(trang)
+        them = np.zeros_like(trang)
+        for i, sl in enumerate(ndimage.find_objects(lt), 1):
+            if sl and (sl[1].start, sl[0].start) in xoa_them:
+                them |= lt == i
+        # nở 2 điểm để ăn luôn viền pha màu quanh mảng trắng
+        them = ndimage.binary_dilation(them, iterations=2) & (a[..., :3].min(axis=2) >= 200)
+        xoa |= them
+
     ra = np.array(im)
-    ra[..., 3] = np.where(nen, 0, 255)
+    ra[..., 3] = np.where(xoa, 0, 255)
     out = Image.fromarray(ra)
     bb = out.getchannel('A').getbbox()
     if bb:
         out = out.crop(bb)
     out.save(duong_ra)
-    return out.size, nen_mau, int(nen.sum()), h * w
+    return out.size, int(xoa.sum()), h * w
 
 
 def main():
     os.makedirs(RA, exist_ok=True)
-    for vao, ten, sai_so in VIEC:
-        p = os.path.join(NGUON, vao)
-        if not os.path.exists(p):
-            print('KHÔNG THẤY', p, '— bỏ qua')
+    for v in VIEC:
+        if not os.path.exists(v['vao']):
+            print('KHÔNG THẤY', v['vao'], '— bỏ qua')
             continue
-        kho, mau, bo, tong = tach(p, os.path.join(RA, ten), sai_so)
-        print('OK %-14s nền %s · còn %sx%s · xoá %.0f%%'
-              % (ten, mau, kho[0], kho[1], 100.0 * bo / tong))
-
+        kho, bo, tong = tach(v['vao'], os.path.join(RA, v['ra']), v['nen'],
+                             v['sai_so'], v.get('xoa_them', ()))
+        print('OK %-14s còn %sx%s · xoá %.0f%%'
+              % (v['ra'], kho[0], kho[1], 100.0 * bo / tong))
 
 if __name__ == '__main__':
     main()

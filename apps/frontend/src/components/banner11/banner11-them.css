@@ -887,7 +887,7 @@
    được ẩn hẳn hay nhỏ tới mức không đọc nổi (thế là vi phạm điều kiện). */
 .cl-b11 .st-b6::after {
   content: "Ảnh vệ tinh © Esri, Maxar, Earthstar Geographics";
-  position: absolute; right: 6px; bottom: calc(var(--thanh, 0px) + 3px); z-index: 30;
+  position: absolute; right: 6px; bottom: 2px; z-index: 30;   /* sát đáy — chủ dự án dặn */
   font-size: 8px; line-height: 1; letter-spacing: .02em;
   color: rgba(255, 255, 255, .5); text-shadow: 0 0 2px rgba(0, 0, 0, .6);
   pointer-events: none;

@@ -931,3 +931,11 @@
 @media (max-width: 760px) {
   .cl-b11 .st-c16 .c16-card { width: 55vw !important; right: 2vw !important; top: calc(var(--dinh) + 1vw) !important; bottom: 2.5vw !important }
 }
+
+/* Mẫu "Hỏi là có": ba chấm "đang nhập" cỡ CỐ ĐỊNH 7px (không co theo banner),
+   lại bị khung hội thoại phóng 1,5 lần → to hơn cả chữ (chủ dự án: "nó to
+   quá"). Thu cho cân với bong bóng chữ bên cạnh. */
+@media (max-width: 760px) {
+  .cl-b11 .typing { gap: 2px; padding: calc(var(--u) * 12px) calc(var(--u) * 16px) }
+  .cl-b11 .typing i { width: 3px; height: 3px }
+}

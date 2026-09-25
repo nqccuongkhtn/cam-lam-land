@@ -1106,8 +1106,16 @@
      (dưới khối đỏ trên, bên phải khối đỏ trái). Chốt theo % chiều cao banner nên máy
      có hay không có tai thỏ đều rơi đúng ô đó. */
   .cl-b11 .st-step.red { --S: 1.25 }
-  .cl-b11 .st-step.red .sp-content { left: 44vw !important; right: auto !important; top: 47% !important }
-  .cl-b11 .st-step.red .sp-cta { left: 44vw !important; right: auto !important; top: auto !important; bottom: calc(var(--thanh) + 1.5vw) !important }
+  /* Cả cụm (tiêu đề + khẩu hiệu + nút) nằm GỌN trong ô trống dưới–phải, nút ngay
+     dưới khẩu hiệu — không để nút rơi tít dưới đáy tách khỏi chữ. */
+  .cl-b11 .st-step.red .sp-content { left: 44vw !important; right: auto !important; top: 52% !important }
+  .cl-b11 .st-step.red .sp-cta { left: 44vw !important; right: auto !important; bottom: auto !important; top: 77% !important }
   /* "Thuyền về bến": viền sáng gọn, không loang thành vệt nhoè (chủ dự án: "lỗi nhòe vệt xanh"). */
   .cl-b11 .b8-edge { filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, .9)) drop-shadow(0 0 4px rgba(94, 234, 212, .8)) !important }
+}
+
+@media (max-width: 760px) {
+  /* "Vươn cao": ảnh toà nhà GIỮ CHỖ CŨ (chủ dự án: "để như cũ, đừng dịch sang phải"),
+     khối chữ phóng ít hơn cho tiêu đề không chạm khung ảnh. */
+  .cl-b11 .st-c18 .b-text { --S: 1.3 }
 }

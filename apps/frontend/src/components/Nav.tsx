@@ -7,6 +7,7 @@ import { useLoginGate } from '@/lib/loginGate';
 import { useHideOnScroll } from '@/lib/hideOnScroll';
 import { apiBase } from '@/lib/api';
 import LogoLe from '@/components/LogoLe';
+import { useLogoLe } from '@/lib/logoLe';
 
 /* ── LOGO NGÀY LỄ ───────────────────────────────────────────────────────────
    Ngày thường dùng logo gốc; tới dịp lễ (Tết, Quốc khánh, Trung thu, Noel…)
@@ -19,18 +20,6 @@ import LogoLe from '@/components/LogoLe';
       cho một thứ cả ngày mới đổi một lần. Không thẻ thì nginx giữ 10 phút.
    ⚠️ Hỏng thì im lặng dùng logo thường — logo là thứ không được phép làm
       vỡ thanh menu. */
-function useLogoLe(): string | null {
-  const [ma, setMa] = useState<string | null>(null);
-  useEffect(() => {
-    let huy = false;
-    fetch(`${apiBase}/logo-le/hom-nay`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((j) => { if (!huy && j?.ma) setMa(String(j.ma)); })
-      .catch(() => {});
-    return () => { huy = true; };
-  }, []);
-  return ma;
-}
 
 const links = [
   { href: '/', label: 'Trang chủ' },

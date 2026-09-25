@@ -965,21 +965,26 @@ def ve_tet(d, m, lop=None):
     if lop is None:
         return
     # (286, 128) = mép phải ô vuông, khoảng 44% chiều cao — chân gốc cành mai.
-    dan_anh(lop, 'tet-mai.png', 256, 134, rong=140, lat=True, xoay=40, neo='duoi-trai')
-    dan_anh(lop, 'tet-mam.png', 296, 178, cao=86)
+    # ⚠️ CHỈ CÀNH MAI, BỎ MÂM TẾT (25/9/2026). Ghép cả hai thì ở cỡ 32 điểm
+    #    ảnh thành một đám lổn nhổn, không nhận ra thứ gì (chủ dự án: "logo
+    #    tết nguyên đán nhiều chi tiết quá không thấy được hình ảnh").
+    #    Mâm Tết tự nó đã có dưa hấu + bánh chưng + cành đào — ba thứ nhỏ
+    #    chen nhau trong khoảng bằng đầu que tăm. Bỏ nó đi thì cành mai to
+    #    được thêm và đọc ra ngay.
+    #    Ảnh scripts/anh/tet-mam.png vẫn giữ, cần thì lấy lại dùng chỗ khác.
+    dan_anh(lop, 'tet-mai.png', 250, 152, rong=168, lat=True, xoay=40, neo='duoi-trai')
 
 
 def ve_tet_duong(d, m):
-    """Tết Dương lịch: chùm pháo hoa.
+    """Tết Dương lịch: chùm pháo hoa — một quả lớn, hai quả nhỏ.
 
-    ⚠️ TIA PHẢI DÀY VÀ ÍT. Bản trước ba quả pháo, mỗi quả 12–20 tia mảnh
-       (nét 3–4 đơn vị). Thu về 32 điểm ảnh thì mỗi tia chỉ còn 0,3 điểm —
-       mất sạch, chỉ còn một vệt vàng nhoè (chủ dự án: "cái này cũng mờ").
-       Nay hai quả thôi, tia dày gấp ba, đầu tia có đốm ĐỎ cho bật lên.
+    ⚠️ ĐÂY LÀ BẢN CŨ, CHỦ DỰ ÁN CHỐT GIỮ NÓ (25/9/2026: "logo tết dương
+       lịch cho về như cũ"). Đã thử bản tia dày gấp ba, hai quả, đầu tia
+       đốm đỏ cho đỡ mờ — bị chê, trả về bản này. ĐỪNG SỬA NỮA.
     """
-    phao_hoa(d, 352, 72, 76, 11, m['vang_sang'], m['do_tet'], day=10)
-    phao_hoa(d, 438, 32, 42, 9, m['kem'], m['vang_sang'], day=7)
-
+    phao_hoa(d, 320, 40, 34, 14, m['kem'], m['vang_sang'], day=3)
+    phao_hoa(d, 414, 62, 30, 12, m['kem'], m['vang_sang'], day=3)
+    phao_hoa(d, 362, 86, 52, 20, m['vang_sang'], m['vang'], day=4)
 
 def ve_gio_to(d, m):
     """Giỗ Tổ Hùng Vương: tượng Vua Hùng trên nền TRỐNG ĐỒNG.
@@ -1007,10 +1012,20 @@ def ve_trung_thu(d, m):
        lại logo như ban đầu là được rồi đừng sửa nữa". Đã thử thêm mặt trăng
        to ở giữa — bị chê. ĐỪNG SỬA NỮA.
     Mặt trăng chính là vầng mặt trời sẵn có trong logo.
+
+    ⚠️ KHÔNG ĐỔI HÌNH, CHỈ XẾP LẠI CHO CÂN (25/9/2026). Chủ dự án thấy
+       "logo trung thu dịch ra sai vị trí rồi": lồng đèn nằm lệch hẳn sang
+       phải so với mấy dịp khác. Lý do: máy dồn cả cụm (lồng đèn + 3 ngôi
+       sao) vào khuôn chung rồi căn giữa KHUNG BAO của cụm. Ba ngôi sao cũ
+       đặt ở 310 / 426 / 304 — lệch hẳn sang trái — nên tâm khung bao rơi
+       về bên trái, đẩy lồng đèn sang phải.
+       Nay lồng đèn đứng đúng giữa (366) và ba ngôi sao xếp CÂN hai bên,
+       nên tâm cụm trùng tâm lồng đèn. Lồng đèn và sao vẫn y như cũ.
     """
-    long_den(d, m, 372, 76, 62, 74, m['do_tet'])
-    for x, y in ((310, 30), (426, 34), (304, 106)):
+    long_den(d, m, 366, 76, 62, 74, m['do_tet'])
+    for x, y in ((312, 28), (420, 30), (318, 122)):
         sao(d, x, y, 13, m['vang_sang'])
+    sao(d, 414, 124, 11, m['vang_sang'])
 
 
 def ve_noel(d, m):
@@ -1168,21 +1183,15 @@ def ve_sen(d, m, lop=None):
     động (xem scripts/tao-chan-dung-bac.py) — thu nhỏ vẫn còn đường nét.
     Chân dung để TO gần hết chiều cao logo, vì đây là thứ chính của ngày này.
 
-    ⚠️ CHÂN DUNG ĐỂ MÀU ĐỎ (chủ dự án chốt 25/9/2026), cả nền tối lẫn nền
-       sáng. Trước đây nền tối thì in nét TRẮNG — nhìn lạnh và dễ lẫn vào
-       chữ trắng của thanh menu; đỏ mới ra đúng chất tranh cổ động.
+    ⚠️ NÉT TRẮNG TRÊN NỀN TỐI, nét đỏ trên nền trắng — tức đúng bản này.
+       Chủ dự án chốt 25/9/2026: "ảnh Bác thì về màu trắng". Đã thử hai bản
+       khác rồi bỏ cả hai: in nét ĐỎ thẳng lên navy thì tối quá không thấy;
+       đặt nét đỏ lên một huy hiệu tròn nền kem thì rõ nhưng không ưng.
+       ĐỪNG SỬA NỮA.
     """
-    # ⚠️ PHẢI CÓ NỀN TRÒN SÁNG PHÍA SAU. Chân dung in nét đỏ đặt thẳng lên
-    #    thanh menu màu navy thì đỏ trên xanh đậm gần như cùng độ sáng — thu
-    #    về 32 điểm ảnh chỉ còn một vệt đỏ tối (chủ dự án: "mờ quá không
-    #    thấy"). Đặt lên một huy hiệu tròn nền kem thì đỏ bật hẳn lên, mà
-    #    hình huy hiệu chân dung cũng là cách thể hiện quen thuộc, trang trọng.
-    d.ellipse([300, 8, 452, 160], fill=m['kem'])
-    d.ellipse([308, 16, 444, 152], fill=m['vang'])
-    hoa_nhieu_canh(d, 310, 182, 32, 7, m['hong'], m['kem'], m['vang_sang'])
+    hoa_nhieu_canh(d, 320, 126, 26, 7, m['hong'], m['kem'], m['vang_sang'])
     if lop is not None:
-        dan_chan_dung(lop, 376, 84, 138, m['do'])
-
+        dan_chan_dung(lop, 380, 76, 148, m['net'] if m['net'] != NAVY else m['do'])
 
 def ve_nen(d, m):
     """27/7 Thương binh Liệt sĩ: ngôi sao vàng và tấm băng đỏ "Tổ quốc ghi công".

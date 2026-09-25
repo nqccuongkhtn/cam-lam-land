@@ -345,14 +345,14 @@
   72%         { opacity: 0; visibility: visible }
   86%, 100%   { opacity: 1; visibility: visible }
 }
-/* Máy đặt "giảm chuyển động": đứng yên ở tầng gần nhất cho thấy rõ thửa đất */
-.cl-b11 .banner.static .m19-phong { animation: none !important; transform: scale(32) !important }
-.cl-b11 .banner.static .m19-l1, .cl-b11 .banner.static .m19-l2 { opacity: 0 !important; visibility: hidden !important }
-.cl-b11 .banner.static .m19-l3 { opacity: 1 !important; visibility: visible !important }
-/* (Thửa đích nay được VẼ SẴN vào tầng ảnh gần nhất nên không còn lớp `m19-thua`
-    riêng để nhấp nháy nữa.) */
-/* Máy đặt "giảm chuyển động": không phóng, hiện nguyên bản đồ */
+/* BANNER ĐỨNG YÊN (.static: máy đặt "giảm chuyển động", hoặc mẫu đang trượt
+   ra khi đổi mẫu): KHÔNG phóng, hiện NGUYÊN tầng toàn cảnh.
+   ⚠️ LỖI ĐÃ VẤP (25/9/2026): trước đây hai luật đá nhau — một luật bật tầng 3
+      (vẽ nhỏ 1/32 để chờ phóng), luật sau lại bỏ phóng → giữa banner chỉ còn
+      một mẩu bản đồ bé tí, chung quanh là ảnh vệ tinh. Nhìn như bản đồ bị hỏng. */
 .cl-b11 .banner.static .m19-phong { animation: none !important; transform: none !important }
+.cl-b11 .banner.static .m19-l1 { opacity: 1 !important; visibility: visible !important }
+.cl-b11 .banner.static .m19-l2, .cl-b11 .banner.static .m19-l3 { opacity: 0 !important; visibility: hidden !important }
 .cl-b11 .banner.static .m19-thua { opacity: .9 !important }
 
 

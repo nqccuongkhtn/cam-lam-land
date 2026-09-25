@@ -790,13 +790,13 @@
   .cl-b11 .dp-content { right: auto !important; width: calc(100% - var(--u0) * 240px) }
 
   /* 3) chữ nhỏ nâng thêm; chỗ xuống dòng */
-  .cl-b11 :is(.cta, [class*="-sub"], [class*="-slogan"]) { --san-nho: .7 }
+  .cl-b11 :is(.cta, [class*="-sub"], [class*="-slogan"]) { --san-nho: .58 }
   /* ⚠️ Các hệ số --san-nho ở đây đã nhân sẵn tỉ lệ phóng khối chữ (~1,55), vì
      khối chữ nay phóng bằng --u (chữ nét) chứ không bằng scale nữa.
      Nhãn nhỏ trên tiêu đề nâng ÍT hơn: nâng .45 thì nhãn dài ("BIỂN XANH · GHỀNH
      ĐÁ · NẮNG VÀNG") vượt khỏi cột chữ — chủ dự án: "nắng vàng bị tràn". */
   .cl-b11 .kicker { --san-nho: .56 }
-  .cl-b11 [class*="-slogan"] { --san-nho: .53 }
+  .cl-b11 [class*="-slogan"] { --san-nho: .45 }
   .cl-b11 :is(.kicker, h3, .cta, [class*="-slogan"]) { white-space: nowrap !important }
   /* <br> trong dòng mô tả nay chỉ nằm giữa hai câu (mỗi câu một dòng) nên GIỮ, không ẩn nữa. */
   .cl-b11 :is(p, [class*="-sub"]) { text-wrap: pretty }
@@ -1053,9 +1053,11 @@
     filter: drop-shadow(0 0 2px rgba(255, 255, 255, .9)) drop-shadow(0 0 6px rgba(94, 234, 212, .95)) drop-shadow(0 0 14px rgba(45, 212, 191, .6));
   }
   .cl-b11 .b8-edge path { stroke-width: 2px }
+  /* bề ngang PHẢI bằng đúng tấm ảnh (.b8-panel), lệch vài px là đường sáng rời khỏi mép ảnh */
+  .cl-b11 .st-b8 .b8-edge { width: calc(100% - 50vw) !important }
   /* "Làng biển": tiêu đề và khẩu hiệu mỗi thứ một hàng; khẩu hiệu to hơn (trước mờ nhỏ). */
   .cl-b11 .st-step.photo :is(.sp-title, .sp-slogan-wrap) { display: block }
-  .cl-b11 .st-step.photo .sp-slogan { --san-nho: .65 }
+  .cl-b11 .st-step.photo .sp-slogan { --san-nho: .5 }
   /* "Nét xưa": ảnh tháp phủ kín (khung nhìn riêng KHUNG_DT trong Banner11.tsx), các
      nét cọ giãn cao 1,75 lần cho quét HẾT chiều cao banner điện thoại — trước chỉ
      quét 4/7, phần dưới tháp không bao giờ hiện màu (chủ dự án: "vẽ thiếu"). */

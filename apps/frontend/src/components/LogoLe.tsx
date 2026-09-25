@@ -24,6 +24,12 @@
  *    · riêng TẾT — thêm PHÁO BÔNG nhiều màu (xem phần dưới).
  * ========================================================================== */
 
+import { LOGO_LE_PB } from '@/lib/logoLePhienBan';
+
+/** Gắn số phiên bản vào ảnh: dựng lại logo là Cloudflare lấy ảnh mới ngay
+ *  (xem ghi_phien_ban() trong scripts/dung-logo-ngay-le.py). */
+const anh = (ten: string) => `/logo-le/${ten}.webp?v=${LOGO_LE_PB}`;
+
 /** Những dịp trang nghiêm: không nhún nhảy, không lấp lánh. */
 const TRANG_NGHIEM = new Set(['tri-an', 'sen', 'gio-to', 'vu-lan', 'nhang']);
 
@@ -102,17 +108,17 @@ export default function LogoLe({
     <span className={`cl-logo-le${CO_VAY.has(ma) ? ' co-vay' : ''}`}
       data-le={ma} style={{ width: cao, height: cao }}>
       {/* Lớp 1 — Ô VUÔNG LOGO. Không hiệu ứng nào được chạm vào lớp này. */}
-      <img className="cl-le-nen" src={`/logo-le/${ma}-nen${duoi}.webp`}
+      <img className="cl-le-nen" src={anh(`${ma}-nen${duoi}`)}
         alt="" aria-hidden="true" width={rong} height={cao} style={o} />
       {/* Lớp 2 — TRANG TRÍ của dịp lễ. Mọi hiệu ứng động nằm ở đây. */}
-      <img className="cl-le-tt" src={`/logo-le/${ma}-tt${duoi}.webp`}
+      <img className="cl-le-tt" src={anh(`${ma}-tt${duoi}`)}
         alt="" aria-hidden="true" width={rong} height={cao} style={o} />
       {/* Lớp 3 — RIÊNG MẶT LÁ CỜ, để nó GỢN SÓNG TRONG GIÓ.
           Chủ dự án: "lá cờ nó vẫy trong gió chứ không phải lắc qua lắc lại".
           Cán cờ, xe tăng, nóc hầm, bóng chiến sĩ nằm ở lớp 2 nên đứng yên;
           chỉ mảnh vải cờ ở lớp này mới chuyển động. */}
       {CO_VAY.has(ma) && (
-        <img className="cl-le-co" src={`/logo-le/${ma}-co${duoi}.webp`}
+        <img className="cl-le-co" src={anh(`${ma}-co${duoi}`)}
           alt="" aria-hidden="true" width={rong} height={cao} style={o} />
       )}
       {/* Giáng sinh: ông già Noel cưỡi xe tuần lộc chạy ngang qua, 2 phút một

@@ -18,10 +18,10 @@
 /* ĐIỆN THOẠI: khổ 1920×620 của bản gốc mà ép vào màn ngang 390px thì banner chỉ
    cao 126px — chữ và nút không có chỗ. Bản thiết kế đã xếp lại nội dung theo
    chiều dọc cho màn nhỏ, nên ở đây cho banner cao lên gần vuông. */
-@media (max-width: 760px) {
+@media (max-width: 0px) /* ĐÃ TẮT 25/9/2026 — xem mục "ĐIỆN THOẠI = MÁY TÍNH THU NHỎ" cuối file */ {
   .cl-b11 .banner { min-height: 268px; aspect-ratio: 7 / 5 }
 }
-@media (max-width: 420px) {
+@media (max-width: 0px) /* ĐÃ TẮT */ {
   .cl-b11 .banner { min-height: 262px; aspect-ratio: 5 / 4 }
 }
 
@@ -31,7 +31,7 @@
    sau logo — nhìn chồng chữ. Đẩy hết xuống dưới thanh menu.
    ⚠️ Đừng chỉnh từng mẫu một trong banner11.css: file đó do
       scripts/banner11/tach-banner.py sinh lại, sửa tay là mất. */
-@media (max-width: 760px) {
+@media (max-width: 0px) /* ĐÃ TẮT 25/9/2026 — xem mục "ĐIỆN THOẠI = MÁY TÍNH THU NHỎ" cuối file */ {
   .cl-b11 .rb-big { top: calc(76px + env(safe-area-inset-top, 0px)) }
   .cl-b11 .du-content,
   .cl-b11 .pl-text,
@@ -202,9 +202,9 @@
    Con số: bản gốc left = 945 đơn vị thiết kế. Cần dời thêm 520 đơn vị thì tâm
    khối người rơi đúng khoảng trống (đo thật trên màn 1905px, --u = 0,754).
    ⚠️ Đừng đẩy quá 1500: quá đà là chồng lên cụm chữ bên phải. */
-@media (min-width: 761px) {
-  .cl-b11 .rb-couple { left: calc(var(--u) * 1464px) }
-}
+/* ⚠️ Áp cho MỌI khổ màn hình (trước chỉ ≥761px): điện thoại nay dùng đúng
+   bố cục máy tính nên đôi người cũng phải đứng đúng chỗ đó. */
+.cl-b11 .rb-couple { left: calc(var(--u) * 1464px) }
 
 /* Mẫu 18: bản gốc cho chiếc máy bay BAY VÚT ĐI (lao chéo lên rồi to dần).
    Nay là toà nhà cao tầng nên đổi thành động tác VƯƠN LÊN — nhô dần lên khỏi
@@ -484,7 +484,7 @@
    Banner trên điện thoại nay chỉ cao 300px, mà tiêu đề "Biển xanh nắng vàng"
    neo mép trên còn ô thông tin neo mép dưới — hai cái đụng nhau. Thu tiêu đề
    và ô chữ nhỏ lại cho đủ chỗ cả hai. */
-@media (max-width: 760px) {
+@media (max-width: 0px) /* ĐÃ TẮT 25/9/2026 — xem mục "ĐIỆN THOẠI = MÁY TÍNH THU NHỎ" cuối file */ {
   .cl-b11 .rb-big { top: calc(62px + env(safe-area-inset-top, 0px)); font-size: 20px; line-height: 1.06 }
   .cl-b11 .rb-text { padding: 8px 11px; bottom: 10px }
   .cl-b11 .rb-title { font-size: 20px; line-height: 1.05 }
@@ -600,9 +600,6 @@
     padding: 10px 10px 14px;
     border-radius: 0 0 18px 18px;
   }
-  /* Banner bớt cao lại một chút cho gần tỉ lệ bên máy tính, và bỏ bo góc dưới
-     vì góc dưới giờ là của khung tìm kiếm. */
-  .cl-b11 .banner { aspect-ratio: 5 / 3; border-bottom-left-radius: 0; border-bottom-right-radius: 0 }
 }
 @media (min-width: 768px) {
   .cl-b11-tim { padding: 0 16px }
@@ -623,7 +620,7 @@
       khỏi lặp — xem `giuTieuDe` trong Banner11.tsx.
    ⚠️ Đừng sửa mấy lớp này trong banner11.css: file đó do
       scripts/banner11/tach-banner.py sinh lại, sửa tay là mất. */
-@media (max-width: 767px) {
+@media (max-width: 0px) /* ĐÃ TẮT 25/9/2026 — xem cuối file */ {
   .cl-b11 .rb-text, .cl-b11 .rb-big, .cl-b11 .sp-content,
   .cl-b11 .du-content, .cl-b11 .pl-text, .cl-b11 .bb-text,
   .cl-b11 .ui-text, .cl-b11 .fl-text, .cl-b11 .b-text,
@@ -689,7 +686,7 @@
      không bo góc ở chỗ giáp nhau. Đây là chỗ chủ dự án chê "đang hơi rời rạc". */
   .cl-b11-tim { padding-top: 14px !important }
 }
-@media (min-width: 768px) { .cl-b11-duoi { display: none } }
+/* Khối chữ dưới ảnh đã bỏ hẳn (Banner11.tsx không dựng nữa). */
 
 /* ══ MẪU 15: BẢN VẼ 2D "VẼ DẦN" RỒI ẢNH THẬT HIỆN LÊN ═══════════════════════
    Mạch chuyện: bản vẽ 2D lộ dần từ trái sang phải như đang được vẽ, rồi ảnh
@@ -722,4 +719,44 @@
    thế là đủ kể câu chuyện "phác thảo → nhà thật". */
 @media (prefers-reduced-motion: reduce) {
   .cl-b11 .m15-ve { clip-path: none; animation: none !important; }
+}
+
+
+/* ══ ĐIỆN THOẠI = MÁY TÍNH THU NHỎ (25/9/2026) ═════════════════════════════
+   Chủ dự án: banner điện thoại "vẽ không giống máy tính", "đồng bộ 2 bản
+   giống nhau 100%", "làm to chữ xíu nhưng phải giữ giống gần như tuyệt đối".
+
+   Trước đây điện thoại có bố cục RIÊNG: chữ dời xuống đáy hoặc ra hẳn ngoài
+   ảnh, đôi người chạy bị ẩn… Nay bỏ hết (các khối ghi "ĐÃ TẮT" ở trên, cùng
+   các khối điện thoại trong banner11.css — xem dong_bo_dien_thoai() trong
+   scripts/banner11/tach-banner.py). Điện thoại dùng ĐÚNG luật máy tính, mọi
+   thứ tính theo --u nên tự co lại cùng một tỉ lệ.
+
+   Ba chỗ phải chỉnh riêng — và chỉ ba chỗ này:
+   1) CHIỀU CAO: bằng đúng tỉ lệ banner trên màn máy tính 1400px (432/1400),
+      nên chữ và hình rơi đúng chỗ như trên máy tính.
+      ⚠️ --u ở điện thoại cũng nhân 0,76 như máy tính (Banner11.tsx). Đã thử
+         nhân to hơn (0,9) cho chữ to: đôi người chạy đè lên chữ ngay, vì
+         đường cong của ảnh tính theo PHẦN TRĂM còn đôi người tính theo --u.
+   2) --san: cỡ TỐI THIỂU của chữ/nút nhân hệ số này. 1 thì chữ to gấp đôi
+      tỉ lệ, tràn khỏi ô; 0 thì số điện thoại chỉ còn 3px. 0,36 = tiêu đề lớn
+      đúng tỉ lệ, chữ nhỏ to hơn tỉ lệ một chút cho đọc được.
+      Muốn chữ to/nhỏ hơn nữa thì chỉnh số này, thử ở khổ 390px.
+   3) font-size của khung: chữ gốc 16px của trang làm mỗi dòng trong ô chữ
+      cao tối thiểu 16px → ô chữ cao gấp rưỡi, tràn đáy. Cho co theo --u.
+
+   THANH MENU: máy tính cho menu nằm ĐÈ lên đầu banner (đã chừa sẵn chỗ).
+   Điện thoại banner chỉ cao ~120px, menu 56px đè vào là mất nửa banner →
+   đẩy banner xuống dưới menu, dải sau menu tô navy liền với khung tìm kiếm. */
+@media (max-width: 760px) {
+  .cl-b11 .banner {
+    --san: .36;
+    aspect-ratio: 1400 / 432 !important; min-height: 0 !important; height: auto !important;
+    font-size: calc(var(--u) * 21px);
+    border-radius: 0;
+  }
+  .cl-b11-khung-ngoai {
+    padding-top: calc(56px + env(safe-area-inset-top, 0px));
+    background: #0A2540;
+  }
 }

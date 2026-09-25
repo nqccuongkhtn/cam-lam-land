@@ -336,10 +336,12 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
          Bình thường `--u` = bề ngang / 1920 (đúng khổ thiết kế). Nhưng banner
          nay đã được hạ thấp (cắt phần trống ở đáy) nên chữ và nút của bản thiết
          kế trông to quá so với khung → nhân thêm một hệ số cho nhỏ lại vừa mắt.
-         Điện thoại KHÔNG nhân (để 1): ở màn nhỏ bản thiết kế đã có bố cục riêng,
-         chữ vốn đã nhỏ, thu thêm nữa là không đọc được. */
+         ⚠️ Điện thoại nhân Y NHƯ MÁY TÍNH (0,76) — từ 25/9/2026 điện thoại
+         dùng đúng bố cục máy tính thu nhỏ (chủ dự án: "giống nhau 100%").
+         Chữ nhỏ quá thì chỉnh --san trong banner11-them.css, ĐỪNG tăng số này:
+         tăng lên là đôi người chạy đè lên chữ (đã thử 0,9). */
       const rongMh = window.innerWidth;
-      const tiLeChu = rongMh >= 1101 ? 0.76 : rongMh >= 761 ? 0.84 : 1;
+      const tiLeChu = rongMh >= 761 && rongMh < 1101 ? 0.84 : 0.76;
       b.style.setProperty('--u', String((w / KHO_GOC) * tiLeChu));
       /* ⚠️ GẮN VÀO THẺ BANNER, KHÔNG gắn vào thẻ bọc ngoài.
          Thẻ bọc ngoài do React dựng: mỗi lần React vẽ lại (vd lúc đổi mẫu, thẻ
@@ -351,7 +353,8 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
       /* Điện thoại: vài mẫu khai sẵn khung cắt ảnh riêng (data-vbm) để chủ thể
          nằm phía trên, không bị khối chữ che. Không đổi thì trên màn nhỏ chỉ
          thấy nửa cái thuyền, nửa cái nhà. */
-      const manNho = window.innerWidth <= 760;
+      /* ⚠️ Nay điện thoại dùng bố cục máy tính nên LUÔN giữ khung cắt gốc. */
+      const manNho = false;
       b.querySelectorAll<SVGElement>('svg[data-vbm]').forEach((sv) => {
         if (!sv.dataset.vbGoc) sv.dataset.vbGoc = sv.getAttribute('viewBox') || '';
         sv.setAttribute('viewBox', manNho ? (sv.dataset.vbm || '') : sv.dataset.vbGoc);
@@ -515,53 +518,6 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
     };
   }, [boc, chiSo, tamDung, it, mau.html, hep]);
 
-  /* ── ĐIỆN THOẠI: LẤY CHỮ RA KHỎI ẢNH ──────────────────────────────────────
-     Chủ dự án chỉ sang app batdongsan.com: ở đó banner là MỘT TẤM ẢNH SẠCH,
-     còn chữ và nút nằm hẳn BÊN DƯỚI ảnh. Màn điện thoại chỉ rộng ~390px mà
-     bản thiết kế gốc vẽ trên khổ 1920px, nên chữ đặt trong ảnh co lại thành
-     bé xíu và rơi trúng chỗ ảnh rối → đọc không ra, đúng cái lỗi "bị đè".
-
-     Cách làm: KHÔNG sửa 19 mẫu (chúng do bản thiết kế sinh ra, sửa tay là mất
-     khi tách lại). Thay vào đó ĐỌC chữ có sẵn trong mẫu đang chạy rồi dựng lại
-     thành một khối gọn bên dưới; phần chữ nằm trong ảnh thì ẩn đi bằng CSS
-     (chỉ ở màn ≤767px).
-     ⚠️ Mẫu 3 "Chữ khổng lồ chứa ảnh": chữ CHÍNH LÀ hình, ẩn đi là mất mẫu.
-        Nên mẫu đó giữ nguyên chữ lớn và khối dưới bỏ dòng tiêu đề cho khỏi
-        lặp hai lần. Nhận ra bằng cách tìm thẻ .kc-text. */
-  const [chuDuoi, setChuDuoi] = useState<{
-    kicker: string; tieuDe: string; slogan: string; nut: string; link: string; giuTieuDe: boolean;
-  } | null>(null);
-
-  useEffect(() => {
-    const b = boc?.querySelector<HTMLElement>('.banner');
-    if (!b) { setChuDuoi(null); return; }
-    /* ⚠️ ĐỪNG DÙNG THẲNG textContent. Tiêu đề trong mẫu ngắt dòng bằng <br>,
-       mà textContent bỏ qua thẻ đó → "Biển xanh<br>nắng vàng" dính thành
-       "Biển xanhnắng vàng". Phải thay <br> bằng dấu cách trước.
-       Cũng đừng dùng innerText: mấy khối này đang bị ẩn (display:none) nên
-       innerText trả về rỗng. */
-    const doc = (sel: string) => {
-      const el = b.querySelector(sel);
-      if (!el) return '';
-      const ban = el.cloneNode(true) as HTMLElement;
-      ban.querySelectorAll('br').forEach((br) => br.replaceWith(' '));
-      return (ban.textContent || '').replace(/\s+/g, ' ').trim();
-    };
-    const nut = b.querySelector<HTMLAnchorElement>('a.cta');
-    setChuDuoi({
-      kicker: doc('.kicker'),
-      /* Vài mẫu có HAI thẻ h3: một chữ lớn trang trí và một tiêu đề thật
-         (mẫu 1: "Biển xanh nắng vàng" + "Sống cạnh Bãi Dài"). Ưu tiên thẻ có
-         tên lớp kết thúc bằng "-title" vì đó mới là tiêu đề thật, đi kèm
-         kicker và nút; không có thì mới lấy h3 đầu tiên. */
-      tieuDe: doc('h3[class*="-title"]') || doc('h3'),
-      slogan: doc('.sp-slogan, .kc-sub, .dp-sub, .sl-sub, .pl-sub, .bb-sub, .ui-sub, .fl-sub, .b-slogan, .du-sub, p'),
-      nut: nut ? (nut.textContent || '').replace(/[→\s]+$/, '').trim() : '',
-      link: nut?.getAttribute('href') || '#',
-      giuTieuDe: !!b.querySelector('.kc-text'),
-    });
-  }, [boc, chiSo]);
-
   /* ── Hết một vòng thì sang mẫu sau ───────────────────────────────────────── */
   useEffect(() => {
     if (tamDung) return;
@@ -579,7 +535,7 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
   }, [boc, chiSo, tamDung, it, sang]);
 
   return (
-    <section className="relative" aria-label="Giới thiệu Cam Lâm Land">
+    <section className="cl-b11-khung-ngoai relative" aria-label="Giới thiệu Cam Lâm Land">
       {/* Hình dùng chung cho mọi mẫu (ngôi sao, vầng sáng…). Các mẫu gọi tới nó
           bằng <use href="#star"> — thiếu khối này là đốm sáng mất sạch mà
           KHÔNG báo lỗi gì. Khối svg này rộng 0 cao 0, không hiện gì cả. */}
@@ -663,18 +619,8 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
           khối liền mạch chứ không rời rạc — chủ dự án dặn "cho baner ôm luôn
           phần khung tìm kiếm". Màn máy tính ẩn khối này đi, chữ vẫn nằm trong
           ảnh như thiết kế gốc. */}
-      {chuDuoi && (chuDuoi.tieuDe || chuDuoi.slogan) ? (
-        <div className="cl-b11-duoi">
-          {chuDuoi.kicker ? <span className="cl-b11-duoi-nho">{chuDuoi.kicker}</span> : null}
-          {!chuDuoi.giuTieuDe && chuDuoi.tieuDe ? <h2>{chuDuoi.tieuDe}</h2> : null}
-          {chuDuoi.slogan ? <p>{chuDuoi.slogan}</p> : null}
-          {chuDuoi.nut ? (
-            <a className="cl-b11-duoi-nut" href={chuDuoi.link}>
-              {chuDuoi.nut} <span aria-hidden="true">→</span>
-            </a>
-          ) : null}
-        </div>
-      ) : null}
+      {/* ⚠️ KHỐI CHỮ DƯỚI ẢNH ĐÃ BỎ (25/9/2026): điện thoại nay hiện đúng chữ
+          trong banner như máy tính (xem cuối banner11-them.css). */}
       {children ? (
         <div
           onPointerEnter={() => setDangTim(true)}

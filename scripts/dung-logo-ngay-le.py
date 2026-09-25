@@ -1734,6 +1734,33 @@ def main():
         print('OK %-11s %-22s %d KB' % (ma, ten, os.path.getsize(os.path.join(RA, ma + '.webp')) // 1024))
     ve_xe_tuan_loc()
     _xem_thu(toi, sang)
+    ghi_phien_ban()
+
+
+def ghi_phien_ban():
+    """Ghi "số phiên bản" của bộ logo vào code web.
+
+    ⚠️ CLOUDFLARE GIỮ ẢNH 7 NGÀY THEO TÊN FILE. Dựng lại logo mà giữ nguyên
+       tên file thì tên miền thật vẫn phát ảnh CŨ (đã vấp 25/9/2026: localhost
+       hiện Trung thu mới, tên miền vẫn bản 2 ngày trước). Nên LogoLe.tsx gắn
+       thêm `?v=<số này>` vào đường dẫn ảnh; ảnh đổi → số đổi → Cloudflare coi
+       là ảnh mới. Số tính từ NỘI DUNG ảnh, không đổi ảnh thì không đổi số.
+    """
+    import hashlib
+    h = hashlib.md5()
+    for ten in sorted(os.listdir(RA)):
+        if ten.endswith('.webp'):
+            with open(os.path.join(RA, ten), 'rb') as fh:
+                h.update(ten.encode()); h.update(fh.read())
+    pb = h.hexdigest()[:10]
+    p = os.path.join(GOC, 'apps', 'frontend', 'src', 'lib', 'logoLePhienBan.ts')
+    dong = ['// FILE TỰ SINH bởi scripts/dung-logo-ngay-le.py — đừng sửa tay.',
+            '// Số phiên bản bộ ảnh logo lễ, gắn vào đường dẫn ảnh (?v=…) để',
+            '// Cloudflare không phát ảnh cũ sau mỗi lần dựng lại logo.',
+            "export const LOGO_LE_PB = '%s';" % pb, '']
+    with open(p, 'w', encoding='utf-8', newline=chr(10)) as fh:
+        fh.write(chr(10).join(dong))
+    print('Phiên bản logo:', pb)
 
 
 if __name__ == '__main__':

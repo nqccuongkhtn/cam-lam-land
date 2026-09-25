@@ -621,6 +621,33 @@ def luat_chua_dai(css: str) -> str:
     return dau + ds + ' { margin-bottom: var(--thanh, 0px) }\n'
 
 
+def dong_bo_dien_thoai(css: str) -> str:
+    """ĐIỆN THOẠI DÙNG ĐÚNG BỐ CỤC MÁY TÍNH, chỉ thu nhỏ lại (25/9/2026).
+
+    Chủ dự án: "đồng bộ 2 bản giống nhau 100%", "làm to chữ xíu nhưng phải
+    giữ giống gần như là tuyệt đối". Nên:
+
+    1) TẮT các khối `@media (max-width:760px)` của bản thiết kế — đó là bố cục
+       RIÊNG cho điện thoại (dời chữ xuống đáy, ẩn đôi người chạy…), chính là
+       thứ làm hai bản khác nhau. Đổi thành `(max-width:0px)` = không bao giờ
+       áp, giữ nguyên chữ để còn đọc lại được.
+    2) Cỡ TỐI THIỂU của chữ/nút (`max(26px, …)`, `min-width:22px`) nhân thêm
+       `var(--san, 1)`. Máy tính không đặt --san nên y như cũ. Điện thoại đặt
+       --san nhỏ (banner11-them.css): cỡ tối thiểu cố định mà để nguyên thì
+       trên khung 390px chữ to gấp đôi tỉ lệ, tràn khỏi ô, đè lên hình.
+       Để --san > 0 một chút thì CHỮ NHỎ (số điện thoại, nhãn) vẫn to hơn tỉ lệ
+       — đúng ý "to chữ xíu" — còn tiêu đề lớn vẫn theo đúng tỉ lệ.
+
+    Chạy nhiều lần vẫn an toàn (đã đổi rồi thì không khớp mẫu nữa).
+    """
+    css = css.replace('@media (max-width:760px){', '@media (max-width:0px){')
+    css = re.sub(r'max\(\s*([\d.]+)px\s*,', r'max(calc(\1px * var(--san, 1)),', css)
+    # `(?<!\()` để KHÔNG đụng vào điều kiện @media (min-width:761px)
+    css = re.sub(r'(?<!\()(min-(?:width|height)):\s*([\d.]+)px',
+                 r'\1:calc(\2px * var(--san, 1))', css)
+    return css
+
+
 def main():
     if not os.path.exists(FILE_THIET_KE):
         raise SystemExit(f'Không thấy bản thiết kế: {FILE_THIET_KE}')
@@ -723,7 +750,7 @@ def main():
 
 ''' % len(mau)
     io.open(os.path.join(THU_MUC_RA, 'banner11.css'), 'w', encoding='utf-8', newline='\n').write(
-        dau_de + ra_css.strip() + luat_chua_dai(ra_css) + '\n')
+        dong_bo_dien_thoai(dau_de + ra_css.strip() + luat_chua_dai(ra_css) + '\n'))
 
     dau_ts = '''/* ============================================================================
  *  %d MẪU BANNER ĐỘNG — phần nội dung (mã HTML của từng mẫu)

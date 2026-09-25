@@ -494,7 +494,7 @@ def bat_che(d, cx, cy, w, h, bat, bat_dam, vien):
        vốn trắng, mà trắng thì nổi trên mọi màu bát.
     """
     # ba viên trôi nước nhô trên miệng bát
-    for dx, dy, r in ((-0.22, -0.12, 0.20), (0.22, -0.12, 0.20), (0.0, -0.22, 0.23)):
+    for dx, dy, r in ((-0.25, -0.12, 0.23), (0.25, -0.12, 0.23), (0.0, -0.24, 0.26)):
         d.ellipse([cx + w * dx - w * r, cy + h * dy - h * r * 1.5,
                    cx + w * dx + w * r, cy + h * dy + h * r * 1.5], fill=TRANG)
     # thân bát: hình thang đáy nhỏ
@@ -1263,7 +1263,12 @@ def ve_nhang(d, m):
     #    chấm bẩn, còn bát thì bé quá không ra cái bát (chủ dự án: "hình như
     #    bị sai"). Nay một bát to, ba viên trôi nước trắng nổi rõ, một bông
     #    hoa duy nhất để điểm xuyết.
-    bat_che(d, 366, 76, 152, 100, m['do_tet'], m['do'], m['net'])
+    # ⚠️ MIỆNG BÁT MÀU KEM, KHÔNG PHẢI ĐỎ SẪM. Bát đỏ đặt trên ô vuông navy
+    #    thì đỏ với navy gần bằng độ tối, nhìn ra một vệt sẫm không rõ hình
+    #    (chủ dự án: "hơi khó nhìn"). Cho miệng bát và chân bát màu kem là có
+    #    một đường sáng cắt ngang, cùng với ba viên trôi nước trắng ở trên —
+    #    thu về 32 điểm ảnh vẫn đọc ra ngay "cái bát có gì trắng trắng ở trên".
+    bat_che(d, 366, 76, 152, 100, m['do_tet'], m['kem'], m['net'])
     hoa_nhieu_canh(d, 296, 44, 28, 5, m['hong'], m['kem'], m['vang_sang'])   # 44: cho hở mép trên
 
 

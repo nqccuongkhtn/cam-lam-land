@@ -245,7 +245,13 @@ export default function Home() {
               ⚠️ Vì sao KHÔNG để thẻ trắng như trước: banner có 18 mẫu, mẫu nền
               sáng mẫu nền tối. Thẻ trắng rơi trúng mẫu nền sáng là chìm nghỉm,
               rơi trúng mẫu nền tối thì chói loà. Khung kính tối hợp với cả hai. */}
-          <div className="rounded-2xl border border-white/15 bg-black/45 p-2 shadow-2xl backdrop-blur-md">
+          {/* ⚠️ ĐIỆN THOẠI BỎ KHUNG KÍNH. Trên màn hẹp, khung tìm kiếm đã nằm
+              hẳn DƯỚI ảnh trên một mảng navy liền (xem .cl-b11-tim trong
+              banner11-them.css), nên thêm một thẻ kính tối nữa là hộp lồng
+              trong hộp — viền chồng viền, nhìn rối và tốn mất hai bên 8px
+              vốn đã hẹp. Từ 768px trở lên mới cần khung kính, vì lúc đó nó
+              nằm ĐÈ LÊN ảnh banner. */}
+          <div className="border-0 bg-transparent p-0 shadow-none md:rounded-2xl md:border md:border-white/15 md:bg-black/45 md:p-2 md:shadow-2xl md:backdrop-blur-md">
             {/* Tab kiểu GẠCH CHÂN ĐỎ, làm theo đúng ảnh chủ dự án gửi (giống
                 batdongsan.com.vn): chữ trắng, tab đang chọn in đậm và có một
                 nét đỏ mảnh bên dưới. Không dùng nút bo tròn nền trắng nữa —
@@ -263,9 +269,16 @@ export default function Home() {
 
           {/* Search card */}
             {/* Hàng ô nhập — nằm ngay trong khung kính, không có thẻ trắng riêng */}
-            <div className={`grid w-full gap-2 ${heroDeal === 'project'
+            {/* ⚠️ ĐIỆN THOẠI XẾP HAI CỘT, KHÔNG XẾP DỌC BỐN HÀNG.
+                Trước đây ở màn hẹp lưới rơi về một cột, thành bốn hàng chồng
+                nhau (ô tìm, Loại hình, Mức giá, nút) — cao gần bằng cả tấm
+                banner, che gần hết ảnh, mà banner trên điện thoại chỉ cao
+                268px. Nay: ô tìm chiếm trọn một hàng, hai ô sổ xuống đứng
+                CẠNH NHAU một hàng, nút một hàng → còn ba hàng, thấp hơn hẳn
+                mà vẫn bấm thoải mái. */}
+            <div className={`grid w-full grid-cols-2 gap-2 ${heroDeal === 'project'
               ? 'md:grid-cols-[2.5fr_1fr_auto]' : 'md:grid-cols-[1.5fr_1fr_1fr_auto]'}`}>
-            <label className="flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3 focus-within:border-[#C8A14B]">
+            <label className="col-span-2 flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3 focus-within:border-[#C8A14B] md:col-span-1">
               <Ic d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" />
               <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder={heroDeal === 'project' ? 'Tên dự án: Golden Bay, Khu đô thị mới Cam Lâm…'
                 : heroDeal === 'rent' ? 'Thuê nhà, phòng trọ, mặt bằng… ở khu vực nào?'
@@ -274,9 +287,11 @@ export default function Home() {
             {/* Hai ô sổ xuống dùng OChon chứ không dùng <select> của trình duyệt:
                 bảng sổ xuống của <select> do hệ điều hành vẽ, không chỉnh được,
                 nhìn lạc hẳn với giao diện (xem components/OChon.tsx). */}
-            <OChon giaTri={type} doiGiaTri={(v) => setType(v as PropertyType)} nhan="Loại hình"
-              icon={<Ic d="M3 11l9-8 9 8M5 10v10h14V10" />}
-              dsChon={CATS.map((c) => ({ gt: c.t, ten: PROPERTY_LABELS[c.t] }))} />
+            <div className={heroDeal === 'project' ? 'col-span-2 md:col-span-1' : ''}>
+              <OChon giaTri={type} doiGiaTri={(v) => setType(v as PropertyType)} nhan="Loại hình"
+                icon={<Ic d="M3 11l9-8 9 8M5 10v10h14V10" />}
+                dsChon={CATS.map((c) => ({ gt: c.t, ten: PROPERTY_LABELS[c.t] }))} />
+            </div>
             {/* ⚠️ BẢNG GIÁ ĐỔI THEO TẮB. Chủ dự án bấm sang "Cho thuê" rồi bảo
                 "hình như chưa hoạt động" — đúng, vì trước đó bấm xong mọi thứ
                 vẫn y nguyên: vẫn "Dưới 1 tỷ, dưới 3 tỷ…" trong khi nhà cho thuê
@@ -291,7 +306,7 @@ export default function Home() {
                   : [{ gt: '1', ten: 'Dưới 1 tỷ' }, { gt: '3', ten: 'Dưới 3 tỷ' },
                      { gt: '5', ten: 'Dưới 5 tỷ' }, { gt: '10', ten: 'Dưới 10 tỷ' }]} />
             )}
-              <button onClick={search} className="cl-press whitespace-nowrap rounded-xl bg-red-600 px-6 py-2.5 font-bold text-white shadow-lg shadow-red-600/30 hover:bg-red-700">
+              <button onClick={search} className="cl-press col-span-2 min-h-[44px] whitespace-nowrap rounded-xl bg-red-600 px-6 py-2.5 font-bold text-white shadow-lg shadow-red-600/30 hover:bg-red-700 md:col-span-1">
                 {heroDeal === 'rent' ? 'Tìm thuê' : heroDeal === 'project' ? 'Xem dự án' : 'Tìm kiếm'}
               </button>
             </div>

@@ -987,4 +987,11 @@
      điện thoại nhỏ hơn 3,6 lần thì trông thô. Hạ theo tỉ lệ (chủ dự án: "trên
      web mỏng hơn, nhìn nghệ thuật hơn"). */
   .cl-b11 .rb-edge path { stroke-width: 1.2px }
+  /* Đuôi nét mờ dần trước khi chạm đáy: khung SVG cao 2 lần banner nên ở đáy
+     nét đang dựng thẳng, tách khỏi mép ảnh cong, cụt ngang (chủ dự án khoanh).
+     Mốc 46% của khung = 92% chiều cao banner. */
+  .cl-b11 .rb-edge {
+    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 30%, transparent 46%);
+    mask-image: linear-gradient(to bottom, #000 0, #000 30%, transparent 46%);
+  }
 }

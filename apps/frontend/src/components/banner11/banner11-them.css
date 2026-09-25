@@ -975,8 +975,10 @@
   }
 }
 
-/* Mẫu "Sống cạnh Bãi Dài": đường viền trắng là một SVG khung 100×100 — trình
-   duyệt giữ tỉ lệ VUÔNG của nó nên cao hơn banner (233 so với 200px ở khổ
-   390), đường trắng bị kéo dài, lệch hẳn khỏi mép ảnh cong (chủ dự án khoanh).
-   Ép cao đúng bằng banner. */
-.cl-b11 .rb-edge { height: 100% }
+/* Mẫu "Sống cạnh Bãi Dài": đường viền trắng là SVG khung 100×100 — trình duyệt
+   giữ tỉ lệ VUÔNG nên ở máy tính nó cao ~2 lần banner, chỉ nửa trên lộ ra:
+   thành một nét cắt chéo qua mép ảnh cong. Đó là cái chủ dự án THÍCH ("không
+   làm như bản web được à"). Điện thoại khung vuông chỉ cao 1,17 lần banner nên
+   nét cong gập lại, trông lệch → ép cao 2 lần banner cho giống máy tính.
+   ⚠️ Đừng ép 100% cho "bám mép ảnh" — đã thử, chủ dự án bảo không giống web. */
+@media (max-width: 760px) { .cl-b11 .rb-edge { height: 200% } }

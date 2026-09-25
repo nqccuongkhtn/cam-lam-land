@@ -1,4 +1,4 @@
-const CACHE = 'camlam-v88';   // tăng số này là xoá sạch cache cũ của mọi máy ở lần vào sau
+const CACHE = 'camlam-v89';   // tăng số này là xoá sạch cache cũ của mọi máy ở lần vào sau
 const API_CACHE = 'camlam-api-v1'; // cache RIÊNG cho API công khai (dễ dọn, giới hạn dung lượng)
 const OFFLINE = '/offline.html';
 // Precache khung app để MỞ APP là vẽ ngay (không chờ mạng → hết màn đen ~1s lúc khởi động).
@@ -93,6 +93,30 @@ self.addEventListener('fetch', (e) => {
   // (Ảnh tile và ảnh overlay KHÔNG rơi vào đây — chúng nằm trong thư mục có đánh số bản
   //  qd2101v7, qd918v3… nên đổi bản là đổi đường dẫn, cache-first vẫn vừa đúng vừa nhanh.)
   if (/\.(json|geojson)$/i.test(url.pathname) && !url.pathname.startsWith('/tiles/')) {
+    e.respondWith((async () => {
+      const cache = await caches.open(CACHE);
+      try {
+        const res = await fetch(req);
+        if (res && res.status === 200) { const copy = res.clone(); cache.put(req, copy).catch(() => {}); }
+        return res;
+      } catch (x) {
+        return (await cache.match(req)) || Response.error();
+      }
+    })());
+    return;
+  }
+
+  // ⚠️ ẢNH TÊN CỐ ĐỊNH TRONG public/ (logo ngày lễ, ảnh banner): HỎI MẠNG TRƯỚC.
+  //    Y HỆT cái bẫy của .json/.geojson ở trên, chỉ khác là ảnh. Mấy thư mục
+  //    này KHÔNG có mã băm trong tên: đổi hình mà giữ nguyên tên file thì
+  //    cache-first giữ bản cũ MÃI MÃI — Ctrl+Shift+R cũng vô ích, vì chính
+  //    Service Worker chặn lại rồi trả bản đã lưu, không hỏi máy chủ.
+  //    Đã vấp thật 25/9/2026: sửa logo ngày lễ, dựng lại web xong, máy chủ
+  //    trả đúng ảnh mới (đã đối chiếu mã băm ổ đĩa = container = nginx) mà
+  //    trình duyệt vẫn hiện ảnh cũ.
+  //    Hỏi mạng trước, lấy được thì cập nhật luôn vào cache; mất mạng mới
+  //    lấy bản đã lưu — nên vẫn dùng được khi không có mạng.
+  if (/^\/(logo-le|banner11|tin-mau|bai-dai)\//.test(url.pathname)) {
     e.respondWith((async () => {
       const cache = await caches.open(CACHE);
       try {

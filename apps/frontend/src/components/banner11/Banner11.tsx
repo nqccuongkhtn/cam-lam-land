@@ -196,8 +196,8 @@ function lamNhe(html: string, hep: boolean | null): string {
  *  của mẫu. Tỉ lệ khung ~1,77 cho khớp banner điện thoại (xem Banner11 → doLaiCo). */
 const KHUNG_DT: Record<string, string> = {
   'st-b2': '0 20 760 430',        // "Nổi bật giữa lòng phố": toà nhà về 1/3 trái
-  'st-c18': '620 -57 1300 734',   // "Vươn cao": khung ảnh về bên phải như máy tính
-  'st-b10': '-435 10 1100 640',    // "Nét xưa": tháp phủ kín, chữ trên nền giấy bên trái
+  'st-c18': '540 -57 1300 734',   // "Vươn cao": khung ảnh về bên phải như máy tính
+  'st-b10': '-520 -70 1260 720',   // "Nét xưa": thấy cả ĐỈNH THÁP (chủ dự án dặn), chữ trên nền giấy bên trái
 };
 
 /* ── Khung chứa mã HTML của một mẫu banner ────────────────────────────────────

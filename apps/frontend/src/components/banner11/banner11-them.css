@@ -1062,7 +1062,7 @@
      nét cọ giãn cao 1,75 lần cho quét HẾT chiều cao banner điện thoại — trước chỉ
      quét 4/7, phần dưới tháp không bao giờ hiện màu (chủ dự án: "vẽ thiếu"). */
   .cl-b11 .st-b10 > .fill-svg { left: 0 !important; width: 100% !important }
-  .cl-b11 .st-b10 mask .grp { transform: scale(1, 1.75); transform-origin: 0 0 }
+  /* (giãn nét cọ: làm bằng thuộc tính SVG trong Banner11.tsx, Safari iPhone bỏ qua transform CSS trong <mask>) */
 }
 
 @media (max-width: 760px) {
@@ -1099,4 +1099,15 @@
   .cl-b11 .sl-panel :is(.cta, .sl-sub) { --san-nho: .45 }
   .cl-b11 .sl-panel .kicker { --san-nho: .36 }
   .cl-b11 .sl-panel { padding-top: calc(var(--u) * 110px + var(--dinh)) !important }
+}
+
+@media (max-width: 760px) {
+  /* "Thuần đồ hoạ" — chữ vào Ô TRỐNG NỬA DƯỚI BÊN PHẢI đúng chỗ chủ dự án khoanh
+     (dưới khối đỏ trên, bên phải khối đỏ trái). Chốt theo % chiều cao banner nên máy
+     có hay không có tai thỏ đều rơi đúng ô đó. */
+  .cl-b11 .st-step.red { --S: 1.25 }
+  .cl-b11 .st-step.red .sp-content { left: 44vw !important; right: auto !important; top: 47% !important }
+  .cl-b11 .st-step.red .sp-cta { left: 44vw !important; right: auto !important; top: auto !important; bottom: calc(var(--thanh) + 1.5vw) !important }
+  /* "Thuyền về bến": viền sáng gọn, không loang thành vệt nhoè (chủ dự án: "lỗi nhòe vệt xanh"). */
+  .cl-b11 .b8-edge { filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, .9)) drop-shadow(0 0 4px rgba(94, 234, 212, .8)) !important }
 }

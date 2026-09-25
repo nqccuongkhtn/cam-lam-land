@@ -381,6 +381,27 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
          banner bị ẩn → đúng cái lỗi "mẫu cũ trượt ra chỉ còn khung trống". */
       b.classList.add('san-sang');
 
+      /* ⚠️ NÉT "VẼ DẦN" ĐO ĐỘ DÀI THẬT (25/9/2026). Bản thiết kế khai pathLength="1"
+         rồi để stroke-dasharray:1 — Safari trên iPhone hiểu sai chỗ này, nét thành
+         chấm lấm tấm: ranh thửa flycam "thiếu nét", nét cọ "Nét xưa" tô màu không
+         hết. Đo bằng getTotalLength() rồi đặt độ dài bằng điểm ảnh thì trình duyệt
+         nào cũng như nhau. (Chỉ làm một lần cho mỗi nét.) */
+      b.querySelectorAll<SVGPathElement>('path.draw:not([data-do])').forEach((p) => {
+        const L = Math.ceil(p.getTotalLength?.() || 0);
+        if (!L) return;
+        p.removeAttribute('pathLength');
+        p.style.strokeDasharray = String(L);
+        p.style.strokeDashoffset = String(L);
+        p.dataset.do = '1';
+      });
+      /* Nét cọ "Nét xưa" giãn cao cho phủ hết banner điện thoại: đặt bằng THUỘC TÍNH
+         transform của SVG — transform viết trong CSS cho thứ nằm trong <mask> bị Safari
+         iPhone bỏ qua. */
+      b.querySelectorAll<SVGGElement>('mask .grp').forEach((g) => {
+        if (b.classList.contains('st-b10') && window.innerWidth <= 760) g.setAttribute('transform', 'scale(1 1.75)');
+        else g.removeAttribute('transform');
+      });
+
       /* Điện thoại: vài mẫu khai sẵn khung cắt ảnh riêng (data-vbm) để chủ thể
          nằm phía trên, không bị khối chữ che. Không đổi thì trên màn nhỏ chỉ
          thấy nửa cái thuyền, nửa cái nhà. */

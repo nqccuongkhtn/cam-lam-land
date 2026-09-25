@@ -369,8 +369,8 @@ MAY_LOC_MAU4 = ('<filter id="dpMayMo" x="-40%" y="-120%" width="180%" height="34
 DAU_CAU = [
     ('Lưng tựa núi xanh, mặt hướng biển lớn – Cam Lâm, đất lành để an cư và thịnh vượng',
      'Lưng tựa núi xanh, mặt hướng biển lớn.<br>Cam Lâm là đất lành để an cư và thịnh vượng.'),
-    ('Nước trong, đá đẹp, trời xanh –<br>thiên nhiên còn nguyên vẹn ngay gần nhà bạn.',
-     'Nước trong, đá đẹp, trời xanh.<br>Thiên nhiên còn nguyên vẹn ngay gần nhà bạn.'),
+    ('Nước trong, đá đẹp, trời xanh –<br>thiên nhiên còn nguyên vẹn ngay gần nhà bạn.',
+     'Nước trong, đá đẹp, trời xanh.<br>Thiên nhiên còn nguyên vẹn ngay gần nhà bạn.'),
     ('Sáng ra đồng, chiều ra biển, đi đâu cũng gần – cuộc sống thong thả giữa thiên nhiên trong lành.',
      'Sáng ra đồng, chiều ra biển, đi đâu cũng gần.<br>Cuộc sống thong thả giữa thiên nhiên trong lành.'),
     ('Vừa đi vừa ngắm núi, ngắm biển – đường về Cam Lâm đẹp như một bức tranh.',

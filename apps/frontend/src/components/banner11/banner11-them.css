@@ -448,8 +448,9 @@
 /* ══ ĐIỆN THOẠI: MẪU 19 CHỈ CÒN MỘT TẦNG ẢNH ═══════════════════════════════
    Banner11.tsx đã gỡ hai tầng ảnh sâu khi màn dưới 761px (đỡ ~640 KB tải về).
    Còn một tầng thì không phóng 32 lần được nữa — phóng thế là nhoè. Hạ xuống
-   2,6 lần, vừa đủ thấy động tác "đi vào gần hơn". */
-@media (max-width: 760px) {
+   2,6 lần, vừa đủ thấy động tác "đi vào gần hơn".
+   ⚠️ ĐÃ TẮT 25/9/2026: điện thoại giữ lại đủ ba tầng (bản một tầng bị nhoè). */
+@media (max-width: 0px) {
   .cl-b11 .st-b6 .b6-map.go .m19-phong { animation-name: cl-b11-phong-nhe }
   .cl-b11 .st-b6 .b6-map.go .m19-l1 { animation: none; opacity: 1; visibility: visible }
   .cl-b11 .banner.static .m19-phong { transform: scale(2.6) !important }

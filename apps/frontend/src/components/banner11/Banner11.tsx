@@ -160,6 +160,7 @@ function anhCuaMau(html: string): string[] {
    hình bé cũng chẳng nhìn ra khác biệt.
    Nên với màn dưới 761px: bỏ hai tầng sâu, chỉ giữ tầng toàn cảnh (tiết kiệm
    ~640 KB), và CSS hạ độ phóng xuống cho vừa với một tầng ảnh. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LOP_NANG = /<g class="m19-l[23]"[\s\S]*?<\/g><\/g>/g;
 /* Bộ ảnh thu nhỏ cho điện thoại nằm ở `/banner11/dt/`, cùng tên file, bề ngang
    tối đa 900 điểm ảnh. Dựng bằng scripts/banner11/nen-anh-dien-thoai.py —
@@ -172,7 +173,10 @@ function lamNhe(html: string, hep: boolean | null): string {
      tả để chữ tự ngắt theo khung (banner11-them.css), mà ẩn <br> thì hai chữ
      hai bên dính liền ("xanh –thiên"). Ở tiêu đề (giữ <br>) dấu cách đầu dòng
      tự bị trình duyệt bỏ qua nên không lệch gì. */
-  return html.replace(LOP_NANG, '').replace(ANH_DT, '/banner11/dt/$1.webp')
+  /* ⚠️ KHÔNG bỏ LOP_NANG nữa (25/9/2026): chỉ còn một tầng rồi phóng 2,6 lần là
+     bản đồ quy hoạch nhoè hẳn (chủ dự án: "bản đồ qh cũng mờ"). Điện thoại nay
+     giữ đủ ba tầng như máy tính; ảnh m19 trong dt/ để 1920px nên vẫn nét. */
+  return html.replace(ANH_DT, '/banner11/dt/$1.webp')
     .replace(/<br\s*\/?>/g, '<br> ');
 }
 

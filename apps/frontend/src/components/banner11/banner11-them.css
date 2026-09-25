@@ -760,12 +760,14 @@
 @media (max-width: 760px) {
   .cl-b11 .banner {
     --dinh: calc(56px + env(safe-area-inset-top, 0px));
-    --thanh: 12vw;
+    /* Dải đáy chỉ 3vw: ở máy tính dải này là chỗ ô tìm kiếm, còn điện thoại ô
+       tìm kiếm nằm hẳn bên dưới → để rộng là thừa một dải trống (chủ dự án khoanh). */
+    --thanh: 3vw;
     --san: 0;
     --san-nho: 0;
     --S: 1.55;
     aspect-ratio: auto !important; min-height: 0 !important;
-    height: calc(var(--dinh) + 100vw * 0.40) !important;
+    height: calc(var(--dinh) + 100vw * 0.37) !important;
     /* chữ gốc 16px của trang làm mỗi dòng trong ô chữ cao tối thiểu 16px → co theo --u */
     font-size: calc(var(--u) * 21px);
     border-radius: 0;
@@ -809,7 +811,7 @@
   /* Mẫu 2 "CAM LÂM": chữ vẽ chung SVG với núi, khung SVG phủ kín banner nên bị
      phóng ~1,8 lần (banner điện thoại cao hơn tỉ lệ máy tính) → thu riêng chữ
      (đơn vị khung vẽ 1000×301, gốc 118). 70 = gần kín bề ngang như máy tính. */
-  .cl-b11 .dp-text text { font-size: 70px }
+  .cl-b11 .dp-text text { font-size: 64px }
 
   /* Mẫu "Làng biển": viền sóng trắng là nét CỐ ĐỊNH 3px (không co theo banner)
      → trên điện thoại nhỏ hơn ~3,6 lần nên trông dày hẳn. Hạ theo tỉ lệ. */
@@ -950,3 +952,25 @@
    mới luôn bắt đầu dòng mới, câu dài thì chia dòng CÂN nhau thay vì để đuôi
    cụt một hai chữ. */
 .cl-b11 .cl-cau { display: block; text-wrap: balance }
+
+@media (max-width: 760px) {
+  /* Mẫu "CAM LÂM" trên iPhone có TAI THỎ: phần tai thỏ làm banner cao thêm ~47px
+     → khung ảnh phủ kín bị phóng thêm, chữ CAM LÂM (nằm GIỮA lớp trời và lớp
+     núi, không dời riêng được) chui lên sau menu. Dời cả cảnh xuống đúng bằng
+     tai thỏ; khoảng trên tô màu trời lấy từ mép trên ảnh cho liền.
+     Máy không tai thỏ: env() = 0 → không đổi gì. */
+  .cl-b11 .st-depth { background: rgb(158, 184, 221) }
+  .cl-b11 .st-depth > .fill-svg { top: env(safe-area-inset-top, 0px); height: calc(100% - env(safe-area-inset-top, 0px)) }
+
+  /* Mẫu "Sống cạnh Bãi Dài": đôi người to thêm 10% (chủ dự án dặn), đứng yên chân. */
+  .cl-b11 .rb-couple { scale: 1.1; transform-origin: 50% 100% }
+
+  /* Mẫu "Màu thật của biển": đường sáng chia đen trắng / màu dừng giữa chừng
+     đúng chỗ chữ "Land" của logo (chủ dự án: "điểm cắt dính chữ land"). Dời đi
+     đâu cũng đụng logo hoặc nút chat → cho nó MỜ DẦN rồi tắt hẳn khi lên tới
+     thanh menu. */
+  .cl-b11 .du-edge {
+    -webkit-mask-image: linear-gradient(to bottom, transparent calc(8% + var(--dinh)), #000 calc(8% + var(--dinh) + 40px));
+    mask-image: linear-gradient(to bottom, transparent calc(8% + var(--dinh)), #000 calc(8% + var(--dinh) + 40px));
+  }
+}

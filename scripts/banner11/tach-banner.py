@@ -363,21 +363,22 @@ MAY_LOC_MAU4 = ('<filter id="dpMayMo" x="-40%" y="-120%" width="180%" height="34
 # rơi vào đâu cũng tự nhiên.
 # Quy ước chung cho mọi dòng mô tả:
 #   · không dùng "–" / "—" nối hai ý; ý thứ hai thành câu mới;
-#   · câu nào cũng kết thúc bằng dấu chấm;
+#   · câu nào cũng kết thúc bằng dấu chấm, và MỖI CÂU BẮT ĐẦU DÒNG MỚI (<br>)
+#     — câu dài thì tự xuống dòng tiếp, không bao giờ câu mới chen giữa dòng;
 #   · dòng nhãn / khẩu hiệu dạng "A · B · C" giữ nguyên (không phải câu).
 DAU_CAU = [
     ('Lưng tựa núi xanh, mặt hướng biển lớn – Cam Lâm, đất lành để an cư và thịnh vượng',
-     'Lưng tựa núi xanh, mặt hướng biển lớn. Cam Lâm là đất lành để an cư và thịnh vượng.'),
+     'Lưng tựa núi xanh, mặt hướng biển lớn.<br>Cam Lâm là đất lành để an cư và thịnh vượng.'),
     ('Nước trong, đá đẹp, trời xanh –<br>thiên nhiên còn nguyên vẹn ngay gần nhà bạn.',
      'Nước trong, đá đẹp, trời xanh.<br>Thiên nhiên còn nguyên vẹn ngay gần nhà bạn.'),
     ('Sáng ra đồng, chiều ra biển, đi đâu cũng gần – cuộc sống thong thả giữa thiên nhiên trong lành.',
-     'Sáng ra đồng, chiều ra biển, đi đâu cũng gần. Cuộc sống thong thả giữa thiên nhiên trong lành.'),
+     'Sáng ra đồng, chiều ra biển, đi đâu cũng gần.<br>Cuộc sống thong thả giữa thiên nhiên trong lành.'),
     ('Vừa đi vừa ngắm núi, ngắm biển – đường về Cam Lâm đẹp như một bức tranh.',
-     'Vừa đi vừa ngắm núi, ngắm biển. Đường về Cam Lâm đẹp như một bức tranh.'),
+     'Vừa đi vừa ngắm núi, ngắm biển.<br>Đường về Cam Lâm đẹp như một bức tranh.'),
     ('Tìm đất, xem bản đồ, nhắn tư vấn – mọi thứ gói gọn trong một chạm.',
-     'Tìm đất, xem bản đồ, nhắn tư vấn. Mọi thứ gói gọn trong một chạm.'),
+     'Tìm đất, xem bản đồ, nhắn tư vấn.<br>Mọi thứ gói gọn trong một chạm.'),
     ('Sát mặt sông, cạnh cầu lớn, xung quanh là phố đã có người ở — đi lại, mua bán đều thuận.',
-     'Sát mặt sông, cạnh cầu lớn, xung quanh là phố đã có người ở. Đi lại, mua bán đều thuận tiện.'),
+     'Sát mặt sông, cạnh cầu lớn, xung quanh là phố đã có người ở.<br>Đi lại, mua bán đều thuận tiện.'),
     ('Những buổi chiều bình yên bên biển Cam Lâm<',
      'Những buổi chiều bình yên bên biển Cam Lâm.<'),
 ]

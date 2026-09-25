@@ -789,7 +789,7 @@
   .cl-b11 .kicker { --san-nho: .36 }
   .cl-b11 [class*="-slogan"] { --san-nho: .34 }
   .cl-b11 :is(.kicker, h3, .cta, [class*="-slogan"]) { white-space: nowrap !important }
-  .cl-b11 :is(p, [class*="-sub"]) br { display: none }
+  /* <br> trong dòng mô tả nay chỉ nằm giữa hai câu (mỗi câu một dòng) nên GIỮ, không ẩn nữa. */
   .cl-b11 :is(p, [class*="-sub"]) { text-wrap: pretty }
   .cl-b11 .rb-row { --san-nho: 0 }
 
@@ -942,6 +942,7 @@
 
 /* ══ NGUYÊN TẮC XUỐNG DÒNG CHO DÒNG MÔ TẢ (máy tính + điện thoại) ══════════
    · Không để một chữ đứng lẻ loi ở dòng cuối (text-wrap: pretty).
+   · Mỗi câu bắt đầu dòng mới (<br> giữa hai câu, khai ở DAU_CAU).
    · Dấu câu: xem DAU_CAU trong scripts/banner11/tach-banner.py — không dùng
      gạch ngang nối hai ý, mỗi ý là một câu có dấu chấm. */
 .cl-b11 :is(p, [class*="-sub"]) { text-wrap: pretty }

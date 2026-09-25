@@ -782,7 +782,10 @@
   .cl-b11 .dp-content { right: auto !important; width: calc((100% - var(--u) * 240px) / var(--S)) }
 
   /* 3) chữ nhỏ nâng thêm; chỗ xuống dòng */
-  .cl-b11 :is(.kicker, .cta, [class*="-sub"], [class*="-slogan"]) { --san-nho: .45 }
+  .cl-b11 :is(.cta, [class*="-sub"], [class*="-slogan"]) { --san-nho: .45 }
+  /* Nhãn nhỏ trên tiêu đề nâng ÍT hơn: nâng .45 thì nhãn dài ("BIỂN XANH · GHỀNH
+     ĐÁ · NẮNG VÀNG") vượt khỏi cột chữ — chủ dự án: "nắng vàng bị tràn". */
+  .cl-b11 .kicker { --san-nho: .36 }
   .cl-b11 [class*="-slogan"] { --san-nho: .34 }
   .cl-b11 :is(.kicker, h3, .cta, [class*="-slogan"]) { white-space: nowrap !important }
   .cl-b11 :is(p, [class*="-sub"]) br { display: none }
@@ -807,6 +810,10 @@
      (đơn vị khung vẽ 1000×301, gốc 118). 70 = gần kín bề ngang như máy tính. */
   .cl-b11 .dp-text text { font-size: 70px }
 
+  /* Mẫu "Làng biển": viền sóng trắng là nét CỐ ĐỊNH 3px (không co theo banner)
+     → trên điện thoại nhỏ hơn ~3,6 lần nên trông dày hẳn. Hạ theo tỉ lệ. */
+  .cl-b11 .pp-edge path { stroke-width: 1.2px }
+
   /* Mẫu "Làng biển bình yên", "Thuần đồ hoạ": khối chữ đặt theo tỉ lệ máy tính */
   .cl-b11 .st-step.red { --S: 1.35 }
   .cl-b11 .st-step.red .sp-content { top: calc(var(--dinh) + 5vw) !important }
@@ -816,7 +823,13 @@
      mép nhau), gói trong nửa phải, dưới menu. Chủ dự án chê bản xếp lưới 2×2
      "xấu" và bản đầu "dày, đè chữ". */
   .cl-b11 .st-pol .pol { scale: 1.1 !important; transform-origin: 0 0; margin-top: 0 !important }
-  .cl-b11 .st-pol .p1 { left: 49% !important;   top: calc(var(--dinh) + 7vw) !important }
+  /* p1 lùi trái 1,5%: chú thích "Mùa gặt Cam Lâm" dài nhất, đuôi chữ bị tấm p2
+     đè lên (chủ dự án: "mất chữ m"). */
+  .cl-b11 .st-pol .p1 { left: 47.5% !important; top: calc(var(--dinh) + 7vw) !important }
+  /* ⚠️ Kiểu chữ "Dancing Script" CHỈ ĐƯỢC KHAI TÊN, không có tệp chữ đi kèm →
+     mỗi máy tự thay một kiểu chữ viết tay khác (iPhone rộng hơn Chrome). Cho
+     chú thích tự co vừa khung ảnh, kiểu chữ nào cũng không tràn. */
+  .cl-b11 .st-pol .pol b { letter-spacing: -.03em; left: 2%; right: 2%; overflow: hidden; text-overflow: clip }
   .cl-b11 .st-pol .p2 { left: 61.5% !important; top: calc(var(--dinh) + 16vw) !important }
   .cl-b11 .st-pol .p3 { left: 73% !important;   top: calc(var(--dinh) + 5vw) !important }
   .cl-b11 .st-pol .p4 { left: 84.5% !important; top: calc(var(--dinh) + 14vw) !important }
@@ -858,4 +871,10 @@
      đường xé giấy) để chữ tối nằm trên nền giấy; con dấu theo khối chữ */
   .cl-b11 .st-b10 > .fill-svg { left: 29vw !important; width: 100% !important }
   .cl-b11 .st-b10 .b10-seal { left: calc(var(--u) * 662px) !important; top: calc(var(--u) * 59px + var(--dinh)) !important }
+}
+
+/* Mẫu 1: "Biển xanh nắng vàng" hạ thấp hơn dải đáy chung một chút (chủ dự án:
+   "hạ xuống tí"). Khối này neo mép dưới, dải đáy chung --thanh là 12vw. */
+@media (max-width: 760px) {
+  .cl-b11 .rb-big { margin-bottom: 7vw }
 }

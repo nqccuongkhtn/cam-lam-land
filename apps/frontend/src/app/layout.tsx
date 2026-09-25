@@ -33,7 +33,11 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 } },
   manifest: '/manifest.webmanifest',
   appleWebApp: { capable: true, title: 'Cam Lâm Land', statusBarStyle: 'black-translucent' },
-  icons: { icon: '/icons/icon-192.png', shortcut: '/icons/icon-192.png', apple: '/icons/apple-180.png' },
+  /* ⚠️ GẮN ?v= VÀO BIỂU TƯỢNG: Cloudflare giữ ảnh 7 ngày theo tên file, đổi logo
+     mà giữ tên thì iPhone "Thêm vào Màn hình chính" vẫn ra biểu tượng CŨ (đã vấp
+     25/9/2026 — ra ngôi nhà cũ). Đổi ảnh trong public/icons/ thì đổi luôn số này
+     (lấy 8 ký tự đầu md5 của apple-180.png) và số trong manifest.webmanifest. */
+  icons: { icon: '/icons/icon-192.png?v=c5b77735', shortcut: '/icons/icon-192.png?v=c5b77735', apple: '/icons/apple-180.png?v=f6114d8f' },
 };
 export const viewport: Viewport = { themeColor: '#0A2540', viewportFit: 'cover' };
 

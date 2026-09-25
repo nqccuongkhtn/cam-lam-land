@@ -939,3 +939,9 @@
   .cl-b11 .typing { gap: 2px; padding: calc(var(--u) * 12px) calc(var(--u) * 16px) }
   .cl-b11 .typing i { width: 3px; height: 3px }
 }
+
+/* ══ NGUYÊN TẮC XUỐNG DÒNG CHO DÒNG MÔ TẢ (máy tính + điện thoại) ══════════
+   · Không để một chữ đứng lẻ loi ở dòng cuối (text-wrap: pretty).
+   · Dấu câu: xem DAU_CAU trong scripts/banner11/tach-banner.py — không dùng
+     gạch ngang nối hai ý, mỗi ý là một câu có dấu chấm. */
+.cl-b11 :is(p, [class*="-sub"]) { text-wrap: pretty }

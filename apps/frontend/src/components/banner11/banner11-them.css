@@ -917,3 +917,9 @@
      kế gốc cũng ẩn ở màn nhỏ. */
   .cl-b11 .st-ui .ui-toast { display: none !important }
 }
+
+/* Mẫu "Mọi cung đường": ảnh con đường to ra lấp khoảng trống giữa chữ và ảnh
+   (chủ dự án: "khoảng trống thừa quá nhiều trong khi ảnh thì nhỏ"). */
+@media (max-width: 760px) {
+  .cl-b11 .st-c16 .c16-card { width: 55vw !important; right: 2vw !important; top: calc(var(--dinh) + 1vw) !important; bottom: 2.5vw !important }
+}

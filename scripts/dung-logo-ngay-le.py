@@ -82,7 +82,11 @@ MAU_NEN_SANG = dict(
     #    nhìn vẫn xỉn (chủ dự án: "màu những chỗ cần tươi hình như chưa sửa
     #    vẫn mờ mờ"). Cách đúng không phải làm NHẠT đi mà đẩy về phía CAM:
     #    cam vàng đậm vẫn tươi mà đặt trên trắng vẫn đọc rõ từng nét.
-    vang=(242, 150, 0), vang_sang=(255, 176, 12), kem=(210, 160, 70),
+    # ⚠️ 25/9/2026 chủ dự án so hai cột trong _xem-thu.png: "màu vàng bên
+    #    trái ok hơn, bên phải nó cứ bị sẫm". Bên phải là bản cho NỀN TRẮNG.
+    #    Đẩy sáng thêm một nấc nữa cho gần bằng bên nền tối, vẫn giữ chút sắc
+    #    cam để không chìm vào giấy trắng.
+    vang=(253, 186, 10), vang_sang=(255, 214, 80), kem=(226, 178, 86),
     nau=(96, 58, 30), do=(210, 28, 20), do_tet=(206, 30, 30),
     hong=(220, 62, 108), xanh=(62, 116, 52), vang_co=VANG_CO,
 )
@@ -640,7 +644,10 @@ def dan_chan_dung(lop, cx, cy, cao, mau, vien=None):
     bong = anh.getchannel('A')
     if vien is not None:
         # nở bóng hình ra ~0,7 điểm ảnh ở cỡ thật (lớp đang vẽ to gấp PHONG lần)
-        no = bong.filter(ImageFilter.MaxFilter(25))
+        # ⚠️ 13 chứ không phải 25. Nở 25 điểm (ở lớp vẽ to gấp 4) ra viền dày
+        #    gần 0,7 điểm ảnh thật, ôm kín hình nên nhìn BỊ ĐẬM, mất nét khắc
+        #    (chủ dự án: "bác hồ đang bị đậm quá"). 13 là một sợi chỉ mảnh.
+        no = bong.filter(ImageFilter.MaxFilter(13))
         lop_vien = Image.new('RGBA', anh.size, tuple(vien) + (255,))
         lop_vien.putalpha(no)
         lop.alpha_composite(lop_vien, goc)
@@ -1125,8 +1132,11 @@ def ve_nha_giao(d, m):
     # quyển sách mở
     d.polygon([(306, 104), (368, 88), (368, 138), (306, 150)], fill=m['vang'])
     d.polygon([(430, 104), (368, 88), (368, 138), (430, 150)], fill=m['vang'])
-    d.polygon([(314, 106), (364, 93), (364, 132), (314, 143)], fill=m['net'])
-    d.polygon([(422, 106), (372, 93), (372, 132), (422, 143)], fill=m['net'])
+    # ⚠️ RUỘT VỞ LUÔN MÀU TRẮNG, đừng lấy theo màu nét của nền. Lấy m['net']
+    #    thì ở bản cho NỀN TRẮNG ruột vở thành navy — quyển vở đen sì, nhìn
+    #    không ra trang giấy (chủ dự án: "nội dung của vở để màu trắng").
+    d.polygon([(314, 106), (364, 93), (364, 132), (314, 143)], fill=TRANG)
+    d.polygon([(422, 106), (372, 93), (372, 132), (422, 143)], fill=TRANG)
     d.polygon([(364, 90), (372, 90), (372, 138), (364, 138)], fill=m['nau'])
     mu_tot_nghiep(d, 366, 48, 104, 74, m['vang_sang'], m['do_tet'])
 
@@ -1166,14 +1176,17 @@ def ve_doanh_nhan(d, m):
     d.polygon([(436, 28), (396, 34), (414, 62)], fill=m['do_tet'])
 
 
-def ve_ong_tao(d, m):
-    """Ông Công ông Táo (23 tháng Chạp): cá chép vàng vượt sóng."""
-    # ⚠️ Sóng phải DÀY: bề dày ngọn sóng tính theo `h`, h=28 thì nét chỉ còn
-    #    0,7 điểm ảnh ở cỡ thật — mất hẳn, cá thành ra bơi giữa không khí
-    #    (chủ dự án: "mờ"). Nay h=42 và cá to hơn một nấc.
-    song_nuoc(d, 366, 136, 152, 42, m['kem'])
-    ca_chep_bay(d, 360, 86, 150, 100, m['do_tet'], m['vang_sang'], m['net'])   # 74: cho hở mép trên
+def ve_ong_tao(d, m, lop=None):
+    """Ông Công ông Táo (23 tháng Chạp): ông Táo cưỡi cá chép.
 
+    ⚠️ KHÔNG VẼ TAY NỮA. Chủ dự án gửi ảnh minh hoạ và dặn cắt lấy hình đó
+       (scripts/anh/ong-tao.png, do scripts/tach-nen-anh-le.py tách nền).
+       Bản vẽ tay trước chỉ có con cá chép với mấy ngọn sóng — thiếu hẳn ông
+       Táo, mà ông Táo mới là nhân vật của ngày này.
+    """
+    if lop is None:
+        return
+    dan_anh(lop, 'ong-tao.png', 368, 84, cao=148)
 
 def ve_lao_dong(d, m):
     """1/5 Quốc tế Lao động: nắm tay giơ cao trước bánh răng.
@@ -1296,8 +1309,12 @@ def ve_nhang(d, m):
     #    (chủ dự án: "hơi khó nhìn"). Cho miệng bát và chân bát màu kem là có
     #    một đường sáng cắt ngang, cùng với ba viên trôi nước trắng ở trên —
     #    thu về 32 điểm ảnh vẫn đọc ra ngay "cái bát có gì trắng trắng ở trên".
-    bat_che(d, 366, 76, 152, 100, m['do_tet'], m['kem'], m['net'])
-    hoa_nhieu_canh(d, 296, 44, 28, 5, m['hong'], m['kem'], m['vang_sang'])   # 44: cho hở mép trên
+    # ⚠️ BỎ HẲN BÔNG HOA, để CÁI BÁT CHIẾM TRỌN KHUÔN. Có thêm bông hoa thì
+    #    máy phải thu cả cụm (hoa + bát) cho vừa khuôn, nên cái bát chỉ còn
+    #    khoảng hai phần ba — ở cỡ 32 điểm ảnh là nhoè thành một đốm
+    #    (chủ dự án nhắc hai lần: "hơi khó nhìn", rồi "tô chè vẫn mờ").
+    #    Một mình cái bát thì nó to hết cỡ khuôn, đọc ra ngay.
+    bat_che(d, 366, 96, 196, 132, m['do_tet'], m['kem'], m['net'])
 
 
 def ve_hoa_cuc(d, m):

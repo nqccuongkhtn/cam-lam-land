@@ -486,7 +486,11 @@ def phao_hoa(d, cx, cy, r, so, mau, mau2, day=3.0):
 def bat_che(d, cx, cy, w, h, bat, bat_dam, vien):
     """Bát chè trôi nước — món của Tết Nguyên tiêu (rằm tháng Giêng).
 
-    ⚠️ VIÊN TRÔI NƯỚC LUÔN MÀU TRẮNG, đừng lấy theo màu nét của nền. Bản
+    ⚠️ VIÊN TRÔI NƯỚC LUÔN MÀU TRẮNG NGÀ (252,244,224), đừng lấy theo màu
+       nét của nền và cũng đừng để trắng tinh. Trắng tinh thì trên trang quản
+       lý (nền trắng) viên chè lẫn luôn vào nền giấy; ngà một chút là tách ra
+       mà vẫn đọc là "chè trắng" (chủ dự án: "phần cơm trắng thôi có thể làm
+       màu khác tí so với nền"). Bản
        trước dùng `vien` (tức m['net']) nên ở bản cho NỀN TRẮNG màu nét là
        navy — viên chè navy nằm trong bát đỏ sẫm, hai màu cùng độ tối nên
        nhìn thành một khối đỏ đặc, không thấy chè đâu (chủ dự án: "phần thức
@@ -496,14 +500,18 @@ def bat_che(d, cx, cy, w, h, bat, bat_dam, vien):
     # ba viên trôi nước nhô trên miệng bát
     for dx, dy, r in ((-0.25, -0.12, 0.23), (0.25, -0.12, 0.23), (0.0, -0.24, 0.26)):
         d.ellipse([cx + w * dx - w * r, cy + h * dy - h * r * 1.5,
-                   cx + w * dx + w * r, cy + h * dy + h * r * 1.5], fill=TRANG)
+                   cx + w * dx + w * r, cy + h * dy + h * r * 1.5], fill=(252, 244, 224))
+    # ⚠️ KHÔNG VIỀN QUANH BÁT. Đã thử viền kem bao cả thân bát — chủ dự án
+    #    bảo "viền thì hơi thô". Cách tách bát khỏi nền là để MIỆNG BÁT màu
+    #    kem (một vệt sáng cắt ngang) và mấy viên chè màu ngà, chứ không kẻ
+    #    viền.
     # thân bát: hình thang đáy nhỏ
     d.polygon([(cx - w * 0.50, cy), (cx + w * 0.50, cy),
                (cx + w * 0.26, cy + h * 0.62), (cx - w * 0.26, cy + h * 0.62)], fill=bat)
     # miệng bát
     d.ellipse([cx - w * 0.50, cy - h * 0.14, cx + w * 0.50, cy + h * 0.14], fill=bat_dam)
     # chân bát
-    d.rectangle([cx - w * 0.16, cy + h * 0.60, cx + w * 0.16, cy + h * 0.76], fill=bat_dam)
+    d.rectangle([cx - w * 0.16, cy + h * 0.60, cx + w * 0.16, cy + h * 0.78], fill=bat_dam)
 
 
 def chum_mimosa(d, cx, cy, r, mau, dam, la):
@@ -607,11 +615,20 @@ def dan_anh(lop, ten, cx, cy, cao=None, lat=False, xoay=0.0, rong=None, neo='giu
         lop.alpha_composite(anh, (int(cx * PHONG - w / 2), int(cy * PHONG - h / 2)))
 
 
-def dan_chan_dung(lop, cx, cy, cao, mau):
+def dan_chan_dung(lop, cx, cy, cao, mau, vien=None):
     """Dán hình khắc chân dung vào lớp trang trí, tô theo màu cho trước.
 
-    Toạ độ ghi theo cỡ THẬT (435×288) giống mọi hàm vẽ khác; ở đây tự nhân
+    Toạ độ ghi theo cỡ THẬT (560×288) giống mọi hàm vẽ khác; ở đây tự nhân
     lên PHONG vì hàm này dán ảnh chứ không đi qua bộ bọc _ve_phong().
+
+    ⚠️ `vien` = VIỀN SÁNG MỎNG ÔM QUANH HÌNH. Chân dung in nét đỏ đặt thẳng
+       lên ô vuông navy thì đỏ với navy gần bằng độ sáng, thu về 32 điểm ảnh
+       chỉ còn một vệt đỏ tối. Chủ dự án muốn giữ MÀU ĐỎ nhưng "nhìn rõ hơn
+       tí", mà bản đặt lên huy hiệu tròn nền kem thì đã bị chê nặng nề.
+       Viền mỏng là cách nhẹ nhất: nở bóng hình ra vài điểm rồi tô màu nét
+       của nền (trắng trên nền tối, navy trên nền trắng), dán xuống dưới —
+       nhìn như hình được viền một sợi chỉ sáng, đỏ bật hẳn lên mà không
+       thêm khối hình nào.
     """
     if not os.path.exists(_CHAN_DUNG):
         return
@@ -619,9 +636,17 @@ def dan_chan_dung(lop, cx, cy, cao, mau):
     h = int(cao * PHONG)
     w = max(1, round(h * anh.width / anh.height))
     anh = anh.resize((w, h), Image.LANCZOS)
+    goc = (int(cx * PHONG - w / 2), int(cy * PHONG - h / 2))
+    bong = anh.getchannel('A')
+    if vien is not None:
+        # nở bóng hình ra ~0,7 điểm ảnh ở cỡ thật (lớp đang vẽ to gấp PHONG lần)
+        no = bong.filter(ImageFilter.MaxFilter(25))
+        lop_vien = Image.new('RGBA', anh.size, tuple(vien) + (255,))
+        lop_vien.putalpha(no)
+        lop.alpha_composite(lop_vien, goc)
     to = Image.new('RGBA', anh.size, tuple(mau) + (255,))
-    to.putalpha(anh.getchannel('A'))
-    lop.alpha_composite(to, (int(cx * PHONG - w / 2), int(cy * PHONG - h / 2)))
+    to.putalpha(bong)
+    lop.alpha_composite(to, goc)
 
 
 def ca_chep_bay(d, cx, cy, w, h, than, vay, mat):
@@ -1234,7 +1259,7 @@ def ve_sen(d, m, lop=None):
     #    tấm hình, nên hình nằm SÁT mép phải ô vuông thay vì bị đẩy ra giữa
     #    khuôn — xem HOP_RIENG['sen'].
     if lop is not None:
-        dan_chan_dung(lop, 380, 90, 148, m['net'])   # 90: cho hở mép trên
+        dan_chan_dung(lop, 380, 90, 148, m['do'], vien=m['net'])   # 90: cho hở mép trên
 
 def ve_nen(d, m):
     """27/7 Thương binh Liệt sĩ: ngôi sao vàng và tấm băng đỏ "Tổ quốc ghi công".

@@ -64,14 +64,22 @@ VANG_CO = (255, 222, 0)      # ngôi sao trên cờ — luôn nằm trên nền 
 #       sắc độ và nhìn như hình dán rẻ tiền.
 MAU_NEN_TOI = dict(
     net=TRANG,
-    vang=(248, 199, 72), vang_sang=(255, 221, 92), kem=(245, 222, 170),
+    # ⚠️ VÀNG GOLD TƯƠI, SÁNG (chủ dự án chốt 25/9/2026: "cho gold và sáng
+    #    lên"). Bản cũ (248,199,72)/(255,221,92) ngả về vàng nhạt, đặt trên
+    #    navy nhìn xỉn. Sửa ở ĐÂY là cả loạt dịp cùng sáng lên một lượt —
+    #    doanh nhân, Vua Hùng, nón lá, thiếu nhi, Nguyên tiêu, Tết Dương
+    #    lịch, Đoan Ngọ, Thương binh Liệt sĩ, Vu Lan, Trung thu, Lao động,
+    #    Ông Táo — chứ không phải sửa tay từng dịp.
+    vang=(255, 199, 40), vang_sang=(255, 229, 126), kem=(250, 233, 192),
     nau=(146, 90, 46), do=(232, 42, 32), do_tet=(228, 46, 46),
     hong=(244, 118, 146), xanh=(96, 156, 80), vang_co=VANG_CO,
 )
 # Nền sáng (thanh menu trắng): cùng sắc nhưng đậm hơn cho đọc rõ trên trắng.
 MAU_NEN_SANG = dict(
     net=NAVY,
-    vang=(198, 138, 16), vang_sang=(216, 156, 20), kem=(186, 140, 60),
+    # Nền TRẮNG thì chỉ nhích sáng một chút thôi: sáng quá là vàng chìm
+    # vào nền trắng, nhìn không ra hình.
+    vang=(214, 150, 12), vang_sang=(232, 170, 16), kem=(196, 148, 62),
     nau=(96, 58, 30), do=(210, 28, 20), do_tet=(206, 30, 30),
     hong=(220, 62, 108), xanh=(62, 116, 52), vang_co=VANG_CO,
 )
@@ -971,8 +979,16 @@ def ve_tet(d, m, lop=None):
     #    Mâm Tết tự nó đã có dưa hấu + bánh chưng + cành đào — ba thứ nhỏ
     #    chen nhau trong khoảng bằng đầu que tăm. Bỏ nó đi thì cành mai to
     #    được thêm và đọc ra ngay.
-    #    Ảnh scripts/anh/tet-mam.png vẫn giữ, cần thì lấy lại dùng chỗ khác.
-    dan_anh(lop, 'tet-mai.png', 250, 152, rong=168, lat=True, xoay=40, neo='duoi-trai')
+    # ⚠️ GỐC CÀNH NẰM TRÊN CHỮ C, mép phải cụm DỪNG TRƯỚC CHỮ.
+    #    Chủ dự án 25/9/2026: "dời gốc mai vào chữ C và cho to lên vừa đụng
+    #    chứ đừng che chữ Cam Lâm Land, vẫn giữ mâm hoa quả bánh chưng cho
+    #    to lên xíu".
+    #    Chữ "Cam Lâm Land" bắt đầu ở khoảng 42 điểm ảnh cỡ thật = 378 ở đây,
+    #    nên mép phải cụm phải ≤ 378. Gốc cành đặt ở 202 (nằm trên nét chữ C)
+    #    cộng bề ngang 176 là vừa chạm 378 — "vừa đụng" đúng như chủ dự án
+    #    nói, không đè lên chữ.
+    dan_anh(lop, 'tet-mai.png', 202, 168, rong=176, lat=True, xoay=40, neo='duoi-trai')
+    dan_anh(lop, 'tet-mam.png', 268, 208, cao=104)
 
 
 def ve_tet_duong(d, m):
@@ -1183,15 +1199,20 @@ def ve_sen(d, m, lop=None):
     động (xem scripts/tao-chan-dung-bac.py) — thu nhỏ vẫn còn đường nét.
     Chân dung để TO gần hết chiều cao logo, vì đây là thứ chính của ngày này.
 
-    ⚠️ NÉT TRẮNG TRÊN NỀN TỐI, nét đỏ trên nền trắng — tức đúng bản này.
-       Chủ dự án chốt 25/9/2026: "ảnh Bác thì về màu trắng". Đã thử hai bản
-       khác rồi bỏ cả hai: in nét ĐỎ thẳng lên navy thì tối quá không thấy;
-       đặt nét đỏ lên một huy hiệu tròn nền kem thì rõ nhưng không ưng.
-       ĐỪNG SỬA NỮA.
+    ⚠️ CHÂN DUNG LẤY ĐÚNG MÀU NÉT CỦA NỀN ĐANG DỰNG — trắng trên thanh menu
+       tối, navy trên thanh menu trắng. KHÔNG DÙNG MÀU ĐỎ nữa.
+       Chủ dự án chốt 25/9/2026: "ảnh Bác thì về màu trắng", xem lại vẫn
+       thấy đỏ nên nhắc tiếp "ảnh bác vẫn màu đỏ" — chỗ còn đỏ chính là bản
+       cho NỀN TRẮNG (đuôi -toi), vì dòng cũ viết
+       `m['net'] if m['net'] != NAVY else m['do']`, tức nền trắng thì cố
+       tình đổi sang đỏ. Trắng trên nền trắng thì không thấy gì, nên nền
+       trắng dùng NAVY — đúng màu nét của chính cái logo.
+       Đã thử rồi bỏ: nét đỏ thẳng trên navy (tối quá không thấy) và nét đỏ
+       đặt trên huy hiệu tròn nền kem (rõ nhưng không ưng). ĐỪNG SỬA NỮA.
     """
     hoa_nhieu_canh(d, 320, 126, 26, 7, m['hong'], m['kem'], m['vang_sang'])
     if lop is not None:
-        dan_chan_dung(lop, 380, 76, 148, m['net'] if m['net'] != NAVY else m['do'])
+        dan_chan_dung(lop, 380, 76, 148, m['net'])
 
 def ve_nen(d, m):
     """27/7 Thương binh Liệt sĩ: ngôi sao vàng và tấm băng đỏ "Tổ quốc ghi công".

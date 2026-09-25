@@ -97,7 +97,10 @@ BO_MAU = [
 #    số mẫu còn được dùng ở BO_MAU, SUA_CHU, DOI_ANH… sửa bản thiết kế là
 #    lệch hết mấy chỗ kia.
 #    25/9/2026 — chủ dự án: "dời banner số 4 lên vị trí 2, dời 15 lên vị trí 4".
-THU_TU = [1, 4, 2, 15, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19]
+#    25/9/2026 — "cho banner so 4 ve so 11": cai dang dung o VI TRI 4 luc do
+#    (mau 15 "Phac thao nha tren dat trong") chuyen xuong vi tri 11.
+#    Mau 4 "Chu nam sau nui" van o vi tri 2.
+THU_TU = [1, 4, 2, 3, 5, 6, 7, 8, 9, 10, 15, 11, 12, 13, 14, 16, 17, 18, 19]
 
 # ── SỬA CHỮ: {số thứ tự mẫu: [(chữ cũ, chữ mới), ...]} ───────────────────────
 SUA_CHU = {

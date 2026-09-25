@@ -133,11 +133,12 @@ export default function SiteFooter() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-3 sm:px-4 pt-6 pb-4 border-t border-white/10 text-xs text-slate-400 leading-relaxed">
+      {/* Khối cuối chân trang CANH GIỮA — trước canh trái nên dồn một góc, lệch với các cột phía trên (chủ dự án chỉ). */}
+      <div className="mx-auto max-w-7xl px-3 sm:px-4 pt-6 pb-4 border-t border-white/10 text-center text-xs text-slate-400 leading-relaxed">
         <p><b className="text-slate-200">CAM LÂM LAND</b> — Nền tảng bất động sản &amp; quy hoạch khu vực Cam Lâm, tỉnh Khánh Hòa.</p>
         <p className="mt-1">Địa chỉ: Cam Lâm, Khánh Hòa · Hotline: 0988 888 888 · Email: lienhe@camlamland.vn.</p>
       </div>
-      <div className="mx-auto max-w-7xl px-3 sm:px-4 text-center sm:text-left text-xs text-slate-500 pb-6">© 2018 Cam Lâm Land</div>
+      <div className="mx-auto max-w-7xl px-3 sm:px-4 text-center text-xs text-slate-500 pb-6">© 2018 Cam Lâm Land</div>
     </footer>
   );
 }

@@ -41,7 +41,17 @@ def main():
     a = np.asarray(im).astype(np.int16)
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
     # Trời ban ngày: xanh dương trội hẳn, hoặc trắng hơi xanh gần chân trời.
-    troi = ((b > r + 22) & (b > 120)) | ((b >= g) & (g >= r) & (b > r + 10) & (r > 170))
+    xanh = ((b > r + 22) & (b > 120)) | ((b >= g) & (g >= r) & (b > r + 10) & (r > 170))
+    # ⚠️ TRỜI = XANH + MỊN. Tường khuất nắng cũng xanh xám nhưng lấm tấm ô cửa
+    #    sổ → độ lệch sáng tối trong ô 7×7 cao. Chỉ dựa vào màu thì khoét mất
+    #    tường; lấp khe để chữa thì lại lấp luôn khe trời tam giác giữa các gờ
+    #    bậc thang ở đỉnh (chủ dự án khoanh đúng chỗ đó). Đo độ lấm tấm là
+    #    phân biệt được cả hai.
+    sang = a.mean(axis=2).astype(float)
+    tb = ndimage.uniform_filter(sang, 7)
+    lech = np.sqrt(np.maximum(ndimage.uniform_filter(sang * sang, 7) - tb * tb, 0))
+    troi = xanh & (lech < 6)
+    troi = ndimage.binary_opening(troi, iterations=1)
     nha = ~troi
     # bỏ đốm lẻ
     nha = ndimage.binary_opening(nha, iterations=2)
@@ -65,16 +75,18 @@ def main():
         if k.sum() < 800:
             continue
         giu |= k
-    # Lấp KHE HẸP theo chiều ngang (< 25 điểm ảnh): khe giữa các gờ tường chỉ
-    # ~10 điểm ảnh, còn khoảng trời giữa toà thấp bên trái và toà chính ~45 —
-    # lấp hết cả hàng như bản trước là lấp luôn mảng trời đó (đã vấp).
-    giu = ndimage.binary_closing(giu, structure=np.ones((1, 25), bool))
+    # Chỉ vá lỗ li ti. ĐỪNG lấp khe rộng: lấp 25 điểm ảnh là lấp luôn khe trời
+    # tam giác giữa các gờ bậc thang ở đỉnh (đã vấp, bản v4).
+    giu = ndimage.binary_closing(giu, structure=np.ones((3, 3), bool))
+    # Gọt mép 2 điểm ảnh: ngay mép tường có dải trời chuyển sắc (không mịn) nên
+    # bị tính là "nhà" → thành viền xanh nhạt bám quanh toà nhà.
+    giu = ndimage.binary_erosion(giu, iterations=2)
     giu = ndimage.binary_fill_holes(giu)
     giu[HANG_KHUNG + 12:, :] = True      # dưới mép khung: trắng hết cho khỏi hở
     m = Image.fromarray((giu * 255).astype('uint8')).filter(ImageFilter.GaussianBlur(0.8))
     # webp KHÔNG NÉN MẤT (lossless): nén thường là mép mặt nạ lem, lộ viền trời.
     # Giữ đuôi .webp vì bản điện thoại tự đổi đường dẫn sang dt/…webp.
-    p = os.path.join(RA, 'm18-matna-v4.webp')  # ⚠️ đổi tên mỗi lần dựng lại (v3, v4…): Cloudflare + trình duyệt giữ ảnh theo tên file
+    p = os.path.join(RA, 'm18-matna-v5.webp')  # ⚠️ đổi tên mỗi lần dựng lại (v3, v4…): Cloudflare + trình duyệt giữ ảnh theo tên file
     m.save(p, 'WEBP', lossless=True)
     print('OK', p, m.size, 'chop toa nha o', (int(x0), int(y0)))
     # ảnh xem thử: toà nhà trên nền navy

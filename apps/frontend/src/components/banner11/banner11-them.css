@@ -922,7 +922,7 @@
        tầng 3: hai bong bóng hội thoại.
      Toạ độ theo vw vì banner điện thoại rộng đúng bằng màn hình. */
   .cl-b11 .st-ui .ui-toast { display: flex !important; left: auto !important; right: 2.5vw !important; top: calc(var(--dinh) + 1vw) !important; max-width: none !important; width: max-content !important; gap: 4px !important; scale: 1.5; transform-origin: 100% 0 }
-  .cl-b11 .st-ui .ui-toast svg { width: 9px !important; height: 9px !important; flex: none }
+  /* (cỡ biểu tượng chuông: xem mục THẺ THÔNG BÁO KIỂU IPHONE cuối file) */
   .cl-b11 .st-ui .ui-listing { right: auto !important; left: 47.5vw !important; top: calc(var(--dinh) + 12vw) !important; scale: 1.5; transform-origin: 0 0 }
   .cl-b11 .st-ui .ui-map { right: 2vw !important; top: calc(var(--dinh) + 12vw) !important; scale: 1.5; transform-origin: 100% 0 }
   .cl-b11 .st-ui .ui-chat { right: auto !important; left: 49vw !important; top: calc(var(--dinh) + 27vw) !important; scale: 1.5; transform-origin: 0 0 }
@@ -1007,3 +1007,27 @@
 }
 /* "Thuyền về bến": đường sáng cyan không vắt qua thanh menu (cả máy tính, chủ dự án khoanh). */
 .cl-b11 .b8-edge { clip-path: inset(var(--dinh, 64px) 0 0 0) }
+
+/* ══ MẪU "HỎI LÀ CÓ": THẺ THÔNG BÁO KIỂU IPHONE (chủ dự án gửi ảnh mẫu 25/9/2026) ══
+   Kính mờ sáng bo tròn, ô biểu tượng ứng dụng bên trái, dòng trên "CAM LÂM LAND … bây giờ",
+   dòng dưới là nội dung. Dùng chung máy tính + điện thoại. */
+.cl-b11 .st-ui .ui-toast{
+  display:grid!important;grid-template-columns:auto 1fr;column-gap:calc(var(--u)*14px);row-gap:calc(var(--u)*3px);align-items:center;
+  padding:calc(var(--u)*14px) calc(var(--u)*18px)!important;border-radius:calc(var(--u)*26px);
+  background:rgba(240,244,250,.72);border:1px solid rgba(255,255,255,.6);
+  backdrop-filter:blur(22px) saturate(1.6);-webkit-backdrop-filter:blur(22px) saturate(1.6);
+  box-shadow:0 10px 30px rgba(2,6,23,.28);color:#111827;font-weight:500;
+  font-size:max(calc(10px * var(--san-nho, 1)),calc(var(--u)*19px));line-height:1.25;
+  width:max-content!important;max-width:calc(var(--u)*560px)!important;
+}
+.cl-b11 .st-ui .ui-toast::before{
+  content:"CAM LÂM LAND";grid-column:2;grid-row:1;
+  font-size:.72em;font-weight:600;letter-spacing:.04em;color:#6b7280;
+  display:flex;justify-content:space-between;gap:2em;
+}
+.cl-b11 .st-ui .ui-toast::after{content:"bây giờ";position:absolute;right:calc(var(--u)*18px);top:calc(var(--u)*14px);font-size:.72em;color:#6b7280}
+.cl-b11 .st-ui .ui-toast svg{
+  grid-column:1;grid-row:1 / span 2;
+  width:calc(var(--u)*46px)!important;height:calc(var(--u)*46px)!important;padding:calc(var(--u)*10px);box-sizing:border-box;
+  border-radius:22%;background:linear-gradient(145deg,#0A2540,#16395f);stroke:#E2C275!important;
+}

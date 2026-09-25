@@ -818,9 +818,9 @@
   .cl-b11 .pp-edge path { stroke-width: 1.2px }
 
   /* Mẫu "Làng biển bình yên", "Thuần đồ hoạ": khối chữ đặt theo tỉ lệ máy tính */
-  .cl-b11 .st-step.red { --S: 1.35 }
-  .cl-b11 .st-step.red .sp-content { top: calc(var(--dinh) + 5vw) !important }
-  .cl-b11 .st-step.red .sp-cta { top: calc(var(--dinh) + 8vw) !important }
+  .cl-b11 .st-step.red { --S: 1.7 }
+  .cl-b11 .st-step.red .sp-content { left: 30vw !important; top: calc(var(--dinh) + 4vw) !important }
+  .cl-b11 .st-step.red .sp-cta { top: auto !important; bottom: calc(var(--thanh) + 6vw) !important; left: 30vw !important; right: auto !important; transform-origin: 0 100% !important }
 
   /* Mẫu polaroid: 4 ảnh xếp SO LE như máy tính (cao – thấp – cao – thấp, chồng
      mép nhau), gói trong nửa phải, dưới menu. Chủ dự án chê bản xếp lưới 2×2
@@ -864,7 +864,7 @@
 
   /* Mẫu "Mặt nước": mép ảnh dời phải theo tỉ lệ phóng chữ để chữ nằm trọn
      trong dải tối */
-  .cl-b11 .st-b8 :is(.b8-panel, .b8-edge) { left: calc(var(--u) * 700px * 1.5) !important }
+  .cl-b11 .st-b8 :is(.b8-panel, .b8-edge) { left: 50vw !important }
 
   /* Mẫu "Nắng sớm": ảnh người làm muối to ra lấp khoảng trống giữa ảnh và chữ
      (chủ dự án khoanh chỗ trống, chê ảnh nhỏ) */
@@ -872,7 +872,7 @@
 
   /* Mẫu "Nét xưa": đẩy cả khung ảnh sang phải (GIỮ bề rộng, thu hẹp là mất
      đường xé giấy) để chữ tối nằm trên nền giấy; con dấu theo khối chữ */
-  .cl-b11 .st-b10 > .fill-svg { left: 29vw !important; width: 100% !important }
+  .cl-b11 .st-b10 > .fill-svg { left: 44vw !important; width: 100% !important }
   .cl-b11 .st-b10 .b10-seal { left: calc(var(--u) * 662px) !important; top: calc(var(--u) * 59px + var(--dinh)) !important }
 }
 
@@ -990,3 +990,20 @@
   }
   .cl-b11 .rb-edge path { stroke-width: 2px }
 }
+
+/* ══ SỬA SAU KHI THỬ TRÊN LÕI SAFARI GIẢ LẬP IPHONE CÓ TAI THỎ (25/9/2026) ══
+   ⚠️ BÀI HỌC: thử bằng Chrome trên máy tính KHÔNG đủ — iPhone có tai thỏ làm
+   banner cao thêm 47px, bố cục lệch hẳn. Ba lỗi chủ dự án nhắc nhiều lần chỉ
+   lộ ra khi thử bằng WebKit + giả lập tai thỏ. Công cụ thử: xem
+   scripts/banner11/thu-iphone.js. */
+@media (max-width: 760px) {
+  /* "Màu thật": đường sáng bắt đầu DƯỚI menu (mask cũ không ăn trên Safari). */
+  .cl-b11 .du-edge { top: var(--dinh) !important; -webkit-mask-image: none !important; mask-image: none !important }
+  /* "Hoàng hôn": cụm chữ căn giữa PHẦN DƯỚI MENU và to 1,45 lần (trước dính sát menu, chữ nhỏ không đọc được). */
+  .cl-b11 .st-knock .kc-wrap { inset: var(--dinh) 0 var(--thanh) 0; scale: 1.45 }
+  /* "Nét xưa" + "Thuyền về bến": dòng mô tả rộng ra, không bẻ vụn 2–3 chữ một dòng. */
+  .cl-b11 .st-b10 .b10-text .b-sub { max-width: none !important; width: calc(40vw / var(--S)) }
+  .cl-b11 .st-b8 .b-sub { max-width: none !important; width: calc(44vw / var(--S)) }
+}
+/* "Thuyền về bến": đường sáng cyan không vắt qua thanh menu (cả máy tính, chủ dự án khoanh). */
+.cl-b11 .b8-edge { clip-path: inset(var(--dinh, 64px) 0 0 0) }

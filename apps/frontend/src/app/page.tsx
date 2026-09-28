@@ -102,9 +102,6 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
   ],
 };
 
-// Tên tab tin tức ghi gọn trên điện thoại (máy tính vẫn ghi đủ).
-const TEN_GON_DT: Record<string, string> = { 'Thị trường BĐS': 'Thị trường', 'Cẩm nang nhà đất': 'Cẩm nang' };
-
 function Ic({ d }: { d: string }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#0A2540]/60 shrink-0"><path d={d} /></svg>;
 }
@@ -624,21 +621,13 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
         {/* `no-scrollbar`: trên điện thoại dải tab này dài hơn màn nên trình duyệt
             vẽ một thanh cuộn xám ngay dưới, nhìn rất thô. Vuốt vẫn cuộn được. */}
-        {/* ⚠️ "Xem thêm" nằm NGOÀI dải cuộn, ghim cứng bên phải. Trước đây nó là phần tử cuối
-            của dải tab cuộn ngang → trên điện thoại bị đẩy ra ngoài màn hình, phải vuốt mới thấy
-            (chủ dự án bắt 28/9/2026). Điện thoại: tab sát nhau hơn + chữ nhỏ một cỡ cho vừa. */}
-        <div className="flex items-end border-b border-slate-200 mb-5">
-          <div className="flex min-w-0 flex-1 items-center gap-3.5 overflow-x-auto no-scrollbar sm:gap-5">
-            {Object.keys(NEWS).map((t) => (
-              <button key={t} onClick={() => setNewsTab(t)} className={`pb-2.5 text-[13px] sm:text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${newsTab === t ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500 hover:text-[#0A2540]'}`}>
-                {/* Điện thoại ghi GỌN để 3 tab + "Xem thêm" vừa MỘT hàng và còn dư chỗ:
-                    "Thị trường BĐS" → "Thị trường", "Cẩm nang nhà đất" → "Cẩm nang".
-                    ⚠️ Chỉ rút một tab thì màn 360px vẫn khít đúng mép → "Cẩm nang" bị lấn mất chữ (đã vấp 28/9/2026). */}
-                {TEN_GON_DT[t] ? <><span className="sm:hidden">{TEN_GON_DT[t]}</span><span className="hidden sm:inline">{t}</span></> : t}
-              </button>
-            ))}
-          </div>
-          <Link href="/tin-tuc" className="shrink-0 whitespace-nowrap pb-2.5 pl-3 text-[13px] font-semibold text-red-600 sm:text-sm">Xem thêm ›</Link>
+        {/* Hàng tab GIỮ NHƯ BẢN ĐẦU (ghi đủ tên, cuộn ngang được). "Xem thêm" KHÔNG nằm ở đây nữa mà
+            ở DƯỚI danh sách tin. ⚠️ Đã thử ghim "Xem thêm" bên phải hàng tab + rút gọn tên tab —
+            chủ dự án thấy rối hơn (28/9/2026). */}
+        <div className="flex items-center gap-5 border-b border-slate-200 mb-5 overflow-x-auto no-scrollbar">
+          {Object.keys(NEWS).map((t) => (
+            <button key={t} onClick={() => setNewsTab(t)} className={`pb-2.5 text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${newsTab === t ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500 hover:text-[#0A2540]'}`}>{t}</button>
+          ))}
         </div>
         <div className="grid lg:grid-cols-[1.05fr_1fr_0.62fr] gap-3 sm:gap-6">
           {marketLoadingNow ? (
@@ -663,6 +652,11 @@ export default function Home() {
             {newsItems.slice(1).map((h) => (
               <a key={h.title} href={h.url} target={h.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="block py-2.5 text-[15px] text-slate-700 hover:text-red-600 leading-snug line-clamp-2">{h.title}</a>
             ))}
+            {/* "Xem thêm" ở CUỐI danh sách tin (chủ dự án chỉ đúng chỗ này, 28/9/2026) — cùng nhịp với các dòng tin, không chen vào hàng tab */}
+            <Link href="/tin-tuc" className="flex items-center justify-center gap-1 pt-3 pb-1 text-sm font-semibold text-red-600 hover:text-red-700">
+              Xem thêm tin tức
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="m9 6 6 6-6 6" /></svg>
+            </Link>
           </div>
           </>)}
           <div className="space-y-4">

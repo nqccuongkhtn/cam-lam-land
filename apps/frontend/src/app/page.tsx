@@ -435,30 +435,27 @@ export default function Home() {
                 Nút lọc có số nhỏ màu đỏ = đang bật mấy điều kiện lọc.
                 Máy tính (từ 768px) vẫn giữ nguyên hàng đầy đủ bên dưới. */}
             <div className="md:hidden">
-              {/* Ô TÌM KIẾM ĐIỆN THOẠI (28/9/2026):
+              {/* Ô TÌM KIẾM ĐIỆN THOẠI (28/9/2026) — MỘT KHỐI DUY NHẤT:
+                    📍 chữ gõ ……………  ⚙  [🔍]
                   · Nền dải bao quanh TRẮNG (đã thử navy, xanh xám — chủ dự án chê cả hai).
                   · GÕ THẲNG trong ô. ⚠️ Đã thử "bấm ô → mở màn hình tìm kiếm toàn màn hình" —
                     chủ dự án không thích (bấm vào để gõ lại bật ra màn hình khác). Đừng làm lại.
-                  · Trong ô: kính lúp · chữ gõ · vạch ngăn · nút "Lọc" (có số điều kiện đang bật).
-                  · Ngoài ô: nút đỏ VUÔNG 44×44 chỉ có kính lúp (bản có chữ "Tìm" chủ dự án bảo to, cần gọn).
-                    Vì nút tìm đã là kính lúp nên biểu tượng đầu ô là GHIM VỊ TRÍ, khỏi lặp hai kính lúp. */}
-              <div className="flex gap-2">
-                <div className="flex h-11 min-w-0 flex-1 items-center rounded-lg border border-transparent bg-slate-100 transition-colors focus-within:border-[#C8A14B] focus-within:bg-white">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-3 h-[18px] w-[18px] shrink-0 text-slate-400"><path d="M12 21s-6.5-5.4-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.6 12 21 12 21Z" /><circle cx="12" cy="10.5" r="2.3" /></svg>
-                  <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} enterKeyHint="search"
-                    placeholder={heroDeal === 'project' ? 'Tên dự án…' : heroDeal === 'rent' ? 'Thuê nhà, mặt bằng ở đâu?' : (searchHint || 'Khu vực, dự án…')}
-                    className="h-full min-w-0 flex-1 bg-transparent px-2 text-sm text-slate-800 outline-none placeholder:text-slate-400" />
-                  <span aria-hidden className="h-5 w-px shrink-0 bg-slate-300" />
-                  <button type="button" onClick={() => setLocMo(true)} aria-label={soLoc > 0 ? `Bộ lọc, đang bật ${soLoc}` : 'Bộ lọc'}
-                    className={`flex h-full shrink-0 items-center gap-1 pl-2.5 pr-3 text-[13px] font-medium ${soLoc > 0 ? 'text-red-600' : 'text-[#0A2540]'}`}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2" /><circle cx="10" cy="17" r="2" /></svg>
-                    Lọc
-                    {soLoc > 0 && <span className="grid h-[18px] min-w-[18px] place-items-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white">{soLoc}</span>}
-                  </button>
-                </div>
+                  · Nút lọc CHỈ CÓ BIỂU TƯỢNG (bỏ chữ "Lọc"), đang lọc thì có chấm số đỏ ở góc.
+                  · Nút tìm đỏ 36×36 nằm TRONG ô, cách mép 4px đều ba phía (chủ dự án: "cho nút tìm kiếm
+                    cùng 1 khối"). Nút tìm là kính lúp nên đầu ô dùng GHIM VỊ TRÍ, khỏi lặp hai kính lúp. */}
+              <div className="flex h-11 items-center rounded-lg border border-transparent bg-slate-100 pr-1 transition-colors focus-within:border-[#C8A14B] focus-within:bg-white">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-3 h-[18px] w-[18px] shrink-0 text-slate-400"><path d="M12 21s-6.5-5.4-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.6 12 21 12 21Z" /><circle cx="12" cy="10.5" r="2.3" /></svg>
+                <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} enterKeyHint="search"
+                  placeholder={heroDeal === 'project' ? 'Tên dự án…' : heroDeal === 'rent' ? 'Thuê nhà, mặt bằng ở đâu?' : (searchHint || 'Khu vực, dự án…')}
+                  className="h-full min-w-0 flex-1 bg-transparent px-2 text-sm text-slate-800 outline-none placeholder:text-slate-400" />
+                <button type="button" onClick={() => setLocMo(true)} aria-label={soLoc > 0 ? `Bộ lọc, đang bật ${soLoc}` : 'Bộ lọc'}
+                  className={`relative grid h-9 w-9 shrink-0 place-items-center rounded-md active:bg-slate-200 ${soLoc > 0 ? 'text-red-600' : 'text-slate-600'}`}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-[18px] w-[18px]"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2" /><circle cx="10" cy="17" r="2" /></svg>
+                  {soLoc > 0 && <span className="absolute right-0.5 top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-red-600 px-1 text-[9px] font-bold leading-none text-white">{soLoc}</span>}
+                </button>
                 <button type="button" onClick={search} aria-label={heroDeal === 'rent' ? 'Tìm thuê' : 'Tìm kiếm'}
-                  className="cl-press grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-red-600 text-white active:bg-red-700">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" className="h-5 w-5"><circle cx="11" cy="11" r="6.5" /><path d="m20 20-4.2-4.2" /></svg>
+                  className="cl-press ml-1 grid h-9 w-9 shrink-0 place-items-center rounded-md bg-red-600 text-white active:bg-red-700">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" className="h-[18px] w-[18px]"><circle cx="11" cy="11" r="6.5" /><path d="m20 20-4.2-4.2" /></svg>
                 </button>
               </div>
               {/* ⚠️ Đã thử thêm hàng từ khoá "Tìm nhiều: Đất nền · Ven biển…" dưới ô — chủ dự án bảo bỏ (28/9/2026). Đừng thêm lại. */}

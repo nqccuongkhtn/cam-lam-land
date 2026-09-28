@@ -95,7 +95,7 @@ const GEMINI_MODELS: string[] = [...new Set([
 const GEMINI_KEY = GEMINI_KEYS[0];
 const GEMINI_MODEL = GEMINI_MODELS[0];
 const AI_KEY = process.env.ANTHROPIC_API_KEY;
-const AI_MODEL = process.env.AI_MODEL || 'claude-haiku-4-5-20251001';
+const AI_MODEL = process.env.AI_MODEL || 'claude-haiku-4-5';
 const NO_THINK = /(^|[^0-9])(2\.5|3\.)/.test(GEMINI_MODEL) || GEMINI_MODEL.includes('flash-latest') || GEMINI_MODEL.includes('pro-latest');
 let lastErr: string | null = null;
 /* ── CÂU LỆNH BIÊN TẬP TIN ─────────────────────────────────────────────────
@@ -163,6 +163,13 @@ RÀ SOÁT LẠI TRƯỚC KHI TRẢ VỀ  (đây là bước của thư ký toà 
 3. Có câu nào biến việc "đề xuất / dự kiến / đang lấy ý kiến" thành việc đã xong không?
 4. Có câu nào là nhận định của mình mà bài gốc không hề có không?
 5. Có câu nào chép gần như nguyên văn bài gốc không?
+6. Câu CUỐI CÙNG của bài có trọn vẹn, có dấu chấm, khép lại được câu chuyện không?
+
+KẾT BÀI TRỌN VẸN  (bắt buộc)
+- Bài phải KẾT THÚC TRỌN VẸN: câu cuối là một câu đầy đủ, có dấu chấm. TUYỆT ĐỐI không dừng giữa câu, không dừng sau dấu hai chấm, không để ngoặc kép mở mà chưa đóng.
+- Đoạn cuối phải khép lại câu chuyện bằng ý cuối cùng của bài gốc (bước tiếp theo, thời hạn, ý kiến của cơ quan có thẩm quyền…). Không kết bằng một câu lửng lơ kiểu "Đại diện ngân hàng cho biết:" rồi hết.
+- Nếu phần cuối NỘI DUNG BÀI GỐC bị đứt giữa chừng (câu cuối cụt, trích dẫn chưa hết) thì BỎ câu cụt đó, kết bài ở ý trọn vẹn cuối cùng. Không tự bịa phần còn thiếu.
+- Bài dài thì viết gọn các đoạn giữa cho đủ chỗ, nhưng vẫn phải đi tới câu kết — thà ngắn mà trọn còn hơn dài mà cụt.
 
 TRẢ VỀ
 - Chỉ phần thân bài. Không thêm tiêu đề, không viết "Tóm tắt:", "Bài viết:", không chú thích cuối bài.
@@ -179,7 +186,7 @@ async function rewrite(title: string, full: string): Promise<string | null> {
   for (const khoa of GEMINI_KEYS) {
     for (const model of GEMINI_MODELS) {
       try {
-        const genCfg: any = { maxOutputTokens: 4096, temperature: 0.7 };
+        const genCfg: any = { maxOutputTokens: 8192, temperature: 0.7 };
         if (NO_THINK) genCfg.thinkingConfig = { thinkingBudget: 0 };
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
           method: 'POST',
@@ -190,6 +197,10 @@ async function rewrite(title: string, full: string): Promise<string | null> {
         if (res.ok) {
           const j: any = await res.json();
           const txt = j?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+          /* ⚠️ finishReason = MAX_TOKENS: AI bị CẮT giữa chừng vì hết độ dài cho phép → bài dừng
+             lửng giữa câu. Trước đây vẫn nhận và đăng → bài cụt vô nghĩa (chủ dự án bắt 28/9/2026).
+             Nay coi như hỏng, thử model/khoá khác. */
+          if (txt && j?.candidates?.[0]?.finishReason === 'MAX_TOKENS') { lastErr = `Gemini ${model} viết chưa xong đã hết độ dài (MAX_TOKENS)`; continue; }
           if (txt) { lastErr = null; return txt; }
           lastErr = `Gemini ${model} trả rỗng (finishReason=${j?.candidates?.[0]?.finishReason || '?'})`;
         } else {
@@ -207,10 +218,16 @@ async function rewrite(title: string, full: string): Promise<string | null> {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-api-key': AI_KEY, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({ model: AI_MODEL, max_tokens: 2200, messages: [{ role: 'user', content: prompt }] }),
+        body: JSON.stringify({ model: AI_MODEL, max_tokens: 8000, messages: [{ role: 'user', content: prompt }] }),
         signal: AbortSignal.timeout(28000),
       });
-      if (res.ok) { const j: any = await res.json(); const txt = j?.content?.[0]?.text?.trim(); if (txt) { lastErr = null; return txt; } }
+      if (res.ok) {
+        const j: any = await res.json();
+        const txt = j?.content?.find((b: any) => b?.type === 'text')?.text?.trim();
+        // stop_reason = 'max_tokens' → bị cắt giữa chừng, KHÔNG nhận (lý do như Gemini ở trên).
+        if (txt && j?.stop_reason !== 'max_tokens') { lastErr = null; return txt; }
+        lastErr = j?.stop_reason === 'max_tokens' ? 'Claude viết chưa xong đã hết độ dài (max_tokens)' : 'Claude trả rỗng';
+      }
       else { lastErr = 'Claude HTTP ' + res.status; }
     } catch (e: any) { lastErr = 'Claude lỗi: ' + (e?.message || String(e)); }
   }
@@ -219,6 +236,21 @@ async function rewrite(title: string, full: string): Promise<string | null> {
 
 // Lọc ảnh sạch (bỏ logo/icon/quảng cáo/ảnh "vận hành bởi"...).
 const cleanImg = (u: string): boolean => /^https?:\/\//i.test(u) && /\.(jpe?g|png|webp)(\?|$)/i.test(u) && !/(logo|icon|avatar|sprite|banner|advert|quang-?cao|vccorp|operate|share|placeholder|default|blank|pixel|1x1|skin|template|thumb-?fb)/i.test(u);
+/* ── LƯỚI AN TOÀN: KHÔNG BAO GIỜ ĐĂNG BÀI DỪNG GIỮA CÂU ─────────────────────
+   Dù bài do AI viết hay đăng nguyên văn bài gốc (khi AI hết lượt), nếu chữ cuối
+   không phải dấu kết câu thì CẮT LÙI về câu trọn vẹn cuối cùng. Chỉ thêm "…" khi
+   cắt lùi sẽ mất quá nửa bài.
+   Ví dụ đã gặp (28/9/2026): bài dừng ở «Đại diện SHB cho biết: "Doa» — bài gốc bị
+   cắt cứng 7.000 ký tự trong lúc khoá AI hết lượt. */
+const KY_TU_AN = /[​-‏‪-‮⁠﻿]/g; // ký tự vô hình hay dính cuối bài báo
+const catTronCau = (text: string): string => {
+  const t = (text || '').replace(KY_TU_AN, '').trim();
+  if (!t || /[.!?…]["'”»)\]]*$/.test(t)) return t;
+  let cuoi = -1;
+  for (const m of t.matchAll(/[.!?…]["'”»)\]]*(?=\s)/g)) cuoi = (m.index ?? 0) + m[0].length;
+  if (cuoi > t.length * 0.5) return t.slice(0, cuoi).trim();
+  return t.replace(/[\s,;:–-]+$/, '') + '…';
+};
 // Bỏ dòng chú thích ảnh ("... Ảnh: Vinhomes", "Nguồn: ...") còn sót trong nội dung.
 const dropCaptions = (text: string): string => text.split(/\n{2,}/).map((p) => p.trim()).filter((t) => t && !/[Ảả]nh\s*:\s*\S/.test(t) && !/^\(?\s*[Ảả]nh\b/.test(t) && !/^[Nn]guồn\s*:\s*\S/.test(t)).join('\n\n');
 // Bỏ ảnh TRÙNG (cùng tấm khác kích thước) bằng tên ảnh đã chuẩn hoá.
@@ -321,7 +353,11 @@ async function fetchArticle(url: string): Promise<{ text: string; images: string
       if (src && cleanImg(src)) bodyImgs.push(src);
     }
     // og:image (đại diện chuẩn) LÊN ĐẦU, rồi mới đến ảnh trong thân bài.
-    return { text: paras.join('\n\n').slice(0, 7000), images: Array.from(new Set([...metaImgs, ...bodyImgs])).slice(0, 6) };
+    /* Gửi AI tối đa ~9.000 ký tự nhưng LẤY TRỌN TỪNG ĐOẠN. Trước đây cắt cứng .slice(0, 7000)
+       nên đoạn cuối đứt giữa câu, và bản biên tập (hoặc bản đăng nguyên văn) cũng đứt theo. */
+    const lay: string[] = []; let dai = 0;
+    for (const d of paras) { if (lay.length && dai + d.length > 9000) break; lay.push(d); dai += d.length + 2; }
+    return { text: lay.join('\n\n'), images: Array.from(new Set([...metaImgs, ...bodyImgs])).slice(0, 6) };
   } catch { return { text: '', images: [] }; }
 }
 
@@ -342,7 +378,7 @@ async function fetchSource(src: { name: string; url: string; local?: boolean; re
     const sm = strip(desc);
     if (src.re && !RE.test(title + ' ' + sm)) continue; // nguồn tổng hợp -> chỉ lấy tin BĐS
     const tier = tierOf(title + ' ' + sm);
-    out.push({ title, url: link, source: src.name, image, summary: sm.slice(0, 600), publishedAt: d.toISOString(), local: !!src.local || tier >= 1, tier });
+    out.push({ title, url: link, source: src.name, image, summary: sm.length > 600 ? catTronCau(sm.slice(0, 600)) : sm, publishedAt: d.toISOString(), local: !!src.local || tier >= 1, tier });
   }
   return out;
 }
@@ -396,7 +432,8 @@ const KHO = path.join(process.cwd(), '.kho-tin', 'tin.json');
 function napKho(): any[] {
   try {
     const d = JSON.parse(fs.readFileSync(KHO, 'utf8'));
-    if (Array.isArray(d?.news) && d.news.length) return d.news;
+    // Bài cũ trong kho cũng qua lưới an toàn → sửa luôn những bài đã lỡ lưu ở dạng cụt câu.
+    if (Array.isArray(d?.news) && d.news.length) return d.news.map((a: any) => (a?.body ? { ...a, body: catTronCau(a.body) } : a));
   } catch { /* chưa có file, hoặc file hỏng — coi như kho rỗng */ }
   return [];
 }
@@ -467,7 +504,7 @@ async function refreshFeed(slot: number): Promise<void> {
        lấy câu tóm tắt của RSS còn hơn. */
     const viet = await rewrite(a.title, full);
     const hong = !viet || /^KHÔNG ĐỦ\s*$/i.test(viet.trim());
-    a.body = dropCaptions(hong ? (art.text && art.text.length > 200 ? art.text : (a.summary || a.title)) : viet);
+    a.body = catTronCau(dropCaptions(hong ? (art.text && art.text.length > 200 ? art.text : (a.summary || a.title)) : viet));
     a.aiOk = !hong;   // false = chưa biên tập được (hết lượt AI, AI báo lỗi…)
     const imgs = dedupeImages([...art.images, a.image].filter((u): u is string => !!u && cleanImg(u))).slice(0, 3); // og:image (đại diện chuẩn) LÊN ĐẦU, ảnh RSS làm dự phòng
     a.images = imgs;
@@ -494,7 +531,7 @@ async function refreshFeed(slot: number): Promise<void> {
       const full = art.text && art.text.length > 200 ? art.text : (a.summary || a.title);
       const viet = await rewrite(a.title, full);
       if (viet && !/^KHÔNG ĐỦ\s*$/i.test(viet.trim())) {
-        a.body = dropCaptions(viet);
+        a.body = catTronCau(dropCaptions(viet));
         a.aiOk = true;
       }
     }));

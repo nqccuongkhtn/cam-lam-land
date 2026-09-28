@@ -621,11 +621,19 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
         {/* `no-scrollbar`: trên điện thoại dải tab này dài hơn màn nên trình duyệt
             vẽ một thanh cuộn xám ngay dưới, nhìn rất thô. Vuốt vẫn cuộn được. */}
-        <div className="flex items-center gap-5 border-b border-slate-200 mb-5 overflow-x-auto no-scrollbar">
-          {Object.keys(NEWS).map((t) => (
-            <button key={t} onClick={() => setNewsTab(t)} className={`pb-2.5 text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${newsTab === t ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500 hover:text-[#0A2540]'}`}>{t}</button>
-          ))}
-          <Link href="/tin-tuc" className="ml-auto text-red-600 text-sm font-semibold whitespace-nowrap shrink-0">Xem thêm →</Link>
+        {/* ⚠️ "Xem thêm" nằm NGOÀI dải cuộn, ghim cứng bên phải. Trước đây nó là phần tử cuối
+            của dải tab cuộn ngang → trên điện thoại bị đẩy ra ngoài màn hình, phải vuốt mới thấy
+            (chủ dự án bắt 28/9/2026). Điện thoại: tab sát nhau hơn + chữ nhỏ một cỡ cho vừa. */}
+        <div className="flex items-end border-b border-slate-200 mb-5">
+          <div className="flex min-w-0 flex-1 items-center gap-3.5 overflow-x-auto no-scrollbar sm:gap-5">
+            {Object.keys(NEWS).map((t) => (
+              <button key={t} onClick={() => setNewsTab(t)} className={`pb-2.5 text-[13px] sm:text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${newsTab === t ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500 hover:text-[#0A2540]'}`}>
+                {/* Điện thoại ghi gọn "Cẩm nang" để 3 tab + "Xem thêm" vừa MỘT hàng, khỏi phải vuốt */}
+                {t === 'Cẩm nang nhà đất' ? <><span className="sm:hidden">Cẩm nang</span><span className="hidden sm:inline">{t}</span></> : t}
+              </button>
+            ))}
+          </div>
+          <Link href="/tin-tuc" className="shrink-0 whitespace-nowrap pb-2.5 pl-3 text-[13px] font-semibold text-red-600 sm:text-sm">Xem thêm ›</Link>
         </div>
         <div className="grid lg:grid-cols-[1.05fr_1fr_0.62fr] gap-3 sm:gap-6">
           {marketLoadingNow ? (

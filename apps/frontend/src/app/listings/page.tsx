@@ -15,7 +15,7 @@ import SiteFooter from '@/components/SiteFooter';
 import { Skeleton, EmptyState, Button, Card } from '@/components/ui';
 import type { BaseMap, ImageOverlay } from '@/components/MapView';
 import { wgs84ToVn2000 } from '@/lib/vn2000';
-import BottomSheet from '@/components/BottomSheet';
+import { KhungBangLoc, NutXemKetQua, MucLoc, NutLien, OLuoi, KhoangKeo, TRAN_GIA, TRAN_DT, tomTat } from '@/components/LocNangCao';
 import { usePullToRefresh } from '@/lib/usePullToRefresh';
 import LogoAnh from '@/components/LogoAnh';
 import LogoLe from '@/components/LogoLe';
@@ -59,22 +59,6 @@ function VerifiedPromo({ count, onView }: { count: number; onView: () => void })
       </div>
       {count > 0 && <button onClick={onView} className="mt-3 inline-flex items-center gap-1 bg-white border border-emerald-300 text-emerald-700 font-bold text-sm px-4 py-2 rounded-xl hover:bg-emerald-100 transition">Xem {count} tin xác thực →</button>}
     </div>
-  );
-}
-
-// Nhóm bộ lọc trong bottom-sheet (nhãn nhỏ + hàng chip).
-function Fgrp({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="mb-4">
-      <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">{label}</p>
-      <div className="flex flex-wrap gap-2">{children}</div>
-    </div>
-  );
-}
-// Chip chọn trong bottom-sheet (sáng lên khi đang chọn).
-function Fchip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button onClick={onClick} className={`cl-press rounded-full border px-3.5 py-2 text-sm font-semibold transition ${on ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 text-slate-600 active:bg-slate-50'}`}>{children}</button>
   );
 }
 
@@ -123,7 +107,6 @@ function ListingsInner() {
   const PER_PAGE = 15;
   const [loading, setLoading] = useState(false);
   const [mapView, setMapView] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false); // ô tìm kiếm toàn màn hình (mobile)
   const [filterOpen, setFilterOpen] = useState(false); // bộ lọc bottom-sheet (mobile)
   const [mapMounted, setMapMounted] = useState(false); // đã mở bản đồ ít nhất 1 lần → GIỮ mount để chuyển tab KHÔNG load lại
   useEffect(() => { if (mapView) setMapMounted(true); }, [mapView]);
@@ -135,7 +118,6 @@ function ListingsInner() {
     const id = requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, listScrollY.current)));
     return () => cancelAnimationFrame(id);
   }, [mapView]);
-  const [showFilters, setShowFilters] = useState(false); // ở chế độ bản đồ: ẩn hàng lọc, bấm ⚙ Lọc mới mở — chừa chỗ cho bản đồ
   const [layerOpen, setLayerOpen] = useState(false);
   const [baseMap, setBaseMap] = useState<BaseMap>('satellite');
   const [qhOn, setQhOn] = useState(true);
@@ -296,9 +278,18 @@ function ListingsInner() {
   }, [mapView, feed.length]);
 
   const activeFilters = (type ? 1 : 0) + (min || max ? 1 : 0) + (areaRange.min || areaRange.max ? 1 : 0) + (verified ? 1 : 0);
+  // Thanh kéo giá trong bảng lọc: trong máy cất theo TỶ; bán hiện tỷ, thuê hiện triệu (giống trang chủ).
+  const heSoGia = deal === 'rent' ? 1000 : 1;
+  const tranGia = TRAN_GIA[deal === 'rent' ? 'rent' : 'sale'];
+  const giaLo = min ? Number(min) * heSoGia : 0, giaHi = max ? Number(max) * heSoGia : tranGia.tran;
+  // Kéo/gõ giá trong bảng lọc → chờ 0,4 giây sau lần đổi cuối mới tải lại danh sách (kéo là đổi liên tục).
+  useEffect(() => {
+    if (!filterOpen) return;
+    const t = setTimeout(() => load({ min, max }), 400);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [min, max]);
   const { pull, refreshing } = usePullToRefresh(() => { showMine(mine); }, !mapView); // kéo xuống ở đỉnh → tải lại
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => { if (searchOpen) { const t = setTimeout(() => searchInputRef.current?.focus(), 280); return () => clearTimeout(t); } }, [searchOpen]); // mở overlay xong mới focus (sau khi trượt lên)
   const title = `${deal === 'rent' ? 'Cho thuê' : 'Mua bán'} ${type ? (PROPERTY_LABELS[type] as string).toLowerCase() : 'nhà đất'} tại Cam Lâm, Khánh Hòa`;
 
   async function onMapClick(lng: number, lat: number) {
@@ -409,32 +400,8 @@ function ListingsInner() {
           </button>
         )}
       </div>
-      {/* NÚT LỌC NỔI TRÊN BẢN ĐỒ — chỉ điện thoại. Đặt GÓC TRÊN BÊN PHẢI, đầu cột nút (chỗ nút "?" ở trang
-          Bản đồ): cụm nút maplibre vốn đã chừa sẵn 38px phía trên (--nut-can-cu) nên vừa khít, không đè gì.
-          Nút tròn 32px chỉ có biểu tượng, số đỏ = số điều kiện đang lọc. Bảng lọc mở ra từ góc phải.
-          ⚠️ Trước đặt bên TRÁI dưới nút Lớp — chủ dự án bảo chuyển sang phải (28/9/2026). */}
-      <div className="md:hidden absolute right-2 top-2 z-30">
-        {showFilters ? (
-          <div className="w-[240px] max-w-[calc(100vw-1.5rem)] bg-white/95 backdrop-blur rounded-2xl border border-slate-200 shadow-xl p-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-extrabold text-[#0A2540]">⚙ Lọc tin{activeFilters > 0 ? ` (${activeFilters})` : ''}</span>
-              <button onClick={() => setShowFilters(false)} className="text-slate-400 hover:text-slate-700 w-6 h-6 grid place-items-center rounded-lg hover:bg-slate-100 text-sm leading-none">✕</button>
-            </div>
-            <div className="flex flex-col gap-2">
-              <select value={type} onChange={(e) => { setType(e.target.value as PropertyType); load({ type: e.target.value }); }} className={`${chip} w-full`} style={chevron}>{TYPES.map((t) => <option key={t} value={t}>{t ? PROPERTY_LABELS[t as PropertyType] : 'Loại hình'}</option>)}</select>
-              <select value={`${min}|${max}`} onChange={(e) => { const [mn, mx] = e.target.value.split('|'); setMin(mn); setMax(mx); load({ min: mn, max: mx }); }} className={`${chip} w-full`} style={chevron}>{PRICE_RANGES.map(([label, mn, mx]) => <option key={label} value={`${mn}|${mx}`}>{label}</option>)}</select>
-              <select value={`${areaRange.min}|${areaRange.max}`} onChange={(e) => { const [mn, mx] = e.target.value.split('|').map(Number); setAreaRange({ min: mn, max: mx }); }} className={`${chip} w-full`} style={chevron}>{AREA_RANGES.map(([label, mn, mx]) => <option key={label} value={`${mn}|${mx}`}>{label}</option>)}</select>
-              <button onClick={() => setVerified((v) => !v)} className={`inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold border ${verified ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-white border-slate-300 text-slate-600'}`}>✓ Tin xác thực</button>
-            </div>
-          </div>
-        ) : (
-          <button onClick={() => setShowFilters(true)} title="Lọc tin" aria-label={activeFilters > 0 ? `Lọc tin, đang bật ${activeFilters}` : 'Lọc tin'}
-            className="relative grid h-8 w-8 place-items-center rounded-full bg-white text-[#0A2540] shadow-[0_1px_2px_rgba(0,0,0,.10),0_3px_10px_rgba(10,37,64,.14)] active:bg-slate-50">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
-            {activeFilters > 0 && <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-red-600 px-1 text-[9px] font-extrabold leading-none text-white ring-2 ring-white">{activeFilters}</span>}
-          </button>
-        )}
-      </div>
+      {/* ⚠️ Nút LỌC NỔI TRÊN BẢN ĐỒ đã BỎ (28/9/2026): nút lọc giờ nằm trong ô tìm kiếm phía trên,
+          dùng chung một bảng lọc cho cả chế độ danh sách lẫn bản đồ — giống trang chủ. */}
       {/* ĐIỆN THOẠI: cột nút bên phải GIỐNG HỆT trang Bản đồ (chủ dự án 15/9/2026 "đồng bộ với bên map") —
           nút tròn ảnh thu nhỏ của nền sẽ chuyển sang (bấm là đổi Vệ tinh ↔ Đường) + thanh độ mờ đỏ mảnh 123px.
           Neo vào ĐÁY CỘT NÚT maplibre (biến --cot-nut-day trong globals.css) Y NHƯ trang Bản đồ. ⚠️ Trước để số
@@ -811,18 +778,31 @@ function ListingsInner() {
                       width={34} height={34} className="h-[34px] w-[34px] object-contain" />}
               </Link>
             )}
-            <label className="flex items-center gap-2 flex-1 min-w-0 bg-slate-50 rounded-full border border-slate-200 px-4 focus-within:border-[#0A2540]">
+            {/* MÁY TÍNH: ô tìm kiếm + nút "Tìm kiếm" như cũ. */}
+            <label className="hidden md:flex items-center gap-2 flex-1 min-w-0 bg-slate-50 rounded-full border border-slate-200 px-4 focus-within:border-[#0A2540]">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-4 h-4 text-slate-400 shrink-0"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
-              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && showMine(false)} onFocus={(e) => { if (window.innerWidth < 768) { e.currentTarget.blur(); setSearchOpen(true); } }} className="py-2 w-full outline-none text-sm bg-transparent" placeholder="Khu vực, từ khoá, dự án…" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && showMine(false)} className="py-2 w-full outline-none text-sm bg-transparent" placeholder="Khu vực, từ khoá, dự án…" />
             </label>
-            {/* MOBILE: nút Bộ lọc GỌN ngay trong hàng tìm kiếm (mở bottom-sheet) — 1 hàng cho gọn */}
-            {!mapView && (
-              <button onClick={() => setFilterOpen(true)} aria-label="Bộ lọc" className="cl-press md:hidden relative shrink-0 w-10 h-10 grid place-items-center rounded-full border border-slate-200 text-[#0A2540]">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-5 h-5"><path d="M3 5h18M6 12h12M10 19h4" /></svg>
-                {activeFilters > 0 && <span className="absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 grid place-items-center rounded-full bg-red-600 text-white text-[10px] font-extrabold leading-none">{activeFilters}</span>}
+            {/* ĐIỆN THOẠI: MỘT KHỐI giống hệt trang chủ (28/9/2026) — 📍 chữ gõ … ⚙ [🔍].
+                Gõ THẲNG trong ô (bỏ kiểu bấm ô là bật màn hình tìm kiếm toàn màn hình).
+                Nút lọc mở bảng "Lọc nâng cao" dùng chung với trang chủ (components/LocNangCao),
+                dùng được cả ở chế độ danh sách lẫn bản đồ. */}
+            <div className="md:hidden flex h-11 min-w-0 flex-1 items-center rounded-lg border border-transparent bg-slate-100 pr-1 transition-colors focus-within:border-[#C8A14B] focus-within:bg-white">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-3 h-[18px] w-[18px] shrink-0 text-slate-400"><path d="M12 21s-6.5-5.4-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.6 12 21 12 21Z" /><circle cx="12" cy="10.5" r="2.3" /></svg>
+              <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && showMine(false)} enterKeyHint="search"
+                placeholder="Khu vực, từ khoá, dự án…"
+                className="h-full min-w-0 flex-1 bg-transparent px-2 text-sm text-slate-800 outline-none placeholder:text-slate-400" />
+              <button type="button" onClick={() => setFilterOpen(true)} aria-label={activeFilters > 0 ? `Bộ lọc, đang bật ${activeFilters}` : 'Bộ lọc'}
+                className={`relative grid h-9 w-9 shrink-0 place-items-center rounded-md active:bg-slate-200 ${activeFilters > 0 ? 'text-red-600' : 'text-slate-600'}`}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-[18px] w-[18px]"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2" /><circle cx="10" cy="17" r="2" /></svg>
+                {activeFilters > 0 && <span className="absolute right-0.5 top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-red-600 px-1 text-[9px] font-bold leading-none text-white">{activeFilters}</span>}
               </button>
-            )}
-            <button onClick={() => showMine(false)} className={`bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-full text-sm whitespace-nowrap ${hidden && !mapView ? 'hidden md:block' : ''}`}>Tìm kiếm</button>
+              <button type="button" onClick={() => showMine(false)} aria-label="Tìm kiếm"
+                className="cl-press ml-1 grid h-9 w-9 shrink-0 place-items-center rounded-md bg-red-600 text-white active:bg-red-700">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" className="h-[18px] w-[18px]"><circle cx="11" cy="11" r="6.5" /><path d="m20 20-4.2-4.2" /></svg>
+              </button>
+            </div>
+            <button onClick={() => showMine(false)} className="hidden md:block bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-full text-sm whitespace-nowrap">Tìm kiếm</button>
             <button onClick={() => goMapView(!mapView)} aria-label={mapView ? 'Đóng bản đồ' : 'Xem bản đồ'} className={`hidden md:flex items-center gap-1.5 font-bold px-3 sm:px-4 py-2.5 rounded-full text-sm whitespace-nowrap shrink-0 ${mapView ? 'bg-[#0A2540] text-white' : 'bg-teal-600 hover:bg-teal-700 text-white'}`}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M9 20l-5.5 2.5V6L9 3.5m0 16.5 6 -2.5M9 20V3.5m6 14 5.5 2.5V6L15 3.5m0 14V3.5m0 0L9 6" /></svg>
               <span className="hidden sm:inline">{mapView ? 'Đóng bản đồ' : 'Xem bản đồ'}</span>
@@ -893,55 +873,37 @@ function ListingsInner() {
         </div>
       )}
 
-      {/* TÌM KIẾM TOÀN MÀN HÌNH (mobile) — trượt lên như app, có gợi ý khu vực */}
-      <div className={`fixed inset-0 z-[70] md:hidden bg-white flex flex-col transition-transform duration-300 ease-out ${searchOpen ? 'translate-y-0' : 'translate-y-full pointer-events-none'}`} style={{ paddingTop: 'env(safe-area-inset-top)' }} aria-hidden={!searchOpen}>
-        <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
-          <button onClick={() => setSearchOpen(false)} aria-label="Đóng" className="cl-press grid h-9 w-9 shrink-0 place-items-center rounded-lg text-slate-500"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg></button>
-          <label className="flex flex-1 min-w-0 items-center gap-2 rounded-full bg-slate-100 px-4">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4 shrink-0 text-slate-400"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
-            <input ref={searchInputRef} value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { setSearchOpen(false); showMine(false); } }} className="w-full bg-transparent py-2.5 text-base outline-none" placeholder="Khu vực, từ khoá, dự án…" />
-            {q && <button onClick={() => { setQ(''); searchInputRef.current?.focus(); }} aria-label="Xoá" className="shrink-0 text-slate-400"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="9" /><path d="M15 9l-6 6M9 9l6 6" /></svg></button>}
-          </label>
-          <button onClick={() => { setSearchOpen(false); showMine(false); }} className="cl-press shrink-0 rounded-full bg-red-600 px-4 py-2 text-sm font-bold text-white">Tìm</button>
-        </div>
-        <div className="flex-1 overflow-y-auto px-4 py-4">
-          <p className="mb-2.5 text-[11px] font-bold uppercase tracking-wide text-slate-400">Khu vực phổ biến</p>
-          <div className="flex flex-wrap gap-2">
-            {['Bãi Dài', 'Cam Hải Đông', 'Cam Đức', 'Cam Thành Bắc', 'Cam Hải Tây', 'Cam Hòa', 'Suối Tân', 'Cam Hiệp'].map((a) => (
-              <button key={a} onClick={() => { setQ(a); setMine(false); setSearchOpen(false); load({ q: a, mine: false }); }} className="cl-press inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3.5 py-2 text-sm text-slate-600 active:bg-slate-50">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-slate-400"><path d="M12 21s-6.5-5.4-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.6 12 21 12 21Z" /><circle cx="12" cy="10.5" r="2.2" /></svg>
-                {a}
-              </button>
+      {/* BẢNG LỌC (điện thoại) — GIỐNG HỆT trang chủ (components/LocNangCao, 28/9/2026).
+          Mọi thay đổi áp NGAY vào danh sách (giá kéo thì chờ 0,4 giây mới tải lại cho đỡ gọi dồn),
+          nút chân bảng ghi đúng số tin đang khớp. */}
+      <KhungBangLoc mo={filterOpen} dong={() => setFilterOpen(false)} coLoc={activeFilters > 0}
+        datLai={() => { setType(''); setMin(''); setMax(''); setAreaRange({ min: 0, max: 0 }); setVerified(false); load({ type: '', min: '', max: '' }); }}
+        chan={<NutXemKetQua so={loading ? null : shown.length} onClick={() => setFilterOpen(false)} />}>
+        <MucLoc ten="Nhu cầu">
+          <NutLien ds={[['sale', 'Mua bán'], ['rent', 'Cho thuê']] as const} chon={deal === 'rent' ? 'rent' : 'sale'} doi={(k) => switchDeal(k)} />
+        </MucLoc>
+        <MucLoc ten="Loại hình">
+          <div className="grid grid-cols-3 gap-2">
+            {(deal === 'rent' ? RENT_PROPERTY_TYPES : SALE_PROPERTY_TYPES).map((t) => (
+              <OLuoi key={t} on={type === t} onClick={() => { const v = type === t ? '' : t; setType(v); load({ type: v }); }}>{PROPERTY_LABELS[t]}</OLuoi>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* BỘ LỌC (mobile) — bottom-sheet với chip chọn nhanh */}
-      <BottomSheet open={filterOpen} onClose={() => setFilterOpen(false)} title="Bộ lọc"
-        footer={
-          <div className="flex gap-2">
-            <button onClick={() => { setType(''); setMin(''); setMax(''); setAreaRange({ min: 0, max: 0 }); setVerified(false); load({ type: '', min: '', max: '' }); }} className="cl-press flex-1 rounded-xl border border-slate-300 py-2.5 text-sm font-bold text-slate-600">Xoá lọc</button>
-            <button onClick={() => setFilterOpen(false)} className="cl-press flex-1 rounded-xl bg-red-600 py-2.5 text-sm font-bold text-white">Xem kết quả</button>
-          </div>
-        }>
-        <Fgrp label="Loại hình">
-          {TYPES.map((t) => <Fchip key={t || 'all'} on={type === t} onClick={() => { setType(t); load({ type: t }); }}>{t ? PROPERTY_LABELS[t as PropertyType] : 'Tất cả'}</Fchip>)}
-        </Fgrp>
-        <Fgrp label="Mức giá">
-          {PRICE_RANGES.map(([label, mn, mx]) => <Fchip key={label} on={min === mn && max === mx} onClick={() => { setMin(mn); setMax(mx); load({ min: mn, max: mx }); }}>{label}</Fchip>)}
-        </Fgrp>
-        <Fgrp label="Diện tích">
-          {AREA_RANGES.map(([label, mn, mx]) => <Fchip key={label} on={areaRange.min === mn && areaRange.max === mx} onClick={() => setAreaRange({ min: mn, max: mx })}>{label}</Fchip>)}
-        </Fgrp>
-        <button onClick={() => setVerified((v) => !v)} className={`cl-press flex w-full items-center justify-between rounded-xl border px-4 py-3 transition ${verified ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white'}`}>
-          <span className={`flex items-center gap-2 text-sm font-bold ${verified ? 'text-emerald-700' : 'text-slate-600'}`}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M20 6 9 17l-5-5" /></svg>
-            Chỉ tin đã xác thực
-          </span>
-          <span className={`relative h-6 w-10 rounded-full transition ${verified ? 'bg-emerald-500' : 'bg-slate-300'}`}><span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${verified ? 'left-[1.125rem]' : 'left-0.5'}`} /></span>
-        </button>
-      </BottomSheet>
+        </MucLoc>
+        <MucLoc ten={deal === 'rent' ? 'Giá thuê / tháng' : 'Khoảng giá'} tomTat={tomTat(giaLo, giaHi, tranGia.tran, tranGia.dv)}>
+          <KhoangKeo lo={giaLo} hi={giaHi} tran={tranGia.tran} buoc={tranGia.buoc} dv={tranGia.dv}
+            doi={(l, h) => { setMin(l > 0 ? String(l / heSoGia) : ''); setMax(h < tranGia.tran ? String(h / heSoGia) : ''); }} />
+        </MucLoc>
+        <MucLoc ten="Diện tích" tomTat={tomTat(areaRange.min, areaRange.max || TRAN_DT.tran, TRAN_DT.tran, 'm²')}>
+          <KhoangKeo lo={areaRange.min} hi={areaRange.max || TRAN_DT.tran} tran={TRAN_DT.tran} buoc={TRAN_DT.buoc} dv={TRAN_DT.dv}
+            doi={(l, h) => setAreaRange({ min: Math.max(0, l), max: h >= TRAN_DT.tran ? 0 : h })} />
+        </MucLoc>
+        <MucLoc ten="Tin đăng">
+          <button type="button" onClick={() => setVerified((v) => !v)} aria-pressed={verified} className="flex w-full items-center justify-between py-1">
+            <span className="text-sm text-slate-700">Chỉ tin đã xác thực</span>
+            <span className={`relative h-6 w-10 rounded-full transition ${verified ? 'bg-red-600' : 'bg-slate-300'}`}><span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${verified ? 'left-[1.125rem]' : 'left-0.5'}`} /></span>
+          </button>
+        </MucLoc>
+      </KhungBangLoc>
 
       {!mapView && <SiteFooter />}
     </div>

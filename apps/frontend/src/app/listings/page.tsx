@@ -577,8 +577,23 @@ function ListingsInner() {
 
   const listHeader = (
     <>
-      {/* HÀNG 1: bán/thuê. (Ô "Sắp xếp" bên phải đã BỎ — thứ tự tin do thuật toán đẩy tin quyết định.) */}
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+      {/* HÀNG 1: bán/thuê. (Ô "Sắp xếp" bên phải đã BỎ — thứ tự tin do thuật toán đẩy tin quyết định.)
+          ĐIỆN THOẠI (28/9/2026, "làm gọn gàng như trang chủ"): TAB GẠCH CHÂN ĐỎ giống hàng tab trang chủ,
+          số tin ghi nhỏ ở cuối hàng — thay cho nút gạt viên thuốc + dòng "Hiện có N bất động sản" riêng.
+          Máy tính giữ nút gạt như cũ. */}
+      <div className="sm:hidden mb-3 flex items-end justify-between border-b border-slate-200">
+        <div className="flex gap-6">
+          {([['sale', 'Nhà đất bán'], ['rent', 'Cho thuê']] as const).map(([k, ten]) => (
+            <button key={k} onClick={() => switchDeal(k)}
+              className={`relative pb-2 text-[14px] transition ${deal === k ? 'font-bold text-[#0A2540]' : 'font-medium text-slate-500'}`}>
+              {ten}
+              <span aria-hidden className={`absolute inset-x-0 -bottom-px h-[2px] rounded-full bg-red-600 transition-opacity ${deal === k ? 'opacity-100' : 'opacity-0'}`} />
+            </button>
+          ))}
+        </div>
+        <span className="pb-2 text-[12px] text-slate-500">{loading ? 'Đang tìm…' : <><b className="text-[#0A2540]">{shown.length}</b> tin</>}</span>
+      </div>
+      <div className="hidden sm:flex flex-wrap items-center justify-between gap-2 mb-2">
         <div className="inline-flex rounded-full bg-slate-100 p-1 shrink-0">
           <button onClick={() => switchDeal('sale')} className={`px-3 sm:px-4 py-1.5 rounded-full text-sm font-bold transition ${deal === 'sale' ? 'bg-red-600 text-white shadow' : 'text-slate-600 hover:text-[#0A2540]'}`}><span className="sm:hidden">Bán</span><span className="hidden sm:inline">Nhà đất bán</span></button>
           <button onClick={() => switchDeal('rent')} className={`px-3 sm:px-4 py-1.5 rounded-full text-sm font-bold transition ${deal === 'rent' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-[#0A2540]'}`}>Cho thuê</button>
@@ -592,8 +607,8 @@ function ListingsInner() {
           <button onClick={() => showMine(true)} className={`px-3.5 py-1.5 text-sm font-bold ${mine ? 'bg-[#0A2540] text-white' : 'text-slate-600'}`}>🧺 Giỏ của tôi</button>
         </div>
       ) : null}
-      <h1 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">{mine ? 'Giỏ hàng của bạn' : title}</h1>
-      <p className="text-sm text-slate-500 mt-0.5">{loading ? 'Đang tìm…' : <>Hiện có <b className="text-[#0A2540]">{shown.length}</b> bất động sản.</>}</p>
+      <h1 className="text-[17px] leading-snug sm:text-xl md:text-2xl font-extrabold text-[#0A2540]">{mine ? 'Giỏ hàng của bạn' : title}</h1>
+      <p className="hidden sm:block text-sm text-slate-500 mt-0.5">{loading ? 'Đang tìm…' : <>Hiện có <b className="text-[#0A2540]">{shown.length}</b> bất động sản.</>}</p>
       {/* ĐÃ BỎ hàng chip "Giá đất & định giá · Cẩm nang pháp lý · CRM khách hàng":
           ba mục này đã có trong trang Tiện ích rồi, để đây là trùng. Đừng thêm lại. */}
     </>

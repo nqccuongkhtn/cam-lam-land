@@ -49,7 +49,8 @@ function ProjectCard({ p, isAdmin, onDelete }: { p: Project; isAdmin: boolean; o
   );
 }
 
-export default function FeaturedProjects() {
+// chiHien: danh sách mã dự án cần hiện (do bảng "Lọc nâng cao" tab Dự án ở trang chủ gửi xuống); null = hiện hết.
+export default function FeaturedProjects({ chiHien = null, boLoc }: { chiHien?: number[] | null; boLoc?: () => void } = {}) {
   const { user } = useAuth();
   const isAdmin = laAdmin(user);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -64,7 +65,8 @@ export default function FeaturedProjects() {
   const load = () => api<{ projects: Project[] }>('/projects').then((r) => setProjects(r.projects || [])).catch(() => {});
   useEffect(() => { load(); }, []);
 
-  const list = projects.length ? projects : DEFAULTS;
+  const tatCa = projects.length ? projects : DEFAULTS;
+  const list = chiHien ? tatCa.filter((p) => chiHien.includes(p.id)) : tatCa;
   const loop = list.length >= 4;                 // đủ thẻ mới nhân đôi + tự trượt
   const track = loop ? [...list, ...list] : list;
 
@@ -136,6 +138,14 @@ export default function FeaturedProjects() {
           <Link href="/listings" className="text-red-600 font-semibold text-sm hover:underline whitespace-nowrap">Xem thêm →</Link>
         </div>
       </div>
+      {/* Đang lọc từ bảng "Lọc nâng cao" (tab Dự án) → báo rõ + nút bỏ lọc */}
+      {chiHien ? (
+        <div className="-mt-2 mb-3 flex items-center gap-2 text-[13px] text-slate-500">
+          <span>Đang lọc: <b className="text-[#0A2540]">{list.length}</b> dự án</span>
+          {boLoc ? <button onClick={boLoc} className="rounded-full border border-slate-200 px-2.5 py-0.5 text-[12px] font-semibold text-red-600 active:bg-slate-50">Bỏ lọc ×</button> : null}
+        </div>
+      ) : null}
+      {chiHien && list.length === 0 ? <p className="py-6 text-center text-sm text-slate-400">Không có dự án nào khớp bộ lọc.</p> : null}
 
       <div className="relative">
         <button onClick={() => nudge(-1)} aria-label="Xem trước"

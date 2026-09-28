@@ -16,6 +16,7 @@ import { listMyPlaces, listAllPlaces, addPlace, removePlace, type SavedPlace } f
 import { listCustomers, listInterests, addInterest, removeInterest, type Customer, type Interest } from '@/lib/crm';
 import { Skeleton } from '@/components/ui';
 import type { Diem } from '@/components/ChiDuongPanel';
+import { useDayCotNutBanDo } from '@/lib/cotNutBanDo';
 
 // Bỏ dấu tiếng Việt để gõ tìm không cần dấu: gõ "cam lam" vẫn ra "Cam Lâm".
 const boDauVn = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
@@ -690,6 +691,9 @@ export default function MapPage() {
   // với màu thấy trong MicroStation. Mà đây là bản đồ quy hoạch, màu phải đúng bản vẽ được
   // duyệt. Ai muốn thấy nhà cửa bên dưới thì tự kéo thanh "Độ mờ" xuống.
   const [opacity, setOpacity] = useState(1);
+  // Cột nút đổi nền + thanh độ mờ (điện thoại) TỰ NỐI ngay dưới cụm nút +/−/định vị — xem lib/cotNutBanDo.ts
+  const cotNutRef = useRef<HTMLDivElement>(null);
+  const cotNutTop = useDayCotNutBanDo(cotNutRef);
   const [canCuOpen, setCanCuOpen] = useState(false);   // bảng Căn cứ pháp lý (nút dấu hỏi trên bản đồ)
   const [nenOpen, setNenOpen] = useState(false);   // điện thoại: bảng chọn nền nổi trên bản đồ đang mở
   // ĐO THẬT THANH MENU ĐÁY (điện thoại). Chiều cao của nó khác nhau theo từng đời iPhone (vạch vuốt
@@ -2229,7 +2233,7 @@ export default function MapPage() {
           {/* Neo vào ĐÁY CỘT NÚT maplibre (biến --cot-nut-day trong globals.css) chứ KHÔNG để số cứng.
               Số cứng 121px cũ đo hồi nút maplibre còn 31px; trên điện thoại nút to 42px nên cột cao
               hơn 40px, nút định vị tụt xuống đè lên nút đổi nền — chủ dự án thấy "ô vuông trắng lạ". */}
-          <div className="lg:hidden absolute right-[10px] top-[var(--cot-nut-day)] z-10 flex w-[31px] flex-col items-center gap-2.5">
+          <div ref={cotNutRef} style={cotNutTop != null ? { top: cotNutTop } : undefined} className="lg:hidden absolute right-[10px] top-[var(--cot-nut-day)] z-10 flex w-[31px] flex-col items-center gap-2.5">
             <button onClick={() => setBaseMap(baseMap === 'satellite' ? 'street' : 'satellite')}
               aria-label={baseMap === 'satellite' ? 'Chuyển sang bản đồ đường' : 'Chuyển sang ảnh vệ tinh'}
               className="cl-press h-[31px] w-[31px] overflow-hidden rounded-full border-2 border-white bg-slate-200 bg-cover bg-center shadow-[0_1px_5px_rgba(0,0,0,.35)]"

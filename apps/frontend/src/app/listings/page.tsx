@@ -20,6 +20,7 @@ import { usePullToRefresh } from '@/lib/usePullToRefresh';
 import LogoAnh from '@/components/LogoAnh';
 import LogoLe from '@/components/LogoLe';
 import { useLogoLe } from '@/lib/logoLe';
+import { useDayCotNutBanDo } from '@/lib/cotNutBanDo';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false, loading: () => <div className="h-full w-full grid place-items-center bg-slate-100 text-slate-400 text-sm animate-pulse">Đang tải bản đồ…</div> });
 // Khoảng giá theo tỷ (bán) — cho thuê dùng phần lẻ của tỷ để load() giữ nguyên hệ số ×1e9 (3 triệu = 0.003 tỷ).
@@ -139,6 +140,9 @@ function ListingsInner() {
   const [baseMap, setBaseMap] = useState<BaseMap>('satellite');
   const [qhOn, setQhOn] = useState(true);
   const [opacity, setOpacity] = useState(0.7);
+  // Cột nút đổi nền + thanh độ mờ (điện thoại) TỰ NỐI ngay dưới cụm nút +/−/định vị — xem lib/cotNutBanDo.ts
+  const cotNutRef = useRef<HTMLDivElement>(null);
+  const cotNutTop = useDayCotNutBanDo(cotNutRef);
   const [labels, setLabels] = useState(true);
   const [info, setInfo] = useState<{ x: number; y: number; lng: number; lat: number; parcel: any; zoning: any } | null>(null);
   const [showSave, setShowSave] = useState(false); // chỉ hiện form lưu tin khi người dùng bấm "Lưu tin này"
@@ -430,8 +434,9 @@ function ListingsInner() {
       </div>
       {/* ĐIỆN THOẠI: cột nút bên phải GIỐNG HỆT trang Bản đồ (chủ dự án 15/9/2026 "đồng bộ với bên map") —
           nút tròn ảnh thu nhỏ của nền sẽ chuyển sang (bấm là đổi Vệ tinh ↔ Đường) + thanh độ mờ đỏ mảnh 123px.
-          Toạ độ right 10 / top 121 = ngay dưới cụm +/− và nút định vị của MapView, xem ghi chú trong app/map/page.tsx. */}
-      <div className="md:hidden absolute right-[10px] top-[121px] z-10 flex w-[31px] flex-col items-center gap-2.5">
+          Neo vào ĐÁY CỘT NÚT maplibre (biến --cot-nut-day trong globals.css) Y NHƯ trang Bản đồ. ⚠️ Trước để số
+          cứng top 121px (đo hồi cụm nút maplibre chưa bị đẩy xuống) → lệch khỏi cụm nút (sửa 28/9/2026). */}
+      <div ref={cotNutRef} style={cotNutTop != null ? { top: cotNutTop } : undefined} className="md:hidden absolute right-[10px] top-[var(--cot-nut-day)] z-10 flex w-[31px] flex-col items-center gap-2.5">
         <button onClick={() => setBaseMap(baseMap === 'satellite' ? 'street' : 'satellite')}
           aria-label={baseMap === 'satellite' ? 'Chuyển sang bản đồ đường' : 'Chuyển sang ảnh vệ tinh'}
           className="cl-press h-[31px] w-[31px] overflow-hidden rounded-full border-2 border-white bg-slate-200 bg-cover bg-center shadow-[0_1px_5px_rgba(0,0,0,.35)]"

@@ -412,9 +412,13 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
    MapLibre mặc định để nút phóng to / thu nhỏ / định vị chỉ 29×29px — quá nhỏ so với
    chuẩn vùng chạm 44px của điện thoại, rất hay bấm trượt. Phóng lên 42px NHƯNG CHỈ trên
    thiết bị cảm ứng (máy tính dùng chuột giữ nguyên cỡ gọn như cũ). */
+/* ⚠️ Viết ".maplibregl-ctrl.maplibregl-ctrl-group" (2 lớp) chứ không phải 1 lớp: tệp giao diện CỦA
+   MAPLIBRE nạp SAU tệp này và có sẵn luật 29px cùng độ mạnh → đè mất luật 42px. Hậu quả đã gặp
+   (28/9/2026): nút vẫn 29px nhưng --cot-nut-day tính theo nút 42px → cột nút đổi nền + thanh độ mờ
+   tụt xuống, hở một khoảng trống ~40px dưới nút định vị (chủ dự án khoanh đỏ báo). */
 @media (hover: none) and (pointer: coarse) {
-  .maplibregl-ctrl-group button { width: 42px; height: 42px; }
-  .maplibregl-ctrl-group button .maplibregl-ctrl-icon { background-size: 21px 21px; }
+  .maplibregl-ctrl.maplibregl-ctrl-group button { width: 42px; height: 42px; }
+  .maplibregl-ctrl.maplibregl-ctrl-group button .maplibregl-ctrl-icon { background-size: 21px 21px; }
 }
 
 /* ══ Sửa PDF: nút thao tác trên ảnh nhỏ ═══════════════════════════════════════

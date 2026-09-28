@@ -130,8 +130,8 @@ export default function BottomNav() {
             const cls = `relative h-full w-full flex flex-col items-center justify-center gap-[3px] transition-colors active:opacity-70 ${t.on ? 'text-red-600' : 'text-slate-500'}`;
             const inner = noi
               ? (<>
-                  <span aria-hidden className="-mt-[22px] grid h-12 w-12 place-items-center rounded-full bg-gradient-to-b from-red-500 to-red-600 text-white ring-4 ring-white shadow-[0_6px_14px_-4px_rgba(220,38,38,0.55)] transition-transform active:scale-90">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5.5v13M5.5 12h13" /></svg>
+                  <span aria-hidden className="-mt-3 grid h-10 w-10 place-items-center rounded-full bg-gradient-to-b from-red-500 to-red-600 text-white ring-[3px] ring-white shadow-[0_4px_10px_-3px_rgba(220,38,38,0.5)] transition-transform active:scale-90">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5.5v13M5.5 12h13" /></svg>
                   </span>
                   <span className={`text-[10.5px] leading-none ${t.on ? 'font-bold' : 'font-medium'}`}>{t.label}</span>
                 </>)

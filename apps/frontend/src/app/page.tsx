@@ -102,6 +102,9 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
   ],
 };
 
+// Tên tab tin tức ghi gọn trên điện thoại (máy tính vẫn ghi đủ).
+const TEN_GON_DT: Record<string, string> = { 'Thị trường BĐS': 'Thị trường', 'Cẩm nang nhà đất': 'Cẩm nang' };
+
 function Ic({ d }: { d: string }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#0A2540]/60 shrink-0"><path d={d} /></svg>;
 }
@@ -628,8 +631,10 @@ export default function Home() {
           <div className="flex min-w-0 flex-1 items-center gap-3.5 overflow-x-auto no-scrollbar sm:gap-5">
             {Object.keys(NEWS).map((t) => (
               <button key={t} onClick={() => setNewsTab(t)} className={`pb-2.5 text-[13px] sm:text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${newsTab === t ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500 hover:text-[#0A2540]'}`}>
-                {/* Điện thoại ghi gọn "Cẩm nang" để 3 tab + "Xem thêm" vừa MỘT hàng, khỏi phải vuốt */}
-                {t === 'Cẩm nang nhà đất' ? <><span className="sm:hidden">Cẩm nang</span><span className="hidden sm:inline">{t}</span></> : t}
+                {/* Điện thoại ghi GỌN để 3 tab + "Xem thêm" vừa MỘT hàng và còn dư chỗ:
+                    "Thị trường BĐS" → "Thị trường", "Cẩm nang nhà đất" → "Cẩm nang".
+                    ⚠️ Chỉ rút một tab thì màn 360px vẫn khít đúng mép → "Cẩm nang" bị lấn mất chữ (đã vấp 28/9/2026). */}
+                {TEN_GON_DT[t] ? <><span className="sm:hidden">{TEN_GON_DT[t]}</span><span className="hidden sm:inline">{t}</span></> : t}
               </button>
             ))}
           </div>

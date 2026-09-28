@@ -111,11 +111,13 @@ function Ic({ d }: { d: string }) {
      đầu bảng  [×]  Bộ lọc  [Đặt lại]
      thân      mỗi mục = tiêu đề + MỘT kiểu điều khiển phù hợp nhất, cách đều nhau:
                Nhu cầu → 3 nút liền · Loại hình → lưới 3 cột đều ô ·
-               Khu vực, Sắp xếp → ô sổ xuống · Khoảng giá, Diện tích → thanh kéo 2 đầu + 2 ô nhập
+               Khu vực → ô sổ xuống · Khoảng giá, Diện tích → thanh kéo 2 đầu + 2 ô nhập
      chân      một nút đỏ "Xem N tin" (đếm trước)
    Giá cất theo TỶ (y như trang /listings đang dùng), '' = không giới hạn.
    Diện tích cất theo m², 0 = không giới hạn. */
-const SAP_XEP: [string, string][] =[['default', 'Nổi bật'], ['newest', 'Mới nhất'], ['price-asc', 'Giá thấp → cao'], ['price-desc', 'Giá cao → thấp']];
+// ⚠️ KHÔNG có mục "Sắp xếp" trong bảng lọc: thứ tự tin do THUẬT TOÁN ĐẨY TIN quyết định (VIP → tin được
+//    đẩy → tin thường, xem routes/listings.ts). Cho khách tự sắp theo giá/ngày là phá cơ chế bán gói đẩy tin
+//    — chủ dự án bảo bỏ (28/9/2026).
 // Thanh kéo: đầu phải = TRẦN, kéo chạm trần nghĩa là "không giới hạn".
 const TRAN_GIA = { sale: { tran: 20, buoc: 0.1, dv: 'tỷ' }, rent: { tran: 50, buoc: 0.5, dv: 'triệu' } };
 const TRAN_DT = { tran: 2000, buoc: 10, dv: 'm²' };
@@ -243,7 +245,7 @@ export default function Home() {
   const [locMo, setLocMo] = useState(false); // bảng "Lọc nâng cao" trên điện thoại
   // Điều kiện lọc THÊM chỉ có trong bảng lọc điện thoại: giá từ (tỷ), xã, diện tích (m²), sắp xếp.
   const [min, setMin] = useState(''); const [xaLoc, setXaLoc] = useState('');
-  const [dt, setDt] = useState<[number, number]>([0, 0]); const [sapXep, setSapXep] = useState('default');
+  const [dt, setDt] = useState<[number, number]>([0, 0]);
   const coGia = heroDeal !== 'project';
   // TAB DỰ ÁN lọc theo thứ khác hẳn tin đăng: loại dự án + trạng thái (dữ liệu dự án không có giá/diện tích/xã).
   const [duAn, setDuAn] = useState<DuAnGoiY[]>([]);
@@ -253,7 +255,7 @@ export default function Home() {
   const duAnKhop = duAn.filter((p) => (!loaiDA.length || loaiCua(p).some((l) => loaiDA.includes(l))) && (!ttDA || trangThaiCua(p) === ttDA));
   const soLoc = heroDeal === 'project'
     ? loaiDA.length + (ttDA ? 1 : 0)
-    : (type ? 1 : 0) + (xaLoc ? 1 : 0) + (min || max ? 1 : 0) + (dt[0] || dt[1] ? 1 : 0) + (sapXep !== 'default' ? 1 : 0); // hiện số trên nút lọc
+    : (type ? 1 : 0) + (xaLoc ? 1 : 0) + (min || max ? 1 : 0) + (dt[0] || dt[1] ? 1 : 0); // hiện số trên nút lọc
   const heSoGia = heroDeal === 'rent' ? 1000 : 1; // trong máy cất theo tỷ; bán hiện tỷ, thuê hiện triệu
   const tranGia = TRAN_GIA[heroDeal === 'rent' ? 'rent' : 'sale'];
   const giaLo = min ? Number(min) * heSoGia : 0, giaHi = max ? Number(max) * heSoGia : tranGia.tran; // theo đơn vị hiển thị
@@ -263,7 +265,7 @@ export default function Home() {
     if (type && !ds.includes(type)) setType('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [heroDeal]);
-  const datLaiLoc = () => { setType(''); setMin(''); setMax(''); setXaLoc(''); setDt([0, 0]); setSapXep('default'); setLoaiDA([]); setTtDA(''); };
+  const datLaiLoc = () => { setType(''); setMin(''); setMax(''); setXaLoc(''); setDt([0, 0]); setLoaiDA([]); setTtDA(''); };
   // Khoá cuộn trang phía sau khi bảng lọc đang mở (không thì vuốt trong bảng lại cuộn cả trang chủ).
   useEffect(() => {
     if (!locMo) return;
@@ -338,7 +340,6 @@ export default function Home() {
       if (max) p.set('maxPrice', String(Math.round(Number(max) * 1e9)));
       if (dt[0]) p.set('minArea', String(dt[0]));
       if (dt[1]) p.set('maxArea', String(dt[1]));
-      if (sapXep !== 'default') p.set('sort', sapXep);
     }
     return p;
   }
@@ -350,7 +351,7 @@ export default function Home() {
     if (!khoaDem) return;
     setSoKhop(null);
     const t = setTimeout(() => {
-      const p = thamSoLoc(); p.delete('sort'); p.delete('minArea'); p.delete('maxArea'); p.set('limit', '500');
+      const p = thamSoLoc(); p.delete('minArea'); p.delete('maxArea'); p.set('limit', '500');
       api<{ listings: Listing[] }>(`/listings?${p.toString()}`)
         .then((d) => setSoKhop((d.listings || []).filter((l) => { const a = l.area ?? 0; return (!dt[0] || a >= dt[0]) && (!dt[1] || a <= dt[1]); }).length))
         .catch(() => setSoKhop(null));
@@ -591,11 +592,6 @@ export default function Home() {
                 <MucLoc ten="Diện tích" tomTat={tomTat(dt[0], dt[1] || TRAN_DT.tran, TRAN_DT.tran, 'm²')}>
                   <KhoangKeo lo={dt[0]} hi={dt[1] || TRAN_DT.tran} tran={TRAN_DT.tran} buoc={TRAN_DT.buoc} dv={TRAN_DT.dv}
                     doi={(l, h) => setDt([Math.max(0, l), h >= TRAN_DT.tran ? 0 : h])} />
-                </MucLoc>
-
-                <MucLoc ten="Sắp xếp">
-                  <OChon giaTri={sapXep === 'default' ? '' : sapXep} doiGiaTri={(v) => setSapXep(v || 'default')} nhan="Nổi bật"
-                    lop="[&>button]:h-10 [&>button]:border-slate-200" dsChon={SAP_XEP.slice(1).map(([gt, ten]) => ({ gt, ten }))} />
                 </MucLoc>
               </>)}
             </div>

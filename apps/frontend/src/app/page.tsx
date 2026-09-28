@@ -113,40 +113,81 @@ function Ic({ d }: { d: string }) {
 }
 
 /* ── BẢNG "LỌC NÂNG CAO" TRÊN ĐIỆN THOẠI ─────────────────────────────────────
-   Khoảng giá cất theo TỶ (y như trang /listings đang dùng): '' = không giới hạn.
-   Diện tích cất theo m², 0 = không giới hạn — khớp AREA_RANGES bên trang /listings. */
-const KHOANG_GIA: Record<'sale' | 'rent', [string, string, string][]> = {
-  sale: [['Dưới 500 triệu', '', '0.5'], ['500 tr – 1 tỷ', '0.5', '1'], ['1 – 2 tỷ', '1', '2'], ['2 – 3 tỷ', '2', '3'],
-         ['3 – 5 tỷ', '3', '5'], ['5 – 10 tỷ', '5', '10'], ['Trên 10 tỷ', '10', '']],
-  rent: [['Dưới 3 triệu', '', '0.003'], ['3 – 5 triệu', '0.003', '0.005'], ['5 – 10 triệu', '0.005', '0.01'],
-         ['10 – 30 triệu', '0.01', '0.03'], ['Trên 30 triệu', '0.03', '']],
-};
-const DIEN_TICH: [string, number, number][] = [['Dưới 50 m²', 0, 50], ['50 – 100 m²', 50, 100], ['100 – 150 m²', 100, 150],
-  ['150 – 300 m²', 150, 300], ['300 – 1.000 m²', 300, 1000], ['Trên 1.000 m²', 1000, 0]];
+   Bố cục chuẩn (làm lại lần 3, 28/9/2026 — hai bản trước chủ dự án chê lộn xộn):
+     đầu bảng  [×]  Bộ lọc  [Đặt lại]
+     thân      mỗi mục = tiêu đề + MỘT kiểu điều khiển phù hợp nhất, cách đều nhau:
+               Nhu cầu → 3 nút liền · Loại hình → lưới 3 cột đều ô ·
+               Khu vực, Sắp xếp → ô sổ xuống · Khoảng giá, Diện tích → thanh kéo 2 đầu + 2 ô nhập
+     chân      một nút đỏ "Xem N tin" (đếm trước)
+   Giá cất theo TỶ (y như trang /listings đang dùng), '' = không giới hạn.
+   Diện tích cất theo m², 0 = không giới hạn. */
 const SAP_XEP: [string, string][] = [['default', 'Nổi bật'], ['newest', 'Mới nhất'], ['price-asc', 'Giá thấp → cao'], ['price-desc', 'Giá cao → thấp']];
-/* Một mục trong bảng lọc = MỘT DÒNG gọn: tên mục bên trái, giá trị đang chọn bên phải, mũi tên.
-   Bấm vào mới sổ các thẻ chọn ra; mỗi lúc chỉ mở MỘT mục (bảng cha giữ `moMuc`).
-   ⚠️ Bản trước sổ hết mọi mục cùng lúc → chủ dự án chê "nhiều sổ ra hết nhìn chán, thô" (28/9/2026). */
-function MucLoc({ ten, giaTri, co, mo, bat, children }: { ten: string; giaTri: string; co: boolean; mo: boolean; bat: () => void; children: React.ReactNode }) {
+// Thanh kéo: đầu phải = TRẦN, kéo chạm trần nghĩa là "không giới hạn".
+const TRAN_GIA = { sale: { tran: 20, buoc: 0.1, dv: 'tỷ' }, rent: { tran: 50, buoc: 0.5, dv: 'triệu' } };
+const TRAN_DT = { tran: 2000, buoc: 10, dv: 'm²' };
+const soDep = (v: number) => (+v.toFixed(2)).toLocaleString('vi-VN');
+// Chữ tóm tắt bên phải tiêu đề mục: "1 – 2,5 tỷ", "Từ 100 m²", "Tất cả".
+function tomTat(lo: number, hi: number, tran: number, dv: string) {
+  const coLo = lo > 0, coHi = hi < tran;
+  if (!coLo && !coHi) return '';
+  if (coLo && coHi) return `${soDep(lo)} – ${soDep(hi)} ${dv}`;
+  return coLo ? `Từ ${soDep(lo)} ${dv}` : `Đến ${soDep(hi)} ${dv}`;
+}
+
+function MucLoc({ ten, tomTat, children }: { ten: string; tomTat?: string; children: React.ReactNode }) {
   return (
-    <div className="border-b border-slate-100 last:border-0">
-      <button type="button" onClick={bat} aria-expanded={mo} className="flex h-12 w-full items-center gap-3 text-left">
-        <span className="flex-1 text-sm text-slate-700">{ten}</span>
-        <span className={`max-w-[55%] truncate text-[13px] ${co ? 'font-semibold text-red-600' : 'text-slate-400'}`}>{giaTri}</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-          className={`h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 ${mo ? 'rotate-180' : ''}`}><path d="m6 9 6 6 6-6" /></svg>
-      </button>
-      {mo && <div className="flex flex-wrap gap-1.5 pb-3.5">{children}</div>}
-    </div>
+    <section className="border-b border-slate-100 py-4 last:border-0">
+      <div className="mb-3 flex items-baseline justify-between gap-3">
+        <h3 className="text-sm font-semibold text-[#0A2540]">{ten}</h3>
+        {tomTat ? <span className="truncate text-[13px] font-medium text-red-600">{tomTat}</span> : null}
+      </div>
+      {children}
+    </section>
   );
 }
-// Thẻ chọn nhỏ gọn cao 32px. Đang chọn: nền đỏ nhạt, chữ đỏ.
-function The({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
+
+// Ô nhập số có đơn vị. Giữ chữ đang gõ riêng (gõ "1," chưa xong không bị nhảy mất dấu phẩy),
+// rời ô mới chốt số. Để trống = không giới hạn.
+function ONhapSo({ nhan, gt, dv, goiY, doi }: { nhan: string; gt: number | null; dv: string; goiY: string; doi: (v: number | null) => void }) {
+  const [chu, setChu] = useState(gt == null ? '' : String(+gt.toFixed(2)).replace('.', ','));
+  const [dangGo, setDangGo] = useState(false);
+  useEffect(() => { if (!dangGo) setChu(gt == null ? '' : String(+gt.toFixed(2)).replace('.', ',')); }, [gt, dangGo]);
   return (
-    <button type="button" onClick={onClick} aria-pressed={on}
-      className={`inline-flex h-8 items-center gap-1 rounded-full border px-3 text-[13px] transition-colors ${on ? 'border-red-200 bg-red-50 font-semibold text-red-600' : 'border-slate-200 bg-white text-slate-600 active:bg-slate-50'}`}>
-      {children}
-    </button>
+    <label className="flex h-10 min-w-0 flex-1 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 focus-within:border-red-400">
+      <span className="text-[12px] text-slate-400">{nhan}</span>
+      <input inputMode="decimal" value={chu} placeholder={goiY}
+        onFocus={() => setDangGo(true)} onBlur={() => setDangGo(false)}
+        onChange={(e) => {
+          const t = e.target.value.replace(/[^\d.,]/g, ''); setChu(t);
+          const n = parseFloat(t.replace(',', '.'));
+          doi(t === '' || isNaN(n) ? null : n);
+        }}
+        className="min-w-0 flex-1 bg-transparent text-right text-sm font-medium text-slate-800 outline-none placeholder:font-normal placeholder:text-slate-300" />
+      <span className="text-[12px] text-slate-400">{dv}</span>
+    </label>
+  );
+}
+
+// Thanh kéo HAI ĐẦU + hai ô nhập. lo = 0 và hi = tran nghĩa là không giới hạn đầu đó.
+function KhoangKeo({ lo, hi, tran, buoc, dv, doi }: { lo: number; hi: number; tran: number; buoc: number; dv: string; doi: (lo: number, hi: number) => void }) {
+  const pLo = Math.min(lo, tran) / tran * 100, pHi = Math.min(hi, tran) / tran * 100;
+  return (
+    <div>
+      <div className="cl-keo mx-1.5">
+        <div className="cl-keo-ray" />
+        <div className="cl-keo-day" style={{ left: `${pLo}%`, right: `${100 - pHi}%` }} />
+        <input type="range" aria-label={`Từ (${dv})`} min={0} max={tran} step={buoc} value={Math.min(lo, tran)}
+          onChange={(e) => doi(Math.min(Number(e.target.value), hi - buoc), hi)} />
+        <input type="range" aria-label={`Đến (${dv})`} min={0} max={tran} step={buoc} value={Math.min(hi, tran)}
+          onChange={(e) => doi(lo, Math.max(Number(e.target.value), lo + buoc))} />
+      </div>
+      <div className="mt-1 mb-3 flex justify-between px-0.5 text-[11px] text-slate-400"><span>0</span><span>{soDep(tran)}+ {dv}</span></div>
+      <div className="flex items-center gap-2">
+        <ONhapSo nhan="Từ" gt={lo > 0 ? lo : null} dv={dv} goiY="0" doi={(v) => doi(v ?? 0, hi)} />
+        <span className="text-slate-300">–</span>
+        <ONhapSo nhan="Đến" gt={hi < tran ? hi : null} dv={dv} goiY="Tối đa" doi={(v) => doi(lo, v ?? tran)} />
+      </div>
+    </div>
   );
 }
 
@@ -211,16 +252,9 @@ export default function Home() {
   const [dt, setDt] = useState<[number, number]>([0, 0]); const [sapXep, setSapXep] = useState('default');
   const coGia = heroDeal !== 'project';
   const soLoc = (type ? 1 : 0) + (xaLoc ? 1 : 0) + (coGia && (min || max) ? 1 : 0) + (coGia && (dt[0] || dt[1]) ? 1 : 0) + (coGia && sapXep !== 'default' ? 1 : 0); // hiện số trên nút lọc
-  const [moMuc, setMoMuc] = useState(''); // mục đang sổ ra trong bảng lọc ('' = thu hết)
-  const heSoGia = heroDeal === 'rent' ? 1000 : 1; // bán ghi tỷ, thuê ghi triệu
-  const chuGia = (() => { // chữ tóm tắt khoảng giá ở dòng "Khoảng giá"
-    const mau = KHOANG_GIA[heroDeal === 'rent' ? 'rent' : 'sale'].find(([, a, b]) => a === min && b === max);
-    if (mau) return mau[0];
-    if (!min && !max) return 'Tất cả';
-    const dv = heroDeal === 'rent' ? ' triệu' : ' tỷ', so = (v: string) => String(+(Number(v) * heSoGia).toFixed(3));
-    return min && max ? `${so(min)} – ${so(max)}${dv}` : min ? `Từ ${so(min)}${dv}` : `Đến ${so(max)}${dv}`;
-  })();
-  useEffect(() => { if (!locMo) setMoMuc(''); }, [locMo]); // mở lại bảng thì mọi mục đều thu gọn
+  const heSoGia = heroDeal === 'rent' ? 1000 : 1; // trong máy cất theo tỷ; bán hiện tỷ, thuê hiện triệu
+  const tranGia = TRAN_GIA[heroDeal === 'rent' ? 'rent' : 'sale'];
+  const giaLo = min ? Number(min) * heSoGia : 0, giaHi = max ? Number(max) * heSoGia : tranGia.tran; // theo đơn vị hiển thị
   const datLaiLoc = () => { setType(''); setMin(''); setMax(''); setXaLoc(''); setDt([0, 0]); setSapXep('default'); };
   // Khoá cuộn trang phía sau khi bảng lọc đang mở (không thì vuốt trong bảng lại cuộn cả trang chủ).
   useEffect(() => {
@@ -383,15 +417,15 @@ export default function Home() {
               {/* Cân đối: lề trái = lề phải (6px quanh hai nút), hai nút CÙNG CỠ 32px (ô cao 44px — bản 48px chủ dự án chê to, thô) thành một cặp —
                   nút lọc nền xám nhạt, nút tìm nền đỏ. Trước đây nút đỏ 40px sát mép còn nút lọc chỉ là
                   một biểu tượng trơ trọi → chủ dự án thấy lệch (28/9/2026). */}
-              {/* Nền dải bao quanh giờ là TRẮNG (hết navy) → ô tìm kiếm đổi sang nền xám rất nhạt + viền mảnh
-                  cho nổi lên; nút lọc nền trắng để vẫn tách khỏi nền ô. */}
-              <div className="flex h-11 items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 pl-3 pr-1.5 focus-within:border-[#C8A14B] focus-within:bg-white">
+              {/* Nền dải bao quanh giờ là XANH XÁM RẤT NHẠT (hết navy) → ô tìm kiếm nền trắng, bóng nhẹ
+                  cho nổi lên; nút lọc nền xám nhạt để tách khỏi nền ô. */}
+              <div className="flex h-11 items-center gap-1.5 rounded-lg border border-slate-200/70 bg-white pl-3 pr-1.5 shadow-sm shadow-slate-900/5 focus-within:border-[#C8A14B]">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 shrink-0 text-slate-400"><path d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" /></svg>
                 <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} enterKeyHint="search"
                   placeholder={heroDeal === 'project' ? 'Tên dự án…' : heroDeal === 'rent' ? 'Thuê nhà, mặt bằng ở đâu?' : (searchHint || 'Khu vực, dự án…')}
                   className="min-w-0 flex-1 bg-transparent px-1 py-2 text-sm text-slate-800 outline-none placeholder:text-slate-400" />
                 <button type="button" onClick={() => setLocMo(true)} aria-label="Lọc nâng cao"
-                  className={`relative grid h-8 w-8 shrink-0 place-items-center rounded-md transition-colors ${soLoc > 0 ? 'bg-red-50 text-red-600' : 'border border-slate-200 bg-white text-[#0A2540] active:bg-slate-100'}`}>
+                  className={`relative grid h-8 w-8 shrink-0 place-items-center rounded-md transition-colors ${soLoc > 0 ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-[#0A2540] active:bg-slate-200'}`}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2" /><circle cx="10" cy="17" r="2" /></svg>
                   {soLoc > 0 && <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-white">{soLoc}</span>}
                 </button>
@@ -437,92 +471,71 @@ export default function Home() {
       </Banner11>
 
       {/* BẢNG "LỌC NÂNG CAO" (chỉ điện thoại) — trồi lên từ đáy màn hình khi bấm nút lọc trong ô tìm kiếm.
-          Đặt NGOÀI banner vì banner cắt cụt mọi thứ tràn ra ngoài nó.
-          Dùng nút bấm dạng thẻ thay cho ô sổ xuống: ngón tay chọn một chạm là xong. */}
+          Đặt NGOÀI banner vì banner cắt cụt mọi thứ tràn ra ngoài nó. Bố cục: xem ghi chú ở MucLoc phía trên. */}
       {locMo && (
-        <div className="md:hidden fixed inset-0 z-[70]" role="dialog" aria-label="Lọc nâng cao">
+        <div className="md:hidden fixed inset-0 z-[70]" role="dialog" aria-label="Bộ lọc">
           <div className="absolute inset-0 bg-[#0A2540]/40 cl-sheet-fade" onClick={() => setLocMo(false)} aria-hidden="true" />
-          <div className="absolute inset-x-0 bottom-0 flex max-h-[88dvh] flex-col rounded-t-2xl bg-white px-4 pt-2 shadow-2xl cl-sheet-up" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
-            <div className="mx-auto mb-1 h-1 w-9 rounded-full bg-slate-300" />
-            {/* Đầu bảng: [×] — tên bảng ở giữa — số điều kiện đang bật */}
-            <div className="-mx-4 mb-3 grid grid-cols-[40px_1fr_40px] items-center border-b border-slate-100 px-2 pb-2">
+          <div className="absolute inset-x-0 bottom-0 flex max-h-[90dvh] flex-col rounded-t-2xl bg-white shadow-2xl cl-sheet-up">
+            <div className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-slate-300" />
+            <div className="grid shrink-0 grid-cols-[64px_1fr_64px] items-center border-b border-slate-100 px-2 py-1.5">
               <button type="button" onClick={() => setLocMo(false)} aria-label="Đóng" className="grid h-10 w-10 place-items-center rounded-full text-slate-500 active:bg-slate-100">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-5 w-5"><path d="M18 6 6 18M6 6l12 12" /></svg>
               </button>
-              <span className="text-center text-base font-bold text-[#0A2540]">Lọc nâng cao</span>
-              <span className="text-center text-[12px] font-semibold text-red-600">{soLoc > 0 ? `${soLoc} lọc` : ''}</span>
+              <span className="text-center text-[15px] font-bold text-[#0A2540]">Bộ lọc</span>
+              <button type="button" onClick={datLaiLoc} disabled={soLoc === 0}
+                className="h-10 justify-self-end px-2 text-[13px] font-semibold text-red-600 disabled:text-slate-300">Đặt lại</button>
             </div>
 
-            <div className="-mx-4 flex-1 overflow-y-auto overscroll-contain px-4 pb-2">
-              {/* Nhu cầu: đổi ngay trong bảng, khỏi đóng ra bấm tab trên banner */}
-              <div className="mb-1 grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1">
-                {([['sale', 'Mua bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
-                  <button key={k} type="button" onClick={() => { if (k !== heroDeal) { setHeroDeal(k); setMin(''); setMax(''); } }}
-                    className={`h-8 rounded-md text-[13px] transition-colors ${heroDeal === k ? 'bg-white font-semibold text-[#0A2540] shadow-sm' : 'font-medium text-slate-500'}`}>{ten}</button>
-                ))}
-              </div>
-
-              {/* Chọn xong một thẻ là mục tự thu lại (trừ ô tự gõ giá) → bảng luôn gọn. */}
-              <MucLoc ten="Loại hình" giaTri={type ? PROPERTY_LABELS[type] : 'Tất cả'} co={!!type}
-                mo={moMuc === 'loai'} bat={() => setMoMuc(moMuc === 'loai' ? '' : 'loai')}>
-                {CATS.map((c) => (
-                  <The key={c.t} on={type === c.t} onClick={() => { setType(type === c.t ? '' : c.t); setMoMuc(''); }}>{PROPERTY_LABELS[c.t]}</The>
-                ))}
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4">
+              <MucLoc ten="Nhu cầu">
+                <div className="grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1">
+                  {([['sale', 'Mua bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
+                    <button key={k} type="button" onClick={() => { if (k !== heroDeal) { setHeroDeal(k); setMin(''); setMax(''); } }}
+                      className={`h-9 rounded-md text-[13px] transition-colors ${heroDeal === k ? 'bg-white font-semibold text-[#0A2540] shadow-sm' : 'font-medium text-slate-500'}`}>{ten}</button>
+                  ))}
+                </div>
               </MucLoc>
 
-              <MucLoc ten="Khu vực" giaTri={xaLoc || 'Tất cả'} co={!!xaLoc}
-                mo={moMuc === 'xa'} bat={() => setMoMuc(moMuc === 'xa' ? '' : 'xa')}>
-                {AREAS.map((a) => (
-                  <The key={a.ward} on={xaLoc === a.ward} onClick={() => { setXaLoc(xaLoc === a.ward ? '' : a.ward); setMoMuc(''); }}>{a.name}</The>
-                ))}
+              <MucLoc ten="Loại hình">
+                <div className="grid grid-cols-3 gap-2">
+                  {CATS.map((c) => {
+                    const on = type === c.t;
+                    return (
+                      <button key={c.t} type="button" onClick={() => setType(on ? '' : c.t)} aria-pressed={on}
+                        className={`h-10 truncate rounded-lg border px-1 text-[13px] transition-colors ${on ? 'border-red-500 bg-red-50 font-semibold text-red-600' : 'border-slate-200 text-slate-600 active:bg-slate-50'}`}>
+                        {PROPERTY_LABELS[c.t]}
+                      </button>
+                    );
+                  })}
+                </div>
+              </MucLoc>
+
+              <MucLoc ten="Khu vực">
+                <OChon giaTri={xaLoc} doiGiaTri={setXaLoc} nhan="Tất cả khu vực" lop="[&>button]:h-10 [&>button]:border-slate-200"
+                  dsChon={AREAS.map((a) => ({ gt: a.ward, ten: a.name }))} />
               </MucLoc>
 
               {coGia && (<>
-                <MucLoc ten={heroDeal === 'rent' ? 'Giá thuê' : 'Khoảng giá'} giaTri={chuGia} co={!!(min || max)}
-                  mo={moMuc === 'gia'} bat={() => setMoMuc(moMuc === 'gia' ? '' : 'gia')}>
-                  {KHOANG_GIA[heroDeal === 'rent' ? 'rent' : 'sale'].map(([ten, a, b]) => {
-                    const on = min === a && max === b;
-                    return <The key={ten} on={on} onClick={() => { setMin(on ? '' : a); setMax(on ? '' : b); setMoMuc(''); }}>{ten}</The>;
-                  })}
-                  {/* Tự gõ khoảng giá. Bán tính bằng TỶ, thuê tính bằng TRIỆU — trong máy vẫn cất theo tỷ như cũ. */}
-                  <div className="mt-1 flex w-full items-center gap-2">
-                    {([['Từ', min, setMin], ['Đến', max, setMax]] as const).map(([nhan, gt, dat]) => (
-                      <label key={nhan} className="flex h-9 flex-1 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 focus-within:border-red-300">
-                        <span className="text-[12px] text-slate-400">{nhan}</span>
-                        <input inputMode="decimal" value={gt ? String(+(Number(gt) * heSoGia).toFixed(3)) : ''}
-                          onChange={(e) => { const v = e.target.value.replace(',', '.').replace(/[^\d.]/g, ''); dat(v ? String(Number(v) / heSoGia) : ''); }}
-                          className="min-w-0 flex-1 bg-transparent text-sm text-slate-800 outline-none" />
-                        <span className="text-[12px] text-slate-400">{heroDeal === 'rent' ? 'triệu' : 'tỷ'}</span>
-                      </label>
-                    ))}
-                  </div>
+                <MucLoc ten={heroDeal === 'rent' ? 'Giá thuê / tháng' : 'Khoảng giá'} tomTat={tomTat(giaLo, giaHi, tranGia.tran, tranGia.dv)}>
+                  <KhoangKeo lo={giaLo} hi={giaHi} tran={tranGia.tran} buoc={tranGia.buoc} dv={tranGia.dv}
+                    doi={(l, h) => { setMin(l > 0 ? String(l / heSoGia) : ''); setMax(h < tranGia.tran ? String(h / heSoGia) : ''); }} />
                 </MucLoc>
 
-                <MucLoc ten="Diện tích" giaTri={DIEN_TICH.find(([, a, b]) => dt[0] === a && dt[1] === b)?.[0] || 'Tất cả'} co={!!(dt[0] || dt[1])}
-                  mo={moMuc === 'dt'} bat={() => setMoMuc(moMuc === 'dt' ? '' : 'dt')}>
-                  {DIEN_TICH.map(([ten, a, b]) => {
-                    const on = dt[0] === a && dt[1] === b;
-                    return <The key={ten} on={on} onClick={() => { setDt(on ? [0, 0] : [a, b]); setMoMuc(''); }}>{ten}</The>;
-                  })}
+                <MucLoc ten="Diện tích" tomTat={tomTat(dt[0], dt[1] || TRAN_DT.tran, TRAN_DT.tran, 'm²')}>
+                  <KhoangKeo lo={dt[0]} hi={dt[1] || TRAN_DT.tran} tran={TRAN_DT.tran} buoc={TRAN_DT.buoc} dv={TRAN_DT.dv}
+                    doi={(l, h) => setDt([Math.max(0, l), h >= TRAN_DT.tran ? 0 : h])} />
                 </MucLoc>
 
-                <MucLoc ten="Sắp xếp" giaTri={SAP_XEP.find(([k]) => k === sapXep)?.[1] || 'Nổi bật'} co={sapXep !== 'default'}
-                  mo={moMuc === 'sx'} bat={() => setMoMuc(moMuc === 'sx' ? '' : 'sx')}>
-                  {SAP_XEP.map(([k, ten]) => (
-                    <The key={k} on={sapXep === k} onClick={() => { setSapXep(k); setMoMuc(''); }}>{ten}</The>
-                  ))}
+                <MucLoc ten="Sắp xếp">
+                  <OChon giaTri={sapXep === 'default' ? '' : sapXep} doiGiaTri={(v) => setSapXep(v || 'default')} nhan="Nổi bật"
+                    lop="[&>button]:h-10 [&>button]:border-slate-200" dsChon={SAP_XEP.slice(1).map(([gt, ten]) => ({ gt, ten }))} />
                 </MucLoc>
               </>)}
             </div>
 
-            {/* Chân bảng luôn đứng yên dưới đáy: Đặt lại + nút xem kèm SỐ TIN ĐẾM TRƯỚC */}
-            <div className="-mx-4 flex gap-2 border-t border-slate-100 px-4 pt-3">
-              <button type="button" onClick={datLaiLoc} disabled={soLoc === 0}
-                className="h-11 flex-1 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 active:bg-slate-50 disabled:opacity-40">
-                Đặt lại
-              </button>
+            <div className="shrink-0 border-t border-slate-100 px-4 pt-3" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
               <button type="button" onClick={() => { setLocMo(false); search(); }} disabled={soKhop === 0}
-                className="cl-press h-11 flex-[2] rounded-lg bg-red-600 text-sm font-bold text-white active:bg-red-700 disabled:bg-slate-300 disabled:shadow-none">
+                className="cl-press h-11 w-full rounded-lg bg-red-600 text-sm font-bold text-white active:bg-red-700 disabled:bg-slate-200 disabled:text-slate-500">
                 {soKhop === 0 ? 'Không có tin phù hợp'
                   : soKhop == null ? (heroDeal === 'rent' ? 'Tìm thuê' : heroDeal === 'project' ? 'Xem dự án' : 'Xem kết quả')
                   : `Xem ${soKhop >= 500 ? '500+' : soKhop.toLocaleString('vi-VN')} tin`}

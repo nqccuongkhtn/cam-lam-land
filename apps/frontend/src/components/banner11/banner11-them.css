@@ -603,7 +603,10 @@
 @media (max-width: 767px) {
   .cl-b11-tim {
     margin-top: -1px;
-    background: #fff;
+    /* Nền xanh xám RẤT NHẠT theo tông navy thương hiệu: trắng trơn thì đơn điệu
+       (chủ dự án nhận xét 28/9/2026), navy đậm thì tối web — chọn khoảng giữa.
+       Ô tìm kiếm màu trắng đặt trên nền này nên tự nổi lên. */
+    background: linear-gradient(180deg, #E9EFF7 0%, #F3F6FA 100%);
     padding: 8px 12px 12px;
     border-radius: 0 0 16px 16px;
     box-shadow: 0 6px 16px -10px rgba(15, 23, 42, .18);

@@ -39,6 +39,29 @@ img, a, button { -webkit-user-drag: none; user-drag: none; }      /* không kéo
 .cl-press:active { transform: scale(.97); }
 /* Sheet trong hub tien ich (Kieu 3): troi len tu duoi + nen mo dan */
 .cl-sheet-up { animation: clSheetUp .3s cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* THANH KÉO HAI ĐẦU (bảng Lọc nâng cao — khoảng giá, diện tích). Hai thanh kéo của trình duyệt
+   chồng khít lên nhau; thân thanh trong suốt và KHÔNG nhận chạm, chỉ hai nút tròn nhận chạm —
+   nhờ vậy kéo được cả hai đầu. Vạch đỏ giữa hai nút do trang tự vẽ (div .cl-keo-day). */
+.cl-keo { position: relative; height: 28px; }
+.cl-keo-ray, .cl-keo-day { position: absolute; top: 12px; height: 4px; border-radius: 9999px; }
+.cl-keo-ray { left: 0; right: 0; background: #e2e8f0; }
+.cl-keo-day { background: #dc2626; }
+.cl-keo input[type=range] {
+  position: absolute; inset: 0; width: 100%; height: 28px; margin: 0;
+  background: transparent; pointer-events: none; -webkit-appearance: none; appearance: none;
+}
+.cl-keo input[type=range]::-webkit-slider-runnable-track { background: transparent; height: 28px; }
+.cl-keo input[type=range]::-moz-range-track { background: transparent; }
+.cl-keo input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; pointer-events: auto; width: 22px; height: 22px; margin-top: 3px;
+  border-radius: 9999px; background: #fff; border: 2px solid #dc2626;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, .25); cursor: grab;
+}
+.cl-keo input[type=range]::-moz-range-thumb {
+  pointer-events: auto; width: 18px; height: 18px; border-radius: 9999px; background: #fff;
+  border: 2px solid #dc2626; box-shadow: 0 1px 4px rgba(15, 23, 42, .25); cursor: grab;
+}
 .cl-sheet-fade { animation: clSheetFade .28s ease; }
 @keyframes clSheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes clSheetFade { from { opacity: 0; } to { opacity: 1; } }

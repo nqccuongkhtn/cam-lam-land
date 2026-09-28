@@ -145,7 +145,6 @@ function ListingsInner() {
   const [flyPoint, setFlyPoint] = useState<{ lng: number; lat: number } | null>(null);
   const [sheetExpanded, setSheetExpanded] = useState(true); // bottom sheet lưu tin: kéo lên/thu gọn (đồng bộ với /map)
   const [ads, setAds] = useState<any[]>([]);
-  const [sort, setSort] = useState('default');
   const [inited, setInited] = useState(false); // đã đọc bộ lọc từ URL xong → mới cho ghi URL (tránh ghi đè lúc mount)
   const { user } = useAuth();
   const { openLogin } = useLoginGate();
@@ -214,10 +213,9 @@ function ListingsInner() {
     const mx = sp.get('maxPrice') ? String(Number(sp.get('maxPrice')) / 1e9) : '';
     const kw = sp.get('q') || sp.get('ward') || '';
     const dl = (sp.get('deal') === 'rent' ? 'rent' : 'sale') as DealType;
-    const so = sp.get('sort') || 'default';
     // Diện tích: bảng "Lọc nâng cao" ở trang chủ (điện thoại) gửi sang qua ?minArea=&maxArea= (m²).
     setAreaRange({ min: Number(sp.get('minArea')) || 0, max: Number(sp.get('maxArea')) || 0 });
-    setType(t); setMin(mn); setMax(mx); setQ(kw); setDeal(dl); setSort(so); setInited(true);
+    setType(t); setMin(mn); setMax(mx); setQ(kw); setDeal(dl); setInited(true);
     load({ type: t, min: mn, max: mx, q: kw, deal: dl });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
@@ -230,12 +228,11 @@ function ListingsInner() {
     if (max) sp.set('maxPrice', String(Math.round(Number(max) * 1e9)));
     if (q) sp.set('q', q);
     if (deal === 'rent') sp.set('deal', 'rent');
-    if (sort !== 'default') sp.set('sort', sort);
     if (areaRange.min) sp.set('minArea', String(areaRange.min));
     if (areaRange.max) sp.set('maxArea', String(areaRange.max));
     const qs = sp.toString();
     window.history.replaceState(null, '', qs ? `/listings?${qs}` : '/listings');
-  }, [inited, type, min, max, q, deal, sort, areaRange]);
+  }, [inited, type, min, max, q, deal, areaRange]);
   useEffect(() => { api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {}); }, []);
   // Tải điểm đã lưu của chính mình khi đăng nhập — để hiện thành gim trên bản đồ (cả bán & thuê).
   useEffect(() => { loadDrafts(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user]);
@@ -262,16 +259,16 @@ function ListingsInner() {
   const overlays: ImageOverlay[] = useMemo(() => [{ ...QH, opacity, visible: qhOn }], [opacity, qhOn]);
   const shown = useMemo(() => {
     let a = [...listings];
-    if (sort === 'price-asc') a.sort((x, y) => x.price - y.price);
-    else if (sort === 'price-desc') a.sort((x, y) => y.price - x.price);
-    else if (sort === 'newest') a.sort((x, y) => +new Date(y.createdAt) - +new Date(x.createdAt));
+    // ⚠️ KHÔNG sắp xếp lại ở đây: giữ NGUYÊN thứ tự máy chủ trả về = thứ tự của THUẬT TOÁN ĐẨY TIN
+    //    (VIP → tin được đẩy → tin thường). Đã có ô "Sắp xếp theo giá/ngày", chủ dự án bảo bỏ (28/9/2026)
+    //    vì nó đẩy tin VIP xuống dưới, phá cơ chế bán gói đẩy tin.
     if (areaRange.min || areaRange.max) a = a.filter((l) => { const ar = l.area ?? 0; return (!areaRange.min || ar >= areaRange.min) && (!areaRange.max || ar <= areaRange.max); });
     if (verified) a = a.filter((l) => !!(l as any).verified);
     return a;
-  }, [listings, sort, areaRange, verified]);
+  }, [listings, areaRange, verified]);
   const verifiedCount = useMemo(() => listings.filter((l) => !!(l as any).verified).length, [listings]);
   // Đổi bộ lọc / dữ liệu → xem lại từ đầu.
-  useEffect(() => { setVisible(8); setPage(1); }, [listings, sort, areaRange, verified, deal, mine]);
+  useEffect(() => { setVisible(8); setPage(1); }, [listings, areaRange, verified, deal, mine]);
   const totalPages = Math.max(1, Math.ceil(shown.length / PER_PAGE));
   const feed = isDesktop ? shown.slice((page - 1) * PER_PAGE, page * PER_PAGE) : shown.slice(0, visible);
   // "Nhích" hàng lọc một cái khi tải/đổi tab để người dùng biết CÒN mục khi kéo ngang.
@@ -605,18 +602,12 @@ function ListingsInner() {
 
   const listHeader = (
     <>
-      {/* HÀNG 1: bán/thuê (trái) + sắp xếp (phải) — gộp chung 1 dòng cho gọn */}
+      {/* HÀNG 1: bán/thuê. (Ô "Sắp xếp" bên phải đã BỎ — thứ tự tin do thuật toán đẩy tin quyết định.) */}
       <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
         <div className="inline-flex rounded-full bg-slate-100 p-1 shrink-0">
           <button onClick={() => switchDeal('sale')} className={`px-3 sm:px-4 py-1.5 rounded-full text-sm font-bold transition ${deal === 'sale' ? 'bg-red-600 text-white shadow' : 'text-slate-600 hover:text-[#0A2540]'}`}><span className="sm:hidden">Bán</span><span className="hidden sm:inline">Nhà đất bán</span></button>
           <button onClick={() => switchDeal('rent')} className={`px-3 sm:px-4 py-1.5 rounded-full text-sm font-bold transition ${deal === 'rent' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-[#0A2540]'}`}>Cho thuê</button>
         </div>
-        <label className="flex items-center gap-1.5 text-sm text-slate-500 shrink-0 min-w-0">
-          <span className="hidden sm:inline">Sắp xếp</span>
-          <select value={sort} onChange={(e) => setSort(e.target.value)} className="border border-slate-200 rounded-lg px-2 py-1.5 text-sm bg-white font-semibold text-[#0A2540] outline-none cursor-pointer max-w-full">
-            <option value="default">Mặc định</option><option value="newest">Mới nhất</option><option value="price-asc">Giá thấp→cao</option><option value="price-desc">Giá cao→thấp</option>
-          </select>
-        </label>
       </div>
       {/* Breadcrumb: ẩn trên điện thoại cho đỡ rối, hiện lại từ màn lớn */}
       <div className="hidden sm:block text-xs text-slate-400 mb-1"><Link href="/" className="hover:text-[#0A2540]">{deal === 'rent' ? 'Cho thuê' : 'Bán'}</Link> › <span className="hover:text-[#0A2540]">Khánh Hòa</span> › <span className="text-slate-600">Cam Lâm</span></div>

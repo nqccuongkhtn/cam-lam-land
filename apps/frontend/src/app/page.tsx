@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api, NO_IMG } from '@/lib/api';
@@ -17,8 +17,7 @@ import FeaturedProjects from '@/components/FeaturedProjects';
 import Banner11 from '@/components/banner11/Banner11';
 import SiteFooter from '@/components/SiteFooter';
 import { useFlags } from '@/lib/flags';
-import TimKiemToanManHinh, { nhoTimKiem, khongDau, type DuAnGoiY } from '@/components/TimKiemToanManHinh';
-import { LOAI_DU_AN, TRANG_THAI_DU_AN, loaiCua, trangThaiCua } from '@/lib/duAnLoc';
+import { LOAI_DU_AN, TRANG_THAI_DU_AN, loaiCua, trangThaiCua, type DuAnGoiY } from '@/lib/duAnLoc';
 
 const U = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=800&q=60`;
 const CATS: { t: PropertyType; icon: string }[] = [
@@ -259,8 +258,6 @@ export default function Home() {
   const [loaiDA, setLoaiDA] = useState<string[]>([]); const [ttDA, setTtDA] = useState('');
   const [locDuAn, setLocDuAn] = useState<number[] | null>(null); // mã dự án đang lọc ở mục "Dự án nổi bật"; null = hiện hết
   const duAnKhop = duAn.filter((p) => (!loaiDA.length || loaiCua(p).some((l) => loaiDA.includes(l))) && (!ttDA || trangThaiCua(p) === ttDA));
-  const [timMo, setTimMo] = useState(false); // màn hình tìm kiếm toàn màn hình (điện thoại)
-  const dongTim = useCallback(() => setTimMo(false), []);
   const soLoc = heroDeal === 'project'
     ? loaiDA.length + (ttDA ? 1 : 0)
     : (type ? 1 : 0) + (xaLoc ? 1 : 0) + (min || max ? 1 : 0) + (dt[0] || dt[1] ? 1 : 0) + (sapXep !== 'default' ? 1 : 0); // hiện số trên nút lọc
@@ -333,17 +330,6 @@ export default function Home() {
   function xemDuAn(ids: number[]) {
     setLocDuAn(ids);
     setTimeout(() => document.getElementById('du-an-noi-bat')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
-  }
-  // Màn hình tìm kiếm gọi về đây. chu = chữ gõ, xa = khu vực chọn từ gợi ý.
-  function timTuManHinh(chu: string, xa?: string) {
-    setTimMo(false);
-    if (heroDeal === 'project' && !xa) {
-      const k = khongDau(chu);
-      const ids = duAn.filter((p) => !k || khongDau(`${p.name} ${p.scale || ''} ${p.location || ''}`).includes(k)).map((p) => p.id);
-      if (ids.length || !k) { xemDuAn(k ? ids : duAn.map((p) => p.id)); return; }
-    }
-    if (xa) setXaLoc(xa);
-    router.push(`/listings?${thamSoLoc({ q: xa ? '' : chu, xa: xa ?? xaLoc, deal: heroDeal === 'project' ? 'sale' : heroDeal }).toString()}`);
   }
   // Gom mọi điều kiện lọc thành địa chỉ trang /listings. Dùng chung cho nút tìm và cho phần ĐẾM SỐ TIN trong bảng lọc.
   // Xã được ghép vào ô từ khoá: trang danh sách tìm không dấu trên tiêu đề + địa chỉ + tên xã nên ra đúng tin của xã đó.
@@ -449,26 +435,29 @@ export default function Home() {
                 Nút lọc có số nhỏ màu đỏ = đang bật mấy điều kiện lọc.
                 Máy tính (từ 768px) vẫn giữ nguyên hàng đầy đủ bên dưới. */}
             <div className="md:hidden">
-              {/* Ô TÌM KIẾM ĐIỆN THOẠI (làm lại 28/9/2026 theo kiểu app nhà đất):
+              {/* Ô TÌM KIẾM ĐIỆN THOẠI (28/9/2026):
                   · Nền dải bao quanh TRẮNG (đã thử navy, xanh xám — chủ dự án chê cả hai).
-                  · Cả ô là MỘT NÚT: bấm vào mở màn hình tìm kiếm toàn màn hình (components/TimKiemToanManHinh)
-                    có tìm gần đây + gợi ý khu vực/dự án. Gõ ngay trong ô dưới banner thì không sổ gợi ý được
-                    (banner cắt mất) và bàn phím che nửa màn hình.
-                  · Bên phải, sau vạch ngăn: nút LỌC có số điều kiện đang bật.
-                  · Bỏ nút kính lúp đỏ: tìm bằng phím "Tìm" của bàn phím hoặc dòng "Tìm …" trong màn hình tìm kiếm. */}
-              <div className="flex h-11 items-center rounded-lg bg-slate-100">
-                <button type="button" onClick={() => setTimMo(true)} className="flex h-full min-w-0 flex-1 items-center gap-2.5 pl-3 text-left">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-[18px] w-[18px] shrink-0 text-slate-500"><circle cx="11" cy="11" r="6.5" /><path d="m20 20-4.2-4.2" /></svg>
-                  <span className={`truncate text-sm ${q ? 'text-slate-800' : 'text-slate-400'}`}>
-                    {q || (heroDeal === 'project' ? 'Tìm dự án ở Cam Lâm' : heroDeal === 'rent' ? 'Thuê nhà, mặt bằng ở đâu?' : (searchHint || 'Khu vực, dự án…'))}
-                  </span>
-                </button>
-                <span aria-hidden className="h-5 w-px shrink-0 bg-slate-300" />
-                <button type="button" onClick={() => setLocMo(true)} aria-label={soLoc > 0 ? `Bộ lọc, đang bật ${soLoc}` : 'Bộ lọc'}
-                  className={`relative flex h-full shrink-0 items-center gap-1.5 pl-3 pr-3.5 text-[13px] font-medium ${soLoc > 0 ? 'text-red-600' : 'text-[#0A2540]'}`}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-[18px] w-[18px]"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2" /><circle cx="10" cy="17" r="2" /></svg>
-                  Lọc
-                  {soLoc > 0 && <span className="grid h-[18px] min-w-[18px] place-items-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white">{soLoc}</span>}
+                  · GÕ THẲNG trong ô. ⚠️ Đã thử "bấm ô → mở màn hình tìm kiếm toàn màn hình" —
+                    chủ dự án không thích (bấm vào để gõ lại bật ra màn hình khác). Đừng làm lại.
+                  · Trong ô: kính lúp · chữ gõ · vạch ngăn · nút "Lọc" (có số điều kiện đang bật).
+                  · Ngoài ô: nút đỏ "Tìm" CÙNG CAO 44px với ô → hai khối cân nhau. */}
+              <div className="flex gap-2">
+                <div className="flex h-11 min-w-0 flex-1 items-center rounded-lg border border-transparent bg-slate-100 transition-colors focus-within:border-[#C8A14B] focus-within:bg-white">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="ml-3 h-[18px] w-[18px] shrink-0 text-slate-400"><circle cx="11" cy="11" r="6.5" /><path d="m20 20-4.2-4.2" /></svg>
+                  <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} enterKeyHint="search"
+                    placeholder={heroDeal === 'project' ? 'Tên dự án…' : heroDeal === 'rent' ? 'Thuê nhà, mặt bằng ở đâu?' : (searchHint || 'Khu vực, dự án…')}
+                    className="h-full min-w-0 flex-1 bg-transparent px-2 text-sm text-slate-800 outline-none placeholder:text-slate-400" />
+                  <span aria-hidden className="h-5 w-px shrink-0 bg-slate-300" />
+                  <button type="button" onClick={() => setLocMo(true)} aria-label={soLoc > 0 ? `Bộ lọc, đang bật ${soLoc}` : 'Bộ lọc'}
+                    className={`flex h-full shrink-0 items-center gap-1 pl-2.5 pr-3 text-[13px] font-medium ${soLoc > 0 ? 'text-red-600' : 'text-[#0A2540]'}`}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2" /><circle cx="10" cy="17" r="2" /></svg>
+                    Lọc
+                    {soLoc > 0 && <span className="grid h-[18px] min-w-[18px] place-items-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white">{soLoc}</span>}
+                  </button>
+                </div>
+                <button type="button" onClick={search}
+                  className="cl-press h-11 shrink-0 rounded-lg bg-red-600 px-4 text-sm font-bold text-white active:bg-red-700">
+                  {heroDeal === 'rent' ? 'Tìm thuê' : 'Tìm'}
                 </button>
               </div>
               {/* ⚠️ Đã thử thêm hàng từ khoá "Tìm nhiều: Đất nền · Ven biển…" dưới ô — chủ dự án bảo bỏ (28/9/2026). Đừng thêm lại. */}
@@ -581,7 +570,7 @@ export default function Home() {
                   {duAnKhop.length === 0 ? <p className="py-3 text-center text-[13px] text-slate-400">Không có dự án nào khớp.</p> : (
                     <div className="-my-1">
                       {duAnKhop.map((p) => (
-                        <Link key={p.id} href={`/listings?q=${encodeURIComponent(p.name)}`} onClick={() => { nhoTimKiem(p.name); setLocMo(false); }}
+                        <Link key={p.id} href={`/listings?q=${encodeURIComponent(p.name)}`} onClick={() => setLocMo(false)}
                           className="flex items-center gap-3 py-2 active:bg-slate-50">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           {p.imageUrl ? <img src={p.imageUrl} alt="" loading="lazy" className="h-11 w-11 shrink-0 rounded-md bg-slate-100 object-cover" /> : <span className="h-11 w-11 shrink-0 rounded-md bg-slate-100" />}
@@ -719,12 +708,6 @@ export default function Home() {
       {/* DỰ ÁN BĐS NỔI BẬT — admin quản lý (kiểu batdongsan) */}
       <FeaturedProjects chiHien={locDuAn} boLoc={() => { setLocDuAn(null); setLoaiDA([]); setTtDA(''); }} />
 
-      {/* Màn hình tìm kiếm toàn màn hình (điện thoại) — mở khi bấm ô tìm kiếm dưới banner */}
-      <TimKiemToanManHinh mo={timMo} dong={dongTim} q={q} setQ={setQ} deal={heroDeal}
-        setDeal={(d) => { setHeroDeal(d); setMin(''); setMax(''); }}
-        khuVuc={AREAS} duAn={duAn} onTim={timTuManHinh}
-        onDuAn={(p) => { setTimMo(false); router.push(`/listings?q=${encodeURIComponent(p.name)}`); }}
-        goiY={heroDeal === 'project' ? 'Tên dự án…' : heroDeal === 'rent' ? 'Thuê nhà, mặt bằng ở đâu?' : 'Khu vực, dự án, từ khoá…'} />
 
       {/* PROMO BANNER — quảng cáo (kiểu batdongsan) */}
       <PromoBanner />

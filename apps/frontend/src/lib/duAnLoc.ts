@@ -4,7 +4,9 @@
 //    (status, scale, name) do admin gõ. Nên ở đây SUY RA từ chữ. Admin thêm dự án mới
 //    mà ghi chữ lạ thì dự án đó rơi vào "Khác" chứ không mất.
 //    Lọc theo giá / diện tích cho dự án là KHÔNG làm được: dữ liệu dự án không có hai thứ đó.
-import { khongDau, type DuAnGoiY } from '@/components/TimKiemToanManHinh';
+export type DuAnGoiY = { id: number; name: string; status?: string | null; scale?: string | null; location?: string | null; imageUrl?: string | null };
+// Bỏ dấu để so chữ: "Đất nền" → "dat nen". Tách dấu (NFD) rồi xoá → chữ gõ liền dấu hay tách dấu đều khớp.
+const khongDau = (s: string) => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase().trim();
 
 // Loại dự án: một dự án có thể thuộc nhiều loại (vd "đất nền nghỉ dưỡng").
 export const LOAI_DU_AN: { key: string; ten: string; khop: RegExp }[] = [

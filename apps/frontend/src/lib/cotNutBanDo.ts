@@ -6,7 +6,7 @@
  *  Dùng chung cho trang Bản đồ (app/map) và bản đồ trang Nhà đất (app/listings).
  *
  *  ⚠️ VÌ SAO KHÔNG ĐẶT SỐ CỨNG (đã hỏng 3 lần):
- *   · cụm nút maplibre đổi chiều cao theo máy: nút 29px trên máy tính, 42px trên máy cảm ứng;
+ *   · cụm nút maplibre từng đổi cỡ theo máy (có lúc 42px trên máy cảm ứng — nay giữ 29px mọi nơi);
  *   · nút ĐỊNH VỊ bị thư viện tự ẩn khi trình duyệt không cho lấy vị trí (trang không phải https…),
  *     nên cụm nút lúc có lúc không có nút đó → cao thấp khác nhau cả chục điểm ảnh;
  *   · có trang có nút "?" đẩy cụm nút xuống, có trang không.

@@ -11,7 +11,7 @@ type Name = 'home' | 'find' | 'post' | 'map' | 'me' | 'tools';
 
 // Icon kiểu Facebook: nét mảnh khi bình thường, TÔ ĐẶC khi đang ở tab đó.
 function Ico({ name, on }: { name: Name; on: boolean }) {
-  const p = { width: 22, height: 22, viewBox: '0 0 24 24' } as const;
+  const p = { width: 20, height: 20, viewBox: '0 0 24 24' } as const;
   const ln = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.85, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
   if (name === 'home') return on
     ? <svg {...p} fill="currentColor"><path d="M11.3 3.2 3.9 9.7c-.25.2-.4.5-.4.83V20a1 1 0 0 0 1 1h4.3v-5.3a1 1 0 0 1 1-1h4.4a1 1 0 0 1 1 1V21H19a1 1 0 0 0 1-1v-9.47c0-.32-.15-.62-.4-.83L12.7 3.2a1 1 0 0 0-1.4 0Z" /></svg>
@@ -121,23 +121,27 @@ export default function BottomNav() {
         </div>
       )}
       {/* Thanh dưới: nền trắng mờ + bóng nhẹ thay cho đường kẻ cứng; tab đang chọn có "viên thuốc" màu nhạt ôm icon
-          (thay cho vạch đỏ trên đầu trước đây — nhìn thô). Nút "Đăng tin" nổi lên giữa thành nút tròn đỏ cho dễ thấy.
-          Chiều cao GIỮ 54px — biến --cl-hub-pb ở trên đang tính theo đúng số này. */}
-      <nav className={`md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-xl shadow-[0_-1px_0_rgba(15,23,42,0.06),0_-6px_20px_rgba(15,23,42,0.06)] transition-transform duration-200 ease-out ${hidden ? 'translate-y-full' : 'translate-y-0'}`} style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          (thay cho vạch đỏ trên đầu trước đây — nhìn thô). Nút "Đăng tin" là viên thuốc ĐỎ ĐẶC cùng khổ 28×44 với
+          viên thuốc của tab đang chọn → ngang hàng, cân với 4 nút kia. (Đã thử nút tròn nổi lên 48px rồi 40px:
+          chủ dự án chê to, lệch tỷ lệ — đừng làm nổi lại.)
+          Chiều cao GIỮ 54px — biến --cl-hub-pb ở trên đang tính theo đúng số này.
+          Lúc ẩn đẩy xuống dư 1.25rem cho chắc: hồi nút còn nổi, đẩy vừa đúng 100% thì nửa hình tròn đỏ
+          còn lòi lên ở đáy màn hình (chủ dự án chụp màn hình bắt lỗi 28/9/2026). */}
+      <nav className={`md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-xl shadow-[0_-1px_0_rgba(15,23,42,0.06),0_-6px_20px_rgba(15,23,42,0.06)] transition-transform duration-200 ease-out ${hidden ? 'translate-y-[calc(100%+1.25rem)]' : 'translate-y-0'}`} style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <ul className="flex items-stretch h-[54px] max-w-lg mx-auto px-1">
           {tabs.map((t) => {
             const noi = t.name === 'post'; // nút giữa nổi lên
             const cls = `relative h-full w-full flex flex-col items-center justify-center gap-[3px] transition-colors active:opacity-70 ${t.on ? 'text-red-600' : 'text-slate-500'}`;
             const inner = noi
               ? (<>
-                  <span aria-hidden className="-mt-3 grid h-10 w-10 place-items-center rounded-full bg-gradient-to-b from-red-500 to-red-600 text-white ring-[3px] ring-white shadow-[0_4px_10px_-3px_rgba(220,38,38,0.5)] transition-transform active:scale-90">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5.5v13M5.5 12h13" /></svg>
+                  <span aria-hidden className="grid h-7 w-11 place-items-center rounded-full bg-red-600 text-white shadow-[0_3px_8px_-3px_rgba(220,38,38,0.6)] transition-transform active:scale-90">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5.5v13M5.5 12h13" /></svg>
                   </span>
-                  <span className={`text-[10.5px] leading-none ${t.on ? 'font-bold' : 'font-medium'}`}>{t.label}</span>
+                  <span className={`text-[10px] leading-none ${t.on ? 'font-bold' : 'font-medium'}`}>{t.label}</span>
                 </>)
               : (<>
-                  <span aria-hidden className={`grid h-7 w-12 place-items-center rounded-full transition-colors duration-200 ${t.on ? 'bg-red-50' : ''}`}><Ico name={t.name} on={t.on} /></span>
-                  <span className={`text-[10.5px] leading-none ${t.on ? 'font-bold' : 'font-medium'}`}>{t.label}</span>
+                  <span aria-hidden className={`grid h-7 w-11 place-items-center rounded-full transition-colors duration-200 ${t.on ? 'bg-red-50' : ''}`}><Ico name={t.name} on={t.on} /></span>
+                  <span className={`text-[10px] leading-none ${t.on ? 'font-bold' : 'font-medium'}`}>{t.label}</span>
                 </>);
             return (
               <li key={t.label} className="flex-1">

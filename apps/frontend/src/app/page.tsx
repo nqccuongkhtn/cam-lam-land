@@ -112,6 +112,37 @@ function Ic({ d }: { d: string }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#0A2540]/60 shrink-0"><path d={d} /></svg>;
 }
 
+/* ── BẢNG "LỌC NÂNG CAO" TRÊN ĐIỆN THOẠI ─────────────────────────────────────
+   Khoảng giá cất theo TỶ (y như trang /listings đang dùng): '' = không giới hạn.
+   Diện tích cất theo m², 0 = không giới hạn — khớp AREA_RANGES bên trang /listings. */
+const KHOANG_GIA: Record<'sale' | 'rent', [string, string, string][]> = {
+  sale: [['Dưới 500 triệu', '', '0.5'], ['500 tr – 1 tỷ', '0.5', '1'], ['1 – 2 tỷ', '1', '2'], ['2 – 3 tỷ', '2', '3'],
+         ['3 – 5 tỷ', '3', '5'], ['5 – 10 tỷ', '5', '10'], ['Trên 10 tỷ', '10', '']],
+  rent: [['Dưới 3 triệu', '', '0.003'], ['3 – 5 triệu', '0.003', '0.005'], ['5 – 10 triệu', '0.005', '0.01'],
+         ['10 – 30 triệu', '0.01', '0.03'], ['Trên 30 triệu', '0.03', '']],
+};
+const DIEN_TICH: [string, number, number][] = [['Dưới 50 m²', 0, 50], ['50 – 100 m²', 50, 100], ['100 – 150 m²', 100, 150],
+  ['150 – 300 m²', 150, 300], ['300 – 1.000 m²', 300, 1000], ['Trên 1.000 m²', 1000, 0]];
+// Một mục trong bảng lọc: tiêu đề nhỏ + hàng thẻ chọn tự xuống dòng.
+function MucLoc({ ten, children }: { ten: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-5">
+      <p className="mb-2 text-[13px] font-bold text-[#0A2540]">{ten}</p>
+      <div className="flex flex-wrap gap-2">{children}</div>
+    </div>
+  );
+}
+// Thẻ chọn bo tròn hẳn, cao 36px. Đang chọn: viền + chữ đỏ trên nền đỏ nhạt, kèm dấu ✓.
+function The({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button type="button" onClick={onClick} aria-pressed={on}
+      className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[13px] transition-colors ${on ? 'border-red-500 bg-red-50 font-semibold text-red-600' : 'border-slate-200 bg-white text-slate-700 active:bg-slate-50'}`}>
+      {on && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5"><path d="M20 6 9 17l-5-5" /></svg>}
+      {children}
+    </button>
+  );
+}
+
 const SEARCH_HINTS = [
   'Đất nền Cam Lâm dưới 1 tỷ',
   'Nhà phố trung tâm Cam Đức',
@@ -168,7 +199,18 @@ export default function Home() {
   const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Thị trường BĐS'); /* mở trang chủ là thấy TIN THỊ TRƯỜNG trước */ const [heroDeal, setHeroDeal] = useState<'sale' | 'rent' | 'project'>('sale');
   const searchHint = useTypingHint(SEARCH_HINTS);
   const [locMo, setLocMo] = useState(false); // bảng "Lọc nâng cao" trên điện thoại
-  const soLoc = (type ? 1 : 0) + (max && heroDeal !== 'project' ? 1 : 0); // số điều kiện lọc đang bật → hiện trên nút lọc
+  // Điều kiện lọc THÊM chỉ có trong bảng lọc điện thoại: giá từ (tỷ), xã, diện tích (m²), sắp xếp.
+  const [min, setMin] = useState(''); const [xaLoc, setXaLoc] = useState('');
+  const [dt, setDt] = useState<[number, number]>([0, 0]); const [sapXep, setSapXep] = useState('default');
+  const coGia = heroDeal !== 'project';
+  const soLoc = (type ? 1 : 0) + (xaLoc ? 1 : 0) + (coGia && (min || max) ? 1 : 0) + (coGia && (dt[0] || dt[1]) ? 1 : 0) + (coGia && sapXep !== 'default' ? 1 : 0); // hiện số trên nút lọc
+  const datLaiLoc = () => { setType(''); setMin(''); setMax(''); setXaLoc(''); setDt([0, 0]); setSapXep('default'); };
+  // Khoá cuộn trang phía sau khi bảng lọc đang mở (không thì vuốt trong bảng lại cuộn cả trang chủ).
+  useEffect(() => {
+    if (!locMo) return;
+    const cu = document.body.style.overflow; document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = cu; };
+  }, [locMo]);
   // Bảng giá đổi theo tab (thuê tính triệu/tháng, bán tính tỷ). Dùng chung cho ô "Mức giá" máy tính và bảng lọc điện thoại.
   const MUC_GIA = heroDeal === 'rent'
     ? [{ gt: '0.003', ten: 'Dưới 3 triệu/tháng' }, { gt: '0.005', ten: 'Dưới 5 triệu/tháng' },
@@ -216,11 +258,41 @@ export default function Home() {
       document.getElementById('du-an-noi-bat')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
-    const p = new URLSearchParams();
-    if (type) p.set('propertyType', type); if (max) p.set('maxPrice', String(Number(max) * 1e9)); if (q) p.set('q', q);
-    if (heroDeal === 'rent') p.set('deal', 'rent');
-    router.push(`/listings?${p.toString()}`);
+    router.push(`/listings?${thamSoLoc().toString()}`);
   }
+  // Gom mọi điều kiện lọc thành địa chỉ trang /listings. Dùng chung cho nút tìm và cho phần ĐẾM SỐ TIN trong bảng lọc.
+  // Xã được ghép vào ô từ khoá: trang danh sách tìm không dấu trên tiêu đề + địa chỉ + tên xã nên ra đúng tin của xã đó.
+  function thamSoLoc() {
+    const p = new URLSearchParams();
+    if (type) p.set('propertyType', type);
+    const kw = [q.trim(), xaLoc].filter(Boolean).join(' ');
+    if (kw) p.set('q', kw);
+    if (heroDeal === 'rent') p.set('deal', 'rent');
+    if (coGia) {
+      if (min) p.set('minPrice', String(Math.round(Number(min) * 1e9)));
+      if (max) p.set('maxPrice', String(Math.round(Number(max) * 1e9)));
+      if (dt[0]) p.set('minArea', String(dt[0]));
+      if (dt[1]) p.set('maxArea', String(dt[1]));
+      if (sapXep !== 'default') p.set('sort', sapXep);
+    }
+    return p;
+  }
+  // ĐẾM TRƯỚC số tin khớp để nút cuối bảng lọc ghi "Xem 23 tin" — người dùng biết trước có hàng hay không,
+  // khỏi bấm sang trang rồi mới thấy trống. Chờ 350ms sau lần chọn cuối mới hỏi máy chủ cho đỡ gọi dồn.
+  const [soKhop, setSoKhop] = useState<number | null>(null);
+  const khoaDem = locMo ? thamSoLoc().toString() : '';
+  useEffect(() => {
+    if (!locMo) return;
+    setSoKhop(null);
+    const t = setTimeout(() => {
+      const p = thamSoLoc(); p.delete('sort'); p.delete('minArea'); p.delete('maxArea'); p.set('limit', '500');
+      api<{ listings: Listing[] }>(`/listings?${p.toString()}`)
+        .then((d) => setSoKhop((d.listings || []).filter((l) => { const a = l.area ?? 0; return (!dt[0] || a >= dt[0]) && (!dt[1] || a <= dt[1]); }).length))
+        .catch(() => setSoKhop(null));
+    }, 350);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [khoaDem]);
   const featured = listings.length > 0 ? listings : STATIC;
   const fromApi = listings.length > 0;
   const newsItems = newsTab === 'Thị trường BĐS' ? (marketNews.length ? marketNews.slice(0, 8) : NEWS['Thị trường BĐS'])
@@ -266,7 +338,7 @@ export default function Home() {
                 nền trắng làm nặng mắt và che mất ảnh banner phía sau. */}
             <div className="mb-2 flex items-center justify-center gap-6 sm:gap-8">
               {([['sale', 'Nhà đất bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
-                <button key={k} onClick={() => { setHeroDeal(k); setMax(''); }}
+                <button key={k} onClick={() => { setHeroDeal(k); setMin(''); setMax(''); }}
                   className={`relative pb-1.5 text-[13px] transition sm:text-sm ${heroDeal === k ? 'font-extrabold text-white' : 'font-semibold text-white/75 hover:text-white'}`}>
                   {ten}
                   <span aria-hidden
@@ -291,19 +363,22 @@ export default function Home() {
                 Nút lọc có số nhỏ màu đỏ = đang bật mấy điều kiện lọc.
                 Máy tính (từ 768px) vẫn giữ nguyên hàng đầy đủ bên dưới. */}
             <div className="md:hidden">
-              <div className="flex h-12 items-center rounded-xl bg-white pl-3 pr-1 shadow-lg shadow-black/10 focus-within:ring-2 focus-within:ring-[#C8A14B]">
-                <Ic d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" />
+              {/* Cân đối: lề trái = lề phải (6px quanh hai nút), hai nút CÙNG CỠ 32px (ô cao 44px — bản 48px chủ dự án chê to, thô) thành một cặp —
+                  nút lọc nền xám nhạt, nút tìm nền đỏ. Trước đây nút đỏ 40px sát mép còn nút lọc chỉ là
+                  một biểu tượng trơ trọi → chủ dự án thấy lệch (28/9/2026). */}
+              <div className="flex h-11 items-center gap-1.5 rounded-lg bg-white pl-3 pr-1.5 shadow-md shadow-black/10 focus-within:ring-2 focus-within:ring-[#C8A14B]">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 shrink-0 text-slate-400"><path d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" /></svg>
                 <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} enterKeyHint="search"
                   placeholder={heroDeal === 'project' ? 'Tên dự án…' : heroDeal === 'rent' ? 'Thuê nhà, mặt bằng ở đâu?' : (searchHint || 'Khu vực, dự án…')}
-                  className="min-w-0 flex-1 bg-transparent px-2 py-2.5 text-[15px] text-slate-800 outline-none placeholder:text-slate-400" />
+                  className="min-w-0 flex-1 bg-transparent px-1 py-2 text-sm text-slate-800 outline-none placeholder:text-slate-400" />
                 <button type="button" onClick={() => setLocMo(true)} aria-label="Lọc nâng cao"
-                  className="relative grid h-10 w-10 shrink-0 place-items-center rounded-lg text-[#0A2540] active:bg-slate-100">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-5 w-5"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2" /><circle cx="10" cy="17" r="2" /></svg>
-                  {soLoc > 0 && <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white">{soLoc}</span>}
+                  className={`relative grid h-8 w-8 shrink-0 place-items-center rounded-md transition-colors ${soLoc > 0 ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-[#0A2540] active:bg-slate-200'}`}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2" /><circle cx="10" cy="17" r="2" /></svg>
+                  {soLoc > 0 && <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-white">{soLoc}</span>}
                 </button>
                 <button type="button" onClick={search} aria-label={heroDeal === 'rent' ? 'Tìm thuê' : heroDeal === 'project' ? 'Xem dự án' : 'Tìm kiếm'}
-                  className="cl-press ml-1 grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-red-600 text-white shadow-md shadow-red-600/30 active:bg-red-700">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" className="h-5 w-5"><circle cx="11" cy="11" r="6.5" /><path d="m20 20-4.2-4.2" /></svg>
+                  className="cl-press grid h-8 w-8 shrink-0 place-items-center rounded-md bg-red-600 text-white active:bg-red-700">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" className="h-4 w-4"><circle cx="11" cy="11" r="6.5" /><path d="m20 20-4.2-4.2" /></svg>
                 </button>
               </div>
             </div>
@@ -348,51 +423,89 @@ export default function Home() {
       {locMo && (
         <div className="md:hidden fixed inset-0 z-[70]" role="dialog" aria-label="Lọc nâng cao">
           <div className="absolute inset-0 bg-[#0A2540]/40 cl-sheet-fade" onClick={() => setLocMo(false)} aria-hidden="true" />
-          <div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-white px-4 pt-2 shadow-2xl cl-sheet-up" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }}>
-            <div className="mx-auto mb-2 h-1 w-9 rounded-full bg-slate-300" />
-            <div className="mb-3 flex items-center justify-between">
-              <span className="text-base font-bold text-[#0A2540]">Lọc nâng cao</span>
-              <button type="button" onClick={() => setLocMo(false)} aria-label="Đóng" className="grid h-9 w-9 place-items-center rounded-full text-slate-400 active:bg-slate-100">
+          <div className="absolute inset-x-0 bottom-0 flex max-h-[88dvh] flex-col rounded-t-2xl bg-white px-4 pt-2 shadow-2xl cl-sheet-up" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
+            <div className="mx-auto mb-1 h-1 w-9 rounded-full bg-slate-300" />
+            {/* Đầu bảng: [×] — tên bảng ở giữa — số điều kiện đang bật */}
+            <div className="-mx-4 mb-3 grid grid-cols-[40px_1fr_40px] items-center border-b border-slate-100 px-2 pb-2">
+              <button type="button" onClick={() => setLocMo(false)} aria-label="Đóng" className="grid h-10 w-10 place-items-center rounded-full text-slate-500 active:bg-slate-100">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-5 w-5"><path d="M18 6 6 18M6 6l12 12" /></svg>
               </button>
+              <span className="text-center text-base font-bold text-[#0A2540]">Lọc nâng cao</span>
+              <span className="text-center text-[12px] font-semibold text-red-600">{soLoc > 0 ? `${soLoc} lọc` : ''}</span>
             </div>
 
-            <p className="mb-2 text-[13px] font-semibold text-slate-500">Loại hình</p>
-            <div className="mb-4 grid grid-cols-3 gap-2">
-              {CATS.map((c) => {
-                const on = type === c.t;
-                return (
-                  <button key={c.t} type="button" onClick={() => setType(on ? '' : c.t)}
-                    className={`flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-lg border px-1 py-2 text-[13px] transition-colors ${on ? 'border-red-500 bg-red-50 font-semibold text-red-600' : 'border-slate-200 text-slate-700 active:bg-slate-50'}`}>
-                    <span className="text-xl leading-none">{c.icon}</span>{PROPERTY_LABELS[c.t]}
-                  </button>
-                );
-              })}
-            </div>
-
-            {heroDeal !== 'project' && (<>
-              <p className="mb-2 text-[13px] font-semibold text-slate-500">Mức giá</p>
-              <div className="mb-5 grid grid-cols-2 gap-2">
-                {MUC_GIA.map((m) => {
-                  const on = max === m.gt;
-                  return (
-                    <button key={m.gt} type="button" onClick={() => setMax(on ? '' : m.gt)}
-                      className={`min-h-[44px] rounded-lg border px-2 text-[13px] transition-colors ${on ? 'border-red-500 bg-red-50 font-semibold text-red-600' : 'border-slate-200 text-slate-700 active:bg-slate-50'}`}>
-                      {m.ten}
-                    </button>
-                  );
-                })}
+            <div className="-mx-4 flex-1 overflow-y-auto overscroll-contain px-4 pb-2">
+              {/* Nhu cầu: đổi ngay trong bảng, khỏi đóng ra bấm tab trên banner */}
+              <div className="mb-4 grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1">
+                {([['sale', 'Mua bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
+                  <button key={k} type="button" onClick={() => { if (k !== heroDeal) { setHeroDeal(k); setMin(''); setMax(''); } }}
+                    className={`h-9 rounded-md text-[13px] transition-colors ${heroDeal === k ? 'bg-white font-bold text-[#0A2540] shadow-sm' : 'font-medium text-slate-500'}`}>{ten}</button>
+                ))}
               </div>
-            </>)}
 
-            <div className="flex gap-2">
-              <button type="button" onClick={() => { setType(''); setMax(''); }}
-                className="min-h-[48px] flex-1 rounded-lg border border-slate-300 font-semibold text-slate-700 active:bg-slate-50">
+              <MucLoc ten="Loại hình">
+                {CATS.map((c) => (
+                  <The key={c.t} on={type === c.t} onClick={() => setType(type === c.t ? '' : c.t)}>
+                    <span className="text-[15px] leading-none">{c.icon}</span>{PROPERTY_LABELS[c.t]}
+                  </The>
+                ))}
+              </MucLoc>
+
+              <MucLoc ten="Khu vực">
+                {AREAS.map((a) => (
+                  <The key={a.ward} on={xaLoc === a.ward} onClick={() => setXaLoc(xaLoc === a.ward ? '' : a.ward)}>{a.name}</The>
+                ))}
+              </MucLoc>
+
+              {coGia && (<>
+                <MucLoc ten={heroDeal === 'rent' ? 'Giá thuê mỗi tháng' : 'Khoảng giá'}>
+                  {KHOANG_GIA[heroDeal === 'rent' ? 'rent' : 'sale'].map(([ten, a, b]) => {
+                    const on = min === a && max === b;
+                    return <The key={ten} on={on} onClick={() => { setMin(on ? '' : a); setMax(on ? '' : b); }}>{ten}</The>;
+                  })}
+                </MucLoc>
+                {/* Tự gõ khoảng giá. Bán tính bằng TỶ, thuê tính bằng TRIỆU — trong máy vẫn cất theo tỷ như cũ. */}
+                <div className="-mt-2 mb-5 flex items-center gap-2">
+                  {([['Từ', min, setMin], ['Đến', max, setMax]] as const).map(([nhan, gt, dat]) => {
+                    const heSo = heroDeal === 'rent' ? 1000 : 1;
+                    return (
+                      <label key={nhan} className="flex h-10 flex-1 items-center gap-1.5 rounded-lg border border-slate-200 px-3 focus-within:border-red-400">
+                        <span className="text-[12px] text-slate-400">{nhan}</span>
+                        <input inputMode="decimal" value={gt ? String(+(Number(gt) * heSo).toFixed(3)) : ''}
+                          onChange={(e) => { const v = e.target.value.replace(',', '.').replace(/[^\d.]/g, ''); dat(v ? String(Number(v) / heSo) : ''); }}
+                          className="min-w-0 flex-1 bg-transparent text-sm text-slate-800 outline-none" />
+                        <span className="text-[12px] text-slate-400">{heroDeal === 'rent' ? 'triệu' : 'tỷ'}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+
+                <MucLoc ten="Diện tích">
+                  {DIEN_TICH.map(([ten, a, b]) => {
+                    const on = dt[0] === a && dt[1] === b;
+                    return <The key={ten} on={on} onClick={() => setDt(on ? [0, 0] : [a, b])}>{ten}</The>;
+                  })}
+                </MucLoc>
+
+                <MucLoc ten="Sắp xếp">
+                  {([['default', 'Nổi bật'], ['newest', 'Mới nhất'], ['price-asc', 'Giá thấp → cao'], ['price-desc', 'Giá cao → thấp']] as const).map(([k, ten]) => (
+                    <The key={k} on={sapXep === k} onClick={() => setSapXep(k)}>{ten}</The>
+                  ))}
+                </MucLoc>
+              </>)}
+            </div>
+
+            {/* Chân bảng luôn đứng yên dưới đáy: Đặt lại + nút xem kèm SỐ TIN ĐẾM TRƯỚC */}
+            <div className="-mx-4 flex gap-2 border-t border-slate-100 px-4 pt-3">
+              <button type="button" onClick={datLaiLoc} disabled={soLoc === 0}
+                className="h-12 flex-1 rounded-lg border border-slate-300 font-semibold text-slate-700 active:bg-slate-50 disabled:opacity-40">
                 Đặt lại
               </button>
-              <button type="button" onClick={() => { setLocMo(false); search(); }}
-                className="cl-press min-h-[48px] flex-[2] rounded-lg bg-red-600 font-bold text-white shadow-lg shadow-red-600/30 active:bg-red-700">
-                {heroDeal === 'rent' ? 'Tìm thuê' : heroDeal === 'project' ? 'Xem dự án' : 'Xem kết quả'}
+              <button type="button" onClick={() => { setLocMo(false); search(); }} disabled={soKhop === 0}
+                className="cl-press h-12 flex-[2] rounded-lg bg-red-600 font-bold text-white shadow-lg shadow-red-600/30 active:bg-red-700 disabled:bg-slate-300 disabled:shadow-none">
+                {soKhop === 0 ? 'Không có tin phù hợp'
+                  : soKhop == null ? (heroDeal === 'rent' ? 'Tìm thuê' : heroDeal === 'project' ? 'Xem dự án' : 'Xem kết quả')
+                  : `Xem ${soKhop >= 500 ? '500+' : soKhop.toLocaleString('vi-VN')} tin`}
               </button>
             </div>
           </div>

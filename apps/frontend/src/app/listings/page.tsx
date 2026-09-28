@@ -215,6 +215,8 @@ function ListingsInner() {
     const kw = sp.get('q') || sp.get('ward') || '';
     const dl = (sp.get('deal') === 'rent' ? 'rent' : 'sale') as DealType;
     const so = sp.get('sort') || 'default';
+    // Diện tích: bảng "Lọc nâng cao" ở trang chủ (điện thoại) gửi sang qua ?minArea=&maxArea= (m²).
+    setAreaRange({ min: Number(sp.get('minArea')) || 0, max: Number(sp.get('maxArea')) || 0 });
     setType(t); setMin(mn); setMax(mx); setQ(kw); setDeal(dl); setSort(so); setInited(true);
     load({ type: t, min: mn, max: mx, q: kw, deal: dl });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -229,9 +231,11 @@ function ListingsInner() {
     if (q) sp.set('q', q);
     if (deal === 'rent') sp.set('deal', 'rent');
     if (sort !== 'default') sp.set('sort', sort);
+    if (areaRange.min) sp.set('minArea', String(areaRange.min));
+    if (areaRange.max) sp.set('maxArea', String(areaRange.max));
     const qs = sp.toString();
     window.history.replaceState(null, '', qs ? `/listings?${qs}` : '/listings');
-  }, [inited, type, min, max, q, deal, sort]);
+  }, [inited, type, min, max, q, deal, sort, areaRange]);
   useEffect(() => { api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {}); }, []);
   // Tải điểm đã lưu của chính mình khi đăng nhập — để hiện thành gim trên bản đồ (cả bán & thuê).
   useEffect(() => { loadDrafts(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user]);

@@ -1,8 +1,11 @@
 'use client';
-import { useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import Link from 'next/link';
 import InstallAppButton from './InstallAppButton';
 import { api } from '@/lib/api';
+import { fmtInt } from '@/lib/types';
+import { TIEN_ICH_TOOLS } from '@/lib/tienIchTools';
+import { locTheoQuyen } from '@/components/HubShell';
 
 const DISCOVER: [string, string][] = [
   ['Giới thiệu Cam Lâm Land', '/gioi-thieu'],
@@ -30,12 +33,29 @@ const RULES: [string, string][] = [
   ['Giải quyết khiếu nại', '/giai-quyet-khieu-nai'],
 ];
 
-const STATS = [
-  { n: '2,000+', l: 'Bất động sản', d: 'M3 21h18M5 21V7l6-4 6 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01' },
-  { n: '5,000+', l: 'Khách hàng', d: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' },
-  { n: '50+', l: 'Dự án quy hoạch', d: 'M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' },
-  { n: '8 năm', l: 'Kinh nghiệm', d: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 6v6l4 2' },
-];
+/* ── SỐ LIỆU ĐẦU CHÂN TRANG — CHỈ GHI SỐ THẬT ────────────────────────────────
+   ⚠️ Trước đây ghi cứng "2,000+ bất động sản · 5,000+ khách hàng · 50+ dự án · 8 năm"
+      trong khi web thật có ~60 tin, 8 dự án — chủ dự án bắt "số liệu cần hợp lý hơn" (28/9/2026).
+      Nay: số tin + số dự án LẤY THẲNG từ máy chủ, số công cụ ĐẾM từ danh sách Tiện ích,
+      64 = số xã/phường hiện hành của Khánh Hòa có bản đồ địa chính (65 − đặc khu Trường Sa).
+   ⚠️ KHÔNG đưa tổng số thửa đất ra đây: con số đó chỉ admin được thấy (chống cào — xem CLAUDE.md). */
+const SO_XA_DIA_CHINH = 64;
+const SO_CONG_CU = locTheoQuyen(TIEN_ICH_TOOLS, null).length; // chỉ đếm công cụ ai cũng thấy
+function useSoLieu() {
+  const [soTin, setSoTin] = useState<number | null>(null);
+  const [soDuAn, setSoDuAn] = useState<number | null>(null);
+  useEffect(() => {
+    api<{ areas: { count: number }[] }>('/listings/areas').then((d) => setSoTin((d.areas || []).reduce((t, a) => t + (a.count || 0), 0))).catch(() => {});
+    api<{ projects: unknown[] }>('/projects').then((d) => setSoDuAn((d.projects || []).length)).catch(() => {});
+  }, []);
+  const so = (v: number | null) => (v == null ? '—' : fmtInt(v));
+  return [
+    { n: String(SO_XA_DIA_CHINH), l: 'Xã, phường tra cứu thửa đất', d: 'M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3zM9 3v15M15 6v15' },
+    { n: so(soTin), l: 'Tin nhà đất đang bán', d: 'M3 21h18M5 21V7l6-4 6 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01' },
+    { n: so(soDuAn), l: 'Dự án đang theo dõi', d: 'M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' },
+    { n: String(SO_CONG_CU), l: 'Công cụ miễn phí', d: 'M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4 2.5-2.5z' },
+  ];
+}
 
 function Newsletter() {
   const [email, setEmail] = useState('');
@@ -69,6 +89,7 @@ function SectionTitle({ children, className = '' }: { children: ReactNode; class
 }
 
 export default function SiteFooter() {
+  const STATS = useSoLieu();
   return (
     <footer className="bg-[#0A2540] text-slate-300">
       {/* Số liệu — 4 mục đều nhau */}

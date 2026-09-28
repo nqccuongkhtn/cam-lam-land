@@ -74,13 +74,6 @@ const AREAS = [
   { name: 'Suối Tân', ward: 'Suối Tân', sub: 'Khu công nghiệp Suối Dầu', img: '/tin-mau/dat-nen-02.webp' },            // mặt bằng san lấp, xe cơ giới
 ];
 
-const STATS = [
-  { n: '2,000+', l: 'Bất động sản', d: 'M3 21h18M5 21V7l6-4 6 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01' },
-  { n: '5,000+', l: 'Khách hàng', d: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' },
-  { n: '50+', l: 'Dự án quy hoạch', d: 'M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' },
-  { n: '8 năm', l: 'Kinh nghiệm', d: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 6v6l4 2' },
-];
-
 const NEWS: Record<string, { title: string; url: string; img?: string; date?: string; source?: string }[]> = {
   'Tin nổi bật': [
     { title: 'Thủ tướng phê duyệt Quy hoạch chung đô thị mới Cam Lâm đến năm 2045', url: 'https://thanhnien.vn/thu-tuong-phe-duyet-quy-hoach-chung-do-thi-moi-cam-lam-den-2045-185240228205628777.htm', img: U('1486406146926-c627a92ad1ab'), date: '28/02/2024' },

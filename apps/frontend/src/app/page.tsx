@@ -167,6 +167,14 @@ export default function Home() {
   const [marketLoading, setMarketLoading] = useState(true);
   const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Thị trường BĐS'); /* mở trang chủ là thấy TIN THỊ TRƯỜNG trước */ const [heroDeal, setHeroDeal] = useState<'sale' | 'rent' | 'project'>('sale');
   const searchHint = useTypingHint(SEARCH_HINTS);
+  const [locMo, setLocMo] = useState(false); // bảng "Lọc nâng cao" trên điện thoại
+  const soLoc = (type ? 1 : 0) + (max && heroDeal !== 'project' ? 1 : 0); // số điều kiện lọc đang bật → hiện trên nút lọc
+  // Bảng giá đổi theo tab (thuê tính triệu/tháng, bán tính tỷ). Dùng chung cho ô "Mức giá" máy tính và bảng lọc điện thoại.
+  const MUC_GIA = heroDeal === 'rent'
+    ? [{ gt: '0.003', ten: 'Dưới 3 triệu/tháng' }, { gt: '0.005', ten: 'Dưới 5 triệu/tháng' },
+       { gt: '0.01', ten: 'Dưới 10 triệu/tháng' }, { gt: '0.03', ten: 'Dưới 30 triệu/tháng' }]
+    : [{ gt: '1', ten: 'Dưới 1 tỷ' }, { gt: '3', ten: 'Dưới 3 tỷ' },
+       { gt: '5', ten: 'Dưới 5 tỷ' }, { gt: '10', ten: 'Dưới 10 tỷ' }];
   /* ⚠️ MỤC "Bất động sản dành cho bạn" PHẢI ĐỔI THEO TAB ĐANG CHỌN ở khung
      tìm kiếm. Trước đây nó chỉ gọi /listings?limit=20 đúng một lần lúc mở
      trang, nên bấm sang "Cho thuê" thì khung tìm kiếm đổi mà danh sách bên
@@ -276,7 +284,31 @@ export default function Home() {
                 268px. Nay: ô tìm chiếm trọn một hàng, hai ô sổ xuống đứng
                 CẠNH NHAU một hàng, nút một hàng → còn ba hàng, thấp hơn hẳn
                 mà vẫn bấm thoải mái. */}
-            <div className={`grid w-full grid-cols-2 gap-2 ${heroDeal === 'project'
+            {/* ── ĐIỆN THOẠI: CHỈ MỘT Ô ──────────────────────────────────────
+                Chủ dự án yêu cầu (28/9/2026): khung tìm kiếm trên điện thoại chỉ
+                còn MỘT ô gõ chữ, bên phải có nút LỌC và nút KÍNH LÚP. Loại hình +
+                mức giá dời vào bảng "Lọc nâng cao" trồi lên từ dưới khi bấm nút lọc.
+                Nút lọc có số nhỏ màu đỏ = đang bật mấy điều kiện lọc.
+                Máy tính (từ 768px) vẫn giữ nguyên hàng đầy đủ bên dưới. */}
+            <div className="md:hidden">
+              <div className="flex h-12 items-center rounded-xl bg-white pl-3 pr-1 shadow-lg shadow-black/10 focus-within:ring-2 focus-within:ring-[#C8A14B]">
+                <Ic d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" />
+                <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} enterKeyHint="search"
+                  placeholder={heroDeal === 'project' ? 'Tên dự án…' : heroDeal === 'rent' ? 'Thuê nhà, mặt bằng ở đâu?' : (searchHint || 'Khu vực, dự án…')}
+                  className="min-w-0 flex-1 bg-transparent px-2 py-2.5 text-[15px] text-slate-800 outline-none placeholder:text-slate-400" />
+                <button type="button" onClick={() => setLocMo(true)} aria-label="Lọc nâng cao"
+                  className="relative grid h-10 w-10 shrink-0 place-items-center rounded-lg text-[#0A2540] active:bg-slate-100">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-5 w-5"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2" /><circle cx="10" cy="17" r="2" /></svg>
+                  {soLoc > 0 && <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white">{soLoc}</span>}
+                </button>
+                <button type="button" onClick={search} aria-label={heroDeal === 'rent' ? 'Tìm thuê' : heroDeal === 'project' ? 'Xem dự án' : 'Tìm kiếm'}
+                  className="cl-press ml-1 grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-red-600 text-white shadow-md shadow-red-600/30 active:bg-red-700">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" className="h-5 w-5"><circle cx="11" cy="11" r="6.5" /><path d="m20 20-4.2-4.2" /></svg>
+                </button>
+              </div>
+            </div>
+
+            <div className={`hidden w-full gap-2 md:grid ${heroDeal === 'project'
               ? 'md:grid-cols-[2.5fr_1fr_auto]' : 'md:grid-cols-[1.5fr_1fr_1fr_auto]'}`}>
             <label className="col-span-2 flex items-center gap-2 rounded-xl border border-white/20 bg-white px-3 focus-within:border-[#C8A14B] md:col-span-1">
               <Ic d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" />
@@ -300,11 +332,7 @@ export default function Home() {
             {heroDeal !== 'project' && (
               <OChon giaTri={max} doiGiaTri={setMax} nhan="Mức giá"
                 icon={<Ic d="M20.6 13.4 12 22l-9-9V3h8z M7 7h.01" />}
-                dsChon={heroDeal === 'rent'
-                  ? [{ gt: '0.003', ten: 'Dưới 3 triệu/tháng' }, { gt: '0.005', ten: 'Dưới 5 triệu/tháng' },
-                     { gt: '0.01', ten: 'Dưới 10 triệu/tháng' }, { gt: '0.03', ten: 'Dưới 30 triệu/tháng' }]
-                  : [{ gt: '1', ten: 'Dưới 1 tỷ' }, { gt: '3', ten: 'Dưới 3 tỷ' },
-                     { gt: '5', ten: 'Dưới 5 tỷ' }, { gt: '10', ten: 'Dưới 10 tỷ' }]} />
+                dsChon={MUC_GIA} />
             )}
               <button onClick={search} className="cl-press col-span-2 min-h-[44px] whitespace-nowrap rounded-xl bg-red-600 px-6 py-2.5 font-bold text-white shadow-lg shadow-red-600/30 hover:bg-red-700 md:col-span-1">
                 {heroDeal === 'rent' ? 'Tìm thuê' : heroDeal === 'project' ? 'Xem dự án' : 'Tìm kiếm'}
@@ -313,6 +341,63 @@ export default function Home() {
           </div>
 
       </Banner11>
+
+      {/* BẢNG "LỌC NÂNG CAO" (chỉ điện thoại) — trồi lên từ đáy màn hình khi bấm nút lọc trong ô tìm kiếm.
+          Đặt NGOÀI banner vì banner cắt cụt mọi thứ tràn ra ngoài nó.
+          Dùng nút bấm dạng thẻ thay cho ô sổ xuống: ngón tay chọn một chạm là xong. */}
+      {locMo && (
+        <div className="md:hidden fixed inset-0 z-[70]" role="dialog" aria-label="Lọc nâng cao">
+          <div className="absolute inset-0 bg-[#0A2540]/40 cl-sheet-fade" onClick={() => setLocMo(false)} aria-hidden="true" />
+          <div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-white px-4 pt-2 shadow-2xl cl-sheet-up" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }}>
+            <div className="mx-auto mb-2 h-1 w-9 rounded-full bg-slate-300" />
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-base font-bold text-[#0A2540]">Lọc nâng cao</span>
+              <button type="button" onClick={() => setLocMo(false)} aria-label="Đóng" className="grid h-9 w-9 place-items-center rounded-full text-slate-400 active:bg-slate-100">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-5 w-5"><path d="M18 6 6 18M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            <p className="mb-2 text-[13px] font-semibold text-slate-500">Loại hình</p>
+            <div className="mb-4 grid grid-cols-3 gap-2">
+              {CATS.map((c) => {
+                const on = type === c.t;
+                return (
+                  <button key={c.t} type="button" onClick={() => setType(on ? '' : c.t)}
+                    className={`flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-lg border px-1 py-2 text-[13px] transition-colors ${on ? 'border-red-500 bg-red-50 font-semibold text-red-600' : 'border-slate-200 text-slate-700 active:bg-slate-50'}`}>
+                    <span className="text-xl leading-none">{c.icon}</span>{PROPERTY_LABELS[c.t]}
+                  </button>
+                );
+              })}
+            </div>
+
+            {heroDeal !== 'project' && (<>
+              <p className="mb-2 text-[13px] font-semibold text-slate-500">Mức giá</p>
+              <div className="mb-5 grid grid-cols-2 gap-2">
+                {MUC_GIA.map((m) => {
+                  const on = max === m.gt;
+                  return (
+                    <button key={m.gt} type="button" onClick={() => setMax(on ? '' : m.gt)}
+                      className={`min-h-[44px] rounded-lg border px-2 text-[13px] transition-colors ${on ? 'border-red-500 bg-red-50 font-semibold text-red-600' : 'border-slate-200 text-slate-700 active:bg-slate-50'}`}>
+                      {m.ten}
+                    </button>
+                  );
+                })}
+              </div>
+            </>)}
+
+            <div className="flex gap-2">
+              <button type="button" onClick={() => { setType(''); setMax(''); }}
+                className="min-h-[48px] flex-1 rounded-lg border border-slate-300 font-semibold text-slate-700 active:bg-slate-50">
+                Đặt lại
+              </button>
+              <button type="button" onClick={() => { setLocMo(false); search(); }}
+                className="cl-press min-h-[48px] flex-[2] rounded-lg bg-red-600 font-bold text-white shadow-lg shadow-red-600/30 active:bg-red-700">
+                {heroDeal === 'rent' ? 'Tìm thuê' : heroDeal === 'project' ? 'Xem dự án' : 'Xem kết quả'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* TIN TỨC & QUY HOẠCH — kiểu batdongsan */}
       <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">

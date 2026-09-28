@@ -120,11 +120,25 @@ export default function BottomNav() {
           </div>
         </div>
       )}
-      <nav className={`md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 transition-transform duration-200 ease-out ${hidden ? 'translate-y-full' : 'translate-y-0'}`} style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        <ul className="flex items-stretch h-[54px] max-w-lg mx-auto">
+      {/* Thanh dưới: nền trắng mờ + bóng nhẹ thay cho đường kẻ cứng; tab đang chọn có "viên thuốc" màu nhạt ôm icon
+          (thay cho vạch đỏ trên đầu trước đây — nhìn thô). Nút "Đăng tin" nổi lên giữa thành nút tròn đỏ cho dễ thấy.
+          Chiều cao GIỮ 54px — biến --cl-hub-pb ở trên đang tính theo đúng số này. */}
+      <nav className={`md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-xl shadow-[0_-1px_0_rgba(15,23,42,0.06),0_-6px_20px_rgba(15,23,42,0.06)] transition-transform duration-200 ease-out ${hidden ? 'translate-y-full' : 'translate-y-0'}`} style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <ul className="flex items-stretch h-[54px] max-w-lg mx-auto px-1">
           {tabs.map((t) => {
-            const cls = `relative h-full w-full flex flex-col items-center justify-center gap-0.5 active:scale-90 transition ${t.on ? 'text-red-600' : 'text-slate-500'}`;
-            const inner = (<>{t.on && <span aria-hidden className="absolute top-0 left-1/2 -translate-x-1/2 h-[3px] w-7 rounded-b-full bg-red-600" />}<Ico name={t.name} on={t.on} /><span className="text-[10px] font-semibold leading-none">{t.label}</span></>);
+            const noi = t.name === 'post'; // nút giữa nổi lên
+            const cls = `relative h-full w-full flex flex-col items-center justify-center gap-[3px] transition-colors active:opacity-70 ${t.on ? 'text-red-600' : 'text-slate-500'}`;
+            const inner = noi
+              ? (<>
+                  <span aria-hidden className="-mt-[22px] grid h-12 w-12 place-items-center rounded-full bg-gradient-to-b from-red-500 to-red-600 text-white ring-4 ring-white shadow-[0_6px_14px_-4px_rgba(220,38,38,0.55)] transition-transform active:scale-90">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5.5v13M5.5 12h13" /></svg>
+                  </span>
+                  <span className={`text-[10.5px] leading-none ${t.on ? 'font-bold' : 'font-medium'}`}>{t.label}</span>
+                </>)
+              : (<>
+                  <span aria-hidden className={`grid h-7 w-12 place-items-center rounded-full transition-colors duration-200 ${t.on ? 'bg-red-50' : ''}`}><Ico name={t.name} on={t.on} /></span>
+                  <span className={`text-[10.5px] leading-none ${t.on ? 'font-bold' : 'font-medium'}`}>{t.label}</span>
+                </>);
             return (
               <li key={t.label} className="flex-1">
                 {t.sheet

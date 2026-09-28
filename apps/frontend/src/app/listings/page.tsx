@@ -376,7 +376,9 @@ function ListingsInner() {
           <button onClick={() => { if (mapLayer === 'saved') { setMapLayer('all'); if (mine) showMine(false); } else { setMapLayer('saved'); loadDrafts(); } }} className={`px-3 py-1.5 rounded-full transition ${mapLayer === 'saved' ? 'bg-[#7c3aed] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'}`}>📌 Tin lưu{drafts.length ? ` (${drafts.length})` : ''}</button>
         </div>
       )}
-      <div className="absolute top-3 md:top-16 left-3 z-20">
+      {/* Nút LỚP BẢN ĐỒ: CHỈ MÁY TÍNH. Điện thoại đã bỏ (chủ dự án 28/9/2026) — lớp quy hoạch bật sẵn,
+          muốn mờ đi thì kéo thanh độ mờ bên phải; đổi nền bằng nút tròn bên phải. */}
+      <div className="hidden md:block absolute top-16 left-3 z-20">
         {layerOpen ? (
           <div className="w-[250px] bg-white/95 backdrop-blur rounded-2xl border border-slate-200 shadow-xl p-3">
             <div className="flex items-center justify-between mb-1">
@@ -386,9 +388,7 @@ function ListingsInner() {
             <label className="flex items-center gap-2.5 py-1.5 text-xs font-semibold text-slate-700 cursor-pointer">
               <input type="checkbox" checked={qhOn} onChange={(e) => setQhOn(e.target.checked)} className="accent-red-600 w-4 h-4" /> Lớp quy hoạch
             </label>
-            <label className="flex items-center gap-2.5 py-1.5 text-xs font-semibold text-slate-700 cursor-pointer border-t border-slate-100">
-              <input type="checkbox" checked={labels} onChange={(e) => setLabels(e.target.checked)} className="accent-red-600 w-4 h-4" /> Nhãn & đường
-            </label>
+            {/* Lựa chọn "Nhãn & đường" ĐÃ BỎ (chủ dự án 28/9/2026) — nhãn đường luôn hiện. */}
             <div className="hidden md:block border-t border-slate-100 pt-2 mt-1">{/* điện thoại đổi nền bằng nút tròn bên phải, giống trang Bản đồ */}
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Nền bản đồ</span>
               <div className="flex gap-1.5 mt-1.5">
@@ -409,8 +409,11 @@ function ListingsInner() {
           </button>
         )}
       </div>
-      {/* NÚT LỌC NỔI TRÊN BẢN ĐỒ — chỉ mobile; đặt bên TRÁI, dưới nút Lớp (tránh chen zoom/định vị/độ mờ bên phải) */}
-      <div className={`md:hidden absolute top-16 left-3 z-20 ${layerOpen ? 'hidden' : ''}`}>
+      {/* NÚT LỌC NỔI TRÊN BẢN ĐỒ — chỉ điện thoại. Đặt GÓC TRÊN BÊN PHẢI, đầu cột nút (chỗ nút "?" ở trang
+          Bản đồ): cụm nút maplibre vốn đã chừa sẵn 38px phía trên (--nut-can-cu) nên vừa khít, không đè gì.
+          Nút tròn 32px chỉ có biểu tượng, số đỏ = số điều kiện đang lọc. Bảng lọc mở ra từ góc phải.
+          ⚠️ Trước đặt bên TRÁI dưới nút Lớp — chủ dự án bảo chuyển sang phải (28/9/2026). */}
+      <div className="md:hidden absolute right-2 top-2 z-30">
         {showFilters ? (
           <div className="w-[240px] max-w-[calc(100vw-1.5rem)] bg-white/95 backdrop-blur rounded-2xl border border-slate-200 shadow-xl p-3">
             <div className="flex items-center justify-between mb-2">
@@ -425,10 +428,10 @@ function ListingsInner() {
             </div>
           </div>
         ) : (
-          <button onClick={() => setShowFilters(true)} title="Lọc tin" className="flex items-center gap-2 bg-white/95 backdrop-blur rounded-full border border-slate-200 shadow-lg pl-2.5 pr-3 py-2 hover:bg-slate-50">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A2540" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
-            <span className="text-xs font-bold text-slate-700">Lọc</span>
-            {activeFilters > 0 && <span className="bg-red-600 text-white rounded-full min-w-[18px] h-[18px] px-1 grid place-items-center text-[10px] font-extrabold">{activeFilters}</span>}
+          <button onClick={() => setShowFilters(true)} title="Lọc tin" aria-label={activeFilters > 0 ? `Lọc tin, đang bật ${activeFilters}` : 'Lọc tin'}
+            className="relative grid h-8 w-8 place-items-center rounded-full bg-white text-[#0A2540] shadow-[0_1px_2px_rgba(0,0,0,.10),0_3px_10px_rgba(10,37,64,.14)] active:bg-slate-50">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
+            {activeFilters > 0 && <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-red-600 px-1 text-[9px] font-extrabold leading-none text-white ring-2 ring-white">{activeFilters}</span>}
           </button>
         )}
       </div>

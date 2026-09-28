@@ -595,13 +595,18 @@
       ảnh ở trên, ô tìm kiếm ở dưới.
    ⚠️ margin-top: -1px là để bịt sợi tóc trắng giữa hai khối do trình duyệt
       làm tròn số lẻ khi phóng to/thu nhỏ trang. */
+/* ⚠️ 28/9/2026: ĐỔI NỀN NAVY → TRẮNG. Chủ dự án chê dải navy "nhìn tối web, thô".
+      Nay là dải trắng bo hai góc dưới + bóng rất nhẹ, vẫn dính liền banner
+      (không hở khe) nên không quay lại lỗi "rời rạc". Chữ tab ở trang chủ
+      tự đổi sang màu tối trên điện thoại (xem app/page.tsx). */
 .cl-b11-tim { padding: 0 12px 24px }
 @media (max-width: 767px) {
   .cl-b11-tim {
     margin-top: -1px;
-    background: #0A2540;
-    padding: 10px 10px 14px;
-    border-radius: 0 0 18px 18px;
+    background: #fff;
+    padding: 8px 12px 12px;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 6px 16px -10px rgba(15, 23, 42, .18);
   }
 }
 @media (min-width: 768px) {

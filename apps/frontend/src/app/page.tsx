@@ -123,21 +123,28 @@ const KHOANG_GIA: Record<'sale' | 'rent', [string, string, string][]> = {
 };
 const DIEN_TICH: [string, number, number][] = [['Dưới 50 m²', 0, 50], ['50 – 100 m²', 50, 100], ['100 – 150 m²', 100, 150],
   ['150 – 300 m²', 150, 300], ['300 – 1.000 m²', 300, 1000], ['Trên 1.000 m²', 1000, 0]];
-// Một mục trong bảng lọc: tiêu đề nhỏ + hàng thẻ chọn tự xuống dòng.
-function MucLoc({ ten, children }: { ten: string; children: React.ReactNode }) {
+const SAP_XEP: [string, string][] = [['default', 'Nổi bật'], ['newest', 'Mới nhất'], ['price-asc', 'Giá thấp → cao'], ['price-desc', 'Giá cao → thấp']];
+/* Một mục trong bảng lọc = MỘT DÒNG gọn: tên mục bên trái, giá trị đang chọn bên phải, mũi tên.
+   Bấm vào mới sổ các thẻ chọn ra; mỗi lúc chỉ mở MỘT mục (bảng cha giữ `moMuc`).
+   ⚠️ Bản trước sổ hết mọi mục cùng lúc → chủ dự án chê "nhiều sổ ra hết nhìn chán, thô" (28/9/2026). */
+function MucLoc({ ten, giaTri, co, mo, bat, children }: { ten: string; giaTri: string; co: boolean; mo: boolean; bat: () => void; children: React.ReactNode }) {
   return (
-    <div className="mb-5">
-      <p className="mb-2 text-[13px] font-bold text-[#0A2540]">{ten}</p>
-      <div className="flex flex-wrap gap-2">{children}</div>
+    <div className="border-b border-slate-100 last:border-0">
+      <button type="button" onClick={bat} aria-expanded={mo} className="flex h-12 w-full items-center gap-3 text-left">
+        <span className="flex-1 text-sm text-slate-700">{ten}</span>
+        <span className={`max-w-[55%] truncate text-[13px] ${co ? 'font-semibold text-red-600' : 'text-slate-400'}`}>{giaTri}</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          className={`h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 ${mo ? 'rotate-180' : ''}`}><path d="m6 9 6 6 6-6" /></svg>
+      </button>
+      {mo && <div className="flex flex-wrap gap-1.5 pb-3.5">{children}</div>}
     </div>
   );
 }
-// Thẻ chọn bo tròn hẳn, cao 36px. Đang chọn: viền + chữ đỏ trên nền đỏ nhạt, kèm dấu ✓.
+// Thẻ chọn nhỏ gọn cao 32px. Đang chọn: nền đỏ nhạt, chữ đỏ.
 function The({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button type="button" onClick={onClick} aria-pressed={on}
-      className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[13px] transition-colors ${on ? 'border-red-500 bg-red-50 font-semibold text-red-600' : 'border-slate-200 bg-white text-slate-700 active:bg-slate-50'}`}>
-      {on && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5"><path d="M20 6 9 17l-5-5" /></svg>}
+      className={`inline-flex h-8 items-center gap-1 rounded-full border px-3 text-[13px] transition-colors ${on ? 'border-red-200 bg-red-50 font-semibold text-red-600' : 'border-slate-200 bg-white text-slate-600 active:bg-slate-50'}`}>
       {children}
     </button>
   );
@@ -204,6 +211,16 @@ export default function Home() {
   const [dt, setDt] = useState<[number, number]>([0, 0]); const [sapXep, setSapXep] = useState('default');
   const coGia = heroDeal !== 'project';
   const soLoc = (type ? 1 : 0) + (xaLoc ? 1 : 0) + (coGia && (min || max) ? 1 : 0) + (coGia && (dt[0] || dt[1]) ? 1 : 0) + (coGia && sapXep !== 'default' ? 1 : 0); // hiện số trên nút lọc
+  const [moMuc, setMoMuc] = useState(''); // mục đang sổ ra trong bảng lọc ('' = thu hết)
+  const heSoGia = heroDeal === 'rent' ? 1000 : 1; // bán ghi tỷ, thuê ghi triệu
+  const chuGia = (() => { // chữ tóm tắt khoảng giá ở dòng "Khoảng giá"
+    const mau = KHOANG_GIA[heroDeal === 'rent' ? 'rent' : 'sale'].find(([, a, b]) => a === min && b === max);
+    if (mau) return mau[0];
+    if (!min && !max) return 'Tất cả';
+    const dv = heroDeal === 'rent' ? ' triệu' : ' tỷ', so = (v: string) => String(+(Number(v) * heSoGia).toFixed(3));
+    return min && max ? `${so(min)} – ${so(max)}${dv}` : min ? `Từ ${so(min)}${dv}` : `Đến ${so(max)}${dv}`;
+  })();
+  useEffect(() => { if (!locMo) setMoMuc(''); }, [locMo]); // mở lại bảng thì mọi mục đều thu gọn
   const datLaiLoc = () => { setType(''); setMin(''); setMax(''); setXaLoc(''); setDt([0, 0]); setSapXep('default'); };
   // Khoá cuộn trang phía sau khi bảng lọc đang mở (không thì vuốt trong bảng lại cuộn cả trang chủ).
   useEffect(() => {
@@ -326,7 +343,7 @@ export default function Home() {
               sáng mẫu nền tối. Thẻ trắng rơi trúng mẫu nền sáng là chìm nghỉm,
               rơi trúng mẫu nền tối thì chói loà. Khung kính tối hợp với cả hai. */}
           {/* ⚠️ ĐIỆN THOẠI BỎ KHUNG KÍNH. Trên màn hẹp, khung tìm kiếm đã nằm
-              hẳn DƯỚI ảnh trên một mảng navy liền (xem .cl-b11-tim trong
+              hẳn DƯỚI ảnh trên một dải TRẮNG liền (trước là navy; xem .cl-b11-tim trong
               banner11-them.css), nên thêm một thẻ kính tối nữa là hộp lồng
               trong hộp — viền chồng viền, nhìn rối và tốn mất hai bên 8px
               vốn đã hẹp. Từ 768px trở lên mới cần khung kính, vì lúc đó nó
@@ -339,7 +356,7 @@ export default function Home() {
             <div className="mb-2 flex items-center justify-center gap-6 sm:gap-8">
               {([['sale', 'Nhà đất bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
                 <button key={k} onClick={() => { setHeroDeal(k); setMin(''); setMax(''); }}
-                  className={`relative pb-1.5 text-[13px] transition sm:text-sm ${heroDeal === k ? 'font-extrabold text-white' : 'font-semibold text-white/75 hover:text-white'}`}>
+                  className={`relative pb-1.5 text-[13px] transition sm:text-sm ${heroDeal === k ? 'font-bold text-[#0A2540] md:font-extrabold md:text-white' : 'font-medium text-slate-500 md:font-semibold md:text-white/75 md:hover:text-white'}`}>
                   {ten}
                   <span aria-hidden
                     className={`absolute inset-x-0 -bottom-0.5 h-[2px] rounded-full bg-red-500 transition-opacity ${heroDeal === k ? 'opacity-100' : 'opacity-0'}`} />
@@ -366,13 +383,15 @@ export default function Home() {
               {/* Cân đối: lề trái = lề phải (6px quanh hai nút), hai nút CÙNG CỠ 32px (ô cao 44px — bản 48px chủ dự án chê to, thô) thành một cặp —
                   nút lọc nền xám nhạt, nút tìm nền đỏ. Trước đây nút đỏ 40px sát mép còn nút lọc chỉ là
                   một biểu tượng trơ trọi → chủ dự án thấy lệch (28/9/2026). */}
-              <div className="flex h-11 items-center gap-1.5 rounded-lg bg-white pl-3 pr-1.5 shadow-md shadow-black/10 focus-within:ring-2 focus-within:ring-[#C8A14B]">
+              {/* Nền dải bao quanh giờ là TRẮNG (hết navy) → ô tìm kiếm đổi sang nền xám rất nhạt + viền mảnh
+                  cho nổi lên; nút lọc nền trắng để vẫn tách khỏi nền ô. */}
+              <div className="flex h-11 items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 pl-3 pr-1.5 focus-within:border-[#C8A14B] focus-within:bg-white">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 shrink-0 text-slate-400"><path d="M12 21s-7-6.3-7-11a7 7 0 1 1 14 0c0 4.7-7 11-7 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z" /></svg>
                 <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} enterKeyHint="search"
                   placeholder={heroDeal === 'project' ? 'Tên dự án…' : heroDeal === 'rent' ? 'Thuê nhà, mặt bằng ở đâu?' : (searchHint || 'Khu vực, dự án…')}
                   className="min-w-0 flex-1 bg-transparent px-1 py-2 text-sm text-slate-800 outline-none placeholder:text-slate-400" />
                 <button type="button" onClick={() => setLocMo(true)} aria-label="Lọc nâng cao"
-                  className={`relative grid h-8 w-8 shrink-0 place-items-center rounded-md transition-colors ${soLoc > 0 ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-[#0A2540] active:bg-slate-200'}`}>
+                  className={`relative grid h-8 w-8 shrink-0 place-items-center rounded-md transition-colors ${soLoc > 0 ? 'bg-red-50 text-red-600' : 'border border-slate-200 bg-white text-[#0A2540] active:bg-slate-100'}`}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2" /><circle cx="10" cy="17" r="2" /></svg>
                   {soLoc > 0 && <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-white">{soLoc}</span>}
                 </button>
@@ -436,60 +455,61 @@ export default function Home() {
 
             <div className="-mx-4 flex-1 overflow-y-auto overscroll-contain px-4 pb-2">
               {/* Nhu cầu: đổi ngay trong bảng, khỏi đóng ra bấm tab trên banner */}
-              <div className="mb-4 grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1">
+              <div className="mb-1 grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1">
                 {([['sale', 'Mua bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
                   <button key={k} type="button" onClick={() => { if (k !== heroDeal) { setHeroDeal(k); setMin(''); setMax(''); } }}
-                    className={`h-9 rounded-md text-[13px] transition-colors ${heroDeal === k ? 'bg-white font-bold text-[#0A2540] shadow-sm' : 'font-medium text-slate-500'}`}>{ten}</button>
+                    className={`h-8 rounded-md text-[13px] transition-colors ${heroDeal === k ? 'bg-white font-semibold text-[#0A2540] shadow-sm' : 'font-medium text-slate-500'}`}>{ten}</button>
                 ))}
               </div>
 
-              <MucLoc ten="Loại hình">
+              {/* Chọn xong một thẻ là mục tự thu lại (trừ ô tự gõ giá) → bảng luôn gọn. */}
+              <MucLoc ten="Loại hình" giaTri={type ? PROPERTY_LABELS[type] : 'Tất cả'} co={!!type}
+                mo={moMuc === 'loai'} bat={() => setMoMuc(moMuc === 'loai' ? '' : 'loai')}>
                 {CATS.map((c) => (
-                  <The key={c.t} on={type === c.t} onClick={() => setType(type === c.t ? '' : c.t)}>
-                    <span className="text-[15px] leading-none">{c.icon}</span>{PROPERTY_LABELS[c.t]}
-                  </The>
+                  <The key={c.t} on={type === c.t} onClick={() => { setType(type === c.t ? '' : c.t); setMoMuc(''); }}>{PROPERTY_LABELS[c.t]}</The>
                 ))}
               </MucLoc>
 
-              <MucLoc ten="Khu vực">
+              <MucLoc ten="Khu vực" giaTri={xaLoc || 'Tất cả'} co={!!xaLoc}
+                mo={moMuc === 'xa'} bat={() => setMoMuc(moMuc === 'xa' ? '' : 'xa')}>
                 {AREAS.map((a) => (
-                  <The key={a.ward} on={xaLoc === a.ward} onClick={() => setXaLoc(xaLoc === a.ward ? '' : a.ward)}>{a.name}</The>
+                  <The key={a.ward} on={xaLoc === a.ward} onClick={() => { setXaLoc(xaLoc === a.ward ? '' : a.ward); setMoMuc(''); }}>{a.name}</The>
                 ))}
               </MucLoc>
 
               {coGia && (<>
-                <MucLoc ten={heroDeal === 'rent' ? 'Giá thuê mỗi tháng' : 'Khoảng giá'}>
+                <MucLoc ten={heroDeal === 'rent' ? 'Giá thuê' : 'Khoảng giá'} giaTri={chuGia} co={!!(min || max)}
+                  mo={moMuc === 'gia'} bat={() => setMoMuc(moMuc === 'gia' ? '' : 'gia')}>
                   {KHOANG_GIA[heroDeal === 'rent' ? 'rent' : 'sale'].map(([ten, a, b]) => {
                     const on = min === a && max === b;
-                    return <The key={ten} on={on} onClick={() => { setMin(on ? '' : a); setMax(on ? '' : b); }}>{ten}</The>;
+                    return <The key={ten} on={on} onClick={() => { setMin(on ? '' : a); setMax(on ? '' : b); setMoMuc(''); }}>{ten}</The>;
                   })}
-                </MucLoc>
-                {/* Tự gõ khoảng giá. Bán tính bằng TỶ, thuê tính bằng TRIỆU — trong máy vẫn cất theo tỷ như cũ. */}
-                <div className="-mt-2 mb-5 flex items-center gap-2">
-                  {([['Từ', min, setMin], ['Đến', max, setMax]] as const).map(([nhan, gt, dat]) => {
-                    const heSo = heroDeal === 'rent' ? 1000 : 1;
-                    return (
-                      <label key={nhan} className="flex h-10 flex-1 items-center gap-1.5 rounded-lg border border-slate-200 px-3 focus-within:border-red-400">
+                  {/* Tự gõ khoảng giá. Bán tính bằng TỶ, thuê tính bằng TRIỆU — trong máy vẫn cất theo tỷ như cũ. */}
+                  <div className="mt-1 flex w-full items-center gap-2">
+                    {([['Từ', min, setMin], ['Đến', max, setMax]] as const).map(([nhan, gt, dat]) => (
+                      <label key={nhan} className="flex h-9 flex-1 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 focus-within:border-red-300">
                         <span className="text-[12px] text-slate-400">{nhan}</span>
-                        <input inputMode="decimal" value={gt ? String(+(Number(gt) * heSo).toFixed(3)) : ''}
-                          onChange={(e) => { const v = e.target.value.replace(',', '.').replace(/[^\d.]/g, ''); dat(v ? String(Number(v) / heSo) : ''); }}
+                        <input inputMode="decimal" value={gt ? String(+(Number(gt) * heSoGia).toFixed(3)) : ''}
+                          onChange={(e) => { const v = e.target.value.replace(',', '.').replace(/[^\d.]/g, ''); dat(v ? String(Number(v) / heSoGia) : ''); }}
                           className="min-w-0 flex-1 bg-transparent text-sm text-slate-800 outline-none" />
                         <span className="text-[12px] text-slate-400">{heroDeal === 'rent' ? 'triệu' : 'tỷ'}</span>
                       </label>
-                    );
-                  })}
-                </div>
+                    ))}
+                  </div>
+                </MucLoc>
 
-                <MucLoc ten="Diện tích">
+                <MucLoc ten="Diện tích" giaTri={DIEN_TICH.find(([, a, b]) => dt[0] === a && dt[1] === b)?.[0] || 'Tất cả'} co={!!(dt[0] || dt[1])}
+                  mo={moMuc === 'dt'} bat={() => setMoMuc(moMuc === 'dt' ? '' : 'dt')}>
                   {DIEN_TICH.map(([ten, a, b]) => {
                     const on = dt[0] === a && dt[1] === b;
-                    return <The key={ten} on={on} onClick={() => setDt(on ? [0, 0] : [a, b])}>{ten}</The>;
+                    return <The key={ten} on={on} onClick={() => { setDt(on ? [0, 0] : [a, b]); setMoMuc(''); }}>{ten}</The>;
                   })}
                 </MucLoc>
 
-                <MucLoc ten="Sắp xếp">
-                  {([['default', 'Nổi bật'], ['newest', 'Mới nhất'], ['price-asc', 'Giá thấp → cao'], ['price-desc', 'Giá cao → thấp']] as const).map(([k, ten]) => (
-                    <The key={k} on={sapXep === k} onClick={() => setSapXep(k)}>{ten}</The>
+                <MucLoc ten="Sắp xếp" giaTri={SAP_XEP.find(([k]) => k === sapXep)?.[1] || 'Nổi bật'} co={sapXep !== 'default'}
+                  mo={moMuc === 'sx'} bat={() => setMoMuc(moMuc === 'sx' ? '' : 'sx')}>
+                  {SAP_XEP.map(([k, ten]) => (
+                    <The key={k} on={sapXep === k} onClick={() => { setSapXep(k); setMoMuc(''); }}>{ten}</The>
                   ))}
                 </MucLoc>
               </>)}
@@ -498,11 +518,11 @@ export default function Home() {
             {/* Chân bảng luôn đứng yên dưới đáy: Đặt lại + nút xem kèm SỐ TIN ĐẾM TRƯỚC */}
             <div className="-mx-4 flex gap-2 border-t border-slate-100 px-4 pt-3">
               <button type="button" onClick={datLaiLoc} disabled={soLoc === 0}
-                className="h-12 flex-1 rounded-lg border border-slate-300 font-semibold text-slate-700 active:bg-slate-50 disabled:opacity-40">
+                className="h-11 flex-1 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 active:bg-slate-50 disabled:opacity-40">
                 Đặt lại
               </button>
               <button type="button" onClick={() => { setLocMo(false); search(); }} disabled={soKhop === 0}
-                className="cl-press h-12 flex-[2] rounded-lg bg-red-600 font-bold text-white shadow-lg shadow-red-600/30 active:bg-red-700 disabled:bg-slate-300 disabled:shadow-none">
+                className="cl-press h-11 flex-[2] rounded-lg bg-red-600 text-sm font-bold text-white active:bg-red-700 disabled:bg-slate-300 disabled:shadow-none">
                 {soKhop === 0 ? 'Không có tin phù hợp'
                   : soKhop == null ? (heroDeal === 'rent' ? 'Tìm thuê' : heroDeal === 'project' ? 'Xem dự án' : 'Xem kết quả')
                   : `Xem ${soKhop >= 500 ? '500+' : soKhop.toLocaleString('vi-VN')} tin`}

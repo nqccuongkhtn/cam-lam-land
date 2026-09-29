@@ -382,6 +382,10 @@ chiDuongRouter.get('/', async (req, res) => {
 
   // alternatives=3: xin tối đa 3 phương án. OSRM có thể trả ít hơn (đường độc đạo thì chỉ có 1).
   const thamSo = `?alternatives=3&steps=true&overview=full&geometries=geojson&continue_straight=false`;
+  // Hỏi Valhalla NGAY TỪ ĐẦU, chạy SONG SONG với OSRM. ⚠️ Trước đây ghi chú nói "song song" nhưng
+  // code lại chờ OSRM xong mới hỏi Valhalla (tối đa 14 giây) → tuyến 1,7 km mất 11,5 giây (đo 29/9/2026).
+  // hoiValhalla tự bắt lỗi và trả [] nên để chạy trước không sợ lỗi lọt ra ngoài.
+  const henValhalla = hoiValhalla(mode, diem);
   let goc: any = null, nguon = '';
   for (const may of MAY_TIM_DUONG) {
     goc = await hoiMayTimDuong(may.url(profile, toaDo) + thamSo);
@@ -397,7 +401,7 @@ chiDuongRouter.get('/', async (req, res) => {
   // Hỏi Valhalla song song (nó có chế độ XE MÁY riêng, và hay tìm ra lối mà OSRM bỏ sót).
   // Gộp lại, bỏ những lối gần trùng nhau, rồi mới xét tới chuyện tự dò thêm.
   const rGoc: any[] = goc.routes.slice();
-  const cuaValhalla = await hoiValhalla(mode, diem);
+  const cuaValhalla = await henValhalla;
   const soOsrm = rGoc.length;
   {
     const vanTayDaCo = rGoc.map((r: any) => vanTay(r));

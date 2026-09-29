@@ -189,7 +189,7 @@ export default function NewsIndex() {
   const [limit, setLimit] = useState(12);
   const [q, setQ] = useState('');
 
-  useEffect(() => { fetch('/feed/news').then((r) => r.json()).then((d) => setNews((d.news || []).map((n: any) => ({ ...n, title: decodeEntities(n.title), summary: decodeEntities(n.summary) })))).catch(() => {}).finally(() => setLoading(false)); }, []);
+  useEffect(() => { fetch('/feed/news?gon=1').then((r) => r.json()).then((d) => setNews((d.news || []).map((n: any) => ({ ...n, title: decodeEntities(n.title), summary: decodeEntities(n.summary) })))).catch(() => {}).finally(() => setLoading(false)); }, []);
 
   const showAd = ad && ad.enabled !== false;
   const na = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');

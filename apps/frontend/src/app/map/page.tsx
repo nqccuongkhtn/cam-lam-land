@@ -996,6 +996,10 @@ export default function MapPage() {
 
   const refreshFeatures = useCallback((v: { west: number; south: number; east: number; north: number; zoom: number }) => {
     const bbox = `${v.west},${v.south},${v.east},${v.north}`;
+    // Máy chủ TỪ CHỐI (400) khung nhìn rộng quá 0,6° (chống cào — routes/layers.ts). Thu nhỏ bản đồ ra
+    // quá mức đó thì đừng gửi: trước đây vẫn gửi → nhật ký nginx đầy lỗi 400 vô ích. Lớp giữ nguyên
+    // dữ liệu đang có, phóng to lại là tải tiếp.
+    if (Math.abs(v.east - v.west) > 0.6 || Math.abs(v.north - v.south) > 0.6) return;
     for (const l of layersRef.current) {
       const vis = visibleRef.current[l.slug] ?? false;
       if (!vis) continue;

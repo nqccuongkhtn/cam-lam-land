@@ -211,7 +211,7 @@ export default function Home() {
   useEffect(() => { api<{ areas: { ward: string; count: number }[] }>('/listings/areas').then((d) => { const m: Record<string, number> = {}; (d.areas || []).forEach((a) => { m[a.ward] = a.count; }); setAreaCounts(m); }).catch(() => {}); }, []);
   useEffect(() => {
     setMarketLoading(true);
-    fetch('/feed/news')
+    fetch('/feed/news?gon=1') /* gọn: không kèm toàn văn bài */
       .then((r) => r.json())
       .then((d) => {
         const raw: any[] = d.news || [];

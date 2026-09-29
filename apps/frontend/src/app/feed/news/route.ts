@@ -485,6 +485,12 @@ export async function GET(req: Request) {
       await new Promise((r) => setTimeout(r, 250));
     }
   }
+  // ?gon=1: BỎ TOÀN VĂN (body) + dãy ảnh — trang chủ và trang danh sách tin chỉ cần tiêu đề/tóm tắt/ảnh
+  // đại diện. Trước đây mỗi lần mở trang chủ tải ~290 KB (toàn văn mọi bài) trên điện thoại (đo 29/9/2026).
+  // Trang ĐỌC BÀI (/tin-tuc/[id]) vẫn gọi không kèm tham số để lấy đủ toàn văn.
+  if (new URL(req.url).searchParams.get('gon') === '1') {
+    return NextResponse.json({ news: store.map(({ body, images, ...gon }: any) => gon) });
+  }
   return NextResponse.json({ news: store });
 }
 

@@ -38,7 +38,11 @@ Mở `http://localhost`.
 | **Chạy thật (production)** | `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build` |
 | Mở ra Internet | thêm `-f docker-compose.tunnel.yml` (cần `TUNNEL_TOKEN` trong `.env`) |
 | Tắt | `docker compose down` · Xoá sạch cả database: `docker compose down -v` |
-| Build lại 1 phần | `docker compose up -d --build backend` |
+| Build lại 1 phần | `docker compose ... up -d --no-deps --build frontend` rồi `restart nginx` |
+
+⚠️ **Luôn kèm `--no-deps`** khi dựng lại một phần: `frontend` khai `depends_on: backend`, thiếu `--no-deps`
+thì dựng frontend là backend cũng bị tạo lại → web lỗi 502 ~10 giây mỗi lần (đo 29/9/2026: 22 lỗi 502
+trong 48 giờ, trùng đúng các lần dựng). Sửa cả hai thì ghi cả hai: `up -d --no-deps --build backend frontend`.
 
 **Chủ dự án dùng bảng điều khiển Windows:** nháy đúp `QUAN-LY-SERVER.vbs` → chạy `QUAN-LY-SERVER.ps1`
 (cửa sổ có nút Bật/Tắt/Xem log/Bảo trì/Sao lưu, thu nhỏ xuống khay đồng hồ).

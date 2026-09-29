@@ -15,7 +15,7 @@ export const TIEN_ICH_TOOLS: HubTool[] = [
   { key: 'tra-so-ban-do', name: 'Tra cứu số tờ bản đồ', desc: 'Số tờ bản đồ cũ ↔ mới sau sáp nhập', icon: '🔄', path: '/tra-so-ban-do' },
   { key: 'hop-dong-dat-coc', name: 'Hợp đồng đặt cọc', desc: 'Soạn & in hợp đồng đặt cọc nhà đất', icon: '📝', path: '/hop-dong-dat-coc' },
   { key: 'crm', name: 'CRM khách hàng', desc: 'Quản lý khách hàng & giao dịch', icon: '👥', path: '/sales/crm', login: true },
-  { key: 'tra-cuu', name: 'Tra cứu danh sách nóng', desc: 'Thửa đất ngăn chặn / hồ sơ nóng (nội bộ)', icon: '🔥', path: '/tra-cuu' },
+  { key: 'tra-cuu', name: 'Tra cứu danh sách nóng', desc: 'Thửa đất ngăn chặn / hồ sơ nóng (nội bộ)', icon: '🔥', path: '/tra-cuu', vaiTro: ['admin', 'hotlist'] }, // chỉ tài khoản được cấp quyền mới THẤY ô này
   // Kho danh mục hồ sơ KHÔNG còn ô riêng — nó nằm ngay trong trang này ở tab thứ hai.
   { key: 'lap-danh-muc', name: 'Lập danh mục hồ sơ', desc: 'Scan PDF → danh mục lưu trữ Excel tự động + kho danh mục', icon: '🗂️', path: '/lap-danh-muc' },
   { key: 'tao-video-ban-do', name: 'Tạo video bản đồ', desc: 'Khoanh lô, vẽ tuyến, bay vệ tinh → xuất MP4', icon: '🎬', path: '/tao-video-ban-do' },

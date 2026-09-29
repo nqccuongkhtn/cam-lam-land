@@ -169,6 +169,10 @@ listingsRouter.get('/agent/:id', async (req, res, next) => {
        ORDER BY COALESCE(listings.bumped_at, listings.created_at) DESC LIMIT 60`, [id]);
     for (const r of active) r.contactPhone = maskPhone(r.contactPhone);
     for (const r of expired) r.contactPhone = maskPhone(r.contactPhone);
+    // ⚠️ 29/9/2026 (rà soát bảo mật): CHE số của chính người đăng. Trước đây trang /moi-gioi/:id chỉ che
+    //    TRÊN MÀN HÌNH nhưng máy chủ gửi đủ 10 số (nằm trong nút tel:), ai cũng dò được SĐT của MỌI tài khoản
+    //    bằng cách đổi số id. Số đầy đủ lấy qua POST /agent/:id/reveal (phải đăng nhập), giống "Hiện số" ở tin.
+    agent.phone = agent.phone ? maskPhone(agent.phone) : null;
     res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=120');
     res.json({ agent, active, expired });
   } catch (e) { next(e); }
@@ -268,6 +272,18 @@ listingsRouter.get('/:id', async (req, res, next) => {
     }
     row.contactPhone = maskPhone(row.contactPhone);
     res.json(row);
+  } catch (e) { next(e); }
+});
+
+// POST /api/listings/agent/:id/reveal — khách ĐĂNG NHẬP xem số đầy đủ của người đăng (trang /moi-gioi/:id).
+listingsRouter.post('/agent/:id/reveal', authRequired, async (req: AuthedRequest, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+    const [u] = await query('SELECT phone FROM users WHERE id=$1', [id]);
+    if (!u) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+    res.set('Cache-Control', 'private, no-store');
+    res.json({ phone: u.phone || null });
   } catch (e) { next(e); }
 });
 

@@ -1,8 +1,10 @@
 // ROUTE "DANH SÁCH NÓNG" — bản ghi THÊM MỚI (bổ sung cho danh sách gốc /public/danh-sach-nong.json).
 // CÔ LẬP để sau tách web dễ gỡ: xoá file này + 1 dòng đăng ký index.ts + DROP TABLE hot_records.
-// Quyền: SỬA + đánh dấu HẾT HIỆU LỰC + TẠO sheet = admin HOẶC 'hotlist'. XOÁ vĩnh viễn (bản ghi & sheet) = CHỈ admin (sheet chỉ xoá được khi đã rỗng).
+// Quyền: XEM (file gốc + bản ghi) + THÊM + SỬA + đánh dấu HẾT HIỆU LỰC + TẠO sheet = admin HOẶC 'hotlist'. XOÁ vĩnh viễn (bản ghi & sheet) = CHỈ admin (sheet chỉ xoá được khi đã rỗng).
 // Trường công văn đến theo NĐ 30/2020 (Sổ đăng ký văn bản đến): số đến, ngày đến, số/ký hiệu, ngày văn bản, đơn vị gửi (tác giả).
 import { Router } from 'express';
+import fs from 'node:fs';
+import path from 'node:path';
 import { laAdmin, coVaiTro } from '../lib/auth.ts';
 import { query } from '../lib/db.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
@@ -40,8 +42,26 @@ async function registerSheet(name: any, by: string) {
   await query(`INSERT INTO hot_sheets (name, created_by) VALUES ($1,$2) ON CONFLICT (name) DO NOTHING`, [n, by || '']);
 }
 
-// GET /api/hotlist — công khai (trang tra cứu gộp vào). Trả kèm danh sách sheet (nguồn) đã đăng ký.
-hotlistRouter.get('/', async (_req, res, next) => {
+// ⛔ 29/9/2026 (rà soát bảo mật): TOÀN BỘ danh sách nóng chỉ dành cho ADMIN hoặc tài khoản được cấp vai trò
+//    "hotlist" (trang quản trị → "🔥 Tra cứu danh sách nóng") — ĐÚNG quyền mà trang /tra-cuu đang dùng để hiện
+//    màn khoá 🔒. Trước đây màn khoá chỉ CHE Ở GIAO DIỆN: file gốc /danh-sach-nong.json (CMND/CCCD, ngày sinh,
+//    địa chỉ người dân) và GET /api/hotlist vẫn ai cũng tải thẳng được. Nay máy chủ chặn thật.
+const khongCoQuyen = (res: any) => res.status(403).json({ error: 'Tài khoản chưa được cấp quyền xem danh sách nóng.' });
+
+// GET /api/hotlist/goc — FILE GỐC danh sách nóng (trước nằm công khai ở public/danh-sach-nong.json).
+// File nằm ở apps/backend/du-lieu-rieng/ (đã loại khỏi git). Không lưu đệm ở đâu cả (no-store).
+const TEP_GOC = path.resolve(process.cwd(), 'du-lieu-rieng', 'danh-sach-nong.json');
+hotlistRouter.get('/goc', authRequired, (req: AuthedRequest, res) => {
+  if (!canManage(req)) return khongCoQuyen(res);
+  res.set('Cache-Control', 'private, no-store');
+  if (!fs.existsSync(TEP_GOC)) return res.status(404).json({ error: 'Chưa có file danh sách nóng trên máy chủ.' });
+  res.type('application/json').sendFile(TEP_GOC);
+});
+
+// GET /api/hotlist — bản ghi thêm mới + danh sách sheet. CHỈ admin / vai trò hotlist.
+hotlistRouter.get('/', authRequired, async (req: AuthedRequest, res, next) => {
+  if (!canManage(req)) return khongCoQuyen(res);
+  res.set('Cache-Control', 'private, no-store');
   try {
     await ensure();
     const records = await query(`SELECT ${SEL} FROM hot_records ORDER BY id DESC LIMIT 5000`);
@@ -50,8 +70,10 @@ hotlistRouter.get('/', async (_req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// POST /api/hotlist — thêm (chỉ cần đăng nhập).
+// POST /api/hotlist — thêm bản ghi. CHỈ admin / vai trò hotlist (trước đây ai đăng nhập cũng thêm được;
+// nay người không có quyền cũng không thấy trang để thêm, nên khoá theo đúng quyền xem).
 hotlistRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => {
+  if (!canManage(req)) return khongCoQuyen(res);
   try {
     await ensure(); const b: any = req.body ?? {};
     // Đã BỎ ràng buộc bắt buộc nhập (theo yêu cầu): cho lưu kể cả khi để trống / chỉ đính kèm tệp.

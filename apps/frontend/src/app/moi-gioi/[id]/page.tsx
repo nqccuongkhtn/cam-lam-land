@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { laAdmin } from '@/lib/auth';
+import { laAdmin, useAuth } from '@/lib/auth';
+import { useLoginGate } from '@/lib/loginGate';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
@@ -22,6 +23,18 @@ export default function AgentProfilePage() {
   const id = String(params?.id || '');
   const [data, setData] = useState<Data | null>(null);
   const [err, setErr] = useState('');
+  // Số đầy đủ: máy chủ CHỈ gửi số đã che; bấm "Hiện số" (phải đăng nhập) mới lấy số đủ để gọi (29/9/2026).
+  const { user } = useAuth();
+  const { openLogin } = useLoginGate();
+  const [soDu, setSoDu] = useState<string | null>(null);
+  const [dangLay, setDangLay] = useState(false);
+  async function hienSo() {
+    if (!user) { openLogin(); return; }
+    setDangLay(true);
+    try { const r = await api<{ phone: string | null }>(`/listings/agent/${id}/reveal`, { method: 'POST' }); setSoDu(r.phone); }
+    catch { /* lỗi thì giữ nút */ }
+    finally { setDangLay(false); }
+  }
 
   useEffect(() => {
     if (!id) return;
@@ -65,9 +78,11 @@ export default function AgentProfilePage() {
       <div className="max-w-5xl mx-auto px-3 sm:px-4 -mt-4">
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-3 sm:p-4 flex flex-wrap gap-2.5">
           <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-[#0068FF] hover:bg-[#0058d6] text-white font-bold py-2.5 rounded-xl">💬 Chat qua Zalo</a>
-          {agent.phone
-            ? <a href={`tel:${agent.phone.replace(/\s/g, '')}`} className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold py-2.5 rounded-xl">📞 Gọi ngay</a>
-            : <Link href="/login" className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-[#0A2540] text-white font-bold py-2.5 rounded-xl">🔒 Đăng nhập để xem số</Link>}
+          {soDu
+            ? <a href={`tel:${soDu.replace(/\s/g, '')}`} className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold py-2.5 rounded-xl">📞 Gọi {soDu}</a>
+            : agent.phone
+              ? <button type="button" onClick={hienSo} disabled={dangLay} className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold py-2.5 rounded-xl">📞 {agent.phone} · {dangLay ? 'Đang lấy…' : 'Hiện số'}</button>
+              : <Link href="/login" className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-[#0A2540] text-white font-bold py-2.5 rounded-xl">🔒 Đăng nhập để xem số</Link>}
         </div>
       </div>
 

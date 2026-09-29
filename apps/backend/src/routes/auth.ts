@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
-import { hashPassword, verifyPassword, signToken, dsVaiTro } from '../lib/auth.ts';
+import { hashPassword, verifyPassword, signToken, dsVaiTro, canNangCap, BAM_GIA, kiemMatKhauMoi, DAI_TOI_DA } from '../lib/auth.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { sendVerificationEmail, EMAIL_LIVE } from '../lib/mailer.ts';
 
@@ -30,7 +30,7 @@ authRouter.post('/register', async (req, res, next) => {
     const { email, password, fullName, phone } = req.body ?? {};
     if (!email || !password || !phone) return res.status(400).json({ error: 'Cần email, mật khẩu và số điện thoại' });
     if (!isEmail(email)) return res.status(400).json({ error: 'Email không hợp lệ' });
-    if (String(password).length < 6) return res.status(400).json({ error: 'Mật khẩu tối thiểu 6 ký tự' });
+    const loiMk = kiemMatKhauMoi(password, email); if (loiMk) return res.status(400).json({ error: loiMk });
     if ((await query('SELECT id FROM users WHERE email=$1', [email])).length)
       return res.status(409).json({ error: 'Email đã được đăng ký' });
     const hash = await hashPassword(password);
@@ -53,13 +53,41 @@ authRouter.post('/verify-email', (_req, res) => { res.status(410).json({ error: 
 authRouter.post('/resend-code', (_req, res) => { res.status(410).json({ error: 'Chức năng xác minh email chưa mở.' }); });
 
 // Đăng nhập — trả role; chặn tài khoản bị khoá
+// ── KHOÁ TẠM THEO TÀI KHOẢN (29/9/2026) ──
+// Giới hạn theo máy (IP) không chặn được kiểu dò mật khẩu RẢI từ nhiều máy vào MỘT tài khoản. Nay sai
+// SAI_TOI_DA lần trong 15 phút thì tài khoản đó tạm khoá 15 phút (đăng nhập đúng cũng phải chờ).
+// Giữ trong bộ nhớ (khởi động lại là xoá) — đủ cho mục đích chặn dò, không cần bảng mới.
+const SAI_TOI_DA = 8, CUA_SO = 15 * 60 * 1000;
+const saiMk = new Map<string, { lan: number; tu: number }>();
+function dangBiKhoa(k: string): number {
+  const r = saiMk.get(k); if (!r) return 0;
+  if (Date.now() - r.tu > CUA_SO) { saiMk.delete(k); return 0; }
+  return r.lan >= SAI_TOI_DA ? Math.ceil((r.tu + CUA_SO - Date.now()) / 60000) : 0;
+}
+function ghiSai(k: string) {
+  const r = saiMk.get(k);
+  if (!r || Date.now() - r.tu > CUA_SO) saiMk.set(k, { lan: 1, tu: Date.now() }); else r.lan++;
+  if (saiMk.size > 50000) saiMk.clear();   // chặn phình bộ nhớ nếu bị spam email ngẫu nhiên
+}
+
 authRouter.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body ?? {};
+    if (typeof email !== 'string' || typeof password !== 'string' || password.length > DAI_TOI_DA)
+      return res.status(400).json({ error: 'Email hoặc mật khẩu không hợp lệ' });
+    const k = email.trim().toLowerCase();
+    const conPhut = dangBiKhoa(k);
+    if (conPhut) return res.status(429).json({ error: `Sai mật khẩu quá nhiều lần. Tài khoản tạm khoá, thử lại sau ${conPhut} phút.` });
     const [user] = await query('SELECT * FROM users WHERE email=$1', [email]);
+    // Email không tồn tại vẫn so với chuỗi băm GIẢ → thời gian trả lời NHƯ NHAU (không đo được email nào đã có).
+    const dung = await verifyPassword(password, user?.password_hash || BAM_GIA);
     // Thông báo GỘP để không lộ email nào đã đăng ký (chống dò tài khoản).
-    if (!user || !(await verifyPassword(password ?? '', user.password_hash)))
-      return res.status(401).json({ error: 'Email hoặc mật khẩu không đúng' });
+    if (!user || !dung) { ghiSai(k); return res.status(401).json({ error: 'Email hoặc mật khẩu không đúng' }); }
+    saiMk.delete(k);
+    // Mật khẩu CŨ băm độ khó thấp → băm lại bằng độ khó mới, GIỮ NGUYÊN mật khẩu (không chờ, lỗi thì thôi).
+    if (canNangCap(user.password_hash)) {
+      hashPassword(password).then((h) => query('UPDATE users SET password_hash=$2 WHERE id=$1', [user.id, h])).catch(() => {});
+    }
     if (user.status === 'suspended') return res.status(403).json({ error: 'Tài khoản đã bị khoá' });
     const token = signToken({ id: user.id, email: user.email, role: user.role, roles: dsVaiTro(user) as any });
     res.json({ token, user: profile(user) });
@@ -80,7 +108,7 @@ authRouter.patch('/me', authRequired, async (req: AuthedRequest, res, next) => {
   try {
     const b = req.body ?? {};
     if (b.newPassword) {
-      if (String(b.newPassword).length < 6) return res.status(400).json({ error: 'Mật khẩu mới tối thiểu 6 ký tự' });
+      const loiMk = kiemMatKhauMoi(b.newPassword, req.user!.email); if (loiMk) return res.status(400).json({ error: loiMk });
       const [u] = await query('SELECT password_hash FROM users WHERE id=$1', [req.user!.id]);
       if (!u || !(await verifyPassword(b.currentPassword ?? '', u.password_hash)))
         return res.status(400).json({ error: 'Mật khẩu hiện tại không đúng' });

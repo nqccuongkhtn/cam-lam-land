@@ -729,6 +729,14 @@ vì nó không đi qua cấu hình nên lại lệch thang.
 - Lỗi ≥500 không trả nguyên văn lỗi DB cho người ngoài (`middleware/error.ts`).
 - Kho tin tức `/app/.kho-tin` gắn volume `tin_kho` (trước mất mỗi lần dựng lại).
 - Trang bảo trì trả **503** (`error_page … =503`), đừng đổi lại 200.
+- **Danh sách nóng** (có CMND/CCCD người dân): file gốc nằm ở `apps/backend/du-lieu-rieng/danh-sach-nong.json`
+  (**đã loại khỏi git**, không còn ở `public/`), chỉ phục vụ qua `GET /api/hotlist/goc` cho **admin hoặc vai
+  trò `hotlist`** — đúng quyền "🔥 Tra cứu danh sách nóng" cấp trong trang quản trị. Mọi đường `/api/hotlist`
+  đều kiểm quyền đó ở MÁY CHỦ (trước chỉ che ở giao diện). Máy mới clone về phải chép tay file này vào.
+- **Mật khẩu:** bcrypt độ khó 12; hash cũ (độ khó 10) vẫn đăng nhập được và **tự băm lại** khi đăng nhập đúng.
+  Mật khẩu MỚI: ≥ 8 ký tự, có chữ và số, không thuộc danh sách dễ đoán (`kiemMatKhauMoi` trong `lib/auth.ts`).
+  Sai 8 lần/15 phút → khoá tạm tài khoản 15 phút. Email không tồn tại vẫn so với hash giả (thời gian như nhau).
+- **SĐT người đăng** (`/api/listings/agent/:id`) trả số ĐÃ CHE; số đủ qua `POST /agent/:id/reveal` (phải đăng nhập).
 
 ## Những chỗ hay vấp
 

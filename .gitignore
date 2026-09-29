@@ -50,3 +50,9 @@ apps/frontend/public/qh_fill.geojson
 __pycache__/
 **/__pycache__/
 backup/
+
+# ── DỮ LIỆU RIÊNG TƯ (29/9/2026): danh sách nóng có CMND/CCCD, ngày sinh, địa chỉ người dân.
+#    KHÔNG BAO GIỜ đưa lên git (kho GitHub từng để công khai). Máy chủ đọc từ đây và chỉ gửi cho
+#    tài khoản admin / vai trò "hotlist" (routes/hotlist.ts → GET /api/hotlist/goc).
+apps/backend/du-lieu-rieng/
+apps/frontend/public/danh-sach-nong.json

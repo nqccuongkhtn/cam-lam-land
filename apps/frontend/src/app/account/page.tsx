@@ -74,7 +74,7 @@ export default function Account() {
         <form onSubmit={savePw} className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
           <h2 className="font-bold text-[#0A2540]">Đổi mật khẩu</h2>
           <div><label className={lbl}>Mật khẩu hiện tại</label><PasswordInput value={curPw} onChange={(e) => setCurPw(e.target.value)} autoComplete="current-password" /></div>
-          <div><label className={lbl}>Mật khẩu mới (≥ 6 ký tự)</label><PasswordInput value={newPw} onChange={(e) => setNewPw(e.target.value)} autoComplete="new-password" /></div>
+          <div><label className={lbl}>Mật khẩu mới (≥ 8 ký tự, có chữ và số)</label><PasswordInput value={newPw} onChange={(e) => setNewPw(e.target.value)} autoComplete="new-password" /></div>
           <button disabled={busy || !curPw || !newPw} className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] disabled:opacity-60 text-white font-bold px-6 py-2.5 rounded-xl">Đổi mật khẩu</button>
         </form>
 

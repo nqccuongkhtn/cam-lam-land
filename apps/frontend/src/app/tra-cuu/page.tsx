@@ -34,9 +34,12 @@ export default function TraCuuPage() {
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(''), 3000); return () => clearTimeout(t); }, [toast]);
   useEffect(() => { const f = () => setMobile(window.innerWidth < 640); f(); window.addEventListener('resize', f); setEmbedded(new URLSearchParams(window.location.search).get('embed') === '1' || document.documentElement.classList.contains('embed')); return () => window.removeEventListener('resize', f); }, []);
 
-  useEffect(() => { (async () => {
+  // ⛔ 29/9/2026: CHỈ tải dữ liệu khi đã biết là tài khoản CÓ QUYỀN (admin / hotlist). Trước đây tải file gốc
+  //    công khai /danh-sach-nong.json cho MỌI người rồi mới che bằng màn khoá 🔒. Nay file gốc nằm sau
+  //    GET /api/hotlist/goc (máy chủ kiểm quyền, gửi kèm thẻ đăng nhập).
+  useEffect(() => { if (authLoading || !canManage) return; (async () => {
     try {
-      const j = await fetch('/danh-sach-nong.json').then((r) => { if (!r.ok) throw new Error('Không tải được dữ liệu'); return r.json(); });
+      const j = await api<any>('/hotlist/goc');
       setData(j); setLoading('Đang dựng chỉ mục…'); await new Promise((r) => setTimeout(r, 10));
       const out: Rec[] = [];
       j.g.forEach((grp: any, gi: number) => { const mg = j.meta.groups[gi]; for (let ri = 0; ri < grp.r.length; ri++) { const row = grp.r[ri]; const nb = norm(row.join(' ')).replace(/\s+/g, ' '); out.push({ gi, ri, src: mg.s, thk: mg.th >= 0 ? digits(row[mg.th]) : [], tok: mg.to >= 0 ? digits(row[mg.to]) : [], xa: mg.xa >= 0 ? String(row[mg.xa] || '') : '', blob: nb, blobNS: nb.replace(/\s+/g, '') }); } });
@@ -44,7 +47,7 @@ export default function TraCuuPage() {
       try { const r = await api<{ records: Added[]; sheets: any[] }>('/hotlist'); setAdded(r.records || []); setSheets(r.sheets || []); } catch { /* */ }
       setLoading('');
     } catch (e: any) { setErr(e?.message || 'Lỗi tải'); setLoading(''); }
-  })(); }, []);
+  })(); }, [authLoading, canManage]);
 
   const xaList = useMemo(() => { const tc = (v: string) => v.split(' ').map((w) => (w ? w.charAt(0).toLocaleUpperCase('vi') + w.slice(1).toLocaleLowerCase('vi') : w)).join(' '); const m = new Map<string, string>(); const add = (raw: any) => { const v = String(raw ?? '').split('\n')[0].trim().replace(/\s+/g, ' '); if (v) { const k = v.toLowerCase(); if (!m.has(k)) m.set(k, tc(v)); } }; recs.forEach((r) => add(r.xa)); added.forEach((a) => add(a.xa)); return [...m.values()].sort((a, b) => a.localeCompare(b, 'vi')); }, [recs, added]);
   const groups = data ? data.meta.groups : []; const counts = data ? data.meta.counts : {};

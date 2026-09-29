@@ -321,7 +321,7 @@ export default function Home() {
             <div className="mb-2 flex items-center justify-center gap-6 sm:gap-8">
               {([['sale', 'Nhà đất bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
                 <button key={k} onClick={() => { setHeroDeal(k); setMin(''); setMax(''); }}
-                  className={`relative pb-1.5 text-[13px] transition sm:text-sm ${heroDeal === k ? 'font-bold text-white md:font-extrabold' : 'font-medium text-white/75 md:font-semibold md:hover:text-white'}`}>
+                  className={`relative pb-1.5 text-[13px] transition sm:text-sm ${heroDeal === k ? 'font-bold text-white md:font-extrabold' : 'font-medium text-white/85 md:text-white/75 md:font-semibold md:hover:text-white'}`}>
                   {ten}
                   <span aria-hidden
                     className={`absolute inset-x-0 -bottom-0.5 h-[2px] rounded-full bg-[#E2B85A] md:bg-red-500 transition-opacity ${heroDeal === k ? 'opacity-100' : 'opacity-0'}`} />{/* điện thoại: gạch chân VÀNG trên dải navy nhạt (mẫu 8) */}

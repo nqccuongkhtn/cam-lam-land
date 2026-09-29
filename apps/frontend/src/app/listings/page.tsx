@@ -21,6 +21,7 @@ import LogoAnh from '@/components/LogoAnh';
 import LogoLe from '@/components/LogoLe';
 import { useLogoLe } from '@/lib/logoLe';
 import { useDayCotNutBanDo } from '@/lib/cotNutBanDo';
+import { escHtml } from '@/lib/escHtml';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false, loading: () => <div className="h-full w-full grid place-items-center bg-slate-100 text-slate-400 text-sm animate-pulse">Đang tải bản đồ…</div> });
 // Khoảng giá theo tỷ (bán) — cho thuê dùng phần lẻ của tỷ để load() giữ nguyên hệ số ×1e9 (3 triệu = 0.003 tỷ).
@@ -227,7 +228,7 @@ function ListingsInner() {
     lng: l.lng, lat: l.lat,
     tier: l.tier || 'normal',              // MapView: VIP → pill giá; tin thường → chấm (rê chuột/zoom cận hiện giá)
     label: priceLabel(l.price, l.deal),
-    popupHtml: `<a href="/listings/${l.id}" style="font-weight:700;color:#0A2540">${l.title}</a><br/><b style="color:#dc2626">${priceLabel(l.price, l.deal)}</b>`,
+    popupHtml: `<a href="/listings/${l.id}" style="font-weight:700;color:#0A2540">${escHtml(l.title)}</a><br/><b style="color:#dc2626">${priceLabel(l.price, l.deal)}</b>`,
   })), [listings]);
   // Gim tin lưu (teardrop tím kiểu Google Maps). Bấm gim → mở BẢNG THÔNG TIN React riêng (selPlace).
   const placeMarkers = useMemo(() => drafts.map((p) => ({

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { laAdmin } from '../lib/auth.ts';
+import { laAdmin, verifyToken } from '../lib/auth.ts';
 import { query } from '../lib/db.ts';
 import { isFlagOn } from '../lib/flags.ts';
 import { cached, cachePut, cacheDrop } from '../lib/cache.ts';
@@ -29,12 +29,25 @@ function maskPhone(p: any): string | null {
   if (d.length <= 6) return String(p);
   return d.slice(0, 4) + ' ' + d.slice(4, 6) + '...';
 }
-function linkImages(listingId: number, images: any): Promise<any> {
+// Người đang xem (KHÔNG bắt buộc đăng nhập): có thẻ hợp lệ thì trả người đó, không thì null.
+function nguoiXem(req: any) {
+  const m = /^Bearer (.+)$/.exec(String(req.headers?.authorization || ''));
+  return m ? verifyToken(m[1]) : null;
+}
+
+// ⚠️ 29/9/2026 (rà soát bảo mật): CHỈ gắn ảnh DO CHÍNH NGƯỜI NÀY TẢI LÊN và CHƯA thuộc tin khác.
+//    Trước đây câu UPDATE không kiểm chủ → gửi danh sách id ảnh tăng dần là "hút" hết ảnh của mọi tin
+//    (cả PDF công văn danh sách nóng) về tin mình, xoá tin là database XOÁ THEO toàn bộ ảnh đó.
+//    Admin vẫn gắn được ảnh bất kỳ (sửa tin hộ người khác). Tối đa 15 ảnh một tin.
+function linkImages(listingId: number, images: any, user: any): Promise<any> {
   const ids = (Array.isArray(images) ? images : []).map((u: string) => {
     const m = /\/api\/images\/(\d+)/.exec(String(u)); return m ? Number(m[1]) : null;
-  }).filter((x): x is number => x != null);
+  }).filter((x): x is number => x != null && Number.isInteger(x) && x > 0 && x < 2 ** 31).slice(0, 15);
   if (!ids.length) return Promise.resolve();
-  return query(`UPDATE listing_images SET listing_id=$1 WHERE id = ANY($2::int[])`, [listingId, ids]);
+  return query(
+    `UPDATE listing_images SET listing_id=$1
+      WHERE id = ANY($2::int[]) AND (listing_id IS NULL OR listing_id = $1) AND ($3::boolean OR owner_id = $4)`,
+    [listingId, ids, laAdmin(user), user?.id ?? -1]);
 }
 
 // GET /api/listings — bộ lọc + ưu tiên tin đẩy
@@ -143,7 +156,8 @@ listingsRouter.get('/agent/:id', async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     if (!id) return res.status(400).json({ error: 'id không hợp lệ' });
-    const [agent] = await query(`SELECT id, full_name AS "name", phone, avatar, role, rating, rating_count AS "ratingCount", created_at AS "createdAt" FROM users WHERE id=$1`, [id]);
+    // ⚠️ KHÔNG trả `role` (29/9/2026): lộ ai là admin/gis là chỉ đường cho kẻ xấu nhắm vào tài khoản đó.
+    const [agent] = await query(`SELECT id, full_name AS "name", phone, avatar, rating, rating_count AS "ratingCount", created_at AS "createdAt" FROM users WHERE id=$1`, [id]);
     if (!agent) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
     const active = await query(
       `${SELECT} WHERE listings.created_by=$1 AND listings.status NOT IN ('hidden','pending','sold')
@@ -238,8 +252,15 @@ listingsRouter.get('/usage', authRequired, async (req: AuthedRequest, res, next)
 
 listingsRouter.get('/:id', async (req, res, next) => {
   try {
-    const [row] = await query(`${SELECT} WHERE listings.id=$1`, [Number(req.params.id)]);
+    const idTin = Number(req.params.id);
+    if (!Number.isInteger(idTin) || idTin <= 0) return res.status(404).json({ error: 'Không tìm thấy tin' });
+    const [row] = await query(`${SELECT} WHERE listings.id=$1`, [idTin]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy tin' });
+    // ⚠️ 29/9/2026: tin đang ẨN / CHỜ DUYỆT chỉ chủ tin hoặc admin xem được (trước đây ai biết số là xem).
+    if (row.status === 'hidden' || row.status === 'pending') {
+      const u = nguoiXem(req);
+      if (!u || (u.id !== row.createdBy && !laAdmin(u))) return res.status(404).json({ error: 'Không tìm thấy tin' });
+    }
     // Đếm lượt xem tin (không chặn phản hồi). Trang sửa tin gọi kèm ?noview=1 để không tự tăng.
     if (req.query.noview !== '1') {
       query('UPDATE listings SET views = views + 1 WHERE id=$1', [row.id]).catch(() => {});
@@ -316,7 +337,7 @@ listingsRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => 
       [clip(b.title, 200), clip(b.description, 5000), b.price, b.area ?? null, clip(b.propertyType, 40) ?? 'land', clip(b.address, 300),
        clip(b.ward, 120), b.bedrooms ?? null, b.bathrooms ?? null, clip(b.direction, 60), clip(b.legal, 120), b.frontage ?? null,
        clip(b.contactName, 120), clip(b.contactPhone, 30), b.images ?? [], b.lng, b.lat, req.user!.id, b.deal === 'rent' ? 'rent' : 'sale']);
-    await linkImages(row.id, b.images);
+    await linkImages(row.id, b.images, req.user);
     cacheDrop('listings:');
     if (svcOn && !laAdmin(req.user) && !pkgActive) bumpUsage(req.user!.id, 'posts').catch(() => {}); // gói trả phí ĐÃ trừ atomic ở trên; free-tier đếm theo tháng ở đây
     const [created] = await query(`${SELECT} WHERE listings.id=$1`, [row.id]);
@@ -348,6 +369,13 @@ listingsRouter.put('/:id', authRequired, async (req: AuthedRequest, res, next) =
     if (!(await ownerOnly(req, id))) return res.status(403).json({ error: 'Chỉ chủ tin mới được sửa. Admin chỉ có thể xoá.' });
     const b = req.body ?? {};
     if (b.price != null && Number(b.price) < 0) return res.status(400).json({ error: 'Giá không được âm' });
+    // ⚠️ 29/9/2026 (rà soát bảo mật): chủ tin chỉ được đặt 'active' hoặc 'sold', và KHÔNG được tự gỡ
+    //    trạng thái 'hidden'/'pending' do admin đặt (trước đây gửi status:'active' là tin bị ẩn hiện lại).
+    let trangThai: string | null = clip(b.status, 20) || null;
+    if (trangThai && !laAdmin(req.user)) {
+      const [cu] = await query('SELECT status FROM listings WHERE id=$1', [id]);
+      if (!['active', 'sold'].includes(trangThai) || ['hidden', 'pending'].includes(cu?.status)) trangThai = null;
+    }
     const [row] = await query(
       `UPDATE listings SET
          title=COALESCE($2,title), description=COALESCE($3,description), price=COALESCE($4,price), area=COALESCE($5,area),
@@ -360,10 +388,10 @@ listingsRouter.put('/:id', authRequired, async (req: AuthedRequest, res, next) =
        WHERE id=$1 RETURNING id`,
       [id, clip(b.title, 200), clip(b.description, 5000), b.price ?? null, b.area ?? null, clip(b.propertyType, 40),
        clip(b.address, 300), clip(b.ward, 120), b.bedrooms ?? null, b.bathrooms ?? null, clip(b.direction, 60),
-       clip(b.legal, 120), b.frontage ?? null, clip(b.contactName, 120), clip(b.contactPhone, 30), clip(b.status, 20),
+       clip(b.legal, 120), b.frontage ?? null, clip(b.contactName, 120), clip(b.contactPhone, 30), trangThai,
        b.images ?? null, b.lng ?? null, b.lat ?? null, clip(b.deal, 10)]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy tin' });
-    if (b.images) await linkImages(id, b.images);
+    if (b.images) await linkImages(id, b.images, req.user);
     const [updated] = await query(`${SELECT} WHERE listings.id=$1`, [id]);
     res.json(updated);
   } catch (e) { next(e); }

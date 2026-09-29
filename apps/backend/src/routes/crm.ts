@@ -185,6 +185,10 @@ crmRouter.post('/interests', authRequired, async (req: AuthedRequest, res, next)
   try {
     const b = req.body ?? {};
     if (!b.placeId) return res.status(400).json({ error: 'Thiếu tin (placeId)' });
+    // ⚠️ 29/9/2026 (rà soát bảo mật): tin và khách PHẢI là của chính mình. Trước đây gửi mã khách/tin
+    //    của người khác là gắn được, rồi phản hồi trả luôn TÊN + SĐT khách của môi giới khác.
+    if (!(await owns('saved_places', Number(b.placeId), req))) return res.status(403).json({ error: 'Không có quyền với tin này' });
+    if (b.customerId && !(await owns('customers', Number(b.customerId), req))) return res.status(403).json({ error: 'Không có quyền với khách này' });
     let customerId = b.customerId;
     if (!customerId) {
       if (!b.name && !b.phone) return res.status(400).json({ error: 'Cần chọn khách hoặc nhập tên/SĐT khách mới' });
@@ -315,6 +319,10 @@ crmRouter.post('/appointments', authRequired, async (req: AuthedRequest, res, ne
   try {
     const b = req.body ?? {};
     if (!b.appointAt) return res.status(400).json({ error: 'Thiếu ngày giờ hẹn' });
+    // ⚠️ 29/9/2026: khách/tin gắn vào lịch hẹn PHẢI là của chính mình (nếu có) — tránh xem trộm và
+    //    tránh gửi SMS nhắc hẹn tới khách của môi giới khác khi bật cổng SMS.
+    if (b.customerId && !(await owns('customers', Number(b.customerId), req))) return res.status(403).json({ error: 'Không có quyền với khách này' });
+    if (b.placeId && !(await owns('saved_places', Number(b.placeId), req))) return res.status(403).json({ error: 'Không có quyền với tin này' });
     const [row] = await query(
       `INSERT INTO notary_appointments (user_id, customer_id, place_id, appoint_at, location, note, status, sms_reminder)
        VALUES ($1,$2,$3,$4,$5,$6,COALESCE($7,'Chờ'),COALESCE($8,false)) RETURNING ${APPT}`,

@@ -461,7 +461,10 @@ function slotStart(): number {
 }
 
 export async function GET(req: Request) {
-  if (new URL(req.url).searchParams.get('diag') === '1') {
+  // ⚠️ 29/9/2026 (rà soát bảo mật): chế độ tự kiểm GỌI AI THẬT (tốn lượt/tiền) — trước đây ai gõ ?diag=1
+  //    cũng gọi được. Nay phải kèm đúng khoá NEWS_DIAG_KEY đặt trong .env (không đặt = tắt hẳn).
+  const khoaDiag = process.env.NEWS_DIAG_KEY || '';
+  if (khoaDiag && new URL(req.url).searchParams.get('diag') === khoaDiag) {
     const sample = await rewrite('Kiểm tra hệ thống tin tức', 'Hạ tầng giao thông khu vực Cam Lâm, Khánh Hòa đang được đầu tư phát triển mạnh, với nhiều dự án đường ven biển và kết nối sân bay Cam Ranh.');
     return NextResponse.json({
       hasGeminiKey: !!GEMINI_KEY, geminiModel: GEMINI_MODEL, disableThinking: NO_THINK, hasClaudeKey: !!AI_KEY,

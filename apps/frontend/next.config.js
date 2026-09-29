@@ -2,7 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  compress: true,
+  // TẮT nén trong Node: nginx phía trước đã nén gzip (viết bằng C, nhanh + ít RAM hơn hẳn nén bằng
+  // JavaScript). Để cả hai cùng nén là Node tốn CPU/bộ nhớ vô ích khi đông khách (29/9/2026).
+  // ⚠️ Chạy Next.js KHÔNG qua nginx (vd Render) thì bật lại true.
+  compress: process.env.NEXT_COMPRESS === '1',
   productionBrowserSourceMaps: false,
   images: {
     remotePatterns: [{ protocol: 'https', hostname: '**' }],

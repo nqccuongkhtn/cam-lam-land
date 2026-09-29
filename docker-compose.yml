@@ -7,6 +7,10 @@ services:
     container_name: camlam_postgis
     restart: unless-stopped
     # Tinh chỉnh hiệu năng: tăng bộ nhớ đệm + tối ưu cho SSD → truy vấn bản đồ/tin nhanh hơn.
+    # ⚠️ jit=off đặt bằng `ALTER SYSTEM SET jit = off` (29/9/2026) — lưu trong volume pgdata
+    #    (postgresql.auto.conf), KHÔNG ghi vào đây để khỏi phải tạo lại container DB. JIT dịch
+    #    câu lệnh ra mã máy: lợi cho truy vấn phân tích rất nặng, còn truy vấn web ngắn (vài ms)
+    #    thì chỉ tốn thêm thời gian + RAM. Dựng DB mới từ đầu thì chạy lại lệnh đó.
     command:
       - "postgres"
       - "-c"

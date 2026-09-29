@@ -53,3 +53,6 @@ services:
         value: camlam-api.onrender.com
       - key: NEXT_PUBLIC_API_BASE
         value: /api
+      # Render không có nginx phía trước → để Next.js tự nén gzip (xem next.config.js)
+      - key: NEXT_COMPRESS
+        value: "1"

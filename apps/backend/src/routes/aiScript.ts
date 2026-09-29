@@ -4,6 +4,7 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
+import { laAdmin } from '../lib/auth.ts';
 
 export const aiScriptRouter = Router();
 
@@ -27,6 +28,13 @@ QUY TẮC BẮT BUỘC:
 // POST /api/ai/video-script  { property, scripts:[{key,name,focus}], duration }
 aiScriptRouter.post('/video-script', authRequired, async (req: AuthedRequest, res) => {
   try {
+    // ⚠️ 29/9/2026 (rà soát bảo mật): chỉ người CÒN HẠN GÓI VIDEO (hoặc admin) mới được gọi AI trả phí.
+    //    Trước đây chỉ chặn ở giao diện (MapVideoPage) → tài khoản miễn phí gọi thẳng API là tốn tiền khoá Claude.
+    if (!laAdmin(req.user)) {
+      const [u] = await query('SELECT video_expires_at FROM users WHERE id=$1', [req.user!.id]);
+      if (!u?.video_expires_at || new Date(u.video_expires_at).getTime() <= Date.now())
+        return res.status(403).json({ error: 'Cần gói Video bản đồ còn hạn để dùng AI viết kịch bản.' });
+    }
     const { property = {}, scripts = [], duration = 8 } = (req.body || {}) as any;
     const cfg = await aiCfg();
     if (!cfg.apiKey) return res.status(503).json({ error: 'Tính năng AI chưa sẵn sàng (chưa cấu hình).' });

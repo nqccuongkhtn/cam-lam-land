@@ -6,7 +6,17 @@
 # Tunnel ra Internet nằm ở docker-compose.tunnel.yml (thêm khi đã có TUNNEL_TOKEN).
 # ─────────────────────────────────────────────────────────────────────────
 services:
+  # ── TRẦN BỘ NHỚ NODE.JS (29/9/2026) ──────────────────────────────────────────
+  # Mặc định Node cho bộ nhớ heap phình tới ~2 GB mới chịu dọn rác mạnh → lúc đông khách RAM cứ
+  # tăng dần. Đặt trần vừa đủ: Node dọn rác sớm hơn, RAM đứng yên; có chỗ rò rỉ bộ nhớ cũng không
+  # nuốt cả máy. Đo lúc thường: backend ~180 MB, frontend ~105 MB → trần gấp 3–4 lần, dư sức.
+  # (Chỉ giới hạn heap JS; ảnh/PDF xử lý bằng Buffer nằm ngoài heap nên không bị ảnh hưởng.)
+  backend:
+    environment:
+      NODE_OPTIONS: "--max-old-space-size=640"
   frontend:
+    environment:
+      NODE_OPTIONS: "--max-old-space-size=384"
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile.prod

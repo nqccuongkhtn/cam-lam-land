@@ -42,34 +42,15 @@ authRouter.post('/register', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// Xác thực email bằng mã 6 số → tự đăng nhập
-authRouter.post('/verify-email', async (req, res, next) => {
-  try {
-    const { email, code } = req.body ?? {};
-    if (!email || !code) return res.status(400).json({ error: 'Thiếu email hoặc mã' });
-    const [v] = await query(
-      `SELECT * FROM email_verifications WHERE email=$1 AND code=$2 AND used=false AND expires_at > now()
-       ORDER BY id DESC LIMIT 1`, [email, String(code).trim()]);
-    if (!v) return res.status(400).json({ error: 'Mã không đúng hoặc đã hết hạn' });
-    await query('UPDATE email_verifications SET used=true WHERE id=$1', [v.id]);
-    const [user] = await query('UPDATE users SET email_verified=true WHERE email=$1 RETURNING *', [email]);
-    if (!user) return res.status(404).json({ error: 'Không tìm thấy tài khoản' });
-    const token = signToken({ id: user.id, email: user.email, role: user.role, roles: dsVaiTro(user) as any });
-    res.json({ token, user: profile(user) });
-  } catch (e) { next(e); }
-});
-
-// Gửi lại mã
-authRouter.post('/resend-code', async (req, res, next) => {
-  try {
-    const { email } = req.body ?? {};
-    if (!email) return res.status(400).json({ error: 'Thiếu email' });
-    const [u] = await query('SELECT id FROM users WHERE email=$1', [email]);
-    if (!u) return res.status(404).json({ error: 'Email chưa đăng ký' });
-    const code = await issueCode(email);
-    res.json({ message: 'Đã gửi lại mã', email, ...(EMAIL_LIVE ? {} : { devCode: code }) });
-  } catch (e) { next(e); }
-});
+// ⛔ ĐÃ TẮT /verify-email và /resend-code (29/9/2026 — rà soát bảo mật, lỗ hổng NGHIÊM TRỌNG):
+//    chưa có dịch vụ gửi email thật (EMAIL_ENABLED trống) nên /resend-code TRẢ LUÔN mã 6 số
+//    trong phản hồi (devCode), còn /verify-email nhận đúng mã là CẤP THẺ ĐĂNG NHẬP ⇒ ai biết email
+//    admin là đăng nhập thành admin KHÔNG CẦN MẬT KHẨU.
+//    Giao diện không dùng hai đường này, và lúc đăng ký đã tự đặt email_verified=true, nên tắt
+//    hẳn không mất tính năng nào. Muốn bật lại xác minh email thì: mã PHẢI gửi qua email thật,
+//    KHÔNG BAO GIỜ trả mã trong phản hồi, và xác minh xong KHÔNG được cấp thẻ đăng nhập.
+authRouter.post('/verify-email', (_req, res) => { res.status(410).json({ error: 'Chức năng xác minh email chưa mở.' }); });
+authRouter.post('/resend-code', (_req, res) => { res.status(410).json({ error: 'Chức năng xác minh email chưa mở.' }); });
 
 // Đăng nhập — trả role; chặn tài khoản bị khoá
 authRouter.post('/login', async (req, res, next) => {

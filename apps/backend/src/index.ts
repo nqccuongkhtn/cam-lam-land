@@ -112,7 +112,10 @@ app.get('/api/config', (_req, res) => {
   res.json({ wsUrl: host ? `wss://${host}/ws` : '', vapidPublic: vapidPublicKey });
 });
 // Chống brute-force: CHỈ tính POST (đăng nhập/đăng ký). GET /auth/me (kiểm tra phiên mỗi lần tải trang) KHÔNG bị tính → refresh nhiều không bị khoá. Email admin luôn được bỏ qua.
-const AUTH_SKIP_EMAILS = new Set([env.adminEmail.toLowerCase(), ...((process.env.RATE_LIMIT_SKIP_EMAILS || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean))]);
+// ⛔ 29/9/2026 (rà soát bảo mật): BỎ email admin khỏi danh sách miễn đếm. Miễn đếm cho admin nghĩa là
+//    kẻ xấu được THỬ MẬT KHẨU ADMIN KHÔNG GIỚI HẠN — đúng tài khoản cần bảo vệ nhất. Cần miễn cho ai thì
+//    khai rõ trong RATE_LIMIT_SKIP_EMAILS.
+const AUTH_SKIP_EMAILS = new Set([...((process.env.RATE_LIMIT_SKIP_EMAILS || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean))]);
 app.use('/api/auth', rateLimit({ windowMs: 10 * 60 * 1000, max: 60, key: 'auth', skip: (req) => req.method !== 'POST' || AUTH_SKIP_EMAILS.has(String((req.body as any)?.email || '').trim().toLowerCase()), message: 'Quá nhiều lần thử đăng nhập/đăng ký. Vui lòng đợi vài phút rồi thử lại.' }), authRouter);
 // Đăng nhập bằng vân tay / khuôn mặt (passkey). Đặt TRƯỚC /api/auth để không dính
 // bộ đếm số lần thử của đăng nhập mật khẩu — mỗi lần chạm vân tay là một lượt gọi,

@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import ListingCard from '@/components/ListingCard';
 import { Skeleton, EmptyState, buttonClass } from '@/components/ui';
+import { escHtml } from '@/lib/escHtml';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
 
@@ -263,7 +264,7 @@ export default function ListingDetail() {
             <div className="bg-white rounded-2xl border border-slate-200 p-3">
               <h2 className="font-bold text-[#0A2540] mb-2 px-2">Vị trí trên bản đồ</h2>
               <div className="h-72 rounded-xl overflow-hidden">
-                <MapView center={[l.lng, l.lat]} zoom={15} baseMap="satellite" markers={[{ lng: l.lng, lat: l.lat, popupHtml: `<b>${l.title}</b>` }]} className="h-full w-full" />
+                <MapView center={[l.lng, l.lat]} zoom={15} baseMap="satellite" markers={[{ lng: l.lng, lat: l.lat, popupHtml: `<b>${escHtml(l.title)}</b>` }]} className="h-full w-full" />
               </div>
               <a href={`https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lng}`} target="_blank" rel="noreferrer" className="cl-press mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#0A2540] py-2.5 font-bold text-white hover:bg-[#0d3a6b]">
                 🧭 Chỉ đường đến bất động sản
@@ -440,7 +441,7 @@ export default function ListingDetail() {
             </>
           ) : (
             <div className="flex-1 min-h-0" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-              <MapView center={[l.lng, l.lat]} zoom={16} baseMap="satellite" markers={[{ lng: l.lng, lat: l.lat, popupHtml: `<b>${l.title}</b>` }]} className="h-full w-full" />
+              <MapView center={[l.lng, l.lat]} zoom={16} baseMap="satellite" markers={[{ lng: l.lng, lat: l.lat, popupHtml: `<b>${escHtml(l.title)}</b>` }]} className="h-full w-full" />
             </div>
           )}
         </div>

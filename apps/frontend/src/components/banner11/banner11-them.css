@@ -605,6 +605,8 @@
     margin-top: -1px;
     /* ⚠️ 29/9/2026 đã thử "mẫu 100" (navy chuyển màu, đáy ảnh tan vào dải, tab gạch vàng):
        chủ dự án khen đẹp nhưng "bị tối" → bảo quay lại nền trắng này. Git: 1f2ae9d5.
+       Cùng ngày thử tiếp "mẫu 8" (xanh nhạt tan dần sang trắng, git 3918c087 + b404196b, đã
+       làm nhạt thêm một bậc) → chủ dự án vẫn bảo QUAY VỀ NỀN TRẮNG. Chốt: nền trắng.
        NỀN TRẮNG. Đã thử xanh xám nhạt — chủ dự án chê "xấu hơn trắng" (28/9/2026).
        Cho đỡ đơn điệu thì làm ở NỘI DUNG chứ không đổi màu nền: ô tìm kiếm nền xám
        nhạt + hàng từ khoá gợi ý bên dưới (xem app/page.tsx). */

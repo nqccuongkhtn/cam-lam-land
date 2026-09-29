@@ -177,6 +177,11 @@ services:
       # Nạp lại bộ tile vào volume (chỉ làm khi thay bộ tile mới):
       #   docker run --rm -v camlam_tiles:/dest camlamgis-frontend:latest sh -c 'cp -a /app/public/tiles/. /dest/'
       - camlam_tiles:/app/public/tiles:ro
+      # ── KHO TIN TỨC (29/9/2026) ── app/feed/news/route.ts ghi kho tin ra /app/.kho-tin/tin.json để
+      # khởi động lại không mất bài. Nhưng thư mục đó nằm TRONG container → mỗi lần DỰNG LẠI web
+      # (container mới) là mất sạch, lượt khách đầu tiên phải chờ ~11 giây tải lại tin (đo thật).
+      # Gắn ra volume thì kho sống qua mọi lần dựng lại.
+      - tin_kho:/app/.kho-tin
     depends_on:
       - backend
     expose:
@@ -201,6 +206,8 @@ services:
 volumes:
   # Bộ tile bản đồ quy hoạch — xem lời giải thích ở service frontend.
   camlam_tiles:
+  # Kho tin tức đã biên tập (xem service frontend).
+  tin_kho:
 
   pgdata:
   uploads:

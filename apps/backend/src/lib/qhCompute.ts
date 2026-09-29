@@ -10,10 +10,129 @@ import path from 'node:path';
 const DATA_DIR = process.env.QH_DATA_DIR ?? path.resolve(process.cwd(), 'data');
 const CELL = 0.0005; // ô lưới chỉ mục vùng (~55m)
 
-type Zone = [number, number, number, number, number[][], string, number, number]; // minx,miny,maxx,maxy, ring, loại, diện, bậc(2=QH/1=HT)
+// Dạng ô đất TRONG FILE JSON (chỉ dùng lúc nạp): minx,miny,maxx,maxy, ring, loại, diện, bậc(2=QH/1=HT/0=chưa rõ)
+type Zone = [number, number, number, number, number[][], string, number, number];
 
-let ZONE: Zone[] = [];
-const zoneIdx = new Map<string, number[]>();
+/* ══ KHO Ô ĐẤT GỌN — TỐI ƯU RAM (29/9/2026) ═══════════════════════════════════════════════
+   ĐO THẬT: nạp y nguyên JSON (mỗi đỉnh là một mảng [x,y] riêng, chỉ mục lưới là Map khoá chữ
+   "gx,gy") ăn 279 MB bộ nhớ heap cho 1.172.712 đỉnh — ~240 byte mỗi đỉnh, vì mỗi mảng nhỏ trong
+   V8 mang phần đầu quản lý + con trỏ + kho số riêng.
+   Nay dồn hết vào MẢNG SỐ LIỀN MẠCH (typed array, nằm ngoài heap JS, không có phần đầu từng phần tử):
+     · xy     Float64Array — x,y của mọi đỉnh nối tiếp nhau: đúng 16 byte/đỉnh (2 số × 8 byte);
+     · dau    Uint32Array  — ô k chiếm các đỉnh [dau[k], dau[k+1]) trong xy;
+     · bb     Float64Array — khung bao 4 số/ô;  dien Float64Array; bac Int8Array (1 byte);
+     · loai   Uint16Array  — SỐ THỨ TỰ loại đất (142 loại dùng chung một bảng tenLoai) thay cho
+                             một con trỏ chuỗi mỗi ô;
+     · chỉ mục lưới kiểu CSR: oDau[c]..oDau[c+1] trong oDs là danh sách ô của ô lưới c —
+       thay Map<string, number[]> (mỗi ô lưới một chuỗi khoá + một mảng).
+   ⚠️ GIỮ NGUYÊN 64 BIT (Float64), KHÔNG hạ xuống Float32: kết quả QĐ205 đã chỉnh khớp app tham
+      chiếu ±3%, đổi độ chính xác là lệch diện tích. Thứ tự ô trong mỗi ô lưới giữ đúng thứ tự k
+      tăng dần như bản cũ (quan trọng khi hai ô bằng bậc bằng diện tích) → kết quả TRÙNG TỪNG CHỮ SỐ
+      (đã so bản cũ/bản mới trên thửa thật trước khi đưa lên). */
+class KhoO {
+  readonly n: number;
+  readonly bb: Float64Array;
+  readonly dau: Uint32Array;
+  readonly xy: Float64Array;
+  readonly loai: Uint16Array;
+  readonly tenLoai: string[] = [];
+  readonly dien: Float64Array;
+  readonly bac: Int8Array;
+  readonly gx0: number; readonly gy0: number; readonly gW: number; readonly gH: number;
+  readonly oDau: Uint32Array;
+  // Số thứ tự ô: bản nhiều ô nhất (QĐ893) có 11.044 ô < 65.535 → đủ chỗ trong SỐ 2 BYTE (Uint16),
+  // tiết kiệm một nửa so với 4 byte. Bản nào vượt 65.535 ô thì tự dùng 4 byte.
+  readonly oDs: Uint16Array | Uint32Array;
+
+  constructor(zone: Zone[]) {
+    const n = this.n = zone.length;
+    let soDinh = 0;
+    for (let k = 0; k < n; k++) soDinh += zone[k][4].length;
+    this.bb = new Float64Array(n * 4);
+    this.dau = new Uint32Array(n + 1);
+    this.xy = new Float64Array(soDinh * 2);
+    this.loai = new Uint16Array(n);
+    this.dien = new Float64Array(n);
+    this.bac = new Int8Array(n);
+    const soLoai = new Map<string, number>();
+    let d = 0, gxa = Infinity, gya = Infinity, gxb = -Infinity, gyb = -Infinity;
+    for (let k = 0; k < n; k++) {
+      const z = zone[k];
+      this.bb[k * 4] = z[0]; this.bb[k * 4 + 1] = z[1]; this.bb[k * 4 + 2] = z[2]; this.bb[k * 4 + 3] = z[3];
+      this.dau[k] = d;
+      const r = z[4];
+      for (let i = 0; i < r.length; i++) { this.xy[2 * d] = r[i][0]; this.xy[2 * d + 1] = r[i][1]; d++; }
+      let li = soLoai.get(z[5]);
+      if (li === undefined) { li = this.tenLoai.length; this.tenLoai.push(z[5]); soLoai.set(z[5], li); }
+      this.loai[k] = li; this.dien[k] = z[6]; this.bac[k] = z[7];
+      const a = Math.floor(z[0] / CELL), b = Math.floor(z[2] / CELL), c = Math.floor(z[1] / CELL), e = Math.floor(z[3] / CELL);
+      if (a < gxa) gxa = a; if (b > gxb) gxb = b; if (c < gya) gya = c; if (e > gyb) gyb = e;
+    }
+    this.dau[n] = d;
+    if (!n) { gxa = gya = 0; gxb = gyb = -1; }
+    this.gx0 = gxa; this.gy0 = gya; this.gW = gxb - gxa + 1; this.gH = gyb - gya + 1;
+    // Chỉ mục lưới CSR: đếm → cộng dồn → rải, duyệt k TĂNG DẦN để giữ thứ tự như Map cũ.
+    const soO = Math.max(0, this.gW * this.gH);
+    const dem = new Uint32Array(soO + 1);
+    const moiO = (k: number, f: (c: number) => void) => {
+      const z0 = this.bb[k * 4], z1 = this.bb[k * 4 + 1], z2 = this.bb[k * 4 + 2], z3 = this.bb[k * 4 + 3];
+      const gx0 = Math.floor(z0 / CELL), gx1 = Math.floor(z2 / CELL), gy0 = Math.floor(z1 / CELL), gy1 = Math.floor(z3 / CELL);
+      for (let gx = gx0; gx <= gx1; gx++) for (let gy = gy0; gy <= gy1; gy++) f((gx - this.gx0) * this.gH + (gy - this.gy0));
+    };
+    for (let k = 0; k < n; k++) moiO(k, (c) => { dem[c + 1]++; });
+    for (let c = 0; c < soO; c++) dem[c + 1] += dem[c];
+    this.oDau = dem;
+    this.oDs = n <= 0xffff ? new Uint16Array(soO ? dem[soO] : 0) : new Uint32Array(soO ? dem[soO] : 0);
+    const con = dem.slice(0, soO);
+    for (let k = 0; k < n; k++) moiO(k, (c) => { this.oDs[con[c]++] = k; });
+  }
+
+  /** Số thứ tự ô lưới (gx,gy); -1 nếu nằm ngoài lưới. */
+  o(gx: number, gy: number): number {
+    const a = gx - this.gx0, b = gy - this.gy0;
+    return a < 0 || b < 0 || a >= this.gW || b >= this.gH ? -1 : a * this.gH + b;
+  }
+  coO(gx: number, gy: number): boolean { const c = this.o(gx, gy); return c >= 0 && this.oDau[c + 1] > this.oDau[c]; }
+
+  /** Điểm (x,y) có nằm trong ô đất k — y hệt công thức pip() bên dưới, chỉ đọc từ mảng liền. */
+  trong(k: number, x: number, y: number): boolean {
+    const xy = this.xy, s = this.dau[k], e = this.dau[k + 1];
+    let ins = false;
+    for (let i = s, j = e - 1; i < e; j = i++) {
+      const xi = xy[2 * i], yi = xy[2 * i + 1], xj = xy[2 * j], yj = xy[2 * j + 1];
+      if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) ins = !ins;
+    }
+    return ins;
+  }
+
+  /** Bình phương khoảng cách ngắn nhất từ điểm tới viền ô k (cùng thứ tự cạnh như bản cũ). */
+  d2Vien(k: number, x: number, y: number): number {
+    const xy = this.xy, s = this.dau[k], e = this.dau[k + 1];
+    let dmin = Infinity;
+    for (let i = s, j = e - 1; i < e; j = i++) {
+      const dd = d2seg(x, y, xy[2 * j], xy[2 * j + 1], xy[2 * i], xy[2 * i + 1]); if (dd < dmin) dmin = dd;
+    }
+    return dmin;
+  }
+
+  /** Ô đất CHỨA điểm: ưu tiên bậc cao (QH>HT); cùng bậc lấy ô NHỎ nhất (cụ thể nhất). */
+  chua(x: number, y: number): string | null {
+    const c = this.o(Math.floor(x / CELL), Math.floor(y / CELL));
+    if (c < 0) return null;
+    let bt = -1, bar = Infinity, blo = -1;
+    for (let t = this.oDau[c], het = this.oDau[c + 1]; t < het; t++) {
+      const k = this.oDs[t];
+      if (this.bac[k] < bt) continue;
+      const q = k * 4;
+      if (x < this.bb[q] || x > this.bb[q + 2] || y < this.bb[q + 1] || y > this.bb[q + 3]) continue;
+      if (!this.trong(k, x, y)) continue;
+      if (this.bac[k] > bt || this.dien[k] < bar) { bt = this.bac[k]; bar = this.dien[k]; blo = this.loai[k]; }
+    }
+    return blo < 0 ? null : this.tenLoai[blo];
+  }
+}
+
+let KHO: KhoO | null = null;
 let ready = false;
 // Khung bao của TOÀN BỘ dữ liệu quy hoạch (hiện chỉ có QĐ205 — huyện Cam Lâm cũ).
 // Ra ngoài khung này là KHÔNG CÓ dữ liệu quy hoạch, phải nói thẳng "chưa có" chứ tuyệt đối
@@ -22,19 +141,15 @@ let ready = false;
 let zX0 = Infinity, zY0 = Infinity, zX1 = -Infinity, zY1 = -Infinity;
 
 try {
-  ZONE = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'qh_zones.json'), 'utf-8'));
-  for (let k = 0; k < ZONE.length; k++) {
-    const z = ZONE[k];
-    if (z[0] < zX0) zX0 = z[0]; if (z[1] < zY0) zY0 = z[1];
-    if (z[2] > zX1) zX1 = z[2]; if (z[3] > zY1) zY1 = z[3];
-    const gx0 = Math.floor(z[0] / CELL), gx1 = Math.floor(z[2] / CELL);
-    const gy0 = Math.floor(z[1] / CELL), gy1 = Math.floor(z[3] / CELL);
-    for (let gx = gx0; gx <= gx1; gx++) for (let gy = gy0; gy <= gy1; gy++) {
-      const key = `${gx},${gy}`; let a = zoneIdx.get(key); if (!a) { a = []; zoneIdx.set(key, a); } a.push(k);
-    }
+  // Mảng JSON tạm chỉ sống trong khối này; nạp xong là bộ gom rác thu hồi, chỉ còn KHO gọn.
+  KHO = new KhoO(JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'qh_zones.json'), 'utf-8')));
+  for (let k = 0; k < KHO.n; k++) {
+    const q = k * 4;
+    if (KHO.bb[q] < zX0) zX0 = KHO.bb[q]; if (KHO.bb[q + 1] < zY0) zY0 = KHO.bb[q + 1];
+    if (KHO.bb[q + 2] > zX1) zX1 = KHO.bb[q + 2]; if (KHO.bb[q + 3] > zY1) zY1 = KHO.bb[q + 3];
   }
-  ready = ZONE.length > 0;
-  console.log(`[qhCompute] nạp ${ZONE.length} ô đất QH · phạm vi ${zX0.toFixed(4)},${zY0.toFixed(4)} → ${zX1.toFixed(4)},${zY1.toFixed(4)}`);
+  ready = KHO.n > 0;
+  console.log(`[qhCompute] nạp ${KHO.n} ô đất QH · phạm vi ${zX0.toFixed(4)},${zY0.toFixed(4)} → ${zX1.toFixed(4)},${zY1.toFixed(4)}`);
 } catch (e: any) {
   console.log('[qhCompute] thiếu qh_zones.json → dùng cách cũ:', e?.message || e);
 }
@@ -76,7 +191,7 @@ export function ngoaiVungQh(ring: number[][] | null | undefined): boolean {
   const gx0 = Math.floor((minx - PHU) / CELL), gx1 = Math.floor((maxx + PHU) / CELL);
   const gy0 = Math.floor((miny - PHU) / CELL), gy1 = Math.floor((maxy + PHU) / CELL);
   for (let gx = gx0; gx <= gx1; gx++) for (let gy = gy0; gy <= gy1; gy++) {
-    if (zoneIdx.has(`${gx},${gy}`)) return false;
+    if (KHO && KHO.coO(gx, gy)) return false;
   }
   return true;
 }
@@ -101,20 +216,8 @@ function pip(x: number, y: number, r: number[][]): boolean {
   return ins;
 }
 
-// Ô đất CHỨA điểm: ưu tiên bậc cao (QH>HT); cùng bậc lấy ô NHỎ nhất (cụ thể nhất).
-function landAt(x: number, y: number): string | null {
-  const key = `${Math.floor(x / CELL)},${Math.floor(y / CELL)}`;
-  const cand = zoneIdx.get(key); if (!cand) return null;
-  let bt = -1, bar = Infinity, blo: string | null = null;
-  for (const k of cand) {
-    const z = ZONE[k];
-    if (z[7] < bt) continue;
-    if (x < z[0] || x > z[2] || y < z[1] || y > z[3]) continue;
-    if (!pip(x, y, z[4])) continue;
-    if (z[7] > bt || z[6] < bar) { bt = z[7]; bar = z[6]; blo = z[5]; }
-  }
-  return blo;
-}
+// Ô đất CHỨA điểm (QĐ205) — xem KhoO.chua.
+function landAt(x: number, y: number): string | null { return KHO ? KHO.chua(x, y) : null; }
 
 // Khoảng cách điểm→đoạn (độ, chỉ để so sánh).
 function d2seg(px: number, py: number, ax: number, ay: number, bx: number, by: number): number {
@@ -129,17 +232,16 @@ const NEAR = 0.00045; // ~50m
 function nearestLand(x: number, y: number): string | null {
   const gx0 = Math.floor((x - NEAR) / CELL), gx1 = Math.floor((x + NEAR) / CELL);
   const gy0 = Math.floor((y - NEAR) / CELL), gy1 = Math.floor((y + NEAR) / CELL);
+  if (!KHO) return null;
   const seen = new Set<number>(); let bd = NEAR * NEAR, bt = -1; let blo: string | null = null;
   for (let gx = gx0; gx <= gx1; gx++) for (let gy = gy0; gy <= gy1; gy++) {
-    const cand = zoneIdx.get(`${gx},${gy}`); if (!cand) continue;
-    for (const k of cand) {
+    const c = KHO.o(gx, gy); if (c < 0) continue;
+    for (let t = KHO.oDau[c], het = KHO.oDau[c + 1]; t < het; t++) {
+      const k = KHO.oDs[t];
       if (seen.has(k)) continue; seen.add(k);
-      const z = ZONE[k]; const r = z[4]; let dmin = Infinity;
-      for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
-        const d = d2seg(x, y, r[j][0], r[j][1], r[i][0], r[i][1]); if (d < dmin) dmin = d;
-      }
+      const dmin = KHO.d2Vien(k, x, y), bk = KHO.bac[k];
       // ưu tiên bậc cao hơn; cùng phạm vi thì gần hơn
-      if (z[7] > bt || (z[7] === bt && dmin < bd)) { if (dmin <= NEAR * NEAR) { bd = dmin; bt = z[7]; blo = z[5]; } }
+      if (bk > bt || (bk === bt && dmin < bd)) { if (dmin <= NEAR * NEAR) { bd = dmin; bt = bk; blo = KHO.tenLoai[KHO.loai[k]]; } }
     }
   }
   return blo;
@@ -209,7 +311,7 @@ export function outerRing(geom: any): number[][] | null {
 // bản vẽ (bản vẽ chỉ tô ô đất, phần đường để trắng). Đo thật trên 43 thửa QĐ2101: có mặt nạ thì
 // tỉ lệ phủ trung bình lên 91,8% → 99,7%, số thửa phủ đủ 100% lên 28 → 39.
 interface MatNa { buf: Buffer; x0: number; y0: number; x1: number; y1: number; W: number; H: number; rb: number; }
-interface BanQh { ma: string; ten: string; zone: Zone[]; idx: Map<string, number[]>; na: MatNa | null; }
+interface BanQh { ma: string; ten: string; kho: KhoO; na: MatNa | null; }
 const BAN_KHAC: BanQh[] = [];
 
 for (const b of [
@@ -226,25 +328,16 @@ for (const b of [
   { ma: 'taybac', ten: 'Quy hoạch phân khu Tây Bắc 1/2000', tep: 'qh_zones_taybac.json' },
 ]) {
   try {
-    const zone: Zone[] = JSON.parse(fs.readFileSync(path.join(DATA_DIR, b.tep), 'utf-8'));
-    if (!zone.length) continue;
-    const idx = new Map<string, number[]>();
-    for (let k = 0; k < zone.length; k++) {
-      const z = zone[k];
-      const gx0 = Math.floor(z[0] / CELL), gx1 = Math.floor(z[2] / CELL);
-      const gy0 = Math.floor(z[1] / CELL), gy1 = Math.floor(z[3] / CELL);
-      for (let gx = gx0; gx <= gx1; gx++) for (let gy = gy0; gy <= gy1; gy++) {
-        const key = `${gx},${gy}`; let a = idx.get(key); if (!a) { a = []; idx.set(key, a); } a.push(k);
-      }
-    }
+    const kho = new KhoO(JSON.parse(fs.readFileSync(path.join(DATA_DIR, b.tep), 'utf-8')));
+    if (!kho.n) continue;
     let na: MatNa | null = null;
     try {
       const m = JSON.parse(fs.readFileSync(path.join(DATA_DIR, `road_mask_${b.ma}.json`), 'utf-8'));
       na = { buf: fs.readFileSync(path.join(DATA_DIR, `road_mask_${b.ma}.bin`)),
              x0: m.x0, y0: m.y0, x1: m.x1, y1: m.y1, W: m.W, H: m.H, rb: m.rowbytes };
     } catch { na = null; }   // chưa có mặt nạ thì thôi, chỉ là phần trăm phủ thấp hơn
-    BAN_KHAC.push({ ma: b.ma, ten: b.ten, zone, idx, na });
-    console.log(`[qhCompute] nạp bản ${b.ma}: ${zone.length} ô đất${na ? ` + mặt nạ đường ${na.W}x${na.H}` : ' (chưa có mặt nạ đường)'}`);
+    BAN_KHAC.push({ ma: b.ma, ten: b.ten, kho, na });
+    console.log(`[qhCompute] nạp bản ${b.ma}: ${kho.n} ô đất${na ? ` + mặt nạ đường ${na.W}x${na.H}` : ' (chưa có mặt nạ đường)'}`);
   } catch {
     console.log(`[qhCompute] chưa có ${b.tep} — bỏ qua bản ${b.ma}`);
   }
@@ -252,19 +345,7 @@ for (const b of [
 
 // Ô đất chứa điểm, trong MỘT bản. Cùng kiểu chọn với landAt: bậc cao thắng, cùng bậc thì ô NHỎ
 // hơn thắng (ô nhỏ = vẽ cụ thể hơn, vd lô nhà ở nằm trong khối đơn vị ở).
-function landAtBan(b: BanQh, x: number, y: number): string | null {
-  const cand = b.idx.get(`${Math.floor(x / CELL)},${Math.floor(y / CELL)}`);
-  if (!cand) return null;
-  let bt = -1, bar = Infinity, blo: string | null = null;
-  for (const k of cand) {
-    const z = b.zone[k];
-    if (z[7] < bt) continue;
-    if (x < z[0] || x > z[2] || y < z[1] || y > z[3]) continue;
-    if (!pip(x, y, z[4])) continue;
-    if (z[7] > bt || z[6] < bar) { bt = z[7]; bar = z[6]; blo = z[5]; }
-  }
-  return blo;
-}
+function landAtBan(b: BanQh, x: number, y: number): string | null { return b.kho.chua(x, y); }
 
 // Điểm này có nằm trong lòng đường của bản đó không (đọc 1 bit trong ảnh mặt nạ).
 function duongBan(b: BanQh, x: number, y: number): boolean {

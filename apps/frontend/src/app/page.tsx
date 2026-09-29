@@ -308,7 +308,7 @@ export default function Home() {
               sáng mẫu nền tối. Thẻ trắng rơi trúng mẫu nền sáng là chìm nghỉm,
               rơi trúng mẫu nền tối thì chói loà. Khung kính tối hợp với cả hai. */}
           {/* ⚠️ ĐIỆN THOẠI BỎ KHUNG KÍNH. Trên màn hẹp, khung tìm kiếm đã nằm
-              hẳn DƯỚI ảnh trên một dải NAVY CHUYỂN MÀU liền ảnh (mẫu 100; xem .cl-b11-tim trong
+              hẳn DƯỚI ảnh trên một dải TRẮNG liền (trước là navy; xem .cl-b11-tim trong
               banner11-them.css), nên thêm một thẻ kính tối nữa là hộp lồng
               trong hộp — viền chồng viền, nhìn rối và tốn mất hai bên 8px
               vốn đã hẹp. Từ 768px trở lên mới cần khung kính, vì lúc đó nó
@@ -321,10 +321,10 @@ export default function Home() {
             <div className="mb-2 flex items-center justify-center gap-6 sm:gap-8">
               {([['sale', 'Nhà đất bán'], ['rent', 'Cho thuê'], ['project', 'Dự án']] as const).map(([k, ten]) => (
                 <button key={k} onClick={() => { setHeroDeal(k); setMin(''); setMax(''); }}
-                  className={`relative pb-1.5 text-[13px] transition sm:text-sm ${heroDeal === k ? 'font-bold text-white md:font-extrabold' : 'font-medium text-white/70 md:font-semibold md:text-white/75 md:hover:text-white'}`}>
+                  className={`relative pb-1.5 text-[13px] transition sm:text-sm ${heroDeal === k ? 'font-bold text-[#0A2540] md:font-extrabold md:text-white' : 'font-medium text-slate-500 md:font-semibold md:text-white/75 md:hover:text-white'}`}>
                   {ten}
                   <span aria-hidden
-                    className={`absolute inset-x-0 -bottom-0.5 h-[2px] rounded-full bg-[#C8A14B] md:bg-red-500 transition-opacity ${heroDeal === k ? 'opacity-100' : 'opacity-0'}`} />{/* điện thoại: gạch chân VÀNG trên dải navy (mẫu 100) */}
+                    className={`absolute inset-x-0 -bottom-0.5 h-[2px] rounded-full bg-red-500 transition-opacity ${heroDeal === k ? 'opacity-100' : 'opacity-0'}`} />
                 </button>
               ))}
             </div>
@@ -347,13 +347,13 @@ export default function Home() {
             <div className="md:hidden">
               {/* Ô TÌM KIẾM ĐIỆN THOẠI (28/9/2026) — MỘT KHỐI DUY NHẤT:
                     📍 chữ gõ ……………  ⚙  [🔍]
-                  · Nền dải bao quanh: NAVY CHUYỂN MÀU, đáy ảnh tan vào dải (mẫu 100 chủ dự án chọn 29/9/2026). Ô tìm kiếm nền trắng.
+                  · Nền dải bao quanh TRẮNG (đã thử navy, xanh xám — chủ dự án chê cả hai).
                   · GÕ THẲNG trong ô. ⚠️ Đã thử "bấm ô → mở màn hình tìm kiếm toàn màn hình" —
                     chủ dự án không thích (bấm vào để gõ lại bật ra màn hình khác). Đừng làm lại.
                   · Nút lọc CHỈ CÓ BIỂU TƯỢNG (bỏ chữ "Lọc"), đang lọc thì có chấm số đỏ ở góc.
                   · Nút tìm đỏ 36×36 nằm TRONG ô, cách mép 4px đều ba phía (chủ dự án: "cho nút tìm kiếm
                     cùng 1 khối"). Nút tìm là kính lúp nên đầu ô dùng GHIM VỊ TRÍ, khỏi lặp hai kính lúp. */}
-              <div className="flex h-11 items-center rounded-lg border border-transparent bg-white pr-1 transition-colors focus-within:border-[#C8A14B]">
+              <div className="flex h-11 items-center rounded-lg border border-transparent bg-slate-100 pr-1 transition-colors focus-within:border-[#C8A14B] focus-within:bg-white">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-3 h-[18px] w-[18px] shrink-0 text-slate-400"><path d="M12 21s-6.5-5.4-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.6 12 21 12 21Z" /><circle cx="12" cy="10.5" r="2.3" /></svg>
                 <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} enterKeyHint="search"
                   placeholder={heroDeal === 'project' ? 'Tên dự án…' : heroDeal === 'rent' ? 'Thuê nhà, mặt bằng ở đâu?' : (searchHint || 'Khu vực, dự án…')}

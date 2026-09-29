@@ -467,6 +467,11 @@ Khi bấm vào thửa ở **Nha Trang, Cam Ranh, Ninh Hoà…** thì MỌI đi�
 - Nhân tiện sửa luôn một lỗi cũ: hai câu SQL tính QH dự phòng đọc cứng `gis_features WHERE id=$1`, trong
   khi thửa địa chính nằm ở bảng `dia_chinh` → **nhầm bảng**, mã trùng nhau là lấy phải hình thửa khác.
 
+**Cách cất ô đất trong RAM (29/9/2026):** `qhCompute.ts` dồn 1,17 triệu đỉnh của mọi bản QH vào
+**mảng số liền (`KhoO`: Float64Array + chỉ mục lưới CSR 2 byte + mã loại đất dùng chung)** thay vì
+mảng lồng nhau → 310 MB còn 58 MB, backend 474 → 177 MB. **Giữ Float64, đừng hạ Float32** (lệch diện
+tích). Sửa phần này thì so kết quả cũ/mới trên vài trăm thửa thật, phải trùng từng chữ số.
+
 **Dữ liệu bắt buộc phải có:** `apps/backend/data/qh_zones.json`, `road_mask.bin`, `road_mask.json`
 (đường dẫn đọc theo `QH_DATA_DIR`, mặc định `<thư mục chạy>/data`; trong container là `/app/apps/backend/data`).
 Các file này **có trong git** (~1.9MB + 1.6MB). Thiếu chúng thì backend vẫn chạy nhưng tự tụt xuống cách B —
@@ -708,6 +713,22 @@ ngay trong `tailwind.config.js` → `rounded-md` và `rounded` = 4px, `rounded-l
 như mặc định của Tailwind. Muốn trả về như cũ thì xoá khối `borderRadius` đó.
 Mấy chỗ ghi thẳng số (`rounded-[11px]`…) đã đổi hết, **đừng viết kiểu đó nữa**
 vì nó không đi qua cấu hình nên lại lệch thang.
+
+## Bảo mật & IP thật (rà soát 29/9/2026)
+
+- **IP thật của khách:** tunnel nằm trong mạng riêng `duong_ham` với địa chỉ CỐ ĐỊNH `172.31.253.2`
+  (`docker-compose.tunnel.yml`); nginx chỉ tin `CF-Connecting-IP` từ đúng địa chỉ đó (`set_real_ip_from`)
+  rồi GHI ĐÈ `X-Forwarded-For`/`X-Real-IP`/`CF-Connecting-IP` bằng `$remote_addr`. Trước đó backend thấy
+  mọi khách cùng IP của tunnel → giới hạn tốc độ tính chung cả web.
+- **Kiểm cấu hình nginx:** dùng `docker exec camlam_nginx nginx -t`, KHÔNG dùng `docker compose run nginx`
+  (container tạm xin trùng địa chỉ cố định → "Address already in use").
+- `/api/auth/verify-email` và `/resend-code` ĐÃ TẮT (410): từng trả mã trong phản hồi + cấp thẻ đăng nhập
+  → chiếm được tài khoản admin không cần mật khẩu. Bật lại thì phải gửi mã qua email thật.
+- Ảnh tải lên nhận diện bằng **chữ ký nhị phân** (JPEG/PNG/GIF/WebP/PDF), không tin mimetype.
+- Chữ người dùng ghép vào `popupHtml` của MapView PHẢI qua `escHtml()` (`lib/escHtml.ts`).
+- Lỗi ≥500 không trả nguyên văn lỗi DB cho người ngoài (`middleware/error.ts`).
+- Kho tin tức `/app/.kho-tin` gắn volume `tin_kho` (trước mất mỗi lần dựng lại).
+- Trang bảo trì trả **503** (`error_page … =503`), đừng đổi lại 200.
 
 ## Những chỗ hay vấp
 

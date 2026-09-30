@@ -16,7 +16,7 @@ const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns
 const JSONLD = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'RealEstateAgent', '@id': SITE + '/#org', name: 'Cam Lâm Land', url: SITE, telephone: '+84988888888', areaServed: 'Cam Lâm, Khánh Hòa, Việt Nam', image: SITE + '/icons/icon-512.png', description: 'Sàn bất động sản và bản đồ quy hoạch huyện Cam Lâm, Khánh Hòa.' },
+    { '@type': 'RealEstateAgent', '@id': SITE + '/#org', name: 'Cam Lâm Land', url: SITE, areaServed: 'Cam Lâm, Khánh Hòa, Việt Nam', image: SITE + '/icons/icon-512.png', description: 'Sàn bất động sản và bản đồ quy hoạch huyện Cam Lâm, Khánh Hòa.' },
     { '@type': 'WebSite', '@id': SITE + '/#web', url: SITE, name: 'Cam Lâm Land', inLanguage: 'vi-VN', publisher: { '@id': SITE + '/#org' }, potentialAction: { '@type': 'SearchAction', target: SITE + '/listings?q={q}', 'query-input': 'required name=q' } },
   ],
 };

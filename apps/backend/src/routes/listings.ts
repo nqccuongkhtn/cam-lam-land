@@ -60,10 +60,12 @@ const TYPE_SLUG: Record<string, string> = {
 };
 // Sáp nhập 01/7/2025: xã MỚI (2 cấp) ⊇ các xã CŨ (3 cấp). Lọc bằng tên MỚI → khớp mọi xã cũ thành phần
 // (xã cũ bị tách sang nhiều xã mới nên đây là khớp GẦN ĐÚNG, chấp nhận được cho bộ lọc). Key = tên mới đã bỏ dấu.
+// 30/9/2026: sửa lại ĐÚNG theo NQ 1667 (scripts/dia-chinh/xa-moi.json) — bản trước xếp nhầm Cam Tân, Sơn Tân,
+// Cam An Bắc vào xã Cam Lâm và Cam Tân, Sơn Tân vào Suối Dầu; thiếu Suối Tân ở Cam Lâm / Cam Hiệp.
 const WARD_EXPAND: Record<string, string[]> = {
-  'cam lam': ['Cam Lâm', 'Cam Đức', 'Cam Hải Đông', 'Cam Hải Tây', 'Cam Thành Bắc', 'Cam Hiệp Bắc', 'Cam Hiệp Nam', 'Cam Hòa', 'Cam Tân', 'Sơn Tân', 'Cam An Nam', 'Cam An Bắc'],
-  'suoi dau': ['Suối Dầu', 'Suối Cát', 'Cam Hòa', 'Cam Tân', 'Sơn Tân', 'Suối Tân'],
-  'cam hiep': ['Cam Hiệp', 'Cam Tân', 'Cam Hòa', 'Cam Hiệp Bắc', 'Cam Hiệp Nam', 'Sơn Tân'],
+  'cam lam': ['Cam Lâm', 'Cam Đức', 'Cam Hải Đông', 'Cam Hải Tây', 'Cam Thành Bắc', 'Cam Hòa', 'Cam Hiệp Bắc', 'Cam Hiệp Nam', 'Cam An Nam', 'Suối Tân'],
+  'suoi dau': ['Suối Dầu', 'Suối Cát', 'Cam Hòa', 'Suối Tân'],
+  'cam hiep': ['Cam Hiệp', 'Cam Tân', 'Sơn Tân', 'Cam Hòa', 'Cam Hiệp Bắc', 'Cam Hiệp Nam', 'Suối Tân'],
   'cam an': ['Cam An', 'Cam An Bắc', 'Cam Phước Tây', 'Cam An Nam'],
 };
 

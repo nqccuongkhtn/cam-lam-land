@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
-export const metadata = { title: 'Giới thiệu | Cam Lâm Land' };
+// Tên trang (khuôn "%s | Cam Lâm Land" ở layout gốc tự thêm đuôi) + địa chỉ chính thức riêng, không khai là bản sao trang chủ.
+export const metadata = { title: 'Giới thiệu', alternates: { canonical: '/gioi-thieu' } };
 
 const FEATURES = [
   { p: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10', t: 'Chợ nhà đất Cam Lâm', d: 'Mua bán, cho thuê đất nền, nhà riêng, căn hộ, biệt thự — đăng tin miễn phí, thông tin minh bạch.' },

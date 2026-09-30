@@ -38,7 +38,8 @@ function labels(p: PageDef) {
   const typeLabel = p.type ? p.type.label : 'Nhà đất';
   const areaShort = p.area ? p.area.name : 'Cam Lâm';
   const h1 = p.area ? `${typeLabel} ${p.area.name}` : `${typeLabel} Cam Lâm`;
-  const locFull = p.area ? `${p.area.name}, Cam Lâm, Khánh Hòa` : 'Cam Lâm, Khánh Hòa';
+  // Xã MỚI (tên bắt đầu bằng "xã ") không còn huyện Cam Lâm phía trên → khỏi ghi "xã Cam Lâm, Cam Lâm".
+  const locFull = p.area ? (p.area.name.startsWith('xã ') ? `${p.area.name}, Khánh Hòa` : `${p.area.name}, Cam Lâm, Khánh Hòa`) : 'Cam Lâm, Khánh Hòa';
   return { typeLabel, areaShort, h1, locFull };
 }
 function metaFor(p: PageDef): Metadata {

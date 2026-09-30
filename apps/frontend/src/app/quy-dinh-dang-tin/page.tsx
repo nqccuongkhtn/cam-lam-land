@@ -1,6 +1,7 @@
 import PolicyPage from '@/components/PolicyPage';
 
-export const metadata = { title: 'Quy định đăng tin | Cam Lâm Land' };
+// Tên trang (khuôn "%s | Cam Lâm Land" ở layout gốc tự thêm đuôi) + địa chỉ chính thức riêng, không khai là bản sao trang chủ.
+export const metadata = { title: 'Quy định đăng tin', alternates: { canonical: '/quy-dinh-dang-tin' } };
 
 export default function Page() {
   return (

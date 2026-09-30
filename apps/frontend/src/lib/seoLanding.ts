@@ -24,43 +24,56 @@ export interface SeoType {
   areas?: string[];        // nếu có: CHỈ sinh cho các area slug này (vd đất ven biển, cho thuê)
 }
 
-// ---- 14 xã/thị trấn Cam Lâm + điểm nóng Bãi Dài ----
+// ---- 14 xã/thị trấn Cam Lâm cũ + điểm nóng Bãi Dài + 4 xã MỚI (từ 1/7/2025) ----
+// Hướng (bắc/nam…) và toạ độ tâm ĐO TỪ BẢN ĐỒ ĐỊA CHÍNH (bảng dia_chinh, 30/9/2026) — bản trước ghi sai hướng
+// nhiều xã (vd Suối Cát, Suối Tân ghi "phía nam" trong khi thật ra ở phía BẮC, giáp Nha Trang – Diên Khánh).
+// Thành phần xã mới lấy theo Nghị quyết 1667/NQ-UBTVQH15 (scripts/dia-chinh/xa-moi.json).
 export const AREAS: SeoArea[] = [
-  { slug: 'cam-duc', name: 'Cam Đức', ward: 'Cam Đức', region: 'trung tâm huyện Cam Lâm', coastal: false, center: [109.098, 12.072],
-    blurb: 'Trung tâm hành chính – thương mại của Cam Lâm, nằm trên Quốc lộ 1, dân cư đông đúc, hạ tầng đầy đủ; mặt bằng và đất thổ cư khu vực này luôn được săn đón.' },
-  { slug: 'cam-hai-dong', name: 'Cam Hải Đông', ward: 'Cam Hải Đông', region: 'ven biển Bãi Dài, bắc bán đảo Cam Ranh', coastal: true, center: [109.190, 12.030],
-    blurb: 'Xã ven biển sở hữu bãi biển Bãi Dài, sát sân bay quốc tế Cam Ranh và loạt dự án nghỉ dưỡng; là thủ phủ bất động sản du lịch – biển của Cam Lâm.' },
-  { slug: 'cam-hai-tay', name: 'Cam Hải Tây', ward: 'Cam Hải Tây', region: 'giáp Cam Đức và vùng ven biển', coastal: true, center: [109.140, 12.050],
-    blurb: 'Nối trung tâm Cam Đức với dải ven biển, quỹ đất nông nghiệp và thổ cư còn nhiều, giá mềm hơn khu biển, tiềm năng theo trục đường ra Bãi Dài.' },
-  { slug: 'cam-thanh-bac', name: 'Cam Thành Bắc', ward: 'Cam Thành Bắc', region: 'cửa ngõ phía bắc Cam Đức', coastal: false, center: [109.105, 12.098],
-    blurb: 'Cửa ngõ phía bắc thị trấn Cam Đức trên Quốc lộ 1, gần đầm Thủy Triều; thuận lợi ở, kinh doanh và kho bãi ven quốc lộ.' },
-  { slug: 'cam-hoa', name: 'Cam Hòa', ward: 'Cam Hòa', region: 'phía bắc huyện, ven đầm Thủy Triều', coastal: false, center: [109.130, 12.130],
-    blurb: 'Vùng phía bắc ven đầm Thủy Triều, thế mạnh nuôi trồng thủy sản và cây lâu năm; đất vườn, đất nông nghiệp diện tích lớn, giá hợp lý.' },
-  { slug: 'cam-tan', name: 'Cam Tân', ward: 'Cam Tân', region: 'bắc Cam Lâm, giáp Ninh Hòa', coastal: false, center: [109.085, 12.150],
-    blurb: 'Xã nông nghiệp phía bắc giáp thị xã Ninh Hòa, đồng ruộng và cây lâu năm; phù hợp đầu tư đất vườn, đất nông nghiệp dài hạn.' },
-  { slug: 'cam-hiep-bac', name: 'Cam Hiệp Bắc', ward: 'Cam Hiệp Bắc', region: 'vùng nông nghiệp trung tâm', coastal: false, center: [109.065, 12.100],
-    blurb: 'Vùng nông nghiệp trung tâm huyện, gần Quốc lộ 1, giá đất mềm; lựa chọn tốt cho nhà vườn, canh tác và đầu tư đón hạ tầng.' },
-  { slug: 'cam-hiep-nam', name: 'Cam Hiệp Nam', ward: 'Cam Hiệp Nam', region: 'vùng nông nghiệp trung tâm', coastal: false, center: [109.062, 12.082],
-    blurb: 'Kề Cam Hiệp Bắc và Suối Cát, quỹ đất nông nghiệp – thổ cư rộng, mặt bằng giá thấp, tiềm năng khi hạ tầng khu vực hoàn thiện.' },
-  { slug: 'cam-an-bac', name: 'Cam An Bắc', ward: 'Cam An Bắc', region: 'phía tây bắc, ven núi', coastal: false, center: [109.050, 12.130],
-    blurb: 'Xã ven núi phía tây bắc, đất vườn và đất nông nghiệp rộng rãi, không khí trong lành; hợp làm nhà vườn, trang trại nghỉ dưỡng.' },
-  { slug: 'cam-an-nam', name: 'Cam An Nam', ward: 'Cam An Nam', region: 'phía tây bắc huyện', coastal: false, center: [109.040, 12.110],
-    blurb: 'Vùng gò đồi phía tây bắc, quỹ đất lớn giá thấp, thích hợp đầu tư đất vườn, cây lâu năm và tích lũy dài hạn.' },
-  { slug: 'cam-phuoc-tay', name: 'Cam Phước Tây', ward: 'Cam Phước Tây', region: 'phía tây huyện', coastal: false, center: [108.980, 12.050],
-    blurb: 'Xã phía tây giáp vùng gò đồi và tuyến giao thông liên vùng; đất rộng, giá mềm, tiềm năng nông nghiệp – trang trại quy mô lớn.' },
-  { slug: 'son-tan', name: 'Sơn Tân', ward: 'Sơn Tân', region: 'xã miền núi phía tây', coastal: false, center: [108.950, 12.020],
-    blurb: 'Xã miền núi phía tây Cam Lâm, quỹ đất rừng – vườn rộng, giá thấp nhất khu vực; phù hợp trang trại, nông – lâm kết hợp.' },
-  { slug: 'suoi-cat', name: 'Suối Cát', ward: 'Suối Cát', region: 'nam Cam Đức, trên Quốc lộ 1', coastal: false, center: [109.030, 11.980],
-    blurb: 'Nằm nam Cam Đức trên Quốc lộ 1, dân cư đông, gần khu công nghiệp; nhu cầu nhà ở, mặt bằng và phòng trọ cao.' },
-  { slug: 'suoi-tan', name: 'Suối Tân', ward: 'Suối Tân', region: 'cực nam huyện, Khu công nghiệp Suối Dầu', coastal: false, center: [109.100, 11.950],
-    blurb: 'Cực nam huyện, có Khu công nghiệp Suối Dầu, sát Diên Khánh – Nha Trang; nhu cầu nhà xưởng, kho bãi và phòng trọ công nhân rất lớn.' },
+  { slug: 'cam-duc', name: 'Cam Đức', ward: 'Cam Đức', region: 'trung tâm huyện Cam Lâm cũ, nay thuộc xã Cam Lâm', coastal: false, center: [109.154, 12.060],
+    blurb: 'Thị trấn Cam Đức cũ — trung tâm hành chính, thương mại của Cam Lâm, nằm trên Quốc lộ 1, dân cư đông, hạ tầng đầy đủ. Từ 1/7/2025 là phần lõi của xã Cam Lâm mới; đất thổ cư và mặt bằng ở đây luôn được săn đón.' },
+  { slug: 'cam-hai-dong', name: 'Cam Hải Đông', ward: 'Cam Hải Đông', region: 'ven biển Bãi Dài, bắc bán đảo Cam Ranh', coastal: true, center: [109.193, 12.088],
+    blurb: 'Xã ven biển sở hữu bãi biển Bãi Dài, gần sân bay quốc tế Cam Ranh và loạt dự án nghỉ dưỡng; là thủ phủ bất động sản du lịch – biển của Cam Lâm. Nay thuộc xã Cam Lâm mới.' },
+  { slug: 'cam-hai-tay', name: 'Cam Hải Tây', ward: 'Cam Hải Tây', region: 'giữa Quốc lộ 1 và dải ven biển', coastal: true, center: [109.152, 12.088],
+    blurb: 'Nối trung tâm Cam Đức với dải ven biển Bãi Dài, quỹ đất nông nghiệp và thổ cư còn nhiều, giá mềm hơn khu biển, tiềm năng theo trục đường ra biển. Nay thuộc xã Cam Lâm mới.' },
+  { slug: 'cam-thanh-bac', name: 'Cam Thành Bắc', ward: 'Cam Thành Bắc', region: 'phía nam Cam Đức, trên Quốc lộ 1 hướng Cam Ranh', coastal: false, center: [109.167, 12.029],
+    blurb: 'Nằm phía nam Cam Đức trên Quốc lộ 1, hướng về Cam Ranh; thuận lợi để ở, kinh doanh và kho bãi ven quốc lộ. Nay thuộc xã Cam Lâm mới.' },
+  { slug: 'cam-hoa', name: 'Cam Hòa', ward: 'Cam Hòa', region: 'phía bắc, ven đầm Thủy Triều', coastal: false, center: [109.132, 12.120],
+    blurb: 'Vùng phía bắc ven đầm Thủy Triều, thế mạnh nuôi trồng thủy sản và cây lâu năm; đất vườn, đất nông nghiệp diện tích lớn, giá hợp lý. Sau sáp nhập được chia cho các xã Cam Lâm, Suối Dầu và Cam Hiệp.' },
+  { slug: 'cam-tan', name: 'Cam Tân', ward: 'Cam Tân', region: 'phía bắc, nay là xã Cam Hiệp', coastal: false, center: [109.101, 12.118],
+    blurb: 'Xã nông nghiệp phía bắc, đồng ruộng và cây lâu năm; từ 1/7/2025 là phần lõi của xã Cam Hiệp mới. Phù hợp đầu tư đất vườn, đất nông nghiệp dài hạn.' },
+  { slug: 'cam-hiep-bac', name: 'Cam Hiệp Bắc', ward: 'Cam Hiệp Bắc', region: 'vùng nông nghiệp phía tây Cam Đức', coastal: false, center: [109.104, 12.068],
+    blurb: 'Vùng nông nghiệp phía tây Cam Đức, gần Quốc lộ 1, giá đất mềm; lựa chọn tốt cho nhà vườn, canh tác và đầu tư đón hạ tầng. Sau sáp nhập được chia cho xã Cam Lâm và xã Cam Hiệp.' },
+  { slug: 'cam-hiep-nam', name: 'Cam Hiệp Nam', ward: 'Cam Hiệp Nam', region: 'vùng nông nghiệp phía tây nam Cam Đức', coastal: false, center: [109.107, 12.032],
+    blurb: 'Kề Cam Hiệp Bắc, quỹ đất nông nghiệp – thổ cư rộng, mặt bằng giá thấp, tiềm năng khi hạ tầng khu vực hoàn thiện. Sau sáp nhập được chia cho xã Cam Lâm và xã Cam Hiệp.' },
+  { slug: 'cam-an-bac', name: 'Cam An Bắc', ward: 'Cam An Bắc', region: 'phía nam huyện, nay là xã Cam An', coastal: false, center: [109.103, 12.013],
+    blurb: 'Xã phía nam, đất vườn và đất nông nghiệp rộng rãi; từ 1/7/2025 là phần lõi của xã Cam An mới. Hợp làm nhà vườn, trang trại.' },
+  { slug: 'cam-an-nam', name: 'Cam An Nam', ward: 'Cam An Nam', region: 'phía nam huyện, giáp Cam Ranh', coastal: false, center: [109.122, 11.984],
+    blurb: 'Vùng phía nam giáp Cam Ranh, quỹ đất lớn giá thấp, thích hợp đầu tư đất vườn, cây lâu năm và tích lũy dài hạn. Sau sáp nhập được chia cho xã Cam An và xã Cam Lâm.' },
+  { slug: 'cam-phuoc-tay', name: 'Cam Phước Tây', ward: 'Cam Phước Tây', region: 'phía tây nam huyện, nay thuộc xã Cam An', coastal: false, center: [109.052, 11.995],
+    blurb: 'Xã phía tây nam giáp vùng gò đồi; đất rộng, giá mềm, tiềm năng nông nghiệp – trang trại quy mô lớn. Nay thuộc xã Cam An mới.' },
+  { slug: 'son-tan', name: 'Sơn Tân', ward: 'Sơn Tân', region: 'xã miền núi phía tây, nay thuộc xã Cam Hiệp', coastal: false, center: [109.051, 12.064],
+    blurb: 'Xã miền núi phía tây, quỹ đất rừng – vườn rộng, giá thấp nhất khu vực; phù hợp trang trại, nông – lâm kết hợp. Nay thuộc xã Cam Hiệp mới.' },
+  { slug: 'suoi-cat', name: 'Suối Cát', ward: 'Suối Cát', region: 'cực bắc, giáp Nha Trang – Diên Khánh, nay là xã Suối Dầu', coastal: false, center: [109.065, 12.186],
+    blurb: 'Nằm ở cực bắc trên Quốc lộ 1, giáp Nha Trang và Diên Khánh, gần Khu công nghiệp Suối Dầu; dân cư đông, nhu cầu nhà ở, mặt bằng và phòng trọ cao. Từ 1/7/2025 là phần lõi của xã Suối Dầu mới.' },
+  { slug: 'suoi-tan', name: 'Suối Tân', ward: 'Suối Tân', region: 'phía bắc, gần Khu công nghiệp Suối Dầu', coastal: false, center: [109.044, 12.117],
+    blurb: 'Phía bắc huyện, gần Khu công nghiệp Suối Dầu và Diên Khánh – Nha Trang; nhu cầu nhà xưởng, kho bãi và phòng trọ công nhân lớn. Sau sáp nhập được chia cho các xã Suối Dầu, Cam Hiệp và Cam Lâm.' },
   { slug: 'bai-dai', name: 'Bãi Dài', ward: 'Cam Hải Đông', region: 'bãi biển bắc bán đảo Cam Ranh', coastal: true, center: [109.195, 12.020],
-    blurb: 'Bãi biển đẹp bậc nhất Khánh Hòa thuộc xã Cam Hải Đông, kề sân bay quốc tế Cam Ranh và các khu nghỉ dưỡng; tâm điểm đất nền ven biển và bất động sản du lịch.' },
+    blurb: 'Bãi biển đẹp bậc nhất Khánh Hòa thuộc Cam Hải Đông (nay là xã Cam Lâm), gần sân bay quốc tế Cam Ranh và các khu nghỉ dưỡng; tâm điểm đất nền ven biển và bất động sản du lịch.' },
+  // ---- 4 XÃ MỚI sau sáp nhập (hiệu lực 1/7/2025) — người mua giờ hay tìm theo tên mới ----
+  // `ward` là tên xã mới: máy chủ (WARD_EXPAND trong routes/listings.ts) tự mở rộng ra các xã cũ bên trong.
+  { slug: 'xa-cam-lam', name: 'xã Cam Lâm', ward: 'Cam Lâm', region: 'xã mới gồm Cam Đức, Cam Hải Đông, Cam Hải Tây, Cam Thành Bắc', coastal: true, center: [109.142, 12.084],
+    blurb: 'Xã Cam Lâm thành lập từ 1/7/2025 (Nghị quyết 1667/NQ-UBTVQH15): kế thừa thị trấn Cam Đức, nhập thêm Cam Hải Đông (Bãi Dài), Cam Hải Tây, Cam Thành Bắc và một phần Cam Hòa, Cam Hiệp Bắc, Cam Hiệp Nam, Cam An Nam, Suối Tân. Là trung tâm hành chính và vùng đất biển sôi động nhất khu vực.' },
+  { slug: 'suoi-dau', name: 'xã Suối Dầu', ward: 'Suối Dầu', region: 'xã mới phía bắc, giáp Nha Trang – Diên Khánh', coastal: false, center: [109.042, 12.144],
+    blurb: 'Xã Suối Dầu thành lập từ 1/7/2025: kế thừa xã Suối Cát, nhập thêm một phần Cam Hòa và Suối Tân. Cửa ngõ phía bắc giáp Nha Trang – Diên Khánh, gần Khu công nghiệp Suối Dầu, nhu cầu nhà ở và phòng trọ lớn.' },
+  { slug: 'cam-hiep', name: 'xã Cam Hiệp', ward: 'Cam Hiệp', region: 'xã mới phía tây bắc', coastal: false, center: [109.056, 12.096],
+    blurb: 'Xã Cam Hiệp thành lập từ 1/7/2025: kế thừa xã Cam Tân, nhập thêm Sơn Tân và một phần Cam Hòa, Cam Hiệp Bắc, Cam Hiệp Nam, Suối Tân. Quỹ đất vườn, đất nông nghiệp rộng, giá mềm.' },
+  { slug: 'cam-an', name: 'xã Cam An', ward: 'Cam An', region: 'xã mới phía nam, giáp Cam Ranh', coastal: false, center: [109.069, 11.995],
+    blurb: 'Xã Cam An thành lập từ 1/7/2025: kế thừa xã Cam An Bắc, nhập thêm Cam Phước Tây và một phần Cam An Nam. Vùng phía nam giáp Cam Ranh, đất vườn – trang trại rộng, giá thấp, hợp tích lũy dài hạn.' },
 ];
 
 // ---- Loại hình (nhiều từ khóa cho MUA BÁN & CHO THUÊ) ----
-const RENT_AREAS = ['cam-duc', 'cam-hai-dong', 'cam-hai-tay', 'cam-thanh-bac', 'suoi-cat', 'suoi-tan', 'cam-hoa'];
-const COASTAL_AREAS = ['cam-hai-dong', 'cam-hai-tay', 'bai-dai'];
+const RENT_AREAS = ['cam-duc', 'cam-hai-dong', 'cam-hai-tay', 'cam-thanh-bac', 'suoi-cat', 'suoi-tan', 'cam-hoa', 'xa-cam-lam', 'suoi-dau'];
+const COASTAL_AREAS = ['cam-hai-dong', 'cam-hai-tay', 'bai-dai', 'xa-cam-lam'];
 
 export const TYPES: SeoType[] = [
   // ----- MUA BÁN -----

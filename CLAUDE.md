@@ -721,7 +721,22 @@ có `layout.tsx` bọc `components/CanDangNhap.tsx`, khung `/tien-ich` (`HubShel
 Máy chủ chặn thêm: `/api/pdftools`, `/api/qr`, `GET /api/van-ban` cần đăng nhập (401). Lớp 2 giữ nguyên
 (danh sách nóng, mã xác thực, tra cứu luật theo vai trò). ⚠️ Chặn ở giao diện KHÔNG giấu được chữ viết
 cứng trong trang (cẩm nang, bảng giá đất vẫn nằm trong mã HTML) — dữ liệu thật sự cần giấu phải để sau API
-có `authRequired`. Các trang này đã bỏ khỏi `sitemap.ts`. Thêm công cụ mới thì nhớ tạo `layout.tsx` y hệt.
+có `authRequired`. Thêm công cụ mới thì nhớ tạo `layout.tsx` y hệt.
+**Bốn trang BÀI ĐỌC dùng "khoá mềm"** (`components/KhoaMem.tsx`): `/cam-nang`, `/bang-gia-dat`, `/gia-dat`, `/den-bu`.
+Toàn bài vẫn nằm trong trang (Google đọc được, kéo khách), người chưa đăng nhập chỉ thấy phần đầu + ô mời
+đăng nhập. Kèm dữ liệu cấu trúc `isAccessibleForFree:false` trỏ vào `.cl-noi-dung-khoa` (`lib/ldKhoaMem.ts`)
+— **đừng bỏ khai báo này**, thiếu nó Google coi là che giấu nội dung (cloaking) và phạt. Trong khung
+`/tien-ich` bốn trang này vẫn khoá cứng.
+
+**Tối ưu Google (30/9/2026):**
+- Layout gốc khai `canonical: '/'` → **trang nào không tự khai canonical sẽ bị coi là bản sao trang chủ**
+  và Google bỏ qua. Đã dính ở `/listings`, `/tin-tuc`, `/map`, `/dau-tu`, `/dichvu` (trang 'use client' →
+  khai trong `layout.tsx` cạnh nó) và 6 trang pháp lý. **Trang mới nào cũng phải có `alternates.canonical`.**
+- Tên trang KHÔNG tự ghi đuôi "| Cam Lâm Land" — khuôn ở layout gốc tự thêm.
+- `sitemap.ts`: có bài cẩm nang, bài tin tức, tin đăng (thử `BACKEND_HOST` rồi tên miền thật — lúc đóng gói
+  máy chủ dữ liệu chưa chạy). `lib/seoLanding.ts` có thêm 4 trang xã MỚI (`xa-cam-lam`, `suoi-dau`, `cam-hiep`,
+  `cam-an`); hướng/toạ độ các xã đo lại từ bảng `dia_chinh` (bản cũ ghi Suối Cát/Suối Tân ở phía nam — sai).
+  `WARD_EXPAND` (routes/listings.ts) sửa đúng theo NQ 1667.
 
 - **IP thật của khách:** tunnel nằm trong mạng riêng `duong_ham` với địa chỉ CỐ ĐỊNH `172.31.253.2`
   (`docker-compose.tunnel.yml`); nginx chỉ tin `CF-Connecting-IP` từ đúng địa chỉ đó (`set_real_ip_from`)

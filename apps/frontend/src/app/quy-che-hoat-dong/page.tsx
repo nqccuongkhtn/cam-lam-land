@@ -1,6 +1,7 @@
 import PolicyPage from '@/components/PolicyPage';
 
-export const metadata = { title: 'Quy chế hoạt động | Cam Lâm Land' };
+// Tên trang (khuôn "%s | Cam Lâm Land" ở layout gốc tự thêm đuôi) + địa chỉ chính thức riêng, không khai là bản sao trang chủ.
+export const metadata = { title: 'Quy chế hoạt động', alternates: { canonical: '/quy-che-hoat-dong' } };
 
 export default function Page() {
   return (

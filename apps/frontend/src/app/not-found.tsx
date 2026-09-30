@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-export const metadata = { title: 'Không tìm thấy trang | Cam Lâm Land' };
+export const metadata = { title: 'Không tìm thấy trang' };
 
 // Trang 404 tiếng Việt (thay trang mặc định tiếng Anh của Next.js). Dùng chung layout gốc (có menu/chân trang).
 export default function NotFound() {

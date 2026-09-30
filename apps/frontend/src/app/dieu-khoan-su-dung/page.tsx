@@ -1,6 +1,7 @@
 import PolicyPage from '@/components/PolicyPage';
 
-export const metadata = { title: 'Điều khoản sử dụng | Cam Lâm Land' };
+// Tên trang (khuôn "%s | Cam Lâm Land" ở layout gốc tự thêm đuôi) + địa chỉ chính thức riêng, không khai là bản sao trang chủ.
+export const metadata = { title: 'Điều khoản sử dụng', alternates: { canonical: '/dieu-khoan-su-dung' } };
 
 export default function Page() {
   return (

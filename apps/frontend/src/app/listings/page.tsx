@@ -28,7 +28,6 @@ const MapView = dynamic(() => import('@/components/MapView'), { ssr: false, load
 const SALE_PRICE_RANGES: [string, string, string][] = [['Tất cả mức giá', '', ''], ['Dưới 1 tỷ', '', '1'], ['1 - 3 tỷ', '1', '3'], ['3 - 5 tỷ', '3', '5'], ['5 - 10 tỷ', '5', '10'], ['10 - 20 tỷ', '10', '20'], ['Trên 20 tỷ', '20', '']];
 const RENT_PRICE_RANGES: [string, string, string][] = [['Tất cả mức giá', '', ''], ['Dưới 3 triệu', '', '0.003'], ['3 - 5 triệu', '0.003', '0.005'], ['5 - 10 triệu', '0.005', '0.01'], ['10 - 20 triệu', '0.01', '0.02'], ['20 - 50 triệu', '0.02', '0.05'], ['Trên 50 triệu', '0.05', '']];
 const AREA_RANGES: [string, number, number][] = [['Tất cả diện tích', 0, 0], ['Dưới 50 m²', 0, 50], ['50 - 80 m²', 50, 80], ['80 - 100 m²', 80, 100], ['100 - 150 m²', 100, 150], ['150 - 300 m²', 150, 300], ['Trên 300 m²', 300, 0]];
-const BASE_THUMBS: [BaseMap, string, string][] = [['street', 'Mặc định', 'm'], ['satellite', 'Vệ tinh', 's'], ['terrain', 'Địa hình', 'p']];
 const lyrOf = (b: BaseMap) => (b === 'satellite' ? 's' : b === 'terrain' ? 'p' : 'm');
 
 const QH = {
@@ -372,26 +371,18 @@ function ListingsInner() {
           muốn mờ đi thì kéo thanh độ mờ bên phải; đổi nền bằng nút tròn bên phải. */}
       <div className="hidden md:block absolute top-16 left-3 z-20">
         {layerOpen ? (
-          <div className="w-[250px] bg-white/95 backdrop-blur rounded-2xl border border-slate-200 shadow-xl p-3">
+          <div className="w-[240px] bg-white/95 backdrop-blur rounded-2xl border border-slate-200 shadow-xl p-3">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-extrabold text-[#0A2540]">Lớp bản đồ</span>
               <button onClick={() => setLayerOpen(false)} className="text-slate-400 hover:text-slate-700 w-6 h-6 grid place-items-center rounded-lg hover:bg-slate-100 text-sm leading-none">✕</button>
             </div>
-            <label className="flex items-center gap-2.5 py-1.5 text-xs font-semibold text-slate-700 cursor-pointer">
-              <input type="checkbox" checked={qhOn} onChange={(e) => setQhOn(e.target.checked)} className="accent-red-600 w-4 h-4" /> Lớp quy hoạch
+            {/* Trình bày GIỐNG bảng lớp trang Bản đồ (chủ dự án 30/9/2026). Phần "Nền bản đồ" đã bỏ khỏi đây:
+                đổi nền bằng NÚT TRÒN ở cột nút bên phải, cũng như trang Bản đồ. */}
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mt-1 mb-0.5">Bản đồ quy hoạch</p>
+            <label className="flex items-start gap-2.5 py-1.5 text-sm cursor-pointer">
+              <input type="checkbox" checked={qhOn} onChange={(e) => setQhOn(e.target.checked)} className="accent-emerald-600 w-4 h-4 rounded-sm mt-0.5" />
+              <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 bg-amber-500 mt-1" /><span className="min-w-0 flex-1 text-slate-700 leading-snug">Quy hoạch chung 2045 (QĐ205)</span>
             </label>
-            {/* Lựa chọn "Nhãn & đường" ĐÃ BỎ (chủ dự án 28/9/2026) — nhãn đường luôn hiện. */}
-            <div className="hidden md:block border-t border-slate-100 pt-2 mt-1">{/* điện thoại đổi nền bằng nút tròn bên phải, giống trang Bản đồ */}
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Nền bản đồ</span>
-              <div className="flex gap-1.5 mt-1.5">
-                {BASE_THUMBS.map(([b, label, lyr]) => (
-                  <button key={b} onClick={() => setBaseMap(b)} className="text-center flex-1">
-                    <span className={`block h-11 rounded-lg overflow-hidden border-2 ${baseMap === b ? 'border-red-600' : 'border-slate-200'}`}>{/* eslint-disable-next-line @next/next/no-img-element */}<img src={`https://mt1.google.com/vt/lyrs=${lyr}&x=3289&y=1909&z=12`} alt={label} loading="lazy" className="w-full h-full object-cover" /></span>
-                    <span className={`block text-[10px] mt-0.5 font-semibold ${baseMap === b ? 'text-red-600' : 'text-slate-600'}`}>{label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         ) : (
           <button onClick={() => setLayerOpen(true)} title="Lớp bản đồ" className="flex items-center gap-2 bg-white/95 backdrop-blur rounded-full border border-slate-200 shadow-lg pl-2.5 pr-3 py-2 hover:bg-slate-50">
@@ -403,11 +394,11 @@ function ListingsInner() {
       </div>
       {/* ⚠️ Nút LỌC NỔI TRÊN BẢN ĐỒ đã BỎ (28/9/2026): nút lọc giờ nằm trong ô tìm kiếm phía trên,
           dùng chung một bảng lọc cho cả chế độ danh sách lẫn bản đồ — giống trang chủ. */}
-      {/* ĐIỆN THOẠI: cột nút bên phải GIỐNG HỆT trang Bản đồ (chủ dự án 15/9/2026 "đồng bộ với bên map") —
+      {/* ĐIỆN THOẠI + MÁY TÍNH (từ 30/9/2026): cột nút bên phải GIỐNG HỆT trang Bản đồ (chủ dự án 15/9/2026 "đồng bộ với bên map") —
           nút tròn ảnh thu nhỏ của nền sẽ chuyển sang (bấm là đổi Vệ tinh ↔ Đường) + thanh độ mờ đỏ mảnh 123px.
           Neo vào ĐÁY CỘT NÚT maplibre (biến --cot-nut-day trong globals.css) Y NHƯ trang Bản đồ. ⚠️ Trước để số
           cứng top 121px (đo hồi cụm nút maplibre chưa bị đẩy xuống) → lệch khỏi cụm nút (sửa 28/9/2026). */}
-      <div ref={cotNutRef} style={cotNutTop != null ? { top: cotNutTop } : undefined} className="md:hidden absolute right-[10px] top-[var(--cot-nut-day)] z-10 flex w-[31px] flex-col items-center gap-2.5">
+      <div ref={cotNutRef} style={cotNutTop != null ? { top: cotNutTop } : undefined} className="absolute right-[10px] top-[var(--cot-nut-day)] z-10 flex w-[31px] flex-col items-center gap-2.5">
         <button onClick={() => setBaseMap(baseMap === 'satellite' ? 'street' : 'satellite')}
           aria-label={baseMap === 'satellite' ? 'Chuyển sang bản đồ đường' : 'Chuyển sang ảnh vệ tinh'}
           className="cl-press h-[31px] w-[31px] overflow-hidden rounded-full border-2 border-white bg-slate-200 bg-cover bg-center shadow-[0_1px_5px_rgba(0,0,0,.35)]"
@@ -423,16 +414,7 @@ function ListingsInner() {
           </div>
         )}
       </div>
-      {qhOn && (
-        <div className="hidden md:flex absolute top-1/2 right-3 -translate-y-1/2 z-10 flex-col items-center gap-1.5 bg-white/95 backdrop-blur rounded-full border border-slate-200 shadow-lg px-1.5 py-3">
-          <span className="text-[9px] font-bold text-slate-400">Đậm</span>
-          <div className="relative h-28 w-5">
-            <input type="range" min={0} max={100} value={Math.round(opacity * 100)} onChange={(e) => setOpacity(Number(e.target.value) / 100)} className="absolute left-1/2 top-1/2 w-28 -translate-x-1/2 -translate-y-1/2 -rotate-90 accent-red-600 cursor-pointer" aria-label="Độ đậm lớp quy hoạch" />
-          </div>
-          <span className="text-[9px] font-bold text-slate-400">Mờ</span>
-          <span className="text-[10px] font-extrabold text-[#0A2540]">{Math.round(opacity * 100)}%</span>
-        </div>
-      )}
+      {/* Ô "Đậm · Mờ · %" to ở giữa mép phải (máy tính) ĐÃ BỎ 30/9/2026 — dùng vạch đỏ mảnh ở cột nút như trang Bản đồ. */}
       {info && showSave && (
         <div className={`absolute left-2 right-2 bottom-[60px] ${sheetExpanded ? 'max-h-[86%]' : 'max-h-[64%]'} sm:top-auto sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:bottom-3 sm:w-[340px] sm:max-w-[92%] sm:max-h-[74vh] overflow-y-auto z-10 bg-white rounded-2xl border border-slate-200 shadow-xl text-xs`}>
           <div className="sticky top-0 z-10 bg-white rounded-t-2xl border-b border-slate-100 px-3.5 pt-2 pb-2">

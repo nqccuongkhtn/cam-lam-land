@@ -47,8 +47,8 @@ export default function CanDangNhap({ ten, children }: { ten?: string; children:
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10.5" rx="2.2" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></svg>
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-[15px] font-extrabold leading-snug text-[#d42a2a]">Mở khoá {ten || 'tiện ích'}</h1>
-            <p className="mt-0.5 text-[12.5px] leading-relaxed text-slate-600">Vui lòng đăng nhập để sử dụng đầy đủ tiện ích. Chưa có tài khoản? Đăng ký miễn phí chỉ trong 30 giây.</p>
+            <h1 className="text-[15px] font-extrabold leading-snug text-[#d42a2a]">{ten || 'Tiện ích'} cần đăng nhập</h1>
+            <p className="mt-0.5 text-[12.5px] leading-relaxed text-slate-600">Tài khoản miễn phí — đăng ký chỉ mất 30 giây.</p>
           </div>
           <button onClick={() => openLogin({ reason: lyDo })}
             className="h-[38px] shrink-0 rounded-md bg-[#d42a2a] px-[18px] text-[13px] font-bold text-white active:scale-[.98]">Đăng nhập</button>

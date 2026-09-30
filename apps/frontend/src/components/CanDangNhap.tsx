@@ -36,13 +36,17 @@ export default function CanDangNhap({ ten, children }: { ten?: string; children:
   // h-full + tự cuộn: trong khung /tien-ich chỗ này có chiều cao cố định, thêm khối quảng cáo là phải cuộn được.
   return (
     <div className="h-full overflow-y-auto">
-    <div className="grid min-h-[60vh] place-items-center px-4">
-      <div className="w-full max-w-sm rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm">
-        <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-slate-100 text-2xl">🔒</div>
-        <h1 className="text-[16px] font-bold text-[#0A2540]">{ten || 'Tiện ích'} cần đăng nhập</h1>
-        <p className="mt-1.5 text-[13.5px] leading-relaxed text-slate-500">Các công cụ tiện ích chỉ dành cho thành viên. Đăng nhập hoặc tạo tài khoản miễn phí để tiếp tục.</p>
+    {/* Ô mời đăng nhập GỌN một dải ngang ở trên (chủ dự án 30/9/2026: ô cao 60% màn hình đẩy quảng cáo
+        "tuột xuống quá"). Máy tính: biểu tượng · chữ · nút trên một hàng; điện thoại: xếp dọc. */}
+    <div className="mx-auto max-w-7xl px-3 pt-4 sm:px-6 sm:pt-6">
+      <div className="flex flex-col items-center gap-3 rounded-lg border border-slate-200 bg-white p-4 text-center shadow-sm sm:flex-row sm:gap-4 sm:p-5 sm:text-left">
+        <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-slate-100 text-xl">🔒</div>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-[15px] font-bold text-[#0A2540]">{ten || 'Tiện ích'} cần đăng nhập</h1>
+          <p className="mt-0.5 text-[13px] leading-relaxed text-slate-500">Các công cụ tiện ích chỉ dành cho thành viên. Đăng nhập hoặc tạo tài khoản miễn phí để tiếp tục.</p>
+        </div>
         <button onClick={() => openLogin({ reason: lyDo })}
-          className="mt-4 h-11 w-full rounded-lg bg-[#0A2540] text-[14px] font-bold text-white active:scale-[.98]">Đăng nhập</button>
+          className="h-10 w-full shrink-0 rounded-lg bg-[#0A2540] px-6 text-[14px] font-bold text-white active:scale-[.98] sm:w-auto">Đăng nhập</button>
       </div>
     </div>
     {/* Quảng cáo dịch vụ VẪN HIỆN khi chưa đăng nhập (chủ dự án 30/9/2026). */}

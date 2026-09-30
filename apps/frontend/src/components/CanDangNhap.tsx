@@ -36,14 +36,13 @@ export default function CanDangNhap({ ten, children }: { ten?: string; children:
   // h-full + tự cuộn: trong khung /tien-ich chỗ này có chiều cao cố định, thêm khối quảng cáo là phải cuộn được.
   return (
     <div className="h-full overflow-y-auto">
-    {/* Ô mời đăng nhập = MẪU 32 chủ dự án chọn 30/9/2026 (thay mẫu 16): thẻ nền trắng VIỀN ĐỎ 2px, ruy băng
-        "MIỄN PHÍ" xanh đậm chéo ở góc phải, ô khoá đỏ · "… cần đăng nhập" · nút đỏ trên một hàng.
+    {/* Ô mời đăng nhập = MẪU 32 chủ dự án chọn 30/9/2026 (thay mẫu 16): thẻ nền trắng VIỀN ĐỎ 2px, ô khoá đỏ
+        (ruy băng "MIỄN PHÍ" ở góc đã bỏ theo ý chủ dự án 30/9/2026) · "… cần đăng nhập" · nút đỏ trên một hàng.
         DÍNH TRÊN ĐẦU khi kéo (sticky) để lúc nào cũng thấy — chủ dự án 30/9/2026. Vì dính nên điện thoại
         cũng để MỘT HÀNG NGANG gọn (xếp dọc cao ~190px sẽ che mất gần 1/3 màn hình). */}
     <div className="sticky top-0 z-30 mx-auto max-w-7xl bg-white/95 px-3 pb-2 pt-3 backdrop-blur sm:px-6 sm:pt-4">
       <div className="relative overflow-hidden rounded-lg border-2 border-[#d42a2a] bg-white px-3 py-2.5 sm:px-4 sm:py-3.5">
-        <span className="absolute -right-[30px] top-2 rotate-[35deg] bg-[#0A2540] px-[34px] py-[2px] text-[9px] font-extrabold tracking-[.08em] text-white sm:top-2.5 sm:py-[3px] sm:text-[10px]">MIỄN PHÍ</span>
-        <div className="flex items-center gap-2.5 pr-7 sm:gap-3.5 sm:pr-10">
+        <div className="flex items-center gap-2.5 sm:gap-3.5">
           <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[9px] bg-[#d42a2a] text-white sm:h-11 sm:w-11 sm:rounded-[10px]">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10.5" rx="2.2" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></svg>
           </div>

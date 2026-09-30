@@ -357,7 +357,7 @@ function ListingsInner() {
   const inpc = 'border border-slate-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-[#7c3aed]'; // ô nhập tin lưu
 
   const mapPanel = (
-    <div className="relative h-full w-full">
+    <div className="cl-ban-do-khong-nut-hoi relative h-full w-full">
       <MapView markers={allMarkers} overlays={overlays} baseMap={baseMap} labels={labels} onMapClick={onMapClick} flyToPoint={flyPoint} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={qhOn ? opacity : 1} className="absolute inset-0 h-full w-full" />
       {/* TAB quản lý marker — bỏ nút "Tin đăng" (mặc định đã là tin đăng); chỉ hiện cho người đăng nhập */}
       {user && (

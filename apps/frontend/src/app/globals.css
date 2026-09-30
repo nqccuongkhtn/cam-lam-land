@@ -322,6 +322,9 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
    Giờ CHỈ LÀ VỊ TRÍ DỰ PHÒNG trong tích tắc trước khi đo xong: cột nút đổi nền + thanh độ mờ tự đo
    đáy cụm nút thật (lib/cotNutBanDo.ts). Nút maplibre giữ 29px trên mọi máy (xem cuối tệp). */
 .maplibregl-ctrl-top-right { margin-top: var(--nut-can-cu); }
+/* Bản đồ trang tin đăng KHÔNG có nút "?" → máy tính khỏi chừa chỗ, cụm nút sát mép trên (chủ dự án 30/9/2026
+   thấy "còn hở"). Cột nút đổi nền + vạch độ mờ tự đo lại nên đi theo. Điện thoại giữ như cũ. */
+@media (min-width: 768px) { .cl-ban-do-khong-nut-hoi .maplibregl-ctrl-top-right { margin-top: 0; } }
 
 /* Quảng cáo động — chuyển động mượt (kiểu Znews) */
 @keyframes clKen { from { transform: scale(1.02); } to { transform: scale(1.09); } }

@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useRef } from 'react';
-import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import QuangCaoDichVu from '@/components/QuangCaoDichVu';
@@ -37,21 +36,22 @@ export default function CanDangNhap({ ten, children }: { ten?: string; children:
   // h-full + tự cuộn: trong khung /tien-ich chỗ này có chiều cao cố định, thêm khối quảng cáo là phải cuộn được.
   return (
     <div className="h-full overflow-y-auto">
-    {/* Ô mời đăng nhập = MẪU 16 chủ dự án chọn 30/9/2026 (trang xem thử 40 mẫu): khối CĂN GIỮA nền xanh nhạt,
-        khoá to trong vòng tròn xanh đậm có viền trắng, tiêu đề xanh đậm, 2 nút cạnh nhau (điện thoại xếp dọc).
-        Gọn chiều cao để khối "Dịch vụ của chúng tôi" nối ngay bên dưới. */}
+    {/* Ô mời đăng nhập = MẪU 32 chủ dự án chọn 30/9/2026 (thay mẫu 16): thẻ nền trắng VIỀN ĐỎ 2px, ruy băng
+        "MIỄN PHÍ" xanh đậm chéo ở góc phải, ô khoá đỏ · tiêu đề "Mở khoá …" · nút đỏ trên một hàng.
+        Điện thoại: xếp dọc căn giữa, nút rộng hết ô. */}
     <div className="mx-auto max-w-7xl px-3 pt-4 sm:px-6 sm:pt-6">
-      <div className="flex flex-col items-center gap-2 rounded-lg bg-[#eef3f9] px-4 py-5 text-center">
-        <div className="grid h-[52px] w-[52px] place-items-center rounded-full bg-[#0A2540] text-white shadow-[0_0_0_6px_rgba(255,255,255,.8)]">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10.5" rx="2.2" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></svg>
-        </div>
-        <h1 className="mt-1 text-[17px] font-extrabold leading-snug text-[#0A2540]">{ten || 'Tiện ích'} cần đăng nhập</h1>
-        <p className="text-[13px] leading-relaxed text-slate-600">Tài khoản miễn phí — đăng ký chỉ mất 30 giây.</p>
-        <div className="mt-1 flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+      <div className="relative overflow-hidden rounded-lg border-2 border-[#d42a2a] bg-white px-4 pb-3.5 pt-4">
+        <span className="absolute -right-[30px] top-2.5 rotate-[35deg] bg-[#0A2540] px-[34px] py-[3px] text-[10px] font-extrabold tracking-[.08em] text-white">MIỄN PHÍ</span>
+        <div className="flex flex-col items-stretch gap-2.5 pt-1.5 text-center sm:flex-row sm:items-center sm:gap-3.5 sm:pr-10 sm:pt-0 sm:text-left">
+          <div className="mx-auto grid h-11 w-11 shrink-0 place-items-center rounded-[10px] bg-[#d42a2a] text-white sm:mx-0">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10.5" rx="2.2" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></svg>
+          </div>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-[15px] font-extrabold leading-snug text-[#d42a2a]">Mở khoá {ten || 'tiện ích'}</h1>
+            <p className="mt-0.5 text-[12.5px] leading-relaxed text-slate-600">Đăng nhập hoặc đăng ký tài khoản miễn phí để dùng toàn bộ tiện ích.</p>
+          </div>
           <button onClick={() => openLogin({ reason: lyDo })}
-            className="h-10 rounded-md bg-[#0A2540] px-5 text-[13.5px] font-bold text-white active:scale-[.98]">Đăng nhập</button>
-          <Link href="/register" target="_top"
-            className="grid h-10 place-items-center rounded-md border-[1.5px] border-[#0A2540] px-5 text-[13.5px] font-bold text-[#0A2540] active:scale-[.98]">Tạo tài khoản</Link>
+            className="h-[38px] shrink-0 rounded-md bg-[#d42a2a] px-[18px] text-[13px] font-bold text-white active:scale-[.98]">Đăng nhập</button>
         </div>
       </div>
     </div>

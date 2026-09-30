@@ -374,6 +374,9 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .cl-fab { bottom: calc(12px + env(safe-area-inset-bottom)); transform: translateY(var(--cl-fab-shift, -48px)); transition: transform .3s ease; }
 .cl-fab-pill { bottom: calc(12px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(var(--cl-fab-shift, -48px)); transition: transform .3s ease; }
 @media (min-width: 768px) { .cl-fab { bottom: 20px; transform: none; } }
+/* Trang /tien-ich (máy tính): khung đã vừa khít màn hình và phần bên phải TỰ CUỘN bên trong → khoá cuộn của
+   cả trang, không thì hiện HAI thanh cuộn song song (chủ dự án 30/9/2026: "nhìn 2 thanh rất xấu"). */
+@media (min-width: 768px) { html.cl-khoa-cuon-trang, html.cl-khoa-cuon-trang body { overflow: hidden; } }
 
 /* Menu mobile ở đầu trang mở ra: trượt + mờ dần cho mượt */
 @keyframes clMenuIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }

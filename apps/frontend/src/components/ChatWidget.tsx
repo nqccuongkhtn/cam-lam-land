@@ -280,7 +280,9 @@ export default function ChatWidget() {
   //   · mép nào  (bong bóng vốn luôn dính mép trái hoặc phải)
   //   · cao bao nhiêu phần trăm màn hình
   // Từ hai thứ đó tính lại toạ độ mỗi lần mở trang và mỗi lần đổi cỡ cửa sổ → luôn đúng chỗ.
-  const NEO_KEY = 'cl-bubble-neo';
+  // Đổi tên khoá (30/9/2026): chủ dự án thấy bong bóng "hơi cao" — là vị trí KÉO CŨ đã nhớ trong máy.
+  // Đổi khoá = mọi máy quay về góc dưới phải mặc định một lần; kéo lại thì vẫn nhớ như thường.
+  const NEO_KEY = 'cl-bubble-neo2';
   const neo = useRef<{ mep: 'trai' | 'phai'; ty: number } | null>(null);
   const BUB = 56;
   // ⚠️ KHÔNG dùng window.innerWidth: con số đó TÍNH CẢ THANH CUỘN (~15px), nên đặt bong bóng
@@ -301,6 +303,7 @@ export default function ChatWidget() {
   useEffect(() => {
     try {
       localStorage.removeItem('cl-bubble-pos'); // bỏ hẳn kiểu nhớ cũ (toạ độ tuyệt đối)
+      localStorage.removeItem('cl-bubble-neo'); // vị trí kéo cũ (trước 30/9/2026)
       const s = localStorage.getItem(NEO_KEY);
       if (!s) return;                            // chưa kéo bao giờ → để mặc định góc dưới phải
       const n = JSON.parse(s);

@@ -32,6 +32,11 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
   // Công cụ nội bộ (vd tra mã xác thực) chỉ hiện với tài khoản được cấp quyền.
   const { user, loading: dangTaiTk } = useAuth();
   const tools = useMemo(() => locTheoQuyen(tatCa, user), [tatCa, user]);
+  // Khoá cuộn của CẢ TRANG khi đang ở khung này (máy tính) — chỉ còn thanh cuộn bên trong. Xem globals.css.
+  useEffect(() => {
+    document.documentElement.classList.add('cl-khoa-cuon-trang');
+    return () => document.documentElement.classList.remove('cl-khoa-cuon-trang');
+  }, []);
   const leaves = useMemo(() => tools.flatMap((t) => (t.children?.length ? t.children : [t])), [tools]);
   const parentOf = useMemo(() => { const m: Record<string, string> = {}; tools.forEach((t) => t.children?.forEach((c) => { m[c.key] = t.key; })); return m; }, [tools]);
   const [tab, setTab] = useState<string>(leaves.find((l) => !l.action)?.key || leaves[0]?.key || '');

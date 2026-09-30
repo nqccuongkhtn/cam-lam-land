@@ -42,7 +42,8 @@ const SERVICES: [string, string, string][] = [
 // moc=false: không gắn mốc #dich-vu-phap-ly (khi trang có HAI bản của khối này, tránh trùng mốc).
 // gon=true: bản THU NHỎ dưới ô "… cần đăng nhập" của Tiện ích (chủ dự án 30/9/2026: "hơi to, phải kéo xuống") —
 // lưới ảnh hẹp lại (máy tính 3 thẻ trong khung ~896px thay vì cả bề rộng), tiêu đề nhỏ, bỏ đoạn giới thiệu.
-export default function ServicesSection({ className = '', moc = true, gon = false }: { className?: string; moc?: boolean; gon?: boolean }) {
+// nho12: lưới 6 thẻ còn 88% bề rộng, căn giữa (chủ dự án 30/9/2026 "nhỏ lại 12%" — dưới ô đăng nhập Tiện ích).
+export default function ServicesSection({ className = '', moc = true, gon = false, nho12 = false }: { className?: string; moc?: boolean; gon?: boolean; nho12?: boolean }) {
   /* Khai báo có cấu trúc: nói cho máy tìm kiếm biết đây là DANH SÁCH DỊCH VỤ,
      chứ không phải mấy tấm ảnh rời. Nhờ vậy Google có thể hiện thẳng tên dịch vụ
      trong kết quả tìm kiếm. */
@@ -74,7 +75,7 @@ export default function ServicesSection({ className = '', moc = true, gon = fals
         <p className={`mx-auto mt-2 max-w-2xl text-[13px] sm:text-sm text-slate-500 ${gon ? 'hidden' : ''}`}>Cam Lâm Land hỗ trợ trọn gói thủ tục pháp lý và hồ sơ đất đai tại Cam Lâm – Khánh Hòa, giúp bạn giao dịch an toàn, nhanh gọn, đúng luật.</p>
       </div>
 
-      <div className={gon ? 'mx-auto mt-3 grid max-w-4xl grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3' : 'mt-4 sm:mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-3'}>
+      <div className={gon ? 'mx-auto mt-3 grid max-w-4xl grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3' : `mt-4 sm:mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-3 ${nho12 ? 'mx-auto w-[88%]' : ''}`}>
         {SERVICES.map(([f, ten, mo]) => (
           <div key={f} className="group overflow-hidden rounded-2xl ring-1 ring-slate-100 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-slate-200">
             {/* eslint-disable-next-line @next/next/no-img-element */}

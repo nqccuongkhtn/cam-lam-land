@@ -97,7 +97,7 @@ export default function MapAdsPage() {
           <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
             <h2 className="font-bold text-[#0A2540]">{editingId ? `Sửa quảng cáo #${editingId}` : 'Tạo quảng cáo'}</h2>
             <div className="grid sm:grid-cols-2 gap-3">
-              <div><label className={lbl}>Tên sales *</label><input className={inp} value={name} onChange={(e) => setName(e.target.value)} placeholder="Nguyễn Quốc Cường" /></div>
+              <div><label className={lbl}>Tên sales *</label><input className={inp} value={name} onChange={(e) => setName(e.target.value)} placeholder="Nguyễn Văn A" /></div>
               <div><label className={lbl}>SĐT *</label><input className={inp} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0988…" /></div>
             </div>
             <div>

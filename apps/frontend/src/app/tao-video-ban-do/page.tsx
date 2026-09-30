@@ -601,7 +601,7 @@ const WIDGETS: Widget[] = [
   // chạy theo. Ba mẫu dưới đây là LỚP RỜI — nằm yên một chỗ trên khung hình, kéo thả tuỳ ý, đặt giờ
   // hiện/tắt riêng. Dùng để giới thiệu dự án, khoe thông số hay dán danh thiếp môi giới vào góc video.
   { key: 'theso', name: 'Thẻ thông số (rời)', note: 'Thẻ đứng riêng một góc: tên lô, thông số, giá — không dính vào bản đồ', w: 0.44, d: { t1: 'ĐẤT NỀN CAM LÂM', t2: '120 m² · 5×24 · Hướng Đông Nam', t3: '2,8 tỷ', t4: 'Sổ đỏ riêng · Đường nhựa 12 m' } },
-  { key: 'moigioi', name: 'Thẻ môi giới (rời)', note: 'Danh thiếp góc video: tên, chức danh, số điện thoại', w: 0.4, d: { t1: 'NGUYỄN QUỐC CƯỜNG', t2: 'Chuyên viên đất nền Cam Lâm', t3: '0988 888 888' } },
+  { key: 'moigioi', name: 'Thẻ môi giới (rời)', note: 'Danh thiếp góc video: tên, chức danh, số điện thoại', w: 0.4, d: { t1: 'TÊN CỦA BẠN', t2: 'Chuyên viên đất nền Cam Lâm', t3: '0988 888 888' } },
   { key: 'huyhieuct', name: 'Huy hiệu công ty (rời)', note: 'Huy hiệu tròn + tên công ty, hợp làm dấu ở góc suốt video', w: 0.36, d: { t1: 'CAM LÂM LAND', t2: 'Đất nền · Sổ đỏ · Cam Lâm', t3: '' } },
   // ══ THANH LIÊN HỆ ══
   // Thanh nhỏ dán góc video: ô vuông màu thương hiệu bên trái, chữ bên phải. Người xem nhìn phát

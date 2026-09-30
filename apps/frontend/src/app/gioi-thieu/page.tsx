@@ -70,7 +70,6 @@ export default function Page() {
             <p>📞 Hotline: <a href="tel:0988888888" className="font-bold text-[#0A2540]">0988 888 888</a></p>
             <p>✉️ Email: lienhe@camlamland.vn</p>
             <p>📍 Địa chỉ: Cam Lâm, Khánh Hòa</p>
-            <p className="text-slate-500">Phát triển bởi Nguyễn Quốc Cường</p>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">

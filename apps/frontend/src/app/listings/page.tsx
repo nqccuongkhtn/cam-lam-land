@@ -118,9 +118,8 @@ function ListingsInner() {
     const id = requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, listScrollY.current)));
     return () => cancelAnimationFrame(id);
   }, [mapView]);
-  const [layerOpen, setLayerOpen] = useState(false);
   const [baseMap, setBaseMap] = useState<BaseMap>('satellite');
-  const [qhOn, setQhOn] = useState(true);
+  const [qhOn] = useState(true); // luôn bật — không còn nút tắt (30/9/2026)
   const [opacity, setOpacity] = useState(0.7);
   // Cột nút đổi nền + thanh độ mờ (điện thoại) TỰ NỐI ngay dưới cụm nút +/−/định vị — xem lib/cotNutBanDo.ts
   const cotNutRef = useRef<HTMLDivElement>(null);
@@ -367,31 +366,8 @@ function ListingsInner() {
           <button onClick={() => { if (mapLayer === 'saved') { setMapLayer('all'); if (mine) showMine(false); } else { setMapLayer('saved'); loadDrafts(); } }} className={`px-3 py-1.5 rounded-full transition ${mapLayer === 'saved' ? 'bg-[#7c3aed] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'}`}>📌 Tin lưu{drafts.length ? ` (${drafts.length})` : ''}</button>
         </div>
       )}
-      {/* Nút LỚP BẢN ĐỒ: CHỈ MÁY TÍNH. Điện thoại đã bỏ (chủ dự án 28/9/2026) — lớp quy hoạch bật sẵn,
-          muốn mờ đi thì kéo thanh độ mờ bên phải; đổi nền bằng nút tròn bên phải. */}
-      <div className="hidden md:block absolute top-16 left-3 z-20">
-        {layerOpen ? (
-          <div className="w-[240px] bg-white/95 backdrop-blur rounded-2xl border border-slate-200 shadow-xl p-3">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-extrabold text-[#0A2540]">Lớp bản đồ</span>
-              <button onClick={() => setLayerOpen(false)} className="text-slate-400 hover:text-slate-700 w-6 h-6 grid place-items-center rounded-lg hover:bg-slate-100 text-sm leading-none">✕</button>
-            </div>
-            {/* Trình bày GIỐNG bảng lớp trang Bản đồ (chủ dự án 30/9/2026). Phần "Nền bản đồ" đã bỏ khỏi đây:
-                đổi nền bằng NÚT TRÒN ở cột nút bên phải, cũng như trang Bản đồ. */}
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mt-1 mb-0.5">Bản đồ quy hoạch</p>
-            <label className="flex items-start gap-2.5 py-1.5 text-sm cursor-pointer">
-              <input type="checkbox" checked={qhOn} onChange={(e) => setQhOn(e.target.checked)} className="accent-emerald-600 w-4 h-4 rounded-sm mt-0.5" />
-              <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 bg-amber-500 mt-1" /><span className="min-w-0 flex-1 text-slate-700 leading-snug">Quy hoạch chung 2045 (QĐ205)</span>
-            </label>
-          </div>
-        ) : (
-          <button onClick={() => setLayerOpen(true)} title="Lớp bản đồ" className="flex items-center gap-2 bg-white/95 backdrop-blur rounded-full border border-slate-200 shadow-lg pl-2.5 pr-3 py-2 hover:bg-slate-50">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0A2540" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></svg>
-            <span className="text-xs font-bold text-slate-700 hidden sm:inline">Lớp bản đồ</span>
-            {qhOn && <span className="w-1.5 h-1.5 rounded-full bg-red-600" />}
-          </button>
-        )}
-      </div>
+      {/* Nút "LỚP BẢN ĐỒ" ĐÃ BỎ HẲN (điện thoại 28/9, máy tính 30/9/2026 — chủ dự án): lớp quy hoạch luôn bật,
+          muốn mờ thì kéo vạch đỏ, đổi nền bằng nút tròn — cả hai ở cột nút bên phải. */}
       {/* ⚠️ Nút LỌC NỔI TRÊN BẢN ĐỒ đã BỎ (28/9/2026): nút lọc giờ nằm trong ô tìm kiếm phía trên,
           dùng chung một bảng lọc cho cả chế độ danh sách lẫn bản đồ — giống trang chủ. */}
       {/* ĐIỆN THOẠI + MÁY TÍNH (từ 30/9/2026): cột nút bên phải GIỐNG HỆT trang Bản đồ (chủ dự án 15/9/2026 "đồng bộ với bên map") —

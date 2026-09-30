@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
+import QuangCaoDichVu from '@/components/QuangCaoDichVu';
 
 /**
  * LỚP BẢO MẬT 1 CỦA TIỆN ÍCH (chủ dự án 30/9/2026): công cụ nào cũng phải ĐĂNG NHẬP mới dùng được.
@@ -32,7 +33,9 @@ export default function CanDangNhap({ ten, children }: { ten?: string; children:
       </div>
     );
   }
+  // h-full + tự cuộn: trong khung /tien-ich chỗ này có chiều cao cố định, thêm khối quảng cáo là phải cuộn được.
   return (
+    <div className="h-full overflow-y-auto">
     <div className="grid min-h-[60vh] place-items-center px-4">
       <div className="w-full max-w-sm rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm">
         <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-slate-100 text-2xl">🔒</div>
@@ -41,6 +44,9 @@ export default function CanDangNhap({ ten, children }: { ten?: string; children:
         <button onClick={() => openLogin({ reason: lyDo })}
           className="mt-4 h-11 w-full rounded-lg bg-[#0A2540] text-[14px] font-bold text-white active:scale-[.98]">Đăng nhập</button>
       </div>
+    </div>
+    {/* Quảng cáo dịch vụ VẪN HIỆN khi chưa đăng nhập (chủ dự án 30/9/2026). */}
+    <QuangCaoDichVu />
     </div>
   );
 }

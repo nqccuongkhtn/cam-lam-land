@@ -1,7 +1,9 @@
 'use client';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
+import QuangCaoDichVu from '@/components/QuangCaoDichVu';
 
 /**
  * "KHOÁ MỀM" cho trang BÀI ĐỌC của Tiện ích (cẩm nang, bảng giá đất, giá đất, đền bù) — 30/9/2026.
@@ -18,6 +20,14 @@ export default function KhoaMem({ ten, caoXem = 1100, children }: { ten: string;
   const { user } = useAuth();
   const { openLogin } = useLoginGate();
   const mo = !!user;
+  // Trang chủ có liên kết /cam-nang#dich-vu-phap-ly: mốc đó nằm trong phần bài BỊ CẮT → khách chưa đăng nhập
+  // cuộn tới bản quảng cáo hiện rõ bên dưới thay vì chỗ bị che.
+  const quangCaoRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (mo || typeof window === 'undefined' || window.location.hash !== '#dich-vu-phap-ly') return;
+    const t = setTimeout(() => quangCaoRef.current?.scrollIntoView({ behavior: 'smooth' }), 300);
+    return () => clearTimeout(t);
+  }, [mo]);
   return (
     <div className="relative">
       <div className="cl-noi-dung-khoa relative" style={mo ? undefined : { maxHeight: caoXem, overflow: 'hidden' }}>
@@ -35,6 +45,9 @@ export default function KhoaMem({ ten, caoXem = 1100, children }: { ten: string;
           </div>
         </div>
       )}
+      {/* Khối quảng cáo cuối bài bị cắt cùng phần khoá → hiện một bản ở đây cho khách chưa đăng nhập
+          (chủ dự án 30/9/2026). Bản trong bài vẫn giữ mốc #dich-vu-phap-ly nên bản này không gắn mốc. */}
+      {!mo && <div ref={quangCaoRef} className="scroll-mt-24"><QuangCaoDichVu moc={false} /></div>}
     </div>
   );
 }

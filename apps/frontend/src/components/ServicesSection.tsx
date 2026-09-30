@@ -39,7 +39,8 @@ const SERVICES: [string, string, string][] = [
     'Tư vấn pháp luật đất đai, mua bán nhà đất, rà soát hồ sơ, giải quyết tranh chấp, khiếu nại, tố cáo, hòa giải, đại diện thực hiện thủ tục hành chính và các vấn đề pháp lý khác…'],
 ];
 
-export default function ServicesSection({ className = '' }: { className?: string }) {
+// moc=false: không gắn mốc #dich-vu-phap-ly (khi trang có HAI bản của khối này, tránh trùng mốc).
+export default function ServicesSection({ className = '', moc = true }: { className?: string; moc?: boolean }) {
   /* Khai báo có cấu trúc: nói cho máy tìm kiếm biết đây là DANH SÁCH DỊCH VỤ,
      chứ không phải mấy tấm ảnh rời. Nhờ vậy Google có thể hiện thẳng tên dịch vụ
      trong kết quả tìm kiếm. */
@@ -61,7 +62,7 @@ export default function ServicesSection({ className = '' }: { className?: string
   };
 
   return (
-    <section id="dich-vu-phap-ly" className={`scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 ${className}`}>
+    <section id={moc ? 'dich-vu-phap-ly' : undefined} className={`scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 ${className}`}>
       <script type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(duLieuCoCauTruc) }} />
 

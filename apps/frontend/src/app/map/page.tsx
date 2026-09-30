@@ -1889,7 +1889,8 @@ export default function MapPage() {
       <div className="bg-white border-b border-slate-200 shrink-0 z-20">
         {/* MÁY TÍNH (lg+): một hàng đầy đủ, tự xuống dòng khi hẹp */}
         <div className="hidden lg:flex items-center gap-x-3 gap-y-2 px-4 py-2.5 flex-wrap">
-          {baseMapCtrl()}
+          {/* Nút đổi nền (Đường/Vệ tinh) + thanh độ mờ đã dời ra CỘT NÚT BÊN PHẢI bản đồ y như điện thoại
+              (chủ dự án 30/9/2026: "cho gọn"). Ở đây chỉ còn "Nhãn & đường". */}
           {labelsCtrl()}
           <span className="h-5 w-px bg-slate-200" />
           {searchCtrl()}
@@ -1947,7 +1948,8 @@ export default function MapPage() {
                 <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 bg-amber-500" /><span className="min-w-0 flex-1 text-slate-700 leading-snug">{o.ten}</span>
               </label>
             ))}
-            <div className="mt-1 pl-[26px]">
+            {/* Máy tính: thanh độ mờ nằm ở cột nút bên phải bản đồ (như điện thoại) → ẩn bản ở bảng này. */}
+            <div className="mt-1 pl-[26px] lg:hidden">
               <div className="flex justify-between text-[11px] text-slate-400 mb-1"><span>Độ mờ</span><span className="font-semibold text-slate-500">{Math.round(opacity * 100)}%</span></div>
               <input type="range" min={0} max={100} value={Math.round(opacity * 100)} onChange={(e) => setOpacity(Number(e.target.value) / 100)} className="w-full accent-emerald-600" />
             </div>
@@ -2220,7 +2222,7 @@ export default function MapPage() {
             </div>
           )}
 
-          {/* ── CỘT NÚT BÊN PHẢI — CHỈ ĐIỆN THOẠI (14/9/2026, làm theo app tham chiếu) ─────────
+          {/* ── CỘT NÚT BÊN PHẢI — điện thoại (14/9/2026) + MÁY TÍNH (30/9/2026, cho gọn thanh trên) ─────────
               Nút TRÒN chọn nền bản đồ, ngay dưới là thanh ĐỘ MỜ dọc (khi bật lớp quy hoạch).
               Bấm nút nền → bảng nhỏ bật sang TRÁI: Đường · Vệ tinh · Địa hình + "Nhãn & đường".
               Hàng nút quy hoạch nổi trên bản đồ (QH chung 205 / Phân khu / SDĐ) ĐÃ BỎ: app chọn bản đồ
@@ -2237,7 +2239,7 @@ export default function MapPage() {
           {/* Neo vào ĐÁY CỘT NÚT maplibre (biến --cot-nut-day trong globals.css) chứ KHÔNG để số cứng.
               Số cứng 121px cũ đo hồi nút maplibre còn 31px; trên điện thoại nút to 42px nên cột cao
               hơn 40px, nút định vị tụt xuống đè lên nút đổi nền — chủ dự án thấy "ô vuông trắng lạ". */}
-          <div ref={cotNutRef} style={cotNutTop != null ? { top: cotNutTop } : undefined} className="lg:hidden absolute right-[10px] top-[var(--cot-nut-day)] z-10 flex w-[31px] flex-col items-center gap-2.5">
+          <div ref={cotNutRef} style={cotNutTop != null ? { top: cotNutTop } : undefined} className="absolute right-[10px] top-[var(--cot-nut-day)] z-10 flex w-[31px] flex-col items-center gap-2.5">
             <button onClick={() => setBaseMap(baseMap === 'satellite' ? 'street' : 'satellite')}
               aria-label={baseMap === 'satellite' ? 'Chuyển sang bản đồ đường' : 'Chuyển sang ảnh vệ tinh'}
               className="cl-press h-[31px] w-[31px] overflow-hidden rounded-full border-2 border-white bg-slate-200 bg-cover bg-center shadow-[0_1px_5px_rgba(0,0,0,.35)]"

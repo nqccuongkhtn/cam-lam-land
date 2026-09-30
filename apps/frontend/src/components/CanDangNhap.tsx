@@ -12,7 +12,9 @@ import QuangCaoDichVu from '@/components/QuangCaoDichVu';
  * Bọc trong layout.tsx của từng công cụ → mở thẳng đường dẫn (/pdf, /qr…) hay mở trong khung Tiện ích
  * đều bị chặn như nhau. Chưa đăng nhập thì KHÔNG dựng công cụ chút nào (không tải dữ liệu, không chạy mã).
  */
-export default function CanDangNhap({ ten, children }: { ten?: string; children: React.ReactNode }) {
+// trongKhung: đang nằm trong khung /tien-ich (HubShell) → tự CUỘN BÊN TRONG khung, không đẩy cả trang cuộn theo
+// (lỗi 30/9/2026: quảng cáo dài hơn khung làm cả trang trôi, ô đăng nhập mất khỏi màn hình, đáy hở khoảng xám).
+export default function CanDangNhap({ ten, trongKhung = false, children }: { ten?: string; trongKhung?: boolean; children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const { openLogin } = useLoginGate();
   const daHoi = useRef(false);
@@ -33,9 +35,8 @@ export default function CanDangNhap({ ten, children }: { ten?: string; children:
       </div>
     );
   }
-  // h-full + tự cuộn: trong khung /tien-ich chỗ này có chiều cao cố định, thêm khối quảng cáo là phải cuộn được.
   return (
-    <div className="h-full overflow-y-auto">
+    <div className={trongKhung ? 'absolute inset-0 overflow-y-auto overscroll-contain' : ''}>
     {/* Ô mời đăng nhập = MẪU 32 chủ dự án chọn 30/9/2026 (thay mẫu 16): thẻ nền trắng VIỀN ĐỎ 2px, ô khoá đỏ
         (ruy băng "MIỄN PHÍ" ở góc đã bỏ theo ý chủ dự án 30/9/2026) · "… cần đăng nhập" · nút đỏ trên một hàng.
         DÍNH TRÊN ĐẦU khi kéo (sticky) để lúc nào cũng thấy — chủ dự án 30/9/2026. Vì dính nên điện thoại

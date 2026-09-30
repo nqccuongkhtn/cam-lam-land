@@ -248,7 +248,7 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
               <button onClick={() => setBiChan(null)} aria-label="Đóng" className="ml-auto text-amber-700">✕</button>
             </div>
           )}
-          <div className="relative flex-1 min-h-0 bg-white">
+          <div className="relative flex-1 min-h-0 overflow-hidden bg-white">
             {loading && user && (
               <div className="absolute inset-0 grid place-items-center bg-white z-10 pointer-events-none">
                 <div className="flex flex-col items-center gap-2 text-slate-400">
@@ -258,7 +258,7 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
               </div>
             )}
             {/* Lớp bảo mật 1: chưa đăng nhập thì KHÔNG nạp khung công cụ — hiện ô mời đăng nhập ngay tại chỗ. */}
-            <CanDangNhap ten={cur.name}>
+            <CanDangNhap ten={cur.name} trongKhung>
               <iframe ref={iframeRef} key={`${cur.key}-${reloadN}`} src={withEmbed(cur.path)} title={cur.name} onLoad={onFrameLoad} allow="fullscreen"
                 className="w-full h-full block" style={{ border: 0 }} />
             </CanDangNhap>

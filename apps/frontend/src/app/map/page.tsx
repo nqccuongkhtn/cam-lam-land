@@ -1922,7 +1922,7 @@ export default function MapPage() {
       <div className="flex flex-1 min-h-0 relative lg:contents">
         {panelOpen && <div className="lg:hidden absolute inset-0 bg-black/30 z-20" onClick={() => setPanelOpen(false)} />}
 
-        <aside className={`${panelOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-200 absolute lg:static lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:min-h-0 lg:w-auto inset-y-0 left-0 z-30 w-72 max-w-[82%] shrink-0 bg-white border-r border-slate-200 overflow-y-auto scroll-soft p-4 shadow-xl lg:shadow-none`}>
+        <aside className={`${panelOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-200 absolute lg:static lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:min-h-0 lg:w-auto lg:max-w-none inset-y-0 left-0 z-30 w-72 max-w-[82%] shrink-0 bg-white border-r border-slate-200 overflow-y-auto scroll-soft p-4 shadow-xl lg:shadow-none`}>
           <div className="flex items-center justify-between mb-1">
             <h2 className="font-bold">Lớp Q.Hoạch</h2>
             <button onClick={() => setPanelOpen(false)} className="lg:hidden text-slate-400 hover:text-slate-700 text-xl leading-none">✕</button>

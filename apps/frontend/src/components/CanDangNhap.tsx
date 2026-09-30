@@ -37,21 +37,22 @@ export default function CanDangNhap({ ten, children }: { ten?: string; children:
   return (
     <div className="h-full overflow-y-auto">
     {/* Ô mời đăng nhập = MẪU 32 chủ dự án chọn 30/9/2026 (thay mẫu 16): thẻ nền trắng VIỀN ĐỎ 2px, ruy băng
-        "MIỄN PHÍ" xanh đậm chéo ở góc phải, ô khoá đỏ · tiêu đề "Mở khoá …" · nút đỏ trên một hàng.
-        Điện thoại: xếp dọc căn giữa, nút rộng hết ô. */}
-    <div className="mx-auto max-w-7xl px-3 pt-4 sm:px-6 sm:pt-6">
-      <div className="relative overflow-hidden rounded-lg border-2 border-[#d42a2a] bg-white px-4 pb-3.5 pt-4">
-        <span className="absolute -right-[30px] top-2.5 rotate-[35deg] bg-[#0A2540] px-[34px] py-[3px] text-[10px] font-extrabold tracking-[.08em] text-white">MIỄN PHÍ</span>
-        <div className="flex flex-col items-stretch gap-2.5 pt-1.5 text-center sm:flex-row sm:items-center sm:gap-3.5 sm:pr-10 sm:pt-0 sm:text-left">
-          <div className="mx-auto grid h-11 w-11 shrink-0 place-items-center rounded-[10px] bg-[#d42a2a] text-white sm:mx-0">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10.5" rx="2.2" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></svg>
+        "MIỄN PHÍ" xanh đậm chéo ở góc phải, ô khoá đỏ · "… cần đăng nhập" · nút đỏ trên một hàng.
+        DÍNH TRÊN ĐẦU khi kéo (sticky) để lúc nào cũng thấy — chủ dự án 30/9/2026. Vì dính nên điện thoại
+        cũng để MỘT HÀNG NGANG gọn (xếp dọc cao ~190px sẽ che mất gần 1/3 màn hình). */}
+    <div className="sticky top-0 z-30 mx-auto max-w-7xl bg-white/95 px-3 pb-2 pt-3 backdrop-blur sm:px-6 sm:pt-4">
+      <div className="relative overflow-hidden rounded-lg border-2 border-[#d42a2a] bg-white px-3 py-2.5 sm:px-4 sm:py-3.5">
+        <span className="absolute -right-[30px] top-2 rotate-[35deg] bg-[#0A2540] px-[34px] py-[2px] text-[9px] font-extrabold tracking-[.08em] text-white sm:top-2.5 sm:py-[3px] sm:text-[10px]">MIỄN PHÍ</span>
+        <div className="flex items-center gap-2.5 pr-7 sm:gap-3.5 sm:pr-10">
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[9px] bg-[#d42a2a] text-white sm:h-11 sm:w-11 sm:rounded-[10px]">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10.5" rx="2.2" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></svg>
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-[15px] font-extrabold leading-snug text-[#d42a2a]">{ten || 'Tiện ích'} cần đăng nhập</h1>
-            <p className="mt-0.5 text-[12.5px] leading-relaxed text-slate-600">Tài khoản miễn phí — đăng ký chỉ mất 30 giây.</p>
+            <h1 className="text-[13.5px] font-extrabold leading-snug text-[#d42a2a] sm:text-[15px]">{ten || 'Tiện ích'} cần đăng nhập</h1>
+            <p className="mt-0.5 text-[11.5px] leading-snug text-slate-600 sm:text-[12.5px]">Tài khoản miễn phí — đăng ký chỉ mất 30 giây.</p>
           </div>
           <button onClick={() => openLogin({ reason: lyDo })}
-            className="h-[38px] shrink-0 rounded-md bg-[#d42a2a] px-[18px] text-[13px] font-bold text-white active:scale-[.98]">Đăng nhập</button>
+            className="h-9 shrink-0 rounded-md bg-[#d42a2a] px-3 text-[12.5px] font-bold text-white active:scale-[.98] sm:h-[38px] sm:px-[18px] sm:text-[13px]">Đăng nhập</button>
         </div>
       </div>
     </div>

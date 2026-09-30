@@ -48,7 +48,7 @@ export default function CanDangNhap({ ten, children }: { ten?: string; children:
           </div>
           <div className="min-w-0 flex-1">
             <h1 className="text-[15px] font-extrabold leading-snug text-[#d42a2a]">Mở khoá {ten || 'tiện ích'}</h1>
-            <p className="mt-0.5 text-[12.5px] leading-relaxed text-slate-600">Đăng nhập để dùng toàn bộ tiện ích. Chưa có tài khoản thì đăng ký miễn phí trước, rồi đăng nhập.</p>
+            <p className="mt-0.5 text-[12.5px] leading-relaxed text-slate-600">Vui lòng đăng nhập để sử dụng đầy đủ tiện ích. Chưa có tài khoản? Đăng ký miễn phí chỉ trong 30 giây.</p>
           </div>
           <button onClick={() => openLogin({ reason: lyDo })}
             className="h-[38px] shrink-0 rounded-md bg-[#d42a2a] px-[18px] text-[13px] font-bold text-white active:scale-[.98]">Đăng nhập</button>

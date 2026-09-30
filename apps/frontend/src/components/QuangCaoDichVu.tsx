@@ -11,7 +11,7 @@ import LegalConsultCTA from '@/components/LegalConsultCTA';
 export default function QuangCaoDichVu({ moc = true }: { moc?: boolean }) {
   return (
     <div className="mx-auto max-w-7xl px-3 pb-6 sm:px-6 sm:pb-8">
-      <ServicesSection className="mt-4" moc={moc} />
+      <ServicesSection className="mt-2" moc={moc} gon />
       <LegalConsultCTA topic="Dịch vụ pháp lý (khách chưa đăng nhập ở Tiện ích)" className="mt-4" />
     </div>
   );

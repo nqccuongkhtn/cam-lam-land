@@ -40,7 +40,9 @@ const SERVICES: [string, string, string][] = [
 ];
 
 // moc=false: không gắn mốc #dich-vu-phap-ly (khi trang có HAI bản của khối này, tránh trùng mốc).
-export default function ServicesSection({ className = '', moc = true }: { className?: string; moc?: boolean }) {
+// gon=true: bản THU NHỎ dưới ô "… cần đăng nhập" của Tiện ích (chủ dự án 30/9/2026: "hơi to, phải kéo xuống") —
+// lưới ảnh hẹp lại (máy tính 3 thẻ trong khung ~896px thay vì cả bề rộng), tiêu đề nhỏ, bỏ đoạn giới thiệu.
+export default function ServicesSection({ className = '', moc = true, gon = false }: { className?: string; moc?: boolean; gon?: boolean }) {
   /* Khai báo có cấu trúc: nói cho máy tìm kiếm biết đây là DANH SÁCH DỊCH VỤ,
      chứ không phải mấy tấm ảnh rời. Nhờ vậy Google có thể hiện thẳng tên dịch vụ
      trong kết quả tìm kiếm. */
@@ -62,17 +64,17 @@ export default function ServicesSection({ className = '', moc = true }: { classN
   };
 
   return (
-    <section id={moc ? 'dich-vu-phap-ly' : undefined} className={`scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 ${className}`}>
+    <section id={moc ? 'dich-vu-phap-ly' : undefined} className={`scroll-mt-24 rounded-2xl border border-slate-200 bg-white ${gon ? 'p-3 sm:p-4' : 'p-4 sm:p-6'} ${className}`}>
       <script type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(duLieuCoCauTruc) }} />
 
       <div className="text-center">
-        <h2 className="text-xl sm:text-2xl font-extrabold uppercase tracking-tight text-[#0A2540]">Dịch vụ của chúng tôi</h2>
+        <h2 className={`${gon ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl'} font-extrabold uppercase tracking-tight text-[#0A2540]`}>Dịch vụ của chúng tôi</h2>
         <p className="mt-1 text-[13px] sm:text-sm font-bold text-[#C8A14B]">Nhanh chóng · Chính xác · Uy tín · Trách nhiệm</p>
-        <p className="mx-auto mt-2 max-w-2xl text-[13px] sm:text-sm text-slate-500">Cam Lâm Land hỗ trợ trọn gói thủ tục pháp lý và hồ sơ đất đai tại Cam Lâm – Khánh Hòa, giúp bạn giao dịch an toàn, nhanh gọn, đúng luật.</p>
+        <p className={`mx-auto mt-2 max-w-2xl text-[13px] sm:text-sm text-slate-500 ${gon ? 'hidden' : ''}`}>Cam Lâm Land hỗ trợ trọn gói thủ tục pháp lý và hồ sơ đất đai tại Cam Lâm – Khánh Hòa, giúp bạn giao dịch an toàn, nhanh gọn, đúng luật.</p>
       </div>
 
-      <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-3">
+      <div className={gon ? 'mx-auto mt-3 grid max-w-4xl grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3' : 'mt-4 sm:mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-3'}>
         {SERVICES.map(([f, ten, mo]) => (
           <div key={f} className="group overflow-hidden rounded-2xl ring-1 ring-slate-100 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-slate-200">
             {/* eslint-disable-next-line @next/next/no-img-element */}

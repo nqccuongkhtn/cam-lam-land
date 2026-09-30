@@ -1883,17 +1883,19 @@ export default function MapPage() {
   return (
     // Cao = màn hình − thanh trên (56px) − phần TAI THỎ phía trên (thanh trên có đệm vùng an toàn).
     // Trước chỉ trừ 56px nên trên iPhone trang DƯ ra đúng phần tai thỏ → còn chỗ để trượt.
-    <div className="flex flex-col h-[calc(100dvh-56px-env(safe-area-inset-top))] overflow-hidden mb-[calc(-48px-env(safe-area-inset-bottom))] md:mb-0"
+    <div className="flex flex-col h-[calc(100dvh-56px-env(safe-area-inset-top))] overflow-hidden mb-[calc(-48px-env(safe-area-inset-bottom))] md:mb-0 lg:grid lg:grid-cols-[18rem_minmax(0,1fr)] lg:grid-rows-[auto_minmax(0,1fr)]"
       style={menuDo ? ({ '--menu-de': menuDo.de + 'px', '--menu-cao': menuDo.cao + 'px' } as React.CSSProperties) : undefined}>
+      {/* MÁY TÍNH (lg+) xếp dạng LƯỚI 2 cột (30/9/2026, chủ dự án đề xuất): bảng lớp bên trái chạy SUỐT từ trên xuống
+        (lấp ô trống cũ phía trên nó), thanh công cụ chỉ nằm trên phần bản đồ. Điện thoại giữ nguyên cột dọc.
+        Thân trang dùng lg:contents để bảng lớp + bản đồ thành ô của lưới này. */}
       {/* Toolbar tra cứu quy hoạch — dính cố định; desktop đầy đủ, mobile gọn theo nhóm */}
-      <div className="bg-white border-b border-slate-200 shrink-0 z-20">
+      <div className="bg-white border-b border-slate-200 shrink-0 z-20 lg:col-start-2 lg:row-start-1">
         {/* MÁY TÍNH (lg+): một hàng đầy đủ, tự xuống dòng khi hẹp */}
         <div className="hidden lg:flex items-center gap-x-3 gap-y-2 px-4 py-2.5 flex-wrap">
           {/* Nút đổi nền (Đường/Vệ tinh) + thanh độ mờ đã dời ra CỘT NÚT BÊN PHẢI bản đồ y như điện thoại
               (chủ dự án 30/9/2026: "cho gọn"). Ở đây chỉ còn "Nhãn & đường".
-              Ô GIỮ CHỖ rộng đúng bằng chỗ cũ (khối nền 205px + khoảng cách + "Nhãn & đường") để cụm tra cứu
-              Số tờ/thửa → Tra cứu đứng NGUYÊN VỊ TRÍ như trước — bỏ ô này là cả cụm bị kéo lệch sang trái. */}
-          <div className="flex w-[327px] shrink-0 justify-end">{labelsCtrl()}</div>
+              Ô trống chỗ khối nền cũ nay được BẢNG LỚP bên trái kéo lên lấp (xem lưới ở thẻ ngoài cùng). */}
+          {labelsCtrl()}
           <span className="h-5 w-px bg-slate-200" />
           {searchCtrl()}
           <span className="h-5 w-px bg-slate-200" />
@@ -1917,10 +1919,10 @@ export default function MapPage() {
       </div>
 
       {/* Body */}
-      <div className="flex flex-1 min-h-0 relative">
+      <div className="flex flex-1 min-h-0 relative lg:contents">
         {panelOpen && <div className="lg:hidden absolute inset-0 bg-black/30 z-20" onClick={() => setPanelOpen(false)} />}
 
-        <aside className={`${panelOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-200 absolute lg:static inset-y-0 left-0 z-30 w-72 max-w-[82%] shrink-0 bg-white border-r border-slate-200 overflow-y-auto scroll-soft p-4 shadow-xl lg:shadow-none`}>
+        <aside className={`${panelOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-200 absolute lg:static lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:min-h-0 lg:w-auto inset-y-0 left-0 z-30 w-72 max-w-[82%] shrink-0 bg-white border-r border-slate-200 overflow-y-auto scroll-soft p-4 shadow-xl lg:shadow-none`}>
           <div className="flex items-center justify-between mb-1">
             <h2 className="font-bold">Lớp Q.Hoạch</h2>
             <button onClick={() => setPanelOpen(false)} className="lg:hidden text-slate-400 hover:text-slate-700 text-xl leading-none">✕</button>
@@ -2027,7 +2029,7 @@ export default function MapPage() {
           <p className="text-xs text-slate-400 mt-4">💡 Nhấp vào bản đồ để xem toạ độ + lưu sản phẩm + tra cứu thửa/quy hoạch.</p>
         </aside>
 
-        <div ref={khungBanDoRef} className="relative flex-1">
+        <div ref={khungBanDoRef} className="relative flex-1 lg:col-start-2 lg:row-start-2 lg:min-h-0">
           <MapView layers={geoLayers} overlays={overlays} markers={allMarkers} baseMap={baseMap} labels={labels} measureMode={measure}
             focusPoint={focusPoint} flyToPoint={flyPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} onViewport={onViewport} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={1} fitTo={fitTo} textLabels={textLabels}
             routes={dirTuyen} onPickRoute={setDirChon} diaChinhTiles={dcTiles} />

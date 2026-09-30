@@ -18,7 +18,7 @@ export default function CanDangNhap({ ten, trongKhung = false, children }: { ten
   const { user, loading } = useAuth();
   const { openLogin } = useLoginGate();
   const daHoi = useRef(false);
-  const lyDo = `Đăng nhập để dùng ${ten ? `"${ten}"` : 'tiện ích này'} — miễn phí, chỉ mất vài giây.`;
+  const lyDo = `Đăng nhập để dùng ${ten ? `tiện ích ${ten}` : 'tiện ích này'} — miễn phí, chỉ mất vài giây.`;
 
   // Tự bật cửa sổ đăng nhập MỘT lần (chờ tải xong tài khoản, không thì người đã đăng nhập cũng bị bật lên trong tích tắc).
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function CanDangNhap({ ten, trongKhung = false, children }: { ten
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10.5" rx="2.2" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></svg>
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-[13.5px] font-extrabold leading-snug text-[#d42a2a] sm:text-[15px]">{ten || 'Tiện ích'} cần đăng nhập</h1>
+            <h1 className="text-[13.5px] font-extrabold leading-snug text-[#d42a2a] sm:text-[15px]">{ten ? `Tiện ích ${ten}` : 'Tiện ích này'} cần đăng nhập</h1>
             <p className="mt-0.5 text-[11.5px] leading-snug text-slate-600 sm:text-[12.5px]">Tài khoản miễn phí — đăng ký chỉ mất 30 giây.</p>
           </div>
           <button onClick={() => openLogin({ reason: lyDo })}

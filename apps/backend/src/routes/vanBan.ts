@@ -294,8 +294,8 @@ async function resolvePdf(link: string): Promise<string | null> {
   } catch { return null; }
 }
 
-// ── GET / (danh sách) — CÔNG KHAI (ai cũng xem được trích yếu); chỉ TẢI mới cần đăng nhập ──
-vanBanRouter.get('/', async (_req, res) => {
+// ── GET / (danh sách) — PHẢI ĐĂNG NHẬP (tiện ích lớp 1, 30/9/2026; trước đây công khai) ──
+vanBanRouter.get('/', authRequired, async (_req, res) => {
   try {
     const rows = await query(`
       SELECT id, so_hieu AS "soKyHieu", trich_yeu AS "trichYeu",
@@ -304,7 +304,7 @@ vanBanRouter.get('/', async (_req, res) => {
              luot_tai AS "luotTai", noi_bat AS "noiBat",
              (link_goc IS NOT NULL AND link_goc <> '') AS "coFile"
       FROM van_ban ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 8000`);
-    res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=1800'); // metadata (không nội dung nặng) — cache CDN 5' cho nhẹ tải
+    res.set('Cache-Control', 'private, max-age=300'); // chỉ trình duyệt của chính người đã đăng nhập giữ — không cho CDN/nginx phát cho người khác
     res.json({ docs: rows });
   } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
 });

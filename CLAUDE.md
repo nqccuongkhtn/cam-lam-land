@@ -716,6 +716,13 @@ vì nó không đi qua cấu hình nên lại lệch thang.
 
 ## Bảo mật & IP thật (rà soát 29/9/2026)
 
+**Tiện ích bảo mật 2 lớp (30/9/2026).** Lớp 1: MỌI công cụ tiện ích phải đăng nhập — mỗi thư mục công cụ
+có `layout.tsx` bọc `components/CanDangNhap.tsx`, khung `/tien-ich` (`HubShell`) cũng bọc khung nhúng bằng nó.
+Máy chủ chặn thêm: `/api/pdftools`, `/api/qr`, `GET /api/van-ban` cần đăng nhập (401). Lớp 2 giữ nguyên
+(danh sách nóng, mã xác thực, tra cứu luật theo vai trò). ⚠️ Chặn ở giao diện KHÔNG giấu được chữ viết
+cứng trong trang (cẩm nang, bảng giá đất vẫn nằm trong mã HTML) — dữ liệu thật sự cần giấu phải để sau API
+có `authRequired`. Các trang này đã bỏ khỏi `sitemap.ts`. Thêm công cụ mới thì nhớ tạo `layout.tsx` y hệt.
+
 - **IP thật của khách:** tunnel nằm trong mạng riêng `duong_ham` với địa chỉ CỐ ĐỊNH `172.31.253.2`
   (`docker-compose.tunnel.yml`); nginx chỉ tin `CF-Connecting-IP` từ đúng địa chỉ đó (`set_real_ip_from`)
   rồi GHI ĐÈ `X-Forwarded-For`/`X-Real-IP`/`CF-Connecting-IP` bằng `$remote_addr`. Trước đó backend thấy

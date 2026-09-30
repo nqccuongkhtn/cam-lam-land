@@ -8,6 +8,7 @@ import { waitForDb, query } from './lib/db.ts';
 import { ensureAdmin } from './lib/ensureAdmin.ts';
 import { bootstrap } from './lib/bootstrap.ts';
 import { migrate } from './lib/migrate.ts';
+import { authRequired } from './middleware/auth.ts';
 import { authRouter } from './routes/auth.ts';
 import { passkeyRouter } from './routes/passkey.ts';
 import { listingsRouter } from './routes/listings.ts';
@@ -131,7 +132,7 @@ app.use('/api/parcels', rateLimit({ windowMs: 60 * 1000, max: 150, key: 'thua',
 app.use('/api/imports', importsRouter);
 app.use('/api/images', imagesRouter);
 app.use('/api/admin', adminRouter);
-app.use('/api/qr', qrRouter);
+app.use('/api/qr', authRequired, qrRouter); // Tiện ích — lớp bảo mật 1: phải đăng nhập
 app.use('/api/map-ads', mapAdsRouter);
 app.use('/api/partners', partnersRouter);
 app.use('/api/logo-le', logoLeRouter); // LỊCH ĐỔI LOGO NGÀY LỄ (dùng tạm — dễ gỡ)
@@ -158,7 +159,7 @@ app.use('/api/hotlist', hotlistRouter); // ĐẤT NÓNG (dùng tạm — dễ g�
 // Chỉ đường: 120 lượt/10 phút cho mỗi máy — đủ dùng thoải mái, chặn kẻ quét hàng loạt làm máy tìm đường miễn phí chặn IP của ta.
 app.use('/api/do-cao', doCaoRouter); // TRA ĐỘ CAO MẶT ĐẤT (dùng tạm — dễ gỡ)
 app.use('/api/chi-duong', rateLimit({ windowMs: 10 * 60 * 1000, max: 120, key: 'chiduong', message: 'Bạn tìm đường quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), chiDuongRouter); // CHỈ ĐƯỜNG NHIỀU TUYẾN (dùng tạm — dễ gỡ)
-app.use('/api/pdftools', rateLimit({ windowMs: 10 * 60 * 1000, max: 12, key: 'pdftools', message: 'Bạn dùng công cụ PDF máy chủ quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), pdftoolsRouter); // 12 lần/10 phút: công cụ này không cần đăng nhập mà rất nặng máy // CÔNG CỤ PDF máy chủ (dùng tạm — dễ gỡ)
+app.use('/api/pdftools', rateLimit({ windowMs: 10 * 60 * 1000, max: 12, key: 'pdftools', message: 'Bạn dùng công cụ PDF máy chủ quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }), authRequired, pdftoolsRouter); // 12 lần/10 phút + PHẢI ĐĂNG NHẬP (tiện ích lớp 1, 30/9/2026) vì rất nặng máy // CÔNG CỤ PDF máy chủ (dùng tạm — dễ gỡ)
 // ĐẶT TRƯỚC bộ hạn chế của /api/danh-muc: đường /api/danh-muc/upload là chỗ MÁY tự đẩy file lên kho,
 // đẩy vài chục file một lượt là chuyện thường — dùng chung mức 20 lần/10 phút của việc chạy AI thì tắc ngay.
 app.use('/api/danh-muc', rateLimit({ windowMs: 10 * 60 * 1000, max: 300, key: 'khoupload', message: 'Tải file lên kho quá nhiều lần. Đợi ít phút rồi thử lại.' }), khoUploadRouter);

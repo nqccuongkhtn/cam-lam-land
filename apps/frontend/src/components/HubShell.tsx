@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { toolIconSvg as iconSvg } from '@/lib/toolIcons';
 import { useAuth, coVaiTro } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
+import CanDangNhap from '@/components/CanDangNhap';
 
 // `vaiTro`: chỉ những tài khoản mang một trong các vai trò này mới THẤY công cụ.
 // Bỏ trống = ai cũng thấy. (Khác với `login` — cái đó chỉ nhắc phải đăng nhập.)
@@ -248,7 +249,7 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
             </div>
           )}
           <div className="relative flex-1 min-h-0 bg-white">
-            {loading && (
+            {loading && user && (
               <div className="absolute inset-0 grid place-items-center bg-white z-10 pointer-events-none">
                 <div className="flex flex-col items-center gap-2 text-slate-400">
                   <div className="w-8 h-8 border-[3px] border-slate-200 border-t-[#0A2540] rounded-full animate-spin" />
@@ -256,8 +257,11 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
                 </div>
               </div>
             )}
-            <iframe ref={iframeRef} key={`${cur.key}-${reloadN}`} src={withEmbed(cur.path)} title={cur.name} onLoad={onFrameLoad} allow="fullscreen"
-              className="w-full h-full block" style={{ border: 0 }} />
+            {/* Lớp bảo mật 1: chưa đăng nhập thì KHÔNG nạp khung công cụ — hiện ô mời đăng nhập ngay tại chỗ. */}
+            <CanDangNhap ten={cur.name}>
+              <iframe ref={iframeRef} key={`${cur.key}-${reloadN}`} src={withEmbed(cur.path)} title={cur.name} onLoad={onFrameLoad} allow="fullscreen"
+                className="w-full h-full block" style={{ border: 0 }} />
+            </CanDangNhap>
 
           </div>
         </div>

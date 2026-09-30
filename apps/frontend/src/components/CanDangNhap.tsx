@@ -41,7 +41,9 @@ export default function CanDangNhap({ ten, children }: { ten?: string; children:
         DÍNH TRÊN ĐẦU khi kéo (sticky) để lúc nào cũng thấy — chủ dự án 30/9/2026. Vì dính nên điện thoại
         cũng để MỘT HÀNG NGANG gọn (xếp dọc cao ~190px sẽ che mất gần 1/3 màn hình). */}
     <div className="sticky top-0 z-30 mx-auto max-w-7xl bg-white/95 px-3 pb-2 pt-3 backdrop-blur sm:px-6 sm:pt-4">
-      <div className="relative overflow-hidden rounded-lg border-2 border-[#d42a2a] bg-white px-3 py-2.5 sm:px-4 sm:py-3.5">
+      {/* Hiệu ứng CHỚP NHẸ thu hút ánh nhìn (chủ dự án 30/9/2026): viền đỏ toả sáng nhẹ theo nhịp (cl-chop-vien)
+          + vệt sáng lướt qua nút Đăng nhập (cl-shine, dùng chung với quảng cáo tin tức). Tắt khi máy bật "giảm chuyển động". */}
+      <div className="cl-chop-vien relative overflow-hidden rounded-lg border-2 border-[#d42a2a] bg-white px-3 py-2.5 sm:px-4 sm:py-3.5">
         <div className="flex items-center gap-2.5 sm:gap-3.5">
           <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[9px] bg-[#d42a2a] text-white sm:h-11 sm:w-11 sm:rounded-[10px]">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10.5" rx="2.2" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></svg>
@@ -51,7 +53,10 @@ export default function CanDangNhap({ ten, children }: { ten?: string; children:
             <p className="mt-0.5 text-[11.5px] leading-snug text-slate-600 sm:text-[12.5px]">Tài khoản miễn phí — đăng ký chỉ mất 30 giây.</p>
           </div>
           <button onClick={() => openLogin({ reason: lyDo })}
-            className="h-9 shrink-0 rounded-md bg-[#d42a2a] px-3 text-[12.5px] font-bold text-white active:scale-[.98] sm:h-[38px] sm:px-[18px] sm:text-[13px]">Đăng nhập</button>
+            className="relative h-9 shrink-0 overflow-hidden rounded-md bg-[#d42a2a] px-3 text-[12.5px] font-bold text-white active:scale-[.98] sm:h-[38px] sm:px-[18px] sm:text-[13px]">
+            <span aria-hidden className="cl-shine pointer-events-none absolute bottom-0 top-0 w-1/3 bg-white/45 blur-[3px]" />
+            <span className="relative">Đăng nhập</span>
+          </button>
         </div>
       </div>
     </div>

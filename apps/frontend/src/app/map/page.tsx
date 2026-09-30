@@ -1890,8 +1890,10 @@ export default function MapPage() {
         {/* MÁY TÍNH (lg+): một hàng đầy đủ, tự xuống dòng khi hẹp */}
         <div className="hidden lg:flex items-center gap-x-3 gap-y-2 px-4 py-2.5 flex-wrap">
           {/* Nút đổi nền (Đường/Vệ tinh) + thanh độ mờ đã dời ra CỘT NÚT BÊN PHẢI bản đồ y như điện thoại
-              (chủ dự án 30/9/2026: "cho gọn"). Ở đây chỉ còn "Nhãn & đường". */}
-          {labelsCtrl()}
+              (chủ dự án 30/9/2026: "cho gọn"). Ở đây chỉ còn "Nhãn & đường".
+              Ô GIỮ CHỖ rộng đúng bằng chỗ cũ (khối nền 205px + khoảng cách + "Nhãn & đường") để cụm tra cứu
+              Số tờ/thửa → Tra cứu đứng NGUYÊN VỊ TRÍ như trước — bỏ ô này là cả cụm bị kéo lệch sang trái. */}
+          <div className="flex w-[327px] shrink-0 justify-end">{labelsCtrl()}</div>
           <span className="h-5 w-px bg-slate-200" />
           {searchCtrl()}
           <span className="h-5 w-px bg-slate-200" />

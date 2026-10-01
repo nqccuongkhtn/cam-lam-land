@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 const ChatWidget = dynamic(() => import('./ChatWidget'), { ssr: false });
 const AiAssistant = dynamic(() => import('./AiAssistant'), { ssr: false });
 const CompareBar = dynamic(() => import('./CompareBar'), { ssr: false });
+const TheoDoiTrang = dynamic(() => import('./TheoDoiTrang'), { ssr: false }); // THEO DÕI TÀI KHOẢN (tạm — dễ gỡ)
 // Lưu ý: InstallPrompt KHÔNG hoãn ở đây — nó phải bắt sự kiện beforeinstallprompt sớm, nên giữ nạp ngay trong layout.
 
 export default function DeferredWidgets() {
@@ -14,6 +15,7 @@ export default function DeferredWidgets() {
       <ChatWidget />
       <AiAssistant />
       <CompareBar />
+      <TheoDoiTrang />
     </>
   );
 }

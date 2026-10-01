@@ -4,11 +4,12 @@
 //   chỉ admin mới xem được, sau này sẽ xoá chức năng này."
 //
 //  Cách làm: ghi lại MỖI LẦN tài khoản nằm trong danh sách theo dõi gọi máy chủ (mở công cụ, tra cứu,
-//  xem thửa, tải file…) + mỗi lần đăng nhập. (Không ghi việc chỉ mở trang mà không gọi máy chủ.)
+//  xem thửa, tải file…) + mỗi lần đăng nhập + mỗi TRANG đã mở (trình duyệt tự báo về, xem
+//  components/TheoDoiTrang.tsx — chủ dự án tự duyệt bật 1/10/2026).
 //  Tài khoản KHÔNG nằm trong danh sách thì không ghi gì cả.
 //
 //  GỠ BỎ: xoá file này + 2 dòng gắn trong index.ts (ghiHoatDong, theoDoiRouter) + 1 dòng ở routes/auth.ts
-//  (ghiSuKien đăng nhập) + trang
+//  (ghiSuKien đăng nhập) + components/TheoDoiTrang.tsx (+ 2 dòng trong DeferredWidgets.tsx) + trang
 //  app/quan-tri/theo-doi-tai-khoan + 1 mục trong app/quan-tri/page.tsx. Bảng dữ liệu xoá bằng:
 //    DROP TABLE theo_doi_hoat_dong, theo_doi_tai_khoan;
 //  (Bảng tạo ngay trong file này thay vì migrate.ts để gỡ một chỗ là sạch.)
@@ -40,7 +41,7 @@ export async function khoiTaoTheoDoi() {
       id BIGSERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL,
       luc TIMESTAMPTZ NOT NULL DEFAULT now(),
-      loai TEXT NOT NULL,              -- 'goi' (gọi máy chủ) · 'dang-nhap'
+      loai TEXT NOT NULL,              -- 'goi' (gọi máy chủ) · 'trang' (mở trang) · 'dang-nhap'
       phuong_thuc TEXT,
       duong_dan TEXT,
       ma_tra_ve INTEGER,
@@ -93,6 +94,16 @@ export function ghiHoatDong(req: AuthedRequest, res: Response, next: NextFunctio
   res.on('finish', () => ghi(Number(p.id), 'goi', req, req.method, duong, res.statusCode));
   next();
 }
+
+// Trình duyệt báo "vừa mở trang X" (components/TheoDoiTrang.tsx) — chủ dự án tự duyệt bật 1/10/2026.
+// CHỈ ghi nếu là tài khoản đang theo dõi; người khác gửi lên bị bỏ qua, không lưu gì.
+theoDoiRouter.post('/trang', (req: AuthedRequest, res) => {
+  const h = req.headers.authorization ?? '';
+  const p = h.startsWith('Bearer ') ? verifyToken(h.slice(7)) : null;
+  const trang = String((req.body as any)?.p || '').slice(0, 300);
+  if (p && dangTheoDoi.has(Number(p.id)) && trang.startsWith('/')) ghi(Number(p.id), 'trang', req, null, trang, null);
+  res.status(204).end();
+});
 
 // Những thứ ĐÃ CÓ SẴN trong dữ liệu từ trước (trước khi bật ghi chi tiết): đếm + lần gần nhất.
 const DU_LIEU_CU: [string, string, string, string][] = [

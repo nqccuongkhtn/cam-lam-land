@@ -14,6 +14,8 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import { useAuth, laAdmin, TEN_VAI_TRO } from '@/lib/auth';
+import { TIEN_ICH_TOOLS } from '@/lib/tienIchTools';
+import { GUIDES } from '@/app/cam-nang/guides';
 
 // moTa: máy chủ đã dịch sẵn lần tra cứu ra chữ, vd "Thửa 45 · Tờ 12 · Xã Cam Lâm" (xem giaiNghia trong theoDoiTk.ts).
 type HoatDong = { luc: string; loai: string; pt: string | null; duong: string; ma: number | null; ip: string; thietBi: string; moTa?: string };
@@ -73,6 +75,33 @@ function viecCua(h: HoatDong): Viec {
   return doc ? null : { ten: 'Thao tác khác' };
 }
 
+// ── Đường dẫn trang → TÊN TRANG dễ hiểu (dòng "Mở trang" do components/TheoDoiTrang.tsx báo về) ──
+const TEN_CO_DINH: [RegExp, string][] = [
+  [/^\/$/, 'Trang chủ'], [/^\/listings$/, 'Nhà đất bán / cho thuê (danh sách tin)'], [/^\/nha-dat$/, 'Nhà đất Cam Lâm (theo khu vực)'],
+  [/^\/map$/, 'Bản đồ quy hoạch'], [/^\/tin-tuc$/, 'Tin tức'], [/^\/cam-nang$/, 'Cẩm nang pháp lý'], [/^\/tien-ich$/, 'Tiện ích'],
+  [/^\/dau-tu$/, 'Đầu tư'], [/^\/dichvu$/, 'Dịch vụ / bảng giá gói'], [/^\/account/, 'Tài khoản của tôi'], [/^\/sales\/crm/, 'CRM khách hàng'],
+  [/^\/sales/, 'Tin của tôi'], [/^\/post|^\/dang-tin/, 'Đăng tin'], [/^\/quan-tri\/theo-doi/, 'Theo dõi tài khoản'], [/^\/quan-tri|^\/admin/, 'Quản trị'],
+  [/^\/login/, 'Đăng nhập'], [/^\/register/, 'Đăng ký'], [/^\/gioi-thieu/, 'Giới thiệu'], [/^\/doc-so-do/, 'Đọc sổ đỏ'],
+];
+function tenTrang(duong: string): string {
+  const [path, q = ''] = duong.split('?');
+  const p = new URLSearchParams(q);
+  if (path === '/tien-ich' && p.get('tab')) {
+    const cc = TIEN_ICH_TOOLS.find((t) => t.key === p.get('tab'));
+    return `Tiện ích · ${cc?.name || p.get('tab')}`;
+  }
+  let m = /^\/listings\/(\d+)/.exec(path); if (m) return `Xem tin nhà đất số ${m[1]}`;
+  m = /^\/cam-nang\/([^/]+)/.exec(path);
+  if (m) { const g = GUIDES.find((x) => x.slug === decodeURIComponent(m![1])); return `Cẩm nang · ${g?.title || m[1]}`; }
+  if (/^\/tin-tuc\/./.test(path)) return 'Đọc một bài tin tức';
+  if (/^\/nha-dat\/./.test(path)) return `Nhà đất · ${decodeURIComponent(path.split('/')[2]).replace(/-/g, ' ')}`;
+  if (path === '/listings' && p.get('deal') === 'rent') return 'Nhà đất cho thuê';
+  const cc = TIEN_ICH_TOOLS.find((t) => t.path && t.path === path);
+  if (cc) return `Tiện ích · ${cc.name}`;
+  for (const [re, ten] of TEN_CO_DINH) if (re.test(path)) return ten;
+  return path;
+}
+
 const TZ = { timeZone: 'Asia/Ho_Chi_Minh' } as const;
 const gio = (s: string | number) => new Date(s).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', ...TZ });
 const ngayDai = (s: string | number) => new Date(s).toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric', ...TZ });
@@ -84,7 +113,7 @@ function baoLau(ms: number) {
   return `${Math.floor(ph / 60)} giờ ${ph % 60 ? `${ph % 60} phút` : ''}`.trim();
 }
 
-type LanVao = { tu: number; den: number; may: string; ip: string; viec: Map<string, { so: number; ct: string[] }>; quanTrong: Map<string, number> };
+type LanVao = { tu: number; den: number; may: string; ip: string; viec: Map<string, { so: number; ct: string[] }>; quanTrong: Map<string, number>; trang: { luc: number; ten: string }[] };
 type Ngay = { ngay: string; lan: LanVao[]; tongMs: number; quanTrong: Map<string, number>; soViec: number };
 
 // Gom thành "các lần vào web": hai lần gọi cách nhau > 10 phút = lần vào mới.
@@ -95,10 +124,16 @@ function phanTich(ds: HoatDong[]): Ngay[] {
     const t = +new Date(h.luc);
     let cur = lan[lan.length - 1];
     if (!cur || t - cur.den > 10 * 60_000 || ngayDai(cur.den) !== ngayDai(t)) {
-      cur = { tu: t, den: t, may: h.thietBi, ip: h.ip, viec: new Map(), quanTrong: new Map() };
+      cur = { tu: t, den: t, may: h.thietBi, ip: h.ip, viec: new Map(), quanTrong: new Map(), trang: [] };
       lan.push(cur);
     }
     cur.den = t;
+    // Trang đã mở: giữ THỨ TỰ THỜI GIAN (đi trang nào trước, trang nào sau); trùng trang ngay trước thì bỏ.
+    if (h.loai === 'trang') {
+      const ten = tenTrang(h.duong);
+      if (cur.trang[cur.trang.length - 1]?.ten !== ten) cur.trang.push({ luc: t, ten });
+      continue;
+    }
     const v = viecCua(h);
     if (!v) continue;
     const ten = h.ma != null && h.ma >= 400 ? `${v.ten} (bị từ chối)` : v.ten;
@@ -233,6 +268,20 @@ export default function TheoDoiTaiKhoanPage() {
                             Lần {i + 1}: từ {gio(l.tu)} đến {gio(l.den)} <span className="font-normal text-slate-500">({baoLau(l.den - l.tu)})</span>
                           </p>
                           <p className="mt-0.5 text-[12.5px] text-slate-500">Dùng {l.may} · địa chỉ mạng {l.ip}</p>
+                          {l.trang.length > 0 && (
+                            <div className="mt-2">
+                              <p className="text-[12px] font-semibold text-slate-500">Các trang đã mở (theo thứ tự):</p>
+                              <ol className="mt-1 space-y-0.5">
+                                {l.trang.map((tr, j) => (
+                                  <li key={j} className="flex gap-2">
+                                    <span className="w-11 shrink-0 tabular-nums text-slate-400">{gio(tr.luc)}</span>
+                                    <span className="text-slate-700">{tr.ten}</span>
+                                  </li>
+                                ))}
+                              </ol>
+                            </div>
+                          )}
+                          {viec.length > 0 && l.trang.length > 0 && <p className="mt-2 text-[12px] font-semibold text-slate-500">Đã làm:</p>}
                           {viec.length ? (
                             <ul className="mt-2 space-y-1">
                               {viec.map(([ten, v]) => (
@@ -250,7 +299,7 @@ export default function TheoDoiTaiKhoanPage() {
                                 </li>
                               ))}
                             </ul>
-                          ) : <p className="mt-2 text-slate-500">Chỉ mở web để xem, <b>không bấm hay tra cứu gì</b>.</p>}
+                          ) : <p className="mt-2 text-slate-500">{l.trang.length ? 'Chỉ mở trang để xem,' : 'Chỉ mở web để xem,'} <b>không bấm hay tra cứu gì</b>.</p>}
                         </li>
                       );
                     })}

@@ -760,8 +760,9 @@ Toàn bài vẫn nằm trong trang (Google đọc được, kéo khách), ngư�
   Sai 8 lần/15 phút → khoá tạm tài khoản 15 phút. Email không tồn tại vẫn so với hash giả (thời gian như nhau).
 - **Theo dõi tài khoản (TẠM, 1/10/2026 — chủ dự án sẽ xoá sau):** `routes/theoDoiTk.ts` ghi mọi lần gọi máy chủ +
   đăng nhập của các tài khoản trong bảng `theo_doi_tai_khoan` (2 email ghi trong file) vào `theo_doi_hoat_dong`;
-  admin xem ở `/quan-tri/theo-doi-tai-khoan` (`GET /api/theo-doi/bao-cao`, chỉ admin). Không ghi việc chỉ mở trang
-  mà không gọi máy chủ. Cách gỡ ghi ở đầu `theoDoiTk.ts`.
+  admin xem ở `/quan-tri/theo-doi-tai-khoan` (`GET /api/theo-doi/bao-cao`, chỉ admin). Trang đã mở do
+  `components/TheoDoiTrang.tsx` báo về (`POST /api/theo-doi/trang`, chỉ lưu nếu là tài khoản đang theo dõi).
+  Cách gỡ ghi ở đầu `theoDoiTk.ts`.
 - **SĐT người đăng** (`/api/listings/agent/:id`) trả số ĐÃ CHE; số đủ qua `POST /agent/:id/reveal` (phải đăng nhập).
 
 ## Những chỗ hay vấp

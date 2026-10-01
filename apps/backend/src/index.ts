@@ -9,6 +9,7 @@ import { ensureAdmin } from './lib/ensureAdmin.ts';
 import { bootstrap } from './lib/bootstrap.ts';
 import { migrate } from './lib/migrate.ts';
 import { authRequired } from './middleware/auth.ts';
+import { theoDoiRouter, ghiHoatDong, khoiTaoTheoDoi } from './routes/theoDoiTk.ts'; // THEO DÕI TÀI KHOẢN (tạm — dễ gỡ)
 import { authRouter } from './routes/auth.ts';
 import { passkeyRouter } from './routes/passkey.ts';
 import { listingsRouter } from './routes/listings.ts';
@@ -82,6 +83,7 @@ app.use(securityHeaders);
 app.use(requestLogger); // ghi log request LỖI (5xx) hoặc CHẬM (>2s) ra file access-*.log
 app.use(express.json({ limit: '5mb' }));
 // PROXY TILE ẢNH VỆ TINH — đặt TRƯỚC rate-limit toàn cục (1 phiên bản đồ tải rất nhiều tile, không được tính vào giới hạn).
+app.use('/api', ghiHoatDong); // THEO DÕI TÀI KHOẢN (tạm — dễ gỡ): đặt TRƯỚC /api/dc để ghi được cả tra số tờ/thửa; chỉ ghi tài khoản trong danh sách
 app.use('/api/tiles', tilesRouter);
 // BẢN ĐỒ ĐỊA CHÍNH — cũng đặt TRƯỚC giới hạn toàn cục vì một phiên xem bản đồ tải rất nhiều ô.
 // Đường này TỰ CÓ bộ khoá chống cào riêng bên trong (vé xem + hạn mức + đo độ phủ),
@@ -93,6 +95,7 @@ app.use('/api/dc', rateLimit({ windowMs: 60 * 1000, max: 90, key: 'dc-hoi',
   message: 'Bạn tra cứu quá nhanh. Vui lòng chậm lại một chút.' }), diaChinhRouter);
 // Chống lụt yêu cầu toàn cục (rộng rãi, không cản người dùng thật).
 app.use('/api', rateLimit({ windowMs: 60 * 1000, max: Number(process.env.RATE_LIMIT_GLOBAL) || 600, key: 'global' })); // đặt RATE_LIMIT_GLOBAL cao khi ĐO TẢI
+app.use('/api/theo-doi', theoDoiRouter);   // báo cáo cho admin (THEO DÕI TÀI KHOẢN — tạm, dễ gỡ)
 
 // /api/ping — siêu nhẹ cho uptime monitor (KHÔNG đụng DB, trả 200 tức thì).
 app.get('/api/ping', (_req, res) => res.status(200).type('text/plain').send('ok'));
@@ -182,6 +185,7 @@ async function main() {
   if (process.env.BOOTSTRAP_DB === 'true') { try { await bootstrap(); } catch (e: any) { console.error('[boot] bootstrap lỗi (bỏ qua):', e?.stack || e?.message || e); } }
   try { await migrate(); } catch (e: any) { console.error('[boot] migrate lỗi (bỏ qua, server vẫn chạy):', e?.stack || e?.message || e); }
   try { await ensureAdmin(); } catch (e: any) { console.error('[boot] ensureAdmin lỗi (bỏ qua):', e?.stack || e?.message || e); }
+  try { await khoiTaoTheoDoi(); } catch (e: any) { console.error('[boot] theo dõi tài khoản lỗi (bỏ qua):', e?.message || e); } // tạm — dễ gỡ
   refreshNews(true).catch(() => {}); // lấy tin ngay khi khởi động
   // Văn bản: seed → crawl Công báo (kho đầy đủ) → quét các cổng TTĐT (bổ sung); sau đó TỰ LÀM MỚI: Công báo mỗi GIỜ, cổng TTĐT mỗi 6 giờ.
   seedVanBan().then(() => crawlCongBao(true, true)).then(() => crawlPortals()).catch(() => {}); // khởi động: backfill SÂU toàn kho (2005→nay, ~853 trang, chạy nền ~15') + quét cổng

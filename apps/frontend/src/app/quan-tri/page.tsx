@@ -12,6 +12,8 @@ const ALL: HubTool[] = [
   { key: 'invest-leads', name: 'Đăng ký góp vốn', desc: 'Lead góp vốn đầu tư (CamInvest)', icon: '📈', path: '/invest-leads', login: true },
   { key: 'map-ads', name: 'Quảng cáo bản đồ', desc: 'Vị trí quảng cáo trên bản đồ', icon: '📍', path: '/map-ads', login: true },
   { key: 'sales', name: 'Tin của tôi', desc: 'Tin đăng & sản phẩm đã lưu', icon: '🏠', path: '/sales', login: true },
+  // TẠM — dễ gỡ (1/10/2026): báo cáo hoạt động 2 tài khoản theo dõi. Không nằm trong danh sách duocDung → CHỈ admin thấy.
+  { key: 'theo-doi-tk', name: 'Theo dõi tài khoản', desc: 'Hoạt động của tài khoản đang theo dõi (chỉ admin)', icon: '🕵️', path: '/quan-tri/theo-doi-tai-khoan', login: true },
   { key: 'logo-le', name: 'Logo ngày lễ', desc: 'Lịch tự đổi logo dịp Tết, Quốc khánh, Trung thu…', icon: '🎏', path: '/quan-tri/logo-le', login: true },
 ];
 

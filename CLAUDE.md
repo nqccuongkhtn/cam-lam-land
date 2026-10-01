@@ -758,6 +758,10 @@ Toàn bài vẫn nằm trong trang (Google đọc được, kéo khách), ngư�
 - **Mật khẩu:** bcrypt độ khó 12; hash cũ (độ khó 10) vẫn đăng nhập được và **tự băm lại** khi đăng nhập đúng.
   Mật khẩu MỚI: ≥ 8 ký tự, có chữ và số, không thuộc danh sách dễ đoán (`kiemMatKhauMoi` trong `lib/auth.ts`).
   Sai 8 lần/15 phút → khoá tạm tài khoản 15 phút. Email không tồn tại vẫn so với hash giả (thời gian như nhau).
+- **Theo dõi tài khoản (TẠM, 1/10/2026 — chủ dự án sẽ xoá sau):** `routes/theoDoiTk.ts` ghi mọi lần gọi máy chủ +
+  đăng nhập của các tài khoản trong bảng `theo_doi_tai_khoan` (2 email ghi trong file) vào `theo_doi_hoat_dong`;
+  admin xem ở `/quan-tri/theo-doi-tai-khoan` (`GET /api/theo-doi/bao-cao`, chỉ admin). Không ghi việc chỉ mở trang
+  mà không gọi máy chủ. Cách gỡ ghi ở đầu `theoDoiTk.ts`.
 - **SĐT người đăng** (`/api/listings/agent/:id`) trả số ĐÃ CHE; số đủ qua `POST /agent/:id/reveal` (phải đăng nhập).
 
 ## Những chỗ hay vấp

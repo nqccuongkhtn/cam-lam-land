@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
+import { ghiSuKien } from './theoDoiTk.ts'; // THEO DÕI TÀI KHOẢN (tạm — dễ gỡ)
 import { hashPassword, verifyPassword, signToken, dsVaiTro, canNangCap, BAM_GIA, kiemMatKhauMoi, DAI_TOI_DA } from '../lib/auth.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { sendVerificationEmail, EMAIL_LIVE } from '../lib/mailer.ts';
@@ -90,6 +91,7 @@ authRouter.post('/login', async (req, res, next) => {
     }
     if (user.status === 'suspended') return res.status(403).json({ error: 'Tài khoản đã bị khoá' });
     const token = signToken({ id: user.id, email: user.email, role: user.role, roles: dsVaiTro(user) as any });
+    ghiSuKien(user.id, 'dang-nhap', req as any, 'Đăng nhập bằng mật khẩu'); // THEO DÕI TÀI KHOẢN (tạm — dễ gỡ)
     res.json({ token, user: profile(user) });
   } catch (e) { next(e); }
 });

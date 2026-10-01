@@ -1,11 +1,8 @@
 'use client';
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import Link from 'next/link';
 import InstallAppButton from './InstallAppButton';
 import { api } from '@/lib/api';
-import { fmtInt } from '@/lib/types';
-import { TIEN_ICH_TOOLS } from '@/lib/tienIchTools';
-import { locTheoQuyen } from '@/components/HubShell';
 
 const DISCOVER: [string, string][] = [
   ['Giới thiệu Cam Lâm Land', '/gioi-thieu'],
@@ -32,30 +29,6 @@ const RULES: [string, string][] = [
   ['Chính sách bảo mật', '/chinh-sach-bao-mat'],
   ['Giải quyết khiếu nại', '/giai-quyet-khieu-nai'],
 ];
-
-/* ── SỐ LIỆU ĐẦU CHÂN TRANG — CHỈ GHI SỐ THẬT ────────────────────────────────
-   ⚠️ Trước đây ghi cứng "2,000+ bất động sản · 5,000+ khách hàng · 50+ dự án · 8 năm"
-      trong khi web thật có ~60 tin, 8 dự án — chủ dự án bắt "số liệu cần hợp lý hơn" (28/9/2026).
-      Nay: số tin + số dự án LẤY THẲNG từ máy chủ, số công cụ ĐẾM từ danh sách Tiện ích,
-      64 = số xã/phường hiện hành của Khánh Hòa có bản đồ địa chính (65 − đặc khu Trường Sa).
-   ⚠️ KHÔNG đưa tổng số thửa đất ra đây: con số đó chỉ admin được thấy (chống cào — xem CLAUDE.md). */
-const SO_XA_DIA_CHINH = 64;
-const SO_CONG_CU = locTheoQuyen(TIEN_ICH_TOOLS, null).length; // chỉ đếm công cụ ai cũng thấy
-function useSoLieu() {
-  const [soTin, setSoTin] = useState<number | null>(null);
-  const [soDuAn, setSoDuAn] = useState<number | null>(null);
-  useEffect(() => {
-    api<{ areas: { count: number }[] }>('/listings/areas').then((d) => setSoTin((d.areas || []).reduce((t, a) => t + (a.count || 0), 0))).catch(() => {});
-    api<{ projects: unknown[] }>('/projects').then((d) => setSoDuAn((d.projects || []).length)).catch(() => {});
-  }, []);
-  const so = (v: number | null) => (v == null ? '—' : fmtInt(v));
-  return [
-    { n: String(SO_XA_DIA_CHINH), l: 'Xã, phường tra cứu thửa đất', d: 'M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3zM9 3v15M15 6v15' },
-    { n: so(soTin), l: 'Tin nhà đất đang bán', d: 'M3 21h18M5 21V7l6-4 6 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01' },
-    { n: so(soDuAn), l: 'Dự án đang theo dõi', d: 'M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' },
-    { n: String(SO_CONG_CU), l: 'Công cụ miễn phí', d: 'M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4 2.5-2.5z' },
-  ];
-}
 
 function Newsletter() {
   const [email, setEmail] = useState('');
@@ -89,26 +62,11 @@ function SectionTitle({ children, className = '' }: { children: ReactNode; class
 }
 
 export default function SiteFooter() {
-  const STATS = useSoLieu();
   return (
     <footer className="bg-[#0A2540] text-slate-300">
-      {/* Số liệu — 4 mục đều nhau */}
-      <div className="mx-auto max-w-7xl px-3 sm:px-4 pt-8 sm:pt-12 pb-8 sm:pb-10 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 border-b border-white/10">
-        {STATS.map((s) => (
-          <div key={s.l} className="flex items-center gap-2 sm:gap-3">
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl grid place-items-center bg-white/[0.06] border border-[#C8A14B]/40 text-[#C8A14B] shrink-0">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d={s.d} /></svg>
-            </div>
-            <div>
-              <div className="text-lg sm:text-xl md:text-2xl font-extrabold text-white leading-none">{s.n}</div>
-              <div className="text-slate-400 text-xs mt-1">{s.l}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-
+      {/* Dải số liệu (64 xã · N tin · N dự án · N công cụ) ĐÃ BỎ theo ý chủ dự án 1/10/2026. */}
       {/* 4 cột đều nhau */}
-      <div className="mx-auto max-w-7xl px-3 sm:px-4 pb-8 sm:pb-10 grid gap-x-6 sm:gap-x-8 gap-y-8 sm:gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto max-w-7xl px-3 sm:px-4 pt-8 sm:pt-12 pb-8 sm:pb-10 grid gap-x-6 sm:gap-x-8 gap-y-8 sm:gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <p className="font-extrabold text-xl text-white">Cam Lâm <span className="text-[#C8A14B]">Land</span></p>
           <p className="text-sm mt-3 text-slate-400">Nền tảng bất động sản &amp; bản đồ quy hoạch khu vực Cam Lâm, Khánh Hòa.</p>

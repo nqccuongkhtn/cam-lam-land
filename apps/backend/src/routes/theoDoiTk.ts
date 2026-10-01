@@ -113,6 +113,40 @@ const DU_LIEU_CU: [string, string, string, string][] = [
   ['import_jobs', 'created_by', 'created_at', 'Lần tải bản đồ lên'],
 ];
 
+// Dịch toạ độ / mã xã trong lần tra cứu ra chữ người đọc hiểu (chủ dự án: "tìm kiếm thửa tờ nào trên map"):
+//  · /api/parcels/at?lng=&lat= (bấm vào bản đồ) → dò thửa địa chính tại điểm đó → "Thửa X · Tờ Y · xã Z"
+//  · /api/dc/tim?xaId=…            (ô tra số tờ/thửa) → tên xã đã chọn
+// Kết quả gắn vào trường `moTa` của từng dòng. Dò tối đa 300 điểm khác nhau mỗi lần xem báo cáo cho nhẹ máy.
+async function giaiNghia(hd: any[]) {
+  const tenXa = new Map<string, string>();
+  try {
+    const xs = await query<{ xa_id: string; ten: string }>('SELECT xa_id, ten FROM dia_chinh_xa');
+    xs.forEach((x) => tenXa.set(String(x.xa_id), x.ten));
+  } catch { /* không có bảng thì thôi */ }
+  const daDo = new Map<string, string>();
+  let soLanDo = 0;
+  for (const h of hd) {
+    const [duong, q = ''] = String(h.duong || '').split('?');
+    const p = new URLSearchParams(q);
+    if (/^\/api\/dc\/tim/.test(duong)) {
+      const xa = p.get('xaId') ? tenXa.get(String(p.get('xaId'))) : '';
+      const phan = [p.get('thua') && `Thửa ${p.get('thua')}`, p.get('to') && `Tờ ${p.get('to')}`, xa].filter(Boolean);
+      if (phan.length) h.moTa = phan.join(' · ');
+    } else if (/^\/api\/parcels\/at/.test(duong)) {
+      const lng = Number(p.get('lng')), lat = Number(p.get('lat'));
+      if (!Number.isFinite(lng) || !Number.isFinite(lat)) continue;
+      const k = `${lng.toFixed(6)},${lat.toFixed(6)}`;
+      if (!daDo.has(k) && soLanDo < 300) {
+        soLanDo++;
+        const r = await query<any>(`SELECT d.so_to, d.so_thua, x.ten FROM dia_chinh d LEFT JOIN dia_chinh_xa x ON x.xa_id = d.xa_id
+                                     WHERE ST_Intersects(d.geom, ST_SetSRID(ST_Point($1, $2), 4326)) LIMIT 1`, [lng, lat]).catch(() => []);
+        daDo.set(k, r[0] ? [`Thửa ${r[0].so_thua}`, `Tờ ${r[0].so_to}`, r[0].ten].filter(Boolean).join(' · ') : `chỗ không có thửa (toạ độ ${lat.toFixed(5)}, ${lng.toFixed(5)})`);
+      }
+      if (daDo.has(k)) h.moTa = daDo.get(k);
+    }
+  }
+}
+
 theoDoiRouter.get('/bao-cao', adminRequired, async (req, res, next) => {
   try {
     const gioiHan = Math.min(Math.max(Number(req.query.n) || 1500, 100), 5000);
@@ -129,6 +163,7 @@ theoDoiRouter.get('/bao-cao', adminRequired, async (req, res, next) => {
       const hd = await query<any>(`SELECT luc, loai, phuong_thuc AS "pt", duong_dan AS "duong", ma_tra_ve AS "ma", ip, thiet_bi AS "thietBi"
                                      FROM theo_doi_hoat_dong WHERE user_id = $1 ORDER BY luc DESC LIMIT $2`, [u.id, gioiHan]);
       const [tong] = await query<any>(`SELECT count(*)::int AS so, min(luc) AS "tu" FROM theo_doi_hoat_dong WHERE user_id = $1`, [u.id]);
+      await giaiNghia(hd);
       ketQua.push({ ...u, duLieuCu: cu, hoatDong: hd, tongHoatDong: tong?.so || 0, ghiTu: tong?.tu || null });
     }
     res.set('Cache-Control', 'private, no-store');

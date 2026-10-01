@@ -22,7 +22,9 @@ import { adminRequired, type AuthedRequest } from '../middleware/auth.ts';
 export const theoDoiRouter = Router();
 
 // Hai tài khoản chủ dự án yêu cầu (tìm theo EMAIL, không ghi cứng mã số).
-const EMAIL_THEO_DOI = ['banhchuoi8833@gmail.com', 'nguyenthiminhnguyet737@gmail.com'];
+// + tài khoản admin của chủ dự án để TỰ THỬ báo cáo (1/10/2026) — thử xong muốn bỏ thì xoá email ở đây
+//   VÀ chạy: DELETE FROM theo_doi_tai_khoan WHERE user_id = (SELECT id FROM users WHERE email='cuonganh365@gmail.com');
+const EMAIL_THEO_DOI = ['banhchuoi8833@gmail.com', 'nguyenthiminhnguyet737@gmail.com', 'cuonganh365@gmail.com'];
 
 let dangTheoDoi = new Set<number>();          // mã các tài khoản đang theo dõi — nhớ trong RAM cho nhanh
 async function napDanhSach() {

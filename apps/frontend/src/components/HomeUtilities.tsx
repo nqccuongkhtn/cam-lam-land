@@ -56,8 +56,8 @@ export default function HomeUtilities() {
         {TOOLS.map((tl) => (
           <button key={tl.k} onClick={() => setOpen(tl.k)}
             className="group flex flex-col items-center gap-1.5 sm:gap-2 text-center">
-            <span className="grid h-14 w-14 place-items-center rounded-full border border-slate-200 bg-white text-2xl shadow-[0_3px_10px_rgba(15,23,42,.08)] transition group-hover:border-[#C8A14B] group-hover:shadow-md sm:h-[72px] sm:w-[72px] sm:text-3xl">{tl.icon}</span>
-            <span className="block text-[12px] font-bold leading-tight text-[#0A2540] sm:text-sm">{tl.t}</span>
+            <span className="grid h-[52px] w-[52px] place-items-center rounded-full border border-slate-200 bg-white text-[22px] shadow-[0_3px_10px_rgba(15,23,42,.08)] transition group-hover:border-[#C8A14B] group-hover:shadow-md sm:h-[72px] sm:w-[72px] sm:text-3xl">{tl.icon}</span>
+            <span className="block min-h-[2.5em] px-0.5 text-[11.5px] font-semibold leading-[1.25] text-[#0A2540] [text-wrap:balance] sm:min-h-0 sm:text-sm sm:font-bold">{tl.t}</span>
             <span className="hidden text-[11px] text-slate-400 sm:block">{tl.d}</span>
           </button>
         ))}

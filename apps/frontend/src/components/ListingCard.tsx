@@ -8,7 +8,9 @@ import { thumbUrl, NO_IMG } from '@/lib/api';
 function IPin() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="2.5" /></svg>; }
 
 
-export default function ListingCard({ l, href }: { l: Listing; href?: string }) {
+// phang: ĐIỆN THOẠI hiện kiểu thẻ PHẲNG như mẫu 54 (chủ dự án chọn 2/10/2026, dùng cho 2 tin đầu ở trang chủ):
+// bỏ khung viền + nền thẻ, ảnh cao hơn (4:3) bo góc riêng, chữ nằm ngay dưới ảnh. Máy tính vẫn là thẻ có viền.
+export default function ListingCard({ l, href, phang = false }: { l: Listing; href?: string; phang?: boolean }) {
   const [fav, setFav] = useState(false);
   const [extraViews, setExtraViews] = useState(0);
   useEffect(() => {
@@ -20,8 +22,8 @@ export default function ListingCard({ l, href }: { l: Listing; href?: string }) 
   const nImg = l.images?.length ?? 0;
   return (
     <Link href={href ?? `/listings/${l.id}`}
-      className="cl-tap group flex flex-col bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-lg hover:border-slate-300 transition duration-200">
-      <div className="relative aspect-[16/10] bg-slate-100 overflow-hidden">
+      className={`cl-tap group flex flex-col bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-lg hover:border-slate-300 transition duration-200 ${phang ? 'max-sm:overflow-visible max-sm:rounded-none max-sm:border-0 max-sm:bg-transparent max-sm:hover:shadow-none' : ''}`}>
+      <div className={`relative aspect-[16/10] bg-slate-100 overflow-hidden ${phang ? 'max-sm:aspect-[4/3] max-sm:rounded-lg' : ''}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={thumbUrl(l.images?.[0]) ?? NO_IMG} alt={l.title}
           onError={(e) => { (e.currentTarget as HTMLImageElement).src = NO_IMG; }}
@@ -33,7 +35,7 @@ export default function ListingCard({ l, href }: { l: Listing; href?: string }) 
         </div>
         {nImg > 1 && <span className="absolute bottom-2 right-2 bg-black/55 backdrop-blur text-white text-[11px] font-medium px-2 py-0.5 rounded-md">📷 {nImg}</span>}
       </div>
-      <div className="p-3 flex flex-col flex-1">
+      <div className={`p-3 flex flex-col flex-1 ${phang ? 'max-sm:px-0.5 max-sm:pb-1 max-sm:pt-2' : ''}`}>
         <h3 className={`text-[15px] font-medium line-clamp-2 leading-snug min-h-[2.6rem] group-hover:text-red-700 ${l.tier === 'diamond' ? 'text-red-600 uppercase' : 'text-slate-800'}`}>{l.title}</h3>
         <div className="mt-1.5 flex items-baseline gap-1.5 flex-wrap">
           <span className="text-red-600 font-bold text-lg leading-none">{priceLabel(l.price, l.deal)}</span>

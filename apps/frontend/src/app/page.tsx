@@ -564,7 +564,7 @@ export default function Home() {
           </div>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
-          {(expanded ? featured : featured.slice(0, 8)).map((l) => <ListingCard key={l.id} l={l} href={fromApi ? undefined : '/listings'} />)}
+          {(expanded ? featured : featured.slice(0, 8)).map((l, i) => <ListingCard key={l.id} l={l} href={fromApi ? undefined : '/listings'} phang={i < 2} />)}
         </div>
         <div className="mt-6 sm:mt-8 text-center">
           {featured.length > 8 ? (

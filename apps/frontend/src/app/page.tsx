@@ -578,6 +578,27 @@ export default function Home() {
         </div>
       </section>
 
+      {/* BẢN ĐỒ QUY HOẠCH — MẪU 5 chủ dự án chọn 2/10/2026: đưa lên NGAY SAU tin đăng (thế mạnh riêng của web),
+          dạng ẢNH RỘNG — ảnh mô hình 3D trải hết khung, chữ đè bên trái trên nền trắng mờ dần.
+          Điện thoại: ảnh ở trên, chữ ở dưới (đè chữ lên ảnh trên màn hẹp khó đọc). */}
+      <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
+        <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-white md:min-h-[360px]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/quyhoach-camlam.jpg" alt="Mô hình quy hoạch Cam Lâm" loading="lazy" decoding="async"
+            className="block h-48 w-full object-cover sm:h-64 md:absolute md:inset-0 md:h-full" />
+          <div aria-hidden className="absolute inset-0 hidden md:block" style={{ background: 'linear-gradient(90deg,#fff 0%,rgba(255,255,255,.96) 38%,rgba(255,255,255,0) 70%)' }} />
+          <div className="relative p-5 sm:p-8 md:max-w-[46%] md:p-12">
+            <span className="text-[#C8A14B] font-semibold text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] mt-2">Tra cứu quy hoạch & thửa đất chính xác</h2>
+            <p className="text-sm sm:text-base text-slate-500 mt-2 sm:mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số thửa/số tờ/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
+            <div className="mt-4 sm:mt-6 flex gap-3">
+              <Link href="/map" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-6 py-3 rounded-xl">Mở bản đồ →</Link>
+              <Link href="/qr" className="cl-press border border-slate-300 bg-white text-[#0A2540] font-semibold px-6 py-3 rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* DỰ ÁN BĐS NỔI BẬT — admin quản lý (kiểu batdongsan) */}
       <FeaturedProjects chiHien={locDuAn} boLoc={() => { setLocDuAn(null); setLoaiDA([]); setTtDA(''); }} />
 
@@ -599,25 +620,6 @@ export default function Home() {
 
       {/* DOANH NGHIỆP TIÊU BIỂU — logo carousel (kiểu batdongsan) */}
       <FeaturedPartners />
-
-      {/* PLANNING PROMO — dưới Tiện ích & Doanh nghiệp tiêu biểu */}
-      <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
-        <div className="grid md:grid-cols-2 rounded-xl sm:rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-sm">
-          <div className="p-5 sm:p-8 md:p-12 flex flex-col justify-center">
-            <span className="text-[#C8A14B] font-semibold text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] mt-2">Tra cứu quy hoạch & thửa đất chính xác</h2>
-            <p className="text-sm sm:text-base text-slate-500 mt-2 sm:mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số thửa/số tờ/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
-            <div className="mt-4 sm:mt-6 flex gap-3">
-              <Link href="/map" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-6 py-3 rounded-xl">Mở bản đồ →</Link>
-              <Link href="/qr" className="cl-press border border-slate-300 text-[#0A2540] font-semibold px-6 py-3 rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
-            </div>
-          </div>
-          <div className="bg-slate-100 flex items-center justify-center min-h-[280px] p-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/quyhoach-camlam.jpg" alt="Mô hình quy hoạch Cam Lâm" loading="lazy" decoding="async" className="w-full h-full object-contain max-h-[460px] rounded-xl" />
-          </div>
-        </div>
-      </section>
 
       {/* AD CONTACT — tế nhị */}
       {flags.services_live && (

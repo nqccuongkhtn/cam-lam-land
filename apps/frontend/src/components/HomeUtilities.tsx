@@ -50,15 +50,15 @@ export default function HomeUtilities() {
   return (
     <section className="mx-auto max-w-7xl px-3 sm:px-4 py-7 sm:py-10">
       <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-4 sm:mb-6">Hỗ trợ tiện ích</h2>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4">
+      {/* BIỂU TƯỢNG TRÒN kiểu ứng dụng (mẫu 5, chủ dự án chọn 2/10/2026): vòng tròn trắng có bóng nhẹ, tên bên dưới.
+          Điện thoại 4 cái một hàng, ẩn dòng mô tả cho gọn. */}
+      <div className="grid grid-cols-4 gap-2 sm:gap-4">
         {TOOLS.map((tl) => (
           <button key={tl.k} onClick={() => setOpen(tl.k)}
-            className="group flex items-center gap-2.5 sm:gap-3 bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 text-left hover:border-[#C8A14B] hover:shadow-md transition">
-            <span className="w-11 h-11 grid place-items-center rounded-xl bg-slate-50 text-2xl group-hover:bg-[#0A2540]/5 shrink-0">{tl.icon}</span>
-            <span className="min-w-0">
-              <span className="block font-bold text-[#0A2540] text-sm leading-tight">{tl.t}</span>
-              <span className="block text-[11px] text-slate-400 mt-0.5 truncate">{tl.d}</span>
-            </span>
+            className="group flex flex-col items-center gap-1.5 sm:gap-2 text-center">
+            <span className="grid h-14 w-14 place-items-center rounded-full border border-slate-200 bg-white text-2xl shadow-[0_3px_10px_rgba(15,23,42,.08)] transition group-hover:border-[#C8A14B] group-hover:shadow-md sm:h-[72px] sm:w-[72px] sm:text-3xl">{tl.icon}</span>
+            <span className="block text-[12px] font-bold leading-tight text-[#0A2540] sm:text-sm">{tl.t}</span>
+            <span className="hidden text-[11px] text-slate-400 sm:block">{tl.d}</span>
           </button>
         ))}
       </div>

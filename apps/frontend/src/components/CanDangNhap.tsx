@@ -27,14 +27,6 @@ export default function CanDangNhap({ ten, trongKhung = false, children }: { ten
     openLogin({ reason: lyDo });
   }, [loading, user, openLogin, lyDo]);
 
-  // Điện thoại: báo cho thanh đầu trang ẩn nút Đăng nhập trùng lặp khi ô này đang hiện (xem globals.css).
-  const hienO = !loading && !user;
-  useEffect(() => {
-    if (!hienO) return;
-    document.documentElement.classList.add('cl-co-o-dang-nhap');
-    return () => document.documentElement.classList.remove('cl-co-o-dang-nhap');
-  }, [hienO]);
-
   if (user) return <>{children}</>;
   if (loading) {
     return (

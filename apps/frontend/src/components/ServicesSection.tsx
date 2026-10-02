@@ -75,11 +75,9 @@ export default function ServicesSection({ className = '', moc = true, gon = fals
         <p className={`mx-auto mt-2 max-w-2xl text-[13px] sm:text-sm text-slate-500 ${gon ? 'hidden' : ''}`}>Cam Lâm Land hỗ trợ trọn gói thủ tục pháp lý và hồ sơ đất đai tại Cam Lâm – Khánh Hòa, giúp bạn giao dịch an toàn, nhanh gọn, đúng luật.</p>
       </div>
 
-      {/* ĐIỆN THOẠI: thẻ dịch vụ là DẢI VUỐT NGANG, mỗi thẻ ~82% bề ngang (chủ dự án 2/10/2026: lưới 2 cột
-          làm chữ in trong ảnh quá nhỏ, không đọc được). Máy tính / máy tính bảng giữ lưới như cũ. */}
-      <div className={gon ? 'mx-auto mt-3 grid max-w-4xl grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3' : `-mx-4 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3 ${nho12 ? 'sm:mx-auto sm:w-[88%]' : ''}`}>
+      <div className={gon ? 'mx-auto mt-3 grid max-w-4xl grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3' : `mt-4 sm:mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-3 ${nho12 ? 'mx-auto w-[88%]' : ''}`}>
         {SERVICES.map(([f, ten, mo]) => (
-          <div key={f} className={`group overflow-hidden rounded-2xl ring-1 ring-slate-100 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-slate-200 ${gon ? '' : 'w-[82%] shrink-0 snap-center sm:w-auto'}`}>
+          <div key={f} className="group overflow-hidden rounded-2xl ring-1 ring-slate-100 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-slate-200">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`/dichvu/${f}.png`} alt={ten} loading="lazy"
               className="block h-auto w-full transition-transform duration-500 group-hover:scale-[1.05]" />
@@ -93,7 +91,6 @@ export default function ServicesSection({ className = '', moc = true, gon = fals
           </div>
         ))}
       </div>
-      {!gon && <p className="mt-1 text-center text-[11.5px] text-slate-400 sm:hidden">Vuốt ngang để xem thêm dịch vụ →</p>}
     </section>
   );
 }

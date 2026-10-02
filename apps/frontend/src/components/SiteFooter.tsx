@@ -66,7 +66,9 @@ export default function SiteFooter() {
   return (
     // NỀN SÁNG (mẫu 34, chủ dự án chọn 2/10/2026): xanh rất nhạt #f4f7fc, chữ xám, tiêu đề xanh đậm, kẻ mảnh phía trên.
     // Trước là nền xanh đậm #0A2540 chữ trắng.
-    <footer className="border-t border-slate-200 bg-[#f4f7fc] text-slate-600">
+    // Điện thoại: <main> chừa sẵn khoảng đáy 48px cho thanh menu dưới (layout.tsx) — khoảng đó mang màu nền trang,
+    // khác màu chân trang nên nhìn như HỞ (chủ dự án 2/10/2026). Kéo chân trang phủ xuống đúng bằng khoảng đó.
+    <footer className="border-t border-slate-200 bg-[#f4f7fc] text-slate-600 max-md:-mb-[calc(48px+env(safe-area-inset-bottom))] max-md:pb-[calc(48px+env(safe-area-inset-bottom))]">
       {/* Dải số liệu (64 xã · N tin · N dự án · N công cụ) ĐÃ BỎ theo ý chủ dự án 1/10/2026. */}
       {/* 4 cột đều nhau */}
       {/* ĐIỆN THOẠI (chủ dự án 2/10/2026, theo mẫu gửi kèm): lưới 2 cột — khối thương hiệu trải hết ngang ở trên,

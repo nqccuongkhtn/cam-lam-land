@@ -162,7 +162,7 @@ export default function Home() {
   const [marketNews, setMarketNews] = useState<{ title: string; url: string; img?: string; date?: string; source?: string }[]>([]);
   const [featuredNews, setFeaturedNews] = useState<{ title: string; url: string; img?: string; date?: string; source?: string }[]>([]);
   const [marketLoading, setMarketLoading] = useState(true);
-  const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [expanded, setExpanded] = useState(false); const [newsTab, setNewsTab] = useState('Thị trường BĐS'); /* mở trang chủ là thấy TIN THỊ TRƯỜNG trước */ const [heroDeal, setHeroDeal] = useState<'sale' | 'rent' | 'project'>('sale');
+  const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [newsTab, setNewsTab] = useState('Thị trường BĐS'); /* mở trang chủ là thấy TIN THỊ TRƯỜNG trước */ const [heroDeal, setHeroDeal] = useState<'sale' | 'rent' | 'project'>('sale');
   const searchHint = useTypingHint(SEARCH_HINTS);
   const [locMo, setLocMo] = useState(false); // bảng "Lọc nâng cao" trên điện thoại
   // Điều kiện lọc THÊM chỉ có trong bảng lọc điện thoại: giá từ (tỷ), xã, diện tích (m²), sắp xếp.
@@ -566,17 +566,15 @@ export default function Home() {
           </div>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
-          {(expanded ? featured : featured.slice(0, 8)).map((l, i) => <ListingCard key={l.id} l={l} href={fromApi ? undefined : '/listings'} to={i < 2} />)}
+          {featured.slice(0, 8).map((l, i) => <ListingCard key={l.id} l={l} href={fromApi ? undefined : '/listings'} to={i < 2} />)}
         </div>
         <div className="mt-6 sm:mt-8 text-center">
-          {featured.length > 8 ? (
-            <button onClick={() => setExpanded((v) => !v)} className="inline-flex items-center gap-1.5 border border-slate-300 hover:border-[#0A2540] hover:text-[#0A2540] text-slate-600 font-semibold rounded-full px-7 py-2.5 bg-white transition">
-              {expanded ? 'Thu gọn' : 'Mở rộng'}
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6" /></svg>
-            </button>
-          ) : (
-            <Link href="/listings" className="inline-flex items-center gap-1.5 border border-slate-300 hover:border-[#0A2540] text-[#0A2540] font-semibold rounded-full px-7 py-2.5 bg-white">Xem tất cả →</Link>
-          )}
+          {/* Thay nút "Mở rộng" bằng nút sang hẳn trang tin đăng (chủ dự án 2/10/2026) — đúng theo tab đang chọn.
+              Kiểu VIỀN MẢNH nền trắng (nền đỏ đặc bị chê "hơi thô"). */}
+          <Link href={heroDeal === 'rent' ? '/listings?deal=rent' : heroDeal === 'project' ? '/du-an' : '/listings'}
+            className="cl-press inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-5 py-2 text-[13.5px] font-semibold text-[#0A2540] transition hover:border-[#0A2540] sm:px-7 sm:py-2.5 sm:text-[14px]">
+            {heroDeal === 'project' ? 'Xem tất cả dự án' : 'Xem tất cả tin đăng'} →
+          </Link>
         </div>
       </section>
 
@@ -591,13 +589,13 @@ export default function Home() {
               className="block h-32 w-full object-cover sm:h-64 md:h-full" />
             {/* HUY HIỆU "Cam Lâm Land · Hotline" — ảnh gốc có sẵn ở góc dưới phải nhưng dạng ảnh rộng bị cắt mất
                 (chủ dự án 2/10/2026) → dựng lại bằng chữ thật, đè lên góc ảnh, bấm là gọi. Giống hệt kiểu trong ảnh gốc. */}
-            <a href="tel:0988888888" className="absolute bottom-2 right-2 z-[2] flex items-center gap-2 rounded-lg bg-[#0f2236]/80 px-2.5 py-1.5 text-white shadow-lg backdrop-blur-sm sm:bottom-4 sm:right-4 sm:gap-2.5 sm:px-3 sm:py-2">
-              <span className="grid h-7 w-7 place-items-center rounded-md border border-[#C8A14B] bg-[#0A2540] text-[#C8A14B] sm:h-9 sm:w-9">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9.5h13V10" /><path d="M10 19.5v-5h4v5" /></svg>
-              </span>
+            <a href="tel:0988888888" className="absolute bottom-1.5 right-1.5 z-[2] flex items-center gap-1.5 rounded-md bg-[#0f2236]/80 px-1.5 py-1 text-white shadow-lg backdrop-blur-sm sm:bottom-4 sm:right-4 sm:gap-2.5 sm:rounded-lg sm:px-3 sm:py-2">
+              {/* ĐÚNG LOGO CỦA WEB (chữ C vàng trên nền xanh đậm) — bản đầu dùng hình ngôi nhà là sai (chủ dự án 2/10/2026). */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo-gon.webp" alt="" width={36} height={36} className="h-5 w-5 rounded sm:h-9 sm:w-9 sm:rounded-md" />
               <span className="leading-tight">
-                <b className="block text-[12.5px] sm:text-[15px]">Cam Lâm <span className="text-[#C8A14B]">Land</span></b>
-                <span className="block text-[10.5px] font-semibold sm:text-[12.5px]">Hotline <span className="text-[#C8A14B]">0988 888 888</span></span>
+                <b className="block text-[10.5px] sm:text-[15px]">Cam Lâm <span className="text-[#C8A14B]">Land</span></b>
+                <span className="block text-[9px] font-semibold sm:text-[12.5px]">Hotline <span className="text-[#C8A14B]">0988 888 888</span></span>
               </span>
             </a>
           </div>

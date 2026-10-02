@@ -49,17 +49,20 @@ export default function HomeUtilities() {
   ] as const;
   return (
     <section className="mx-auto max-w-7xl px-3 sm:px-4 py-7 sm:py-10">
-      <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-4 sm:mb-6">Hỗ trợ tiện ích</h2>
-      {/* BIỂU TƯỢNG TRÒN kiểu ứng dụng (mẫu 5, chủ dự án chọn 2/10/2026): vòng tròn trắng có bóng nhẹ, tên bên dưới.
-          Điện thoại 4 cái một hàng, ẩn dòng mô tả cho gọn. Máy tính: mỗi tiện ích nằm trong Ô TRẮNG CÓ VIỀN — để trơn
-          thì 4 vòng tròn nhỏ trôi giữa khoảng trắng rộng, "lạc quẻ" (chủ dự án 2/10/2026). */}
-      <div className="grid grid-cols-4 gap-2 sm:gap-4">
+      {/* Nhãn nhỏ "CÔNG CỤ" trên tiêu đề (học theo mẫu chủ dự án gửi 2/10/2026). */}
+      <p className="text-[10.5px] font-extrabold tracking-[.12em] text-red-600 sm:text-[11px]">CÔNG CỤ</p>
+      <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-3 sm:mb-6">Hỗ trợ tiện ích</h2>
+      {/* ĐIỆN THOẠI: lưới 2 cột, mỗi ô = biểu tượng vuông nhỏ bên trái + tên đậm + mô tả 2 dòng (theo mẫu chủ dự án gửi
+          2/10/2026 — thay cho 4 vòng tròn, đọc rõ hơn). MÁY TÍNH: ô trắng có viền, biểu tượng tròn ở giữa (mẫu 5). */}
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-4">
         {TOOLS.map((tl) => (
           <button key={tl.k} onClick={() => setOpen(tl.k)}
-            className="group flex flex-col items-center gap-1.5 sm:gap-2 text-center sm:rounded-lg sm:border sm:border-slate-200 sm:bg-white sm:px-3 sm:py-5 sm:transition sm:hover:border-[#C8A14B] sm:hover:shadow-md">
-            <span className="grid h-[52px] w-[52px] place-items-center rounded-full border border-slate-200 bg-white text-[22px] shadow-[0_3px_10px_rgba(15,23,42,.08)] transition group-hover:border-[#C8A14B] group-hover:shadow-md sm:h-[72px] sm:w-[72px] sm:text-3xl">{tl.icon}</span>
-            <span className="block min-h-[2.5em] px-0.5 text-[11.5px] font-semibold leading-[1.25] text-[#0A2540] [text-wrap:balance] sm:min-h-0 sm:text-sm sm:font-bold">{tl.t}</span>
-            <span className="hidden text-[11px] text-slate-400 sm:block">{tl.d}</span>
+            className="group flex items-start gap-2.5 rounded-lg border border-slate-200 bg-white p-2.5 text-left transition hover:border-[#C8A14B] hover:shadow-md sm:flex-col sm:items-center sm:gap-2 sm:px-3 sm:py-5 sm:text-center">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-slate-50 text-lg sm:h-[72px] sm:w-[72px] sm:rounded-full sm:border sm:border-slate-200 sm:bg-white sm:text-3xl sm:shadow-[0_3px_10px_rgba(15,23,42,.08)]">{tl.icon}</span>
+            <span className="min-w-0">
+              <span className="block text-[13px] font-bold leading-tight text-[#0A2540] sm:text-sm">{tl.t}</span>
+              <span className="mt-0.5 block line-clamp-2 text-[11px] leading-snug text-slate-400 sm:mt-1">{tl.d}</span>
+            </span>
           </button>
         ))}
       </div>

@@ -43,11 +43,13 @@ export default function ListingCard({ l, href, to = false }: { l: Listing; href?
           {l.area != null && <span className="text-slate-500 text-sm">· {l.area} m²</span>}
         </div>
         <div className="mt-1.5 flex items-center gap-1 text-[13px] text-slate-500 truncate"><IPin /> <span className="truncate">{l.ward ?? 'Cam Lâm'}, Khánh Hòa</span></div>
-        <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between">
-          <span suppressHydrationWarning className="text-xs text-slate-400 inline-flex items-center gap-1">{postedLabel(l.createdAt)} ·<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 shrink-0 ml-0.5"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>{fmtInt(displayViews(l) + extraViews)}</span>
+        {/* MỘT HÀNG: "Đăng 1 tuần trước · 👁 số xem · ♡" — điện thoại chữ nhỏ + không cho xuống dòng (chủ dự án 2/10/2026,
+            trước bị gãy thành "Đăng 1 tuần / trước ·"). */}
+        <div className="mt-2 sm:mt-2.5 pt-1.5 sm:pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
+          <span suppressHydrationWarning className="min-w-0 truncate whitespace-nowrap text-[10.5px] sm:text-xs text-slate-400 inline-flex items-center gap-0.5 sm:gap-1"><span className="sm:hidden">{postedLabel(l.createdAt).replace(/^Đăng\s*/, '')}</span><span className="hidden sm:inline">{postedLabel(l.createdAt)}</span> ·<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ml-0.5"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>{fmtInt(displayViews(l) + extraViews)}</span>
           <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setFav((v) => !v); }} aria-label="Lưu tin"
-            className={`w-8 h-8 grid place-items-center rounded-lg border transition ${fav ? 'border-red-200 text-red-500 bg-red-50' : 'border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200'}`}>
-            <svg viewBox="0 0 24 24" fill={fav ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" /></svg>
+            className={`shrink-0 w-6 h-6 sm:w-8 sm:h-8 grid place-items-center rounded-md sm:rounded-lg border transition ${fav ? 'border-red-200 text-red-500 bg-red-50' : 'border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200'}`}>
+            <svg viewBox="0 0 24 24" fill={fav ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 sm:w-4 sm:h-4"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" /></svg>
           </button>
         </div>
       </div>

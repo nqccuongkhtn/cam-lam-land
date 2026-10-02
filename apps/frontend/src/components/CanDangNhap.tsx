@@ -2,7 +2,6 @@
 import { useEffect, useRef } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
-import Link from 'next/link';
 import QuangCaoDichVu from '@/components/QuangCaoDichVu';
 
 /**
@@ -45,19 +44,11 @@ export default function CanDangNhap({ ten, trongKhung = false, children }: { ten
     <div className="sticky top-0 z-30 mx-auto max-w-7xl bg-white/95 px-3 pb-2 pt-3 backdrop-blur sm:px-6 sm:pt-4">
       {/* Hiệu ứng CHỚP NHẸ thu hút ánh nhìn (chủ dự án 30/9/2026): viền đỏ toả sáng nhẹ theo nhịp (cl-chop-vien)
           + vệt sáng lướt qua nút Đăng nhập (cl-shine, dùng chung với quảng cáo tin tức). Tắt khi máy bật "giảm chuyển động". */}
-      {/* ĐIỆN THOẠI = MẪU 4 chủ dự án chọn 2/10/2026 (ô D): dải báo nhẹ nền hồng, KHÔNG có nút đỏ trong ô (trùng
-          với nút Đăng nhập trên menu, đứng sát nhau nhìn rối). Chữ "Đăng nhập" trong câu vẫn bấm được. */}
-      <div className="cl-chop-vien rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 sm:hidden">
-        <p className="text-[13px] font-extrabold leading-snug text-[#d42a2a]">🔒 {ten ? `Tiện ích ${ten}` : 'Tiện ích này'} cần đăng nhập</p>
-        <p className="mt-1 text-[12px] leading-snug text-slate-600">
-          Đã có tài khoản thì bấm <button type="button" onClick={() => openLogin({ reason: lyDo })} className="font-bold text-[#0A2540] underline underline-offset-2">Đăng nhập</button> ở trên.
-          {' '}Chưa có? <Link href="/register" className="font-bold text-[#d42a2a] underline underline-offset-2">Đăng ký miễn phí</Link>
-        </p>
-      </div>
-      {/* MÁY TÍNH: giữ thẻ viền đỏ có nút Đăng nhập (hai nút ở xa nhau nên không rối); bấm vào đâu trong ô cũng mở đăng nhập. */}
+      {/* MẪU 2 chủ dự án chọn 2/10/2026 (ô B): CẢ Ô bấm được để đăng nhập. Điện thoại bỏ nút đỏ trong ô (trùng với
+          nút Đăng nhập trên menu, đứng sát nhau nhìn rối), thay bằng mũi tên ›. Máy tính vẫn giữ nút đỏ. */}
       <div role="button" tabIndex={0} aria-label={`Đăng nhập để dùng ${ten ? `tiện ích ${ten}` : 'tiện ích này'}`}
         onClick={() => openLogin({ reason: lyDo })} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLogin({ reason: lyDo }); } }}
-        className="cl-chop-vien relative hidden cursor-pointer overflow-hidden rounded-lg border-2 border-[#d42a2a] bg-white px-4 py-3.5 sm:block">
+        className="cl-chop-vien relative cursor-pointer overflow-hidden rounded-lg border-2 border-[#d42a2a] bg-white px-3 py-2.5 active:bg-red-50/60 sm:px-4 sm:py-3.5">
         <div className="flex items-center gap-2.5 sm:gap-3.5">
           <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[9px] bg-[#d42a2a] text-white sm:h-11 sm:w-11 sm:rounded-[10px]">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10.5" rx="2.2" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></svg>
@@ -71,6 +62,8 @@ export default function CanDangNhap({ ten, trongKhung = false, children }: { ten
             <span aria-hidden className="cl-shine pointer-events-none absolute bottom-0 top-0 w-1/3 bg-white/45 blur-[3px]" />
             <span className="relative">Đăng nhập</span>
           </span>
+          {/* Điện thoại: mũi tên › thay cho nút. */}
+          <span aria-hidden className="shrink-0 text-[26px] font-bold leading-none text-[#d42a2a] sm:hidden">›</span>
         </div>
       </div>
     </div>

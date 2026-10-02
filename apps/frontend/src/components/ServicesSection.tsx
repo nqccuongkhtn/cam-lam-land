@@ -75,8 +75,8 @@ export default function ServicesSection({ className = '', moc = true, gon = fals
         <p className={`mx-auto mt-2 max-w-2xl text-[13px] sm:text-sm text-slate-500 ${gon ? 'hidden' : ''}`}>Cam Lâm Land hỗ trợ trọn gói thủ tục pháp lý và hồ sơ đất đai tại Cam Lâm – Khánh Hòa, giúp bạn giao dịch an toàn, nhanh gọn, đúng luật.</p>
       </div>
 
-      {/* Điện thoại: HAI CỘT SÁT LỀ (lấn vào lề khung 10px, khe giữa hẹp) → thẻ to hơn bản cũ ~20% (mẫu 4, chủ dự án chọn 2/10/2026). */}
-      <div className={gon ? 'mx-auto mt-3 grid max-w-4xl grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3' : `-mx-2.5 mt-4 grid grid-cols-2 gap-1.5 sm:mx-0 sm:mt-6 sm:gap-4 lg:grid-cols-3 ${nho12 ? 'sm:mx-auto sm:w-[88%]' : ''}`}>
+      {/* Điện thoại: MỘT CỘT, thẻ to hết bề ngang để đọc được chữ in trong ảnh (mẫu 2, chủ dự án chọn 2/10/2026). */}
+      <div className={gon ? 'mx-auto mt-3 grid max-w-4xl grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3' : `mt-4 sm:mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 ${nho12 ? 'sm:mx-auto sm:w-[88%]' : ''}`}>
         {SERVICES.map(([f, ten, mo]) => (
           <div key={f} className="group overflow-hidden rounded-2xl ring-1 ring-slate-100 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-slate-200">
             {/* eslint-disable-next-line @next/next/no-img-element */}

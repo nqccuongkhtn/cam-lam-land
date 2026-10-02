@@ -534,17 +534,19 @@ export default function Home() {
             </Link>
           </div>
           </>)}
-          <div className="space-y-4">
-            <Link href="/map" className="block rounded-xl bg-gradient-to-br from-[#a3121b] to-[#6d0d14] text-white p-5 hover:brightness-110 transition active:scale-[.98]">
-              <p className="text-[11px] tracking-wide text-white/70 font-semibold">CAM LÂM LAND</p>
-              <p className="font-extrabold text-lg mt-1 leading-tight">Sàn BĐS & Bản đồ quy hoạch Cam Lâm</p>
-              <p className="text-xs text-white/80 mt-1.5 leading-snug">Tra cứu quy hoạch, mua bán nhà đất, nền vệ tinh — tất cả tại một nơi.</p>
-              <span className="inline-block mt-3 bg-white text-[#a3121b] text-xs font-bold px-3 py-1.5 rounded">Khám phá ngay →</span>
+          {/* ĐIỆN THOẠI (chủ dự án 2/10/2026: hai thẻ to "lạc quẻ" giữa tin tức và tin đăng): thu thành HAI Ô NHỎ đứng
+              cạnh nhau — nhãn nhỏ + tiêu đề ngắn + mũi tên, bỏ đoạn mô tả và nút. Máy tính giữ hai thẻ to như cũ. */}
+          <div className="grid grid-cols-2 gap-2.5 sm:block sm:space-y-4">
+            <Link href="/map" className="flex flex-col justify-between rounded-lg bg-gradient-to-br from-[#a3121b] to-[#6d0d14] p-3 text-white transition hover:brightness-110 active:scale-[.98] sm:block sm:rounded-xl sm:p-5">
+              <p className="text-[10px] font-semibold tracking-wide text-white/70 sm:text-[11px]">CAM LÂM LAND</p>
+              <p className="mt-1 text-[13.5px] font-extrabold leading-tight sm:text-lg"><span className="sm:hidden">Bản đồ quy hoạch</span><span className="hidden sm:inline">Sàn BĐS & Bản đồ quy hoạch Cam Lâm</span></p>
+              <p className="mt-1.5 hidden text-xs leading-snug text-white/80 sm:block">Tra cứu quy hoạch, mua bán nhà đất, nền vệ tinh — tất cả tại một nơi.</p>
+              <span className="mt-1.5 text-[11.5px] font-bold text-white/90 sm:mt-3 sm:inline-block sm:rounded sm:bg-white sm:px-3 sm:py-1.5 sm:text-xs sm:text-[#a3121b]">Khám phá ngay →</span>
             </Link>
-            <Link href="/sales/post" className="block rounded-xl bg-gradient-to-br from-[#0A2540] to-[#0d2f54] text-white p-5 hover:brightness-110 transition active:scale-[.98]">
-              <p className="text-[11px] tracking-wide text-[#C8A14B] font-semibold">MIỄN PHÍ</p>
-              <p className="font-extrabold text-lg mt-1 leading-tight">Đăng tin — tiếp cận khách mua ngay</p>
-              <span className="inline-block mt-3 bg-[#C8A14B] text-[#0A2540] text-xs font-bold px-3 py-1.5 rounded">Đăng tin ngay →</span>
+            <Link href="/sales/post" className="flex flex-col justify-between rounded-lg bg-gradient-to-br from-[#0A2540] to-[#0d2f54] p-3 text-white transition hover:brightness-110 active:scale-[.98] sm:block sm:rounded-xl sm:p-5">
+              <p className="text-[10px] font-semibold tracking-wide text-[#C8A14B] sm:text-[11px]">MIỄN PHÍ</p>
+              <p className="mt-1 text-[13.5px] font-extrabold leading-tight sm:text-lg"><span className="sm:hidden">Đăng tin bán nhà đất</span><span className="hidden sm:inline">Đăng tin — tiếp cận khách mua ngay</span></p>
+              <span className="mt-1.5 text-[11.5px] font-bold text-[#C8A14B] sm:mt-3 sm:inline-block sm:rounded sm:bg-[#C8A14B] sm:px-3 sm:py-1.5 sm:text-xs sm:text-[#0A2540]">Đăng tin ngay →</span>
             </Link>
           </div>
         </div>
@@ -585,15 +587,16 @@ export default function Home() {
         <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-white md:min-h-[360px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/quyhoach-camlam.jpg" alt="Mô hình quy hoạch Cam Lâm" loading="lazy" decoding="async"
-            className="block h-48 w-full object-cover sm:h-64 md:absolute md:inset-0 md:h-full" />
+            className="block h-32 w-full object-cover sm:h-64 md:absolute md:inset-0 md:h-full" />
           <div aria-hidden className="absolute inset-0 hidden md:block" style={{ background: 'linear-gradient(90deg,#fff 0%,rgba(255,255,255,.96) 38%,rgba(255,255,255,0) 70%)' }} />
-          <div className="relative p-5 sm:p-8 md:max-w-[46%] md:p-12">
-            <span className="text-[#C8A14B] font-semibold text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] mt-2">Tra cứu quy hoạch & thửa đất chính xác</h2>
-            <p className="text-sm sm:text-base text-slate-500 mt-2 sm:mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số thửa/số tờ/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
-            <div className="mt-4 sm:mt-6 flex gap-3">
-              <Link href="/map" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-6 py-3 rounded-xl">Mở bản đồ →</Link>
-              <Link href="/qr" className="cl-press border border-slate-300 bg-white text-[#0A2540] font-semibold px-6 py-3 rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
+          <div className="relative p-3.5 sm:p-8 md:max-w-[46%] md:p-12">
+            {/* Điện thoại: gọn lại (chủ dự án 2/10/2026 "hơi to") — ảnh thấp, chữ nhỏ, mô tả 2 dòng, nút nhỏ. */}
+            <span className="text-[#C8A14B] font-semibold text-[11px] sm:text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>
+            <h2 className="text-[17px] leading-snug sm:text-3xl font-extrabold text-[#0A2540] mt-1 sm:mt-2">Tra cứu quy hoạch & thửa đất chính xác</h2>
+            <p className="line-clamp-2 sm:line-clamp-none text-[12.5px] sm:text-base text-slate-500 mt-1 sm:mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số thửa/số tờ/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
+            <div className="mt-3 sm:mt-6 flex gap-2 sm:gap-3">
+              <Link href="/map" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold text-[13px] sm:text-base px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl">Mở bản đồ →</Link>
+              <Link href="/qr" className="cl-press border border-slate-300 bg-white text-[#0A2540] font-semibold text-[13px] sm:text-base px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
             </div>
           </div>
         </div>

@@ -9,6 +9,7 @@ const DISCOVER: [string, string][] = [
   ['Dịch vụ & Bảng giá', '/dichvu'],
   ['Nhà đất bán & cho thuê', '/listings'],
   ['Nhà đất theo khu vực', '/nha-dat'],
+  ['Dự án bất động sản', '/du-an'],
   ['Góp vốn đầu tư (CamInvest)', '/dau-tu'],
   ['Tin tức', '/tin-tuc'],
   ['🎮 Game giải trí', '/game'],

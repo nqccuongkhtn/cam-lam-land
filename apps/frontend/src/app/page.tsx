@@ -570,9 +570,9 @@ export default function Home() {
         </div>
         <div className="mt-6 sm:mt-8 text-center">
           {/* Thay nút "Mở rộng" bằng nút sang hẳn trang tin đăng (chủ dự án 2/10/2026) — đúng theo tab đang chọn.
-              Kiểu VIỀN MẢNH nền trắng (nền đỏ đặc bị chê "hơi thô"). */}
+              Nút ĐỎ NHỎ GỌN bo góc 4px theo mẫu chủ dự án gửi (bản nút tròn to bị chê "hơi thô"). */}
           <Link href={heroDeal === 'rent' ? '/listings?deal=rent' : heroDeal === 'project' ? '/du-an' : '/listings'}
-            className="cl-press inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-5 py-2 text-[13.5px] font-semibold text-[#0A2540] transition hover:border-[#0A2540] sm:px-7 sm:py-2.5 sm:text-[14px]">
+            className="cl-press inline-flex items-center gap-1 rounded bg-red-600 px-4 py-1.5 text-[12.5px] font-bold text-white shadow-sm transition hover:bg-red-700 sm:px-5 sm:py-2 sm:text-[13.5px]">
             {heroDeal === 'project' ? 'Xem tất cả dự án' : 'Xem tất cả tin đăng'} →
           </Link>
         </div>
@@ -589,13 +589,13 @@ export default function Home() {
               className="block h-32 w-full object-cover sm:h-64 md:h-full" />
             {/* HUY HIỆU "Cam Lâm Land · Hotline" — ảnh gốc có sẵn ở góc dưới phải nhưng dạng ảnh rộng bị cắt mất
                 (chủ dự án 2/10/2026) → dựng lại bằng chữ thật, đè lên góc ảnh, bấm là gọi. Giống hệt kiểu trong ảnh gốc. */}
-            <a href="tel:0988888888" className="absolute bottom-1.5 right-1.5 z-[2] flex items-center gap-1.5 rounded-md bg-[#0f2236]/80 px-1.5 py-1 text-white shadow-lg backdrop-blur-sm sm:bottom-4 sm:right-4 sm:gap-2.5 sm:rounded-lg sm:px-3 sm:py-2">
+            <a href="tel:0988888888" className="absolute bottom-1.5 right-1.5 z-[2] flex items-center gap-1 rounded bg-[#0f2236]/80 px-1 py-0.5 text-white shadow-lg backdrop-blur-sm sm:bottom-4 sm:right-4 sm:gap-2.5 sm:rounded-lg sm:px-3 sm:py-2">
               {/* ĐÚNG LOGO CỦA WEB (chữ C vàng trên nền xanh đậm) — bản đầu dùng hình ngôi nhà là sai (chủ dự án 2/10/2026). */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo-gon.webp" alt="" width={36} height={36} className="h-5 w-5 rounded sm:h-9 sm:w-9 sm:rounded-md" />
+              <img src="/logo-gon.webp" alt="" width={36} height={36} className="h-4 w-4 rounded-sm sm:h-9 sm:w-9 sm:rounded-md" />
               <span className="leading-tight">
-                <b className="block text-[10.5px] sm:text-[15px]">Cam Lâm <span className="text-[#C8A14B]">Land</span></b>
-                <span className="block text-[9px] font-semibold sm:text-[12.5px]">Hotline <span className="text-[#C8A14B]">0988 888 888</span></span>
+                <b className="block text-[9px] sm:text-[15px]">Cam Lâm <span className="text-[#C8A14B]">Land</span></b>
+                <span className="block text-[7.5px] font-semibold sm:text-[12.5px]">Hotline <span className="text-[#C8A14B]">0988 888 888</span></span>
               </span>
             </a>
           </div>

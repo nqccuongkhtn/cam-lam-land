@@ -36,20 +36,22 @@ export default function ListingCard({ l, href, to = false }: { l: Listing; href?
         </div>
         {nImg > 1 && <span className="absolute bottom-2 right-2 bg-black/55 backdrop-blur text-white text-[11px] font-medium px-2 py-0.5 rounded-md">📷 {nImg}</span>}
       </div>
-      <div className="p-3 flex flex-col flex-1">
-        <h3 className={`text-[15px] font-medium line-clamp-2 leading-snug min-h-[2.6rem] group-hover:text-red-700 ${l.tier === 'diamond' ? 'text-red-600 uppercase' : 'text-slate-800'}`}>{l.title}</h3>
-        <div className="mt-1.5 flex items-baseline gap-1.5 flex-wrap">
-          <span className="text-red-600 font-bold text-lg leading-none">{priceLabel(l.price, l.deal)}</span>
-          {l.area != null && <span className="text-slate-500 text-sm">· {l.area} m²</span>}
+      {/* ĐIỆN THOẠI: tỉ lệ chữ theo trang mẫu chủ dự án khen (2/10/2026) — tiêu đề 12,5 đậm, giá 14, vị trí 11,
+          dòng ngày đăng 9,5, đệm 8px. Máy tính giữ cỡ cũ. */}
+      <div className="p-2 sm:p-3 flex flex-col flex-1">
+        <h3 className={`text-[12.5px] font-bold sm:text-[15px] sm:font-medium line-clamp-2 leading-[1.35] sm:leading-snug min-h-[2.7em] sm:min-h-[2.6rem] group-hover:text-red-700 ${l.tier === 'diamond' ? 'text-red-600 uppercase' : 'text-slate-800'}`}>{l.title}</h3>
+        <div className="mt-1 sm:mt-1.5 flex items-baseline gap-1 sm:gap-1.5 flex-wrap">
+          <span className="text-red-600 font-bold text-[14px] sm:text-lg leading-none">{priceLabel(l.price, l.deal)}</span>
+          {l.area != null && <span className="text-slate-500 text-[11px] sm:text-sm">· {l.area} m²</span>}
         </div>
-        <div className="mt-1.5 flex items-center gap-1 text-[13px] text-slate-500 truncate"><IPin /> <span className="truncate">{l.ward ?? 'Cam Lâm'}, Khánh Hòa</span></div>
+        <div className="mt-1 sm:mt-1.5 flex items-center gap-1 text-[11px] sm:text-[13px] text-slate-500 truncate"><IPin /> <span className="truncate">{l.ward ?? 'Cam Lâm'}, Khánh Hòa</span></div>
         {/* MỘT HÀNG: "Đăng 1 tuần trước · 👁 số xem · ♡" — điện thoại chữ nhỏ + không cho xuống dòng (chủ dự án 2/10/2026,
             trước bị gãy thành "Đăng 1 tuần / trước ·"). */}
-        <div className="mt-2 sm:mt-2.5 pt-1.5 sm:pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
-          <span suppressHydrationWarning className="min-w-0 truncate whitespace-nowrap text-[10.5px] sm:text-xs text-slate-400 inline-flex items-center gap-0.5 sm:gap-1"><span className="sm:hidden">{postedLabel(l.createdAt).replace(/^Đăng\s*/, '')}</span><span className="hidden sm:inline">{postedLabel(l.createdAt)}</span> ·<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ml-0.5"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>{fmtInt(displayViews(l) + extraViews)}</span>
+        <div className="mt-1.5 sm:mt-2.5 pt-1.5 sm:pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
+          <span suppressHydrationWarning className="min-w-0 truncate whitespace-nowrap text-[9.5px] sm:text-xs text-slate-400 inline-flex items-center gap-0.5 sm:gap-1">{postedLabel(l.createdAt)} ·<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ml-0.5"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>{fmtInt(displayViews(l) + extraViews)}</span>
           <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setFav((v) => !v); }} aria-label="Lưu tin"
-            className={`shrink-0 w-6 h-6 sm:w-8 sm:h-8 grid place-items-center rounded-md sm:rounded-lg border transition ${fav ? 'border-red-200 text-red-500 bg-red-50' : 'border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200'}`}>
-            <svg viewBox="0 0 24 24" fill={fav ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 sm:w-4 sm:h-4"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" /></svg>
+            className={`shrink-0 w-5 h-5 sm:w-8 sm:h-8 grid place-items-center rounded sm:rounded-lg border transition ${fav ? 'border-red-200 text-red-500 bg-red-50' : 'border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200'}`}>
+            <svg viewBox="0 0 24 24" fill={fav ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" className="w-3 h-3 sm:w-4 sm:h-4"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" /></svg>
           </button>
         </div>
       </div>

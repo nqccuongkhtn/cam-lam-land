@@ -1134,3 +1134,11 @@
   .cl-b11 .st-c18 .b-title { font-size: 3.4vw !important }
   .cl-b11 .st-c18 .b-sub { max-width: none !important; width: 36vw }
 }
+
+/* Slide "Vươn cao giữa lòng Cam Lâm" (st-c18) — MÁY TÍNH: cụm tòa nhà + khung ảnh thấp quá, đáy khung đè xuống
+   ngang ô tìm kiếm, lệch so với khối chữ bên trái (chủ dự án 2/10/2026). Thu cả cụm còn 74%, GIỮ NGUYÊN đỉnh tòa nhà
+   (gốc phóng ở mép trên) → đáy khung tự nâng lên ~120 đơn vị. Đơn vị tính theo khung vẽ 1920×620 của hình.
+   Điện thoại dùng khung cắt riêng (data-vbm) nên không đụng tới. */
+@media (min-width: 761px) {
+  .cl-b11 .st-c18 .c18-nhom { transform-box: view-box; transform-origin: 1450px 24px; transform: scale(.74) }
+}

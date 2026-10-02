@@ -135,7 +135,7 @@ export default function FeaturedProjects({ chiHien = null, boLoc }: { chiHien?: 
         <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540]">Dự án bất động sản nổi bật</h2>
         <div className="flex items-center gap-2 shrink-0">
           {isAdmin ? <button onClick={() => setAddOpen(true)} className="inline-flex items-center gap-1.5 bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-semibold px-4 py-2 rounded-xl">＋ Thêm dự án</button> : null}
-          <Link href="/listings" className="text-red-600 font-semibold text-sm hover:underline whitespace-nowrap">Xem thêm →</Link>
+          <Link href="/listings" className="text-[#C8A14B] sm:text-red-600 font-semibold text-sm hover:underline whitespace-nowrap">Xem thêm<span className="hidden sm:inline"> →</span></Link>
         </div>
       </div>
       {/* Đang lọc từ bảng "Lọc nâng cao" (tab Dự án) → báo rõ + nút bỏ lọc */}
@@ -147,7 +147,32 @@ export default function FeaturedProjects({ chiHien = null, boLoc }: { chiHien?: 
       ) : null}
       {chiHien && list.length === 0 ? <p className="py-6 text-center text-sm text-slate-400">Không có dự án nào khớp bộ lọc.</p> : null}
 
-      <div className="relative">
+      {/* ĐIỆN THOẠI (chủ dự án 2/10/2026, theo ảnh mẫu): DANH SÁCH DỌC 3 dự án — ảnh nhỏ bo góc bên trái, bên phải
+          là tình trạng (chữ xanh lá), tên dự án đậm, quy mô/vị trí xám. Máy tính bảng & máy tính giữ dải cuộn ngang. */}
+      <ul className="space-y-3 sm:hidden">
+        {list.slice(0, 3).map((p) => (
+          <li key={p.id + p.name} className="relative">
+            <Link href={`/listings?q=${encodeURIComponent(p.name)}`} className="flex items-center gap-3 active:opacity-80">
+              <span className="relative h-[78px] w-[116px] shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                {p.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.imageUrl} alt={p.name} loading="lazy" decoding="async" onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden'; }} className="h-full w-full object-cover" />
+                ) : null}
+              </span>
+              <span className="min-w-0 flex-1">
+                {p.status ? <span className="block text-[11.5px] font-semibold text-emerald-600">{p.status}</span> : null}
+                <span className="mt-0.5 block truncate text-[15px] font-bold leading-snug text-[#0A2540]">{p.name}</span>
+                {(p.scale || p.location) ? <span className="mt-0.5 block truncate text-[12.5px] text-slate-500">{[p.scale, p.location].filter(Boolean).join(' · ')}</span> : null}
+              </span>
+            </Link>
+            {isAdmin && p.id > 0 ? (
+              <button onClick={() => del(p.id, p.name)} aria-label="Xoá dự án" className="absolute left-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-red-500 text-base leading-none text-white shadow">×</button>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+
+      <div className="relative hidden sm:block">
         <button onClick={() => nudge(-1)} aria-label="Xem trước"
           className="hidden sm:grid absolute left-0 top-[34%] -translate-y-1/2 z-10 w-10 h-10 place-items-center rounded-full bg-white/95 backdrop-blur border border-slate-200 shadow-md text-slate-500 hover:text-[#0A2540] hover:shadow-lg text-xl leading-none transition">‹</button>
 

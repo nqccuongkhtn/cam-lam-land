@@ -58,7 +58,7 @@ function Newsletter() {
 }
 
 function SectionTitle({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <p className={`mb-3 font-semibold text-[#0A2540] ${className}`}>{children}</p>;
+  return <p className={`mb-2 sm:mb-3 font-bold sm:font-semibold text-[#0A2540] ${className}`}>{children}</p>;
 }
 
 export default function SiteFooter() {
@@ -68,18 +68,21 @@ export default function SiteFooter() {
     <footer className="border-t border-slate-200 bg-[#f4f7fc] text-slate-600">
       {/* Dải số liệu (64 xã · N tin · N dự án · N công cụ) ĐÃ BỎ theo ý chủ dự án 1/10/2026. */}
       {/* 4 cột đều nhau */}
-      <div className="mx-auto max-w-7xl px-3 sm:px-4 pt-8 sm:pt-12 pb-8 sm:pb-10 grid gap-x-6 sm:gap-x-8 gap-y-8 sm:gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
-        <div>
-          <p className="font-extrabold text-xl text-[#0A2540]">Cam Lâm <span className="text-[#C8A14B]">Land</span></p>
-          <p className="text-sm mt-3 text-slate-500">Nền tảng bất động sản &amp; bản đồ quy hoạch khu vực Cam Lâm, Khánh Hòa.</p>
-          <a href="tel:0988888888" className="inline-flex items-center gap-1.5 text-lg font-extrabold text-[#a8842f] hover:text-[#0A2540] mt-4">📞 0988 888 888</a>
-          <p className="text-sm text-slate-500 mt-1">✉️ lienhe@camlamland.vn</p>
-          <div className="flex flex-wrap items-center gap-2.5 mt-4">
+      {/* ĐIỆN THOẠI (chủ dự án 2/10/2026, theo mẫu gửi kèm): lưới 2 cột — khối thương hiệu trải hết ngang ở trên,
+          "Khám phá" + "Tra cứu & công cụ" đứng cạnh nhau, "Quy định" + đăng ký nhận tin ở dưới; chữ nhỏ gọn hơn,
+          ẩn mã QR + nhãn "Việt Nam" cho đỡ dài. Máy tính giữ 4 cột như cũ. */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-4 pt-7 sm:pt-12 pb-6 sm:pb-10 grid grid-cols-2 gap-x-4 sm:gap-x-8 gap-y-6 sm:gap-y-9 lg:grid-cols-4">
+        <div className="col-span-2 sm:col-span-1">
+          <p className="font-extrabold text-lg sm:text-xl text-[#0A2540]">Cam Lâm <span className="text-[#C8A14B]">Land</span></p>
+          <p className="text-[13px] sm:text-sm mt-1.5 sm:mt-3 text-slate-500">Nền tảng bất động sản &amp; bản đồ quy hoạch khu vực Cam Lâm, Khánh Hòa.</p>
+          <a href="tel:0988888888" className="inline-flex items-center gap-1.5 text-base sm:text-lg font-extrabold text-[#a8842f] hover:text-[#0A2540] mt-2 sm:mt-4">📞 0988 888 888</a>
+          <p className="text-[13px] sm:text-sm text-slate-500 mt-0.5 sm:mt-1">✉️ lienhe@camlamland.vn</p>
+          <div className="flex flex-wrap items-center gap-2.5 mt-3 sm:mt-4">
             <InstallAppButton className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[#0A2540] hover:border-[#C8A14B] [&_b]:!text-[#0A2540]" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=0&data=https%3A%2F%2Fbatdongsancamlam.dpdns.org" alt="QR mở web Cam Lâm Land" width={56} height={56} className="w-14 h-14 rounded-lg border border-slate-200 bg-white p-1" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=0&data=https%3A%2F%2Fbatdongsancamlam.dpdns.org" alt="QR mở web Cam Lâm Land" width={56} height={56} className="hidden sm:block w-14 h-14 rounded-lg border border-slate-200 bg-white p-1" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
           </div>
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 mt-3 sm:mt-4">
             <a href="#" aria-label="Facebook" className="w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-[#0A2540] hover:border-[#C8A14B] font-bold">f</a>
             <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" aria-label="Zalo" className="w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-[#0A2540] hover:border-[#C8A14B] text-[11px] font-bold">Zalo</a>
             <a href="tel:0988888888" aria-label="Gọi điện" className="w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-[#0A2540] hover:border-[#C8A14B]">☎</a>
@@ -88,38 +91,38 @@ export default function SiteFooter() {
 
         <div>
           <SectionTitle>Khám phá</SectionTitle>
-          <ul className="text-sm space-y-2 text-slate-500">
+          <ul className="text-[13px] sm:text-sm space-y-1.5 sm:space-y-2 text-slate-500">
             {DISCOVER.map(([label, href]) => <li key={label}><Link href={href} className="inline-block transition duration-150 hover:translate-x-0.5 hover:text-[#0A2540]">{label}</Link></li>)}
           </ul>
         </div>
 
         <div>
           <SectionTitle>Tra cứu &amp; công cụ</SectionTitle>
-          <ul className="text-sm space-y-2 text-slate-500">
+          <ul className="text-[13px] sm:text-sm space-y-1.5 sm:space-y-2 text-slate-500">
             {TOOLS.map(([label, href]) => <li key={label}><Link href={href} className="inline-block transition duration-150 hover:translate-x-0.5 hover:text-[#0A2540]">{label}</Link></li>)}
           </ul>
         </div>
 
-        <div>
+        <div className="col-span-2 sm:col-span-1">
           <SectionTitle>Quy định</SectionTitle>
-          <ul className="text-sm space-y-2 text-slate-500">
+          <ul className="text-[13px] sm:text-sm space-y-1.5 sm:space-y-2 text-slate-500">
             {RULES.map(([label, href]) => <li key={label}><Link href={href} className="inline-block transition duration-150 hover:translate-x-0.5 hover:text-[#0A2540]">{label}</Link></li>)}
           </ul>
-          <SectionTitle className="mt-6">Đăng ký nhận tin</SectionTitle>
+          <SectionTitle className="mt-5 sm:mt-6">Đăng ký nhận tin</SectionTitle>
           <p className="text-xs text-slate-500 mb-2">Nhận tin nhà đất &amp; quy hoạch Cam Lâm mới nhất.</p>
           <Newsletter />
-          <div className="mt-5 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm">
+          <div className="mt-5 hidden items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:inline-flex">
             <span className="text-base">🇻🇳</span> Việt Nam
           </div>
         </div>
       </div>
 
       {/* Khối cuối chân trang CANH GIỮA — trước canh trái nên dồn một góc, lệch với các cột phía trên (chủ dự án chỉ). */}
-      <div className="mx-auto max-w-7xl px-3 sm:px-4 pt-6 pb-4 border-t border-slate-200 text-center text-xs text-slate-500 leading-relaxed">
+      <div className="mx-auto max-w-7xl px-4 sm:px-4 pt-4 sm:pt-6 pb-3 sm:pb-4 border-t border-slate-200 text-center text-[11px] sm:text-xs text-slate-500 leading-relaxed">
         <p><b className="text-[#0A2540]">CAM LÂM LAND</b> — Nền tảng bất động sản &amp; quy hoạch khu vực Cam Lâm, tỉnh Khánh Hòa.</p>
         <p className="mt-1">Địa chỉ: Cam Lâm, Khánh Hòa · Hotline: 0988 888 888 · Email: lienhe@camlamland.vn.</p>
       </div>
-      <div className="mx-auto max-w-7xl px-3 sm:px-4 text-center text-xs text-slate-500 pb-6">© 2018 Cam Lâm Land</div>
+      <div className="mx-auto max-w-7xl px-3 sm:px-4 text-center text-[11px] sm:text-xs text-slate-500 pb-5 sm:pb-6">© 2018 Cam Lâm Land</div>
     </footer>
   );
 }

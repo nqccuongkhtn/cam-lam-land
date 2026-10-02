@@ -210,7 +210,7 @@ export default function Nav() {
           ) : loading ? (
             <div className={`w-8 h-8 rounded-full animate-pulse ${solid ? 'bg-slate-200' : 'bg-white/25'}`} />
           ) : (
-            <button onClick={() => openLogin()} className="cl-press bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-4 py-2 rounded-lg shadow-sm shadow-red-600/30">Đăng nhập</button>
+            <button onClick={() => openLogin()} className="cl-nut-dn-dau cl-press bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-4 py-2 rounded-lg shadow-sm shadow-red-600/30">Đăng nhập</button>
           )}
           {(user || open) && <button onClick={() => setOpen((o) => !o)} aria-label={open ? 'Đóng menu' : 'Menu'} className={`md:hidden grid place-items-center w-10 h-10 rounded-lg border ${solid ? 'border-slate-200 text-[#0A2540]' : 'border-white/50 text-white'}`}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-5 h-5">{open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M3 6h18M3 12h18M3 18h18" />}</svg>

@@ -377,6 +377,9 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 /* Trang /tien-ich (máy tính): khung đã vừa khít màn hình và phần bên phải TỰ CUỘN bên trong → khoá cuộn của
    cả trang, không thì hiện HAI thanh cuộn song song (chủ dự án 30/9/2026: "nhìn 2 thanh rất xấu"). */
 @media (min-width: 768px) { html.cl-khoa-cuon-trang, html.cl-khoa-cuon-trang body { overflow: hidden; } }
+/* Điện thoại: đang hiện ô "… cần đăng nhập" (CanDangNhap) thì ẨN nút Đăng nhập trên thanh đầu trang —
+   hai nút đỏ cùng chữ đứng sát nhau nhìn rối (chủ dự án 2/10/2026). Ô kia đã có nút Đăng nhập rõ ràng. */
+@media (max-width: 767px) { html.cl-co-o-dang-nhap .cl-nut-dn-dau { display: none; } }
 
 /* Menu mobile ở đầu trang mở ra: trượt + mờ dần cho mượt */
 @keyframes clMenuIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }

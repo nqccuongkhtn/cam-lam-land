@@ -585,10 +585,23 @@ export default function Home() {
           Điện thoại: ảnh ở trên, chữ ở dưới (đè chữ lên ảnh trên màn hẹp khó đọc). */}
       <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
         <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-white md:min-h-[360px]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/quyhoach-camlam.jpg" alt="Mô hình quy hoạch Cam Lâm" loading="lazy" decoding="async"
-            className="block h-32 w-full object-cover sm:h-64 md:absolute md:inset-0 md:h-full" />
-          <div aria-hidden className="absolute inset-0 hidden md:block" style={{ background: 'linear-gradient(90deg,#fff 0%,rgba(255,255,255,.96) 38%,rgba(255,255,255,0) 70%)' }} />
+          <div className="relative md:absolute md:inset-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/quyhoach-camlam.jpg" alt="Mô hình quy hoạch Cam Lâm" loading="lazy" decoding="async"
+              className="block h-32 w-full object-cover sm:h-64 md:h-full" />
+            {/* HUY HIỆU "Cam Lâm Land · Hotline" — ảnh gốc có sẵn ở góc dưới phải nhưng dạng ảnh rộng bị cắt mất
+                (chủ dự án 2/10/2026) → dựng lại bằng chữ thật, đè lên góc ảnh, bấm là gọi. Giống hệt kiểu trong ảnh gốc. */}
+            <a href="tel:0988888888" className="absolute bottom-2 right-2 z-[2] flex items-center gap-2 rounded-lg bg-[#0f2236]/80 px-2.5 py-1.5 text-white shadow-lg backdrop-blur-sm sm:bottom-4 sm:right-4 sm:gap-2.5 sm:px-3 sm:py-2">
+              <span className="grid h-7 w-7 place-items-center rounded-md border border-[#C8A14B] bg-[#0A2540] text-[#C8A14B] sm:h-9 sm:w-9">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9.5h13V10" /><path d="M10 19.5v-5h4v5" /></svg>
+              </span>
+              <span className="leading-tight">
+                <b className="block text-[12.5px] sm:text-[15px]">Cam Lâm <span className="text-[#C8A14B]">Land</span></b>
+                <span className="block text-[10.5px] font-semibold sm:text-[12.5px]">Hotline <span className="text-[#C8A14B]">0988 888 888</span></span>
+              </span>
+            </a>
+          </div>
+          <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block" style={{ background: 'linear-gradient(90deg,#fff 0%,rgba(255,255,255,.96) 38%,rgba(255,255,255,0) 70%)' }} />
           <div className="relative p-3.5 sm:p-8 md:max-w-[46%] md:p-12">
             {/* Điện thoại: gọn lại (chủ dự án 2/10/2026 "hơi to") — ảnh thấp, chữ nhỏ, mô tả 2 dòng, nút nhỏ. */}
             <span className="text-[#C8A14B] font-semibold text-[11px] sm:text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>

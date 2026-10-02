@@ -9,21 +9,21 @@ function Wordmark({ name }: { name: string }) {
   const n = name.trim().toLowerCase();
   if (n === 'cam lâm land') {
     return (
-      <span className="font-extrabold text-[17px] sm:text-[26px] md:text-3xl leading-none tracking-tight whitespace-nowrap"><span className="text-[#0A2540]">Cam Lâm</span> <span className="text-[#C8A14B]">Land</span></span>
+      <span className="font-extrabold text-[17px] sm:text-[20px] md:text-[22px] leading-none tracking-tight whitespace-nowrap"><span className="text-[#0A2540]">Cam Lâm</span> <span className="text-[#C8A14B]">Land</span></span>
     );
   }
   if (n === 'vingroup') {
-    return <span className="font-serif font-bold text-[17px] sm:text-[26px] md:text-3xl leading-none tracking-tight text-slate-600 whitespace-nowrap">Vin<span className="text-[#b01e2e]">group</span></span>;
+    return <span className="font-serif font-bold text-[17px] sm:text-[20px] md:text-[22px] leading-none tracking-tight text-slate-600 whitespace-nowrap">Vin<span className="text-[#b01e2e]">group</span></span>;
   }
   return <span className="font-bold text-slate-600 text-[13px] sm:text-base md:text-lg text-center leading-tight line-clamp-2">{name}</span>;
 }
 
 function Tile({ p, isAdmin, onDelete }: { p: Partner; isAdmin: boolean; onDelete: () => void }) {
   return (
-    <div className="group relative shrink-0 w-[132px] sm:w-52 md:w-60 h-14 sm:h-24 md:h-28 bg-white border border-slate-200 rounded-lg sm:rounded-2xl grid place-items-center px-2 sm:px-4 hover:shadow-md hover:border-slate-300 transition">
+    <div className="group relative shrink-0 w-[132px] sm:w-44 md:w-48 h-14 sm:h-[72px] md:h-20 bg-white border border-slate-200 rounded-lg grid place-items-center px-2 sm:px-4 hover:shadow-md hover:border-slate-300 transition">
       {p.logoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={p.logoUrl} alt={p.name} loading="lazy" decoding="async" className="max-h-9 sm:max-h-14 md:max-h-16 max-w-full object-contain grayscale group-hover:grayscale-0 transition duration-300" />
+        <img src={p.logoUrl} alt={p.name} loading="lazy" decoding="async" className="max-h-9 sm:max-h-11 md:max-h-12 max-w-full object-contain grayscale group-hover:grayscale-0 transition duration-300" />
       ) : (
         <span className="grayscale group-hover:grayscale-0 transition duration-300">
           <Wordmark name={p.name} />
@@ -103,16 +103,18 @@ export default function FeaturedPartners() {
       </div>
 
       <div className="relative">
-        <button onClick={() => nudge(-1)} aria-label="Xem trước" className="hidden sm:grid absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 place-items-center rounded-full bg-white border border-slate-300 shadow-sm text-slate-500 hover:text-[#0A2540] hover:border-[#0A2540] text-lg leading-none">‹</button>
+        <button onClick={() => nudge(-1)} aria-label="Xem trước" className="hidden sm:grid absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 place-items-center rounded-full bg-white border border-slate-300 shadow-sm text-slate-500 hover:text-[#0A2540] hover:border-[#0A2540] text-lg leading-none">‹</button>
         <div ref={scrollerRef} onMouseEnter={() => { hoverRef.current = true; }} onMouseLeave={() => { hoverRef.current = false; }}
-          className="overflow-x-auto sm:px-7 md:px-10 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          className="overflow-x-auto [&::-webkit-scrollbar]:hidden"
+          // Hai đầu dải MỜ DẦN thay vì cắt ngang ô logo; mũi tên nằm ngoài mép (-left/-right) không đè lên logo (2/10/2026).
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitMaskImage: 'linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)', maskImage: 'linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)' }}>
           <div className="flex gap-2 sm:gap-3 md:gap-4 w-max py-1">
             {track.map((p, i) => (
               <Tile key={i} p={p} isAdmin={!!isAdmin} onDelete={() => del(p.id)} />
             ))}
           </div>
         </div>
-        <button onClick={() => nudge(1)} aria-label="Xem tiếp" className="hidden sm:grid absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 place-items-center rounded-full bg-white border border-slate-300 shadow-sm text-slate-500 hover:text-[#0A2540] hover:border-[#0A2540] text-lg leading-none">›</button>
+        <button onClick={() => nudge(1)} aria-label="Xem tiếp" className="hidden sm:grid absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 place-items-center rounded-full bg-white border border-slate-300 shadow-sm text-slate-500 hover:text-[#0A2540] hover:border-[#0A2540] text-lg leading-none">›</button>
       </div>
 
       {isAdmin && addOpen ? (

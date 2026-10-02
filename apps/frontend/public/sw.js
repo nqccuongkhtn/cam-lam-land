@@ -1,4 +1,4 @@
-const CACHE = 'camlam-v91';  /* v91 (29/9/2026): xoá bản sao danh-sach-nong.json (dữ liệu cá nhân) có thể còn nằm trong cache của máy đã từng vào /tra-cuu */   // tăng số này là xoá sạch cache cũ của mọi máy ở lần vào sau
+const CACHE = 'camlam-v92';  /* v92 (2/10/2026): xoá trang cũ đã lưu — khung Tiện ích mở bản trang cũ gọi tới file mã đã bị thay → "Có lỗi khi hiển thị trang" */   // tăng số này là xoá sạch cache cũ của mọi máy ở lần vào sau
 const API_CACHE = 'camlam-api-v1'; // cache RIÊNG cho API công khai (dễ dọn, giới hạn dung lượng)
 const OFFLINE = '/offline.html';
 // Precache khung app để MỞ APP là vẽ ngay (không chờ mạng → hết màn đen ~1s lúc khởi động).
@@ -69,6 +69,12 @@ self.addEventListener('fetch', (e) => {
 
   // ĐIỀU HƯỚNG TRANG (mở app / đổi trang): trả CACHE TỨC THÌ rồi cập nhật ngầm (stale-while-revalidate).
   // Đây là mấu chốt hết cảnh màn đen: WebView có HTML ngay → splash nhúng sẵn hiện lập tức.
+  // TRANG MỞ TRONG KHUNG TIỆN ÍCH (?embed=1 hoặc mở trong iframe): LUÔN HỎI MẠNG TRƯỚC (2/10/2026).
+  // Trả bản đã lưu ở đây là mở bản trang CŨ trong khi trang ngoài đã mới → gọi file mã đã bị thay → trang lỗi.
+  if (req.mode === 'navigate' && (url.searchParams.get('embed') === '1' || req.destination === 'iframe')) {
+    e.respondWith(fetch(req).catch(async () => (await caches.match(req)) || (await caches.match(OFFLINE)) || Response.error()));
+    return;
+  }
   if (req.mode === 'navigate') {
     /* ⚠️ BẢN CŨ "DÍNH" TRÊN IPHONE (25/9/2026): trang lưu sẵn hiện ngay cho nhanh, bản
        mới chỉ lưu ngầm → người dùng LUÔN chậm một bản so với web thật (sửa xong mà

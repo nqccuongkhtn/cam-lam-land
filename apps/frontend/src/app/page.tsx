@@ -586,7 +586,7 @@ export default function Home() {
           <div className="relative md:absolute md:inset-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/quyhoach-camlam.jpg" alt="Mô hình quy hoạch Cam Lâm" loading="lazy" decoding="async"
-              className="block h-32 w-full object-cover sm:h-64 md:h-full" />
+              className="block aspect-[2.35/1] w-full object-cover sm:aspect-auto sm:h-64 md:h-full" />
             {/* HUY HIỆU "Cam Lâm Land · Hotline" — ảnh gốc có sẵn ở góc dưới phải nhưng dạng ảnh rộng bị cắt mất
                 (chủ dự án 2/10/2026) → dựng lại bằng chữ thật, đè lên góc ảnh, bấm là gọi. Giống hệt kiểu trong ảnh gốc. */}
             <a href="tel:0988888888" className="absolute bottom-1.5 right-1.5 z-[2] flex items-center gap-1 rounded bg-[#0f2236]/80 px-1 py-0.5 text-white shadow-lg backdrop-blur-sm sm:bottom-4 sm:right-4 sm:gap-2.5 sm:rounded-lg sm:px-3 sm:py-2">
@@ -600,14 +600,14 @@ export default function Home() {
             </a>
           </div>
           <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block" style={{ background: 'linear-gradient(90deg,#fff 0%,rgba(255,255,255,.96) 38%,rgba(255,255,255,0) 70%)' }} />
-          <div className="relative p-3.5 sm:p-8 md:max-w-[46%] md:p-12">
-            {/* Điện thoại: gọn lại (chủ dự án 2/10/2026 "hơi to") — ảnh thấp, chữ nhỏ, mô tả 2 dòng, nút nhỏ. */}
+          <div className="relative p-4 sm:p-8 md:max-w-[46%] md:p-12">
+            {/* Điện thoại: tỉ lệ theo mẫu 5 trong trang xem thử (chủ dự án 2/10/2026) — ảnh 2,35:1, tiêu đề 17, mô tả đủ dòng 12, nút nhỏ. */}
             <span className="text-[#C8A14B] font-semibold text-[11px] sm:text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>
             <h2 className="text-[17px] leading-snug sm:text-3xl font-extrabold text-[#0A2540] mt-1 sm:mt-2">Tra cứu quy hoạch & thửa đất chính xác</h2>
-            <p className="line-clamp-2 sm:line-clamp-none text-[12.5px] sm:text-base text-slate-500 mt-1 sm:mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số thửa/số tờ/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
-            <div className="mt-3 sm:mt-6 flex gap-2 sm:gap-3">
-              <Link href="/map" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold text-[13px] sm:text-base px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl">Mở bản đồ →</Link>
-              <Link href="/qr" className="cl-press border border-slate-300 bg-white text-[#0A2540] font-semibold text-[13px] sm:text-base px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
+            <p className="text-[12px] leading-relaxed sm:text-base text-slate-500 mt-1.5 sm:mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số thửa/số tờ/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
+            <div className="mt-3.5 sm:mt-6 flex gap-2 sm:gap-3">
+              <Link href="/map" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold text-[12.5px] sm:text-base px-3.5 sm:px-6 py-2 sm:py-3 rounded sm:rounded-xl">Mở bản đồ →</Link>
+              <Link href="/qr" className="cl-press border border-slate-300 bg-white text-[#0A2540] font-bold text-[12.5px] sm:text-base px-3.5 sm:px-6 py-2 sm:py-3 rounded sm:rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
             </div>
           </div>
         </div>

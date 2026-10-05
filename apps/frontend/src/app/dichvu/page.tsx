@@ -171,6 +171,24 @@ export default function ServicesPage() {
           </div>
         </div>
 
+        {/* Bán 2 ô quảng cáo cạnh Tin tức ở trang chủ (admin nhập ở /admin → Quảng cáo). Trang chủ có link "Đặt quảng cáo tại vị trí này" trỏ về đây. */}
+        <div id="quang-cao" className="mt-6 scroll-mt-20 rounded-2xl bg-white border border-slate-200 p-6 md:flex items-center gap-6">
+          <div className="flex-1">
+            <h3 className="text-xl font-extrabold text-[#0A2540]">🏠 Banner quảng cáo trang chủ</h3>
+            <p className="text-slate-500 mt-1.5 text-sm max-w-xl">Hai vị trí cạnh mục <b>Tin tức</b> — nằm ngay màn hình đầu trang chủ, mọi người vào web đều thấy, cả trên điện thoại.
+              Hợp cho <b>dự án, đất nền, môi giới, ngân hàng, công chứng, xây dựng – nội thất</b> tại Cam Lâm – Khánh Hoà.</p>
+            <ul className="mt-2.5 text-sm text-slate-600 space-y-1">
+              <li>✓ Tiêu đề, ảnh, nút bấm dẫn thẳng tới trang dự án / số điện thoại / Zalo của bạn</li>
+              <li>✓ Thuê theo tuần hoặc theo tháng — mỗi vị trí chỉ một khách, không chạy chung</li>
+              <li>✓ Cam Lâm Land soạn chữ và làm ảnh giúp nếu bạn cần</li>
+            </ul>
+          </div>
+          <div className="mt-4 md:mt-0 flex flex-col gap-2 shrink-0 w-full md:w-auto">
+            <a href="tel:0988888888" className="bg-[#0A2540] text-white font-bold px-6 py-2.5 rounded-xl text-center">📞 0988 888 888</a>
+            <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="bg-[#0068FF] text-white font-bold px-6 py-2.5 rounded-xl text-center">Chat Zalo</a>
+          </div>
+        </div>
+
         <div className="mt-6 rounded-2xl bg-white border border-slate-200 p-6 md:flex items-center gap-6">
           <div className="flex-1">
             <h3 className="text-xl font-extrabold text-[#0A2540]">🗺️ Quảng cáo logo trên bản đồ</h3>

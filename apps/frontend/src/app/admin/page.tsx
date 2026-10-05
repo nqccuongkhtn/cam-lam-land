@@ -1,4 +1,5 @@
 'use client';
+import { TheQc, MAU_QC, dangChay, type CauHinhQc, type OQc } from '@/components/OQuangCaoTrangChu';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { refreshFlags } from '@/lib/flags';
 import { api, uploadGis } from '@/lib/api';
@@ -122,10 +123,71 @@ function AdsManager() {
         </div>
       </div>
 
+      <QcTrangChu />
+
       <div className="bg-white rounded-2xl border border-slate-200 p-4">
         <p className="font-bold text-[#0A2540]">📣 Banner liên hệ quảng cáo (trang chủ)</p>
         <p className="text-sm text-slate-500 mt-0.5">Hiện ở cuối trang chủ khi <b>Dịch vụ</b> đang bật. Bật/tắt ở tab <b>Cấu hình</b>.</p>
       </div>
+    </div>
+  );
+}
+// HAI Ô QUẢNG CÁO CẠNH TIN TỨC Ở TRANG CHỦ (khoá trangchu_ad) — xem components/OQuangCaoTrangChu.tsx.
+function QcTrangChu() {
+  const [ch, setCh] = useState<CauHinhQc>({ o1: { bat: false, mau: 'do' }, o2: { bat: false, mau: 'xanh' } });
+  const [msg, setMsg] = useState('');
+  useEffect(() => { api<{ value: any }>('/config/trangchu_ad').then((r) => { if (r.value && typeof r.value === 'object') setCh((c) => ({ ...c, ...r.value })); }).catch(() => {}); }, []);
+  const setO = (k: 'o1' | 'o2', f: keyof OQc, v: any) => setCh((c) => ({ ...c, [k]: { ...(c[k] || {}), [f]: v } }));
+  async function save() { setMsg('Đang lưu…'); try { await api('/config/trangchu_ad', { method: 'POST', body: JSON.stringify({ value: ch }) }); setMsg('✓ Đã lưu — trang chủ đổi sau khoảng 1 phút.'); } catch (e: any) { setMsg('✗ ' + (e?.message || 'Lỗi')); } }
+  const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm';
+  const homNay = new Date().toISOString().slice(0, 10);
+  // Gọi như hàm thường (không phải <O/>) để ô nhập không bị dựng lại mất chữ đang gõ
+  const O = ({ k, ten, macDinh }: { k: 'o1' | 'o2'; ten: string; macDinh: string }) => {
+    const o = ch[k] || {};
+    const chay = dangChay(o);
+    const quaHan = !!o.hanDen && o.hanDen < homNay;
+    return (
+      <div className="rounded-xl border border-slate-200 p-3">
+        <div className="flex items-center justify-between gap-2">
+          <p className="font-bold text-[#0A2540] text-sm">{ten}</p>
+          <button onClick={() => setO(k, 'bat', o.bat === false ? true : !o.bat)} aria-label="Bật/tắt" className={`w-12 h-7 rounded-full relative transition shrink-0 ${o.bat ? 'bg-emerald-500' : 'bg-slate-300'}`}><span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-all ${o.bat ? 'left-6' : 'left-1'}`} /></button>
+        </div>
+        <p className={`text-xs mt-1 font-medium ${chay ? 'text-emerald-600' : quaHan ? 'text-red-600' : 'text-slate-500'}`}>
+          {chay ? '● Đang chạy quảng cáo của khách' : quaHan ? '● Đã hết hạn — đang hiện thẻ của web' : `● Đang hiện thẻ của web (${macDinh})`}
+        </p>
+        <div className="grid sm:grid-cols-[1fr_200px] gap-3 mt-3 items-start">
+          <div className="space-y-2">
+            <input defaultValue={o.khach || ''} onBlur={(e) => setO(k, 'khach', e.target.value)} placeholder="Tên khách đặt + SĐT (chỉ để nhớ, không hiện ra web)" className={inp} />
+            <input defaultValue={o.nhan || ''} onBlur={(e) => setO(k, 'nhan', e.target.value)} placeholder="Nhãn nhỏ — vd: DỰ ÁN MỚI · ĐẤT NỀN BÃI DÀI" className={inp} />
+            <input defaultValue={o.tieuDe || ''} onBlur={(e) => setO(k, 'tieuDe', e.target.value)} placeholder="Tiêu đề (bắt buộc) — vd: Đất nền ven biển Bãi Dài, sổ riêng" className={inp} />
+            <input defaultValue={o.moTa || ''} onBlur={(e) => setO(k, 'moTa', e.target.value)} placeholder="Một dòng mô tả — chỉ hiện trên máy tính" className={inp} />
+            <div className="grid grid-cols-2 gap-2">
+              <input defaultValue={o.nut || ''} onBlur={(e) => setO(k, 'nut', e.target.value)} placeholder="Chữ nút — vd: Xem dự án" className={inp} />
+              <label className="flex items-center gap-2 text-xs text-slate-500">Hết hạn<input type="date" value={o.hanDen || ''} onChange={(e) => setO(k, 'hanDen', e.target.value)} className={inp} /></label>
+            </div>
+            <input defaultValue={o.link || ''} onBlur={(e) => setO(k, 'link', e.target.value)} placeholder="Bấm vào đi đâu — /listings/123 · https://... · tel:0988888888 · https://zalo.me/0988888888" className={inp} />
+            <input defaultValue={o.anh || ''} onBlur={(e) => setO(k, 'anh', e.target.value)} placeholder="Link ảnh nền (không bắt buộc) — ảnh ngang, vd 800×500" className={inp} />
+            <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500">Màu (khi không có ảnh):
+              {Object.entries(MAU_QC).map(([id, m]) => <button key={id} onClick={() => setO(k, 'mau', id)} className={`px-2 py-1 rounded text-[11px] font-bold ${(o.mau || 'xanh') === id ? 'ring-2 ring-offset-1 ring-[#0A2540]' : ''}`} style={{ background: m.nen, color: m.chu }}>{m.ten}</button>)}
+            </div>
+          </div>
+          <div>
+            <p className="text-[11px] text-slate-400 mb-1.5 text-center">Xem trước (máy tính)</p>
+            {o.tieuDe?.trim() ? <TheQc o={o} xemTruoc /> : <div className="rounded-xl border border-dashed border-slate-300 p-4 text-center text-xs text-slate-400">Nhập tiêu đề để xem trước</div>}
+          </div>
+        </div>
+      </div>
+    );
+  };
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 p-4">
+      <p className="font-bold text-[#0A2540]">🏠 2 ô quảng cáo trang chủ (cạnh Tin tức)</p>
+      <p className="text-xs text-slate-500 mt-1">Vị trí đẹp nhất web — ngay màn hình đầu, ai vào trang chủ cũng thấy. Ô có khách + đang bật + chưa hết hạn thì hiện quảng cáo (góc có chữ nhỏ &quot;Quảng cáo&quot;); tắt hoặc <b>quá ngày hết hạn là tự quay về thẻ của web</b>, không cần gỡ tay.</p>
+      <div className="space-y-3 mt-3">
+        {O({ k: 'o1', ten: 'Ô 1 — trên (ô đỏ)', macDinh: 'Bản đồ quy hoạch' })}
+        {O({ k: 'o2', ten: 'Ô 2 — dưới (ô xanh)', macDinh: 'Đăng tin miễn phí' })}
+      </div>
+      <div className="flex items-center gap-3 mt-3"><button onClick={save} className="bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-4 py-2 rounded-xl text-sm">Lưu</button>{msg && <span className="text-xs font-medium text-slate-600">{msg}</span>}</div>
     </div>
   );
 }

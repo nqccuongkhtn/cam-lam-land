@@ -4,7 +4,7 @@ import { adminRequired } from '../middleware/auth.ts';
 import { cached, cachePut, cacheDrop } from '../lib/cache.ts';
 
 // Kho cấu hình key-value đơn giản (quảng cáo trang tin tức, v.v.). Chỉ cho phép các key trong danh sách.
-const KEYS = ['tintuc_ad'];
+const KEYS = ['tintuc_ad', 'trangchu_ad']; // trangchu_ad = 2 ô quảng cáo cạnh Tin tức ở trang chủ
 export const configRouter = Router();
 
 configRouter.get('/:key', async (req, res) => {

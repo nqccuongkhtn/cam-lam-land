@@ -194,11 +194,112 @@ const L = {
     ${ke(p, 'margin:14px 0 10px')}${meta(d, p)}</div>`],
 };
 
+
+// ── 3 MẪU "SANG" (101–103) — làm thêm 5/10/2026 sau khi chủ dự án chê cả 100 mẫu trên "không sang".
+//    Khác hẳn 100 mẫu kia: có ẢNH THẬT Cam Lâm, khung viền VẼ BẰNG SVG (góc hoa văn, vân guilloche
+//    như tờ tiền), nút ÁNH KIM có vệt sáng chạy, chữ có chân Playfair. Mỗi mẫu một bộ màu cố định.
+const VANG = 'linear-gradient(115deg,#7a5a1e 0%,#c9a24e 18%,#f6e3a1 34%,#b8893a 52%,#e9cf86 70%,#8a6626 100%)';
+const svgUrl = (svg) => `url('data:image/svg+xml,${encodeURIComponent(svg)}')`;
+// Hạt nhiễu rất mịn phủ lên nền tối → nhìn như giấy/da thật, hết cảm giác "màu phẳng vẽ máy"
+const HAT = svgUrl('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .09 0 0 0 0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>');
+// Vân guilloche (kiểu hoa văn trên tờ tiền / thiệp cưới): 14 đường sóng lệch pha đan vào nhau
+const guilloche = (mau, w = 360, h = 130) => {
+  let dd = '';
+  for (let k = 0; k < 14; k++) {
+    let d = '';
+    for (let x = 0; x <= w; x += 3) {
+      const y = h / 2 + h * 0.36 * Math.sin(x / 24 + k * 0.45) * Math.cos(x / 67 - k * 0.22);
+      d += (x ? 'L' : 'M') + x + ' ' + y.toFixed(1);
+    }
+    dd += `<path d="${d}"/>`;
+  }
+  return svgUrl(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><g fill="none" stroke="${mau}" stroke-width=".6">${dd}</g></svg>`);
+};
+// Góc hoa văn: hai đường viền lồng nhau + nét cong + chấm tròn; lật gương để đủ 4 góc
+const gocHv = (mau, size = 30) => ['top:5px;left:5px', 'top:5px;right:5px;transform:scaleX(-1)', 'bottom:5px;left:5px;transform:scaleY(-1)', 'bottom:5px;right:5px;transform:scale(-1,-1)']
+  .map((vt) => `<svg viewBox="0 0 40 40" width="${size}" height="${size}" style="position:absolute;${vt};z-index:2;pointer-events:none" fill="none" stroke="${mau}" stroke-width="1" stroke-linecap="round"><path d="M1.5 38V11Q1.5 1.5 11 1.5H38"/><path d="M5.5 38V14Q5.5 5.5 14 5.5H38" opacity=".45"/><path d="M11 11q8 1 10 10M11 11q1 8 10 10" opacity=".8"/><circle cx="11" cy="11" r="1.8" fill="${mau}" stroke="none"/></svg>`).join('');
+// Đường kẻ có hạt kim cương ở giữa
+const keKc = (mau, rong = 54) => `<div style="display:flex;align-items:center;justify-content:center;gap:9px;color:${mau}"><span style="height:1px;width:${rong}px;background:linear-gradient(90deg,transparent,${mau})"></span><svg width="9" height="9" viewBox="0 0 10 10"><path d="M5 0 10 5 5 10 0 5z" fill="currentColor"/></svg><span style="height:1px;width:${rong}px;background:linear-gradient(90deg,${mau},transparent)"></span></div>`;
+const SERIF = `font-family:'Playfair Display',Georgia,'Times New Roman',serif`;
+// Nút số điện thoại riêng cho 3 mẫu này (cách chạy y như cũ: chưa hiện → bấm "Hiện số")
+const telSang = (d, st, lop = 'b') => {
+  const nd = d.soDu ? `${I.tel}<span>${esc(d.soDu)}</span>` : `${I.tel}<span>${esc(d.so)}</span><span style="opacity:.65;font-weight:600">· Hiện số</span>`;
+  return d.soDu ? `<a class="${lop}" href="tel:${esc(d.soDu.replace(/\s/g, ''))}" style="${st}">${nd}</a>` : `<button type="button" class="${lop}" data-act="hien" style="${st}">${nd}</button>`;
+};
+const zaloSang = (d, st) => `<a class="b" href="${esc(d.zalo)}" target="_blank" rel="noreferrer" style="${st}">${I.zalo}<span>Chat Zalo</span></a>`;
+const luuSang = (d, st) => `<button type="button" class="b" data-act="luu" style="${st}${d.daLuu ? ';color:#f87171' : ''}">${I.tim(d.daLuu)}<span>${d.daLuu ? 'Đã lưu' : 'Lưu tin'}</span></button>`;
+const vongVang = (d, size, nen) => `<span style="display:inline-block;padding:2px;border-radius:50%;background:${VANG};box-shadow:0 6px 18px -6px rgba(0,0,0,.5)">${av(d, { ac: '#14110c', acT: '#f3e2a6' }, size, 'tron', `border:2px solid ${nen}`)}</span>`;
+const metaSang = (d, mau, them = '') => `<div style="font-size:10.5px;color:${mau};${them}">Mã tin ${esc(d.ma)} · ${esc(d.dang)} · ${esc(d.xem)} lượt xem</div>`;
+
+const S = {
+  s1: ['SANG 1 · Thẻ đen ánh kim: ảnh biển Cam Lâm trên đầu, khung viền vàng góc hoa văn, nút vàng có vệt sáng chạy', (d) => {
+    const kim = 'rgba(214,180,106,';
+    const phu = `height:38px;border-radius:4px;color:#efe6cf;background:rgba(255,255,255,.04);border:1px solid ${kim}.38);font-size:13px`;
+    return `<div style="position:relative;border-radius:8px;overflow:hidden;color:#efe6cf;background:${HAT},radial-gradient(120% 70% at 50% 0%,#1b2c47 0%,#0c1626 62%,#080f1b 100%);box-shadow:0 18px 40px -16px rgba(8,20,40,.7)">
+    <div style="height:132px;background:linear-gradient(180deg,rgba(12,22,38,0) 0%,rgba(12,22,38,0) 52%,rgba(12,22,38,.6) 78%,#0e1a2d 100%),url(/bai-dai/hero.webp) center 66%/cover"></div>
+    <div style="position:absolute;inset:7px;border:1px solid ${kim}.5);border-radius:5px;pointer-events:none;z-index:2"></div>${gocHv('#d6b46a')}
+    <div style="position:relative;z-index:3;margin-top:-34px;padding:0 22px 20px;text-align:center">
+      ${vongVang(d, 68, '#0e1a2d')}
+      <div style="margin-top:10px;font-size:9.5px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:${kim}.95)">Người đăng tin</div>
+      <div style="margin-top:4px;display:flex;align-items:center;justify-content:center;gap:6px"><span style="${SERIF};font-weight:600;font-size:21px;line-height:1.2;color:#f7efd9">${esc(d.ten)}</span><span style="color:#d6b46a;display:inline-grid">${I.khien}</span></div>
+      <div style="margin-top:4px;font-size:12px;color:rgba(239,230,207,.6)">Tham gia ${esc(d.thamGia)} · ${esc(d.soTin)} tin đang đăng</div>
+      <div style="margin:14px 0 16px">${keKc('#d6b46a')}</div>
+      <div style="display:grid;gap:8px">
+        ${telSang(d, 'height:42px;border-radius:4px;color:#1b1408;font-size:14px;letter-spacing:.02em;border:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 8px 20px -8px rgba(201,162,78,.7)', 'b kim')}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${zaloSang(d, phu)}${luuSang(d, phu)}</div>
+      </div>
+      ${d.trang ? `<a href="${esc(d.trang)}" style="display:inline-flex;align-items:center;gap:3px;margin-top:14px;font-size:12.5px;font-weight:600;color:#d6b46a">Xem trang cá nhân ${I.phai}</a>` : ''}
+      ${metaSang(d, 'rgba(239,230,207,.45)', `margin-top:12px;padding-top:10px;border-top:1px solid ${kim}.18)`)}
+    </div></div>`;
+  }],
+
+  s2: ['SANG 2 · Thiệp ngà: vân hoa văn như tờ tiền, viền vàng đôi, chữ có chân, nút đen chữ vàng', (d) => {
+    const phu = 'height:38px;border-radius:3px;background:rgba(255,255,255,.6);color:#1d1a15;border:1px solid #d9cba9;font-size:13px';
+    return `<div style="position:relative;border-radius:8px;overflow:hidden;color:#1d1a15;background:${guilloche('rgba(176,141,66,.22)')} top center/100% 150px no-repeat,linear-gradient(180deg,#fbf6ea 0%,#fdfbf6 45%,#faf6ec 100%);border:1px solid #e6dcc6;box-shadow:0 14px 34px -18px rgba(90,70,30,.45)">
+    <div style="position:absolute;inset:6px;border:1px solid #cdb27a;border-radius:4px;pointer-events:none"></div>
+    <div style="position:absolute;inset:10px;border:1px solid rgba(205,178,122,.45);border-radius:3px;pointer-events:none"></div>${gocHv('#b08d42', 28)}
+    <div style="position:relative;z-index:3;padding:28px 24px 22px;text-align:center">
+      <span style="display:inline-block;padding:3px;border-radius:50%;border:1px solid #b08d42;background:#fdfbf6">${av(d, { ac: '#14110c', acT: '#f3e2a6' }, 64, 'tron', 'border:1px solid #e6dcc6')}</span>
+      <div style="margin-top:10px;font-size:9.5px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:#9a7b3a">Người đăng tin</div>
+      <div style="margin-top:4px;display:flex;align-items:center;justify-content:center;gap:6px"><span style="${SERIF};font-weight:600;font-size:22px;line-height:1.2">${esc(d.ten)}</span><span style="color:#b08d42;display:inline-grid">${I.khien}</span></div>
+      <div style="margin-top:4px;font-size:12px;color:#7a7163">Tham gia ${esc(d.thamGia)} · ${esc(d.soTin)} tin đang đăng</div>
+      <div style="margin:14px 0 16px">${keKc('#b08d42')}</div>
+      <div style="display:grid;gap:8px">
+        ${telSang(d, 'height:42px;border-radius:3px;background:linear-gradient(180deg,#23201a,#100e0a);color:#f0dc9c;font-size:14px;letter-spacing:.02em;border:0;box-shadow:inset 0 0 0 1px rgba(240,220,156,.28),0 8px 18px -10px rgba(0,0,0,.6)')}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${zaloSang(d, phu)}${luuSang(d, phu)}</div>
+      </div>
+      ${d.trang ? `<a href="${esc(d.trang)}" style="display:inline-block;margin-top:14px;${SERIF};font-style:italic;font-size:13.5px;color:#7d6227;border-bottom:1px solid rgba(176,141,66,.5);padding-bottom:1px">Xem trang cá nhân →</a>` : ''}
+      ${metaSang(d, '#9a907e', 'margin-top:12px')}
+    </div></div>`;
+  }],
+
+  s3: ['SANG 3 · Kính mờ trên ảnh resort Cam Lâm: khung kính trong suốt, chữ trắng, nút trắng', (d) => {
+    const kinh = 'background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.38);color:#fff;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)';
+    return `<div style="position:relative;border-radius:8px;overflow:hidden;color:#fff;background:linear-gradient(180deg,rgba(6,24,44,.05) 0%,rgba(6,24,44,.35) 45%,rgba(6,24,44,.78) 100%),url(/bai-dai/bd-02.webp) center 40%/cover;padding:12px;box-shadow:0 18px 40px -18px rgba(6,24,44,.7)">
+    <div style="display:flex;justify-content:space-between;align-items:center"><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;${kinh}">${I.nguoi}Người đăng tin</span>
+      <span style="padding:5px 9px;border-radius:999px;font-size:10.5px;font-weight:600;${kinh}">${esc(d.soTin)} tin</span></div>
+    <div style="margin-top:78px;border-radius:8px;padding:16px;background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.35);-webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 10px 30px rgba(0,0,0,.25)">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="display:inline-block;padding:2px;border-radius:50%;background:rgba(255,255,255,.85)">${av(d, { ac: '#0A2540', acT: '#fff' }, 52)}</span>
+        <div style="min-width:0;flex:1"><div style="display:flex;align-items:center;gap:6px"><span style="${SERIF};font-weight:600;font-size:19px;line-height:1.2;text-shadow:0 1px 8px rgba(0,0,0,.3)">${esc(d.ten)}</span><span style="display:inline-grid;color:#fde68a">${I.khien}</span></div>
+          <div style="margin-top:2px;font-size:12px;color:rgba(255,255,255,.78)">Tham gia ${esc(d.thamGia)}${d.trang ? ` · <a href="${esc(d.trang)}" style="color:#fff;font-weight:600;border-bottom:1px solid rgba(255,255,255,.5)">Trang cá nhân</a>` : ''}</div></div>
+      </div>
+      <div style="display:grid;gap:8px;margin-top:14px">
+        ${telSang(d, 'height:42px;border-radius:6px;background:#fff;color:#0A2540;font-size:14px;border:0;box-shadow:0 8px 20px -8px rgba(0,0,0,.45)')}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${zaloSang(d, `height:38px;border-radius:6px;font-size:13px;${kinh}`)}${luuSang(d, `height:38px;border-radius:6px;font-size:13px;${kinh}`)}</div>
+      </div>
+    </div>
+    ${metaSang(d, 'rgba(255,255,255,.7)', 'margin-top:10px;text-align:center')}</div>`;
+  }],
+};
 export const DS_MAU: { n: number; l: string; c: string }[] = [];
 { let k = 0; for (const l in L) for (const c in C) DS_MAU.push({ n: ++k, l, c }); }
-export const CSS_MAU = `.mlh .b{display:flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 12px;border-radius:6px;font-size:13.5px;font-weight:700;white-space:nowrap;transition:filter .15s,opacity .15s}
+for (const l in S) DS_MAU.push({ n: DS_MAU.length + 1, l, c: '' }); // 101–103 = 3 mẫu sang
+export const CSS_MAU = `@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,500&display=swap&subset=vietnamese');
+.mlh .kim{background:${VANG};background-size:220% 100%;animation:mlhKim 7s ease-in-out infinite}@keyframes mlhKim{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.mlh .b{display:flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 12px;border-radius:6px;font-size:13.5px;font-weight:700;white-space:nowrap;transition:filter .15s,opacity .15s}
 .mlh .b:hover{filter:brightness(1.08)}.mlh button{cursor:pointer;background:none;border:0;padding:0;font:inherit}.mlh button.b{border-style:solid}
 .mlh a{text-decoration:none}`;
 export interface DuLieuLienHe { ten: string; chu: string; anh?: string; thamGia: string; soTin: string | number; trang?: string; so: string; soDu?: string | null; zalo: string; daLuu: boolean; ma: string; dang: string; xem: string; gia: string; dt: string }
-export function moTaMau(n: number) { const m = DS_MAU[n - 1]; return m ? `${L[m.l][0]} · Màu: ${C[m.c][0]}` : ''; }
-export function htmlMau(n: number, d: DuLieuLienHe) { const m = DS_MAU[n - 1]; return m ? L[m.l][1](d, C[m.c][1]) : ''; }
+export function moTaMau(n: number) { const m = DS_MAU[n - 1]; if (!m) return ''; return m.c ? `${L[m.l][0]} · Màu: ${C[m.c][0]}` : S[m.l][0]; }
+export function htmlMau(n: number, d: DuLieuLienHe) { const m = DS_MAU[n - 1]; if (!m) return ''; return m.c ? L[m.l][1](d, C[m.c][1]) : S[m.l][1](d); }

@@ -1,5 +1,5 @@
 'use client';
-import { TheQc, MAU_QC, dangChay, type CauHinhQc, type OQc } from '@/components/OQuangCaoTrangChu';
+import { TheQc, CssQc, MAU_QC, dangChay, dsCua, type OQc } from '@/components/OQuangCaoTrangChu';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { refreshFlags } from '@/lib/flags';
 import { api, uploadGis } from '@/lib/api';
@@ -61,7 +61,7 @@ export default function Admin() {
 }
 
 function AdsManager() {
-  const [ad, setAd] = useState<any>({ enabled: true, images: ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1280&h=800&q=72'], link: '/sales/post', title: 'ĐĂNG TIN NHÀ ĐẤT MIỄN PHÍ', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' });
+  const [ad, setAd] = useState<any>({ enabled: true, images: ['/bai-dai/hero.webp', '/bai-dai/bd-05.webp', '/bai-dai/bd-02.webp', '/bai-dai/bd-13.webp'], link: '/sales/post', title: 'ĐĂNG TIN NHÀ ĐẤT MIỄN PHÍ', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' });
   const [adMsg, setAdMsg] = useState('');
   const [mapCount, setMapCount] = useState<number | null>(null);
   useEffect(() => { api<{ value: any }>('/config/tintuc_ad').then((r) => { if (r.value && typeof r.value === 'object') setAd((a: any) => ({ ...a, ...r.value })); }).catch(() => {}); }, []);
@@ -133,42 +133,52 @@ function AdsManager() {
   );
 }
 // HAI Ô QUẢNG CÁO CẠNH TIN TỨC Ở TRANG CHỦ (khoá trangchu_ad) — xem components/OQuangCaoTrangChu.tsx.
+// Mỗi ô chứa NHIỀU quảng cáo, trang chủ tự trượt luân phiên.
+const maMoi = () => Math.random().toString(36).slice(2, 9);
 function QcTrangChu() {
-  const [ch, setCh] = useState<CauHinhQc>({ o1: { bat: false, mau: 'do' }, o2: { bat: false, mau: 'xanh' } });
+  const [ch, setCh] = useState<{ o1: OQc[]; o2: OQc[] }>({ o1: [], o2: [] });
   const [msg, setMsg] = useState('');
-  useEffect(() => { api<{ value: any }>('/config/trangchu_ad').then((r) => { if (r.value && typeof r.value === 'object') setCh((c) => ({ ...c, ...r.value })); }).catch(() => {}); }, []);
-  const setO = (k: 'o1' | 'o2', f: keyof OQc, v: any) => setCh((c) => ({ ...c, [k]: { ...(c[k] || {}), [f]: v } }));
+  useEffect(() => { api<{ value: any }>('/config/trangchu_ad').then((r) => { if (r.value && typeof r.value === 'object') setCh({ o1: dsCua(r.value.o1).map((o) => ({ id: maMoi(), ...o })), o2: dsCua(r.value.o2).map((o) => ({ id: maMoi(), ...o })) }); }).catch(() => {}); }, []);
+  const sua = (k: 'o1' | 'o2', id: string, f: keyof OQc, v: any) => setCh((c) => ({ ...c, [k]: c[k].map((o) => (o.id === id ? { ...o, [f]: v } : o)) }));
+  const them = (k: 'o1' | 'o2') => setCh((c) => ({ ...c, [k]: [...c[k], { id: maMoi(), bat: true, mau: k === 'o1' ? 'do' : 'xanh' }] }));
+  const xoa = (k: 'o1' | 'o2', id: string) => { if (confirm('Xoá quảng cáo này khỏi ô? (bấm Lưu mới có hiệu lực)')) setCh((c) => ({ ...c, [k]: c[k].filter((o) => o.id !== id) })); };
+  const doiCho = (k: 'o1' | 'o2', id: string, d: number) => setCh((c) => { const a = [...c[k]]; const i = a.findIndex((o) => o.id === id); const j = i + d; if (j < 0 || j >= a.length) return c; [a[i], a[j]] = [a[j], a[i]]; return { ...c, [k]: a }; });
   async function save() { setMsg('Đang lưu…'); try { await api('/config/trangchu_ad', { method: 'POST', body: JSON.stringify({ value: ch }) }); setMsg('✓ Đã lưu — trang chủ đổi sau khoảng 1 phút.'); } catch (e: any) { setMsg('✗ ' + (e?.message || 'Lỗi')); } }
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm';
   const homNay = new Date().toISOString().slice(0, 10);
-  // Gọi như hàm thường (không phải <O/>) để ô nhập không bị dựng lại mất chữ đang gõ
-  const O = ({ k, ten, macDinh }: { k: 'o1' | 'o2'; ten: string; macDinh: string }) => {
-    const o = ch[k] || {};
+  // Gọi như hàm thường (không phải <MotQc/>) để ô nhập không bị dựng lại mất chữ đang gõ
+  const MotQc = (k: 'o1' | 'o2', o: OQc, thu: number, tong: number) => {
+    const id = o.id!;
     const chay = dangChay(o);
     const quaHan = !!o.hanDen && o.hanDen < homNay;
     return (
-      <div className="rounded-xl border border-slate-200 p-3">
+      <div key={id} className="rounded-xl border border-slate-200 p-3 bg-slate-50/50">
         <div className="flex items-center justify-between gap-2">
-          <p className="font-bold text-[#0A2540] text-sm">{ten}</p>
-          <button onClick={() => setO(k, 'bat', o.bat === false ? true : !o.bat)} aria-label="Bật/tắt" className={`w-12 h-7 rounded-full relative transition shrink-0 ${o.bat ? 'bg-emerald-500' : 'bg-slate-300'}`}><span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-all ${o.bat ? 'left-6' : 'left-1'}`} /></button>
+          <p className="text-sm font-bold text-[#0A2540]">Quảng cáo {thu + 1}{o.khach ? <span className="font-normal text-slate-500"> · {o.khach}</span> : null}</p>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button onClick={() => doiCho(k, id, -1)} disabled={thu === 0} title="Lên trước" className="w-7 h-7 rounded border border-slate-200 text-slate-500 disabled:opacity-30">↑</button>
+            <button onClick={() => doiCho(k, id, 1)} disabled={thu === tong - 1} title="Xuống sau" className="w-7 h-7 rounded border border-slate-200 text-slate-500 disabled:opacity-30">↓</button>
+            <button onClick={() => xoa(k, id)} className="px-2 h-7 rounded border border-red-200 text-red-600 text-xs font-semibold">Xoá</button>
+            <button onClick={() => sua(k, id, 'bat', !o.bat)} aria-label="Bật/tắt" className={`w-12 h-7 rounded-full relative transition ${o.bat ? 'bg-emerald-500' : 'bg-slate-300'}`}><span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-all ${o.bat ? 'left-6' : 'left-1'}`} /></button>
+          </div>
         </div>
         <p className={`text-xs mt-1 font-medium ${chay ? 'text-emerald-600' : quaHan ? 'text-red-600' : 'text-slate-500'}`}>
-          {chay ? '● Đang chạy quảng cáo của khách' : quaHan ? '● Đã hết hạn — đang hiện thẻ của web' : `● Đang hiện thẻ của web (${macDinh})`}
+          {chay ? '● Đang chạy' : quaHan ? '● Đã hết hạn — không hiện nữa' : !o.tieuDe?.trim() ? '● Chưa có tiêu đề — chưa hiện' : '● Đang tắt'}
         </p>
-        <div className="grid sm:grid-cols-[1fr_200px] gap-3 mt-3 items-start">
+        <div className="grid sm:grid-cols-[1fr_210px] gap-3 mt-2 items-start">
           <div className="space-y-2">
-            <input defaultValue={o.khach || ''} onBlur={(e) => setO(k, 'khach', e.target.value)} placeholder="Tên khách đặt + SĐT (chỉ để nhớ, không hiện ra web)" className={inp} />
-            <input defaultValue={o.nhan || ''} onBlur={(e) => setO(k, 'nhan', e.target.value)} placeholder="Nhãn nhỏ — vd: DỰ ÁN MỚI · ĐẤT NỀN BÃI DÀI" className={inp} />
-            <input defaultValue={o.tieuDe || ''} onBlur={(e) => setO(k, 'tieuDe', e.target.value)} placeholder="Tiêu đề (bắt buộc) — vd: Đất nền ven biển Bãi Dài, sổ riêng" className={inp} />
-            <input defaultValue={o.moTa || ''} onBlur={(e) => setO(k, 'moTa', e.target.value)} placeholder="Một dòng mô tả — chỉ hiện trên máy tính" className={inp} />
+            <input defaultValue={o.khach || ''} onBlur={(e) => sua(k, id, 'khach', e.target.value)} placeholder="Tên khách đặt + SĐT (chỉ để nhớ, không hiện ra web)" className={inp} />
+            <input defaultValue={o.nhan || ''} onBlur={(e) => sua(k, id, 'nhan', e.target.value)} placeholder="Nhãn nhỏ — vd: DỰ ÁN MỚI · ĐẤT NỀN BÃI DÀI" className={inp} />
+            <input defaultValue={o.tieuDe || ''} onBlur={(e) => sua(k, id, 'tieuDe', e.target.value)} placeholder="Tiêu đề (bắt buộc) — vd: Đất nền ven biển Bãi Dài, sổ riêng" className={inp} />
+            <input defaultValue={o.moTa || ''} onBlur={(e) => sua(k, id, 'moTa', e.target.value)} placeholder="Một dòng mô tả — chỉ hiện trên máy tính" className={inp} />
             <div className="grid grid-cols-2 gap-2">
-              <input defaultValue={o.nut || ''} onBlur={(e) => setO(k, 'nut', e.target.value)} placeholder="Chữ nút — vd: Xem dự án" className={inp} />
-              <label className="flex items-center gap-2 text-xs text-slate-500">Hết hạn<input type="date" value={o.hanDen || ''} onChange={(e) => setO(k, 'hanDen', e.target.value)} className={inp} /></label>
+              <input defaultValue={o.nut || ''} onBlur={(e) => sua(k, id, 'nut', e.target.value)} placeholder="Chữ nút — vd: Xem dự án" className={inp} />
+              <label className="flex items-center gap-2 text-xs text-slate-500">Hết hạn<input type="date" value={o.hanDen || ''} onChange={(e) => sua(k, id, 'hanDen', e.target.value)} className={inp} /></label>
             </div>
-            <input defaultValue={o.link || ''} onBlur={(e) => setO(k, 'link', e.target.value)} placeholder="Bấm vào đi đâu — /listings/123 · https://... · tel:0988888888 · https://zalo.me/0988888888" className={inp} />
-            <input defaultValue={o.anh || ''} onBlur={(e) => setO(k, 'anh', e.target.value)} placeholder="Link ảnh nền (không bắt buộc) — ảnh ngang, vd 800×500" className={inp} />
+            <input defaultValue={o.link || ''} onBlur={(e) => sua(k, id, 'link', e.target.value)} placeholder="Bấm vào đi đâu — /listings/123 · https://... · tel:0988888888 · https://zalo.me/0988888888" className={inp} />
+            <input defaultValue={o.anh || ''} onBlur={(e) => sua(k, id, 'anh', e.target.value)} placeholder="Link ảnh nền (nên có — ảnh chạy động) — ảnh ngang, vd 800×500" className={inp} />
             <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500">Màu (khi không có ảnh):
-              {Object.entries(MAU_QC).map(([id, m]) => <button key={id} onClick={() => setO(k, 'mau', id)} className={`px-2 py-1 rounded text-[11px] font-bold ${(o.mau || 'xanh') === id ? 'ring-2 ring-offset-1 ring-[#0A2540]' : ''}`} style={{ background: m.nen, color: m.chu }}>{m.ten}</button>)}
+              {Object.entries(MAU_QC).map(([mid, m]) => <button key={mid} onClick={() => sua(k, id, 'mau', mid)} className={`px-2 py-1 rounded text-[11px] font-bold ${(o.mau || 'xanh') === mid ? 'ring-2 ring-offset-1 ring-[#0A2540]' : ''}`} style={{ background: m.nen, color: m.chu }}>{m.ten}</button>)}
             </div>
           </div>
           <div>
@@ -179,15 +189,32 @@ function QcTrangChu() {
       </div>
     );
   };
+  const MotO = (k: 'o1' | 'o2', ten: string, macDinh: string) => {
+    const ds = ch[k];
+    const soChay = ds.filter((o) => dangChay(o)).length;
+    return (
+      <div className="rounded-xl border border-slate-200 p-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="font-bold text-[#0A2540] text-sm">{ten}</p>
+          <p className={`text-xs font-medium ${soChay ? 'text-emerald-600' : 'text-slate-500'}`}>{soChay ? `${soChay} quảng cáo đang chạy${soChay > 1 ? ' — tự trượt luân phiên 5 giây/cái' : ''}` : `Chưa có quảng cáo chạy → đang hiện thẻ của web (${macDinh})`}</p>
+        </div>
+        <div className="space-y-2.5 mt-2.5">
+          {ds.map((o, i) => MotQc(k, o, i, ds.length))}
+          <button onClick={() => them(k)} className="w-full rounded-xl border border-dashed border-slate-300 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">＋ Thêm quảng cáo vào ô này</button>
+        </div>
+      </div>
+    );
+  };
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-4">
+      <CssQc />
       <p className="font-bold text-[#0A2540]">🏠 2 ô quảng cáo trang chủ (cạnh Tin tức)</p>
-      <p className="text-xs text-slate-500 mt-1">Vị trí đẹp nhất web — ngay màn hình đầu, ai vào trang chủ cũng thấy. Ô có khách + đang bật + chưa hết hạn thì hiện quảng cáo (góc có chữ nhỏ &quot;Quảng cáo&quot;); tắt hoặc <b>quá ngày hết hạn là tự quay về thẻ của web</b>, không cần gỡ tay.</p>
+      <p className="text-xs text-slate-500 mt-1">Vị trí đẹp nhất web — ngay màn hình đầu, ai vào trang chủ cũng thấy. Mỗi ô nhận <b>nhiều quảng cáo, tự trượt luân phiên</b> (điện thoại vuốt được). Quảng cáo tắt hoặc <b>quá ngày hết hạn là tự bỏ ra</b>; ô hết quảng cáo thì quay về thẻ của web.</p>
       <div className="space-y-3 mt-3">
-        {O({ k: 'o1', ten: 'Ô 1 — trên (ô đỏ)', macDinh: 'Bản đồ quy hoạch' })}
-        {O({ k: 'o2', ten: 'Ô 2 — dưới (ô xanh)', macDinh: 'Đăng tin miễn phí' })}
+        {MotO('o1', 'Ô 1 — trên (chỗ ô đỏ)', 'Bản đồ quy hoạch')}
+        {MotO('o2', 'Ô 2 — dưới (chỗ ô xanh)', 'Đăng tin miễn phí')}
       </div>
-      <div className="flex items-center gap-3 mt-3"><button onClick={save} className="bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-4 py-2 rounded-xl text-sm">Lưu</button>{msg && <span className="text-xs font-medium text-slate-600">{msg}</span>}</div>
+      <div className="sticky bottom-0 bg-white/95 py-2 flex items-center gap-3 mt-3"><button onClick={save} className="bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-4 py-2 rounded-xl text-sm">Lưu</button>{msg && <span className="text-xs font-medium text-slate-600">{msg}</span>}</div>
     </div>
   );
 }

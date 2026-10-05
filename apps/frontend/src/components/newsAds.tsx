@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 
 export interface Ad { enabled?: boolean; image?: string; images?: string[]; link?: string; title?: string; sub?: string; cta?: string }
 
-export const SAMPLE_AD: Ad = { enabled: true, images: ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1280&h=800&q=72', 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1280&h=800&q=72', 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1280&h=800&q=72'], link: '/sales/post', title: 'Đăng tin nhà đất miễn phí', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' };
+// Ảnh mặc định: biển Bãi Dài – Cam Lâm thật (public/bai-dai), thay 3 ảnh nhà kiểu Mỹ trên Unsplash (5/10/2026)
+export const SAMPLE_AD: Ad = { enabled: true, images: ['/bai-dai/hero.webp', '/bai-dai/bd-05.webp', '/bai-dai/bd-02.webp', '/bai-dai/bd-13.webp'], link: '/sales/post', title: 'Đăng tin nhà đất miễn phí', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' };
 
 export const imgsOf = (ad: Ad) => ((ad.images && ad.images.length ? ad.images : ad.image ? [ad.image] : []) as string[]).filter(Boolean);
 const isExt = (l?: string) => (l || '').startsWith('http');

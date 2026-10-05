@@ -586,7 +586,7 @@ export default function Home() {
           <div className="relative md:absolute md:inset-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/quyhoach-camlam.jpg" alt="Mô hình quy hoạch Cam Lâm" loading="lazy" decoding="async"
-              className="block aspect-[2.35/1] w-full object-cover sm:aspect-auto sm:h-64 md:h-full" />
+              className="block aspect-[3.2/1] w-full object-cover sm:aspect-auto sm:h-64 md:h-full" />
             {/* HUY HIỆU "Cam Lâm Land · Hotline" — ảnh gốc có sẵn ở góc dưới phải nhưng dạng ảnh rộng bị cắt mất
                 (chủ dự án 2/10/2026) → dựng lại bằng chữ thật, đè lên góc ảnh, bấm là gọi. Giống hệt kiểu trong ảnh gốc. */}
             <a href="tel:0988888888" className="absolute bottom-1.5 right-1.5 z-[2] flex items-center gap-1 rounded bg-[#0f2236]/80 px-1 py-0.5 text-white shadow-lg backdrop-blur-sm sm:bottom-4 sm:right-4 sm:gap-2.5 sm:rounded-lg sm:px-3 sm:py-2">
@@ -600,14 +600,17 @@ export default function Home() {
             </a>
           </div>
           <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block" style={{ background: 'linear-gradient(90deg,#fff 0%,rgba(255,255,255,.96) 38%,rgba(255,255,255,0) 70%)' }} />
-          <div className="relative p-4 sm:p-8 md:max-w-[46%] md:p-12">
-            {/* Điện thoại: tỉ lệ theo mẫu 5 trong trang xem thử (chủ dự án 2/10/2026) — ảnh 2,35:1, tiêu đề 17, mô tả đủ dòng 12, nút nhỏ. */}
-            <span className="text-[#C8A14B] font-semibold text-[11px] sm:text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>
-            <h2 className="text-[17px] leading-snug sm:text-3xl font-extrabold text-[#0A2540] mt-1 sm:mt-2">Tra cứu quy hoạch & thửa đất chính xác</h2>
-            <p className="text-[12px] leading-relaxed sm:text-base text-slate-500 mt-1.5 sm:mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số thửa/số tờ/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
-            <div className="mt-3.5 sm:mt-6 flex gap-2 sm:gap-3">
-              <Link href="/map" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold text-[12.5px] sm:text-base px-3.5 sm:px-6 py-2 sm:py-3 rounded sm:rounded-xl">Mở bản đồ →</Link>
-              <Link href="/qr" className="cl-press border border-slate-300 bg-white text-[#0A2540] font-bold text-[12.5px] sm:text-base px-3.5 sm:px-6 py-2 sm:py-3 rounded sm:rounded-xl hover:bg-slate-50">Tra cứu QR</Link>
+          {/* Điện thoại: MẪU 8 "băng ảnh mỏng" chủ dự án chọn 5/10/2026 (bản cũ bị chê "chưa gọn") — ảnh 3,2:1,
+              dưới ảnh CHỈ MỘT HÀNG: tiêu đề + nút "QR" + nút "Mở bản đồ"; ẩn dòng nhãn và đoạn mô tả.
+              Từ khổ sm trở lên giữ nguyên bố cục cũ. */}
+          <div className="relative flex items-center gap-2 px-[11px] py-[9px] sm:block sm:p-8 md:max-w-[46%] md:p-12">
+            <span className="hidden sm:inline text-[#C8A14B] font-semibold text-sm tracking-wide">BẢN ĐỒ QUY HOẠCH</span>
+            <h2 className="min-w-0 flex-1 text-[14px] leading-snug sm:text-3xl font-extrabold text-[#0A2540] sm:mt-2">Tra cứu quy hoạch & thửa đất<span className="hidden sm:inline"> chính xác</span></h2>
+            <p className="hidden sm:block leading-relaxed text-base text-slate-500 mt-3">Quy hoạch sử dụng đất, nền vệ tinh độ nét cao, tra cứu theo số thửa/số tờ/xã, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.</p>
+            <div className="flex flex-none gap-1.5 sm:mt-6 sm:gap-3">
+              <Link href="/map" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold text-[11.5px] sm:text-base px-2.5 sm:px-6 py-[5px] sm:py-3 rounded sm:rounded-xl">Mở bản đồ<span className="hidden sm:inline"> →</span></Link>
+              {/* Điện thoại: nút QR đứng TRƯỚC nút Mở bản đồ (đúng mẫu 8); máy tính đứng sau như cũ. */}
+              <Link href="/qr" className="cl-press order-first sm:order-none border border-slate-300 bg-white text-[#0A2540] font-bold text-[11.5px] sm:text-base px-[9px] sm:px-6 py-[5px] sm:py-3 rounded sm:rounded-xl hover:bg-slate-50"><span className="hidden sm:inline">Tra cứu </span>QR</Link>
             </div>
           </div>
         </div>

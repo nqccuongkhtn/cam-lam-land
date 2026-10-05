@@ -11,7 +11,6 @@ import { useLoginGate } from '@/lib/loginGate';
 import ListingCard from '@/components/ListingCard';
 import { Skeleton, EmptyState, buttonClass } from '@/components/ui';
 import { escHtml } from '@/lib/escHtml';
-import XemMauLienHe from '@/components/XemMauLienHe'; // TẠM: xem thử mẫu khung người đăng bằng ?xemmau=N
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
 
@@ -41,7 +40,7 @@ export default function ListingDetail() {
   const [similar, setSimilar] = useState<Listing[]>([]);
   const [similarLoading, setSimilarLoading] = useState(true);
   const [recent, setRecent] = useState<Listing[]>([]);
-  const [agentInfo, setAgentInfo] = useState<{ createdAt?: string; activeCount: number } | null>(null);
+  const [agentInfo, setAgentInfo] = useState<{ createdAt?: string; activeCount: number; pro?: boolean } | null>(null);
   const [areas, setAreas] = useState<{ ward: string; count: number }[]>([]);
   const [lightbox, setLightbox] = useState(false);
   const [lbView, setLbView] = useState<'img' | 'map'>('img');
@@ -59,7 +58,7 @@ export default function ListingDetail() {
   // Thống kê môi giới (đã tham gia · tin đang đăng) — như batdongsan
   useEffect(() => {
     if (!l?.createdBy) { setAgentInfo(null); return; }
-    api<{ agent: any; active: any[] }>(`/listings/agent/${l.createdBy}`).then((d) => setAgentInfo({ createdAt: d.agent?.createdAt, activeCount: Array.isArray(d.active) ? d.active.length : 0 })).catch(() => {});
+    api<{ agent: any; active: any[] }>(`/listings/agent/${l.createdBy}`).then((d) => setAgentInfo({ createdAt: d.agent?.createdAt, pro: !!d.agent?.pro, activeCount: Array.isArray(d.active) ? d.active.length : 0 })).catch(() => {});
   }, [l]);
   // Danh sách khu vực cho mục "Mua bán nhà đất tại Cam Lâm"
   useEffect(() => { api<{ areas: { ward: string; count: number }[] }>(`/listings/areas`).then((d) => setAreas(d.areas || [])).catch(() => {}); }, []);
@@ -328,14 +327,36 @@ export default function ListingDetail() {
             {/* MẢNH LẠI CHO SANG — so với batdongsan.com.vn thì thẻ này của mình dày và nặng:
                   bóng đổ to, ảnh đại diện 64px, con số 20px, ba nút đều cao 48-52px.
                   Bên họ: viền mảnh, ảnh 52px, nút vừa phải. Hạ theo hướng đó. */}
-            {/* TẠM: ?xemmau=N thay khung này bằng mẫu N để chủ dự án lướt thử trên web thật (xem lib/mauLienHe.ts). */}
-            <XemMauLienHe onHien={user ? reveal : () => openLogin()} onLuu={() => setSaved((v) => !v)} d={{
-              ten: l.contactName || 'Cam Lâm Land', chu: (l.contactName || 'C').charAt(0).toUpperCase(), anh: l.posterAvatar || '',
-              thamGia: joinLabel(agentInfo?.createdAt) ?? '—', soTin: agentInfo ? agentInfo.activeCount : '—',
-              trang: l.createdBy ? `/moi-gioi/${l.createdBy}` : '', so: l.contactPhone || '0988 88•••', soDu: full,
-              zalo: 'https://zalo.me/0988888888', daLuu: saved, ma: code, dang: postedLabel(l.createdAt),
-              xem: displayViews(l).toLocaleString('vi-VN'), gia: priceLabel(l.price, l.deal), dt: l.area ? `${l.area} m²` : '',
-            }}>
+            {/* HAI KIỂU KHUNG NHƯ batdongsan.com.vn (5/10/2026):
+                  - Người đăng ĐANG CÒN HẠN gói trả phí (agentInfo.pro, máy chủ tính) → khung xanh ngọc có nhãn
+                    "Môi giới chuyên nghiệp" (khung bên dưới).
+                  - Người thường → thẻ trắng viền nhạt, ảnh giữa, nút số xanh ngọc, nút Zalo trắng.
+                  Trước đây ai cũng được khung "chuyên nghiệp" → nhãn mất ý nghĩa. */}
+            {!agentInfo?.pro ? (
+              <div className="rounded-lg border border-slate-200 bg-white p-4 text-center">
+                <div className="flex justify-center">
+                  {l.posterAvatar ? <img src={l.posterAvatar} alt="" className="h-[52px] w-[52px] rounded-full object-cover" /> : <div className="grid h-[52px] w-[52px] place-items-center rounded-full bg-slate-100 text-xl font-semibold text-slate-600">{(l.contactName || 'C').charAt(0).toUpperCase()}</div>}
+                </div>
+                <p className="mt-2 text-xs text-slate-400">Được đăng bởi</p>
+                <p className="mt-0.5 text-base font-semibold leading-6 text-[#2c2c2c]">{l.contactName || 'Cam Lâm Land'}</p>
+                {l.createdBy && agentInfo && <Link href={`/moi-gioi/${l.createdBy}`} className="mt-0.5 inline-block text-xs text-slate-500 hover:text-[#009ba1]">Xem thêm {agentInfo.activeCount} tin khác</Link>}
+                <div className="mt-4 space-y-2">
+                  {full ? (
+                    <a href={`tel:${full.replace(/\s/g, '')}`} className="flex h-12 items-center justify-center gap-2 rounded-lg bg-[#009ba1] text-[15px] font-semibold text-white hover:bg-[#008a90]"><IPhone /> {full}</a>
+                  ) : (
+                    <button onClick={user ? reveal : () => openLogin()} disabled={revealing} className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#009ba1] text-[15px] font-semibold text-white hover:bg-[#008a90] disabled:opacity-60"><IPhone /> {revealing ? 'Đang hiện…' : <>{l.contactPhone || '0988 88•••'} <span className="font-normal">· Hiện số</span></>}</button>
+                  )}
+                  <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white text-[15px] font-semibold text-[#2c2c2c] hover:bg-slate-50"><svg viewBox="0 0 24 24" fill="#0068FF" className="h-5 w-5"><path d="M12 2C6.5 2 2 5.8 2 10.5c0 2.6 1.4 4.9 3.6 6.4-.1.9-.5 2.2-1.2 3.1 1.4-.2 2.8-.8 3.9-1.5 1.1.3 2.4.5 3.7.5 5.5 0 10-3.8 10-8.5S17.5 2 12 2z" /></svg> Chat qua Zalo</a>
+                  <div className="flex gap-2">
+                    <button onClick={() => setSaved((v) => !v)} className={`flex h-12 flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white text-[15px] font-semibold hover:bg-slate-50 ${saved ? 'text-red-600' : 'text-[#2c2c2c]'}`}><IHeart filled={saved} /> {saved ? 'Đã lưu' : 'Lưu tin'}</button>
+                    {user && l.createdBy === user.id && (
+                      <Link href={`/sales/edit/${l.id}`} className="flex h-12 flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white text-[15px] font-semibold text-[#2c2c2c] hover:bg-slate-50">✏️ Sửa</Link>
+                    )}
+                  </div>
+                </div>
+                <p className="mt-3 text-[11px] text-slate-400">Mã tin {code} · {postedLabel(l.createdAt)} · {displayViews(l).toLocaleString('vi-VN')} lượt xem</p>
+              </div>
+            ) : (
             <div className="rounded-xl overflow-hidden shadow-[0_4px_16px_rgba(13,138,128,0.18)] bg-gradient-to-b from-[#13a99c] to-[#0b7d72]">
               <div className="flex items-center justify-center gap-1.5 px-4 py-2">
                 <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="12" cy="8" r="6" /><path d="M15.5 13.6 17 22l-5-3-5 3 1.5-8.4" /></svg>
@@ -375,7 +396,7 @@ export default function ListingDetail() {
                 <p className="text-[11px] text-white/70 text-center pt-0.5">Mã tin {code} · {postedLabel(l.createdAt)} · {displayViews(l).toLocaleString('vi-VN')} lượt xem</p>
               </div>
             </div>
-            </XemMauLienHe>
+            )}
             {areas.length > 0 && (
               <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
                 <h3 className="font-bold text-[#0A2540] mb-3">Mua bán nhà đất tại Cam Lâm</h3>

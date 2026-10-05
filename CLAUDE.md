@@ -514,6 +514,13 @@ Trang video tự chặn ở lớp bọc ngoài (`MapVideoPage` → `MapVideoTool
 **công cụ không chạy chút nào** — không dựng bản đồ, không tải ảnh vệ tinh.
 Lưu ý: video dựng **hoàn toàn trên máy khách**, không có endpoint máy chủ → đây là chặn ở giao diện.
 
+**Môi giới chuyên nghiệp** (`routes/moiGioiCn.ts`, 5/10/2026) — giống batdongsan.com.vn: trang xem tin hiện khung
+xanh ngọc "Môi giới chuyên nghiệp" CHỈ cho người admin đã duyệt (`users.cn_trang_thai='duyet'`), còn lại khung trắng.
+Người dùng bấm "Xin duyệt" ở `/account` khi đủ 4 điều kiện (máy chủ tự kiểm): tài khoản > 3 tháng · ≥ 30 tin ·
+đã xác minh SĐT · đã từng mua gói. Admin duyệt ở `/quan-tri/moi-gioi-chuyen-nghiep`. Chưa có cổng SMS nên xác minh SĐT
+là admin gọi điện rồi bấm tay; lưu SỐ đã xác minh (`sdt_da_xac_minh`) nên đổi số là tự mất xác minh.
+Cờ `pro` trả ở `/api/listings/agent/:id` (cache 30 giây → duyệt xong ~30 giây mới đổi khung).
+
 **Quy tắc tin đăng** (`routes/listings.ts`): tài khoản miễn phí `FREE_POST_LIMIT = 1` tin/tháng;
 gói trả phí trừ hạn mức **atomic** (`UPDATE ... WHERE post_used < post_quota`) để không vượt khi bấm nhiều tab;
 tin thường **tự ẩn khỏi danh sách sau 7 ngày** nếu không được đẩy; thứ tự hiển thị = hạng VIP trước,

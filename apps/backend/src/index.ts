@@ -9,6 +9,7 @@ import { ensureAdmin } from './lib/ensureAdmin.ts';
 import { bootstrap } from './lib/bootstrap.ts';
 import { migrate } from './lib/migrate.ts';
 import { authRequired } from './middleware/auth.ts';
+import { moiGioiCnRouter } from './routes/moiGioiCn.ts';
 import { theoDoiRouter, ghiHoatDong, khoiTaoTheoDoi } from './routes/theoDoiTk.ts'; // THEO DÕI TÀI KHOẢN (tạm — dễ gỡ)
 import { authRouter } from './routes/auth.ts';
 import { passkeyRouter } from './routes/passkey.ts';
@@ -127,6 +128,7 @@ app.use('/api/auth', rateLimit({ windowMs: 10 * 60 * 1000, max: 60, key: 'auth',
 app.use('/api/passkey', rateLimit({ windowMs: 10 * 60 * 1000, max: 120, key: 'passkey',
   message: 'Thử vân tay quá nhiều lần. Đợi vài phút rồi thử lại.' }), passkeyRouter);
 app.use('/api/listings', listingsRouter);
+app.use('/api/moi-gioi-cn', moiGioiCnRouter); // xin / duyệt MÔI GIỚI CHUYÊN NGHIỆP
 app.use('/api/layers', layersRouter);
 // Bấm vào thửa để xem thông tin: người thật bấm nhiều lắm cũng vài lần mỗi giây, còn máy cào
 // thì gọi liên tục. 150 lần/phút là rất rộng rãi với người dùng nhưng chặn đứng kiểu quét tự động.

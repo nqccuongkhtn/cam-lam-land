@@ -684,5 +684,19 @@ export async function migrate(): Promise<void> {
     console.log('[migrate] lịch logo ngày lễ: đã nạp tới đợt', DOT_LICH_LE);
   }
 
+  // ── MÔI GIỚI CHUYÊN NGHIỆP (5/10/2026) — xem routes/moiGioiCn.ts ──
+  //   sdt_da_xac_minh: SỐ điện thoại admin đã xác minh. Chỉ tính "đã xác minh" khi trùng số hiện tại
+  //     → người dùng đổi số là tự mất xác minh, không cần sửa chỗ đổi số.
+  //   sdt_xin_luc: lúc người dùng bấm "nhờ xác minh số" (để admin biết ai đang chờ gọi).
+  //   cn_trang_thai: 'khong' | 'cho' (đang xin duyệt) | 'duyet' | 'tu_choi'.
+  for (const sql of [
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS sdt_da_xac_minh text`,
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS sdt_xin_luc timestamptz`,
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS cn_trang_thai text NOT NULL DEFAULT 'khong'`,
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS cn_xin_luc timestamptz`,
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS cn_duyet_luc timestamptz`,
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS cn_ghi_chu text`,
+  ]) await pool.query(sql).catch((e) => console.error('[migrate] môi giới chuyên nghiệp:', e.message));
+
   console.log('[migrate] schema up to date');
 }

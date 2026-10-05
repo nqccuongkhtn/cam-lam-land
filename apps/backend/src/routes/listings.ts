@@ -159,7 +159,10 @@ listingsRouter.get('/agent/:id', async (req, res, next) => {
     const id = Number(req.params.id);
     if (!id) return res.status(400).json({ error: 'id không hợp lệ' });
     // ⚠️ KHÔNG trả `role` (29/9/2026): lộ ai là admin/gis là chỉ đường cho kẻ xấu nhắm vào tài khoản đó.
-    const [agent] = await query(`SELECT id, full_name AS "name", phone, avatar, rating, rating_count AS "ratingCount", created_at AS "createdAt" FROM users WHERE id=$1`, [id]);
+    const [agent] = await query(`SELECT id, full_name AS "name", phone, avatar, rating, rating_count AS "ratingCount", created_at AS "createdAt",
+       -- "Môi giới chuyên nghiệp" = admin đã DUYỆT (xem routes/moiGioiCn.ts) → trang tin hiện khung xanh ngọc có nhãn.
+       (cn_trang_thai = 'duyet') AS "pro"
+       FROM users WHERE id=$1`, [id]);
     if (!agent) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
     const active = await query(
       `${SELECT} WHERE listings.created_by=$1 AND listings.status NOT IN ('hidden','pending','sold')

@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth';
 import PasswordInput from '@/components/PasswordInput';
 import ImageCropper from '@/components/ImageCropper';
 import QuanLyVanTay from '@/components/QuanLyVanTay';
+import XinMoiGioiCn from '@/components/XinMoiGioiCn';
 
 export default function Account() {
   const router = useRouter();
@@ -77,6 +78,8 @@ export default function Account() {
           <div><label className={lbl}>Mật khẩu mới (≥ 8 ký tự, có chữ và số)</label><PasswordInput value={newPw} onChange={(e) => setNewPw(e.target.value)} autoComplete="new-password" /></div>
           <button disabled={busy || !curPw || !newPw} className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] disabled:opacity-60 text-white font-bold px-6 py-2.5 rounded-xl">Đổi mật khẩu</button>
         </form>
+
+        <XinMoiGioiCn />
 
         <QuanLyVanTay />
 

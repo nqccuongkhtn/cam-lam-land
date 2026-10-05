@@ -339,10 +339,33 @@ Object.assign(S, {
     ${d.trang ? `<a href="${esc(d.trang)}" style="display:inline-flex;align-items:center;gap:3px;margin-top:12px;font-size:12.5px;font-weight:600;color:#0f0f0f">Xem trang cá nhân ${I.phai}</a>` : ''}
   </div>`],
 });
+
+// ── MẪU 107 — CHÉP SÁT khung liên hệ của batdongsan.com.vn (chủ dự án yêu cầu 5/10/2026).
+//    Đặc điểm của họ: thẻ trắng viền xám rất nhạt, KHÔNG bóng đổ, ảnh đại diện 52px giữa,
+//    "Được đăng bởi" xám nhỏ, tên đậm vừa, link "Xem thêm N tin khác"; nút số xanh ngọc #009BA1
+//    cao 48px bo 8px, nút Zalo trắng viền xám cùng cỡ; phông Lexend.
+const LEXEND = `font-family:'Lexend',Inter,system-ui,sans-serif`;
+Object.assign(S, {
+  s7: ['GIỐNG BATDONGSAN.COM.VN · thẻ trắng viền nhạt, ảnh giữa, nút số xanh ngọc, nút Zalo trắng', (d) => {
+    const nut = `height:48px;border-radius:8px;font-size:15px;font-weight:500;${LEXEND};gap:8px`;
+    return `<div style="background:#fff;color:#2c2c2c;border:1px solid #f2f2f2;border-radius:8px;padding:16px;text-align:center;${LEXEND}">
+    <div style="display:flex;justify-content:center">${d.anh ? `<img src="${esc(d.anh)}" alt="" style="width:52px;height:52px;border-radius:50%;object-fit:cover">` : `<span style="width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:#f2f2f2;color:#505050;font-size:20px;font-weight:500">${esc(d.chu)}</span>`}</div>
+    <div style="margin-top:8px;font-size:12px;color:#999">Được đăng bởi</div>
+    <div style="margin-top:2px;font-size:16px;font-weight:500;line-height:24px">${esc(d.ten)}</div>
+    ${d.trang ? `<a href="${esc(d.trang)}" style="display:inline-block;margin-top:2px;font-size:12px;color:#505050">Xem thêm ${esc(d.soTin)} tin khác</a>` : `<div style="margin-top:2px;font-size:12px;color:#505050">${esc(d.soTin)} tin đang đăng</div>`}
+    <div style="display:grid;gap:8px;margin-top:16px">
+      ${d.soDu
+        ? `<a class="b" href="tel:${esc(d.soDu.replace(/\s/g, ''))}" style="${nut};background:#009ba1;color:#fff;border:1px solid #009ba1">${I.tel}<span>${esc(d.soDu)}</span></a>`
+        : `<button type="button" class="b" data-act="hien" style="${nut};background:#009ba1;color:#fff;border:1px solid #009ba1">${I.tel}<span>${esc(d.so)}</span><span style="font-weight:400">· Hiện số</span></button>`}
+      <a class="b" href="${esc(d.zalo)}" target="_blank" rel="noreferrer" style="${nut};background:#fff;color:#2c2c2c;border:1px solid #ccc"><span style="color:#0068ff;display:inline-grid">${I.zalo}</span><span>Chat qua Zalo</span></a>
+      <button type="button" class="b" data-act="luu" style="${nut};background:#fff;color:${d.daLuu ? '#e03c31' : '#2c2c2c'};border:1px solid #ccc">${I.tim(d.daLuu)}<span>${d.daLuu ? 'Đã lưu tin' : 'Lưu tin'}</span></button>
+    </div></div>`;
+  }],
+});
 export const DS_MAU: { n: number; l: string; c: string }[] = [];
 { let k = 0; for (const l in L) for (const c in C) DS_MAU.push({ n: ++k, l, c }); }
-for (const l in S) DS_MAU.push({ n: DS_MAU.length + 1, l, c: '' }); // 101–103 = 3 mẫu sang, 104–106 = 3 mẫu tiết chế
-export const CSS_MAU = `@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,500&display=swap&subset=vietnamese');
+for (const l in S) DS_MAU.push({ n: DS_MAU.length + 1, l, c: '' }); // 101–103 = 3 mẫu sang, 104–106 = 3 mẫu tiết chế, 107 = giống batdongsan.com.vn
+export const CSS_MAU = `@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,500&family=Lexend:wght@400;500&display=swap&subset=vietnamese');
 .mlh .kim{background:${VANG};background-size:220% 100%;animation:mlhKim 7s ease-in-out infinite}@keyframes mlhKim{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 .mlh .b{display:flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 12px;border-radius:6px;font-size:13.5px;font-weight:700;white-space:nowrap;transition:filter .15s,opacity .15s}
 .mlh .b:hover{filter:brightness(1.08)}.mlh button{cursor:pointer;background:none;border:0;padding:0;font:inherit}.mlh button.b{border-style:solid}

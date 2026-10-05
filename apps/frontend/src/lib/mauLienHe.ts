@@ -292,9 +292,56 @@ const S = {
     ${metaSang(d, 'rgba(255,255,255,.7)', 'margin-top:10px;text-align:center')}</div>`;
   }],
 };
+
+// ── 3 MẪU "TIẾT CHẾ" (104–106) — chủ dự án chê 101–103 "hoạt hình quá" (5/10/2026).
+//    Học các hãng nhà đất cao cấp thật: KHÔNG hoa văn, KHÔNG ánh kim, KHÔNG bóng đổ, KHÔNG hiệu ứng chạy.
+//    Sang nhờ: ảnh thật, khoảng trống rộng, đường kẻ 1px, chữ có chân cỡ vừa, màu phẳng, ít màu.
+const avNhe = (d, size, nen, chu) => d.anh
+  ? `<img src="${esc(d.anh)}" alt="" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex:none">`
+  : `<span style="width:${size}px;height:${size}px;border-radius:50%;flex:none;display:grid;place-items:center;background:${nen};color:${chu};${SERIF};font-weight:600;font-size:${Math.round(size * .42)}px">${esc(d.chu)}</span>`;
+const nutPhang = (d, kieu) => {
+  // kieu: [nền nút số, chữ nút số, viền nút phụ, chữ nút phụ]
+  const [n1, c1, v2, c2] = kieu;
+  const chinh = `height:44px;border-radius:2px;background:${n1};color:${c1};border:1px solid ${n1};font-size:13.5px;font-weight:600;letter-spacing:.03em`;
+  const phu = `height:40px;border-radius:2px;background:transparent;color:${c2};border:1px solid ${v2};font-size:13px;font-weight:600`;
+  return `<div style="display:grid;gap:8px">${telSang(d, chinh)}<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${zaloSang(d, phu)}${luuSang(d, phu)}</div></div>`;
+};
+
+Object.assign(S, {
+  s4: ['TIẾT CHẾ 1 · Kiểu Sotheby\'s: ảnh Cam Lâm thật trên đầu, nền trắng, chữ có chân, nút xanh đậm phẳng', (d) => `<div style="background:#fff;color:#111827;border:1px solid #e5e7eb;border-radius:4px;overflow:hidden">
+    <div style="height:120px;background:url(/bai-dai/hero.webp) center 62%/cover"></div>
+    <div style="padding:18px 20px 16px">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:#6b7280">Người đăng tin</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:10px">${avNhe(d, 46, '#0A2540', '#fff')}
+        <div style="min-width:0"><div style="${SERIF};font-weight:600;font-size:19px;line-height:1.25">${esc(d.ten)}</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:2px">Tham gia ${esc(d.thamGia)} · ${esc(d.soTin)} tin đang đăng</div></div></div>
+      <div style="height:1px;background:#e5e7eb;margin:16px 0"></div>
+      ${nutPhang(d, ['#0A2540', '#fff', '#d1d5db', '#111827'])}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:11px;color:#9ca3af"><span>Mã tin ${esc(d.ma)} · ${esc(d.dang)}</span>${d.trang ? `<a href="${esc(d.trang)}" style="color:#0A2540;font-weight:600;font-size:12px;border-bottom:1px solid #0A2540">Trang cá nhân</a>` : ''}</div>
+    </div></div>`],
+
+  s5: ['TIẾT CHẾ 2 · Xanh đậm phẳng: không ảnh, một đường kẻ vàng mảnh, nút trắng', (d) => `<div style="background:#0A2540;color:#fff;border-radius:4px;padding:22px 20px 16px">
+    <div style="display:flex;align-items:center;gap:14px">${avNhe(d, 52, 'rgba(255,255,255,.1)', '#fff')}
+      <div style="min-width:0"><div style="font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:#C8A14B">Người đăng tin</div>
+      <div style="${SERIF};font-weight:600;font-size:20px;line-height:1.25;margin-top:3px">${esc(d.ten)}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Tham gia ${esc(d.thamGia)} · ${esc(d.soTin)} tin</div></div></div>
+    <div style="height:1px;background:#C8A14B;opacity:.55;margin:18px 0"></div>
+    ${nutPhang(d, ['#fff', '#0A2540', 'rgba(255,255,255,.3)', '#fff'])}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:11px;color:rgba(255,255,255,.45)"><span>Mã tin ${esc(d.ma)} · ${esc(d.xem)} lượt xem</span>${d.trang ? `<a href="${esc(d.trang)}" style="color:#fff;font-weight:600;font-size:12px;border-bottom:1px solid rgba(255,255,255,.5)">Trang cá nhân</a>` : ''}</div>
+  </div>`],
+
+  s6: ['TIẾT CHẾ 3 · Kiểu tạp chí: không khung, chỉ kẻ trên dưới, chữ to, nút đen', (d) => `<div style="background:#fff;color:#0f0f0f;border-top:2px solid #0f0f0f;border-bottom:1px solid #e5e5e5;padding:16px 2px 14px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:10px;font-weight:700;letter-spacing:.24em;text-transform:uppercase">Liên hệ</span><span style="font-size:11px;color:#8a8a8a">Mã tin ${esc(d.ma)}</span></div>
+    <div style="display:flex;align-items:center;gap:14px;margin-top:14px">${avNhe(d, 56, '#efefef', '#0f0f0f')}
+      <div style="min-width:0"><div style="${SERIF};font-weight:600;font-size:22px;line-height:1.2">${esc(d.ten)}</div>
+      <div style="font-size:12px;color:#737373;margin-top:3px">${esc(d.soTin)} tin đang đăng · tham gia ${esc(d.thamGia)}</div></div></div>
+    <div style="margin-top:16px">${nutPhang(d, ['#0f0f0f', '#fff', '#d4d4d4', '#0f0f0f'])}</div>
+    ${d.trang ? `<a href="${esc(d.trang)}" style="display:inline-flex;align-items:center;gap:3px;margin-top:12px;font-size:12.5px;font-weight:600;color:#0f0f0f">Xem trang cá nhân ${I.phai}</a>` : ''}
+  </div>`],
+});
 export const DS_MAU: { n: number; l: string; c: string }[] = [];
 { let k = 0; for (const l in L) for (const c in C) DS_MAU.push({ n: ++k, l, c }); }
-for (const l in S) DS_MAU.push({ n: DS_MAU.length + 1, l, c: '' }); // 101–103 = 3 mẫu sang
+for (const l in S) DS_MAU.push({ n: DS_MAU.length + 1, l, c: '' }); // 101–103 = 3 mẫu sang, 104–106 = 3 mẫu tiết chế
 export const CSS_MAU = `@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,500&display=swap&subset=vietnamese');
 .mlh .kim{background:${VANG};background-size:220% 100%;animation:mlhKim 7s ease-in-out infinite}@keyframes mlhKim{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 .mlh .b{display:flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 12px;border-radius:6px;font-size:13.5px;font-weight:700;white-space:nowrap;transition:filter .15s,opacity .15s}

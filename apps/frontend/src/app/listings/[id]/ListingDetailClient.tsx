@@ -11,6 +11,7 @@ import { useLoginGate } from '@/lib/loginGate';
 import ListingCard from '@/components/ListingCard';
 import { Skeleton, EmptyState, buttonClass } from '@/components/ui';
 import { escHtml } from '@/lib/escHtml';
+import XemMauLienHe from '@/components/XemMauLienHe'; // TẠM: xem thử mẫu khung người đăng bằng ?xemmau=N
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
 
@@ -327,6 +328,14 @@ export default function ListingDetail() {
             {/* MẢNH LẠI CHO SANG — so với batdongsan.com.vn thì thẻ này của mình dày và nặng:
                   bóng đổ to, ảnh đại diện 64px, con số 20px, ba nút đều cao 48-52px.
                   Bên họ: viền mảnh, ảnh 52px, nút vừa phải. Hạ theo hướng đó. */}
+            {/* TẠM: ?xemmau=N thay khung này bằng mẫu N để chủ dự án lướt thử trên web thật (xem lib/mauLienHe.ts). */}
+            <XemMauLienHe onHien={user ? reveal : () => openLogin()} onLuu={() => setSaved((v) => !v)} d={{
+              ten: l.contactName || 'Cam Lâm Land', chu: (l.contactName || 'C').charAt(0).toUpperCase(), anh: l.posterAvatar || '',
+              thamGia: joinLabel(agentInfo?.createdAt) ?? '—', soTin: agentInfo ? agentInfo.activeCount : '—',
+              trang: l.createdBy ? `/moi-gioi/${l.createdBy}` : '', so: l.contactPhone || '0988 88•••', soDu: full,
+              zalo: 'https://zalo.me/0988888888', daLuu: saved, ma: code, dang: postedLabel(l.createdAt),
+              xem: displayViews(l).toLocaleString('vi-VN'), gia: priceLabel(l.price, l.deal), dt: l.area ? `${l.area} m²` : '',
+            }}>
             <div className="rounded-xl overflow-hidden shadow-[0_4px_16px_rgba(13,138,128,0.18)] bg-gradient-to-b from-[#13a99c] to-[#0b7d72]">
               <div className="flex items-center justify-center gap-1.5 px-4 py-2">
                 <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="12" cy="8" r="6" /><path d="M15.5 13.6 17 22l-5-3-5 3 1.5-8.4" /></svg>
@@ -366,6 +375,7 @@ export default function ListingDetail() {
                 <p className="text-[11px] text-white/70 text-center pt-0.5">Mã tin {code} · {postedLabel(l.createdAt)} · {displayViews(l).toLocaleString('vi-VN')} lượt xem</p>
               </div>
             </div>
+            </XemMauLienHe>
             {areas.length > 0 && (
               <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
                 <h3 className="font-bold text-[#0A2540] mb-3">Mua bán nhà đất tại Cam Lâm</h3>

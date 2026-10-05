@@ -587,7 +587,7 @@ export default function Home() {
           <div className="relative md:absolute md:inset-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/quyhoach-camlam.jpg" alt="Mô hình quy hoạch Cam Lâm" loading="lazy" decoding="async"
-              className="block aspect-[2.4/1] w-full object-cover sm:aspect-auto sm:h-64 md:h-full" />
+              className="block aspect-[2/1] w-full object-cover sm:aspect-auto sm:h-64 md:h-full" />
             {/* HUY HIỆU "Cam Lâm Land · Hotline" — ảnh gốc có sẵn ở góc dưới phải nhưng dạng ảnh rộng bị cắt mất
                 (chủ dự án 2/10/2026) → dựng lại bằng chữ thật, đè lên góc ảnh, bấm là gọi. Giống hệt kiểu trong ảnh gốc. */}
             <a href="tel:0988888888" className="absolute bottom-1.5 right-1.5 z-[2] hidden sm:flex items-center gap-1 rounded bg-[#0f2236]/80 px-1 py-0.5 text-white shadow-lg backdrop-blur-sm sm:bottom-4 sm:right-4 sm:gap-2.5 sm:rounded-lg sm:px-3 sm:py-2">
@@ -602,7 +602,7 @@ export default function Home() {
           </div>
           <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block" style={{ background: 'linear-gradient(90deg,#fff 0%,rgba(255,255,255,.96) 38%,rgba(255,255,255,0) 70%)' }} />
           {/* Điện thoại: MẪU 6 "chữ trên ảnh" chủ dự án chọn 5/10/2026 (mẫu 8 trước đó tiêu đề gãy dòng, nhiều kiểu nút → rối).
-              Cả ô chỉ còn MỘT KHỐI ẢNH 2,4:1: chân ảnh tối mờ dần, trên đó nhãn vàng + "Tra cứu quy hoạch" chữ trắng,
+              Cả ô chỉ còn MỘT KHỐI ẢNH 2:1 (trước 2,4:1 — chủ dự án bảo cao thêm 20%, 5/10/2026): chân ảnh tối mờ dần, trên đó nhãn vàng + "Tra cứu quy hoạch" chữ trắng,
               bên phải một nút trắng "Mở bản đồ". Bỏ nút QR và huy hiệu hotline trên điện thoại cho đỡ chật.
               Từ khổ sm trở lên giữ nguyên bố cục cũ. */}
           <div aria-hidden className="pointer-events-none absolute inset-0 sm:hidden" style={{ background: 'linear-gradient(180deg,rgba(10,37,64,0) 35%,rgba(10,37,64,.9) 100%)' }} />

@@ -5,7 +5,7 @@
 //  Được bấm "Xin duyệt" khi đủ CẢ 4 điều kiện (chủ dự án chốt):
 //    1. Tài khoản tạo trên 3 tháng
 //    2. Đã đăng từ 30 tin trở lên (tính mọi tin đã được duyệt đăng, kể cả tin đã ẩn / đã bán)
-//    3. Số điện thoại đã được xác minh
+//    3. Số điện thoại đã được xác minh — ĐANG TẠM TẮT (CAN_XAC_MINH_SDT bên dưới)
 //    4. Đã từng mua gói (có đơn thanh toán thành công, hoặc từng được cấp gói đăng tin / đẩy tin)
 //  Máy chủ TỰ KIỂM lại cả 4 điều kiện lúc xin — không tin giao diện.
 //
@@ -20,6 +20,9 @@ import { authRequired, adminRequired, type AuthedRequest } from '../middleware/a
 export const moiGioiCnRouter = Router();
 
 const SO_TIN_CAN = 30;
+// TẠM TẮT điều kiện xác minh số điện thoại (chủ dự án 5/10/2026: "tạm thời không cần").
+// Bật lại = đổi thành true; giao diện tự hiện lại dòng điều kiện + các nút xác minh (đọc cờ canSdt).
+const CAN_XAC_MINH_SDT = false;
 const chuSo = (s: any) => String(s || '').replace(/\D/g, '');
 
 // Các cột cần để tính điều kiện — dùng chung cho người dùng và trang duyệt của admin
@@ -40,8 +43,8 @@ function dieuKien(r: any) {
     { ma: 'sdt', ten: 'Đã xác minh số điện thoại', dat: sdtOk,
       chiTiet: !r.phone ? 'Chưa khai số điện thoại' : sdtOk ? `Số ${r.phone} đã xác minh` : r.sdtXinLuc ? 'Đang chờ admin gọi xác minh' : 'Chưa xác minh' },
     { ma: 'goi', ten: 'Đã từng mua gói', dat: !!r.daMuaGoi, chiTiet: r.daMuaGoi ? 'Đã mua gói' : 'Chưa mua gói nào' },
-  ];
-  return { dieuKien: ds, duDieuKien: ds.every((d) => d.dat), sdtOk };
+  ].filter((d) => CAN_XAC_MINH_SDT || d.ma !== 'sdt');
+  return { dieuKien: ds, duDieuKien: ds.every((d) => d.dat), sdtOk, canSdt: CAN_XAC_MINH_SDT };
 }
 const goi = (r: any) => {
   const { du3Thang, soNgay, daMuaGoi, ...con } = r;
@@ -98,7 +101,7 @@ moiGioiCnRouter.get('/admin/ds', adminRequired, async (req, res, next) => {
   try {
     const loc = String(req.query.loc || 'cho');
     const q = String(req.query.q || '').trim();
-    let where = `u.cn_trang_thai = 'cho' OR (u.sdt_xin_luc IS NOT NULL AND u.phone IS NOT NULL
+    let where = !CAN_XAC_MINH_SDT ? `u.cn_trang_thai = 'cho'` : `u.cn_trang_thai = 'cho' OR (u.sdt_xin_luc IS NOT NULL AND u.phone IS NOT NULL
                   AND regexp_replace(u.phone, '\\D', '', 'g') IS DISTINCT FROM regexp_replace(COALESCE(u.sdt_da_xac_minh, ''), '\\D', '', 'g'))`;
     const params: any[] = [];
     if (q) { where = `u.full_name ILIKE $1 OR u.email ILIKE $1 OR u.phone ILIKE $1`; params.push(`%${q}%`); }

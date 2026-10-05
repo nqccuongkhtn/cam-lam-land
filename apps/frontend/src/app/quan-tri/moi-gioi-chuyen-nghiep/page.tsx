@@ -18,7 +18,7 @@ type DK = { ma: string; ten: string; dat: boolean; chiTiet: string };
 type Dong = {
   id: number; email: string; ten: string | null; phone: string | null; avatar: string | null; taoLuc: string;
   trangThai: 'khong' | 'cho' | 'duyet' | 'tu_choi'; xinLuc: string | null; duyetLuc: string | null; ghiChu: string | null;
-  sdtXinLuc: string | null; soTin: number; dieuKien: DK[]; duDieuKien: boolean; sdtOk: boolean;
+  sdtXinLuc: string | null; soTin: number; dieuKien: DK[]; duDieuKien: boolean; sdtOk: boolean; canSdt: boolean;
 };
 const TEN_TT: Record<Dong['trangThai'], [string, string]> = {
   khong: ['Chưa xin', 'bg-slate-100 text-slate-600'],
@@ -60,7 +60,7 @@ export default function DuyetMoiGioiCn() {
       <div className="mx-auto max-w-3xl space-y-4 px-3 sm:px-4">
         <div>
           <h1 className="text-xl font-extrabold text-[#0A2540] sm:text-2xl">Duyệt môi giới chuyên nghiệp</h1>
-          <p className="mt-1 text-sm text-slate-500">Người được duyệt sẽ hiện khung xanh ngọc "Môi giới chuyên nghiệp" ở trang xem tin. Xin duyệt cần đủ: tài khoản trên 3 tháng · từ 30 tin · đã xác minh số · đã từng mua gói.</p>
+          <p className="mt-1 text-sm text-slate-500">Người được duyệt sẽ hiện khung xanh ngọc "Môi giới chuyên nghiệp" ở trang xem tin. Xin duyệt cần đủ: tài khoản trên 3 tháng · từ 30 tin · đã từng mua gói.</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -102,10 +102,10 @@ export default function DuyetMoiGioiCn() {
               </ul>
 
               <div className="mt-3 flex flex-wrap gap-2">
-                {d.phone && (d.sdtOk
+                {d.canSdt && d.phone && (d.sdtOk
                   ? <button disabled={dang === d.id} onClick={() => lam(d.id, 'sdt', { xacMinh: false })} className="h-9 rounded-lg border border-slate-300 px-3 text-xs font-semibold text-slate-600 hover:bg-slate-50">Bỏ xác minh số</button>
                   : <a href={`tel:${d.phone.replace(/\s/g, '')}`} className="flex h-9 items-center rounded-lg border border-slate-300 px-3 text-xs font-semibold text-[#0A2540] hover:bg-slate-50">📞 Gọi {d.phone}</a>)}
-                {d.phone && !d.sdtOk && <button disabled={dang === d.id} onClick={() => lam(d.id, 'sdt', { xacMinh: true })} className="h-9 rounded-lg bg-emerald-600 px-3 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-60">✓ Đã xác minh số</button>}
+                {d.canSdt && d.phone && !d.sdtOk && <button disabled={dang === d.id} onClick={() => lam(d.id, 'sdt', { xacMinh: true })} className="h-9 rounded-lg bg-emerald-600 px-3 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-60">✓ Đã xác minh số</button>}
                 {d.trangThai !== 'duyet' && (
                   <button disabled={dang === d.id} onClick={() => lam(d.id, 'quyet', { hanhDong: 'duyet' })} className="h-9 rounded-lg bg-[#009ba1] px-4 text-xs font-bold text-white hover:bg-[#008a90] disabled:opacity-60" title={d.duDieuKien ? '' : 'Người này chưa đủ 4 điều kiện — admin vẫn duyệt tay được'}>
                     Duyệt{d.duDieuKien ? '' : ' (chưa đủ điều kiện)'}

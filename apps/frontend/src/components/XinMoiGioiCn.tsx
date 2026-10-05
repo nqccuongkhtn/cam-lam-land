@@ -31,7 +31,7 @@ export default function XinMoiGioiCn() {
       <p className="mt-1 text-[13px] text-slate-500">
         {tt.trangThai === 'duyet'
           ? 'Tin của bạn đang hiện khung "Môi giới chuyên nghiệp" màu xanh ngọc ở trang xem tin.'
-          : 'Được duyệt thì tin của bạn hiện khung "Môi giới chuyên nghiệp" nổi bật, tạo tin tưởng với người mua. Cần đủ 4 điều kiện:'}
+          : `Được duyệt thì tin của bạn hiện khung "Môi giới chuyên nghiệp" nổi bật, tạo tin tưởng với người mua. Cần đủ ${tt.dieuKien.length} điều kiện:`}
       </p>
 
       {tt.trangThai !== 'duyet' && (

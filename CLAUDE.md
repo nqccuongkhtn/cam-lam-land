@@ -516,8 +516,8 @@ Lưu ý: video dựng **hoàn toàn trên máy khách**, không có endpoint má
 
 **Môi giới chuyên nghiệp** (`routes/moiGioiCn.ts`, 5/10/2026) — giống batdongsan.com.vn: trang xem tin hiện khung
 xanh ngọc "Môi giới chuyên nghiệp" CHỈ cho người admin đã duyệt (`users.cn_trang_thai='duyet'`), còn lại khung trắng.
-Người dùng bấm "Xin duyệt" ở `/account` khi đủ 4 điều kiện (máy chủ tự kiểm): tài khoản > 3 tháng · ≥ 30 tin ·
-đã xác minh SĐT · đã từng mua gói. Admin duyệt ở `/quan-tri/moi-gioi-chuyen-nghiep`. Chưa có cổng SMS nên xác minh SĐT
+Người dùng bấm "Xin duyệt" ở `/account` khi đủ điều kiện (máy chủ tự kiểm): tài khoản > 3 tháng · ≥ 30 tin ·
+đã từng mua gói (điều kiện "đã xác minh SĐT" đang TẠM TẮT — cờ `CAN_XAC_MINH_SDT` trong `moiGioiCn.ts`). Admin duyệt ở `/quan-tri/moi-gioi-chuyen-nghiep`. Chưa có cổng SMS nên xác minh SĐT
 là admin gọi điện rồi bấm tay; lưu SỐ đã xác minh (`sdt_da_xac_minh`) nên đổi số là tự mất xác minh.
 Cờ `pro` trả ở `/api/listings/agent/:id` (cache 30 giây → duyệt xong ~30 giây mới đổi khung).
 

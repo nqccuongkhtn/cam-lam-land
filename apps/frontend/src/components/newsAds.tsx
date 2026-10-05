@@ -134,25 +134,30 @@ export function SidebarAd({ ds, batDau = 2 }: { ds: OQc[]; batDau?: number }) {
   );
 }
 
-/** Cột dọc hai bên trang xem một tin đăng ("cánh gà", chỉ màn hình rất rộng) — cùng kho quảng cáo, cùng kiểu báo:
-    chữ "QUẢNG CÁO" xám phía trên, khung mảnh, ảnh dọc ở trên, chữ + nút ở dưới. */
-export function CotDocAd({ ds, batDau = 0 }: { ds: OQc[]; batDau?: number }) {
-  const buoc = useNhip(); if (!ds.length) return null;
-  const o = lay(ds, batDau, buoc);
+
+/* CÁNH GÀ kiểu Znews: fixed kẹp 2 bên cột nội dung (màn ≥1536px). Dùng ở trang Tin tức + trang xem một tin đăng.
+   Mỗi bên XẾP CHỒNG 2 thẻ, ảnh giữ tỉ lệ ngang 4:3. KHÔNG kéo một ảnh cao hết màn hình: ảnh ngang bị cắt
+   thành dải dọc, chữ trong ảnh còn "M L" — chủ dự án chê "cụt cụt" (5/10/2026).
+   `rong` = bề rộng cột nội dung của trang (px), cánh gà nằm gọn trong phần trống hai bên.
+   `hienSau` = cuộn xuống bao nhiêu px thì trượt vào (trang Tin tức chờ qua dải quảng cáo trên đầu; 0 = hiện ngay).
+   `batDau` = quảng cáo đầu tiên của 4 thẻ (trái 2 thẻ, phải 2 thẻ) → không trùng các chỗ quảng cáo khác trên trang. */
+export function CanhGaAd({ ds, rong = 1120, hienSau = 340, batDau = 2 }: { ds: OQc[]; rong?: number; hienSau?: number; batDau?: number }) {
+  const [shown, setShown] = useState(hienSau <= 0);
+  useEffect(() => {
+    if (hienSau <= 0) return;
+    const onScroll = () => setShown(window.scrollY > hienSau);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [hienSau]);
+  if (!ds.length) return null;
+  const cls = 'pointer-events-auto fixed top-20 z-20 flex max-h-[calc(100vh-6rem)] flex-col gap-4 overflow-hidden transition-all duration-500 ease-out';
+  const w = `calc((100vw - ${rong}px) * 0.3)`;
+  const off = `calc((100vw - ${rong}px) * 0.1)`;
   return (
-    <div>
-      <NhanTren />
-      <LinkQc o={o} className="group block overflow-hidden rounded border border-slate-200 bg-white shadow-sm hover:border-slate-300">
-        <div key={o.id || buoc} className="cl-fadeup">
-          <div className="aspect-[3/4] overflow-hidden bg-slate-100"><Anh o={o} /></div>
-          <div className="p-3">
-            {o.nhan && <p className="text-[10.5px] font-semibold uppercase tracking-wide text-red-600">{o.nhan}</p>}
-            <p className="mt-0.5 text-[15px] font-bold leading-snug text-[#0A2540] line-clamp-3 group-hover:text-red-600">{o.tieuDe}</p>
-            {o.moTa && <p className="mt-1 text-xs text-slate-500 line-clamp-3">{o.moTa}</p>}
-            <Nut o={o} className="mt-2.5" />
-          </div>
-        </div>
-      </LinkQc>
+    <div className="hidden 2xl:block">
+      <aside className={`${cls} ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`} style={{ width: w, maxWidth: 260, left: off }}><SidebarAd ds={ds} batDau={batDau} /><SidebarAd ds={ds} batDau={batDau + 1} /></aside>
+      <aside className={`${cls} ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`} style={{ width: w, maxWidth: 260, right: off }}><SidebarAd ds={ds} batDau={batDau + 2} /><SidebarAd ds={ds} batDau={batDau + 3} /></aside>
     </div>
   );
 }

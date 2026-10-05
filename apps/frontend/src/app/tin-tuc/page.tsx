@@ -1,34 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useBoQc, BillboardAd, NativeAd, SidebarAd } from '@/components/newsAds'; // dùng chung với trang đọc bài
+import { useBoQc, BillboardAd, NativeAd, CanhGaAd } from '@/components/newsAds'; // dùng chung với trang đọc bài
 import type { OQc } from '@/components/OQuangCaoTrangChu';
 import { decodeEntities } from '@/lib/htmlEntities';
 
 interface N { title: string; url: string; source?: string; image?: string; summary?: string; publishedAt?: string; slug: string }
-
-// Cánh gà kiểu Znews: fixed kẹp 2 bên cột nội dung, trượt vào khi cuộn xuống (màn ≥1536px).
-// Mỗi bên XẾP CHỒNG 2 thẻ, ảnh giữ tỉ lệ ngang 4:3. KHÔNG kéo một ảnh cao hết màn hình: ảnh ngang bị cắt
-// thành dải dọc, chữ trong ảnh còn "M L" — chủ dự án chê "cụt cụt" (5/10/2026).
-// Dải trên = quảng cáo 0, giữa danh sách = 1, bên trái = 2 và 3, bên phải = 4 và 5 → 6 quảng cáo không trùng.
-function WingRails({ ds }: { ds: OQc[] }) {
-  const [shown, setShown] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setShown(window.scrollY > 340);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-  const cls = 'pointer-events-auto fixed top-20 z-20 flex max-h-[calc(100vh-6rem)] flex-col gap-4 overflow-hidden transition-all duration-500 ease-out';
-  const w = 'calc((100vw - 1120px) * 0.3)';
-  const off = 'calc((100vw - 1120px) * 0.1)';
-  return (
-    <div className="hidden 2xl:block">
-      <aside className={`${cls} ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`} style={{ width: w, maxWidth: 260, left: off }}><SidebarAd ds={ds} batDau={2} /><SidebarAd ds={ds} batDau={3} /></aside>
-      <aside className={`${cls} ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`} style={{ width: w, maxWidth: 260, right: off }}><SidebarAd ds={ds} batDau={4} /><SidebarAd ds={ds} batDau={5} /></aside>
-    </div>
-  );
-}
 
 const fmtDate = (iso?: string) => (iso ? new Date(iso).toLocaleDateString('vi-VN') : '');
 const meta = (n: N) => `${n.source || ''}${n.source && fmtDate(n.publishedAt) ? ' · ' : ''}${fmtDate(n.publishedAt)}`;
@@ -127,7 +104,7 @@ export default function NewsIndex() {
 
   return (
     <div className="relative min-h-[calc(100dvh-56px)] bg-white">
-      {showAd && <WingRails ds={boQc} />}
+      {showAd && <CanhGaAd ds={boQc} />}
       <div className="relative z-10 mx-auto max-w-[1120px] px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
         {showAd && <div className="hidden md:block mb-6"><BillboardAd ds={boQc} batDau={0} /></div>}
         <div>

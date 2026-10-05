@@ -174,6 +174,9 @@ export default function NewsReaderClient() {
     if (i === 2 && boQc.length) body.push(<div key="adin" className="my-4 border-y border-slate-100"><NativeAd ds={boQc} batDau={1} /></div>);
     if ((i + 1) % 2 === 0 && ip < extra.length) body.push(<WmImg key={'i' + i} src={extra[ip++]} wrap="my-1" img="max-h-[440px]" />);
   });
+  // Bài ngắn (dưới 3 đoạn) thì ô quảng cáo giữa bài chưa được chèn → chèn cuối bài. Trước đây điện thoại đọc bài ngắn
+  // KHÔNG thấy quảng cáo nào, vì ô to trên đầu bài và ô cột phải đều chỉ hiện trên máy tính (5/10/2026).
+  if (paras.length < 3 && boQc.length) body.push(<div key="adin" className="my-4 border-y border-slate-100"><NativeAd ds={boQc} batDau={1} /></div>);
 
   return (
     <div className="bg-slate-50 min-h-[calc(100dvh-56px)]">
@@ -207,6 +210,8 @@ export default function NewsReaderClient() {
 
             <div className="mt-5"><ChiaSe tieuDe={decodeEntities(a.title)} /></div>
 
+            {/* Điện thoại / máy tính bảng: thay cho ô quảng cáo cột phải (cột phải chỉ có từ khổ lg) — dạng dòng tin gọn */}
+            {boQc.length > 0 && <div className="lg:hidden mt-6 border-y border-slate-100"><NativeAd ds={boQc} batDau={2} /></div>}
             <div className="lg:hidden mt-6"><RelatedList items={related.slice(0, 6)} /></div>
             <div className="mt-6"><Link href="/tin-tuc" className="text-sm font-semibold text-red-600 hover:text-red-700">← Tất cả tin tức</Link></div>
           </article>

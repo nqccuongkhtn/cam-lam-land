@@ -73,12 +73,12 @@ export function TheQc({ o, on = true, xemTruoc = false, coMoTa = true }: { o: OQ
       <span className="absolute right-1.5 top-1.5 z-[1] rounded bg-black/35 px-1 py-px text-[8.5px] font-medium tracking-wide text-white/90 sm:right-2 sm:top-2 sm:text-[9.5px]">Quảng cáo</span>
       <span className="relative z-[1] flex h-full flex-col justify-between">
         <span>
-          {o.nhan && <span className="block pr-12 text-[10px] font-semibold uppercase tracking-wide sm:text-[11px]" style={{ color: nhanMau }}>{o.nhan}</span>}
+          {o.nhan && <span className="block truncate pr-14 text-[10px] font-semibold uppercase tracking-wide sm:pr-16 sm:text-[11px]" style={{ color: nhanMau }}>{o.nhan}</span>}
           <span className="mt-1 block text-[13.5px] font-extrabold leading-tight line-clamp-2 sm:text-lg">{o.tieuDe}</span>
           {/* Mô tả chỉ có ở ô mà thẻ gốc của web cũng có mô tả (ô 1) — ô 2 thẻ gốc thấp hơn, thêm mô tả là tràn khung */}
           {o.moTa && coMoTa && <span className={`mt-1.5 hidden text-xs leading-snug line-clamp-1 sm:block ${xemTruoc ? '!block' : ''}`} style={{ opacity: .85 }}>{o.moTa}</span>}
         </span>
-        <span className="mt-1.5 block text-[11.5px] font-bold sm:hidden" style={{ color: nhanMau }}>{o.nut || 'Xem ngay'} →</span>
+        <span className="mt-1.5 block truncate pr-9 text-[11.5px] font-bold sm:hidden" style={{ color: nhanMau }}>{o.nut || 'Xem ngay'} →</span>
         <span className="sm:mt-3 hidden sm:block"><span className="inline-block rounded px-3 py-1.5 text-xs font-bold" style={{ background: coAnh ? '#fff' : m.nut, color: coAnh ? '#0A2540' : m.chuNut }}>{o.nut || 'Xem ngay'} →</span></span>
       </span>
     </>
@@ -120,8 +120,9 @@ export function TruotQc({ ds, buoc, denBuoc, dungLai, coMoTa = true, xemTruoc = 
       <div className="clqc-ray flex h-full transition-transform duration-[650ms] ease-[cubic-bezier(.5,0,.25,1)]" style={{ transform: `translateX(-${i * 100}%)` }}>
         {ds.map((o, k) => <div key={o.id || k} className="h-full w-full shrink-0" aria-hidden={k !== i}><TheQc o={o} on={k === i} xemTruoc={xemTruoc} coMoTa={coMoTa} /></div>)}
       </div>
-      {/* Chấm chuyển quảng cáo — góc TRÊN bên trái (góc dưới hay đè lên logo/chữ có sẵn trong ảnh) */}
-      <div className="absolute left-2 top-1 z-[2] flex gap-1 sm:left-5 sm:top-2">
+      {/* Chấm chuyển quảng cáo — máy tính: góc TRÊN bên trái (góc dưới hay đè lên logo/chữ có sẵn trong ảnh).
+          Điện thoại: góc DƯỚI PHẢI — ô nhỏ, để trên trái thì dính sát nhãn (5/10/2026). */}
+      <div className="absolute bottom-2.5 right-2.5 z-[2] flex gap-1 sm:bottom-auto sm:right-auto sm:left-5 sm:top-2">
         {ds.map((o, k) => (
           <button key={o.id || k} type="button" aria-label={`Quảng cáo ${k + 1}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); denBuoc(buoc - i + k); }}
             className={`h-1.5 rounded-full transition-all ${k === i ? 'w-4 bg-white' : 'w-1.5 bg-white/45 hover:bg-white/70'}`} />

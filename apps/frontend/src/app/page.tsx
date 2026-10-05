@@ -537,15 +537,17 @@ export default function Home() {
           </>)}
           {/* ĐIỆN THOẠI (chủ dự án 2/10/2026: hai thẻ to "lạc quẻ" giữa tin tức và tin đăng): thu thành HAI Ô NHỎ đứng
               cạnh nhau — nhãn nhỏ + tiêu đề ngắn + mũi tên, bỏ đoạn mô tả và nút. Máy tính giữ hai thẻ to như cũ. */}
+          {/* Điện thoại: hai ô cao tối thiểu 104px (5/10/2026) — trước đó ô chỉ cao theo thẻ của web (~85px) nên quảng cáo
+              có nhãn + tiêu đề 2 dòng + "Xem ngay" bị tràn, mất dòng "Xem ngay". Quảng cáo phủ đúng cỡ thẻ nên cùng cao theo. */}
           {/* Hai ô này là CHỖ ĐẶT QUẢNG CÁO: admin nhập quảng cáo của khách ở /admin → Quảng cáo; ô trống/hết hạn thì hiện thẻ của web. */}
           <OQuangCaoTrangChu macDinh1={
-            <Link href="/map" className="flex flex-col justify-between rounded-lg bg-gradient-to-br from-[#a3121b] to-[#6d0d14] p-3 text-white transition hover:brightness-110 active:scale-[.98] sm:block sm:rounded-xl sm:p-5">
+            <Link href="/map" className="flex min-h-[104px] flex-col sm:min-h-0 justify-between rounded-lg bg-gradient-to-br from-[#a3121b] to-[#6d0d14] p-3 text-white transition hover:brightness-110 active:scale-[.98] sm:block sm:rounded-xl sm:p-5">
               <p className="text-[10px] font-semibold tracking-wide text-white/70 sm:text-[11px]">CAM LÂM LAND</p>
               <p className="mt-1 text-[13.5px] font-extrabold leading-tight sm:text-lg"><span className="sm:hidden">Bản đồ quy hoạch</span><span className="hidden sm:inline">Sàn BĐS & Bản đồ quy hoạch Cam Lâm</span></p>
               <p className="mt-1.5 hidden text-xs leading-snug text-white/80 sm:block">Tra cứu quy hoạch, mua bán nhà đất, nền vệ tinh — tất cả tại một nơi.</p>
               <span className="mt-1.5 text-[11.5px] font-bold text-white/90 sm:mt-3 sm:inline-block sm:rounded sm:bg-white sm:px-3 sm:py-1.5 sm:text-xs sm:text-[#a3121b]">Khám phá ngay →</span>
             </Link>} macDinh2={
-            <Link href="/sales/post" className="flex flex-col justify-between rounded-lg bg-gradient-to-br from-[#0A2540] to-[#0d2f54] p-3 text-white transition hover:brightness-110 active:scale-[.98] sm:block sm:rounded-xl sm:p-5">
+            <Link href="/sales/post" className="flex min-h-[104px] flex-col sm:min-h-0 justify-between rounded-lg bg-gradient-to-br from-[#0A2540] to-[#0d2f54] p-3 text-white transition hover:brightness-110 active:scale-[.98] sm:block sm:rounded-xl sm:p-5">
               <p className="text-[10px] font-semibold tracking-wide text-[#C8A14B] sm:text-[11px]">MIỄN PHÍ</p>
               <p className="mt-1 text-[13.5px] font-extrabold leading-tight sm:text-lg"><span className="sm:hidden">Đăng tin bán nhà đất</span><span className="hidden sm:inline">Đăng tin — tiếp cận khách mua ngay</span></p>
               <span className="mt-1.5 text-[11.5px] font-bold text-[#C8A14B] sm:mt-3 sm:inline-block sm:rounded sm:bg-[#C8A14B] sm:px-3 sm:py-1.5 sm:text-xs sm:text-[#0A2540]">Đăng tin ngay →</span>

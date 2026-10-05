@@ -33,17 +33,6 @@ const links = [
 function MIco({ children }: { children: ReactNode }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round" className="w-[19px] h-[19px] shrink-0" aria-hidden="true">{children}</svg>;
 }
-function NavIco({ href }: { href: string }) {
-  const map: Record<string, ReactNode> = {
-    '/': <><path d="M4 10.5 12 4l8 6.5" /><path d="M6 9.4V20h12V9.4" /></>,
-    '/listings': <><path d="M4 20V7.6l8-3.6 8 3.6V20" /><path d="M9.5 20v-5.5h5V20" /></>,
-    '/listings?deal=rent': <><circle cx="9" cy="9" r="3.4" /><path d="M11.4 11.4 19 19M16 19l2-2M18.6 16.4 20 15" /></>,
-    '/map': <><path d="M9 4.5 4 6.5v13l5-2 6 2 5-2v-13l-5 2-6-2Z" /><path d="M9 4.5v13M15 6.5v13" /></>,
-    '/tien-ich': <><rect x="4" y="4" width="7" height="7" rx="1.6" /><rect x="13" y="4" width="7" height="7" rx="1.6" /><rect x="4" y="13" width="7" height="7" rx="1.6" /><rect x="13" y="13" width="7" height="7" rx="1.6" /></>,
-  };
-  return <MIco>{map[href]}</MIco>;
-}
-
 function Logo({ light }: { light: boolean }) {
   const le = useLogoLe();
   return (
@@ -220,15 +209,11 @@ export default function Nav() {
 
       {open && (
         <nav className="md:hidden flex max-h-[calc(100dvh-7rem)] flex-col overflow-y-auto overscroll-contain border-t border-slate-100 bg-white px-3 py-2 shadow-lg cl-menu-in">
-          {/* Điều hướng chính (mobile) — gồm cả "Cho thuê" mà thanh dưới không có */}
-          <div className="pb-1">
-            <p className="px-2 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wide">Điều hướng</p>
-            {links.map((l) => (
-              <Link key={l.href} href={l.href} onClick={() => { setOpen(false); if (l.href === '/tien-ich') window.dispatchEvent(new CustomEvent('cl-open-tools')); }} className="flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50"><span className="text-slate-400"><NavIco href={l.href} /></span>{l.label}</Link>
-            ))}
-          </div>
+          {/* BỎ khối "Điều hướng" (Trang chủ / Nhà đất / Bản đồ / Tiện ích) — trùng với thanh menu dưới,
+              chủ dự án yêu cầu bỏ 5/10/2026. Menu này giờ chỉ còn Tài khoản / Quản lý / Liên hệ.
+              Khối nào đứng đầu thì bỏ đường kẻ + khoảng trên (first:...). */}
           {user && (
-            <div className="pt-1 mt-1.5 border-t border-slate-100">
+            <div className="pt-1 mt-1.5 border-t border-slate-100 first:mt-0 first:border-t-0">
               <p className="px-2 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wide">Tài khoản</p>
               <Link href="/account" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-slate-50">
                 {user.avatar ? <img src={user.avatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" /> : <span className="w-9 h-9 rounded-full bg-[#0A2540] text-[#C8A14B] grid place-items-center text-sm font-bold shrink-0">{(name || 'U').charAt(0).toUpperCase()}</span>}
@@ -242,12 +227,12 @@ export default function Nav() {
             </div>
           )}
           {user && (laAdmin(user) || coVaiTro(user, 'gis') || coVaiTro(user, 'vanban')) && (
-            <div className="mt-1.5 pt-2 border-t border-slate-100">
+            <div className="mt-1.5 pt-2 border-t border-slate-100 first:mt-0 first:pt-0 first:border-t-0">
               <p className="px-2 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wide">Quản lý</p>
               <Link href="/quan-tri" onClick={() => setOpen(false)} className="flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-bold text-[#0A2540] hover:bg-slate-50"><span className="text-slate-400"><MIco><path d="M12 3.5 5 6v5c0 4.2 3 7.6 7 9.5 4-1.9 7-5.3 7-9.5V6l-7-2.5Z" /><path d="m9.3 11.8 1.9 1.9 3.4-3.8" /></MIco></span>Trang quản lý</Link>
             </div>
           )}
-          <div className="mt-1.5 pt-2 border-t border-slate-100">
+          <div className="mt-1.5 pt-2 border-t border-slate-100 first:mt-0 first:pt-0 first:border-t-0">
             <a href="tel:0988888888" className="flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-bold text-[#0A2540] hover:bg-slate-50"><span className="text-[#C8A14B]"><MIco><path d="M6.6 4.5h2.9l1.2 4-1.8 1.4a11 11 0 0 0 5.2 5.2l1.4-1.8 4 1.2v2.9a1.5 1.5 0 0 1-1.6 1.5C10.6 19.6 4.4 13.4 3.6 6.1A1.5 1.5 0 0 1 5.1 4.5h1.5Z" /></MIco></span>Hotline 0988 888 888</a>
             <button onClick={() => { setOpen(false); window.dispatchEvent(new CustomEvent('cl-open-chat', { detail: { tab: 'advisory' } })); }} className="w-full text-left flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50"><span className="text-[#C8A14B]"><MIco><path d="M20 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-4.4A8 8 0 1 1 20 11.5Z" /></MIco></span>Chat với chúng tôi</button>
             {user ? (

@@ -4,7 +4,8 @@
    - MỖI Ô CHỨA ĐƯỢC NHIỀU QUẢNG CÁO, tự TRƯỢT luân phiên như các web khác (5 giây/quảng cáo, có chấm chuyển,
      điện thoại vuốt được, rê chuột vào thì dừng). Hai ô trượt CÙNG LÚC (chung một đồng hồ).
    - Khung quảng cáo khoá ĐÚNG cỡ thẻ gốc của web (thẻ gốc nằm ẩn bên dưới giữ chỗ).
-   - Quảng cáo có ảnh nền thì chạy kiểu "banner động": ảnh phóng chậm, chữ trồi lên, nút có vệt sáng lướt qua.
+   - Quảng cáo có ảnh nền: ảnh phóng thật chậm, thật nhẹ; phủ một lớp tối đều để chữ trắng luôn đọc rõ.
+     (Bản đầu có chữ trồi lên + nút vàng có vệt sáng chạy → chủ dự án chê "màu mè", 5/10/2026 làm dịu lại.)
    - Quảng cáo nào tắt / thiếu tiêu đề / quá ngày hết hạn thì tự bỏ ra. Ô hết sạch quảng cáo → quay về thẻ của web
      (Bản đồ quy hoạch, Đăng tin) — không bao giờ để ô trống, admin không phải nhớ ngày mà gỡ tay.
    - Góc mỗi quảng cáo có chữ nhỏ "Quảng cáo" (Luật Quảng cáo: phải phân biệt được với nội dung của web). */
@@ -46,20 +47,12 @@ export function dangChay(o?: OQc, homNay = new Date()): boolean {
   return true;
 }
 
-/* Hiệu ứng "banner động". Chỉ chạy khi thẻ đang được hiện (.on) → mỗi lần trượt tới là chữ trồi lên lại.
-   Người dùng bật "giảm chuyển động" trong máy thì tắt hết. */
+/* Chuyển động duy nhất trong thẻ: ảnh nền phóng rất chậm (4% trong 8 giây) — gần như không nhận ra,
+   chỉ đủ cho ảnh "sống". Người dùng bật "giảm chuyển động" trong máy thì tắt hết. */
 const CSS = `
-@keyframes clqc-phong{from{transform:scale(1)}to{transform:scale(1.14)}}
-@keyframes clqc-troi{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-@keyframes clqc-sang{0%,55%{left:-40%}100%{left:130%}}
-.clqc-the.on .clqc-anh{animation:clqc-phong 7s ease-out both}
-.clqc-the.on .clqc-c1{animation:clqc-troi .55s .15s cubic-bezier(.2,.8,.2,1) both}
-.clqc-the.on .clqc-c2{animation:clqc-troi .55s .3s cubic-bezier(.2,.8,.2,1) both}
-.clqc-the.on .clqc-c3{animation:clqc-troi .55s .45s cubic-bezier(.2,.8,.2,1) both}
-.clqc-the.on .clqc-c4{animation:clqc-troi .55s .6s cubic-bezier(.2,.8,.2,1) both}
-.clqc-nut{position:relative;overflow:hidden}
-.clqc-nut::after{content:'';position:absolute;top:0;bottom:0;left:-40%;width:30%;background:rgba(255,255,255,.55);filter:blur(3px);transform:skewX(-20deg);animation:clqc-sang 3.2s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){.clqc-the *,.clqc-the *::after,.clqc-ray{animation:none!important;transition:none!important}}
+@keyframes clqc-phong{from{transform:scale(1)}to{transform:scale(1.04)}}
+.clqc-the.on .clqc-anh{animation:clqc-phong 8s ease-out both}
+@media (prefers-reduced-motion:reduce){.clqc-the *,.clqc-ray{animation:none!important;transition:none!important}}
 `;
 
 /** Một thẻ quảng cáo — cùng khuôn với thẻ của web (điện thoại: ô nhỏ; máy tính: thẻ to). */
@@ -67,25 +60,26 @@ export function TheQc({ o, on = true, xemTruoc = false, coMoTa = true }: { o: OQ
   const m = MAU_QC[o.mau || 'xanh'] || MAU_QC.xanh;
   const coAnh = !!o.anh?.trim();
   const ngoai = /^https?:/i.test(o.link || '');
-  const nhanMau = coAnh ? '#C8A14B' : m.nhan;
+  // Có ảnh: nhãn trắng mờ (vàng nhỏ trên ảnh rối thì không đọc nổi), nút nền trắng chữ xanh đậm
+  const nhanMau = coAnh ? 'rgba(255,255,255,.75)' : m.nhan;
   const ruot = (
     <>
       {coAnh && <>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={o.anh} alt="" loading="lazy" draggable={false} className="clqc-anh absolute inset-0 h-full w-full object-cover" />
-        <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/10" />
+        <span aria-hidden className="absolute inset-0 bg-black/55" />
       </>}
       {/* Chữ "Quảng cáo" nhỏ ở góc — bắt buộc để người xem phân biệt với nội dung của web */}
       <span className="absolute right-1.5 top-1.5 z-[1] rounded bg-black/35 px-1 py-px text-[8.5px] font-medium tracking-wide text-white/90 sm:right-2 sm:top-2 sm:text-[9.5px]">Quảng cáo</span>
       <span className="relative z-[1] flex h-full flex-col justify-between">
         <span>
-          {o.nhan && <span className="clqc-c1 block pr-12 text-[10px] font-semibold uppercase tracking-wide sm:text-[11px]" style={{ color: nhanMau }}>{o.nhan}</span>}
-          <span className="clqc-c2 mt-1 block text-[13.5px] font-extrabold leading-tight line-clamp-2 sm:text-lg">{o.tieuDe}</span>
+          {o.nhan && <span className="block pr-12 text-[10px] font-semibold uppercase tracking-wide sm:text-[11px]" style={{ color: nhanMau }}>{o.nhan}</span>}
+          <span className="mt-1 block text-[13.5px] font-extrabold leading-tight line-clamp-2 sm:text-lg">{o.tieuDe}</span>
           {/* Mô tả chỉ có ở ô mà thẻ gốc của web cũng có mô tả (ô 1) — ô 2 thẻ gốc thấp hơn, thêm mô tả là tràn khung */}
-          {o.moTa && coMoTa && <span className={`clqc-c3 mt-1.5 hidden text-xs leading-snug line-clamp-1 sm:block ${xemTruoc ? '!block' : ''}`} style={{ opacity: .85 }}>{o.moTa}</span>}
+          {o.moTa && coMoTa && <span className={`mt-1.5 hidden text-xs leading-snug line-clamp-1 sm:block ${xemTruoc ? '!block' : ''}`} style={{ opacity: .85 }}>{o.moTa}</span>}
         </span>
-        <span className="clqc-c4 mt-1.5 block text-[11.5px] font-bold sm:hidden" style={{ color: nhanMau }}>{o.nut || 'Xem ngay'} →</span>
-        <span className="clqc-c4 sm:mt-3 hidden sm:block"><span className="clqc-nut inline-block rounded px-3 py-1.5 text-xs font-bold" style={{ background: coAnh ? '#C8A14B' : m.nut, color: coAnh ? '#0A2540' : m.chuNut }}>{o.nut || 'Xem ngay'} →</span></span>
+        <span className="mt-1.5 block text-[11.5px] font-bold sm:hidden" style={{ color: nhanMau }}>{o.nut || 'Xem ngay'} →</span>
+        <span className="sm:mt-3 hidden sm:block"><span className="inline-block rounded px-3 py-1.5 text-xs font-bold" style={{ background: coAnh ? '#fff' : m.nut, color: coAnh ? '#0A2540' : m.chuNut }}>{o.nut || 'Xem ngay'} →</span></span>
       </span>
     </>
   );
@@ -126,8 +120,8 @@ export function TruotQc({ ds, buoc, denBuoc, dungLai, coMoTa = true, xemTruoc = 
       <div className="clqc-ray flex h-full transition-transform duration-[650ms] ease-[cubic-bezier(.5,0,.25,1)]" style={{ transform: `translateX(-${i * 100}%)` }}>
         {ds.map((o, k) => <div key={o.id || k} className="h-full w-full shrink-0" aria-hidden={k !== i}><TheQc o={o} on={k === i} xemTruoc={xemTruoc} coMoTa={coMoTa} /></div>)}
       </div>
-      {/* Chấm chuyển quảng cáo — góc dưới bên phải, không đè lên nút bấm bên trái */}
-      <div className="absolute bottom-1.5 right-2 z-[2] flex gap-1 sm:bottom-2.5 sm:right-3">
+      {/* Chấm chuyển quảng cáo — góc TRÊN bên trái (góc dưới hay đè lên logo/chữ có sẵn trong ảnh) */}
+      <div className="absolute left-2 top-1 z-[2] flex gap-1 sm:left-5 sm:top-2">
         {ds.map((o, k) => (
           <button key={o.id || k} type="button" aria-label={`Quảng cáo ${k + 1}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); denBuoc(buoc - i + k); }}
             className={`h-1.5 rounded-full transition-all ${k === i ? 'w-4 bg-white' : 'w-1.5 bg-white/45 hover:bg-white/70'}`} />

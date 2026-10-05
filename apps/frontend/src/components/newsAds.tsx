@@ -133,3 +133,26 @@ export function SidebarAd({ ds, batDau = 2 }: { ds: OQc[]; batDau?: number }) {
     </div>
   );
 }
+
+/** Cột dọc hai bên trang xem một tin đăng ("cánh gà", chỉ màn hình rất rộng) — cùng kho quảng cáo, cùng kiểu báo:
+    chữ "QUẢNG CÁO" xám phía trên, khung mảnh, ảnh dọc ở trên, chữ + nút ở dưới. */
+export function CotDocAd({ ds, batDau = 0 }: { ds: OQc[]; batDau?: number }) {
+  const buoc = useNhip(); if (!ds.length) return null;
+  const o = lay(ds, batDau, buoc);
+  return (
+    <div>
+      <NhanTren />
+      <LinkQc o={o} className="group block overflow-hidden rounded border border-slate-200 bg-white shadow-sm hover:border-slate-300">
+        <div key={o.id || buoc} className="cl-fadeup">
+          <div className="aspect-[3/4] overflow-hidden bg-slate-100"><Anh o={o} /></div>
+          <div className="p-3">
+            {o.nhan && <p className="text-[10.5px] font-semibold uppercase tracking-wide text-red-600">{o.nhan}</p>}
+            <p className="mt-0.5 text-[15px] font-bold leading-snug text-[#0A2540] line-clamp-3 group-hover:text-red-600">{o.tieuDe}</p>
+            {o.moTa && <p className="mt-1 text-xs text-slate-500 line-clamp-3">{o.moTa}</p>}
+            <Nut o={o} className="mt-2.5" />
+          </div>
+        </div>
+      </LinkQc>
+    </div>
+  );
+}

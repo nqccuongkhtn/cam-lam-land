@@ -2,12 +2,13 @@
 /* HAI Ô QUẢNG CÁO CẠNH TIN TỨC Ở TRANG CHỦ (5/10/2026).
    Admin nhập ở /admin → tab Quảng cáo → "2 ô quảng cáo trang chủ" (cất ở app_config, khoá `trangchu_ad`).
    - MỖI Ô CHỨA ĐƯỢC NHIỀU QUẢNG CÁO, tự TRƯỢT luân phiên như các web khác (5 giây/quảng cáo, có chấm chuyển,
-     điện thoại vuốt được, rê chuột vào thì dừng). Ô 2 trượt lệch nửa nhịp với ô 1 cho khỏi giật cùng lúc.
+     điện thoại vuốt được, rê chuột vào thì dừng). Hai ô trượt CÙNG LÚC (chung một đồng hồ).
+   - Khung quảng cáo khoá ĐÚNG cỡ thẻ gốc của web (thẻ gốc nằm ẩn bên dưới giữ chỗ).
    - Quảng cáo có ảnh nền thì chạy kiểu "banner động": ảnh phóng chậm, chữ trồi lên, nút có vệt sáng lướt qua.
    - Quảng cáo nào tắt / thiếu tiêu đề / quá ngày hết hạn thì tự bỏ ra. Ô hết sạch quảng cáo → quay về thẻ của web
      (Bản đồ quy hoạch, Đăng tin) — không bao giờ để ô trống, admin không phải nhớ ngày mà gỡ tay.
    - Góc mỗi quảng cáo có chữ nhỏ "Quảng cáo" (Luật Quảng cáo: phải phân biệt được với nội dung của web). */
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 
 export interface OQc {
@@ -62,7 +63,7 @@ const CSS = `
 `;
 
 /** Một thẻ quảng cáo — cùng khuôn với thẻ của web (điện thoại: ô nhỏ; máy tính: thẻ to). */
-export function TheQc({ o, on = true, xemTruoc = false }: { o: OQc; on?: boolean; xemTruoc?: boolean }) {
+export function TheQc({ o, on = true, xemTruoc = false, coMoTa = true }: { o: OQc; on?: boolean; xemTruoc?: boolean; coMoTa?: boolean }) {
   const m = MAU_QC[o.mau || 'xanh'] || MAU_QC.xanh;
   const coAnh = !!o.anh?.trim();
   const ngoai = /^https?:/i.test(o.link || '');
@@ -79,15 +80,16 @@ export function TheQc({ o, on = true, xemTruoc = false }: { o: OQc; on?: boolean
       <span className="relative z-[1] flex h-full flex-col justify-between">
         <span>
           {o.nhan && <span className="clqc-c1 block pr-12 text-[10px] font-semibold uppercase tracking-wide sm:text-[11px]" style={{ color: nhanMau }}>{o.nhan}</span>}
-          <span className="clqc-c2 mt-1 block text-[13.5px] font-extrabold leading-tight line-clamp-2 sm:text-lg sm:line-clamp-3">{o.tieuDe}</span>
-          {o.moTa && <span className={`clqc-c3 mt-1.5 hidden text-xs leading-snug line-clamp-2 sm:block ${xemTruoc ? '!block' : ''}`} style={{ opacity: .85 }}>{o.moTa}</span>}
+          <span className="clqc-c2 mt-1 block text-[13.5px] font-extrabold leading-tight line-clamp-2 sm:text-lg">{o.tieuDe}</span>
+          {/* Mô tả chỉ có ở ô mà thẻ gốc của web cũng có mô tả (ô 1) — ô 2 thẻ gốc thấp hơn, thêm mô tả là tràn khung */}
+          {o.moTa && coMoTa && <span className={`clqc-c3 mt-1.5 hidden text-xs leading-snug line-clamp-1 sm:block ${xemTruoc ? '!block' : ''}`} style={{ opacity: .85 }}>{o.moTa}</span>}
         </span>
         <span className="clqc-c4 mt-1.5 block text-[11.5px] font-bold sm:hidden" style={{ color: nhanMau }}>{o.nut || 'Xem ngay'} →</span>
         <span className="clqc-c4 sm:mt-3 hidden sm:block"><span className="clqc-nut inline-block rounded px-3 py-1.5 text-xs font-bold" style={{ background: coAnh ? '#C8A14B' : m.nut, color: coAnh ? '#0A2540' : m.chuNut }}>{o.nut || 'Xem ngay'} →</span></span>
       </span>
     </>
   );
-  const cls = `clqc-the ${on ? 'on' : ''} relative flex h-full w-full flex-col overflow-hidden rounded-lg p-3 pb-4 select-none sm:block sm:min-h-[172px] sm:rounded-xl sm:p-5 sm:pb-6`;
+  const cls = `clqc-the ${on ? 'on' : ''} relative flex h-full w-full flex-col overflow-hidden rounded-lg p-3 select-none sm:rounded-xl sm:p-5`;
   const style = { background: coAnh ? '#0A2540' : m.nen, color: coAnh ? '#fff' : m.chu };
   // Thẻ đang khuất (chờ trượt tới) thì không cho bấm phím Tab tới, đỡ nhầm
   const tab = on ? undefined : -1;
@@ -98,42 +100,36 @@ export function TheQc({ o, on = true, xemTruoc = false }: { o: OQc; on?: boolean
   return <Link href={o.link} tabIndex={tab} className={cls} style={style}>{ruot}</Link>;
 }
 
-/** Một ô: nhiều quảng cáo trượt ngang luân phiên. `lech` = trễ nhịp đầu (ms) để hai ô không trượt cùng lúc. */
-export function TruotQc({ ds, lech = 0, xemTruoc = false }: { ds: OQc[]; lech?: number; xemTruoc?: boolean }) {
-  const [i, setI] = useState(0);
-  const [dung, setDung] = useState(false);
+/** Một ô: nhiều quảng cáo trượt ngang. Số thứ tự `buoc` do bên ngoài giữ — HAI Ô DÙNG CHUNG một bước
+    nên luôn trượt CÙNG LÚC (chủ dự án 5/10/2026: lệch nhịp nhìn không đồng bộ). Ô ít quảng cáo hơn thì quay vòng sớm hơn. */
+export function TruotQc({ ds, buoc, denBuoc, dungLai, coMoTa = true, xemTruoc = false }: {
+  ds: OQc[]; buoc: number; denBuoc: (k: number) => void; dungLai: (d: boolean) => void; coMoTa?: boolean; xemTruoc?: boolean;
+}) {
   const cham = useRef<{ x: number; y: number } | null>(null);
   const keo = useRef(false);
   const n = ds.length;
-  const den = useCallback((k: number) => setI(((k % n) + n) % n), [n]);
-  useEffect(() => { if (i >= n) setI(0); }, [n, i]);
-  useEffect(() => {
-    if (n < 2 || dung) return;
-    let t: ReturnType<typeof setInterval> | undefined;
-    const d = setTimeout(() => { setI((k) => (k + 1) % n); t = setInterval(() => setI((k) => (k + 1) % n), 5000); }, 5000 + lech);
-    return () => { clearTimeout(d); if (t) clearInterval(t); };
-  }, [n, dung, lech]);
   if (!n) return null;
-  if (n === 1) return <TheQc o={ds[0]} xemTruoc={xemTruoc} />;
+  const i = ((buoc % n) + n) % n;
+  if (n === 1) return <TheQc o={ds[0]} xemTruoc={xemTruoc} coMoTa={coMoTa} />;
   return (
-    <div className="relative overflow-hidden rounded-lg sm:rounded-xl"
-      onMouseEnter={() => setDung(true)} onMouseLeave={() => setDung(false)}
-      onTouchStart={(e) => { cham.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; keo.current = false; setDung(true); }}
+    <div className="relative h-full overflow-hidden rounded-lg sm:rounded-xl"
+      onMouseEnter={() => dungLai(true)} onMouseLeave={() => dungLai(false)}
+      onTouchStart={(e) => { cham.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; keo.current = false; dungLai(true); }}
       onTouchEnd={(e) => {
-        const c = cham.current; cham.current = null; setDung(false);
+        const c = cham.current; cham.current = null; dungLai(false);
         if (!c) return;
         const dx = e.changedTouches[0].clientX - c.x, dy = e.changedTouches[0].clientY - c.y;
-        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { keo.current = true; den(i + (dx < 0 ? 1 : -1)); }
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { keo.current = true; denBuoc(buoc + (dx < 0 ? 1 : -1)); }
       }}
       // Vuốt để chuyển thì không tính là bấm vào quảng cáo
       onClickCapture={(e) => { if (keo.current) { e.preventDefault(); e.stopPropagation(); keo.current = false; } }}>
       <div className="clqc-ray flex h-full transition-transform duration-[650ms] ease-[cubic-bezier(.5,0,.25,1)]" style={{ transform: `translateX(-${i * 100}%)` }}>
-        {ds.map((o, k) => <div key={o.id || k} className="w-full shrink-0" aria-hidden={k !== i}><TheQc o={o} on={k === i} xemTruoc={xemTruoc} /></div>)}
+        {ds.map((o, k) => <div key={o.id || k} className="h-full w-full shrink-0" aria-hidden={k !== i}><TheQc o={o} on={k === i} xemTruoc={xemTruoc} coMoTa={coMoTa} /></div>)}
       </div>
-      {/* Chấm chuyển quảng cáo */}
-      <div className="absolute inset-x-0 bottom-1 z-[2] flex justify-center gap-1 sm:bottom-2">
+      {/* Chấm chuyển quảng cáo — góc dưới bên phải, không đè lên nút bấm bên trái */}
+      <div className="absolute bottom-1.5 right-2 z-[2] flex gap-1 sm:bottom-2.5 sm:right-3">
         {ds.map((o, k) => (
-          <button key={o.id || k} type="button" aria-label={`Quảng cáo ${k + 1}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); den(k); }}
+          <button key={o.id || k} type="button" aria-label={`Quảng cáo ${k + 1}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); denBuoc(buoc - i + k); }}
             className={`h-1.5 rounded-full transition-all ${k === i ? 'w-4 bg-white' : 'w-1.5 bg-white/45 hover:bg-white/70'}`} />
         ))}
       </div>
@@ -152,12 +148,31 @@ export default function OQuangCaoTrangChu({ macDinh1, macDinh2 }: { macDinh1: Re
   }, []);
   const ds1 = dsCua(ch.o1).filter((o) => dangChay(o));
   const ds2 = dsCua(ch.o2).filter((o) => dangChay(o));
+  // MỘT đồng hồ chung cho cả hai ô → trượt cùng lúc. Rê chuột / chạm vào ô nào cũng dừng cả hai.
+  const [buoc, setBuoc] = useState(0);
+  const [dung, setDung] = useState(false);
+  const chay = Math.max(ds1.length, ds2.length) > 1;
+  useEffect(() => {
+    if (!chay || dung) return;
+    const t = setInterval(() => setBuoc((k) => k + 1), 5000);
+    return () => clearInterval(t);
+  }, [chay, dung, buoc]); // có `buoc`: bấm chấm / vuốt xong thì đếm lại đủ 5 giây
+  // KHUNG GIỮ NGUYÊN CỠ THẺ GỐC: thẻ của web vẫn nằm đó nhưng ẩn đi (giữ chỗ), quảng cáo phủ đúng lên khung đó
+  // → ô quảng cáo không bao giờ to hơn/nhỏ hơn thẻ ban đầu, dù chữ dài hay ảnh to.
+  const khung = (ds: OQc[], macDinh: ReactNode, coMoTa: boolean) => !ds.length ? macDinh : (
+    <div className="relative">
+      <div className="invisible" aria-hidden>{macDinh}</div>
+      <div className="absolute inset-0">
+        <TruotQc ds={ds} buoc={buoc} denBuoc={setBuoc} dungLai={setDung} coMoTa={coMoTa} />
+      </div>
+    </div>
+  );
   return (
     <div>
       <CssQc />
       <div className="grid grid-cols-2 gap-2.5 sm:block sm:space-y-4">
-        {ds1.length ? <TruotQc ds={ds1} /> : macDinh1}
-        {ds2.length ? <TruotQc ds={ds2} lech={2500} /> : macDinh2}
+        {khung(ds1, macDinh1, true)}
+        {khung(ds2, macDinh2, false)}
       </div>
       {/* Lời mời đặt quảng cáo — chỉ trên máy tính, chữ nhỏ cho khỏi rối (điện thoại cần gọn) */}
       <Link href="/dichvu#quang-cao" className="mt-2 hidden text-right text-[11px] text-slate-400 hover:text-red-600 sm:block">Đặt quảng cáo tại vị trí này →</Link>

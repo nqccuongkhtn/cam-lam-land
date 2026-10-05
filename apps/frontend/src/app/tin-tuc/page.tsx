@@ -1,57 +1,17 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useSlides, imgsOf, useNewsAd, type Ad } from '@/components/newsAds'; // dùng chung, tránh lặp
+import { useBoQc, BillboardAd, NativeAd, SidebarAd } from '@/components/newsAds'; // dùng chung với trang đọc bài
+import type { OQc } from '@/components/OQuangCaoTrangChu';
 import { decodeEntities } from '@/lib/htmlEntities';
 
 interface N { title: string; url: string; source?: string; image?: string; summary?: string; publishedAt?: string; slug: string }
 
-const isExt = (l?: string) => (l || '').startsWith('http');
-function Cta({ text, className = '' }: { text: string; className?: string }) {
-  return (
-    <span className={`relative overflow-hidden bg-[#C8A14B] text-[#0A2540] font-bold rounded-md ${className}`}>
-      <span className="relative z-10">{text} →</span>
-      <span aria-hidden className="cl-shine pointer-events-none absolute top-0 bottom-0 w-1/4 bg-white/45 blur-[3px]" />
-    </span>
-  );
-}
-function Slides({ imgs, idx }: { imgs: string[]; idx: number }) {
-  return <>{imgs.map((src, i) => <img key={i} src={src} alt="" className={`absolute inset-0 w-full h-full object-cover cl-ken transition-opacity duration-[1300ms] ease-in-out ${i === idx ? 'opacity-100' : 'opacity-0'}`} />)}</>;
-}
-// Khung quảng cáo kiểu Znews: thẻ trắng, nút × đóng, nhãn QC
-function AdFrame({ children, className = '' }: { children: any; className?: string }) {
-  return (
-    <div className={`cl-fadeup group/ad relative overflow-hidden border border-slate-200 shadow-md hover:shadow-xl transition-shadow duration-300 bg-white ${className}`}>
-      <span className="absolute top-1.5 left-1.5 z-20 bg-[#0A2540]/75 text-white/90 text-[8px] font-bold px-1.5 py-0.5 rounded leading-none tracking-wide">QC</span>
-      {children}
-    </div>
-  );
-}
-
-// Cánh gà dọc
-function WingAd({ ad }: { ad: Ad }) {
-  const imgs = imgsOf(ad); const idx = useSlides(imgs.length);
-  const tgt = isExt(ad.link) ? '_blank' : undefined;
-  return (
-    <AdFrame className="h-full w-full flex flex-col rounded-2xl">
-      <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group flex flex-col flex-1 min-h-0">
-        <div className="relative flex-1 bg-slate-100 overflow-hidden">
-          {imgs.length ? <Slides imgs={imgs} idx={idx} /> : <div className="absolute inset-0 bg-gradient-to-br from-[#0A2540] to-[#10355f]" />}
-        </div>
-        {(ad.title || ad.cta) && (
-          <div className="bg-white px-3 py-3 text-center border-t border-slate-100">
-            {ad.title && <p className="font-bold text-[#0A2540] text-sm leading-snug line-clamp-2">{ad.title}</p>}
-            {ad.sub && <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">{ad.sub}</p>}
-            {ad.cta && <Cta text={ad.cta} className="mt-2 inline-block text-xs px-4 py-1.5" />}
-          </div>
-        )}
-      </a>
-    </AdFrame>
-  );
-}
-
-// Cánh gà kiểu Znews: fixed kẹp 2 bên cột nội dung, trượt vào khi cuộn xuống (màn ≥1536px)
-function WingRails({ ad }: { ad: Ad }) {
+// Cánh gà kiểu Znews: fixed kẹp 2 bên cột nội dung, trượt vào khi cuộn xuống (màn ≥1536px).
+// Mỗi bên XẾP CHỒNG 2 thẻ, ảnh giữ tỉ lệ ngang 4:3. KHÔNG kéo một ảnh cao hết màn hình: ảnh ngang bị cắt
+// thành dải dọc, chữ trong ảnh còn "M L" — chủ dự án chê "cụt cụt" (5/10/2026).
+// Dải trên = quảng cáo 0, giữa danh sách = 1, bên trái = 2 và 3, bên phải = 4 và 5 → 6 quảng cáo không trùng.
+function WingRails({ ds }: { ds: OQc[] }) {
   const [shown, setShown] = useState(false);
   useEffect(() => {
     const onScroll = () => setShown(window.scrollY > 340);
@@ -59,53 +19,13 @@ function WingRails({ ad }: { ad: Ad }) {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-  const cls = 'pointer-events-auto fixed top-24 bottom-6 z-20 transition-all duration-500 ease-out';
+  const cls = 'pointer-events-auto fixed top-20 z-20 flex max-h-[calc(100vh-6rem)] flex-col gap-4 overflow-hidden transition-all duration-500 ease-out';
   const w = 'calc((100vw - 1120px) * 0.3)';
   const off = 'calc((100vw - 1120px) * 0.1)';
   return (
-    <div aria-hidden className="hidden 2xl:block">
-      <aside className={`${cls} ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`} style={{ width: w, maxWidth: 340, left: off }}><WingAd ad={ad} /></aside>
-      <aside className={`${cls} ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`} style={{ width: w, maxWidth: 340, right: off }}><WingAd ad={ad} /></aside>
-    </div>
-  );
-}
-
-// Dải ngang trên đầu (billboard lớn, ảnh phủ full + chữ to bên trái)
-function BillboardAd({ ad }: { ad: Ad }) {
-  const imgs = imgsOf(ad); const idx = useSlides(imgs.length);
-  const tgt = isExt(ad.link) ? '_blank' : undefined;
-  return (
-    <AdFrame className="h-56 md:h-64 rounded-2xl">
-      <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group block relative h-full w-full bg-[#0A2540]">
-        {imgs.length ? <Slides imgs={imgs} idx={idx} /> : <div className="absolute inset-0 bg-gradient-to-br from-[#0A2540] to-[#10355f]" />}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0A2540]/95 via-[#0A2540]/55 to-transparent" />
-        <div className="absolute inset-y-0 left-0 z-10 flex flex-col justify-center p-6 md:p-10 max-w-[62%] text-white">
-          <p className="font-extrabold text-2xl md:text-4xl leading-tight drop-shadow">{ad.title}</p>
-          {ad.sub && <p className="text-sm md:text-lg text-white/85 mt-2 md:mt-3 drop-shadow">{ad.sub}</p>}
-          {ad.cta && <Cta text={ad.cta} className="mt-4 md:mt-5 self-start text-sm md:text-base px-6 py-3" />}
-        </div>
-      </a>
-    </AdFrame>
-  );
-}
-
-// Native chèn giữa danh sách
-function NativeAd({ ad }: { ad: Ad }) {
-  const img = imgsOf(ad)[0] || '';
-  const tgt = isExt(ad.link) ? '_blank' : undefined;
-  return (
-    <div className="relative py-4">
-      <a href={ad.link || '#'} target={tgt} rel="noreferrer" className="group flex gap-4 items-start">
-        <div className="w-32 sm:w-48 aspect-[16/10] rounded-lg overflow-hidden bg-slate-100 shrink-0 relative">
-          {img ? <img src={img} alt="" className="w-full h-full object-cover group-hover:scale-105 transition duration-700" /> : <div className="w-full h-full grid place-items-center text-slate-300">📰</div>}
-          <span className="absolute top-1 left-1 bg-[#C8A14B] text-[#0A2540] text-[9px] font-bold px-1.5 py-0.5 rounded shadow">Tài trợ</span>
-        </div>
-        <div className="min-w-0 pr-5">
-          <h3 className="font-bold text-[#0A2540] leading-snug line-clamp-2 group-hover:text-red-600 text-[15px] md:text-base">{ad.title}</h3>
-          {ad.sub && <p className="text-sm text-slate-500 mt-1.5 line-clamp-2">{ad.sub}</p>}
-          <p className="text-xs text-[#C8A14B] font-bold mt-2">Quảng cáo · {ad.cta || 'Xem ngay'} →</p>
-        </div>
-      </a>
+    <div className="hidden 2xl:block">
+      <aside className={`${cls} ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`} style={{ width: w, maxWidth: 260, left: off }}><SidebarAd ds={ds} batDau={2} /><SidebarAd ds={ds} batDau={3} /></aside>
+      <aside className={`${cls} ${shown ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`} style={{ width: w, maxWidth: 260, right: off }}><SidebarAd ds={ds} batDau={4} /><SidebarAd ds={ds} batDau={5} /></aside>
     </div>
   );
 }
@@ -185,13 +105,13 @@ function RankRow({ n, rank }: { n: N; rank: number }) {
 export default function NewsIndex() {
   const [news, setNews] = useState<N[]>([]);
   const [loading, setLoading] = useState(true);
-  const ad = useNewsAd();
+  const boQc = useBoQc(); // kho quảng cáo chung với 2 ô trang chủ
   const [limit, setLimit] = useState(12);
   const [q, setQ] = useState('');
 
   useEffect(() => { fetch('/feed/news?gon=1').then((r) => r.json()).then((d) => setNews((d.news || []).map((n: any) => ({ ...n, title: decodeEntities(n.title), summary: decodeEntities(n.summary) })))).catch(() => {}).finally(() => setLoading(false)); }, []);
 
-  const showAd = ad && ad.enabled !== false;
+  const showAd = boQc.length > 0;
   const na = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
   const toks = na(q).split(/\s+/).filter(Boolean);
   const filtered = toks.length ? news.filter((n) => { const d = na(n.title + ' ' + (n.summary || '')); return toks.every((t) => d.includes(t)); }) : news;
@@ -202,14 +122,14 @@ export default function NewsIndex() {
   const rest = filtered.slice(11);
   const shown = rest.slice(0, limit);
   const rows: any[] = [];
-  shown.forEach((n, i) => { rows.push(<Row key={n.slug} n={n} />); if (i === 2 && showAd) rows.push(<NativeAd key="native-ad" ad={ad} />); });
+  shown.forEach((n, i) => { rows.push(<Row key={n.slug} n={n} />); if (i === 2 && showAd) rows.push(<NativeAd key="native-ad" ds={boQc} batDau={1} />); });
   const hasMore = rest.length > limit;
 
   return (
     <div className="relative min-h-[calc(100dvh-56px)] bg-white">
-      {showAd && <WingRails ad={ad} />}
+      {showAd && <WingRails ds={boQc} />}
       <div className="relative z-10 mx-auto max-w-[1120px] px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
-        {showAd && <div className="hidden md:block mb-6"><BillboardAd ad={ad} /></div>}
+        {showAd && <div className="hidden md:block mb-6"><BillboardAd ds={boQc} batDau={0} /></div>}
         <div>
           <div className="pt-0">
             <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <span className="text-slate-600">Tin tức</span></div>

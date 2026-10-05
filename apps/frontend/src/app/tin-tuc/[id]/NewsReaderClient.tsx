@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { useNewsAd, showAd, BillboardAd, NativeAd, SidebarAd } from '@/components/newsAds';
+import { useBoQc, BillboardAd, NativeAd, SidebarAd } from '@/components/newsAds';
 import { decodeEntities } from '@/lib/htmlEntities';
 
 interface Article { title: string; url: string; source?: string; image?: string; images?: string[]; summary?: string; body?: string; publishedAt?: string; slug: string }
@@ -123,7 +123,7 @@ export default function NewsReaderClient() {
   const [a, setA] = useState<Article | null>(null);
   const [related, setRelated] = useState<Article[]>([]);
   const [done, setDone] = useState(false);
-  const ad = useNewsAd();
+  const boQc = useBoQc(); // kho quảng cáo chung với 2 ô trang chủ
 
   useEffect(() => {
     let huy = false;
@@ -171,7 +171,7 @@ export default function NewsReaderClient() {
   const body: any[] = []; let ip = 0;
   paras.forEach((para, i) => {
     body.push(<p key={'p' + i}>{para}</p>);
-    if (i === 2 && showAd(ad)) body.push(<div key="adin" className="my-4"><NativeAd ad={ad} /></div>);
+    if (i === 2 && boQc.length) body.push(<div key="adin" className="my-4 border-y border-slate-100"><NativeAd ds={boQc} batDau={1} /></div>);
     if ((i + 1) % 2 === 0 && ip < extra.length) body.push(<WmImg key={'i' + i} src={extra[ip++]} wrap="my-1" img="max-h-[440px]" />);
   });
 
@@ -180,7 +180,7 @@ export default function NewsReaderClient() {
       <div className="mx-auto max-w-6xl px-3 py-4 sm:px-4 sm:py-6">
         <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <Link href="/tin-tuc" className="hover:text-[#0A2540]">Tin tức</Link> › <span className="text-slate-600">Bài viết</span></div>
 
-        {showAd(ad) && <div className="mb-5"><BillboardAd ad={ad} /></div>}
+        {boQc.length > 0 && <div className="mb-5 hidden md:block"><BillboardAd ds={boQc} batDau={0} /></div>}
 
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
           <article className="min-w-0">
@@ -213,7 +213,7 @@ export default function NewsReaderClient() {
 
           <aside className="hidden lg:block">
             <div className="sticky top-20 space-y-5">
-              {showAd(ad) && <SidebarAd ad={ad} />}
+              {boQc.length > 0 && <SidebarAd ds={boQc} batDau={2} />}
               <RelatedList items={related} />
             </div>
           </aside>

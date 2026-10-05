@@ -61,7 +61,7 @@ export default function Admin() {
 }
 
 function AdsManager() {
-  const [ad, setAd] = useState<any>({ enabled: true, images: ['/bai-dai/hero.webp', '/bai-dai/bd-05.webp', '/bai-dai/bd-02.webp', '/bai-dai/bd-13.webp'], link: '/sales/post', title: 'ĐĂNG TIN NHÀ ĐẤT MIỄN PHÍ', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' });
+  const [ad, setAd] = useState<any>({ enabled: true, images: ['/tin-mau/nha-01.webp'], link: '/sales/post', title: 'ĐĂNG TIN NHÀ ĐẤT MIỄN PHÍ', sub: 'Tiếp cận hàng nghìn khách mua tại Cam Lâm', cta: 'Đăng ngay' });
   const [adMsg, setAdMsg] = useState('');
   const [mapCount, setMapCount] = useState<number | null>(null);
   useEffect(() => { api<{ value: any }>('/config/tintuc_ad').then((r) => { if (r.value && typeof r.value === 'object') setAd((a: any) => ({ ...a, ...r.value })); }).catch(() => {}); }, []);
@@ -88,7 +88,7 @@ function AdsManager() {
           <p className="font-bold text-[#0A2540]">📢 Banner trang Tin tức (2 bên)</p>
           <button onClick={() => setAd((a: any) => ({ ...a, enabled: a.enabled === false }))} aria-label="Bật/tắt" className={`w-12 h-7 rounded-full relative transition ${on ? 'bg-emerald-500' : 'bg-slate-300'}`}><span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-all ${on ? 'left-6' : 'left-1'}`} /></button>
         </div>
-        <p className="text-xs text-slate-500 mt-1">Banner dọc cao như batdongsan. Nhập nhiều ảnh (mỗi dòng 1 URL) để chạy động (slideshow + zoom). Ảnh đứng, vd 600×1400.</p>
+        <p className="text-xs text-slate-500 mt-1">Bật thì quảng cáo này được xếp ĐẦU hàng quảng cáo trang Tin tức, chạy luân phiên cùng các quảng cáo của 2 ô trang chủ (dải trên đầu, giữa danh sách tin, cột bên). Chỉ lấy ảnh đầu tiên — nên dùng ảnh ngang, vd 800×500.</p>
         <div className="grid sm:grid-cols-[1fr_170px] gap-4 mt-3 items-start">
           <div className="space-y-2.5">
             <textarea value={(ad.images && ad.images.length ? ad.images : ad.image ? [ad.image] : []).join('\n')} onChange={(e) => setAd((a: any) => ({ ...a, images: e.target.value.split('\n').map((x: string) => x.trim()).filter(Boolean) }))} rows={3} placeholder="URL ảnh — MỖI DÒNG 1 ẢNH (nhiều ảnh = chạy slideshow động)" className={inp} />

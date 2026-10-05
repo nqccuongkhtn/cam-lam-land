@@ -102,6 +102,9 @@ export default function DuyetMoiGioiCn() {
               </ul>
 
               <div className="mt-3 flex flex-wrap gap-2">
+                {/* Kiểm tra người xin duyệt: bấm mở Zalo của số đó để kết bạn — kết bạn được = số có thật, đúng người
+                    (chủ dự án chọn cách này thay cho điều kiện "đã xác minh SĐT", 5/10/2026). */}
+                {d.phone && <a href={`https://zalo.me/${d.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="flex h-9 items-center gap-1.5 rounded-lg border border-slate-300 px-3 text-xs font-semibold text-[#0068ff] hover:bg-slate-50">Mở Zalo {d.phone}</a>}
                 {d.canSdt && d.phone && (d.sdtOk
                   ? <button disabled={dang === d.id} onClick={() => lam(d.id, 'sdt', { xacMinh: false })} className="h-9 rounded-lg border border-slate-300 px-3 text-xs font-semibold text-slate-600 hover:bg-slate-50">Bỏ xác minh số</button>
                   : <a href={`tel:${d.phone.replace(/\s/g, '')}`} className="flex h-9 items-center rounded-lg border border-slate-300 px-3 text-xs font-semibold text-[#0A2540] hover:bg-slate-50">📞 Gọi {d.phone}</a>)}

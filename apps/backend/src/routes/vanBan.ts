@@ -254,6 +254,87 @@ export async function crawlPortals(onAdd?: (isNew: boolean) => void): Promise<nu
   return n;
 }
 
+// ── NGUỒN BỔ SUNG: camhomes.vn/van-ban (6/10/2026) ──
+// Chủ dự án: "nguồn văn bản chất lượng, có chọn lọc" — văn bản địa phương Cam Lâm / Cam Ranh mà Công báo và cổng
+// TTĐT ít có: thông báo kiểm kê, niêm yết phương án bồi thường từng đợt, của Chi nhánh Phát triển quỹ đất, UBND các xã…
+// Dùng CHUNG nền tảng với các bộ lấy ở trên: cùng bảng, cùng khoá chống trùng (số ký hiệu + ngày), cùng lịch chạy,
+// cùng nút "Cập nhật" trong trang quản lý văn bản. KHÔNG lọc từ khoá như Công báo vì nguồn này đã chọn lọc sẵn.
+//   · Danh sách: /van-ban/ (trang 1) và /van-ban/page-N/ (trang sau) — 50 văn bản/trang, mới → cũ.
+//     (Đường /van-ban/?page=N hiện trên trang KHÔNG chạy với máy, luôn trả trang 1.)
+//   · File PDF: trang chi tiết nhúng trình xem PDF.js, file thật ở
+//     /index.php?language=vi&nv=van-ban&op=detail/<đường-dẫn>&download=1&id=0  (trả thẳng application/pdf).
+//   · Văn bản trùng với Công báo / cổng TTĐT thì GIỮ link cũ (nguồn nhà nước), chỉ bổ sung khi chưa có link.
+//   · Văn bản không có số ký hiệu (niêm yết, thông báo danh sách…) ghi "Không số (mã)" để khoá chống trùng vẫn chạy.
+//   · Lượt tải của họ KHÔNG chép sang (đó là số liệu của web khác).
+const CAMHOMES = 'https://camhomes.vn';
+const coQuanCH = (s: string) => {
+  const t = clean(s);
+  if (!t || /^khác$/i.test(t)) return 'Khác';
+  return t.toLocaleLowerCase('vi')
+    .replace(/(^|\s)(\S)/g, (_m, a, b) => a + b.toLocaleUpperCase('vi'))
+    .replace(/(^|\s)Ubnd(?=\s|$)/g, '$1UBND').replace(/(^|\s)Hđnd(?=\s|$)/g, '$1HĐND')
+    .replace(/(^|\s)(Xã|Phường|Tỉnh|Huyện|Thị Trấn|Khu Vực|Thành Phố)(?=\s)/g, (_m, a, w) => a + w.toLocaleLowerCase('vi'))
+    // Tên riêng của cơ quan viết đúng chính tả (nguồn ghi IN HOA hết, tự đổi chữ thường thì sai mấy chỗ này)
+    .replace('Thủ Tướng Chính Phủ', 'Thủ tướng Chính phủ').replace('Bộ Xây Dựng', 'Bộ Xây dựng')
+    .replace(/^(Chi Nhánh|Cn) Phát Triển Quỹ Đất/, 'Chi nhánh Phát triển quỹ đất').replace('Nn&mt', 'NN&MT')
+    .replace('Sở Tài Chính', 'Sở Tài chính').replace('Sở Giao Thông Vận Tải', 'Sở Giao thông vận tải')
+    .replace('Sở Tài Nguyên Và Môi Trường', 'Sở Tài nguyên và Môi trường').replace('Sở Nông Nghiệp Và Môi Trường', 'Sở Nông nghiệp và Môi trường');
+};
+function parseCamhomes(html: string) {
+  const out: { id: string; so: string; ngay: string; coQuan: string; trichYeu: string; slug: string }[] = [];
+  for (const tr of html.match(/<tr>[\s\S]*?<\/tr>/gi) || []) {
+    const tds = [...tr.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map((m) => m[1]);
+    if (tds.length < 7) continue;
+    const a = tds[1].match(/href="\/van-ban\/detail\/([^"]+?)-(\d+)\/"[^>]*title="([^"]*)"[^>]*>([^<]*)</i);
+    if (!a) continue;
+    const d = tds[3].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    out.push({
+      slug: `${a[1]}-${a[2]}`, id: a[2],
+      so: clean(a[4]).replace(/^Số[:\s]*/i, ''),
+      ngay: d ? `${d[3]}-${d[2].padStart(2, '0')}-${d[1].padStart(2, '0')}` : '',
+      coQuan: coQuanCH(tds[4]),
+      trichYeu: clean(a[3]) || clean(tds[5]),
+    });
+  }
+  return out;
+}
+let lastCamhomes = 0;
+/** deep = duyệt hết các trang (lúc khởi động / bấm Cập nhật); thường = 3 trang mới nhất. */
+export async function crawlCamhomes(deep = false, onAdd?: (isNew: boolean) => void): Promise<number> {
+  if (!deep && Date.now() - lastCamhomes < 5 * 3600 * 1000) return 0; // lịch 6 giờ/lần, chặn chạy dồn
+  lastCamhomes = Date.now();
+  const MAX = deep ? 40 : 3;
+  const seen = new Set<string>();
+  let n = 0;
+  for (let pg = 1; pg <= MAX; pg++) {
+    let rows: ReturnType<typeof parseCamhomes>;
+    try {
+      const r = await fetch(pg === 1 ? `${CAMHOMES}/van-ban/` : `${CAMHOMES}/van-ban/page-${pg}/`, { headers: UA, signal: AbortSignal.timeout(15000) });
+      if (!r.ok) break;
+      rows = parseCamhomes(await r.text());
+    } catch { break; }
+    const moi = rows.filter((x) => !seen.has(x.id));
+    if (!moi.length) break;                              // hết trang (máy chủ trả lại trang cũ) → dừng
+    for (const x of moi) {
+      seen.add(x.id);
+      if (!x.ngay || x.trichYeu.length < 8) continue;
+      const so = x.so || `Không số (${x.id})`;
+      const link = `${CAMHOMES}/index.php?language=vi&nv=van-ban&op=detail/${x.slug}&download=1&id=0`;
+      await query(
+        `INSERT INTO van_ban (so_hieu, trich_yeu, ngay_ban_hanh, co_quan, chu_de, linh_vuc, nguon, link_goc)
+         VALUES ($1,$2,$3,$4,$5,'Đất đai','camhomes.vn',$6)
+         ON CONFLICT (so_hieu, ngay_ban_hanh) DO UPDATE SET
+           link_goc = COALESCE(NULLIF(van_ban.link_goc, ''), EXCLUDED.link_goc)
+         RETURNING (xmax = 0) AS inserted`,
+        [so, x.trichYeu, x.ngay, x.coQuan, classify(x.trichYeu), link])
+        .then((rs: any) => { n++; onAdd?.(!!(rs && rs[0] && rs[0].inserted)); }).catch(() => {});
+    }
+    await new Promise((z) => setTimeout(z, 800)); // lịch sự với máy chủ nguồn (web nhỏ)
+  }
+  console.log(`[van-ban] crawl camhomes.vn: ${n} văn bản (${seen.size} mục đã duyệt)`);
+  return n;
+}
+
 // Crawl NỀN: /refresh khởi động rồi trả lời NGAY (tránh 524 — Cloudflare cắt kết nối ở ~100s khi crawl sâu).
 // Client hỏi tiến độ qua /refresh-status tới khi running=false. Chặn chạy trùng bằng cờ running.
 const crawlState = { running: false, added: 0, updated: 0, startedAt: 0, finishedAt: 0, error: '' };
@@ -262,7 +343,7 @@ function startCrawlBg(): boolean {
   crawlState.running = true; crawlState.added = 0; crawlState.updated = 0; crawlState.startedAt = Date.now(); crawlState.finishedAt = 0; crawlState.error = '';
   const cb = (isNew: boolean) => { if (isNew) crawlState.added++; else crawlState.updated++; };
   (async () => {
-    try { await crawlCongBao(true, true, cb); await crawlPortals(cb); }
+    try { await crawlCongBao(true, true, cb); await crawlPortals(cb); await crawlCamhomes(true, cb); }
     catch (e: any) { crawlState.error = e?.message || 'Lỗi crawl'; }
     finally { crawlState.running = false; crawlState.finishedAt = Date.now(); }
   })();
@@ -282,6 +363,7 @@ function normPdf(raw: string, base: string): string | null {
 async function resolvePdf(link: string): Promise<string | null> {
   if (!link) return null;
   if (/\.pdf(\?|$)/i.test(link)) return normPdf(link, link);
+  if (/camhomes\.vn\/index\.php\?.*download=1/i.test(link)) return link; // camhomes: link tải trả thẳng PDF
   try {
     const r = await fetch(link, { headers: UA, signal: AbortSignal.timeout(12000) });
     if (!r.ok) return null;

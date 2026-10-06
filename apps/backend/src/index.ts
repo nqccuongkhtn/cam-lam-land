@@ -33,7 +33,7 @@ import { paymentsRouter } from './routes/payments.ts';
 import { flagsRouter } from './routes/flags.ts';
 import { newsRouter, refreshNews } from './routes/news.ts';
 import { newsletterRouter } from './routes/newsletter.ts';
-import { vanBanRouter, seedVanBan, crawlCongBao, crawlPortals } from './routes/vanBan.ts';
+import { vanBanRouter, seedVanBan, crawlCongBao, crawlPortals, crawlCamhomes } from './routes/vanBan.ts';
 import { configRouter } from './routes/config.ts';
 import { savedPlacesRouter } from './routes/savedPlaces.ts';
 import { crmRouter } from './routes/crm.ts';
@@ -189,10 +189,10 @@ async function main() {
   try { await ensureAdmin(); } catch (e: any) { console.error('[boot] ensureAdmin lỗi (bỏ qua):', e?.stack || e?.message || e); }
   try { await khoiTaoTheoDoi(); } catch (e: any) { console.error('[boot] theo dõi tài khoản lỗi (bỏ qua):', e?.message || e); } // tạm — dễ gỡ
   refreshNews(true).catch(() => {}); // lấy tin ngay khi khởi động
-  // Văn bản: seed → crawl Công báo (kho đầy đủ) → quét các cổng TTĐT (bổ sung); sau đó TỰ LÀM MỚI: Công báo mỗi GIỜ, cổng TTĐT mỗi 6 giờ.
-  seedVanBan().then(() => crawlCongBao(true, true)).then(() => crawlPortals()).catch(() => {}); // khởi động: backfill SÂU toàn kho (2005→nay, ~853 trang, chạy nền ~15') + quét cổng
+  // Văn bản: seed → crawl Công báo (kho đầy đủ) → quét các cổng TTĐT → camhomes.vn (bổ sung, 6/10/2026); sau đó TỰ LÀM MỚI: Công báo mỗi GIỜ, cổng TTĐT mỗi 6 giờ.
+  seedVanBan().then(() => crawlCongBao(true, true)).then(() => crawlPortals()).then(() => crawlCamhomes(true)).catch(() => {}); // khởi động: backfill SÂU toàn kho (2005→nay, ~853 trang, chạy nền ~15') + quét cổng
   setInterval(() => crawlCongBao().catch(() => {}), 60 * 60 * 1000);   // Công báo (nguồn chính): tự làm mới MỖI GIỜ — crawl "gần đây" (15 trang, nhẹ)
-  setInterval(() => crawlPortals().catch(() => {}), 6 * 3600 * 1000);  // cổng TTĐT (bổ sung, cấp quốc gia): mỗi 6 giờ cho đỡ tải nguồn ngoài
+  setInterval(() => crawlPortals().then(() => crawlCamhomes()).catch(() => {}), 6 * 3600 * 1000);  // cổng TTĐT + camhomes.vn (bổ sung): mỗi 6 giờ cho đỡ tải nguồn ngoài
   // Tự cập nhật tin BĐS mỗi 6 giờ từ 6h sáng (giờ VN): 06:00, 12:00, 18:00, 00:00
   let lastNewsSlot = '';
   setInterval(() => {

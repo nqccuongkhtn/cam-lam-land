@@ -160,7 +160,7 @@ function Kieu1({ ds, i }: { ds: OQc[]; i: number }) {
           <div className="aspect-[16/10] w-[108px] shrink-0 overflow-hidden rounded bg-slate-100"><AnhDt o={o} /></div>
           <div className="min-w-0 flex-1">
             <p className="text-[15px] font-bold leading-snug text-[#0A2540] line-clamp-2">{o.tieuDe}</p>
-            <p className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400"><span className="rounded border border-slate-300 px-1 text-[10px] font-medium text-slate-500">Quảng cáo</span><span className="truncate">{o.nhan}</span></p>
+            <p className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400"><span className="shrink-0 whitespace-nowrap rounded border border-slate-300 px-1 text-[10px] font-medium text-slate-500">Quảng cáo</span><span className="truncate">{o.nhan}</span></p>
           </div>
         </div>
       </LinkDt>
@@ -176,6 +176,87 @@ function QcDienThoai({ ds }: { ds: OQc[] }) {
   return <div className="sm:hidden"><Kieu1 ds={ds} i={buoc % ds.length} /></div>;
 }
 
+/* ── MÁY TÍNH: 3 KIỂU XEM THỬ (6/10/2026, TẠM) ──
+   Chủ dự án chê hai ô ảnh tối ở cột phải khu tin tức (chữ "Quảng cáo" bị cắt, chấm bé, ảnh phủ tối nặng).
+   Mở trang chủ kèm ?mauqc=1 / 2 / 3 trên máy tính để xem. Chọn xong giữ một kiểu, xoá phần còn lại. */
+const NhanXam = () => <p className="mb-2 text-[10.5px] font-medium uppercase tracking-[.14em] text-slate-400">Quảng cáo</p>;
+
+/** Kiểu 1 — HAI DÒNG như dòng tin tức ở cột giữa (đồng bộ với kiểu đã chọn cho điện thoại). */
+function Mt1({ hai }: { hai: OQc[] }) {
+  return (
+    <div>
+      <NhanXam />
+      <div className="sm:grid sm:grid-cols-2 sm:gap-x-5 lg:block">
+        {hai.map((o, k) => (
+          <LinkDt key={k} o={o} className="group block border-b border-slate-200 py-3 first:pt-0">
+            <div key={o.id || k} className="cl-fadeup flex gap-3">
+              <div className="aspect-[4/3] w-[104px] shrink-0 overflow-hidden rounded bg-slate-100"><AnhDt o={o} /></div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[15px] font-bold leading-snug text-[#0A2540] line-clamp-3 group-hover:text-red-600">{o.tieuDe}</p>
+                <p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-slate-400"><span className="shrink-0 whitespace-nowrap rounded border border-slate-300 px-1 text-[10px] font-medium text-slate-500">Quảng cáo</span><span className="truncate">{o.nhan}</span></p>
+              </div>
+            </div>
+          </LinkDt>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Kiểu 2 — MỘT THẺ KIỂU BÁO (giống cột phải trang Tin tức): chữ "QUẢNG CÁO" xám phía trên, ảnh sáng, chữ đen, nút xanh đậm. */
+function Mt2({ o }: { o: OQc }) {
+  return (
+    <div>
+      <NhanXam />
+      <LinkDt o={o} className="group block overflow-hidden rounded border border-slate-200 bg-white hover:border-slate-300">
+        <div key={o.id} className="cl-fadeup sm:flex lg:block">
+          <div className="aspect-[16/10] overflow-hidden bg-slate-100 sm:w-2/5 sm:shrink-0 lg:w-auto"><AnhDt o={o} /></div>
+          <div className="p-3.5">
+            {o.nhan && <p className="truncate text-[10.5px] font-semibold uppercase tracking-wide text-red-600">{o.nhan}</p>}
+            <p className="mt-0.5 text-base font-bold leading-snug text-[#0A2540] line-clamp-2 group-hover:text-red-600">{o.tieuDe}</p>
+            {o.moTa && <p className="mt-1 text-[13px] leading-snug text-slate-500 line-clamp-2">{o.moTa}</p>}
+            <span className="mt-3 inline-block rounded bg-[#0A2540] px-3 py-1.5 text-xs font-bold text-white group-hover:bg-red-600">{o.nut || 'Xem ngay'} →</span>
+          </div>
+        </div>
+      </LinkDt>
+    </div>
+  );
+}
+
+/** Kiểu 3 — HAI THẺ ẢNH TRÊN CHỮ DƯỚI (kiểu thẻ tin đăng), không phủ tối. */
+function Mt3({ hai }: { hai: OQc[] }) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+      {hai.map((o, k) => (
+        <LinkDt key={k} o={o} className="group block overflow-hidden rounded-lg border border-slate-200 bg-white hover:border-slate-300">
+          <div key={o.id || k} className="cl-fadeup">
+            <div className="relative aspect-[2.3/1] overflow-hidden bg-slate-100"><AnhDt o={o} />
+              <span className="absolute left-2 top-2 rounded bg-white/90 px-1.5 py-px text-[9.5px] font-medium text-slate-600">Quảng cáo</span></div>
+            <div className="px-3 py-2.5">
+              <p className="text-[14.5px] font-bold leading-snug text-[#0A2540] line-clamp-2 group-hover:text-red-600">{o.tieuDe}</p>
+              <p className="mt-1 truncate text-xs font-semibold text-red-600">{o.nut || 'Xem ngay'} →</p>
+            </div>
+          </div>
+        </LinkDt>
+      ))}
+    </div>
+  );
+}
+
+function XemThuMayTinh({ ds, kieu }: { ds: OQc[]; kieu: number }) {
+  const [buoc, setBuoc] = useState(0);
+  const nhay = kieu === 2 ? 1 : 2;
+  useEffect(() => { if (ds.length <= (kieu === 2 ? 1 : 2)) return; const t = setInterval(() => setBuoc((k) => k + nhay), 6000); return () => clearInterval(t); }, [ds.length, kieu, nhay]);
+  const i = buoc % ds.length;
+  const hai = ds.length === 1 ? [ds[0]] : [ds[i], ds[(i + 1) % ds.length]];
+  return (
+    <div className="hidden sm:block">
+      {kieu === 1 ? <Mt1 hai={hai} /> : kieu === 2 ? <Mt2 o={ds[i]} /> : <Mt3 hai={hai} />}
+      <p className="mt-2 text-right text-[11px] text-slate-400">Đang xem thử kiểu {kieu}/3 · <a href="/?mauqc=1" className="underline">1</a> · <a href="/?mauqc=2" className="underline">2</a> · <a href="/?mauqc=3" className="underline">3</a></p>
+    </div>
+  );
+}
+
 /** Cột hai ô: ô nào có quảng cáo đang chạy thì trượt luân phiên, không thì giữ thẻ mặc định của web. */
 export default function OQuangCaoTrangChu({ macDinh1, macDinh2 }: { macDinh1: ReactNode; macDinh2: ReactNode }) {
   const [ch, setCh] = useState<CauHinhQc>({});
@@ -186,6 +267,10 @@ export default function OQuangCaoTrangChu({ macDinh1, macDinh2 }: { macDinh1: Re
   const ds1 = dsCua(ch.o1).filter((o) => dangChay(o));
   const ds2 = dsCua(ch.o2).filter((o) => dangChay(o));
   const dsDt = [...ds1, ...ds2]; // điện thoại: gộp 2 ô thành một dòng
+  // TẠM: ?mauqc=1|2|3 → máy tính xem thử kiểu mới (xem XemThuMayTinh ở trên)
+  const [kieuMt, setKieuMt] = useState(0);
+  useEffect(() => { const k = Number(new URLSearchParams(location.search).get('mauqc')); if (k >= 1 && k <= 3) setKieuMt(k); }, []);
+  const xemThuMt = kieuMt > 0 && dsDt.length > 0;
   // MỘT đồng hồ chung cho cả hai ô → trượt cùng lúc. Rê chuột / chạm vào ô nào cũng dừng cả hai.
   const [buoc, setBuoc] = useState(0);
   const [dung, setDung] = useState(false);
@@ -209,12 +294,13 @@ export default function OQuangCaoTrangChu({ macDinh1, macDinh2 }: { macDinh1: Re
     <div>
       <CssQc />
       {dsDt.length > 0 && <QcDienThoai ds={dsDt} />}
-      <div className={`grid grid-cols-2 gap-2.5 sm:block sm:space-y-4 ${dsDt.length > 0 ? 'max-sm:hidden' : ''}`}>
+      {xemThuMt && <XemThuMayTinh ds={dsDt} kieu={kieuMt} />}
+      <div className={`grid grid-cols-2 gap-2.5 sm:block sm:space-y-4 ${dsDt.length > 0 ? 'max-sm:hidden' : ''} ${xemThuMt ? 'sm:hidden' : ''}`}>
         {khung(ds1, macDinh1, true)}
         {khung(ds2, macDinh2, false)}
       </div>
       {/* Lời mời đặt quảng cáo — chỉ trên máy tính, chữ nhỏ cho khỏi rối (điện thoại cần gọn) */}
-      <Link href="/dichvu#quang-cao" className="mt-2 hidden text-right text-[11px] text-slate-400 hover:text-red-600 sm:block">Đặt quảng cáo tại vị trí này →</Link>
+      <Link href="/dichvu#quang-cao" className={`mt-2 hidden text-right text-[11px] text-slate-400 hover:text-red-600 ${xemThuMt ? '' : 'sm:block'}`}>Đặt quảng cáo tại vị trí này →</Link>
     </div>
   );
 }

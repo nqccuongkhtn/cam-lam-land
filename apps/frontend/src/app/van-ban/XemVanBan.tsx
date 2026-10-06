@@ -73,7 +73,7 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
   const mb = (b: number) => (b / 1048576).toLocaleString('vi-VN', { maximumFractionDigits: 1 });
 
   return (
-    <div className="fixed inset-0 z-[90] flex flex-col bg-slate-900/80" role="dialog" aria-modal="true" aria-label={vb.ten}>
+    <div className="fixed inset-0 z-[90] flex flex-col bg-slate-700" role="dialog" aria-modal="true" aria-label={vb.ten}>
       <div className="flex items-center gap-2 bg-white px-3 py-2 shadow">
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13px] font-bold text-[#0A2540]">{vb.ten}</p>

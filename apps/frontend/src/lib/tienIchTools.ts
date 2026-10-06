@@ -6,8 +6,9 @@ import type { HubTool } from '@/components/HubShell';
 export const TIEN_ICH_TOOLS: HubTool[] = [
   // Ô đặc biệt: KHÔNG mở trang, mà mở khung CHAT cộng đồng (action) — xử lý ở runToolAction.
   { key: 'cong-dong', name: 'Cộng đồng', desc: 'Chat cộng đồng đầu tư Cam Lâm', icon: '💬', path: '', action: 'chat:community' },
-  { key: 'cam-nang', name: 'Cẩm nang pháp lý', desc: 'Thủ tục & kinh nghiệm mua bán nhà đất', icon: '📘', path: '/cam-nang' },
+  // Tra cứu văn bản đứng TRƯỚC Cẩm nang pháp lý (chủ dự án 6/10/2026)
   { key: 'van-ban', name: 'Tra cứu văn bản', desc: 'Văn bản, nghị quyết, quy định nhà đất', icon: '📑', path: '/van-ban' },
+  { key: 'cam-nang', name: 'Cẩm nang pháp lý', desc: 'Thủ tục & kinh nghiệm mua bán nhà đất', icon: '📘', path: '/cam-nang' },
   { key: 'bang-gia-dat', name: 'Bảng giá đất', desc: 'Bảng giá đất Khánh Hòa 2026 (NQ 15/2025)', icon: '🏷️', path: '/bang-gia-dat' },
   { key: 'gia-dat', name: 'Giá đất & định giá nhanh', desc: 'Giá tham khảo theo khu vực + tính theo m²', icon: '💰', path: '/gia-dat' },
   { key: 'den-bu', name: 'Giá đền bù & tính bồi thường', desc: 'Đất nông nghiệp bị thu hồi — giá từng thôn, tính tiền', icon: '💵', path: '/den-bu' },

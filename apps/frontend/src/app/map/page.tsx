@@ -2120,7 +2120,9 @@ export default function MapPage() {
               <div className="mt-2.5 [&>div]:grid [&>div]:grid-cols-3 [&>div]:gap-2 [&>div>*]:!w-full [&>div>*]:min-w-0 [&>div>*]:!py-2 [&>div>*]:!text-[13px]">{searchCtrl(false, true)}</div>
             </div>
           )}
-          {tool === 'measure' && (
+          {/* Đang đo mà mở khung Lớp / Đã lưu: thước đo VẪN chạy (đổi lớp xem cùng khoảng đất), chỉ GIẤU khung Đo
+              cho khỏi chồng hai khung lên nhau (chủ dự án 6/10/2026); đóng khung Lớp là khung Đo hiện lại. */}
+          {tool === 'measure' && !panelOpen && (
             <div className={KHUNG_NOI}>{dauKhung('Đo khoảng cách · diện tích', () => { setMeasure('off'); setMResult(null); setTool('none'); })}{measureCtrl()}</div>
           )}
           {tool === 'chugiai' && (

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import {
   DEN_BU_NGUON, DU_AN_PHUC_HOP, GIA_LUA_2VU, GIA_NONG_NGHIEP, GIA_PHUC_HOP, GIA_RUNG_SAN_XUAT,
   BANG_GIA_NN, TEN_NGAN_LOAI_DAT, TEN_VI_TRI_PH, dsThon, giaBangGiaNN, giaDenBu, type LoaiDat, type ViTriPH,
-  HAN_MUC, SO_LAN_KHANH_HOA, SO_LAN_TRAN, DI_CHUYEN, DI_CHUYEN_THEM_MOI_TANG, THUONG_BAN_GIAO,
+  HAN_MUC, SO_LAN_KHANH_HOA, SO_LAN_TRUOC_QD32, DI_CHUYEN, DI_CHUYEN_THEM_MOI_TANG, THUONG_BAN_GIAO,
   GAO_KG_THANG, soThangOnDinh,
 } from '@/lib/denBuCamLam';
 
@@ -89,11 +89,9 @@ export default function DenBuClient() {
   const tienNha = dongs.reduce((s, d) => s + d.gia * d.sl, 0);
 
   // ── Hỗ trợ ───────────────────────────────────────────────
-  // MẶC ĐỊNH × 3 — đúng mức Khánh Hòa ĐANG CHI TRẢ. Đã đối chiếu nguyên văn bản gốc Công báo tỉnh
-  // (Công báo Khánh Hòa số 015+016 ngày 29/8/2025, khoản 10 Điều 2 QĐ 14/2025/QĐ-UBND sửa Điều 13
-  // QĐ 17/2024): "bằng 03 lần giá đất nông nghiệp cùng loại trong Bảng giá đất hiện hành".
-  // Mức 5 lần chỉ là TRẦN của khoản 3 Điều 22 NĐ 88/2024 — để nút bấm xem thử, KHÔNG đặt làm mặc định
-  // vì hiện số cao gấp rưỡi tiền thật là làm người dân hiểu sai quyền lợi.
+  // MẶC ĐỊNH × 5 (sửa 6/10/2026, chủ dự án chỉ ra): 03 lần của khoản 10 Điều 2 QĐ 14/2025 (Công báo số 015+016
+  // ngày 29/8/2025) + 02 lần của khoản 1 Điều 9 QĐ 32/2026/QĐ-UBND (hiệu lực 30/4/2026, Công báo số 43 ngày 18/5/2026).
+  // Bản cũ để × 3 vì chưa biết QĐ 32/2026 → tính THIẾU 40% quyền lợi của người dân. Nút × 3 giữ cho phương án duyệt trước 30/4/2026.
   const [heSoNghe, setHeSoNghe] = useState(String(SO_LAN_KHANH_HOA));
   const [truSxNn, setTruSxNn] = useState(true);       // có phải hộ TRỰC TIẾP sản xuất nông nghiệp không
   const [maHanMuc, setMaHanMuc] = useState('hangnam');// hạn mức giao đất áp cho thửa này
@@ -136,7 +134,8 @@ export default function DenBuClient() {
   const dtTuNhap = so(dtHanMuc);
   const dtTinhNghe = Math.min(dtTuNhap || dienTich, hanMucChon.m2);
   const biCatHanMuc = (dtTuNhap || dienTich) > hanMucChon.m2;
-  const tienNghe = truSxNn && giaNN > 0 && heSo > 0 ? giaNN * dtTinhNghe * heSo : 0;
+  // Không trực tiếp sản xuất NN: khoản 2 Điều 9 QĐ 32/2026 → 50% phần cộng thêm của QĐ 32 (số lần vượt 3), không phải 0
+  const tienNghe = giaNN > 0 && heSo > 0 ? (truSxNn ? giaNN * dtTinhNghe * heSo : giaNN * dtTinhNghe * Math.max(0, heSo - SO_LAN_TRUOC_QD32) * 0.5) : 0;
 
   // Hỗ trợ ổn định đời sống — Điều 19 NĐ 88/2024
   const thangOnDinh = soThangOnDinh(tyThuHoi, phaiDoiNha, vungKhoKhan);
@@ -389,18 +388,19 @@ export default function DenBuClient() {
             <div className="mt-3 rounded-xl bg-slate-50 p-3">
               <p className="text-[13.5px] font-semibold text-[#0A2540]">Hỗ trợ đào tạo, chuyển đổi nghề &amp; tìm kiếm việc làm</p>
               <p className="mt-0.5 text-[12px] leading-snug text-slate-500">= <b>giá đất nông nghiệp trong BẢNG GIÁ ĐẤT của nhà nước</b> (không phải giá bồi thường) × diện tích <b>trong hạn mức</b> × số lần.
-                Khánh Hòa đang áp dụng <b>03 lần</b> — nguyên văn Điều 13: “<i>bằng 03 lần giá đất nông nghiệp cùng loại trong Bảng giá đất hiện hành… đối với toàn bộ diện tích đất nông nghiệp thu hồi nhưng không vượt quá hạn mức giao đất nông nghiệp</i>”
-                (khoản 10 Điều 2 <b>QĐ 14/2025/QĐ-UBND</b> sửa Điều 13 QĐ 17/2024). Con số 5 lần chỉ là <b>mức trần</b> Trung ương cho phép (khoản 3 Điều 22 NĐ 88/2024), <b>không phải mức tỉnh chi trả</b>.</p>
+                Khánh Hòa đang áp dụng <b>05 lần</b> = 03 lần theo Điều 13 (khoản 10 Điều 2 <b>QĐ 14/2025/QĐ-UBND</b>)
+                + <b>02 lần</b> theo khoản 1 Điều 9 <b>QĐ 32/2026/QĐ-UBND</b> (hiệu lực 30/4/2026): “<i>ngoài mức hỗ trợ quy định tại Điều 13 … còn được hỗ trợ thêm 02 (hai) lần giá đất nông nghiệp cùng loại trong Bảng giá đất hiện hành</i>”.
+                Phương án bồi thường duyệt <b>trước 30/4/2026</b> thì chọn 3 lần.</p>
               <label className="mt-2 flex items-start gap-2 text-[12.5px] leading-snug text-slate-600">
                 <input type="checkbox" checked={truSxNn} onChange={(e) => setTruSxNn(e.target.checked)} className="mt-0.5 h-4 w-4" />
-                <span>Hộ gia đình, cá nhân <b>trực tiếp sản xuất nông nghiệp</b> (điều kiện bắt buộc — khoản 1 Điều 109 Luật Đất đai 2024). Bỏ tick thì khoản này bằng 0.</span>
+                <span>Hộ gia đình, cá nhân <b>trực tiếp sản xuất nông nghiệp</b> (khoản 1 Điều 109 Luật Đất đai 2024). Bỏ tick: chỉ còn <b>50% phần cộng thêm của QĐ 32/2026</b> (khoản 2 Điều 9) = 1 lần.</span>
               </label>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span className="text-[12.5px] text-slate-600">Số lần:</span>
-                {[String(SO_LAN_KHANH_HOA), String(SO_LAN_TRAN)].map((k) => (
+                {[String(SO_LAN_KHANH_HOA), String(SO_LAN_TRUOC_QD32)].map((k) => (
                   <button key={k} onClick={() => setHeSoNghe(k)}
                     className={`cl-press rounded-full px-3 py-1.5 text-[13px] font-bold ${heSoNghe === k ? 'bg-[#0A2540] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>
-                    × {k} lần{k === String(SO_LAN_KHANH_HOA) ? ' — Khánh Hòa đang áp dụng' : ' — trần của Nghị định'}
+                    × {k} lần{k === String(SO_LAN_KHANH_HOA) ? ' — Khánh Hòa đang áp dụng (QĐ 14/2025 + QĐ 32/2026)' : ' — phương án duyệt trước 30/4/2026'}
                   </button>
                 ))}
               </div>
@@ -427,7 +427,7 @@ export default function DenBuClient() {
               </div>
               <div className="mt-2 grid gap-2 sm:grid-cols-2">
                 <label className="text-[12.5px] text-slate-600">Số lần
-                  <input value={heSoNghe} onChange={(e) => setHeSoNghe(e.target.value)} inputMode="decimal" placeholder="VD: 3" className={`${O} mt-1`} /></label>
+                  <input value={heSoNghe} onChange={(e) => setHeSoNghe(e.target.value)} inputMode="decimal" placeholder="VD: 5" className={`${O} mt-1`} /></label>
                 <label className="text-[12.5px] text-slate-600">Diện tích đất nông nghiệp bị thu hồi (m²)
                   <input value={dtHanMuc} onChange={(e) => setDtHanMuc(e.target.value)} inputMode="decimal" placeholder={dienTich ? `mặc định ${dienTich.toLocaleString('vi-VN')} (ô diện tích ở tab ①)` : 'mặc định = diện tích thu hồi'} className={`${O} mt-1`} /></label>
                 <label className="text-[12.5px] text-slate-600 sm:col-span-2">Hạn mức giao đất áp cho thửa này (Điều 176 Luật Đất đai 2024)
@@ -441,7 +441,7 @@ export default function DenBuClient() {
                   chỉ tính hỗ trợ cho <b>{dtTinhNghe.toLocaleString('vi-VN')} m²</b>, phần vượt <b>không được khoản hỗ trợ này</b>.
                 </p>
               )}
-              {!truSxNn && <p className="mt-1.5 text-[12px] text-slate-500">Không phải hộ trực tiếp sản xuất nông nghiệp → khoản này bằng 0.</p>}
+              {!truSxNn && <p className="mt-1.5 text-[12px] text-slate-500">Không phải hộ trực tiếp sản xuất nông nghiệp → chỉ được 50% phần cộng thêm của QĐ 32/2026 (khoản 2 Điều 9){heSo > SO_LAN_TRUOC_QD32 ? ` = ${((heSo - SO_LAN_TRUOC_QD32) * 0.5).toLocaleString('vi-VN')} lần` : ' — với mức 3 lần (trước 30/4/2026) thì bằng 0'}.</p>}
               {tienNghe > 0 && (
                 <p className="mt-1.5 text-[13px] text-slate-600">→ <b className="text-[#0A2540]">{tien(tienNghe)}</b>
                   <span className="ml-1 text-[12px] text-slate-400">({tien(giaNN)} × {dtTinhNghe.toLocaleString('vi-VN')} m² × {heSo})</span></p>
@@ -565,7 +565,7 @@ export default function DenBuClient() {
             <li><b>Bồi thường cây trồng, vật nuôi</b> bị thiệt hại — Điều 103 Luật Đất đai 2024.</li>
             <li><b>Bồi thường chi phí đầu tư vào đất còn lại</b> — Điều 104 Luật Đất đai 2024, đơn giá tại QĐ 12/2026.</li>
             <li><b>Hỗ trợ ổn định đời sống và sản xuất</b> — Điều 108 Luật Đất đai 2024.</li>
-            <li><b>Hỗ trợ đào tạo, chuyển đổi nghề và tìm kiếm việc làm</b> — Điều 109 Luật Đất đai 2024 &amp; khoản 3 Điều 22 Nghị định 88/2024/NĐ-CP: hỗ trợ bằng tiền <b>không quá 5 lần</b> giá đất nông nghiệp cùng loại trong bảng giá đất, tính cho toàn bộ diện tích thu hồi nhưng <b>không vượt hạn mức giao đất nông nghiệp</b> (Điều 176 Luật Đất đai 2024); mức cụ thể do UBND tỉnh quy định. <b>Khánh Hòa quy định 03 lần</b> — Điều 13 Quy định kèm QĐ 17/2024/QĐ-UBND, được thay bằng khoản 10 Điều 2 QĐ 14/2025/QĐ-UBND.</li>
+            <li><b>Hỗ trợ đào tạo, chuyển đổi nghề và tìm kiếm việc làm</b> — Điều 109 Luật Đất đai 2024 &amp; khoản 3 Điều 22 Nghị định 88/2024/NĐ-CP: hỗ trợ bằng tiền <b>không quá 5 lần</b> giá đất nông nghiệp cùng loại trong bảng giá đất, tính cho toàn bộ diện tích thu hồi nhưng <b>không vượt hạn mức giao đất nông nghiệp</b> (Điều 176 Luật Đất đai 2024); mức cụ thể do UBND tỉnh quy định. <b>Khánh Hòa đang áp dụng 05 lần</b>: 03 lần theo Điều 13 Quy định kèm QĐ 17/2024/QĐ-UBND (được thay bằng khoản 10 Điều 2 QĐ 14/2025/QĐ-UBND) <b>+ 02 lần</b> theo khoản 1 Điều 9 QĐ 32/2026/QĐ-UBND (hiệu lực 30/4/2026); người không đủ điều kiện chuyển đổi nghề được 50% phần cộng thêm (khoản 2 Điều 9).</li>
               <li><b>Hỗ trợ ổn định đời sống</b> — Điều 108 Luật Đất đai 2024 &amp; Điều 19 Nghị định 88/2024/NĐ-CP: mỗi nhân khẩu mỗi tháng được số tiền bằng <b>30 kg gạo</b> theo giá trung bình tại thị trường địa phương. Thu hồi 30–70% đất nông nghiệp đang dùng: 6 tháng (không dời nhà) / 12 tháng (dời nhà) / tối đa 24 tháng nếu dời đến vùng khó khăn. Thu hồi trên 70%: 12 / 24 / tối đa 36 tháng.</li>
               <li><b>Bồi thường chi phí di chuyển tài sản</b> — khoản 1 Điều 8 Quy định kèm QĐ 17/2024, thay bằng khoản 6 Điều 2 QĐ 14/2025/QĐ-UBND: <b>10.000.000 đ/hộ</b> nếu chuyển trong cùng xã, <b>12.000.000 đ/hộ</b> nếu ra ngoài xã, <b>5.000.000 đ/hộ</b> nếu chỉ thu hồi một phần đất ở mà phần còn lại vẫn xây nhà được; nhà nhiều tầng cộng thêm <b>20%</b> cho mỗi tầng từ tầng thứ 3 trở lên.</li>
               <li><b>Hỗ trợ ổn định sản xuất, kinh doanh</b> — Điều 20 Nghị định 88/2024/NĐ-CP &amp; Điều 11 Quy định kèm QĐ 17/2024/QĐ-UBND: tổ chức kinh tế, hộ/cá nhân sản xuất kinh doanh được <b>30% một năm thu nhập sau thuế</b> (bình quân 03 năm liền kề); hộ nhận bồi thường bằng đất nông nghiệp được hỗ trợ giống cây trồng, giống vật nuôi, khuyến nông, thú y; người lao động được trợ cấp ngừng việc tối đa <b>06 tháng</b>.</li>

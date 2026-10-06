@@ -182,8 +182,14 @@ export const HAN_MUC: Record<'cay' | 'thuysan' | 'rung', HanMuc[]> = {
 };
 
 /** Số lần giá đất nông nghiệp dùng tính hỗ trợ chuyển đổi nghề. */
-export const SO_LAN_KHANH_HOA = 3;   // Điều 13 QĐ 17/2024, sửa bởi QĐ 14/2025 — mức ĐANG ÁP DỤNG
-export const SO_LAN_TRAN = 5;        // khoản 3 Điều 22 NĐ 88/2024 — mức trần của Trung ương
+// ĐANG ÁP DỤNG = 5 lần (chủ dự án chỉ ra 6/10/2026, đã đọc nguyên văn văn bản):
+//   03 lần — Điều 13 QĐ 17/2024, sửa bởi khoản 10 Điều 2 QĐ 14/2025/QĐ-UBND
+// + 02 lần — khoản 1 Điều 9 QĐ 32/2026/QĐ-UBND ngày 29/4/2026 (hiệu lực 30/4/2026, Công báo Khánh Hòa số 43 ngày 18/5/2026):
+//            "ngoài mức hỗ trợ quy định tại Điều 13 … còn được hỗ trợ thêm 02 (hai) lần giá đất nông nghiệp cùng loại".
+//   Không đủ điều kiện chuyển đổi nghề → khoản 2 Điều 9 QĐ 32/2026: 50% phần cộng thêm (= 1 lần).
+export const SO_LAN_KHANH_HOA = 5;
+export const SO_LAN_TRUOC_QD32 = 3;  // phương án bồi thường duyệt TRƯỚC 30/4/2026 (chỉ có QĐ 14/2025)
+export const SO_LAN_TRAN = SO_LAN_KHANH_HOA; // giữ tên cũ cho chỗ khác đang dùng
 
 // ───────────────────────────────────────────────────────────────────────────────────────────
 // HỖ TRỢ DI CHUYỂN TÀI SẢN KHI PHẢI DI CHUYỂN CHỖ Ở — khoản 1 Điều 8 Quy định kèm

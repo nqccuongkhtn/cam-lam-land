@@ -1888,7 +1888,9 @@ export default function MapPage() {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5" aria-hidden>{ICO[ico]}</svg>{nhan}</button>
   );
   // KHUNG NỔI DÙNG CHUNG cho Lớp · Đã lưu · Đo · Chú giải (máy tính): cùng chỗ, cùng rộng, cùng kiểu đầu khung
-  const KHUNG_NOI = 'absolute top-[96px] z-30 hidden w-[300px] rounded-xl border border-slate-200 bg-white p-3.5 shadow-lg lg:left-1/2 lg:block lg:-translate-x-[230px]';
+  // Mọi khung (kể cả khung Tìm) cùng RỘNG 480px = đúng bằng ô tìm, căn GIỮA thẳng dưới ô tìm, cùng chiều cao tối đa
+  // (trước lệch hẳn sang trái và mỗi khung một cỡ — chủ dự án 6/10/2026).
+  const KHUNG_NOI = 'absolute top-[96px] z-30 hidden w-[480px] max-h-[calc(100%-110px)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-3.5 shadow-lg lg:left-1/2 lg:block lg:-translate-x-1/2';
   const dauKhung = (ten: string, dong: () => void) => (
     <div className="mb-2.5 flex items-center justify-between"><h2 className="text-[15px] font-bold text-[#0A2540]">{ten}</h2><button type="button" onClick={dong} aria-label="Đóng" className="text-xl leading-none text-slate-400 hover:text-slate-700">✕</button></div>
   );
@@ -1969,7 +1971,7 @@ export default function MapPage() {
       <div className="flex flex-1 min-h-0 relative">
         {panelOpen && <div className="lg:hidden absolute inset-0 bg-black/30 z-20" onClick={() => setPanelOpen(false)} />}
 
-        <aside className={`${panelOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'} transition-transform duration-200 absolute inset-y-0 left-0 z-30 w-72 max-w-[82%] shrink-0 bg-white border-r border-slate-200 overflow-y-auto scroll-soft p-4 shadow-xl lg:inset-y-auto lg:top-[96px] lg:left-1/2 lg:-translate-x-[230px] lg:max-h-[calc(100%-110px)] lg:w-[300px] lg:rounded-xl lg:border lg:p-3.5 lg:text-[13px]`}>
+        <aside className={`${panelOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'} transition-transform duration-200 absolute inset-y-0 left-0 z-30 w-72 max-w-[82%] shrink-0 bg-white border-r border-slate-200 overflow-y-auto scroll-soft p-4 shadow-xl lg:inset-y-auto lg:top-[96px] lg:left-1/2 lg:-translate-x-1/2 lg:max-h-[calc(100%-110px)] lg:w-[480px] lg:rounded-xl lg:border lg:p-3.5 lg:text-[13px]`}>
           {/* Mẫu 51 (máy tính): chip "Lớp" chỉ hiện phần LỚP, chip "Đã lưu" chỉ hiện phần SẢN PHẨM ĐÃ LƯU — trước đây
               cả hai cùng hiện chung một bảng nên trùng (chủ dự án 6/10/2026). Điện thoại ngăn kéo vẫn đủ cả hai. */}
           <div className={bangMuc === 'luu' ? 'lg:hidden' : ''}>
@@ -2091,7 +2093,7 @@ export default function MapPage() {
               Điện thoại: ô tìm chừa cột nút bên phải (nút ?, phóng to…) → bấm mở BẢNG ĐÁY Tra cứu sẵn có.
               Máy tính: ô 440px giữa trên → bấm sổ khung tìm ngay dưới (4 cách tìm + đủ ô cấp/huyện/xã/thửa/tờ). */}
           <button type="button" onClick={() => { if (laMayTinh()) { tatDo(); setPanelOpen(false); if (tool === 'chugiai') setTool('none'); setTimMo((v) => !v); } else { setPanelOpen(false); setTcTab('to'); setTool('search'); } }}
-            className="absolute top-2 left-2 right-[50px] z-30 hidden h-[38px] items-center lg:flex gap-2 rounded-full border border-slate-200 bg-white px-3.5 text-left text-[13px] shadow-[0_6px_18px_-8px_rgba(10,37,64,.45)] lg:left-1/2 lg:right-auto lg:w-[440px] lg:-translate-x-1/2">
+            className="absolute top-2 left-2 right-[50px] z-30 hidden h-[38px] items-center lg:flex gap-2 rounded-full border border-slate-200 bg-white px-3.5 text-left text-[13px] shadow-[0_6px_18px_-8px_rgba(10,37,64,.45)] lg:left-1/2 lg:right-auto lg:w-[480px] lg:-translate-x-1/2">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4 shrink-0 text-slate-400" aria-hidden><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
             <span className="min-w-0 flex-1 truncate text-slate-500">{(c2 || c1) && searchMode === 'parcel' ? `${dsXaCap.find((x) => x.xaId === c3)?.ten || ''}${c2 ? ' · Thửa ' + c2 : ''}${c1 ? ' · Tờ ' + c1 : ''}` : 'Xã, số thửa, số tờ…'}</span>
           </button>
@@ -2104,7 +2106,7 @@ export default function MapPage() {
             {/* Chip "Nhãn" đã bỏ (chủ dự án 6/10/2026): nhãn & đường mặc định luôn bật; điện thoại vẫn tắt/bật được ở thanh cũ. */}
           </div>
           {timMo && (
-            <div className="absolute top-[52px] left-1/2 z-40 hidden w-[560px] max-w-[calc(100%-120px)] -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 shadow-[0_12px_32px_-12px_rgba(10,37,64,.45)] lg:block">
+            <div className="absolute top-[96px] left-1/2 z-40 hidden w-[480px] max-w-[calc(100%-120px)] -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 shadow-[0_12px_32px_-12px_rgba(10,37,64,.45)] lg:block">
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5 rounded-lg bg-slate-100 p-0.5 text-[12px] font-bold">
                   {([['parcel', 'Số thửa · tờ'], ['vn2000', 'Toạ độ VN-2000'], ['latlng', 'Toạ độ WGS-84'], ['gmap', 'Link Google Maps']] as const).map(([k, t]) => (

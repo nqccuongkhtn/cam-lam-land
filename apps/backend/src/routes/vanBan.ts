@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { authRequired, vanBanRequired } from '../middleware/auth.ts';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import { mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 
 export const vanBanRouter = Router();
 const UA = { 'User-Agent': 'Mozilla/5.0 (compatible; CamLamLand/1.0)' };
@@ -372,7 +375,9 @@ export async function crawlCamhomes(deep = false, onAdd?: (isNew: boolean) => vo
 //      cột B "3363/CNKVCL 24/9/2026", cột C nội dung + LIÊN KẾT tới file/thư mục Google Drive (đọc công khai).
 //      Số ghi lại thành "3363/TB-CNKVCL" cho trùng cách ghi của camhomes.vn → cùng số + ngày thì không nhân đôi.
 // Tải dạng xlsx (CSV làm mất liên kết), đọc bằng exceljs. Chạy cùng lịch 6 giờ với cổng TTĐT + nút "Cập nhật".
-// Đường tải thẳng của Drive bị chủ file chặn → link_goc là trang XEM của Drive (nút tải PDF sẽ mở trang đó).
+// Liên kết Drive dạng "open?id=…" phần lớn là THƯ MỤC (mỗi văn bản một thư mục, trong có 1–3 file PDF).
+// Trước đây ghi nhầm thành trang XEM FILE (file/d/<id>/view) → Drive báo "Không có bản xem trước" (6/10/2026).
+// Nay máy chủ tự mở thư mục, tải các file PDF bên trong, ghép thành MỘT file rồi đưa người xem (xem layPdfDrive).
 const SHEETS = [
   { ten: 'thu-hoi', url: 'https://docs.google.com/spreadsheets/d/1rHOtnGclptr637qY7elA46Jfs3oirt954t14grglJ1w/export?format=xlsx', xem: 'https://docs.google.com/spreadsheets/d/1rHOtnGclptr637qY7elA46Jfs3oirt954t14grglJ1w/edit' },
   { ten: 'niem-yet', url: 'https://docs.google.com/spreadsheets/d/1Ie7ddfiDybzNDk_JWdiXmeCK2Rjk9BFt/export?format=xlsx', xem: 'https://docs.google.com/spreadsheets/d/1Ie7ddfiDybzNDk_JWdiXmeCK2Rjk9BFt/preview' },
@@ -384,6 +389,54 @@ const ngayIso = (v: any): string => {
   const m = String(v || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : '';
 };
+// ── GOOGLE DRIVE: lấy PDF từ thư mục/file công khai (không cần khoá API) ──
+//   · Thư mục: trang "embeddedfolderview" liệt kê file công khai → lấy mã + tên từng file.
+//   · File: drive.usercontent.google.com/download?id=…&confirm=t trả thẳng nội dung (confirm=t để qua bước hỏi quét virus của file lớn).
+// Thư mục có nhiều PDF (vd …-001 thông báo, …-002 phụ lục) → ghép theo thứ tự tên bằng qpdf thành MỘT file.
+// Giữ bản đã ghép ở /tmp/drive-pdf (mất khi dựng lại backend thì tự tải lại).
+const idDrive = (u: string) => (u.match(/[?&]id=([\w-]{20,})/) || u.match(/\/(?:folders|d)\/([\w-]{20,})/) || [])[1] || '';
+async function dsFileDrive(id: string): Promise<{ id: string; ten: string }[] | null> {
+  try {
+    const r = await fetch(`https://drive.google.com/embeddedfolderview?id=${id}`, { headers: UA, signal: AbortSignal.timeout(15000) });
+    if (!r.ok) return null;                                  // không phải thư mục (hoặc không công khai)
+    const html = await r.text(); const ra: { id: string; ten: string }[] = [];
+    const re = /\/file\/d\/([\w-]{20,})[^"]*"[\s\S]*?flip-entry-title">([^<]+)</g; let m;
+    while ((m = re.exec(html))) ra.push({ id: m[1], ten: m[2].trim() });
+    return ra;
+  } catch { return null; }
+}
+async function taiDrive(id: string): Promise<Buffer | null> {
+  try {
+    const r = await fetch(`https://drive.usercontent.google.com/download?id=${id}&export=download&confirm=t`, { headers: UA, signal: AbortSignal.timeout(120000) });
+    if (!r.ok) return null;
+    const b = Buffer.from(await r.arrayBuffer());
+    return b.subarray(0, 4).toString() === '%PDF' ? b : null;
+  } catch { return null; }
+}
+const KHO_DRIVE = '/tmp/drive-pdf';
+export async function layPdfDrive(link: string): Promise<Buffer | null> {
+  const id = idDrive(link); if (!id) return null;
+  const f = `${KHO_DRIVE}/${id}.pdf`;
+  try { return await readFile(f); } catch { /* chưa có → tải */ }
+  const ds = await dsFileDrive(id);
+  const pdfs = ds && ds.length ? ds.filter((x) => /\.pdf$/i.test(x.ten)).sort((a, b) => a.ten.localeCompare(b.ten)) : [{ id, ten: '' }];
+  const bufs: Buffer[] = [];
+  for (const x of pdfs) { const b = await taiDrive(x.id); if (b) bufs.push(b); }
+  if (!bufs.length) return null;
+  await mkdir(KHO_DRIVE, { recursive: true });
+  let out = bufs[0];
+  if (bufs.length > 1) {
+    const tam = bufs.map((_, i) => `${KHO_DRIVE}/${id}-${i}.pdf`);
+    try {
+      await Promise.all(bufs.map((b, i) => writeFile(tam[i], b)));
+      await promisify(execFile)('qpdf', ['--empty', '--pages', ...tam, '--', f], { timeout: 60000 }).catch((e: any) => { if (e?.code !== 3) throw e; }); // mã 3 = cảnh báo, file vẫn ra
+      out = await readFile(f);
+    } catch { out = bufs[0]; } finally { await Promise.all(tam.map((t) => rm(t, { force: true }))); }
+  }
+  await writeFile(f, out).catch(() => {});
+  return out;
+}
+
 let lastSheets = 0;
 export async function crawlSheets(force = false, onAdd?: (isNew: boolean) => void): Promise<number> {
   if (!force && Date.now() - lastSheets < 5 * 3600 * 1000) return 0;
@@ -406,9 +459,10 @@ export async function crawlSheets(force = false, onAdd?: (isNew: boolean) => voi
           if (m && ty) rows.push({ so: `${m[1]}/QĐ-UBND`, ngay: ngayIso(row.getCell(3).value), ty, link: '', cq: 'UBND xã Cam Lâm' }); // bảng không kèm file → để trống, bước tự tìm file sẽ đi tìm
         } else {
           const m = b.match(/^(\d+)\s*\/\s*CNKVCL\s+(\d{1,2}\/\d{1,2}\/\d{4})/i);
-          const c = row.getCell(3);
+          const c: any = row.getCell(3);
           const ty = clean(String(giaTri(c.value) ?? ''));
-          if (m && ty.length > 8) rows.push({ so: `${m[1]}/TB-CNKVCL`, ngay: ngayIso(m[2]), ty, link: '', cq: 'Chi nhánh Phát triển quỹ đất khu vực Cam Lâm' });
+          const id = idDrive(String(c.hyperlink || c.value?.hyperlink || row.getCell(2).hyperlink || ''));
+          if (m && ty.length > 8) rows.push({ so: `${m[1]}/TB-CNKVCL`, ngay: ngayIso(m[2]), ty, link: id ? `https://drive.google.com/open?id=${id}` : '', cq: 'Chi nhánh Phát triển quỹ đất khu vực Cam Lâm' });
         }
       });
       for (const x of rows) {
@@ -417,7 +471,8 @@ export async function crawlSheets(force = false, onAdd?: (isNew: boolean) => voi
           `INSERT INTO van_ban (so_hieu, trich_yeu, ngay_ban_hanh, co_quan, chu_de, linh_vuc, nguon, link_goc)
            VALUES ($1,$2,$3,$4,$5,'Bồi thường - TĐC','Bảng tổng hợp KĐT mới Cam Lâm',$6)
            ON CONFLICT (so_hieu, ngay_ban_hanh) DO UPDATE SET
-             link_goc = COALESCE(NULLIF(van_ban.link_goc, ''), EXCLUDED.link_goc)
+             link_goc = CASE WHEN EXCLUDED.link_goc <> '' AND (van_ban.link_goc IS NULL OR van_ban.link_goc = '' OR van_ban.link_goc LIKE '%drive.google.com%')
+                             THEN EXCLUDED.link_goc ELSE van_ban.link_goc END
            RETURNING (xmax = 0) AS inserted`,
           [x.so, x.ty, x.ngay, x.cq, classify(x.ty), x.link])
           .then((rs: any) => { n++; onAdd?.(!!(rs && rs[0] && rs[0].inserted)); }).catch(() => {});
@@ -436,8 +491,8 @@ export async function crawlSheets(force = false, onAdd?: (isNew: boolean) => voi
 // Tìm thấy → gắn link FILE PDF THẬT của cổng (Temp/LawDocument/LawDocumentRender/<mã>.pdf), đã thử tải được mới gắn.
 // KHÔNG BAO GIỜ trỏ người dùng sang trang khác để tự tìm. Văn bản đã thử mà chưa thấy thì 3 ngày sau mới thử lại
 // (cột tim_file_luc) cho đỡ tải cổng. Chạy sau mỗi lượt lấy văn bản (khởi động + lịch 6 giờ + nút Cập nhật).
-// Drive KHÔNG tính là có file: chủ file tắt xem trước + tải xuống ("Không có bản xem trước", 6/10/2026)
-const coFileThat = (link: string | null) => !!link && (/LawDocumentRender|FileVanBans|\.pdf(\?|$)/i.test(link) || /camhomes\.vn\/index\.php\?.*download=1/.test(link));
+// Drive (thư mục/file công khai) TÍNH là có file — máy chủ tự tải + ghép PDF (layPdfDrive)
+const coFileThat = (link: string | null) => !!link && (/LawDocumentRender|FileVanBans|\.pdf(\?|$)|drive\.google\.com\/open\?id=/i.test(link) || /camhomes\.vn\/index\.php\?.*download=1/.test(link));
 // Cổng KHÔNG lọc thật khi tìm theo trích yếu (trả văn bản bất kỳ) → phải tự so: ≥ 70% từ đầu trích yếu có trong kết quả
 const khopTrichYeu = (a: string, b: string) => { const bo = (x: string) => vnNoAccentLite(x).split(/\s+/).filter((w) => w.length > 1); const ta = bo(a).slice(0, 10), tb = new Set(bo(b)); return ta.length >= 4 && ta.filter((w) => tb.has(w)).length / ta.length >= 0.7; };
 const vnNoAccentLite = (x: string) => x.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
@@ -561,6 +616,12 @@ vanBanRouter.get('/:id/pdf', authRequired, async (req, res) => {
     const [row] = await query<any>('SELECT id, so_hieu, link_goc FROM van_ban WHERE id=$1', [Number(req.params.id)]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy văn bản' });
     query('UPDATE van_ban SET luot_tai = luot_tai + 1 WHERE id=$1', [row.id]).catch(() => {});
+    const tenFile = `${String(row.so_hieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`;
+    if (/drive\.google\.com/.test(row.link_goc || '')) {          // Drive: tự tải + ghép, KHÔNG đưa người dùng sang trang Drive
+      const buf = await layPdfDrive(row.link_goc);
+      if (buf) { res.set('Content-Type', 'application/pdf'); res.set('Content-Disposition', `inline; filename="${tenFile}"`); res.set('Cache-Control', 'private, max-age=86400'); return res.send(buf); }
+      return res.json({ redirect: null });
+    }
     const pdf = await resolvePdf(row.link_goc);
     if (pdf) {
       let ref = ''; try { ref = new URL(row.link_goc).origin + '/'; } catch { /* link_goc rỗng */ }

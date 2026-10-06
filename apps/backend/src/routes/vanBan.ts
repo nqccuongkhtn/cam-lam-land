@@ -464,45 +464,39 @@ export async function layPdfDrive(link: string): Promise<Buffer | null> {
 //    · qpdf gom các mảnh nhỏ thành luồng nén chung, nén lại mức cao nhất.
 //    Ép JPEG mạnh hơn chỉ bớt thêm ~1% mà làm dấu đỏ nhoè → không dùng.
 // Kho CHỈ giữ bản đã xử lý (vb-<phiên bản>-<mã>.pdf); đổi cách xử lý thì tăng PHIEN_BAN_FILE để làm lại.
-const PHIEN_BAN_FILE = 'v3';   // v3 (6/10/2026): chữ chéo 2 dòng (thêm link + SĐT) đã giãn không đè nhau, gắn cho MỌI văn bản
+const PHIEN_BAN_FILE = 'v4';   // v4 (6/10/2026): chữ chéo 2 dòng (thêm link + SĐT) vẽ bằng xoay hệ toạ độ — không đè nhau; gắn cho MỌI văn bản
 const PHONG_DAU = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
 async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
   try {
-    const { PDFDocument, rgb, degrees } = (await import('pdf-lib')) as any;
+    const { PDFDocument, rgb, pushGraphicsState, popGraphicsState, concatTransformationMatrix } = (await import('pdf-lib')) as any;
     const fontkit = ((await import('@pdf-lib/fontkit')) as any).default;
     const doc = await PDFDocument.load(buf, { ignoreEncryption: true, updateMetadata: false });
     doc.registerFontkit(fontkit);
     const font = await doc.embedFont(await readFile(PHONG_DAU), { subset: true });
-    const chan = 'Tải miễn phí tại batdongsancamlam.dpdns.org — Cam Lâm Land · Nhà đất & bản đồ quy hoạch Cam Lâm';
+    const chan = 'Tải miễn phí tại batdongsancamlam.dpdns.org · Hotline/Zalo 0988 888 888 — Cam Lâm Land · Nhà đất & bản đồ quy hoạch Cam Lâm';
+    const chu1 = 'CAM LÂM LAND', chu2 = 'batdongsancamlam.dpdns.org  ·  0988 888 888';
     for (const page of doc.getPages()) {
       const { width: W, height: H } = page.getSize();
       const xoay = ((page.getRotation()?.angle || 0) % 360 + 360) % 360;
-      const ngang = xoay === 90 || xoay === 270;          // trang bị xoay: vẽ theo chiều người đọc nhìn thấy
-      const w = ngang ? H : W, h = ngang ? W : H;
-      // đổi toạ độ "theo mắt người đọc" (x, y, góc) sang toạ độ thật của trang
-      const doi = (x: number, y: number) => xoay === 90 ? { x: W - y, y: x } : xoay === 180 ? { x: W - x, y: H - y } : xoay === 270 ? { x: y, y: H - x } : { x, y };
-      // CHỮ CHÉO GIỮA TRANG — 2 dòng: "CAM LÂM LAND" + link web & số điện thoại (chủ dự án 6/10/2026: chân trang dễ bị
-      // xén mất "thì công cốc" → link + SĐT phải nằm cả ở giữa trang). Đậm hơn bản đầu (0,10 → 0,15) cho dễ thấy mà chữ văn bản vẫn đọc rõ.
-      const goc = Math.atan2(h, w), cosg = Math.cos(goc), sing = Math.sin(goc);
-      const dongCheo = (chu: string, co: number, lech: number, mau: any, mo: number) => {
-        // lech: dời vuông góc với đường chéo (dương = lên trên) để xếp 2 dòng
-        const dai = font.widthOfTextAtSize(chu, co);
-        const cx = w / 2 - cosg * dai / 2 + sing * (co * 0.35 - lech), cy = h / 2 - sing * dai / 2 - cosg * (co * 0.35 - lech);
-        const p1 = doi(cx, cy);
-        page.drawText(chu, { x: p1.x, y: p1.y, size: co, font, color: mau, opacity: mo, rotate: degrees(goc * 180 / Math.PI + xoay) });
-      };
-      const cheo = Math.hypot(w, h);
-      let to = Math.min(w, h) * 0.11; const chu1 = 'CAM LÂM LAND';
-      while (font.widthOfTextAtSize(chu1, to) > cheo * 0.62) to *= 0.92;
-      const chu2 = 'batdongsancamlam.dpdns.org  ·  0988 888 888';
+      const ngang = xoay === 90 || xoay === 270;
+      const w = ngang ? H : W, h = ngang ? W : H;       // khổ trang THEO MẮT NGƯỜI ĐỌC
+      // Ma trận đổi toạ độ "theo mắt người đọc" → toạ độ thật của trang (trang có thể bị đặt xoay 90/180/270)
+      const M = xoay === 90 ? [0, 1, -1, 0, W, 0] : xoay === 180 ? [-1, 0, 0, -1, W, H] : xoay === 270 ? [0, -1, 1, 0, 0, H] : [1, 0, 0, 1, 0, 0];
+      page.pushOperators(pushGraphicsState(), concatTransformationMatrix(...M));
+      // CHỮ CHÉO GIỮA TRANG — 2 dòng: "CAM LÂM LAND" + link web & SĐT (chủ dự án 6/10/2026: chân trang dễ bị xén mất
+      // "thì công cốc" → link + SĐT phải nằm cả giữa trang). Xoay hệ toạ độ quanh tâm trang theo đường chéo rồi viết 2 dòng
+      // như viết ngang bình thường → khoảng cách 2 dòng luôn đúng (bản tính tay từng điểm bị đè dòng).
+      const goc = Math.atan2(h, w), c = Math.cos(goc), sn = Math.sin(goc), cheo = Math.hypot(w, h);
+      let to = Math.min(w, h) * 0.11; while (font.widthOfTextAtSize(chu1, to) > cheo * 0.62) to *= 0.92;
       let nho = to * 0.36; while (font.widthOfTextAtSize(chu2, nho) > cheo * 0.62) nho *= 0.92;
-      dongCheo(chu1, to, to * 0.5, rgb(0.78, 0.6, 0.22), 0.15);
-      dongCheo(chu2, nho, -to * 0.62, rgb(0.04, 0.15, 0.25), 0.2);
-      // dòng chân trang (giữ như cũ, thêm số điện thoại)
-      const chan = 'Tải miễn phí tại batdongsancamlam.dpdns.org · Hotline/Zalo 0988 888 888 — Cam Lâm Land · Nhà đất & bản đồ quy hoạch Cam Lâm';
+      page.pushOperators(pushGraphicsState(), concatTransformationMatrix(c, sn, -sn, c, w / 2, h / 2));
+      page.drawText(chu1, { x: -font.widthOfTextAtSize(chu1, to) / 2, y: nho * 0.6, size: to, font, color: rgb(0.78, 0.6, 0.22), opacity: 0.15 });
+      page.drawText(chu2, { x: -font.widthOfTextAtSize(chu2, nho) / 2, y: -nho * 1.6, size: nho, font, color: rgb(0.04, 0.15, 0.25), opacity: 0.22 });
+      page.pushOperators(popGraphicsState());
+      // DÒNG CHÂN TRANG (giữ như cũ, thêm số điện thoại)
       let co = 7.5; while (co > 4.5 && font.widthOfTextAtSize(chan, co) > w - 24) co -= 0.5;
-      const p2 = doi((w - font.widthOfTextAtSize(chan, co)) / 2, 6);
-      page.drawText(chan, { x: p2.x, y: p2.y, size: co, font, color: rgb(0.04, 0.15, 0.25), opacity: 0.7, rotate: degrees(xoay) });
+      page.drawText(chan, { x: (w - font.widthOfTextAtSize(chan, co)) / 2, y: 6, size: co, font, color: rgb(0.04, 0.15, 0.25), opacity: 0.7 });
+      page.pushOperators(popGraphicsState());
     }
     doc.setProducer('Cam Lâm Land — batdongsancamlam.dpdns.org');
     return Buffer.from(await doc.save({ useObjectStreams: true }));

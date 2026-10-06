@@ -463,7 +463,7 @@ export async function layPdfDrive(link: string): Promise<Buffer | null> {
 //    · qpdf gom các mảnh nhỏ thành luồng nén chung, nén lại mức cao nhất.
 //    Ép JPEG mạnh hơn chỉ bớt thêm ~1% mà làm dấu đỏ nhoè → không dùng.
 // Kho CHỈ giữ bản đã xử lý (vb-<phiên bản>-<mã>.pdf); đổi cách xử lý thì tăng PHIEN_BAN_FILE để làm lại.
-const PHIEN_BAN_FILE = 'v7';   // v7 (6/10/2026): dấu bản quyền ghi tên miền mới batdongsancamlam.vn; v6: chữ chéo nhỏ lại; v4: chữ chéo 2 dòng (thêm link + SĐT) vẽ bằng xoay hệ toạ độ — không đè nhau; gắn cho MỌI văn bản
+const PHIEN_BAN_FILE = 'v8';   // v8 (6/10/2026): chèn thêm trang 2 trắng có dấu bản quyền; v7: dấu bản quyền ghi tên miền mới batdongsancamlam.vn; v6: chữ chéo nhỏ lại; v4: chữ chéo 2 dòng (thêm link + SĐT) vẽ bằng xoay hệ toạ độ — không đè nhau; gắn cho MỌI văn bản
 const PHONG_DAU = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
 async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
   try {
@@ -474,6 +474,15 @@ async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
     const font = await doc.embedFont(await readFile(PHONG_DAU), { subset: true });
     const chan = 'Tải miễn phí tại batdongsancamlam.vn · Hotline/Zalo 0988 888 888 — Cam Lâm Land · Nhà đất & bản đồ quy hoạch Cam Lâm';
     const chu1 = 'CAM LÂM LAND', chu2 = 'batdongsancamlam.vn  ·  0988 888 888';
+    // TRANG 2 CHÈN THÊM (chủ dự án 6/10/2026, gửi hình mẫu): một trang trắng cùng khổ với trang 1 (theo mắt người đọc),
+    // chỉ có chữ chéo + dòng chân trang như mọi trang khác — chèn vào sau trang 1 (file 1 trang thì thành trang cuối).
+    // Tạo TRƯỚC vòng lặp để trang này cũng được vẽ dấu y hệt các trang khác.
+    {
+      const p1 = doc.getPage(0); const { width: W1, height: H1 } = p1.getSize();
+      const x1 = ((p1.getRotation()?.angle || 0) % 360 + 360) % 360;
+      const kho: [number, number] = x1 === 90 || x1 === 270 ? [H1, W1] : [W1, H1];
+      doc.insertPage(Math.min(1, doc.getPageCount()), kho);
+    }
     for (const page of doc.getPages()) {
       const { width: W, height: H } = page.getSize();
       const xoay = ((page.getRotation()?.angle || 0) % 360 + 360) % 360;

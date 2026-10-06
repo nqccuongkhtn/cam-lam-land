@@ -2076,7 +2076,7 @@ export default function MapPage() {
           {/* ══ MẪU 51: Ô TÌM NỔI + HÀNG CHIP ══════════════════════════════════════════════════════
               Điện thoại: ô tìm chừa cột nút bên phải (nút ?, phóng to…) → bấm mở BẢNG ĐÁY Tra cứu sẵn có.
               Máy tính: ô 440px giữa trên → bấm sổ khung tìm ngay dưới (4 cách tìm + đủ ô cấp/huyện/xã/thửa/tờ). */}
-          <button type="button" onClick={() => { if (laMayTinh()) { tatDo(); setTimMo((v) => !v); } else { setPanelOpen(false); setTcTab('to'); setTool('search'); } }}
+          <button type="button" onClick={() => { if (laMayTinh()) { tatDo(); setPanelOpen(false); if (tool === 'chugiai') setTool('none'); setTimMo((v) => !v); } else { setPanelOpen(false); setTcTab('to'); setTool('search'); } }}
             className="absolute top-2 left-2 right-[50px] z-30 hidden h-[38px] items-center lg:flex gap-2 rounded-full border border-slate-200 bg-white px-3.5 text-left text-[13px] shadow-[0_6px_18px_-8px_rgba(10,37,64,.45)] lg:left-1/2 lg:right-auto lg:w-[440px] lg:-translate-x-1/2">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4 shrink-0 text-slate-400" aria-hidden><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
             <span className="min-w-0 flex-1 truncate text-slate-500">{(c2 || c1) && searchMode === 'parcel' ? `${dsXaCap.find((x) => x.xaId === c3)?.ten || ''}${c2 ? ' · Thửa ' + c2 : ''}${c1 ? ' · Tờ ' + c1 : ''}` : 'Xã, số thửa, số tờ…'}</span>

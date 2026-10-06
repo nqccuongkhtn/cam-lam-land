@@ -4,15 +4,15 @@
  *  Phạm vi chủ dự án chốt: TỪ DẢI QUẢNG BÁ TRỞ XUỐNG = Dải quảng bá + Hỗ trợ tiện ích + Doanh nghiệp tiêu biểu.
  *  (Chân trang SiteFooter giữ nguyên.) Mở trang chủ kèm ?maucum=N (1–100). Không có tham số → web y như cũ.
  *
- *  DẢI QUẢNG BÁ GIỮ NGUYÊN (chủ dự án không cho đổi phong cách). Mỗi mẫu = MỘT TÔNG CHUNG cho cả cụm (4 kiểu khung nền)
- *  + 1 trong 10 kiểu "Hỗ trợ tiện ích" + 1 trong 5 kiểu "Doanh nghiệp tiêu biểu". Cả cụm dùng chung màu chữ,
+ *  DẢI QUẢNG BÁ và DOANH NGHIỆP TIÊU BIỂU GIỮ NGUYÊN (chủ dự án không cho đổi). Mỗi mẫu = MỘT TÔNG CHUNG (4 kiểu khung nền)
+ *  + 1 trong 10 kiểu "Hỗ trợ tiện ích" → 40 mẫu. Cả cụm dùng chung màu chữ,
  *  màu thẻ, kiểu tiêu đề mục → nhìn liền một khối chứ không phải ba mảnh ghép.
- *  Doanh nghiệp: mọi kiểu đều KHÔNG LẶP logo (bản cũ lặp Cam Lâm Land / Vingroup 3 lần → nhìn như hàng giả).
  *  Ô công cụ trong bản xem thử chỉ dẫn sang /tien-ich; chọn xong mới nối lại hộp tính toán như bản thật.
  * ========================================================================== */
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import Link from 'next/link';
 import PromoBanner from './PromoBanner';
+import FeaturedPartners from './FeaturedPartners';
 
 type Nen = { ten: string; ngoai: CSSProperties; fg: string; mu: string; the: string; ln: string; nhan: string; tongBn: number }; // tongBn: không còn dùng
 // 4 kiểu khung nền cho CẢ CỤM (tongBn = tông dải quảng bá đi kèm cho hợp)
@@ -90,52 +90,15 @@ const TIEN_ICH: { ten: string; ve: (n: Nen) => ReactNode }[] = [
         <span className="text-2xl">{t.icon}</span><span className="mt-2 block text-[14.5px] font-bold">{t.t}</span><span className="mt-0.5 block text-[12px]" style={{ color: n.mu }}>{t.d}</span></Link>))}</div>) },
 ];
 
-// ── Doanh nghiệp: logo hoặc chữ thay logo (KHÔNG LẶP) ──
-type Dn = { id: number; name: string; logoUrl?: string | null };
-const ChuLogo = ({ p, n, co = 20 }: { p: Dn; n: Nen; co?: number }) => {
-  if (p.logoUrl) return /* eslint-disable-next-line @next/next/no-img-element */ <img src={p.logoUrl} alt={p.name} className="max-h-10 max-w-[150px] object-contain" style={{ filter: toi(n) ? 'brightness(0) invert(1)' : 'grayscale(1)', opacity: .8 }} />;
-  const ten = p.name.trim().toLowerCase();
-  if (ten === 'cam lâm land') return <span className="whitespace-nowrap font-extrabold tracking-tight" style={{ fontSize: co, color: n.fg }}>Cam Lâm <span style={{ color: '#C8A14B' }}>Land</span></span>;
-  if (ten === 'vingroup') return <span className="whitespace-nowrap font-serif font-bold tracking-tight" style={{ fontSize: co, color: toi(n) ? '#fff' : '#475569' }}>Vin<span style={{ color: toi(n) ? '#f2a3ab' : '#b01e2e' }}>group</span></span>;
-  return <span className="font-bold" style={{ fontSize: co - 3, color: n.mu }}>{p.name}</span>;
-};
-const DOANH_NGHIEP: { ten: string; ve: (n: Nen, ds: Dn[]) => ReactNode }[] = [
-  { ten: 'Dải logo mờ không khung, căn giữa', ve: (n, ds) => (
-    <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4 py-2" style={{ opacity: .85 }}>{ds.map((p) => <ChuLogo key={p.id} p={p} n={n} />)}</div>) },
-  { ten: 'Lưới ô có khung + ô "Trở thành đối tác"', ve: (n, ds) => (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{ds.map((p) => <div key={p.id} className="grid h-20 place-items-center rounded-lg px-3" style={vienThe(n)}><ChuLogo p={p} n={n} /></div>)}
-      <Link href="/dichvu" className="grid h-20 place-items-center rounded-lg border-2 border-dashed px-3 text-center text-[13px] font-bold" style={{ borderColor: n.ln, color: n.mu }}>+ Trở thành đối tác</Link></div>) },
-  { ten: 'Một dòng: "Đồng hành cùng chúng tôi" + logo nhỏ', ve: (n, ds) => (
-    <div className="flex flex-wrap items-center gap-x-8 gap-y-3 rounded-lg px-5 py-4" style={vienThe(n)}>
-      <span className="text-[13px] font-semibold" style={{ color: n.mu }}>Đồng hành cùng Cam Lâm Land:</span>{ds.map((p) => <ChuLogo key={p.id} p={p} n={n} co={17} />)}</div>) },
-  { ten: 'Khung logo + nút "Liên hệ hợp tác" bên phải', ve: (n, ds) => (
-    <div className="flex flex-col gap-4 rounded-lg p-5 sm:flex-row sm:items-center" style={vienThe(n)}>
-      <div className="flex flex-1 flex-wrap items-center gap-x-10 gap-y-3">{ds.map((p) => <ChuLogo key={p.id} p={p} n={n} />)}</div>
-      <Link href="/dichvu" className="inline-flex shrink-0 items-center gap-1.5 rounded px-4 py-2 text-[13.5px] font-bold" style={{ background: toi(n) ? '#C8A14B' : '#0A2540', color: toi(n) ? '#0A2540' : '#fff' }}>Liên hệ hợp tác <Mui c={toi(n) ? '#0A2540' : '#fff'} /></Link></div>) },
-  { ten: 'Căn giữa: logo to + một câu giới thiệu', ve: (n, ds) => (
-    <div className="text-center"><div className="flex flex-wrap items-center justify-center gap-x-14 gap-y-4">{ds.map((p) => <ChuLogo key={p.id} p={p} n={n} co={24} />)}</div>
-      <p className="mx-auto mt-4 max-w-xl text-[13.5px]" style={{ color: n.mu }}>Các chủ đầu tư, đơn vị phát triển dự án đang đồng hành cùng Cam Lâm Land. <Link href="/dichvu" className="font-bold underline" style={{ color: n.nhan }}>Hợp tác với chúng tôi</Link></p></div>) },
-];
-
-export const SO_MAU_CUM = 100;
+export const SO_MAU_CUM = 40; // 4 nền × 10 kiểu tiện ích — doanh nghiệp giữ nguyên nên không còn đủ 100 mẫu khác nhau
 
 export default function MauCum({ so }: { so: number }) {
   const m = so - 1;
-  const n = NEN[Math.floor(m / 25)];
-  // Trong mỗi nhóm nền 25 mẫu: tiện ích xoay 10 kiểu, đối tác đổi kiểu sau mỗi 5 mẫu → 25 cặp không trùng
-  const k = m % 25;
-  const ti = TIEN_ICH[k % TIEN_ICH.length];
-  const dn = DOANH_NGHIEP[Math.floor(k / 5) % DOANH_NGHIEP.length];
-  const [ds, setDs] = useState<Dn[]>([]);
+  // Mẫu 1–10 nền 1, 11–20 nền 2, 21–30 nền 3, 31–40 nền 4; trong mỗi nhóm là đủ 10 kiểu tiện ích
+  const n = NEN[Math.floor(m / 10)];
+  const ti = TIEN_ICH[m % 10];
   const [go, setGo] = useState(String(so));
   useEffect(() => { setGo(String(so)); }, [so]);
-  useEffect(() => {
-    fetch('/api/partners').then((r) => r.json()).then((d) => {
-      const a: Dn[] = Array.isArray(d?.partners) ? d.partners : [];
-      const thay = new Set<string>(); const duy = a.filter((p) => { const k = p.name.trim().toLowerCase(); if (thay.has(k)) return false; thay.add(k); return true; });
-      setDs(duy.length ? duy : [{ id: -1, name: 'Cam Lâm Land' }, { id: -2, name: 'Vingroup' }]);
-    }).catch(() => setDs([{ id: -1, name: 'Cam Lâm Land' }, { id: -2, name: 'Vingroup' }]));
-  }, []);
   const den = (k: number) => { const x = ((k - 1 + SO_MAU_CUM) % SO_MAU_CUM) + 1; location.href = `/?maucum=${x}#mau-cum`; };
   return (
     <div id="mau-cum" className="scroll-mt-20">
@@ -144,9 +107,11 @@ export default function MauCum({ so }: { so: number }) {
         <div className="pt-2 sm:pt-4"><PromoBanner /></div>
         <div className="mx-auto max-w-7xl space-y-10 px-3 pb-8 pt-4 sm:px-4 sm:pb-12">
           <section><TieuDe n={n} nho="Công cụ" to="Hỗ trợ tiện ích" />{ti.ve(n)}</section>
-          <section><TieuDe n={n} nho="Đối tác" to="Doanh nghiệp tiêu biểu" />{dn.ve(n, ds)}</section>
         </div>
       </div>
+      {/* Doanh nghiệp tiêu biểu GIỮ NGUYÊN (dải logo dài, tự trượt) — chủ dự án 6/10/2026. Đặt ngoài dải nền
+          vì tiêu đề của nó chữ xanh đậm, nằm trên nền xanh đậm sẽ chìm mất. */}
+      <FeaturedPartners />
       <div className="sticky bottom-[calc(64px+env(safe-area-inset-bottom))] z-[60] mx-auto mt-3 max-w-7xl px-3 md:bottom-3 sm:px-4">
         <div className="flex flex-wrap items-center gap-2 rounded-md bg-amber-50/95 px-3 py-2 text-[12px] text-amber-900 shadow-lg ring-1 ring-amber-200 backdrop-blur">
           <button type="button" onClick={() => den(so - 1)} className="grid h-7 w-7 place-items-center rounded bg-white ring-1 ring-amber-200">‹</button>
@@ -154,7 +119,7 @@ export default function MauCum({ so }: { so: number }) {
             <b>Mẫu</b><input value={go} onChange={(e) => setGo(e.target.value.replace(/\D/g, ''))} inputMode="numeric" className="h-7 w-11 rounded border border-amber-300 bg-white text-center font-bold outline-none" /><span>/{SO_MAU_CUM}</span>
           </form>
           <button type="button" onClick={() => den(so + 1)} className="grid h-7 w-7 place-items-center rounded bg-white ring-1 ring-amber-200">›</button>
-          <span className="min-w-0 flex-1 leading-snug"><b>Nền:</b> {n.ten} · <b>Tiện ích:</b> {ti.ten} · <b>Đối tác:</b> {dn.ten}</span>
+          <span className="min-w-0 flex-1 leading-snug"><b>Nền:</b> {n.ten} · <b>Tiện ích:</b> {ti.ten}</span>
         </div>
       </div>
     </div>

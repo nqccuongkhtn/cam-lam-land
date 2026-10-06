@@ -496,8 +496,8 @@ async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
       while (font.widthOfTextAtSize(chu1, to) > cheo * 0.62) to *= 0.92;
       const chu2 = 'batdongsancamlam.dpdns.org  ·  0988 888 888';
       let nho = to * 0.36; while (font.widthOfTextAtSize(chu2, nho) > cheo * 0.62) nho *= 0.92;
-      dongCheo(chu1, to, to * 0.32, rgb(0.78, 0.6, 0.22), 0.15);
-      dongCheo(chu2, nho, -to * 0.42, rgb(0.04, 0.15, 0.25), 0.2);
+      dongCheo(chu1, to, to * 0.5, rgb(0.78, 0.6, 0.22), 0.15);
+      dongCheo(chu2, nho, -to * 0.62, rgb(0.04, 0.15, 0.25), 0.2);
       // dòng chân trang (giữ như cũ, thêm số điện thoại)
       const chan = 'Tải miễn phí tại batdongsancamlam.dpdns.org · Hotline/Zalo 0988 888 888 — Cam Lâm Land · Nhà đất & bản đồ quy hoạch Cam Lâm';
       let co = 7.5; while (co > 4.5 && font.widthOfTextAtSize(chan, co) > w - 24) co -= 0.5;

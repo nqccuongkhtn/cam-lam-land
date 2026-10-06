@@ -52,17 +52,15 @@ export default function HomeUtilities() {
       {/* Nhãn nhỏ "CÔNG CỤ" trên tiêu đề (học theo mẫu chủ dự án gửi 2/10/2026). */}
       <p className="text-[10.5px] font-extrabold tracking-[.12em] text-red-600 sm:text-[11px]">CÔNG CỤ</p>
       <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-3 sm:mb-6">Hỗ trợ tiện ích</h2>
-      {/* ĐIỆN THOẠI: lưới 2 cột, mỗi ô = biểu tượng vuông nhỏ bên trái + tên đậm + mô tả 2 dòng (theo mẫu chủ dự án gửi
-          2/10/2026 — thay cho 4 vòng tròn, đọc rõ hơn). MÁY TÍNH: ô trắng có viền, biểu tượng tròn ở giữa (mẫu 5). */}
-      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-4">
-        {TOOLS.map((tl) => (
+      {/* MẪU 13 chủ dự án chọn (6/10/2026): MỘT KHUNG chia 4 cột bằng vạch dọc, không viền từng ô — nền xám rất nhạt
+          nổi trên dải trắng của khối kết trang. Điện thoại: 2×2, vạch dọc giữa 2 cột + vạch ngang giữa 2 hàng. */}
+      <div className="grid grid-cols-2 overflow-hidden rounded-lg border border-[#e8edf3] bg-[#f6f8fb] sm:grid-cols-4">
+        {TOOLS.map((tl, k) => (
           <button key={tl.k} onClick={() => setOpen(tl.k)}
-            className="group flex items-start gap-2.5 rounded-lg border border-slate-200 bg-white p-2.5 text-left transition hover:border-[#C8A14B] hover:shadow-md sm:flex-col sm:items-center sm:gap-2 sm:px-3 sm:py-5 sm:text-center">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-slate-50 text-lg sm:h-[72px] sm:w-[72px] sm:rounded-full sm:border sm:border-slate-200 sm:bg-white sm:text-3xl sm:shadow-[0_3px_10px_rgba(15,23,42,.08)]">{tl.icon}</span>
-            <span className="min-w-0">
-              <span className="block text-[13px] font-bold leading-tight text-[#0A2540] sm:text-sm">{tl.t}</span>
-              <span className="mt-0.5 block line-clamp-2 text-[11px] leading-snug text-slate-400 sm:mt-1">{tl.d}</span>
-            </span>
+            className={`flex flex-col items-center px-3 py-5 text-center transition hover:bg-white ${k % 2 ? 'border-l' : ''} ${k > 0 ? 'sm:border-l' : ''} ${k > 1 ? 'border-t sm:border-t-0' : ''} border-[#e8edf3]`}>
+            <span className="text-[28px] leading-none">{tl.icon}</span>
+            <span className="mt-2 text-sm font-bold text-[#0A2540]">{tl.t}</span>
+            <span className="mt-0.5 text-[11.5px] leading-snug text-slate-500">{tl.d}</span>
           </button>
         ))}
       </div>

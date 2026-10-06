@@ -90,6 +90,7 @@ export default function PdfEditorPage() {
     [timMo, tuTim, pages, ovByPage, phienChu]);
   const chiSoDung = khop.length ? Math.min(chiSo, khop.length - 1) : 0;
   useEffect(() => { if (!khop.length) return; const t = setTimeout(() => document.getElementById('khop-dang-chon')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60); return () => clearTimeout(t); }, [chiSoDung, khop.length, tuTim]);
+  useEffect(() => { if (pages.length) setTimMo(true); }, [pages.length > 0]); // mở file là hiện sẵn thanh Tìm & thay (tính năng chính)
   useEffect(() => { const phim = (e: KeyboardEvent) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f' && pages.length) { e.preventDefault(); setTimMo(true); } }; window.addEventListener('keydown', phim); return () => window.removeEventListener('keydown', phim); }, [pages.length]);
   const baoNhanh = (m: string, ms = 1400) => { setBusy(m); setTimeout(() => setBusy(null), ms); };
   const thayMotCho = () => { const k = khop[chiSoDung]; if (!k) return; const ok = thayFns.current[k.pgId]?.(k.ii, k.chu.slice(0, k.start) + tuThay + k.chu.slice(k.start + k.len)); if (ok === false) { baoNhanh('Dòng này có số/chữ điền xen giữa — bấm vào chữ để sửa tay cho khỏi mất', 2600); if (khop.length) setChiSo((chiSoDung + 1) % khop.length); } };

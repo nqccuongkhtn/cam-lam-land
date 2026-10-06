@@ -39,20 +39,21 @@ export function ThanhTimThay({ tu, setTu, thay, setThay, khop, chiSo, setChiSo, 
   useEffect(() => { oTim.current?.focus(); oTim.current?.select(); }, []);
   const n = khop.length;
   const di = (b: number) => { if (n) setChiSo(((chiSo + b) % n + n) % n); };
-  const o = 'h-8 rounded-md border border-slate-300 px-2.5 text-sm outline-none focus:border-[#0A2540]';
-  const nut = 'h-8 rounded-md px-3 text-sm font-semibold disabled:opacity-40';
+  const o = 'h-9 rounded-md border border-[#C8A14B]/60 bg-white px-2.5 text-sm outline-none focus:border-[#0A2540] focus:ring-2 focus:ring-[#C8A14B]/30';
+  const nut = 'h-9 rounded-md px-3 text-sm font-semibold disabled:opacity-40';
   return (
-    <div className="flex flex-wrap items-center gap-1.5 border-b bg-slate-50 px-3 py-1.5">
+    <div className="flex flex-wrap items-center gap-1.5 border-b-2 border-[#C8A14B] bg-[#FFF8E6] px-3 py-2">
+      <span className="mr-1 text-[13px] font-extrabold text-[#0A2540]">Tìm &amp; thay thế</span>
       <div className="relative">
         <input ref={oTim} value={tu} onChange={(e) => { setTu(e.target.value); setChiSo(0); }} onKeyDown={(e) => { if (e.key === 'Enter') di(e.shiftKey ? -1 : 1); if (e.key === 'Escape') onDong(); }}
-          placeholder="Tìm chữ trong văn bản…" className={`${o} w-56 pr-16`} aria-label="Tìm chữ" />
+          placeholder="Tìm chữ trong văn bản…" className={`${o} w-64 pr-16`} aria-label="Tìm chữ" />
         <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs tabular-nums text-slate-500">{tu.trim() ? (n ? `${chiSo + 1}/${n}` : '0 chỗ') : ''}</span>
       </div>
       <button type="button" onClick={() => di(-1)} disabled={!n} title="Chỗ trước (Shift+Enter)" className={`${nut} border border-slate-300 bg-white px-2`}>‹</button>
       <button type="button" onClick={() => di(1)} disabled={!n} title="Chỗ sau (Enter)" className={`${nut} border border-slate-300 bg-white px-2`}>›</button>
       <span className="mx-1 h-6 w-px bg-slate-200" />
       <input value={thay} onChange={(e) => setThay(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') onThay(); if (e.key === 'Escape') onDong(); }}
-        placeholder="Thay bằng…" className={`${o} w-48`} aria-label="Thay bằng" />
+        placeholder="Thay bằng…" className={`${o} w-56`} aria-label="Thay bằng" />
       <button type="button" onClick={onThay} disabled={!n} className={`${nut} border border-slate-300 bg-white text-[#0A2540] hover:bg-slate-100`}>Thay</button>
       <button type="button" onClick={onThayHet} disabled={!n} className={`${nut} bg-[#0A2540] text-white hover:bg-[#13365c]`}>Thay tất cả{n ? ` (${n})` : ''}</button>
       <span className="ml-1 hidden text-xs text-slate-500 lg:inline">Gõ không dấu vẫn tìm được chữ có dấu</span>

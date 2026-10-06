@@ -667,7 +667,8 @@ export default function Home() {
       )}
 
       {/* FOOTER — nhiều tầng (kiểu batdongsan) */}
-      <SiteFooter />
+      {/* Đang xem thử mẫu khối kết trang thì chân trang đã nằm trong khối đó */}
+      {!mauCum && <SiteFooter />}
     </div>
   );
 }

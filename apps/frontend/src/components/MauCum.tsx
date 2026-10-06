@@ -4,8 +4,9 @@
  *  Phạm vi chủ dự án chốt: TỪ DẢI QUẢNG BÁ TRỞ XUỐNG = Dải quảng bá + Hỗ trợ tiện ích + Doanh nghiệp tiêu biểu.
  *  (Chân trang SiteFooter giữ nguyên.) Mở trang chủ kèm ?maucum=N (1–100). Không có tham số → web y như cũ.
  *
- *  DẢI QUẢNG BÁ và DOANH NGHIỆP TIÊU BIỂU GIỮ NGUYÊN (chủ dự án không cho đổi). Mỗi mẫu = MỘT TÔNG CHUNG (4 kiểu khung nền)
- *  + 1 trong 10 kiểu "Hỗ trợ tiện ích" → 40 mẫu. Cả cụm dùng chung màu chữ,
+ *  KHỐI KẾT TRANG (chủ dự án 6/10/2026): dải quảng bá + tiện ích + doanh nghiệp + CHÂN TRANG gom thành MỘT KHỐI chung nền.
+ *  Dải quảng bá và dải doanh nghiệp (dài, tự trượt) GIỮ NGUYÊN. Mỗi mẫu = 1 trong 5 nền × 2 hình dạng khối
+ *  × 10 kiểu "Hỗ trợ tiện ích" = 100 mẫu. Cả khối dùng chung màu chữ,
  *  màu thẻ, kiểu tiêu đề mục → nhìn liền một khối chứ không phải ba mảnh ghép.
  *  Ô công cụ trong bản xem thử chỉ dẫn sang /tien-ich; chọn xong mới nối lại hộp tính toán như bản thật.
  * ========================================================================== */
@@ -13,16 +14,32 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import Link from 'next/link';
 import PromoBanner from './PromoBanner';
 import FeaturedPartners from './FeaturedPartners';
+import SiteFooter from './SiteFooter';
 
-type Nen = { ten: string; ngoai: CSSProperties; fg: string; mu: string; the: string; ln: string; nhan: string; tongBn: number }; // tongBn: không còn dùng
-// 4 kiểu khung nền cho CẢ CỤM (tongBn = tông dải quảng bá đi kèm cho hợp)
+type Nen = { ten: string; nen: string; fg: string; mu: string; the: string; ln: string; nhan: string; toi?: boolean };
+// 5 kiểu NỀN cho cả KHỐI KẾT TRANG (dải quảng bá → hết chân trang)
 const NEN: Nen[] = [
-  { ten: 'Nền trang như hiện tại', ngoai: {}, fg: '#0A2540', mu: '#64748b', the: '#fff', ln: '#e2e8f0', nhan: '#c8102e', tongBn: 0 },
-  { ten: 'Cả cụm trên một dải TRẮNG có viền trên/dưới', ngoai: { background: '#fff', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }, fg: '#0A2540', mu: '#64748b', the: '#f6f8fb', ln: '#e8edf3', nhan: '#c8102e', tongBn: 1 },
-  { ten: 'Cả cụm trên một dải XANH ĐẬM (màu logo)', ngoai: { background: '#0A2540' }, fg: '#fff', mu: 'rgba(255,255,255,.62)', the: 'rgba(255,255,255,.06)', ln: 'rgba(255,255,255,.12)', nhan: '#E3C67A', tongBn: 2 },
-  { ten: 'Cả cụm trên một dải KEM ấm', ngoai: { background: '#f7f3ea' }, fg: '#0A2540', mu: '#6b6457', the: '#fff', ln: '#e9e1d0', nhan: '#a8791f', tongBn: 3 },
+  { ten: 'Trắng', nen: '#ffffff', fg: '#0A2540', mu: '#64748b', the: '#fff', ln: '#e5e9f0', nhan: '#c8102e' },
+  { ten: 'Xám xanh nhạt (màu chân trang hiện tại)', nen: '#f4f7fc', fg: '#0A2540', mu: '#64748b', the: '#fff', ln: '#e2e8f0', nhan: '#c8102e' },
+  { ten: 'Kem ấm', nen: '#f7f3ea', fg: '#0A2540', mu: '#6b6457', the: '#fff', ln: '#e9e1d0', nhan: '#a8791f' },
+  { ten: 'Trắng chuyển dần xuống xanh nhạt', nen: 'linear-gradient(180deg,#ffffff 0%,#f1f5fb 55%,#e8eef8 100%)', fg: '#0A2540', mu: '#64748b', the: '#fff', ln: '#e2e8f0', nhan: '#c8102e' },
+  { ten: 'Xanh đậm màu logo', nen: '#0A2540', fg: '#fff', mu: 'rgba(255,255,255,.62)', the: 'rgba(255,255,255,.06)', ln: 'rgba(255,255,255,.13)', nhan: '#E3C67A', toi: true },
 ];
+// Hai HÌNH DẠNG khối
+const KHUNG = ['Tràn hết bề ngang màn hình', 'Khối bo góc nằm giữa trang (hai bên lộ nền trang)'];
 
+// Chân trang + dải doanh nghiệp là component dùng chung, viết sẵn màu nền trắng/xám → trong bản xem thử
+// ép lại màu bằng CSS chỉ áp trong #mau-cum (nền trong suốt; khối tối thì chữ sáng). Chọn xong sẽ sửa thẳng component.
+const CSS_KHOI = String.raw`
+#mau-cum footer{background:transparent!important;border-top:0!important}
+#mau-cum.toi .text-\[\#0A2540\]{color:#fff!important}
+#mau-cum.toi .text-slate-400,#mau-cum.toi .text-slate-500,#mau-cum.toi .text-slate-600,#mau-cum.toi .text-slate-800{color:rgba(255,255,255,.66)!important}
+#mau-cum.toi .bg-white{background:rgba(255,255,255,.07)!important}
+#mau-cum.toi .border-slate-200,#mau-cum.toi .border-slate-300{border-color:rgba(255,255,255,.16)!important}
+#mau-cum.toi .border-t{border-color:rgba(255,255,255,.14)!important}
+#mau-cum.toi input{color:#fff!important}
+#mau-cum.toi .text-\[\#a8842f\]{color:#E3C67A!important}
+`;
 
 const TOOLS = [
   { k: 'age', icon: '☯️', t: 'Xem tuổi xây nhà', d: 'Kim Lâu · Hoang Ốc · Tam Tai', mau: '#f3eefe' },
@@ -90,28 +107,32 @@ const TIEN_ICH: { ten: string; ve: (n: Nen) => ReactNode }[] = [
         <span className="text-2xl">{t.icon}</span><span className="mt-2 block text-[14.5px] font-bold">{t.t}</span><span className="mt-0.5 block text-[12px]" style={{ color: n.mu }}>{t.d}</span></Link>))}</div>) },
 ];
 
-export const SO_MAU_CUM = 40; // 4 nền × 10 kiểu tiện ích — doanh nghiệp giữ nguyên nên không còn đủ 100 mẫu khác nhau
+export const SO_MAU_CUM = 100; // 5 nền × 2 hình dạng × 10 kiểu tiện ích
 
 export default function MauCum({ so }: { so: number }) {
   const m = so - 1;
-  // Mẫu 1–10 nền 1, 11–20 nền 2, 21–30 nền 3, 31–40 nền 4; trong mỗi nhóm là đủ 10 kiểu tiện ích
-  const n = NEN[Math.floor(m / 10)];
+  // Mẫu 1–20 nền 1, 21–40 nền 2… Trong mỗi nhóm 20: 1–10 tràn ngang, 11–20 khối bo góc; mỗi 10 mẫu đủ 10 kiểu tiện ích
+  const n = NEN[Math.floor(m / 20)];
+  const boGoc = Math.floor(m / 10) % 2 === 1;
   const ti = TIEN_ICH[m % 10];
   const [go, setGo] = useState(String(so));
   useEffect(() => { setGo(String(so)); }, [so]);
   const den = (k: number) => { const x = ((k - 1 + SO_MAU_CUM) % SO_MAU_CUM) + 1; location.href = `/?maucum=${x}#mau-cum`; };
+  const ke = boGoc ? <div className="mx-3 h-px sm:mx-6" style={{ background: n.ln }} /> : null;
   return (
-    <div id="mau-cum" className="scroll-mt-20">
-      <div style={n.ngoai}>
-        {/* Dải quảng bá GIỮ NGUYÊN thiết kế hiện tại (chủ dự án 6/10/2026: "không đổi phong cách thiết kế banner") */}
-        <div className="pt-2 sm:pt-4"><PromoBanner /></div>
-        <div className="mx-auto max-w-7xl space-y-10 px-3 pb-8 pt-4 sm:px-4 sm:pb-12">
-          <section><TieuDe n={n} nho="Công cụ" to="Hỗ trợ tiện ích" />{ti.ve(n)}</section>
+    <div className="scroll-mt-20">
+      <style dangerouslySetInnerHTML={{ __html: CSS_KHOI }} />
+      {/* KHỐI KẾT TRANG: dải quảng bá (giữ nguyên) + tiện ích + doanh nghiệp (giữ nguyên, trượt) + chân trang — MỘT nền */}
+      <div className={boGoc ? 'mx-auto max-w-7xl px-3 pb-4 pt-6 sm:px-4' : ''}>
+        <div id="mau-cum" className={`${n.toi ? 'toi' : ''} ${boGoc ? 'overflow-hidden rounded-2xl' : ''}`} style={{ background: n.nen, color: n.fg, border: boGoc && !n.toi ? `1px solid ${n.ln}` : undefined }}>
+          <div className="pt-4 sm:pt-6"><PromoBanner /></div>
+          <div className="mx-auto max-w-7xl px-3 py-6 sm:px-4 sm:py-8"><section><TieuDe n={n} nho="Công cụ" to="Hỗ trợ tiện ích" />{ti.ve(n)}</section></div>
+          {ke}
+          <FeaturedPartners />
+          {ke}
+          <SiteFooter />
         </div>
       </div>
-      {/* Doanh nghiệp tiêu biểu GIỮ NGUYÊN (dải logo dài, tự trượt) — chủ dự án 6/10/2026. Đặt ngoài dải nền
-          vì tiêu đề của nó chữ xanh đậm, nằm trên nền xanh đậm sẽ chìm mất. */}
-      <FeaturedPartners />
       <div className="sticky bottom-[calc(64px+env(safe-area-inset-bottom))] z-[60] mx-auto mt-3 max-w-7xl px-3 md:bottom-3 sm:px-4">
         <div className="flex flex-wrap items-center gap-2 rounded-md bg-amber-50/95 px-3 py-2 text-[12px] text-amber-900 shadow-lg ring-1 ring-amber-200 backdrop-blur">
           <button type="button" onClick={() => den(so - 1)} className="grid h-7 w-7 place-items-center rounded bg-white ring-1 ring-amber-200">‹</button>
@@ -119,7 +140,7 @@ export default function MauCum({ so }: { so: number }) {
             <b>Mẫu</b><input value={go} onChange={(e) => setGo(e.target.value.replace(/\D/g, ''))} inputMode="numeric" className="h-7 w-11 rounded border border-amber-300 bg-white text-center font-bold outline-none" /><span>/{SO_MAU_CUM}</span>
           </form>
           <button type="button" onClick={() => den(so + 1)} className="grid h-7 w-7 place-items-center rounded bg-white ring-1 ring-amber-200">›</button>
-          <span className="min-w-0 flex-1 leading-snug"><b>Nền:</b> {n.ten} · <b>Tiện ích:</b> {ti.ten}</span>
+          <span className="min-w-0 flex-1 leading-snug"><b>Nền khối:</b> {n.ten} · <b>Hình dạng:</b> {KHUNG[boGoc ? 1 : 0]} · <b>Tiện ích:</b> {ti.ten}</span>
         </div>
       </div>
     </div>

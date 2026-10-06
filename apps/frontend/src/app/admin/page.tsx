@@ -136,9 +136,9 @@ function AdsManager() {
 // Mỗi ô chứa NHIỀU quảng cáo, trang chủ tự trượt luân phiên.
 const maMoi = () => Math.random().toString(36).slice(2, 9);
 function QcTrangChu() {
-  const [ch, setCh] = useState<{ o1: OQc[]; o2: OQc[] }>({ o1: [], o2: [] });
+  const [ch, setCh] = useState<{ o1: OQc[]; o2: OQc[]; kieu: 'dong' | 'the' }>({ o1: [], o2: [], kieu: 'dong' });
   const [msg, setMsg] = useState('');
-  useEffect(() => { api<{ value: any }>('/config/trangchu_ad').then((r) => { if (r.value && typeof r.value === 'object') setCh({ o1: dsCua(r.value.o1).map((o) => ({ id: maMoi(), ...o })), o2: dsCua(r.value.o2).map((o) => ({ id: maMoi(), ...o })) }); }).catch(() => {}); }, []);
+  useEffect(() => { api<{ value: any }>('/config/trangchu_ad').then((r) => { if (r.value && typeof r.value === 'object') setCh({ o1: dsCua(r.value.o1).map((o) => ({ id: maMoi(), ...o })), o2: dsCua(r.value.o2).map((o) => ({ id: maMoi(), ...o })), kieu: r.value.kieu === 'the' ? 'the' : 'dong' }); }).catch(() => {}); }, []);
   const sua = (k: 'o1' | 'o2', id: string, f: keyof OQc, v: any) => setCh((c) => ({ ...c, [k]: c[k].map((o) => (o.id === id ? { ...o, [f]: v } : o)) }));
   const them = (k: 'o1' | 'o2') => setCh((c) => ({ ...c, [k]: [...c[k], { id: maMoi(), bat: true, mau: k === 'o1' ? 'do' : 'xanh' }] }));
   const xoa = (k: 'o1' | 'o2', id: string) => { if (confirm('Xoá quảng cáo này khỏi ô? (bấm Lưu mới có hiệu lực)')) setCh((c) => ({ ...c, [k]: c[k].filter((o) => o.id !== id) })); };
@@ -210,6 +210,20 @@ function QcTrangChu() {
       <CssQc />
       <p className="font-bold text-[#0A2540]">🏠 2 ô quảng cáo trang chủ (cạnh Tin tức)</p>
       <p className="text-xs text-slate-500 mt-1">Vị trí đẹp nhất web — ngay màn hình đầu, ai vào trang chủ cũng thấy. Mỗi ô nhận <b>nhiều quảng cáo, tự trượt luân phiên</b> (điện thoại vuốt được). Quảng cáo tắt hoặc <b>quá ngày hết hạn là tự bỏ ra</b>; ô hết quảng cáo thì quay về thẻ của web.</p>
+      {/* Cách hiện trên MÁY TÍNH (điện thoại luôn là 1 dòng như tin tức) — xem QcMayTinh trong OQuangCaoTrangChu.tsx */}
+      <div className="mt-3 rounded-lg border border-slate-200 p-3">
+        <p className="text-sm font-semibold text-[#0A2540]">Cách hiện trên máy tính</p>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {([['dong', 'Dòng tin (mặc định)', 'Chữ "QUẢNG CÁO" xám + 2 dòng: ảnh nhỏ trái, tiêu đề đậm — giống dòng tin tức bên cạnh. 6 giây đổi 2 quảng cáo kế tiếp.'],
+             ['the', 'Thẻ kiểu báo (dự phòng)', 'Một thẻ: ảnh to sáng phía trên, tiêu đề, mô tả, nút xanh đậm. 6 giây đổi một quảng cáo.']] as const).map(([k, t, m]) => (
+            <label key={k} className={`flex cursor-pointer gap-2 rounded-lg border p-2.5 text-sm ${ch.kieu === k ? 'border-[#0A2540] bg-slate-50' : 'border-slate-200'}`}>
+              <input type="radio" name="kieu-qc" checked={ch.kieu === k} onChange={() => setCh((c) => ({ ...c, kieu: k }))} className="mt-0.5" />
+              <span><b className="block text-[#0A2540]">{t}</b><span className="text-xs text-slate-500">{m}</span></span>
+            </label>
+          ))}
+        </div>
+        <p className="mt-2 text-[11px] text-slate-400">Điện thoại luôn hiện 1 dòng như tin tức. Ô xem trước bên dưới chỉ để xem nội dung, không phải hình dạng thật trên trang chủ.</p>
+      </div>
       <div className="space-y-3 mt-3">
         {MotO('o1', 'Ô 1 — trên (chỗ ô đỏ)', 'Bản đồ quy hoạch')}
         {MotO('o2', 'Ô 2 — dưới (chỗ ô xanh)', 'Đăng tin miễn phí')}

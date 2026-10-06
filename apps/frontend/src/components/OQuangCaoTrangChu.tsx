@@ -1,15 +1,15 @@
 'use client';
-/* HAI Ô QUẢNG CÁO CẠNH TIN TỨC Ở TRANG CHỦ (5/10/2026).
+/* QUẢNG CÁO CẠNH TIN TỨC Ở TRANG CHỦ (5/10/2026, đổi cách hiện 6/10/2026).
    Admin nhập ở /admin → tab Quảng cáo → "2 ô quảng cáo trang chủ" (cất ở app_config, khoá `trangchu_ad`).
-   - MỖI Ô CHỨA ĐƯỢC NHIỀU QUẢNG CÁO, tự TRƯỢT luân phiên như các web khác (5 giây/quảng cáo, có chấm chuyển,
-     điện thoại vuốt được, rê chuột vào thì dừng). Hai ô trượt CÙNG LÚC (chung một đồng hồ).
-   - Khung quảng cáo khoá ĐÚNG cỡ thẻ gốc của web (thẻ gốc nằm ẩn bên dưới giữ chỗ).
-   - Quảng cáo có ảnh nền: ảnh phóng thật chậm, thật nhẹ; phủ một lớp tối đều để chữ trắng luôn đọc rõ.
-     (Bản đầu có chữ trồi lên + nút vàng có vệt sáng chạy → chủ dự án chê "màu mè", 5/10/2026 làm dịu lại.)
-   - Quảng cáo nào tắt / thiếu tiêu đề / quá ngày hết hạn thì tự bỏ ra. Ô hết sạch quảng cáo → quay về thẻ của web
+   - CÁCH HIỆN (chủ dự án chọn sau 2 lượt xem thử): quảng cáo của cả 2 ô GỘP THÀNH MỘT DANH SÁCH và hiện dạng
+     DÒNG TIN giống hệt dòng tin tức bên cạnh (ảnh nhỏ trái + tiêu đề đậm + nhãn "Quảng cáo" viền xám).
+     Điện thoại: 1 dòng, 5 giây đổi. Máy tính: chữ "QUẢNG CÁO" xám + 2 dòng, 6 giây đổi 2 cái kế tiếp.
+     (Bản trước: hai ô ảnh phủ tối chữ trắng — bị chê "nhìn kì", chữ "Quảng cáo" bị cắt, chấm chuyển bé.)
+   - Quảng cáo nào tắt / thiếu tiêu đề / quá ngày hết hạn thì tự bỏ ra. Hết sạch quảng cáo → quay về 2 thẻ của web
      (Bản đồ quy hoạch, Đăng tin) — không bao giờ để ô trống, admin không phải nhớ ngày mà gỡ tay.
-   - Góc mỗi quảng cáo có chữ nhỏ "Quảng cáo" (Luật Quảng cáo: phải phân biệt được với nội dung của web). */
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+   - Mỗi quảng cáo có chữ "Quảng cáo" (Luật Quảng cáo: phải phân biệt được với nội dung của web).
+   - TheQc (thẻ ảnh tối) giờ CHỈ còn dùng cho ô xem trước trong trang quản trị. */
+import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 
 export interface OQc {
@@ -26,7 +26,8 @@ export interface OQc {
   hanDen?: string;      // ngày hết hạn YYYY-MM-DD (rỗng = không hạn)
 }
 // Bản đầu (sáng 5/10) mỗi ô chỉ 1 quảng cáo → o1/o2 có thể là 1 quảng cáo lẻ, vẫn đọc được.
-export interface CauHinhQc { o1?: OQc[] | OQc; o2?: OQc[] | OQc }
+// kieu = cách hiện trên MÁY TÍNH, admin chọn: 'dong' (2 dòng như tin tức — mặc định) | 'the' (1 thẻ kiểu báo, dự phòng)
+export interface CauHinhQc { o1?: OQc[] | OQc; o2?: OQc[] | OQc; kieu?: 'dong' | 'the' }
 export const dsCua = (v?: OQc[] | OQc): OQc[] => (Array.isArray(v) ? v : v ? [v] : []);
 
 // Bộ màu khi quảng cáo không có ảnh — dùng chung cho trang chủ lẫn ô xem trước trong trang quản trị.
@@ -94,44 +95,6 @@ export function TheQc({ o, on = true, xemTruoc = false, coMoTa = true }: { o: OQ
   return <Link href={o.link} tabIndex={tab} className={cls} style={style}>{ruot}</Link>;
 }
 
-/** Một ô: nhiều quảng cáo trượt ngang. Số thứ tự `buoc` do bên ngoài giữ — HAI Ô DÙNG CHUNG một bước
-    nên luôn trượt CÙNG LÚC (chủ dự án 5/10/2026: lệch nhịp nhìn không đồng bộ). Ô ít quảng cáo hơn thì quay vòng sớm hơn. */
-export function TruotQc({ ds, buoc, denBuoc, dungLai, coMoTa = true, xemTruoc = false }: {
-  ds: OQc[]; buoc: number; denBuoc: (k: number) => void; dungLai: (d: boolean) => void; coMoTa?: boolean; xemTruoc?: boolean;
-}) {
-  const cham = useRef<{ x: number; y: number } | null>(null);
-  const keo = useRef(false);
-  const n = ds.length;
-  if (!n) return null;
-  const i = ((buoc % n) + n) % n;
-  if (n === 1) return <TheQc o={ds[0]} xemTruoc={xemTruoc} coMoTa={coMoTa} />;
-  return (
-    <div className="relative h-full overflow-hidden rounded-lg sm:rounded-xl"
-      onMouseEnter={() => dungLai(true)} onMouseLeave={() => dungLai(false)}
-      onTouchStart={(e) => { cham.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; keo.current = false; dungLai(true); }}
-      onTouchEnd={(e) => {
-        const c = cham.current; cham.current = null; dungLai(false);
-        if (!c) return;
-        const dx = e.changedTouches[0].clientX - c.x, dy = e.changedTouches[0].clientY - c.y;
-        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { keo.current = true; denBuoc(buoc + (dx < 0 ? 1 : -1)); }
-      }}
-      // Vuốt để chuyển thì không tính là bấm vào quảng cáo
-      onClickCapture={(e) => { if (keo.current) { e.preventDefault(); e.stopPropagation(); keo.current = false; } }}>
-      <div className="clqc-ray flex h-full transition-transform duration-[650ms] ease-[cubic-bezier(.5,0,.25,1)]" style={{ transform: `translateX(-${i * 100}%)` }}>
-        {ds.map((o, k) => <div key={o.id || k} className="h-full w-full shrink-0" aria-hidden={k !== i}><TheQc o={o} on={k === i} xemTruoc={xemTruoc} coMoTa={coMoTa} /></div>)}
-      </div>
-      {/* Chấm chuyển quảng cáo — máy tính: góc TRÊN bên trái (góc dưới hay đè lên logo/chữ có sẵn trong ảnh).
-          Điện thoại: góc DƯỚI PHẢI — ô nhỏ, để trên trái thì dính sát nhãn (5/10/2026). */}
-      <div className="absolute bottom-2.5 right-2.5 z-[2] flex gap-1 sm:bottom-auto sm:right-auto sm:left-5 sm:top-2">
-        {ds.map((o, k) => (
-          <button key={o.id || k} type="button" aria-label={`Quảng cáo ${k + 1}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); denBuoc(buoc - i + k); }}
-            className={`h-1.5 rounded-full transition-all ${k === i ? 'w-4 bg-white' : 'w-1.5 bg-white/45 hover:bg-white/70'}`} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function CssQc() { return <style dangerouslySetInnerHTML={{ __html: CSS }} />; }
 
 /* ── ĐIỆN THOẠI (6/10/2026): chủ dự án chê hai ô ảnh tối chữ trắng "nhìn kì", xem thử 3 kiểu và CHỌN KIỂU 1:
@@ -176,224 +139,71 @@ function QcDienThoai({ ds }: { ds: OQc[] }) {
   return <div className="sm:hidden"><Kieu1 ds={ds} i={buoc % ds.length} /></div>;
 }
 
-/* ── MÁY TÍNH: 18 KIỂU XEM THỬ (6/10/2026, TẠM) ──
-   Chủ dự án chê hai ô ảnh tối ở cột phải khu tin tức (chữ "Quảng cáo" bị cắt, chấm bé, ảnh phủ tối nặng).
-   Mở trang chủ kèm ?mauqc=N trên máy tính để xem. 1–3: lượt đầu · 4–8: cải tiến kiểu 1 · 9–18: kiểu mới.
-   Chọn xong giữ một kiểu làm mặc định, xoá phần còn lại. */
-const NhanXam = ({ cls = '' }: { cls?: string }) => <p className={`mb-2 text-[10.5px] font-medium uppercase tracking-[.14em] text-slate-400 ${cls}`}>Quảng cáo</p>;
-const TheQcNho = () => <span className="shrink-0 whitespace-nowrap rounded border border-slate-300 px-1 text-[10px] font-medium text-slate-500">Quảng cáo</span>;
-const NutXanh = ({ o, cls = '' }: { o: OQc; cls?: string }) => <span className={`inline-block rounded bg-[#0A2540] px-3 py-1.5 text-xs font-bold text-white group-hover:bg-red-600 ${cls}`}>{o.nut || 'Xem ngay'} →</span>;
-const NutChu = ({ o, cls = '' }: { o: OQc; cls?: string }) => <span className={`block truncate text-xs font-semibold text-red-600 ${cls}`}>{o.nut || 'Xem ngay'} →</span>;
-type Ve = (ds: OQc[]) => ReactNode; // ds = các quảng cáo đang tới lượt (đã xoay vòng)
-
-// Một dòng kiểu tin tức — dùng lại cho kiểu 1 và các bản cải tiến
-const Dong = ({ o, anh = 'w-[104px] aspect-[4/3]', moTa = 0, nut = false, dong = 3 }: { o: OQc; anh?: string; moTa?: number; nut?: boolean; dong?: number }) => (
-  <LinkDt o={o} className="group block border-b border-slate-200 py-3 first:pt-0 last:border-b-0">
-    <div className="flex gap-3">
-      <div className={`${anh} shrink-0 overflow-hidden rounded bg-slate-100`}><AnhDt o={o} /></div>
-      <div className="min-w-0 flex-1">
-        <p className={`text-[15px] font-bold leading-snug text-[#0A2540] group-hover:text-red-600 ${dong === 2 ? 'line-clamp-2' : 'line-clamp-3'}`}>{o.tieuDe}</p>
-        {moTa > 0 && o.moTa && <p className={`mt-1 text-[12.5px] leading-snug text-slate-500 ${moTa === 1 ? 'line-clamp-1' : 'line-clamp-2'}`}>{o.moTa}</p>}
-        {nut ? <NutChu o={o} cls="mt-1.5" /> : <p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-slate-400"><TheQcNho /><span className="truncate">{o.nhan}</span></p>}
-      </div>
-    </div>
-  </LinkDt>
-);
-
-const KIEU_MT: { ten: string; so: number; ve: Ve }[] = [
-  // ── Lượt đầu ──
-  { ten: 'Hai dòng như tin tức', so: 2, ve: (ds) => <div><NhanXam />{ds.map((o, k) => <Dong key={k} o={o} />)}</div> },
-  { ten: 'Một thẻ kiểu báo', so: 1, ve: ([o]) => (
-    <div><NhanXam />
-      <LinkDt o={o} className="group block overflow-hidden rounded border border-slate-200 bg-white hover:border-slate-300">
-        <div className="aspect-[16/10] overflow-hidden bg-slate-100"><AnhDt o={o} /></div>
-        <div className="p-3.5">
-          {o.nhan && <p className="truncate text-[10.5px] font-semibold uppercase tracking-wide text-red-600">{o.nhan}</p>}
-          <p className="mt-0.5 text-base font-bold leading-snug text-[#0A2540] line-clamp-2 group-hover:text-red-600">{o.tieuDe}</p>
-          {o.moTa && <p className="mt-1 text-[13px] leading-snug text-slate-500 line-clamp-2">{o.moTa}</p>}
-          <NutXanh o={o} cls="mt-3" />
-        </div>
-      </LinkDt></div>) },
-  { ten: 'Hai thẻ ảnh trên chữ dưới', so: 2, ve: (ds) => (
-    <div className="space-y-3">{ds.map((o, k) => (
-      <LinkDt key={k} o={o} className="group block overflow-hidden rounded-lg border border-slate-200 bg-white hover:border-slate-300">
-        <div className="relative aspect-[2.3/1] overflow-hidden bg-slate-100"><AnhDt o={o} /><span className="absolute left-2 top-2 rounded bg-white/90 px-1.5 py-px text-[9.5px] font-medium text-slate-600">Quảng cáo</span></div>
-        <div className="px-3 py-2.5"><p className="text-[14.5px] font-bold leading-snug text-[#0A2540] line-clamp-2 group-hover:text-red-600">{o.tieuDe}</p><NutChu o={o} cls="mt-1" /></div>
-      </LinkDt>))}</div>) },
-
-  // ── 5 bản cải tiến của kiểu 1 (kiểu 1 chỉ cao nửa cột → các bản dưới lấp cho cân) ──
-  { ten: 'Cải tiến 1a · BA dòng thay vì hai, cuối có lời mời đặt quảng cáo', so: 3, ve: (ds) => (
-    <div><NhanXam />{ds.map((o, k) => <Dong key={k} o={o} dong={2} />)}
-      <Link href="/dichvu#quang-cao" className="mt-1 block text-[11.5px] text-slate-400 hover:text-red-600">Đặt quảng cáo tại đây →</Link></div>) },
-  { ten: 'Cải tiến 1b · Hai dòng, ảnh to hơn + một dòng mô tả', so: 2, ve: (ds) => (
-    <div><NhanXam />{ds.map((o, k) => <Dong key={k} o={o} anh="w-[122px] aspect-[4/3.4]" moTa={2} dong={2} />)}</div>) },
-  { ten: 'Cải tiến 1c · Hai dòng có mô tả + chữ đỏ "Xem ngay →"', so: 2, ve: (ds) => (
-    <div><NhanXam />{ds.map((o, k) => <Dong key={k} o={o} anh="w-[112px] aspect-square" moTa={2} nut dong={2} />)}</div>) },
-  { ten: 'Cải tiến 1d · Đặt trong hộp trắng, tiêu đề hộp gạch đỏ (giống "Tin liên quan")', so: 3, ve: (ds) => (
-    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-      <p className="border-b-2 border-red-600 px-3.5 py-2.5 text-[13px] font-extrabold uppercase tracking-wide text-[#0A2540]">Quảng cáo</p>
-      <div className="px-3.5 pt-3">{ds.map((o, k) => <Dong key={k} o={o} anh="w-[92px] aspect-[4/3]" dong={2} />)}</div>
-    </div>) },
-  { ten: 'Cải tiến 1e · Một quảng cáo ảnh to + hai dòng nhỏ bên dưới (như tin chính + tin phụ)', so: 3, ve: ([a, ...con]) => (
-    <div><NhanXam />
-      <LinkDt o={a} className="group block border-b border-slate-200 pb-3">
-        <div className="aspect-[16/9] overflow-hidden rounded bg-slate-100"><AnhDt o={a} /></div>
-        <p className="mt-2 text-[15.5px] font-bold leading-snug text-[#0A2540] line-clamp-2 group-hover:text-red-600">{a.tieuDe}</p>
-        <p className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400"><TheQcNho /><span className="truncate">{a.nhan}</span></p>
-      </LinkDt>
-      <div className="pt-3">{con.map((o, k) => <Dong key={k} o={o} anh="w-[84px] aspect-[4/3]" dong={2} />)}</div>
-    </div>) },
-
-  // ── 10 kiểu mới ──
-  { ten: 'Mới 1 · Áp phích ảnh cao bằng cột, chân ảnh có dải trắng ghi tiêu đề', so: 1, ve: ([o]) => (
-    <LinkDt o={o} className="group relative block aspect-[3/4] overflow-hidden rounded-lg bg-slate-100 lg:aspect-auto lg:h-[360px]">
-      <AnhDt o={o} />
-      <span className="absolute left-2 top-2 rounded bg-white/90 px-1.5 py-px text-[9.5px] font-medium text-slate-600">Quảng cáo</span>
-      <div className="absolute inset-x-2 bottom-2 rounded bg-white/95 p-3 shadow-sm">
-        {o.nhan && <p className="truncate text-[10px] font-semibold uppercase tracking-wide text-red-600">{o.nhan}</p>}
-        <p className="text-[15px] font-bold leading-snug text-[#0A2540] line-clamp-2">{o.tieuDe}</p>
-        <NutChu o={o} cls="mt-1" />
-      </div>
-    </LinkDt>) },
-  { ten: 'Mới 2 · Chỉ chữ, nền xanh đậm phẳng (không ảnh), hai thẻ', so: 2, ve: (ds) => (
-    <div className="space-y-3">{ds.map((o, k) => (
-      <LinkDt key={k} o={o} className="group block rounded-lg bg-[#0A2540] p-4 text-white hover:bg-[#0d2f54]">
-        <p className="flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-wide text-[#C8A14B]"><span className="truncate">{o.nhan}</span><span className="shrink-0 font-medium normal-case tracking-normal text-white/50">Quảng cáo</span></p>
-        <p className="mt-1 text-[16px] font-bold leading-snug line-clamp-2">{o.tieuDe}</p>
-        {o.moTa && <p className="mt-1 text-[12.5px] leading-snug text-white/65 line-clamp-2">{o.moTa}</p>}
-        <span className="mt-3 inline-block rounded bg-[#C8A14B] px-3 py-1.5 text-xs font-bold text-[#0A2540]">{o.nut || 'Xem ngay'} →</span>
-      </LinkDt>))}</div>) },
-  { ten: 'Mới 3 · Ba thẻ nhỏ ảnh tròn kiểu danh thiếp', so: 3, ve: (ds) => (
-    <div><NhanXam /><div className="space-y-2.5">{ds.map((o, k) => (
-      <LinkDt key={k} o={o} className="group flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 hover:border-slate-300">
-        <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-slate-100"><AnhDt o={o} /></div>
-        <div className="min-w-0 flex-1"><p className="text-[14px] font-bold leading-snug text-[#0A2540] line-clamp-2 group-hover:text-red-600">{o.tieuDe}</p><NutChu o={o} cls="mt-0.5" /></div>
-      </LinkDt>))}</div></div>) },
-  { ten: 'Mới 4 · Một thẻ ảnh trên, chữ dưới có vạch vàng bên trái', so: 1, ve: ([o]) => (
-    <div><NhanXam />
-      <LinkDt o={o} className="group block bg-white">
-        <div className="aspect-[4/3] overflow-hidden rounded bg-slate-100"><AnhDt o={o} /></div>
-        <div className="mt-3 border-l-[3px] border-[#C8A14B] pl-3">
-          {o.nhan && <p className="truncate text-[10.5px] font-semibold uppercase tracking-wide text-slate-400">{o.nhan}</p>}
-          <p className="text-[16px] font-bold leading-snug text-[#0A2540] line-clamp-2 group-hover:text-red-600">{o.tieuDe}</p>
-          {o.moTa && <p className="mt-1 text-[12.5px] leading-snug text-slate-500 line-clamp-2">{o.moTa}</p>}
-        </div>
-      </LinkDt></div>) },
-  { ten: 'Mới 5 · Hai ảnh có dải chữ trắng mờ ở chân ảnh', so: 2, ve: (ds) => (
-    <div className="space-y-3">{ds.map((o, k) => (
-      <LinkDt key={k} o={o} className="group relative block aspect-[16/10] overflow-hidden rounded-lg bg-slate-100">
-        <AnhDt o={o} />
-        <span className="absolute right-2 top-2 rounded bg-white/90 px-1.5 py-px text-[9.5px] font-medium text-slate-600">Quảng cáo</span>
-        <div className="absolute inset-x-0 bottom-0 bg-white/90 px-3 py-2 backdrop-blur-sm">
-          <p className="text-[14px] font-bold leading-snug text-[#0A2540] line-clamp-1">{o.tieuDe}</p><NutChu o={o} />
-        </div>
-      </LinkDt>))}</div>) },
-  { ten: 'Mới 6 · Lưới 4 ô vuông nhỏ (4 quảng cáo cùng lúc)', so: 4, ve: (ds) => (
-    <div><NhanXam /><div className="grid grid-cols-2 gap-2.5">{ds.map((o, k) => (
-      <LinkDt key={k} o={o} className="group block">
-        <div className="aspect-square overflow-hidden rounded bg-slate-100"><AnhDt o={o} /></div>
-        <p className="mt-1.5 text-[13px] font-bold leading-snug text-[#0A2540] line-clamp-2 group-hover:text-red-600">{o.tieuDe}</p>
-      </LinkDt>))}</div></div>) },
-  { ten: 'Mới 7 · Danh sách đánh số "Gợi ý cho bạn", ảnh nhỏ bên phải', so: 4, ve: (ds) => (
-    <div><p className="mb-1 flex items-baseline justify-between"><span className="text-[13px] font-extrabold uppercase tracking-wide text-[#0A2540]">Gợi ý cho bạn</span><span className="text-[10px] text-slate-400">Quảng cáo</span></p>
-      {ds.map((o, k) => (
-        <LinkDt key={k} o={o} className="group flex items-center gap-3 border-b border-slate-200 py-2.5 last:border-b-0">
-          <span className="w-5 shrink-0 text-xl font-extrabold text-slate-300">{k + 1}</span>
-          <p className="min-w-0 flex-1 text-[14px] font-semibold leading-snug text-[#0A2540] line-clamp-2 group-hover:text-red-600">{o.tieuDe}</p>
-          <div className="aspect-square w-14 shrink-0 overflow-hidden rounded bg-slate-100"><AnhDt o={o} /></div>
-        </LinkDt>))}</div>) },
-  { ten: 'Mới 8 · Thẻ viền đỏ trên đầu: chữ trước, ảnh sau', so: 1, ve: ([o]) => (
-    <LinkDt o={o} className="group block overflow-hidden rounded-lg border border-slate-200 border-t-[3px] border-t-red-600 bg-white p-4 hover:border-slate-300 hover:border-t-red-600">
-      <p className="flex items-center justify-between text-[10.5px] font-semibold uppercase tracking-wide text-red-600"><span className="truncate">{o.nhan}</span><span className="font-medium normal-case tracking-normal text-slate-400">Quảng cáo</span></p>
-      <p className="mt-1 text-[17px] font-extrabold leading-snug text-[#0A2540] line-clamp-2">{o.tieuDe}</p>
-      {o.moTa && <p className="mt-1.5 text-[13px] leading-snug text-slate-500 line-clamp-2">{o.moTa}</p>}
-      <div className="mt-3 aspect-[16/9] overflow-hidden rounded bg-slate-100"><AnhDt o={o} /></div>
-      <NutXanh o={o} cls="mt-3" />
-    </LinkDt>) },
-  { ten: 'Mới 9 · Giống thẻ tin VIP: nhãn vàng "QUẢNG CÁO" trên ảnh, chữ đỏ dưới', so: 2, ve: (ds) => (
-    <div className="space-y-3">{ds.map((o, k) => (
-      <LinkDt key={k} o={o} className="group block overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200 hover:ring-slate-300">
-        <div className="relative aspect-[2.2/1] overflow-hidden bg-slate-100"><AnhDt o={o} />
-          <span className="absolute left-2 top-2 rounded bg-[#C8A14B] px-1.5 py-0.5 text-[9.5px] font-extrabold uppercase text-[#0A2540]">Quảng cáo</span></div>
-        <div className="px-3 py-2.5">
-          <p className="text-[13.5px] font-bold uppercase leading-snug text-red-600 line-clamp-2">{o.tieuDe}</p>
-          {o.nhan && <p className="mt-1 truncate text-[11.5px] text-slate-500">{o.nhan}</p>}
-        </div>
-      </LinkDt>))}</div>) },
-  { ten: 'Mới 10 · Một khung xám nhạt, ảnh trái chữ phải, hai quảng cáo', so: 2, ve: (ds) => (
-    <div className="rounded-lg bg-slate-100 p-3">
-      <p className="mb-2 text-[10.5px] font-medium uppercase tracking-[.14em] text-slate-400">Quảng cáo</p>
-      <div className="space-y-2.5">{ds.map((o, k) => (
-        <LinkDt key={k} o={o} className="group flex gap-3 rounded bg-white p-2.5">
-          <div className="aspect-[4/3] w-[96px] shrink-0 overflow-hidden rounded bg-slate-100"><AnhDt o={o} /></div>
-          <div className="min-w-0 flex-1"><p className="text-[14px] font-bold leading-snug text-[#0A2540] line-clamp-2 group-hover:text-red-600">{o.tieuDe}</p>
-            {o.moTa && <p className="mt-0.5 text-[12px] leading-snug text-slate-500 line-clamp-2">{o.moTa}</p>}<NutChu o={o} cls="mt-1" /></div>
-        </LinkDt>))}</div>
-    </div>) },
-];
-
-function XemThuMayTinh({ ds, kieu }: { ds: OQc[]; kieu: number }) {
-  const k = KIEU_MT[kieu - 1];
+/* ── MÁY TÍNH (6/10/2026): chủ dự án chê hai ô ảnh tối ở cột phải khu tin tức, xem thử 18 kiểu và CHỐT KIỂU 1:
+   HAI DÒNG giống dòng tin tức ở cột giữa (đồng bộ với điện thoại) — chữ "QUẢNG CÁO" xám trên đầu, mỗi dòng
+   ảnh nhỏ trái + tiêu đề đậm + nhãn "Quảng cáo" viền xám. Hiện 2 quảng cáo một lúc, 6 giây đổi sang 2 cái kế tiếp. */
+function QcMayTinh({ ds, kieu = 'dong' }: { ds: OQc[]; kieu?: 'dong' | 'the' }) {
   const [buoc, setBuoc] = useState(0);
-  useEffect(() => { if (ds.length <= k.so) return; const t = setInterval(() => setBuoc((b) => b + k.so), 6000); return () => clearInterval(t); }, [ds.length, k.so]);
-  const n = Math.min(k.so, ds.length);
-  const dang = Array.from({ length: n }, (_, j) => ds[(buoc + j) % ds.length]);
-  const tong = KIEU_MT.length;
+  const moiLan = kieu === 'the' ? 1 : 2;
+  useEffect(() => { if (ds.length <= moiLan) return; const t = setInterval(() => setBuoc((b) => b + moiLan), 6000); return () => clearInterval(t); }, [ds.length, moiLan]);
+  // DỰ PHÒNG — kiểu "thẻ kiểu báo" (mẫu 2 lượt xem thử): 1 quảng cáo, ảnh sáng 16:10, tiêu đề đen, mô tả, nút xanh đậm
+  if (kieu === 'the') {
+    const o = ds[buoc % ds.length];
+    return (
+      <div className="hidden sm:block">
+        <p className="mb-2 text-[10.5px] font-medium uppercase tracking-[.14em] text-slate-400">Quảng cáo</p>
+        <LinkDt o={o} className="group block overflow-hidden rounded border border-slate-200 bg-white hover:border-slate-300">
+          <div key={buoc} className="cl-fadeup sm:flex lg:block">
+            <div className="aspect-[16/10] overflow-hidden bg-slate-100 sm:w-2/5 sm:shrink-0 lg:w-auto"><AnhDt o={o} /></div>
+            <div className="p-3.5">
+              {o.nhan && <p className="truncate text-[10.5px] font-semibold uppercase tracking-wide text-red-600">{o.nhan}</p>}
+              <p className="mt-0.5 text-base font-bold leading-snug text-[#0A2540] line-clamp-2 group-hover:text-red-600">{o.tieuDe}</p>
+              {o.moTa && <p className="mt-1 text-[13px] leading-snug text-slate-500 line-clamp-2">{o.moTa}</p>}
+              <span className="mt-3 inline-block rounded bg-[#0A2540] px-3 py-1.5 text-xs font-bold text-white group-hover:bg-red-600">{o.nut || 'Xem ngay'} →</span>
+            </div>
+          </div>
+        </LinkDt>
+      </div>
+    );
+  }
+  const hai = Array.from({ length: Math.min(2, ds.length) }, (_, j) => ds[(buoc + j) % ds.length]);
   return (
     <div className="hidden sm:block">
-      <div key={buoc} className="cl-fadeup lg:max-w-none sm:max-w-md">{k.ve(dang)}</div>
-      <div className="mt-2 rounded bg-amber-50 px-2 py-1.5 text-[11px] text-amber-800">
-        <b>Xem thử {kieu}/{tong}</b> · {k.ten}
-        <div className="mt-1 flex flex-wrap gap-1">{KIEU_MT.map((_, j) => <a key={j} href={`/?mauqc=${j + 1}`} className={`grid h-5 min-w-[20px] place-items-center rounded px-1 ${j + 1 === kieu ? 'bg-amber-600 text-white' : 'bg-white text-amber-800 ring-1 ring-amber-200'}`}>{j + 1}</a>)}</div>
+      <p className="mb-2 text-[10.5px] font-medium uppercase tracking-[.14em] text-slate-400">Quảng cáo</p>
+      <div key={buoc} className="cl-fadeup">
+        {hai.map((o, k) => (
+          <LinkDt key={k} o={o} className="group block border-b border-slate-200 py-3 first:pt-0 last:border-b-0">
+            <div className="flex gap-3">
+              <div className="aspect-[4/3] w-[104px] shrink-0 overflow-hidden rounded bg-slate-100"><AnhDt o={o} /></div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[15px] font-bold leading-snug text-[#0A2540] line-clamp-3 group-hover:text-red-600">{o.tieuDe}</p>
+                <p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-slate-400"><span className="shrink-0 whitespace-nowrap rounded border border-slate-300 px-1 text-[10px] font-medium text-slate-500">Quảng cáo</span><span className="truncate">{o.nhan}</span></p>
+              </div>
+            </div>
+          </LinkDt>
+        ))}
       </div>
     </div>
   );
 }
 
-/** Cột hai ô: ô nào có quảng cáo đang chạy thì trượt luân phiên, không thì giữ thẻ mặc định của web. */
+/** Cột quảng cáo cạnh tin tức ở trang chủ. Có quảng cáo đang chạy → dạng dòng tin (điện thoại 1 dòng, máy tính 2 dòng);
+    không có quảng cáo nào → hiện 2 thẻ của web (Bản đồ quy hoạch, Đăng tin) như trước. */
 export default function OQuangCaoTrangChu({ macDinh1, macDinh2 }: { macDinh1: ReactNode; macDinh2: ReactNode }) {
   const [ch, setCh] = useState<CauHinhQc>({});
   useEffect(() => {
     fetch('/api/config/trangchu_ad').then((r) => r.json())
       .then((d) => { if (d?.value && typeof d.value === 'object') setCh(d.value); }).catch(() => {});
   }, []);
-  const ds1 = dsCua(ch.o1).filter((o) => dangChay(o));
-  const ds2 = dsCua(ch.o2).filter((o) => dangChay(o));
-  const dsDt = [...ds1, ...ds2]; // điện thoại: gộp 2 ô thành một dòng
-  // TẠM: ?mauqc=1|2|3 → máy tính xem thử kiểu mới (xem XemThuMayTinh ở trên)
-  const [kieuMt, setKieuMt] = useState(0);
-  useEffect(() => { const k = Number(new URLSearchParams(location.search).get('mauqc')); if (k >= 1 && k <= KIEU_MT.length) setKieuMt(k); }, []);
-  const xemThuMt = kieuMt > 0 && dsDt.length > 0;
-  // MỘT đồng hồ chung cho cả hai ô → trượt cùng lúc. Rê chuột / chạm vào ô nào cũng dừng cả hai.
-  const [buoc, setBuoc] = useState(0);
-  const [dung, setDung] = useState(false);
-  const chay = Math.max(ds1.length, ds2.length) > 1;
-  useEffect(() => {
-    if (!chay || dung) return;
-    const t = setInterval(() => setBuoc((k) => k + 1), 5000);
-    return () => clearInterval(t);
-  }, [chay, dung, buoc]); // có `buoc`: bấm chấm / vuốt xong thì đếm lại đủ 5 giây
-  // KHUNG GIỮ NGUYÊN CỠ THẺ GỐC: thẻ của web vẫn nằm đó nhưng ẩn đi (giữ chỗ), quảng cáo phủ đúng lên khung đó
-  // → ô quảng cáo không bao giờ to hơn/nhỏ hơn thẻ ban đầu, dù chữ dài hay ảnh to.
-  const khung = (ds: OQc[], macDinh: ReactNode, coMoTa: boolean) => !ds.length ? macDinh : (
-    <div className="relative">
-      <div className="invisible" aria-hidden>{macDinh}</div>
-      <div className="absolute inset-0">
-        <TruotQc ds={ds} buoc={buoc} denBuoc={setBuoc} dungLai={setDung} coMoTa={coMoTa} />
-      </div>
-    </div>
-  );
+  // Quảng cáo của 2 ô (admin nhập riêng) gộp thành MỘT danh sách, đổi lần lượt
+  const ds = [...dsCua(ch.o1), ...dsCua(ch.o2)].filter((o) => dangChay(o));
   return (
     <div>
-      <CssQc />
-      {dsDt.length > 0 && <QcDienThoai ds={dsDt} />}
-      {xemThuMt && <XemThuMayTinh ds={dsDt} kieu={kieuMt} />}
-      <div className={`grid grid-cols-2 gap-2.5 sm:block sm:space-y-4 ${dsDt.length > 0 ? 'max-sm:hidden' : ''} ${xemThuMt ? 'sm:hidden' : ''}`}>
-        {khung(ds1, macDinh1, true)}
-        {khung(ds2, macDinh2, false)}
-      </div>
+      {ds.length > 0 ? <><QcDienThoai ds={ds} /><QcMayTinh ds={ds} kieu={ch.kieu === 'the' ? 'the' : 'dong'} /></> : (
+        <div className="grid grid-cols-2 gap-2.5 sm:block sm:space-y-4">{macDinh1}{macDinh2}</div>
+      )}
       {/* Lời mời đặt quảng cáo — chỉ trên máy tính, chữ nhỏ cho khỏi rối (điện thoại cần gọn) */}
-      <Link href="/dichvu#quang-cao" className={`mt-2 hidden text-right text-[11px] text-slate-400 hover:text-red-600 ${xemThuMt ? '' : 'sm:block'}`}>Đặt quảng cáo tại vị trí này →</Link>
+      <Link href="/dichvu#quang-cao" className="mt-2 hidden text-right text-[11px] text-slate-400 hover:text-red-600 sm:block">Đặt quảng cáo tại vị trí này →</Link>
     </div>
   );
 }

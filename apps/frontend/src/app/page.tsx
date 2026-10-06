@@ -636,13 +636,10 @@ export default function Home() {
 
       {/* PROMO BANNER — quảng cáo (kiểu batdongsan). Chủ dự án dời xuống SAU mục "theo địa điểm", trước "Hỗ trợ tiện ích"
           (6/10/2026) — trước đó nằm giữa "Dự án nổi bật" và "theo địa điểm", chen giữa hai mục nhà đất. */}
-      {/* KHỐI KẾT TRANG — chủ dự án chọn mẫu 13 (6/10/2026): dải quảng bá + "Hỗ trợ tiện ích" chung MỘT DẢI NỀN TRẮNG
-          tràn ngang, viền mảnh trên/dưới (tách khỏi nền xám của khối giữa trang). Dải quảng bá giữ nguyên thiết kế.
-          Doanh nghiệp tiêu biểu + chân trang giữ như cũ, nằm dưới dải. (Bản gom cả chân trang vào khối bị chê "rộng quá".) */}
-      <div className="border-y border-slate-200 bg-white">
-        <div className="pt-2 sm:pt-4"><PromoBanner /></div>
-        <HomeUtilities />
-      </div>
+      {/* KHỐI KẾT TRANG — NỀN TRÙNG THÂN WEB, KHÔNG chia dải nền riêng (chủ dự án 6/10/2026: "để nền trùng với thân web
+          đừng chia khối như này" — bản dải trắng viền trên/dưới bị bỏ). Dải quảng bá giữ nguyên thiết kế. */}
+      <PromoBanner />
+      <HomeUtilities />
 
       {/* DOANH NGHIỆP TIÊU BIỂU — logo carousel (kiểu batdongsan) */}
       <FeaturedPartners />

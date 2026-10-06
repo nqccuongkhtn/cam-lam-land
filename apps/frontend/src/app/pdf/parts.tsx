@@ -99,11 +99,14 @@ export function PageView({ pg, doc, zoom, tool, color, fontSize, ov, sel, setSel
   const startEdit = (it: Item, ii: number, chuMoi?: string, chon = true) => {
     // Ô che chữ cũ: vừa khít chữ (dưới = chân chữ g/y, trên = dấu mũ chữ hoa tiếng Việt) và KHÔNG lấn sang dòng trên/dưới.
     // Bản cũ cao 1,36 cỡ chữ → đè mất chân chữ dòng trên + dấu dòng dưới trong đoạn văn dòng sát (chủ dự án báo 6/10/2026).
-    let top = it.y + it.size * 1.05, bot = it.y - it.size * 0.34; // 0.34: đủ che đuôi chữ g/y/p + dấu nặng (6/10/2026: còn sót đuôi "g" dưới chữ mới)
+    let top = it.y + it.size * 1.05, bot = it.y - it.size * 0.42; // khung dò đủ sâu cho đuôi chữ g/y/p + chân chữ (serif) + dấu nặng — chỗ dừng thật do bước dò nét mực quyết định
     for (const o of items) {
       if (o === it || o.x > it.x + it.w || o.x + o.w < it.x) continue;          // không cùng cột chữ → bỏ qua
       if (o.y > it.y + 0.5 && o.y < it.y + it.size * 2) top = Math.min(top, Math.max(it.y + it.size * 0.7, o.y - o.size * 0.24 - 0.4));
-      if (o.y < it.y - 0.5 && o.y > it.y - it.size * 2) bot = Math.max(bot, Math.min(it.y - it.size * 0.08, o.y + o.size * 0.95 + 0.4));
+      // Dòng BÊN DƯỚI: chỉ chặn ở ~đỉnh chữ thường của nó (0,62 cỡ chữ). Bản cũ chặn ở 0,95 (tính cả chỗ dấu mũ) → ở đoạn văn
+      // dòng sát, mức chặn nằm CAO HƠN đuôi chữ p/g/y → ô che dừng sớm, sót gạch chân chữ "p" cũ dưới chữ "Lập" mới
+      // (chủ dự án chụp 6/10/2026). Dấu của dòng dưới (nếu có trong khung) thì bước dò nét mực dừng ở khoảng trắng trước nó.
+      if (o.y < it.y - 0.5 && o.y > it.y - it.size * 2) bot = Math.max(bot, Math.min(it.y - it.size * 0.08, o.y + o.size * 0.62 + 0.4));
     }
     // ĐO THEO NÉT MỰC THẬT của từng dòng (chủ dự án 6/10/2026: "mỗi chữ cao thấp khác nhau, tính từng chữ"): dò điểm ảnh tối
     // trong cột chữ — từ chân chữ dò XUỐNG (đuôi g/y/p, dấu nặng), từ thân chữ dò LÊN (dấu mũ, sắc, huyền, ngã…), gặp một

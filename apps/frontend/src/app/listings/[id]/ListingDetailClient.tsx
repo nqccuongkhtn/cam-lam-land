@@ -160,8 +160,10 @@ export default function ListingDetail() {
       <div className="mx-auto max-w-6xl px-3 sm:px-4 py-4 sm:py-5">
         <div className="text-xs text-slate-400 mb-3"><Link href="/" className="hover:text-[#0A2540]">Trang chủ</Link> › <Link href="/listings" className="hover:text-[#0A2540]">Nhà đất</Link> › <span className="text-slate-600">{l.ward || 'Cam Lâm'}</span></div>
 
+        {/* min-w-0 ở hai cột: ô lưới mặc định KHÔNG co nhỏ hơn nội dung bên trong → trên điện thoại cột chính bị đẩy
+            rộng 462px trên màn 390px, cả trang trượt ngang (phát hiện 6/10/2026). */}
         <div className="grid lg:grid-cols-3 gap-5">
-          <div className="lg:col-span-2 space-y-5">
+          <div className="min-w-0 lg:col-span-2 space-y-5">
             <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
               <div className="relative bg-slate-900 aspect-[16/10]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -323,7 +325,7 @@ export default function ListingDetail() {
                  tự cuộn riêng.
               Không đè lên chân trang: cột dính chỉ trượt trong phạm vi lưới, mà lưới
               kết thúc trước chân trang. */}
-          <div className="space-y-5 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto lg:pr-1 cl-cot-ben">
+          <div className="min-w-0 space-y-5 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto lg:pr-1 cl-cot-ben">
             {/* MẢNH LẠI CHO SANG — so với batdongsan.com.vn thì thẻ này của mình dày và nặng:
                   bóng đổ to, ảnh đại diện 64px, con số 20px, ba nút đều cao 48-52px.
                   Bên họ: viền mảnh, ảnh 52px, nút vừa phải. Hạ theo hướng đó. */}
@@ -357,43 +359,38 @@ export default function ListingDetail() {
                 <p className="mt-3 text-[11px] text-slate-400">Mã tin {code} · {postedLabel(l.createdAt)} · {displayViews(l).toLocaleString('vi-VN')} lượt xem</p>
               </div>
             ) : (
-            <div className="rounded-xl overflow-hidden shadow-[0_4px_16px_rgba(13,138,128,0.18)] bg-gradient-to-b from-[#13a99c] to-[#0b7d72]">
-              <div className="flex items-center justify-center gap-1.5 px-4 py-2">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="12" cy="8" r="6" /><path d="M15.5 13.6 17 22l-5-3-5 3 1.5-8.4" /></svg>
-                <span className="text-white text-[12.5px] font-bold tracking-wide">Môi giới chuyên nghiệp</span>
-              </div>
-              <div className="bg-white mx-2 rounded-lg p-3 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <div className="relative shrink-0">
-                    {l.posterAvatar ? <img src={l.posterAvatar} alt="" className="w-[52px] h-[52px] rounded-full object-cover ring-2 ring-[#13a99c]/25" /> : <div className="w-[52px] h-[52px] rounded-full bg-gradient-to-br from-[#123459] to-[#081B30] text-[#C8A14B] grid place-items-center text-xl font-extrabold ring-2 ring-[#13a99c]/25">{(l.contactName || 'C').charAt(0).toUpperCase()}</div>}
-                    <span className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-[#13a99c] grid place-items-center ring-2 ring-white"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="w-2.5 h-2.5"><path d="M20 6 9 17l-5-5" /></svg></span>
-                  </div>
-                  <p className="font-extrabold text-[#0A2540] text-[16px] leading-snug">{l.contactName || 'Cam Lâm Land'}</p>
+            /* KHUNG "MÔI GIỚI CHUYÊN NGHIỆP" — chép theo ảnh chụp batdongsan.com.vn chủ dự án gửi (6/10/2026):
+               thẻ TRẮNG có viền xanh ngọc dày bao quanh (không phải nền xanh cả khung như bản trước); dải xanh chỉ ở trên đầu,
+               ảnh đại diện to đè lên mép dải, tên IN HOA bên cạnh; số liệu + "Xem trang cá nhân" chữ đen;
+               chỉ 2 nút trên nền trắng: "Chat qua Zalo" viền xám, nút số xanh ngọc. Nút Lưu tin đã có ở thẻ tiêu đề tin. */
+            <div className="overflow-hidden rounded-lg border-[3px] border-[#0b6f6b] bg-white">
+              <div className="h-11 bg-gradient-to-r from-[#0b6f6b] to-[#108e87] pl-[104px] pr-3 text-center text-[14.5px] font-semibold leading-[44px] text-white">Môi giới chuyên nghiệp</div>
+              <div className="relative px-4 pb-4">
+                <div className="absolute -top-9 left-4">
+                  {l.posterAvatar ? <img src={l.posterAvatar} alt="" className="h-[78px] w-[78px] rounded-full object-cover ring-4 ring-white" /> : <div className="grid h-[78px] w-[78px] place-items-center rounded-full bg-slate-100 text-2xl font-bold text-slate-600 ring-4 ring-white">{(l.contactName || 'C').charAt(0).toUpperCase()}</div>}
+                  <span className="absolute bottom-0.5 right-0.5 grid h-5 w-5 place-items-center rounded-full bg-[#009ba1] ring-2 ring-white"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="h-2.5 w-2.5"><path d="M20 6 9 17l-5-5" /></svg></span>
                 </div>
+                <p className="min-h-[50px] pl-[92px] pt-2 text-[16px] font-bold uppercase leading-snug text-[#2c2c2c]">{l.contactName || 'Cam Lâm Land'}</p>
                 {agentInfo && (
                   <div className="mt-3 grid grid-cols-2 text-center">
-                    <div className="border-r border-slate-100 px-2"><p className="text-[11px] text-slate-400 leading-tight">Tham gia Cam Lâm Land</p><p className="font-extrabold text-[#0A2540] text-[17px] mt-1 leading-none">{joinLabel(agentInfo.createdAt) ?? '—'}</p></div>
-                    <div className="px-2"><p className="text-[11px] text-slate-400 leading-tight">Tin đăng đang có</p><p className="font-extrabold text-[#0A2540] text-[17px] mt-1 leading-none">{agentInfo.activeCount}{agentInfo.activeCount >= 60 ? '+' : ''}</p></div>
+                    <div className="border-r border-slate-200 px-2"><p className="text-[12.5px] leading-tight text-[#505050]">Tham gia<br />Cam Lâm Land</p><p className="mt-1 text-[18px] font-semibold text-[#2c2c2c]">{joinLabel(agentInfo.createdAt) ?? '—'}</p></div>
+                    <div className="px-2"><p className="text-[12.5px] leading-tight text-[#505050]">Tin đăng<br />đang có</p><p className="mt-1 text-[18px] font-semibold text-[#2c2c2c]">{agentInfo.activeCount}{agentInfo.activeCount >= 60 ? '+' : ''}</p></div>
                   </div>
                 )}
                 {l.createdBy && (
-                  <Link href={`/moi-gioi/${l.createdBy}`} className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-center gap-1 text-[12.5px] font-bold text-[#0e8b80]">Xem trang cá nhân <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><path d="M9 18l6-6-6-6" /></svg></Link>
+                  <Link href={`/moi-gioi/${l.createdBy}`} className="mt-3 flex items-center justify-center gap-1 py-1 text-[14px] font-medium text-[#2c2c2c] hover:text-[#009ba1]">Xem trang cá nhân <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M9 18l6-6-6-6" /></svg></Link>
                 )}
-              </div>
-              <div className="px-2 pt-2.5 pb-2.5 space-y-2">
-                <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#0A2540] font-bold py-2.5 rounded-lg shadow-sm text-[14px]"><svg viewBox="0 0 24 24" fill="#0068FF" className="w-5 h-5"><path d="M12 2C6.5 2 2 5.8 2 10.5c0 2.6 1.4 4.9 3.6 6.4-.1.9-.5 2.2-1.2 3.1 1.4-.2 2.8-.8 3.9-1.5 1.1.3 2.4.5 3.7.5 5.5 0 10-3.8 10-8.5S17.5 2 12 2z" /></svg> Chat qua Zalo</a>
-                {full ? (
-                  <a href={`tel:${full.replace(/\s/g, '')}`} className="flex items-center justify-center gap-2 bg-[#075e56] hover:bg-[#064f48] text-white font-extrabold text-[15px] py-2.5 rounded-lg shadow-sm"><IPhone /> {full}</a>
-                ) : (
-                  <button onClick={user ? reveal : () => openLogin()} disabled={revealing} className="cl-press w-full flex items-center justify-center gap-2 bg-[#075e56] hover:bg-[#064f48] disabled:opacity-60 text-white font-extrabold py-3.5 rounded-xl shadow-md"><IPhone /> {revealing ? 'Đang hiện…' : `${l.contactPhone || '0988 88•••'} · Hiện số`}</button>
-                )}
-                <div className="flex items-center gap-2.5">
-                  <button onClick={() => setSaved((v) => !v)} className={`flex-1 flex items-center justify-center gap-1.5 font-bold py-2.5 rounded-xl border transition ${saved ? 'bg-white text-red-600 border-white' : 'border-white/45 text-white hover:bg-white/10'}`}><IHeart filled={saved} /> {saved ? 'Đã lưu' : 'Lưu tin'}</button>
+                <div className="mt-3 space-y-2.5 border-t border-slate-200 pt-4">
+                  <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white text-[15px] font-medium text-[#2c2c2c] hover:bg-slate-50"><svg viewBox="0 0 24 24" fill="#0068FF" className="h-5 w-5"><path d="M12 2C6.5 2 2 5.8 2 10.5c0 2.6 1.4 4.9 3.6 6.4-.1.9-.5 2.2-1.2 3.1 1.4-.2 2.8-.8 3.9-1.5 1.1.3 2.4.5 3.7.5 5.5 0 10-3.8 10-8.5S17.5 2 12 2z" /></svg> Chat qua Zalo</a>
+                  {full ? (
+                    <a href={`tel:${full.replace(/\s/g, '')}`} className="flex h-12 items-center justify-center gap-2 rounded-lg bg-[#009ba1] text-[15px] font-semibold text-white hover:bg-[#008a90]"><IPhone /> {full}</a>
+                  ) : (
+                    <button onClick={user ? reveal : () => openLogin()} disabled={revealing} className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#009ba1] text-[15px] font-semibold text-white hover:bg-[#008a90] disabled:opacity-60"><IPhone /> {revealing ? 'Đang hiện…' : <>{l.contactPhone || '0988 88•••'} <span className="font-normal">· Hiện số</span></>}</button>
+                  )}
                   {user && l.createdBy === user.id && (
-                    <Link href={`/sales/edit/${l.id}`} className="flex-1 flex items-center justify-center gap-1.5 font-bold py-2.5 rounded-xl border border-white/45 text-white hover:bg-white/10">✏️ Sửa</Link>
+                    <Link href={`/sales/edit/${l.id}`} className="flex h-10 items-center justify-center gap-1.5 rounded-lg border border-slate-300 text-sm font-semibold text-[#2c2c2c] hover:bg-slate-50">✏️ Sửa tin</Link>
                   )}
                 </div>
-                <p className="text-[11px] text-white/70 text-center pt-0.5">Mã tin {code} · {postedLabel(l.createdAt)} · {displayViews(l).toLocaleString('vi-VN')} lượt xem</p>
               </div>
             </div>
             )}

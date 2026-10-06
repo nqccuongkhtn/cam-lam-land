@@ -134,6 +134,94 @@ export function TruotQc({ ds, buoc, denBuoc, dungLai, coMoTa = true, xemTruoc = 
 
 export function CssQc() { return <style dangerouslySetInnerHTML={{ __html: CSS }} />; }
 
+/* ── ĐIỆN THOẠI: 3 KIỂU XEM THỬ (6/10/2026, TẠM) ──
+   Chủ dự án chê hai ô ảnh tối chữ trắng trên điện thoại "nhìn kì". Mở trang chủ kèm ?mauqc=1 / 2 / 3 để xem từng kiểu.
+   Chọn xong thì giữ đúng kiểu đó làm mặc định và xoá hai kiểu còn lại. Máy tính KHÔNG đổi gì.
+   Cả 3 kiểu gộp quảng cáo của 2 ô thành MỘT danh sách và đổi lần lượt 5 giây/lần. */
+function LinkDt({ o, className, children }: { o: OQc; className?: string; children: ReactNode }) {
+  const ngoai = /^https?:/i.test(o.link || '');
+  return <a href={o.link || '#'} target={ngoai ? '_blank' : undefined} rel={ngoai ? 'sponsored noopener noreferrer' : undefined} className={className}>{children}</a>;
+}
+const AnhDt = ({ o }: { o: OQc }) => (o.anh
+  // eslint-disable-next-line @next/next/no-img-element
+  ? <img src={o.anh} alt="" loading="lazy" className="h-full w-full object-cover" />
+  : <div className="h-full w-full" style={{ background: (MAU_QC[o.mau || 'xanh'] || MAU_QC.xanh).nen }} />);
+const ChamDt = ({ n, i, sang = false }: { n: number; i: number; sang?: boolean }) => n < 2 ? null : (
+  <div className="flex gap-1">{Array.from({ length: n }, (_, k) => <span key={k} className={`h-1.5 rounded-full transition-all ${k === i ? `w-3.5 ${sang ? 'bg-white' : 'bg-[#0A2540]'}` : `w-1.5 ${sang ? 'bg-white/50' : 'bg-slate-300'}`}`} />)}</div>
+);
+
+/** Kiểu 1 — MỘT DÒNG như dòng tin tức ngay phía trên: ảnh nhỏ trái, tiêu đề đậm, nhãn "Quảng cáo" viền xám. */
+function Kieu1({ ds, i }: { ds: OQc[]; i: number }) {
+  const o = ds[i];
+  return (
+    <div className="border-y border-slate-200 bg-white">
+      <LinkDt o={o} className="flex items-center gap-3 px-1 py-3">
+        <div key={o.id || i} className="cl-fadeup flex min-w-0 flex-1 items-center gap-3">
+          <div className="aspect-[16/10] w-[108px] shrink-0 overflow-hidden rounded bg-slate-100"><AnhDt o={o} /></div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[15px] font-bold leading-snug text-[#0A2540] line-clamp-2">{o.tieuDe}</p>
+            <p className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400"><span className="rounded border border-slate-300 px-1 text-[10px] font-medium text-slate-500">Quảng cáo</span><span className="truncate">{o.nhan}</span></p>
+          </div>
+        </div>
+      </LinkDt>
+      {ds.length > 1 && <div className="flex justify-center pb-2"><ChamDt n={ds.length} i={i} /></div>}
+    </div>
+  );
+}
+
+/** Kiểu 2 — MỘT BĂNG ẢNH RỘNG, giống khung "Tra cứu quy hoạch" bên dưới: chân ảnh tối dần, chữ trắng, nút trắng nhỏ. */
+function Kieu2({ ds, i }: { ds: OQc[]; i: number }) {
+  const o = ds[i];
+  return (
+    <LinkDt o={o} className="relative block aspect-[2.6/1] overflow-hidden rounded-lg bg-[#0A2540]">
+      <div key={o.id || i} className="cl-fadeup absolute inset-0"><AnhDt o={o} /></div>
+      <span aria-hidden className="absolute inset-0" style={{ background: 'linear-gradient(180deg,rgba(10,37,64,0) 30%,rgba(10,37,64,.88) 100%)' }} />
+      <span className="absolute right-2 top-2 rounded bg-black/40 px-1.5 py-px text-[9.5px] font-medium text-white/90">Quảng cáo</span>
+      <div className="absolute inset-x-0 bottom-0 flex items-end gap-2 px-3 pb-2.5">
+        <div className="min-w-0 flex-1">
+          {o.nhan && <p className="truncate text-[9.5px] font-bold uppercase tracking-wide text-[#E3C67A]">{o.nhan}</p>}
+          <p className="text-[14px] font-extrabold leading-snug text-white line-clamp-1">{o.tieuDe}</p>
+        </div>
+        <span className="shrink-0 rounded bg-white px-2.5 py-[5px] text-[11.5px] font-bold text-[#0A2540]">{o.nut || 'Xem ngay'}</span>
+      </div>
+      {ds.length > 1 && <div className="absolute left-3 top-2.5"><ChamDt n={ds.length} i={i} sang /></div>}
+    </LinkDt>
+  );
+}
+
+/** Kiểu 3 — HAI THẺ cạnh nhau kiểu thẻ tin đăng: ảnh sáng phía trên (không phủ tối), chữ đen trên nền trắng phía dưới. */
+function Kieu3({ ds, i }: { ds: OQc[]; i: number }) {
+  const hai = ds.length === 1 ? [ds[0]] : [ds[i % ds.length], ds[(i + 1) % ds.length]];
+  return (
+    <div className="grid grid-cols-2 gap-2.5">
+      {hai.map((o, k) => (
+        <LinkDt key={k} o={o} className="block overflow-hidden rounded-lg border border-slate-200 bg-white">
+          <div key={o.id || i} className="cl-fadeup">
+            <div className="relative aspect-[16/10] bg-slate-100"><AnhDt o={o} />
+              <span className="absolute left-1.5 top-1.5 rounded bg-white/90 px-1 py-px text-[9px] font-medium text-slate-600">Quảng cáo</span></div>
+            <div className="px-2.5 py-2">
+              <p className="text-[13px] font-bold leading-snug text-[#0A2540] line-clamp-2">{o.tieuDe}</p>
+              <p className="mt-1 truncate text-[11.5px] font-semibold text-red-600">{o.nut || 'Xem ngay'} →</p>
+            </div>
+          </div>
+        </LinkDt>
+      ))}
+    </div>
+  );
+}
+
+function XemThuDienThoai({ ds, kieu }: { ds: OQc[]; kieu: number }) {
+  const [buoc, setBuoc] = useState(0);
+  useEffect(() => { if (ds.length < 2) return; const t = setInterval(() => setBuoc((k) => k + (kieu === 3 ? 2 : 1)), 5000); return () => clearInterval(t); }, [ds.length, kieu]);
+  const i = buoc % ds.length;
+  return (
+    <div className="sm:hidden">
+      {kieu === 1 ? <Kieu1 ds={ds} i={i} /> : kieu === 2 ? <Kieu2 ds={ds} i={i} /> : <Kieu3 ds={ds} i={i} />}
+      <p className="mt-1.5 text-center text-[11px] text-slate-400">Đang xem thử kiểu {kieu}/3 · <a href="/?mauqc=1" className="underline">1</a> · <a href="/?mauqc=2" className="underline">2</a> · <a href="/?mauqc=3" className="underline">3</a></p>
+    </div>
+  );
+}
+
 /** Cột hai ô: ô nào có quảng cáo đang chạy thì trượt luân phiên, không thì giữ thẻ mặc định của web. */
 export default function OQuangCaoTrangChu({ macDinh1, macDinh2 }: { macDinh1: ReactNode; macDinh2: ReactNode }) {
   const [ch, setCh] = useState<CauHinhQc>({});
@@ -143,6 +231,11 @@ export default function OQuangCaoTrangChu({ macDinh1, macDinh2 }: { macDinh1: Re
   }, []);
   const ds1 = dsCua(ch.o1).filter((o) => dangChay(o));
   const ds2 = dsCua(ch.o2).filter((o) => dangChay(o));
+  // TẠM: ?mauqc=1|2|3 → điện thoại xem thử kiểu mới (xem XemThuDienThoai ở trên)
+  const [kieuDt, setKieuDt] = useState(0);
+  useEffect(() => { const k = Number(new URLSearchParams(location.search).get('mauqc')); if (k >= 1 && k <= 3) setKieuDt(k); }, []);
+  const dsDt = [...ds1, ...ds2];
+  const xemThu = kieuDt > 0 && dsDt.length > 0;
   // MỘT đồng hồ chung cho cả hai ô → trượt cùng lúc. Rê chuột / chạm vào ô nào cũng dừng cả hai.
   const [buoc, setBuoc] = useState(0);
   const [dung, setDung] = useState(false);
@@ -165,7 +258,8 @@ export default function OQuangCaoTrangChu({ macDinh1, macDinh2 }: { macDinh1: Re
   return (
     <div>
       <CssQc />
-      <div className="grid grid-cols-2 gap-2.5 sm:block sm:space-y-4">
+      {xemThu && <XemThuDienThoai ds={dsDt} kieu={kieuDt} />}
+      <div className={`grid grid-cols-2 gap-2.5 sm:block sm:space-y-4 ${xemThu ? 'max-sm:hidden' : ''}`}>
         {khung(ds1, macDinh1, true)}
         {khung(ds2, macDinh2, false)}
       </div>

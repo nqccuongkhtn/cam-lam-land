@@ -36,13 +36,20 @@ export default function VanBanPage() {
       <section className="mt-8 sm:mt-10">
         <h2 className="text-lg sm:text-xl font-extrabold text-[#0A2540]">Cổng thông tin điện tử Khánh Hòa</h2>
         <p className="text-sm text-slate-500 mt-1 mb-3 sm:mb-4">Tra cứu văn bản, quy hoạch, dự án và thủ tục trực tiếp tại các cổng chính thống của tỉnh, sở ngành và xã/phường.</p>
-        <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+        {/* MỘT KHUNG, MỖI NHÓM MỘT HÀNG (6/10/2026 — chủ dự án chê bản 4 ô lưới "hiển thị chưa đẹp": 4 ô cao thấp
+            khác nhau, ô ít liên kết trống trơn, nút viền xám nhảy dòng lộn xộn). Nay: tên nhóm cột trái cố định,
+            liên kết dạng CHỮ (không viền) xếp hàng bên phải, ngăn bằng vạch mảnh → thẳng hàng, không chừa trống.
+            Điện thoại: tên nhóm nằm trên, liên kết xuống dưới. */}
+        <div className="divide-y divide-slate-100 overflow-hidden rounded-lg border border-slate-200 bg-white">
           {PORTALS.map((g) => (
-            <div key={g.nhom} className="bg-white border border-slate-200 rounded-2xl p-4">
-              <p className="font-bold text-[#0A2540] text-sm mb-2.5">{g.nhom}</p>
-              <div className="flex flex-wrap gap-2">
+            <div key={g.nhom} className="flex flex-col gap-1.5 px-4 py-3 sm:flex-row sm:items-baseline sm:gap-6 sm:px-5 sm:py-3.5">
+              <p className="shrink-0 text-[13px] font-bold text-[#0A2540] sm:w-48">{g.nhom}</p>
+              <div className="flex min-w-0 flex-wrap gap-x-5 gap-y-1.5">
                 {g.items.map(([name, url]) => (
-                  <a key={url} href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[13px] text-[#0A2540] bg-slate-50 hover:bg-[#C8A14B]/15 border border-slate-200 hover:border-[#C8A14B] rounded-lg px-2.5 py-1.5 transition">{name} ↗</a>
+                  <a key={url} href={url} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-1 text-[14px] text-slate-600 transition hover:text-red-600">
+                    {name}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3 text-slate-300 transition group-hover:text-red-600" aria-hidden><path d="M7 17 17 7M9 7h8v8" /></svg>
+                  </a>
                 ))}
               </div>
             </div>

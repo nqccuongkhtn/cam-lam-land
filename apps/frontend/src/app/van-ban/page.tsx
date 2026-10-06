@@ -4,7 +4,7 @@ import ShareRow from '@/components/ShareRow';
 import LegalConsultCTA from '@/components/LegalConsultCTA';
 import VanBanBrowser from './VanBanBrowser';
 import ServicesSection from '@/components/ServicesSection';
-import { PORTALS } from './data';
+import CongTtdt from './CongTtdt';
 
 export const metadata: Metadata = {
   title: 'Tra cứu văn bản pháp luật nhà đất Cam Lâm, Khánh Hòa',
@@ -36,26 +36,8 @@ export default function VanBanPage() {
       <section className="mt-8 sm:mt-10">
         <h2 className="text-lg sm:text-xl font-extrabold text-[#0A2540]">Cổng thông tin điện tử Khánh Hòa</h2>
         <p className="text-sm text-slate-500 mt-1 mb-3 sm:mb-4">Tra cứu văn bản, quy hoạch, dự án và thủ tục trực tiếp tại các cổng chính thống của tỉnh, sở ngành và xã/phường.</p>
-        {/* MẪU 34 chủ dự án chọn (6/10/2026, sau 2 lượt chê "lộn xộn" + xem 50 mẫu): MỘT khung trắng, 4 CỘT theo nhóm,
-            mỗi liên kết có ô vuông biểu tượng toà nhà nhỏ phía trước → liên kết xếp dọc thẳng hàng, không còn dòng lẻ.
-            Điện thoại: các nhóm xếp chồng, liên kết trong nhóm chia 2 cột. */}
-        <div className="grid gap-4 rounded-lg border border-slate-200 bg-white p-3.5 sm:p-5 lg:grid-cols-4 lg:gap-6">
-          {PORTALS.map((g) => (
-            <div key={g.nhom} className="min-w-0">
-              <p className="mb-2 text-[13.5px] font-bold text-[#0A2540] lg:mb-3">{g.nhom}</p>
-              <div className="grid grid-cols-2 gap-x-2.5 gap-y-2 lg:grid-cols-1">
-                {g.items.map(([name, url]) => (
-                  <a key={url} href={url} target="_blank" rel="noreferrer" className="group flex min-w-0 items-center gap-2 text-[13px] text-slate-700 transition hover:text-red-600 sm:text-sm">
-                    <span className="grid h-[22px] w-[22px] shrink-0 place-items-center rounded-md bg-slate-100 transition group-hover:bg-red-50 sm:h-[26px] sm:w-[26px]">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3 text-slate-500 group-hover:text-red-600 sm:h-3.5 sm:w-3.5" aria-hidden><path d="M3 21h18M5 21V10m14 11V10M3 10l9-6 9 6M9 21v-6h6v6" /></svg>
-                    </span>
-                    <span className="min-w-0 leading-snug">{name}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* MẪU 34 chủ dự án chọn (6/10/2026): ô tìm nhanh + lưới tất cả cổng, gõ là lọc — xem CongTtdt.tsx */}
+        <CongTtdt />
       </section>
 
       <ServicesSection className="mt-6 sm:mt-8" />

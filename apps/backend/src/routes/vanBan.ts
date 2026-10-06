@@ -299,6 +299,15 @@ function parseCamhomes(html: string) {
   }
   return out;
 }
+/** Link có trả về FILE PDF thật không (chỉ đọc 4 byte đầu). */
+async function laPdf(u: string): Promise<boolean> {
+  try {
+    const r = await fetch(u, { headers: { ...UA, Range: 'bytes=0-3' }, signal: AbortSignal.timeout(12000) });
+    if (!r.ok) return false;
+    if (/pdf/i.test(r.headers.get('content-type') || '')) return true;
+    return Buffer.from(await r.arrayBuffer()).subarray(0, 4).toString() === '%PDF';
+  } catch { return false; }
+}
 let lastCamhomes = 0;
 /** deep = duyệt hết các trang (lúc khởi động / bấm Cập nhật); thường = 3 trang mới nhất. */
 export async function crawlCamhomes(deep = false, onAdd?: (isNew: boolean) => void): Promise<number> {
@@ -320,12 +329,17 @@ export async function crawlCamhomes(deep = false, onAdd?: (isNew: boolean) => vo
       seen.add(x.id);
       if (!x.ngay || x.trichYeu.length < 8) continue;
       const so = x.so || `Không số (${x.id})`;
-      const link = `${CAMHOMES}/index.php?language=vi&nv=van-ban&op=detail/${x.slug}&download=1&id=0`;
+      const taiVe = `${CAMHOMES}/index.php?language=vi&nv=van-ban&op=detail/${x.slug}&download=1&id=0`;
+      // Một số văn bản camhomes CHỈ cho thành viên của họ tải: link trả về trang ĐĂNG NHẬP camhomes thay vì PDF
+      // (chủ dự án bấm tải bị đưa sang trang đăng nhập của họ, 6/10/2026). Thử trước — không phải PDF thì KHÔNG ghi link
+      // → web hiện "—", không bao giờ dẫn khách sang trang đăng nhập web khác.
+      const link = await laPdf(taiVe) ? taiVe : null;
       await query(
         `INSERT INTO van_ban (so_hieu, trich_yeu, ngay_ban_hanh, co_quan, chu_de, linh_vuc, nguon, link_goc)
          VALUES ($1,$2,$3,$4,$5,'Đất đai','camhomes.vn',$6)
          ON CONFLICT (so_hieu, ngay_ban_hanh) DO UPDATE SET
-           link_goc = COALESCE(NULLIF(van_ban.link_goc, ''), EXCLUDED.link_goc)
+           link_goc = CASE WHEN COALESCE(van_ban.link_goc, '') = '' OR van_ban.link_goc LIKE 'https://camhomes.vn/%'
+                           THEN EXCLUDED.link_goc ELSE van_ban.link_goc END
          RETURNING (xmax = 0) AS inserted`,
         [so, x.trichYeu, x.ngay, x.coQuan, classify(x.trichYeu), link])
         .then((rs: any) => { n++; onAdd?.(!!(rs && rs[0] && rs[0].inserted)); }).catch(() => {});
@@ -489,6 +503,7 @@ vanBanRouter.get('/:id/pdf', authRequired, async (req, res) => {
         return res.send(buf);
       }
     }
+    if (/^https:\/\/camhomes\.vn\//.test(row.link_goc || '')) return res.json({ redirect: null }); // camhomes khoá đăng nhập → không mở trang của họ
     return res.json({ redirect: row.link_goc || null }); // không lấy được PDF → mở trang nguồn
   } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi tải' }); }
 });

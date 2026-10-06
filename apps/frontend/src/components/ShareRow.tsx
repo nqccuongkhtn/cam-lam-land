@@ -1,12 +1,13 @@
 'use client';
 import { useState } from 'react';
+import { SITE as SITE_GOC } from '@/lib/tenMien';
 
 /** Nút chia sẻ (Facebook · Zalo · Chép link). GIAO DIỆN icon như cũ, nhưng:
  *  bấm Facebook/Zalo → nếu máy hỗ trợ sẽ mở BẢNG CHIA SẺ NATIVE (giống iPhone) cho đẹp;
  *  máy không hỗ trợ (thường là desktop) mới mở popup riêng của Facebook/Zalo. */
 export default function ShareRow({ title, className }: { title?: string; className?: string }) {
   const [copied, setCopied] = useState(false);
-  const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns.org';
+  const SITE = SITE_GOC;
   const url = () => { if (typeof window === 'undefined') return SITE; try { const u = new URL(window.location.href); u.searchParams.delete('embed'); return SITE + u.pathname + u.search + u.hash; } catch { return SITE; } };
   const enc = () => encodeURIComponent(url());
   const b64 = (s: string) => { try { return btoa(unescape(encodeURIComponent(s))); } catch { return btoa(s); } };

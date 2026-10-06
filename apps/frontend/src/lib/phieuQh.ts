@@ -9,7 +9,7 @@ const SITE = {
   hotline: '0988 888 888',
   email: 'lienhe@camlamland.vn',
   diaChi: 'Cam Lâm, Khánh Hòa',
-  domain: 'batdongsancamlam.dpdns.org',
+  domain: 'batdongsancamlam.vn',
 };
 
 type Overlap = { type: string; areaM2: number; hz?: string | null };

@@ -4,7 +4,8 @@ import SiteFooter from '@/components/SiteFooter';
 import SideAds from '@/components/SideAds';
 
 import { ldJson } from '@/lib/jsonld';
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns.org';
+import { SITE } from '@/lib/tenMien';
+
 const BACKEND = process.env.BACKEND_HOST ? (process.env.BACKEND_HOST.startsWith('http') ? process.env.BACKEND_HOST : `https://${process.env.BACKEND_HOST}`) : '';
 
 async function getListing(id: string): Promise<any | null> {

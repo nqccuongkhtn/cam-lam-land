@@ -4,7 +4,8 @@ import SiteFooter from '@/components/SiteFooter';
 import { AREAS, TYPES } from '@/lib/seoLanding';
 
 import { ldJson } from '@/lib/jsonld';
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns.org';
+import { SITE } from '@/lib/tenMien';
+
 
 export const metadata: Metadata = {
   title: 'Nhà đất Cam Lâm, Khánh Hòa — Mua bán & cho thuê theo khu vực, loại hình',

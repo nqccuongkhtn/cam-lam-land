@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import NewsReaderClient from './NewsReaderClient';
 
 import { ldJson } from '@/lib/jsonld';
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns.org';
+import { SITE } from '@/lib/tenMien';
+
 
 async function getArticle(slug: string): Promise<any | null> {
   try {

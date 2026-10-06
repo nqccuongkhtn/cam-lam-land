@@ -456,7 +456,7 @@ export async function layPdfDrive(link: string): Promise<Buffer | null> {
 // ── DẤU BẢN QUYỀN + NÉN + LƯU FILE VĂN BẢN (chủ dự án 6/10/2026) ──
 // 1) DẤU BẢN QUYỀN: file tải về bị chia sẻ đi đâu cũng thành quảng cáo cho web → mỗi trang thêm
 //    · chữ "CAM LÂM LAND" chéo giữa trang, rất mờ (không che nội dung văn bản);
-//    · một dòng nhỏ ở mép dưới: "Tải miễn phí tại batdongsancamlam.dpdns.org — Cam Lâm Land · …".
+//    · một dòng nhỏ ở mép dưới: "Tải miễn phí tại batdongsancamlam.vn — Cam Lâm Land · …".
 //    Phông DejaVu (có sẵn trong máy chủ, đủ dấu tiếng Việt). Gắn TRƯỚC khi nén để Ghostscript cắt gọn phông.
 // 2) NÉN SÂU — đã đo trên 12 file thật (31,3 MB → 4,3 MB, nhẹ 86%):
 //    · thủ phạm chính KHÔNG phải ảnh mà là PHÔNG CHỮ nhúng nguyên bộ (Times New Roman vài MB/file) → cắt gọn chỉ giữ chữ dùng;
@@ -464,7 +464,7 @@ export async function layPdfDrive(link: string): Promise<Buffer | null> {
 //    · qpdf gom các mảnh nhỏ thành luồng nén chung, nén lại mức cao nhất.
 //    Ép JPEG mạnh hơn chỉ bớt thêm ~1% mà làm dấu đỏ nhoè → không dùng.
 // Kho CHỈ giữ bản đã xử lý (vb-<phiên bản>-<mã>.pdf); đổi cách xử lý thì tăng PHIEN_BAN_FILE để làm lại.
-const PHIEN_BAN_FILE = 'v6';   // v6 (6/10/2026): chữ chéo nhỏ lại; v4: chữ chéo 2 dòng (thêm link + SĐT) vẽ bằng xoay hệ toạ độ — không đè nhau; gắn cho MỌI văn bản
+const PHIEN_BAN_FILE = 'v7';   // v7 (6/10/2026): dấu bản quyền ghi tên miền mới batdongsancamlam.vn; v6: chữ chéo nhỏ lại; v4: chữ chéo 2 dòng (thêm link + SĐT) vẽ bằng xoay hệ toạ độ — không đè nhau; gắn cho MỌI văn bản
 const PHONG_DAU = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
 async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
   try {
@@ -473,8 +473,8 @@ async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
     const doc = await PDFDocument.load(buf, { ignoreEncryption: true, updateMetadata: false });
     doc.registerFontkit(fontkit);
     const font = await doc.embedFont(await readFile(PHONG_DAU), { subset: true });
-    const chan = 'Tải miễn phí tại batdongsancamlam.dpdns.org · Hotline/Zalo 0988 888 888 — Cam Lâm Land · Nhà đất & bản đồ quy hoạch Cam Lâm';
-    const chu1 = 'CAM LÂM LAND', chu2 = 'batdongsancamlam.dpdns.org  ·  0988 888 888';
+    const chan = 'Tải miễn phí tại batdongsancamlam.vn · Hotline/Zalo 0988 888 888 — Cam Lâm Land · Nhà đất & bản đồ quy hoạch Cam Lâm';
+    const chu1 = 'CAM LÂM LAND', chu2 = 'batdongsancamlam.vn  ·  0988 888 888';
     for (const page of doc.getPages()) {
       const { width: W, height: H } = page.getSize();
       const xoay = ((page.getRotation()?.angle || 0) % 360 + 360) % 360;
@@ -499,7 +499,7 @@ async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
       page.drawText(chan, { x: (w - font.widthOfTextAtSize(chan, co)) / 2, y: 6, size: co, font, color: rgb(0.04, 0.15, 0.25), opacity: 0.7 });
       page.pushOperators(popGraphicsState());
     }
-    doc.setProducer('Cam Lâm Land — batdongsancamlam.dpdns.org');
+    doc.setProducer('Cam Lâm Land — batdongsancamlam.vn');
     return Buffer.from(await doc.save({ useObjectStreams: true }));
   } catch (e: any) { console.error('[van-ban] gắn dấu bản quyền lỗi:', e?.message || e); return buf; }
 }

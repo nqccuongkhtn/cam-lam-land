@@ -208,7 +208,7 @@ export default function HopDongDatCoc() {
           <div style={{ fontSize: '23px', fontWeight: 800, color: '#0A2540', letterSpacing: '0.5px' }}>{salesN || 'HỌ VÀ TÊN CỦA BẠN'}</div>
           <div style={{ fontSize: '11.5px', letterSpacing: '1.5px', color: '#9c7a2f', fontFamily: 'Arial, sans-serif', textTransform: 'uppercase', marginTop: '1mm' }}>{(f.salesTitle || '').trim() || 'Chuyên viên Tư vấn Bất động sản'}</div>
           {(f.salesSlogan || '').trim() && <div style={{ fontSize: '11.5px', fontStyle: 'italic', color: '#c0161d', marginTop: '0.8mm' }}>“{f.salesSlogan}”</div>}
-          <div style={{ fontSize: '12px', color: '#3a2d12', marginTop: '1.5mm', fontFamily: 'Arial, sans-serif' }}>📞 {salesP || HOTLINE} · batdongsancamlam.dpdns.org</div>
+          <div style={{ fontSize: '12px', color: '#3a2d12', marginTop: '1.5mm', fontFamily: 'Arial, sans-serif' }}>📞 {salesP || HOTLINE} · batdongsancamlam.vn</div>
         </div>
       </div>
     </div>
@@ -227,7 +227,7 @@ export default function HopDongDatCoc() {
         <div style={{ flex: 1 }} />
         <div style={{ borderTop: '1px solid #C8A14B', paddingTop: '4mm', width: '112mm', fontSize: '12px', color: '#3a2d12', fontFamily: 'Arial, sans-serif' }}>
           <div><b style={{ color: '#0A2540' }}>{salesN || 'Chuyên viên tư vấn'}</b>{salesP ? ` · 📞 ${salesP}` : ''}</div>
-          <div style={{ marginTop: '1mm', color: '#6a5220' }}>Hotline {HOTLINE} · Zalo {HOTLINE} · batdongsancamlam.dpdns.org</div>
+          <div style={{ marginTop: '1mm', color: '#6a5220' }}>Hotline {HOTLINE} · Zalo {HOTLINE} · batdongsancamlam.vn</div>
         </div>
       </div>
     </div>
@@ -366,7 +366,7 @@ export default function HopDongDatCoc() {
                 <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '11px', color: '#555' }}>Sàn Bất động sản &amp; Bản đồ quy hoạch Cam Lâm, Khánh Hòa · Hotline {HOTLINE}</div>
                 <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '9.5px', fontStyle: 'italic', color: '#9a7b3a' }}>Nội dung do bên mua và bên bán chủ động thỏa thuận, thực hiện</div>
               </div>
-              <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '10px', color: '#888', textAlign: 'right' }}>Mã HĐ: ĐC-{d[0] || '____'}-______<br />batdongsancamlam.dpdns.org</div>
+              <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '10px', color: '#888', textAlign: 'right' }}>Mã HĐ: ĐC-{d[0] || '____'}-______<br />batdongsancamlam.vn</div>
             </div>
 
             <div style={{ textAlign: 'center', marginTop: '10px' }}>
@@ -455,7 +455,7 @@ export default function HopDongDatCoc() {
             </tr></tbody></table>
 
             <div style={{ marginTop: '10px', borderTop: '1px dashed #999', paddingTop: '6px', fontFamily: 'Arial, sans-serif', fontSize: '10px', color: '#888', textAlign: 'center' }}>
-              <b style={{ color: '#0A2540' }}>Cam Lâm Land</b> · {HOTLINE} · batdongsancamlam.dpdns.org — <i>Khuyến nghị công chứng khi giao dịch.</i>
+              <b style={{ color: '#0A2540' }}>Cam Lâm Land</b> · {HOTLINE} · batdongsancamlam.vn — <i>Khuyến nghị công chứng khi giao dịch.</i>
             </div>
           </div>
         </div>

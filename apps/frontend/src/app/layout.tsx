@@ -12,7 +12,8 @@ import InstallPrompt from '@/components/InstallPrompt';
 import DeferredWidgets from '@/components/DeferredWidgets';
 
 import { ldJson } from '@/lib/jsonld';
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns.org';
+import { SITE } from '@/lib/tenMien';
+
 const JSONLD = {
   '@context': 'https://schema.org',
   '@graph': [

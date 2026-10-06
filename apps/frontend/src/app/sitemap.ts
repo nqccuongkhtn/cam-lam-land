@@ -1,8 +1,9 @@
 import type { MetadataRoute } from 'next';
 import { ALL_SLUGS } from '@/lib/seoLanding';
 import { GUIDES } from '@/app/cam-nang/guides';
+import { SITE } from '@/lib/tenMien';
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns.org';
+
 const BACKEND = process.env.BACKEND_HOST ? (process.env.BACKEND_HOST.startsWith('http') ? process.env.BACKEND_HOST : `https://${process.env.BACKEND_HOST}`) : '';
 
 export const revalidate = 3600; // làm mới sitemap mỗi giờ

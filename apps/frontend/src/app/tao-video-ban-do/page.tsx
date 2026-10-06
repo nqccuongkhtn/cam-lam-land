@@ -11624,7 +11624,7 @@ function paintTextFx(ctx: CanvasRenderingContext2D, text: string, x: number, y: 
 // thẻ hợp tông với từng video — cảnh sáng dùng thẻ đặc, cảnh tối dùng thẻ viền, cảnh cần kín đáo
 // thì dùng dấu chìm. Kiểu "Viên thuốc" là kiểu đang dùng, giữ nguyên làm mặc định.
 const LOGO_TEXT = 'CAM LÂM LAND';
-const LOGO_SUB = 'batdongsancamlam.dpdns.org';
+const LOGO_SUB = 'batdongsancamlam.vn';
 const LOGO_STYLES: { key: string; name: string; note: string }[] = [
   { key: 'vienthuoc', name: 'Viên thuốc', note: 'Nền tối bo tròn, chấm vàng — hợp mọi cảnh' },
   { key: 'vangdac', name: 'Vàng đặc', note: 'Nền vàng chữ xanh đêm — nổi nhất trên cảnh sáng' },

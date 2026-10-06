@@ -9,7 +9,8 @@ import { formatVnd, type Listing } from '@/lib/types';
 import bangGia from '@/data/camlamBangGia.json';
 
 import { ldJson } from '@/lib/jsonld';
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://batdongsancamlam.dpdns.org';
+import { SITE } from '@/lib/tenMien';
+
 const BACKEND = process.env.BACKEND_HOST ? (process.env.BACKEND_HOST.startsWith('http') ? process.env.BACKEND_HOST : `https://${process.env.BACKEND_HOST}`) : '';
 
 export const revalidate = 600;          // ISR: làm mới mỗi 10 phút

@@ -5,13 +5,15 @@ import { fromHex } from './parts';
 
 const TOOLS = [{ k: 'edit', label: 'Sửa chữ', icon: '✍️' }, { k: 'select', label: 'Chọn', icon: '🖱️' }, { k: 'text', label: 'Thêm chữ', icon: '🔤' }, { k: 'image', label: 'Ảnh', icon: '🖼️' }, { k: 'sign', label: 'Ký', icon: '🖊️' }, { k: 'white', label: 'Bôi trắng', icon: '⬜' }, { k: 'draw', label: 'Vẽ', icon: '✏️' }, { k: 'rect', label: 'Khung', icon: '▭' }, { k: 'highlight', label: 'Highlight', icon: '🖍️' }];
 
-export function Toolbar({ tool, setTool, selText, updateSel, color, setColor, fontSize, setFontSize, zoom, setZoom, sel, deleteSel, hasPages, onOpenPdf, onMergePdf, onTools, onSign, onImageTool, onExport, embedded }: any) {
+export function Toolbar({ tool, setTool, selText, updateSel, color, setColor, fontSize, setFontSize, zoom, setZoom, sel, deleteSel, hasPages, onOpenPdf, onMergePdf, onTools, onSign, onImageTool, onExport, embedded, onCloseFile }: any) {
   return (
     <div className="flex flex-wrap items-center gap-1.5 border-b bg-white px-3 py-2 shadow-sm">
       {!embedded && <button onClick={() => { window.location.href = '/'; }} title="Thoát" className="mr-1 rounded px-2 py-1.5 text-sm hover:bg-slate-100">✕</button>}
       <button onClick={onTools} title="Về danh sách công cụ" className="mr-1 rounded px-2 py-1.5 text-sm hover:bg-slate-100">←</button>
       <b className="mr-2 text-[#0A2540]">📄 PDF Editor</b>
-      <button onClick={onOpenPdf} className="rounded bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-700">Mở PDF</button>
+      <button onClick={onOpenPdf} className="rounded bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-700">{hasPages ? 'Mở PDF khác' : 'Mở PDF'}</button>
+      {/* ĐÓNG FILE đang sửa để mở file khác (chủ dự án 6/10/2026: "tắt văn bản này để mở văn bản khác… chưa thấy nút") */}
+      {hasPages && <button onClick={onCloseFile} title="Đóng file đang mở" className="rounded border border-slate-300 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">✕ Đóng file</button>}
       <button onClick={onMergePdf} disabled={!hasPages} className="rounded border px-3 py-1.5 text-sm disabled:opacity-40">Ghép PDF</button>
       <button onClick={onTools} className="rounded border px-3 py-1.5 text-sm hover:bg-slate-50">🧰 Công cụ</button>
       <span className="mx-1 h-6 w-px bg-slate-200" />

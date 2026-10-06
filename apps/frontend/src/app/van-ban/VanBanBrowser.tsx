@@ -228,7 +228,7 @@ export default function VanBanBrowser() {
               {vis.map((d, i) => (
                 <tr key={d.id} className="border-t border-slate-100 even:bg-slate-50/60 hover:bg-amber-50/50 transition-colors">
                   <td className={`${td} text-center text-slate-400 hidden sm:table-cell`}>{(cur - 1) * PER + i + 1}</td>
-                  <td className={td}><span className="font-mono font-semibold text-[#0A2540] whitespace-nowrap">{d.soKyHieu}</span></td>
+                  <td className={td}><span className="font-mono font-semibold text-[#0A2540] whitespace-nowrap" title={/^Không số/.test(d.soKyHieu || '') ? 'Văn bản không ghi số ký hiệu (danh sách, thông báo niêm yết…)' : undefined}>{(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')}</span></td>
                   <td className={`${td} text-center text-slate-500 hidden md:table-cell whitespace-nowrap`}>{d.luotTai != null ? d.luotTai.toLocaleString('vi-VN') : '—'}</td>
                   <td className={`${td} text-slate-500 whitespace-nowrap hidden sm:table-cell`}>{fmtNgay(d.ngay)}</td>
                   <td className={`${td} text-slate-500 hidden lg:table-cell`}>{d.coQuan}</td>

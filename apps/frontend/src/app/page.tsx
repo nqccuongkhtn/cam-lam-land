@@ -625,10 +625,6 @@ export default function Home() {
       {/* DỰ ÁN BĐS NỔI BẬT — admin quản lý (kiểu batdongsan) */}
       <FeaturedProjects chiHien={locDuAn} boLoc={() => { setLocDuAn(null); setLoaiDA([]); setTtDA(''); }} />
 
-
-      {/* PROMO BANNER — quảng cáo (kiểu batdongsan) */}
-      <PromoBanner />
-
       {/* BĐS THEO ĐỊA ĐIỂM — ô lớn + lưới + số tin (kiểu batdongsan) */}
       <section className="mx-auto max-w-7xl px-3 sm:px-4 py-5 sm:py-8">
         <h2 className="text-xl md:text-2xl font-extrabold text-[#0A2540] mb-4 sm:mb-6">Bất động sản theo địa điểm</h2>
@@ -637,6 +633,10 @@ export default function Home() {
           {gridAreas.map((a) => <AreaCard key={a.ward} a={a} />)}
         </div>
       </section>
+
+      {/* PROMO BANNER — quảng cáo (kiểu batdongsan). Chủ dự án dời xuống SAU mục "theo địa điểm", trước "Hỗ trợ tiện ích"
+          (6/10/2026) — trước đó nằm giữa "Dự án nổi bật" và "theo địa điểm", chen giữa hai mục nhà đất. */}
+      <PromoBanner />
 
       {/* HỖ TRỢ TIỆN ÍCH */}
       <HomeUtilities />

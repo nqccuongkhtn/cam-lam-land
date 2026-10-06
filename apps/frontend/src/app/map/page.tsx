@@ -1822,6 +1822,9 @@ export default function MapPage() {
       .then((d) => setChuGiai(d?.nhom || []))
       .catch(() => setChuGiai([]));
   };
+  // Tải SẴN chú giải ~1,5 giây sau khi mở trang (file chỉ ~12 KB) → bấm "Chú giải" là hiện ngay,
+  // không phải chờ tải lúc bấm (chủ dự án thấy "tải hơi lâu", 6/10/2026).
+  useEffect(() => { const t = setTimeout(napChuGiai, 1500); return () => clearTimeout(t); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   // Ruột bảng chú giải — dùng chung cho bảng bên trái (máy tính) và nhóm trên thanh (điện thoại).
   const chuGiaiNoiDung = () => (
     <div className="max-h-72 overflow-y-auto rounded-lg border bg-slate-50/60 p-2">

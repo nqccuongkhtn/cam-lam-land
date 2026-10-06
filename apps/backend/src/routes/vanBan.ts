@@ -3,7 +3,7 @@ import { query } from '../lib/db.ts';
 import { authRequired, vanBanRequired } from '../middleware/auth.ts';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { mkdir, readFile, writeFile, rm } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, rm, readdir } from 'node:fs/promises';
 
 export const vanBanRouter = Router();
 const UA = { 'User-Agent': 'Mozilla/5.0 (compatible; CamLamLand/1.0)' };
@@ -418,14 +418,18 @@ const KHO_DRIVE = process.env.VAN_BAN_KHO || '/app/.kho-van-ban';
 // Nên sau mỗi lượt lấy văn bản, máy tự tải sẵn MỌI văn bản Drive chưa có trong kho, từng cái một (nhẹ cho mạng nhà).
 let dangTaiSan = false;
 export async function taiSanFile(): Promise<number> {
-  if (dangTaiSan) return 0; dangTaiSan = true; let n = 0;
+  if (dangTaiSan) return 0; dangTaiSan = true; let n = 0, loi = 0;
   try {
-    const ds = await query<any>(`SELECT id, link_goc FROM van_ban WHERE link_goc LIKE '%drive.google.com%' ORDER BY ngay_ban_hanh DESC`);
+    // Dọn bản của phiên xử lý cũ (đổi PHIEN_BAN_FILE) cho đỡ tốn ổ
+    try { for (const f of await readdir(KHO_DRIVE)) if (/^vb-/.test(f) && !f.startsWith(`vb-${PHIEN_BAN_FILE}-`)) await rm(`${KHO_DRIVE}/${f}`, { force: true }); } catch { /* chưa có kho */ }
+    // MỌI văn bản có file thật (Drive, cổng TTĐT, Công báo, camhomes…) — mới trước, từng cái một cho nhẹ mạng nhà
+    const ds = (await query<any>(`SELECT id, link_goc FROM van_ban WHERE coalesce(link_goc,'') <> '' ORDER BY ngay_ban_hanh DESC NULLS LAST`)).filter((d) => coFileThat(d.link_goc));
     for (const d of ds) {
       try { await readFile(`${KHO_DRIVE}/vb-${PHIEN_BAN_FILE}-${d.id}.pdf`); continue; } catch { /* chưa có */ }
-      if (await layFileVb(d.id, d.link_goc)) n++;
+      if (await layFileVb(d.id, d.link_goc)) n++; else loi++;
+      await new Promise((z) => setTimeout(z, 300));
     }
-    console.log(`[van-ban] tải sẵn + nén file Drive: thêm ${n} file`);
+    console.log(`[van-ban] tải sẵn + gắn dấu + nén: thêm ${n} file, ${loi} văn bản chưa lấy được file`);
   } catch (e: any) { console.error('[van-ban] tải sẵn lỗi:', e?.message || e); } finally { dangTaiSan = false; }
   return n;
 }
@@ -460,7 +464,7 @@ export async function layPdfDrive(link: string): Promise<Buffer | null> {
 //    · qpdf gom các mảnh nhỏ thành luồng nén chung, nén lại mức cao nhất.
 //    Ép JPEG mạnh hơn chỉ bớt thêm ~1% mà làm dấu đỏ nhoè → không dùng.
 // Kho CHỈ giữ bản đã xử lý (vb-<phiên bản>-<mã>.pdf); đổi cách xử lý thì tăng PHIEN_BAN_FILE để làm lại.
-const PHIEN_BAN_FILE = 'v1';
+const PHIEN_BAN_FILE = 'v2';   // v2 (6/10/2026): chữ chéo thêm link + SĐT, gắn cho MỌI văn bản
 const PHONG_DAU = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
 async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
   try {
@@ -477,15 +481,28 @@ async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
       const w = ngang ? H : W, h = ngang ? W : H;
       // đổi toạ độ "theo mắt người đọc" (x, y, góc) sang toạ độ thật của trang
       const doi = (x: number, y: number) => xoay === 90 ? { x: W - y, y: x } : xoay === 180 ? { x: W - x, y: H - y } : xoay === 270 ? { x: y, y: H - x } : { x, y };
-      // chữ chéo giữa trang
-      const to = Math.min(w, h) * 0.11, chu = 'CAM LÂM LAND', dai = font.widthOfTextAtSize(chu, to), goc = Math.atan2(h, w);
-      const cx = w / 2 - Math.cos(goc) * dai / 2 + Math.sin(goc) * to * 0.35, cy = h / 2 - Math.sin(goc) * dai / 2 - Math.cos(goc) * to * 0.35;
-      const p1 = doi(cx, cy);
-      page.drawText(chu, { x: p1.x, y: p1.y, size: to, font, color: rgb(0.78, 0.63, 0.29), opacity: 0.10, rotate: degrees(goc * 180 / Math.PI + xoay) });
-      // dòng chân trang
-      let co = 7; while (co > 4.5 && font.widthOfTextAtSize(chan, co) > w - 24) co -= 0.5;
+      // CHỮ CHÉO GIỮA TRANG — 2 dòng: "CAM LÂM LAND" + link web & số điện thoại (chủ dự án 6/10/2026: chân trang dễ bị
+      // xén mất "thì công cốc" → link + SĐT phải nằm cả ở giữa trang). Đậm hơn bản đầu (0,10 → 0,15) cho dễ thấy mà chữ văn bản vẫn đọc rõ.
+      const goc = Math.atan2(h, w), cosg = Math.cos(goc), sing = Math.sin(goc);
+      const dongCheo = (chu: string, co: number, lech: number, mau: any, mo: number) => {
+        // lech: dời vuông góc với đường chéo (dương = lên trên) để xếp 2 dòng
+        const dai = font.widthOfTextAtSize(chu, co);
+        const cx = w / 2 - cosg * dai / 2 + sing * (co * 0.35 - lech), cy = h / 2 - sing * dai / 2 - cosg * (co * 0.35 - lech);
+        const p1 = doi(cx, cy);
+        page.drawText(chu, { x: p1.x, y: p1.y, size: co, font, color: mau, opacity: mo, rotate: degrees(goc * 180 / Math.PI + xoay) });
+      };
+      const cheo = Math.hypot(w, h);
+      let to = Math.min(w, h) * 0.11; const chu1 = 'CAM LÂM LAND';
+      while (font.widthOfTextAtSize(chu1, to) > cheo * 0.62) to *= 0.92;
+      const chu2 = 'batdongsancamlam.dpdns.org  ·  0988 888 888';
+      let nho = to * 0.36; while (font.widthOfTextAtSize(chu2, nho) > cheo * 0.62) nho *= 0.92;
+      dongCheo(chu1, to, to * 0.32, rgb(0.78, 0.6, 0.22), 0.15);
+      dongCheo(chu2, nho, -to * 0.42, rgb(0.04, 0.15, 0.25), 0.2);
+      // dòng chân trang (giữ như cũ, thêm số điện thoại)
+      const chan = 'Tải miễn phí tại batdongsancamlam.dpdns.org · Hotline/Zalo 0988 888 888 — Cam Lâm Land · Nhà đất & bản đồ quy hoạch Cam Lâm';
+      let co = 7.5; while (co > 4.5 && font.widthOfTextAtSize(chan, co) > w - 24) co -= 0.5;
       const p2 = doi((w - font.widthOfTextAtSize(chan, co)) / 2, 6);
-      page.drawText(chan, { x: p2.x, y: p2.y, size: co, font, color: rgb(0.04, 0.15, 0.25), opacity: 0.55, rotate: degrees(xoay) });
+      page.drawText(chan, { x: p2.x, y: p2.y, size: co, font, color: rgb(0.04, 0.15, 0.25), opacity: 0.7, rotate: degrees(xoay) });
     }
     doc.setProducer('Cam Lâm Land — batdongsancamlam.dpdns.org');
     return Buffer.from(await doc.save({ useObjectStreams: true }));

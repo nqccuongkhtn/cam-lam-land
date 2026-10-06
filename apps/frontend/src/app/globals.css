@@ -324,7 +324,9 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 .maplibregl-ctrl-top-right { margin-top: var(--nut-can-cu); }
 /* Bản đồ trang tin đăng KHÔNG có nút "?" → máy tính khỏi chừa chỗ, cụm nút sát mép trên (chủ dự án 30/9/2026
    thấy "còn hở"). Cột nút đổi nền + vạch độ mờ tự đo lại nên đi theo. Điện thoại giữ như cũ. */
-@media (min-width: 768px) { .cl-ban-do-khong-nut-hoi .maplibregl-ctrl-top-right { margin-top: 0; } }
+/* Bản đồ KHÔNG có nút "?" (trang Nhà đất) → không chừa chỗ ở MỌI cỡ màn hình. Trước chỉ bỏ từ 768px nên điện thoại
+   còn hở 38px phía trên cụm nút +/− (chủ dự án báo nhiều lần, sửa dứt điểm 6/10/2026). Cột nút đổi nền tự đo lại nên đi theo. */
+.cl-ban-do-khong-nut-hoi .maplibregl-ctrl-top-right { margin-top: 0; }
 
 /* Quảng cáo động — chuyển động mượt (kiểu Znews) */
 @keyframes clKen { from { transform: scale(1.02); } to { transform: scale(1.09); } }

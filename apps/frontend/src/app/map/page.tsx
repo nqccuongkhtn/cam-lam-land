@@ -1874,9 +1874,23 @@ export default function MapPage() {
   // Mở công cụ khác (Vẽ, Chú giải, Đã lưu, ô tìm) thì TẮT thước đo đang mở (chủ dự án 6/10/2026). Riêng chip Lớp vẫn giữ phép đo
   // (quy định 17/9/2026: đo xong đổi lớp quy hoạch để so, không bắt đo lại).
   const tatDo = () => { if (measure !== 'off') { setMeasure('off'); setMResult(null); } if (tool === 'measure') setTool('none'); };
-  const chip = (nhan: string, on: boolean, bam: () => void) => (
+  // Biểu tượng chip — CÙNG MỘT KIỂU nét mảnh đơn sắc (trước lẫn emoji màu ⭐📏 với ký tự đen ✎◧ → không thống nhất, 6/10/2026)
+  const ICO: Record<string, JSX.Element> = {
+    lop: <><path d="m12 3 9 5-9 5-9-5 9-5z" /><path d="m3 13 9 5 9-5" /></>,
+    do: <><path d="M3 17 17 3l4 4L7 21z" /><path d="m7 13 2 2M10 10l2 2M13 7l2 2" /></>,
+    ve: <><path d="M4 20h4L19 9l-4-4L4 16z" /><path d="m13 7 4 4" /></>,
+    chugiai: <><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M8 9h2M8 13h2M8 17h2M13 9h3M13 13h3M13 17h3" /></>,
+    luu: <path d="M6 3h12v18l-6-4-6 4z" />,
+  };
+  const chip = (ico: string, nhan: string, on: boolean, bam: () => void) => (
     <button type="button" onClick={bam}
-      className={`h-[30px] shrink-0 whitespace-nowrap rounded-full border px-3 text-[12px] font-semibold shadow-[0_4px_12px_-8px_rgba(10,37,64,.5)] transition active:scale-[.97] ${on ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}>{nhan}</button>
+      className={`flex h-[30px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 text-[12px] font-semibold shadow-[0_4px_12px_-8px_rgba(10,37,64,.5)] transition active:scale-[.97] ${on ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5" aria-hidden>{ICO[ico]}</svg>{nhan}</button>
+  );
+  // KHUNG NỔI DÙNG CHUNG cho Lớp · Đã lưu · Đo · Chú giải (máy tính): cùng chỗ, cùng rộng, cùng kiểu đầu khung
+  const KHUNG_NOI = 'absolute top-[96px] z-30 hidden w-[300px] rounded-xl border border-slate-200 bg-white p-3.5 shadow-lg lg:left-1/2 lg:block lg:-translate-x-[230px]';
+  const dauKhung = (ten: string, dong: () => void) => (
+    <div className="mb-2.5 flex items-center justify-between"><h2 className="text-[15px] font-bold text-[#0A2540]">{ten}</h2><button type="button" onClick={dong} aria-label="Đóng" className="text-xl leading-none text-slate-400 hover:text-slate-700">✕</button></div>
   );
   const tabBtn = (key: string, label: string, active: boolean, dot = false) => (
     // MỖI LÚC CHỈ MỘT NHÓM MỞ: bấm nhóm nào là đóng bảng "Lớp Q.Hoạch" + tắt đo của nhóm khác.
@@ -1955,12 +1969,12 @@ export default function MapPage() {
       <div className="flex flex-1 min-h-0 relative">
         {panelOpen && <div className="lg:hidden absolute inset-0 bg-black/30 z-20" onClick={() => setPanelOpen(false)} />}
 
-        <aside className={`${panelOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'} transition-transform duration-200 absolute inset-y-0 left-0 z-30 w-72 max-w-[82%] shrink-0 bg-white border-r border-slate-200 overflow-y-auto scroll-soft p-4 shadow-xl lg:inset-y-auto lg:top-[96px] lg:left-1/2 lg:-translate-x-[230px] lg:max-h-[calc(100%-110px)] lg:w-[290px] lg:rounded-xl lg:border lg:p-3.5 lg:text-[13px]`}>
+        <aside className={`${panelOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'} transition-transform duration-200 absolute inset-y-0 left-0 z-30 w-72 max-w-[82%] shrink-0 bg-white border-r border-slate-200 overflow-y-auto scroll-soft p-4 shadow-xl lg:inset-y-auto lg:top-[96px] lg:left-1/2 lg:-translate-x-[230px] lg:max-h-[calc(100%-110px)] lg:w-[300px] lg:rounded-xl lg:border lg:p-3.5 lg:text-[13px]`}>
           {/* Mẫu 51 (máy tính): chip "Lớp" chỉ hiện phần LỚP, chip "Đã lưu" chỉ hiện phần SẢN PHẨM ĐÃ LƯU — trước đây
               cả hai cùng hiện chung một bảng nên trùng (chủ dự án 6/10/2026). Điện thoại ngăn kéo vẫn đủ cả hai. */}
           <div className={bangMuc === 'luu' ? 'lg:hidden' : ''}>
           <div className="flex items-center justify-between mb-1">
-            <h2 className="font-bold">Lớp Q.Hoạch</h2>
+            <h2 className="font-bold lg:text-[15px] lg:text-[#0A2540]">Lớp Q.Hoạch</h2>
             <button onClick={() => setPanelOpen(false)} aria-label="Đóng" className="text-slate-400 hover:text-slate-700 text-xl leading-none">✕</button>
           </div>
           {/* Máy tính (mẫu 51): bỏ nút "Vẽ thửa từ toạ độ" (trùng chip "Vẽ") + dòng gợi ý cuối bảng — chủ dự án thấy dư, 6/10/2026 */}
@@ -2043,9 +2057,9 @@ export default function MapPage() {
           </div>
           {user && (
             <div className={`mt-3 pt-3 border-t ${bangMuc === 'lop' ? 'lg:hidden' : 'lg:mt-0 lg:pt-0 lg:border-t-0'}`}>
-              {bangMuc === 'luu' && <div className="mb-2 hidden items-center justify-between lg:flex"><h2 className="font-bold">Sản phẩm đã lưu</h2><button onClick={() => setPanelOpen(false)} aria-label="Đóng" className="text-xl leading-none text-slate-400 hover:text-slate-700">✕</button></div>}
+              {bangMuc === 'luu' && <div className="mb-2.5 hidden items-center justify-between lg:flex"><h2 className="text-[15px] font-bold text-[#0A2540]">Sản phẩm đã lưu</h2><button onClick={() => setPanelOpen(false)} aria-label="Đóng" className="text-xl leading-none text-slate-400 hover:text-slate-700">✕</button></div>}
               <div className="flex items-center justify-between mb-1">
-                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">📌 {adminAll ? 'Tất cả đã lưu' : 'Sản phẩm của tôi'} ({places.length})</p>
+                <p className={`text-[11px] font-bold text-slate-400 uppercase tracking-wide ${bangMuc === 'luu' ? 'lg:invisible' : ''}`}>📌 {adminAll ? 'Tất cả đã lưu' : 'Sản phẩm của tôi'} ({places.length})</p>
                 {laAdmin(user) && (
                   <label className="flex items-center gap-1 text-[11px] text-slate-500 cursor-pointer"><input type="checkbox" checked={adminAll} onChange={(e) => setAdminAll(e.target.checked)} className="accent-[#7c3aed]" /> Xem tất cả</label>
                 )}
@@ -2082,11 +2096,11 @@ export default function MapPage() {
             <span className="min-w-0 flex-1 truncate text-slate-500">{(c2 || c1) && searchMode === 'parcel' ? `${dsXaCap.find((x) => x.xaId === c3)?.ten || ''}${c2 ? ' · Thửa ' + c2 : ''}${c1 ? ' · Tờ ' + c1 : ''}` : 'Xã, số thửa, số tờ…'}</span>
           </button>
           <div className="absolute top-[52px] left-2 right-[50px] z-20 hidden gap-1.5 overflow-x-auto lg:flex [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:left-1/2 lg:right-auto lg:-translate-x-1/2 lg:overflow-visible">
-            {chip(`▤ ${tenLopDangBat()} ▾`, true, () => { if (laMayTinh()) { setTimMo(false); if (tool === 'chugiai') setTool('none'); setBangMuc('lop'); setPanelOpen((v) => !(v && bangMuc === 'lop')); } else { setQhSheet(true); setPanelOpen(false); if (measure === 'off') { setTool('none'); setMResult(null); } } })}
-            {chip('📏 Đo', tool === 'measure', () => { const open = tool !== 'measure'; setPanelOpen(false); setTimMo(false); setTool(open ? 'measure' : 'none'); setMeasure(open ? 'distance' : 'off'); setMResult(null); })}
-            {chip('✎ Vẽ', false, () => { setTimMo(false); tatDo(); setPanelOpen(false); if (tool === 'chugiai') setTool('none'); if (laMayTinh()) setDrawOpen(true); else { setPanelOpen(false); setTcTab('goc'); setTool('search'); } })}
-            {chip('◧ Chú giải', tool === 'chugiai', () => { napChuGiai(); setPanelOpen(false); setTimMo(false); if (measure !== 'off') { setMeasure('off'); setMResult(null); } setTool(tool === 'chugiai' ? 'none' : 'chugiai'); })}
-            {user && chip(`⭐ Đã lưu${places.length ? ` (${places.length})` : ''}`, panelOpen && bangMuc === 'luu', () => { setTimMo(false); tatDo(); if (tool === 'chugiai') setTool('none'); setBangMuc('luu'); setPanelOpen((v) => !(v && bangMuc === 'luu')); })}
+            {chip('lop', `${tenLopDangBat()} ▾`, true, () => { if (laMayTinh()) { setTimMo(false); if (tool === 'chugiai') setTool('none'); setBangMuc('lop'); setPanelOpen((v) => !(v && bangMuc === 'lop')); } else { setQhSheet(true); setPanelOpen(false); if (measure === 'off') { setTool('none'); setMResult(null); } } })}
+            {chip('do', 'Đo', tool === 'measure', () => { const open = tool !== 'measure'; setPanelOpen(false); setTimMo(false); setTool(open ? 'measure' : 'none'); setMeasure(open ? 'distance' : 'off'); setMResult(null); })}
+            {chip('ve', 'Vẽ', false, () => { setTimMo(false); tatDo(); setPanelOpen(false); if (tool === 'chugiai') setTool('none'); if (laMayTinh()) setDrawOpen(true); else { setPanelOpen(false); setTcTab('goc'); setTool('search'); } })}
+            {chip('chugiai', 'Chú giải', tool === 'chugiai', () => { napChuGiai(); setPanelOpen(false); setTimMo(false); if (measure !== 'off') { setMeasure('off'); setMResult(null); } setTool(tool === 'chugiai' ? 'none' : 'chugiai'); })}
+            {user && chip('luu', `Đã lưu${places.length ? ` (${places.length})` : ''}`, panelOpen && bangMuc === 'luu', () => { setTimMo(false); tatDo(); if (tool === 'chugiai') setTool('none'); setBangMuc('luu'); setPanelOpen((v) => !(v && bangMuc === 'luu')); })}
             {/* Chip "Nhãn" đã bỏ (chủ dự án 6/10/2026): nhãn & đường mặc định luôn bật; điện thoại vẫn tắt/bật được ở thanh cũ. */}
           </div>
           {timMo && (
@@ -2105,11 +2119,11 @@ export default function MapPage() {
             </div>
           )}
           {tool === 'measure' && (
-            <div className="absolute top-[96px] left-1/2 z-20 hidden -translate-x-1/2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-lg lg:block">{measureCtrl()}</div>
+            <div className={KHUNG_NOI}>{dauKhung('Đo khoảng cách · diện tích', () => { setMeasure('off'); setMResult(null); setTool('none'); })}{measureCtrl()}</div>
           )}
           {tool === 'chugiai' && (
-            <div className="absolute top-[96px] left-2 right-[50px] z-30 hidden rounded-xl border border-slate-200 bg-white p-2.5 shadow-lg lg:block lg:left-1/2 lg:right-auto lg:w-[320px] lg:-translate-x-1/2">
-              <div className="mb-1.5 flex items-center"><p className="text-[12px] font-bold text-[#0A2540]">Chú giải loại đất</p><button type="button" onClick={() => setTool('none')} aria-label="Đóng" className="ml-auto text-slate-400 hover:text-slate-700">✕</button></div>
+            <div className={KHUNG_NOI}>
+              {dauKhung('Chú giải loại đất', () => setTool('none'))}
               {chuGiaiNoiDung()}
             </div>
           )}

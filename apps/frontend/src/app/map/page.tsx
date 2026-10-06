@@ -2046,9 +2046,50 @@ export default function MapPage() {
             </div>
           ))}
           </div>
-          {user && (
-            <div className={`mt-3 pt-3 border-t ${bangMuc === 'lop' ? 'lg:hidden' : 'lg:mt-0 lg:pt-0 lg:border-t-0'}`}>
-              {bangMuc === 'luu' && <div className="mb-2.5 hidden items-center justify-between lg:flex"><h2 className="text-[15px] font-bold text-[#0A2540]">Sản phẩm đã lưu</h2><button onClick={() => setPanelOpen(false)} aria-label="Đóng" className="text-xl leading-none text-slate-400 hover:text-slate-700">✕</button></div>}
+          {user && (<>
+            {/* MÁY TÍNH — khung "Sản phẩm đã lưu" làm lại (chủ dự án 6/10/2026 "làm đẹp hơn"): thẻ từng điểm có ghim vàng,
+                tên + toạ độ hai dòng, giá thành nhãn vàng, nút "Đăng tin" viền xanh đậm (bỏ màu tím lạc tông), nút xoá hiện khi rê chuột. */}
+            {bangMuc === 'luu' && (
+              <div className="hidden lg:block">
+                <div className="mb-3 flex items-center gap-2">
+                  <h2 className="text-[15px] font-bold text-[#0A2540]">Sản phẩm đã lưu</h2>
+                  <span className="rounded-full bg-[#0A2540]/8 px-2 py-0.5 text-[11px] font-bold text-[#0A2540] ring-1 ring-[#0A2540]/15">{places.length}</span>
+                  {laAdmin(user) && (
+                    <label className="ml-auto flex cursor-pointer items-center gap-1.5 text-[12px] text-slate-500"><input type="checkbox" checked={adminAll} onChange={(e) => setAdminAll(e.target.checked)} className="h-3.5 w-3.5 accent-[#0A2540]" />Xem của mọi người</label>
+                  )}
+                  <button onClick={() => setPanelOpen(false)} aria-label="Đóng" className={`${laAdmin(user) ? 'ml-2' : 'ml-auto'} text-xl leading-none text-slate-400 hover:text-slate-700`}>✕</button>
+                </div>
+                {places.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-slate-200 px-4 py-6 text-center text-[13px] text-slate-500">Chưa lưu điểm nào.<br /><span className="text-[12px] text-slate-400">Bấm vào bản đồ rồi chọn &quot;Lưu sản phẩm&quot;.</span></div>
+                ) : (
+                  <div className="max-h-[calc(100vh-260px)] space-y-1.5 overflow-y-auto pr-0.5 scroll-soft">
+                    {places.map((p) => (
+                      <div key={p.id} className="group flex items-center gap-2.5 rounded-lg border border-slate-200 bg-white px-2.5 py-2 transition hover:border-[#C8A14B]/60 hover:bg-[#C8A14B]/5">
+                        <button onClick={() => { setFocusPoint({ lng: p.lng, lat: p.lat }); setFitTo([[p.lng - 0.004, p.lat - 0.004], [p.lng + 0.004, p.lat + 0.004]]); }} className="flex min-w-0 flex-1 items-center gap-2.5 text-left" title="Bay tới điểm này">
+                          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#C8A14B]/15 text-[#a8822f]">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-[13px] font-semibold text-[#0A2540]">{p.note || 'Điểm đã lưu'}</span>
+                            <span className="mt-0.5 flex items-center gap-1.5 text-[11px] text-slate-500">
+                              <span className="truncate tabular-nums">X {(p.x ?? 0).toFixed(0)}{(p as any).y != null ? ` · Y ${Number((p as any).y).toFixed(0)}` : ''}</span>
+                              {p.price && <span className="shrink-0 rounded bg-[#C8A14B]/15 px-1.5 py-px font-bold text-[#8a6a22]">{p.price}</span>}
+                            </span>
+                            {adminAll && p.ownerName && <span className="mt-0.5 block truncate text-[11px] text-slate-500">Người lưu: {p.ownerName}{p.ownerPhone ? ' · ' + p.ownerPhone : ''}</span>}
+                          </span>
+                        </button>
+                        {!adminAll && <button onClick={() => publishPlace(p)} title="Đăng tin bán cho điểm này" className="shrink-0 rounded-md border border-[#0A2540]/25 px-2.5 py-1 text-[12px] font-semibold text-[#0A2540] hover:border-[#0A2540] hover:bg-[#0A2540] hover:text-white">Đăng tin</button>}
+                        <button onClick={async () => { await removePlace(p.id).catch(() => {}); loadPlaces(); }} aria-label="Xoá điểm đã lưu" title="Xoá" className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-slate-300 opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" /></svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {/* Khối cũ bên dưới: giữ cho ĐIỆN THOẠI; trên máy tính chỉ hiện ở khung Lớp (không ở khung Đã lưu) */}
+            <div className={`mt-3 pt-3 border-t ${bangMuc === 'lop' || bangMuc === 'luu' ? 'lg:hidden' : ''}`}>
               <div className="flex items-center justify-between mb-1">
                 <p className={`text-[11px] font-bold text-slate-400 uppercase tracking-wide ${bangMuc === 'luu' ? 'lg:invisible' : ''}`}>📌 {adminAll ? 'Tất cả đã lưu' : 'Sản phẩm của tôi'} ({places.length})</p>
                 {laAdmin(user) && (
@@ -2069,7 +2110,7 @@ export default function MapPage() {
                 ))}
               </div>
             </div>
-          )}
+          </>)}
           <p className="text-xs text-slate-400 mt-4 lg:hidden">💡 Nhấp vào bản đồ để xem toạ độ + lưu sản phẩm + tra cứu thửa/quy hoạch.</p>
         </aside>
 

@@ -78,11 +78,8 @@ export default function PdfEditorPage() {
   const updateSel = (patch: any) => { if (selText) setOv(selText.pid, (a) => a.map((x) => x.id === sel ? { ...x, ...patch } as Ov : x)); };
   const deleteSel = () => { for (const pid in ovByPage) setOv(pid, (a) => a.filter((x) => x.id !== sel)); setSel(null); };
 
-  if (!mounted) return <div style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }} className="grid place-items-center text-slate-400">Đang tải…</div>;
-  if (err) return <div style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }} className="grid place-items-center bg-white p-8 text-center text-red-600 font-semibold">{err}</div>;
-  if (!ready) return <div style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }} className="grid place-items-center bg-white text-slate-500">Đang tải trình soạn PDF…</div>;
-  const embedded = new URLSearchParams(window.location.search).get('embed') === '1' || document.documentElement.classList.contains('embed');
-  // ── TÌM & THAY THẾ (6/10/2026) ──
+  // ── TÌM & THAY THẾ (6/10/2026) — PHẢI đặt TRƯỚC mấy dòng `if (!mounted/err/!ready) return` bên dưới:
+  //    hook nằm sau lệnh return sớm là số hook đổi giữa các lần vẽ → React báo lỗi #310, cả trang PDF sập. ──
   const [timMo, setTimMo] = useState(false); const [tuTim, setTuTim] = useState(''); const [tuThay, setTuThay] = useState(''); const [chiSo, setChiSo] = useState(0);
   const [phienChu, setPhienChu] = useState(0);                       // tăng mỗi khi một trang đọc xong chữ → tìm lại
   const thayFns = useRef<Record<string, (ii: number, chu: string) => void>>({});
@@ -101,6 +98,10 @@ export default function PdfEditorPage() {
     nhom.forEach((ds) => { let chu = ds[0].chu; [...ds].sort((a, b) => b.start - a.start).forEach((k) => { chu = chu.slice(0, k.start) + tuThay + chu.slice(k.start + k.len); n++; }); thayFns.current[ds[0].pgId]?.(ds[0].ii, chu); });
     setChiSo(0); setBusy(`Đã thay ${n} chỗ`); setTimeout(() => setBusy(null), 900);
   };
+  if (!mounted) return <div style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }} className="grid place-items-center text-slate-400">Đang tải…</div>;
+  if (err) return <div style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }} className="grid place-items-center bg-white p-8 text-center text-red-600 font-semibold">{err}</div>;
+  if (!ready) return <div style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }} className="grid place-items-center bg-white text-slate-500">Đang tải trình soạn PDF…</div>;
+  const embedded = new URLSearchParams(window.location.search).get('embed') === '1' || document.documentElement.classList.contains('embed');
   if (mode === 'hub') return <PdfHub onEdit={() => setMode('edit')} setBusy={setBusy} embedded={embedded} />;
 
   return (

@@ -17,7 +17,6 @@ import FeaturedProjects from '@/components/FeaturedProjects';
 import Banner11 from '@/components/banner11/Banner11';
 import SiteFooter from '@/components/SiteFooter';
 import OQuangCaoTrangChu from '@/components/OQuangCaoTrangChu';
-import MauCum, { SO_MAU_CUM } from '@/components/MauCum'; // TẠM: xem thử 100 mẫu cụm cuối trang
 import { useFlags } from '@/lib/flags';
 import { LOAI_DU_AN, TRANG_THAI_DU_AN, loaiCua, trangThaiCua, type DuAnGoiY } from '@/lib/duAnLoc';
 import { KhungBangLoc, NutXemKetQua, MucLoc, NutLien, OLuoi, KhoangKeo, TRAN_GIA, TRAN_DT, tomTat } from '@/components/LocNangCao';
@@ -164,8 +163,6 @@ export default function Home() {
   const [marketNews, setMarketNews] = useState<{ title: string; url: string; img?: string; date?: string; source?: string }[]>([]);
   const [featuredNews, setFeaturedNews] = useState<{ title: string; url: string; img?: string; date?: string; source?: string }[]>([]);
   const [marketLoading, setMarketLoading] = useState(true);
-  const [mauCum, setMauCum] = useState(0); // TẠM: xem thử 100 mẫu cụm cuối trang (?maucum=N)
-  useEffect(() => { const n = Number(new URLSearchParams(location.search).get('maucum')); if (n >= 1 && n <= SO_MAU_CUM) setMauCum(n); }, []);
   const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [newsTab, setNewsTab] = useState('Thị trường BĐS'); /* mở trang chủ là thấy TIN THỊ TRƯỜNG trước */ const [heroDeal, setHeroDeal] = useState<'sale' | 'rent' | 'project'>('sale');
   const searchHint = useTypingHint(SEARCH_HINTS);
   const [locMo, setLocMo] = useState(false); // bảng "Lọc nâng cao" trên điện thoại
@@ -639,16 +636,16 @@ export default function Home() {
 
       {/* PROMO BANNER — quảng cáo (kiểu batdongsan). Chủ dự án dời xuống SAU mục "theo địa điểm", trước "Hỗ trợ tiện ích"
           (6/10/2026) — trước đó nằm giữa "Dự án nổi bật" và "theo địa điểm", chen giữa hai mục nhà đất. */}
-      {/* TẠM (6/10/2026): ?maucum=N → xem thử mẫu N trong 100 mẫu cho CẢ CỤM dưới đây (components/MauCum.tsx) */}
-      {mauCum ? <MauCum so={mauCum} /> : (<>
-      <PromoBanner />
-
-      {/* HỖ TRỢ TIỆN ÍCH */}
-      <HomeUtilities />
+      {/* KHỐI KẾT TRANG — chủ dự án chọn mẫu 13 (6/10/2026): dải quảng bá + "Hỗ trợ tiện ích" chung MỘT DẢI NỀN TRẮNG
+          tràn ngang, viền mảnh trên/dưới (tách khỏi nền xám của khối giữa trang). Dải quảng bá giữ nguyên thiết kế.
+          Doanh nghiệp tiêu biểu + chân trang giữ như cũ, nằm dưới dải. (Bản gom cả chân trang vào khối bị chê "rộng quá".) */}
+      <div className="border-y border-slate-200 bg-white">
+        <div className="pt-2 sm:pt-4"><PromoBanner /></div>
+        <HomeUtilities />
+      </div>
 
       {/* DOANH NGHIỆP TIÊU BIỂU — logo carousel (kiểu batdongsan) */}
       <FeaturedPartners />
-      </>)}
 
       {/* AD CONTACT — tế nhị */}
       {flags.services_live && (
@@ -667,8 +664,7 @@ export default function Home() {
       )}
 
       {/* FOOTER — nhiều tầng (kiểu batdongsan) */}
-      {/* Đang xem thử mẫu khối kết trang thì chân trang đã nằm trong khối đó */}
-      {!mauCum && <SiteFooter />}
+      <SiteFooter />
     </div>
   );
 }

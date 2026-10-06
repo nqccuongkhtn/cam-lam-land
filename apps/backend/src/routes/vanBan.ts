@@ -197,8 +197,20 @@ function parseAspDate(v: any): string {
 }
 
 // Gọi API DMSSearch của 1 cổng → danh sách văn bản mới nhất (tối đa 150).
-async function fetchPortalDocs(base: string): Promise<{ so: string; ngay: string; trichYeu: string; luot: number; id: string; link: string }[]> {
-  const body = JSON.stringify({ notation: '', subject: '', content: '', idField: EMPTY_GUID, idCategory: EMPTY_GUID, idCategories: EMPTY_GUID, dateBegin: '', dateEnd: '', isCopy: false, starIndex: 0, endIndex: 150 });
+// ĐỌC HẾT KHO của cổng theo từng lượt 200 (6/10/2026 — trước chỉ 150 văn bản mới nhất, cổng Cam Lâm có 1.054 → sót phần lớn).
+// sau = true: chỉ đọc lượt đầu (lịch 6 giờ chỉ cần văn bản mới).
+async function fetchPortalDocs(base: string, sau = false) {
+  const tat: Awaited<ReturnType<typeof fetchPortalLuot>> = [];
+  for (let tu = 0; tu < 6000; tu += 200) {
+    const l = await fetchPortalLuot(base, tu, tu + 200);
+    tat.push(...l);
+    if (l.length < 200 || sau) break;
+    await new Promise((z) => setTimeout(z, 300));
+  }
+  return tat;
+}
+async function fetchPortalLuot(base: string, tu: number, den: number): Promise<{ so: string; ngay: string; trichYeu: string; luot: number; id: string; link: string }[]> {
+  const body = JSON.stringify({ notation: '', subject: '', content: '', idField: EMPTY_GUID, idCategory: EMPTY_GUID, idCategories: EMPTY_GUID, dateBegin: '', dateEnd: '', isCopy: false, starIndex: tu, endIndex: den });
   const r = await fetch(`${base}/Services/DMSSearch.asmx/Search`, {
     method: 'POST', body,
     headers: { ...UA, 'Content-Type': 'application/json; charset=utf-8', 'Accept': 'application/json' },
@@ -221,16 +233,18 @@ async function fetchPortalDocs(base: string): Promise<{ so: string; ngay: string
       if (/^https?:\/\//i.test(v) && /(file|download|document|upload|attach)/i.test(v)) link = v;
     }
     if (link && !/^https?:/i.test(link)) { try { link = new URL(link, base).href; } catch { link = ''; } }
+    // Cổng TTĐT luôn có FILE PDF THẬT theo mã văn bản (trình xem PDF của cổng đọc từ đây) — tải thẳng, không cần mở trang
+    if (!link && /^[0-9a-f-]{36}$/i.test(String(o.Id || ''))) link = `${base}/Temp/LawDocument/LawDocumentRender/${o.Id}.pdf`;
     return { so: soOf(String(o.Notation || '')), ngay: parseAspDate(o.CreatedDate), trichYeu: clean(String(o.Subject || '')), luot: Number(o.LuotXem) || 0, id: String(o.Id || ''), link };
   });
 }
 
 // Quét toàn bộ cổng TTĐT qua API (best-effort): cổng nào lỗi/không có service thì bỏ qua, không ảnh hưởng cổng khác.
-export async function crawlPortals(onAdd?: (isNew: boolean) => void): Promise<number> {
+export async function crawlPortals(onAdd?: (isNew: boolean) => void, sau = false): Promise<number> {
   let n = 0; const seen = new Set<string>();
   for (const p of PORTALS_DOC) {
     try {
-      const docs = await fetchPortalDocs(p.base);
+      const docs = await fetchPortalDocs(p.base, sau);
       for (const d of docs) {
         const year = Number((d.ngay || '').slice(0, 4));
         const text = `${d.trichYeu} ${d.so}`;
@@ -242,7 +256,7 @@ export async function crawlPortals(onAdd?: (isNew: boolean) => void): Promise<nu
           `INSERT INTO van_ban (so_hieu, trich_yeu, ngay_ban_hanh, co_quan, chu_de, linh_vuc, nguon, link_goc, luot_tai)
            VALUES ($1,$2,$3,$4,$5,'Đất đai',$6,$7,$8)
            ON CONFLICT (so_hieu, ngay_ban_hanh) DO UPDATE SET
-             link_goc = COALESCE(NULLIF(van_ban.link_goc, ''), EXCLUDED.link_goc)
+             link_goc = CASE WHEN COALESCE(van_ban.link_goc, '') = '' OR van_ban.link_goc LIKE '%/module/document' THEN EXCLUDED.link_goc ELSE van_ban.link_goc END
            RETURNING (xmax = 0) AS inserted`,
           [d.so, d.trichYeu, d.ngay, p.ten.startsWith('Cổng') ? p.ten : `Cổng ${p.ten}`, classify(text), p.ten.startsWith('Cổng') ? p.ten : `Cổng ${p.ten}`, // tên đã có chữ "Cổng" thì không chắp thêm (từng ra "Cổng Cổng tỉnh…")
            d.link || `${p.base}/module/document`, d.luot]
@@ -440,7 +454,7 @@ function normPdf(raw: string, base: string): string | null {
     return new URL(u).href;        // new URL tự mã hoá ký tự non-ASCII trong path
   } catch { try { return new URL(raw.replace(/\\/g, '/'), base).href; } catch { return null; } }
 }
-async function resolvePdf(link: string): Promise<string | null> {
+export async function resolvePdf(link: string): Promise<string | null> {
   if (!link) return null;
   if (/\.pdf(\?|$)/i.test(link)) return normPdf(link, link);
   if (/camhomes\.vn\/index\.php\?.*download=1/i.test(link)) return link; // camhomes: link tải trả thẳng PDF

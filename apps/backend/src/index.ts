@@ -192,7 +192,7 @@ async function main() {
   // Văn bản: seed → crawl Công báo (kho đầy đủ) → quét các cổng TTĐT → camhomes.vn (bổ sung, 6/10/2026); sau đó TỰ LÀM MỚI: Công báo mỗi GIỜ, cổng TTĐT mỗi 6 giờ.
   seedVanBan().then(() => crawlCongBao(true, true)).then(() => crawlPortals()).then(() => crawlCamhomes(true)).then(() => crawlSheets(true)).catch(() => {}); // khởi động: backfill SÂU toàn kho (2005→nay, ~853 trang, chạy nền ~15') + quét cổng
   setInterval(() => crawlCongBao().catch(() => {}), 60 * 60 * 1000);   // Công báo (nguồn chính): tự làm mới MỖI GIỜ — crawl "gần đây" (15 trang, nhẹ)
-  setInterval(() => crawlPortals().then(() => crawlCamhomes()).then(() => crawlSheets()).catch(() => {}), 6 * 3600 * 1000);  // cổng TTĐT + camhomes.vn (bổ sung): mỗi 6 giờ cho đỡ tải nguồn ngoài
+  setInterval(() => crawlPortals(undefined, true).then(() => crawlCamhomes()).then(() => crawlSheets()).catch(() => {}), 6 * 3600 * 1000);  // cổng TTĐT + camhomes.vn (bổ sung): mỗi 6 giờ cho đỡ tải nguồn ngoài
   // Tự cập nhật tin BĐS mỗi 6 giờ từ 6h sáng (giờ VN): 06:00, 12:00, 18:00, 00:00
   let lastNewsSlot = '';
   setInterval(() => {

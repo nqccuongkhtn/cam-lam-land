@@ -82,8 +82,8 @@ export default function PdfEditorPage() {
   //    hook nằm sau lệnh return sớm là số hook đổi giữa các lần vẽ → React báo lỗi #310, cả trang PDF sập. ──
   const [timMo, setTimMo] = useState(false); const [tuTim, setTuTim] = useState(''); const [tuThay, setTuThay] = useState(''); const [chiSo, setChiSo] = useState(0);
   const [phienChu, setPhienChu] = useState(0);                       // tăng mỗi khi một trang đọc xong chữ → tìm lại
-  const thayFns = useRef<Record<string, (ii: number, chu: string) => void>>({});
-  const dangKyThay = useCallback((pid: string, fn: (ii: number, chu: string) => void) => { thayFns.current[pid] = fn; }, []);
+  const thayFns = useRef<Record<string, (ii: number, chu: string) => boolean>>({});
+  const dangKyThay = useCallback((pid: string, fn: (ii: number, chu: string) => boolean) => { thayFns.current[pid] = fn; }, []);
   const daDocChu = useCallback(() => setPhienChu((v) => v + 1), []);
   const khop = useMemo(() => (timMo ? timKhop(pages, itemsCache.current, (pid, ii, goc) => ((ovByPage[pid] || []).find((o: any) => o.kind === 'edit' && o.ii === ii) as any)?.text ?? goc, tuTim) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -91,12 +91,13 @@ export default function PdfEditorPage() {
   const chiSoDung = khop.length ? Math.min(chiSo, khop.length - 1) : 0;
   useEffect(() => { if (!khop.length) return; const t = setTimeout(() => document.getElementById('khop-dang-chon')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60); return () => clearTimeout(t); }, [chiSoDung, khop.length, tuTim]);
   useEffect(() => { const phim = (e: KeyboardEvent) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f' && pages.length) { e.preventDefault(); setTimMo(true); } }; window.addEventListener('keydown', phim); return () => window.removeEventListener('keydown', phim); }, [pages.length]);
-  const thayMotCho = () => { const k = khop[chiSoDung]; if (!k) return; thayFns.current[k.pgId]?.(k.ii, k.chu.slice(0, k.start) + tuThay + k.chu.slice(k.start + k.len)); };
+  const baoNhanh = (m: string, ms = 1400) => { setBusy(m); setTimeout(() => setBusy(null), ms); };
+  const thayMotCho = () => { const k = khop[chiSoDung]; if (!k) return; const ok = thayFns.current[k.pgId]?.(k.ii, k.chu.slice(0, k.start) + tuThay + k.chu.slice(k.start + k.len)); if (ok === false) { baoNhanh('Dòng này có số/chữ điền xen giữa — bấm vào chữ để sửa tay cho khỏi mất', 2600); if (khop.length) setChiSo((chiSoDung + 1) % khop.length); } };
   const thayTatCa = () => {
     const nhom = new Map<string, typeof khop>(); for (const k of khop) { const key = `${k.pgId}|${k.ii}`; nhom.set(key, [...(nhom.get(key) || []), k]); }
-    let n = 0;
-    nhom.forEach((ds) => { let chu = ds[0].chu; [...ds].sort((a, b) => b.start - a.start).forEach((k) => { chu = chu.slice(0, k.start) + tuThay + chu.slice(k.start + k.len); n++; }); thayFns.current[ds[0].pgId]?.(ds[0].ii, chu); });
-    setChiSo(0); setBusy(`Đã thay ${n} chỗ`); setTimeout(() => setBusy(null), 900);
+    let n = 0, boQua = 0;
+    nhom.forEach((ds) => { let chu = ds[0].chu; [...ds].sort((a, b) => b.start - a.start).forEach((k) => { chu = chu.slice(0, k.start) + tuThay + chu.slice(k.start + k.len); }); if (thayFns.current[ds[0].pgId]?.(ds[0].ii, chu) === false) boQua += ds.length; else n += ds.length; });
+    setChiSo(0); baoNhanh(boQua ? `Đã thay ${n} chỗ · bỏ qua ${boQua} chỗ nằm trên dòng có số/chữ điền xen giữa (sửa tay để khỏi mất)` : `Đã thay ${n} chỗ`, boQua ? 3200 : 1100);
   };
   if (!mounted) return <div style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }} className="grid place-items-center text-slate-400">Đang tải…</div>;
   if (err) return <div style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }} className="grid place-items-center bg-white p-8 text-center text-red-600 font-semibold">{err}</div>;

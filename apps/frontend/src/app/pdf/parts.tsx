@@ -136,10 +136,14 @@ export function PageView({ pg, doc, zoom, tool, color, fontSize, ov, sel, setSel
   // TÌM & THAY THẾ (chủ dự án 6/10/2026): trang cha gọi thayChu(ii, chữ mới) để đổi cả dòng chữ thứ ii —
   // dòng đã sửa rồi thì đổi chữ trong ô sửa, chưa sửa thì mở ô sửa (y như bấm tay) với chữ mới sẵn.
   useEffect(() => {
-    dangKy?.(pg.id, (ii: number, chuMoi: string) => {
-      const ds: Item[] = itemsCache.current[pg.id] || []; const it = ds[ii]; if (!it) return;
-      if ((ov as Ov[]).some((o) => o.kind === 'edit' && o.ii === ii)) setOv(pg.id, (a: Ov[]) => a.map((o) => o.kind === 'edit' && o.ii === ii ? { ...o, text: chuMoi } as Ov : o));
-      else startEdit(it, ii, chuMoi, false);
+    dangKy?.(pg.id, (ii: number, chuMoi: string): boolean => {
+      const ds: Item[] = itemsCache.current[pg.id] || []; const it = ds[ii]; if (!it) return false;
+      if ((ov as Ov[]).some((o) => o.kind === 'edit' && o.ii === ii)) { setOv(pg.id, (a: Ov[]) => a.map((o) => o.kind === 'edit' && o.ii === ii ? { ...o, text: chuMoi } as Ov : o)); return true; }
+      // DÒNG CÓ CHỮ KHÁC XEN GIỮA (vd "Số: 803 /TB-UBND … ngày 03 tháng 9": số điền sau nằm thành mẩu riêng giữa dòng) → viết lại
+      // cả dòng sẽ CHE MẤT mấy mẩu đó (thử thật 6/10/2026 mất số 803, 03, 9). Không tự thay — trả false để báo người dùng sửa tay.
+      const xen = ds.some((o, k) => k !== ii && Math.abs(o.y - it.y) < it.size * 0.6 && o.x > it.x + 0.5 && o.x + o.w < it.x + it.w - 0.5);
+      if (xen) return false;
+      startEdit(it, ii, chuMoi, false); return true;
     });
   });
   const onDown = (e: React.PointerEvent) => {
@@ -167,9 +171,14 @@ export function PageView({ pg, doc, zoom, tool, color, fontSize, ov, sel, setSel
         {vp && (khop || []).map((k: any, i: number) => {
           const it: Item | undefined = items[k.ii]; if (!it) return null;
           const chu: string = k.chu, dai = chu.length || 1;
-          let a = k.start / dai, b = (k.start + k.len) / dai;
-          try { const c = document.createElement('canvas').getContext('2d')!; c.font = `${it.bold ? '700' : '400'} 100px ${famCss(it.fam)}`; const W = c.measureText(chu).width || 1; a = c.measureText(chu.slice(0, k.start)).width / W; b = c.measureText(chu.slice(0, k.start + k.len)).width / W; } catch { /* giữ tỉ lệ theo số chữ */ }
-          const [x1, y1] = vp.convertToViewportPoint(it.x + it.w * a, it.y + it.size * 0.95), [x2, y2] = vp.convertToViewportPoint(it.x + it.w * b, it.y - it.size * 0.25);
+          // Vị trí đo bằng phông máy × độ giãn của dòng gốc (như ô sửa chữ) → khớp cả khi chữ mới dài/ngắn hơn chữ cũ
+          let xa = it.x + it.w * k.start / dai, xb = it.x + it.w * (k.start + k.len) / dai;
+          try {
+            const c = document.createElement('canvas').getContext('2d')!; c.font = `${it.italic ? 'italic ' : ''}${it.bold ? '700' : '400'} 100px ${famCss(it.fam)}`;
+            const do_ = (t: string) => c.measureText(t).width / 100 * it.size; const goc = do_(it.str); const sx = goc > 0 && it.w > 0 ? Math.min(1.25, Math.max(0.8, it.w / goc)) : 1;
+            xa = it.x + do_(chu.slice(0, k.start)) * sx; xb = it.x + do_(chu.slice(0, k.start + k.len)) * sx;
+          } catch { /* giữ tỉ lệ theo số chữ */ }
+          const [x1, y1] = vp.convertToViewportPoint(xa, it.y + it.size * 0.95), [x2, y2] = vp.convertToViewportPoint(xb, it.y - it.size * 0.25);
           return <div key={'k' + i} id={k.cur ? 'khop-dang-chon' : undefined} className={`absolute rounded-sm ${k.cur ? 'bg-orange-400/45 outline outline-2 outline-orange-500' : 'bg-yellow-300/45'}`} style={{ left: Math.min(x1, x2), top: Math.min(y1, y2), width: Math.max(4, Math.abs(x2 - x1)), height: Math.abs(y2 - y1) }} />;
         })}
         {vp && <DragPreview drag={dragRef.current} vp={vp} />}

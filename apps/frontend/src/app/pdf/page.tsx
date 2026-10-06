@@ -1,8 +1,9 @@
 'use client';
 /* eslint-disable @typescript-eslint/no-explicit-any, @next/next/no-img-element, react-hooks/exhaustive-deps */
 // PDF EDITOR (dùng tạm). GIỮ NGUYÊN trang gốc; chỉ che+sửa ĐÚNG ô người dùng bấm. Xuất: sao chép trang gốc + vẽ overlay. Cuộn xem mọi trang. Nút 🧰 mở thêm công cụ.
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type Ov, type PageRef, uid, fromHex, FAM, PageView, SignPad, XemTo } from './parts';
+import { ThanhTimThay, timKhop } from './TimThay';
 import { PdfHub } from './tools';
 import { Toolbar } from './Toolbar';
 
@@ -81,11 +82,31 @@ export default function PdfEditorPage() {
   if (err) return <div style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }} className="grid place-items-center bg-white p-8 text-center text-red-600 font-semibold">{err}</div>;
   if (!ready) return <div style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }} className="grid place-items-center bg-white text-slate-500">Đang tải trình soạn PDF…</div>;
   const embedded = new URLSearchParams(window.location.search).get('embed') === '1' || document.documentElement.classList.contains('embed');
+  // ── TÌM & THAY THẾ (6/10/2026) ──
+  const [timMo, setTimMo] = useState(false); const [tuTim, setTuTim] = useState(''); const [tuThay, setTuThay] = useState(''); const [chiSo, setChiSo] = useState(0);
+  const [phienChu, setPhienChu] = useState(0);                       // tăng mỗi khi một trang đọc xong chữ → tìm lại
+  const thayFns = useRef<Record<string, (ii: number, chu: string) => void>>({});
+  const dangKyThay = useCallback((pid: string, fn: (ii: number, chu: string) => void) => { thayFns.current[pid] = fn; }, []);
+  const daDocChu = useCallback(() => setPhienChu((v) => v + 1), []);
+  const khop = useMemo(() => (timMo ? timKhop(pages, itemsCache.current, (pid, ii, goc) => ((ovByPage[pid] || []).find((o: any) => o.kind === 'edit' && o.ii === ii) as any)?.text ?? goc, tuTim) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [timMo, tuTim, pages, ovByPage, phienChu]);
+  const chiSoDung = khop.length ? Math.min(chiSo, khop.length - 1) : 0;
+  useEffect(() => { if (!khop.length) return; const t = setTimeout(() => document.getElementById('khop-dang-chon')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60); return () => clearTimeout(t); }, [chiSoDung, khop.length, tuTim]);
+  useEffect(() => { const phim = (e: KeyboardEvent) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f' && pages.length) { e.preventDefault(); setTimMo(true); } }; window.addEventListener('keydown', phim); return () => window.removeEventListener('keydown', phim); }, [pages.length]);
+  const thayMotCho = () => { const k = khop[chiSoDung]; if (!k) return; thayFns.current[k.pgId]?.(k.ii, k.chu.slice(0, k.start) + tuThay + k.chu.slice(k.start + k.len)); };
+  const thayTatCa = () => {
+    const nhom = new Map<string, typeof khop>(); for (const k of khop) { const key = `${k.pgId}|${k.ii}`; nhom.set(key, [...(nhom.get(key) || []), k]); }
+    let n = 0;
+    nhom.forEach((ds) => { let chu = ds[0].chu; [...ds].sort((a, b) => b.start - a.start).forEach((k) => { chu = chu.slice(0, k.start) + tuThay + chu.slice(k.start + k.len); n++; }); thayFns.current[ds[0].pgId]?.(ds[0].ii, chu); });
+    setChiSo(0); setBusy(`Đã thay ${n} chỗ`); setTimeout(() => setBusy(null), 900);
+  };
   if (mode === 'hub') return <PdfHub onEdit={() => setMode('edit')} setBusy={setBusy} embedded={embedded} />;
 
   return (
     <div className="flex flex-col bg-slate-100" style={{ height: 'calc(100dvh - var(--chrome-h, 56px))' }}>
-      <Toolbar tool={tool} setTool={setTool} selText={selText} updateSel={updateSel} color={color} setColor={setColor} fontSize={fontSize} setFontSize={setFontSize} zoom={zoom} setZoom={setZoom} sel={sel} deleteSel={deleteSel} hasPages={!!pages.length} onOpenPdf={() => fileRef.current?.click()} onMergePdf={() => mergeRef.current?.click()} onTools={() => setMode('hub')} onSign={() => setSignOpen(true)} onImageTool={() => { pendImage.current = pages[0]?.id || null; imgRef.current?.click(); }} onExport={() => exportPdf()} embedded={embedded} onCloseFile={() => { const coSua = Object.values(ovByPage).some((a) => a.length); if (coSua && !window.confirm('Đóng file này? Các chỗ đã sửa mà chưa Xuất PDF sẽ mất.')) return; setPages([]); setOvByPage({}); itemsCache.current = {}; setSel(null); if (fileRef.current) fileRef.current.value = ''; }} />
+      <Toolbar tool={tool} setTool={setTool} selText={selText} updateSel={updateSel} color={color} setColor={setColor} fontSize={fontSize} setFontSize={setFontSize} zoom={zoom} setZoom={setZoom} sel={sel} deleteSel={deleteSel} hasPages={!!pages.length} onOpenPdf={() => fileRef.current?.click()} onMergePdf={() => mergeRef.current?.click()} onTools={() => setMode('hub')} onSign={() => setSignOpen(true)} onImageTool={() => { pendImage.current = pages[0]?.id || null; imgRef.current?.click(); }} onExport={() => exportPdf()} embedded={embedded} onTim={() => { setTimMo((v) => !v); setTool('edit'); }} timMo={timMo} onCloseFile={() => { const coSua = Object.values(ovByPage).some((a) => a.length); if (coSua && !window.confirm('Đóng file này? Các chỗ đã sửa mà chưa Xuất PDF sẽ mất.')) return; setPages([]); setOvByPage({}); itemsCache.current = {}; setSel(null); if (fileRef.current) fileRef.current.value = ''; }} />
+      {timMo && pages.length > 0 && <ThanhTimThay tu={tuTim} setTu={setTuTim} thay={tuThay} setThay={setTuThay} khop={khop} chiSo={chiSoDung} setChiSo={setChiSo} onThay={thayMotCho} onThayHet={thayTatCa} onDong={() => setTimMo(false)} />}
       {tool === 'edit' && pages.length > 0 && <div className="bg-amber-50 px-3 py-1 text-center text-xs text-amber-700">Chế độ <b>Sửa chữ</b> — bấm thẳng vào chữ cần sửa rồi gõ. <b>Chỉ chữ bạn thay đổi</b> mới được cập nhật, phần còn lại giữ nguyên 100% bản gốc. Cuộn xem mọi trang.</div>}
       {!pages.length ? (
         <div onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) addFile(f, false); }} className="m-auto flex w-[92%] max-w-xl flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-white p-16 text-center">
@@ -132,7 +153,7 @@ export default function PdfEditorPage() {
                   <button onClick={() => rotate(i, 90)} title="Xoay phải 90°" aria-label="Xoay phải 90 độ" className="grid h-9 w-9 place-items-center rounded-lg bg-white text-base shadow-sm ring-1 ring-slate-300 transition active:scale-95 hover:bg-slate-50">↻</button>
                   <button onClick={() => setXemTo(i)} title="Xem to toàn màn hình" aria-label="Xem to toàn màn hình" className="grid h-9 w-9 place-items-center rounded-lg bg-white text-base shadow-sm ring-1 ring-slate-300 transition active:scale-95 hover:bg-slate-50">⤢</button>
                 </div>
-                <PageView pg={pg} doc={docs.current[pg.srcId]?.doc} zoom={zoom} tool={tool} color={color} fontSize={fontSize} ov={ovByPage[pg.id] || []} sel={sel} setSel={setSel} setOv={setOv} setTool={setTool} itemsCache={itemsCache} onImage={(pid: string) => { pendImage.current = pid; imgRef.current?.click(); }} />
+                <PageView pg={pg} doc={docs.current[pg.srcId]?.doc} zoom={zoom} tool={tool} color={color} fontSize={fontSize} ov={ovByPage[pg.id] || []} sel={sel} setSel={setSel} setOv={setOv} setTool={setTool} itemsCache={itemsCache} onImage={(pid: string) => { pendImage.current = pid; imgRef.current?.click(); }} dangKy={dangKyThay} onItems={daDocChu} khop={timMo ? khop.map((k, j) => ({ ...k, cur: j === chiSoDung })).filter((k) => k.pgId === pg.id) : undefined} />
               </div>
             ))}
           </div>

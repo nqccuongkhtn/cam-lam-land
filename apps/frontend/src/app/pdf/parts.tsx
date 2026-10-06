@@ -81,7 +81,7 @@ export async function extractItems(page: any, vp: any, ctx: CanvasRenderingConte
 }
 
 // 1 TRANG: render canvas gốc (1 lần / zoom). Ô bấm-sửa nổi lên trên; chữ đã sửa được che + gõ đè bằng HTML (không đụng canvas).
-export function PageView({ pg, doc, zoom, tool, color, fontSize, ov, sel, setSel, setOv, setTool, itemsCache, onImage }: any) {
+export function PageView({ pg, doc, zoom, tool, color, fontSize, ov, sel, setSel, setOv, setTool, itemsCache, onImage, khop, dangKy, onItems }: any) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null); const layerRef = useRef<HTMLDivElement | null>(null);
   const vpRef = useRef<any>(null); const [items, setItems] = useState<Item[]>([]); const [, force] = useState(0);
   const dragRef = useRef<any>(null); const moveDrag = useRef<any>(null);
@@ -93,10 +93,10 @@ export function PageView({ pg, doc, zoom, tool, color, fontSize, ov, sel, setSel
     const canvas = canvasRef.current; canvas.width = vp.width; canvas.height = vp.height; const ctx = canvas.getContext('2d')!;
     await page.render({ canvasContext: ctx, viewport: vp }).promise;
     if (!itemsCache.current[pg.id]) { try { itemsCache.current[pg.id] = await extractItems(page, vp, ctx, canvas.width, canvas.height); } catch { itemsCache.current[pg.id] = []; } }
-    setItems(itemsCache.current[pg.id]); force((v) => v + 1);
+    setItems(itemsCache.current[pg.id]); force((v) => v + 1); onItems?.();
   }
   const pdfPt = (e: React.PointerEvent) => { const r = layerRef.current!.getBoundingClientRect(); return vpRef.current.convertToPdfPoint(e.clientX - r.left, e.clientY - r.top); };
-  const startEdit = (it: Item, ii: number) => {
+  const startEdit = (it: Item, ii: number, chuMoi?: string, chon = true) => {
     // Ô che chữ cũ: vừa khít chữ (dưới = chân chữ g/y, trên = dấu mũ chữ hoa tiếng Việt) và KHÔNG lấn sang dòng trên/dưới.
     // Bản cũ cao 1,36 cỡ chữ → đè mất chân chữ dòng trên + dấu dòng dưới trong đoạn văn dòng sát (chủ dự án báo 6/10/2026).
     let top = it.y + it.size * 1.05, bot = it.y - it.size * 0.34; // 0.34: đủ che đuôi chữ g/y/p + dấu nặng (6/10/2026: còn sót đuôi "g" dưới chữ mới)
@@ -130,9 +130,18 @@ export function PageView({ pg, doc, zoom, tool, color, fontSize, ov, sel, setSel
     // bề rộng trong PDF; khi xuất cũng giãn đúng tỉ lệ đó nên chữ mới cùng nhịp chữ cũ.
     let sx = 1;
     try { const c = document.createElement('canvas').getContext('2d')!; c.font = `${it.italic ? 'italic ' : ''}${it.bold ? '700' : '400'} 100px ${famCss(it.fam)}`; const w = c.measureText(it.str).width / 100 * it.size; if (w > 0 && it.w > 0) sx = Math.min(1.25, Math.max(0.8, it.w / w)); } catch { /* giữ 1 */ }
-    const id = uid(); setOv(pg.id, (a: Ov[]) => [...a, { id, kind: 'edit', ii, orig: it.str, sx, x: it.x, y: it.y, size: it.size, text: it.str, color: it.fg, bg: it.bg, fam: it.fam, bold: it.bold, italic: it.italic, ...box }]);
-    setSel(id);
+    const id = uid(); setOv(pg.id, (a: Ov[]) => [...a, { id, kind: 'edit', ii, orig: it.str, sx, x: it.x, y: it.y, size: it.size, text: chuMoi ?? it.str, color: it.fg, bg: it.bg, fam: it.fam, bold: it.bold, italic: it.italic, ...box }]);
+    if (chon) setSel(id);
   };
+  // TÌM & THAY THẾ (chủ dự án 6/10/2026): trang cha gọi thayChu(ii, chữ mới) để đổi cả dòng chữ thứ ii —
+  // dòng đã sửa rồi thì đổi chữ trong ô sửa, chưa sửa thì mở ô sửa (y như bấm tay) với chữ mới sẵn.
+  useEffect(() => {
+    dangKy?.(pg.id, (ii: number, chuMoi: string) => {
+      const ds: Item[] = itemsCache.current[pg.id] || []; const it = ds[ii]; if (!it) return;
+      if ((ov as Ov[]).some((o) => o.kind === 'edit' && o.ii === ii)) setOv(pg.id, (a: Ov[]) => a.map((o) => o.kind === 'edit' && o.ii === ii ? { ...o, text: chuMoi } as Ov : o));
+      else startEdit(it, ii, chuMoi, false);
+    });
+  });
   const onDown = (e: React.PointerEvent) => {
     if (!vpRef.current) return; const [px, py] = pdfPt(e); const r = layerRef.current!.getBoundingClientRect(); const cx = e.clientX - r.left, cy = e.clientY - r.top;
     if (tool === 'text') { const id = uid(); setOv(pg.id, (a: Ov[]) => [...a, { id, kind: 'text', x: px, y: py, size: fontSize, text: 'Nhập chữ…', color: fromHex(color), fam: 'sans', bold: false, italic: false }]); setSel(id); setTool('select'); return; }
@@ -154,6 +163,15 @@ export function PageView({ pg, doc, zoom, tool, color, fontSize, ov, sel, setSel
       <div className="pointer-events-none absolute inset-0">
         {vp && tool === 'edit' && items.map((it, i) => { if (edited.has(i)) return null; const [vx, vy] = vp.convertToViewportPoint(it.x, it.y + it.size); const [vx2] = vp.convertToViewportPoint(it.x + it.w, it.y); return <div key={i} onClick={(e) => { e.stopPropagation(); startEdit(it, i); }} className="pointer-events-auto absolute cursor-text rounded-sm hover:bg-yellow-300/40 hover:outline hover:outline-1 hover:outline-yellow-500/70" style={{ left: vx, top: vy, width: Math.max(6, vx2 - vx), height: it.size * zoom * 1.3 }} title={`Bấm để sửa: ${it.str}`} />; })}
         {vp && (ov as Ov[]).map((o) => <OverlayView key={o.id} o={o} vp={vp} zoom={zoom} sel={sel === o.id} tool={tool} onDown={(e: any) => startMove(e, o)} onMoveP={onMoveOv} onUpP={endMove} onText={(t: string) => setOv(pg.id, (a: Ov[]) => a.map((z) => z.id === o.id ? { ...z, text: t } as Ov : z))} onSelect={() => setSel(o.id)} />)}
+        {/* Ô tô vàng những chỗ khớp chữ đang tìm; chỗ đang chọn tô cam (id="khop-dang-chon" để cuộn tới) */}
+        {vp && (khop || []).map((k: any, i: number) => {
+          const it: Item | undefined = items[k.ii]; if (!it) return null;
+          const chu: string = k.chu, dai = chu.length || 1;
+          let a = k.start / dai, b = (k.start + k.len) / dai;
+          try { const c = document.createElement('canvas').getContext('2d')!; c.font = `${it.bold ? '700' : '400'} 100px ${famCss(it.fam)}`; const W = c.measureText(chu).width || 1; a = c.measureText(chu.slice(0, k.start)).width / W; b = c.measureText(chu.slice(0, k.start + k.len)).width / W; } catch { /* giữ tỉ lệ theo số chữ */ }
+          const [x1, y1] = vp.convertToViewportPoint(it.x + it.w * a, it.y + it.size * 0.95), [x2, y2] = vp.convertToViewportPoint(it.x + it.w * b, it.y - it.size * 0.25);
+          return <div key={'k' + i} id={k.cur ? 'khop-dang-chon' : undefined} className={`absolute rounded-sm ${k.cur ? 'bg-orange-400/45 outline outline-2 outline-orange-500' : 'bg-yellow-300/45'}`} style={{ left: Math.min(x1, x2), top: Math.min(y1, y2), width: Math.max(4, Math.abs(x2 - x1)), height: Math.abs(y2 - y1) }} />;
+        })}
         {vp && <DragPreview drag={dragRef.current} vp={vp} />}
       </div>
     </div>

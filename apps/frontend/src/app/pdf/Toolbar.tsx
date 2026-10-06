@@ -5,7 +5,7 @@ import { fromHex } from './parts';
 
 const TOOLS = [{ k: 'edit', label: 'Sửa chữ', icon: '✍️' }, { k: 'select', label: 'Chọn', icon: '🖱️' }, { k: 'text', label: 'Thêm chữ', icon: '🔤' }, { k: 'image', label: 'Ảnh', icon: '🖼️' }, { k: 'sign', label: 'Ký', icon: '🖊️' }, { k: 'white', label: 'Bôi trắng', icon: '⬜' }, { k: 'draw', label: 'Vẽ', icon: '✏️' }, { k: 'rect', label: 'Khung', icon: '▭' }, { k: 'highlight', label: 'Highlight', icon: '🖍️' }];
 
-export function Toolbar({ tool, setTool, selText, updateSel, color, setColor, fontSize, setFontSize, zoom, setZoom, sel, deleteSel, hasPages, onOpenPdf, onMergePdf, onTools, onSign, onImageTool, onExport, embedded, onCloseFile }: any) {
+export function Toolbar({ tool, setTool, selText, updateSel, color, setColor, fontSize, setFontSize, zoom, setZoom, sel, deleteSel, hasPages, onOpenPdf, onMergePdf, onTools, onSign, onImageTool, onExport, embedded, onCloseFile, onTim, timMo }: any) {
   return (
     <div className="flex flex-wrap items-center gap-1.5 border-b bg-white px-3 py-2 shadow-sm">
       {!embedded && <button onClick={() => { window.location.href = '/'; }} title="Thoát" className="mr-1 rounded px-2 py-1.5 text-sm hover:bg-slate-100">✕</button>}
@@ -18,6 +18,8 @@ export function Toolbar({ tool, setTool, selText, updateSel, color, setColor, fo
       <button onClick={onTools} className="rounded border px-3 py-1.5 text-sm hover:bg-slate-50">🧰 Công cụ</button>
       <span className="mx-1 h-6 w-px bg-slate-200" />
       {TOOLS.map((t) => <button key={t.k} onClick={() => { setTool(t.k); if (t.k === 'image') onImageTool(); if (t.k === 'sign') onSign(); }} className={`rounded px-2.5 py-1.5 text-sm font-medium ${tool === t.k ? 'bg-[#0A2540] text-white' : 'hover:bg-slate-100'}`}>{t.icon} {t.label}</button>)}
+      {/* TÌM & THAY THẾ (Ctrl+F) — 6/10/2026 */}
+      <button onClick={onTim} disabled={!hasPages} title="Tìm chữ / Tìm & thay thế (Ctrl+F)" className={`rounded px-2.5 py-1.5 text-sm font-medium disabled:opacity-40 ${timMo ? 'bg-[#0A2540] text-white' : 'hover:bg-slate-100'}`}>🔎 Tìm & thay</button>
       <span className="mx-1 h-6 w-px bg-slate-200" />
       <input type="color" value={color} onChange={(e) => { setColor(e.target.value); if (selText) updateSel({ color: fromHex(e.target.value) }); }} className="h-7 w-8 cursor-pointer rounded border" title="Màu" />
       <select value={selText ? selText.o.fam : 'serif'} onChange={(e) => { if (selText) updateSel({ fam: e.target.value }); }} disabled={!selText} title="Phông chữ (chọn ô chữ để đổi cho khớp file)" className="rounded border px-1 py-1 text-sm disabled:opacity-40"><option value="serif">Times New Roman</option><option value="sans">Arial</option><option value="tahoma">Tahoma</option><option value="calibri">Calibri</option><option value="verdana">Verdana</option></select>

@@ -420,37 +420,119 @@ let dangTaiSan = false;
 export async function taiSanFile(): Promise<number> {
   if (dangTaiSan) return 0; dangTaiSan = true; let n = 0;
   try {
-    const ds = await query<any>(`SELECT link_goc FROM van_ban WHERE link_goc LIKE '%drive.google.com%'`);
+    const ds = await query<any>(`SELECT id, link_goc FROM van_ban WHERE link_goc LIKE '%drive.google.com%' ORDER BY ngay_ban_hanh DESC`);
     for (const d of ds) {
-      const id = idDrive(d.link_goc); if (!id) continue;
-      try { await readFile(`${KHO_DRIVE}/${id}.pdf`); continue; } catch { /* chưa có */ }
-      if (await layPdfDrive(d.link_goc)) n++;
+      try { await readFile(`${KHO_DRIVE}/vb-${PHIEN_BAN_FILE}-${d.id}.pdf`); continue; } catch { /* chưa có */ }
+      if (await layFileVb(d.id, d.link_goc)) n++;
     }
-    console.log(`[van-ban] tải sẵn file Drive: thêm ${n} file`);
+    console.log(`[van-ban] tải sẵn + nén file Drive: thêm ${n} file`);
   } catch (e: any) { console.error('[van-ban] tải sẵn lỗi:', e?.message || e); } finally { dangTaiSan = false; }
   return n;
 }
+/** Tải + ghép PDF trong thư mục/file Drive. KHÔNG tự lưu — việc lưu (bản đã nén) do layFileVb() lo. */
 export async function layPdfDrive(link: string): Promise<Buffer | null> {
   const id = idDrive(link); if (!id) return null;
-  const f = `${KHO_DRIVE}/${id}.pdf`;
-  try { return await readFile(f); } catch { /* chưa có → tải */ }
+  const cu = `${KHO_DRIVE}/${id}.pdf`;                 // bản chưa nén của lần chạy trước (6/10/2026) → dùng làm nguồn, đỡ tải lại
+  try { const b = await readFile(cu); rm(cu, { force: true }).catch(() => {}); return b; } catch { /* không có → tải */ }
   const ds = await dsFileDrive(id);
   const pdfs = ds && ds.length ? ds.filter((x) => /\.pdf$/i.test(x.ten)).sort((a, b) => a.ten.localeCompare(b.ten)) : [{ id, ten: '' }];
   const bufs: Buffer[] = [];
   for (const x of pdfs) { const b = await taiDrive(x.id); if (b) bufs.push(b); }
   if (!bufs.length) return null;
+  if (bufs.length === 1) return bufs[0];
   await mkdir(KHO_DRIVE, { recursive: true });
-  let out = bufs[0];
-  if (bufs.length > 1) {
-    const tam = bufs.map((_, i) => `${KHO_DRIVE}/${id}-${i}.pdf`);
-    try {
-      await Promise.all(bufs.map((b, i) => writeFile(tam[i], b)));
-      await promisify(execFile)('qpdf', ['--empty', '--pages', ...tam, '--', f], { timeout: 60000 }).catch((e: any) => { if (e?.code !== 3) throw e; }); // mã 3 = cảnh báo, file vẫn ra
-      out = await readFile(f);
-    } catch { out = bufs[0]; } finally { await Promise.all(tam.map((t) => rm(t, { force: true }))); }
-  }
-  await writeFile(f, out).catch(() => {});
-  return out;
+  const tam = bufs.map((_, i) => `${KHO_DRIVE}/tam-${id}-${i}.pdf`), ra = `${KHO_DRIVE}/tam-${id}.pdf`;
+  try {
+    await Promise.all(bufs.map((b, i) => writeFile(tam[i], b)));
+    await promisify(execFile)('qpdf', ['--empty', '--pages', ...tam, '--', ra], { timeout: 60000 }).catch((e: any) => { if (e?.code !== 3) throw e; }); // mã 3 = cảnh báo, file vẫn ra
+    return await readFile(ra);
+  } catch { return bufs[0]; } finally { await Promise.all([...tam, ra].map((t) => rm(t, { force: true }))); }
+}
+
+// ── DẤU BẢN QUYỀN + NÉN + LƯU FILE VĂN BẢN (chủ dự án 6/10/2026) ──
+// 1) DẤU BẢN QUYỀN: file tải về bị chia sẻ đi đâu cũng thành quảng cáo cho web → mỗi trang thêm
+//    · chữ "CAM LÂM LAND" chéo giữa trang, rất mờ (không che nội dung văn bản);
+//    · một dòng nhỏ ở mép dưới: "Tải miễn phí tại batdongsancamlam.dpdns.org — Cam Lâm Land · …".
+//    Phông DejaVu (có sẵn trong máy chủ, đủ dấu tiếng Việt). Gắn TRƯỚC khi nén để Ghostscript cắt gọn phông.
+// 2) NÉN SÂU — đã đo trên 12 file thật (31,3 MB → 4,3 MB, nhẹ 86%):
+//    · thủ phạm chính KHÔNG phải ảnh mà là PHÔNG CHỮ nhúng nguyên bộ (Times New Roman vài MB/file) → cắt gọn chỉ giữ chữ dùng;
+//    · ảnh màu/xám (dấu đỏ, chữ ký) hạ 100 điểm ảnh/inch, ảnh đen trắng 200; ảnh trùng nhau chỉ giữ 1 bản;
+//    · qpdf gom các mảnh nhỏ thành luồng nén chung, nén lại mức cao nhất.
+//    Ép JPEG mạnh hơn chỉ bớt thêm ~1% mà làm dấu đỏ nhoè → không dùng.
+// Kho CHỈ giữ bản đã xử lý (vb-<phiên bản>-<mã>.pdf); đổi cách xử lý thì tăng PHIEN_BAN_FILE để làm lại.
+const PHIEN_BAN_FILE = 'v1';
+const PHONG_DAU = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
+async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
+  try {
+    const { PDFDocument, rgb, degrees } = (await import('pdf-lib')) as any;
+    const fontkit = ((await import('@pdf-lib/fontkit')) as any).default;
+    const doc = await PDFDocument.load(buf, { ignoreEncryption: true, updateMetadata: false });
+    doc.registerFontkit(fontkit);
+    const font = await doc.embedFont(await readFile(PHONG_DAU), { subset: true });
+    const chan = 'Tải miễn phí tại batdongsancamlam.dpdns.org — Cam Lâm Land · Nhà đất & bản đồ quy hoạch Cam Lâm';
+    for (const page of doc.getPages()) {
+      const { width: W, height: H } = page.getSize();
+      const xoay = ((page.getRotation()?.angle || 0) % 360 + 360) % 360;
+      const ngang = xoay === 90 || xoay === 270;          // trang bị xoay: vẽ theo chiều người đọc nhìn thấy
+      const w = ngang ? H : W, h = ngang ? W : H;
+      // đổi toạ độ "theo mắt người đọc" (x, y, góc) sang toạ độ thật của trang
+      const doi = (x: number, y: number) => xoay === 90 ? { x: W - y, y: x } : xoay === 180 ? { x: W - x, y: H - y } : xoay === 270 ? { x: y, y: H - x } : { x, y };
+      // chữ chéo giữa trang
+      const to = Math.min(w, h) * 0.11, chu = 'CAM LÂM LAND', dai = font.widthOfTextAtSize(chu, to), goc = Math.atan2(h, w);
+      const cx = w / 2 - Math.cos(goc) * dai / 2 + Math.sin(goc) * to * 0.35, cy = h / 2 - Math.sin(goc) * dai / 2 - Math.cos(goc) * to * 0.35;
+      const p1 = doi(cx, cy);
+      page.drawText(chu, { x: p1.x, y: p1.y, size: to, font, color: rgb(0.78, 0.63, 0.29), opacity: 0.10, rotate: degrees(goc * 180 / Math.PI + xoay) });
+      // dòng chân trang
+      let co = 7; while (co > 4.5 && font.widthOfTextAtSize(chan, co) > w - 24) co -= 0.5;
+      const p2 = doi((w - font.widthOfTextAtSize(chan, co)) / 2, 6);
+      page.drawText(chan, { x: p2.x, y: p2.y, size: co, font, color: rgb(0.04, 0.15, 0.25), opacity: 0.55, rotate: degrees(xoay) });
+    }
+    doc.setProducer('Cam Lâm Land — batdongsancamlam.dpdns.org');
+    return Buffer.from(await doc.save({ useObjectStreams: true }));
+  } catch (e: any) { console.error('[van-ban] gắn dấu bản quyền lỗi:', e?.message || e); return buf; }
+}
+async function nenPdf(buf: Buffer): Promise<Buffer> {
+  await mkdir(KHO_DRIVE, { recursive: true });
+  const k = `${KHO_DRIVE}/nen-${Date.now()}-${Math.random().toString(36).slice(2)}`, vao = `${k}-a.pdf`, giua = `${k}-b.pdf`, ra = `${k}-c.pdf`;
+  try {
+    await writeFile(vao, buf);
+    await promisify(execFile)('gs', ['-sDEVICE=pdfwrite', '-dCompatibilityLevel=1.5', '-dNOPAUSE', '-dBATCH', '-dQUIET',
+      '-dDetectDuplicateImages=true', '-dCompressFonts=true', '-dSubsetFonts=true',
+      '-dDownsampleColorImages=true', '-dColorImageResolution=100', '-dDownsampleGrayImages=true', '-dGrayImageResolution=100',
+      '-dDownsampleMonoImages=true', '-dMonoImageResolution=200',
+      '-dColorImageDownsampleThreshold=1.0', '-dGrayImageDownsampleThreshold=1.0', '-dMonoImageDownsampleThreshold=1.0',
+      `-sOutputFile=${giua}`, vao], { timeout: 240000 });
+    await promisify(execFile)('qpdf', ['--object-streams=generate', '--recompress-flate', '--compression-level=9', giua, ra], { timeout: 60000 })
+      .catch((e: any) => { if (e?.code !== 3) throw e; });
+    const b = await readFile(ra);
+    return b.subarray(0, 4).toString() === '%PDF' && b.length < buf.length ? b : buf; // nén không lợi thì giữ nguyên
+  } catch { return buf; } finally { await Promise.all([vao, giua, ra].map((t) => rm(t, { force: true }))); }
+}
+/** Lấy file GỐC của văn bản từ nguồn (Drive / cổng TTĐT / Công báo / camhomes). */
+async function layFileGoc(link: string | null): Promise<Buffer | null> {
+  if (!link) return null;
+  if (/drive\.google\.com/.test(link)) return layPdfDrive(link);
+  const pdf = await resolvePdf(link); if (!pdf) return null;
+  let ref = ''; try { ref = new URL(link).origin + '/'; } catch { /* bỏ qua */ }
+  try {
+    const r = await fetch(pdf, { headers: { ...UA, ...(ref ? { Referer: ref } : {}) }, signal: AbortSignal.timeout(60000) });
+    if (!r.ok) return null;
+    const b = Buffer.from(await r.arrayBuffer());
+    return b.subarray(0, 4).toString() === '%PDF' ? b : null;
+  } catch { return null; }
+}
+const dangLay = new Map<number, Promise<Buffer | null>>();   // nhiều người bấm cùng lúc một văn bản → chỉ tải 1 lần
+export function layFileVb(id: number, link: string | null): Promise<Buffer | null> {
+  const f = `${KHO_DRIVE}/vb-${PHIEN_BAN_FILE}-${id}.pdf`;
+  if (dangLay.has(id)) return dangLay.get(id)!;
+  const p = (async () => {
+    try { return await readFile(f); } catch { /* chưa có */ }
+    const goc = await layFileGoc(link); if (!goc) return null;
+    const nen = await nenPdf(await ganDauBanQuyen(goc));
+    await mkdir(KHO_DRIVE, { recursive: true }); await writeFile(f, nen).catch(() => {});
+    return nen;
+  })().finally(() => dangLay.delete(id));
+  dangLay.set(id, p); return p;
 }
 
 // ── FILE GỐC CỦA BẢNG "QUYẾT ĐỊNH THU HỒI ĐẤT" (tìm ra 6/10/2026) ──
@@ -664,26 +746,15 @@ vanBanRouter.get('/:id/pdf', authRequired, async (req, res) => {
     if (!row) return res.status(404).json({ error: 'Không tìm thấy văn bản' });
     query('UPDATE van_ban SET luot_tai = luot_tai + 1 WHERE id=$1', [row.id]).catch(() => {});
     const tenFile = `${String(row.so_hieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`;
-    if (/drive\.google\.com/.test(row.link_goc || '')) {          // Drive: tự tải + ghép, KHÔNG đưa người dùng sang trang Drive
-      const buf = await layPdfDrive(row.link_goc);
-      if (buf) { res.set('Content-Type', 'application/pdf'); res.set('Content-Disposition', `inline; filename="${tenFile}"`); res.set('Cache-Control', 'private, max-age=86400'); return res.send(buf); }
-      return res.json({ redirect: null });
+    // Bản đã gắn dấu bản quyền + nén, lưu sẵn trong kho (mở nhanh, nhẹ)
+    const buf = await layFileVb(row.id, row.link_goc);
+    if (buf) {
+      res.set('Content-Type', 'application/pdf');
+      res.set('Content-Disposition', `inline; filename="${tenFile}"`);
+      res.set('Cache-Control', 'private, max-age=86400');
+      return res.send(buf);
     }
-    const pdf = await resolvePdf(row.link_goc);
-    if (pdf) {
-      let ref = ''; try { ref = new URL(row.link_goc).origin + '/'; } catch { /* link_goc rỗng */ }
-      const r = await fetch(pdf, { headers: { ...UA, ...(ref ? { Referer: ref } : {}) }, signal: AbortSignal.timeout(20000) });
-      const ct = r.headers.get('content-type') || '';
-      if (r.ok && (/pdf/i.test(ct) || /\.pdf/i.test(pdf))) {
-        const buf = Buffer.from(await r.arrayBuffer());
-        res.set('Content-Type', 'application/pdf');
-        res.set('Content-Disposition', `inline; filename="${String(row.so_hieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf"`);
-        res.set('Cache-Control', 'private, max-age=86400');
-        return res.send(buf);
-      }
-    }
-    if (/^https:\/\/camhomes\.vn\//.test(row.link_goc || '')) return res.json({ redirect: null }); // camhomes khoá đăng nhập → không mở trang của họ
-    return res.json({ redirect: row.link_goc || null }); // không lấy được PDF → mở trang nguồn
+    return res.json({ redirect: null }); // không lấy được PDF → báo chưa có file, KHÔNG đưa người dùng sang trang khác
   } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi tải' }); }
 });
 

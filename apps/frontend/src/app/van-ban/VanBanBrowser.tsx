@@ -1,10 +1,11 @@
 'use client';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import { api, apiBase } from '@/lib/api';
 import { getToken } from '@/lib/token';
 import { CHUDE_LIST, CHUDE_META, type ChuDeNhom, type VanBan } from './data';
+import XemVanBan, { type MoVanBan } from './XemVanBan';
 
 const PER = 10;
 const kd = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
@@ -97,7 +98,8 @@ export default function VanBanBrowser() {
   const [thang, setThang] = useState('all');
   const [sort, setSort] = useState<'moi' | 'tai'>('moi');
   const [page, setPage] = useState(1);
-  const [taiId, setTaiId] = useState<number | null>(null);
+  const [taiId] = useState<number | null>(null);
+  const [dangXem, setDangXem] = useState<MoVanBan | null>(null);   // văn bản đang mở trong khung xem
   const reset = () => setPage(1);
 
   useEffect(() => {
@@ -121,29 +123,16 @@ export default function VanBanBrowser() {
       .sort((a, b) => sort === 'tai' ? (b.luotTai || 0) - (a.luotTai || 0) : (b.ngay || '').localeCompare(a.ngay || ''));
   }, [docs, q, chuDe, nam, diaBan, coQuan, thang, sort]);
 
-  async function taiPdf(d: VanBan) {
+  // Mở KHUNG XEM ngay trong trang (không mở tab mới nữa — chủ dự án 6/10/2026)
+  function taiPdf(d: VanBan) {
     if (!user) { openLogin(); return; }          // chưa đăng nhập → mở popup đăng nhập
-    if (!d.coFile || taiId) return;
-    setTaiId(d.id);
-    // iOS Safari CHẶN window.open() gọi sau await (mất ngữ cảnh chạm). → Mở tab trống NGAY trong cú chạm, rồi trỏ URL sau khi tải xong.
-    const win = window.open('', '_blank');
-    const go = (u: string) => { if (win && !win.closed) win.location.href = u; else { const a = document.createElement('a'); a.href = u; a.target = '_blank'; a.rel = 'noopener'; a.click(); } };
-    try {
-      const r = await fetch(`${apiBase}/van-ban/${d.id}/pdf`, { headers: { Authorization: `Bearer ${getToken() || ''}` } });
-      if (r.status === 401) { win?.close(); alert('Vui lòng đăng nhập lại để tải văn bản.'); openLogin(); return; }
-      if (!r.ok) { win?.close(); alert('Không tải được văn bản. Thử lại sau.'); return; }
-      const ct = r.headers.get('content-type') || '';
-      if (ct.includes('application/pdf')) {
-        const url = URL.createObjectURL(await r.blob());
-        go(url); setTimeout(() => URL.revokeObjectURL(url), 60000);
-      } else {
-        const j = await r.json().catch(() => null);
-        if (j?.redirect) go(j.redirect); else { win?.close(); alert('Chưa có file cho văn bản này.'); }
-      }
-      setDocs((ds) => (ds || []).map((x) => x.id === d.id ? { ...x, luotTai: (x.luotTai || 0) + 1 } : x));
-    } catch { win?.close(); alert('Lỗi tải văn bản.'); }
-    finally { setTaiId(null); }
+    if (!d.coFile) return;
+    setDangXem({ id: d.id, ten: `${(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')} · ${d.trichYeu}`,
+      tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`, url: `${apiBase}/van-ban/${d.id}/pdf`, token: getToken() || '' });
+    setDocs((ds) => (ds || []).map((x) => x.id === d.id ? { ...x, luotTai: (x.luotTai || 0) + 1 } : x));
   }
+  const dongXem = useCallback(() => setDangXem(null), []);
+  const loiXem = useCallback((m: string) => { alert(m); }, []);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER));
   const cur = Math.min(page, totalPages);
@@ -259,6 +248,7 @@ export default function VanBanBrowser() {
           <button onClick={() => setPage(cur + 1)} disabled={cur === totalPages} className="min-w-9 h-9 px-2 grid place-items-center rounded-lg border border-slate-200 text-slate-600 text-sm font-semibold hover:border-[#C8A14B] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-slate-200">›</button>
         </nav>
       )}
+      {dangXem && <XemVanBan vb={dangXem} onDong={dongXem} onLoi={loiXem} />}
     </div>
   );
 }

@@ -2016,18 +2016,7 @@ export default function MapPage() {
                 đúng cho chúng, hiện ra là dẫn người xem đọc sai. */}
             {/* Điện thoại KHÔNG hiện khối này (chủ dự án yêu cầu 14/9/2026): đã có nhóm "Chú giải"
                 riêng trên thanh trên, để thêm trong bảng lớp là trùng. */}
-            {(MUC_QH.find((x) => x.id === 'phan-khu')?.gom || []).some((id) => !!ovOn[id]) && (
-              <div className="mt-2 hidden lg:block">
-                <button
-                  onClick={() => { setChuGiaiOpen((v) => !v); napChuGiai(); }}
-                  className="cl-press w-full flex items-center justify-between gap-2 rounded-lg border px-2.5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50"
-                >
-                  <span>📖 Chú giải loại đất</span>
-                  <span className="text-slate-400">{chuGiaiOpen ? '▲' : '▼'}</span>
-                </button>
-                {chuGiaiOpen && <div className="mt-1.5">{chuGiaiNoiDung()}</div>}
-              </div>
-            )}
+            {/* Máy tính: KHÔNG còn khối chú giải trong khung Lớp — đã có nút "Chú giải" riêng trên hàng chip (chủ dự án 6/10/2026). */}
           </div>
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mt-3 mb-1.5 pt-3 border-t">Lớp dữ liệu</p>
           {ranhXa && (
@@ -2106,12 +2095,12 @@ export default function MapPage() {
             {/* Chip "Nhãn" đã bỏ (chủ dự án 6/10/2026): nhãn & đường mặc định luôn bật; điện thoại vẫn tắt/bật được ở thanh cũ. */}
           </div>
           {timMo && (
-            <div className="absolute top-[96px] left-1/2 z-40 hidden w-[480px] max-w-[calc(100%-120px)] -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 shadow-[0_12px_32px_-12px_rgba(10,37,64,.45)] lg:block">
+            <div className="absolute top-[96px] left-1/2 z-40 hidden w-[600px] max-w-[calc(100%-120px)] -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 shadow-[0_12px_32px_-12px_rgba(10,37,64,.45)] lg:block">
               <div className="flex items-center gap-2">
                 <div className="grid flex-1 grid-cols-4 gap-0.5 rounded-lg bg-slate-100 p-0.5 text-[12px] font-bold">
                   {([['parcel', 'Số thửa · tờ'], ['vn2000', 'Toạ độ VN-2000'], ['latlng', 'Toạ độ WGS-84'], ['gmap', 'Link Google Maps']] as const).map(([k, t]) => (
                     <button key={k} type="button" onClick={() => { setC1(''); setC2(''); setSearchMode(k as any); }}
-                      className={`whitespace-nowrap rounded-md px-1 py-1 ${searchMode === k ? 'bg-white text-[#0A2540] shadow-sm' : 'text-slate-500 hover:text-[#0A2540]'}`}>{t}</button>
+                      className={`whitespace-nowrap rounded-md px-2.5 py-1.5 ${searchMode === k ? 'bg-white text-[#0A2540] shadow-sm' : 'text-slate-500 hover:text-[#0A2540]'}`}>{t}</button>
                   ))}
                 </div>
                 <button type="button" onClick={() => setTimMo(false)} aria-label="Đóng" className="ml-auto grid h-7 w-7 place-items-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700">✕</button>

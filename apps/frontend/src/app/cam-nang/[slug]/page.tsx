@@ -59,6 +59,15 @@ export default function GuidePage({ params }: { params: { slug: string } }) {
                 ))}
               </ul>
             )}
+            {b.links && (
+              <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
+                {b.links.map(([ten, url]) => (
+                  <a key={url} href={url} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-[#0A2540] hover:border-[#C8A14B] hover:text-red-600">
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-slate-100 text-xs">{/youtu/.test(url) ? '▶' : 'PDF'}</span>{ten}
+                  </a>
+                ))}
+              </div>
+            )}
           </section>
         ))}
       </article>

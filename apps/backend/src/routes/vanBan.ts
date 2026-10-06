@@ -244,7 +244,8 @@ export async function crawlPortals(onAdd?: (isNew: boolean) => void): Promise<nu
            ON CONFLICT (so_hieu, ngay_ban_hanh) DO UPDATE SET
              link_goc = COALESCE(NULLIF(van_ban.link_goc, ''), EXCLUDED.link_goc)
            RETURNING (xmax = 0) AS inserted`,
-          [d.so, d.trichYeu, d.ngay, `Cổng ${p.ten}`, classify(text), `Cổng ${p.ten}`, d.link || `${p.base}/module/document`, d.luot]
+          [d.so, d.trichYeu, d.ngay, p.ten.startsWith('Cổng') ? p.ten : `Cổng ${p.ten}`, classify(text), p.ten.startsWith('Cổng') ? p.ten : `Cổng ${p.ten}`, // tên đã có chữ "Cổng" thì không chắp thêm (từng ra "Cổng Cổng tỉnh…")
+           d.link || `${p.base}/module/document`, d.luot]
         ).then((rs: any) => { n++; onAdd?.(!!(rs && rs[0] && rs[0].inserted)); }).catch(() => {});
       }
     } catch { /* cổng lỗi/timeout → bỏ qua */ }

@@ -1,6 +1,6 @@
 // Nội dung Cẩm nang pháp lý nhà đất — dùng cho trang /cam-nang và /cam-nang/[slug].
 // Thông tin mang tính tham khảo, hướng dẫn chung; quy định có thể thay đổi (đặc biệt theo Luật Đất đai 2024).
-export interface GuideBlock { h: string; p?: string; list?: string[] }
+export interface GuideBlock { h: string; p?: string; list?: string[]; links?: [string, string][] } // links: [tên, đường dẫn] — tải biểu mẫu/văn bản gốc
 export interface Guide { slug: string; title: string; desc: string; updated: string; intro: string; body: GuideBlock[] }
 
 export const GUIDES: Guide[] = [
@@ -128,6 +128,26 @@ export const GUIDES: Guide[] = [
       { h: 'Chi phí chính', p: 'Khoản lớn nhất thường là tiền sử dụng đất, tính bằng chênh lệch giữa giá đất ở và giá đất trước khi chuyển theo bảng giá/định giá của Nhà nước. Ngoài ra có lệ phí, phí đo đạc (nếu cần).' },
       { h: 'Trình tự', list: ['Nộp hồ sơ tại Bộ phận Một cửa/Phòng TN&MT', 'Cơ quan thẩm định, ra quyết định cho phép', 'Nộp tiền sử dụng đất và cập nhật Giấy chứng nhận'] },
       { h: 'Lưu ý', p: 'Nên hỏi trước cơ quan chuyên môn về khả năng chuyển mục đích và ước tính tiền sử dụng đất để dự trù chi phí.' },
+    ],
+  },
+  {
+    // Viết 6/10/2026 từ tài liệu chủ dự án gửi (thư mục Drive "Hướng dẫn tính lại tiền lên thổ năm 2026"):
+    // TB 696/TB-UBND ngày 11/8/2026 của UBND xã Cam Lâm + mẫu đơn đề nghị xác định lại theo khoản 2 Điều 12 NĐ 50/2026.
+    // KHÔNG đăng file mẫu 01/ĐNXLNT trong thư mục đó vì bản ấy đã điền tên + mã số thuế của một người thật.
+    slug: 'tinh-lai-tien-su-dung-dat-len-tho-cu',
+    title: 'Tính lại tiền sử dụng đất khi đã chuyển lên thổ cư (01/8/2024 – 31/12/2025)',
+    desc: 'Ai được tính lại, mức 30% – 50% – 100% chênh lệch, đã nộp rồi thì xin hoàn thế nào — theo NQ 254/2025/QH15 và NĐ 50/2026/NĐ-CP.',
+    updated: '2026',
+    intro: 'Hộ gia đình, cá nhân được cho phép chuyển đất vườn, ao, đất nông nghiệp sang đất ở trong khoảng từ 01/8/2024 đến trước 01/01/2026 có thể được tính hoặc tính lại tiền sử dụng đất theo mức thấp hơn. Nếu đã nộp nhiều hơn mức mới, phần chênh lệch được bù trừ hoặc hoàn trả. Bài này tóm tắt theo Thông báo 696/TB-UBND ngày 11/8/2026 của UBND xã Cam Lâm.',
+    body: [
+      { h: 'Căn cứ pháp lý', list: ['Nghị quyết 254/2025/QH15 ngày 11/12/2025 của Quốc hội — tháo gỡ vướng mắc về tiền sử dụng đất, tiền thuê đất', 'Nghị định 50/2026/NĐ-CP ngày 31/01/2026 của Chính phủ — hướng dẫn Nghị quyết 254 (Điều 6 về mức thu, Điều 12 về chuyển tiếp)', 'Công văn 7713/BTC-QLCS ngày 08/6/2026 của Bộ Tài chính', 'Thông báo 696/TB-UBND ngày 11/8/2026 của UBND xã Cam Lâm'] },
+      { h: 'Ai được áp dụng', list: ['Đất vườn, ao, đất nông nghiệp trong cùng thửa đất có đất ở, nay chuyển sang đất ở', 'Đất có nguồn gốc là đất vườn, ao gắn liền với đất ở nhưng người sử dụng đất tách ra để chuyển quyền', 'Đất vườn, ao gắn liền với đất ở mà đơn vị đo đạc đã tự tách thành thửa riêng khi đo vẽ bản đồ địa chính trước 01/7/2014'], p: 'Chỉ được hưởng MỘT LẦN cho một hộ gia đình, cá nhân và trên MỘT thửa đất do người sử dụng đất tự chọn. Đã hưởng ở thửa này thì lần chuyển mục đích sau (kể cả thửa khác) không được hưởng nữa.' },
+      { h: 'Mức tiền sử dụng đất phải nộp', p: 'Tính trên phần chênh lệch giữa tiền sử dụng đất theo giá đất ở và theo giá đất nông nghiệp, tại thời điểm có quyết định cho phép chuyển mục đích:', list: ['30% chênh lệch — phần diện tích trong hạn mức giao đất ở', '50% chênh lệch — phần vượt hạn mức nhưng không quá 01 lần hạn mức', '100% chênh lệch — phần vượt quá 01 lần hạn mức giao đất ở'] },
+      { h: 'Ai được tính lại (chuyển tiếp)', p: 'Các trường hợp đã có quyết định cho phép chuyển mục đích sang đất ở từ ngày 01/8/2024 đến trước ngày 01/01/2026, thuộc các trường hợp nêu trên:', list: ['Cơ quan thuế CHƯA ra Thông báo nộp tiền: được tính theo mức mới', 'Đã có Thông báo nhưng CHƯA nộp tiền: đề nghị cơ quan thuế tính lại và điều chỉnh Thông báo', 'Đã nộp MỘT PHẦN: đề nghị tính lại — thiếu thì nộp thêm (kèm tiền chậm nộp), thừa thì được xử lý theo quy định', 'Đã nộp ĐỦ: đề nghị tính lại — phần nộp thừa được bù trừ vào tiền sử dụng đất, tiền thuê đất hoặc nghĩa vụ tài chính khác; không còn gì để bù trừ thì được hoàn trả bằng tiền'] },
+      { h: 'Hồ sơ đề nghị tính lại', list: ['Đơn đề nghị xác định lại tiền sử dụng đất và hoàn trả số tiền nộp thừa (mẫu bên dưới)', 'Bản sao Giấy chứng nhận quyền sử dụng đất', 'Bản sao Quyết định cho phép chuyển mục đích sử dụng đất', 'Bản sao Thông báo nộp tiền sử dụng đất và Thông báo nộp lệ phí trước bạ', 'Bản sao Thông báo thuế sử dụng đất phi nông nghiệp (nếu có)', 'Bản sao Giấy nộp tiền vào ngân sách nhà nước', 'Giấy tờ khác chứng minh thuộc trường hợp được áp dụng (điểm c khoản 2 Điều 10 NQ 254)'] },
+      { h: 'Nộp ở đâu, ai giải quyết', list: ['Nộp tại UBND xã/phường nơi có đất (Trung tâm phục vụ hành chính công). Ở xã Cam Lâm, Phòng Kinh tế tiếp nhận, rà soát hồ sơ và xác định hạn mức giao đất ở', 'Xã lập Phiếu chuyển thông tin xác định nghĩa vụ tài chính, gửi cơ quan thuế (Thuế cơ sở) cùng hồ sơ', 'Cơ quan thuế tính lại và ra thông báo số tiền phải nộp / được hoàn'] },
+      { h: 'Biểu mẫu & văn bản gốc', p: 'Mẫu đơn dưới đây đang ghi gửi UBND xã Cam An — khi nộp ở xã khác thì sửa lại tên xã. Ngoài đơn này, khi xin hoàn tiền cơ quan thuế có thể yêu cầu thêm mẫu 01/ĐNXLNT (Thông tư 89/2026/TT-BTC).', links: [['Mẫu đơn đề nghị xác định lại tiền sử dụng đất (PDF)', '/tai-lieu/don-de-nghi-xac-dinh-lai-tien-su-dung-dat-ND50-2026.pdf'], ['Thông báo 696/TB-UBND của UBND xã Cam Lâm (PDF)', '/tai-lieu/TB-696-UBND-xa-Cam-Lam-tinh-lai-tien-su-dung-dat.pdf'], ['Video hướng dẫn cụ thể (YouTube)', 'https://youtu.be/J8lJ9Qp9Zic']] },
+      { h: 'Lưu ý', p: 'Hãy tự rà soát xem quyết định chuyển mục đích của mình có nằm trong khoảng 01/8/2024 – 31/12/2025 không và đã từng hưởng mức ưu đãi này ở thửa khác chưa. Chọn thửa có lợi nhất để đề nghị, vì mỗi hộ chỉ được hưởng một lần.' },
     ],
   },
   {

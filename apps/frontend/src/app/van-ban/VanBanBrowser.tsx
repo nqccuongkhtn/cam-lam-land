@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import { api, apiBase } from '@/lib/api';
@@ -47,6 +47,42 @@ function PdfIcon() {
   return <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" /><path d="M12 11v6M9.5 14.5 12 17l2.5-2.5" /></svg>;
 }
 
+// Ô CHỌN LUÔN SỔ XUỐNG (6/10/2026): ô <select> mặc định của trình duyệt tự lật LÊN TRÊN khi gần đáy màn hình,
+// che mất các ô chủ đề — chủ dự án: "cho địa giới hành chính sổ xuống chứ". Ô này luôn mở xuống dưới, cuộn trong khung.
+function SoXuong({ value, onChange, opts, w = '' }: { value: string; onChange: (v: string) => void; opts: [string, string][]; w?: string }) {
+  const [mo, setMo] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!mo) return;
+    const dong = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setMo(false); };
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setMo(false); };
+    document.addEventListener('mousedown', dong); document.addEventListener('keydown', esc);
+    return () => { document.removeEventListener('mousedown', dong); document.removeEventListener('keydown', esc); };
+  }, [mo]);
+  const nhan = opts.find(([v]) => v === value)?.[1] ?? opts[0]?.[1];
+  return (
+    <div ref={ref} className={`relative ${w}`}>
+      <button type="button" onClick={() => setMo((x) => !x)} aria-haspopup="listbox" aria-expanded={mo}
+        className={`flex w-full items-center gap-2 rounded-lg border bg-white px-3 py-2 text-left text-sm outline-none ${mo ? 'border-[#C8A14B]' : 'border-slate-200'}`}>
+        <span className="min-w-0 flex-1 truncate">{nhan}</span>
+        <svg viewBox="0 0 24 24" className={`h-4 w-4 shrink-0 text-slate-400 transition ${mo ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m6 9 6 6 6-6" /></svg>
+      </button>
+      {mo && (
+        <ul role="listbox" className="absolute left-0 top-full z-30 mt-1 max-h-72 min-w-full overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg sm:w-max sm:max-w-[360px]">
+          {opts.map(([v, t]) => (
+            <li key={v} role="option" aria-selected={v === value}>
+              <button type="button" onClick={() => { onChange(v); setMo(false); }}
+                className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-slate-50 ${v === value ? 'font-semibold text-[#0A2540]' : 'text-slate-700'}`}>
+                <span className="w-3 shrink-0 text-[#C8A14B]">{v === value ? '✓' : ''}</span>{t}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export default function VanBanBrowser() {
   const { user } = useAuth();
   const { openLogin } = useLoginGate();
@@ -56,6 +92,9 @@ export default function VanBanBrowser() {
   const [chuDe, setChuDe] = useState<ChuDeNhom | 'all'>('all');
   const [nam, setNam] = useState('all');
   const [diaBan, setDiaBan] = useState('all');
+  // Lọc theo CƠ QUAN BAN HÀNH + THÁNG — học camhomes.vn/van-ban (họ chia văn bản theo cơ quan · tháng · năm), 6/10/2026
+  const [coQuan, setCoQuan] = useState('all');
+  const [thang, setThang] = useState('all');
   const [sort, setSort] = useState<'moi' | 'tai'>('moi');
   const [page, setPage] = useState(1);
   const [taiId, setTaiId] = useState<number | null>(null);
@@ -67,6 +106,7 @@ export default function VanBanBrowser() {
   }, []);
 
   const YEARS = useMemo(() => Array.from(new Set((docs || []).map((d) => (d.ngay || '').slice(0, 4)).filter(Boolean))).sort((a, b) => b.localeCompare(a)), [docs]);
+  const CO_QUAN = useMemo(() => { const m = new Map<string, number>(); (docs || []).forEach((d) => { const c = (d.coQuan || '').trim(); if (c) m.set(c, (m.get(c) || 0) + 1); }); return [...m.entries()].sort((a, b) => b[1] - a[1]); }, [docs]);
   const DIA_BAN = useMemo(() => { const s = new Set((docs || []).map(diaBanOf)); return DB_ORDER.filter((x) => s.has(x)); }, [docs]);
   const filtered = useMemo(() => {
     const kw = kd(q.trim());
@@ -75,9 +115,11 @@ export default function VanBanBrowser() {
         (chuDe === 'all' || CHUDE_META[chuDe].match.includes(d.chuDe)) &&
         (nam === 'all' || (d.ngay || '').slice(0, 4) === nam) &&
         (diaBan === 'all' || diaBanOf(d) === diaBan) &&
+        (coQuan === 'all' || (d.coQuan || '').trim() === coQuan) &&
+        (thang === 'all' || (d.ngay || '').slice(5, 7) === thang) &&
         (!kw || kd(d.soKyHieu || '').includes(kw) || kd(d.trichYeu || '').includes(kw) || kd(d.coQuan || '').includes(kw) || kd(d.linhVuc || '').includes(kw)))
       .sort((a, b) => sort === 'tai' ? (b.luotTai || 0) - (a.luotTai || 0) : (b.ngay || '').localeCompare(a.ngay || ''));
-  }, [docs, q, chuDe, nam, diaBan, sort]);
+  }, [docs, q, chuDe, nam, diaBan, coQuan, thang, sort]);
 
   async function taiPdf(d: VanBan) {
     if (!user) { openLogin(); return; }          // chưa đăng nhập → mở popup đăng nhập
@@ -106,7 +148,7 @@ export default function VanBanBrowser() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER));
   const cur = Math.min(page, totalPages);
   const vis = filtered.slice((cur - 1) * PER, cur * PER);
-  const hasFilter = q || chuDe !== 'all' || nam !== 'all' || diaBan !== 'all';
+  const hasFilter = q || chuDe !== 'all' || nam !== 'all' || diaBan !== 'all' || coQuan !== 'all' || thang !== 'all';
   const th = 'px-2.5 sm:px-3 py-3 font-semibold text-left whitespace-nowrap';
   const td = 'px-2.5 sm:px-3 py-3.5 align-top';
   const COUNT = (c: ChuDeNhom) => (docs || []).filter((d) => CHUDE_META[c].match.includes(d.chuDe)).length;
@@ -141,15 +183,11 @@ export default function VanBanBrowser() {
           <input value={q} onChange={(e) => { setQ(e.target.value); reset(); }} placeholder="Tìm theo số ký hiệu, trích yếu, cơ quan…" className="w-full pl-10 pr-3 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white outline-none focus:border-[#C8A14B] text-sm" />
         </div>
         <div className="flex flex-wrap gap-2 mt-2 items-center">
-          <select value={diaBan} onChange={(e) => { setDiaBan(e.target.value); reset(); }} className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white outline-none focus:border-[#C8A14B]">
-            <option value="all">Tất cả địa giới hành chính</option>
-            {DIA_BAN.map((x) => <option key={x} value={x}>{x}</option>)}
-          </select>
-          <select value={nam} onChange={(e) => { setNam(e.target.value); reset(); }} className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white outline-none focus:border-[#C8A14B]">
-            <option value="all">Tất cả các năm</option>
-            {YEARS.map((y) => <option key={y} value={y}>Năm {y}</option>)}
-          </select>
-          {hasFilter && <button onClick={() => { setQ(''); setChuDe('all'); setNam('all'); setDiaBan('all'); reset(); }} className="text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg px-3 py-2">✕ Xóa lọc</button>}
+          <SoXuong value={diaBan} onChange={(v) => { setDiaBan(v); reset(); }} w="w-full sm:w-auto sm:min-w-[210px]" opts={[['all', 'Tất cả địa giới hành chính'], ...DIA_BAN.map((x): [string, string] => [x, x])]} />
+          <SoXuong value={nam} onChange={(v) => { setNam(v); reset(); }} w="w-[calc(50%-4px)] sm:w-auto sm:min-w-[150px]" opts={[['all', 'Tất cả các năm'], ...YEARS.map((y): [string, string] => [y, `Năm ${y}`])]} />
+          <SoXuong value={thang} onChange={(v) => { setThang(v); reset(); }} w="w-[calc(50%-4px)] sm:w-auto sm:min-w-[150px]" opts={[['all', 'Tất cả các tháng'], ...Array.from({ length: 12 }, (_, i): [string, string] => [String(i + 1).padStart(2, '0'), `Tháng ${i + 1}`])]} />
+          <SoXuong value={coQuan} onChange={(v) => { setCoQuan(v); reset(); }} w="w-full sm:w-[280px]" opts={[['all', 'Tất cả cơ quan ban hành'], ...CO_QUAN.map(([c, n]): [string, string] => [c, `${c} (${n})`])]} />
+          {hasFilter && <button onClick={() => { setQ(''); setChuDe('all'); setNam('all'); setDiaBan('all'); setCoQuan('all'); setThang('all'); reset(); }} className="text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg px-3 py-2">✕ Xóa lọc</button>}
         </div>
       </div>
 

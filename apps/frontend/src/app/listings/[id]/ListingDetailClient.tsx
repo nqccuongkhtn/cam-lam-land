@@ -361,13 +361,14 @@ export default function ListingDetail() {
                nền khung đổi sang xám-xanh RẤT NHẠT, xanh ngọc chỉ còn ở dải tiêu đề + nút số điện thoại. */
             <div className="rounded-xl overflow-hidden border border-[#d5e7e4] bg-[#f3f8f7] shadow-[0_4px_16px_rgba(15,23,42,0.06)]">
               {/* ẢNH ĐẠI DIỆN KIỂU batdongsan.com.vn (6/10/2026): ảnh TO 76px, tròn, viền trắng dày, ĐÈ lên mép dải xanh;
-                  chữ "Môi giới chuyên nghiệp" dời sang phải nhường chỗ cho ảnh, tên đứng ngay cạnh ảnh. */}
-              <div className="flex items-center gap-1.5 bg-[#0e8b80] py-2.5 pl-[104px] pr-3">
+                  chữ "Môi giới chuyên nghiệp" dời sang phải nhường chỗ cho ảnh, tên đứng ngay cạnh ảnh.
+                  Dải cao 52px + ảnh lùi 40px → mép trên ảnh cách mép khung ~20px (bản đầu ảnh vượt lên bị khung cắt mất đầu). */}
+              <div className="flex h-[52px] items-center gap-1.5 bg-[#0e8b80] pl-[104px] pr-3">
                 <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 shrink-0"><circle cx="12" cy="8" r="6" /><path d="M15.5 13.6 17 22l-5-3-5 3 1.5-8.4" /></svg>
                 <span className="text-white text-[13px] font-bold tracking-wide">Môi giới chuyên nghiệp</span>
               </div>
               <div className="relative bg-white mx-2 mt-2 rounded-lg border border-slate-100 p-3">
-                <div className="absolute -top-[46px] left-3">
+                <div className="absolute -top-[40px] left-3">
                   {l.posterAvatar ? <img src={l.posterAvatar} alt="" className="h-[76px] w-[76px] rounded-full object-cover ring-4 ring-white shadow-sm" /> : <div className="grid h-[76px] w-[76px] place-items-center rounded-full bg-gradient-to-br from-[#123459] to-[#081B30] text-2xl font-extrabold text-[#C8A14B] ring-4 ring-white shadow-sm">{(l.contactName || 'C').charAt(0).toUpperCase()}</div>}
                   <span className="absolute bottom-0.5 right-0.5 grid h-5 w-5 place-items-center rounded-full bg-[#0e8b80] ring-2 ring-white"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="w-2.5 h-2.5"><path d="M20 6 9 17l-5-5" /></svg></span>
                 </div>

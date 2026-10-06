@@ -22,13 +22,17 @@ export function Toolbar({ tool, setTool, selText, updateSel, color, setColor, fo
       <button onClick={onTim} disabled={!hasPages} title="Tìm chữ / Tìm & thay thế (Ctrl+F)" className={`inline-flex items-center gap-1.5 rounded-md px-3.5 py-1.5 text-sm font-bold shadow-sm ring-1 transition disabled:opacity-40 ${timMo ? 'bg-[#0A2540] text-white ring-[#0A2540]' : 'bg-[#C8A14B] text-[#0A2540] ring-[#b8923f] hover:bg-[#d4b05e]'}`}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" className="h-4 w-4" aria-hidden><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>Tìm & thay thế
       </button>
-      <input type="color" value={color} onChange={(e) => { setColor(e.target.value); if (selText) updateSel({ color: fromHex(e.target.value) }); }} className="h-7 w-8 cursor-pointer rounded border" title="Màu" />
-      <select value={selText ? selText.o.fam : 'serif'} onChange={(e) => { if (selText) updateSel({ fam: e.target.value }); }} disabled={!selText} title="Phông chữ (chọn ô chữ để đổi cho khớp file)" className="rounded border px-1 py-1 text-sm disabled:opacity-40"><option value="serif">Times New Roman</option><option value="sans">Arial</option><option value="tahoma">Tahoma</option><option value="calibri">Calibri</option><option value="verdana">Verdana</option></select>
-      <label className="flex items-center gap-1 text-sm">Cỡ<input type="number" min={6} max={96} step={0.5} value={selText ? Math.round(selText.o.size * 10) / 10 : fontSize} onChange={(e) => { const v = +e.target.value; setFontSize(v); if (selText) updateSel({ size: v }); }} className="w-16 rounded border px-1 py-0.5" title="Cỡ chữ (chọn ô chữ để đổi)" /></label>
-      <span className="mx-1 h-6 w-px bg-slate-200" />
-      <button onClick={() => setZoom((z: number) => Math.max(0.4, z - 0.15))} className="rounded border px-2 py-1 text-sm">−</button>
-      <span className="w-12 text-center text-sm">{Math.round(zoom * 100)}%</span>
-      <button onClick={() => setZoom((z: number) => Math.min(4, z + 0.15))} className="rounded border px-2 py-1 text-sm">＋</button>
+      {/* CỤM ĐỊNH DẠNG: màu · phông · cỡ chữ · thu phóng luôn nằm CHUNG MỘT HÀNG, không bị tách khi thanh công cụ xuống dòng
+          (chủ dự án 6/10/2026: ô màu + phông bị kẹt ở hàng trên, cỡ chữ + % thu phóng ở hàng dưới). */}
+      <div className="flex shrink-0 items-center gap-1.5">
+        <input type="color" value={color} onChange={(e) => { setColor(e.target.value); if (selText) updateSel({ color: fromHex(e.target.value) }); }} className="h-7 w-8 cursor-pointer rounded border" title="Màu" />
+        <select value={selText ? selText.o.fam : 'serif'} onChange={(e) => { if (selText) updateSel({ fam: e.target.value }); }} disabled={!selText} title="Phông chữ (chọn ô chữ để đổi cho khớp file)" className="rounded border px-1 py-1 text-sm disabled:opacity-40"><option value="serif">Times New Roman</option><option value="sans">Arial</option><option value="tahoma">Tahoma</option><option value="calibri">Calibri</option><option value="verdana">Verdana</option></select>
+        <label className="flex items-center gap-1 text-sm">Cỡ<input type="number" min={6} max={96} step={0.5} value={selText ? Math.round(selText.o.size * 10) / 10 : fontSize} onChange={(e) => { const v = +e.target.value; setFontSize(v); if (selText) updateSel({ size: v }); }} className="w-16 rounded border px-1 py-0.5" title="Cỡ chữ (chọn ô chữ để đổi)" /></label>
+        <span className="mx-1 h-6 w-px bg-slate-200" />
+        <button onClick={() => setZoom((z: number) => Math.max(0.4, z - 0.15))} className="rounded border px-2 py-1 text-sm">−</button>
+        <span className="w-12 text-center text-sm">{Math.round(zoom * 100)}%</span>
+        <button onClick={() => setZoom((z: number) => Math.min(4, z + 0.15))} className="rounded border px-2 py-1 text-sm">＋</button>
+      </div>
       <div className="ml-auto flex items-center gap-2">
         {sel && <button onClick={deleteSel} className="rounded border border-red-300 px-2.5 py-1.5 text-sm text-red-600">🗑 Xoá</button>}
         <button onClick={onExport} disabled={!hasPages} className="rounded bg-emerald-600 px-4 py-1.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-40">⬇ Xuất PDF</button>

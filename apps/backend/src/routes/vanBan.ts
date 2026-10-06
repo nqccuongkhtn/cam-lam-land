@@ -763,10 +763,11 @@ vanBanRouter.get('/:id/pdf', authRequired, async (req, res) => {
     if (buf) {
       res.set('Content-Type', 'application/pdf');
       res.set('Content-Disposition', `inline; filename="${tenFile}"`);
-      // KHÔNG cho trình duyệt giữ 1 ngày như trước: người đã mở trước khi có dấu bản quyền cứ thấy bản cũ không dấu
-      // (chủ dự án 6/10/2026 "vẫn nhiều văn bản không có watermark"). no-cache = lần nào cũng hỏi lại, file không đổi thì
-      // máy chủ chỉ trả "dùng bản cũ" (ETag → 304) nên vẫn nhẹ. Đường dẫn có ?v=<phiên bản> để bỏ hẳn bản cũ trong máy khách.
-      res.set('Cache-Control', 'private, no-cache');
+      // CACHE THEO PHIÊN BẢN (chủ dự án 6/10/2026: vẫn phải cho trình duyệt giữ file để máy chủ nhẹ):
+      // · đường dẫn mang đúng phiên bản hiện tại (?v=7 ↔ PHIEN_BAN_FILE 'v7') → trình duyệt giữ 30 ngày, mở lại không hỏi máy chủ;
+      // · đổi dấu bản quyền/cách nén thì tăng PHIEN_BAN_FILE + số ?v= bên giao diện → đường dẫn mới, trình duyệt tự lấy bản mới.
+      // · đường dẫn cũ / không có ?v= → bắt hỏi lại (ETag → 304 nếu không đổi), để không ai kẹt bản cũ không dấu như trước.
+      res.set('Cache-Control', String(req.query.v || '') === PHIEN_BAN_FILE.slice(1) ? 'private, max-age=2592000, immutable' : 'private, no-cache');
       res.set('X-Phien-Ban-File', PHIEN_BAN_FILE);
       return res.send(buf);
     }

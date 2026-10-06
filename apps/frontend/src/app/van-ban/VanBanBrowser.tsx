@@ -128,7 +128,7 @@ export default function VanBanBrowser() {
     if (!user) { openLogin(); return; }          // chưa đăng nhập → mở popup đăng nhập
     if (!d.coFile) return;
     setDangXem({ id: d.id, ten: `${(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')} · ${d.trichYeu}`,
-      tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`, url: `${apiBase}/van-ban/${d.id}/pdf?v=7`, token: getToken() || '' });
+      tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`, url: `${apiBase}/van-ban/${d.id}/pdf?v=7` /* v=7 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts) mới được giữ 30 ngày */, token: getToken() || '' });
     setDocs((ds) => (ds || []).map((x) => x.id === d.id ? { ...x, luotTai: (x.luotTai || 0) + 1 } : x));
   }
   const dongXem = useCallback(() => setDangXem(null), []);

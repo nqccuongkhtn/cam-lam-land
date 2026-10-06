@@ -1957,10 +1957,11 @@ export default function MapPage() {
             <h2 className="font-bold">Lớp Q.Hoạch</h2>
             <button onClick={() => setPanelOpen(false)} aria-label="Đóng" className="text-slate-400 hover:text-slate-700 text-xl leading-none">✕</button>
           </div>
+          {/* Máy tính (mẫu 51): bỏ nút "Vẽ thửa từ toạ độ" (trùng chip "Vẽ") + dòng gợi ý cuối bảng — chủ dự án thấy dư, 6/10/2026 */}
           <p className="text-xs text-slate-500 mb-2.5">Cam Lâm, Khánh Hòa · EPSG:4326</p>
           {/* Máy tính: giữ nguyên nút này ở bảng lớp như cũ. Điện thoại thì nó đã nằm trong
               nhóm "Đo - vẽ" ở thanh trên rồi, để thêm ở đây là thừa. */}
-          <button onClick={() => setDrawOpen(true)} className="cl-press hidden lg:flex w-full mb-3 items-center justify-center gap-2 bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-bold py-2.5 rounded-lg">✏️ Vẽ thửa từ toạ độ</button>
+          <button onClick={() => setDrawOpen(true)} className="cl-press hidden w-full mb-3 items-center justify-center gap-2 bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-bold py-2.5 rounded-lg">✏️ Vẽ thửa từ toạ độ</button>
           {/* Ô chọn nền bản đồ nằm ở đây vì trên điện thoại nhóm 'Bản đồ' ở thanh trên đã được
               nhường chỗ cho Chú giải. Máy tính vẫn có ô này ở thanh trên, để đây thêm cũng không
               thừa: người dùng hay mở bảng lớp rồi mới nghĩ đến chuyện đổi nền. */}
@@ -2058,7 +2059,7 @@ export default function MapPage() {
               </div>
             </div>
           )}
-          <p className={`text-xs text-slate-400 mt-4 ${bangMuc === 'luu' ? 'lg:hidden' : ''}`}>💡 Nhấp vào bản đồ để xem toạ độ + lưu sản phẩm + tra cứu thửa/quy hoạch.</p>
+          <p className="text-xs text-slate-400 mt-4 lg:hidden">💡 Nhấp vào bản đồ để xem toạ độ + lưu sản phẩm + tra cứu thửa/quy hoạch.</p>
         </aside>
 
         <div ref={khungBanDoRef} className="relative flex-1 min-h-0">

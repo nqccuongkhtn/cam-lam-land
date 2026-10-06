@@ -335,6 +335,71 @@ export async function crawlCamhomes(deep = false, onAdd?: (isNew: boolean) => vo
   return n;
 }
 
+// ── NGUỒN BỔ SUNG: 2 BẢNG GOOGLE chủ dự án gửi (6/10/2026) — văn bản dự án Khu đô thị mới Cam Lâm ──
+//   1. "Danh sách quyết định thu hồi đất đô thị mới Cam Lâm 2026" (Google Sheets): Số ký hiệu · Ngày ký · Nội dung.
+//      Số dạng 735/QĐ-UBND (có chỗ ghi "QĐ UBND") — của UBND xã Cam Lâm. Bảng không kèm file.
+//   2. "Niêm yết dự thảo phương án chi tiết về bồi thường, hỗ trợ, TĐC dự án KĐT mới Cam Lâm" (file Excel trên Drive):
+//      cột B "3363/CNKVCL 24/9/2026", cột C nội dung + LIÊN KẾT tới file/thư mục Google Drive (đọc công khai).
+//      Số ghi lại thành "3363/TB-CNKVCL" cho trùng cách ghi của camhomes.vn → cùng số + ngày thì không nhân đôi.
+// Tải dạng xlsx (CSV làm mất liên kết), đọc bằng exceljs. Chạy cùng lịch 6 giờ với cổng TTĐT + nút "Cập nhật".
+// Đường tải thẳng của Drive bị chủ file chặn → link_goc là trang XEM của Drive (nút tải PDF sẽ mở trang đó).
+const SHEETS = [
+  { ten: 'thu-hoi', url: 'https://docs.google.com/spreadsheets/d/1rHOtnGclptr637qY7elA46Jfs3oirt954t14grglJ1w/export?format=xlsx', xem: 'https://docs.google.com/spreadsheets/d/1rHOtnGclptr637qY7elA46Jfs3oirt954t14grglJ1w/edit' },
+  { ten: 'niem-yet', url: 'https://docs.google.com/spreadsheets/d/1Ie7ddfiDybzNDk_JWdiXmeCK2Rjk9BFt/export?format=xlsx', xem: 'https://docs.google.com/spreadsheets/d/1Ie7ddfiDybzNDk_JWdiXmeCK2Rjk9BFt/preview' },
+];
+const giaTri = (v: any): any => (v && typeof v === 'object' ? (v.result ?? v.text ?? (v.richText ? v.richText.map((t: any) => t.text).join('') : v)) : v);
+const ngayIso = (v: any): string => {
+  v = giaTri(v);
+  if (v instanceof Date) return new Date(v.getTime() + 7 * 3600e3).toISOString().slice(0, 10);
+  const m = String(v || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : '';
+};
+const linkXem = (u: string) => { const m = u.match(/[?&]id=([\w-]{20,})/); return m ? `https://drive.google.com/file/d/${m[1]}/view` : u; };
+let lastSheets = 0;
+export async function crawlSheets(force = false, onAdd?: (isNew: boolean) => void): Promise<number> {
+  if (!force && Date.now() - lastSheets < 5 * 3600 * 1000) return 0;
+  lastSheets = Date.now();
+  const ExcelJS = (await import('exceljs')).default;
+  let n = 0;
+  for (const sh of SHEETS) {
+    try {
+      const r = await fetch(sh.url, { headers: UA, redirect: 'follow', signal: AbortSignal.timeout(30000) });
+      if (!r.ok) continue;
+      const wb = new ExcelJS.Workbook();
+      await wb.xlsx.load(Buffer.from(await r.arrayBuffer()) as any);
+      const ws = wb.worksheets[0];
+      const rows: { so: string; ngay: string; ty: string; link: string; cq: string }[] = [];
+      ws.eachRow((row) => {
+        const b = String(giaTri(row.getCell(2).value) ?? '').trim();
+        if (sh.ten === 'thu-hoi') {
+          const m = b.match(/^(\d+)\s*\/\s*QĐ[\s-]*UBND$/i);
+          const ty = clean(String(giaTri(row.getCell(4).value) ?? ''));
+          if (m && ty) rows.push({ so: `${m[1]}/QĐ-UBND`, ngay: ngayIso(row.getCell(3).value), ty, link: sh.xem, cq: 'UBND xã Cam Lâm' });
+        } else {
+          const m = b.match(/^(\d+)\s*\/\s*CNKVCL\s+(\d{1,2}\/\d{1,2}\/\d{4})/i);
+          const c = row.getCell(3);
+          const ty = clean(String(giaTri(c.value) ?? ''));
+          const lk = (c as any).hyperlink || (c.value as any)?.hyperlink || '';
+          if (m && ty.length > 8) rows.push({ so: `${m[1]}/TB-CNKVCL`, ngay: ngayIso(m[2]), ty, link: lk ? linkXem(lk) : sh.xem, cq: 'Chi nhánh Phát triển quỹ đất khu vực Cam Lâm' });
+        }
+      });
+      for (const x of rows) {
+        if (!x.ngay) continue;
+        await query(
+          `INSERT INTO van_ban (so_hieu, trich_yeu, ngay_ban_hanh, co_quan, chu_de, linh_vuc, nguon, link_goc)
+           VALUES ($1,$2,$3,$4,$5,'Bồi thường - TĐC','Bảng tổng hợp KĐT mới Cam Lâm',$6)
+           ON CONFLICT (so_hieu, ngay_ban_hanh) DO UPDATE SET
+             link_goc = COALESCE(NULLIF(van_ban.link_goc, ''), EXCLUDED.link_goc)
+           RETURNING (xmax = 0) AS inserted`,
+          [x.so, x.ty, x.ngay, x.cq, classify(x.ty), x.link])
+          .then((rs: any) => { n++; onAdd?.(!!(rs && rs[0] && rs[0].inserted)); }).catch(() => {});
+      }
+      console.log(`[van-ban] bảng ${sh.ten}: ${rows.length} dòng`);
+    } catch (e: any) { console.error(`[van-ban] bảng ${sh.ten} lỗi:`, e?.message || e); }
+  }
+  return n;
+}
+
 // Crawl NỀN: /refresh khởi động rồi trả lời NGAY (tránh 524 — Cloudflare cắt kết nối ở ~100s khi crawl sâu).
 // Client hỏi tiến độ qua /refresh-status tới khi running=false. Chặn chạy trùng bằng cờ running.
 const crawlState = { running: false, added: 0, updated: 0, startedAt: 0, finishedAt: 0, error: '' };
@@ -343,7 +408,7 @@ function startCrawlBg(): boolean {
   crawlState.running = true; crawlState.added = 0; crawlState.updated = 0; crawlState.startedAt = Date.now(); crawlState.finishedAt = 0; crawlState.error = '';
   const cb = (isNew: boolean) => { if (isNew) crawlState.added++; else crawlState.updated++; };
   (async () => {
-    try { await crawlCongBao(true, true, cb); await crawlPortals(cb); await crawlCamhomes(true, cb); }
+    try { await crawlCongBao(true, true, cb); await crawlPortals(cb); await crawlCamhomes(true, cb); await crawlSheets(true, cb); }
     catch (e: any) { crawlState.error = e?.message || 'Lỗi crawl'; }
     finally { crawlState.running = false; crawlState.finishedAt = Date.now(); }
   })();

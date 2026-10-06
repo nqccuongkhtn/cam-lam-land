@@ -437,12 +437,42 @@ export async function layPdfDrive(link: string): Promise<Buffer | null> {
   return out;
 }
 
+// ── FILE GỐC CỦA BẢNG "QUYẾT ĐỊNH THU HỒI ĐẤT" (tìm ra 6/10/2026) ──
+// Cổng xã Cam Lâm có trang "Quyết định thu hồi đất đô thị mới Cam Lâm" nhúng thư mục Drive công khai chứa bản PDF
+// đã ký số của từng quyết định; tên file bắt đầu bằng số quyết định ("1000.signed thu hồi đất của ông …").
+// Đọc trang đó → mọi thư mục Drive trong trang → map số quyết định → các file. Một số có 2 file (2 thửa khác nơi)
+// thì chọn file có tên khớp nhiều chữ nhất với trích yếu.
+const TRANG_QD_THU_HOI = ['https://camlam.khanhhoa.gov.vn/vi/dat-dai/quyet-dinh-thu-hoi-dat-do-thi-moi-cam-lam'];
+async function fileThuHoiCongXa(): Promise<Map<string, { id: string; ten: string }[]>> {
+  const map = new Map<string, { id: string; ten: string }[]>();
+  for (const trang of TRANG_QD_THU_HOI) {
+    try {
+      const html = await (await fetch(trang, { headers: UA, signal: AbortSignal.timeout(20000) })).text();
+      const thuMuc = new Set([...html.matchAll(/drive\.google\.com\/(?:drive\/folders\/|embeddedfolderview\?id=)([\w-]{20,})/g)].map((x) => x[1]));
+      for (const tm of thuMuc) for (const f of (await dsFileDrive(tm)) || []) {
+        const so = (f.ten.match(/^\s*(\d+)/) || [])[1];
+        if (so && /\.pdf$/i.test(f.ten)) map.set(so, [...(map.get(so) || []), f]);
+      }
+    } catch (e: any) { console.error('[van-ban] đọc trang QĐ thu hồi đất lỗi:', e?.message || e); }
+  }
+  console.log(`[van-ban] file QĐ thu hồi đất trên cổng xã: ${map.size} số quyết định`);
+  return map;
+}
+function chonFileQd(ds: { id: string; ten: string }[] | undefined, ty: string): string {
+  if (!ds?.length) return '';
+  const tu = new Set(vnNoAccentLite(ty.replace(/\.\.\.$/, '')).split(/\s+/).filter((w) => w.length > 1));
+  const diem = (t: string) => vnNoAccentLite(t).split(/\s+/).filter((w) => tu.has(w)).length;
+  const tot = [...ds].sort((a, b) => diem(b.ten) - diem(a.ten))[0];
+  return `https://drive.google.com/open?id=${tot.id}`;
+}
+
 let lastSheets = 0;
 export async function crawlSheets(force = false, onAdd?: (isNew: boolean) => void): Promise<number> {
   if (!force && Date.now() - lastSheets < 5 * 3600 * 1000) return 0;
   lastSheets = Date.now();
   const ExcelJS = (await import('exceljs')).default;
   let n = 0;
+  const fileQd = await fileThuHoiCongXa();
   for (const sh of SHEETS) {
     try {
       const r = await fetch(sh.url, { headers: UA, redirect: 'follow', signal: AbortSignal.timeout(30000) });
@@ -456,7 +486,8 @@ export async function crawlSheets(force = false, onAdd?: (isNew: boolean) => voi
         if (sh.ten === 'thu-hoi') {
           const m = b.match(/^(\d+)\s*\/\s*QĐ[\s-]*UBND$/i);
           const ty = clean(String(giaTri(row.getCell(4).value) ?? ''));
-          if (m && ty) rows.push({ so: `${m[1]}/QĐ-UBND`, ngay: ngayIso(row.getCell(3).value), ty, link: '', cq: 'UBND xã Cam Lâm' }); // bảng không kèm file → để trống, bước tự tìm file sẽ đi tìm
+          // Bảng không kèm file → lấy file từ thư mục Drive mà CỔNG XÃ CAM LÂM công bố (tên file bắt đầu bằng số quyết định)
+          if (m && ty) rows.push({ so: `${m[1]}/QĐ-UBND`, ngay: ngayIso(row.getCell(3).value), ty, link: chonFileQd(fileQd.get(m[1]), ty), cq: 'UBND xã Cam Lâm' });
         } else {
           const m = b.match(/^(\d+)\s*\/\s*CNKVCL\s+(\d{1,2}\/\d{1,2}\/\d{4})/i);
           const c: any = row.getCell(3);

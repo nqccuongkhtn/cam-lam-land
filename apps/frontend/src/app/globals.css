@@ -327,12 +327,7 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 /* Bản đồ KHÔNG có nút "?" (trang Nhà đất) → không chừa chỗ ở MỌI cỡ màn hình. Trước chỉ bỏ từ 768px nên điện thoại
    còn hở 38px phía trên cụm nút +/− (chủ dự án báo nhiều lần, sửa dứt điểm 6/10/2026). Cột nút đổi nền tự đo lại nên đi theo. */
 .cl-ban-do-khong-nut-hoi .maplibregl-ctrl-top-right { margin-top: 0; }
-/* Điện thoại: cột nút bản đồ THẲNG HÀNG với nút tìm đỏ + nút menu phía trên (chủ dự án 6/10/2026 "không thẳng hàng"):
-   mép phải cách lề 17px như ô tìm, nút vuông 36px bằng đúng nút tìm (trước: lệch 7px, rộng 31px). */
-@media (max-width: 1023px) {
-  .cl-ban-do-khong-nut-hoi .maplibregl-ctrl-top-right .maplibregl-ctrl { margin-right: 17px; }
-  .cl-ban-do-khong-nut-hoi .maplibregl-ctrl-group button { width: 36px; height: 36px; }
-}
+
 
 /* Quảng cáo động — chuyển động mượt (kiểu Znews) */
 @keyframes clKen { from { transform: scale(1.02); } to { transform: scale(1.09); } }

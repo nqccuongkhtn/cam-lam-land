@@ -1890,7 +1890,9 @@ export default function MapPage() {
   // KHUNG NỔI DÙNG CHUNG cho Lớp · Đã lưu · Đo · Chú giải (máy tính): cùng chỗ, cùng rộng, cùng kiểu đầu khung
   // Mọi khung (kể cả khung Tìm) cùng RỘNG 480px = đúng bằng ô tìm, căn GIỮA thẳng dưới ô tìm, cùng chiều cao tối đa
   // (trước lệch hẳn sang trái và mỗi khung một cỡ — chủ dự án 6/10/2026).
-  const KHUNG_NOI = 'absolute top-[96px] z-30 hidden w-[480px] max-h-[calc(100%-110px)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-3.5 shadow-lg lg:left-1/2 lg:block lg:-translate-x-1/2';
+  // MẪU KÍNH MỜ (chủ dự án chọn mẫu 4, 6/10/2026): nền trắng trong 82% + làm mờ bản đồ phía sau, viền trắng mờ, bo 12px.
+  const KINH_MO = 'bg-white/[.82] backdrop-blur-xl backdrop-saturate-150 border border-white/70 rounded-xl shadow-[0_10px_30px_-10px_rgba(10,37,64,.45)]';
+  const KHUNG_NOI = `absolute top-[96px] z-30 hidden w-[480px] max-h-[calc(100%-110px)] overflow-y-auto p-3.5 lg:left-1/2 lg:block lg:-translate-x-1/2 ${KINH_MO}`;
   const dauKhung = (ten: string, dong: () => void) => (
     <div className="mb-2.5 flex items-center justify-between"><h2 className="text-[15px] font-bold text-[#0A2540]">{ten}</h2><button type="button" onClick={dong} aria-label="Đóng" className="text-xl leading-none text-slate-400 hover:text-slate-700">✕</button></div>
   );
@@ -1971,7 +1973,7 @@ export default function MapPage() {
       <div className="flex flex-1 min-h-0 relative">
         {panelOpen && <div className="lg:hidden absolute inset-0 bg-black/30 z-20" onClick={() => setPanelOpen(false)} />}
 
-        <aside className={`${panelOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'} transition-transform duration-200 absolute inset-y-0 left-0 z-30 w-72 max-w-[82%] shrink-0 bg-white border-r border-slate-200 overflow-y-auto scroll-soft p-4 shadow-xl lg:inset-y-auto lg:top-[96px] lg:left-1/2 lg:-translate-x-1/2 lg:max-h-[calc(100%-110px)] lg:w-[480px] lg:rounded-xl lg:border lg:p-3.5 lg:text-[13px]`}>
+        <aside className={`${panelOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'} transition-transform duration-200 absolute inset-y-0 left-0 z-30 w-72 max-w-[82%] shrink-0 bg-white border-r border-slate-200 overflow-y-auto scroll-soft p-4 shadow-xl lg:inset-y-auto lg:top-[96px] lg:left-1/2 lg:-translate-x-1/2 lg:max-h-[calc(100%-110px)] lg:w-[480px] lg:rounded-xl lg:border lg:p-3.5 lg:text-[13px] lg:bg-white/[.82] lg:backdrop-blur-xl lg:backdrop-saturate-150 lg:border-white/70 lg:shadow-[0_10px_30px_-10px_rgba(10,37,64,.45)]`}>
           {/* Mẫu 51 (máy tính): chip "Lớp" chỉ hiện phần LỚP, chip "Đã lưu" chỉ hiện phần SẢN PHẨM ĐÃ LƯU — trước đây
               cả hai cùng hiện chung một bảng nên trùng (chủ dự án 6/10/2026). Điện thoại ngăn kéo vẫn đủ cả hai. */}
           <div className={bangMuc === 'luu' ? 'lg:hidden' : ''}>
@@ -1980,7 +1982,7 @@ export default function MapPage() {
             <button onClick={() => setPanelOpen(false)} aria-label="Đóng" className="text-slate-400 hover:text-slate-700 text-xl leading-none">✕</button>
           </div>
           {/* Máy tính (mẫu 51): bỏ nút "Vẽ thửa từ toạ độ" (trùng chip "Vẽ") + dòng gợi ý cuối bảng — chủ dự án thấy dư, 6/10/2026 */}
-          <p className="text-xs text-slate-500 mb-2.5">Cam Lâm, Khánh Hòa · EPSG:4326</p>
+          <p className="text-xs text-slate-500 mb-2.5 lg:hidden">Cam Lâm, Khánh Hòa · EPSG:4326</p>
           {/* Máy tính: giữ nguyên nút này ở bảng lớp như cũ. Điện thoại thì nó đã nằm trong
               nhóm "Đo - vẽ" ở thanh trên rồi, để thêm ở đây là thừa. */}
           <button onClick={() => setDrawOpen(true)} className="cl-press hidden w-full mb-3 items-center justify-center gap-2 bg-[#0A2540] hover:bg-[#0d2f54] text-white text-sm font-bold py-2.5 rounded-lg">✏️ Vẽ thửa từ toạ độ</button>
@@ -1992,7 +1994,7 @@ export default function MapPage() {
           <div className="pt-1">
             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1.5">Bản đồ quy hoạch</p>
             {MUC_QH.map((o) => (
-              <label key={o.id} className="flex items-start gap-2.5 py-1.5 text-sm cursor-pointer">
+              <label key={o.id} className={`flex items-start gap-2.5 py-1.5 text-sm cursor-pointer lg:-mx-2 lg:rounded-lg lg:px-2 lg:py-2 lg:transition lg:hover:bg-[#0A2540]/[.05] ${o.gom.every((id) => !!ovOn[id]) ? 'lg:bg-[#0A2540]/[.07]' : ''}`}>
                 {/* MỖI LÚC CHỈ MỘT lớp quy hoạch — chọn lớp này là tự tắt lớp kia. Các bản quy hoạch
                     phủ đè lên nhau (QĐ205 trùm cả huyện, 3 bản 1/2000 nằm lọt bên trong), bật cùng
                     lúc là màu chồng màu, không đọc được gì. Bấm lại vào lớp đang bật để TẮT HẾT,
@@ -2062,9 +2064,9 @@ export default function MapPage() {
                 {places.length === 0 ? (
                   <div className="rounded-lg border border-dashed border-slate-200 px-4 py-6 text-center text-[13px] text-slate-500">Chưa lưu điểm nào.<br /><span className="text-[12px] text-slate-400">Bấm vào bản đồ rồi chọn &quot;Lưu sản phẩm&quot;.</span></div>
                 ) : (
-                  <div className="max-h-[calc(100vh-260px)] space-y-1.5 overflow-y-auto pr-0.5 scroll-soft">
+                  <div className="-mx-2 max-h-[calc(100vh-260px)] space-y-0.5 overflow-y-auto scroll-soft">
                     {places.map((p) => (
-                      <div key={p.id} className="group flex items-center gap-2.5 rounded-lg border border-slate-200 bg-white px-2.5 py-2 transition hover:border-[#C8A14B]/60 hover:bg-[#C8A14B]/5">
+                      <div key={p.id} className="group flex items-center gap-2.5 rounded-lg px-2 py-2 transition hover:bg-[#0A2540]/[.06]">
                         <button onClick={() => { setFocusPoint({ lng: p.lng, lat: p.lat }); setFitTo([[p.lng - 0.004, p.lat - 0.004], [p.lng + 0.004, p.lat + 0.004]]); }} className="flex min-w-0 flex-1 items-center gap-2.5 text-left" title="Bay tới điểm này">
                           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#C8A14B]/15 text-[#a8822f]">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
@@ -2136,7 +2138,7 @@ export default function MapPage() {
             {/* Chip "Nhãn" đã bỏ (chủ dự án 6/10/2026): nhãn & đường mặc định luôn bật; điện thoại vẫn tắt/bật được ở thanh cũ. */}
           </div>
           {timMo && (
-            <div className="absolute top-[96px] left-1/2 z-40 hidden w-[600px] max-w-[calc(100%-120px)] -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 shadow-[0_12px_32px_-12px_rgba(10,37,64,.45)] lg:block">
+            <div className={`absolute top-[96px] left-1/2 z-40 hidden w-[600px] max-w-[calc(100%-120px)] -translate-x-1/2 p-3 lg:block ${KINH_MO}`}>
               <div className="flex items-center gap-2">
                 <div className="grid flex-1 grid-cols-4 gap-0.5 rounded-lg bg-slate-100 p-0.5 text-[12px] font-bold">
                   {([['parcel', 'Số thửa · tờ'], ['vn2000', 'Toạ độ VN-2000'], ['latlng', 'Toạ độ WGS-84'], ['gmap', 'Link Google Maps']] as const).map(([k, t]) => (
@@ -2153,7 +2155,29 @@ export default function MapPage() {
           {/* Đang đo mà mở khung Lớp / Đã lưu: thước đo VẪN chạy (đổi lớp xem cùng khoảng đất), chỉ GIẤU khung Đo
               cho khỏi chồng hai khung lên nhau (chủ dự án 6/10/2026); đóng khung Lớp là khung Đo hiện lại. */}
           {tool === 'measure' && !panelOpen && (
-            <div className={KHUNG_NOI}>{dauKhung('Đo khoảng cách · diện tích', () => { setMeasure('off'); setMResult(null); setTool('none'); })}{measureCtrl()}</div>
+            <div className={KHUNG_NOI}>
+              {dauKhung('Đo khoảng cách · diện tích', () => { setMeasure('off'); setMResult(null); setTool('none'); })}
+              {/* Mẫu kính mờ: nút chọn 2 phần · kết quả số to · Đo lại / Xong (bản điện thoại vẫn dùng measureCtrl cũ) */}
+              <div className="grid grid-cols-2 gap-[3px] rounded-lg bg-[#0A2540]/[.07] p-[3px]">
+                {([['distance', 'Khoảng cách', <path key="d" d="M4 17l13-13 3 3L7 20H4v-3zM13 8l2 2M10 11l2 2" />], ['area', 'Diện tích', <path key="a" d="M4 7l6-3 10 5-3 11-11-2z" />]] as [MeasureMode, string, any][]).map(([m, ten, ico]) => (
+                  <button key={m} type="button" onClick={() => { setMeasure(m); setMResult(null); }}
+                    className={`flex h-8 items-center justify-center gap-1.5 rounded-md text-[13px] font-semibold transition ${measure === m ? 'bg-white text-[#0A2540] shadow-[0_1px_3px_rgba(10,37,64,.18)]' : 'text-slate-500 hover:text-[#0A2540]'}`}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden>{ico}</svg>{ten}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-3.5 flex items-baseline gap-2.5">
+                <span className="text-2xl font-extrabold tabular-nums text-[#0A2540]">{mResult && mResult.points > 0 ? (mResult.mode === 'distance' ? fmtLen(mResult.distance) : fmtArea(mResult.area)) : '—'}</span>
+                <span className="text-xs tabular-nums text-slate-500">{mResult && mResult.points > 0 ? `${mResult.points} điểm đã chấm` : 'chưa chấm điểm nào'}</span>
+              </div>
+              <p className="mt-1 text-xs text-slate-500">{measure === 'area' ? 'Bấm lần lượt các góc trên bản đồ — tự khép kín để tính diện tích.' : 'Bấm lần lượt các điểm trên bản đồ để đo độ dài.'}</p>
+              <div className="mt-3 flex gap-2">
+                <button type="button" onClick={() => { const m = measure === 'off' ? 'distance' : measure; setMeasure('off'); setMResult(null); setTimeout(() => setMeasure(m), 0); }}
+                  className="h-8 flex-1 rounded-md border border-slate-300 bg-white/70 text-[13px] font-semibold text-[#0A2540] hover:bg-white">Đo lại</button>
+                <button type="button" onClick={() => { setMeasure('off'); setMResult(null); setTool('none'); }}
+                  className="h-8 flex-1 rounded-md bg-[#0A2540] text-[13px] font-semibold text-white hover:bg-[#13365c]">Xong</button>
+              </div>
+            </div>
           )}
           {tool === 'chugiai' && (
             <div className={KHUNG_NOI}>

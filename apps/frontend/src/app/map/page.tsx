@@ -1693,8 +1693,8 @@ export default function MapPage() {
             </>
           ) : (
             <>
-              <input value={c1} onChange={(e) => setC1(e.target.value)} inputMode="decimal" placeholder={searchMode === 'vn2000' ? 'X (Bắc)' : 'Vĩ độ'} className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
-              <input value={c2} onChange={(e) => setC2(e.target.value)} inputMode="decimal" placeholder={searchMode === 'vn2000' ? 'Y (Đông)' : 'Kinh độ'} className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
+              <input value={c1} onChange={(e) => setC1(e.target.value)} inputMode="decimal" placeholder={searchMode === 'vn2000' ? 'X (Bắc)' : 'Vĩ độ (vd 12.0771)'} className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
+              <input value={c2} onChange={(e) => setC2(e.target.value)} inputMode="decimal" placeholder={searchMode === 'vn2000' ? 'Y (Đông)' : 'Kinh độ (vd 109.0917)'} className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
             </>
           )}
         </>
@@ -2087,7 +2087,7 @@ export default function MapPage() {
             <div className="absolute top-[52px] left-1/2 z-40 hidden w-[560px] max-w-[calc(100%-120px)] -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 shadow-[0_12px_32px_-12px_rgba(10,37,64,.45)] lg:block">
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5 rounded-lg bg-slate-100 p-0.5 text-[12px] font-bold">
-                  {([['parcel', 'Số thửa · tờ'], ['vn2000', 'Toạ độ VN-2000'], ['latlng', 'Kinh · vĩ độ'], ['gmap', 'Link Google Maps']] as const).map(([k, t]) => (
+                  {([['parcel', 'Số thửa · tờ'], ['vn2000', 'Toạ độ VN-2000'], ['latlng', 'WGS-84 (kinh · vĩ độ)'], ['gmap', 'Link Google Maps']] as const).map(([k, t]) => (
                     <button key={k} type="button" onClick={() => { setC1(''); setC2(''); setSearchMode(k as any); }}
                       className={`rounded-md px-2.5 py-1 ${searchMode === k ? 'bg-white text-[#0A2540] shadow-sm' : 'text-slate-500 hover:text-[#0A2540]'}`}>{t}</button>
                   ))}

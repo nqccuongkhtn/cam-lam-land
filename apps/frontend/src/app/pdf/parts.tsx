@@ -29,7 +29,9 @@ function sampleFgBg(d: Uint8ClampedArray, W: number, H: number, x0: number, y0: 
   return { fg, bg };
 }
 // Gộp các mảnh chữ (pdf.js cắt vụn theo từng lệnh vẽ) thành TỪNG DÒNG hoàn chỉnh -> sửa cả câu như Word.
-function groupLines(raw: Item[]): Item[] {
+// coVach(trước, sau) = giữa 2 mẩu chữ có ĐƯỜNG KẺ Ô dọc → không gom (6/10/2026: gom chữ 2 ô kế nhau thành 1 dòng làm
+// ô trắng che chữ phủ lấn, MẤT nét kẻ giữa 2 cột bảng).
+function groupLines(raw: Item[], coVach: (a: Item, b: Item) => boolean = () => false): Item[] {
   if (!raw.length) return [];
   const sorted = [...raw].sort((a, b) => (Math.abs(a.y - b.y) > 2 ? b.y - a.y : a.x - b.x));
   const lines: Item[] = []; let cur: Item[] = [];
@@ -43,7 +45,7 @@ function groupLines(raw: Item[]): Item[] {
   for (const it of sorted) {
     if (!cur.length) { cur = [it]; continue; }
     const ref = cur[0], prev = cur[cur.length - 1]; const sameLine = Math.abs(it.y - ref.y) <= Math.max(2, ref.size * 0.5); const gap = it.x - (prev.x + prev.w);
-    if (sameLine && gap <= ref.size * 8) cur.push(it); else { flush(); cur = [it]; }
+    if (sameLine && gap <= ref.size * 8 && !coVach(prev, it)) cur.push(it); else { flush(); cur = [it]; }
   }
   flush(); return lines;
 }
@@ -61,7 +63,21 @@ export async function extractItems(page: any, vp: any, ctx: CanvasRenderingConte
     const fam: Fam = /tahoma/.test(all) ? 'tahoma' : /calibri|carlito/.test(all) ? 'calibri' : /verdana/.test(all) ? 'verdana' : /arial|helvet|nimbus\s?sans|liberation\s?sans|segoe|roboto|myriad|dejavu\s?sans|open\s?sans|noto\s?sans/.test(all) ? 'sans' : 'serif';
     its.push({ x: e, y: f, size, w: it.width, h: it.height || size, str: it.str, fg, bg, fam, bold: /bold|black|semibold|heavy/.test(all), italic: /italic|oblique/.test(all) });
   }
-  return groupLines(its);
+  // Dò ĐƯỜNG KẺ DỌC trong khoảng hở giữa 2 mẩu chữ: một cột điểm ảnh tối chạy suốt chiều cao dòng chữ = nét kẻ ô bảng.
+  const coVach = (a: Item, b: Item) => {
+    const [ax] = vp.convertToViewportPoint(a.x + a.w, a.y), [bx] = vp.convertToViewportPoint(b.x, b.y);
+    const [, yt] = vp.convertToViewportPoint(a.x, a.y + a.size), [, yb] = vp.convertToViewportPoint(a.x, a.y);
+    const x0 = Math.max(0, Math.floor(Math.min(ax, bx))), x1 = Math.min(W - 1, Math.ceil(Math.max(ax, bx)));
+    const y0 = Math.max(0, Math.floor(Math.min(yt, yb))), y1 = Math.min(H - 1, Math.ceil(Math.max(yt, yb)));
+    if (x1 - x0 < 1 || y1 - y0 < 3) return false;
+    for (let x = x0; x <= x1; x++) {
+      let toi = 0;
+      for (let y = y0; y <= y1; y++) { const i = (y * W + x) * 4; if (0.299 * img[i] + 0.587 * img[i + 1] + 0.114 * img[i + 2] < 205) toi++; } // < 205: nhận cả nét kẻ XÁM MẢNH (file Word in ra PDF hay có)
+      if (toi >= (y1 - y0 + 1) * 0.85) return true;
+    }
+    return false;
+  };
+  return groupLines(its, coVach);
 }
 
 // 1 TRANG: render canvas gốc (1 lần / zoom). Ô bấm-sửa nổi lên trên; chữ đã sửa được che + gõ đè bằng HTML (không đụng canvas).
@@ -81,7 +97,15 @@ export function PageView({ pg, doc, zoom, tool, color, fontSize, ov, sel, setSel
   }
   const pdfPt = (e: React.PointerEvent) => { const r = layerRef.current!.getBoundingClientRect(); return vpRef.current.convertToPdfPoint(e.clientX - r.left, e.clientY - r.top); };
   const startEdit = (it: Item, ii: number) => {
-    const box = { wx: it.x, wy: it.y - it.size * 0.26, ww: Math.max(it.w, it.size * 0.5), wh: it.size * 1.36 };
+    // Ô che chữ cũ: vừa khít chữ (dưới = chân chữ g/y, trên = dấu mũ chữ hoa tiếng Việt) và KHÔNG lấn sang dòng trên/dưới.
+    // Bản cũ cao 1,36 cỡ chữ → đè mất chân chữ dòng trên + dấu dòng dưới trong đoạn văn dòng sát (chủ dự án báo 6/10/2026).
+    let top = it.y + it.size * 0.95, bot = it.y - it.size * 0.24;
+    for (const o of items) {
+      if (o === it || o.x > it.x + it.w || o.x + o.w < it.x) continue;          // không cùng cột chữ → bỏ qua
+      if (o.y > it.y + 0.5 && o.y < it.y + it.size * 2) top = Math.min(top, Math.max(it.y + it.size * 0.7, o.y - o.size * 0.24 - 0.4));
+      if (o.y < it.y - 0.5 && o.y > it.y - it.size * 2) bot = Math.max(bot, Math.min(it.y - it.size * 0.08, o.y + o.size * 0.95 + 0.4));
+    }
+    const box = { wx: it.x, wy: bot, ww: Math.max(it.w, it.size * 0.5), wh: top - bot };
     const id = uid(); setOv(pg.id, (a: Ov[]) => [...a, { id, kind: 'edit', ii, orig: it.str, x: it.x, y: it.y, size: it.size, text: it.str, color: it.fg, bg: it.bg, fam: it.fam, bold: it.bold, italic: it.italic, ...box }]);
     setSel(id);
   };

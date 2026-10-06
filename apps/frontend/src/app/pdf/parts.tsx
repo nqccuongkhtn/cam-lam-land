@@ -7,7 +7,7 @@ export type Fam = 'serif' | 'sans' | 'tahoma' | 'calibri' | 'verdana';
 export type Item = { x: number; y: number; size: number; w: number; h: number; str: string; fam: Fam; bold: boolean; italic: boolean; fg: number[]; bg: number[] };
 export type PageRef = { id: string; srcId: string; pageIndex: number; rot: number };
 export type Ov =
-  | { id: string; kind: 'edit'; ii: number; orig: string; x: number; y: number; size: number; text: string; color: number[]; bg: number[]; fam: Fam; bold: boolean; italic: boolean; wx: number; wy: number; ww: number; wh: number }
+  | { id: string; kind: 'edit'; ii: number; orig: string; sx?: number; x: number; y: number; size: number; text: string; color: number[]; bg: number[]; fam: Fam; bold: boolean; italic: boolean; wx: number; wy: number; ww: number; wh: number }
   | { id: string; kind: 'text'; x: number; y: number; size: number; text: string; color: number[]; fam: Fam; bold: boolean; italic: boolean }
   | { id: string; kind: 'white'; x: number; y: number; w: number; h: number }
   | { id: string; kind: 'rect' | 'highlight'; x: number; y: number; w: number; h: number; color: number[] }
@@ -106,7 +106,12 @@ export function PageView({ pg, doc, zoom, tool, color, fontSize, ov, sel, setSel
       if (o.y < it.y - 0.5 && o.y > it.y - it.size * 2) bot = Math.max(bot, Math.min(it.y - it.size * 0.08, o.y + o.size * 0.95 + 0.4));
     }
     const box = { wx: it.x, wy: bot, ww: Math.max(it.w, it.size * 0.5), wh: top - bot };
-    const id = uid(); setOv(pg.id, (a: Ov[]) => [...a, { id, kind: 'edit', ii, orig: it.str, x: it.x, y: it.y, size: it.size, text: it.str, color: it.fg, bg: it.bg, fam: it.fam, bold: it.bold, italic: it.italic, ...box }]);
+    // ĐỘ GIÃN NGANG sx: phông nhúng trong PDF và phông của máy hiển thị rộng hẹp khác nhau → con trỏ gõ trôi lệch dần
+    // so với chữ gốc (chủ dự án: "con trỏ lệch 2 ký tự", 6/10/2026). Đo bề rộng chữ gốc bằng phông máy rồi giãn/co cho khớp đúng
+    // bề rộng trong PDF; khi xuất cũng giãn đúng tỉ lệ đó nên chữ mới cùng nhịp chữ cũ.
+    let sx = 1;
+    try { const c = document.createElement('canvas').getContext('2d')!; c.font = `${it.italic ? 'italic ' : ''}${it.bold ? '700' : '400'} 100px ${famCss(it.fam)}`; const w = c.measureText(it.str).width / 100 * it.size; if (w > 0 && it.w > 0) sx = Math.min(1.25, Math.max(0.8, it.w / w)); } catch { /* giữ 1 */ }
+    const id = uid(); setOv(pg.id, (a: Ov[]) => [...a, { id, kind: 'edit', ii, orig: it.str, sx, x: it.x, y: it.y, size: it.size, text: it.str, color: it.fg, bg: it.bg, fam: it.fam, bold: it.bold, italic: it.italic, ...box }]);
     setSel(id);
   };
   const onDown = (e: React.PointerEvent) => {
@@ -155,7 +160,7 @@ export function OverlayView({ o, vp, zoom, sel, tool, onDown, onMoveP, onUpP, on
     return (
       <div className="absolute inset-0" style={{ pointerEvents: 'none' }}>
         {o.kind === 'edit' && dirty && (() => { const [wx, wy] = vp.convertToViewportPoint(o.wx, o.wy + o.wh); return <div className="absolute" style={{ left: wx, top: wy, width: o.ww * zoom, height: o.wh * zoom, background: rs(o.bg) }} />; })()}
-        <div style={{ position: 'absolute', left: sx, top: sy - fpx * 0.80, pointerEvents: peText }}>
+        <div style={{ position: 'absolute', left: sx, top: sy - fpx * 0.80, pointerEvents: peText, transform: o.kind === 'edit' && o.sx ? `scaleX(${o.sx})` : undefined, transformOrigin: 'left top' }}>
           {sel && tool === 'select' && <div onPointerDown={onDown} onPointerMove={onMoveP} onPointerUp={onUpP} title="Kéo di chuyển" style={{ position: 'absolute', left: -16, top: -6, width: 13, height: 13, cursor: 'move', background: '#0A2540', borderRadius: 3 }} />}
           <div ref={editRef} contentEditable suppressContentEditableWarning spellCheck={false} onFocus={onSelect} onInput={(e) => setCur(e.currentTarget.innerText)} onBlur={(e) => onText(e.currentTarget.innerText)} style={{ fontSize: fpx, lineHeight: 1.0, color: dirty ? rs(o.color) : 'transparent', caretColor: rs(o.color), border, padding: 0, fontFamily: famCss(o.fam), fontWeight: o.bold ? 700 : 400, fontStyle: o.italic ? 'italic' : 'normal', whiteSpace: 'pre', outline: 'none', cursor: 'text', minWidth: 8 }} />
         </div>

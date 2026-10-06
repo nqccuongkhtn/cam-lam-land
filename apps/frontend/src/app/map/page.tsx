@@ -1871,6 +1871,9 @@ export default function MapPage() {
     return () => window.removeEventListener('keydown', f);
   }, [timMo]);
   // Chip "Lớp" luôn nền đậm (nút chính); các chip khác đậm khi đang mở.
+  // Mở công cụ khác (Vẽ, Chú giải, Đã lưu, ô tìm) thì TẮT thước đo đang mở (chủ dự án 6/10/2026). Riêng chip Lớp vẫn giữ phép đo
+  // (quy định 17/9/2026: đo xong đổi lớp quy hoạch để so, không bắt đo lại).
+  const tatDo = () => { if (measure !== 'off') { setMeasure('off'); setMResult(null); } if (tool === 'measure') setTool('none'); };
   const chip = (nhan: string, on: boolean, bam: () => void) => (
     <button type="button" onClick={bam}
       className={`h-[30px] shrink-0 whitespace-nowrap rounded-full border px-3 text-[12px] font-semibold shadow-[0_4px_12px_-8px_rgba(10,37,64,.5)] transition active:scale-[.97] ${on ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}>{nhan}</button>
@@ -2073,7 +2076,7 @@ export default function MapPage() {
           {/* ══ MẪU 51: Ô TÌM NỔI + HÀNG CHIP ══════════════════════════════════════════════════════
               Điện thoại: ô tìm chừa cột nút bên phải (nút ?, phóng to…) → bấm mở BẢNG ĐÁY Tra cứu sẵn có.
               Máy tính: ô 440px giữa trên → bấm sổ khung tìm ngay dưới (4 cách tìm + đủ ô cấp/huyện/xã/thửa/tờ). */}
-          <button type="button" onClick={() => { if (laMayTinh()) setTimMo((v) => !v); else { setPanelOpen(false); setTcTab('to'); setTool('search'); } }}
+          <button type="button" onClick={() => { if (laMayTinh()) { tatDo(); setTimMo((v) => !v); } else { setPanelOpen(false); setTcTab('to'); setTool('search'); } }}
             className="absolute top-2 left-2 right-[50px] z-30 hidden h-[38px] items-center lg:flex gap-2 rounded-full border border-slate-200 bg-white px-3.5 text-left text-[13px] shadow-[0_6px_18px_-8px_rgba(10,37,64,.45)] lg:left-1/2 lg:right-auto lg:w-[440px] lg:-translate-x-1/2">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4 shrink-0 text-slate-400" aria-hidden><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
             <span className="min-w-0 flex-1 truncate text-slate-500">{(c2 || c1) && searchMode === 'parcel' ? `${dsXaCap.find((x) => x.xaId === c3)?.ten || ''}${c2 ? ' · Thửa ' + c2 : ''}${c1 ? ' · Tờ ' + c1 : ''}` : 'Xã, số thửa, số tờ…'}</span>
@@ -2081,9 +2084,9 @@ export default function MapPage() {
           <div className="absolute top-[52px] left-2 right-[50px] z-20 hidden gap-1.5 overflow-x-auto lg:flex [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:left-1/2 lg:right-auto lg:-translate-x-1/2 lg:overflow-visible">
             {chip(`▤ ${tenLopDangBat()} ▾`, true, () => { if (laMayTinh()) { setTimMo(false); setBangMuc('lop'); setPanelOpen((v) => !(v && bangMuc === 'lop')); } else { setQhSheet(true); setPanelOpen(false); if (measure === 'off') { setTool('none'); setMResult(null); } } })}
             {chip('📏 Đo', tool === 'measure', () => { const open = tool !== 'measure'; setPanelOpen(false); setTimMo(false); setTool(open ? 'measure' : 'none'); setMeasure(open ? 'distance' : 'off'); setMResult(null); })}
-            {chip('✎ Vẽ', false, () => { setTimMo(false); if (laMayTinh()) setDrawOpen(true); else { setPanelOpen(false); setTcTab('goc'); setTool('search'); } })}
-            {chip('◧ Chú giải', tool === 'chugiai', () => { napChuGiai(); setPanelOpen(false); setTimMo(false); setTool(tool === 'chugiai' ? 'none' : 'chugiai'); })}
-            {user && chip(`⭐ Đã lưu${places.length ? ` (${places.length})` : ''}`, panelOpen && bangMuc === 'luu', () => { setTimMo(false); setBangMuc('luu'); setPanelOpen((v) => !(v && bangMuc === 'luu')); })}
+            {chip('✎ Vẽ', false, () => { setTimMo(false); tatDo(); if (laMayTinh()) setDrawOpen(true); else { setPanelOpen(false); setTcTab('goc'); setTool('search'); } })}
+            {chip('◧ Chú giải', tool === 'chugiai', () => { napChuGiai(); setPanelOpen(false); setTimMo(false); if (measure !== 'off') { setMeasure('off'); setMResult(null); } setTool(tool === 'chugiai' ? 'none' : 'chugiai'); })}
+            {user && chip(`⭐ Đã lưu${places.length ? ` (${places.length})` : ''}`, panelOpen && bangMuc === 'luu', () => { setTimMo(false); tatDo(); setBangMuc('luu'); setPanelOpen((v) => !(v && bangMuc === 'luu')); })}
             {/* Chip "Nhãn" đã bỏ (chủ dự án 6/10/2026): nhãn & đường mặc định luôn bật; điện thoại vẫn tắt/bật được ở thanh cũ. */}
           </div>
           {timMo && (

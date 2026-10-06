@@ -1640,7 +1640,7 @@ export default function MapPage() {
         <option value="gmap">Link Google Maps</option>
       </select>
       {searchMode === 'gmap' ? (
-        <input value={c1} onChange={(e) => setC1(e.target.value)} placeholder="Dán link Google Maps (…/@12.34,109.12…)" className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] w-full' : 'py-1.5 text-xs w-56'}`} />
+        <input value={c1} onChange={(e) => setC1(e.target.value)} placeholder="Dán link Google Maps (…/@12.34,109.12…)" className={`col-span-2 border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] w-full' : 'py-1.5 text-xs w-56'}`} />
       ) : (
         <>
           {searchMode === 'parcel' && (

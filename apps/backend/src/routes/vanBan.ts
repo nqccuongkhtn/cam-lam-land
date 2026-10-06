@@ -417,20 +417,19 @@ const KHO_DRIVE = process.env.VAN_BAN_KHO || '/app/.kho-van-ban';
 // TẢI SẴN (chủ dự án 6/10/2026 "tải văn bản hơi lâu"): lần đầu mở một văn bản Drive phải tải 2–8 MB rồi ghép → 5–10 giây.
 // Nên sau mỗi lượt lấy văn bản, máy tự tải sẵn MỌI văn bản Drive chưa có trong kho, từng cái một (nhẹ cho mạng nhà).
 let dangTaiSan = false;
+// CHỈ LƯU KHI CÓ NGƯỜI MỞ (chủ dự án 6/10/2026: "đừng tải văn bản về sever vội, người dùng đầu tiên tải về thì lưu luôn")
+// → KHÔNG tải sẵn hàng loạt nữa. Văn bản nào có người mở lần đầu thì layFileVb() tải + gắn dấu + nén + lưu; người sau mở ngay.
+// Văn bản không ai xem thì không tốn chỗ. Hàm này giờ chỉ DỌN các bản của phiên xử lý cũ (đổi PHIEN_BAN_FILE) + file tạm sót lại.
 export async function taiSanFile(): Promise<number> {
-  if (dangTaiSan) return 0; dangTaiSan = true; let n = 0, loi = 0;
+  if (dangTaiSan) return 0; dangTaiSan = true; let n = 0;
   try {
-    // Dọn bản của phiên xử lý cũ (đổi PHIEN_BAN_FILE) cho đỡ tốn ổ
-    try { for (const f of await readdir(KHO_DRIVE)) if (/^vb-/.test(f) && !f.startsWith(`vb-${PHIEN_BAN_FILE}-`)) await rm(`${KHO_DRIVE}/${f}`, { force: true }); } catch { /* chưa có kho */ }
-    // MỌI văn bản có file thật (Drive, cổng TTĐT, Công báo, camhomes…) — mới trước, từng cái một cho nhẹ mạng nhà
-    const ds = (await query<any>(`SELECT id, link_goc FROM van_ban WHERE coalesce(link_goc,'') <> '' ORDER BY ngay_ban_hanh DESC NULLS LAST`)).filter((d) => coFileThat(d.link_goc));
-    for (const d of ds) {
-      try { await readFile(`${KHO_DRIVE}/vb-${PHIEN_BAN_FILE}-${d.id}.pdf`); continue; } catch { /* chưa có */ }
-      if (await layFileVb(d.id, d.link_goc)) n++; else loi++;
-      await new Promise((z) => setTimeout(z, 300));
+    for (const f of await readdir(KHO_DRIVE).catch(() => [] as string[])) {
+      const cu = /^vb-/.test(f) && !f.startsWith(`vb-${PHIEN_BAN_FILE}-`);
+      const tam = /^(nen-|tam-)/.test(f) || /^[\w-]{20,}\.pdf$/.test(f);   // file tạm + bản Drive chưa nén của bản đầu
+      if (cu || tam) { await rm(`${KHO_DRIVE}/${f}`, { force: true }); n++; }
     }
-    console.log(`[van-ban] tải sẵn + gắn dấu + nén: thêm ${n} file, ${loi} văn bản chưa lấy được file`);
-  } catch (e: any) { console.error('[van-ban] tải sẵn lỗi:', e?.message || e); } finally { dangTaiSan = false; }
+    if (n) console.log(`[van-ban] dọn kho file văn bản: xoá ${n} file cũ`);
+  } catch (e: any) { console.error('[van-ban] dọn kho lỗi:', e?.message || e); } finally { dangTaiSan = false; }
   return n;
 }
 /** Tải + ghép PDF trong thư mục/file Drive. KHÔNG tự lưu — việc lưu (bản đã nén) do layFileVb() lo. */
@@ -764,7 +763,11 @@ vanBanRouter.get('/:id/pdf', authRequired, async (req, res) => {
     if (buf) {
       res.set('Content-Type', 'application/pdf');
       res.set('Content-Disposition', `inline; filename="${tenFile}"`);
-      res.set('Cache-Control', 'private, max-age=86400');
+      // KHÔNG cho trình duyệt giữ 1 ngày như trước: người đã mở trước khi có dấu bản quyền cứ thấy bản cũ không dấu
+      // (chủ dự án 6/10/2026 "vẫn nhiều văn bản không có watermark"). no-cache = lần nào cũng hỏi lại, file không đổi thì
+      // máy chủ chỉ trả "dùng bản cũ" (ETag → 304) nên vẫn nhẹ. Đường dẫn có ?v=<phiên bản> để bỏ hẳn bản cũ trong máy khách.
+      res.set('Cache-Control', 'private, no-cache');
+      res.set('X-Phien-Ban-File', PHIEN_BAN_FILE);
       return res.send(buf);
     }
     return res.json({ redirect: null }); // không lấy được PDF → báo chưa có file, KHÔNG đưa người dùng sang trang khác

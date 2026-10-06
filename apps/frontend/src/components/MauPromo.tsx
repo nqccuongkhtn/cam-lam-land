@@ -10,15 +10,15 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import Link from 'next/link';
 
-type ND = { k: string; nhan: string; tieuDe: string; mo: string; ich: string[]; nut: string; link: string; anh: string; mau: string; nhat: string };
-const DS: ND[] = [
+export type ND = { k: string; nhan: string; tieuDe: string; mo: string; ich: string[]; nut: string; link: string; anh: string; mau: string; nhat: string };
+export const DS: ND[] = [
   { k: 'qh', nhan: 'Bản đồ quy hoạch', tieuDe: 'Tra cứu quy hoạch & thửa đất Cam Lâm chính xác', mo: 'Nền vệ tinh nét cao, toạ độ VN-2000, đo đạc trực tiếp trên bản đồ.', ich: ['Nền vệ tinh nét cao', 'Toạ độ VN-2000', 'Đo đạc trực tiếp'], nut: 'Mở bản đồ', link: '/map', anh: '/quyhoach-camlam.jpg', mau: '#0A2540', nhat: '#eef3f9' },
   { k: 'dt', nhan: 'Miễn phí đăng tin', tieuDe: 'Bán nhà đất Cam Lâm nhanh hơn', mo: 'Tin hiện ngay trên bản đồ quy hoạch, đến đúng người đang tìm mua ở Cam Lâm.', ich: ['Hiện trên bản đồ', 'Đúng khách khu vực', 'Hỗ trợ pháp lý'], nut: 'Đăng tin ngay', link: '/sales/post', anh: '/tin-mau/nha-01.webp', mau: '#c8102e', nhat: '#fdf1f2' },
   { k: 'dn', nhan: 'Dành cho doanh nghiệp', tieuDe: 'Quảng bá thương hiệu & dự án tại Cam Lâm', mo: 'Banner trang chủ, logo trên bản đồ, đẩy tin nổi bật cho dự án của bạn.', ich: ['Banner trang chủ', 'Logo trên bản đồ', 'Đẩy tin nổi bật'], nut: 'Xem dịch vụ', link: '/dichvu', anh: '/bai-dai/bd-02.webp', mau: '#a8791f', nhat: '#fbf5e8' },
 ];
 
-type Tk = { bg: string; fg: string; mu: string; ln: string; the: string; nut: string; nutC: string; nhan: string; vien: string };
-const TONG: { ten: string; tk: (s: ND) => Tk }[] = [
+export type Tk = { bg: string; fg: string; mu: string; ln: string; the: string; nut: string; nutC: string; nhan: string; vien: string };
+export const TONG: { ten: string; tk: (s: ND) => Tk }[] = [
   { ten: 'Trắng viền mảnh', tk: (s) => ({ bg: '#fff', fg: '#0A2540', mu: '#64748b', ln: '#e2e8f0', the: '#fff', nut: s.k === 'qh' ? '#0A2540' : s.mau, nutC: '#fff', nhan: s.mau === '#0A2540' ? '#2563eb' : s.mau, vien: '1px solid #e2e8f0' }) },
   { ten: 'Xám nhạt', tk: (s) => ({ bg: '#f3f5f8', fg: '#0A2540', mu: '#64748b', ln: '#e2e8f0', the: '#fff', nut: '#0A2540', nutC: '#fff', nhan: s.mau === '#0A2540' ? '#2563eb' : s.mau, vien: '1px solid transparent' }) },
   { ten: 'Xanh đậm + vàng', tk: () => ({ bg: '#0A2540', fg: '#fff', mu: 'rgba(255,255,255,.66)', ln: 'rgba(255,255,255,.14)', the: 'rgba(255,255,255,.06)', nut: '#C8A14B', nutC: '#0A2540', nhan: '#E3C67A', vien: '1px solid #0A2540' }) },
@@ -49,11 +49,11 @@ const Cham = ({ i, set, t }: { i: number; set: (k: number) => void; t: Tk }) => 
   <div className="flex gap-1.5">{DS.map((_, k) => <button key={k} type="button" aria-label={`Nội dung ${k + 1}`} onClick={() => set(k)} className="h-1.5 rounded-full transition-all" style={{ width: k === i ? 18 : 6, background: k === i ? t.fg : t.fg === '#fff' ? 'rgba(255,255,255,.35)' : '#cbd5e1' }} />)}</div>
 );
 
-type Ctx = { i: number; set: (k: number) => void; tk: (s: ND) => Tk };
-type BoCuc = { ten: string; ve: (c: Ctx) => ReactNode };
+export type Ctx = { i: number; set: (k: number) => void; tk: (s: ND) => Tk };
+export type BoCuc = { ten: string; ve: (c: Ctx) => ReactNode };
 const khung = (t: Tk, cls = '', them: CSSProperties = {}) => ({ className: `overflow-hidden rounded-lg ${cls}`, style: { background: t.bg, color: t.fg, border: t.vien, ...them } as CSSProperties });
 
-const BO_CUC: BoCuc[] = [
+export const BO_CUC: BoCuc[] = [
   { ten: 'Dải gọn: biểu tượng trái · chữ · nút phải, tự đổi nội dung', ve: ({ i, set, tk }) => { const s = DS[i], t = tk(s); return (
     <div {...khung(t, 'flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:gap-5 sm:px-7')}>
       <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full" style={{ background: t.the, border: `1px solid ${t.ln}` }}><Ico k={s.k} c={t.nhan} /></span>

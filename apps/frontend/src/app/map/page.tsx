@@ -1890,8 +1890,8 @@ export default function MapPage() {
   // KHUNG NỔI DÙNG CHUNG cho Lớp · Đã lưu · Đo · Chú giải (máy tính): cùng chỗ, cùng rộng, cùng kiểu đầu khung
   // Mọi khung (kể cả khung Tìm) cùng RỘNG 480px = đúng bằng ô tìm, căn GIỮA thẳng dưới ô tìm, cùng chiều cao tối đa
   // (trước lệch hẳn sang trái và mỗi khung một cỡ — chủ dự án 6/10/2026).
-  // MẪU KÍNH MỜ (chủ dự án chọn mẫu 4, 6/10/2026): nền trắng trong 82% + làm mờ bản đồ phía sau, viền trắng mờ, bo 12px.
-  const KINH_MO = 'bg-white/[.82] backdrop-blur-xl backdrop-saturate-150 border border-white/70 rounded-xl shadow-[0_10px_30px_-10px_rgba(10,37,64,.45)]';
+  // MẪU KÍNH MỜ (chủ dự án chọn mẫu 4, 6/10/2026): nền trắng trong 92% + làm mờ bản đồ phía sau, viền trắng mờ, bo 12px.
+  const KINH_MO = 'bg-white/[.92] backdrop-blur-xl backdrop-saturate-150 border border-white/80 rounded-xl shadow-[0_12px_32px_-10px_rgba(10,37,64,.5)]'; // 0,82 → 0,92: chủ dự án thấy hơi mờ (6/10/2026)
   const KHUNG_NOI = `absolute top-[96px] z-30 hidden w-[480px] max-h-[calc(100%-110px)] overflow-y-auto p-3.5 lg:left-1/2 lg:block lg:-translate-x-1/2 ${KINH_MO}`;
   const dauKhung = (ten: string, dong: () => void) => (
     <div className="mb-2.5 flex items-center justify-between"><h2 className="text-[15px] font-bold text-[#0A2540]">{ten}</h2><button type="button" onClick={dong} aria-label="Đóng" className="text-xl leading-none text-slate-400 hover:text-slate-700">✕</button></div>
@@ -1973,7 +1973,7 @@ export default function MapPage() {
       <div className="flex flex-1 min-h-0 relative">
         {panelOpen && <div className="lg:hidden absolute inset-0 bg-black/30 z-20" onClick={() => setPanelOpen(false)} />}
 
-        <aside className={`${panelOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'} transition-transform duration-200 absolute inset-y-0 left-0 z-30 w-72 max-w-[82%] shrink-0 bg-white border-r border-slate-200 overflow-y-auto scroll-soft p-4 shadow-xl lg:inset-y-auto lg:top-[96px] lg:left-1/2 lg:-translate-x-1/2 lg:max-h-[calc(100%-110px)] lg:w-[480px] lg:rounded-xl lg:border lg:p-3.5 lg:text-[13px] lg:bg-white/[.82] lg:backdrop-blur-xl lg:backdrop-saturate-150 lg:border-white/70 lg:shadow-[0_10px_30px_-10px_rgba(10,37,64,.45)]`}>
+        <aside className={`${panelOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'} transition-transform duration-200 absolute inset-y-0 left-0 z-30 w-72 max-w-[82%] shrink-0 bg-white border-r border-slate-200 overflow-y-auto scroll-soft p-4 shadow-xl lg:inset-y-auto lg:top-[96px] lg:left-1/2 lg:-translate-x-1/2 lg:max-h-[calc(100%-110px)] lg:w-[480px] lg:rounded-xl lg:border lg:p-3.5 lg:text-[13px] lg:bg-white/[.92] lg:backdrop-blur-xl lg:backdrop-saturate-150 lg:border-white/80 lg:shadow-[0_12px_32px_-10px_rgba(10,37,64,.5)]`}>
           {/* Mẫu 51 (máy tính): chip "Lớp" chỉ hiện phần LỚP, chip "Đã lưu" chỉ hiện phần SẢN PHẨM ĐÃ LƯU — trước đây
               cả hai cùng hiện chung một bảng nên trùng (chủ dự án 6/10/2026). Điện thoại ngăn kéo vẫn đủ cả hai. */}
           <div className={bangMuc === 'luu' ? 'lg:hidden' : ''}>

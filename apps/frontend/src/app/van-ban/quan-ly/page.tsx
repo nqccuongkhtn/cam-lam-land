@@ -6,7 +6,7 @@ import { useLoginGate } from '@/lib/loginGate';
 import { api } from '@/lib/api';
 import { CHUDE_LIST, CHUDE_META, type ChuDeNhom } from '../data';
 
-type Doc = { id: number; soKyHieu: string; trichYeu: string; ngay: string; coQuan: string; chuDe: string; linhVuc: string; nguon: string; linkGoc: string; luotTai: number; noiBat: boolean };
+type Doc = { id: number; soKyHieu: string; trichYeu: string; ngay: string; coQuan: string; chuDe: string; linhVuc: string; nguon: string; linkGoc: string; luotTai: number; noiBat: boolean; coFile?: boolean };
 type Form = { id?: number; soKyHieu: string; trichYeu: string; ngay: string; coQuan: string; chuDe: string; linhVuc: string; linkGoc: string; noiBat: boolean };
 const CHUDE = ['Quy hoạch', 'Bồi thường', 'Tái định cư', 'Nhà ở xã hội', 'Khác'];
 const empty: Form = { soKyHieu: '', trichYeu: '', ngay: '', coQuan: '', chuDe: 'Quy hoạch', linhVuc: '', linkGoc: '', noiBat: false };
@@ -147,6 +147,8 @@ export default function QuanLyVanBan() {
         </div>
       </div>
 
+      {docs && <VanBanThieuFile docs={docs} onDaLuu={load} />}
+
       {msg && <div className="mt-4 text-sm font-semibold text-[#0A2540] bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">{msg}</div>}
 
       {form && (
@@ -279,6 +281,78 @@ export default function QuanLyVanBan() {
             : <button key={p} onClick={() => setPage(p as number)} className={`min-w-9 h-9 px-2 grid place-items-center rounded-lg text-sm font-semibold border ${p === cur ? 'bg-[#0A2540] text-white border-[#0A2540]' : 'border-slate-200 text-slate-600 hover:border-[#C8A14B]'}`}>{p}</button>)}
           <button onClick={() => setPage(cur + 1)} disabled={cur === totalPages} className="min-w-9 h-9 px-2 grid place-items-center rounded-lg border border-slate-200 text-slate-600 text-sm font-semibold hover:border-[#C8A14B] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-slate-200">›</button>
         </nav>
+      )}
+    </div>
+  );
+}
+
+// ── KHUNG "VĂN BẢN CHƯA CÓ FILE" (chủ dự án 6/10/2026: liệt kê để admin tự tìm bằng tay) ──
+// Máy đã tự tìm ở cổng TTĐT / Công báo / Google mà không ra → admin bấm "Tìm trên Google" (câu tìm soạn sẵn theo số + trích yếu),
+// thấy file thì dán link vào ô rồi Lưu. Máy chủ thử tải ngay — phải ra đúng file PDF mới nhận, rồi tự gắn dấu bản quyền + nén.
+function VanBanThieuFile({ docs, onDaLuu }: { docs: Doc[]; onDaLuu: () => void }) {
+  const thieu = docs.filter((d) => d.coFile === false);
+  const [mo, setMo] = useState(true);
+  const [link, setLink] = useState<Record<number, string>>({});
+  const [dang, setDang] = useState<number | null>(null);
+  const [bao, setBao] = useState<Record<number, { ok: boolean; m: string }>>({});
+  const [loc, setLoc] = useState('all');
+  const nguonDs = Array.from(new Set(thieu.map((d) => d.nguon || 'Khác')));
+  const ds = loc === 'all' ? thieu : thieu.filter((d) => (d.nguon || 'Khác') === loc);
+  if (!thieu.length) return <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">✓ Mọi văn bản đều đã có file để người dùng xem.</div>;
+  const timGoogle = (d: Doc) => {
+    const so = /^Không số/.test(d.soKyHieu || '') ? '' : `"${d.soKyHieu}" `;
+    const ty = (d.trichYeu || '').replace(/^(Quyết định|Thông báo|Nghị quyết|Kế hoạch|Phương án)\s*:\s*/i, '').split(/\s+/).slice(0, 12).join(' ');
+    return `https://www.google.com/search?q=${encodeURIComponent(`${so}${ty} filetype:pdf`)}`;
+  };
+  async function luu(d: Doc) {
+    const u = (link[d.id] || '').trim(); if (!u) return;
+    setDang(d.id); setBao((b) => ({ ...b, [d.id]: { ok: true, m: 'Đang thử tải file…' } }));
+    try {
+      const r = await api<{ ok: boolean; kb: number }>(`/van-ban/${d.id}/link`, { method: 'PATCH', body: JSON.stringify({ linkGoc: u }) });
+      setBao((b) => ({ ...b, [d.id]: { ok: true, m: `Đã lưu ✓ (file ${r.kb.toLocaleString('vi-VN')} KB)` } }));
+      setTimeout(onDaLuu, 1200);
+    } catch (e: any) { setBao((b) => ({ ...b, [d.id]: { ok: false, m: e?.message || 'Không lưu được' } })); }
+    finally { setDang(null); }
+  }
+  return (
+    <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/60 p-3 sm:p-4">
+      <button type="button" onClick={() => setMo((v) => !v)} className="flex w-full items-center gap-2 text-left">
+        <span className="text-[15px] font-extrabold text-[#0A2540]">Văn bản chưa có file</span>
+        <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[12px] font-bold text-white">{thieu.length}</span>
+        <span className="hidden text-[12px] text-slate-500 sm:inline">— máy đã tự tìm ở cổng TTĐT, Công báo, Google nhưng chưa ra. Tìm tay rồi dán link vào.</span>
+        <span className="ml-auto text-slate-400">{mo ? '▲' : '▼'}</span>
+      </button>
+      {mo && (
+        <>
+          {nguonDs.length > 1 && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {['all', ...nguonDs].map((n) => (
+                <button key={n} type="button" onClick={() => setLoc(n)} className={`rounded-full border px-3 py-1 text-[12px] font-semibold ${loc === n ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-300 bg-white text-slate-600 hover:border-[#0A2540]'}`}>
+                  {n === 'all' ? `Tất cả (${thieu.length})` : `${n} (${thieu.filter((d) => (d.nguon || 'Khác') === n).length})`}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="mt-3 max-h-[560px] space-y-2 overflow-y-auto pr-1">
+            {ds.map((d) => (
+              <div key={d.id} className="rounded-xl border border-slate-200 bg-white p-3">
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[12px] text-slate-500">
+                  <b className="font-mono text-[13px] text-[#0A2540]">{(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')}</b>
+                  <span>{fmtNgay(d.ngay)}</span><span>· {d.coQuan || '—'}</span><span>· nguồn: {d.nguon}</span>
+                </div>
+                <p className="mt-1 text-[13px] leading-snug text-[#0A2540]">{d.trichYeu}</p>
+                <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <a href={timGoogle(d)} target="_blank" rel="noreferrer" className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-slate-300 px-3 text-[13px] font-semibold text-[#0A2540] hover:bg-slate-50">🔎 Tìm trên Google</a>
+                  {d.linkGoc && <a href={d.linkGoc} target="_blank" rel="noreferrer" className="inline-flex h-9 shrink-0 items-center justify-center rounded-lg border border-slate-300 px-3 text-[13px] font-semibold text-slate-600 hover:bg-slate-50" title={d.linkGoc}>Trang nguồn ↗</a>}
+                  <input value={link[d.id] || ''} onChange={(e) => setLink((l) => ({ ...l, [d.id]: e.target.value }))} onKeyDown={(e) => { if (e.key === 'Enter') luu(d); }}
+                    placeholder="Dán link file PDF (hoặc link Google Drive) vào đây…" className="h-9 min-w-0 flex-1 rounded-lg border border-slate-300 px-3 text-[13px] outline-none focus:border-[#C8A14B]" />
+                  <button type="button" onClick={() => luu(d)} disabled={dang === d.id || !(link[d.id] || '').trim()} className="h-9 shrink-0 rounded-lg bg-[#0A2540] px-4 text-[13px] font-bold text-white hover:bg-[#13365c] disabled:opacity-40">{dang === d.id ? 'Đang thử…' : 'Lưu link'}</button>
+                </div>
+                {bao[d.id] && <p className={`mt-1.5 text-[12px] font-semibold ${bao[d.id].ok ? 'text-emerald-700' : 'text-red-600'}`}>{bao[d.id].m}</p>}
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

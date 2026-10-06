@@ -746,7 +746,8 @@ vanBanRouter.get('/manage', vanBanRequired, async (_req, res) => {
              chu_de AS "chuDe", linh_vuc AS "linhVuc", nguon, link_goc AS "linkGoc",
              luot_tai AS "luotTai", noi_bat AS "noiBat"
       FROM van_ban ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 8000`);
-    res.json({ docs: rows });
+    // coFile = có FILE THẬT xem được (không phải trang chung / trang tìm kiếm / link bị khoá) → admin lọc ra để tự tìm bằng tay
+    res.json({ docs: rows.map((d: any) => ({ ...d, coFile: coFileThat(d.linkGoc) })) });
   } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
 });
 
@@ -789,8 +790,24 @@ vanBanRouter.put('/:id', vanBanRequired, async (req, res) => {
     await query(
       `UPDATE van_ban SET so_hieu=$2, trich_yeu=$3, ngay_ban_hanh=$4, co_quan=$5, chu_de=$6, linh_vuc=$7, nguon=$8, link_goc=$9, noi_bat=$10 WHERE id=$1`,
       [Number(req.params.id), b.soKyHieu || null, b.trichYeu, b.ngay || null, b.coQuan || null, b.chuDe || 'Khác', b.linhVuc || null, b.nguon || null, b.linkGoc || null, !!b.noiBat]);
+    await rm(`${KHO_DRIVE}/vb-${PHIEN_BAN_FILE}-${Number(req.params.id)}.pdf`, { force: true }); // link có thể đã đổi → làm lại file
     res.json({ ok: true });
   } catch (e: any) { res.status(400).json({ error: e?.message || 'Lỗi sửa' }); }
+});
+// ── Admin dán LINK FILE tìm được bằng tay (khung "Văn bản chưa có file", 6/10/2026) ──
+// Thử tải ngay: phải ra đúng file PDF (link Drive thư mục/file cũng được) mới lưu → không lưu nhầm link trang web.
+// Lưu xong xoá bản cũ trong kho rồi tự tải + gắn dấu bản quyền + nén ở nền.
+vanBanRouter.patch('/:id/link', vanBanRequired, async (req, res) => {
+  try {
+    const id = Number(req.params.id); const link = String(req.body?.linkGoc || '').trim();
+    if (!/^https?:\/\//i.test(link)) return res.status(400).json({ error: 'Link phải bắt đầu bằng http:// hoặc https://' });
+    const goc = await layFileGoc(link);
+    if (!goc) return res.status(400).json({ error: 'Link này không tải được file PDF. Hãy dán link TẢI TRỰC TIẾP file (đuôi .pdf, hoặc link Google Drive công khai), không phải link trang web.' });
+    await query('UPDATE van_ban SET link_goc=$2, tim_file_luc=now() WHERE id=$1', [id, link]);
+    await rm(`${KHO_DRIVE}/vb-${PHIEN_BAN_FILE}-${id}.pdf`, { force: true });
+    layFileVb(id, link).catch(() => {});
+    res.json({ ok: true, kb: Math.round(goc.length / 1024) });
+  } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi lưu link' }); }
 });
 vanBanRouter.delete('/:id', vanBanRequired, async (req, res) => {
   try { await query('DELETE FROM van_ban WHERE id=$1', [Number(req.params.id)]); res.json({ ok: true }); }

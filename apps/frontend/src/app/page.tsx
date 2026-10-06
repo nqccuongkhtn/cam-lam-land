@@ -93,14 +93,16 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
     { title: 'Đăng tin bán nhà đất miễn phí tại Cam Lâm', url: '/sales/post' },
   ],
   'Cẩm nang nhà đất': [
-    { title: 'Thủ tục sang tên Sổ đỏ (chuyển nhượng quyền sử dụng đất)', url: '/cam-nang/sang-ten-so-do', img: U('1486406146926-c627a92ad1ab'), date: 'Cẩm nang' },
+    // Ảnh: mô hình nhà + chìa khoá (chuyển nhượng, sang tên) — thay ảnh nhà cao tầng không liên quan (chủ dự án 6/10/2026)
+    { title: 'Thủ tục sang tên Sổ đỏ (chuyển nhượng quyền sử dụng đất)', url: '/cam-nang/sang-ten-so-do', img: U('1560518883-ce09059eeffa'), date: 'Cẩm nang' },
     { title: 'Các loại thuế, phí khi mua bán nhà đất phải nộp', url: '/cam-nang/thue-phi-mua-ban-nha-dat' },
     { title: 'Cách kiểm tra Sổ đỏ thật hay giả nhanh, chính xác', url: '/cam-nang/kiem-tra-so-do-that-gia' },
     { title: 'Cách kiểm tra đất có dính quy hoạch không', url: '/cam-nang/kiem-tra-quy-hoach-dat' },
-    { title: '🔎 Tra cứu văn bản pháp luật nhà đất (quy hoạch, bồi thường, tái định cư, NOXH)', url: '/van-ban' },
-    { title: '⚖️ Dịch vụ pháp lý nhà đất — sang tên, tách thửa, thuế phí', url: '/cam-nang#dich-vu-phap-ly' },
-    { title: '📝 Mẫu hợp đồng đặt cọc Cam Lâm Land — tạo & in miễn phí', url: '/hop-dong-dat-coc' },
-    { title: '📚 Xem tất cả cẩm nang pháp lý nhà đất', url: '/cam-nang' },
+    // Bỏ biểu tượng 🔎 ⚖️ 📝 📚 ở đầu dòng (6/10/2026): chỉ 4 dòng cuối có, 4 dòng đầu không → lệch, nhìn "chưa phù hợp".
+    { title: 'Tra cứu văn bản pháp luật nhà đất (quy hoạch, bồi thường, tái định cư, NOXH)', url: '/van-ban' },
+    { title: 'Dịch vụ pháp lý nhà đất — sang tên, tách thửa, thuế phí', url: '/cam-nang#dich-vu-phap-ly' },
+    { title: 'Mẫu hợp đồng đặt cọc Cam Lâm Land — tạo & in miễn phí', url: '/hop-dong-dat-coc' },
+    { title: 'Xem tất cả cẩm nang pháp lý nhà đất', url: '/cam-nang' },
   ],
 };
 

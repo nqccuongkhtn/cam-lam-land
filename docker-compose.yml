@@ -99,6 +99,7 @@ services:
     volumes:
       - uploads:/data/uploads
       - logs:/app/apps/backend/logs        # GIỮ log lỗi/chậm qua các lần build lại
+      - van_ban_kho:/app/.kho-van-ban      # file PDF văn bản đã tải sẵn — mở ngay, không mất khi dựng lại (6/10/2026)
     depends_on:
       postgis:
         condition: service_healthy
@@ -208,6 +209,8 @@ volumes:
   camlam_tiles:
   # Kho tin tức đã biên tập (xem service frontend).
   tin_kho:
+  # File PDF văn bản đã tải sẵn từ Drive / cổng TTĐT (xem routes/vanBan.ts).
+  van_ban_kho:
 
   pgdata:
   uploads:

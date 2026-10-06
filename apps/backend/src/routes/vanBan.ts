@@ -393,7 +393,7 @@ const ngayIso = (v: any): string => {
 //   · Thư mục: trang "embeddedfolderview" liệt kê file công khai → lấy mã + tên từng file.
 //   · File: drive.usercontent.google.com/download?id=…&confirm=t trả thẳng nội dung (confirm=t để qua bước hỏi quét virus của file lớn).
 // Thư mục có nhiều PDF (vd …-001 thông báo, …-002 phụ lục) → ghép theo thứ tự tên bằng qpdf thành MỘT file.
-// Giữ bản đã ghép ở /tmp/drive-pdf (mất khi dựng lại backend thì tự tải lại).
+// Giữ bản đã ghép ở /app/.kho-van-ban (ổ bền, không mất khi dựng lại) — xem thêm taiSanFile().
 const idDrive = (u: string) => (u.match(/[?&]id=([\w-]{20,})/) || u.match(/\/(?:folders|d)\/([\w-]{20,})/) || [])[1] || '';
 async function dsFileDrive(id: string): Promise<{ id: string; ten: string }[] | null> {
   try {
@@ -413,7 +413,23 @@ async function taiDrive(id: string): Promise<Buffer | null> {
     return b.subarray(0, 4).toString() === '%PDF' ? b : null;
   } catch { return null; }
 }
-const KHO_DRIVE = '/tmp/drive-pdf';
+const KHO_DRIVE = process.env.VAN_BAN_KHO || '/app/.kho-van-ban';
+// TẢI SẴN (chủ dự án 6/10/2026 "tải văn bản hơi lâu"): lần đầu mở một văn bản Drive phải tải 2–8 MB rồi ghép → 5–10 giây.
+// Nên sau mỗi lượt lấy văn bản, máy tự tải sẵn MỌI văn bản Drive chưa có trong kho, từng cái một (nhẹ cho mạng nhà).
+let dangTaiSan = false;
+export async function taiSanFile(): Promise<number> {
+  if (dangTaiSan) return 0; dangTaiSan = true; let n = 0;
+  try {
+    const ds = await query<any>(`SELECT link_goc FROM van_ban WHERE link_goc LIKE '%drive.google.com%'`);
+    for (const d of ds) {
+      const id = idDrive(d.link_goc); if (!id) continue;
+      try { await readFile(`${KHO_DRIVE}/${id}.pdf`); continue; } catch { /* chưa có */ }
+      if (await layPdfDrive(d.link_goc)) n++;
+    }
+    console.log(`[van-ban] tải sẵn file Drive: thêm ${n} file`);
+  } catch (e: any) { console.error('[van-ban] tải sẵn lỗi:', e?.message || e); } finally { dangTaiSan = false; }
+  return n;
+}
 export async function layPdfDrive(link: string): Promise<Buffer | null> {
   const id = idDrive(link); if (!id) return null;
   const f = `${KHO_DRIVE}/${id}.pdf`;
@@ -580,7 +596,7 @@ function startCrawlBg(): boolean {
   crawlState.running = true; crawlState.added = 0; crawlState.updated = 0; crawlState.startedAt = Date.now(); crawlState.finishedAt = 0; crawlState.error = '';
   const cb = (isNew: boolean) => { if (isNew) crawlState.added++; else crawlState.updated++; };
   (async () => {
-    try { await crawlCongBao(true, true, cb); await crawlPortals(cb); await crawlCamhomes(true, cb); await crawlSheets(true, cb); await timFileThieu(cb); }
+    try { await crawlCongBao(true, true, cb); await crawlPortals(cb); await crawlCamhomes(true, cb); await crawlSheets(true, cb); await timFileThieu(cb); taiSanFile().catch(() => {}); }
     catch (e: any) { crawlState.error = e?.message || 'Lỗi crawl'; }
     finally { crawlState.running = false; crawlState.finishedAt = Date.now(); }
   })();

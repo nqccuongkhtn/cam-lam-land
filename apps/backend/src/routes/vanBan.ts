@@ -144,7 +144,9 @@ export async function crawlCongBao(force = false, deep = false, onAdd?: (isNew: 
         `INSERT INTO van_ban (so_hieu, trich_yeu, ngay_ban_hanh, co_quan, chu_de, linh_vuc, nguon, link_goc)
          VALUES ($1,$2,$3,$4,$5,'Đất đai','Công báo Khánh Hòa',$6)
          ON CONFLICT (so_hieu, ngay_ban_hanh) DO UPDATE SET trich_yeu=EXCLUDED.trich_yeu,
-           chu_de=EXCLUDED.chu_de, link_goc=COALESCE(EXCLUDED.link_goc, van_ban.link_goc)
+           chu_de=EXCLUDED.chu_de,
+           -- ĐÃ CÓ FILE THẬT (gắn tay / tự tìm được) thì GIỮ, không ghi đè bằng link trang chi tiết Công báo (6/10/2026: 198/QĐ-UBND bị ghi đè)
+           link_goc=CASE WHEN van_ban.link_goc ~* '(LawDocumentRender|FileVanBans|\\.pdf(\\?|$)|drive\\.google\\.com/open\\?id=)' THEN van_ban.link_goc ELSE COALESCE(EXCLUDED.link_goc, van_ban.link_goc) END
          RETURNING (xmax = 0) AS inserted`,
         [row.so, row.trichYeu, row.ngay, row.coQuan, classify(`${row.trichYeu} ${row.so}`), link])
         .then((rs: any) => { n++; onAdd?.(!!(rs && rs[0] && rs[0].inserted)); }).catch(() => {});
@@ -641,7 +643,7 @@ export async function crawlSheets(force = false, onAdd?: (isNew: boolean) => voi
 // KHÔNG BAO GIỜ trỏ người dùng sang trang khác để tự tìm. Văn bản đã thử mà chưa thấy thì 3 ngày sau mới thử lại
 // (cột tim_file_luc) cho đỡ tải cổng. Chạy sau mỗi lượt lấy văn bản (khởi động + lịch 6 giờ + nút Cập nhật).
 // Drive (thư mục/file công khai) TÍNH là có file — máy chủ tự tải + ghép PDF (layPdfDrive)
-const coFileThat = (link: string | null) => !!link && (/LawDocumentRender|FileVanBans|\.pdf(\?|$)|drive\.google\.com\/open\?id=/i.test(link) || /camhomes\.vn\/index\.php\?.*download=1/.test(link));
+const coFileThat = (link: string | null) => !!link && (/LawDocumentRender|FileVanBans|\.pdf(\?|$)|drive\.google\.com\/open\?id=/i.test(link) || /[?&]download=1(&|$)/i.test(link));
 // Cổng KHÔNG lọc thật khi tìm theo trích yếu (trả văn bản bất kỳ) → phải tự so: ≥ 70% từ đầu trích yếu có trong kết quả
 const khopTrichYeu = (a: string, b: string) => { const bo = (x: string) => vnNoAccentLite(x).split(/\s+/).filter((w) => w.length > 1); const ta = bo(a).slice(0, 10), tb = new Set(bo(b)); return ta.length >= 4 && ta.filter((w) => tb.has(w)).length / ta.length >= 0.7; };
 const vnNoAccentLite = (x: string) => x.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
@@ -718,7 +720,7 @@ function normPdf(raw: string, base: string): string | null {
 export async function resolvePdf(link: string): Promise<string | null> {
   if (!link) return null;
   if (/\.pdf(\?|$)/i.test(link)) return normPdf(link, link);
-  if (/camhomes\.vn\/index\.php\?.*download=1/i.test(link)) return link; // camhomes: link tải trả thẳng PDF
+  if (/[?&]download=1(&|$)/i.test(link)) return link; // trang nền NukeViet (camhomes, bqlnngt.khanhhoa.gov.vn…): link tải trả thẳng PDF
   try {
     const r = await fetch(link, { headers: UA, signal: AbortSignal.timeout(12000) });
     if (!r.ok) return null;

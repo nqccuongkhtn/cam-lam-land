@@ -698,5 +698,19 @@ export async function migrate(): Promise<void> {
     `ALTER TABLE users ADD COLUMN IF NOT EXISTS cn_ghi_chu text`,
   ]) await pool.query(sql).catch((e) => console.error('[migrate] môi giới chuyên nghiệp:', e.message));
 
+  // Văn bản: lần cuối máy tự đi tìm file ở nguồn chính thống (routes/vanBan.ts timFileThieu), 6/10/2026
+  await pool.query(`ALTER TABLE van_ban ADD COLUMN IF NOT EXISTS tim_file_luc timestamptz`).catch(() => {});
+  // Sửa 1 LẦN ngày văn bản cổng TTĐT bị ghi lùi 1 ngày (lỗi múi giờ): dời +1 ngày, bản nào dời bị trùng thì xoá bản lệch
+  {
+    const [da] = await pool.query(`SELECT value FROM app_config WHERE key='van_ban_sua_ngay_cong'`).then((r: any) => r.rows).catch(() => [null]);
+    if (!da) {
+      // Bản đúng ngày nhưng KHÔNG có file (b) nhường chỗ cho bản lệch ngày CÓ file (a) — giữ bản có file rồi dời ngày nó
+      await pool.query(`DELETE FROM van_ban b USING van_ban a WHERE a.nguon LIKE 'Cổng %' AND a.link_goc LIKE '%LawDocumentRender%' AND b.id <> a.id AND b.so_hieu = a.so_hieu AND b.ngay_ban_hanh = a.ngay_ban_hanh + 1 AND COALESCE(b.link_goc,'') NOT LIKE '%LawDocumentRender%'`).catch(() => {});
+      await pool.query(`DELETE FROM van_ban a USING van_ban b WHERE a.nguon LIKE 'Cổng %' AND a.link_goc LIKE '%LawDocumentRender%' AND b.id <> a.id AND b.so_hieu = a.so_hieu AND b.ngay_ban_hanh = a.ngay_ban_hanh + 1`).catch(() => {});
+      await pool.query(`UPDATE van_ban SET ngay_ban_hanh = ngay_ban_hanh + 1 WHERE nguon LIKE 'Cổng %' AND link_goc LIKE '%LawDocumentRender%'`).catch((e: any) => console.error('[migrate] sửa ngày cổng:', e?.message));
+      await pool.query(`INSERT INTO app_config (key, value) VALUES ('van_ban_sua_ngay_cong', '{"xong":true}'::jsonb) ON CONFLICT (key) DO NOTHING`).catch(() => {});
+    }
+  }
+
   console.log('[migrate] schema up to date');
 }

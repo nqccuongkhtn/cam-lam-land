@@ -99,13 +99,32 @@ export function PageView({ pg, doc, zoom, tool, color, fontSize, ov, sel, setSel
   const startEdit = (it: Item, ii: number) => {
     // Ô che chữ cũ: vừa khít chữ (dưới = chân chữ g/y, trên = dấu mũ chữ hoa tiếng Việt) và KHÔNG lấn sang dòng trên/dưới.
     // Bản cũ cao 1,36 cỡ chữ → đè mất chân chữ dòng trên + dấu dòng dưới trong đoạn văn dòng sát (chủ dự án báo 6/10/2026).
-    let top = it.y + it.size * 0.95, bot = it.y - it.size * 0.24;
+    let top = it.y + it.size * 1.05, bot = it.y - it.size * 0.34; // 0.34: đủ che đuôi chữ g/y/p + dấu nặng (6/10/2026: còn sót đuôi "g" dưới chữ mới)
     for (const o of items) {
       if (o === it || o.x > it.x + it.w || o.x + o.w < it.x) continue;          // không cùng cột chữ → bỏ qua
       if (o.y > it.y + 0.5 && o.y < it.y + it.size * 2) top = Math.min(top, Math.max(it.y + it.size * 0.7, o.y - o.size * 0.24 - 0.4));
       if (o.y < it.y - 0.5 && o.y > it.y - it.size * 2) bot = Math.max(bot, Math.min(it.y - it.size * 0.08, o.y + o.size * 0.95 + 0.4));
     }
-    const box = { wx: it.x, wy: bot, ww: Math.max(it.w, it.size * 0.5), wh: top - bot };
+    // ĐO THEO NÉT MỰC THẬT của từng dòng (chủ dự án 6/10/2026: "mỗi chữ cao thấp khác nhau, tính từng chữ"): dò điểm ảnh tối
+    // trong cột chữ — từ chân chữ dò XUỐNG (đuôi g/y/p, dấu nặng), từ thân chữ dò LÊN (dấu mũ, sắc, huyền, ngã…), gặp một
+    // dải trắng đủ rộng thì dừng (đó là khoảng cách dòng) → ô che ôm khít đúng nét của dòng này, không ăn sang dòng kế.
+    try {
+      const vp = vpRef.current, cv = canvasRef.current!;
+      const [ax, ay] = vp.convertToViewportPoint(it.x - it.size * 0.06, top), [bx, by] = vp.convertToViewportPoint(it.x + it.w + it.size * 0.06, bot);
+      const x0 = Math.max(0, Math.floor(Math.min(ax, bx))), x1 = Math.min(cv.width - 1, Math.ceil(Math.max(ax, bx)));
+      const y0 = Math.max(0, Math.floor(Math.min(ay, by))), y1 = Math.min(cv.height - 1, Math.ceil(Math.max(ay, by)));
+      const d = cv.getContext('2d')!.getImageData(x0, y0, x1 - x0 + 1, y1 - y0 + 1).data, W = x1 - x0 + 1;
+      const coMuc = (y: number) => { for (let x = 0; x < W; x++) { const i = ((y - y0) * W + x) * 4; if (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2] < 190) return true; } return false; };
+      const [, yChan] = vp.convertToViewportPoint(it.x, it.y), [, yThan] = vp.convertToViewportPoint(it.x, it.y + it.size * 0.45);
+      const nghi = Math.max(2, Math.round(Math.abs(yChan - yThan) * 0.35));   // dải trắng ≥ ~16% cỡ chữ = hết dòng
+      let duoi = Math.min(y1, Math.round(yChan)), trang = 0;
+      for (let y = Math.round(yChan); y <= y1; y++) { if (coMuc(y)) { duoi = y; trang = 0; } else if (++trang >= nghi) break; }
+      let tren = Math.max(y0, Math.round(yThan)); trang = 0;
+      for (let y = Math.round(yThan); y >= y0; y--) { if (coMuc(y)) { tren = y; trang = 0; } else if (++trang >= nghi) break; }
+      const [, ptTren] = vp.convertToPdfPoint(0, tren - 1.5), [, ptDuoi] = vp.convertToPdfPoint(0, duoi + 1.5);
+      top = Math.max(ptTren, it.y + it.size * 0.6); bot = Math.min(ptDuoi, it.y - it.size * 0.05);
+    } catch { /* không đo được thì giữ ước lượng */ }
+    const box = { wx: it.x - it.size * 0.06, wy: bot, ww: Math.max(it.w, it.size * 0.5) + it.size * 0.12, wh: top - bot };
     // ĐỘ GIÃN NGANG sx: phông nhúng trong PDF và phông của máy hiển thị rộng hẹp khác nhau → con trỏ gõ trôi lệch dần
     // so với chữ gốc (chủ dự án: "con trỏ lệch 2 ký tự", 6/10/2026). Đo bề rộng chữ gốc bằng phông máy rồi giãn/co cho khớp đúng
     // bề rộng trong PDF; khi xuất cũng giãn đúng tỉ lệ đó nên chữ mới cùng nhịp chữ cũ.

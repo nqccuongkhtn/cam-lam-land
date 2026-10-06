@@ -189,7 +189,8 @@ function parseAspDate(v: any): string {
   if (v == null) return '';
   const s = String(v);
   const m = s.match(/\/Date\((-?\d+)/);                 // định dạng .NET: /Date(1712...)/
-  if (m) { const d = new Date(Number(m[1])); return isNaN(+d) ? '' : d.toISOString().slice(0, 10); }
+  // +7 giờ: ngày của cổng là 0 giờ giờ VN = 17 giờ hôm trước giờ quốc tế → trước đây ghi LÙI 1 NGÀY (sửa 6/10/2026)
+  if (m) { const d = new Date(Number(m[1]) + 7 * 3600e3); return isNaN(+d) ? '' : d.toISOString().slice(0, 10); }
   const dmy = s.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
   if (dmy) return `${dmy[3]}-${dmy[2].padStart(2, '0')}-${dmy[1].padStart(2, '0')}`;
   const iso = s.match(/(\d{4})-(\d{2})-(\d{2})/);
@@ -383,7 +384,6 @@ const ngayIso = (v: any): string => {
   const m = String(v || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : '';
 };
-const linkXem = (u: string) => { const m = u.match(/[?&]id=([\w-]{20,})/); return m ? `https://drive.google.com/file/d/${m[1]}/view` : u; };
 let lastSheets = 0;
 export async function crawlSheets(force = false, onAdd?: (isNew: boolean) => void): Promise<number> {
   if (!force && Date.now() - lastSheets < 5 * 3600 * 1000) return 0;
@@ -403,13 +403,12 @@ export async function crawlSheets(force = false, onAdd?: (isNew: boolean) => voi
         if (sh.ten === 'thu-hoi') {
           const m = b.match(/^(\d+)\s*\/\s*QĐ[\s-]*UBND$/i);
           const ty = clean(String(giaTri(row.getCell(4).value) ?? ''));
-          if (m && ty) rows.push({ so: `${m[1]}/QĐ-UBND`, ngay: ngayIso(row.getCell(3).value), ty, link: sh.xem, cq: 'UBND xã Cam Lâm' });
+          if (m && ty) rows.push({ so: `${m[1]}/QĐ-UBND`, ngay: ngayIso(row.getCell(3).value), ty, link: '', cq: 'UBND xã Cam Lâm' }); // bảng không kèm file → để trống, bước tự tìm file sẽ đi tìm
         } else {
           const m = b.match(/^(\d+)\s*\/\s*CNKVCL\s+(\d{1,2}\/\d{1,2}\/\d{4})/i);
           const c = row.getCell(3);
           const ty = clean(String(giaTri(c.value) ?? ''));
-          const lk = (c as any).hyperlink || (c.value as any)?.hyperlink || '';
-          if (m && ty.length > 8) rows.push({ so: `${m[1]}/TB-CNKVCL`, ngay: ngayIso(m[2]), ty, link: lk ? linkXem(lk) : sh.xem, cq: 'Chi nhánh Phát triển quỹ đất khu vực Cam Lâm' });
+          if (m && ty.length > 8) rows.push({ so: `${m[1]}/TB-CNKVCL`, ngay: ngayIso(m[2]), ty, link: '', cq: 'Chi nhánh Phát triển quỹ đất khu vực Cam Lâm' });
         }
       });
       for (const x of rows) {
@@ -429,6 +428,64 @@ export async function crawlSheets(force = false, onAdd?: (isNew: boolean) => voi
   return n;
 }
 
+// ══ TỰ TÌM FILE Ở NGUỒN CHÍNH THỐNG (chủ dự án 6/10/2026) ══════════════════════════════════════════════
+// Văn bản nào CHƯA mở được file (không link, link trang chung "/module/document", link trang tìm kiếm thuvienphapluat,
+// link camhomes bị khoá đăng nhập, bảng tổng hợp không kèm file) thì máy TỰ tìm trên các cổng TTĐT của tỉnh/xã:
+//   · có số ký hiệu → tìm theo SỐ (DMSSearch notation), khớp số + ngày lệch ≤ 3 ngày;
+//   · "Không số"   → tìm theo TRÍCH YẾU (6 từ đầu), khớp ngày lệch ≤ 3 ngày.
+// Tìm thấy → gắn link FILE PDF THẬT của cổng (Temp/LawDocument/LawDocumentRender/<mã>.pdf), đã thử tải được mới gắn.
+// KHÔNG BAO GIỜ trỏ người dùng sang trang khác để tự tìm. Văn bản đã thử mà chưa thấy thì 3 ngày sau mới thử lại
+// (cột tim_file_luc) cho đỡ tải cổng. Chạy sau mỗi lượt lấy văn bản (khởi động + lịch 6 giờ + nút Cập nhật).
+// Drive KHÔNG tính là có file: chủ file tắt xem trước + tải xuống ("Không có bản xem trước", 6/10/2026)
+const coFileThat = (link: string | null) => !!link && (/LawDocumentRender|FileVanBans|\.pdf(\?|$)/i.test(link) || /camhomes\.vn\/index\.php\?.*download=1/.test(link));
+// Cổng KHÔNG lọc thật khi tìm theo trích yếu (trả văn bản bất kỳ) → phải tự so: ≥ 70% từ đầu trích yếu có trong kết quả
+const khopTrichYeu = (a: string, b: string) => { const bo = (x: string) => vnNoAccentLite(x).split(/\s+/).filter((w) => w.length > 1); const ta = bo(a).slice(0, 10), tb = new Set(bo(b)); return ta.length >= 4 && ta.filter((w) => tb.has(w)).length / ta.length >= 0.7; };
+const vnNoAccentLite = (x: string) => x.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
+async function timTrenCong(base: string, notation: string, subject: string) {
+  const body = JSON.stringify({ notation, subject, content: '', idField: EMPTY_GUID, idCategory: EMPTY_GUID, idCategories: EMPTY_GUID, dateBegin: '', dateEnd: '', isCopy: false, starIndex: 0, endIndex: 10 });
+  try {
+    const r = await fetch(`${base}/Services/DMSSearch.asmx/Search`, { method: 'POST', body, headers: { ...UA, 'Content-Type': 'application/json; charset=utf-8', Accept: 'application/json' }, signal: AbortSignal.timeout(12000) });
+    if (!r.ok) return [];
+    const j: any = await r.json().catch(() => null); let s: string = j && typeof j.d === 'string' ? j.d : '';
+    const i = s.lastIndexOf('_'); if (i > 0) s = s.slice(0, i);
+    const arr = JSON.parse(s || '[]');
+    return Array.isArray(arr) ? arr.map((o: any) => ({ id: String(o.Id || ''), so: soOf(String(o.Notation || '')), ngay: parseAspDate(o.CreatedDate), ty: clean(String(o.Subject || '')) })) : [];
+  } catch { return []; }
+}
+const lechNgay = (a: string, b: string) => Math.abs((Date.parse(a) - Date.parse(b)) / 864e5);
+const chuanSo = (s: string) => s.toUpperCase().replace(/\s+/g, '').replace(/Đ/g, 'D');
+let dangTim = false;
+export async function timFileThieu(onAdd?: (isNew: boolean) => void): Promise<number> {
+  if (dangTim) return 0; dangTim = true;
+  let n = 0;
+  try {
+    const ds = await query<any>(`SELECT id, so_hieu, trich_yeu, to_char(ngay_ban_hanh,'YYYY-MM-DD') AS ngay, nguon, link_goc FROM van_ban
+      WHERE (tim_file_luc IS NULL OR tim_file_luc < now() - interval '3 days') ORDER BY ngay_ban_hanh DESC NULLS LAST`);
+    const thieu = ds.filter((d) => !coFileThat(d.link_goc));
+    // Cổng nguồn của chính văn bản thử trước, rồi Cổng tỉnh, rồi các cổng còn lại
+    const thuTu = (nguon: string) => { const goc = PORTALS_DOC.find((p) => `Cổng ${p.ten}` === nguon || p.ten === nguon); return [...(goc ? [goc] : []), ...PORTALS_DOC.filter((p) => p !== goc).sort((a, b) => (a.ten.includes('tỉnh') ? -1 : b.ten.includes('tỉnh') ? 1 : 0))]; };
+    for (const d of thieu) {
+      const khongSo = /^Không số/.test(d.so_hieu || '');
+      const tuKhoa = khongSo ? String(d.trich_yeu || '').split(/\s+/).slice(0, 6).join(' ') : '';
+      let link = '';
+      for (const p of thuTu(d.nguon)) {
+        const kq = await timTrenCong(p.base, khongSo ? '' : d.so_hieu, tuKhoa);
+        const hop = kq.find((k) => k.id && (!d.ngay || !k.ngay || lechNgay(k.ngay, d.ngay) <= 3) && (khongSo ? khopTrichYeu(d.trich_yeu || '', k.ty) : chuanSo(k.so) === chuanSo(d.so_hieu)));
+        if (hop) {
+          const u = `${p.base}/Temp/LawDocument/LawDocumentRender/${hop.id}.pdf`;
+          try { const r = await fetch(u, { headers: { ...UA, Range: 'bytes=0-3' }, signal: AbortSignal.timeout(15000) }); if (r.ok && Buffer.from(await r.arrayBuffer()).subarray(0, 4).toString() === '%PDF') link = u; } catch { /* thử cổng khác */ }
+          if (link) break;
+        }
+        await new Promise((z) => setTimeout(z, 150));
+      }
+      await query(`UPDATE van_ban SET tim_file_luc = now()${link ? ', link_goc = $2' : ''} WHERE id = $1`, link ? [d.id, link] : [d.id]).catch(() => {});
+      if (link) { n++; onAdd?.(false); }
+    }
+    console.log(`[van-ban] tự tìm file: thử ${thieu.length} văn bản thiếu file, tìm được ${n}`);
+  } finally { dangTim = false; }
+  return n;
+}
+
 // Crawl NỀN: /refresh khởi động rồi trả lời NGAY (tránh 524 — Cloudflare cắt kết nối ở ~100s khi crawl sâu).
 // Client hỏi tiến độ qua /refresh-status tới khi running=false. Chặn chạy trùng bằng cờ running.
 const crawlState = { running: false, added: 0, updated: 0, startedAt: 0, finishedAt: 0, error: '' };
@@ -437,7 +494,7 @@ function startCrawlBg(): boolean {
   crawlState.running = true; crawlState.added = 0; crawlState.updated = 0; crawlState.startedAt = Date.now(); crawlState.finishedAt = 0; crawlState.error = '';
   const cb = (isNew: boolean) => { if (isNew) crawlState.added++; else crawlState.updated++; };
   (async () => {
-    try { await crawlCongBao(true, true, cb); await crawlPortals(cb); await crawlCamhomes(true, cb); await crawlSheets(true, cb); }
+    try { await crawlCongBao(true, true, cb); await crawlPortals(cb); await crawlCamhomes(true, cb); await crawlSheets(true, cb); await timFileThieu(cb); }
     catch (e: any) { crawlState.error = e?.message || 'Lỗi crawl'; }
     finally { crawlState.running = false; crawlState.finishedAt = Date.now(); }
   })();

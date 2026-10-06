@@ -4,7 +4,7 @@
  *  Phạm vi chủ dự án chốt: TỪ DẢI QUẢNG BÁ TRỞ XUỐNG = Dải quảng bá + Hỗ trợ tiện ích + Doanh nghiệp tiêu biểu.
  *  (Chân trang SiteFooter giữ nguyên.) Mở trang chủ kèm ?maucum=N (1–100). Không có tham số → web y như cũ.
  *
- *  Mỗi mẫu = MỘT TÔNG CHUNG cho cả cụm (4 kiểu khung nền) + 1 trong 25 bố cục dải quảng bá (MauPromo.tsx)
+ *  DẢI QUẢNG BÁ GIỮ NGUYÊN (chủ dự án không cho đổi phong cách). Mỗi mẫu = MỘT TÔNG CHUNG cho cả cụm (4 kiểu khung nền)
  *  + 1 trong 10 kiểu "Hỗ trợ tiện ích" + 1 trong 5 kiểu "Doanh nghiệp tiêu biểu". Cả cụm dùng chung màu chữ,
  *  màu thẻ, kiểu tiêu đề mục → nhìn liền một khối chứ không phải ba mảnh ghép.
  *  Doanh nghiệp: mọi kiểu đều KHÔNG LẶP logo (bản cũ lặp Cam Lâm Land / Vingroup 3 lần → nhìn như hàng giả).
@@ -12,9 +12,9 @@
  * ========================================================================== */
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import Link from 'next/link';
-import { BO_CUC, TONG, DS, type Tk } from './MauPromo';
+import PromoBanner from './PromoBanner';
 
-type Nen = { ten: string; ngoai: CSSProperties; fg: string; mu: string; the: string; ln: string; nhan: string; tongBn: number };
+type Nen = { ten: string; ngoai: CSSProperties; fg: string; mu: string; the: string; ln: string; nhan: string; tongBn: number }; // tongBn: không còn dùng
 // 4 kiểu khung nền cho CẢ CỤM (tongBn = tông dải quảng bá đi kèm cho hợp)
 const NEN: Nen[] = [
   { ten: 'Nền trang như hiện tại', ngoai: {}, fg: '#0A2540', mu: '#64748b', the: '#fff', ln: '#e2e8f0', nhan: '#c8102e', tongBn: 0 },
@@ -23,13 +23,6 @@ const NEN: Nen[] = [
   { ten: 'Cả cụm trên một dải KEM ấm', ngoai: { background: '#f7f3ea' }, fg: '#0A2540', mu: '#6b6457', the: '#fff', ln: '#e9e1d0', nhan: '#a8791f', tongBn: 3 },
 ];
 
-// Tông cho dải quảng bá khi nằm trên dải xanh đậm: thẻ sáng hơn nền một chút để còn thấy khung
-const tkTrenNen = (n: Nen, base: (s: typeof DS[number]) => Tk) => (s: typeof DS[number]): Tk => {
-  const t = base(s);
-  if (n.tongBn === 2) return { ...t, bg: '#0f2f50', vien: '1px solid rgba(255,255,255,.1)' };
-  if (n.tongBn === 1) return { ...t, bg: '#f3f5f8' };
-  return t;
-};
 
 const TOOLS = [
   { k: 'age', icon: '☯️', t: 'Xem tuổi xây nhà', d: 'Kim Lâu · Hoang Ốc · Tam Tai', mau: '#f3eefe' },
@@ -129,15 +122,13 @@ export const SO_MAU_CUM = 100;
 export default function MauCum({ so }: { so: number }) {
   const m = so - 1;
   const n = NEN[Math.floor(m / 25)];
-  const bc = BO_CUC[m % 25];
-  const ti = TIEN_ICH[(m + Math.floor(m / 25) * 3) % TIEN_ICH.length];
-  const dn = DOANH_NGHIEP[(m + Math.floor(m / 25)) % DOANH_NGHIEP.length];
-  const [i, setI] = useState(0);
-  const [dung, setDung] = useState(false);
+  // Trong mỗi nhóm nền 25 mẫu: tiện ích xoay 10 kiểu, đối tác đổi kiểu sau mỗi 5 mẫu → 25 cặp không trùng
+  const k = m % 25;
+  const ti = TIEN_ICH[k % TIEN_ICH.length];
+  const dn = DOANH_NGHIEP[Math.floor(k / 5) % DOANH_NGHIEP.length];
   const [ds, setDs] = useState<Dn[]>([]);
   const [go, setGo] = useState(String(so));
   useEffect(() => { setGo(String(so)); }, [so]);
-  useEffect(() => { if (dung) return; const t = setInterval(() => setI((k) => (k + 1) % DS.length), 6000); return () => clearInterval(t); }, [dung, i]);
   useEffect(() => {
     fetch('/api/partners').then((r) => r.json()).then((d) => {
       const a: Dn[] = Array.isArray(d?.partners) ? d.partners : [];
@@ -149,8 +140,9 @@ export default function MauCum({ so }: { so: number }) {
   return (
     <div id="mau-cum" className="scroll-mt-20">
       <div style={n.ngoai}>
-        <div className="mx-auto max-w-7xl space-y-10 px-3 py-8 sm:px-4 sm:py-12" onMouseEnter={() => setDung(true)} onMouseLeave={() => setDung(false)}>
-          {bc.ve({ i, set: setI, tk: tkTrenNen(n, TONG[n.tongBn].tk) })}
+        {/* Dải quảng bá GIỮ NGUYÊN thiết kế hiện tại (chủ dự án 6/10/2026: "không đổi phong cách thiết kế banner") */}
+        <div className="pt-2 sm:pt-4"><PromoBanner /></div>
+        <div className="mx-auto max-w-7xl space-y-10 px-3 pb-8 pt-4 sm:px-4 sm:pb-12">
           <section><TieuDe n={n} nho="Công cụ" to="Hỗ trợ tiện ích" />{ti.ve(n)}</section>
           <section><TieuDe n={n} nho="Đối tác" to="Doanh nghiệp tiêu biểu" />{dn.ve(n, ds)}</section>
         </div>
@@ -162,7 +154,7 @@ export default function MauCum({ so }: { so: number }) {
             <b>Mẫu</b><input value={go} onChange={(e) => setGo(e.target.value.replace(/\D/g, ''))} inputMode="numeric" className="h-7 w-11 rounded border border-amber-300 bg-white text-center font-bold outline-none" /><span>/{SO_MAU_CUM}</span>
           </form>
           <button type="button" onClick={() => den(so + 1)} className="grid h-7 w-7 place-items-center rounded bg-white ring-1 ring-amber-200">›</button>
-          <span className="min-w-0 flex-1 leading-snug"><b>Nền:</b> {n.ten} · <b>Quảng bá:</b> {bc.ten} · <b>Tiện ích:</b> {ti.ten} · <b>Đối tác:</b> {dn.ten}</span>
+          <span className="min-w-0 flex-1 leading-snug"><b>Nền:</b> {n.ten} · <b>Tiện ích:</b> {ti.ten} · <b>Đối tác:</b> {dn.ten}</span>
         </div>
       </div>
     </div>

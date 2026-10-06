@@ -18,7 +18,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import './promo.css';
-import MauPromo, { SO_MAU_BN } from './MauPromo'; // TẠM: xem thử 100 mẫu
 
 type Slide = {
   nen: string;        // dải màu nền
@@ -99,14 +98,7 @@ function Hinh({ loai, toi }: { loai: Slide['hinh']; toi?: boolean }) {
   );
 }
 
-// TẠM (6/10/2026): ?maubn=N → xem thử mẫu N trong 100 mẫu (components/MauPromo.tsx). Không có tham số thì như cũ.
 export default function PromoBanner() {
-  const [mau, setMau] = useState(0);
-  useEffect(() => { const n = Number(new URLSearchParams(location.search).get('maubn')); if (n >= 1 && n <= SO_MAU_BN) setMau(n); }, []);
-  return mau ? <MauPromo so={mau} /> : <PromoBannerGoc />;
-}
-
-function PromoBannerGoc() {
   const [i, setI] = useState(0);
   const [chay, setChay] = useState(false);     // có đang cho hiệu ứng chạy không
   const dungRe = useRef(false);                // chuột đang rê vào banner

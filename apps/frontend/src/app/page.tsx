@@ -218,17 +218,18 @@ function VanBanMoiNhat({ tu, onXoa }: { tu: string; onXoa: () => void }) {
           hoặc <Link href={trangChinh} className="font-semibold text-red-600">mở trang tra cứu đầy đủ</Link> để lọc theo chủ đề, năm, cơ quan.</p>
       )}
       {ds?.slice(0, 4).map((d) => (
-        <button key={d.id} type="button" onClick={() => moXem(d)} className="group flex w-full gap-2.5 py-2.5 text-left lg:gap-2 lg:py-2">
-          <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-red-600 lg:mt-[6px] lg:h-1 lg:w-1" />
+        // Chữ CÙNG CỠ dòng tin tab "Thị trường BĐS" (15px, slate-700) — chủ dự án: "chữ bên tra cứu bé hơn bên báo".
+        <button key={d.id} type="button" onClick={() => moXem(d)} className="group flex w-full gap-2.5 py-2.5 text-left">
+          <span className="mt-[8px] h-1.5 w-1.5 shrink-0 rounded-full bg-red-600" />
           <div className="min-w-0 flex-1">
-            <p className="line-clamp-2 text-[15px] font-medium leading-snug text-slate-800 group-hover:text-red-600 lg:text-[13px]">{d.trichYeu}</p>
-            <p className="mt-1 truncate text-[12.5px] text-slate-500 lg:mt-0.5 lg:text-[11px]">{tu && <b className="font-semibold text-red-600">{d.soKyHieu} · </b>}{[d.ngay ? ngayVn(d.ngay) : '', d.coQuan].filter(Boolean).join(' · ')}</p>
+            <p className="line-clamp-2 text-[15px] leading-snug text-slate-700 group-hover:text-red-600">{d.trichYeu}</p>
+            <p className="mt-1 truncate text-[12.5px] text-slate-500">{tu && <b className="font-semibold text-red-600">{d.soKyHieu} · </b>}{[d.ngay ? ngayVn(d.ngay) : '', d.coQuan].filter(Boolean).join(' · ')}</p>
           </div>
         </button>
       ))}
       </div>
       {dangXem && <XemVanBan vb={dangXem} onDong={() => setDangXem(null)} onLoi={(m) => { setDangXem(null); alert(m); }} />}
-      <div className="flex items-center justify-center gap-5 pt-3 pb-1 text-sm font-semibold lg:pt-2 lg:text-[12px]">
+      <div className="flex items-center justify-center gap-5 pt-3 pb-1 text-sm font-semibold">
         {tu && <button type="button" onClick={onXoa} className="text-slate-500 hover:text-red-600">✕ Bỏ tìm</button>}
         <Link href={trangChinh} className="flex items-center gap-1 text-red-600 hover:text-red-700">
           {tu ? (kq && kq.length > 4 ? 'Xem thêm kết quả ở trang tra cứu' : 'Mở trang tra cứu văn bản') : 'Xem tất cả văn bản'}

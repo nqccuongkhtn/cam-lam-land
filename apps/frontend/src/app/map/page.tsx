@@ -364,6 +364,11 @@ const CAN_CU_QH: Record<string, CanCu> = {
 };
 
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
+// Khung mở bản đồ trên MÁY TÍNH (chủ dự án 7/10/2026 gửi ảnh vị trí mong muốn): GIỮ NGUYÊN mức phóng, chỉ dịch khung
+// sang ĐÔNG 0,0514° (~142px ở màn 1920) + lên BẮC 0,0043° (~12px) → vùng quy hoạch nằm lệch trái như ảnh mẫu, chừa chỗ
+// cho biển + đảo bên phải. Điện thoại giữ khung cũ (màn hẹp, dịch là mất phần phía Tây của vùng quy hoạch).
+const QH_BOUNDS_MAY_TINH: [[number, number], [number, number]] = [[108.9401268 + 0.0514, 11.9257021 + 0.0043], [109.2563886 + 0.0514, 12.217594 + 0.0043]];
+const khungMoBanDo = () => (typeof window !== 'undefined' && window.innerWidth >= 1024 ? QH_BOUNDS_MAY_TINH : QH_BOUNDS);
 // Khung bao [tây, nam, đông, bắc] của một hình GeoJSON bất kỳ (điểm, đường, vùng, nhiều vùng).
 // Dùng để biết thửa đang xem nằm ở đâu mà so với phạm vi từng bản quy hoạch.
 function bboxHinh(g: any): [number, number, number, number] | null {
@@ -2118,7 +2123,7 @@ export default function MapPage() {
 
         <div ref={khungBanDoRef} className="relative flex-1 min-h-0">
           <MapView layers={geoLayers} overlays={overlays} markers={allMarkers} baseMap={baseMap} labels={labels} measureMode={measure}
-            focusPoint={focusPoint} flyToPoint={flyPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} onViewport={onViewport} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={1} fitTo={fitTo} textLabels={textLabels}
+            focusPoint={focusPoint} flyToPoint={flyPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} onViewport={onViewport} initialBounds={khungMoBanDo()} adMarkers={ads} adOpacity={1} fitTo={fitTo} textLabels={textLabels}
             routes={dirTuyen} onPickRoute={setDirChon} diaChinhTiles={dcTiles} />
 
           {/* ══ MẪU 51: Ô TÌM NỔI + HÀNG CHIP ══════════════════════════════════════════════════════

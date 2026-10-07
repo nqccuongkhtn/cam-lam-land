@@ -92,17 +92,18 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
     { title: 'Ký gửi nhà đất — định giá & bán giúp miễn phí', url: '/listings' },
     { title: 'Đăng tin bán nhà đất miễn phí tại Cam Lâm', url: '/sales/post' },
   ],
-  'Cẩm nang nhà đất': [
+  // Tab đổi tên "Cẩm nang nhà đất" → "Tra cứu văn bản" (chủ dự án 7/10/2026): bài NỔI BẬT (dòng đầu, có ảnh)
+  // là Tra cứu văn bản thay cho Thủ tục sang tên Sổ đỏ; 3 dòng kế đưa lên trên, 4 bài cẩm nang xuống dưới.
+  'Tra cứu văn bản': [
     // Ảnh: xấp Giấy chứng nhận (sổ hồng) chủ dự án gửi 6/10/2026 — file public/cam-nang/so-hong.webp
-    { title: 'Thủ tục sang tên Sổ đỏ (chuyển nhượng quyền sử dụng đất)', url: '/cam-nang/sang-ten-so-do', img: '/cam-nang/so-hong.webp', date: 'Cẩm nang' },
-    { title: 'Các loại thuế, phí khi mua bán nhà đất phải nộp', url: '/cam-nang/thue-phi-mua-ban-nha-dat' },
-    { title: 'Cách kiểm tra Sổ đỏ thật hay giả nhanh, chính xác', url: '/cam-nang/kiem-tra-so-do-that-gia' },
-    { title: 'Cách kiểm tra đất có dính quy hoạch không', url: '/cam-nang/kiem-tra-quy-hoach-dat' },
-    // Bỏ biểu tượng 🔎 ⚖️ 📝 📚 ở đầu dòng (6/10/2026): chỉ 4 dòng cuối có, 4 dòng đầu không → lệch, nhìn "chưa phù hợp".
-    { title: 'Tra cứu văn bản pháp luật nhà đất (quy hoạch, bồi thường, tái định cư, NOXH)', url: '/van-ban' },
+    { title: 'Tra cứu văn bản pháp luật nhà đất (quy hoạch, bồi thường, tái định cư, NOXH)', url: '/van-ban', img: '/cam-nang/so-hong.webp', date: 'Văn bản' },
     { title: 'Dịch vụ pháp lý nhà đất — sang tên, tách thửa, thuế phí', url: '/cam-nang#dich-vu-phap-ly' },
     { title: 'Mẫu hợp đồng đặt cọc Cam Lâm Land — tạo & in miễn phí', url: '/hop-dong-dat-coc' },
     { title: 'Xem tất cả cẩm nang pháp lý nhà đất', url: '/cam-nang' },
+    { title: 'Thủ tục sang tên Sổ đỏ (chuyển nhượng quyền sử dụng đất)', url: '/cam-nang/sang-ten-so-do' },
+    { title: 'Các loại thuế, phí khi mua bán nhà đất phải nộp', url: '/cam-nang/thue-phi-mua-ban-nha-dat' },
+    { title: 'Cách kiểm tra Sổ đỏ thật hay giả nhanh, chính xác', url: '/cam-nang/kiem-tra-so-do-that-gia' },
+    { title: 'Cách kiểm tra đất có dính quy hoạch không', url: '/cam-nang/kiem-tra-quy-hoach-dat' },
   ],
 };
 

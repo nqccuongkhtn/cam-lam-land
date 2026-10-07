@@ -2,7 +2,14 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { api, NO_IMG } from '@/lib/api';
+import { api, apiBase, NO_IMG } from '@/lib/api';
+import dynamic from 'next/dynamic';
+import { useAuth } from '@/lib/auth';
+import { useLoginGate } from '@/lib/loginGate';
+import { getToken } from '@/lib/token';
+import type { MoVanBan } from './van-ban/XemVanBan';
+// Khung xem văn bản DÙNG CHUNG với trang /van-ban — chỉ nạp khi khách bấm mở một văn bản (trang chủ nhẹ hơn).
+const XemVanBan = dynamic(() => import('./van-ban/XemVanBan'), { ssr: false });
 import { Listing, PropertyType, PROPERTY_LABELS, SALE_PROPERTY_TYPES, RENT_PROPERTY_TYPES } from '@/lib/types';
 import ListingCard from '@/components/ListingCard';
 import HomeUtilities from '@/components/HomeUtilities';
@@ -122,30 +129,44 @@ const LIEN_KET_PHAP_LY: [string, string][] = [
   ['Giá đền bù, bồi thường đất', '/den-bu'],
   ['Mẫu hợp đồng đặt cọc', '/hop-dong-dat-coc'],
 ];
-function KhoiTraCuuVanBan() {
-  const router = useRouter();
+// TÌM NGAY TẠI TRANG CHỦ (chủ dự án 7/10/2026): gõ là tìm (chờ 0,45 giây ngừng gõ), kết quả đẩy lên đầu cột phải
+// thay cho "văn bản mới" — qua GET /api/van-ban/tim (công khai, tối đa 6 văn bản). Bấm Enter / kính lúp trên
+// điện thoại thì cuộn xuống chỗ kết quả (cột phải nằm dưới khối này).
+function KhoiTraCuuVanBan({ onTim, tuNgoai }: { onTim: (tu: string) => void; tuNgoai: string }) {
   const [tu, setTu] = useState('');
+  // bấm "Bỏ tìm" bên cột phải → xoá luôn chữ trong ô
+  useEffect(() => { if (!tuNgoai) setTu((x) => (x.trim().length >= 2 ? '' : x)); }, [tuNgoai]);
+  useEffect(() => {
+    const t = setTimeout(() => onTim(tu.trim().length >= 2 ? tu.trim() : ''), 450);
+    return () => clearTimeout(t);
+  }, [tu, onTim]);
   return (
     <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white lg:h-full">
       <img src="/cam-nang/so-hong.webp" alt="" loading="lazy" className="absolute inset-y-0 right-0 h-full w-2/3 object-cover" />
       <div className="absolute inset-0 bg-gradient-to-r from-white from-35% via-white/90 via-60% to-white/20" />
-      <div className="relative flex h-full max-w-[400px] flex-col justify-center gap-3.5 p-5">
-      <h3 className="text-xl font-extrabold text-[#0A2540]">Tra cứu văn bản</h3>
-      <form onSubmit={(e) => { e.preventDefault(); router.push('/van-ban' + (tu.trim() ? `?q=${encodeURIComponent(tu.trim())}` : '')); }} className="relative">
+      {/* Máy tính (lg:) dùng cỡ GỌN ≈ 80% — chủ dự án thu web về 80% thấy tỷ lệ khối này đẹp nhất (7/10/2026).
+          Điện thoại giữ cỡ to như cũ cho dễ bấm. */}
+      <div className="relative flex h-full max-w-[400px] flex-col justify-center gap-3.5 p-5 lg:max-w-[330px] lg:gap-3 lg:p-4">
+      <h3 className="text-xl font-extrabold text-[#0A2540] lg:text-[17px]">Tra cứu văn bản</h3>
+      <form onSubmit={(e) => {
+        e.preventDefault(); onTim(tu.trim());
+        (document.activeElement as HTMLElement | null)?.blur();   // điện thoại: cụp bàn phím
+        if (window.innerWidth < 1024) document.getElementById('kq-van-ban')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }} className="relative">
         <input value={tu} onChange={(e) => setTu(e.target.value)} placeholder="Ví dụ: 1264/QĐ-UBND" enterKeyHint="search"
-          aria-label="Tìm văn bản" className="h-11 w-full rounded-md border border-slate-300 bg-white pl-3 pr-11 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:border-[#0A2540]" />
-        <button type="submit" aria-label="Tìm" className="absolute right-1 top-1 grid h-9 w-9 place-items-center rounded text-slate-500 hover:text-red-600">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="h-5 w-5"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+          aria-label="Tìm văn bản" className="h-11 w-full rounded-md border border-slate-300 bg-white pl-3 pr-11 text-sm text-slate-800 lg:h-9 lg:pr-9 lg:text-[12.5px] outline-none placeholder:text-slate-400 focus:border-[#0A2540]" />
+        <button type="submit" aria-label="Tìm" className="absolute right-1 top-1 grid h-9 w-9 place-items-center rounded text-slate-500 hover:text-red-600 lg:h-7 lg:w-7">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="h-5 w-5 lg:h-4 lg:w-4"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
         </button>
       </form>
       <div>
         {LIEN_KET_PHAP_LY.map(([nhan, url]) => (
-          <Link key={nhan} href={url} className="block w-fit py-2 text-[15px] text-slate-700 hover:text-red-600">{nhan}</Link>
+          <Link key={nhan} href={url} className="block w-fit py-2 text-[15px] text-slate-700 hover:text-red-600 lg:py-1.5 lg:text-[13px]">{nhan}</Link>
         ))}
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <Link href="/cam-nang#dich-vu-phap-ly" className="inline-flex h-10 items-center justify-center rounded-md bg-red-600 px-2 text-sm font-bold text-white hover:bg-red-700">Dịch vụ pháp lý</Link>
-        <Link href="/cam-nang" className="inline-flex h-10 items-center justify-center rounded-md border border-slate-300 bg-white px-2 text-sm font-bold text-[#0A2540] hover:border-[#0A2540]">Cẩm nang pháp lý</Link>
+        <Link href="/cam-nang#dich-vu-phap-ly" className="inline-flex h-10 items-center justify-center rounded-md bg-red-600 px-2 text-sm font-bold text-white hover:bg-red-700 lg:h-8 lg:text-[12px]">Dịch vụ pháp lý</Link>
+        <Link href="/cam-nang" className="inline-flex h-10 items-center justify-center rounded-md border border-slate-300 bg-white px-2 text-sm font-bold text-[#0A2540] hover:border-[#0A2540] lg:h-8 lg:text-[12px]">Cẩm nang pháp lý</Link>
       </div>
       </div>
     </div>
@@ -153,30 +174,66 @@ function KhoiTraCuuVanBan() {
 }
 
 // Cột phải: 4 văn bản mới ban hành — GET /api/van-ban/moi-nhat (công khai, chỉ số hiệu · ngày · cơ quan · trích yếu).
-// Bấm một văn bản → mở kho văn bản tìm sẵn theo số hiệu đó.
-type VbMoi = { id: number; soKyHieu: string; trichYeu: string; ngay: string | null; coQuan: string };
-function VanBanMoiNhat() {
-  const [ds, setDs] = useState<VbMoi[] | null>(null);
-  useEffect(() => { api<{ docs: VbMoi[] }>('/van-ban/moi-nhat').then((r) => setDs(r.docs || [])).catch(() => setDs([])); }, []);
+// Bấm một văn bản → MỞ KHUNG XEM NGAY TẠI TRANG CHỦ, y như trang /van-ban (chủ dự án 7/10/2026). Chưa đăng nhập thì
+// bật ô đăng nhập (file chỉ phát cho người đã đăng nhập). Văn bản chưa có file thật → sang trang tra cứu tìm sẵn số hiệu.
+type VbMoi = { id: number; soKyHieu: string; trichYeu: string; ngay: string | null; coQuan: string; coFile?: boolean };
+// tu = từ khoá đang tìm ở khối trái; rỗng thì hiện 4 văn bản mới như cũ.
+function VanBanMoiNhat({ tu, onXoa }: { tu: string; onXoa: () => void }) {
+  const router = useRouter();
+  const { user } = useAuth();
+  const { openLogin } = useLoginGate();
+  const [dangXem, setDangXem] = useState<MoVanBan | null>(null);
+  function moXem(d: VbMoi) {
+    if (d.coFile === false) { router.push(`/van-ban?q=${encodeURIComponent(d.soKyHieu)}`); return; }   // /moi-nhat chỉ trả văn bản có file
+    if (!user) { openLogin({ reason: 'Đăng nhập để xem văn bản — miễn phí, chỉ mất vài giây.' }); return; }
+    setDangXem({ id: d.id, ten: `${(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')} · ${d.trichYeu}`,
+      tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`,
+      url: `${apiBase}/van-ban/${d.id}/pdf?v=9` /* v=9 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts), giống VanBanBrowser */, token: getToken() || '' });
+  }
+  const [moi, setMoi] = useState<VbMoi[] | null>(null);
+  const [kq, setKq] = useState<VbMoi[] | null>(null);
+  useEffect(() => { api<{ docs: VbMoi[] }>('/van-ban/moi-nhat').then((r) => setMoi(r.docs || [])).catch(() => setMoi([])); }, []);
+  useEffect(() => {
+    if (!tu) { setKq(null); return; }
+    let huy = false; setKq(null);
+    api<{ docs: VbMoi[] }>(`/van-ban/tim?q=${encodeURIComponent(tu)}`).then((r) => { if (!huy) setKq(r.docs || []); }).catch(() => { if (!huy) setKq([]); });
+    return () => { huy = true; };
+  }, [tu]);
+  const ds = tu ? kq : moi;
   const ngayVn = (d: string | null) => (d ? d.split('-').reverse().join('/') : '');
+  const trangChinh = '/van-ban' + (tu ? `?q=${encodeURIComponent(tu)}` : '');
   return (
     // min-w-0: thiếu nó thì dòng cơ quan dài (đã cắt "…") vẫn đẩy cột rộng ra → điện thoại tràn ngang 494px/390px
     // Mẫu 34: chữ hơi đậm xám đen 2 dòng · dòng phụ "ngày · cơ quan" (bỏ số hiệu) · chấm đỏ nhỏ đầu dòng.
-    <div className="min-w-0">
+    <div id="kq-van-ban" className="min-w-0 scroll-mt-20">
+      {tu && (
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2 lg:[&_*]:text-[12px]">
+          <p className="min-w-0 text-sm text-slate-600">Kết quả tìm <b className="text-[#0A2540]">“{tu}”</b>{kq ? ` · ${kq.length === 6 ? '6+' : kq.length} văn bản` : ''}</p>
+          <div className="flex items-center gap-3 text-sm font-semibold">
+            <button type="button" onClick={onXoa} className="text-slate-500 hover:text-red-600">✕ Bỏ tìm</button>
+            <Link href={trangChinh} className="text-red-600 hover:text-red-700">Mở trang tra cứu ›</Link>
+          </div>
+        </div>
+      )}
       <div className="divide-y divide-slate-100">
       {ds === null && [0, 1, 2, 3].map((k) => <div key={k} className="py-3"><div className="h-4 w-11/12 animate-pulse rounded bg-slate-100" /><div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-slate-100" /></div>)}
+      {tu && kq?.length === 0 && (
+        <p className="py-6 text-center text-sm text-slate-500">Chưa thấy văn bản khớp “{tu}”. Thử gõ số hiệu hoặc vài chữ trong nội dung,
+          hoặc <Link href={trangChinh} className="font-semibold text-red-600">mở trang tra cứu đầy đủ</Link> để lọc theo chủ đề, năm, cơ quan.</p>
+      )}
       {ds?.map((d) => (
-        <Link key={d.id} href={`/van-ban?q=${encodeURIComponent(d.soKyHieu)}`} className="group flex gap-2.5 py-2.5">
-          <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-red-600" />
+        <button key={d.id} type="button" onClick={() => moXem(d)} className="group flex w-full gap-2.5 py-2.5 text-left lg:gap-2 lg:py-2">
+          <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-red-600 lg:mt-[6px] lg:h-1 lg:w-1" />
           <div className="min-w-0 flex-1">
-            <p className="line-clamp-2 text-[15px] font-medium leading-snug text-slate-800 group-hover:text-red-600">{d.trichYeu}</p>
-            <p className="mt-1 truncate text-[12.5px] text-slate-500">{[d.ngay ? ngayVn(d.ngay) : '', d.coQuan].filter(Boolean).join(' · ')}</p>
+            <p className="line-clamp-2 text-[15px] font-medium leading-snug text-slate-800 group-hover:text-red-600 lg:text-[13px]">{d.trichYeu}</p>
+            <p className="mt-1 truncate text-[12.5px] text-slate-500 lg:mt-0.5 lg:text-[11px]">{tu && <b className="font-semibold text-red-600">{d.soKyHieu} · </b>}{[d.ngay ? ngayVn(d.ngay) : '', d.coQuan].filter(Boolean).join(' · ')}</p>
           </div>
-        </Link>
+        </button>
       ))}
       </div>
-      <Link href="/van-ban" className="flex items-center justify-center gap-1 pt-3 pb-1 text-sm font-semibold text-red-600 hover:text-red-700">
-        Xem tất cả văn bản
+      {dangXem && <XemVanBan vb={dangXem} onDong={() => setDangXem(null)} onLoi={(m) => { setDangXem(null); alert(m); }} />}
+      <Link href={trangChinh} className="flex items-center justify-center gap-1 pt-3 pb-1 text-sm font-semibold text-red-600 hover:text-red-700 lg:pt-2 lg:text-[12px]">
+        {tu ? 'Xem đầy đủ ở trang tra cứu văn bản' : 'Xem tất cả văn bản'}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="m9 6 6 6-6 6" /></svg>
       </Link>
     </div>
@@ -242,7 +299,7 @@ export default function Home() {
   const [marketNews, setMarketNews] = useState<{ title: string; url: string; img?: string; date?: string; source?: string }[]>([]);
   const [featuredNews, setFeaturedNews] = useState<{ title: string; url: string; img?: string; date?: string; source?: string }[]>([]);
   const [marketLoading, setMarketLoading] = useState(true);
-  const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [newsTab, setNewsTab] = useState('Thị trường BĐS'); /* mở trang chủ là thấy TIN THỊ TRƯỜNG trước */ const [heroDeal, setHeroDeal] = useState<'sale' | 'rent' | 'project'>('sale');
+  const [q, setQ] = useState(''); const [type, setType] = useState<PropertyType | ''>(''); const [max, setMax] = useState(''); const [newsTab, setNewsTab] = useState('Thị trường BĐS'); const [tuVb, setTuVb] = useState(''); /* từ khoá tìm văn bản ngay ở trang chủ */ /* mở trang chủ là thấy TIN THỊ TRƯỜNG trước */ const [heroDeal, setHeroDeal] = useState<'sale' | 'rent' | 'project'>('sale');
   const searchHint = useTypingHint(SEARCH_HINTS);
   const [locMo, setLocMo] = useState(false); // bảng "Lọc nâng cao" trên điện thoại
   // Điều kiện lọc THÊM chỉ có trong bảng lọc điện thoại: giá từ (tỷ), xã, diện tích (m²), sắp xếp.
@@ -593,7 +650,7 @@ export default function Home() {
               </div>
             </div>
           ) : (<>
-          {newsTab === 'Tra cứu văn bản' ? <KhoiTraCuuVanBan /> : (() => { const feat = newsItems[0]; return (
+          {newsTab === 'Tra cứu văn bản' ? <KhoiTraCuuVanBan onTim={setTuVb} tuNgoai={tuVb} /> : (() => { const feat = newsItems[0]; return (
             <a href={feat.url} target={feat.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="group block">
               <div className="aspect-[16/10] rounded-xl overflow-hidden bg-slate-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -603,7 +660,7 @@ export default function Home() {
               {feat.date && <p className="text-xs text-slate-400 mt-2">🕒 {feat.date}{feat.source ? ` · ${feat.source}` : ''}</p>}
             </a>
           ); })()}
-          {newsTab === 'Tra cứu văn bản' ? <VanBanMoiNhat /> : <div className="divide-y divide-slate-100">
+          {newsTab === 'Tra cứu văn bản' ? <VanBanMoiNhat tu={tuVb} onXoa={() => setTuVb('')} /> : <div className="divide-y divide-slate-100">
             {newsItems.slice(1).map((h) => (
               <a key={h.title} href={h.url} target={h.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="block py-2.5 text-[15px] text-slate-700 hover:text-red-600 leading-snug line-clamp-2">{h.title}</a>
             ))}

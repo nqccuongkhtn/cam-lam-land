@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
+import { vnNoAccent } from '../lib/vn.ts';
 import { authRequired, vanBanRequired } from '../middleware/auth.ts';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -786,6 +787,32 @@ vanBanRouter.get('/moi-nhat', async (_req, res) => {
     const docs = rows.filter((d: any) => coFileThat(d.link_goc)).slice(0, 4).map(({ link_goc, ...d }: any) => d);
     res.set('Cache-Control', 'public, max-age=600');
     res.json({ docs });
+  } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
+});
+
+// ── GET /tim?q= — Ô TÌM ở trang chủ: tìm ngay tại chỗ, kết quả đẩy lên cột phải (chủ dự án 7/10/2026) ──
+// CÔNG KHAI giống /moi-nhat: chỉ số hiệu · ngày · cơ quan · trích yếu + cờ coFile, TỐI ĐA 6 văn bản, không link file.
+// Xem toàn kho + mở file vẫn phải đăng nhập. Gõ không dấu vẫn ra (vn_unaccent).
+// Nhiều chữ thì MỖI chữ phải có mặt (không cần đúng thứ tự). Trùng số hiệu xếp lên trước.
+// Từ dân gian → từ trong văn bản: khách gõ "đền bù" nhưng văn bản ghi "bồi thường" (thử 7/10/2026: ra 0 kết quả).
+const TU_DONG_NGHIA: [RegExp, string][] = [[/\bden bu\b/g, 'boi thuong'], [/\bso do\b|\bso hong\b/g, 'giay chung nhan'], [/\bnoxh\b/g, 'nha o xa hoi']];
+vanBanRouter.get('/tim', async (req, res) => {
+  try {
+    const q = String(req.query.q || '').trim().slice(0, 80);
+    if (q.length < 2) return res.json({ docs: [] });
+    let kd = vnNoAccent(q.toLowerCase()).replace(/\s+/g, ' ');
+    for (const [re, thay] of TU_DONG_NGHIA) kd = kd.replace(re, thay);
+    const tu = kd.split(' ').filter(Boolean).slice(0, 8).map((w) => '%' + w.replace(/[\\%_]/g, (c) => '\\' + c) + '%');
+    const goc = `vn_unaccent(lower(coalesce(so_hieu,'') || ' ' || coalesce(trich_yeu,'') || ' ' || coalesce(co_quan,'')))`;
+    const rows = await query(`
+      SELECT id, so_hieu AS "soKyHieu", trich_yeu AS "trichYeu",
+             to_char(ngay_ban_hanh,'YYYY-MM-DD') AS ngay, co_quan AS "coQuan", link_goc
+      FROM van_ban
+      WHERE can_kiem_tra IS NULL AND ${goc} LIKE ALL($1::text[])
+      ORDER BY (vn_unaccent(lower(coalesce(so_hieu,''))) LIKE $2) DESC, ngay_ban_hanh DESC NULLS LAST, id DESC
+      LIMIT 6`, [tu, '%' + kd.replace(/[\\%_]/g, (c) => '\\' + c) + '%']);
+    res.set('Cache-Control', 'public, max-age=300');
+    res.json({ docs: rows.map(({ link_goc, ...d }: any) => ({ ...d, coFile: coFileThat(link_goc) })) });
   } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
 });
 

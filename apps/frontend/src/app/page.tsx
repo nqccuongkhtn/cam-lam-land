@@ -100,7 +100,7 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
     // Kho có đủ loại văn bản, không riêng quy hoạch/bồi thường → tiêu đề ghi chung (chủ dự án 7/10/2026).
     { title: 'Tra cứu văn bản pháp luật về nhà đất', url: '/van-ban', img: '/cam-nang/so-hong.webp' },
     { title: 'Cẩm nang pháp lý nhà đất', url: '/cam-nang' },
-    { title: 'Dịch vụ thủ tục sang tên, tách thửa', url: '/cam-nang#dich-vu-phap-ly' },
+    { title: 'Hỗ trợ thủ tục pháp lý nhà đất', url: '/cam-nang#dich-vu-phap-ly' },
     { title: 'Mẫu hợp đồng đặt cọc mua bán nhà đất', url: '/hop-dong-dat-coc' },
     { title: 'Hướng dẫn kiểm tra thông tin quy hoạch thửa đất', url: '/cam-nang/kiem-tra-quy-hoach-dat' },
     { title: 'Hướng dẫn kiểm tra tính xác thực của Giấy chứng nhận', url: '/cam-nang/kiem-tra-so-do-that-gia' },

@@ -98,7 +98,8 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
     // Ảnh: xấp Giấy chứng nhận (sổ hồng) chủ dự án gửi 6/10/2026 — file public/cam-nang/so-hong.webp
     // Văn phong HÀNH CHÍNH, LỊCH SỰ với khách (chủ dự án 7/10/2026 — đã chê kiểu quảng cáo màu mè là "nhảm").
     // Kho có đủ loại văn bản, không riêng quy hoạch/bồi thường → tiêu đề ghi chung (chủ dự án 7/10/2026).
-    { title: 'Tra cứu văn bản pháp luật về nhà đất', url: '/van-ban', img: '/cam-nang/so-hong.webp' },
+    // Ghi rõ KHU VỰC: "văn bản pháp luật" nghe như tra luật chung, trong khi kho là văn bản của tỉnh, xã (chủ dự án 7/10/2026).
+    { title: 'Tra cứu văn bản nhà đất tại Cam Lâm – Khánh Hòa', url: '/van-ban', img: '/cam-nang/so-hong.webp' },
     { title: 'Cẩm nang pháp lý nhà đất', url: '/cam-nang' },
     { title: 'Hỗ trợ thủ tục pháp lý nhà đất', url: '/cam-nang#dich-vu-phap-ly' },
     { title: 'Mẫu hợp đồng đặt cọc mua bán nhà đất', url: '/hop-dong-dat-coc' },

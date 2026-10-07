@@ -69,6 +69,17 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
     return () => { huy = true; ctl.abort(); if (url) URL.revokeObjectURL(url); docRef.current?.destroy?.(); };
   }, [vb.url, vb.token, onDong, onLoi]);
 
+  // % ẢO (chủ dự án 7/10/2026): văn bản mở LẦN ĐẦU thì máy chủ còn phải đi lấy file ở cổng nhà nước + gắn dấu,
+  // mấy giây đầu chưa có byte nào → thanh đứng ở 0% như bị treo. Nên cho % tự nhích dần (nhanh lúc đầu, chậm dần,
+  // không bao giờ quá 92%); có số thật lớn hơn thì theo số thật, mở xong nhảy 100%.
+  const [ao, setAo] = useState(0);
+  useEffect(() => {
+    if (soTrang) return;
+    const t = setInterval(() => setAo((x) => (x >= 92 ? x : x + Math.max(0.3, (92 - x) * 0.06))), 200);
+    return () => clearInterval(t);
+  }, [soTrang]);
+  const hienPt = soTrang ? 100 : Math.round(Math.min(99, Math.max(ao, phanTram ?? 0)));
+
   const taiVe = () => { if (!blobUrl) return; const a = document.createElement('a'); a.href = blobUrl; a.download = vb.tenFile; a.click(); };
   const mb = (b: number) => (b / 1048576).toLocaleString('vi-VN', { maximumFractionDigits: 1 });
 
@@ -77,20 +88,21 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
       <div className="flex items-center gap-2 bg-white px-3 py-2 shadow">
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13px] font-bold text-[#0A2540]">{vb.ten}</p>
-          <p className="text-[11px] text-slate-500">{soTrang ? `${soTrang} trang` : phanTram === null ? `Đang tải… ${mb(daTai)} MB` : `Đang tải… ${phanTram}%`}</p>
+          <p className="text-[11px] text-slate-500">{soTrang ? `${soTrang} trang` : `Đang tải… ${hienPt}%`}</p>
         </div>
         <button type="button" onClick={taiVe} disabled={!blobUrl} className="h-8 shrink-0 rounded-md border border-slate-200 px-3 text-[13px] font-semibold text-[#0A2540] hover:bg-slate-50 disabled:opacity-40">Tải về</button>
         <button type="button" onClick={onDong} aria-label="Đóng" className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-xl leading-none text-slate-500 hover:bg-slate-100">✕</button>
       </div>
       {/* thanh % ngay dưới đầu khung */}
       <div className="h-1 w-full bg-slate-200">
-        <div className={`h-full bg-[#C8A14B] transition-[width] duration-200 ${phanTram === null ? 'w-1/3 animate-pulse' : ''}`} style={phanTram === null ? undefined : { width: `${soTrang ? 100 : phanTram}%` }} />
+        <div className="h-full bg-[#C8A14B] transition-[width] duration-200" style={{ width: `${hienPt}%` }} />
       </div>
       <div ref={khungRef} className="flex-1 overflow-y-auto overscroll-contain px-2 py-3 sm:px-6">
         {!soTrang && (
           <div className="mx-auto mt-16 max-w-xs text-center text-sm text-white/90">
             <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            {phanTram === null ? `Đang tải văn bản… ${mb(daTai)} MB` : `Đang tải văn bản… ${phanTram}%`}
+            Đang tải văn bản… {hienPt}%
+            {daTai > 0 && <span className="mt-1 block text-[12px] text-white/60">{mb(daTai)} MB</span>}
           </div>
         )}
         {soTrang > 0 && Array.from({ length: soTrang }, (_, i) => <TrangPdf key={i} doc={docRef.current} so={i + 1} khung={khungRef} />)}

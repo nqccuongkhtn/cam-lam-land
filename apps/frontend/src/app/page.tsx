@@ -109,21 +109,23 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
   ],
 };
 
-// Tab "Tra cứu văn bản" — dựng ĐÚNG MẪU 105 (chủ dự án chọn 7/10/2026).
-// Trái: thẻ "Tra cứu văn bản" (mô tả · ô tìm · 2 nút Dịch vụ / Cẩm nang). Phải: 4 văn bản mới ban hành.
-// Ô tìm mở /van-ban đã lọc sẵn (?q=, VanBanBrowser đọc tham số này; ?chude= vẫn dùng được).
-// Hàng thẻ chủ đề (Tất cả · Quy hoạch · …) đã BỎ theo yêu cầu chủ dự án 7/10/2026 cho gọn.
+// Tab "Tra cứu văn bản" — chủ dự án chọn 7/10/2026: khối trái = MẪU 90 (bỏ các gạch kẻ), cột phải = MẪU 34
+// trên trang xem thử 100 mẫu ghép.
+// Trái: nền trắng, ảnh sổ hồng tan dần sang trắng bên phải · tiêu đề · ô tìm · danh sách chủ đề có mũi tên
+// (KHÔNG kẻ gạch — gạch trắng tràn đè lên ảnh sổ bị chê) · 2 liên kết Dịch vụ / Cẩm nang.
+// Ô tìm và chủ đề mở /van-ban đã lọc sẵn (?q= / ?chude=, VanBanBrowser đọc các tham số này).
+const CHU_DE_NHANH: [string, string][] = [
+  ['Quy hoạch', 'Quy hoạch'], ['Thu hồi, bồi thường', 'Bồi thường & Tái định cư'], ['Cấp Giấy chứng nhận', 'Giấy chứng nhận'], ['Nhà ở xã hội', 'Nhà ở xã hội'],
+];
 function KhoiTraCuuVanBan() {
-  // Thẻ TRẮNG có viền, y như mẫu 105 trên trang xem thử (chủ dự án gửi ảnh mẫu 105 làm chuẩn, 7/10/2026 —
-  // bản nền ảnh sổ hồng phủ xanh bị chê "không đẹp như mẫu": ảnh hồng dưới lớp xanh thành tím đục).
   const router = useRouter();
   const [tu, setTu] = useState('');
   return (
-    <div className="flex flex-col justify-center gap-3.5 rounded-xl border border-slate-200 bg-white p-4 sm:p-5 lg:h-full">
-      <div>
-        <h3 className="text-xl font-extrabold text-[#0A2540]">Tra cứu văn bản</h3>
-        <p className="mt-1 text-[13.5px] text-slate-500">Tìm theo số hiệu, cơ quan ban hành hoặc nội dung.</p>
-      </div>
+    <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white lg:h-full">
+      <img src="/cam-nang/so-hong.webp" alt="" loading="lazy" className="absolute inset-y-0 right-0 h-full w-2/3 object-cover" />
+      <div className="absolute inset-0 bg-gradient-to-r from-white from-35% via-white/90 via-60% to-white/20" />
+      <div className="relative flex h-full max-w-[400px] flex-col justify-center gap-3.5 p-5">
+      <h3 className="text-xl font-extrabold text-[#0A2540]">Tra cứu văn bản</h3>
       <form onSubmit={(e) => { e.preventDefault(); router.push('/van-ban' + (tu.trim() ? `?q=${encodeURIComponent(tu.trim())}` : '')); }} className="relative">
         <input value={tu} onChange={(e) => setTu(e.target.value)} placeholder="Ví dụ: 1264/QĐ-UBND" enterKeyHint="search"
           aria-label="Tìm văn bản" className="h-11 w-full rounded-md border border-slate-300 bg-white pl-3 pr-11 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:border-[#0A2540]" />
@@ -131,9 +133,18 @@ function KhoiTraCuuVanBan() {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="h-5 w-5"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
         </button>
       </form>
-      <div className="flex flex-wrap gap-2">
-        <Link href="/cam-nang#dich-vu-phap-ly" className="inline-flex h-10 items-center rounded-md border border-slate-300 bg-white px-4 text-sm font-bold text-[#0A2540] hover:border-[#0A2540]">Dịch vụ pháp lý</Link>
-        <Link href="/cam-nang" className="inline-flex h-10 items-center rounded-md border border-slate-300 bg-white px-4 text-sm font-bold text-[#0A2540] hover:border-[#0A2540]">Cẩm nang pháp lý</Link>
+      <div>
+        {CHU_DE_NHANH.map(([nhan, ma]) => (
+          <Link key={nhan} href={`/van-ban?chude=${encodeURIComponent(ma)}`}
+            className="flex items-center justify-between py-2 text-[13.5px] font-semibold text-[#0A2540] hover:text-red-600">
+            {nhan}<span className="text-slate-400">›</span>
+          </Link>
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm font-bold text-[#0A2540]">
+        <Link href="/cam-nang#dich-vu-phap-ly" className="hover:text-red-600">Dịch vụ pháp lý →</Link>
+        <Link href="/cam-nang" className="hover:text-red-600">Cẩm nang pháp lý →</Link>
+      </div>
       </div>
     </div>
   );
@@ -148,14 +159,20 @@ function VanBanMoiNhat() {
   const ngayVn = (d: string | null) => (d ? d.split('-').reverse().join('/') : '');
   return (
     // min-w-0: thiếu nó thì dòng cơ quan dài (đã cắt "…") vẫn đẩy cột rộng ra → điện thoại tràn ngang 494px/390px
-    <div className="min-w-0 divide-y divide-slate-100">
+    // Mẫu 34: chữ hơi đậm xám đen 2 dòng · dòng phụ "ngày · cơ quan" (bỏ số hiệu) · chấm đỏ nhỏ đầu dòng.
+    <div className="min-w-0">
+      <div className="divide-y divide-slate-100">
       {ds === null && [0, 1, 2, 3].map((k) => <div key={k} className="py-3"><div className="h-4 w-11/12 animate-pulse rounded bg-slate-100" /><div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-slate-100" /></div>)}
       {ds?.map((d) => (
-        <Link key={d.id} href={`/van-ban?q=${encodeURIComponent(d.soKyHieu)}`} className="group block py-2.5">
-          <p className="line-clamp-2 text-[15px] font-semibold leading-snug text-[#0A2540] group-hover:text-red-600">{d.trichYeu}</p>
-          <p className="mt-1 truncate text-[12.5px] text-slate-500"><b className="font-bold text-red-600">{d.soKyHieu}</b>{d.ngay ? ` · ${ngayVn(d.ngay)}` : ''}{d.coQuan ? ` · ${d.coQuan}` : ''}</p>
+        <Link key={d.id} href={`/van-ban?q=${encodeURIComponent(d.soKyHieu)}`} className="group flex gap-2.5 py-2.5">
+          <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-red-600" />
+          <div className="min-w-0 flex-1">
+            <p className="line-clamp-2 text-[15px] font-medium leading-snug text-slate-800 group-hover:text-red-600">{d.trichYeu}</p>
+            <p className="mt-1 truncate text-[12.5px] text-slate-500">{[d.ngay ? ngayVn(d.ngay) : '', d.coQuan].filter(Boolean).join(' · ')}</p>
+          </div>
         </Link>
       ))}
+      </div>
       <Link href="/van-ban" className="flex items-center justify-center gap-1 pt-3 pb-1 text-sm font-semibold text-red-600 hover:text-red-700">
         Xem tất cả văn bản
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="m9 6 6 6-6 6" /></svg>

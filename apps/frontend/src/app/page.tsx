@@ -354,10 +354,23 @@ export default function Home() {
         const raw: any[] = d.news || [];
         const toCard = (n: any) => ({ title: n.title, url: '/tin-tuc/' + n.slug, img: n.image || U('1486406146926-c627a92ad1ab'), date: n.publishedAt ? new Date(n.publishedAt).toLocaleDateString('vi-VN') : undefined, source: n.source });
         setMarketNews(raw.filter((n) => !n.pin).map(toCard)); // Thị trường BĐS — GIỮ NGUYÊN (bỏ bài ghim)
-        // Tin nổi bật: CHỈ tin về ĐÔ THỊ MỚI CAM LÂM (bài ghim + tin mới khớp từ khoá), mới nhất trước.
+        // Tin nổi bật (sửa 7/10/2026 — chủ dự án: "tin nổi bật yếu thế hơn 2 tab kia"): trước chỉ có 5 bài ghim từ 2024
+        // nên vừa CŨ vừa ÍT. Nay xếp 3 tầng, đủ 8 bài như tab Thị trường:
+        //   1) tin MỚI (≤ 45 ngày) về Cam Lâm / Bãi Dài / vịnh Cam Ranh / sân bay — mới nhất lên đầu, làm bài lớn có ảnh;
+        //   2) các bài ghim về Đô thị mới Cam Lâm (QĐ 205…);
+        //   3) còn thiếu thì lấy tin LỚN mới nhất của Khánh Hòa (quy hoạch, sân bay, cao tốc, dự án, đầu tư…).
+        const chu = (n: any) => (n.title || '') + ' ' + (n.summary || '');
+        const moi = (n: any, ngay: number) => n.publishedAt && Date.now() - +new Date(n.publishedAt) < ngay * 864e5;
+        const CAM_LAM = /cam lâm|bãi dài|vịnh cam ranh|sân bay cam ranh|cam hải|suối dầu|cam hiệp|đô thị sân bay/i;
         const DTM = /đô thị mới cam lâm|đô thị sân bay cam lâm|đô thị cam lâm|phân khu.*cam lâm|cam lâm.*đô thị/i;
-        const feat = raw.filter((n) => n.pin || DTM.test((n.title || '') + ' ' + (n.summary || ''))).sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || +new Date(b.publishedAt) - +new Date(a.publishedAt)).map(toCard);
-        setFeaturedNews(feat);
+        const LON = /quy hoạch|sân bay|cao tốc|đường sắt|dự án|đầu tư|khu đô thị|vinhomes|vingroup|hạ tầng|cảng/i;
+        const theoNgay = (a: any, b: any) => +new Date(b.publishedAt) - +new Date(a.publishedAt);
+        const t1 = raw.filter((n) => !n.pin && moi(n, 45) && CAM_LAM.test(chu(n))).sort(theoNgay);
+        const t2 = raw.filter((n) => n.pin || DTM.test(chu(n))).sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || theoNgay(a, b));
+        const t3 = raw.filter((n) => !n.pin && moi(n, 30) && LON.test(n.title || '')).sort(theoNgay);
+        const daCo = new Set<string>(); const feat: any[] = [];
+        for (const n of [...t1, ...t2, ...t3]) { if (feat.length >= 8 || daCo.has(n.slug)) continue; daCo.add(n.slug); feat.push(n); }
+        setFeaturedNews(feat.map(toCard));
       })
       .catch(() => {})
       .finally(() => setMarketLoading(false));
@@ -652,9 +665,11 @@ export default function Home() {
           ) : (<>
           {newsTab === 'Tra cứu văn bản' ? <KhoiTraCuuVanBan onTim={setTuVb} tuNgoai={tuVb} /> : (() => { const feat = newsItems[0]; return (
             <a href={feat.url} target={feat.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="group block">
-              <div className="aspect-[16/10] rounded-xl overflow-hidden bg-slate-100">
+              <div className="relative aspect-[16/10] rounded-xl overflow-hidden bg-slate-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={feat.img} alt={feat.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                {/* Nhãn đỏ "NỔI BẬT" chỉ ở tab Tin nổi bật — cho tab này có điểm nhấn riêng (7/10/2026) */}
+                {newsTab === 'Tin nổi bật' && <span className="absolute left-3 top-3 rounded bg-red-600 px-2 py-1 text-[11px] font-bold tracking-wide text-white shadow">NỔI BẬT</span>}
               </div>
               <h3 className="font-extrabold text-[#0A2540] mt-3 text-lg leading-snug line-clamp-2 group-hover:text-red-600">{feat.title}</h3>
               {feat.date && <p className="text-xs text-slate-400 mt-2">🕒 {feat.date}{feat.source ? ` · ${feat.source}` : ''}</p>}

@@ -544,7 +544,27 @@ async function layFileGoc(link: string | null): Promise<Buffer | null> {
     if (!r.ok) return null;
     const b = Buffer.from(await r.arrayBuffer());
     return b.subarray(0, 4).toString() === '%PDF' ? b : null;
-  } catch { return null; }
+  } catch (e: any) {
+    // Cổng nhà nước để CHỨNG CHỈ HẾT HẠN (vd camranh.khanhhoa.gov.vn, 7/10/2026) → tải lại bỏ qua kiểm chứng chỉ.
+    // Chỉ cho tên miền .gov.vn, và file vẫn phải đúng PDF mới nhận.
+    const ma = String(e?.cause?.code || '');
+    if (/CERT|SELF_SIGNED|UNABLE_TO_VERIFY/.test(ma) && /\.gov\.vn$/i.test(new URL(pdf).hostname)) return taiBoQuaChungChi(pdf, ref);
+    return null;
+  }
+}
+async function taiBoQuaChungChi(u: string, ref: string, lan = 0): Promise<Buffer | null> {
+  const https = await import('node:https');
+  return new Promise((xong) => {
+    const rq = https.get(u, { rejectUnauthorized: false, headers: { ...UA, ...(ref ? { Referer: ref } : {}) }, timeout: 60000 }, (r) => {
+      if (r.statusCode && r.statusCode >= 300 && r.statusCode < 400 && r.headers.location && lan < 3) {
+        r.resume(); xong(taiBoQuaChungChi(new URL(r.headers.location, u).href, ref, lan + 1)); return;
+      }
+      if (r.statusCode !== 200) { r.resume(); xong(null); return; }
+      const ds: Buffer[] = []; r.on('data', (c) => ds.push(c)); r.on('error', () => xong(null));
+      r.on('end', () => { const b = Buffer.concat(ds); xong(b.subarray(0, 4).toString() === '%PDF' ? b : null); });
+    });
+    rq.on('timeout', () => rq.destroy()); rq.on('error', () => xong(null));
+  });
 }
 const dangLay = new Map<number, Promise<Buffer | null>>();   // nhiều người bấm cùng lúc một văn bản → chỉ tải 1 lần
 export function layFileVb(id: number, link: string | null): Promise<Buffer | null> {
@@ -646,7 +666,8 @@ export async function crawlSheets(force = false, onAdd?: (isNew: boolean) => voi
 // KHÔNG BAO GIỜ trỏ người dùng sang trang khác để tự tìm. Văn bản đã thử mà chưa thấy thì 3 ngày sau mới thử lại
 // (cột tim_file_luc) cho đỡ tải cổng. Chạy sau mỗi lượt lấy văn bản (khởi động + lịch 6 giờ + nút Cập nhật).
 // Drive (thư mục/file công khai) TÍNH là có file — máy chủ tự tải + ghép PDF (layPdfDrive)
-const coFileThat = (link: string | null) => !!link && (/LawDocumentRender|FileVanBans|\.pdf(\?|$)|drive\.google\.com\/open\?id=/i.test(link) || /[?&]download=1(&|$)/i.test(link));
+// /VanBan/Download/<số> = link tải thẳng của cổng phường/xã kiểu mới (camranh, nhatrang…), trả về PDF
+const coFileThat = (link: string | null) => !!link && (/LawDocumentRender|FileVanBans|\.pdf(\?|$)|drive\.google\.com\/open\?id=|\/VanBan\/Download\/\d+$/i.test(link) || /[?&]download=1(&|$)/i.test(link));
 // Cổng KHÔNG lọc thật khi tìm theo trích yếu (trả văn bản bất kỳ) → phải tự so: ≥ 70% từ đầu trích yếu có trong kết quả
 const khopTrichYeu = (a: string, b: string) => { const bo = (x: string) => vnNoAccentLite(x).split(/\s+/).filter((w) => w.length > 1); const ta = bo(a).slice(0, 10), tb = new Set(bo(b)); return ta.length >= 4 && ta.filter((w) => tb.has(w)).length / ta.length >= 0.7; };
 const vnNoAccentLite = (x: string) => x.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
@@ -723,6 +744,7 @@ function normPdf(raw: string, base: string): string | null {
 export async function resolvePdf(link: string): Promise<string | null> {
   if (!link) return null;
   if (/\.pdf(\?|$)/i.test(link)) return normPdf(link, link);
+  if (/\/VanBan\/Download\/\d+$/i.test(link)) return link; // cổng phường/xã kiểu mới: link tải trả thẳng PDF
   if (/[?&]download=1(&|$)/i.test(link)) return link; // trang nền NukeViet (camhomes, bqlnngt.khanhhoa.gov.vn…): link tải trả thẳng PDF
   try {
     const r = await fetch(link, { headers: UA, signal: AbortSignal.timeout(12000) });

@@ -114,8 +114,12 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
 // Trái: nền trắng, ảnh sổ hồng tan dần sang trắng bên phải · tiêu đề · ô tìm · danh sách chủ đề có mũi tên
 // (KHÔNG kẻ gạch) · 2 NÚT cùng cỡ theo MẪU 2 trang "60 mẫu nền + nút": Dịch vụ (đỏ) / Cẩm nang (trắng viền).
 // Ô tìm và chủ đề mở /van-ban đã lọc sẵn (?q= / ?chude=, VanBanBrowser đọc các tham số này).
-const CHU_DE_NHANH: [string, string][] = [
-  ['Quy hoạch', 'Quy hoạch'], ['Thu hồi, bồi thường', 'Bồi thường & Tái định cư'], ['Cấp Giấy chứng nhận', 'Giấy chứng nhận'], ['Nhà ở xã hội', 'Nhà ở xã hội'],
+// 4 dòng liên kết dưới ô tìm — chủ dự án gửi ảnh chốt 7/10/2026, thay cho 4 chủ đề văn bản (Quy hoạch, Thu hồi…).
+const LIEN_KET_PHAP_LY: [string, string][] = [
+  ['Dịch vụ pháp lý nhà đất', '/cam-nang#dich-vu-phap-ly'],
+  ['Mẫu hợp đồng đặt cọc', '/hop-dong-dat-coc'],
+  ['Cẩm nang pháp lý nhà đất', '/cam-nang'],
+  ['Kiểm tra quy hoạch thửa đất', '/map'],
 ];
 function KhoiTraCuuVanBan() {
   const router = useRouter();
@@ -134,11 +138,8 @@ function KhoiTraCuuVanBan() {
         </button>
       </form>
       <div>
-        {CHU_DE_NHANH.map(([nhan, ma]) => (
-          <Link key={nhan} href={`/van-ban?chude=${encodeURIComponent(ma)}`}
-            className="flex items-center justify-between py-2 text-[13.5px] font-semibold text-[#0A2540] hover:text-red-600">
-            {nhan}<span className="text-slate-400">›</span>
-          </Link>
+        {LIEN_KET_PHAP_LY.map(([nhan, url]) => (
+          <Link key={nhan} href={url} className="block w-fit py-2 text-[15px] text-slate-700 hover:text-red-600">{nhan}</Link>
         ))}
       </div>
       <div className="grid grid-cols-2 gap-2">

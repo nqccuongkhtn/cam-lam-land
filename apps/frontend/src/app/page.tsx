@@ -96,16 +96,15 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
   // là Tra cứu văn bản thay cho Thủ tục sang tên Sổ đỏ; 3 dòng kế đưa lên trên, 4 bài cẩm nang xuống dưới.
   'Tra cứu văn bản': [
     // Ảnh: xấp Giấy chứng nhận (sổ hồng) chủ dự án gửi 6/10/2026 — file public/cam-nang/so-hong.webp
-    // Câu chữ kiểu CHỐT SALES (7/10/2026, chủ dự án: "chưa gọn" rồi "chưa đủ để chốt sales"):
-    // mỗi dòng ngắn, nói thẳng khách ĐƯỢC GÌ / TRÁNH ĐƯỢC RỦI RO GÌ, không chỉ nêu tên mục.
-    { title: 'Xem tận mắt văn bản quy hoạch, bồi thường gốc — chắc chắn trước khi xuống tiền', url: '/van-ban', img: '/cam-nang/so-hong.webp' },
-    { title: 'Sang tên, tách thửa trọn gói — bạn không phải chạy hồ sơ', url: '/cam-nang#dich-vu-phap-ly' },
-    { title: 'Tạo hợp đồng đặt cọc chặt chẽ, in ngay — miễn phí', url: '/hop-dong-dat-coc' },
-    { title: 'Đất có dính quy hoạch không? Kiểm tra trước khi cọc', url: '/cam-nang/kiem-tra-quy-hoach-dat' },
-    { title: 'Phân biệt Sổ đỏ thật – giả, tránh mất trắng tiền cọc', url: '/cam-nang/kiem-tra-so-do-that-gia' },
-    { title: 'Mua bán đất phải nộp những khoản thuế, phí nào?', url: '/cam-nang/thue-phi-mua-ban-nha-dat' },
-    { title: 'Sang tên Sổ đỏ: các bước, giấy tờ, thời gian', url: '/cam-nang/sang-ten-so-do' },
-    { title: 'Toàn bộ cẩm nang pháp lý nhà đất Cam Lâm', url: '/cam-nang' },
+    // Văn phong HÀNH CHÍNH, LỊCH SỰ với khách (chủ dự án 7/10/2026 — đã chê kiểu quảng cáo màu mè là "nhảm").
+    { title: 'Tra cứu văn bản quy hoạch, bồi thường, tái định cư tại Cam Lâm', url: '/van-ban', img: '/cam-nang/so-hong.webp' },
+    { title: 'Dịch vụ thủ tục sang tên, tách thửa', url: '/cam-nang#dich-vu-phap-ly' },
+    { title: 'Mẫu hợp đồng đặt cọc mua bán nhà đất', url: '/hop-dong-dat-coc' },
+    { title: 'Hướng dẫn kiểm tra thông tin quy hoạch thửa đất', url: '/cam-nang/kiem-tra-quy-hoach-dat' },
+    { title: 'Hướng dẫn kiểm tra tính xác thực của Giấy chứng nhận', url: '/cam-nang/kiem-tra-so-do-that-gia' },
+    { title: 'Các khoản thuế, phí khi chuyển nhượng nhà đất', url: '/cam-nang/thue-phi-mua-ban-nha-dat' },
+    { title: 'Thủ tục chuyển nhượng quyền sử dụng đất', url: '/cam-nang/sang-ten-so-do' },
+    { title: 'Cẩm nang pháp lý nhà đất', url: '/cam-nang' },
   ],
 };
 

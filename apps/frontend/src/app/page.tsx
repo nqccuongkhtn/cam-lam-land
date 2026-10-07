@@ -109,40 +109,39 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
   ],
 };
 
-// Tab "Tra cứu văn bản" — dựng ĐÚNG MẪU 105 (chủ dự án chọn 7/10/2026), riêng khối trái lấy nền ảnh như MẪU 101.
+// Tab "Tra cứu văn bản" — dựng ĐÚNG MẪU 105 (chủ dự án chọn 7/10/2026).
 // Trái: thẻ "Tra cứu văn bản" (mô tả · ô tìm · thẻ lọc chủ đề · 2 nút Dịch vụ / Cẩm nang). Phải: 4 văn bản mới ban hành.
 // Ô tìm và thẻ chủ đề mở /van-ban đã lọc sẵn (?q= / ?chude=, VanBanBrowser đọc các tham số này).
 const CHU_DE_NHANH: [string, string][] = [
   ['Tất cả', ''], ['Quy hoạch', 'Quy hoạch'], ['Thu hồi, bồi thường', 'Bồi thường & Tái định cư'], ['Cấp Giấy chứng nhận', 'Giấy chứng nhận'], ['Nhà ở xã hội', 'Nhà ở xã hội'],
 ];
-function KhoiTraCuuVanBan({ anh }: { anh?: string }) {
+function KhoiTraCuuVanBan() {
+  // Thẻ TRẮNG có viền, y như mẫu 105 trên trang xem thử (chủ dự án gửi ảnh mẫu 105 làm chuẩn, 7/10/2026 —
+  // bản nền ảnh sổ hồng phủ xanh bị chê "không đẹp như mẫu": ảnh hồng dưới lớp xanh thành tím đục).
   const router = useRouter();
   const [tu, setTu] = useState('');
   return (
-    <div className="relative overflow-hidden rounded-xl bg-[#0A2540] lg:h-full">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      {anh && <img src={anh} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0A2540]/90 via-[#0A2540]/70 to-[#0A2540]/30" />
-      <div className="relative flex h-full flex-col justify-center gap-3 p-4 sm:p-6">
-        <h3 className="text-xl font-extrabold text-white sm:text-2xl">Tra cứu văn bản</h3>
-        <p className="-mt-1 text-[13px] text-white/80 sm:text-sm">Tìm theo số hiệu, cơ quan ban hành hoặc nội dung.</p>
-        <form onSubmit={(e) => { e.preventDefault(); router.push('/van-ban' + (tu.trim() ? `?q=${encodeURIComponent(tu.trim())}` : '')); }} className="relative">
-          <input value={tu} onChange={(e) => setTu(e.target.value)} placeholder="Ví dụ: 1264/QĐ-UBND" enterKeyHint="search"
-            aria-label="Tìm văn bản" className="h-11 w-full rounded-md border-0 bg-white pl-3 pr-11 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-[#C8A14B]" />
-          <button type="submit" aria-label="Tìm" className="absolute right-1 top-1 grid h-9 w-9 place-items-center rounded text-slate-500 hover:text-red-600">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="h-5 w-5"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-          </button>
-        </form>
-        <div className="flex flex-wrap gap-1.5">
-          {CHU_DE_NHANH.map(([nhan, ma]) => (
-            <Link key={nhan} href={ma ? `/van-ban?chude=${encodeURIComponent(ma)}` : '/van-ban'}
-              className={`rounded-full border px-3 py-1 text-[12.5px] font-medium ${ma ? 'border-white/30 bg-white/10 text-white hover:bg-white/20' : 'border-white bg-white text-[#0A2540]'}`}>{nhan}</Link>
-          ))}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/cam-nang#dich-vu-phap-ly" className="inline-flex h-10 items-center rounded-md bg-white px-4 text-sm font-bold text-[#0A2540] hover:bg-slate-100">Dịch vụ pháp lý</Link>
-          <Link href="/cam-nang" className="inline-flex h-10 items-center rounded-md bg-white px-4 text-sm font-bold text-[#0A2540] hover:bg-slate-100">Cẩm nang pháp lý</Link>
-        </div>
+    <div className="flex flex-col justify-center gap-3.5 rounded-xl border border-slate-200 bg-white p-4 sm:p-5 lg:h-full">
+      <div>
+        <h3 className="text-xl font-extrabold text-[#0A2540]">Tra cứu văn bản</h3>
+        <p className="mt-1 text-[13.5px] text-slate-500">Tìm theo số hiệu, cơ quan ban hành hoặc nội dung.</p>
+      </div>
+      <form onSubmit={(e) => { e.preventDefault(); router.push('/van-ban' + (tu.trim() ? `?q=${encodeURIComponent(tu.trim())}` : '')); }} className="relative">
+        <input value={tu} onChange={(e) => setTu(e.target.value)} placeholder="Ví dụ: 1264/QĐ-UBND" enterKeyHint="search"
+          aria-label="Tìm văn bản" className="h-11 w-full rounded-md border border-slate-300 bg-white pl-3 pr-11 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:border-[#0A2540]" />
+        <button type="submit" aria-label="Tìm" className="absolute right-1 top-1 grid h-9 w-9 place-items-center rounded text-slate-500 hover:text-red-600">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="h-5 w-5"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+        </button>
+      </form>
+      <div className="flex flex-wrap gap-1.5">
+        {CHU_DE_NHANH.map(([nhan, ma]) => (
+          <Link key={nhan} href={ma ? `/van-ban?chude=${encodeURIComponent(ma)}` : '/van-ban'}
+            className={`rounded-full border px-3 py-1 text-[13px] ${ma ? 'border-slate-300 bg-white text-[#0A2540] hover:border-[#0A2540]' : 'border-[#0A2540] bg-[#0A2540] text-white'}`}>{nhan}</Link>
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Link href="/cam-nang#dich-vu-phap-ly" className="inline-flex h-10 items-center rounded-md border border-slate-300 bg-white px-4 text-sm font-bold text-[#0A2540] hover:border-[#0A2540]">Dịch vụ pháp lý</Link>
+        <Link href="/cam-nang" className="inline-flex h-10 items-center rounded-md border border-slate-300 bg-white px-4 text-sm font-bold text-[#0A2540] hover:border-[#0A2540]">Cẩm nang pháp lý</Link>
       </div>
     </div>
   );
@@ -161,7 +160,7 @@ function VanBanMoiNhat() {
       {ds?.map((d) => (
         <Link key={d.id} href={`/van-ban?q=${encodeURIComponent(d.soKyHieu)}`} className="group block py-2.5">
           <p className="line-clamp-2 text-[15px] font-semibold leading-snug text-[#0A2540] group-hover:text-red-600">{d.trichYeu}</p>
-          <p className="mt-0.5 text-[12.5px] text-slate-500"><b className="font-bold text-red-600">{d.soKyHieu}</b>{d.ngay ? ` · ${ngayVn(d.ngay)}` : ''}{d.coQuan ? ` · ${d.coQuan}` : ''}</p>
+          <p className="mt-1 truncate text-[12.5px] text-slate-500"><b className="font-bold text-red-600">{d.soKyHieu}</b>{d.ngay ? ` · ${ngayVn(d.ngay)}` : ''}{d.coQuan ? ` · ${d.coQuan}` : ''}</p>
         </Link>
       ))}
       <Link href="/van-ban" className="flex items-center justify-center gap-1 pt-3 pb-1 text-sm font-semibold text-red-600 hover:text-red-700">
@@ -582,7 +581,7 @@ export default function Home() {
               </div>
             </div>
           ) : (<>
-          {newsTab === 'Tra cứu văn bản' ? <KhoiTraCuuVanBan anh={newsItems[0].img} /> : (() => { const feat = newsItems[0]; return (
+          {newsTab === 'Tra cứu văn bản' ? <KhoiTraCuuVanBan /> : (() => { const feat = newsItems[0]; return (
             <a href={feat.url} target={feat.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="group block">
               <div className="aspect-[16/10] rounded-xl overflow-hidden bg-slate-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}

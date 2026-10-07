@@ -109,6 +109,44 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
   ],
 };
 
+// Khối bên trái của tab "Tra cứu văn bản" — MẪU 105 + nền ảnh của MẪU 101 (chủ dự án chọn 7/10/2026).
+// Ảnh sổ hồng làm nền, chữ đè lên, có ô tìm + nút chủ đề → mở /van-ban đã lọc sẵn (?q= / ?chude=).
+// Không đặt "văn bản mới" ở đây: kho văn bản cần đăng nhập, khách chưa đăng nhập sẽ thấy khối trống.
+const CHU_DE_NHANH: [string, string][] = [
+  ['Quy hoạch', 'Quy hoạch'], ['Bồi thường, TĐC', 'Bồi thường & Tái định cư'], ['Giấy chứng nhận', 'Giấy chứng nhận'], ['Nhà ở xã hội', 'Nhà ở xã hội'],
+];
+function KhoiTraCuuVanBan({ tieuDe, anh }: { tieuDe: string; anh?: string }) {
+  const router = useRouter();
+  const [tu, setTu] = useState('');
+  const i = tieuDe.indexOf(' (');
+  const chinh = i > 0 ? tieuDe.slice(0, i) : tieuDe;            // "Tra cứu văn bản pháp luật nhà đất"
+  const phu = i > 0 ? tieuDe.slice(i + 2).replace(/\)$/, '') : ''; // "quy hoạch, bồi thường, tái định cư, NOXH..."
+  return (
+    <div className="relative overflow-hidden rounded-xl bg-[#0A2540] min-h-[270px] sm:min-h-[300px] lg:min-h-0 lg:h-full">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {anh && <img src={anh} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0A2540]/95 via-[#0A2540]/80 to-[#0A2540]/40" />
+      <div className="relative flex h-full flex-col justify-center gap-3 p-4 sm:p-6">
+        <div>
+          <h3 className="text-xl font-extrabold leading-snug text-white sm:text-2xl">{chinh}</h3>
+          {phu && <p className="mt-1 text-[13px] text-white/80 sm:text-sm">{phu.charAt(0).toUpperCase() + phu.slice(1)}</p>}
+        </div>
+        <form onSubmit={(e) => { e.preventDefault(); router.push('/van-ban' + (tu.trim() ? `?q=${encodeURIComponent(tu.trim())}` : '')); }} className="flex gap-2">
+          <input value={tu} onChange={(e) => setTu(e.target.value)} placeholder="Số hiệu hoặc tên văn bản, vd 1264/QĐ-UBND"
+            aria-label="Tìm văn bản" className="h-11 min-w-0 flex-1 rounded-md border-0 bg-white px-3 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-[#C8A14B]" />
+          <button type="submit" className="h-11 shrink-0 rounded-md bg-red-600 px-4 text-sm font-bold text-white hover:bg-red-700">Tìm</button>
+        </form>
+        <div className="flex flex-wrap gap-1.5">
+          {CHU_DE_NHANH.map(([nhan, ma]) => (
+            <Link key={ma} href={`/van-ban?chude=${encodeURIComponent(ma)}`}
+              className="rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[12.5px] font-medium text-white hover:bg-white/20">{nhan}</Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Ic({ d }: { d: string }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#0A2540]/60 shrink-0"><path d={d} /></svg>;
 }
@@ -519,7 +557,7 @@ export default function Home() {
               </div>
             </div>
           ) : (<>
-          {(() => { const feat = newsItems[0]; return (
+          {newsTab === 'Tra cứu văn bản' ? <KhoiTraCuuVanBan tieuDe={newsItems[0].title} anh={newsItems[0].img} /> : (() => { const feat = newsItems[0]; return (
             <a href={feat.url} target={feat.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="group block">
               <div className="aspect-[16/10] rounded-xl overflow-hidden bg-slate-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}

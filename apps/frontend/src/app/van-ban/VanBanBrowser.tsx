@@ -102,6 +102,15 @@ export default function VanBanBrowser() {
   const [dangXem, setDangXem] = useState<MoVanBan | null>(null);   // văn bản đang mở trong khung xem
   const reset = () => setPage(1);
 
+  // Nhận từ khoá / chủ đề từ đường dẫn (?q=…&chude=…) — ô tìm văn bản ở trang chủ gửi sang đây (7/10/2026).
+  useEffect(() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      const q0 = sp.get('q'); if (q0) setQ(q0);
+      const c0 = sp.get('chude') as ChuDeNhom | null; if (c0 && c0 in CHUDE_META) setChuDe(c0);
+    } catch {}
+  }, []);
+
   useEffect(() => {
     setErr('');
     api<{ docs: VanBan[] }>('/van-ban').then((r) => setDocs((r.docs || []).map((d) => ({ ...d, soKyHieu: deEnt(d.soKyHieu), trichYeu: deEnt(d.trichYeu), coQuan: deEnt(d.coQuan) })))).catch((e) => setErr(e?.message || 'Lỗi tải văn bản'));

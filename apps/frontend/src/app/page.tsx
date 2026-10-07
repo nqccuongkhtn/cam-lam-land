@@ -138,12 +138,14 @@ function KhoiTraCuuVanBan({ onTim, tuNgoai }: { onTim: (tu: string) => void; tuN
   useEffect(() => { if (!tuNgoai) setTu((x) => (x.trim().length >= 2 ? '' : x)); }, [tuNgoai]);
   return (
     <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white lg:h-full">
-      <img src="/cam-nang/so-hong.webp" alt="" loading="lazy" className="absolute inset-y-0 right-0 h-full w-2/3 object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-r from-white from-35% via-white/90 via-60% to-white/20" />
+      {/* Ảnh sổ chỉ hé ở MÉP PHẢI (chủ dự án 7/10/2026: "nền sổ đỏ hiện nhiều không đẹp như ảnh tôi gửi") */}
+      <img src="/cam-nang/so-hong.webp" alt="" loading="lazy" className="absolute inset-y-0 right-0 h-full w-1/2 object-cover" />
+      <div className="absolute inset-0 bg-gradient-to-r from-white from-50% via-white/90 via-75% to-white/35" />
       {/* Máy tính (lg:) dùng cỡ GỌN ≈ 80% — chủ dự án thu web về 80% thấy tỷ lệ khối này đẹp nhất (7/10/2026).
           Điện thoại giữ cỡ to như cũ cho dễ bấm. */}
       <div className="relative flex h-full max-w-[400px] flex-col justify-center gap-3.5 p-5 lg:max-w-[330px] lg:gap-3 lg:p-4">
-      <h3 className="text-xl font-extrabold text-[#0A2540] lg:text-[17px]">Tra cứu văn bản</h3>
+      {/* Chữ ĐỒNG BỘ tab "Thị trường BĐS": tiêu đề = tiêu đề bài nổi bật (text-lg đậm), dòng liên kết = dòng tin (15px, slate-700) */}
+      <h3 className="text-lg font-extrabold leading-snug text-[#0A2540]">Tra cứu văn bản</h3>
       <form onSubmit={(e) => {
         e.preventDefault(); onTim(tu.trim());
         (document.activeElement as HTMLElement | null)?.blur();   // điện thoại: cụp bàn phím
@@ -157,7 +159,7 @@ function KhoiTraCuuVanBan({ onTim, tuNgoai }: { onTim: (tu: string) => void; tuN
       </form>
       <div>
         {LIEN_KET_PHAP_LY.map(([nhan, url]) => (
-          <Link key={nhan} href={url} className="block w-fit py-2 text-[15px] text-slate-700 hover:text-red-600 lg:py-1.5 lg:text-[13px]">{nhan}</Link>
+          <Link key={nhan} href={url} className="block w-fit py-2 text-[15px] leading-snug text-slate-700 hover:text-red-600 lg:py-1.5">{nhan}</Link>
         ))}
       </div>
       <div className="grid grid-cols-2 gap-2">

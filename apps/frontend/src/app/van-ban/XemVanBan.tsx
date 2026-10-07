@@ -52,6 +52,8 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
         const libP = layPdfjs();
         const r = await fetch(vb.url, { headers: { Authorization: `Bearer ${vb.token}` }, signal: ctl.signal });
         if (r.status === 401) throw new Error('Vui lòng đăng nhập lại để xem văn bản.');
+        // 429 = bộ chống cào chặn (mở quá nhiều văn bản) — hiện đúng câu máy chủ báo
+        if (r.status === 429) throw new Error((await r.json().catch(() => null))?.error || 'Bạn mở văn bản hơi nhanh — vui lòng thử lại sau ít phút.');
         if (!r.ok || !(r.headers.get('content-type') || '').includes('pdf')) throw new Error('Chưa có file cho văn bản này.');
         const tong = Number(r.headers.get('content-length')) || 0;
         if (!tong) setPhanTram(null);

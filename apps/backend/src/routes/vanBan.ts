@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { vnNoAccent } from '../lib/vn.ts';
-import { authRequired, vanBanRequired } from '../middleware/auth.ts';
+import { authRequired, vanBanRequired, type AuthedRequest } from '../middleware/auth.ts';
+import { kiemMoVanBan, kiemDanhSach, kiemTimCongKhai } from '../lib/chongCaoVb.ts';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { mkdir, readFile, writeFile, rm, readdir } from 'node:fs/promises';
@@ -760,8 +761,9 @@ export async function resolvePdf(link: string): Promise<string | null> {
 }
 
 // ── GET / (danh sách) — PHẢI ĐĂNG NHẬP (tiện ích lớp 1, 30/9/2026; trước đây công khai) ──
-vanBanRouter.get('/', authRequired, async (_req, res) => {
+vanBanRouter.get('/', authRequired, async (req: AuthedRequest, res) => {
   try {
+    const chan = kiemDanhSach(req.user); if (chan) return res.status(429).json({ error: chan });   // chống cào (lib/chongCaoVb.ts)
     const rows = await query(`
       SELECT id, so_hieu AS "soKyHieu", trich_yeu AS "trichYeu",
              to_char(ngay_ban_hanh,'YYYY-MM-DD') AS ngay, co_quan AS "coQuan",
@@ -800,6 +802,7 @@ vanBanRouter.get('/tim', async (req, res) => {
   try {
     const q = String(req.query.q || '').trim().slice(0, 80);
     if (q.length < 2) return res.json({ docs: [] });
+    const chan = kiemTimCongKhai(req); if (chan) { res.set('Cache-Control', 'no-store'); return res.status(429).json({ error: chan }); }   // chống cào (lib/chongCaoVb.ts) — no-store để nginx không lưu câu chặn phát cho người khác
     let kd = vnNoAccent(q.toLowerCase()).replace(/\s+/g, ' ');
     for (const [re, thay] of TU_DONG_NGHIA) kd = kd.replace(re, thay);
     const tu = kd.split(' ').filter(Boolean).slice(0, 8).map((w) => '%' + w.replace(/[\\%_]/g, (c) => '\\' + c) + '%');
@@ -831,10 +834,13 @@ vanBanRouter.get('/manage', vanBanRequired, async (_req, res) => {
 });
 
 // ── GET /:id/pdf — proxy tải PDF qua server (đếm lượt) — CHỈ người đăng nhập ──
-vanBanRouter.get('/:id/pdf', authRequired, async (req, res) => {
+vanBanRouter.get('/:id/pdf', authRequired, async (req: AuthedRequest, res) => {
   try {
     const [row] = await query<any>('SELECT id, so_hieu, link_goc FROM van_ban WHERE id=$1', [Number(req.params.id)]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy văn bản' });
+    // CHỐNG CÀO: đếm số văn bản KHÁC NHAU mỗi tài khoản / mỗi máy mở trong 1 giờ, 1 ngày (lib/chongCaoVb.ts)
+    const chan = kiemMoVanBan(req, req.user, row.id);
+    if (chan) { res.set('Cache-Control', 'no-store'); return res.status(429).json({ error: chan }); }
     query('UPDATE van_ban SET luot_tai = luot_tai + 1 WHERE id=$1', [row.id]).catch(() => {});
     const tenFile = `${String(row.so_hieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`;
     // Bản đã gắn dấu bản quyền + nén, lưu sẵn trong kho (mở nhanh, nhẹ)

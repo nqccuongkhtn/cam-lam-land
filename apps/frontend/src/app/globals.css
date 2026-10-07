@@ -327,6 +327,14 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
 /* Bản đồ KHÔNG có nút "?" (trang Nhà đất) → không chừa chỗ ở MỌI cỡ màn hình. Trước chỉ bỏ từ 768px nên điện thoại
    còn hở 38px phía trên cụm nút +/− (chủ dự án báo nhiều lần, sửa dứt điểm 6/10/2026). Cột nút đổi nền tự đo lại nên đi theo. */
 .cl-ban-do-khong-nut-hoi .maplibregl-ctrl-top-right { margin-top: 0; }
+/* Dòng ghi công "© Google | MapLibre ⓘ" góc dưới phải: chủ dự án 7/10/2026 "to quá che hết bản đồ, cho nhỏ lại".
+   Thu thật nhỏ (chữ 7px, nút ⓘ 12px, nền gần trong suốt) nhưng VẪN HIỆN — điều khoản dùng ảnh nền Google bắt buộc
+   phải ghi "© Google" trên bản đồ, xoá hẳn là vi phạm. Chỉ đổi hình thức, không chạm JS bản đồ. */
+.maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib { margin: 0 !important; padding: 0 2px !important; min-height: 0 !important; background: rgba(255,255,255,.45) !important; border-radius: 4px 0 0 0 !important; font-size: 7px !important; line-height: 12px !important; opacity: .75; }
+.maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-inner { font-size: 7px !important; line-height: 12px !important; }
+.maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button { width: 12px !important; height: 12px !important; background-size: 10px !important; }
+.maplibregl-ctrl-attrib.maplibregl-compact { min-height: 12px !important; padding-right: 12px !important; }
+.maplibregl-ctrl-attrib.maplibregl-compact-show { padding: 0 14px 0 3px !important; }
 
 
 /* Quảng cáo động — chuyển động mượt (kiểu Znews) */

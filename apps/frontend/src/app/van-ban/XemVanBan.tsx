@@ -30,13 +30,19 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
   const docRef = useRef<any>(null);
   const khungRef = useRef<HTMLDivElement>(null);
 
+  // Giữ onDong/onLoi trong ref: trang chủ truyền hàm MỚI mỗi lần vẽ lại (kéo trang là vẽ lại) → nếu để chúng
+  // trong danh sách theo dõi của useEffect thì mỗi lần kéo, file bị HUỶ rồi tải lại giữa lúc đang vẽ trang
+  // → lỗi "Có lỗi khi hiển thị trang" (chủ dự án 7/10/2026: "kéo xem văn bản cứ lỗi").
+  const dongRef = useRef(onDong); dongRef.current = onDong;
+  const loiRef = useRef(onLoi); loiRef.current = onLoi;
+
   // Khoá cuộn trang nền + phím Esc để đóng
   useEffect(() => {
     const cu = document.body.style.overflow; document.body.style.overflow = 'hidden';
-    const phim = (e: KeyboardEvent) => { if (e.key === 'Escape') onDong(); };
+    const phim = (e: KeyboardEvent) => { if (e.key === 'Escape') dongRef.current(); };
     window.addEventListener('keydown', phim);
     return () => { document.body.style.overflow = cu; window.removeEventListener('keydown', phim); };
-  }, [onDong]);
+  }, []);
 
   // Tải file, đếm % theo từng phần nhận được
   useEffect(() => {
@@ -63,11 +69,11 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
         docRef.current = pdf; setPhanTram(100); setSoTrang(pdf.numPages);
       } catch (e: any) {
         if (huy || e?.name === 'AbortError') return;
-        onLoi(e?.message || 'Không mở được văn bản.'); onDong();
+        loiRef.current(e?.message || 'Không mở được văn bản.'); dongRef.current();
       }
     })();
-    return () => { huy = true; ctl.abort(); if (url) URL.revokeObjectURL(url); docRef.current?.destroy?.(); };
-  }, [vb.url, vb.token, onDong, onLoi]);
+    return () => { huy = true; ctl.abort(); if (url) URL.revokeObjectURL(url); docRef.current?.destroy?.(); docRef.current = null; };
+  }, [vb.url, vb.token]);
 
   // % ẢO (chủ dự án 7/10/2026): văn bản mở LẦN ĐẦU thì máy chủ còn phải đi lấy file ở cổng nhà nước + gắn dấu,
   // mấy giây đầu chưa có byte nào → thanh đứng ở 0% như bị treo. Nên cho % tự nhích dần (nhanh lúc đầu, chậm dần,
@@ -118,23 +124,25 @@ function TrangPdf({ doc, so, khung }: { doc: any; so: number; khung: React.RefOb
   const [tiLe, setTiLe] = useState(1.414);
   const [ve, setVe] = useState(false);
   useEffect(() => {
+    if (!doc) return;   // file vừa bị huỷ (đóng khung / tải lại) — không vẽ, tránh lỗi làm sập cả trang
     let huy = false;
-    doc.getPage(so).then((p: any) => { if (!huy) { const v = p.getViewport({ scale: 1 }); setTiLe(v.height / v.width); } });
+    Promise.resolve().then(() => doc.getPage(so)).then((p: any) => { if (!huy) { const v = p.getViewport({ scale: 1 }); setTiLe(v.height / v.width); } }).catch(() => {});
     const el = ref.current; if (!el) return;
     const io = new IntersectionObserver((ds) => { if (ds.some((d) => d.isIntersecting)) { setVe(true); io.disconnect(); } }, { root: khung.current, rootMargin: '800px 0px' });
     io.observe(el);
     return () => { huy = true; io.disconnect(); };
   }, [doc, so, khung]);
   useEffect(() => {
-    if (!ve || !cv.current || !ref.current) return;
+    if (!doc || !ve || !cv.current || !ref.current) return;
     let tac: any; let huy = false;
-    doc.getPage(so).then((p: any) => {
+    Promise.resolve().then(() => doc.getPage(so)).then((p: any) => {
       if (huy || !cv.current || !ref.current) return;
       const rong = ref.current.clientWidth, dpr = Math.min(window.devicePixelRatio || 1, 2);
       const v = p.getViewport({ scale: (rong / p.getViewport({ scale: 1 }).width) * dpr });
       const c = cv.current; c.width = v.width; c.height = v.height;
       tac = p.render({ canvasContext: c.getContext('2d'), viewport: v });
-    });
+      tac.promise?.catch?.(() => {});   // bị huỷ giữa chừng khi kéo nhanh — bỏ qua
+    }).catch(() => {});
     return () => { huy = true; tac?.cancel?.(); };
   }, [ve, doc, so]);
   return (

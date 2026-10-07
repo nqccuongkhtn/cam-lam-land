@@ -110,11 +110,9 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
 };
 
 // Tab "Tra cứu văn bản" — dựng ĐÚNG MẪU 105 (chủ dự án chọn 7/10/2026).
-// Trái: thẻ "Tra cứu văn bản" (mô tả · ô tìm · thẻ lọc chủ đề · 2 nút Dịch vụ / Cẩm nang). Phải: 4 văn bản mới ban hành.
-// Ô tìm và thẻ chủ đề mở /van-ban đã lọc sẵn (?q= / ?chude=, VanBanBrowser đọc các tham số này).
-const CHU_DE_NHANH: [string, string][] = [
-  ['Tất cả', ''], ['Quy hoạch', 'Quy hoạch'], ['Thu hồi, bồi thường', 'Bồi thường & Tái định cư'], ['Cấp Giấy chứng nhận', 'Giấy chứng nhận'], ['Nhà ở xã hội', 'Nhà ở xã hội'],
-];
+// Trái: thẻ "Tra cứu văn bản" (mô tả · ô tìm · 2 nút Dịch vụ / Cẩm nang). Phải: 4 văn bản mới ban hành.
+// Ô tìm mở /van-ban đã lọc sẵn (?q=, VanBanBrowser đọc tham số này; ?chude= vẫn dùng được).
+// Hàng thẻ chủ đề (Tất cả · Quy hoạch · …) đã BỎ theo yêu cầu chủ dự án 7/10/2026 cho gọn.
 function KhoiTraCuuVanBan() {
   // Thẻ TRẮNG có viền, y như mẫu 105 trên trang xem thử (chủ dự án gửi ảnh mẫu 105 làm chuẩn, 7/10/2026 —
   // bản nền ảnh sổ hồng phủ xanh bị chê "không đẹp như mẫu": ảnh hồng dưới lớp xanh thành tím đục).
@@ -133,12 +131,6 @@ function KhoiTraCuuVanBan() {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="h-5 w-5"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
         </button>
       </form>
-      <div className="flex flex-wrap gap-1.5">
-        {CHU_DE_NHANH.map(([nhan, ma]) => (
-          <Link key={nhan} href={ma ? `/van-ban?chude=${encodeURIComponent(ma)}` : '/van-ban'}
-            className={`rounded-full border px-3 py-1 text-[13px] ${ma ? 'border-slate-300 bg-white text-[#0A2540] hover:border-[#0A2540]' : 'border-[#0A2540] bg-[#0A2540] text-white'}`}>{nhan}</Link>
-        ))}
-      </div>
       <div className="flex flex-wrap gap-2">
         <Link href="/cam-nang#dich-vu-phap-ly" className="inline-flex h-10 items-center rounded-md border border-slate-300 bg-white px-4 text-sm font-bold text-[#0A2540] hover:border-[#0A2540]">Dịch vụ pháp lý</Link>
         <Link href="/cam-nang" className="inline-flex h-10 items-center rounded-md border border-slate-300 bg-white px-4 text-sm font-bold text-[#0A2540] hover:border-[#0A2540]">Cẩm nang pháp lý</Link>

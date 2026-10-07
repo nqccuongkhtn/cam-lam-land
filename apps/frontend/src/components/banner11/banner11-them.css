@@ -172,7 +172,7 @@
        450/1920 thay cho 620/1920 — cắt đúng phần trống, KHÔNG cắt vào nội dung
        và KHÔNG bóp méo tỉ lệ chữ (chữ vẫn tính theo bề ngang như cũ).
        Muốn thấp/cao hơn nữa thì chỉnh con số 0.234375 (= 450/1920) này. */
-    height: calc(min(100vw, 1920px) * 0.234375 + 104px);
+    height: calc(100vw * 0.234375 + 104px);   /* 7/10/2026: bỏ chặn 1920px — banner tràn kín màn rộng (thu nhỏ 90%), phóng theo tỉ lệ */
     min-height: 400px;
   }
 }

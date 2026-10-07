@@ -602,10 +602,12 @@ export default function Banner11({ children }: { children?: React.ReactNode }) {
           Thanh menu của web ở đầu trang vốn trong suốt (chỉ hiện nền khi cuộn
           xuống), nên cho banner chạy lên tận mép trên là menu nằm lồng trong
           banner đúng như ảnh bìa của các trang bất động sản lớn.
-          Chặn bề ngang ở 1920px vì bản gốc vẽ trên khổ 1920×620 — rộng hơn nữa
-          thì chữ và nút phình to quá cỡ chứ không đẹp thêm. */}
+          ⚠️ KHÔNG chặn bề ngang ở 1920px nữa (7/10/2026): thu nhỏ trình duyệt về
+          90% là màn "rộng" hơn 1920 → banner hở hai mép trắng. Nay khung tràn hết
+          bề ngang và cả bố cục phóng theo đúng tỉ lệ (chữ/nút đặt theo khổ 1920 nên
+          chặn cỡ chữ riêng là nội dung dồn hết sang trái). Ở 90% trông y như 100%. */}
       <div
-        className="relative mx-auto w-full max-w-[1920px] overflow-hidden"
+        className="relative mx-auto w-full overflow-hidden"
         onPointerMove={reChuot}
         /* VUỐT NGANG để đổi mẫu (máy cảm ứng). Chỉ tính khi vuốt ĐỦ XA (>40px)
            và NGANG nhiều hơn DỌC — vuốt dọc là người dùng đang cuộn trang,

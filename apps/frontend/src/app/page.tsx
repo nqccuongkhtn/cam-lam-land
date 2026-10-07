@@ -129,11 +129,16 @@ const LIEN_KET_PHAP_LY: [string, string][] = [
   ['Giá đền bù, bồi thường đất', '/den-bu'],
   ['Mẫu hợp đồng đặt cọc', '/hop-dong-dat-coc'],
 ];
-// TÌM NGAY TẠI TRANG CHỦ (chủ dự án 7/10/2026): CHỈ tìm khi khách BẤM tìm (Enter / kính lúp) — không tự tìm lúc
-// đang gõ (chủ dự án chốt). Kết quả đẩy lên đầu cột phải thay cho "văn bản mới" — qua GET /api/van-ban/tim
-// (công khai, tối đa 6 văn bản). Điện thoại thì cuộn xuống chỗ kết quả (cột phải nằm dưới khối này).
+// TÌM NGAY TẠI TRANG CHỦ (chủ dự án 7/10/2026): ngừng gõ 0,5 giây là tìm, Enter / kính lúp tìm ngay. Kết quả thay
+// chỗ "văn bản mới" ở cột phải, ĐÚNG 4 DÒNG như cũ — hiện nhiều hơn là hàng cao vọt, vỡ bố cục (chủ dự án chê).
+// Qua GET /api/van-ban/tim (công khai). Điện thoại bấm tìm thì cuộn xuống chỗ kết quả (cột phải nằm dưới khối này).
 function KhoiTraCuuVanBan({ onTim, tuNgoai }: { onTim: (tu: string) => void; tuNgoai: string }) {
   const [tu, setTu] = useState('');
+  // Ngừng gõ 0,5 giây là tự tìm (chủ dự án chốt giữ lại); bấm Enter / kính lúp thì tìm ngay.
+  useEffect(() => {
+    const t = setTimeout(() => onTim(tu.trim().length >= 2 ? tu.trim() : ''), 500);
+    return () => clearTimeout(t);
+  }, [tu, onTim]);
   // bấm "Bỏ tìm" bên cột phải → xoá luôn chữ trong ô
   useEffect(() => { if (!tuNgoai) setTu((x) => (x.trim().length >= 2 ? '' : x)); }, [tuNgoai]);
   return (
@@ -204,22 +209,15 @@ function VanBanMoiNhat({ tu, onXoa }: { tu: string; onXoa: () => void }) {
     // min-w-0: thiếu nó thì dòng cơ quan dài (đã cắt "…") vẫn đẩy cột rộng ra → điện thoại tràn ngang 494px/390px
     // Mẫu 34: chữ hơi đậm xám đen 2 dòng · dòng phụ "ngày · cơ quan" (bỏ số hiệu) · chấm đỏ nhỏ đầu dòng.
     <div id="kq-van-ban" className="min-w-0 scroll-mt-20">
-      {tu && (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2 lg:[&_*]:text-[12px]">
-          <p className="min-w-0 text-sm text-slate-600">Kết quả tìm <b className="text-[#0A2540]">“{tu}”</b>{kq ? ` · ${kq.length === 6 ? '6+' : kq.length} văn bản` : ''}</p>
-          <div className="flex items-center gap-3 text-sm font-semibold">
-            <button type="button" onClick={onXoa} className="text-slate-500 hover:text-red-600">✕ Bỏ tìm</button>
-            <Link href={trangChinh} className="text-red-600 hover:text-red-700">Mở trang tra cứu ›</Link>
-          </div>
-        </div>
-      )}
+      {/* Không thêm dòng tiêu đề "Kết quả tìm…" ở trên: giữ y khuôn 4 dòng như lúc chưa tìm (chủ dự án: "mất bố cục").
+          Nút "Bỏ tìm" + "Xem thêm" nằm ở dòng cuối, đúng chỗ của "Xem tất cả văn bản". */}
       <div className="divide-y divide-slate-100">
       {ds === null && [0, 1, 2, 3].map((k) => <div key={k} className="py-3"><div className="h-4 w-11/12 animate-pulse rounded bg-slate-100" /><div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-slate-100" /></div>)}
       {tu && kq?.length === 0 && (
         <p className="py-6 text-center text-sm text-slate-500">Chưa thấy văn bản khớp “{tu}”. Thử gõ số hiệu hoặc vài chữ trong nội dung,
           hoặc <Link href={trangChinh} className="font-semibold text-red-600">mở trang tra cứu đầy đủ</Link> để lọc theo chủ đề, năm, cơ quan.</p>
       )}
-      {ds?.map((d) => (
+      {ds?.slice(0, 4).map((d) => (
         <button key={d.id} type="button" onClick={() => moXem(d)} className="group flex w-full gap-2.5 py-2.5 text-left lg:gap-2 lg:py-2">
           <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-red-600 lg:mt-[6px] lg:h-1 lg:w-1" />
           <div className="min-w-0 flex-1">
@@ -230,10 +228,13 @@ function VanBanMoiNhat({ tu, onXoa }: { tu: string; onXoa: () => void }) {
       ))}
       </div>
       {dangXem && <XemVanBan vb={dangXem} onDong={() => setDangXem(null)} onLoi={(m) => { setDangXem(null); alert(m); }} />}
-      <Link href={trangChinh} className="flex items-center justify-center gap-1 pt-3 pb-1 text-sm font-semibold text-red-600 hover:text-red-700 lg:pt-2 lg:text-[12px]">
-        {tu ? 'Xem đầy đủ ở trang tra cứu văn bản' : 'Xem tất cả văn bản'}
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="m9 6 6 6-6 6" /></svg>
-      </Link>
+      <div className="flex items-center justify-center gap-5 pt-3 pb-1 text-sm font-semibold lg:pt-2 lg:text-[12px]">
+        {tu && <button type="button" onClick={onXoa} className="text-slate-500 hover:text-red-600">✕ Bỏ tìm</button>}
+        <Link href={trangChinh} className="flex items-center gap-1 text-red-600 hover:text-red-700">
+          {tu ? (kq && kq.length > 4 ? 'Xem thêm kết quả ở trang tra cứu' : 'Mở trang tra cứu văn bản') : 'Xem tất cả văn bản'}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="m9 6 6 6-6 6" /></svg>
+        </Link>
+      </div>
     </div>
   );
 }

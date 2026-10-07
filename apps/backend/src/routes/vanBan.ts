@@ -773,6 +773,22 @@ vanBanRouter.get('/', authRequired, async (_req, res) => {
   } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
 });
 
+// ── GET /moi-nhat — 4 văn bản mới ban hành cho khối "Tra cứu văn bản" ở TRANG CHỦ (mẫu 105, 7/10/2026) ──
+// CÔNG KHAI nhưng chỉ có số hiệu · ngày · cơ quan · trích yếu của 4 văn bản (thông tin công bố công khai của
+// nhà nước), không có link file; xem toàn kho + mở file vẫn phải đăng nhập. Chỉ lấy văn bản có file thật.
+vanBanRouter.get('/moi-nhat', async (_req, res) => {
+  try {
+    const rows = await query(`
+      SELECT id, so_hieu AS "soKyHieu", trich_yeu AS "trichYeu",
+             to_char(ngay_ban_hanh,'YYYY-MM-DD') AS ngay, co_quan AS "coQuan", link_goc
+      FROM van_ban WHERE link_goc IS NOT NULL AND link_goc <> '' AND can_kiem_tra IS NULL
+      ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 40`);
+    const docs = rows.filter((d: any) => coFileThat(d.link_goc)).slice(0, 4).map(({ link_goc, ...d }: any) => d);
+    res.set('Cache-Control', 'public, max-age=600');
+    res.json({ docs });
+  } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
+});
+
 // ── GET /manage — danh sách đầy đủ (có link gốc) cho người quản lý văn bản ──
 vanBanRouter.get('/manage', vanBanRequired, async (_req, res) => {
   try {

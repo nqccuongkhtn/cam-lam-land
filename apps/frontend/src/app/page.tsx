@@ -96,17 +96,16 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
   // là Tra cứu văn bản thay cho Thủ tục sang tên Sổ đỏ; 3 dòng kế đưa lên trên, 4 bài cẩm nang xuống dưới.
   'Tra cứu văn bản': [
     // Ảnh: xấp Giấy chứng nhận (sổ hồng) chủ dự án gửi 6/10/2026 — file public/cam-nang/so-hong.webp
-    // Văn phong HÀNH CHÍNH, LỊCH SỰ với khách (chủ dự án 7/10/2026 — đã chê kiểu quảng cáo màu mè là "nhảm").
-    // Kho có đủ loại văn bản, không riêng quy hoạch/bồi thường → tiêu đề ghi chung (chủ dự án 7/10/2026).
-    // Ghi rõ KHU VỰC: "văn bản pháp luật" nghe như tra luật chung, trong khi kho là văn bản của tỉnh, xã (chủ dự án 7/10/2026).
-    { title: 'Tra cứu văn bản nhà đất tại Cam Lâm – Khánh Hòa', url: '/van-ban', img: '/cam-nang/so-hong.webp' },
-    { title: 'Cẩm nang pháp lý nhà đất', url: '/cam-nang' },
-    { title: 'Hỗ trợ thủ tục pháp lý nhà đất', url: '/cam-nang#dich-vu-phap-ly' },
-    { title: 'Mẫu hợp đồng đặt cọc mua bán nhà đất', url: '/hop-dong-dat-coc' },
-    { title: 'Hướng dẫn kiểm tra thông tin quy hoạch thửa đất', url: '/cam-nang/kiem-tra-quy-hoach-dat' },
-    { title: 'Hướng dẫn kiểm tra tính xác thực của Giấy chứng nhận', url: '/cam-nang/kiem-tra-so-do-that-gia' },
-    { title: 'Các khoản thuế, phí khi chuyển nhượng nhà đất', url: '/cam-nang/thue-phi-mua-ban-nha-dat' },
-    { title: 'Thủ tục chuyển nhượng quyền sử dụng đất', url: '/cam-nang/sang-ten-so-do' },
+    // Câu chữ (chủ dự án chốt 7/10/2026): GIỮ cách viết ban đầu, chỉ thêm "..." sau NOXH (kho còn nhiều loại văn bản khác).
+    // Thứ tự: dịch vụ → hợp đồng → cẩm nang → 4 bài con của cẩm nang (cẩm nang đứng ngay trên các bài con của nó).
+    { title: 'Tra cứu văn bản pháp luật nhà đất (quy hoạch, bồi thường, tái định cư, NOXH...)', url: '/van-ban', img: '/cam-nang/so-hong.webp' },
+    { title: 'Dịch vụ pháp lý nhà đất — sang tên, tách thửa, thuế phí', url: '/cam-nang#dich-vu-phap-ly' },
+    { title: 'Mẫu hợp đồng đặt cọc Cam Lâm Land — tạo & in miễn phí', url: '/hop-dong-dat-coc' },
+    { title: 'Xem tất cả cẩm nang pháp lý nhà đất', url: '/cam-nang' },
+    { title: 'Thủ tục sang tên Sổ đỏ (chuyển nhượng quyền sử dụng đất)', url: '/cam-nang/sang-ten-so-do' },
+    { title: 'Các loại thuế, phí khi mua bán nhà đất phải nộp', url: '/cam-nang/thue-phi-mua-ban-nha-dat' },
+    { title: 'Cách kiểm tra Sổ đỏ thật hay giả nhanh, chính xác', url: '/cam-nang/kiem-tra-so-do-that-gia' },
+    { title: 'Cách kiểm tra đất có dính quy hoạch không', url: '/cam-nang/kiem-tra-quy-hoach-dat' },
   ],
 };
 

@@ -96,14 +96,15 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
   // là Tra cứu văn bản thay cho Thủ tục sang tên Sổ đỏ; 3 dòng kế đưa lên trên, 4 bài cẩm nang xuống dưới.
   'Tra cứu văn bản': [
     // Ảnh: xấp Giấy chứng nhận (sổ hồng) chủ dự án gửi 6/10/2026 — file public/cam-nang/so-hong.webp
-    { title: 'Tra cứu văn bản pháp luật nhà đất (quy hoạch, bồi thường, tái định cư, NOXH)', url: '/van-ban', img: '/cam-nang/so-hong.webp', date: 'Văn bản' },
-    { title: 'Dịch vụ pháp lý nhà đất — sang tên, tách thửa, thuế phí', url: '/cam-nang#dich-vu-phap-ly' },
-    { title: 'Mẫu hợp đồng đặt cọc Cam Lâm Land — tạo & in miễn phí', url: '/hop-dong-dat-coc' },
-    { title: 'Xem tất cả cẩm nang pháp lý nhà đất', url: '/cam-nang' },
-    { title: 'Thủ tục sang tên Sổ đỏ (chuyển nhượng quyền sử dụng đất)', url: '/cam-nang/sang-ten-so-do' },
-    { title: 'Các loại thuế, phí khi mua bán nhà đất phải nộp', url: '/cam-nang/thue-phi-mua-ban-nha-dat' },
-    { title: 'Cách kiểm tra Sổ đỏ thật hay giả nhanh, chính xác', url: '/cam-nang/kiem-tra-so-do-that-gia' },
-    { title: 'Cách kiểm tra đất có dính quy hoạch không', url: '/cam-nang/kiem-tra-quy-hoach-dat' },
+    // Câu chữ rút gọn (7/10/2026, chủ dự án: "nội dung ok nhưng câu chữ chưa gọn").
+    { title: 'Tra cứu văn bản quy hoạch, bồi thường, tái định cư', url: '/van-ban', img: '/cam-nang/so-hong.webp' },
+    { title: 'Dịch vụ pháp lý: sang tên, tách thửa', url: '/cam-nang#dich-vu-phap-ly' },
+    { title: 'Mẫu hợp đồng đặt cọc miễn phí', url: '/hop-dong-dat-coc' },
+    { title: 'Cẩm nang pháp lý nhà đất', url: '/cam-nang' },
+    { title: 'Thủ tục sang tên Sổ đỏ', url: '/cam-nang/sang-ten-so-do' },
+    { title: 'Thuế, phí khi mua bán nhà đất', url: '/cam-nang/thue-phi-mua-ban-nha-dat' },
+    { title: 'Kiểm tra Sổ đỏ thật hay giả', url: '/cam-nang/kiem-tra-so-do-that-gia' },
+    { title: 'Kiểm tra đất có dính quy hoạch', url: '/cam-nang/kiem-tra-quy-hoach-dat' },
   ],
 };
 
@@ -532,8 +533,9 @@ export default function Home() {
               <a key={h.title} href={h.url} target={h.url.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="block py-2.5 text-[15px] text-slate-700 hover:text-red-600 leading-snug line-clamp-2">{h.title}</a>
             ))}
             {/* "Xem thêm" ở CUỐI danh sách tin (chủ dự án chỉ đúng chỗ này, 28/9/2026) — cùng nhịp với các dòng tin, không chen vào hàng tab */}
-            <Link href="/tin-tuc" className="flex items-center justify-center gap-1 pt-3 pb-1 text-sm font-semibold text-red-600 hover:text-red-700">
-              Xem thêm tin tức
+            {/* Tab "Tra cứu văn bản" thì nút dẫn sang kho văn bản, không phải tin tức */}
+            <Link href={newsTab === 'Tra cứu văn bản' ? '/van-ban' : '/tin-tuc'} className="flex items-center justify-center gap-1 pt-3 pb-1 text-sm font-semibold text-red-600 hover:text-red-700">
+              {newsTab === 'Tra cứu văn bản' ? 'Xem tất cả văn bản' : 'Xem thêm tin tức'}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="m9 6 6 6-6 6" /></svg>
             </Link>
           </div>

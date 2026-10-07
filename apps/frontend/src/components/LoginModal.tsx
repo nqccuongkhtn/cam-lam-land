@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { layMaNguoiThat } from '@/lib/turnstile';
 import { useAuth, type AuthUser } from '@/lib/auth';
 import PasswordInput from './PasswordInput';
 import LogoAnh from '@/components/LogoAnh';
@@ -61,7 +62,7 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setErr(''); setBusy(true);
     try {
-      const r = await api<{ token: string; user: AuthUser }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+      const r = await api<{ token: string; user: AuthUser }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password, cfToken: await layMaNguoiThat() /* kiểm tra người thật — chống cào */ }) });
       login(r.token, r.user, remember);
       setEmail(''); setPassword('');
       onSuccess();

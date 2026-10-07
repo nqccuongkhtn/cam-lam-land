@@ -5,6 +5,7 @@
 //   không xem được PDF nhúng, iPhone chỉ hiện trang đầu. Trang nào cuộn tới mới vẽ trang đó cho nhẹ máy.
 // · Nút "Tải về" lưu đúng file (đã có dấu bản quyền Cam Lâm Land do máy chủ gắn).
 import { useEffect, useRef, useState } from 'react';
+import { layVeXemVanBan } from '@/lib/turnstile';
 
 const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
 const WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -50,10 +51,13 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
     (async () => {
       try {
         const libP = layPdfjs();
-        const r = await fetch(vb.url, { headers: { Authorization: `Bearer ${vb.token}` }, signal: ctl.signal });
+        // CHỐNG CÀO: kèm "vé người thật" (qua Cloudflare Turnstile — lib/turnstile.ts). Vé hết hạn / đổi mạng
+        // (vé gắn địa chỉ máy) thì máy chủ trả 403 canVe → xin vé mới rồi thử lại MỘT lần.
+        const goi = async (moi: boolean) => fetch(vb.url, { headers: { Authorization: `Bearer ${vb.token}`, 'X-Ve-Nguoi-That': await layVeXemVanBan(moi) }, signal: ctl.signal });
+        let r = await goi(false);
+        if (r.status === 403 && (await r.clone().json().catch(() => null))?.canVe) r = await goi(true);
         if (r.status === 401) throw new Error('Vui lòng đăng nhập lại để xem văn bản.');
-        // 429 = bộ chống cào chặn (mở quá nhiều văn bản) — hiện đúng câu máy chủ báo
-        if (r.status === 429) throw new Error((await r.json().catch(() => null))?.error || 'Bạn mở văn bản hơi nhanh — vui lòng thử lại sau ít phút.');
+        if (r.status === 403 || r.status === 429) throw new Error((await r.json().catch(() => null))?.error || 'Chưa mở được văn bản, vui lòng thử lại sau ít phút.');
         if (!r.ok || !(r.headers.get('content-type') || '').includes('pdf')) throw new Error('Chưa có file cho văn bản này.');
         const tong = Number(r.headers.get('content-length')) || 0;
         if (!tong) setPhanTram(null);

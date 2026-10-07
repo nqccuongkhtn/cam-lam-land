@@ -68,6 +68,12 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@camlam.local}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin12345}
       UPLOAD_DIR: /data/uploads
+      # ── Chống cào: kiểm tra người thật Cloudflare Turnstile (để trống = tắt) + giới hạn ô tìm văn bản trang chủ ──
+      TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
+      TURNSTILE_SECRET: ${TURNSTILE_SECRET:-}
+      VB_TIM_5P: ${VB_TIM_5P:-}
+      VB_TIM_NGAY: ${VB_TIM_NGAY:-}
+      VB_TAT_CHONG_CAO: ${VB_TAT_CHONG_CAO:-}
       # ── AI đọc ảnh sổ đỏ / OCR (COPY KEY TỪ RENDER VÀO .env thì mới chạy) ──
       GEMINI_API_KEYS: ${GEMINI_API_KEYS:-}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}

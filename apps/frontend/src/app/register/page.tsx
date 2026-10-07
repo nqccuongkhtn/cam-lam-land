@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { layMaNguoiThat } from '@/lib/turnstile';
 import { useAuth, type AuthUser } from '@/lib/auth';
 import PasswordInput from '@/components/PasswordInput';
 
@@ -15,7 +16,7 @@ export default function RegisterPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setErr(''); setBusy(true);
     try {
-      const r = await api<{ token: string; user: AuthUser }>('/auth/register', { method: 'POST', body: JSON.stringify({ fullName, email, phone, password }) });
+      const r = await api<{ token: string; user: AuthUser }>('/auth/register', { method: 'POST', body: JSON.stringify({ fullName, email, phone, password, cfToken: await layMaNguoiThat() /* kiểm tra người thật — chặn đăng ký hàng loạt */ }) });
       login(r.token, r.user); router.push('/');
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   }

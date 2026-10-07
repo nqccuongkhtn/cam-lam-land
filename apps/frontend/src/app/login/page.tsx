@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { layMaNguoiThat } from '@/lib/turnstile';
 import { useAuth, type AuthUser, laAdmin } from '@/lib/auth';
 import PasswordInput from '@/components/PasswordInput';
 import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, type TinhTrangVanTay } from '@/lib/vanTay';
@@ -39,7 +40,7 @@ export default function LoginPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setErr(''); setBusy(true);
     try {
-      const r = await api<{ token: string; user: AuthUser }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+      const r = await api<{ token: string; user: AuthUser }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password, cfToken: await layMaNguoiThat() /* kiểm tra người thật — chống cào */ }) });
       login(r.token, r.user, remember);
       router.push(laAdmin(r.user) ? '/admin' : '/');
     } catch (e: any) { setErr(e.message || 'Đăng nhập thất bại'); } finally { setBusy(false); }

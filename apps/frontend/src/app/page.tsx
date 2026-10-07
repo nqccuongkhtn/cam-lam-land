@@ -218,12 +218,12 @@ function VanBanMoiNhat({ tu, onXoa }: { tu: string; onXoa: () => void }) {
           hoặc <Link href={trangChinh} className="font-semibold text-red-600">mở trang tra cứu đầy đủ</Link> để lọc theo chủ đề, năm, cơ quan.</p>
       )}
       {ds?.slice(0, 4).map((d) => (
-        // Chữ theo dòng tin tab "Thị trường BĐS" (15px) rồi GIẢM 5% theo chủ dự án 7/10/2026 → 14.25px, dòng phụ 12px.
-        // Không còn chấm đỏ đầu dòng (chủ dự án bỏ 7/10/2026).
-        <button key={d.id} type="button" onClick={() => moXem(d)} className="group block w-full py-[9.5px] text-left">
+        // Chữ ĐÚNG BẰNG dòng tin tab "Thị trường BĐS" (15px, slate-700, py-2.5). Đã thử giảm 5% → chủ dự án thấy nhỏ
+        // hơn bên báo, trả về bằng nhau (7/10/2026). Không còn chấm đỏ đầu dòng.
+        <button key={d.id} type="button" onClick={() => moXem(d)} className="group block w-full py-2.5 text-left">
           <div className="min-w-0">
-            <p className="line-clamp-2 text-[14.25px] leading-snug text-slate-700 group-hover:text-red-600">{d.trichYeu}</p>
-            <p className="mt-1 truncate text-[12px] text-slate-500">{tu && <b className="font-semibold text-red-600">{d.soKyHieu} · </b>}{[d.ngay ? ngayVn(d.ngay) : '', d.coQuan].filter(Boolean).join(' · ')}</p>
+            <p className="line-clamp-2 text-[15px] leading-snug text-slate-700 group-hover:text-red-600">{d.trichYeu}</p>
+            <p className="mt-1 truncate text-[12.5px] text-slate-500">{tu && <b className="font-semibold text-red-600">{d.soKyHieu} · </b>}{[d.ngay ? ngayVn(d.ngay) : '', d.coQuan].filter(Boolean).join(' · ')}</p>
           </div>
         </button>
       ))}

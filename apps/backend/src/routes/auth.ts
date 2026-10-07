@@ -4,6 +4,9 @@ import { ghiSuKien } from './theoDoiTk.ts'; // THEO DÕI TÀI KHOẢN (tạm —
 import { hashPassword, verifyPassword, signToken, dsVaiTro, canNangCap, BAM_GIA, kiemMatKhauMoi, DAI_TOI_DA } from '../lib/auth.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { sendVerificationEmail, EMAIL_LIVE } from '../lib/mailer.ts';
+import { laNguoiThat, TURNSTILE_SITE_KEY, turnstileBat } from '../lib/turnstile.ts';
+
+const LOI_NGUOI_THAT = 'Không xác nhận được bạn là người thật. Vui lòng tải lại trang rồi thử lại.';
 
 export const authRouter = Router();
 
@@ -25,9 +28,13 @@ async function issueCode(email: string): Promise<string> {
   return code;
 }
 
+// Khoá CÔNG KHAI của Cloudflare Turnstile cho giao diện (rỗng = chưa bật kiểm tra người thật) — lib/turnstile.ts
+authRouter.get('/turnstile', (_req, res) => { res.set('Cache-Control', 'public, max-age=300'); res.json({ siteKey: turnstileBat() ? TURNSTILE_SITE_KEY : '' }); });
+
 // Khách (user) đăng ký nhanh — không cần xác thực email
 authRouter.post('/register', async (req, res, next) => {
   try {
+    if (!(await laNguoiThat(req.body?.cfToken, req))) return res.status(403).json({ error: LOI_NGUOI_THAT });   // chặn đăng ký tự động hàng loạt
     const { email, password, fullName, phone } = req.body ?? {};
     if (!email || !password || !phone) return res.status(400).json({ error: 'Cần email, mật khẩu và số điện thoại' });
     if (!isEmail(email)) return res.status(400).json({ error: 'Email không hợp lệ' });
@@ -73,6 +80,7 @@ function ghiSai(k: string) {
 
 authRouter.post('/login', async (req, res, next) => {
   try {
+    if (!(await laNguoiThat(req.body?.cfToken, req))) return res.status(403).json({ error: LOI_NGUOI_THAT });   // chặn đăng nhập bằng phần mềm tự động
     const { email, password } = req.body ?? {};
     if (typeof email !== 'string' || typeof password !== 'string' || password.length > DAI_TOI_DA)
       return res.status(400).json({ error: 'Email hoặc mật khẩu không hợp lệ' });

@@ -712,5 +712,22 @@ export async function migrate(): Promise<void> {
     }
   }
 
+  // Văn bản: "CẦN KIỂM TRA" (chủ dự án 7/10/2026 — chỗ nào máy nghi sai thì để admin xem lại, không tự sửa)
+  //   can_kiem_tra = ghi chú vì sao nghi (rỗng = không có gì phải xem).
+  //   so_goc / ngay_goc = số + ngày GỐC lúc lấy về. Admin sửa số/ngày thì lưu lại cái cũ ở đây, và cò chặn bên dưới
+  //   không cho máy lấy văn bản thêm lại đúng bản cũ đó (khoá chống trùng là số + ngày → sửa xong là thành "văn bản mới").
+  for (const sql of [
+    `ALTER TABLE van_ban ADD COLUMN IF NOT EXISTS can_kiem_tra text`,
+    `ALTER TABLE van_ban ADD COLUMN IF NOT EXISTS so_goc text`,
+    `ALTER TABLE van_ban ADD COLUMN IF NOT EXISTS ngay_goc date`,
+    `CREATE OR REPLACE FUNCTION van_ban_chan_ban_cu() RETURNS trigger LANGUAGE plpgsql AS $f$
+     BEGIN
+       IF EXISTS (SELECT 1 FROM van_ban WHERE so_goc = NEW.so_hieu AND ngay_goc IS NOT DISTINCT FROM NEW.ngay_ban_hanh) THEN RETURN NULL; END IF;
+       RETURN NEW;
+     END $f$`,
+    `DROP TRIGGER IF EXISTS van_ban_chan_ban_cu ON van_ban`,
+    `CREATE TRIGGER van_ban_chan_ban_cu BEFORE INSERT ON van_ban FOR EACH ROW EXECUTE FUNCTION van_ban_chan_ban_cu()`,
+  ]) await pool.query(sql).catch((e) => console.error('[migrate] văn bản cần kiểm tra:', e.message));
+
   console.log('[migrate] schema up to date');
 }

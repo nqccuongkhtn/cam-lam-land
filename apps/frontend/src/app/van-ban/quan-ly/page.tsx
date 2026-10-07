@@ -3,10 +3,11 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
-import { api } from '@/lib/api';
+import { api, apiBase as API_BASE } from '@/lib/api';
+import { getToken } from '@/lib/token';
 import { CHUDE_LIST, CHUDE_META, type ChuDeNhom } from '../data';
 
-type Doc = { id: number; soKyHieu: string; trichYeu: string; ngay: string; coQuan: string; chuDe: string; linhVuc: string; nguon: string; linkGoc: string; luotTai: number; noiBat: boolean; coFile?: boolean };
+type Doc = { id: number; soKyHieu: string; trichYeu: string; ngay: string; coQuan: string; chuDe: string; linhVuc: string; nguon: string; linkGoc: string; luotTai: number; noiBat: boolean; coFile?: boolean; canKiemTra?: string | null };
 type Form = { id?: number; soKyHieu: string; trichYeu: string; ngay: string; coQuan: string; chuDe: string; linhVuc: string; linkGoc: string; noiBat: boolean };
 const CHUDE = ['Quy hoạch', 'Bồi thường', 'Tái định cư', 'Nhà ở xã hội', 'Khác'];
 const empty: Form = { soKyHieu: '', trichYeu: '', ngay: '', coQuan: '', chuDe: 'Quy hoạch', linhVuc: '', linkGoc: '', noiBat: false };
@@ -147,6 +148,7 @@ export default function QuanLyVanBan() {
         </div>
       </div>
 
+      {docs && <VanBanCanKiemTra docs={docs} onSua={openEdit} onXong={load} />}
       {docs && <VanBanThieuFile docs={docs} onDaLuu={load} />}
 
       {msg && <div className="mt-4 text-sm font-semibold text-[#0A2540] bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">{msg}</div>}
@@ -353,6 +355,61 @@ function VanBanThieuFile({ docs, onDaLuu }: { docs: Doc[]; onDaLuu: () => void }
             ))}
           </div>
         </>
+      )}
+    </div>
+  );
+}
+
+// ── KHUNG "VĂN BẢN CẦN KIỂM TRA" (chủ dự án 7/10/2026: "cái nào nghi ngờ thì để trong phần quản lý để tôi kiểm tra") ──
+// Máy KHÔNG tự sửa số/ngày khi nghi sai — chỉ ghi chú lý do (cột can_kiem_tra). Admin mở file đối chiếu, sai thì bấm "Sửa"
+// (sửa số/ngày xong máy tự nhớ bản gốc, không lấy về thêm lại thành bản trùng), đúng rồi thì bấm "Đã kiểm tra" cho khỏi hiện nữa.
+function VanBanCanKiemTra({ docs, onSua, onXong }: { docs: Doc[]; onSua: (d: Doc) => void; onXong: () => void }) {
+  const ds = docs.filter((d) => d.canKiemTra);
+  const [mo, setMo] = useState(true);
+  const [dang, setDang] = useState<number | null>(null);
+  if (!ds.length) return null;
+  async function xemFile(d: Doc) {
+    // File qua máy chủ cần thẻ đăng nhập → tải về rồi mở ở tab mới (mở tab trước cho khỏi bị chặn cửa sổ bật lên)
+    const w = window.open('', '_blank');
+    try {
+      const r = await fetch(`${API_BASE}/van-ban/${d.id}/pdf`, { headers: { Authorization: `Bearer ${getToken() || ''}` } });
+      if (!(r.headers.get('content-type') || '').includes('pdf')) throw new Error();
+      const u = URL.createObjectURL(await r.blob());
+      if (w) w.location.href = u; else window.open(u, '_blank');
+    } catch { w?.close(); alert('Văn bản này chưa có file để xem.'); }
+  }
+  async function daKiemTra(d: Doc) {
+    setDang(d.id);
+    try { await api(`/van-ban/${d.id}/kiem-tra`, { method: 'PATCH' }); onXong(); } finally { setDang(null); }
+  }
+  const nut = 'inline-flex h-9 shrink-0 items-center justify-center rounded-lg border border-slate-300 px-3 text-[13px] font-semibold text-[#0A2540] hover:bg-slate-50';
+  return (
+    <div className="mt-4 rounded-2xl border border-red-200 bg-red-50/50 p-3 sm:p-4">
+      <button type="button" onClick={() => setMo((v) => !v)} className="flex w-full items-center gap-2 text-left">
+        <span className="text-[15px] font-extrabold text-[#0A2540]">Văn bản cần kiểm tra</span>
+        <span className="rounded-full bg-red-600 px-2 py-0.5 text-[12px] font-bold text-white">{ds.length}</span>
+        <span className="hidden text-[12px] text-slate-500 sm:inline">— máy nghi số/ngày/nguồn có chỗ sai, chưa tự sửa. Mở file đối chiếu rồi sửa hoặc bấm "Đã kiểm tra".</span>
+        <span className="ml-auto text-slate-400">{mo ? '▲' : '▼'}</span>
+      </button>
+      {mo && (
+        <div className="mt-3 space-y-2">
+          {ds.map((d) => (
+            <div key={d.id} className="rounded-xl border border-slate-200 bg-white p-3">
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[12px] text-slate-500">
+                <b className="font-mono text-[13px] text-[#0A2540]">{(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')}</b>
+                <span>{fmtNgay(d.ngay)}</span><span>· {d.coQuan || '—'}</span><span>· nguồn: {d.nguon}</span>
+              </div>
+              <p className="mt-1 text-[13px] leading-snug text-[#0A2540]">{d.trichYeu}</p>
+              <p className="mt-1.5 rounded-lg bg-amber-50 px-2.5 py-1.5 text-[13px] leading-snug text-amber-900">⚠️ {d.canKiemTra}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {d.coFile !== false && <button type="button" onClick={() => xemFile(d)} className={nut}>📄 Xem file</button>}
+                {d.linkGoc && <a href={d.linkGoc} target="_blank" rel="noreferrer" className={nut} title={d.linkGoc}>Trang nguồn ↗</a>}
+                <button type="button" onClick={() => onSua(d)} className={nut}>✏️ Sửa số / ngày</button>
+                <button type="button" onClick={() => daKiemTra(d)} disabled={dang === d.id} className="h-9 shrink-0 rounded-lg bg-emerald-600 px-4 text-[13px] font-bold text-white hover:bg-emerald-700 disabled:opacity-40">{dang === d.id ? 'Đang lưu…' : '✓ Đã kiểm tra'}</button>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

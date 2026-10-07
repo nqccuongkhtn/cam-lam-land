@@ -780,7 +780,7 @@ vanBanRouter.get('/manage', vanBanRequired, async (_req, res) => {
       SELECT id, so_hieu AS "soKyHieu", trich_yeu AS "trichYeu",
              to_char(ngay_ban_hanh,'YYYY-MM-DD') AS ngay, co_quan AS "coQuan",
              chu_de AS "chuDe", linh_vuc AS "linhVuc", nguon, link_goc AS "linkGoc",
-             luot_tai AS "luotTai", noi_bat AS "noiBat"
+             luot_tai AS "luotTai", noi_bat AS "noiBat", can_kiem_tra AS "canKiemTra"
       FROM van_ban ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 8000`);
     // coFile = có FILE THẬT xem được (không phải trang chung / trang tìm kiếm / link bị khoá) → admin lọc ra để tự tìm bằng tay
     res.json({ docs: rows.map((d: any) => ({ ...d, coFile: coFileThat(d.linkGoc) })) });
@@ -828,6 +828,9 @@ vanBanRouter.post('/', vanBanRequired, async (req, res) => {
 vanBanRouter.put('/:id', vanBanRequired, async (req, res) => {
   try {
     const b = req.body || {};
+    // Sửa số/ngày → nhớ số + ngày GỐC (chỉ lần sửa đầu) để máy lấy văn bản không thêm lại bản cũ thành bản trùng (cò chặn trong migrate.ts)
+    await query(`UPDATE van_ban SET so_goc = so_hieu, ngay_goc = ngay_ban_hanh WHERE id=$1 AND so_goc IS NULL
+      AND (so_hieu IS DISTINCT FROM $2 OR ngay_ban_hanh IS DISTINCT FROM $3::date)`, [Number(req.params.id), b.soKyHieu || null, b.ngay || null]);
     await query(
       `UPDATE van_ban SET so_hieu=$2, trich_yeu=$3, ngay_ban_hanh=$4, co_quan=$5, chu_de=$6, linh_vuc=$7, nguon=$8, link_goc=$9, noi_bat=$10 WHERE id=$1`,
       [Number(req.params.id), b.soKyHieu || null, b.trichYeu, b.ngay || null, b.coQuan || null, b.chuDe || 'Khác', b.linhVuc || null, b.nguon || null, b.linkGoc || null, !!b.noiBat]);
@@ -849,6 +852,11 @@ vanBanRouter.patch('/:id/link', vanBanRequired, async (req, res) => {
     layFileVb(id, link).catch(() => {});
     res.json({ ok: true, kb: Math.round(goc.length / 1024) });
   } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi lưu link' }); }
+});
+// ── Admin bấm "Đã kiểm tra" trong khung "Văn bản cần kiểm tra" → bỏ ghi chú nghi vấn ──
+vanBanRouter.patch('/:id/kiem-tra', vanBanRequired, async (req, res) => {
+  try { await query('UPDATE van_ban SET can_kiem_tra = NULL WHERE id=$1', [Number(req.params.id)]); res.json({ ok: true }); }
+  catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
 });
 vanBanRouter.delete('/:id', vanBanRequired, async (req, res) => {
   try { await query('DELETE FROM van_ban WHERE id=$1', [Number(req.params.id)]); res.json({ ok: true }); }

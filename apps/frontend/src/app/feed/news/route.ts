@@ -41,6 +41,15 @@ const SOURCES = [
   { name: 'Tuổi Trẻ', url: 'https://tuoitre.vn/rss/nha-dat.rss' },
   { name: 'Thanh Niên', url: 'https://thanhnien.vn/rss/dia-oc.rss' },
   { name: 'Tiền Phong', url: 'https://tienphong.vn/rss/dia-oc-142.rss' },
+  // ── Báo Chính phủ (chính thống) — CHỈ lấy tin nhắc tới Khánh Hòa (chiKH) và liên quan BĐS/quy hoạch (re) ──
+  { name: 'Báo Chính phủ', url: 'https://baochinhphu.vn/kinh-te.rss', re: true, chiKH: true },
+  /* ── NGUỒN ẨN DANH (chủ dự án 7/10/2026): blog Cam Lâm của camhomes.vn — chỉ ĐỌC để biết chủ đề rồi AI VIẾT LẠI
+     HOÀN TOÀN (đặt tiêu đề mới, đổi câu chữ + bố cục, bỏ tên/SĐT/lời mời dịch vụ của họ), KHÔNG lấy ảnh của họ,
+     KHÔNG ghi nguồn, KHÔNG hiện đường dẫn gốc. AI không viết lại được thì BỎ BÀI (không bao giờ đăng nguyên văn). */
+  { name: 'Cam Lâm Land', url: 'https://camhomes.vn/blog/rss/cam-lam/', local: true, anDanh: true },
+  { name: 'Cam Lâm Land', url: 'https://camhomes.vn/blog/rss/do-thi-moi-cam-lam/', local: true, anDanh: true },
+  { name: 'Cam Lâm Land', url: 'https://camhomes.vn/blog/rss/quy-hoach-cam-lam/', local: true, anDanh: true },
+  { name: 'Cam Lâm Land', url: 'https://camhomes.vn/blog/rss/boi-thuong-du-an-do-thi-moi-cam-lam/', local: true, anDanh: true },
 ];
 const BAD = /(lừa đảo|vỡ nợ|phá sản|siết nợ|tranh chấp|khởi tố|khởi kiện|kiện tụng|bắt giam|lao dốc|bán tháo|nợ xấu|đóng băng|ế ẩm|sụt giảm|giảm mạnh|thổi giá|bong bóng|chiếm đoạt|cảnh báo sốt|trục lợi)/i;
 // Lọc tin liên quan BĐS (áp dụng cho nguồn báo địa phương tổng hợp như Báo Khánh Hòa)
@@ -118,7 +127,16 @@ let lastErr: string | null = null;
  *    bất động sản là tự rước trách nhiệm pháp lý.
  */
 
-const newsPrompt = (title: string, full: string): string => `Bạn là biên tập viên một toà soạn tin tức bất động sản. Biên tập lại bài dưới đây thành một bài hoàn chỉnh bằng tiếng Việt, đúng chuẩn báo chí.
+// Phần dặn thêm cho bài từ NGUỒN ẨN DANH (trang tư nhân): phải là bài MỚI của mình, không phải bản chép.
+const DAN_AN_DANH = `
+BÀI NÀY LẤY TỪ MỘT TRANG TƯ NHÂN — CHỈ DÙNG LÀM TƯ LIỆU, PHẢI VIẾT THÀNH BÀI MỚI CỦA MÌNH  (bắt buộc, ưu tiên hơn các mục dưới)
+- DÒNG ĐẦU TIÊN trả về phải là: TIÊU ĐỀ: <tiêu đề MỚI do bạn đặt, khác hẳn tiêu đề gốc, dưới 18 chữ, không giật tít>
+  rồi một dòng trống, rồi mới đến thân bài.
+- Viết lại TOÀN BỘ bằng câu chữ của mình: đổi cách mở bài, đổi thứ tự trình bày cho mạch lạc hơn, không giữ câu nào gần nguyên văn. Chỉ giữ SỰ KIỆN và SỐ LIỆU (số hiệu văn bản, ngày, diện tích, quy mô) cho đúng.
+- BỎ HẲN mọi tên trang web, tên công ty, thương hiệu, số điện thoại, Zalo, lời mời dịch vụ, lời kêu gọi liên hệ / ký gửi / tư vấn của trang đó. Không viết "theo trang…", "theo Cam Homes…".
+- Độ dài khoảng 60–80% bài gốc. Bài gốc là danh sách / bảng thì viết thành đoạn văn tóm lược ý chính.
+`;
+const newsPrompt = (title: string, full: string, anDanh = false): string => `${anDanh ? DAN_AN_DANH : ''}Bạn là biên tập viên một toà soạn tin tức bất động sản. Biên tập lại bài dưới đây thành một bài hoàn chỉnh bằng tiếng Việt, đúng chuẩn báo chí.
 
 TRƯỚC TIÊN — KIỂM TRA ĐẦU VÀO  (bước này làm trước, đừng bỏ)
 - Đọc phần NỘI DUNG BÀI GỐC. Nếu nó KHÔNG phải một bài báo hoàn chỉnh — chỉ là thực đơn trang web, danh sách chuyên mục, dòng "Đăng nhập / Quảng cáo / Xem thêm", hoặc có dưới 3 đoạn văn thật — thì TRẢ VỀ ĐÚNG MỘT DÒNG: KHÔNG ĐỦ
@@ -181,8 +199,8 @@ TIÊU ĐỀ BÀI GỐC: ${title}
 NỘI DUNG BÀI GỐC:
 ${full}`;
 
-async function rewrite(title: string, full: string): Promise<string | null> {
-  const prompt = newsPrompt(title, full);
+async function rewrite(title: string, full: string, anDanh = false): Promise<string | null> {
+  const prompt = newsPrompt(title, full, anDanh);
   for (const khoa of GEMINI_KEYS) {
     for (const model of GEMINI_MODELS) {
       try {
@@ -361,7 +379,7 @@ async function fetchArticle(url: string): Promise<{ text: string; images: string
   } catch { return { text: '', images: [] }; }
 }
 
-async function fetchSource(src: { name: string; url: string; local?: boolean; re?: boolean }): Promise<any[]> {
+async function fetchSource(src: { name: string; url: string; local?: boolean; re?: boolean; chiKH?: boolean; anDanh?: boolean }): Promise<any[]> {
   const res = await fetch(src.url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CamLamLand/1.0)' }, signal: AbortSignal.timeout(8000), cache: 'no-store' });
   if (!res.ok) return [];
   const xml = await res.text();
@@ -378,6 +396,9 @@ async function fetchSource(src: { name: string; url: string; local?: boolean; re
     const sm = strip(desc);
     if (src.re && !RE.test(title + ' ' + sm)) continue; // nguồn tổng hợp -> chỉ lấy tin BĐS
     const tier = tierOf(title + ' ' + sm);
+    if (src.chiKH && tier < 1) continue;   // nguồn toàn quốc: chỉ giữ tin nhắc Khánh Hòa
+    // Nguồn ẨN DANH: không giữ ảnh + tóm tắt của họ (tóm tắt sẽ lấy từ bài đã viết lại)
+    if (src.anDanh) { out.push({ title, url: link, source: src.name, image: null, summary: '', publishedAt: d.toISOString(), local: true, tier: Math.max(tier, 3), anDanh: true }); continue; }
     out.push({ title, url: link, source: src.name, image, summary: sm.length > 600 ? catTronCau(sm.slice(0, 600)) : sm, publishedAt: d.toISOString(), local: !!src.local || tier >= 1, tier });
   }
   return out;
@@ -491,10 +512,35 @@ export async function GET(req: Request) {
   // ?gon=1: BỎ TOÀN VĂN (body) + dãy ảnh — trang chủ và trang danh sách tin chỉ cần tiêu đề/tóm tắt/ảnh
   // đại diện. Trước đây mỗi lần mở trang chủ tải ~290 KB (toàn văn mọi bài) trên điện thoại (đo 29/9/2026).
   // Trang ĐỌC BÀI (/tin-tuc/[id]) vẫn gọi không kèm tham số để lấy đủ toàn văn.
+  // Bài NGUỒN ẨN DANH: KHÔNG bao giờ trả đường dẫn gốc ra ngoài (url rỗng, nguồn = Cam Lâm Land).
+  const ra = store.map((a: any) => (a.anDanh ? { ...a, url: '', source: 'Cam Lâm Land' } : a));
   if (new URL(req.url).searchParams.get('gon') === '1') {
-    return NextResponse.json({ news: store.map(({ body, images, ...gon }: any) => gon) });
+    return NextResponse.json({ news: ra.map(({ body, images, ...gon }: any) => gon) });
   }
-  return NextResponse.json({ news: store });
+  return NextResponse.json({ news: ra });
+}
+
+/* ── Bài NGUỒN ẨN DANH: AI viết lại thành bài mới (tiêu đề mới + câu chữ mới) — hỏng thì BỎ, không đăng nguyên văn ──
+   Ảnh: KHÔNG dùng ảnh của họ — lấy ảnh Bãi Dài thật của mình (public/bai-dai/), chọn theo bài cho khỏi trùng nhau. */
+async function vietLaiAnDanh(a: any): Promise<void> {
+  const art = await fetchArticle(a.url);
+  if (!art.text || art.text.length < 300) return;              // không đọc được bài → bỏ
+  const viet = await rewrite(a.title, art.text, true);
+  if (!viet || /^KHÔNG ĐỦ\s*$/i.test(viet.trim())) return;      // AI hết lượt / báo không đủ → bỏ, lượt sau thử lại
+  const m = viet.match(/^\s*TIÊU ĐỀ:\s*(.+)\n+([\s\S]+)$/i);
+  if (!m) return;                                              // không đặt được tiêu đề mới → bỏ (tránh giữ tiêu đề gốc)
+  const tieuDe = m[1].replace(/[*#"“”]/g, '').trim();
+  const than = catTronCau(dropCaptions(m[2].replace(/cam\s*homes?/gi, '').trim()));
+  if (tieuDe.length < 12 || than.length < 300) return;
+  a.title = tieuDe;
+  a.body = than;
+  a.summary = catTronCau(than.split(/\n\s*\n/)[0].slice(0, 400));
+  a.aiOk = true;
+  const { hero, rest } = baiDaiPool();
+  const kho = rest.length ? rest : hero ? [hero] : [];
+  const img = kho.length ? kho[Number(shortHash(a.url)) % kho.length] : null;
+  a.image = img; a.images = img ? [img] : [];
+  a.slug = `${vnSlug(tieuDe) || 'tin'}-${shortHash(a.url)}`;
 }
 
 async function refreshFeed(slot: number): Promise<void> {
@@ -506,6 +552,7 @@ async function refreshFeed(slot: number): Promise<void> {
   fetched.sort((a, b) => (b.tier || 0) - (a.tier || 0) || +new Date(b.publishedAt) - +new Date(a.publishedAt));
   const fresh = fetched.filter((a) => !byUrl.has(a.url)).slice(0, FRESH_CAP);
   await Promise.allSettled(fresh.map(async (a) => {
+    if (a.anDanh) return vietLaiAnDanh(a);
     const art = await fetchArticle(a.url);
     const full = art.text && art.text.length > 200 ? art.text : (a.summary || a.title);
     /* AI trả "KHÔNG ĐỦ" nghĩa là phần bóc được từ bài gốc không phải bài báo
@@ -531,7 +578,7 @@ async function refreshFeed(slot: number): Promise<void> {
      (RA_SOAT bài) cho khỏi đốt hết hạn mức vào việc cũ. */
   const RA_SOAT = 5;
   const canSua = [...byUrl.values()]
-    .filter((a) => !a.pin && a.slug && a.aiOk === false)
+    .filter((a) => !a.pin && !a.anDanh && a.slug && a.aiOk === false)
     .sort((a, b) => +new Date(b.publishedAt) - +new Date(a.publishedAt))
     .slice(0, RA_SOAT);
   if (canSua.length) {
@@ -554,7 +601,8 @@ async function refreshFeed(slot: number): Promise<void> {
   const thangTruoc = Date.now() - 30 * 86400000;
   const localKeep = Date.now() - 60 * 86400000;
   const rotating = [...byUrl.values()]
-    .filter((a) => !a.pin && a.slug && +new Date(a.publishedAt) >= ((a.tier || 0) >= 1 ? localKeep : thangTruoc))
+    // Bài ẩn danh (quy hoạch Cam Lâm — nội dung lâu dài) giữ 1 năm; chỉ giữ bài ĐÃ viết lại xong (aiOk).
+    .filter((a) => !a.pin && a.slug && (!a.anDanh || a.aiOk) && +new Date(a.publishedAt) >= (a.anDanh ? Date.now() - 365 * 86400000 : (a.tier || 0) >= 1 ? localKeep : thangTruoc))
     .sort((a, b) => (b.local ? 1 : 0) - (a.local ? 1 : 0) || +new Date(b.publishedAt) - +new Date(a.publishedAt))
     .slice(0, 600);
   store = [...PINNED, ...rotating]; // bài GHIM luôn đứng đầu

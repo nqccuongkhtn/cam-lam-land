@@ -354,22 +354,21 @@ export default function Home() {
         const raw: any[] = d.news || [];
         const toCard = (n: any) => ({ title: n.title, url: '/tin-tuc/' + n.slug, img: n.image || U('1486406146926-c627a92ad1ab'), date: n.publishedAt ? new Date(n.publishedAt).toLocaleDateString('vi-VN') : undefined, source: n.source });
         setMarketNews(raw.filter((n) => !n.pin).map(toCard)); // Thị trường BĐS — GIỮ NGUYÊN (bỏ bài ghim)
-        // Tin nổi bật (sửa 7/10/2026 — chủ dự án: "tin nổi bật yếu thế hơn 2 tab kia"): trước chỉ có 5 bài ghim từ 2024
-        // nên vừa CŨ vừa ÍT. Nay xếp 3 tầng, đủ 8 bài như tab Thị trường:
-        //   1) tin MỚI (≤ 45 ngày) về Cam Lâm / Bãi Dài / vịnh Cam Ranh / sân bay — mới nhất lên đầu, làm bài lớn có ảnh;
+        // Tin nổi bật = CHỈ TIN CAM LÂM (chủ dự án chốt 7/10/2026: "tin nổi bật chỉ nói về Cam Lâm thôi").
+        //   1) tin nhắc thẳng Cam Lâm / Bãi Dài / các xã Cam Lâm (gồm bài Cam Lâm Land biên tập) — mới nhất lên đầu;
         //   2) các bài ghim về Đô thị mới Cam Lâm (QĐ 205…);
-        //   3) còn thiếu thì lấy tin LỚN mới nhất của Khánh Hòa (quy hoạch, sân bay, cao tốc, dự án, đầu tư…).
+        //   3) CHỈ KHI còn thiếu (< 6 bài) mới chèn tin VỊNH CAM RANH / sân bay Cam Ranh (sát dự án Cam Lâm — chủ dự án
+        //      "du di" được). Tin BĐS chung chung (vd "TP.HCM đề nghị công ty địa ốc khai báo…") TUYỆT ĐỐI không lấy.
         const chu = (n: any) => (n.title || '') + ' ' + (n.summary || '');
-        const moi = (n: any, ngay: number) => n.publishedAt && Date.now() - +new Date(n.publishedAt) < ngay * 864e5;
-        const CAM_LAM = /cam lâm|bãi dài|vịnh cam ranh|sân bay cam ranh|cam hải|suối dầu|cam hiệp|đô thị sân bay/i;
-        const DTM = /đô thị mới cam lâm|đô thị sân bay cam lâm|đô thị cam lâm|phân khu.*cam lâm|cam lâm.*đô thị/i;
-        const LON = /quy hoạch|sân bay|cao tốc|đường sắt|dự án|đầu tư|khu đô thị|vinhomes|vingroup|hạ tầng|cảng/i;
+        const CAM_LAM = /cam lâm|bãi dài|cam đức|cam hải|suối dầu|suối tân|suối cát|cam hiệp|cam an |cam thành bắc|cam hòa|cam tân|đô thị sân bay/i;
+        const SAT_CAM_LAM = /vịnh cam ranh|sân bay (quốc tế )?cam ranh|bán đảo cam ranh/i;
         const theoNgay = (a: any, b: any) => +new Date(b.publishedAt) - +new Date(a.publishedAt);
-        const t1 = raw.filter((n) => !n.pin && moi(n, 45) && CAM_LAM.test(chu(n))).sort(theoNgay);
-        const t2 = raw.filter((n) => n.pin || DTM.test(chu(n))).sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || theoNgay(a, b));
-        const t3 = raw.filter((n) => !n.pin && moi(n, 30) && LON.test(n.title || '')).sort(theoNgay);
+        const t1 = raw.filter((n) => !n.pin && CAM_LAM.test(chu(n))).sort(theoNgay);
+        const t2 = raw.filter((n) => n.pin).sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || theoNgay(a, b));
+        const t3 = raw.filter((n) => !n.pin && !CAM_LAM.test(chu(n)) && SAT_CAM_LAM.test(chu(n))).sort(theoNgay);
         const daCo = new Set<string>(); const feat: any[] = [];
-        for (const n of [...t1, ...t2, ...t3]) { if (feat.length >= 8 || daCo.has(n.slug)) continue; daCo.add(n.slug); feat.push(n); }
+        const them = (ds: any[], toiDa: number) => { for (const n of ds) { if (feat.length >= toiDa || daCo.has(n.slug)) continue; daCo.add(n.slug); feat.push(n); } };
+        them(t1, 8); them(t2, 8); them(t3, 6);
         setFeaturedNews(feat.map(toCard));
       })
       .catch(() => {})

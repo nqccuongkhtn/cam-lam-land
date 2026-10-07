@@ -202,11 +202,16 @@ export default function NewsReaderClient() {
 
             <div className="mt-4 text-slate-700 leading-relaxed text-[16px] sm:text-[18px] space-y-4">{body}</div>
 
+            {/* Bài Cam Lâm Land tự tổng hợp, biên tập (không có đường dẫn gốc) thì không hiện khung "đọc bản gốc" */}
+            {a.url ? (
             <div className="mt-6 sm:mt-8 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
               <p className="text-sm text-slate-600">Bài do Cam Lâm Land biên tập, dựa trên thông tin từ <b>{a.source || 'báo chí'}</b>. Xem bản gốc đầy đủ tại nguồn:</p>
               <a href={a.url} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-2 bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-5 py-2.5 rounded-xl">Đọc bản gốc tại {a.source || 'nguồn'} →</a>
               <p className="text-[11px] text-slate-400 mt-3">Nguồn: <a href={a.url} target="_blank" rel="noreferrer" className="underline break-all hover:text-[#0A2540]">{a.url}</a></p>
             </div>
+            ) : (
+            <p className="mt-6 text-sm text-slate-500 sm:mt-8">Bài do Cam Lâm Land tổng hợp và biên tập.</p>
+            )}
 
             <div className="mt-5"><ChiaSe tieuDe={decodeEntities(a.title)} /></div>
 

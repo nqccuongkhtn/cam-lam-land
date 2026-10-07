@@ -112,7 +112,7 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
 // Tab "Tra cứu văn bản" — chủ dự án chọn 7/10/2026: khối trái = MẪU 90 (bỏ các gạch kẻ), cột phải = MẪU 34
 // trên trang xem thử 100 mẫu ghép. (Đã thử nền Bãi Dài của mẫu 100 → chủ dự án bảo quay lại nền này.)
 // Trái: nền trắng, ảnh sổ hồng tan dần sang trắng bên phải · tiêu đề · ô tìm · danh sách chủ đề có mũi tên
-// (KHÔNG kẻ gạch) · 2 NÚT Dịch vụ (xanh đậm) / Cẩm nang (vàng) cùng cỡ — "làm nổi bật hơn".
+// (KHÔNG kẻ gạch) · 2 NÚT cùng cỡ theo MẪU 2 trang "60 mẫu nền + nút": Dịch vụ (đỏ) / Cẩm nang (trắng viền).
 // Ô tìm và chủ đề mở /van-ban đã lọc sẵn (?q= / ?chude=, VanBanBrowser đọc các tham số này).
 const CHU_DE_NHANH: [string, string][] = [
   ['Quy hoạch', 'Quy hoạch'], ['Thu hồi, bồi thường', 'Bồi thường & Tái định cư'], ['Cấp Giấy chứng nhận', 'Giấy chứng nhận'], ['Nhà ở xã hội', 'Nhà ở xã hội'],
@@ -142,8 +142,8 @@ function KhoiTraCuuVanBan() {
         ))}
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <Link href="/cam-nang#dich-vu-phap-ly" className="inline-flex h-10 items-center justify-center rounded-md bg-[#0A2540] px-2 text-sm font-bold text-white hover:bg-[#123a63]">Dịch vụ pháp lý</Link>
-        <Link href="/cam-nang" className="inline-flex h-10 items-center justify-center rounded-md bg-[#C8A14B] px-2 text-sm font-bold text-[#0A2540] hover:brightness-105">Cẩm nang pháp lý</Link>
+        <Link href="/cam-nang#dich-vu-phap-ly" className="inline-flex h-10 items-center justify-center rounded-md bg-red-600 px-2 text-sm font-bold text-white hover:bg-red-700">Dịch vụ pháp lý</Link>
+        <Link href="/cam-nang" className="inline-flex h-10 items-center justify-center rounded-md border border-slate-300 bg-white px-2 text-sm font-bold text-[#0A2540] hover:border-[#0A2540]">Cẩm nang pháp lý</Link>
       </div>
       </div>
     </div>

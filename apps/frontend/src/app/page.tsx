@@ -155,7 +155,8 @@ function VanBanMoiNhat() {
   useEffect(() => { api<{ docs: VbMoi[] }>('/van-ban/moi-nhat').then((r) => setDs(r.docs || [])).catch(() => setDs([])); }, []);
   const ngayVn = (d: string | null) => (d ? d.split('-').reverse().join('/') : '');
   return (
-    <div className="divide-y divide-slate-100">
+    // min-w-0: thiếu nó thì dòng cơ quan dài (đã cắt "…") vẫn đẩy cột rộng ra → điện thoại tràn ngang 494px/390px
+    <div className="min-w-0 divide-y divide-slate-100">
       {ds === null && [0, 1, 2, 3].map((k) => <div key={k} className="py-3"><div className="h-4 w-11/12 animate-pulse rounded bg-slate-100" /><div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-slate-100" /></div>)}
       {ds?.map((d) => (
         <Link key={d.id} href={`/van-ban?q=${encodeURIComponent(d.soKyHieu)}`} className="group block py-2.5">

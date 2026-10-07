@@ -267,10 +267,17 @@ export default function ChatWidget() {
     // Chỉ chào lần MỞ APP đầu (mỗi phiên) — không hiện lại mỗi lần chuyển trang.
     let already = false;
     try { already = !!sessionStorage.getItem('cl-hint-shown'); } catch {}
-    let firstT: any;
-    if (!already) firstT = setTimeout(() => { show(); try { sessionStorage.setItem('cl-hint-shown', '1'); } catch {} }, 2000);
+    // Lần đầu: CHỜ KHÁCH LƯỚT XUỐNG một đoạn (~60% chiều cao màn hình) rồi mới mời (chủ dự án duyệt 7/10/2026).
+    // Trước đây hiện sau 2 giây → vừa mở web đã che banner + ô tìm kiếm, khách chưa kịp xem gì đã bị chào.
+    // Lướt tức là khách đang thật sự xem trang → lúc đó mời gửi đất mới hợp. Trang không cuộn (bản đồ) thì không hiện.
+    const daLuot = () => {
+      if (window.scrollY < window.innerHeight * 0.6) return;
+      window.removeEventListener('scroll', daLuot);
+      show(); try { sessionStorage.setItem('cl-hint-shown', '1'); } catch {}
+    };
+    if (!already) window.addEventListener('scroll', daLuot, { passive: true });
     const iv = setInterval(show, 240000); // hiện lại mỗi 4 phút (trong phiên)
-    return () => { clearTimeout(firstT); clearTimeout(hideT); clearInterval(iv); };
+    return () => { window.removeEventListener('scroll', daLuot); clearTimeout(hideT); clearInterval(iv); };
   }, []);
   function dismissHint() { setHint(false); hintStop.current = true; }
   // ===== Bong bóng chat kéo di chuyển tự do (chat head Android) — dính mép + nhớ vị trí =====

@@ -91,11 +91,11 @@ export default function VanBanBrowser() {
   const [err, setErr] = useState('');
   const [q, setQ] = useState('');
   const [chuDe, setChuDe] = useState<ChuDeNhom | 'all'>('all');
-  const [nam, setNam] = useState('all');
   const [diaBan, setDiaBan] = useState('all');
-  // Lọc theo CƠ QUAN BAN HÀNH + THÁNG — học camhomes.vn/van-ban (họ chia văn bản theo cơ quan · tháng · năm), 6/10/2026
+  // Lọc theo CƠ QUAN BAN HÀNH — học camhomes.vn/van-ban (6/10/2026)
   const [coQuan, setCoQuan] = useState('all');
-  const [thang, setThang] = useState('all');
+  // THỜI GIAN BAN HÀNH = gộp Năm + Tháng làm MỘT ô (chủ dự án 7/10/2026): 'all' | 'YYYY' (cả năm) | 'YYYY-MM' (một tháng)
+  const [thoiGian, setThoiGian] = useState('all');
   const [sort, setSort] = useState<'moi' | 'tai'>('moi');
   const [page, setPage] = useState(1);
   const [taiId] = useState<number | null>(null);
@@ -126,7 +126,17 @@ export default function VanBanBrowser() {
     api<{ docs: VanBan[] }>('/van-ban').then((r) => setDocs((r.docs || []).map((d) => ({ ...d, soKyHieu: deEnt(d.soKyHieu), trichYeu: deEnt(d.trichYeu), coQuan: deEnt(d.coQuan) })))).catch((e) => setErr(e?.message || 'Lỗi tải văn bản'));
   }, []);
 
-  const YEARS = useMemo(() => Array.from(new Set((docs || []).map((d) => (d.ngay || '').slice(0, 4)).filter(Boolean))).sort((a, b) => b.localeCompare(a)), [docs]);
+  // Danh sách chọn thời gian: mỗi năm có 1 dòng "Năm 2026" rồi tới các tháng CÓ văn bản của năm đó (mới nhất trước)
+  const THOI_GIAN = useMemo(() => {
+    const thang = Array.from(new Set((docs || []).map((d) => (d.ngay || '').slice(0, 7)).filter((x) => /^\d{4}-\d{2}$/.test(x)))).sort((a, b) => b.localeCompare(a));
+    const ra: [string, string][] = [];
+    for (const t of thang) {
+      const [y, m] = t.split('-');
+      if (!ra.some(([v]) => v === y)) ra.push([y, `Năm ${y}`]);
+      ra.push([t, `Tháng ${Number(m)}/${y}`]);
+    }
+    return ra;
+  }, [docs]);
   const CO_QUAN = useMemo(() => { const m = new Map<string, number>(); (docs || []).forEach((d) => { const c = (d.coQuan || '').trim(); if (c) m.set(c, (m.get(c) || 0) + 1); }); return [...m.entries()].sort((a, b) => b[1] - a[1]); }, [docs]);
   const DIA_BAN = useMemo(() => { const s = new Set((docs || []).map(diaBanOf)); return DB_ORDER.filter((x) => s.has(x)); }, [docs]);
   const filtered = useMemo(() => {
@@ -134,13 +144,12 @@ export default function VanBanBrowser() {
     return (docs || [])
       .filter((d) =>
         (chuDe === 'all' || CHUDE_META[chuDe].match.includes(d.chuDe)) &&
-        (nam === 'all' || (d.ngay || '').slice(0, 4) === nam) &&
+        (thoiGian === 'all' || (d.ngay || '').startsWith(thoiGian)) &&
         (diaBan === 'all' || diaBanOf(d) === diaBan) &&
         (coQuan === 'all' || (d.coQuan || '').trim() === coQuan) &&
-        (thang === 'all' || (d.ngay || '').slice(5, 7) === thang) &&
         (!kw || kd(d.soKyHieu || '').includes(kw) || kd(d.trichYeu || '').includes(kw) || kd(d.coQuan || '').includes(kw) || kd(d.linhVuc || '').includes(kw)))
       .sort((a, b) => sort === 'tai' ? (b.luotTai || 0) - (a.luotTai || 0) : (b.ngay || '').localeCompare(a.ngay || ''));
-  }, [docs, q, chuDe, nam, diaBan, coQuan, thang, sort]);
+  }, [docs, q, chuDe, thoiGian, diaBan, coQuan, sort]);
 
   // Mở KHUNG XEM ngay trong trang (không mở tab mới nữa — chủ dự án 6/10/2026)
   function taiPdf(d: VanBan) {
@@ -156,7 +165,7 @@ export default function VanBanBrowser() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER));
   const cur = Math.min(page, totalPages);
   const vis = filtered.slice((cur - 1) * PER, cur * PER);
-  const hasFilter = q || chuDe !== 'all' || nam !== 'all' || diaBan !== 'all' || coQuan !== 'all' || thang !== 'all';
+  const hasFilter = q || chuDe !== 'all' || thoiGian !== 'all' || diaBan !== 'all' || coQuan !== 'all';
   const th = 'px-2.5 sm:px-3 py-3 font-semibold text-left whitespace-nowrap';
   const td = 'px-2.5 sm:px-3 py-3.5 align-top';
   const COUNT = (c: ChuDeNhom) => (docs || []).filter((d) => CHUDE_META[c].match.includes(d.chuDe)).length;
@@ -165,7 +174,10 @@ export default function VanBanBrowser() {
     <div>
       {/* MẪU 34 (chủ dự án chọn 7/10/2026, trang 100 mẫu phần đầu): chủ đề = THANH THẺ CHUYỂN gạch chân đỏ có số
           (điện thoại lướt ngang); ô tìm = THANH TÌM TO viền xanh đậm + nút "Tìm" đỏ, bộ lọc gọn bên dưới. */}
-      <div className="-mx-3 flex gap-5 overflow-x-auto border-b border-slate-200 px-3 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
+      {/* Điện thoại (kiểu Đ1): thanh lướt ngang, MÉP PHẢI MỜ DẦN để khách biết còn chủ đề phía sau */}
+      <div className="relative">
+      <div className="pointer-events-none absolute inset-y-0 -right-3 z-10 w-10 bg-gradient-to-l from-[#f8fafc] to-transparent sm:hidden" />
+      <div className="-mx-3 flex gap-5 overflow-x-auto border-b border-slate-200 px-3 pr-10 [scrollbar-width:none] sm:mx-0 sm:px-0 sm:pr-0 [&::-webkit-scrollbar]:hidden">
         {([['all', 'Văn bản chung', (docs || []).length], ...CHUDE_LIST.map((c) => [c, c, COUNT(c)])] as [ChuDeNhom | 'all', string, number][]).map(([ma, ten, n]) => {
           const on = chuDe === ma;
           return (
@@ -175,6 +187,7 @@ export default function VanBanBrowser() {
             </button>
           );
         })}
+      </div>
       </div>
 
       <div ref={oTimRef} className="mt-4 scroll-mt-20">
@@ -188,12 +201,13 @@ export default function VanBanBrowser() {
           {/* Danh sách tự lọc ngay khi gõ — nút "Tìm" để quen tay khách (và cụp bàn phím trên điện thoại) */}
           <button type="submit" className="shrink-0 bg-red-600 px-5 text-sm font-bold text-white hover:bg-red-700">Tìm</button>
         </form>
+        {/* KIỂU Đ1 (điện thoại, chủ dự án chốt 7/10/2026): 3 ô lọc — "Địa giới hành chính" một hàng riêng,
+            "Thời gian ban hành" (gộp năm + tháng) và "Cơ quan ban hành" chung một hàng. Máy tính xếp 3 ô trên một hàng. */}
         <div className="mt-2 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
-          <SoXuong value={diaBan} onChange={(v) => { setDiaBan(v); reset(); }} w="w-full sm:w-auto sm:min-w-[200px]" opts={[['all', 'Địa giới hành chính'], ...DIA_BAN.map((x): [string, string] => [x, x])]} />
-          <SoXuong value={nam} onChange={(v) => { setNam(v); reset(); }} w="w-full sm:w-auto sm:min-w-[130px]" opts={[['all', 'Tất cả các năm'], ...YEARS.map((y): [string, string] => [y, `Năm ${y}`])]} />
-          <SoXuong value={thang} onChange={(v) => { setThang(v); reset(); }} w="w-full sm:w-auto sm:min-w-[130px]" opts={[['all', 'Tất cả các tháng'], ...Array.from({ length: 12 }, (_, i): [string, string] => [String(i + 1).padStart(2, '0'), `Tháng ${i + 1}`])]} />
+          <SoXuong value={diaBan} onChange={(v) => { setDiaBan(v); reset(); }} w="col-span-2 w-full sm:w-auto sm:min-w-[220px]" opts={[['all', 'Địa giới hành chính'], ...DIA_BAN.map((x): [string, string] => [x, x])]} />
+          <SoXuong value={thoiGian} onChange={(v) => { setThoiGian(v); reset(); }} w="w-full sm:w-auto sm:min-w-[190px]" opts={[['all', 'Thời gian ban hành'], ...THOI_GIAN]} />
           <SoXuong value={coQuan} onChange={(v) => { setCoQuan(v); reset(); }} w="w-full sm:w-[260px]" opts={[['all', 'Cơ quan ban hành'], ...CO_QUAN.map(([c, n]): [string, string] => [c, `${c} (${n})`])]} />
-          {hasFilter && <button onClick={() => { setQ(''); setChuDe('all'); setNam('all'); setDiaBan('all'); setCoQuan('all'); setThang('all'); reset(); }} className="col-span-2 rounded-lg px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 sm:col-span-1">✕ Xóa lọc</button>}
+          {hasFilter && <button onClick={() => { setQ(''); setChuDe('all'); setThoiGian('all'); setDiaBan('all'); setCoQuan('all'); reset(); }} className="col-span-2 rounded-lg px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 sm:col-span-1">✕ Xóa lọc</button>}
         </div>
       </div>
 

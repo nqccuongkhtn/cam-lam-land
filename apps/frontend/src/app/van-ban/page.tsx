@@ -19,12 +19,14 @@ export default function VanBanPage() {
   return (
     <div className="mx-auto max-w-7xl px-3 sm:px-6 py-5 sm:py-8">
       {/* MẪU 34 (chủ dự án chọn 7/10/2026): tiêu đề GỌN MỘT HÀNG — tiêu đề bên trái, nút chia sẻ bên phải, gạch dưới */}
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-slate-200 pb-3">
-        <div>
-          <h1 className="text-2xl font-extrabold leading-tight text-[#0A2540]">Tra cứu văn bản</h1>
-          <p className="mt-0.5 text-[13px] text-slate-500">Văn bản Cam Lâm &amp; pháp luật nhà đất · cập nhật hằng ngày</p>
+      {/* Điện thoại (kiểu Đ1, chốt 7/10/2026): 4 nút chia sẻ CỠ NHỎ cùng hàng tiêu đề; dòng chữ nhỏ ĐƯỢC XUỐNG DÒNG,
+          không cắt "…" (chủ dự án: "pháp luật nhà ... là sao" — phải hiện đủ chữ "đất"). */}
+      <div className="mb-4 flex items-start justify-between gap-2 border-b border-slate-200 pb-3 sm:items-end sm:gap-3">
+        <div className="min-w-0">
+          <h1 className="text-[21px] font-extrabold leading-tight text-[#0A2540] sm:text-2xl">Tra cứu văn bản</h1>
+          <p className="mt-0.5 text-[12px] text-slate-500 sm:text-[13px]">Văn bản Cam Lâm &amp; pháp luật nhà đất<span className="hidden sm:inline"> · cập nhật hằng ngày</span></p>
         </div>
-        <ShareRow title="Tra cứu văn bản nhà đất Cam Lâm theo chủ đề" khongNhan />
+        <ShareRow title="Tra cứu văn bản nhà đất Cam Lâm theo chủ đề" khongNhan gon className="shrink-0 flex-nowrap pt-0.5 sm:pt-0" />
       </div>
 
       <VanBanBrowser />

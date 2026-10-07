@@ -881,8 +881,9 @@
   .cl-b11 .ui-toast { transform-origin: 50% 0 }
   .cl-b11 .st-ui .ui-toast { top: calc(var(--u) * 88px + var(--dinh)) }
 
-  /* Mẫu flycam: khung ngắm + chữ REC */
-  .cl-b11 .hud { top: calc(var(--u) * 22px + var(--dinh)) }
+  /* Mẫu flycam: 4 góc khung ngắm GIỮ sát mép ảnh như máy tính (7/10/2026: dời cả khung xuống dưới
+     menu thì 2 góc trên lệch hẳn xuống, chủ dự án khoanh chỉ ra) — chỉ dời chữ REC xuống cho khỏi đè nút menu */
+  .cl-b11 .hud .rec { top: calc(var(--u) * 8px + var(--dinh) - var(--u) * 22px) }
 
   /* Mẫu "Mặt nước": mép ảnh dời phải theo tỉ lệ phóng chữ để chữ nằm trọn
      trong dải tối */

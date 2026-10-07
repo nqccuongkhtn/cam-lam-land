@@ -38,7 +38,15 @@ export default function KhoaMem({ ten, caoXem = 1100, children }: { ten: string;
     if (!muonToi() || loading) return;
     const html = document.documentElement;
     const tim = (): HTMLElement | null => (mo ? document.getElementById('dich-vu-phap-ly') : quangCaoRef.current);
-    const nhay = (el: HTMLElement) => window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 72, behavior: 'instant' as ScrollBehavior });
+    // Chừa đúng chiều cao thanh đầu trang ĐANG dính trên màn hình (+8px) — trước chừa cứng 72px nên trên điện thoại
+    // (thanh đầu trang không dính) lòi ra hàng số trang "1 2 … 5" của cẩm nang phía trên (chủ dự án 7/10/2026).
+    const caoDau = () => {
+      const h = document.querySelector('header');
+      if (!h) return 0;
+      const vt = getComputedStyle(h).position;
+      return vt === 'fixed' || vt === 'sticky' ? Math.max(0, h.getBoundingClientRect().bottom) : 0;
+    };
+    const nhay = (el: HTMLElement) => window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - caoDau() - 8, behavior: 'instant' as ScrollBehavior });
     let lan = 0, giu: ResizeObserver | null = null, khachLuot = false;
     const thoiGiu = () => { khachLuot = true; };
     const t = setInterval(() => {
@@ -51,6 +59,11 @@ export default function KhoaMem({ ten, caoXem = 1100, children }: { ten: string;
         giu.observe(document.body);
         ['wheel', 'touchstart', 'keydown'].forEach((s) => window.addEventListener(s, thoiGiu, { once: true, passive: true }));
         setTimeout(() => giu?.disconnect(), 2000);
+        // Điện thoại: thanh đầu trang TỰ ẨN khi trang cuộn xuống (Nav.tsx) — ẩn xong thì khoảng chừa cho nó thành
+        // khoảng hở → căn lại sau khi thanh đầu trang chạy xong hiệu ứng (~240ms).
+        // Trang vẫn ẨN tới lần căn 300ms để khách không thấy trang nhích ~50px.
+        [300, 700].forEach((ms) => setTimeout(() => { if (!khachLuot) nhay(el); if (ms === 300) html.style.visibility = ''; }, ms));
+        return;
       }
       html.style.visibility = '';
     }, 50);

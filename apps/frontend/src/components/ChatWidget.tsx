@@ -270,14 +270,22 @@ export default function ChatWidget() {
     // Lần đầu: CHỜ KHÁCH LƯỚT XUỐNG một đoạn (~60% chiều cao màn hình) rồi mới mời (chủ dự án duyệt 7/10/2026).
     // Trước đây hiện sau 2 giây → vừa mở web đã che banner + ô tìm kiếm, khách chưa kịp xem gì đã bị chào.
     // Lướt tức là khách đang thật sự xem trang → lúc đó mời gửi đất mới hợp. Trang không cuộn (bản đồ) thì không hiện.
+    // Chỉ tính khi KHÁCH TỰ LƯỚT (lăn chuột / vuốt / phím) — trang tự nhảy (vd mở thẳng phần "Dịch vụ pháp lý"
+    // ở /cam-nang?toi=dich-vu-phap-ly) cũng làm trang cuộn nhưng không phải khách lướt, không được bật bảng mời.
+    let khachLuot = false;
+    const coThaoTac = () => { khachLuot = true; };
+    const THAO_TAC = ['wheel', 'touchmove', 'keydown'];
     const daLuot = () => {
-      if (window.scrollY < window.innerHeight * 0.6) return;
+      if (!khachLuot || window.scrollY < window.innerHeight * 0.6) return;
       window.removeEventListener('scroll', daLuot);
       show(); try { sessionStorage.setItem('cl-hint-shown', '1'); } catch {}
     };
-    if (!already) window.addEventListener('scroll', daLuot, { passive: true });
+    if (!already) {
+      window.addEventListener('scroll', daLuot, { passive: true });
+      THAO_TAC.forEach((s) => window.addEventListener(s, coThaoTac, { passive: true }));
+    }
     const iv = setInterval(show, 240000); // hiện lại mỗi 4 phút (trong phiên)
-    return () => { window.removeEventListener('scroll', daLuot); clearTimeout(hideT); clearInterval(iv); };
+    return () => { window.removeEventListener('scroll', daLuot); THAO_TAC.forEach((s) => window.removeEventListener(s, coThaoTac)); clearTimeout(hideT); clearInterval(iv); };
   }, []);
   function dismissHint() { setHint(false); hintStop.current = true; }
   // ===== Bong bóng chat kéo di chuyển tự do (chat head Android) — dính mép + nhớ vị trí =====

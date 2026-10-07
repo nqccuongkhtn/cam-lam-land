@@ -106,7 +106,7 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
     // Câu chữ (chủ dự án chốt 7/10/2026): GIỮ cách viết ban đầu, chỉ thêm "..." sau NOXH (kho còn nhiều loại văn bản khác).
     // Thứ tự: dịch vụ → hợp đồng → cẩm nang → 4 bài con của cẩm nang (cẩm nang đứng ngay trên các bài con của nó).
     { title: 'Tra cứu văn bản pháp luật nhà đất (quy hoạch, bồi thường, tái định cư, NOXH...)', url: '/van-ban', img: '/cam-nang/so-hong.webp' },
-    { title: 'Dịch vụ pháp lý nhà đất — sang tên, tách thửa, thuế phí', url: '/cam-nang#dich-vu-phap-ly' },
+    { title: 'Dịch vụ pháp lý nhà đất — sang tên, tách thửa, thuế phí', url: '/cam-nang?toi=dich-vu-phap-ly' },
     { title: 'Mẫu hợp đồng đặt cọc Cam Lâm Land — tạo & in miễn phí', url: '/hop-dong-dat-coc' },
     { title: 'Xem tất cả cẩm nang pháp lý nhà đất', url: '/cam-nang' },
     { title: 'Thủ tục sang tên Sổ đỏ (chuyển nhượng quyền sử dụng đất)', url: '/cam-nang/sang-ten-so-do' },
@@ -168,7 +168,7 @@ function KhoiTraCuuVanBan({ onTim, tuNgoai }: { onTim: (tu: string) => void; tuN
         ))}
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <Link href="/cam-nang#dich-vu-phap-ly" className="inline-flex h-10 items-center justify-center rounded-md bg-red-600 px-2 text-sm font-bold text-white hover:bg-red-700 lg:h-8 lg:text-[12px]">Dịch vụ pháp lý</Link>
+        <Link href="/cam-nang?toi=dich-vu-phap-ly" className="inline-flex h-10 items-center justify-center rounded-md bg-red-600 px-2 text-sm font-bold text-white hover:bg-red-700 lg:h-8 lg:text-[12px]">Dịch vụ pháp lý</Link>
         <Link href="/cam-nang" className="inline-flex h-10 items-center justify-center rounded-md border border-slate-300 bg-white px-2 text-sm font-bold text-[#0A2540] hover:border-[#0A2540] lg:h-8 lg:text-[12px]">Cẩm nang pháp lý</Link>
       </div>
       </div>

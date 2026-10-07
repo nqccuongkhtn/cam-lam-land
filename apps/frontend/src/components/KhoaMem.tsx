@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
@@ -17,17 +17,45 @@ import QuangCaoDichVu from '@/components/QuangCaoDichVu';
  * Người đã đăng nhập xem đầy đủ như thường. Ô mời đăng nhập cũng là chỗ thu thập khách (bán hàng).
  */
 export default function KhoaMem({ ten, caoXem = 1100, children }: { ten: string; caoXem?: number; children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { openLogin } = useLoginGate();
   const mo = !!user;
-  // Trang chủ có liên kết /cam-nang#dich-vu-phap-ly: mốc đó nằm trong phần bài BỊ CẮT → khách chưa đăng nhập
-  // cuộn tới bản quảng cáo hiện rõ bên dưới thay vì chỗ bị che.
   const quangCaoRef = useRef<HTMLDivElement>(null);
+
+  /* MỞ THẲNG PHẦN "DỊCH VỤ PHÁP LÝ" (chủ dự án 7/10/2026): bấm "Dịch vụ pháp lý" ở trang chủ phải có cảm giác MỞ HẲN
+     MỘT TRANG DỊCH VỤ — không được thấy trang cẩm nang hiện ra rồi trôi xuống. Thực chất vẫn là /cam-nang:
+     · liên kết dùng ?toi=dich-vu-phap-ly (vẫn nhận cả #dich-vu-phap-ly kiểu cũ);
+     · ẨN cả trang ngay trước lần vẽ đầu (useLayoutEffect), chờ biết đăng nhập hay chưa + khối dịch vụ có mặt,
+       NHẢY THẲNG tới đó (behavior 'instant' — thắng cả CSS scroll-behavior:smooth) rồi mới hiện trang;
+     · ảnh phía trên tải xong làm trang dài ra → giữ khối dịch vụ đứng yên ở đầu màn hình thêm ~2 giây,
+       trừ khi khách tự lướt (lướt lên mới thấy nội dung cẩm nang).
+     Đã đăng nhập → khối dịch vụ trong bài (#dich-vu-phap-ly). Chưa đăng nhập → khối đó nằm trong phần bị khoá,
+     nên tới bản quảng cáo dịch vụ hiện rõ bên dưới. */
+  const muonToi = () => typeof window !== 'undefined'
+    && (window.location.hash === '#dich-vu-phap-ly' || new URLSearchParams(window.location.search).get('toi') === 'dich-vu-phap-ly');
+  useLayoutEffect(() => { if (muonToi()) document.documentElement.style.visibility = 'hidden'; }, []);
   useEffect(() => {
-    if (mo || typeof window === 'undefined' || window.location.hash !== '#dich-vu-phap-ly') return;
-    const t = setTimeout(() => quangCaoRef.current?.scrollIntoView({ behavior: 'smooth' }), 300);
-    return () => clearTimeout(t);
-  }, [mo]);
+    if (!muonToi() || loading) return;
+    const html = document.documentElement;
+    const tim = (): HTMLElement | null => (mo ? document.getElementById('dich-vu-phap-ly') : quangCaoRef.current);
+    const nhay = (el: HTMLElement) => window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 72, behavior: 'instant' as ScrollBehavior });
+    let lan = 0, giu: ResizeObserver | null = null, khachLuot = false;
+    const thoiGiu = () => { khachLuot = true; };
+    const t = setInterval(() => {
+      const el = tim();
+      if (!el && ++lan < 60) return;                       // chờ tối đa ~3 giây cho khối dịch vụ có mặt
+      clearInterval(t);
+      if (el) {
+        nhay(el);
+        giu = new ResizeObserver(() => { if (!khachLuot) nhay(el); });
+        giu.observe(document.body);
+        ['wheel', 'touchstart', 'keydown'].forEach((s) => window.addEventListener(s, thoiGiu, { once: true, passive: true }));
+        setTimeout(() => giu?.disconnect(), 2000);
+      }
+      html.style.visibility = '';
+    }, 50);
+    return () => { clearInterval(t); giu?.disconnect(); html.style.visibility = ''; };
+  }, [mo, loading]);
   return (
     <div className="relative">
       <div className="cl-noi-dung-khoa relative" style={mo ? undefined : { maxHeight: caoXem, overflow: 'hidden' }}>

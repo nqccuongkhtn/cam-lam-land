@@ -114,12 +114,13 @@ const NEWS: Record<string, { title: string; url: string; img?: string; date?: st
 // Trái: nền trắng, ảnh sổ hồng tan dần sang trắng bên phải · tiêu đề · ô tìm · danh sách chủ đề có mũi tên
 // (KHÔNG kẻ gạch) · 2 NÚT cùng cỡ theo MẪU 2 trang "60 mẫu nền + nút": Dịch vụ (đỏ) / Cẩm nang (trắng viền).
 // Ô tìm và chủ đề mở /van-ban đã lọc sẵn (?q= / ?chude=, VanBanBrowser đọc các tham số này).
-// 4 dòng liên kết dưới ô tìm — chủ dự án gửi ảnh chốt 7/10/2026, thay cho 4 chủ đề văn bản (Quy hoạch, Thu hồi…).
+// 4 dòng liên kết dưới ô tìm (chủ dự án 7/10/2026). KHÔNG lặp "Dịch vụ pháp lý" / "Cẩm nang pháp lý" vì 2 nút
+// đỏ/trắng bên dưới đã có — chủ dự án chê trùng. Chỉ để các công cụ tra cứu khác.
 const LIEN_KET_PHAP_LY: [string, string][] = [
-  ['Dịch vụ pháp lý nhà đất', '/cam-nang#dich-vu-phap-ly'],
-  ['Mẫu hợp đồng đặt cọc', '/hop-dong-dat-coc'],
-  ['Cẩm nang pháp lý nhà đất', '/cam-nang'],
   ['Kiểm tra quy hoạch thửa đất', '/map'],
+  ['Bảng giá đất Khánh Hòa 2026', '/bang-gia-dat'],
+  ['Giá đền bù, bồi thường đất', '/den-bu'],
+  ['Mẫu hợp đồng đặt cọc', '/hop-dong-dat-coc'],
 ];
 function KhoiTraCuuVanBan() {
   const router = useRouter();

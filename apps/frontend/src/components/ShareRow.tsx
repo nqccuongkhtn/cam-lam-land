@@ -27,7 +27,9 @@ export default function ShareRow({ title, className, khongNhan, gon }: { title?:
   const iconBtn = `inline-flex ${gon ? 'h-7 w-7 sm:h-9 sm:w-9' : 'h-9 w-9'} shrink-0 items-center justify-center rounded-lg transition`;
   const icCo = gon ? 'h-3.5 w-3.5 sm:h-[18px] sm:w-[18px]' : 'h-[18px] w-[18px]';
   return (
-    <div className={`flex flex-wrap items-center ${gon ? 'gap-1 sm:gap-1.5' : 'gap-1.5'} ${className || ''}`}>
+    // gon: KHÔNG BAO GIỜ xuống dòng (chủ dự án: "cố gắng để 4 nút không xuống dòng") — trước để flex-wrap lẫn
+    // flex-nowrap cùng lúc nên trình duyệt vẫn cho xuống dòng.
+    <div className={`flex ${gon ? 'flex-nowrap gap-1 sm:gap-1.5' : 'flex-wrap gap-1.5'} items-center ${className || ''}`}>
       {!khongNhan && <span className="text-[13px] font-semibold text-slate-500">Chia sẻ:</span>}
       <button onClick={fb} aria-label="Chia sẻ Facebook" title="Chia sẻ Facebook" className={`${iconBtn} bg-[#1877F2] text-white hover:brightness-110`}>
         <svg viewBox="0 0 24 24" fill="currentColor" className={icCo}><path d="M22 12a10 10 0 1 0-11.5 9.9v-7H8v-2.9h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6v1.8h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z" /></svg>

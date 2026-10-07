@@ -26,7 +26,7 @@ export default function VanBanPage() {
           <h1 className="text-[21px] font-extrabold leading-tight text-[#0A2540] sm:text-2xl">Tra cứu văn bản</h1>
           <p className="mt-0.5 text-[12px] text-slate-500 sm:text-[13px]">Văn bản Cam Lâm &amp; pháp luật nhà đất<span className="hidden sm:inline"> · cập nhật hằng ngày</span></p>
         </div>
-        <ShareRow title="Tra cứu văn bản nhà đất Cam Lâm theo chủ đề" khongNhan gon className="shrink-0 flex-nowrap pt-0.5 sm:pt-0" />
+        <ShareRow title="Tra cứu văn bản nhà đất Cam Lâm theo chủ đề" khongNhan gon className="shrink-0 pt-0.5 sm:pt-0" />
       </div>
 
       <VanBanBrowser />

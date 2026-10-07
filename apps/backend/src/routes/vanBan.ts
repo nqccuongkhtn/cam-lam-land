@@ -465,7 +465,7 @@ export async function layPdfDrive(link: string): Promise<Buffer | null> {
 //    · qpdf gom các mảnh nhỏ thành luồng nén chung, nén lại mức cao nhất.
 //    Ép JPEG mạnh hơn chỉ bớt thêm ~1% mà làm dấu đỏ nhoè → không dùng.
 // Kho CHỈ giữ bản đã xử lý (vb-<phiên bản>-<mã>.pdf); đổi cách xử lý thì tăng PHIEN_BAN_FILE để làm lại.
-const PHIEN_BAN_FILE = 'v8';   // v8 (6/10/2026): chèn thêm trang 2 trắng có dấu bản quyền; v7: dấu bản quyền ghi tên miền mới batdongsancamlam.vn; v6: chữ chéo nhỏ lại; v4: chữ chéo 2 dòng (thêm link + SĐT) vẽ bằng xoay hệ toạ độ — không đè nhau; gắn cho MỌI văn bản
+const PHIEN_BAN_FILE = 'v9';   // v9 (7/10/2026): chữ chéo nghiêng ít hơn (30° thay vì theo đường chéo); v8 (6/10/2026): chèn thêm trang 2 trắng có dấu bản quyền; v7: dấu bản quyền ghi tên miền mới batdongsancamlam.vn; v6: chữ chéo nhỏ lại; v4: chữ chéo 2 dòng (thêm link + SĐT) vẽ bằng xoay hệ toạ độ — không đè nhau; gắn cho MỌI văn bản
 const PHONG_DAU = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
 async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
   try {
@@ -496,10 +496,13 @@ async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
       // CHỮ CHÉO GIỮA TRANG — 2 dòng: "CAM LÂM LAND" + link web & SĐT (chủ dự án 6/10/2026: chân trang dễ bị xén mất
       // "thì công cốc" → link + SĐT phải nằm cả giữa trang). Xoay hệ toạ độ quanh tâm trang theo đường chéo rồi viết 2 dòng
       // như viết ngang bình thường → khoảng cách 2 dòng luôn đúng (bản tính tay từng điểm bị đè dòng).
-      const goc = Math.atan2(h, w), c = Math.cos(goc), sn = Math.sin(goc), cheo = Math.hypot(w, h);
+      // Góc nghiêng: trước chạy theo đường chéo trang (~55° với trang dọc) → chủ dự án 7/10/2026 "nghiêng ít hơn" → cố định 30°
+      const goc = Math.PI / 6, c = Math.cos(goc), sn = Math.sin(goc), cheo = Math.hypot(w, h);
       // Cỡ chữ chéo: bản đầu to quá (chủ dự án 6/10/2026 "hơi to") → chữ lớn ~7% cạnh ngắn, dài tối đa 45% đường chéo
-      let to = Math.min(w, h) * 0.07; while (font.widthOfTextAtSize(chu1, to) > cheo * 0.45) to *= 0.92;
-      let nho = to * 0.42; while (font.widthOfTextAtSize(chu2, nho) > cheo * 0.45) nho *= 0.92;
+      // và không tràn quá 85% bề ngang trang (nghiêng ít thì chữ chiếm bề ngang nhiều hơn)
+      const dai = Math.min(cheo * 0.45, w * 0.85 / c);
+      let to = Math.min(w, h) * 0.07; while (font.widthOfTextAtSize(chu1, to) > dai) to *= 0.92;
+      let nho = to * 0.42; while (font.widthOfTextAtSize(chu2, nho) > dai) nho *= 0.92;
       page.pushOperators(pushGraphicsState(), concatTransformationMatrix(c, sn, -sn, c, w / 2, h / 2));
       page.drawText(chu1, { x: -font.widthOfTextAtSize(chu1, to) / 2, y: to * 0.35, size: to, font, color: rgb(0.78, 0.6, 0.22), opacity: 0.15 });
       page.drawText(chu2, { x: -font.widthOfTextAtSize(chu2, nho) / 2, y: -to * 0.75, size: nho, font, color: rgb(0.04, 0.15, 0.25), opacity: 0.22 });

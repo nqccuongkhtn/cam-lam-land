@@ -103,13 +103,23 @@ export default function VanBanBrowser() {
   const reset = () => setPage(1);
 
   // Nhận từ khoá / chủ đề từ đường dẫn (?q=…&chude=…) — ô tìm văn bản ở trang chủ gửi sang đây (7/10/2026).
+  // Kèm CUỘN THẲNG xuống ô tìm + kết quả: trước đó trang mở ở đầu, 8 thẻ chủ đề che kín màn hình điện thoại
+  // nên khách tưởng "tìm ngoài trang chủ chưa được" (chủ dự án 7/10/2026).
+  const oTimRef = useRef<HTMLDivElement>(null);
+  const [canCuon, setCanCuon] = useState(false);
   useEffect(() => {
     try {
       const sp = new URLSearchParams(window.location.search);
       const q0 = sp.get('q'); if (q0) setQ(q0);
       const c0 = sp.get('chude') as ChuDeNhom | null; if (c0 && c0 in CHUDE_META) setChuDe(c0);
+      if (q0 || c0) setCanCuon(true);
     } catch {}
   }, []);
+  useEffect(() => {
+    if (!canCuon || !docs) return;   // chờ có danh sách rồi mới cuộn, không thì trang còn ngắn, cuộn hụt
+    setCanCuon(false);
+    requestAnimationFrame(() => oTimRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  }, [canCuon, docs]);
 
   useEffect(() => {
     setErr('');
@@ -175,7 +185,7 @@ export default function VanBanBrowser() {
         })}
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 shadow-sm mt-4">
+      <div ref={oTimRef} className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 shadow-sm mt-4 scroll-mt-20">
         <div className="relative">
           <svg viewBox="0 0 24 24" className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
           <input value={q} onChange={(e) => { setQ(e.target.value); reset(); }} placeholder="Tìm theo số ký hiệu, trích yếu, cơ quan…" className="w-full pl-10 pr-3 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white outline-none focus:border-[#C8A14B] text-sm" />

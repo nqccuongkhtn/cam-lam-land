@@ -163,39 +163,37 @@ export default function VanBanBrowser() {
 
   return (
     <div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
-        <button onClick={() => { setChuDe('all'); reset(); }}
-          className={`text-left rounded-2xl border p-3 sm:p-4 transition ${chuDe === 'all' ? 'border-[#C8A14B] bg-[#C8A14B]/10 ring-1 ring-[#C8A14B]/30' : 'border-slate-200 bg-white hover:border-[#C8A14B] hover:shadow-sm'}`}>
-          <div className="text-2xl leading-none">🗂️</div>
-          <div className="font-bold text-[#0A2540] mt-2 leading-tight">Văn bản chung</div>
-          <div className="text-[12px] text-slate-500 mt-1 leading-snug">Tất cả văn bản đất đai & dự án — tỉnh và cả nước</div>
-          <div className="text-[11px] font-semibold text-[#C8A14B] mt-2">{(docs || []).length} văn bản →</div>
-        </button>
-        {CHUDE_LIST.map((c) => {
-          const on = chuDe === c;
+      {/* MẪU 34 (chủ dự án chọn 7/10/2026, trang 100 mẫu phần đầu): chủ đề = THANH THẺ CHUYỂN gạch chân đỏ có số
+          (điện thoại lướt ngang); ô tìm = THANH TÌM TO viền xanh đậm + nút "Tìm" đỏ, bộ lọc gọn bên dưới. */}
+      <div className="-mx-3 flex gap-5 overflow-x-auto border-b border-slate-200 px-3 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
+        {([['all', 'Văn bản chung', (docs || []).length], ...CHUDE_LIST.map((c) => [c, c, COUNT(c)])] as [ChuDeNhom | 'all', string, number][]).map(([ma, ten, n]) => {
+          const on = chuDe === ma;
           return (
-            <button key={c} onClick={() => { setChuDe(on ? 'all' : c); reset(); }}
-              className={`text-left rounded-2xl border p-3 sm:p-4 transition ${on ? 'border-[#C8A14B] bg-[#C8A14B]/10 ring-1 ring-[#C8A14B]/30' : 'border-slate-200 bg-white hover:border-[#C8A14B] hover:shadow-sm'}`}>
-              <div className="text-2xl leading-none">{CHUDE_META[c].icon}</div>
-              <div className="font-bold text-[#0A2540] mt-2 leading-tight">{c}</div>
-              <div className="text-[12px] text-slate-500 mt-1 leading-snug">{CHUDE_META[c].desc}</div>
-              <div className="text-[11px] font-semibold text-[#C8A14B] mt-2">{COUNT(c)} văn bản →</div>
+            <button key={ma} type="button" onClick={() => { setChuDe(ma); reset(); }}
+              className={`-mb-px shrink-0 whitespace-nowrap border-b-2 pb-2.5 text-[14px] font-bold transition ${on ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500 hover:text-[#0A2540]'}`}>
+              {ten} <span className={`font-semibold ${on ? 'text-red-600' : 'text-slate-400'}`}>{n.toLocaleString('vi-VN')}</span>
             </button>
           );
         })}
       </div>
 
-      <div ref={oTimRef} className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 shadow-sm mt-4 scroll-mt-20">
-        <div className="relative">
-          <svg viewBox="0 0 24 24" className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
-          <input value={q} onChange={(e) => { setQ(e.target.value); reset(); }} placeholder="Tìm theo số ký hiệu, trích yếu, cơ quan…" className="w-full pl-10 pr-3 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white outline-none focus:border-[#C8A14B] text-sm" />
-        </div>
-        <div className="flex flex-wrap gap-2 mt-2 items-center">
-          <SoXuong value={diaBan} onChange={(v) => { setDiaBan(v); reset(); }} w="w-full sm:w-auto sm:min-w-[210px]" opts={[['all', 'Tất cả địa giới hành chính'], ...DIA_BAN.map((x): [string, string] => [x, x])]} />
-          <SoXuong value={nam} onChange={(v) => { setNam(v); reset(); }} w="w-[calc(50%-4px)] sm:w-auto sm:min-w-[150px]" opts={[['all', 'Tất cả các năm'], ...YEARS.map((y): [string, string] => [y, `Năm ${y}`])]} />
-          <SoXuong value={thang} onChange={(v) => { setThang(v); reset(); }} w="w-[calc(50%-4px)] sm:w-auto sm:min-w-[150px]" opts={[['all', 'Tất cả các tháng'], ...Array.from({ length: 12 }, (_, i): [string, string] => [String(i + 1).padStart(2, '0'), `Tháng ${i + 1}`])]} />
-          <SoXuong value={coQuan} onChange={(v) => { setCoQuan(v); reset(); }} w="w-full sm:w-[280px]" opts={[['all', 'Tất cả cơ quan ban hành'], ...CO_QUAN.map(([c, n]): [string, string] => [c, `${c} (${n})`])]} />
-          {hasFilter && <button onClick={() => { setQ(''); setChuDe('all'); setNam('all'); setDiaBan('all'); setCoQuan('all'); setThang('all'); reset(); }} className="text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg px-3 py-2">✕ Xóa lọc</button>}
+      <div ref={oTimRef} className="mt-4 scroll-mt-20">
+        <form onSubmit={(e) => { e.preventDefault(); (document.activeElement as HTMLElement | null)?.blur(); }}
+          className="flex overflow-hidden rounded-lg border-2 border-[#0A2540] bg-white">
+          <span className="grid w-11 shrink-0 place-items-center text-slate-400">
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+          </span>
+          <input value={q} onChange={(e) => { setQ(e.target.value); reset(); }} placeholder="Số hiệu, trích yếu, cơ quan…" enterKeyHint="search"
+            className="h-12 min-w-0 flex-1 bg-transparent pr-2 text-[14px] text-slate-800 outline-none placeholder:text-slate-400" />
+          {/* Danh sách tự lọc ngay khi gõ — nút "Tìm" để quen tay khách (và cụp bàn phím trên điện thoại) */}
+          <button type="submit" className="shrink-0 bg-red-600 px-5 text-sm font-bold text-white hover:bg-red-700">Tìm</button>
+        </form>
+        <div className="mt-2 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
+          <SoXuong value={diaBan} onChange={(v) => { setDiaBan(v); reset(); }} w="w-full sm:w-auto sm:min-w-[200px]" opts={[['all', 'Địa giới hành chính'], ...DIA_BAN.map((x): [string, string] => [x, x])]} />
+          <SoXuong value={nam} onChange={(v) => { setNam(v); reset(); }} w="w-full sm:w-auto sm:min-w-[130px]" opts={[['all', 'Tất cả các năm'], ...YEARS.map((y): [string, string] => [y, `Năm ${y}`])]} />
+          <SoXuong value={thang} onChange={(v) => { setThang(v); reset(); }} w="w-full sm:w-auto sm:min-w-[130px]" opts={[['all', 'Tất cả các tháng'], ...Array.from({ length: 12 }, (_, i): [string, string] => [String(i + 1).padStart(2, '0'), `Tháng ${i + 1}`])]} />
+          <SoXuong value={coQuan} onChange={(v) => { setCoQuan(v); reset(); }} w="w-full sm:w-[260px]" opts={[['all', 'Cơ quan ban hành'], ...CO_QUAN.map(([c, n]): [string, string] => [c, `${c} (${n})`])]} />
+          {hasFilter && <button onClick={() => { setQ(''); setChuDe('all'); setNam('all'); setDiaBan('all'); setCoQuan('all'); setThang('all'); reset(); }} className="col-span-2 rounded-lg px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 sm:col-span-1">✕ Xóa lọc</button>}
         </div>
       </div>
 

@@ -18,17 +18,14 @@ export const metadata: Metadata = {
 export default function VanBanPage() {
   return (
     <div className="mx-auto max-w-7xl px-3 sm:px-6 py-5 sm:py-8">
-      {/* Tiêu đề + nhận diện thương hiệu (đồng bộ trang Cẩm nang) */}
-      <div className="flex items-center gap-3">
-        <span className="grid place-items-center w-11 h-11 rounded-2xl bg-[#0A2540] shrink-0">
-          <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="#C8A14B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" /><path d="M9 9h1M9 13h6M9 17h6" /></svg>
-        </span>
+      {/* MẪU 34 (chủ dự án chọn 7/10/2026): tiêu đề GỌN MỘT HÀNG — tiêu đề bên trái, nút chia sẻ bên phải, gạch dưới */}
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-slate-200 pb-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] leading-tight">Tra cứu văn bản</h1>
-          <p className="text-[13px] font-semibold text-[#C8A14B]">Cam Lâm Land · Văn bản Cam Lâm &amp; pháp luật nhà đất</p>
+          <h1 className="text-2xl font-extrabold leading-tight text-[#0A2540]">Tra cứu văn bản</h1>
+          <p className="mt-0.5 text-[13px] text-slate-500">Văn bản Cam Lâm &amp; pháp luật nhà đất · cập nhật hằng ngày</p>
         </div>
+        <ShareRow title="Tra cứu văn bản nhà đất Cam Lâm theo chủ đề" khongNhan />
       </div>
-      <ShareRow title="Tra cứu văn bản nhà đất Cam Lâm theo chủ đề" className="mt-3 mb-5" />
 
       <VanBanBrowser />
 

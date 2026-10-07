@@ -5,7 +5,8 @@ import { SITE as SITE_GOC } from '@/lib/tenMien';
 /** Nút chia sẻ (Facebook · Zalo · Chép link). GIAO DIỆN icon như cũ, nhưng:
  *  bấm Facebook/Zalo → nếu máy hỗ trợ sẽ mở BẢNG CHIA SẺ NATIVE (giống iPhone) cho đẹp;
  *  máy không hỗ trợ (thường là desktop) mới mở popup riêng của Facebook/Zalo. */
-export default function ShareRow({ title, className }: { title?: string; className?: string }) {
+// khongNhan: bỏ chữ "Chia sẻ:" (khi đứng cạnh tiêu đề trang, vd trang /van-ban mẫu 34)
+export default function ShareRow({ title, className, khongNhan }: { title?: string; className?: string; khongNhan?: boolean }) {
   const [copied, setCopied] = useState(false);
   const SITE = SITE_GOC;
   const url = () => { if (typeof window === 'undefined') return SITE; try { const u = new URL(window.location.href); u.searchParams.delete('embed'); return SITE + u.pathname + u.search + u.hash; } catch { return SITE; } };
@@ -25,7 +26,7 @@ export default function ShareRow({ title, className }: { title?: string; classNa
   const iconBtn = 'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition';
   return (
     <div className={`flex flex-wrap items-center gap-1.5 ${className || ''}`}>
-      <span className="text-[13px] font-semibold text-slate-500">Chia sẻ:</span>
+      {!khongNhan && <span className="text-[13px] font-semibold text-slate-500">Chia sẻ:</span>}
       <button onClick={fb} aria-label="Chia sẻ Facebook" title="Chia sẻ Facebook" className={`${iconBtn} bg-[#1877F2] text-white hover:brightness-110`}>
         <svg viewBox="0 0 24 24" fill="currentColor" className="h-[18px] w-[18px]"><path d="M22 12a10 10 0 1 0-11.5 9.9v-7H8v-2.9h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6v1.8h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z" /></svg>
       </button>

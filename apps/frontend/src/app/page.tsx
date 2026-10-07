@@ -129,17 +129,13 @@ const LIEN_KET_PHAP_LY: [string, string][] = [
   ['Giá đền bù, bồi thường đất', '/den-bu'],
   ['Mẫu hợp đồng đặt cọc', '/hop-dong-dat-coc'],
 ];
-// TÌM NGAY TẠI TRANG CHỦ (chủ dự án 7/10/2026): gõ là tìm (chờ 0,45 giây ngừng gõ), kết quả đẩy lên đầu cột phải
-// thay cho "văn bản mới" — qua GET /api/van-ban/tim (công khai, tối đa 6 văn bản). Bấm Enter / kính lúp trên
-// điện thoại thì cuộn xuống chỗ kết quả (cột phải nằm dưới khối này).
+// TÌM NGAY TẠI TRANG CHỦ (chủ dự án 7/10/2026): CHỈ tìm khi khách BẤM tìm (Enter / kính lúp) — không tự tìm lúc
+// đang gõ (chủ dự án chốt). Kết quả đẩy lên đầu cột phải thay cho "văn bản mới" — qua GET /api/van-ban/tim
+// (công khai, tối đa 6 văn bản). Điện thoại thì cuộn xuống chỗ kết quả (cột phải nằm dưới khối này).
 function KhoiTraCuuVanBan({ onTim, tuNgoai }: { onTim: (tu: string) => void; tuNgoai: string }) {
   const [tu, setTu] = useState('');
   // bấm "Bỏ tìm" bên cột phải → xoá luôn chữ trong ô
   useEffect(() => { if (!tuNgoai) setTu((x) => (x.trim().length >= 2 ? '' : x)); }, [tuNgoai]);
-  useEffect(() => {
-    const t = setTimeout(() => onTim(tu.trim().length >= 2 ? tu.trim() : ''), 450);
-    return () => clearTimeout(t);
-  }, [tu, onTim]);
   return (
     <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white lg:h-full">
       <img src="/cam-nang/so-hong.webp" alt="" loading="lazy" className="absolute inset-y-0 right-0 h-full w-2/3 object-cover" />

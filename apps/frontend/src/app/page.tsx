@@ -653,7 +653,9 @@ export default function Home() {
             <button key={t} onClick={() => setNewsTab(t)} className={`pb-2.5 text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${newsTab === t ? 'border-red-600 text-[#0A2540]' : 'border-transparent text-slate-500 hover:text-[#0A2540]'}`}>{t}</button>
           ))}
         </div>
-        <div className="grid lg:grid-cols-[1.05fr_1fr_0.62fr] gap-3 sm:gap-6">
+        {/* minmax(0,…): khoá độ rộng 3 cột. Để "1fr" trần thì cột quảng cáo tự nới ra khi quảng cáo có nhãn dài
+            → mỗi lần quảng cáo đổi, hai cột tra cứu bên trái bị co/giãn ~15px, nhìn như "giật" (8/10/2026). */}
+        <div className="grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)_minmax(0,0.62fr)] gap-3 sm:gap-6">
           {marketLoadingNow ? (
             <div className="lg:col-span-2 grid place-items-center min-h-[220px] text-slate-400 text-sm">
               <div className="text-center">

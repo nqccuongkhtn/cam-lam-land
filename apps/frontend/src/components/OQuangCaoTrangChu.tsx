@@ -123,7 +123,7 @@ function Kieu1({ ds, i }: { ds: OQc[]; i: number }) {
           <div className="aspect-[16/10] w-[108px] shrink-0 overflow-hidden rounded bg-slate-100"><AnhDt o={o} /></div>
           <div className="min-w-0 flex-1">
             <p className="text-[15px] font-bold leading-snug text-[#0A2540] line-clamp-2">{o.tieuDe}</p>
-            <p className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400"><span className="shrink-0 whitespace-nowrap rounded border border-slate-300 px-1 text-[10px] font-medium text-slate-500">Quảng cáo</span><span className="truncate">{o.nhan}</span></p>
+            <p className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400"><span className="shrink-0 whitespace-nowrap rounded border border-slate-300 px-1 text-[10px] font-medium text-slate-500">Quảng cáo</span><span className="min-w-0 truncate">{o.nhan}</span></p>
           </div>
         </div>
       </LinkDt>
@@ -177,7 +177,7 @@ function QcMayTinh({ ds, kieu = 'dong' }: { ds: OQc[]; kieu?: 'dong' | 'the' }) 
               <div className="aspect-[4/3] w-[104px] shrink-0 overflow-hidden rounded bg-slate-100"><AnhDt o={o} /></div>
               <div className="min-w-0 flex-1">
                 <p className="text-[15px] font-bold leading-snug text-[#0A2540] line-clamp-3 group-hover:text-red-600">{o.tieuDe}</p>
-                <p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-slate-400"><span className="shrink-0 whitespace-nowrap rounded border border-slate-300 px-1 text-[10px] font-medium text-slate-500">Quảng cáo</span><span className="truncate">{o.nhan}</span></p>
+                <p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-slate-400"><span className="shrink-0 whitespace-nowrap rounded border border-slate-300 px-1 text-[10px] font-medium text-slate-500">Quảng cáo</span><span className="min-w-0 truncate">{o.nhan}</span></p>
               </div>
             </div>
           </LinkDt>

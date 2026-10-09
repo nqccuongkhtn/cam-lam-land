@@ -1,0 +1,5 @@
+# Phiếu thật của người dân (có họ tên) — không đưa lên git
+du-lieu/
+*.jsonl
+kq_*.json
+cham.json

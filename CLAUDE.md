@@ -472,6 +472,16 @@ Khi bấm vào thửa ở **Nha Trang, Cam Ranh, Ninh Hoà…** thì MỌI đi�
 mảng lồng nhau → 310 MB còn 58 MB, backend 474 → 177 MB. **Giữ Float64, đừng hạ Float32** (lệch diện
 tích). Sửa phần này thì so kết quả cũ/mới trên vài trăm thửa thật, phải trùng từng chữ số.
 
+**Đối chiếu với phiếu chính thức (9/10/2026) — `scripts/kiem-tra-qh/`.** 78 phiếu kiểm tra QH / trích đo của
+VPĐK + Phòng Kinh tế (151 cặp phiếu × bản QH): đúng 98,4 % diện tích (93,5 % nếu tính cả tên gọi), 130/151 cặp
+khớp ±1 %. Sửa 2 lỗi trong `computeQhTheoBan` (bản phân khu): (1) **khe hở giữa các ô đất** (mặt nạ đường chỉ là
+nét mép đường nới 8 m nên đường rộng / nét đứt còn hở) bị ghi "ngoài phạm vi" → nay điểm bị ô đất bao quanh ≥6/8
+hướng trong 60 m (`biBaoQuanh`) = đất giao thông; thửa nằm trọn trong đường không còn mất cả dòng QH;
+(2) **"ô trùm"** — vùng tô vẽ trùm qua nhiều lô LẪN đường (vd QĐ2076 'Nhà ở chung cư' 5,7 ha) → điểm trong
+mặt nạ đường + chỉ thuộc ô trùm + bị lô thật bao quanh = đất giao thông. Sông/suối/mặt nước KHÔNG bao giờ là
+ô trùm. Kiểm 1.000 thửa ngẫu nhiên: 77 thửa đổi, soi 17 thửa trên nét CAD gốc đều đúng. Sửa phần này thì chạy
+lại bộ kiểm, không được có phiếu nào tệ đi.
+
 **Dữ liệu bắt buộc phải có:** `apps/backend/data/qh_zones.json`, `road_mask.bin`, `road_mask.json`
 (đường dẫn đọc theo `QH_DATA_DIR`, mặc định `<thư mục chạy>/data`; trong container là `/app/apps/backend/data`).
 Các file này **có trong git** (~1.9MB + 1.6MB). Thiếu chúng thì backend vẫn chạy nhưng tự tụt xuống cách B —

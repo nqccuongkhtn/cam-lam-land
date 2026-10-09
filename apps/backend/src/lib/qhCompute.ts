@@ -117,18 +117,59 @@ class KhoO {
 
   /** Ô đất CHỨA điểm: ưu tiên bậc cao (QH>HT); cùng bậc lấy ô NHỎ nhất (cụ thể nhất). */
   chua(x: number, y: number): string | null {
+    const k = this.chuaK(x, y);
+    return k < 0 ? null : this.tenLoai[this.loai[k]];
+  }
+
+  // "Ô TRÙM" = ô chứa trọn từ 2 ô khác trở lên (đường bao cả một khu, vẽ trùm qua các lô VÀ các con đường
+  // giữa chúng). Chỉ đánh dấu khi gọi danhDauTrum(); QĐ205 không gọi nên không đổi gì.
+  trum: Uint8Array | null = null;
+  danhDauTrum(): number {
+    const t = new Uint8Array(this.n); let soTrum = 0;
+    for (let i = 0; i < this.n; i++) {
+      // Sông suối / mặt nước KHÔNG BAO GIỜ là ô trùm: vùng nước hay ôm cồn bãi bên trong (nên trông như "chứa ô khác"),
+      // và đường men theo suối sẽ biến mặt nước thành "đất giao thông" — đã thấy ở 3 thửa QĐ2076/QĐ918 (9/10/2026).
+      if (/sông|suối|mặt nước|hồ|ao|kênh|rạch|biển/i.test(this.tenLoai[this.loai[i]])) continue;
+      const q = i * 4, con = new Set<number>(), daXet = new Set<number>();
+      const gx0 = Math.floor(this.bb[q] / CELL), gx1 = Math.floor(this.bb[q + 2] / CELL);
+      const gy0 = Math.floor(this.bb[q + 1] / CELL), gy1 = Math.floor(this.bb[q + 3] / CELL);
+      for (let gx = gx0; gx <= gx1 && con.size < 2; gx++) for (let gy = gy0; gy <= gy1 && con.size < 2; gy++) {
+        const c = this.o(gx, gy); if (c < 0) continue;
+        for (let s = this.oDau[c], het = this.oDau[c + 1]; s < het; s++) {
+          const j = this.oDs[s];
+          if (j === i || daXet.has(j)) continue;
+          daXet.add(j);   // một ô con chạm nhiều ô lưới — chỉ xét một lần
+          if (this.dien[j] >= this.dien[i] * 0.8) continue;
+          const r = j * 4;
+          if (this.bb[r] < this.bb[q] || this.bb[r + 2] > this.bb[q + 2] || this.bb[r + 1] < this.bb[q + 1] || this.bb[r + 3] > this.bb[q + 3]) continue;
+          let het2 = true;
+          // thử tối đa 16 đỉnh rải đều (đủ để biết ô con nằm trọn trong hay không; thử hết thì quá chậm với ô vài nghìn đỉnh)
+          const sv = this.dau[j], ev = this.dau[j + 1], buoc = Math.max(1, Math.floor((ev - sv) / 16));
+          for (let v = sv; v < ev && het2; v += buoc) if (!this.trong(i, this.xy[2 * v], this.xy[2 * v + 1]) && this.d2Vien(i, this.xy[2 * v], this.xy[2 * v + 1]) > 1e-12) het2 = false;
+          if (het2) con.add(j);
+        }
+      }
+      if (con.size >= 2) { t[i] = 1; soTrum++; }
+    }
+    this.trum = t;
+    return soTrum;
+  }
+
+  /** Như chua() nhưng trả SỐ THỨ TỰ ô (-1 = không có). boTrum = bỏ qua các ô trùm. */
+  chuaK(x: number, y: number, boTrum = false): number {
     const c = this.o(Math.floor(x / CELL), Math.floor(y / CELL));
-    if (c < 0) return null;
-    let bt = -1, bar = Infinity, blo = -1;
+    if (c < 0) return -1;
+    let bt = -1, bar = Infinity, bk = -1;
     for (let t = this.oDau[c], het = this.oDau[c + 1]; t < het; t++) {
       const k = this.oDs[t];
+      if (boTrum && this.trum && this.trum[k]) continue;
       if (this.bac[k] < bt) continue;
       const q = k * 4;
       if (x < this.bb[q] || x > this.bb[q + 2] || y < this.bb[q + 1] || y > this.bb[q + 3]) continue;
       if (!this.trong(k, x, y)) continue;
-      if (this.bac[k] > bt || this.dien[k] < bar) { bt = this.bac[k]; bar = this.dien[k]; blo = this.loai[k]; }
+      if (this.bac[k] > bt || this.dien[k] < bar) { bt = this.bac[k]; bar = this.dien[k]; bk = k; }
     }
-    return blo < 0 ? null : this.tenLoai[blo];
+    return bk;
   }
 }
 
@@ -311,7 +352,7 @@ export function outerRing(geom: any): number[][] | null {
 // bản vẽ (bản vẽ chỉ tô ô đất, phần đường để trắng). Đo thật trên 43 thửa QĐ2101: có mặt nạ thì
 // tỉ lệ phủ trung bình lên 91,8% → 99,7%, số thửa phủ đủ 100% lên 28 → 39.
 interface MatNa { buf: Buffer; x0: number; y0: number; x1: number; y1: number; W: number; H: number; rb: number; }
-interface BanQh { ma: string; ten: string; kho: KhoO; na: MatNa | null; }
+interface BanQh { ma: string; ten: string; kho: KhoO; na: MatNa | null; khung: [number, number, number, number]; }
 const BAN_KHAC: BanQh[] = [];
 
 for (const b of [
@@ -336,8 +377,16 @@ for (const b of [
       na = { buf: fs.readFileSync(path.join(DATA_DIR, `road_mask_${b.ma}.bin`)),
              x0: m.x0, y0: m.y0, x1: m.x1, y1: m.y1, W: m.W, H: m.H, rb: m.rowbytes };
     } catch { na = null; }   // chưa có mặt nạ thì thôi, chỉ là phần trăm phủ thấp hơn
-    BAN_KHAC.push({ ma: b.ma, ten: b.ten, kho, na });
-    console.log(`[qhCompute] nạp bản ${b.ma}: ${kho.n} ô đất${na ? ` + mặt nạ đường ${na.W}x${na.H}` : ' (chưa có mặt nạ đường)'}`);
+    // Bản phân khu (có mặt nạ đường) mới đánh dấu ô trùm — xem chỗ dùng trong computeQhTheoBan.
+    const soTrum = na ? kho.danhDauTrum() : 0;
+    // Khung bao mọi ô đất của bản — để bỏ qua sớm bản ở xa thửa (xem computeQhTheoBan)
+    const khung: [number, number, number, number] = [Infinity, Infinity, -Infinity, -Infinity];
+    for (let k = 0; k < kho.n; k++) {
+      khung[0] = Math.min(khung[0], kho.bb[k * 4]); khung[1] = Math.min(khung[1], kho.bb[k * 4 + 1]);
+      khung[2] = Math.max(khung[2], kho.bb[k * 4 + 2]); khung[3] = Math.max(khung[3], kho.bb[k * 4 + 3]);
+    }
+    BAN_KHAC.push({ ma: b.ma, ten: b.ten, kho, na, khung });
+    console.log(`[qhCompute] nạp bản ${b.ma}: ${kho.n} ô đất${na ? ` + mặt nạ đường ${na.W}x${na.H} · ${soTrum} ô trùm` : ' (chưa có mặt nạ đường)'}`);
   } catch {
     console.log(`[qhCompute] chưa có ${b.tep} — bỏ qua bản ${b.ma}`);
   }
@@ -358,6 +407,34 @@ function duongBan(b: BanQh, x: number, y: number): boolean {
   return !!((m.buf[gy * m.rb + (gx >> 3)] >> (7 - (gx & 7))) & 1);
 }
 
+// Điểm KHÔNG thuộc ô đất nào, cũng không dính mặt nạ đường — nhưng có bị Ô ĐẤT CỦA CHÍNH BẢN ĐÓ BAO QUANH không?
+// Nhìn ra 8 hướng, mỗi hướng dò tới 60 m: từ 6 hướng trở lên gặp ô đất ⇒ điểm nằm lọt giữa các khu đất
+// ⇒ là hành lang đường (bản vẽ phân khu chỉ tô ô đất, đường để trắng) ⇒ "Đất giao thông".
+// Còn điểm ở rìa bản vẽ thì phía ngoài trống trơn, ít hướng gặp ô đất ⇒ vẫn là "ngoài phạm vi".
+// VÌ SAO CẦN (9/10/2026): mặt nạ đường dựng bằng cách nới nét mép đường thêm 8 m, nên đường rộng
+// (QL1A lộ giới 51 m) và chỗ nét vẽ đứt còn KHE HỞ. Đối chiếu 3 phiếu kiểm tra quy hoạch chính thức
+// (VPĐK / Phòng Kinh tế): khe hở đó cán bộ đều tính là đất giao thông, web lại ghi "ngoài phạm vi"
+// (QĐ2101 51,1 m² · QĐ918 119,1 m² · QĐ2222 12,4 m²). Cũng nhờ nó, thửa nằm TRỌN trong lòng đường
+// không còn bị mất cả dòng quy hoạch (trước đây bản nào không có điểm rơi vào ô đất thật là bị bỏ).
+const BAO_HUONG: [number, number][] = [[1, 0], [-1, 0], [0, 1], [0, -1], [0.7071, 0.7071], [-0.7071, 0.7071], [0.7071, -0.7071], [-0.7071, -0.7071]];
+const DO_BUOC = 3 / 111000, DO_XA = 60 / 111000;   // bước dò 3 m, dò tối đa 60 m (độ, xấp xỉ ở vĩ độ Cam Lâm)
+function biBaoQuanh(b: BanQh, x: number, y: number, boTrum = false): boolean {
+  // Kiểm nhanh: trong phạm vi dò không có ô đất nào của bản thì khỏi dò 8 hướng
+  let coGan = false;
+  for (let gx = Math.floor((x - DO_XA) / CELL); gx <= Math.floor((x + DO_XA) / CELL) && !coGan; gx++)
+    for (let gy = Math.floor((y - DO_XA) / CELL); gy <= Math.floor((y + DO_XA) / CELL) && !coGan; gy++) if (b.kho.coO(gx, gy)) coGan = true;
+  if (!coGan) return false;
+  let gap = 0;
+  for (let h = 0; h < 8; h++) {
+    const [dx, dy] = BAO_HUONG[h];
+    for (let r = DO_BUOC; r <= DO_XA; r += DO_BUOC) {
+      if (b.kho.chuaK(x + dx * r, y + dy * r, boTrum) >= 0) { gap++; break; }
+    }
+    if (gap + (7 - h) < 6) return false;   // các hướng còn lại có gặp hết cũng không đủ 6 → thôi
+  }
+  return gap >= 6;
+}
+
 // Nhãn do scripts/qh-pipeline/5-tao-qh-zones.py gắn cho ô mà BẢN VẼ KHÔNG GHI loại đất.
 // Trước đây mấy ô này bị vứt hẳn khỏi dữ liệu, để lại LỖ TRỐNG giữa bản đồ — riêng QĐ893 thủng
 // 4.846 ô (~8.861 ha). Hậu quả: thửa nào rơi phần lớn vào lỗ thì tỉ lệ phủ tụt xuống dưới ngưỡng
@@ -375,18 +452,44 @@ export function computeQhTheoBan(ring: number[][], dienTich: number): KetQuaBan[
   let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
   for (const c of ring) { if (c[0] < minx) minx = c[0]; if (c[0] > maxx) maxx = c[0]; if (c[1] < miny) miny = c[1]; if (c[1] > maxy) maxy = c[1]; }
   const N = 44;
+  // Chỉ xét bản có ô đất trong vòng DO_XA quanh thửa — bản ở xa hơn không thể có điểm rơi vào ô đất
+  // hay bị bao quanh, nên kết quả y hệt mà đỡ dò vô ích (trước đây vòng lặp chạy qua đủ 8 bản cho mọi điểm).
+  const BAN = BAN_KHAC.filter((b) => !(b.khung[0] > maxx + DO_XA || b.khung[2] < minx - DO_XA || b.khung[1] > maxy + DO_XA || b.khung[3] < miny - DO_XA));
   const dem: Record<string, Record<string, number>> = {};
   const demO: Record<string, number> = {};   // số điểm rơi vào Ô ĐẤT THẬT của từng bản
+  const demBao: Record<string, number> = {}; // số điểm lọt giữa các ô đất (khe hở hành lang đường) — xem biBaoQuanh
+  const mauDuong: Record<string, number[][]> = {};
+  // Nhớ kết quả dò theo ô lưới 3 m: các điểm mẫu sát nhau dùng chung, khỏi dò lại 8 hướng.
+  const nhoBao = new Map<string, boolean>();
+  const baoQuanh = (b: BanQh, x: number, y: number, boTrum = false) => {
+    const k = `${b.ma}|${boTrum ? 1 : 0}|${Math.round(x / DO_BUOC)}|${Math.round(y / DO_BUOC)}`;
+    let v = nhoBao.get(k);
+    if (v === undefined) { v = biBaoQuanh(b, x, y, boTrum); nhoBao.set(k, v); }
+    return v;
+  };
   let ins = 0;
   for (let iy = 0; iy < N; iy++) for (let ix = 0; ix < N; ix++) {
     const x = minx + (maxx - minx) * (ix + 0.5) / N, y = miny + (maxy - miny) * (iy + 0.5) / N;
     if (!pip(x, y, ring)) continue;
     ins++;
-    for (const b of BAN_KHAC) {
+    for (const b of BAN) {
       // Ô đất trước; không thuộc ô nào thì hỏi mặt nạ đường của CHÍNH bản đó (không mượn bản khác).
-      const o = landAtBan(b, x, y);
+      const k = b.kho.chuaK(x, y);
+      let o = k < 0 ? null : b.kho.tenLoai[b.kho.loai[k]];
+      // Điểm chỉ rơi vào Ô TRÙM (đường bao cả khu, vẽ trùm qua lô lẫn đường) mà lại nằm trong lòng đường
+      // VÀ bị các lô thật bao quanh → là con đường giữa các lô, không phải đất của ô trùm.
+      // Đối chiếu phiếu chính thức (9/10/2026): thửa 3138/3139 Cam Hòa, ô 'Nhà ở chung cư' 5,7 ha của
+      // QĐ2076 trùm qua đường → web ghi 190 m² chung cư, cán bộ ghi 191,8 m² đất giao thông.
+      if (o && b.kho.trum?.[k] && duongBan(b, x, y) && baoQuanh(b, x, y, true)) o = 'Đất giao thông';
       if (o) demO[b.ma] = (demO[b.ma] || 0) + 1;
-      const lo = o || (duongBan(b, x, y) ? 'Đất giao thông' : null);
+      let lo = o;
+      if (!lo && duongBan(b, x, y)) {
+        lo = 'Đất giao thông';
+        // giữ vài điểm lòng đường làm mẫu — thửa nằm trọn trong đường thì dùng chúng để chứng minh bản có phủ tới
+        if ((mauDuong[b.ma] ||= []).length < 5) mauDuong[b.ma].push([x, y]);
+      } else if (!lo && b.na && baoQuanh(b, x, y)) {
+        lo = 'Đất giao thông'; demBao[b.ma] = (demBao[b.ma] || 0) + 1;
+      }
       if (!lo) continue;
       (dem[b.ma] ||= {})[lo] = ((dem[b.ma] || {})[lo] || 0) + 1;
     }
@@ -399,7 +502,10 @@ export function computeQhTheoBan(ring: number[][], dienTich: number): KetQuaBan[
     // Mặt nạ đường có vùng đệm ~220m quanh bản vẽ; thửa nằm HẲN NGOÀI bản mà chỉ lọt vào
     // vùng đệm sẽ ra 'Đất giao thông' phủ kín cả thửa — sai mà nhìn y như thật, đúng cái
     // bẫy đã từng làm mọi thửa ở Nha Trang hiện 'Đất giao thông'.
-    if (!d || !demO[b.ma]) continue;
+    // Ngoại lệ: không điểm nào trúng ô đất nhưng có điểm LỌT GIỮA các ô đất của bản này (thửa nằm trọn
+    // trong lòng đường) — bị bao quanh thì chắc chắn nằm trong bản vẽ, khác hẳn vùng đệm rìa bản.
+    if (d && !demO[b.ma] && !demBao[b.ma] && (mauDuong[b.ma] || []).some(([x, y]) => baoQuanh(b, x, y))) demBao[b.ma] = 1;
+    if (!d || (!demO[b.ma] && !demBao[b.ma])) continue;
     // ⛔ ĐÃ BỎ luật "phủ dưới 20% thì không liệt kê".
     // Luật đó GIẤU LUÔN cả bản quy hoạch, mà giấu thì người tra cứu không hề biết là có thứ bị
     // giấu — nguy hiểm hơn hẳn cái nó định tránh. Nó cũng đo sai bản chất: thửa tờ 24 thửa 34

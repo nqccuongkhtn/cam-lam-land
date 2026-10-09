@@ -25,7 +25,7 @@ const JSONLD = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
   applicationName: 'Cam Lâm Land',
-  title: { default: 'Cam Lâm Land — Mua bán nhà đất & Bản đồ quy hoạch Cam Lâm, Khánh Hòa', template: '%s | Cam Lâm Land' },
+  title: { default: 'Cam Lâm Land | Nhà đất Khánh Hòa', template: '%s | Cam Lâm Land' },
   description: 'Sàn bất động sản Cam Lâm, Khánh Hòa: mua bán nhà đất, đất nền ven biển Bãi Dài, tra cứu bản đồ quy hoạch và giá đất khu vực. Tin đăng cập nhật mỗi ngày.',
   keywords: ['bất động sản Cam Lâm', 'nhà đất Cam Lâm', 'đất nền Cam Lâm', 'mua bán nhà đất Khánh Hòa', 'bản đồ quy hoạch Cam Lâm', 'đất Bãi Dài', 'Cam Đức', 'Cam Hải Đông', 'sân bay Cam Ranh'],
   alternates: { canonical: '/' },

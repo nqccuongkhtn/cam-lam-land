@@ -5,6 +5,7 @@ import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import { api, apiBase as API_BASE } from '@/lib/api';
 import { getToken } from '@/lib/token';
+import { deEnt } from '@/lib/deEnt';   // làm sạch + giải mã chữ HTML — dùng chung với trang chủ
 import { CHUDE_LIST, CHUDE_META, type ChuDeNhom } from '../data';
 
 type Doc = { id: number; soKyHieu: string; trichYeu: string; ngay: string; coQuan: string; chuDe: string; linhVuc: string; nguon: string; linkGoc: string; luotTai: number; noiBat: boolean; coFile?: boolean; canKiemTra?: string | null };
@@ -14,13 +15,6 @@ const empty: Form = { soKyHieu: '', trichYeu: '', ngay: '', coQuan: '', chuDe: '
 const PER = 15;
 const CHUDE_COLOR: Record<string, string> = { 'Quy hoạch': 'bg-emerald-50 text-emerald-700', 'Bồi thường': 'bg-amber-50 text-amber-700', 'Tái định cư': 'bg-violet-50 text-violet-700', 'Nhà ở xã hội': 'bg-sky-50 text-sky-700', 'Khác': 'bg-slate-100 text-slate-600' };
 const kd = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
-const deEnt = (s: string) => (s || '')
-  .replace(/data:[^\s"'<>]+/gi, ' ')                 // xoá chuỗi data:image;base64,... (mã QR nhúng)
-  .replace(/<[^>]*>/g, ' ').replace(/[<>]/g, ' ')    // lột thẻ HTML + ký tự lẻ
-  .replace(/&#(\d+);/g, (_, n) => { try { return String.fromCodePoint(Number(n)); } catch { return ''; } })
-  .replace(/&#x([0-9a-fA-F]+);/gi, (_, h) => { try { return String.fromCodePoint(parseInt(h, 16)); } catch { return ''; } })
-  .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ')
-  .replace(/\s+/g, ' ').trim();
 const fmtNgay = (iso: string) => { if (!iso) return ''; const [y, m, d] = iso.split('-'); return `${d}/${m}/${y}`; };
 const pageWindow = (cur: number, total: number): (number | '…')[] => {
   const out: (number | '…')[] = [];

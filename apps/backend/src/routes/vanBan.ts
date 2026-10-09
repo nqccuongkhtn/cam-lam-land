@@ -7,7 +7,7 @@ import { laNguoiThat, capVe, veHopLe } from '../lib/turnstile.ts';
 import { coVaiTro } from '../lib/auth.ts';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { mkdir, readFile, writeFile, rm, readdir } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, rm, readdir, rename } from 'node:fs/promises';
 
 export const vanBanRouter = Router();
 const UA = { 'User-Agent': 'Mozilla/5.0 (compatible; CamLamLand/1.0)' };
@@ -81,13 +81,35 @@ function classify(t: string): string {
   if (/(định giá|giá đất|bảng giá)/i.test(t)) return 'Định giá đất';
   return 'Khác';
 }
-const clean = (s: string) => String(s || '')
+// Bảng đổi "mã chữ HTML" dạng TÊN (&aacute; = á …) — nguồn nhà nước hay xuất kiểu này.
+const TEN_MA_HTML: Record<string, string> = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ',
+  ndash: '–', mdash: '—', hellip: '…', lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”', laquo: '«', raquo: '»', middot: '·', bull: '•', deg: '°',
+  agrave: 'à', aacute: 'á', acirc: 'â', atilde: 'ã', egrave: 'è', eacute: 'é', ecirc: 'ê', igrave: 'ì', iacute: 'í',
+  ograve: 'ò', oacute: 'ó', ocirc: 'ô', otilde: 'õ', ugrave: 'ù', uacute: 'ú', yacute: 'ý',
+  Agrave: 'À', Aacute: 'Á', Acirc: 'Â', Atilde: 'Ã', Egrave: 'È', Eacute: 'É', Ecirc: 'Ê', Igrave: 'Ì', Iacute: 'Í',
+  Ograve: 'Ò', Oacute: 'Ó', Ocirc: 'Ô', Otilde: 'Õ', Ugrave: 'Ù', Uacute: 'Ú', Yacute: 'Ý',
+};
+// Giải mã chữ HTML: dạng số (&#253;), số hex (&#xFD;) và dạng tên (&aacute;).
+// Chạy lặp tối đa 3 lượt vì có nguồn mã hoá HAI LẦN ("&amp;#253;" → "&#253;" → "ý") — trước đây chỉ giải 1 lượt
+// nên 7 văn bản Công báo lưu vào kho chữ "quản l&#253;", hiện sai và gõ chữ có dấu tìm không ra (9/10/2026).
+const giaiMaHtml = (s: string) => {
+  let t = s;
+  for (let i = 0; i < 3 && t.includes('&'); i++) {
+    const truoc = t;
+    t = t
+      .replace(/&#(\d+);/g, (m, n) => { const c = Number(n); return c > 0 && c <= 0x10FFFF ? String.fromCodePoint(c) : m; })
+      .replace(/&#x([0-9a-fA-F]+);/gi, (m, h) => { const c = parseInt(h, 16); return c > 0 && c <= 0x10FFFF ? String.fromCodePoint(c) : m; })
+      .replace(/&([a-zA-Z][a-zA-Z0-9]*);/g, (m, ten) => (Object.prototype.hasOwnProperty.call(TEN_MA_HTML, ten) ? TEN_MA_HTML[ten] : m));
+    if (t === truoc) break;
+  }
+  return t;
+};
+const clean = (s: string) => giaiMaHtml(String(s || '')
   .replace(/data:[^\s"'<>]+/gi, ' ')                 // xoá chuỗi data:image;base64,... (mã QR/ảnh nhúng)
   .replace(/<[^>]*>/g, ' ')                          // lột thẻ HTML hoàn chỉnh
-  .replace(/[<>]/g, ' ')                             // dọn ký tự < > lẻ còn sót (do thuộc tính lồng nhau)
-  .replace(/&#(\d+);/g, (_, n) => { try { return String.fromCodePoint(Number(n)); } catch { return ''; } })
-  .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => { try { return String.fromCodePoint(parseInt(h, 16)); } catch { return ''; } })
-  .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ')
+  .replace(/[<>]/g, ' '))                            // dọn ký tự < > lẻ còn sót (do thuộc tính lồng nhau)
+  .normalize('NFC')                                  // gộp chữ "tách dấu" (dấu gõ rời khỏi chữ) về chữ liền dấu — không thì tìm kiếm / so trùng số hiệu bị trượt
   .replace(/\s+/g, ' ').trim();
 // Trích đúng SỐ KÝ HIỆU (vd 185/NQ-HĐND, 2549/QĐ-UBND) từ chuỗi đã làm sạch — tránh dính đuôi rác/lặp.
 const soOf = (s: string) => {
@@ -431,7 +453,7 @@ export async function taiSanFile(): Promise<number> {
   try {
     for (const f of await readdir(KHO_DRIVE).catch(() => [] as string[])) {
       const cu = /^vb-/.test(f) && !f.startsWith(`vb-${PHIEN_BAN_FILE}-`);
-      const tam = /^(nen-|tam-)/.test(f) || /^[\w-]{20,}\.pdf$/.test(f);   // file tạm + bản Drive chưa nén của bản đầu
+      const tam = /^(nen-|tam-)/.test(f) || /\.tam-\d+$/.test(f) || /^[\w-]{20,}\.pdf$/.test(f);   // file tạm + bản Drive chưa nén của bản đầu
       if (cu || tam) { await rm(`${KHO_DRIVE}/${f}`, { force: true }); n++; }
     }
     if (n) console.log(`[van-ban] dọn kho file văn bản: xoá ${n} file cũ`);
@@ -571,15 +593,28 @@ async function taiBoQuaChungChi(u: string, ref: string, lan = 0): Promise<Buffer
   });
 }
 const dangLay = new Map<number, Promise<Buffer | null>>();   // nhiều người bấm cùng lúc một văn bản → chỉ tải 1 lần
+/** Nén ngầm một file đã lưu: ghi ra file tạm rồi đổi tên (đổi tên là tức thì → người đang đọc không bao giờ gặp file dở). */
+const dangNen = new Set<string>();
+function nenNgam(f: string, buf: Buffer) {
+  if (dangNen.has(f)) return; dangNen.add(f);
+  (async () => {
+    const nen = await nenPdf(buf);
+    if (nen.length < buf.length) { const tam = `${f}.tam-${Date.now()}`; await writeFile(tam, nen); await rename(tam, f); }
+  })().catch(() => {}).finally(() => dangNen.delete(f));
+}
 export function layFileVb(id: number, link: string | null): Promise<Buffer | null> {
   const f = `${KHO_DRIVE}/vb-${PHIEN_BAN_FILE}-${id}.pdf`;
   if (dangLay.has(id)) return dangLay.get(id)!;
   const p = (async () => {
     try { return await readFile(f); } catch { /* chưa có */ }
     const goc = await layFileGoc(link); if (!goc) return null;
-    const nen = await nenPdf(await ganDauBanQuyen(goc));
-    await mkdir(KHO_DRIVE, { recursive: true }); await writeFile(f, nen).catch(() => {});
-    return nen;
+    // NGƯỜI ĐẦU TIÊN KHÔNG PHẢI CHỜ NÉN (9/10/2026): đóng dấu xong là lưu + trả ngay (đóng dấu chỉ ~1 giây);
+    // việc nén (ghostscript, có file mất 5–10 giây) chạy NGẦM sau đó, nén xong thì thay bản trong kho
+    // → người sau nhận bản nhẹ, ổ đĩa vẫn chỉ giữ bản đã nén. Vẫn đúng ý "chỉ tải khi có người mở lần đầu".
+    const dau = await ganDauBanQuyen(goc);
+    await mkdir(KHO_DRIVE, { recursive: true }); await writeFile(f, dau).catch(() => {});
+    nenNgam(f, dau);
+    return dau;
   })().finally(() => dangLay.delete(id));
   dangLay.set(id, p); return p;
 }

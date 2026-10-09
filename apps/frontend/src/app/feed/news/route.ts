@@ -514,6 +514,22 @@ export async function GET(req: Request) {
   // Trang ĐỌC BÀI (/tin-tuc/[id]) vẫn gọi không kèm tham số để lấy đủ toàn văn.
   // Bài NGUỒN ẨN DANH: KHÔNG bao giờ trả đường dẫn gốc ra ngoài (url rỗng, nguồn = Cam Lâm Land).
   const ra = store.map((a: any) => (a.anDanh ? { ...a, url: '', source: 'Cam Lâm Land' } : a));
+  // ?slug=…: CHỈ MỘT BÀI + 8 tin liên quan bản gọn (9/10/2026). Trước đây trang đọc bài tải cả kho ~600 bài
+  // (3,5 MB trên điện thoại, 3–4 giây) chỉ để lấy 1 bài. Không có bài mà kho đã nạp xong → 404 thật
+  // (bài quá hạn lưu 30 ngày) để trang đọc trả "không tồn tại" cho Google. Kho chưa nạp xong (máy chủ vừa dựng lại)
+  // → 503 "thử lại sau", tuyệt đối không báo 404 oan.
+  const slugHoi = new URL(req.url).searchParams.get('slug');
+  if (slugHoi) {
+    const i = ra.findIndex((x: any) => x.slug === slugHoi);
+    const sanSang = store.length > PINNED.length;
+    if (i < 0) return NextResponse.json({ bai: null }, { status: sanSang ? 404 : 503 });
+    const bai = ra[i];
+    // Tin liên quan: ưu tiên cùng nhóm (Cam Lâm/Khánh Hòa với nhau), mới trước; chỉ gửi phần cần hiện (tiêu đề, ảnh, slug)
+    const lienQuan = ra.filter((x: any, k: number) => k !== i && x.slug && !x.pin)
+      .sort((x: any, y: any) => (Math.min(y.tier || 0, 1) === Math.min(bai.tier || 0, 1) ? 1 : 0) - (Math.min(x.tier || 0, 1) === Math.min(bai.tier || 0, 1) ? 1 : 0))
+      .slice(0, 8).map((x: any) => ({ slug: x.slug, title: x.title, image: x.image || null, publishedAt: x.publishedAt }));
+    return NextResponse.json({ bai, lienQuan });
+  }
   if (new URL(req.url).searchParams.get('gon') === '1') {
     return NextResponse.json({ news: ra.map(({ body, images, ...gon }: any) => gon) });
   }
@@ -543,6 +559,23 @@ async function vietLaiAnDanh(a: any): Promise<void> {
   a.slug = `${vnSlug(tieuDe) || 'tin'}-${shortHash(a.url)}`;
 }
 
+/* ── LỌC TIN TRÙNG (9/10/2026) ── nhiều báo đăng cùng một sự kiện, tiêu đề chỉ khác vài chữ
+   ("…lo bị phạt oan" / "…lo bị đánh thuế nhầm"). So TẬP TỪ của tiêu đề sau khi bỏ dấu:
+   giống TRÊN 80% (2×số từ chung / tổng số từ) thì coi là một tin, chỉ giữ một bài.
+   Đo trên 605 bài thật: ngưỡng này bắt đúng các cặp trùng mà không gộp nhầm "Khai mạc…" với "Bế mạc…" (đúng 80%). */
+const tuKhoa = (t: string) => new Set(String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd')
+  .toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter(Boolean));
+function giongNhau(a: Set<string>, b: Set<string>): boolean {
+  if (!a.size || !b.size) return false;
+  let chung = 0; for (const w of a) if (b.has(w)) chung++;
+  return (2 * chung) / (a.size + b.size) > 0.8;
+}
+/** Chữ "tách dấu" (NFD — hay gặp ở bài chép từ máy Mac/Word) nhìn y hệt nhưng tìm kiếm & so trùng bị trượt → gộp về NFC. */
+function chuanChu(a: any) {
+  for (const k of ['title', 'summary', 'body']) if (typeof a[k] === 'string') a[k] = a[k].normalize('NFC');
+  return a;
+}
+
 async function refreshFeed(slot: number): Promise<void> {
   const results = await Promise.allSettled(SOURCES.map(fetchSource));
   const fetched: any[] = [];
@@ -550,7 +583,17 @@ async function refreshFeed(slot: number): Promise<void> {
   const byUrl = new Map<string, any>(store.map((a) => [a.url, a]));
   // Ưu tiên xử lý (tải bài + viết lại) tin Cam Lâm/Khánh Hòa TRƯỚC để "Tin nổi bật" luôn có tin thật.
   fetched.sort((a, b) => (b.tier || 0) - (a.tier || 0) || +new Date(b.publishedAt) - +new Date(a.publishedAt));
-  const fresh = fetched.filter((a) => !byUrl.has(a.url)).slice(0, FRESH_CAP);
+  fetched.forEach(chuanChu);
+  // Bài mới trùng sự kiện với bài đã có (hoặc với bài mới khác vừa chọn) → bỏ luôn, đỡ tốn lượt AI viết lại.
+  const daCo = [...byUrl.values()].map((a) => tuKhoa(a.title));
+  const fresh: any[] = [];
+  for (const a of fetched) {
+    if (fresh.length >= FRESH_CAP) break;
+    if (byUrl.has(a.url)) continue;
+    const k = tuKhoa(a.title);
+    if (!a.anDanh && daCo.some((x) => giongNhau(k, x))) continue;
+    daCo.push(k); fresh.push(a);
+  }
   await Promise.allSettled(fresh.map(async (a) => {
     if (a.anDanh) return vietLaiAnDanh(a);
     const art = await fetchArticle(a.url);
@@ -605,6 +648,17 @@ async function refreshFeed(slot: number): Promise<void> {
     .filter((a) => !a.pin && a.slug && (!a.anDanh || a.aiOk) && +new Date(a.publishedAt) >= (a.anDanh ? Date.now() - 365 * 86400000 : (a.tier || 0) >= 1 ? localKeep : thangTruoc))
     .sort((a, b) => (b.local ? 1 : 0) - (a.local ? 1 : 0) || +new Date(b.publishedAt) - +new Date(a.publishedAt))
     .slice(0, 600);
+  // Dọn trùng trong kho cũ (bài về TRƯỚC khi có bộ lọc). Giữ bài đứng trước (tin địa phương, mới hơn);
+  // riêng bài sau đã được AI biên tập mà bài trước chưa thì giữ bài đã biên tập.
+  const giu: any[] = [], khoa: Set<string>[] = [];
+  for (const a of rotating) {
+    chuanChu(a);
+    const k = tuKhoa(a.title);
+    const i = a.anDanh ? -1 : khoa.findIndex((x, j) => !giu[j].anDanh && giongNhau(k, x));
+    if (i < 0) { giu.push(a); khoa.push(k); }
+    else if (a.aiOk && giu[i].aiOk === false) { giu[i] = a; khoa[i] = k; }
+  }
+  rotating.length = 0; rotating.push(...giu);
   store = [...PINNED, ...rotating]; // bài GHIM luôn đứng đầu
   luuKho(rotating);                  // ghi ra đĩa để lần khởi động sau còn nguyên
   if (fetched.length) lastSlot = slot;

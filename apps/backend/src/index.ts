@@ -121,7 +121,11 @@ app.get('/api/config', (_req, res) => {
 //    kẻ xấu được THỬ MẬT KHẨU ADMIN KHÔNG GIỚI HẠN — đúng tài khoản cần bảo vệ nhất. Cần miễn cho ai thì
 //    khai rõ trong RATE_LIMIT_SKIP_EMAILS.
 const AUTH_SKIP_EMAILS = new Set([...((process.env.RATE_LIMIT_SKIP_EMAILS || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean))]);
-app.use('/api/auth', rateLimit({ windowMs: 10 * 60 * 1000, max: 60, key: 'auth', skip: (req) => req.method !== 'POST' || AUTH_SKIP_EMAILS.has(String((req.body as any)?.email || '').trim().toLowerCase()), message: 'Quá nhiều lần thử đăng nhập/đăng ký. Vui lòng đợi vài phút rồi thử lại.' }), authRouter);
+// 9/10/2026: CHỈ đếm lượt ĐĂNG NHẬP / ĐĂNG KÝ thật. Trước đây đếm mọi POST, nên tín hiệu "đang mở web"
+// (POST /auth/ping, mỗi 45 giây/tab) ăn hết hạn mức → người chung mạng (gia đình, công ty) bấm Đăng nhập bị chặn oan
+// (48 giờ có 153 lần). Ping cần đăng nhập sẵn nên không dùng để đoán mật khẩu được.
+const DEM_AUTH = /^\/(login|register)\/?$/;
+app.use('/api/auth', rateLimit({ windowMs: 10 * 60 * 1000, max: 60, key: 'auth', skip: (req) => req.method !== 'POST' || !DEM_AUTH.test(req.path) || AUTH_SKIP_EMAILS.has(String((req.body as any)?.email || '').trim().toLowerCase()), message: 'Quá nhiều lần thử đăng nhập/đăng ký. Vui lòng đợi vài phút rồi thử lại.' }), authRouter);
 // Đăng nhập bằng vân tay / khuôn mặt (passkey). Đặt TRƯỚC /api/auth để không dính
 // bộ đếm số lần thử của đăng nhập mật khẩu — mỗi lần chạm vân tay là một lượt gọi,
 // mà thao tác này không đoán mò được nên không cần siết như mật khẩu.

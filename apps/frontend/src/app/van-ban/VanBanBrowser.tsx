@@ -4,19 +4,13 @@ import { useAuth } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import { api, apiBase } from '@/lib/api';
 import { getToken } from '@/lib/token';
+import { deEnt } from '@/lib/deEnt';   // làm sạch + giải mã chữ HTML — dùng chung với trang chủ
 import { CHUDE_LIST, CHUDE_META, type ChuDeNhom, type VanBan } from './data';
 import XemVanBan, { type MoVanBan } from './XemVanBan';
 
 const PER = 10;
 const kd = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
-// Giải mã HTML entity (kể cả dạng số &#233;) cho trích yếu/cơ quan lấy từ nguồn.
-const deEnt = (s: string) => (s || '')
-  .replace(/data:[^\s"'<>]+/gi, ' ')                 // xoá chuỗi data:image;base64,... (mã QR nhúng)
-  .replace(/<[^>]*>/g, ' ').replace(/[<>]/g, ' ')    // lột thẻ HTML + ký tự lẻ
-  .replace(/&#(\d+);/g, (_, n) => { try { return String.fromCodePoint(Number(n)); } catch { return ''; } })
-  .replace(/&#x([0-9a-fA-F]+);/gi, (_, h) => { try { return String.fromCodePoint(parseInt(h, 16)); } catch { return ''; } })
-  .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ')
-  .replace(/\s+/g, ' ').trim();
+// Giải mã HTML entity (kể cả dạng số &#233; và dạng tên &aacute;) cho trích yếu/cơ quan lấy từ nguồn — hàm dùng chung ở lib/deEnt.ts.
 const fmtNgay = (iso: string) => { if (!iso) return ''; const [y, m, d] = iso.split('-'); return `${d}/${m}/${y}`; };
 const pageWindow = (cur: number, total: number): (number | '…')[] => {
   const out: (number | '…')[] = [];

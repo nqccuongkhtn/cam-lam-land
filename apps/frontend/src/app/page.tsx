@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import { getToken } from '@/lib/token';
 import type { MoVanBan } from './van-ban/XemVanBan';
+import { deEnt } from '@/lib/deEnt';
 // Khung xem văn bản DÙNG CHUNG với trang /van-ban — chỉ nạp khi khách bấm mở một văn bản (trang chủ nhẹ hơn).
 const XemVanBan = dynamic(() => import('./van-ban/XemVanBan'), { ssr: false });
 import { Listing, PropertyType, PROPERTY_LABELS, SALE_PROPERTY_TYPES, RENT_PROPERTY_TYPES } from '@/lib/types';
@@ -193,13 +194,15 @@ function VanBanMoiNhat({ tu, onXoa }: { tu: string; onXoa: () => void }) {
       tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`,
       url: `${apiBase}/van-ban/${d.id}/pdf?v=9` /* v=9 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts), giống VanBanBrowser */, token: getToken() || '' });
   }
+  // Giải mã chữ HTML (&#253; → ý…) y như trang /van-ban — vài văn bản nguồn Công báo còn lưu kiểu này.
+  const sach = (ds?: VbMoi[]) => (ds || []).map((d) => ({ ...d, soKyHieu: deEnt(d.soKyHieu), trichYeu: deEnt(d.trichYeu), coQuan: deEnt(d.coQuan) }));
   const [moi, setMoi] = useState<VbMoi[] | null>(null);
   const [kq, setKq] = useState<VbMoi[] | null>(null);
-  useEffect(() => { api<{ docs: VbMoi[] }>('/van-ban/moi-nhat').then((r) => setMoi(r.docs || [])).catch(() => setMoi([])); }, []);
+  useEffect(() => { api<{ docs: VbMoi[] }>('/van-ban/moi-nhat').then((r) => setMoi(sach(r.docs))).catch(() => setMoi([])); }, []);
   useEffect(() => {
     if (!tu) { setKq(null); return; }
     let huy = false; setKq(null);
-    api<{ docs: VbMoi[] }>(`/van-ban/tim?q=${encodeURIComponent(tu)}`).then((r) => { if (!huy) setKq(r.docs || []); }).catch(() => { if (!huy) setKq([]); });
+    api<{ docs: VbMoi[] }>(`/van-ban/tim?q=${encodeURIComponent(tu)}`).then((r) => { if (!huy) setKq(sach(r.docs)); }).catch(() => { if (!huy) setKq([]); });
     return () => { huy = true; };
   }, [tu]);
   const ds = tu ? kq : moi;

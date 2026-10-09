@@ -98,6 +98,10 @@ function ChiaSe({ tieuDe, gon }: { tieuDe: string; gon?: boolean }) {
   );
 }
 
+// Ảnh tin liên quan chỉ cao 56px mà trước tải nguyên ảnh gốc (~200 KB/ảnh). Cho qua bộ thu nhỏ ảnh của Next.js:
+// bản rộng 128px chỉ còn ~2 KB. Ảnh nội bộ (/bai-dai/…) cũng đi qua được.
+const anhNho = (u: string) => /^(https:\/\/|\/)/.test(u) ? `/_next/image?url=${encodeURIComponent(u)}&w=128&q=60` : u;
+
 function RelatedList({ items }: { items: Article[] }) {
   if (!items.length) return null;
   return (
@@ -107,7 +111,7 @@ function RelatedList({ items }: { items: Article[] }) {
         {items.map((n) => (
           <Link key={n.slug} href={`/tin-tuc/${n.slug}`} className="group flex gap-3 items-start p-3 hover:bg-slate-50">
             <div className="w-20 h-14 rounded-lg overflow-hidden bg-slate-100 shrink-0">
-              {n.image ? <img src={n.image} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full grid place-items-center text-slate-300">📰</div>}
+              {n.image ? <img src={anhNho(n.image)} alt="" loading="lazy" className="w-full h-full object-cover" /> : <div className="w-full h-full grid place-items-center text-slate-300">📰</div>}
             </div>
             <p className="text-[13px] font-semibold text-[#0A2540] leading-snug line-clamp-3 group-hover:text-red-600">{decodeEntities(n.title)}</p>
           </Link>
@@ -117,28 +121,28 @@ function RelatedList({ items }: { items: Article[] }) {
   );
 }
 
-export default function NewsReaderClient() {
+// Máy chủ đã lấy sẵn bài + tin liên quan (bai/lienQuan) → hiện NGAY, không tải gì thêm (9/10/2026).
+// Chỉ khi máy chủ lỗi tạm thời (bai = null) mới tự hỏi lại MỘT BÀI qua /feed/news?slug= — không bao giờ tải cả kho.
+export default function NewsReaderClient({ bai = null, lienQuan }: { bai?: Article | null; lienQuan?: Article[] }) {
   const { id } = useParams<{ id: string }>();
   const slug = id ? decodeURIComponent(id) : '';
-  const [a, setA] = useState<Article | null>(null);
-  const [related, setRelated] = useState<Article[]>([]);
-  const [done, setDone] = useState(false);
+  const [a, setA] = useState<Article | null>(bai);
+  const [related, setRelated] = useState<Article[]>(lienQuan || []);
+  const [done, setDone] = useState(!!bai);
   const boQc = useBoQc(); // kho quảng cáo chung với 2 ô trang chủ
 
   useEffect(() => {
+    if (bai) return;
     let huy = false;
-    // Không thấy bài thì THỬ LẠI một lần sau 3 giây rồi mới kết luận.
-    // Lý do: máy chủ vừa dựng lại thì kho tin đang được tải lại ở nền — lần hỏi đầu có thể chưa có
-    // bài, mà báo ngay "bài không còn được lưu" là báo oan (bấm F5 lại thấy).
+    // Không thấy bài thì THỬ LẠI một lần sau 3 giây rồi mới kết luận (máy chủ vừa dựng lại thì kho tin đang nạp lại).
     const hoi = async (lanCuoi: boolean) => {
       try {
-        const d = await (await fetch('/feed/news', { cache: 'no-store' })).json();
-        const list: Article[] = d.news || [];
-        const bai = list.find((x: any) => x.slug === slug) || null;
+        const r = await fetch(`/feed/news?slug=${encodeURIComponent(slug)}`, { cache: 'no-store' });
+        const d = await r.json();
         if (huy) return true;
-        if (bai || lanCuoi) {
-          setA(bai);
-          setRelated(list.filter((x: any) => x.slug !== slug).slice(0, 8));
+        if (d.bai || lanCuoi || r.status === 404) {
+          setA(d.bai || null);
+          setRelated(d.lienQuan || []);
           setDone(true);
           return true;
         }
@@ -147,7 +151,7 @@ export default function NewsReaderClient() {
     };
     hoi(false).then((xong) => { if (!xong && !huy) setTimeout(() => { if (!huy) hoi(true); }, 3000); });
     return () => { huy = true; };
-  }, [slug]);
+  }, [slug, bai]);
 
   if (!done) return <div className="mx-auto max-w-5xl p-12 text-center text-slate-400">Đang tải…</div>;
 
@@ -155,7 +159,7 @@ export default function NewsReaderClient() {
     <div className="mx-auto max-w-5xl px-4 py-16 text-center">
       <p className="text-5xl">🗞️</p>
       <p className="text-lg font-bold text-[#0A2540] mt-3">Bài viết không còn được lưu</p>
-      <p className="text-slate-500 mt-1 text-sm">Tin tức chỉ được lưu trong 7 ngày.</p>
+      <p className="text-slate-500 mt-1 text-sm">Tin tức chỉ được lưu trong 30 ngày.</p>
       <div className="mt-5"><Link href="/tin-tuc" className="text-sm font-semibold text-red-600">← Tất cả tin tức</Link></div>
     </div>
   );

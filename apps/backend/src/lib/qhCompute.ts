@@ -270,22 +270,43 @@ function d2seg(px: number, py: number, ax: number, ay: number, bx: number, by: n
 
 // Ô đất GẦN NHẤT trong bán kính ~50m (dùng cho điểm-đất mà qh_vector vẽ thiếu → không rơi vào ô nào).
 const NEAR = 0.00045; // ~50m
+let CACH_O_GAN_M = Infinity;   // khoảng cách (m) từ điểm vừa hỏi tới ô QĐ205 gần nhất — nearestLand ghi lại
 function nearestLand(x: number, y: number): string | null {
   const gx0 = Math.floor((x - NEAR) / CELL), gx1 = Math.floor((x + NEAR) / CELL);
   const gy0 = Math.floor((y - NEAR) / CELL), gy1 = Math.floor((y + NEAR) / CELL);
   if (!KHO) return null;
-  const seen = new Set<number>(); let bd = NEAR * NEAR, bt = -1; let blo: string | null = null;
+  const seen = new Set<number>(); let bd = NEAR * NEAR, bt = -1; let blo: string | null = null; let dGan = Infinity;
   for (let gx = gx0; gx <= gx1; gx++) for (let gy = gy0; gy <= gy1; gy++) {
     const c = KHO.o(gx, gy); if (c < 0) continue;
     for (let t = KHO.oDau[c], het = KHO.oDau[c + 1]; t < het; t++) {
       const k = KHO.oDs[t];
       if (seen.has(k)) continue; seen.add(k);
-      const dmin = KHO.d2Vien(k, x, y), bk = KHO.bac[k];
+      const dmin = KHO.d2Vien(k, x, y), bk = KHO.bac[k]; if (dmin < dGan) dGan = dmin;
       // ưu tiên bậc cao hơn; cùng phạm vi thì gần hơn
       if (bk > bt || (bk === bt && dmin < bd)) { if (dmin <= NEAR * NEAR) { bd = dmin; bt = bk; blo = KHO.tenLoai[KHO.loai[k]]; } }
     }
   }
   return blo;
+  CACH_O_GAN_M = Math.sqrt(dGan) * 111000;
+}
+
+// ── ĐƯỜNG CỦA QĐ205 NGOÀI KHUNG MẶT NẠ (10/10/2026) ──
+// QĐ205 KHÔNG có ô "đất giao thông": đường = khoảng trống giữa các ô. Mặt nạ đường road_mask.bin chỉ phủ khung ~7×6 km
+// quanh Cam Đức; ra ngoài khung, điểm trong khe bị gán theo ô gần nhất ≤50 m → lòng đường QĐ205 thành đất ở / cây xanh
+// (đo 2.264 thửa mà 893 = phân khu: ngoài khung QĐ205 thiếu 70 % đường, trong khung 39 %).
+// Điểm trong khe RỘNG (cách ô gần nhất ≥ 2,5 m → khe ≥ 5 m, khác khe vẽ chưa khít < 1 m) và bị ô QĐ205 bao quanh
+// ≥ 6/8 hướng trong 100 m = lòng đường. Soi 7 chỗ "không bản nào xác nhận" trên ảnh vẽ từ QD205.dxf gốc (lớp mép đường
+// -1-TRAFFIC-PAVEMENT): cả 7 đều nằm giữa lòng đường QĐ205. Đã thử thêm điều kiện "khe phải là dải thẳng" → loại nhầm
+// đường chạy chéo, bỏ. Kết quả: lệch đường so với 893/phân khu 204.938 → 139.161 m² (2.264 thửa), 5/5 phiếu 205 giữ 100 %.
+function bao205(x: number, y: number): boolean {
+  if (!KHO) return false;
+  const BUOC = 3 / 111000, XA = 100 / 111000; let gap = 0;
+  const H: [number, number][] = [[1, 0], [-1, 0], [0, 1], [0, -1], [0.7071, 0.7071], [-0.7071, 0.7071], [0.7071, -0.7071], [-0.7071, -0.7071]];
+  for (let h = 0; h < 8; h++) {
+    for (let r = BUOC; r <= XA; r += BUOC) if (KHO.chuaK(x + H[h][0] * r, y + H[h][1] * r) >= 0) { gap++; break; }
+    if (gap + (7 - h) < 6) return false;
+  }
+  return gap >= 6;
 }
 
 // ring: [[lng,lat],…] WGS84 (ranh ngoài thửa); dienTich: diện tích thửa (m²) từ DB.
@@ -330,7 +351,9 @@ export function computeQhAreas(ring: number[][], dienTich: number): { type: stri
     if (z) lo = z;                                            // rơi vào 1 ô QH ⇒ loại đó
     else {
       const near = nearestLand(x, y);                        // ô QH gần nhất ≤50m (null nếu xa)
-      if (near) lo = (r === 1) ? 'Đất giao thông' : near;    // trong vùng QH: lòng đường=gt, khe hở vẽ thiếu=ô gần nhất
+      if (near) lo = (r === 1) ? 'Đất giao thông'
+        : (r === null && CACH_O_GAN_M >= 2.5 && bao205(x, y)) ? 'Đất giao thông'   // ngoài khung mặt nạ: khe rộng bị ô bao quanh = đường
+        : near;                                                // khe hẹp (vẽ chưa khít) = ô gần nhất
       // Điểm xa mọi ô đất: TRONG vùng quy hoạch thì đó là lòng đường (cách B) — giữ nguyên,
       // vì đây là chỗ làm cho kết quả khớp app tham chiếu ±3%. Còn thửa nằm HẲN ngoài vùng
       // quy hoạch thì đã bị chặn từ đầu hàm rồi, không xuống tới đây.

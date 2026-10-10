@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useBoQc, BillboardAd, NativeAd, CanhGaAd } from '@/components/newsAds'; // dùng chung với trang đọc bài
 import type { OQc } from '@/components/OQuangCaoTrangChu';
@@ -107,6 +107,16 @@ export default function NewsIndex() {
   const rows: any[] = [];
   shown.forEach((n, i) => { rows.push(<Row key={n.slug} n={n} />); if (i === 2 && showAd) rows.push(<NativeAd key="native-ad" ds={boQc} batDau={1} />); });
   const hasMore = rest.length > limit;
+  // Cuộn gần tới cuối danh sách là TỰ nạp thêm 12 tin (chủ dự án 10/10/2026: "cho tự sổ thêm tin, không cần bấm").
+  // Nút "Xem thêm tin" vẫn giữ cho ai muốn bấm. Bắt sớm 600px trước khi chạm đáy để người đọc không phải chờ.
+  const moc = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = moc.current;
+    if (!el || !hasMore || typeof IntersectionObserver === 'undefined') return;
+    const ob = new IntersectionObserver((ds) => { if (ds.some((d) => d.isIntersecting)) setLimit((l) => l + 12); }, { rootMargin: '600px 0px' });
+    ob.observe(el);
+    return () => ob.disconnect();
+  }, [hasMore, limit]);
 
   return (
     <div className="relative min-h-[calc(100dvh-56px)] bg-white">
@@ -152,6 +162,7 @@ export default function NewsIndex() {
                 <section>
                   <SectionHead title="Tin khác" />
                   <div className="divide-y divide-slate-100">{rows}</div>
+                  <div ref={moc} aria-hidden className="h-px" />
                   {hasMore && <div className="text-center mt-6"><button onClick={() => setLimit((l) => l + 12)} className="inline-flex items-center gap-2 bg-white border border-slate-300 hover:border-[#0A2540] text-[#0A2540] font-semibold px-8 py-3 rounded-full text-sm">Xem thêm tin →</button></div>}
                 </section>
               </>

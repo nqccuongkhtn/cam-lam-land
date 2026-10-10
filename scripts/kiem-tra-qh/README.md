@@ -45,5 +45,6 @@ sai **mà không báo lỗi** (đã vấp: tưởng chạy thử nghiệm nhưng
   Ô 893 không có mã bên trong giữ tên nhóm chung. Đây là khác biệt CÓ CHỦ Ý, không phải lỗi.
 - QĐ920 (Tây Nam): ô "Đất chưa sử dụng" (lớp HT, hoa văn CORK đúng chú giải) — phiếu ghi "sản xuất nông nghiệp".
   Bản web dùng là bản đã sửa; cần DXF của bản gốc để so.
-- Ranh khác hẳn bản vẽ (Nguyễn Văn Đặng, Vũ Thị Lan, Trần Thị Niệm) — có thể cán bộ dùng bản điều chỉnh mới hơn.
+- Ranh khác hẳn bản vẽ (Nguyễn Văn Đặng, Vũ Thị Lan, Trần Thị Niệm) — chủ dự án nhận định 10/10/2026: WEB dùng bản đồ
+  MỚI HƠN, file của cán bộ có thể vẽ trên bản đồ CHƯA CHỈNH LÝ → không tính là lỗi của web, không chỉnh web theo 3 phiếu này.
 - "Hành lang an toàn lưới điện" (phiếu 5644) — web chưa có lớp này.

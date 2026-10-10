@@ -41,6 +41,8 @@ sai **mà không báo lỗi** (đã vấp: tưởng chạy thử nghiệm nhưng
 - QĐ893: ô không ghi mã → web ghi tên nhóm chung "Đất công cộng, dịch vụ, sản xuất" / "Đất ở"; phiếu ghi cụ thể
   (khu vui chơi, thể thao, ODT/ONT). Bản vẽ không có căn cứ (màu đã bị gộp số 11), quy tắc dự án: KHÔNG đoán.
   Cán bộ nhất quán: phân khu "cây xanh" ⇔ QĐ893 "khu vui chơi, giải trí công cộng" (6/7 phiếu).
+  → ĐÃ CHỐT (chủ dự án 10/10/2026): KHÔNG suy 893 từ phân khu — mỗi bản xử lý theo đúng dữ liệu của bản đó.
+  Ô 893 không có mã bên trong giữ tên nhóm chung. Đây là khác biệt CÓ CHỦ Ý, không phải lỗi.
 - QĐ920 (Tây Nam): ô "Đất chưa sử dụng" (lớp HT, hoa văn CORK đúng chú giải) — phiếu ghi "sản xuất nông nghiệp".
   Bản web dùng là bản đã sửa; cần DXF của bản gốc để so.
 - Ranh khác hẳn bản vẽ (Nguyễn Văn Đặng, Vũ Thị Lan, Trần Thị Niệm) — có thể cán bộ dùng bản điều chỉnh mới hơn.

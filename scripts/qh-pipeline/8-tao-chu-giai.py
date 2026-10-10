@@ -13,11 +13,15 @@ Nên chú giải cũng chỉ LIỆT KÊ lại màu bản vẽ; việc của nó 
 Xếp nhóm (Đất ở · Cây xanh · Mặt nước…) chỉ để bảng dễ đọc: suy từ TÊN loại đất qua bộ từ khoá
 trong `mau-loai-dat.json` (từ khoá → màu mẫu → nhóm). Tên loại đất vẫn là tên thật trong bản vẽ.
 
-Cùng một màu mà nhiều loại đất dùng thì gộp MỘT dòng: ghi 2 tên nhiều ô nhất + "+N loại nữa",
-tên đầy đủ để ở `dayDu` (web hiện khi rê chuột). Chỉ liệt kê loại đất THẬT SỰ có trên bản đồ.
+Cùng một màu mà nhiều loại đất dùng thì gộp MỘT dòng màu, ghi ĐỦ MỌI TÊN trong `tenDs` (web hiện mỗi tên
+một dòng). Trước 10/10/2026 chỉ ghi 2 tên + "+N loại nữa" → chủ dự án chê "là sao", nên bỏ hẳn kiểu cắt.
+Chỉ liệt kê loại đất THẬT SỰ có trên bản đồ.
 
-Cách gọi:
-    python 8-tao-chu-giai.py <vao1.geojson> [vao2.geojson ...]
+Ghi THÊM chú giải RIÊNG cho từng bản (`ban`: mã lớp trên web → nhóm/màu/tên) để trang bản đồ chỉ hiện loại đất
+của bản đang bật. Mã lớp ghi trước dấu '=' (vd qh-qd2076=...), không ghi thì lấy tên file.
+
+Cách gọi (đúng bộ đang dùng cho 7 bộ tile phân khu, 10/10/2026):
+    python 8-tao-chu-giai.py qh-qd2076=quyhoach2025/qd2076_qh_tuoi2_sach.geojson         qh-qd2101=quyhoach2025/qd2101_qh_tuoi2_sach.geojson qh-qd2222=quyhoach2025/qd2222_qh_tuoi2_sach.geojson         qh-qd918=quyhoach2025/qd918_qh_tuoi2_sach.geojson qh-cuhin=quyhoach2025/qdcuhin_qh_tuoi2_sach.geojson         qh-taynam=quyhoach2025/qdtaynam_qh_tuoi2_sach.geojson qh-taybac=quyhoach2025/qdtaybac_qh_tuoi2_sach.geojson
 """
 import collections
 import importlib.util
@@ -69,8 +73,10 @@ def nhom_cua(ten):
 
 def main(files):
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-    dem = collections.Counter()          # (nhóm, màu, tên loại đất) -> số ô
-    for f in files:
+    dem = collections.Counter()          # (nhóm, màu, tên loại đất) -> số ô  (gộp mọi bản)
+    dem_ban = collections.defaultdict(collections.Counter)   # mã lớp -> như trên, riêng từng bản
+    for arg in files:
+        ma, f = arg.split('=', 1) if '=' in arg else (os.path.splitext(os.path.basename(arg))[0], arg)
         d = json.load(io.open(f, encoding='utf-8'))
         for ft in d.get('features', []):
             p = ft.get('properties') or {}
@@ -84,7 +90,22 @@ def main(files):
             m = (p.get('c') or '').lower()
             if m:
                 dem[(nhom_cua(ten), m, ten)] += 1
+                dem_ban[ma][(nhom_cua(ten), m, ten)] += 1
 
+    ra = xep(dem)
+    ban = {ma: xep(c) for ma, c in dem_ban.items()}
+    with io.open(RA, 'w', encoding='utf-8') as fp:
+        json.dump({'_doc': 'Sinh tự động bởi scripts/qh-pipeline/8-tao-chu-giai.py — đừng sửa tay. '
+                           'Màu lấy ĐÚNG từ bản vẽ quy hoạch (bảng màu MicroStation).',
+                   'nhom': ra, 'ban': ban}, fp, ensure_ascii=False, indent=1)
+    print('Chú giải: %d nhóm, %d dòng màu · %d bản riêng' % (len(ra), sum(len(x['muc']) for x in ra), len(ban)))
+    for x in ra:
+        print('  · %-32s %d dòng' % (x['nhom'], len(x['muc'])))
+    print('  >>> %s' % RA)
+
+
+def xep(dem):
+    """(nhóm, màu, tên) -> số ô  ⇒  [{nhom, muc: [{mau, tenDs: [tên...], so}]}] theo thứ tự nhóm, màu nhiều ô trước."""
     ra = []
     for ten_nhom in THU_TU:
         theo_mau = {}
@@ -99,19 +120,9 @@ def main(files):
         muc = []
         for g in sorted(theo_mau.values(), key=lambda x: -x['so']):
             g['ten'].sort(key=lambda x: -x[1])
-            ten = [t for t, _ in g['ten']]
-            ngan = ' · '.join(ten[:2]) + ((' + %d loại nữa' % (len(ten) - 2)) if len(ten) > 2 else '')
-            muc.append({'mau': g['mau'], 'ten': ngan, 'dayDu': ' · '.join(ten), 'so': g['so']})
+            muc.append({'mau': g['mau'], 'tenDs': [t for t, _ in g['ten']], 'so': g['so']})
         ra.append({'nhom': ten_nhom, 'muc': muc})
-
-    with io.open(RA, 'w', encoding='utf-8') as fp:
-        json.dump({'_doc': 'Sinh tự động bởi scripts/qh-pipeline/8-tao-chu-giai.py — đừng sửa tay. '
-                           'Màu lấy ĐÚNG từ bản vẽ quy hoạch (bảng màu MicroStation).',
-                   'nhom': ra}, fp, ensure_ascii=False, indent=1)
-    print('Chú giải: %d nhóm, %d dòng màu' % (len(ra), sum(len(x['muc']) for x in ra)))
-    for x in ra:
-        print('  · %-32s %d dòng' % (x['nhom'], len(x['muc'])))
-    print('  >>> %s' % RA)
+    return ra
 
 
 if __name__ == '__main__':

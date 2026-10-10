@@ -6,44 +6,63 @@
    "muc": [
     {
      "mau": "#cc9f19",
-     "ten": "Nhóm nhà ở · Nhóm nhà ở thấp tầng + 3 loại nữa",
-     "dayDu": "Nhóm nhà ở · Nhóm nhà ở thấp tầng · Đơn vị ở mới mật độ trung bình · Đơn vị ở mới mật độ trung bình (2030) · Nhóm nhà ở (hiện trạng)",
+     "tenDs": [
+      "Nhóm nhà ở",
+      "Nhóm nhà ở thấp tầng",
+      "Đơn vị ở mới mật độ trung bình",
+      "Đơn vị ở mới mật độ trung bình (2030)",
+      "Nhóm nhà ở (hiện trạng)"
+     ],
      "so": 1165
     },
     {
      "mau": "#979763",
-     "ten": "Làng xóm (hiện trạng) · Nhóm nhà ở (hiện trạng) + 5 loại nữa",
-     "dayDu": "Làng xóm (hiện trạng) · Nhóm nhà ở (hiện trạng) · Làng xóm · Làng xóm đô thị hoá (hiện trạng) · Dân cư nông thôn (hiện trạng) · Dân cư nông thôn · Làng xóm đô thị hoá",
+     "tenDs": [
+      "Làng xóm (hiện trạng)",
+      "Nhóm nhà ở (hiện trạng)",
+      "Làng xóm",
+      "Làng xóm đô thị hoá (hiện trạng)",
+      "Dân cư nông thôn (hiện trạng)",
+      "Dân cư nông thôn",
+      "Làng xóm đô thị hoá"
+     ],
      "so": 627
     },
     {
      "mau": "#e2f5ab",
-     "ten": "Nhóm nhà ở · Đơn vị ở mật độ thấp đến năm 2045 + 1 loại nữa",
-     "dayDu": "Nhóm nhà ở · Đơn vị ở mật độ thấp đến năm 2045 · Đơn vị ở mật độ thấp đến năm 2030",
+     "tenDs": [
+      "Nhóm nhà ở",
+      "Đơn vị ở mật độ thấp đến năm 2045",
+      "Đơn vị ở mật độ thấp đến năm 2030"
+     ],
      "so": 435
     },
     {
      "mau": "#cc4619",
-     "ten": "Nhóm nhà ở trong khu hỗn hợp",
-     "dayDu": "Nhóm nhà ở trong khu hỗn hợp",
+     "tenDs": [
+      "Nhóm nhà ở trong khu hỗn hợp"
+     ],
      "so": 37
     },
     {
      "mau": "#cc7219",
-     "ten": "Nhà ở chung cư",
-     "dayDu": "Nhà ở chung cư",
+     "tenDs": [
+      "Nhà ở chung cư"
+     ],
      "so": 32
     },
     {
      "mau": "#a93915",
-     "ten": "Đơn vị ở mới mật độ cao",
-     "dayDu": "Đơn vị ở mới mật độ cao",
+     "tenDs": [
+      "Đơn vị ở mới mật độ cao"
+     ],
      "so": 11
     },
     {
      "mau": "#b3a67e",
-     "ten": "Hiện trạng cải tạo chỉnh trang",
-     "dayDu": "Hiện trạng cải tạo chỉnh trang",
+     "tenDs": [
+      "Hiện trạng cải tạo chỉnh trang"
+     ],
      "so": 1
     }
    ]
@@ -53,8 +72,10 @@
    "muc": [
     {
      "mau": "#cc4619",
-     "ten": "Đất hỗn hợp – nhóm nhà ở · Đất hỗn hợp",
-     "dayDu": "Đất hỗn hợp – nhóm nhà ở · Đất hỗn hợp",
+     "tenDs": [
+      "Đất hỗn hợp – nhóm nhà ở",
+      "Đất hỗn hợp"
+     ],
      "so": 91
     }
    ]
@@ -64,32 +85,43 @@
    "muc": [
     {
      "mau": "#fb30fc",
-     "ten": "Đất du lịch · Đất dịch vụ + 3 loại nữa",
-     "dayDu": "Đất du lịch · Đất dịch vụ · Đất du lịch (hiện trạng) · Du lịch – khu du lịch · Đất dịch vụ (hiện trạng)",
+     "tenDs": [
+      "Đất du lịch",
+      "Đất dịch vụ",
+      "Đất du lịch (hiện trạng)",
+      "Du lịch – khu du lịch",
+      "Đất dịch vụ (hiện trạng)"
+     ],
      "so": 156
     },
     {
      "mau": "#cc1919",
-     "ten": "Dịch vụ đơn vị ở · Dịch vụ đô thị",
-     "dayDu": "Dịch vụ đơn vị ở · Dịch vụ đô thị",
+     "tenDs": [
+      "Dịch vụ đơn vị ở",
+      "Dịch vụ đô thị"
+     ],
      "so": 125
     },
     {
      "mau": "#f5abbd",
-     "ten": "Du lịch – khu dịch vụ",
-     "dayDu": "Du lịch – khu dịch vụ",
+     "tenDs": [
+      "Du lịch – khu dịch vụ"
+     ],
      "so": 20
     },
     {
      "mau": "#a91515",
-     "ten": "Dịch vụ nông thôn · Dịch vụ nông thôn (hiện trạng)",
-     "dayDu": "Dịch vụ nông thôn · Dịch vụ nông thôn (hiện trạng)",
+     "tenDs": [
+      "Dịch vụ nông thôn",
+      "Dịch vụ nông thôn (hiện trạng)"
+     ],
      "so": 6
     },
     {
      "mau": "#15a915",
-     "ten": "Sân golf",
-     "dayDu": "Sân golf",
+     "tenDs": [
+      "Sân golf"
+     ],
      "so": 5
     }
    ]
@@ -99,50 +131,83 @@
    "muc": [
     {
      "mau": "#a05d5d",
-     "ten": "Trường học · Trường học (hiện trạng) + 2 loại nữa",
-     "dayDu": "Trường học · Trường học (hiện trạng) · Trường học nông thôn · Trường học (nông thôn) (hiện trạng)",
+     "tenDs": [
+      "Trường học",
+      "Trường học (hiện trạng)",
+      "Trường học nông thôn",
+      "Trường học (nông thôn) (hiện trạng)"
+     ],
      "so": 343
     },
     {
      "mau": "#750f0f",
-     "ten": "Di tích – tôn giáo (hiện trạng) · Di tích (hiện trạng) + 1 loại nữa",
-     "dayDu": "Di tích – tôn giáo (hiện trạng) · Di tích (hiện trạng) · Di tích – tôn giáo",
+     "tenDs": [
+      "Di tích – tôn giáo (hiện trạng)",
+      "Di tích (hiện trạng)",
+      "Di tích – tôn giáo"
+     ],
      "so": 110
     },
     {
      "mau": "#b37e8b",
-     "ten": "Văn hoá đơn vị ở · Đất cơ sở văn hoá + 5 loại nữa",
-     "dayDu": "Văn hoá đơn vị ở · Đất cơ sở văn hoá · Đất cơ sở văn hoá (hiện trạng) · Đất cơ sở văn hoá (nông thôn) (hiện trạng) · Văn hoá đơn vị ở (hiện trạng) · Đất cơ sở văn hoá (đô thị) · Đất cơ sở văn hoá (nông thôn)",
+     "tenDs": [
+      "Văn hoá đơn vị ở",
+      "Đất cơ sở văn hoá",
+      "Đất cơ sở văn hoá (hiện trạng)",
+      "Đất cơ sở văn hoá (nông thôn) (hiện trạng)",
+      "Văn hoá đơn vị ở (hiện trạng)",
+      "Đất cơ sở văn hoá (đô thị)",
+      "Đất cơ sở văn hoá (nông thôn)"
+     ],
      "so": 102
     },
     {
      "mau": "#e94fc2",
-     "ten": "Y tế đơn vị ở · Đất cơ sở y tế + 6 loại nữa",
-     "dayDu": "Y tế đơn vị ở · Đất cơ sở y tế · Đất cơ sở y tế (hiện trạng) · Y tế đơn vị ở (hiện trạng) · Đất cơ sở y tế (ngoài đô thị) · Đất cơ sở y tế (ngoài đô thị) (hiện trạng) · Đất cơ sở y tế (đô thị) · Yte_CT (hiện trạng)",
+     "tenDs": [
+      "Y tế đơn vị ở",
+      "Đất cơ sở y tế",
+      "Đất cơ sở y tế (hiện trạng)",
+      "Y tế đơn vị ở (hiện trạng)",
+      "Đất cơ sở y tế (ngoài đô thị)",
+      "Đất cơ sở y tế (ngoài đô thị) (hiện trạng)",
+      "Đất cơ sở y tế (đô thị)",
+      "Yte_CT (hiện trạng)"
+     ],
      "so": 92
     },
     {
      "mau": "#a95e15",
-     "ten": "Đất cơ quan (hiện trạng) · Đất cơ quan + 2 loại nữa",
-     "dayDu": "Đất cơ quan (hiện trạng) · Đất cơ quan · Đất cơ quan (đô thị) · Đất cơ quan (đô thị) (hiện trạng)",
+     "tenDs": [
+      "Đất cơ quan (hiện trạng)",
+      "Đất cơ quan",
+      "Đất cơ quan (đô thị)",
+      "Đất cơ quan (đô thị) (hiện trạng)"
+     ],
      "so": 26
     },
     {
      "mau": "#a93915",
-     "ten": "Trường THPT · Trường THPT (hiện trạng)",
-     "dayDu": "Trường THPT · Trường THPT (hiện trạng)",
+     "tenDs": [
+      "Trường THPT",
+      "Trường THPT (hiện trạng)"
+     ],
      "so": 23
     },
     {
      "mau": "#1584a9",
-     "ten": "Đào tạo – nghiên cứu (hiện trạng) · Đào tạo – nghiên cứu + 1 loại nữa",
-     "dayDu": "Đào tạo – nghiên cứu (hiện trạng) · Đào tạo – nghiên cứu · Đất đào tạo",
+     "tenDs": [
+      "Đào tạo – nghiên cứu (hiện trạng)",
+      "Đào tạo – nghiên cứu",
+      "Đất đào tạo"
+     ],
      "so": 9
     },
     {
      "mau": "#755c0f",
-     "ten": "Đất cơ quan (ngoài đô thị) (hiện trạng) · Đất cơ quan (ngoài đô thị)",
-     "dayDu": "Đất cơ quan (ngoài đô thị) (hiện trạng) · Đất cơ quan (ngoài đô thị)",
+     "tenDs": [
+      "Đất cơ quan (ngoài đô thị) (hiện trạng)",
+      "Đất cơ quan (ngoài đô thị)"
+     ],
      "so": 4
     }
    ]
@@ -152,38 +217,54 @@
    "muc": [
     {
      "mau": "#d5f7df",
-     "ten": "Cây xanh chuyên dụng · Cây xanh chuyên dụng (hiện trạng)",
-     "dayDu": "Cây xanh chuyên dụng · Cây xanh chuyên dụng (hiện trạng)",
+     "tenDs": [
+      "Cây xanh chuyên dụng",
+      "Cây xanh chuyên dụng (hiện trạng)"
+     ],
      "so": 492
     },
     {
      "mau": "#72cc19",
-     "ten": "Cây xanh công cộng đơn vị ở · Cây xanh công cộng đô thị + 3 loại nữa",
-     "dayDu": "Cây xanh công cộng đơn vị ở · Cây xanh công cộng đô thị · Cây xanh công cộng · Cây xanh công cộng (hiện trạng) · Cây xanh công cộng đơn vị ở (hiện trạng)",
+     "tenDs": [
+      "Cây xanh công cộng đơn vị ở",
+      "Cây xanh công cộng đô thị",
+      "Cây xanh công cộng",
+      "Cây xanh công cộng (hiện trạng)",
+      "Cây xanh công cộng đơn vị ở (hiện trạng)"
+     ],
      "so": 451
     },
     {
      "mau": "#15a915",
-     "ten": "Thể dục thể thao đơn vị ở · Thể dục thể thao + 4 loại nữa",
-     "dayDu": "Thể dục thể thao đơn vị ở · Thể dục thể thao · Cây xanh sử dụng hạn chế · Thể dục thể thao đô thị · Thể dục thể thao đơn vị ở (hiện trạng) · Thể dục thể thao (hiện trạng)",
+     "tenDs": [
+      "Thể dục thể thao đơn vị ở",
+      "Thể dục thể thao",
+      "Cây xanh sử dụng hạn chế",
+      "Thể dục thể thao đô thị",
+      "Thể dục thể thao đơn vị ở (hiện trạng)",
+      "Thể dục thể thao (hiện trạng)"
+     ],
      "so": 141
     },
     {
      "mau": "#0f750f",
-     "ten": "Cây xanh sử dụng hạn chế – công viên thể dục thể thao",
-     "dayDu": "Cây xanh sử dụng hạn chế – công viên thể dục thể thao",
+     "tenDs": [
+      "Cây xanh sử dụng hạn chế – công viên thể dục thể thao"
+     ],
      "so": 13
     },
     {
      "mau": "#5ea915",
-     "ten": "Cây xanh công cộng nông thôn",
-     "dayDu": "Cây xanh công cộng nông thôn",
+     "tenDs": [
+      "Cây xanh công cộng nông thôn"
+     ],
      "so": 11
     },
     {
      "mau": "#0f7528",
-     "ten": "Sân bãi thể thao nông thôn",
-     "dayDu": "Sân bãi thể thao nông thôn",
+     "tenDs": [
+      "Sân bãi thể thao nông thôn"
+     ],
      "so": 7
     }
    ]
@@ -193,26 +274,30 @@
    "muc": [
     {
      "mau": "#416f4c",
-     "ten": "Đất rừng sản xuất (hiện trạng)",
-     "dayDu": "Đất rừng sản xuất (hiện trạng)",
+     "tenDs": [
+      "Đất rừng sản xuất (hiện trạng)"
+     ],
      "so": 68
     },
     {
      "mau": "#5da08f",
-     "ten": "Đất rừng phòng hộ (hiện trạng)",
-     "dayDu": "Đất rừng phòng hộ (hiện trạng)",
+     "tenDs": [
+      "Đất rừng phòng hộ (hiện trạng)"
+     ],
      "so": 58
     },
     {
      "mau": "#2a7e7e",
-     "ten": "Đất rừng đặc dụng (hiện trạng)",
-     "dayDu": "Đất rừng đặc dụng (hiện trạng)",
+     "tenDs": [
+      "Đất rừng đặc dụng (hiện trạng)"
+     ],
      "so": 15
     },
     {
      "mau": "#abf5ab",
-     "ten": "KXD_DulichRung_qh",
-     "dayDu": "KXD_DulichRung_qh",
+     "tenDs": [
+      "KXD_DulichRung_qh"
+     ],
      "so": 1
     }
    ]
@@ -222,14 +307,16 @@
    "muc": [
     {
      "mau": "#4fe94f",
-     "ten": "Đất nông nghiệp (hiện trạng)",
-     "dayDu": "Đất nông nghiệp (hiện trạng)",
+     "tenDs": [
+      "Đất nông nghiệp (hiện trạng)"
+     ],
      "so": 101
     },
     {
      "mau": "#d0d0d0",
-     "ten": "Đất chưa sử dụng (hiện trạng)",
-     "dayDu": "Đất chưa sử dụng (hiện trạng)",
+     "tenDs": [
+      "Đất chưa sử dụng (hiện trạng)"
+     ],
      "so": 8
     }
    ]
@@ -239,14 +326,26 @@
    "muc": [
     {
      "mau": "#1972cc",
-     "ten": "Sông suối (hiện trạng) · Sông suối + 2 loại nữa",
-     "dayDu": "Sông suối (hiện trạng) · Sông suối · Mặt nước biển (hiện trạng) · Sông suối (ngoài ranh giới)",
+     "tenDs": [
+      "Sông suối (hiện trạng)",
+      "Sông suối",
+      "Mặt nước biển (hiện trạng)",
+      "Sông suối (ngoài ranh giới)"
+     ],
      "so": 236
     },
     {
      "mau": "#155ea9",
-     "ten": "Mặt nước, hồ ao đầm (đơn vị ở đến năm 2045) · Mặt nước, hồ ao đầm (đơn vị ở đến năm 2030) + 6 loại nữa",
-     "dayDu": "Mặt nước, hồ ao đầm (đơn vị ở đến năm 2045) · Mặt nước, hồ ao đầm (đơn vị ở đến năm 2030) · Hồ nước · Mặt nước, hồ ao đầm · Mặt nước sử dụng công cộng (đơn vị ở) · Hồ nước (hiện trạng) · Mặt nước, hồ ao đầm (đô thị) · Đầm Thuỷ Triều",
+     "tenDs": [
+      "Mặt nước, hồ ao đầm (đơn vị ở đến năm 2045)",
+      "Mặt nước, hồ ao đầm (đơn vị ở đến năm 2030)",
+      "Hồ nước",
+      "Mặt nước, hồ ao đầm",
+      "Mặt nước sử dụng công cộng (đơn vị ở)",
+      "Hồ nước (hiện trạng)",
+      "Mặt nước, hồ ao đầm (đô thị)",
+      "Đầm Thuỷ Triều"
+     ],
      "so": 142
     }
    ]
@@ -256,20 +355,32 @@
    "muc": [
     {
      "mau": "#848484",
-     "ten": "Bãi đỗ xe đơn vị ở · Nghĩa trang (hiện trạng) + 2 loại nữa",
-     "dayDu": "Bãi đỗ xe đơn vị ở · Nghĩa trang (hiện trạng) · Nghĩa trang · Bãi đỗ xe (nông thôn)",
+     "tenDs": [
+      "Bãi đỗ xe đơn vị ở",
+      "Nghĩa trang (hiện trạng)",
+      "Nghĩa trang",
+      "Bãi đỗ xe (nông thôn)"
+     ],
      "so": 149
     },
     {
      "mau": "#352a7e",
-     "ten": "Hạ tầng khác · Hạ tầng khác (hiện trạng) + 5 loại nữa",
-     "dayDu": "Hạ tầng khác · Hạ tầng khác (hiện trạng) · Hạ tầng khác đô thị · Hạ tầng kỹ thuật ngoài đô thị (hiện trạng) · Hạ tầng kỹ thuật ngoài đô thị · Hạ tầng khác ngoài đô thị · Hạ tầng khác đô thị (hiện trạng)",
+     "tenDs": [
+      "Hạ tầng khác",
+      "Hạ tầng khác (hiện trạng)",
+      "Hạ tầng khác đô thị",
+      "Hạ tầng kỹ thuật ngoài đô thị (hiện trạng)",
+      "Hạ tầng kỹ thuật ngoài đô thị",
+      "Hạ tầng khác ngoài đô thị",
+      "Hạ tầng khác đô thị (hiện trạng)"
+     ],
      "so": 78
     },
     {
      "mau": "#858585",
-     "ten": "Bãi đỗ xe",
-     "dayDu": "Bãi đỗ xe",
+     "tenDs": [
+      "Bãi đỗ xe"
+     ],
      "so": 65
     }
    ]
@@ -279,14 +390,20 @@
    "muc": [
     {
      "mau": "#7000e2",
-     "ten": "Sản xuất công nghiệp · Sản xuất công nghiệp (hiện trạng) + 2 loại nữa",
-     "dayDu": "Sản xuất công nghiệp · Sản xuất công nghiệp (hiện trạng) · Đất công nghiệp (hiện trạng) · Đất công nghiệp",
+     "tenDs": [
+      "Sản xuất công nghiệp",
+      "Sản xuất công nghiệp (hiện trạng)",
+      "Đất công nghiệp (hiện trạng)",
+      "Đất công nghiệp"
+     ],
      "so": 57
     },
     {
      "mau": "#5d5da0",
-     "ten": "Sản xuất vật liệu (hiện trạng) · Sản xuất vật liệu",
-     "dayDu": "Sản xuất vật liệu (hiện trạng) · Sản xuất vật liệu",
+     "tenDs": [
+      "Sản xuất vật liệu (hiện trạng)",
+      "Sản xuất vật liệu"
+     ],
      "so": 2
     }
    ]
@@ -296,14 +413,19 @@
    "muc": [
     {
      "mau": "#354428",
-     "ten": "Đất quốc phòng (hiện trạng) · Đất quốc phòng",
-     "dayDu": "Đất quốc phòng (hiện trạng) · Đất quốc phòng",
+     "tenDs": [
+      "Đất quốc phòng (hiện trạng)",
+      "Đất quốc phòng"
+     ],
      "so": 35
     },
     {
      "mau": "#84a915",
-     "ten": "Đất an ninh · Đất an ninh (hiện trạng) + 1 loại nữa",
-     "dayDu": "Đất an ninh · Đất an ninh (hiện trạng) · Anninh_CT (hiện trạng)",
+     "tenDs": [
+      "Đất an ninh",
+      "Đất an ninh (hiện trạng)",
+      "Anninh_CT (hiện trạng)"
+     ],
      "so": 28
     }
    ]
@@ -313,17 +435,1739 @@
    "muc": [
     {
      "mau": "#155ea9",
-     "ten": "Hatch_Khop",
-     "dayDu": "Hatch_Khop",
+     "tenDs": [
+      "Hatch_Khop"
+     ],
      "so": 17
     },
     {
      "mau": "#7eb38b",
-     "ten": "Đồi núi",
-     "dayDu": "Đồi núi",
+     "tenDs": [
+      "Đồi núi"
+     ],
      "so": 3
     }
    ]
   }
- ]
+ ],
+ "ban": {
+  "qh-qd2076": [
+   {
+    "nhom": "Đất ở",
+    "muc": [
+     {
+      "mau": "#cc9f19",
+      "tenDs": [
+       "Nhóm nhà ở thấp tầng",
+       "Đơn vị ở mới mật độ trung bình",
+       "Đơn vị ở mới mật độ trung bình (2030)"
+      ],
+      "so": 662
+     },
+     {
+      "mau": "#e2f5ab",
+      "tenDs": [
+       "Đơn vị ở mật độ thấp đến năm 2045",
+       "Đơn vị ở mật độ thấp đến năm 2030"
+      ],
+      "so": 183
+     },
+     {
+      "mau": "#979763",
+      "tenDs": [
+       "Làng xóm đô thị hoá (hiện trạng)",
+       "Dân cư nông thôn (hiện trạng)",
+       "Dân cư nông thôn",
+       "Làng xóm",
+       "Làng xóm đô thị hoá"
+      ],
+      "so": 150
+     },
+     {
+      "mau": "#cc7219",
+      "tenDs": [
+       "Nhà ở chung cư"
+      ],
+      "so": 32
+     },
+     {
+      "mau": "#a93915",
+      "tenDs": [
+       "Đơn vị ở mới mật độ cao"
+      ],
+      "so": 11
+     },
+     {
+      "mau": "#b3a67e",
+      "tenDs": [
+       "Hiện trạng cải tạo chỉnh trang"
+      ],
+      "so": 1
+     }
+    ]
+   },
+   {
+    "nhom": "Đất hỗn hợp",
+    "muc": [
+     {
+      "mau": "#cc4619",
+      "tenDs": [
+       "Đất hỗn hợp"
+      ],
+      "so": 17
+     }
+    ]
+   },
+   {
+    "nhom": "Thương mại – dịch vụ – du lịch",
+    "muc": [
+     {
+      "mau": "#cc1919",
+      "tenDs": [
+       "Dịch vụ đơn vị ở",
+       "Dịch vụ đô thị"
+      ],
+      "so": 48
+     },
+     {
+      "mau": "#fb30fc",
+      "tenDs": [
+       "Đất du lịch",
+       "Đất dịch vụ"
+      ],
+      "so": 15
+     },
+     {
+      "mau": "#a91515",
+      "tenDs": [
+       "Dịch vụ nông thôn",
+       "Dịch vụ nông thôn (hiện trạng)"
+      ],
+      "so": 6
+     },
+     {
+      "mau": "#15a915",
+      "tenDs": [
+       "Sân golf"
+      ],
+      "so": 5
+     }
+    ]
+   },
+   {
+    "nhom": "Công trình công cộng",
+    "muc": [
+     {
+      "mau": "#a05d5d",
+      "tenDs": [
+       "Trường học",
+       "Trường học nông thôn",
+       "Trường học (nông thôn) (hiện trạng)",
+       "Trường học (hiện trạng)"
+      ],
+      "so": 141
+     },
+     {
+      "mau": "#e94fc2",
+      "tenDs": [
+       "Y tế đơn vị ở",
+       "Đất cơ sở y tế (ngoài đô thị)",
+       "Đất cơ sở y tế",
+       "Đất cơ sở y tế (hiện trạng)",
+       "Y tế đơn vị ở (hiện trạng)",
+       "Đất cơ sở y tế (ngoài đô thị) (hiện trạng)",
+       "Đất cơ sở y tế (đô thị)"
+      ],
+      "so": 38
+     },
+     {
+      "mau": "#b37e8b",
+      "tenDs": [
+       "Văn hoá đơn vị ở",
+       "Đất cơ sở văn hoá (nông thôn) (hiện trạng)",
+       "Đất cơ sở văn hoá (đô thị)",
+       "Đất cơ sở văn hoá (nông thôn)",
+       "Đất cơ sở văn hoá (hiện trạng)"
+      ],
+      "so": 38
+     },
+     {
+      "mau": "#750f0f",
+      "tenDs": [
+       "Di tích (hiện trạng)"
+      ],
+      "so": 26
+     },
+     {
+      "mau": "#a93915",
+      "tenDs": [
+       "Trường THPT"
+      ],
+      "so": 8
+     },
+     {
+      "mau": "#a95e15",
+      "tenDs": [
+       "Đất cơ quan (đô thị)",
+       "Đất cơ quan (đô thị) (hiện trạng)"
+      ],
+      "so": 5
+     },
+     {
+      "mau": "#755c0f",
+      "tenDs": [
+       "Đất cơ quan (ngoài đô thị) (hiện trạng)",
+       "Đất cơ quan (ngoài đô thị)"
+      ],
+      "so": 4
+     },
+     {
+      "mau": "#1584a9",
+      "tenDs": [
+       "Đất đào tạo"
+      ],
+      "so": 1
+     }
+    ]
+   },
+   {
+    "nhom": "Cây xanh – thể dục thể thao",
+    "muc": [
+     {
+      "mau": "#72cc19",
+      "tenDs": [
+       "Cây xanh công cộng đơn vị ở",
+       "Cây xanh công cộng đô thị"
+      ],
+      "so": 171
+     },
+     {
+      "mau": "#d5f7df",
+      "tenDs": [
+       "Cây xanh chuyên dụng"
+      ],
+      "so": 152
+     },
+     {
+      "mau": "#15a915",
+      "tenDs": [
+       "Thể dục thể thao đơn vị ở",
+       "Thể dục thể thao đô thị",
+       "Cây xanh sử dụng hạn chế"
+      ],
+      "so": 50
+     },
+     {
+      "mau": "#0f750f",
+      "tenDs": [
+       "Cây xanh sử dụng hạn chế – công viên thể dục thể thao"
+      ],
+      "so": 13
+     },
+     {
+      "mau": "#5ea915",
+      "tenDs": [
+       "Cây xanh công cộng nông thôn"
+      ],
+      "so": 11
+     },
+     {
+      "mau": "#0f7528",
+      "tenDs": [
+       "Sân bãi thể thao nông thôn"
+      ],
+      "so": 7
+     }
+    ]
+   },
+   {
+    "nhom": "Rừng",
+    "muc": [
+     {
+      "mau": "#416f4c",
+      "tenDs": [
+       "Đất rừng sản xuất (hiện trạng)"
+      ],
+      "so": 3
+     }
+    ]
+   },
+   {
+    "nhom": "Nông nghiệp",
+    "muc": [
+     {
+      "mau": "#4fe94f",
+      "tenDs": [
+       "Đất nông nghiệp (hiện trạng)"
+      ],
+      "so": 7
+     }
+    ]
+   },
+   {
+    "nhom": "Mặt nước",
+    "muc": [
+     {
+      "mau": "#155ea9",
+      "tenDs": [
+       "Mặt nước, hồ ao đầm (đơn vị ở đến năm 2045)",
+       "Mặt nước, hồ ao đầm (đơn vị ở đến năm 2030)",
+       "Mặt nước, hồ ao đầm",
+       "Mặt nước, hồ ao đầm (đô thị)",
+       "Đầm Thuỷ Triều"
+      ],
+      "so": 84
+     },
+     {
+      "mau": "#1972cc",
+      "tenDs": [
+       "Sông suối",
+       "Sông suối (ngoài ranh giới)"
+      ],
+      "so": 51
+     }
+    ]
+   },
+   {
+    "nhom": "Giao thông – hạ tầng",
+    "muc": [
+     {
+      "mau": "#848484",
+      "tenDs": [
+       "Bãi đỗ xe đơn vị ở",
+       "Nghĩa trang",
+       "Bãi đỗ xe (nông thôn)"
+      ],
+      "so": 75
+     },
+     {
+      "mau": "#352a7e",
+      "tenDs": [
+       "Hạ tầng khác đô thị",
+       "Hạ tầng kỹ thuật ngoài đô thị (hiện trạng)",
+       "Hạ tầng kỹ thuật ngoài đô thị",
+       "Hạ tầng khác ngoài đô thị",
+       "Hạ tầng khác đô thị (hiện trạng)"
+      ],
+      "so": 21
+     }
+    ]
+   },
+   {
+    "nhom": "Công nghiệp",
+    "muc": [
+     {
+      "mau": "#7000e2",
+      "tenDs": [
+       "Đất công nghiệp (hiện trạng)",
+       "Đất công nghiệp"
+      ],
+      "so": 6
+     }
+    ]
+   },
+   {
+    "nhom": "Quốc phòng – an ninh",
+    "muc": [
+     {
+      "mau": "#84a915",
+      "tenDs": [
+       "Đất an ninh",
+       "Đất an ninh (hiện trạng)"
+      ],
+      "so": 9
+     },
+     {
+      "mau": "#354428",
+      "tenDs": [
+       "Đất quốc phòng",
+       "Đất quốc phòng (hiện trạng)"
+      ],
+      "so": 5
+     }
+    ]
+   }
+  ],
+  "qh-qd2101": [
+   {
+    "nhom": "Đất ở",
+    "muc": [
+     {
+      "mau": "#cc9f19",
+      "tenDs": [
+       "Nhóm nhà ở"
+      ],
+      "so": 313
+     },
+     {
+      "mau": "#e2f5ab",
+      "tenDs": [
+       "Nhóm nhà ở"
+      ],
+      "so": 252
+     },
+     {
+      "mau": "#979763",
+      "tenDs": [
+       "Nhóm nhà ở (hiện trạng)"
+      ],
+      "so": 105
+     },
+     {
+      "mau": "#cc4619",
+      "tenDs": [
+       "Nhóm nhà ở trong khu hỗn hợp"
+      ],
+      "so": 37
+     }
+    ]
+   },
+   {
+    "nhom": "Đất hỗn hợp",
+    "muc": [
+     {
+      "mau": "#cc4619",
+      "tenDs": [
+       "Đất hỗn hợp – nhóm nhà ở"
+      ],
+      "so": 47
+     }
+    ]
+   },
+   {
+    "nhom": "Thương mại – dịch vụ – du lịch",
+    "muc": [
+     {
+      "mau": "#cc1919",
+      "tenDs": [
+       "Dịch vụ đơn vị ở"
+      ],
+      "so": 69
+     },
+     {
+      "mau": "#f5abbd",
+      "tenDs": [
+       "Du lịch – khu dịch vụ"
+      ],
+      "so": 20
+     },
+     {
+      "mau": "#fb30fc",
+      "tenDs": [
+       "Đất dịch vụ",
+       "Du lịch – khu du lịch"
+      ],
+      "so": 18
+     }
+    ]
+   },
+   {
+    "nhom": "Công trình công cộng",
+    "muc": [
+     {
+      "mau": "#a05d5d",
+      "tenDs": [
+       "Trường học",
+       "Trường học (hiện trạng)"
+      ],
+      "so": 118
+     },
+     {
+      "mau": "#b37e8b",
+      "tenDs": [
+       "Văn hoá đơn vị ở",
+       "Đất cơ sở văn hoá",
+       "Văn hoá đơn vị ở (hiện trạng)"
+      ],
+      "so": 39
+     },
+     {
+      "mau": "#750f0f",
+      "tenDs": [
+       "Di tích – tôn giáo (hiện trạng)",
+       "Di tích – tôn giáo"
+      ],
+      "so": 34
+     },
+     {
+      "mau": "#e94fc2",
+      "tenDs": [
+       "Y tế đơn vị ở",
+       "Y tế đơn vị ở (hiện trạng)",
+       "Đất cơ sở y tế"
+      ],
+      "so": 31
+     },
+     {
+      "mau": "#a95e15",
+      "tenDs": [
+       "Đất cơ quan (hiện trạng)",
+       "Đất cơ quan"
+      ],
+      "so": 6
+     },
+     {
+      "mau": "#a93915",
+      "tenDs": [
+       "Trường THPT"
+      ],
+      "so": 5
+     },
+     {
+      "mau": "#1584a9",
+      "tenDs": [
+       "Đào tạo – nghiên cứu (hiện trạng)",
+       "Đào tạo – nghiên cứu"
+      ],
+      "so": 3
+     }
+    ]
+   },
+   {
+    "nhom": "Cây xanh – thể dục thể thao",
+    "muc": [
+     {
+      "mau": "#72cc19",
+      "tenDs": [
+       "Cây xanh công cộng đơn vị ở",
+       "Cây xanh công cộng"
+      ],
+      "so": 165
+     },
+     {
+      "mau": "#d5f7df",
+      "tenDs": [
+       "Cây xanh chuyên dụng"
+      ],
+      "so": 149
+     },
+     {
+      "mau": "#15a915",
+      "tenDs": [
+       "Thể dục thể thao đơn vị ở",
+       "Thể dục thể thao",
+       "Thể dục thể thao đơn vị ở (hiện trạng)",
+       "Cây xanh sử dụng hạn chế"
+      ],
+      "so": 58
+     }
+    ]
+   },
+   {
+    "nhom": "Mặt nước",
+    "muc": [
+     {
+      "mau": "#155ea9",
+      "tenDs": [
+       "Mặt nước sử dụng công cộng (đơn vị ở)",
+       "Hồ nước",
+       "Hồ nước (hiện trạng)"
+      ],
+      "so": 38
+     },
+     {
+      "mau": "#1972cc",
+      "tenDs": [
+       "Sông suối"
+      ],
+      "so": 26
+     }
+    ]
+   },
+   {
+    "nhom": "Giao thông – hạ tầng",
+    "muc": [
+     {
+      "mau": "#848484",
+      "tenDs": [
+       "Bãi đỗ xe đơn vị ở",
+       "Nghĩa trang (hiện trạng)"
+      ],
+      "so": 56
+     },
+     {
+      "mau": "#352a7e",
+      "tenDs": [
+       "Hạ tầng khác",
+       "Hạ tầng khác (hiện trạng)"
+      ],
+      "so": 16
+     },
+     {
+      "mau": "#858585",
+      "tenDs": [
+       "Bãi đỗ xe"
+      ],
+      "so": 11
+     }
+    ]
+   },
+   {
+    "nhom": "Công nghiệp",
+    "muc": [
+     {
+      "mau": "#7000e2",
+      "tenDs": [
+       "Sản xuất công nghiệp"
+      ],
+      "so": 4
+     }
+    ]
+   },
+   {
+    "nhom": "Quốc phòng – an ninh",
+    "muc": [
+     {
+      "mau": "#84a915",
+      "tenDs": [
+       "Đất an ninh",
+       "Đất an ninh (hiện trạng)"
+      ],
+      "so": 12
+     },
+     {
+      "mau": "#354428",
+      "tenDs": [
+       "Đất quốc phòng (hiện trạng)",
+       "Đất quốc phòng"
+      ],
+      "so": 5
+     }
+    ]
+   }
+  ],
+  "qh-qd2222": [
+   {
+    "nhom": "Đất ở",
+    "muc": [
+     {
+      "mau": "#cc9f19",
+      "tenDs": [
+       "Nhóm nhà ở",
+       "Nhóm nhà ở (hiện trạng)"
+      ],
+      "so": 149
+     }
+    ]
+   },
+   {
+    "nhom": "Đất hỗn hợp",
+    "muc": [
+     {
+      "mau": "#cc4619",
+      "tenDs": [
+       "Đất hỗn hợp – nhóm nhà ở"
+      ],
+      "so": 16
+     }
+    ]
+   },
+   {
+    "nhom": "Thương mại – dịch vụ – du lịch",
+    "muc": [
+     {
+      "mau": "#fb30fc",
+      "tenDs": [
+       "Đất du lịch",
+       "Đất du lịch (hiện trạng)",
+       "Đất dịch vụ",
+       "Đất dịch vụ (hiện trạng)"
+      ],
+      "so": 86
+     },
+     {
+      "mau": "#cc1919",
+      "tenDs": [
+       "Dịch vụ đơn vị ở"
+      ],
+      "so": 8
+     }
+    ]
+   },
+   {
+    "nhom": "Công trình công cộng",
+    "muc": [
+     {
+      "mau": "#a05d5d",
+      "tenDs": [
+       "Trường học",
+       "Trường học (hiện trạng)"
+      ],
+      "so": 43
+     },
+     {
+      "mau": "#e94fc2",
+      "tenDs": [
+       "Đất cơ sở y tế",
+       "Yte_CT (hiện trạng)"
+      ],
+      "so": 10
+     },
+     {
+      "mau": "#750f0f",
+      "tenDs": [
+       "Di tích – tôn giáo (hiện trạng)",
+       "Di tích – tôn giáo"
+      ],
+      "so": 9
+     },
+     {
+      "mau": "#b37e8b",
+      "tenDs": [
+       "Đất cơ sở văn hoá",
+       "Đất cơ sở văn hoá (hiện trạng)"
+      ],
+      "so": 8
+     },
+     {
+      "mau": "#a93915",
+      "tenDs": [
+       "Trường THPT"
+      ],
+      "so": 4
+     },
+     {
+      "mau": "#a95e15",
+      "tenDs": [
+       "Đất cơ quan (hiện trạng)"
+      ],
+      "so": 2
+     }
+    ]
+   },
+   {
+    "nhom": "Cây xanh – thể dục thể thao",
+    "muc": [
+     {
+      "mau": "#72cc19",
+      "tenDs": [
+       "Cây xanh công cộng đơn vị ở",
+       "Cây xanh công cộng đô thị",
+       "Cây xanh công cộng",
+       "Cây xanh công cộng (hiện trạng)",
+       "Cây xanh công cộng đơn vị ở (hiện trạng)"
+      ],
+      "so": 76
+     },
+     {
+      "mau": "#d5f7df",
+      "tenDs": [
+       "Cây xanh chuyên dụng"
+      ],
+      "so": 24
+     },
+     {
+      "mau": "#15a915",
+      "tenDs": [
+       "Cây xanh sử dụng hạn chế",
+       "Thể dục thể thao đơn vị ở"
+      ],
+      "so": 14
+     }
+    ]
+   },
+   {
+    "nhom": "Rừng",
+    "muc": [
+     {
+      "mau": "#416f4c",
+      "tenDs": [
+       "Đất rừng sản xuất (hiện trạng)"
+      ],
+      "so": 2
+     }
+    ]
+   },
+   {
+    "nhom": "Mặt nước",
+    "muc": [
+     {
+      "mau": "#1972cc",
+      "tenDs": [
+       "Mặt nước biển (hiện trạng)",
+       "Sông suối",
+       "Sông suối (hiện trạng)"
+      ],
+      "so": 11
+     },
+     {
+      "mau": "#155ea9",
+      "tenDs": [
+       "Hồ nước",
+       "Hồ nước (hiện trạng)"
+      ],
+      "so": 10
+     }
+    ]
+   },
+   {
+    "nhom": "Giao thông – hạ tầng",
+    "muc": [
+     {
+      "mau": "#858585",
+      "tenDs": [
+       "Bãi đỗ xe"
+      ],
+      "so": 26
+     },
+     {
+      "mau": "#352a7e",
+      "tenDs": [
+       "Hạ tầng khác",
+       "Hạ tầng khác (hiện trạng)"
+      ],
+      "so": 7
+     }
+    ]
+   },
+   {
+    "nhom": "Quốc phòng – an ninh",
+    "muc": [
+     {
+      "mau": "#354428",
+      "tenDs": [
+       "Đất quốc phòng (hiện trạng)"
+      ],
+      "so": 7
+     },
+     {
+      "mau": "#84a915",
+      "tenDs": [
+       "Anninh_CT (hiện trạng)",
+       "Đất an ninh"
+      ],
+      "so": 2
+     }
+    ]
+   },
+   {
+    "nhom": "Loại đất khác",
+    "muc": [
+     {
+      "mau": "#155ea9",
+      "tenDs": [
+       "Hatch_Khop"
+      ],
+      "so": 17
+     }
+    ]
+   }
+  ],
+  "qh-qd918": [
+   {
+    "nhom": "Đất ở",
+    "muc": [
+     {
+      "mau": "#979763",
+      "tenDs": [
+       "Làng xóm (hiện trạng)",
+       "Làng xóm",
+       "Làng xóm đô thị hoá"
+      ],
+      "so": 143
+     }
+    ]
+   },
+   {
+    "nhom": "Thương mại – dịch vụ – du lịch",
+    "muc": [
+     {
+      "mau": "#fb30fc",
+      "tenDs": [
+       "Đất du lịch",
+       "Đất dịch vụ"
+      ],
+      "so": 19
+     }
+    ]
+   },
+   {
+    "nhom": "Công trình công cộng",
+    "muc": [
+     {
+      "mau": "#750f0f",
+      "tenDs": [
+       "Di tích – tôn giáo (hiện trạng)"
+      ],
+      "so": 16
+     },
+     {
+      "mau": "#a05d5d",
+      "tenDs": [
+       "Trường học",
+       "Trường học (hiện trạng)"
+      ],
+      "so": 16
+     },
+     {
+      "mau": "#b37e8b",
+      "tenDs": [
+       "Đất cơ sở văn hoá"
+      ],
+      "so": 7
+     },
+     {
+      "mau": "#e94fc2",
+      "tenDs": [
+       "Đất cơ sở y tế",
+       "Đất cơ sở y tế (hiện trạng)"
+      ],
+      "so": 5
+     },
+     {
+      "mau": "#a95e15",
+      "tenDs": [
+       "Đất cơ quan (hiện trạng)",
+       "Đất cơ quan"
+      ],
+      "so": 3
+     },
+     {
+      "mau": "#a93915",
+      "tenDs": [
+       "Trường THPT"
+      ],
+      "so": 3
+     }
+    ]
+   },
+   {
+    "nhom": "Cây xanh – thể dục thể thao",
+    "muc": [
+     {
+      "mau": "#d5f7df",
+      "tenDs": [
+       "Cây xanh chuyên dụng"
+      ],
+      "so": 61
+     },
+     {
+      "mau": "#15a915",
+      "tenDs": [
+       "Thể dục thể thao",
+       "Thể dục thể thao (hiện trạng)",
+       "Cây xanh sử dụng hạn chế"
+      ],
+      "so": 9
+     },
+     {
+      "mau": "#72cc19",
+      "tenDs": [
+       "Cây xanh công cộng"
+      ],
+      "so": 9
+     }
+    ]
+   },
+   {
+    "nhom": "Rừng",
+    "muc": [
+     {
+      "mau": "#5da08f",
+      "tenDs": [
+       "Đất rừng phòng hộ (hiện trạng)"
+      ],
+      "so": 21
+     },
+     {
+      "mau": "#416f4c",
+      "tenDs": [
+       "Đất rừng sản xuất (hiện trạng)"
+      ],
+      "so": 16
+     },
+     {
+      "mau": "#abf5ab",
+      "tenDs": [
+       "KXD_DulichRung_qh"
+      ],
+      "so": 1
+     }
+    ]
+   },
+   {
+    "nhom": "Nông nghiệp",
+    "muc": [
+     {
+      "mau": "#4fe94f",
+      "tenDs": [
+       "Đất nông nghiệp (hiện trạng)"
+      ],
+      "so": 20
+     }
+    ]
+   },
+   {
+    "nhom": "Mặt nước",
+    "muc": [
+     {
+      "mau": "#1972cc",
+      "tenDs": [
+       "Sông suối (hiện trạng)"
+      ],
+      "so": 38
+     },
+     {
+      "mau": "#155ea9",
+      "tenDs": [
+       "Hồ nước (hiện trạng)"
+      ],
+      "so": 3
+     }
+    ]
+   },
+   {
+    "nhom": "Giao thông – hạ tầng",
+    "muc": [
+     {
+      "mau": "#352a7e",
+      "tenDs": [
+       "Hạ tầng khác (hiện trạng)",
+       "Hạ tầng khác"
+      ],
+      "so": 20
+     },
+     {
+      "mau": "#858585",
+      "tenDs": [
+       "Bãi đỗ xe"
+      ],
+      "so": 11
+     },
+     {
+      "mau": "#848484",
+      "tenDs": [
+       "Nghĩa trang (hiện trạng)",
+       "Nghĩa trang"
+      ],
+      "so": 6
+     }
+    ]
+   },
+   {
+    "nhom": "Công nghiệp",
+    "muc": [
+     {
+      "mau": "#7000e2",
+      "tenDs": [
+       "Sản xuất công nghiệp"
+      ],
+      "so": 15
+     }
+    ]
+   },
+   {
+    "nhom": "Quốc phòng – an ninh",
+    "muc": [
+     {
+      "mau": "#354428",
+      "tenDs": [
+       "Đất quốc phòng",
+       "Đất quốc phòng (hiện trạng)"
+      ],
+      "so": 10
+     },
+     {
+      "mau": "#84a915",
+      "tenDs": [
+       "Đất an ninh (hiện trạng)",
+       "Đất an ninh"
+      ],
+      "so": 2
+     }
+    ]
+   }
+  ],
+  "qh-cuhin": [
+   {
+    "nhom": "Đất ở",
+    "muc": [
+     {
+      "mau": "#979763",
+      "tenDs": [
+       "Làng xóm (hiện trạng)",
+       "Làng xóm"
+      ],
+      "so": 142
+     }
+    ]
+   },
+   {
+    "nhom": "Đất hỗn hợp",
+    "muc": [
+     {
+      "mau": "#cc4619",
+      "tenDs": [
+       "Đất hỗn hợp – nhóm nhà ở"
+      ],
+      "so": 6
+     }
+    ]
+   },
+   {
+    "nhom": "Thương mại – dịch vụ – du lịch",
+    "muc": [
+     {
+      "mau": "#fb30fc",
+      "tenDs": [
+       "Đất dịch vụ",
+       "Đất dịch vụ (hiện trạng)",
+       "Đất du lịch"
+      ],
+      "so": 10
+     }
+    ]
+   },
+   {
+    "nhom": "Công trình công cộng",
+    "muc": [
+     {
+      "mau": "#750f0f",
+      "tenDs": [
+       "Di tích – tôn giáo (hiện trạng)"
+      ],
+      "so": 15
+     },
+     {
+      "mau": "#a05d5d",
+      "tenDs": [
+       "Trường học (hiện trạng)",
+       "Trường học"
+      ],
+      "so": 10
+     },
+     {
+      "mau": "#e94fc2",
+      "tenDs": [
+       "Đất cơ sở y tế (hiện trạng)",
+       "Đất cơ sở y tế"
+      ],
+      "so": 5
+     },
+     {
+      "mau": "#1584a9",
+      "tenDs": [
+       "Đào tạo – nghiên cứu",
+       "Đào tạo – nghiên cứu (hiện trạng)"
+      ],
+      "so": 3
+     },
+     {
+      "mau": "#a95e15",
+      "tenDs": [
+       "Đất cơ quan (hiện trạng)",
+       "Đất cơ quan"
+      ],
+      "so": 3
+     },
+     {
+      "mau": "#a93915",
+      "tenDs": [
+       "Trường THPT (hiện trạng)",
+       "Trường THPT"
+      ],
+      "so": 2
+     },
+     {
+      "mau": "#b37e8b",
+      "tenDs": [
+       "Đất cơ sở văn hoá (hiện trạng)",
+       "Đất cơ sở văn hoá"
+      ],
+      "so": 2
+     }
+    ]
+   },
+   {
+    "nhom": "Cây xanh – thể dục thể thao",
+    "muc": [
+     {
+      "mau": "#d5f7df",
+      "tenDs": [
+       "Cây xanh chuyên dụng",
+       "Cây xanh chuyên dụng (hiện trạng)"
+      ],
+      "so": 69
+     },
+     {
+      "mau": "#72cc19",
+      "tenDs": [
+       "Cây xanh công cộng"
+      ],
+      "so": 5
+     },
+     {
+      "mau": "#15a915",
+      "tenDs": [
+       "Thể dục thể thao (hiện trạng)",
+       "Thể dục thể thao"
+      ],
+      "so": 2
+     }
+    ]
+   },
+   {
+    "nhom": "Rừng",
+    "muc": [
+     {
+      "mau": "#416f4c",
+      "tenDs": [
+       "Đất rừng sản xuất (hiện trạng)"
+      ],
+      "so": 2
+     }
+    ]
+   },
+   {
+    "nhom": "Nông nghiệp",
+    "muc": [
+     {
+      "mau": "#4fe94f",
+      "tenDs": [
+       "Đất nông nghiệp (hiện trạng)"
+      ],
+      "so": 14
+     }
+    ]
+   },
+   {
+    "nhom": "Mặt nước",
+    "muc": [
+     {
+      "mau": "#1972cc",
+      "tenDs": [
+       "Sông suối (hiện trạng)"
+      ],
+      "so": 34
+     }
+    ]
+   },
+   {
+    "nhom": "Giao thông – hạ tầng",
+    "muc": [
+     {
+      "mau": "#858585",
+      "tenDs": [
+       "Bãi đỗ xe"
+      ],
+      "so": 12
+     },
+     {
+      "mau": "#848484",
+      "tenDs": [
+       "Nghĩa trang (hiện trạng)",
+       "Nghĩa trang"
+      ],
+      "so": 6
+     },
+     {
+      "mau": "#352a7e",
+      "tenDs": [
+       "Hạ tầng khác",
+       "Hạ tầng khác (hiện trạng)"
+      ],
+      "so": 6
+     }
+    ]
+   },
+   {
+    "nhom": "Công nghiệp",
+    "muc": [
+     {
+      "mau": "#7000e2",
+      "tenDs": [
+       "Sản xuất công nghiệp",
+       "Sản xuất công nghiệp (hiện trạng)"
+      ],
+      "so": 22
+     },
+     {
+      "mau": "#5d5da0",
+      "tenDs": [
+       "Sản xuất vật liệu (hiện trạng)",
+       "Sản xuất vật liệu"
+      ],
+      "so": 2
+     }
+    ]
+   },
+   {
+    "nhom": "Quốc phòng – an ninh",
+    "muc": [
+     {
+      "mau": "#84a915",
+      "tenDs": [
+       "Đất an ninh",
+       "Đất an ninh (hiện trạng)"
+      ],
+      "so": 3
+     },
+     {
+      "mau": "#354428",
+      "tenDs": [
+       "Đất quốc phòng"
+      ],
+      "so": 2
+     }
+    ]
+   }
+  ],
+  "qh-taynam": [
+   {
+    "nhom": "Đất ở",
+    "muc": [
+     {
+      "mau": "#979763",
+      "tenDs": [
+       "Làng xóm (hiện trạng)"
+      ],
+      "so": 73
+     },
+     {
+      "mau": "#cc9f19",
+      "tenDs": [
+       "Nhóm nhà ở"
+      ],
+      "so": 41
+     }
+    ]
+   },
+   {
+    "nhom": "Đất hỗn hợp",
+    "muc": [
+     {
+      "mau": "#cc4619",
+      "tenDs": [
+       "Đất hỗn hợp – nhóm nhà ở"
+      ],
+      "so": 3
+     }
+    ]
+   },
+   {
+    "nhom": "Thương mại – dịch vụ – du lịch",
+    "muc": [
+     {
+      "mau": "#fb30fc",
+      "tenDs": [
+       "Đất dịch vụ",
+       "Đất du lịch"
+      ],
+      "so": 4
+     }
+    ]
+   },
+   {
+    "nhom": "Công trình công cộng",
+    "muc": [
+     {
+      "mau": "#a05d5d",
+      "tenDs": [
+       "Trường học (hiện trạng)",
+       "Trường học"
+      ],
+      "so": 12
+     },
+     {
+      "mau": "#750f0f",
+      "tenDs": [
+       "Di tích – tôn giáo (hiện trạng)"
+      ],
+      "so": 6
+     },
+     {
+      "mau": "#b37e8b",
+      "tenDs": [
+       "Đất cơ sở văn hoá (hiện trạng)",
+       "Đất cơ sở văn hoá"
+      ],
+      "so": 6
+     },
+     {
+      "mau": "#a95e15",
+      "tenDs": [
+       "Đất cơ quan (hiện trạng)",
+       "Đất cơ quan"
+      ],
+      "so": 5
+     },
+     {
+      "mau": "#e94fc2",
+      "tenDs": [
+       "Đất cơ sở y tế (hiện trạng)"
+      ],
+      "so": 1
+     },
+     {
+      "mau": "#a93915",
+      "tenDs": [
+       "Trường THPT"
+      ],
+      "so": 1
+     }
+    ]
+   },
+   {
+    "nhom": "Cây xanh – thể dục thể thao",
+    "muc": [
+     {
+      "mau": "#72cc19",
+      "tenDs": [
+       "Cây xanh công cộng"
+      ],
+      "so": 21
+     },
+     {
+      "mau": "#d5f7df",
+      "tenDs": [
+       "Cây xanh chuyên dụng"
+      ],
+      "so": 16
+     },
+     {
+      "mau": "#15a915",
+      "tenDs": [
+       "Thể dục thể thao",
+       "Cây xanh sử dụng hạn chế",
+       "Thể dục thể thao (hiện trạng)"
+      ],
+      "so": 6
+     }
+    ]
+   },
+   {
+    "nhom": "Rừng",
+    "muc": [
+     {
+      "mau": "#5da08f",
+      "tenDs": [
+       "Đất rừng phòng hộ (hiện trạng)"
+      ],
+      "so": 35
+     },
+     {
+      "mau": "#416f4c",
+      "tenDs": [
+       "Đất rừng sản xuất (hiện trạng)"
+      ],
+      "so": 34
+     }
+    ]
+   },
+   {
+    "nhom": "Nông nghiệp",
+    "muc": [
+     {
+      "mau": "#4fe94f",
+      "tenDs": [
+       "Đất nông nghiệp (hiện trạng)"
+      ],
+      "so": 43
+     },
+     {
+      "mau": "#d0d0d0",
+      "tenDs": [
+       "Đất chưa sử dụng (hiện trạng)"
+      ],
+      "so": 8
+     }
+    ]
+   },
+   {
+    "nhom": "Mặt nước",
+    "muc": [
+     {
+      "mau": "#1972cc",
+      "tenDs": [
+       "Sông suối (hiện trạng)"
+      ],
+      "so": 45
+     },
+     {
+      "mau": "#155ea9",
+      "tenDs": [
+       "Hồ nước (hiện trạng)"
+      ],
+      "so": 1
+     }
+    ]
+   },
+   {
+    "nhom": "Giao thông – hạ tầng",
+    "muc": [
+     {
+      "mau": "#352a7e",
+      "tenDs": [
+       "Hạ tầng khác (hiện trạng)"
+      ],
+      "so": 4
+     },
+     {
+      "mau": "#848484",
+      "tenDs": [
+       "Nghĩa trang (hiện trạng)"
+      ],
+      "so": 4
+     },
+     {
+      "mau": "#858585",
+      "tenDs": [
+       "Bãi đỗ xe"
+      ],
+      "so": 3
+     }
+    ]
+   },
+   {
+    "nhom": "Công nghiệp",
+    "muc": [
+     {
+      "mau": "#7000e2",
+      "tenDs": [
+       "Sản xuất công nghiệp (hiện trạng)",
+       "Sản xuất công nghiệp"
+      ],
+      "so": 10
+     }
+    ]
+   },
+   {
+    "nhom": "Quốc phòng – an ninh",
+    "muc": [
+     {
+      "mau": "#354428",
+      "tenDs": [
+       "Đất quốc phòng",
+       "Đất quốc phòng (hiện trạng)"
+      ],
+      "so": 4
+     }
+    ]
+   },
+   {
+    "nhom": "Loại đất khác",
+    "muc": [
+     {
+      "mau": "#7eb38b",
+      "tenDs": [
+       "Đồi núi"
+      ],
+      "so": 3
+     }
+    ]
+   }
+  ],
+  "qh-taybac": [
+   {
+    "nhom": "Đất ở",
+    "muc": [
+     {
+      "mau": "#979763",
+      "tenDs": [
+       "Làng xóm (hiện trạng)",
+       "Làng xóm"
+      ],
+      "so": 14
+     }
+    ]
+   },
+   {
+    "nhom": "Đất hỗn hợp",
+    "muc": [
+     {
+      "mau": "#cc4619",
+      "tenDs": [
+       "Đất hỗn hợp – nhóm nhà ở"
+      ],
+      "so": 2
+     }
+    ]
+   },
+   {
+    "nhom": "Thương mại – dịch vụ – du lịch",
+    "muc": [
+     {
+      "mau": "#fb30fc",
+      "tenDs": [
+       "Du lịch – khu du lịch",
+       "Đất dịch vụ"
+      ],
+      "so": 4
+     }
+    ]
+   },
+   {
+    "nhom": "Công trình công cộng",
+    "muc": [
+     {
+      "mau": "#750f0f",
+      "tenDs": [
+       "Di tích – tôn giáo (hiện trạng)",
+       "Di tích – tôn giáo"
+      ],
+      "so": 4
+     },
+     {
+      "mau": "#a05d5d",
+      "tenDs": [
+       "Trường học"
+      ],
+      "so": 3
+     },
+     {
+      "mau": "#1584a9",
+      "tenDs": [
+       "Đào tạo – nghiên cứu (hiện trạng)"
+      ],
+      "so": 2
+     },
+     {
+      "mau": "#a95e15",
+      "tenDs": [
+       "Đất cơ quan (hiện trạng)"
+      ],
+      "so": 2
+     },
+     {
+      "mau": "#b37e8b",
+      "tenDs": [
+       "Đất cơ sở văn hoá"
+      ],
+      "so": 2
+     },
+     {
+      "mau": "#e94fc2",
+      "tenDs": [
+       "Đất cơ sở y tế"
+      ],
+      "so": 2
+     }
+    ]
+   },
+   {
+    "nhom": "Cây xanh – thể dục thể thao",
+    "muc": [
+     {
+      "mau": "#d5f7df",
+      "tenDs": [
+       "Cây xanh chuyên dụng"
+      ],
+      "so": 21
+     },
+     {
+      "mau": "#72cc19",
+      "tenDs": [
+       "Cây xanh công cộng"
+      ],
+      "so": 4
+     },
+     {
+      "mau": "#15a915",
+      "tenDs": [
+       "Thể dục thể thao"
+      ],
+      "so": 2
+     }
+    ]
+   },
+   {
+    "nhom": "Rừng",
+    "muc": [
+     {
+      "mau": "#2a7e7e",
+      "tenDs": [
+       "Đất rừng đặc dụng (hiện trạng)"
+      ],
+      "so": 15
+     },
+     {
+      "mau": "#416f4c",
+      "tenDs": [
+       "Đất rừng sản xuất (hiện trạng)"
+      ],
+      "so": 11
+     },
+     {
+      "mau": "#5da08f",
+      "tenDs": [
+       "Đất rừng phòng hộ (hiện trạng)"
+      ],
+      "so": 2
+     }
+    ]
+   },
+   {
+    "nhom": "Nông nghiệp",
+    "muc": [
+     {
+      "mau": "#4fe94f",
+      "tenDs": [
+       "Đất nông nghiệp (hiện trạng)"
+      ],
+      "so": 17
+     }
+    ]
+   },
+   {
+    "nhom": "Mặt nước",
+    "muc": [
+     {
+      "mau": "#1972cc",
+      "tenDs": [
+       "Sông suối",
+       "Sông suối (hiện trạng)"
+      ],
+      "so": 31
+     },
+     {
+      "mau": "#155ea9",
+      "tenDs": [
+       "Hồ nước (hiện trạng)",
+       "Hồ nước"
+      ],
+      "so": 6
+     }
+    ]
+   },
+   {
+    "nhom": "Giao thông – hạ tầng",
+    "muc": [
+     {
+      "mau": "#352a7e",
+      "tenDs": [
+       "Hạ tầng khác (hiện trạng)",
+       "Hạ tầng khác"
+      ],
+      "so": 4
+     },
+     {
+      "mau": "#848484",
+      "tenDs": [
+       "Nghĩa trang (hiện trạng)"
+      ],
+      "so": 2
+     },
+     {
+      "mau": "#858585",
+      "tenDs": [
+       "Bãi đỗ xe"
+      ],
+      "so": 2
+     }
+    ]
+   },
+   {
+    "nhom": "Quốc phòng – an ninh",
+    "muc": [
+     {
+      "mau": "#354428",
+      "tenDs": [
+       "Đất quốc phòng (hiện trạng)"
+      ],
+      "so": 2
+     }
+    ]
+   }
+  ]
+ }
 }

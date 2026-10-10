@@ -834,7 +834,10 @@ export default function MapPage() {
   // File `/chu-giai-qh.json` do scripts/qh-pipeline/8-tao-chu-giai.py sinh ra, chỉ liệt kê
   // những loại đất THẬT SỰ có trên bản đồ. Nạp LÚC BẤM MỞ chứ không nạp sẵn — ai không xem
   // chú giải thì không phải tải thêm gì.
-  const [chuGiai, setChuGiai] = useState<{ nhom: string; muc: { mau: string; ten: string; dayDu?: string; so: number }[] }[] | null>(null);
+  // 10/10/2026: mỗi màu ghi ĐỦ MỌI TÊN (tenDs) — bỏ kiểu "2 tên + 3 loại nữa"; file có thêm `ban` = chú giải RIÊNG
+  // từng bản phân khu để chỉ hiện loại đất của bản đang bật.
+  type NhomChuGiai = { nhom: string; muc: { mau: string; tenDs: string[]; so: number }[] };
+  const [chuGiai, setChuGiai] = useState<{ nhom: NhomChuGiai[]; ban: Record<string, NhomChuGiai[]> } | null>(null);
   const [chuGiaiOpen, setChuGiaiOpen] = useState(false);
   // Ảnh PNG QĐ205 là lớp CHÍNH (đúng màu/ký hiệu gốc) — bật mặc định, hiển thị TRÊN lớp vector.
   // Hai lớp phân khu MẶC ĐỊNH TẮT: chúng nằm đè lên vùng QĐ205, bật sẵn cả ba thì màu chồng màu.
@@ -1819,29 +1822,53 @@ export default function MapPage() {
   const napChuGiai = () => {
     if (chuGiai) return;
     fetch('/chu-giai-qh.json').then((r) => r.json())
-      .then((d) => setChuGiai(d?.nhom || []))
-      .catch(() => setChuGiai([]));
+      .then((d) => setChuGiai({ nhom: d?.nhom || [], ban: d?.ban || {} }))
+      .catch(() => setChuGiai({ nhom: [], ban: {} }));
   };
   // Tải SẴN chú giải ~1,5 giây sau khi mở trang (file chỉ ~12 KB) → bấm "Chú giải" là hiện ngay,
   // không phải chờ tải lúc bấm (chủ dự án thấy "tải hơi lâu", 6/10/2026).
   useEffect(() => { const t = setTimeout(napChuGiai, 1500); return () => clearTimeout(t); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   // Ruột bảng chú giải — dùng chung cho bảng bên trái (máy tính) và nhóm trên thanh (điện thoại).
-  const chuGiaiNoiDung = () => (
+  // Gộp chú giải của các bản phân khu ĐANG BẬT: cùng nhóm + cùng màu thì gộp tên (không lặp), xếp màu nhiều ô trước.
+  const chuGiaiDangBat = (): NhomChuGiai[] | null => {
+    if (!chuGiai) return null;
+    const ids = (MUC_QH.find((x) => x.id === 'phan-khu')?.gom || []).filter((id) => !!ovOn[id] && chuGiai.ban[id]);
+    if (!ids.length) return [];
+    const thuTu = chuGiai.nhom.map((n) => n.nhom);
+    const gom = new Map<string, Map<string, { mau: string; ten: Map<string, number>; so: number }>>();
+    for (const id of ids) for (const n of chuGiai.ban[id]) {
+      const g = gom.get(n.nhom) || new Map(); gom.set(n.nhom, g);
+      for (const m of n.muc) {
+        const o = g.get(m.mau) || { mau: m.mau, ten: new Map<string, number>(), so: 0 }; g.set(m.mau, o);
+        o.so += m.so; m.tenDs.forEach((t, i) => o.ten.set(t, (o.ten.get(t) || 0) + (m.tenDs.length - i)));
+      }
+    }
+    return Array.from(gom.entries())
+      .sort((a, b) => thuTu.indexOf(a[0]) - thuTu.indexOf(b[0]))
+      .map(([nhom, g]) => ({ nhom, muc: Array.from(g.values()).sort((a, b) => b.so - a.so)
+        .map((o) => ({ mau: o.mau, so: o.so, tenDs: Array.from(o.ten.entries()).sort((a, b) => b[1] - a[1]).map(([t]) => t) })) }));
+  };
+  const chuGiaiNoiDung = () => {
+    const ds = chuGiaiDangBat();
+    return (
     <div className="max-h-72 overflow-y-auto rounded-lg border bg-slate-50/60 p-2">
-      {chuGiai === null && <p className="text-[11px] text-slate-400 py-1">Đang tải…</p>}
-      {chuGiai !== null && chuGiai.length === 0 && (
-        <p className="text-[11px] text-slate-400 py-1">Chưa có dữ liệu chú giải.</p>
+      {ds === null && <p className="text-[11px] text-slate-400 py-1">Đang tải…</p>}
+      {ds !== null && ds.length === 0 && (
+        <p className="text-[11px] text-slate-500 py-1 leading-snug">
+          Chú giải màu hiện có cho <b>Quy hoạch phân khu 1/2000</b>. Với bản đang xem, bấm vào thửa đất để biết loại đất quy hoạch.
+        </p>
       )}
-      {(chuGiai || []).map((n) => (
+      {(ds || []).map((n) => (
         <div key={n.nhom} className="mb-2 last:mb-0">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">{n.nhom}</p>
           {n.muc.map((m) => (
-            /* title = tên đầy đủ: một màu hay gánh 3–4 loại đất, dòng chú giải chỉ ghi 2 tên
-               đầu cho gọn, rê chuột vào mới hiện hết. */
-            <div key={m.mau + m.ten} title={m.dayDu || m.ten} className="flex items-start gap-2 py-[3px]">
+            /* Một màu có thể dùng cho nhiều loại đất (bản vẽ tô chung màu) → ghi ĐỦ từng tên, mỗi tên một dòng. */
+            <div key={m.mau} className="flex items-start gap-2 py-[3px]">
               <span className="mt-[3px] inline-block w-3.5 h-3.5 rounded-sm shrink-0 border border-black/10"
                 style={{ background: m.mau }} />
-              <span className="min-w-0 flex-1 text-[11px] leading-snug text-slate-600">{m.ten}</span>
+              <span className="min-w-0 flex-1 text-[11px] leading-snug text-slate-600">
+                {m.tenDs.map((t) => <span key={t} className="block">{t}</span>)}
+              </span>
             </div>
           ))}
         </div>
@@ -1851,7 +1878,8 @@ export default function MapPage() {
         Thông tin chỉ mang tính tham khảo.
       </p>
     </div>
-  );
+    );
+  };
   // Thanh nút ĐIỆN THOẠI — KIỂU APP THAM CHIẾU (14/9/2026): một hàng nút BO TRÒN, không icon,
   // "Lớp Q.Hoạch (n)" ghi kèm số bản đồ quy hoạch chọn được. Bấm nó mở BẢNG ĐÁY chọn bản đồ
   // (không mở bảng lớp trượt che nửa màn hình nữa).

@@ -22,7 +22,9 @@ import { adminRequired, type AuthedRequest } from '../middleware/auth.ts';
 export const theoDoiRouter = Router();
 
 // Hai tài khoản chủ dự án yêu cầu (tìm theo EMAIL, không ghi cứng mã số).
-const EMAIL_THEO_DOI = ['banhchuoi8833@gmail.com', 'nguyenthiminhnguyet737@gmail.com'];
+const EMAIL_THEO_DOI = ['banhchuoi8833@gmail.com', 'nguyenthiminhnguyet737@gmail.com',
+  // thêm 10/10/2026 theo yêu cầu chủ dự án
+  'vtthoixnk@gmail.com', 'lethianhdung.b9pbc2020@gmail.com', 'tqdung_cl@gmail.com', 'nguyenthanhhauqg12@gmail.com'];
 
 let dangTheoDoi = new Set<number>();          // mã các tài khoản đang theo dõi — nhớ trong RAM cho nhanh
 async function napDanhSach() {
@@ -32,7 +34,7 @@ async function napDanhSach() {
   } catch { /* bảng chưa có thì thôi */ }
 }
 
-/** Tạo bảng + đưa 2 tài khoản vào danh sách. Chạy lại nhiều lần vẫn an toàn. */
+/** Tạo bảng + đưa các tài khoản trong EMAIL_THEO_DOI vào danh sách. Chạy lại nhiều lần vẫn an toàn. */
 export async function khoiTaoTheoDoi() {
   await query(`CREATE TABLE IF NOT EXISTS theo_doi_tai_khoan (
       user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,

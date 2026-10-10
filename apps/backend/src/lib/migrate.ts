@@ -729,5 +729,11 @@ export async function migrate(): Promise<void> {
     `CREATE TRIGGER van_ban_chan_ban_cu BEFORE INSERT ON van_ban FOR EACH ROW EXECUTE FUNCTION van_ban_chan_ban_cu()`,
   ]) await pool.query(sql).catch((e) => console.error('[migrate] văn bản cần kiểm tra:', e.message));
 
+  // Kết quả tính quy hoạch ĐÃ LƯU SẴN theo thửa địa chính (lib/qhLuu.ts, 10/10/2026). pb = dấu phiên bản dữ liệu + cách tính,
+  // dau = dấu hình thửa + diện tích → một trong hai đổi thì dòng cũ bị bỏ qua và tính lại. Xoá cả bảng cũng an toàn.
+  await pool.query(`CREATE TABLE IF NOT EXISTS qh_luu (
+      id integer PRIMARY KEY, pb text NOT NULL, dau text NOT NULL, kq jsonb NOT NULL, luc timestamptz NOT NULL DEFAULT now())`)
+    .catch((e) => console.error('[migrate] qh_luu:', e.message));
+
   console.log('[migrate] schema up to date');
 }

@@ -4,6 +4,7 @@ import { cached, cachePut } from '../lib/cache.ts';
 import { vnNoAccent } from '../lib/vn.ts';
 import { verifyToken, coVaiTro } from '../lib/auth.ts';
 import { computeQhAreas, computeQhTheoBan, outerRing, qhReady, ngoaiVungQh, chuanToaDoDiaChinh } from '../lib/qhCompute.ts';
+import { qhCoLuu, tinhQh } from '../lib/qhLuu.ts';
 
 
 // Mã mục đích sử dụng KHÔNG mở tra cứu thửa — đây là hạ tầng công cộng do Nhà nước quản lý,
@@ -180,10 +181,13 @@ parcelsRouter.get('/at', async (req, res, next) => {
     const ringGoc = outerRing((parcel as any)?.geometry) || [];
     const ringThua = tuBangMoi ? chuanToaDoDiaChinh(ringGoc) : ringGoc;
     const ngoaiQh = !!parcel && ngoaiVungQh(ringThua);
+    // Kết quả tính quy hoạch: thửa địa chính dùng bản ĐÃ LƯU SẴN nếu còn đúng phiên bản (lib/qhLuu.ts), không thì tính + lưu.
+    const dtThua = Number((parcel as any)?.areaM2) || 0;
+    const kqQh = parcel && qhReady() ? (tuBangMoi ? await qhCoLuu(Number(parcel.id), ringThua, dtThua) : tinhQh(ringThua, dtThua)) : null;
     if (parcel && !ngoaiQh) {
       // ƯU TIÊN: diện tích QH theo ĐƯỜNG THẬT (QĐ205 cố định) — chạy TƯƠI theo hình thửa hiện tại.
       // Nhờ vậy đổi/nạp bản đồ địa chính mới vẫn đúng, KHÔNG cần tính sẵn lại. Thiếu dữ liệu đường → rơi về cách cũ.
-      const _pre = qhReady() ? computeQhAreas(ringThua, Number((parcel as any).areaM2) || 0) : null;
+      const _pre = kqQh ? kqQh.pre : null;
       if (_pre && _pre.length) {
         overlaps = _pre.map((o) => ({ layer: 'Quy hoạch', type: o.type, hz: o.hz, areaM2: o.areaM2 }));
       } else {
@@ -266,7 +270,7 @@ parcelsRouter.get('/at', async (req, res, next) => {
     // Một thửa hay bị NHIỀU bản quy hoạch phủ chồng (QĐ205 trùm cả huyện, bên trong còn QĐ893 và
     // các bản phân khu 1/2000). Liệt kê RIÊNG từng bản, mỗi bản ghi rõ loại đất + diện tích, để
     // người xem tự đối chiếu — không bản nào bị giấu đi.
-    const qhCacBan = parcel ? computeQhTheoBan(ringThua, Number((parcel as any).areaM2) || 0) : [];
+    const qhCacBan = parcel ? (kqQh ? kqQh.cacBan : computeQhTheoBan(ringThua, dtThua)) : [];
     res.json({ found: true, point: { lng, lat }, parcel: parcel ?? null, zoning: zoningOut, overlaps, neighbors, listings: linked,
                qhCacBan,
                qhNgoaiVung: ngoaiQh && overlaps.length === 0 && qhCacBan.length === 0 });

@@ -1,3 +1,4 @@
+import { spawn } from 'node:child_process';
 import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
@@ -194,6 +195,15 @@ async function main() {
   try { await khoiTaoTheoDoi(); } catch (e: any) { console.error('[boot] theo dõi tài khoản lỗi (bỏ qua):', e?.message || e); } // tạm — dễ gỡ
   refreshNews(true).catch(() => {}); // lấy tin ngay khi khởi động
   // Văn bản: seed → crawl Công báo (kho đầy đủ) → quét các cổng TTĐT → camhomes.vn (bổ sung, 6/10/2026); sau đó TỰ LÀM MỚI: Công báo mỗi GIỜ, cổng TTĐT mỗi 6 giờ.
+  // Tính sẵn quy hoạch cho thửa lớn bằng TIẾN TRÌNH RIÊNG (không làm chậm máy chủ web) — xem scripts/tinhSanQh.ts.
+  // Dùng đúng trình chạy hiện tại (process.execPath + execArgv của tsx). Thửa đã tính đúng phiên bản thì tự bỏ qua.
+  setTimeout(() => {
+    try {
+      const tep = new URL('./scripts/tinhSanQh.ts', import.meta.url).pathname;
+      const con = spawn(process.execPath, [...process.execArgv, tep], { stdio: 'inherit', env: process.env });
+      con.on('error', (e) => console.error('[tinh-san-qh] không chạy được:', e.message));
+    } catch (e: any) { console.error('[tinh-san-qh] không chạy được:', e?.message || e); }
+  }, 2 * 60 * 1000);
   setTimeout(() => { taiSanFile().catch(() => {}); }, 20000); // dọn file văn bản của phiên xử lý cũ (KHÔNG tải sẵn — file chỉ lưu khi có người mở)
   seedVanBan().then(() => crawlCongBao(true, true)).then(() => crawlPortals()).then(() => crawlCamhomes(true)).then(() => crawlSheets(true)).then(() => timFileThieu()).then(() => taiSanFile()).catch(() => {}); // khởi động: backfill SÂU toàn kho (2005→nay, ~853 trang, chạy nền ~15') + quét cổng
   setInterval(() => crawlCongBao().catch(() => {}), 60 * 60 * 1000);   // Công báo (nguồn chính): tự làm mới MỖI GIỜ — crawl "gần đây" (15 trang, nhẹ)

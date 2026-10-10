@@ -28,6 +28,13 @@ sai **mà không báo lỗi** (đã vấp: tưởng chạy thử nghiệm nhưng
 - Bộ mẫu đầy đủ (79 phiếu) cất ở `du-lieu/mau_all.jsonl` (không lên git vì có họ tên).
 - Lớp 23 (đỏ) trong tờ địa chính KHÔNG phải toàn bộ là chỉ giới QHGT — chỉ có 1 nhãn "Chỉ giới QHGT theo QĐ 507, 1180"; so thử chỉ khớp ~6 % → đừng dùng lớp này làm chuẩn lòng đường.
 
+## Lớp địa chính trượt 0,55 m (10/10/2026)
+Bộ chấm ở trên dùng HÌNH THỬA CỦA PHIẾU → không thấy lỗi này. Trên web thật, hình thửa lấy từ `dia_chinh`.
+Cách đo: nạp ring phiếu (WGS84) vào bảng tạm, lấy thửa `dia_chinh` chồng nhiều nhất, chỉ giữ cặp có diện tích lệch
+< 0,3 % (cùng một thửa), so tâm hai hình → 9/9 cặp lệch +0,533 m đông, +0,141 m bắc (độ lệch chuẩn ~1 cm).
+Chạy lại phép so QH trên hình web (gốc / đã dịch) với hình phiếu: tổng lệch 60,7 → 4,4 m².
+Phiếu có thửa web "trùng 0 %" là thửa mới tách / bản đồ chưa chỉnh lý — không dùng để đo độ trượt.
+
 ## Bẫy khi đọc phiếu
 1. Chữ TCVN3 (ABC) — đổi bằng `tcvn3.py`.
 2. Hai mẫu phiếu: mẫu cũ (Phòng Kinh tế, dòng "179.5 m thuộc…") và mẫu mới (VPĐK, dòng "+ Toàn bộ / + Diện tích còn lại…").

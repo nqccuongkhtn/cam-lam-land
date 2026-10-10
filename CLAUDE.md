@@ -482,6 +482,14 @@ mặt nạ đường + chỉ thuộc ô trùm + bị lô thật bao quanh = đ�
 ô trùm. Kiểm 1.000 thửa ngẫu nhiên: 77 thửa đổi, soi 17 thửa trên nét CAD gốc đều đúng. Sửa phần này thì chạy
 lại bộ kiểm, không được có phiếu nào tệ đi.
 
+**⚠️ Lớp địa chính `dia_chinh` bị TRƯỢT 0,533 m đông / 0,141 m bắc (đo 10/10/2026).** So 9 thửa có phiếu chính thức
+(cùng tờ/số thửa, diện tích trùng 0,1 %) ở 7 xã: lệch đều nhau tới ~1 cm → đơn vị cung cấp đổi VN-2000 → WGS84 bằng
+tham số khác bộ 7 tham số Khánh Hoà mà lớp quy hoạch + `vn2000.ts` dùng. `parcels.ts` gọi `chuanToaDoDiaChinh()`
+(qhCompute.ts) dịch hình thửa về đúng chỗ TRƯỚC khi chồng lên quy hoạch: tổng lệch 9 thửa 60,7 → 4,4 m².
+Diện tích thửa không đổi (chỉ tịnh tiến). **Đừng dịch** hình thửa của phiếu / toạ độ người dùng nhập — đã đúng chỗ.
+Nạp lại bản đồ địa chính từ nguồn khác thì đo lại độ trượt (cách đo: `scripts/kiem-tra-qh/README.md`).
+Cách web đo diện tích thửa (`ST_Area` geography) KHÔNG gây lệch: trùng diện tích sổ ở 99,9 % trong 121.303 thửa.
+
 **Dữ liệu bắt buộc phải có:** `apps/backend/data/qh_zones.json`, `road_mask.bin`, `road_mask.json`
 (đường dẫn đọc theo `QH_DATA_DIR`, mặc định `<thư mục chạy>/data`; trong container là `/app/apps/backend/data`).
 Các file này **có trong git** (~1.9MB + 1.6MB). Thiếu chúng thì backend vẫn chạy nhưng tự tụt xuống cách B —

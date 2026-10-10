@@ -3,7 +3,7 @@ import { query } from '../lib/db.ts';
 import { cached, cachePut } from '../lib/cache.ts';
 import { vnNoAccent } from '../lib/vn.ts';
 import { verifyToken, coVaiTro } from '../lib/auth.ts';
-import { computeQhAreas, computeQhTheoBan, outerRing, qhReady, ngoaiVungQh } from '../lib/qhCompute.ts';
+import { computeQhAreas, computeQhTheoBan, outerRing, qhReady, ngoaiVungQh, chuanToaDoDiaChinh } from '../lib/qhCompute.ts';
 
 
 // Mã mục đích sử dụng KHÔNG mở tra cứu thửa — đây là hạ tầng công cộng do Nhà nước quản lý,
@@ -175,7 +175,10 @@ parcelsRouter.get('/at', async (req, res, next) => {
     //  thì đó là NHẦM BẢNG, mã số trùng nhau là lấy phải hình của thửa khác.)
     const bangThua = tuBangMoi ? 'dia_chinh' : 'gis_features';
     // Thửa nằm ngoài vùng đã có dữ liệu quy hoạch (hiện chỉ có huyện Cam Lâm cũ)?
-    const ringThua = outerRing((parcel as any)?.geometry) || [];
+    // Thửa của bản đồ địa chính toàn tỉnh (dia_chinh) bị TRƯỢT 0,53 m đông / 0,14 m bắc so với toạ độ VN-2000 chính thức
+    // (đơn vị cung cấp đổi toạ độ bằng bộ tham số khác) → dịch về đúng chỗ rồi mới chồng lên quy hoạch. Xem chuanToaDoDiaChinh.
+    const ringGoc = outerRing((parcel as any)?.geometry) || [];
+    const ringThua = tuBangMoi ? chuanToaDoDiaChinh(ringGoc) : ringGoc;
     const ngoaiQh = !!parcel && ngoaiVungQh(ringThua);
     if (parcel && !ngoaiQh) {
       // ƯU TIÊN: diện tích QH theo ĐƯỜNG THẬT (QĐ205 cố định) — chạy TƯƠI theo hình thửa hiện tại.

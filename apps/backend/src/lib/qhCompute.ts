@@ -353,6 +353,19 @@ export function computeQhAreas(ring: number[][], dienTich: number): { type: stri
   return out.filter((o) => o.areaM2 > 0.4);
 }
 
+// ── LỚP ĐỊA CHÍNH TOÀN TỈNH BỊ TRƯỢT ~0,55 m (đo 10/10/2026) ──
+// So 9 thửa có phiếu chính thức (toạ độ VN-2000 do VPĐK đo, cùng tờ/số thửa, diện tích trùng tới 0,1 %) ở 7 xã khác
+// nhau: hình thửa trong bảng dia_chinh lệch ĐỀU +0,533 m về ĐÔNG và +0,141 m về BẮC (chênh giữa các thửa chỉ ~1 cm).
+// Lớp quy hoạch + phiếu đổi toạ độ bằng CÙNG bộ 7 tham số Khánh Hoà (vn2000.ts = PROJ towgs84, so khớp tới 1e-9 độ),
+// còn dữ liệu địa chính do đơn vị khác đổi sẵn sang WGS84 bằng tham số khác → trượt cả lớp.
+// Hệ quả: thửa mặt đường 20 m bị tính nhầm ~10 m² sang/khỏi đất giao thông. Dịch về đúng chỗ: tổng lệch 9 thửa
+// 60,7 m² → 4,4 m². Diện tích thửa KHÔNG đổi (chỉ tịnh tiến). CHỈ dùng cho thửa lấy từ dia_chinh — đừng dịch hình
+// thửa của phiếu / toạ độ VN-2000 người dùng nhập (những thứ đó đã đúng chỗ).
+const LECH_DC_X = 0.000004899, LECH_DC_Y = 0.000001273; // độ
+export function chuanToaDoDiaChinh(ring: number[][]): number[][] {
+  return ring.map(([x, y]) => [x - LECH_DC_X, y - LECH_DC_Y]);
+}
+
 // Lấy ranh ngoài (lớn nhất) từ 1 GeoJSON geometry.
 export function outerRing(geom: any): number[][] | null {
   if (!geom) return null;

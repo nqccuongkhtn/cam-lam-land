@@ -120,7 +120,7 @@ export default function QuanLyVanBan() {
 
   const F = (k: keyof Form, v: any) => setForm((f) => f ? { ...f, [k]: v } : f);
   const inp = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#C8A14B]';
-  const openEdit = (d: Doc) => { setForm({ id: d.id, soKyHieu: d.soKyHieu || '', trichYeu: d.trichYeu || '', ngay: d.ngay || '', coQuan: d.coQuan || '', chuDe: d.chuDe || 'Khác', linhVuc: d.linhVuc || '', linkGoc: d.linkGoc || '', noiBat: !!d.noiBat }); setMsg(''); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const openEdit = (d: Doc) => { setForm({ id: d.id, soKyHieu: d.soKyHieu || '', trichYeu: d.trichYeu || '', ngay: d.ngay || '', coQuan: d.coQuan || '', chuDe: d.chuDe || 'Khác', linhVuc: d.linhVuc || '', linkGoc: d.linkGoc || '', noiBat: !!d.noiBat }); setMsg(''); setTimeout(() => document.getElementById('khung-sua-vb')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50); }; // cuộn tới đúng khung sửa (nó nằm dưới 2 khung kiểm tra, cuộn lên đầu trang là không thấy)
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER));
   const cur = Math.min(page, totalPages);
   const vis = filtered.slice((cur - 1) * PER, cur * PER);
@@ -142,13 +142,13 @@ export default function QuanLyVanBan() {
         </div>
       </div>
 
-      {docs && <VanBanCanKiemTra docs={docs} onSua={openEdit} onXong={load} />}
+      {docs && <VanBanCanKiemTra docs={docs} onXong={load} />}
       {docs && <VanBanThieuFile docs={docs} onDaLuu={load} />}
 
       {msg && <div className="mt-4 text-sm font-semibold text-[#0A2540] bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">{msg}</div>}
 
       {form && (
-        <div className="mt-4 bg-white border border-slate-200 rounded-2xl p-4 sm:p-5">
+        <div id="khung-sua-vb" className="mt-4 scroll-mt-20 bg-white border border-slate-200 rounded-2xl p-4 sm:p-5">
           <p className="font-bold text-[#0A2540] mb-3">{form.id ? 'Sửa văn bản' : 'Thêm văn bản mới'}</p>
           <div className="grid sm:grid-cols-2 gap-3">
             <label className="text-sm">Số ký hiệu<input className={inp} value={form.soKyHieu} onChange={(e) => F('soKyHieu', e.target.value)} placeholder="VD: 893/QĐ-UBND" /></label>
@@ -357,11 +357,24 @@ function VanBanThieuFile({ docs, onDaLuu }: { docs: Doc[]; onDaLuu: () => void }
 // ── KHUNG "VĂN BẢN CẦN KIỂM TRA" (chủ dự án 7/10/2026: "cái nào nghi ngờ thì để trong phần quản lý để tôi kiểm tra") ──
 // Máy KHÔNG tự sửa số/ngày khi nghi sai — chỉ ghi chú lý do (cột can_kiem_tra). Admin mở file đối chiếu, sai thì bấm "Sửa"
 // (sửa số/ngày xong máy tự nhớ bản gốc, không lấy về thêm lại thành bản trùng), đúng rồi thì bấm "Đã kiểm tra" cho khỏi hiện nữa.
-function VanBanCanKiemTra({ docs, onSua, onXong }: { docs: Doc[]; onSua: (d: Doc) => void; onXong: () => void }) {
+function VanBanCanKiemTra({ docs, onXong }: { docs: Doc[]; onXong: () => void }) {
   const ds = docs.filter((d) => d.canKiemTra);
   const [mo, setMo] = useState(true);
   const [dang, setDang] = useState<number | null>(null);
+  // Sửa NGAY TRONG THẺ (trước đây khung sửa nằm khuất dưới cả danh sách → bấm như không có gì xảy ra)
+  const [sua, setSua] = useState<{ id: number; so: string; ngay: string; coQuan: string } | null>(null);
+  const [loi, setLoi] = useState('');
   if (!ds.length) return null;
+  async function luuSua(d: Doc) {
+    if (!sua) return;
+    setDang(d.id); setLoi('');
+    try {
+      await api(`/van-ban/${d.id}`, { method: 'PUT', body: JSON.stringify({ soKyHieu: sua.so.trim(), ngay: sua.ngay, coQuan: sua.coQuan.trim(), trichYeu: d.trichYeu, chuDe: d.chuDe, linhVuc: d.linhVuc, nguon: d.nguon, linkGoc: d.linkGoc, noiBat: d.noiBat }) });
+      await api(`/van-ban/${d.id}/kiem-tra`, { method: 'PATCH' }); // đã sửa theo file gốc = đã kiểm tra xong
+      setSua(null); onXong();
+    } catch (e: any) { setLoi(e?.message || 'Lỗi lưu'); }
+    finally { setDang(null); }
+  }
   async function xemFile(d: Doc) {
     // File qua máy chủ cần thẻ đăng nhập → tải về rồi mở ở tab mới (mở tab trước cho khỏi bị chặn cửa sổ bật lên)
     const w = window.open('', '_blank');
@@ -376,6 +389,7 @@ function VanBanCanKiemTra({ docs, onSua, onXong }: { docs: Doc[]; onSua: (d: Doc
     setDang(d.id);
     try { await api(`/van-ban/${d.id}/kiem-tra`, { method: 'PATCH' }); onXong(); } finally { setDang(null); }
   }
+  const o = 'mt-0.5 block h-9 w-full rounded-lg border border-slate-300 bg-white px-2.5 text-[13px] text-[#0A2540] outline-none focus:border-[#C8A14B]';
   const nut = 'inline-flex h-9 shrink-0 items-center justify-center rounded-lg border border-slate-300 px-3 text-[13px] font-semibold text-[#0A2540] hover:bg-slate-50';
   return (
     <div className="mt-4 rounded-2xl border border-red-200 bg-red-50/50 p-3 sm:p-4">
@@ -398,9 +412,23 @@ function VanBanCanKiemTra({ docs, onSua, onXong }: { docs: Doc[]; onSua: (d: Doc
               <div className="mt-2 flex flex-wrap gap-2">
                 {d.coFile !== false && <button type="button" onClick={() => xemFile(d)} className={nut}>📄 Xem file</button>}
                 {d.linkGoc && <a href={d.linkGoc} target="_blank" rel="noreferrer" className={nut} title={d.linkGoc}>Trang nguồn ↗</a>}
-                <button type="button" onClick={() => onSua(d)} className={nut}>✏️ Sửa số / ngày</button>
+                <button type="button" onClick={() => { setLoi(''); setSua(sua?.id === d.id ? null : { id: d.id, so: d.soKyHieu || '', ngay: d.ngay || '', coQuan: d.coQuan || '' }); }} className={nut}>✏️ Sửa số / ngày</button>
                 <button type="button" onClick={() => daKiemTra(d)} disabled={dang === d.id} className="h-9 shrink-0 rounded-lg bg-emerald-600 px-4 text-[13px] font-bold text-white hover:bg-emerald-700 disabled:opacity-40">{dang === d.id ? 'Đang lưu…' : '✓ Đã kiểm tra'}</button>
               </div>
+              {sua?.id === d.id && (
+                <div className="mt-2 rounded-lg border border-[#C8A14B]/50 bg-[#C8A14B]/5 p-2.5">
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    <label className="text-[12px] text-slate-600">Số ký hiệu<input autoFocus value={sua.so} onChange={(e) => setSua({ ...sua, so: e.target.value })} className={o} placeholder="VD: 199/TB-UBND" /></label>
+                    <label className="text-[12px] text-slate-600">Ngày ban hành<input type="date" value={sua.ngay} onChange={(e) => setSua({ ...sua, ngay: e.target.value })} className={o} /></label>
+                    <label className="text-[12px] text-slate-600">Cơ quan ban hành<input value={sua.coQuan} onChange={(e) => setSua({ ...sua, coQuan: e.target.value })} className={o} placeholder="VD: UBND xã Cam Lâm" /></label>
+                  </div>
+                  {loi && <p className="mt-1.5 text-[12px] font-semibold text-red-600">{loi}</p>}
+                  <div className="mt-2 flex gap-2">
+                    <button type="button" onClick={() => luuSua(d)} disabled={dang === d.id} className="h-9 rounded-lg bg-[#0A2540] px-4 text-[13px] font-bold text-white hover:bg-[#0d3a6b] disabled:opacity-40">{dang === d.id ? 'Đang lưu…' : 'Lưu'}</button>
+                    <button type="button" onClick={() => setSua(null)} className={nut}>Huỷ</button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

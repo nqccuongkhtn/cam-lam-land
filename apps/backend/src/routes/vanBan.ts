@@ -927,7 +927,7 @@ vanBanRouter.put('/:id', vanBanRequired, async (req, res) => {
     await query(`UPDATE van_ban SET so_goc = so_hieu, ngay_goc = ngay_ban_hanh WHERE id=$1 AND so_goc IS NULL
       AND (so_hieu IS DISTINCT FROM $2 OR ngay_ban_hanh IS DISTINCT FROM $3::date)`, [Number(req.params.id), b.soKyHieu || null, b.ngay || null]);
     await query(
-      `UPDATE van_ban SET so_hieu=$2, trich_yeu=$3, ngay_ban_hanh=$4, co_quan=$5, chu_de=$6, linh_vuc=$7, nguon=$8, link_goc=$9, noi_bat=$10 WHERE id=$1`,
+      `UPDATE van_ban SET so_hieu=$2, trich_yeu=$3, ngay_ban_hanh=$4, co_quan=$5, chu_de=$6, linh_vuc=$7, nguon=COALESCE($8, nguon), link_goc=$9, noi_bat=$10 WHERE id=$1`,
       [Number(req.params.id), b.soKyHieu || null, b.trichYeu, b.ngay || null, b.coQuan || null, b.chuDe || 'Khác', b.linhVuc || null, b.nguon || null, b.linkGoc || null, !!b.noiBat]);
     await rm(`${KHO_DRIVE}/vb-${PHIEN_BAN_FILE}-${Number(req.params.id)}.pdf`, { force: true }); // link có thể đã đổi → làm lại file
     res.json({ ok: true });

@@ -48,8 +48,18 @@ def main(vao, tep_chu):
         mau = m.group(0).lower()
         if mau == '#ffffff': continue   # màu ký hiệu, 1b cũng bỏ
         if (f['properties'].get('Layer') or '') == 'Level 56': continue   # khung chú dẫn, không phải đất
-        g0 = shape(f['geometry'])
-        if 'LineString' in g0.geom_type:   # viền hỏng: nới 1 cm cho khít rồi chẵn–lẻ
+        try:
+            g0 = shape(f['geometry'])
+        except Exception:
+            # vùng tô lẫn VÒNG HỎNG (< 4 điểm) → đọc cả hình bị lỗi và cả vùng bị bỏ (C096E0, 2,2 ha đất công cộng ở Cam Hòa):
+            # bỏ vòng hỏng, dựng các vòng còn lại theo chẵn–lẻ
+            g = f['geometry']; kq = None
+            for r in [r for p in (g['coordinates'] if g['type'] == 'MultiPolygon' else [g['coordinates']]) for r in p if len(r) >= 4]:
+                v = Polygon(r).buffer(0); kq = v if kq is None else kq.symmetric_difference(v)
+            g0 = None
+        if g0 is None:
+            pass
+        elif 'LineString' in g0.geom_type:   # viền hỏng: nới 1 cm cho khít rồi chẵn–lẻ
             b = unary_union(g0.buffer(0.01)); kq = None
             for v in sorted([Polygon(p.exterior) for p in getattr(b, 'geoms', [b])], key=lambda p: -p.area):
                 kq = v if kq is None else kq.symmetric_difference(v)

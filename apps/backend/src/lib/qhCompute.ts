@@ -235,7 +235,7 @@ export function qhReady() { return ready; }
 // = băm NỘI DUNG mọi file dữ liệu quy hoạch (qh_zones*.json, road_mask*) + số phiên bản CÁCH TÍNH bên dưới.
 // Đổi dữ liệu hay đổi cách tính → dấu đổi → mọi kết quả đã lưu tự bị bỏ, tính lại. Không bao giờ hiện số cũ.
 // ⚠️ SỬA CÁCH TÍNH TRONG FILE NÀY (hoặc catHinh.ts) THÌ TĂNG CACH_TINH.
-const CACH_TINH = '2026-10-10-ranh-qh-1';   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
+const CACH_TINH = '2026-10-10-ranh-qh-2';   // 2: khe QĐ205 ≥ 5 m trong ranh lập QH = đường   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
 let PHIEN_BAN = '';
 export function qhPhienBan(): string {
   if (PHIEN_BAN || !ready) return PHIEN_BAN;
@@ -324,11 +324,8 @@ function nearestLand(x: number, y: number): string | null {
       if (bk > bt || (bk === bt && dmin < bd)) { if (dmin <= NEAR * NEAR) { bd = dmin; bt = bk; blo = KHO.tenLoai[KHO.loai[k]]; } }
     }
   }
+  CACH_O_GAN_M = Math.sqrt(dGan) * 111000;   // (10/10/2026, bản ranh-205) nay CHẠY THẬT — dùng cho luật khe ≥ 2,5 m trong ranh QĐ205
   return blo;
-  // ⚠️ (10/10/2026) Dòng dưới nằm SAU return nên KHÔNG BAO GIỜ chạy → CACH_O_GAN_M luôn = Infinity → ở loaiKhe205, khe hở
-  // ngoài khung mặt nạ mà bị ô bao quanh là ĐƯỜNG bất kể khe rộng hẹp. ĐỪNG "sửa" cho nó chạy: đã đo trên 2.953 thửa có
-  // bản chi tiết phủ trọn — sửa thì QĐ205 lệch đất giao thông NHIỀU hơn (295.644 → 312.872 m²; 293 thửa tệ hơn, 72 tốt hơn).
-  CACH_O_GAN_M = Math.sqrt(dGan) * 111000;
 }
 
 // ── ĐƯỜNG CỦA QĐ205 NGOÀI KHUNG MẶT NẠ (10/10/2026) ──
@@ -362,7 +359,7 @@ function loaiKhe205(x: number, y: number): string {
   const r = roadAt(x, y);          // 1=lòng đường, 0=đất, null=ngoài phạm vi mask
   const near = nearestLand(x, y);  // ô QH gần nhất ≤50m (null nếu xa)
   if (near) return (r === 1) ? 'Đất giao thông'
-    : (r === null && CACH_O_GAN_M >= 2.5 && bao205(x, y)) ? 'Đất giao thông'   // ngoài khung mặt nạ: khe rộng bị ô bao quanh = đường
+    : (r === null && CACH_O_GAN_M >= 2.5 && trongRanh205(x, y)) ? 'Đất giao thông'   // ngoài khung mặt nạ: khe RỘNG (≥ 5 m) TRONG ranh lập QH = lòng đường (10/10/2026)
     : near;                                                // khe hẹp (vẽ chưa khít) = ô gần nhất
   // Điểm xa mọi ô đất: TRONG vùng quy hoạch thì đó là lòng đường (cách B) — giữ nguyên,
   // vì đây là chỗ làm cho kết quả khớp app tham chiếu ±3%. Còn thửa nằm HẲN ngoài vùng
@@ -845,4 +842,18 @@ export function hoaHop205(ring: number[][], dienTich: number, pre: { type: strin
     return { kq, theo: kb.ma };
   }
   return { kq: pre, theo: null };
+}
+
+// RANH LẬP QUY HOẠCH QĐ205 (data/ranh_qh.json, lớp '1-QH_Ranh giới lập quy hoạch' của QD205.gpkg). Soi trên bản vẽ gốc 10/10/2026: khe
+// hở giữa các ô QĐ205 ngoài khung mặt nạ đường là LÒNG ĐƯỜNG (2 bên có nét mép đường -1-TRAFFIC-PAVEMENT) — luật cũ "bị ô bao ≥ 6/8
+// hướng" trượt ở đường lớn chạy dài (dọc đường không gặp ô nào) → thửa 13 tờ 49 Suối Tân nửa thửa trên đường bị ghi cây xanh.
+const R205 = (() => { const r = RANH_QH['205']; if (!r) return null; const a = new Float64Array(r.length * 2); r.forEach(([x, y], i) => { a[2 * i] = x; a[2 * i + 1] = y; }); return a; })();
+function trongRanh205(x: number, y: number): boolean {
+  const r = R205; if (!r) return bao205(x, y);
+  const n = r.length / 2; let ins = false;
+  for (let i = 0, j = n - 1; i < n; j = i++) {
+    const xi = r[2 * i], yi = r[2 * i + 1], xj = r[2 * j], yj = r[2 * j + 1];
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) ins = !ins;
+  }
+  return ins;
 }

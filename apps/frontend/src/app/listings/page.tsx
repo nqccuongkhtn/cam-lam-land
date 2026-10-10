@@ -34,7 +34,7 @@ const QH = {
   id: 'qh-qd205', url: '/overlays/QD205.png',
   // Bộ tile render từ DGN (QD205) → z10-18, ĐẦY ĐỦ mọi zone.
   // minzoom = ĐÚNG mức thấp nhất đã cắt (z12) — khai 10 là đi đòi ô không tồn tại, nhận 404.
-  tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png?v=5'], minzoom: 12, maxzoom: 18,   // ?v=2: xem ghi chú ở app/map/page.tsx
+  tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png?v=6'], minzoom: 12, maxzoom: 18,   // ?v=2: xem ghi chú ở app/map/page.tsx
   coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]],
 };
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];

@@ -38,6 +38,7 @@ def main(vao):
         con = g.difference(unary_union([ZP[i] for i in idx])) if len(idx) else g
         for p in (con.geoms if hasattr(con, 'geoms') else [con]):
             if p.geom_type != 'Polygon' or p.area * 1.21e10 < 50: continue
+            if not (108.9 < p.bounds[0] and p.bounds[2] < 109.3 and 11.9 < p.bounds[1] and p.bounds[3] < 12.25): continue   # rác ngoài khung (khung bản vẽ / chú giải)
             p = Polygon(p.exterior)   # mảnh sót không lỗ (lỗ = ô đất đã có, được ưu tiên vì ô nhỏ hơn / bậc cao hơn)
             x0, y0, x1, y1 = p.bounds
             them.append([round(x0, 7), round(y0, 7), round(x1, 7), round(y1, 7),

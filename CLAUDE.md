@@ -513,9 +513,11 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   nào phủ → web tính thành đường (thửa 4 tờ 22 Cam Hiệp giữa khối "đơn vị ở" bị ghi đường; lòng quảng trường tròn Cam Đức là cây
   xanh). Bổ sung bằng `scripts/qh-pipeline/5e-bo-sung-phan-sot-205.py` (loại = loại chiếm nhiều nhất của ô web cùng vùng tô) và
   `5d-bo-sung-mat-nuoc-205.py` (mặt nước / sông suối). Nạp lại qh_zones từ đầu thì PHẢI chạy lại 5c → 5d → 5e.
-- **QĐ893 có 4 vùng tô HỎNG VIỀN** (đường bao là chuỗi đoạn rời → GDAL/1b không dựng được vùng): Điện mặt trời Miền Trung
-  (DNL 68 ha, Cam An) + 3 ô nhỏ = 78,3 ha bị ghi "ngoài phạm vi". Bổ sung bằng `scripts/qh-pipeline/5f-bo-sung-vung-to-hong-893.py`
-  (11/10/2026) — chạy lại 5b thì PHẢI chạy lại 5f. Ô trùm: mẩu vẽ thừa < 50 m² không tính là "lô con" (dải cây xanh QĐ2222).
+- **QĐ893 thiếu 82 ha vùng tô** (so toàn bộ 12.987 vùng tô gốc với web, 11/10/2026): 4 vùng HỎNG VIỀN (đường bao là chuỗi đoạn
+  rời → không dựng được vùng; lớn nhất Điện mặt trời Miền Trung DNL 68 ha Cam An), 1 vùng lẫn VÒNG HỎNG < 4 điểm làm đọc lỗi cả
+  vùng (đất quốc phòng 2,2 ha Cam Hòa), và phần còn lại của vùng tô "chỉ có màu" khi bị ô có mã đè một phần (thửa 187 tờ 1 /
+  221 tờ 3 Suối Dầu). Web từng ghi "ngoài phạm vi". Bổ sung bằng `scripts/qh-pipeline/5f-bo-sung-vung-to-hong-893.py`
+  — chạy lại 5b thì PHẢI chạy lại 5f. Còn lại chỉ là khung chú dẫn (Level 56) và khe không tô màu thật. Ô trùm: mẩu vẽ thừa < 50 m² không tính là "lô con" (dải cây xanh QĐ2222).
 - Đã thử và BỎ: đáp án "giữa 2 nét mép đường -1-TRAFFIC-PAVEMENT trong 35 m = đường" — nét mép đường QĐ205 vẽ không đủ, đường
   rộng bị hụt. Dòng `CACH_O_GAN_M` trong nearestLand nay chạy thật (trước nằm sau return).
 Công cụ: scratchpad của phiên (audit*.ts quét thửa thật trong container, dap_an_all.py, ve_thua205.py vẽ thửa lên bản vẽ) — chưa

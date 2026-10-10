@@ -741,7 +741,8 @@ export async function migrate(): Promise<void> {
     .catch((e) => console.error('[migrate] qh_luu_loi:', e.message));
 
   // SỔ THIẾT BỊ + GIỚI HẠN THIẾT BỊ (lib/thietBi.ts, 10/10/2026). Ghi luôn kể cả khi chưa bật giới hạn (cờ gioi_han_thiet_bi)
-  // để admin có bằng chứng từng máy / từng lần đăng nhập khi khách chối.
+  // để admin có bằng chứng khi khách chối. Chủ dự án dặn GỌN: mỗi tài khoản chỉ giữ LẦN ĐĂNG NHẬP CUỐI (+ mỗi máy nhớ lần
+  // đăng nhập cuối của nó) và 10 TRA CỨU GẦN NHẤT — không lưu lịch sử dài.
   for (const sql of [
     `ALTER TABLE users ADD COLUMN IF NOT EXISTS thiet_bi_toi_da integer`,                       // NULL = mặc định (3)
     `CREATE TABLE IF NOT EXISTS thiet_bi (
@@ -749,17 +750,17 @@ export async function migrate(): Promise<void> {
        ten text, loai text, he_dieu_hanh text, trinh_duyet text, ua text, chi_tiet jsonb NOT NULL DEFAULT '{}',
        ip_dau text, ip_cuoi text, quoc_gia text,
        lan_dau timestamptz NOT NULL DEFAULT now(), lan_cuoi timestamptz NOT NULL DEFAULT now(),
-       so_lan_dang_nhap integer NOT NULL DEFAULT 0, UNIQUE (user_id, ma))`,
+       so_lan_dang_nhap integer NOT NULL DEFAULT 0, dn_cuoi timestamptz, ip_dn_cuoi text, UNIQUE (user_id, ma))`,
     `CREATE INDEX IF NOT EXISTS thiet_bi_user_idx ON thiet_bi (user_id)`,
-    // nhật ký TỪNG lần đăng nhập, kể cả lần bị chặn vì quá số máy (ket_qua='bi-chan'); giữ cả khi máy bị gỡ
+    // LẦN ĐĂNG NHẬP CUỐI của tài khoản — 1 dòng / tài khoản, ghi đè (kể cả lần BỊ CHẶN vì quá số máy: ket_qua='bi-chan')
     `CREATE TABLE IF NOT EXISTS thiet_bi_dang_nhap (
-       id bigserial PRIMARY KEY, user_id integer NOT NULL, thiet_bi_id integer, ma text, luc timestamptz NOT NULL DEFAULT now(),
+       user_id integer PRIMARY KEY, thiet_bi_id integer, ma text, luc timestamptz NOT NULL DEFAULT now(),
        ip text, quoc_gia text, ten text, ua text, cach text, ket_qua text NOT NULL DEFAULT 'ok')`,
-    `CREATE INDEX IF NOT EXISTS thiet_bi_dn_user_idx ON thiet_bi_dang_nhap (user_id, luc DESC)`,
-    // số lần dùng web theo NGÀY của từng máy (gom 2 phút/lần) → "máy này dùng những ngày nào"
-    `CREATE TABLE IF NOT EXISTS thiet_bi_ngay (
-       thiet_bi_id integer NOT NULL, ngay date NOT NULL, so_lan integer NOT NULL DEFAULT 0, ip_cuoi text,
-       luc_cuoi timestamptz NOT NULL DEFAULT now(), PRIMARY KEY (thiet_bi_id, ngay))`,
+    // 10 TRA CỨU GẦN NHẤT của tài khoản (tra thửa, tìm số tờ/thửa, văn bản, QR, danh sách nóng) — giữ đúng 10 dòng / tài khoản
+    `CREATE TABLE IF NOT EXISTS tra_cuu_gan_day (
+       id bigserial PRIMARY KEY, user_id integer NOT NULL, thiet_bi_id integer, luc timestamptz NOT NULL DEFAULT now(),
+       ip text, viec text, mo_ta text)`,
+    `CREATE INDEX IF NOT EXISTS tra_cuu_gan_day_user_idx ON tra_cuu_gan_day (user_id, luc DESC)`,
     // sổ các lần admin reset / gỡ máy (ai làm, lúc nào, gỡ máy nào, đã thu phí chưa)
     `CREATE TABLE IF NOT EXISTS thiet_bi_reset (
        id serial PRIMARY KEY, user_id integer NOT NULL, admin_id integer, luc timestamptz NOT NULL DEFAULT now(),

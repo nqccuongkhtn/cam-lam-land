@@ -1,6 +1,6 @@
 // ── QUẢN LÝ THIẾT BỊ ĐĂNG NHẬP (10/10/2026) — xem lib/thietBi.ts ──
 // Người dùng: CHỈ XEM máy của mình (không tự gỡ — tự gỡ được là lách phí reset).
-// Admin: tổng quan mọi tài khoản · chi tiết từng tài khoản (từng máy, từng lần đăng nhập, những ngày đã dùng) ·
+// Admin: tổng quan mọi tài khoản · chi tiết từng tài khoản (từng máy, lần đăng nhập cuối, 10 tra cứu gần nhất) ·
 //        gỡ 1 máy · reset hết (ghi sổ phí) · đổi giới hạn riêng · bật/tắt giới hạn (cờ gioi_han_thiet_bi qua /api/flags).
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
@@ -11,13 +11,10 @@ import { CO_GIOI_HAN, TOI_DA_MAC_DINH, ZALO_ADMIN, PHI_RESET, maThietBi, quenMay
 export const thietBiRouter = Router();
 
 const MAY_COT = `id, ten, loai, he_dieu_hanh "heDieuHanh", trinh_duyet "trinhDuyet", chi_tiet "chiTiet", ip_dau "ipDau", ip_cuoi "ipCuoi",
-  quoc_gia "quocGia", lan_dau "lanDau", lan_cuoi "lanCuoi", so_lan_dang_nhap "soLanDangNhap"`;
+  quoc_gia "quocGia", lan_dau "lanDau", lan_cuoi "lanCuoi", so_lan_dang_nhap "soLanDangNhap", dn_cuoi "dnCuoi", ip_dn_cuoi "ipDnCuoi"`;
 
 async function dsMay(userId: number) {
-  const may = await query<any>(`SELECT ${MAY_COT}, ma, ua,
-      (SELECT count(*)::int FROM thiet_bi_ngay n WHERE n.thiet_bi_id=t.id) "soNgayDung",
-      (SELECT COALESCE(sum(so_lan),0)::int FROM thiet_bi_ngay n WHERE n.thiet_bi_id=t.id) "soLanDung"
-    FROM thiet_bi t WHERE user_id=$1 ORDER BY lan_dau`, [userId]);
+  const may = await query<any>(`SELECT ${MAY_COT}, ma, ua FROM thiet_bi t WHERE user_id=$1 ORDER BY lan_dau`, [userId]);
   return may;
 }
 
@@ -38,8 +35,8 @@ thietBiRouter.get('/admin/tong-quan', adminRequired, async (req, res, next) => {
     const ds = await query<any>(`
       SELECT u.id, u.email, u.full_name "ten", u.phone, u.role, u.roles, u.thiet_bi_toi_da "toiDaRieng",
         count(t.id)::int "soMay", max(t.lan_cuoi) "lanCuoi",
-        (SELECT count(DISTINCT d.ip)::int FROM thiet_bi_dang_nhap d WHERE d.user_id=u.id AND d.luc > now() - interval '30 days') "soIp30",
-        (SELECT count(*)::int FROM thiet_bi_dang_nhap d WHERE d.user_id=u.id AND d.ket_qua='bi-chan') "soLanBiChan",
+        count(DISTINCT t.ip_cuoi)::int "soIp",
+        (SELECT d.ket_qua='bi-chan' FROM thiet_bi_dang_nhap d WHERE d.user_id=u.id) "vuaBiChan",
         (SELECT count(*)::int FROM thiet_bi_reset r WHERE r.user_id=u.id) "soLanReset"
       FROM users u JOIN thiet_bi t ON t.user_id=u.id
       WHERE ($1 = '' OR lower(u.email) LIKE '%'||$1||'%' OR lower(coalesce(u.full_name,'')) LIKE '%'||$1||'%' OR coalesce(u.phone,'') LIKE '%'||$1||'%')
@@ -56,14 +53,14 @@ thietBiRouter.get('/admin/tai-khoan/:id', adminRequired, async (req, res, next) 
     const [u] = await query<any>(`SELECT id, email, full_name "ten", phone, role, roles, created_at "taoLuc", thiet_bi_toi_da "toiDaRieng" FROM users WHERE id=$1`, [id]);
     if (!u) return res.status(404).json({ error: 'Không có tài khoản này' });
     const may = await dsMay(id);
-    const ngay = may.length ? await query<any>(`SELECT thiet_bi_id "may", to_char(ngay,'YYYY-MM-DD') ngay, so_lan "soLan", ip_cuoi "ip"
-      FROM thiet_bi_ngay WHERE thiet_bi_id = ANY($1) ORDER BY ngay DESC LIMIT 2000`, [may.map((m: any) => m.id)]) : [];
-    const dangNhap = await query<any>(`SELECT id, thiet_bi_id "may", ma, luc, ip, quoc_gia "quocGia", ten, ua, cach, ket_qua "ketQua"
-      FROM thiet_bi_dang_nhap WHERE user_id=$1 ORDER BY luc DESC LIMIT 500`, [id]);
+    const [dnCuoi] = await query<any>(`SELECT thiet_bi_id "may", ma, luc, ip, quoc_gia "quocGia", ten, ua, cach, ket_qua "ketQua"
+      FROM thiet_bi_dang_nhap WHERE user_id=$1`, [id]);
+    const traCuu = await query<any>(`SELECT id, thiet_bi_id "may", luc, ip, viec, mo_ta "moTa" FROM tra_cuu_gan_day
+      WHERE user_id=$1 ORDER BY luc DESC, id DESC LIMIT 10`, [id]);
     const reset = await query<any>(`SELECT r.id, r.luc, r.so_may "soMay", r.ds_may "dsMay", r.phi, r.ghi_chu "ghiChu", a.email "admin"
       FROM thiet_bi_reset r LEFT JOIN users a ON a.id=r.admin_id WHERE r.user_id=$1 ORDER BY r.luc DESC`, [id]);
     res.set('Cache-Control', 'private, no-store');
-    res.json({ taiKhoan: u, toiDa: u.toiDaRieng ?? TOI_DA_MAC_DINH, may, ngay, dangNhap, reset, batGioiHan: await isFlagOn(CO_GIOI_HAN), phi: PHI_RESET });
+    res.json({ taiKhoan: u, toiDa: u.toiDaRieng ?? TOI_DA_MAC_DINH, may, dnCuoi: dnCuoi || null, traCuu, reset, batGioiHan: await isFlagOn(CO_GIOI_HAN), phi: PHI_RESET });
   } catch (e) { next(e); }
 });
 

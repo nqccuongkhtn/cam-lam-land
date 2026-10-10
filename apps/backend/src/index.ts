@@ -33,6 +33,7 @@ import { pushRouter } from './routes/push.ts';
 import { paymentsRouter } from './routes/payments.ts';
 import { flagsRouter } from './routes/flags.ts';
 import { thietBiRouter } from './routes/thietBi.ts';   // quản lý / giới hạn thiết bị đăng nhập (lib/thietBi.ts)
+import { ghiTraCuu } from './lib/thietBi.ts';          // 10 tra cứu gần nhất của mỗi tài khoản
 import { newsRouter, refreshNews } from './routes/news.ts';
 import { newsletterRouter } from './routes/newsletter.ts';
 import { vanBanRouter, seedVanBan, crawlCongBao, crawlPortals, crawlCamhomes, crawlSheets, timFileThieu, taiSanFile } from './routes/vanBan.ts';
@@ -86,6 +87,7 @@ app.use(securityHeaders);
 app.use(requestLogger); // ghi log request LỖI (5xx) hoặc CHẬM (>2s) ra file access-*.log
 app.use(express.json({ limit: '5mb' }));
 // PROXY TILE ẢNH VỆ TINH — đặt TRƯỚC rate-limit toàn cục (1 phiên bản đồ tải rất nhiều tile, không được tính vào giới hạn).
+app.use('/api', ghiTraCuu);   // sổ thiết bị: giữ 10 lần tra cứu gần nhất / tài khoản (lib/thietBi.ts)
 app.use('/api', ghiHoatDong); // THEO DÕI TÀI KHOẢN (tạm — dễ gỡ): đặt TRƯỚC /api/dc để ghi được cả tra số tờ/thửa; chỉ ghi tài khoản trong danh sách
 app.use('/api/tiles', tilesRouter);
 // BẢN ĐỒ ĐỊA CHÍNH — cũng đặt TRƯỚC giới hạn toàn cục vì một phiên xem bản đồ tải rất nhiều ô.

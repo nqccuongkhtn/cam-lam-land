@@ -6,8 +6,9 @@
 // HAI PHẦN, BẬT/TẮT RIÊNG:
 //   1. SỔ THIẾT BỊ — LUÔN GHI (kể cả khi chưa bật giới hạn): mỗi máy (mã ngẫu nhiên trình duyệt tự sinh, lưu ở
 //      localStorage, gửi kèm mọi yêu cầu qua header X-Thiet-Bi) + loại máy / hệ điều hành / trình duyệt / màn hình /
-//      IP / quốc gia, lần đầu – lần cuối, số lần đăng nhập. Kèm NHẬT KÝ từng lần đăng nhập (cả lần BỊ CHẶN) và số lần
-//      dùng web theo NGÀY của từng máy → bằng chứng khi khách chối.
+//      IP / quốc gia, lần đầu – lần hoạt động cuối – lần đăng nhập cuối, số lần đăng nhập. Kèm LẦN ĐĂNG NHẬP CUỐI của tài
+//      khoản (cả lần BỊ CHẶN) và 10 TRA CỨU GẦN NHẤT → bằng chứng khi khách chối. Chủ dự án dặn chỉ giữ chừng đó cho nhẹ:
+//      mỗi tài khoản chỉ vài chục dòng, không phình theo thời gian.
 //   2. GIỚI HẠN — chỉ chạy khi cờ `gioi_han_thiet_bi` bật (trang quản trị). Máy MỚI thứ (giới hạn + 1) bị chặn đăng
 //      nhập; thẻ đăng nhập gắn với mã máy nên chép thẻ sang máy khác không dùng được; admin gỡ máy là máy đó bị
 //      đăng xuất ngay. Admin / tài khoản quản trị không bị giới hạn.
@@ -16,7 +17,7 @@
 import type { Request } from 'express';
 import { query } from './db.ts';
 import { isFlagOn } from './flags.ts';
-import { laAdmin } from './auth.ts';
+import { laAdmin, verifyToken } from './auth.ts';
 
 export const CO_GIOI_HAN = 'gioi_han_thiet_bi';
 export const TOI_DA_MAC_DINH = Number(process.env.THIET_BI_TOI_DA || 3);
@@ -112,8 +113,7 @@ export async function ghiDangNhap(user: { id: number; role?: string; roles?: str
       const toiDa = await gioiHanCua(user.id);
       const [{ n }] = await query<{ n: number }>('SELECT count(*)::int n FROM thiet_bi WHERE user_id=$1', [user.id]);
       if (n >= toiDa) {
-        await query(`INSERT INTO thiet_bi_dang_nhap (user_id, thiet_bi_id, ma, ip, quoc_gia, ten, ua, cach, ket_qua)
-                     VALUES ($1,NULL,$2,$3,$4,$5,$6,$7,'bi-chan')`, [user.id, ma, ip, qg, u.ten, ua, cach]).catch(() => {});
+        await ghiLanCuoi(user.id, null, ma, ip, qg, u.ten, ua, cach, 'bi-chan');
         return { ok: false, loi: loiQuaGioiHan(toiDa) };
       }
     }
@@ -123,11 +123,11 @@ export async function ghiDangNhap(user: { id: number; role?: string; roles?: str
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$9,$10,1)
        ON CONFLICT (user_id, ma) DO UPDATE SET ten=EXCLUDED.ten, loai=EXCLUDED.loai, he_dieu_hanh=EXCLUDED.he_dieu_hanh,
          trinh_duyet=EXCLUDED.trinh_duyet, ua=EXCLUDED.ua, chi_tiet=thiet_bi.chi_tiet || EXCLUDED.chi_tiet, ip_cuoi=EXCLUDED.ip_cuoi,
-         quoc_gia=COALESCE(EXCLUDED.quoc_gia, thiet_bi.quoc_gia), lan_cuoi=now(), so_lan_dang_nhap=thiet_bi.so_lan_dang_nhap+1
+         quoc_gia=COALESCE(EXCLUDED.quoc_gia, thiet_bi.quoc_gia), lan_cuoi=now(), so_lan_dang_nhap=thiet_bi.so_lan_dang_nhap+1,
+         dn_cuoi=now(), ip_dn_cuoi=EXCLUDED.ip_cuoi
        RETURNING id`, [user.id, ma, u.ten, u.loai, u.heDieuHanh, u.trinhDuyet, ua, JSON.stringify(ct), ip, qg]);
-    // lần thành công KHÔNG lưu lại chuỗi trình duyệt dài (đã có ở sổ máy) cho đỡ tốn chỗ; lần bị chặn thì lưu đủ vì máy đó không có trong sổ
-    await query(`INSERT INTO thiet_bi_dang_nhap (user_id, thiet_bi_id, ma, ip, quoc_gia, ten, ua, cach, ket_qua)
-                 VALUES ($1,$2,$3,$4,$5,$6,NULL,$7,'ok')`, [user.id, tb.id, ma, ip, qg, u.ten, cach]).catch(() => {});
+    await query('UPDATE thiet_bi SET dn_cuoi=now(), ip_dn_cuoi=$2 WHERE id=$1 AND dn_cuoi IS NULL', [tb.id, ip]).catch(() => {});   // máy mới tạo
+    await ghiLanCuoi(user.id, tb.id, ma, ip, qg, u.ten, null, cach, 'ok');   // chuỗi trình duyệt đã có ở sổ máy → khỏi lưu lại
     quenMay(user.id, ma);
     return { ok: true, ma };
   } catch (e: any) {
@@ -137,21 +137,26 @@ export async function ghiDangNhap(user: { id: number; role?: string; roles?: str
   }
 }
 
+/** Ghi ĐÈ lần đăng nhập cuối của tài khoản (1 dòng / tài khoản). */
+async function ghiLanCuoi(userId: number, tbId: number | null, ma: string, ip: string, qg: string | null, ten: string, ua: string | null, cach: string, kq: string) {
+  await query(`INSERT INTO thiet_bi_dang_nhap (user_id, thiet_bi_id, ma, luc, ip, quoc_gia, ten, ua, cach, ket_qua)
+               VALUES ($1,$2,$3,now(),$4,$5,$6,$7,$8,$9)
+               ON CONFLICT (user_id) DO UPDATE SET thiet_bi_id=EXCLUDED.thiet_bi_id, ma=EXCLUDED.ma, luc=now(), ip=EXCLUDED.ip,
+                 quoc_gia=EXCLUDED.quoc_gia, ten=EXCLUDED.ten, ua=EXCLUDED.ua, cach=EXCLUDED.cach, ket_qua=EXCLUDED.ket_qua`,
+    [userId, tbId, ma, ip, qg, ten, ua, cach, kq]).catch(() => {});
+}
+
 // ── Kiểm mỗi yêu cầu đã đăng nhập (authRequired gọi) ──
-// Nhớ tạm 30 giây "máy (user, mã) còn trong sổ không" để khỏi hỏi database mỗi lần. Đồng thời gom số lần dùng web theo
-// ngày rồi ghi một lượt mỗi 2 phút (không ghi từng yêu cầu).
+// Nhớ tạm 30 giây "máy (user, mã) còn trong sổ không" để khỏi hỏi database mỗi lần. Cập nhật "hoạt động cuối" của máy
+// gom 2 phút/lần (không ghi từng yêu cầu).
 const nhoMay = new Map<string, { con: boolean; id: number | null; luc: number }>();
 function quenMay(userId: number, ma: string | null) { nhoMay.delete(userId + ':' + ma); }
 export function quenMayCuaUser(userId: number) { for (const k of [...nhoMay.keys()]) if (k.startsWith(userId + ':')) nhoMay.delete(k); }
-const gomGoi = new Map<number, { n: number; ip: string }>();   // thiet_bi.id → số yêu cầu chưa ghi
+const gomGoi = new Map<number, { n: number; ip: string }>();   // thiet_bi.id → máy vừa có hoạt động
 setInterval(() => {
   if (!gomGoi.size) return;
   const ds = [...gomGoi.entries()]; gomGoi.clear();
-  for (const [id, g] of ds) {
-    query(`INSERT INTO thiet_bi_ngay (thiet_bi_id, ngay, so_lan, ip_cuoi) VALUES ($1, (now() AT TIME ZONE 'Asia/Ho_Chi_Minh')::date, $2, $3)
-           ON CONFLICT (thiet_bi_id, ngay) DO UPDATE SET so_lan=thiet_bi_ngay.so_lan+EXCLUDED.so_lan, ip_cuoi=EXCLUDED.ip_cuoi, luc_cuoi=now()`, [id, g.n, g.ip])
-      .then(() => query('UPDATE thiet_bi SET lan_cuoi=now(), ip_cuoi=$2 WHERE id=$1', [id, g.ip])).catch(() => {});
-  }
+  for (const [id, g] of ds) query('UPDATE thiet_bi SET lan_cuoi=now(), ip_cuoi=$2 WHERE id=$1', [id, g.ip]).catch(() => {});
 }, 2 * 60 * 1000).unref?.();
 
 /**
@@ -186,11 +191,52 @@ async function isFlagOnNho(): Promise<boolean> {
 }
 export function quenCo() { coNho.luc = 0; }
 
-// ── TỰ DỌN dữ liệu cũ (mỗi ngày 1 lần) cho sổ không phình mãi ──
-// Nhật ký đăng nhập giữ 2 năm, số lần dùng theo ngày giữ 1 năm, sổ reset giữ vĩnh viễn (ít dòng, là chứng từ thu phí).
-// Ước tính (thẻ đăng nhập hạn 7 ngày ⇒ mỗi máy ~1 lần đăng nhập/tuần): 1.000 tài khoản × 3 máy ≈ 150.000 dòng nhật ký/năm
-// (~30 MB) + tối đa ~1 triệu dòng "dùng theo ngày"/năm nếu ngày nào cũng dùng (~70 MB) — nhỏ so với database (~700 MB).
-setInterval(() => {
-  query(`DELETE FROM thiet_bi_dang_nhap WHERE luc < now() - interval '2 years'`).catch(() => {});
-  query(`DELETE FROM thiet_bi_ngay WHERE ngay < (now() - interval '1 year')::date`).catch(() => {});
-}, 24 * 3600 * 1000).unref?.();
+// ── 10 TRA CỨU GẦN NHẤT của tài khoản ──
+// Gắn ở /api (index.ts). Chỉ ghi các lần TRA CỨU thật (không ghi mọi lần gọi máy chủ), xong việc mới ghi (res 'finish'),
+// rồi xoá bớt cho mỗi tài khoản chỉ còn đúng 10 dòng mới nhất.
+const TRA_CUU: [RegExp, string][] = [
+  [/^\/api\/parcels\/at\b/, 'Bấm xem thửa đất trên bản đồ'],
+  [/^\/api\/dc\/tim\b/, 'Tìm thửa theo số tờ / số thửa'],
+  [/^\/api\/van-ban\/?\?.*\bq=/, 'Tra cứu văn bản'],
+  [/^\/api\/qr\b/, 'Tra cứu QR sổ đỏ'],
+  [/^\/api\/hotlist\/goc\b/, 'Mở danh sách nóng'],
+];
+async function moTaTraCuu(duong: string): Promise<string | null> {
+  const [d, q = ''] = duong.split('?'); const p = new URLSearchParams(q);
+  try {
+    if (/\/parcels\/at/.test(d)) {
+      const lng = Number(p.get('lng')), lat = Number(p.get('lat'));
+      if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null;
+      const [r] = await query<any>(`SELECT d.so_to, d.so_thua, x.ten FROM dia_chinh d LEFT JOIN dia_chinh_xa x ON x.xa_id = d.xa_id
+        WHERE ST_Intersects(d.geom, ST_SetSRID(ST_Point($1, $2), 4326)) LIMIT 1`, [lng, lat]);
+      return r ? [`Thửa ${r.so_thua}`, `Tờ ${r.so_to}`, r.ten].filter(Boolean).join(' · ') : `toạ độ ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    }
+    if (/\/dc\/tim/.test(d)) {
+      let xa = '';
+      if (p.get('xaId')) { const [x] = await query<any>('SELECT ten FROM dia_chinh_xa WHERE xa_id=$1', [p.get('xaId')]); xa = x?.ten || ''; }
+      return [p.get('thua') && `Thửa ${p.get('thua')}`, p.get('to') && `Tờ ${p.get('to')}`, xa].filter(Boolean).join(' · ') || null;
+    }
+    if (/\/van-ban/.test(d)) return p.get('q') ? `“${String(p.get('q')).slice(0, 80)}”` : null;
+  } catch { /* bỏ qua */ }
+  return null;
+}
+export function ghiTraCuu(req: Request, res: any, next: () => void) {
+  if (req.method !== 'GET' && req.method !== 'POST') return next();
+  const duong = req.originalUrl || req.url;
+  const loai = TRA_CUU.find(([re]) => re.test(duong));
+  const h = String(req.headers.authorization || '');
+  if (!loai || !h.startsWith('Bearer ')) return next();
+  res.on('finish', async () => {
+    if (res.statusCode >= 400) return;
+    const p = verifyToken(h.slice(7)); if (!p) return;
+    const userId = Number(p.id); const ma = p.tb || maThietBi(req);
+    try {
+      const [tb] = ma ? await query<{ id: number }>('SELECT id FROM thiet_bi WHERE user_id=$1 AND ma=$2', [userId, ma]) : [];
+      await query('INSERT INTO tra_cuu_gan_day (user_id, thiet_bi_id, ip, viec, mo_ta) VALUES ($1,$2,$3,$4,$5)',
+        [userId, tb?.id ?? null, ipCua(req), loai[1], await moTaTraCuu(duong)]);
+      await query(`DELETE FROM tra_cuu_gan_day WHERE user_id=$1 AND id NOT IN
+        (SELECT id FROM tra_cuu_gan_day WHERE user_id=$1 ORDER BY luc DESC, id DESC LIMIT 10)`, [userId]);
+    } catch { /* sổ trục trặc không ảnh hưởng việc tra cứu */ }
+  });
+  next();
+}

@@ -3,24 +3,25 @@
 //  QUẢN LÝ THIẾT BỊ ĐĂNG NHẬP (10/10/2026) — CHỈ ADMIN. Máy chủ: apps/backend/src/routes/thietBi.ts + lib/thietBi.ts
 //  Chủ dự án: khoá mỗi tài khoản tối đa 3 thiết bị (tính năng ẨN, bật ở đây), reset thiết bị qua Zalo admin (phí 100k),
 //  và "quản lý thiết bị đang đăng nhập của tài khoản 1 cách chi tiết nhất … để có thể nói chuyện khi khách chối".
-//  Nên trang này cho xem đủ: từng máy (loại máy, hệ điều hành, trình duyệt, màn hình, IP đầu/cuối), TỪNG LẦN đăng
-//  nhập (kể cả lần BỊ CHẶN vì quá số máy), những NGÀY máy đó có dùng web, và sổ các lần reset / gỡ máy.
+//  Trang cho xem: từng máy (loại máy, hệ điều hành, trình duyệt, màn hình, IP, lần đầu / lần đăng nhập cuối / lần hoạt
+//  động cuối), LẦN ĐĂNG NHẬP CUỐI của tài khoản (kể cả lần BỊ CHẶN vì quá số máy), 10 TRA CỨU GẦN NHẤT, sổ reset / gỡ máy.
+//  Chủ dự án dặn chỉ lưu chừng đó cho đỡ tốn dung lượng (không lưu lịch sử dài).
 // ════════════════════════════════════════════════════════════════════════════════════════════
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { useAuth, laAdmin } from '@/lib/auth';
 
-type TongQuan = { id: number; email: string; ten: string | null; phone: string | null; soMay: number; lanCuoi: string; soIp30: number; soLanBiChan: number; soLanReset: number; toiDaRieng: number | null };
+type TongQuan = { id: number; email: string; ten: string | null; phone: string | null; soMay: number; lanCuoi: string; soIp: number; vuaBiChan: boolean | null; soLanReset: number; toiDaRieng: number | null };
 type May = { id: number; ten: string; loai: string; heDieuHanh: string; trinhDuyet: string; chiTiet: Record<string, any>; ipDau: string; ipCuoi: string; quocGia: string | null;
-  lanDau: string; lanCuoi: string; soLanDangNhap: number; soNgayDung: number; soLanDung: number; ma: string; ua: string };
-type DangNhap = { id: number; may: number | null; ma: string; luc: string; ip: string; quocGia: string | null; ten: string; ua: string; cach: string; ketQua: string };
+  lanDau: string; lanCuoi: string; soLanDangNhap: number; dnCuoi: string | null; ipDnCuoi: string | null; ma: string; ua: string };
+type DangNhap = { may: number | null; ma: string; luc: string; ip: string; quocGia: string | null; ten: string; ua: string | null; cach: string; ketQua: string };
+type TraCuu = { id: number; may: number | null; luc: string; ip: string; viec: string; moTa: string | null };
 type Reset = { id: number; luc: string; soMay: number; dsMay: May[]; phi: number; ghiChu: string | null; admin: string | null };
 type ChiTiet = { taiKhoan: { id: number; email: string; ten: string | null; phone: string | null; taoLuc: string; toiDaRieng: number | null }; toiDa: number;
-  may: May[]; ngay: { may: number; ngay: string; soLan: number; ip: string }[]; dangNhap: DangNhap[]; reset: Reset[]; batGioiHan: boolean; phi: number };
+  may: May[]; dnCuoi: DangNhap | null; traCuu: TraCuu[]; reset: Reset[]; batGioiHan: boolean; phi: number };
 
 const gio = (s?: string | null) => s ? new Date(s).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour12: false }) : '—';
-const ngayVN = (s: string) => { const [y, m, d] = s.split('-'); return `${d}/${m}/${y}`; };
 const CACH: Record<string, string> = { 'mat-khau': 'Mật khẩu', 'van-tay': 'Vân tay / khuôn mặt', 'dang-ky': 'Đăng ký tài khoản' };
 const icon = (loai: string) => loai === 'Điện thoại' ? '📱' : loai === 'Máy tính bảng' ? '📲' : '💻';
 const tien = (n: number) => n.toLocaleString('vi-VN') + 'đ';
@@ -85,12 +86,7 @@ export default function ThietBiPage() {
     catch (e: any) { alert(e?.message || 'Không đổi được'); }
   };
 
-  // những ngày từng máy có dùng web (gom theo máy)
-  const ngayTheoMay = useMemo(() => {
-    const m: Record<number, { ngay: string; soLan: number; ip: string }[]> = {};
-    for (const n of ct?.ngay || []) (m[n.may] ||= []).push(n);
-    return m;
-  }, [ct]);
+  const tenMay = (id: number | null) => { const i = ct ? ct.may.findIndex((m) => m.id === id) : -1; return i >= 0 ? `Thiết bị ${i + 1}` : id ? 'máy đã gỡ' : '—'; };
 
   if (loading) return <div className="p-10 text-center text-slate-400">Đang tải…</div>;
   if (!laAdmin(user)) return (
@@ -144,8 +140,8 @@ export default function ThietBiPage() {
                   <div className={`truncate text-[11px] ${chon === t.id ? 'text-slate-200' : 'text-slate-500'}`}>{t.email}{t.phone ? ` · ${t.phone}` : ''}</div>
                   <div className="mt-1 flex flex-wrap gap-1 text-[11px]">
                     <span className={`rounded px-1.5 font-bold ${t.soMay >= toiDa ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'}`}>{t.soMay}/{toiDa} máy</span>
-                    <span className="rounded bg-slate-100 px-1.5 text-slate-700">{t.soIp30} IP / 30 ngày</span>
-                    {t.soLanBiChan > 0 && <span className="rounded bg-amber-100 px-1.5 font-bold text-amber-800">bị chặn {t.soLanBiChan} lần</span>}
+                    <span className="rounded bg-slate-100 px-1.5 text-slate-700">{t.soIp} IP khác nhau</span>
+                    {t.vuaBiChan && <span className="rounded bg-amber-100 px-1.5 font-bold text-amber-800">lần đăng nhập cuối bị chặn</span>}
                     {t.soLanReset > 0 && <span className="rounded bg-sky-100 px-1.5 text-sky-800">reset {t.soLanReset} lần</span>}
                   </div>
                 </button>
@@ -175,7 +171,6 @@ export default function ThietBiPage() {
               <div className="space-y-2">
                 {ct.may.map((m, i) => {
                   const c = m.chiTiet || {};
-                  const ngay = ngayTheoMay[m.id] || [];
                   return (
                     <div key={m.id} className="rounded-lg border bg-white p-3 text-[13px]">
                       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -186,9 +181,9 @@ export default function ThietBiPage() {
                         <div>Loại: <b>{m.loai}</b> · {m.heDieuHanh}{c.banNenTang ? ` (${c.nenTang || ''} ${c.banNenTang})` : ''}</div>
                         <div>Trình duyệt: <b>{m.trinhDuyet}</b></div>
                         <div>Đăng nhập lần đầu: <b>{gio(m.lanDau)}</b></div>
+                        <div>Đăng nhập gần nhất: <b>{gio(m.dnCuoi)}</b>{m.ipDnCuoi ? ` · IP ${m.ipDnCuoi}` : ''}</div>
                         <div>Hoạt động gần nhất: <b>{gio(m.lanCuoi)}</b></div>
                         <div>Số lần đăng nhập: <b>{m.soLanDangNhap}</b></div>
-                        <div>Có dùng web: <b>{m.soNgayDung} ngày</b> ({m.soLanDung.toLocaleString('vi-VN')} lần gọi máy chủ)</div>
                         <div>IP lần đầu: <b>{m.ipDau || '—'}</b>{m.quocGia ? ` · ${m.quocGia}` : ''}</div>
                         <div>IP gần nhất: <b>{m.ipCuoi || '—'}</b></div>
                         {(c.manHinh || c.muiGio) && <div>Màn hình: {c.manHinh || '—'}{c.tiLe ? ` (×${c.tiLe})` : ''} · múi giờ {c.muiGio || '—'} · {c.ngonNgu || ''}</div>}
@@ -196,42 +191,48 @@ export default function ThietBiPage() {
                         <div className="sm:col-span-2 break-all text-[11px] text-slate-400">Mã thiết bị: {m.ma}</div>
                         <div className="sm:col-span-2 break-all text-[11px] text-slate-400">Trình duyệt tự khai: {m.ua}</div>
                       </div>
-                      {ngay.length > 0 && (
-                        <details className="mt-2">
-                          <summary className="cursor-pointer text-[12px] font-semibold text-[#0A2540]">Những ngày có dùng web ({ngay.length} ngày)</summary>
-                          <div className="mt-1 flex flex-wrap gap-1">
-                            {ngay.map((n) => <span key={n.ngay} title={`IP ${n.ip}`} className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-700">{ngayVN(n.ngay)} · {n.soLan} lần</span>)}
-                          </div>
-                        </details>
-                      )}
                     </div>
                   );
                 })}
                 {!ct.may.length && <p className="text-[13px] text-slate-400">Tài khoản đang không có thiết bị nào.</p>}
               </div>
 
-              {/* Nhật ký đăng nhập */}
+              {/* Lần đăng nhập cuối */}
+              <div className="rounded-lg border bg-white p-3 text-[13px]">
+                <h2 className="text-[14px] font-extrabold text-[#0A2540]">Lần đăng nhập cuối</h2>
+                {!ct.dnCuoi && <p className="mt-1 text-slate-400">Chưa ghi nhận (sổ bắt đầu ghi từ lần đăng nhập kế tiếp).</p>}
+                {ct.dnCuoi && (
+                  <div className={`mt-1 rounded-md px-2 py-1.5 ${ct.dnCuoi.ketQua === 'bi-chan' ? 'bg-amber-50' : ''}`}>
+                    <b>{gio(ct.dnCuoi.luc)}</b> · {ct.dnCuoi.ketQua === 'bi-chan' ? <b className="text-amber-700">BỊ CHẶN (đã đủ số máy)</b> : <span className="text-emerald-700">thành công</span>}
+                    {' '}· {ct.dnCuoi.ten} ({ct.dnCuoi.ketQua === 'bi-chan' ? 'máy mới, chưa có trong danh sách' : tenMay(ct.dnCuoi.may)})
+                    {' '}· IP {ct.dnCuoi.ip}{ct.dnCuoi.quocGia ? ` · ${ct.dnCuoi.quocGia}` : ''} · {CACH[ct.dnCuoi.cach] || ct.dnCuoi.cach}
+                    {ct.dnCuoi.ua && <div className="break-all text-[11px] text-slate-400">Trình duyệt tự khai: {ct.dnCuoi.ua}</div>}
+                  </div>
+                )}
+              </div>
+
+              {/* 10 tra cứu gần nhất */}
               <div className="rounded-lg border bg-white p-3">
-                <h2 className="text-[14px] font-extrabold text-[#0A2540]">Nhật ký đăng nhập ({ct.dangNhap.length} lần gần nhất)</h2>
-                <div className="mt-2 overflow-x-auto">
-                  <table className="w-full min-w-[640px] text-left text-[12px]">
-                    <thead className="text-slate-500"><tr><th className="py-1 pr-2">Thời gian</th><th className="pr-2">Kết quả</th><th className="pr-2">Thiết bị</th><th className="pr-2">IP</th><th>Cách đăng nhập</th></tr></thead>
-                    <tbody>
-                      {ct.dangNhap.map((d) => {
-                        const so = ct.may.findIndex((m) => m.id === d.may);
-                        return (
-                          <tr key={d.id} className={`border-t ${d.ketQua === 'bi-chan' ? 'bg-amber-50' : ''}`}>
-                            <td className="py-1 pr-2 whitespace-nowrap">{gio(d.luc)}</td>
-                            <td className="pr-2">{d.ketQua === 'bi-chan' ? <b className="text-amber-700">Bị chặn (quá số máy)</b> : <span className="text-emerald-700">Thành công</span>}</td>
-                            <td className="pr-2" title={d.ua || undefined}>{d.ten}{so >= 0 ? ` (Thiết bị ${so + 1})` : d.ketQua === 'ok' ? ' (máy đã gỡ)' : ''}</td>
-                            <td className="pr-2 whitespace-nowrap">{d.ip}{d.quocGia ? ` · ${d.quocGia}` : ''}</td>
-                            <td>{CACH[d.cach] || d.cach}</td>
+                <h2 className="text-[14px] font-extrabold text-[#0A2540]">10 lần tra cứu gần nhất</h2>
+                {!ct.traCuu.length && <p className="mt-1 text-[13px] text-slate-400">Chưa có lần tra cứu nào được ghi.</p>}
+                {ct.traCuu.length > 0 && (
+                  <div className="mt-2 overflow-x-auto">
+                    <table className="w-full min-w-[560px] text-left text-[12px]">
+                      <thead className="text-slate-500"><tr><th className="py-1 pr-2">Thời gian</th><th className="pr-2">Việc</th><th className="pr-2">Chi tiết</th><th className="pr-2">Thiết bị</th><th>IP</th></tr></thead>
+                      <tbody>
+                        {ct.traCuu.map((t) => (
+                          <tr key={t.id} className="border-t">
+                            <td className="py-1 pr-2 whitespace-nowrap">{gio(t.luc)}</td>
+                            <td className="pr-2">{t.viec}</td>
+                            <td className="pr-2">{t.moTa || '—'}</td>
+                            <td className="pr-2 whitespace-nowrap">{tenMay(t.may)}</td>
+                            <td className="whitespace-nowrap">{t.ip}</td>
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
 
               {/* Sổ reset */}

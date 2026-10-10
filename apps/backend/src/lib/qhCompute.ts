@@ -235,7 +235,7 @@ export function qhReady() { return ready; }
 // = băm NỘI DUNG mọi file dữ liệu quy hoạch (qh_zones*.json, road_mask*) + số phiên bản CÁCH TÍNH bên dưới.
 // Đổi dữ liệu hay đổi cách tính → dấu đổi → mọi kết quả đã lưu tự bị bỏ, tính lại. Không bao giờ hiện số cũ.
 // ⚠️ SỬA CÁCH TÍNH TRONG FILE NÀY (hoặc catHinh.ts) THÌ TĂNG CACH_TINH.
-const CACH_TINH = '2026-10-10-cat-hinh-3';   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
+const CACH_TINH = '2026-10-10-ranh-qh-1';   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
 let PHIEN_BAN = '';
 export function qhPhienBan(): string {
   if (PHIEN_BAN || !ready) return PHIEN_BAN;
@@ -511,7 +511,32 @@ export function outerRing(geom: any): number[][] | null {
 // bản vẽ (bản vẽ chỉ tô ô đất, phần đường để trắng). Đo thật trên 43 thửa QĐ2101: có mặt nạ thì
 // tỉ lệ phủ trung bình lên 91,8% → 99,7%, số thửa phủ đủ 100% lên 28 → 39.
 interface MatNa { buf: Buffer; x0: number; y0: number; x1: number; y1: number; W: number; H: number; rb: number; }
-interface BanQh { ma: string; ten: string; kho: KhoO; na: MatNa | null; khung: [number, number, number, number]; }
+interface BanQh { ma: string; ten: string; kho: KhoO; na: MatNa | null; khung: [number, number, number, number]; ranh: Ranh | null; }
+// RANH GIỚI LẬP QUY HOẠCH của bản (data/ranh_qh.json, 10/10/2026). Đối chiếu 2.400 thửa với "đáp án" đo thẳng trên bản vẽ
+// (trong vùng tô = loại đất; trong ranh mà không tô = đường; ngoài ranh = ngoài phạm vi) thấy 2 lỗi có hệ thống:
+//   · mặt nạ đường nới ra QUÁ ranh → phần ngoài ranh bị ghi "Đất giao thông" (thửa 590 tờ 3 Cam Hiệp Bắc: 2.380 m² cho QĐ918);
+//   · đường chạy SÁT MÉP ranh: nhìn 8 hướng thì nửa hướng ra ngoài ranh, không gặp ô đất → không đủ 6/8 → ghi "ngoài phạm vi"
+//     (thửa 243 tờ 12 Cam Hiệp Nam: 1.233 m²).
+// Nay: khe hở NGOÀI ranh luôn là ngoài phạm vi; TRONG ranh thì khi dò 8 hướng, gặp MÉP RANH cũng tính như gặp ô đất.
+interface Ranh { r: Float64Array; x0: number; y0: number; x1: number; y1: number; }
+let RANH_QH: Record<string, number[][]> = {};
+try { RANH_QH = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'ranh_qh.json'), 'utf-8')); } catch { RANH_QH = {}; }
+function taoRanh(ring: number[][] | undefined): Ranh | null {
+  if (!ring || ring.length < 4) return null;
+  const r = new Float64Array(ring.length * 2); let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  ring.forEach(([x, y], i) => { r[2 * i] = x; r[2 * i + 1] = y; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; });
+  return { r, x0, y0, x1, y1 };
+}
+function trongRanh(b: BanQh, x: number, y: number): boolean {
+  const g = b.ranh; if (!g) return true;   // bản chưa có ranh → coi như trong (giữ cách cũ)
+  if (x < g.x0 || x > g.x1 || y < g.y0 || y > g.y1) return false;
+  const r = g.r, n = r.length / 2; let ins = false;
+  for (let i = 0, j = n - 1; i < n; j = i++) {
+    const xi = r[2 * i], yi = r[2 * i + 1], xj = r[2 * j], yj = r[2 * j + 1];
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) ins = !ins;
+  }
+  return ins;
+}
 const BAN_KHAC: BanQh[] = [];
 
 for (const b of [
@@ -544,7 +569,7 @@ for (const b of [
       khung[0] = Math.min(khung[0], kho.bb[k * 4]); khung[1] = Math.min(khung[1], kho.bb[k * 4 + 1]);
       khung[2] = Math.max(khung[2], kho.bb[k * 4 + 2]); khung[3] = Math.max(khung[3], kho.bb[k * 4 + 3]);
     }
-    BAN_KHAC.push({ ma: b.ma, ten: b.ten, kho, na, khung });
+    BAN_KHAC.push({ ma: b.ma, ten: b.ten, kho, na, khung, ranh: taoRanh(RANH_QH[b.ma]) });
     console.log(`[qhCompute] nạp bản ${b.ma}: ${kho.n} ô đất${na ? ` + mặt nạ đường ${na.W}x${na.H} · ${soTrum} ô trùm` : ' (chưa có mặt nạ đường)'}`);
   } catch {
     console.log(`[qhCompute] chưa có ${b.tep} — bỏ qua bản ${b.ma}`);
@@ -593,6 +618,7 @@ function biBaoQuanh(b: BanQh, x: number, y: number, boTrum = false): boolean {
     const [dx, dy] = BAO_HUONG[h];
     for (let r = DO_BUOC; r <= XA; r += DO_BUOC) {
       if (b.kho.chuaK(x + dx * r, y + dy * r, boTrum) >= 0) { gap++; break; }
+      if (b.ranh && !trongRanh(b, x + dx * r, y + dy * r)) { gap++; break; }   // chạm mép ranh = như chạm ô đất (đường sát mép ranh)
     }
     if (gap + (7 - h) < 6) return false;   // các hướng còn lại có gặp hết cũng không đủ 6 → thôi
   }
@@ -650,10 +676,14 @@ export function computeQhTheoBan(ring: number[][], dienTich: number, dayDu = fal
       if (o && b.kho.trum?.[k] && duongBan(b, x, y) && baoQuanh(b, x, y, true)) o = 'Đất giao thông';
       if (o) demO[b.ma] = (demO[b.ma] || 0) + 1;
       let lo = o;
-      if (!lo && duongBan(b, x, y)) {
+      if (!lo && !trongRanh(b, x, y)) {
+        /* khe hở NGOÀI ranh lập quy hoạch → ngoài phạm vi, không xét đường */
+      } else if (!lo && duongBan(b, x, y)) {
         lo = 'Đất giao thông';
         // giữ vài điểm lòng đường làm mẫu — thửa nằm trọn trong đường thì dùng chúng để chứng minh bản có phủ tới
         if ((mauDuong[b.ma] ||= []).length < 5) mauDuong[b.ma].push([x, y]);
+      } else if (!lo && b.ranh && demO[b.ma]) {   // RANH2: trong ranh mà không thuộc ô nào = đường (bản phân khu để trắng lòng đường)
+        lo = 'Đất giao thông'; demBao[b.ma] = (demBao[b.ma] || 0) + 1;
       } else if (!lo && b.na && (dayDu || (!demO[b.ma] && !demBao[b.ma] && ix % 3 === 0 && iy % 3 === 0)) && baoQuanh(b, x, y)) {   // chế độ nhanh: chỉ dò 1/9 điểm rải đều — đủ để biết bản có phủ tới không
         lo = 'Đất giao thông'; demBao[b.ma] = (demBao[b.ma] || 0) + 1;
       }
@@ -687,7 +717,7 @@ export function computeQhTheoBan(ring: number[][], dienTich: number, dayDu = fal
       const aCon = dienTichMP(con, kx, ky) * tl;
       if (aCon > 1e-4) {
         const { p: pts, w } = diemCoTrongSo(con, kx, ky); const tong = w.reduce((s2, v) => s2 + v, 0);
-        let gt = 0; pts.forEach(([x, y], i) => { if (duongBan(b, x, y) || (b.na && baoQuanh(b, x, y))) gt += w[i]; });
+        let gt = 0; pts.forEach(([x, y], i) => { if (trongRanh(b, x, y) && (b.ranh || duongBan(b, x, y) || (b.na && baoQuanh(b, x, y)))) gt += w[i]; });
         if (gt && tong > 0) cong('Đất giao thông', aCon * gt / tong);
       }
       return kq;

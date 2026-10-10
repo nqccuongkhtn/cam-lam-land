@@ -490,6 +490,16 @@ Diện tích thửa không đổi (chỉ tịnh tiến). **Đừng dịch** hìn
 Nạp lại bản đồ địa chính từ nguồn khác thì đo lại độ trượt (cách đo: `scripts/kiem-tra-qh/README.md`).
 Cách web đo diện tích thửa (`ST_Area` geography) KHÔNG gây lệch: trùng diện tích sổ ở 99,9 % trong 121.303 thửa.
 
+**QĐ205 — đối chiếu bản vẽ gốc (10/10/2026).** Nguồn chuẩn nhất: `quyhoach2025/QD205.gpkg` lớp `hatches` (1.947 vùng tô
+còn nguyên đường bao + màu + tên lớp có giai đoạn HT/QH2030/QH2045). `QD205.dxf` (788 MB) thì vùng tô đã bị phá thành nét
+đứt 15 m, MẤT vùng tô đặc, và **tên lớp KHÔNG phản ánh loại đất** (người vẽ đặt lớp theo kiểu nét) → muốn biết nghĩa lớp phải
+xem KHUNG CHÚ GIẢI (lớp `T-cmt 28-02-2023`, góc phải ~X 608.000 Y 1.334.000; 3 cột Hiện trạng / QH 2030 / QH 2045).
+Rải 13.910 điểm trong vùng tô gpkg: web khớp 95–100 % mọi lớp, trừ 2 lớp bị SÓT → đã bổ sung bằng
+`scripts/qh-pipeline/5c-bo-sung-205-tu-gpkg.py` (đơn vị ở mới mật độ TB 2030 — 857 ha; làng xóm đô thị hoá QH — 56 ha).
+⚠️ GDAL đọc vùng tô nhiều vòng sai (vòng đầu = ngoài, còn lại = lỗ) → phải dựng theo LUẬT CHẴN–LẺ; qhCompute không hỗ
+trợ ô có lỗ → cắt thành mảnh không lỗ. QĐ205 không có ô "đất giao thông": đường = khe giữa các ô (xem `bao205`).
+Web CHƯA phân biệt giai đoạn (hiện trạng / 2030 / 2045) — mọi loại đất QĐ205 đang ghi "2045".
+
 **Dữ liệu bắt buộc phải có:** `apps/backend/data/qh_zones.json`, `road_mask.bin`, `road_mask.json`
 (đường dẫn đọc theo `QH_DATA_DIR`, mặc định `<thư mục chạy>/data`; trong container là `/app/apps/backend/data`).
 Các file này **có trong git** (~1.9MB + 1.6MB). Thiếu chúng thì backend vẫn chạy nhưng tự tụt xuống cách B —

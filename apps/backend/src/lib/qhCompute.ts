@@ -142,6 +142,9 @@ class KhoO {
           if (j === i || daXet.has(j)) continue;
           daXet.add(j);   // một ô con chạm nhiều ô lưới — chỉ xét một lần
           if (this.dien[j] >= this.dien[i] * 0.8) continue;
+          // mẩu vẽ thừa < 50 m² (vd 2 mẩu 7 m² + 10 m² trong dải cây xanh QĐ2222) không phải lô thật — trước đây đủ để biến
+          // cả dải cây xanh 10 ha thành "ô trùm" → nửa thửa 163 tờ 2 Cam Hải Đông bị ghi đường (11/10/2026)
+          if (this.dien[j] * 1.21e10 < 50) continue;
           const r = j * 4;
           if (this.bb[r] < this.bb[q] || this.bb[r + 2] > this.bb[q + 2] || this.bb[r + 1] < this.bb[q + 1] || this.bb[r + 3] > this.bb[q + 3]) continue;
           let het2 = true;
@@ -235,7 +238,7 @@ export function qhReady() { return ready; }
 // = băm NỘI DUNG mọi file dữ liệu quy hoạch (qh_zones*.json, road_mask*) + số phiên bản CÁCH TÍNH bên dưới.
 // Đổi dữ liệu hay đổi cách tính → dấu đổi → mọi kết quả đã lưu tự bị bỏ, tính lại. Không bao giờ hiện số cũ.
 // ⚠️ SỬA CÁCH TÍNH TRONG FILE NÀY (hoặc catHinh.ts) THÌ TĂNG CACH_TINH.
-const CACH_TINH = '2026-10-10-ranh-qh-4';   // 4: QĐ205 'Đất khác' → 'Chưa ghi loại đất trong bản vẽ'   // 3: phần ngoài ranh QĐ205 = ngoài phạm vi   // 2: khe QĐ205 ≥ 5 m trong ranh lập QH = đường   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
+const CACH_TINH = '2026-10-11-trum-vun';   // trum-vun: mẩu < 50 m² không làm ô thành ô trùm   // 4: QĐ205 'Đất khác' → 'Chưa ghi loại đất trong bản vẽ'   // 3: phần ngoài ranh QĐ205 = ngoài phạm vi   // 2: khe QĐ205 ≥ 5 m trong ranh lập QH = đường   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
 let PHIEN_BAN = '';
 export function qhPhienBan(): string {
   if (PHIEN_BAN || !ready) return PHIEN_BAN;

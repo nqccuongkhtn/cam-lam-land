@@ -20,7 +20,7 @@ async function main() {
     const ds = await query<any>(`
       SELECT d.id, ST_AsGeoJSON(d.geom)::json AS g, ROUND(ST_Area(d.geom::geography)::numeric, 1) AS dt
       FROM dia_chinh d LEFT JOIN qh_luu l ON l.id = d.id AND l.pb = $1
-      WHERE l.id IS NULL AND d.geom && ST_MakeEnvelope(108.9401, 11.9335, 109.2471, 12.2142, 4326)
+      WHERE l.id IS NULL AND NOT EXISTS (SELECT 1 FROM qh_luu_loi e WHERE e.id = d.id AND e.pb = $1) AND d.geom && ST_MakeEnvelope(108.9401, 11.9335, 109.2471, 12.2142, 4326)
         AND d.dien_tich >= $2 AND d.id > $3
       ORDER BY d.id LIMIT 300`, [pb, NGUONG, sau]);
     if (!ds.length) break;
@@ -29,7 +29,10 @@ async function main() {
       const ring = chuanToaDoDiaChinh(outerRing(r.g) || []);
       const dt = Number(r.dt) || 0;
       if (ring.length < 3 || !(dt > 0) || ngoaiVungQh(ring)) { bo++; continue; }
+      // đánh dấu "đang tính" trước — chết giữa chừng thì lần sau bỏ qua thửa này (xem bảng qh_luu_loi)
+      await query('INSERT INTO qh_luu_loi (id, pb) VALUES ($1,$2) ON CONFLICT (id) DO UPDATE SET pb=EXCLUDED.pb, luc=now()', [r.id, pb]);
       await luuQh(r.id, pb, dauThua(ring, dt), tinhQh(ring, dt)).catch(() => {});
+      await query('DELETE FROM qh_luu_loi WHERE id=$1', [r.id]);
       lam++;
       if (lam % 1000 === 0) console.log(`[tinh-san-qh] đã tính ${lam} thửa (${Math.round((Date.now() - t0) / 1000)} giây)`);
       await sleep(5);   // nhường CPU cho máy chủ web

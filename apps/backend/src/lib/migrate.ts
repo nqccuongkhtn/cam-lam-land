@@ -734,6 +734,11 @@ export async function migrate(): Promise<void> {
   await pool.query(`CREATE TABLE IF NOT EXISTS qh_luu (
       id integer PRIMARY KEY, pb text NOT NULL, dau text NOT NULL, kq jsonb NOT NULL, luc timestamptz NOT NULL DEFAULT now())`)
     .catch((e) => console.error('[migrate] qh_luu:', e.message));
+  // Thửa ĐANG TÍNH dở của tiến trình tính sẵn: ghi trước khi tính, xoá khi xong. Tiến trình chết giữa chừng (hết bộ nhớ)
+  // thì dòng còn lại → lần chạy sau bỏ qua thửa đó, không kẹt mãi một chỗ (scripts/tinhSanQh.ts).
+  await pool.query(`CREATE TABLE IF NOT EXISTS qh_luu_loi (
+      id integer PRIMARY KEY, pb text NOT NULL, luc timestamptz NOT NULL DEFAULT now())`)
+    .catch((e) => console.error('[migrate] qh_luu_loi:', e.message));
 
   console.log('[migrate] schema up to date');
 }

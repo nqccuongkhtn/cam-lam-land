@@ -71,10 +71,17 @@ function xenKhung(r: number[][], x0: number, y0: number, x1: number, y1: number)
   return out;
 }
 
+// LÀM TRÒN TOẠ ĐỘ tới 1e-9 độ (~0,1 mm) trước mọi phép cắt (10/10/2026). Thư viện polygon-clipping có lỗi đã biết: gặp đỉnh gần
+// trùng nhau tới mức sai số dấu phẩy động thì lặp vô tận tới hết bộ nhớ — thửa 693 tờ 15 Cam Đức (id 151481) với ô 503 làm chết
+// tiến trình tính sẵn, và nếu khách bấm vào thửa đó thì kéo sập cả máy chủ web. So 3.000 thửa: phần cắt hình không đổi.
+const TRON = 1e9;
+const tron = (r: number[][]) => r.map(([x, y]) => [Math.round(x * TRON) / TRON, Math.round(y * TRON) / TRON]);
+const tronMP = (mp: MP): MP => mp.map((poly) => poly.map(tron));
+
 export function catTheoUuTien(ring: number[][], zones: { k: number; ring: number[][] }[]): { manh: { k: number; mp: MP }[]; con: MP; thua: MP } {
   // Chuẩn hoá hình thửa trước (thửa TỰ CẮT CHÉO — vd phiếu 3354 — thì công thức diện tích thường ra số sai, kéo hệ số
   // quy đổi lên gấp 7 lần). Diện tích thửa phải đo trên CHÍNH hình đã chuẩn hoá này cho cùng hệ với các mảnh cắt.
-  const thua = pc.union([[ring.map(([x, y]) => [x, y])]] as any) as MP;
+  const thua = tronMP(pc.union([tron(ring)] as any) as MP);
   let con: MP = thua;
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   for (const [x, y] of ring) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
@@ -84,9 +91,9 @@ export function catTheoUuTien(ring: number[][], zones: { k: number; ring: number
     if (!con.length) break;
     const xr = xenKhung(z.ring, x0, y0, x1, y1);
     if (xr.length < 3) continue;
-    const zg: MP = [[xr]];
+    const zg: MP = [[tron(xr)]];
     const g = pc.intersection(con as any, zg as any) as MP;
-    if (g.length) { manh.push({ k: z.k, mp: g }); con = pc.difference(con as any, zg as any) as MP; }
+    if (g.length) { manh.push({ k: z.k, mp: g }); con = tronMP(pc.difference(con as any, zg as any) as MP); }
   }
   return { manh, con, thua };
 }

@@ -238,7 +238,7 @@ export function qhReady() { return ready; }
 // = băm NỘI DUNG mọi file dữ liệu quy hoạch (qh_zones*.json, road_mask*) + số phiên bản CÁCH TÍNH bên dưới.
 // Đổi dữ liệu hay đổi cách tính → dấu đổi → mọi kết quả đã lưu tự bị bỏ, tính lại. Không bao giờ hiện số cũ.
 // ⚠️ SỬA CÁCH TÍNH TRONG FILE NÀY (hoặc catHinh.ts) THÌ TĂNG CACH_TINH.
-const CACH_TINH = '2026-10-11-893-dnl';   // 893-dnl: bổ sung 4 vùng tô QĐ893 hỏng viền (5f)   // trum-vun: mẩu < 50 m² không làm ô thành ô trùm   // 4: QĐ205 'Đất khác' → 'Chưa ghi loại đất trong bản vẽ'   // 3: phần ngoài ranh QĐ205 = ngoài phạm vi   // 2: khe QĐ205 ≥ 5 m trong ranh lập QH = đường   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
+const CACH_TINH = '2026-10-11-893-sot';   // 893-sot: 5f bổ sung cả phần vùng tô bị 5b bỏ sót   // 893-dnl: bổ sung 4 vùng tô QĐ893 hỏng viền (5f)   // trum-vun: mẩu < 50 m² không làm ô thành ô trùm   // 4: QĐ205 'Đất khác' → 'Chưa ghi loại đất trong bản vẽ'   // 3: phần ngoài ranh QĐ205 = ngoài phạm vi   // 2: khe QĐ205 ≥ 5 m trong ranh lập QH = đường   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
 let PHIEN_BAN = '';
 export function qhPhienBan(): string {
   if (PHIEN_BAN || !ready) return PHIEN_BAN;

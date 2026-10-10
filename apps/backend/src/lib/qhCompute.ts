@@ -298,6 +298,29 @@ export function computeQhAreas(ring: number[][], dienTich: number): { type: stri
   let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
   for (const c of ring) { if (c[0] < minx) minx = c[0]; if (c[0] > maxx) maxx = c[0]; if (c[1] < miny) miny = c[1]; if (c[1] > maxy) maxy = c[1]; }
   const N = 44; const cnt: Record<string, number> = {}; let ins = 0;
+  // ── MẨU LẺ SÁT MÉP THỬA (nghiên cứu 10/10/2026) ──
+  // QĐ205 là quy hoạch CHUNG tỷ lệ nhỏ (~1/10.000): nét ranh lệch 0,15 mm trên giấy = 1,5 m thực địa, và ranh
+  // không vẽ bám thửa → hay sinh "mẩu lẻ" là một DẢI HẸP chạy dọc mép thửa (đo 3.000 thửa ngẫu nhiên: 146 mẩu
+  // nằm gọn trong 1,5 m sát mép, có mẩu tới 21 % thửa dài). Đó là sai số nét vẽ, không phải quy hoạch thật.
+  // → Loại đất nào mà MỌI điểm của nó CHẮC CHẮN nằm trong dải 1,5 m sát mép thì tính vào loại chính của lõi thửa.
+  //   "Chắc chắn" = độ sâu lớn nhất đo được + nửa đường chéo ô lưới mẫu vẫn < 1,5 m (thửa to, lưới thưa thì
+  //   không đủ chắc → để nguyên, không gộp bừa).
+  // CHỈ áp cho QĐ205. Bản 1/2000 + QĐ893 vẽ trên nền địa chính và cán bộ VPĐK ghi cả mẩu 1 m² → KHÔNG đụng.
+  // 5/5 phiếu chính thức có ghi QĐ205 đều "toàn bộ" một loại — web khớp cả trước lẫn sau khi thêm bước này.
+  const MEP = 1.5;
+  const kx = 111320 * Math.cos(((miny + maxy) / 2) * Math.PI / 180), ky = 110574;
+  const sauMep = (x: number, y: number) => {   // khoảng cách (m) từ điểm tới cạnh thửa gần nhất
+    let d = Infinity;
+    for (let i = 0; i + 1 < ring.length; i++) {
+      const ax = ring[i][0] * kx, ay = ring[i][1] * ky, bx = ring[i + 1][0] * kx, by = ring[i + 1][1] * ky;
+      const v = d2seg(x * kx, y * ky, ax, ay, bx, by); if (v < d) d = v;
+    }
+    return Math.sqrt(d);
+  };
+  const buocLuoi = Math.hypot((maxx - minx) * kx / N, (maxy - miny) * ky / N) / 2;
+  const sauNhat: Record<string, number> = {};
+  const loiThua: Record<string, number> = {};   // loại đất của các điểm ở LÕI thửa (cách mép ≥ 1,5 m)
+  const diem: [string, number][] = [];
   for (let iy = 0; iy < N; iy++) for (let ix = 0; ix < N; ix++) {
     const x = minx + (maxx - minx) * (ix + 0.5) / N, y = miny + (maxy - miny) * (iy + 0.5) / N;
     if (!pip(x, y, ring)) continue; ins++;
@@ -313,9 +336,18 @@ export function computeQhAreas(ring: number[][], dienTich: number): { type: stri
       // quy hoạch thì đã bị chặn từ đầu hàm rồi, không xuống tới đây.
       else lo = (r === null) ? 'Đất giao thông' : 'Đất khác'; // ngoài mask→cách B; trong mask mà xa mọi ô⇒ngoài QĐ205
     }
-    cnt[lo] = (cnt[lo] || 0) + 1;
+    const s = sauMep(x, y);
+    if (!(sauNhat[lo] >= s)) sauNhat[lo] = s;
+    if (s >= MEP) loiThua[lo] = (loiThua[lo] || 0) + 1;
+    diem.push([lo, s]);
   }
   if (ins < 4) return null;
+  const chinh = Object.entries(loiThua).sort((a, b) => b[1] - a[1])[0]?.[0];   // không có lõi (thửa hẹp < 3 m) → không gộp
+  for (const [lo, s] of diem) {
+    const leMep = chinh && lo !== chinh && sauNhat[lo] + buocLuoi < MEP;
+    const k = leMep ? chinh! : lo;
+    cnt[k] = (cnt[k] || 0) + 1;
+  }
   const out = Object.entries(cnt).map(([lo, n]) => ({ type: lo, hz: '2045', areaM2: Math.round((dienTich * n / ins) * 10) / 10 }));
   out.sort((a, b) => b.areaM2 - a.areaM2);
   return out.filter((o) => o.areaM2 > 0.4);

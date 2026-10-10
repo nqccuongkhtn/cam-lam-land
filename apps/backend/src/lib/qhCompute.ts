@@ -235,7 +235,7 @@ export function qhReady() { return ready; }
 // = băm NỘI DUNG mọi file dữ liệu quy hoạch (qh_zones*.json, road_mask*) + số phiên bản CÁCH TÍNH bên dưới.
 // Đổi dữ liệu hay đổi cách tính → dấu đổi → mọi kết quả đã lưu tự bị bỏ, tính lại. Không bao giờ hiện số cũ.
 // ⚠️ SỬA CÁCH TÍNH TRONG FILE NÀY (hoặc catHinh.ts) THÌ TĂNG CACH_TINH.
-const CACH_TINH = '2026-10-10-ranh-qh-2';   // 2: khe QĐ205 ≥ 5 m trong ranh lập QH = đường   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
+const CACH_TINH = '2026-10-10-ranh-qh-3';   // 3: phần ngoài ranh QĐ205 = ngoài phạm vi   // 2: khe QĐ205 ≥ 5 m trong ranh lập QH = đường   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
 let PHIEN_BAN = '';
 export function qhPhienBan(): string {
   if (PHIEN_BAN || !ready) return PHIEN_BAN;
@@ -356,6 +356,7 @@ function loai205TaiDiem(x: number, y: number): string {
 }
 // Điểm KHÔNG thuộc ô QĐ205 nào (khe hở giữa các ô): đường hay ô gần nhất.
 function loaiKhe205(x: number, y: number): string {
+  if (R205 && !trongR205(x, y)) return NGOAI_205;   // ngoài ranh lập QH QĐ205 (10/10/2026): thửa Phước Đồng / Cam Ranh sát ranh từng bị ghi 'Đất giao thông' cả thửa
   const r = roadAt(x, y);          // 1=lòng đường, 0=đất, null=ngoài phạm vi mask
   const near = nearestLand(x, y);  // ô QH gần nhất ≤50m (null nếu xa)
   if (near) return (r === 1) ? 'Đất giao thông'
@@ -443,7 +444,7 @@ export function computeQhAreas(ring: number[][], dienTich: number): { type: stri
       // mẩu lẻ sát mép (xem MEP ở trên) → gộp vào loại chính của lõi thửa
       const kq: Record<string, number> = {};
       for (const [lo, a] of Object.entries(dt)) {
-        const leMep = chinh && lo !== chinh && (sau[lo] ?? Infinity) + (bien[lo] ?? Infinity) < MEP;
+        const leMep = chinh && lo !== chinh && lo !== NGOAI_205 && (sau[lo] ?? Infinity) + (bien[lo] ?? Infinity) < MEP;
         const k = leMep ? chinh! : lo; kq[k] = (kq[k] || 0) + a;
       }
       return kq;
@@ -452,7 +453,8 @@ export function computeQhAreas(ring: number[][], dienTich: number): { type: stri
   if (chinhXac) {
     const out = Object.entries(chinhXac).map(([lo, a]) => ({ type: lo, hz: '2045', areaM2: Math.round(a * 10) / 10 }));
     out.sort((a, b) => b.areaM2 - a.areaM2);
-    return out.filter((o) => o.areaM2 > 0.4);
+    const loc = gopMauNgoai205(out.filter((o) => o.areaM2 > 0.4));
+    return loc.every((o) => o.type === NGOAI_205) ? null : loc;   // trọn ngoài ranh QĐ205 → không có dòng QĐ205
   }
   for (const [lo, s] of diem) {
     const leMep = chinh && lo !== chinh && sauNhat[lo] + buocLuoi < MEP;
@@ -461,7 +463,8 @@ export function computeQhAreas(ring: number[][], dienTich: number): { type: stri
   }
   const out = Object.entries(cnt).map(([lo, n]) => ({ type: lo, hz: '2045', areaM2: Math.round((dienTich * n / ins) * 10) / 10 }));
   out.sort((a, b) => b.areaM2 - a.areaM2);
-  return out.filter((o) => o.areaM2 > 0.4);
+  const loc2 = gopMauNgoai205(out.filter((o) => o.areaM2 > 0.4));
+  return loc2.every((o) => o.type === NGOAI_205) ? null : loc2;
 }
 
 // ── LỚP ĐỊA CHÍNH TOÀN TỈNH BỊ TRƯỢT ~0,55 m (đo 10/10/2026) ──
@@ -848,6 +851,14 @@ export function hoaHop205(ring: number[][], dienTich: number, pre: { type: strin
 // hở giữa các ô QĐ205 ngoài khung mặt nạ đường là LÒNG ĐƯỜNG (2 bên có nét mép đường -1-TRAFFIC-PAVEMENT) — luật cũ "bị ô bao ≥ 6/8
 // hướng" trượt ở đường lớn chạy dài (dọc đường không gặp ô nào) → thửa 13 tờ 49 Suối Tân nửa thửa trên đường bị ghi cây xanh.
 const R205 = (() => { const r = RANH_QH['205']; if (!r) return null; const a = new Float64Array(r.length * 2); r.forEach(([x, y], i) => { a[2 * i] = x; a[2 * i + 1] = y; }); return a; })();
+const NGOAI_205 = 'Nằm ngoài phạm vi bản quy hoạch này';
+// mẩu "ngoài phạm vi" < 2 m² sát ranh (nét ranh 1/10.000 sai số ~1 m) → gộp vào loại đất lớn nhất, khỏi hiện dòng vô nghĩa
+function gopMauNgoai205<T extends { type: string; areaM2: number }>(ds: T[]): T[] {
+  const ng = ds.find((o) => o.type === NGOAI_205); const chinh = ds.find((o) => o.type !== NGOAI_205);
+  if (!ng || !chinh || ng.areaM2 >= 2) return ds;
+  chinh.areaM2 = Math.round((chinh.areaM2 + ng.areaM2) * 10) / 10; return ds.filter((o) => o !== ng);
+}
+function trongR205(x: number, y: number): boolean { return R205 ? trongRanh205(x, y) : true; }
 function trongRanh205(x: number, y: number): boolean {
   const r = R205; if (!r) return bao205(x, y);
   const n = r.length / 2; let ins = false;

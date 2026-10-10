@@ -4,6 +4,7 @@
 // Khoá AI + giá/trang do QUẢN TRỊ đặt trong bảng cấu hình. Tông màu đồng bộ web.
 // LÀM THEO LÔ: thêm nhiều bộ hồ sơ → chạy lần lượt → mỗi bộ ra một tệp Excel → làm mới cho khách sau.
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { dauThietBi } from '@/lib/thietBi';
 import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
 import { apiBase } from '@/lib/api';
 import { getToken } from '@/lib/token';
@@ -14,7 +15,7 @@ const NAVY = '#0A2540', GOLD = '#C8A14B';
 const fmt = (n: number) => (n || 0).toLocaleString('vi-VN') + 'đ';
 // Nút của thanh chuyển tab — nút đang chọn nền trắng nổi lên, giống trang Tra cứu số tờ bản đồ.
 const nutTab = (on: boolean) => `flex-1 rounded-md px-2 py-2 text-[12px] sm:text-sm font-bold transition ${on ? 'bg-white text-[#0A2540] shadow-sm' : 'text-slate-500 hover:text-[#0A2540]'}`;
-const authHead = () => ({ Authorization: `Bearer ${getToken() || ''}` });
+const authHead = () => ({ Authorization: `Bearer ${getToken() || ''}`, ...dauThietBi() });
 
 // Một "bộ hồ sơ" = 1 tệp PDF khách mang tới.
 type Bo = {

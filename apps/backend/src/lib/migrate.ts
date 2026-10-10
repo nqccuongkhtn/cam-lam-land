@@ -740,5 +740,32 @@ export async function migrate(): Promise<void> {
       id integer PRIMARY KEY, pb text NOT NULL, luc timestamptz NOT NULL DEFAULT now())`)
     .catch((e) => console.error('[migrate] qh_luu_loi:', e.message));
 
+  // SỔ THIẾT BỊ + GIỚI HẠN THIẾT BỊ (lib/thietBi.ts, 10/10/2026). Ghi luôn kể cả khi chưa bật giới hạn (cờ gioi_han_thiet_bi)
+  // để admin có bằng chứng từng máy / từng lần đăng nhập khi khách chối.
+  for (const sql of [
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS thiet_bi_toi_da integer`,                       // NULL = mặc định (3)
+    `CREATE TABLE IF NOT EXISTS thiet_bi (
+       id serial PRIMARY KEY, user_id integer NOT NULL, ma text NOT NULL,
+       ten text, loai text, he_dieu_hanh text, trinh_duyet text, ua text, chi_tiet jsonb NOT NULL DEFAULT '{}',
+       ip_dau text, ip_cuoi text, quoc_gia text,
+       lan_dau timestamptz NOT NULL DEFAULT now(), lan_cuoi timestamptz NOT NULL DEFAULT now(),
+       so_lan_dang_nhap integer NOT NULL DEFAULT 0, UNIQUE (user_id, ma))`,
+    `CREATE INDEX IF NOT EXISTS thiet_bi_user_idx ON thiet_bi (user_id)`,
+    // nhật ký TỪNG lần đăng nhập, kể cả lần bị chặn vì quá số máy (ket_qua='bi-chan'); giữ cả khi máy bị gỡ
+    `CREATE TABLE IF NOT EXISTS thiet_bi_dang_nhap (
+       id bigserial PRIMARY KEY, user_id integer NOT NULL, thiet_bi_id integer, ma text, luc timestamptz NOT NULL DEFAULT now(),
+       ip text, quoc_gia text, ten text, ua text, cach text, ket_qua text NOT NULL DEFAULT 'ok')`,
+    `CREATE INDEX IF NOT EXISTS thiet_bi_dn_user_idx ON thiet_bi_dang_nhap (user_id, luc DESC)`,
+    // số lần dùng web theo NGÀY của từng máy (gom 2 phút/lần) → "máy này dùng những ngày nào"
+    `CREATE TABLE IF NOT EXISTS thiet_bi_ngay (
+       thiet_bi_id integer NOT NULL, ngay date NOT NULL, so_lan integer NOT NULL DEFAULT 0, ip_cuoi text,
+       luc_cuoi timestamptz NOT NULL DEFAULT now(), PRIMARY KEY (thiet_bi_id, ngay))`,
+    // sổ các lần admin reset / gỡ máy (ai làm, lúc nào, gỡ máy nào, đã thu phí chưa)
+    `CREATE TABLE IF NOT EXISTS thiet_bi_reset (
+       id serial PRIMARY KEY, user_id integer NOT NULL, admin_id integer, luc timestamptz NOT NULL DEFAULT now(),
+       so_may integer NOT NULL DEFAULT 0, ds_may jsonb NOT NULL DEFAULT '[]', phi integer NOT NULL DEFAULT 0, ghi_chu text)`,
+    `CREATE INDEX IF NOT EXISTS thiet_bi_reset_user_idx ON thiet_bi_reset (user_id, luc DESC)`,
+  ]) await pool.query(sql).catch((e) => console.error('[migrate] thiết bị:', e.message));
+
   console.log('[migrate] schema up to date');
 }

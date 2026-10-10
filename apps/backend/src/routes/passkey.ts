@@ -23,6 +23,7 @@
  *  http://localhost. Web thật đã chạy https qua Cloudflare Tunnel nên không sao.
  * ========================================================================== */
 import { Router } from 'express';
+import { ghiDangNhap } from '../lib/thietBi.ts';
 import crypto from 'node:crypto';
 import {
   generateRegistrationOptions, verifyRegistrationResponse,
@@ -200,7 +201,9 @@ passkeyRouter.post('/dang-nhap/xong', async (req, res, next) => {
     await query('UPDATE webauthn_credentials SET counter=$1, last_used=now() WHERE id=$2',
                 [moi, c.cred_row_id]);
 
-    const token = signToken({ id: c.user_id, email: c.email, role: c.role, roles: dsVaiTro(c) as any });
+    const tb = await ghiDangNhap({ id: c.user_id, role: c.role, roles: dsVaiTro(c) }, req, 'van-tay');   // sổ + giới hạn thiết bị
+    if (!tb.ok) return res.status(403).json({ error: tb.loi, maLoi: 'QUA_THIET_BI' });
+    const token = signToken({ id: c.user_id, email: c.email, role: c.role, roles: dsVaiTro(c) as any, tb: tb.ma || undefined });
     res.json({ token, user: hoSo({ ...c, id: c.user_id }) });
   } catch (e) { next(e); }
 });

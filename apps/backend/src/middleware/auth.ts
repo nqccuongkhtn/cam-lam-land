@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { verifyToken, coVaiTro, laAdmin, dsVaiTro, type JwtPayload } from '../lib/auth.ts';
 import { query } from '../lib/db.ts';
+import { kiemMoiYeuCau } from '../lib/thietBi.ts';
 
 export interface AuthedRequest extends Request { user?: JwtPayload; }
 
@@ -36,7 +37,13 @@ export function authRequired(req: AuthedRequest, res: Response, next: NextFuncti
   if (!payload) return res.status(401).json({ error: 'Unauthorized' });
   req.user = payload;
   vaiTroMoiNhat(payload.id, dsVaiTro(payload))
-    .then((ds) => { req.user = { ...payload, roles: ds as any, role: (ds[0] || payload.role) as any }; next(); })
+    .then(async (ds) => {
+      req.user = { ...payload, roles: ds as any, role: (ds[0] || payload.role) as any };
+      // GIỚI HẠN THIẾT BỊ (lib/thietBi.ts): ghi máy đang dùng; khi bật giới hạn thì thẻ chỉ dùng được trên đúng máy đã đăng nhập
+      const loi = await kiemMoiYeuCau(req.user!, req).catch(() => null);
+      if (loi) return res.status(401).json({ error: loi, maLoi: 'THIET_BI' });
+      next();
+    })
     .catch(() => next());
 }
 

@@ -32,6 +32,7 @@ import { gameRouter } from './routes/game.ts';
 import { pushRouter } from './routes/push.ts';
 import { paymentsRouter } from './routes/payments.ts';
 import { flagsRouter } from './routes/flags.ts';
+import { thietBiRouter } from './routes/thietBi.ts';   // quản lý / giới hạn thiết bị đăng nhập (lib/thietBi.ts)
 import { newsRouter, refreshNews } from './routes/news.ts';
 import { newsletterRouter } from './routes/newsletter.ts';
 import { vanBanRouter, seedVanBan, crawlCongBao, crawlPortals, crawlCamhomes, crawlSheets, timFileThieu, taiSanFile } from './routes/vanBan.ts';
@@ -160,6 +161,7 @@ app.use('/api/ocr', rateLimit({ windowMs: 10 * 60 * 1000, max: 60, key: 'ocr', m
 app.use('/api/push', pushRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/flags', flagsRouter);
+app.use('/api/thiet-bi', thietBiRouter);
 app.use('/api/news', newsRouter);
 app.use('/api/van-ban', vanBanRouter);
 app.use('/api/config', configRouter);

@@ -2,13 +2,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // TRANG CẤU HÌNH QUẢN TRỊ cho công cụ Lập danh mục — CHỈ admin. Không đặt trên trang khách để tránh lộ khoá/giá.
 import { useEffect, useState } from 'react';
+import { dauThietBi } from '@/lib/thietBi';
 import { useAuth, laAdmin } from '@/lib/auth';
 import { apiBase } from '@/lib/api';
 import { getToken } from '@/lib/token';
 import { toast } from '@/lib/toast';
 
 const NAVY = '#0A2540';
-const authHead = () => ({ Authorization: `Bearer ${getToken() || ''}` });
+const authHead = () => ({ Authorization: `Bearer ${getToken() || ''}`, ...dauThietBi() });
 
 export default function CauHinhPage() {
   const { user, loading } = useAuth();

@@ -1,9 +1,11 @@
 import { API_BASE } from './config';
 import { getToken } from './token';
+import { dauThietBi, thongTinThietBi } from './thietBi';
 
 function authHeaders(): Record<string,string> {
   const t = getToken();
-  return t ? { Authorization: `Bearer ${t}` } : {};
+  // X-Thiet-Bi: mã thiết bị (lib/thietBi.ts) — máy chủ ghi sổ thiết bị + giới hạn số máy mỗi tài khoản
+  return t ? { Authorization: `Bearer ${t}`, ...dauThietBi() } : { ...dauThietBi() };
 }
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -11,10 +13,12 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 // Tự thử lại khi máy chủ (gói free) đang "thức dậy": lỗi mạng hoặc 5xx -> gọi lại sau 1–3s.
 export async function api<T = any>(path: string, opts: RequestInit = {}, _retry = 0): Promise<T> {
   let res: Response;
+  // Lúc ĐĂNG NHẬP / ĐĂNG KÝ gửi kèm thông số máy (màn hình, múi giờ…) cho sổ thiết bị
+  const info: Record<string, string> = /^\/(auth\/(login|register)|passkey\/dang-nhap\/xong)/.test(path) ? { 'X-Thiet-Bi-Info': await thongTinThietBi() } : {};
   try {
     res = await fetch(`${API_BASE}${path}`, {
       ...opts,
-      headers: { 'Content-Type': 'application/json', ...authHeaders(), ...(opts.headers || {}) },
+      headers: { 'Content-Type': 'application/json', ...authHeaders(), ...info, ...(opts.headers || {}) },
     });
   } catch {
     if (_retry < 2) { await wait(1200 * (_retry + 1)); return api(path, opts, _retry + 1); }

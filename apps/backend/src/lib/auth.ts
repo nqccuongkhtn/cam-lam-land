@@ -5,7 +5,7 @@ import type { Role } from '../shared.ts';
 
 // role  = vai trò chính (giữ lại cho tương thích với bản cũ)
 // roles = TOÀN BỘ vai trò của tài khoản — một người có thể vừa là biên tập GIS vừa quản lý văn bản…
-export interface JwtPayload { id: number; email: string; role: Role; roles?: Role[]; }
+export interface JwtPayload { id: number; email: string; role: Role; roles?: Role[]; tb?: string; }   // tb = mã thiết bị lúc đăng nhập (lib/thietBi.ts)
 
 /** Danh sách vai trò của một tài khoản. Tài khoản cũ chưa có `roles` thì lấy tạm `role`. */
 export function dsVaiTro(u?: { role?: string | null; roles?: string[] | null } | null): string[] {

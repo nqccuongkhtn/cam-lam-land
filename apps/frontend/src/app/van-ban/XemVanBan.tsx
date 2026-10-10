@@ -5,6 +5,7 @@
 //   không xem được PDF nhúng, iPhone chỉ hiện trang đầu. Trang nào cuộn tới mới vẽ trang đó cho nhẹ máy.
 // · Nút "Tải về" lưu đúng file (đã có dấu bản quyền Cam Lâm Land do máy chủ gắn).
 import { useEffect, useRef, useState } from 'react';
+import { dauThietBi } from '@/lib/thietBi';
 import { layVeXemVanBan } from '@/lib/turnstile';
 
 const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
@@ -53,7 +54,7 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
         const libP = layPdfjs();
         // CHỐNG CÀO: kèm "vé người thật" (qua Cloudflare Turnstile — lib/turnstile.ts). Vé hết hạn / đổi mạng
         // (vé gắn địa chỉ máy) thì máy chủ trả 403 canVe → xin vé mới rồi thử lại MỘT lần.
-        const goi = async (moi: boolean) => fetch(vb.url, { headers: { Authorization: `Bearer ${vb.token}`, 'X-Ve-Nguoi-That': await layVeXemVanBan(moi) }, signal: ctl.signal });
+        const goi = async (moi: boolean) => fetch(vb.url, { headers: { Authorization: `Bearer ${vb.token}`, 'X-Ve-Nguoi-That': await layVeXemVanBan(moi), ...dauThietBi() }, signal: ctl.signal });
         let r = await goi(false);
         if (r.status === 403 && (await r.clone().json().catch(() => null))?.canVe) r = await goi(true);
         if (r.status === 401) throw new Error('Vui lòng đăng nhập lại để xem văn bản.');

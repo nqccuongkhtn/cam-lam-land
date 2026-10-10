@@ -15,6 +15,7 @@ const ALL: HubTool[] = [
   // TẠM — dễ gỡ (1/10/2026): báo cáo hoạt động 2 tài khoản theo dõi. Không nằm trong danh sách duocDung → CHỈ admin thấy.
   { key: 'theo-doi-tk', name: 'Theo dõi tài khoản', desc: 'Hoạt động của tài khoản đang theo dõi (chỉ admin)', icon: '🕵️', path: '/quan-tri/theo-doi-tai-khoan', login: true },
   { key: 'moi-gioi-cn', name: 'Duyệt môi giới chuyên nghiệp', desc: 'Xác minh số điện thoại, duyệt / thu hồi nhãn môi giới chuyên nghiệp', icon: '🏅', path: '/quan-tri/moi-gioi-chuyen-nghiep', login: true },
+  { key: 'thiet-bi', name: 'Thiết bị đăng nhập', desc: 'Máy từng đăng nhập của từng tài khoản · giới hạn 3 thiết bị · reset', icon: '📱', path: '/quan-tri/thiet-bi', login: true },
   { key: 'logo-le', name: 'Logo ngày lễ', desc: 'Lịch tự đổi logo dịp Tết, Quốc khánh, Trung thu…', icon: '🎏', path: '/quan-tri/logo-le', login: true },
 ];
 

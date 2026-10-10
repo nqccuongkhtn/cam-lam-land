@@ -8,6 +8,7 @@ import PasswordInput from '@/components/PasswordInput';
 import ImageCropper from '@/components/ImageCropper';
 import QuanLyVanTay from '@/components/QuanLyVanTay';
 import XinMoiGioiCn from '@/components/XinMoiGioiCn';
+import ThietBiCuaToi from '@/components/ThietBiCuaToi';
 
 export default function Account() {
   const router = useRouter();
@@ -82,6 +83,8 @@ export default function Account() {
         <XinMoiGioiCn />
 
         <QuanLyVanTay />
+
+        <ThietBiCuaToi />
 
         {err && <p className="text-red-600 text-sm font-semibold">{err}</p>}
         {msg && !err && <p className="text-emerald-600 text-sm font-semibold">{msg}</p>}

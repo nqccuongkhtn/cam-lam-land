@@ -3,6 +3,7 @@
 // TRANG CÔNG CỤ PDF (kiểu PDF24/iLovePDF). Lưới tất cả công cụ — "Sửa chữ" đầu tiên. Bấm 1 công cụ -> TRANG CON:
 // vùng thả tệp -> XEM TRƯỚC file (thumbnail từng trang) -> tuỳ chọn -> xử lý. Sửa chữ mở trình soạn đầy đủ.
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { dauThietBi } from '@/lib/thietBi';
 import * as ops from './pdfops';
 import { XemTo } from './parts';
 import { apiBase } from '@/lib/api';
@@ -508,7 +509,7 @@ export function PdfHub({ onEdit, setBusy, embedded }: any) {
     if (t.opts?.includes('ocr')) qs.set('ocr', ocrY);
     if (t.opts?.includes('kieuword')) qs.set('kieu', kieuWord);
     const token = getToken();
-    const res = await fetch(`${apiBase}/pdftools/${t.op}?${qs.toString()}`, { method: 'POST', headers: token ? { Authorization: 'Bearer ' + token } : {}, body: fd });
+    const res = await fetch(`${apiBase}/pdftools/${t.op}?${qs.toString()}`, { method: 'POST', headers: token ? { Authorization: 'Bearer ' + token, ...dauThietBi() } : {}, body: fd });
     if (!res.ok) { let m = ''; try { m = (await res.json()).error; } catch { m = ''; } throw new Error(m || `Máy chủ lỗi (mã ${res.status})`); }
     const blob = await res.blob(); const fb = (file.name || 'ket-qua').replace(/\.[^.]+$/, '') + '.' + (t.to || 'pdf');
     const co = res.headers.get('X-Da-OCR') || '';

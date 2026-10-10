@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { ghiDangNhap } from '../lib/thietBi.ts';
 import { query } from '../lib/db.ts';
 import { ghiSuKien } from './theoDoiTk.ts'; // THEO DÕI TÀI KHOẢN (tạm — dễ gỡ)
 import { hashPassword, verifyPassword, signToken, dsVaiTro, canNangCap, BAM_GIA, kiemMatKhauMoi, DAI_TOI_DA } from '../lib/auth.ts';
@@ -45,7 +46,8 @@ authRouter.post('/register', async (req, res, next) => {
     const [user] = await query(
       `INSERT INTO users (email, password_hash, role, roles, full_name, phone, email_verified)
        VALUES ($1,$2,'user',ARRAY['user']::text[],$3,$4,true) RETURNING *`, [email, hash, fullName ?? null, phone]);
-    const token = signToken({ id: user.id, email: user.email, role: user.role, roles: dsVaiTro(user) as any });
+    const tb = await ghiDangNhap(user, req, 'dang-ky');   // sổ thiết bị (lib/thietBi.ts) — tài khoản mới chưa có máy nào nên không bị chặn
+    const token = signToken({ id: user.id, email: user.email, role: user.role, roles: dsVaiTro(user) as any, tb: tb.ok ? tb.ma || undefined : undefined });
     res.status(201).json({ token, user: profile(user) });
   } catch (e) { next(e); }
 });
@@ -98,7 +100,10 @@ authRouter.post('/login', async (req, res, next) => {
       hashPassword(password).then((h) => query('UPDATE users SET password_hash=$2 WHERE id=$1', [user.id, h])).catch(() => {});
     }
     if (user.status === 'suspended') return res.status(403).json({ error: 'Tài khoản đã bị khoá' });
-    const token = signToken({ id: user.id, email: user.email, role: user.role, roles: dsVaiTro(user) as any });
+    // GIỚI HẠN THIẾT BỊ (lib/thietBi.ts): ghi máy vào sổ; đang bật giới hạn mà là máy mới vượt số cho phép → chặn
+    const tb = await ghiDangNhap(user, req, 'mat-khau');
+    if (!tb.ok) return res.status(403).json({ error: tb.loi, maLoi: 'QUA_THIET_BI' });
+    const token = signToken({ id: user.id, email: user.email, role: user.role, roles: dsVaiTro(user) as any, tb: tb.ma || undefined });
     ghiSuKien(user.id, 'dang-nhap', req as any, 'Đăng nhập bằng mật khẩu'); // THEO DÕI TÀI KHOẢN (tạm — dễ gỡ)
     res.json({ token, user: profile(user) });
   } catch (e) { next(e); }

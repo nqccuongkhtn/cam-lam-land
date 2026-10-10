@@ -6,13 +6,14 @@
 // Sắp xếp MẶC ĐỊNH theo SỐ ĐÁNH Ở ĐẦU TÊN FILE (0490, 0489…) — đúng thứ tự bạn tự đánh khi đặt tên.
 // Chọn nhiều dòng → tải một lượt về thành 1 file nén; mỗi dòng cũng có nút tải riêng.
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { dauThietBi } from '@/lib/thietBi';
 import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
 import { apiBase } from '@/lib/api';
 import { getToken } from '@/lib/token';
 import { toast } from '@/lib/toast';
 
 const NAVY = '#0A2540', GOLD = '#C8A14B';
-const authHead = () => ({ Authorization: `Bearer ${getToken() || ''}` });
+const authHead = () => ({ Authorization: `Bearer ${getToken() || ''}`, ...dauThietBi() });
 
 type ThuMuc = { slug: string; ten: string; icon: string; so_file: number; tong_bytes: number };
 type FileKho = { id: number; thu_muc: string; so_tt: number | null; ten: string; mime: string; co_bytes: number; ghi_chu: string | null; created_at: string };

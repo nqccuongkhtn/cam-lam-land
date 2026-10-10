@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
+import { dauThietBi } from '@/lib/thietBi';
 import Link from 'next/link';
 import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
@@ -379,7 +380,7 @@ function VanBanCanKiemTra({ docs, onXong }: { docs: Doc[]; onXong: () => void })
     // File qua máy chủ cần thẻ đăng nhập → tải về rồi mở ở tab mới (mở tab trước cho khỏi bị chặn cửa sổ bật lên)
     const w = window.open('', '_blank');
     try {
-      const r = await fetch(`${API_BASE}/van-ban/${d.id}/pdf`, { headers: { Authorization: `Bearer ${getToken() || ''}` } });
+      const r = await fetch(`${API_BASE}/van-ban/${d.id}/pdf`, { headers: { Authorization: `Bearer ${getToken() || ''}`, ...dauThietBi() } });
       if (!(r.headers.get('content-type') || '').includes('pdf')) throw new Error();
       const u = URL.createObjectURL(await r.blob());
       if (w) w.location.href = u; else window.open(u, '_blank');

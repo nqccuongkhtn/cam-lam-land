@@ -22,6 +22,12 @@ sai **mà không báo lỗi** (đã vấp: tưởng chạy thử nghiệm nhưng
 - Chặt cả tên lẫn diện tích: đúng **93,5 %**. Bỏ qua khác biệt tên gọi nhóm chung của QĐ893: đúng **98,4 %**.
 - 130/151 cặp khớp trong ±1 %. Code cũ → mới: tổng m² sai 10.000 → 9.410, **0 phiếu tệ đi**.
 
+## Bổ sung 10/10/2026
+- Đợt 2 (42 file): chỉ 1 file là phiếu kiểm tra QH (`bt (1)`, Cam Phước Tây, 16.586 m² rừng sản xuất) → web khớp 100 % cả QĐ205 lẫn QĐ893.
+  Còn lại là trích lục / nguyên tờ bản đồ địa chính / hình thửa không chữ → không dùng để chấm.
+- Bộ mẫu đầy đủ (79 phiếu) cất ở `du-lieu/mau_all.jsonl` (không lên git vì có họ tên).
+- Lớp 23 (đỏ) trong tờ địa chính KHÔNG phải toàn bộ là chỉ giới QHGT — chỉ có 1 nhãn "Chỉ giới QHGT theo QĐ 507, 1180"; so thử chỉ khớp ~6 % → đừng dùng lớp này làm chuẩn lòng đường.
+
 ## Bẫy khi đọc phiếu
 1. Chữ TCVN3 (ABC) — đổi bằng `tcvn3.py`.
 2. Hai mẫu phiếu: mẫu cũ (Phòng Kinh tế, dòng "179.5 m thuộc…") và mẫu mới (VPĐK, dòng "+ Toàn bộ / + Diện tích còn lại…").

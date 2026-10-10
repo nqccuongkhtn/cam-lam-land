@@ -273,7 +273,9 @@ parcelsRouter.get('/at', async (req, res, next) => {
     const qhCacBan = parcel ? (kqQh ? kqQh.cacBan : computeQhTheoBan(ringThua, dtThua)) : [];
     res.json({ found: true, point: { lng, lat }, parcel: parcel ?? null, zoning: zoningOut, overlaps, neighbors, listings: linked,
                qhCacBan,
-               qhNgoaiVung: ngoaiQh && overlaps.length === 0 && qhCacBan.length === 0 });
+               // (10/10/2026) thêm: có thửa mà KHÔNG bản nào phủ (vd thửa Phước Đồng sát ranh QĐ205, nay phần ngoài ranh không còn bị
+               // ghi đường giả) → cũng là "chưa có dữ liệu", kẻo trang hiện khung quy hoạch trống
+               qhNgoaiVung: (ngoaiQh || !!parcel) && overlaps.length === 0 && qhCacBan.length === 0 });
   } catch (e) { next(e); }
 });
 

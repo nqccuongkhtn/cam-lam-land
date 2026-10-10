@@ -26,6 +26,7 @@ import Banner11 from '@/components/banner11/Banner11';
 import SiteFooter from '@/components/SiteFooter';
 import OQuangCaoTrangChu from '@/components/OQuangCaoTrangChu';
 import { useFlags } from '@/lib/flags';
+import { chonTinNoiBat } from '@/lib/tinNoiBat';
 import { LOAI_DU_AN, TRANG_THAI_DU_AN, loaiCua, trangThaiCua, type DuAnGoiY } from '@/lib/duAnLoc';
 import { KhungBangLoc, NutXemKetQua, MucLoc, NutLien, OLuoi, KhoangKeo, TRAN_GIA, TRAN_DT, tomTat } from '@/components/LocNangCao';
 
@@ -357,22 +358,8 @@ export default function Home() {
         const raw: any[] = d.news || [];
         const toCard = (n: any) => ({ title: n.title, url: '/tin-tuc/' + n.slug, img: n.image || U('1486406146926-c627a92ad1ab'), date: n.publishedAt ? new Date(n.publishedAt).toLocaleDateString('vi-VN') : undefined, source: n.source });
         setMarketNews(raw.filter((n) => !n.pin).map(toCard)); // Thị trường BĐS — GIỮ NGUYÊN (bỏ bài ghim)
-        // Tin nổi bật = CHỈ TIN CAM LÂM (chủ dự án chốt 7/10/2026: "tin nổi bật chỉ nói về Cam Lâm thôi").
-        //   1) tin nhắc thẳng Cam Lâm / Bãi Dài / các xã Cam Lâm (gồm bài Cam Lâm Land biên tập) — mới nhất lên đầu;
-        //   2) các bài ghim về Đô thị mới Cam Lâm (QĐ 205…);
-        //   3) CHỈ KHI còn thiếu (< 6 bài) mới chèn tin VỊNH CAM RANH / sân bay Cam Ranh (sát dự án Cam Lâm — chủ dự án
-        //      "du di" được). Tin BĐS chung chung (vd "TP.HCM đề nghị công ty địa ốc khai báo…") TUYỆT ĐỐI không lấy.
-        const chu = (n: any) => (n.title || '') + ' ' + (n.summary || '');
-        const CAM_LAM = /cam lâm|bãi dài|cam đức|cam hải|suối dầu|suối tân|suối cát|cam hiệp|cam an |cam thành bắc|cam hòa|cam tân|đô thị sân bay/i;
-        const SAT_CAM_LAM = /vịnh cam ranh|sân bay (quốc tế )?cam ranh|bán đảo cam ranh/i;
-        const theoNgay = (a: any, b: any) => +new Date(b.publishedAt) - +new Date(a.publishedAt);
-        const t1 = raw.filter((n) => !n.pin && CAM_LAM.test(chu(n))).sort(theoNgay);
-        const t2 = raw.filter((n) => n.pin).sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || theoNgay(a, b));
-        const t3 = raw.filter((n) => !n.pin && !CAM_LAM.test(chu(n)) && SAT_CAM_LAM.test(chu(n))).sort(theoNgay);
-        const daCo = new Set<string>(); const feat: any[] = [];
-        const them = (ds: any[], toiDa: number) => { for (const n of ds) { if (feat.length >= toiDa || daCo.has(n.slug)) continue; daCo.add(n.slug); feat.push(n); } };
-        them(t1, 8); them(t2, 8); them(t3, 6);
-        setFeaturedNews(feat.map(toCard));
+        // Tin nổi bật = CHỈ TIN CAM LÂM — quy tắc chọn nằm ở lib/tinNoiBat.ts, DÙNG CHUNG với trang /tin-tuc
+        setFeaturedNews(chonTinNoiBat(raw, 8).map(toCard));
       })
       .catch(() => {})
       .finally(() => setMarketLoading(false));

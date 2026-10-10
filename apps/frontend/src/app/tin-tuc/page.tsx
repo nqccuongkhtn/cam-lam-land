@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { useBoQc, BillboardAd, NativeAd, CanhGaAd } from '@/components/newsAds'; // dùng chung với trang đọc bài
 import type { OQc } from '@/components/OQuangCaoTrangChu';
 import { decodeEntities } from '@/lib/htmlEntities';
+import { chonTinNoiBat } from '@/lib/tinNoiBat';
 
-interface N { title: string; url: string; source?: string; image?: string; summary?: string; publishedAt?: string; slug: string }
+interface N { title: string; url: string; source?: string; image?: string; summary?: string; publishedAt?: string; slug: string; pin?: boolean; order?: number }
 
 const fmtDate = (iso?: string) => (iso ? new Date(iso).toLocaleDateString('vi-VN') : '');
 const meta = (n: N) => `${n.source || ''}${n.source && fmtDate(n.publishedAt) ? ' · ' : ''}${fmtDate(n.publishedAt)}`;
@@ -92,11 +93,16 @@ export default function NewsIndex() {
   const na = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
   const toks = na(q).split(/\s+/).filter(Boolean);
   const filtered = toks.length ? news.filter((n) => { const d = na(n.title + ' ' + (n.summary || '')); return toks.every((t) => d.includes(t)); }) : news;
-  const lead = filtered[0];
-  const heroSide = filtered.slice(1, 5);
-  const grid = filtered.slice(5, 11);
-  const trending = filtered.slice(1, 7);
-  const rest = filtered.slice(11);
+  // Tin chính + "Nổi bật" = ĐÚNG bộ "Tin nổi bật" của trang chủ (lib/tinNoiBat.ts). Trước đây lấy 5 tin đầu của nguồn
+  // → luôn là các bài ghim QĐ205 từ 2024, lệch hẳn với trang chủ. Đang gõ tìm thì vẫn xếp theo kết quả tìm như cũ.
+  const noiBat = toks.length ? filtered.slice(0, 5) : chonTinNoiBat(filtered, 5);
+  const daDung = new Set(noiBat.map((n) => n.slug));
+  // "Mới cập nhật" phải là tin mới thật: bài ghim (QĐ205 từ 2024) xếp xuống sau, không chen lên đầu
+  const conLai = filtered.filter((n) => !daDung.has(n.slug) && (toks.length || !n.pin)).concat(toks.length ? [] : filtered.filter((n) => !daDung.has(n.slug) && n.pin));
+  const lead = noiBat[0];
+  const heroSide = noiBat.slice(1, 5);
+  const grid = conLai.slice(0, 6);
+  const rest = conLai.slice(6);
   const shown = rest.slice(0, limit);
   const rows: any[] = [];
   shown.forEach((n, i) => { rows.push(<Row key={n.slug} n={n} />); if (i === 2 && showAd) rows.push(<NativeAd key="native-ad" ds={boQc} batDau={1} />); });

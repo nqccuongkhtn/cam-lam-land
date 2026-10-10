@@ -462,17 +462,22 @@ function duongBan(b: BanQh, x: number, y: number): boolean {
 // (QĐ2101 51,1 m² · QĐ918 119,1 m² · QĐ2222 12,4 m²). Cũng nhờ nó, thửa nằm TRỌN trong lòng đường
 // không còn bị mất cả dòng quy hoạch (trước đây bản nào không có điểm rơi vào ô đất thật là bị bỏ).
 const BAO_HUONG: [number, number][] = [[1, 0], [-1, 0], [0, 1], [0, -1], [0.7071, 0.7071], [-0.7071, 0.7071], [0.7071, -0.7071], [-0.7071, -0.7071]];
-const DO_BUOC = 3 / 111000, DO_XA = 60 / 111000;   // bước dò 3 m, dò tối đa 60 m (độ, xấp xỉ ở vĩ độ Cam Lâm)
+// Bước dò 3 m. Tầm dò: chỗ HỞ giữa các ô (không thuộc ô nào) dò tới 100 m — đường lớn / nút giao rộng hơn 60 m trước đây
+// bị bỏ sót thành "Nằm ngoài phạm vi" (phiếu 5694 Cam Đức: QĐ2101 thiếu 35 m² đường). Nới lên 100 m (10/10/2026): 118/3.000
+// thửa đổi, QĐ893 độc lập xác nhận 117/119 chỗ đúng là đường. Kiểm "Ô TRÙM" giữ 60 m — nới cả nó thì bắt đầu ăn sang
+// cây xanh / nhóm nhà ở thật (đã thử, bỏ).
+const DO_BUOC = 3 / 111000, DO_XA = 100 / 111000, DO_XA_TRUM = 60 / 111000;
 function biBaoQuanh(b: BanQh, x: number, y: number, boTrum = false): boolean {
   // Kiểm nhanh: trong phạm vi dò không có ô đất nào của bản thì khỏi dò 8 hướng
+  const XA = boTrum ? DO_XA_TRUM : DO_XA;
   let coGan = false;
-  for (let gx = Math.floor((x - DO_XA) / CELL); gx <= Math.floor((x + DO_XA) / CELL) && !coGan; gx++)
-    for (let gy = Math.floor((y - DO_XA) / CELL); gy <= Math.floor((y + DO_XA) / CELL) && !coGan; gy++) if (b.kho.coO(gx, gy)) coGan = true;
+  for (let gx = Math.floor((x - XA) / CELL); gx <= Math.floor((x + XA) / CELL) && !coGan; gx++)
+    for (let gy = Math.floor((y - XA) / CELL); gy <= Math.floor((y + XA) / CELL) && !coGan; gy++) if (b.kho.coO(gx, gy)) coGan = true;
   if (!coGan) return false;
   let gap = 0;
   for (let h = 0; h < 8; h++) {
     const [dx, dy] = BAO_HUONG[h];
-    for (let r = DO_BUOC; r <= DO_XA; r += DO_BUOC) {
+    for (let r = DO_BUOC; r <= XA; r += DO_BUOC) {
       if (b.kho.chuaK(x + dx * r, y + dy * r, boTrum) >= 0) { gap++; break; }
     }
     if (gap + (7 - h) < 6) return false;   // các hướng còn lại có gặp hết cũng không đủ 6 → thôi

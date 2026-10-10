@@ -45,6 +45,38 @@ export function diemTrongMP(mp: MP, N = 24): number[][] {
 }
 
 /**
+ * Điểm mẫu CÓ TRỌNG SỐ để chia một MultiPolygon thành các loại (khe hở / ô trùm) — thay diemTrongMP ở việc CHIA DIỆN TÍCH.
+ * (10/10/2026) diemTrongMP rải 24×24 điểm trên khung bao CẢ CỤM: khe hở hay gồm một mảnh lớn + vài mẩu li ti, chỉ cần
+ * một mẩu xuất hiện/biến mất (thửa xê dịch 0,1 mm) là khung bao đổi hẳn → cả lưới dời chỗ → kết quả nhảy tới 1,8 %
+ * diện tích thửa. Ở đây: MỖI MẢNH rải lưới riêng theo KHUNG CỦA CHÍNH MẢNH ĐÓ (thửa xê dịch thì lưới dời theo; đã thử neo
+ * lưới theo toạ độ tuyệt đối → dời thửa 0,2 mm làm mảnh nhỏ đổi hẳn điểm rơi vào, kém ổn định hơn cả cách cũ); mỗi điểm
+ * mang trọng số = diện tích mảnh / số điểm của mảnh ⇒ mẩu li ti chỉ ảnh hưởng đúng phần diện tích li ti của nó.
+ * Bước lưới tự chọn: ~0,5 m, mảnh lớn thưa dần cho tối đa ~toiDa điểm/mảnh.
+ */
+export function diemCoTrongSo(mp: MP, kx: number, ky: number, toiDa = 300): { p: number[][]; w: number[] } {
+  const p: number[][] = [], w: number[] = [];
+  for (const poly of mp) {
+    const a = dienTichMP([poly], kx, ky); if (!(a > 1e-6)) continue;
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const [x, y] of poly[0]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    const muc = Math.min(toiDa, Math.max(a < 1 ? 3 : 24, Math.round(a / 0.25)));
+    let buoc = Math.max(0.3, Math.sqrt(a / muc));                                  // mét
+    const oKhung = ((x1 - x0) * kx) * ((y1 - y0) * ky);
+    if (oKhung / (buoc * buoc) > 60000) buoc = Math.sqrt(oKhung / 60000);         // mảnh xiên dài: chặn số ô lưới phải thử
+    const dx = buoc / kx, dy = buoc / ky;
+    const ds: number[][] = [];
+    const nx = Math.max(1, Math.ceil((x1 - x0) / dx)), ny = Math.max(1, Math.ceil((y1 - y0) / dy));
+    for (let iy = 0; iy < ny; iy++) for (let ix = 0; ix < nx; ix++) {
+      const x = x0 + (x1 - x0) * (ix + 0.5) / nx, y = y0 + (y1 - y0) * (iy + 0.5) / ny; if (trongMP(x, y, [poly])) ds.push([x, y]);
+    }
+    if (!ds.length) ds.push(...diemTrongMP([poly], 8));
+    if (!ds.length) { const r = poly[0]; ds.push([(r[0][0] + r[1][0] + r[2][0]) / 3, (r[0][1] + r[1][1] + r[2][1]) / 3]); }
+    for (const d of ds) { p.push(d); w.push(a / ds.length); }
+  }
+  return { p, w };
+}
+
+/**
  * Cắt thửa theo DANH SÁCH Ô ĐÃ XẾP THEO ƯU TIÊN (ô đứng trước thắng): phần thửa còn lại ∩ ô 1 → của ô 1, bỏ đi; ∩ ô 2 …
  * Đúng y luật chọn ô của KhoO.chuaK (bậc cao thắng, cùng bậc ô nhỏ thắng) nhưng tính chính xác thay vì từng điểm.
  * Trả về các mảnh theo ô + phần còn lại (khe hở, không thuộc ô nào).

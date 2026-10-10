@@ -4,7 +4,7 @@
 //   ngoài đường ⇒ LOẠI ĐẤT = ô QH chứa điểm (hoặc ô QH gần nhất nếu qh_vector vẽ thiếu vài mét).
 // Nhờ vậy thửa kiểu 326 (qh_vector vẽ thiếu ~10%) vẫn ra đủ 72% hỗn hợp thay vì bị tính nhầm thành giao thông.
 // Dữ liệu: qh_zones.json (loại đất) + road_mask.bin/json (đường). Ngoài phạm vi mask ⇒ tự lùi về cách "không-thuộc-ô = giao thông".
-import { catTheoUuTien, dienTichMP, diemTrongMP, type MP } from './catHinh.ts';
+import { catTheoUuTien, dienTichMP, diemTrongMP, diemCoTrongSo, type MP } from './catHinh.ts';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import path from 'node:path';
@@ -235,7 +235,7 @@ export function qhReady() { return ready; }
 // = băm NỘI DUNG mọi file dữ liệu quy hoạch (qh_zones*.json, road_mask*) + số phiên bản CÁCH TÍNH bên dưới.
 // Đổi dữ liệu hay đổi cách tính → dấu đổi → mọi kết quả đã lưu tự bị bỏ, tính lại. Không bao giờ hiện số cũ.
 // ⚠️ SỬA CÁCH TÍNH TRONG FILE NÀY (hoặc catHinh.ts) THÌ TĂNG CACH_TINH.
-const CACH_TINH = '2026-10-10-cat-hinh-2';
+const CACH_TINH = '2026-10-10-cat-hinh-3';   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
 let PHIEN_BAN = '';
 export function qhPhienBan(): string {
   if (PHIEN_BAN || !ready) return PHIEN_BAN;
@@ -325,6 +325,9 @@ function nearestLand(x: number, y: number): string | null {
     }
   }
   return blo;
+  // ⚠️ (10/10/2026) Dòng dưới nằm SAU return nên KHÔNG BAO GIỜ chạy → CACH_O_GAN_M luôn = Infinity → ở loaiKhe205, khe hở
+  // ngoài khung mặt nạ mà bị ô bao quanh là ĐƯỜNG bất kể khe rộng hẹp. ĐỪNG "sửa" cho nó chạy: đã đo trên 2.953 thửa có
+  // bản chi tiết phủ trọn — sửa thì QĐ205 lệch đất giao thông NHIỀU hơn (295.644 → 312.872 m²; 293 thửa tệ hơn, 72 tốt hơn).
   CACH_O_GAN_M = Math.sqrt(dGan) * 111000;
 }
 
@@ -430,12 +433,14 @@ export function computeQhAreas(ring: number[][], dienTich: number): { type: stri
       for (const m of manh) { const a = dienTichMP(m.mp, kx, ky) * tl; if (a > 1e-4) ghi(KHO!.tenLoai[KHO!.loai[m.k]], a, diemTrongMP(m.mp), m.mp); }
       const aCon = dienTichMP(con, kx, ky) * tl;
       if (aCon > 1e-4) {
-        const pts = diemTrongMP(con);
-        if (!pts.length) ghi(loaiKhe205(con[0][0][0][0], con[0][0][0][1]), aCon, [], con);
+        // chia khe theo điểm CÓ TRỌNG SỐ, rải riêng từng mảnh (diemCoTrongSo) — ổn định khi thửa xê dịch li ti
+        const { p: pts, w } = diemCoTrongSo(con, kx, ky);
+        const tong = w.reduce((s2, v) => s2 + v, 0);
+        if (!pts.length || !(tong > 0)) ghi(loaiKhe205(con[0][0][0][0], con[0][0][0][1]), aCon, [], con);
         else {
-          const nhom: Record<string, number[][]> = {};
-          for (const [x, y] of pts) (nhom[loaiKhe205(x, y)] ||= []).push([x, y]);
-          for (const [lo, ds] of Object.entries(nhom)) ghi(lo, aCon * ds.length / pts.length, ds, con);
+          const nhom: Record<string, { ds: number[][]; w: number }> = {};
+          pts.forEach(([x, y], i) => { const g = (nhom[loaiKhe205(x, y)] ||= { ds: [], w: 0 }); g.ds.push([x, y]); g.w += w[i]; });
+          for (const [lo, g] of Object.entries(nhom)) ghi(lo, aCon * g.w / tong, g.ds, con);
         }
       }
       // mẩu lẻ sát mép (xem MEP ở trên) → gộp vào loại chính của lõi thửa
@@ -673,16 +678,17 @@ export function computeQhTheoBan(ring: number[][], dienTich: number, dayDu = fal
         const a = dienTichMP(m.mp, kx, ky) * tl; if (a <= 1e-4) continue;
         const ten = b.kho.tenLoai[b.kho.loai[m.k]];
         if (!b.kho.trum?.[m.k]) { cong(ten, a); continue; }
-        const pts = diemTrongMP(m.mp); if (!pts.length) { cong(ten, a); continue; }
-        let gt = 0; for (const [x, y] of pts) if (duongBan(b, x, y) && baoQuanh(b, x, y, true)) gt++;
-        if (gt) cong('Đất giao thông', a * gt / pts.length);
-        if (gt < pts.length) cong(ten, a * (pts.length - gt) / pts.length);
+        const { p: pts, w } = diemCoTrongSo(m.mp, kx, ky); const tong = w.reduce((s2, v) => s2 + v, 0);
+        if (!pts.length || !(tong > 0)) { cong(ten, a); continue; }
+        let gt = 0; pts.forEach(([x, y], i) => { if (duongBan(b, x, y) && baoQuanh(b, x, y, true)) gt += w[i]; });
+        if (gt) cong('Đất giao thông', a * gt / tong);
+        if (gt < tong) cong(ten, a * (tong - gt) / tong);
       }
       const aCon = dienTichMP(con, kx, ky) * tl;
       if (aCon > 1e-4) {
-        const pts = diemTrongMP(con);
-        let gt = 0; for (const [x, y] of pts) if (duongBan(b, x, y) || (b.na && baoQuanh(b, x, y))) gt++;
-        if (gt) cong('Đất giao thông', aCon * gt / pts.length);
+        const { p: pts, w } = diemCoTrongSo(con, kx, ky); const tong = w.reduce((s2, v) => s2 + v, 0);
+        let gt = 0; pts.forEach(([x, y], i) => { if (duongBan(b, x, y) || (b.na && baoQuanh(b, x, y))) gt += w[i]; });
+        if (gt && tong > 0) cong('Đất giao thông', aCon * gt / tong);
       }
       return kq;
     } catch { return null; }
@@ -726,4 +732,87 @@ export function computeQhTheoBan(ring: number[][], dienTich: number, dayDu = fal
     ra.push({ ma: b.ma, ten: b.ten, areas, phuTramPhanTram: Math.round((soDiem / ins) * 100) });
   }
   return ra;
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// KHỚP RANH QĐ205 THEO BẢN CHI TIẾT khi hai bên chỉ lệch NÉT VẼ (10/10/2026)
+// ═══════════════════════════════════════════════════════════════════════════
+// QĐ205 là quy hoạch chung tỷ lệ 1/10.000 — một nét bút đã rộng 1–2 m ngoài thực địa. Ở chỗ QĐ205 và bản chi tiết
+// (phân khu 1/2000, hoặc QĐ893 vẽ trên nền địa chính) nói CÙNG một điều (cùng các nhóm đất trên thửa) mà mép đường chỉ
+// lệch vài chục cm, web vẫn tính theo đúng nét nên ra chênh vài m² (thửa 70 tờ 25 Cam Đức: 205 = 393,97 m² đất ở,
+// 893 = 2101 = 395,28). Chủ dự án: "3 quy hoạch giống nhau mà bị lệch thành ra gây nghi ngờ cho người dùng".
+// Luật — CHỈ khớp khi đủ cả 4 điều kiện, thiếu một là giữ nguyên số của QĐ205:
+//   1. Bản chi tiết phủ TRỌN thửa (không điểm nào "ngoài phạm vi").
+//   2. Hai bên có CÙNG tập nhóm đất (ở / giao thông / cây xanh / mặt nước …) trên thửa.
+//   3. MỌI chỗ hai bên khác nhóm đều nằm sát mép ô QĐ205 trong vòng 1,5 m (= sai số nét vẽ 1/10.000).
+//   4. Tổng chỗ khác ≤ 10 % diện tích thửa.
+// Khớp thì: diện tích MỖI NHÓM lấy theo bản chi tiết, TÊN loại đất vẫn là tên của QĐ205 (không mượn tên bản khác —
+// giữ nguyên tắc "bản nào theo bản đó" về loại đất, chỉ mượn RANH ở mức dưới sai số nét vẽ).
+const HH_MEP_M = 1.5, HH_TI_LE = 0.10;
+function nhomDat(ten: string | null): string {
+  const s = (ten || '').toLowerCase();
+  if (!ten) return 'NGOAI';
+  if (/ngoài phạm vi|chưa ghi/.test(s)) return 'NGOAI';
+  if (/giao thông/.test(s)) return 'GT';
+  if (/mặt nước|sông|suối|kênh|hồ|ao|đầm/.test(s)) return 'MN';
+  if (/cây xanh|công viên|vui chơi/.test(s)) return 'CX';
+  if (/thể dục|thể thao/.test(s)) return 'TT';
+  if (/giáo dục|trường|đào tạo/.test(s)) return 'GD';
+  if (/nông nghiệp|lâu năm|hàng năm|lúa|rừng|chưa sử dụng/.test(s)) return 'NN';
+  if (/đất ở|nhà ở|đơn vị ở|làng xóm|dân cư/.test(s)) return 'O';
+  if (/quốc phòng|an ninh/.test(s)) return 'QP';
+  if (/đất khác/.test(s)) return 'KHAC';
+  return 'CC:' + s;     // nhóm công cộng / dịch vụ / hỗn hợp…: phải TRÙNG HẲN tên mới coi là cùng nhóm
+}
+function loaiBanTaiDiem(b: BanQh, x: number, y: number): string | null {
+  const k = b.kho.chuaK(x, y);
+  if (k >= 0) {
+    if (b.kho.trum?.[k] && duongBan(b, x, y) && biBaoQuanh(b, x, y, true)) return 'Đất giao thông';
+    return b.kho.tenLoai[b.kho.loai[k]];
+  }
+  return (duongBan(b, x, y) || (b.na && biBaoQuanh(b, x, y))) ? 'Đất giao thông' : null;
+}
+function kcMep205(x: number, y: number, xaM: number): number {   // mét tới cạnh ô QĐ205 gần nhất (tối đa xaM)
+  if (!KHO) return Infinity;
+  const r = xaM / 111000; let d = Infinity;
+  for (const k of KHO.oTrongKhung(x - r, y - r, x + r, y + r)) d = Math.min(d, KHO.d2Vien(k, x, y));
+  return Math.sqrt(d) * 111000;
+}
+export function hoaHop205(ring: number[][], dienTich: number, pre: { type: string; hz: string; areaM2: number }[] | null,
+  cacBan: KetQuaBan[]): { kq: { type: string; hz: string; areaM2: number }[] | null; theo: string | null } {
+  if (!pre || !pre.length || !cacBan.length || !KHO) return { kq: pre, theo: null };
+  let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
+  for (const [x, y] of ring) { if (x < minx) minx = x; if (x > maxx) maxx = x; if (y < miny) miny = y; if (y > maxy) maxy = y; }
+  const kx = 111320 * Math.cos(((miny + maxy) / 2) * Math.PI / 180), ky = 110574;
+  const { p: pts, w } = diemCoTrongSo([[ring.map(([x, y]) => [x, y])]], kx, ky, 500);
+  const tong = w.reduce((s2, v) => s2 + v, 0); if (!(tong > 0)) return { kq: pre, theo: null };
+  const g205 = pts.map(([x, y]) => nhomDat(loai205TaiDiem(x, y)));
+  const nhom205 = new Set(pre.map((o) => nhomDat(o.type)));
+  // ưu tiên bản phân khu (vẽ chi tiết 1/2000) rồi mới tới QĐ893
+  const thuTu = [...cacBan].sort((a, b) => (a.ma === '893' ? 1 : 0) - (b.ma === '893' ? 1 : 0));
+  for (const kb of thuTu) {
+    const b = BAN_KHAC.find((x) => x.ma === kb.ma); if (!b) continue;
+    const nhomB = new Set(kb.areas.map((o) => nhomDat(o.type)));
+    if (nhomB.has('NGOAI')) continue;                                          // (1)
+    if (nhomB.size !== nhom205.size || [...nhomB].some((g) => !nhom205.has(g))) continue;   // (2)
+    let khac = 0, ok = true;
+    for (let i = 0; i < pts.length && ok; i++) {
+      const gb = nhomDat(loaiBanTaiDiem(b, pts[i][0], pts[i][1]));
+      if (gb === 'NGOAI') { ok = false; break; }
+      if (gb === g205[i]) continue;
+      khac += w[i];
+      if (kcMep205(pts[i][0], pts[i][1], HH_MEP_M + 1) > HH_MEP_M) ok = false;       // (3)
+    }
+    if (!ok || khac > HH_TI_LE * tong) continue;                                     // (4)
+    // diện tích từng nhóm theo bản chi tiết; trong nhóm có nhiều tên QĐ205 thì chia theo tỉ lệ cũ của QĐ205
+    const aNhom: Record<string, number> = {};
+    for (const o of kb.areas) aNhom[nhomDat(o.type)] = (aNhom[nhomDat(o.type)] || 0) + o.areaM2;
+    const tong205: Record<string, number> = {};
+    for (const o of pre) tong205[nhomDat(o.type)] = (tong205[nhomDat(o.type)] || 0) + o.areaM2;
+    const kq = pre.map((o) => { const g = nhomDat(o.type); return { ...o, areaM2: Math.round(aNhom[g] * o.areaM2 / tong205[g] * 10) / 10 }; })
+      .filter((o) => o.areaM2 > 0.4).sort((a, b) => b.areaM2 - a.areaM2);
+    return { kq, theo: kb.ma };
+  }
+  return { kq: pre, theo: null };
 }

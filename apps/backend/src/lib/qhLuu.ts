@@ -6,12 +6,15 @@
 //     là bỏ qua dòng cũ và tính lại → không bao giờ hiện kết quả cũ sau khi đổi dữ liệu / cách tính / nạp lại địa chính.
 import crypto from 'node:crypto';
 import { query } from './db.ts';
-import { computeQhAreas, computeQhTheoBan, qhPhienBan } from './qhCompute.ts';
+import { computeQhAreas, computeQhTheoBan, hoaHop205, qhPhienBan } from './qhCompute.ts';
 
 export interface KetQuaQh { pre: ReturnType<typeof computeQhAreas>; cacBan: ReturnType<typeof computeQhTheoBan> }
 
 export function tinhQh(ring: number[][], dienTich: number): KetQuaQh {
-  return { pre: computeQhAreas(ring, dienTich), cacBan: computeQhTheoBan(ring, dienTich) };
+  const cacBan = computeQhTheoBan(ring, dienTich);
+  // QĐ205 chỉ lệch bản chi tiết ở mức NÉT VẼ (≤ 1,5 m, cùng nhóm đất) → lấy ranh bản chi tiết, giữ tên loại của QĐ205 (hoaHop205)
+  const pre = hoaHop205(ring, dienTich, computeQhAreas(ring, dienTich), cacBan).kq;
+  return { pre, cacBan };
 }
 
 export function dauThua(ring: number[][], dienTich: number): string {

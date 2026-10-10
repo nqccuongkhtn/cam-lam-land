@@ -500,6 +500,24 @@ Rải 13.910 điểm trong vùng tô gpkg: web khớp 95–100 % mọi lớp, tr
 trợ ô có lỗ → cắt thành mảnh không lỗ. QĐ205 không có ô "đất giao thông": đường = khe giữa các ô (xem `bao205`).
 Web CHƯA phân biệt giai đoạn (hiện trạng / 2030 / 2045) — mọi loại đất QĐ205 đang ghi "2045".
 
+**Đối chiếu với ĐÁP ÁN ĐO THẲNG TRÊN BẢN VẼ (10/10/2026, 8.114 thửa).** Đáp án = cắt hình thửa trên vùng tô gốc + RANH LẬP QUY
+HOẠCH của chính bản vẽ (`apps/backend/data/ranh_qh.json`: 7 phân khu + QĐ205, lấy từ level ranh lập QH của DXF/gpkg).
+Kết quả sau sửa: phân khu lệch 0,00–0,31 % (phần còn lại = luật ô trùm, đã soi trên bản vẽ: web đúng), QĐ893 0,27 % (khe không
+ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 %. Những gì đã sửa:
+- **Phân khu:** khe hở NGOÀI ranh = ngoài phạm vi; TRONG ranh = đường (bản phân khu để trắng lòng đường); dò 8 hướng chạm mép
+  ranh tính như chạm ô đất (đường sát mép ranh).
+- **QĐ205 khe hở ≥ 5 m trong ranh = đường** (thay luật "bao 6/8 hướng" trượt ở đường lớn chạy dài); phần ngoài ranh QĐ205 = ngoài
+  phạm vi, thửa trọn ngoài ranh không hiện dòng QĐ205 (trước: thửa Phước Đồng / Cam Ranh sát ranh bị ghi "Đất giao thông" cả thửa).
+  Thửa không bản nào phủ → `qhNgoaiVung=true`.
+- **QĐ205 THIẾU VÙNG TÔ:** vùng tô nhiều vòng lồng nhau phải dựng theo LUẬT CHẴN–LẺ; dựng đúng thì 640 mảnh (158 ha) chưa có ô
+  nào phủ → web tính thành đường (thửa 4 tờ 22 Cam Hiệp giữa khối "đơn vị ở" bị ghi đường; lòng quảng trường tròn Cam Đức là cây
+  xanh). Bổ sung bằng `scripts/qh-pipeline/5e-bo-sung-phan-sot-205.py` (loại = loại chiếm nhiều nhất của ô web cùng vùng tô) và
+  `5d-bo-sung-mat-nuoc-205.py` (mặt nước / sông suối). Nạp lại qh_zones từ đầu thì PHẢI chạy lại 5c → 5d → 5e.
+- Đã thử và BỎ: đáp án "giữa 2 nét mép đường -1-TRAFFIC-PAVEMENT trong 35 m = đường" — nét mép đường QĐ205 vẽ không đủ, đường
+  rộng bị hụt. Dòng `CACH_O_GAN_M` trong nearestLand nay chạy thật (trước nằm sau return).
+Công cụ: scratchpad của phiên (audit*.ts quét thửa thật trong container, dap_an_all.py, ve_thua205.py vẽ thửa lên bản vẽ) — chưa
+đưa vào repo; cách làm ghi ở `scripts/kiem-tra-qh/README.md`.
+
 **Dữ liệu bắt buộc phải có:** `apps/backend/data/qh_zones.json`, `road_mask.bin`, `road_mask.json`
 (đường dẫn đọc theo `QH_DATA_DIR`, mặc định `<thư mục chạy>/data`; trong container là `/app/apps/backend/data`).
 Các file này **có trong git** (~1.9MB + 1.6MB). Thiếu chúng thì backend vẫn chạy nhưng tự tụt xuống cách B —

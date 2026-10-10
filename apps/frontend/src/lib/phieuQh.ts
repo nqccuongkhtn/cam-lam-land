@@ -136,7 +136,7 @@ const QH_META: Record<string, { ten: string; qd: string }> = {
 };
 
 // ---- SƠ ĐỒ THEO ẢNH QH GỐC (raster QĐ205, giống Guland/Meey) ----
-const QD205_TILE = '/tiles/qd205v11/{z}/{x}/{y}.png?v=3';   // ảnh QH đã nắn toạ độ (cùng origin) · ?v=3 PHẢI khớp app/map/page.tsx
+const QD205_TILE = '/tiles/qd205v11/{z}/{x}/{y}.png?v=4';   // ảnh QH đã nắn toạ độ (cùng origin) · ?v=4 PHẢI khớp app/map/page.tsx
 const lonToWX = (lng: number) => (lng + 180) / 360;
 const latToWY = (lat: number) => { const s = Math.sin(lat * Math.PI / 180); return 0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI); };
 function buildSvgRaster(ll: [number, number][], areaM2: number, extra: { soThua?: string; neighbors?: { so: string; lng: number; lat: number }[]; origin?: string }): string {

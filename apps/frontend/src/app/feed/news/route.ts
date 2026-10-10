@@ -271,6 +271,23 @@ const catTronCau = (text: string): string => {
 };
 // Bỏ dòng chú thích ảnh ("... Ảnh: Vinhomes", "Nguồn: ...") còn sót trong nội dung.
 const dropCaptions = (text: string): string => text.split(/\n{2,}/).map((p) => p.trim()).filter((t) => t && !/[Ảả]nh\s*:\s*\S/.test(t) && !/^\(?\s*[Ảả]nh\b/.test(t) && !/^[Nn]guồn\s*:\s*\S/.test(t)).join('\n\n');
+/* ── ẢNH THU NHỎ → ẢNH GỐC (10/10/2026) ── chủ dự án: "lâu lâu vẫn lỗi lấy ảnh mờ quá". RSS của CafeF, Báo Xây dựng,
+   Kiến thức, Tuổi Trẻ, Báo Chính phủ… (cùng một kiểu máy chủ ảnh) hay đưa bản THU NHỎ trong đường dẫn: `/zoom/223_140/…`,
+   `/thumb_w/640/…` — 223×140 điểm ảnh phóng lên khung ~800 là nhoè. Đổi đoạn đó thành `/thumb_w/1200/` (máy chủ ảnh của báo
+   tự thu nhỏ + tự trả WebP cho trình duyệt: ~350 KB, nét; ảnh gốc PNG 1,2 MB thì nặng cho điện thoại). Vẫn DÙNG THẲNG đường
+   dẫn của báo, không tải về lưu (chủ dự án: đỡ tốn dung lượng). Chỉ đổi khi bản đang có < 800 điểm ảnh. Áp CẢ lúc trả tin đã
+   lưu → bài cũ cũng hết mờ. */
+const anhGoc = (u: string | null | undefined): string | null => {
+  if (!u) return u ?? null;
+  const m = u.match(/^(https?:\/\/[^/]+)\/(?:zoom\/(\d+)_\d+|thumb_w\/(\d+))\/(.+)$/i);
+  if (!m || Number(m[2] || m[3]) >= 800) return u;
+  return `${m[1]}/thumb_w/1200/${m[4]}`;
+};
+const anhGocBai = (a: any): any => {
+  if (!a || (!a.image && !a.images)) return a;
+  return { ...a, image: anhGoc(a.image), ...(Array.isArray(a.images) ? { images: a.images.map(anhGoc) } : {}) };
+};
+
 // Bỏ ảnh TRÙNG (cùng tấm khác kích thước) bằng tên ảnh đã chuẩn hoá.
 const imgKey = (u: string): string => {
   let x = u.split('?')[0].split('#')[0].toLowerCase();
@@ -513,7 +530,7 @@ export async function GET(req: Request) {
   // đại diện. Trước đây mỗi lần mở trang chủ tải ~290 KB (toàn văn mọi bài) trên điện thoại (đo 29/9/2026).
   // Trang ĐỌC BÀI (/tin-tuc/[id]) vẫn gọi không kèm tham số để lấy đủ toàn văn.
   // Bài NGUỒN ẨN DANH: KHÔNG bao giờ trả đường dẫn gốc ra ngoài (url rỗng, nguồn = Cam Lâm Land).
-  const ra = store.map((a: any) => (a.anDanh ? { ...a, url: '', source: 'Cam Lâm Land' } : a));
+  const ra = store.map((a: any) => anhGocBai(a.anDanh ? { ...a, url: '', source: 'Cam Lâm Land' } : a));
   // ?slug=…: CHỈ MỘT BÀI + 8 tin liên quan bản gọn (9/10/2026). Trước đây trang đọc bài tải cả kho ~600 bài
   // (3,5 MB trên điện thoại, 3–4 giây) chỉ để lấy 1 bài. Không có bài mà kho đã nạp xong → 404 thật
   // (bài quá hạn lưu 30 ngày) để trang đọc trả "không tồn tại" cho Google. Kho chưa nạp xong (máy chủ vừa dựng lại)
@@ -605,7 +622,7 @@ async function refreshFeed(slot: number): Promise<void> {
     const hong = !viet || /^KHÔNG ĐỦ\s*$/i.test(viet.trim());
     a.body = catTronCau(dropCaptions(hong ? (art.text && art.text.length > 200 ? art.text : (a.summary || a.title)) : viet));
     a.aiOk = !hong;   // false = chưa biên tập được (hết lượt AI, AI báo lỗi…)
-    const imgs = dedupeImages([...art.images, a.image].filter((u): u is string => !!u && cleanImg(u))).slice(0, 3); // og:image (đại diện chuẩn) LÊN ĐẦU, ảnh RSS làm dự phòng
+    const imgs = dedupeImages([...art.images, a.image].map((u) => anhGoc(u)).filter((u): u is string => !!u && cleanImg(u))).slice(0, 3); // og:image (đại diện chuẩn) LÊN ĐẦU, ảnh RSS làm dự phòng
     a.images = imgs;
     a.image = imgs[0] || null;
     a.slug = `${vnSlug(a.title) || 'tin'}-${shortHash(a.url)}`; // mô tả + đuôi SỐ

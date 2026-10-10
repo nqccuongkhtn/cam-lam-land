@@ -713,6 +713,37 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     el.style.display = (mp && mp.getZoom() < WM_MIN_ZOOM) ? 'none' : '';
   }, [adMarkers]);
 
+  // ── CHỐNG ĐÈ huy hiệu quảng cáo tròn (10/10/2026) ──
+  // Chủ dự án: "zoom ra thì các thẻ quảng cáo tròn đè lên nhau thì giảm còn 1 thẻ thôi, các điểm ghim màu tím khi này cũng
+  // ẩn đi chứ để đè lên chỗ quảng cáo tròn". Mỗi lần bản đồ dịch / zoom (gom theo khung hình): huy hiệu nào chồng lên một
+  // huy hiệu ĐANG HIỆN (tâm cách nhau < 1 đường kính) thì ẩn; ghim / chấm tin nằm dưới huy hiệu đang hiện cũng ẩn.
+  // Zoom gần lại, tách ra được thì tự hiện lại. Chỉ ẩn bằng visibility — không xoá marker, không đụng dữ liệu.
+  useEffect(() => {
+    const map = mapRef.current; if (!map) return;
+    let cho = 0;
+    const chongDe = () => {
+      cho = 0;
+      const adSize = window.innerWidth < 768 ? 58 : 96;
+      const dangHien: { x: number; y: number }[] = [];
+      for (const mk of adRefs.current) {
+        const el = mk.getElement() as HTMLElement; const p = map.project(mk.getLngLat());
+        const de = dangHien.some((q) => Math.hypot(q.x - p.x, q.y - p.y) < adSize * 0.95);
+        el.style.visibility = de ? 'hidden' : '';
+        if (!de) dangHien.push({ x: p.x, y: p.y });
+      }
+      const banKinh = adSize / 2 + 10;   // ghim cắm đáy tại điểm → phần thân ghim nhô lên trên ~30px, vẫn nằm trong vòng này
+      for (const mk of markerRefs.current) {
+        const el = mk.getElement() as HTMLElement; const p = map.project(mk.getLngLat());
+        el.style.visibility = dangHien.some((q) => Math.hypot(q.x - p.x, q.y - p.y) < banKinh) ? 'hidden' : '';
+      }
+    };
+    const henLai = () => { if (!cho) cho = requestAnimationFrame(chongDe); };
+    henLai();
+    // moveend: ghim tin được DỰNG LẠI khi zoom qua ngưỡng bung giá (effect ghim ở trên) → xét lại sau khi dựng
+    map.on('move', henLai); map.on('moveend', henLai); map.on('resize', henLai);
+    return () => { map.off('move', henLai); map.off('moveend', henLai); map.off('resize', henLai); if (cho) cancelAnimationFrame(cho); };
+  }, [adMarkers, markers]);
+
   useEffect(() => {
     adRefs.current.forEach((m) => { try { (m.getElement() as HTMLElement).style.opacity = String(adOpacity); } catch {} });
     if (wmRef.current) wmRef.current.style.opacity = String(adOpacity * WM_OPACITY);

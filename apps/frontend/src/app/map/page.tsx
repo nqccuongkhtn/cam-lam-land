@@ -183,8 +183,8 @@ const RASTER_OVERLAYS = [
     // nhỏ (bộ gốc chỉ có từ mức 12) — để lùi bản đồ ra xa vẫn thấy quy hoạch. Chỉ thêm file, không đụng ô cũ.
     // "?v=2" (15/9/2026): ĐỔI ĐỊA CHỈ để điện thoại + Cloudflare bỏ qua câu trả lời "không có ô" đã lỡ nhớ 1 năm
     // từ hồi chưa cắt bù mức 10–11 (xem map $cache_anh trong nginx/nginx.conf). Đổi bộ ảnh sau này thì tăng số.
-    tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png?v=3'], minzoom: 10, maxzoom: 18,
-    // "?v=3" (10/10/2026): xoá vòng tròn xanh có chấm đen (ký hiệu quên xoá trước khi xuất tile) ở 18 ô z10–18 quanh
+    tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png?v=4'], minzoom: 10, maxzoom: 18,
+    // "?v=4" (10/10/2026, sửa lại mức 11–16 cho dải cây xanh đúng đường cong) · "?v=3": xoá vòng tròn xanh có chấm đen (ký hiệu quên xoá trước khi xuất tile) ở 18 ô z10–18 quanh
     // 109.16972, 12.05229 — ô gốc sao lưu ở backup/tile-qd205v11-truoc-xoa-vong-tron-2026-10-10. Nhớ đổi cả lib/phieuQh.ts.
     coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ⚠️ MÀU BẢN ĐỒ QUY HOẠCH LẤY ĐÚNG TỪ BẢN VẼ — ĐỌC KỸ TRƯỚC KHI ĐỔI (13/9/2026)

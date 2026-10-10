@@ -235,7 +235,7 @@ export function qhReady() { return ready; }
 // = băm NỘI DUNG mọi file dữ liệu quy hoạch (qh_zones*.json, road_mask*) + số phiên bản CÁCH TÍNH bên dưới.
 // Đổi dữ liệu hay đổi cách tính → dấu đổi → mọi kết quả đã lưu tự bị bỏ, tính lại. Không bao giờ hiện số cũ.
 // ⚠️ SỬA CÁCH TÍNH TRONG FILE NÀY (hoặc catHinh.ts) THÌ TĂNG CACH_TINH.
-const CACH_TINH = '2026-10-10-ranh-qh-3';   // 3: phần ngoài ranh QĐ205 = ngoài phạm vi   // 2: khe QĐ205 ≥ 5 m trong ranh lập QH = đường   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
+const CACH_TINH = '2026-10-10-ranh-qh-4';   // 4: QĐ205 'Đất khác' → 'Chưa ghi loại đất trong bản vẽ'   // 3: phần ngoài ranh QĐ205 = ngoài phạm vi   // 2: khe QĐ205 ≥ 5 m trong ranh lập QH = đường   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
 let PHIEN_BAN = '';
 export function qhPhienBan(): string {
   if (PHIEN_BAN || !ready) return PHIEN_BAN;
@@ -365,7 +365,9 @@ function loaiKhe205(x: number, y: number): string {
   // Điểm xa mọi ô đất: TRONG vùng quy hoạch thì đó là lòng đường (cách B) — giữ nguyên,
   // vì đây là chỗ làm cho kết quả khớp app tham chiếu ±3%. Còn thửa nằm HẲN ngoài vùng
   // quy hoạch thì đã bị chặn từ đầu hàm rồi, không xuống tới đây.
-  return (r === null) ? 'Đất giao thông' : 'Đất khác'; // ngoài mask→cách B; trong mask mà xa mọi ô⇒ngoài QĐ205
+  // Trong khung mặt nạ mà xa mọi ô > 50 m (vd lòng QUẢNG TRƯỜNG TRÒN trung tâm Cam Đức — bản vẽ chỉ tô tam giác cây xanh, còn lại
+  // để trống): trước ghi 'Đất khác' nghe như một loại đất thật → nay ghi thẳng "chưa ghi loại đất" như các bản phân khu (10/10/2026).
+  return (r === null) ? 'Đất giao thông' : CHUA_RO_205;
 }
 
 export function computeQhAreas(ring: number[][], dienTich: number): { type: string; hz: string; areaM2: number }[] | null {
@@ -852,6 +854,7 @@ export function hoaHop205(ring: number[][], dienTich: number, pre: { type: strin
 // hướng" trượt ở đường lớn chạy dài (dọc đường không gặp ô nào) → thửa 13 tờ 49 Suối Tân nửa thửa trên đường bị ghi cây xanh.
 const R205 = (() => { const r = RANH_QH['205']; if (!r) return null; const a = new Float64Array(r.length * 2); r.forEach(([x, y], i) => { a[2 * i] = x; a[2 * i + 1] = y; }); return a; })();
 const NGOAI_205 = 'Nằm ngoài phạm vi bản quy hoạch này';
+const CHUA_RO_205 = 'Chưa ghi loại đất trong bản vẽ';
 // mẩu "ngoài phạm vi" < 2 m² sát ranh (nét ranh 1/10.000 sai số ~1 m) → gộp vào loại đất lớn nhất, khỏi hiện dòng vô nghĩa
 function gopMauNgoai205<T extends { type: string; areaM2: number }>(ds: T[]): T[] {
   const ng = ds.find((o) => o.type === NGOAI_205); const chinh = ds.find((o) => o.type !== NGOAI_205);

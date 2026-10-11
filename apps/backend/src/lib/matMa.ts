@@ -26,3 +26,14 @@ export function giaiMa(b64: string): string {
     return Buffer.concat([d.update(raw.subarray(28)), d.final()]).toString('utf8');
   } catch { return ''; }
 }
+
+/**
+ * Đọc chuỗi bí mật có thể đang ở 1 trong 2 dạng: ĐÃ MÃ HOÁ (bản mới) hoặc CHỮ TRẦN (bản lưu từ trước khi có mã hoá —
+ * nhận ra nhờ tiền tố cố định, vd khoá Anthropic luôn bắt đầu bằng "sk-"). Nhờ vậy đổi sang lưu mã hoá không làm hỏng
+ * khoá đang dùng. Giải mã hỏng (đổi KEY_SECRET/JWT_SECRET) → chuỗi rỗng = coi như chưa đặt khoá.
+ */
+export function moBiMat(s: unknown, tienToChuTran: string): string {
+  const v = String(s ?? '');
+  if (!v) return '';
+  return v.startsWith(tienToChuTran) ? v : giaiMa(v);
+}

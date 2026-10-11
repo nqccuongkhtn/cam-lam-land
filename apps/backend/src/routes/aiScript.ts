@@ -5,6 +5,7 @@ import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { laAdmin } from '../lib/auth.ts';
+import { moBiMat } from '../lib/matMa.ts';
 
 export const aiScriptRouter = Router();
 
@@ -12,7 +13,7 @@ async function aiCfg(): Promise<{ apiKey: string; model: string; effort: string 
   let v: any = {};
   try { const r = await query<{ value: any }>('SELECT value FROM app_config WHERE key=$1', ['danhmuc_ai']); v = r[0]?.value || {}; } catch { /* ignore */ }
   return {
-    apiKey: String(v.apiKey || process.env.ANTHROPIC_API_KEY || ''),
+    apiKey: moBiMat(v.apiKey, 'sk-') || String(process.env.ANTHROPIC_API_KEY || ''),   // khoá chung lưu đã mã hoá (11/10/2026), bản cũ chữ trần vẫn đọc được
     model: String(v.model || process.env.AI_MODEL || 'claude-sonnet-5'),
     effort: String(v.effort || process.env.AI_EFFORT || 'low'),
   };
@@ -62,5 +63,9 @@ aiScriptRouter.post('/video-script', authRequired, async (req: AuthedRequest, re
     }
     if (!Object.keys(out).length) return res.status(502).json({ error: 'AI chưa tạo được nội dung, thử lại.' });
     res.json({ scripts: out });
-  } catch (e: any) { res.status(500).json({ error: 'Lỗi tạo kịch bản: ' + (e?.message || '') }); }
+  } catch (e: any) {
+    // Không trả nguyên văn lỗi nội bộ cho người dùng (11/10/2026) — chỉ ghi nhật ký.
+    console.error('[ai-script] lỗi:', e?.message || e);
+    res.status(500).json({ error: 'Lỗi tạo kịch bản, vui lòng thử lại sau.' });
+  }
 });

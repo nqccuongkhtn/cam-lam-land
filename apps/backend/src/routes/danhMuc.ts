@@ -8,7 +8,7 @@ import { execFile } from 'node:child_process';
 import { writeFile, readFile, mkdtemp, rm, readdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { maHoa, giaiMa } from '../lib/matMa.ts';
+import { maHoa, giaiMa, moBiMat } from '../lib/matMa.ts';
 import { query } from '../lib/db.ts';
 import { adminRequired, authRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { BANK } from '../lib/packages.ts';
@@ -35,7 +35,8 @@ type AiCfg = { apiKey: string; model: string; effort: string; enabled: boolean; 
 async function getAiCfg(): Promise<AiCfg> {
   let v: any = {};
   try { const r = await query<{ value: any }>('SELECT value FROM app_config WHERE key=$1', ['danhmuc_ai']); v = r[0]?.value || {}; } catch {}
-  const apiKey = String(v.apiKey || process.env.ANTHROPIC_API_KEY || '');
+  // Khoá CHUNG lưu ĐÃ MÃ HOÁ (11/10/2026); khoá cũ còn lưu chữ trần ("sk-…") vẫn đọc được — xem lib/matMa.ts moBiMat.
+  const apiKey = moBiMat(v.apiKey, 'sk-') || String(process.env.ANTHROPIC_API_KEY || '');
   const model = String(v.model || process.env.AI_MODEL || 'claude-sonnet-5');
   const effort = String(v.effort || process.env.AI_EFFORT || 'low');   // low = nhanh, tiết kiệm token
   const enabled = v.enabled === undefined ? true : !!v.enabled;
@@ -395,8 +396,11 @@ danhMucRouter.post('/config', adminRequired, async (req, res, next) => {
     if (body.pricePerPage !== undefined && Number.isFinite(Number(body.pricePerPage)) && Number(body.pricePerPage) >= 0) nv.pricePerPage = Math.round(Number(body.pricePerPage));
     if (body.servicePricePerPage !== undefined && Number.isFinite(Number(body.servicePricePerPage)) && Number(body.servicePricePerPage) >= 0) nv.servicePricePerPage = Math.round(Number(body.servicePricePerPage));
     if (typeof body.enabled === 'boolean') nv.enabled = body.enabled;
+    // ⚠️ 11/10/2026 (rà soát bảo mật): khoá AI CHUNG trước đây lưu CHỮ TRẦN trong app_config (trái với ghi chú "mã hoá AES")
+    //    → ai xem được database hay bản sao lưu SAO-LUU là cầm được khoá trả tiền. Nay mã hoá AES-256-GCM như khoá riêng.
     if (body.clearKey === true) nv.apiKey = '';
-    else if (typeof body.apiKey === 'string' && body.apiKey.trim()) nv.apiKey = body.apiKey.trim();
+    else if (typeof body.apiKey === 'string' && body.apiKey.trim()) nv.apiKey = maHoa(body.apiKey.trim());
+    if (typeof nv.apiKey === 'string' && nv.apiKey.startsWith('sk-')) nv.apiKey = maHoa(nv.apiKey);   // khoá cũ còn chữ trần → mã hoá luôn
     await query(`INSERT INTO app_config (key, value, updated_at) VALUES ('danhmuc_ai', $1::jsonb, now()) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`, [JSON.stringify(nv)]);
     res.json({ ok: true });
   } catch (e) { next(e); }

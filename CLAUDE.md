@@ -544,7 +544,7 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   xanh nước KHÔNG ghi mã (4.585 ha) đang gọi "Đất sông, ngòi, kênh, rạch" dù chú dẫn dùng màu này cho cả hồ / thuỷ lợi / ao nuôi.
   (7) NHÃN GHÉP "+" ("TMD+ODT", "NKH+TMD", "DTT+DKV+TMD"… 119 nhãn) = một loại "Đất hỗn hợp (TMD + ODT)" — trước tách mã rồi bỏ mã trái
   màu (thửa 326 tờ 7 Cam Đức: app tham chiếu ghi đất hỗn hợp, web ghi thương mại dịch vụ). Chữ "%%u…%%U" (gạch chân CAD) bỏ trước khi đọc mã.
-- **QĐ205 DỰNG LẠI THẲNG TỪ QD205.gpkg (11/10/2026): `5h-dung-o-205-tu-gpkg.py` (+ bảng `lop-205.json` lớp → tên), toạ độ 7 số lẻ (~1 cm).
+- **QĐ205 DỰNG LẠI THẲNG TỪ QD205.gpkg (11/10/2026): `5h-dung-o-205-tu-gpkg.py` (+ bảng `lop-205.json` lớp → tên), toạ độ 8 số lẻ (~1 mm).
   Thay hẳn ô cũ (DGN qua GDAL) + 5c / 5d / 5e (không cần chạy nữa).** Ô cũ khác nguồn hình với vùng tô gốc: so cả bản lệch 593 ha khác tên
   (261 ha đất nông nghiệp ghi "Đất đồi núi" — vùng tô bị lấp lỗ), 111 ô tự cắt nhau; thửa 326 tờ 7 Cam Đức dư 33 m² đường so với app tham
   chiếu. Nay chẵn–lẻ, cắt theo ranh (2.036 ha vẽ ra ngoài ranh), so cả bản với gpkg 99,99 %. **Ba luật chia phần KHÔNG TÔ đổi theo:**
@@ -552,7 +552,7 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   2,5 m giao cho ô cạnh; bản thử "khe ≥ 3 m" cũng bỏ vì dư 1,3 m² ở mép cong); (2) trong khung mặt nạ (ảnh điểm 1,8 m, răng cưa): chỗ
   trắng SÁT MÉP ô đã tô (< 2 m, `SAT_MEP_205`) = đường; mặt nạ chỉ quyết phần trắng sâu trong khối không tô; (3) TẮT gộp "mẩu lẻ sát mép
   thửa < 1,5 m" (chủ dự án cần đúng 100 % như bản vẽ; bật lại bằng QH205_GOP_MEP=1). 2.000 thửa ngẫu nhiên: lệch so với gpkg 2,84 % →
-  0,00 % (30 m², 9 thửa lệch 0,3–0,9 m² do làm tròn); thửa 326 = 1.218,0 hỗn hợp + 469,0 đường (gpkg 1.217,9 + 469,1; app tham chiếu
+  0,00 % (12 m², không thửa nào lệch quá 0,3 m² — toạ độ 8 số lẻ; 6 số lẻ lệch tới 1,3 m², 7 số lẻ 0,45 m²); thửa 326 = 1.218,0 hỗn hợp + 469,0 đường (gpkg 1.217,9 + 469,1; app tham chiếu
   1.218,7 + 468,3); thửa mốc 70 tờ 25 = 395,1 + 116,8 (gpkg quy về diện tích sổ 395,2 + 116,7 — số mốc cũ 395,5 lệch bản vẽ 0,3).
   Bẫy đã vấp: (a) sau khi đổi toạ độ, make_valid có lúc trả "hộp chứa" (MultiPolygon + nét thừa) — phải nhặt MỌI đa giác ở mọi tầng
   (`cac_da_giac` trong 5g / 5h / 1d), không thì sót cả nhóm (QĐ205 từng mất 76,8 ha); (b) ogr2ogr `-spat` trên gpkg có lúc BỎ SÓT vùng

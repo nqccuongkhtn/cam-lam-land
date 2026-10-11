@@ -219,14 +219,6 @@ try {
 } catch (e: any) {
   console.log('[qhCompute] thiếu qh_zones.json → dùng cách cũ:', e?.message || e);
 }
-// KHE RỘNG QĐ205 (scripts/qh-pipeline/5i-khe-rong-205.py, 11/10/2026): phần TRONG RANH không tô màu mà rộng ≥ 3 m = lòng đường —
-// tính sẵn từ ô đất chuẩn (gpkg). Thay luật "cách ô gần nhất ≥ 2,5 m mới là đường" ở ngoài khung mặt nạ: luật đó cắt mỗi bên
-// đường một dải 2,5 m giao cho ô bên cạnh (thửa 646 tờ 7 xã 22471 dư 80 m² "đơn vị ở"). Thiếu file thì dùng lại luật cũ.
-let KHE205: KhoO | null = null;
-try {
-  KHE205 = new KhoO(JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'khe_rong_205.json'), 'utf-8')));
-  console.log(`[qhCompute] nạp ${KHE205.n} mảnh khe rộng (lòng đường) QĐ205`);
-} catch { KHE205 = null; }
 
 // ── MẶT NẠ ĐƯỜNG (raster bit-packed, giữ cung từ DXF) ──────────────────────────
 let MASK: Buffer | null = null;
@@ -246,7 +238,7 @@ export function qhReady() { return ready; }
 // = băm NỘI DUNG mọi file dữ liệu quy hoạch (qh_zones*.json, road_mask*) + số phiên bản CÁCH TÍNH bên dưới.
 // Đổi dữ liệu hay đổi cách tính → dấu đổi → mọi kết quả đã lưu tự bị bỏ, tính lại. Không bao giờ hiện số cũ.
 // ⚠️ SỬA CÁCH TÍNH TRONG FILE NÀY (hoặc catHinh.ts) THÌ TĂNG CACH_TINH.
-const CACH_TINH = '2026-10-11-205-gpkg';   // 205-gpkg: QĐ205 dựng lại thẳng từ gpkg (5h) + khe rộng = lòng đường (5i) + QĐ893 nhãn ghép '+' = đất hỗn hợp   // 893-banve: QĐ893 dựng lại (1d chẵn–lẻ, bỏ khung chú dẫn Level 56, mã nước, màu riêng một mã, xếp lớp như bản vẽ) + vùng khớp nối QĐ2222   // 893-banve: QĐ893 dựng lại (1d chẵn–lẻ, bỏ khung chú dẫn Level 56, mã nước, màu riêng một mã, xếp lớp như bản vẽ) + vùng khớp nối QĐ2222   // pk-chanle: 7 bản phân khu dựng lại thẳng từ DXF (5g: lỗ chẵn–lẻ, cắt theo ranh, lớp có mốc năm trên DAT_)   // pk-chanle: 7 bản phân khu dựng lại thẳng từ DXF (5g: lỗ chẵn–lẻ, cắt theo ranh, lớp có mốc năm trên DAT_)   // lo-ranh: vùng trống > 300 m trong ranh phân khu (Na Tia, Tây Nam) = ngoài phạm vi   // lo-ranh: vùng trống > 300 m trong ranh phân khu (Na Tia, Tây Nam) = ngoài phạm vi   // sot2: + vùng tô lẫn vòng hỏng (C096E0 đất quốc phòng Cam Hòa)   // 893-sot: 5f bổ sung cả phần vùng tô bị 5b bỏ sót   // 893-dnl: bổ sung 4 vùng tô QĐ893 hỏng viền (5f)   // trum-vun: mẩu < 50 m² không làm ô thành ô trùm   // 4: QĐ205 'Đất khác' → 'Chưa ghi loại đất trong bản vẽ'   // 3: phần ngoài ranh QĐ205 = ngoài phạm vi   // 2: khe QĐ205 ≥ 5 m trong ranh lập QH = đường   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
+const CACH_TINH = '2026-10-11-205-banve';   // 205-banve: QĐ205 toạ độ 7 số lẻ, không tô = đường (ngoài khung), sát mép ô đã tô < 2 m = đường (trong khung), tắt gộp mẩu lẻ   // 205-gpkg: QĐ205 dựng lại thẳng từ gpkg (5h) + QĐ893 nhãn ghép '+' = đất hỗn hợp   // 205-gpkg: QĐ205 dựng lại thẳng từ gpkg (5h) + khe rộng = lòng đường (5i) + QĐ893 nhãn ghép '+' = đất hỗn hợp   // 893-banve: QĐ893 dựng lại (1d chẵn–lẻ, bỏ khung chú dẫn Level 56, mã nước, màu riêng một mã, xếp lớp như bản vẽ) + vùng khớp nối QĐ2222   // 893-banve: QĐ893 dựng lại (1d chẵn–lẻ, bỏ khung chú dẫn Level 56, mã nước, màu riêng một mã, xếp lớp như bản vẽ) + vùng khớp nối QĐ2222   // pk-chanle: 7 bản phân khu dựng lại thẳng từ DXF (5g: lỗ chẵn–lẻ, cắt theo ranh, lớp có mốc năm trên DAT_)   // pk-chanle: 7 bản phân khu dựng lại thẳng từ DXF (5g: lỗ chẵn–lẻ, cắt theo ranh, lớp có mốc năm trên DAT_)   // lo-ranh: vùng trống > 300 m trong ranh phân khu (Na Tia, Tây Nam) = ngoài phạm vi   // lo-ranh: vùng trống > 300 m trong ranh phân khu (Na Tia, Tây Nam) = ngoài phạm vi   // sot2: + vùng tô lẫn vòng hỏng (C096E0 đất quốc phòng Cam Hòa)   // 893-sot: 5f bổ sung cả phần vùng tô bị 5b bỏ sót   // 893-dnl: bổ sung 4 vùng tô QĐ893 hỏng viền (5f)   // trum-vun: mẩu < 50 m² không làm ô thành ô trùm   // 4: QĐ205 'Đất khác' → 'Chưa ghi loại đất trong bản vẽ'   // 3: phần ngoài ranh QĐ205 = ngoài phạm vi   // 2: khe QĐ205 ≥ 5 m trong ranh lập QH = đường   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
 let PHIEN_BAN = '';
 export function qhPhienBan(): string {
   if (PHIEN_BAN || !ready) return PHIEN_BAN;
@@ -320,6 +312,7 @@ function d2seg(px: number, py: number, ax: number, ay: number, bx: number, by: n
 // Ô đất GẦN NHẤT trong bán kính ~50m (dùng cho điểm-đất mà qh_vector vẽ thiếu → không rơi vào ô nào).
 const NEAR = 0.00045; // ~50m
 let CACH_O_GAN_M = Infinity;   // khoảng cách (m) từ điểm vừa hỏi tới ô QĐ205 gần nhất — nearestLand ghi lại
+const SAT_MEP_205 = Number(process.env.QH205_SAT_MEP || 2);   // m — dải trắng sát ô đã tô coi là lòng đường dù mặt nạ (1,8 m/điểm ảnh) ghi "khối"
 function nearestLand(x: number, y: number): string | null {
   const gx0 = Math.floor((x - NEAR) / CELL), gx1 = Math.floor((x + NEAR) / CELL);
   const gy0 = Math.floor((y - NEAR) / CELL), gy1 = Math.floor((y + NEAR) / CELL);
@@ -371,8 +364,16 @@ function loaiKhe205(x: number, y: number): string {
   const r = roadAt(x, y);          // 1=lòng đường, 0=đất, null=ngoài phạm vi mask
   const near = nearestLand(x, y);  // ô QH gần nhất ≤50m (null nếu xa)
   if (near) return (r === 1) ? 'Đất giao thông'
-    : (r === null && trongRanh205(x, y) && (KHE205 ? KHE205.chuaK(x, y) >= 0 : CACH_O_GAN_M >= 2.5)) ? 'Đất giao thông'   // ngoài khung mặt nạ: điểm thuộc KHE RỘNG (≥ 3 m, tính sẵn — xem KHE205) TRONG ranh = lòng đường, kể cả sát mép ô (11/10/2026; trước: chỉ khi cách ô ≥ 2,5 m)
-    : near;                                                // khe hẹp (vẽ chưa khít) = ô gần nhất
+    // Ngoài khung mặt nạ: TRONG ranh mà KHÔNG TÔ MÀU = lòng đường, ĐÚNG như bản vẽ (11/10/2026 — ô QĐ205 nay dựng chuẩn từ gpkg).
+    // Trước: chỉ khi cách ô gần nhất ≥ 2,5 m — luật lấp kẽ "vẽ chưa khít" của ô cũ, nhưng nó cắt mỗi bên đường một dải 2,5 m giao
+    // cho ô bên cạnh (thửa 646 tờ 7 xã 22471 dư 80 m² "đơn vị ở"); bản thử "khe ≥ 3 m mới là đường" vẫn dư 1,3 m² ở mép đường cong
+    // (thửa 836 tờ 12 Cam Thành Bắc) → bỏ hẳn, bản vẽ để trắng thì ghi đường.
+    : (r === null && trongRanh205(x, y)) ? 'Đất giao thông'
+    // Trong khung mặt nạ, chỗ trắng SÁT MÉP một ô đã tô (< SAT_MEP_205 m) cũng là lòng đường: mặt nạ là ảnh điểm 1,8 m nên mép
+    // "khối" răng cưa lấn sang đường tới ~1,8 m → trước đây dải đó bị giao cho ô bên cạnh (thửa 49 tờ 8 Cam Thành Bắc dư 17,8 m²
+    // "đơn vị ở"). Mặt nạ chỉ còn quyết phần trắng nằm SÂU trong khối không tô màu (thửa mốc 70 tờ 25: khối không tô = đất ở).
+    : (r === 0 && CACH_O_GAN_M < SAT_MEP_205 && trongRanh205(x, y)) ? 'Đất giao thông'
+    : near;                                                // khối không tô màu (mặt nạ: không phải đường) = loại của ô gần nhất
   // Điểm xa mọi ô đất: TRONG vùng quy hoạch thì đó là lòng đường (cách B) — giữ nguyên,
   // vì đây là chỗ làm cho kết quả khớp app tham chiếu ±3%. Còn thửa nằm HẲN ngoài vùng
   // quy hoạch thì đã bị chặn từ đầu hàm rồi, không xuống tới đây.
@@ -399,7 +400,10 @@ export function computeQhAreas(ring: number[][], dienTich: number): { type: stri
   //   không đủ chắc → để nguyên, không gộp bừa).
   // CHỈ áp cho QĐ205. Bản 1/2000 + QĐ893 vẽ trên nền địa chính và cán bộ VPĐK ghi cả mẩu 1 m² → KHÔNG đụng.
   // 5/5 phiếu chính thức có ghi QĐ205 đều "toàn bộ" một loại — web khớp cả trước lẫn sau khi thêm bước này.
-  const MEP = 1.5;
+  // ⚠️ 11/10/2026 (chủ dự án: "tôi cần chính xác 100%" — so với app tham chiếu): TẮT gộp mẩu lẻ. Ô QĐ205 nay dựng chuẩn từ gpkg nên
+  // mẩu sát mép là đúng hình bản vẽ (thửa 110 tờ 15: 17,7 m² mặt nước bị gộp thành cây xanh; thửa 593 tờ 8: 9,9 m² văn hoá – thể thao
+  // gộp vào dân cư nông thôn). Bật lại: đặt biến môi trường QH205_GOP_MEP=1.
+  const MEP = process.env.QH205_GOP_MEP === '1' ? 1.5 : 0;
   const kx = 111320 * Math.cos(((miny + maxy) / 2) * Math.PI / 180), ky = 110574;
   const sauMep = (x: number, y: number) => {   // khoảng cách (m) từ điểm tới cạnh thửa gần nhất
     let d = Infinity;

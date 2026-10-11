@@ -544,15 +544,19 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   xanh nước KHÔNG ghi mã (4.585 ha) đang gọi "Đất sông, ngòi, kênh, rạch" dù chú dẫn dùng màu này cho cả hồ / thuỷ lợi / ao nuôi.
   (7) NHÃN GHÉP "+" ("TMD+ODT", "NKH+TMD", "DTT+DKV+TMD"… 119 nhãn) = một loại "Đất hỗn hợp (TMD + ODT)" — trước tách mã rồi bỏ mã trái
   màu (thửa 326 tờ 7 Cam Đức: app tham chiếu ghi đất hỗn hợp, web ghi thương mại dịch vụ). Chữ "%%u…%%U" (gạch chân CAD) bỏ trước khi đọc mã.
-- **QĐ205 DỰNG LẠI THẲNG TỪ QD205.gpkg (11/10/2026): `5h-dung-o-205-tu-gpkg.py` (+ bảng `lop-205.json` lớp → tên) rồi `5i-khe-rong-205.py`.
+- **QĐ205 DỰNG LẠI THẲNG TỪ QD205.gpkg (11/10/2026): `5h-dung-o-205-tu-gpkg.py` (+ bảng `lop-205.json` lớp → tên), toạ độ 7 số lẻ (~1 cm).
   Thay hẳn ô cũ (DGN qua GDAL) + 5c / 5d / 5e (không cần chạy nữa).** Ô cũ khác nguồn hình với vùng tô gốc: so cả bản lệch 593 ha khác tên
   (261 ha đất nông nghiệp ghi "Đất đồi núi" — vùng tô bị lấp lỗ), 111 ô tự cắt nhau; thửa 326 tờ 7 Cam Đức dư 33 m² đường so với app tham
-  chiếu. Nay chẵn–lẻ, cắt theo ranh (2.036 ha vẽ ra ngoài ranh), so cả bản với gpkg 99,99 %. **Luật khe ngoài khung mặt nạ đổi:** trước
-  "cách ô gần nhất ≥ 2,5 m mới là đường" → cắt mỗi bên đường 2,5 m giao cho ô cạnh (đường 20 m thiếu 5 m); nay dùng `khe_rong_205.json`
-  (phần không tô co–nở 1,5 m: khe ≥ 3 m = lòng đường, kể cả sát mép; kẽ < 3 m → ô gần nhất). 2.000 thửa ngẫu nhiên: lệch so với gpkg
-  2,84 % → 0,02 % (441 thửa gần bản vẽ hơn, 1 thửa xa hơn 0,6 m²); thửa 326 = 1.218,9 hỗn hợp + 468,1 đường (app tham chiếu 1.218,7 +
-  468,3). Bẫy đã vấp: sau khi đổi toạ độ, make_valid có lúc trả "hộp chứa" (MultiPolygon + nét thừa) — phải nhặt MỌI đa giác ở mọi tầng
-  (`cac_da_giac` trong 5g / 5h / 1d), không thì sót cả nhóm (QĐ205 từng mất 76,8 ha).
+  chiếu. Nay chẵn–lẻ, cắt theo ranh (2.036 ha vẽ ra ngoài ranh), so cả bản với gpkg 99,99 %. **Ba luật chia phần KHÔNG TÔ đổi theo:**
+  (1) ngoài khung mặt nạ: trong ranh mà không tô = lòng đường, đúng bản vẽ (bỏ luật "cách ô ≥ 2,5 m mới là đường" — nó cắt mỗi bên đường
+  2,5 m giao cho ô cạnh; bản thử "khe ≥ 3 m" cũng bỏ vì dư 1,3 m² ở mép cong); (2) trong khung mặt nạ (ảnh điểm 1,8 m, răng cưa): chỗ
+  trắng SÁT MÉP ô đã tô (< 2 m, `SAT_MEP_205`) = đường; mặt nạ chỉ quyết phần trắng sâu trong khối không tô; (3) TẮT gộp "mẩu lẻ sát mép
+  thửa < 1,5 m" (chủ dự án cần đúng 100 % như bản vẽ; bật lại bằng QH205_GOP_MEP=1). 2.000 thửa ngẫu nhiên: lệch so với gpkg 2,84 % →
+  0,00 % (30 m², 9 thửa lệch 0,3–0,9 m² do làm tròn); thửa 326 = 1.218,0 hỗn hợp + 469,0 đường (gpkg 1.217,9 + 469,1; app tham chiếu
+  1.218,7 + 468,3); thửa mốc 70 tờ 25 = 395,1 + 116,8 (gpkg quy về diện tích sổ 395,2 + 116,7 — số mốc cũ 395,5 lệch bản vẽ 0,3).
+  Bẫy đã vấp: (a) sau khi đổi toạ độ, make_valid có lúc trả "hộp chứa" (MultiPolygon + nét thừa) — phải nhặt MỌI đa giác ở mọi tầng
+  (`cac_da_giac` trong 5g / 5h / 1d), không thì sót cả nhóm (QĐ205 từng mất 76,8 ha); (b) ogr2ogr `-spat` trên gpkg có lúc BỎ SÓT vùng
+  tô (đường cong) — soi một thửa thì xuất toàn bộ vùng tô rồi lọc bằng shapely, đừng tin ảnh soi dùng -spat.
 - Đã thử và BỎ: đáp án "giữa 2 nét mép đường -1-TRAFFIC-PAVEMENT trong 35 m = đường" — nét mép đường QĐ205 vẽ không đủ, đường
   rộng bị hụt. Dòng `CACH_O_GAN_M` trong nearestLand nay chạy thật (trước nằm sau return).
 Công cụ: scratchpad của phiên (audit*.ts quét thửa thật trong container, dap_an_all.py, ve_thua205.py vẽ thửa lên bản vẽ) — chưa

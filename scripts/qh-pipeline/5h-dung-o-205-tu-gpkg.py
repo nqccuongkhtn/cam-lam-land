@@ -89,10 +89,10 @@ def main(vao):
             trong = make_valid(phan.intersection(RG))
             for m in manh_khong_lo(trong):
                 if m.area * 1.21e10 < 0.5: continue
-                r = [[round(x, 6), round(y, 6)] for x, y in m.exterior.coords]
+                r = [[round(x, 7), round(y, 7)] for x, y in m.exterior.coords]   # 7 số lẻ (~1 cm): 6 số lẻ (~10 cm) lệch tới 1,3 m² ở thửa có mép dài (836 tờ 12 Cam Thành Bắc)
                 if len(r) < 4: continue
                 mx0, my0, mx1, my1 = m.bounds
-                out.append([round(mx0, 6), round(my0, 6), round(mx1, 6), round(my1, 6), r, TEN[lv], dt, bac_cua(lv)])
+                out.append([round(mx0, 7), round(my0, 7), round(mx1, 7), round(my1, 7), r, TEN[lv], dt, bac_cua(lv)])
                 theo[TEN[lv]] += m.area * 1.21e10 / 1e4
     json.dump(out, io.open(os.path.join(DATA, 'qh_zones.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
     print('QĐ205: %d ô (trong ranh %.0f ha) | bỏ lớp không phải đất: %s' % (len(out), sum(theo.values()), dict(bo.most_common())))

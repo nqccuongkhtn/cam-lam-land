@@ -798,9 +798,22 @@ export default function TraCuuLuatPage() {
         if (!coDuTieng(x, truoc)) continue;
         for (const t of bk.dau ? x.tuD : x.tuK) if (t.length > cuoi.length && t.startsWith(cuoi)) dem.set(t, (dem.get(t) || 0) + 1);
       }
-      let tot = '', so = 0;
-      dem.forEach((c, t) => { if (c > so) { tot = t; so = c; } });
-      return tot ? [...truoc.tu, tot].join(' ') : '';
+      // Ưu tiên tiếng ĐI LIỀN SAU tiếng đứng trước trong chữ luật ("quốc ph" → "quốc phòng"; chỉ đếm số lần gặp thì ra "quốc pháp"
+      // vì "pháp" — trong "pháp luật" — gặp nhiều hơn). Xét 8 tiếng hay gặp nhất; không tiếng nào đi liền thì lấy tiếng hay gặp nhất.
+      const ung = [...dem.entries()].sort((x, y) => y[1] - x[1]).slice(0, 8);
+      if (!ung.length) return '';
+      let tot = ung[0][0];
+      const truocCuoi = truoc.tu[truoc.tu.length - 1];
+      if (truocCuoi) {
+        let soLien = 0;
+        for (const [t] of ung) {
+          const re = new RegExp('(?:^|[^\\p{L}\\p{N}])' + escRe(truocCuoi) + '[^\\p{L}\\p{N}]+' + escRe(t) + '(?=$|[^\\p{L}\\p{N}])', 'u');
+          let c = 0;
+          for (const x of ds) if ((bk.dau ? x.tuD : x.tuK).has(t) && coDuTieng(x, truoc) && re.test(bk.dau ? x.khoD : x.kho)) c++;
+          if (c > soLien) { soLien = c; tot = t; }
+        }
+      }
+      return [...truoc.tu, tot].join(' ');
     };
     const coGoi = (cau: string) => { const mr = doiCachGoi(cau); return !!mr && co(mr.cau); };
     if (co(q) || coGoi(q)) return giu;

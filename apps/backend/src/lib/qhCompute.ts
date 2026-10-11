@@ -238,7 +238,7 @@ export function qhReady() { return ready; }
 // = băm NỘI DUNG mọi file dữ liệu quy hoạch (qh_zones*.json, road_mask*) + số phiên bản CÁCH TÍNH bên dưới.
 // Đổi dữ liệu hay đổi cách tính → dấu đổi → mọi kết quả đã lưu tự bị bỏ, tính lại. Không bao giờ hiện số cũ.
 // ⚠️ SỬA CÁCH TÍNH TRONG FILE NÀY (hoặc catHinh.ts) THÌ TĂNG CACH_TINH.
-const CACH_TINH = '2026-10-11-pk-chanle';   // pk-chanle: 7 bản phân khu dựng lại thẳng từ DXF (5g: lỗ chẵn–lẻ, cắt theo ranh, lớp có mốc năm trên DAT_)   // lo-ranh: vùng trống > 300 m trong ranh phân khu (Na Tia, Tây Nam) = ngoài phạm vi   // lo-ranh: vùng trống > 300 m trong ranh phân khu (Na Tia, Tây Nam) = ngoài phạm vi   // sot2: + vùng tô lẫn vòng hỏng (C096E0 đất quốc phòng Cam Hòa)   // 893-sot: 5f bổ sung cả phần vùng tô bị 5b bỏ sót   // 893-dnl: bổ sung 4 vùng tô QĐ893 hỏng viền (5f)   // trum-vun: mẩu < 50 m² không làm ô thành ô trùm   // 4: QĐ205 'Đất khác' → 'Chưa ghi loại đất trong bản vẽ'   // 3: phần ngoài ranh QĐ205 = ngoài phạm vi   // 2: khe QĐ205 ≥ 5 m trong ranh lập QH = đường   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
+const CACH_TINH = '2026-10-11-893-banve';   // 893-banve: QĐ893 dựng lại (1d chẵn–lẻ, bỏ khung chú dẫn Level 56, mã nước, màu riêng một mã, xếp lớp như bản vẽ) + vùng khớp nối QĐ2222   // pk-chanle: 7 bản phân khu dựng lại thẳng từ DXF (5g: lỗ chẵn–lẻ, cắt theo ranh, lớp có mốc năm trên DAT_)   // pk-chanle: 7 bản phân khu dựng lại thẳng từ DXF (5g: lỗ chẵn–lẻ, cắt theo ranh, lớp có mốc năm trên DAT_)   // lo-ranh: vùng trống > 300 m trong ranh phân khu (Na Tia, Tây Nam) = ngoài phạm vi   // lo-ranh: vùng trống > 300 m trong ranh phân khu (Na Tia, Tây Nam) = ngoài phạm vi   // sot2: + vùng tô lẫn vòng hỏng (C096E0 đất quốc phòng Cam Hòa)   // 893-sot: 5f bổ sung cả phần vùng tô bị 5b bỏ sót   // 893-dnl: bổ sung 4 vùng tô QĐ893 hỏng viền (5f)   // trum-vun: mẩu < 50 m² không làm ô thành ô trùm   // 4: QĐ205 'Đất khác' → 'Chưa ghi loại đất trong bản vẽ'   // 3: phần ngoài ranh QĐ205 = ngoài phạm vi   // 2: khe QĐ205 ≥ 5 m trong ranh lập QH = đường   // ranh-qh: khe hở theo ranh lập quy hoạch (data/ranh_qh.json)   // 3: chia khe theo từng mảnh + khớp ranh QĐ205 (hoaHop205)
 let PHIEN_BAN = '';
 export function qhPhienBan(): string {
   if (PHIEN_BAN || !ready) return PHIEN_BAN;
@@ -526,6 +526,7 @@ interface BanQh { ma: string; ten: string; kho: KhoO; na: MatNa | null; khung: [
 // LỖ TRỐNG trong ranh (khoá "_lo", scripts/qh-pipeline/7-lo-trong-ranh.py, 11/10/2026): vùng trắng rộng > 300 m theo mọi hướng
 // không thể là lòng đường — vd Tây Nam để trống ~1.020 ha quanh Suối Tà Nia (chủ dự án mở DGN gốc xác nhận). Điểm trong lỗ
 // tính như NGOÀI ranh → "ngoài phạm vi" (trước: thửa 5 tờ 49 bị ghi 129 ha đất giao thông).
+// Khoá "_khop" (5g-dung-o-phan-khu.py) cũng là lỗ: mẩu VÙNG KHỚP NỐI với quy hoạch bên cạnh lọt vào trong ranh (QĐ2222 'Hatch_Khop').
 interface Ranh { r: Float64Array; x0: number; y0: number; x1: number; y1: number; lo?: Ranh[]; }
 let RANH_QH: Record<string, any> = {};
 try { RANH_QH = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'ranh_qh.json'), 'utf-8')); } catch { RANH_QH = {}; }
@@ -583,7 +584,7 @@ for (const b of [
       khung[0] = Math.min(khung[0], kho.bb[k * 4]); khung[1] = Math.min(khung[1], kho.bb[k * 4 + 1]);
       khung[2] = Math.max(khung[2], kho.bb[k * 4 + 2]); khung[3] = Math.max(khung[3], kho.bb[k * 4 + 3]);
     }
-    BAN_KHAC.push({ ma: b.ma, ten: b.ten, kho, na, khung, ranh: taoRanh(RANH_QH[b.ma], RANH_QH._lo?.[b.ma]) });
+    BAN_KHAC.push({ ma: b.ma, ten: b.ten, kho, na, khung, ranh: taoRanh(RANH_QH[b.ma], [...(RANH_QH._lo?.[b.ma] || []), ...(RANH_QH._khop?.[b.ma] || [])]) });
     console.log(`[qhCompute] nạp bản ${b.ma}: ${kho.n} ô đất${na ? ` + mặt nạ đường ${na.W}x${na.H} · ${soTrum} ô trùm` : ' (chưa có mặt nạ đường)'}`);
   } catch {
     console.log(`[qhCompute] chưa có ${b.tep} — bỏ qua bản ${b.ma}`);

@@ -220,5 +220,14 @@
    100.0,
    18
   ]
+ },
+ "mau_mot_ma_qd893": {
+  "_doc": "CHỈ dùng cho QĐ893, cho vùng tô KHÔNG ghi mã chữ bên trong (luật e của 5b). Đọc từ KHUNG CHÚ DẪN của chính bản vẽ (Level 56, 11/10/2026): mỗi dòng chú dẫn = ô màu mẫu + \"mã HT\" + mã loại đất. Màu nào trong chú dẫn CHỈ dùng cho ĐÚNG MỘT mã thì vùng tô màu đó là loại đất của mã đó — không phải đoán, cũng không lấy từ bản khác. Màu dùng chung nhiều mã (vàng #ffff7f = LUA/LUC/LUK/CNT, hồng #ff7f7f = 21 mã công cộng–dịch vụ–sản xuất, xanh lá #7fff7f = RSX/RDD/RSN, xanh nước #7fffff = NTS/SON/MNC/DTL/DCT, tím #a552a5 = SKS/DRA) thì vẫn chỉ ghi tên nhóm. Màu #dcdcdc là số liệu GDAL đọc ra (ezdxf bảng AutoCAD ra #cccccc).",
+  "#ffdf7f": "HNK",
+  "#ffbf7f": "CLN",
+  "#bfff00": "RPH",
+  "#dfff7f": "NKH",
+  "#dcdcdc": "NTD",
+  "#ffaaaa": "DPC"
  }
 }

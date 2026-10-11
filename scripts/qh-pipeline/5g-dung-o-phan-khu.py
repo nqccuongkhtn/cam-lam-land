@@ -41,6 +41,7 @@ def nap(ten, tep):
     sp = importlib.util.spec_from_file_location(ten, os.path.join(HERE, tep)); m = importlib.util.module_from_spec(sp); sp.loader.exec_module(m); return m
 b1 = nap('b1', '1b-doc-dxf.py'); b5 = nap('b5', '5-tao-qh-zones.py')
 BAC = {'HT': 1, 'DAT': 2}          # còn lại (QH2030 / QH2045 / QHDD) = 3 — nằm trên, như ảnh tile
+KHOP = re.compile(r'hatch_khop', re.I)   # level tô VÙNG KHỚP NỐI với quy hoạch bên cạnh — không phải loại đất (xem dưới)
 
 
 def chan_le(polys):
@@ -73,7 +74,7 @@ def main(vao, ma):
     RG = make_valid(Polygon(R[ma]))
     wgs = lambda g: transform(lambda x, y, z=None: tuple(zip(*[b1.vn2wgs(a, b) for a, b in zip(x, y)])), g)
     d = ezdxf.readfile(vao); msp = d.modelspace()
-    out = []; dem = {'vung': 0, 'co_lo': 0, 'ngoai_ranh': 0, 'loi': 0}
+    out = []; khop = []; dem = {'vung': 0, 'co_lo': 0, 'ngoai_ranh': 0, 'loi': 0}
     for e in msp:
         if e.dxftype() != 'HATCH': continue
         lv = e.dxf.get('layer', '') or ''
@@ -93,6 +94,13 @@ def main(vao, ma):
         W = make_valid(wgs(g))
         x0, y0, x1, y1 = W.bounds
         if not (b1.KHUNG[0] <= x0 and x1 <= b1.KHUNG[2] and b1.KHUNG[1] <= y0 and y1 <= b1.KHUNG[3]): continue
+        if KHOP.search(lv):
+            # VÙNG KHỚP NỐI (QĐ2222 'Hatch_Khop'): tô phần đất của quy hoạch BÊN CẠNH để đối chiếu — 99,7 % nằm ngoài ranh, phần lọt
+            # vào trong chỉ là mẩu dọc mép ranh. Không phải loại đất của bản này: không thành ô đất (trước đây web ghi "Hatch_Khop"),
+            # mà ghi vào ranh_qh.json["_khop"] để chỗ đó tính là NGOÀI PHẠM VI (không bị luật "khe trong ranh = đường" biến thành đường).
+            t = make_valid(W.intersection(RG))
+            khop += [p for p in (t.geoms if hasattr(t, 'geoms') else [t]) if isinstance(p, Polygon) and p.area * 1.21e10 >= 50]
+            continue
         if re.fullmatch(r'\s*\d+\s*', lv): loai, bac = b5.CHUA_RO, 0      # level chỉ là con số: bản vẽ không nói đất gì
         else: loai, bac = b5.ten_loai(lv), BAC.get(b1.nhom(lv), 3)
         for phan in (W.geoms if hasattr(W, 'geoms') else [W]):
@@ -109,8 +117,14 @@ def main(vao, ma):
                 out.append([round(mx0, 6), round(my0, 6), round(mx1, 6), round(my1, 6), r, loai, dt, bac])
     ra = os.path.join(DATA, 'qh_zones_%s.json' % ma)
     json.dump(out, io.open(ra, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
-    print('%s: %d vùng tô (%d có lỗ) → %d ô | bỏ %d phần nằm trọn ngoài ranh | %d vùng lỗi đọc'
-          % (ma, dem['vung'], dem['co_lo'], len(out), dem['ngoai_ranh'], dem['loi']))
+    # vùng khớp nối lọt trong ranh → lỗ của ranh (đọc lại file ranh rồi mới ghi, giữ nguyên các khoá khác như "_lo")
+    R = json.load(io.open(os.path.join(DATA, 'ranh_qh.json'), encoding='utf-8'))
+    R.setdefault('_khop', {})
+    if khop: R['_khop'][ma] = [[[round(x, 6), round(y, 6)] for x, y in m.exterior.coords] for p in khop for m in manh_khong_lo(p)]
+    else: R['_khop'].pop(ma, None)
+    json.dump(R, io.open(os.path.join(DATA, 'ranh_qh.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+    print('%s: %d vùng tô (%d có lỗ) → %d ô | bỏ %d phần nằm trọn ngoài ranh | %d vùng lỗi đọc | khớp nối trong ranh %.2f ha'
+          % (ma, dem['vung'], dem['co_lo'], len(out), dem['ngoai_ranh'], dem['loi'], sum(p.area for p in khop) * 1.21e10 / 1e4))
 
 
 if __name__ == '__main__':

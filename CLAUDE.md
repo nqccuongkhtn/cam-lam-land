@@ -529,6 +529,19 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   có mốc năm=3. Sau sửa: web khác bản vẽ 0,00–0,01 % (sai số lưới rải điểm), 79 phiếu giữ nguyên. Đổi bản vẽ / ranh thì chạy lại
   5g rồi `7-lo-trong-ranh.py` (vùng trắng > 300 m trong ranh = ngoài phạm vi, vd Na Tia ~1.020 ha của Tây Nam — chủ dự án mở DGN
   xác nhận trống thật). ⚠️ ẢNH TILE phân khu vẫn vẽ từ chuỗi cũ (1b) nên chỗ lỗ có thể còn sai màu — sửa ảnh phải gửi ảnh thử chờ duyệt.
+  Vùng tô 'Hatch_Khop' (QĐ2222) = VÙNG KHỚP NỐI với quy hoạch bên cạnh, không phải loại đất: 5g không cho thành ô, phần lọt trong
+  ranh ghi vào ranh_qh.json "_khop" = lỗ của ranh (ngoài phạm vi). QĐ918 'DAT_KXD_DulichRung_qh' (lô DLST-01, 31,97 ha, "Khu du lịch
+  sinh thái ven hồ Cam Ranh") KHÔNG có trong chú giải — giữ tên level, chờ chủ dự án xác nhận tên.
+- **QĐ893 DỰNG LẠI (11/10/2026), chuỗi mới: `1d-vung-to-893-chan-le.py` → `5b` → `5f`.** So toàn bản với bản vẽ (lưới 20 m khắp huyện)
+  96,6 % → 99,98 %. Đã sửa: (1) **khung chú dẫn Level 56 lọt vào dữ liệu** — 94 ô màu mẫu 11 ha, sơ đồ vị trí góc tây bắc, 2 ô 108 +
+  68 ha sát Cam Ranh = 336 ô 2.031 ha "đất" bịa đè lên đất thật Khánh Vĩnh / Cam Ranh (5b nay bỏ Level 56); (2) file vùng tô cũ dựng
+  bằng GDAL hiểu sai vùng tô có ĐẢO TRONG LỖ → 1d đọc bằng ezdxf từng hình (nhẹ RAM), chẵn–lẻ đủ vòng, có cả 532 hình SOLID; (3) màu
+  xanh nước #7fffff chú dẫn dùng chung cho NTS/SON/MNC/DTL/DCT → vùng ghi mã nhóm nước lấy theo mã (856 ha hồ chứa MNC từng ghi "sông
+  ngòi"); (4) màu chú dẫn chỉ dùng cho MỘT mã (bảng `mau_mot_ma_qd893`: xám = NTD, #ffbf7f = CLN, #ffdf7f = HNK, #bfff00 = RPH,
+  #dfff7f = NKH, #ffaaaa = DPC) → vùng không ghi mã gọi đúng tên mã; (5) "lọt trong ô có mã" phải PHỦ ≥ 95 % và CÙNG MÀU mới bỏ;
+  (6) xếp lớp như bản vẽ hiển thị: mọi ô ngang bậc, ô có vùng tô gốc nhỏ hơn nằm trên (diện tích xếp = vòng ngoài vùng tô gốc, không
+  phải mảnh). 79 phiếu: 9.315 → 9.269 m² (8 phiếu tốt lên, 4 phiếu đổi 0,1 m² do làm tròn cung). Còn để nguyên chờ chủ dự án: 714 vùng
+  xanh nước KHÔNG ghi mã (4.585 ha) đang gọi "Đất sông, ngòi, kênh, rạch" dù chú dẫn dùng màu này cho cả hồ / thuỷ lợi / ao nuôi.
 - Đã thử và BỎ: đáp án "giữa 2 nét mép đường -1-TRAFFIC-PAVEMENT trong 35 m = đường" — nét mép đường QĐ205 vẽ không đủ, đường
   rộng bị hụt. Dòng `CACH_O_GAN_M` trong nearestLand nay chạy thật (trước nằm sau return).
 Công cụ: scratchpad của phiên (audit*.ts quét thửa thật trong container, dap_an_all.py, ve_thua205.py vẽ thửa lên bản vẽ) — chưa

@@ -41,6 +41,12 @@ RA = os.path.join(GOC, 'apps', 'backend', 'data', 'qh_zones_893.json')
 BANG = json.load(io.open(os.path.join(HERE, 'ten-loai-dat.json'), encoding='utf-8'))
 MAU_893 = {k.lower(): v for k, v in BANG['mau_qd893'].items() if not k.startswith('_')}
 NHOM_MAU = {k.lower(): v[0] for k, v in BANG['nhom_mau_qd893'].items() if not k.startswith('_')}
+MAU_MOT_MA = {k.lower(): v for k, v in BANG.get('mau_mot_ma_qd893', {}).items() if not k.startswith('_')}
+MA_NUOC = ('MNC', 'SON', 'DTL', 'DCT', 'NTS')   # 5 mã chú dẫn tô CHUNG màu xanh nước #7fffff
+# XẾP LỚP NHƯ BẢN VẼ HIỂN THỊ (11/10/2026): mọi ô ngang bậc, ô có VÙNG TÔ GỐC nhỏ hơn nằm trên. Bản cũ: ô chỉ có màu bậc 0 (thua
+# cả ô có mã nằm DƯỚI nó — khối công cộng 35 ha 89411F mất 3 ha vào khu rừng phòng hộ 6.010 ha bên dưới) và xếp theo diện
+# tích MẢNH sau khi cắt lỗ (mảnh nhỏ của khu rừng lớn thắng khối nằm trên). Đặt QH893_THEO_BAN_VE=0 để chạy kiểu cũ (so sánh).
+THEO_BAN_VE = os.environ.get('QH893_THEO_BAN_VE', '1') == '1'
 
 # TÊN LOẠI ĐẤT — chép ĐÚNG chữ trong khung chú dẫn của bản vẽ QĐ893 (Level 56), không lấy tên từ nơi khác.
 TEN = {
@@ -111,6 +117,11 @@ def main(vao, tep_chu, tep_kh):
     d = json.load(io.open(vao, encoding='utf-8'))
     vung, mau = [], []
     for f in d['features']:
+        # Level 56 = phần TRÌNH BÀY của tờ bản vẽ, không phải đất (11/10/2026): 94 ô màu mẫu chú dẫn 11 ha/ô xếp cột ở mép tây,
+        # sơ đồ vị trí in góc tây bắc (nước 616 ha…), 2 ô 108 ha + 68 ha góc đông nam sát Cam Ranh. Trước đây lọt vào dữ liệu web
+        # thành 109 ô "đất" 1.385 ha nằm đè lên đất thật Khánh Vĩnh / Cam Ranh → thửa ở đó hiện dòng QĐ893 bịa hoàn toàn.
+        if ((f.get('properties') or {}).get('lo') or '') == 'Level 56':
+            continue
         try:
             g = shape(f['geometry'])
             if not g.is_valid:
@@ -164,8 +175,16 @@ def main(vao, tep_chu, tep_kh):
         qh[i] = [x for x in qh[i] if not trai_mau(x, m)]
 
     loai, bac, can_cu = [None] * len(vung), [0] * len(vung), collections.Counter()
+    chi_mau = [False] * len(vung)   # ô KHÔNG căn cứ chữ / ký hiệu, chỉ có màu (luật e, e')
     for i, m in enumerate(mau):
-        if m in MAU_893:
+        # a'. MÀU XANH NƯỚC mà bên trong ghi MÃ NHÓM NƯỚC → theo mã (11/10/2026). Chú dẫn bản vẽ dùng CHUNG màu #7fffff cho 5 mã
+        # NTS / SON / MNC / DTL / DCT, nên "màu nước = sông ngòi" là sai khi chính vùng đó ghi MNC: 4 vùng 856 ha hồ chứa, mặt nước
+        # chuyên dùng từng bị ghi "Đất sông, ngòi, kênh, rạch". Chỉ nhận mã thuộc nhóm nước — chữ ODT, RSX… của khối bên cạnh rơi
+        # vào dải sông vẫn bị bỏ qua như cũ (lý do luật a).
+        nuoc = [x for x in qh[i] if x in MA_NUOC] or [x for x in ht[i] if x in MA_NUOC]
+        if m in MAU_893 and MAU_893[m] != 'Đất giao thông' and nuoc:
+            loai[i], bac[i] = TEN[collections.Counter(nuoc).most_common(1)[0][0]], 2; can_cu["a'. màu nước + mã nhóm nước"] += 1
+        elif m in MAU_893:
             loai[i], bac[i] = MAU_893[m], 2; can_cu['a. màu đường/sông'] += 1
         elif qh[i]:
             ma = chon(qh[i], m)
@@ -175,22 +194,42 @@ def main(vao, tep_chu, tep_kh):
             loai[i], bac[i] = TEN[chon([x for x in kh[i] if hop_mau(x, m)], m)], 2; can_cu['c. ký hiệu công trình'] += 1
         elif [x for x in ht[i] if hop_mau(x, m)]:
             loai[i], bac[i] = TEN[chon([x for x in ht[i] if hop_mau(x, m)], m)], 2; can_cu['d. mã hiện trạng hợp màu'] += 1
+        elif m in MAU_MOT_MA:
+            # e'. màu mà KHUNG CHÚ DẪN chỉ dùng cho đúng MỘT mã (bảng mau_mot_ma_qd893) → tên của mã đó (vd xám = nghĩa trang,
+            # trước ghi "Loại đất khác"). Vẫn bậc 0 như luật e: thua ô có mã chữ khi chồng nhau.
+            loai[i], bac[i] = TEN[MAU_MOT_MA[m]], 0; chi_mau[i] = True; can_cu["e'. chỉ có màu — màu riêng một mã"] += 1
         else:
-            loai[i], bac[i] = NHOM_MAU.get(m, 'Loại đất khác'), 0; can_cu['e. chỉ có màu'] += 1
+            loai[i], bac[i] = NHOM_MAU.get(m, 'Loại đất khác'), 0; chi_mau[i] = True; can_cu['e. chỉ có màu'] += 1
     print('Căn cứ gán loại đất:', dict(sorted(can_cu.items())))
 
     # Vùng KHÔNG căn cứ nằm lọt hẳn trong vùng CÓ căn cứ (tính trên hình đủ lỗ) = nét chia nhỏ bên trong → bỏ,
     # không thì nó thắng vùng lớn (vùng nhỏ thắng) nhưng lại chỉ mang tên nhóm.
-    co = [i for i in range(len(vung)) if bac[i] > 0]
+    # ⚠️ CHỈ BỎ KHI CÙNG MÀU với vùng chứa nó (11/10/2026) — khác màu trong chú dẫn là khác mã, kể cả cùng nhóm.
+    # Khác màu là một LOẠI ĐẤT KHÁC vẽ đè lên — bản vẽ hiện
+    # rõ màu của nó: khối công cộng 3 ha giữa rừng phòng hộ (89411F), khối nông nghiệp 2,4 ha trong khu thương mại dịch vụ
+    # 18,4 ha (336D86) — bản cũ bỏ đi nên web ghi cả khối theo vùng bên ngoài. Giữ lại và cho NGANG BẬC (2) để "ô nhỏ nằm trên"
+    # như bản vẽ hiển thị.
+    co = [i for i in range(len(vung)) if not chi_mau[i]]
     tree_co = STRtree([vung[i] for i in co])
     bo = set()
     for i in range(len(vung)):
-        if bac[i] > 0:
+        if not chi_mau[i]:
             continue
         pt = vung[i].representative_point()
-        for j in tree_co.query(pt):
-            if vung[co[int(j)]].contains(pt):
-                bo.add(i); break
+        # "lọt hẳn" phải là PHỦ ≥ 95 % diện tích, không chỉ chứa một điểm: khối công cộng 35 ha 89411F giữa rừng phòng hộ có điểm
+        # đại diện rơi trúng một lô nhỏ có mã cùng màu bên trong → bản cũ bỏ cả 35 ha, web ghi rừng phòng hộ.
+        chua = [co[int(j)] for j in tree_co.query(pt) if vung[co[int(j)]].contains(pt)
+                and vung[co[int(j)]].intersection(vung[i]).area >= 0.95 * vung[i].area]
+        if not chua:
+            continue
+        j = min(chua, key=lambda k: vung[k].area)          # vùng có căn cứ NHỎ NHẤT chứa nó = vùng nó nằm ngay trên
+        if mau[i] == mau[j]:                                # cùng màu = nét chia nhỏ bên trong → bỏ như cũ
+            bo.add(i)
+        else:
+            bac[i] = 2; can_cu['giữ ô khác màu nằm trên ô có mã'] += 1
+    print('Giữ %d vùng khác màu nằm trên vùng có căn cứ' % can_cu['giữ ô khác màu nằm trên ô có mã'])
+    if THEO_BAN_VE:
+        bac = [2 if loai[i] is not None else b for i, b in enumerate(bac)]
 
     out, so_manh = [], 0
     for i, g in enumerate(vung):
@@ -201,7 +240,9 @@ def main(vao, tep_chu, tep_kh):
             if len(r) < 4:
                 continue
             x0, y0, x1, y1 = p.bounds
-            out.append([round(x0, 6), round(y0, 6), round(x1, 6), round(y1, 6), r, loai[i], p.area, bac[i]])
+            # diện tích dùng để xếp lớp: cả VÙNG TÔ GỐC (vòng ngoài) — cắt mảnh không được làm đổi thứ tự hiển thị
+            out.append([round(x0, 6), round(y0, 6), round(x1, 6), round(y1, 6), r, loai[i],
+                        Polygon(g.exterior).area if THEO_BAN_VE else p.area, bac[i]])
             so_manh += 1
     tmp = RA + '.tmp'
     with io.open(tmp, 'w', encoding='utf-8', newline='\n') as fo:

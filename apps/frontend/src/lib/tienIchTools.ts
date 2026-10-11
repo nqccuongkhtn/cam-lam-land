@@ -23,5 +23,5 @@ export const TIEN_ICH_TOOLS: HubTool[] = [
   { key: 'pdf', name: 'Chỉnh sửa PDF', desc: 'Sửa chữ, ghép/tách, chuyển đổi, OCR, ký PDF', icon: '📄', path: '/pdf' },
   // CÔNG CỤ NỘI BỘ: chỉ tài khoản được cấp quyền mới THẤY ô này (xem locTheoQuyen trong HubShell).
   { key: 'ma-xac-thuc', name: 'Mã xác thực 2 lớp', desc: 'Mã Google Authenticator của tài khoản dùng chung (nội bộ)', icon: '🔐', path: '/ma-xac-thuc', vaiTro: ['admin', 'xacthuc'] },
-  { key: 'tra-cuu-luat', name: 'Tra cứu & học Luật Đất đai', desc: 'Toàn văn luật + nghị định, tra theo chủ đề, ghim điều để học (nội bộ)', icon: '⚖️', path: '/tra-cuu-luat', vaiTro: ['admin'] },
+  { key: 'tra-cuu-luat', name: 'Tra cứu & học Luật Đất đai', desc: 'Toàn văn luật + nghị định, bộ tổng hợp văn bản, công văn tham khảo, tra theo chủ đề (nội bộ)', icon: '⚖️', path: '/tra-cuu-luat', vaiTro: ['admin'] },
 ];

@@ -63,9 +63,12 @@ def chu_cua_dieu(d):
 
 
 def lam(thu_muc):
-    duong = {os.path.splitext(os.path.basename(f))[0]: f
-             for f in glob.glob(os.path.join(thu_muc, '*.json'))
-             if not os.path.basename(f).startswith(('_', 'danh-muc', 'giai-thich', 'doi-chieu', 'so-do', 'tinh-huong'))}
+    # CHỈ lấy văn bản có tên trong _kho.json. Trước đây quét mọi tệp *.json trong thư mục rồi loại vài
+    # tên — thư mục có thêm lo-trinh.json, chuoi-doc.json, the-so.json, tu-ngu.json, the-tu-dong.json,
+    # bo-tong-hop.json (không có "soHieu") là chạy lại bị đổ ngay (KeyError). Đã sửa 11/10/2026.
+    kho_ds = json.load(open(os.path.join(thu_muc, '_kho.json'), encoding='utf-8'))
+    duong = {x['ma']: os.path.join(thu_muc, x['ma'] + '.json') for x in kho_ds
+             if os.path.exists(os.path.join(thu_muc, x['ma'] + '.json'))}
     kho = {ma: json.load(open(f, encoding='utf-8')) for ma, f in duong.items()}
     theo_so = {v['soHieu']: ma for ma, v in kho.items()}
     co_dieu = {ma: set(d['so'] for d in v['dieu']) for ma, v in kho.items()}

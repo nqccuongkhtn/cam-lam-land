@@ -456,6 +456,24 @@ export default function TraCuuLuatPage() {
   const [cuonToi, setCuonToi] = useState(0);
   // Bung / thu hai khung phụ trước nguyên văn (đợt 25): mặc định THU một dòng; người dùng bung một lần thì các điều sau cũng bung.
   const [moHuongDan, setMoHuongDan] = useState(false);
+  // NHẢY GIỮA CÁC CHỖ TÔ VÀNG trong điều đang đọc (đợt 30): đếm <mark> trong khung nội dung sau mỗi lần vẽ; nút nổi ‹ › cuộn tới từng chỗ.
+  // Vị trí đang đứng chỉ đặt lại khi đổi điều / đổi chữ tìm.
+  const [soMark, setSoMark] = useState(0);
+  const [viTriMark, setViTriMark] = useState(-1);
+  const khoaMark = `${maVb}:${chon}:${tim}`;
+  useEffect(() => { setViTriMark(-1); }, [khoaMark]);
+  useEffect(() => {
+    const n = oNoiDung.current?.querySelectorAll('mark').length || 0;
+    setSoMark((c) => (c === n ? c : n));   // chạy sau mỗi lần vẽ nhưng chỉ đổi state khi số chỗ khớp đổi → không vẽ lại vô hạn
+  });
+  const nhayMark = (buoc: number) => {
+    const ms = Array.from(oNoiDung.current?.querySelectorAll('mark') || []) as HTMLElement[];
+    if (!ms.length) return;
+    const i = viTriMark < 0 ? (buoc > 0 ? 0 : ms.length - 1) : ((viTriMark + buoc) % ms.length + ms.length) % ms.length;
+    ms[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    ms.forEach((m, j) => { m.style.outline = j === i ? '2px solid #0A2540' : ''; m.style.outlineOffset = j === i ? '1px' : ''; });
+    setViTriMark(i);
+  };
   const [moThamKhao, setMoThamKhao] = useState(false);
   const oTim = useRef<HTMLInputElement | null>(null);
   const daTai = useRef<Record<string, Promise<VanBan>>>({});
@@ -3477,6 +3495,17 @@ export default function TraCuuLuatPage() {
       {/* ── THANH ĐIỀU HƯỚNG DƯỚI ĐÁY — chỉ trên điện thoại ──
           Ngón cái với tới được, không phải với lên đỉnh màn hình. Đây là cách mọi app
           điện thoại làm, và là lý do bỏ hàng thẻ ở đầu trang đi. */}
+      {/* NÚT NỔI NHẢY CHỖ KHỚP (đợt 30) — chỉ khi đang tìm, đang đọc một điều có ≥ 2 chỗ tô vàng; nằm trên thanh thẻ ở điện thoại */}
+      {the === 'luat' && tim.trim() && dieuDangXem && soMark >= 2 && (
+        <div className="fixed right-3 z-40 flex items-center gap-1 rounded-full border border-amber-300 bg-white/95 px-2 py-1 text-[12px] shadow-md backdrop-blur lg:bottom-5"
+          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 66px)' }}>
+          <span className="px-1 font-semibold text-amber-800" title="Chỗ khớp chữ tìm trong điều đang đọc">🔦 {viTriMark >= 0 ? viTriMark + 1 : '–'}/{soMark}</span>
+          <button onClick={() => nhayMark(-1)} aria-label="Chỗ khớp trước"
+            className="h-7 w-7 rounded-full border border-slate-200 text-[14px] font-bold text-[#0A2540]">‹</button>
+          <button onClick={() => nhayMark(1)} aria-label="Chỗ khớp sau"
+            className="h-7 w-7 rounded-full border border-slate-200 text-[14px] font-bold text-[#0A2540]">›</button>
+        </div>
+      )}
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur lg:hidden"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <div className="mx-auto flex max-w-lg">

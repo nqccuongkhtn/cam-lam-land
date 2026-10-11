@@ -180,6 +180,33 @@ là 903 ha; ngoài khu lõi Cam Đức (nơi web áp luật này) còn 325,5 ha 
 
 ⇒ Khoảng trắng rộng của QĐ205 là **đường lớn thật** (đại lộ, hành lang cao tốc, nút giao) — luật hiện tại đúng, **không đổi gì**.
 
+## I. ĐÃ SỬA: VÙNG "TRẮNG TRƠN" TRONG 7 BẢN PHÂN KHU KHÔNG CÒN BỊ GHI LÀ ĐƯỜNG (anh xem ảnh, sai thì báo — gỡ được ngay)
+
+Bản phân khu để trắng lòng đường nên web tính "trong ranh mà không tô = đường". Soi kỹ (11/10/2026 tối) thấy có chỗ bản vẽ để trắng mà
+**không phải đường**: không ô đất, **không một nét vẽ nào** (đã gộp cả file nét gốc lẫn file DXF), rộng hơn 60 m. Đường thật thì luôn có
+nét mép / tim / chỉ giới chạy trong lòng — đã soi các hành lang QL1A, đường sắt rộng ~100 m của QĐ918 và Tây Bắc: vẫn có nét, nên không bị
+đụng tới. Cả 7 bản chỉ có **10 vùng (~20 ha)** như vậy; nay web ghi "Nằm ngoài phạm vi bản quy hoạch này" (giống cách đã làm với vùng
+Na Tia ~1.020 ha mà anh đã xác nhận trống trên DGN). **79 phiếu: kết quả giữ nguyên từng con số; thửa 70 tờ 25: giữ nguyên.**
+
+| Bản | Vùng | Toạ độ (vĩ độ, kinh độ) | Bản vẽ ở đó | QĐ893 ghi | Ảnh (`bao-cao-qh/`) |
+|---|---|---|---|---|---|
+| Tây Nam | 3,34 ha | 12.068994, 109.008319 | dải hở giữa vùng tô rừng và ranh | rừng đặc dụng | `trang-tron-taynam-1.png` |
+| Tây Nam | 3,18 ha | 12.056975, 109.062932 | dải hở giữa vùng tô rừng và ranh | rừng sản xuất | `trang-tron-taynam-2.png` |
+| Tây Nam | 2,21 ha | 12.054828, 109.070102 | dải hở sát ranh | rừng sản xuất | `trang-tron-taynam-3.png` |
+| Tây Nam | 1,37 ha | 11.990363, 109.067142 | khe hình chữ V giữa hai vùng tô rừng | rừng sản xuất | `trang-tron-taynam-4.png` |
+| Tây Bắc | 2,98 ha | 12.151849, 109.062596 | dải hở giữa hành lang QL1A và ranh | cây lâu năm, KCN | `trang-tron-taybac-2.png` |
+| Tây Bắc | 2,51 ha | 12.147631, 109.064681 | như trên | khu công nghiệp | `trang-tron-taybac-3.png` |
+| QĐ2222 | 1,32 ha | 12.084782, 109.190564 | ô chữ nhật trắng giữa 3 vùng tô | văn hoá + đường | `trang-tron-2222-1.png` |
+| QĐ2222 | 0,81 ha | 12.120180, 109.207271 | trắng trơn | công cộng | `trang-tron-2222-2.png` |
+| QĐ2222 | 0,46 ha | 12.084536, 109.189476 | trắng trơn | văn hoá + đường | `trang-tron-2222-3.png` |
+| QĐ2076 | 0,62 ha | 12.141588, 109.092235 | trắng trơn (có thể là đảo giữa nút giao) | đường | `trang-tron-2076-1.png` |
+
+Ví dụ thửa đổi: **thửa 14 tờ 5 Suối Tân** (rừng đặc dụng 22,75 ha) — trước Tây Nam ghi 22.088 m² "đất giao thông", nay không còn dòng
+Tây Nam (cả thửa ngoài phạm vi thật sự của bản vẽ). Thửa 339 tờ 18 Sơn Tân: đường 31.692 → 5.282 m² (phần còn lại là khe hẹp < 60 m —
+xem mục G). **Hai vùng anh nên xem kỹ:** QĐ2222 1,32 ha (ô chữ nhật trắng — nếu trên bản vẽ đó là quảng trường thuộc đường thì báo tôi
+trả lại) và QĐ2076 0,62 ha (QĐ893 ghi đường — có thể là đảo giữa nút giao). Gỡ: xoá vùng đó trong khoá `_lo` của
+`apps/backend/data/ranh_qh.json`, hoặc chạy lại `scripts/qh-pipeline/7-lo-trong-ranh.py` sau khi sửa luật.
+
 ## D. CẦN ANH XÁC NHẬN TRÊN MICROSTATION
 
 - **Thửa 95 tờ 15 Xã Cam Lâm, QĐ205 — mảnh giao thông số 2** (104,57 m², dải rộng ~1,4 m giữa vùng hồ và vùng cây xanh, ảnh

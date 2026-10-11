@@ -552,7 +552,9 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   ngang hàng → QĐ2076 ~250 ha ghi "Nhóm nhà ở thấp tầng" thay vì "Đơn vị ở…". Nay: tô chẵn–lẻ, cắt theo ranh, bậc HT=1 · DAT=2 ·
   có mốc năm=3. Sau sửa: web khác bản vẽ 0,00–0,01 % (sai số lưới rải điểm), 79 phiếu giữ nguyên. Đổi bản vẽ / ranh thì chạy lại
   5g rồi `7-lo-trong-ranh.py` (vùng trắng > 300 m trong ranh = ngoài phạm vi, vd Na Tia ~1.020 ha của Tây Nam — chủ dự án mở DGN
-  xác nhận trống thật). ⚠️ ẢNH TILE phân khu vẫn vẽ từ chuỗi cũ (1b) nên chỗ lỗ có thể còn sai màu — sửa ảnh phải gửi ảnh thử chờ duyệt.
+  xác nhận trống thật; thêm lượt 2: vùng "TRẮNG TRƠN" > 60 m không ô đất, không một nét vẽ nào trong file nét
+  `quyhoach2025/qd<ma>_net.geojson` lẫn DXF → 10 vùng ~20 ha, Tây Nam 4 vùng rừng — cần cả hai file, thiếu thì bỏ lượt 2 bản đó).
+  `qhPhienBan()` băm cả `ranh_qh.json` nên sửa ranh / lỗ là bảng nhớ `qh_luu` tự tính lại. ⚠️ ẢNH TILE phân khu vẫn vẽ từ chuỗi cũ (1b) nên chỗ lỗ có thể còn sai màu — sửa ảnh phải gửi ảnh thử chờ duyệt.
   Vùng tô 'Hatch_Khop' (QĐ2222) = VÙNG KHỚP NỐI với quy hoạch bên cạnh, không phải loại đất: 5g không cho thành ô, phần lọt trong
   ranh ghi vào ranh_qh.json "_khop" = lỗ của ranh (ngoài phạm vi). QĐ918 'DAT_KXD_DulichRung_qh' (lô DLST-01, 31,97 ha, "Khu du lịch
   sinh thái ven hồ Cam Ranh") KHÔNG có trong chú giải — giữ tên level, chờ chủ dự án xác nhận tên.

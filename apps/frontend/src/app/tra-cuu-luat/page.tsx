@@ -854,7 +854,7 @@ export default function TraCuuLuatPage() {
               </p>
               {z.canh && z.luuY && (
                 <p className="mt-1 rounded-md border border-rose-300 bg-rose-50 px-1.5 py-1 text-[11.5px] font-semibold leading-snug text-rose-800">
-                  ⚠️ Cần kiểm hiệu lực: {z.luuY}
+                  ❓ Cần kiểm hiệu lực: {z.luuY}
                 </p>
               )}
               {trich && (
@@ -1792,7 +1792,10 @@ export default function TraCuuLuatPage() {
                       {!dangLoc && goiY.length > 0 && (
                         <p className="mt-1 text-[11.5px] leading-snug text-slate-500">
                           ➕ Nên bổ sung: {goiY.map((r) => r.soHieu).join(' · ')}{' '}
-                          <button onClick={() => setMoNen(true)} className="font-semibold text-slate-600 underline">vì sao</button>
+                          <button onClick={() => {
+                            setMoNen(true);
+                            setTimeout(() => document.getElementById('nen-bo-sung')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+                          }} className="font-semibold text-slate-600 underline">vì sao</button>
                         </p>
                       )}
                     </section>
@@ -1803,7 +1806,7 @@ export default function TraCuuLuatPage() {
                     văn bản đang làm THAY ĐỔI HIỆU LỰC của điều có trong kho: nạp vào là các script tự đánh
                     dấu đúng, khỏi phải trông vào lời của công văn. */}
                 {!dangLoc && bth.nenBoSung.length > 0 && (
-                  <div className="mt-3 rounded-xl border border-dashed border-slate-300 bg-white">
+                  <div id="nen-bo-sung" className="mt-3 scroll-mt-2 rounded-xl border border-dashed border-slate-300 bg-white">
                     <button onClick={() => setMoNen((v) => !v)} className="flex w-full items-center justify-between px-2.5 py-2 text-left">
                       <span className="text-[13px] font-bold text-[#0A2540]">➕ Văn bản nên bổ sung vào kho ({bth.nenBoSung.length})</span>
                       <span className="text-[12px] text-slate-400">{moNen ? '▾' : '▸'}</span>

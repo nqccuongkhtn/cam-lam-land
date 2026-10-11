@@ -408,6 +408,8 @@ export default function TraCuuLuatPage() {
   const [tkTruoc, setTkTruoc] = useState<string | null>(null);
   const daTaiTk = useRef<Record<string, Promise<VbThamKhao>>>({});
   const oNoiDung = useRef<HTMLDivElement | null>(null);
+  // Cuộn tới điều vừa mở SAU KHI trang vẽ xong (đợt 23, 12/10/2026) — moDieu chỉ tăng số này, việc cuộn để effect bên dưới làm.
+  const [cuonToi, setCuonToi] = useState(0);
   const oTim = useRef<HTMLInputElement | null>(null);
   const daTai = useRef<Record<string, Promise<VanBan>>>({});
 
@@ -1066,8 +1068,15 @@ export default function TraCuuLuatPage() {
     setDocTk(null); setTkTruoc(null);       // mở hẳn một điều thì đóng ngăn đọc công văn
     setXemPhuLuc(false); setChon(so); setThe('luat');
     setMoDs(false);        // điện thoại: chọn xong thì thu danh sách, nhường màn hình cho nội dung
-    oNoiDung.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setCuonToi((n) => n + 1);   // cuộn tới điều SAU khi vẽ xong (xem effect cuonToi)
   };
+  // Cuộn ngay lúc bấm thì điều chưa kịp hiện, danh sách chưa kịp thu → chỗ dừng lệch hẳn (mở bằng đường dẫn: trang đứng yên ở đầu).
+  // Chờ một nhịp vẽ rồi mới cuộn; khung nội dung có scroll-mt để không bị ô tìm dính trên đầu che mất tiêu đề điều.
+  useEffect(() => {
+    if (!cuonToi) return;
+    const t = window.requestAnimationFrame(() => oNoiDung.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    return () => window.cancelAnimationFrame(t);
+  }, [cuonToi]);
   // ĐƯỜNG DẪN TỚI TỪNG ĐIỀU (đợt 14, 11/10/2026): /tra-cuu-luat?vb=ldd2024&d=78&k=2 mở thẳng Điều 78 khoản 2 — lưu dấu trang, gửi
   // cho đồng nghiệp (người nhận vẫn phải đăng nhập, có quyền mới xem được). Đổi điều đang đọc thì đường dẫn trên thanh địa chỉ đổi
   // theo (thay tại chỗ, không chồng thêm lịch sử).
@@ -2796,7 +2805,7 @@ export default function TraCuuLuatPage() {
           </div>
 
           {/* ── CỘT PHẢI: nguyên văn điều đang chọn ── */}
-          <div ref={oNoiDung} className="rounded-xl border border-slate-200 bg-white p-4">
+          <div ref={oNoiDung} className="scroll-mt-20 rounded-xl border border-slate-200 bg-white p-4">
             {xemPhuLuc && vb.phuLuc ? (
               <article>
                 <h2 className="text-[17px] font-extrabold text-[#0A2540]">📎 Phụ lục — {vb.soHieu}</h2>

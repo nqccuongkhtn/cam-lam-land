@@ -584,7 +584,7 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   2,5 m giao cho ô cạnh; bản thử "khe ≥ 3 m" cũng bỏ vì dư 1,3 m² ở mép cong); (2) trong khung mặt nạ (ảnh điểm 1,8 m, răng cưa): chỗ
   trắng SÁT MÉP ô đã tô (< 2 m, `SAT_MEP_205`) = đường; mặt nạ chỉ quyết phần trắng sâu trong khối không tô; (3) TẮT gộp "mẩu lẻ sát mép
   thửa < 1,5 m" (chủ dự án cần đúng 100 % như bản vẽ; bật lại bằng QH205_GOP_MEP=1). 2.000 thửa ngẫu nhiên: lệch so với gpkg 2,84 % →
-  0,00 % (12 m², không thửa nào lệch quá 0,3 m² — toạ độ 8 số lẻ; 6 số lẻ lệch tới 1,3 m², 7 số lẻ 0,45 m²); thửa 326 = 1.218,0 hỗn hợp + 469,0 đường (gpkg 1.217,9 + 469,1; app tham chiếu
+  0,00 % (12 m², không thửa nào lệch quá 0,3 m² — toạ độ 8 số lẻ; 6 số lẻ lệch tới 1,3 m², 7 số lẻ 0,45 m²); thửa 326 = 1.218,3 hỗn hợp + 468,7 đường (12/10: cắt hình thẳng trên ô đất ra đúng 1.218,32 + 468,68 — số 1.218,0 + 469,0 ghi hôm 11/10 là số cũ; gpkg 1.217,9 + 469,1; app tham chiếu
   1.218,7 + 468,3).
   **THỬA MỐC 70 TỜ 25 CAM ĐỨC — số ĐÚNG THEO BẢN VẼ (đo phẳng VN-2000 như MicroStation, 11/10/2026):** QĐ205 = 395,2 đơn vị ở +
   116,7 đường; QĐ893 = 395,09 đất ở đô thị + 116,80 đường; QĐ2101 = 395,09 nhóm nhà ở + 116,80 đường. Số mốc cũ 395,5 + 116,4 là do

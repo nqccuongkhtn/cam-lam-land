@@ -405,6 +405,7 @@ export default function TraCuuLuatPage() {
   const [tkTruoc, setTkTruoc] = useState<string | null>(null);
   const daTaiTk = useRef<Record<string, Promise<VbThamKhao>>>({});
   const oNoiDung = useRef<HTMLDivElement | null>(null);
+  const oTim = useRef<HTMLInputElement | null>(null);
   const daTai = useRef<Record<string, Promise<VanBan>>>({});
 
   const vb = cacVb[maVb] || null;
@@ -986,6 +987,24 @@ export default function TraCuuLuatPage() {
       if (moi !== window.location.pathname + window.location.search + window.location.hash) window.history.replaceState(window.history.state, '', moi);
     } catch { /* */ }
   }, [maVb, chon, khoanSang]);
+  // PHÍM TẮT MÁY TÍNH (đợt 15, 11/10/2026): "/" hoặc Ctrl+K → vào ô tìm; ← / → → điều trước / sau của văn bản đang đọc. Bỏ qua khi
+  // con trỏ đang ở ô gõ chữ / ô chọn (để gõ chữ, chọn văn bản bình thường) hay đang giữ phím Alt (Alt+← là "quay lại" của trình duyệt).
+  useEffect(() => {
+    const nghe = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null;
+      const dangGo = !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable);
+      if ((e.key === 'k' || e.key === 'K') && (e.ctrlKey || e.metaKey)) { e.preventDefault(); oTim.current?.focus(); oTim.current?.select(); return; }
+      if (dangGo || e.altKey || e.ctrlKey || e.metaKey) return;
+      if (e.key === '/') { e.preventDefault(); oTim.current?.focus(); oTim.current?.select(); return; }
+      if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && the === 'luat' && vb && chon != null) {
+        const i = vb.dieu.findIndex((d) => d.so === chon);
+        const j = e.key === 'ArrowLeft' ? i - 1 : i + 1;
+        if (i >= 0 && j >= 0 && j < vb.dieu.length) { e.preventDefault(); moDieu(vb.ma, vb.dieu[j].so); }
+      }
+    };
+    window.addEventListener('keydown', nghe);
+    return () => window.removeEventListener('keydown', nghe);
+  });
   // Đang ở thẻ nào thì mở kiểu đó: ở "Toàn văn" thì nhảy tới điều luôn; ở sơ đồ, tình
   // huống, thẻ học thì mở NGĂN BÊN để không mất chỗ đang xem.
   const moDieuHopLy = (ma: string, so: number) => {
@@ -2416,11 +2435,15 @@ export default function TraCuuLuatPage() {
       <div className="sticky top-0 z-10 -mx-3 mt-3 bg-white/95 px-3 py-2 backdrop-blur sm:mx-0 sm:px-0">
         <div className="flex items-center gap-2 rounded-xl border-2 border-slate-200 px-3 py-2 focus-within:border-[#0A2540]">
           <span className="text-slate-400">🔍</span>
-          <input value={tim} onChange={(e) => setTim(e.target.value)} enterKeyHint="search"
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.nativeEvent.isComposing && ketQua.length) { e.preventDefault(); moDieu(ketQua[0].ma, ketQua[0].d.so, khoanKhop(ketQua[0].ma, ketQua[0].d.so)); (e.target as HTMLInputElement).blur(); } }}
+          <input ref={oTim} value={tim} onChange={(e) => setTim(e.target.value)} enterKeyHint="search"
+            onKeyDown={(e) => {
+              if (e.key === 'Escape' && tim) { e.preventDefault(); setTim(''); return; }
+              if (e.key === 'Enter' && !e.nativeEvent.isComposing && ketQua.length) { e.preventDefault(); moDieu(ketQua[0].ma, ketQua[0].d.so, khoanKhop(ketQua[0].ma, ketQua[0].d.so)); (e.target as HTMLInputElement).blur(); }
+            }}
             placeholder="Từ khoá, hoặc số điều (vd 45, đ45 k2)…" title="Gõ rồi Enter để mở điều đầu tiên"
             className="w-full bg-transparent text-[15px] outline-none" />
           {tim && <button onClick={() => setTim('')} className="text-slate-400 hover:text-slate-700">✕</button>}
+          {!tim && <kbd className="hidden shrink-0 rounded border border-slate-200 bg-slate-50 px-1.5 text-[11px] text-slate-400 lg:inline" title="Bấm / hoặc Ctrl+K ở bất cứ đâu để vào ô tìm">/</kbd>}
         </div>
         {/* MỘT HÀNG NÚT NHỎ, không xuống dòng lung tung. 14 chủ đề nhanh giấu sau nút
             "Chủ đề" — bấm mới xổ ra, nhìn đỡ rối hẳn. */}

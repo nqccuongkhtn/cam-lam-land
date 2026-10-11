@@ -16,6 +16,8 @@ tilesRouter.get('/:z/:x/:y', async (req, res) => {
   const { z, x } = req.params;
   const y = (req.params.y || '').replace(/\.(png|jpg|jpeg)$/i, '');
   if (![z, x, y].every((v) => /^\d+$/.test(v))) return res.status(400).end();
+  // Số ô phải nằm trong lưới thật của mức phóng đó — số bậy thì trả lỗi ngay, khỏi hỏi Google rồi ESRI vô ích.
+  if (Number(z) > 22 || Number(x) >= 2 ** Number(z) || Number(y) >= 2 ** Number(z)) return res.status(400).end();
   const ref = String(req.query.l) === 'ref';
   const sub = (Number(x) + Number(y)) % 4;
   const google = `https://mt${sub}.google.com/vt/lyrs=${ref ? 'h' : 's'}&x=${x}&y=${y}&z=${z}`;

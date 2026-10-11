@@ -89,7 +89,11 @@ app.use(express.json({ limit: '5mb' }));
 // PROXY TILE ẢNH VỆ TINH — đặt TRƯỚC rate-limit toàn cục (1 phiên bản đồ tải rất nhiều tile, không được tính vào giới hạn).
 app.use('/api', ghiTraCuu);   // sổ thiết bị: giữ 10 lần tra cứu gần nhất / tài khoản (lib/thietBi.ts)
 app.use('/api', ghiHoatDong); // THEO DÕI TÀI KHOẢN (tạm — dễ gỡ): đặt TRƯỚC /api/dc để ghi được cả tra số tờ/thửa; chỉ ghi tài khoản trong danh sách
-app.use('/api/tiles', tilesRouter);
+// Ô ảnh vệ tinh không tính vào giới hạn chung (1 video tải vài trăm ô) nhưng vẫn phải có TRẦN riêng (11/10/2026):
+// đường này công khai, không cần đăng nhập → trước đây ai cũng dùng máy chủ nhà làm "trạm trung chuyển" ảnh Google
+// không giới hạn (tốn mạng nhà, Google có thể chặn IP của web). 6.000 ô / 10 phút / máy ≈ 10 ô mỗi giây liên tục —
+// quay video thật không bao giờ chạm tới (ô đã tải còn được nginx giữ lại, không hỏi lại máy chủ).
+app.use('/api/tiles', rateLimit({ windowMs: 10 * 60 * 1000, max: 6000, key: 'tiles', message: 'Tải ảnh bản đồ quá nhanh. Vui lòng đợi ít phút rồi thử lại.' }), tilesRouter);
 // BẢN ĐỒ ĐỊA CHÍNH — cũng đặt TRƯỚC giới hạn toàn cục vì một phiên xem bản đồ tải rất nhiều ô.
 // Đường này TỰ CÓ bộ khoá chống cào riêng bên trong (vé xem + hạn mức + đo độ phủ),
 // chặt hơn giới hạn toàn cục rất nhiều nên không cần cộng dồn vào đó.
@@ -100,6 +104,19 @@ app.use('/api/dc', rateLimit({ windowMs: 60 * 1000, max: 90, key: 'dc-hoi',
   message: 'Bạn tra cứu quá nhanh. Vui lòng chậm lại một chút.' }), diaChinhRouter);
 // Chống lụt yêu cầu toàn cục (rộng rãi, không cản người dùng thật).
 app.use('/api', rateLimit({ windowMs: 60 * 1000, max: Number(process.env.RATE_LIMIT_GLOBAL) || 600, key: 'global' })); // đặt RATE_LIMIT_GLOBAL cao khi ĐO TẢI
+// ── GIỚI HẠN RIÊNG CHO CÁC ĐƯỜNG GHI DỮ LIỆU (11/10/2026 — rà soát bảo mật) ──
+// Trước đây chỉ có mức chung 600 lần/phút: một máy có thể nhồi 600 khách "gửi bán" rác mỗi phút vào trang quản trị,
+// 600 lượt tải ảnh/phút (mỗi lượt tới 15 ảnh × 8 MB, cất THẲNG trong database — ổ C đang gần đầy), hay spam nhóm chat
+// cộng đồng (mỗi tin là một thông báo đẩy tới MỌI người). Các mức dưới đây rộng rãi với người dùng thật.
+// Chỉ đếm lượt GỬI (POST) — xem/tải về không bị tính.
+const chiDemGui = (req: any) => req.method !== 'POST';
+app.use('/api/images', rateLimit({ windowMs: 10 * 60 * 1000, max: 60, key: 'taianh', skip: chiDemGui, message: 'Bạn tải ảnh lên quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }));
+app.use('/api/track', rateLimit({ windowMs: 60 * 1000, max: 120, key: 'track', skip: chiDemGui, message: 'Quá nhiều yêu cầu.' }));
+app.use('/api/consignments', rateLimit({ windowMs: 10 * 60 * 1000, max: 20, key: 'kygui', skip: chiDemGui, message: 'Bạn gửi thông tin quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }));
+app.use('/api/invest', rateLimit({ windowMs: 10 * 60 * 1000, max: 20, key: 'dautu', skip: chiDemGui, message: 'Bạn gửi thông tin quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }));
+app.use('/api/newsletter', rateLimit({ windowMs: 10 * 60 * 1000, max: 20, key: 'nhantin', skip: chiDemGui, message: 'Bạn đăng ký quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }));
+app.use('/api/game/score', rateLimit({ windowMs: 10 * 60 * 1000, max: 120, key: 'game', skip: chiDemGui, message: 'Bạn gửi điểm quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }));
+app.use('/api/chat/messages', rateLimit({ windowMs: 60 * 1000, max: 30, key: 'chatgui', skip: chiDemGui, message: 'Bạn nhắn quá nhanh. Vui lòng chậm lại một chút.' }));
 app.use('/api/theo-doi', theoDoiRouter);   // báo cáo cho admin (THEO DÕI TÀI KHOẢN — tạm, dễ gỡ)
 
 // /api/ping — siêu nhẹ cho uptime monitor (KHÔNG đụng DB, trả 200 tức thì).

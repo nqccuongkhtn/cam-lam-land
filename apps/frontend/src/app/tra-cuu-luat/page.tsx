@@ -740,26 +740,39 @@ export default function TraCuuLuatPage() {
   }, [khoanSang, dieuDangXem]);
   // TRÍCH ĐOẠN quanh chữ khớp cho từng kết quả tìm (tối đa 80 kết quả đầu) — nhìn là biết điều nào đúng ý, khỏi mở từng điều.
   // Chữ đã bỏ dấu và chữ gốc (dạng NFC) dài bằng nhau từng ký tự nên dùng chung vị trí cắt.
+  // Đợt 5 (11/10/2026): trước lấy đoạn ĐẦU TIÊN có từ đầu tiên ("quốc phòng thu hồi" → trích chỗ có mỗi chữ "quốc"). Nay chấm điểm
+  // từng khoản / điểm: có nguyên cụm là nhất, rồi tới đoạn có NHIỀU TIẾNG KHÁC NHAU nhất; cửa sổ trích nới ra để phủ thêm các chữ
+  // khớp gần nhau, cắt ở chỗ cách chữ (không cụt giữa tiếng), tô vàng MỌI tiếng khớp. Nhớ luôn khoản đó để bấm vào là cuộn tới.
   const trichDoan = useMemo(() => {
-    const ra = new Map<string, { truoc: string; khop: string; sau: string }>();
+    const ra = new Map<string, { chu: string; khoan?: number }>();
     const q = kd(tim.trim());
     if (q.length < 2 || docSoDieu(q)) return ra;
     const bk = boKhop(tim);
-    const cacRe = [bk.reCum, ...bk.reTu.filter((_, i) => bk.tu[i].length >= 2)];
+    const cacTu = bk.reTu.filter((_, i) => bk.tu[i].length >= 2);
+    const viTri = (m: RegExpExecArray) => m.index + (m[0].length - m[1].length);   // bỏ ký tự ranh giới đứng trước
     for (const x of ketQua.slice(0, 80)) {
-      const cacChu = x.d.khoan.flatMap((k) => [k.chu, ...k.diem.map((z) => z.chu)]);
-      tim1: for (const re of cacRe) for (const chu0 of cacChu) {
-        const chu = (chu0 || '').normalize('NFC');
-        const m = re.exec(bk.dau ? thuongDau(chu) : kd(chu));
-        if (!m) continue;
-        const i = m.index + (m[0].length - m[1].length), n = m[1].length;   // bỏ ký tự ranh giới đứng trước
-        const a = Math.max(0, i - 45), b = Math.min(chu.length, i + n + 75);
-        ra.set(x.ma + ':' + x.d.so, { truoc: (a > 0 ? '…' : '') + chu.slice(a, i), khop: chu.slice(i, i + n), sau: chu.slice(i + n, b) + (b < chu.length ? '…' : '') });
-        break tim1;
+      let tot: { chu: string; so: number; diem: number; vt: number[] } | null = null;
+      for (const k of x.d.khoan) for (const chu0 of [k.chu, ...k.diem.map((z) => z.chu)]) {
+        const chu = (chu0 || '').normalize('NFC'), so = bk.dau ? thuongDau(chu) : kd(chu);
+        const vt: number[] = []; let diem = 0;
+        const mc = bk.reCum.exec(so);
+        if (mc) { diem = 100; vt.push(viTri(mc)); }
+        for (const re of cacTu) { const m = re.exec(so); if (m) { diem++; vt.push(viTri(m)); } }
+        if (diem && (!tot || diem > tot.diem)) tot = { chu, so: k.so, diem, vt };
       }
+      if (!tot) continue;
+      const chu = tot.chu, vt = tot.vt.sort((m, n) => m - n), dau = vt[0];
+      let cuoi = dau;
+      for (const v of vt) if (v - dau <= 150) cuoi = v;
+      let a = Math.max(0, dau - 45), b = Math.min(chu.length, cuoi + 90);
+      if (a > 0) { const c = chu.indexOf(' ', a); if (c > 0 && c < dau) a = c + 1; }
+      if (b < chu.length) { const c = chu.lastIndexOf(' ', b); if (c > cuoi) b = c; }
+      ra.set(x.ma + ':' + x.d.so, { chu: (a > 0 ? '…' : '') + chu.slice(a, b) + (b < chu.length ? '…' : ''), khoan: tot.so || undefined });
     }
     return ra;
   }, [ketQua, tim]);
+  // Mở kết quả thì cuộn tới khoản nào: gõ số ("75.2") thì theo số; gõ chữ thì tới khoản có trích đoạn.
+  const khoanKhop = (ma: string, so: number) => docSoDieu(kd(tim.trim()))?.khoan ?? trichDoan.get(ma + ':' + so)?.khoan;
 
   // Tra nhanh một văn bản trong bộ tổng hợp theo mã.
   const vbBth = useMemo<Record<string, VbBth>>(
@@ -2166,7 +2179,7 @@ export default function TraCuuLuatPage() {
         <div className="flex items-center gap-2 rounded-xl border-2 border-slate-200 px-3 py-2 focus-within:border-[#0A2540]">
           <span className="text-slate-400">🔍</span>
           <input value={tim} onChange={(e) => setTim(e.target.value)} enterKeyHint="search"
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.nativeEvent.isComposing && ketQua.length) { e.preventDefault(); moDieu(ketQua[0].ma, ketQua[0].d.so, docSoDieu(kd(tim.trim()))?.khoan); (e.target as HTMLInputElement).blur(); } }}
+            onKeyDown={(e) => { if (e.key === 'Enter' && !e.nativeEvent.isComposing && ketQua.length) { e.preventDefault(); moDieu(ketQua[0].ma, ketQua[0].d.so, khoanKhop(ketQua[0].ma, ketQua[0].d.so)); (e.target as HTMLInputElement).blur(); } }}
             placeholder="Từ khoá, hoặc số điều (vd 45, đ45 k2)…" title="Gõ rồi Enter để mở điều đầu tiên"
             className="w-full bg-transparent text-[15px] outline-none" />
           {tim && <button onClick={() => setTim('')} className="text-slate-400 hover:text-slate-700">✕</button>}
@@ -2266,7 +2279,7 @@ export default function TraCuuLuatPage() {
                     )}
                   </div>
                 : ketQua.map((x) => (
-                  <button key={x.ma + ':' + x.d.so} onClick={() => moDieu(x.ma, x.d.so, docSoDieu(kd(tim.trim()))?.khoan)}
+                  <button key={x.ma + ':' + x.d.so} onClick={() => moDieu(x.ma, x.d.so, khoanKhop(x.ma, x.d.so))}
                     className={`block w-full border-b border-slate-100 px-3 py-2 text-left hover:bg-slate-50 ${x.ma === maVb && chon === x.d.so ? 'bg-[#0A2540]/[0.05]' : ''}`}>
                     <span className={`block text-[13px] font-bold ${x.d.tinhTrang?.loai === 'het-hieu-luc' ? 'text-slate-400 line-through decoration-rose-300' : 'text-[#0A2540]'}`}>
                       {ghim.includes(khoaGhim(x.ma, x.d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(x.ma, x.d.so)] ? '💡 ' : ''}{canKiem(x.ma, x.d.so) ? '❓ ' : ''}{dauTinhTrang(x.d)}Điều {x.d.so}. {x.d.tieuDe}
@@ -2279,7 +2292,7 @@ export default function TraCuuLuatPage() {
                       const td = trichDoan.get(x.ma + ':' + x.d.so);
                       return td ? (
                         <span className="mt-0.5 block text-[11.5px] leading-snug text-slate-500">
-                          {td.truoc}<b className="rounded bg-amber-100 px-0.5 font-semibold text-slate-800">{td.khop}</b>{td.sau}
+                          {td.khoan ? <b className="mr-1 text-slate-400">K{td.khoan}</b> : null}{toVang(td.chu)}
                         </span>
                       ) : null;
                     })()}

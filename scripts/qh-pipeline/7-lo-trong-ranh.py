@@ -34,6 +34,7 @@ M = 1 / 111000          # 1 m theo độ (xấp xỉ, đủ cho việc co/nở)
 CO, THEM, NHO_NHAT_HA = 150, 20, 20
 # lượt 2
 RONG_M, NET_DEM_M, NHO_NHAT_2_HA = 60, 3, 0.3
+CHAM_RANH_M = 5      # vùng trắng trơn phải cách viền ranh ≤ 5 m mới tính là ngoài phạm vi (xem lượt 2)
 DXF = {'2076': 'QD2076PKPB 1.2000.dxf', '2101': 'QD2101 TT 1.2000.dxf', '2222': 'QD2222.dxf',
        '918': '1-2000 phan khu Phia Tay (1).dxf', 'cuhin': 'phân khu cù hin 1.2000.dxf',
        'taynam': 'Tay Nam da sua - ban cuoi.dxf', 'taybac': '1-2000 Phan khu Tay Bac.dxf'}
@@ -110,6 +111,15 @@ def main():
             mo = make_valid(tron.buffer(-RONG_M / 2, join_style=2).buffer(RONG_M / 2, join_style=2))
             g2 = an_toan(lambda a, b, **k: a.intersection(b, **k), mo, tron)
             ds2 = [p for p in getattr(g2, 'geoms', [g2]) if p.geom_type == 'Polygon' and p.area >= NHO_NHAT_2_HA * 1e4]
+            # CHỈ VÙNG CHẠM RANH (12/10/2026): vùng trắng trơn nằm GIỮA bản vẽ hay là góc vạt nút giao / đảo giao thông / quảng trường
+            # (QĐ2222 ngã tư đường N5A: hai góc vạt ~0,9 ha bị bắt vì đứng sát ngưỡng 60 m) → giữ luật mặc định "trong ranh không tô =
+            # đường", ghi báo cáo cho chủ dự án quyết. Vùng chạm ranh (khe giữa vùng tô rừng và ranh — như Na Tia) mới là ngoài phạm vi.
+            vien = to_m(make_valid(Polygon(ring))).exterior
+            giua = [p for p in ds2 if p.distance(vien) > CHAM_RANH_M]
+            for p in giua:
+                c = p.representative_point()
+                print('%-7s (giữa bản vẽ — KHÔNG tính) trắng trơn %.2f ha tại %.6f %.6f' % (ma, p.area / 1e4, c.y / ky, c.x / kx))
+            ds2 = [p for p in ds2 if p.distance(vien) <= CHAM_RANH_M]
             for p in ds2:
                 c = p.representative_point()
                 print('%-7s trắng trơn %.2f ha tại %.6f %.6f' % (ma, p.area / 1e4, c.y / ky, c.x / kx))

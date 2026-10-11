@@ -228,6 +228,14 @@ DIỆN TÍCH LÔ do đơn vị lập quy hoạch tính). Đọc 1.183 tem ở 7 
 
 ## I. ĐÃ SỬA: VÙNG "TRẮNG TRƠN" TRONG 7 BẢN PHÂN KHU KHÔNG CÒN BỊ GHI LÀ ĐƯỜNG (anh xem ảnh, sai thì báo — gỡ được ngay)
 
+> **CẬP NHẬT 12/10 (2h sáng) — LUẬT SIẾT LẠI:** chỉ vùng trắng trơn **CHẠM RANH** (khe giữa vùng tô và ranh, như Na Tia) mới tính là
+> "ngoài phạm vi". Lý do: khi dựng lại ranh đúng đường cong, luật cũ bắt thêm 2 **góc vạt nút giao** ở QĐ2222 (ngã tư đường N5A,
+> 12.06895, 109.18952 — ảnh `bao-cao-qh/trang-tron-2222-moi.png`) — rõ ràng là lòng đường. Vùng nằm GIỮA bản vẽ (nút giao, đảo giao
+> thông, quảng trường, ô chữ nhật không tô) nay **trở lại luật mặc định "trong ranh không tô = đường"**: QĐ2222 1,32 ha + 0,46 ha,
+> QĐ2076 0,62 ha, Tây Nam 1,37 ha (khe chữ V). Còn tính "ngoài phạm vi": Tây Nam 3 vùng sát ranh (3,34 / 3,18 / 2,21 ha), QĐ2222 0,81 ha.
+> Hai vùng Tây Bắc đã mất hẳn (do ranh cũ kẻ thẳng sai — mục L ý 6). Anh thấy vùng giữa bản vẽ nào KHÔNG phải đường (vd ô chữ nhật
+> QĐ2222 có thể là quảng trường / bãi xe chưa tô) thì báo, tôi ghi đúng loại (hoặc "Chưa ghi loại đất trong bản vẽ").
+
 Bản phân khu để trắng lòng đường nên web tính "trong ranh mà không tô = đường". Soi kỹ (11/10/2026 tối) thấy có chỗ bản vẽ để trắng mà
 **không phải đường**: không ô đất, **không một nét vẽ nào** (đã gộp cả file nét gốc lẫn file DXF), rộng hơn 60 m. Đường thật thì luôn có
 nét mép / tim / chỉ giới chạy trong lòng — đã soi các hành lang QL1A, đường sắt rộng ~100 m của QĐ918 và Tây Bắc: vẫn có nét, nên không bị

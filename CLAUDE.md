@@ -553,7 +553,9 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   có mốc năm=3. Sau sửa: web khác bản vẽ 0,00–0,01 % (sai số lưới rải điểm), 79 phiếu giữ nguyên. Đổi bản vẽ / ranh thì chạy lại
   5g rồi `7-lo-trong-ranh.py` (vùng trắng > 300 m trong ranh = ngoài phạm vi, vd Na Tia ~1.020 ha của Tây Nam — chủ dự án mở DGN
   xác nhận trống thật; thêm lượt 2: vùng "TRẮNG TRƠN" > 60 m không ô đất, không một nét vẽ nào trong file nét
-  `quyhoach2025/qd<ma>_net.geojson` lẫn DXF → 10 vùng ~20 ha, Tây Nam 4 vùng rừng — cần cả hai file, thiếu thì bỏ lượt 2 bản đó).
+  `quyhoach2025/qd<ma>_net.geojson` lẫn DXF, và phải CHẠM RANH ≤ 5 m (`CHAM_RANH_M`, siết 12/10/2026: vùng giữa bản vẽ hay là góc vạt nút
+  giao / đảo giao thông / quảng trường — QĐ2222 ngã tư N5A từng bị bắt — nên giữ luật đường) → còn 4 vùng (Tây Nam 3 khe sát ranh,
+  QĐ2222 0,81 ha) — cần cả hai file, thiếu thì bỏ lượt 2 bản đó).
   `qhPhienBan()` băm cả `ranh_qh.json` nên sửa ranh / lỗ là bảng nhớ `qh_luu` tự tính lại. ⚠️ ẢNH TILE phân khu vẫn vẽ từ chuỗi cũ (1b) nên chỗ lỗ có thể còn sai màu — sửa ảnh phải gửi ảnh thử chờ duyệt.
   Vùng tô 'Hatch_Khop' (QĐ2222) = VÙNG KHỚP NỐI với quy hoạch bên cạnh, không phải loại đất: 5g không cho thành ô, phần lọt trong
   ranh ghi vào ranh_qh.json "_khop" = lỗ của ranh (ngoài phạm vi). QĐ918 'DAT_KXD_DulichRung_qh' (lô DLST-01, 31,97 ha, "Khu du lịch

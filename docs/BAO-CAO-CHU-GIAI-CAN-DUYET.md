@@ -196,6 +196,11 @@ Tây Nam `QHDD_DAT_Cayxanhhanche` 26,8 ha — mục B).
 KÝ HIỆU và KHUNG — ký hiệu tôn giáo (56 hình), ký hiệu cấp 3, ký hiệu bến du lịch (6 vòng tròn đường kính 79 m trên mặt nước + 1 hình
 mẫu nằm tít ngoài bản đồ), khung A0, khung tỷ lệ 1/10.000, 1 ô bến xe buýt 0,19 ha (web vẫn tính là đất giao thông), và 112 ha hình
 "NET-RANH PHAN KHU" ở mũi nam (~11,935°, 109,115°) — chỗ đó không có thửa địa chính nào. ⇒ Không sót loại đất thật nào.
+**QĐ893 — tên lấy từ đâu** (59.842 ha, 52 loại): phần lớn có MÃ cụ thể trên bản vẽ (chữ mã quy hoạch Level 34, ký hiệu công trình, hoặc
+màu mà chú dẫn chỉ dùng cho đúng một mã). Còn **6.427 ha (10,7 %) chỉ có màu dùng chung nhiều mã** → web ghi TÊN NHÓM đúng nguyên tắc
+anh đã duyệt ("ô 893 không mã giữ tên nhóm"): "Đất công cộng, dịch vụ, sản xuất" 2.494,6 ha · "Đất ở" 2.472 ha (không biết ODT hay
+ONT) · "Đất nông nghiệp" 1.377,8 ha · "Loại đất khác" 82,5 ha (vùng tím — đề xuất ở mục B). Riêng 4.585 ha xanh nước không mã đang ghi
+"sông, ngòi" — xem mục C.
 
 ## I. ĐÃ SỬA: VÙNG "TRẮNG TRƠN" TRONG 7 BẢN PHÂN KHU KHÔNG CÒN BỊ GHI LÀ ĐƯỜNG (anh xem ảnh, sai thì báo — gỡ được ngay)
 

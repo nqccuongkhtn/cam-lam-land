@@ -244,6 +244,28 @@ nguyên (`thu-2076-cay-xanh-cach-ly.png`).
 `3-cat-tile.py` kèm lớp nét), ra THƯ MỤC MỚI (bản cũ giữ nguyên để lùi lại), rồi mới đổi số bản trên web. Ảnh thử bên phải chưa có
 lớp nét đường (lúc cắt thật vẫn vẽ nét như cũ).
 
+## K. ĐỀ XUẤT: GHI RÕ "HIỆN TRẠNG" HAY "QUY HOẠCH" (chờ anh quyết — đổi chữ trên bảng thông tin thửa và phiếu)
+
+Khung chú giải các bản phân khu chia 2–3 cột: **Hiện trạng** (đất giữ nguyên) · **Quy hoạch đợt đầu** · **Quy hoạch dài hạn**, mỗi cột
+một màu riêng. Web đã tô đúng màu từng cột nhưng TÊN thì gộp: ô hiện trạng và ô quy hoạch mới cùng ghi một tên — vd QĐ2101 có 288 ha
+"Đất nhóm nhà ở (mật độ trung bình)" là nhà ở HIỆN TRẠNG (màu ô liu), cùng tên với nhà ở quy hoạch mới (màu vàng). Với người mua bán,
+"đất ở có sẵn, giữ lại" khác hẳn "đất quy hoạch thành đất ở". Phần hiện trạng trong từng bản (đo trên dữ liệu web):
+
+| Bản | Hiện trạng | Nhiều nhất |
+|---|---|---|
+| QĐ2076 | 986 ha (16 %) | khu dân cư hiện hữu 417 ha · nhà ở hiện trạng 184 ha · công nghiệp 152 ha |
+| QĐ2101 | 1.208 ha (25 %) | hồ 560 ha · quốc phòng 318 ha · **nhóm nhà ở 288 ha (trùng tên nhà ở quy hoạch)** |
+| QĐ2222 | 2.080 ha (66 %) | rừng sản xuất 1.397 ha · dịch vụ du lịch 471 ha · nhóm nhà ở 122 ha |
+| QĐ918 | 6.342 ha (69 %) | rừng sản xuất 2.530 ha · rừng phòng hộ 1.891 ha · nông nghiệp 628 ha |
+| Cù Hin | 4.477 ha (85 %) | rừng sản xuất 2.563 ha · nông nghiệp 1.452 ha · làng xóm 226 ha |
+| Tây Nam | 10.387 ha (97 %) | rừng phòng hộ 7.189 ha · rừng sản xuất 1.451 ha · nông nghiệp 1.084 ha |
+| Tây Bắc | 12.190 ha (98 %) | rừng đặc dụng 9.357 ha · rừng sản xuất 1.488 ha · nông nghiệp 863 ha |
+
+Đề xuất: ô thuộc cột Hiện trạng mà tên chưa có chữ "hiện trạng / hiện hữu" thì ghi thêm **"(hiện trạng)"** — vd "Đất nhóm nhà ở (mật độ
+trung bình) (hiện trạng)". Dữ liệu đã sẵn (bậc 1 = cột hiện trạng), chỉ đổi chữ hiển thị; diện tích không đổi. QĐ205 cũng có 3 giai
+đoạn (HT / 2030 / 2045) mà web đang ghi chung "2045" — làm cùng lúc được. Anh đồng ý thì tôi làm và chạy lại bộ kiểm 79 phiếu
+(phiếu chính thức ghi tên thế nào thì giữ đúng như vậy khi so).
+
 ## D. CẦN ANH XÁC NHẬN TRÊN MICROSTATION
 
 - **Thửa 95 tờ 15 Xã Cam Lâm, QĐ205 — mảnh giao thông số 2** (104,57 m², dải rộng ~1,4 m giữa vùng hồ và vùng cây xanh, ảnh

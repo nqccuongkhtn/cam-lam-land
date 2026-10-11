@@ -728,8 +728,8 @@ export default function TraCuuLuatPage() {
     return m ? { dieu: Number(m[1]), khoan: Number(m[2]) } : null;
   };
   // Câu tìm thêm theo chữ của luật (null nếu không có cách gọi đời thường nào). Có dấu thì đổi có dấu, không dấu thì đổi không dấu.
-  const moRong = useMemo(() => {
-    const q = tim.trim();
+  const doiCachGoi = (q0: string) => {
+    const q = q0.trim();
     if (q.length < 2 || docSoDieu(kd(q))) return null;
     const dau = coDau(q);
     const chuan = (t: string) => (dau ? thuongDau(t) : kd(t));
@@ -745,7 +745,7 @@ export default function TraCuuLuatPage() {
       if (!cap.some((x) => x[1] === m.luat)) cap.push([m.g, m.luat]);
     }
     return cap.length ? { cau, cap } : null;
-  }, [tim]);
+  };
   // Chuẩn bị sẵn chuỗi không dấu của từng điều để tìm cho nhanh (làm một lần cho mỗi văn bản).
   const chiMuc = useMemo(() => {
     const ra: Record<string, { d: Dieu; ma: string; kho: string; tde: string; khoD: string; tdeD: string }[]> = {};
@@ -757,6 +757,22 @@ export default function TraCuuLuatPage() {
     }
     return ra;
   }, [cacVb]);
+
+  // GÕ SAI / THIẾU DẤU (đợt 8, 11/10/2026): gõ có dấu thì so có dấu (đợt 4) — nhưng lỡ sai hay thiếu dấu một chữ ("thu hồi đât",
+  // "đen bu") là ra 0 kết quả. Nay: chữ có dấu (kể cả cách gọi đời thường đã đổi) không khớp điều nào trong phạm vi đang tìm thì tự
+  // LÙI VỀ SO KHÔNG DẤU, kèm dòng báo. Có ít nhất một điều khớp đúng dấu thì giữ nguyên so có dấu.
+  const timHL = useMemo(() => {
+    const q = tim.trim();
+    if (q.length < 2 || !coDau(q) || docSoDieu(kd(q))) return q;
+    const ds = timCaKho ? kho.flatMap((x) => chiMuc[x.ma] || []) : (chiMuc[maVb] || []);
+    const co = (cau: string) => { const bk = boKhop(cau); return ds.some((x) => bk.reTu.every((r) => r.test(bk.dau ? x.khoD : x.kho))); };
+    if (co(q)) return q;
+    const mr = doiCachGoi(q);
+    if (mr && co(mr.cau)) return q;
+    return kd(q);
+  }, [tim, timCaKho, kho, chiMuc, maVb]);
+  const luiKhongDau = timHL !== tim.trim();
+  const moRong = useMemo(() => doiCachGoi(timHL), [timHL]);
 
   const ketQua = useMemo(() => {
     const q = kd(tim.trim());
@@ -784,12 +800,12 @@ export default function TraCuuLuatPage() {
       const tdDu = (x: (typeof ds)[number]) => bk.reTu.every((r) => r.test(tde(x)));
       return [...tieuDeTruoc(nguyen), ...duTu.filter(tdDu), ...duTu.filter((x) => !tdDu(x))];
     };
-    const kq = timTheo(tim);
+    const kq = timTheo(timHL);
     if (!moRong) return kq;
     // gõ cách gọi đời thường ("sổ đỏ") → thêm các điều theo chữ của luật ("giấy chứng nhận"), xếp SAU kết quả theo đúng chữ đã gõ
     const co = new Set(kq.map((x) => x.ma + ':' + x.d.so));
     return [...kq, ...timTheo(moRong.cau).filter((x) => !co.has(x.ma + ':' + x.d.so))];
-  }, [chiMuc, tim, chiGhim, chiGt, gt, ghim, timCaKho, maVb, kho, moRong]);
+  }, [chiMuc, tim, timHL, chiGhim, chiGt, gt, ghim, timCaKho, maVb, kho, moRong]);
 
   const dieuDangXem = useMemo(() => (vb && chon != null ? vb.dieu.find((d) => d.so === chon) || null : null), [vb, chon]);
   useEffect(() => {
@@ -806,7 +822,7 @@ export default function TraCuuLuatPage() {
     const ra = new Map<string, { chu: string; khoan?: number }>();
     const q = kd(tim.trim());
     if (q.length < 2 || docSoDieu(q)) return ra;
-    const cacBk = [boKhop(tim), ...(moRong ? [boKhop(moRong.cau)] : [])];
+    const cacBk = [boKhop(timHL), ...(moRong ? [boKhop(moRong.cau)] : [])];
     const viTri = (m: RegExpExecArray) => m.index + (m[0].length - m[1].length);   // bỏ ký tự ranh giới đứng trước
     for (const x of ketQua.slice(0, 80)) {
       // ghi kiểu bằng 'as' để TypeScript không coi tot luôn là null (gán trong vòng lặp lồng nhau)
@@ -833,7 +849,7 @@ export default function TraCuuLuatPage() {
       ra.set(x.ma + ':' + x.d.so, { chu: (a > 0 ? '…' : '') + chu.slice(a, b) + (b < chu.length ? '…' : ''), khoan: tot.so || undefined });
     }
     return ra;
-  }, [ketQua, tim, moRong]);
+  }, [ketQua, tim, timHL, moRong]);
   // Mở kết quả thì cuộn tới khoản nào: gõ số ("75.2") thì theo số; gõ chữ thì tới khoản có trích đoạn.
   const khoanKhop = (ma: string, so: number) => docSoDieu(kd(tim.trim()))?.khoan ?? trichDoan.get(ma + ':' + so)?.khoan;
 
@@ -891,7 +907,7 @@ export default function TraCuuLuatPage() {
   // nguyên cụm thì chỉ tô cụm; tiếng lẻ còn sót mới tô riêng, và chỉ khi nó HIẾM (có mặt ≤ 25 % số điều của văn bản — "đất" trong
   // Luật Đất đai thì không). Gõ cách gọi đời thường ("sổ đỏ") thì tô cả chữ của luật ("giấy chứng nhận").
   const cachTo = useMemo(() => {
-    const q = tim.trim();
+    const q = timHL;
     if (!q || q.length < 2 || docSoDieu(kd(q))) return null;   // tìm theo số điều thì không tô chữ
     const ds = chiMuc[maVb] || [];
     return [q, ...(moRong ? [moRong.cau] : [])].map((cau) => {
@@ -910,7 +926,7 @@ export default function TraCuuLuatPage() {
       });
       return { bk, cum, hiem };
     });
-  }, [tim, moRong, chiMuc, maVb]);
+  }, [timHL, moRong, chiMuc, maVb]);
   // Chữ cần tô cho MỘT điều (mỗi nhóm một danh sách: chữ đã gõ / chữ của luật), chữ dài trước.
   const phuDieu = (x: { khoD: string; kho: string } | undefined): string[][] | null => {
     if (!cachTo || !x) return null;
@@ -2311,10 +2327,10 @@ export default function TraCuuLuatPage() {
             className={`rounded-full border px-2.5 py-1 text-[12px] font-bold transition ${timCaKho ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-emerald-300 bg-emerald-50 text-emerald-700'}`}>
             {dangTaiKho ? '⏳ đang mở…' : `🔎 Cả kho${timCaKho ? ' ✓' : ''}`}
           </button>
-          <button onClick={() => { setChiGhim((v) => !v); setChon(null); setXemPhuLuc(false); }} title="Chỉ hiện những điều đã ghim"
+          {(ghim.length > 0 || chiGhim) && <button onClick={() => { setChiGhim((v) => !v); setChon(null); setXemPhuLuc(false); }} title="Chỉ hiện những điều đã ghim"
             className={`rounded-full border px-2.5 py-1 text-[12px] font-bold transition ${chiGhim ? 'border-amber-500 bg-amber-500 text-white' : 'border-amber-300 bg-amber-50 text-amber-700'}`}>
             ⭐ Ghim {ghim.length}
-          </button>
+          </button>}
           {gt && (
             <button onClick={() => { setChiGt((v) => !v); setChon(null); setXemPhuLuc(false); }} title="Chỉ hiện những điều có giải thích ngắn"
               className={`rounded-full border px-2.5 py-1 text-[12px] font-bold transition ${chiGt ? 'border-sky-600 bg-sky-600 text-white' : 'border-sky-300 bg-sky-50 text-sky-700'}`}>
@@ -2383,6 +2399,11 @@ export default function TraCuuLuatPage() {
                   <p className="text-[11px] font-bold text-amber-800">📨 {tkKhop.length} văn bản tham khảo khớp (không phải văn bản luật):</p>
                   <div className="mt-0.5 flex flex-wrap gap-1">{tkKhop.map((x) => <NutDan key={x.ma} d={{ ma: x.ma }} nho />)}</div>
                 </div>
+              )}
+              {tim && luiKhongDau && (
+                <p className="border-b border-amber-100 bg-amber-50/70 px-3 py-1.5 text-[11.5px] leading-snug text-amber-900">
+                  ✍️ Không có điều nào đúng dấu như đã gõ — đang tìm <b>không dấu</b> “{timHL}”. Có thể một chữ gõ sai / thiếu dấu.
+                </p>
               )}
               {tim && moRong && (
                 <p className="border-b border-sky-100 bg-sky-50/70 px-3 py-1.5 text-[11.5px] leading-snug text-sky-900">

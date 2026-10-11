@@ -51,6 +51,11 @@ try:
         TCG = json.load(fp)
 except Exception:
     TCG = {}
+try:
+    with io.open(os.path.join(HERE, 'ten-suy-luan.json'), encoding='utf-8') as fp:
+        SL = json.load(fp)
+except Exception:
+    SL = {}
 MA_BAN = {'qh-qd2076': '2076', 'qh-qd2101': '2101', 'qh-qd2222': '2222', 'qh-qd918': '918', 'qh-cuhin': 'cuhin',
           'qh-taynam': 'taynam', 'qh-taybac': 'taybac'}
 DATA = os.path.join(GOC, 'apps', 'backend', 'data')
@@ -77,7 +82,8 @@ def ten_theo_chu_giai(ma_lop, lo, ci):
     """Tên loại đất của một vùng tô: theo khung chú giải nếu khớp chắc chắn (level + màu gốc), không thì tên cũ theo level."""
     t = TCG.get(MA_BAN.get(ma_lop, ''), {})
     mau = (_b1.BANG[ci] if isinstance(ci, int) and 0 < ci < 256 else '').lower()
-    return t.get('theo_level_mau', {}).get('%s||%s' % (sua_chu(lo), mau)) or t.get('theo_level', {}).get(sua_chu(lo)) or ten_loai(lo)
+    return (t.get('theo_level_mau', {}).get('%s||%s' % (sua_chu(lo), mau)) or t.get('theo_level', {}).get(sua_chu(lo))
+            or SL.get(MA_BAN.get(ma_lop, ''), {}).get(sua_chu(lo)) or ten_loai(lo))   # SL: tên suy luận (ten-suy-luan.json)
 
 with io.open(os.path.join(HERE, 'mau-loai-dat.json'), encoding='utf-8') as fp:
     _B = json.load(fp)

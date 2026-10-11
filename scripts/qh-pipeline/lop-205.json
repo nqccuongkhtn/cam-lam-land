@@ -2,7 +2,7 @@
  "_doc": "QĐ205 — lớp (layer) vùng tô trong quyhoach2025/QD205.gpkg → tên loại đất trên web. Dựng 11/10/2026 từ chính dữ liệu web cũ (tên chiếm đa số diện tích trên mỗi lớp, phần lớn thuần 94–100 %), sửa tay 2 lớp lẫn theo nghĩa tên lớp. Lớp không có ở đây = không phải đất (khung, ký hiệu, nét ranh…) → 5h bỏ qua. Đổi tên theo khung chú giải thì sửa file này rồi chạy lại 5h.",
  "0": "Rừng phòng hộ",
  "@ Dat nghia trang": "Đất nghĩa trang",
- "@ nuoc": "Mặt nước",
+ "@ nuoc": "Đất sông, suối, kênh rạch",
  "DAT_Ditich_tongiao": "Di tích",
  "DatQuandoi": "Đất quốc phòng",
  "HT_DAT_DD_Coquandothi": "Cơ quan",

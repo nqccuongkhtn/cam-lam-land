@@ -1,0 +1,13 @@
+{
+ "_doc": "TÊN SUY LUẬN (11/10/2026) cho lớp vùng tô KHÔNG có dòng trong khung chú giải của chính bản vẽ — chỉ ghi khi căn cứ CHẮC (cùng tên lớp + cùng màu có dòng chú giải ở bản vẽ khác cùng bộ tiêu chuẩn lớp, và bản đồ địa chính / các bản quy hoạch khác cùng chỗ nói cùng một điều). 5g-dung-o-phan-khu.py và 8-tao-chu-giai.py đọc sau bảng ten-theo-chu-giai.json. Chủ dự án duyệt trong báo cáo docs/BAO-CAO-CHU-GIAI-CAN-DUYET.md — sai thì sửa ở đây rồi chạy lại 5g + 8-tao-chu-giai.",
+ "918": {
+  "L-QH-langxomdothihoa": "Đất làng xóm đô thị hóa"
+ },
+ "taynam": {
+  "HT_DAT_O_Langxom": "Đất làng xóm, dân cư nông thôn"
+ },
+ "_can_cu": {
+  "918/L-QH-langxomdothihoa": "Khung chú giải QĐ205 có dòng \"LÀNG XÓM ĐÔ THỊ HÓA\" dùng đúng lớp L-QH-langxomdothihoa, màu #a9b34b (y hệt); QĐ205 cùng chỗ 100 % \"Đất làng xóm đô thị hóa\"; QĐ893 cùng chỗ 100 % \"Đất ở tại nông thôn\".",
+  "taynam/HT_DAT_O_Langxom": "Khung chú giải QĐ918 (cùng bộ tên lớp) có dòng \"Đất làng xóm, dân cư nông thôn\" cho chính lớp HT_DAT_O_Langxom / QHDD_DAT_O_Langxom; bản đồ địa chính cùng chỗ: ONT+CLN 33 %, ONT 15 %; QĐ205 cùng chỗ 95 % \"điểm dân cư nông thôn hiện hữu\"; QĐ893 62 % \"Đất ở\"."
+ }
+}

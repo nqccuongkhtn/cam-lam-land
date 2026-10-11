@@ -72,7 +72,7 @@
   "Đất chuyên trồng lúa": "#ffff7f",
   "Đất chăn nuôi tập trung": "#ffff7f",
   "Đất chợ dân sinh, chợ đầu mối": "#ff7f7f",
-  "Đất có di tích lịch sử - văn hóa, danh lam thắng cảnh": "#ff7f7f",
+  "Đất có di tích lịch sử - văn hóa, danh lam thắng cảnh, di sản thiên nhiên": "#ff7f7f",
   "Đất có mặt nước chuyên dùng dạng ao, hồ, đầm, phá": "#7fffff",
   "Đất công cộng, dịch vụ, sản xuất": "#ff7f7f",
   "Đất công trình năng lượng, chiếu sáng công cộng": "#ff7f7f",
@@ -92,7 +92,7 @@
   "Đất hỗn hợp (TMD + ODT)": "#ff7f7f",
   "Đất khu công nghiệp": "#ff7f7f",
   "Đất khu vui chơi, giải trí công cộng, sinh hoạt cộng đồng": "#ff7f7f",
-  "Đất nghĩa trang, nhà tang lễ, cơ sở hỏa táng": "#dcdcdc",
+  "Đất nghĩa trang, nhà tang lễ, cơ sở hỏa táng, đất cơ sở lưu giữ tro cốt": "#dcdcdc",
   "Đất nuôi trồng thủy sản": "#7fffff",
   "Đất nông nghiệp": "#ffff7f",
   "Đất nông nghiệp khác": "#dfff7f",
@@ -292,6 +292,7 @@
   "Đất trường THCS, tiểu học, mầm non": "#a05d5d",
   "Đất đồi núi": "#7eb38b",
   "Đất lâm nghiệp - rừng đặc dụng": "#2a7e7e",
-  "Đất khu dịch vụ - du lịch": "#fb30fc"
+  "Đất khu dịch vụ - du lịch": "#fb30fc",
+  "Đất làng xóm đô thị hóa": "#979763"
  }
 }

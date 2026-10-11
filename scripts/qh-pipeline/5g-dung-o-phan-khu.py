@@ -100,6 +100,8 @@ def main(vao, ma):
     RG = make_valid(Polygon(R[ma]))
     try: TCG = json.load(io.open(os.path.join(HERE, 'ten-theo-chu-giai.json'), encoding='utf-8')).get(ma) or {}
     except Exception: TCG = {}
+    try: SL = json.load(io.open(os.path.join(HERE, 'ten-suy-luan.json'), encoding='utf-8')).get(ma) or {}
+    except Exception: SL = {}
     wgs = lambda g: transform(lambda x, y, z=None: tuple(zip(*[b1.vn2wgs(a, b) for a, b in zip(x, y)])), g)
     d = ezdxf.readfile(vao); msp = d.modelspace()
     out = []; khop = []; dem = {'vung': 0, 'co_lo': 0, 'ngoai_ranh': 0, 'loi': 0}
@@ -141,6 +143,7 @@ def main(vao, ma):
         # cùng level mà khác màu có thể là dòng khác (QĐ2101 "Nhóm nhà ở" #a57c00 = mật độ trung bình, #dfff7f = mật độ thấp).
         mau_to = b1.mau_va_so(e, d)[0].lower()
         loai = TCG.get('theo_level_mau', {}).get('%s||%s' % (h5_sua(lv), mau_to)) or TCG.get('theo_level', {}).get(h5_sua(lv)) or loai
+        loai = SL.get(h5_sua(lv), loai)   # tên SUY LUẬN cho lớp không có trong chú giải của chính bản vẽ (ten-suy-luan.json)
         for phan in cac_da_giac(W):
             dt = Polygon(phan.exterior).area                  # xếp thứ tự theo VÒNG NGOÀI của phần này (như cũ)
             trong = make_valid(phan.intersection(RG))

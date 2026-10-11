@@ -1363,14 +1363,9 @@ export default function MapPage() {
     try {
       const r = await api<ParcelInfo>(`/parcels/at?lng=${lng}&lat=${lat}`);
       const pg = (r.parcel as any)?.geometry; // click TRÚNG thửa → highlight + hiện cạnh/diện tích (kiểu Guland)
-      // Diện tích QH giờ do BACKEND tính theo ĐƯỜNG THẬT (robust khi đổi địa chính) → dùng thẳng r.overlaps.
-      // Fallback: nếu backend chưa cập nhật (overlaps rỗng) thì tạm overlay vector phía client.
-      if ((!(r as any).overlaps || !(r as any).overlaps.length) && pg) {
-        const ring = pg.type === 'Polygon' ? (pg.coordinates?.[0] || [])
-          : pg.type === 'MultiPolygon' ? ((pg.coordinates || []).reduce((a: number[][], poly: any) => ((poly?.[0]?.length || 0) > (a?.length || 0) ? poly[0] : a), [] as number[][])) : [];
-        const areas = qhAreasFromVector(ring as number[][]);
-        if (areas.length) (r as any).overlaps = areas;
-      }
+      // Diện tích QH do MÁY CHỦ tính (cắt hình đúng bản vẽ) → dùng thẳng r.overlaps. ĐÃ BỎ (12/10/2026) đoạn "tính bù" từ file cũ
+      // public/qh_vector.geojson (dựng tháng 7 bằng chuỗi cũ: lấp lỗ, tên cũ, vẽ cả ngoài ranh) khi máy chủ không trả dòng QĐ205: máy chủ
+      // CỐ Ý không trả khi thửa nằm trọn ngoài ranh QĐ205 (sửa 10/10) — tính bù là dựng lại một dòng QĐ205 sai từ dữ liệu cũ, in cả lên phiếu.
       setInfo(r); setParcelMore(false); // mỗi lần click thửa mới → thu gọn lại
       // Kèm luôn diện tích CHÍNH THỨC do máy chủ đo, để con số ghi trên bản đồ khớp y hệt
       // con số trong bảng "Thông tin thửa" (trước đây bản đồ tự tính lấy nên lệch vài mét vuông).
@@ -3234,7 +3229,8 @@ export default function MapPage() {
                         const html = phieuQhHtml({ parcel: info.parcel as any, geometry: g, overlaps, qhCacBan: (info as any).qhCacBan, qhPieces: qhPiecesFor(g, pieceHz), roadFeats: roadFeatsFor(g), neighbors: (info as any).neighbors || [], point: info.point, user: user as any, scenario: mapScen, roadHz: pieceHz, phuLuc });
                         try { win.document.open(); win.document.write(html); win.document.close(); win.focus(); } catch { /* */ }
                       };
-                      const areas = (info.overlaps && info.overlaps.length) ? info.overlaps : qhAreasFromVector(ring); finish(areas.length ? areas : []);
+                      // chỉ dùng số máy chủ (12/10/2026: bỏ tính bù từ qh_vector cũ — xem chỗ gọi /parcels/at)
+                      const areas = info.overlaps || []; finish(areas.length ? areas : []);
                     }}
                     id="nut-phieu-qh"
                     className="min-w-0 whitespace-nowrap px-1 sm:px-0 sm:mb-1.5 sm:w-full flex items-center justify-center gap-1.5 sm:gap-2 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold bg-[#0A2540] hover:bg-[#0d3a6b] text-white">

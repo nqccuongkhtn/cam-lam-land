@@ -688,6 +688,8 @@ Mọi thao tác ghi phải gọi `cacheDrop('listings:')` để xoá cache.
   **cùng độ dài** với chữ gốc NFC (`kd`, `thuongDau`) vì vị trí cắt trích đoạn / tô vàng dùng chung.
   Tốc độ: mỗi điều có sẵn BẢNG TIẾNG (`tuD`/`tuK` trong `chiMuc`) → "đủ mọi tiếng" chỉ là tra bảng, chỉ điều đủ tiếng mới dò cụm
   (nhanh 5–15 lần); danh sách chỉ vẽ 60 dòng + nút "Xem thêm". Gõ dở chữ cuối thì `timHL` đoán nốt (ưu tiên tiếng đi liền sau).
+  Đường dẫn tới từng điều: `/tra-cuu-luat?vb=<mã>&d=<số điều>&k=<khoản>` (mở thẳng, đổi điều thì địa chỉ đổi theo); nút "🔗 Gửi".
+  Phím tắt máy tính: `/` hoặc Ctrl+K vào ô tìm, ← → điều trước / sau, Esc xoá ô tìm.
 
 ---
 

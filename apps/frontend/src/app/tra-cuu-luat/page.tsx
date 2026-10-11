@@ -283,7 +283,12 @@ export default function TraCuuLuatPage() {
   const [moSuaDoi, setMoSuaDoi] = useState<Record<string, boolean>>({});
   const [moLuocDo, setMoLuocDo] = useState(false);
   const [moThuocTinh, setMoThuocTinh] = useState(false);
-  const [moCanKiem, setMoCanKiem] = useState(false);   // dòng "❓ N điều cần kiểm hiệu lực" — bấm mới bung danh sách
+  const [moCanKiem, setMoCanKiem] = useState(false);
+  // Gõ "đ45 k2" rồi mở → tô sáng + cuộn tới khoản 2 của điều đang đọc (null = không tô khoản nào)
+  const [khoanSang, setKhoanSang] = useState<number | null>(null);
+  // XEM GẦN ĐÂY (lưu trên máy người dùng): ô tìm còn trống thì hiện để bấm mở lại ngay, khỏi tìm lại từ đầu
+  const [ganDay, setGanDay] = useState<{ ma: string; so: number; nhan: string; tieuDe: string }[]>([]);
+  useEffect(() => { try { setGanDay(JSON.parse(localStorage.getItem('luat-gan-day') || '[]')); } catch { /* */ } }, []);   // dòng "❓ N điều cần kiểm hiệu lực" — bấm mới bung danh sách
   // Điện thoại: danh sách điều đang bung ra hay đã thu lại (máy tính không dùng tới).
   const [moDs, setMoDs] = useState(false);
   const [thChon, setThChon] = useState<string>('');
@@ -711,6 +716,31 @@ export default function TraCuuLuatPage() {
   }, [chiMuc, tim, chiGhim, chiGt, gt, ghim, timCaKho, maVb, kho]);
 
   const dieuDangXem = useMemo(() => (vb && chon != null ? vb.dieu.find((d) => d.so === chon) || null : null), [vb, chon]);
+  useEffect(() => {
+    if (!khoanSang || !dieuDangXem) return;
+    const t = setTimeout(() => document.getElementById('khoan-' + khoanSang)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 450);
+    return () => clearTimeout(t);
+  }, [khoanSang, dieuDangXem]);
+  // TRÍCH ĐOẠN quanh chữ khớp cho từng kết quả tìm (tối đa 80 kết quả đầu) — nhìn là biết điều nào đúng ý, khỏi mở từng điều.
+  // Chữ đã bỏ dấu và chữ gốc (dạng NFC) dài bằng nhau từng ký tự nên dùng chung vị trí cắt.
+  const trichDoan = useMemo(() => {
+    const ra = new Map<string, { truoc: string; khop: string; sau: string }>();
+    const q = kd(tim.trim());
+    if (q.length < 2 || docSoDieu(q)) return ra;
+    const tu = [q, ...q.split(/\s+/).filter((w) => w.length >= 2)];
+    for (const x of ketQua.slice(0, 80)) {
+      const cacChu = x.d.khoan.flatMap((k) => [k.chu, ...k.diem.map((z) => z.chu)]);
+      tim1: for (const w of tu) for (const chu0 of cacChu) {
+        const chu = (chu0 || '').normalize('NFC');
+        const i = kd(chu).indexOf(w);
+        if (i < 0) continue;
+        const a = Math.max(0, i - 45), b = Math.min(chu.length, i + w.length + 75);
+        ra.set(x.ma + ':' + x.d.so, { truoc: (a > 0 ? '…' : '') + chu.slice(a, i), khop: chu.slice(i, i + w.length), sau: chu.slice(i + w.length, b) + (b < chu.length ? '…' : '') });
+        break tim1;
+      }
+    }
+    return ra;
+  }, [ketQua, tim]);
 
   // Tra nhanh một văn bản trong bộ tổng hợp theo mã.
   const vbBth = useMemo<Record<string, VbBth>>(
@@ -739,7 +769,14 @@ export default function TraCuuLuatPage() {
     if (ma === maVb) return;
     setMaVb(ma); setChon(null); setMoChuong({}); setXemPhuLuc(false);
   };
-  const moDieu = (ma: string, so: number) => {
+  const moDieu = (ma: string, so: number, khoan?: number) => {
+    setKhoanSang(khoan ?? null);
+    {
+      const v = cacVb[ma]; const d = v?.dieu.find((x) => x.so === so);
+      const k0 = kho.find((x) => x.ma === ma);
+      const muc = { ma, so, nhan: nhanNgan(ma, v?.soHieu || k0?.soHieu || ''), tieuDe: d?.tieuDe || '' };
+      setGanDay((g) => { const m = [muc, ...g.filter((x) => !(x.ma === ma && x.so === so))].slice(0, 8); try { localStorage.setItem('luat-gan-day', JSON.stringify(m)); } catch { /* */ } return m; });
+    }
     if (ma !== maVb) { setMaVb(ma); setMoChuong({}); }
     setDocTk(null); setTkTruoc(null);       // mở hẳn một điều thì đóng ngăn đọc công văn
     setXemPhuLuc(false); setChon(so); setThe('luat');
@@ -2099,7 +2136,7 @@ export default function TraCuuLuatPage() {
         <div className="flex items-center gap-2 rounded-xl border-2 border-slate-200 px-3 py-2 focus-within:border-[#0A2540]">
           <span className="text-slate-400">🔍</span>
           <input value={tim} onChange={(e) => setTim(e.target.value)} enterKeyHint="search"
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.nativeEvent.isComposing && ketQua.length) { e.preventDefault(); moDieu(ketQua[0].ma, ketQua[0].d.so); (e.target as HTMLInputElement).blur(); } }}
+            onKeyDown={(e) => { if (e.key === 'Enter' && !e.nativeEvent.isComposing && ketQua.length) { e.preventDefault(); moDieu(ketQua[0].ma, ketQua[0].d.so, docSoDieu(kd(tim.trim()))?.khoan); (e.target as HTMLInputElement).blur(); } }}
             placeholder="Từ khoá, hoặc số điều (vd 45, đ45 k2)…" title="Gõ rồi Enter để mở điều đầu tiên"
             className="w-full bg-transparent text-[15px] outline-none" />
           {tim && <button onClick={() => setTim('')} className="text-slate-400 hover:text-slate-700">✕</button>}
@@ -2131,6 +2168,17 @@ export default function TraCuuLuatPage() {
               className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-500">✕ Bỏ lọc</button>
           )}
         </div>
+        {!tim && !chiGhim && !chiGt && ganDay.length > 0 && (
+          <div className="mt-1.5 flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <span className="shrink-0 text-[11px] font-semibold text-slate-400">🕘 Gần đây:</span>
+            {ganDay.map((g) => (
+              <button key={g.ma + ':' + g.so} onClick={() => moDieu(g.ma, g.so)} title={`${g.nhan} · Điều ${g.so}. ${g.tieuDe}`}
+                className="shrink-0 whitespace-nowrap rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[11.5px] text-slate-600 hover:border-[#0A2540] hover:text-[#0A2540]">
+                Điều {g.so}{g.ma !== maVb ? <span className="text-slate-400"> · {g.nhan}</span> : null}
+              </button>
+            ))}
+          </div>
+        )}
         {moChuDe && (
           <div className="mt-1.5 flex flex-wrap gap-1.5 rounded-xl bg-slate-50 p-2">
             {CHU_DE.map((c) => (
@@ -2179,9 +2227,16 @@ export default function TraCuuLuatPage() {
                 </div>
               )}
               {ketQua.length === 0
-                ? <p className="p-3 text-[13px] text-slate-400">Không tìm thấy điều nào. Thử từ khoá khác, gõ số điều, hoặc bật <b>Tìm cả kho</b>.</p>
+                ? <div className="p-3 text-[13px] text-slate-400">
+                    Không tìm thấy điều nào{timCaKho ? ' trong cả kho' : ' trong văn bản này'}. Thử từ khoá khác hoặc gõ số điều.
+                    {!timCaKho && (
+                      <button onClick={() => setTimCaKho(true)} className="mt-2 block rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-[12.5px] font-bold text-emerald-700">
+                        🔎 Tìm trong cả kho (luật, nghị định, thông tư…)
+                      </button>
+                    )}
+                  </div>
                 : ketQua.map((x) => (
-                  <button key={x.ma + ':' + x.d.so} onClick={() => moDieu(x.ma, x.d.so)}
+                  <button key={x.ma + ':' + x.d.so} onClick={() => moDieu(x.ma, x.d.so, docSoDieu(kd(tim.trim()))?.khoan)}
                     className={`block w-full border-b border-slate-100 px-3 py-2 text-left hover:bg-slate-50 ${x.ma === maVb && chon === x.d.so ? 'bg-[#0A2540]/[0.05]' : ''}`}>
                     <span className={`block text-[13px] font-bold ${x.d.tinhTrang?.loai === 'het-hieu-luc' ? 'text-slate-400 line-through decoration-rose-300' : 'text-[#0A2540]'}`}>
                       {ghim.includes(khoaGhim(x.ma, x.d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(x.ma, x.d.so)] ? '💡 ' : ''}{canKiem(x.ma, x.d.so) ? '❓ ' : ''}{dauTinhTrang(x.d)}Điều {x.d.so}. {x.d.tieuDe}
@@ -2190,6 +2245,14 @@ export default function TraCuuLuatPage() {
                       {timCaKho && <span className="mr-1 rounded bg-slate-100 px-1 font-bold text-slate-500">{nhanNgan(x.ma, cacVb[x.ma]?.soHieu || '')}</span>}
                       {x.d.chuong ? <>Chương {x.d.chuong}{x.d.muc ? ` · Mục ${x.d.muc}` : ''}</> : null}
                     </span>
+                    {(() => {
+                      const td = trichDoan.get(x.ma + ':' + x.d.so);
+                      return td ? (
+                        <span className="mt-0.5 block text-[11.5px] leading-snug text-slate-500">
+                          {td.truoc}<b className="rounded bg-amber-100 px-0.5 font-semibold text-slate-800">{td.khop}</b>{td.sau}
+                        </span>
+                      ) : null;
+                    })()}
                   </button>
                 ))}
             </>) : vb.chuong.length === 0 ? (
@@ -2433,7 +2496,8 @@ export default function TraCuuLuatPage() {
                 <p className="mt-3 text-[10.5px] font-bold uppercase tracking-wide text-slate-400">Nguyên văn</p>
                 <div className="mt-1 space-y-2.5 text-[14px] leading-relaxed text-slate-800">
                   {dieuDangXem.khoan.map((k, i) => (
-                    <div key={i}>
+                    <div key={i} id={k.so ? 'khoan-' + k.so : undefined}
+                      className={khoanSang && k.so === khoanSang ? '-mx-1.5 rounded-lg bg-amber-50 px-1.5 py-1 ring-1 ring-amber-300' : ''}>
                       <p className="whitespace-pre-line">
                         {k.so ? <b className="text-[#0A2540]">{k.so}. </b> : null}{noiDung(k.chu)}
                       </p>

@@ -414,6 +414,11 @@ export default function TraCuuLuatPage() {
   const vb = cacVb[maVb] || null;
   const [daChep, setDaChep] = useState<'' | 'chu' | 'link'>('');
   const daMoLink = useRef(false);
+  // Cỡ chữ phần nguyên văn (đợt 20): 0 = 14px (mặc định), 1 = 16px, 2 = 18px — nhớ trên máy.
+  const CO_CHU = [14, 16, 18];
+  const [coChu, setCoChu] = useState(0);
+  useEffect(() => { try { const v = Number(localStorage.getItem('luat-co-chu')); if (v >= 0 && v <= 2) setCoChu(v); } catch { /* */ } }, []);
+  const doiCoChu = () => setCoChu((v) => { const m = (v + 1) % CO_CHU.length; try { localStorage.setItem('luat-co-chu', String(m)); } catch { /* */ } return m; });
 
   // Tải một văn bản. Nhớ lại lời hứa đang chạy để bấm nhanh hai lần không tải hai lần.
   const taiVb = (ma: string): Promise<VanBan> => {
@@ -2801,6 +2806,10 @@ export default function TraCuuLuatPage() {
                     className={`shrink-0 rounded-lg border px-2 py-1 text-[12px] font-semibold ${daChep === 'chu' ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-500'}`}>{daChep === 'chu' ? '✓ Đã chép' : '⧉ Chép'}</button>
                   <button onClick={() => guiLink(dieuDangXem)} title="Gửi đường dẫn tới điều này (mở thẳng đúng điều)"
                     className={`shrink-0 rounded-lg border px-2 py-1 text-[12px] font-semibold ${daChep === 'link' ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-500'}`}>{daChep === 'link' ? '✓ Đã chép đường dẫn' : '🔗 Gửi'}</button>
+                  <button onClick={doiCoChu} title={`Cỡ chữ nguyên văn: ${CO_CHU[coChu]} — bấm để đổi`}
+                    className="shrink-0 rounded-lg border border-slate-200 px-2 py-1 text-[12px] font-semibold text-slate-500">
+                    <span style={{ fontSize: 10 + coChu * 2 }}>A</span>a
+                  </button>
                   </span>
                 </div>
 
@@ -2950,7 +2959,7 @@ export default function TraCuuLuatPage() {
                 )}
 
                 <p className="mt-3 text-[10.5px] font-bold uppercase tracking-wide text-slate-400">Nguyên văn</p>
-                <div className="mt-1 space-y-2.5 text-[14px] leading-relaxed text-slate-800">
+                <div className="mt-1 space-y-2.5 leading-relaxed text-slate-800" style={{ fontSize: CO_CHU[coChu] }}>
                   {dieuDangXem.khoan.map((k, i) => (
                     <div key={i} id={k.so ? 'khoan-' + k.so : undefined}
                       className={khoanSang && k.so === khoanSang ? '-mx-1.5 rounded-lg bg-amber-50 px-1.5 py-1 ring-1 ring-amber-300' : ''}>

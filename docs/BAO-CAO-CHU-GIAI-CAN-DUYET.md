@@ -375,7 +375,10 @@ Anh bấm thử thửa nào thấy khác trước thì đó là 1 trong 5 chỗ 
 bị lệch thành ra gây nghi ngờ cho người dùng"*). Khi QĐ205 và bản phân khu cùng nói một điều trên thửa, chỉ lệch nhau ở nét vẽ ≤ 1,5 m,
 web lấy diện tích theo bản phân khu (tên loại vẫn của QĐ205). Đo 2.340 thửa: 1.035 thửa được mượn ranh; **17 thửa đổi quá 1 m², lớn nhất
 17 m²** (thửa 114 tờ 9 Xã Cam Lâm: QĐ205 thuần 2.039,6 m² đường — web ghi 2.022,5 theo QĐ2101; thửa 56 tờ 63 Cam Hải Đông: 28,8 → 11,8
-theo QĐ2222). Nếu anh đo tay QĐ205 trên MicroStation thì sẽ thấy chênh đúng chừng đó. Anh chọn:
+theo QĐ2222). Nếu anh đo tay QĐ205 trên MicroStation thì sẽ thấy chênh đúng chừng đó.
+Ảnh `bao-cao-qh/hoa-hop-205-thua-114-to-9.png` (tô đỏ đậm = phần chênh 17,1 m²): chênh gần hết nằm ở **góc lô sát ngã tư** — QĐ205 vẽ
+góc lô **bo tròn** (phần bo là lòng đường), QĐ2101 vẽ góc **vát thẳng** ngắn hơn (nét xanh) nên lô to hơn; dọc mép lô hai bản lệch nhau
+chỉ vài phân. Hai bản vẽ đều đúng theo bản của mình — chỉ là mỗi bản vẽ góc một kiểu. Anh chọn:
 (a) giữ như hiện nay (3 bản ra số giống nhau, dễ hiểu cho người xem); (b) tắt — QĐ205 ra **đúng 100 % bản vẽ QĐ205**, chấp nhận 3 bản
 lệch nhau vài m² ở mép đường.
 

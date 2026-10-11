@@ -22,10 +22,11 @@ CÁC LỆNH
         Kiểm mọi văn bản tham khảo: đủ trường, dẫn chiếu trỏ đúng điều có thật trong kho, và
         NGUYÊN VĂN: từng đoạn chữ phải có trong chữ bóc từ bản gốc (bản quét thì liệt kê chỗ
         khác với chữ máy đọc để người soát nhìn lại ảnh).
-  vao-kho <tệp-chữ.txt>... --ma <mã> --so-hieu <số hiệu> [--ten "..."] [--het-hieu-luc "..."]
+  vao-kho <tệp-chữ.txt>... --ma <mã> --so-hieu <số hiệu> [--ten "..."] [--het-hieu-luc "..."] [--thu-muc <dir>]
         Văn bản có ĐIỀU (luật, nghị quyết QH, nghị định, thông tư): tách thành JSON bằng đúng bộ
         tách của kho (tach-luat-pdf.py qua dung-kho-luat.py) và thêm MỘT dòng vào _kho.json —
         không đụng văn bản nào khác. Sau đó chạy tiếp chuỗi script ghi trong SKILL.md.
+        --thu-muc: làm trên BẢN SAO của thư mục kho (chạy thử trước khi làm thật).
 
 Các công cụ PDF (gs, qpdf, ocrmypdf, tesseract tiếng Việt, pdftotext…) chạy TRONG container máy
 chủ `camlam_backend` (đổi bằng biến MAY_XU_LY), trên BẢN SAO đặt ở /tmp — không đụng tệp gốc.
@@ -540,6 +541,20 @@ def nhap_cong_van(ma, tinh='', nhom='huong-dan'):
     chu = boc_chu(ma)
     dong = [d.strip() for d in chu.replace('\f', '\n').split('\n')]
     dong = [d for d in dong if d and not re.fullmatch(r'\d{1,3}', d)]      # bỏ số trang
+    # Chữ máy đọc từ ảnh quét hay GỘP hai cột phần đầu công văn vào một dòng:
+    #   "CHI CỤC KIỂM LÂM LÀO CAI CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"
+    #   "Số: 82/HKL-QLBVR Lục Yên, ngày 23 tháng 6 năm 2026"
+    # → gỡ quốc hiệu, tiêu ngữ ra khỏi dòng; tách "Số: …" và "<địa danh>, ngày …" thành hai dòng.
+    tach = []
+    for d in dong:
+        d = re.sub(r'\s*CỘNG H[OÒ]A XÃ HỘI CHỦ NGHĨA VIỆT NAM\s*|\s*CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM\s*', ' ', d)
+        d = re.sub(r'\s*Độc lập\s*-\s*Tự do\s*-\s*Hạnh phúc\s*', ' ', d).strip()
+        m = re.match(r'^(Số\s*:\s*\S+(?:\s*/\s*\S+)?)\s+(\S.{1,40}?,\s*ngày.*)$', d)
+        if m:
+            tach += [m.group(1), m.group(2)]
+        elif d:
+            tach.append(d)
+    dong = tach
     the = {'coQuan': [], 'soHieu': '', 'ngay': '', 'diaDanh': '', 'ten': [], 'kinhGui': [], 'doan': [],
            'noiNhan': [], 'chucVuKy': [], 'nguoiKy': ''}
     vung = 'dau'
@@ -555,6 +570,11 @@ def nhap_cong_van(ma, tinh='', nhom='huong-dan'):
             if m:
                 the['diaDanh'] = m.group(1).strip()
                 the['ngay'] = '%s-%02d-%02d' % (m.group(4), int(m.group(3)), int(m.group(2)))
+                continue
+            m = re.match(r'^([^,]{2,40}),\s*ngày\b', d)
+            if m:
+                # dòng ngày tháng mà máy đọc sai số (ngày viết tay…) — nhận địa danh, ngày để người soát điền
+                the['diaDanh'] = m.group(1).strip()
                 continue
             if d.startswith(('V/v', 'Về việc', 'V/V')) or (the['ten'] and not d.startswith('Kính gửi')):
                 the['ten'].append(d)
@@ -574,14 +594,23 @@ def nhap_cong_van(ma, tinh='', nhom='huong-dan'):
                 continue
             vung = 'than'
         if vung == 'than':
-            if re.match(r'^Nơi nhận\s*:?', d):
+            m = re.match(r'^Nơi nhận\s*:?\s*(.*)$', d)
+            if m:
                 vung = 'noi-nhan'
+                if m.group(1) and RE_KY.match(m.group(1)):          # "Nơi nhận: KT. HẠT TRƯỞNG" (hai cột gộp)
+                    the['chucVuKy'].append(m.group(1).strip())
                 continue
             the['doan'].append(d)
             continue
         if vung == 'noi-nhan':
             if d.startswith('- '):
-                the['noiNhan'].append(d[2:].strip())
+                # "- Như trên; PHÓ HẠT TRƯỞNG" (hai cột gộp) → tách chức vụ người ký ra
+                m = re.match(r'^-\s*(.+?[;.])\s+((?:KT\.|TM\.|TL\.)?\s*[A-ZĐÀ-Ỹ][A-ZĐÀ-Ỹ .]{3,})$', d)
+                if m:
+                    the['noiNhan'].append(m.group(1).strip())
+                    the['chucVuKy'].append(m.group(2).strip())
+                else:
+                    the['noiNhan'].append(d[2:].strip())
             elif RE_KY.match(d):
                 the['chucVuKy'].append(d)
             else:

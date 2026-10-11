@@ -410,6 +410,9 @@ export default function TraCuuLuatPage() {
   const oNoiDung = useRef<HTMLDivElement | null>(null);
   // Cuộn tới điều vừa mở SAU KHI trang vẽ xong (đợt 23, 12/10/2026) — moDieu chỉ tăng số này, việc cuộn để effect bên dưới làm.
   const [cuonToi, setCuonToi] = useState(0);
+  // Bung / thu hai khung phụ trước nguyên văn (đợt 25): mặc định THU một dòng; người dùng bung một lần thì các điều sau cũng bung.
+  const [moHuongDan, setMoHuongDan] = useState(false);
+  const [moThamKhao, setMoThamKhao] = useState(false);
   const oTim = useRef<HTMLInputElement | null>(null);
   const daTai = useRef<Record<string, Promise<VanBan>>>({});
 
@@ -1306,7 +1309,15 @@ export default function TraCuuLuatPage() {
     if (!ds?.length) return null;
     return (
       <div className="mt-2 rounded-xl border-l-4 border-amber-400 bg-amber-50/70 px-2.5 py-2">
-        <p className="text-[12.5px] font-bold text-amber-900">📨 {ds.length} văn bản hướng dẫn, giải đáp nhắc tới điều này</p>
+        {/* THU MỘT DÒNG (đợt 25) — nhưng công văn báo điều này CẦN KIỂM HIỆU LỰC thì luôn hiện chữ đỏ ngay dòng đầu */}
+        <button onClick={() => setMoThamKhao((v) => !v)} className="flex w-full items-start justify-between gap-2 text-left">
+          <span className="text-[12.5px] font-bold leading-snug text-amber-900">
+            📨 {ds.length} văn bản hướng dẫn, giải đáp nhắc tới điều này
+            {!moThamKhao && ds.some((z) => z.canh) && <span className="ml-1 font-extrabold text-rose-700">· ❓ có văn bản báo cần kiểm hiệu lực</span>}
+          </span>
+          <span className="shrink-0 text-[12px] font-bold text-amber-800">{moThamKhao ? '▴' : '▾'}</span>
+        </button>
+        {moThamKhao && <>
         <p className="text-[11px] leading-snug text-amber-800/80">Chỉ để tham khảo — không phải văn bản luật; văn bản của tỉnh khác không bắt buộc ở Khánh Hòa.</p>
         {ds.map((z, i) => {
           const v = vbBth[z.ma];
@@ -1334,6 +1345,7 @@ export default function TraCuuLuatPage() {
             </div>
           );
         })}
+        </>}
       </div>
     );
   };
@@ -2955,10 +2967,15 @@ export default function TraCuuLuatPage() {
                   if (maVb !== 'ldd2024' || !ds?.length) return null;
                   return (
                     <div className="mt-2 rounded-xl border-l-4 border-teal-400 bg-teal-50/70 px-2.5 py-2">
-                      <p className="text-[12.5px] font-bold text-teal-800">
-                        📎 Điều này được hướng dẫn chi tiết ở {ds.length} văn bản dưới luật
-                      </p>
-                      <div className="mt-1 space-y-1">
+                      {/* THU MỘT DÒNG (đợt 25): tên các văn bản; bấm mới bung từng điều */}
+                      <button onClick={() => setMoHuongDan((v) => !v)} className="flex w-full items-start justify-between gap-2 text-left">
+                        <span className="text-[12.5px] leading-snug">
+                          <b className="text-teal-800">📎 Hướng dẫn chi tiết ở {ds.length} văn bản dưới luật</b>
+                          {!moHuongDan && <span className="text-slate-500">: {ds.map((v) => nhanNgan(v.ma, kho.find((z) => z.ma === v.ma)?.soHieu || '') || v.nhan).join(' · ')}</span>}
+                        </span>
+                        <span className="shrink-0 text-[12px] font-bold text-teal-700">{moHuongDan ? '▴' : '▾'}</span>
+                      </button>
+                      {moHuongDan && <div className="mt-1 space-y-1">
                         {ds.map((v) => (
                           <div key={v.ma} className="flex flex-wrap items-center gap-1">
                             <span className="text-[11.5px] font-semibold text-slate-500">{v.nhan}:</span>
@@ -2966,7 +2983,7 @@ export default function TraCuuLuatPage() {
                             {v.dieu.length > 8 && <span className="text-[11px] text-slate-400">+{v.dieu.length - 8}</span>}
                           </div>
                         ))}
-                      </div>
+                      </div>}
                     </div>
                   );
                 })()}

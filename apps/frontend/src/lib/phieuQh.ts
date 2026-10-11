@@ -563,7 +563,10 @@ function buildHtml(o: PhieuOpts): string {
     (function(){
       var svg=document.getElementById('qhsvg'); if(!svg) return;
       var vb={x:0,y:0,w:400,h:300};
-      function apply(){ svg.setAttribute('viewBox', vb.x.toFixed(2)+' '+vb.y.toFixed(2)+' '+vb.w.toFixed(2)+' '+vb.h.toFixed(2)); }
+      // Sơ đồ các PHỤ LỤC (plsvg0, plsvg1…) dựng cùng khung toạ độ với sơ đồ chính → phóng/kéo sơ đồ chính thì
+      // các phụ lục CHẠY THEO cùng khung nhìn (chủ dự án 11/10/2026: "khi chỉnh ở ô chính thì cho các ô phụ lục chính thửa đất theo").
+      var phu=Array.prototype.slice.call(document.querySelectorAll('svg[id^="plsvg"]'));
+      function apply(){ var v=vb.x.toFixed(2)+' '+vb.y.toFixed(2)+' '+vb.w.toFixed(2)+' '+vb.h.toFixed(2); svg.setAttribute('viewBox', v); phu.forEach(function(s){ s.setAttribute('viewBox', v); }); }
       function toSvg(cx,cy){ var r=svg.getBoundingClientRect(); return {x:vb.x+(cx-r.left)/r.width*vb.w, y:vb.y+(cy-r.top)/r.height*vb.h}; }
       function zoomAt(f,sx,sy){ var nw=vb.w*f; if(nw>1600||nw<100) return; vb.x=sx-(sx-vb.x)*f; vb.y=sy-(sy-vb.y)*f; vb.w=nw; vb.h=vb.h*f; apply(); }
       svg.addEventListener('wheel',function(e){ e.preventDefault(); var p=toSvg(e.clientX,e.clientY); zoomAt(e.deltaY>0?1.12:0.892,p.x,p.y); },{passive:false});

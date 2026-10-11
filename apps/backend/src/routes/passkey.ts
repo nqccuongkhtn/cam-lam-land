@@ -48,10 +48,16 @@ const ORIGINS = (process.env.WEBAUTHN_ORIGINS || '')
   .split(',').map((s) => s.trim()).filter(Boolean);
 if (!ORIGINS.length) ORIGINS.push('http://localhost', 'http://127.0.0.1');
 
-/** Lấy đúng tên miền của request để so — cho phép cả localhost lẫn tên miền thật. */
+/** Lấy đúng tên miền của request để so — cho phép cả localhost lẫn tên miền thật.
+ *  ⚠️ 11/10/2026 (rà soát bảo mật): trước đây nhận THÊM BẤT KỲ địa chỉ https nào trình duyệt khai trong Origin,
+ *  tức bỏ mất phép so tên miền. Nay chỉ nhận thêm khi đó đúng là tên miền đã đăng ký (RP_ID) hoặc tên miền con của nó. */
 function gocCuaRequest(req: any): string[] {
   const o = String(req.get('origin') || '').trim();
-  return o && !ORIGINS.includes(o) && /^https:\/\//.test(o) ? [...ORIGINS, o] : ORIGINS;
+  if (!o || ORIGINS.includes(o) || !/^https:\/\//.test(o)) return ORIGINS;
+  let host = '';
+  try { host = new URL(o).hostname.toLowerCase(); } catch { return ORIGINS; }
+  const rp = RP_ID.toLowerCase();
+  return host === rp || host.endsWith('.' + rp) ? [...ORIGINS, o] : ORIGINS;
 }
 
 /** Cất thử thách vào database, trả về khoá phiên để trình duyệt gửi lại. */
@@ -126,13 +132,19 @@ passkeyRouter.post('/dang-ky/xong', authRequired, async (req: AuthedRequest, res
       return res.status(400).json({ error: 'Không nhận được. Thử lại.' });
 
     const { credential } = kq.registrationInfo;
-    await query(
+    // ⚠️ 11/10/2026 (rà soát bảo mật): trùng mã khoá thì CHỈ cập nhật khi khoá đó là của CHÍNH người này.
+    //    Trước đây ai cũng ghi đè được bộ đếm của khoá người khác (mã khoá lộ qua /dang-nhap/bat-dau kèm email)
+    //    → chủ thật không đăng nhập bằng vân tay được nữa ("Chữ ký không hợp lệ").
+    const ghi = await query(
       `INSERT INTO webauthn_credentials (user_id, cred_id, public_key, counter, transports, ten_may)
        VALUES ($1,$2,$3,$4,$5,$6)
-       ON CONFLICT (cred_id) DO UPDATE SET counter = EXCLUDED.counter, last_used = now()`,
+       ON CONFLICT (cred_id) DO UPDATE SET counter = EXCLUDED.counter, last_used = now()
+         WHERE webauthn_credentials.user_id = EXCLUDED.user_id
+       RETURNING id`,
       [me.id, credential.id, Buffer.from(credential.publicKey), credential.counter ?? 0,
        (credential.transports || []).join(',') || null,
        String(tenMay || '').slice(0, 60) || 'Máy này']);
+    if (!ghi.length) return res.status(409).json({ error: 'Khoá này đang gắn với tài khoản khác.' });
     res.status(201).json({ ok: true });
   } catch (e) { next(e); }
 });

@@ -677,7 +677,8 @@ Mọi thao tác ghi phải gọi `cacheDrop('listings:')` để xoá cache.
   Đây là lý do nginx có luật cache riêng cho `.geojson`, `.pmtiles`, `/tiles/`, `/overlays/`.
 - Là **PWA**: `public/sw.js`, `manifest.webmanifest`, `offline.html`, thông báo đẩy (VAPID).
 - **`app/tra-cuu-luat/page.tsx`** — học & tra cứu luật (dữ liệu `public/luat/*.json`, cần đăng nhập). Bộ TÌM (11/10/2026):
-  khớp theo **TIẾNG trọn vẹn** ("thu" không dính "thuộc"); gõ **có dấu thì so có dấu**, không dấu thì so không dấu;
+  khớp theo **TIẾNG trọn vẹn** ("thu" không dính "thuộc"); gõ **có dấu thì so có dấu**, không dấu thì so không dấu
+  (có dấu mà không điều nào khớp đúng dấu — gõ sai / thiếu dấu một chữ — thì `timHL` tự lùi về so không dấu, có dòng báo);
   `thuongDau()` quy **hai kiểu đặt dấu thanh** về một (`chuanDau`: "ủy/uỷ", "hòa/hoà" — chính kho luật dùng lẫn: "ủy" 1.909 chỗ,
   "uỷ" 313 chỗ; thiếu bước này gõ một kiểu là sót kiểu kia); `CACH_GOI` đổi **cách gọi đời thường → chữ của luật**
   ("sổ đỏ" → "giấy chứng nhận", "đền bù" → "bồi thường", "UBND"…) để tìm THÊM, xếp sau kết quả đúng chữ đã gõ.

@@ -171,6 +171,10 @@ authRouter.patch('/me', authRequired, async (req: AuthedRequest, res, next) => {
       const [u] = await query('SELECT password_hash FROM users WHERE id=$1', [req.user!.id]);
       if (!u || !(await verifyPassword(b.currentPassword ?? '', u.password_hash)))
         return res.status(400).json({ error: 'Mật khẩu hiện tại không đúng' });
+      // 11/10/2026 (chủ dự án báo lỗi): đặt lại ĐÚNG mật khẩu đang dùng vẫn được "đổi" — vô nghĩa mà còn tắt vân tay /
+      // đăng xuất máy khác như thật. So với chuỗi băm đang lưu (không so chữ trần) → trùng thì từ chối.
+      if (await verifyPassword(String(b.newPassword), u.password_hash))
+        return res.status(400).json({ error: 'Mật khẩu mới phải khác mật khẩu đang dùng.' });
       const dangXuatMayKhac = b.dangXuatMayKhac !== false;   // không gửi (giao diện cũ) = CÓ đăng xuất — mặc định an toàn
       const kq = await doiMatKhau(req.user!.id, String(b.newPassword), dangXuatMayKhac);
       // Thẻ MỚI cho chính máy này (cùng mã thiết bị, mang đời phiên mới) → máy đang đổi mật khẩu vẫn đăng nhập.

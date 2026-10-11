@@ -68,6 +68,16 @@ def manh_khong_lo(g, sau=0):
     return [p for p in ra if isinstance(p, Polygon) and p.area > 0]
 
 
+
+def cac_da_giac(g):
+    """MỌI đa giác trong một hình, ở mọi tầng. Đổi toạ độ xong, thư viện hình học có lúc trả về "hộp chứa" gồm nhiều đa giác
+    lẫn vài nét thừa (GeometryCollection[MultiPolygon, MultiLineString]) — chỉ nhặt đa giác đơn ở tầng ngoài là SÓT cả nhóm
+    (11/10/2026: QĐ205 mất 76,8 ha đất nông nghiệp + 7,8 ha sông suối theo cách đó)."""
+    if g is None or g.is_empty: return []
+    if isinstance(g, Polygon): return [g] if g.area > 0 else []
+    return [p for q in getattr(g, 'geoms', []) for p in cac_da_giac(q)]
+
+
 def main(vao, ma):
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     R = json.load(io.open(os.path.join(DATA, 'ranh_qh.json'), encoding='utf-8'))
@@ -103,8 +113,7 @@ def main(vao, ma):
             continue
         if re.fullmatch(r'\s*\d+\s*', lv): loai, bac = b5.CHUA_RO, 0      # level chỉ là con số: bản vẽ không nói đất gì
         else: loai, bac = b5.ten_loai(lv), BAC.get(b1.nhom(lv), 3)
-        for phan in (W.geoms if hasattr(W, 'geoms') else [W]):
-            if not isinstance(phan, Polygon) or phan.area <= 0: continue
+        for phan in cac_da_giac(W):
             dt = Polygon(phan.exterior).area                  # xếp thứ tự theo VÒNG NGOÀI của phần này (như cũ)
             trong = make_valid(phan.intersection(RG))
             if trong.is_empty or trong.area < phan.area * 1e-9:

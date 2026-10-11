@@ -84,8 +84,21 @@ LV_QH, LV_HT = 'Level 34', 'Level 33'
 
 
 def hop_mau(ma, mau):
+    if '+' in ma:                                   # nhãn ghép: hợp màu khi có ít nhất một mã hợp màu
+        return any(hop_mau(x, mau) for x in ma.split('+'))
     nm = NHOM_MAU.get(mau)
     return nm is not None and NHOM.get(ma) == nm
+
+
+def ma_ghep(ds):
+    """Nhãn ghép "A+B(+C)" → một mã mới, tên "Đất hỗn hợp (A + B …)" — giữ đúng thứ tự và chữ của bản vẽ."""
+    k = '+'.join(ds)
+    if k not in TEN:
+        TEN[k] = 'Đất hỗn hợp (%s)' % ' + '.join(ds)
+        nh = {NHOM.get(x) for x in ds}
+        if len(nh) == 1 and None not in nh:
+            NHOM[k] = nh.pop()
+    return k
 
 
 def tach_lo(g, sau=0):
@@ -149,9 +162,15 @@ def main(vao, tep_chu, tep_kh):
         t = ((f['properties'] or {}).get('Text') or '').strip()
         if lv not in (LV_QH, LV_HT):
             continue
-        for ma in re.findall(r'\b[A-Z]{3}\b', t):     # có chữ ghi 2 mã "TMD, RSX"
-            if ma not in TEN:
-                continue
+        # %%u / %%U = mã gạch chân của CAD dính liền chữ ("%%uHNK+RSX+CSD%%U") → bỏ trước, không thì mã đầu bị sót.
+        t = re.sub(r'%%[uUoO]', '', t)
+        ds = [ma for ma in re.findall(r'\b[A-Z]{3}\b', t) if ma in TEN]
+        # NHÃN GHÉP bằng dấu "+" (11/10/2026): "TMD+ODT", "NKH+TMD", "DTT+DKV+TMD"… = ĐẤT HỖN HỢP gồm các mã đó (119 nhãn quy
+        # hoạch). Trước đây tách rời từng mã rồi bỏ mã "trái màu" → web ghi một loại đơn lẻ (thửa 326 tờ 7 Cam Đức: bản vẽ ghi
+        # "TMD+ODT", web ghi "Đất thương mại, dịch vụ"; app tham chiếu ghi đất hỗn hợp). Nay giữ cả nhãn thành MỘT loại.
+        if '+' in t and len(ds) >= 2:
+            ds = [ma_ghep(ds)]
+        for ma in ds:
             i = gan(Point(f['geometry']['coordinates']), ma)
             if i is not None:
                 (qh if lv == LV_QH else ht)[i].append(ma)
@@ -170,6 +189,8 @@ def main(vao, tep_chu, tep_kh):
     # đất. Kiểm tra màu ảnh 4.000 điểm (15/9/2026): chữ DGT của một con đường rơi vào khu rừng phòng hộ lớn phía Tây
     # Nam → cả khu rừng thành "đất giao thông", chiếm 80/81 điểm lệch còn lại.
     def trai_mau(ma, m):
+        if '+' in ma:                               # nhãn ghép trái màu khi KHÔNG mã nào thuộc nhóm của màu tô
+            return m in NHOM_MAU and all(NHOM.get(x) != NHOM_MAU[m] for x in ma.split('+'))
         return m in NHOM_MAU and NHOM.get(ma) != NHOM_MAU[m]
     for i, m in enumerate(mau):
         qh[i] = [x for x in qh[i] if not trai_mau(x, m)]

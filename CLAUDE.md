@@ -542,6 +542,17 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   (6) xếp lớp như bản vẽ hiển thị: mọi ô ngang bậc, ô có vùng tô gốc nhỏ hơn nằm trên (diện tích xếp = vòng ngoài vùng tô gốc, không
   phải mảnh). 79 phiếu: 9.315 → 9.269 m² (8 phiếu tốt lên, 4 phiếu đổi 0,1 m² do làm tròn cung). Còn để nguyên chờ chủ dự án: 714 vùng
   xanh nước KHÔNG ghi mã (4.585 ha) đang gọi "Đất sông, ngòi, kênh, rạch" dù chú dẫn dùng màu này cho cả hồ / thuỷ lợi / ao nuôi.
+  (7) NHÃN GHÉP "+" ("TMD+ODT", "NKH+TMD", "DTT+DKV+TMD"… 119 nhãn) = một loại "Đất hỗn hợp (TMD + ODT)" — trước tách mã rồi bỏ mã trái
+  màu (thửa 326 tờ 7 Cam Đức: app tham chiếu ghi đất hỗn hợp, web ghi thương mại dịch vụ). Chữ "%%u…%%U" (gạch chân CAD) bỏ trước khi đọc mã.
+- **QĐ205 DỰNG LẠI THẲNG TỪ QD205.gpkg (11/10/2026): `5h-dung-o-205-tu-gpkg.py` (+ bảng `lop-205.json` lớp → tên) rồi `5i-khe-rong-205.py`.
+  Thay hẳn ô cũ (DGN qua GDAL) + 5c / 5d / 5e (không cần chạy nữa).** Ô cũ khác nguồn hình với vùng tô gốc: so cả bản lệch 593 ha khác tên
+  (261 ha đất nông nghiệp ghi "Đất đồi núi" — vùng tô bị lấp lỗ), 111 ô tự cắt nhau; thửa 326 tờ 7 Cam Đức dư 33 m² đường so với app tham
+  chiếu. Nay chẵn–lẻ, cắt theo ranh (2.036 ha vẽ ra ngoài ranh), so cả bản với gpkg 99,99 %. **Luật khe ngoài khung mặt nạ đổi:** trước
+  "cách ô gần nhất ≥ 2,5 m mới là đường" → cắt mỗi bên đường 2,5 m giao cho ô cạnh (đường 20 m thiếu 5 m); nay dùng `khe_rong_205.json`
+  (phần không tô co–nở 1,5 m: khe ≥ 3 m = lòng đường, kể cả sát mép; kẽ < 3 m → ô gần nhất). 2.000 thửa ngẫu nhiên: lệch so với gpkg
+  2,84 % → 0,02 % (441 thửa gần bản vẽ hơn, 1 thửa xa hơn 0,6 m²); thửa 326 = 1.218,9 hỗn hợp + 468,1 đường (app tham chiếu 1.218,7 +
+  468,3). Bẫy đã vấp: sau khi đổi toạ độ, make_valid có lúc trả "hộp chứa" (MultiPolygon + nét thừa) — phải nhặt MỌI đa giác ở mọi tầng
+  (`cac_da_giac` trong 5g / 5h / 1d), không thì sót cả nhóm (QĐ205 từng mất 76,8 ha).
 - Đã thử và BỎ: đáp án "giữa 2 nét mép đường -1-TRAFFIC-PAVEMENT trong 35 m = đường" — nét mép đường QĐ205 vẽ không đủ, đường
   rộng bị hụt. Dòng `CACH_O_GAN_M` trong nearestLand nay chạy thật (trước nằm sau return).
 Công cụ: scratchpad của phiên (audit*.ts quét thửa thật trong container, dap_an_all.py, ve_thua205.py vẽ thửa lên bản vẽ) — chưa

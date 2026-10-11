@@ -64,6 +64,16 @@ def mau_cua(e, lv):
     return MAU_NHU_GDAL.get(ci, b1.BANG[ci])
 
 
+
+def cac_da_giac(g):
+    """MỌI đa giác trong một hình, ở mọi tầng. Đổi toạ độ xong, thư viện hình học có lúc trả về "hộp chứa" gồm nhiều đa giác
+    lẫn vài nét thừa (GeometryCollection[MultiPolygon, MultiLineString]) — chỉ nhặt đa giác đơn ở tầng ngoài là SÓT cả nhóm
+    (11/10/2026: QĐ205 mất 76,8 ha đất nông nghiệp + 7,8 ha sông suối theo cách đó)."""
+    if g is None or g.is_empty: return []
+    if isinstance(g, Polygon): return [g] if g.area > 0 else []
+    return [p for q in getattr(g, 'geoms', []) for p in cac_da_giac(q)]
+
+
 def main(vao, ra):
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     lv = mau_cac_level(vao)
@@ -99,10 +109,9 @@ def main(vao, ra):
                 dem['loi'] += 1; continue
             x0, y0, x1, y1 = W.bounds
             if not (b1.KHUNG[0] <= x0 and x1 <= b1.KHUNG[2] and b1.KHUNG[1] <= y0 and y1 <= b1.KHUNG[3]): continue
-            for p in (W.geoms if hasattr(W, 'geoms') else [W]):
-                if isinstance(p, Polygon) and p.area > 0:
-                    out.append({'type': 'Feature', 'properties': {'lo': layer, 'c': c, 'hz': 'DAT', 'h': e.dxf.handle},
-                                'geometry': mapping(p)})
+            for p in cac_da_giac(W):
+                out.append({'type': 'Feature', 'properties': {'lo': layer, 'c': c, 'hz': 'DAT', 'h': e.dxf.handle},
+                            'geometry': mapping(p)})
             dem[t] += 1
     finally:
         doc.close()

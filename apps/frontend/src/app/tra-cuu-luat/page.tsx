@@ -297,6 +297,9 @@ const CACH_GOI: { goi: string[]; luat: string; canDau?: boolean }[] = [
   { goi: ['sang tên', 'mua bán đất'], luat: 'chuyển nhượng quyền sử dụng đất' },
   { goi: ['lấn chiếm'], luat: 'lấn đất' },
   { goi: ['khung giá đất', 'khung giá'], luat: 'bảng giá đất' },
+  // cụm ĐỦ phải có riêng (12/10/2026): bảng xếp theo độ dài nên "cấp sổ" đổi trước "sổ đỏ" → "cấp sổ đỏ" thành "cấp giấy chứng nhận ĐỎ"
+  // (sót chữ "đỏ") → không điều nào khớp. Cụm dài hơn thì được đổi trước, trọn cụm.
+  { goi: ['cấp sổ đỏ', 'làm sổ đỏ', 'cấp sổ hồng', 'làm sổ hồng', 'cấp bìa đỏ', 'cấp bìa hồng'], luat: 'cấp giấy chứng nhận', canDau: true },
   { goi: ['cấp sổ', 'làm sổ', 'cấp bìa'], luat: 'cấp giấy chứng nhận' },
   { goi: ['đất lúa'], luat: 'đất trồng lúa' },
 ];

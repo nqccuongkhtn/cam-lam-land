@@ -86,6 +86,55 @@ type KhoTheSo = { canhBao: string; the: TheSo[] };
 // Một thẻ đã dựng xong, sẵn sàng đưa ra hỏi.
 type TheHoc = { khoa: string; loai: string; chuDe: string; hoi: string; dap: string; nho?: string; dan?: Dan[] ; truc?: number };
 
+// ── BỘ TỔNG HỢP: một danh mục gom MỌI văn bản học được, sinh bởi scripts/luat/dung-bo-tong-hop.py ──
+// Không tự tính gì ở đây — chỉ hiện ra cái script đã gom (tình trạng, quan hệ, chủ đề, chặng).
+type TinhTrangVb = 'con-hieu-luc' | 'sua-doi-mot-phan' | 'het-hieu-luc' | 'tham-khao';
+type VbBth = { ma: string; nhom: string; loai: string; soHieu: string; nhan: string; ten: string; coQuan: string;
+  ngay: string; ngayHieuLuc: string; ngayHieuLucDoc?: string; hieuLucNguyenVan?: string; nguoiKy?: string;
+  tinhTrang: TinhTrangVb; tinhTrangChu: string; soDieu?: number; soChuong?: number;
+  dieuHetHieuLuc?: number; dieuBaiBoMotPhan?: number; dieuSuaDoi?: number;
+  quanHe?: Record<string, string[]>; chuDe: { ten: string; icon: string; soDieu?: number }[];
+  chang: { so: number; soDieu?: number; loi?: boolean }[]; nguon?: string;
+  tinh?: string; nguonChu?: string; banGoc?: string; tom?: string; nhacToiNgoaiKho?: string[];
+  canKiemTra?: { tu: string; dieu: number; khoan?: number; ghi: string }[];
+  luuTru?: { tep: string; kichThuocGoc: number; kichThuocLuu: number; cachLuu: string } };
+// Một văn bản tham khảo nhắc tới một điều của kho: TRÍCH DẪN (công văn trích điều đó) hoặc LIÊN QUAN
+// (người làm web thấy nên đọc kèm). luuY = lời người làm web, KHÔNG phải chữ của văn bản nào.
+type DanTk = { ma: string; kieu: 'trich-dan' | 'lien-quan'; khoan?: number; trich?: string[]; luuY?: string;
+  canh?: boolean; lyDo?: string };
+type NenBoSung = { soHieu: string; ten?: string; duocNhacBoi: string[]; nhom?: string; anhHuongDieu?: string[];
+  lyDoChuaCo?: string; canKiemTra?: string; danhMuc?: { link: string; tep: string[] } };
+type BoTongHop = { capNhat: string; tong: { vanBan: number; coDieu: number; thamKhao: number; dieu: number };
+  nhom: { ma: string; icon: string; ten: string; moTa: string; soVanBan: number; conHieuLuc: number; nenBoSung?: number }[];
+  tinhTrang: Record<string, { icon: string; ten: string }>;
+  chuDe: { ten: string; icon: string; tim: string; vanBan: { ma: string; soDieu?: number }[] }[];
+  chang: Chang2[]; vanBan: VbBth[]; theoDieu: Record<string, DanTk[]>; nenBoSung: NenBoSung[] };
+// VĂN BẢN THAM KHẢO (công văn hướng dẫn, giải đáp của bộ, sở các tỉnh) — public/luat/tham-khao/<mã>.json.
+// Không chia điều nên không đi chung đường với kho luật. doan = NGUYÊN VĂN từng đoạn.
+type VbThamKhao = { ma: string; loai: string; soHieu: string; ngay: string; diaDanh?: string; coQuanChuQuan?: string;
+  coQuan: string; coQuanNgan: string; tinh?: string; ten: string; kinhGui?: string; canhBao: string;
+  doan: string[]; chuThich?: { so: string; chu: string }[]; noiNhan?: string[]; chucVuKy?: string[]; nguoiKy?: string;
+  nguonChu: string; ghiChuChu?: string; suaMayDoc?: { may: string; dung: string; ghi?: string }[]; banGoc?: string;
+  danChieu: { chu: string; ma?: string; so?: number; khoan?: number; soHieu?: string; ngoaiKho?: boolean; luuY?: string; canh?: boolean }[];
+  vanBanNhacToi?: { soHieu: string; ma?: string; ten?: string; canKiemTra?: string }[];
+  lienQuan?: { ma: string; so: number; khoan?: number; lyDo?: string }[];
+  giaiThich?: { tom?: string; y?: string[]; luuY?: string } };
+// Màu nhãn tình trạng — nhìn màu là biết văn bản còn dùng được không.
+const MAU_TT: Record<TinhTrangVb, string> = {
+  'con-hieu-luc': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  'sua-doi-mot-phan': 'bg-sky-50 text-sky-700 border-sky-200',
+  'het-hieu-luc': 'bg-rose-50 text-rose-700 border-rose-200',
+  'tham-khao': 'bg-amber-50 text-amber-800 border-amber-200',
+};
+const TEN_QH: [string, string][] = [['canCu', 'Căn cứ ban hành'], ['thayThe', 'Thay thế'], ['biThayTheBoi', 'Bị thay thế bởi'],
+  ['suaDoi', 'Sửa đổi, bổ sung'], ['biSuaDoiBoi', 'Bị sửa đổi, bổ sung bởi'], ['baiBoMotPhan', 'Bãi bỏ một phần của'],
+  ['biBaiBoMotPhanBoi', 'Bị bãi bỏ một phần bởi'], ['laCanCuCho', 'Được hướng dẫn bởi']];
+// Tên NGẮN của nhóm cho hàng nút lọc trên điện thoại (tên đầy đủ để ở tiêu đề nhóm).
+const TEN_NGAN_NHOM: Record<string, string> = { luat: 'Luật', 'nghi-quyet': 'Nghị quyết', 'nghi-dinh': 'Nghị định',
+  'thong-tu': 'Thông tư', 'dia-phuong': 'Khánh Hòa', 'huong-dan': 'Tham khảo' };
+const nutLoc = (bat: boolean) => `shrink-0 whitespace-nowrap rounded-full border px-2.5 py-1 text-[12px] font-semibold transition ${bat ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`;
+const escRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 // DẪN CHIẾU TRONG CHỮ LUẬT — biến thành nút bấm được, kiểu Thư viện pháp luật.
 // Ba dạng, xét theo đúng thứ tự này (dạng dài phải xét trước, không thì bị dạng ngắn ăn mất):
 //   1. "Điều 5 của Nghị định số 88/2024/NĐ-CP"  -> nhảy tới đúng điều của đúng văn bản
@@ -131,6 +180,10 @@ const nhanNgan = (ma: string, soHieu: string) => {
   if (ma.startsWith('ldd')) return 'Luật Đất đai ' + ma.slice(3);
   if (ma.startsWith('lsd')) return 'Luật sửa đổi ' + ma.slice(3);
   const [so, nam, loai] = (soHieu || '').split('/');
+  // Nghị quyết của Quốc hội cũng đuôi QH như luật — nhận theo mã "nq…" (quy ước khi nạp).
+  if (ma.startsWith('nq')) return `NQ ${so}/${nam}`;
+  if (loai && /HĐND/.test(loai)) return `NQ ${so}/${nam} (HĐND)`;
+  if (loai && /UBND/.test(loai)) return `QĐ ${so}/${nam} (UBND)`;
   if (loai && loai.startsWith('QH')) return `Luật ${so}/${nam}`;
   if (loai && loai.startsWith('TT')) return `TT ${so}/${nam}`;
   return `NĐ ${so}/${nam}`;
@@ -139,6 +192,8 @@ const ngayVn = (s: string) => (s ? s.split('-').reverse().join('/') : '');
 // Dấu hiệu nhỏ đặt trước tên điều để nhìn danh sách là biết ngay điều nào còn dùng được.
 // Dấu đứng đầu tên điều trong danh sách — nhìn lướt là biết điều nào còn dùng được.
 // ⛔ hết hiệu lực · ⚠️ bị bãi bỏ một phần · ✏️ đã bị sửa đổi, bổ sung.
+// ❓ (dấu riêng, xem canKiem): công văn tham khảo báo điều này đã đổi hiệu lực mà văn bản làm thay đổi
+//    CHƯA có trong kho — máy không tự kết luận, chỉ nhắc "cần kiểm".
 const dauTinhTrang = (d: Dieu) => (d.tinhTrang?.loai === 'het-hieu-luc' ? '⛔ '
   : d.tinhTrang?.loai === 'bai-bo-mot-phan' ? '⚠️ '
   : (d.tinhTrang?.loai === 'sua-doi' || (d.suaDoi?.length || 0) > 0) ? '✏️ ' : '');
@@ -286,6 +341,21 @@ export default function TraCuuLuatPage() {
   const [dm, setDm] = useState<VanBanNgan[]>([]);
   const [timDm, setTimDm] = useState('');
   const [locLoai, setLocLoai] = useState('');
+  // ── BỘ TỔNG HỢP + VĂN BẢN THAM KHẢO ──
+  const [bth, setBth] = useState<BoTongHop | null>(null);
+  const [kieuDm, setKieuDm] = useState<'bo' | 'toanquoc'>('bo');   // thẻ Danh mục: bộ để học / toàn quốc
+  const [timBo, setTimBo] = useState('');
+  const [locNhom, setLocNhom] = useState('');
+  const [locTt, setLocTt] = useState('');
+  const [locCd, setLocCd] = useState('');
+  const [moVb, setMoVb] = useState<Record<string, boolean>>({});
+  const [moNen, setMoNen] = useState(false);
+  const [cacTk, setCacTk] = useState<Record<string, VbThamKhao>>({});
+  // Công văn đang mở ở NGĂN ĐỌC (giống ngăn đọc điều luật). tkTruoc: đang đọc công văn thì bấm sang
+  // một điều luật nó dẫn — nhớ lại để có nút "← Về công văn", khỏi lạc đường.
+  const [docTk, setDocTk] = useState<string | null>(null);
+  const [tkTruoc, setTkTruoc] = useState<string | null>(null);
+  const daTaiTk = useRef<Record<string, Promise<VbThamKhao>>>({});
   const oNoiDung = useRef<HTMLDivElement | null>(null);
   const daTai = useRef<Record<string, Promise<VanBan>>>({});
 
@@ -301,6 +371,21 @@ export default function TraCuuLuatPage() {
     }
     return daTai.current[ma];
   };
+  // Tải một văn bản tham khảo (công văn) — nhỏ, vài KB, chỉ tải khi cần.
+  const taiTk = (ma: string): Promise<VbThamKhao> => {
+    if (!daTaiTk.current[ma]) {
+      daTaiTk.current[ma] = fetch(`/luat/tham-khao/${ma}.json`)
+        .then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+        .then((d: VbThamKhao) => { setCacTk((m) => ({ ...m, [ma]: d })); return d; });
+      daTaiTk.current[ma].catch(() => { delete daTaiTk.current[ma]; });
+    }
+    return daTaiTk.current[ma];
+  };
+  // Mở công văn ở ngăn đọc bên cạnh — đang xem gì vẫn giữ nguyên phía sau.
+  const moTk = (ma: string) => {
+    taiTk(ma).catch(() => {});
+    setXemNhanh(null); setDocBen(null); setDocTk(ma);
+  };
 
   useEffect(() => {
     if (!duocXem) return;
@@ -313,6 +398,8 @@ export default function TraCuuLuatPage() {
     fetch('/luat/the-tu-dong.json').then((r) => r.json()).then(setTheTd).catch(() => {});
     fetch('/luat/lo-trinh.json').then((r) => r.json()).then(setLt).catch(() => {});
     fetch('/luat/chuoi-doc.json').then((r) => r.json()).then(setCd).catch(() => {});
+    // Bộ tổng hợp ~50 KB: tải luôn vì cả khung "văn bản tham khảo nhắc tới điều này" cũng cần nó.
+    fetch('/luat/bo-tong-hop.json').then((r) => r.json()).then(setBth).catch(() => {});
   }, [duocXem]);
 
   useEffect(() => {
@@ -341,7 +428,8 @@ export default function TraCuuLuatPage() {
 
   // Danh mục văn bản: cào cả dải mã văn bản của Hệ thống văn bản Chính phủ rồi lọc theo từ khoá đất đai
   // (xem scripts/luat/cao-van-ban-dat-dai.py) — nên KHÔNG SÓT như cách dùng ô tìm kiếm của trang gốc.
-  useEffect(() => { if (the === 'danhmuc' && !dm.length) fetch('/luat/danh-muc.json').then((r) => r.json()).then((d) => setDm(d.vanBan || [])).catch(() => {}); }, [the, dm.length]);
+  // Danh mục toàn quốc ~170 KB: chỉ tải khi mở đúng lớp "toàn quốc" (lớp "bộ để học" không cần).
+  useEffect(() => { if (the === 'danhmuc' && kieuDm === 'toanquoc' && !dm.length) fetch('/luat/danh-muc.json').then((r) => r.json()).then((d) => setDm(d.vanBan || [])).catch(() => {}); }, [the, kieuDm, dm.length]);
 
   useEffect(() => {
     try {
@@ -606,12 +694,36 @@ export default function TraCuuLuatPage() {
 
   const dieuDangXem = useMemo(() => (vb && chon != null ? vb.dieu.find((d) => d.so === chon) || null : null), [vb, chon]);
 
+  // Tra nhanh một văn bản trong bộ tổng hợp theo mã.
+  const vbBth = useMemo<Record<string, VbBth>>(
+    () => Object.fromEntries((bth?.vanBan || []).map((x) => [x.ma, x])), [bth]);
+  const dsTk = useMemo(() => (bth?.vanBan || []).filter((x) => x.tinhTrang === 'tham-khao'), [bth]);
+  // Đang gõ tìm thì tải luôn mấy văn bản tham khảo (vài KB mỗi cái) để tìm được cả trong đó.
+  useEffect(() => {
+    if (tim.trim().length >= 2) dsTk.forEach((x) => { taiTk(x.ma).catch(() => {}); });
+  }, [tim, dsTk]);
+  // Văn bản tham khảo có chữ khớp ô tìm (gõ không dấu vẫn ra) — hiện thành hàng nút trên kết quả.
+  const tkKhop = useMemo(() => {
+    const q = kd(tim.trim());
+    if (q.length < 2) return [];
+    return dsTk.filter((x) => {
+      const v = cacTk[x.ma];
+      const chu = [x.nhan, x.ten, x.coQuan, x.tinh || '', ...(v ? [...v.doan, ...(v.chuThich || []).map((c) => c.chu)] : [])].join(' ');
+      return kd(chu).includes(q);
+    });
+  }, [tim, dsTk, cacTk]);
+  // Điều này có văn bản tham khảo báo là đã đổi hiệu lực (văn bản làm thay đổi CHƯA có trong kho) không.
+  const canKiem = (ma: string, so: number) => !!bth?.theoDieu[`${ma}:${so}`]?.some((z) => z.canh);
+  // Đóng ngăn đọc điều luật thì quên luôn "công văn đang đọc dở" để nút "← Về công văn" không hiện sai chỗ.
+  useEffect(() => { if (!docBen) setTkTruoc(null); }, [docBen]);
+
   const doiVanBan = (ma: string) => {
     if (ma === maVb) return;
     setMaVb(ma); setChon(null); setMoChuong({}); setXemPhuLuc(false);
   };
   const moDieu = (ma: string, so: number) => {
     if (ma !== maVb) { setMaVb(ma); setMoChuong({}); }
+    setDocTk(null); setTkTruoc(null);       // mở hẳn một điều thì đóng ngăn đọc công văn
     setXemPhuLuc(false); setChon(so); setThe('luat');
     setMoDs(false);        // điện thoại: chọn xong thì thu danh sách, nhường màn hình cho nội dung
     oNoiDung.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -654,6 +766,14 @@ export default function TraCuuLuatPage() {
   const dichHetHieuLuc = (d: Dan) =>
     !!d.so && cacVb[d.ma]?.dieu.find((z) => z.so === d.so)?.tinhTrang?.loai === 'het-hieu-luc';
   const NutDan = ({ d, nho }: { d: Dan; nho?: boolean }) => {
+    // Văn bản THAM KHẢO (công văn): nút màu vàng, bấm là mở ngăn đọc công văn — không lẫn với văn bản luật.
+    const tk = vbBth[d.ma]?.tinhTrang === 'tham-khao' ? vbBth[d.ma] : null;
+    if (tk) return (
+      <button onClick={() => moTk(d.ma)} title={`${tk.ten} — văn bản tham khảo, KHÔNG phải văn bản luật`}
+        className={`rounded-md border border-amber-200 bg-amber-50 font-semibold text-amber-800 transition hover:border-amber-500 ${nho ? 'px-1.5 py-0.5 text-[11px]' : 'px-1.5 py-0.5 text-[11.5px]'}`}>
+        📨 {tk.nhan}{tk.tinh ? ` · ${tk.tinh}` : ''}
+      </button>
+    );
     const v = kho.find((x) => x.ma === d.ma);
     const bo = dichHetHieuLuc(d);
     return (
@@ -711,6 +831,187 @@ export default function TraCuuLuatPage() {
     return ra;
   };
 
+  // ── KHUNG "VĂN BẢN THAM KHẢO NHẮC TỚI ĐIỀU NÀY" ──
+  // Công văn hướng dẫn, giải đáp (của bộ, của sở tỉnh khác) trích điều này, hoặc người làm web thấy nên
+  // đọc kèm. Màu vàng, ghi rõ "tham khảo — không phải văn bản luật" để không bao giờ lẫn với nguyên văn.
+  // Chỗ nào công văn báo điều này đã đổi hiệu lực mà văn bản làm thay đổi CHƯA có trong kho thì hiện
+  // khung đỏ "cần kiểm" — máy không tự đánh dấu hết hiệu lực khi chưa có nguyên văn để kiểm.
+  const veThamKhaoDieu = (ma: string, so: number) => {
+    const ds = bth?.theoDieu[`${ma}:${so}`];
+    if (!ds?.length) return null;
+    return (
+      <div className="mt-2 rounded-xl border-l-4 border-amber-400 bg-amber-50/70 px-2.5 py-2">
+        <p className="text-[12.5px] font-bold text-amber-900">📨 {ds.length} văn bản hướng dẫn, giải đáp nhắc tới điều này</p>
+        <p className="text-[11px] leading-snug text-amber-800/80">Chỉ để tham khảo — không phải văn bản luật; văn bản của tỉnh khác không bắt buộc ở Khánh Hòa.</p>
+        {ds.map((z, i) => {
+          const v = vbBth[z.ma];
+          const trich = z.trich?.find((s) => /hết hiệu lực/.test(s)) || z.trich?.[0];
+          return (
+            <div key={i} className="mt-1.5 rounded-lg bg-white/90 px-2 py-1.5">
+              <p className="text-[12px] font-semibold leading-snug text-slate-700">
+                {v ? v.nhan : z.ma}{v?.tinh ? ` · tỉnh ${v.tinh}` : ''}{v?.ngay ? ` · ${ngayVn(v.ngay)}` : ''}
+                <span className="font-normal text-slate-500"> — {z.kieu === 'trich-dan' ? `có trích${z.khoan ? ` khoản ${z.khoan}` : ''} điều này` : 'liên quan, nên đọc kèm'}</span>
+              </p>
+              {z.canh && z.luuY && (
+                <p className="mt-1 rounded-md border border-rose-300 bg-rose-50 px-1.5 py-1 text-[11.5px] font-semibold leading-snug text-rose-800">
+                  ⚠️ Cần kiểm hiệu lực: {z.luuY}
+                </p>
+              )}
+              {trich && (
+                <p className="mt-1 line-clamp-4 border-l-2 border-amber-300 pl-2 text-[12px] italic leading-snug text-slate-600">“{trich}”</p>
+              )}
+              {!z.canh && z.luuY && <p className="mt-1 text-[11.5px] leading-snug text-slate-500">💡 Lưu ý (không phải chữ luật): {z.luuY}</p>}
+              {z.lyDo && <p className="mt-0.5 text-[11.5px] leading-snug text-slate-500">💡 {z.lyDo}</p>}
+              <button onClick={() => moTk(z.ma)}
+                className="mt-1 rounded-md border border-amber-300 bg-amber-50 px-2 py-0.5 text-[11.5px] font-bold text-amber-800 hover:border-amber-500">
+                📨 Đọc công văn
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // Đang đọc công văn mà bấm sang một điều luật nó dẫn: ở "Toàn văn" thì nhảy thẳng tới điều đó;
+  // ở chỗ khác thì mở ngăn đọc điều luật, kèm nút "← Về công văn" để quay lại.
+  const moDieuTuTk = (ma: string, so: number) => {
+    const tu = docTk;
+    setDocTk(null);
+    if (the === 'luat') { moDieu(ma, so); return; }
+    taiVb(ma).catch(() => {});
+    setTkTruoc(tu); setDocBen({ ma, so });
+  };
+
+  // Chữ công văn: CHỈ biến đúng những cụm dẫn chiếu đã khai (danChieu.chu) thành nút bấm — không đoán.
+  // Chữ hiện ra giữ nguyên từng ký tự.
+  const noiDungTk = (chu: string, v: VbThamKhao): React.ReactNode => {
+    const ds = v.danChieu.filter((z) => z.ma && z.so && chu.includes(z.chu));
+    if (!ds.length) return chu;
+    const re = new RegExp(ds.map((z) => z.chu).sort((a, b) => b.length - a.length).map(escRe).join('|'), 'g');
+    const ra: React.ReactNode[] = [];
+    let i = 0, m: RegExpExecArray | null;
+    while ((m = re.exec(chu)) !== null) {
+      if (m.index > i) ra.push(chu.slice(i, m.index));
+      const z = ds.find((y) => y.chu === m![0])!;
+      // Dùng <span> chứ không dùng <button>: nút luôn đứng thành một khối riêng, cụm dài bị đẩy xuống
+      // dòng mới làm câu văn đứt khúc; span thì chữ chảy liền như đọc sách.
+      ra.push(
+        <span key={m.index} role="button" tabIndex={0} onClick={() => moDieuTuTk(z.ma!, z.so!)}
+          onKeyDown={(e) => { if (e.key === 'Enter') moDieuTuTk(z.ma!, z.so!); }} title={`Mở Điều ${z.so} trong kho`}
+          className="cursor-pointer font-semibold text-sky-700 underline decoration-sky-300 underline-offset-2 hover:decoration-sky-600">{m[0]}</span>);
+      i = m.index + m[0].length;
+    }
+    ra.push(chu.slice(i));
+    return ra;
+  };
+
+  // ── THẺ MỘT VĂN BẢN trong bộ tổng hợp ── gọn một khối; bấm vào thì mở chi tiết ngay tại chỗ.
+  const veTheVb = (x: VbBth, soDieuCd?: number) => {
+    const mo = !!moVb[x.ma];
+    const laTk = x.tinhTrang === 'tham-khao';
+    const nhanTt = laTk ? `Tham khảo${x.tinh ? ` · ${x.tinh}` : ''}` : x.tinhTrang === 'het-hieu-luc' ? 'Hết hiệu lực'
+      : x.tinhTrang === 'sua-doi-mot-phan' ? 'Còn hiệu lực · có phần bị sửa' : 'Còn hiệu lực';
+    return (
+      <div key={x.ma} className={`overflow-hidden rounded-xl border bg-white ${laTk ? 'border-amber-200' : 'border-slate-200'}`}>
+        <button onClick={() => setMoVb((m) => ({ ...m, [x.ma]: !m[x.ma] }))} className="block w-full px-2.5 py-2 text-left">
+          <span className="flex items-start gap-1.5">
+            <span className="min-w-0 flex-1">
+              <span className={`block text-[13px] font-bold leading-snug ${x.tinhTrang === 'het-hieu-luc' ? 'text-slate-500' : 'text-[#0A2540]'}`}>
+                {x.nhan}
+                {!x.nhan.includes(x.soHieu) && <span className="ml-1 text-[11.5px] font-normal text-slate-400">{x.soHieu}</span>}
+              </span>
+              {/* line-clamp tự đặt kiểu hiển thị riêng — KHÔNG kèm "block" (đè mất, chữ không cắt). */}
+              <span className={`mt-0.5 text-[12px] leading-snug text-slate-600 ${mo ? 'block' : 'line-clamp-2'}`}>{x.ten}</span>
+            </span>
+            <span className="shrink-0 pt-0.5 text-[12px] text-slate-400">{mo ? '▾' : '▸'}</span>
+          </span>
+          <span className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px]">
+            <span className={`rounded-full border px-1.5 py-px font-semibold ${MAU_TT[x.tinhTrang]}`}>{bth?.tinhTrang[x.tinhTrang]?.icon} {nhanTt}</span>
+            <span className="text-slate-500">{x.coQuan}</span>
+            <span className="text-slate-400">· {ngayVn(x.ngay)}</span>
+            {x.soDieu ? <span className="text-slate-400">· {x.soDieu} điều</span> : null}
+            {soDieuCd ? <span className="rounded-full bg-sky-50 px-1.5 font-semibold text-sky-700">{soDieuCd} điều về chủ đề này</span> : null}
+            {x.canKiemTra?.length ? <span className="rounded-full bg-rose-50 px-1.5 font-semibold text-rose-700">❓ cần kiểm</span> : null}
+          </span>
+        </button>
+        {mo && (
+          <div className="space-y-1.5 border-t border-slate-100 bg-slate-50/60 px-2.5 py-2 text-[12px] leading-snug text-slate-600">
+            <p><b className="text-slate-700">Tình trạng:</b> {x.tinhTrangChu}</p>
+            {x.canKiemTra?.map((c, i) => (
+              <p key={i} className="rounded-md border border-rose-300 bg-rose-50 px-2 py-1 font-semibold text-rose-800">
+                ❓ Điều {c.dieu}{c.khoan ? ` khoản ${c.khoan}` : ''}: {c.ghi}
+              </p>
+            ))}
+            <p className="flex flex-wrap gap-x-3 gap-y-0.5">
+              <span><b className="text-slate-700">Ban hành:</b> {ngayVn(x.ngay)}</span>
+              {!laTk && <span><b className="text-slate-700">Hiệu lực:</b> {x.ngayHieuLuc ? ngayVn(x.ngayHieuLuc) : 'chưa ghi được ngày'}</span>}
+              {x.nguoiKy && <span><b className="text-slate-700">Người ký:</b> {x.nguoiKy}</span>}
+            </p>
+            {!laTk && x.hieuLucNguyenVan && (
+              <p className="text-[11.5px] italic text-slate-500">Câu hiệu lực (nguyên văn): “{x.hieuLucNguyenVan}”</p>
+            )}
+            {TEN_QH.filter(([k]) => (x.quanHe?.[k]?.length || 0) > 0).map(([k, nhan]) => (
+              <div key={k} className="flex flex-wrap items-center gap-1">
+                <b className="text-slate-700">{nhan}:</b>{x.quanHe![k].map((m2) => <NutDan key={m2} d={{ ma: m2 }} nho />)}
+              </div>
+            ))}
+            {x.chuDe.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1">
+                <b className="text-slate-700">Chủ đề chính:</b>
+                {x.chuDe.map((c) => (
+                  <button key={c.ten} onClick={() => setLocCd(c.ten)} title="Lọc bộ tổng hợp theo chủ đề này"
+                    className="rounded-full border border-slate-200 bg-white px-1.5 py-px text-[11px] font-semibold text-slate-600 hover:border-[#0A2540]">
+                    {c.icon} {c.ten}{c.soDieu ? ` · ${c.soDieu}` : ''}
+                  </button>
+                ))}
+              </div>
+            )}
+            {x.chang.length > 0 && bth && (
+              <div className="flex flex-wrap items-center gap-1">
+                <b className="text-slate-700">Chặng lộ trình học:</b>
+                {x.chang.slice(0, 5).map((c) => {
+                  const cg = bth.chang.find((z) => z.so === c.so);
+                  return cg ? (
+                    <span key={c.so} className="rounded-full bg-white px-1.5 py-px text-[11px] text-slate-600 ring-1 ring-slate-200">
+                      {cg.icon} {c.so + 1}. {cg.ten}{c.soDieu ? ` · ${c.soDieu} điều` : ''}
+                    </span>
+                  ) : null;
+                })}
+                {x.chang.length > 5 && <span className="text-[11px] text-slate-400">+{x.chang.length - 5}</span>}
+              </div>
+            )}
+            {laTk && x.tom && (
+              <p className="rounded-md border border-dashed border-sky-300 bg-sky-50/70 px-2 py-1">
+                <b className="text-sky-800">💡 Tóm tắt (không phải văn bản luật):</b> {x.tom}
+              </p>
+            )}
+            {laTk && (x.nhacToiNgoaiKho?.length || 0) > 0 && (
+              <p><b className="text-slate-700">Nhắc tới văn bản chưa có trong kho:</b> {x.nhacToiNgoaiKho!.join(' · ')}</p>
+            )}
+            <p className="text-[11px] text-slate-400">
+              {laTk ? (x.nguonChu === 'may-doc-anh-quet'
+                ? 'Bản quét — chữ do máy đọc từ ảnh rồi người soát lại; trích dẫn chính thức phải đối chiếu ảnh bản gốc.'
+                : 'Chữ lấy thẳng từ lớp chữ của bản PDF gốc.') : (x.nguon ? `Nguồn chữ: ${x.nguon}` : '')}
+            </p>
+            <div className="flex flex-wrap gap-1.5 pt-0.5">
+              {laTk ? (
+                <button onClick={() => moTk(x.ma)} className="rounded-lg bg-amber-600 px-2.5 py-1 text-[12px] font-bold text-white">📨 Đọc công văn</button>
+              ) : (
+                <button onClick={() => { doiVanBan(x.ma); setThe('luat'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className="rounded-lg bg-[#0A2540] px-2.5 py-1 text-[12px] font-bold text-white">⚖️ Mở toàn văn</button>
+              )}
+              {x.banGoc && (
+                <a href={x.banGoc} target="_blank" rel="noreferrer"
+                  className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-600">📄 Bản gốc (PDF)</a>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const chep = (d: Dieu) => {
     const t = `Điều ${d.so}. ${d.tieuDe}\n` + d.khoan.map((k) =>
       (k.so ? `${k.so}. ` : '') + k.chu + (k.diem.length ? '\n' + k.diem.map((x) => `${x.ky}) ${x.chu}`).join('\n') : '')).join('\n')
@@ -737,11 +1038,11 @@ export default function TraCuuLuatPage() {
         <h1 className="text-[16px] font-extrabold text-[#0A2540] sm:text-2xl">⚖️ Luật Đất đai</h1>
         <span className="rounded-full bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-700">Nội bộ</span>
         <span className="text-[11.5px] text-slate-500 lg:hidden">
-          {kho.length ? <>{kho.length} văn bản · {tongDieu} điều</> : 'Đang tải…'}
+          {kho.length ? <>{kho.length} văn bản · {tongDieu} điều{dsTk.length ? ` · ${dsTk.length} tham khảo` : ''}</> : 'Đang tải…'}
         </span>
       </div>
       <p className="mt-1 hidden text-[12.5px] leading-snug text-slate-500 lg:block">
-        {kho.length ? <><b className="text-[#0A2540]">{kho.length} văn bản</b> · <b className="text-[#0A2540]">{tongDieu} điều</b> · nguyên văn từ bản PDF ký số Công báo</> : 'Đang tải…'}
+        {kho.length ? <><b className="text-[#0A2540]">{kho.length} văn bản</b> · <b className="text-[#0A2540]">{tongDieu} điều</b> · nguyên văn từ bản PDF ký số Công báo{dsTk.length ? <> · <b className="text-amber-700">{dsTk.length} văn bản tham khảo</b> (công văn hướng dẫn, giải đáp)</> : null}</> : 'Đang tải…'}
       </p>
 
       {/* Màn hình điện thoại 390px không đủ cho 4 thẻ -> cho TRƯỢT NGANG, đừng để xuống
@@ -1403,10 +1704,156 @@ export default function TraCuuLuatPage() {
 
       {the === 'danhmuc' && (
         <div className="mt-3">
-          <p className="text-[12.5px] leading-snug text-slate-500">
+          {/* HAI LỚP DANH MỤC — đừng lẫn:
+              · BỘ ĐỂ HỌC: mọi văn bản CÓ TOÀN VĂN trong công cụ này, xếp theo loại, ghi tình trạng, quan hệ,
+                chủ đề, chặng. Dữ liệu: public/luat/bo-tong-hop.json (sinh bởi scripts/luat/dung-bo-tong-hop.py).
+              · TOÀN QUỐC: mọi văn bản về đất đai trên hệ thống văn bản Chính phủ — chỉ có tên + đường tải bản
+                gốc, phần lớn CHƯA có toàn văn ở đây. */}
+          <div className="flex gap-1.5">
+            {([['bo', `📚 Bộ để học${bth ? ` (${bth.tong.vanBan})` : ''}`],
+               ['toanquoc', `🌐 Danh mục toàn quốc${dm.length ? ` (${dm.length})` : ''}`]] as const).map(([k, l]) => (
+              <button key={k} onClick={() => setKieuDm(k)} className={nutLoc(kieuDm === k)}>{l}</button>
+            ))}
+          </div>
+
+          {kieuDm === 'bo' && (!bth ? <p className="mt-3 text-[13px] text-slate-400">Đang tải bộ tổng hợp…</p> : (() => {
+            const q = kd(timBo.trim());
+            const cdChon = bth.chuDe.find((c) => c.ten === locCd);
+            const theoCd = cdChon ? new Map(cdChon.vanBan.map((z) => [z.ma, z.soDieu])) : null;
+            const hop = (x: VbBth) =>
+              (!locNhom || x.nhom === locNhom)
+              && (!locTt || (locTt === 'con' ? (x.tinhTrang === 'con-hieu-luc' || x.tinhTrang === 'sua-doi-mot-phan')
+                : locTt === 'het' ? x.tinhTrang === 'het-hieu-luc' : x.tinhTrang === 'tham-khao'))
+              && (!theoCd || theoCd.has(x.ma))
+              && (!q || kd([x.nhan, x.soHieu, x.ten, x.coQuan, x.tinh || '', x.loai, ...x.chuDe.map((c) => c.ten)].join(' ')).includes(q));
+            const ds = bth.vanBan.filter(hop);
+            const dangLoc = !!(q || locNhom || locTt || locCd);
+            return (
+              <>
+                <p className="mt-2 text-[12px] leading-snug text-slate-500">
+                  <b className="text-[#0A2540]">{bth.tong.vanBan} văn bản</b> học được ở đây ({bth.tong.dieu.toLocaleString('vi-VN')} điều),
+                  xếp theo loại · ghi rõ <b>còn hay hết hiệu lực</b> · văn bản nào sửa, thay, hướng dẫn văn bản nào.
+                  <span className="hidden sm:inline"> Bấm vào từng văn bản để xem chi tiết.</span>
+                </p>
+                {/* Lọc theo LOẠI — trượt ngang trên điện thoại, không xuống dòng lộn xộn */}
+                <div className="mt-2 -mx-3 flex gap-1.5 overflow-x-auto px-3 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <button onClick={() => setLocNhom('')} className={nutLoc(locNhom === '')}>Tất cả</button>
+                  {bth.nhom.map((n) => (
+                    <button key={n.ma} onClick={() => setLocNhom(locNhom === n.ma ? '' : n.ma)} className={nutLoc(locNhom === n.ma)}>
+                      {n.icon} {TEN_NGAN_NHOM[n.ma] || n.ten} <span className="opacity-60">{n.soVanBan}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-1.5 flex items-center gap-1.5 rounded-xl border-2 border-slate-200 px-2.5 py-1.5 focus-within:border-[#0A2540]">
+                  <span className="text-slate-400">🔍</span>
+                  <input value={timBo} onChange={(e) => setTimBo(e.target.value)} placeholder="Tìm số hiệu, tên, cơ quan, tỉnh…"
+                    className="w-full min-w-0 bg-transparent text-[14px] outline-none" />
+                  {timBo && <button onClick={() => setTimBo('')} className="text-slate-400 hover:text-slate-700">✕</button>}
+                </div>
+                <div className="mt-1.5 grid grid-cols-2 gap-1.5">
+                  <select value={locTt} onChange={(e) => setLocTt(e.target.value)}
+                    className="min-w-0 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[12.5px] text-slate-700">
+                    <option value="">Mọi tình trạng</option>
+                    <option value="con">✅ Còn hiệu lực</option>
+                    <option value="het">⛔ Hết hiệu lực</option>
+                    <option value="tk">📨 Tham khảo</option>
+                  </select>
+                  <select value={locCd} onChange={(e) => setLocCd(e.target.value)}
+                    className="min-w-0 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[12.5px] text-slate-700">
+                    <option value="">Mọi chủ đề</option>
+                    {bth.chuDe.filter((c) => c.vanBan.length).map((c) => (
+                      <option key={c.ten} value={c.ten}>{c.icon} {c.ten} ({c.vanBan.length})</option>
+                    ))}
+                  </select>
+                </div>
+                {dangLoc && (
+                  <p className="mt-1.5 flex items-center justify-between text-[11.5px] text-slate-500">
+                    <span>{ds.length} văn bản khớp{cdChon ? ` · chủ đề “${cdChon.ten}”: đếm điều có cụm “${cdChon.tim}”` : ''}</span>
+                    <button onClick={() => { setTimBo(''); setLocNhom(''); setLocTt(''); setLocCd(''); }}
+                      className="shrink-0 font-semibold text-slate-500 underline">Bỏ lọc</button>
+                  </p>
+                )}
+
+                {bth.nhom.map((n) => {
+                  const cua = ds.filter((x) => x.nhom === n.ma);
+                  const goiY = bth.nenBoSung.filter((r) => r.nhom === n.ma);
+                  if (dangLoc && !cua.length) return null;
+                  return (
+                    <section key={n.ma} className="mt-3">
+                      <div className="flex flex-wrap items-baseline gap-x-1.5 border-b border-slate-200 pb-1">
+                        <h3 className="text-[13.5px] font-extrabold text-[#0A2540]">{n.icon} {n.ten}</h3>
+                        <span className="text-[11.5px] text-slate-400">
+                          {n.soVanBan} văn bản{n.ma !== 'huong-dan' && n.soVanBan ? ` · ${n.conHieuLuc} còn hiệu lực` : ''}
+                        </span>
+                      </div>
+                      <p className="mt-0.5 text-[11.5px] leading-snug text-slate-500">{n.moTa}</p>
+                      {!cua.length && <p className="mt-1 text-[12px] italic text-slate-400">Chưa có văn bản nào trong kho.</p>}
+                      <div className="mt-1.5 space-y-1.5">{cua.map((x) => veTheVb(x, theoCd?.get(x.ma)))}</div>
+                      {!dangLoc && goiY.length > 0 && (
+                        <p className="mt-1 text-[11.5px] leading-snug text-slate-500">
+                          ➕ Nên bổ sung: {goiY.map((r) => r.soHieu).join(' · ')}{' '}
+                          <button onClick={() => setMoNen(true)} className="font-semibold text-slate-600 underline">vì sao</button>
+                        </p>
+                      )}
+                    </section>
+                  );
+                })}
+
+                {/* VĂN BẢN NÊN BỔ SUNG — được văn bản trong kho nhắc tới mà kho chưa có. Đứng đầu là những
+                    văn bản đang làm THAY ĐỔI HIỆU LỰC của điều có trong kho: nạp vào là các script tự đánh
+                    dấu đúng, khỏi phải trông vào lời của công văn. */}
+                {!dangLoc && bth.nenBoSung.length > 0 && (
+                  <div className="mt-3 rounded-xl border border-dashed border-slate-300 bg-white">
+                    <button onClick={() => setMoNen((v) => !v)} className="flex w-full items-center justify-between px-2.5 py-2 text-left">
+                      <span className="text-[13px] font-bold text-[#0A2540]">➕ Văn bản nên bổ sung vào kho ({bth.nenBoSung.length})</span>
+                      <span className="text-[12px] text-slate-400">{moNen ? '▾' : '▸'}</span>
+                    </button>
+                    {moNen && (
+                      <div className="divide-y divide-slate-100 border-t border-slate-100">
+                        {bth.nenBoSung.map((r) => (
+                          <div key={r.soHieu} className="px-2.5 py-1.5 text-[12px] leading-snug">
+                            <p className="font-semibold text-slate-700">
+                              {r.soHieu}{r.ten ? <span className="font-normal text-slate-500"> — {r.ten}</span> : null}
+                            </p>
+                            {(r.anhHuongDieu?.length || 0) > 0 && (
+                              <p className="mt-0.5 font-semibold text-rose-700">⚠️ Làm thay đổi hiệu lực của: {r.anhHuongDieu!.join(', ')} — nên nạp trước.</p>
+                            )}
+                            {r.duocNhacBoi.length > 0 && (
+                              <p className="mt-0.5 flex flex-wrap items-center gap-1 text-slate-500">
+                                Được nhắc tới ở: {r.duocNhacBoi.map((m2) => <NutDan key={m2} d={{ ma: m2 }} nho />)}
+                              </p>
+                            )}
+                            {r.lyDoChuaCo && <p className="mt-0.5 text-slate-500">Chưa đưa vào được: {r.lyDoChuaCo}</p>}
+                            {r.canKiemTra && <p className="mt-0.5 text-amber-700">⚠️ {r.canKiemTra}</p>}
+                            {r.danhMuc && (
+                              <p className="mt-0.5 flex flex-wrap gap-2 text-[11.5px]">
+                                <a href={r.danhMuc.link} target="_blank" rel="noreferrer" className="font-semibold text-sky-700 underline">Xem trên cổng Chính phủ</a>
+                                {r.danhMuc.tep.slice(0, 1).map((u) => (
+                                  <a key={u} href={u} target="_blank" rel="noreferrer" className="font-semibold text-emerald-700 underline">📄 Tải bản gốc</a>
+                                ))}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+                <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-[11px] leading-snug text-slate-500">
+                  Bộ tổng hợp cập nhật ngày {ngayVn(bth.capNhat)} — máy tự gom từ chính dữ liệu của công cụ, không gõ tay.
+                  Văn bản <b>📨 tham khảo</b> là công văn hướng dẫn, giải đáp: không phải văn bản quy phạm pháp luật; của tỉnh
+                  khác thì không bắt buộc ở Khánh Hòa.
+                </p>
+              </>
+            );
+          })())}
+
+          {kieuDm === 'toanquoc' && <>
+          <p className="mt-2 text-[12.5px] leading-snug text-slate-500">
             Toàn bộ văn bản về đất đai trên <b>Hệ thống văn bản của Chính phủ</b> — máy quét lần lượt từng mã văn bản
             rồi lọc theo từ khoá nên <b>không sót</b>. Bấm vào từng dòng để mở bản gốc trên cổng Chính phủ,
-            hoặc tải thẳng tệp PDF ký số.
+            hoặc tải thẳng tệp PDF ký số. Phần lớn văn bản ở đây <b>chưa có toàn văn</b> trong công cụ — văn bản
+            học được nằm ở <b>Bộ để học</b>.
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
             <input value={timDm} onChange={(e) => setTimDm(e.target.value)} placeholder="Tìm trong danh mục…"
@@ -1442,6 +1889,7 @@ export default function TraCuuLuatPage() {
               </>
             );
           })()}
+          </>}
         </div>
       )}
 
@@ -1450,11 +1898,19 @@ export default function TraCuuLuatPage() {
           Trước đây bày 17 cái nút thành hàng cuộn ngang -> nhìn rối, lại phải kéo mới
           thấy hết. Nay gom vào một ô sổ xuống, chia nhóm Luật / Nghị định / Thông tư. */}
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <select value={maVb} onChange={(e) => doiVanBan(e.target.value)}
+        <select value={maVb} onChange={(e) => {
+          // Chọn văn bản tham khảo (công văn) thì mở ngăn đọc công văn, ô chọn vẫn giữ văn bản đang xem.
+          const v = e.target.value;
+          if (v.startsWith('tk:')) moTk(v.slice(3)); else doiVanBan(v);
+        }}
           className="min-w-0 flex-1 rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-[14px] font-semibold text-[#0A2540] outline-none focus:border-[#0A2540]">
-          {([['Đang áp dụng — Luật', (x: KhoItem) => !x.hetHieuLuc && x.soHieu.includes('/QH')],
+          {/* Nghị quyết của Quốc hội cũng mang đuôi /QH như luật → tách theo mã "nq…" (quy ước đặt mã khi
+              nạp, xem .claude/skills/bo-sung-van-ban-hoc-luat). Văn bản của tỉnh mang đuôi UBND / HĐND. */}
+          {([['Đang áp dụng — Luật', (x: KhoItem) => !x.hetHieuLuc && x.soHieu.includes('/QH') && !x.ma.startsWith('nq')],
+             ['Đang áp dụng — Nghị quyết của Quốc hội', (x: KhoItem) => !x.hetHieuLuc && x.ma.startsWith('nq')],
              ['Đang áp dụng — Nghị định', (x: KhoItem) => !x.hetHieuLuc && x.soHieu.includes('NĐ-CP')],
              ['Đang áp dụng — Thông tư', (x: KhoItem) => !x.hetHieuLuc && x.soHieu.includes('/TT-')],
+             ['Đang áp dụng — Văn bản của tỉnh Khánh Hòa', (x: KhoItem) => !x.hetHieuLuc && /UBND|HĐND/.test(x.soHieu)],
              ['⛔ Luật đời cũ (đã hết hiệu lực) — tra hồ sơ thời kỳ đó',
               (x: KhoItem) => !!x.hetHieuLuc]] as const).map(([nhom, loc]) => {
             const ds = kho.filter(loc);
@@ -1469,6 +1925,15 @@ export default function TraCuuLuatPage() {
               </optgroup>
             );
           })}
+          {dsTk.length > 0 && (
+            <optgroup label="📨 Văn bản tham khảo (công văn) — chọn để đọc">
+              {dsTk.map((x) => (
+                <option key={x.ma} value={'tk:' + x.ma}>
+                  📨 {x.nhan}{x.tinh ? ` (${x.tinh})` : ''} — {x.ten.length > 50 ? x.ten.slice(0, 50) + '…' : x.ten}
+                </option>
+              ))}
+            </optgroup>
+          )}
         </select>
         {vb?.phuLuc && (
           <button onClick={() => { setXemPhuLuc((v) => !v); setChon(null); oNoiDung.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}
@@ -1571,6 +2036,19 @@ export default function TraCuuLuatPage() {
           </p>
         );
       })()}
+      {/* Văn bản tham khảo (công văn) báo một điều của văn bản này đã đổi hiệu lực, nhưng văn bản làm
+          thay đổi CHƯA có trong kho → máy không tự đánh dấu, chỉ báo "cần kiểm" để người đọc biết. */}
+      {vb && (vbBth[maVb]?.canKiemTra?.length || 0) > 0 && (
+        <div className="mt-1.5 rounded-lg border-2 border-rose-300 bg-rose-50 px-2.5 py-1.5 text-[12px] leading-snug text-rose-800">
+          <b>❓ Cần kiểm hiệu lực:</b>{' '}
+          {vbBth[maVb]!.canKiemTra!.map((c, i) => (
+            <button key={i} onClick={() => moDieu(maVb, c.dieu)} className="mr-1 font-bold underline">
+              Điều {c.dieu}{c.khoan ? ` khoản ${c.khoan}` : ''}
+            </button>
+          ))}
+          — có văn bản tham khảo báo đã thay đổi, nhưng văn bản làm thay đổi chưa có trong kho. Bấm để xem.
+        </div>
+      )}
       {/* Còn hiệu lực nhưng có điều đã bị bãi bỏ — đếm ra cho người đọc biết trước. */}
       {vb && !vb.hetHieuLuc && (() => {
         const bo = vb.dieu.filter((d) => d.tinhTrang?.loai === 'het-hieu-luc').length;
@@ -1662,22 +2140,29 @@ export default function TraCuuLuatPage() {
             <p className="sticky top-0 z-10 border-b bg-slate-50/95 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-500 backdrop-blur">
               {tim || chiGhim || chiGt ? `${ketQua.length} điều khớp${timCaKho ? ' · cả kho' : ''}` : `${vb.chuong.length ? vb.chuong.length + ' chương · ' : ''}${vb.dieu.length} điều`}
             </p>
-            {tim || chiGhim || chiGt ? (
-              ketQua.length === 0
+            {tim || chiGhim || chiGt ? (<>
+              {/* Công văn tham khảo có chữ khớp — để riêng một hàng màu vàng trên đầu, không trộn với điều luật. */}
+              {tim && tkKhop.length > 0 && (
+                <div className="border-b border-amber-100 bg-amber-50/60 px-3 py-1.5">
+                  <p className="text-[11px] font-bold text-amber-800">📨 {tkKhop.length} văn bản tham khảo khớp (không phải văn bản luật):</p>
+                  <div className="mt-0.5 flex flex-wrap gap-1">{tkKhop.map((x) => <NutDan key={x.ma} d={{ ma: x.ma }} nho />)}</div>
+                </div>
+              )}
+              {ketQua.length === 0
                 ? <p className="p-3 text-[13px] text-slate-400">Không tìm thấy điều nào. Thử từ khoá khác, gõ số điều, hoặc bật <b>Tìm cả kho</b>.</p>
                 : ketQua.map((x) => (
                   <button key={x.ma + ':' + x.d.so} onClick={() => moDieu(x.ma, x.d.so)}
                     className={`block w-full border-b border-slate-100 px-3 py-2 text-left hover:bg-slate-50 ${x.ma === maVb && chon === x.d.so ? 'bg-[#0A2540]/[0.05]' : ''}`}>
                     <span className={`block text-[13px] font-bold ${x.d.tinhTrang?.loai === 'het-hieu-luc' ? 'text-slate-400 line-through decoration-rose-300' : 'text-[#0A2540]'}`}>
-                      {ghim.includes(khoaGhim(x.ma, x.d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(x.ma, x.d.so)] ? '💡 ' : ''}{dauTinhTrang(x.d)}Điều {x.d.so}. {x.d.tieuDe}
+                      {ghim.includes(khoaGhim(x.ma, x.d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(x.ma, x.d.so)] ? '💡 ' : ''}{canKiem(x.ma, x.d.so) ? '❓ ' : ''}{dauTinhTrang(x.d)}Điều {x.d.so}. {x.d.tieuDe}
                     </span>
                     <span className="block text-[11px] text-slate-400">
                       {timCaKho && <span className="mr-1 rounded bg-slate-100 px-1 font-bold text-slate-500">{nhanNgan(x.ma, cacVb[x.ma]?.soHieu || '')}</span>}
                       {x.d.chuong ? <>Chương {x.d.chuong}{x.d.muc ? ` · Mục ${x.d.muc}` : ''}</> : null}
                     </span>
                   </button>
-                ))
-            ) : vb.chuong.length === 0 ? (
+                ))}
+            </>) : vb.chuong.length === 0 ? (
               // Văn bản ngắn không chia chương (Luật 43/2024, Nghị định 42/2024) — liệt kê
               // thẳng từng điều. Không có nhánh này thì cột trái trống trơn.
               vb.dieu.map((d) => (
@@ -1685,7 +2170,7 @@ export default function TraCuuLuatPage() {
                 <button onClick={() => moDieu(vb.ma, d.so)}
                   className={`block w-full border-b border-slate-100 px-3 py-2 text-left text-[12.5px] hover:bg-slate-50 ${chon === d.so ? 'bg-[#0A2540]/[0.05] font-semibold' : 'text-slate-600'}`}>
                   <span className={d.tinhTrang?.loai === 'het-hieu-luc' ? 'text-slate-400 line-through decoration-rose-300' : ''}>
-                    {ghim.includes(khoaGhim(vb.ma, d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(vb.ma, d.so)] ? '💡 ' : ''}{dauTinhTrang(d)}Điều {d.so}. {d.tieuDe}
+                    {ghim.includes(khoaGhim(vb.ma, d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(vb.ma, d.so)] ? '💡 ' : ''}{canKiem(vb.ma, d.so) ? '❓ ' : ''}{dauTinhTrang(d)}Điều {d.so}. {d.tieuDe}
                   </span>
                 </button>
                 {(vb.boSungThem || []).filter((z) => z.sauDieu === Number(d.so)).map((z) => (
@@ -1716,7 +2201,7 @@ export default function TraCuuLuatPage() {
                       <button onClick={() => moDieu(vb.ma, d.so)}
                         className={`block w-full px-3 py-1.5 pl-8 text-left text-[12.5px] hover:bg-slate-50 ${chon === d.so ? 'bg-[#0A2540]/[0.05] font-semibold' : 'text-slate-600'}`}>
                         <span className={d.tinhTrang?.loai === 'het-hieu-luc' ? 'text-slate-400 line-through decoration-rose-300' : ''}>
-                          {ghim.includes(khoaGhim(vb.ma, d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(vb.ma, d.so)] ? '💡 ' : ''}{dauTinhTrang(d)}Điều {d.so}. {d.tieuDe}
+                          {ghim.includes(khoaGhim(vb.ma, d.so)) ? '⭐ ' : ''}{gt?.muc[khoaGhim(vb.ma, d.so)] ? '💡 ' : ''}{canKiem(vb.ma, d.so) ? '❓ ' : ''}{dauTinhTrang(d)}Điều {d.so}. {d.tieuDe}
                         </span>
                       </button>
                       {(vb.boSungThem || []).filter((z) => z.sauDieu === Number(d.so)).map((z) => (
@@ -1897,6 +2382,9 @@ export default function TraCuuLuatPage() {
                   );
                 })()}
 
+                {/* Công văn hướng dẫn, giải đáp nhắc tới điều này (tham khảo) — xem veThamKhaoDieu */}
+                {veThamKhaoDieu(vb.ma, dieuDangXem.so)}
+
                 {/* KHUNG GIẢI THÍCH — màu khác hẳn, ghi rõ không phải chữ luật, để người đọc
                     không bao giờ lẫn với nguyên văn bên dưới. */}
                 {gt?.muc[khoaGhim(vb.ma, dieuDangXem.so)] && (
@@ -1993,6 +2481,13 @@ export default function TraCuuLuatPage() {
               </div>
 
               <div className="min-h-0 flex-1 overflow-y-auto px-3 py-2.5">
+                {/* Đang đọc công văn thì bấm sang điều này → cho nút quay lại công văn, khỏi lạc đường. */}
+                {tkTruoc && (
+                  <button onClick={() => { const t = tkTruoc; setDocBen(null); moTk(t); }}
+                    className="mb-2 rounded-lg border border-amber-300 bg-amber-50 px-2 py-0.5 text-[12px] font-semibold text-amber-800">
+                    ← Về công văn {vbBth[tkTruoc]?.nhan || ''}
+                  </button>
+                )}
                 {!d ? <p className="text-[13px] text-slate-400">Đang mở…</p> : (
                   <>
                     {tt && (
@@ -2013,6 +2508,7 @@ export default function TraCuuLuatPage() {
                         <p className="mt-0.5 text-[12.5px] leading-relaxed text-slate-700">{g.y}</p>
                       </div>
                     )}
+                    {(() => { const k = veThamKhaoDieu(docBen.ma, docBen.so); return k ? <div className="-mt-2 mb-2">{k}</div> : null; })()}
                     <p className="text-[10.5px] font-bold uppercase tracking-wide text-slate-400">Nguyên văn</p>
                     <div className="mt-1 space-y-2 text-[13.5px] leading-relaxed text-slate-800">
                       {d.khoan.map((k, i) => (
@@ -2067,6 +2563,158 @@ export default function TraCuuLuatPage() {
                   {docBen && ghim.includes(khoaGhim(docBen.ma, docBen.so)) ? '⭐' : '☆'}
                 </button>
                 <button onClick={() => setDocBen(null)}
+                  className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[12.5px] font-semibold text-slate-500">Đóng</button>
+              </div>
+            </div>
+          </>
+        );
+      })()}
+
+      {/* ── NGĂN ĐỌC CÔNG VĂN (VĂN BẢN THAM KHẢO) ──
+          Cùng kiểu ngăn đọc điều luật (máy tính: trượt từ phải; điện thoại: đẩy lên từ đáy) nhưng VIỀN
+          VÀNG và ghi to "không phải văn bản luật". Thứ tự: cảnh báo phạm vi (tỉnh nào, không bắt buộc ở
+          Khánh Hòa) → nếu là bản quét thì nói rõ chữ do máy đọc → tóm tắt (khung giải thích riêng) →
+          điều luật trong kho mà công văn trích → NGUYÊN VĂN. */}
+      {docTk && (() => {
+        const v = cacTk[docTk];
+        const x = vbBth[docTk];
+        const ngayKy = v?.ngay ? v.ngay.split('-') : [];
+        return (
+          <>
+            <div className="fixed inset-0 z-40 bg-black/20" onClick={() => setDocTk(null)} />
+            <div className="fixed inset-x-0 bottom-0 z-50 flex max-h-[85vh] flex-col rounded-t-2xl border-t-2 border-amber-500 bg-white shadow-2xl
+                            sm:inset-y-0 sm:left-auto sm:right-0 sm:max-h-none sm:w-[min(94vw,520px)] sm:rounded-none sm:rounded-l-2xl sm:border-l-2 sm:border-t-0">
+              <div className="flex items-start gap-2 border-b bg-amber-50 px-3 py-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10.5px] font-bold uppercase tracking-wide text-amber-700">
+                    📨 Văn bản tham khảo{x?.tinh ? ` · tỉnh ${x.tinh}` : ''} — không phải văn bản luật
+                  </p>
+                  <p className="text-[14.5px] font-extrabold leading-snug text-[#0A2540]">{x ? x.nhan : (v ? `${v.loai} ${v.soHieu}` : '…')}</p>
+                </div>
+                <button onClick={() => setDocTk(null)} title="Đóng, về lại chỗ đang xem"
+                  className="shrink-0 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[13px] font-bold text-slate-500 hover:text-slate-800">✕</button>
+              </div>
+
+              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-2.5">
+                {!v ? <p className="text-[13px] text-slate-400">Đang mở…</p> : (
+                  <>
+                    <p className="rounded-xl border-2 border-amber-300 bg-amber-50 px-2.5 py-1.5 text-[12.5px] font-semibold leading-snug text-amber-900">
+                      📍 {v.canhBao}
+                    </p>
+                    {v.nguonChu === 'may-doc-anh-quet' && (
+                      <p className="mt-1.5 rounded-xl border border-slate-300 bg-slate-50 px-2.5 py-1.5 text-[12px] leading-snug text-slate-700">
+                        🖨️ <b>Bản quét:</b> chữ ở dưới do máy đọc từ ảnh rồi người làm web soát lại từng chữ — vẫn có thể sót.
+                        Trích dẫn chính thức phải đối chiếu <b>ảnh bản gốc</b>.
+                        {v.banGoc && <> <a href={v.banGoc} target="_blank" rel="noreferrer" className="font-bold text-sky-700 underline">Xem ảnh bản gốc</a></>}
+                      </p>
+                    )}
+
+                    {/* TÓM TẮT — khung giải thích riêng, màu khác hẳn nguyên văn */}
+                    {v.giaiThich?.tom && (
+                      <div className="mt-2 rounded-xl border-2 border-dashed border-sky-300 bg-sky-50/70 p-2.5">
+                        <p className="text-[10.5px] font-bold uppercase tracking-wide text-sky-700">💡 Tóm tắt cho dễ hiểu — KHÔNG PHẢI VĂN BẢN LUẬT</p>
+                        <p className="mt-0.5 text-[13px] leading-relaxed text-slate-700">{v.giaiThich.tom}</p>
+                        {(v.giaiThich.y?.length || 0) > 0 && (
+                          <ul className="mt-1 space-y-0.5">
+                            {v.giaiThich.y!.map((y, i) => <li key={i} className="text-[12.5px] leading-snug text-slate-600">• {y}</li>)}
+                          </ul>
+                        )}
+                        {v.giaiThich.luuY && (
+                          <p className="mt-1.5 rounded-lg bg-white/80 px-2 py-1 text-[12px] font-semibold leading-snug text-sky-900">Lưu ý: {v.giaiThich.luuY}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Điều luật trong kho mà công văn trích (bấm là mở), và điều nên đọc kèm */}
+                    {(v.danChieu.some((z) => z.ma && z.so) || (v.lienQuan?.length || 0) > 0) && (
+                      <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50/70 p-2">
+                        <p className="text-[10.5px] font-bold uppercase tracking-wide text-slate-500">🔗 Điều luật liên quan có trong kho</p>
+                        {v.danChieu.filter((z) => z.ma && z.so).map((z, i) => {
+                          const kz = kho.find((y) => y.ma === z.ma);
+                          return (
+                            <div key={i} className="mt-1 text-[12px] leading-snug text-slate-600">
+                              <button onClick={() => moDieuTuTk(z.ma!, z.so!)}
+                                className="mr-1 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[11.5px] font-semibold text-slate-700 hover:border-[#0A2540]">
+                                Điều {z.so}{z.khoan ? ` (khoản ${z.khoan})` : ''} · {kz ? nhanNgan(kz.ma, kz.soHieu) : z.ma}
+                              </button>
+                              công văn trích: “{z.chu}”
+                              {z.canh && z.luuY && (
+                                <p className="mt-0.5 rounded border border-rose-300 bg-rose-50 px-1.5 py-0.5 text-[11.5px] font-semibold text-rose-800">❓ Cần kiểm hiệu lực: {z.luuY}</p>
+                              )}
+                            </div>
+                          );
+                        })}
+                        {(v.lienQuan || []).map((z, i) => {
+                          const kz = kho.find((y) => y.ma === z.ma);
+                          return (
+                            <div key={'l' + i} className="mt-1 text-[12px] leading-snug text-slate-600">
+                              <button onClick={() => moDieuTuTk(z.ma, z.so)}
+                                className="mr-1 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[11.5px] font-semibold text-slate-700 hover:border-[#0A2540]">
+                                Điều {z.so} · {kz ? nhanNgan(kz.ma, kz.soHieu) : z.ma}
+                              </button>
+                              nên đọc kèm (công văn không trích){z.lyDo ? `: ${z.lyDo}` : ''}
+                            </div>
+                          );
+                        })}
+                        {(v.vanBanNhacToi || []).some((z) => !z.ma) && (
+                          <p className="mt-1.5 text-[11.5px] leading-snug text-slate-500">
+                            Công văn còn nhắc tới (CHƯA có trong kho): {(v.vanBanNhacToi || []).filter((z) => !z.ma).map((z) => z.soHieu).join(' · ')}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* NGUYÊN VĂN — trích yếu, kính gửi, từng đoạn, chú thích cuối trang, nơi nhận, người ký */}
+                    <p className="mt-3 text-[10.5px] font-bold uppercase tracking-wide text-slate-400">
+                      Nguyên văn{v.nguonChu === 'may-doc-anh-quet' ? ' (chữ máy đọc từ ảnh, đã soát)' : ''}
+                    </p>
+                    <div className="mt-1 rounded-xl border border-slate-200 bg-white p-2.5 text-[13.5px] leading-relaxed text-slate-800">
+                      <p className="text-[11.5px] leading-snug text-slate-500">
+                        {v.coQuanChuQuan ? `${v.coQuanChuQuan} · ` : ''}<b className="text-slate-700">{v.coQuan}</b>
+                        <br />Số: {v.soHieu}{v.diaDanh && ngayKy.length === 3 ? ` · ${v.diaDanh}, ngày ${ngayKy[2]}/${ngayKy[1]}/${ngayKy[0]}` : ''}
+                      </p>
+                      <p className="mt-2 text-center text-[13px] font-semibold leading-snug">{v.ten}</p>
+                      {v.kinhGui && <p className="mt-2 text-center text-[13px]">Kính gửi: {v.kinhGui}</p>}
+                      <div className="mt-2 space-y-2">
+                        {v.doan.map((d, i) => <p key={i} className="whitespace-pre-line">{noiDungTk(d, v)}</p>)}
+                      </div>
+                      {(v.chuThich?.length || 0) > 0 && (
+                        <div className="mt-3 space-y-0.5 border-t border-slate-200 pt-1.5 text-[11.5px] leading-snug text-slate-600">
+                          {v.chuThich!.map((c) => <p key={c.so}><sup className="font-bold">{c.so}</sup> {c.chu}</p>)}
+                        </div>
+                      )}
+                      <div className="mt-3 flex flex-wrap justify-between gap-3 text-[11.5px] leading-snug">
+                        {(v.noiNhan?.length || 0) > 0 && (
+                          <div>
+                            <p className="font-semibold italic">Nơi nhận:</p>
+                            {v.noiNhan!.map((z, i) => <p key={i}>- {z}</p>)}
+                          </div>
+                        )}
+                        <div className="text-center">
+                          {(v.chucVuKy || []).map((z, i) => <p key={i} className="font-bold">{z}</p>)}
+                          {v.nguoiKy && <p className="mt-2 font-bold">{v.nguoiKy}</p>}
+                        </div>
+                      </div>
+                    </div>
+                    {v.ghiChuChu && <p className="mt-1.5 text-[11px] leading-snug text-slate-400">{v.ghiChuChu}</p>}
+                    {(v.suaMayDoc?.length || 0) > 0 && (
+                      <details className="mt-1 text-[11px] leading-snug text-slate-400">
+                        <summary className="cursor-pointer font-semibold">Máy đọc sai {v.suaMayDoc!.length} chỗ — đã sửa theo ảnh</summary>
+                        <ul className="mt-0.5 space-y-0.5">
+                          {v.suaMayDoc!.map((s, i) => <li key={i}>“{s.may}” → “{s.dung}”{s.ghi ? ` (${s.ghi})` : ''}</li>)}
+                        </ul>
+                      </details>
+                    )}
+                  </>
+                )}
+              </div>
+
+              <div className="flex gap-1.5 border-t bg-amber-50/60 px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+                {v?.banGoc && (
+                  <a href={v.banGoc} target="_blank" rel="noreferrer"
+                    className="flex-1 rounded-lg bg-amber-600 px-3 py-1.5 text-center text-[12.5px] font-bold text-white">📄 Xem bản gốc (PDF)</a>
+                )}
+                <button onClick={() => setDocTk(null)}
                   className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[12.5px] font-semibold text-slate-500">Đóng</button>
               </div>
             </div>

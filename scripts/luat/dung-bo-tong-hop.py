@@ -72,11 +72,11 @@ TINH_TRANG = {
 # xem danh mục biết thiếu gì, vì sao thiếu.
 THIEU_DA_BIET = [
     {'soHieu': '112/2024/NĐ-CP', 'ten': 'Quy định chi tiết về đất trồng lúa',
-     'lyDo': 'Công báo không đăng; bản trên cổng Chính phủ là ảnh quét, bóc chữ không ra (xem dung-kho-luat.py).'},
+     'lyDo': 'Công báo không đăng; bản trên cổng Chính phủ là ảnh quét, bóc chữ không ra.'},
     {'soHieu': '09/2024/TT-BTNMT', 'ten': '',
-     'lyDo': 'Bản PDF tải được bị cụt — không có điều khoản thi hành (xem dung-kho-luat.py).'},
+     'lyDo': 'Bản PDF tải được bị cụt — không có điều khoản thi hành.'},
     {'soHieu': '23/2025/TT-BNNMT', 'ten': 'Quy định phân cấp, phân định thẩm quyền quản lý nhà nước trong lĩnh vực đất đai',
-     'lyDo': 'Thông tư sửa đổi chép nguyên chương của văn bản khác trong ngoặc kép, bộ tách bị đứt số điều (xem dung-kho-luat.py).'},
+     'lyDo': 'Thông tư sửa đổi chép nguyên chương của văn bản khác trong ngoặc kép, bộ tách bị đứt số điều.'},
 ]
 # Văn bản ngoài kho mà văn bản tham khảo hay văn bản trong kho cần tới, kèm tên — để gợi ý bổ sung.
 TEN_BIET = {
@@ -125,6 +125,10 @@ def nhan_ngan(ma, so_hieu):
         return 'Luật sửa đổi ' + ma[3:]
     p = (so_hieu or '').split('/')
     if len(p) >= 3:
+        if 'HĐND' in p[2]:
+            return 'NQ %s/%s (HĐND)' % (p[0], p[1])
+        if 'UBND' in p[2]:
+            return 'QĐ %s/%s (UBND)' % (p[0], p[1])
         if ma.startswith('nq') or '/NQ-' in so_hieu:
             return 'NQ %s/%s' % (p[0], p[1])
         if p[2].startswith('QH'):
@@ -267,15 +271,15 @@ def lam():
         #  · "chủ đề chính" của văn bản = chủ đề chiếm từ 4% số điều trở lên, lấy 6 cái nhiều nhất;
         #  · còn để TRA THEO CHỦ ĐỀ thì văn bản nào có từ 2 điều trở lên (văn bản ngắn: 1 điều) là kể ra.
         chi_muc = [kd(chu_dieu(d)) for d in dieu]
-        cd, cd_tra = [], []
+        cd, dem_cd = [], {}
         for c in chu_de:
             n = sum(1 for t in chi_muc if kd(c['tim']) in t)
-            ngan = len(dieu) <= 12
-            if n >= max(2, round(0.04 * len(dieu))) or (ngan and n >= 1):
+            dem_cd[c['ten']] = n
+            if n >= max(2, round(0.04 * len(dieu))) or (len(dieu) <= 12 and n >= 1):
                 cd.append({'ten': c['ten'], 'icon': c['icon'], 'soDieu': n})
-            if n >= 2 or (ngan and n >= 1):
-                cd_tra.append({'ten': c['ten'], 'soDieu': n})
         cd.sort(key=lambda z: -z['soDieu'])
+        # (danh sách để TRA THEO CHỦ ĐỀ tính sau, khi đã biết chủ đề đó hiếm hay phổ biến trong cả kho)
+        cd_tra = dem_cd
         # chặng: đếm số điều của văn bản thuộc từng chặng (một điều có thể thuộc nhiều chặng)
         dem = {}
         for d in dieu:
@@ -451,6 +455,18 @@ def lam():
         nhom_ra.append({**n, 'soVanBan': len(ds),
                         'conHieuLuc': sum(1 for x in ds if x['tinhTrang'] in ('con-hieu-luc', 'sua-doi-mot-phan')),
                         'nenBoSung': sum(1 for r in nen_bo_sung if r.get('nhom') == n['ma'])})
+    # TRA THEO CHỦ ĐỀ: văn bản có từ 2 điều nói tới chủ đề trở lên thì kể ra (văn bản ngắn: 1 điều).
+    # Chủ đề HIẾM (cả kho chưa tới 10 điều, vd "trồng rừng thay thế" chỉ có 1 điều) thì 1 điều cũng kể —
+    # bỏ đi là mất đúng chỗ duy nhất trong kho nói về việc đó.
+    tong_cd = {}
+    for x in van_ban:
+        if isinstance(x['_chuDeTra'], dict):
+            for ten, n in x['_chuDeTra'].items():
+                tong_cd[ten] = tong_cd.get(ten, 0) + n
+    for x in van_ban:
+        if isinstance(x['_chuDeTra'], dict):
+            x['_chuDeTra'] = [{'ten': ten, 'soDieu': n} for ten, n in x['_chuDeTra'].items()
+                              if n >= 2 or (n >= 1 and (x.get('soDieu', 99) <= 12 or tong_cd.get(ten, 0) < 10))]
     chu_de_ra = []
     for c in chu_de:
         ds = [{'ma': x['ma'], **({'soDieu': z['soDieu']} if 'soDieu' in z else {})}

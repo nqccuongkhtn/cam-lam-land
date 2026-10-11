@@ -29,6 +29,7 @@ _Văn bản gốc. Luật Đất đai 2024 là trục; luật sửa đổi và c
 - **Cơ quan ban hành:** Quốc hội · **Người ký:** Vương Đình Huệ
 - **Ban hành:** 18/01/2024 · **Hiệu lực:** 01/08/2024
 - **Tình trạng:** ✏️ Còn hiệu lực — 4 điều bị sửa đổi, bổ sung (bởi Luật 43/2024).
+- ⚠️ **Cần kiểm:** Điều 122 khoản 1 — Theo công văn này, khoản 3 Điều 4 Nghị quyết 254/2025/QH15 (hiệu lực 01/01/2026) cho phép quyết định giao đất, cho thuê đất, cho phép chuyển mục đích đất trồng lúa, đất rừng mà KHÔNG phải trình HĐND cấp tỉnh chấp thuận — khác với khoản 1 điều này. Nghị quyết 254/2025/QH15 CHƯA có trong kho nên chưa đối chiếu được nguyên văn. _(theo CV 1857/SNNMT-QLĐĐ)_
 - **Thay thế:** Luật Đất đai 2013
 - **Bị sửa đổi, bổ sung bởi:** Luật 43/2024
 - **Được hướng dẫn bởi (là căn cứ của):** NĐ 101/2024, NĐ 102/2024, NĐ 103/2024, NĐ 104/2024, NĐ 123/2024, NĐ 71/2024, NĐ 88/2024, TT 10/2024, TT 12/2024, TT 25/2024, TT 26/2024, TT 29/2024
@@ -177,6 +178,7 @@ _Quy định chi tiết, hướng dẫn thi hành luật: trình tự, hồ sơ,
 - **Cơ quan ban hành:** Chính phủ · **Người ký:** Trần Hồng Hà
 - **Ban hành:** 30/07/2024 · **Hiệu lực:** 01/08/2024
 - **Tình trạng:** ✏️ Còn hiệu lực — 17 điều đã hết hiệu lực, 6 điều bị bãi bỏ một phần (bởi NĐ 151/2025).
+- ⚠️ **Cần kiểm:** Điều 50 — Theo công văn này, hiện nay không còn trình tự, thủ tục chấp thuận chuyển mục đích đất trồng lúa, đất rừng để thực hiện dự án (điều này quy định đúng trình tự đó). Kho chưa có Nghị định 226/2025/NĐ-CP và Nghị định 49/2026/NĐ-CP nên điều này chưa được tự đánh dấu — cần nạp hai nghị định đó để biết chính xác điều này còn hiệu lực tới đâu. _(theo CV 1857/SNNMT-QLĐĐ)_
 - **Căn cứ ban hành:** Luật Đất đai 2024
 - **Thay thế:** NĐ 42/2024
 - **Bị bãi bỏ một phần bởi:** NĐ 151/2025
@@ -370,7 +372,7 @@ _Chủ đề = hàng "Chủ đề nhanh" trên trang. Với văn bản có đi�
 - **🤝 Giao đất, cho thuê đất** (cụm tìm: “giao đất, cho thuê đất”): Luật Đất đai 2024 (63 điều) · NĐ 102/2024 (37 điều) · Luật Đất đai 2013 (33 điều) · Luật Đất đai 2003 (21 điều) · NĐ 103/2024 (8 điều) · NĐ 101/2024 (6 điều) · NĐ 151/2025 (6 điều) · TT 26/2024 (6 điều) · NĐ 71/2024 (5 điều) · NĐ 123/2024 (4 điều) · TT 10/2024 (4 điều) · Luật Đất đai 1993 (3 điều) · NĐ 88/2024 (3 điều) · NĐ 42/2024 (3 điều) · TT 25/2024 (3 điều) · Luật sửa đổi 1998 (2 điều) · Luật 43/2024 (1 điều) · Luật sửa đổi 2001 (1 điều) · CV 1857/SNNMT-QLĐĐ 📨
 - **🔁 Chuyển mục đích sử dụng** (cụm tìm: “chuyển mục đích sử dụng đất”): Luật Đất đai 2024 (39 điều) · Luật Đất đai 2013 (29 điều) · NĐ 102/2024 (22 điều) · Luật Đất đai 2003 (19 điều) · NĐ 103/2024 (17 điều) · TT 29/2024 (9 điều) · NĐ 101/2024 (7 điều) · NĐ 151/2025 (7 điều) · NĐ 123/2024 (3 điều) · TT 26/2024 (3 điều) · NĐ 71/2024 (2 điều) · TT 10/2024 (2 điều) · Luật sửa đổi 2001 (1 điều) · Luật sửa đổi 1998 (1 điều) · CV 82/HKL-QLBVR 📨 · CV 1857/SNNMT-QLĐĐ 📨
 - **🌲 Chuyển mục đích đất lúa, đất rừng** (cụm tìm: “đất trồng lúa, đất rừng”): TT 29/2024 (9 điều) · Luật Đất đai 2024 (7 điều) · NĐ 102/2024 (5 điều) · Luật Đất đai 2013 (3 điều) · NĐ 151/2025 (2 điều) · CV 82/HKL-QLBVR 📨 · CV 1857/SNNMT-QLĐĐ 📨
-- **🌱 Trồng rừng thay thế** (cụm tìm: “trồng rừng thay thế”): CV 82/HKL-QLBVR 📨
+- **🌱 Trồng rừng thay thế** (cụm tìm: “trồng rừng thay thế”): NĐ 102/2024 (1 điều) · CV 82/HKL-QLBVR 📨
 - **📏 Hạn mức & thời hạn** (cụm tìm: “hạn mức”): Luật Đất đai 2024 (27 điều) · Luật Đất đai 2013 (18 điều) · Luật Đất đai 2003 (10 điều) · NĐ 103/2024 (8 điều) · NĐ 88/2024 (5 điều) · NĐ 101/2024 (4 điều) · NĐ 71/2024 (2 điều) · NĐ 102/2024 (2 điều) · NĐ 123/2024 (2 điều) · Luật sửa đổi 1998 (1 điều)
 - **🌾 Đất nông nghiệp** (cụm tìm: “đất nông nghiệp”): Luật Đất đai 2024 (50 điều) · Luật Đất đai 2013 (44 điều) · Luật Đất đai 2003 (22 điều) · NĐ 102/2024 (17 điều) · TT 29/2024 (17 điều) · Luật Đất đai 1993 (13 điều) · Luật Đất đai 1987 (11 điều) · NĐ 123/2024 (9 điều) · NĐ 88/2024 (8 điều) · NĐ 101/2024 (6 điều) · NĐ 103/2024 (6 điều) · NĐ 71/2024 (5 điều) · TT 10/2024 (5 điều) · NĐ 151/2025 (3 điều) · TT 25/2024 (2 điều) · TT 26/2024 (2 điều) · Luật sửa đổi 2001 (1 điều) · Luật sửa đổi 1998 (1 điều)
 - **🏠 Đất ở** (cụm tìm: “đất ở”): Luật Đất đai 2024 (58 điều) · Luật Đất đai 2013 (39 điều) · Luật Đất đai 2003 (24 điều) · NĐ 103/2024 (15 điều) · NĐ 88/2024 (13 điều) · Luật Đất đai 1993 (11 điều) · NĐ 101/2024 (11 điều) · NĐ 102/2024 (11 điều) · NĐ 151/2025 (6 điều) · TT 10/2024 (6 điều) · TT 26/2024 (6 điều) · NĐ 123/2024 (5 điều) · Luật Đất đai 1987 (4 điều) · TT 29/2024 (4 điều) · NĐ 71/2024 (3 điều) · Luật sửa đổi 2001 (1 điều) · Luật sửa đổi 1998 (1 điều)
@@ -398,11 +400,11 @@ _Chủ đề = hàng "Chủ đề nhanh" trên trang. Với văn bản có đi�
 
 - **Luật Đất đai 2024 Điều 121** khoản 1 ← CV 1857/SNNMT-QLĐĐ (liên quan, đọc kèm)
 - **Luật Đất đai 2024 Điều 121** khoản 1 ← CV 82/HKL-QLBVR (liên quan, đọc kèm)
-- **Luật Đất đai 2024 Điều 122** khoản 1 ← CV 1857/SNNMT-QLĐĐ (trích dẫn)
+- **Luật Đất đai 2024 Điều 122** khoản 1 ← CV 1857/SNNMT-QLĐĐ (trích dẫn) — ⚠️ Theo công văn này, khoản 3 Điều 4 Nghị quyết 254/2025/QH15 (hiệu lực 01/01/2026) cho phép quyết định giao đất, cho thuê đất, cho phép chuyển mục đích đất trồng lúa, đất rừng mà KHÔNG phải trình HĐND cấp tỉnh chấp thuận — khác với khoản 1 điều này. Nghị quyết 254/2025/QH15 CHƯA có trong kho nên chưa đối chiếu được nguyên văn.
 - **Luật Đất đai 2024 Điều 248** ← CV 82/HKL-QLBVR (liên quan, đọc kèm)
 - **NĐ 102/2024 Điều 46** ← CV 1857/SNNMT-QLĐĐ (liên quan, đọc kèm)
 - **NĐ 102/2024 Điều 46** khoản 1 ← CV 82/HKL-QLBVR (liên quan, đọc kèm)
-- **NĐ 102/2024 Điều 50** ← CV 1857/SNNMT-QLĐĐ (trích dẫn)
+- **NĐ 102/2024 Điều 50** ← CV 1857/SNNMT-QLĐĐ (trích dẫn) — ⚠️ Theo công văn này, hiện nay không còn trình tự, thủ tục chấp thuận chuyển mục đích đất trồng lúa, đất rừng để thực hiện dự án (điều này quy định đúng trình tự đó). Kho chưa có Nghị định 226/2025/NĐ-CP và Nghị định 49/2026/NĐ-CP nên điều này chưa được tự đánh dấu — cần nạp hai nghị định đó để biết chính xác điều này còn hiệu lực tới đâu.
 - **NĐ 151/2025 Điều 8** khoản 3 ← CV 1857/SNNMT-QLĐĐ (trích dẫn) — ⚠️ Theo công văn này, tiết đ1 điểm đ khoản 3 Điều 16 Nghị định 49/2026/NĐ-CP (hiệu lực 31/01/2026) đã cho HẾT HIỆU LỰC khoản 3 điều này. Trong kho điều này vẫn hiện như còn hiệu lực vì kho CHƯA có Nghị định 49/2026/NĐ-CP — cần nạp nguyên văn nghị định đó để kiểm.
 
 ## Văn bản nên bổ sung vào kho
@@ -416,9 +418,9 @@ _Chủ đề = hàng "Chủ đề nhanh" trên trang. Với văn bản có đi�
 | 16/2017/QH14 | Luật Lâm nghiệp (đã được Luật Đất đai 2024, Điều 248 sửa một số điều) | được Luật Đất đai 2024 nhắc tới | chưa tìm thấy trong danh mục toàn quốc |
 | 5442/SNNMT-CCKL | Văn bản của Sở Nông nghiệp và Môi trường (tỉnh Lào Cai) gửi Bộ Nông nghiệp và Môi trường xin hướng dẫn — gửi kèm công văn nhưng không có trong tệp nhận được | được CV 82/HKL-QLBVR nhắc tới | chưa tìm thấy trong danh mục toàn quốc |
 | 84/2025/TT-BNNMT | Thông tư quy định chi tiết Luật Lâm nghiệp và sửa đổi, bổ sung một số thông tư trong lĩnh vực lâm nghiệp và kiểm lâm (ngày 31/12/2025) | được CV 82/HKL-QLBVR nhắc tới; ⚠️ Tên thông tư ghi theo tra cứu trên mạng ngày 11/10/2026, chưa có nguyên văn trong kho để đối chiếu. | chưa tìm thấy trong danh mục toàn quốc |
-| 09/2024/TT-BTNMT | Quy định về nội dung, cấu trúc, kiểu thông tin cơ sở dữ liệu quốc gia về đất đai và yêu cầu kỹ thuật đối với phần mềm ứng dụng của Hệ thống thông tin quốc gia về đất đai | chưa đưa vào được: Bản PDF tải được bị cụt — không có điều khoản thi hành (xem dung-kho-luat.py). | [cổng Chính phủ](https://vanban.chinhphu.vn/?pageid=27160&docid=210903) · [PDF](https://datafiles.chinhphu.vn/cpp/files/vbpq/2024/8/09-btnmt.pdf) |
-| 112/2024/NĐ-CP | Quy định chi tiết về đất trồng lúa | chưa đưa vào được: Công báo không đăng; bản trên cổng Chính phủ là ảnh quét, bóc chữ không ra (xem dung-kho-luat.py). | [cổng Chính phủ](https://vanban.chinhphu.vn/?pageid=27160&docid=211120) · [PDF](https://datafiles.chinhphu.vn/cpp/files/vbpq/2024/9/112-cp.signed.pdf) |
-| 23/2025/TT-BNNMT | Quy định phân cấp, phân định thẩm quyền quản lý nhà nước trong lĩnh vực đất đai | chưa đưa vào được: Thông tư sửa đổi chép nguyên chương của văn bản khác trong ngoặc kép, bộ tách bị đứt số điều (xem dung-kho-luat.py). | [cổng Chính phủ](https://vanban.chinhphu.vn/?pageid=27160&docid=214094) · [PDF](https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/6/23-bnnmt-kem.pdf) |
+| 09/2024/TT-BTNMT | Quy định về nội dung, cấu trúc, kiểu thông tin cơ sở dữ liệu quốc gia về đất đai và yêu cầu kỹ thuật đối với phần mềm ứng dụng của Hệ thống thông tin quốc gia về đất đai | chưa đưa vào được: Bản PDF tải được bị cụt — không có điều khoản thi hành. | [cổng Chính phủ](https://vanban.chinhphu.vn/?pageid=27160&docid=210903) · [PDF](https://datafiles.chinhphu.vn/cpp/files/vbpq/2024/8/09-btnmt.pdf) |
+| 112/2024/NĐ-CP | Quy định chi tiết về đất trồng lúa | chưa đưa vào được: Công báo không đăng; bản trên cổng Chính phủ là ảnh quét, bóc chữ không ra. | [cổng Chính phủ](https://vanban.chinhphu.vn/?pageid=27160&docid=211120) · [PDF](https://datafiles.chinhphu.vn/cpp/files/vbpq/2024/9/112-cp.signed.pdf) |
+| 23/2025/TT-BNNMT | Quy định phân cấp, phân định thẩm quyền quản lý nhà nước trong lĩnh vực đất đai | chưa đưa vào được: Thông tư sửa đổi chép nguyên chương của văn bản khác trong ngoặc kép, bộ tách bị đứt số điều. | [cổng Chính phủ](https://vanban.chinhphu.vn/?pageid=27160&docid=214094) · [PDF](https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/6/23-bnnmt-kem.pdf) |
 
 ## Bản lưu trữ các tệp chủ dự án gửi
 

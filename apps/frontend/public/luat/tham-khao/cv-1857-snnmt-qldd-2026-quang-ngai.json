@@ -55,13 +55,15 @@
    "ma": "ldd2024",
    "so": 122,
    "khoan": 1,
-   "luuY": "Công văn dẫn khoản 3 Điều 4 Nghị quyết 254/2025/QH15: từ 01/01/2026 người có thẩm quyền quyết định cho chuyển mục đích đất trồng lúa, đất rừng mà KHÔNG phải trình HĐND cấp tỉnh chấp thuận — khác với khoản 1 điều này. Nghị quyết 254/2025/QH15 CHƯA có trong kho nên chưa đối chiếu được nguyên văn."
+   "canh": true,
+   "luuY": "Theo công văn này, khoản 3 Điều 4 Nghị quyết 254/2025/QH15 (hiệu lực 01/01/2026) cho phép quyết định giao đất, cho thuê đất, cho phép chuyển mục đích đất trồng lúa, đất rừng mà KHÔNG phải trình HĐND cấp tỉnh chấp thuận — khác với khoản 1 điều này. Nghị quyết 254/2025/QH15 CHƯA có trong kho nên chưa đối chiếu được nguyên văn."
   },
   {
    "chu": "Điều 50 Nghị định 102/2024/NĐ-CP",
    "ma": "nd102-2024",
    "so": 50,
-   "luuY": "Công văn kết luận: hiện nay không còn trình tự, thủ tục chấp thuận chuyển mục đích đất trồng lúa, đất rừng để thực hiện dự án. Kho chưa có Nghị định 226/2025/NĐ-CP và Nghị định 49/2026/NĐ-CP nên điều này chưa được tự đánh dấu — cần nạp hai nghị định đó để biết chính xác điều này còn hiệu lực tới đâu."
+   "canh": true,
+   "luuY": "Theo công văn này, hiện nay không còn trình tự, thủ tục chấp thuận chuyển mục đích đất trồng lúa, đất rừng để thực hiện dự án (điều này quy định đúng trình tự đó). Kho chưa có Nghị định 226/2025/NĐ-CP và Nghị định 49/2026/NĐ-CP nên điều này chưa được tự đánh dấu — cần nạp hai nghị định đó để biết chính xác điều này còn hiệu lực tới đâu."
   },
   {
    "chu": "khoản 3 Điều 8 Nghị định số 151/2025/NĐ-CP",

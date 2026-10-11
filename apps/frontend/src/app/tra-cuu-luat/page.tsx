@@ -479,7 +479,7 @@ export default function TraCuuLuatPage() {
   const daTai = useRef<Record<string, Promise<VanBan>>>({});
 
   const vb = cacVb[maVb] || null;
-  const [daChep, setDaChep] = useState<'' | 'chu' | 'link'>('');
+  const [daChep, setDaChep] = useState<'' | 'chu' | 'link' | 'th'>('');
   const daMoLink = useRef(false);
   // Cỡ chữ phần nguyên văn (đợt 20): 0 = 14px (mặc định), 1 = 16px, 2 = 18px — nhớ trên máy.
   const CO_CHU = [14, 16, 18];
@@ -1189,6 +1189,8 @@ export default function TraCuuLuatPage() {
     daMoLink.current = true;
     let sp: URLSearchParams;
     try { sp = new URLSearchParams(window.location.search); } catch { return; }
+    const th0 = sp.get('th');
+    if (th0 && /^[a-z0-9-]+$/.test(th0)) { setThe('tinhhuong'); setThChon(th0); return; }   // đợt 33: mở thẳng một tình huống
     const ma = sp.get('vb'), so = Number(sp.get('d')), k = Number(sp.get('k')) || undefined;
     if (!ma || !/^[a-z0-9-]+$/.test(ma) || !(so > 0)) return;
     taiVb(ma).then(() => moDieu(ma, so, k)).catch(() => {});
@@ -1197,6 +1199,7 @@ export default function TraCuuLuatPage() {
     if (!daMoLink.current) return;
     try {
       const u = new URL(window.location.href);
+      u.searchParams.delete('th');   // đợt 33: ?th= (mở thẳng tình huống) chỉ dùng một lần lúc mở trang
       if (chon != null) {
         u.searchParams.set('vb', maVb); u.searchParams.set('d', String(chon));
         if (khoanSang) u.searchParams.set('k', String(khoanSang)); else u.searchParams.delete('k');
@@ -1623,6 +1626,13 @@ export default function TraCuuLuatPage() {
     );
   };
   // Gửi đường dẫn tới điều đang đọc: điện thoại mở bảng chia sẻ (Zalo, Messenger…); máy tính chép đường dẫn.
+  const guiLinkTh = async (x: { ma: string; ten: string }) => {
+    const url = `${window.location.origin}/tra-cuu-luat?th=${encodeURIComponent(x.ma)}`;
+    const ten = `Tình huống: ${x.ten}`;
+    const dienThoai = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
+    if (dienThoai && typeof navigator.share === 'function') { try { await navigator.share({ title: ten, url }); } catch { /* người dùng huỷ */ } return; }
+    try { await navigator.clipboard.writeText(ten + '\n' + url); setDaChep('th'); setTimeout(() => setDaChep(''), 1800); } catch { /* */ }
+  };
   const guiLink = async (d: Dieu) => {
     const url = `${window.location.origin}/tra-cuu-luat?vb=${encodeURIComponent(maVb)}&d=${d.so}`;
     const ten = `Điều ${d.so}. ${d.tieuDe} — ${nhanNgan(maVb, vb?.soHieu || '')}`;
@@ -1705,7 +1715,13 @@ export default function TraCuuLuatPage() {
             const x = th.ds.find((k) => k.ma === thChon)!;
             return (
               <>
-                <button onClick={() => setThChon('')} className="text-[12.5px] font-semibold text-slate-500 hover:text-[#0A2540]">← Chọn tình huống khác</button>
+                <div className="flex items-center justify-between gap-2">
+                  <button onClick={() => setThChon('')} className="text-[12.5px] font-semibold text-slate-500 hover:text-[#0A2540]">← Chọn tình huống khác</button>
+                  <button onClick={() => guiLinkTh(x)} title="Gửi đường dẫn mở thẳng tình huống này"
+                    className="shrink-0 rounded-lg border border-slate-200 px-2 py-1 text-[12px] font-semibold text-slate-600 hover:border-[#0A2540]">
+                    {daChep === 'th' ? '✓ Đã chép đường dẫn' : '🔗 Gửi'}
+                  </button>
+                </div>
                 <h2 className="mt-1.5 text-[17px] font-extrabold leading-snug text-[#0A2540]">{x.icon} {x.ten}</h2>
                 <p className="mt-0.5 text-[12.5px] leading-snug text-slate-500">{x.tom}</p>
 

@@ -596,6 +596,28 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
 Công cụ: scratchpad của phiên (audit*.ts quét thửa thật trong container, dap_an_all.py, ve_thua205.py vẽ thửa lên bản vẽ) — chưa
 đưa vào repo; cách làm ghi ở `scripts/kiem-tra-qh/README.md`.
 
+**KIỂM NGẪU NHIÊN 2.427 THỬA (12/10/2026) — số web so với CẮT HÌNH THẲNG trên ô đất, cả 9 bản** (`scripts/kiem-tra-qh/kiem-ngau-nhien.ts`
+chạy trong container + `dap-an-cat-hinh.py`). Ô đất đã khớp bản vẽ từ 11/10, nhưng PHẦN TÍNH trên thửa còn 5 lỗi thuật toán — đã sửa
+(CACH_TINH `2026-10-12-ranh-cat-hinh-trum`):
+1. **Bản có ranh lập QH quyết báo bản bằng CẮT HÌNH** (`theoRanh` trong `computeQhTheoBan`): thửa có phần trong ranh là bản đã phủ.
+   Trước đòi điểm mẫu trúng ô đất → thửa nằm trọn trong lòng đường rộng (hành lang QL1A, đường sắt…) hay chạm ranh bằng dải mảnh
+   MẤT CẢ DÒNG của bản đó: QĐ918 26/396 thửa (6,5 %), Tây Bắc 4, Tây Nam 3, QĐ2101 2, Cù Hin 1, QĐ2076 1.
+2. **Khe hở của bản có ranh chia đường / ngoài phạm vi bằng CẮT HÌNH với ranh** (`catTrongVung` trong catHinh.ts) — trước rải điểm
+   mẫu, thửa vắt mép ranh lệch 2–35 m² (thửa 4,7 ha lệch 249 m²).
+3. **Thửa có lỗ: `qhLuu.gop` tính lại "ngoài phạm vi" = diện tích thửa − phần có loại.** Lỗ nằm trọn ngoài một bản không có dòng của bản
+   đó nên không trừ được → thửa 581 tờ 16 Cam An Nam ghi QĐ2101 "ngoài phạm vi" 48.351 m², các dòng cộng lại lớn hơn cả thửa.
+4. **Ô trùm phải CHỨA THẬT** (ô con nằm trong lòng ≥ 50 %, `tiLeNamTrong`). Từ khi dựng chẵn–lẻ, vùng tô có lỗ được cắt thành mảnh không
+   lỗ; ô nằm trong LỖ có mọi đỉnh trên viền mảnh → cả 16 ô trùm của 7 bản đều bắt nhầm (ô con nằm trong lòng 0 %), mặt nạ đường (nét mép
+   nới 8 m) cắt dải đất sát đường thành "đường" (thửa 139 tờ 18 Cam Hiệp: 49,8 m² giữa vùng tô khu dân cư hiện hữu). Nay **0 ô trùm**;
+   luật "điểm trong ô trùm + mặt nạ + bị bao quanh = đường" giữ lại cho dữ liệu có vùng tô chồng thật.
+5. **QĐ205: xa mọi ô > 50 m mà mặt nạ nói đường thì là đường** (giữa vòng xoay lớn Cam Đức / ngã tư rộng từng ghi "chưa ghi loại đất").
+Kết quả: lệch so với cắt hình QĐ918 3,48 % → 0,00 %, Tây Bắc 2,33 → 0,00, QĐ2101 1,51 → 0,00, Cù Hin 0,64 → 0,00, Tây Nam 0,22 → 0,00,
+QĐ2076 0,17 → 0,00, QĐ205 0,01 → 0,00 (152 m² / 4,4 triệu m² — gần hết là luật `hoaHop205`, xem dưới); 79 phiếu giữ nguyên (9.029 m²),
+thửa 70 tờ 25 giữ nguyên, tốc độ như cũ (~93 ms/thửa).
+**`hoaHop205` VẪN BẬT** (chủ dự án yêu cầu 10/10: "3 quy hoạch giống nhau mà bị lệch thành ra gây nghi ngờ"): QĐ205 mượn ranh bản chi
+tiết khi chỉ lệch nét vẽ ≤ 1,5 m — đo 2.340 thửa: 1.035 thửa được khớp, 17 thửa đổi > 1 m², lớn nhất 17 m². Đo tay QĐ205 trên MicroStation
+sẽ thấy chênh đúng chừng đó; muốn số QĐ205 thuần thì tắt luật này (chờ chủ dự án quyết — báo cáo mục L).
+
 **Dữ liệu bắt buộc phải có:** `apps/backend/data/qh_zones.json`, `road_mask.bin`, `road_mask.json`
 (đường dẫn đọc theo `QH_DATA_DIR`, mặc định `<thư mục chạy>/data`; trong container là `/app/apps/backend/data`).
 Các file này **có trong git** (~1.9MB + 1.6MB). Thiếu chúng thì backend vẫn chạy nhưng tự tụt xuống cách B —

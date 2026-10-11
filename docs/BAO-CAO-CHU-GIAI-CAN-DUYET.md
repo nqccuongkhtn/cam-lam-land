@@ -291,6 +291,32 @@ trung bình) (hiện trạng)". Dữ liệu đã sẵn (bậc 1 = cột hiện t
 đoạn (HT / 2030 / 2045) mà web đang ghi chung "2045" — làm cùng lúc được. Anh đồng ý thì tôi làm và chạy lại bộ kiểm 79 phiếu
 (phiếu chính thức ghi tên thế nào thì giữ đúng như vậy khi so).
 
+## L. ĐÃ SỬA ĐÊM 12/10: PHẦN TÍNH TRÊN THỬA CÒN 5 LỖI THUẬT TOÁN — kiểm 2.427 thửa ngẫu nhiên
+
+Ô đất của 9 bản đã khớp bản vẽ từ hôm 11/10, nhưng anh vẫn thấy nhiều thửa sai, nên máy kiểm thêm một lớp nữa: cho web tính 2.427 thửa
+ngẫu nhiên đúng như khi anh bấm vào thửa, rồi so với số **cắt hình thửa thẳng trên ô đất**. Ra 5 lỗi ở bước tính trên thửa (không phải
+ở dữ liệu), đã sửa hết:
+
+| # | Lỗi | Ví dụ thửa (trước → nay) |
+|---|---|---|
+| 1 | Thửa nằm **trọn trong lòng đường rộng** (hành lang QL1A, đường sắt…) hoặc chỉ chạm ranh bằng một dải mảnh → **mất cả dòng** của bản đó. QĐ918 dính 26/396 thửa (6,5 %), Tây Bắc 4, Tây Nam 3, QĐ2101 2, Cù Hin 1, QĐ2076 1 | Thửa 202 tờ 13 Cam An (4.478 m²): không có dòng QĐ918 → nay "QĐ918: Đất giao thông 4.478 m²" |
+| 2 | Phần đường / ngoài phạm vi ở **mép ranh** chia bằng điểm mẫu → lệch 2–35 m² (thửa lớn tới 249 m²) | Thửa 502 tờ 4 Cam Hải Đông, QĐ2076: đường 108,9 → **142,7** m² (cắt hình 142,8) |
+| 3 | Thửa có **lỗ thủng** (thửa khác nằm lọt bên trong): phần "ngoài phạm vi" bị cộng dư, các dòng cộng lại **lớn hơn cả thửa** | Thửa 581 tờ 16 Cam An Nam (39.600 m²), QĐ2101: "ngoài phạm vi" 48.351 → **23.792** m² |
+| 4 | **"Ô trùm" bắt nhầm cả 16 ô**: ô nằm trong lỗ thủng của vùng tô bị hiểu là "vùng tô vẽ phủ lên lô" → dải 8 m sát đường bị cắt thành đường | Thửa 139 tờ 18 Cam Hiệp, QĐ2076: 118 khu dân cư + 49,8 đường → **167,5 m² khu dân cư** (đúng vùng tô); thửa 6041 tờ 2 Suối Tân, Cù Hin: trả lại 720 m² cây xanh chuyên dụng |
+| 5 | QĐ205: giữa **nút giao / vòng xoay rộng** (xa ô đất > 50 m) ghi "Chưa ghi loại đất" dù mặt nạ nói là đường | Thửa 15 tờ 14 Xã Cam Lâm (giữa vòng xoay lớn Cam Đức): "chưa ghi loại" → **Đất giao thông 232,6 m²** (QĐ893, QĐ2101 cùng ghi đường) |
+
+**Sau khi sửa: cả 9 bản lệch 0,00 %** so với cắt hình thẳng (trước: QĐ918 3,48 %, Tây Bắc 2,33 %, QĐ2101 1,51 %, Cù Hin 0,64 %, Tây Nam
+0,22 %, QĐ2076 0,17 %). **79 phiếu: giữ nguyên từng con số. Thửa 70 tờ 25: giữ nguyên** (395,1 + 116,8 cả 3 bản). Tốc độ như cũ.
+Anh bấm thử thửa nào thấy khác trước thì đó là 1 trong 5 chỗ trên.
+
+**Còn MỘT luật cố ý lệch bản vẽ — CHỜ ANH QUYẾT:** luật "QĐ205 mượn ranh bản chi tiết" (anh dặn hôm 10/10: *"3 quy hoạch giống nhau mà
+bị lệch thành ra gây nghi ngờ cho người dùng"*). Khi QĐ205 và bản phân khu cùng nói một điều trên thửa, chỉ lệch nhau ở nét vẽ ≤ 1,5 m,
+web lấy diện tích theo bản phân khu (tên loại vẫn của QĐ205). Đo 2.340 thửa: 1.035 thửa được mượn ranh; **17 thửa đổi quá 1 m², lớn nhất
+17 m²** (thửa 114 tờ 9 Xã Cam Lâm: QĐ205 thuần 2.039,6 m² đường — web ghi 2.022,5 theo QĐ2101; thửa 56 tờ 63 Cam Hải Đông: 28,8 → 11,8
+theo QĐ2222). Nếu anh đo tay QĐ205 trên MicroStation thì sẽ thấy chênh đúng chừng đó. Anh chọn:
+(a) giữ như hiện nay (3 bản ra số giống nhau, dễ hiểu cho người xem); (b) tắt — QĐ205 ra **đúng 100 % bản vẽ QĐ205**, chấp nhận 3 bản
+lệch nhau vài m² ở mép đường.
+
 ## D. CẦN ANH XÁC NHẬN TRÊN MICROSTATION
 
 - **Thửa 95 tờ 15 Xã Cam Lâm, QĐ205 — mảnh giao thông số 2** (104,57 m², dải rộng ~1,4 m giữa vùng hồ và vùng cây xanh, ảnh

@@ -52,6 +52,21 @@ Phiếu có thửa web "trùng 0 %" là thửa mới tách / bản đồ chưa c
   Ô 893 không có mã bên trong giữ tên nhóm chung. Đây là khác biệt CÓ CHỦ Ý, không phải lỗi.
 - QĐ920 (Tây Nam): ô "Đất chưa sử dụng" (lớp HT, hoa văn CORK đúng chú giải) — phiếu ghi "sản xuất nông nghiệp".
   Bản web dùng là bản đã sửa; cần DXF của bản gốc để so.
-- Ranh khác hẳn bản vẽ (Nguyễn Văn Đặng, Vũ Thị Lan, Trần Thị Niệm) — chủ dự án nhận định 10/10/2026: WEB dùng bản đồ
+- Ranh khác hẳn bản vẽ (3 phiếu — tên người dân chỉ ghi trong `du-lieu/`, không ghi ở đây) — chủ dự án nhận định 10/10/2026: WEB dùng bản đồ
   MỚI HƠN, file của cán bộ có thể vẽ trên bản đồ CHƯA CHỈNH LÝ → không tính là lỗi của web, không chỉnh web theo 3 phiếu này.
 - "Hành lang an toàn lưới điện" (phiếu 5644) — web chưa có lớp này.
+
+## Kiểm ngẫu nhiên: số web so với cắt hình thẳng trên ô đất (12/10/2026)
+Bộ 79 phiếu dùng HÌNH THỬA CỦA PHIẾU và chỉ gọi `computeQhTheoBan` nên không thấy lỗi ở đường web thật (thửa địa chính nhiều vòng,
+QĐ205, quyết định có báo bản hay không). Bộ này đi đúng đường web: `tinhQhHinh` + nắn toạ độ địa chính.
+```bash
+docker cp scripts/kiem-tra-qh/kiem-ngau-nhien.ts camlam_backend:/app/apps/backend/src/scripts/
+MSYS_NO_PATHCONV=1 docker exec -w /app/apps/backend camlam_backend node_modules/.bin/tsx src/scripts/kiem-ngau-nhien.ts 3500   # ~4 phút
+MSYS_NO_PATHCONV=1 docker cp camlam_backend:/tmp/kiem-ngau-nhien.jsonl .
+python scripts/kiem-tra-qh/dap-an-cat-hinh.py kiem-ngau-nhien.jsonl dap-an.jsonl   # ~3 phút, in bảng lệch từng bản
+```
+Đáp án: trong ô đất → loại của ô (bậc cao thắng, cùng bậc ô nhỏ thắng); bản phân khu + QĐ205: trong ranh (trừ lỗ `_lo`/`_khop`) mà
+không ô nào → đường, ngoài ranh → ngoài phạm vi; QĐ893: không ô nào → ngoài phạm vi. Thử code CHƯA đưa lên: trong container chép
+`src/lib` sang `src/libmoi`, chép file đã sửa vào đó, đổi import của kiem-ngau-nhien.ts sang `../libmoi/…` (máy chủ đang chạy không bị đụng).
+Kết quả 12/10/2026 sau khi sửa 5 lỗi (xem CLAUDE.md): cả 9 bản lệch 0,00 %; còn lại duy nhất luật `hoaHop205` (QĐ205 mượn ranh bản chi
+tiết khi chỉ lệch nét vẽ ≤ 1,5 m — 17/2.340 thửa đổi > 1 m², lớn nhất 17 m²).

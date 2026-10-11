@@ -45,19 +45,29 @@ function cacVong(geom: any, dich: (r: number[][]) => number[][]): Vong[] {
 }
 
 const lam1 = (x: number) => Math.round(x * 10) / 10;
+// Phần "ngoài phạm vi" của thửa nhiều vòng = diện tích thửa − mọi phần CÓ LOẠI (12/10/2026). Cộng/trừ theo từng vòng sẽ SÓT khi một
+// LỖ THỦNG nằm trọn ngoài một bản: lỗ không có dòng của bản đó nên không trừ được → thửa 581 tờ 16 Cam An Nam (3,96 ha, có lỗ) từng
+// ghi QĐ2101 "ngoài phạm vi" 48.351 m², các dòng cộng lại 63.912 m² — lớn hơn cả thửa.
+const NGOAI = 'Nằm ngoài phạm vi bản quy hoạch này';
 
 function gop(phan: { kq: KetQuaQh; dau: 1 | -1; dt: number }[], dtTong: number): KetQuaQh {
   // QĐ205
   let coPre = false;
   const mPre = new Map<string, { type: string; hz: string; areaM2: number }>();
+  let hzNgoai = '';
   for (const { kq, dau } of phan) {
     if (!kq.pre) continue;
     if (dau > 0) coPre = true;
     for (const o of kq.pre) {
+      if (o.type === NGOAI) { hzNgoai = o.hz; continue; }
       const k = o.type + '|' + o.hz;
       const g = mPre.get(k) || { type: o.type, hz: o.hz, areaM2: 0 };
       g.areaM2 += dau * o.areaM2; mPre.set(k, g);
     }
+  }
+  if (coPre) {
+    const conLai = dtTong - [...mPre.values()].reduce((s, o) => s + o.areaM2, 0);
+    if (conLai >= 1) mPre.set(NGOAI, { type: NGOAI, hz: hzNgoai, areaM2: conLai });
   }
   const pre = coPre ? [...mPre.values()].map((o) => ({ ...o, areaM2: lam1(o.areaM2) })).filter((o) => o.areaM2 > 0.4).sort((a, b) => b.areaM2 - a.areaM2) : null;
   // các bản khác
@@ -65,9 +75,13 @@ function gop(phan: { kq: KetQuaQh; dau: 1 | -1; dt: number }[], dtTong: number):
   for (const { kq, dau, dt } of phan) for (const b of kq.cacBan || []) {
     const g = mBan.get(b.ma) || { ma: b.ma, ten: b.ten, a: new Map<string, number>(), phu: 0, co: false };
     if (dau > 0) g.co = true;
-    for (const o of b.areas) g.a.set(o.type, (g.a.get(o.type) || 0) + dau * o.areaM2);
+    for (const o of b.areas) if (o.type !== NGOAI) g.a.set(o.type, (g.a.get(o.type) || 0) + dau * o.areaM2);
     g.phu += dau * (b.phuTramPhanTram || 0) * dt;
     mBan.set(b.ma, g);
+  }
+  for (const g of mBan.values()) {
+    const conLai = dtTong - [...g.a.values()].reduce((s, a) => s + a, 0);
+    if (conLai >= 1) g.a.set(NGOAI, conLai);
   }
   const cacBan = [...mBan.values()].filter((g) => g.co).map((g) => ({
     ma: g.ma, ten: g.ten,

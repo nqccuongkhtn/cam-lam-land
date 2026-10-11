@@ -110,6 +110,37 @@ const TRON = 1e9;
 const tron = (r: number[][]) => r.map(([x, y]) => [Math.round(x * TRON) / TRON, Math.round(y * TRON) / TRON]);
 const tronMP = (mp: MP): MP => mp.map((poly) => poly.map(tron));
 
+/**
+ * Phần của MultiPolygon `mp` nằm TRONG vùng `ngoai` (một vòng) trừ các lỗ `lo` — cắt hình chính xác (12/10/2026).
+ * Dùng chia khe hở của bản phân khu: trong ranh lập quy hoạch = lòng đường, ngoài ranh / trong lỗ = ngoài phạm vi.
+ * Vùng + lỗ xén theo khung của `mp` trước (ranh có tới vài nghìn đỉnh) — phần trong khung giữ y nguyên.
+ */
+export function catTrongVung(mp: MP, ngoai: number[][], lo: number[][][] = []): MP {
+  if (!mp.length || !ngoai || ngoai.length < 4) return [];
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const poly of mp) for (const [x, y] of poly[0]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  const e = Math.max(x1 - x0, y1 - y0) * 0.01 + 1e-7; x0 -= e; y0 -= e; x1 += e; y1 += e;
+  const vr = xenKhung(ngoai, x0, y0, x1, y1);
+  if (vr.length < 3) return [];
+  let g = tronMP(pc.intersection(mp as any, [[tron(vr)]] as any) as MP);
+  for (const h of lo) {
+    if (!g.length) break;
+    if (!h || h.length < 4) continue;
+    const hr = xenKhung(h, x0, y0, x1, y1);
+    if (hr.length < 3) continue;
+    g = tronMP(pc.difference(g as any, [[tron(hr)]] as any) as MP);
+  }
+  return g;
+}
+
+/** Tỉ lệ diện tích của vòng `a` nằm TRONG LÒNG vòng `b` (0–1), cắt hình chính xác — dùng soát "ô trùm" (12/10/2026). */
+export function tiLeNamTrong(a: number[][], b: number[][]): number {
+  try {
+    const A = pc.union([tron(a)] as any) as MP; const aA = dienTichMP(A, 1, 1); if (!(aA > 0)) return 0;
+    return dienTichMP(pc.intersection(A as any, [[tron(b)]] as any) as MP, 1, 1) / aA;
+  } catch { return 0; }
+}
+
 export function catTheoUuTien(ring: number[][], zones: { k: number; ring: number[][] }[]): { manh: { k: number; mp: MP }[]; con: MP; thua: MP } {
   // Chuẩn hoá hình thửa trước (thửa TỰ CẮT CHÉO — vd phiếu 3354 — thì công thức diện tích thường ra số sai, kéo hệ số
   // quy đổi lên gấp 7 lần). Diện tích thửa phải đo trên CHÍNH hình đã chuẩn hoá này cho cùng hệ với các mảnh cắt.

@@ -4,7 +4,7 @@
 //   ngoài đường ⇒ LOẠI ĐẤT = ô QH chứa điểm (hoặc ô QH gần nhất nếu qh_vector vẽ thiếu vài mét).
 // Nhờ vậy thửa kiểu 326 (qh_vector vẽ thiếu ~10%) vẫn ra đủ 72% hỗn hợp thay vì bị tính nhầm thành giao thông.
 // Dữ liệu: qh_zones.json (loại đất) + road_mask.bin/json (đường). Ngoài phạm vi mask ⇒ tự lùi về cách "không-thuộc-ô = giao thông".
-import { catTheoUuTien, dienTichMP, diemTrongMP, diemCoTrongSo, type MP } from './catHinh.ts';
+import { catTheoUuTien, catTrongVung, tiLeNamTrong, dienTichMP, diemTrongMP, diemCoTrongSo, type MP } from './catHinh.ts';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import path from 'node:path';
@@ -151,7 +151,12 @@ class KhoO {
           // thử tối đa 16 đỉnh rải đều (đủ để biết ô con nằm trọn trong hay không; thử hết thì quá chậm với ô vài nghìn đỉnh)
           const sv = this.dau[j], ev = this.dau[j + 1], buoc = Math.max(1, Math.floor((ev - sv) / 16));
           for (let v = sv; v < ev && het2; v += buoc) if (!this.trong(i, this.xy[2 * v], this.xy[2 * v + 1]) && this.d2Vien(i, this.xy[2 * v], this.xy[2 * v + 1]) > 1e-12) het2 = false;
-          if (het2) con.add(j);
+          // ô con phải THẬT SỰ nằm trong lòng ô trùm (12/10/2026). Từ khi ô đất dựng chẵn–lẻ (11/10), vùng tô có lỗ thủng được cắt
+          // thành mảnh không lỗ; ô nằm trong LỖ có mọi đỉnh trên viền mảnh nên phép thử đỉnh ở trên tưởng là "chứa" → cả 16 ô trùm
+          // của 7 bản đều bắt nhầm kiểu này (ô con nằm trong lòng 0 %), và mặt nạ đường (nét mép đường nới 8 m) cắt dải đất sát
+          // đường của chúng thành "đường": thửa 139 tờ 18 Cam Hiệp ghi 49,8 m² đường giữa vùng tô khu dân cư hiện hữu QĐ2076; thửa 6041
+          // tờ 2 Suối Tân mất 720 m² cây xanh chuyên dụng Cù Hin.
+          if (het2 && tiLeNamTrong(this.vong(j), this.vong(i)) >= 0.5) con.add(j);
         }
       }
       if (con.size >= 2) { t[i] = 1; soTrum++; }
@@ -238,7 +243,8 @@ export function qhReady() { return ready; }
 // = băm NỘI DUNG mọi file dữ liệu quy hoạch (qh_zones*.json, road_mask*) + số phiên bản CÁCH TÍNH bên dưới.
 // Đổi dữ liệu hay đổi cách tính → dấu đổi → mọi kết quả đã lưu tự bị bỏ, tính lại. Không bao giờ hiện số cũ.
 // ⚠️ SỬA CÁCH TÍNH TRONG FILE NÀY (hoặc catHinh.ts) THÌ TĂNG CACH_TINH.
-const CACH_TINH = '2026-10-11-cung-chinh-xac';   // cung-chinh-xac: mọi bản dựng lại với CUNG TRÒN ĐÚNG CÔNG THỨC (cung_chinh_xac.py — trước hụt dọc mọi đường cong, thửa 95 tờ 15 thiếu 33 m²) + tên loại đất đúng chữ khung chú giải + diện tích thửa trên mặt phẳng VN-2000 (dienTichPhang.ts) + thửa có lỗ / nhiều mảnh tính đủ (qhLuu.tinhQhHinh)
+const CACH_TINH = '2026-10-12-ranh-cat-hinh-trum';   // ranh-cat-hinh: bản có ranh lập QH quyết báo bản + chia khe đường / ngoài phạm vi bằng CẮT HÌNH; thửa có lỗ tính lại phần ngoài phạm vi (qhLuu.gop); ô trùm phải chứa THẬT (không tính ô trong lỗ); QĐ205 xa ô > 50 m mà mặt nạ nói đường = đường
+// trước: '2026-10-11-cung-chinh-xac'   // cung-chinh-xac: mọi bản dựng lại với CUNG TRÒN ĐÚNG CÔNG THỨC (cung_chinh_xac.py — trước hụt dọc mọi đường cong, thửa 95 tờ 15 thiếu 33 m²) + tên loại đất đúng chữ khung chú giải + diện tích thửa trên mặt phẳng VN-2000 (dienTichPhang.ts) + thửa có lỗ / nhiều mảnh tính đủ (qhLuu.tinhQhHinh)
 // Lịch sử (cũ → mới): 3 chia khe theo mảnh · ranh-qh · 2 khe QĐ205 ≥ 5 m = đường · 3 ngoài ranh QĐ205 · 4 'Chưa ghi loại đất' · trum-vun · 893-dnl · 893-sot · sot2 · lo-ranh · pk-chanle · 893-banve · 205-gpkg · 205-banve · 205-8so · 8so-tat · cung-chinh-xac
 let PHIEN_BAN = '';
 export function qhPhienBan(): string {
@@ -382,7 +388,10 @@ function loaiKhe205(x: number, y: number): string {
   // quy hoạch thì đã bị chặn từ đầu hàm rồi, không xuống tới đây.
   // Trong khung mặt nạ mà xa mọi ô > 50 m (vd lòng QUẢNG TRƯỜNG TRÒN trung tâm Cam Đức — bản vẽ chỉ tô tam giác cây xanh, còn lại
   // để trống): trước ghi 'Đất khác' nghe như một loại đất thật → nay ghi thẳng "chưa ghi loại đất" như các bản phân khu (10/10/2026).
-  return (r === null) ? 'Đất giao thông' : CHUA_RO_205;
+  // Mặt nạ nói LÀ ĐƯỜNG (r === 1) thì là đường dù xa ô đất > 50 m (12/10/2026): giữa nút giao / vòng xoay rộng (thửa 15 tờ 14 Xã Cam
+  // Lâm nằm giữa vòng xoay lớn Cam Đức, thửa 748 tờ 28 Cam Hải Tây giữa ngã tư rộng) web từng ghi "chưa ghi loại đất" cả thửa, trong khi
+  // QĐ893 và bản phân khu cùng chỗ đều ghi đường. Chỉ chỗ mặt nạ nói KHÔNG phải đường mới còn "chưa ghi loại".
+  return (r === null || r === 1) ? 'Đất giao thông' : CHUA_RO_205;
 }
 
 export function computeQhAreas(ring: number[][], dienTich: number): { type: string; hz: string; areaM2: number }[] | null {
@@ -531,7 +540,8 @@ export function outerRing(geom: any): number[][] | null {
 // bản vẽ (bản vẽ chỉ tô ô đất, phần đường để trắng). Đo thật trên 43 thửa QĐ2101: có mặt nạ thì
 // tỉ lệ phủ trung bình lên 91,8% → 99,7%, số thửa phủ đủ 100% lên 28 → 39.
 interface MatNa { buf: Buffer; x0: number; y0: number; x1: number; y1: number; W: number; H: number; rb: number; }
-interface BanQh { ma: string; ten: string; kho: KhoO; na: MatNa | null; khung: [number, number, number, number]; ranh: Ranh | null; }
+interface BanQh { ma: string; ten: string; kho: KhoO; na: MatNa | null; khung: [number, number, number, number]; ranh: Ranh | null;
+  ranhVong: { ngoai: number[][]; lo: number[][][] } | null; }   // ranh dạng vòng toạ độ — để CẮT HÌNH (catTrongVung)
 // RANH GIỚI LẬP QUY HOẠCH của bản (data/ranh_qh.json, 10/10/2026). Đối chiếu 2.400 thửa với "đáp án" đo thẳng trên bản vẽ
 // (trong vùng tô = loại đất; trong ranh mà không tô = đường; ngoài ranh = ngoài phạm vi) thấy 2 lỗi có hệ thống:
 //   · mặt nạ đường nới ra QUÁ ranh → phần ngoài ranh bị ghi "Đất giao thông" (thửa 590 tờ 3 Cam Hiệp Bắc: 2.380 m² cho QĐ918);
@@ -599,7 +609,9 @@ for (const b of [
       khung[0] = Math.min(khung[0], kho.bb[k * 4]); khung[1] = Math.min(khung[1], kho.bb[k * 4 + 1]);
       khung[2] = Math.max(khung[2], kho.bb[k * 4 + 2]); khung[3] = Math.max(khung[3], kho.bb[k * 4 + 3]);
     }
-    BAN_KHAC.push({ ma: b.ma, ten: b.ten, kho, na, khung, ranh: taoRanh(RANH_QH[b.ma], [...(RANH_QH._lo?.[b.ma] || []), ...(RANH_QH._khop?.[b.ma] || [])]) });
+    const loRanh: number[][][] = [...(RANH_QH._lo?.[b.ma] || []), ...(RANH_QH._khop?.[b.ma] || [])];
+    const ranh = taoRanh(RANH_QH[b.ma], loRanh);
+    BAN_KHAC.push({ ma: b.ma, ten: b.ten, kho, na, khung, ranh, ranhVong: ranh ? { ngoai: RANH_QH[b.ma], lo: loRanh } : null });
     console.log(`[qhCompute] nạp bản ${b.ma}: ${kho.n} ô đất${na ? ` + mặt nạ đường ${na.W}x${na.H} · ${soTrum} ô trùm` : ' (chưa có mặt nạ đường)'}`);
   } catch {
     console.log(`[qhCompute] chưa có ${b.tep} — bỏ qua bản ${b.ma}`);
@@ -745,7 +757,13 @@ export function computeQhTheoBan(ring: number[][], dienTich: number, dayDu = fal
         if (gt < tong) cong(ten, a * (tong - gt) / tong);
       }
       const aCon = dienTichMP(con, kx, ky) * tl;
-      if (aCon > 1e-4) {
+      if (aCon > 1e-4 && b.ranhVong) {
+        // Bản có RANH LẬP QUY HOẠCH: khe hở trong ranh (trừ lỗ _lo / _khop) = lòng đường, ngoài ranh = ngoài phạm vi — CẮT HÌNH
+        // chính xác (12/10/2026). Trước rải điểm mẫu để chia → thửa vắt ngang mép ranh lệch 2–35 m² (thửa 502 tờ 4 Cam Hải Đông:
+        // QĐ2076 ghi đường 108,9 m², cắt hình ra 142,8; thửa 6027 tờ 2 Suối Tân 4,7 ha: Tây Bắc lệch 249 m²).
+        const aDuong = Math.min(aCon, dienTichMP(catTrongVung(con, b.ranhVong.ngoai, b.ranhVong.lo), kx, ky) * tl);
+        if (aDuong > 1e-4) cong('Đất giao thông', aDuong);
+      } else if (aCon > 1e-4) {
         const { p: pts, w } = diemCoTrongSo(con, kx, ky); const tong = w.reduce((s2, v) => s2 + v, 0);
         let gt = 0; pts.forEach(([x, y], i) => { if (trongRanh(b, x, y) && (b.ranh || duongBan(b, x, y) || (b.na && baoQuanh(b, x, y)))) gt += w[i]; });
         if (gt && tong > 0) cong('Đất giao thông', aCon * gt / tong);
@@ -763,7 +781,14 @@ export function computeQhTheoBan(ring: number[][], dienTich: number, dayDu = fal
     // Ngoại lệ: không điểm nào trúng ô đất nhưng có điểm LỌT GIỮA các ô đất của bản này (thửa nằm trọn
     // trong lòng đường) — bị bao quanh thì chắc chắn nằm trong bản vẽ, khác hẳn vùng đệm rìa bản.
     if (d && !demO[b.ma] && !demBao[b.ma] && (mauDuong[b.ma] || []).some(([x, y]) => baoQuanh(b, x, y))) demBao[b.ma] = 1;
-    if (!d || (!demO[b.ma] && !demBao[b.ma])) continue;
+    const theoMau = !!d && !!(demO[b.ma] || demBao[b.ma]);
+    // Bản có RANH LẬP QUY HOẠCH (12/10/2026): thửa có phần nằm trong ranh là bản đã phủ tới — QUYẾT bằng cắt hình (bên dưới), không
+    // đòi điểm mẫu trúng ô đất. Trước: thửa nằm TRỌN trong lòng đường rộng (hành lang QL1A, đường sắt…), hay chỉ chạm ranh bằng một
+    // dải mảnh mà lưới mẫu không trúng, bị MẤT CẢ DÒNG của bản đó — kiểm 2.427 thửa ngẫu nhiên: QĐ918 26/396 thửa (6,5 %), Tây Bắc 4,
+    // Tây Nam 3, QĐ2101 2, Cù Hin 1, QĐ2076 1 (vd thửa 202 tờ 13 Cam An, 4.478 m² trọn trong đường của QĐ918: web không có dòng QĐ918).
+    const g = b.ranh;
+    const theoRanh = !!b.ranhVong && !!g && !(g.x0 > maxx || g.x1 < minx || g.y0 > maxy || g.y1 < miny);
+    if (!theoMau && !theoRanh) continue;
     // ⛔ ĐÃ BỎ luật "phủ dưới 20% thì không liệt kê".
     // Luật đó GIẤU LUÔN cả bản quy hoạch, mà giấu thì người tra cứu không hề biết là có thứ bị
     // giấu — nguy hiểm hơn hẳn cái nó định tránh. Nó cũng đo sai bản chất: thửa tờ 24 thửa 34
@@ -772,11 +797,12 @@ export function computeQhTheoBan(ring: number[][], dienTich: number, dayDu = fal
     // Nỗi lo ban đầu — in "Đất ở tại đô thị 63,6 m²" trên thửa 1.039 m² thì người đọc tưởng cả
     // thửa chỉ có ngần ấy — xử lý đúng cách là GHI NỐT PHẦN CÒN LẠI (xem NGOAI_BAN bên dưới),
     // để các con số cộng lại luôn bằng đúng diện tích thửa. Nói đủ, không cắt bớt.
-    const soDiem = Object.values(d).reduce((s, n) => s + n, 0);
+    const soDiem = d ? Object.values(d).reduce((s, n) => s + n, 0) : 0;
     const cx = chinhXacBan(b);
     if (!cx && !dayDu) return computeQhTheoBan(ring, dienTich, true);
+    if (!cx && !theoMau) continue;   // cắt hình hỏng mà mẫu không trúng → như cũ (không báo)
     const areas = (cx ? Object.entries(cx).map(([type, a]) => ({ type, areaM2: Math.round(a * 10) / 10 }))
-      : Object.entries(d).map(([type, n]) => ({ type, areaM2: Math.round((dienTich * n / ins) * 10) / 10 })))
+      : Object.entries(d!).map(([type, n]) => ({ type, areaM2: Math.round((dienTich * n / ins) * 10) / 10 })))
       .filter((o) => o.areaM2 > 0.4)
       .sort((a, b2) => b2.areaM2 - a.areaM2);
     if (!areas.length) continue;
@@ -789,7 +815,9 @@ export function computeQhTheoBan(ring: number[][], dienTich: number, dayDu = fal
     const conLai = Math.round((dienTich - areas.reduce((t, a) => t + a.areaM2, 0)) * 10) / 10;
     if (conLai >= 1) areas.push({ type: NGOAI_BAN, areaM2: conLai });
     // Phủ bao nhiêu phần thửa — dưới 100% nghĩa là bản đó chỉ trùm một phần (mép ranh).
-    ra.push({ ma: b.ma, ten: b.ten, areas, phuTramPhanTram: Math.round((soDiem / ins) * 100) });
+    // bản quyết theo cắt hình: độ phủ đo bằng chính diện tích cắt được (điểm mẫu có thể không trúng điểm nào)
+    const phu = cx && theoRanh ? Math.round(Object.values(cx).reduce((s, a) => s + a, 0) / dienTich * 100) : Math.round((soDiem / ins) * 100);
+    ra.push({ ma: b.ma, ten: b.ten, areas, phuTramPhanTram: Math.max(0, Math.min(100, phu)) });
   }
   return ra;
 }

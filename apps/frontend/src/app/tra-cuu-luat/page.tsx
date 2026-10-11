@@ -793,17 +793,25 @@ export default function TraCuuLuatPage() {
   // Tô vàng chỗ khớp từ khoá trong nguyên văn (chỉ tô, không đổi chữ).
   const toVang = (chu: string) => {
     const q = tim.trim();
-    if (!q || q.length < 2) return chu;
-    const k = kd(chu), qq = kd(q);
+    if (!q || q.length < 2 || !chu) return chu;
+    const qq = kd(q);
+    if (docSoDieu(qq)) return chu;                   // tìm theo số điều thì không tô chữ
+    // Từ cần tô: nguyên cụm + từng từ (≥ 2 chữ), cụm dài xét trước. Chữ không dấu và chữ gốc (NFC) dài bằng nhau từng ký tự.
+    const tu = [...new Set([qq, ...qq.split(/\s+/).filter((w) => w.length >= 2)])].sort((a, b) => b.length - a.length);
+    const goc = chu.normalize('NFC'), k = kd(goc);
     const ra: React.ReactNode[] = [];
-    let i = 0, j = k.indexOf(qq);
-    while (j >= 0) {
-      ra.push(chu.slice(i, j));
-      ra.push(<mark key={i + '-' + j} className="rounded bg-amber-200 px-0.5">{chu.slice(j, j + q.length)}</mark>);
-      i = j + q.length;
-      j = k.indexOf(qq, i);
+    let i = 0, tu0 = 0;
+    while (i < k.length) {
+      let dai = 0;
+      for (const w of tu) if (k.startsWith(w, i)) { dai = w.length; break; }
+      if (dai) {
+        if (i > tu0) ra.push(goc.slice(tu0, i));
+        ra.push(<mark key={'v' + i} className="rounded bg-amber-200 px-0.5">{goc.slice(i, i + dai)}</mark>);
+        i += dai; tu0 = i;
+      } else i++;
     }
-    ra.push(chu.slice(i));
+    if (tu0 === 0) return chu;
+    ra.push(goc.slice(tu0));
     return ra;
   };
 
@@ -2326,7 +2334,8 @@ export default function TraCuuLuatPage() {
               <div className="py-10 text-center text-slate-400">
                 <p className="text-4xl">⚖️</p>
                 <p className="mt-2 text-sm">Chọn một điều trong danh sách, hoặc gõ từ khoá để tìm.</p>
-                <p className="mt-1 text-[12px]">Mẹo: gõ thẳng <b>số điều</b> (ví dụ <b>79</b>) là nhảy tới ngay.</p>
+                <p className="mt-1 text-[12px]">Mẹo: gõ <b>số điều</b> kiểu nào cũng được — <b>79</b>, <b>đ79</b>, <b>điều 79 khoản 2</b>, <b>79.2</b> — rồi <b>Enter</b> là mở ngay.</p>
+                <p className="mt-1 text-[12px]">Gõ nhiều từ không cần đúng thứ tự (vd <b>thu hồi quốc phòng</b>) — điều có đủ các từ sẽ hiện ra, chữ khớp được tô vàng.</p>
                 <p className="mt-1 text-[12px]">Việc nào luật ghi &ldquo;Chính phủ quy định chi tiết&rdquo; thì bật <b>Tìm cả kho</b> để ra luôn nghị định.</p>
               </div>
             ) : (
@@ -2511,6 +2520,31 @@ export default function TraCuuLuatPage() {
                     </div>
                   ))}
                 </div>
+
+                {/* ĐỌC LIỀN MẠCH (11/10/2026): sang điều trước / điều sau ngay tại chỗ, khỏi quay lại danh sách (nhất là trên điện thoại) */}
+                {(() => {
+                  const i = vb.dieu.findIndex((d) => d.so === dieuDangXem.so);
+                  const truoc = i > 0 ? vb.dieu[i - 1] : null, sau = i >= 0 && i < vb.dieu.length - 1 ? vb.dieu[i + 1] : null;
+                  if (!truoc && !sau) return null;
+                  return (
+                    <div className="mt-3 flex items-stretch gap-2 border-t border-slate-100 pt-2.5">
+                      {truoc ? (
+                        <button onClick={() => moDieu(vb.ma, truoc.so)} title={truoc.tieuDe}
+                          className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-left hover:border-[#0A2540]">
+                          <span className="block text-[11px] text-slate-400">‹ Điều trước</span>
+                          <span className="block truncate text-[12.5px] font-semibold text-[#0A2540]">Điều {truoc.so}. {truoc.tieuDe}</span>
+                        </button>
+                      ) : <span className="flex-1" />}
+                      {sau ? (
+                        <button onClick={() => moDieu(vb.ma, sau.so)} title={sau.tieuDe}
+                          className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-right hover:border-[#0A2540]">
+                          <span className="block text-[11px] text-slate-400">Điều sau ›</span>
+                          <span className="block truncate text-[12.5px] font-semibold text-[#0A2540]">Điều {sau.so}. {sau.tieuDe}</span>
+                        </button>
+                      ) : <span className="flex-1" />}
+                    </div>
+                  );
+                })()}
 
                 {/* ── LIÊN KẾT HAI CHIỀU ──
                     Luật đất đai nhắc chéo nhau chằng chịt: luật nói một câu rồi "Chính phủ

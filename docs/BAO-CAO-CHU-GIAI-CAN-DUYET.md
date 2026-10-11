@@ -187,6 +187,11 @@ huyện: lệch nhau **dưới 0,5 mm**. Không phải nguồn sai số.
 Bước **cắt vùng có lỗ thành mảnh** (máy chủ chỉ nhận ô không lỗ) cũng đã kiểm: ghép lại các mảnh ô đất web của 7 bản phân khu so với
 vùng tô gốc (đã cắt theo ranh) — lệch 0–75 m² trên MỖI BẢN hàng nghìn ha, toàn là vụn dưới 0,6 m² dọc mép do làm tròn toạ độ ~1 mm;
 một thửa chịu ảnh hưởng không tới 0,1 m². Không phải nguồn sai số.
+**Nghi vấn "gán nhầm tên loại đất" — soát toàn bộ 7 bản phân khu** (mỗi cặp lớp + màu của vùng tô, ~51.300 ha): **99,3–100 % diện tích
+lấy đúng chữ trong khung chú giải của chính bản vẽ** (QĐ2076, QĐ2101, QĐ2222, Cù Hin, Tây Bắc: 100 %). Chỉ còn 4 lớp không có dòng chú
+giải: 2 lớp đã SUY LUẬN có căn cứ và áp dụng (QĐ918 `L-QH-langxomdothihoa` 35,7 ha → "Đất làng xóm đô thị hóa"; Tây Nam
+`HT_DAT_O_Langxom` 183,9 ha → "Đất làng xóm, dân cư nông thôn" — mục A) và 2 lớp còn CHỜ ANH (QĐ918 `DAT_KXD_DulichRung_qh` 32 ha,
+Tây Nam `QHDD_DAT_Cayxanhhanche` 26,8 ha — mục B).
 
 ## I. ĐÃ SỬA: VÙNG "TRẮNG TRƠN" TRONG 7 BẢN PHÂN KHU KHÔNG CÒN BỊ GHI LÀ ĐƯỜNG (anh xem ảnh, sai thì báo — gỡ được ngay)
 

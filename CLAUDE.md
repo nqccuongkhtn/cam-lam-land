@@ -708,8 +708,8 @@ Mọi thao tác ghi phải gọi `cacheDrop('listings:')` để xoá cache.
 - **`components/ui/`** — 7 thành phần dùng chung: `Button`, `Card`, `Badge`, `Chip`, `Skeleton`, `EmptyState`.
   Màu thương hiệu trong `tailwind.config.js`: `navy` `#0A2540`, `gold` `#C8A14B` → dùng `bg-navy`, `text-gold`.
 - **`public/`** — dữ liệu bản đồ **tĩnh**: `qh_vector.geojson` (⚠️ BẢN CŨ tháng 7/2026, dựng bằng chuỗi cũ — lấp lỗ, tên cũ, vẽ cả ngoài ranh; 12/10/2026
-  đã BỎ việc trang bản đồ dùng nó TÍNH BÙ diện tích QĐ205 khi máy chủ không trả dòng; còn dùng cho lớp tô màu tuỳ chọn + SƠ ĐỒ ô đất trên phiếu in — nên đổi
-  sang hình ô đất mới từ máy chủ; MỌI CON SỐ phải lấy từ máy chủ `/api/parcels/at`), `ranh-xa.geojson`,
+  đã BỎ việc trang bản đồ dùng nó TÍNH BÙ diện tích QĐ205 khi máy chủ không trả dòng, và SƠ ĐỒ ô đất trên phiếu in nay lấy hình MỚI từ
+  máy chủ `GET /api/parcels/:id/qh-manh` (`manhQh205`); file cũ chỉ còn cho lớp tô màu tuỳ chọn; MỌI CON SỐ phải lấy từ máy chủ `/api/parcels/at`), `ranh-xa.geojson`,
   `roadnet_camlam.json`, `danh-sach-nong.json`, thư mục `tiles/`, `overlays/`.
   Đây là lý do nginx có luật cache riêng cho `.geojson`, `.pmtiles`, `/tiles/`, `/overlays/`.
 - Là **PWA**: `public/sw.js`, `manifest.webmanifest`, `offline.html`, thông báo đẩy (VAPID). Trang mở từ bộ nhớ đệm trước rồi

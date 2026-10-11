@@ -1,0 +1,91 @@
+{
+ "ghiChu": "Mỗi tệp chủ dự án gửi để HỌC LUẬT đều được cất ở thư mục này TRƯỚC khi làm gì khác, vì chủ dự án sẽ xoá bản gốc. Ưu tiên bản đã nén; bản nén chỉ được lấy khi đã kiểm: mở được, đủ số trang, chữ bóc ra y hệt bản gốc (bản quét: máy đọc lại vẫn ra đủ chữ). Tệp có dữ liệu cá nhân thì nằm ở _rieng/ (không lên git). Cách làm: .claude/skills/bo-sung-van-ban-hoc-luat/SKILL.md",
+ "tep": [
+  {
+   "ma": "cv-1857-snnmt-qldd-2026-quang-ngai",
+   "tep": "scripts/luat/van-ban-goc/cv-1857-snnmt-qldd-2026-quang-ngai.pdf",
+   "tenGoc": "Về việc chấp thuận chuyển mục đích sử dụng đất trồng lúa, đất rừng đặc dụng, đất rừng phòng hộ, đất rừng sản xuất sang mục đích khác.pdf",
+   "ngayNhan": "2026-10-11",
+   "soTrang": 2,
+   "coLopChu": true,
+   "kichThuocGoc": 551626,
+   "kichThuocLuu": 551626,
+   "cachLuu": "giữ nguyên bản gốc",
+   "daThu": [
+    {
+     "cach": "A: gs + qpdf (như nenPdf)",
+     "kichThuoc": 144607,
+     "ketQua": "HỎNG LỚP CHỮ: chữ bóc ra khác bản gốc (thường là chữ có dấu bị đổi thành ký tự lạ) — bỏ · bản nén KHÔNG còn chữ ký số"
+    },
+    {
+     "cach": "Q: chỉ qpdf (không đổi phông, không đổi ảnh)",
+     "kichThuoc": 534281,
+     "ketQua": "chữ y hệt nhưng chỉ bớt 3% (dưới 10%) — không bõ · bản nén KHÔNG còn chữ ký số"
+    }
+   ],
+   "sha256Goc": "27967a42c6b9cd34d68497f811b1be06d374c017adee05457e3cdb4963bb58cb",
+   "sha256Luu": "27967a42c6b9cd34d68497f811b1be06d374c017adee05457e3cdb4963bb58cb",
+   "banWeb": "apps/frontend/public/luat/tham-khao/cv-1857-snnmt-qldd-2026-quang-ngai.pdf",
+   "chuMayDoc": "",
+   "coDuLieuCaNhan": false,
+   "chuKySoBanGoc": [
+    {
+     "nguoiKy": "Hồ Trọng Phương",
+     "luc": "2026-03-04 11:24:35 giờ Việt Nam",
+     "hopLe": true
+    },
+    {
+     "nguoiKy": "SỞ NÔNG NGHIỆP VÀ MÔI TRƯỜNG",
+     "luc": "2026-03-04 13:47:31 giờ Việt Nam",
+     "hopLe": true
+    },
+    {
+     "nguoiKy": "SỞ NÔNG NGHIỆP VÀ MÔI TRƯỜNG",
+     "luc": "2026-03-04 13:47:31 giờ Việt Nam",
+     "hopLe": true
+    },
+    {
+     "nguoiKy": "SỞ NÔNG NGHIỆP VÀ MÔI TRƯỜNG",
+     "luc": "2026-03-04 13:47:31 giờ Việt Nam",
+     "hopLe": true
+    }
+   ]
+  },
+  {
+   "ma": "cv-82-hkl-qlbvr-2026-lao-cai",
+   "tep": "scripts/luat/van-ban-goc/cv-82-hkl-qlbvr-2026-lao-cai.pdf",
+   "tenGoc": "18. 82HKL-QLBVR (Ban gui lai) ck rừng thay thế.pdf",
+   "ngayNhan": "2026-10-11",
+   "soTrang": 1,
+   "coLopChu": false,
+   "kichThuocGoc": 825805,
+   "kichThuocLuu": 139165,
+   "cachLuu": "A: gs + qpdf (như nenPdf) trên bản đã đọc lại chữ",
+   "daThu": [
+    {
+     "cach": "O: giữ ảnh gốc, chỉ thay lớp chữ bằng chữ máy đọc lại",
+     "kichThuoc": 806276,
+     "mayDocLai": 100.0,
+     "ketQua": "ĐẠT: máy đọc lại ra 100.0% số chữ"
+    },
+    {
+     "cach": "A: gs + qpdf (như nenPdf) trên bản đã đọc lại chữ",
+     "kichThuoc": 139165,
+     "mayDocLai": 95.5,
+     "ketQua": "ĐẠT: máy đọc lại ra 95.5% số chữ"
+    },
+    {
+     "cach": "B: ảnh xám 150 dpi, trang có màu giữ màu (nen-pdf-tai-lieu.py) + lớp chữ",
+     "kichThuoc": 333874,
+     "mayDocLai": 95.7,
+     "ketQua": "ĐẠT: máy đọc lại ra 95.7% số chữ"
+    }
+   ],
+   "sha256Goc": "4ff5452a0a6684813da684dcf99c8a9045923faa6190058f1e7fdf85c185fdf1",
+   "sha256Luu": "002b89692a0f805488f9daa1401e68c1a2050b9da619c547b46518b0df1c080f",
+   "banWeb": "apps/frontend/public/luat/tham-khao/cv-82-hkl-qlbvr-2026-lao-cai.pdf",
+   "chuMayDoc": "scripts/luat/van-ban-goc/cv-82-hkl-qlbvr-2026-lao-cai.ocr.txt",
+   "coDuLieuCaNhan": false
+  }
+ ]
+}

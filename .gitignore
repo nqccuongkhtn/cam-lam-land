@@ -56,3 +56,10 @@ backup/
 #    tài khoản admin / vai trò "hotlist" (routes/hotlist.ts → GET /api/hotlist/goc).
 apps/backend/du-lieu-rieng/
 apps/frontend/public/danh-sach-nong.json
+
+# ── HỌC LUẬT (11/10/2026): tệp chủ dự án gửi để bổ sung vào "Học và tra cứu luật".
+#    _moi-nhan/ = chỗ thả tệp GỐC vừa nhận (chưa nén, chủ dự án sẽ xoá) — không đưa lên git.
+#    _rieng/    = bản lưu của tệp có DỮ LIỆU CÁ NHÂN (họ tên + CCCD, tiền bồi thường của người có tên…).
+#    Xem .claude/skills/bo-sung-van-ban-hoc-luat/SKILL.md
+scripts/luat/van-ban-goc/_moi-nhan/
+scripts/luat/van-ban-goc/_rieng/

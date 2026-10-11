@@ -768,6 +768,17 @@ export async function migrate(): Promise<void> {
     `CREATE INDEX IF NOT EXISTS thiet_bi_reset_user_idx ON thiet_bi_reset (user_id, luc DESC)`,
   ]) await pool.query(sql).catch((e) => console.error('[migrate] thiết bị:', e.message));
 
+  // ── ĐỔI MẬT KHẨU THU HỒI PHIÊN ĐĂNG NHẬP (11/10/2026 — chủ dự án: "đổi mật khẩu rồi mà Face ID vẫn vào được") ──
+  //   phien_dang_nhap: "đời phiên" — ghi vào mọi thẻ đăng nhập (pv). Đổi mật khẩu + chọn "Đăng xuất khỏi mọi thiết bị khác",
+  //     hoặc admin đặt lại mật khẩu (TAO-TAI-KHOAN.bat) → tăng 1 → mọi thẻ cũ bị từ chối ngay (middleware/auth.ts).
+  //   doi_mat_khau_luc: lúc đổi mật khẩu gần nhất. Khoá vân tay / khuôn mặt (passkey) đăng ký TRƯỚC mốc này thì không
+  //     dùng đăng nhập được nữa (routes/passkey.ts) — chốt chặn thứ hai, ngoài việc xoá hết passkey khi đổi mật khẩu.
+  //   Thêm cột có giá trị mặc định trên Postgres 16 là tức thì; thẻ đang dùng (không có pv) = 0 = khớp → không ai bị văng ra.
+  for (const sql of [
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS phien_dang_nhap integer NOT NULL DEFAULT 0`,
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS doi_mat_khau_luc timestamptz`,
+  ]) await pool.query(sql).catch((e: any) => console.error('[migrate] phiên đăng nhập:', e?.message || e));
+
   // ── TỆP RIÊNG trong kho ảnh /api/images (11/10/2026 — rà soát bảo mật) ──
   // Công văn đính kèm DANH SÁCH NÓNG (tên, CCCD, địa chỉ người dân) nằm chung kho với ảnh tin rao công khai, số tệp tăng
   // dần nên ai cũng đoán được link. rieng = true → chỉ mở bằng link có chữ ký (lib/kyTep.ts, routes/images.ts, hotlist.ts).

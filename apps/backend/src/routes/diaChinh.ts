@@ -23,7 +23,8 @@ import crypto from 'node:crypto';
 import { query } from '../lib/db.ts';
 import { env } from '../lib/env.ts';
 import { cached, cachePut } from '../lib/cache.ts';
-import { verifyToken, coVaiTro } from '../lib/auth.ts';
+import { coVaiTro } from '../lib/auth.ts';
+import { nguoiDungTuYeuCau } from '../middleware/auth.ts';
 
 import { CHAN_TRA_CUU } from './parcels.ts';
 export const diaChinhRouter = Router();
@@ -197,8 +198,8 @@ diaChinhRouter.get('/danh-muc', async (req, res) => {
   // Người ngoài biết xã nào có bao nhiêu thửa là biết luôn quy mô kho dữ liệu và
   // biết nên nhắm vào đâu để cào. Nên máy chủ KHÔNG GỬI con số đó xuống, chứ không
   // phải chỉ giấu trên giao diện (giấu ở giao diện thì mở trình duyệt ra vẫn xem được).
-  const h = String(req.headers.authorization || '');
-  const nguoi = h.startsWith('Bearer ') ? verifyToken(h.slice(7)) : null;
+  // Kiểm thẻ ĐẦY ĐỦ (11/10/2026): thẻ đã thu hồi (đổi mật khẩu / bị khoá) không còn được xem số thửa.
+  const nguoi = await nguoiDungTuYeuCau(req).catch(() => null);
   const quanLy = coVaiTro(nguoi as any, 'admin', 'gis');
 
   const KEY = quanLy ? 'dc:danh-muc:admin' : 'dc:danh-muc';

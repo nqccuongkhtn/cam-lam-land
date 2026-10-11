@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
-import { gisRequired } from '../middleware/auth.ts';
-import { verifyToken, coVaiTro } from '../lib/auth.ts';
+import { gisRequired, nguoiDungTuYeuCau } from '../middleware/auth.ts';
+import { coVaiTro } from '../lib/auth.ts';
 
 export const layersRouter = Router();
 
@@ -18,9 +18,9 @@ const LAYER_SELECT = `
 // để còn quản lý, xoá lớp cũ.
 layersRouter.get('/', async (req: any, res, next) => {
   try {
-    // Đọc nhanh thẻ đăng nhập để biết có phải người quản lý bản đồ không (không cần hỏi database).
-    const h = String(req.headers.authorization || '');
-    const nguoi = h.startsWith('Bearer ') ? verifyToken(h.slice(7)) : null;
+    // Có phải người quản lý bản đồ không — kiểm thẻ ĐẦY ĐỦ (11/10/2026: thẻ đã thu hồi do đổi mật khẩu / bị khoá thì
+    // không được tính; vai trò lấy từ database, có nhớ tạm 30 giây nên gần như không tốn thêm).
+    const nguoi = await nguoiDungTuYeuCau(req);
     const quanLy = coVaiTro(nguoi as any, 'admin', 'gis');
     const loc = quanLy ? '' : ` WHERE layer_type <> 'parcel'`;
     res.json({ layers: await query(`${LAYER_SELECT}${loc} ORDER BY layer_type, name`) });

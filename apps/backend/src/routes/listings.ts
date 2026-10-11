@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { laAdmin, verifyToken } from '../lib/auth.ts';
+import { laAdmin } from '../lib/auth.ts';
 import { query } from '../lib/db.ts';
 import { isFlagOn } from '../lib/flags.ts';
 import { cached, cachePut, cacheDrop } from '../lib/cache.ts';
-import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
+import { authRequired, nguoiDungTuYeuCau, type AuthedRequest } from '../middleware/auth.ts';
 import { vnNoAccent, vnTokens } from '../lib/vn.ts';
 
 export const listingsRouter = Router();
@@ -41,10 +41,9 @@ function maskPhone(p: any): string | null {
   return d.slice(0, 4) + ' ' + d.slice(4, 6) + '...';
 }
 // Người đang xem (KHÔNG bắt buộc đăng nhập): có thẻ hợp lệ thì trả người đó, không thì null.
-function nguoiXem(req: any) {
-  const m = /^Bearer (.+)$/.exec(String(req.headers?.authorization || ''));
-  return m ? verifyToken(m[1]) : null;
-}
+// 11/10/2026: kiểm ĐẦY ĐỦ như authRequired (tài khoản còn, không bị khoá, thẻ chưa bị thu hồi do đổi mật khẩu) —
+// trước đây chỉ kiểm chữ ký, nên thẻ đã thu hồi vẫn xem được tin đang ẩn của chủ tin / quyền admin.
+const nguoiXem = (req: any) => nguoiDungTuYeuCau(req);
 
 // ⚠️ 29/9/2026 (rà soát bảo mật): CHỈ gắn ảnh DO CHÍNH NGƯỜI NÀY TẢI LÊN và CHƯA thuộc tin khác.
 //    Trước đây câu UPDATE không kiểm chủ → gửi danh sách id ảnh tăng dần là "hút" hết ảnh của mọi tin
@@ -179,7 +178,7 @@ listingsRouter.get('/agent/:id', async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id <= 0 || id >= 2 ** 31) return res.status(400).json({ error: 'id không hợp lệ' });
-    const xem = nguoiXem(req);
+    const xem = await nguoiXem(req);
     const dacBiet = duocXemMoiNguoi(xem, id);              // admin / chính chủ → được xem cả tài khoản chưa đăng tin
     if (!dacBiet && !(await laNguoiDangTin(id))) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
     // ⚠️ KHÔNG trả `role` (29/9/2026): lộ ai là admin/gis là chỉ đường cho kẻ xấu nhắm vào tài khoản đó.
@@ -292,7 +291,7 @@ listingsRouter.get('/:id', async (req, res, next) => {
     if (!row) return res.status(404).json({ error: 'Không tìm thấy tin' });
     // ⚠️ 29/9/2026: tin đang ẨN / CHỜ DUYỆT chỉ chủ tin hoặc admin xem được (trước đây ai biết số là xem).
     if (row.status === 'hidden' || row.status === 'pending') {
-      const u = nguoiXem(req);
+      const u = await nguoiXem(req);
       if (!u || (u.id !== row.createdBy && !laAdmin(u))) return res.status(404).json({ error: 'Không tìm thấy tin' });
     }
     // Đếm lượt xem tin (không chặn phản hồi). Trang sửa tin gọi kèm ?noview=1 để không tự tăng.

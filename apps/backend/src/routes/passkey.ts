@@ -182,7 +182,7 @@ passkeyRouter.post('/dang-nhap/xong', async (req, res, next) => {
 
     const credId = String(response?.id || '');
     const [c] = await query(
-      `SELECT c.*, u.* , c.id AS cred_row_id FROM webauthn_credentials c
+      `SELECT c.*, u.* , c.id AS cred_row_id, c.created_at AS cred_tao_luc FROM webauthn_credentials c
        JOIN users u ON u.id = c.user_id WHERE c.cred_id = $1`, [credId]);
     // ⚠️ Câu này phải chỉ rõ CHỖ BẬT. Máy có Face ID rồi vẫn chưa đăng nhập
     //    được nếu chưa bật cho tài khoản — mà chỗ bật nằm trong Tài khoản
@@ -190,6 +190,11 @@ passkeyRouter.post('/dang-nhap/xong', async (req, res, next) => {
     if (!c) return res.status(404).json({ error: 'Máy này chưa bật. Vào Tài khoản để bật.' });
     if (c.status && c.status !== 'active')
       return res.status(403).json({ error: 'Tài khoản đang bị khoá' });
+    // ⛔ 11/10/2026 (chủ dự án báo lỗi: "đổi mật khẩu rồi mà Face ID vẫn vào được"): đổi mật khẩu đã XOÁ hết khoá vân tay
+    //    (routes/auth.ts). Đây là chốt chặn thứ hai — khoá nào bật TRƯỚC lần đổi mật khẩu gần nhất (vd sót lại do đặt lại
+    //    mật khẩu bằng cách khác) thì không cho đăng nhập.
+    if (c.doi_mat_khau_luc && c.cred_tao_luc && new Date(c.cred_tao_luc).getTime() <= new Date(c.doi_mat_khau_luc).getTime())
+      return res.status(403).json({ error: 'Mật khẩu tài khoản đã được đổi nên vân tay / khuôn mặt trên máy này đã tắt. Hãy đăng nhập bằng mật khẩu mới rồi bật lại trong Tài khoản.' });
 
     const kq = await verifyAuthenticationResponse({
       response,
@@ -215,7 +220,7 @@ passkeyRouter.post('/dang-nhap/xong', async (req, res, next) => {
 
     const tb = await ghiDangNhap({ id: c.user_id, role: c.role, roles: dsVaiTro(c) }, req, 'van-tay');   // sổ + giới hạn thiết bị
     if (!tb.ok) return res.status(403).json({ error: tb.loi, maLoi: 'QUA_THIET_BI' });
-    const token = signToken({ id: c.user_id, email: c.email, role: c.role, roles: dsVaiTro(c) as any, tb: tb.ma || undefined });
+    const token = signToken({ id: c.user_id, email: c.email, role: c.role, roles: dsVaiTro(c) as any, tb: tb.ma || undefined, pv: Number(c.phien_dang_nhap) || 0 });
     res.json({ token, user: hoSo({ ...c, id: c.user_id }) });
   } catch (e) { next(e); }
 });

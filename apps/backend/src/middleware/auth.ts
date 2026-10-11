@@ -13,7 +13,10 @@ export interface AuthedRequest extends Request { user?: JwtPayload; }
 // ⚠️ 11/10/2026 (rà soát bảo mật): hỏi luôn TRẠNG THÁI tài khoản. Trước đây thẻ đăng nhập (sống 7 ngày) vẫn dùng
 //    được sau khi admin KHOÁ tài khoản, và tài khoản đã XOÁ vẫn giữ nguyên vai trò ghi trong thẻ — kể cả vai trò
 //    admin. Nay: bị khoá → 403, không còn tồn tại → 401, áp dụng ngay (admin đổi gì thì gọi quenVaiTro).
-type TinhTrang = { ds: string[]; khoa: boolean; mat: boolean; luc: number };
+// ⚠️ 11/10/2026 (chủ dự án báo lỗi): hỏi luôn "ĐỜI PHIÊN ĐĂNG NHẬP" (cột users.phien_dang_nhap). Đổi mật khẩu + chọn
+//    "Đăng xuất khỏi mọi thiết bị khác" (hoặc admin đặt lại mật khẩu bằng TAO-TAI-KHOAN.bat) thì số này tăng → mọi thẻ cấp
+//    trước đó (số pv trong thẻ nhỏ hơn) bị từ chối NGAY, dù chưa hết hạn 7 ngày. Thẻ cũ không có pv được hiểu là 0.
+type TinhTrang = { ds: string[]; khoa: boolean; mat: boolean; pv?: number; luc: number };
 const nhoVaiTro = new Map<number, TinhTrang>();
 const NHO_MS = 30_000;
 
@@ -21,9 +24,9 @@ async function vaiTroMoiNhat(id: number, cu: string[]): Promise<TinhTrang> {
   const co = nhoVaiTro.get(id);
   if (co && Date.now() - co.luc < NHO_MS) return co;
   try {
-    const [u] = await query('SELECT role, roles, status FROM users WHERE id=$1', [id]);
+    const [u] = await query('SELECT role, roles, status, phien_dang_nhap FROM users WHERE id=$1', [id]);
     const tt: TinhTrang = u
-      ? { ds: dsVaiTro(u), khoa: u.status === 'suspended', mat: false, luc: Date.now() }
+      ? { ds: dsVaiTro(u), khoa: u.status === 'suspended', mat: false, pv: Number(u.phien_dang_nhap) || 0, luc: Date.now() }
       : { ds: [], khoa: false, mat: true, luc: Date.now() };   // tài khoản đã bị xoá khỏi database
     if (nhoVaiTro.size > 2000) nhoVaiTro.clear();          // dọn cho khỏi phình bộ nhớ
     nhoVaiTro.set(id, tt);
@@ -34,8 +37,30 @@ async function vaiTroMoiNhat(id: number, cu: string[]): Promise<TinhTrang> {
   }
 }
 
-/** Admin vừa đổi vai trò / khoá / mở khoá ai đó → xoá phần nhớ tạm để áp dụng NGAY, không phải chờ 30 giây. */
+/** Thẻ này thuộc "đời phiên" cũ (mật khẩu đã đổi + đăng xuất máy khác sau khi cấp thẻ) chưa? Không biết (DB lỗi) → coi là còn. */
+const theDoiCu = (payload: JwtPayload, tt: TinhTrang) => tt.pv !== undefined && (Number(payload.pv) || 0) !== tt.pv;
+
+/** Admin vừa đổi vai trò / khoá / mở khoá ai đó, hoặc vừa đổi mật khẩu → xoá phần nhớ tạm để áp dụng NGAY, không chờ 30 giây. */
 export function quenVaiTro(id: number): void { nhoVaiTro.delete(id); }
+
+/**
+ * Kiểm một thẻ đăng nhập ĐẦY ĐỦ như authRequired (chữ ký + tài khoản còn tồn tại + không bị khoá + đúng đời phiên)
+ * nhưng KHÔNG chặn yêu cầu: hợp lệ → trả người dùng (vai trò lấy từ database), không thì null.
+ * Dùng cho các đường "không bắt buộc đăng nhập nhưng đăng nhập thì thấy thêm" (bản đồ, danh mục xã, tin đang ẩn…) —
+ * trước đây các đường đó chỉ kiểm chữ ký thẻ, nên thẻ đã bị thu hồi (đổi mật khẩu / bị khoá) vẫn mở được phần thêm.
+ */
+export async function xacMinhThe(token: string | null | undefined): Promise<JwtPayload | null> {
+  const p = token ? verifyToken(token) : null;
+  if (!p) return null;
+  const tt = await vaiTroMoiNhat(p.id, dsVaiTro(p));
+  if (tt.mat || tt.khoa || theDoiCu(p, tt)) return null;
+  return { ...p, roles: tt.ds as any, role: (tt.ds[0] || p.role) as any };
+}
+/** Như xacMinhThe nhưng đọc thẻ từ tiêu đề Authorization của yêu cầu. */
+export function nguoiDungTuYeuCau(req: Request): Promise<JwtPayload | null> {
+  const h = String(req.headers.authorization || '');
+  return xacMinhThe(h.startsWith('Bearer ') ? h.slice(7) : null);
+}
 
 export function authRequired(req: AuthedRequest, res: Response, next: NextFunction) {
   const header = req.headers.authorization ?? '';
@@ -50,6 +75,8 @@ export function authRequired(req: AuthedRequest, res: Response, next: NextFuncti
     .then(async (tt) => {
       if (tt.mat) return res.status(401).json({ error: 'Tài khoản không còn tồn tại. Vui lòng đăng nhập lại.' });
       if (tt.khoa) return res.status(403).json({ error: 'Tài khoản đã bị khoá' });
+      if (theDoiCu(payload, tt))
+        return res.status(401).json({ error: 'Phiên đăng nhập đã hết hiệu lực vì mật khẩu tài khoản vừa được đổi. Vui lòng đăng nhập lại.', maLoi: 'DA_DOI_MAT_KHAU' });
       const ds = tt.ds;
       req.user = { ...payload, roles: ds as any, role: (ds[0] || payload.role) as any };
       // GIỚI HẠN THIẾT BỊ (lib/thietBi.ts): ghi máy đang dùng; khi bật giới hạn thì thẻ chỉ dùng được trên đúng máy đã đăng nhập

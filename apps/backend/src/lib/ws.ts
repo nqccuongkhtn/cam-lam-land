@@ -1,6 +1,7 @@
 import http from 'node:http';
 import { WebSocketServer } from 'ws';
-import { verifyToken, laAdmin } from './auth.ts';
+import { laAdmin } from './auth.ts';
+import { xacMinhThe } from '../middleware/auth.ts';
 
 let wss: WebSocketServer | null = null;
 
@@ -24,8 +25,11 @@ export function initWs(server: http.Server): void {
     try {
       const url = new URL(req.url || '', 'http://x');
       const token = url.searchParams.get('token');
-      const payload = token ? verifyToken(token) : null;
-      if (payload) (ws as any).user = payload;
+      // Kiểm thẻ ĐẦY ĐỦ (11/10/2026): tài khoản còn, không bị khoá, thẻ chưa bị thu hồi do đổi mật khẩu.
+      if (token) {
+        (ws as any).the = token;
+        xacMinhThe(token).then((p) => { if (p) (ws as any).user = p; }).catch(() => {});
+      }
     } catch {}
     try { ws.send(JSON.stringify({ type: 'hello', region: 'Cam Lâm' })); } catch {}
   });
@@ -34,6 +38,8 @@ export function initWs(server: http.Server): void {
       if (c.conSong === false) { try { c.terminate(); } catch {} return; }   // lần trước hỏi không thấy trả lời → cắt
       c.conSong = false;
       try { c.ping(); } catch {}
+      // Thẻ đã bị thu hồi (đổi mật khẩu + đăng xuất máy khác, tài khoản bị khoá / xoá) → thôi nhận tin, cắt kết nối.
+      if (c.the && c.user) xacMinhThe(c.the).then((p) => { if (!p) { c.user = null; try { c.terminate(); } catch {} } }).catch(() => {});
     });
   }, 30_000);
   nhip.unref?.();

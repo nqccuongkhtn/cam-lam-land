@@ -931,8 +931,12 @@ export default function TraCuuLuatPage() {
       for (const x of ds) {
         if (!coDuTieng(x, bk)) continue;                 // có đủ mọi tiếng (tra bảng, rất nhanh)
         const tdDu = coDuTieng(x, bk, true);
+        // + mỗi tiếng của câu tìm CÓ TRONG TIÊU ĐỀ (3 điểm, tối đa 15 — không vượt mức trên): hai điều cùng có nguyên cụm trong thân bài
+        // thì điều có tiêu đề gần chủ đề hơn đứng trước (Điều 223 "Các THỦ TỤC hành chính…" trên Điều 27 chỉ nhắc "làm thủ tục cấp…").
+        const tdSet = bk.dau ? x.tdeTuD : x.tdeTuK;
+        const cong = Math.min(15, 3 * bk.tu.filter((t) => tdSet.has(t)).length);
         const d = (bk.tu.length < 2 ? (tdDu ? 80 : 20)
-          : tdDu && bk.reCum.test(tde(x)) ? 100 : tdDu ? 80 : bk.reCum.test(than(x)) ? 60 : 20) - tru;
+          : tdDu && bk.reCum.test(tde(x)) ? 100 : tdDu ? 80 : bk.reCum.test(than(x)) ? 60 : 20) + cong - tru;
         if (!(ra.get(x)! >= d)) ra.set(x, d);
       }
       return true;

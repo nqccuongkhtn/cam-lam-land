@@ -165,6 +165,25 @@ của khoảng trắng trong ranh; con số hơi cao vì gồm cả mũi nhọn 
 tô gần nhất) thay vì tính đường — áp cho cả 7 bản phân khu và QĐ205. Ảnh hưởng: ~0,94 ha toàn bộ, nhưng thửa nằm đè lên dải thì có
 thể đổi vài chục tới vài trăm m² "đất giao thông". Trước khi đưa lên phải chạy lại bộ kiểm 79 phiếu + 2.000 thửa.
 
+**ẢNH HƯỞNG NẾU ÁP LUẬT NÀY — đếm chính xác 12/10/2026** (dải trắng < 2,5 m kẹp giữa vùng tô, ≥ 60 % viền giáp ô đất, trong ranh — đã bỏ
+lỗ / khớp nối; hình thửa nắn đúng độ trượt địa chính như web): 233 dải, QĐ205 7.220 m² + 7 bản phân khu ~3.660 m². Số thửa sẽ đổi "đất
+giao thông" sang loại đất bên cạnh:
+
+| Bản | Thửa đổi > 1 m² | > 10 m² | > 50 m² | Đổi nhiều nhất |
+|---|---|---|---|---|
+| QĐ205 | 205 | 118 | 38 | 710 m² (thửa 413 tờ 8 Suối Dầu, 6,9 ha) |
+| QĐ2076 | 70 | 20 | 3 | 101 m² |
+| QĐ2101 | 46 | 7 | 0 | 35 m² |
+| QĐ2222 | 8 | 4 | 0 | 22 m² |
+| QĐ918 | 37 | 16 | 2 | 348 m² (thửa 341 tờ 18 Sơn Tân, 100 ha) |
+| Cù Hin | 49 | 16 | 3 | 122 m² |
+| Tây Nam | 25 | 15 | 3 | 193 m² |
+| Tây Bắc | 4 | 0 | 0 | 9 m² |
+
+Thửa đổi nhiều nhất phần lớn là thửa vài ha (đổi < 1 %). Thửa cỡ vừa đổi đáng kể: **thửa 286 tờ 36 Suối Dầu** (5.467 m²) 198 m² · **thửa 283
+tờ 43 Suối Hiệp** (8.957 m²) 154 m² · **thửa 131 tờ 6 Suối Dầu** (5.651 m²) 154 m² · **thửa 85 tờ 7 Xã Cam Lâm** (5.954 m²) 141 m² — đều QĐ205.
+⚠️ Một số dải hẹp có thể là ĐƯỜNG MÒN / MƯƠNG thật rộng 1–2 m — áp luật thì chúng thành đất hai bên. Anh xem vài thửa trên rồi quyết.
+
 ## H. ĐÃ KIỂM: KHOẢNG TRẮNG RỘNG CỦA QĐ205 ĐÚNG LÀ ĐƯỜNG (không cần sửa)
 
 Mặt ngược lại của mục G: luật "trong ranh mà không tô = đường" có làm sai ở những khoảng trắng **rộng** không? (rộng trên 60 m thì

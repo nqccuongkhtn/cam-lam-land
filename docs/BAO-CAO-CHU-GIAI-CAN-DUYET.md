@@ -365,6 +365,8 @@ ngẫu nhiên đúng như khi anh bấm vào thửa, rồi so với số **cắt
 
 | 6 | **RANH LẬP QUY HOẠCH bị kẻ thẳng qua đường cong** (đúng nghi ngờ "thuật toán đổi DXF" của anh): ranh dựng hôm 10/10 từ file nét xuất trước đây — file đó biến cung tròn thành dây cung, đường cong trơn thành một đoạn thẳng nối hai đầu. Lệch tới 153–155 m ở Tây Bắc và Cù Hin, 49,8 m ở QĐ918, 3,2 m ở QĐ2076. Dải đất giữa đường cong thật và đoạn thẳng bị tính sai "trong / ngoài bản quy hoạch": Tây Bắc 27,7 ha · Cù Hin 12,8 ha · QĐ918 5,2 ha · QĐ2076 1,4 ha | Nay dựng ranh THẲNG TỪ DXF GỐC, đường cong tính đúng công thức (script mới `6b-dung-ranh-tu-dxf.py`), rồi dựng lại ô đất 6 bản. Tây Nam và QĐ205 vốn đúng (lệch < 1 cm). Ảnh: `soi_ranh_moi_*.png` trong thư mục nháp |
 
+| 7 | **Giao diện bản đồ tự TÍNH BÙ số QĐ205 từ file cũ** `public/qh_vector.geojson` (dựng tháng 7 bằng chuỗi cũ) mỗi khi máy chủ không trả dòng QĐ205 — mà máy chủ CỐ Ý không trả khi thửa nằm trọn ngoài ranh QĐ205. Thửa ngoài ranh vì vậy vẫn hiện (và IN LÊN PHIẾU) một dòng QĐ205 dựng từ dữ liệu cũ | Đã bỏ (12/10, 4h30): mọi con số chỉ lấy từ máy chủ. **Còn lại:** SƠ ĐỒ ô đất vẽ trên phiếu in vẫn lấy hình từ file cũ đó — hình có thể khác con số in cạnh bên; sẽ đổi sang hình ô đất mới từ máy chủ |
+
 **Sau khi sửa: cả 9 bản lệch 0,00 %** so với cắt hình thẳng (trước: QĐ918 3,48 %, Tây Bắc 2,33 %, QĐ2101 1,51 %, Cù Hin 0,64 %, Tây Nam
 0,22 %, QĐ2076 0,17 %). **79 phiếu: giữ nguyên từng con số. Thửa 70 tờ 25: giữ nguyên** (395,1 + 116,8 cả 3 bản). Tốc độ như cũ.
 Anh bấm thử thửa nào thấy khác trước thì đó là 1 trong 5 chỗ trên.

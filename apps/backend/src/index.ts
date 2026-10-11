@@ -129,7 +129,8 @@ app.get('/api/health', async (_req, res) => {
     res.json({ status: 'ok', db: 'up', dbMs: Date.now() - t0, uptimeSec: Math.round(process.uptime()), region: 'Cam Lâm, Khánh Hòa', ts: Date.now() });
   } catch (e: any) {
     logError('[health] DB không phản hồi: ' + (e?.message || e));
-    res.status(503).json({ status: 'degraded', db: 'down', error: e?.message || String(e), uptimeSec: Math.round(process.uptime()), ts: Date.now() });
+    // Đường công khai: KHÔNG trả nguyên văn lỗi (có thể lộ địa chỉ mạng nội bộ của database) — chi tiết đã ghi nhật ký ở trên.
+    res.status(503).json({ status: 'degraded', db: 'down', error: 'Database không phản hồi', uptimeSec: Math.round(process.uptime()), ts: Date.now() });
   }
 });
 app.get('/api/config', (_req, res) => {

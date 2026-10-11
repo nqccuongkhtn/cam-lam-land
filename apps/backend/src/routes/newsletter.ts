@@ -11,7 +11,11 @@ newsletterRouter.post('/', async (req, res) => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 160) return res.status(400).json({ error: 'Email không hợp lệ.' });
     await query(`INSERT INTO newsletter_subscribers (email) VALUES ($1) ON CONFLICT (email) DO NOTHING`, [email]);
     res.json({ ok: true });
-  } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
+  } catch (e: any) {
+    // Đường CÔNG KHAI: không trả nguyên văn lỗi database cho người ngoài (11/10/2026) — chỉ ghi nhật ký.
+    console.error('[newsletter] lưu email lỗi:', e?.message || e);
+    res.status(500).json({ error: 'Máy chủ gặp sự cố, vui lòng thử lại sau.' });
+  }
 });
 
 // Danh sách email đã đăng ký — CHỈ admin.

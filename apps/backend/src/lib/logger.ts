@@ -29,12 +29,21 @@ export function logError(msg: string, extra?: any) {
 /** Ghi request 5xx / CHẬM: file access-YYYY-MM-DD.log */
 export function logAccess(msg: string) { append(`access-${day()}.log`, `${stamp()} [INFO] ${msg}\n`); }
 
+/**
+ * Che giá trị các tham số BÍ MẬT trên đường dẫn trước khi ghi nhật ký (11/10/2026 — rà soát bảo mật).
+ * Vài đường nhận bí mật ngay trên URL: mật khẩu PDF (/api/pdftools/encrypt?pw=…), chìa khoá máy tự tải lên kho hồ sơ
+ * (?token=…), chữ ký link tệp riêng (?ky=…). Ghi nguyên URL vào file log = bí mật nằm trên đĩa, ai đọc log cũng thấy.
+ */
+export function anBiMat(url: string): string {
+  return String(url || '').replace(/([?&](?:pw|password|matkhau|token|ky|key|apikey|api_key|secret|cftoken)=)[^&#]*/gi, '$1***');
+}
+
 /** Middleware: chỉ ghi request bị lỗi (>=500) hoặc CHẬM (>2s) để soi hiệu năng & sự cố, không làm phình log. */
 export function requestLogger(req: any, res: any, next: any) {
   const t0 = Date.now();
   res.on('finish', () => {
     const ms = Date.now() - t0;
-    if (res.statusCode >= 500 || ms > 2000) logAccess(`${req.method} ${req.originalUrl} ${res.statusCode} ${ms}ms ip=${req.ip || '-'}`);
+    if (res.statusCode >= 500 || ms > 2000) logAccess(`${req.method} ${anBiMat(req.originalUrl)} ${res.statusCode} ${ms}ms ip=${req.ip || '-'}`);
   });
   next();
 }

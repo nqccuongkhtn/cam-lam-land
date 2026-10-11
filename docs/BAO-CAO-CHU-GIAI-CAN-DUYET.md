@@ -130,6 +130,11 @@ cách 0,000 m). Điểm giữa: X = 1.334.829,34 · Y = 599.631,76 (VN-2000), t�
   cây xanh và khu đơn vị ở, **đúng chỗ QĐ2101 / QĐ893 có con đường 2.894,9 m²** trong thửa. Tức là QĐ205 CÓ thể hiện tuyến đó, nhưng
   chỉ bằng một nét kẻ (vùng tô hai bên vẫn khít nhau), nên web không tính ra đường ở đó cho QĐ205.
 
+- **Dải này là một "đuôi hẹp" của khoảng trắng**: nó nối vào mạng khoảng trắng của đường phố, nhưng suốt chiều dài chỉ rộng ~1,4 m;
+  phần lòng đường RỘNG thật (≥ 2,5 m) gần nhất cách giữa dải **60,5 m**. Không có đoạn nào của dải đủ rộng để là một con đường.
+  (Trong khung 800 m quanh đó, các "đuôi hẹp" < 2,5 m kiểu này cộng lại ~719 m², so với ~11,9 ha lòng đường thật. Riêng các khe
+  hẹp ĐỨNG RIÊNG — không nối mạng đường — trên toàn QĐ205: ~161 chỗ, tổng ~0,87 ha.)
+
 **Kết luận của tôi:** nhiều khả năng mảnh 2 **KHÔNG phải đường quy hoạch** mà là **khe hở do hai vùng tô vẽ không khít nhau** (đường
 bao hồ và đường bao khu cây xanh là hai nét cong vẽ riêng, cách nhau ~1,4 m). Mức chắc: cao.
 

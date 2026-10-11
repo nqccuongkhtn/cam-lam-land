@@ -2424,8 +2424,10 @@ export default function TraCuuLuatPage() {
       {/* ── HỘP THUỘC TÍNH + LƯỢC ĐỒ VĂN BẢN ──
           Thư viện pháp luật để hộp này ngay đầu trang vì người tra luật nhìn nó trước cả
           nội dung: ai ký, hiệu lực từ bao giờ, còn hay hết hiệu lực. Ở đây thêm LƯỢC ĐỒ
-          tính sẵn: văn bản này dựa trên văn bản nào, và văn bản nào hướng dẫn nó. */}
-      {vb && (() => {
+          tính sẵn: văn bản này dựa trên văn bản nào, và văn bản nào hướng dẫn nó.
+          ĐANG TÌM thì ẩn (đợt 22, 12/10/2026): trên điện thoại hộp này + dòng cảnh báo hiệu lực đẩy kết quả xuống
+          gần nửa màn hình, lúc tìm "Cả kho" thì còn không liên quan tới kết quả. Xoá ô tìm là hiện lại. */}
+      {vb && !tim.trim() && (() => {
         const k = kho.find((x) => x.ma === maVb);
         return (
           <div className="mt-1.5 rounded-xl border border-slate-200 bg-slate-50/70 px-2.5 py-2">
@@ -2518,8 +2520,9 @@ export default function TraCuuLuatPage() {
       {/* Văn bản tham khảo (công văn) báo một điều của văn bản này đã đổi hiệu lực, nhưng văn bản làm
           thay đổi CHƯA có trong kho → máy không tự đánh dấu, chỉ báo "cần kiểm" để người đọc biết. */}
       {/* GỌN LẠI (11/10/2026): "điều bị sửa đổi / bãi bỏ" + "cần kiểm hiệu lực" trước là một dòng cam + một HỘP ĐỎ TO luôn bung,
-          trên điện thoại chiếm nửa màn hình trước cả ô tìm. Nay chung MỘT dòng nhỏ; bấm "chi tiết" mới bung danh sách cần kiểm. */}
-      {vb && (() => {
+          trên điện thoại chiếm nửa màn hình trước cả ô tìm. Nay chung MỘT dòng nhỏ; bấm "chi tiết" mới bung danh sách cần kiểm.
+          Đang tìm thì ẩn như hộp thuộc tính ở trên (đợt 22). */}
+      {vb && !tim.trim() && (() => {
         const bo = vb.hetHieuLuc ? 0 : vb.dieu.filter((d) => d.tinhTrang?.loai === 'het-hieu-luc').length;
         const phan = vb.hetHieuLuc ? 0 : vb.dieu.filter((d) => d.tinhTrang && d.tinhTrang.loai !== 'het-hieu-luc').length
           + vb.dieu.filter((d) => !d.tinhTrang && (d.suaDoi?.length || 0) > 0).length;
@@ -2665,7 +2668,7 @@ export default function TraCuuLuatPage() {
                 </div>
               )}
               {timCaKho && tim.trim() && demTheoVb.length > 1 && (
-                <div className="flex items-center gap-1.5 overflow-x-auto border-b border-slate-100 px-3 py-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div key={tim.trim()} className="flex items-center gap-1.5 overflow-x-auto border-b border-slate-100 px-3 py-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   <button onClick={() => setLocVb(null)}
                     className={`shrink-0 whitespace-nowrap rounded-full border px-2 py-0.5 text-[11.5px] font-semibold ${!locVb ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>
                     Tất cả · {ketQua.length}

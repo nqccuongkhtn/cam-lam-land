@@ -8,8 +8,18 @@ import { coVaiTro } from '../lib/auth.ts';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { mkdir, readFile, writeFile, rm, readdir, rename } from 'node:fs/promises';
+import { logError } from '../lib/logger.ts';
+import { laUrlCongKhai, laTaiLieuCuaWeb } from '../lib/urlAnToan.ts';
+// Link máy chủ được phép tự tải: link công khai trên Internet, hoặc tệp chủ web đặt trong public/tai-lieu/ của trang web.
+const linkTaiDuoc = (l: string | null | undefined) => laUrlCongKhai(l) || laTaiLieuCuaWeb(l);
 
 export const vanBanRouter = Router();
+// Lỗi hệ thống trả cho NGƯỜI XEM: không kèm nguyên văn lỗi database (giống middleware/error.ts, rà soát 29/9 + 11/10/2026)
+// — nguyên văn chỉ ghi vào nhật ký lỗi để sửa. Các đường dành cho người quản lý văn bản vẫn báo chi tiết như cũ.
+const loiChung = (res: any, e: any, viec: string) => {
+  logError(`[van-ban] ${viec}: ${e?.message || e}`);
+  if (!res.headersSent) res.status(500).json({ error: 'Máy chủ gặp sự cố, vui lòng thử lại sau.' });
+};
 const UA = { 'User-Agent': 'Mozilla/5.0 (compatible; CamLamLand/1.0)' };
 const tim = (kw: string) => `https://thuvienphapluat.vn/page/tim-van-ban.aspx?keyword=${encodeURIComponent(kw)}`;
 const CAMLAM = 'https://camlam.khanhhoa.gov.vn/module/document';
@@ -562,8 +572,11 @@ async function nenPdf(buf: Buffer): Promise<Buffer> {
 /** Lấy file GỐC của văn bản từ nguồn (Drive / cổng TTĐT / Công báo / camhomes). */
 async function layFileGoc(link: string | null): Promise<Buffer | null> {
   if (!link) return null;
+  // 11/10/2026 (rà soát bảo mật): link do người quản lý văn bản dán vào / máy lấy về → chỉ tải link CÔNG KHAI trên
+  // Internet, không bao giờ gõ cửa mạng nội bộ của máy chủ (lib/urlAnToan.ts). Kiểm cả link PDF tìm thấy trong trang.
+  if (!linkTaiDuoc(link)) return null;
   if (/drive\.google\.com/.test(link)) return layPdfDrive(link);
-  const pdf = await resolvePdf(link); if (!pdf) return null;
+  const pdf = await resolvePdf(link); if (!pdf || !linkTaiDuoc(pdf)) return null;
   let ref = ''; try { ref = new URL(link).origin + '/'; } catch { /* bỏ qua */ }
   try {
     const r = await fetch(pdf, { headers: { ...UA, ...(ref ? { Referer: ref } : {}) }, signal: AbortSignal.timeout(60000) });
@@ -583,7 +596,8 @@ async function taiBoQuaChungChi(u: string, ref: string, lan = 0): Promise<Buffer
   return new Promise((xong) => {
     const rq = https.get(u, { rejectUnauthorized: false, headers: { ...UA, ...(ref ? { Referer: ref } : {}) }, timeout: 60000 }, (r) => {
       if (r.statusCode && r.statusCode >= 300 && r.statusCode < 400 && r.headers.location && lan < 3) {
-        r.resume(); xong(taiBoQuaChungChi(new URL(r.headers.location, u).href, ref, lan + 1)); return;
+        const tiep = new URL(r.headers.location, u).href;
+        r.resume(); xong(laUrlCongKhai(tiep) ? taiBoQuaChungChi(tiep, ref, lan + 1) : Promise.resolve(null)); return;   // chuyển hướng vào mạng nội bộ → thôi
       }
       if (r.statusCode !== 200) { r.resume(); xong(null); return; }
       const ds: Buffer[] = []; r.on('data', (c) => ds.push(c)); r.on('error', () => xong(null));
@@ -809,7 +823,7 @@ vanBanRouter.get('/', authRequired, async (req: AuthedRequest, res) => {
       FROM van_ban ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 8000`);
     res.set('Cache-Control', 'private, max-age=300'); // chỉ trình duyệt của chính người đã đăng nhập giữ — không cho CDN/nginx phát cho người khác
     res.json({ docs: rows });
-  } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
+  } catch (e: any) { loiChung(res, e, 'danh sách'); }
 });
 
 // ── GET /moi-nhat — 4 văn bản mới ban hành cho khối "Tra cứu văn bản" ở TRANG CHỦ (mẫu 105, 7/10/2026) ──
@@ -825,7 +839,7 @@ vanBanRouter.get('/moi-nhat', async (_req, res) => {
     const docs = rows.filter((d: any) => coFileThat(d.link_goc)).slice(0, 4).map(({ link_goc, ...d }: any) => d);
     res.set('Cache-Control', 'public, max-age=600');
     res.json({ docs });
-  } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
+  } catch (e: any) { loiChung(res, e, 'mới nhất'); }
 });
 
 // ── GET /tim?q= — Ô TÌM ở trang chủ: tìm ngay tại chỗ, kết quả đẩy lên cột phải (chủ dự án 7/10/2026) ──
@@ -852,7 +866,7 @@ vanBanRouter.get('/tim', async (req, res) => {
       LIMIT 6`, [tu, '%' + kd.replace(/[\\%_]/g, (c) => '\\' + c) + '%']);
     res.set('Cache-Control', 'public, max-age=300');
     res.json({ docs: rows.map(({ link_goc, ...d }: any) => ({ ...d, coFile: coFileThat(link_goc) })) });
-  } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
+  } catch (e: any) { loiChung(res, e, 'tìm công khai'); }
 });
 
 // ── GET /manage — danh sách đầy đủ (có link gốc) cho người quản lý văn bản ──
@@ -903,7 +917,7 @@ vanBanRouter.get('/:id/pdf', authRequired, async (req: AuthedRequest, res) => {
       return res.send(buf);
     }
     return res.json({ redirect: null }); // không lấy được PDF → báo chưa có file, KHÔNG đưa người dùng sang trang khác
-  } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi tải' }); }
+  } catch (e: any) { loiChung(res, e, 'tải PDF'); }
 });
 
 // ── Admin: thêm / sửa / xoá / làm mới ──
@@ -940,6 +954,7 @@ vanBanRouter.patch('/:id/link', vanBanRequired, async (req, res) => {
   try {
     const id = Number(req.params.id); const link = String(req.body?.linkGoc || '').trim();
     if (!/^https?:\/\//i.test(link)) return res.status(400).json({ error: 'Link phải bắt đầu bằng http:// hoặc https://' });
+    if (!linkTaiDuoc(link)) return res.status(400).json({ error: 'Link phải là địa chỉ công khai trên Internet (không nhận địa chỉ nội bộ).' });
     const goc = await layFileGoc(link);
     if (!goc) return res.status(400).json({ error: 'Link này không tải được file PDF. Hãy dán link TẢI TRỰC TIẾP file (đuôi .pdf, hoặc link Google Drive công khai), không phải link trang web.' });
     await query('UPDATE van_ban SET link_goc=$2, tim_file_luc=now() WHERE id=$1', [id, link]);

@@ -21,9 +21,12 @@ const soTepCuaLink = (link: unknown): number | null => {
   const m = /\/api\/images\/(\d{1,9})(?!\d)/.exec(String(link || ''));
   return m ? Number(m[1]) : null;
 };
-async function danhDauTepRieng(link: unknown): Promise<void> {
+// Chỉ đánh dấu tệp KHÔNG thuộc tin rao nào và do CHÍNH người này tải lên (admin thì được mọi tệp) — kẻo ai đó dán link
+// ảnh tin rao / ảnh đại diện của người khác vào bản ghi là biến ảnh công khai đó thành tệp riêng, làm hỏng ảnh của họ.
+async function danhDauTepRieng(link: unknown, req: AuthedRequest): Promise<void> {
   const id = soTepCuaLink(link);
-  if (id) await query('UPDATE listing_images SET rieng = true WHERE id = $1 AND NOT rieng', [id]).catch(() => {});
+  if (id) await query(`UPDATE listing_images SET rieng = true WHERE id = $1 AND NOT rieng AND listing_id IS NULL AND (owner_id = $2 OR $3::boolean)`,
+    [id, req.user?.id ?? -1, laAdmin(req.user)]).catch(() => {});
 }
 
 let ensured = false;
@@ -116,7 +119,7 @@ hotlistRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => {
        clip(b.loaiVb, 120), clip(b.soVbGoc, 120), clip(b.soGiayTo, 60), clip(b.namSinh, 12), clip(b.diaChi, 400),
        clip(b.soPhatHanh, 120), clip(b.soVaoSo, 120), clip(b.ngayCap, 40), req.user?.email || 'admin']);
     await registerSheet(row.nguon, req.user?.email || 'admin'); // đăng ký sheet (nguồn) để tồn tại độc lập với bản ghi
-    await danhDauTepRieng(row.link);                             // tệp công văn đính kèm → tệp riêng
+    await danhDauTepRieng(row.link, req);                          // tệp công văn đính kèm → tệp riêng
     res.json({ ok: true, record: row });
   } catch (e) { next(e); }
 });
@@ -159,7 +162,7 @@ hotlistRouter.put('/:id', authRequired, async (req: AuthedRequest, res, next) =>
        clip(b.soPhatHanh, 120), clip(b.soVaoSo, 120), clip(b.ngayCap, 40), Number(req.params.id)]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy bản ghi' });
     await registerSheet(row.nguon, req.user?.email || 'admin'); // sheet (nguồn) có thể đổi khi sửa → đăng ký lại
-    await danhDauTepRieng(row.link);                             // tệp công văn đính kèm → tệp riêng
+    await danhDauTepRieng(row.link, req);                          // tệp công văn đính kèm → tệp riêng
     res.json({ ok: true, record: row });
   } catch (e) { next(e); }
 });

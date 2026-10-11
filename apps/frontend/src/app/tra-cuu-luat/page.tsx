@@ -836,6 +836,13 @@ export default function TraCuuLuatPage() {
     return d2 ? { q: d2, lui: true, doan: d2 } : { q: k, lui: true, doan: '' };
   }, [tim, timCaKho, kho, chiMuc, maVb]);
   const luiKhongDau = timHL.lui;
+  // Từ điển TIẾNG (không dấu) của phạm vi đang tìm → số điều có tiếng đó. Chỉ dùng để gợi ý sửa chính tả (đợt 16).
+  const tuDien = useMemo(() => {
+    const ds = timCaKho ? kho.flatMap((x) => chiMuc[x.ma] || []) : (chiMuc[maVb] || []);
+    const dem = new Map<string, number>();
+    for (const x of ds) x.tuK.forEach((t) => dem.set(t, (dem.get(t) || 0) + 1));
+    return { ds, dem };
+  }, [chiMuc, timCaKho, kho, maVb]);
   const moRong = useMemo(() => doiCachGoi(timHL.q), [timHL]);
 
   const ketQua = useMemo(() => {
@@ -919,6 +926,75 @@ export default function TraCuuLuatPage() {
     return ra;
   }, [ketQua, tim, timHL, moRong]);
   useEffect(() => { setSoHien(SO_HIEN); }, [tim, timCaKho, chiGhim, chiGt, maVb]);
+  // GÕ SAI CHÍNH TẢ (đợt 16, 11/10/2026): không điều nào khớp (đã thử cả không dấu, cách gọi đời thường, đoán chữ cuối) thì sửa
+  // từng tiếng LẠ thành tiếng gần giống nhất có trong chữ luật (sai 1 chữ cái; tiếng ≥ 5 chữ cái cho sai 2), ưu tiên tiếng hay ĐI LIỀN
+  // SAU tiếng đứng trước ("thu hoj" → "thu hồi", không phải "thu hộ"). Chỉ gợi ý câu chắc chắn có điều khớp; chữ hiện ra lấy đúng
+  // dấu như chữ luật viết (cắt từ chính đoạn luật có cụm đó).
+  const goiYSua = useMemo(() => {
+    const q = tim.trim();
+    if (ketQua.length || q.length < 2 || docSoDieu(kd(q)) || chiGhim || chiGt) return [] as string[];
+    const { ds, dem } = tuDien;
+    if (!ds.length) return [] as string[];
+    // khoảng cách sửa chữ: thêm / bớt / thay một chữ cái, hoặc ĐẢO hai chữ cạnh nhau ("thuogn" → "thuong") đều tính 1 lỗi
+    const kc = (a: string, b: string, max: number) => {
+      let hai = Array.from({ length: b.length + 1 }, (_, j) => j), mot = hai.slice();
+      for (let i = 1; i <= a.length; i++) {
+        const nay = [i]; let nhoNhat = i;
+        for (let j = 1; j <= b.length; j++) {
+          let v = Math.min(mot[j] + 1, nay[j - 1] + 1, mot[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+          if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) v = Math.min(v, hai[j - 2] + 1);
+          nay[j] = v; if (v < nhoNhat) nhoNhat = v;
+        }
+        if (nhoNhat > max) return max + 1;
+        hai = mot; mot = nay;
+      }
+      return mot[b.length];
+    };
+    const coDu = (tu: string[]) => ds.filter((x) => tu.every((t) => x.tuK.has(t)));
+    const lien = (a: string, b: string, trong: typeof ds) => {
+      const re = new RegExp('(?:^|[^\\p{L}\\p{N}])' + escRe(a) + '[^\\p{L}\\p{N}]+' + escRe(b) + '(?=$|[^\\p{L}\\p{N}])', 'u');
+      let c = 0; for (const x of trong) if (re.test(x.kho)) c++;
+      return c;
+    };
+    const tu = tachTieng(kd(q));
+    if (!tu.length || tu.every((t) => dem.has(t))) return [] as string[];
+    const chon: string[] = [];
+    for (let i = 0; i < tu.length; i++) {
+      const w = tu[i];
+      if (dem.has(w)) { chon.push(w); continue; }
+      const gh = w.length >= 5 ? 2 : 1;
+      const ung: [string, number, number][] = [];
+      dem.forEach((n, t) => { if (Math.abs(t.length - w.length) <= gh) { const d = kc(w, t, gh); if (d <= gh) ung.push([t, d, n]); } });
+      if (!ung.length) return [] as string[];
+      ung.sort((a, b) => a[1] - b[1] || b[2] - a[2]);
+      const top = ung.slice(0, 30);
+      const sau = tu[i + 1] && dem.has(tu[i + 1]) ? tu[i + 1] : '';
+      let tot = top[0][0], diem = -Infinity;
+      for (const [t, d] of top) {
+        const trong = coDu([...chon, t]);
+        if (!trong.length) continue;
+        const ghep = (chon.length ? lien(chon[chon.length - 1], t, trong) : 0) + (sau ? lien(t, sau, trong) : 0);
+        const sc = ghep * 1000 + trong.length - d * 100000;
+        if (sc > diem) { diem = sc; tot = t; }
+      }
+      if (diem === -Infinity) return [] as string[];     // không ứng viên nào ra kết quả
+      chon.push(tot);
+    }
+    const trong = coDu(chon);
+    if (!trong.length) return [] as string[];
+    // chữ hiện ra: cắt đúng đoạn luật có cụm đó (giữ dấu như luật viết); không có nguyên cụm thì ghép từng tiếng
+    const reCum = new RegExp('(?:^|[^\\p{L}\\p{N}])(' + chon.map(escRe).join('[^\\p{L}\\p{N}]+') + ')(?=$|[^\\p{L}\\p{N}])', 'u');
+    for (const x of trong) {
+      const m = reCum.exec(x.kho);
+      if (m) { const a = m.index + (m[0].length - m[1].length); return [x.khoD.slice(a, a + m[1].length)]; }
+    }
+    const coDauTu = chon.map((t) => {
+      const re = new RegExp('(?:^|[^\\p{L}\\p{N}])(' + escRe(t) + ')(?=$|[^\\p{L}\\p{N}])', 'u');
+      for (const x of trong) { const m = re.exec(x.kho); if (m) { const a = m.index + (m[0].length - m[1].length); return x.khoD.slice(a, a + m[1].length); } }
+      return t;
+    });
+    return [coDauTu.join(' ')];
+  }, [ketQua, tim, tuDien, chiGhim, chiGt]);
   // Mở kết quả thì cuộn tới khoản nào: gõ số ("75.2") thì theo số; gõ chữ thì tới khoản có trích đoạn.
   const khoanKhop = (ma: string, so: number) => docSoDieu(kd(tim.trim()))?.khoan ?? trichDoan.get(ma + ':' + so)?.khoan;
 
@@ -2548,6 +2624,14 @@ export default function TraCuuLuatPage() {
               {ketQua.length === 0
                 ? <div className="p-3 text-[13px] text-slate-400">
                     Không tìm thấy điều nào{timCaKho ? ' trong cả kho' : ' trong văn bản này'}. Thử từ khoá khác hoặc gõ số điều.
+                    {goiYSua.length > 0 && (
+                      <span className="mt-2 flex flex-wrap items-center gap-1.5 text-slate-600">
+                        <span>Có phải muốn tìm:</span>
+                        {goiYSua.map((g) => (
+                          <button key={g} onClick={() => setTim(g)} className="rounded-full border border-sky-300 bg-sky-50 px-2.5 py-0.5 text-[12.5px] font-bold text-sky-800">“{g}”</button>
+                        ))}
+                      </span>
+                    )}
                     {!timCaKho && (
                       <button onClick={() => setTimCaKho(true)} className="mt-2 block rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-[12.5px] font-bold text-emerald-700">
                         🔎 Tìm trong cả kho (luật, nghị định, thông tư…)

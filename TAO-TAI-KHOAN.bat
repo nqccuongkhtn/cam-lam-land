@@ -34,6 +34,14 @@ echo   [*] Ghi vao database...
 docker exec camlam_postgis psql -U camlam -d camlam_gis -v ON_ERROR_STOP=1 -c "INSERT INTO users (email, password_hash, role, full_name, email_verified) VALUES ('%UEMAIL%','%UHASH%','%UROLE%', NULLIF('%UNAME%',''), true) ON CONFLICT (email) DO UPDATE SET password_hash=EXCLUDED.password_hash, role=EXCLUDED.role, email_verified=true, full_name=COALESCE(EXCLUDED.full_name, users.full_name);"
 if errorlevel 1 ( echo   [X] Loi ghi database. & goto :eof )
 echo   [OK] Xong: %UEMAIL%   (role: %UROLE%)
+rem 11/10/2026: DAT LAI mat khau = THU HOI moi quyen vao cu cua tai khoan nay
+rem   1. xoa moi khoa van tay / khuon mat - Face ID tren may cu khong dang nhap thay mat khau moi duoc nua
+rem   2. tang doi phien dang nhap - moi the dang nhap cu tren dien thoai / may tinh khac bi tu choi ngay
+rem   Chay rieng tung lenh, loi thi bo qua: tai khoan van da tao / doi mat khau xong o tren.
+docker exec camlam_postgis psql -U camlam -d camlam_gis -v ON_ERROR_STOP=1 -c "DELETE FROM webauthn_credentials WHERE user_id IN (SELECT id FROM users WHERE email='%UEMAIL%');" >nul 2>&1
+if errorlevel 1 ( echo   [!] Chua tat duoc dang nhap bang van tay - khuon mat cua tai khoan nay ) else ( echo   [OK] Da tat dang nhap bang van tay / khuon mat cu cua tai khoan nay )
+docker exec camlam_postgis psql -U camlam -d camlam_gis -v ON_ERROR_STOP=1 -c "UPDATE users SET phien_dang_nhap = phien_dang_nhap + 1, doi_mat_khau_luc = now() WHERE email='%UEMAIL%';" >nul 2>&1
+if errorlevel 1 ( echo   [!] Chua dang xuat duoc cac thiet bi cu - can cap nhat backend roi chay lai ) else ( echo   [OK] Da dang xuat tai khoan nay khoi moi thiet bi cu - trong vong 30 giay )
 goto :eof
 
 :fin

@@ -2764,6 +2764,23 @@ export default function TraCuuLuatPage() {
                   </span>
                 </div>
 
+                {/* LƯỚT KẾT QUẢ TÌM (đợt 17, 11/10/2026): điều đang đọc nằm trong danh sách kết quả thì cho sang kết quả trước / sau ngay tại
+                    chỗ, mở đúng khoản khớp — khỏi bấm "Danh sách điều" rồi tìm lại chỗ đang xem. */}
+                {(tim.trim() || chiGhim || chiGt) && (() => {
+                  const i = ketQua.findIndex((x) => x.ma === vb.ma && x.d.so === dieuDangXem.so);
+                  if (i < 0 || ketQua.length < 2) return null;
+                  const mo = (j: number) => { const x = ketQua[j]; if (x) moDieu(x.ma, x.d.so, khoanKhop(x.ma, x.d.so)); };
+                  return (
+                    <div className="mt-2 flex items-center gap-2 rounded-lg bg-slate-50 px-2.5 py-1.5 text-[12px] text-slate-600">
+                      <span className="min-w-0 flex-1 truncate">🔎 Kết quả <b className="text-[#0A2540]">{i + 1}/{ketQua.length}</b>{tim.trim() ? <> cho “{tim.trim()}”</> : null}</span>
+                      <button disabled={i === 0} onClick={() => mo(i - 1)}
+                        className="shrink-0 rounded-md border border-slate-200 bg-white px-2 py-0.5 font-semibold text-[#0A2540] disabled:opacity-40">‹ Trước</button>
+                      <button disabled={i >= ketQua.length - 1} onClick={() => mo(i + 1)}
+                        className="shrink-0 rounded-md border border-slate-200 bg-white px-2 py-0.5 font-semibold text-[#0A2540] disabled:opacity-40">Sau ›</button>
+                    </div>
+                  );
+                })()}
+
                 {/* ── CẢNH BÁO TÌNH TRẠNG ĐIỀU ──
                     Phải đặt TRƯỚC mọi thứ khác. Nghị định 151/2025 bãi bỏ 25 điều của Nghị
                     định 101/2024 — đúng những điều nói về hồ sơ, thời hạn, mẫu đơn. Đọc

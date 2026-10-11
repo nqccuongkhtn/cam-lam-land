@@ -1587,9 +1587,23 @@ export default function TraCuuLuatPage() {
   };
 
   const chep = (d: Dieu) => {
-    const t = `Điều ${d.so}. ${d.tieuDe}\n` + d.khoan.map((k) =>
+    // Đợt 32 (12/10/2026): chép kèm CẢNH BÁO HIỆU LỰC (điều đã hết hiệu lực / bị sửa — người nhận không thấy khung đỏ trên web, dán đi
+    // dễ dùng sai) + ĐƯỜNG DẪN mở thẳng điều này (người nhận vẫn phải đăng nhập, có quyền mới xem được).
+    const canhBao: string[] = [];
+    if (d.tinhTrang) {
+      const tt = d.tinhTrang, kb = kho.find((z) => z.ma === tt.boi);
+      const nhan = tt.loai === 'het-hieu-luc' ? 'ĐÃ HẾT HIỆU LỰC' : tt.loai === 'bai-bo-mot-phan' ? 'BỊ BÃI BỎ MỘT PHẦN' : 'ĐÃ BỊ SỬA ĐỔI, BỔ SUNG';
+      canhBao.push(`⚠️ Điều này ${nhan}${tt.tuNgay ? ' từ ' + ngayVn(tt.tuNgay) : ''} — bởi ${kb ? nhanNgan(kb.ma, kb.soHieu) : tt.boi}${tt.boiDieu ? ' Điều ' + tt.boiDieu : ''}.`);
+    }
+    for (const sd of d.suaDoi || []) {
+      const kb = kho.find((z) => z.ma === sd.boi);
+      canhBao.push(`⚠️ ${sd.phamVi || 'Nội dung'} được sửa đổi, bổ sung bởi khoản ${sd.boiKhoan} Điều ${sd.boiDieu} ${kb ? nhanNgan(kb.ma, kb.soHieu) : sd.boi}${sd.tuNgay ? ' (hiệu lực ' + ngayVn(sd.tuNgay) + ')' : ''}.`);
+    }
+    let link = '';
+    try { if (vb) link = `${window.location.origin}/tra-cuu-luat?vb=${vb.ma}&d=${d.so}`; } catch { /* */ }
+    const t = (canhBao.length ? canhBao.join('\n') + '\n\n' : '') + `Điều ${d.so}. ${d.tieuDe}\n` + d.khoan.map((k) =>
       (k.so ? `${k.so}. ` : '') + k.chu + (k.diem.length ? '\n' + k.diem.map((x) => `${x.ky}) ${x.chu}`).join('\n') : '')).join('\n')
-      + `\n\n(${vb?.ten} — ${vb?.soHieu})`;
+      + `\n\n(${vb?.ten} — ${vb?.soHieu})` + (link ? `\nXem: ${link}` : '');
     navigator.clipboard?.writeText(t).then(() => { setDaChep('chu'); setTimeout(() => setDaChep(''), 1800); }).catch(() => {});
   };
   // Thanh "Kết quả i/N · ‹ Trước · Sau ›" khi điều đang đọc nằm trong kết quả tìm / lọc (đợt 17–18) — vẽ ở đầu và cuối bài.

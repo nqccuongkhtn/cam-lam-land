@@ -1071,11 +1071,15 @@ export default function TraCuuLuatPage() {
     setCuonToi((n) => n + 1);   // cuộn tới điều SAU khi vẽ xong (xem effect cuonToi)
   };
   // Cuộn ngay lúc bấm thì điều chưa kịp hiện, danh sách chưa kịp thu → chỗ dừng lệch hẳn (mở bằng đường dẫn: trang đứng yên ở đầu).
-  // Chờ một nhịp vẽ rồi mới cuộn; khung nội dung có scroll-mt để không bị ô tìm dính trên đầu che mất tiêu đề điều.
+  // Effect chạy SAU khi trang đã vẽ xong nên cuộn luôn được; 0,4 giây sau canh lại một lần (nội dung tải sau làm xê dịch). Không
+  // dùng requestAnimationFrame: thẻ trình duyệt đang ẩn (mở đường dẫn ở thẻ nền) thì nó không chạy. Khung nội dung có scroll-mt để
+  // không bị ô tìm dính trên đầu che mất tiêu đề điều.
   useEffect(() => {
     if (!cuonToi) return;
-    const t = window.requestAnimationFrame(() => oNoiDung.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-    return () => window.cancelAnimationFrame(t);
+    const cuon = () => oNoiDung.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    cuon();
+    const t = window.setTimeout(cuon, 400);
+    return () => window.clearTimeout(t);
   }, [cuonToi]);
   // ĐƯỜNG DẪN TỚI TỪNG ĐIỀU (đợt 14, 11/10/2026): /tra-cuu-luat?vb=ldd2024&d=78&k=2 mở thẳng Điều 78 khoản 2 — lưu dấu trang, gửi
   // cho đồng nghiệp (người nhận vẫn phải đăng nhập, có quyền mới xem được). Đổi điều đang đọc thì đường dẫn trên thanh địa chỉ đổi

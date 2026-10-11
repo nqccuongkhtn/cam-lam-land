@@ -184,6 +184,9 @@ là 903 ha; ngoài khu lõi Cam Đức (nơi web áp luật này) còn 325,5 ha 
 **Cũng đã kiểm (nghi vấn "thuật toán đổi toạ độ sai"):** công thức đổi VN-2000 → WGS84 của xưởng dữ liệu (Python, dùng dựng ô
 đất từ bản vẽ) và của máy chủ (dùng đổi toạ độ phiếu / toạ độ anh nhập) — cùng bộ 7 tham số Khánh Hòa; so trên 3 điểm thật trải khắp
 huyện: lệch nhau **dưới 0,5 mm**. Không phải nguồn sai số.
+Bước **cắt vùng có lỗ thành mảnh** (máy chủ chỉ nhận ô không lỗ) cũng đã kiểm: ghép lại các mảnh ô đất web của 7 bản phân khu so với
+vùng tô gốc (đã cắt theo ranh) — lệch 0–75 m² trên MỖI BẢN hàng nghìn ha, toàn là vụn dưới 0,6 m² dọc mép do làm tròn toạ độ ~1 mm;
+một thửa chịu ảnh hưởng không tới 0,1 m². Không phải nguồn sai số.
 
 ## I. ĐÃ SỬA: VÙNG "TRẮNG TRƠN" TRONG 7 BẢN PHÂN KHU KHÔNG CÒN BỊ GHI LÀ ĐƯỜNG (anh xem ảnh, sai thì báo — gỡ được ngay)
 

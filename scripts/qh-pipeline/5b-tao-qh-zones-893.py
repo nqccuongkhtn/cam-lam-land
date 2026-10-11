@@ -28,8 +28,10 @@ CÁCH GÁN LOẠI ĐẤT CHO MỖI VÙNG — theo thứ tự, căn cứ nào có
 vùng có lỗ được CẮT thành các mảnh không lỗ (cắt đôi khung bao qua lỗ cho tới khi hết lỗ) — ghép lại đúng
 bằng vùng cũ, lỗ vẫn là lỗ.
 
-Cách chạy (sau 1b + 1c):
-    python 5b-tao-qh-zones-893.py qd893_qh.geojson qd893_chu.geojson qd893_kyhieu.geojson
+Cách chạy (sau 1d + 1c — KHÔNG dùng file qd893_qh.geojson cũ dựng bằng GDAL: hiểu sai đảo trong lỗ, đã xoá 11/10/2026):
+    python 1d-vung-to-893-chan-le.py "QD893 QHSDD2030.dxf" qd893_qh_chanle.geojson
+    python 5b-tao-qh-zones-893.py qd893_qh_chanle.geojson qd893_chu.geojson qd893_kyhieu.geojson
+    rồi chạy 5f-bo-sung-vung-to-hong-893.py
 """
 import collections, io, json, os, re, sys
 from shapely.geometry import shape, box, Polygon, MultiPolygon, GeometryCollection

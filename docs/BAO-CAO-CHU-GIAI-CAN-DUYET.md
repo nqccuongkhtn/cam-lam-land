@@ -230,6 +230,9 @@ DIỆN TÍCH LÔ do đơn vị lập quy hoạch tính). Đọc 1.183 tem ở 7 
   trong vùng tô làng xóm · 1-CXCD-06 (12.187529, 109.064055) trong vùng tô hỗn hợp nhà ở – dịch vụ · 3-CXCD-06 (12.168450, 109.080463)
   không có vùng tô · 3-SS-01 (12.174583, 109.076724), 3-SS-02 (12.173148, 109.079071), 3-SS-03 (12.170146, 109.080226): lô suối nằm
   trong vùng tô làng xóm. Nếu đúng là bản vẽ quên tô, web cần anh xác nhận loại để thêm ô cho các lô này.
+  **Ảnh soi cả 10 lô:** `bao-cao-qh/cuhin-10-lo-nghi-chua-to.png` (mỗi ô 120 m, chấm đỏ = tem lô). Nhìn ảnh: phần lớn tem của dải hẹp
+  (3-CXCD-02/04, 3-SS-02/03, 1-CXCD-06) có dải cây xanh / suối thật cách 30–60 m → chỉ là tem đặt xa. **Đáng ngờ nhất:** 1-OHT-45, 1-OHT-47
+  (giữa vùng nông nghiệp, không có ô dân cư nào gần) và 1-CXCD-01, 3-SS-01 (có NÉT VIỀN lô nhưng không tô màu riêng).
 - QĐ2076, QĐ2101, Tây Nam: tem không dùng được để so (QĐ2076 là chữ ghi tầng cao công trình, QĐ2101 / Tây Nam gần như không có tem).
 
 ## I. ĐÃ SỬA: VÙNG "TRẮNG TRƠN" TRONG 7 BẢN PHÂN KHU KHÔNG CÒN BỊ GHI LÀ ĐƯỜNG (anh xem ảnh, sai thì báo — gỡ được ngay)

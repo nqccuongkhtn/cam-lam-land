@@ -283,6 +283,7 @@ export default function TraCuuLuatPage() {
   const [moSuaDoi, setMoSuaDoi] = useState<Record<string, boolean>>({});
   const [moLuocDo, setMoLuocDo] = useState(false);
   const [moThuocTinh, setMoThuocTinh] = useState(false);
+  const [moCanKiem, setMoCanKiem] = useState(false);   // dòng "❓ N điều cần kiểm hiệu lực" — bấm mới bung danh sách
   // Điện thoại: danh sách điều đang bung ra hay đã thu lại (máy tính không dùng tới).
   const [moDs, setMoDs] = useState(false);
   const [thChon, setThChon] = useState<string>('');
@@ -663,12 +664,21 @@ export default function TraCuuLuatPage() {
     return m;
   });
 
+  // Đọc "số điều" từ chữ đã bỏ dấu: 75 · dieu 75 · d75 · d.75 · dieu 75 khoan 2 · d75 k2 · k2 d75 · 75.2
+  const docSoDieu = (q: string): { dieu: number; khoan?: number } | null => {
+    let m = /^(?:dieu|d\.?)?\s*(\d{1,3})(?:\s*(?:,|\.)?\s*(?:khoan|k\.?)\s*(\d{1,2}))?$/.exec(q);
+    if (m) return { dieu: Number(m[1]), khoan: m[2] ? Number(m[2]) : undefined };
+    m = /^(?:khoan|k\.?)\s*(\d{1,2})\s*(?:,|\.)?\s*(?:dieu|d\.?)\s*(\d{1,3})$/.exec(q);
+    if (m) return { dieu: Number(m[2]), khoan: Number(m[1]) };
+    m = /^(\d{1,3})\.(\d{1,2})$/.exec(q);
+    return m ? { dieu: Number(m[1]), khoan: Number(m[2]) } : null;
+  };
   // Chuẩn bị sẵn chuỗi không dấu của từng điều để tìm cho nhanh (làm một lần cho mỗi văn bản).
   const chiMuc = useMemo(() => {
-    const ra: Record<string, { d: Dieu; ma: string; kho: string }[]> = {};
+    const ra: Record<string, { d: Dieu; ma: string; kho: string; tde: string }[]> = {};
     for (const ma of Object.keys(cacVb)) {
       ra[ma] = cacVb[ma].dieu.map((d) => ({
-        d, ma,
+        d, ma, tde: kd(d.tieuDe || ''),
         kho: kd(`Điều ${d.so} ${d.tieuDe} ${d.khoan.map((k) => k.chu + ' ' + k.diem.map((x) => x.chu).join(' ')).join(' ')}`),
       }));
     }
@@ -682,14 +692,22 @@ export default function TraCuuLuatPage() {
     if (chiGhim) ds = ds.filter((x) => ghim.includes(khoaGhim(x.ma, x.d.so)));
     if (chiGt) ds = ds.filter((x) => !!gt?.muc[khoaGhim(x.ma, x.d.so)]);
     if (!q) return ds;
-    // Gõ "điều 75" hay "75" -> nhảy thẳng tới điều đó
-    const soDieu = /^(?:dieu\s*)?(\d{1,3})$/.exec(q);
-    if (soDieu) {
-      const s = Number(soDieu[1]);
-      const t = ds.filter((x) => x.d.so === s);
+    // Gõ số điều kiểu nào cũng hiểu: "75", "điều 75", "đ75", "d.75", "điều 75 khoản 2", "k2 đ75", "75.2" → đúng Điều 75
+    const so = docSoDieu(q);
+    if (so) {
+      const t = ds.filter((x) => x.d.so === so.dieu);
       if (t.length) return t;
     }
-    return ds.filter((x) => x.kho.includes(q));
+    // TÌM THÔNG MINH (11/10/2026): trước đây phải gõ đúng NGUYÊN CỤM liền nhau mới ra ("thu hồi đất quốc phòng" không ra nếu
+    // các chữ đứng cách nhau). Nay: điều chứa nguyên cụm xếp trước, rồi tới điều có ĐỦ MỌI TỪ (không cần liền nhau);
+    // trong mỗi nhóm, điều khớp ở TIÊU ĐỀ đứng trên điều chỉ khớp trong thân bài.
+    const tieuDeTruoc = (a: typeof ds) => [...a.filter((x) => x.tde.includes(q)), ...a.filter((x) => !x.tde.includes(q))];
+    const nguyen = ds.filter((x) => x.kho.includes(q));
+    const tu = q.split(/\s+/).filter(Boolean);
+    if (tu.length < 2) return tieuDeTruoc(nguyen);
+    const duTu = ds.filter((x) => !x.kho.includes(q) && tu.every((w) => x.kho.includes(w)));
+    const tdDu = (x: (typeof ds)[number]) => tu.every((w) => x.tde.includes(w));
+    return [...tieuDeTruoc(nguyen), ...duTu.filter(tdDu), ...duTu.filter((x) => !tdDu(x))];
   }, [chiMuc, tim, chiGhim, chiGt, gt, ghim, timCaKho, maVb, kho]);
 
   const dieuDangXem = useMemo(() => (vb && chon != null ? vb.dieu.find((d) => d.so === chon) || null : null), [vb, chon]);
@@ -2041,30 +2059,38 @@ export default function TraCuuLuatPage() {
       })()}
       {/* Văn bản tham khảo (công văn) báo một điều của văn bản này đã đổi hiệu lực, nhưng văn bản làm
           thay đổi CHƯA có trong kho → máy không tự đánh dấu, chỉ báo "cần kiểm" để người đọc biết. */}
-      {vb && (vbBth[maVb]?.canKiemTra?.length || 0) > 0 && (
-        <div className="mt-1.5 rounded-lg border-2 border-rose-300 bg-rose-50 px-2.5 py-1.5 text-[12px] leading-snug text-rose-800">
-          <b>❓ Cần kiểm hiệu lực:</b>{' '}
-          {vbBth[maVb]!.canKiemTra!.map((c, i) => (
-            <button key={i} onClick={() => moDieu(maVb, c.dieu)} className="mr-1 font-bold underline">
-              Điều {c.dieu}{c.khoan ? ` khoản ${c.khoan}` : ''}
-            </button>
-          ))}
-          — có văn bản tham khảo báo đã thay đổi, nhưng văn bản làm thay đổi chưa có trong kho. Bấm để xem.
-        </div>
-      )}
-      {/* Còn hiệu lực nhưng có điều đã bị bãi bỏ — đếm ra cho người đọc biết trước. */}
-      {vb && !vb.hetHieuLuc && (() => {
-        const bo = vb.dieu.filter((d) => d.tinhTrang?.loai === 'het-hieu-luc').length;
-        const phan = vb.dieu.filter((d) => d.tinhTrang && d.tinhTrang.loai !== 'het-hieu-luc').length
+      {/* GỌN LẠI (11/10/2026): "điều bị sửa đổi / bãi bỏ" + "cần kiểm hiệu lực" trước là một dòng cam + một HỘP ĐỎ TO luôn bung,
+          trên điện thoại chiếm nửa màn hình trước cả ô tìm. Nay chung MỘT dòng nhỏ; bấm "chi tiết" mới bung danh sách cần kiểm. */}
+      {vb && (() => {
+        const bo = vb.hetHieuLuc ? 0 : vb.dieu.filter((d) => d.tinhTrang?.loai === 'het-hieu-luc').length;
+        const phan = vb.hetHieuLuc ? 0 : vb.dieu.filter((d) => d.tinhTrang && d.tinhTrang.loai !== 'het-hieu-luc').length
           + vb.dieu.filter((d) => !d.tinhTrang && (d.suaDoi?.length || 0) > 0).length;
-        if (!bo && !phan) return null;
+        const ck = vbBth[maVb]?.canKiemTra || [];
+        if (!bo && !phan && !ck.length) return null;
         return (
-          <p className="mt-1 text-[11.5px] leading-snug text-slate-500">
-            Trong văn bản này: {bo > 0 && <><b className="text-rose-600">{bo} điều đã hết hiệu lực ⛔</b></>}
-            {bo > 0 && phan > 0 && ' · '}
-            {phan > 0 && <><b className="text-amber-600">{phan} điều bị sửa đổi / bãi bỏ một phần ⚠️</b></>}
-            {' '}— nhìn dấu ở danh sách là biết.
-          </p>
+          <div className="mt-1 text-[11.5px] leading-snug text-slate-500">
+            <span>
+              {bo > 0 && <b className="text-rose-600">{bo} điều hết hiệu lực ⛔</b>}
+              {bo > 0 && (phan > 0 || ck.length > 0) && ' · '}
+              {phan > 0 && <b className="text-amber-600">{phan} điều bị sửa đổi / bãi bỏ một phần ⚠️</b>}
+              {phan > 0 && ck.length > 0 && ' · '}
+              {ck.length > 0 && (
+                <button onClick={() => setMoCanKiem((v) => !v)} className="font-bold text-rose-700 underline decoration-dotted underline-offset-2">
+                  ❓ {ck.length} điều cần kiểm hiệu lực {moCanKiem ? '▴' : '▾'}
+                </button>
+              )}
+            </span>
+            {ck.length > 0 && moCanKiem && (
+              <div className="mt-1 rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-[12px] text-rose-800">
+                {ck.map((c, i) => (
+                  <button key={i} onClick={() => moDieu(maVb, c.dieu)} className="mr-1.5 font-bold underline">
+                    Điều {c.dieu}{c.khoan ? ` khoản ${c.khoan}` : ''}
+                  </button>
+                ))}
+                — văn bản tham khảo báo đã thay đổi, nhưng văn bản làm thay đổi chưa có trong kho. Bấm để xem.
+              </div>
+            )}
+          </div>
         );
       })()}
 
@@ -2072,8 +2098,9 @@ export default function TraCuuLuatPage() {
       <div className="sticky top-0 z-10 -mx-3 mt-3 bg-white/95 px-3 py-2 backdrop-blur sm:mx-0 sm:px-0">
         <div className="flex items-center gap-2 rounded-xl border-2 border-slate-200 px-3 py-2 focus-within:border-[#0A2540]">
           <span className="text-slate-400">🔍</span>
-          <input value={tim} onChange={(e) => setTim(e.target.value)}
-            placeholder="Gõ từ khoá hoặc số điều…"
+          <input value={tim} onChange={(e) => setTim(e.target.value)} enterKeyHint="search"
+            onKeyDown={(e) => { if (e.key === 'Enter' && !e.nativeEvent.isComposing && ketQua.length) { e.preventDefault(); moDieu(ketQua[0].ma, ketQua[0].d.so); (e.target as HTMLInputElement).blur(); } }}
+            placeholder="Từ khoá, hoặc số điều (vd 45, đ45 k2)…" title="Gõ rồi Enter để mở điều đầu tiên"
             className="w-full bg-transparent text-[15px] outline-none" />
           {tim && <button onClick={() => setTim('')} className="text-slate-400 hover:text-slate-700">✕</button>}
         </div>
@@ -2091,12 +2118,12 @@ export default function TraCuuLuatPage() {
           </button>
           <button onClick={() => { setChiGhim((v) => !v); setChon(null); setXemPhuLuc(false); }} title="Chỉ hiện những điều đã ghim"
             className={`rounded-full border px-2.5 py-1 text-[12px] font-bold transition ${chiGhim ? 'border-amber-500 bg-amber-500 text-white' : 'border-amber-300 bg-amber-50 text-amber-700'}`}>
-            ⭐ {ghim.length}
+            ⭐ Ghim {ghim.length}
           </button>
           {gt && (
             <button onClick={() => { setChiGt((v) => !v); setChon(null); setXemPhuLuc(false); }} title="Chỉ hiện những điều có giải thích ngắn"
               className={`rounded-full border px-2.5 py-1 text-[12px] font-bold transition ${chiGt ? 'border-sky-600 bg-sky-600 text-white' : 'border-sky-300 bg-sky-50 text-sky-700'}`}>
-              💡 {Object.keys(gt.muc).length}
+              💡 Giải thích {Object.keys(gt.muc).length}
             </button>
           )}
           {(tim || chiGhim || chiGt) && (
@@ -2139,8 +2166,8 @@ export default function TraCuuLuatPage() {
               </span>
             </button>
           )}
-          <div className={`max-h-[70vh] overflow-y-auto rounded-xl border border-slate-200 bg-white ${dieuDangXem && !moDs ? 'hidden lg:block' : ''}`}>
-            <p className="sticky top-0 z-10 border-b bg-slate-50/95 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-500 backdrop-blur">
+          <div className={`rounded-xl border border-slate-200 bg-white lg:max-h-[70vh] lg:overflow-y-auto ${dieuDangXem && !moDs ? 'hidden lg:block' : ''}`}>
+            <p className="border-b bg-slate-50/95 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-500 backdrop-blur lg:sticky lg:top-0 lg:z-10">
               {tim || chiGhim || chiGt ? `${ketQua.length} điều khớp${timCaKho ? ' · cả kho' : ''}` : `${vb.chuong.length ? vb.chuong.length + ' chương · ' : ''}${vb.dieu.length} điều`}
             </p>
             {tim || chiGhim || chiGt ? (<>

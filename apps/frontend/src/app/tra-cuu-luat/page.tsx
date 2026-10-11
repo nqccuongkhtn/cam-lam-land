@@ -2203,7 +2203,7 @@ export default function TraCuuLuatPage() {
       {loi && <p className="mt-6 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">{loi}</p>}
 
       {vb && (
-        <div className="mt-3 grid gap-3 lg:grid-cols-[360px_1fr]">
+        <div className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[360px_minmax(0,1fr)]">
           {/* Điều ĐẺ RA VỀ SAU: Luật sửa đổi 1998/2001 thêm hẳn Điều 22a, 78b… vào Luật 1993.
               Bản gốc 1993 không có mấy điều này, mà chèn chữ vào giữa nguyên văn là sửa luật
               gốc — không được phép. Nên hiện thành dòng gạch đứt nối ngay sau điều liền trước,

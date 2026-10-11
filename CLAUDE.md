@@ -577,7 +577,9 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   (7) NHÃN GHÉP "+" ("TMD+ODT", "NKH+TMD", "DTT+DKV+TMD"… 119 nhãn) = một loại "Đất hỗn hợp (TMD + ODT)" — trước tách mã rồi bỏ mã trái
   màu (thửa 326 tờ 7 Cam Đức: app tham chiếu ghi đất hỗn hợp, web ghi thương mại dịch vụ). Chữ "%%u…%%U" (gạch chân CAD) bỏ trước khi đọc mã.
 - **QĐ205 DỰNG LẠI THẲNG TỪ QD205.gpkg (11/10/2026): `5h-dung-o-205-tu-gpkg.py` (+ bảng `lop-205.json` lớp → tên), toạ độ 8 số lẻ (~1 mm).
-  Thay hẳn ô cũ (DGN qua GDAL) + 5c / 5d / 5e (không cần chạy nữa).** Ô cũ khác nguồn hình với vùng tô gốc: so cả bản lệch 593 ha khác tên
+  Thay hẳn ô cũ (DGN qua GDAL) + 5c / 5d / 5e (không cần chạy nữa).** 12/10/2026: 5h BỎ VÙNG TÔ TRÙNG — lớp không có trong khung chú
+  giải mà bị vùng tô đúng chú giải phủ ≥ 95 % (`L- bo dat` 26 ha trùng khít `QH2030_DAT_NDD_CayxanhCD`; cùng bậc, diện tích chênh 0,02 %
+  nên trước ai nằm trên là may rủi → web ghi "Cây xanh" thay vì "Đất cây xanh chuyên dụng"). Ô cũ khác nguồn hình với vùng tô gốc: so cả bản lệch 593 ha khác tên
   (261 ha đất nông nghiệp ghi "Đất đồi núi" — vùng tô bị lấp lỗ), 111 ô tự cắt nhau; thửa 326 tờ 7 Cam Đức dư 33 m² đường so với app tham
   chiếu. Nay chẵn–lẻ, cắt theo ranh (2.036 ha vẽ ra ngoài ranh), so cả bản với gpkg 99,99 %. **Ba luật chia phần KHÔNG TÔ đổi theo:**
   (1) ngoài khung mặt nạ: trong ranh mà không tô = lòng đường, đúng bản vẽ (bỏ luật "cách ô ≥ 2,5 m mới là đường" — nó cắt mỗi bên đường

@@ -28,7 +28,7 @@ Ghi đè apps/backend/data/qh_zones.json.
 """
 import io, json, os, sys, importlib.util, collections, sqlite3
 from shapely.geometry import Polygon, MultiPolygon, GeometryCollection, box
-from shapely.ops import transform
+from shapely.ops import transform, unary_union
 from shapely.validation import make_valid
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -103,9 +103,11 @@ def main(vao):
     try: TCG = json.load(io.open(os.path.join(HERE, 'ten-theo-chu-giai.json'), encoding='utf-8')).get('205', {}).get('theo_level', {})
     except Exception: TCG = {}
     TEN = {k: TCG.get(sua_chu(k), v) for k, v in TEN.items()}
+    CO_CG = {k for k in TEN if sua_chu(k) in TCG}                # lớp có dòng trong khung chú giải
     RG = make_valid(Polygon(json.load(io.open(os.path.join(DATA, 'ranh_qh.json'), encoding='utf-8'))['205']))
     wgs = lambda g: transform(lambda x, y, z=None: tuple(zip(*[b1.vn2wgs(a, b) for a, b in zip(x, y)])), g)
     out, bo, theo = [], collections.Counter(), collections.Counter()
+    vt = []                                                      # (lớp, hình chẵn–lẻ toạ độ bản vẽ)
     for lv, vong in doc_vung_to(vao):
         if lv not in TEN or not vong:
             bo[sua_chu(lv)] += 1; continue
@@ -115,7 +117,22 @@ def main(vao):
             v = make_valid(Polygon(r))
             g = v if g is None else g.symmetric_difference(v)
         if g is None or g.is_empty or g.area < 1: continue
-        W = make_valid(wgs(make_valid(g)))
+        vt.append((lv, make_valid(g)))
+    # VÙNG TÔ TRÙNG (12/10/2026): lớp KHÔNG có trong khung chú giải mà bị vùng tô ĐÚNG CHÚ GIẢI phủ ≥ 95 % = nét vẽ trùng → bỏ. Vd lớp
+    # 'L- bo dat' (26 ha, màu xám, tên tạm "Cây xanh") trùng khít 100 % vùng tô 'QH2030_DAT_NDD_CayxanhCD' — hai ô cùng bậc, diện tích chênh
+    # 0,02 % nên ai nằm trên là may rủi; web từng ghi "Cây xanh" trong khi ảnh bản đồ + chú giải là "Đất cây xanh chuyên dụng".
+    from shapely.strtree import STRtree
+    cg = [g for lv, g in vt if lv in CO_CG]
+    cay = STRtree(cg)
+    giu = []
+    for lv, g in vt:
+        if lv not in CO_CG:
+            phu = unary_union([cg[int(j)].intersection(g) for j in cay.query(g)]) if len(cg) else None
+            if phu is not None and not phu.is_empty and phu.area >= 0.95 * g.area:
+                bo['%s (trùng vùng tô có chú giải)' % sua_chu(lv)] += 1; continue
+        giu.append((lv, g))
+    for lv, g in giu:
+        W = make_valid(wgs(g))
         for phan in cac_da_giac(W):
             dt = Polygon(phan.exterior).area                    # xếp lớp theo vòng ngoài vùng tô gốc
             trong = make_valid(phan.intersection(RG))

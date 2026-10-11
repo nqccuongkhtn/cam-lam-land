@@ -33,7 +33,7 @@ Giữ nguyên có lý do: QĐ893 mã **SKC** — khung chú dẫn bản vẽ in 
 
 | Bản | Lớp | Đang ghi | Đề xuất | Căn cứ | Mức chắc |
 |---|---|---|---|---|---|
-| QĐ205 | `L- bo dat` (26,2 ha, màu XÁM #848484, một dải dài — dài gấp ~7,5 lần rộng) | Cây xanh | **Đất cây xanh chuyên dụng** | QĐ2076 (phân khu, chi tiết hơn) cùng chỗ **100 % "Đất cây xanh chuyên dụng (cây xanh cách ly)"**; QĐ893 100 % "Đất công cộng, dịch vụ, sản xuất"; địa chính: CLN 38 %, ONT+CLN 20 %, BHK 13 %, NTS 11 %. Khung chú giải QĐ205 không có ô màu xám này | Vừa |
+| ~~QĐ205~~ | ~~`L- bo dat`~~ — **ĐÃ GIẢI QUYẾT 12/10**: vùng tô này TRÙNG KHÍT 100 % vùng tô `QH2030_DAT_NDD_CayxanhCD` (đúng chú giải) — là nét vẽ trùng, nay bỏ; chỗ đó web ghi theo vùng tô đúng chú giải "Đất cây xanh chuyên dụng" (vd thửa 197 tờ 25 Cam Hải Tây 12.378 m²; ảnh bản đồ cũng tô màu này) | Cây xanh | **Đất cây xanh chuyên dụng** | QĐ2076 (phân khu, chi tiết hơn) cùng chỗ **100 % "Đất cây xanh chuyên dụng (cây xanh cách ly)"**; QĐ893 100 % "Đất công cộng, dịch vụ, sản xuất"; địa chính: CLN 38 %, ONT+CLN 20 %, BHK 13 %, NTS 11 %. Khung chú giải QĐ205 không có ô màu xám này | Vừa |
 | QĐ205 | `l-Datdoinui` (16,7 ha, 5 mảnh) | Đất đồi núi | **Giữ "Đất đồi núi"** (hoặc "Đất lâm nghiệp (rừng sản xuất)") | Bản Tây Nam có dòng chú giải "Đất đồi núi"; địa chính cùng chỗ 72 % RSX (rừng sản xuất); QĐ Tây Bắc 58 % rừng sản xuất + 42 % rừng đặc dụng | Vừa |
 | QĐ918 | `DAT_KXD_DulichRung_qh` (32,1 ha, một lô, nhãn lô DLST-01) | KXD_DulichRung_qh (tên lớp thô) | **Đất khu dịch vụ du lịch** (dòng chú giải QĐ918 gần nhất) — hoặc anh đặt tên đúng theo thuyết minh quyết định 918 | Tên lớp "Du lịch rừng", nhãn lô "DLST" (du lịch sinh thái); QĐ893 cùng chỗ "Đất thương mại, dịch vụ"; QĐ205 cùng chỗ 56 % cây xanh chuyên dụng + 44 % rừng sản xuất; địa chính 62 % RSX. Khung chú giải QĐ918 KHÔNG có dòng cho lớp này | Thấp |
 | Tây Nam | `QHDD_DAT_Cayxanhhanche` (27 ha, 2 mảnh) | Cây xanh sử dụng hạn chế | **Đất cây xanh sử dụng hạn chế** (thêm chữ "Đất" cho đồng bộ) | Không có dòng trong chú giải Tây Nam; QĐ205 cùng chỗ 100 % "Đất sản xuất nông nghiệp"; địa chính 54 % BHK, 23 % đất lúa (hiện là ruộng) | Vừa |
@@ -289,7 +289,7 @@ quy hoạch cả chỗ này): QĐ2222 ~1.670 ha mặt nước đầm Thủy Tri�
 liệu tính có "Đất công trình năng lượng"; đây là vùng tô hỏng viền đã bổ sung bằng `5f` hôm 11/10) — `thu-893-dien-mat-troi.png`.
 Còn lại ~2.250 ha máy báo "lệch tên" ở Suối Tân / Cam Hải Tây là do bảng màu (cùng màu xanh #7fff7f dùng cho nhiều mã): ảnh vẫn đúng
 màu bản vẽ. Soi kỹ vùng 1.130 ha: bên trong có mã QUY HOẠCH "NKH" (Level 34) → web ghi "Đất nông nghiệp khác" là đúng bản vẽ; chữ
-"RSX" trong vùng là mã HIỆN TRẠNG (Level 33). QĐ205: ảnh bản đồ vẽ trong suốt nên cách so này không dùng được — chưa kiểm.
+"RSX" trong vùng là mã HIỆN TRẠNG (Level 33). QĐ205 (so 12/10 ở mức phóng 14, nơi nét hoa văn dồn thành màu; 68.397 điểm nằm sâu trong ô): **ảnh khớp dữ liệu 99,25 %** — chỗ lệch là các cụm nhỏ 8–16 ha; một cụm 13 ha (12.080552, 109.170154) dẫn tới phát hiện vùng tô trùng `L- bo dat` (mục B, đã sửa).
 
 **Chỗ máy báo lệch nhưng ảnh ĐÚNG (để anh yên tâm):** khối "nhóm nhà ở" màu ô liu ở QĐ2101 là đất ở HIỆN TRẠNG — bản vẽ tô màu khác
 đất ở quy hoạch; ảnh cắt lại GIỮ màu này (`thu-2101-giu-mau-hien-trang.png`). Vùng cây xanh cách ly có hoa văn dấu "+" cũng giữ

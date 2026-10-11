@@ -2582,9 +2582,13 @@ export default function TraCuuLuatPage() {
           {tim && <button onClick={() => setTim('')} className="text-slate-400 hover:text-slate-700">✕</button>}
           {!tim && <kbd className="hidden shrink-0 rounded border border-slate-200 bg-slate-50 px-1.5 text-[11px] text-slate-400 lg:inline" title="Bấm / hoặc Ctrl+K ở bất cứ đâu để vào ô tìm">/</kbd>}
         </div>
+      </div>
+      {/* CHỈ Ô TÌM DÍNH TRÊN ĐẦU (đợt 24, 12/10/2026). Hàng nút lọc + "Gần đây" + "Đã tìm" + bảng chủ đề trước cũng dính theo → cả khối
+          ~170 px đứng yên trên đầu, đọc điều trên điện thoại mất gần 1/4 màn hình và che tiêu đề điều vừa mở. Nay chúng cuộn đi như thường. */}
+      <div>
         {/* MỘT HÀNG NÚT NHỎ, không xuống dòng lung tung. 14 chủ đề nhanh giấu sau nút
             "Chủ đề" — bấm mới xổ ra, nhìn đỡ rối hẳn. */}
-        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           <button onClick={() => setMoChuDe((v) => !v)}
             className={`rounded-full border px-2.5 py-1 text-[12px] font-bold transition ${moChuDe ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>
             🔖 Chủ đề {moChuDe ? '▴' : '▾'}

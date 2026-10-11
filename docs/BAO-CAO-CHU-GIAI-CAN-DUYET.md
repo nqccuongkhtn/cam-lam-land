@@ -275,15 +275,15 @@ Na Tia ~1.020 ha mà anh đã xác nhận trống trên DGN). **79 phiếu: kế
 | Tây Nam | 3,34 ha | 12.068994, 109.008319 | dải hở giữa vùng tô rừng và ranh | rừng đặc dụng | `trang-tron-taynam-1.png` |
 | Tây Nam | 3,18 ha | 12.056975, 109.062932 | dải hở giữa vùng tô rừng và ranh | rừng sản xuất | `trang-tron-taynam-2.png` |
 | Tây Nam | 2,21 ha | 12.054828, 109.070102 | dải hở sát ranh | rừng sản xuất | `trang-tron-taynam-3.png` |
-| Tây Nam | 1,37 ha | 11.990363, 109.067142 | khe hình chữ V giữa hai vùng tô rừng | rừng sản xuất | `trang-tron-taynam-4.png` |
+| Tây Nam | 1,37 ha | 11.990363, 109.067142 | khe hình chữ V giữa hai vùng tô rừng — giữa bản vẽ, **nay giữ là đường, chờ anh** | rừng sản xuất | `trang-tron-taynam-4.png` |
 | ~~Tây Bắc~~ | ~~2,98 ha~~ | 12.151849, 109.062596 | **ĐÃ MẤT 12/10** — không phải vùng trắng thật: là dải hở giữa vùng tô và RANH CŨ bị kẻ thẳng sai (mục L, ý 6) | cây lâu năm, KCN | `trang-tron-taybac-2.png` |
 | ~~Tây Bắc~~ | ~~2,51 ha~~ | 12.147631, 109.064681 | **ĐÃ MẤT 12/10** — như trên | khu công nghiệp | `trang-tron-taybac-3.png` |
-| QĐ2222 | 0,50 ha | 12.068973, 109.189841 | MỚI 12/10 (sau khi ranh dựng lại đúng đường cong) — trắng trơn | — | — |
-| QĐ2222 | 0,39 ha | 12.068927, 109.189207 | MỚI 12/10 — trắng trơn, cạnh vùng trên | — | — |
-| QĐ2222 | 1,32 ha | 12.084782, 109.190564 | ô chữ nhật trắng giữa 3 vùng tô | văn hoá + đường | `trang-tron-2222-1.png` |
+| QĐ2222 | 0,50 ha | 12.068973, 109.189841 | góc vạt NÚT GIAO đường N5A — luật cũ bắt nhầm; **nay giữ là đường** (luật đã siết) | — | `trang-tron-2222-moi.png` |
+| QĐ2222 | 0,39 ha | 12.068927, 109.189207 | góc vạt nút giao (cạnh vùng trên) — **nay giữ là đường** | — | `trang-tron-2222-moi.png` |
+| QĐ2222 | 1,32 ha | 12.084782, 109.190564 | ô chữ nhật trắng giữa 3 vùng tô — giữa bản vẽ, **nay giữ là đường, chờ anh** | văn hoá + đường | `trang-tron-2222-1.png` |
 | QĐ2222 | 0,81 ha | 12.120180, 109.207271 | trắng trơn | công cộng | `trang-tron-2222-2.png` |
-| QĐ2222 | 0,46 ha | 12.084536, 109.189476 | trắng trơn | văn hoá + đường | `trang-tron-2222-3.png` |
-| QĐ2076 | 0,62 ha | 12.141588, 109.092235 | trắng trơn (có thể là đảo giữa nút giao) | đường | `trang-tron-2076-1.png` |
+| QĐ2222 | 0,46 ha | 12.084536, 109.189476 | trắng trơn giữa bản vẽ — **nay giữ là đường, chờ anh** | văn hoá + đường | `trang-tron-2222-3.png` |
+| QĐ2076 | 0,62 ha | 12.141588, 109.092235 | trắng trơn (có thể là đảo giữa nút giao) — **nay giữ là đường** | đường | `trang-tron-2076-1.png` |
 
 Ví dụ thửa đổi: **thửa 14 tờ 5 Suối Tân** (rừng đặc dụng 22,75 ha) — trước Tây Nam ghi 22.088 m² "đất giao thông", nay không còn dòng
 Tây Nam (cả thửa ngoài phạm vi thật sự của bản vẽ). Thửa 339 tờ 18 Sơn Tân: đường 31.692 → 5.282 m² (phần còn lại là khe hẹp < 60 m —

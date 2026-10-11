@@ -587,7 +587,7 @@ def nhap_cong_van(ma, tinh='', nhom='huong-dan'):
             else:
                 the['nguoiKy'] = d
     doan = noi_doan(the['doan'])
-    ten = re.sub(r'^(V/v|V/V)\s*', '', ' '.join(the['ten'])).strip()
+    ten = ' '.join(the['ten']).strip()              # giữ đúng như bản gốc, kể cả chữ "V/v" đứng đầu
     nhap = {
         'nhap': True,
         'ghiChuNhap': 'BẢN NHÁP do máy soạn — soát từng đoạn với bản gốc (bản quét: với ẢNH), tách chú thích '
@@ -691,16 +691,34 @@ def kiem(chi_ma=None):
                 sua = [(' '.join(tu(s.get('may', ''))), ' '.join(tu(s.get('dung', ''))))
                        for s in (v.get('suaMayDoc') or [])]
 
+                # Chữ của phần KHUNG văn bản (quốc hiệu, số, ngày, "Kính gửi", "Nơi nhận", chức vụ, người
+                # ký) nằm ở trường riêng, không nằm trong các đoạn đem so — máy đọc ra mà bên này "thiếu"
+                # thì không phải lỗi.
+                ng = (v.get('ngay') or '0-0-0').split('-')
+                khung = set(tu(' '.join([
+                    v.get('coQuanChuQuan', ''), v.get('coQuan', ''), v.get('soHieu', ''), v.get('diaDanh', ''),
+                    ' '.join(v.get('chucVuKy') or []), v.get('nguoiKy', ''),
+                    'CỘNG HÒA HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM Độc lập Tự do Hạnh phúc Số Kính gửi Nơi nhận ngày tháng năm',
+                    ' '.join(ng), ' '.join(str(int(x)) for x in ng if x.isdigit())])))
+
+                chu_sai_da_ghi = set(' '.join(m for m, d in sua).split())
+
+                def la_khung(ta, tb):
+                    # chữ khung, kể cả chữ khung bị máy đọc sai mà đã ghi trong suaMayDoc
+                    return not ta and tb and all(w in khung or w in chu_sai_da_ghi for w in tb.split())
+
                 def da_giai_thich(ta, tb):
                     # chỗ khác này đã được ghi trong "suaMayDoc" (máy đọc X → đúng là Y theo ảnh) chưa
                     return any((not ta or ta in d) and (not tb or tb in m) for m, d in sua)
+                khac = [(ta, tb) for ta, tb in khac if not la_khung(ta, tb)]
                 chua = [(ta, tb) for ta, tb in khac if not da_giai_thich(ta, tb)]
                 bao('  [%s] chữ đã soát khác chữ máy đọc %d chỗ, %d chỗ đã ghi lý do trong suaMayDoc (khớp %.1f%%):'
                     % (v['ma'], len(khac), len(khac) - len(chua), 100 * khop_chu(a, b)))
                 for ta, tb in khac[:80]:
                     bao('      %s "%s"  ⟵ máy đọc "%s"' % ('✓' if da_giai_thich(ta, tb) else '?', ta, tb))
                 if chua:
-                    bao('      (dấu ? = chưa ghi lý do: nhìn lại ẢNH, đúng thì thêm vào suaMayDoc, sai thì sửa đoạn chữ)')
+                    sai.append('%d chỗ khác chữ máy đọc chưa ghi lý do (dấu ?): nhìn lại ẢNH, đúng thì thêm vào '
+                               'suaMayDoc, sai thì sửa đoạn chữ' % len(chua))
         tong_loi += len(sai)
         bao('%s %s%s' % ('OK ' if not sai else '[!]', v.get('ma'), ''.join('\n      - ' + s for s in sai)))
     for p in glob.glob(os.path.join(THU_MUC_TK, '*.nhap.json')):

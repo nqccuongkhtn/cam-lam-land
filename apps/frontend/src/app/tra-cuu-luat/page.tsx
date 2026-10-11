@@ -152,6 +152,11 @@ const CHU_DE: { ten: string; icon: string; tim: string }[] = [
   { ten: 'Giá đất, bảng giá đất', icon: '🏷️', tim: 'giá đất' },
   { ten: 'Giao đất, cho thuê đất', icon: '🤝', tim: 'giao đất, cho thuê đất' },
   { ten: 'Chuyển mục đích sử dụng', icon: '🔁', tim: 'chuyển mục đích sử dụng đất' },
+  // Hai chủ đề thêm 11/10/2026 cùng hai công văn tham khảo (Quảng Ngãi, Lào Cai). Cụm tìm chọn đúng
+  // chữ luật dùng: "đất trồng lúa, đất rừng" chỉ có ở các điều về chuyển mục đích đất lúa, đất rừng.
+  // Bộ tổng hợp (scripts/luat/dung-bo-tong-hop.py) đọc THẲNG mảng này — thêm, đổi tên ở đây là đủ.
+  { ten: 'Chuyển mục đích đất lúa, đất rừng', icon: '🌲', tim: 'đất trồng lúa, đất rừng' },
+  { ten: 'Trồng rừng thay thế', icon: '🌱', tim: 'trồng rừng thay thế' },
   { ten: 'Hạn mức & thời hạn', icon: '📏', tim: 'hạn mức' },
   { ten: 'Đất nông nghiệp', icon: '🌾', tim: 'đất nông nghiệp' },
   { ten: 'Đất ở', icon: '🏠', tim: 'đất ở' },

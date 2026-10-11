@@ -245,7 +245,9 @@ export function qhPhienBan(): string {
   if (PHIEN_BAN || !ready) return PHIEN_BAN;
   try {
     const h = crypto.createHash('sha1').update(CACH_TINH);
-    for (const f of fs.readdirSync(DATA_DIR).filter((f) => /^(qh_zones|road_mask)/.test(f)).sort()) h.update(f).update(fs.readFileSync(path.join(DATA_DIR, f)));
+    // ranh_qh.json cũng đổi kết quả (ranh lập QH, lỗ trống "_lo", vùng khớp nối "_khop") — thiếu nó thì sửa ranh xong, thửa đã lưu
+    // sẵn trong bảng qh_luu vẫn trả kết quả cũ (11/10/2026).
+    for (const f of fs.readdirSync(DATA_DIR).filter((f) => /^(qh_zones|road_mask|ranh_qh)/.test(f)).sort()) h.update(f).update(fs.readFileSync(path.join(DATA_DIR, f)));
     PHIEN_BAN = h.digest('hex').slice(0, 16);
   } catch { PHIEN_BAN = ''; }
   return PHIEN_BAN;

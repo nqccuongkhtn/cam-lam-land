@@ -55,6 +55,10 @@ def lam(thu_muc_json, thu_muc_txt):
         tep[os.path.basename(f)[:-7]] = f
 
     BANG = {'nd': 'NĐ-CP', 'tt': 'TT'}
+    # "Căn cứ" đọc từ TỆP CHỮ GỐC (phần mở đầu). Văn bản nào không có tệp chữ trong thư mục thì GIỮ
+    # căn cứ đã tính lần trước — tệp chữ của các văn bản cũ không còn trên máy, xoá trắng là mất hết
+    # (đã sửa 11/10/2026, khi thêm cách nạp từng văn bản một: scripts/luat/them-van-ban.py vao-kho).
+    can_cu_cu = {x['ma']: list(x.get('canCu') or []) for x in kho}
     for x in kho:
         x['canCu'] = []
         x['thayThe'] = []
@@ -78,6 +82,8 @@ def lam(thu_muc_json, thu_muc_txt):
                 for ma2 in tim_vb(m.group(1), theo_so, theo_ngay):
                     if ma2 != x['ma'] and ma2 not in x['canCu']:
                         x['canCu'].append(ma2)
+        else:
+            x['canCu'] = can_cu_cu.get(x['ma'], [])
 
         # --- 2. THAY THẾ / BÃI BỎ (đọc điều "Hiệu lực thi hành") ---
         p = os.path.join(thu_muc_json, x['ma'] + '.json')

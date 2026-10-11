@@ -737,11 +737,12 @@ def nap_module(ten, tep):
     return m
 
 
-def vao_kho(cac_tep, ma, so_hieu, ten='', het_hieu_luc=''):
+def vao_kho(cac_tep, ma, so_hieu, ten='', het_hieu_luc='', thu_muc=None):
     """Tách MỘT văn bản bằng đúng bộ tách của kho rồi thêm/thay đúng một dòng trong _kho.json.
 
     KHÔNG chạy lại dung-kho-luat.py cho cả kho: nó dựng _kho.json từ thư mục tệp chữ, mà tệp chữ của
     các văn bản cũ không còn trên máy — chạy là mất sạch văn bản cũ khỏi kho."""
+    thu_muc = thu_muc or THU_MUC_WEB          # --thu-muc: chạy thử trên BẢN SAO kho trước khi làm thật
     kiem_ma(ma)
     dk = nap_module('dungkho', 'dung-kho-luat.py')
     if ten:
@@ -751,10 +752,10 @@ def vao_kho(cac_tep, ma, so_hieu, ten='', het_hieu_luc=''):
     for t in cac_tep:
         if not os.path.isfile(t):
             loi('không thấy tệp chữ: %s' % t)
-    muc = dk.lam(list(cac_tep), so_hieu, ma, THU_MUC_WEB)
+    muc = dk.lam(list(cac_tep), so_hieu, ma, thu_muc)
     if not muc:
         loi('bộ tách báo lỗi (xem dòng [!] ở trên) — chưa ghi gì vào kho.')
-    p_kho = os.path.join(THU_MUC_WEB, '_kho.json')
+    p_kho = os.path.join(thu_muc, '_kho.json')
     kho = json.load(open(p_kho, encoding='utf-8'))
     cu = next((x for x in kho if x['ma'] == ma), None)
     if cu:
@@ -769,7 +770,7 @@ def vao_kho(cac_tep, ma, so_hieu, ten='', het_hieu_luc=''):
     # Lược đồ "nhắc tới" ở mức văn bản — tính lại cho cả kho vì văn bản mới có thể nhắc văn bản cũ.
     theo_so = {x['soHieu']: x['ma'] for x in kho}
     for x in kho:
-        p = os.path.join(THU_MUC_WEB, x['ma'] + '.json')
+        p = os.path.join(thu_muc, x['ma'] + '.json')
         if not os.path.exists(p):
             continue
         v = json.load(open(p, encoding='utf-8'))
@@ -834,8 +835,9 @@ if __name__ == '__main__':
         so = lay_co(a, '--so-hieu')
         ten = lay_co(a, '--ten', '')
         hhl = lay_co(a, '--het-hieu-luc', '')
+        tm = lay_co(a, '--thu-muc', None)
         if not a or not ma or not so:
             loi('cách dùng: vao-kho <tệp-chữ_p1.txt> [tệp_p2.txt…] --ma <mã> --so-hieu <số hiệu>')
-        vao_kho(a, ma, so, ten=ten, het_hieu_luc=hhl)
+        vao_kho(a, ma, so, ten=ten, het_hieu_luc=hhl, thu_muc=tm)
     else:
         loi('không có lệnh "%s". Gõ: python scripts/luat/them-van-ban.py giup' % lenh)

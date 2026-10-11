@@ -297,6 +297,18 @@ if __name__ == '__main__':
         x['dan'] = sorted({m for so, m in theo_so.items() if m != x['ma'] and so in chu})
     for x in xong:
         x['duocDan'] = sorted({y['ma'] for y in xong if x['ma'] in y['dan']})
-    json.dump(xong, open(os.path.join(ra_dir, '_kho.json'), 'w', encoding='utf-8'),
+    # KHOÁ AN TOÀN (11/10/2026): script này dựng _kho.json TỪ ĐẦU theo thư mục tệp chữ. Tệp chữ của các
+    # văn bản cũ không còn trên máy → chạy với thư mục thiếu là MẤT SẠCH văn bản cũ khỏi kho. Nên: hễ
+    # danh sách mới thiếu văn bản nào đang có thì dừng, trừ khi cố ý gõ thêm --cho-bot.
+    # Thêm MỘT văn bản thì dùng: python scripts/luat/them-van-ban.py vao-kho <tệp chữ> --ma … --so-hieu …
+    p_kho = os.path.join(ra_dir, '_kho.json')
+    if os.path.exists(p_kho) and '--cho-bot' not in sys.argv:
+        mat = sorted({x['ma'] for x in json.load(open(p_kho, encoding='utf-8'))} - {x['ma'] for x in xong})
+        if mat:
+            sys.stdout.buffer.write(('[!] DỪNG, KHÔNG GHI _kho.json: sẽ làm mất %d văn bản đang có (%s). '
+                                     'Thêm một văn bản thì dùng them-van-ban.py vao-kho; cố ý bỏ thì thêm --cho-bot.\n'
+                                     % (len(mat), ', '.join(mat))).encode('utf-8', 'replace'))
+            sys.exit(1)
+    json.dump(xong, open(p_kho, 'w', encoding='utf-8'),
               ensure_ascii=False, indent=1)
     print('ghi duoc %d/%d van ban' % (len(xong), len(BANG)))

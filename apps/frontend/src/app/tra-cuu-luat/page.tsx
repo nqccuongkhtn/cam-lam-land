@@ -793,30 +793,37 @@ export default function TraCuuLuatPage() {
       const bk = boKhop(cau), n = bk.tu.length;
       if (!n) return '';
       const cuoi = bk.tu[n - 1], truoc = { dau: bk.dau, tu: bk.tu.slice(0, -1) };
-      const dem = new Map<string, number>();
+      // Ưu tiên tiếng ĐI LIỀN SAU tiếng đứng trước trong chữ luật ("quốc ph" → "quốc phòng", "tách t" → "tách thửa"); đếm theo số
+      // điều có cặp đó. Không có cặp nào thì lấy tiếng bắt đầu bằng chữ đã gõ hay gặp nhất (số điều có tiếng đó).
+      const tc = truoc.tu[truoc.tu.length - 1];
+      const re = tc ? new RegExp('(?:^|[^\\p{L}\\p{N}])' + escRe(tc) + '[^\\p{L}\\p{N}]+(' + escRe(cuoi) + '[\\p{L}\\p{N}]+)', 'gu') : null;
+      const lien = new Map<string, number>(), hay = new Map<string, number>();
       for (const x of ds) {
         if (!coDuTieng(x, truoc)) continue;
-        for (const t of bk.dau ? x.tuD : x.tuK) if (t.length > cuoi.length && t.startsWith(cuoi)) dem.set(t, (dem.get(t) || 0) + 1);
-      }
-      // Ưu tiên tiếng ĐI LIỀN SAU tiếng đứng trước trong chữ luật ("quốc ph" → "quốc phòng"; chỉ đếm số lần gặp thì ra "quốc pháp"
-      // vì "pháp" — trong "pháp luật" — gặp nhiều hơn). Xét 8 tiếng hay gặp nhất; không tiếng nào đi liền thì lấy tiếng hay gặp nhất.
-      const ung = [...dem.entries()].sort((x, y) => y[1] - x[1]).slice(0, 8);
-      if (!ung.length) return '';
-      let tot = ung[0][0];
-      const truocCuoi = truoc.tu[truoc.tu.length - 1];
-      if (truocCuoi) {
-        let soLien = 0;
-        for (const [t] of ung) {
-          const re = new RegExp('(?:^|[^\\p{L}\\p{N}])' + escRe(truocCuoi) + '[^\\p{L}\\p{N}]+' + escRe(t) + '(?=$|[^\\p{L}\\p{N}])', 'u');
-          let c = 0;
-          for (const x of ds) if ((bk.dau ? x.tuD : x.tuK).has(t) && coDuTieng(x, truoc) && re.test(bk.dau ? x.khoD : x.kho)) c++;
-          if (c > soLien) { soLien = c; tot = t; }
+        for (const t of bk.dau ? x.tuD : x.tuK) if (t.length > cuoi.length && t.startsWith(cuoi)) hay.set(t, (hay.get(t) || 0) + 1);
+        if (re) {
+          re.lastIndex = 0;
+          const gap = new Set<string>();
+          let m: RegExpExecArray | null;
+          while ((m = re.exec(bk.dau ? x.khoD : x.kho))) gap.add(m[1]);
+          gap.forEach((t) => lien.set(t, (lien.get(t) || 0) + 1));
         }
       }
-      return [...truoc.tu, tot].join(' ');
+      const nhieuNhat = (mp: Map<string, number>) => { let t = '', so = 0; mp.forEach((c, k) => { if (c > so) { t = k; so = c; } }); return t; };
+      const chon = nhieuNhat(lien) || nhieuNhat(hay);
+      return chon ? [...truoc.tu, chon].join(' ') : '';
     };
     const coGoi = (cau: string) => { const mr = doiCachGoi(cau); return !!mr && co(mr.cau); };
-    if (co(q) || coGoi(q)) return giu;
+    const dem = (cau: string) => { const bk = boKhop(cau); let c = 0; for (const x of ds) if (coDuTieng(x, bk)) c++; return c; };
+    if (co(q) || coGoi(q)) {
+      // chữ cuối gõ dở mà ngắn (1–2 chữ cái) vẫn khớp lác đác ("hạn m" → 1 điều có ký hiệu "m)") → đoán nốt nếu ra nhiều hơn hẳn
+      const bk = boKhop(q), cuoi = bk.tu[bk.tu.length - 1] || '';
+      if (!/\s$/.test(tim) && bk.tu.length >= 2 && cuoi.length <= 2) {
+        const d0 = doanCuoi(q);
+        if (d0 && dem(d0) >= 5 * Math.max(1, dem(q))) return { q: d0, lui: false, doan: d0 };
+      }
+      return giu;
+    }
     const d1 = doanCuoi(q);
     if (d1) return { q: d1, lui: false, doan: d1 };
     if (!coDau(q)) return giu;

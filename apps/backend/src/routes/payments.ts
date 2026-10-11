@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { timingSafeEqual } from 'node:crypto';
 import { query } from '../lib/db.ts';
 import { authRequired, adminRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { PACKAGES, findPkg, BANK } from '../lib/packages.ts';
@@ -60,7 +61,9 @@ paymentsRouter.get('/my', authRequired, async (req: AuthedRequest, res, next) =>
 paymentsRouter.post('/webhook', async (req, res, next) => {
   try {
     const key = process.env.PAYMENT_WEBHOOK_KEY;
-    if (!key || req.headers['x-webhook-key'] !== key) return res.status(401).json({ error: 'unauthorized' });
+    // So khoá kiểu "thời gian không đổi" (11/10/2026) — không để đo thời gian trả lời mà dò dần ra khoá webhook.
+    const gui = Buffer.from(String(req.headers['x-webhook-key'] || '')), dung = Buffer.from(String(key || ''));
+    if (!key || gui.length !== dung.length || !timingSafeEqual(gui, dung)) return res.status(401).json({ error: 'unauthorized' });
     const content = String(req.body?.content ?? req.body?.description ?? req.body?.addInfo ?? '');
     const amount = Number(req.body?.transferAmount ?? req.body?.amount ?? 0);
     const m = /CLL(\d+)/i.exec(content);

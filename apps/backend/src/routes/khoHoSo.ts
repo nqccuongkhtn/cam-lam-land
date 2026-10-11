@@ -10,6 +10,7 @@
 //     Nhờ cách 2 mà cái script canh thư mục trên máy có thể tự đẩy file lên, không cần đăng nhập.
 import { Router } from 'express';
 import multer from 'multer';
+import { timingSafeEqual } from 'node:crypto';
 import { query } from '../lib/db.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { coVaiTro, laAdmin } from '../lib/auth.ts';
@@ -50,7 +51,9 @@ function dungChiaKhoa(req: AuthedRequest): boolean {
   const token = String(process.env.KHO_TOKEN || '').trim();
   if (!token) return false;                                  // chưa đặt KHO_TOKEN trong .env thì tắt hẳn đường này
   const gui = String(req.headers['x-kho-token'] || (req.query as any)?.token || '').trim();
-  return !!gui && gui === token;
+  // So kiểu "thời gian không đổi" (11/10/2026): so bằng === thì sai càng muộn trả lời càng chậm một chút → đo được để dò dần chìa khoá.
+  const a = Buffer.from(gui), b = Buffer.from(token);
+  return a.length > 0 && a.length === b.length && timingSafeEqual(a, b);
 }
 
 // Vào được kho danh mục hồ sơ: quản trị và vai trò 'danhmuc'.

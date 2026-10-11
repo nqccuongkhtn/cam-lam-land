@@ -924,7 +924,9 @@ export default function TraCuuLuatPage() {
       }
       if (tot > 0) kq.push({ x: z.x, d: tot });
     }
-    return kq.sort((a, b) => b.d - a.d).slice(0, 2).map((k) => k.x);
+    kq.sort((a, b) => b.d - a.d);
+    // gợi ý thứ hai chỉ khi sát gần bằng gợi ý đầu (≥ 80 % điểm) — "lên thổ cư" từng kèm "Hồ sơ bắt đầu trước ngày luật mới…" lạc đề
+    return kq.filter((k, i) => i === 0 || (i === 1 && k.d >= 0.8 * kq[0].d)).map((k) => k.x);
   }, [th, timHL, moRong]);
 
   const ketQua = useMemo(() => {

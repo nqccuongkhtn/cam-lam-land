@@ -19,17 +19,21 @@ export interface AuthedRequest extends Request { user?: JwtPayload; }
 type TinhTrang = { ds: string[]; khoa: boolean; mat: boolean; pv?: number; luc: number };
 const nhoVaiTro = new Map<number, TinhTrang>();
 const NHO_MS = 30_000;
+// Đếm số lần "quên" của từng tài khoản: kết quả hỏi database mà trong lúc chờ có lần quên mới (vd vừa đổi mật khẩu xong)
+// thì KHÔNG được nhớ lại — nếu không, kết quả cũ (trước khi đổi) sẽ nằm trong bộ nhớ thêm 30 giây nữa.
+const lanQuen = new Map<number, number>();
 
 async function vaiTroMoiNhat(id: number, cu: string[]): Promise<TinhTrang> {
   const co = nhoVaiTro.get(id);
   if (co && Date.now() - co.luc < NHO_MS) return co;
+  const dau = lanQuen.get(id) || 0;
   try {
     const [u] = await query('SELECT role, roles, status, phien_dang_nhap FROM users WHERE id=$1', [id]);
     const tt: TinhTrang = u
       ? { ds: dsVaiTro(u), khoa: u.status === 'suspended', mat: false, pv: Number(u.phien_dang_nhap) || 0, luc: Date.now() }
       : { ds: [], khoa: false, mat: true, luc: Date.now() };   // tài khoản đã bị xoá khỏi database
     if (nhoVaiTro.size > 2000) nhoVaiTro.clear();          // dọn cho khỏi phình bộ nhớ
-    nhoVaiTro.set(id, tt);
+    if ((lanQuen.get(id) || 0) === dau) nhoVaiTro.set(id, tt);
     return tt;
   } catch {
     // database trục trặc thì tạm dùng vai trò ghi trong thẻ (giữ nguyên cách cũ — không làm hỏng việc đang dùng)
@@ -41,7 +45,11 @@ async function vaiTroMoiNhat(id: number, cu: string[]): Promise<TinhTrang> {
 const theDoiCu = (payload: JwtPayload, tt: TinhTrang) => tt.pv !== undefined && (Number(payload.pv) || 0) !== tt.pv;
 
 /** Admin vừa đổi vai trò / khoá / mở khoá ai đó, hoặc vừa đổi mật khẩu → xoá phần nhớ tạm để áp dụng NGAY, không chờ 30 giây. */
-export function quenVaiTro(id: number): void { nhoVaiTro.delete(id); }
+export function quenVaiTro(id: number): void {
+  nhoVaiTro.delete(id);
+  if (lanQuen.size > 5000) lanQuen.clear();
+  lanQuen.set(id, (lanQuen.get(id) || 0) + 1);
+}
 
 /**
  * Kiểm một thẻ đăng nhập ĐẦY ĐỦ như authRequired (chữ ký + tài khoản còn tồn tại + không bị khoá + đúng đời phiên)

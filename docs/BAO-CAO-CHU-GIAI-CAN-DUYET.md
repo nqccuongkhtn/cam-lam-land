@@ -57,6 +57,84 @@ trồng thuỷ sản · DTL thuỷ lợi · DCT). Đối chiếu từng ô với
 Chưa đổi gì trên web. Anh chọn cách: (a) để nguyên "sông, ngòi" như hiện nay; (b) đổi theo bảng trên; (c) chỉ đổi 2 dòng chắc nhất
 (NTS → nuôi trồng thuỷ sản, DTL → thuỷ lợi).
 
+## E. THỬA 95 TỜ 15 XÃ CAM LÂM — ĐỐI CHIẾU CHI TIẾT TỪNG PHẦN QUY HOẠCH
+
+Hình thửa trên web (đo phẳng VN-2000 như MicroStation): **16.704,4884 m²** — đúng số sổ 16.704,5. Thửa có một lỗ thủng nhỏ (~11,6 m²,
+đất thửa khác) nằm trọn trong phần cây xanh của QĐ205 — đã trừ đúng chỗ. Mỗi bản một ảnh, số trên ảnh = số mảnh trong bảng
+(thư mục `bao-cao-qh/`): `thua-95-to-15-xa-cam-lam-qd205.png`, `…-qd893.png`, `…-qd2101.png`, và riêng phần đường QĐ205:
+`thua-95-to-15-xa-cam-lam-giao-thong-qd205.png`.
+
+**QĐ205** (vùng tô đọc thẳng QD205.gpkg, cung tròn chính xác)
+
+| Mảnh | Loại đất | Diện tích (m²) |
+|---|---|---|
+| 1 | Đất giao thông (khe không tô — trong hành lang đường lớn chạy chéo góc tây nam) | 514,6909 |
+| 2 | Đất giao thông (khe không tô — **dải 1,4 m giữa hồ và cây xanh**, xem mục F) | 104,5747 |
+| 3 | Đất cây xanh sử dụng công cộng | 4.759,2935 |
+| 4 | Đất hồ, ao, đầm | 1.302,7238 |
+| 5 | Đất đơn vị ở mới (mật độ trung bình) | 10.023,2057 |
+| | **Cộng** | **16.704,4884** |
+
+**QĐ893**
+
+| Mảnh | Loại đất | Diện tích (m²) |
+|---|---|---|
+| 1 | Đất công cộng, dịch vụ, sản xuất | 4.270,5811 |
+| 2 | Đất giao thông (dải cong giữa thửa) | 2.894,9299 |
+| 3 | Đất giao thông (góc tây nam) | 514,6950 |
+| 4 | Đất khu vui chơi, giải trí công cộng, sinh hoạt cộng đồng | 2.174,3890 |
+| 5 | Đất sông, ngòi, kênh, rạch | 1.302,7238 |
+| 6 | Đất ở tại đô thị | 5.547,1142 |
+| | (mẩu vụn < 0,05 m² do hai ô kề nhau lệch ~1 mm khi làm tròn toạ độ) | 0,0548 |
+| | **Cộng** | **16.704,4877** |
+
+**QĐ2101** (phân khu trung tâm 1/2000)
+
+| Mảnh | Loại đất | Diện tích (m²) |
+|---|---|---|
+| 1 | Đất giao thông (khe không tô trong ranh — dải cong giữa thửa) | 2.894,9570 |
+| 2 | Đất giao thông (khe không tô — góc tây nam) | 514,6950 |
+| 3 | Đất cây xanh sử dụng công cộng | 4.270,5811 |
+| 4 | Đất cây xanh sử dụng công cộng | 2.174,3890 |
+| 5 | Đất hồ, ao, đầm | 1.302,7238 |
+| 6 | Đất nhóm nhà ở (mật độ trung bình) | 5.547,1425 |
+| | **Cộng** | **16.704,4884** |
+
+Nhận xét: QĐ893 và QĐ2101 **trùng ranh với nhau gần như tuyệt đối** (đất ở 5.547,1 · đường 2.894,9 + 514,7 · nước 1.302,7 ·
+cây xanh / công cộng 4.270,6 + 2.174,4) — QĐ893 vẽ theo nền phân khu. QĐ205 là bản 1/10.000 nên KHÔNG có con đường 2.894,9 m² chạy
+giữa thửa (phần đó QĐ205 ghi cây xanh + đơn vị ở), còn mặt nước 1.302,7 m² thì cả ba bản trùng nhau.
+
+## F. VÌ SAO MẢNH 2 (104,57 m²) BỊ TÍNH LÀ ĐẤT GIAO THÔNG — SUY LUẬN CHI TIẾT
+
+**Mảnh 2 là gì:** dải KHÔNG có vùng tô nào, dài ~75,5 m, rộng trung bình **1,39 m**, chạy theo đường cong giữa vùng tô **hồ**
+(lớp `Matnuoc_hoaodam`) và vùng tô **cây xanh** (lớp `QH2030_DAT_DD_CayxanhCCdothi`); cả hai vùng tô chạm sát mép dải (khoảng
+cách 0,000 m). Điểm giữa: X = 1.334.829,34 · Y = 599.631,76 (VN-2000), tức 12,068679 / 109,166942.
+
+**Web suy ra "đường" theo chuỗi luật sau (luật áp cho QĐ205):**
+1. QĐ205 **không có loại vùng tô "đất giao thông"** — mạng đường thể hiện bằng phần để trắng giữa các vùng tô. Nên phần trong ranh lập
+   quy hoạch mà không tô màu được coi là lòng đường.
+2. Khu lõi Cam Đức (khung 109,1216–109,1853 Đ, 12,0267–12,0806 B) có thêm **mặt nạ đường** (ảnh điểm 1,8 m dựng từ nét mép đường
+   của bản vẽ) để phân biệt khoảng trắng nào là đường; và luật **khoảng trắng sát vùng tô < 2 m = đường** (`SAT_MEP_205`).
+3. Mảnh 2: không tô (luật 1) + mặt nạ ghi "đường" ở **400/400 điểm** + sát vùng tô < 2 m (luật 2) ⇒ "Đất giao thông".
+
+**Nhưng soi kỹ thì căn cứ "là đường" rất yếu:**
+- **Mặt nạ đường ở chỗ này vô nghĩa:** cắt ngang dải 40 m (bước 0,5 m) thấy mặt nạ ghi "đường" **suốt cả 40 m** — kể cả lòng hồ và
+  vùng cây xanh hai bên. Nghĩa là khi dựng mặt nạ, vùng quanh hồ / vòng xoay bị lấp kín (nét bờ hồ bị hiểu như mép đường). Mặt nạ
+  "đồng ý" chỉ vì nó đồng ý với mọi điểm ở đây, không phải vì có con đường hình dải.
+- **QĐ893 và QĐ2101 cùng chỗ đều KHÔNG có đường:** QĐ893 ghi trọn 104,6 m² là "Đất công cộng, dịch vụ, sản xuất"; QĐ2101 ghi trọn là
+  "Đất cây xanh sử dụng công cộng". Hai bản chi tiết hơn (vẽ trên nền địa chính 1/2000) không hề có đường ven hồ ở đây.
+- **1,39 m không phải bề rộng một con đường**: làn xe tối thiểu ~3,5 m; trên bản vẽ tỉ lệ 1/10.000, 1,4 m chỉ là **0,14 mm** — mảnh
+  hơn cả nét bút vẽ (0,18–0,35 mm). Một con đường ven hồ thật trong quy hoạch chung phải rộng cỡ 13–20 m.
+- Không thấy nét vẽ đường (mép đường / tim đường) nào chạy trong dải này trong file bản vẽ.
+
+**Kết luận của tôi:** nhiều khả năng mảnh 2 **KHÔNG phải đường quy hoạch** mà là **khe hở do hai vùng tô vẽ không khít nhau** (đường
+bao hồ và đường bao khu cây xanh là hai nét cong vẽ riêng, cách nhau ~1,4 m). Mức chắc: cao.
+
+**Nếu anh xác nhận trên MicroStation** (không có nét đường chạy trong dải), đề xuất luật mới cho QĐ205: khe trắng **hẹp dưới ~2,5 m
+nằm kẹp giữa hai vùng tô** (không nối vào mạng đường) thì **chia đôi cho hai vùng tô hai bên** thay vì tính là đường. Với thửa 95:
+đường 619,24 → 514,68 m²; hồ +~52 m²; cây xanh +~52 m². Phải chạy lại bộ kiểm 79 phiếu + 2.000 thửa trước khi đưa lên (trước đây
+từng bỏ một luật na ná vì làm dư 1,3 m² ở mép cong — lần này chỉ áp cho khe kẹp giữa hai vùng tô khác loại).
+
 ## D. CẦN ANH XÁC NHẬN TRÊN MICROSTATION
 
 - **Thửa 95 tờ 15 Xã Cam Lâm, QĐ205 — mảnh giao thông số 2** (104,57 m², dải rộng ~1,4 m giữa vùng hồ và vùng cây xanh, ảnh

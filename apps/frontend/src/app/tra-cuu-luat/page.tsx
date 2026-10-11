@@ -2877,7 +2877,7 @@ export default function TraCuuLuatPage() {
                       const td = trichDoan.get(x.ma + ':' + x.d.so);
                       return td ? (
                         <span className="mt-0.5 block text-[11.5px] leading-snug text-slate-500">
-                          {td.khoan ? <b className="mr-1 text-slate-400">K{td.khoan}</b> : null}{toVang(td.chu, toKetQua.get(x.ma + ':' + x.d.so) || null)}
+                          {td.khoan ? <b className="mr-1 whitespace-nowrap text-slate-400">khoản {td.khoan} ·</b> : null}{toVang(td.chu, toKetQua.get(x.ma + ':' + x.d.so) || null)}
                         </span>
                       ) : null;
                     })()}

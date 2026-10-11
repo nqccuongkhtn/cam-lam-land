@@ -3209,7 +3209,7 @@ export default function MapPage() {
                       const win = window.open('', '_blank');
                       if (!win) { alert('Trình duyệt đang chặn cửa sổ. Hãy cho phép pop-up rồi thử lại.'); return; }
                       try { win.document.write('<!doctype html><meta charset="utf-8"><body style="font:14px sans-serif;color:#334155;padding:24px">Đang tạo phiếu kiểm tra quy hoạch…</body>'); } catch { /* */ }
-                      const finish = (overlaps: any[]) => {
+                      const finish = (overlaps: any[], manh?: { lo: string; ring: number[][] }[] | null) => {
                         const hzA: Record<string, number> = {};
                         for (const x of (overlaps || []) as any[]) if (x?.hz) hzA[String(x.hz)] = (hzA[String(x.hz)] || 0) + (Number(x.areaM2) || 0);
                         const pieceHz = Object.keys(hzA).sort((a, b) => hzA[b] - hzA[a])[0] || mapScen;
@@ -3226,11 +3226,15 @@ export default function MapPage() {
                             areas: ((bn.areas || []) as { type: string; areaM2: number }[]).map((a) => ({ ...a, mau: mauQh?.[bang]?.[a.type] })),
                           } : null;
                         }).filter(Boolean) as any[];
-                        const html = phieuQhHtml({ parcel: info.parcel as any, geometry: g, overlaps, qhCacBan: (info as any).qhCacBan, qhPieces: qhPiecesFor(g, pieceHz), roadFeats: roadFeatsFor(g), neighbors: (info as any).neighbors || [], point: info.point, user: user as any, scenario: mapScen, roadHz: pieceHz, phuLuc });
+                        const html = phieuQhHtml({ parcel: info.parcel as any, geometry: g, overlaps, qhCacBan: (info as any).qhCacBan, qhPieces: manh ? manh.map((m) => ({ lo: m.lo, c: mauQh?.qd205?.[m.lo], ring: m.ring })) : qhPiecesFor(g, pieceHz), roadFeats: roadFeatsFor(g), neighbors: (info as any).neighbors || [], point: info.point, user: user as any, scenario: mapScen, roadHz: pieceHz, phuLuc });
                         try { win.document.open(); win.document.write(html); win.document.close(); win.focus(); } catch { /* */ }
                       };
                       // chỉ dùng số máy chủ (12/10/2026: bỏ tính bù từ qh_vector cũ — xem chỗ gọi /parcels/at)
-                      const areas = info.overlaps || []; finish(areas.length ? areas : []);
+                      const areas = info.overlaps || [];
+                      // SƠ ĐỒ ô đất lấy HÌNH MỚI từ máy chủ (12/10/2026) — trước vẽ từ file cũ qh_vector.geojson nên có thể khác con số in cạnh bên
+                      const idThua = (info.parcel as any)?.id;
+                      (idThua ? api<{ manh: { lo: string; ring: number[][] }[] }>(`/parcels/${idThua}/qh-manh`).then((r) => r.manh || null).catch(() => null)
+                        : Promise.resolve(null)).then((manh) => finish(areas.length ? areas : [], manh));
                     }}
                     id="nut-phieu-qh"
                     className="min-w-0 whitespace-nowrap px-1 sm:px-0 sm:mb-1.5 sm:w-full flex items-center justify-center gap-1.5 sm:gap-2 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold bg-[#0A2540] hover:bg-[#0d3a6b] text-white">

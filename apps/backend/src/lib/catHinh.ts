@@ -83,7 +83,7 @@ export function diemCoTrongSo(mp: MP, kx: number, ky: number, toiDa = 300): { p:
  */
 /** Xén một vòng theo khung chữ nhật (Sutherland–Hodgman). Phần nằm TRONG khung giữ y nguyên → giao với thửa (nằm gọn
  *  trong khung) không đổi; chỉ bớt đỉnh ở xa. Ô QĐ893 có ô 9.683 đỉnh làm phép cắt chạy ~8 giây rồi lỗi (thửa 487988). */
-function xenKhung(r: number[][], x0: number, y0: number, x1: number, y1: number): number[][] {
+export function xenKhung(r: number[][], x0: number, y0: number, x1: number, y1: number): number[][] {
   let out = r;
   const canh: [(p: number[]) => boolean, (a: number[], b: number[]) => number[]][] = [
     [(p) => p[0] >= x0, (a, b) => [x0, a[1] + (b[1] - a[1]) * (x0 - a[0]) / (b[0] - a[0])]],

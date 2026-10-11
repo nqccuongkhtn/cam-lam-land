@@ -3,7 +3,7 @@ import { query } from '../lib/db.ts';
 import { cached, cachePut } from '../lib/cache.ts';
 import { vnNoAccent } from '../lib/vn.ts';
 import { verifyToken, coVaiTro } from '../lib/auth.ts';
-import { computeQhAreas, computeQhTheoBan, outerRing, qhReady, ngoaiVungQh, chuanToaDoDiaChinh } from '../lib/qhCompute.ts';
+import { computeQhAreas, computeQhTheoBan, outerRing, qhReady, ngoaiVungQh, chuanToaDoDiaChinh, manhQh205 } from '../lib/qhCompute.ts';
 import { sqlDienTichPhang, sqlHeSoPhang } from '../lib/dienTichPhang.ts';
 import { qhCoLuu, tinhQhHinh } from '../lib/qhLuu.ts';
 
@@ -280,6 +280,18 @@ parcelsRouter.get('/at', async (req, res, next) => {
                // (10/10/2026) thêm: có thửa mà KHÔNG bản nào phủ (vd thửa Phước Đồng sát ranh QĐ205, nay phần ngoài ranh không còn bị
                // ghi đường giả) → cũng là "chưa có dữ liệu", kẻo trang hiện khung quy hoạch trống
                qhNgoaiVung: (ngoaiQh || !!parcel) && overlaps.length === 0 && qhCacBan.length === 0 });
+  } catch (e) { next(e); }
+});
+
+// GET /api/parcels/:id/qh-manh — Ô ĐẤT QĐ205 quanh một thửa địa chính, để vẽ SƠ ĐỒ trên phiếu in (12/10/2026). Trước phiếu vẽ từ file cũ
+// public/qh_vector.geojson (tháng 7) nên hình có thể khác con số máy chủ tính. Giao diện chỉ gọi khi bấm in phiếu; chung hạn mức /api/parcels.
+parcelsRouter.get('/:id(\\d+)/qh-manh', async (req, res, next) => {
+  try {
+    if (!qhReady()) return res.json({ manh: [] });
+    const [p] = await query<any>('SELECT ST_AsGeoJSON(geom)::json g FROM dia_chinh WHERE id=$1', [Number(req.params.id)]);
+    if (!p) return res.status(404).json({ error: 'Không có thửa này' });
+    const ring = chuanToaDoDiaChinh(outerRing(p.g) || []);
+    res.json({ manh: manhQh205(ring, 25, 150, true) });
   } catch (e) { next(e); }
 });
 

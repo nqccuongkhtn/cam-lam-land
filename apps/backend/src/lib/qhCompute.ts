@@ -4,7 +4,7 @@
 //   ngoài đường ⇒ LOẠI ĐẤT = ô QH chứa điểm (hoặc ô QH gần nhất nếu qh_vector vẽ thiếu vài mét).
 // Nhờ vậy thửa kiểu 326 (qh_vector vẽ thiếu ~10%) vẫn ra đủ 72% hỗn hợp thay vì bị tính nhầm thành giao thông.
 // Dữ liệu: qh_zones.json (loại đất) + road_mask.bin/json (đường). Ngoài phạm vi mask ⇒ tự lùi về cách "không-thuộc-ô = giao thông".
-import { catTheoUuTien, catTrongVung, tiLeNamTrong, dienTichMP, diemTrongMP, diemCoTrongSo, type MP } from './catHinh.ts';
+import { catTheoUuTien, catTrongVung, tiLeNamTrong, xenKhung, dienTichMP, diemTrongMP, diemCoTrongSo, type MP } from './catHinh.ts';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import path from 'node:path';
@@ -505,6 +505,30 @@ export function computeQhAreas(ring: number[][], dienTich: number): { type: stri
 // 60,7 m² → 4,4 m². Diện tích thửa KHÔNG đổi (chỉ tịnh tiến). CHỈ dùng cho thửa lấy từ dia_chinh — đừng dịch hình
 // thửa của phiếu / toạ độ VN-2000 người dùng nhập (những thứ đó đã đúng chỗ).
 const LECH_DC_X = 0.000004899, LECH_DC_Y = 0.000001273; // độ
+/**
+ * Ô ĐẤT QĐ205 QUANH THỬA để vẽ SƠ ĐỒ trên phiếu in (12/10/2026) — trước phiếu vẽ từ file cũ public/qh_vector.geojson (tháng 7, chuỗi cũ:
+ * lấp lỗ, tên cũ) nên hình trên sơ đồ có thể khác con số in cạnh bên. `ringQh` = vòng thửa ĐÃ NẮN (cùng hệ với ô đất); mỗi ô xén theo khung
+ * quanh thửa (+ `le` mét), xếp ô bậc thấp / ô lớn vẽ trước (ô cụ thể nằm trên — đúng thứ tự máy tính chọn). `veDiaChinh`: dời ô về hệ của
+ * hình thửa địa chính GỐC (ngược chuanToaDoDiaChinh) vì phiếu vẽ hình thửa gốc.
+ */
+export function manhQh205(ringQh: number[][], le = 25, toiDa = 150, veDiaChinh = false): { lo: string; ring: number[][] }[] {
+  if (!KHO || !ringQh || ringQh.length < 3) return [];
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const [x, y] of ringQh) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  const dx = le / (111320 * Math.cos(((y0 + y1) / 2) * Math.PI / 180)), dy = le / 110574;
+  x0 -= dx; x1 += dx; y0 -= dy; y1 += dy;
+  const ra: { lo: string; ring: number[][]; bac: number; dien: number }[] = [];
+  for (const k of KHO.oTrongKhung(x0, y0, x1, y1)) {
+    const r = xenKhung(KHO.vong(k), x0, y0, x1, y1);
+    if (r.length < 3) continue;
+    const ddx = veDiaChinh ? LECH_DC_X : 0, ddy = veDiaChinh ? LECH_DC_Y : 0;
+    ra.push({ lo: KHO.tenLoai[KHO.loai[k]], ring: r.map(([x, y]) => [Math.round((x + ddx) * 1e8) / 1e8, Math.round((y + ddy) * 1e8) / 1e8]),
+      bac: KHO.bac[k], dien: KHO.dien[k] });
+    if (ra.length >= toiDa) break;
+  }
+  ra.sort((a, b) => a.bac - b.bac || b.dien - a.dien);
+  return ra.map(({ lo, ring }) => ({ lo, ring }));
+}
 export function chuanToaDoDiaChinh(ring: number[][]): number[][] {
   return ring.map(([x, y]) => [x - LECH_DC_X, y - LECH_DC_Y]);
 }

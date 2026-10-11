@@ -181,6 +181,10 @@ là 903 ha; ngoài khu lõi Cam Đức (nơi web áp luật này) còn 325,5 ha 
 
 ⇒ Khoảng trắng rộng của QĐ205 là **đường lớn thật** (đại lộ, hành lang cao tốc, nút giao) — luật hiện tại đúng, **không đổi gì**.
 
+**Cũng đã kiểm (nghi vấn "thuật toán đổi toạ độ sai"):** công thức đổi VN-2000 → WGS84 của xưởng dữ liệu (Python, dùng dựng ô
+đất từ bản vẽ) và của máy chủ (dùng đổi toạ độ phiếu / toạ độ anh nhập) — cùng bộ 7 tham số Khánh Hòa; so trên 3 điểm thật trải khắp
+huyện: lệch nhau **dưới 0,5 mm**. Không phải nguồn sai số.
+
 ## I. ĐÃ SỬA: VÙNG "TRẮNG TRƠN" TRONG 7 BẢN PHÂN KHU KHÔNG CÒN BỊ GHI LÀ ĐƯỜNG (anh xem ảnh, sai thì báo — gỡ được ngay)
 
 Bản phân khu để trắng lòng đường nên web tính "trong ranh mà không tô = đường". Soi kỹ (11/10/2026 tối) thấy có chỗ bản vẽ để trắng mà

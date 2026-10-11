@@ -89,6 +89,12 @@ def main(vao, ma):
         if e.dxftype() != 'HATCH': continue
         lv = e.dxf.get('layer', '') or ''
         if 'ranh gi' in lv.lower() or lv.upper().startswith('RG') or b1.bo_level(lv): continue   # như 1b-doc-dxf.py
+        # LEVEL BỊ TẮT / ĐÓNG BĂNG (11/10/2026): MicroStation không hiện → không phải nội dung bản vẽ. QĐ2076 có 290 vùng tô
+        # 'DAT_O_Nhomnhao Thaptang' (905 ha, web ghi "Nhóm nhà ở thấp tầng") + 30 vùng 'DAT_NO_Nhaochungcu' (178 ha, chính là ô
+        # "Nhà ở chung cư 5,7 ha vẽ trùm cả lô lẫn đường") nằm trên level đóng băng — khung chú giải cũng không có hai loại này.
+        L = d.layers.get(lv) if d.layers.has_entry(lv) else None
+        if L is not None and (L.is_frozen() or L.is_off()):
+            dem['level_tat'] = dem.get('level_tat', 0) + 1; continue
         try: ds = list(ezpath.from_hatch(e))
         except Exception: dem['loi'] += 1; continue
         polys = []
@@ -120,20 +126,20 @@ def main(vao, ma):
                 dem['ngoai_ranh'] += 1; continue
             for m in manh_khong_lo(trong):
                 if m.area * 1.21e10 < 0.5: continue          # vụn < 0,5 m² do cắt
-                r = [[round(x, 6), round(y, 6)] for x, y in m.exterior.coords]   # 6 số lẻ (~0,1 m) như 5-tao-qh-zones.py
+                r = [[round(x, 8), round(y, 8)] for x, y in m.exterior.coords]   # 8 số lẻ (~1 mm): 6 số lẻ (~10 cm) lệch tới 1,3 m² ở thửa có mép dài
                 if len(r) < 4: continue
                 mx0, my0, mx1, my1 = m.bounds
-                out.append([round(mx0, 6), round(my0, 6), round(mx1, 6), round(my1, 6), r, loai, dt, bac])
+                out.append([round(mx0, 8), round(my0, 8), round(mx1, 8), round(my1, 8), r, loai, dt, bac])
     ra = os.path.join(DATA, 'qh_zones_%s.json' % ma)
     json.dump(out, io.open(ra, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
     # vùng khớp nối lọt trong ranh → lỗ của ranh (đọc lại file ranh rồi mới ghi, giữ nguyên các khoá khác như "_lo")
     R = json.load(io.open(os.path.join(DATA, 'ranh_qh.json'), encoding='utf-8'))
     R.setdefault('_khop', {})
-    if khop: R['_khop'][ma] = [[[round(x, 6), round(y, 6)] for x, y in m.exterior.coords] for p in khop for m in manh_khong_lo(p)]
+    if khop: R['_khop'][ma] = [[[round(x, 8), round(y, 8)] for x, y in m.exterior.coords] for p in khop for m in manh_khong_lo(p)]
     else: R['_khop'].pop(ma, None)
     json.dump(R, io.open(os.path.join(DATA, 'ranh_qh.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
-    print('%s: %d vùng tô (%d có lỗ) → %d ô | bỏ %d phần nằm trọn ngoài ranh | %d vùng lỗi đọc | khớp nối trong ranh %.2f ha'
-          % (ma, dem['vung'], dem['co_lo'], len(out), dem['ngoai_ranh'], dem['loi'], sum(p.area for p in khop) * 1.21e10 / 1e4))
+    print('%s: %d vùng tô (%d có lỗ) → %d ô | bỏ %d phần nằm trọn ngoài ranh | %d vùng lỗi đọc | %d vùng trên level tắt | khớp nối trong ranh %.2f ha'
+          % (ma, dem['vung'], dem['co_lo'], len(out), dem['ngoai_ranh'], dem['loi'], dem.get('level_tat', 0), sum(p.area for p in khop) * 1.21e10 / 1e4))
 
 
 if __name__ == '__main__':

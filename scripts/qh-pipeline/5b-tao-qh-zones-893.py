@@ -259,12 +259,12 @@ def main(vao, tep_chu, tep_kh):
         if i in bo:
             continue
         for p in tach_lo(g):
-            r = [[round(c[0], 6), round(c[1], 6)] for c in p.exterior.coords]   # bỏ toạ độ độ cao nếu có
+            r = [[round(c[0], 8), round(c[1], 8)] for c in p.exterior.coords]   # bỏ toạ độ độ cao nếu có
             if len(r) < 4:
                 continue
             x0, y0, x1, y1 = p.bounds
             # diện tích dùng để xếp lớp: cả VÙNG TÔ GỐC (vòng ngoài) — cắt mảnh không được làm đổi thứ tự hiển thị
-            out.append([round(x0, 6), round(y0, 6), round(x1, 6), round(y1, 6), r, loai[i],
+            out.append([round(x0, 8), round(y0, 8), round(x1, 8), round(y1, 8), r, loai[i],
                         Polygon(g.exterior).area if THEO_BAN_VE else p.area, bac[i]])
             so_manh += 1
     tmp = RA + '.tmp'

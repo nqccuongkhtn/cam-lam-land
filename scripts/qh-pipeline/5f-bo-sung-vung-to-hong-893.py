@@ -84,9 +84,9 @@ def main(vao, tep_chu):
         else:    loai, bac = b5.NHOM_MAU.get(mau, 'Loại đất khác'), 0
         for p in b5.tach_lo(con):
             if p.area * 1.21e10 < 50: continue
-            r = [[round(c[0], 6), round(c[1], 6)] for c in p.exterior.coords]
+            r = [[round(c[0], 8), round(c[1], 8)] for c in p.exterior.coords]
             x0, y0, x1, y1 = p.bounds
-            them.append([round(x0, 6), round(y0, 6), round(x1, 6), round(y1, 6), r, loai, p.area, bac, DAU])
+            them.append([round(x0, 8), round(y0, 8), round(x1, 8), round(y1, 8), r, loai, p.area, bac, DAU])
         print('  %s %s  %.1f ha → %s (bậc %d)' % (f['properties'].get('EntityHandle'), mau, con.area * 1.21e10 / 1e4, loai, bac))
     Z += them
     json.dump(Z, io.open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))

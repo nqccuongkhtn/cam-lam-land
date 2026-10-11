@@ -532,6 +532,10 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   Vùng tô 'Hatch_Khop' (QĐ2222) = VÙNG KHỚP NỐI với quy hoạch bên cạnh, không phải loại đất: 5g không cho thành ô, phần lọt trong
   ranh ghi vào ranh_qh.json "_khop" = lỗ của ranh (ngoài phạm vi). QĐ918 'DAT_KXD_DulichRung_qh' (lô DLST-01, 31,97 ha, "Khu du lịch
   sinh thái ven hồ Cam Ranh") KHÔNG có trong chú giải — giữ tên level, chờ chủ dự án xác nhận tên.
+  **Level TẮT / ĐÓNG BĂNG phải bỏ** (5g, 11/10/2026): QĐ2076 có 290 vùng tô 'DAT_O_Nhomnhao Thaptang' (905 ha, "Nhóm nhà ở thấp
+  tầng") + 30 vùng 'DAT_NO_Nhaochungcu' (178 ha, "Nhà ở chung cư") trên level đóng băng — MicroStation không hiện, chú giải không có.
+  Web từng ghi ~57,6 ha ĐƯỜNG NỘI BỘ (dải 7–17 m) thành nhà ở; "ô trùm" QĐ2076 từ 52 còn 4 (phần lớn ô trùm chính là lớp đóng băng).
+  Toạ độ ô đất mọi bản nay 8 số lẻ (~1 mm) — 6 số lẻ (~10 cm) lệch tới 1,3 m² ở thửa có mép dài; 79 phiếu 9.315 → 9.239 m².
 - **QĐ893 DỰNG LẠI (11/10/2026), chuỗi mới: `1d-vung-to-893-chan-le.py` → `5b` → `5f`.** So toàn bản với bản vẽ (lưới 20 m khắp huyện)
   96,6 % → 99,98 %. Đã sửa: (1) **khung chú dẫn Level 56 lọt vào dữ liệu** — 94 ô màu mẫu 11 ha, sơ đồ vị trí góc tây bắc, 2 ô 108 +
   68 ha sát Cam Ranh = 336 ô 2.031 ha "đất" bịa đè lên đất thật Khánh Vĩnh / Cam Ranh (5b nay bỏ Level 56); (2) file vùng tô cũ dựng

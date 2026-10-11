@@ -1441,6 +1441,22 @@ export default function TraCuuLuatPage() {
       + `\n\n(${vb?.ten} — ${vb?.soHieu})`;
     navigator.clipboard?.writeText(t).then(() => { setDaChep('chu'); setTimeout(() => setDaChep(''), 1800); }).catch(() => {});
   };
+  // Thanh "Kết quả i/N · ‹ Trước · Sau ›" khi điều đang đọc nằm trong kết quả tìm / lọc (đợt 17–18) — vẽ ở đầu và cuối bài.
+  const thanhKetQua = (lop: string) => {
+    if (!(tim.trim() || chiGhim || chiGt) || !vb || !dieuDangXem) return null;
+    const i = ketQua.findIndex((x) => x.ma === vb.ma && x.d.so === dieuDangXem.so);
+    if (i < 0 || ketQua.length < 2) return null;
+    const mo = (j: number) => { const x = ketQua[j]; if (x) moDieu(x.ma, x.d.so, khoanKhop(x.ma, x.d.so)); };
+    return (
+      <div className={`${lop} flex items-center gap-2 rounded-lg bg-slate-50 px-2.5 py-1.5 text-[12px] text-slate-600`}>
+        <span className="min-w-0 flex-1 truncate">🔎 Kết quả <b className="text-[#0A2540]">{i + 1}/{ketQua.length}</b>{tim.trim() ? <> cho “{tim.trim()}”</> : null}</span>
+        <button disabled={i === 0} onClick={() => mo(i - 1)}
+          className="shrink-0 rounded-md border border-slate-200 bg-white px-2 py-0.5 font-semibold text-[#0A2540] disabled:opacity-40">‹ Trước</button>
+        <button disabled={i >= ketQua.length - 1} onClick={() => mo(i + 1)}
+          className="shrink-0 rounded-md border border-slate-200 bg-white px-2 py-0.5 font-semibold text-[#0A2540] disabled:opacity-40">Sau ›</button>
+      </div>
+    );
+  };
   // Gửi đường dẫn tới điều đang đọc: điện thoại mở bảng chia sẻ (Zalo, Messenger…); máy tính chép đường dẫn.
   const guiLink = async (d: Dieu) => {
     const url = `${window.location.origin}/tra-cuu-luat?vb=${encodeURIComponent(maVb)}&d=${d.so}`;
@@ -2766,20 +2782,7 @@ export default function TraCuuLuatPage() {
 
                 {/* LƯỚT KẾT QUẢ TÌM (đợt 17, 11/10/2026): điều đang đọc nằm trong danh sách kết quả thì cho sang kết quả trước / sau ngay tại
                     chỗ, mở đúng khoản khớp — khỏi bấm "Danh sách điều" rồi tìm lại chỗ đang xem. */}
-                {(tim.trim() || chiGhim || chiGt) && (() => {
-                  const i = ketQua.findIndex((x) => x.ma === vb.ma && x.d.so === dieuDangXem.so);
-                  if (i < 0 || ketQua.length < 2) return null;
-                  const mo = (j: number) => { const x = ketQua[j]; if (x) moDieu(x.ma, x.d.so, khoanKhop(x.ma, x.d.so)); };
-                  return (
-                    <div className="mt-2 flex items-center gap-2 rounded-lg bg-slate-50 px-2.5 py-1.5 text-[12px] text-slate-600">
-                      <span className="min-w-0 flex-1 truncate">🔎 Kết quả <b className="text-[#0A2540]">{i + 1}/{ketQua.length}</b>{tim.trim() ? <> cho “{tim.trim()}”</> : null}</span>
-                      <button disabled={i === 0} onClick={() => mo(i - 1)}
-                        className="shrink-0 rounded-md border border-slate-200 bg-white px-2 py-0.5 font-semibold text-[#0A2540] disabled:opacity-40">‹ Trước</button>
-                      <button disabled={i >= ketQua.length - 1} onClick={() => mo(i + 1)}
-                        className="shrink-0 rounded-md border border-slate-200 bg-white px-2 py-0.5 font-semibold text-[#0A2540] disabled:opacity-40">Sau ›</button>
-                    </div>
-                  );
-                })()}
+                {thanhKetQua('mt-2')}
 
                 {/* ── CẢNH BÁO TÌNH TRẠNG ĐIỀU ──
                     Phải đặt TRƯỚC mọi thứ khác. Nghị định 151/2025 bãi bỏ 25 điều của Nghị
@@ -2941,6 +2944,7 @@ export default function TraCuuLuatPage() {
                   ))}
                 </div>
 
+                {thanhKetQua('mt-3')}
                 {/* ĐỌC LIỀN MẠCH (11/10/2026): sang điều trước / điều sau ngay tại chỗ, khỏi quay lại danh sách (nhất là trên điện thoại) */}
                 {(() => {
                   const i = vb.dieu.findIndex((d) => d.so === dieuDangXem.so);

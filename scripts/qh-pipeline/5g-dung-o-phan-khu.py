@@ -1,0 +1,117 @@
+# -*- coding: utf-8 -*-
+"""
+DỰNG LẠI Ô ĐẤT BẢN PHÂN KHU 1/2000 THẲNG TỪ DXF — TÔ ĐÚNG NHƯ BẢN VẼ (11/10/2026). Thay chuỗi 1b → 4 → 5 cho phần TÍNH.
+
+Chủ dự án kiểm nhiều thửa thấy sai, nghi "thuật toán biến đổi DXF → dữ liệu web bị sai" và "xác định sai loại quy hoạch".
+So thẳng bản vẽ gốc với web (rải điểm 10 m khắp ranh 7 bản) tìm ra BA lỗi của chuỗi cũ:
+
+ 1. LỖ TRONG VÙNG TÔ BỊ LẤP. Vùng tô CAD có nhiều đường bao: vòng ngoài + các vòng trong là LỖ (tô chẵn–lẻ). 1b-doc-dxf.py
+    xuất MỖI đường bao thành một hình đặc, 5-tao-qh-zones.py coi mỗi hình là một ô → cái lỗ thành ô cùng loại với vùng
+    ngoài. Lô thật nằm trong lỗ có hình TRÙNG KHÍT cái "lỗ giả" nên ai thắng là hú hoạ. Đo được ~75 ha ghi sai loại:
+    Tây Bắc 36,8 ha ĐẤT QUỐC PHÒNG thành đất nông nghiệp · QĐ2101 7,1 ha NGHĨA TRANG thành cây xanh · QĐ2222 7 ha HỒ NƯỚC
+    thành đất du lịch · QĐ918 6,6 ha nông nghiệp thành sông suối, quốc phòng / nghĩa trang thành cây xanh · Tây Nam nghĩa
+    trang, trường học, văn hoá thành cây xanh / làng xóm · QĐ2076 di tích thành cây xanh.
+ 2. VÙNG TÔ NGOÀI RANH vẫn tính. Bản vẽ phân khu vẽ cả phần KHỚP NỐI với khu bên cạnh (chỉ để tham khảo, ngoài phạm vi
+    pháp lý). 4-cat-theo-ranh.py giữ hình nào chạm ranh một điểm → QĐ2222 còn 1.742 ha ngoài ranh (946 ha "Hatch_Khop",
+    658 ha biển), Tây Nam 804 ha rừng phòng hộ… Thửa 4 tờ 39 xã Cam Lâm (trong đầm) hiện dòng QĐ2222 "Hatch_Khop" 3.580 m².
+ 3. THỨ TỰ LỚP khác ảnh bản đồ. Ảnh tile (và MicroStation — chủ dự án đã đối chiếu) để lớp có MỐC NĂM (QH2030_/QH2045_/
+    QHDD_) NẰM TRÊN lớp phân loại chung DAT_; phần tính lại coi ngang hàng, ô nhỏ thắng → QĐ2076 ~250 ha ghi "Nhóm nhà ở
+    thấp tầng" trong khi bản đồ hiện "Đơn vị ở mật độ thấp đến năm 2045", "Đơn vị ở mới mật độ trung bình"… Phiếu VPĐK ghi
+    theo lớp trên ("nhóm nhà ở mới (mật độ trung bình)").
+
+Cách dựng: mỗi vùng tô = chẵn–lẻ mọi đường bao (kiểu tô 2 "bỏ qua lỗ" thì tô đặc) → đổi VN-2000 → WGS84 (đúng hàm của
+1b-doc-dxf.py) → cắt theo RANH LẬP QUY HOẠCH (ranh_qh.json) → cắt mảnh có lỗ thành mảnh không lỗ (qhCompute không đọc lỗ).
+Tên loại đất y hệt 5-tao-qh-zones.py (ten_loai, level chỉ là số = 'Loại đất khác' bậc 0). Bậc ưu tiên: hiện trạng HT_ = 1,
+DAT_/khác = 2, có mốc năm = 3. Diện tích dùng để xếp "ô nhỏ nằm trên" = diện tích VÒNG NGOÀI của từng phần vùng tô (như cũ),
+không phải của mảnh sau khi cắt — cắt mảnh không được làm đổi thứ tự hiển thị.
+
+Cách gọi:  python 5g-dung-o-phan-khu.py <ban_ve.dxf> <ma>      (ma: 2076 2101 2222 918 cuhin taynam taybac)
+Ghi đè apps/backend/data/qh_zones_<ma>.json. Đổi bản vẽ / ranh thì chạy lại, rồi chạy 7-lo-trong-ranh.py.
+"""
+import io, json, os, re, sys, importlib.util
+import ezdxf
+from ezdxf import path as ezpath
+from shapely.geometry import Polygon, MultiPolygon, GeometryCollection, box
+from shapely.ops import unary_union, transform
+from shapely.validation import make_valid
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+DATA = os.path.join(HERE, '..', '..', 'apps', 'backend', 'data')
+def nap(ten, tep):
+    sp = importlib.util.spec_from_file_location(ten, os.path.join(HERE, tep)); m = importlib.util.module_from_spec(sp); sp.loader.exec_module(m); return m
+b1 = nap('b1', '1b-doc-dxf.py'); b5 = nap('b5', '5-tao-qh-zones.py')
+BAC = {'HT': 1, 'DAT': 2}          # còn lại (QH2030 / QH2045 / QHDD) = 3 — nằm trên, như ảnh tile
+
+
+def chan_le(polys):
+    g = None
+    for q in polys:
+        g = q if g is None else g.symmetric_difference(q)
+    return g
+
+
+def manh_khong_lo(g, sau=0):
+    """Cắt hình có lỗ thành các mảnh KHÔNG lỗ: cắt đôi khung bao đi qua tâm một lỗ, lặp tới khi hết lỗ."""
+    if g.is_empty: return []
+    if isinstance(g, (MultiPolygon, GeometryCollection)):
+        return [m for p in g.geoms for m in manh_khong_lo(p, sau)]
+    if not isinstance(g, Polygon): return []
+    if not g.interiors: return [g]
+    if sau > 200: raise RuntimeError('cắt mãi không hết lỗ')
+    x0, y0, x1, y1 = g.bounds
+    c = Polygon(g.interiors[0]).representative_point()
+    hai = (box(x0, y0, c.x, y1), box(c.x, y0, x1, y1)) if x1 - x0 >= y1 - y0 else (box(x0, y0, x1, c.y), box(x0, c.y, x1, y1))
+    ra = []
+    for b in hai:
+        ra += manh_khong_lo(make_valid(g.intersection(b)), sau + 1)
+    return [p for p in ra if isinstance(p, Polygon) and p.area > 0]
+
+
+def main(vao, ma):
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    R = json.load(io.open(os.path.join(DATA, 'ranh_qh.json'), encoding='utf-8'))
+    RG = make_valid(Polygon(R[ma]))
+    wgs = lambda g: transform(lambda x, y, z=None: tuple(zip(*[b1.vn2wgs(a, b) for a, b in zip(x, y)])), g)
+    d = ezdxf.readfile(vao); msp = d.modelspace()
+    out = []; dem = {'vung': 0, 'co_lo': 0, 'ngoai_ranh': 0, 'loi': 0}
+    for e in msp:
+        if e.dxftype() != 'HATCH': continue
+        lv = e.dxf.get('layer', '') or ''
+        if 'ranh gi' in lv.lower() or lv.upper().startswith('RG') or b1.bo_level(lv): continue   # như 1b-doc-dxf.py
+        try: ds = list(ezpath.from_hatch(e))
+        except Exception: dem['loi'] += 1; continue
+        polys = []
+        for p in ds:
+            try: pts = [(v.x, v.y) for v in p.flattening(distance=0.05, segments=8)]
+            except Exception: continue
+            if len(pts) >= 4: polys.append(make_valid(Polygon(pts)))
+        if not polys: continue
+        dem['vung'] += 1
+        g = unary_union(polys) if e.dxf.get('hatch_style', 0) == 2 or len(polys) == 1 else make_valid(chan_le(polys))
+        if len(polys) > 1: dem['co_lo'] += 1
+        if g.is_empty: continue
+        W = make_valid(wgs(g))
+        x0, y0, x1, y1 = W.bounds
+        if not (b1.KHUNG[0] <= x0 and x1 <= b1.KHUNG[2] and b1.KHUNG[1] <= y0 and y1 <= b1.KHUNG[3]): continue
+        if re.fullmatch(r'\s*\d+\s*', lv): loai, bac = b5.CHUA_RO, 0      # level chỉ là con số: bản vẽ không nói đất gì
+        else: loai, bac = b5.ten_loai(lv), BAC.get(b1.nhom(lv), 3)
+        for phan in (W.geoms if hasattr(W, 'geoms') else [W]):
+            if not isinstance(phan, Polygon) or phan.area <= 0: continue
+            dt = Polygon(phan.exterior).area                  # xếp thứ tự theo VÒNG NGOÀI của phần này (như cũ)
+            trong = make_valid(phan.intersection(RG))
+            if trong.is_empty or trong.area < phan.area * 1e-9:
+                dem['ngoai_ranh'] += 1; continue
+            for m in manh_khong_lo(trong):
+                if m.area * 1.21e10 < 0.5: continue          # vụn < 0,5 m² do cắt
+                r = [[round(x, 6), round(y, 6)] for x, y in m.exterior.coords]   # 6 số lẻ (~0,1 m) như 5-tao-qh-zones.py
+                if len(r) < 4: continue
+                mx0, my0, mx1, my1 = m.bounds
+                out.append([round(mx0, 6), round(my0, 6), round(mx1, 6), round(my1, 6), r, loai, dt, bac])
+    ra = os.path.join(DATA, 'qh_zones_%s.json' % ma)
+    json.dump(out, io.open(ra, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+    print('%s: %d vùng tô (%d có lỗ) → %d ô | bỏ %d phần nằm trọn ngoài ranh | %d vùng lỗi đọc'
+          % (ma, dem['vung'], dem['co_lo'], len(out), dem['ngoai_ranh'], dem['loi']))
+
+
+if __name__ == '__main__':
+    main(sys.argv[1], sys.argv[2])

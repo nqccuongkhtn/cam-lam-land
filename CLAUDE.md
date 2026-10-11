@@ -518,6 +518,17 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   vùng (đất quốc phòng 2,2 ha Cam Hòa), và phần còn lại của vùng tô "chỉ có màu" khi bị ô có mã đè một phần (thửa 187 tờ 1 /
   221 tờ 3 Suối Dầu). Web từng ghi "ngoài phạm vi". Bổ sung bằng `scripts/qh-pipeline/5f-bo-sung-vung-to-hong-893.py`
   — chạy lại 5b thì PHẢI chạy lại 5f. Còn lại chỉ là khung chú dẫn (Level 56) và khe không tô màu thật. Ô trùm: mẩu vẽ thừa < 50 m² không tính là "lô con" (dải cây xanh QĐ2222).
+- **7 BẢN PHÂN KHU DỰNG LẠI THẲNG TỪ DXF (11/10/2026) — `scripts/qh-pipeline/5g-dung-o-phan-khu.py` thay chuỗi 1b → 4 → 5 cho
+  phần TÍNH.** Chủ dự án kiểm nhiều thửa thấy sai; so thẳng bản vẽ với web (rải điểm 10 m khắp ranh 7 bản) ra 3 lỗi của chuỗi cũ:
+  (1) **lỗ trong vùng tô bị lấp** — 1b xuất MỖI đường bao thành hình đặc nên cái lỗ thành ô cùng loại vùng ngoài, lô thật trong lỗ
+  trùng khít "lỗ giả" → ai thắng là hú hoạ: ~75 ha sai loại (Tây Bắc 36,8 ha đất quốc phòng → nông nghiệp, QĐ2101 7,1 ha nghĩa
+  trang → cây xanh, QĐ2222 7 ha hồ nước → du lịch…); (2) **vùng tô NGOÀI ranh** (phần khớp nối vẽ tham khảo) vẫn tính — QĐ2222
+  1.742 ha ("Hatch_Khop" 946 ha), Tây Nam 804 ha; thửa 4 tờ 39 xã Cam Lâm trong đầm từng hiện dòng QĐ2222 "Hatch_Khop";
+  (3) **thứ tự lớp khác ảnh bản đồ** — ảnh/MicroStation để lớp có mốc năm (QH2030_/QH2045_/QHDD_) trên lớp DAT_, phần tính lại coi
+  ngang hàng → QĐ2076 ~250 ha ghi "Nhóm nhà ở thấp tầng" thay vì "Đơn vị ở…". Nay: tô chẵn–lẻ, cắt theo ranh, bậc HT=1 · DAT=2 ·
+  có mốc năm=3. Sau sửa: web khác bản vẽ 0,00–0,01 % (sai số lưới rải điểm), 79 phiếu giữ nguyên. Đổi bản vẽ / ranh thì chạy lại
+  5g rồi `7-lo-trong-ranh.py` (vùng trắng > 300 m trong ranh = ngoài phạm vi, vd Na Tia ~1.020 ha của Tây Nam — chủ dự án mở DGN
+  xác nhận trống thật). ⚠️ ẢNH TILE phân khu vẫn vẽ từ chuỗi cũ (1b) nên chỗ lỗ có thể còn sai màu — sửa ảnh phải gửi ảnh thử chờ duyệt.
 - Đã thử và BỎ: đáp án "giữa 2 nét mép đường -1-TRAFFIC-PAVEMENT trong 35 m = đường" — nét mép đường QĐ205 vẽ không đủ, đường
   rộng bị hụt. Dòng `CACH_O_GAN_M` trong nearestLand nay chạy thật (trước nằm sau return).
 Công cụ: scratchpad của phiên (audit*.ts quét thửa thật trong container, dap_an_all.py, ve_thua205.py vẽ thửa lên bản vẽ) — chưa

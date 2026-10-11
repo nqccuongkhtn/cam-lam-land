@@ -12,10 +12,12 @@ cùng bậc thì vùng to vẽ trước → vùng nhỏ nằm trên), rồi đư
 ⚠️ KHÔNG ghi gì vào apps/backend/data — chỉ ghi tệp GeoJSON ra chỗ chỉ định. Cắt tile và thay bộ tile trên web phải chờ chủ dự án
 duyệt ảnh thử (quy ước "vẽ thử trước khi cắt tile").
 
-Cách gọi:  python 5i-xuat-vung-to-co-mau.py <ban_ve.dxf> <ma> <ra.geojson> [tile_cu.geojson]
-  tile_cu.geojson (tuỳ chọn, vd quyhoach2025/qd2101_qh_tuoi2_sach.geojson): tệp đã dùng cắt bộ tile ĐANG CHẠY. Có tệp này thì màu 'c'
-  lấy đúng BẢNG MÀU WEB đã duyệt (cặp lớp + số hiệu màu → màu trong tile cũ; mốc màu 14/9/2026), màu gốc bản vẽ để ở 'c_goc'.
-  Không có thì 'c' = màu gốc bản vẽ (tối hơn tile đang chạy).
+Cách gọi (đủ chuỗi cắt lại tile, GIỮ NGUYÊN bảng màu + hoa văn đã duyệt 14/9/2026):
+  python 5i-xuat-vung-to-co-mau.py <ban_ve.dxf> <ma> <vung.geojson>
+  python 9-doi-bang-mau.py <vung.geojson> <vung_tuoi.geojson> autocad-tuoi     # bảng 'autocad-tuoi' = đúng bảng của bộ tile đang chạy
+                                                                                 # (đã thử: ra trùng 1.637/1.637 ô cả màu lẫn hoa văn)
+  3-cat-tile.py <vung_tuoi.geojson> <thư mục tile mới> 8 18 c <qd<ma>_net.geojson>    (chạy bằng python của QGIS — xem 3-cat-tile.py)
+Tệp ra có 'lo' (level) + 'ci' (số hiệu màu) như tệp của bước 1b nên 9-doi-bang-mau.py dùng thẳng được; 'c' = màu gốc bản vẽ.
 """
 import io, json, os, re, sys, importlib.util
 from shapely.geometry import Polygon, mapping
@@ -27,7 +29,7 @@ sp = importlib.util.spec_from_file_location('g5', os.path.join(HERE, '5g-dung-o-
 g5 = importlib.util.module_from_spec(sp); sp.loader.exec_module(g5)      # chỉ lấy các hàm dùng chung, KHÔNG gọi main()
 
 
-def main(vao, ma, ra, cu=None):
+def main(vao, ma, ra):
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     b1, b5, CX = g5.b1, g5.b5, g5.CX
     R = json.load(io.open(os.path.join(g5.DATA, 'ranh_qh.json'), encoding='utf-8'))
@@ -40,16 +42,6 @@ def main(vao, ma, ra, cu=None):
     wgs = lambda g: transform(lambda x, y, z=None: tuple(zip(*[b1.vn2wgs(a, b) for a, b in zip(x, y)])), g)
     import ezdxf
     d = ezdxf.readfile(vao); msp = d.modelspace()
-    import collections
-    theo_cap, theo_so = collections.defaultdict(collections.Counter), collections.defaultdict(collections.Counter)
-    if cu:
-        for f in json.load(io.open(cu, encoding='utf-8'))['features']:
-            q = f.get('properties') or {}
-            if q.get('c'): theo_cap[(q.get('lo') or '', q.get('ci') or 0)][q['c']] += 1; theo_so[q.get('ci') or 0][q['c']] += 1
-    def mau_web(lv, mau, ci):
-        if (lv, ci) in theo_cap: return theo_cap[(lv, ci)].most_common(1)[0][0]
-        if ci and ci in theo_so: return theo_so[ci].most_common(1)[0][0]
-        return mau
     ft = []
     for e in msp:
         if e.dxftype() != 'HATCH': continue
@@ -78,7 +70,7 @@ def main(vao, ma, ra, cu=None):
             if trong.is_empty: continue
             for m in g5.cac_da_giac(trong):
                 if m.area * 1.21e10 < 0.5: continue
-                ft.append((bac, -dt, {'type': 'Feature', 'properties': {'c': mau_web(lv, mau, ci), 'c_goc': mau, 'ci': ci, 'loai': loai, 'lop': lv, 'bac': bac},
+                ft.append((bac, -dt, {'type': 'Feature', 'properties': {'c': mau, 'ci': ci, 'lo': lv, 'loai': loai, 'bac': bac},
                                        'geometry': mapping(m)}))
     ft.sort(key=lambda x: (x[0], x[1]))            # bậc thấp trước; cùng bậc vùng TO trước → vùng nhỏ / bậc cao vẽ đè lên trên
     json.dump({'type': 'FeatureCollection', 'features': [f for _, _, f in ft]}, io.open(ra, 'w', encoding='utf-8'), ensure_ascii=False)
@@ -86,4 +78,4 @@ def main(vao, ma, ra, cu=None):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else None)
+    main(sys.argv[1], sys.argv[2], sys.argv[3])

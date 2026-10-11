@@ -330,6 +330,9 @@ export default function TraCuuLuatPage() {
   const [khoanSang, setKhoanSang] = useState<number | null>(null);
   // XEM GẦN ĐÂY (lưu trên máy người dùng): ô tìm còn trống thì hiện để bấm mở lại ngay, khỏi tìm lại từ đầu
   const [ganDay, setGanDay] = useState<{ ma: string; so: number; nhan: string; tieuDe: string }[]>([]);
+  // Từ khoá đã tìm (đợt 19, 11/10/2026): ghi lại khi người dùng MỞ một kết quả từ ô tìm (gõ dở rồi bỏ thì không ghi). Tối đa 6, mới nhất trước.
+  const [daTim, setDaTim] = useState<string[]>([]);
+  useEffect(() => { try { setDaTim(JSON.parse(localStorage.getItem('luat-da-tim') || '[]')); } catch { /* */ } }, []);
   useEffect(() => { try { setGanDay(JSON.parse(localStorage.getItem('luat-gan-day') || '[]')); } catch { /* */ } }, []);   // dòng "❓ N điều cần kiểm hiệu lực" — bấm mới bung danh sách
   // Điện thoại: danh sách điều đang bung ra hay đã thu lại (máy tính không dùng tới).
   const [moDs, setMoDs] = useState(false);
@@ -1027,6 +1030,14 @@ export default function TraCuuLuatPage() {
   };
   const moDieu = (ma: string, so: number, khoan?: number) => {
     setKhoanSang(khoan ?? null);
+    {
+      const q = tim.trim();
+      if (q.length >= 2 && !docSoDieu(kd(q))) setDaTim((ds) => {
+        const m = [q, ...ds.filter((x) => kd(x) !== kd(q))].slice(0, 6);
+        try { localStorage.setItem('luat-da-tim', JSON.stringify(m)); } catch { /* */ }
+        return m;
+      });
+    }
     {
       const v = cacVb[ma]; const d = v?.dieu.find((x) => x.so === so);
       const k0 = kho.find((x) => x.ma === ma);
@@ -2573,6 +2584,19 @@ export default function TraCuuLuatPage() {
                 Điều {g.so}{g.ma !== maVb ? <span className="text-slate-400"> · {g.nhan}</span> : null}
               </button>
             ))}
+          </div>
+        )}
+        {!tim && !chiGhim && !chiGt && daTim.length > 0 && (
+          <div className="mt-1 flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <span className="shrink-0 text-[11px] font-semibold text-slate-400">🔎 Đã tìm:</span>
+            {daTim.map((q) => (
+              <button key={q} onClick={() => setTim(q)} title={`Tìm lại “${q}”`}
+                className="shrink-0 whitespace-nowrap rounded-full border border-sky-200 bg-sky-50/60 px-2 py-0.5 text-[11.5px] text-sky-800 hover:border-sky-400">
+                {q}
+              </button>
+            ))}
+            <button onClick={() => { setDaTim([]); try { localStorage.removeItem('luat-da-tim'); } catch { /* */ } }} title="Xoá danh sách đã tìm"
+              className="shrink-0 px-1 text-[11px] text-slate-400 hover:text-slate-600">✕</button>
           </div>
         )}
         {moChuDe && (

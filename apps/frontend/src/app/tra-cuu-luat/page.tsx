@@ -136,6 +136,47 @@ const nutLoc = (bat: boolean) => `shrink-0 whitespace-nowrap rounded-full border
 const escRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 // tách chữ đã chuẩn hoá thành TIẾNG (mọi thứ không phải chữ / số là chỗ ngắt) — dùng chung cho câu gõ và chữ luật
 const tachTieng = (s: string) => s.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+// ── BỎ TỪ HỎI ĐỜI THƯỜNG (đợt 26, 12/10/2026) ──
+// Người dùng điện thoại hay gõ cả câu hỏi: "tách thửa cần điều kiện gì", "có được xây nhà không", "như thế nào", "bao nhiêu". Chữ luật không
+// có mấy từ này → đòi đủ mọi tiếng là hụt kết quả. Bỏ chúng trước khi so khớp. Cẩn thận không bỏ nhầm chữ có nghĩa trong luật:
+//   · "sao" chỉ bỏ trong cụm ("ra sao", "làm sao") — "bản sao" là thuật ngữ; "không" / "chưa" chỉ bỏ khi ĐỨNG CUỐI ("không được" có nghĩa);
+//   · gõ KHÔNG DẤU thì không bỏ từ đơn dễ nhầm ("can" = căn hộ, "vay" = vay vốn, "chua" = đất chùa) — chỉ bỏ khi gõ có dấu đúng chữ;
+//   · "anh, chị, em" giữ nguyên (luật thừa kế: "anh, chị, em ruột").
+// [cụm từ (gõ có dấu), bỏ cả khi gõ không dấu?, chỉ bỏ khi đứng cuối?]
+const TU_HOI: [string, boolean, boolean][] = [
+  ['như thế nào', true, false], ['làm thế nào', true, false], ['thế nào', true, false], ['làm sao', true, false], ['ra sao', true, false],
+  ['là gì', true, false], ['là sao', true, false], ['bao nhiêu', true, false], ['bao lâu', true, false], ['khi nào', true, false],
+  ['ở đâu', true, false], ['hay không', true, false], ['được không', true, false], ['có không', true, false], ['phải không', true, false],
+  ['đúng không', true, false], ['hay chưa', true, false], ['cho hỏi', true, false], ['xin hỏi', true, false], ['cho mình hỏi', true, false],
+  ['cho tôi hỏi', true, false], ['cho em hỏi', true, false],
+  ['gì', true, false], ['nào', true, false], ['không', true, true], ['chưa', false, true], ['cần', false, false], ['vậy', false, false],
+  ['ạ', false, false], ['nhỉ', false, false], ['hả', false, false], ['à', false, false], ['tôi', false, false], ['mình', false, false],
+];
+const TU_HOI_TACH = TU_HOI.map(([c, kdOk, cuoi]) => ({ c, tu: c.split(' '), kdOk, cuoi })).sort((a, b) => b.tu.length - a.tu.length);
+function boTuHoi(cau: string): { cau: string; bo: string[] } {
+  const goc = tachTieng(cau);
+  if (goc.length < 2) return { cau, bo: [] };
+  const D = goc.map((t) => thuongDau(t)), K = goc.map((t) => kd(t));
+  const xoa = new Array(goc.length).fill(false); const bo: string[] = [];
+  for (let i = 0; i < goc.length; i++) {
+    if (xoa[i]) continue;
+    for (const h of TU_HOI_TACH) {
+      const n = h.tu.length;
+      if (i + n > goc.length || (h.cuoi && i + n !== goc.length)) continue;
+      let khop = true;
+      for (let j = 0; j < n && khop; j++) {
+        const coDauGo = D[i + j] !== K[i + j];   // tiếng người dùng gõ CÓ dấu
+        khop = coDauGo ? D[i + j] === h.tu[j] : (h.kdOk && K[i + j] === kd(h.tu[j]));
+      }
+      if (!khop) continue;
+      for (let j = 0; j < n; j++) xoa[i + j] = true;
+      bo.push(goc.slice(i, i + n).join(' ')); break;
+    }
+  }
+  const con = goc.filter((_, i) => !xoa[i]);
+  if (!bo.length || con.join('').length < 2) return { cau, bo: [] };   // bỏ hết thì thôi, giữ nguyên câu gõ
+  return { cau: con.join(' '), bo };
+}
 
 // DẪN CHIẾU TRONG CHỮ LUẬT — biến thành nút bấm được, kiểu Thư viện pháp luật.
 // Ba dạng, xét theo đúng thứ tự này (dạng dài phải xét trước, không thì bị dạng ngắn ăn mất):
@@ -800,7 +841,8 @@ export default function TraCuuLuatPage() {
   // chưa gõ dấu cách) không khớp tiếng nào thì đoán nốt: lấy tiếng HAY GẶP NHẤT bắt đầu bằng chữ đó, trong các điều có đủ mấy tiếng
   // đứng trước. Thứ tự thử: đúng dấu → cách gọi đời thường → đoán chữ cuối → lùi không dấu → không dấu + đoán chữ cuối.
   const timHL = useMemo(() => {
-    const q = tim.trim(), giu = { q, lui: false, doan: '' };
+    const { cau: q, bo: boHoi } = boTuHoi(tim.trim());   // đợt 26: bỏ từ hỏi đời thường trước khi so khớp
+    const giu = { q, lui: false, doan: '', boHoi };
     if (q.length < 2 || docSoDieu(kd(q))) return giu;
     const ds = timCaKho ? kho.flatMap((x) => chiMuc[x.ma] || []) : (chiMuc[maVb] || []);
     const co = (cau: string) => { const bk = boKhop(cau); return !bk.tu.length || ds.some((x) => coDuTieng(x, bk)); };
@@ -836,17 +878,17 @@ export default function TraCuuLuatPage() {
       const bk = boKhop(q), cuoi = bk.tu[bk.tu.length - 1] || '';
       if (!/\s$/.test(tim) && bk.tu.length >= 2 && cuoi.length <= 2) {
         const d0 = doanCuoi(q);
-        if (d0 && dem(d0) >= 5 * Math.max(1, dem(q))) return { q: d0, lui: false, doan: d0 };
+        if (d0 && dem(d0) >= 5 * Math.max(1, dem(q))) return { q: d0, lui: false, doan: d0, boHoi };
       }
       return giu;
     }
     const d1 = doanCuoi(q);
-    if (d1) return { q: d1, lui: false, doan: d1 };
+    if (d1) return { q: d1, lui: false, doan: d1, boHoi };
     if (!coDau(q)) return giu;
     const k = kd(q);
-    if (co(k) || coGoi(k)) return { q: k, lui: true, doan: '' };
+    if (co(k) || coGoi(k)) return { q: k, lui: true, doan: '', boHoi };
     const d2 = doanCuoi(k);
-    return d2 ? { q: d2, lui: true, doan: d2 } : { q: k, lui: true, doan: '' };
+    return d2 ? { q: d2, lui: true, doan: d2, boHoi } : { q: k, lui: true, doan: '', boHoi };
   }, [tim, timCaKho, kho, chiMuc, maVb]);
   const luiKhongDau = timHL.lui;
   // Từ điển TIẾNG (không dấu) của phạm vi đang tìm → số điều có tiếng đó. Chỉ dùng để gợi ý sửa chính tả (đợt 16).
@@ -2709,6 +2751,11 @@ export default function TraCuuLuatPage() {
                     </button>
                   ))}
                 </div>
+              )}
+              {tim && timHL.boHoi.length > 0 && (
+                <p className="border-b border-slate-100 px-3 py-1.5 text-[11.5px] leading-snug text-slate-500">
+                  🗣 Bỏ từ hỏi {timHL.boHoi.map((t) => `“${t}”`).join(', ')} — tìm theo “<b className="text-slate-700">{timHL.q}</b>”
+                </p>
               )}
               {tim && luiKhongDau && (
                 <p className="border-b border-amber-100 bg-amber-50/70 px-3 py-1.5 text-[11.5px] leading-snug text-amber-900">

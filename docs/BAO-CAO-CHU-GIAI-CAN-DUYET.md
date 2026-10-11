@@ -143,6 +143,27 @@ nằm kẹp giữa hai vùng tô** (không nối vào mạng đường) thì **c
 đường 619,24 → 514,68 m²; hồ +~52 m²; cây xanh +~52 m². Phải chạy lại bộ kiểm 79 phiếu + 2.000 thửa trước khi đưa lên (trước đây
 từng bỏ một luật na ná vì làm dư 1,3 m² ở mép cong — lần này chỉ áp cho khe kẹp giữa hai vùng tô khác loại).
 
+## G. DẢI TRẮNG HẸP TRONG 7 BẢN PHÂN KHU (cùng kiểu mảnh 2) — web đang tính là đất giao thông
+
+Bản phân khu 1/2000 để trắng lòng đường, nên web tính "trong ranh mà không tô = đường". Nhưng đường 1/2000 rộng ≥ 4 m; dải trắng
+hẹp hơn 2,5 m gần như chắc là **hai vùng tô vẽ không khít** (cùng loại lỗi với mảnh 2 của thửa 95). Quét toàn bộ (phần hẹp < 2,5 m
+của khoảng trắng trong ranh; con số hơi cao vì gồm cả mũi nhọn ở góc giao lộ):
+
+| Bản | Khoảng trắng trong ranh | Dải hẹp < 2,5 m | Số mảnh ≥ 20 m² | Mảnh lớn nhất — toạ độ để soi (vĩ độ, kinh độ) |
+|---|---|---|---|---|
+| QĐ2076 | 838,9 ha | 3.791 m² | 22 | 568 m², rộng ~0,9 m — 12.155237, 109.100729 · 385 m² — 12.150566, 109.102352 · 385 m² — 12.148619, 109.104280 |
+| Cù Hin | 137,0 ha | 1.504 m² | 16 | 508 m², rộng ~0,6 m — 12.173542, 109.075795 · 109 m² — 12.186131, 109.095632 |
+| Tây Nam | 162,4 ha | 1.569 m² | 17 | 99 m², rộng ~0,5 m — 12.093137, 109.027811 · 89 m² — 12.100996, 109.034282 |
+| QĐ918 | 760,4 ha | 1.331 m² | 8 | 201 m², rộng ~1,2 m — 12.037892, 109.125576 · 115 m² — 12.058666, 109.063815 |
+| QĐ2101 | 892,9 ha | 608 m² | 8 | 66 m² |
+| QĐ2222 | 410,0 ha | 549 m² | 6 | 119 m², rộng ~0,2 m — 12.041171, 109.199349 |
+| Tây Bắc | 202,8 ha | 71 m² | 0 | 7 m² |
+| **Cộng** | ~3.400 ha | **~9.420 m² (0,94 ha)** | | |
+
+Đề xuất (chờ anh duyệt, CHƯA đổi): dải trắng **rộng dưới 2,5 m kẹp giữa các vùng tô** thì chia cho vùng tô hai bên (mỗi điểm về vùng
+tô gần nhất) thay vì tính đường — áp cho cả 7 bản phân khu và QĐ205. Ảnh hưởng: ~0,94 ha toàn bộ, nhưng thửa nằm đè lên dải thì có
+thể đổi vài chục tới vài trăm m² "đất giao thông". Trước khi đưa lên phải chạy lại bộ kiểm 79 phiếu + 2.000 thửa.
+
 ## D. CẦN ANH XÁC NHẬN TRÊN MICROSTATION
 
 - **Thửa 95 tờ 15 Xã Cam Lâm, QĐ205 — mảnh giao thông số 2** (104,57 m², dải rộng ~1,4 m giữa vùng hồ và vùng cây xanh, ảnh

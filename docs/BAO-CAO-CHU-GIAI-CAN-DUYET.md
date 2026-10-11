@@ -41,7 +41,21 @@ Giữ nguyên có lý do: QĐ893 mã **SKC** — khung chú dẫn bản vẽ in 
 
 ## C. QĐ893 — VÙNG XANH NƯỚC KHÔNG MÃ
 
-(đang đo, xem bổ sung bên dưới)
+Bản đồ QĐ893 **không ghi chữ "SON" ở vùng nào**. Cả 801 ô web đang gọi "Đất sông, ngòi, kênh, rạch" (~4.588 ha) đều được gán
+**theo màu xanh nước**, mà khung chú dẫn dùng chung màu này cho 5 loại (SON sông · MNC mặt nước chuyên dùng/hồ chứa · NTS nuôi
+trồng thuỷ sản · DTL thuỷ lợi · DCT). Đối chiếu từng ô với **bản đồ địa chính cùng chỗ** (mã chiếm nhiều diện tích nhất trong ô):
+
+| Địa chính cùng chỗ đang ghi | Số ô | Diện tích | Gợi ý loại quy hoạch | Mức chắc |
+|---|---|---|---|---|
+| (không có thửa địa chính — mặt đầm, sông lớn chưa chia thửa) | ~400 | ~2.745 ha | Đầm Thuỷ Triều / mặt nước lớn → **"Đất có mặt nước chuyên dùng dạng ao, hồ, đầm, phá" (MNC)** nếu là đầm; sông lớn giữ SON | Vừa |
+| DCS — đất đồi núi chưa sử dụng | 44 | 492 ha | Hồ chứa quy hoạch mới → **MNC** | Vừa |
+| NTS — nuôi trồng thuỷ sản | 45 | 274 ha | **"Đất nuôi trồng thủy sản" (NTS)** | Vừa – cao |
+| BHK / CLN / LUC / RSX — đất trồng trọt, rừng | ~140 | ~600 ha | Hồ, kênh quy hoạch mới → **MNC** hoặc SON tuỳ hình (dải dài = kênh/sông, khối = hồ) | Thấp |
+| SON — sông suối | 149 | 225 ha | Giữ **"Đất sông, ngòi, kênh, rạch"** | Cao |
+| DTL — thuỷ lợi | 270 | 34 ha | **"Đất công trình thủy lợi" (DTL)** — các kênh mương nhỏ | Vừa – cao |
+
+Chưa đổi gì trên web. Anh chọn cách: (a) để nguyên "sông, ngòi" như hiện nay; (b) đổi theo bảng trên; (c) chỉ đổi 2 dòng chắc nhất
+(NTS → nuôi trồng thuỷ sản, DTL → thuỷ lợi).
 
 ## D. CẦN ANH XÁC NHẬN TRÊN MICROSTATION
 

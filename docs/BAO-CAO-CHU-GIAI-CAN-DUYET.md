@@ -205,6 +205,26 @@ màu mà chú dẫn chỉ dùng cho đúng một mã). Còn **6.427 ha (10,7 %) 
 anh đã duyệt ("ô 893 không mã giữ tên nhóm"): "Đất công cộng, dịch vụ, sản xuất" 2.494,6 ha · "Đất ở" 2.472 ha (không biết ODT hay
 ONT) · "Đất nông nghiệp" 1.377,8 ha · "Loại đất khác" 82,5 ha (vùng tím — đề xuất ở mục B). Riêng 4.585 ha xanh nước không mã đang ghi
 "sông, ngòi" — xem mục C.
+**QĐ893 — vùng tô ghi NHIỀU MÃ khác nhau** (soát 12/10/2026, gần 13.000 vùng tô): chỉ **1 vùng** — 6,45 ha màu hồng #ff7f7f gần
+12.1045, 109.1512 (Cam Hải Tây) có 2 chữ mã quy hoạch: **TSC** (trụ sở cơ quan) ở phía bắc (12.104543, 109.151227) và **DVH** (văn hoá)
+ở phía nam cách 140 m (12.103348, 109.151886), không có nét chia giữa hai phần. Web đang ghi cả 6,45 ha là "Đất xây dựng trụ sở cơ quan"
+(hai mã hoà nhau, máy lấy mã đọc trước). QĐ2076 cùng chỗ ghi "Đất văn hóa cấp đô thị", QĐ205 ghi "dịch vụ - công cộng" — nhưng theo
+nguyên tắc anh đã chốt (mỗi bản theo dữ liệu của bản đó) tôi KHÔNG mượn tên bản khác. Anh xem bản vẽ: nếu là 2 khu thì chia theo chữ
+(phía bắc TSC, phía nam DVH); nếu là một khu thì cho biết mã đúng. Còn lại mọi vùng tô có chữ mã đều chỉ có MỘT mã.
+**Kiểm bằng TEM THÔNG TIN LÔ của chính bản vẽ** (12/10/2026 — nguồn độc lập với vùng tô: tem ghi ký hiệu lô "1-ONT-01", "CXCD-39"… và
+DIỆN TÍCH LÔ do đơn vị lập quy hoạch tính). Đọc 1.183 tem ở 7 bản phân khu, xem web gán loại gì tại tem và diện tích vùng web chứa tem:
+- **QĐ918:** 376 tem có ký hiệu rõ nhóm đất — chỉ 3 tem "lệch" (YT-01, TG-03, AN-02) và cả 3 nằm cách đúng lô của nó 5–11 m (lô nhỏ, tem
+  đặt cạnh). Diện tích: **389/390 lô khớp** diện tích bản vẽ ghi.
+- **Tây Bắc:** 75 tem, 0 lệch loại; diện tích 80/81 lô khớp (lô còn lại là nhiều lô rừng đặc dụng liền nhau, không so riêng được).
+- **Cù Hin:** 314 tem; 75 tem nằm trong ô khác loại — 65 tem cách ô đúng loại ≤ 40 m (tem của DẢI hẹp cây xanh / suối đặt ra ngoài dải),
+  **10 tem cách 44–64 m — có thể là lô bản vẽ CHƯA TÔ MÀU** (web theo màu tô nên ghi loại của vùng tô trùm lên). Tại chỗ tem, vùng tô
+  gốc đúng là loại web đang ghi — web vẽ y bản vẽ. Anh soi giúp trên MicroStation:
+  1-OHT-45 (12.193473, 109.057107) và 1-OHT-47 (12.193797, 109.055981): lô ở hiện trạng nằm trong vùng tô nông nghiệp ·
+  1-CXCD-01 (12.189090, 109.054754), 3-CXCD-02 (12.171984, 109.079538), 3-CXCD-04 (12.171005, 109.079940): lô cây xanh chuyên dụng
+  trong vùng tô làng xóm · 1-CXCD-06 (12.187529, 109.064055) trong vùng tô hỗn hợp nhà ở – dịch vụ · 3-CXCD-06 (12.168450, 109.080463)
+  không có vùng tô · 3-SS-01 (12.174583, 109.076724), 3-SS-02 (12.173148, 109.079071), 3-SS-03 (12.170146, 109.080226): lô suối nằm
+  trong vùng tô làng xóm. Nếu đúng là bản vẽ quên tô, web cần anh xác nhận loại để thêm ô cho các lô này.
+- QĐ2076, QĐ2101, Tây Nam: tem không dùng được để so (QĐ2076 là chữ ghi tầng cao công trình, QĐ2101 / Tây Nam gần như không có tem).
 
 ## I. ĐÃ SỬA: VÙNG "TRẮNG TRƠN" TRONG 7 BẢN PHÂN KHU KHÔNG CÒN BỊ GHI LÀ ĐƯỜNG (anh xem ảnh, sai thì báo — gỡ được ngay)
 

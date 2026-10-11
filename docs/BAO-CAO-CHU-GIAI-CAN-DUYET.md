@@ -192,6 +192,10 @@ lấy đúng chữ trong khung chú giải của chính bản vẽ** (QĐ2076, Q
 giải: 2 lớp đã SUY LUẬN có căn cứ và áp dụng (QĐ918 `L-QH-langxomdothihoa` 35,7 ha → "Đất làng xóm đô thị hóa"; Tây Nam
 `HT_DAT_O_Langxom` 183,9 ha → "Đất làng xóm, dân cư nông thôn" — mục A) và 2 lớp còn CHỜ ANH (QĐ918 `DAT_KXD_DulichRung_qh` 32 ha,
 Tây Nam `QHDD_DAT_Cayxanhhanche` 26,8 ha — mục B).
+**QĐ205 — lớp vùng tô nào bị bỏ qua?** Bản vẽ có 8 lớp vùng tô không nằm trong bảng tên `lop-205.json` (nên không thành ô đất): toàn là
+KÝ HIỆU và KHUNG — ký hiệu tôn giáo (56 hình), ký hiệu cấp 3, ký hiệu bến du lịch (6 vòng tròn đường kính 79 m trên mặt nước + 1 hình
+mẫu nằm tít ngoài bản đồ), khung A0, khung tỷ lệ 1/10.000, 1 ô bến xe buýt 0,19 ha (web vẫn tính là đất giao thông), và 112 ha hình
+"NET-RANH PHAN KHU" ở mũi nam (~11,935°, 109,115°) — chỗ đó không có thửa địa chính nào. ⇒ Không sót loại đất thật nào.
 
 ## I. ĐÃ SỬA: VÙNG "TRẮNG TRƠN" TRONG 7 BẢN PHÂN KHU KHÔNG CÒN BỊ GHI LÀ ĐƯỜNG (anh xem ảnh, sai thì báo — gỡ được ngay)
 

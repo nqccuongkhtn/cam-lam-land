@@ -164,6 +164,22 @@ của khoảng trắng trong ranh; con số hơi cao vì gồm cả mũi nhọn 
 tô gần nhất) thay vì tính đường — áp cho cả 7 bản phân khu và QĐ205. Ảnh hưởng: ~0,94 ha toàn bộ, nhưng thửa nằm đè lên dải thì có
 thể đổi vài chục tới vài trăm m² "đất giao thông". Trước khi đưa lên phải chạy lại bộ kiểm 79 phiếu + 2.000 thửa.
 
+## H. ĐÃ KIỂM: KHOẢNG TRẮNG RỘNG CỦA QĐ205 ĐÚNG LÀ ĐƯỜNG (không cần sửa)
+
+Mặt ngược lại của mục G: luật "trong ranh mà không tô = đường" có làm sai ở những khoảng trắng **rộng** không? (rộng trên 60 m thì
+khó là một lòng đường). Đo trên bản vẽ gốc `QD205.gpkg` (11/10/2026): trong ranh QĐ205 có 2.279 ha khoảng trắng, phần rộng trên 60 m
+là 903 ha; ngoài khu lõi Cam Đức (nơi web áp luật này) còn 325,5 ha chia 135 khối. Soi **25 khối lớn nhất (238 ha)**: cả 25 khối đều
+được QĐ893 ghi **đất giao thông** (95–100 % diện tích), và phần lớn có nét mép đường `-1-TRAFFIC-PAVEMENT` chạy dọc:
+
+| Khối | Diện tích | Toạ độ (vĩ độ, kinh độ) | QĐ893 ghi | Là gì |
+|---|---|---|---|---|
+| 1 | 120,0 ha | 12.075227, 109.191913 | giao thông 117,6 ha | dải đại lộ ven biển dài 10,6 km (nét mép đường 12,4 km) |
+| 2 | 57,5 ha | 11.998264, 109.119042 | giao thông 57,3 ha | hành lang đường lớn dài 6 km (thửa 312 tờ 6 Cam An Nam: cả QĐ893 lẫn QĐ918 đều ghi đường) |
+| 3 | 10,4 ha | 12.166468, 109.057854 | giao thông 10,5 ha | đoạn đường dài 1,7 km, rộng ~120 m |
+| 4–25 | 1,5–5,2 ha mỗi khối | (xem file soi) | giao thông | nút giao, quảng trường giao thông |
+
+⇒ Khoảng trắng rộng của QĐ205 là **đường lớn thật** (đại lộ, hành lang cao tốc, nút giao) — luật hiện tại đúng, **không đổi gì**.
+
 ## D. CẦN ANH XÁC NHẬN TRÊN MICROSTATION
 
 - **Thửa 95 tờ 15 Xã Cam Lâm, QĐ205 — mảnh giao thông số 2** (104,57 m², dải rộng ~1,4 m giữa vùng hồ và vùng cây xanh, ảnh

@@ -248,6 +248,12 @@ def main(vao, tep_chu, tep_kh):
         j = min(chua, key=lambda k: vung[k].area)          # vùng có căn cứ NHỎ NHẤT chứa nó = vùng nó nằm ngay trên
         if mau[i] == mau[j]:                                # cùng màu = nét chia nhỏ bên trong → bỏ như cũ
             bo.add(i)
+        elif vung[j].intersection(vung[i]).area >= 0.90 * vung[j].area:
+            # TRÙNG KHÍT (phủ nhau ≥ 90 % CẢ HAI CHIỀU, 12/10/2026): không biết ai vẽ đè ai — "ô nhỏ nằm trên" chỉ còn do chênh diện tích
+            # li ti quyết định (may rủi). Lấy vùng CÓ CĂN CỨ chữ / ký hiệu. Soát 12/10: vùng 31,97 ha "Đất thương mại, dịch vụ" (mã TMD)
+            # trùng khít vùng chỉ có màu "Đất công cộng, dịch vụ, sản xuất" — web ghi đúng tên có mã là nhờ may; vùng 0,72 ha ghi
+            # "Đất nông nghiệp" (tên nhóm) thay vì mã "Đất nông nghiệp khác".
+            bo.add(i); can_cu['bỏ ô chỉ có màu trùng khít ô có mã'] += 1
         else:
             bac[i] = 2; can_cu['giữ ô khác màu nằm trên ô có mã'] += 1
     print('Giữ %d vùng khác màu nằm trên vùng có căn cứ' % can_cu['giữ ô khác màu nằm trên ô có mã'])

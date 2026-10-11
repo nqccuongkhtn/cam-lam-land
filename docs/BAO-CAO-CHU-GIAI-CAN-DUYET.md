@@ -211,6 +211,12 @@ ONT) · "Đất nông nghiệp" 1.377,8 ha · "Loại đất khác" 82,5 ha (vù
 (hai mã hoà nhau, máy lấy mã đọc trước). QĐ2076 cùng chỗ ghi "Đất văn hóa cấp đô thị", QĐ205 ghi "dịch vụ - công cộng" — nhưng theo
 nguyên tắc anh đã chốt (mỗi bản theo dữ liệu của bản đó) tôi KHÔNG mượn tên bản khác. Anh xem bản vẽ: nếu là 2 khu thì chia theo chữ
 (phía bắc TSC, phía nam DVH); nếu là một khu thì cho biết mã đúng. Còn lại mọi vùng tô có chữ mã đều chỉ có MỘT mã.
+**Vùng tô TRÙNG KHÍT nhau mà khác tên** (soát 12/10/2026 cả 9 bản — trùng khít thì không biết ai vẽ đè ai, web chọn theo chênh diện tích
+li ti = may rủi): 7 bản phân khu **không có**; QĐ205 có lớp `L- bo dat` 26 ha (ĐÃ SỬA, mục B) + 1 cặp 0,61 ha "hồ, ao, đầm" / "sông,
+suối" (đều là nước, để nguyên); QĐ893 có 3 cặp — 31,97 ha "Đất thương mại, dịch vụ" (mã TMD) trùng vùng chỉ có màu "công cộng, dịch vụ,
+sản xuất": web ĐANG ghi đúng tên có mã nhưng là nhờ may; 0,72 ha (12.033414, 109.248386) ghi tên nhóm "Đất nông nghiệp" thay vì mã
+"Đất nông nghiệp khác". Đã sửa luật trong `5b` (trùng khít thì lấy vùng có mã chữ) — có hiệu lực lần dựng lại QĐ893 tới (dựng lại cần
+xuất lại vùng tô bằng ogr2ogr từ bản vẽ 150 MB, để dịp có bản vẽ mới; hiện chỉ ảnh hưởng 0,72 ha).
 **Kiểm bằng TEM THÔNG TIN LÔ của chính bản vẽ** (12/10/2026 — nguồn độc lập với vùng tô: tem ghi ký hiệu lô "1-ONT-01", "CXCD-39"… và
 DIỆN TÍCH LÔ do đơn vị lập quy hoạch tính). Đọc 1.183 tem ở 7 bản phân khu, xem web gán loại gì tại tem và diện tích vùng web chứa tem:
 - **QĐ918:** 376 tem có ký hiệu rõ nhóm đất — chỉ 3 tem "lệch" (YT-01, TG-03, AN-02) và cả 3 nằm cách đúng lô của nó 5–11 m (lô nhỏ, tem

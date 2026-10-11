@@ -3,7 +3,7 @@
 // Kết quả tra cứu. DESKTOP: bảng zebra. MOBILE: thẻ. Bấm 1 dòng/thẻ -> POPUP chi tiết (lưới ô có viền, tự xếp dọc trên mobile).
 import { useState } from 'react';
 import { chipCls, toHref, Linkify } from './parts';
-import { imgUrl } from '@/lib/api';
+import { imgUrl, linkTepRieng } from '@/lib/api';
 import { useLockBody } from '@/lib/useLockBody';
 
 const ZEBRA: Record<string, [string, string]> = {
@@ -196,7 +196,8 @@ function ResultCard({ row, onOpen, openDoc }: any) {
 }
 
 export function ResultTable({ shownRows, total, limit, openKey, setOpenKey, canManage, isAdmin, onEdit, onDel, onExpire, mobile }: any) {
-  const [viewDoc, setViewDoc] = useState(''); const openDoc = (u: string) => setViewDoc(u);
+  // Tệp công văn tải lên kho là tệp RIÊNG → xin chữ ký (lib/api.ts linkTepRieng) rồi mới mở khung xem.
+  const [viewDoc, setViewDoc] = useState(''); const openDoc = (u: string) => { linkTepRieng(u).then(setViewDoc); };
   const openRow = shownRows.find((r: any) => r.key === openKey);
   return (
     <>

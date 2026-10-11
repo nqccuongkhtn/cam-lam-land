@@ -768,6 +768,17 @@ export async function migrate(): Promise<void> {
     `CREATE INDEX IF NOT EXISTS thiet_bi_reset_user_idx ON thiet_bi_reset (user_id, luc DESC)`,
   ]) await pool.query(sql).catch((e) => console.error('[migrate] thiết bị:', e.message));
 
+  // ── TỆP RIÊNG trong kho ảnh /api/images (11/10/2026 — rà soát bảo mật) ──
+  // Công văn đính kèm DANH SÁCH NÓNG (tên, CCCD, địa chỉ người dân) nằm chung kho với ảnh tin rao công khai, số tệp tăng
+  // dần nên ai cũng đoán được link. rieng = true → chỉ mở bằng link có chữ ký (lib/kyTep.ts, routes/images.ts, hotlist.ts).
+  // Thêm cột kiểu này trên Postgres 16 là tức thì (không chép lại bảng). Rồi đánh dấu luôn các tệp ĐANG gắn vào bản ghi
+  // danh sách nóng (bảng hot_records do routes/hotlist.ts tự tạo — máy cài mới chưa có thì câu này lỗi, bỏ qua).
+  await pool.query(`ALTER TABLE listing_images ADD COLUMN IF NOT EXISTS rieng BOOLEAN NOT NULL DEFAULT false`)
+    .catch((e: any) => console.error('[migrate] listing_images.rieng lỗi:', e?.message || e));
+  await pool.query(`UPDATE listing_images SET rieng = true WHERE NOT rieng AND id IN (
+      SELECT (regexp_match(link, '/api/images/([0-9]{1,9})([^0-9]|$)'))[1]::int FROM hot_records WHERE link ~ '/api/images/[0-9]')`)
+    .catch(() => {});
+
   // ── CHỈ MỤC TRA THỬA THEO XÃ MỚI + SỐ THỬA (11/10/2026 — rà soát tốc độ) ──
   // Ô tra cứu: chọn một XÃ MỚI (sau sáp nhập) rồi chỉ gõ SỐ THỬA (không gõ số tờ). Trước đây máy phải dò gần hết
   // chỉ mục (xa_id, to_num, thua_num) mới gom đủ kết quả — đo trên máy thật: 353 ms và đọc ~18 MB từ đĩa cho MỘT lần tra.

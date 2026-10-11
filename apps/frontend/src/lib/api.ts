@@ -140,6 +140,20 @@ export async function uploadFile(file: File): Promise<{ id: number; url: string 
   const url = /^https?:\/\//.test(rel) ? rel : new URL(rel, base).href;
   return { id: imgs[0].id, url };
 }
+/** Tệp công văn đính kèm DANH SÁCH NÓNG là tệp RIÊNG (11/10/2026 — rà soát bảo mật): máy chủ chỉ trả tệp khi link có
+ *  CHỮ KÝ còn hạn (2 giờ). Khung xem công văn / thẻ mới không gửi kèm thẻ đăng nhập được, nên xin chữ ký trước rồi gắn
+ *  vào link (?het=…&ky=…). Link ngoài (Google Drive, cổng nhà nước…) giữ nguyên; xin chữ ký lỗi thì trả link cũ. */
+export async function linkTepRieng(url: string): Promise<string> {
+  const m = /\/api\/images\/(\d+)/.exec(String(url || ''));
+  if (!m) return url;
+  try {
+    const k = await api<{ het: number; ky: string }>('/hotlist/ky-tep', { method: 'POST', body: JSON.stringify({ id: Number(m[1]) }) });
+    const u = new URL(url, typeof window !== 'undefined' ? window.location.origin : 'http://localhost');
+    u.searchParams.set('het', String(k.het));
+    u.searchParams.set('ky', k.ky);
+    return u.toString();
+  } catch { return url; }
+}
 /** Đổi URL ảnh gốc → ảnh THU NHỎ (cho thẻ tin/danh sách). URL ngoài (không phải /api/images/) giữ nguyên.
  *  Thêm đuôi .webp để Cloudflare cache ảnh ở biên (điện thoại tải nhanh hơn). */
 export function thumbUrl(url?: string | null): string | undefined {

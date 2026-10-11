@@ -3,7 +3,7 @@
 // Modal Thêm/Sửa bản ghi danh sách nóng. Hỗ trợ 1 thửa NHIỀU CHỦ (đồng sở hữu) và 1 chủ NHIỀU THỬA (thêm/bớt dòng).
 // Lưu: chủ nối bằng " + "; thửa & tờ nối bằng ", " (theo vị trí). Trường công văn đến theo NĐ 30/2020.
 import { useState } from 'react';
-import { api, uploadFile } from '@/lib/api';
+import { api, uploadFile, linkTepRieng } from '@/lib/api';
 import type { Added } from './parts';
 import { SHORT } from './parts';
 import { useLockBody } from '@/lib/useLockBody';
@@ -162,7 +162,10 @@ export function EditModal({ initial, onClose, canManage, loggedIn, srcList, newS
               <label htmlFor="hot-file" className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-dashed px-3 py-1.5 text-xs font-semibold ${upLoading ? 'border-slate-200 text-slate-400' : 'border-slate-300 text-slate-600 hover:bg-slate-50'}`}>📎 {upLoading ? 'Đang tải tệp…' : 'Tải ảnh / PDF công văn'}</label>
               {/\/api\/images\//.test(f.link) && !upLoading && (
                 <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700">✓ Đã đính kèm tệp
-                  <a href={f.link} target="_blank" rel="noreferrer" className="underline">Xem</a>
+                  {/* Tệp đã lưu vào bản ghi là tệp RIÊNG → xin chữ ký rồi mới mở. Mở thẻ trống NGAY lúc bấm (trình duyệt điện
+                      thoại chặn thẻ mở muộn sau khi chờ mạng), có link rồi mới chuyển thẻ đó tới tệp. */}
+                  <a href={f.link} target="_blank" rel="noreferrer" className="underline"
+                    onClick={(ev) => { ev.preventDefault(); const w = window.open('', '_blank'); linkTepRieng(f.link).then((u) => { if (w) w.location.href = u; else window.open(u, '_blank', 'noopener'); }); }}>Xem</a>
                   <button type="button" onClick={() => set('link', '')} className="font-semibold text-red-500 hover:text-red-700">Bỏ</button>
                 </span>
               )}

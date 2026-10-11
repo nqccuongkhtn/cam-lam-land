@@ -4,6 +4,18 @@ import { query } from '../lib/db.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 // Nhận diện loại file bằng CHỮ KÝ NHỊ PHÂN (29/9/2026 — rà soát bảo mật), nay dùng chung với tệp chat: xem lib/loaiTep.ts.
 import { loaiThat, datLoaiAnToan as datLoai } from '../lib/loaiTep.ts';
+import { kyTepHopLe } from '../lib/kyTep.ts';
+
+// Tệp RIÊNG (công văn đính kèm danh sách nóng — lib/kyTep.ts): chỉ mở được bằng link có chữ ký còn hạn, và KHÔNG cho
+// nginx / Cloudflare / trình duyệt giữ lại. Không có chữ ký thì trả "không tìm thấy" (không để lộ là tệp có tồn tại).
+// Trả true nếu đã trả lời từ chối.
+function chanTepRieng(req: any, res: any, id: number, rieng: boolean): boolean {
+  if (!rieng) return false;
+  if (kyTepHopLe(id, req.query.het, req.query.ky)) { res.set('Cache-Control', 'private, no-store'); return false; }
+  res.set('Cache-Control', 'no-store');
+  res.status(404).end();
+  return true;
+}
 
 export const imagesRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024, files: 30 } });
@@ -41,10 +53,11 @@ const soId = (v: string) => { const n = Number(v); return Number.isInteger(n) &&
 imagesRouter.get(['/:id/thumb.:ext', '/:id/thumb'], async (req, res, next) => {
   try {
     const id = soId(req.params.id); if (!id) return res.status(404).end();
-    const [row] = await query('SELECT mime, thumb, bytes FROM listing_images WHERE id=$1', [id]);
+    const [row] = await query('SELECT mime, thumb, bytes, rieng FROM listing_images WHERE id=$1', [id]);
     if (!row) return res.status(404).end();
+    if (chanTepRieng(req, res, id, row.rieng)) return;
     datLoai(res, row.thumb ? (loaiThat(row.thumb) || 'image/webp') : row.mime, 'image/webp');
-    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    if (!row.rieng) res.set('Cache-Control', 'public, max-age=31536000, immutable');
     res.send(row.thumb || row.bytes);
   } catch (e) { next(e); }
 });
@@ -53,10 +66,11 @@ imagesRouter.get(['/:id/thumb.:ext', '/:id/thumb'], async (req, res, next) => {
 imagesRouter.get(['/:id.:ext', '/:id'], async (req, res, next) => {
   try {
     const id = soId(req.params.id); if (!id) return res.status(404).end();
-    const [row] = await query('SELECT mime, bytes FROM listing_images WHERE id=$1', [id]);
+    const [row] = await query('SELECT mime, bytes, rieng FROM listing_images WHERE id=$1', [id]);
     if (!row) return res.status(404).end();
+    if (chanTepRieng(req, res, id, row.rieng)) return;
     datLoai(res, row.mime, 'image/jpeg');
-    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    if (!row.rieng) res.set('Cache-Control', 'public, max-age=31536000, immutable');
     res.send(row.bytes);
   } catch (e) { next(e); }
 });

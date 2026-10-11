@@ -8,9 +8,23 @@ import path from 'node:path';
 import { laAdmin, coVaiTro } from '../lib/auth.ts';
 import { query } from '../lib/db.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
+import { kyTep } from '../lib/kyTep.ts';
 
 export const hotlistRouter = Router();
 const canManage = (req: AuthedRequest) => coVaiTro(req.user, 'admin', 'hotlist');
+
+// ── TỆP CÔNG VĂN ĐÍNH KÈM LÀ TỆP RIÊNG (11/10/2026 — rà soát bảo mật) ──
+// Tệp tải lên ở hộp "Thêm/Sửa bản ghi" nằm chung kho /api/images với ảnh tin rao (công khai, số tệp tăng dần 1, 2, 3…
+// ai cũng đoán được). Công văn có tên, CCCD, địa chỉ người dân → lưu bản ghi xong thì đánh dấu tệp đó là RIÊNG:
+// từ đó chỉ mở được bằng link có chữ ký 2 giờ do đường /ky-tep bên dưới cấp (lib/kyTep.ts, routes/images.ts).
+const soTepCuaLink = (link: unknown): number | null => {
+  const m = /\/api\/images\/(\d{1,9})(?!\d)/.exec(String(link || ''));
+  return m ? Number(m[1]) : null;
+};
+async function danhDauTepRieng(link: unknown): Promise<void> {
+  const id = soTepCuaLink(link);
+  if (id) await query('UPDATE listing_images SET rieng = true WHERE id = $1 AND NOT rieng', [id]).catch(() => {});
+}
 
 let ensured = false;
 async function ensure() {
@@ -70,6 +84,22 @@ hotlistRouter.get('/', authRequired, async (req: AuthedRequest, res, next) => {
   } catch (e) { next(e); }
 });
 
+// POST /api/hotlist/ky-tep { id } — cấp CHỮ KÝ 2 giờ để mở tệp công văn riêng (khung xem / thẻ mới không gửi được thẻ
+// đăng nhập nên phải dùng link có chữ ký). CHỈ admin / vai trò hotlist, và CHỈ cho tệp đang gắn vào một bản ghi danh sách
+// nóng — không thành chỗ "xin chữ ký" cho tệp bất kỳ. Đặt TRƯỚC /:id.
+hotlistRouter.post('/ky-tep', authRequired, async (req: AuthedRequest, res, next) => {
+  if (!canManage(req)) return khongCoQuyen(res);
+  try {
+    await ensure();
+    const id = Number((req.body as any)?.id);
+    if (!Number.isInteger(id) || id <= 0 || id >= 2 ** 31) return res.status(400).json({ error: 'Thiếu số tệp.' });
+    const ds = await query<{ link: string }>(`SELECT link FROM hot_records WHERE link LIKE $1`, [`%/api/images/${id}%`]);
+    if (!ds.some((r) => soTepCuaLink(r.link) === id)) return res.status(404).json({ error: 'Tệp này không thuộc danh sách nóng.' });
+    res.set('Cache-Control', 'private, no-store');
+    res.json(kyTep(id));
+  } catch (e) { next(e); }
+});
+
 // POST /api/hotlist — thêm bản ghi. CHỈ admin / vai trò hotlist (trước đây ai đăng nhập cũng thêm được;
 // nay người không có quyền cũng không thấy trang để thêm, nên khoá theo đúng quyền xem).
 hotlistRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => {
@@ -86,6 +116,7 @@ hotlistRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => {
        clip(b.loaiVb, 120), clip(b.soVbGoc, 120), clip(b.soGiayTo, 60), clip(b.namSinh, 12), clip(b.diaChi, 400),
        clip(b.soPhatHanh, 120), clip(b.soVaoSo, 120), clip(b.ngayCap, 40), req.user?.email || 'admin']);
     await registerSheet(row.nguon, req.user?.email || 'admin'); // đăng ký sheet (nguồn) để tồn tại độc lập với bản ghi
+    await danhDauTepRieng(row.link);                             // tệp công văn đính kèm → tệp riêng
     res.json({ ok: true, record: row });
   } catch (e) { next(e); }
 });
@@ -128,6 +159,7 @@ hotlistRouter.put('/:id', authRequired, async (req: AuthedRequest, res, next) =>
        clip(b.soPhatHanh, 120), clip(b.soVaoSo, 120), clip(b.ngayCap, 40), Number(req.params.id)]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy bản ghi' });
     await registerSheet(row.nguon, req.user?.email || 'admin'); // sheet (nguồn) có thể đổi khi sửa → đăng ký lại
+    await danhDauTepRieng(row.link);                             // tệp công văn đính kèm → tệp riêng
     res.json({ ok: true, record: row });
   } catch (e) { next(e); }
 });

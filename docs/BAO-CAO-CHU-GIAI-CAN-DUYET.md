@@ -229,6 +229,12 @@ hiện SAI so với bản vẽ (và so với con số web tính). Máy đã so t
 quy hoạch cả chỗ này): QĐ2222 ~1.670 ha mặt nước đầm Thủy Triều / biển (`thu-2222-dam-ngoai-ranh.png`), Tây Nam ~310 ha rừng
 (`thu-taynam-rung-ngoai-ranh.png`), QĐ2076 ~15 ha mặt nước. Cắt lại sẽ cắt đúng theo ranh như phần tính.
 
+**QĐ893 (quy hoạch sử dụng đất):** ảnh đang THIẾU hẳn khu điện mặt trời ~66 ha ở Cam An (12.007524, 109.090549 — ảnh để trắng, dữ
+liệu tính có "Đất công trình năng lượng"; đây là vùng tô hỏng viền đã bổ sung bằng `5f` hôm 11/10) — `thu-893-dien-mat-troi.png`.
+Còn lại ~2.250 ha máy báo "lệch tên" ở Suối Tân / Cam Hải Tây là do bảng màu (cùng màu xanh #7fff7f dùng cho nhiều mã): ảnh vẫn đúng
+màu bản vẽ. Soi kỹ vùng 1.130 ha: bên trong có mã QUY HOẠCH "NKH" (Level 34) → web ghi "Đất nông nghiệp khác" là đúng bản vẽ; chữ
+"RSX" trong vùng là mã HIỆN TRẠNG (Level 33). QĐ205: ảnh bản đồ vẽ trong suốt nên cách so này không dùng được — chưa kiểm.
+
 **Chỗ máy báo lệch nhưng ảnh ĐÚNG (để anh yên tâm):** khối "nhóm nhà ở" màu ô liu ở QĐ2101 là đất ở HIỆN TRẠNG — bản vẽ tô màu khác
 đất ở quy hoạch; ảnh cắt lại GIỮ màu này (`thu-2101-giu-mau-hien-trang.png`). Vùng cây xanh cách ly có hoa văn dấu "+" cũng giữ
 nguyên (`thu-2076-cay-xanh-cach-ly.png`).

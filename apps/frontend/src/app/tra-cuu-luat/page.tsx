@@ -888,6 +888,15 @@ export default function TraCuuLuatPage() {
     const co = new Set(kq.map((x) => x.ma + ':' + x.d.so));
     return [...kq, ...timTheo(moRong.cau).filter((x) => !co.has(x.ma + ':' + x.d.so))];
   }, [chiMuc, tim, timHL, chiGhim, chiGt, gt, ghim, timCaKho, maVb, kho, moRong]);
+  // LỌC THEO VĂN BẢN khi tìm cả kho (đợt 21): bấm chip "NĐ 102/2024 · 60" → chỉ xem kết quả của văn bản đó. Đổi chữ tìm thì bỏ lọc.
+  const [locVb, setLocVb] = useState<string | null>(null);
+  useEffect(() => { setLocVb(null); }, [tim, timCaKho]);
+  const ketQuaHien = useMemo(() => (locVb ? ketQua.filter((x) => x.ma === locVb) : ketQua), [ketQua, locVb]);
+  const demTheoVb = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const x of ketQua) m.set(x.ma, (m.get(x.ma) || 0) + 1);
+    return [...m.entries()].sort((a, b) => b[1] - a[1]);
+  }, [ketQua]);
 
   const dieuDangXem = useMemo(() => (vb && chon != null ? vb.dieu.find((d) => d.so === chon) || null : null), [vb, chon]);
   useEffect(() => {
@@ -906,7 +915,7 @@ export default function TraCuuLuatPage() {
     if (q.length < 2 || docSoDieu(q)) return ra;
     const cacBk = [boKhop(timHL.q), ...(moRong ? [boKhop(moRong.cau)] : [])];
     const viTri = (m: RegExpExecArray) => m.index + (m[0].length - m[1].length);   // bỏ ký tự ranh giới đứng trước
-    for (const x of ketQua.slice(0, 80)) {
+    for (const x of ketQuaHien.slice(0, 80)) {
       // ghi kiểu bằng 'as' để TypeScript không coi tot luôn là null (gán trong vòng lặp lồng nhau)
       let tot = null as { chu: string; so: number; diem: number; vt: number[] } | null;
       for (const bk of cacBk) {
@@ -932,7 +941,7 @@ export default function TraCuuLuatPage() {
       ra.set(x.ma + ':' + x.d.so, { chu: (a > 0 ? '…' : '') + chu.slice(a, b) + (b < chu.length ? '…' : ''), khoan: tot.so || undefined });
     }
     return ra;
-  }, [ketQua, tim, timHL, moRong]);
+  }, [ketQuaHien, tim, timHL, moRong]);
   useEffect(() => { setSoHien(SO_HIEN); }, [tim, timCaKho, chiGhim, chiGt, maVb]);
   // GÕ SAI CHÍNH TẢ (đợt 16, 11/10/2026): không điều nào khớp (đã thử cả không dấu, cách gọi đời thường, đoán chữ cuối) thì sửa
   // từng tiếng LẠ thành tiếng gần giống nhất có trong chữ luật (sai 1 chữ cái; tiếng ≥ 5 chữ cái cho sai 2), ưu tiên tiếng hay ĐI LIỀN
@@ -1017,13 +1026,17 @@ export default function TraCuuLuatPage() {
   // Văn bản tham khảo có chữ khớp ô tìm (gõ không dấu vẫn ra) — hiện thành hàng nút trên kết quả.
   const tkKhop = useMemo(() => {
     const q = kd(tim.trim());
-    if (q.length < 2) return [];
+    if (q.length < 2 || docSoDieu(q)) return [];
+    // cùng bộ so khớp với kho chính (đợt 21): đủ mọi TIẾNG trọn vẹn, gõ có dấu so có dấu (trước "thu" dính "thuộc")
+    const bk = boKhop(timHL.q);
+    if (!bk.tu.length) return [];
     return dsTk.filter((x) => {
       const v = cacTk[x.ma];
       const chu = [x.nhan, x.ten, x.coQuan, x.tinh || '', ...(v ? [...v.doan, ...(v.chuThich || []).map((c) => c.chu)] : [])].join(' ');
-      return kd(chu).includes(q);
+      const so = bk.dau ? thuongDau(chu) : kd(chu);
+      return bk.reTu.every((r) => r.test(so));
     });
-  }, [tim, dsTk, cacTk]);
+  }, [tim, timHL, dsTk, cacTk]);
   // Điều này có văn bản tham khảo báo là đã đổi hiệu lực (văn bản làm thay đổi CHƯA có trong kho) không.
   const canKiem = (ma: string, so: number) => !!bth?.theoDieu[`${ma}:${so}`]?.some((z) => z.canh);
   // Đóng ngăn đọc điều luật thì quên luôn "công văn đang đọc dở" để nút "← Về công văn" không hiện sai chỗ.
@@ -1158,9 +1171,9 @@ export default function TraCuuLuatPage() {
   }, [cachTo, dieuDangXem, vb, chiMuc]);
   const toKetQua = useMemo(() => {
     const ra = new Map<string, string[][] | null>();
-    if (cachTo) for (const x of ketQua.slice(0, 80)) ra.set(x.ma + ':' + x.d.so, phuDieu(x));
+    if (cachTo) for (const x of ketQuaHien.slice(0, 80)) ra.set(x.ma + ':' + x.d.so, phuDieu(x));
     return ra;
-  }, [cachTo, ketQua]);
+  }, [cachTo, ketQuaHien]);
   // Tô vàng chỗ khớp từ khoá trong nguyên văn (chỉ tô, không đổi chữ). Chỉ tô khi trọn tiếng (hai bên là ranh giới chữ); gõ có dấu
   // thì so có dấu. Chữ không dấu / chữ thường và chữ gốc (NFC) dài bằng nhau từng ký tự nên dùng chung vị trí.
   const toVang = (chu: string, to: string[][] | null = toCuaDieu) => {
@@ -1460,15 +1473,15 @@ export default function TraCuuLuatPage() {
   // Thanh "Kết quả i/N · ‹ Trước · Sau ›" khi điều đang đọc nằm trong kết quả tìm / lọc (đợt 17–18) — vẽ ở đầu và cuối bài.
   const thanhKetQua = (lop: string) => {
     if (!(tim.trim() || chiGhim || chiGt) || !vb || !dieuDangXem) return null;
-    const i = ketQua.findIndex((x) => x.ma === vb.ma && x.d.so === dieuDangXem.so);
-    if (i < 0 || ketQua.length < 2) return null;
-    const mo = (j: number) => { const x = ketQua[j]; if (x) moDieu(x.ma, x.d.so, khoanKhop(x.ma, x.d.so)); };
+    const i = ketQuaHien.findIndex((x) => x.ma === vb.ma && x.d.so === dieuDangXem.so);
+    if (i < 0 || ketQuaHien.length < 2) return null;
+    const mo = (j: number) => { const x = ketQuaHien[j]; if (x) moDieu(x.ma, x.d.so, khoanKhop(x.ma, x.d.so)); };
     return (
       <div className={`${lop} flex items-center gap-2 rounded-lg bg-slate-50 px-2.5 py-1.5 text-[12px] text-slate-600`}>
-        <span className="min-w-0 flex-1 truncate">🔎 Kết quả <b className="text-[#0A2540]">{i + 1}/{ketQua.length}</b>{tim.trim() ? <> cho “{tim.trim()}”</> : null}</span>
+        <span className="min-w-0 flex-1 truncate">🔎 Kết quả <b className="text-[#0A2540]">{i + 1}/{ketQuaHien.length}</b>{tim.trim() ? <> cho “{tim.trim()}”</> : null}</span>
         <button disabled={i === 0} onClick={() => mo(i - 1)}
           className="shrink-0 rounded-md border border-slate-200 bg-white px-2 py-0.5 font-semibold text-[#0A2540] disabled:opacity-40">‹ Trước</button>
-        <button disabled={i >= ketQua.length - 1} onClick={() => mo(i + 1)}
+        <button disabled={i >= ketQuaHien.length - 1} onClick={() => mo(i + 1)}
           className="shrink-0 rounded-md border border-slate-200 bg-white px-2 py-0.5 font-semibold text-[#0A2540] disabled:opacity-40">Sau ›</button>
       </div>
     );
@@ -2546,7 +2559,7 @@ export default function TraCuuLuatPage() {
           <input ref={oTim} value={tim} onChange={(e) => setTim(e.target.value)} enterKeyHint="search"
             onKeyDown={(e) => {
               if (e.key === 'Escape' && tim) { e.preventDefault(); setTim(''); return; }
-              if (e.key === 'Enter' && !e.nativeEvent.isComposing && ketQua.length) { e.preventDefault(); moDieu(ketQua[0].ma, ketQua[0].d.so, khoanKhop(ketQua[0].ma, ketQua[0].d.so)); (e.target as HTMLInputElement).blur(); }
+              if (e.key === 'Enter' && !e.nativeEvent.isComposing && ketQuaHien.length) { e.preventDefault(); moDieu(ketQuaHien[0].ma, ketQuaHien[0].d.so, khoanKhop(ketQuaHien[0].ma, ketQuaHien[0].d.so)); (e.target as HTMLInputElement).blur(); }
             }}
             placeholder="Từ khoá, hoặc số điều (vd 45, đ45 k2)…" title="Gõ rồi Enter để mở điều đầu tiên"
             className="w-full bg-transparent text-[15px] outline-none" />
@@ -2651,6 +2664,20 @@ export default function TraCuuLuatPage() {
                   <div className="mt-0.5 flex flex-wrap gap-1">{tkKhop.map((x) => <NutDan key={x.ma} d={{ ma: x.ma }} nho />)}</div>
                 </div>
               )}
+              {timCaKho && tim.trim() && demTheoVb.length > 1 && (
+                <div className="flex items-center gap-1.5 overflow-x-auto border-b border-slate-100 px-3 py-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <button onClick={() => setLocVb(null)}
+                    className={`shrink-0 whitespace-nowrap rounded-full border px-2 py-0.5 text-[11.5px] font-semibold ${!locVb ? 'border-[#0A2540] bg-[#0A2540] text-white' : 'border-slate-200 bg-white text-slate-600'}`}>
+                    Tất cả · {ketQua.length}
+                  </button>
+                  {demTheoVb.map(([ma, n]) => (
+                    <button key={ma} onClick={() => setLocVb(locVb === ma ? null : ma)}
+                      className={`shrink-0 whitespace-nowrap rounded-full border px-2 py-0.5 text-[11.5px] ${locVb === ma ? 'border-[#0A2540] bg-[#0A2540] font-semibold text-white' : 'border-slate-200 bg-white text-slate-600'}`}>
+                      {nhanNgan(ma, cacVb[ma]?.soHieu || '')} · {n}
+                    </button>
+                  ))}
+                </div>
+              )}
               {tim && luiKhongDau && (
                 <p className="border-b border-amber-100 bg-amber-50/70 px-3 py-1.5 text-[11.5px] leading-snug text-amber-900">
                   ✍️ Không có điều nào đúng dấu như đã gõ — đang tìm <b>không dấu</b> “{timHL.q}”. Có thể một chữ gõ sai / thiếu dấu.
@@ -2683,7 +2710,7 @@ export default function TraCuuLuatPage() {
                       </button>
                     )}
                   </div>
-                : <>{ketQua.slice(0, soHien).map((x) => (
+                : <>{ketQuaHien.slice(0, soHien).map((x) => (
                   <button key={x.ma + ':' + x.d.so} onClick={() => moDieu(x.ma, x.d.so, khoanKhop(x.ma, x.d.so))}
                     className={`block w-full border-b border-slate-100 px-3 py-2 text-left hover:bg-slate-50 ${x.ma === maVb && chon === x.d.so ? 'bg-[#0A2540]/[0.05]' : ''}`}>
                     <span className={`block text-[13px] font-bold ${x.d.tinhTrang?.loai === 'het-hieu-luc' ? 'text-slate-400 line-through decoration-rose-300' : 'text-[#0A2540]'}`}>
@@ -2703,10 +2730,10 @@ export default function TraCuuLuatPage() {
                     })()}
                   </button>
                 ))}
-                {ketQua.length > soHien && (
+                {ketQuaHien.length > soHien && (
                   <button onClick={() => setSoHien((n) => n + 100)}
                     className="block w-full px-3 py-2.5 text-center text-[12.5px] font-bold text-[#0A2540] hover:bg-slate-50">
-                    Xem thêm {Math.min(100, ketQua.length - soHien)} điều ▾ <span className="font-normal text-slate-400">(còn {ketQua.length - soHien})</span>
+                    Xem thêm {Math.min(100, ketQuaHien.length - soHien)} điều ▾ <span className="font-normal text-slate-400">(còn {ketQuaHien.length - soHien})</span>
                   </button>
                 )}</>}
             </>) : vb.chuong.length === 0 ? (

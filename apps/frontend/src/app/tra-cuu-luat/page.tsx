@@ -277,6 +277,10 @@ export default function TraCuuLuatPage() {
   const [moChuong, setMoChuong] = useState<Record<string, boolean>>({});
   const [ghim, setGhim] = useState<string[]>([]);
   const [chiGhim, setChiGhim] = useState(false);
+  // Danh sách kết quả chỉ vẽ trước SO_HIEN dòng (đợt 11): gõ "đất" + Cả kho là ~1.400 điều khớp → vẽ 1.400 nút mỗi lần gõ một chữ
+  // làm điện thoại giật. Dòng cuối có nút "Xem thêm"; đổi chữ tìm / bộ lọc thì về lại 60.
+  const SO_HIEN = 60;
+  const [soHien, setSoHien] = useState(SO_HIEN);
   const [gt, setGt] = useState<GiaiThich | null>(null);
   const [chiGt, setChiGt] = useState(false);
   const [sd, setSd] = useState<SoDo | null>(null);
@@ -891,6 +895,7 @@ export default function TraCuuLuatPage() {
     }
     return ra;
   }, [ketQua, tim, timHL, moRong]);
+  useEffect(() => { setSoHien(SO_HIEN); }, [tim, timCaKho, chiGhim, chiGt, maVb]);
   // Mở kết quả thì cuộn tới khoản nào: gõ số ("75.2") thì theo số; gõ chữ thì tới khoản có trích đoạn.
   const khoanKhop = (ma: string, so: number) => docSoDieu(kd(tim.trim()))?.khoan ?? trichDoan.get(ma + ':' + so)?.khoan;
 
@@ -2472,7 +2477,7 @@ export default function TraCuuLuatPage() {
                       </button>
                     )}
                   </div>
-                : ketQua.map((x) => (
+                : <>{ketQua.slice(0, soHien).map((x) => (
                   <button key={x.ma + ':' + x.d.so} onClick={() => moDieu(x.ma, x.d.so, khoanKhop(x.ma, x.d.so))}
                     className={`block w-full border-b border-slate-100 px-3 py-2 text-left hover:bg-slate-50 ${x.ma === maVb && chon === x.d.so ? 'bg-[#0A2540]/[0.05]' : ''}`}>
                     <span className={`block text-[13px] font-bold ${x.d.tinhTrang?.loai === 'het-hieu-luc' ? 'text-slate-400 line-through decoration-rose-300' : 'text-[#0A2540]'}`}>
@@ -2492,6 +2497,12 @@ export default function TraCuuLuatPage() {
                     })()}
                   </button>
                 ))}
+                {ketQua.length > soHien && (
+                  <button onClick={() => setSoHien((n) => n + 100)}
+                    className="block w-full px-3 py-2.5 text-center text-[12.5px] font-bold text-[#0A2540] hover:bg-slate-50">
+                    Xem thêm {Math.min(100, ketQua.length - soHien)} điều ▾ <span className="font-normal text-slate-400">(còn {ketQua.length - soHien})</span>
+                  </button>
+                )}</>}
             </>) : vb.chuong.length === 0 ? (
               // Văn bản ngắn không chia chương (Luật 43/2024, Nghị định 42/2024) — liệt kê
               // thẳng từng điều. Không có nhánh này thì cột trái trống trơn.

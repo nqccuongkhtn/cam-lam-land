@@ -2759,7 +2759,15 @@ export default function TraCuuLuatPage() {
               )}
               {tim && luiKhongDau && (
                 <p className="border-b border-amber-100 bg-amber-50/70 px-3 py-1.5 text-[11.5px] leading-snug text-amber-900">
-                  ✍️ Không có điều nào đúng dấu như đã gõ — đang tìm <b>không dấu</b> “{timHL.q}”. Có thể một chữ gõ sai / thiếu dấu.
+                  ✍️ Không có điều nào{timCaKho ? '' : ' của văn bản này'} chứa đủ cụm đúng dấu như đã gõ — đang tìm <b>không dấu</b> “{timHL.q}” (rộng hơn,
+                  dễ lạc đề). Có thể một chữ gõ sai / thiếu dấu{timCaKho ? '.' : <>, hoặc nội dung nằm ở <b>nghị định, thông tư</b> (trình tự, thủ tục, mẫu giấy… hay nằm ở đó).</>}
+                  {/* đợt 27: tìm trong một văn bản mà không khớp đúng dấu → mời tìm cả kho, chỗ hay có chữ "thủ tục", "hồ sơ" thật */}
+                  {!timCaKho && (
+                    <button onClick={() => setTimCaKho(true)}
+                      className="ml-1 mt-1 inline-block rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[11.5px] font-bold text-emerald-700">
+                      🔎 Tìm cả kho (nghị định, thông tư)
+                    </button>
+                  )}
                 </p>
               )}
               {tim && timHL.doan && !luiKhongDau && (

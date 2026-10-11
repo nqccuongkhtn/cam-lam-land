@@ -873,7 +873,7 @@ export function hoaHop205(ring: number[][], dienTich: number, pre: { type: strin
 // RANH LẬP QUY HOẠCH QĐ205 (data/ranh_qh.json, lớp '1-QH_Ranh giới lập quy hoạch' của QD205.gpkg). Soi trên bản vẽ gốc 10/10/2026: khe
 // hở giữa các ô QĐ205 ngoài khung mặt nạ đường là LÒNG ĐƯỜNG (2 bên có nét mép đường -1-TRAFFIC-PAVEMENT) — luật cũ "bị ô bao ≥ 6/8
 // hướng" trượt ở đường lớn chạy dài (dọc đường không gặp ô nào) → thửa 13 tờ 49 Suối Tân nửa thửa trên đường bị ghi cây xanh.
-const R205 = (() => { const r = RANH_QH['205']; if (!r) return null; const a = new Float64Array(r.length * 2); r.forEach(([x, y], i) => { a[2 * i] = x; a[2 * i + 1] = y; }); return a; })();
+const R205 = (() => { const r = RANH_QH['205'] as number[][] | undefined; if (!r) return null; const a = new Float64Array(r.length * 2); r.forEach(([x, y]: number[], i: number) => { a[2 * i] = x; a[2 * i + 1] = y; }); return a; })();
 const NGOAI_205 = 'Nằm ngoài phạm vi bản quy hoạch này';
 const CHUA_RO_205 = 'Chưa ghi loại đất trong bản vẽ';
 // mẩu "ngoài phạm vi" < 2 m² sát ranh (nét ranh 1/10.000 sai số ~1 m) → gộp vào loại đất lớn nhất, khỏi hiện dòng vô nghĩa

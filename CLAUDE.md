@@ -675,7 +675,9 @@ Mọi thao tác ghi phải gọi `cacheDrop('listings:')` để xoá cache.
 - **`public/`** — dữ liệu bản đồ **tĩnh**: `qh_vector.geojson` (bản đang dùng), `ranh-xa.geojson`,
   `roadnet_camlam.json`, `danh-sach-nong.json`, thư mục `tiles/`, `overlays/`.
   Đây là lý do nginx có luật cache riêng cho `.geojson`, `.pmtiles`, `/tiles/`, `/overlays/`.
-- Là **PWA**: `public/sw.js`, `manifest.webmanifest`, `offline.html`, thông báo đẩy (VAPID).
+- Là **PWA**: `public/sw.js`, `manifest.webmanifest`, `offline.html`, thông báo đẩy (VAPID). Trang mở từ bộ nhớ đệm trước rồi
+  cập nhật ngầm; khác "dấu phiên bản" (mọi file CSS + JS của Next mà trang gọi — trước 11/10/2026 chỉ so CSS nên sửa mã JS
+  xong người dùng vẫn chạy bản cũ) thì tự tải lại một lần. Cần xoá sạch trang cũ của mọi máy: tăng `CACHE` trong `sw.js`.
 - **`app/tra-cuu-luat/page.tsx`** — học & tra cứu luật (dữ liệu `public/luat/*.json`, cần đăng nhập). Bộ TÌM (11/10/2026):
   khớp theo **TIẾNG trọn vẹn** ("thu" không dính "thuộc"); gõ **có dấu thì so có dấu**, không dấu thì so không dấu
   (có dấu mà không điều nào khớp đúng dấu — gõ sai / thiếu dấu một chữ — thì `timHL` tự lùi về so không dấu, có dòng báo);
@@ -684,6 +686,8 @@ Mọi thao tác ghi phải gọi `cacheDrop('listings:')` để xoá cache.
   ("sổ đỏ" → "giấy chứng nhận", "đền bù" → "bồi thường", "UBND"…) để tìm THÊM, xếp sau kết quả đúng chữ đã gõ.
   Tô vàng: điều có nguyên cụm thì chỉ tô cụm, tiếng có mặt > 25 % số điều (vd "đất") không tô lẻ. Mọi chuỗi so khớp phải giữ
   **cùng độ dài** với chữ gốc NFC (`kd`, `thuongDau`) vì vị trí cắt trích đoạn / tô vàng dùng chung.
+  Tốc độ: mỗi điều có sẵn BẢNG TIẾNG (`tuD`/`tuK` trong `chiMuc`) → "đủ mọi tiếng" chỉ là tra bảng, chỉ điều đủ tiếng mới dò cụm
+  (nhanh 5–15 lần); danh sách chỉ vẽ 60 dòng + nút "Xem thêm". Gõ dở chữ cuối thì `timHL` đoán nốt (ưu tiên tiếng đi liền sau).
 
 ---
 

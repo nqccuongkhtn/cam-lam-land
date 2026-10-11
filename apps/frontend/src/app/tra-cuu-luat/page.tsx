@@ -801,9 +801,9 @@ export default function TraCuuLuatPage() {
   // Chữ đã bỏ dấu và chữ gốc (dạng NFC) dài bằng nhau từng ký tự nên dùng chung vị trí cắt.
   // Đợt 5 (11/10/2026): trước lấy đoạn ĐẦU TIÊN có từ đầu tiên ("quốc phòng thu hồi" → trích chỗ có mỗi chữ "quốc"). Nay chấm điểm
   // từng khoản / điểm: có nguyên cụm là nhất, rồi tới đoạn có NHIỀU TIẾNG KHÁC NHAU nhất; cửa sổ trích nới ra để phủ thêm các chữ
-  // khớp gần nhau, cắt ở chỗ cách chữ (không cụt giữa tiếng), tô vàng MỌI tiếng khớp. Nhớ luôn khoản đó để bấm vào là cuộn tới.
+  // khớp gần nhau, cắt ở chỗ cách chữ (không cụt giữa tiếng). Nhớ luôn khoản đó để bấm vào là cuộn tới.
   const trichDoan = useMemo(() => {
-    const ra = new Map<string, { chu: string; khoan?: number; coCum: boolean }>();
+    const ra = new Map<string, { chu: string; khoan?: number }>();
     const q = kd(tim.trim());
     if (q.length < 2 || docSoDieu(q)) return ra;
     const cacBk = [boKhop(tim), ...(moRong ? [boKhop(moRong.cau)] : [])];
@@ -830,7 +830,7 @@ export default function TraCuuLuatPage() {
       let a = Math.max(0, dau - 45), b = Math.min(chu.length, cuoi + 90);
       if (a > 0) { const c = chu.indexOf(' ', a); if (c > 0 && c < dau) a = c + 1; }
       if (b < chu.length) { const c = chu.lastIndexOf(' ', b); if (c > cuoi) b = c; }
-      ra.set(x.ma + ':' + x.d.so, { chu: (a > 0 ? '…' : '') + chu.slice(a, b) + (b < chu.length ? '…' : ''), khoan: tot.so || undefined, coCum: tot.diem >= 100 });
+      ra.set(x.ma + ':' + x.d.so, { chu: (a > 0 ? '…' : '') + chu.slice(a, b) + (b < chu.length ? '…' : ''), khoan: tot.so || undefined });
     }
     return ra;
   }, [ketQua, tim, moRong]);
@@ -885,40 +885,66 @@ export default function TraCuuLuatPage() {
     else { taiVb(ma).catch(() => {}); setDocBen({ ma, so }); }
   };
 
-  // CÁCH TÔ VÀNG (đợt 6, 11/10/2026). Trước: tô nguyên cụm + MỌI tiếng lẻ → gõ "hạn mức giao đất ở" là cả trang vàng rực chữ "đất".
-  // Nay: (1) điều / trích đoạn có NGUYÊN CỤM thì chỉ tô cụm; (2) không có cụm mới tô từng tiếng, và bỏ tiếng QUÁ PHỔ BIẾN (có mặt
-  // trong > 25 % số điều của văn bản đang xem, vd "đất" trong Luật Đất đai); (3) gõ cách gọi đời thường thì tô cả chữ của luật.
+  // CÁCH TÔ VÀNG (đợt 7, 11/10/2026). Tiếng Việt: một TỪ thường gồm 2 tiếng ("thu hồi", "quốc phòng") → tô từng TIẾNG rời là rối
+  // (gõ "quốc phòng thu hồi" từng chỉ tô mỗi chữ "phòng", cả trong "phòng hộ"; gõ "hạn mức giao đất ở" thì vàng rực chữ "đất").
+  // Nay với MỖI ĐIỀU: phủ các tiếng đã gõ bằng những CỤM LIỀN dài nhất có mặt trong điều đó (→ tô "thu hồi" + "quốc phòng"); điều có
+  // nguyên cụm thì chỉ tô cụm; tiếng lẻ còn sót mới tô riêng, và chỉ khi nó HIẾM (có mặt ≤ 25 % số điều của văn bản — "đất" trong
+  // Luật Đất đai thì không). Gõ cách gọi đời thường ("sổ đỏ") thì tô cả chữ của luật ("giấy chứng nhận").
   const cachTo = useMemo(() => {
     const q = tim.trim();
     if (!q || q.length < 2 || docSoDieu(kd(q))) return null;   // tìm theo số điều thì không tô chữ
     const ds = chiMuc[maVb] || [];
     return [q, ...(moRong ? [moRong.cau] : [])].map((cau) => {
-      const bk = boKhop(cau);
-      const le = bk.tu.filter((w, i) => {
+      const bk = boKhop(cau), n = bk.tu.length;
+      const cum: { i: number; j: number; chu: string; re: RegExp }[] = [];   // cụm liền từ tiếng i tới j-1, cụm dài trước
+      for (let dai = n; dai >= 2; dai--) for (let i = 0; i + dai <= n; i++) {
+        const chu = bk.tu.slice(i, i + dai).join(' ');
+        cum.push({ i, j: i + dai, chu, re: new RegExp('(?:^|[^\\p{L}\\p{N}])(' + escRe(chu) + ')(?=$|[^\\p{L}\\p{N}])', 'u') });
+      }
+      const hiem = bk.tu.map((w, i) => {
         if (w.length < 2) return false;
-        if (bk.tu.length < 2 || !ds.length) return true;
-        let n = 0;
-        for (const x of ds) if (bk.reTu[i].test(bk.dau ? x.khoD : x.kho)) n++;
-        return n / ds.length <= 0.25;
+        if (n < 2 || !ds.length) return true;
+        let c = 0;
+        for (const x of ds) if (bk.reTu[i].test(bk.dau ? x.khoD : x.kho)) c++;
+        return c / ds.length <= 0.25;
       });
-      return { bk, le };
+      return { bk, cum, hiem };
     });
   }, [tim, moRong, chiMuc, maVb]);
-  // Điều đang đọc có nguyên cụm (của chữ đã gõ hoặc chữ của luật) không — có thì trong điều chỉ tô cụm.
-  const cumTrongDieu = useMemo(() => {
-    if (!cachTo || !dieuDangXem || !vb) return false;
-    const x = (chiMuc[vb.ma] || []).find((y) => y.d.so === dieuDangXem.so);
-    return !!x && cachTo.some((g) => g.bk.reCum.test(g.bk.dau ? x.khoD : x.kho));
+  // Chữ cần tô cho MỘT điều (mỗi nhóm một danh sách: chữ đã gõ / chữ của luật), chữ dài trước.
+  const phuDieu = (x: { khoD: string; kho: string } | undefined): string[][] | null => {
+    if (!cachTo || !x) return null;
+    return cachTo.map((g) => {
+      const so = g.bk.dau ? x.khoD : x.kho, n = g.bk.tu.length;
+      if (n === 1) return [g.bk.cum];
+      const phu: boolean[] = new Array(n).fill(false), ra: string[] = [];
+      for (const c of g.cum) {
+        let moi = false;
+        for (let k = c.i; k < c.j; k++) if (!phu[k]) { moi = true; break; }
+        if (!moi || !c.re.test(so)) continue;
+        ra.push(c.chu);
+        for (let k = c.i; k < c.j; k++) phu[k] = true;
+      }
+      g.bk.tu.forEach((w, i) => { if (!phu[i] && g.hiem[i]) ra.push(w); });
+      return [...new Set(ra)].sort((a, b) => b.length - a.length);
+    });
+  };
+  // Điều đang đọc, và 80 kết quả đầu (dòng trích) — tính sẵn một lần.
+  const toCuaDieu = useMemo(() => {
+    if (!cachTo || !dieuDangXem || !vb) return null;
+    return phuDieu((chiMuc[vb.ma] || []).find((y) => y.d.so === dieuDangXem.so));
   }, [cachTo, dieuDangXem, vb, chiMuc]);
+  const toKetQua = useMemo(() => {
+    const ra = new Map<string, string[][] | null>();
+    if (cachTo) for (const x of ketQua.slice(0, 80)) ra.set(x.ma + ':' + x.d.so, phuDieu(x));
+    return ra;
+  }, [cachTo, ketQua]);
   // Tô vàng chỗ khớp từ khoá trong nguyên văn (chỉ tô, không đổi chữ). Chỉ tô khi trọn tiếng (hai bên là ranh giới chữ); gõ có dấu
   // thì so có dấu. Chữ không dấu / chữ thường và chữ gốc (NFC) dài bằng nhau từng ký tự nên dùng chung vị trí.
-  const toVang = (chu: string, chiCum: boolean = cumTrongDieu) => {
-    if (!cachTo || !chu) return chu;
+  const toVang = (chu: string, to: string[][] | null = toCuaDieu) => {
+    if (!cachTo || !to || !chu) return chu;
     const goc = chu.normalize('NFC'), D = thuongDau(goc), K = kd(goc);
-    const nhom = cachTo.map((g) => ({
-      k: g.bk.dau ? D : K,
-      tu: (chiCum ? [g.bk.cum] : [...new Set([g.bk.cum, ...g.le])]).sort((a, b) => b.length - a.length),
-    }));
+    const nhom = cachTo.map((g, i) => ({ k: g.bk.dau ? D : K, tu: to[i] || [] }));
     const laChu = (c: string | undefined) => !!c && /[\p{L}\p{N}]/u.test(c);
     const ra: React.ReactNode[] = [];
     let i = 0, tu0 = 0;
@@ -2386,7 +2412,7 @@ export default function TraCuuLuatPage() {
                       const td = trichDoan.get(x.ma + ':' + x.d.so);
                       return td ? (
                         <span className="mt-0.5 block text-[11.5px] leading-snug text-slate-500">
-                          {td.khoan ? <b className="mr-1 text-slate-400">K{td.khoan}</b> : null}{toVang(td.chu, td.coCum)}
+                          {td.khoan ? <b className="mr-1 text-slate-400">K{td.khoan}</b> : null}{toVang(td.chu, toKetQua.get(x.ma + ':' + x.d.so) || null)}
                         </span>
                       ) : null;
                     })()}

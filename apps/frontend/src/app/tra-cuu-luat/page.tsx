@@ -919,24 +919,28 @@ export default function TraCuuLuatPage() {
     // TÌM THÔNG MINH (11/10/2026): trước đây phải gõ đúng NGUYÊN CỤM liền nhau mới ra ("thu hồi đất quốc phòng" không ra nếu
     // các chữ đứng cách nhau). Nay: điều chứa nguyên cụm xếp trước, rồi tới điều có ĐỦ MỌI TIẾNG (không cần liền nhau);
     // trong mỗi nhóm, điều khớp ở TIÊU ĐỀ đứng trên điều chỉ khớp trong thân bài. So theo tiếng trọn vẹn, có dấu thì so có dấu.
-    const timTheo = (cau: string) => {
+    // XẾP THEO MỨC SÁT NGHĨA (đợt 28, 12/10/2026) — chấm điểm từng điều có đủ mọi tiếng:
+    //   tiêu đề có NGUYÊN CỤM 100 · tiêu đề có đủ mọi tiếng 80 · thân bài có nguyên cụm 60 · chỉ có đủ tiếng rải rác 20.
+    // Kết quả theo CHỮ CỦA LUẬT (cách gọi đời thường "sổ đỏ" → "giấy chứng nhận") gộp CHUNG, chỉ trừ 5 điểm — trước luôn xếp sau hết nên
+    // "thủ tục cấp sổ đỏ" ra Điều 27 (chữ rải rác) trên Điều 223 "Các thủ tục hành chính về đất đai". Bằng điểm thì giữ thứ tự cũ.
+    const thuTu = new Map(ds.map((x, i) => [x, i] as [(typeof ds)[number], number]));
+    const chamDiem = (cau: string, tru: number, ra: Map<(typeof ds)[number], number>) => {
       const bk = boKhop(cau);
-      if (!bk.tu.length) return ds;                      // gõ toàn dấu câu → coi như chưa gõ
+      if (!bk.tu.length) return false;                   // gõ toàn dấu câu → coi như chưa gõ
       const than = (x: (typeof ds)[number]) => (bk.dau ? x.khoD : x.kho), tde = (x: (typeof ds)[number]) => (bk.dau ? x.tdeD : x.tde);
-      const tdCum = (x: (typeof ds)[number]) => coDuTieng(x, bk, true) && bk.reCum.test(tde(x));
-      const tieuDeTruoc = (a: typeof ds) => [...a.filter(tdCum), ...a.filter((x) => !tdCum(x))];
-      const du = ds.filter((x) => coDuTieng(x, bk));                     // có đủ mọi tiếng (tra bảng, rất nhanh)
-      if (bk.tu.length < 2) return tieuDeTruoc(du);                      // một tiếng: có tiếng đó là khớp
-      const laCum = new Set(du.filter((x) => bk.reCum.test(than(x))));   // chỉ dò nguyên cụm trên các điều đã đủ tiếng
-      const nguyen = du.filter((x) => laCum.has(x)), duTu = du.filter((x) => !laCum.has(x));
-      const tdDu = (x: (typeof ds)[number]) => coDuTieng(x, bk, true);
-      return [...tieuDeTruoc(nguyen), ...duTu.filter(tdDu), ...duTu.filter((x) => !tdDu(x))];
+      for (const x of ds) {
+        if (!coDuTieng(x, bk)) continue;                 // có đủ mọi tiếng (tra bảng, rất nhanh)
+        const tdDu = coDuTieng(x, bk, true);
+        const d = (bk.tu.length < 2 ? (tdDu ? 80 : 20)
+          : tdDu && bk.reCum.test(tde(x)) ? 100 : tdDu ? 80 : bk.reCum.test(than(x)) ? 60 : 20) - tru;
+        if (!(ra.get(x)! >= d)) ra.set(x, d);
+      }
+      return true;
     };
-    const kq = timTheo(timHL.q);
-    if (!moRong) return kq;
-    // gõ cách gọi đời thường ("sổ đỏ") → thêm các điều theo chữ của luật ("giấy chứng nhận"), xếp SAU kết quả theo đúng chữ đã gõ
-    const co = new Set(kq.map((x) => x.ma + ':' + x.d.so));
-    return [...kq, ...timTheo(moRong.cau).filter((x) => !co.has(x.ma + ':' + x.d.so))];
+    const diem = new Map<(typeof ds)[number], number>();
+    if (!chamDiem(timHL.q, 0, diem)) return ds;
+    if (moRong) chamDiem(moRong.cau, 5, diem);
+    return [...diem.entries()].sort((a, b) => b[1] - a[1] || thuTu.get(a[0])! - thuTu.get(b[0])!).map(([x]) => x);
   }, [chiMuc, tim, timHL, chiGhim, chiGt, gt, ghim, timCaKho, maVb, kho, moRong]);
   // LỌC THEO VĂN BẢN khi tìm cả kho (đợt 21): bấm chip "NĐ 102/2024 · 60" → chỉ xem kết quả của văn bản đó. Đổi chữ tìm thì bỏ lọc.
   const [locVb, setLocVb] = useState<string | null>(null);

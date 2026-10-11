@@ -125,7 +125,10 @@ cách 0,000 m). Điểm giữa: X = 1.334.829,34 · Y = 599.631,76 (VN-2000), t�
   "Đất cây xanh sử dụng công cộng". Hai bản chi tiết hơn (vẽ trên nền địa chính 1/2000) không hề có đường ven hồ ở đây.
 - **1,39 m không phải bề rộng một con đường**: làn xe tối thiểu ~3,5 m; trên bản vẽ tỉ lệ 1/10.000, 1,4 m chỉ là **0,14 mm** — mảnh
   hơn cả nét bút vẽ (0,18–0,35 mm). Một con đường ven hồ thật trong quy hoạch chung phải rộng cỡ 13–20 m.
-- Không thấy nét vẽ đường (mép đường / tim đường) nào chạy trong dải này trong file bản vẽ.
+- **Không có nét vẽ nào chạy trong dải** (đã quét 34.070 nét `lines` + 6.696 nét `polylines` của QD205.gpkg: trong vòng 3 m quanh
+  giữa dải không có nét nào). Nét gần nhất là một nét **"L-duong dao" (đường dạo)** cách giữa dải **30,7 m** — nét này chạy giữa khu
+  cây xanh và khu đơn vị ở, **đúng chỗ QĐ2101 / QĐ893 có con đường 2.894,9 m²** trong thửa. Tức là QĐ205 CÓ thể hiện tuyến đó, nhưng
+  chỉ bằng một nét kẻ (vùng tô hai bên vẫn khít nhau), nên web không tính ra đường ở đó cho QĐ205.
 
 **Kết luận của tôi:** nhiều khả năng mảnh 2 **KHÔNG phải đường quy hoạch** mà là **khe hở do hai vùng tô vẽ không khít nhau** (đường
 bao hồ và đường bao khu cây xanh là hai nét cong vẽ riêng, cách nhau ~1,4 m). Mức chắc: cao.

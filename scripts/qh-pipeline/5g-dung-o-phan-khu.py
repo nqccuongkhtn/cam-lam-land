@@ -47,9 +47,17 @@ KHOP = re.compile(r'hatch_khop', re.I)   # level tô VÙNG KHỚP NỐI với qu
 
 
 def h5_sua(s):
-    """Tên level tiếng Việt bị đọc nhầm bảng mã (mojibake) → sửa lại như bảng chú giải đã sửa."""
-    try: return s.encode('cp1252').decode('utf-8')
-    except Exception: return s
+    """Tên lớp tiếng Việt bị đọc nhầm bảng mã (chữ UTF-8 bị hiểu thành cp1252) → sửa lại. Ký tự \x80–\x9f (byte cp1252 KHÔNG định
+    nghĩa — vd 'Đ' = C4 90 thành 'Ä\x90') lấy nguyên byte: trước 11/10/2026 gặp chúng là bó tay → lớp QĐ205 "_X_ĐVO mớiTB_2030"
+    (857 ha) không khớp khung chú giải, web ghi tên chung "Đất đơn vị ở"."""
+    try:
+        b = bytearray()
+        for ch in s:
+            o = ord(ch)
+            b += bytes([o]) if o < 0x100 else ch.encode('cp1252')
+        return b.decode('utf-8')
+    except Exception:
+        return s
 
 
 def chan_le(polys):

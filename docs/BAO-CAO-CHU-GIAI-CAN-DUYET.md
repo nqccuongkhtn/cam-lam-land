@@ -207,6 +207,36 @@ xem mục G). **Hai vùng anh nên xem kỹ:** QĐ2222 1,32 ha (ô chữ nhật 
 trả lại) và QĐ2076 0,62 ha (QĐ893 ghi đường — có thể là đảo giữa nút giao). Gỡ: xoá vùng đó trong khoá `_lo` của
 `apps/backend/data/ranh_qh.json`, hoặc chạy lại `scripts/qh-pipeline/7-lo-trong-ranh.py` sau khi sửa luật.
 
+## J. ẢNH THỬ CẮT LẠI ẢNH BẢN ĐỒ (TILE) 7 BẢN PHÂN KHU — CHỜ ANH DUYỆT (chưa cắt gì)
+
+Phần TÍNH diện tích đã dựng lại từ bản vẽ hôm 11/10 (5g), nhưng ẢNH bản đồ phân khu trên web vẫn cắt từ dữ liệu cũ → có chỗ ảnh
+hiện SAI so với bản vẽ (và so với con số web tính). Máy đã so toàn bộ 7 bộ ảnh với "ảnh sẽ cắt lại" (rải điểm 40 m khắp các bản):
+**97–99 % trùng nhau**; chỗ sai thật (cụm ≥ 1 ha) chỉ có mấy chỗ dưới đây. Ảnh thử để ở `bao-cao-qh/anh-thu-tile/`
+(TRÁI = ảnh đang hiện, PHẢI = ảnh sẽ cắt lại; giữ NGUYÊN bảng màu + hoa văn dấu "+" đã duyệt 14/9 — đã thử: tô lại ra trùng
+1.637/1.637 ô cả màu lẫn hoa văn).
+
+**Ảnh đang SAI loại đất (bị vùng khác che):**
+| Bản | Chỗ | Toạ độ | Ảnh đang hiện | Đúng theo bản vẽ | Ảnh thử |
+|---|---|---|---|---|---|
+| QĐ2222 | hồ nước 7,0 ha | 12.046426, 109.198787 | đất du lịch (hồng) | hồ, ao, đầm (xanh) | `thu-2222-ho-nuoc.png` |
+| QĐ2101 | nghĩa trang 4,5 ha | 12.054047, 109.145918 | cây xanh chuyên dụng | nghĩa trang (xám) | `thu-2101-nghia-trang.png` |
+| Tây Bắc | rừng sản xuất 22,4 ha | 12.146971, 109.037519 | nông nghiệp (xanh lá tươi) | rừng sản xuất (xanh đậm) | `thu-taybac-rung-san-xuat.png` |
+| QĐ2076 | di tích 1,3 ha | 12.132337, 109.091957 | cây xanh cách ly | di tích, tôn giáo | `thu-2076-di-tich.png` |
+
+(Lỗi chung: dữ liệu cũ LẤP LỖ của vùng tô — vùng hồ / nghĩa trang / rừng nằm trong "lỗ" của vùng lớn bị vùng lớn tô đè.)
+
+**Ảnh đang VẼ CẢ PHẦN NGOÀI RANH lập quy hoạch** (web tính chỗ này là "nằm ngoài phạm vi", ảnh lại tô màu → người xem dễ tưởng bản đó
+quy hoạch cả chỗ này): QĐ2222 ~1.670 ha mặt nước đầm Thủy Triều / biển (`thu-2222-dam-ngoai-ranh.png`), Tây Nam ~310 ha rừng
+(`thu-taynam-rung-ngoai-ranh.png`), QĐ2076 ~15 ha mặt nước. Cắt lại sẽ cắt đúng theo ranh như phần tính.
+
+**Chỗ máy báo lệch nhưng ảnh ĐÚNG (để anh yên tâm):** khối "nhóm nhà ở" màu ô liu ở QĐ2101 là đất ở HIỆN TRẠNG — bản vẽ tô màu khác
+đất ở quy hoạch; ảnh cắt lại GIỮ màu này (`thu-2101-giu-mau-hien-trang.png`). Vùng cây xanh cách ly có hoa văn dấu "+" cũng giữ
+nguyên (`thu-2076-cay-xanh-cach-ly.png`).
+
+**Nếu anh duyệt:** cắt lại 7 bộ ảnh bằng chuỗi mới (`5i-xuat-vung-to-co-mau.py` → `9-doi-bang-mau.py … autocad-tuoi` →
+`3-cat-tile.py` kèm lớp nét), ra THƯ MỤC MỚI (bản cũ giữ nguyên để lùi lại), rồi mới đổi số bản trên web. Ảnh thử bên phải chưa có
+lớp nét đường (lúc cắt thật vẫn vẽ nét như cũ).
+
 ## D. CẦN ANH XÁC NHẬN TRÊN MICROSTATION
 
 - **Thửa 95 tờ 15 Xã Cam Lâm, QĐ205 — mảnh giao thông số 2** (104,57 m², dải rộng ~1,4 m giữa vùng hồ và vùng cây xanh, ảnh

@@ -617,6 +617,15 @@ thửa 70 tờ 25 giữ nguyên, tốc độ như cũ (~93 ms/thửa).
 **`hoaHop205` VẪN BẬT** (chủ dự án yêu cầu 10/10: "3 quy hoạch giống nhau mà bị lệch thành ra gây nghi ngờ"): QĐ205 mượn ranh bản chi
 tiết khi chỉ lệch nét vẽ ≤ 1,5 m — đo 2.340 thửa: 1.035 thửa được khớp, 17 thửa đổi > 1 m², lớn nhất 17 m². Đo tay QĐ205 trên MicroStation
 sẽ thấy chênh đúng chừng đó; muốn số QĐ205 thuần thì tắt luật này (chờ chủ dự án quyết — báo cáo mục L).
+**RANH LẬP QUY HOẠCH 6 BẢN PHÂN KHU DỰNG LẠI THẲNG TỪ DXF (12/10/2026) — `scripts/qh-pipeline/6b-dung-ranh-tu-dxf.py`.** Ranh cũ (10/10)
+dựng từ `quyhoach2025/*_net.geojson` — file nét xuất trước đây LÀM THẲNG đường cong: cung tròn bẻ dây cung thô, đường cong trơn thành
+một đoạn thẳng nối hai đầu. Mọi đỉnh ranh cũ nằm đúng nét bản vẽ nhưng giữa các đỉnh lệch tới 3,2 m (QĐ2076, cung lớn) · 49,8 m (QĐ918)
+· 153–155 m (Tây Bắc, Cù Hin): khác nhau 27,7 ha Tây Bắc · 12,8 ha Cù Hin · 5,2 ha QĐ918 · 1,4 ha QĐ2076 · 0,16 ha QĐ2222 · 0,05 ha QĐ2101;
+Tây Nam và QĐ205 (gpkg) vốn đúng (< 1 cm). 6b đọc đúng lớp ranh (`BV_Rg_lapquyhoach`; Cù Hin / Tây Nam `1-QH_Ranh giới lập quy hoạch`),
+đường cong tính đúng bằng `cung_chinh_xac.py` (bulge, ARC, SPLINE), nối nét → dựng mặt → GỘP mặt (QĐ2222 có nét chia bên trong: mặt lớn
+nhất chỉ 1.615/3.554 ha) → vòng ngoài khối lớn nhất. Đổi ranh thì PHẢI chạy lại 5g cho bản đó (ô đất cắt theo ranh) rồi 7-lo-trong-ranh.py.
+Hai vùng "trắng trơn" Tây Bắc sát QL1A (2,98 + 2,51 ha) tự mất: chính là dải hở giữa vùng tô và dây cung sai của ranh cũ.
+Kiểm ranh bất cứ lúc nào: so đỉnh ranh với nét DXF (cả hai chiều) — xem `scripts/kiem-tra-qh/README.md`.
 
 **Dữ liệu bắt buộc phải có:** `apps/backend/data/qh_zones.json`, `road_mask.bin`, `road_mask.json`
 (đường dẫn đọc theo `QH_DATA_DIR`, mặc định `<thư mục chạy>/data`; trong container là `/app/apps/backend/data`).

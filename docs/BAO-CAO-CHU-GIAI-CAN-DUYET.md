@@ -240,8 +240,10 @@ Na Tia ~1.020 ha mà anh đã xác nhận trống trên DGN). **79 phiếu: kế
 | Tây Nam | 3,18 ha | 12.056975, 109.062932 | dải hở giữa vùng tô rừng và ranh | rừng sản xuất | `trang-tron-taynam-2.png` |
 | Tây Nam | 2,21 ha | 12.054828, 109.070102 | dải hở sát ranh | rừng sản xuất | `trang-tron-taynam-3.png` |
 | Tây Nam | 1,37 ha | 11.990363, 109.067142 | khe hình chữ V giữa hai vùng tô rừng | rừng sản xuất | `trang-tron-taynam-4.png` |
-| Tây Bắc | 2,98 ha | 12.151849, 109.062596 | dải hở giữa hành lang QL1A và ranh | cây lâu năm, KCN | `trang-tron-taybac-2.png` |
-| Tây Bắc | 2,51 ha | 12.147631, 109.064681 | như trên | khu công nghiệp | `trang-tron-taybac-3.png` |
+| ~~Tây Bắc~~ | ~~2,98 ha~~ | 12.151849, 109.062596 | **ĐÃ MẤT 12/10** — không phải vùng trắng thật: là dải hở giữa vùng tô và RANH CŨ bị kẻ thẳng sai (mục L, ý 6) | cây lâu năm, KCN | `trang-tron-taybac-2.png` |
+| ~~Tây Bắc~~ | ~~2,51 ha~~ | 12.147631, 109.064681 | **ĐÃ MẤT 12/10** — như trên | khu công nghiệp | `trang-tron-taybac-3.png` |
+| QĐ2222 | 0,50 ha | 12.068973, 109.189841 | MỚI 12/10 (sau khi ranh dựng lại đúng đường cong) — trắng trơn | — | — |
+| QĐ2222 | 0,39 ha | 12.068927, 109.189207 | MỚI 12/10 — trắng trơn, cạnh vùng trên | — | — |
 | QĐ2222 | 1,32 ha | 12.084782, 109.190564 | ô chữ nhật trắng giữa 3 vùng tô | văn hoá + đường | `trang-tron-2222-1.png` |
 | QĐ2222 | 0,81 ha | 12.120180, 109.207271 | trắng trơn | công cộng | `trang-tron-2222-2.png` |
 | QĐ2222 | 0,46 ha | 12.084536, 109.189476 | trắng trơn | văn hoá + đường | `trang-tron-2222-3.png` |
@@ -324,6 +326,8 @@ ngẫu nhiên đúng như khi anh bấm vào thửa, rồi so với số **cắt
 | 3 | Thửa có **lỗ thủng** (thửa khác nằm lọt bên trong): phần "ngoài phạm vi" bị cộng dư, các dòng cộng lại **lớn hơn cả thửa** | Thửa 581 tờ 16 Cam An Nam (39.600 m²), QĐ2101: "ngoài phạm vi" 48.351 → **23.792** m² |
 | 4 | **"Ô trùm" bắt nhầm cả 16 ô**: ô nằm trong lỗ thủng của vùng tô bị hiểu là "vùng tô vẽ phủ lên lô" → dải 8 m sát đường bị cắt thành đường | Thửa 139 tờ 18 Cam Hiệp, QĐ2076: 118 khu dân cư + 49,8 đường → **167,5 m² khu dân cư** (đúng vùng tô); thửa 6041 tờ 2 Suối Tân, Cù Hin: trả lại 720 m² cây xanh chuyên dụng |
 | 5 | QĐ205: giữa **nút giao / vòng xoay rộng** (xa ô đất > 50 m) ghi "Chưa ghi loại đất" dù mặt nạ nói là đường | Thửa 15 tờ 14 Xã Cam Lâm (giữa vòng xoay lớn Cam Đức): "chưa ghi loại" → **Đất giao thông 232,6 m²** (QĐ893, QĐ2101 cùng ghi đường) |
+
+| 6 | **RANH LẬP QUY HOẠCH bị kẻ thẳng qua đường cong** (đúng nghi ngờ "thuật toán đổi DXF" của anh): ranh dựng hôm 10/10 từ file nét xuất trước đây — file đó biến cung tròn thành dây cung, đường cong trơn thành một đoạn thẳng nối hai đầu. Lệch tới 153–155 m ở Tây Bắc và Cù Hin, 49,8 m ở QĐ918, 3,2 m ở QĐ2076. Dải đất giữa đường cong thật và đoạn thẳng bị tính sai "trong / ngoài bản quy hoạch": Tây Bắc 27,7 ha · Cù Hin 12,8 ha · QĐ918 5,2 ha · QĐ2076 1,4 ha | Nay dựng ranh THẲNG TỪ DXF GỐC, đường cong tính đúng công thức (script mới `6b-dung-ranh-tu-dxf.py`), rồi dựng lại ô đất 6 bản. Tây Nam và QĐ205 vốn đúng (lệch < 1 cm). Ảnh: `soi_ranh_moi_*.png` trong thư mục nháp |
 
 **Sau khi sửa: cả 9 bản lệch 0,00 %** so với cắt hình thẳng (trước: QĐ918 3,48 %, Tây Bắc 2,33 %, QĐ2101 1,51 %, Cù Hin 0,64 %, Tây Nam
 0,22 %, QĐ2076 0,17 %). **79 phiếu: giữ nguyên từng con số. Thửa 70 tờ 25: giữ nguyên** (395,1 + 116,8 cả 3 bản). Tốc độ như cũ.

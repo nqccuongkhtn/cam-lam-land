@@ -710,13 +710,15 @@ export default function TraCuuLuatPage() {
   //     cũng phải là ranh giới tiếng. (2) Người dùng gõ CÓ DẤU thì so CÓ DẤU ("thu hồi" không lẫn "thủ", "thư", "thú");
   //     gõ không dấu thì so không dấu như cũ (gõ "thu hoi" vẫn ra "thu hồi").
   const coDau = (q: string) => q.normalize('NFD') !== q.normalize('NFD').replace(/[\u0300-\u036f]/g, '') || /[đĐ]/.test(q);
+  // (3) Đợt 9: tách TIẾNG theo mọi thứ không phải chữ / số ("giao đất, cho thuê đất" = 5 tiếng, trước tính "đất," là một tiếng);
+  //     cụm nhiều tiếng thì giữa hai tiếng chấp nhận mọi dấu câu / khoảng trắng → gõ "giao đất cho thuê đất" vẫn khớp nguyên cụm
+  //     "giao đất, cho thuê đất" trong luật, gõ thừa dấu phẩy cũng không sao.
   const boKhop = (q: string) => {
     const dau = coDau(q);
     const goc = dau ? thuongDau(q.trim()) : kd(q.trim());
-    const esc = (t: string) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const tao = (t: string) => new RegExp('(?:^|[^\\p{L}\\p{N}])(' + esc(t) + ')(?=$|[^\\p{L}\\p{N}])', 'u');
-    const cum = goc, tu = goc.split(/\s+/).filter(Boolean);
-    return { dau, cum, tu, reCum: tao(cum), reTu: tu.map(tao) };
+    const tu = goc.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+    const tao = (ds: string[]) => new RegExp('(?:^|[^\\p{L}\\p{N}])(' + ds.map(escRe).join('[^\\p{L}\\p{N}]+') + ')(?=$|[^\\p{L}\\p{N}])', 'u');
+    return { dau, cum: tu.join(' '), tu, reCum: tao(tu), reTu: tu.map((t) => tao([t])) };
   };
   // Đọc "số điều" từ chữ đã bỏ dấu: 75 · dieu 75 · d75 · d.75 · dieu 75 khoan 2 · d75 k2 · k2 d75 · 75.2
   const docSoDieu = (q: string): { dieu: number; khoan?: number } | null => {
@@ -792,6 +794,7 @@ export default function TraCuuLuatPage() {
     // trong mỗi nhóm, điều khớp ở TIÊU ĐỀ đứng trên điều chỉ khớp trong thân bài. So theo tiếng trọn vẹn, có dấu thì so có dấu.
     const timTheo = (cau: string) => {
       const bk = boKhop(cau);
+      if (!bk.tu.length) return ds;                      // gõ toàn dấu câu → coi như chưa gõ
       const than = (x: (typeof ds)[number]) => (bk.dau ? x.khoD : x.kho), tde = (x: (typeof ds)[number]) => (bk.dau ? x.tdeD : x.tde);
       const tieuDeTruoc = (a: typeof ds) => [...a.filter((x) => bk.reCum.test(tde(x))), ...a.filter((x) => !bk.reCum.test(tde(x)))];
       const nguyen = ds.filter((x) => bk.reCum.test(than(x)));
@@ -828,6 +831,7 @@ export default function TraCuuLuatPage() {
       // ghi kiểu bằng 'as' để TypeScript không coi tot luôn là null (gán trong vòng lặp lồng nhau)
       let tot = null as { chu: string; so: number; diem: number; vt: number[] } | null;
       for (const bk of cacBk) {
+        if (!bk.tu.length) continue;
         const cacTu = bk.reTu.filter((_, i) => bk.tu[i].length >= 2);
         for (const k of x.d.khoan) for (const chu0 of [k.chu, ...k.diem.map((z) => z.chu)]) {
           const chu = (chu0 || '').normalize('NFC'), so = bk.dau ? thuongDau(chu) : kd(chu);
@@ -915,7 +919,7 @@ export default function TraCuuLuatPage() {
       const cum: { i: number; j: number; chu: string; re: RegExp }[] = [];   // cụm liền từ tiếng i tới j-1, cụm dài trước
       for (let dai = n; dai >= 2; dai--) for (let i = 0; i + dai <= n; i++) {
         const chu = bk.tu.slice(i, i + dai).join(' ');
-        cum.push({ i, j: i + dai, chu, re: new RegExp('(?:^|[^\\p{L}\\p{N}])(' + escRe(chu) + ')(?=$|[^\\p{L}\\p{N}])', 'u') });
+        cum.push({ i, j: i + dai, chu, re: new RegExp('(?:^|[^\\p{L}\\p{N}])(' + bk.tu.slice(i, i + dai).map(escRe).join('[^\\p{L}\\p{N}]+') + ')(?=$|[^\\p{L}\\p{N}])', 'u') });
       }
       const hiem = bk.tu.map((w, i) => {
         if (w.length < 2) return false;
@@ -960,23 +964,27 @@ export default function TraCuuLuatPage() {
   const toVang = (chu: string, to: string[][] | null = toCuaDieu) => {
     if (!cachTo || !to || !chu) return chu;
     const goc = chu.normalize('NFC'), D = thuongDau(goc), K = kd(goc);
-    const nhom = cachTo.map((g, i) => ({ k: g.bk.dau ? D : K, tu: to[i] || [] }));
-    const laChu = (c: string | undefined) => !!c && /[\p{L}\p{N}]/u.test(c);
-    const ra: React.ReactNode[] = [];
-    let i = 0, tu0 = 0;
-    while (i < goc.length) {
-      let dai = 0;
-      for (const g of nhom) {
-        if (laChu(g.k[i - 1])) continue;
-        for (const w of g.tu) if (w.length > dai && g.k.startsWith(w, i) && !laChu(g.k[i + w.length])) { dai = w.length; break; }
+    // Tìm MỌI chỗ khớp (cụm nhiều tiếng: giữa các tiếng chấp nhận dấu câu / nhiều khoảng trắng). Chỗ chồng nhau thì giữ chỗ bắt
+    // đầu trước; cùng chỗ bắt đầu thì giữ chỗ dài hơn.
+    const doan: [number, number][] = [];
+    cachTo.forEach((g, gi) => {
+      const k = g.bk.dau ? D : K;
+      for (const w of to[gi] || []) {
+        const re = new RegExp('(^|[^\\p{L}\\p{N}])(' + w.split(' ').map(escRe).join('[^\\p{L}\\p{N}]+') + ')(?=$|[^\\p{L}\\p{N}])', 'gu');
+        let m: RegExpExecArray | null;
+        while ((m = re.exec(k))) { const a = m.index + m[1].length; doan.push([a, a + m[2].length]); }
       }
-      if (dai) {
-        if (i > tu0) ra.push(goc.slice(tu0, i));
-        ra.push(<mark key={'v' + i} className="rounded bg-amber-200 px-0.5">{goc.slice(i, i + dai)}</mark>);
-        i += dai; tu0 = i;
-      } else i++;
+    });
+    if (!doan.length) return chu;
+    doan.sort((x, y) => x[0] - y[0] || (y[1] - y[0]) - (x[1] - x[0]));
+    const ra: React.ReactNode[] = [];
+    let tu0 = 0;
+    for (const [a, b] of doan) {
+      if (a < tu0) continue;
+      if (a > tu0) ra.push(goc.slice(tu0, a));
+      ra.push(<mark key={'v' + a} className="rounded bg-amber-200 px-0.5">{goc.slice(a, b)}</mark>);
+      tu0 = b;
     }
-    if (tu0 === 0) return chu;
     ra.push(goc.slice(tu0));
     return ra;
   };

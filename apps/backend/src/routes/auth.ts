@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { ghiDangNhap } from '../lib/thietBi.ts';
 import { query } from '../lib/db.ts';
 import { ghiSuKien } from './theoDoiTk.ts'; // THEO DÕI TÀI KHOẢN (tạm — dễ gỡ)
-import { hashPassword, verifyPassword, signToken, dsVaiTro, canNangCap, BAM_GIA, kiemMatKhauMoi, DAI_TOI_DA } from '../lib/auth.ts';
+import { hashPassword, verifyPassword, signToken, dsVaiTro, canNangCap, BAM_GIA, kiemMatKhauMoi, DAI_TOI_DA, MAT_KHAU_CONG_KHAI, laMangNoiBo } from '../lib/auth.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { sendVerificationEmail, EMAIL_LIVE } from '../lib/mailer.ts';
 import { laNguoiThat, TURNSTILE_SITE_KEY, turnstileBat } from '../lib/turnstile.ts';
@@ -95,6 +95,12 @@ authRouter.post('/login', async (req, res, next) => {
     // Thông báo GỘP để không lộ email nào đã đăng ký (chống dò tài khoản).
     if (!user || !dung) { ghiSai(k); return res.status(401).json({ error: 'Email hoặc mật khẩu không đúng' }); }
     saiMk.delete(k);
+    // ⛔ 11/10/2026 (rà soát bảo mật): mật khẩu MẶC ĐỊNH ĐÃ CÔNG KHAI (lib/auth.ts) — ai đọc mã nguồn cũng biết.
+    //    Chặn dùng từ Internet; ngồi tại máy chủ / mạng nội bộ vẫn vào được để đổi sang mật khẩu riêng.
+    if (MAT_KHAU_CONG_KHAI.has(password) && !laMangNoiBo(req.ip)) {
+      console.warn(`[BẢO MẬT] Chặn đăng nhập từ Internet bằng mật khẩu mặc định công khai: tài khoản #${user.id} (máy ${req.ip})`);
+      return res.status(403).json({ error: 'Tài khoản này đang dùng MẬT KHẨU MẶC ĐỊNH (ai cũng có thể biết) nên bị chặn đăng nhập từ Internet để bảo vệ. Hãy đăng nhập ngay trên máy chủ rồi đổi mật khẩu, hoặc nhờ quản trị viên đặt lại.' });
+    }
     // Mật khẩu CŨ băm độ khó thấp → băm lại bằng độ khó mới, GIỮ NGUYÊN mật khẩu (không chờ, lỗi thì thôi).
     if (canNangCap(user.password_hash)) {
       hashPassword(password).then((h) => query('UPDATE users SET password_hash=$2 WHERE id=$1', [user.id, h])).catch(() => {});

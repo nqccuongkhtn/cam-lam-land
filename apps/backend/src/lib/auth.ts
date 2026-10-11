@@ -59,9 +59,30 @@ export const canNangCap = (hash: string | null | undefined): boolean => {
 /** Chuỗi băm GIẢ để so khi email không tồn tại → thời gian trả lời NHƯ NHAU, không đo được email nào đã có. */
 export const BAM_GIA = bcrypt.hashSync('khong-co-tai-khoan-' + Math.random().toString(36), DO_KHO_BCRYPT);
 
+// ── MẬT KHẨU MẶC ĐỊNH ĐÃ CÔNG KHAI (11/10/2026 — rà soát bảo mật) ──────────────────────────────────────
+// Ba mật khẩu này nằm sẵn trong mã nguồn (lib/env.ts, lib/ensureAdmin.ts), tệp .env.example và docker-compose.yml
+// — ai xem được mã là biết. Tài khoản tạo tự động lúc cài đặt (admin@camlam.local, khach@camlam.vn, dat@camlam.vn)
+// mang đúng các mật khẩu này nếu chưa ai đổi. Đăng nhập bằng chúng TỪ INTERNET sẽ bị chặn (routes/auth.ts);
+// ngồi ngay máy chủ (http://localhost, mạng nội bộ) vẫn vào được để đổi mật khẩu.
+export const MAT_KHAU_CONG_KHAI = new Set(['admin12345', 'khach12345', 'dat12345']);
+
+/** Địa chỉ máy thuộc mạng nội bộ / chính máy chủ (localhost, 10.x, 172.16–31.x, 192.168.x, IPv6 nội bộ)? */
+export function laMangNoiBo(ip: string | null | undefined): boolean {
+  let s = String(ip || '').trim().toLowerCase();
+  if (s.startsWith('::ffff:')) s = s.slice(7);                 // IPv4 viết dạng IPv6
+  if (s === '::1' || s === 'localhost') return true;
+  const m = /^(\d{1,3})\.(\d{1,3})\.\d{1,3}\.\d{1,3}$/.exec(s);
+  if (m) {
+    const a = Number(m[1]), b = Number(m[2]);
+    return a === 127 || a === 10 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 169 && b === 254);
+  }
+  return /^f[cd][0-9a-f]{2}:/.test(s) || /^fe[89ab][0-9a-f]:/.test(s);   // IPv6 nội bộ (fc00::/7) và link-local (fe80::/10)
+}
+
 // Mật khẩu quá phổ biến — kẻ dò mật khẩu luôn thử trước tiên.
 const MAT_KHAU_DE = new Set(['12345678', '123456789', '1234567890', '87654321', '11111111', '00000000', '88888888', '66666666',
-  'password', 'password1', 'matkhau', 'matkhau123', 'qwerty123', 'abc12345', 'abcd1234', '123123123', 'iloveyou', 'admin123', 'admin12345', 'camlam123']);
+  'password', 'password1', 'matkhau', 'matkhau123', 'qwerty123', 'abc12345', 'abcd1234', '123123123', 'iloveyou', 'admin123', 'admin12345', 'camlam123',
+  ...MAT_KHAU_CONG_KHAI]);
 /** Kiểm mật khẩu MỚI. Trả câu báo lỗi tiếng Việt, hoặc null nếu dùng được. */
 export function kiemMatKhauMoi(p: unknown, email?: string | null): string | null {
   const s = String(p ?? '');

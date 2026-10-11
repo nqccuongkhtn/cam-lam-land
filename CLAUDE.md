@@ -690,6 +690,7 @@ Mọi thao tác ghi phải gọi `cacheDrop('listings:')` để xoá cache.
   (nhanh 5–15 lần); danh sách chỉ vẽ 60 dòng + nút "Xem thêm". Gõ dở chữ cuối thì `timHL` đoán nốt (ưu tiên tiếng đi liền sau).
   Đường dẫn tới từng điều: `/tra-cuu-luat?vb=<mã>&d=<số điều>&k=<khoản>` (mở thẳng, đổi điều thì địa chỉ đổi theo); nút "🔗 Gửi".
   Phím tắt máy tính: `/` hoặc Ctrl+K vào ô tìm, ← → điều trước / sau, Esc xoá ô tìm.
+  Gõ sai chính tả ra 0 kết quả → `goiYSua` gợi ý "Có phải muốn tìm…" (sửa tiếng lạ theo từ điển tiếng của chữ luật, ưu tiên cặp tiếng đi liền).
 
 ---
 

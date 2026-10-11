@@ -153,11 +153,24 @@ listingsRouter.get('/gia-khu-vuc', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+// ⚠️ 11/10/2026 (rà soát bảo mật): trang cá nhân + "Hiện số" CHỈ dành cho NGƯỜI ĐĂNG TIN (có ít nhất 1 tin công khai).
+//    Trước đây đổi số id là xem được tên + 6 số đầu SĐT của BẤT KỲ tài khoản nào, và (đã đăng nhập) lấy được SĐT
+//    ĐẦY ĐỦ — mà đăng ký tài khoản bắt buộc nhập SĐT → cào được SĐT của toàn bộ khách hàng, kể cả người chưa đăng
+//    tin bao giờ. Admin và chính chủ tài khoản vẫn xem được như cũ.
+async function laNguoiDangTin(id: number): Promise<boolean> {
+  const [r] = await query(`SELECT EXISTS (SELECT 1 FROM listings WHERE created_by=$1 AND status NOT IN ('hidden','pending')) AS co`, [id]);
+  return !!r?.co;
+}
+function duocXemMoiNguoi(u: any, id: number): boolean { return !!u && (Number(u.id) === id || laAdmin(u)); }
+
 // GET /api/listings/agent/:id — trang cá nhân người đăng (môi giới): thông tin + tin đang hiển thị + tin hết hạn/đã ẩn.
 listingsRouter.get('/agent/:id', async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    if (!id) return res.status(400).json({ error: 'id không hợp lệ' });
+    if (!Number.isInteger(id) || id <= 0 || id >= 2 ** 31) return res.status(400).json({ error: 'id không hợp lệ' });
+    const xem = nguoiXem(req);
+    const dacBiet = duocXemMoiNguoi(xem, id);              // admin / chính chủ → được xem cả tài khoản chưa đăng tin
+    if (!dacBiet && !(await laNguoiDangTin(id))) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
     // ⚠️ KHÔNG trả `role` (29/9/2026): lộ ai là admin/gis là chỉ đường cho kẻ xấu nhắm vào tài khoản đó.
     const [agent] = await query(`SELECT id, full_name AS "name", phone, avatar, rating, rating_count AS "ratingCount", created_at AS "createdAt",
        -- "Môi giới chuyên nghiệp" = admin đã DUYỆT (xem routes/moiGioiCn.ts) → trang tin hiện khung xanh ngọc có nhãn.
@@ -178,7 +191,8 @@ listingsRouter.get('/agent/:id', async (req, res, next) => {
     //    TRÊN MÀN HÌNH nhưng máy chủ gửi đủ 10 số (nằm trong nút tel:), ai cũng dò được SĐT của MỌI tài khoản
     //    bằng cách đổi số id. Số đầy đủ lấy qua POST /agent/:id/reveal (phải đăng nhập), giống "Hiện số" ở tin.
     agent.phone = agent.phone ? maskPhone(agent.phone) : null;
-    res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=120');
+    // Bản trả cho admin / chính chủ có thể là tài khoản chưa đăng tin → không cho nginx / trình duyệt khác giữ lại.
+    res.set('Cache-Control', dacBiet ? 'private, no-store' : 'public, max-age=30, stale-while-revalidate=120');
     res.json({ agent, active, expired });
   } catch (e) { next(e); }
 });
@@ -284,7 +298,8 @@ listingsRouter.get('/:id', async (req, res, next) => {
 listingsRouter.post('/agent/:id/reveal', authRequired, async (req: AuthedRequest, res, next) => {
   try {
     const id = Number(req.params.id);
-    if (!Number.isInteger(id) || id <= 0) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+    if (!Number.isInteger(id) || id <= 0 || id >= 2 ** 31) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+    if (!duocXemMoiNguoi(req.user, id) && !(await laNguoiDangTin(id))) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
     const [u] = await query('SELECT phone FROM users WHERE id=$1', [id]);
     if (!u) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
     res.set('Cache-Control', 'private, no-store');
@@ -296,8 +311,11 @@ listingsRouter.post('/agent/:id/reveal', authRequired, async (req: AuthedRequest
 listingsRouter.post('/:id/reveal', authRequired, async (req: AuthedRequest, res, next) => {
   try {
     const id = Number(req.params.id);
-    const [l] = await query(`SELECT COALESCE(listings.contact_phone, u.phone, '0988888888') AS contact_phone, COALESCE(listings.contact_name, u.full_name, 'Cam Lâm Land') AS contact_name, listings.created_by FROM listings LEFT JOIN users u ON u.id = listings.created_by WHERE listings.id=$1`, [id]);
+    const [l] = await query(`SELECT COALESCE(listings.contact_phone, u.phone, '0988888888') AS contact_phone, COALESCE(listings.contact_name, u.full_name, 'Cam Lâm Land') AS contact_name, listings.created_by, listings.status FROM listings LEFT JOIN users u ON u.id = listings.created_by WHERE listings.id=$1`, [id]);
     if (!l) return res.status(404).json({ error: 'Không tìm thấy tin' });
+    // Tin đang ẨN / CHỜ DUYỆT: chỉ chủ tin hoặc admin (giống GET /:id) — trước đây ai đoán số tin là lấy được SĐT.
+    if ((l.status === 'hidden' || l.status === 'pending') && l.created_by !== req.user!.id && !laAdmin(req.user))
+      return res.status(404).json({ error: 'Không tìm thấy tin' });
     // Không ghi lead khi người xem là chủ tin hoặc admin
     if (!laAdmin(req.user) && l.created_by !== req.user!.id) {
       const [u] = await query('SELECT full_name, phone, email FROM users WHERE id=$1', [req.user!.id]);

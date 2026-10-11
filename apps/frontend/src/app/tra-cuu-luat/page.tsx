@@ -902,6 +902,30 @@ export default function TraCuuLuatPage() {
     return { ds, dem };
   }, [chiMuc, timCaKho, kho, maVb]);
   const moRong = useMemo(() => doiCachGoi(timHL.q), [timHL]);
+  // TÌNH HUỐNG KHỚP CÂU TÌM (đợt 29, 12/10/2026): người gõ "tách thửa", "lên thổ cư", "thu hồi đất được bồi thường gì" thường đang gặp
+  // đúng một chuyện → mời mở TÌNH HUỐNG hỏi–đáp từng bước (có trích nguyên văn) thay vì chỉ đưa danh sách điều. So không dấu theo tiếng
+  // trọn vẹn: phải có ≥ 60 % số tiếng đã gõ + ít nhất một tiếng "hiếm" (có ở ≤ 4/12 tình huống) — gõ "đất" thôi thì không gợi ý bừa.
+  const thKhop = useMemo(() => {
+    if (!th || timHL.q.length < 3 || docSoDieu(kd(timHL.q))) return [];
+    const tach = (chu: string) => new Set(tachTieng(kd(chu)));
+    const ds = th.ds.map((x) => ({ x, ten: tach(x.ten), het: tach([x.ten, x.tom, ...x.buoc.map((b) => b.hoi + ' ' + b.y)].join(' ')) }));
+    const dem = new Map<string, number>();
+    ds.forEach((z) => z.het.forEach((t) => dem.set(t, (dem.get(t) || 0) + 1)));
+    const cau = [timHL.q, ...(moRong ? [moRong.cau] : [])];
+    const kq: { x: (typeof th.ds)[number]; d: number }[] = [];
+    for (const z of ds) {
+      let tot = 0;
+      for (const c of cau) {
+        const tu = tachTieng(kd(c)).filter((t) => t.length >= 2);
+        if (!tu.length) continue;
+        const coHet = tu.filter((t) => z.het.has(t));
+        if (coHet.length < Math.ceil(tu.length * 0.6) || !coHet.some((t) => (dem.get(t) || 0) <= 4)) continue;
+        tot = Math.max(tot, coHet.length / tu.length + tu.filter((t) => z.ten.has(t)).length / tu.length);
+      }
+      if (tot > 0) kq.push({ x: z.x, d: tot });
+    }
+    return kq.sort((a, b) => b.d - a.d).slice(0, 2).map((k) => k.x);
+  }, [th, timHL, moRong]);
 
   const ketQua = useMemo(() => {
     const q = kd(tim.trim());
@@ -2790,6 +2814,17 @@ export default function TraCuuLuatPage() {
                 <p className="border-b border-sky-100 bg-sky-50/70 px-3 py-1.5 text-[11.5px] leading-snug text-sky-900">
                   💡 Luật gọi {moRong.cap.map(([g, l], i) => <span key={g}>{i ? '; ' : ''}“{g}” là <b>“{l}”</b></span>)} — đã tìm thêm theo chữ của luật.
                 </p>
+              )}
+              {tim && thKhop.length > 0 && (
+                <div className="border-b border-emerald-100 bg-emerald-50/70 px-3 py-2">
+                  <p className="text-[11.5px] font-bold text-emerald-800">🧭 Có tình huống hướng dẫn từng bước (hỏi–đáp, kèm nguyên văn):</p>
+                  {thKhop.map((x) => (
+                    <button key={x.ma} onClick={() => { setThe('tinhhuong'); setThChon(x.ma); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                      className="mt-1 block w-full rounded-lg border border-emerald-200 bg-white px-2.5 py-1.5 text-left text-[13px] font-bold leading-snug text-[#0A2540] hover:border-emerald-400">
+                      {x.icon} {x.ten} <span className="font-normal text-emerald-700">· {x.buoc.length} bước ›</span>
+                    </button>
+                  ))}
+                </div>
               )}
               {ketQua.length === 0
                 ? <div className="p-3 text-[13px] text-slate-400">

@@ -38,7 +38,13 @@ services:
       - ./db/init:/docker-entrypoint-initdb.d:ro
     ports:
       # host:container — 5433 on the host avoids clashing with a local Postgres on 5432
-      - "${POSTGRES_HOST_PORT:-5433}:5432"
+      # ⚠️ 11/10/2026 (rà soát bảo mật): CHỈ mở trên chính máy chủ (127.0.0.1). Trước đây mở trên MỌI card mạng
+      #    (0.0.0.0 và [::]) trong khi tường lửa Windows có sẵn luật cho "Docker Desktop Backend" nhận kết nối ở cả
+      #    mạng Private lẫn Public → máy nào cùng mạng Wi-Fi/LAN cũng gõ được thẳng vào database (tài khoản quản trị
+      #    database, mật khẩu mặc định nằm ngay dòng POSTGRES_PASSWORD phía trên). QGIS / công cụ chạy NGAY TRÊN máy
+      #    chủ vẫn nối localhost:5433 như cũ; các script SAO-LUU/PHUC-HOI dùng "docker exec" nên không ảnh hưởng.
+      #    Đổi dòng này chỉ có hiệu lực khi container postgis được TẠO LẠI (dữ liệu nằm ở volume pgdata, không mất).
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5433}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-camlam} -d ${POSTGRES_DB:-camlam_gis}"]
       interval: 5s

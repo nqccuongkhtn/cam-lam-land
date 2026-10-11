@@ -4,7 +4,8 @@ import { cached, cachePut } from '../lib/cache.ts';
 import { vnNoAccent } from '../lib/vn.ts';
 import { verifyToken, coVaiTro } from '../lib/auth.ts';
 import { computeQhAreas, computeQhTheoBan, outerRing, qhReady, ngoaiVungQh, chuanToaDoDiaChinh } from '../lib/qhCompute.ts';
-import { qhCoLuu, tinhQh } from '../lib/qhLuu.ts';
+import { sqlDienTichPhang, sqlHeSoPhang } from '../lib/dienTichPhang.ts';
+import { qhCoLuu, tinhQhHinh } from '../lib/qhLuu.ts';
 
 
 // Mã mục đích sử dụng KHÔNG mở tra cứu thửa — đây là hạ tầng công cộng do Nhà nước quản lý,
@@ -66,7 +67,7 @@ parcelsRouter.get('/search', async (req, res, next) => {
              ST_AsGeoJSON(f.geom)::json AS geometry,
              ST_X(ST_PointOnSurface(ST_CollectionExtract(ST_MakeValid(f.geom),3))) AS lng,
              ST_Y(ST_PointOnSurface(ST_CollectionExtract(ST_MakeValid(f.geom),3))) AS lat,
-             ROUND(ST_Area(f.geom::geography)::numeric, 1) AS area_m2,
+             ROUND(${sqlDienTichPhang('f.geom')}::numeric, 1) AS area_m2,   -- mặt phẳng VN-2000 như sổ (lib/dienTichPhang.ts)
              l.name AS layer_name
       FROM gis_features f JOIN gis_layers l ON l.id = f.layer_id
       WHERE ${where.join(' AND ')}
@@ -99,7 +100,7 @@ parcelsRouter.get('/at', async (req, res, next) => {
              tt.to_cu_that AS "soToCuThat",  -- số tờ cũ THẬT theo bảng giấy
              xm.so_xa_gop AS "soXaGop", -- xã mới này gộp từ mấy xã cũ (1 = không thể trùng số tờ)
              ST_AsGeoJSON(d.geom)::json AS geometry,
-             ROUND(ST_Area(d.geom::geography)::numeric, 1) AS "areaM2"
+             ROUND(${sqlDienTichPhang('d.geom')}::numeric, 1) AS "areaM2"   -- mặt phẳng VN-2000 như sổ / MicroStation (lib/dienTichPhang.ts)
       FROM dia_chinh d
       LEFT JOIN dia_chinh_xa x  ON x.xa_id  = d.xa_id
       LEFT JOIN dia_chinh_xa xm ON xm.xa_id = d.xa_moi_id
@@ -147,7 +148,7 @@ parcelsRouter.get('/at', async (req, res, next) => {
     } else {
       [parcel] = await query(`
         SELECT f.id, f.properties, ST_AsGeoJSON(f.geom)::json AS geometry, l.name AS layer_name,
-               ROUND(ST_Area(f.geom::geography)::numeric, 1) AS "areaM2",
+               ROUND(${sqlDienTichPhang('f.geom')}::numeric, 1) AS "areaM2",
                ${coal(KEYS_TO)} AS "soTo", ${coal(KEYS_THUA)} AS "soThua", ${coal(KEYS_XA)} AS "xa"
         FROM gis_features f JOIN gis_layers l ON l.id=f.layer_id
         WHERE l.layer_type IN ('parcel','custom') AND ST_Contains(f.geom, ${pt})
@@ -167,8 +168,9 @@ parcelsRouter.get('/at', async (req, res, next) => {
       SELECT f.properties, l.name AS layer_name
       FROM gis_features f JOIN gis_layers l ON l.id=f.layer_id
       WHERE l.layer_type='zoning' AND ${BLOCK} AND ST_Contains(ST_MakeValid(f.geom), ${pt}) LIMIT 1`, [lng, lat]);
-    // Diện tích giao (thửa ∩ vùng QH): tự sửa hình lỗi, union, chỉ lấy phần polygon, đo trên geography (m²)
-    const IA = `ST_Area(ST_CollectionExtract(ST_Union(ST_Intersection(ST_MakeValid(f.geom), p.geom)),3)::geography)`;
+    // Diện tích giao (thửa ∩ vùng QH): tự sửa hình lỗi, union, chỉ lấy phần polygon, đo trên geography (m²) rồi đổi ra MẶT PHẲNG
+    // VN-2000 (nhân hệ số k² tại thửa — lib/dienTichPhang.ts) cho cùng thước đo với diện tích thửa
+    const IA = `(ST_Area(ST_CollectionExtract(ST_Union(ST_Intersection(ST_MakeValid(f.geom), p.geom)),3)::geography) * max(${sqlHeSoPhang('p.geom')}))`;   // max(): p chỉ 1 dòng, bọc hàm gộp để dùng được cạnh ST_Union (GROUP BY)
     // Chồng lấn quy hoạch: thửa đè lên những ô đất nào, mỗi loại bao nhiêu m²
     let overlaps: any[] = [];
     // Bảng chứa hình thửa: thửa lấy từ bản đồ địa chính mới thì nằm ở dia_chinh, còn lại ở gis_features.
@@ -183,7 +185,9 @@ parcelsRouter.get('/at', async (req, res, next) => {
     const ngoaiQh = !!parcel && ngoaiVungQh(ringThua);
     // Kết quả tính quy hoạch: thửa địa chính dùng bản ĐÃ LƯU SẴN nếu còn đúng phiên bản (lib/qhLuu.ts), không thì tính + lưu.
     const dtThua = Number((parcel as any)?.areaM2) || 0;
-    const kqQh = parcel && qhReady() ? (tuBangMoi ? await qhCoLuu(Number(parcel.id), ringThua, dtThua) : tinhQh(ringThua, dtThua)) : null;
+    // Tính trên CẢ HÌNH thửa (mọi mảnh, trừ lỗ thủng — qhLuu.tinhQhHinh), không chỉ vòng ngoài lớn nhất.
+    const kqQh = parcel && qhReady() ? (tuBangMoi ? await qhCoLuu(Number(parcel.id), (parcel as any).geometry, dtThua, chuanToaDoDiaChinh)
+      : tinhQhHinh((parcel as any).geometry, dtThua)) : null;
     if (parcel && !ngoaiQh) {
       // ƯU TIÊN: diện tích QH theo ĐƯỜNG THẬT (QĐ205 cố định) — chạy TƯƠI theo hình thửa hiện tại.
       // Nhờ vậy đổi/nạp bản đồ địa chính mới vẫn đúng, KHÔNG cần tính sẵn lại. Thiếu dữ liệu đường → rơi về cách cũ.

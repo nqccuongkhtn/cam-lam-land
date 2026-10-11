@@ -27,6 +27,14 @@ import { coVaiTro } from '../lib/auth.ts';
 import { nguoiDungTuYeuCau } from '../middleware/auth.ts';
 
 import { CHAN_TRA_CUU } from './parcels.ts';
+import fs from 'node:fs';
+import path from 'node:path';
+
+// Huyện/TP CŨ của các ĐƠN VỊ GỐC (data/huyen-goc.json, lấy theo danh mục Sở) — cho ô chọn xã "3 cấp". Thiếu file thì thôi.
+let HUYEN_GOC: Record<string, string> = {};
+try {
+  HUYEN_GOC = JSON.parse(fs.readFileSync(path.resolve(process.env.QH_DATA_DIR || path.resolve(process.cwd(), 'data'), 'huyen-goc.json'), 'utf8'));
+} catch { /* không có file → huyện ghi chung "Khánh Hoà (cũ)" */ }
 export const diaChinhRouter = Router();
 
 // ── Cấu hình (đổi được trong .env, không cần sửa code) ───────────────────────
@@ -220,9 +228,27 @@ diaChinhRouter.get('/danh-muc', async (req, res) => {
       bbox: [Number(d.minx), Number(d.miny), Number(d.maxx), Number(d.maxy)],
       tam: [Number(d.cx), Number(d.cy)],
     });
+    // ĐƠN VỊ CŨ "GỐC" (11/10/2026): xã mới KẾ THỪA MÃ của một xã cũ (Xã Cam Lâm mang mã 22453 của thị trấn Cam Đức) nên
+    // trong danh mục chỉ còn tên MỚI — chọn "3 cấp" thì không có dòng "thị trấn Cam Đức" để tra theo xã cũ. Thêm một dòng cho
+    // mỗi đơn vị gốc (tên lấy ở ten_goc = donViGoc của danh mục Sở), mã ghi 'g' + mã xã: /tim hiểu là lọc theo đúng thửa của
+    // file đơn vị gốc (xa_id), giữ nguyên số tờ cũ. Huyện cũ theo danh mục Sở (data/huyen-goc.json).
+    let goc: any[] = [];
+    try {
+      goc = await query<any>(
+        `SELECT x.xa_id, x.ten_goc, e.minx, e.miny, e.maxx, e.maxy, e.cx, e.cy
+         FROM dia_chinh_xa x
+         CROSS JOIN LATERAL (SELECT ST_XMin(b) AS minx, ST_YMin(b) AS miny, ST_XMax(b) AS maxx, ST_YMax(b) AS maxy,
+                                    (ST_XMin(b) + ST_XMax(b)) / 2 AS cx, (ST_YMin(b) + ST_YMax(b)) / 2 AS cy
+                             FROM (SELECT ST_Extent(d.geom)::geometry AS b FROM dia_chinh d
+                                   WHERE d.xa_id = x.xa_id AND d.geom && ST_MakeEnvelope(108.3, 11.3, 109.6, 12.95, 4326)) q) e
+         WHERE x.cap = 2 AND coalesce(x.ten_goc, '') <> '' AND e.minx IS NOT NULL`);
+    } catch (e: any) { console.error('[dia-chinh] đơn vị gốc lỗi:', e?.message || e); }
     const out = {
       cap2: r.filter((d: any) => Number(d.cap) === 2).map(map),
-      cap3: r.filter((d: any) => Number(d.cap) !== 2).map(map),
+      cap3: [...r.filter((d: any) => Number(d.cap) !== 2).map(map),
+             ...goc.map((g: any) => ({ xaId: 'g' + g.xa_id, ten: g.ten_goc, tenKd: '', huyen: HUYEN_GOC[g.xa_id] || 'Khánh Hoà (cũ)', coBangTo: false,
+                                       bbox: [Number(g.minx), Number(g.miny), Number(g.maxx), Number(g.maxy)], tam: [Number(g.cx), Number(g.cy)] }))]
+        .sort((a: any, b: any) => String(a.huyen).localeCompare(String(b.huyen), 'vi') || String(a.ten).localeCompare(String(b.ten), 'vi')),
     };
     cachePut(KEY, out, 10 * 60 * 1000);
     res.setHeader('Cache-Control', quanLy ? 'private, no-store' : 'public, max-age=600');
@@ -233,6 +259,34 @@ diaChinhRouter.get('/danh-muc', async (req, res) => {
   }
 });
 
+// ── XÃ CỦA CHỖ ĐANG XEM (11/10/2026) ─────────────────────────────────────────
+// GET /api/dc/xa-tai?lng=&lat=  →  { xaId, cap, xaMoiId }  (rỗng nếu quanh đó ~300 m không có thửa)
+// Chủ dự án: phóng tới mức thấy thửa thì ô tìm kiếm TỰ CHỌN địa giới của thửa ở giữa màn hình (mặc định 2 cấp; người dùng
+// chuyển 3 cấp thì chọn theo xã cũ). Lấy thửa CHỨA điểm hoặc thửa GẦN NHẤT (giữa màn hình hay rơi vào lòng đường) — một
+// câu KNN trên chỉ mục không gian, nhanh. Chỉ trả mã xã (không hình, không số liệu) nên không có gì đáng để cào.
+diaChinhRouter.get('/xa-tai', async (req, res) => {
+  const lng = Number(req.query.lng), lat = Number(req.query.lat);
+  if (!Number.isFinite(lng) || !Number.isFinite(lat) || lng < 108 || lng > 110 || lat < 11 || lat > 13.5) {
+    return res.status(400).json({ error: 'Toạ độ không hợp lệ.' });
+  }
+  const k = `dc:xa-tai:${lng.toFixed(3)},${lat.toFixed(3)}`;   // ô ~100 m
+  const san = cached<any>(k);
+  res.setHeader('Cache-Control', 'public, max-age=600');
+  if (san) return res.json(san);
+  try {
+    const [r] = await query<any>(
+      `SELECT d.xa_id, d.xa_moi_id, x.cap, d.geom <-> ST_SetSRID(ST_MakePoint($1, $2), 4326) AS kc
+       FROM dia_chinh d JOIN dia_chinh_xa x ON x.xa_id = d.xa_id
+       ORDER BY d.geom <-> ST_SetSRID(ST_MakePoint($1, $2), 4326) LIMIT 1`, [lng, lat]);
+    const out = r && Number(r.kc) < 0.003 ? { xaId: r.xa_id, cap: Number(r.cap), xaMoiId: r.xa_moi_id || r.xa_id } : {};
+    cachePut(k, out, 10 * 60 * 1000);
+    res.json(out);
+  } catch (e: any) {
+    console.error('[dia-chinh] xa-tai lỗi:', e?.message || e);
+    res.json({});
+  }
+});
+
 // ── TRA CỨU SỐ TỜ / SỐ THỬA ─────────────────────────────────────────────────
 // GET /api/dc/tim?to=&thua=&xaId=&cap=
 // Trả tối đa 40 kết quả; chỉ 12 kết quả đầu kèm hình thửa (để tô sáng), còn lại chỉ toạ độ
@@ -240,9 +294,12 @@ diaChinhRouter.get('/danh-muc', async (req, res) => {
 diaChinhRouter.get('/tim', async (req, res) => {
   const to = String(req.query.to || '').trim();
   const thua = String(req.query.thua || '').trim();
-  const xaId = String(req.query.xaId || '').trim();
+  let xaId = String(req.query.xaId || '').trim();
   const cap = String(req.query.cap || '').trim();
   if (!to && !thua) return res.status(400).json({ error: 'Cần ít nhất số thửa hoặc số tờ.' });
+  // 'g' + mã = ĐƠN VỊ CŨ GỐC (xem /danh-muc): lọc đúng thửa của file đơn vị đó theo xa_id, số tờ cũ — không đổi sang xã mới
+  const donViGoc = /^g\d+$/.test(xaId);
+  if (donViGoc) xaId = xaId.slice(1);
 
   const dk: string[] = []; const val: any[] = [];
   const soHoa = (v: string) => { const n = v.replace(/[^0-9]/g, '').replace(/^0+/, ''); return n ? Number(n) : NaN; };
@@ -266,7 +323,7 @@ diaChinhRouter.get('/tim', async (req, res) => {
     //     nhau — vô nghĩa, vì trong một xã thì một tờ + một thửa chỉ có ĐÚNG MỘT mảnh đất.
     //     Nên phải đổi số tờ mới → (xã cũ, số tờ cũ) qua bảng dia_chinh_to.
     let laXaMoi = false;
-    if (xaId) {
+    if (xaId && !donViGoc) {
       const [xa] = await query<any>('SELECT cap FROM dia_chinh_xa WHERE xa_id = $1', [xaId]).catch(() => [] as any[]);
       laXaMoi = Number(xa?.cap) === 2;
     }

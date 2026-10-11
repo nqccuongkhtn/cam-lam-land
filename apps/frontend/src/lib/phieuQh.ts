@@ -31,6 +31,10 @@ export type PhieuOpts = {
   user?: { name?: string | null; phone?: string | null } | null;
   logo?: string | null;   // ảnh logo/con dấu (data URL) do người dùng tải lên
   sign?: string | null;   // ảnh chữ ký (data URL)
+  // PHỤ LỤC (11/10/2026 — chủ dự án: "vì chỉ hiện 1 quy hoạch… phải thêm các phụ lục bản trích lục và tọa độ của các quy hoạch
+  // khác áp lên thửa này"). Sơ đồ trang chính chỉ in ảnh QĐ205 → mỗi bản KHÁC đè lên thửa (QĐ893, các bản phân khu) in thêm
+  // MỘT TRANG: sơ đồ trích lục trên ảnh của CHÍNH bản đó + bảng toạ độ + căn cứ + loại đất/diện tích (màu đúng bảng màu web).
+  phuLuc?: { ma: string; tieuDe: string; canCu: string; tile: string; areas: { type: string; areaM2: number; mau?: string }[] }[];
 };
 
 // Màu theo loại đất quy hoạch (để tô nét QH trên thửa + chú giải).
@@ -139,7 +143,7 @@ const QH_META: Record<string, { ten: string; qd: string }> = {
 const QD205_TILE = '/tiles/qd205v11/{z}/{x}/{y}.png?v=7';   // ảnh QH đã nắn toạ độ (cùng origin) · ?v=7 PHẢI khớp app/map/page.tsx
 const lonToWX = (lng: number) => (lng + 180) / 360;
 const latToWY = (lat: number) => { const s = Math.sin(lat * Math.PI / 180); return 0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI); };
-function buildSvgRaster(ll: [number, number][], areaM2: number, extra: { soThua?: string; neighbors?: { so: string; lng: number; lat: number }[]; origin?: string }): string {
+function buildSvgRaster(ll: [number, number][], areaM2: number, extra: { soThua?: string; neighbors?: { so: string; lng: number; lat: number }[]; origin?: string; tile?: string; id?: string }): string {
   const W = 400, H = 300, nbs = extra.neighbors || [], origin = extra.origin || '';
   const ring = ll.length > 1 && ll[0][0] === ll[ll.length - 1][0] && ll[0][1] === ll[ll.length - 1][1] ? ll.slice(0, -1) : ll.slice();
   if (ring.length < 3) return '<div style="text-align:center;color:#888;padding:24px 0;font-size:11px">— Thửa chưa có ranh số hóa —</div>';
@@ -159,7 +163,7 @@ function buildSvgRaster(ll: [number, number][], areaM2: number, extra: { soThua?
   let tiles = '';
   for (let tx = tx0; tx <= tx1; tx++) for (let ty = ty0; ty <= ty1; ty++) {
     if (tx < 0 || ty < 0 || tx >= nT || ty >= nT) continue;
-    tiles += `<image href="${origin}${QD205_TILE.replace('{z}', '' + z).replace('{x}', '' + tx).replace('{y}', '' + ty)}" x="${num(sX(tx * 256), 1)}" y="${num(sY(ty * 256), 1)}" width="256.4" height="256.4" preserveAspectRatio="none"/>`;
+    tiles += `<image href="${origin}${(extra.tile || QD205_TILE).replace('{z}', '' + z).replace('{x}', '' + tx).replace('{y}', '' + ty)}" x="${num(sX(tx * 256), 1)}" y="${num(sY(ty * 256), 1)}" width="256.4" height="256.4" preserveAspectRatio="none"/>`;
   }
   // Phủ ẢNH QH cả khung (bối cảnh xung quanh thửa, giống Guland) — KHÔNG cắt chỉ trong thửa.
   let els = `<rect x="0" y="0" width="${W}" height="${H}" fill="#eef0f2"/>${tiles}`;
@@ -175,7 +179,7 @@ function buildSvgRaster(ll: [number, number][], areaM2: number, extra: { soThua?
   if (sth) els += `<text x="${num(CX, 1)}" y="${num(CY - 4, 1)}" font-size="10" font-weight="800" fill="#111" text-anchor="middle" dominant-baseline="central" style="paint-order:stroke;stroke:#fff;stroke-width:3.5">${sth}</text>`;
   els += `<line x1="${num(CX - 16, 1)}" y1="${num(CY + 1, 1)}" x2="${num(CX + 16, 1)}" y2="${num(CY + 1, 1)}" stroke="#111" stroke-width="0.8"/>`;
   els += `<text x="${num(CX, 1)}" y="${num(CY + 8, 1)}" font-size="8.5" font-weight="700" fill="#111" text-anchor="middle" dominant-baseline="central" style="paint-order:stroke;stroke:#fff;stroke-width:3.5">${numVi(areaM2, 1)}</text>`;
-  return `<svg id="qhsvg" viewBox="0 0 ${W} ${H}" width="100%" style="max-height:360px;touch-action:none;cursor:grab" xmlns="http://www.w3.org/2000/svg">${els}</svg>`;
+  return `<svg id="${extra.id || 'qhsvg'}" viewBox="0 0 ${W} ${H}" width="100%" style="max-height:360px;touch-action:none;cursor:grab" xmlns="http://www.w3.org/2000/svg">${els}</svg>`;
 }
 
 function buildSvg(
@@ -378,10 +382,20 @@ function buildHtml(o: PhieuOpts): string {
       const ds = b.areas.filter((x) => x && x.areaM2 > 0.5);
       if (!ds.length) return '';
       // Không in "chỉ phủ X% thửa" — chữ nghề, người cầm phiếu không hiểu.
-      return `<div class="qhb"><b>Căn cứ:</b> ${esc(b.ten)}.<br><b>Nội dung:</b> Thửa đất có ${bdOf(ds)}.</div>`;
+      const cc = (o.phuLuc || []).find((x) => x.ma === b.ma)?.canCu || b.ten;   // căn cứ đầy đủ (số, ngày, cơ quan) nếu có
+      return `<div class="qhb"><b>Căn cứ:</b> ${esc(cc)}.<br><b>Nội dung:</b> Thửa đất có ${bdOf(ds)}.</div>`;
     })
     .join('');
   const qhTypes = ovAll.map((x) => x.type);
+
+  const bangToaDo = vn.length >= 3 ? `<table class="tcoord">
+          <tr><th style="width:18%">Góc thửa</th><th>X (m)</th><th>Y (m)</th><th style="width:20%">S (m)</th></tr>
+          ${vn.map((pt, i) => `<tr><td class="c">${i + 1}</td><td class="r">${numVi(pt.N)}</td><td class="r">${numVi(pt.E)}</td><td class="r">${numVi(edges[i])}</td></tr>`).join('')}
+          <tr><td class="c">1</td><td class="r">${numVi(vn[0].N)}</td><td class="r">${numVi(vn[0].E)}</td><td class="r"></td></tr>
+        </table>` : '<div class="note">Thửa chưa có ranh số hóa.</div>';
+  const NGOAI_BAN = 'Nằm ngoài phạm vi bản quy hoạch này';
+  const phuLuc = (o.phuLuc || []).filter((pl) => pl && pl.tile && (pl.areas || []).some((a) => a && a.areaM2 > 0.5 && a.type !== NGOAI_BAN));
+  const muiTenBac = `<div class="northind"><svg viewBox="0 0 24 34" width="13" height="19"><line x1="12" y1="31" x2="12" y2="8" stroke="#111" stroke-width="2"/><polygon points="12,2 7,12 17,12" fill="#111"/></svg><b>B</b></div>`;
 
   const lng = o.point?.lng, lat = o.point?.lat;
   const now = new Date();
@@ -395,6 +409,29 @@ function buildHtml(o: PhieuOpts): string {
   const uName = esc(o.user?.name || '');
   const uPhone = esc(o.user?.phone || '');
   const diaChiThua = [p.xa, 'tỉnh Khánh Hòa'].filter(Boolean).map(esc).join(', ');
+  const phuLucHtml = phuLuc.map((pl, i) => {
+    const ds = pl.areas.filter((a) => a && a.areaM2 > 0.5 && a.type !== NGOAI_BAN);
+    const ngoai = pl.areas.find((a) => a && a.type === NGOAI_BAN);
+    return `<div class="sheet pl">
+    <div class="plhd"><b>${SITE.ten}</b><span>Phụ lục ${i + 1}/${phuLuc.length} kèm Phiếu cung cấp thông tin quy hoạch thửa đất · Mã tra cứu: ${ma}</span></div>
+    <h1>Phụ lục ${i + 1}: Trích lục ${esc(pl.tieuDe)}</h1>
+    <div class="sub" style="font-style:normal;color:#222">Thửa <b>${esc(p.soThua || '—')}</b>, Tờ bản đồ số <b>${esc(p.soTo || '—')}</b>${p.xa ? ' — ' + esc(p.xa) : ''}, tỉnh Khánh Hòa · Diện tích <b>${numVi(dt, 1)} m²</b></div>
+    <div class="grid2" style="margin-top:6px">
+      <div>
+        <div class="sec" style="margin-top:0">Sơ đồ thửa đất trên bản đồ quy hoạch</div>
+        <div class="diagram" style="position:relative">${muiTenBac}${buildSvgRaster(ring as [number, number][], dt, { soThua: p.soThua || '', neighbors: o.neighbors || [], origin, tile: pl.tile, id: 'plsvg' + i })}</div>
+        <div class="legend">${ds.map((a) => `<span><i style="background:${esc(a.mau || '#cbd5e1')}"></i>${esc(a.type)}</span>`).join('')}</div>
+        <div class="sec" style="margin-top:5px">Thông tin quy hoạch</div>
+        <div class="qhb"><b>Căn cứ:</b> ${esc(pl.canCu)}.<br><b>Nội dung:</b> Thửa đất có ${bdOf(ds)}${ngoai && ngoai.areaM2 >= 1 ? `; <b>${numVi(ngoai.areaM2, 1)} m²</b> nằm ngoài phạm vi bản quy hoạch này` : ''}.</div>
+      </div>
+      <div>
+        <div class="sec" style="margin-top:0">Bảng kê toạ độ và khoảng cách (Hệ tọa độ VN-2000)</div>
+        ${bangToaDo}
+      </div>
+    </div>
+    <div class="ghichu"><b>Ghi chú:</b> Phụ lục là một phần không tách rời của phiếu mã ${ma}. Sơ đồ in trên ảnh bản đồ ${esc(pl.tieuDe)}; ranh thửa màu đỏ, số ghi ở góc thửa ứng với bảng toạ độ. Diện tích từng loại đất đo trên bản vẽ quy hoạch số hoá, chỉ mang tính tham khảo.</div>
+  </div>`;
+  }).join('');
 
   return `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Phiếu quy hoạch — Thửa ${esc(p.soThua || '')} Tờ ${esc(p.soTo || '')}</title>
 <style>
@@ -464,10 +501,14 @@ function buildHtml(o: PhieuOpts): string {
   .signbox img, .signbox svg { width: 100%; height: auto; display: block; }
   .signbox img { mix-blend-mode: multiply; }
   .fb { display: none; }
-  @media print { .toolbar { display: none; } input.e { border-bottom: none; } .wrap { padding: 0; } .noprint { display: none !important; } }
+  .sheet.pl { margin-top: 16px; padding-top: 10px; border-top: 2px dashed #cbd5e1; }
+  .plhd { display: flex; justify-content: space-between; gap: 8px; font-size: 9px; color: #555; border-bottom: 1.5px solid #0A2540; padding-bottom: 3px; }
+  .plhd b { color: #0A2540; font-size: 10.5px; }
+  @media print { .toolbar { display: none; } input.e { border-bottom: none; } .wrap { padding: 0; } .noprint { display: none !important; }
+    .sheet.pl { break-before: page; page-break-before: always; margin-top: 0; padding-top: 0; border-top: none; } }
 </style></head>
 <body>
-  <div class="toolbar"><button onclick="try{window.close()}catch(e){}setTimeout(function(){if(!window.closed){if(history.length>1){history.back()}else{location.href='/map'}}},200)" style="background:#fff;color:#0A2540">← Quay lại</button><button onclick="window.print()">🖨 In / Lưu PDF (1 trang A4)</button><span>Chỉ cần điền mục 1 (người yêu cầu) và mục 4 (mục đích SDĐ) trước khi in</span></div>
+  <div class="toolbar"><button onclick="try{window.close()}catch(e){}setTimeout(function(){if(!window.closed){if(history.length>1){history.back()}else{location.href='/map'}}},200)" style="background:#fff;color:#0A2540">← Quay lại</button><button onclick="window.print()">🖨 In / Lưu PDF (${1 + phuLuc.length} trang A4)</button><span>Chỉ cần điền mục 1 (người yêu cầu) và mục 4 (mục đích SDĐ) trước khi in</span></div>
   <div class="wrap"><div class="sheet">
     <div class="hd">
       <div class="brand">${navLogo(origin)}<div><div class="bname">${SITE.ten}</div><div class="bsub">${SITE.mota} · ☎ ${SITE.hotline} · ${SITE.domain}</div></div></div>
@@ -501,25 +542,22 @@ function buildHtml(o: PhieuOpts): string {
       </div>
       <div>
         <div class="sec" style="margin-top:0">Bảng kê toạ độ và khoảng cách (Hệ tọa độ VN-2000)</div>
-        ${vn.length >= 3 ? `<table class="tcoord">
-          <tr><th style="width:18%">Góc thửa</th><th>X (m)</th><th>Y (m)</th><th style="width:20%">S (m)</th></tr>
-          ${vn.map((pt, i) => `<tr><td class="c">${i + 1}</td><td class="r">${numVi(pt.N)}</td><td class="r">${numVi(pt.E)}</td><td class="r">${numVi(edges[i])}</td></tr>`).join('')}
-          <tr><td class="c">1</td><td class="r">${numVi(vn[0].N)}</td><td class="r">${numVi(vn[0].E)}</td><td class="r"></td></tr>
-        </table>` : '<div class="note">Thửa chưa có ranh số hóa.</div>'}
+        ${bangToaDo}
       </div>
     </div>
 
     <div class="sec">Ghi chú</div>
     <div class="ghichu"><b>Miễn trừ trách nhiệm:</b> Bản trích lục do ${SITE.ten} lập tự động từ dữ liệu số hóa, chỉ mang tính tham khảo, không thay thế giấy tờ, trích lục hay văn bản do cơ quan Nhà nước có thẩm quyền cấp; diện tích, toạ độ và ranh quy hoạch có thể sai lệch so với hồ sơ địa chính gốc.</div>
 
+    ${phuLuc.length ? `<div class="note" style="margin-top:3px">Kèm theo ${phuLuc.length} phụ lục trích lục: ${phuLuc.map((pl, i) => `(${i + 1}) ${esc(pl.tieuDe)}`).join('; ')}.</div>` : ''}
     <div class="sign">
       <div><div class="day">Ngày ${now.getDate()} tháng ${now.getMonth() + 1} năm ${now.getFullYear()}</div><div class="role">NGƯỜI YÊU CẦU</div><div class="hint">(Ký, ghi rõ họ tên)</div><div class="sp"></div></div>
       <div><div class="day">Ngày ${now.getDate()} tháng ${now.getMonth() + 1} năm ${now.getFullYear()}</div><div class="role">${SITE.ten}</div><div class="hint">(Người lập phiếu)</div><div class="signbox"><div class="kymau"><img src="${signSrc}" alt="chữ ký" ${imgFb}><span class="fb">${signSvg()}</span></div><div class="stamp"><img src="${logoSrc}" alt="con dấu" ${imgFb}><span class="fb">${stampSvg()}</span></div></div></div>
     </div>
-  </div></div>
+  </div>${phuLucHtml}</div>
   <script>
     try { window.focus(); } catch (e) {}
-    (function(){ function fit(){ var s=document.querySelector('.sheet'); if(!s) return; s.style.zoom=''; var maxH=1040; var h=s.scrollHeight; if(h>maxH){ s.style.zoom=(maxH/h).toFixed(4); } }
+    (function(){ function fit(){ var ds=document.querySelectorAll('.sheet'); for(var i=0;i<ds.length;i++){ var s=ds[i]; s.style.zoom=''; var maxH=1040; var h=s.scrollHeight; if(h>maxH){ s.style.zoom=(maxH/h).toFixed(4); } } }
       if(document.readyState!=='loading') setTimeout(fit,60); else window.addEventListener('load',function(){setTimeout(fit,60);}); })();
     // Zoom/di chuyển SƠ ĐỒ theo ý người dùng: con lăn chuột, kéo thả, chụm 2 ngón, nút +/-/reset.
     (function(){

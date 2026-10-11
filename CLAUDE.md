@@ -398,6 +398,13 @@ Kiểm tra nhanh trong Console: `Object.values(__banDo.style.sourceCaches['src-d
   không tắt được, cũng không biết có bao nhiêu lớp/bao nhiêu thửa. Chỉ hiện từ mức phóng 16.
 - Thứ tự ô tra cứu: **cấp → huyện/TP cũ → xã/phường → số tờ → số thửa** (chọn địa giới trước, vì
   số tờ/số thửa chỉ có nghĩa khi đã biết hỏi ở xã nào).
+- **Mặc định 2 cấp + TỰ CHỌN địa giới theo chỗ đang xem** (11/10/2026): phóng tới mức thấy thửa (≥ 16) thì ô xã/huyện tự
+  điền theo thửa ở GIỮA MÀN HÌNH (`GET /api/dc/xa-tai`, KNN trên chỉ mục, ~1 ms) — 2 cấp lấy xã mới, người dùng chuyển 3 cấp
+  thì lấy xã cũ. Chỉ điền ô, KHÔNG dọn kết quả, KHÔNG bay bản đồ. Nhóm 3 cấp có thêm dòng **đơn vị gốc** (mã `g` + mã xã,
+  vd `g22453` = thị trấn Cam Đức): `/api/dc/tim` hiểu là lọc đúng thửa của file đó theo `xa_id`; huyện cũ lấy ở
+  `apps/backend/data/huyen-goc.json` (sinh từ danh mục Sở).
+- **Phiếu trích lục có PHỤ LỤC** (11/10/2026, `lib/phieuQh.ts` `phuLuc`): mỗi bản quy hoạch khác đè lên thửa (QĐ893, phân khu)
+  in thêm một trang: sơ đồ trên ảnh của chính bản đó + bảng toạ độ + căn cứ đầy đủ + loại đất/diện tích (màu theo bảng màu web).
 - Hai ô địa giới là kiểu **"sổ xuống + gõ tìm"** (`OChonCoGo` trong `app/map/page.tsx`): chọn huyện rồi
   thì ô xã chỉ sổ ra xã của huyện đó, chưa chọn thì sổ ra hết. Bấm vào ô là gõ tìm ngay, **gõ không dấu
   vẫn ra**. Mỗi dòng ghi kèm tên huyện để phân biệt **10 cặp xã trùng tên** (vd "xã Vĩnh Hải · Huyện Ninh Hải"
@@ -488,7 +495,24 @@ tham số khác bộ 7 tham số Khánh Hoà mà lớp quy hoạch + `vn2000.ts`
 (qhCompute.ts) dịch hình thửa về đúng chỗ TRƯỚC khi chồng lên quy hoạch: tổng lệch 9 thửa 60,7 → 4,4 m².
 Diện tích thửa không đổi (chỉ tịnh tiến). **Đừng dịch** hình thửa của phiếu / toạ độ người dùng nhập — đã đúng chỗ.
 Nạp lại bản đồ địa chính từ nguồn khác thì đo lại độ trượt (cách đo: `scripts/kiem-tra-qh/README.md`).
-Cách web đo diện tích thửa (`ST_Area` geography) KHÔNG gây lệch: trùng diện tích sổ ở 99,9 % trong 121.303 thửa.
+
+**⚠️ CUNG TRÒN PHẢI TÍNH ĐÚNG CÔNG THỨC (11/10/2026) — `scripts/qh-pipeline/cung_chinh_xac.py`.** Chủ dự án đo tay trên
+MicroStation thửa 1297 tờ 15 Cam Đức (sát vòng xoay): web lệch 0,5–1,9 m². Nguyên nhân đúng như chủ dự án nghi "thuật toán
+đổi DXF → web bị sai": ezdxf đổi cung tròn/bulge thành đường cong Bézier (lệch tới 0,027 % bán kính) rồi bẻ võng 5 cm; QĐ205 qua
+ogr2ogr `CONVERT_TO_LINEAR` bẻ 4° một đoạn. Dây cung luôn nằm TRONG cung → hụt dọc mọi đường cong (QĐ2101: trung bình 2,7 m²
+mỗi vùng tô cong, có vùng 38,8 m²; thửa 95 tờ 15 thiếu 33,5 m² đất đơn vị ở). Nay: cung tính từ tâm + bán kính + góc, đỉnh giữa
+đặt ở bán kính R' để diện tích hình gấp khúc = diện tích cung thật (khớp công thức giải tích tới 10⁻¹⁶); elip = đường tròn kéo
+giãn; spline bẻ kiểu Simpson. 5g / 1d dùng `duong_bao_hatch(e)`, 5h đọc THẲNG `QD205.gpkg` (`vong_gpkg`, cung 3 điểm) — đừng
+quay lại `ezpath.from_hatch` hay ogr2ogr cho phần TÍNH. Dữ liệu tăng 1,44 → 2,6 triệu đỉnh (~72 MB JSON).
+
+**⚠️ DIỆN TÍCH THỬA ĐO TRÊN MẶT PHẲNG VN-2000 (11/10/2026) — `apps/backend/src/lib/dienTichPhang.ts`.** Sổ đỏ / MicroStation đo
+trên mặt phẳng chiếu VN-2000; `ST_Area(geography)` đo trên elipxoit — lệch hệ số k² (Cam Lâm +0,0044 %, Vạn Ninh +0,02 %). Thửa
+1297: sổ 3.788,5 — phẳng 3.788,50 — elipxoit 3.788,33. Đo 21.000 thửa: trùng khít sổ từ 31–74 % lên 61–88 %. `parcels.ts` và
+`tinhSanQh.ts` PHẢI cùng biểu thức (`sqlDienTichPhang`) vì diện tích nằm trong "dấu" kết quả lưu sẵn.
+**Thửa có LỖ THỦNG / NHIỀU MẢNH** (1.350 + 10 thửa trong vùng QH) tính đủ từng vòng, trừ lỗ đúng loại đất (`qhLuu.tinhQhHinh`);
+trước chỉ tính vòng ngoài lớn nhất rồi chia đều.
+**Phần còn lệch với đo tay là HÌNH THỬA**: thửa 1297 trong `dc15.dgn` của chủ dự án (D:\BandoCamLam\Ban do chep xa Cam Lam\bddc,
+DGN V8 — GDAL không đọc được) cộng 8 lần đo = 3.787,44 m², trong khi nhãn bản vẽ + sổ + web = 3.788,5.
 
 **QĐ205 — đối chiếu bản vẽ gốc (10/10/2026).** Nguồn chuẩn nhất: `quyhoach2025/QD205.gpkg` lớp `hatches` (1.947 vùng tô
 còn nguyên đường bao + màu + tên lớp có giai đoạn HT/QH2030/QH2045). `QD205.dxf` (788 MB) thì vùng tô đã bị phá thành nét
@@ -557,7 +581,11 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   trắng SÁT MÉP ô đã tô (< 2 m, `SAT_MEP_205`) = đường; mặt nạ chỉ quyết phần trắng sâu trong khối không tô; (3) TẮT gộp "mẩu lẻ sát mép
   thửa < 1,5 m" (chủ dự án cần đúng 100 % như bản vẽ; bật lại bằng QH205_GOP_MEP=1). 2.000 thửa ngẫu nhiên: lệch so với gpkg 2,84 % →
   0,00 % (12 m², không thửa nào lệch quá 0,3 m² — toạ độ 8 số lẻ; 6 số lẻ lệch tới 1,3 m², 7 số lẻ 0,45 m²); thửa 326 = 1.218,0 hỗn hợp + 469,0 đường (gpkg 1.217,9 + 469,1; app tham chiếu
-  1.218,7 + 468,3); thửa mốc 70 tờ 25 = 395,1 + 116,8 (gpkg quy về diện tích sổ 395,2 + 116,7 — số mốc cũ 395,5 lệch bản vẽ 0,3).
+  1.218,7 + 468,3).
+  **THỬA MỐC 70 TỜ 25 CAM ĐỨC — số ĐÚNG THEO BẢN VẼ (đo phẳng VN-2000 như MicroStation, 11/10/2026):** QĐ205 = 395,2 đơn vị ở +
+  116,7 đường; QĐ893 = 395,09 đất ở đô thị + 116,80 đường; QĐ2101 = 395,09 nhóm nhà ở + 116,80 đường. Số mốc cũ 395,5 + 116,4 là do
+  ô đất làm tròn 6 số lẻ (~10 cm) — đừng dùng nữa. Chủ dự án đo tay QĐ205 trên dc25.dgn: đường 116,57 m² (web 116,67 — khớp 0,1 m²);
+  phần còn lại 392,06 vì thửa 70 trong dc25.dgn chỉ 508,63 m² còn lớp địa chính web 511,89 m² (= diện tích sổ 511,9): chênh do HÌNH THỬA.
   Bẫy đã vấp: (a) sau khi đổi toạ độ, make_valid có lúc trả "hộp chứa" (MultiPolygon + nét thừa) — phải nhặt MỌI đa giác ở mọi tầng
   (`cac_da_giac` trong 5g / 5h / 1d), không thì sót cả nhóm (QĐ205 từng mất 76,8 ha); (b) ogr2ogr `-spat` trên gpkg có lúc BỎ SÓT vùng
   tô (đường cong) — soi một thửa thì xuất toàn bộ vùng tô rồi lọc bằng shapely, đừng tin ảnh soi dùng -spat.

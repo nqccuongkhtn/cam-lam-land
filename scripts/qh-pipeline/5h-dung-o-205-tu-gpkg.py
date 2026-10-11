@@ -15,12 +15,18 @@ Bậc: lớp hiện trạng (HT…, …htrang…) = 1, còn lại = 2; cùng b�
 gốc, không phải mảnh). Các lớp hiện trạng / 2030 / 2045 hầu như không chồng nhau khác tên (đo: ~14 ha cả bản) nên thứ tự lớp
 không làm đổi kết quả. Thay luôn 5c / 5d / 5e (chúng chỉ vá chỗ ô cũ thiếu so với gpkg).
 
-Cách gọi (xuất vùng tô gpkg bằng ogr2ogr của QGIS rồi dựng):
-  ogr2ogr -f GeoJSON h205.geojson quyhoach2025/QD205.gpkg hatches -nlt CONVERT_TO_LINEAR -dim XY -select handle,layer
-  python 5h-dung-o-205-tu-gpkg.py h205.geojson
+CUNG TRÒN CHÍNH XÁC (11/10/2026): đọc THẲNG QD205.gpkg — cung tròn lưu dạng 3 điểm (CircularString), bẻ bằng cung_chinh_xac.py
+(độ võng ≤ 2 mm, đỉnh giữa đặt sao cho diện tích cung không hụt). Trước đây xuất qua ogr2ogr "CONVERT_TO_LINEAR" — GDAL bẻ cung 4°
+một đoạn, dây cung nằm trong cung nên hụt: chủ dự án đo tay thửa 1297 tờ 15 Cam Đức (sát vòng xoay) cây xanh 408,35 — web 410,1;
+đường 262,95 — web 263,4. Đọc chính xác: cây xanh 408,13, đường 263,10 (phần lệch còn lại là hình thửa: tổng đo tay 3.787,44 <
+diện tích thửa 3.788,50 ghi trên bản vẽ).
+
+Cách gọi:
+  python 5h-dung-o-205-tu-gpkg.py quyhoach2025/QD205.gpkg          (nên dùng — cung chính xác)
+  python 5h-dung-o-205-tu-gpkg.py h205.geojson                     (kiểu cũ: file ogr2ogr xuất, cung bị bẻ thô)
 Ghi đè apps/backend/data/qh_zones.json.
 """
-import io, json, os, sys, importlib.util, collections
+import io, json, os, sys, importlib.util, collections, sqlite3
 from shapely.geometry import Polygon, MultiPolygon, GeometryCollection, box
 from shapely.ops import transform
 from shapely.validation import make_valid
@@ -28,6 +34,21 @@ from shapely.validation import make_valid
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, '..', '..', 'apps', 'backend', 'data')
 sp = importlib.util.spec_from_file_location('b1', os.path.join(HERE, '1b-doc-dxf.py')); b1 = importlib.util.module_from_spec(sp); sp.loader.exec_module(b1)
+sys.path.insert(0, HERE)
+import cung_chinh_xac as CX
+
+
+def doc_vung_to(vao):
+    """(tên lớp, [vòng, ...]) của từng vùng tô. Vòng = [(x, y), ...] toạ độ VN-2000."""
+    if vao.lower().endswith('.gpkg'):
+        c = sqlite3.connect('file:%s?mode=ro' % os.path.abspath(vao).replace(os.sep, '/'), uri=True)
+        for layer, blob in c.execute('SELECT layer, geom FROM hatches'):
+            yield layer or '', CX.vong_gpkg(blob)
+        c.close()
+        return
+    for f in json.load(io.open(vao, encoding='utf-8'))['features']:
+        g = f.get('geometry')
+        yield (f['properties'] or {}).get('layer') or '', ([[(a[0], a[1]) for a in r] for r in g['coordinates']] if g else [])
 
 
 def sua_chu(s):
@@ -70,17 +91,20 @@ def cac_da_giac(g):
 def main(vao):
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     TEN = {k: v for k, v in json.load(io.open(os.path.join(HERE, 'lop-205.json'), encoding='utf-8')).items() if k != '_doc'}
+    # tên ĐÚNG CHỮ KHUNG CHÚ GIẢI (11/10/2026, ten-theo-chu-giai.json — chỉ lớp khớp chắc chắn một dòng); lớp khác giữ tên lop-205.json
+    try: TCG = json.load(io.open(os.path.join(HERE, 'ten-theo-chu-giai.json'), encoding='utf-8')).get('205', {}).get('theo_level', {})
+    except Exception: TCG = {}
+    TEN = {k: TCG.get(sua_chu(k), v) for k, v in TEN.items()}
     RG = make_valid(Polygon(json.load(io.open(os.path.join(DATA, 'ranh_qh.json'), encoding='utf-8'))['205']))
     wgs = lambda g: transform(lambda x, y, z=None: tuple(zip(*[b1.vn2wgs(a, b) for a, b in zip(x, y)])), g)
     out, bo, theo = [], collections.Counter(), collections.Counter()
-    for f in json.load(io.open(vao, encoding='utf-8'))['features']:
-        lv = (f['properties'] or {}).get('layer') or ''
-        if lv not in TEN or not f['geometry']:
+    for lv, vong in doc_vung_to(vao):
+        if lv not in TEN or not vong:
             bo[sua_chu(lv)] += 1; continue
         g = None
-        for r in f['geometry']['coordinates']:                  # CHẴN–LẺ đủ mọi vòng
-            if len(r) < 4: continue
-            v = make_valid(Polygon([(a[0], a[1]) for a in r]))
+        for r in vong:                                           # CHẴN–LẺ đủ mọi vòng
+            if len(r) < 3: continue
+            v = make_valid(Polygon(r))
             g = v if g is None else g.symmetric_difference(v)
         if g is None or g.is_empty or g.area < 1: continue
         W = make_valid(wgs(make_valid(g)))

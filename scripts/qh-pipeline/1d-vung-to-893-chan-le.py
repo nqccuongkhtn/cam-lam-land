@@ -28,6 +28,8 @@ from shapely.validation import make_valid
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sp = importlib.util.spec_from_file_location('b1', os.path.join(HERE, '1b-doc-dxf.py')); b1 = importlib.util.module_from_spec(sp); sp.loader.exec_module(b1)
+sys.path.insert(0, HERE)
+import cung_chinh_xac as CX
 MAU_NHU_GDAL = {254: '#dcdcdc'}   # số hiệu màu mà bảng màu GDAL (file cũ) khác bảng AutoCAD của 1b
 
 
@@ -88,9 +90,8 @@ def main(vao, ra):
             try:
                 if t == 'HATCH':
                     ps = []
-                    for p in ezpath.from_hatch(e):
-                        pts = [(v.x, v.y) for v in p.flattening(distance=0.05, segments=8)]
-                        if len(pts) >= 4:
+                    for pts in CX.duong_bao_hatch(e):     # cung tròn chính xác (cung_chinh_xac.py, 11/10/2026)
+                        if len(pts) >= 3:
                             q = make_valid(Polygon(pts))
                             if not q.is_empty and q.area > 0: ps.append(q)
                     if not ps: continue

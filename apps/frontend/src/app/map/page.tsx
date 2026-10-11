@@ -881,7 +881,7 @@ export default function MapPage() {
   const [searchMode, setSearchMode] = useState<'parcel' | 'vn2000' | 'latlng' | 'gmap'>('parcel');
   const [c1, setC1] = useState(''); const [c2, setC2] = useState('');
   const [c3, setC3] = useState(''); // = XÃ đang chọn (dropdown)
-  const [cap, setCap] = useState<'2' | '3'>('3'); // cấp hành chính, mặc định 3 cấp (Cam Đức hiện tại)
+  const [cap, setCap] = useState<'2' | '3'>('2'); // cấp hành chính — MẶC ĐỊNH 2 CẤP (đơn vị hiện hành, chủ dự án 11/10/2026); người dùng tự chuyển 3 cấp
 
   // ══ BẢN ĐỒ ĐỊA CHÍNH TOÀN TỈNH ═══════════════════════════════════════════════
   // Lớp này LUÔN BẬT, không có nút tắt và không hiện trong bảng "Lớp bản đồ".
@@ -964,6 +964,33 @@ export default function MapPage() {
     setPanelOpen(false);
   }, []);
 
+  // ── TỰ CHỌN ĐỊA GIỚI THEO CHỖ ĐANG XEM (chủ dự án 11/10/2026) ──
+  // Phóng tới mức THẤY THỬA (≥ 16) thì ô tìm kiếm tự chọn xã/phường (và huyện) của thửa ở GIỮA MÀN HÌNH — mặc định theo 2 cấp
+  // (xã mới); người dùng đã chuyển sang 3 cấp thì chọn theo xã CŨ (đơn vị gốc của xã mới có dòng riêng mã 'g…').
+  // Chỉ điền ô chọn — KHÔNG dọn kết quả đang xem, KHÔNG bay bản đồ (khác với khi người dùng tự chọn xã).
+  const [tamXem, setTamXem] = useState<{ lng: number; lat: number } | null>(null);
+  const xaTaiNho = useRef<Map<string, { xaId?: string; cap?: number; xaMoiId?: string }>>(new Map());
+  useEffect(() => {
+    if (!tamXem || !(dsXa.cap2.length || dsXa.cap3.length)) return;
+    let huy = false;
+    const t = setTimeout(async () => {
+      const k = `${tamXem.lng.toFixed(3)},${tamXem.lat.toFixed(3)}`;
+      let kq = xaTaiNho.current.get(k);
+      if (!kq) {
+        kq = await api<{ xaId?: string; cap?: number; xaMoiId?: string }>(`/dc/xa-tai?lng=${tamXem.lng.toFixed(6)}&lat=${tamXem.lat.toFixed(6)}`).catch(() => ({}));
+        if (xaTaiNho.current.size > 300) xaTaiNho.current.clear();
+        xaTaiNho.current.set(k, kq);
+      }
+      if (huy || !kq?.xaId) return;
+      const ma = cap === '2' ? (kq.xaMoiId || kq.xaId) : (kq.cap === 3 ? kq.xaId : 'g' + kq.xaId);
+      const x = (cap === '2' ? dsXa.cap2 : dsXa.cap3).find((y) => y.xaId === ma);
+      if (!x) return;
+      setC3((cu) => (cu === ma ? cu : ma));
+      setHuyenChon((cu) => (cu === x.huyen ? cu : x.huyen));
+    }, 600);
+    return () => { huy = true; clearTimeout(t); };
+  }, [tamXem, cap, dsXa]);
+
   const [panelOpen, setPanelOpen] = useState(false);
   const [ads, setAds] = useState<any[]>([]);
   const [qhVector, setQhVector] = useState<GeoJSON.FeatureCollection | null>(null);
@@ -1018,6 +1045,8 @@ export default function MapPage() {
   const onViewport = useCallback((v: { west: number; south: number; east: number; north: number; zoom: number }) => {
     viewRef.current = v; setZoomNow(v.zoom);
     clearTimeout(featTimer.current); featTimer.current = setTimeout(() => refreshFeatures(v), 350);
+    // tâm màn hình khi đã phóng tới mức thấy thửa → ô tìm kiếm tự chọn địa giới (xem tamXem)
+    setTamXem(v.zoom >= 16 ? { lng: (v.west + v.east) / 2, lat: (v.south + v.north) / 2 } : null);
   }, [refreshFeatures]);
   // BẬT MỘT MỤC QUY HOẠCH. Mỗi lúc chỉ một mục; mục "phân khu" bật cùng lúc cả ba bản 2076/2101/2222.
   // ⚠️ KHÔNG tự thu/dời bản đồ nữa. Trước đây bật lớp ở nơi khác thì bản đồ tự lùi ra cho thấy cả lớp,
@@ -1834,7 +1863,8 @@ export default function MapPage() {
   // Gộp chú giải của các bản phân khu ĐANG BẬT: cùng nhóm + cùng màu thì gộp tên (không lặp), xếp màu nhiều ô trước.
   const chuGiaiDangBat = (): NhomChuGiai[] | null => {
     if (!chuGiai) return null;
-    const ids = (MUC_QH.find((x) => x.id === 'phan-khu')?.gom || []).filter((id) => !!ovOn[id] && chuGiai.ban[id]);
+    // Mọi bản đang bật (QĐ205 · phân khu · QĐ893 — 11/10/2026: trước chỉ có phân khu, chủ dự án hỏi "205 và 893 chưa có chú giải")
+    const ids = MUC_QH.flatMap((x) => x.gom).filter((id) => !!ovOn[id] && chuGiai.ban[id]);
     if (!ids.length) return [];
     const thuTu = chuGiai.nhom.map((n) => n.nhom);
     const gom = new Map<string, Map<string, { mau: string; ten: Map<string, number>; so: number }>>();
@@ -1857,7 +1887,7 @@ export default function MapPage() {
       {ds === null && <p className="text-[11px] text-slate-400 py-1">Đang tải…</p>}
       {ds !== null && ds.length === 0 && (
         <p className="text-[11px] text-slate-500 py-1 leading-snug">
-          Chú giải màu hiện có cho <b>Quy hoạch phân khu 1/2000</b>. Với bản đang xem, bấm vào thửa đất để biết loại đất quy hoạch.
+          Bật một lớp quy hoạch (nút <b>Lớp Q.Hoạch</b>) để xem chú giải màu của bản đó. Bấm vào thửa đất để biết loại đất và diện tích quy hoạch.
         </p>
       )}
       {(ds || []).map((n) => (
@@ -3115,7 +3145,20 @@ export default function MapPage() {
                         const hzA: Record<string, number> = {};
                         for (const x of (overlaps || []) as any[]) if (x?.hz) hzA[String(x.hz)] = (hzA[String(x.hz)] || 0) + (Number(x.areaM2) || 0);
                         const pieceHz = Object.keys(hzA).sort((a, b) => hzA[b] - hzA[a])[0] || mapScen;
-                        const html = phieuQhHtml({ parcel: info.parcel as any, geometry: g, overlaps, qhCacBan: (info as any).qhCacBan, qhPieces: qhPiecesFor(g, pieceHz), roadFeats: roadFeatsFor(g), neighbors: (info as any).neighbors || [], point: info.point, user: user as any, scenario: mapScen, roadHz: pieceHz });
+                        // PHỤ LỤC: mỗi bản quy hoạch KHÁC đè lên thửa một trang trích lục trên ảnh của chính bản đó (lib/phieuQh.ts)
+                        const phuLuc = (((info as any).qhCacBan || []) as any[]).map((bn) => {
+                          const ma = String(bn.ma);
+                          const id = /^\d+$/.test(ma) ? 'qh-qd' + ma : 'qh-' + ma;
+                          const tile = ((RASTER_OVERLAYS.find((x) => x.id === id) as any)?.tiles || [])[0] as string | undefined;
+                          const cc = CAN_CU_QH[id];
+                          const bang = ma === '893' ? 'qd893' : 'phankhu';
+                          return tile ? {
+                            ma, tile, tieuDe: String(bn.ten || ma),
+                            canCu: cc ? `Quyết định số ${cc.so} ngày ${cc.ngay} của ${cc.coQuan} về việc ${cc.ten.charAt(0).toLowerCase()}${cc.ten.slice(1)}` : String(bn.ten || ma),
+                            areas: ((bn.areas || []) as { type: string; areaM2: number }[]).map((a) => ({ ...a, mau: mauQh?.[bang]?.[a.type] })),
+                          } : null;
+                        }).filter(Boolean) as any[];
+                        const html = phieuQhHtml({ parcel: info.parcel as any, geometry: g, overlaps, qhCacBan: (info as any).qhCacBan, qhPieces: qhPiecesFor(g, pieceHz), roadFeats: roadFeatsFor(g), neighbors: (info as any).neighbors || [], point: info.point, user: user as any, scenario: mapScen, roadHz: pieceHz, phuLuc });
                         try { win.document.open(); win.document.write(html); win.document.close(); win.focus(); } catch { /* */ }
                       };
                       const areas = (info.overlaps && info.overlaps.length) ? info.overlaps : qhAreasFromVector(ring); finish(areas.length ? areas : []);

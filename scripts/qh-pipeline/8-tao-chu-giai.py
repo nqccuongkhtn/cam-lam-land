@@ -28,6 +28,7 @@ import importlib.util
 import io
 import json
 import os
+import re
 import sys
 import unicodedata
 
@@ -40,6 +41,34 @@ _spec = importlib.util.spec_from_file_location('_z5', os.path.join(HERE, '5-tao-
 _z5 = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_z5)
 ten_loai = _z5.ten_loai
+_spec1 = importlib.util.spec_from_file_location('_b1', os.path.join(HERE, '1b-doc-dxf.py'))
+_b1 = importlib.util.module_from_spec(_spec1)
+_spec1.loader.exec_module(_b1)
+# TÊN ĐÚNG CHỮ KHUNG CHÚ GIẢI (11/10/2026) — cùng bảng với 5g / 5h (ten-theo-chu-giai.json): bảng chú giải và bảng Thông tin thửa
+# phải ghi CÙNG một tên. Mã lớp web → mã bản trong bảng.
+try:
+    with io.open(os.path.join(HERE, 'ten-theo-chu-giai.json'), encoding='utf-8') as fp:
+        TCG = json.load(fp)
+except Exception:
+    TCG = {}
+MA_BAN = {'qh-qd2076': '2076', 'qh-qd2101': '2101', 'qh-qd2222': '2222', 'qh-qd918': '918', 'qh-cuhin': 'cuhin',
+          'qh-taynam': 'taynam', 'qh-taybac': 'taybac'}
+DATA = os.path.join(GOC, 'apps', 'backend', 'data')
+# Level bị tắt / đóng băng trong bản vẽ (5g bỏ qua; ảnh bản đồ cũ còn vẽ cho tới khi cắt lại) — 11/10/2026 đo ở QĐ2076.
+LEVEL_TAT = {'qh-qd2076': {'DAT_O_Nhomnhao Thaptang', 'DAT_NO_Nhaochungcu'}}
+TEP_MAU = os.path.join(GOC, 'apps', 'frontend', 'public', 'mau-loai-dat-qh.json')
+
+
+def sua_chu(s):
+    try: return s.encode('cp1252').decode('utf-8')
+    except Exception: return s
+
+
+def ten_theo_chu_giai(ma_lop, lo, ci):
+    """Tên loại đất của một vùng tô: theo khung chú giải nếu khớp chắc chắn (level + màu gốc), không thì tên cũ theo level."""
+    t = TCG.get(MA_BAN.get(ma_lop, ''), {})
+    mau = (_b1.BANG[ci] if isinstance(ci, int) and 0 < ci < 256 else '').lower()
+    return t.get('theo_level_mau', {}).get('%s||%s' % (sua_chu(lo), mau)) or t.get('theo_level', {}).get(sua_chu(lo)) or ten_loai(lo)
 
 with io.open(os.path.join(HERE, 'mau-loai-dat.json'), encoding='utf-8') as fp:
     _B = json.load(fp)
@@ -60,13 +89,36 @@ TEN_NHOM = {khong_dau(k): _NHOM_CUA_MAU.get((v or '').lower(), KHAC) for k, v in
 THU_TU = list(_B['nhom']) + [KHAC]
 
 
+# Luật THÊM cho tên đúng chữ khung chú giải (11/10/2026): khớp NGUYÊN CỤM TỪ (hai đầu là ranh giới chữ), xét trước LUAT_NHOM.
+LUAT_THEM = [(tu, nh) for nh, ds in (
+    ('Công nghiệp', ('phi nong nghiep', 'khoang san')),
+    ('Đất ở', ('dat o', 'dat o tai do thi', 'dat o tai nong thon')),
+    ('Nông nghiệp', ('cay hang nam', 'cay lau nam', 'chan nuoi', 'trong lua', 'lam nghiep')),
+    ('Giao thông – hạ tầng', ('thuy loi', 'thien tai', 'chat thai', 'nang luong', 'buu chinh', 'vien thong', 'nghia trang')),
+    ('Công trình công cộng', ('vui choi', 'cong cong', 'sinh hoat cong dong', 'tin nguong', 'su nghiep', 'cho dan sinh', 'cho dau moi')),
+) for tu in ds]
+
+
+def _khop(tu, k, hai_dau=False):
+    """Từ khoá có trong tên (đã bỏ dấu) — xét RANH GIỚI CHỮ: "rung" không được khớp vào "t-rung" (trước 11/10/2026 "Đất trung tâm
+    y tế", "Đất chăn nuôi tập trung" bị xếp vào nhóm Rừng). Đầu sau để mở (tên level dính liền: 'qhdd_dat_cayxanhcc')."""
+    return re.search(r'(?<![a-z0-9])' + re.escape(tu) + (r'(?![a-z0-9])' if hai_dau else ''), k) is not None
+
+
 def nhom_cua(ten):
     """Tên loại đất → tên nhóm để xếp trong bảng chú giải."""
     k = khong_dau(ten)
     if k in TEN_NHOM:
         return TEN_NHOM[k]
+    if 'rung' in k.split() or k.startswith('dat rung') or 'lam nghiep (rung' in k:
+        return 'Rừng'
+    if _khop('cay xanh', k) or _khop('cayxanh', k):     # "Đất cây xanh sử dụng công cộng" là cây xanh, không phải công trình công cộng
+        return 'Cây xanh – thể dục thể thao'
+    for tu, nh in LUAT_THEM:
+        if _khop(tu, k, True):
+            return nh
     for tu, nh in LUAT_NHOM:
-        if tu in k:
+        if _khop(tu, k):
             return nh
     return KHAC
 
@@ -75,6 +127,7 @@ def main(files):
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     dem = collections.Counter()          # (nhóm, màu, tên loại đất) -> số ô  (gộp mọi bản)
     dem_ban = collections.defaultdict(collections.Counter)   # mã lớp -> như trên, riêng từng bản
+    mau_ten_pk = collections.defaultdict(collections.Counter)  # tên loại đất phân khu -> màu ảnh -> số vùng tô
     for arg in files:
         ma, f = arg.split('=', 1) if '=' in arg else (os.path.splitext(os.path.basename(arg))[0], arg)
         d = json.load(io.open(f, encoding='utf-8'))
@@ -82,7 +135,12 @@ def main(files):
             p = ft.get('properties') or {}
             if (p.get('lo') or '').strip().isdigit():
                 continue    # level chỉ là con số (vd '0' ở Cù Hin): bản vẽ không nói đất gì, in "0" vào chú giải vô nghĩa
-            ten = ten_loai(p.get('lo', ''))
+            if 'hatch_khop' in (p.get('lo') or '').lower():
+                continue    # vùng KHỚP NỐI (tô đất của bản bên cạnh để đối chiếu) — không phải loại đất của bản này
+            if p.get('lo') in LEVEL_TAT.get(ma, ()):
+                continue    # level bị TẮT / ĐÓNG BĂNG trong bản vẽ: MicroStation không hiện, dữ liệu tính QH (5g) cũng bỏ
+            ten = ten_theo_chu_giai(ma, p.get('lo', ''), p.get('ci'))
+            ten0 = ten
             # Bản vẽ tô HIỆN TRẠNG bằng màu khác hẳn quy hoạch, mà tên level sau khi cắt tiền tố
             # lại ra giống nhau ('Nhóm nhà ở'). Ghi rõ để người xem khỏi tưởng bảng in lặp.
             if p.get('hz') == 'HT':
@@ -91,9 +149,41 @@ def main(files):
             if m:
                 dem[(nhom_cua(ten), m, ten)] += 1
                 dem_ban[ma][(nhom_cua(ten), m, ten)] += 1
+                mau_ten_pk[ten0][m] += 1          # màu ô vuông bảng Thông tin thửa: theo tên (không kèm "(hiện trạng)")
 
     ra = xep(dem)
     ban = {ma: xep(c) for ma, c in dem_ban.items()}
+    # ── CHÚ GIẢI QĐ205 + QĐ893 (11/10/2026 — chủ dự án: "205 và 893 trên web chưa có chú giải") ──
+    # Lấy đúng các loại đất có trong dữ liệu tính quy hoạch (tên y như bảng Thông tin thửa), màu = màu bản vẽ (ảnh bản đồ QĐ205 /
+    # QĐ893 dùng đúng màu bản vẽ: đã so ô mẫu khung chú giải với bảng màu web). QĐ205 màu theo LỚP gpkg (chu-giai-ban-ve.json).
+    bang_mau = json.load(io.open(TEP_MAU, encoding='utf-8'))
+    try:
+        cg = json.load(io.open(os.path.join(HERE, 'chu-giai-ban-ve.json'), encoding='utf-8'))['ban']
+    except Exception:
+        cg = {}
+    t205 = TCG.get('205', {}).get('theo_level', {})
+    mau205 = collections.defaultdict(collections.Counter)
+    for x in (cg.get('205') or {}).get('lop_ban_do') or []:
+        lop = sua_chu(x.get('lop') or ''); ten = t205.get(lop) or x.get('ten_web')
+        if ten and x.get('mau'): mau205[ten][x['mau'].lower()] += x.get('dien_tich_trong_ranh_ha') or 0
+    for ma_lop, tep, khoa in (('qh-qd205', 'qh_zones.json', 'qd205'), ('qh-qd893', 'qh_zones_893.json', 'qd893')):
+        try:
+            Z = json.load(io.open(os.path.join(DATA, tep), encoding='utf-8'))
+        except Exception:
+            continue
+        so = collections.Counter(z[5] for z in Z)
+        c = collections.Counter()
+        for ten, n in so.items():
+            m = (mau205[ten].most_common(1)[0][0] if khoa == 'qd205' and mau205.get(ten) else (bang_mau.get(khoa) or {}).get(ten))
+            if not m: continue
+            if khoa == 'qd205': bang_mau.setdefault('qd205', {})[ten] = m
+            c[(nhom_cua(ten), m.lower(), ten)] += n
+        ban[ma_lop] = xep(c)
+    # màu ô vuông bảng Thông tin thửa cho tên phân khu (tên theo chú giải mới + tên cũ còn dùng)
+    for ten, cm in mau_ten_pk.items():
+        bang_mau.setdefault('phankhu', {})[ten] = cm.most_common(1)[0][0]
+    with io.open(TEP_MAU, 'w', encoding='utf-8', newline='\n') as fp:
+        json.dump(bang_mau, fp, ensure_ascii=False, indent=1)
     with io.open(RA, 'w', encoding='utf-8') as fp:
         json.dump({'_doc': 'Sinh tự động bởi scripts/qh-pipeline/8-tao-chu-giai.py — đừng sửa tay. '
                            'Màu lấy ĐÚNG từ bản vẽ quy hoạch (bảng màu MicroStation).',

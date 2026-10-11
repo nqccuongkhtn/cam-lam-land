@@ -40,8 +40,16 @@ DATA = os.path.join(HERE, '..', '..', 'apps', 'backend', 'data')
 def nap(ten, tep):
     sp = importlib.util.spec_from_file_location(ten, os.path.join(HERE, tep)); m = importlib.util.module_from_spec(sp); sp.loader.exec_module(m); return m
 b1 = nap('b1', '1b-doc-dxf.py'); b5 = nap('b5', '5-tao-qh-zones.py')
+sys.path.insert(0, HERE)
+import cung_chinh_xac as CX
 BAC = {'HT': 1, 'DAT': 2}          # còn lại (QH2030 / QH2045 / QHDD) = 3 — nằm trên, như ảnh tile
 KHOP = re.compile(r'hatch_khop', re.I)   # level tô VÙNG KHỚP NỐI với quy hoạch bên cạnh — không phải loại đất (xem dưới)
+
+
+def h5_sua(s):
+    """Tên level tiếng Việt bị đọc nhầm bảng mã (mojibake) → sửa lại như bảng chú giải đã sửa."""
+    try: return s.encode('cp1252').decode('utf-8')
+    except Exception: return s
 
 
 def chan_le(polys):
@@ -82,6 +90,8 @@ def main(vao, ma):
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     R = json.load(io.open(os.path.join(DATA, 'ranh_qh.json'), encoding='utf-8'))
     RG = make_valid(Polygon(R[ma]))
+    try: TCG = json.load(io.open(os.path.join(HERE, 'ten-theo-chu-giai.json'), encoding='utf-8')).get(ma) or {}
+    except Exception: TCG = {}
     wgs = lambda g: transform(lambda x, y, z=None: tuple(zip(*[b1.vn2wgs(a, b) for a, b in zip(x, y)])), g)
     d = ezdxf.readfile(vao); msp = d.modelspace()
     out = []; khop = []; dem = {'vung': 0, 'co_lo': 0, 'ngoai_ranh': 0, 'loi': 0}
@@ -95,13 +105,13 @@ def main(vao, ma):
         L = d.layers.get(lv) if d.layers.has_entry(lv) else None
         if L is not None and (L.is_frozen() or L.is_off()):
             dem['level_tat'] = dem.get('level_tat', 0) + 1; continue
-        try: ds = list(ezpath.from_hatch(e))
+        # CUNG TRÒN CHÍNH XÁC (11/10/2026, cung_chinh_xac.py): ezdxf đổi cung thành đường cong Bézier rồi bẻ võng 5 cm → hụt diện
+        # tích dọc mọi đường cong (thửa sát vòng xoay lệch 1–2 m² so với đo tay MicroStation). Nay tính cung đúng công thức.
+        try: ds = list(CX.duong_bao_hatch(e))
         except Exception: dem['loi'] += 1; continue
         polys = []
-        for p in ds:
-            try: pts = [(v.x, v.y) for v in p.flattening(distance=0.05, segments=8)]
-            except Exception: continue
-            if len(pts) >= 4: polys.append(make_valid(Polygon(pts)))
+        for pts in ds:
+            if len(pts) >= 3: polys.append(make_valid(Polygon(pts)))
         if not polys: continue
         dem['vung'] += 1
         g = unary_union(polys) if e.dxf.get('hatch_style', 0) == 2 or len(polys) == 1 else make_valid(chan_le(polys))
@@ -119,6 +129,10 @@ def main(vao, ma):
             continue
         if re.fullmatch(r'\s*\d+\s*', lv): loai, bac = b5.CHUA_RO, 0      # level chỉ là con số: bản vẽ không nói đất gì
         else: loai, bac = b5.ten_loai(lv), BAC.get(b1.nhom(lv), 3)
+        # TÊN ĐÚNG CHỮ KHUNG CHÚ GIẢI (11/10/2026, ten-theo-chu-giai.json — chỉ cặp level + màu khớp chắc chắn một dòng chú giải):
+        # cùng level mà khác màu có thể là dòng khác (QĐ2101 "Nhóm nhà ở" #a57c00 = mật độ trung bình, #dfff7f = mật độ thấp).
+        mau_to = b1.mau_va_so(e, d)[0].lower()
+        loai = TCG.get('theo_level_mau', {}).get('%s||%s' % (h5_sua(lv), mau_to)) or TCG.get('theo_level', {}).get(h5_sua(lv)) or loai
         for phan in cac_da_giac(W):
             dt = Polygon(phan.exterior).area                  # xếp thứ tự theo VÒNG NGOÀI của phần này (như cũ)
             trong = make_valid(phan.intersection(RG))

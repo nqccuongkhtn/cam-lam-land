@@ -3,6 +3,7 @@ import json, re, sys
 MA = {'920': 'taynam', '30': 'cuhin'}
 NHOM = [('GT', r'giao thông'), ('NGOAI', r'ngoài phạm vi'), ('MN', r'mặt nước|sông|suối|kênh|hồ ao'),
         ('VC', r'vui chơi'), ('CX', r'cây xanh'), ('TT', r'thể dục|thể thao'), ('GD', r'giáo dục|trường'),
+        ('O', r'dân cư'),   # 11/10/2026: 'khu dân cư hiện hữu (có nông nghiệp xen kẹp ~75%)' là đất dân cư, không phải nông nghiệp
         ('NN', r'nông nghiệp|lâu năm|hàng năm|lúa|rừng|chưa sử dụng'),
         ('O', r'ở|làng xóm|dân cư'), ('CC', r'.')]
 def nhom(s):

@@ -11,6 +11,17 @@ export const listingsRouter = Router();
 const FREE_POST_LIMIT = 1; // tài khoản free: 1 tin/tháng
 // Giới hạn độ dài chuỗi trước khi lưu (chống dữ liệu rác/quá khổ làm phình DB). null giữ nguyên null.
 const clip = (v: any, n: number) => (v === undefined || v === null ? null : String(v).slice(0, n));
+// Danh sách link ảnh của tin: trước đây nhận NGUYÊN mảng gửi lên (không giới hạn số lượng / độ dài) → một tin có thể
+// mang vài MB chữ, và mọi trang danh sách đều phải chở theo. Nay: tối đa 15 link, mỗi link tối đa 500 ký tự.
+// (Giao diện chỉ cho 5 ảnh/tin, link dạng /api/images/123 — dư sức.)
+function dsAnh(v: any): string[] | null {
+  if (!Array.isArray(v)) return null;
+  return v.filter((x) => typeof x === 'string' && x.trim()).map((x: string) => x.trim().slice(0, 500)).slice(0, 15);
+}
+// Khoá nhớ tạm của danh sách tin: CHỈ ghép từ các bộ lọc thật. Trước đây ghép NGUYÊN chuỗi hỏi → ai đó gắn thêm
+// tham số rác (?x=1, ?x=2…) là mỗi lần một bản sao mới trong bộ nhớ, ép máy hỏi database liên tục.
+const LOC_DS = ['minPrice', 'maxPrice', 'propertyType', 'ward', 'q', 'bbox', 'deal', 'limit', 'offset'];
+const khoaDs = (q: any) => 'listings:list:' + JSON.stringify(LOC_DS.map((k) => (q?.[k] == null ? '' : String(q[k]).slice(0, 200))));
 const SELECT = `
   SELECT listings.id, listings.title, listings.description, listings.price, listings.area,
          listings.property_type AS "propertyType", listings.address, listings.ward, listings.bedrooms,
@@ -71,7 +82,7 @@ const WARD_EXPAND: Record<string, string[]> = {
 
 listingsRouter.get('/', async (req, res, next) => {
   try {
-    const ckey = 'listings:list:' + JSON.stringify(req.query);
+    const ckey = khoaDs(req.query);
     const chit = cached<any>(ckey);
     if (chit) { res.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=60'); return res.json(chit); }
     const { minPrice, maxPrice, propertyType, ward, q, bbox, deal } = req.query as Record<string, string>;
@@ -375,7 +386,7 @@ listingsRouter.post('/', authRequired, async (req: AuthedRequest, res, next) => 
        RETURNING id`,
       [clip(b.title, 200), clip(b.description, 5000), b.price, b.area ?? null, clip(b.propertyType, 40) ?? 'land', clip(b.address, 300),
        clip(b.ward, 120), b.bedrooms ?? null, b.bathrooms ?? null, clip(b.direction, 60), clip(b.legal, 120), b.frontage ?? null,
-       clip(b.contactName, 120), clip(b.contactPhone, 30), b.images ?? [], b.lng, b.lat, req.user!.id, b.deal === 'rent' ? 'rent' : 'sale']);
+       clip(b.contactName, 120), clip(b.contactPhone, 30), dsAnh(b.images) ?? [], b.lng, b.lat, req.user!.id, b.deal === 'rent' ? 'rent' : 'sale']);
     await linkImages(row.id, b.images, req.user);
     cacheDrop('listings:');
     if (svcOn && !laAdmin(req.user) && !pkgActive) bumpUsage(req.user!.id, 'posts').catch(() => {}); // gói trả phí ĐÃ trừ atomic ở trên; free-tier đếm theo tháng ở đây
@@ -428,9 +439,11 @@ listingsRouter.put('/:id', authRequired, async (req: AuthedRequest, res, next) =
       [id, clip(b.title, 200), clip(b.description, 5000), b.price ?? null, b.area ?? null, clip(b.propertyType, 40),
        clip(b.address, 300), clip(b.ward, 120), b.bedrooms ?? null, b.bathrooms ?? null, clip(b.direction, 60),
        clip(b.legal, 120), b.frontage ?? null, clip(b.contactName, 120), clip(b.contactPhone, 30), trangThai,
-       b.images ?? null, b.lng ?? null, b.lat ?? null, clip(b.deal, 10)]);
+       dsAnh(b.images), b.lng ?? null, b.lat ?? null, clip(b.deal, 10)]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy tin' });
     if (b.images) await linkImages(id, b.images, req.user);
+    // Sửa tin (giá, ảnh, đã bán…) phải xoá bản nhớ tạm của danh sách — trước đây quên, danh sách / bản đồ hiện bản cũ tới 30 giây.
+    cacheDrop('listings:');
     const [updated] = await query(`${SELECT} WHERE listings.id=$1`, [id]);
     res.json(updated);
   } catch (e) { next(e); }

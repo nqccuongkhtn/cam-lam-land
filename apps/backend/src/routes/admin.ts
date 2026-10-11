@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { adminRequired, quenVaiTro, type AuthedRequest } from '../middleware/auth.ts';
 import { hashPassword, dsVaiTro, chuanHoaVaiTro, vaiTroChinh } from '../lib/auth.ts';
+import { cacheDrop } from '../lib/cache.ts';
 
 export const adminRouter = Router();
 adminRouter.use(adminRequired);
@@ -498,6 +499,7 @@ adminRouter.patch('/listings/:id', async (req, res, next) => {
               verified_at=CASE WHEN $5 IS TRUE THEN now() WHEN $5 IS FALSE THEN NULL ELSE verified_at END
        WHERE id=$1 RETURNING id, status, tier, boosted, verified`, [id, b.status ?? null, b.tier ?? null, !!b.bump, typeof b.verified === 'boolean' ? b.verified : null]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy tin' });
+    cacheDrop('listings:');   // admin ẩn / duyệt / đổi hạng tin → danh sách & bản đồ đổi theo NGAY (trước đây còn hiện bản cũ tới 30 giây)
     res.json({ listing: row });
   } catch (e) { next(e); }
 });

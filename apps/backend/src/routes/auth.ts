@@ -135,15 +135,28 @@ authRouter.patch('/me', authRequired, async (req: AuthedRequest, res, next) => {
         return res.status(400).json({ error: 'Mật khẩu hiện tại không đúng' });
       await query('UPDATE users SET password_hash=$2 WHERE id=$1', [req.user!.id, await hashPassword(b.newPassword)]);
     }
+    // 11/10/2026: giới hạn độ dài (trước đây nhận nguyên chuỗi — tên / SĐT / ảnh đại diện vài MB đi theo mọi tin đăng,
+    // tin chat, trang cá nhân). Ảnh đại diện chỉ nhận link ảnh (/api/images/…, http/https) — giá trị lạ thì giữ ảnh cũ.
+    const chu = (v: any, n: number) => (v === undefined || v === null ? null : String(v).trim().slice(0, n));
+    const anh = typeof b.avatar === 'string' && b.avatar.length <= 1000 && /^(\/api\/images\/|https?:\/\/)/i.test(b.avatar.trim()) ? b.avatar.trim() : null;
+    // Nút "Xoá ảnh" ở trang Tài khoản gửi avatar: null — trước đây máy chủ bỏ qua nên xoá mãi không được.
+    // Chỉ xoá khi GỬI RÕ null; không gửi trường avatar (vd lúc đổi mật khẩu) thì giữ nguyên ảnh.
+    const xoaAnh = Object.prototype.hasOwnProperty.call(b, 'avatar') && b.avatar === null;
     const [user] = await query(
-      `UPDATE users SET full_name=COALESCE($2,full_name), phone=COALESCE($3,phone), avatar=COALESCE($4,avatar)
-       WHERE id=$1 RETURNING *`, [req.user!.id, b.fullName ?? null, b.phone ?? null, b.avatar ?? null]);
+      `UPDATE users SET full_name=COALESCE($2,full_name), phone=COALESCE($3,phone),
+              avatar=CASE WHEN $5::boolean THEN NULL ELSE COALESCE($4,avatar) END
+       WHERE id=$1 RETURNING *`, [req.user!.id, chu(b.fullName, 120), chu(b.phone, 30), anh, xoaAnh]);
     res.json({ user: profile(user) });
   } catch (e) { next(e); }
 });
 
 // Heartbeat — đánh dấu còn hoạt động (để biết online)
+// Mỗi tab gửi 45 giây/lần; mở nhiều tab là ghi đè liên tục cùng một dòng. Chỉ ghi khi lần trước đã cách ≥ 20 giây —
+// "đang online" tính trong 2 phút nên không đổi gì với người xem, mà bớt hẳn số lần ghi vào bảng users.
 authRouter.post('/ping', authRequired, async (req: AuthedRequest, res, next) => {
-  try { await query('UPDATE users SET last_seen_at = now() WHERE id=$1', [req.user!.id]); res.json({ ok: true }); }
+  try {
+    await query(`UPDATE users SET last_seen_at = now() WHERE id=$1 AND (last_seen_at IS NULL OR last_seen_at < now() - interval '20 seconds')`, [req.user!.id]);
+    res.json({ ok: true });
+  }
   catch (e) { next(e); }
 });

@@ -13,11 +13,14 @@ consignmentsRouter.post('/', async (req, res, next) => {
     const phone = String(b.phone ?? '').trim();
     if (!name) return res.status(400).json({ error: 'Vui lòng nhập họ tên' });
     if (!isValidPhone(phone)) return res.status(400).json({ error: 'Số điện thoại không hợp lệ (cần 9–11 chữ số).' });
+    // Form CÔNG KHAI (không cần đăng nhập) → giới hạn độ dài từng ô (trước đây nhận nguyên khối tới 5 MB mỗi lần gửi).
+    const chu = (v: any, n: number) => (v ? String(v).slice(0, n) : null);
+    const dt = Number(b.area);
     const [row] = await query(
       `INSERT INTO consignments (name, phone, property_type, ward, address, area, price_expect, description)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`,
-      [name, phone.slice(0, 20), b.propertyType || null, b.ward || null, b.address || null,
-       b.area ? Number(b.area) : null, b.priceExpect || null, b.description || null]);
+      [name, phone.slice(0, 20), chu(b.propertyType, 40), chu(b.ward, 120), chu(b.address, 300),
+       b.area && Number.isFinite(dt) && dt >= 0 && dt < 1e9 ? dt : null, chu(b.priceExpect, 120), chu(b.description, 3000)]);
     res.status(201).json({ id: row.id, ok: true });
   } catch (e) { next(e); }
 });

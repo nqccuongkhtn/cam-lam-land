@@ -1,4 +1,4 @@
-const CACHE = 'camlam-v92';  /* v92 (2/10/2026): xoá trang cũ đã lưu — khung Tiện ích mở bản trang cũ gọi tới file mã đã bị thay → "Có lỗi khi hiển thị trang" */   // tăng số này là xoá sạch cache cũ của mọi máy ở lần vào sau
+const CACHE = 'camlam-v93';  /* v93 (11/10/2026): xoá trang cũ đã lưu — trang Bản đồ còn chạy bản mã cũ (chưa có phụ lục phiếu) vì dấu "bản mới" chỉ so file CSS · v92 (2/10/2026): khung Tiện ích mở bản trang cũ gọi tới file mã đã bị thay → "Có lỗi khi hiển thị trang" */   // tăng số này là xoá sạch cache cũ của mọi máy ở lần vào sau
 const API_CACHE = 'camlam-api-v1'; // cache RIÊNG cho API công khai (dễ dọn, giới hạn dung lượng)
 const OFFLINE = '/offline.html';
 // Precache khung app để MỞ APP là vẽ ngay (không chờ mạng → hết màn đen ~1s lúc khởi động).
@@ -80,7 +80,9 @@ self.addEventListener('fetch', (e) => {
        mới chỉ lưu ngầm → người dùng LUÔN chậm một bản so với web thật (sửa xong mà
        iPhone vẫn thấy lỗi cũ). Nay: bản mới tải về mà KHÁC bản đang hiện (khác dấu
        phiên bản của gói giao diện) thì báo trang tự tải lại một lần. */
-    const dau = (html) => (html.match(/\/_next\/static\/css\/[a-z0-9]+\.css/g) || []).join(',');
+    // DẤU PHIÊN BẢN = mọi file CSS + JS của Next mà trang gọi tới (11/10/2026). Trước chỉ so file CSS: bản dựng chỉ đổi MÃ JS
+    // (vd thêm phụ lục phiếu ở trang Bản đồ) thì CSS y nguyên → không báo → người dùng chạy bản mã cũ cả lượt vào đó.
+    const dau = (html) => [...new Set(html.match(/static\/(?:css|chunks)\/[\w\/.-]+\.(?:css|js)/g) || [])].sort().join(',');
     const net = fetch(req).then(async (res) => {
       if (res && res.ok) {
         const copy = res.clone();

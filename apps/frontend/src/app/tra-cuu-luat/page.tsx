@@ -1688,8 +1688,13 @@ export default function TraCuuLuatPage() {
           bắt đầu từ "tôi đang gặp chuyện gì". Mỗi bước đều kèm nút dẫn tới điều gốc. */}
       {the === 'tinhhuong' && (
         <div className="mt-3">
-          {!th ? <p className="text-slate-400">Đang tải…</p> : !thChon ? (
+          {!th ? <p className="text-slate-400">Đang tải…</p> : !thChon || !th.ds.some((k) => k.ma === thChon) ? (
             <>
+              {thChon && (   /* đợt 34: mã lạ trong đường dẫn — trước làm sập cả trang */
+                <p className="mb-2 rounded-lg bg-amber-50 px-3 py-2 text-[12.5px] leading-snug text-amber-800">
+                  Đường dẫn trỏ tới một tình huống không còn (có thể đã đổi tên) — bạn chọn lại ở dưới nhé.
+                </p>
+              )}
               <p className="text-[12.5px] leading-snug text-slate-500">
                 Chọn đúng chuyện bạn đang gặp. Mỗi tình huống là một chuỗi câu hỏi — trả lời tới đâu,
                 luật chỉ tới đó.

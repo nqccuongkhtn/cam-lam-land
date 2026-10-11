@@ -408,6 +408,8 @@ export default function TraCuuLuatPage() {
   const daTai = useRef<Record<string, Promise<VanBan>>>({});
 
   const vb = cacVb[maVb] || null;
+  const [daChep, setDaChep] = useState<'' | 'chu' | 'link'>('');
+  const daMoLink = useRef(false);
 
   // Tải một văn bản. Nhớ lại lời hứa đang chạy để bấm nhanh hai lần không tải hai lần.
   const taiVb = (ma: string): Promise<VanBan> => {
@@ -960,6 +962,30 @@ export default function TraCuuLuatPage() {
     setMoDs(false);        // điện thoại: chọn xong thì thu danh sách, nhường màn hình cho nội dung
     oNoiDung.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
+  // ĐƯỜNG DẪN TỚI TỪNG ĐIỀU (đợt 14, 11/10/2026): /tra-cuu-luat?vb=ldd2024&d=78&k=2 mở thẳng Điều 78 khoản 2 — lưu dấu trang, gửi
+  // cho đồng nghiệp (người nhận vẫn phải đăng nhập, có quyền mới xem được). Đổi điều đang đọc thì đường dẫn trên thanh địa chỉ đổi
+  // theo (thay tại chỗ, không chồng thêm lịch sử).
+  useEffect(() => {
+    if (!duocXem || daMoLink.current) return;
+    daMoLink.current = true;
+    let sp: URLSearchParams;
+    try { sp = new URLSearchParams(window.location.search); } catch { return; }
+    const ma = sp.get('vb'), so = Number(sp.get('d')), k = Number(sp.get('k')) || undefined;
+    if (!ma || !/^[a-z0-9-]+$/.test(ma) || !(so > 0)) return;
+    taiVb(ma).then(() => moDieu(ma, so, k)).catch(() => {});
+  }, [duocXem]);
+  useEffect(() => {
+    if (!daMoLink.current) return;
+    try {
+      const u = new URL(window.location.href);
+      if (chon != null) {
+        u.searchParams.set('vb', maVb); u.searchParams.set('d', String(chon));
+        if (khoanSang) u.searchParams.set('k', String(khoanSang)); else u.searchParams.delete('k');
+      } else { u.searchParams.delete('vb'); u.searchParams.delete('d'); u.searchParams.delete('k'); }
+      const moi = u.pathname + u.search + u.hash;
+      if (moi !== window.location.pathname + window.location.search + window.location.hash) window.history.replaceState(window.history.state, '', moi);
+    } catch { /* */ }
+  }, [maVb, chon, khoanSang]);
   // Đang ở thẻ nào thì mở kiểu đó: ở "Toàn văn" thì nhảy tới điều luôn; ở sơ đồ, tình
   // huống, thẻ học thì mở NGĂN BÊN để không mất chỗ đang xem.
   const moDieuHopLy = (ma: string, so: number) => {
@@ -1318,7 +1344,15 @@ export default function TraCuuLuatPage() {
     const t = `Điều ${d.so}. ${d.tieuDe}\n` + d.khoan.map((k) =>
       (k.so ? `${k.so}. ` : '') + k.chu + (k.diem.length ? '\n' + k.diem.map((x) => `${x.ky}) ${x.chu}`).join('\n') : '')).join('\n')
       + `\n\n(${vb?.ten} — ${vb?.soHieu})`;
-    navigator.clipboard?.writeText(t);
+    navigator.clipboard?.writeText(t).then(() => { setDaChep('chu'); setTimeout(() => setDaChep(''), 1800); }).catch(() => {});
+  };
+  // Gửi đường dẫn tới điều đang đọc: điện thoại mở bảng chia sẻ (Zalo, Messenger…); máy tính chép đường dẫn.
+  const guiLink = async (d: Dieu) => {
+    const url = `${window.location.origin}/tra-cuu-luat?vb=${encodeURIComponent(maVb)}&d=${d.so}`;
+    const ten = `Điều ${d.so}. ${d.tieuDe} — ${nhanNgan(maVb, vb?.soHieu || '')}`;
+    const dienThoai = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
+    if (dienThoai && typeof navigator.share === 'function') { try { await navigator.share({ title: ten, url }); } catch { /* người dùng huỷ */ } return; }
+    try { await navigator.clipboard.writeText(ten + '\n' + url); setDaChep('link'); setTimeout(() => setDaChep(''), 1800); } catch { /* */ }
   };
 
   if (loading) return <div className="p-6 text-slate-500">Đang kiểm tra quyền…</div>;
@@ -2617,7 +2651,9 @@ export default function TraCuuLuatPage() {
                     {ghim.includes(khoaGhim(vb.ma, dieuDangXem.so)) ? '⭐ Đã ghim' : '☆ Ghim'}
                   </button>
                   <button onClick={() => chep(dieuDangXem)} title="Sao chép nguyên văn"
-                    className="shrink-0 rounded-lg border border-slate-200 px-2 py-1 text-[12px] font-semibold text-slate-500">⧉ Chép</button>
+                    className={`shrink-0 rounded-lg border px-2 py-1 text-[12px] font-semibold ${daChep === 'chu' ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-500'}`}>{daChep === 'chu' ? '✓ Đã chép' : '⧉ Chép'}</button>
+                  <button onClick={() => guiLink(dieuDangXem)} title="Gửi đường dẫn tới điều này (mở thẳng đúng điều)"
+                    className={`shrink-0 rounded-lg border px-2 py-1 text-[12px] font-semibold ${daChep === 'link' ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-500'}`}>{daChep === 'link' ? '✓ Đã chép đường dẫn' : '🔗 Gửi'}</button>
                   </span>
                 </div>
 

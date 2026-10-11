@@ -768,5 +768,40 @@ export async function migrate(): Promise<void> {
     `CREATE INDEX IF NOT EXISTS thiet_bi_reset_user_idx ON thiet_bi_reset (user_id, luc DESC)`,
   ]) await pool.query(sql).catch((e) => console.error('[migrate] thiết bị:', e.message));
 
+  // ── CHỈ MỤC TRA THỬA THEO XÃ MỚI + SỐ THỬA (11/10/2026 — rà soát tốc độ) ──
+  // Ô tra cứu: chọn một XÃ MỚI (sau sáp nhập) rồi chỉ gõ SỐ THỬA (không gõ số tờ). Trước đây máy phải dò gần hết
+  // chỉ mục (xa_id, to_num, thua_num) mới gom đủ kết quả — đo trên máy thật: 353 ms và đọc ~18 MB từ đĩa cho MỘT lần tra.
+  // Chỉ mục (xa_moi_id, thua_num) cho máy nhảy thẳng tới đúng các thửa đó → còn khoảng 1 ms.
+  // Dựng ở NỀN (không bắt máy chủ chờ → không thêm lỗi 502 lúc khởi động). Lần đầu mất vài giây với 733 nghìn thửa;
+  // trong lúc dựng mọi người vẫn XEM / TRA bình thường, chỉ việc NẠP dữ liệu địa chính phải chờ. Đã có thì bỏ qua ngay.
+  // scripts/dia-chinh/nap-tat-ca.sh tháo + dựng lại chỉ mục này cùng 3 chỉ mục kia khi nạp lại toàn bộ.
+  dungChiMucNen('dia_chinh_xa_moi_thua_idx', `CREATE INDEX IF NOT EXISTS dia_chinh_xa_moi_thua_idx ON dia_chinh (xa_moi_id, thua_num)`);
+
   console.log('[migrate] schema up to date');
+}
+
+/**
+ * Dựng một CHỈ MỤC trên bảng lớn ở NỀN, bằng một kết nối riêng:
+ *  · được chạy lâu hơn giới hạn 20 giây chung (lib/db.ts) — không thì bảng lớn dựng dở bị huỷ, lần sau lại dựng lại từ đầu;
+ *  · nhưng KHÔNG chờ khoá bảng quá 30 giây (vd đang có người nạp dữ liệu địa chính) — thôi, lần khởi động sau thử lại.
+ * Dựng kiểu thường (không CONCURRENTLY): hỏng giữa chừng thì tự huỷ sạch, không để lại chỉ mục hỏng. Lỗi chỉ ghi log.
+ */
+function dungChiMucNen(ten: string, sql: string): void {
+  (async () => {
+    const [co] = await pool.query(`SELECT to_regclass($1) IS NOT NULL AS co`, [ten]).then((r: any) => r.rows);
+    if (co?.co) return;                                   // đã có rồi → không làm gì
+    const c = await pool.connect();
+    const t0 = Date.now();
+    let hong = false;                                     // kết nối hỏng thì bỏ luôn, không trả lại cho nhóm kết nối
+    try {
+      await c.query(`SET statement_timeout = '15min'`);
+      await c.query(`SET lock_timeout = '30s'`);
+      await c.query(sql);
+      console.log(`[migrate] đã dựng xong chỉ mục ${ten} (${Math.round((Date.now() - t0) / 1000)} giây)`);
+    } finally {
+      await c.query('RESET statement_timeout').catch(() => { hong = true; });
+      await c.query('RESET lock_timeout').catch(() => { hong = true; });
+      c.release(hong);
+    }
+  })().catch((e: any) => console.error(`[migrate] dựng chỉ mục ${ten} lỗi (lần khởi động sau sẽ thử lại):`, e?.message || e));
 }

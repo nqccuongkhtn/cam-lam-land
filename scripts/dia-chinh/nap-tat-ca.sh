@@ -22,7 +22,7 @@ if [ ! -d "$THU_MUC" ]; then echo "!! Không thấy thư mục"; exit 1; fi
 # Tháo chỉ mục ra cho nạp nhanh (nạp xong dựng lại) — dựng chỉ mục 1 lần nhanh hơn
 # nhiều so với vừa nạp vừa cập nhật chỉ mục cho từng thửa một.
 echo "== Tháo chỉ mục cho nạp nhanh"
-psql_ct -c "DROP INDEX IF EXISTS dia_chinh_geom_gix; DROP INDEX IF EXISTS dia_chinh_tim_idx; DROP INDEX IF EXISTS dia_chinh_to_thua_idx;" >/dev/null
+psql_ct -c "DROP INDEX IF EXISTS dia_chinh_geom_gix; DROP INDEX IF EXISTS dia_chinh_tim_idx; DROP INDEX IF EXISTS dia_chinh_to_thua_idx; DROP INDEX IF EXISTS dia_chinh_xa_moi_thua_idx;" >/dev/null
 
 CHUYEN_SQL="
 INSERT INTO dia_chinh (xa_id, cap, so_to, so_thua, to_num, thua_num, dien_tich, mdsd, geom)
@@ -65,6 +65,8 @@ echo "== Dựng lại chỉ mục (bước này lâu vài phút, đừng tắt)"
 psql_ct -c "CREATE INDEX IF NOT EXISTS dia_chinh_geom_gix   ON dia_chinh USING GIST (geom);" >/dev/null
 psql_ct -c "CREATE INDEX IF NOT EXISTS dia_chinh_tim_idx    ON dia_chinh (xa_id, to_num, thua_num);" >/dev/null
 psql_ct -c "CREATE INDEX IF NOT EXISTS dia_chinh_to_thua_idx ON dia_chinh (to_num, thua_num);" >/dev/null
+# Tra "xã mới + số thửa" (không gõ số tờ) — xem migrate.ts (11/10/2026). Cột xa_moi_id do bước sau điền, chỉ mục tự cập nhật theo.
+psql_ct -c "CREATE INDEX IF NOT EXISTS dia_chinh_xa_moi_thua_idx ON dia_chinh (xa_moi_id, thua_num);" >/dev/null
 psql_ct -c "ANALYZE dia_chinh;" >/dev/null
 
 echo "== Xong. Tổng số thửa trong database:"

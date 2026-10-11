@@ -6,6 +6,7 @@ import { query } from '../lib/db.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { broadcastChat, broadcastRecall } from '../lib/ws.ts';
 import { pushToUsers, pushAllExcept } from '../lib/push.ts';
+import { loaiThat, datLoaiAnToan } from '../lib/loaiTep.ts';
 
 export const chatRouter = Router();
 
@@ -293,9 +294,12 @@ chatRouter.post('/file', authRequired, nhanTep, async (req: AuthedRequest, res, 
     if (!laPhongRieng(room)) return res.status(400).json({ error: 'Chỉ gửi được ảnh/tệp trong tin nhắn riêng.' });
     if (!(await duocGuiTep(room, req.user!)))
       return res.status(403).json({ error: 'Tài khoản của bạn chưa được mở quyền gửi ảnh/tệp. Vui lòng nhắn cho admin.' });
-    const mime = String(f.mimetype || '');
+    // ⚠️ 11/10/2026 (rà soát bảo mật): xét loại tệp theo CHỮ KÝ NHỊ PHÂN, không tin loại trình duyệt khai.
+    //    Trước đây khai "image/svg+xml" là gửi được SVG chứa mã <script>; admin bấm mở ảnh ở thẻ mới là mã chạy
+    //    trên tên miền của web → lấy được thẻ đăng nhập admin. Nay chỉ nhận JPG/PNG/GIF/WebP/PDF thật.
+    const mime = loaiThat(f.buffer);
+    if (!mime) return res.status(400).json({ error: 'Chỉ nhận ảnh (JPG, PNG, WebP, GIF) hoặc tệp PDF.' });
     const laAnh = mime.startsWith('image/');
-    if (!laAnh && mime !== 'application/pdf') return res.status(400).json({ error: 'Chỉ nhận ảnh hoặc tệp PDF.' });
     const ten = String(f.originalname || (laAnh ? 'hinh-anh' : 'tai-lieu.pdf')).slice(0, 200);
 
     const [tep] = await query(
@@ -330,7 +334,8 @@ async function guiTep(req: AuthedRequest, res: any, cot: 'du_lieu' | 'thumb') {
   const [row] = await query('SELECT room, ten, mime, du_lieu, thumb FROM chat_files WHERE id=$1', [Number(req.params.id)]);
   if (!row) return res.status(404).json({ error: 'Không tìm thấy tệp' });
   if (!(await canAccess(row.room, req.user!))) return res.status(403).json({ error: 'Không có quyền' });
-  res.set('Content-Type', row.mime || 'application/octet-stream');
+  // Loại lạ còn sót từ trước (vd SVG) → trả dạng tải về, không cho trình duyệt hiển thị trên tên miền của web.
+  datLoaiAnToan(res, row.mime, 'application/octet-stream');
   res.set('Cache-Control', 'private, no-store'); // tệp riêng tư: nginx & trình duyệt đều không được giữ lại
   if (String(req.query.tai ?? '') === '1')
     res.set('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(row.ten || 'tep')}`);

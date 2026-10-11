@@ -25,12 +25,16 @@ const boDauVn = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replac
 // (gõ không dấu cũng ra). Dùng cho ô chọn huyện/TP cũ và ô chọn xã/phường.
 // Đặt NGOÀI trang chính: nếu để bên trong, mỗi lần trang vẽ lại thì ô này bị dựng lại từ đầu
 // và con trỏ đang gõ sẽ nhảy ra ngoài.
-function OChonCoGo({ nhan, dsMuc, giaTri, khiChon, className, dienThoai = false }: {
+function OChonCoGo({ nhan, dsMuc, giaTri, khiChon, className, dienThoai = false, oRef, khiXong }: {
   nhan: string;
   dsMuc: { id: string; ten: string; phu?: string }[];
   giaTri: string;
   khiChon: (id: string) => void;
   className?: string;
+  // BÀN PHÍM (11/10/2026): oRef = cho trang chính đặt con trỏ vào ô này; khiXong = chọn xong (bằng phím hoặc chuột) thì
+  // làm gì tiếp — thường là đặt con trỏ sang ô kế (huyện → xã → số thửa) để gõ liền một mạch, khỏi cầm chuột.
+  oRef?: (el: HTMLInputElement | null) => void;
+  khiXong?: () => void;
   // dienThoai: bảng đáy Tra cứu trên điện thoại — chữ 16px (iPhone tự PHÓNG TO cả trang khi bấm ô chữ
   // nhỏ hơn 16px) và danh sách SỔ LÊN TRÊN (bảng nằm sát bàn phím, sổ xuống là bị bàn phím che mất).
   dienThoai?: boolean;
@@ -38,10 +42,12 @@ function OChonCoGo({ nhan, dsMuc, giaTri, khiChon, className, dienThoai = false 
   const [go, setGo] = useState('');
   const [daGo, setDaGo] = useState(false);   // đã bắt đầu gõ hay chưa (chưa gõ thì sổ ĐỦ danh sách)
   const [mo, setMo] = useState(false);
+  const [chiSo, setChiSo] = useState(-1);   // dòng đang được tô (đi bằng phím ↑↓); -1 = chưa tô dòng nào
   const boc = useRef<HTMLDivElement>(null);
   const dongDangChon = useRef<HTMLButtonElement>(null);
+  const dongTo = useRef<HTMLButtonElement>(null);
 
-  const dong = () => { setMo(false); setGo(''); setDaGo(false); };
+  const dong = () => { setMo(false); setGo(''); setDaGo(false); setChiSo(-1); };
   // Điện thoại: danh sách vẽ TÁCH RA body (portal) và đặt `fixed` ngay TRÊN ô đang gõ. Để trong bảng
   // đáy thì khung bảng (cuộn được) CẮT MẤT danh sách, chỉ còn thấy 1 dòng (chủ dự án chụp 14/9/2026).
   const dsRef = useRef<HTMLDivElement>(null);
@@ -76,22 +82,38 @@ function OChonCoGo({ nhan, dsMuc, giaTri, khiChon, className, dienThoai = false 
   const oNhap = useRef<HTMLInputElement>(null);
   // Chọn xong thì nhả con trỏ ra khỏi ô, nếu không lần bấm sau sẽ không mở lại được danh sách
   // (vì ô vẫn đang được chọn nên trình duyệt không báo "vừa bấm vào ô" nữa).
-  const chon = (id: string) => { khiChon(id); dong(); oNhap.current?.blur(); };
+  const chon = (id: string) => { khiChon(id); dong(); oNhap.current?.blur(); if (khiXong && !dienThoai) setTimeout(khiXong, 0); };
+  // Dòng đang tô luôn nằm trong tầm nhìn khi đi bằng phím ↑↓
+  useEffect(() => { if (mo && chiSo >= 0) dongTo.current?.scrollIntoView({ block: 'nearest' }); }, [mo, chiSo]);
+  const moRa = () => { setMo(true); setDaGo(false); setChiSo(dsMuc.findIndex((m) => m.id === giaTri)); };
 
   return (
     <div ref={boc} className={`relative ${className || ''}`}>
       {/* Có CẢ onFocus lẫn onClick: bấm lần đầu thì onFocus lo, còn khi con trỏ đã sẵn trong ô
           (vừa chọn xong) thì trình duyệt không báo "vừa bấm vào ô" nữa nên phải nhờ onClick. */}
       <input
-        ref={oNhap}
+        ref={(el) => { (oNhap as any).current = el; oRef?.(el); }}
         value={daGo ? go : dangChon}
         placeholder={nhan}
-        onFocus={(e) => { setMo(true); setDaGo(false); e.currentTarget.select(); }}
-        onClick={(e) => { setMo(true); setDaGo(false); e.currentTarget.select(); }}
-        onChange={(e) => { setGo(e.target.value); setDaGo(true); setMo(true); }}
+        onFocus={(e) => { moRa(); e.currentTarget.select(); }}
+        onClick={(e) => { if (!mo) moRa(); e.currentTarget.select(); }}
+        onChange={(e) => { setGo(e.target.value); setDaGo(true); setMo(true); setChiSo(e.target.value.trim() ? 0 : -1); }}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' && loc.length) { e.preventDefault(); chon(loc[0].id); (e.target as HTMLInputElement).blur(); }
-          if (e.key === 'Escape') dong();
+          if (e.nativeEvent.isComposing) return;   // bộ gõ tiếng Việt đang ghép chữ — chưa phải phím thật
+          const n = loc.length;
+          if (e.key === 'ArrowDown') { e.preventDefault(); if (!mo) { moRa(); return; } setChiSo((i) => (n ? Math.min(n - 1, i + 1) : -1)); return; }
+          if (e.key === 'ArrowUp') { e.preventDefault(); if (!mo) { moRa(); return; } setChiSo((i) => (n ? Math.max(0, i - 1) : -1)); return; }
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (!mo) { moRa(); return; }
+            if (n) chon(loc[chiSo >= 0 && chiSo < n ? chiSo : 0].id);
+            return;
+          }
+          // Tab: đã gõ để lọc (hoặc đã đi phím tới một dòng) thì NHẬN dòng đó rồi để con trỏ đi tiếp như thường
+          if (e.key === 'Tab' && mo && n && (daGo || chiSo >= 0)) { const id = loc[chiSo >= 0 && chiSo < n ? chiSo : 0].id; khiChon(id); dong(); if (khiXong && !dienThoai && !e.shiftKey) { e.preventDefault(); setTimeout(khiXong, 0); } return; }
+          if (e.key === 'Tab') { dong(); return; }
+          // Esc: đang sổ danh sách thì chỉ ĐÓNG DANH SÁCH (preventDefault báo cho trang chính đừng đóng cả khung tìm)
+          if (e.key === 'Escape' && mo) { e.preventDefault(); dong(); }
         }}
         className={`border rounded-lg pl-2.5 pr-6 w-full bg-white truncate ${dienThoai ? 'py-2 text-[16px]' : 'py-1.5 text-xs'} ${giaTri ? 'border-[#0A2540] font-semibold text-[#0A2540]' : 'border-slate-300'}`} />
       <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[9px]">▼</span>
@@ -105,10 +127,10 @@ function OChonCoGo({ nhan, dsMuc, giaTri, khiChon, className, dienThoai = false 
                 className={`w-full text-left px-2.5 text-slate-400 hover:bg-slate-50 border-b border-slate-100 sticky top-0 bg-white ${dienThoai ? 'py-2 text-[13px]' : 'py-1.5 text-[11px]'}`}>— Bỏ chọn —</button>
             )}
             {loc.length === 0 && <div className={`px-2.5 py-2 text-slate-400 ${dienThoai ? 'text-[13px]' : 'text-[11px]'}`}>Không tìm thấy</div>}
-            {loc.map((m) => (
-              <button key={m.id} type="button" ref={m.id === giaTri ? dongDangChon : undefined}
-                onMouseDown={(e) => e.preventDefault()} onClick={() => chon(m.id)}
-                className={`w-full text-left px-2.5 hover:bg-slate-50 border-b last:border-b-0 border-slate-100 ${dienThoai ? 'py-2' : 'py-1.5'} ${m.id === giaTri ? 'bg-amber-50' : ''}`}>
+            {loc.map((m, i) => (
+              <button key={m.id} type="button" ref={i === chiSo ? dongTo : (m.id === giaTri ? dongDangChon : undefined)}
+                onMouseDown={(e) => e.preventDefault()} onClick={() => chon(m.id)} onMouseEnter={() => setChiSo(i)}
+                className={`w-full text-left px-2.5 hover:bg-slate-50 border-b last:border-b-0 border-slate-100 ${dienThoai ? 'py-2' : 'py-1.5'} ${i === chiSo ? '!bg-slate-100' : m.id === giaTri ? 'bg-amber-50' : ''}`}>
                 <span className={`block truncate ${dienThoai ? 'text-[14px]' : 'text-xs'} ${m.id === giaTri ? 'font-bold text-[#0A2540]' : 'font-medium text-slate-800'}`}>
                   {m.id === giaTri ? '✓ ' : ''}{m.ten}
                 </span>
@@ -1500,15 +1522,16 @@ export default function MapPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function doSearch() {
+  async function doSearch(ghiDe?: { c1?: string; c2?: string }) {
+    const v1 = ghiDe?.c1 ?? c1, v2 = ghiDe?.c2 ?? c2;   // số vừa tự tách (95/15) — trạng thái c1/c2 chưa kịp đổi
     if (searchMode === 'parcel') {
       // Tra trên bảng địa chính toàn tỉnh (/dc/tim) — có chỉ mục theo số tờ/số thửa nên rất nhanh.
       const params = new URLSearchParams();
-      if (c1.trim()) params.set('to', c1.trim());
-      if (c2.trim()) params.set('thua', c2.trim());
+      if (v1.trim()) params.set('to', v1.trim());
+      if (v2.trim()) params.set('thua', v2.trim());
       if (c3.trim()) params.set('xaId', c3.trim());   // c3 giờ là MÃ XÃ, không phải tên (10 cặp xã trùng tên)
       if (!c3.trim() && cap) params.set('cap', cap);   // chưa chọn xã thì lọc theo cấp cho gọn kết quả
-      if (!c1.trim() && !c2.trim()) return alert('Nhập số thửa và/hoặc số tờ.');
+      if (!v1.trim() && !v2.trim()) return alert('Nhập số thửa và/hoặc số tờ.');
       try {
         const r = await api<{ soLuong: number; thuaDat: ThuaTim[] }>(`/dc/tim?${params.toString()}`);
         if (!r.soLuong) { setKetQuaTim([]); return alert('Không tìm thấy thửa nào khớp. Thử bỏ bớt điều kiện, hoặc chọn đúng xã/phường.'); }
@@ -1518,19 +1541,19 @@ export default function MapPage() {
       return;
     }
     if (searchMode === 'gmap') {
-      const g = parseGmap(c1.trim());
+      const g = parseGmap(v1.trim());
       if (!g) return alert('Không đọc được toạ độ từ link. Hãy dán link Google Maps có dạng …/@12.34,109.12,… hoặc copy toạ độ. (Link rút gọn goo.gl cần mở ra để lấy link đầy đủ.)');
       setFocusPoint({ lng: g.lng, lat: g.lat, label: `${g.lat.toFixed(6)}, ${g.lng.toFixed(6)}` });
       setTool('none'); return;
     }
     let lng: number, lat: number;
     if (searchMode === 'vn2000') {
-      const a = parseFloat(c1), b = parseFloat(c2);
+      const a = parseFloat(v1), b = parseFloat(v2);
       if (Number.isNaN(a) || Number.isNaN(b)) return alert('Nhập X (Bắc), Y (Đông) hệ VN-2000.');
       const E = a < 900000 ? a : b, N = a < 900000 ? b : a; // sổ: X=Bắc(>900k), Y=Đông(<900k) — tự nhận, không lo nhầm X/Y
       const w = vn2000ToWgs84(E, N); lng = w.lng; lat = w.lat;
     } else {
-      lat = parseFloat(c1); lng = parseFloat(c2);
+      lat = parseFloat(v1); lng = parseFloat(v2);
       if (Number.isNaN(lat) || Number.isNaN(lng)) return alert('Nhập Vĩ độ (lat), Kinh độ (lng).');
     }
     setFocusPoint({ lng, lat, label: `${lat.toFixed(6)}, ${lng.toFixed(6)}` });
@@ -1665,7 +1688,51 @@ export default function MapPage() {
   // vì xã chưa có bảng thì số nhập vào vẫn được hiểu là số tờ cũ.
   const nhanOSoTo = (cap === '2' && dsXaCap.find((x) => x.xaId === c3)?.coBangTo) ? 'Số tờ mới' : 'Số tờ';
   // anChon = true: bảng đáy Tra cứu của điện thoại — kiểu tra đã chọn bằng THẺ nên ẩn ô sổ xuống.
-  const searchCtrl = (full = false, anChon = false) => (
+  // ── BÀN PHÍM Ô TRA CỨU (chủ dự án 11/10/2026: "nhập đủ thông tin thì bấm Enter tra cứu được, không cần dùng chuột") ──
+  //   Enter ở ô SỐ THỬA: ô số tờ còn trống → nhảy sang ô số tờ; đủ rồi → tra luôn. Enter ở ô SỐ TỜ → tra.
+  //   Gõ gộp "95/15", "95 15", "thửa 95 tờ 15", "tờ 15 thửa 95" vào ô số thửa → tự tách thửa 95, tờ 15.
+  //   Ô huyện / xã: ↑↓ đi trong danh sách, Enter hoặc Tab chọn, chọn xong con trỏ tự sang ô kế (huyện → xã → số thửa).
+  //   Esc: đóng danh sách đang sổ; bấm lần nữa đóng khung tìm. Phím "/" hoặc Ctrl+K: mở khung tìm, con trỏ vào ô số thửa.
+  const oTimRef = useRef<Record<string, HTMLElement | null>>({});
+  const datTro = (k: string) => setTimeout(() => { const el = oTimRef.current[k] as HTMLInputElement | undefined; if (el) { el.focus(); el.select?.(); } }, 30);
+  const tachThuaTo = (s: string): { thua: string; to: string } | null => {
+    const k = boDauVn(s || '').trim();
+    let m = /^(?:thua\s*)?(\d+[a-z]?)\s*(?:[\/\-,;.]\s*|\s+)(?:to\s*)?(\d+)$/.exec(k);
+    if (m) return { thua: m[1], to: m[2] };
+    m = /^to\s*(\d+)\s*[,;]?\s*thua\s*(\d+[a-z]?)$/.exec(k);
+    return m ? { thua: m[2], to: m[1] } : null;
+  };
+  const traCuu = (full: boolean, ghiDe?: { c1?: string; c2?: string }) => { doSearch(ghiDe); if (full) setTool('none'); };
+  const phimEnter = (full: boolean, o: 'thua' | 'to' | 'mot' | 'hai', kp: string) => (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== 'Enter' || e.nativeEvent.isComposing) return;   // isComposing: bộ gõ tiếng Việt đang ghép chữ
+    e.preventDefault();
+    if (o === 'thua') {
+      const t = tachThuaTo(c2);
+      if (t) { setC2(t.thua); setC1(t.to); traCuu(full, { c1: t.to, c2: t.thua }); return; }
+      if (c2.trim() && !c1.trim()) { datTro('to-' + kp); return; }
+    }
+    if (o === 'mot' && c1.trim() && !c2.trim()) { datTro('hai-' + kp); return; }
+    traCuu(full);
+  };
+  useEffect(() => {
+    const nghe = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && timMo && !e.defaultPrevented) { setTimMo(false); return; }
+      const t = e.target as HTMLElement | null;
+      if (t && t.closest && t.closest('input, textarea, select, [contenteditable="true"]')) return;
+      const moTim = (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) || ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K'));
+      if (!moTim || !laMayTinh()) return;
+      e.preventDefault();
+      setPanelOpen(false); setTimMo(true);
+      datTro(searchMode === 'parcel' ? (c3 ? 'thua-mt' : 'xa-mt') : 'mot-mt');
+    };
+    window.addEventListener('keydown', nghe);
+    return () => window.removeEventListener('keydown', nghe);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timMo, c3, searchMode]);
+  const searchCtrl = (full = false, anChon = false) => {
+    const kp = full ? 'dt' : anChon ? 'mt' : 'cu';   // khoá giữ ô: điện thoại / khung tìm máy tính / thanh cũ (đang ẩn)
+    const giu = (k: string) => (el: HTMLElement | null) => { oTimRef.current[k + '-' + kp] = el; };
+    return (
     <div className={`flex items-center gap-1.5 ${full ? 'flex-wrap' : ''}`}>
       <select value={searchMode} hidden={anChon} onChange={(e) => { setC1(''); setC2(''); setSearchMode(e.target.value as any); }} className={`border rounded-lg px-2 py-1.5 text-xs bg-white ${full ? 'w-full' : ''}`}>
         <option value="parcel">Số tờ / thửa</option>
@@ -1674,7 +1741,7 @@ export default function MapPage() {
         <option value="gmap">Link Google Maps</option>
       </select>
       {searchMode === 'gmap' ? (
-        <input value={c1} onChange={(e) => setC1(e.target.value)} placeholder="Dán link Google Maps (…/@12.34,109.12…)" className={`col-span-2 border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] w-full' : 'py-1.5 text-xs w-56'}`} />
+        <input ref={giu('mot')} value={c1} onChange={(e) => setC1(e.target.value)} onKeyDown={phimEnter(full, 'hai', kp)} enterKeyHint="search" placeholder="Dán link Google Maps (…/@12.34,109.12…)" className={`col-span-2 border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] w-full' : 'py-1.5 text-xs w-56'}`} />
       ) : (
         <>
           {searchMode === 'parcel' && (
@@ -1694,6 +1761,7 @@ export default function MapPage() {
                 giaTri={huyenChon}
                 dsMuc={dsHuyen.map(([h, n]) => ({ id: h, ten: h, phu: `${n} xã/phường` }))}
                 khiChon={(h) => { setHuyenChon(h); setC3(''); donKetQuaCu(); }}
+                oRef={giu('huyen')} khiXong={() => datTro('xa-' + kp)}
                 className={full ? 'flex-1 min-w-[150px]' : 'w-44'} />
 
               {/* ── RỒI CHỌN XÃ/PHƯỜNG ── chọn huyện rồi thì chỉ sổ ra xã của huyện đó;
@@ -1714,6 +1782,7 @@ export default function MapPage() {
                   const x = dsXaCap.find((y) => y.xaId === ma) || null;
                   if (x) { setHuyenChon(x.huyen); bayToiXa(x); }   // bay thẳng tới xã đó
                 }}
+                oRef={giu('xa')} khiXong={() => datTro('thua-' + kp)}
                 className={full ? 'flex-1 min-w-[160px]' : 'w-48'} />
             </>
           )}
@@ -1722,21 +1791,24 @@ export default function MapPage() {
               Ô số tờ luôn là c1, ô số thửa luôn là c2 — chỉ đổi chỗ HIỂN THỊ, không đổi ruột. */}
           {searchMode === 'parcel' ? (
             <>
-              <input value={c2} onChange={(e) => setC2(e.target.value)} placeholder="Số thửa" className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
-              <input value={c1} onChange={(e) => setC1(e.target.value)} placeholder={nhanOSoTo} className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
+              <input ref={giu('thua')} value={c2} onChange={(e) => setC2(e.target.value)} onKeyDown={phimEnter(full, 'thua', kp)}
+                onBlur={() => { const t = tachThuaTo(c2); if (t) { setC2(t.thua); setC1(t.to); } }}
+                enterKeyHint={c1.trim() ? 'search' : 'next'} autoComplete="off" placeholder="Số thửa" title="Gõ số thửa rồi Enter (gõ gộp 95/15 cũng được)" className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
+              <input ref={giu('to')} value={c1} onChange={(e) => setC1(e.target.value)} onKeyDown={phimEnter(full, 'to', kp)} enterKeyHint="search" autoComplete="off" placeholder={nhanOSoTo} className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
             </>
           ) : (
             <>
-              <input value={c1} onChange={(e) => setC1(e.target.value)} inputMode="decimal" placeholder={searchMode === 'vn2000' ? 'X (Bắc)' : 'Vĩ độ (vd 12.0771)'} className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
-              <input value={c2} onChange={(e) => setC2(e.target.value)} inputMode="decimal" placeholder={searchMode === 'vn2000' ? 'Y (Đông)' : 'Kinh độ (vd 109.0917)'} className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
+              <input ref={giu('mot')} value={c1} onChange={(e) => setC1(e.target.value)} onKeyDown={phimEnter(full, 'mot', kp)} enterKeyHint="next" inputMode="decimal" placeholder={searchMode === 'vn2000' ? 'X (Bắc)' : 'Vĩ độ (vd 12.0771)'} className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
+              <input ref={giu('hai')} value={c2} onChange={(e) => setC2(e.target.value)} onKeyDown={phimEnter(full, 'hai', kp)} enterKeyHint="search" inputMode="decimal" placeholder={searchMode === 'vn2000' ? 'Y (Đông)' : 'Kinh độ (vd 109.0917)'} className={`border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] flex-1 min-w-[80px]' : 'py-1.5 text-xs w-24'}`} />
             </>
           )}
         </>
       )}
       {/* Điện thoại (full): tra xong đóng bảng đáy để thấy kết quả trên bản đồ. */}
-      <button onClick={() => { doSearch(); if (full) setTool('none'); }} className={`cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white px-4 rounded-lg font-bold whitespace-nowrap ${full ? 'w-full mt-1.5 py-2.5 text-sm' : 'py-1.5 text-xs'}`}>Tra cứu</button>
+      <button onClick={() => traCuu(full)} title="Tra cứu (phím Enter)" className={`cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white px-4 rounded-lg font-bold whitespace-nowrap ${full ? 'w-full mt-1.5 py-2.5 text-sm' : 'py-1.5 text-xs'}`}>Tra cứu</button>
     </div>
-  );
+    );
+  };
   // dt = true: đang vẽ cho ĐIỆN THOẠI. Chỉ ở điện thoại mới gộp "Vẽ thửa từ toạ độ" vào
   // nhóm này (màn hẹp, gom ba công cụ TỰ TẠO HÌNH vào một chỗ cho dễ tìm). Máy tính giữ
   // nguyên như cũ: nhãn "Đo:" và nút vẽ thửa nằm ở bảng lớp bên trái.
@@ -2210,6 +2282,7 @@ export default function MapPage() {
               </div>
               {/* Lưới 3 cột đều, kín khung (hàng 1: cấp · huyện · xã; hàng 2: thửa · tờ · Tra cứu) — bản đầu xếp hàng dồn trái, hở nhiều (chủ dự án 6/10/2026) */}
               <div className="mt-2.5 [&>div]:grid [&>div]:grid-cols-3 [&>div]:gap-2 [&>div>*]:!w-full [&>div>*]:min-w-0 [&>div>*]:!py-2 [&>div>*]:!text-[13px]">{searchCtrl(false, true)}</div>
+              <p className="mt-1.5 text-[11px] leading-snug text-slate-400">Phím tắt: <b className="font-semibold text-slate-500">Enter</b> tra cứu · <b className="font-semibold text-slate-500">Tab</b> sang ô sau · <b className="font-semibold text-slate-500">↑↓</b> chọn xã · <b className="font-semibold text-slate-500">Esc</b> đóng · gõ gộp <b className="font-semibold text-slate-500">95/15</b> = thửa 95 tờ 15 · phím <b className="font-semibold text-slate-500">/</b> mở ô tìm</p>
             </div>
           )}
           {/* Đang đo mà mở khung Lớp / Đã lưu: thước đo VẪN chạy (đổi lớp xem cùng khoảng đất), chỉ GIẤU khung Đo

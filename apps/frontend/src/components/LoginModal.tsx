@@ -6,7 +6,7 @@ import { layMaNguoiThat } from '@/lib/turnstile';
 import { useAuth, type AuthUser } from '@/lib/auth';
 import PasswordInput from './PasswordInput';
 import LogoAnh from '@/components/LogoAnh';
-import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, type TinhTrangVanTay } from '@/lib/vanTay';
+import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, laHuy, chuanBiVanTay, type TinhTrangVanTay } from '@/lib/vanTay';
 
 /**
  * Popup ĐĂNG NHẬP dùng chung — hiện đè lên trang (không rời trang).
@@ -32,10 +32,20 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
 
   useEffect(() => {
     if (!open) return;
-    kiemTraVanTay().then(setVanTay).catch(() => {});
+    /* Mở ô là XIN SẴN thử thách Face ID (lib/vanTay.ts chuanBiVanTay): bấm nút là vào thẳng Face ID, iPhone
+       không chèn hộp "Sử dụng Face ID để đăng nhập? — Tiếp tục" nữa. Máy chủ giữ thử thách 5 phút → làm mới mỗi 4 phút. */
+    let huy = false;
+    let lamMoi: ReturnType<typeof setInterval> | undefined;
+    kiemTraVanTay().then((tt) => {
+      if (huy) return;
+      setVanTay(tt);
+      if (tt.dung) { chuanBiVanTay(); lamMoi = setInterval(() => chuanBiVanTay(true), 4 * 60 * 1000); }
+    }).catch(() => {});
+    return () => { huy = true; if (lamMoi) clearInterval(lamMoi); };
   }, [open]);
 
   async function vaoBangVanTay() {
+    // ⚠️ Không thêm lệnh chờ (await) nào trước dangNhapVanTay — chờ là Safari lại hỏi "Tiếp tục".
     const tt = vanTay ?? await kiemTraVanTay();
     if (!vanTay) setVanTay(tt);
     if (!tt.dung) { setBaoVanTay(tt.loiNhan); return; }
@@ -44,7 +54,10 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
       const r = await dangNhapVanTay(email.trim() || undefined);
       login(r.token, r.user as AuthUser, true);
       onSuccess();
-    } catch (e: any) { setBaoVanTay(loiDeHieu(e)); } finally { setBusyVt(false); }
+    } catch (e: any) {
+      // Tự tắt bảng Face ID thì thôi, không hiện hộp báo (chủ dự án: "bỏ thông báo này đi", 12/10/2026).
+      if (!laHuy(e)) setBaoVanTay(loiDeHieu(e));
+    } finally { setBusyVt(false); chuanBiVanTay(); }
   }
 
   useEffect(() => {
@@ -76,9 +89,9 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
         <div className="p-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6">
           <button onClick={onClose} aria-label="Đóng" className="absolute top-3 right-3 w-8 h-8 grid place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 text-lg leading-none">✕</button>
           <div className="flex items-center gap-2.5">
-            <span className="w-11 h-11 rounded-xl bg-[#0A2540] grid place-items-center shrink-0">
-              <LogoAnh cao={26} nenToi />
-            </span>
+            {/* ⚠️ KHÔNG BỌC LOGO TRONG Ô NAVY: logo tự là ô vuông navy viền vàng — bọc thêm thành
+                hai khung lồng nhau, chữ CL bé tí (chủ dự án chụp màn hình báo lỗi 12/10/2026). */}
+            <LogoAnh cao={44} />
             <div>
               <div className="font-extrabold text-[#0A2540] leading-tight">Cam Lâm <span className="text-[#C8A14B]">Land</span></div>
               <div className="text-[11px] text-slate-400">Sàn BĐS &amp; bản đồ quy hoạch</div>

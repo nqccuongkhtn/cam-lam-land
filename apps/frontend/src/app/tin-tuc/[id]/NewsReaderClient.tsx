@@ -61,10 +61,15 @@ function ChiaSe({ tieuDe, gon }: { tieuDe: string; gon?: boolean }) {
   };
   const moCuaSo = (u: string) => { try { window.open(u, '_blank', 'noopener,width=640,height=560'); } catch { /* trình duyệt chặn cửa sổ bật */ } };
 
-  const nut = 'inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-[13px] font-bold transition';
+  /* ĐIỆN THOẠI: nhãn + hai nút PHẢI NẰM MỘT HÀNG (chủ dự án chụp màn hình 12/10/2026: nút "Chép đường dẫn"
+     rớt xuống dòng dưới). Nên trên điện thoại: không cho xuống dòng, nút đệm hẹp hơn, nút chép ghi "Chép link";
+     màn rất hẹp (< 375px) thì nhãn chỉ còn "Chia sẻ:". Máy tính rộng nên vẫn như cũ (thêm Facebook, Zalo). */
+  const nut = 'inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-2.5 py-2 text-[13px] font-bold transition sm:px-3';
   return (
-    <div className={`flex flex-wrap items-center gap-2 ${gon ? '' : 'rounded-2xl border border-slate-200 bg-white p-3 sm:p-4'}`}>
-      {!gon && <span className="mr-1 text-sm font-bold text-[#0A2540]">Chia sẻ bài này:</span>}
+    <div className={gon ? '' : 'rounded-2xl border border-slate-200 bg-white p-3 sm:p-4'}>
+    {/* Trình duyệt không có bảng chia sẻ (vài trình duyệt trong app) thì hiện thêm Facebook + Zalo → cho xuống dòng như cũ, kẻo tràn ngang. */}
+    <div className={`flex items-center gap-1.5 sm:gap-2 ${gon || !coMayChiaSe ? 'flex-wrap' : 'flex-nowrap sm:flex-wrap'}`}>
+      {!gon && <span className="mr-0.5 shrink-0 whitespace-nowrap text-[13px] font-bold text-[#0A2540] sm:mr-1 sm:text-sm">Chia sẻ<span className="max-[374px]:hidden"> bài này</span>:</span>}
       {coMayChiaSe && (
         <button onClick={mayChiaSe} className={`${nut} bg-[#0A2540] text-white hover:bg-[#0d2f54]`} aria-label="Chia sẻ">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" /></svg>
@@ -84,11 +89,12 @@ function ChiaSe({ tieuDe, gon }: { tieuDe: string; gon?: boolean }) {
         {daChep ? (
           <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>Đã chép</>
         ) : (
-          <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15V5a2 2 0 012-2h10" /></svg>Chép đường dẫn</>
+          <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15V5a2 2 0 012-2h10" /></svg><span className="sm:hidden">Chép link</span><span className="hidden sm:inline">Chép đường dẫn</span></>
         )}
       </button>
+    </div>
       {hienLink && (
-        <div className="mt-1 flex w-full items-center gap-2">
+        <div className="mt-2 flex w-full items-center gap-2">
           <input readOnly value={hienLink} onFocus={(e) => e.currentTarget.select()} autoFocus
             className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[12px] text-slate-600" />
           <span className="shrink-0 text-[11px] text-slate-500">Bấm Ctrl+C để chép</span>

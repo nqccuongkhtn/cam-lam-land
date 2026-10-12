@@ -49,25 +49,46 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
   // Tải file, đếm % theo từng phần nhận được
   useEffect(() => {
     let huy = false; const ctl = new AbortController(); let url = '';
+    // Lỗi do CHÍNH web đặt chữ (tiếng Việt) thì hiện nguyên văn; lỗi của trình duyệt (tiếng Anh: "Load failed",
+    // "Failed to fetch"…) thì đổi ra câu tiếng Việt — chủ dự án chụp màn hình 12/10/2026 thấy hộp "Load failed".
+    const loiVn = (m: string) => Object.assign(new Error(m), { vn: true });
+    const laLoiMang = (e: any) => e?.name === 'TypeError' || /load failed|failed to fetch|network ?error|terminated/i.test(String(e?.message || ''));
+    // Tải file một lượt, đếm % theo từng phần nhận được
+    const taiMotLan = async (): Promise<Uint8Array<ArrayBuffer>> => {
+      // CHỐNG CÀO: kèm "vé người thật" (qua Cloudflare Turnstile — lib/turnstile.ts). Vé hết hạn / đổi mạng
+      // (vé gắn địa chỉ máy) thì máy chủ trả 403 canVe → xin vé mới rồi thử lại MỘT lần.
+      const goi = async (moi: boolean) => fetch(vb.url, { headers: { Authorization: `Bearer ${vb.token}`, 'X-Ve-Nguoi-That': await layVeXemVanBan(moi), ...dauThietBi() }, signal: ctl.signal });
+      let r = await goi(false);
+      if (r.status === 403 && (await r.clone().json().catch(() => null))?.canVe) r = await goi(true);
+      if (r.status === 401) throw loiVn('Vui lòng đăng nhập lại để xem văn bản.');
+      if (r.status === 403 || r.status === 429) throw loiVn((await r.json().catch(() => null))?.error || 'Chưa mở được văn bản, vui lòng thử lại sau ít phút.');
+      if (!r.ok || !(r.headers.get('content-type') || '').includes('pdf')) throw loiVn('Chưa có file cho văn bản này.');
+      const tong = Number(r.headers.get('content-length')) || 0;
+      if (!tong) setPhanTram(null);
+      const doc = r.body?.getReader();
+      const manh: Uint8Array[] = []; let n = 0;
+      if (doc) {
+        for (;;) { const { done, value } = await doc.read(); if (done) break; manh.push(value); n += value.length; if (!huy) { setDaTai(n); if (tong) setPhanTram(Math.min(99, Math.round((n / tong) * 100))); } }
+      } else { const b = new Uint8Array(await r.arrayBuffer()); manh.push(b); n = b.length; }
+      // Nhận THIẾU so với dung lượng máy chủ báo = đường truyền bị cắt giữa chừng → coi như lỗi mạng để tải lại.
+      if (tong && n < tong) throw new TypeError('network error');
+      const bytes = new Uint8Array(n); let o = 0; for (const m of manh) { bytes.set(m, o); o += m.length; }
+      return bytes;
+    };
     (async () => {
       try {
         const libP = layPdfjs();
-        // CHỐNG CÀO: kèm "vé người thật" (qua Cloudflare Turnstile — lib/turnstile.ts). Vé hết hạn / đổi mạng
-        // (vé gắn địa chỉ máy) thì máy chủ trả 403 canVe → xin vé mới rồi thử lại MỘT lần.
-        const goi = async (moi: boolean) => fetch(vb.url, { headers: { Authorization: `Bearer ${vb.token}`, 'X-Ve-Nguoi-That': await layVeXemVanBan(moi), ...dauThietBi() }, signal: ctl.signal });
-        let r = await goi(false);
-        if (r.status === 403 && (await r.clone().json().catch(() => null))?.canVe) r = await goi(true);
-        if (r.status === 401) throw new Error('Vui lòng đăng nhập lại để xem văn bản.');
-        if (r.status === 403 || r.status === 429) throw new Error((await r.json().catch(() => null))?.error || 'Chưa mở được văn bản, vui lòng thử lại sau ít phút.');
-        if (!r.ok || !(r.headers.get('content-type') || '').includes('pdf')) throw new Error('Chưa có file cho văn bản này.');
-        const tong = Number(r.headers.get('content-length')) || 0;
-        if (!tong) setPhanTram(null);
-        const doc = r.body?.getReader();
-        const manh: Uint8Array[] = []; let n = 0;
-        if (doc) {
-          for (;;) { const { done, value } = await doc.read(); if (done) break; manh.push(value); n += value.length; if (!huy) { setDaTai(n); if (tong) setPhanTram(Math.min(99, Math.round((n / tong) * 100))); } }
-        } else { const b = new Uint8Array(await r.arrayBuffer()); manh.push(b); n = b.length; }
-        const bytes = new Uint8Array(n); let o = 0; for (const m of manh) { bytes.set(m, o); o += m.length; }
+        // Mạng chập chờn đứt giữa chừng (điện thoại đổi sóng, mạng yếu…) thì TỰ TẢI LẠI tối đa 2 lần rồi mới báo.
+        let bytes: Uint8Array<ArrayBuffer> | null = null;
+        for (let lan = 0; !bytes; lan++) {
+          try { bytes = await taiMotLan(); }
+          catch (e: any) {
+            if (huy || e?.name === 'AbortError' || lan >= 2 || !laLoiMang(e)) throw e;
+            if (!huy) { setDaTai(0); setPhanTram(0); }
+            await new Promise((ok) => setTimeout(ok, 700 * (lan + 1)));
+            if (huy) return;
+          }
+        }
         if (huy) return;
         url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' })); setBlobUrl(url);
         const lib = await libP;
@@ -76,7 +97,10 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
         docRef.current = pdf; setPhanTram(100); setSoTrang(pdf.numPages);
       } catch (e: any) {
         if (huy || e?.name === 'AbortError') return;
-        loiRef.current(e?.message || 'Không mở được văn bản.'); dongRef.current();
+        loiRef.current(e?.vn ? e.message
+          : laLoiMang(e) ? 'Mạng bị ngắt khi đang tải văn bản. Bấm mở lại để thử.'
+          : 'Không mở được văn bản. Bấm mở lại để thử.');
+        dongRef.current();
       }
     })();
     return () => { huy = true; ctl.abort(); if (url) URL.revokeObjectURL(url); docRef.current?.destroy?.(); docRef.current = null; };

@@ -8,6 +8,7 @@ import { WARDS_NEW, WARDS_OLD, PROPERTY_LABELS, type PropertyType } from '@/lib/
 import FlappyMini from './FlappyMini';
 import ChatDinhKem from './ChatDinhKem';
 import { useLockBody } from '@/lib/useLockBody';
+import { nhoViTri, ghiTuChoiViTri } from '@/lib/viTri';
 
 interface Msg { id: number; userId: number | null; name: string; avatar?: string | null; body: string; createdAt: string;
   kind?: string; fileId?: number | null; fileName?: string | null; fileMime?: string | null; fileSize?: number | null; deletedAt?: string | null; }
@@ -455,6 +456,7 @@ export default function ChatWidget() {
     if (!navigator.geolocation) { setWarn('Máy này không hỗ trợ định vị.'); return; }
     setDangDinhVi(true); setWarn('');
     navigator.geolocation.getCurrentPosition(async (v) => {
+      nhoViTri(v.coords.longitude, v.coords.latitude);   // lib/viTri.ts: chỗ khác dùng lại, khỏi xin thêm lần nữa
       const body = `📍 Vị trí: ${v.coords.latitude.toFixed(6)}, ${v.coords.longitude.toFixed(6)}`;
       try {
         const r = await api<{ id: number; createdAt: string; name: string; avatar?: string | null }>(
@@ -464,6 +466,7 @@ export default function ChatWidget() {
       setDangDinhVi(false);
     }, (e) => {
       setDangDinhVi(false);
+      if (e.code === 1) ghiTuChoiViTri();
       setWarn(e.code === 1 ? 'Bạn chưa cho phép truy cập vị trí. Hãy bật quyền vị trí cho trang này rồi thử lại.'
         : 'Không lấy được vị trí. Thử lại ở chỗ thoáng hoặc bật GPS.');
     }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });

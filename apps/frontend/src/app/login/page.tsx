@@ -6,7 +6,7 @@ import { api } from '@/lib/api';
 import { layMaNguoiThat } from '@/lib/turnstile';
 import { useAuth, type AuthUser, laAdmin } from '@/lib/auth';
 import PasswordInput from '@/components/PasswordInput';
-import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, type TinhTrangVanTay } from '@/lib/vanTay';
+import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, laHuy, chuanBiVanTay, type TinhTrangVanTay } from '@/lib/vanTay';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,10 +21,21 @@ export default function LoginPage() {
   const [vanTay, setVanTay] = useState<TinhTrangVanTay | null>(null);
   const [busyVt, setBusyVt] = useState(false);
   const [baoVanTay, setBaoVanTay] = useState('');   // nội dung bảng thông báo, rỗng = đóng
-  useEffect(() => { kiemTraVanTay().then(setVanTay).catch(() => {}); }, []);
+  useEffect(() => {
+    // Xin SẴN thử thách Face ID để bấm nút là vào thẳng Face ID (xem chuanBiVanTay trong lib/vanTay.ts).
+    let huy = false;
+    let lamMoi: ReturnType<typeof setInterval> | undefined;
+    kiemTraVanTay().then((tt) => {
+      if (huy) return;
+      setVanTay(tt);
+      if (tt.dung) { chuanBiVanTay(); lamMoi = setInterval(() => chuanBiVanTay(true), 4 * 60 * 1000); }
+    }).catch(() => {});
+    return () => { huy = true; if (lamMoi) clearInterval(lamMoi); };
+  }, []);
 
   async function vaoBangVanTay() {
     // Chưa kiểm xong thì kiểm ngay lúc bấm, khỏi bắt người dùng chờ.
+    // ⚠️ Không thêm lệnh chờ (await) nào trước dangNhapVanTay — chờ là Safari lại hỏi "Tiếp tục".
     const tt = vanTay ?? await kiemTraVanTay();
     if (!vanTay) setVanTay(tt);
     if (!tt.dung) { setBaoVanTay(tt.loiNhan); return; }
@@ -34,7 +45,10 @@ export default function LoginPage() {
       const r = await dangNhapVanTay(email.trim() || undefined);
       login(r.token, r.user as AuthUser, true);
       router.push(laAdmin(r.user) ? '/admin' : '/');
-    } catch (e: any) { setBaoVanTay(loiDeHieu(e)); } finally { setBusyVt(false); }
+    } catch (e: any) {
+      // Tự tắt bảng Face ID thì thôi, không hiện hộp báo (chủ dự án: "bỏ thông báo này đi", 12/10/2026).
+      if (!laHuy(e)) setBaoVanTay(loiDeHieu(e));
+    } finally { setBusyVt(false); chuanBiVanTay(); }
   }
 
   async function submit(e: React.FormEvent) {

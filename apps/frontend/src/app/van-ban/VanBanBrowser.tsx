@@ -7,6 +7,7 @@ import { getToken } from '@/lib/token';
 import { deEnt } from '@/lib/deEnt';   // làm sạch + giải mã chữ HTML — dùng chung với trang chủ
 import { CHUDE_LIST, CHUDE_META, type ChuDeNhom, type VanBan } from './data';
 import XemVanBan, { type MoVanBan } from './XemVanBan';
+import { toast } from '@/lib/toast';
 
 const PER = 10;
 const kd = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
@@ -154,7 +155,8 @@ export default function VanBanBrowser() {
     setDocs((ds) => (ds || []).map((x) => x.id === d.id ? { ...x, luotTai: (x.luotTai || 0) + 1 } : x));
   }
   const dongXem = useCallback(() => setDangXem(null), []);
-  const loiXem = useCallback((m: string) => { alert(m); }, []);
+  // Hộp báo của web (tiếng Việt, kiểu thông báo iPhone) thay cho hộp alert trơn của trình duyệt.
+  const loiXem = useCallback((m: string) => { toast.error(m, 'Chưa mở được văn bản'); }, []);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER));
   const cur = Math.min(page, totalPages);

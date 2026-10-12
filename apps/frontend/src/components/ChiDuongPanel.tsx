@@ -5,6 +5,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { TuyenVe } from '@/components/MapView';
 import { timDuong, docKhoangCach, docThoiGian, gioToiNoi, khungTuyen, viTriCuaToi, type PhuongTien, type Tuyen } from '@/lib/chiDuong';
+import { daTuChoiViTri, viTriGanDay } from '@/lib/viTri';
 
 export interface Diem { lng: number; lat: number; ten?: string }
 
@@ -48,7 +49,9 @@ export default function ChiDuongPanel({ diemDi, diemDen, onDoiDiemDi, onChonTren
   useEffect(() => {
     if (diemDi) return;
     setDangXinViTri(true);
-    viTriCuaToi()
+    // Người dùng đã bấm "Từ chối" lần trước thì KHÔNG TỰ xin lại (iPhone sẽ hiện hộp hỏi lần nữa — chủ dự án:
+    // "hỏi 1 lần thôi"); lấy luôn chỗ đang xem. Muốn dùng vị trí thật thì bấm nút "Vị trí của tôi".
+    (daTuChoiViTri() && !viTriGanDay() ? Promise.reject(new Error('Chưa cho phép lấy vị trí.')) : viTriCuaToi())
       .then((p) => { setNhacNho(''); onDoiDiemDi({ ...p, ten: 'Vị trí của tôi' }); })
       .catch((e) => {
         if (tamBanDo) {

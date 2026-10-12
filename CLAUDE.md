@@ -964,6 +964,13 @@ Toàn bài vẫn nằm trong trang (Google đọc được, kéo khách), ngư�
   khởi động, mà `up -d --build backend` thì tạo container MỚI với địa chỉ khác → nginx còn trỏ chỗ cũ.
   Khắc phục: `docker compose ... restart nginx`. Nhớ làm mỗi khi container backend bị tạo lại
   (trang web vẫn hiện bình thường, chỉ phần /api chết → rất dễ tưởng nhầm là lỗi backend).
+- **⚠️ XOÁ ĐỆM NGINX: `docker exec camlam_nginx sh -c 'rm -rf /var/cache/nginx/[0-9a-f]'` — TUYỆT ĐỐI KHÔNG
+  `rm -rf /var/cache/nginx/*`.** `proxy_cache_path` đặt thẳng ở `/var/cache/nginx` (thư mục đệm là các thư mục 1 ký tự
+  0–9, a–f), nằm chung chỗ với thư mục TẠM `proxy_temp`, `client_temp`… mà nginx CHỈ TẠO LÚC KHỞI ĐỘNG / NẠP LẠI.
+  Xoá cả `*` là mất thư mục tạm → file nào lớn hơn bộ đệm (PDF văn bản, ảnh, file quy hoạch…) bị **CẮT CỤT giữa
+  chừng** mà vẫn báo 200; iPhone hiện "Load failed". Đã dính 11→12/10/2026 (10 file bị cắt trong 12 giờ, chủ dự án
+  mở văn bản 3533/TB-CNKVCL đứng ở 33 %). Dấu hiệu: `docker logs camlam_nginx | grep "proxy_temp.*failed"`.
+  Lỡ xoá rồi thì `docker exec camlam_nginx nginx -s reload` là thư mục tạm được tạo lại.
 - **Bật/tắt trang bảo trì** (chỉ ảnh hưởng tên miền thật, `localhost` vẫn vào được):
   `docker exec camlam_nginx touch /etc/nginx/maintenance.on` · tắt: `rm -f` đường dẫn đó.
   Nút trên bảng điều khiển làm sẵn 2 lệnh này.

@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import LogoAnh from './LogoAnh';
 
 const DISMISS_KEY = 'pwa_install_dismissed';
 
@@ -50,8 +51,8 @@ export default function InstallPrompt() {
   return (
     <div className="cl-install-cta fixed inset-x-0 bottom-0 z-[75] px-3 pointer-events-none" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}>
       <div className="mx-auto max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 flex items-center gap-3 pointer-events-auto">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icons/icon-192.png" alt="Cam Lâm Land" className="w-12 h-12 rounded-xl shrink-0 border border-slate-200 object-cover" />
+        {/* Logo tự có ô vuông navy viền vàng — không khung viền xám bọc ngoài (lồng hai khung). */}
+        <LogoAnh cao={48} />
         <div className="flex-1 min-w-0">
           <p className="font-bold text-[#0A2540] text-sm leading-tight">Cài Cam Lâm Land vào máy</p>
           {ios ? (

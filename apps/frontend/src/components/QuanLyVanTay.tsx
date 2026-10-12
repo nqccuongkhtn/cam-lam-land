@@ -5,7 +5,7 @@
  * ========================================================================== */
 import { useCallback, useEffect, useState } from 'react';
 import {
-  themVanTay, dsMayDaDangKy, xoaVanTay, mayCoVanTay, tenMayMacDinh, loiDeHieu,
+  themVanTay, dsMayDaDangKy, xoaVanTay, mayCoVanTay, tenMayMacDinh, loiDeHieu, laHuy,
   type MayDaDangKy,
 } from '@/lib/vanTay';
 
@@ -33,7 +33,7 @@ export default function QuanLyVanTay() {
       await themVanTay(tenMayMacDinh());
       setMsg('Đã bật cho máy này.');
       await nap();
-    } catch (e: any) { setErr(loiDeHieu(e)); } finally { setBusy(false); }
+    } catch (e: any) { if (!laHuy(e)) setErr(loiDeHieu(e)); } finally { setBusy(false); }   // tự tắt bảng thì im lặng
   }
 
   async function xoa(id: number, ten: string) {

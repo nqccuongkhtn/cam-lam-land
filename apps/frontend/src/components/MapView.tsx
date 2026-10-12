@@ -6,6 +6,7 @@ import { Protocol as PMTilesProtocol } from 'pmtiles';
 import { MAP } from '@/lib/config';
 import { themLopBienDao } from '@/lib/bienDao';
 import { batTaiTruoc, soOAnhNenGiu } from '@/lib/tilePrefetch';
+import { nhoViTri, ghiTuChoiViTri } from '@/lib/viTri';
 
 // Đăng ký giao thức pmtiles cho MapLibre (đọc 1 file .pmtiles qua HTTP range request) — chỉ đăng ký 1 lần.
 if (typeof window !== 'undefined' && !(maplibregl as any).__pmtiles) {
@@ -322,7 +323,13 @@ export default function MapView({ center, zoom, className, layers = [], markers 
     // Nút la bàn trong NavigationControl cũng ẩn đi — để lại thì bấm vào không có tác dụng gì.
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
     // Định vị GPS: đưa bản đồ về vị trí người dùng, có chấm xanh + theo dõi khi di chuyển.
-    map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true, showUserHeading: true, showAccuracyCircle: true } as any), 'top-right');
+    const dinhVi = new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true, showUserHeading: true, showAccuracyCircle: true } as any);
+    map.addControl(dinhVi, 'top-right');
+    // Ghi vị trí vừa lấy / lần bị từ chối vào lib/viTri.ts: chỉ đường, chat… dùng lại vị trí này trong 10 phút
+    // thay vì xin lại (mỗi lần xin là iPhone hiện hộp "Từ chối / Cho phép" — chủ dự án: "hỏi 1 lần thôi").
+    // Chỉ NGHE sự kiện của nút, không đụng cách nút chạy.
+    dinhVi.on('geolocate', (e: any) => { const c = e?.coords; if (c) nhoViTri(c.longitude, c.latitude); });
+    dinhVi.on('error', (e: any) => { if (e?.code === 1) ghiTuChoiViTri(); });
     // ⚠️ KHÔNG chỉ dựa vào sự kiện 'load' của maplibre.
     // 'load' chỉ chạy khi KIỂU BẢN ĐỒ nạp xong VÀ mọi ô ảnh của khung nhìn đầu tiên tải xong.
     // Ảnh nền lấy từ Google; mạng chậm hoặc một vài ô ảnh bị treo là 'load' KHÔNG BAO GIỜ chạy,

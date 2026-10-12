@@ -79,16 +79,55 @@ export async function themVanTay(tenMay?: string): Promise<void> {
   });
 }
 
-/** Đăng nhập bằng vân tay. Trả về token + hồ sơ người dùng. */
+/* ── LẤY SẴN THỬ THÁCH ĐĂNG NHẬP (12/10/2026) ─────────────────────────────────
+ * Chủ dự án chụp màn hình: bấm nút Face ID thì iPhone hiện thêm hộp "Sử dụng Face ID để đăng nhập?
+ * — Tiếp tục", phải bấm thêm một lần nữa. Nguyên nhân: trước đây bấm nút xong web còn đi XIN MÁY CHỦ
+ * thử thách rồi mới gọi Face ID — Safari thấy lệnh Face ID không nằm ngay trong cú bấm (đã chờ mạng)
+ * nên chèn hộp hỏi lại cho chắc. Nay xin SẴN thử thách lúc mở ô đăng nhập; bấm nút là gọi Face ID
+ * NGAY, không chờ gì → vào thẳng Face ID. Máy chủ giữ thử thách 5 phút và chỉ cho dùng một lần
+ * (routes/passkey.ts) nên ở đây chỉ dùng bản lấy chưa quá 4 phút; ô đăng nhập làm mới mỗi 4 phút.
+ * Thử thách lấy KHÔNG kèm email: khoá đăng ký kiểu "máy tự nhận ra tài khoản" (residentKey) nên
+ * iPhone vẫn tự đưa đúng tài khoản. */
+type ThuThach = { khoa: string; options: any; luc: number };
+const HAN_THU_THACH_MS = 4 * 60 * 1000;
+let thuThachSan: ThuThach | null = null;
+let dangXin: Promise<ThuThach | null> | null = null;
+const conHan = (t: ThuThach | null): t is ThuThach => !!t && Date.now() - t.luc < HAN_THU_THACH_MS;
+
+/** Xin trước thử thách đăng nhập (gọi khi mở ô đăng nhập). Hỏng thì im lặng — lúc bấm sẽ xin lại. */
+export function chuanBiVanTay(lamMoi = false): Promise<ThuThach | null> {
+  if (!lamMoi && conHan(thuThachSan)) return Promise.resolve(thuThachSan);
+  if (dangXin) return dangXin;
+  dangXin = api<{ khoa: string; options: any }>('/passkey/dang-nhap/bat-dau', { method: 'POST', body: '{}' })
+    .then((r) => (thuThachSan = { khoa: r.khoa, options: r.options, luc: Date.now() }))
+    .catch(() => null)
+    .finally(() => { dangXin = null; });
+  return dangXin;
+}
+
+/** Đăng nhập bằng vân tay. Trả về token + hồ sơ người dùng.
+ *  ⚠️ Có thử thách lấy sẵn thì KHÔNG được chờ gì trước lệnh Face ID (xem trên). */
 export async function dangNhapVanTay(email?: string): Promise<{ token: string; user: any }> {
-  const { khoa, options } = await api<{ khoa: string; options: any }>(
-    '/passkey/dang-nhap/bat-dau', {
-      method: 'POST', body: JSON.stringify(email ? { email } : {}),
-    });
-  const response = await startAuthentication({ optionsJSON: options });
+  let tt: ThuThach | null = conHan(thuThachSan) ? thuThachSan : null;
+  if (!tt) {
+    const r = await api<{ khoa: string; options: any }>(
+      '/passkey/dang-nhap/bat-dau', {
+        method: 'POST', body: JSON.stringify(email ? { email } : {}),
+      });
+    tt = { khoa: r.khoa, options: r.options, luc: Date.now() };
+  }
+  const response = await startAuthentication({ optionsJSON: tt.options });
+  if (thuThachSan === tt) thuThachSan = null;      // thử thách chỉ dùng được một lần
   return api<{ token: string; user: any }>('/passkey/dang-nhap/xong', {
-    method: 'POST', body: JSON.stringify({ khoa, response }),
+    method: 'POST', body: JSON.stringify({ khoa: tt.khoa, response }),
   });
+}
+
+/** Người dùng TỰ TẮT bảng Face ID / vân tay (bấm Huỷ, vuốt bảng xuống).
+ *  Chủ dự án (12/10/2026): tự tắt thì thôi, KHÔNG hiện hộp "Chưa dùng được — Đã huỷ" nữa. */
+export function laHuy(e: any): boolean {
+  const t = String(e?.name || '') + ' ' + String(e?.message || '');
+  return /NotAllowedError|AbortError|cancel|abort/i.test(t);
 }
 
 export type MayDaDangKy = {

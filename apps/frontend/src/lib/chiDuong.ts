@@ -1,6 +1,7 @@
 // CHỈ ĐƯỜNG NHIỀU TUYẾN — phần gọi máy chủ + mấy hàm hiển thị cho đẹp.
 // Máy chủ trả về tối đa 3 phương án đi (giống Google Maps), đã dịch sẵn lời dẫn sang tiếng Việt.
 import { api } from './api';
+import { xinViTri } from './viTri';
 
 export type PhuongTien = 'car' | 'motorbike' | 'bike' | 'foot';
 
@@ -83,14 +84,8 @@ export function diemGiua(t: Tuyen): [number, number] {
   return c[Math.floor(c.length / 2)];
 }
 
-/** Xin vị trí hiện tại của người dùng (dùng cho "Vị trí của tôi"). */
+/** Xin vị trí hiện tại của người dùng (dùng cho "Vị trí của tôi").
+ *  Đi qua lib/viTri.ts: vừa lấy trong 10 phút thì dùng lại, không để iPhone hỏi thêm lần nữa. */
 export function viTriCuaToi(): Promise<{ lng: number; lat: number }> {
-  return new Promise((ok, loi) => {
-    if (typeof navigator === 'undefined' || !navigator.geolocation) return loi(new Error('Máy không hỗ trợ định vị'));
-    navigator.geolocation.getCurrentPosition(
-      (p) => ok({ lng: p.coords.longitude, lat: p.coords.latitude }),
-      () => loi(new Error('Chưa cho phép lấy vị trí. Hãy bật định vị cho trang web này.')),
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 },
-    );
-  });
+  return xinViTri();
 }

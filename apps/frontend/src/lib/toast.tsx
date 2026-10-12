@@ -4,7 +4,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 type Kind = 'error' | 'success' | 'info';
-interface Item { id: number; kind: Kind; title?: string; msg: string }
+interface Item { id: number; kind: Kind; title?: string; msg: string; ms?: number }
 type Payload = Omit<Item, 'id'>;
 
 // Bộ phát sự kiện ở cấp module → code ngoài React vẫn bắn toast được.
@@ -16,7 +16,8 @@ const emit = (t: Payload) => {
 export const toast = {
   error: (msg: string, title?: string) => emit({ kind: 'error', msg, title }),
   success: (msg: string, title?: string) => emit({ kind: 'success', msg, title }),
-  info: (msg: string, title?: string) => emit({ kind: 'info', msg, title }),
+  /** ms = giữ trên màn hình bao lâu (mặc định 3,8 giây) — lời hướng dẫn dài thì cho lâu hơn để kịp đọc. */
+  info: (msg: string, title?: string, ms?: number) => emit({ kind: 'info', msg, title, ms }),
 };
 
 const Ctx = createContext(toast);
@@ -58,7 +59,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const push = useCallback((t: Payload) => {
     const id = Date.now() + Math.random();
     setItems((s) => [...s.slice(-3), { ...t, id }]); // giữ tối đa ~4 cái
-    window.setTimeout(() => remove(id), t.kind === 'error' ? 6500 : 3800);
+    window.setTimeout(() => remove(id), t.ms ?? (t.kind === 'error' ? 6500 : 3800));
   }, [remove]);
   useEffect(() => { listeners.add(push); return () => { listeners.delete(push); }; }, [push]);
 

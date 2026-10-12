@@ -51,7 +51,9 @@ export interface Slide {
  *
  * => MỖI LẦN THAY ẢNH TRONG public/hero/ THÌ TĂNG SỐ NÀY LÊN 1.
  *    Đường dẫn đổi theo nên trình duyệt buộc phải tải ảnh mới.
- * (Nhớ xoá thêm đệm nginx nếu cần: docker exec camlam_nginx sh -c 'rm -rf /var/cache/nginx/*')
+ * (Nhớ xoá thêm đệm nginx nếu cần: docker exec camlam_nginx sh -c 'rm -rf /var/cache/nginx/[0-9a-f]'
+ *  — CHỈ xoá các thư mục đệm 1 ký tự. ⚠️ ĐỪNG xoá cả /var/cache/nginx/*: mất luôn thư mục tạm proxy_temp
+ *  mà nginx chỉ tạo lúc khởi động → mọi file lớn bị CẮT CỤT giữa chừng, iPhone báo "Load failed" (12/10/2026).)
  */
 export const PHIEN_BAN_ANH = 10;
 const v = (duong: string) => `${duong}?v=${PHIEN_BAN_ANH}`;

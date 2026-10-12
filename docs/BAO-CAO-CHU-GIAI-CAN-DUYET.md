@@ -149,6 +149,11 @@ từng bỏ một luật na ná vì làm dư 1,3 m² ở mép cong — lần nà
 
 ## G. DẢI TRẮNG HẸP TRONG 7 BẢN PHÂN KHU (cùng kiểu mảnh 2) — web đang tính là đất giao thông
 
+> **12/10/2026:** sau khi chủ dự án xác nhận mảnh 2 thửa 95 là tô sót, đã quét lại cả 8 bản: **232 dải** (QĐ205 98 · QĐ2076 22 ·
+> QĐ2101 18 · QĐ2222 6 · QĐ918 42 · Cù Hin 10 · Tây Nam 33 · Tây Bắc 3), 217 dải chạm thửa. Đưa lên trang "Dải trắng cần soi"
+> (mỗi dải: toạ độ VN-2000 + lệnh `XY=` cho MicroStation, hai loại đất hai bên, thửa bị tính nhầm, ảnh) để chủ dự án soi từng chỗ;
+> chỗ nào xác nhận thì thêm vào `sua-tay-khe.json` rồi chạy `5k`. Số đếm dưới đây là bản đầu (11/10).
+
 Bản phân khu 1/2000 để trắng lòng đường, nên web tính "trong ranh mà không tô = đường". Nhưng đường 1/2000 rộng ≥ 4 m; dải trắng
 hẹp hơn 2,5 m gần như chắc là **hai vùng tô vẽ không khít** (cùng loại lỗi với mảnh 2 của thửa 95). Quét toàn bộ (phần hẹp < 2,5 m
 của khoảng trắng trong ranh; con số hơi cao vì gồm cả mũi nhọn ở góc giao lộ):
@@ -386,6 +391,11 @@ chỉ vài phân. Hai bản vẽ đều đúng theo bản của mình — chỉ 
 lệch nhau vài m² ở mép đường.
 
 ## D. CẦN ANH XÁC NHẬN TRÊN MICROSTATION
+
+> **ĐÃ XÁC NHẬN 12/10/2026:** chủ dự án soi trên MicroStation (dc15.dgn + tham chiếu QD205.dgn) — trong dải có ký hiệu cây xanh,
+> **đơn vị tư vấn tô màu thiếu** → mảnh 2 là **Đất cây xanh sử dụng công cộng**. Cả dải hở 1,38 m quanh hồ Cam Đức (mã **205-001**,
+> dài ~1,37 km, 1.897,6 m², 53 thửa) đã thêm thành ô cây xanh (`scripts/qh-pipeline/5k-sua-tay-khe.py` + `sua-tay-khe.json`).
+> Web nay: Thửa 95 · Tờ 15 QĐ205 cây xanh 4.863,9 m², đường 514,7 m² (trước 619,3); Thửa 85 · Tờ 7 hết 141 m² "đường". 79 phiếu giữ nguyên.
 
 - **Thửa 95 tờ 15 Xã Cam Lâm, QĐ205 — mảnh giao thông số 2** (104,57 m², dải rộng ~1,4 m giữa vùng hồ và vùng cây xanh, ảnh
   `bao-cao-qh/thua-95-to-15-xa-cam-lam-giao-thong-qd205.png`): bản vẽ để hở dải này, web tính là đường theo luật "trong ranh mà

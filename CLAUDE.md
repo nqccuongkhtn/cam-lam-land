@@ -576,6 +576,11 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   xanh nước KHÔNG ghi mã (4.585 ha) đang gọi "Đất sông, ngòi, kênh, rạch" dù chú dẫn dùng màu này cho cả hồ / thuỷ lợi / ao nuôi.
   (7) NHÃN GHÉP "+" ("TMD+ODT", "NKH+TMD", "DTT+DKV+TMD"… 119 nhãn) = một loại "Đất hỗn hợp (TMD + ODT)" — trước tách mã rồi bỏ mã trái
   màu (thửa 326 tờ 7 Cam Đức: app tham chiếu ghi đất hỗn hợp, web ghi thương mại dịch vụ). Chữ "%%u…%%U" (gạch chân CAD) bỏ trước khi đọc mã.
+- **DẢI TRẮNG HẸP DO TƯ VẤN TÔ SÓT (12/10/2026): `5k-sua-tay-khe.py` + `sua-tay-khe.json`.** Bản vẽ có chỗ để hở dải trắng
+  hẹp (vd 1,38 m) giữa hai vùng tô; luật "trong ranh không tô = đường" biến nó thành đất giao thông. Chủ dự án soi trên MicroStation
+  thấy ký hiệu cây xanh trong dải quanh hồ Cam Đức (Thửa 95 · Tờ 15, mảnh 2) → tô sót. Chỗ đã xác nhận ghi vào `sua-tay-khe.json`
+  (mã dải, loại đất đúng, ai xác nhận, hình WGS84); 5k thêm thành ô đất đúng loại. **Chạy 5h / 5g (+7-lo) xong PHẢI chạy lại 5k.**
+  Danh sách 232 dải nghi tô sót (8 bản) dò bằng scratchpad `quet_khe.py`, đưa chủ dự án soi từng chỗ trước khi thêm vào file.
 - **QĐ205 DỰNG LẠI THẲNG TỪ QD205.gpkg (11/10/2026): `5h-dung-o-205-tu-gpkg.py` (+ bảng `lop-205.json` lớp → tên), toạ độ 8 số lẻ (~1 mm).
   Thay hẳn ô cũ (DGN qua GDAL) + 5c / 5d / 5e (không cần chạy nữa).** 12/10/2026: 5h BỎ VÙNG TÔ TRÙNG — lớp không có trong khung chú
   giải mà bị vùng tô đúng chú giải phủ ≥ 95 % (`L- bo dat` 26 ha trùng khít `QH2030_DAT_NDD_CayxanhCD`; cùng bậc, diện tích chênh 0,02 %

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 DỰNG LẠI Ô ĐẤT BẢN PHÂN KHU 1/2000 THẲNG TỪ DXF — TÔ ĐÚNG NHƯ BẢN VẼ (11/10/2026). Thay chuỗi 1b → 4 → 5 cho phần TÍNH.
+⚠️ Chạy xong (và 7-lo-trong-ranh.py) PHẢI chạy 5k-sua-tay-khe.py — các dải trắng hẹp chủ dự án đã xác nhận tô sót (sua-tay-khe.json).
 
 Chủ dự án kiểm nhiều thửa thấy sai, nghi "thuật toán biến đổi DXF → dữ liệu web bị sai" và "xác định sai loại quy hoạch".
 So thẳng bản vẽ gốc với web (rải điểm 10 m khắp ranh 7 bản) tìm ra BA lỗi của chuỗi cũ:

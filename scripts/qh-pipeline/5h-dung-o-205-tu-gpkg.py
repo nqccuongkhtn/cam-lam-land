@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 DỰNG LẠI Ô ĐẤT QĐ205 (quy hoạch chung đô thị mới Cam Lâm đến 2045) THẲNG TỪ BẢN VẼ GỐC QD205.gpkg (11/10/2026).
+⚠️ Chạy xong PHẢI chạy tiếp 5k-sua-tay-khe.py — thêm lại các dải trắng hẹp chủ dự án đã xác nhận là đơn vị tư vấn tô màu sót
+   (sua-tay-khe.json, vd quanh hồ Cam Đức — Thửa 95 · Tờ 15). Quên là mất các chỗ đã sửa.
 
 Vì sao: ô QĐ205 trên web (apps/backend/data/qh_zones.json) dựng từ đợt chuyển đổi cũ (DGN qua GDAL, đặt tên theo bảng level)
 rồi vá thêm 3 đợt từ gpkg (5c / 5d / 5e) — HÌNH ô không cùng nguồn với vùng tô gốc nên lệch ở mép, góc cua:

@@ -411,10 +411,19 @@ function buildHtml(o: PhieuOpts): string {
   const uName = esc(o.user?.name || '');
   const uPhone = esc(o.user?.phone || '');
   const diaChiThua = [p.xa, 'tỉnh Khánh Hòa'].filter(Boolean).map(esc).join(', ');
+  /* DẤU GIÁP LAI (chủ dự án 12/10/2026: "đóng giáp lai cho những kiểm tra quy hoạch có phụ lục đi kèm").
+     Phiếu có phụ lục → mỗi trang in MỘT LÁT DỌC của con dấu ở mép phải, cùng một độ cao: trang chính lát bên trái,
+     phụ lục cuối lát bên phải — xếp các trang chồng mép lên nhau là ghép đủ con dấu, chứng minh các trang đi cùng
+     một bộ (như đóng giáp lai trên giấy). Dùng đúng ảnh con dấu ở chỗ ký phiếu (dấu người dùng tải lên, không có
+     thì dấu Cam Lâm Land). Lát dấu nằm NGOÀI khối .sheet (khối đó bị thu nhỏ cho vừa trang A4) nên trang nào
+     cũng đúng một cỡ, ghép mới khớp. Phiếu một trang thì không có giáp lai. */
+  const soTrangIn = 1 + phuLuc.length;
+  const giapLai = (k: number) => soTrangIn < 2 ? ''
+    : `<div class="giaplai" style="--n:${soTrangIn};--k:${k}" aria-hidden="true"><img src="${logoSrc}" alt="" onerror="this.parentNode.style.display='none'"></div>`;
   const phuLucHtml = phuLuc.map((pl, i) => {
     const ds = pl.areas.filter((a) => a && a.areaM2 > 0.5 && a.type !== NGOAI_BAN);
     const ngoai = pl.areas.find((a) => a && a.type === NGOAI_BAN);
-    return `<div class="sheet pl">
+    return `<div class="trang pl"><div class="sheet">
     <div class="plhd"><b>${SITE.ten}</b><span>Phụ lục ${i + 1}/${phuLuc.length} kèm Phiếu cung cấp thông tin quy hoạch thửa đất · Mã tra cứu: ${ma}</span></div>
     <h1>Phụ lục ${i + 1}: Trích lục ${esc(pl.tieuDe)}</h1>
     <div class="sub" style="font-style:normal;color:#222">Thửa <b>${esc(p.soThua || '—')}</b>, Tờ bản đồ số <b>${esc(p.soTo || '—')}</b>${p.xa ? ' — ' + esc(p.xa) : ''}, tỉnh Khánh Hòa · Diện tích <b>${numVi(dt, 1)} m²</b></div>
@@ -432,7 +441,7 @@ function buildHtml(o: PhieuOpts): string {
       </div>
     </div>
     <div class="ghichu"><b>Ghi chú:</b> Phụ lục là một phần không tách rời của phiếu mã ${ma}. Sơ đồ in trên ảnh bản đồ ${esc(pl.tieuDe)}; ranh thửa màu đỏ, số ghi ở góc thửa ứng với bảng toạ độ. Diện tích từng loại đất đo trên bản vẽ quy hoạch số hoá, chỉ mang tính tham khảo.</div>
-  </div>`;
+  </div>${giapLai(i + 1)}</div>`;
   }).join('');
 
   return `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Phiếu quy hoạch — Thửa ${esc(p.soThua || '')} Tờ ${esc(p.soTo || '')}</title>
@@ -503,15 +512,22 @@ function buildHtml(o: PhieuOpts): string {
   .signbox img, .signbox svg { width: 100%; height: auto; display: block; }
   .signbox img { mix-blend-mode: multiply; }
   .fb { display: none; }
-  .sheet.pl { margin-top: 16px; padding-top: 10px; border-top: 2px dashed #cbd5e1; }
+  .trang { position: relative; }
+  .trang.pl { margin-top: 16px; padding-top: 10px; border-top: 2px dashed #cbd5e1; }
+  /* Dấu giáp lai: lát dấu rộng = cỡ dấu / số trang, ảnh dấu lùi sang trái đúng số lát của trang này. Đặt cách đầu
+     trang cố định (không theo %) để trang dài trang ngắn lát dấu vẫn nằm cùng một độ cao. */
+  .giaplai { --dau: 84px; position: absolute; right: 0; top: 330px; width: calc(var(--dau) / var(--n)); height: var(--dau);
+             overflow: hidden; pointer-events: none; z-index: 4; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .giaplai img { position: absolute; top: 0; left: calc(var(--dau) / var(--n) * var(--k) * -1); width: var(--dau); height: var(--dau);
+                 max-width: none; display: block; mix-blend-mode: multiply; }
   .plhd { display: flex; justify-content: space-between; gap: 8px; font-size: 9px; color: #555; border-bottom: 1.5px solid #0A2540; padding-bottom: 3px; }
   .plhd b { color: #0A2540; font-size: 10.5px; }
   @media print { .toolbar { display: none; } input.e { border-bottom: none; } .wrap { padding: 0; } .noprint { display: none !important; }
-    .sheet.pl { break-before: page; page-break-before: always; margin-top: 0; padding-top: 0; border-top: none; } }
+    .trang.pl { break-before: page; page-break-before: always; margin-top: 0; padding-top: 0; border-top: none; } }
 </style></head>
 <body>
   <div class="toolbar"><button onclick="try{window.close()}catch(e){}setTimeout(function(){if(!window.closed){if(history.length>1){history.back()}else{location.href='/map'}}},200)" style="background:#fff;color:#0A2540">← Quay lại</button><button onclick="window.print()">🖨 In / Lưu PDF (${1 + phuLuc.length} trang A4)</button><span>Chỉ cần điền mục 1 (người yêu cầu) và mục 4 (mục đích SDĐ) trước khi in</span></div>
-  <div class="wrap"><div class="sheet">
+  <div class="wrap"><div class="trang"><div class="sheet">
     <div class="hd">
       <div class="brand">${navLogo(origin)}<div><div class="bname">${SITE.ten}</div><div class="bsub">${SITE.mota} · ☎ ${SITE.hotline} · ${SITE.domain}</div></div></div>
       <div class="qrbox"><img id="qr" src="${qrSrc}" alt="QR" onerror="this.style.display='none'"><div>Quét mở thửa</div></div>
@@ -556,7 +572,7 @@ function buildHtml(o: PhieuOpts): string {
       <div><div class="day">Ngày ${now.getDate()} tháng ${now.getMonth() + 1} năm ${now.getFullYear()}</div><div class="role">NGƯỜI YÊU CẦU</div><div class="hint">(Ký, ghi rõ họ tên)</div><div class="sp"></div></div>
       <div><div class="day">Ngày ${now.getDate()} tháng ${now.getMonth() + 1} năm ${now.getFullYear()}</div><div class="role">${SITE.ten}</div><div class="hint">(Người lập phiếu)</div><div class="signbox"><div class="kymau"><img src="${signSrc}" alt="chữ ký" ${imgFb}><span class="fb">${signSvg()}</span></div><div class="stamp"><img src="${logoSrc}" alt="con dấu" ${imgFb}><span class="fb">${stampSvg()}</span></div></div></div>
     </div>
-  </div>${phuLucHtml}</div>
+  </div>${giapLai(0)}</div>${phuLucHtml}</div>
   <script>
     try { window.focus(); } catch (e) {}
     (function(){ function fit(){ var ds=document.querySelectorAll('.sheet'); for(var i=0;i<ds.length;i++){ var s=ds[i]; s.style.zoom=''; var maxH=1040; var h=s.scrollHeight; if(h>maxH){ s.style.zoom=(maxH/h).toFixed(4); } } }

@@ -25,7 +25,12 @@ export async function api<T = any>(path: string, opts: RequestInit = {}, _retry 
     throw new Error('Không kết nối được máy chủ. Vui lòng kiểm tra mạng và thử lại.');
   }
   if (res.status >= 500 && _retry < 2) { await wait(1200 * (_retry + 1)); return api(path, opts, _retry + 1); }
-  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `Máy chủ đang bận, vui lòng thử lại (mã ${res.status}).`);
+  if (!res.ok) {
+    // Kèm mã trạng thái + mã lỗi (maLoi) máy chủ gửi, để nơi gọi phân biệt từng trường hợp (vd 'KHOA_DA_TAT' ở lib/vanTay.ts)
+    const j = await res.json().catch(() => ({}));
+    throw Object.assign(new Error(j.error || `Máy chủ đang bận, vui lòng thử lại (mã ${res.status}).`),
+      { status: res.status, maLoi: j.maLoi as string | undefined });
+  }
   return res.json();
 }
 

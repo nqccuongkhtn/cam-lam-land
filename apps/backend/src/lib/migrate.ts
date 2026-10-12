@@ -779,6 +779,12 @@ export async function migrate(): Promise<void> {
     `ALTER TABLE users ADD COLUMN IF NOT EXISTS doi_mat_khau_luc timestamptz`,
   ]) await pool.query(sql).catch((e: any) => console.error('[migrate] phiên đăng nhập:', e?.message || e));
 
+  // ── MÃ TÀI KHOẢN CỐ ĐỊNH GẮN VÀO KHOÁ FACE ID / VÂN TAY (12/10/2026 — routes/passkey.ts maTaiKhoan) ──
+  //   iPhone nhận diện tài khoản theo mã này: bật lại Face ID với CÙNG mã thì THAY khoá cũ, khác mã thì CẤT THÊM một khoá
+  //   (chủ dự án đổi mật khẩu xong bật lại → iPhone hiện hai khoá cùng một email). Rỗng = chưa có, lần bật / đăng nhập sau tự điền.
+  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS passkey_uid text`)
+    .catch((e: any) => console.error('[migrate] users.passkey_uid lỗi:', e?.message || e));
+
   // ── TỆP RIÊNG trong kho ảnh /api/images (11/10/2026 — rà soát bảo mật) ──
   // Công văn đính kèm DANH SÁCH NÓNG (tên, CCCD, địa chỉ người dân) nằm chung kho với ảnh tin rao công khai, số tệp tăng
   // dần nên ai cũng đoán được link. rieng = true → chỉ mở bằng link có chữ ký (lib/kyTep.ts, routes/images.ts, hotlist.ts).

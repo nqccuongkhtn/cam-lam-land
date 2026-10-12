@@ -1,12 +1,12 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { layMaNguoiThat } from '@/lib/turnstile';
 import { useAuth, type AuthUser } from '@/lib/auth';
 import PasswordInput from './PasswordInput';
 import LogoAnh from '@/components/LogoAnh';
-import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, laHuy, chuanBiVanTay, type TinhTrangVanTay } from '@/lib/vanTay';
+import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, laHuy, chuanBiVanTay, batGoiYBanPhim, type TinhTrangVanTay } from '@/lib/vanTay';
 
 /**
  * Popup ĐĂNG NHẬP dùng chung — hiện đè lên trang (không rời trang).
@@ -30,22 +30,32 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
   const [busyVt, setBusyVt] = useState(false);
   const [baoVanTay, setBaoVanTay] = useState('');
 
+  // Hàm mới nhất của trang mẹ — lệnh gợi ý trên bàn phím treo lâu, xong việc phải gọi đúng bản mới nhất.
+  const xongRef = useRef(onSuccess); xongRef.current = onSuccess;
+  const loginRef = useRef(login); loginRef.current = login;
+
   useEffect(() => {
     if (!open) return;
-    /* Mở ô là XIN SẴN thử thách Face ID (lib/vanTay.ts chuanBiVanTay): bấm nút là vào thẳng Face ID, iPhone
-       không chèn hộp "Sử dụng Face ID để đăng nhập? — Tiếp tục" nữa. Máy chủ giữ thử thách 5 phút → làm mới mỗi 4 phút. */
+    /* Mở ô là XIN SẴN thử thách Face ID (lib/vanTay.ts chuanBiVanTay) cho nút, máy chủ giữ 5 phút → làm mới mỗi 4 phút.
+       Kèm TREO GỢI Ý TRÊN BÀN PHÍM (batGoiYBanPhim): chạm ô Email → iPhone hiện tài khoản ngay trên bàn phím → chạm vào là
+       quét Face ID luôn, không qua hộp "Sử dụng Face ID để đăng nhập? — Tiếp tục" (hộp đó chỉ hiện khi bấm NÚT, Apple bắt buộc). */
     let huy = false;
     let lamMoi: ReturnType<typeof setInterval> | undefined;
+    let goGoiY: (() => void) | undefined;
     kiemTraVanTay().then((tt) => {
       if (huy) return;
       setVanTay(tt);
-      if (tt.dung) { chuanBiVanTay(); lamMoi = setInterval(() => chuanBiVanTay(true), 4 * 60 * 1000); }
+      if (!tt.dung) return;
+      chuanBiVanTay(); lamMoi = setInterval(() => chuanBiVanTay(true), 4 * 60 * 1000);
+      goGoiY = batGoiYBanPhim(
+        (r) => { loginRef.current(r.token, r.user as AuthUser, true); xongRef.current(); },
+        (e) => { if (!laHuy(e)) setBaoVanTay(loiDeHieu(e)); });
     }).catch(() => {});
-    return () => { huy = true; if (lamMoi) clearInterval(lamMoi); };
+    return () => { huy = true; if (lamMoi) clearInterval(lamMoi); goGoiY?.(); };
   }, [open]);
 
   async function vaoBangVanTay() {
-    // ⚠️ Không thêm lệnh chờ (await) nào trước dangNhapVanTay — chờ là Safari lại hỏi "Tiếp tục".
+    // ⚠️ Không thêm lệnh chờ (await) nào trước dangNhapVanTay — iPhone đời cũ (iOS ≤ 17.3) không cho mở Face ID sau khi chờ.
     const tt = vanTay ?? await kiemTraVanTay();
     if (!vanTay) setVanTay(tt);
     if (!tt.dung) { setBaoVanTay(tt.loiNhan); return; }
@@ -100,7 +110,9 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
           <h2 className="text-xl font-extrabold text-[#0A2540] mt-4">Đăng nhập để tiếp tục</h2>
           <p className="text-[13px] text-slate-500 mt-0.5">{reason || 'Đăng nhập để dùng đầy đủ tính năng của Cam Lâm Land.'}</p>
           <form onSubmit={submit} className="space-y-3 mt-4">
-            <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required autoComplete="username" placeholder="Email" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base sm:text-sm focus:border-[#0A2540] outline-none" />
+            {/* autoComplete "username webauthn": chạm vào ô là iPhone gợi ý tài khoản đã bật Face ID ngay trên bàn phím
+                (lib/vanTay.ts batGoiYBanPhim). Bỏ chữ "webauthn" là mất gợi ý. */}
+            <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required autoComplete="username webauthn" placeholder="Email" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-base sm:text-sm focus:border-[#0A2540] outline-none" />
             <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mật khẩu" autoComplete="current-password" required />
             {err && <p className="text-red-600 text-sm font-semibold">{err}</p>}
             <label className="flex items-center gap-2 text-sm text-slate-600 select-none cursor-pointer">

@@ -1,12 +1,12 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { layMaNguoiThat } from '@/lib/turnstile';
 import { useAuth, type AuthUser, laAdmin } from '@/lib/auth';
 import PasswordInput from '@/components/PasswordInput';
-import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, laHuy, chuanBiVanTay, type TinhTrangVanTay } from '@/lib/vanTay';
+import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, laHuy, chuanBiVanTay, batGoiYBanPhim, type TinhTrangVanTay } from '@/lib/vanTay';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,21 +21,28 @@ export default function LoginPage() {
   const [vanTay, setVanTay] = useState<TinhTrangVanTay | null>(null);
   const [busyVt, setBusyVt] = useState(false);
   const [baoVanTay, setBaoVanTay] = useState('');   // nội dung bảng thông báo, rỗng = đóng
+  const loginRef = useRef(login); loginRef.current = login;
   useEffect(() => {
-    // Xin SẴN thử thách Face ID để bấm nút là vào thẳng Face ID (xem chuanBiVanTay trong lib/vanTay.ts).
+    // Xin SẴN thử thách Face ID cho nút (chuanBiVanTay) + treo GỢI Ý TRÊN BÀN PHÍM (batGoiYBanPhim): chạm ô Email là iPhone
+    // hiện tài khoản ngay trên bàn phím, chạm vào là quét Face ID, không qua hộp "Tiếp tục" — xem lib/vanTay.ts.
     let huy = false;
     let lamMoi: ReturnType<typeof setInterval> | undefined;
+    let goGoiY: (() => void) | undefined;
     kiemTraVanTay().then((tt) => {
       if (huy) return;
       setVanTay(tt);
-      if (tt.dung) { chuanBiVanTay(); lamMoi = setInterval(() => chuanBiVanTay(true), 4 * 60 * 1000); }
+      if (!tt.dung) return;
+      chuanBiVanTay(); lamMoi = setInterval(() => chuanBiVanTay(true), 4 * 60 * 1000);
+      goGoiY = batGoiYBanPhim(
+        (r) => { loginRef.current(r.token, r.user as AuthUser, true); router.push(laAdmin(r.user) ? '/admin' : '/'); },
+        (e) => { if (!laHuy(e)) setBaoVanTay(loiDeHieu(e)); });
     }).catch(() => {});
-    return () => { huy = true; if (lamMoi) clearInterval(lamMoi); };
-  }, []);
+    return () => { huy = true; if (lamMoi) clearInterval(lamMoi); goGoiY?.(); };
+  }, [router]);
 
   async function vaoBangVanTay() {
     // Chưa kiểm xong thì kiểm ngay lúc bấm, khỏi bắt người dùng chờ.
-    // ⚠️ Không thêm lệnh chờ (await) nào trước dangNhapVanTay — chờ là Safari lại hỏi "Tiếp tục".
+    // ⚠️ Không thêm lệnh chờ (await) nào trước dangNhapVanTay — iPhone đời cũ (iOS ≤ 17.3) không cho mở Face ID sau khi chờ.
     const tt = vanTay ?? await kiemTraVanTay();
     if (!vanTay) setVanTay(tt);
     if (!tt.dung) { setBaoVanTay(tt.loiNhan); return; }
@@ -65,7 +72,8 @@ export default function LoginPage() {
         <h1 className="text-2xl font-extrabold text-[#0A2540]">Đăng nhập</h1>
         <p className="text-sm text-slate-500 mt-1 mb-5">Cam Lâm <span className="text-[#C8A14B] font-bold">Land</span> — sàn bất động sản & quy hoạch</p>
         <form onSubmit={submit} className="space-y-3">
-          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required autoComplete="username" placeholder="Email" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:border-[#0A2540] outline-none" />
+          {/* "username webauthn": chạm ô là iPhone gợi ý tài khoản đã bật Face ID trên bàn phím (lib/vanTay.ts batGoiYBanPhim) */}
+          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required autoComplete="username webauthn" placeholder="Email" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:border-[#0A2540] outline-none" />
           <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mật khẩu" autoComplete="current-password" required />
           {err && <p className="text-red-600 text-sm font-semibold">{err}</p>}
           <label className="flex items-center gap-2 text-sm text-slate-600 select-none cursor-pointer">

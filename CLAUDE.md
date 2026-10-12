@@ -976,6 +976,16 @@ Toàn bài vẫn nằm trong trang (Google đọc được, kéo khách), ngư�
   chừng** mà vẫn báo 200; iPhone hiện "Load failed". Đã dính 11→12/10/2026 (10 file bị cắt trong 12 giờ, chủ dự án
   mở văn bản 3533/TB-CNKVCL đứng ở 33 %). Dấu hiệu: `docker logs camlam_nginx | grep "proxy_temp.*failed"`.
   Lỡ xoá rồi thì `docker exec camlam_nginx nginx -s reload` là thư mục tạm được tạo lại.
+- **Face ID / vân tay (passkey, `routes/passkey.ts` + `lib/vanTay.ts`) — ba điều đã vấp (12/10/2026):**
+  (1) Hộp iPhone **"Sử dụng Face ID để đăng nhập? — Tiếp tục"** hiện MỖI LẦN bấm NÚT Face ID — Apple bắt buộc, web KHÔNG tắt
+  được (lấy sẵn thử thách cũng không; từng báo nhầm chủ dự án là bỏ được). Đường không có hộp: **gợi ý trên bàn phím** —
+  chạm ô Email → iPhone hiện tài khoản → chạm là quét Face ID (`batGoiYBanPhim`, ô Email phải `autoComplete="username webauthn"`).
+  (2) **Mã tài khoản gắn vào khoá phải CỐ ĐỊNH** (`users.passkey_uid`): thư viện mặc định sinh mã ngẫu nhiên mỗi lần bật → bật lại
+  là iPhone cất THÊM khoá (đổi mật khẩu xong hiện 2 khoá cùng email). Cùng mã thì iPhone thay khoá cũ.
+  (3) Đổi mật khẩu xoá khoá trên máy chủ nhưng iPhone vẫn giữ → nút gửi kèm danh sách khoá còn dùng được (`lib/maKhoaMay.ts`,
+  cất ở máy khi đang đăng nhập) để iPhone không đưa khoá cũ ra; chọn phải khoá cũ thì máy chủ trả `maLoi: 'KHOA_DA_TAT'`.
+  Không có iPhone thật để thử → bài thử GIẢ LẬP trình duyệt cho phần điều phối nút ↔ gợi ý ↔ khoá cũ (19 mục, không đụng web thật):
+  `apps/backend/node_modules/.bin/tsx scripts/thu-van-tay.mts` — sửa `vanTay.ts` / `maKhoaMay.ts` thì chạy lại, phải "TẤT CẢ ĐẠT".
 - **Bật/tắt trang bảo trì** (chỉ ảnh hưởng tên miền thật, `localhost` vẫn vào được):
   `docker exec camlam_nginx touch /etc/nginx/maintenance.on` · tắt: `rm -f` đường dẫn đó.
   Nút trên bảng điều khiển làm sẵn 2 lệnh này.

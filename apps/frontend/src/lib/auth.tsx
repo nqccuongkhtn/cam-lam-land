@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { api } from './api';
 import { getToken, setToken, clearToken } from './token';
+import { dongBoMaKhoa } from './maKhoaMay';
 
 // Khớp với packages/shared/src/index.ts và ràng buộc trong database.
 export type Role = 'user' | 'admin' | 'gis' | 'vanban' | 'hotlist' | 'danhmuc';
@@ -49,7 +50,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refresh = useCallback(async () => {
     const t = getToken();
     if (!t) { setUser(null); writeCachedUser(null); setLoading(false); return; }
-    try { const r = await api<{ user: AuthUser }>('/auth/me'); setUser(r.user); writeCachedUser(r.user); }
+    try {
+      const r = await api<{ user: AuthUser }>('/auth/me'); setUser(r.user); writeCachedUser(r.user);
+      // Đang đăng nhập → cất danh sách khoá Face ID còn dùng được của máy này (6 giờ một lần, lib/maKhoaMay.ts)
+      if (r.user?.id != null) void dongBoMaKhoa(r.user.id);
+    }
     catch { setUser(null); clearToken(); writeCachedUser(null); }
     finally { setLoading(false); }
   }, []);
@@ -64,7 +69,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
   }, [refresh]);
-  const login = (t: string, u: AuthUser, remember = true) => { setToken(t, remember); writeCachedUser(u, remember); setUser(u); };
+  const login = (t: string, u: AuthUser, remember = true) => {
+    setToken(t, remember); writeCachedUser(u, remember); setUser(u);
+    if (u?.id != null) void dongBoMaKhoa(u.id, true);   // vừa đăng nhập: hỏi ngay danh sách khoá Face ID còn dùng được
+  };
   const logout = () => { clearToken(); writeCachedUser(null); setUser(null); };
   return <AuthCtx.Provider value={{ user, loading, login, logout, refresh }}>{children}</AuthCtx.Provider>;
 }

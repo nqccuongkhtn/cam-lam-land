@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { toast } from '@/lib/toast';
 
 type DK = { ma: string; ten: string; dat: boolean; chiTiet: string };
 type TinhTrang = { trangThai: 'khong' | 'cho' | 'duyet' | 'tu_choi'; ghiChu: string | null; dieuKien: DK[]; duDieuKien: boolean; sdtOk: boolean; sdtXinLuc: string | null; phone: string | null };
@@ -11,14 +12,17 @@ type TinhTrang = { trangThai: 'khong' | 'cho' | 'duyet' | 'tu_choi'; ghiChu: str
 export default function XinMoiGioiCn() {
   const [tt, setTt] = useState<TinhTrang | null>(null);
   const [busy, setBusy] = useState(false);
-  const [loi, setLoi] = useState('');
 
   useEffect(() => { api<TinhTrang>('/moi-gioi-cn/cua-toi').then(setTt).catch(() => {}); }, []);
   if (!tt) return null;
 
   const goi = async (duong: string) => {
-    setBusy(true); setLoi('');
-    try { setTt(await api<TinhTrang>(duong, { method: 'POST' })); } catch (e: any) { setLoi(e.message); } finally { setBusy(false); }
+    // Kết quả báo bằng hộp nổi đầu màn hình như cả trang Tài khoản (chủ dự án 12/10/2026: "cho hiện popup").
+    setBusy(true);
+    try {
+      setTt(await api<TinhTrang>(duong, { method: 'POST' }));
+      toast.success(duong.endsWith('xin-duyet') ? 'Admin sẽ xem hồ sơ và duyệt sớm.' : 'Admin sẽ gọi xác minh số điện thoại.', 'Đã gửi yêu cầu');
+    } catch (e: any) { toast.error(e?.message || 'Thử lại.', 'Chưa gửi được'); } finally { setBusy(false); }
   };
 
   return (
@@ -60,7 +64,6 @@ export default function XinMoiGioiCn() {
         </button>
       )}
       {tt.trangThai === 'cho' && <p className="mt-3 text-[13px] text-slate-500">Đã gửi yêu cầu. Admin sẽ xem hồ sơ và duyệt sớm.</p>}
-      {loi && <p className="mt-2 text-sm font-semibold text-red-600">{loi}</p>}
     </div>
   );
 }

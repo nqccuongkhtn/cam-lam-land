@@ -10,6 +10,7 @@ import ImageCropper from '@/components/ImageCropper';
 import QuanLyVanTay from '@/components/QuanLyVanTay';
 import XinMoiGioiCn from '@/components/XinMoiGioiCn';
 import ThietBiCuaToi from '@/components/ThietBiCuaToi';
+import { toast } from '@/lib/toast';
 
 export default function Account() {
   const router = useRouter();
@@ -20,7 +21,8 @@ export default function Account() {
   // Đổi mật khẩu: mặc định ĐĂNG XUẤT mọi thiết bị khác (chủ dự án 11/10/2026: cho người dùng tự chọn, mặc định có đánh dấu).
   const [dangXuatKhac, setDangXuatKhac] = useState(true);
   const [lanDoiMk, setLanDoiMk] = useState(0);   // tăng sau mỗi lần đổi mật khẩu → khung "vân tay / khuôn mặt" tải lại danh sách
-  const [msg, setMsg] = useState(''); const [err, setErr] = useState('');
+  // Thông báo kết quả hiện bằng HỘP NỔI ở đầu màn hình (lib/toast.tsx). Trước để chữ ở CUỐI TRANG — bấm "Đổi mật khẩu" xong
+  // phải cuộn tận đáy mới thấy (chủ dự án 12/10/2026: "thông báo cho hiện popup chứ ai lại đi để ở dưới cùng").
   const [busy, setBusy] = useState(false); const [uploading, setUploading] = useState(false);
   const [cropFile, setCropFile] = useState<File | null>(null);
 
@@ -33,28 +35,30 @@ export default function Account() {
     const f = e.target.files?.[0]; e.target.value = ''; if (f) setCropFile(f);
   }
   async function onCropDone(blob: Blob) {
-    setCropFile(null); setUploading(true); setErr(''); setMsg('');
+    setCropFile(null); setUploading(true);
     try { const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' }); const r = await uploadImages([file]); setAvatar(r[0].url); }
-    catch (e: any) { setErr('Lỗi tải ảnh: ' + e.message); } finally { setUploading(false); }
+    catch (e: any) { toast.error(e?.message || 'Thử lại.', 'Chưa tải được ảnh'); } finally { setUploading(false); }
   }
   async function saveInfo(e: React.FormEvent) {
-    e.preventDefault(); setErr(''); setMsg(''); setBusy(true);
-    try { await api('/auth/me', { method: 'PATCH', body: JSON.stringify({ fullName, phone, avatar }) }); await refresh(); setMsg('Đã lưu thông tin tài khoản.'); }
-    catch (e: any) { setErr(e.message); } finally { setBusy(false); }
+    e.preventDefault(); setBusy(true);
+    try { await api('/auth/me', { method: 'PATCH', body: JSON.stringify({ fullName, phone, avatar }) }); await refresh(); toast.success('Đã lưu thông tin tài khoản.'); }
+    catch (e: any) { toast.error(e?.message || 'Thử lại.', 'Chưa lưu được'); } finally { setBusy(false); }
   }
   async function savePw(e: React.FormEvent) {
-    e.preventDefault(); setErr(''); setMsg(''); setBusy(true);
+    e.preventDefault(); setBusy(true);
     try {
       const r = await api<{ token?: string; soVanTayDaTat?: number; daDangXuatMayKhac?: boolean }>('/auth/me', {
         method: 'PATCH', body: JSON.stringify({ currentPassword: curPw, newPassword: newPw, dangXuatMayKhac: dangXuatKhac }) });
       // Máy chủ đã thu hồi thẻ cũ và cấp THẺ MỚI cho chính máy này → thay ngay, máy này không bị đăng xuất.
       if (r.token) thayToken(r.token);
       setCurPw(''); setNewPw(''); setLanDoiMk((n) => n + 1);
-      setMsg('Đã đổi mật khẩu.'
-        + (r.soVanTayDaTat ? ' Đăng nhập bằng vân tay / khuôn mặt đã được tắt — bật lại trong Tài khoản nếu cần.' : '')
-        + (r.daDangXuatMayKhac ? ' Các thiết bị khác đã bị đăng xuất.' : ''));
+      const them = [
+        r.soVanTayDaTat ? 'Face ID / vân tay đã tắt — bấm “Bật cho máy này” để bật lại.' : '',
+        r.daDangXuatMayKhac ? 'Các thiết bị khác đã bị đăng xuất.' : '',
+      ].filter(Boolean).join(' ');
+      toast.success(them || 'Lần sau đăng nhập bằng mật khẩu mới.', 'Đã đổi mật khẩu', them ? 8000 : undefined);
     }
-    catch (e: any) { setErr(e.message); } finally { setBusy(false); }
+    catch (e: any) { toast.error(e?.message || 'Thử lại.', 'Chưa đổi được mật khẩu'); } finally { setBusy(false); }
   }
 
   if (loading || !user) return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
@@ -103,8 +107,6 @@ export default function Account() {
 
         <ThietBiCuaToi />
 
-        {err && <p className="text-red-600 text-sm font-semibold">{err}</p>}
-        {msg && !err && <p className="text-emerald-600 text-sm font-semibold">{msg}</p>}
         {cropFile && <ImageCropper file={cropFile} title="Cân chỉnh ảnh đại diện" onCancel={() => setCropFile(null)} onDone={onCropDone} />}
       </div>
     </div>

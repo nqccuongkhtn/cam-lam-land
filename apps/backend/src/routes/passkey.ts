@@ -79,6 +79,26 @@ async function layThuThach(khoa: string): Promise<{ challenge: string; user_id: 
   return r ?? null;
 }
 
+/* ── MÃ TÀI KHOẢN GẮN VÀO KHOÁ — CỐ ĐỊNH CHO MỖI NGƯỜI (12/10/2026) ─────────────────────────────────────────
+ * Chủ dự án chụp màn hình: đổi mật khẩu xong bật lại Face ID thì iPhone hiện HAI khoá cùng một email, bắt chọn —
+ * chọn nhầm khoá cũ (đã tắt khi đổi mật khẩu) là báo lỗi. Nguyên nhân: trước đây không đưa mã tài khoản nên mỗi
+ * lần bật, thư viện tự sinh một mã NGẪU NHIÊN MỚI. iPhone (và mọi nơi cất khoá) nhận diện tài khoản bằng mã này:
+ * TRÙNG mã thì THAY khoá cũ, KHÁC mã thì CẤT THÊM một khoá. Nay mỗi người một mã cố định (users.passkey_uid)
+ * → bật lại trên cùng một máy là thay hẳn khoá cũ, máy chỉ còn một.
+ * Người đã bật từ trước (mã ngẫu nhiên, máy chủ không lưu): lần đăng nhập Face ID kế tiếp NHẬN LUÔN mã của khoá
+ * vừa dùng làm mã cố định (xem /dang-nhap/xong) → lần bật lại sau đó vẫn thay đúng khoá đang nằm trên máy. */
+async function maTaiKhoan(userId: number): Promise<Uint8Array<ArrayBuffer>> {
+  const [u] = await query('SELECT passkey_uid FROM users WHERE id=$1', [userId]);
+  let ma: string = u?.passkey_uid || '';
+  if (!ma) {
+    const [r] = await query(
+      `UPDATE users SET passkey_uid = COALESCE(passkey_uid, $2) WHERE id=$1 RETURNING passkey_uid`,
+      [userId, crypto.randomBytes(32).toString('base64url')]);
+    ma = r?.passkey_uid;
+  }
+  return new Uint8Array(Buffer.from(ma, 'base64url'));
+}
+
 const hoSo = (u: any) => ({
   id: u.id, email: u.email, role: u.role, roles: dsVaiTro(u),
   fullName: u.full_name ?? null, phone: u.phone ?? null,
@@ -94,6 +114,7 @@ passkeyRouter.post('/dang-ky/bat-dau', authRequired, async (req: AuthedRequest, 
     const opts = await generateRegistrationOptions({
       rpName: RP_TEN,
       rpID: RP_ID,
+      userID: await maTaiKhoan(Number(me.id)),   // CỐ ĐỊNH — bật lại là thay khoá cũ trên máy (xem maTaiKhoan)
       userName: me.email,
       userDisplayName: me.email,
       attestationType: 'none',              // không cần biết hãng máy, đỡ lộ thông tin
@@ -187,14 +208,16 @@ passkeyRouter.post('/dang-nhap/xong', async (req, res, next) => {
     // ⚠️ Câu này phải chỉ rõ CHỖ BẬT. Máy có Face ID rồi vẫn chưa đăng nhập
     //    được nếu chưa bật cho tài khoản — mà chỗ bật nằm trong Tài khoản
     //    của web, không phải Cài đặt của máy. Chủ dự án nhắc đúng chỗ này.
-    if (!c) return res.status(404).json({ error: 'Máy này chưa bật. Vào Tài khoản để bật.' });
+    // maLoi 'KHOA_DA_TAT' = khoá máy chủ không còn nhận (đổi mật khẩu / bấm Gỡ) mà máy vẫn giữ: trình duyệt bỏ khoá đó
+    // khỏi danh sách đưa ra lần sau, và nhờ máy xoá luôn nếu máy hỗ trợ (lib/vanTay.ts xacNhanDangNhap).
+    if (!c) return res.status(404).json({ error: 'Máy này chưa bật. Vào Tài khoản để bật.', maLoi: 'KHOA_DA_TAT' });
     if (c.status && c.status !== 'active')
       return res.status(403).json({ error: 'Tài khoản đang bị khoá' });
     // ⛔ 11/10/2026 (chủ dự án báo lỗi: "đổi mật khẩu rồi mà Face ID vẫn vào được"): đổi mật khẩu đã XOÁ hết khoá vân tay
     //    (routes/auth.ts). Đây là chốt chặn thứ hai — khoá nào bật TRƯỚC lần đổi mật khẩu gần nhất (vd sót lại do đặt lại
     //    mật khẩu bằng cách khác) thì không cho đăng nhập.
     if (c.doi_mat_khau_luc && c.cred_tao_luc && new Date(c.cred_tao_luc).getTime() <= new Date(c.doi_mat_khau_luc).getTime())
-      return res.status(403).json({ error: 'Mật khẩu tài khoản đã được đổi nên vân tay / khuôn mặt trên máy này đã tắt. Hãy đăng nhập bằng mật khẩu mới rồi bật lại trong Tài khoản.' });
+      return res.status(403).json({ error: 'Mật khẩu tài khoản đã được đổi nên vân tay / khuôn mặt trên máy này đã tắt. Hãy đăng nhập bằng mật khẩu mới rồi bật lại trong Tài khoản.', maLoi: 'KHOA_DA_TAT' });
 
     const kq = await verifyAuthenticationResponse({
       response,
@@ -217,6 +240,11 @@ passkeyRouter.post('/dang-nhap/xong', async (req, res, next) => {
       return res.status(401).json({ error: 'Chữ ký không hợp lệ' });
     await query('UPDATE webauthn_credentials SET counter=$1, last_used=now() WHERE id=$2',
                 [moi, c.cred_row_id]);
+    // Chưa có mã tài khoản cố định (người bật từ trước 12/10/2026) → nhận mã của chính khoá vừa dùng, để lần bật lại
+    // sau này trên máy đó THAY khoá này chứ không cất thêm khoá thứ hai (xem maTaiKhoan). Chỉ ghi vào tài khoản của khoá.
+    const maKhoa = String(response?.response?.userHandle || '');
+    if (/^[A-Za-z0-9_-]{8,128}$/.test(maKhoa))
+      query('UPDATE users SET passkey_uid=$2 WHERE id=$1 AND passkey_uid IS NULL', [c.user_id, maKhoa]).catch(() => {});
 
     const tb = await ghiDangNhap({ id: c.user_id, role: c.role, roles: dsVaiTro(c) }, req, 'van-tay');   // sổ + giới hạn thiết bị
     if (!tb.ok) return res.status(403).json({ error: tb.loi, maLoi: 'QUA_THIET_BI' });
@@ -228,10 +256,12 @@ passkeyRouter.post('/dang-nhap/xong', async (req, res, next) => {
 /* ══ 3. Quản lý các máy đã đăng ký ═════════════════════════════════════════ */
 passkeyRouter.get('/danh-sach', authRequired, async (req: AuthedRequest, res, next) => {
   try {
+    // cred_id + uid: trình duyệt cất lại danh sách khoá CÒN DÙNG ĐƯỢC để lúc đăng nhập chỉ đưa đúng các khoá đó cho
+    // iPhone chọn — khoá cũ đã tắt không hiện ra nữa (frontend lib/maKhoaMay.ts). Mã khoá không phải thứ bí mật.
     const ds = await query(
-      `SELECT id, ten_may, transports, created_at, last_used
+      `SELECT id, cred_id, ten_may, transports, created_at, last_used
        FROM webauthn_credentials WHERE user_id=$1 ORDER BY id DESC`, [req.user!.id]);
-    res.json({ ds });
+    res.json({ ds, uid: req.user!.id });
   } catch (e) { next(e); }
 });
 

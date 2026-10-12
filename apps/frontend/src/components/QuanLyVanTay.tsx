@@ -8,6 +8,7 @@ import {
   themVanTay, dsMayDaDangKy, xoaVanTay, mayCoVanTay, tenMayMacDinh, loiDeHieu, laHuy,
   type MayDaDangKy,
 } from '@/lib/vanTay';
+import { toast } from '@/lib/toast';
 
 const ngayVn = (s?: string | null) => {
   if (!s) return '—';
@@ -19,7 +20,7 @@ export default function QuanLyVanTay() {
   const [co, setCo] = useState(false);
   const [ds, setDs] = useState<MayDaDangKy[]>([]);
   const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState(''); const [err, setErr] = useState('');
+  // Báo kết quả bằng hộp nổi đầu màn hình (lib/toast.tsx) như cả trang Tài khoản — chủ dự án 12/10/2026.
 
   const nap = useCallback(async () => {
     try { setDs((await dsMayDaDangKy()).ds || []); } catch { /* chưa đăng nhập thì thôi */ }
@@ -28,19 +29,18 @@ export default function QuanLyVanTay() {
   useEffect(() => { mayCoVanTay().then(setCo).catch(() => {}); nap(); }, [nap]);
 
   async function them() {
-    setErr(''); setMsg(''); setBusy(true);
+    setBusy(true);
     try {
       await themVanTay(tenMayMacDinh());
-      setMsg('Đã bật cho máy này.');
+      toast.success('Lần sau đăng nhập bằng Face ID / vân tay, khỏi gõ mật khẩu.', 'Đã bật cho máy này');
       await nap();
-    } catch (e: any) { if (!laHuy(e)) setErr(loiDeHieu(e)); } finally { setBusy(false); }   // tự tắt bảng thì im lặng
+    } catch (e: any) { if (!laHuy(e)) toast.error(loiDeHieu(e), 'Chưa bật được'); } finally { setBusy(false); }   // tự tắt bảng thì im lặng
   }
 
   async function xoa(id: number, ten: string) {
     if (!confirm(`Gỡ "${ten}"? Máy đó sẽ phải nhập mật khẩu.`)) return;
-    setErr(''); setMsg('');
-    try { await xoaVanTay(id); setMsg('Đã gỡ.'); await nap(); }
-    catch (e: any) { setErr(e?.message || 'Không gỡ được'); }
+    try { await xoaVanTay(id); toast.success(`Đã gỡ "${ten}".`); await nap(); }
+    catch (e: any) { toast.error(e?.message || 'Thử lại.', 'Chưa gỡ được'); }
   }
 
   return (
@@ -58,9 +58,6 @@ export default function QuanLyVanTay() {
           Máy này chưa dùng được.
         </p>
       )}
-
-      {msg && <p className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-[12.5px] font-semibold text-emerald-700">{msg}</p>}
-      {err && <p className="mt-3 rounded-lg bg-rose-50 px-3 py-2 text-[12.5px] font-semibold text-rose-700">{err}</p>}
 
       {ds.length > 0 && (
         <ul className="mt-3 divide-y divide-slate-100 rounded-xl border border-slate-200">

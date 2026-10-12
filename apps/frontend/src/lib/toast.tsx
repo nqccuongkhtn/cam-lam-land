@@ -13,10 +13,10 @@ const emit = (t: Payload) => {
   if (listeners.size) listeners.forEach((l) => l(t));
   else if (typeof window !== 'undefined') window.alert(t.msg); // dự phòng khi Provider chưa gắn
 };
+/** ms = giữ trên màn hình bao lâu (mặc định 3,8 giây; lỗi 6,5 giây) — lời dài thì cho lâu hơn để kịp đọc. */
 export const toast = {
-  error: (msg: string, title?: string) => emit({ kind: 'error', msg, title }),
-  success: (msg: string, title?: string) => emit({ kind: 'success', msg, title }),
-  /** ms = giữ trên màn hình bao lâu (mặc định 3,8 giây) — lời hướng dẫn dài thì cho lâu hơn để kịp đọc. */
+  error: (msg: string, title?: string, ms?: number) => emit({ kind: 'error', msg, title, ms }),
+  success: (msg: string, title?: string, ms?: number) => emit({ kind: 'success', msg, title, ms }),
   info: (msg: string, title?: string, ms?: number) => emit({ kind: 'info', msg, title, ms }),
 };
 

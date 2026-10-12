@@ -446,7 +446,9 @@ function buildHtml(o: PhieuOpts): string {
 
   return `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Phiếu quy hoạch — Thửa ${esc(p.soThua || '')} Tờ ${esc(p.soTo || '')}</title>
 <style>
-  @page { size: A4 portrait; margin: 10mm; }
+  /* Lề PHẢI của trang in = 0 để lát dấu giáp lai chạm MÉP GIẤY (chủ dự án 12/10/2026: "giáp lai mà bị hở" — lát dấu nằm lùi
+     vào trong lề 10 mm thì xếp các trang không ghép liền). Chữ vẫn cách mép phải 10 mm nhờ .wrap đệm phải 10 mm khi in. */
+  @page { size: A4 portrait; margin: 10mm 0 10mm 10mm; }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body { font-family: 'Times New Roman', serif; color: #111; font-size: 11px; line-height: 1.32; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -522,7 +524,9 @@ function buildHtml(o: PhieuOpts): string {
                  max-width: none; display: block; mix-blend-mode: multiply; }
   .plhd { display: flex; justify-content: space-between; gap: 8px; font-size: 9px; color: #555; border-bottom: 1.5px solid #0A2540; padding-bottom: 3px; }
   .plhd b { color: #0A2540; font-size: 10.5px; }
-  @media print { .toolbar { display: none; } input.e { border-bottom: none; } .wrap { padding: 0; } .noprint { display: none !important; }
+  @media print { .toolbar { display: none; } input.e { border-bottom: none; } .noprint { display: none !important; }
+    .wrap { max-width: none; margin: 0; padding: 0 10mm 0 0; }        /* chữ cách mép phải 10 mm như cũ (lề phải trang = 0) */
+    .giaplai { right: -10mm; }                                         /* lát dấu giáp lai CHẠM MÉP GIẤY */
     .trang.pl { break-before: page; page-break-before: always; margin-top: 0; padding-top: 0; border-top: none; } }
 </style></head>
 <body>

@@ -64,6 +64,9 @@ Hình thửa trên web (đo phẳng VN-2000 như MicroStation): **16.704,4884 m�
 đất thửa khác) nằm trọn trong phần cây xanh của QĐ205 — đã trừ đúng chỗ. Mỗi bản một ảnh, số trên ảnh = số mảnh trong bảng
 (thư mục `bao-cao-qh/`): `thua-95-to-15-xa-cam-lam-qd205.png`, `…-qd893.png`, `…-qd2101.png`, và riêng phần đường QĐ205:
 `thua-95-to-15-xa-cam-lam-giao-thong-qd205.png`.
+**Kiểm lại 10 giờ sáng 12/10/2026** (sau đợt sửa 5 lỗi thuật toán + dựng lại ranh đêm 12/10): web ra đúng các số dưới đây —
+QĐ205 đường 619,3 · cây xanh 4.759,3 · hồ 1.302,7 · đơn vị ở 10.023,2; QĐ893 đường 3.409,6; QĐ2101 đường 3.409,7, cây xanh 6.445.
+Bảng đầy đủ + 3 ảnh cũng đã đưa lên trang báo cáo sáng (việc số 12).
 
 **QĐ205** (vùng tô đọc thẳng QD205.gpkg, cung tròn chính xác)
 

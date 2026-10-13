@@ -19,18 +19,18 @@ const O = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-[16px] outli
 const TL = '/tai-lieu/';
 
 type DongTinh = { ten: string; dv: string; gia: number; sl: number };
-// Bảng đơn giá bóc từ BẢN WORD trên Công báo tỉnh (scripts/den-bu/boc-don-gia.py) → mỗi hạng mục đủ
-// tên, nhóm, mô tả kết cấu, đơn vị tính và số tiền. Không phải OCR nên số chính xác.
+// Bảng đơn giá bóc từ BẢN WORD trên Công báo tỉnh → mỗi hạng mục đủ tên, nhóm, mô tả kết cấu, đơn vị tính và số tiền.
+// Không phải OCR nên số chính xác. 13/10/2026 bóc lại theo đúng ô của bảng (scripts/den-bu/README.md): bản cũ sót 126 dòng
+// (cả mục "Xây dựng mặt tiền nhà", 14 loại giếng…) và gắn nhầm tên nhóm — chủ dự án báo "thiếu" QĐ 12/2026.
 type Muc = { pl?: string; nhom: string; phu: string; ketCau: string; ten: string; dv: string; gia: number };
-const TEN_PL: Record<string, string> = {
-  I: 'Phụ lục I — tự xây dựng, cải tạo, sửa chữa, nâng cấp',
-  II: 'Phụ lục II — di dời mồ mả',
-  III: 'Phụ lục III — tháo dỡ, di chuyển, lắp đặt tài sản',
-  IV: 'Phụ lục IV — chi phí đầu tư vào đất còn lại',
-};
+// Cây trồng, vật nuôi — QĐ 35/2026/QĐ-UBND: 559 dòng bóc từ bản Word Công báo (số 43 ngày 18/5/2026), đối chiếu bản PDF ký số
+// khớp 100% (13/10/2026). gia = null: văn bản ghi "tính theo thực tế" (gỗ, củi rừng trồng từ năm thứ 4/6) → người dùng tự nhập giá.
+type MucCay = { pl: string; nhom: string; ten: string; phanLoai: string; dv: string; gia: number | null; ghiChu?: string };
+type DongCay = { ten: string; dv: string; gia: number; sl: number; vuot: boolean; tuNhap: boolean };
+type MatDo = { ten: string; dv: string; tuHat: number | null; chietGhep: number | null };
 
 export default function DenBuClient() {
-  const [tab, setTab] = useState<'dat' | 'nha' | 'khac' | 'cancu'>('dat');
+  const [tab, setTab] = useState<'dat' | 'nha' | 'cay' | 'khac' | 'cancu'>('dat');
 
   // ── Tiền đất ──────────────────────────────────────────────
   const [duAn, setDuAn] = useState<'camlam' | 'phuchop'>('camlam');
@@ -68,10 +68,19 @@ export default function DenBuClient() {
   const [tim, setTim] = useState('');
   const [timCp, setTimCp] = useState('');
   const [dongs, setDongs] = useState<DongTinh[]>([]);
+  // ── Cây trồng, vật nuôi (QĐ 35/2026) ──
+  const [cays, setCays] = useState<MucCay[]>([]);
+  const [matDo, setMatDo] = useState<MatDo[]>([]);
+  const [timCay, setTimCay] = useState('');
+  const [dongCay, setDongCay] = useState<DongCay[]>([]);
   useEffect(() => {
     if (tab === 'nha' && !mucs.length) fetch('/den-bu-nha-qd08.json').then((r) => r.json()).then(setMucs).catch(() => setMucs([]));
     if (tab === 'khac' && !chiPhi.length) fetch('/den-bu-chi-phi-qd12.json').then((r) => r.json()).then(setChiPhi).catch(() => setChiPhi([]));
-  }, [tab, mucs.length, chiPhi.length]);
+    if (tab === 'cay' && !cays.length) {
+      fetch('/den-bu-cay-trong-qd35.json').then((r) => r.json()).then(setCays).catch(() => setCays([]));
+      fetch('/den-bu-mat-do-cay-qd35.json').then((r) => r.json()).then(setMatDo).catch(() => setMatDo([]));
+    }
+  }, [tab, mucs.length, chiPhi.length, cays.length]);
   const loc = (ds: Muc[], k: string) => {
     const q = khongDau(k.trim());
     const r = q ? ds.filter((m) => khongDau([m.ten, m.phu, m.nhom, m.ketCau].join(' ')).includes(q)) : ds;
@@ -83,10 +92,18 @@ export default function DenBuClient() {
       <span className="block text-[13.5px] font-semibold leading-snug text-slate-700">{[m.phu, m.ten].filter(Boolean).join(' · ')}</span>
       {m.ketCau && <span className="mt-0.5 block text-[11.5px] leading-snug text-slate-400">{m.ketCau}</span>}
       <span className="mt-0.5 block text-[12.5px] font-bold text-[#0A2540]">{tien(m.gia)} / {m.dv}
-        <span className="ml-1 font-normal text-slate-400">· {(m.pl ? TEN_PL[m.pl]?.split('—')[1] || m.nhom : m.nhom).toLowerCase().trim()}</span></span>
+        <span className="ml-1 font-normal text-slate-400">· {m.pl ? `PL ${m.pl} · ` : ''}{m.nhom.toLowerCase().trim()}</span></span>
     </button>
   );
   const tienNha = dongs.reduce((s, d) => s + d.gia * d.sl, 0);
+  const locCay = (k: string) => {
+    const q = khongDau(k.trim());
+    const r = q ? cays.filter((m) => khongDau([m.ten, m.phanLoai, m.nhom].join(' ')).includes(q)) : cays;
+    return r.slice(0, 80);
+  };
+  const themCay = (m: MucCay) => setDongCay((d) => [...d, { ten: [m.ten, m.phanLoai].filter(Boolean).join(' · '), dv: m.dv || 'cây', gia: m.gia ?? 0, sl: 1, vuot: false, tuNhap: m.gia == null }]);
+  // Phần cây VƯỢT mật độ được hỗ trợ 80% giá trị theo bảng giá (Điều 11 QĐ 32/2026/QĐ-UBND).
+  const tienCay = dongCay.reduce((s, d) => s + d.gia * d.sl * (d.vuot ? 0.8 : 1), 0);
 
   // ── Hỗ trợ ───────────────────────────────────────────────
   // MẶC ĐỊNH × 5 (sửa 6/10/2026, chủ dự án chỉ ra): 03 lần của khoản 10 Điều 2 QĐ 14/2025 (Công báo số 015+016
@@ -96,7 +113,6 @@ export default function DenBuClient() {
   const [truSxNn, setTruSxNn] = useState(true);       // có phải hộ TRỰC TIẾP sản xuất nông nghiệp không
   const [maHanMuc, setMaHanMuc] = useState('hangnam');// hạn mức giao đất áp cho thửa này
   const [dtHanMuc, setDtHanMuc] = useState('');
-  const [cayTrong, setCayTrong] = useState('');
   const [thuong, setThuong] = useState(String(THUONG_BAN_GIAO));   // thưởng bàn giao trước hạn (QĐ 14/2025)
   const [khac, setKhac] = useState('');
   // Hỗ trợ ổn định đời sống — Điều 19 NĐ 88/2024: số khẩu × 30 kg gạo × giá gạo × số tháng
@@ -152,7 +168,7 @@ export default function DenBuClient() {
   // lấy theo mức thu nhập bình quân của 03 năm liền kề trước đó.
   const tienSxkd = so(thuNhapNam) * 0.3;
 
-  const tong = tienDat + tienNha + tienNghe + tienOnDinh + tienDiChuyen + tienSxkd + so(cayTrong) + so(thuong) + so(khac);
+  const tong = tienDat + tienNha + tienNghe + tienOnDinh + tienDiChuyen + tienSxkd + tienCay + so(thuong) + so(khac);
 
   const [moTong, setMoTong] = useState(true);   // thanh tổng tiền dính đáy: mở sẵn phần chi tiết
   const nut = (k: typeof tab, nhan: string) => (
@@ -168,7 +184,7 @@ export default function DenBuClient() {
       </p>
 
       <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {nut('dat', '① Tiền đất')}{nut('nha', '② Nhà & công trình')}{nut('khac', '③ Chi phí khác')}{nut('cancu', '④ Căn cứ pháp luật')}
+        {nut('dat', '① Tiền đất')}{nut('nha', '② Nhà & công trình')}{nut('cay', '③ Cây trồng, vật nuôi')}{nut('khac', '④ Chi phí khác')}{nut('cancu', '⑤ Căn cứ pháp luật')}
       </div>
 
       {/* ───────────────── ① TIỀN ĐẤT ───────────────── */}
@@ -348,7 +364,7 @@ export default function DenBuClient() {
       {tab === 'nha' && (
         <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <p className="text-[13px] leading-snug text-slate-600">
-            Đơn giá bồi thường nhà, nhà ở, công trình xây dựng theo <b>Quyết định 08/2026/QĐ-UBND</b> ngày 20/01/2026 của UBND tỉnh Khánh Hòa. Gõ tên hạng mục (nhà 1 tầng, tường rào, giếng, chuồng trại…) rồi bấm để cộng vào bảng tính.
+            Đơn giá bồi thường nhà, nhà ở, công trình xây dựng theo <b>Quyết định 08/2026/QĐ-UBND</b> ngày 22/01/2026 của UBND tỉnh Khánh Hòa. Gõ tên hạng mục (nhà 1 tầng, tường rào, giếng, chuồng trại…) rồi bấm để cộng vào bảng tính.
           </p>
           <input value={tim} onChange={(e) => setTim(e.target.value)} placeholder="Tìm: tường rào, mái tôn, giếng, sân bê tông…" className={`${O} mt-2.5`} />
           <div className="mt-2 max-h-[46vh] overflow-y-auto overscroll-contain rounded-xl border border-slate-100">
@@ -378,7 +394,96 @@ export default function DenBuClient() {
         </div>
       )}
 
-      {/* ───────────────── ③ CHI PHÍ KHÁC ───────────────── */}
+      {/* ───────────────── ③ CÂY TRỒNG, VẬT NUÔI ─────────────────
+          QĐ 35/2026/QĐ-UBND ngày 04/5/2026 (hiệu lực 14/5/2026). 13/10/2026 chủ dự án: "tìm về 35 cây trồng nữa" — trước chỉ có
+          một ô tự gõ số tiền. Phần vượt mật độ 80%: Điều 11 QĐ 32/2026. Quy định đi kèm: Phụ lục I–IV QĐ 35 + Điều 103, 105 Luật Đất đai. */}
+      {tab === 'cay' && (
+        <div className="mt-3 space-y-3">
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p className="text-[13px] leading-snug text-slate-600">
+              Đơn giá bồi thường cây trồng, vật nuôi theo <b>Quyết định 35/2026/QĐ-UBND</b> ngày 04/5/2026 của UBND tỉnh Khánh Hòa (hiệu lực 14/5/2026):
+              cây hằng năm (đ/m²), cây lâu năm theo tuổi hoặc loại A/B/C (đ/cây), cây lâm nghiệp theo năm chăm sóc, thủy sản theo thời gian nuôi.
+              Gõ tên cây, con rồi bấm để cộng vào bảng tính.
+            </p>
+            <input value={timCay} onChange={(e) => setTimCay(e.target.value)} placeholder="Tìm: sầu riêng, xoài ghép, keo lai, lúa, tôm thẻ…" className={`${O} mt-2.5`} />
+            <div className="mt-2 max-h-[46vh] overflow-y-auto overscroll-contain rounded-xl border border-slate-100">
+              {cays.length === 0 && <p className="p-3 text-[13px] text-slate-400">Đang tải bảng đơn giá…</p>}
+              {locCay(timCay).map((m, i) => (
+                <button key={i} onClick={() => themCay(m)} className="block w-full border-b border-slate-100 px-3 py-2 text-left last:border-b-0 hover:bg-slate-50 active:bg-slate-100">
+                  <span className="block text-[13.5px] font-semibold leading-snug text-slate-700">{m.ten}</span>
+                  {m.phanLoai && <span className="mt-0.5 block text-[11.5px] leading-snug text-slate-500">{m.phanLoai}</span>}
+                  <span className="mt-0.5 block text-[12.5px] font-bold text-[#0A2540]">{m.gia != null ? `${tien(m.gia)} / ${m.dv}` : 'Tính theo thực tế — tự nhập giá'}
+                    <span className="ml-1 font-normal text-slate-400">· {m.nhom.toLowerCase()}</span></span>
+                </button>
+              ))}
+              {cays.length > 0 && locCay(timCay).length === 0 && <p className="p-3 text-[13px] text-slate-400">Không tìm thấy — cây, con không có trong bảng thì áp loại tương đồng (Điều 4 Quy định kèm QĐ 35/2026).</p>}
+            </div>
+            <p className="mt-1.5 text-[12px] leading-snug text-slate-500">
+              Hoa, cây cảnh tính theo giá thực tế lúc kiểm kê (khoản 4 Điều 2 Quy định kèm QĐ 35/2026). Bản gốc:{' '}
+              <a href={TL + 'QD-35-2026-don-gia-boi-thuong-cay-trong-vat-nuoi.pdf'} target="_blank" rel="noreferrer" className="font-semibold text-[#0A2540] underline">QĐ 35/2026 (PDF)</a>.
+            </p>
+
+            {dongCay.length > 0 && (
+              <div className="mt-3 rounded-xl bg-slate-50 p-3">
+                <p className="text-[13px] font-bold text-[#0A2540]">Cây trồng, vật nuôi đã chọn <span className="font-normal text-slate-400">(ô bên phải: số cây / số m²)</span></p>
+                {dongCay.map((d, i) => (
+                  <div key={i} className="mt-2 border-t border-slate-200 pt-2 first:border-t-0 first:pt-0">
+                    <div className="flex items-start gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[12.5px] leading-snug text-slate-600">{d.ten.slice(0, 120)}</p>
+                        {d.tuNhap ? (
+                          <label className="mt-1 block text-[12px] text-slate-500">Giá thực tế (đồng/{d.dv})
+                            <input value={d.gia ? String(d.gia) : ''} onChange={(e) => setDongCay((a) => a.map((x, j) => (j === i ? { ...x, gia: so(e.target.value) } : x)))}
+                              inputMode="decimal" placeholder="theo biên bản kiểm đếm" className="mt-0.5 w-full rounded-lg border border-slate-300 px-2 py-1.5 text-[16px]" /></label>
+                        ) : <p className="text-[12px] text-slate-400">{tien(d.gia)} / {d.dv}</p>}
+                      </div>
+                      <input value={String(d.sl)} onChange={(e) => setDongCay((a) => a.map((x, j) => (j === i ? { ...x, sl: so(e.target.value) } : x)))}
+                        inputMode="decimal" aria-label={`Số lượng (${d.dv})`} className="w-20 shrink-0 rounded-lg border border-slate-300 px-2 py-1.5 text-right text-[16px]" />
+                      <button onClick={() => setDongCay((a) => a.filter((_, j) => j !== i))} aria-label="Bỏ" className="shrink-0 px-1 text-slate-400">✕</button>
+                    </div>
+                    <label className="mt-1 flex items-center gap-1.5 text-[12px] text-slate-500">
+                      <input type="checkbox" checked={d.vuot} onChange={(e) => setDongCay((a) => a.map((x, j) => (j === i ? { ...x, vuot: e.target.checked } : x)))} />
+                      Đây là phần cây <b className="font-semibold">vượt mật độ</b> — hỗ trợ 80% (Điều 11 QĐ 32/2026)
+                    </label>
+                  </div>
+                ))}
+                <p className="mt-2 border-t border-slate-200 pt-2 text-[14px] text-slate-600">Cộng cây trồng, vật nuôi: <b className="text-[#0A2540]">{tien(tienCay)}</b></p>
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-4">
+            <p className="font-bold text-[#0A2540]">Khi nào được bồi thường cây trồng, vật nuôi</p>
+            <ul className="mt-1.5 list-disc space-y-1 pl-5 text-[13px] leading-relaxed text-slate-600">
+              <li>Chỉ bồi thường cây, con <b>tạo lập hợp pháp trước khi có thông báo thu hồi đất</b>. Trồng, thả nuôi trong thời hạn thông báo thu hồi (12 tháng) thì <b>không được bồi thường</b> (khoản 2 Điều 105, khoản 5 Điều 85 Luật Đất đai 2024).</li>
+              <li>Cây hằng năm, thủy sản <b>đã đến kỳ thu hoạch hoặc đã thu hoạch xong thì không bồi thường</b> (ghi chú Phụ lục I, IV QĐ 35/2026).</li>
+              <li>Cây lâu năm tính <b>theo mật độ</b> (bảng dưới). Trồng xen: cây lâu năm tính số cây thực tế nhưng không quá mật độ, cây hằng năm tính theo diện tích thực tế. <b>Phần vượt mật độ được hỗ trợ 80%</b> (Điều 11 QĐ 32/2026).</li>
+              <li>Tuổi cây: giá “1 năm” cho cây dưới 1 đến 1 năm tuổi, “2 năm” cho cây trên 1 đến 2 năm tuổi… Cây đang cho thu hoạch chia <b>loại A, B, C</b> theo năng suất cao hơn, bằng, thấp hơn bình quân niên giám thống kê 3 năm liền kề.</li>
+              <li>Cây lâm nghiệp từ năm thứ 4 (bạch đàn, keo, phi lao) hoặc năm thứ 6 (loài khác) trở đi: sản phẩm gỗ, củi <b>tính theo thực tế</b>.</li>
+              <li>Chủ cây trồng, vật nuôi <b>được tự thu hồi</b> (chặt, bứng, bắt) trước khi bàn giao đất (khoản 5 Điều 103 Luật Đất đai 2024).</li>
+              <li>Phương án bồi thường đã được duyệt trước 14/5/2026 thì giữ theo phương án đã duyệt (Điều 3 QĐ 35/2026).</li>
+            </ul>
+            {matDo.length > 0 && (
+              <details className="mt-2.5">
+                <summary className="cursor-pointer text-[13px] font-semibold text-[#0A2540]">Mật độ tối đa được bồi thường (cây/ha) — Bảng 2 Phụ lục II</summary>
+                <div className="mt-1.5 overflow-x-auto">
+                  <table className="w-full text-left text-[12.5px] [font-variant-numeric:tabular-nums]">
+                    <thead><tr className="border-b border-slate-200 text-slate-500"><th className="py-1 pr-2 font-semibold">Cây</th><th className="py-1 pr-2 font-semibold">Từ hạt</th><th className="py-1 font-semibold">Chiết, ghép</th></tr></thead>
+                    <tbody>{matDo.map((m, i) => (
+                      <tr key={i} className="border-b border-slate-100"><td className="py-1 pr-2 text-slate-700">{m.ten}</td>
+                        <td className="py-1 pr-2">{m.tuHat != null ? m.tuHat.toLocaleString('vi-VN') : '—'}</td>
+                        <td className="py-1">{m.chietGhep != null ? m.chietGhep.toLocaleString('vi-VN') : '—'}</td></tr>
+                    ))}</tbody>
+                  </table>
+                </div>
+                <p className="mt-1 text-[11.5px] text-slate-400">Cây không có trong bảng mật độ thì tính theo số cây trong biên bản kiểm đếm.</p>
+              </details>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ───────────────── ④ CHI PHÍ KHÁC ───────────────── */}
       {tab === 'khac' && (
         <div className="mt-3 space-y-3">
           <div className="rounded-2xl border border-slate-200 bg-white p-4">
@@ -520,8 +625,7 @@ export default function DenBuClient() {
             </div>
 
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              {([['Bồi thường cây trồng, vật nuôi (QĐ 35/2026)', cayTrong, setCayTrong],
-                 ['Thưởng bàn giao mặt bằng trước hạn (5.000.000 đ — Điều 14, QĐ 14/2025)', thuong, setThuong],
+              {([['Thưởng bàn giao mặt bằng trước hạn (5.000.000 đ — Điều 14, QĐ 14/2025)', thuong, setThuong],
                  ['Khoản khác trong phương án bồi thường', khac, setKhac]] as [string, string, (v: string) => void][]).map(([nhan, v, set]) => (
                 <label key={nhan} className="text-[12.5px] text-slate-600">{nhan} (đồng)
                   <input value={v} onChange={(e) => set(e.target.value)} inputMode="decimal" placeholder="0" className={`${O} mt-1`} /></label>
@@ -555,14 +659,14 @@ export default function DenBuClient() {
         </div>
       )}
 
-      {/* ───────────────── ④ CĂN CỨ ───────────────── */}
+      {/* ───────────────── ⑤ CĂN CỨ ───────────────── */}
       {tab === 'cancu' && (
         <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4">
           <p className="font-bold text-[#0A2540]">Người bị thu hồi đất nông nghiệp được nhận những khoản gì?</p>
           <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-[13px] leading-relaxed text-slate-600">
             <li><b>Tiền bồi thường về đất</b> = diện tích thu hồi × giá đất cụ thể được phê duyệt cho dự án.</li>
             <li><b>Bồi thường nhà, công trình xây dựng</b> gắn liền với đất — đơn giá tại QĐ 08/2026/QĐ-UBND.</li>
-            <li><b>Bồi thường cây trồng, vật nuôi</b> bị thiệt hại — Điều 103 Luật Đất đai 2024.</li>
+            <li><b>Bồi thường cây trồng, vật nuôi</b> bị thiệt hại — Điều 103 Luật Đất đai 2024, đơn giá tại QĐ 35/2026/QĐ-UBND (hiệu lực 14/5/2026); phần cây vượt mật độ hỗ trợ 80% (Điều 11 QĐ 32/2026).</li>
             <li><b>Bồi thường chi phí đầu tư vào đất còn lại</b> — Điều 104 Luật Đất đai 2024, đơn giá tại QĐ 12/2026.</li>
             <li><b>Hỗ trợ ổn định đời sống và sản xuất</b> — Điều 108 Luật Đất đai 2024.</li>
             <li><b>Hỗ trợ đào tạo, chuyển đổi nghề và tìm kiếm việc làm</b> — Điều 109 Luật Đất đai 2024 &amp; khoản 3 Điều 22 Nghị định 88/2024/NĐ-CP: hỗ trợ bằng tiền <b>không quá 5 lần</b> giá đất nông nghiệp cùng loại trong bảng giá đất, tính cho toàn bộ diện tích thu hồi nhưng <b>không vượt hạn mức giao đất nông nghiệp</b> (Điều 176 Luật Đất đai 2024); mức cụ thể do UBND tỉnh quy định. <b>Khánh Hòa đang áp dụng 05 lần</b>: 03 lần theo Điều 13 Quy định kèm QĐ 17/2024/QĐ-UBND (được thay bằng khoản 10 Điều 2 QĐ 14/2025/QĐ-UBND) <b>+ 02 lần</b> theo khoản 1 Điều 9 QĐ 32/2026/QĐ-UBND (hiệu lực 30/4/2026); người không đủ điều kiện chuyển đổi nghề được 50% phần cộng thêm (khoản 2 Điều 9).</li>
@@ -586,6 +690,8 @@ export default function DenBuClient() {
               ['QD-2955-gia-dat-boi-thuong-KDT-Cam-Hoa.pdf', 'QĐ 2955 — KĐT phức hợp Cam Hòa'],
               ['QD-08-2026-don-gia-boi-thuong-nha-cong-trinh.pdf', 'QĐ 08/2026 — đơn giá nhà, công trình'],
               ['QD-12-2026-don-gia-boi-thuong-ho-tro-chi-phi.pdf', 'QĐ 12/2026 — đơn giá một số chi phí'],
+              ['QD-35-2026-don-gia-boi-thuong-cay-trong-vat-nuoi.pdf', 'QĐ 35/2026 — đơn giá cây trồng, vật nuôi'],
+              ['QD-32-2026-chinh-sach-ho-tro-boi-thuong-tai-dinh-cu.pdf', 'QĐ 32/2026 — chính sách hỗ trợ'],
               ['2093-SXD-huong-dan-ap-dung-QD08-QD12.pdf', 'CV 2093/SXD — hướng dẫn áp dụng QĐ 08 & 12']].map(([f, n]) => (
               <a key={f} href={TL + f} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 px-3 py-1.5 text-[12.5px] font-semibold text-[#0A2540] hover:bg-slate-200">📄 {n}</a>
             ))}
@@ -613,15 +719,15 @@ export default function DenBuClient() {
           {moTong && (
             <div className="mt-2 space-y-0.5 border-t border-white/15 pt-2 text-[12.5px] text-white/85">
               {tienDat > 0 && <p>· Đất: {tien(tienDat)}</p>}
-              {tienNha > 0 && <p>· Nhà &amp; công trình: {tien(tienNha)}</p>}
+              {tienNha > 0 && <p>· Nhà, công trình &amp; chi phí khác: {tien(tienNha)}</p>}
               {tienNghe > 0 && <p>· Hỗ trợ chuyển đổi nghề: {tien(tienNghe)}</p>}
               {tienOnDinh > 0 && <p>· Hỗ trợ ổn định đời sống: {tien(tienOnDinh)}</p>}
               {tienDiChuyen > 0 && <p>· Di chuyển tài sản{tuLoChoO ? ' + tự lo chỗ ở' : ''}: {tien(tienDiChuyen)}</p>}
               {tienSxkd > 0 && <p>· Ổn định sản xuất, kinh doanh: {tien(tienSxkd)}</p>}
-              {so(cayTrong) > 0 && <p>· Cây trồng, vật nuôi: {tien(so(cayTrong))}</p>}
+              {tienCay > 0 && <p>· Cây trồng, vật nuôi: {tien(tienCay)}</p>}
               {so(thuong) > 0 && <p>· Thưởng bàn giao: {tien(so(thuong))}</p>}
               {so(khac) > 0 && <p>· Khoản khác: {tien(so(khac))}</p>}
-              {tong === 0 && <p>Chưa có số liệu — hãy nhập diện tích ở mục ① hoặc chọn hạng mục ở mục ② ③.</p>}
+              {tong === 0 && <p>Chưa có số liệu — hãy nhập diện tích ở mục ① hoặc chọn hạng mục ở mục ② ③ ④.</p>}
               <p className="pt-1 text-[11.5px] leading-snug text-white/60">Con số chỉ mang tính tham khảo. Số chính thức là số ghi trong phương án bồi thường, hỗ trợ, tái định cư được cơ quan có thẩm quyền phê duyệt.</p>
             </div>
           )}

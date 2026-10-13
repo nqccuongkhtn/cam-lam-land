@@ -446,8 +446,8 @@ function buildHtml(o: PhieuOpts): string {
 
   return `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Phiếu quy hoạch — Thửa ${esc(p.soThua || '')} Tờ ${esc(p.soTo || '')}</title>
 <style>
-  /* Lề PHẢI của trang in = 0 để lát dấu giáp lai chạm MÉP GIẤY (chủ dự án 12/10/2026: "giáp lai mà bị hở" — lát dấu nằm lùi
-     vào trong lề 10 mm thì xếp các trang không ghép liền). Chữ vẫn cách mép phải 10 mm nhờ .wrap đệm phải 10 mm khi in. */
+  /* Lề PHẢI của trang in = 0 để tự đặt lát dấu giáp lai trong dải 10 mm sát mép (xem .giaplai trong @media print).
+     Chữ vẫn cách mép phải 10 mm nhờ .wrap đệm phải 10 mm khi in. */
   @page { size: A4 portrait; margin: 10mm 0 10mm 10mm; }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
@@ -526,7 +526,14 @@ function buildHtml(o: PhieuOpts): string {
   .plhd b { color: #0A2540; font-size: 10.5px; }
   @media print { .toolbar { display: none; } input.e { border-bottom: none; } .noprint { display: none !important; }
     .wrap { max-width: none; margin: 0; padding: 0 10mm 0 0; }        /* chữ cách mép phải 10 mm như cũ (lề phải trang = 0) */
-    .giaplai { right: -10mm; }                                         /* lát dấu giáp lai CHẠM MÉP GIẤY */
+    /* LÁT DẤU GIÁP LAI CÁCH MÉP GIẤY 5 mm — đã thử cả hai đầu, chủ dự án in thật trên máy HP LaserJet M706n:
+       · sát mép (12/10/2026): "in ra bị mất không đủ dấu" — máy in KHÔNG in được dải ~4,4 mm sát mép phải (đo trong
+         trình điều khiển máy in: vùng in được của khổ A4 chừa 4,40 mm bên phải), lát dấu rộng ~7 mm mất quá nửa;
+       · lùi 10 mm (bản đầu): đủ dấu nhưng xếp lệch các tờ thì giữa hai lát hở 10 mm — "thừa một khoảng trắng".
+       Khoảng hở NHỎ NHẤT có thể = đúng dải máy in không in được: tờ trên luôn chừa trắng dải đó ở mép, không tờ nào che
+       được nó. 5 mm = 4,4 mm + 0,6 mm phòng giấy kéo lệch → đủ dấu, hở 5 mm (bằng nửa bản đầu).
+       Xếp: mỗi tờ lòi ra = bề rộng lát dấu + 5 mm (3 trang ≈ 12 mm) thì lát dấu tờ dưới nằm ngay sát mép tờ trên. */
+    .giaplai { right: -5mm; }
     .trang.pl { break-before: page; page-break-before: always; margin-top: 0; padding-top: 0; border-top: none; } }
 </style></head>
 <body>

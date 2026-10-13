@@ -18,11 +18,16 @@ export default function Account() {
   const [fullName, setFullName] = useState(''); const [phone, setPhone] = useState('');
   const [avatar, setAvatar] = useState<string | null>(null);
   const [curPw, setCurPw] = useState(''); const [newPw, setNewPw] = useState('');
+  const [xacNhan, setXacNhan] = useState('');   // ô nhập lại mật khẩu mới (chủ dự án 13/10/2026)
+  /* Kết quả ĐỔI MẬT KHẨU hiện NGAY DƯỚI ô xác nhận, KHÔNG dùng hộp nổi (chủ dự án 13/10/2026: "cho thông báo ở dưới ô xác nhận
+     mật khẩu mới… bỏ popup đi"). Dòng báo luôn GIỮ SẴN CHỖ một dòng (min-h) nên lúc hiện không đẩy ô đánh dấu / nút xuống —
+     câu báo vì thế phải NGẮN, vừa một dòng trên điện thoại. Gõ lại vào một trong ba ô là dòng báo tự xoá. */
+  const [baoMk, setBaoMk] = useState<{ loi: boolean; chu: string } | null>(null);
   // Đổi mật khẩu: mặc định ĐĂNG XUẤT mọi thiết bị khác (chủ dự án 11/10/2026: cho người dùng tự chọn, mặc định có đánh dấu).
   const [dangXuatKhac, setDangXuatKhac] = useState(true);
   const [lanDoiMk, setLanDoiMk] = useState(0);   // tăng sau mỗi lần đổi mật khẩu → khung "vân tay / khuôn mặt" tải lại danh sách
-  // Thông báo kết quả hiện bằng HỘP NỔI ở đầu màn hình (lib/toast.tsx). Trước để chữ ở CUỐI TRANG — bấm "Đổi mật khẩu" xong
-  // phải cuộn tận đáy mới thấy (chủ dự án 12/10/2026: "thông báo cho hiện popup chứ ai lại đi để ở dưới cùng").
+  // Lưu thông tin / ảnh: báo bằng HỘP NỔI đầu màn hình (lib/toast.tsx). Trước để chữ ở CUỐI TRANG — phải cuộn tận đáy mới thấy
+  // (chủ dự án 12/10/2026: "thông báo cho hiện popup chứ ai lại đi để ở dưới cùng"). Riêng đổi mật khẩu báo ngay dưới ô (baoMk).
   const [busy, setBusy] = useState(false); const [uploading, setUploading] = useState(false);
   const [cropFile, setCropFile] = useState<File | null>(null);
 
@@ -45,20 +50,22 @@ export default function Account() {
     catch (e: any) { toast.error(e?.message || 'Thử lại.', 'Chưa lưu được'); } finally { setBusy(false); }
   }
   async function savePw(e: React.FormEvent) {
-    e.preventDefault(); setBusy(true);
+    e.preventDefault();
+    // Kiểm ngay trên máy, khỏi gửi đi rồi mới biết
+    if (newPw !== xacNhan) { setBaoMk({ loi: true, chu: 'Mật khẩu xác nhận chưa khớp.' }); return; }
+    if (newPw === curPw) { setBaoMk({ loi: true, chu: 'Mật khẩu mới phải khác mật khẩu đang dùng.' }); return; }
+    setBaoMk(null); setBusy(true);
     try {
       const r = await api<{ token?: string; soVanTayDaTat?: number; daDangXuatMayKhac?: boolean }>('/auth/me', {
         method: 'PATCH', body: JSON.stringify({ currentPassword: curPw, newPassword: newPw, dangXuatMayKhac: dangXuatKhac }) });
       // Máy chủ đã thu hồi thẻ cũ và cấp THẺ MỚI cho chính máy này → thay ngay, máy này không bị đăng xuất.
       if (r.token) thayToken(r.token);
-      setCurPw(''); setNewPw(''); setLanDoiMk((n) => n + 1);
-      const them = [
-        r.soVanTayDaTat ? 'Face ID / vân tay đã tắt — bấm “Bật cho máy này” để bật lại.' : '',
-        r.daDangXuatMayKhac ? 'Các thiết bị khác đã bị đăng xuất.' : '',
-      ].filter(Boolean).join(' ');
-      toast.success(them || 'Lần sau đăng nhập bằng mật khẩu mới.', 'Đã đổi mật khẩu', them ? 8000 : undefined);
+      setCurPw(''); setNewPw(''); setXacNhan(''); setLanDoiMk((n) => n + 1);
+      // Ngắn cho vừa một dòng. Face ID tắt + đăng xuất máy khác đã ghi sẵn ở dòng chữ cạnh ô đánh dấu; khung Face ID bên dưới
+      // tự hiện lại nút "Bật cho máy này".
+      setBaoMk({ loi: false, chu: 'Đã đổi mật khẩu.' });
     }
-    catch (e: any) { toast.error(e?.message || 'Thử lại.', 'Chưa đổi được mật khẩu'); } finally { setBusy(false); }
+    catch (e: any) { setBaoMk({ loi: true, chu: e?.message || 'Chưa đổi được. Thử lại.' }); } finally { setBusy(false); }
   }
 
   if (loading || !user) return <div className="py-24 text-center text-slate-500">Đang tải…</div>;
@@ -92,13 +99,19 @@ export default function Account() {
 
         <form onSubmit={savePw} className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
           <h2 className="font-bold text-[#0A2540]">Đổi mật khẩu</h2>
-          <div><label className={lbl}>Mật khẩu hiện tại</label><PasswordInput value={curPw} onChange={(e) => setCurPw(e.target.value)} autoComplete="current-password" /></div>
-          <div><label className={lbl}>Mật khẩu mới (≥ 8 ký tự, có chữ và số)</label><PasswordInput value={newPw} onChange={(e) => setNewPw(e.target.value)} autoComplete="new-password" /></div>
+          <div><label className={lbl}>Mật khẩu hiện tại</label><PasswordInput value={curPw} onChange={(e) => { setCurPw(e.target.value); setBaoMk(null); }} autoComplete="current-password" /></div>
+          <div><label className={lbl}>Mật khẩu mới (≥ 8 ký tự, có chữ và số)</label><PasswordInput value={newPw} onChange={(e) => { setNewPw(e.target.value); setBaoMk(null); }} autoComplete="new-password" /></div>
+          <div>
+            <label className={lbl}>Xác nhận mật khẩu mới</label>
+            <PasswordInput value={xacNhan} onChange={(e) => { setXacNhan(e.target.value); setBaoMk(null); }} autoComplete="new-password" />
+            {/* GIỮ SẴN CHỖ một dòng (min-h) — hiện / ẩn câu báo không làm nhảy ô bên dưới */}
+            <p role="status" aria-live="polite" className={`mt-1.5 min-h-[18px] text-[12.5px] font-semibold leading-[18px] ${baoMk?.loi ? 'text-red-600' : 'text-emerald-600'}`}>{baoMk?.chu}</p>
+          </div>
           <label className="flex items-start gap-2 text-sm text-slate-700 cursor-pointer select-none">
             <input type="checkbox" checked={dangXuatKhac} onChange={(e) => setDangXuatKhac(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#0A2540]" />
             <span><b>Đăng xuất khỏi mọi thiết bị khác</b><span className="block text-xs text-slate-500">Máy này vẫn đăng nhập. Đăng nhập bằng vân tay / khuôn mặt luôn được tắt khi đổi mật khẩu.</span></span>
           </label>
-          <button disabled={busy || !curPw || !newPw} className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] disabled:opacity-60 text-white font-bold px-6 py-2.5 rounded-xl">Đổi mật khẩu</button>
+          <button disabled={busy || !curPw || !newPw || !xacNhan} className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] disabled:opacity-60 text-white font-bold px-6 py-2.5 rounded-xl">Đổi mật khẩu</button>
         </form>
 
         <XinMoiGioiCn />

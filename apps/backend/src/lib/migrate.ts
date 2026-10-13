@@ -796,6 +796,20 @@ export async function migrate(): Promise<void> {
   await pool.query(`ALTER TABLE webauthn_credentials ADD COLUMN IF NOT EXISTS thiet_bi_ids int[] NOT NULL DEFAULT '{}'`)
     .catch((e: any) => console.error('[migrate] webauthn_credentials.thiet_bi_ids lỗi:', e?.message || e));
 
+  // ── TỰ TẠO KHOÁ + THÔNG TIN NƠI CẤT KHOÁ (13/10/2026 — routes/passkey.ts, chuẩn WebAuthn bản 3) ──
+  //   webauthn_challenges.loai: 'tu-dong' = thử thách cho khoá TỰ TẠO ngầm ngay sau khi đăng nhập bằng mật khẩu tự điền
+  //     ("conditional create"). Khoá loại này không có cờ "có mặt" / "đã xác minh" → máy chủ chỉ nới đúng cho loại thử thách này.
+  //   webauthn_credentials: aaguid = mã NƠI CẤT khoá (iCloud, Google Password Manager, Windows Hello…); dong_bo = cờ BE: khoá
+  //     ĐỒNG BỘ nhiều máy (iCloud / Google — có thể nằm cả trên máy khác, kể cả máy người được chia sẻ) hay chỉ trên MỘT máy;
+  //     da_sao_luu = cờ BS; tu_tao = khoá web tự tạo ngầm.
+  for (const sql of [
+    `ALTER TABLE webauthn_challenges ADD COLUMN IF NOT EXISTS loai text`,
+    `ALTER TABLE webauthn_credentials ADD COLUMN IF NOT EXISTS aaguid text`,
+    `ALTER TABLE webauthn_credentials ADD COLUMN IF NOT EXISTS dong_bo boolean`,
+    `ALTER TABLE webauthn_credentials ADD COLUMN IF NOT EXISTS da_sao_luu boolean`,
+    `ALTER TABLE webauthn_credentials ADD COLUMN IF NOT EXISTS tu_tao boolean NOT NULL DEFAULT false`,
+  ]) await pool.query(sql).catch((e: any) => console.error('[migrate] khoá Face ID (nơi cất / tự tạo) lỗi:', e?.message || e));
+
   // ── TỆP RIÊNG trong kho ảnh /api/images (11/10/2026 — rà soát bảo mật) ──
   // Công văn đính kèm DANH SÁCH NÓNG (tên, CCCD, địa chỉ người dân) nằm chung kho với ảnh tin rao công khai, số tệp tăng
   // dần nên ai cũng đoán được link. rieng = true → chỉ mở bằng link có chữ ký (lib/kyTep.ts, routes/images.ts, hotlist.ts).

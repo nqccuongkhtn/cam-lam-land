@@ -52,6 +52,13 @@ const req = (ma: string, ip: string, ua: string, info: any) => ({ headers: { 'x-
 const UA_IP = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.7 Mobile/15E148 Safari/604.1';
 let kq: any = await tb.ghiDangNhap({ id: U, role: 'user' }, req('maAnDanhIPhone0001', '5.5.5.5', UA_IP, { ...IP, manHinh: '390×664' }), 'van-tay', { mayKhoa: [S] });
 kiem(kq.ok && kq.mayId === S, 'tab ẩn danh iPhone, mạng khác, màn hình bị giấu + cùng khoá Face ID → gộp vào đúng máy S (bậc khoa)');
+// khoá ĐỒNG BỘ (iCloud — chia sẻ được cho người khác) mà máy S VỪA hoạt động ở mạng khác → máy khác, không gộp theo khoá
+await query(`UPDATE thiet_bi SET lan_cuoi = now(), ip_cuoi = '3.3.3.3' WHERE id=$1`, [S]);
+kq = await tb.ghiDangNhap({ id: U, role: 'user' }, req('maBanDuocChiaSe01', '8.8.8.8', UA_IP, IP), 'van-tay', { mayKhoa: [S], khoaDongBo: true });
+kiem(kq.ok && kq.mayId !== S, 'khoá iCloud được CHIA SẺ: máy S đang dùng ở mạng khác cùng lúc → máy KHÁC, không gộp (một máy không ở hai nơi)');
+kq = await tb.ghiDangNhap({ id: U, role: 'user' }, req('maWindowsHello001', '9.9.9.9', UA_IP, IP), 'van-tay', { mayKhoa: [S], khoaDongBo: false });
+kiem(kq.ok && kq.mayId === S, 'khoá CHỈ TRÊN MỘT MÁY (vd Windows Hello) → chắc chắn cùng máy, gộp dù máy cũ đang hoạt động nơi khác');
+await query(`UPDATE thiet_bi SET lan_cuoi = now() - interval '1 hour' WHERE id=$1`, [S]);
 kq = await tb.ghiDangNhap({ id: U, role: 'user' }, req('maAnDanhIPhone0002', '6.6.6.6', UA_IP, IP), 'mat-khau');
 kiem(kq.ok && kq.mayId !== S && kq.mayId !== T, 'iPhone lạ, mạng lạ, đăng nhập mật khẩu (không có khoá) → máy mới');
 const UA_EDGE = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0';

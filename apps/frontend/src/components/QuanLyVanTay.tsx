@@ -66,9 +66,16 @@ export default function QuanLyVanTay() {
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[13px] font-bold text-[#0A2540]">{m.ten_may || 'Máy không tên'}</span>
                 <span className="block text-[11.5px] text-slate-400">
-                  Bật ngày {ngayVn(m.created_at)}
+                  {m.tuTao ? 'Tự tạo' : 'Bật'} ngày {ngayVn(m.created_at)}
                   {m.last_used ? ` · dùng lần cuối ${ngayVn(m.last_used)}` : ' · chưa dùng lần nào'}
                 </span>
+                {/* Nơi cất khoá + khoá đồng bộ hay chỉ trên một máy (backend routes/passkey.ts tenNoiCat, cờ BE của chuẩn WebAuthn) */}
+                {(m.noiCat || m.dongBo != null) && (
+                  <span className="block text-[11.5px] text-slate-400">
+                    {m.noiCat ? `Lưu ở ${m.noiCat}` : 'Lưu trong máy'}
+                    {m.dongBo === true ? ' · dùng được trên các máy cùng tài khoản' : m.dongBo === false ? ' · chỉ trên máy này' : ''}
+                  </span>
+                )}
               </span>
               <button onClick={() => xoa(m.id, m.ten_may || 'Máy không tên')}
                 className="shrink-0 rounded-lg border border-slate-200 px-2.5 py-1 text-[12px] font-semibold text-rose-600 hover:border-rose-300">

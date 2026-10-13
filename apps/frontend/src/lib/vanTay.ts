@@ -13,7 +13,7 @@ import {
   base64URLStringToBuffer, bufferToBase64URLString,
 } from '@simplewebauthn/browser';
 import { api } from './api';
-import { maKhoaCuaMay, nhoMaKhoa, themMaKhoa, boMaKhoa } from './maKhoaMay';
+import { maKhoaCuaMay, nhoMaKhoa, themMaKhoa, boMaKhoa, baoNoiCatKhoa } from './maKhoaMay';
 
 /** Máy này có dùng được vân tay / khuôn mặt không. */
 export function mayCoHoTro(): boolean {
@@ -275,12 +275,38 @@ export function laHuy(e: any): boolean {
 export type MayDaDangKy = {
   id: number; cred_id?: string; ten_may: string | null; transports: string | null;
   created_at: string; last_used: string | null;
+  noiCat?: string | null;     // nơi cất khoá: iCloud Keychain, Google Password Manager, Windows Hello…
+  dongBo?: boolean | null;    // khoá đồng bộ nhiều máy (iCloud / Google) hay chỉ nằm trên một máy
+  tuTao?: boolean;            // khoá web tự tạo ngầm sau khi đăng nhập bằng mật khẩu
 };
-/** Danh sách máy đã bật — tiện cất luôn danh sách khoá còn dùng được của máy này (lib/maKhoaMay.ts). */
+/** Danh sách máy đã bật — tiện cất luôn danh sách khoá còn dùng được của máy này (lib/maKhoaMay.ts) và báo cho nơi cất
+ *  khoá biết khoá nào còn hiệu lực (baoNoiCatKhoa — vd vừa bấm Gỡ thì máy này ẩn khoá đó đi). */
 export async function dsMayDaDangKy(): Promise<{ ds: MayDaDangKy[] }> {
-  const r = await api<{ ds: MayDaDangKy[]; uid?: number }>('/passkey/danh-sach');
+  const r = await api<{ ds: MayDaDangKy[]; uid?: number; maTk?: string | null; rpId?: string; email?: string | null; ten?: string | null }>('/passkey/danh-sach');
   if (r?.uid != null) nhoMaKhoa(r.uid, r.ds || []);
+  baoNoiCatKhoa(r);
   return r;
+}
+
+/* ── TỰ TẠO KHOÁ NGẦM ngay sau khi đăng nhập bằng mật khẩu tự điền (13/10/2026 — backend routes/passkey.ts mục 1b) ──
+ * Chuẩn WebAuthn bản 3 "conditional create" (Apple: "automatic passkey upgrades", iOS 18+ / macOS 15+; Chrome 136+ với Google
+ * Password Manager). Theo hướng dẫn của Apple: HỎI TRƯỚC trình duyệt có hỗ trợ không (getClientCapabilities → conditionalCreate),
+ * gọi NGAY sau khi đăng nhập bằng mật khẩu, KHÔNG hiện bảng mời; máy không đủ điều kiện (mật khẩu gõ tay, tab ẩn danh, máy chưa đặt
+ * khoá màn hình, đã có khoá…) thì trình duyệt báo lỗi mà không hiện gì → ở đây im lặng, lần đăng nhập sau thử lại.
+ * tenDangNhap = đúng chữ trong ô email lúc đăng nhập: trình quản lý mật khẩu chỉ tạo khoá khi tên trùng tên nó vừa điền. */
+export async function tuTaoKhoa(tenDangNhap: string): Promise<void> {
+  try {
+    const P: any = (window as any).PublicKeyCredential;
+    if (typeof P?.getClientCapabilities !== 'function') return;
+    const kn = await P.getClientCapabilities();
+    if (!kn?.conditionalCreate) return;
+    if (goiY) { goiY.con = false; huyGoiY(goiY); goiY = null; }   // lệnh gợi ý trên bàn phím còn treo thì gỡ trước
+    const { khoa, options } = await api<{ khoa: string; options: any }>('/passkey/tu-dong/bat-dau',
+      { method: 'POST', body: JSON.stringify({ tenDangNhap: String(tenDangNhap || '').trim() }) });
+    const response = await startRegistration({ optionsJSON: options, useAutoRegister: true });
+    await api('/passkey/tu-dong/xong', { method: 'POST', body: JSON.stringify({ khoa, response, tenMay: tenMayMacDinh() }) });
+    dsMayDaDangKy().catch(() => {});                               // cất lại danh sách khoá của máy
+  } catch { /* không đủ điều kiện → im lặng */ }
 }
 export const xoaVanTay = (id: number) => api(`/passkey/${id}`, { method: 'DELETE' });
 

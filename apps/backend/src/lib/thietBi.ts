@@ -123,17 +123,28 @@ function mangCua(ip: string | null | undefined): string {
   }
   return s;
 }
-type MayCu = { loai: string | null; he_dieu_hanh: string | null; trinh_duyet?: string | null; chi_tiet: any; ip_dau?: string | null; ip_cuoi?: string | null; ip_dn_cuoi?: string | null };
+type MayCu = { loai: string | null; he_dieu_hanh: string | null; trinh_duyet?: string | null; chi_tiet: any; ip_dau?: string | null; ip_cuoi?: string | null;
+  ip_dn_cuoi?: string | null; lan_cuoi?: string | Date | null };
 type MayMoi = { loai: string; heDieuHanh: string; trinhDuyet?: string | null; ct: Record<string, any>; ips: (string | null | undefined)[] };
 /** Trả về BẬC khớp ('khoa' | 'van-tay' | 'mang') hoặc null = không phải cùng máy. Ba bậc: xem chú thích đầu file. */
-export function bacCungMay(cu: MayCu, moi: MayMoi, tuy?: { khoaChung?: boolean }): 'khoa' | 'van-tay' | 'mang' | null {
+/** Máy cũ VỪA hoạt động (≤ 5 phút) ở một MẠNG KHÁC mạng của lần đăng nhập này — một máy không thể ở hai nơi cùng lúc. */
+function dangONoiKhac(cu: MayCu, ips: (string | null | undefined)[]): boolean {
+  const t = cu.lan_cuoi ? new Date(cu.lan_cuoi).getTime() : 0;
+  const mangCu = mangCua(cu.ip_cuoi);
+  return !!t && Date.now() - t < 5 * 60 * 1000 && !!mangCu && !ips.map(mangCua).includes(mangCu);
+}
+export function bacCungMay(cu: MayCu, moi: MayMoi, tuy?: { khoaChung?: boolean; khoaDongBo?: boolean }): 'khoa' | 'van-tay' | 'mang' | null {
   if (!cu || cu.loai !== moi.loai || cu.he_dieu_hanh !== moi.heDieuHanh) return null;
   const a = cu.chi_tiet || {}, b = moi.ct || {};
   if (a.khongGop || b.khongGop) return null;                       // admin đã TÁCH tay máy này ra — không tự gộp lại
   // 1. Cùng khoá Face ID / vân tay đã dùng trên máy này. Chỉ đòi cùng loại máy + hệ điều hành (+ cùng đời máy Android nếu
   //    có): tab ẩn danh trên iPhone bị Safari làm nhiễu / giấu độ phân giải nên không so màn hình. Khoá iCloud dùng chung
   //    cho iPhone + iPad + Mac của một người — khác loại máy / hệ điều hành nên vẫn tách được.
-  if (tuy?.khoaChung && (a.model == null || b.model == null || a.model === b.model)) return 'khoa';
+  //    Khoá CHỈ TRÊN MỘT MÁY (cờ BE = 0 của chuẩn WebAuthn, vd Windows Hello) → chắc chắn cùng máy. Khoá ĐỒNG BỘ (iCloud, Google)
+  //    nằm được trên nhiều máy của cùng một người và từ iOS 17 còn CHIA SẺ được cho người khác → thêm luật "một máy không ở hai
+  //    nơi cùng lúc": máy cũ vừa hoạt động ở mạng khác thì đây là MÁY KHÁC, không gộp theo khoá (xét tiếp các bậc dưới).
+  if (tuy?.khoaChung && (a.model == null || b.model == null || a.model === b.model)
+    && (tuy.khoaDongBo === false || !dangONoiKhac(cu, moi.ips))) return 'khoa';
   for (const k of BAT_BUOC) if (a[k] == null || b[k] == null || a[k] === '' || b[k] === '') return null;
   for (const k of PHAN_CUNG) if (a[k] != null && b[k] != null && String(a[k]) !== String(b[k])) return null;
   const cungNhan = nhanTrinhDuyet(cu.trinh_duyet, cu.he_dieu_hanh) === nhanTrinhDuyet(moi.trinhDuyet, moi.heDieuHanh)
@@ -180,7 +191,7 @@ export function loiQuaGioiHan(toiDa: number): string {
  * Trả { ok:false, loi } nếu đang bật giới hạn mà đây là máy mới vượt số cho phép (lần bị chặn cũng được ghi).
  */
 export async function ghiDangNhap(user: { id: number; role?: string; roles?: string[] | null }, req: Request, cach: string,
-  goiY?: { mayKhoa?: number[] })      // mayKhoa: các máy đã dùng khoá Face ID / vân tay vừa đăng nhập (routes/passkey.ts)
+  goiY?: { mayKhoa?: number[]; khoaDongBo?: boolean })   // mayKhoa: các máy đã dùng khoá Face ID vừa đăng nhập; khoaDongBo: khoá đồng bộ
   : Promise<{ ok: true; ma: string | null; mayId?: number | null } | { ok: false; loi: string }> {
   const ma = maThietBi(req);
   const ua = String(req.headers['user-agent'] || '').slice(0, 500);
@@ -199,11 +210,11 @@ export async function ghiDangNhap(user: { id: number; role?: string; roles?: str
     if (!co) {
       // Mã lạ mà phần cứng + mạng giống hệt một máy đã có → CÙNG MÁY (cửa sổ ẩn danh, hồ sơ / trình duyệt khác…) → gộp,
       // không tính là máy mới, không bị chặn vì giới hạn (xem laCungMay)
-      const ds = await query<any>(`SELECT id, ma, loai, he_dieu_hanh, trinh_duyet, chi_tiet, ip_dau, ip_cuoi, ip_dn_cuoi FROM thiet_bi
+      const ds = await query<any>(`SELECT id, ma, loai, he_dieu_hanh, trinh_duyet, chi_tiet, ip_dau, ip_cuoi, ip_dn_cuoi, lan_cuoi FROM thiet_bi
         WHERE user_id=$1 ORDER BY lan_dau`, [user.id]);
       // Bậc chắc nhất thắng: cùng khoá Face ID > vân tay máy tính > cùng mạng (xem bacCungMay)
       const thu = ds.map((m: any) => ({ m, bac: bacCungMay(m, { loai: u.loai, heDieuHanh: u.heDieuHanh, trinhDuyet: u.trinhDuyet, ct, ips: [ip] },
-        { khoaChung: !!goiY?.mayKhoa?.includes(m.id) }) })).filter((x) => x.bac);
+        { khoaChung: !!goiY?.mayKhoa?.includes(m.id), khoaDongBo: goiY?.khoaDongBo }) })).filter((x) => x.bac);
       const trung = thu.find((x) => x.bac === 'khoa') || thu.find((x) => x.bac === 'van-tay') || thu[0];
       if (trung) { co = { id: trung.m.id, ma: trung.m.ma }; bacGop = trung.bac!; }
     }

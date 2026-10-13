@@ -6,7 +6,7 @@ import { api } from '@/lib/api';
 import { layMaNguoiThat } from '@/lib/turnstile';
 import { useAuth, type AuthUser, laAdmin } from '@/lib/auth';
 import PasswordInput from '@/components/PasswordInput';
-import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, laHuy, chuanBiVanTay, batGoiYBanPhim, type TinhTrangVanTay } from '@/lib/vanTay';
+import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, laHuy, chuanBiVanTay, batGoiYBanPhim, tuTaoKhoa, type TinhTrangVanTay } from '@/lib/vanTay';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -63,6 +63,8 @@ export default function LoginPage() {
     try {
       const r = await api<{ token: string; user: AuthUser }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password, cfToken: await layMaNguoiThat() /* kiểm tra người thật — chống cào */ }) });
       login(r.token, r.user, remember);
+      // Vừa đăng nhập bằng mật khẩu: mật khẩu do máy tự điền thì máy tự tạo luôn khoá Face ID / vân tay (lib/vanTay.ts tuTaoKhoa)
+      void tuTaoKhoa(email);
       router.push(laAdmin(r.user) ? '/admin' : '/');
     } catch (e: any) { setErr(e.message || 'Đăng nhập thất bại'); } finally { setBusy(false); }
   }

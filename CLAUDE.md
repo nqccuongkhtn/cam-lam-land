@@ -984,7 +984,15 @@ Toàn bài vẫn nằm trong trang (Google đọc được, kéo khách), ngư�
   là iPhone cất THÊM khoá (đổi mật khẩu xong hiện 2 khoá cùng email). Cùng mã thì iPhone thay khoá cũ.
   (3) Đổi mật khẩu xoá khoá trên máy chủ nhưng iPhone vẫn giữ → nút gửi kèm danh sách khoá còn dùng được (`lib/maKhoaMay.ts`,
   cất ở máy khi đang đăng nhập) để iPhone không đưa khoá cũ ra; chọn phải khoá cũ thì máy chủ trả `maLoi: 'KHOA_DA_TAT'`.
-  Không có iPhone thật để thử → bài thử GIẢ LẬP trình duyệt cho phần điều phối nút ↔ gợi ý ↔ khoá cũ (19 mục, không đụng web thật):
+  (4) **Tự tạo khoá ngầm** (13/10/2026, chuẩn WebAuthn bản 3 "conditional create" — Apple "automatic passkey upgrades" iOS 18+,
+  Chrome 136+): ngay sau khi đăng nhập bằng mật khẩu TỰ ĐIỀN, `tuTaoKhoa` → `/passkey/tu-dong/*`. Máy chủ chỉ nới cờ "có mặt / đã
+  xác minh" cho thử thách loại `tu-dong`, cấp trong 5 phút sau lần đăng nhập mật khẩu từ CHÍNH máy đó, mỗi lần một lần.
+  (5) Mỗi khoá ghi NƠI CẤT (AAGUID → iCloud / Google / Windows Hello) + cờ **đồng bộ (BE)**: khoá đồng bộ nằm được trên nhiều máy và
+  CHIA SẺ được cho người khác (iOS 17) → sổ thiết bị coi là dấu hiệu yếu hơn khoá một máy ("một máy không ở hai nơi cùng lúc").
+  (6) Đang đăng nhập thì báo nơi cất khoá danh sách khoá còn hiệu lực (Signal API `baoNoiCatKhoa` — PHẢI đủ mọi khoá, thiếu là khoá
+  thật bị ẩn). Tệp chuẩn `/.well-known/passkey-endpoints` khai trong nginx.conf (ghi cứng tên miền — đổi tên miền thì sửa cùng
+  WEBAUTHN_RP_ID).
+  Không có iPhone thật để thử → bài thử GIẢ LẬP trình duyệt cho phần điều phối nút ↔ gợi ý ↔ khoá cũ ↔ tự tạo khoá (30 mục, không đụng web thật):
   `apps/backend/node_modules/.bin/tsx scripts/thu-van-tay.mts` — sửa `vanTay.ts` / `maKhoaMay.ts` thì chạy lại, phải "TẤT CẢ ĐẠT".
 - **Bật/tắt trang bảo trì** (chỉ ảnh hưởng tên miền thật, `localhost` vẫn vào được):
   `docker exec camlam_nginx touch /etc/nginx/maintenance.on` · tắt: `rm -f` đường dẫn đó.

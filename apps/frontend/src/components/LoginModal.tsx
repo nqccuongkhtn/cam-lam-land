@@ -6,7 +6,7 @@ import { layMaNguoiThat } from '@/lib/turnstile';
 import { useAuth, type AuthUser } from '@/lib/auth';
 import PasswordInput from './PasswordInput';
 import LogoAnh from '@/components/LogoAnh';
-import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, laHuy, chuanBiVanTay, batGoiYBanPhim, type TinhTrangVanTay } from '@/lib/vanTay';
+import { dangNhapVanTay, kiemTraVanTay, loiDeHieu, laHuy, chuanBiVanTay, batGoiYBanPhim, tuTaoKhoa, type TinhTrangVanTay } from '@/lib/vanTay';
 
 /**
  * Popup ĐĂNG NHẬP dùng chung — hiện đè lên trang (không rời trang).
@@ -87,8 +87,11 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
     try {
       const r = await api<{ token: string; user: AuthUser }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password, cfToken: await layMaNguoiThat() /* kiểm tra người thật — chống cào */ }) });
       login(r.token, r.user, remember);
+      const tenDaGo = email;
       setEmail(''); setPassword('');
       onSuccess();
+      // Vừa đăng nhập bằng mật khẩu: nếu mật khẩu do máy tự điền thì máy tự tạo luôn khoá Face ID / vân tay, không hỏi gì (lib/vanTay.ts)
+      void tuTaoKhoa(tenDaGo);
     } catch (e: any) { setErr(e?.message || 'Đăng nhập thất bại'); } finally { setBusy(false); }
   }
 

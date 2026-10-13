@@ -69,7 +69,27 @@ export async function dongBoMaKhoa(uid: number | string, epBuoc = false): Promis
     if (typeof window === 'undefined' || !(window as any).PublicKeyCredential) return;
     const u = doc()[String(uid)];
     if (!epBuoc && u && Date.now() - u.luc < HOI_LAI_MS) return;
-    const r = await api<{ ds: { cred_id?: string; transports?: string | null }[]; uid?: number }>('/passkey/danh-sach');
+    const r = await api<DsKhoa>('/passkey/danh-sach');
     nhoMaKhoa(r.uid ?? uid, r.ds || []);
+    baoNoiCatKhoa(r);
   } catch { /* chưa đăng nhập / mất mạng: lần sau hỏi lại */ }
+}
+
+/* ── BÁO CHO NƠI CẤT KHOÁ BIẾT KHOÁ NÀO CÒN HIỆU LỰC (chuẩn WebAuthn bản 3 "Signal API", 13/10/2026) ──
+ * iCloud / Google Password Manager… không tự biết máy chủ đã xoá khoá (đổi mật khẩu, bấm Gỡ) nên cứ đưa khoá cũ ra cho chọn — đúng
+ * chỗ từng sinh ra "hai khoá cùng email". Đang đăng nhập thì báo: tài khoản này (mã cố định maTk) chỉ còn các khoá X, Y → nơi cất khoá
+ * tự ẨN những khoá khác của tài khoản này (không xoá hẳn; khoá còn hiệu lực thì hiện lại). Kèm tên đăng nhập mới nhất.
+ * ⚠️ Danh sách phải ĐỦ mọi khoá còn hiệu lực của tài khoản (thiếu là khoá thật bị ẩn) — lấy nguyên từ máy chủ, không lọc.
+ * Máy chưa hỗ trợ (iOS 18, Chrome < 132…) thì bỏ qua. */
+type DsKhoa = { ds: { cred_id?: string; transports?: string | null }[]; uid?: number; maTk?: string | null; rpId?: string; email?: string | null; ten?: string | null };
+export function baoNoiCatKhoa(r: DsKhoa) {
+  try {
+    const P: any = typeof window !== 'undefined' ? (window as any).PublicKeyCredential : null;
+    if (!P || !r?.maTk || !r.rpId) return;
+    if (typeof P.signalAllAcceptedCredentials === 'function')
+      P.signalAllAcceptedCredentials({ rpId: r.rpId, userId: r.maTk,
+        allAcceptedCredentialIds: (r.ds || []).map((c) => c.cred_id).filter(Boolean) }).catch(() => {});
+    if (typeof P.signalCurrentUserDetails === 'function' && r.email)
+      P.signalCurrentUserDetails({ rpId: r.rpId, userId: r.maTk, name: r.email, displayName: r.ten || r.email }).catch(() => {});
+  } catch { /* máy chưa hỗ trợ */ }
 }

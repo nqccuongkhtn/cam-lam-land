@@ -42,6 +42,16 @@ export default function ThietBiPage() {
   const [ct, setCt] = useState<ChiTiet | null>(null);
   const [loi, setLoi] = useState('');
   const [tai, setTai] = useState(0);
+  // CÔNG TẮC TẮT NHANH việc tự tạo khoá Face ID sau đăng nhập mật khẩu (cờ tat_tu_tao_khoa — backend routes/passkey.ts mục 1b).
+  // Thấy khách phàn nàn / lỗi lạ thì bấm tắt ngay, không cần dựng lại web. null = chưa tải.
+  const [tatTuTao, setTatTuTao] = useState<boolean | null>(null);
+  useEffect(() => { api<{ flags: Record<string, boolean> }>('/flags').then((r) => setTatTuTao(!!r.flags?.tat_tu_tao_khoa)).catch(() => {}); }, [tai]);
+  const doiTuTao = async () => {
+    if (tatTuTao == null) return;
+    setDangLam(true);
+    try { await api('/flags', { method: 'POST', body: JSON.stringify({ key: 'tat_tu_tao_khoa', on: !tatTuTao }) }); setTai((n) => n + 1); }
+    catch (e: any) { alert(e?.message || 'Không đổi được'); } finally { setDangLam(false); }
+  };
   const [dangLam, setDangLam] = useState(false);
 
   useEffect(() => {
@@ -140,6 +150,19 @@ Hai dòng này là CÙNG MỘT MÁY — gộp xong chỉ còn một thiết bị
           </div>
           <button disabled={dangLam} onClick={batTat} className={`h-9 rounded-md px-4 text-[13px] font-bold text-white ${meta.batGioiHan ? 'bg-slate-600' : 'bg-emerald-600'} disabled:opacity-50`}>
             {meta.batGioiHan ? 'Tắt giới hạn' : 'Bật giới hạn'}
+          </button>
+        </div>
+      )}
+      {tatTuTao != null && (
+        <div className={`mt-2 flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3 ${tatTuTao ? 'border-amber-300 bg-amber-50' : 'border-emerald-300 bg-emerald-50'}`}>
+          <div className="text-[13px] leading-snug">
+            <b>Tự tạo khoá Face ID sau khi đăng nhập bằng mật khẩu: {tatTuTao ? 'ĐANG TẮT' : 'ĐANG BẬT'}</b><br />
+            {tatTuTao
+              ? <>Khách muốn dùng Face ID thì tự bật trong trang Tài khoản.</>
+              : <>Khách đăng nhập bằng mật khẩu do máy tự điền (iPhone iOS 18+, Chrome) thì máy tự lưu khoá, lần sau quét mặt là vào.</>}
+          </div>
+          <button disabled={dangLam} onClick={doiTuTao} className={`h-9 rounded-md px-4 text-[13px] font-bold text-white ${tatTuTao ? 'bg-emerald-600' : 'bg-slate-600'} disabled:opacity-50`}>
+            {tatTuTao ? 'Bật lại' : 'Tắt ngay'}
           </button>
         </div>
       )}

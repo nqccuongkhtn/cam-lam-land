@@ -72,9 +72,10 @@ export async function kiemTraVanTay(): Promise<TinhTrangVanTay> {
 }
 
 /** Đăng ký vân tay cho máy đang dùng (phải đang đăng nhập bằng mật khẩu trước). */
-export async function themVanTay(tenMay?: string): Promise<void> {
+export async function themVanTay(tenMay?: string, matKhau?: string): Promise<void> {
+  // Máy chủ đòi XÁC NHẬN (maLoi 'CAN_XAC_NHAN') khi lần đăng nhập trên máy này đã quá 10 phút → gửi kèm mật khẩu khách vừa gõ.
   const { khoa, options } = await api<{ khoa: string; options: any }>(
-    '/passkey/dang-ky/bat-dau', { method: 'POST', body: '{}' });
+    '/passkey/dang-ky/bat-dau', { method: 'POST', body: JSON.stringify(matKhau ? { matKhau } : {}) });
   const response = await startRegistration({ optionsJSON: options });
   await api('/passkey/dang-ky/xong', {
     method: 'POST',

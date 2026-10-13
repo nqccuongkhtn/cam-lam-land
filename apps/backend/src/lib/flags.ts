@@ -1,6 +1,8 @@
 import { query } from './db.ts';
 
-export const PUBLIC_FLAGS = ['services_live', 'gioi_han_thiet_bi'];   // gioi_han_thiet_bi: lib/thietBi.ts
+// gioi_han_thiet_bi: lib/thietBi.ts · tat_tu_tao_khoa: CÔNG TẮC TẮT NHANH việc tự tạo khoá Face ID sau đăng nhập mật khẩu
+// (routes/passkey.ts mục 1b) — bật cờ này = TẮT tự tạo (mặc định không có cờ = đang chạy).
+export const PUBLIC_FLAGS = ['services_live', 'gioi_han_thiet_bi', 'tat_tu_tao_khoa'];
 
 export async function isFlagOn(key: string): Promise<boolean> {
   try { const rows = await query('SELECT 1 FROM app_flags WHERE key=$1', [key]); return rows.length > 0; }

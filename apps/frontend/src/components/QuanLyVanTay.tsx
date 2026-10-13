@@ -9,6 +9,7 @@ import {
   type MayDaDangKy,
 } from '@/lib/vanTay';
 import { toast } from '@/lib/toast';
+import PasswordInput from './PasswordInput';
 
 const ngayVn = (s?: string | null) => {
   if (!s) return '—';
@@ -20,6 +21,11 @@ export default function QuanLyVanTay() {
   const [co, setCo] = useState(false);
   const [ds, setDs] = useState<MayDaDangKy[]>([]);
   const [busy, setBusy] = useState(false);
+  // Bật Face ID phải xác nhận lại (backend routes/passkey.ts daXacNhan): đăng nhập trên máy này quá 10 phút thì hiện ô mật khẩu NGAY
+  // TRONG KHUNG (không dùng hộp nổi), dòng báo lỗi giữ sẵn chỗ để không đẩy nút xuống.
+  const [canMk, setCanMk] = useState(false);
+  const [mk, setMk] = useState('');
+  const [loiMk, setLoiMk] = useState('');
   // Báo kết quả bằng hộp nổi đầu màn hình (lib/toast.tsx) như cả trang Tài khoản — chủ dự án 12/10/2026.
 
   const nap = useCallback(async () => {
@@ -29,12 +35,17 @@ export default function QuanLyVanTay() {
   useEffect(() => { mayCoVanTay().then(setCo).catch(() => {}); nap(); }, [nap]);
 
   async function them() {
-    setBusy(true);
+    if (canMk && !mk) { setLoiMk('Nhập mật khẩu tài khoản để xác nhận.'); return; }
+    setBusy(true); setLoiMk('');
     try {
-      await themVanTay(tenMayMacDinh());
+      await themVanTay(tenMayMacDinh(), canMk ? mk : undefined);
+      setCanMk(false); setMk('');
       toast.success('Lần sau đăng nhập bằng Face ID / vân tay, khỏi gõ mật khẩu.', 'Đã bật cho máy này');
       await nap();
-    } catch (e: any) { if (!laHuy(e)) toast.error(loiDeHieu(e), 'Chưa bật được'); } finally { setBusy(false); }   // tự tắt bảng thì im lặng
+    } catch (e: any) {
+      if (e?.maLoi === 'CAN_XAC_NHAN') { setCanMk(true); if (canMk) setLoiMk(e?.message || 'Mật khẩu không đúng.'); }
+      else if (!laHuy(e)) toast.error(loiDeHieu(e), 'Chưa bật được');                       // tự tắt bảng thì im lặng
+    } finally { setBusy(false); }
   }
 
   async function xoa(id: number, ten: string) {
@@ -86,9 +97,16 @@ export default function QuanLyVanTay() {
         </ul>
       )}
 
+      {canMk && (
+        <div className="mt-3">
+          <label className="mb-1 block text-[12.5px] font-semibold text-slate-700">Nhập mật khẩu tài khoản để xác nhận</label>
+          <PasswordInput value={mk} onChange={(e) => { setMk(e.target.value); setLoiMk(''); }} autoComplete="current-password" />
+          <p className="mt-1 min-h-[18px] text-[12.5px] font-semibold leading-[18px] text-red-600">{loiMk}</p>
+        </div>
+      )}
       <button onClick={them} disabled={!co || busy}
         className="cl-press mt-3 w-full rounded-lg bg-[#0A2540] py-2.5 font-bold text-white disabled:opacity-50">
-        {busy ? 'Đang chờ xác nhận trên máy…' : ds.length ? 'Bật thêm cho máy khác' : 'Bật cho máy này'}
+        {busy ? 'Đang chờ xác nhận trên máy…' : canMk ? 'Xác nhận và bật' : ds.length ? 'Bật thêm cho máy khác' : 'Bật cho máy này'}
       </button>
     </div>
   );

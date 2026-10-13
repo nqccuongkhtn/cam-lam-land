@@ -30,7 +30,8 @@ import {
   generateAuthenticationOptions, verifyAuthenticationResponse,
 } from '@simplewebauthn/server';
 import { query } from '../lib/db.ts';
-import { signToken, dsVaiTro } from '../lib/auth.ts';
+import { signToken, dsVaiTro, verifyPassword } from '../lib/auth.ts';
+import { isFlagOn } from '../lib/flags.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 
 export const passkeyRouter = Router();
@@ -161,9 +162,37 @@ const hoSo = (u: any) => ({
 });
 
 /* ══ 1. ĐĂNG KÝ vân tay cho máy này (phải đang đăng nhập) ══════════════════ */
+/* ⛔ BẬT FACE ID / VÂN TAY PHẢI XÁC NHẬN LẠI (13/10/2026 — rà soát rủi ro). Trước đây ai ĐANG đăng nhập là bật được ngay: kẻ lấy
+ * được phiên đăng nhập (không cần biết mật khẩu) gắn được khoá của máy hắn → vào được tới khi chủ đổi mật khẩu. Nay phải: vừa đăng
+ * nhập TỪ CHÍNH MÁY NÀY trong 10 phút, hoặc gõ lại MẬT KHẨU (sai 5 lần / 15 phút là tạm khoá việc này). */
+const saiMk = new Map<number, { n: number; tu: number }>();
+async function daXacNhan(req: AuthedRequest): Promise<{ ok: true } | { ok: false; ma: number; loi: string }> {
+  const me = req.user!;
+  const maMay = maThietBi(req);
+  if (maMay) {
+    const [vua] = await query(`SELECT 1 FROM thiet_bi_dang_nhap WHERE user_id=$1 AND ma=$2 AND ket_qua='ok'
+      AND luc > now() - interval '10 minutes'`, [me.id, maMay]);
+    if (vua) return { ok: true };
+  }
+  const mk = String(req.body?.matKhau || '');
+  if (!mk) return { ok: false, ma: 403, loi: 'Nhập mật khẩu tài khoản để xác nhận.' };
+  const s = saiMk.get(Number(me.id));
+  if (s && s.n >= 5 && Date.now() - s.tu < 15 * 60 * 1000) return { ok: false, ma: 429, loi: 'Sai mật khẩu nhiều lần. Thử lại sau 15 phút.' };
+  const [u] = await query('SELECT password_hash FROM users WHERE id=$1', [me.id]);
+  if (!u || !(await verifyPassword(mk, u.password_hash))) {
+    const c = s && Date.now() - s.tu < 15 * 60 * 1000 ? s : { n: 0, tu: Date.now() };
+    saiMk.set(Number(me.id), { n: c.n + 1, tu: c.tu });
+    return { ok: false, ma: 403, loi: 'Mật khẩu không đúng.' };
+  }
+  saiMk.delete(Number(me.id));
+  return { ok: true };
+}
+
 passkeyRouter.post('/dang-ky/bat-dau', authRequired, async (req: AuthedRequest, res, next) => {
   try {
     const me = req.user!;
+    const xn = await daXacNhan(req);
+    if (!xn.ok) return res.status(xn.ma).json({ error: xn.loi, maLoi: 'CAN_XAC_NHAN' });
     const da = await query('SELECT cred_id, transports FROM webauthn_credentials WHERE user_id=$1', [me.id]);
     const opts = await generateRegistrationOptions({
       rpName: RP_TEN,
@@ -226,6 +255,7 @@ const daXinTuTao = new Map<string, number>();     // "người:máy" → lúc đ
 passkeyRouter.post('/tu-dong/bat-dau', authRequired, async (req: AuthedRequest, res, next) => {
   try {
     const me = req.user!;
+    if (await isFlagOn('tat_tu_tao_khoa')) return res.status(409).json({ error: 'Tự tạo khoá đang tắt.' });   // công tắc ở trang quản trị
     const maMay = maThietBi(req);
     if (!maMay) return res.status(409).json({ error: 'Không nhận diện được máy.' });
     const [dn] = await query<any>(`SELECT luc FROM thiet_bi_dang_nhap WHERE user_id=$1 AND ma=$2 AND cach='mat-khau' AND ket_qua='ok'

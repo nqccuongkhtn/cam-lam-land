@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { toolIconSvg } from '@/lib/toolIcons';
 import { TIEN_ICH_TOOLS } from '@/lib/tienIchTools';
 import { runToolAction, locTheoQuyen } from '@/components/HubShell';
-import { SU_KIEN_THANH_RIENG } from '@/lib/thanhDuoiRieng';
+import { SU_KIEN_THANH_RIENG, SU_KIEN_MO_MENU_WEB } from '@/lib/thanhDuoiRieng';
 
 type Name = 'home' | 'find' | 'post' | 'map' | 'me' | 'tools';
 
@@ -82,6 +82,21 @@ export default function BottomNav() {
     window.addEventListener('message', tuKhung);
     return () => { window.removeEventListener(SU_KIEN_THANH_RIENG, tuTrang as EventListener); window.removeEventListener('message', tuKhung); };
   }, []);
+  // Đang nhường mà người dùng bấm "Menu chính" trên thanh của trang (moMenuWeb) → thanh này TRỒI LÊN TẠM, đè lên thanh của trang,
+  // phía sau có lớp mờ; chạm lớp mờ / chọn mục / đổi trang là trượt xuống lại. Khung Tiện ích KHÔNG co lại (thanh trang nằm yên).
+  const [moTam, setMoTam] = useState(false);
+  useEffect(() => {
+    const mo = () => setMoTam(true);
+    const tuKhung = (e: MessageEvent) => {
+      if (e.origin !== window.location.origin || e.data?.loai !== SU_KIEN_MO_MENU_WEB) return;
+      if (Array.from(document.querySelectorAll('iframe')).some((f) => f.contentWindow === e.source)) setMoTam(true);
+    };
+    window.addEventListener(SU_KIEN_MO_MENU_WEB, mo);
+    window.addEventListener('message', tuKhung);
+    return () => { window.removeEventListener(SU_KIEN_MO_MENU_WEB, mo); window.removeEventListener('message', tuKhung); };
+  }, []);
+  useEffect(() => { setMoTam(false); }, [path, nhuong]);
+  const an = nhuong ? !moTam : hidden;
   // Báo cho pill "Danh sách/Bản đồ" + bong bóng chat biết thanh dưới đang hiện/ẩn để tự canh vị trí (mượt).
   // Đang nhường: nút nổi vẫn nâng 56px (thanh của trang nằm đúng chỗ đó); khung Tiện ích chỉ chừa dải thanh vuốt iPhone ở đáy.
   useEffect(() => {
@@ -140,6 +155,11 @@ export default function BottomNav() {
           </div>
         </div>
       )}
+      {/* Lớp mờ khi thanh trồi lên tạm (trang có thanh riêng, bấm "Menu chính"): nằm TRÊN trang + khung Tiện ích (z-30), DƯỚI thanh này
+          (z-40) và thanh đầu trang (z-50). Chạm vào là thanh trượt xuống, trả lại thanh của trang. */}
+      {nhuong && moTam && (
+        <div className="md:hidden fixed inset-0 z-[35] bg-[#0A2540]/30 cl-sheet-fade" onClick={() => setMoTam(false)} aria-hidden="true" />
+      )}
       {/* Thanh dưới: nền trắng mờ + bóng nhẹ thay cho đường kẻ cứng; tab đang chọn có "viên thuốc" màu nhạt ôm icon
           (thay cho vạch đỏ trên đầu trước đây — nhìn thô). Nút "Đăng tin" là viên thuốc ĐỎ ĐẶC cùng khổ 28×44 với
           viên thuốc của tab đang chọn → ngang hàng, cân với 4 nút kia. (Đã thử nút tròn nổi lên 48px rồi 40px:
@@ -147,7 +167,7 @@ export default function BottomNav() {
           Chiều cao GIỮ 54px — biến --cl-hub-pb ở trên đang tính theo đúng số này.
           Lúc ẩn đẩy xuống dư 1.25rem cho chắc: hồi nút còn nổi, đẩy vừa đúng 100% thì nửa hình tròn đỏ
           còn lòi lên ở đáy màn hình (chủ dự án chụp màn hình bắt lỗi 28/9/2026). */}
-      <nav className={`md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-xl shadow-[0_-1px_0_rgba(15,23,42,0.06),0_-6px_20px_rgba(15,23,42,0.06)] transition-transform duration-200 ease-out ${hidden || nhuong ? 'translate-y-[calc(100%+1.25rem)]' : 'translate-y-0'}`} style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <nav className={`md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-xl shadow-[0_-1px_0_rgba(15,23,42,0.06),0_-6px_20px_rgba(15,23,42,0.06)] transition-transform duration-200 ease-out ${an ? 'translate-y-[calc(100%+1.25rem)]' : 'translate-y-0'}`} style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <ul className="flex items-stretch h-[54px] max-w-lg mx-auto px-1">
           {tabs.map((t) => {
             const noi = t.name === 'post'; // nút giữa nổi lên
@@ -166,7 +186,7 @@ export default function BottomNav() {
             return (
               <li key={t.label} className="flex-1">
                 {t.sheet
-                  ? <button type="button" onClick={() => setToolsOpen((o) => !o)} aria-label={t.label} aria-expanded={toolsOpen} className={cls}>{inner}</button>
+                  ? <button type="button" onClick={() => { setMoTam(false); setToolsOpen((o) => !o); }} aria-label={t.label} aria-expanded={toolsOpen} className={cls}>{inner}</button>
                   : <Link href={t.href!} aria-label={t.label} aria-current={t.on ? 'page' : undefined} className={cls}>{inner}</Link>}
               </li>
             );

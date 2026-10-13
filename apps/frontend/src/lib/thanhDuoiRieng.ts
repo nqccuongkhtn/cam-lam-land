@@ -12,6 +12,17 @@ import { useEffect } from 'react';
      cụ / tải lại khung, nên khung có bị gỡ đột ngột (không kịp báo) thì thanh menu web vẫn hiện lại đúng.
    `bat` = trang đang THẬT SỰ vẽ thanh của nó (vd chưa có quyền xem thì không có thanh → không bắt web nhường). */
 export const SU_KIEN_THANH_RIENG = 'cl-thanh-duoi-rieng';
+export const SU_KIEN_MO_MENU_WEB = 'cl-mo-menu-web';
+
+/** Nút "Menu chính" trên thanh riêng của trang (chủ dự án hỏi 13/10/2026: menu web nhường chỗ rồi thì đi Trang chủ / Nhà đất /
+ *  Bản đồ / Tiện ích bằng gì?) → gọi thanh menu web TRỒI LÊN TẠM, đè lên thanh của trang; chạm ra ngoài là trượt xuống lại.
+ *  Báo cả cửa sổ này (mở thẳng trang) lẫn trang mẹ (trong khung Tiện ích) — bên nào có thanh menu đang hiện thì bên đó nhận. */
+export function moMenuWeb() {
+  window.dispatchEvent(new CustomEvent(SU_KIEN_MO_MENU_WEB));
+  if (window.parent !== window) {
+    try { window.parent.postMessage({ loai: SU_KIEN_MO_MENU_WEB }, window.location.origin); } catch { /* */ }
+  }
+}
 
 export function useThanhDuoiRieng(bat = true) {
   useEffect(() => {

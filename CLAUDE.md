@@ -333,11 +333,17 @@ Cột `so_thua` + khung bao của xã 2 cấp trong `dia_chinh_xa` cũng tính t
 Hệ quả: tra theo xã mới hay ra **nhiều thửa trùng số tờ/số thửa** (mỗi xã cũ có bộ số riêng) → giao diện
 có bảng "Tìm thấy N thửa trùng số" cho người dùng chọn, mỗi dòng ghi rõ xã cũ để phân biệt.
 
-**6 xã bị CHIA** cho nhiều xã mới (văn bản chỉ ghi "một phần diện tích", không có ranh giới):
-`Cam Hòa`, `Cam Hiệp Bắc`, `Cam Hiệp Nam`, `Cam An Nam`, `Suối Tân`, `phường Đông Hải` (Ninh Thuận).
-Với 6 xã này phải xét **TỪNG THỬA**: thửa gần thửa của xã mới nào nhất thì thuộc xã đó, và **chỉ so với
+**8 xã bị CHIA** cho nhiều xã mới (văn bản chỉ ghi "một phần diện tích", không có ranh giới):
+`Cam Hòa`, `Cam Hiệp Bắc`, `Cam Hiệp Nam`, `Cam An Nam`, `Suối Tân`, `phường Đông Hải` (Ninh Thuận) — và
+(phát hiện 13/10/2026 khi chép nguyên văn NQ 1667) **`Cam Tân`** (→ Cam Lâm, Suối Dầu, Cam Hiệp) + **`Cam An Bắc`** (→ Cam Lâm,
+Cam An). Hai xã sau là ĐƠN VỊ GỐC (Cam Hiệp / Cam An kế thừa mã) nên trước bị coi là xã mới nguyên vẹn → 1.928 thửa trên tờ bị
+ranh cắt gán sai, đã chia lại bằng `scripts/dia-chinh/chia-thua-to-bi-cat.sql` (giá trị cũ lưu ở `dia_chinh_xa_moi_sao_luu`).
+**Nạp lại dữ liệu địa chính thì chạy lại file SQL đó sau `nap-bang-so-to.mjs`.**
+Với các xã này phải xét **TỪNG THỬA**: thửa gần thửa của xã mới nào nhất thì thuộc xã đó, và **chỉ so với
 danh sách xã mới được phép** (khai trong `bi_chia`) nên không gán nhảy lung tung. Đây là **ước lượng
 theo vị trí**, không phải theo văn bản — chỗ duy nhất trong hệ thống không có căn cứ pháp lý tuyệt đối.
+Nguyên văn NQ 1667 cho cả 65 xã mới (205 dòng "xã cũ nhập vào", toàn bộ / một phần) nằm ở `scripts/dia-chinh/nq1667.json`
+(chép từ Công báo số 803+804 ngày 24/6/2025) — **nguồn chuẩn hơn `xa-moi.json`**, đối chiếu ở đây trước khi sửa ánh xạ.
 
 Kết quả lưu ở cột `dia_chinh.xa_moi_id` (từng thửa) và `dia_chinh_xa.xa_moi_id` (từng xã).
 `GET /api/parcels/at` trả về `xa` = đơn vị **hiện hành**, `xaCu` + `huyenCu` = tên **trước sáp nhập**;
@@ -925,6 +931,14 @@ Toàn bài vẫn nằm trong trang (Google đọc được, kéo khách), ngư�
   máy chủ dữ liệu chưa chạy). `lib/seoLanding.ts` có thêm 4 trang xã MỚI (`xa-cam-lam`, `suoi-dau`, `cam-hiep`,
   `cam-an`); hướng/toạ độ các xã đo lại từ bảng `dia_chinh` (bản cũ ghi Suối Cát/Suối Tân ở phía nam — sai).
   `WARD_EXPAND` (routes/listings.ts) sửa đúng theo NQ 1667.
+- **TRANG ĐỊA DANH `/ban-do` (13/10/2026, "SEO theo địa danh học từ qhviet.com")**: 1 trang tổng + 65 xã/phường MỚI + 189 xã
+  CŨ + 16 huyện CŨ, nối hai chiều tên trước ↔ sau sáp nhập (xã cũ năm 2024 bắc cầu qua NQ 1196/1198), bảng đánh số lại tờ, nút
+  `/map?xa=<mã>` (trang bản đồ tự chọn xã + bay vừa khung; mã `g…` = đơn vị gốc), hỏi đáp + BreadcrumbList/AdministrativeArea/FAQPage.
+  Dữ liệu TĨNH `src/data/diaDanh.json` sinh bằng `node scripts/dia-chinh/dung-dia-danh.mjs` (danh mục Sở + `nq1667.json` + cơ sở dữ
+  liệu) — **KHÔNG có số thửa** (thông tin nội bộ). qhviet làm mọi trang cùng nội dung + giấu chữ/link ngoài màn hình (Google phạt) —
+  ĐỪNG bắt chước kiểu đó; mỗi trang phải có nội dung riêng thật.
+- **Trang công cụ `/chuyen-doi-toa-do-vn2000`** (13/10/2026): đổi toạ độ sổ đỏ VN-2000 ↔ WGS84 chạy NGAY trên trang (không cần đăng
+  nhập — khác các công cụ Tiện ích), dán cả bảng, tự tính diện tích; tiêu đề nhắm cụm "chuyển tọa độ VN2000 sang WGS84".
 
 - **IP thật của khách:** tunnel nằm trong mạng riêng `duong_ham` với địa chỉ CỐ ĐỊNH `172.31.253.2`
   (`docker-compose.tunnel.yml`); nginx chỉ tin `CF-Connecting-IP` từ đúng địa chỉ đó (`set_real_ip_from`)

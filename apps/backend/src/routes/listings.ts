@@ -72,9 +72,11 @@ const TYPE_SLUG: Record<string, string> = {
 // (xã cũ bị tách sang nhiều xã mới nên đây là khớp GẦN ĐÚNG, chấp nhận được cho bộ lọc). Key = tên mới đã bỏ dấu.
 // 30/9/2026: sửa lại ĐÚNG theo NQ 1667 (scripts/dia-chinh/xa-moi.json) — bản trước xếp nhầm Cam Tân, Sơn Tân,
 // Cam An Bắc vào xã Cam Lâm và Cam Tân, Sơn Tân vào Suối Dầu; thiếu Suối Tân ở Cam Lâm / Cam Hiệp.
+// 13/10/2026: đối chiếu NGUYÊN VĂN NQ 1667 (scripts/dia-chinh/nq1667.json, Công báo 803+804): xã Cam Tân bị chia cho Cam Lâm,
+// Suối Dầu, Cam Hiệp; xã Cam An Bắc chia cho Cam Lâm, Cam An (xa-moi.json từng sót hai xã này) → bổ sung vào Cam Lâm / Suối Dầu.
 const WARD_EXPAND: Record<string, string[]> = {
-  'cam lam': ['Cam Lâm', 'Cam Đức', 'Cam Hải Đông', 'Cam Hải Tây', 'Cam Thành Bắc', 'Cam Hòa', 'Cam Hiệp Bắc', 'Cam Hiệp Nam', 'Cam An Nam', 'Suối Tân'],
-  'suoi dau': ['Suối Dầu', 'Suối Cát', 'Cam Hòa', 'Suối Tân'],
+  'cam lam': ['Cam Lâm', 'Cam Đức', 'Cam Hải Đông', 'Cam Hải Tây', 'Cam Thành Bắc', 'Cam Hòa', 'Cam Hiệp Bắc', 'Cam Hiệp Nam', 'Cam Tân', 'Cam An Bắc', 'Cam An Nam', 'Suối Tân'],
+  'suoi dau': ['Suối Dầu', 'Suối Cát', 'Cam Hòa', 'Cam Tân', 'Suối Tân'],
   'cam hiep': ['Cam Hiệp', 'Cam Tân', 'Sơn Tân', 'Cam Hòa', 'Cam Hiệp Bắc', 'Cam Hiệp Nam', 'Suối Tân'],
   'cam an': ['Cam An', 'Cam An Bắc', 'Cam Phước Tây', 'Cam An Nam'],
 };

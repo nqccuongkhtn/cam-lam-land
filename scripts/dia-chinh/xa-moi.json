@@ -102,8 +102,13 @@
       "Sáu xã CŨ bị CẮT RA chia cho nhiều xã mới (văn bản ghi rõ 'một phần diện tích').",
       "Không thể gán cả xã vào một xã mới → phải xét TỪNG THỬA một:",
       "thửa nằm gần thửa của xã mới nào nhất thì thuộc xã mới đó.",
-      "Chỉ so với các xã mới ĐƯỢC PHÉP (liệt kê dưới đây) nên không thể nhảy lung tung."
+      "Chỉ so với các xã mới ĐƯỢC PHÉP (liệt kê dưới đây) nên không thể nhảy lung tung.",
+      "13/10/2026: thêm 22435 (xã Cam Tân) và 22465 (xã Cam An Bắc) — NQ 1667 khoản 18–21 ghi hai xã này cũng chỉ nhập MỘT PHẦN.",
+      "Hai mã này vẫn là mã KẾ THỪA của Xã Cam Hiệp / Xã Cam An (giữ trong cap2). Thửa trên tờ bị ranh cắt chia bằng",
+      "scripts/dia-chinh/chia-thua-to-bi-cat.sql — nạp lại dữ liệu địa chính thì chạy lại file đó sau nap-bang-so-to.mjs."
     ],
+    "22435": ["22435", "22453", "22708"],
+    "22465": ["22453", "22465"],
     "22438": ["22453", "22708", "22435"],
     "22450": ["22453", "22435"],
     "22456": ["22453", "22435"],

@@ -997,7 +997,16 @@ export default function MapPage() {
     const x2 = dsXa.cap2.find((y) => y.xaId === ma);
     const x = x2 || dsXa.cap3.find((y) => y.xaId === ma);
     if (!x) return;
-    setCap(x2 ? '2' : '3'); setC3(ma); setHuyenChon(x.huyen); bayToiXa(x);
+    setCap(x2 ? '2' : '3'); setC3(ma); setHuyenChon(x.huyen);
+    // Danh mục xã về TRƯỚC khi bản đồ dựng xong → lệnh "vừa khung" gửi sớm bị MapView bỏ qua (nó chỉ nhận khi đã có bản đồ),
+    // rồi bước tự khớp khung vùng quy hoạch lúc mở còn ghi đè. Chờ bản đồ tải xong (__banDo.loaded) mới bay — không đụng lõi bản đồ.
+    let lan = 0;
+    const cho = () => {
+      const bd = (window as any).__banDo;
+      if (bd && typeof bd.loaded === 'function' && bd.loaded()) { setTimeout(() => bayToiXa(x), 300); return; }
+      if (++lan < 80) setTimeout(cho, 250);
+    };
+    cho();
   }, [dsXa, bayToiXa]);
 
   // ── TỰ CHỌN ĐỊA GIỚI THEO CHỖ ĐANG XEM (chủ dự án 11/10/2026) ──

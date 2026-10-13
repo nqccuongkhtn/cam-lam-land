@@ -785,6 +785,12 @@ export async function migrate(): Promise<void> {
   await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS passkey_uid text`)
     .catch((e: any) => console.error('[migrate] users.passkey_uid lỗi:', e?.message || e));
 
+  // ── GỘP CÁC LẦN ĐĂNG NHẬP TRÊN CÙNG MỘT MÁY (13/10/2026 — lib/thietBi.ts laCungMay) ──
+  //   ma_phu: mã của các cửa sổ ẩn danh / hồ sơ / trình duyệt KHÁC trên cùng máy đó (mỗi cái tự sinh mã riêng), đã gộp vào dòng
+  //   máy này thay vì thành "máy mới". Chủ dự án: "tôi chỉ đăng nhập 2 máy mà" — sổ ghi 3/3 vì một máy mở thêm một cửa sổ khác.
+  await pool.query(`ALTER TABLE thiet_bi ADD COLUMN IF NOT EXISTS ma_phu text[] NOT NULL DEFAULT '{}'`)
+    .catch((e: any) => console.error('[migrate] thiet_bi.ma_phu lỗi:', e?.message || e));
+
   // ── TỆP RIÊNG trong kho ảnh /api/images (11/10/2026 — rà soát bảo mật) ──
   // Công văn đính kèm DANH SÁCH NÓNG (tên, CCCD, địa chỉ người dân) nằm chung kho với ảnh tin rao công khai, số tệp tăng
   // dần nên ai cũng đoán được link. rieng = true → chỉ mở bằng link có chữ ký (lib/kyTep.ts, routes/images.ts, hotlist.ts).

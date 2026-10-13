@@ -12,10 +12,15 @@
 //   2. GIỚI HẠN — chỉ chạy khi cờ `gioi_han_thiet_bi` bật (trang quản trị). Máy MỚI thứ (giới hạn + 1) bị chặn đăng
 //      nhập; thẻ đăng nhập gắn với mã máy nên chép thẻ sang máy khác không dùng được; admin gỡ máy là máy đó bị
 //      đăng xuất ngay. Admin / tài khoản quản trị không bị giới hạn.
-// Mã máy chỉ là số ngẫu nhiên, KHÔNG phải vân tay trình duyệt: khách xoá dữ liệu trình duyệt thì thành "máy mới" và
-// chiếm thêm một chỗ — đúng ý (muốn thêm chỗ thì liên hệ admin).
+// Mã máy là số ngẫu nhiên MỖI TRÌNH DUYỆT tự sinh (web không đọc được số máy thật: số sê-ri, MAC, IMEI — trình duyệt chặn).
+// ⚠️ GỘP CÙNG MÁY (13/10/2026 — chủ dự án: "tôi chỉ đăng nhập 2 máy mà nhỉ", sổ ghi 3/3; hỏi "kiểm tra dựa vào mã phần cứng
+// được không"): cửa sổ ẩn danh, hồ sơ trình duyệt khác, trình duyệt khác, xoá dữ liệu trình duyệt… đều sinh MÃ MỚI → một máy bị
+// đếm thành nhiều máy. Nay mã lạ mà PHẦN CỨNG giống hệt một máy đã có (loại máy, hệ điều hành, màn hình, số nhân CPU, RAM,
+// cảm ứng, múi giờ, tên card đồ hoạ…) VÀ cùng mạng (cùng IP; IPv6 cùng 64 bit đầu) thì gộp vào máy đó (cột ma_phu), không
+// chiếm thêm chỗ. Bắt buộc cùng mạng vì phần cứng của hai máy cùng đời (hai iPhone cùng loại) giống hệt nhau — bỏ điều kiện
+// này thì người ở nơi khác dùng máy cùng loại cũng bị gộp, giới hạn 3 máy mất tác dụng. Xem laCungMay.
 import type { Request } from 'express';
-import { query } from './db.ts';
+import { query, pool } from './db.ts';
 import { isFlagOn } from './flags.ts';
 import { laAdmin, verifyToken } from './auth.ts';
 
@@ -77,10 +82,53 @@ function chiTietTuMay(req: Request): Record<string, unknown> {
     if (!raw || raw.length > 2000) return {};
     const o = JSON.parse(decodeURIComponent(raw));
     const giu: Record<string, unknown> = {};
-    for (const k of ['manHinh', 'tiLe', 'muiGio', 'ngonNgu', 'nhanCpu', 'ram', 'cham', 'model', 'nenTang', 'banNenTang'])
+    for (const k of ['manHinh', 'tiLe', 'muiGio', 'ngonNgu', 'nhanCpu', 'ram', 'cham', 'model', 'nenTang', 'banNenTang', 'gpu'])
       if (o[k] != null && String(o[k]).length < 120) giu[k] = o[k];
     return giu;
   } catch { return {}; }
+}
+
+/* ── CÙNG MỘT MÁY? (xem chú thích đầu file) ──
+ * Thông số PHẦN CỨNG mọi cửa sổ / trình duyệt trên cùng máy đều thấy như nhau. Không so: tỉ lệ điểm ảnh (đổi theo mức phóng to
+ * trang), ngôn ngữ (mỗi trình duyệt cài một kiểu). Thông số chỉ một bên có (RAM, tên card đồ hoạ — Safari / Firefox không cho
+ * đọc) thì bỏ qua, nhưng màn hình + số nhân CPU + múi giờ thì hai bên PHẢI có đủ, thiếu là không gộp (thà tách nhầm còn hơn
+ * gộp nhầm hai máy). */
+const PHAN_CUNG = ['manHinh', 'nhanCpu', 'ram', 'cham', 'muiGio', 'nenTang', 'banNenTang', 'model', 'gpu'] as const;
+const BAT_BUOC = ['manHinh', 'nhanCpu', 'muiGio'] as const;
+/** Mạng của một địa chỉ IP: IPv4 lấy nguyên địa chỉ, IPv6 lấy 64 bit đầu (một nhà mạng cấp cả dải cho một thuê bao). */
+function mangCua(ip: string | null | undefined): string {
+  const s = String(ip || '').trim().toLowerCase();
+  if (!s) return '';
+  if (s.includes(':')) {
+    const nhom = s.split('::')[0].split(':');                   // dạng rút gọn "a:b::c" — 64 bit đầu luôn nằm ở phần trước "::"
+    return nhom.length >= 4 ? nhom.slice(0, 4).join(':') : s;
+  }
+  return s;
+}
+type MayCu = { loai: string | null; he_dieu_hanh: string | null; chi_tiet: any; ip_dau?: string | null; ip_cuoi?: string | null; ip_dn_cuoi?: string | null };
+export function laCungMay(cu: MayCu, moi: { loai: string; heDieuHanh: string; ct: Record<string, any>; ips: (string | null | undefined)[] }): boolean {
+  if (!cu || cu.loai !== moi.loai || cu.he_dieu_hanh !== moi.heDieuHanh) return false;
+  const a = cu.chi_tiet || {}, b = moi.ct || {};
+  for (const k of BAT_BUOC) if (a[k] == null || b[k] == null || a[k] === '' || b[k] === '') return false;
+  for (const k of PHAN_CUNG) if (a[k] != null && b[k] != null && String(a[k]) !== String(b[k])) return false;
+  const mangCu = new Set([cu.ip_dau, cu.ip_cuoi, cu.ip_dn_cuoi].map(mangCua).filter(Boolean));
+  return moi.ips.map(mangCua).some((m) => m && mangCu.has(m));
+}
+
+/** Đăng nhập bằng mã PHỤ (cửa sổ / trình duyệt khác trên máy đã có): ghi thêm mã vào máy đó + số lần, lần cuối, IP. */
+async function ghiMaPhu(mayId: number, ma: string, ten: string, ip: string, qg: string | null) {
+  await query(
+    `UPDATE thiet_bi SET
+       ma_phu = CASE WHEN $2 = ANY(ma_phu) THEN ma_phu
+                     WHEN cardinality(ma_phu) >= 30 THEN ma_phu[cardinality(ma_phu) - 28:cardinality(ma_phu)] || $2::text
+                     ELSE ma_phu || $2::text END,
+       chi_tiet = jsonb_set(chi_tiet, '{phu}', coalesce(chi_tiet->'phu', '{}'::jsonb) || jsonb_build_object($2::text, jsonb_build_object(
+         'ten', $3::text, 'lanDau', coalesce(chi_tiet #>> ARRAY['phu', $2::text, 'lanDau'], to_char(now() AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')),
+         'lanCuoi', to_char(now() AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+         'soLan', coalesce((chi_tiet #>> ARRAY['phu', $2::text, 'soLan'])::int, 0) + 1))),
+       lan_cuoi = now(), so_lan_dang_nhap = so_lan_dang_nhap + 1, dn_cuoi = now(), ip_cuoi = $4, ip_dn_cuoi = $4,
+       quoc_gia = COALESCE($5, quoc_gia)
+     WHERE id = $1`, [mayId, ma, ten, ip, qg]);
 }
 
 async function gioiHanCua(userId: number): Promise<number> {
@@ -108,7 +156,24 @@ export async function ghiDangNhap(user: { id: number; role?: string; roles?: str
     if (batGioiHan && !ma && !khongGioiHan)   // trình duyệt quá cũ / tắt lưu trữ → không nhận diện được máy thì không cho vào
       return { ok: false, loi: 'Trình duyệt này không lưu được dữ liệu nên không nhận diện được thiết bị. Vui lòng bật lưu dữ liệu trang web (không dùng chế độ ẩn danh) rồi thử lại.' };
     if (!ma) return { ok: true, ma: null };
-    const [co] = await query<{ id: number }>('SELECT id FROM thiet_bi WHERE user_id=$1 AND ma=$2', [user.id, ma]);
+    const ct = chiTietTuMay(req);
+    // Mã đã có trong sổ: là mã CHÍNH của một máy, hoặc mã PHỤ (cửa sổ / trình duyệt khác đã gộp vào máy đó)
+    let [co] = await query<{ id: number; ma: string }>(
+      'SELECT id, ma FROM thiet_bi WHERE user_id=$1 AND (ma=$2 OR $2 = ANY(ma_phu))', [user.id, ma]);
+    if (!co) {
+      // Mã lạ mà phần cứng + mạng giống hệt một máy đã có → CÙNG MÁY (cửa sổ ẩn danh, hồ sơ / trình duyệt khác…) → gộp,
+      // không tính là máy mới, không bị chặn vì giới hạn (xem laCungMay)
+      const ds = await query<any>(`SELECT id, ma, loai, he_dieu_hanh, chi_tiet, ip_dau, ip_cuoi, ip_dn_cuoi FROM thiet_bi
+        WHERE user_id=$1 ORDER BY lan_dau`, [user.id]);
+      const trung = ds.find((m: any) => laCungMay(m, { loai: u.loai, heDieuHanh: u.heDieuHanh, ct, ips: [ip] }));
+      if (trung) co = { id: trung.id, ma: trung.ma };
+    }
+    if (co && co.ma !== ma) {
+      await ghiMaPhu(co.id, ma, u.ten, ip, qg);
+      await ghiLanCuoi(user.id, co.id, ma, ip, qg, u.ten, ua, cach, 'ok');
+      quenMay(user.id, ma);
+      return { ok: true, ma };
+    }
     if (!co && batGioiHan && !khongGioiHan) {
       const toiDa = await gioiHanCua(user.id);
       const [{ n }] = await query<{ n: number }>('SELECT count(*)::int n FROM thiet_bi WHERE user_id=$1', [user.id]);
@@ -117,7 +182,6 @@ export async function ghiDangNhap(user: { id: number; role?: string; roles?: str
         return { ok: false, loi: loiQuaGioiHan(toiDa) };
       }
     }
-    const ct = chiTietTuMay(req);
     const [tb] = await query<{ id: number }>(
       `INSERT INTO thiet_bi (user_id, ma, ten, loai, he_dieu_hanh, trinh_duyet, ua, chi_tiet, ip_dau, ip_cuoi, quoc_gia, so_lan_dang_nhap)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$9,$10,1)
@@ -135,6 +199,54 @@ export async function ghiDangNhap(user: { id: number; role?: string; roles?: str
     console.error('[thiet-bi] ghi đăng nhập lỗi:', e?.message || e);
     return { ok: true, ma };
   }
+}
+
+/**
+ * GỘP MÁY TRÙNG ĐÃ NẰM SẴN TRONG SỔ (chạy lúc máy chủ khởi động; chạy lại vô hại — gộp xong thì không còn gì để gộp).
+ * Dòng máy nào laCungMay với một dòng CÓ TRƯỚC của cùng tài khoản → dồn vào dòng có trước: mã thành mã phụ (kèm tên trình
+ * duyệt, lần đầu, lần cuối, số lần — giữ làm bằng chứng ở chi_tiet.phu), cộng số lần đăng nhập, lấy mốc sớm / muộn nhất,
+ * chuyển tra cứu + lần đăng nhập cuối sang dòng đó, rồi xoá dòng trùng. Mỗi lần gộp là một giao dịch riêng.
+ */
+export async function gopMayTrungCu(): Promise<number> {
+  const ds = await query<any>(`SELECT id, user_id, ma, ma_phu, ten, loai, he_dieu_hanh, chi_tiet, ip_dau, ip_cuoi, ip_dn_cuoi,
+      lan_dau, lan_cuoi, so_lan_dang_nhap, dn_cuoi FROM thiet_bi
+    WHERE user_id IN (SELECT user_id FROM thiet_bi GROUP BY user_id HAVING count(*) > 1)
+    ORDER BY user_id, lan_dau, id`);
+  const theoUser = new Map<number, any[]>();
+  for (const r of ds) theoUser.set(r.user_id, [...(theoUser.get(r.user_id) || []), r]);
+  let soGop = 0;
+  for (const [userId, may] of theoUser) {
+    const giu: any[] = [];
+    for (const r of may) {
+      const chinh = giu.find((p) => laCungMay(p, { loai: r.loai, heDieuHanh: r.he_dieu_hanh, ct: r.chi_tiet,
+        ips: [r.ip_dau, r.ip_cuoi, r.ip_dn_cuoi] }));
+      if (!chinh) { giu.push(r); continue; }
+      const phu = { ...(r.chi_tiet?.phu || {}), [r.ma]: { ten: r.ten, lanDau: r.lan_dau, lanCuoi: r.lan_cuoi, soLan: r.so_lan_dang_nhap } };
+      const c = await pool.connect();
+      try {
+        await c.query('BEGIN');
+        await c.query(`UPDATE thiet_bi SET
+            ma_phu = (SELECT array_agg(DISTINCT x) FROM unnest(ma_phu || $2::text[]) x),
+            chi_tiet = jsonb_set(chi_tiet, '{phu}', coalesce(chi_tiet->'phu', '{}'::jsonb) || $3::jsonb),
+            ip_cuoi = CASE WHEN $5::timestamptz > lan_cuoi THEN $6 ELSE ip_cuoi END,
+            lan_dau = least(lan_dau, $4::timestamptz), lan_cuoi = greatest(lan_cuoi, $5::timestamptz),
+            so_lan_dang_nhap = so_lan_dang_nhap + $7, dn_cuoi = greatest(dn_cuoi, $8::timestamptz)
+          WHERE id = $1`,
+          [chinh.id, [r.ma, ...(r.ma_phu || [])], JSON.stringify(phu), r.lan_dau, r.lan_cuoi, r.ip_cuoi, r.so_lan_dang_nhap || 0, r.dn_cuoi]);
+        await c.query('UPDATE tra_cuu_gan_day SET thiet_bi_id=$1 WHERE thiet_bi_id=$2', [chinh.id, r.id]);
+        await c.query('UPDATE thiet_bi_dang_nhap SET thiet_bi_id=$1 WHERE thiet_bi_id=$2', [chinh.id, r.id]);
+        await c.query('DELETE FROM thiet_bi WHERE id=$1', [r.id]);
+        await c.query('COMMIT');
+        soGop++;
+        console.log(`[thiet-bi] gộp máy trùng: tài khoản ${userId} — máy #${r.id} (${r.ten}) vào máy #${chinh.id}: cùng phần cứng, cùng mạng`);
+      } catch (e: any) {
+        await c.query('ROLLBACK').catch(() => {});
+        console.error('[thiet-bi] gộp máy trùng lỗi:', e?.message || e);
+      } finally { c.release(); }
+    }
+  }
+  if (soGop) nhoMay.clear();
+  return soGop;
 }
 
 /** Ghi ĐÈ lần đăng nhập cuối của tài khoản (1 dòng / tài khoản). */
@@ -171,7 +283,7 @@ export async function kiemMoiYeuCau(payload: { id: number; role?: string; roles?
     let id: number | null = null;
     try {
       const m = payload.tb || ma;
-      if (m) { const [r] = await query<{ id: number }>('SELECT id FROM thiet_bi WHERE user_id=$1 AND ma=$2', [payload.id, m]); id = r?.id ?? null; }
+      if (m) { const [r] = await query<{ id: number }>('SELECT id FROM thiet_bi WHERE user_id=$1 AND (ma=$2 OR $2 = ANY(ma_phu))', [payload.id, m]); id = r?.id ?? null; }
     } catch { return null; }
     nho = { con: id != null, id, luc: Date.now() }; nhoMay.set(khoa, nho);
     if (nhoMay.size > 5000) nhoMay.clear();
@@ -231,7 +343,7 @@ export function ghiTraCuu(req: Request, res: any, next: () => void) {
     const p = verifyToken(h.slice(7)); if (!p) return;
     const userId = Number(p.id); const ma = p.tb || maThietBi(req);
     try {
-      const [tb] = ma ? await query<{ id: number }>('SELECT id FROM thiet_bi WHERE user_id=$1 AND ma=$2', [userId, ma]) : [];
+      const [tb] = ma ? await query<{ id: number }>('SELECT id FROM thiet_bi WHERE user_id=$1 AND (ma=$2 OR $2 = ANY(ma_phu))', [userId, ma]) : [];
       await query('INSERT INTO tra_cuu_gan_day (user_id, thiet_bi_id, ip, viec, mo_ta) VALUES ($1,$2,$3,$4,$5)',
         [userId, tb?.id ?? null, ipCua(req), loai[1], await moTaTraCuu(duong)]);
       await query(`DELETE FROM tra_cuu_gan_day WHERE user_id=$1 AND id NOT IN

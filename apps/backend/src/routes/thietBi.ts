@@ -14,7 +14,7 @@ const MAY_COT = `id, ten, loai, he_dieu_hanh "heDieuHanh", trinh_duyet "trinhDuy
   quoc_gia "quocGia", lan_dau "lanDau", lan_cuoi "lanCuoi", so_lan_dang_nhap "soLanDangNhap", dn_cuoi "dnCuoi", ip_dn_cuoi "ipDnCuoi"`;
 
 async function dsMay(userId: number) {
-  const may = await query<any>(`SELECT ${MAY_COT}, ma, ua FROM thiet_bi t WHERE user_id=$1 ORDER BY lan_dau`, [userId]);
+  const may = await query<any>(`SELECT ${MAY_COT}, ma, ma_phu "maPhu", ua FROM thiet_bi t WHERE user_id=$1 ORDER BY lan_dau`, [userId]);
   return may;
 }
 
@@ -23,7 +23,12 @@ thietBiRouter.get('/cua-toi', authRequired, async (req: AuthedRequest, res, next
   try {
     const [u] = await query<any>('SELECT thiet_bi_toi_da FROM users WHERE id=$1', [req.user!.id]);
     const ma = maThietBi(req);
-    const may = (await dsMay(req.user!.id)).map(({ ma: m, ua, ...o }: any) => ({ ...o, mayNay: m === ma }));
+    // "Máy này": mã của trình duyệt đang xem là mã chính HOẶC mã phụ của máy đó (cửa sổ / trình duyệt khác cùng máy — lib/thietBi.ts).
+    // Không gửi mã máy + danh sách mã phụ xuống trình duyệt người dùng.
+    const may = (await dsMay(req.user!.id)).map(({ ma: m, maPhu, ua, chiTiet, ...o }: any) => {
+      const { phu, ...ct } = chiTiet || {};
+      return { ...o, chiTiet: ct, soCuaSoKhac: Object.keys(phu || {}).length, mayNay: !!ma && (m === ma || (maPhu || []).includes(ma)) };
+    });
     res.json({ may, toiDa: u?.thiet_bi_toi_da ?? TOI_DA_MAC_DINH, batGioiHan: await isFlagOn(CO_GIOI_HAN), zalo: ZALO_ADMIN, phi: PHI_RESET });
   } catch (e) { next(e); }
 });

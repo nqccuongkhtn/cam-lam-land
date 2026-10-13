@@ -33,7 +33,7 @@ import { pushRouter } from './routes/push.ts';
 import { paymentsRouter } from './routes/payments.ts';
 import { flagsRouter } from './routes/flags.ts';
 import { thietBiRouter } from './routes/thietBi.ts';   // quản lý / giới hạn thiết bị đăng nhập (lib/thietBi.ts)
-import { ghiTraCuu } from './lib/thietBi.ts';          // 10 tra cứu gần nhất của mỗi tài khoản
+import { ghiTraCuu, gopMayTrungCu } from './lib/thietBi.ts';   // 10 tra cứu gần nhất của mỗi tài khoản + gộp máy trùng
 import { newsRouter, refreshNews } from './routes/news.ts';
 import { newsletterRouter } from './routes/newsletter.ts';
 import { vanBanRouter, seedVanBan, crawlCongBao, crawlPortals, crawlCamhomes, crawlSheets, timFileThieu, taiSanFile } from './routes/vanBan.ts';
@@ -214,6 +214,8 @@ async function main() {
   if (process.env.BOOTSTRAP_DB === 'true') { try { await bootstrap(); } catch (e: any) { console.error('[boot] bootstrap lỗi (bỏ qua):', e?.stack || e?.message || e); } }
   try { await migrate(); } catch (e: any) { console.error('[boot] migrate lỗi (bỏ qua, server vẫn chạy):', e?.stack || e?.message || e); }
   try { await ensureAdmin(); } catch (e: any) { console.error('[boot] ensureAdmin lỗi (bỏ qua):', e?.stack || e?.message || e); }
+  // Sổ thiết bị: gộp các dòng là CÙNG MỘT MÁY (cửa sổ ẩn danh / trình duyệt khác — lib/thietBi.ts). Chạy nền, lỗi chỉ ghi log.
+  gopMayTrungCu().catch((e: any) => console.error('[boot] gộp máy trùng lỗi (bỏ qua):', e?.message || e));
   try { await khoiTaoTheoDoi(); } catch (e: any) { console.error('[boot] theo dõi tài khoản lỗi (bỏ qua):', e?.message || e); } // tạm — dễ gỡ
   refreshNews(true).catch(() => {}); // lấy tin ngay khi khởi động
   // Văn bản: seed → crawl Công báo (kho đầy đủ) → quét các cổng TTĐT → camhomes.vn (bổ sung, 6/10/2026); sau đó TỰ LÀM MỚI: Công báo mỗi GIỜ, cổng TTĐT mỗi 6 giờ.

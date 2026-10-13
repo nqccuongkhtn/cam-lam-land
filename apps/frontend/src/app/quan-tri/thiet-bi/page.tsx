@@ -14,7 +14,7 @@ import { useAuth, laAdmin } from '@/lib/auth';
 
 type TongQuan = { id: number; email: string; ten: string | null; phone: string | null; soMay: number; lanCuoi: string; soIp: number; vuaBiChan: boolean | null; soLanReset: number; toiDaRieng: number | null };
 type May = { id: number; ten: string; loai: string; heDieuHanh: string; trinhDuyet: string; chiTiet: Record<string, any>; ipDau: string; ipCuoi: string; quocGia: string | null;
-  lanDau: string; lanCuoi: string; soLanDangNhap: number; dnCuoi: string | null; ipDnCuoi: string | null; ma: string; ua: string };
+  lanDau: string; lanCuoi: string; soLanDangNhap: number; dnCuoi: string | null; ipDnCuoi: string | null; ma: string; maPhu?: string[]; ua: string };
 type DangNhap = { may: number | null; ma: string; luc: string; ip: string; quocGia: string | null; ten: string; ua: string | null; cach: string; ketQua: string };
 type TraCuu = { id: number; may: number | null; luc: string; ip: string; viec: string; moTa: string | null };
 type Reset = { id: number; luc: string; soMay: number; dsMay: May[]; phi: number; ghiChu: string | null; admin: string | null };
@@ -188,6 +188,17 @@ export default function ThietBiPage() {
                         <div>IP gần nhất: <b>{m.ipCuoi || '—'}</b></div>
                         {(c.manHinh || c.muiGio) && <div>Màn hình: {c.manHinh || '—'}{c.tiLe ? ` (×${c.tiLe})` : ''} · múi giờ {c.muiGio || '—'} · {c.ngonNgu || ''}</div>}
                         {(c.nhanCpu || c.ram) && <div>CPU {c.nhanCpu || '?'} nhân · RAM ~{c.ram || '?'} GB · cảm ứng {c.cham ? `${c.cham} điểm` : 'không'}</div>}
+                        {c.gpu && <div className="sm:col-span-2 break-all">Card đồ hoạ: {c.gpu}</div>}
+                        {/* Cửa sổ ẩn danh / hồ sơ / trình duyệt khác TRÊN CÙNG MÁY này đã gộp vào đây (backend lib/thietBi.ts laCungMay):
+                            cùng phần cứng + cùng mạng nên không tính là máy mới. Ghi rõ để admin đối chiếu khi khách hỏi. */}
+                        {c.phu && Object.keys(c.phu).length > 0 && (
+                          <div className="sm:col-span-2 mt-1 rounded-md bg-sky-50 px-2 py-1.5 text-[12px] text-sky-900">
+                            <b>Cùng máy này, đã gộp {Object.keys(c.phu).length} cửa sổ / trình duyệt khác</b> (cùng phần cứng, cùng mạng — không tính là máy mới):
+                            {Object.entries(c.phu as Record<string, any>).map(([maPhu, v]) => (
+                              <div key={maPhu} className="break-all">· {v?.ten || 'Không rõ'} — lần đầu {gio(v?.lanDau)} · gần nhất {gio(v?.lanCuoi)} · {v?.soLan || 0} lần · mã {maPhu}</div>
+                            ))}
+                          </div>
+                        )}
                         <div className="sm:col-span-2 break-all text-[11px] text-slate-400">Mã thiết bị: {m.ma}</div>
                         <div className="sm:col-span-2 break-all text-[11px] text-slate-400">Trình duyệt tự khai: {m.ua}</div>
                       </div>

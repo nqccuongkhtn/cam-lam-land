@@ -37,6 +37,16 @@ export async function thongTinThietBi(): Promise<string> {
     o.manHinh = `${screen.width}×${screen.height}`; o.tiLe = Math.round((window.devicePixelRatio || 1) * 100) / 100;
     o.muiGio = Intl.DateTimeFormat().resolvedOptions().timeZone; o.ngonNgu = navigator.language;
     o.nhanCpu = (navigator as any).hardwareConcurrency; o.ram = (navigator as any).deviceMemory; o.cham = navigator.maxTouchPoints;
+    // Tên CARD ĐỒ HOẠ (13/10/2026): mọi cửa sổ / trình duyệt nhân Chromium trên cùng máy đọc ra cùng một tên → máy chủ dùng
+    // làm thêm một dấu hiệu "cùng máy" khi gộp thiết bị (backend lib/thietBi.ts laCungMay). Web KHÔNG đọc được số máy thật
+    // (sê-ri, MAC, IMEI) — trình duyệt chặn; đây là thông số phần cứng gần nhất đọc được. Safari / Firefox trả tên chung chung.
+    try {
+      const gl = document.createElement('canvas').getContext('webgl') as WebGLRenderingContext | null;
+      const ext = gl?.getExtension('WEBGL_debug_renderer_info');
+      const gpu = gl && (ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+      if (gpu) o.gpu = String(gpu).slice(0, 110);
+      gl?.getExtension('WEBGL_lose_context')?.loseContext();        // trả lại bộ nhớ card đồ hoạ ngay
+    } catch { /* máy tắt WebGL: bỏ qua */ }
     const uad = (navigator as any).userAgentData;
     if (uad?.getHighEntropyValues) {
       const h = await Promise.race([uad.getHighEntropyValues(['model', 'platformVersion']), new Promise((r) => setTimeout(() => r(null), 800))]) as any;

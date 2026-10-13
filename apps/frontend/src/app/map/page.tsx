@@ -985,6 +985,20 @@ export default function MapPage() {
     setFitTo([[x.bbox[0], x.bbox[1]], [x.bbox[2], x.bbox[3]]]);
     setPanelOpen(false);
   }, []);
+  // Mở từ TRANG ĐỊA DANH (/ban-do/<xã>, 13/10/2026): /map?xa=<mã xã> → chọn sẵn xã đó trong ô tra cứu (đúng cấp: mã xã mới = 2 cấp,
+  // xã cũ = 3 cấp, 'g' + mã = đơn vị cũ gốc) rồi bay tới VỪA KHUNG CẢ XÃ. Không mở bảng thửa nào (khác ?lng=&lat= của mã QR).
+  const daMoTheoXa = useRef(false);
+  useEffect(() => {
+    if (daMoTheoXa.current || !(dsXa.cap2.length || dsXa.cap3.length)) return;
+    daMoTheoXa.current = true;
+    let ma = '';
+    try { ma = (new URLSearchParams(window.location.search).get('xa') || '').trim(); } catch { /* */ }
+    if (!ma) return;
+    const x2 = dsXa.cap2.find((y) => y.xaId === ma);
+    const x = x2 || dsXa.cap3.find((y) => y.xaId === ma);
+    if (!x) return;
+    setCap(x2 ? '2' : '3'); setC3(ma); setHuyenChon(x.huyen); bayToiXa(x);
+  }, [dsXa, bayToiXa]);
 
   // ── TỰ CHỌN ĐỊA GIỚI THEO CHỖ ĐANG XEM (chủ dự án 11/10/2026) ──
   // Phóng tới mức THẤY THỬA (≥ 16) thì ô tìm kiếm tự chọn xã/phường (và huyện) của thửa ở GIỮA MÀN HÌNH — mặc định theo 2 cấp

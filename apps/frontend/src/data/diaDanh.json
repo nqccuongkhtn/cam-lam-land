@@ -1,0 +1,8827 @@
+{
+ "_ghiChu": "SINH TỰ ĐỘNG bằng scripts/dia-chinh/dung-dia-danh.mjs — đừng sửa tay. Không chứa số thửa (thông tin nội bộ).",
+ "canCu": "Nghị quyết 1667/NQ-UBTVQH15 (sắp xếp đơn vị hành chính cấp xã tỉnh Khánh Hòa năm 2025, hiệu lực 1/7/2025); danh mục đơn vị hành chính của Sở Nông nghiệp và Môi trường Khánh Hòa.",
+ "duNq": true,
+ "huyenCu": [
+  {
+   "id": 568,
+   "slug": "thanh-pho-nha-trang-khanh-hoa",
+   "loai": "thành phố",
+   "ten": "Nha Trang",
+   "tinhCu": "Khánh Hòa",
+   "xaCu": [
+    "phuong-vinh-hoa-thanh-pho-nha-trang",
+    "phuong-vinh-hai-thanh-pho-nha-trang",
+    "phuong-ngoc-hiep-thanh-pho-nha-trang",
+    "phuong-vinh-tho-thanh-pho-nha-trang",
+    "phuong-xuong-huan-thanh-pho-nha-trang",
+    "phuong-van-thang-thanh-pho-nha-trang",
+    "phuong-van-thanh-thanh-pho-nha-trang",
+    "phuong-phuong-sai-thanh-pho-nha-trang",
+    "phuong-phuong-son-thanh-pho-nha-trang",
+    "phuong-phuoc-hai-thanh-pho-nha-trang",
+    "phuong-phuoc-tan-thanh-pho-nha-trang",
+    "phuong-loc-tho-thanh-pho-nha-trang",
+    "phuong-tan-lap-thanh-pho-nha-trang",
+    "phuong-phuoc-hoa-thanh-pho-nha-trang",
+    "phuong-vinh-nguyen-thanh-pho-nha-trang",
+    "phuong-phuoc-long-thanh-pho-nha-trang",
+    "phuong-vinh-truong-thanh-pho-nha-trang",
+    "xa-vinh-luong-thanh-pho-nha-trang",
+    "xa-vinh-phuong-thanh-pho-nha-trang",
+    "xa-vinh-thanh-thanh-pho-nha-trang",
+    "xa-vinh-trung-thanh-pho-nha-trang",
+    "xa-vinh-hiep-thanh-pho-nha-trang",
+    "xa-phuoc-dong-thanh-pho-nha-trang",
+    "phuong-vinh-phuoc-thanh-pho-nha-trang",
+    "phuong-tan-tien-thanh-pho-nha-trang",
+    "xa-vinh-ngoc-thanh-pho-nha-trang",
+    "xa-vinh-thai-thanh-pho-nha-trang"
+   ],
+   "xaMoi": [
+    "22333",
+    "22366",
+    "22390",
+    "22402"
+   ]
+  },
+  {
+   "id": 569,
+   "slug": "thanh-pho-cam-ranh-khanh-hoa",
+   "loai": "thành phố",
+   "ten": "Cam Ranh",
+   "tinhCu": "Khánh Hòa",
+   "xaCu": [
+    "phuong-cam-nghia-thanh-pho-cam-ranh",
+    "phuong-cam-phuc-nam-thanh-pho-cam-ranh",
+    "phuong-cam-loc-thanh-pho-cam-ranh",
+    "phuong-cam-thuan-thanh-pho-cam-ranh",
+    "phuong-cam-loi-thanh-pho-cam-ranh",
+    "xa-cam-thanh-nam-thanh-pho-cam-ranh",
+    "xa-cam-phuoc-dong-thanh-pho-cam-ranh",
+    "xa-cam-thinh-tay-thanh-pho-cam-ranh",
+    "xa-cam-lap-thanh-pho-cam-ranh",
+    "xa-cam-binh-thanh-pho-cam-ranh",
+    "phuong-cam-phuc-bac-thanh-pho-cam-ranh",
+    "phuong-cam-phu-thanh-pho-cam-ranh",
+    "xa-cam-thinh-dong-thanh-pho-cam-ranh"
+   ],
+   "xaMoi": [
+    "22411",
+    "22420",
+    "22423",
+    "22432",
+    "22480"
+   ]
+  },
+  {
+   "id": 570,
+   "slug": "huyen-cam-lam-khanh-hoa",
+   "loai": "huyện",
+   "ten": "Cam Lâm",
+   "tinhCu": "Khánh Hòa",
+   "xaCu": [
+    "xa-cam-hoa-huyen-cam-lam",
+    "xa-cam-hai-dong-huyen-cam-lam",
+    "xa-cam-hai-tay-huyen-cam-lam",
+    "xa-son-tan-huyen-cam-lam",
+    "xa-cam-hiep-bac-huyen-cam-lam",
+    "xa-cam-hiep-nam-huyen-cam-lam",
+    "xa-cam-phuoc-tay-huyen-cam-lam",
+    "xa-cam-thanh-bac-huyen-cam-lam",
+    "xa-cam-an-nam-huyen-cam-lam",
+    "xa-suoi-tan-huyen-cam-lam",
+    "xa-cam-tan-huyen-cam-lam",
+    "thi-tran-cam-duc-huyen-cam-lam",
+    "xa-cam-an-bac-huyen-cam-lam",
+    "xa-suoi-cat-huyen-cam-lam"
+   ],
+   "xaMoi": [
+    "22435",
+    "22453",
+    "22465",
+    "22708"
+   ]
+  },
+  {
+   "id": 571,
+   "slug": "huyen-van-ninh-khanh-hoa",
+   "loai": "huyện",
+   "ten": "Vạn Ninh",
+   "tinhCu": "Khánh Hòa",
+   "xaCu": [
+    "xa-dai-lanh-huyen-van-ninh",
+    "xa-van-phuoc-huyen-van-ninh",
+    "xa-van-binh-huyen-van-ninh",
+    "xa-van-khanh-huyen-van-ninh",
+    "xa-van-phu-huyen-van-ninh",
+    "xa-van-luong-huyen-van-ninh",
+    "xa-van-thanh-huyen-van-ninh",
+    "xa-xuan-son-huyen-van-ninh",
+    "thi-tran-van-gia-huyen-van-ninh",
+    "xa-van-long-huyen-van-ninh",
+    "xa-van-tho-huyen-van-ninh"
+   ],
+   "xaMoi": [
+    "22489",
+    "22498",
+    "22504",
+    "22516",
+    "22525"
+   ]
+  },
+  {
+   "id": 572,
+   "slug": "thi-xa-ninh-hoa-khanh-hoa",
+   "loai": "thị xã",
+   "ten": "Ninh Hòa",
+   "tinhCu": "Khánh Hòa",
+   "xaCu": [
+    "xa-ninh-son-thi-xa-ninh-hoa",
+    "xa-ninh-tay-thi-xa-ninh-hoa",
+    "xa-ninh-thuong-thi-xa-ninh-hoa",
+    "xa-ninh-an-thi-xa-ninh-hoa",
+    "phuong-ninh-hai-thi-xa-ninh-hoa",
+    "xa-ninh-trung-thi-xa-ninh-hoa",
+    "xa-ninh-xuan-thi-xa-ninh-hoa",
+    "xa-ninh-dong-thi-xa-ninh-hoa",
+    "phuong-ninh-thuy-thi-xa-ninh-hoa",
+    "phuong-ninh-da-thi-xa-ninh-hoa",
+    "xa-ninh-phung-thi-xa-ninh-hoa",
+    "xa-ninh-phu-thi-xa-ninh-hoa",
+    "xa-ninh-tan-thi-xa-ninh-hoa",
+    "xa-ninh-quang-thi-xa-ninh-hoa",
+    "phuong-ninh-ha-thi-xa-ninh-hoa",
+    "xa-ninh-loc-thi-xa-ninh-hoa",
+    "xa-ninh-ich-thi-xa-ninh-hoa",
+    "xa-ninh-phuoc-thi-xa-ninh-hoa",
+    "phuong-ninh-hiep-thi-xa-ninh-hoa",
+    "xa-ninh-tho-thi-xa-ninh-hoa",
+    "xa-ninh-sim-thi-xa-ninh-hoa",
+    "xa-ninh-than-thi-xa-ninh-hoa",
+    "phuong-ninh-diem-thi-xa-ninh-hoa",
+    "xa-ninh-binh-thi-xa-ninh-hoa",
+    "phuong-ninh-giang-thi-xa-ninh-hoa",
+    "xa-ninh-hung-thi-xa-ninh-hoa"
+   ],
+   "xaMoi": [
+    "22528",
+    "22546",
+    "22552",
+    "22558",
+    "22561",
+    "22576",
+    "22591",
+    "22597"
+   ]
+  },
+  {
+   "id": 573,
+   "slug": "huyen-khanh-vinh-khanh-hoa",
+   "loai": "huyện",
+   "ten": "Khánh Vĩnh",
+   "tinhCu": "Khánh Hòa",
+   "xaCu": [
+    "xa-khanh-trung-huyen-khanh-vinh",
+    "xa-khanh-dong-huyen-khanh-vinh",
+    "xa-khanh-nam-huyen-khanh-vinh",
+    "xa-song-cau-huyen-khanh-vinh",
+    "xa-giang-ly-huyen-khanh-vinh",
+    "xa-cau-ba-huyen-khanh-vinh",
+    "xa-lien-sang-huyen-khanh-vinh",
+    "xa-khanh-thanh-huyen-khanh-vinh",
+    "xa-khanh-phu-huyen-khanh-vinh",
+    "thi-tran-khanh-vinh-huyen-khanh-vinh",
+    "xa-khanh-hiep-huyen-khanh-vinh",
+    "xa-khanh-binh-huyen-khanh-vinh",
+    "xa-khanh-thuong-huyen-khanh-vinh",
+    "xa-son-thai-huyen-khanh-vinh"
+   ],
+   "xaMoi": [
+    "22609",
+    "22612",
+    "22615",
+    "22624",
+    "22648"
+   ]
+  },
+  {
+   "id": 574,
+   "slug": "huyen-dien-khanh-khanh-hoa",
+   "loai": "huyện",
+   "ten": "Diên Khánh",
+   "tinhCu": "Khánh Hòa",
+   "xaCu": [
+    "xa-dien-lam-huyen-dien-khanh",
+    "xa-dien-son-huyen-dien-khanh",
+    "xa-dien-dong-huyen-dien-khanh",
+    "xa-dien-phu-huyen-dien-khanh",
+    "xa-dien-phuoc-huyen-dien-khanh",
+    "xa-dien-tan-huyen-dien-khanh",
+    "xa-dien-hoa-huyen-dien-khanh",
+    "xa-dien-thanh-huyen-dien-khanh",
+    "xa-dien-toan-huyen-dien-khanh",
+    "xa-dien-an-huyen-dien-khanh",
+    "xa-binh-loc-huyen-dien-khanh",
+    "xa-suoi-tien-huyen-dien-khanh",
+    "thi-tran-dien-khanh-huyen-dien-khanh",
+    "xa-xuan-dong-huyen-dien-khanh"
+   ],
+   "xaMoi": [
+    "22651",
+    "22657",
+    "22660",
+    "22672",
+    "22678",
+    "22702"
+   ]
+  },
+  {
+   "id": 575,
+   "slug": "huyen-khanh-son-khanh-hoa",
+   "loai": "huyện",
+   "ten": "Khánh Sơn",
+   "tinhCu": "Khánh Hòa",
+   "xaCu": [
+    "xa-thanh-son-huyen-khanh-son",
+    "xa-son-hiep-huyen-khanh-son",
+    "xa-son-binh-huyen-khanh-son",
+    "xa-son-trung-huyen-khanh-son",
+    "xa-ba-cum-nam-huyen-khanh-son",
+    "thi-tran-to-hap-huyen-khanh-son",
+    "xa-son-lam-huyen-khanh-son",
+    "xa-ba-cum-bac-huyen-khanh-son"
+   ],
+   "xaMoi": [
+    "22714",
+    "22720",
+    "22732"
+   ]
+  },
+  {
+   "id": 576,
+   "slug": "huyen-truong-sa-khanh-hoa",
+   "loai": "huyện",
+   "ten": "Trường Sa",
+   "tinhCu": "Khánh Hòa",
+   "xaCu": [
+    "xa-song-tu-tay-huyen-truong-sa",
+    "xa-sinh-ton-huyen-truong-sa",
+    "thi-tran-truong-sa-huyen-truong-sa"
+   ],
+   "xaMoi": [
+    "22736"
+   ]
+  },
+  {
+   "id": 582,
+   "slug": "thanh-pho-phan-rang-thap-cham-ninh-thuan",
+   "loai": "thành phố",
+   "ten": "Phan Rang - Tháp Chàm",
+   "tinhCu": "Ninh Thuận",
+   "xaCu": [
+    "phuong-bao-an-thanh-pho-phan-rang-thap-cham",
+    "phuong-phu-ha-thanh-pho-phan-rang-thap-cham",
+    "phuong-thanh-son-thanh-pho-phan-rang-thap-cham",
+    "phuong-my-huong-thanh-pho-phan-rang-thap-cham",
+    "phuong-tan-tai-thanh-pho-phan-rang-thap-cham",
+    "phuong-dao-long-thanh-pho-phan-rang-thap-cham",
+    "phuong-dai-son-thanh-pho-phan-rang-thap-cham",
+    "phuong-dong-hai-thanh-pho-phan-rang-thap-cham",
+    "phuong-my-dong-thanh-pho-phan-rang-thap-cham",
+    "xa-thanh-hai-thanh-pho-phan-rang-thap-cham",
+    "phuong-van-hai-thanh-pho-phan-rang-thap-cham",
+    "phuong-my-binh-thanh-pho-phan-rang-thap-cham",
+    "phuong-phuoc-my-thanh-pho-phan-rang-thap-cham",
+    "phuong-kinh-dinh-thanh-pho-phan-rang-thap-cham",
+    "phuong-my-hai-thanh-pho-phan-rang-thap-cham",
+    "thi-tran-khanh-hai-thanh-pho-phan-rang-thap-cham"
+   ],
+   "xaMoi": [
+    "22738",
+    "22741",
+    "22759",
+    "22780",
+    "22834",
+    "22888"
+   ]
+  },
+  {
+   "id": 584,
+   "slug": "huyen-bac-ai-ninh-thuan",
+   "loai": "huyện",
+   "ten": "Bác Ái",
+   "tinhCu": "Ninh Thuận",
+   "xaCu": [
+    "xa-phuoc-binh-huyen-bac-ai",
+    "xa-phuoc-tan-huyen-bac-ai",
+    "xa-phuoc-tien-huyen-bac-ai",
+    "xa-phuoc-thanh-huyen-bac-ai",
+    "xa-phuoc-chinh-huyen-bac-ai",
+    "xa-phuoc-trung-huyen-bac-ai",
+    "xa-phuoc-hoa-huyen-bac-ai",
+    "xa-phuoc-thang-huyen-bac-ai",
+    "xa-phuoc-dai-huyen-bac-ai"
+   ],
+   "xaMoi": [
+    "22786",
+    "22795",
+    "22801",
+    "22822"
+   ]
+  },
+  {
+   "id": 585,
+   "slug": "huyen-ninh-son-ninh-thuan",
+   "loai": "huyện",
+   "ten": "Ninh Sơn",
+   "tinhCu": "Ninh Thuận",
+   "xaCu": [
+    "xa-luong-son-huyen-ninh-son",
+    "xa-quang-son-huyen-ninh-son",
+    "xa-hoa-son-huyen-ninh-son",
+    "xa-nhon-son-huyen-ninh-son",
+    "thi-tran-tan-son-huyen-ninh-son",
+    "xa-ma-noi-huyen-ninh-son"
+   ],
+   "xaMoi": [
+    "22738",
+    "22810",
+    "22813",
+    "22822",
+    "22828"
+   ]
+  },
+  {
+   "id": 586,
+   "slug": "huyen-ninh-hai-ninh-thuan",
+   "loai": "huyện",
+   "ten": "Ninh Hải",
+   "tinhCu": "Ninh Thuận",
+   "xaCu": [
+    "xa-tan-hai-huyen-ninh-hai",
+    "xa-xuan-hai-huyen-ninh-hai",
+    "xa-tri-hai-huyen-ninh-hai",
+    "xa-nhon-hai-huyen-ninh-hai",
+    "xa-thanh-hai-huyen-ninh-hai",
+    "xa-phuong-hai-huyen-ninh-hai",
+    "xa-ho-hai-huyen-ninh-hai"
+   ],
+   "xaMoi": [
+    "22846",
+    "22852",
+    "22861"
+   ]
+  },
+  {
+   "id": 587,
+   "slug": "huyen-ninh-phuoc-ninh-thuan",
+   "loai": "huyện",
+   "ten": "Ninh Phước",
+   "tinhCu": "Ninh Thuận",
+   "xaCu": [
+    "xa-phuoc-thai-huyen-ninh-phuoc",
+    "xa-phuoc-hau-huyen-ninh-phuoc",
+    "xa-phuoc-thuan-huyen-ninh-phuoc",
+    "xa-phuoc-hai-huyen-ninh-phuoc",
+    "xa-phuoc-vinh-huyen-ninh-phuoc",
+    "thi-tran-phuoc-dan-huyen-ninh-phuoc",
+    "xa-phuoc-son-huyen-ninh-phuoc"
+   ],
+   "xaMoi": [
+    "22870",
+    "22873",
+    "22891"
+   ]
+  },
+  {
+   "id": 588,
+   "slug": "huyen-thuan-bac-ninh-thuan",
+   "loai": "huyện",
+   "ten": "Thuận Bắc",
+   "tinhCu": "Ninh Thuận",
+   "xaCu": [
+    "xa-phuoc-chien-huyen-thuan-bac",
+    "xa-phuoc-khang-huyen-thuan-bac",
+    "xa-bac-son-huyen-thuan-bac",
+    "xa-bac-phong-huyen-thuan-bac",
+    "xa-loi-hai-huyen-thuan-bac"
+   ],
+   "xaMoi": [
+    "22840",
+    "22849",
+    "22852"
+   ]
+  },
+  {
+   "id": 589,
+   "slug": "huyen-thuan-nam-ninh-thuan",
+   "loai": "huyện",
+   "ten": "Thuận Nam",
+   "tinhCu": "Ninh Thuận",
+   "xaCu": [
+    "xa-phuoc-ha-huyen-thuan-nam",
+    "xa-phuoc-ninh-huyen-thuan-nam",
+    "xa-phuoc-dinh-huyen-thuan-nam",
+    "xa-phuoc-minh-huyen-thuan-nam",
+    "xa-ca-na-huyen-thuan-nam",
+    "xa-an-hai-huyen-thuan-nam",
+    "xa-phuoc-nam-huyen-thuan-nam",
+    "xa-nhi-ha-huyen-thuan-nam",
+    "xa-phuoc-diem-huyen-thuan-nam"
+   ],
+   "xaMoi": [
+    "22888",
+    "22897",
+    "22900",
+    "22909"
+   ]
+  }
+ ],
+ "xaMoi": [
+  {
+   "id": "22333",
+   "slug": "phuong-bac-nha-trang-khanh-hoa",
+   "loai": "phường",
+   "ten": "Bắc Nha Trang",
+   "donViGoc": "phường Vĩnh Phước",
+   "huyenGoc": 568,
+   "huyenCu": [
+    568
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.1772,
+    12.31908
+   ],
+   "bbox": [
+    109.11147,
+    12.25868,
+    109.24294,
+    12.37949
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Vĩnh Hòa, Vĩnh Hải, Vĩnh Phước, Vĩnh Thọ, xã Vĩnh Lương và xã Vĩnh Phương thành phường mới có tên gọi là phường Bắc Nha Trang.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "phuong-vinh-hoa-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-vinh-hai-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-vinh-phuoc-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-vinh-tho-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-vinh-luong-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-vinh-phuong-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 36,
+     "toCuTu": 1,
+     "toCuDen": 36,
+     "soTo": 36,
+     "xaCu": "phuong-vinh-phuoc-thanh-pho-nha-trang",
+     "tenXaCu": "phường Vĩnh Phước",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 37,
+     "toMoiDen": 74,
+     "toCuTu": 4,
+     "toCuDen": 41,
+     "soTo": 38,
+     "xaCu": "xa-vinh-luong-thanh-pho-nha-trang",
+     "tenXaCu": "xã Vĩnh Lương",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 75,
+     "toMoiDen": 150,
+     "toCuTu": 1,
+     "toCuDen": 76,
+     "soTo": 76,
+     "xaCu": "phuong-vinh-hoa-thanh-pho-nha-trang",
+     "tenXaCu": "phường Vĩnh Hòa",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 151,
+     "toMoiDen": 218,
+     "toCuTu": 3,
+     "toCuDen": 70,
+     "soTo": 68,
+     "xaCu": "xa-vinh-phuong-thanh-pho-nha-trang",
+     "tenXaCu": "xã Vĩnh Phương",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 219,
+     "toMoiDen": 279,
+     "toCuTu": 1,
+     "toCuDen": 61,
+     "soTo": 61,
+     "xaCu": "phuong-vinh-hai-thanh-pho-nha-trang",
+     "tenXaCu": "phường Vĩnh Hải",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 280,
+     "toMoiDen": 296,
+     "toCuTu": 2,
+     "toCuDen": 19,
+     "soTo": 17,
+     "xaCu": "phuong-vinh-tho-thanh-pho-nha-trang",
+     "tenXaCu": "phường Vĩnh Thọ",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22366",
+   "slug": "phuong-nha-trang-khanh-hoa",
+   "loai": "phường",
+   "ten": "Nha Trang",
+   "donViGoc": "phường Tân Tiến",
+   "huyenGoc": 568,
+   "huyenCu": [
+    568
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.19967,
+    12.23154
+   ],
+   "bbox": [
+    109.18107,
+    12.20066,
+    109.21827,
+    12.26242
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Vạn Thạnh, Lộc Thọ, Vĩnh Nguyên, Tân Tiến và Phước Hòa thành phường mới có tên gọi là phường Nha Trang.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "phuong-van-thanh-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-loc-tho-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-vinh-nguyen-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-tan-tien-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-phuoc-hoa-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 10,
+     "toCuTu": 1,
+     "toCuDen": 10,
+     "soTo": 10,
+     "xaCu": "phuong-tan-tien-thanh-pho-nha-trang",
+     "tenXaCu": "phường Tân Tiến",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 11,
+     "toMoiDen": 26,
+     "toCuTu": 1,
+     "toCuDen": 16,
+     "soTo": 16,
+     "xaCu": "phuong-phuoc-tan-thanh-pho-nha-trang",
+     "tenXaCu": "phường Phước Tân",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 27,
+     "toMoiDen": 44,
+     "toCuTu": 1,
+     "toCuDen": 19,
+     "soTo": 18,
+     "xaCu": "phuong-tan-lap-thanh-pho-nha-trang",
+     "tenXaCu": "phường Tân Lập",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 45,
+     "toMoiDen": 56,
+     "toCuTu": 1,
+     "toCuDen": 12,
+     "soTo": 12,
+     "xaCu": "phuong-van-thanh-thanh-pho-nha-trang",
+     "tenXaCu": "phường Vạn Thạnh",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 57,
+     "toMoiDen": 67,
+     "toCuTu": 3,
+     "toCuDen": 17,
+     "soTo": 11,
+     "xaCu": "phuong-xuong-huan-thanh-pho-nha-trang",
+     "tenXaCu": "phường Xương Huân",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 68,
+     "toMoiDen": 79,
+     "toCuTu": 1,
+     "toCuDen": 12,
+     "soTo": 12,
+     "xaCu": "phuong-van-thang-thanh-pho-nha-trang",
+     "tenXaCu": "phường Vạn Thắng",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 80,
+     "toMoiDen": 114,
+     "toCuTu": 1,
+     "toCuDen": 35,
+     "soTo": 35,
+     "xaCu": "phuong-loc-tho-thanh-pho-nha-trang",
+     "tenXaCu": "phường Lộc Thọ",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 115,
+     "toMoiDen": 133,
+     "toCuTu": 1,
+     "toCuDen": 19,
+     "soTo": 19,
+     "xaCu": "phuong-phuoc-hoa-thanh-pho-nha-trang",
+     "tenXaCu": "phường Phước Hòa",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 134,
+     "toMoiDen": 204,
+     "toCuTu": 1,
+     "toCuDen": 71,
+     "soTo": 71,
+     "xaCu": "phuong-vinh-nguyen-thanh-pho-nha-trang",
+     "tenXaCu": "phường Vĩnh Nguyên",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22390",
+   "slug": "phuong-tay-nha-trang-khanh-hoa",
+   "loai": "phường",
+   "ten": "Tây Nha Trang",
+   "donViGoc": "xã Vĩnh Ngọc",
+   "huyenGoc": 568,
+   "huyenCu": [
+    568
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.15658,
+    12.25956
+   ],
+   "bbox": [
+    109.11914,
+    12.22574,
+    109.19402,
+    12.29339
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Ngọc Hiệp, phường Phương Sài và các xã Vĩnh Ngọc, Vĩnh Thạnh, Vĩnh Hiệp, Vĩnh Trung thành phường mới có tên gọi là phường Tây Nha Trang.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "phuong-ngoc-hiep-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-phuong-sai-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-vinh-ngoc-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-vinh-thanh-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-vinh-hiep-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-vinh-trung-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 42,
+     "toCuTu": 1,
+     "toCuDen": 42,
+     "soTo": 42,
+     "xaCu": "xa-vinh-ngoc-thanh-pho-nha-trang",
+     "tenXaCu": "xã Vĩnh Ngọc",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 43,
+     "toMoiDen": 70,
+     "toCuTu": 1,
+     "toCuDen": 28,
+     "soTo": 28,
+     "xaCu": "xa-vinh-thanh-thanh-pho-nha-trang",
+     "tenXaCu": "xã Vĩnh Thạnh",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 71,
+     "toMoiDen": 118,
+     "toCuTu": 2,
+     "toCuDen": 49,
+     "soTo": 48,
+     "xaCu": "phuong-ngoc-hiep-thanh-pho-nha-trang",
+     "tenXaCu": "phường Ngọc Hiệp",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 119,
+     "toMoiDen": 144,
+     "toCuTu": 1,
+     "toCuDen": 26,
+     "soTo": 26,
+     "xaCu": "xa-vinh-hiep-thanh-pho-nha-trang",
+     "tenXaCu": "xã Vĩnh Hiệp",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 145,
+     "toMoiDen": 159,
+     "toCuTu": 1,
+     "toCuDen": 15,
+     "soTo": 15,
+     "xaCu": "phuong-phuong-sai-thanh-pho-nha-trang",
+     "tenXaCu": "phường Phương Sài",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 160,
+     "toMoiDen": 173,
+     "toCuTu": 1,
+     "toCuDen": 14,
+     "soTo": 14,
+     "xaCu": "phuong-phuong-son-thanh-pho-nha-trang",
+     "tenXaCu": "phường Phương Sơn",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 174,
+     "toMoiDen": 219,
+     "toCuTu": 1,
+     "toCuDen": 46,
+     "soTo": 46,
+     "xaCu": "xa-vinh-trung-thanh-pho-nha-trang",
+     "tenXaCu": "xã Vĩnh Trung",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22402",
+   "slug": "phuong-nam-nha-trang-khanh-hoa",
+   "loai": "phường",
+   "ten": "Nam Nha Trang",
+   "donViGoc": "xã Vĩnh Thái",
+   "huyenGoc": 568,
+   "huyenCu": [
+    568
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.16925,
+    12.19748
+   ],
+   "bbox": [
+    109.11467,
+    12.14082,
+    109.22383,
+    12.25414
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Phước Hải, Phước Long, Vĩnh Trường, xã Vĩnh Thái và xã Phước Đồng thành phường mới có tên gọi là phường Nam Nha Trang.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "phuong-phuoc-hai-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-phuoc-long-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-vinh-truong-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-vinh-thai-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-dong-thanh-pho-nha-trang",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 49,
+     "toCuTu": 1,
+     "toCuDen": 49,
+     "soTo": 49,
+     "xaCu": "xa-vinh-thai-thanh-pho-nha-trang",
+     "tenXaCu": "xã Vĩnh Thái",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 50,
+     "toMoiDen": 101,
+     "toCuTu": 1,
+     "toCuDen": 52,
+     "soTo": 52,
+     "xaCu": "phuong-phuoc-hai-thanh-pho-nha-trang",
+     "tenXaCu": "phường Phước Hải",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 102,
+     "toMoiDen": 182,
+     "toCuTu": 1,
+     "toCuDen": 81,
+     "soTo": 81,
+     "xaCu": "phuong-phuoc-long-thanh-pho-nha-trang",
+     "tenXaCu": "phường Phước Long",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 183,
+     "toMoiDen": 233,
+     "toCuTu": 1,
+     "toCuDen": 51,
+     "soTo": 51,
+     "xaCu": "phuong-vinh-truong-thanh-pho-nha-trang",
+     "tenXaCu": "phường Vĩnh Trường",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 234,
+     "toMoiDen": 295,
+     "toCuTu": 1,
+     "toCuDen": 65,
+     "soTo": 62,
+     "xaCu": "xa-phuoc-dong-thanh-pho-nha-trang",
+     "tenXaCu": "xã Phước Đồng",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22411",
+   "slug": "phuong-bac-cam-ranh-khanh-hoa",
+   "loai": "phường",
+   "ten": "Bắc Cam Ranh",
+   "donViGoc": "phường Cam Phúc Bắc",
+   "huyenGoc": 569,
+   "huyenCu": [
+    569
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.20744,
+    11.94046
+   ],
+   "bbox": [
+    109.13077,
+    11.85224,
+    109.28412,
+    12.02868
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Cam Nghĩa, phường Cam Phúc Bắc và xã Cam Thành Nam thành phường mới có tên gọi là phường Bắc Cam Ranh.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "phuong-cam-nghia-thanh-pho-cam-ranh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-cam-phuc-bac-thanh-pho-cam-ranh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-cam-thanh-nam-thanh-pho-cam-ranh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22420",
+   "slug": "phuong-cam-ranh-khanh-hoa",
+   "loai": "phường",
+   "ten": "Cam Ranh",
+   "donViGoc": "phường Cam Phú",
+   "huyenGoc": 569,
+   "huyenCu": [
+    569
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.16035,
+    11.9329
+   ],
+   "bbox": [
+    109.13032,
+    11.91273,
+    109.19037,
+    11.95306
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Cam Phú, Cam Lộc và Cam Phúc Nam thành phường mới có tên gọi là phường Cam Ranh.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "phuong-cam-phu-thanh-pho-cam-ranh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-cam-loc-thanh-pho-cam-ranh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-cam-phuc-nam-thanh-pho-cam-ranh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22423",
+   "slug": "phuong-ba-ngoi-khanh-hoa",
+   "loai": "phường",
+   "ten": "Ba Ngòi",
+   "donViGoc": "",
+   "huyenGoc": 569,
+   "huyenCu": [
+    569
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.07034,
+    11.93372
+   ],
+   "bbox": [
+    109.00061,
+    11.89523,
+    109.14006,
+    11.97221
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Ba Ngòi và xã Cam Phước Đông thành phường mới có tên gọi là phường Ba Ngòi.",
+   "gomCungTen": {
+    "ten": "phường Ba Ngòi",
+    "phan": "toan-bo"
+   },
+   "gom": [
+    {
+     "xa": "xa-cam-phuoc-dong-thanh-pho-cam-ranh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22432",
+   "slug": "phuong-cam-linh-khanh-hoa",
+   "loai": "phường",
+   "ten": "Cam Linh",
+   "donViGoc": "",
+   "huyenGoc": 569,
+   "huyenCu": [
+    569
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.14722,
+    11.90763
+   ],
+   "bbox": [
+    109.13447,
+    11.8941,
+    109.15997,
+    11.92117
+   ],
+   "nguyenVan": "Sắp xếp bộ diện tích tự nhiên, quy mô dân số của các phường Cam Thuận, Cam Lợi và Cam Linh thành phường mới có tên gọi là phường Cam Linh.",
+   "gomCungTen": {
+    "ten": "phường Cam Linh",
+    "phan": "toan-bo"
+   },
+   "gom": [
+    {
+     "xa": "phuong-cam-thuan-thanh-pho-cam-ranh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-cam-loi-thanh-pho-cam-ranh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22480",
+   "slug": "xa-nam-cam-ranh-khanh-hoa",
+   "loai": "xã",
+   "ten": "Nam Cam Ranh",
+   "donViGoc": "xã Cam Thịnh Đông",
+   "huyenGoc": 569,
+   "huyenCu": [
+    569
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.1178,
+    11.86144
+   ],
+   "bbox": [
+    109.04726,
+    11.80365,
+    109.18835,
+    11.91924
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Cam Lập, Cam Bình, Cam Thịnh Đông và Cam Thịnh Tây thành xã mới có tên gọi là xã Nam Cam Ranh.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-cam-lap-thanh-pho-cam-ranh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-cam-binh-thanh-pho-cam-ranh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-cam-thinh-dong-thanh-pho-cam-ranh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-cam-thinh-tay-thanh-pho-cam-ranh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22435",
+   "slug": "xa-cam-hiep-khanh-hoa",
+   "loai": "xã",
+   "ten": "Cam Hiệp",
+   "donViGoc": "xã Cam Tân",
+   "huyenGoc": 570,
+   "huyenCu": [
+    570
+   ],
+   "coQh": true,
+   "coBanDo": true,
+   "tam": [
+    109.05575,
+    12.09626
+   ],
+   "bbox": [
+    108.94399,
+    12.02377,
+    109.16751,
+    12.16876
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Sơn Tân, phần còn lại của xã Cam Hiệp Bắc và xã Cam Hiệp Nam sau khi sắp xếp theo quy định tại khoản 18 Điều này và phần còn lại của các xã Cam Hòa, Cam Tân, Suối Tân sau khi sắp xếp theo quy định tại khoản 18,khoản 19 Điều này thành xã mới có tên gọi là xã Cam Hiệp.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-son-tan-huyen-cam-lam",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-cam-hiep-bac-huyen-cam-lam",
+     "phan": "mot-phan"
+    },
+    {
+     "xa": "xa-cam-hiep-nam-huyen-cam-lam",
+     "phan": "mot-phan"
+    },
+    {
+     "xa": "xa-cam-hoa-huyen-cam-lam",
+     "phan": "mot-phan"
+    },
+    {
+     "xa": "xa-cam-tan-huyen-cam-lam",
+     "phan": "mot-phan"
+    },
+    {
+     "xa": "xa-suoi-tan-huyen-cam-lam",
+     "phan": "mot-phan"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 3,
+     "toMoiDen": 46,
+     "toCuTu": 3,
+     "toCuDen": 46,
+     "soTo": 11,
+     "xaCu": "xa-cam-tan-huyen-cam-lam",
+     "tenXaCu": "xã Cam Tân",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 45,
+     "toMoiDen": 52,
+     "toCuTu": 2,
+     "toCuDen": 49,
+     "soTo": 7,
+     "xaCu": "xa-cam-hoa-huyen-cam-lam",
+     "tenXaCu": "xã Cam Hòa",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 53,
+     "toMoiDen": 62,
+     "toCuTu": 1,
+     "toCuDen": 23,
+     "soTo": 10,
+     "xaCu": "xa-cam-hiep-bac-huyen-cam-lam",
+     "tenXaCu": "xã Cam Hiệp Bắc",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 63,
+     "toMoiDen": 77,
+     "toCuTu": 2,
+     "toCuDen": 29,
+     "soTo": 15,
+     "xaCu": "xa-cam-hiep-nam-huyen-cam-lam",
+     "tenXaCu": "xã Cam Hiệp Nam",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 78,
+     "toMoiDen": 95,
+     "toCuTu": 1,
+     "toCuDen": 18,
+     "soTo": 18,
+     "xaCu": "xa-suoi-tan-huyen-cam-lam",
+     "tenXaCu": "xã Suối Tân",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22453",
+   "slug": "xa-cam-lam-khanh-hoa",
+   "loai": "xã",
+   "ten": "Cam Lâm",
+   "donViGoc": "thị trấn Cam Đức",
+   "huyenGoc": 570,
+   "huyenCu": [
+    570
+   ],
+   "coQh": true,
+   "coBanDo": true,
+   "tam": [
+    109.14166,
+    12.08353
+   ],
+   "bbox": [
+    109.06002,
+    11.9968,
+    109.2233,
+    12.17027
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của thị trấn Cam Đức, các xã Cam Hải Đông, Cam Hải Tây, Cam Thành Bắc và một phần diện tích, quy mô dân số của các xã Cam Hiệp Bắc, Cam Hiệp Nam, Cam Hòa, Cam Tân, Cam An Bắc, Cam An Nam, Suối Tân thành xã mới có tên gọi là xã Cam Lâm.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "thi-tran-cam-duc-huyen-cam-lam",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-cam-hai-dong-huyen-cam-lam",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-cam-hai-tay-huyen-cam-lam",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-cam-thanh-bac-huyen-cam-lam",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-cam-hiep-bac-huyen-cam-lam",
+     "phan": "mot-phan"
+    },
+    {
+     "xa": "xa-cam-hiep-nam-huyen-cam-lam",
+     "phan": "mot-phan"
+    },
+    {
+     "xa": "xa-cam-hoa-huyen-cam-lam",
+     "phan": "mot-phan"
+    },
+    {
+     "xa": "xa-cam-tan-huyen-cam-lam",
+     "phan": "mot-phan"
+    },
+    {
+     "xa": "xa-cam-an-bac-huyen-cam-lam",
+     "phan": "mot-phan"
+    },
+    {
+     "xa": "xa-cam-an-nam-huyen-cam-lam",
+     "phan": "mot-phan"
+    },
+    {
+     "xa": "xa-suoi-tan-huyen-cam-lam",
+     "phan": "mot-phan"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 57,
+     "toCuTu": 1,
+     "toCuDen": 57,
+     "soTo": 57,
+     "xaCu": "thi-tran-cam-duc-huyen-cam-lam",
+     "tenXaCu": "thị trấn Cam Đức",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 58,
+     "toMoiDen": 120,
+     "toCuTu": 1,
+     "toCuDen": 63,
+     "soTo": 63,
+     "xaCu": "xa-cam-hai-dong-huyen-cam-lam",
+     "tenXaCu": "xã Cam Hải Đông",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 121,
+     "toMoiDen": 153,
+     "toCuTu": 2,
+     "toCuDen": 34,
+     "soTo": 33,
+     "xaCu": "xa-cam-hai-tay-huyen-cam-lam",
+     "tenXaCu": "xã Cam Hải Tây",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 154,
+     "toMoiDen": 203,
+     "toCuTu": 1,
+     "toCuDen": 50,
+     "soTo": 50,
+     "xaCu": "xa-cam-thanh-bac-huyen-cam-lam",
+     "tenXaCu": "xã Cam Thành Bắc",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 204,
+     "toMoiDen": 223,
+     "toCuTu": 2,
+     "toCuDen": 24,
+     "soTo": 20,
+     "xaCu": "xa-cam-hiep-bac-huyen-cam-lam",
+     "tenXaCu": "xã Cam Hiệp Bắc",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 224,
+     "toMoiDen": 245,
+     "toCuTu": 2,
+     "toCuDen": 31,
+     "soTo": 22,
+     "xaCu": "xa-cam-hiep-nam-huyen-cam-lam",
+     "tenXaCu": "xã Cam Hiệp Nam",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 246,
+     "toMoiDen": 300,
+     "toCuTu": 1,
+     "toCuDen": 56,
+     "soTo": 55,
+     "xaCu": "xa-cam-hoa-huyen-cam-lam",
+     "tenXaCu": "xã Cam Hòa",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 301,
+     "toMoiDen": 342,
+     "toCuTu": 1,
+     "toCuDen": 46,
+     "soTo": 42,
+     "xaCu": "xa-cam-tan-huyen-cam-lam",
+     "tenXaCu": "xã Cam Tân",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 343,
+     "toMoiDen": 385,
+     "toCuTu": 1,
+     "toCuDen": 50,
+     "soTo": 43,
+     "xaCu": "xa-suoi-tan-huyen-cam-lam",
+     "tenXaCu": "xã Suối Tân",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 386,
+     "toMoiDen": 398,
+     "toCuTu": 1,
+     "toCuDen": 17,
+     "soTo": 13,
+     "xaCu": "xa-cam-an-nam-huyen-cam-lam",
+     "tenXaCu": "xã Cam An Nam",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 399,
+     "toMoiDen": 399,
+     "toCuTu": 22,
+     "toCuDen": 22,
+     "soTo": 1,
+     "xaCu": "xa-cam-an-bac-huyen-cam-lam",
+     "tenXaCu": "xã Cam An Bắc",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22465",
+   "slug": "xa-cam-an-khanh-hoa",
+   "loai": "xã",
+   "ten": "Cam An",
+   "donViGoc": "xã Cam An Bắc",
+   "huyenGoc": 570,
+   "huyenCu": [
+    570
+   ],
+   "coQh": true,
+   "coBanDo": true,
+   "tam": [
+    109.06943,
+    11.9946
+   ],
+   "bbox": [
+    108.99293,
+    11.93655,
+    109.14593,
+    12.05265
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Cam Phước Tây và phần còn lại của xã Cam An Bắc, xã Cam An Nam sau khi thực hiện sắp xếp theo quy định tại khoản 18 Điều này thành xã mới có tên gọi là xã Cam An.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-cam-phuoc-tay-huyen-cam-lam",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-cam-an-bac-huyen-cam-lam",
+     "phan": "mot-phan"
+    },
+    {
+     "xa": "xa-cam-an-nam-huyen-cam-lam",
+     "phan": "mot-phan"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 31,
+     "toCuTu": 1,
+     "toCuDen": 31,
+     "soTo": 31,
+     "xaCu": "xa-cam-an-bac-huyen-cam-lam",
+     "tenXaCu": "xã Cam An Bắc",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 32,
+     "toMoiDen": 82,
+     "toCuTu": 1,
+     "toCuDen": 51,
+     "soTo": 51,
+     "xaCu": "xa-cam-phuoc-tay-huyen-cam-lam",
+     "tenXaCu": "xã Cam Phước Tây",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 83,
+     "toMoiDen": 105,
+     "toCuTu": 1,
+     "toCuDen": 29,
+     "soTo": 23,
+     "xaCu": "xa-cam-an-nam-huyen-cam-lam",
+     "tenXaCu": "xã Cam An Nam",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22708",
+   "slug": "xa-suoi-dau-khanh-hoa",
+   "loai": "xã",
+   "ten": "Suối Dầu",
+   "donViGoc": "xã Suối Cát",
+   "huyenGoc": 570,
+   "huyenCu": [
+    570
+   ],
+   "coQh": true,
+   "coBanDo": true,
+   "tam": [
+    109.0418,
+    12.14432
+   ],
+   "bbox": [
+    108.94021,
+    12.07448,
+    109.14338,
+    12.21415
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Suối Cát và một phần diện tích tự nhiên, quy mô dân số của các xã Cam Hòa, Cam Tân, Suối Tân thành xã mới có tên gọi là xã Suối Dầu.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-suoi-cat-huyen-cam-lam",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-cam-hoa-huyen-cam-lam",
+     "phan": "mot-phan"
+    },
+    {
+     "xa": "xa-cam-tan-huyen-cam-lam",
+     "phan": "mot-phan"
+    },
+    {
+     "xa": "xa-suoi-tan-huyen-cam-lam",
+     "phan": "mot-phan"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 57,
+     "toCuTu": 1,
+     "toCuDen": 57,
+     "soTo": 57,
+     "xaCu": "xa-suoi-cat-huyen-cam-lam",
+     "tenXaCu": "xã Suối Cát",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 58,
+     "toMoiDen": 62,
+     "toCuTu": 1,
+     "toCuDen": 56,
+     "soTo": 5,
+     "xaCu": "xa-cam-hoa-huyen-cam-lam",
+     "tenXaCu": "xã Cam Hòa",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 63,
+     "toMoiDen": 63,
+     "toCuTu": 45,
+     "toCuDen": 45,
+     "soTo": 1,
+     "xaCu": "xa-cam-tan-huyen-cam-lam",
+     "tenXaCu": "xã Cam Tân",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 64,
+     "toMoiDen": 82,
+     "toCuTu": 1,
+     "toCuDen": 49,
+     "soTo": 19,
+     "xaCu": "xa-suoi-tan-huyen-cam-lam",
+     "tenXaCu": "xã Suối Tân",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22489",
+   "slug": "xa-van-ninh-khanh-hoa",
+   "loai": "xã",
+   "ten": "Vạn Ninh",
+   "donViGoc": "thị trấn Vạn Giã",
+   "huyenGoc": 571,
+   "huyenCu": [
+    571
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.22183,
+    12.69071
+   ],
+   "bbox": [
+    109.20914,
+    12.67609,
+    109.23452,
+    12.70534
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của thị trấn Vạn Giã, xã Vạn Phú và xã Vạn Lương thành xã mới có tên gọi là xã Vạn Ninh.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "thi-tran-van-gia-huyen-van-ninh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-van-phu-huyen-van-ninh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-van-luong-huyen-van-ninh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 57,
+     "toCuTu": 1,
+     "toCuDen": 57,
+     "soTo": 57,
+     "xaCu": "thi-tran-van-gia-huyen-van-ninh",
+     "tenXaCu": "thị trấn Vạn Giã",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 58,
+     "toMoiDen": 122,
+     "toCuTu": 1,
+     "toCuDen": 65,
+     "soTo": 65,
+     "xaCu": "xa-van-phu-huyen-van-ninh",
+     "tenXaCu": "xã Vạn Phú",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 123,
+     "toMoiDen": 170,
+     "toCuTu": 1,
+     "toCuDen": 48,
+     "soTo": 48,
+     "xaCu": "xa-van-luong-huyen-van-ninh",
+     "tenXaCu": "xã Vạn Lương",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22498",
+   "slug": "xa-tu-bong-khanh-hoa",
+   "loai": "xã",
+   "ten": "Tu Bông",
+   "donViGoc": "xã Vạn Long",
+   "huyenGoc": 571,
+   "huyenCu": [
+    571
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.27913,
+    12.79753
+   ],
+   "bbox": [
+    109.22822,
+    12.75656,
+    109.33004,
+    12.8385
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Vạn Khánh, Vạn Long và Vạn Phước thành xã mới có tên gọi là xã Tu Bông.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-van-khanh-huyen-van-ninh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-van-long-huyen-van-ninh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-van-phuoc-huyen-van-ninh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 39,
+     "toCuTu": 1,
+     "toCuDen": 39,
+     "soTo": 39,
+     "xaCu": "xa-van-long-huyen-van-ninh",
+     "tenXaCu": "xã Vạn Long",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 40,
+     "toMoiDen": 79,
+     "toCuTu": 1,
+     "toCuDen": 40,
+     "soTo": 40,
+     "xaCu": "xa-van-phuoc-huyen-van-ninh",
+     "tenXaCu": "xã Vạn Phước",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 80,
+     "toMoiDen": 126,
+     "toCuTu": 1,
+     "toCuDen": 47,
+     "soTo": 47,
+     "xaCu": "xa-van-khanh-huyen-van-ninh",
+     "tenXaCu": "xã Vạn Khánh",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22504",
+   "slug": "xa-dai-lanh-khanh-hoa",
+   "loai": "xã",
+   "ten": "Đại Lãnh",
+   "donViGoc": "xã Vạn Thọ",
+   "huyenGoc": 571,
+   "huyenCu": [
+    571
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.3554,
+    12.78088
+   ],
+   "bbox": [
+    109.31446,
+    12.71153,
+    109.39635,
+    12.85023
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Vạn Thạnh, Vạn Thọ và Đại Lãnh thành xã mới có tên gọi là xã Đại Lãnh.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-van-thanh-huyen-van-ninh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-van-tho-huyen-van-ninh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-dai-lanh-huyen-van-ninh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 39,
+     "toCuTu": 1,
+     "toCuDen": 39,
+     "soTo": 39,
+     "xaCu": "xa-van-tho-huyen-van-ninh",
+     "tenXaCu": "xã Vạn Thọ",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 40,
+     "toMoiDen": 61,
+     "toCuTu": 1,
+     "toCuDen": 22,
+     "soTo": 22,
+     "xaCu": "xa-dai-lanh-huyen-van-ninh",
+     "tenXaCu": "xã Đại Lãnh",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 62,
+     "toMoiDen": 129,
+     "toCuTu": 1,
+     "toCuDen": 68,
+     "soTo": 68,
+     "xaCu": "xa-van-thanh-huyen-van-ninh",
+     "tenXaCu": "xã Vạn Thạnh",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22516",
+   "slug": "xa-van-thang-khanh-hoa",
+   "loai": "xã",
+   "ten": "Vạn Thắng",
+   "donViGoc": "",
+   "huyenGoc": 571,
+   "huyenCu": [
+    571
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.25241,
+    12.72728
+   ],
+   "bbox": [
+    109.22795,
+    12.69867,
+    109.27687,
+    12.75589
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Vạn Bình và xã Vạn Thắng thành xã mới có tên gọi là xã Vạn Thắng.",
+   "gomCungTen": {
+    "ten": "xã Vạn Thắng",
+    "phan": "toan-bo"
+   },
+   "gom": [
+    {
+     "xa": "xa-van-binh-huyen-van-ninh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 58,
+     "toCuTu": 1,
+     "toCuDen": 58,
+     "soTo": 58,
+     "xaCu": "",
+     "tenXaCu": "xã Vạn Thắng",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 59,
+     "toMoiDen": 101,
+     "toCuTu": 1,
+     "toCuDen": 43,
+     "soTo": 43,
+     "xaCu": "xa-van-binh-huyen-van-ninh",
+     "tenXaCu": "xã Vạn Bình",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22525",
+   "slug": "xa-van-hung-khanh-hoa",
+   "loai": "xã",
+   "ten": "Vạn Hưng",
+   "donViGoc": "",
+   "huyenGoc": 571,
+   "huyenCu": [
+    571
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.16563,
+    12.63124
+   ],
+   "bbox": [
+    109.11535,
+    12.58254,
+    109.21591,
+    12.67995
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Xuân Sơn và xã Vạn Hưng thành xã mới có tên gọi là xã Vạn Hưng.",
+   "gomCungTen": {
+    "ten": "xã Vạn Hưng",
+    "phan": "toan-bo"
+   },
+   "gom": [
+    {
+     "xa": "xa-xuan-son-huyen-van-ninh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 72,
+     "toCuTu": 1,
+     "toCuDen": 72,
+     "soTo": 72,
+     "xaCu": "",
+     "tenXaCu": "xã Vạn Hưng",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 73,
+     "toMoiDen": 112,
+     "toCuTu": 1,
+     "toCuDen": 40,
+     "soTo": 40,
+     "xaCu": "xa-xuan-son-huyen-van-ninh",
+     "tenXaCu": "xã Xuân Sơn",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22528",
+   "slug": "phuong-ninh-hoa-khanh-hoa",
+   "loai": "phường",
+   "ten": "Ninh Hòa",
+   "donViGoc": "phường Ninh Hiệp",
+   "huyenGoc": 572,
+   "huyenCu": [
+    572
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.13834,
+    12.50046
+   ],
+   "bbox": [
+    109.12323,
+    12.47545,
+    109.15346,
+    12.52547
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Ninh Hiệp, phường Ninh Đa, xã Ninh Đông và xã Ninh Phụng thành phường mới có tên gọi là phường Ninh Hòa.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "phuong-ninh-hiep-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-ninh-da-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ninh-dong-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ninh-phung-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 73,
+     "toCuTu": 1,
+     "toCuDen": 73,
+     "soTo": 73,
+     "xaCu": "phuong-ninh-hiep-thi-xa-ninh-hoa",
+     "tenXaCu": "phường Ninh Hiệp",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 74,
+     "toMoiDen": 91,
+     "toCuTu": 1,
+     "toCuDen": 18,
+     "soTo": 18,
+     "xaCu": "xa-ninh-dong-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Đông",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 92,
+     "toMoiDen": 110,
+     "toCuTu": 1,
+     "toCuDen": 19,
+     "soTo": 19,
+     "xaCu": "xa-ninh-phung-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Phụng",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 111,
+     "toMoiDen": 168,
+     "toCuTu": 1,
+     "toCuDen": 58,
+     "soTo": 58,
+     "xaCu": "phuong-ninh-da-thi-xa-ninh-hoa",
+     "tenXaCu": "phường Ninh Đa",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22546",
+   "slug": "xa-bac-ninh-hoa-khanh-hoa",
+   "loai": "xã",
+   "ten": "Bắc Ninh Hòa",
+   "donViGoc": "xã Ninh Thọ",
+   "huyenGoc": 572,
+   "huyenCu": [
+    572
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.18664,
+    12.54324
+   ],
+   "bbox": [
+    109.16278,
+    12.49838,
+    109.21051,
+    12.58811
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Ninh An, Ninh Sơn và Ninh Thọ thành xã mới có tên gọi là xã Bắc Ninh Hòa.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-ninh-an-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ninh-son-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ninh-tho-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 95,
+     "toCuTu": 1,
+     "toCuDen": 95,
+     "soTo": 95,
+     "xaCu": "xa-ninh-tho-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Thọ",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 96,
+     "toMoiDen": 244,
+     "toCuTu": 1,
+     "toCuDen": 149,
+     "soTo": 149,
+     "xaCu": "xa-ninh-an-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh An",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 245,
+     "toMoiDen": 284,
+     "toCuTu": 1,
+     "toCuDen": 40,
+     "soTo": 40,
+     "xaCu": "xa-ninh-son-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Sơn",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22552",
+   "slug": "xa-tay-ninh-hoa-khanh-hoa",
+   "loai": "xã",
+   "ten": "Tây Ninh Hòa",
+   "donViGoc": "xã Ninh Sim",
+   "huyenGoc": 572,
+   "huyenCu": [
+    572
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.00513,
+    12.53196
+   ],
+   "bbox": [
+    108.96947,
+    12.47755,
+    109.0408,
+    12.58636
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Ninh Tây và xã Ninh Sim thành xã mới có tên gọi là xã Tây Ninh Hòa.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-ninh-tay-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ninh-sim-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 4,
+     "toMoiDen": 80,
+     "toCuTu": 4,
+     "toCuDen": 80,
+     "soTo": 77,
+     "xaCu": "xa-ninh-sim-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Sim",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 81,
+     "toMoiDen": 210,
+     "toCuTu": 1,
+     "toCuDen": 130,
+     "soTo": 129,
+     "xaCu": "xa-ninh-tay-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Tây",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 102,
+     "toMoiDen": 102,
+     "toCuTu": 22,
+     "toCuDen": 22,
+     "soTo": 1,
+     "xaCu": "xa-ninh-tay-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Tây",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22558",
+   "slug": "xa-hoa-tri-khanh-hoa",
+   "loai": "xã",
+   "ten": "Hoà Trí",
+   "donViGoc": "xã Ninh Thân",
+   "huyenGoc": 572,
+   "huyenCu": [
+    572
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.09292,
+    12.53306
+   ],
+   "bbox": [
+    109.06742,
+    12.50835,
+    109.11842,
+    12.55777
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Ninh Thượng, Ninh Trung và Ninh Thân thành xã mới có tên gọi là xã Hòa Trí.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-ninh-thuong-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ninh-trung-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ninh-than-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 27,
+     "toCuTu": 1,
+     "toCuDen": 27,
+     "soTo": 27,
+     "xaCu": "xa-ninh-than-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Thân",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 28,
+     "toMoiDen": 78,
+     "toCuTu": 1,
+     "toCuDen": 52,
+     "soTo": 51,
+     "xaCu": "xa-ninh-thuong-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Thượng",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 79,
+     "toMoiDen": 106,
+     "toCuTu": 1,
+     "toCuDen": 28,
+     "soTo": 28,
+     "xaCu": "xa-ninh-trung-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Trung",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22561",
+   "slug": "phuong-dong-ninh-hoa-khanh-hoa",
+   "loai": "phường",
+   "ten": "Đông Ninh Hòa",
+   "donViGoc": "phường Ninh Diêm",
+   "huyenGoc": 572,
+   "huyenCu": [
+    572
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.25471,
+    12.48835
+   ],
+   "bbox": [
+    109.19269,
+    12.41447,
+    109.31673,
+    12.56223
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Ninh Diêm, Ninh Hải, Ninh Thủy và xã Ninh Phước thành phường mới có tên gọi là phường Đông Ninh Hòa.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "phuong-ninh-diem-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-ninh-hai-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-ninh-thuy-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ninh-phuoc-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 24,
+     "toCuTu": 1,
+     "toCuDen": 24,
+     "soTo": 24,
+     "xaCu": "phuong-ninh-diem-thi-xa-ninh-hoa",
+     "tenXaCu": "phường Ninh Diêm",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 25,
+     "toMoiDen": 43,
+     "toCuTu": 1,
+     "toCuDen": 19,
+     "soTo": 19,
+     "xaCu": "phuong-ninh-hai-thi-xa-ninh-hoa",
+     "tenXaCu": "phường Ninh Hải",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 44,
+     "toMoiDen": 71,
+     "toCuTu": 1,
+     "toCuDen": 28,
+     "soTo": 28,
+     "xaCu": "phuong-ninh-thuy-thi-xa-ninh-hoa",
+     "tenXaCu": "phường Ninh Thủy",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 72,
+     "toMoiDen": 103,
+     "toCuTu": 1,
+     "toCuDen": 32,
+     "soTo": 25,
+     "xaCu": "xa-ninh-phuoc-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Phước",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 74,
+     "toMoiDen": 120,
+     "toCuTu": 3,
+     "toCuDen": 50,
+     "soTo": 24,
+     "xaCu": "xa-ninh-phuoc-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Phước",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22576",
+   "slug": "xa-tan-dinh-khanh-hoa",
+   "loai": "xã",
+   "ten": "Tân Định",
+   "donViGoc": "xã Ninh Bình",
+   "huyenGoc": 572,
+   "huyenCu": [
+    572
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.07883,
+    12.48737
+   ],
+   "bbox": [
+    109.03096,
+    12.47433,
+    109.12669,
+    12.50041
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Ninh Xuân, Ninh Quang và Ninh Bình thành xã mới có tên gọi là xã Tân Định.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-ninh-xuan-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ninh-quang-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ninh-binh-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 29,
+     "toCuTu": 1,
+     "toCuDen": 29,
+     "soTo": 29,
+     "xaCu": "xa-ninh-binh-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Bình",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 30,
+     "toMoiDen": 183,
+     "toCuTu": 1,
+     "toCuDen": 154,
+     "soTo": 154,
+     "xaCu": "xa-ninh-xuan-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Xuân",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 184,
+     "toMoiDen": 222,
+     "toCuTu": 1,
+     "toCuDen": 39,
+     "soTo": 39,
+     "xaCu": "xa-ninh-quang-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Quang",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22591",
+   "slug": "phuong-hoa-thang-khanh-hoa",
+   "loai": "phường",
+   "ten": "Hòa Thắng",
+   "donViGoc": "phường Ninh Giang",
+   "huyenGoc": 572,
+   "huyenCu": [
+    572
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.1512,
+    12.47348
+   ],
+   "bbox": [
+    109.12834,
+    12.45788,
+    109.17406,
+    12.48907
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Ninh Giang, phường Ninh Hà và xã Ninh Phú thành phường mới có tên gọi là phường Hòa Thắng.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "phuong-ninh-giang-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-ninh-ha-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ninh-phu-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 12,
+     "toCuTu": 1,
+     "toCuDen": 12,
+     "soTo": 12,
+     "xaCu": "phuong-ninh-giang-thi-xa-ninh-hoa",
+     "tenXaCu": "phường Ninh Giang",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 13,
+     "toMoiDen": 36,
+     "toCuTu": 1,
+     "toCuDen": 24,
+     "soTo": 24,
+     "xaCu": "phuong-ninh-ha-thi-xa-ninh-hoa",
+     "tenXaCu": "phường Ninh Hà",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 37,
+     "toMoiDen": 62,
+     "toCuTu": 1,
+     "toCuDen": 26,
+     "soTo": 26,
+     "xaCu": "xa-ninh-phu-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Phú",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22597",
+   "slug": "xa-nam-ninh-hoa-khanh-hoa",
+   "loai": "xã",
+   "ten": "Nam Ninh Hòa",
+   "donViGoc": "xã Ninh Hưng",
+   "huyenGoc": 572,
+   "huyenCu": [
+    572
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.07172,
+    12.43401
+   ],
+   "bbox": [
+    109.02644,
+    12.39897,
+    109.11699,
+    12.46905
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Ninh Lộc, Ninh Ích, Ninh Hưng và Ninh Tân thành xã mới có tên gọi là xã Nam Ninh Hòa.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-ninh-loc-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ninh-ich-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ninh-hung-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ninh-tan-thi-xa-ninh-hoa",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 24,
+     "toCuTu": 1,
+     "toCuDen": 24,
+     "soTo": 24,
+     "xaCu": "xa-ninh-hung-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Hưng",
+     "giuSo": true
+    },
+    {
+     "toMoiTu": 25,
+     "toMoiDen": 64,
+     "toCuTu": 1,
+     "toCuDen": 40,
+     "soTo": 40,
+     "xaCu": "xa-ninh-tan-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Tân",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 65,
+     "toMoiDen": 93,
+     "toCuTu": 1,
+     "toCuDen": 30,
+     "soTo": 29,
+     "xaCu": "xa-ninh-loc-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Lộc",
+     "giuSo": false
+    },
+    {
+     "toMoiTu": 94,
+     "toMoiDen": 120,
+     "toCuTu": 1,
+     "toCuDen": 27,
+     "soTo": 27,
+     "xaCu": "xa-ninh-ich-thi-xa-ninh-hoa",
+     "tenXaCu": "xã Ninh Ích",
+     "giuSo": false
+    }
+   ]
+  },
+  {
+   "id": "22609",
+   "slug": "xa-khanh-vinh-khanh-hoa",
+   "loai": "xã",
+   "ten": "Khánh Vĩnh",
+   "donViGoc": "thị trấn Khánh Vĩnh",
+   "huyenGoc": 573,
+   "huyenCu": [
+    573
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.90578,
+    12.19059
+   ],
+   "bbox": [
+    108.83577,
+    12.08735,
+    108.97579,
+    12.29383
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của thị trấn Khánh Vĩnh, xã Sông Cầu và xã Khánh Phú thành xã mới có tên gọi là xã Khánh Vĩnh.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "thi-tran-khanh-vinh-huyen-khanh-vinh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-song-cau-huyen-khanh-vinh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-khanh-phu-huyen-khanh-vinh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22612",
+   "slug": "xa-trung-khanh-vinh-khanh-hoa",
+   "loai": "xã",
+   "ten": "Trung Khánh Vĩnh",
+   "donViGoc": "xã Khánh Hiệp",
+   "huyenGoc": 573,
+   "huyenCu": [
+    573
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.80645,
+    12.40744
+   ],
+   "bbox": [
+    108.66868,
+    12.30923,
+    108.94422,
+    12.50564
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Khánh Trung và xã Khánh Hiệp thành xã mới có tên gọi là xã Trung Khánh Vĩnh.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-khanh-trung-huyen-khanh-vinh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-khanh-hiep-huyen-khanh-vinh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22615",
+   "slug": "xa-bac-khanh-vinh-khanh-hoa",
+   "loai": "xã",
+   "ten": "Bắc Khánh Vĩnh",
+   "donViGoc": "xã Khánh Bình",
+   "huyenGoc": 573,
+   "huyenCu": [
+    573
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.96453,
+    12.4169
+   ],
+   "bbox": [
+    108.86409,
+    12.3335,
+    109.06498,
+    12.50031
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Khánh Bình và xã Khánh Đông thành xã mới có tên gọi là xã Bắc Khánh Vĩnh.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-khanh-binh-huyen-khanh-vinh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-khanh-dong-huyen-khanh-vinh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22624",
+   "slug": "xa-tay-khanh-vinh-khanh-hoa",
+   "loai": "xã",
+   "ten": "Tây Khánh Vĩnh",
+   "donViGoc": "xã Khánh Thượng",
+   "huyenGoc": 573,
+   "huyenCu": [
+    573
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.81389,
+    12.30778
+   ],
+   "bbox": [
+    108.67678,
+    12.21719,
+    108.95099,
+    12.39837
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Giang Ly, Khánh Thượng và Khánh Nam thành xã mới có tên gọi là xã Tây Khánh Vĩnh.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-giang-ly-huyen-khanh-vinh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-khanh-thuong-huyen-khanh-vinh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-khanh-nam-huyen-khanh-vinh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22648",
+   "slug": "xa-nam-khanh-vinh-khanh-hoa",
+   "loai": "xã",
+   "ten": "Nam Khánh Vĩnh",
+   "donViGoc": "xã Sơn Thái",
+   "huyenGoc": 573,
+   "huyenCu": [
+    573
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.81505,
+    12.20803
+   ],
+   "bbox": [
+    108.71119,
+    12.13567,
+    108.9189,
+    12.28038
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Cầu Bà, Khánh Thành, Liên Sang và Sơn Thái thành xã mới có tên gọi là xã Nam Khánh Vĩnh.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-cau-ba-huyen-khanh-vinh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-khanh-thanh-huyen-khanh-vinh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-lien-sang-huyen-khanh-vinh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-son-thai-huyen-khanh-vinh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22651",
+   "slug": "xa-dien-khanh-khanh-hoa",
+   "loai": "xã",
+   "ten": "Diên Khánh",
+   "donViGoc": "thị trấn Diên Khánh",
+   "huyenGoc": 574,
+   "huyenCu": [
+    574
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.10534,
+    12.25846
+   ],
+   "bbox": [
+    109.08521,
+    12.2453,
+    109.12547,
+    12.27162
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của thị trấn Diên Khánh, xã Diên An và xã Diên Toàn thành xã mới có tên gọi là xã Diên Khánh.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "thi-tran-dien-khanh-huyen-dien-khanh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-dien-an-huyen-dien-khanh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-dien-toan-huyen-dien-khanh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22657",
+   "slug": "xa-dien-dien-khanh-hoa",
+   "loai": "xã",
+   "ten": "Diên Điền",
+   "donViGoc": "",
+   "huyenGoc": 574,
+   "huyenCu": [
+    574
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.10186,
+    12.31549
+   ],
+   "bbox": [
+    109.07225,
+    12.26948,
+    109.13148,
+    12.3615
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Diên Sơn, Diên Phú và Diên Điềnthành xã mới có tên gọi là xã Diên Điền.",
+   "gomCungTen": {
+    "ten": "xã Diên Điền",
+    "phan": "toan-bo"
+   },
+   "gom": [
+    {
+     "xa": "xa-dien-son-huyen-dien-khanh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-dien-phu-huyen-dien-khanh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22660",
+   "slug": "xa-dien-lam-khanh-hoa",
+   "loai": "xã",
+   "ten": "Diên Lâm",
+   "donViGoc": "xã Xuân Đồng",
+   "huyenGoc": 574,
+   "huyenCu": [
+    574
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.98595,
+    12.32866
+   ],
+   "bbox": [
+    108.93313,
+    12.30136,
+    109.03878,
+    12.35597
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Xuân Đồng và xã Diên Lâm thành xã mới có tên gọi là xã Diên Lâm.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-xuan-dong-huyen-dien-khanh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-dien-lam-huyen-dien-khanh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22672",
+   "slug": "xa-dien-tho-khanh-hoa",
+   "loai": "xã",
+   "ten": "Diên Thọ",
+   "donViGoc": "",
+   "huyenGoc": 574,
+   "huyenCu": [
+    574
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.00007,
+    12.26035
+   ],
+   "bbox": [
+    108.95751,
+    12.23472,
+    109.04262,
+    12.28599
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Diên Tân, Diên Phước và Diên Thọ thành xã mới có tên gọi là xã Diên Thọ.",
+   "gomCungTen": {
+    "ten": "xã Diên Thọ",
+    "phan": "toan-bo"
+   },
+   "gom": [
+    {
+     "xa": "xa-dien-tan-huyen-dien-khanh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-dien-phuoc-huyen-dien-khanh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22678",
+   "slug": "xa-dien-lac-khanh-hoa",
+   "loai": "xã",
+   "ten": "Diên Lạc",
+   "donViGoc": "",
+   "huyenGoc": 574,
+   "huyenCu": [
+    574
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.07113,
+    12.25327
+   ],
+   "bbox": [
+    109.05499,
+    12.24098,
+    109.08726,
+    12.26555
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Diên Thạnh, Diên Lạc và Diên Hòa thành xã mới có tên gọi là xã Diên Lạc.",
+   "gomCungTen": {
+    "ten": "xã Diên Lạc",
+    "phan": "toan-bo"
+   },
+   "gom": [
+    {
+     "xa": "xa-dien-thanh-huyen-dien-khanh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-dien-hoa-huyen-dien-khanh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22702",
+   "slug": "xa-suoi-hiep-khanh-hoa",
+   "loai": "xã",
+   "ten": "Suối Hiệp",
+   "donViGoc": "",
+   "huyenGoc": 574,
+   "huyenCu": [
+    574
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.08514,
+    12.21714
+   ],
+   "bbox": [
+    109.05668,
+    12.19542,
+    109.11361,
+    12.23887
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Suối Tiên, Bình Lộc và Suối Hiệp thành xã mới có tên gọi là xã Suối Hiệp.",
+   "gomCungTen": {
+    "ten": "xã Suối Hiệp",
+    "phan": "toan-bo"
+   },
+   "gom": [
+    {
+     "xa": "xa-suoi-tien-huyen-dien-khanh",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-binh-loc-huyen-dien-khanh",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22714",
+   "slug": "xa-khanh-son-khanh-hoa",
+   "loai": "xã",
+   "ten": "Khánh Sơn",
+   "donViGoc": "thị trấn Tô Hạp",
+   "huyenGoc": 575,
+   "huyenCu": [
+    575
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.91479,
+    12.02817
+   ],
+   "bbox": [
+    108.87261,
+    11.96709,
+    108.95697,
+    12.08924
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên và quy mô dân số của thị trấn Tô Hạp, xã Sơn Hiệp và xã Sơn Bình thành xã mới có tên gọi là xã Khánh Sơn.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "thi-tran-to-hap-huyen-khanh-son",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-son-hiep-huyen-khanh-son",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-son-binh-huyen-khanh-son",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22720",
+   "slug": "xa-tay-khanh-son-khanh-hoa",
+   "loai": "xã",
+   "ten": "Tây Khánh Sơn",
+   "donViGoc": "xã Sơn Lâm",
+   "huyenGoc": 575,
+   "huyenCu": [
+    575
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.85147,
+    12.03649
+   ],
+   "bbox": [
+    108.79887,
+    11.96388,
+    108.90407,
+    12.10911
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Sơn Lâm và xã Thành Sơn thành xã mới có tên gọi là xã Tây Khánh Sơn.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-son-lam-huyen-khanh-son",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-thanh-son-huyen-khanh-son",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22732",
+   "slug": "xa-dong-khanh-son-khanh-hoa",
+   "loai": "xã",
+   "ten": "Đông Khánh Sơn",
+   "donViGoc": "xã Ba Cụm Bắc",
+   "huyenGoc": 575,
+   "huyenCu": [
+    575
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.95348,
+    11.9964
+   ],
+   "bbox": [
+    108.89913,
+    11.92053,
+    109.00784,
+    12.07228
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên và quy mô dân số của các xã Sơn Trung, Ba Cụm Bắc và Ba Cụm Nam thành xã mới có tên gọi là xã Đông Khánh Sơn.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-son-trung-huyen-khanh-son",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ba-cum-bac-huyen-khanh-son",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ba-cum-nam-huyen-khanh-son",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22736",
+   "slug": "dac-khu-truong-sa-khanh-hoa",
+   "loai": "đặc khu",
+   "ten": "Trường Sa",
+   "donViGoc": "thị trấn Trường Sa",
+   "huyenGoc": 576,
+   "huyenCu": [
+    576
+   ],
+   "coQh": false,
+   "coBanDo": false,
+   "tam": null,
+   "bbox": null,
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của thị trấn Trường Sa, xã Song Tử Tây và xã Sinh Tồn thành đặc khu có tên gọi là đặc khu Trường Sa.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "thi-tran-truong-sa-huyen-truong-sa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-song-tu-tay-huyen-truong-sa",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-sinh-ton-huyen-truong-sa",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22738",
+   "slug": "phuong-do-vinh-khanh-hoa",
+   "loai": "phường",
+   "ten": "Đô Vinh",
+   "donViGoc": "",
+   "huyenGoc": 582,
+   "huyenCu": [
+    582,
+    585
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.93983,
+    11.63442
+   ],
+   "bbox": [
+    108.91327,
+    11.59201,
+    108.9664,
+    11.67684
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Đô Vinh và xã Nhơn Sơn thành phường mới có tên gọi là phường Đô Vinh.",
+   "gomCungTen": {
+    "ten": "phường Đô Vinh",
+    "phan": "toan-bo"
+   },
+   "gom": [
+    {
+     "xa": "xa-nhon-son-huyen-ninh-son",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22741",
+   "slug": "phuong-bao-an-khanh-hoa",
+   "loai": "phường",
+   "ten": "Bảo An",
+   "donViGoc": "phường Phước Mỹ",
+   "huyenGoc": 582,
+   "huyenCu": [
+    582
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.97077,
+    11.58994
+   ],
+   "bbox": [
+    108.93805,
+    11.57034,
+    109.00349,
+    11.60954
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Phước Mỹ, phường Bảo An và xã Thành Hải thành phường mới có tên gọi là phường Bảo An.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "phuong-phuoc-my-thanh-pho-phan-rang-thap-cham",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-bao-an-thanh-pho-phan-rang-thap-cham",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-thanh-hai-thanh-pho-phan-rang-thap-cham",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22759",
+   "slug": "phuong-phan-rang-khanh-hoa",
+   "loai": "phường",
+   "ten": "Phan Rang",
+   "donViGoc": "phường Kinh Dinh",
+   "huyenGoc": 582,
+   "huyenCu": [
+    582
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.9907,
+    11.56979
+   ],
+   "bbox": [
+    108.9846,
+    11.55567,
+    108.9968,
+    11.58391
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Kinh Dinh, Phủ Hà, Đài Sơn và Đạo Long thành phường mới có tên gọi là phường Phan Rang.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "phuong-kinh-dinh-thanh-pho-phan-rang-thap-cham",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-phu-ha-thanh-pho-phan-rang-thap-cham",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-dai-son-thanh-pho-phan-rang-thap-cham",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-dao-long-thanh-pho-phan-rang-thap-cham",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22780",
+   "slug": "phuong-dong-hai-khanh-hoa",
+   "loai": "phường",
+   "ten": "Đông Hải",
+   "donViGoc": "phường Mỹ Hải",
+   "huyenGoc": 582,
+   "huyenCu": [
+    582
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.01343,
+    11.56131
+   ],
+   "bbox": [
+    108.99904,
+    11.54612,
+    109.02781,
+    11.57651
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Mỹ Bình, Mỹ Đông, Mỹ Hải và phần còn lại của phường Đông Hải sau khi sắp xếp theo quy định tại khoản 36 Điều này thành phường mới có tên gọi là phường Đông Hải.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "phuong-my-binh-thanh-pho-phan-rang-thap-cham",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-my-dong-thanh-pho-phan-rang-thap-cham",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-my-hai-thanh-pho-phan-rang-thap-cham",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-dong-hai-thanh-pho-phan-rang-thap-cham",
+     "phan": "mot-phan"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22834",
+   "slug": "phuong-ninh-chu-khanh-hoa",
+   "loai": "phường",
+   "ten": "Ninh Chử",
+   "donViGoc": "thị trấn Khánh Hải",
+   "huyenGoc": 582,
+   "huyenCu": [
+    582
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.02199,
+    11.59752
+   ],
+   "bbox": [
+    108.9968,
+    11.57802,
+    109.04718,
+    11.61702
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Văn Hải và thị trấn Khánh Hải thành phường mới có tên gọi là phường Ninh Chử.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "phuong-van-hai-thanh-pho-phan-rang-thap-cham",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "thi-tran-khanh-hai-thanh-pho-phan-rang-thap-cham",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22786",
+   "slug": "xa-bac-ai-tay-khanh-hoa",
+   "loai": "xã",
+   "ten": "Bác Ái Tây",
+   "donViGoc": "xã Phước Hòa",
+   "huyenGoc": 584,
+   "huyenCu": [
+    584
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.78624,
+    11.93728
+   ],
+   "bbox": [
+    108.74133,
+    11.83364,
+    108.83115,
+    12.04092
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Phước Hòa, Phước Tân và Phước Bình thành xã mới có tên gọi là xã Bác Ái Tây.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-phuoc-hoa-huyen-bac-ai",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-tan-huyen-bac-ai",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-binh-huyen-bac-ai",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22795",
+   "slug": "xa-bac-ai-khanh-hoa",
+   "loai": "xã",
+   "ten": "Bác Ái",
+   "donViGoc": "xã Phước Thắng",
+   "huyenGoc": 584,
+   "huyenCu": [
+    584
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.84837,
+    11.82899
+   ],
+   "bbox": [
+    108.79662,
+    11.77918,
+    108.90012,
+    11.8788
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Phước Tiến, Phước Thắng và Phước Chính thành xã mới có tên gọi là xã Bác Ái.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-phuoc-tien-huyen-bac-ai",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-thang-huyen-bac-ai",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-chinh-huyen-bac-ai",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22801",
+   "slug": "xa-bac-ai-dong-khanh-hoa",
+   "loai": "xã",
+   "ten": "Bác Ái Đông",
+   "donViGoc": "xã Phước Đại",
+   "huyenGoc": 584,
+   "huyenCu": [
+    584
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.9631,
+    11.85996
+   ],
+   "bbox": [
+    108.87181,
+    11.80979,
+    109.05439,
+    11.91012
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Phước Đại và xã Phước Thành thành xã mới có tên gọi là xã Bác Ái Đông.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-phuoc-dai-huyen-bac-ai",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-thanh-huyen-bac-ai",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22810",
+   "slug": "xa-ninh-son-khanh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Sơn",
+   "donViGoc": "thị trấn Tân Sơn",
+   "huyenGoc": 585,
+   "huyenCu": [
+    585
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.75746,
+    11.75147
+   ],
+   "bbox": [
+    108.70117,
+    11.70785,
+    108.81375,
+    11.7951
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của thị trấn Tân Sơn và xã Quảng Sơn thành xã mới có tên gọi là xã Ninh Sơn.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "thi-tran-tan-son-huyen-ninh-son",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-quang-son-huyen-ninh-son",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22813",
+   "slug": "xa-lam-son-khanh-hoa",
+   "loai": "xã",
+   "ten": "Lâm Sơn",
+   "donViGoc": "",
+   "huyenGoc": 585,
+   "huyenCu": [
+    585
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.71293,
+    11.82515
+   ],
+   "bbox": [
+    108.63417,
+    11.7884,
+    108.7917,
+    11.8619
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Lương Sơn và xã Lâm Sơn thành xã mới có tên gọi là xã Lâm Sơn.",
+   "gomCungTen": {
+    "ten": "xã Lâm Sơn",
+    "phan": "toan-bo"
+   },
+   "gom": [
+    {
+     "xa": "xa-luong-son-huyen-ninh-son",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22822",
+   "slug": "xa-my-son-khanh-hoa",
+   "loai": "xã",
+   "ten": "Mỹ Sơn",
+   "donViGoc": "",
+   "huyenGoc": 585,
+   "huyenCu": [
+    585,
+    584
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.84434,
+    11.68969
+   ],
+   "bbox": [
+    108.77815,
+    11.63568,
+    108.91052,
+    11.7437
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Phước Trung và xã Mỹ Sơn thành xã mới có tên gọi là xã Mỹ Sơn.",
+   "gomCungTen": {
+    "ten": "xã Mỹ Sơn",
+    "phan": "toan-bo"
+   },
+   "gom": [
+    {
+     "xa": "xa-phuoc-trung-huyen-bac-ai",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22828",
+   "slug": "xa-anh-dung-khanh-hoa",
+   "loai": "xã",
+   "ten": "Anh Dũng",
+   "donViGoc": "xã Ma Nới",
+   "huyenGoc": 585,
+   "huyenCu": [
+    585
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.71292,
+    11.67054
+   ],
+   "bbox": [
+    108.62438,
+    11.61858,
+    108.80146,
+    11.7225
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Ma Nới và xã Hòa Sơn thành xã mới có tên gọi là xã Anh Dũng.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-ma-noi-huyen-ninh-son",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-hoa-son-huyen-ninh-son",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22846",
+   "slug": "xa-vinh-hai-khanh-hoa",
+   "loai": "xã",
+   "ten": "Vĩnh Hải",
+   "donViGoc": "",
+   "huyenGoc": 586,
+   "huyenCu": [
+    586
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.16859,
+    11.6631
+   ],
+   "bbox": [
+    109.13553,
+    11.58952,
+    109.20165,
+    11.73668
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Nhơn Hải, Thanh Hải và Vĩnh Hải thành xã mới có tên gọi là xã Vĩnh Hải.",
+   "gomCungTen": {
+    "ten": "xã Vĩnh Hải",
+    "phan": "toan-bo"
+   },
+   "gom": [
+    {
+     "xa": "xa-nhon-hai-huyen-ninh-hai",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-thanh-hai-huyen-ninh-hai",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22852",
+   "slug": "xa-ninh-hai-khanh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Hải",
+   "donViGoc": "xã Phương Hải",
+   "huyenGoc": 586,
+   "huyenCu": [
+    586,
+    588
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.0459,
+    11.65663
+   ],
+   "bbox": [
+    109.03459,
+    11.62145,
+    109.05722,
+    11.69181
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Phương Hải, Tri Hải và Bắc Sơn thành xã mới có tên gọi là xã Ninh Hải.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-phuong-hai-huyen-ninh-hai",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-tri-hai-huyen-ninh-hai",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-bac-son-huyen-thuan-bac",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22861",
+   "slug": "xa-xuan-hai-khanh-hoa",
+   "loai": "xã",
+   "ten": "Xuân Hải",
+   "donViGoc": "xã Hộ Hải",
+   "huyenGoc": 586,
+   "huyenCu": [
+    586
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.99616,
+    11.63867
+   ],
+   "bbox": [
+    108.96735,
+    11.61257,
+    109.02497,
+    11.66478
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Hộ Hải, Tân Hải và Xuân Hải thành xã mới có tên gọi là xã Xuân Hải.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-ho-hai-huyen-ninh-hai",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-tan-hai-huyen-ninh-hai",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-xuan-hai-huyen-ninh-hai",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22870",
+   "slug": "xa-ninh-phuoc-khanh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Phước",
+   "donViGoc": "thị trấn Phước Dân",
+   "huyenGoc": 587,
+   "huyenCu": [
+    587
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.94622,
+    11.54566
+   ],
+   "bbox": [
+    108.91125,
+    11.50555,
+    108.9812,
+    11.58576
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của thị trấn Phước Dân, xã Phước Thuận và xã Phước Hải thành xã mới có tên gọi là xã Ninh Phước.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "thi-tran-phuoc-dan-huyen-ninh-phuoc",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-thuan-huyen-ninh-phuoc",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-hai-huyen-ninh-phuoc",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22873",
+   "slug": "xa-phuoc-hau-khanh-hoa",
+   "loai": "xã",
+   "ten": "Phước Hậu",
+   "donViGoc": "xã Phước Sơn",
+   "huyenGoc": 587,
+   "huyenCu": [
+    587
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.87648,
+    11.61707
+   ],
+   "bbox": [
+    108.82189,
+    11.57948,
+    108.93106,
+    11.65466
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Phước Vinh, Phước Sơn và Phước Hậu thành xã mới có tên gọi là xã Phước Hậu.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-phuoc-vinh-huyen-ninh-phuoc",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-son-huyen-ninh-phuoc",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-hau-huyen-ninh-phuoc",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22891",
+   "slug": "xa-phuoc-huu-khanh-hoa",
+   "loai": "xã",
+   "ten": "Phước Hữu",
+   "donViGoc": "",
+   "huyenGoc": 587,
+   "huyenCu": [
+    587
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.87663,
+    11.51923
+   ],
+   "bbox": [
+    108.83603,
+    11.48291,
+    108.91723,
+    11.55554
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Phước Thái và xã Phước Hữu thành xã mới có tên gọi là xã Phước Hữu.",
+   "gomCungTen": {
+    "ten": "xã Phước Hữu",
+    "phan": "toan-bo"
+   },
+   "gom": [
+    {
+     "xa": "xa-phuoc-thai-huyen-ninh-phuoc",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22840",
+   "slug": "xa-cong-hai-khanh-hoa",
+   "loai": "xã",
+   "ten": "Công Hải",
+   "donViGoc": "",
+   "huyenGoc": 588,
+   "huyenCu": [
+    588
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.11799,
+    11.78777
+   ],
+   "bbox": [
+    109.05532,
+    11.7641,
+    109.18065,
+    11.81145
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Phước Chiến và xã Công Hải thành xã mới có tên gọi là xã Công Hải.",
+   "gomCungTen": {
+    "ten": "xã Công Hải",
+    "phan": "toan-bo"
+   },
+   "gom": [
+    {
+     "xa": "xa-phuoc-chien-huyen-thuan-bac",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22849",
+   "slug": "xa-thuan-bac-khanh-hoa",
+   "loai": "xã",
+   "ten": "Thuận Bắc",
+   "donViGoc": "xã Lợi Hải",
+   "huyenGoc": 588,
+   "huyenCu": [
+    588
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    109.04481,
+    11.7259
+   ],
+   "bbox": [
+    109.00581,
+    11.68603,
+    109.08381,
+    11.76577
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Bắc Phong, Phước Kháng và Lợi Hải thành xã mới có tên gọi là xã Thuận Bắc.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-bac-phong-huyen-thuan-bac",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-khang-huyen-thuan-bac",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-loi-hai-huyen-thuan-bac",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22888",
+   "slug": "xa-phuoc-dinh-khanh-hoa",
+   "loai": "xã",
+   "ten": "Phước Dinh",
+   "donViGoc": "xã An Hải",
+   "huyenGoc": 589,
+   "huyenCu": [
+    589,
+    582
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.98847,
+    11.52987
+   ],
+   "bbox": [
+    108.96077,
+    11.49935,
+    109.01617,
+    11.5604
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã An Hải, xã Phước Dinh và một phần diện tích tự nhiên, quy mô dân số của phường Đông Hải thành xã mới có tên gọi là xã Phước Dinh.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-an-hai-huyen-thuan-nam",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-dinh-huyen-thuan-nam",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "phuong-dong-hai-thanh-pho-phan-rang-thap-cham",
+     "phan": "mot-phan"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22897",
+   "slug": "xa-thuan-nam-khanh-hoa",
+   "loai": "xã",
+   "ten": "Thuận Nam",
+   "donViGoc": "xã Phước Nam",
+   "huyenGoc": 589,
+   "huyenCu": [
+    589
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.92495,
+    11.47451
+   ],
+   "bbox": [
+    108.89416,
+    11.43849,
+    108.95575,
+    11.51052
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Phước Nam, Phước Ninh và Phước Minh thành xã mới có tên gọi là xã Thuận Nam.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-phuoc-nam-huyen-thuan-nam",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-ninh-huyen-thuan-nam",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-minh-huyen-thuan-nam",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22900",
+   "slug": "xa-phuoc-ha-khanh-hoa",
+   "loai": "xã",
+   "ten": "Phước Hà",
+   "donViGoc": "xã Nhị Hà",
+   "huyenGoc": 589,
+   "huyenCu": [
+    589
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.83857,
+    11.46141
+   ],
+   "bbox": [
+    108.81285,
+    11.42403,
+    108.86428,
+    11.49879
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Nhị Hà và xã Phước Hà thành xã mới có tên gọi là xã Phước Hà.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-nhi-ha-huyen-thuan-nam",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-phuoc-ha-huyen-thuan-nam",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22909",
+   "slug": "xa-ca-na-khanh-hoa",
+   "loai": "xã",
+   "ten": "Cà Ná",
+   "donViGoc": "xã Phước Diêm",
+   "huyenGoc": 589,
+   "huyenCu": [
+    589
+   ],
+   "coQh": false,
+   "coBanDo": true,
+   "tam": [
+    108.89974,
+    11.34483
+   ],
+   "bbox": [
+    108.88201,
+    11.31443,
+    108.91746,
+    11.37522
+   ],
+   "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Phước Diêm và xã Cà Ná thành xã mới có tên gọi là xã Cà Ná.",
+   "gomCungTen": null,
+   "gom": [
+    {
+     "xa": "xa-phuoc-diem-huyen-thuan-nam",
+     "phan": "toan-bo"
+    },
+    {
+     "xa": "xa-ca-na-huyen-thuan-nam",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  }
+ ],
+ "xaCu": [
+  {
+   "id": "22327",
+   "slug": "phuong-vinh-hoa-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Vĩnh Hòa",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22327",
+   "tam": [
+    109.21429,
+    12.29852
+   ],
+   "vao": [
+    {
+     "id": "22333",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 75,
+     "toMoiDen": 150,
+     "toCuTu": 1,
+     "toCuDen": 76,
+     "soTo": 76,
+     "xaMoi": "22333"
+    }
+   ]
+  },
+  {
+   "id": "22330",
+   "slug": "phuong-vinh-hai-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Vĩnh Hải",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22330",
+   "tam": [
+    109.18946,
+    12.28908
+   ],
+   "vao": [
+    {
+     "id": "22333",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 219,
+     "toMoiDen": 279,
+     "toCuTu": 1,
+     "toCuDen": 61,
+     "soTo": 61,
+     "xaMoi": "22333"
+    }
+   ]
+  },
+  {
+   "id": "22336",
+   "slug": "phuong-ngoc-hiep-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Ngọc Hiệp",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22336",
+   "tam": [
+    109.18246,
+    12.26309
+   ],
+   "vao": [
+    {
+     "id": "22390",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 71,
+     "toMoiDen": 118,
+     "toCuTu": 2,
+     "toCuDen": 49,
+     "soTo": 48,
+     "xaMoi": "22390"
+    }
+   ]
+  },
+  {
+   "id": "22339",
+   "slug": "phuong-vinh-tho-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Vĩnh Thọ",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22339",
+   "tam": [
+    109.20117,
+    12.26678
+   ],
+   "vao": [
+    {
+     "id": "22333",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 280,
+     "toMoiDen": 296,
+     "toCuTu": 2,
+     "toCuDen": 19,
+     "soTo": 17,
+     "xaMoi": "22333"
+    }
+   ]
+  },
+  {
+   "id": "22342",
+   "slug": "phuong-xuong-huan-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Xương Huân",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22342",
+   "tam": [
+    109.19607,
+    12.25588
+   ],
+   "vao": [
+    {
+     "id": "22366",
+     "phan": "toan-bo",
+     "qua": "phường Vạn Thạnh (năm 2024, Nghị quyết 1196/NQ-UBTVQH15)"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 57,
+     "toMoiDen": 67,
+     "toCuTu": 3,
+     "toCuDen": 17,
+     "soTo": 11,
+     "xaMoi": "22366"
+    }
+   ]
+  },
+  {
+   "id": "22345",
+   "slug": "phuong-van-thang-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Vạn Thắng",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22345",
+   "tam": [
+    109.18775,
+    12.25505
+   ],
+   "vao": [
+    {
+     "id": "22366",
+     "phan": "toan-bo",
+     "qua": "phường Vạn Thạnh (năm 2024, Nghị quyết 1196/NQ-UBTVQH15)"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 68,
+     "toMoiDen": 79,
+     "toCuTu": 1,
+     "toCuDen": 12,
+     "soTo": 12,
+     "xaMoi": "22366"
+    }
+   ]
+  },
+  {
+   "id": "22348",
+   "slug": "phuong-van-thanh-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Vạn Thạnh",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22348",
+   "tam": [
+    109.19131,
+    12.25457
+   ],
+   "vao": [
+    {
+     "id": "22366",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 45,
+     "toMoiDen": 56,
+     "toCuTu": 1,
+     "toCuDen": 12,
+     "soTo": 12,
+     "xaMoi": "22366"
+    }
+   ]
+  },
+  {
+   "id": "22351",
+   "slug": "phuong-phuong-sai-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Phương Sài",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22351",
+   "tam": [
+    109.18358,
+    12.2515
+   ],
+   "vao": [
+    {
+     "id": "22390",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 145,
+     "toMoiDen": 159,
+     "toCuTu": 1,
+     "toCuDen": 15,
+     "soTo": 15,
+     "xaMoi": "22390"
+    }
+   ]
+  },
+  {
+   "id": "22354",
+   "slug": "phuong-phuong-son-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Phương Sơn",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22354",
+   "tam": [
+    109.17935,
+    12.25232
+   ],
+   "vao": [
+    {
+     "id": "22390",
+     "phan": "toan-bo",
+     "qua": "phường Phương Sài (năm 2024, Nghị quyết 1196/NQ-UBTVQH15)"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 160,
+     "toMoiDen": 173,
+     "toCuTu": 1,
+     "toCuDen": 14,
+     "soTo": 14,
+     "xaMoi": "22390"
+    }
+   ]
+  },
+  {
+   "id": "22357",
+   "slug": "phuong-phuoc-hai-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Phước Hải",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22357",
+   "tam": [
+    109.17798,
+    12.23778
+   ],
+   "vao": [
+    {
+     "id": "22402",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 50,
+     "toMoiDen": 101,
+     "toCuTu": 1,
+     "toCuDen": 52,
+     "soTo": 52,
+     "xaMoi": "22402"
+    }
+   ]
+  },
+  {
+   "id": "22360",
+   "slug": "phuong-phuoc-tan-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Phước Tân",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22360",
+   "tam": [
+    109.18539,
+    12.24531
+   ],
+   "vao": [
+    {
+     "id": "22366",
+     "phan": "toan-bo",
+     "qua": "phường Tân Tiến (năm 2024, Nghị quyết 1196/NQ-UBTVQH15)"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 11,
+     "toMoiDen": 26,
+     "toCuTu": 1,
+     "toCuDen": 16,
+     "soTo": 16,
+     "xaMoi": "22366"
+    }
+   ]
+  },
+  {
+   "id": "22363",
+   "slug": "phuong-loc-tho-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Lộc Thọ",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22363",
+   "tam": [
+    109.1958,
+    12.23689
+   ],
+   "vao": [
+    {
+     "id": "22366",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 80,
+     "toMoiDen": 114,
+     "toCuTu": 1,
+     "toCuDen": 35,
+     "soTo": 35,
+     "xaMoi": "22366"
+    }
+   ]
+  },
+  {
+   "id": "22369",
+   "slug": "phuong-tan-lap-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Tân Lập",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22369",
+   "tam": [
+    109.19072,
+    12.23871
+   ],
+   "vao": [
+    {
+     "id": "22366",
+     "phan": "toan-bo",
+     "qua": "phường Tân Tiến (năm 2024, Nghị quyết 1196/NQ-UBTVQH15)"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 27,
+     "toMoiDen": 44,
+     "toCuTu": 1,
+     "toCuDen": 19,
+     "soTo": 18,
+     "xaMoi": "22366"
+    }
+   ]
+  },
+  {
+   "id": "22372",
+   "slug": "phuong-phuoc-hoa-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Phước Hòa",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22372",
+   "tam": [
+    109.1873,
+    12.23575
+   ],
+   "vao": [
+    {
+     "id": "22366",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 115,
+     "toMoiDen": 133,
+     "toCuTu": 1,
+     "toCuDen": 19,
+     "soTo": 19,
+     "xaMoi": "22366"
+    }
+   ]
+  },
+  {
+   "id": "22375",
+   "slug": "phuong-vinh-nguyen-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Vĩnh Nguyên",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22375",
+   "tam": [
+    109.20323,
+    12.21586
+   ],
+   "vao": [
+    {
+     "id": "22366",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 134,
+     "toMoiDen": 204,
+     "toCuTu": 1,
+     "toCuDen": 71,
+     "soTo": 71,
+     "xaMoi": "22366"
+    }
+   ]
+  },
+  {
+   "id": "22378",
+   "slug": "phuong-phuoc-long-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Phước Long",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22378",
+   "tam": [
+    109.18793,
+    12.21732
+   ],
+   "vao": [
+    {
+     "id": "22402",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 102,
+     "toMoiDen": 182,
+     "toCuTu": 1,
+     "toCuDen": 81,
+     "soTo": 81,
+     "xaMoi": "22402"
+    }
+   ]
+  },
+  {
+   "id": "22381",
+   "slug": "phuong-vinh-truong-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Vĩnh Trường",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22381",
+   "tam": [
+    109.20176,
+    12.2008
+   ],
+   "vao": [
+    {
+     "id": "22402",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 183,
+     "toMoiDen": 233,
+     "toCuTu": 1,
+     "toCuDen": 51,
+     "soTo": 51,
+     "xaMoi": "22402"
+    }
+   ]
+  },
+  {
+   "id": "22384",
+   "slug": "xa-vinh-luong-thanh-pho-nha-trang",
+   "loai": "xã",
+   "ten": "Vĩnh Lương",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22384",
+   "tam": [
+    109.1772,
+    12.34217
+   ],
+   "vao": [
+    {
+     "id": "22333",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 37,
+     "toMoiDen": 74,
+     "toCuTu": 4,
+     "toCuDen": 41,
+     "soTo": 38,
+     "xaMoi": "22333"
+    }
+   ]
+  },
+  {
+   "id": "22387",
+   "slug": "xa-vinh-phuong-thanh-pho-nha-trang",
+   "loai": "xã",
+   "ten": "Vĩnh Phương",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22387",
+   "tam": [
+    109.14801,
+    12.30598
+   ],
+   "vao": [
+    {
+     "id": "22333",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 151,
+     "toMoiDen": 218,
+     "toCuTu": 3,
+     "toCuDen": 70,
+     "soTo": 68,
+     "xaMoi": "22333"
+    }
+   ]
+  },
+  {
+   "id": "22393",
+   "slug": "xa-vinh-thanh-thanh-pho-nha-trang",
+   "loai": "xã",
+   "ten": "Vĩnh Thạnh",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22393",
+   "tam": [
+    109.14991,
+    12.26315
+   ],
+   "vao": [
+    {
+     "id": "22390",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 43,
+     "toMoiDen": 70,
+     "toCuTu": 1,
+     "toCuDen": 28,
+     "soTo": 28,
+     "xaMoi": "22390"
+    }
+   ]
+  },
+  {
+   "id": "22396",
+   "slug": "xa-vinh-trung-thanh-pho-nha-trang",
+   "loai": "xã",
+   "ten": "Vĩnh Trung",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22396",
+   "tam": [
+    109.1379,
+    12.24569
+   ],
+   "vao": [
+    {
+     "id": "22390",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 174,
+     "toMoiDen": 219,
+     "toCuTu": 1,
+     "toCuDen": 46,
+     "soTo": 46,
+     "xaMoi": "22390"
+    }
+   ]
+  },
+  {
+   "id": "22399",
+   "slug": "xa-vinh-hiep-thanh-pho-nha-trang",
+   "loai": "xã",
+   "ten": "Vĩnh Hiệp",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22399",
+   "tam": [
+    109.15551,
+    12.25475
+   ],
+   "vao": [
+    {
+     "id": "22390",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 119,
+     "toMoiDen": 144,
+     "toCuTu": 1,
+     "toCuDen": 26,
+     "soTo": 26,
+     "xaMoi": "22390"
+    }
+   ]
+  },
+  {
+   "id": "22405",
+   "slug": "xa-phuoc-dong-thanh-pho-nha-trang",
+   "loai": "xã",
+   "ten": "Phước Đồng",
+   "huyenId": 568,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22405",
+   "tam": [
+    109.16925,
+    12.18407
+   ],
+   "vao": [
+    {
+     "id": "22402",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 234,
+     "toMoiDen": 295,
+     "toCuTu": 1,
+     "toCuDen": 65,
+     "soTo": 62,
+     "xaMoi": "22402"
+    }
+   ]
+  },
+  {
+   "id": "22408",
+   "slug": "phuong-cam-nghia-thanh-pho-cam-ranh",
+   "loai": "phường",
+   "ten": "Cam Nghĩa",
+   "huyenId": 569,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22408",
+   "tam": [
+    109.22534,
+    11.94046
+   ],
+   "vao": [
+    {
+     "id": "22411",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22414",
+   "slug": "phuong-cam-phuc-nam-thanh-pho-cam-ranh",
+   "loai": "phường",
+   "ten": "Cam Phúc Nam",
+   "huyenId": 569,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22414",
+   "tam": [
+    109.17279,
+    11.94285
+   ],
+   "vao": [
+    {
+     "id": "22420",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22417",
+   "slug": "phuong-cam-loc-thanh-pho-cam-ranh",
+   "loai": "phường",
+   "ten": "Cam Lộc",
+   "huyenId": 569,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22417",
+   "tam": [
+    109.14404,
+    11.92229
+   ],
+   "vao": [
+    {
+     "id": "22420",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22426",
+   "slug": "phuong-cam-thuan-thanh-pho-cam-ranh",
+   "loai": "phường",
+   "ten": "Cam Thuận",
+   "huyenId": 569,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22426",
+   "tam": [
+    109.15375,
+    11.91516
+   ],
+   "vao": [
+    {
+     "id": "22432",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22429",
+   "slug": "phuong-cam-loi-thanh-pho-cam-ranh",
+   "loai": "phường",
+   "ten": "Cam Lợi",
+   "huyenId": 569,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22429",
+   "tam": [
+    109.14102,
+    11.91259
+   ],
+   "vao": [
+    {
+     "id": "22432",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22468",
+   "slug": "xa-cam-thanh-nam-thanh-pho-cam-ranh",
+   "loai": "xã",
+   "ten": "Cam Thành Nam",
+   "huyenId": 569,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22468",
+   "tam": [
+    109.15595,
+    11.99011
+   ],
+   "vao": [
+    {
+     "id": "22411",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22474",
+   "slug": "xa-cam-phuoc-dong-thanh-pho-cam-ranh",
+   "loai": "xã",
+   "ten": "Cam Phước Đông",
+   "huyenId": 569,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22474",
+   "tam": [
+    109.06639,
+    11.93523
+   ],
+   "vao": [
+    {
+     "id": "22423",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22477",
+   "slug": "xa-cam-thinh-tay-thanh-pho-cam-ranh",
+   "loai": "xã",
+   "ten": "Cam Thịnh Tây",
+   "huyenId": 569,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22477",
+   "tam": [
+    109.0723,
+    11.87346
+   ],
+   "vao": [
+    {
+     "id": "22480",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22483",
+   "slug": "xa-cam-lap-thanh-pho-cam-ranh",
+   "loai": "xã",
+   "ten": "Cam Lập",
+   "huyenId": 569,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22483",
+   "tam": [
+    109.15263,
+    11.8371
+   ],
+   "vao": [
+    {
+     "id": "22480",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22486",
+   "slug": "xa-cam-binh-thanh-pho-cam-ranh",
+   "loai": "xã",
+   "ten": "Cam Bình",
+   "huyenId": 569,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22480",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22438",
+   "slug": "xa-cam-hoa-huyen-cam-lam",
+   "loai": "xã",
+   "ten": "Cam Hòa",
+   "huyenId": 570,
+   "laGoc": false,
+   "coQh": true,
+   "coBanDo": true,
+   "maBanDo": "22438",
+   "tam": [
+    109.13157,
+    12.12004
+   ],
+   "vao": [
+    {
+     "id": "22453",
+     "phan": "mot-phan"
+    },
+    {
+     "id": "22708",
+     "phan": "mot-phan"
+    },
+    {
+     "id": "22435",
+     "phan": "mot-phan"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 246,
+     "toMoiDen": 300,
+     "toCuTu": 1,
+     "toCuDen": 56,
+     "soTo": 55,
+     "xaMoi": "22453"
+    },
+    {
+     "toMoiTu": 58,
+     "toMoiDen": 62,
+     "toCuTu": 1,
+     "toCuDen": 56,
+     "soTo": 5,
+     "xaMoi": "22708"
+    },
+    {
+     "toMoiTu": 45,
+     "toMoiDen": 52,
+     "toCuTu": 2,
+     "toCuDen": 49,
+     "soTo": 7,
+     "xaMoi": "22435"
+    }
+   ]
+  },
+  {
+   "id": "22441",
+   "slug": "xa-cam-hai-dong-huyen-cam-lam",
+   "loai": "xã",
+   "ten": "Cam Hải Đông",
+   "huyenId": 570,
+   "laGoc": false,
+   "coQh": true,
+   "coBanDo": true,
+   "maBanDo": "22441",
+   "tam": [
+    109.19302,
+    12.08779
+   ],
+   "vao": [
+    {
+     "id": "22453",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 58,
+     "toMoiDen": 120,
+     "toCuTu": 1,
+     "toCuDen": 63,
+     "soTo": 63,
+     "xaMoi": "22453"
+    }
+   ]
+  },
+  {
+   "id": "22444",
+   "slug": "xa-cam-hai-tay-huyen-cam-lam",
+   "loai": "xã",
+   "ten": "Cam Hải Tây",
+   "huyenId": 570,
+   "laGoc": false,
+   "coQh": true,
+   "coBanDo": true,
+   "maBanDo": "22444",
+   "tam": [
+    109.15205,
+    12.08788
+   ],
+   "vao": [
+    {
+     "id": "22453",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 121,
+     "toMoiDen": 153,
+     "toCuTu": 2,
+     "toCuDen": 34,
+     "soTo": 33,
+     "xaMoi": "22453"
+    }
+   ]
+  },
+  {
+   "id": "22447",
+   "slug": "xa-son-tan-huyen-cam-lam",
+   "loai": "xã",
+   "ten": "Sơn Tân",
+   "huyenId": 570,
+   "laGoc": false,
+   "coQh": true,
+   "coBanDo": true,
+   "maBanDo": "22447",
+   "tam": [
+    109.05053,
+    12.06371
+   ],
+   "vao": [
+    {
+     "id": "22435",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22450",
+   "slug": "xa-cam-hiep-bac-huyen-cam-lam",
+   "loai": "xã",
+   "ten": "Cam Hiệp Bắc",
+   "huyenId": 570,
+   "laGoc": false,
+   "coQh": true,
+   "coBanDo": true,
+   "maBanDo": "22450",
+   "tam": [
+    109.10391,
+    12.06792
+   ],
+   "vao": [
+    {
+     "id": "22453",
+     "phan": "mot-phan"
+    },
+    {
+     "id": "22435",
+     "phan": "mot-phan"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 204,
+     "toMoiDen": 223,
+     "toCuTu": 2,
+     "toCuDen": 24,
+     "soTo": 20,
+     "xaMoi": "22453"
+    },
+    {
+     "toMoiTu": 53,
+     "toMoiDen": 62,
+     "toCuTu": 1,
+     "toCuDen": 23,
+     "soTo": 10,
+     "xaMoi": "22435"
+    }
+   ]
+  },
+  {
+   "id": "22456",
+   "slug": "xa-cam-hiep-nam-huyen-cam-lam",
+   "loai": "xã",
+   "ten": "Cam Hiệp Nam",
+   "huyenId": 570,
+   "laGoc": false,
+   "coQh": true,
+   "coBanDo": true,
+   "maBanDo": "22456",
+   "tam": [
+    109.10736,
+    12.03232
+   ],
+   "vao": [
+    {
+     "id": "22453",
+     "phan": "mot-phan"
+    },
+    {
+     "id": "22435",
+     "phan": "mot-phan"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 63,
+     "toMoiDen": 77,
+     "toCuTu": 2,
+     "toCuDen": 29,
+     "soTo": 15,
+     "xaMoi": "22435"
+    },
+    {
+     "toMoiTu": 224,
+     "toMoiDen": 245,
+     "toCuTu": 2,
+     "toCuDen": 31,
+     "soTo": 22,
+     "xaMoi": "22453"
+    }
+   ]
+  },
+  {
+   "id": "22459",
+   "slug": "xa-cam-phuoc-tay-huyen-cam-lam",
+   "loai": "xã",
+   "ten": "Cam Phước Tây",
+   "huyenId": 570,
+   "laGoc": false,
+   "coQh": true,
+   "coBanDo": true,
+   "maBanDo": "22459",
+   "tam": [
+    109.05179,
+    11.9946
+   ],
+   "vao": [
+    {
+     "id": "22465",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 32,
+     "toMoiDen": 82,
+     "toCuTu": 1,
+     "toCuDen": 51,
+     "soTo": 51,
+     "xaMoi": "22465"
+    }
+   ]
+  },
+  {
+   "id": "22462",
+   "slug": "xa-cam-thanh-bac-huyen-cam-lam",
+   "loai": "xã",
+   "ten": "Cam Thành Bắc",
+   "huyenId": 570,
+   "laGoc": false,
+   "coQh": true,
+   "coBanDo": true,
+   "maBanDo": "22462",
+   "tam": [
+    109.16664,
+    12.02857
+   ],
+   "vao": [
+    {
+     "id": "22453",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 154,
+     "toMoiDen": 203,
+     "toCuTu": 1,
+     "toCuDen": 50,
+     "soTo": 50,
+     "xaMoi": "22453"
+    }
+   ]
+  },
+  {
+   "id": "22471",
+   "slug": "xa-cam-an-nam-huyen-cam-lam",
+   "loai": "xã",
+   "ten": "Cam An Nam",
+   "huyenId": 570,
+   "laGoc": false,
+   "coQh": true,
+   "coBanDo": true,
+   "maBanDo": "22471",
+   "tam": [
+    109.12211,
+    11.9835
+   ],
+   "vao": [
+    {
+     "id": "22453",
+     "phan": "mot-phan"
+    },
+    {
+     "id": "22465",
+     "phan": "mot-phan"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 386,
+     "toMoiDen": 398,
+     "toCuTu": 1,
+     "toCuDen": 17,
+     "soTo": 13,
+     "xaMoi": "22453"
+    },
+    {
+     "toMoiTu": 83,
+     "toMoiDen": 105,
+     "toCuTu": 1,
+     "toCuDen": 29,
+     "soTo": 23,
+     "xaMoi": "22465"
+    }
+   ]
+  },
+  {
+   "id": "22711",
+   "slug": "xa-suoi-tan-huyen-cam-lam",
+   "loai": "xã",
+   "ten": "Suối Tân",
+   "huyenId": 570,
+   "laGoc": false,
+   "coQh": true,
+   "coBanDo": true,
+   "maBanDo": "22711",
+   "tam": [
+    109.04368,
+    12.11736
+   ],
+   "vao": [
+    {
+     "id": "22453",
+     "phan": "mot-phan"
+    },
+    {
+     "id": "22708",
+     "phan": "mot-phan"
+    },
+    {
+     "id": "22435",
+     "phan": "mot-phan"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 64,
+     "toMoiDen": 82,
+     "toCuTu": 1,
+     "toCuDen": 49,
+     "soTo": 19,
+     "xaMoi": "22708"
+    },
+    {
+     "toMoiTu": 343,
+     "toMoiDen": 385,
+     "toCuTu": 1,
+     "toCuDen": 50,
+     "soTo": 43,
+     "xaMoi": "22453"
+    },
+    {
+     "toMoiTu": 78,
+     "toMoiDen": 95,
+     "toCuTu": 1,
+     "toCuDen": 18,
+     "soTo": 18,
+     "xaMoi": "22435"
+    }
+   ]
+  },
+  {
+   "id": "22492",
+   "slug": "xa-dai-lanh-huyen-van-ninh",
+   "loai": "xã",
+   "ten": "Đại Lãnh",
+   "huyenId": 571,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22504",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 40,
+     "toMoiDen": 61,
+     "toCuTu": 1,
+     "toCuDen": 22,
+     "soTo": 22,
+     "xaMoi": "22504"
+    }
+   ]
+  },
+  {
+   "id": "22495",
+   "slug": "xa-van-phuoc-huyen-van-ninh",
+   "loai": "xã",
+   "ten": "Vạn Phước",
+   "huyenId": 571,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22498",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 40,
+     "toMoiDen": 79,
+     "toCuTu": 1,
+     "toCuDen": 40,
+     "soTo": 40,
+     "xaMoi": "22498"
+    }
+   ]
+  },
+  {
+   "id": "22501",
+   "slug": "xa-van-binh-huyen-van-ninh",
+   "loai": "xã",
+   "ten": "Vạn Bình",
+   "huyenId": 571,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22516",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 59,
+     "toMoiDen": 101,
+     "toCuTu": 1,
+     "toCuDen": 43,
+     "soTo": 43,
+     "xaMoi": "22516"
+    }
+   ]
+  },
+  {
+   "id": "22507",
+   "slug": "xa-van-khanh-huyen-van-ninh",
+   "loai": "xã",
+   "ten": "Vạn Khánh",
+   "huyenId": 571,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22498",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 80,
+     "toMoiDen": 126,
+     "toCuTu": 1,
+     "toCuDen": 47,
+     "soTo": 47,
+     "xaMoi": "22498"
+    }
+   ]
+  },
+  {
+   "id": "22510",
+   "slug": "xa-van-phu-huyen-van-ninh",
+   "loai": "xã",
+   "ten": "Vạn Phú",
+   "huyenId": 571,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22489",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 58,
+     "toMoiDen": 122,
+     "toCuTu": 1,
+     "toCuDen": 65,
+     "soTo": 65,
+     "xaMoi": "22489"
+    }
+   ]
+  },
+  {
+   "id": "22513",
+   "slug": "xa-van-luong-huyen-van-ninh",
+   "loai": "xã",
+   "ten": "Vạn Lương",
+   "huyenId": 571,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22489",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 123,
+     "toMoiDen": 170,
+     "toCuTu": 1,
+     "toCuDen": 48,
+     "soTo": 48,
+     "xaMoi": "22489"
+    }
+   ]
+  },
+  {
+   "id": "22519",
+   "slug": "xa-van-thanh-huyen-van-ninh",
+   "loai": "xã",
+   "ten": "Vạn Thạnh",
+   "huyenId": 571,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22504",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 62,
+     "toMoiDen": 129,
+     "toCuTu": 1,
+     "toCuDen": 68,
+     "soTo": 68,
+     "xaMoi": "22504"
+    }
+   ]
+  },
+  {
+   "id": "22522",
+   "slug": "xa-xuan-son-huyen-van-ninh",
+   "loai": "xã",
+   "ten": "Xuân Sơn",
+   "huyenId": 571,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22525",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 73,
+     "toMoiDen": 112,
+     "toCuTu": 1,
+     "toCuDen": 40,
+     "soTo": 40,
+     "xaMoi": "22525"
+    }
+   ]
+  },
+  {
+   "id": "22531",
+   "slug": "xa-ninh-son-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Sơn",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22546",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 245,
+     "toMoiDen": 284,
+     "toCuTu": 1,
+     "toCuDen": 40,
+     "soTo": 40,
+     "xaMoi": "22546"
+    }
+   ]
+  },
+  {
+   "id": "22534",
+   "slug": "xa-ninh-tay-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Tây",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22534",
+   "tam": [
+    109.03024,
+    12.58575
+   ],
+   "vao": [
+    {
+     "id": "22552",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 102,
+     "toMoiDen": 102,
+     "toCuTu": 22,
+     "toCuDen": 22,
+     "soTo": 1,
+     "xaMoi": "22552"
+    },
+    {
+     "toMoiTu": 81,
+     "toMoiDen": 210,
+     "toCuTu": 1,
+     "toCuDen": 130,
+     "soTo": 129,
+     "xaMoi": "22552"
+    }
+   ]
+  },
+  {
+   "id": "22537",
+   "slug": "xa-ninh-thuong-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Thượng",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22558",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 28,
+     "toMoiDen": 78,
+     "toCuTu": 1,
+     "toCuDen": 52,
+     "soTo": 51,
+     "xaMoi": "22558"
+    }
+   ]
+  },
+  {
+   "id": "22540",
+   "slug": "xa-ninh-an-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh An",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22546",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 96,
+     "toMoiDen": 244,
+     "toCuTu": 1,
+     "toCuDen": 149,
+     "soTo": 149,
+     "xaMoi": "22546"
+    }
+   ]
+  },
+  {
+   "id": "22543",
+   "slug": "phuong-ninh-hai-thi-xa-ninh-hoa",
+   "loai": "phường",
+   "ten": "Ninh Hải",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22561",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 25,
+     "toMoiDen": 43,
+     "toCuTu": 1,
+     "toCuDen": 19,
+     "soTo": 19,
+     "xaMoi": "22561"
+    }
+   ]
+  },
+  {
+   "id": "22549",
+   "slug": "xa-ninh-trung-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Trung",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22558",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 79,
+     "toMoiDen": 106,
+     "toCuTu": 1,
+     "toCuDen": 28,
+     "soTo": 28,
+     "xaMoi": "22558"
+    }
+   ]
+  },
+  {
+   "id": "22555",
+   "slug": "xa-ninh-xuan-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Xuân",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22576",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 30,
+     "toMoiDen": 183,
+     "toCuTu": 1,
+     "toCuDen": 154,
+     "soTo": 154,
+     "xaMoi": "22576"
+    }
+   ]
+  },
+  {
+   "id": "22564",
+   "slug": "xa-ninh-dong-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Đông",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22528",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 74,
+     "toMoiDen": 91,
+     "toCuTu": 1,
+     "toCuDen": 18,
+     "soTo": 18,
+     "xaMoi": "22528"
+    }
+   ]
+  },
+  {
+   "id": "22567",
+   "slug": "phuong-ninh-thuy-thi-xa-ninh-hoa",
+   "loai": "phường",
+   "ten": "Ninh Thủy",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22561",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 44,
+     "toMoiDen": 71,
+     "toCuTu": 1,
+     "toCuDen": 28,
+     "soTo": 28,
+     "xaMoi": "22561"
+    }
+   ]
+  },
+  {
+   "id": "22570",
+   "slug": "phuong-ninh-da-thi-xa-ninh-hoa",
+   "loai": "phường",
+   "ten": "Ninh Đa",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22528",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 111,
+     "toMoiDen": 168,
+     "toCuTu": 1,
+     "toCuDen": 58,
+     "soTo": 58,
+     "xaMoi": "22528"
+    }
+   ]
+  },
+  {
+   "id": "22573",
+   "slug": "xa-ninh-phung-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Phụng",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22528",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 92,
+     "toMoiDen": 110,
+     "toCuTu": 1,
+     "toCuDen": 19,
+     "soTo": 19,
+     "xaMoi": "22528"
+    }
+   ]
+  },
+  {
+   "id": "22582",
+   "slug": "xa-ninh-phu-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Phú",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22591",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 37,
+     "toMoiDen": 62,
+     "toCuTu": 1,
+     "toCuDen": 26,
+     "soTo": 26,
+     "xaMoi": "22591"
+    }
+   ]
+  },
+  {
+   "id": "22585",
+   "slug": "xa-ninh-tan-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Tân",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22597",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 25,
+     "toMoiDen": 64,
+     "toCuTu": 1,
+     "toCuDen": 40,
+     "soTo": 40,
+     "xaMoi": "22597"
+    }
+   ]
+  },
+  {
+   "id": "22588",
+   "slug": "xa-ninh-quang-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Quang",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22576",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 184,
+     "toMoiDen": 222,
+     "toCuTu": 1,
+     "toCuDen": 39,
+     "soTo": 39,
+     "xaMoi": "22576"
+    }
+   ]
+  },
+  {
+   "id": "22594",
+   "slug": "phuong-ninh-ha-thi-xa-ninh-hoa",
+   "loai": "phường",
+   "ten": "Ninh Hà",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22591",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 13,
+     "toMoiDen": 36,
+     "toCuTu": 1,
+     "toCuDen": 24,
+     "soTo": 24,
+     "xaMoi": "22591"
+    }
+   ]
+  },
+  {
+   "id": "22600",
+   "slug": "xa-ninh-loc-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Lộc",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22597",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 65,
+     "toMoiDen": 93,
+     "toCuTu": 1,
+     "toCuDen": 30,
+     "soTo": 29,
+     "xaMoi": "22597"
+    }
+   ]
+  },
+  {
+   "id": "22603",
+   "slug": "xa-ninh-ich-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Ích",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22597",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 94,
+     "toMoiDen": 120,
+     "toCuTu": 1,
+     "toCuDen": 27,
+     "soTo": 27,
+     "xaMoi": "22597"
+    }
+   ]
+  },
+  {
+   "id": "22606",
+   "slug": "xa-ninh-phuoc-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Phước",
+   "huyenId": 572,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22561",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 74,
+     "toMoiDen": 120,
+     "toCuTu": 3,
+     "toCuDen": 50,
+     "soTo": 24,
+     "xaMoi": "22561"
+    },
+    {
+     "toMoiTu": 72,
+     "toMoiDen": 103,
+     "toCuTu": 1,
+     "toCuDen": 32,
+     "soTo": 25,
+     "xaMoi": "22561"
+    }
+   ]
+  },
+  {
+   "id": "22618",
+   "slug": "xa-khanh-trung-huyen-khanh-vinh",
+   "loai": "xã",
+   "ten": "Khánh Trung",
+   "huyenId": 573,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22618",
+   "tam": [
+    108.80257,
+    12.39661
+   ],
+   "vao": [
+    {
+     "id": "22612",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22621",
+   "slug": "xa-khanh-dong-huyen-khanh-vinh",
+   "loai": "xã",
+   "ten": "Khánh Đông",
+   "huyenId": 573,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22621",
+   "tam": [
+    109.0142,
+    12.37026
+   ],
+   "vao": [
+    {
+     "id": "22615",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22627",
+   "slug": "xa-khanh-nam-huyen-khanh-vinh",
+   "loai": "xã",
+   "ten": "Khánh Nam",
+   "huyenId": 573,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22627",
+   "tam": [
+    108.89446,
+    12.29353
+   ],
+   "vao": [
+    {
+     "id": "22624",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22630",
+   "slug": "xa-song-cau-huyen-khanh-vinh",
+   "loai": "xã",
+   "ten": "Sông Cầu",
+   "huyenId": 573,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22630",
+   "tam": [
+    108.92175,
+    12.24501
+   ],
+   "vao": [
+    {
+     "id": "22609",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22633",
+   "slug": "xa-giang-ly-huyen-khanh-vinh",
+   "loai": "xã",
+   "ten": "Giang Ly",
+   "huyenId": 573,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22633",
+   "tam": [
+    108.75676,
+    12.24847
+   ],
+   "vao": [
+    {
+     "id": "22624",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22636",
+   "slug": "xa-cau-ba-huyen-khanh-vinh",
+   "loai": "xã",
+   "ten": "Cầu Bà",
+   "huyenId": 573,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22636",
+   "tam": [
+    108.85856,
+    12.24851
+   ],
+   "vao": [
+    {
+     "id": "22648",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22639",
+   "slug": "xa-lien-sang-huyen-khanh-vinh",
+   "loai": "xã",
+   "ten": "Liên Sang",
+   "huyenId": 573,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22639",
+   "tam": [
+    108.80462,
+    12.21252
+   ],
+   "vao": [
+    {
+     "id": "22648",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22642",
+   "slug": "xa-khanh-thanh-huyen-khanh-vinh",
+   "loai": "xã",
+   "ten": "Khánh Thành",
+   "huyenId": 573,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22642",
+   "tam": [
+    108.86701,
+    12.20365
+   ],
+   "vao": [
+    {
+     "id": "22648",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22645",
+   "slug": "xa-khanh-phu-huyen-khanh-vinh",
+   "loai": "xã",
+   "ten": "Khánh Phú",
+   "huyenId": 573,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22645",
+   "tam": [
+    108.90578,
+    12.17392
+   ],
+   "vao": [
+    {
+     "id": "22609",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22654",
+   "slug": "xa-dien-lam-huyen-dien-khanh",
+   "loai": "xã",
+   "ten": "Diên Lâm",
+   "huyenId": 574,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22660",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22663",
+   "slug": "xa-dien-son-huyen-dien-khanh",
+   "loai": "xã",
+   "ten": "Diên Sơn",
+   "huyenId": 574,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22657",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22666",
+   "slug": "xa-dien-dong-huyen-dien-khanh",
+   "loai": "xã",
+   "ten": "Diên Đồng",
+   "huyenId": 574,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22660",
+     "phan": "toan-bo",
+     "qua": "xã Xuân Đồng (năm 2024, Nghị quyết 1196/NQ-UBTVQH15)"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22669",
+   "slug": "xa-dien-phu-huyen-dien-khanh",
+   "loai": "xã",
+   "ten": "Diên Phú",
+   "huyenId": 574,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22657",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22675",
+   "slug": "xa-dien-phuoc-huyen-dien-khanh",
+   "loai": "xã",
+   "ten": "Diên Phước",
+   "huyenId": 574,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22672",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22681",
+   "slug": "xa-dien-tan-huyen-dien-khanh",
+   "loai": "xã",
+   "ten": "Diên Tân",
+   "huyenId": 574,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22672",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22684",
+   "slug": "xa-dien-hoa-huyen-dien-khanh",
+   "loai": "xã",
+   "ten": "Diên Hòa",
+   "huyenId": 574,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22678",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22687",
+   "slug": "xa-dien-thanh-huyen-dien-khanh",
+   "loai": "xã",
+   "ten": "Diên Thạnh",
+   "huyenId": 574,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22678",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22690",
+   "slug": "xa-dien-toan-huyen-dien-khanh",
+   "loai": "xã",
+   "ten": "Diên Toàn",
+   "huyenId": 574,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22651",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22693",
+   "slug": "xa-dien-an-huyen-dien-khanh",
+   "loai": "xã",
+   "ten": "Diên An",
+   "huyenId": 574,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22651",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22696",
+   "slug": "xa-binh-loc-huyen-dien-khanh",
+   "loai": "xã",
+   "ten": "Bình Lộc",
+   "huyenId": 574,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22702",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22705",
+   "slug": "xa-suoi-tien-huyen-dien-khanh",
+   "loai": "xã",
+   "ten": "Suối Tiên",
+   "huyenId": 574,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22702",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22717",
+   "slug": "xa-thanh-son-huyen-khanh-son",
+   "loai": "xã",
+   "ten": "Thành Sơn",
+   "huyenId": 575,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22717",
+   "tam": [
+    108.82705,
+    12.05215
+   ],
+   "vao": [
+    {
+     "id": "22720",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22723",
+   "slug": "xa-son-hiep-huyen-khanh-son",
+   "loai": "xã",
+   "ten": "Sơn Hiệp",
+   "huyenId": 575,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22723",
+   "tam": [
+    108.9252,
+    12.01802
+   ],
+   "vao": [
+    {
+     "id": "22714",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22726",
+   "slug": "xa-son-binh-huyen-khanh-son",
+   "loai": "xã",
+   "ten": "Sơn Bình",
+   "huyenId": 575,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22726",
+   "tam": [
+    108.89547,
+    12.03475
+   ],
+   "vao": [
+    {
+     "id": "22714",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22729",
+   "slug": "xa-son-trung-huyen-khanh-son",
+   "loai": "xã",
+   "ten": "Sơn Trung",
+   "huyenId": 575,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22729",
+   "tam": [
+    108.95352,
+    12.03984
+   ],
+   "vao": [
+    {
+     "id": "22732",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22735",
+   "slug": "xa-ba-cum-nam-huyen-khanh-son",
+   "loai": "xã",
+   "ten": "Ba Cụm Nam",
+   "huyenId": 575,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22735",
+   "tam": [
+    108.95055,
+    11.95104
+   ],
+   "vao": [
+    {
+     "id": "22732",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22737",
+   "slug": "xa-song-tu-tay-huyen-truong-sa",
+   "loai": "xã",
+   "ten": "Song Tử Tây",
+   "huyenId": 576,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22736",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22739",
+   "slug": "xa-sinh-ton-huyen-truong-sa",
+   "loai": "xã",
+   "ten": "Sinh Tồn",
+   "huyenId": 576,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22736",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22744",
+   "slug": "phuong-bao-an-thanh-pho-phan-rang-thap-cham",
+   "loai": "phường",
+   "ten": "Bảo An",
+   "huyenId": 582,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22744",
+   "tam": [
+    108.93812,
+    11.58492
+   ],
+   "vao": [
+    {
+     "id": "22741",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22747",
+   "slug": "phuong-phu-ha-thanh-pho-phan-rang-thap-cham",
+   "loai": "phường",
+   "ten": "Phủ Hà",
+   "huyenId": 582,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22747",
+   "tam": [
+    108.9873,
+    11.57689
+   ],
+   "vao": [
+    {
+     "id": "22759",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22750",
+   "slug": "phuong-thanh-son-thanh-pho-phan-rang-thap-cham",
+   "loai": "phường",
+   "ten": "Thanh Sơn",
+   "huyenId": 582,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22750",
+   "tam": [
+    108.99448,
+    11.57186
+   ],
+   "vao": [
+    {
+     "id": "22759",
+     "phan": "toan-bo",
+     "qua": "phường Phủ Hà (năm 2024, Nghị quyết 1198/NQ-UBTVQH15)"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22753",
+   "slug": "phuong-my-huong-thanh-pho-phan-rang-thap-cham",
+   "loai": "phường",
+   "ten": "Mỹ Hương",
+   "huyenId": 582,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22753",
+   "tam": [
+    108.98916,
+    11.5668
+   ],
+   "vao": [
+    {
+     "id": "22759",
+     "phan": "toan-bo",
+     "qua": "phường Kinh Dinh (năm 2024, Nghị quyết 1198/NQ-UBTVQH15)"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22756",
+   "slug": "phuong-tan-tai-thanh-pho-phan-rang-thap-cham",
+   "loai": "phường",
+   "ten": "Tấn Tài",
+   "huyenId": 582,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22759",
+     "phan": "toan-bo",
+     "qua": "phường Kinh Dinh (năm 2024, Nghị quyết 1198/NQ-UBTVQH15)"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22762",
+   "slug": "phuong-dao-long-thanh-pho-phan-rang-thap-cham",
+   "loai": "phường",
+   "ten": "Đạo Long",
+   "huyenId": 582,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22759",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22765",
+   "slug": "phuong-dai-son-thanh-pho-phan-rang-thap-cham",
+   "loai": "phường",
+   "ten": "Đài Sơn",
+   "huyenId": 582,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22765",
+   "tam": [
+    108.98865,
+    11.58316
+   ],
+   "vao": [
+    {
+     "id": "22759",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22768",
+   "slug": "phuong-dong-hai-thanh-pho-phan-rang-thap-cham",
+   "loai": "phường",
+   "ten": "Đông Hải",
+   "huyenId": 582,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22768",
+   "tam": [
+    109.02616,
+    11.54949
+   ],
+   "vao": [
+    {
+     "id": "22888",
+     "phan": "mot-phan"
+    },
+    {
+     "id": "22780",
+     "phan": "mot-phan"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22771",
+   "slug": "phuong-my-dong-thanh-pho-phan-rang-thap-cham",
+   "loai": "phường",
+   "ten": "Mỹ Đông",
+   "huyenId": 582,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22780",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22774",
+   "slug": "xa-thanh-hai-thanh-pho-phan-rang-thap-cham",
+   "loai": "xã",
+   "ten": "Thành Hải",
+   "huyenId": 582,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22774",
+   "tam": [
+    108.99326,
+    11.59793
+   ],
+   "vao": [
+    {
+     "id": "22741",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22777",
+   "slug": "phuong-van-hai-thanh-pho-phan-rang-thap-cham",
+   "loai": "phường",
+   "ten": "Văn Hải",
+   "huyenId": 582,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22777",
+   "tam": [
+    109.01013,
+    11.59059
+   ],
+   "vao": [
+    {
+     "id": "22834",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22779",
+   "slug": "phuong-my-binh-thanh-pho-phan-rang-thap-cham",
+   "loai": "phường",
+   "ten": "Mỹ Bình",
+   "huyenId": 582,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22779",
+   "tam": [
+    109.01052,
+    11.56982
+   ],
+   "vao": [
+    {
+     "id": "22780",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22783",
+   "slug": "xa-phuoc-binh-huyen-bac-ai",
+   "loai": "xã",
+   "ten": "Phước Bình",
+   "huyenId": 584,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22783",
+   "tam": [
+    108.7874,
+    12.00124
+   ],
+   "vao": [
+    {
+     "id": "22786",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22789",
+   "slug": "xa-phuoc-tan-huyen-bac-ai",
+   "loai": "xã",
+   "ten": "Phước Tân",
+   "huyenId": 584,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22789",
+   "tam": [
+    108.81539,
+    11.87823
+   ],
+   "vao": [
+    {
+     "id": "22786",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22792",
+   "slug": "xa-phuoc-tien-huyen-bac-ai",
+   "loai": "xã",
+   "ten": "Phước Tiến",
+   "huyenId": 584,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22792",
+   "tam": [
+    108.81718,
+    11.83065
+   ],
+   "vao": [
+    {
+     "id": "22795",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22798",
+   "slug": "xa-phuoc-thanh-huyen-bac-ai",
+   "loai": "xã",
+   "ten": "Phước Thành",
+   "huyenId": 584,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22798",
+   "tam": [
+    109.00736,
+    11.8713
+   ],
+   "vao": [
+    {
+     "id": "22801",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22804",
+   "slug": "xa-phuoc-chinh-huyen-bac-ai",
+   "loai": "xã",
+   "ten": "Phước Chính",
+   "huyenId": 584,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22804",
+   "tam": [
+    108.87421,
+    11.80135
+   ],
+   "vao": [
+    {
+     "id": "22795",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22807",
+   "slug": "xa-phuoc-trung-huyen-bac-ai",
+   "loai": "xã",
+   "ten": "Phước Trung",
+   "huyenId": 584,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22822",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22816",
+   "slug": "xa-luong-son-huyen-ninh-son",
+   "loai": "xã",
+   "ten": "Lương Sơn",
+   "huyenId": 585,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22816",
+   "tam": [
+    108.76465,
+    11.81648
+   ],
+   "vao": [
+    {
+     "id": "22813",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22819",
+   "slug": "xa-quang-son-huyen-ninh-son",
+   "loai": "xã",
+   "ten": "Quảng Sơn",
+   "huyenId": 585,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22819",
+   "tam": [
+    108.75746,
+    11.74271
+   ],
+   "vao": [
+    {
+     "id": "22810",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22825",
+   "slug": "xa-hoa-son-huyen-ninh-son",
+   "loai": "xã",
+   "ten": "Hòa Sơn",
+   "huyenId": 585,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22825",
+   "tam": [
+    108.76039,
+    11.7005
+   ],
+   "vao": [
+    {
+     "id": "22828",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22831",
+   "slug": "xa-nhon-son-huyen-ninh-son",
+   "loai": "xã",
+   "ten": "Nhơn Sơn",
+   "huyenId": 585,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22831",
+   "tam": [
+    108.93069,
+    11.67665
+   ],
+   "vao": [
+    {
+     "id": "22738",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22855",
+   "slug": "xa-tan-hai-huyen-ninh-hai",
+   "loai": "xã",
+   "ten": "Tân Hải",
+   "huyenId": 586,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22855",
+   "tam": [
+    109.02486,
+    11.65666
+   ],
+   "vao": [
+    {
+     "id": "22861",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22858",
+   "slug": "xa-xuan-hai-huyen-ninh-hai",
+   "loai": "xã",
+   "ten": "Xuân Hải",
+   "huyenId": 586,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22858",
+   "tam": [
+    108.99705,
+    11.65528
+   ],
+   "vao": [
+    {
+     "id": "22861",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22864",
+   "slug": "xa-tri-hai-huyen-ninh-hai",
+   "loai": "xã",
+   "ten": "Tri Hải",
+   "huyenId": 586,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22852",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22867",
+   "slug": "xa-nhon-hai-huyen-ninh-hai",
+   "loai": "xã",
+   "ten": "Nhơn Hải",
+   "huyenId": 586,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22846",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22868",
+   "slug": "xa-thanh-hai-huyen-ninh-hai",
+   "loai": "xã",
+   "ten": "Thanh Hải",
+   "huyenId": 586,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22846",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22876",
+   "slug": "xa-phuoc-thai-huyen-ninh-phuoc",
+   "loai": "xã",
+   "ten": "Phước Thái",
+   "huyenId": 587,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22891",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22879",
+   "slug": "xa-phuoc-hau-huyen-ninh-phuoc",
+   "loai": "xã",
+   "ten": "Phước Hậu",
+   "huyenId": 587,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22879",
+   "tam": [
+    108.92149,
+    11.58234
+   ],
+   "vao": [
+    {
+     "id": "22873",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22882",
+   "slug": "xa-phuoc-thuan-huyen-ninh-phuoc",
+   "loai": "xã",
+   "ten": "Phước Thuận",
+   "huyenId": 587,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22882",
+   "tam": [
+    108.95934,
+    11.57054
+   ],
+   "vao": [
+    {
+     "id": "22870",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22894",
+   "slug": "xa-phuoc-hai-huyen-ninh-phuoc",
+   "loai": "xã",
+   "ten": "Phước Hải",
+   "huyenId": 587,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22894",
+   "tam": [
+    108.95595,
+    11.52033
+   ],
+   "vao": [
+    {
+     "id": "22870",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22912",
+   "slug": "xa-phuoc-vinh-huyen-ninh-phuoc",
+   "loai": "xã",
+   "ten": "Phước Vinh",
+   "huyenId": 587,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22873",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22837",
+   "slug": "xa-phuoc-chien-huyen-thuan-bac",
+   "loai": "xã",
+   "ten": "Phước Chiến",
+   "huyenId": 588,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22840",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22843",
+   "slug": "xa-phuoc-khang-huyen-thuan-bac",
+   "loai": "xã",
+   "ten": "Phước Kháng",
+   "huyenId": 588,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22849",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22853",
+   "slug": "xa-bac-son-huyen-thuan-bac",
+   "loai": "xã",
+   "ten": "Bắc Sơn",
+   "huyenId": 588,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22852",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22856",
+   "slug": "xa-bac-phong-huyen-thuan-bac",
+   "loai": "xã",
+   "ten": "Bắc Phong",
+   "huyenId": 588,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22856",
+   "tam": [
+    109.04461,
+    11.68624
+   ],
+   "vao": [
+    {
+     "id": "22849",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22885",
+   "slug": "xa-phuoc-ha-huyen-thuan-nam",
+   "loai": "xã",
+   "ten": "Phước Hà",
+   "huyenId": 589,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22900",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22898",
+   "slug": "xa-phuoc-ninh-huyen-thuan-nam",
+   "loai": "xã",
+   "ten": "Phước Ninh",
+   "huyenId": 589,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22897",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22903",
+   "slug": "xa-phuoc-dinh-huyen-thuan-nam",
+   "loai": "xã",
+   "ten": "Phước Dinh",
+   "huyenId": 589,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22888",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22906",
+   "slug": "xa-phuoc-minh-huyen-thuan-nam",
+   "loai": "xã",
+   "ten": "Phước Minh",
+   "huyenId": 589,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22897",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22910",
+   "slug": "xa-ca-na-huyen-thuan-nam",
+   "loai": "xã",
+   "ten": "Cà Ná",
+   "huyenId": 589,
+   "laGoc": false,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "22910",
+   "tam": [
+    108.8874,
+    11.33961
+   ],
+   "vao": [
+    {
+     "id": "22909",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22333",
+   "slug": "phuong-vinh-phuoc-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Vĩnh Phước",
+   "huyenId": 568,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22333",
+   "tam": [
+    109.1772,
+    12.31908
+   ],
+   "vao": [
+    {
+     "id": "22333",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 36,
+     "toCuTu": 1,
+     "toCuDen": 36,
+     "soTo": 36,
+     "xaMoi": "22333"
+    }
+   ]
+  },
+  {
+   "id": "22366",
+   "slug": "phuong-tan-tien-thanh-pho-nha-trang",
+   "loai": "phường",
+   "ten": "Tân Tiến",
+   "huyenId": 568,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22366",
+   "tam": [
+    109.19967,
+    12.23154
+   ],
+   "vao": [
+    {
+     "id": "22366",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 10,
+     "toCuTu": 1,
+     "toCuDen": 10,
+     "soTo": 10,
+     "xaMoi": "22366"
+    }
+   ]
+  },
+  {
+   "id": "22390",
+   "slug": "xa-vinh-ngoc-thanh-pho-nha-trang",
+   "loai": "xã",
+   "ten": "Vĩnh Ngọc",
+   "huyenId": 568,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22390",
+   "tam": [
+    109.15658,
+    12.25956
+   ],
+   "vao": [
+    {
+     "id": "22390",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 42,
+     "toCuTu": 1,
+     "toCuDen": 42,
+     "soTo": 42,
+     "xaMoi": "22390"
+    }
+   ]
+  },
+  {
+   "id": "22402",
+   "slug": "xa-vinh-thai-thanh-pho-nha-trang",
+   "loai": "xã",
+   "ten": "Vĩnh Thái",
+   "huyenId": 568,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22402",
+   "tam": [
+    109.16925,
+    12.19748
+   ],
+   "vao": [
+    {
+     "id": "22402",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 49,
+     "toCuTu": 1,
+     "toCuDen": 49,
+     "soTo": 49,
+     "xaMoi": "22402"
+    }
+   ]
+  },
+  {
+   "id": "22411",
+   "slug": "phuong-cam-phuc-bac-thanh-pho-cam-ranh",
+   "loai": "phường",
+   "ten": "Cam Phúc Bắc",
+   "huyenId": 569,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22411",
+   "tam": [
+    109.20744,
+    11.94046
+   ],
+   "vao": [
+    {
+     "id": "22411",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22420",
+   "slug": "phuong-cam-phu-thanh-pho-cam-ranh",
+   "loai": "phường",
+   "ten": "Cam Phú",
+   "huyenId": 569,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22420",
+   "tam": [
+    109.16035,
+    11.9329
+   ],
+   "vao": [
+    {
+     "id": "22420",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22480",
+   "slug": "xa-cam-thinh-dong-thanh-pho-cam-ranh",
+   "loai": "xã",
+   "ten": "Cam Thịnh Đông",
+   "huyenId": 569,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22480",
+   "tam": [
+    109.1178,
+    11.86144
+   ],
+   "vao": [
+    {
+     "id": "22480",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22435",
+   "slug": "xa-cam-tan-huyen-cam-lam",
+   "loai": "xã",
+   "ten": "Cam Tân",
+   "huyenId": 570,
+   "laGoc": true,
+   "coQh": true,
+   "coBanDo": true,
+   "maBanDo": "g22435",
+   "tam": [
+    109.05575,
+    12.09626
+   ],
+   "vao": [
+    {
+     "id": "22453",
+     "phan": "mot-phan"
+    },
+    {
+     "id": "22708",
+     "phan": "mot-phan"
+    },
+    {
+     "id": "22435",
+     "phan": "mot-phan"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 63,
+     "toMoiDen": 63,
+     "toCuTu": 45,
+     "toCuDen": 45,
+     "soTo": 1,
+     "xaMoi": "22708"
+    },
+    {
+     "toMoiTu": 301,
+     "toMoiDen": 342,
+     "toCuTu": 1,
+     "toCuDen": 46,
+     "soTo": 42,
+     "xaMoi": "22453"
+    },
+    {
+     "toMoiTu": 3,
+     "toMoiDen": 46,
+     "toCuTu": 3,
+     "toCuDen": 46,
+     "soTo": 11,
+     "xaMoi": "22435"
+    }
+   ]
+  },
+  {
+   "id": "22453",
+   "slug": "thi-tran-cam-duc-huyen-cam-lam",
+   "loai": "thị trấn",
+   "ten": "Cam Đức",
+   "huyenId": 570,
+   "laGoc": true,
+   "coQh": true,
+   "coBanDo": true,
+   "maBanDo": "g22453",
+   "tam": [
+    109.14166,
+    12.08353
+   ],
+   "vao": [
+    {
+     "id": "22453",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 57,
+     "toCuTu": 1,
+     "toCuDen": 57,
+     "soTo": 57,
+     "xaMoi": "22453"
+    }
+   ]
+  },
+  {
+   "id": "22465",
+   "slug": "xa-cam-an-bac-huyen-cam-lam",
+   "loai": "xã",
+   "ten": "Cam An Bắc",
+   "huyenId": 570,
+   "laGoc": true,
+   "coQh": true,
+   "coBanDo": true,
+   "maBanDo": "g22465",
+   "tam": [
+    109.06943,
+    11.9946
+   ],
+   "vao": [
+    {
+     "id": "22453",
+     "phan": "mot-phan"
+    },
+    {
+     "id": "22465",
+     "phan": "mot-phan"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 399,
+     "toMoiDen": 399,
+     "toCuTu": 22,
+     "toCuDen": 22,
+     "soTo": 1,
+     "xaMoi": "22453"
+    },
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 31,
+     "toCuTu": 1,
+     "toCuDen": 31,
+     "soTo": 31,
+     "xaMoi": "22465"
+    }
+   ]
+  },
+  {
+   "id": "22708",
+   "slug": "xa-suoi-cat-huyen-cam-lam",
+   "loai": "xã",
+   "ten": "Suối Cát",
+   "huyenId": 570,
+   "laGoc": true,
+   "coQh": true,
+   "coBanDo": true,
+   "maBanDo": "g22708",
+   "tam": [
+    109.0418,
+    12.14432
+   ],
+   "vao": [
+    {
+     "id": "22708",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 57,
+     "toCuTu": 1,
+     "toCuDen": 57,
+     "soTo": 57,
+     "xaMoi": "22708"
+    }
+   ]
+  },
+  {
+   "id": "22489",
+   "slug": "thi-tran-van-gia-huyen-van-ninh",
+   "loai": "thị trấn",
+   "ten": "Vạn Giã",
+   "huyenId": 571,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22489",
+   "tam": [
+    109.22183,
+    12.69071
+   ],
+   "vao": [
+    {
+     "id": "22489",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 57,
+     "toCuTu": 1,
+     "toCuDen": 57,
+     "soTo": 57,
+     "xaMoi": "22489"
+    }
+   ]
+  },
+  {
+   "id": "22498",
+   "slug": "xa-van-long-huyen-van-ninh",
+   "loai": "xã",
+   "ten": "Vạn Long",
+   "huyenId": 571,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22498",
+   "tam": [
+    109.27913,
+    12.79753
+   ],
+   "vao": [
+    {
+     "id": "22498",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 39,
+     "toCuTu": 1,
+     "toCuDen": 39,
+     "soTo": 39,
+     "xaMoi": "22498"
+    }
+   ]
+  },
+  {
+   "id": "22504",
+   "slug": "xa-van-tho-huyen-van-ninh",
+   "loai": "xã",
+   "ten": "Vạn Thọ",
+   "huyenId": 571,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22504",
+   "tam": [
+    109.3554,
+    12.78088
+   ],
+   "vao": [
+    {
+     "id": "22504",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 39,
+     "toCuTu": 1,
+     "toCuDen": 39,
+     "soTo": 39,
+     "xaMoi": "22504"
+    }
+   ]
+  },
+  {
+   "id": "22528",
+   "slug": "phuong-ninh-hiep-thi-xa-ninh-hoa",
+   "loai": "phường",
+   "ten": "Ninh Hiệp",
+   "huyenId": 572,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22528",
+   "tam": [
+    109.13834,
+    12.50046
+   ],
+   "vao": [
+    {
+     "id": "22528",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 73,
+     "toCuTu": 1,
+     "toCuDen": 73,
+     "soTo": 73,
+     "xaMoi": "22528"
+    }
+   ]
+  },
+  {
+   "id": "22546",
+   "slug": "xa-ninh-tho-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Thọ",
+   "huyenId": 572,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22546",
+   "tam": [
+    109.18664,
+    12.54324
+   ],
+   "vao": [
+    {
+     "id": "22546",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 95,
+     "toCuTu": 1,
+     "toCuDen": 95,
+     "soTo": 95,
+     "xaMoi": "22546"
+    }
+   ]
+  },
+  {
+   "id": "22552",
+   "slug": "xa-ninh-sim-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Sim",
+   "huyenId": 572,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22552",
+   "tam": [
+    109.00513,
+    12.53196
+   ],
+   "vao": [
+    {
+     "id": "22552",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 4,
+     "toMoiDen": 80,
+     "toCuTu": 4,
+     "toCuDen": 80,
+     "soTo": 77,
+     "xaMoi": "22552"
+    }
+   ]
+  },
+  {
+   "id": "22558",
+   "slug": "xa-ninh-than-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Thân",
+   "huyenId": 572,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22558",
+   "tam": [
+    109.09292,
+    12.53306
+   ],
+   "vao": [
+    {
+     "id": "22558",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 27,
+     "toCuTu": 1,
+     "toCuDen": 27,
+     "soTo": 27,
+     "xaMoi": "22558"
+    }
+   ]
+  },
+  {
+   "id": "22561",
+   "slug": "phuong-ninh-diem-thi-xa-ninh-hoa",
+   "loai": "phường",
+   "ten": "Ninh Diêm",
+   "huyenId": 572,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22561",
+   "tam": [
+    109.25471,
+    12.48835
+   ],
+   "vao": [
+    {
+     "id": "22561",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 24,
+     "toCuTu": 1,
+     "toCuDen": 24,
+     "soTo": 24,
+     "xaMoi": "22561"
+    }
+   ]
+  },
+  {
+   "id": "22576",
+   "slug": "xa-ninh-binh-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Bình",
+   "huyenId": 572,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22576",
+   "tam": [
+    109.07883,
+    12.48737
+   ],
+   "vao": [
+    {
+     "id": "22576",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 29,
+     "toCuTu": 1,
+     "toCuDen": 29,
+     "soTo": 29,
+     "xaMoi": "22576"
+    }
+   ]
+  },
+  {
+   "id": "22591",
+   "slug": "phuong-ninh-giang-thi-xa-ninh-hoa",
+   "loai": "phường",
+   "ten": "Ninh Giang",
+   "huyenId": 572,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22591",
+   "tam": [
+    109.1512,
+    12.47348
+   ],
+   "vao": [
+    {
+     "id": "22591",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 12,
+     "toCuTu": 1,
+     "toCuDen": 12,
+     "soTo": 12,
+     "xaMoi": "22591"
+    }
+   ]
+  },
+  {
+   "id": "22597",
+   "slug": "xa-ninh-hung-thi-xa-ninh-hoa",
+   "loai": "xã",
+   "ten": "Ninh Hưng",
+   "huyenId": 572,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22597",
+   "tam": [
+    109.07172,
+    12.43401
+   ],
+   "vao": [
+    {
+     "id": "22597",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": [
+    {
+     "toMoiTu": 1,
+     "toMoiDen": 24,
+     "toCuTu": 1,
+     "toCuDen": 24,
+     "soTo": 24,
+     "xaMoi": "22597"
+    }
+   ]
+  },
+  {
+   "id": "22609",
+   "slug": "thi-tran-khanh-vinh-huyen-khanh-vinh",
+   "loai": "thị trấn",
+   "ten": "Khánh Vĩnh",
+   "huyenId": 573,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22609",
+   "tam": [
+    108.90578,
+    12.19059
+   ],
+   "vao": [
+    {
+     "id": "22609",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22612",
+   "slug": "xa-khanh-hiep-huyen-khanh-vinh",
+   "loai": "xã",
+   "ten": "Khánh Hiệp",
+   "huyenId": 573,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22612",
+   "tam": [
+    108.80645,
+    12.40744
+   ],
+   "vao": [
+    {
+     "id": "22612",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22615",
+   "slug": "xa-khanh-binh-huyen-khanh-vinh",
+   "loai": "xã",
+   "ten": "Khánh Bình",
+   "huyenId": 573,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22615",
+   "tam": [
+    108.96453,
+    12.4169
+   ],
+   "vao": [
+    {
+     "id": "22615",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22624",
+   "slug": "xa-khanh-thuong-huyen-khanh-vinh",
+   "loai": "xã",
+   "ten": "Khánh Thượng",
+   "huyenId": 573,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22624",
+   "tam": [
+    108.81389,
+    12.30778
+   ],
+   "vao": [
+    {
+     "id": "22624",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22648",
+   "slug": "xa-son-thai-huyen-khanh-vinh",
+   "loai": "xã",
+   "ten": "Sơn Thái",
+   "huyenId": 573,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22648",
+   "tam": [
+    108.81505,
+    12.20803
+   ],
+   "vao": [
+    {
+     "id": "22648",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22651",
+   "slug": "thi-tran-dien-khanh-huyen-dien-khanh",
+   "loai": "thị trấn",
+   "ten": "Diên Khánh",
+   "huyenId": 574,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22651",
+   "tam": [
+    109.10534,
+    12.25846
+   ],
+   "vao": [
+    {
+     "id": "22651",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22660",
+   "slug": "xa-xuan-dong-huyen-dien-khanh",
+   "loai": "xã",
+   "ten": "Xuân Đồng",
+   "huyenId": 574,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22660",
+   "tam": [
+    108.98595,
+    12.32866
+   ],
+   "vao": [
+    {
+     "id": "22660",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22714",
+   "slug": "thi-tran-to-hap-huyen-khanh-son",
+   "loai": "thị trấn",
+   "ten": "Tô Hạp",
+   "huyenId": 575,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22714",
+   "tam": [
+    108.91479,
+    12.02817
+   ],
+   "vao": [
+    {
+     "id": "22714",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22720",
+   "slug": "xa-son-lam-huyen-khanh-son",
+   "loai": "xã",
+   "ten": "Sơn Lâm",
+   "huyenId": 575,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22720",
+   "tam": [
+    108.85147,
+    12.03649
+   ],
+   "vao": [
+    {
+     "id": "22720",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22732",
+   "slug": "xa-ba-cum-bac-huyen-khanh-son",
+   "loai": "xã",
+   "ten": "Ba Cụm Bắc",
+   "huyenId": 575,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22732",
+   "tam": [
+    108.95348,
+    11.9964
+   ],
+   "vao": [
+    {
+     "id": "22732",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22736",
+   "slug": "thi-tran-truong-sa-huyen-truong-sa",
+   "loai": "thị trấn",
+   "ten": "Trường Sa",
+   "huyenId": 576,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": false,
+   "maBanDo": "",
+   "tam": null,
+   "vao": [
+    {
+     "id": "22736",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22741",
+   "slug": "phuong-phuoc-my-thanh-pho-phan-rang-thap-cham",
+   "loai": "phường",
+   "ten": "Phước Mỹ",
+   "huyenId": 582,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22741",
+   "tam": [
+    108.97077,
+    11.58994
+   ],
+   "vao": [
+    {
+     "id": "22741",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22759",
+   "slug": "phuong-kinh-dinh-thanh-pho-phan-rang-thap-cham",
+   "loai": "phường",
+   "ten": "Kinh Dinh",
+   "huyenId": 582,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22759",
+   "tam": [
+    108.9907,
+    11.56979
+   ],
+   "vao": [
+    {
+     "id": "22759",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22780",
+   "slug": "phuong-my-hai-thanh-pho-phan-rang-thap-cham",
+   "loai": "phường",
+   "ten": "Mỹ Hải",
+   "huyenId": 582,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22780",
+   "tam": [
+    109.01343,
+    11.56131
+   ],
+   "vao": [
+    {
+     "id": "22780",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22834",
+   "slug": "thi-tran-khanh-hai-thanh-pho-phan-rang-thap-cham",
+   "loai": "thị trấn",
+   "ten": "Khánh Hải",
+   "huyenId": 582,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22834",
+   "tam": [
+    109.02199,
+    11.59752
+   ],
+   "vao": [
+    {
+     "id": "22834",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22786",
+   "slug": "xa-phuoc-hoa-huyen-bac-ai",
+   "loai": "xã",
+   "ten": "Phước Hòa",
+   "huyenId": 584,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22786",
+   "tam": [
+    108.78624,
+    11.93728
+   ],
+   "vao": [
+    {
+     "id": "22786",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22795",
+   "slug": "xa-phuoc-thang-huyen-bac-ai",
+   "loai": "xã",
+   "ten": "Phước Thắng",
+   "huyenId": 584,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22795",
+   "tam": [
+    108.84837,
+    11.82899
+   ],
+   "vao": [
+    {
+     "id": "22795",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22801",
+   "slug": "xa-phuoc-dai-huyen-bac-ai",
+   "loai": "xã",
+   "ten": "Phước Đại",
+   "huyenId": 584,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22801",
+   "tam": [
+    108.9631,
+    11.85996
+   ],
+   "vao": [
+    {
+     "id": "22801",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22810",
+   "slug": "thi-tran-tan-son-huyen-ninh-son",
+   "loai": "thị trấn",
+   "ten": "Tân Sơn",
+   "huyenId": 585,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22810",
+   "tam": [
+    108.75746,
+    11.75147
+   ],
+   "vao": [
+    {
+     "id": "22810",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22828",
+   "slug": "xa-ma-noi-huyen-ninh-son",
+   "loai": "xã",
+   "ten": "Ma Nới",
+   "huyenId": 585,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22828",
+   "tam": [
+    108.71292,
+    11.67054
+   ],
+   "vao": [
+    {
+     "id": "22828",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22852",
+   "slug": "xa-phuong-hai-huyen-ninh-hai",
+   "loai": "xã",
+   "ten": "Phương Hải",
+   "huyenId": 586,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22852",
+   "tam": [
+    109.0459,
+    11.65663
+   ],
+   "vao": [
+    {
+     "id": "22852",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22861",
+   "slug": "xa-ho-hai-huyen-ninh-hai",
+   "loai": "xã",
+   "ten": "Hộ Hải",
+   "huyenId": 586,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22861",
+   "tam": [
+    108.99616,
+    11.63867
+   ],
+   "vao": [
+    {
+     "id": "22861",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22870",
+   "slug": "thi-tran-phuoc-dan-huyen-ninh-phuoc",
+   "loai": "thị trấn",
+   "ten": "Phước Dân",
+   "huyenId": 587,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22870",
+   "tam": [
+    108.94622,
+    11.54566
+   ],
+   "vao": [
+    {
+     "id": "22870",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22873",
+   "slug": "xa-phuoc-son-huyen-ninh-phuoc",
+   "loai": "xã",
+   "ten": "Phước Sơn",
+   "huyenId": 587,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22873",
+   "tam": [
+    108.87648,
+    11.61707
+   ],
+   "vao": [
+    {
+     "id": "22873",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22849",
+   "slug": "xa-loi-hai-huyen-thuan-bac",
+   "loai": "xã",
+   "ten": "Lợi Hải",
+   "huyenId": 588,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22849",
+   "tam": [
+    109.04481,
+    11.7259
+   ],
+   "vao": [
+    {
+     "id": "22849",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22888",
+   "slug": "xa-an-hai-huyen-thuan-nam",
+   "loai": "xã",
+   "ten": "An Hải",
+   "huyenId": 589,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22888",
+   "tam": [
+    108.98847,
+    11.52987
+   ],
+   "vao": [
+    {
+     "id": "22888",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22897",
+   "slug": "xa-phuoc-nam-huyen-thuan-nam",
+   "loai": "xã",
+   "ten": "Phước Nam",
+   "huyenId": 589,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22897",
+   "tam": [
+    108.92495,
+    11.47451
+   ],
+   "vao": [
+    {
+     "id": "22897",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22900",
+   "slug": "xa-nhi-ha-huyen-thuan-nam",
+   "loai": "xã",
+   "ten": "Nhị Hà",
+   "huyenId": 589,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22900",
+   "tam": [
+    108.83857,
+    11.46141
+   ],
+   "vao": [
+    {
+     "id": "22900",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  },
+  {
+   "id": "22909",
+   "slug": "xa-phuoc-diem-huyen-thuan-nam",
+   "loai": "xã",
+   "ten": "Phước Diêm",
+   "huyenId": 589,
+   "laGoc": true,
+   "coQh": false,
+   "coBanDo": true,
+   "maBanDo": "g22909",
+   "tam": [
+    108.89974,
+    11.34483
+   ],
+   "vao": [
+    {
+     "id": "22909",
+     "phan": "toan-bo"
+    }
+   ],
+   "soTo": []
+  }
+ ]
+}

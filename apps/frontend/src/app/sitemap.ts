@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { ALL_SLUGS } from '@/lib/seoLanding';
+import { TAT_CA_SLUG as DIA_DANH } from '@/lib/diaDanh';
 import { GUIDES } from '@/app/cam-nang/guides';
 import { SITE } from '@/lib/tenMien';
 
@@ -16,6 +17,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const landing: MetadataRoute.Sitemap = ALL_SLUGS.map((slug) => ({
     url: `${SITE}/nha-dat/${slug}`, changeFrequency: 'daily', priority: 0.75,
   }));
+  // TRANG ĐỊA DANH (13/10/2026): 65 xã/phường mới + xã cũ + huyện cũ, nối tên trước ↔ sau sáp nhập (lib/diaDanh.ts)
+  const diaDanh: MetadataRoute.Sitemap = [
+    { url: `${SITE}/ban-do`, changeFrequency: 'monthly', priority: 0.8 },
+    ...DIA_DANH.map((slug) => ({ url: `${SITE}/ban-do/${slug}`, changeFrequency: 'monthly' as const, priority: 0.7 })),
+  ];
   let listings: MetadataRoute.Sitemap = [];
   try {
     // Lúc ĐÓNG GÓI web máy chủ dữ liệu chưa chạy → gọi BACKEND hỏng, sitemap rỗng tin đăng suốt 1 tiếng.
@@ -49,5 +55,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }));
     }
   } catch { /* kho tin lỗi -> bỏ qua phần tin tức */ }
-  return [...staticUrls, ...landing, ...guides, ...news, ...listings];
+  return [...staticUrls, ...landing, ...diaDanh, ...guides, ...news, ...listings];
 }

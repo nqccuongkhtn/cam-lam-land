@@ -9,6 +9,7 @@ const DISCOVER: [string, string][] = [
   ['Dịch vụ & Bảng giá', '/dichvu'],
   ['Nhà đất bán & cho thuê', '/listings'],
   ['Nhà đất theo khu vực', '/nha-dat'],
+  ['Bản đồ 65 xã, phường Khánh Hòa', '/ban-do'],   // trang địa danh (13/10/2026): xã mới ↔ xã cũ, số tờ mới
   ['Dự án bất động sản', '/du-an'],
   ['Góp vốn đầu tư (CamInvest)', '/dau-tu'],
   ['Tin tức', '/tin-tuc'],

@@ -1,0 +1,2215 @@
+{
+  "nguon": [
+    "https://congbao.chinhphu.vn/van-ban/nghi-quyet-so-1667-nq-ubtvqh15-45122.htm",
+    "https://congbaocdn.chinhphu.vn/CongBaoCP/VanBan/2025/6/45122/56843-1-2025803-8041667-nq-ubtvqh15.pdf",
+    "https://g7.cdnchinhphu.vn/api/download/stream?Url=tm-8mq6BhNw0NbrKRhTDAQWsKg3tuqaY0aWypnY78U6M2BY68Ekp0Gvvr483flbReUpmLUf-4UmPY7gNghBNqcGW6VSu6OmOE_PGO0W9P1oHZjC95jGqe_S6XBH2miPKP0aqf200LdYg2OYTs6tdIQ~~&file_name=2025_803+%2b+804_1667-NQ-UBTVQH15.doc (bản Word của Công báo — nguồn chính cho nguyenVan)",
+    "https://luatvietnam.vn/hanh-chinh/nghi-quyet-1667-nq-ubtvqh15-2025-sap-xep-don-vi-hanh-chinh-cap-xa-tinh-khanh-hoa-403029-d1.html",
+    "https://vanban.chinhphu.vn/?pageid=27160&docid=213979 (bản PDF ký số 1667-nq.signed.pdf — là ảnh quét, chỉ dùng để xác nhận có văn bản)",
+    "https://daibieunhandan.vn/nghi-quyet-ve-viec-sap-xep-don-vi-hanh-chinh-cap-xa-cua-tinh-khanh-hoa-giai-doan-2023-2025-post392690.html (NQ 1196/2024, để bắc cầu)",
+    "https://daibieunhandan.vn/nghi-quyet-ve-viec-sap-xep-don-vi-hanh-chinh-cap-xa-cua-tinh-ninh-thuan-giai-doan-2023-2025-post392692.html (NQ 1198/2024, để bắc cầu)"
+  ],
+  "xaMoi": [
+    {
+      "khoan": 1,
+      "ten": "xã Nam Cam Ranh",
+      "xaId": 22480,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Cam Lập",
+          "xaId": 22483,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Cam Bình",
+          "xaId": 22486,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Cam Thịnh Đông",
+          "xaId": 22480,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Cam Thịnh Tây",
+          "xaId": 22477,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Cam Lập, Cam Bình, Cam Thịnh Đông và Cam Thịnh Tây thành xã mới có tên gọi là xã Nam Cam Ranh."
+    },
+    {
+      "khoan": 2,
+      "ten": "xã Bắc Ninh Hòa",
+      "xaId": 22546,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Ninh An",
+          "xaId": 22540,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ninh Sơn",
+          "xaId": 22531,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ninh Thọ",
+          "xaId": 22546,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Ninh An, Ninh Sơn và Ninh Thọ thành xã mới có tên gọi là xã Bắc Ninh Hòa."
+    },
+    {
+      "khoan": 3,
+      "ten": "xã Tân Định",
+      "xaId": 22576,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Ninh Xuân",
+          "xaId": 22555,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ninh Quang",
+          "xaId": 22588,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ninh Bình",
+          "xaId": 22576,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Ninh Xuân, Ninh Quang và Ninh Bình thành xã mới có tên gọi là xã Tân Định."
+    },
+    {
+      "khoan": 4,
+      "ten": "xã Nam Ninh Hòa",
+      "xaId": 22597,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Ninh Lộc",
+          "xaId": 22600,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ninh Ích",
+          "xaId": 22603,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ninh Hưng",
+          "xaId": 22597,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ninh Tân",
+          "xaId": 22585,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Ninh Lộc, Ninh Ích, Ninh Hưng và Ninh Tân thành xã mới có tên gọi là xã Nam Ninh Hòa."
+    },
+    {
+      "khoan": 5,
+      "ten": "xã Tây Ninh Hòa",
+      "xaId": 22552,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Ninh Tây",
+          "xaId": 22534,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ninh Sim",
+          "xaId": 22552,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Ninh Tây và xã Ninh Sim thành xã mới có tên gọi là xã Tây Ninh Hòa."
+    },
+    {
+      "khoan": 6,
+      "ten": "xã Hòa Trí",
+      "xaId": 22558,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Ninh Thượng",
+          "xaId": 22537,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ninh Trung",
+          "xaId": 22549,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ninh Thân",
+          "xaId": 22558,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Ninh Thượng, Ninh Trung và Ninh Thân thành xã mới có tên gọi là xã Hòa Trí."
+    },
+    {
+      "khoan": 7,
+      "ten": "xã Đại Lãnh",
+      "xaId": 22504,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Vạn Thạnh",
+          "xaId": 22519,
+          "huyenCu": "huyện Vạn Ninh",
+          "huyenIdCu": 571,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vạn Thọ",
+          "xaId": 22504,
+          "huyenCu": "huyện Vạn Ninh",
+          "huyenIdCu": 571,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Đại Lãnh",
+          "xaId": 22492,
+          "huyenCu": "huyện Vạn Ninh",
+          "huyenIdCu": 571,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Vạn Thạnh, Vạn Thọ và Đại Lãnh thành xã mới có tên gọi là xã Đại Lãnh."
+    },
+    {
+      "khoan": 8,
+      "ten": "xã Tu Bông",
+      "xaId": 22498,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Vạn Khánh",
+          "xaId": 22507,
+          "huyenCu": "huyện Vạn Ninh",
+          "huyenIdCu": 571,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vạn Long",
+          "xaId": 22498,
+          "huyenCu": "huyện Vạn Ninh",
+          "huyenIdCu": 571,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vạn Phước",
+          "xaId": 22495,
+          "huyenCu": "huyện Vạn Ninh",
+          "huyenIdCu": 571,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Vạn Khánh, Vạn Long và Vạn Phước thành xã mới có tên gọi là xã Tu Bông."
+    },
+    {
+      "khoan": 9,
+      "ten": "xã Vạn Thắng",
+      "xaId": 22516,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Vạn Bình",
+          "xaId": 22501,
+          "huyenCu": "huyện Vạn Ninh",
+          "huyenIdCu": 571,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vạn Thắng",
+          "xaId": 22516,
+          "huyenCu": "huyện Vạn Ninh",
+          "huyenIdCu": 571,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Vạn Bình và xã Vạn Thắng thành xã mới có tên gọi là xã Vạn Thắng."
+    },
+    {
+      "khoan": 10,
+      "ten": "xã Vạn Ninh",
+      "xaId": 22489,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "thị trấn Vạn Giã",
+          "xaId": 22489,
+          "huyenCu": "huyện Vạn Ninh",
+          "huyenIdCu": 571,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vạn Phú",
+          "xaId": 22510,
+          "huyenCu": "huyện Vạn Ninh",
+          "huyenIdCu": 571,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vạn Lương",
+          "xaId": 22513,
+          "huyenCu": "huyện Vạn Ninh",
+          "huyenIdCu": 571,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của thị trấn Vạn Giã, xã Vạn Phú và xã Vạn Lương thành xã mới có tên gọi là xã Vạn Ninh."
+    },
+    {
+      "khoan": 11,
+      "ten": "xã Vạn Hưng",
+      "xaId": 22525,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Xuân Sơn",
+          "xaId": 22522,
+          "huyenCu": "huyện Vạn Ninh",
+          "huyenIdCu": 571,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vạn Hưng",
+          "xaId": 22525,
+          "huyenCu": "huyện Vạn Ninh",
+          "huyenIdCu": 571,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Xuân Sơn và xã Vạn Hưng thành xã mới có tên gọi là xã Vạn Hưng."
+    },
+    {
+      "khoan": 12,
+      "ten": "xã Diên Khánh",
+      "xaId": 22651,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "thị trấn Diên Khánh",
+          "xaId": 22651,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Diên An",
+          "xaId": 22693,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Diên Toàn",
+          "xaId": 22690,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của thị trấn Diên Khánh, xã Diên An và xã Diên Toàn thành xã mới có tên gọi là xã Diên Khánh."
+    },
+    {
+      "khoan": 13,
+      "ten": "xã Diên Lạc",
+      "xaId": 22678,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Diên Thạnh",
+          "xaId": 22687,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Diên Lạc",
+          "xaId": 22678,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Diên Hòa",
+          "xaId": 22684,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Diên Thạnh, Diên Lạc và Diên Hòa thành xã mới có tên gọi là xã Diên Lạc."
+    },
+    {
+      "khoan": 14,
+      "ten": "xã Diên Điền",
+      "xaId": 22657,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Diên Sơn",
+          "xaId": 22663,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Diên Phú",
+          "xaId": 22669,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Diên Điền",
+          "xaId": 22657,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Diên Sơn, Diên Phú và Diên Điềnthành xã mới có tên gọi là xã Diên Điền."
+    },
+    {
+      "khoan": 15,
+      "ten": "xã Diên Lâm",
+      "xaId": 22660,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Xuân Đồng",
+          "xaId": 22660,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Diên Lâm",
+          "xaId": 22654,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Xuân Đồng và xã Diên Lâm thành xã mới có tên gọi là xã Diên Lâm."
+    },
+    {
+      "khoan": 16,
+      "ten": "xã Diên Thọ",
+      "xaId": 22672,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Diên Tân",
+          "xaId": 22681,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Diên Phước",
+          "xaId": 22675,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Diên Thọ",
+          "xaId": 22672,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Diên Tân, Diên Phước và Diên Thọ thành xã mới có tên gọi là xã Diên Thọ."
+    },
+    {
+      "khoan": 17,
+      "ten": "xã Suối Hiệp",
+      "xaId": 22702,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Suối Tiên",
+          "xaId": 22705,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Bình Lộc",
+          "xaId": 22696,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Suối Hiệp",
+          "xaId": 22702,
+          "huyenCu": "huyện Diên Khánh",
+          "huyenIdCu": 574,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Suối Tiên, Bình Lộc và Suối Hiệp thành xã mới có tên gọi là xã Suối Hiệp."
+    },
+    {
+      "khoan": 18,
+      "ten": "xã Cam Lâm",
+      "xaId": 22453,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "thị trấn Cam Đức",
+          "xaId": 22453,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Cam Hải Đông",
+          "xaId": 22441,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Cam Hải Tây",
+          "xaId": 22444,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Cam Thành Bắc",
+          "xaId": 22462,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Cam Hiệp Bắc",
+          "xaId": 22450,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "một phần diện tích, quy mô dân số"
+        },
+        {
+          "ten": "xã Cam Hiệp Nam",
+          "xaId": 22456,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "một phần diện tích, quy mô dân số"
+        },
+        {
+          "ten": "xã Cam Hòa",
+          "xaId": 22438,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "một phần diện tích, quy mô dân số"
+        },
+        {
+          "ten": "xã Cam Tân",
+          "xaId": 22435,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "một phần diện tích, quy mô dân số"
+        },
+        {
+          "ten": "xã Cam An Bắc",
+          "xaId": 22465,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "một phần diện tích, quy mô dân số"
+        },
+        {
+          "ten": "xã Cam An Nam",
+          "xaId": 22471,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "một phần diện tích, quy mô dân số"
+        },
+        {
+          "ten": "xã Suối Tân",
+          "xaId": 22711,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "một phần diện tích, quy mô dân số"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của thị trấn Cam Đức, các xã Cam Hải Đông, Cam Hải Tây, Cam Thành Bắc và một phần diện tích, quy mô dân số của các xã Cam Hiệp Bắc, Cam Hiệp Nam, Cam Hòa, Cam Tân, Cam An Bắc, Cam An Nam, Suối Tân thành xã mới có tên gọi là xã Cam Lâm."
+    },
+    {
+      "khoan": 19,
+      "ten": "xã Suối Dầu",
+      "xaId": 22708,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Suối Cát",
+          "xaId": 22708,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Cam Hòa",
+          "xaId": 22438,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "một phần diện tích tự nhiên, quy mô dân số"
+        },
+        {
+          "ten": "xã Cam Tân",
+          "xaId": 22435,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "một phần diện tích tự nhiên, quy mô dân số"
+        },
+        {
+          "ten": "xã Suối Tân",
+          "xaId": 22711,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "một phần diện tích tự nhiên, quy mô dân số"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Suối Cát và một phần diện tích tự nhiên, quy mô dân số của các xã Cam Hòa, Cam Tân, Suối Tân thành xã mới có tên gọi là xã Suối Dầu."
+    },
+    {
+      "khoan": 20,
+      "ten": "xã Cam Hiệp",
+      "xaId": 22435,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Sơn Tân",
+          "xaId": 22447,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Cam Hiệp Bắc",
+          "xaId": 22450,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "phần còn lại sau khi sắp xếp theo khoản 18"
+        },
+        {
+          "ten": "xã Cam Hiệp Nam",
+          "xaId": 22456,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "phần còn lại sau khi sắp xếp theo khoản 18"
+        },
+        {
+          "ten": "xã Cam Hòa",
+          "xaId": 22438,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "phần còn lại sau khi sắp xếp theo khoản 18, khoản 19"
+        },
+        {
+          "ten": "xã Cam Tân",
+          "xaId": 22435,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "phần còn lại sau khi sắp xếp theo khoản 18, khoản 19"
+        },
+        {
+          "ten": "xã Suối Tân",
+          "xaId": 22711,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "phần còn lại sau khi sắp xếp theo khoản 18, khoản 19"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Sơn Tân, phần còn lại của xã Cam Hiệp Bắc và xã Cam Hiệp Nam sau khi sắp xếp theo quy định tại khoản 18 Điều này và phần còn lại của các xã Cam Hòa, Cam Tân, Suối Tân sau khi sắp xếp theo quy định tại khoản 18,khoản 19 Điều này thành xã mới có tên gọi là xã Cam Hiệp."
+    },
+    {
+      "khoan": 21,
+      "ten": "xã Cam An",
+      "xaId": 22465,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Cam Phước Tây",
+          "xaId": 22459,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Cam An Bắc",
+          "xaId": 22465,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "phần còn lại sau khi sắp xếp theo khoản 18"
+        },
+        {
+          "ten": "xã Cam An Nam",
+          "xaId": 22471,
+          "huyenCu": "huyện Cam Lâm",
+          "huyenIdCu": 570,
+          "phan": "mot-phan",
+          "ghiChu": "phần còn lại sau khi sắp xếp theo khoản 18"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Cam Phước Tây và phần còn lại của xã Cam An Bắc, xã Cam An Nam sau khi thực hiện sắp xếp theo quy định tại khoản 18 Điều này thành xã mới có tên gọi là xã Cam An."
+    },
+    {
+      "khoan": 22,
+      "ten": "xã Bắc Khánh Vĩnh",
+      "xaId": 22615,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Khánh Bình",
+          "xaId": 22615,
+          "huyenCu": "huyện Khánh Vĩnh",
+          "huyenIdCu": 573,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Khánh Đông",
+          "xaId": 22621,
+          "huyenCu": "huyện Khánh Vĩnh",
+          "huyenIdCu": 573,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Khánh Bình và xã Khánh Đông thành xã mới có tên gọi là xã Bắc Khánh Vĩnh."
+    },
+    {
+      "khoan": 23,
+      "ten": "xã Trung Khánh Vĩnh",
+      "xaId": 22612,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Khánh Trung",
+          "xaId": 22618,
+          "huyenCu": "huyện Khánh Vĩnh",
+          "huyenIdCu": 573,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Khánh Hiệp",
+          "xaId": 22612,
+          "huyenCu": "huyện Khánh Vĩnh",
+          "huyenIdCu": 573,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Khánh Trung và xã Khánh Hiệp thành xã mới có tên gọi là xã Trung Khánh Vĩnh."
+    },
+    {
+      "khoan": 24,
+      "ten": "xã Tây Khánh Vĩnh",
+      "xaId": 22624,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Giang Ly",
+          "xaId": 22633,
+          "huyenCu": "huyện Khánh Vĩnh",
+          "huyenIdCu": 573,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Khánh Thượng",
+          "xaId": 22624,
+          "huyenCu": "huyện Khánh Vĩnh",
+          "huyenIdCu": 573,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Khánh Nam",
+          "xaId": 22627,
+          "huyenCu": "huyện Khánh Vĩnh",
+          "huyenIdCu": 573,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Giang Ly, Khánh Thượng và Khánh Nam thành xã mới có tên gọi là xã Tây Khánh Vĩnh."
+    },
+    {
+      "khoan": 25,
+      "ten": "xã Nam Khánh Vĩnh",
+      "xaId": 22648,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Cầu Bà",
+          "xaId": 22636,
+          "huyenCu": "huyện Khánh Vĩnh",
+          "huyenIdCu": 573,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Khánh Thành",
+          "xaId": 22642,
+          "huyenCu": "huyện Khánh Vĩnh",
+          "huyenIdCu": 573,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Liên Sang",
+          "xaId": 22639,
+          "huyenCu": "huyện Khánh Vĩnh",
+          "huyenIdCu": 573,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Sơn Thái",
+          "xaId": 22648,
+          "huyenCu": "huyện Khánh Vĩnh",
+          "huyenIdCu": 573,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Cầu Bà, Khánh Thành, Liên Sang và Sơn Thái thành xã mới có tên gọi là xã Nam Khánh Vĩnh."
+    },
+    {
+      "khoan": 26,
+      "ten": "xã Khánh Vĩnh",
+      "xaId": 22609,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "thị trấn Khánh Vĩnh",
+          "xaId": 22609,
+          "huyenCu": "huyện Khánh Vĩnh",
+          "huyenIdCu": 573,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Sông Cầu",
+          "xaId": 22630,
+          "huyenCu": "huyện Khánh Vĩnh",
+          "huyenIdCu": 573,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Khánh Phú",
+          "xaId": 22645,
+          "huyenCu": "huyện Khánh Vĩnh",
+          "huyenIdCu": 573,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của thị trấn Khánh Vĩnh, xã Sông Cầu và xã Khánh Phú thành xã mới có tên gọi là xã Khánh Vĩnh."
+    },
+    {
+      "khoan": 27,
+      "ten": "xã Khánh Sơn",
+      "xaId": 22714,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "thị trấn Tô Hạp",
+          "xaId": 22714,
+          "huyenCu": "huyện Khánh Sơn",
+          "huyenIdCu": 575,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Sơn Hiệp",
+          "xaId": 22723,
+          "huyenCu": "huyện Khánh Sơn",
+          "huyenIdCu": 575,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Sơn Bình",
+          "xaId": 22726,
+          "huyenCu": "huyện Khánh Sơn",
+          "huyenIdCu": 575,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên và quy mô dân số của thị trấn Tô Hạp, xã Sơn Hiệp và xã Sơn Bình thành xã mới có tên gọi là xã Khánh Sơn."
+    },
+    {
+      "khoan": 28,
+      "ten": "xã Tây Khánh Sơn",
+      "xaId": 22720,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Sơn Lâm",
+          "xaId": 22720,
+          "huyenCu": "huyện Khánh Sơn",
+          "huyenIdCu": 575,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Thành Sơn",
+          "xaId": 22717,
+          "huyenCu": "huyện Khánh Sơn",
+          "huyenIdCu": 575,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Sơn Lâm và xã Thành Sơn thành xã mới có tên gọi là xã Tây Khánh Sơn."
+    },
+    {
+      "khoan": 29,
+      "ten": "xã Đông Khánh Sơn",
+      "xaId": 22732,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Sơn Trung",
+          "xaId": 22729,
+          "huyenCu": "huyện Khánh Sơn",
+          "huyenIdCu": 575,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ba Cụm Bắc",
+          "xaId": 22732,
+          "huyenCu": "huyện Khánh Sơn",
+          "huyenIdCu": 575,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ba Cụm Nam",
+          "xaId": 22735,
+          "huyenCu": "huyện Khánh Sơn",
+          "huyenIdCu": 575,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên và quy mô dân số của các xã Sơn Trung, Ba Cụm Bắc và Ba Cụm Nam thành xã mới có tên gọi là xã Đông Khánh Sơn."
+    },
+    {
+      "khoan": 30,
+      "ten": "xã Ninh Phước",
+      "xaId": 22870,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "thị trấn Phước Dân",
+          "xaId": 22870,
+          "huyenCu": "huyện Ninh Phước",
+          "huyenIdCu": 587,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Thuận",
+          "xaId": 22882,
+          "huyenCu": "huyện Ninh Phước",
+          "huyenIdCu": 587,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Hải",
+          "xaId": 22894,
+          "huyenCu": "huyện Ninh Phước",
+          "huyenIdCu": 587,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của thị trấn Phước Dân, xã Phước Thuận và xã Phước Hải thành xã mới có tên gọi là xã Ninh Phước."
+    },
+    {
+      "khoan": 31,
+      "ten": "xã Phước Hữu",
+      "xaId": 22891,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Phước Thái",
+          "xaId": 22876,
+          "huyenCu": "huyện Ninh Phước",
+          "huyenIdCu": 587,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Hữu",
+          "xaId": 22891,
+          "huyenCu": "huyện Ninh Phước",
+          "huyenIdCu": 587,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Phước Thái và xã Phước Hữu thành xã mới có tên gọi là xã Phước Hữu."
+    },
+    {
+      "khoan": 32,
+      "ten": "xã Phước Hậu",
+      "xaId": 22873,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Phước Vinh",
+          "xaId": 22912,
+          "huyenCu": "huyện Ninh Phước",
+          "huyenIdCu": 587,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Sơn",
+          "xaId": 22873,
+          "huyenCu": "huyện Ninh Phước",
+          "huyenIdCu": 587,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Hậu",
+          "xaId": 22879,
+          "huyenCu": "huyện Ninh Phước",
+          "huyenIdCu": 587,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Phước Vinh, Phước Sơn và Phước Hậu thành xã mới có tên gọi là xã Phước Hậu."
+    },
+    {
+      "khoan": 33,
+      "ten": "xã Thuận Nam",
+      "xaId": 22897,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Phước Nam",
+          "xaId": 22897,
+          "huyenCu": "huyện Thuận Nam",
+          "huyenIdCu": 589,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Ninh",
+          "xaId": 22898,
+          "huyenCu": "huyện Thuận Nam",
+          "huyenIdCu": 589,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Minh",
+          "xaId": 22906,
+          "huyenCu": "huyện Thuận Nam",
+          "huyenIdCu": 589,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Phước Nam, Phước Ninh và Phước Minh thành xã mới có tên gọi là xã Thuận Nam."
+    },
+    {
+      "khoan": 34,
+      "ten": "xã Cà Ná",
+      "xaId": 22909,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Phước Diêm",
+          "xaId": 22909,
+          "huyenCu": "huyện Thuận Nam",
+          "huyenIdCu": 589,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Cà Ná",
+          "xaId": 22910,
+          "huyenCu": "huyện Thuận Nam",
+          "huyenIdCu": 589,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Phước Diêm và xã Cà Ná thành xã mới có tên gọi là xã Cà Ná."
+    },
+    {
+      "khoan": 35,
+      "ten": "xã Phước Hà",
+      "xaId": 22900,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Nhị Hà",
+          "xaId": 22900,
+          "huyenCu": "huyện Thuận Nam",
+          "huyenIdCu": 589,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Hà",
+          "xaId": 22885,
+          "huyenCu": "huyện Thuận Nam",
+          "huyenIdCu": 589,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Nhị Hà và xã Phước Hà thành xã mới có tên gọi là xã Phước Hà."
+    },
+    {
+      "khoan": 36,
+      "ten": "xã Phước Dinh",
+      "xaId": 22888,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã An Hải",
+          "xaId": 22888,
+          "huyenCu": "huyện Ninh Phước",
+          "huyenIdCu": 587,
+          "phan": "toan-bo",
+          "ghiChu": "xã An Hải thuộc huyện Ninh Phước cũ (khác huyện với xã Phước Dinh)"
+        },
+        {
+          "ten": "xã Phước Dinh",
+          "xaId": 22903,
+          "huyenCu": "huyện Thuận Nam",
+          "huyenIdCu": 589,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Đông Hải",
+          "xaId": 22768,
+          "huyenCu": "thành phố Phan Rang - Tháp Chàm",
+          "huyenIdCu": 582,
+          "phan": "mot-phan",
+          "ghiChu": "một phần diện tích tự nhiên, quy mô dân số; phường thuộc TP Phan Rang - Tháp Chàm cũ"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã An Hải, xã Phước Dinh và một phần diện tích tự nhiên, quy mô dân số của phường Đông Hải thành xã mới có tên gọi là xã Phước Dinh."
+    },
+    {
+      "khoan": 37,
+      "ten": "xã Ninh Hải",
+      "xaId": 22852,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Phương Hải",
+          "xaId": 22852,
+          "huyenCu": "huyện Ninh Hải",
+          "huyenIdCu": 586,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Tri Hải",
+          "xaId": 22864,
+          "huyenCu": "huyện Ninh Hải",
+          "huyenIdCu": 586,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Bắc Sơn",
+          "xaId": 22853,
+          "huyenCu": "huyện Thuận Bắc",
+          "huyenIdCu": 588,
+          "phan": "toan-bo",
+          "ghiChu": "xã Bắc Sơn thuộc huyện Thuận Bắc cũ (khác huyện)"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Phương Hải, Tri Hải và Bắc Sơn thành xã mới có tên gọi là xã Ninh Hải."
+    },
+    {
+      "khoan": 38,
+      "ten": "xã Xuân Hải",
+      "xaId": 22861,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Hộ Hải",
+          "xaId": 22861,
+          "huyenCu": "huyện Ninh Hải",
+          "huyenIdCu": 586,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Tân Hải",
+          "xaId": 22855,
+          "huyenCu": "huyện Ninh Hải",
+          "huyenIdCu": 586,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Xuân Hải",
+          "xaId": 22858,
+          "huyenCu": "huyện Ninh Hải",
+          "huyenIdCu": 586,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Hộ Hải, Tân Hải và Xuân Hải thành xã mới có tên gọi là xã Xuân Hải."
+    },
+    {
+      "khoan": 39,
+      "ten": "xã Vĩnh Hải",
+      "xaId": 22846,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Nhơn Hải",
+          "xaId": 22867,
+          "huyenCu": "huyện Ninh Hải",
+          "huyenIdCu": 586,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Thanh Hải",
+          "xaId": 22868,
+          "huyenCu": "huyện Ninh Hải",
+          "huyenIdCu": 586,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vĩnh Hải",
+          "xaId": 22846,
+          "huyenCu": "huyện Ninh Hải",
+          "huyenIdCu": 586,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Nhơn Hải, Thanh Hải và Vĩnh Hải thành xã mới có tên gọi là xã Vĩnh Hải."
+    },
+    {
+      "khoan": 40,
+      "ten": "xã Thuận Bắc",
+      "xaId": 22849,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Bắc Phong",
+          "xaId": 22856,
+          "huyenCu": "huyện Thuận Bắc",
+          "huyenIdCu": 588,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Kháng",
+          "xaId": 22843,
+          "huyenCu": "huyện Thuận Bắc",
+          "huyenIdCu": 588,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Lợi Hải",
+          "xaId": 22849,
+          "huyenCu": "huyện Thuận Bắc",
+          "huyenIdCu": 588,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Bắc Phong, Phước Kháng và Lợi Hải thành xã mới có tên gọi là xã Thuận Bắc."
+    },
+    {
+      "khoan": 41,
+      "ten": "xã Công Hải",
+      "xaId": 22840,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Phước Chiến",
+          "xaId": 22837,
+          "huyenCu": "huyện Thuận Bắc",
+          "huyenIdCu": 588,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Công Hải",
+          "xaId": 22840,
+          "huyenCu": "huyện Thuận Bắc",
+          "huyenIdCu": 588,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Phước Chiến và xã Công Hải thành xã mới có tên gọi là xã Công Hải."
+    },
+    {
+      "khoan": 42,
+      "ten": "xã Ninh Sơn",
+      "xaId": 22810,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "thị trấn Tân Sơn",
+          "xaId": 22810,
+          "huyenCu": "huyện Ninh Sơn",
+          "huyenIdCu": 585,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Quảng Sơn",
+          "xaId": 22819,
+          "huyenCu": "huyện Ninh Sơn",
+          "huyenIdCu": 585,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của thị trấn Tân Sơn và xã Quảng Sơn thành xã mới có tên gọi là xã Ninh Sơn."
+    },
+    {
+      "khoan": 43,
+      "ten": "xã Lâm Sơn",
+      "xaId": 22813,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Lương Sơn",
+          "xaId": 22816,
+          "huyenCu": "huyện Ninh Sơn",
+          "huyenIdCu": 585,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Lâm Sơn",
+          "xaId": 22813,
+          "huyenCu": "huyện Ninh Sơn",
+          "huyenIdCu": 585,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Lương Sơn và xã Lâm Sơn thành xã mới có tên gọi là xã Lâm Sơn."
+    },
+    {
+      "khoan": 44,
+      "ten": "xã Anh Dũng",
+      "xaId": 22828,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Ma Nới",
+          "xaId": 22828,
+          "huyenCu": "huyện Ninh Sơn",
+          "huyenIdCu": 585,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Hòa Sơn",
+          "xaId": 22825,
+          "huyenCu": "huyện Ninh Sơn",
+          "huyenIdCu": 585,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Ma Nới và xã Hòa Sơn thành xã mới có tên gọi là xã Anh Dũng."
+    },
+    {
+      "khoan": 45,
+      "ten": "xã Mỹ Sơn",
+      "xaId": 22822,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Phước Trung",
+          "xaId": 22807,
+          "huyenCu": "huyện Bác Ái",
+          "huyenIdCu": 584,
+          "phan": "toan-bo",
+          "ghiChu": "xã Phước Trung thuộc huyện Bác Ái cũ (khác huyện)"
+        },
+        {
+          "ten": "xã Mỹ Sơn",
+          "xaId": 22822,
+          "huyenCu": "huyện Ninh Sơn",
+          "huyenIdCu": 585,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Phước Trung và xã Mỹ Sơn thành xã mới có tên gọi là xã Mỹ Sơn."
+    },
+    {
+      "khoan": 46,
+      "ten": "xã Bác Ái Đông",
+      "xaId": 22801,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Phước Đại",
+          "xaId": 22801,
+          "huyenCu": "huyện Bác Ái",
+          "huyenIdCu": 584,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Thành",
+          "xaId": 22798,
+          "huyenCu": "huyện Bác Ái",
+          "huyenIdCu": 584,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Phước Đại và xã Phước Thành thành xã mới có tên gọi là xã Bác Ái Đông."
+    },
+    {
+      "khoan": 47,
+      "ten": "xã Bác Ái",
+      "xaId": 22795,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Phước Tiến",
+          "xaId": 22792,
+          "huyenCu": "huyện Bác Ái",
+          "huyenIdCu": 584,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Thắng",
+          "xaId": 22795,
+          "huyenCu": "huyện Bác Ái",
+          "huyenIdCu": 584,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Chính",
+          "xaId": 22804,
+          "huyenCu": "huyện Bác Ái",
+          "huyenIdCu": 584,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Phước Tiến, Phước Thắng và Phước Chính thành xã mới có tên gọi là xã Bác Ái."
+    },
+    {
+      "khoan": 48,
+      "ten": "xã Bác Ái Tây",
+      "xaId": 22786,
+      "loai": "xã",
+      "gom": [
+        {
+          "ten": "xã Phước Hòa",
+          "xaId": 22786,
+          "huyenCu": "huyện Bác Ái",
+          "huyenIdCu": 584,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Tân",
+          "xaId": 22789,
+          "huyenCu": "huyện Bác Ái",
+          "huyenIdCu": 584,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Bình",
+          "xaId": 22783,
+          "huyenCu": "huyện Bác Ái",
+          "huyenIdCu": 584,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các xã Phước Hòa, Phước Tân và Phước Bình thành xã mới có tên gọi là xã Bác Ái Tây."
+    },
+    {
+      "khoan": 49,
+      "ten": "phường Nha Trang",
+      "xaId": 22366,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Vạn Thạnh",
+          "xaId": 22348,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Lộc Thọ",
+          "xaId": 22363,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Vĩnh Nguyên",
+          "xaId": 22375,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Tân Tiến",
+          "xaId": 22366,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Phước Hòa",
+          "xaId": 22372,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Vạn Thạnh, Lộc Thọ, Vĩnh Nguyên, Tân Tiến và Phước Hòa thành phường mới có tên gọi là phường Nha Trang."
+    },
+    {
+      "khoan": 50,
+      "ten": "phường Bắc Nha Trang",
+      "xaId": 22333,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Vĩnh Hòa",
+          "xaId": 22327,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Vĩnh Hải",
+          "xaId": 22330,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Vĩnh Phước",
+          "xaId": 22333,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Vĩnh Thọ",
+          "xaId": 22339,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vĩnh Lương",
+          "xaId": 22384,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vĩnh Phương",
+          "xaId": 22387,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Vĩnh Hòa, Vĩnh Hải, Vĩnh Phước, Vĩnh Thọ, xã Vĩnh Lương và xã Vĩnh Phương thành phường mới có tên gọi là phường Bắc Nha Trang."
+    },
+    {
+      "khoan": 51,
+      "ten": "phường Tây Nha Trang",
+      "xaId": 22390,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Ngọc Hiệp",
+          "xaId": 22336,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Phương Sài",
+          "xaId": 22351,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vĩnh Ngọc",
+          "xaId": 22390,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vĩnh Thạnh",
+          "xaId": 22393,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vĩnh Hiệp",
+          "xaId": 22399,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vĩnh Trung",
+          "xaId": 22396,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Ngọc Hiệp, phường Phương Sài và các xã Vĩnh Ngọc, Vĩnh Thạnh, Vĩnh Hiệp, Vĩnh Trung thành phường mới có tên gọi là phường Tây Nha Trang."
+    },
+    {
+      "khoan": 52,
+      "ten": "phường Nam Nha Trang",
+      "xaId": 22402,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Phước Hải",
+          "xaId": 22357,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Phước Long",
+          "xaId": 22378,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Vĩnh Trường",
+          "xaId": 22381,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Vĩnh Thái",
+          "xaId": 22402,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Phước Đồng",
+          "xaId": 22405,
+          "huyenCu": "thành phố Nha Trang",
+          "huyenIdCu": 568,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Phước Hải, Phước Long, Vĩnh Trường, xã Vĩnh Thái và xã Phước Đồng thành phường mới có tên gọi là phường Nam Nha Trang."
+    },
+    {
+      "khoan": 53,
+      "ten": "phường Bắc Cam Ranh",
+      "xaId": 22411,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Cam Nghĩa",
+          "xaId": 22408,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Cam Phúc Bắc",
+          "xaId": 22411,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Cam Thành Nam",
+          "xaId": 22468,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Cam Nghĩa, phường Cam Phúc Bắc và xã Cam Thành Nam thành phường mới có tên gọi là phường Bắc Cam Ranh."
+    },
+    {
+      "khoan": 54,
+      "ten": "phường Cam Ranh",
+      "xaId": 22420,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Cam Phú",
+          "xaId": 22420,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Cam Lộc",
+          "xaId": 22417,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Cam Phúc Nam",
+          "xaId": 22414,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Cam Phú, Cam Lộc và Cam Phúc Nam thành phường mới có tên gọi là phường Cam Ranh."
+    },
+    {
+      "khoan": 55,
+      "ten": "phường Cam Linh",
+      "xaId": 22432,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Cam Thuận",
+          "xaId": 22426,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo",
+          "ghiChu": "văn bản in \"Sắp xếp bộ diện tích\" (thiếu chữ \"toàn\") — hiểu là toàn bộ"
+        },
+        {
+          "ten": "phường Cam Lợi",
+          "xaId": 22429,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo",
+          "ghiChu": "văn bản in \"Sắp xếp bộ diện tích\" (thiếu chữ \"toàn\") — hiểu là toàn bộ"
+        },
+        {
+          "ten": "phường Cam Linh",
+          "xaId": 22432,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo",
+          "ghiChu": "văn bản in \"Sắp xếp bộ diện tích\" (thiếu chữ \"toàn\") — hiểu là toàn bộ"
+        }
+      ],
+      "nguyenVan": "Sắp xếp bộ diện tích tự nhiên, quy mô dân số của các phường Cam Thuận, Cam Lợi và Cam Linh thành phường mới có tên gọi là phường Cam Linh."
+    },
+    {
+      "khoan": 56,
+      "ten": "phường Ba Ngòi",
+      "xaId": 22423,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Ba Ngòi",
+          "xaId": 22423,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Cam Phước Đông",
+          "xaId": 22474,
+          "huyenCu": "thành phố Cam Ranh",
+          "huyenIdCu": 569,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Ba Ngòi và xã Cam Phước Đông thành phường mới có tên gọi là phường Ba Ngòi."
+    },
+    {
+      "khoan": 57,
+      "ten": "phường Ninh Hòa",
+      "xaId": 22528,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Ninh Hiệp",
+          "xaId": 22528,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Ninh Đa",
+          "xaId": 22570,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ninh Đông",
+          "xaId": 22564,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ninh Phụng",
+          "xaId": 22573,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Ninh Hiệp, phường Ninh Đa, xã Ninh Đông và xã Ninh Phụng thành phường mới có tên gọi là phường Ninh Hòa."
+    },
+    {
+      "khoan": 58,
+      "ten": "phường Đông Ninh Hòa",
+      "xaId": 22561,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Ninh Diêm",
+          "xaId": 22561,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Ninh Hải",
+          "xaId": 22543,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Ninh Thủy",
+          "xaId": 22567,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ninh Phước",
+          "xaId": 22606,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo",
+          "ghiChu": "xã Ninh Phước sau NQ 1196/2024 (đã nhập xã Ninh Vân). Danh mục có 2 mã: 22606 \"xã Ninh Phước\" và 22579 \"xã Ninh Phước (cũ)\" — cả hai đều về phường Đông Ninh Hòa"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Ninh Diêm, Ninh Hải, Ninh Thủy và xã Ninh Phước thành phường mới có tên gọi là phường Đông Ninh Hòa."
+    },
+    {
+      "khoan": 59,
+      "ten": "phường Hòa Thắng",
+      "xaId": 22591,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Ninh Giang",
+          "xaId": 22591,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Ninh Hà",
+          "xaId": 22594,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Ninh Phú",
+          "xaId": 22582,
+          "huyenCu": "thị xã Ninh Hòa",
+          "huyenIdCu": 572,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Ninh Giang, phường Ninh Hà và xã Ninh Phú thành phường mới có tên gọi là phường Hòa Thắng."
+    },
+    {
+      "khoan": 60,
+      "ten": "phường Phan Rang",
+      "xaId": 22759,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Kinh Dinh",
+          "xaId": 22759,
+          "huyenCu": "thành phố Phan Rang - Tháp Chàm",
+          "huyenIdCu": 582,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Phủ Hà",
+          "xaId": 22747,
+          "huyenCu": "thành phố Phan Rang - Tháp Chàm",
+          "huyenIdCu": 582,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Đài Sơn",
+          "xaId": 22765,
+          "huyenCu": "thành phố Phan Rang - Tháp Chàm",
+          "huyenIdCu": 582,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Đạo Long",
+          "xaId": 22762,
+          "huyenCu": "thành phố Phan Rang - Tháp Chàm",
+          "huyenIdCu": 582,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Kinh Dinh, Phủ Hà, Đài Sơn và Đạo Long thành phường mới có tên gọi là phường Phan Rang."
+    },
+    {
+      "khoan": 61,
+      "ten": "phường Đông Hải",
+      "xaId": 22780,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Mỹ Bình",
+          "xaId": 22779,
+          "huyenCu": "thành phố Phan Rang - Tháp Chàm",
+          "huyenIdCu": 582,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Mỹ Đông",
+          "xaId": 22771,
+          "huyenCu": "thành phố Phan Rang - Tháp Chàm",
+          "huyenIdCu": 582,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Mỹ Hải",
+          "xaId": 22780,
+          "huyenCu": "thành phố Phan Rang - Tháp Chàm",
+          "huyenIdCu": 582,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Đông Hải",
+          "xaId": 22768,
+          "huyenCu": "thành phố Phan Rang - Tháp Chàm",
+          "huyenIdCu": 582,
+          "phan": "mot-phan",
+          "ghiChu": "phần còn lại sau khi sắp xếp theo khoản 36"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Mỹ Bình, Mỹ Đông, Mỹ Hải và phần còn lại của phường Đông Hải sau khi sắp xếp theo quy định tại khoản 36 Điều này thành phường mới có tên gọi là phường Đông Hải."
+    },
+    {
+      "khoan": 62,
+      "ten": "phường Ninh Chử",
+      "xaId": 22834,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Văn Hải",
+          "xaId": 22777,
+          "huyenCu": "thành phố Phan Rang - Tháp Chàm",
+          "huyenIdCu": 582,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "thị trấn Khánh Hải",
+          "xaId": 22834,
+          "huyenCu": "huyện Ninh Hải",
+          "huyenIdCu": 586,
+          "phan": "toan-bo",
+          "ghiChu": "thị trấn Khánh Hải thuộc huyện Ninh Hải cũ (khác huyện)"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Văn Hải và thị trấn Khánh Hải thành phường mới có tên gọi là phường Ninh Chử."
+    },
+    {
+      "khoan": 63,
+      "ten": "phường Bảo An",
+      "xaId": 22741,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Phước Mỹ",
+          "xaId": 22741,
+          "huyenCu": "thành phố Phan Rang - Tháp Chàm",
+          "huyenIdCu": 582,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "phường Bảo An",
+          "xaId": 22744,
+          "huyenCu": "thành phố Phan Rang - Tháp Chàm",
+          "huyenIdCu": 582,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Thành Hải",
+          "xaId": 22774,
+          "huyenCu": "thành phố Phan Rang - Tháp Chàm",
+          "huyenIdCu": 582,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Phước Mỹ, phường Bảo An và xã Thành Hải thành phường mới có tên gọi là phường Bảo An."
+    },
+    {
+      "khoan": 64,
+      "ten": "phường Đô Vinh",
+      "xaId": 22738,
+      "loai": "phường",
+      "gom": [
+        {
+          "ten": "phường Đô Vinh",
+          "xaId": 22738,
+          "huyenCu": "thành phố Phan Rang - Tháp Chàm",
+          "huyenIdCu": 582,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Nhơn Sơn",
+          "xaId": 22831,
+          "huyenCu": "huyện Ninh Sơn",
+          "huyenIdCu": 585,
+          "phan": "toan-bo",
+          "ghiChu": "xã Nhơn Sơn thuộc huyện Ninh Sơn cũ (khác huyện)"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của phường Đô Vinh và xã Nhơn Sơn thành phường mới có tên gọi là phường Đô Vinh."
+    },
+    {
+      "khoan": 65,
+      "ten": "đặc khu Trường Sa",
+      "xaId": 22736,
+      "loai": "đặc khu",
+      "gom": [
+        {
+          "ten": "thị trấn Trường Sa",
+          "xaId": 22736,
+          "huyenCu": "huyện Trường Sa",
+          "huyenIdCu": 576,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Song Tử Tây",
+          "xaId": 22737,
+          "huyenCu": "huyện Trường Sa",
+          "huyenIdCu": 576,
+          "phan": "toan-bo"
+        },
+        {
+          "ten": "xã Sinh Tồn",
+          "xaId": 22739,
+          "huyenCu": "huyện Trường Sa",
+          "huyenIdCu": 576,
+          "phan": "toan-bo"
+        }
+      ],
+      "nguyenVan": "Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của thị trấn Trường Sa, xã Song Tử Tây và xã Sinh Tồn thành đặc khu có tên gọi là đặc khu Trường Sa."
+    }
+  ],
+  "khongKhop": [],
+  "lechVoiXaMoiJson": [
+    "bi_chia THIẾU mã 22435 (xã Cam Tân, huyện Cam Lâm cũ): NQ 1667 khoản 18, 19, 20 ghi xã này chỉ nhập MỘT PHẦN, chia cho 22435 xã Cam Hiệp, 22453 xã Cam Lâm, 22708 xã Suối Dầu. xa-moi.json không ghi mã 22435 trong bi_chia; mã 22435 lại nằm trong cap2 (là mã kế thừa của xã Cam Hiệp) nên mọi thửa mang mã này mặc định bị tính cả vào xã Cam Hiệp",
+    "bi_chia THIẾU mã 22465 (xã Cam An Bắc, huyện Cam Lâm cũ): NQ 1667 khoản 18, 21 ghi xã này chỉ nhập MỘT PHẦN, chia cho 22453 xã Cam Lâm, 22465 xã Cam An. xa-moi.json không ghi mã 22465 trong bi_chia; mã 22465 lại nằm trong cap2 (là mã kế thừa của xã Cam An) nên mọi thửa mang mã này mặc định bị tính cả vào xã Cam An"
+  ],
+  "vanBan": {
+    "so": "1667/NQ-UBTVQH15",
+    "ten": "Nghị quyết về việc sắp xếp các đơn vị hành chính cấp xã của tỉnh Khánh Hòa năm 2025",
+    "thongQua": "2025-06-16 (Ủy ban Thường vụ Quốc hội khóa XV; Chủ tịch Trần Thanh Mẫn ký)",
+    "hieuLuc": "từ ngày thông qua (16/6/2025); chính quyền cấp xã mới hoạt động từ 01/7/2025",
+    "congBao": "Công báo số 803 + 804 ngày 24/6/2025, trang 18–23",
+    "khoan66": "Sau khi sắp xếp, tỉnh Khánh Hòa có 65 đơn vị hành chính cấp xã, gồm 48 xã, 16 phường và 01 đặc khu.",
+    "dieu3khoan2": "Giao Chính phủ xác định chính xác diện tích tự nhiên các ĐVHC cấp xã, công bố trước 30/9/2025; đo đạc, xác định ranh giới trên thực địa (văn bản KHÔNG ghi ranh giới phần bị chia)"
+  },
+  "kiemTra": {
+    "soXaMoi": 65,
+    "theoLoai": {
+      "xã": 48,
+      "phường": 16,
+      "đặc khu": 1
+    },
+    "soMucGom": 205,
+    "soMucCoMa": 205,
+    "soDonViCuKhacNhau": 194,
+    "donViCuBiChia": {
+      "22435": [
+        22435,
+        22453,
+        22708
+      ],
+      "22438": [
+        22435,
+        22453,
+        22708
+      ],
+      "22450": [
+        22435,
+        22453
+      ],
+      "22456": [
+        22435,
+        22453
+      ],
+      "22465": [
+        22453,
+        22465
+      ],
+      "22471": [
+        22453,
+        22465
+      ],
+      "22711": [
+        22435,
+        22453,
+        22708
+      ],
+      "22768": [
+        22780,
+        22888
+      ]
+    },
+    "maDanhMucKhongNhacTrongNQ1667": [
+      "22342 phường Xương Huân — NQ 1196: phường Xương Huân nhập vào phường Vạn Thạnh",
+      "22345 phường Vạn Thắng — NQ 1196: phường Vạn Thắng nhập vào phường Vạn Thạnh",
+      "22354 phường Phương Sơn — NQ 1196: phường Phương Sơn nhập vào phường Phương Sài",
+      "22360 phường Phước Tân — NQ 1196: phường Phước Tân (cùng Phước Tiến, Tân Lập) thành lập phường Tân Tiến",
+      "22369 phường Tân Lập — NQ 1196: phường Tân Lập (cùng Phước Tiến, Phước Tân) thành lập phường Tân Tiến",
+      "22579 xã Ninh Phước (cũ) — NQ 1196: xã Ninh Vân nhập vào xã Ninh Phước; danh mục Sở ghi 22579 = \"xã Ninh Phước (cũ)\", 22606 = \"xã Ninh Phước\" (đơn vị sau 2024), không có tên \"Ninh Vân\"",
+      "22666 xã Diên Đồng — NQ 1196: xã Diên Đồng (cùng xã Diên Xuân) thành lập xã Xuân Đồng",
+      "22750 phường Thanh Sơn — NQ 1198: phường Thanh Sơn nhập vào phường Phủ Hà",
+      "22753 phường Mỹ Hương — NQ 1198: phường Mỹ Hương nhập vào phường Kinh Dinh",
+      "22756 phường Tấn Tài — NQ 1198: phường Tấn Tài nhập vào phường Kinh Dinh"
+    ],
+    "soSanhBanVanBan": [
+      "khoản 50: bản luatvietnam khác bản Word Công báo: LVN='Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Vĩnh Hòa, Vĩnh Hải, Vĩnh Phước, Vĩnh Thọ, xãVĩnh Lương và xã Vĩnh Phương thành phường mới có tên gọi là phường Bắc Nha Trang.'"
+    ],
+    "loiTuKiem": []
+  },
+  "khopQuaBuoc2024": [
+    "22342 (phường Xương Huân) → 22366: khớp qua bước 2024 — NQ 1196: phường Xương Huân nhập vào phường Vạn Thạnh",
+    "22345 (phường Vạn Thắng) → 22366: khớp qua bước 2024 — NQ 1196: phường Vạn Thắng nhập vào phường Vạn Thạnh",
+    "22354 (phường Phương Sơn) → 22390: khớp qua bước 2024 — NQ 1196: phường Phương Sơn nhập vào phường Phương Sài",
+    "22360 (phường Phước Tân) → 22366: khớp qua bước 2024 — NQ 1196: phường Phước Tân (cùng Phước Tiến, Tân Lập) thành lập phường Tân Tiến",
+    "22369 (phường Tân Lập) → 22366: khớp qua bước 2024 — NQ 1196: phường Tân Lập (cùng Phước Tiến, Phước Tân) thành lập phường Tân Tiến",
+    "22579 (xã Ninh Phước (cũ)) → 22561: khớp qua bước 2024 — NQ 1196: xã Ninh Vân nhập vào xã Ninh Phước; danh mục Sở ghi 22579 = \"xã Ninh Phước (cũ)\", 22606 = \"xã Ninh Phước\" (đơn vị sau 2024), không có tên \"Ninh Vân\"",
+    "22750 (phường Thanh Sơn) → 22759: khớp qua bước 2024 — NQ 1198: phường Thanh Sơn nhập vào phường Phủ Hà",
+    "22753 (phường Mỹ Hương) → 22759: khớp qua bước 2024 — NQ 1198: phường Mỹ Hương nhập vào phường Kinh Dinh"
+  ],
+  "thieuTrongXaMoiJson": [
+    "22486 xã Cam Bình → 22480 (khoản 1)",
+    "22492 xã Đại Lãnh → 22504 (khoản 7)",
+    "22495 xã Vạn Phước → 22498 (khoản 8)",
+    "22501 xã Vạn Bình → 22516 (khoản 9)",
+    "22507 xã Vạn Khánh → 22498 (khoản 8)",
+    "22510 xã Vạn Phú → 22489 (khoản 10)",
+    "22513 xã Vạn Lương → 22489 (khoản 10)",
+    "22519 xã Vạn Thạnh → 22504 (khoản 7)",
+    "22522 xã Xuân Sơn → 22525 (khoản 11)",
+    "22531 xã Ninh Sơn → 22546 (khoản 2)",
+    "22537 xã Ninh Thượng → 22558 (khoản 6)",
+    "22540 xã Ninh An → 22546 (khoản 2)",
+    "22543 phường Ninh Hải → 22561 (khoản 58)",
+    "22549 xã Ninh Trung → 22558 (khoản 6)",
+    "22555 xã Ninh Xuân → 22576 (khoản 3)",
+    "22564 xã Ninh Đông → 22528 (khoản 57)",
+    "22567 phường Ninh Thủy → 22561 (khoản 58)",
+    "22570 phường Ninh Đa → 22528 (khoản 57)",
+    "22573 xã Ninh Phụng → 22528 (khoản 57)",
+    "22582 xã Ninh Phú → 22591 (khoản 59)",
+    "22585 xã Ninh Tân → 22597 (khoản 4)",
+    "22588 xã Ninh Quang → 22576 (khoản 3)",
+    "22594 phường Ninh Hà → 22591 (khoản 59)",
+    "22600 xã Ninh Lộc → 22597 (khoản 4)",
+    "22603 xã Ninh Ích → 22597 (khoản 4)",
+    "22606 xã Ninh Phước → 22561 (khoản 58)",
+    "22654 xã Diên Lâm → 22660 (khoản 15)",
+    "22663 xã Diên Sơn → 22657 (khoản 14)",
+    "22666 xã Diên Đồng → 22660 (khoản 15) — NQ 1196: xã Diên Đồng (cùng xã Diên Xuân) thành lập xã Xuân Đồng",
+    "22669 xã Diên Phú → 22657 (khoản 14)",
+    "22675 xã Diên Phước → 22672 (khoản 16)",
+    "22681 xã Diên Tân → 22672 (khoản 16)",
+    "22684 xã Diên Hòa → 22678 (khoản 13)",
+    "22687 xã Diên Thạnh → 22678 (khoản 13)",
+    "22690 xã Diên Toàn → 22651 (khoản 12)",
+    "22693 xã Diên An → 22651 (khoản 12)",
+    "22696 xã Bình Lộc → 22702 (khoản 17)",
+    "22705 xã Suối Tiên → 22702 (khoản 17)",
+    "22737 xã Song Tử Tây → 22736 (khoản 65)",
+    "22739 xã Sinh Tồn → 22736 (khoản 65)",
+    "22756 phường Tấn Tài → 22759 (khoản 60) — NQ 1198: phường Tấn Tài nhập vào phường Kinh Dinh",
+    "22762 phường Đạo Long → 22759 (khoản 60)",
+    "22771 phường Mỹ Đông → 22780 (khoản 61)",
+    "22807 xã Phước Trung → 22822 (khoản 45)",
+    "22837 xã Phước Chiến → 22840 (khoản 41)",
+    "22843 xã Phước Kháng → 22849 (khoản 40)",
+    "22853 xã Bắc Sơn → 22852 (khoản 37)",
+    "22864 xã Tri Hải → 22852 (khoản 37)",
+    "22867 xã Nhơn Hải → 22846 (khoản 39)",
+    "22868 xã Thanh Hải → 22846 (khoản 39)",
+    "22876 xã Phước Thái → 22891 (khoản 31)",
+    "22885 xã Phước Hà → 22900 (khoản 35)",
+    "22898 xã Phước Ninh → 22897 (khoản 33)",
+    "22903 xã Phước Dinh → 22888 (khoản 36)",
+    "22906 xã Phước Minh → 22897 (khoản 33)",
+    "22912 xã Phước Vinh → 22873 (khoản 32)"
+  ],
+  "ghiChu": [
+    "nguyenVan lấy từ bản Word của Công báo (đã gộp khoảng trắng thừa), so khớp từng chữ với bản PDF Công báo; bản luatvietnam chỉ khác 1 chỗ đánh máy (\"xãVĩnh Lương\", khoản 50).",
+    "Văn bản gốc có 3 lỗi đánh máy, giữ nguyên trong nguyenVan: khoản 14 \"Diên Điềnthành\", khoản 20 \"khoản 18,khoản 19\", khoản 55 \"Sắp xếp bộ diện tích\" (thiếu chữ \"toàn\" — vẫn hiểu là toàn bộ).",
+    "Có 8 đơn vị cũ bị CHIA (phan = mot-phan): xã Cam Hiệp Bắc, Cam Hiệp Nam, Cam Hòa, Cam Tân, Cam An Bắc, Cam An Nam, Suối Tân (huyện Cam Lâm cũ) và phường Đông Hải (TP Phan Rang - Tháp Chàm cũ). Văn bản không ghi ranh giới phần bị chia.",
+    "huyenIdCu trong gom = huyện cũ THẬT của từng đơn vị cũ. Danh mục Sở ghi huyenIdCu của xã MỚI khác đi ở 2 chỗ: 22834 phường Ninh Chử (582, trong khi thị trấn Khánh Hải thuộc huyện Ninh Hải 586) và 22888 xã Phước Dinh (589, trong khi xã An Hải thuộc huyện Ninh Phước 587).",
+    "Các mã trong thieuTrongXaMoiJson KHÔNG có file dữ liệu trong \"gis khanh hoa\" (147/147 file đều đã có trong xa-moi.json) — bổ sung nếu sau này có dữ liệu.",
+    "10 mã danh mục không được nhắc trong NQ 1667 là các đơn vị đã nhập từ năm 2024 (NQ 1196, NQ 1198) — xem kiemTra."
+  ]
+}

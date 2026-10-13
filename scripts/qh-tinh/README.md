@@ -68,6 +68,15 @@ python -P tiler2.py  ban-do.pdf  $TAM_LNG $TAM_LAT  ra/ranh.json  ra/tiles  tenl
 hoặc **(b)** nắn tay bằng QGIS (georeferencer, chọn điểm mốc trên lưới), hoặc **(c)** khớp hình thị xã
 trên bản đồ với ranh hành chính thật. PDF đã tải ở `scratchpad .../nguon/them/`.
 
+**ĐÃ THỬ TỰ ĐỘNG CHO CAM RANH (đều hỏng, ghi lại để khỏi thử lại):**
+- OCR dải nhãn: nét quá mảnh + lẫn chữ "SƠ ĐỒ VỊ TRÍ…" của ô sơ đồ góc → đọc ra "40/860/900" thay vì "84.0/86.0/88.0".
+- Dò đường lưới cyan (`nan_luoi.py`): **NƯỚC BIỂN cũng màu cyan** như lưới → lẫn, ra 200 pt/km (sai, phải ~114,5).
+- **Số lưới Cam Ranh đọc bằng mắt (giúp nắn tay QGIS):** tỉ lệ **1:25.000** (~114,5 pt/km);
+  ĐÔNG (mép trên): `582.0 · 584.0 · 586.0 · 588.0 …` bước 2 km; BẮC (mép trái): `1330.0 …` bước 2 km.
+  Đường lưới dọc 582 km nằm quanh PDF x≈500 pt; đường ngang 1330 km quanh PDF y≈466 pt (ước lượng).
+  → Mở PDF trong QGIS, chọn 3–4 giao điểm lưới làm điểm mốc (vd (582000,1330000)…) là nắn xong.
+- `nan_luoi.py` dùng được khi dò được đúng đường lưới (không lẫn nước) — cần lọc nét mảnh/dài trước.
+
 ## Ninh Thuận cũ (nay thuộc Khánh Hòa) + cấp tỉnh
 Tên miền `ninhthuan.gov.vn` đã ngừng sau sáp nhập 1/7/2025, cổng Khánh Hòa chưa chuyển dữ liệu về.
 Bản đồ QHSDĐ cấp tỉnh không đăng PDF công khai (nằm trong phụ lục hồ sơ QH tỉnh). → Chờ nguồn.

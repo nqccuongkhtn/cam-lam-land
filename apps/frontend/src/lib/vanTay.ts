@@ -63,7 +63,9 @@ export async function kiemTraVanTay(): Promise<TinhTrangVanTay> {
         //    án hỏi lại "Windows Hello là cái gì". Người dùng không cần biết
         //    tên hãng đặt; họ chỉ cần biết phải mở Cài đặt của máy và bật
         //    mở khoá bằng khuôn mặt hay vân tay.
-        loiNhan: 'Máy này chưa bật mở khoá bằng khuôn mặt hoặc vân tay. Bật trong Cài đặt của máy.' };
+        //    13/10/2026 (chủ dự án: "không phải máy nào cũng có Face ID và vân tay"): khoá đăng nhập KHÔNG bắt buộc khuôn mặt / vân tay
+        //    — mật mã / mã PIN mở máy cũng xác nhận được. Máy báo không dùng được nghĩa là CHƯA ĐẶT khoá màn hình nào.
+        loiNhan: 'Máy này chưa đặt mật mã mở máy. Đặt mật mã (hoặc khuôn mặt, vân tay) trong Cài đặt của máy.' };
 
     return { dung: true };
   } catch {

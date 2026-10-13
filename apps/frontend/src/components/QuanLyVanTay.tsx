@@ -61,7 +61,7 @@ export default function QuanLyVanTay() {
           điều kiện kỹ thuật. Người dùng chỉ cần biết bật để làm gì. */}
       <h2 className="text-[15px] font-extrabold text-[#0A2540]">🔐 Đăng nhập bằng khuôn mặt · vân tay</h2>
       <p className="mt-1 text-[12.5px] leading-snug text-slate-500">
-        Bật rồi thì khỏi gõ mật khẩu. Bật riêng cho từng máy.
+        Bật rồi thì khỏi gõ mật khẩu. Máy không có khuôn mặt, vân tay thì dùng mật mã mở máy.
       </p>
 
       {!co && (

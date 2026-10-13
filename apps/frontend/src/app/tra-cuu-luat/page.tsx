@@ -3550,6 +3550,14 @@ export default function TraCuuLuatPage() {
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur lg:hidden"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <div className="mx-auto flex max-w-lg">
+          {/* LOGO NHỎ = MỞ MENU CHÍNH (13/10/2026, chủ dự án chọn mẫu 5 "logo nhỏ bên trái" rồi dặn thu nhỏ hơn nữa): thanh menu của
+              web đang nhường chỗ cho thanh này → bấm logo gọi nó TRỒI LÊN TẠM, đè lên thanh này (Trang chủ / Nhà đất / Đăng tin /
+              Bản đồ / Tiện ích); chạm ra ngoài là trượt xuống lại. Ô hẹp 32px + logo 20px để 5 thẻ gần như giữ nguyên độ rộng
+              (đã thử ô thứ 6 "Menu chính" đủ chữ: chủ dự án chê 6 ô dày). Từ 768px trở lên web không có thanh menu dưới → ẩn. */}
+          <button onClick={moMenuWeb} aria-label="Mở menu chính của web" title="Menu chính"
+            className="my-[9px] flex w-8 shrink-0 items-center justify-center border-r border-slate-200 md:hidden">
+            <img src="/icons/apple-180.png" alt="" width={20} height={20} className="h-5 w-5 rounded-[5px]" />
+          </button>
           {([['tinhhuong', '🧭', 'Tình huống', false],
              ['luat', '⚖️', 'Toàn văn', false],
              ['the', '🎴', 'Thẻ ôn', true],
@@ -3576,16 +3584,6 @@ export default function TraCuuLuatPage() {
               </button>
             );
           })}
-          {/* MENU CHÍNH (13/10/2026): thanh menu của web đang nhường chỗ cho thanh này → bấm đây gọi nó TRỒI LÊN TẠM, đè lên thanh
-              này (Trang chủ / Nhà đất / Đăng tin / Bản đồ / Tiện ích); chạm ra ngoài là trượt xuống lại. Từ 768px trở lên web không
-              có thanh menu dưới (đã có menu ở đầu trang) nên ẩn nút này. */}
-          <button onClick={moMenuWeb} aria-label="Mở menu chính của web"
-            className="relative flex flex-1 flex-col items-center gap-0.5 py-2 text-[10.5px] font-semibold text-slate-400 md:hidden">
-            <svg viewBox="0 0 24 24" className="h-[19px] w-[19px]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-              <path d="M4 6.5h16M4 12h16M4 17.5h16" />
-            </svg>
-            <span className="whitespace-nowrap">Menu chính</span>
-          </button>
         </div>
       </nav>
 

@@ -21,6 +21,13 @@ type Reset = { id: number; luc: string; soMay: number; dsMay: May[]; phi: number
 type ChiTiet = { taiKhoan: { id: number; email: string; ten: string | null; phone: string | null; taoLuc: string; toiDaRieng: number | null }; toiDa: number;
   may: May[]; dnCuoi: DangNhap | null; traCuu: TraCuu[]; reset: Reset[]; batGioiHan: boolean; phi: number };
 
+// Vì sao máy tự gộp mã này vào (backend lib/thietBi.ts bacCungMay)
+const LY_DO_GOP: Record<string, string> = {
+  khoa: 'cùng khoá Face ID / vân tay',
+  'van-tay': 'cùng phần cứng + card đồ hoạ + bộ phông chữ',
+  mang: 'cùng phần cứng, cùng mạng',
+  'admin-gop': 'admin gộp tay',
+};
 const gio = (s?: string | null) => s ? new Date(s).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour12: false }) : '—';
 const CACH: Record<string, string> = { 'mat-khau': 'Mật khẩu', 'van-tay': 'Vân tay / khuôn mặt', 'dang-ky': 'Đăng ký tài khoản' };
 const icon = (loai: string) => loai === 'Điện thoại' ? '📱' : loai === 'Máy tính bảng' ? '📲' : '💻';
@@ -68,6 +75,22 @@ export default function ThietBiPage() {
     setDangLam(true);
     try { await api(`/thiet-bi/admin/may/${m.id}`, { method: 'DELETE', body: JSON.stringify({ phi: Number(phi) || 0, ghiChu: ghiChu || 'Gỡ 1 thiết bị' }) }); setTai((n) => n + 1); }
     catch (e: any) { alert(e?.message || 'Không gỡ được'); } finally { setDangLam(false); }
+  };
+  // GỘP / TÁCH TAY (13/10/2026): máy tự nhận "cùng máy" theo phần cứng / khoá Face ID / mạng (backend lib/thietBi.ts bacCungMay);
+  // chỗ nào đoán sai thì admin sửa ở đây.
+  const gopMay = async (m: May, vao: May) => {
+    if (!confirm(`Gộp "${m.ten}" vào "${vao.ten}"?
+Hai dòng này là CÙNG MỘT MÁY — gộp xong chỉ còn một thiết bị.`)) return;
+    setDangLam(true);
+    try { await api(`/thiet-bi/admin/may/${m.id}/gop`, { method: 'POST', body: JSON.stringify({ vaoMayId: vao.id }) }); setTai((n) => n + 1); }
+    catch (e: any) { alert(e?.message || 'Không gộp được'); } finally { setDangLam(false); }
+  };
+  const tachMa = async (m: May, maPhu: string, ten: string) => {
+    if (!confirm(`Tách "${ten}" ra khỏi "${m.ten}"?
+Đây là MÁY KHÁC — tách xong nó tính là một thiết bị riêng, không tự gộp lại.`)) return;
+    setDangLam(true);
+    try { await api(`/thiet-bi/admin/may/${m.id}/tach`, { method: 'POST', body: JSON.stringify({ ma: maPhu }) }); setTai((n) => n + 1); }
+    catch (e: any) { alert(e?.message || 'Không tách được'); } finally { setDangLam(false); }
   };
   const resetHet = async () => {
     if (!ct) return;
@@ -175,7 +198,17 @@ export default function ThietBiPage() {
                     <div key={m.id} className="rounded-lg border bg-white p-3 text-[13px]">
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <div className="font-bold text-[#0A2540]">{icon(m.loai)} Thiết bị {i + 1}: {c.model ? `${c.model} · ${m.trinhDuyet}` : m.ten}</div>
-                        <button disabled={dangLam} onClick={() => goMay(m)} className="h-8 rounded-md border border-red-300 px-2.5 text-[12px] font-semibold text-red-700 hover:bg-red-50">Gỡ máy này</button>
+                        <div className="flex flex-wrap items-center gap-2">
+                          {ct.may.length > 1 && (
+                            <select disabled={dangLam} value="" aria-label="Gộp thiết bị này vào thiết bị khác"
+                              onChange={(e) => { const v = ct.may.find((x) => x.id === Number(e.target.value)); if (v) gopMay(m, v); }}
+                              className="h-8 rounded-md border border-slate-300 bg-white px-2 text-[12px] font-semibold text-slate-700">
+                              <option value="">Cùng máy với…</option>
+                              {ct.may.map((x, j) => x.id === m.id ? null : <option key={x.id} value={x.id}>Thiết bị {j + 1}: {x.ten}</option>)}
+                            </select>
+                          )}
+                          <button disabled={dangLam} onClick={() => goMay(m)} className="h-8 rounded-md border border-red-300 px-2.5 text-[12px] font-semibold text-red-700 hover:bg-red-50">Gỡ máy này</button>
+                        </div>
                       </div>
                       <div className="mt-1.5 grid gap-x-6 gap-y-0.5 text-slate-700 sm:grid-cols-2">
                         <div>Loại: <b>{m.loai}</b> · {m.heDieuHanh}{c.banNenTang ? ` (${c.nenTang || ''} ${c.banNenTang})` : ''}</div>
@@ -188,14 +221,19 @@ export default function ThietBiPage() {
                         <div>IP gần nhất: <b>{m.ipCuoi || '—'}</b></div>
                         {(c.manHinh || c.muiGio) && <div>Màn hình: {c.manHinh || '—'}{c.tiLe ? ` (×${c.tiLe})` : ''} · múi giờ {c.muiGio || '—'} · {c.ngonNgu || ''}</div>}
                         {(c.nhanCpu || c.ram) && <div>CPU {c.nhanCpu || '?'} nhân · RAM ~{c.ram || '?'} GB · cảm ứng {c.cham ? `${c.cham} điểm` : 'không'}</div>}
-                        {c.gpu && <div className="sm:col-span-2 break-all">Card đồ hoạ: {c.gpu}</div>}
+                        {c.gpu && <div className="sm:col-span-2 break-all">Card đồ hoạ: {c.gpu}{c.phongChu ? ` · bộ phông chữ: ${String(c.phongChu).split(':')[0]} phông (mã ${String(c.phongChu).split(':')[1] || ''})` : ''}</div>}
                         {/* Cửa sổ ẩn danh / hồ sơ / trình duyệt khác TRÊN CÙNG MÁY này đã gộp vào đây (backend lib/thietBi.ts laCungMay):
                             cùng phần cứng + cùng mạng nên không tính là máy mới. Ghi rõ để admin đối chiếu khi khách hỏi. */}
                         {c.phu && Object.keys(c.phu).length > 0 && (
                           <div className="sm:col-span-2 mt-1 rounded-md bg-sky-50 px-2 py-1.5 text-[12px] text-sky-900">
-                            <b>Cùng máy này, đã gộp {Object.keys(c.phu).length} cửa sổ / trình duyệt khác</b> (cùng phần cứng, cùng mạng — không tính là máy mới):
+                            <b>Cùng máy này, đã gộp {Object.keys(c.phu).length} cửa sổ / trình duyệt khác</b> (không tính là máy mới). Gộp sai thì bấm Tách ra:
                             {Object.entries(c.phu as Record<string, any>).map(([maPhu, v]) => (
-                              <div key={maPhu} className="break-all">· {v?.ten || 'Không rõ'} — lần đầu {gio(v?.lanDau)} · gần nhất {gio(v?.lanCuoi)} · {v?.soLan || 0} lần · mã {maPhu}</div>
+                              <div key={maPhu} className="flex flex-wrap items-center gap-x-2 break-all">
+                                <span className="min-w-0">· {v?.ten || 'Không rõ'} — lần đầu {gio(v?.lanDau)} · gần nhất {gio(v?.lanCuoi)} · {v?.soLan || 0} lần
+                                  · <i>{LY_DO_GOP[v?.bac] || LY_DO_GOP.mang}</i> · mã {maPhu}</span>
+                                <button disabled={dangLam} onClick={() => tachMa(m, maPhu, v?.ten || maPhu)}
+                                  className="h-6 rounded border border-sky-300 bg-white px-2 text-[11px] font-semibold text-sky-800 hover:bg-sky-100">Tách ra</button>
+                              </div>
                             ))}
                           </div>
                         )}

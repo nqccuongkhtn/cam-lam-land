@@ -6,7 +6,7 @@ import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { authRequired, adminRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { isFlagOn } from '../lib/flags.ts';
-import { CO_GIOI_HAN, TOI_DA_MAC_DINH, ZALO_ADMIN, PHI_RESET, maThietBi, quenMayCuaUser, quenCo } from '../lib/thietBi.ts';
+import { CO_GIOI_HAN, TOI_DA_MAC_DINH, ZALO_ADMIN, PHI_RESET, maThietBi, quenMayCuaUser, quenCo, gopHaiMay, tachMaPhu } from '../lib/thietBi.ts';
 
 export const thietBiRouter = Router();
 
@@ -86,6 +86,24 @@ thietBiRouter.delete('/admin/may/:mayId', adminRequired, async (req: AuthedReque
     if (!m) return res.status(404).json({ error: 'Không có thiết bị này' });
     const n = await goMay(m.user_id, req.user!.id, [Number(req.params.mayId)], Math.max(0, Number(req.body?.phi) || 0), String(req.body?.ghiChu || 'Gỡ 1 thiết bị').slice(0, 500));
     res.json({ ok: true, daGo: n });
+  } catch (e) { next(e); }
+});
+
+// GỘP / TÁCH TAY (13/10/2026): máy tự gộp theo phần cứng (lib/thietBi.ts bacCungMay) — chỗ nào máy đoán sai thì admin sửa tay.
+//   gộp: máy :mayId thật ra là CÙNG MÁY với vaoMayId → dồn vào, trả lại một chỗ.
+//   tách: mã phụ `ma` đã gộp vào máy :mayId thật ra là MÁY KHÁC → tách thành thiết bị riêng (chiếm một chỗ, không tự gộp lại).
+thietBiRouter.post('/admin/may/:mayId/gop', adminRequired, async (req, res, next) => {
+  try {
+    const loi = await gopHaiMay(Number(req.params.mayId), Number(req.body?.vaoMayId));
+    if (loi) return res.status(400).json({ error: loi });
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+});
+thietBiRouter.post('/admin/may/:mayId/tach', adminRequired, async (req, res, next) => {
+  try {
+    const loi = await tachMaPhu(Number(req.params.mayId), String(req.body?.ma || ''));
+    if (loi) return res.status(400).json({ error: loi });
+    res.json({ ok: true });
   } catch (e) { next(e); }
 });
 

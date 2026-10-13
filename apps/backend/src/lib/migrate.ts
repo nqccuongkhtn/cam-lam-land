@@ -790,6 +790,11 @@ export async function migrate(): Promise<void> {
   //   máy này thay vì thành "máy mới". Chủ dự án: "tôi chỉ đăng nhập 2 máy mà" — sổ ghi 3/3 vì một máy mở thêm một cửa sổ khác.
   await pool.query(`ALTER TABLE thiet_bi ADD COLUMN IF NOT EXISTS ma_phu text[] NOT NULL DEFAULT '{}'`)
     .catch((e: any) => console.error('[migrate] thiet_bi.ma_phu lỗi:', e?.message || e));
+  //   webauthn_credentials.thiet_bi_ids: các dòng máy (thiet_bi.id) đã bật / đã dùng khoá Face ID · vân tay này. Tab ẩn danh, trình
+  //   duyệt khác trên cùng máy dùng CHUNG khoá đó (khoá nằm trong máy, không nằm trong trình duyệt) → đăng nhập bằng khoá là
+  //   nhận ra đúng máy dù đang ở mạng nào (lib/thietBi.ts laCungMay, bậc "cùng khoá").
+  await pool.query(`ALTER TABLE webauthn_credentials ADD COLUMN IF NOT EXISTS thiet_bi_ids int[] NOT NULL DEFAULT '{}'`)
+    .catch((e: any) => console.error('[migrate] webauthn_credentials.thiet_bi_ids lỗi:', e?.message || e));
 
   // ── TỆP RIÊNG trong kho ảnh /api/images (11/10/2026 — rà soát bảo mật) ──
   // Công văn đính kèm DANH SÁCH NÓNG (tên, CCCD, địa chỉ người dân) nằm chung kho với ảnh tin rao công khai, số tệp tăng

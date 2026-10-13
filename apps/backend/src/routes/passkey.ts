@@ -23,7 +23,7 @@
  *  http://localhost. Web thật đã chạy https qua Cloudflare Tunnel nên không sao.
  * ========================================================================== */
 import { Router } from 'express';
-import { ghiDangNhap } from '../lib/thietBi.ts';
+import { ghiDangNhap, maThietBi } from '../lib/thietBi.ts';
 import crypto from 'node:crypto';
 import {
   generateRegistrationOptions, verifyRegistrationResponse,
@@ -166,6 +166,11 @@ passkeyRouter.post('/dang-ky/xong', authRequired, async (req: AuthedRequest, res
        (credential.transports || []).join(',') || null,
        String(tenMay || '').slice(0, 60) || 'Máy này']);
     if (!ghi.length) return res.status(409).json({ error: 'Khoá này đang gắn với tài khoản khác.' });
+    // Ghi khoá này thuộc MÁY nào trong sổ thiết bị: sau này tab ẩn danh / trình duyệt khác trên cùng máy đăng nhập bằng khoá
+    // này là nhận ra đúng máy, đổi mạng cũng vậy (lib/thietBi.ts bacCungMay, bậc "cùng khoá").
+    const maMay = maThietBi(req);
+    if (maMay) query(`UPDATE webauthn_credentials SET thiet_bi_ids = ARRAY(SELECT id FROM thiet_bi WHERE user_id=$2 AND (ma=$3 OR $3 = ANY(ma_phu)))
+                      WHERE id=$1`, [ghi[0].id, me.id, maMay]).catch(() => {});
     res.status(201).json({ ok: true });
   } catch (e) { next(e); }
 });
@@ -246,8 +251,12 @@ passkeyRouter.post('/dang-nhap/xong', async (req, res, next) => {
     if (/^[A-Za-z0-9_-]{8,128}$/.test(maKhoa))
       query('UPDATE users SET passkey_uid=$2 WHERE id=$1 AND passkey_uid IS NULL', [c.user_id, maKhoa]).catch(() => {});
 
-    const tb = await ghiDangNhap({ id: c.user_id, role: c.role, roles: dsVaiTro(c) }, req, 'van-tay');   // sổ + giới hạn thiết bị
+    const tb = await ghiDangNhap({ id: c.user_id, role: c.role, roles: dsVaiTro(c) }, req, 'van-tay',   // sổ + giới hạn thiết bị
+      { mayKhoa: (c.thiet_bi_ids || []).map(Number) });       // khoá này từng dùng trên máy nào → nhận ra cùng máy dù khác mạng
     if (!tb.ok) return res.status(403).json({ error: tb.loi, maLoi: 'QUA_THIET_BI' });
+    if (tb.mayId) query(`UPDATE webauthn_credentials SET thiet_bi_ids = CASE WHEN $2 = ANY(thiet_bi_ids) THEN thiet_bi_ids
+                           ELSE (thiet_bi_ids || $2)[greatest(1, cardinality(thiet_bi_ids) - 8):] END WHERE id=$1`,
+                        [c.cred_row_id, tb.mayId]).catch(() => {});
     const token = signToken({ id: c.user_id, email: c.email, role: c.role, roles: dsVaiTro(c) as any, tb: tb.ma || undefined, pv: Number(c.phien_dang_nhap) || 0 });
     res.json({ token, user: hoSo({ ...c, id: c.user_id }) });
   } catch (e) { next(e); }

@@ -378,6 +378,9 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:fo
     padding-top: var(--cl-hub-pt, calc(3.5rem + env(safe-area-inset-top)));
     padding-bottom: var(--cl-hub-pb, calc(3.375rem + env(safe-area-inset-bottom)));
     transition: padding .3s ease; }
+  /* Công cụ có thanh dưới riêng (vd Tra cứu luật) → thanh menu web nhường chỗ, khung chỉ chừa dải thanh vuốt iPhone ở đáy:
+     tô dải đó TRẮNG cho liền với thanh của công cụ (nền xám của khung lộ ra thì trông như hở một khe). Xem lib/thanhDuoiRieng.ts. */
+  html.cl-nhuong-thanh-duoi .cl-hub { background-color: #fff; }
 }
 
 /* Nút nổi (pill Danh sách/Bản đồ + bong bóng chat): bám đáy, TỰ HẠ XUỐNG khi thanh điều hướng dưới ẩn — chuyển mượt.

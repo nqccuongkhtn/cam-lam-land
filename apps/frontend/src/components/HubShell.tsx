@@ -4,6 +4,7 @@ import { toolIconSvg as iconSvg } from '@/lib/toolIcons';
 import { useAuth, coVaiTro } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import CanDangNhap from '@/components/CanDangNhap';
+import { SU_KIEN_THANH_RIENG } from '@/lib/thanhDuoiRieng';
 
 // `vaiTro`: chỉ những tài khoản mang một trong các vai trò này mới THẤY công cụ.
 // Bỏ trống = ai cũng thấy. (Khác với `login` — cái đó chỉ nhắc phải đăng nhập.)
@@ -113,6 +114,13 @@ export default function HubShell({ tools: tatCa, storageKey = 'hub', hideMobileM
   // Bật "Đang mở…" ĐÚNG lúc khung nhúng đổi trang. Trước bật theo `tab`: tab đổi mà trang hiển thị không đổi (vd tab
   // công cụ nội bộ bị lùi về Cẩm nang đang mở sẵn) → khung không nạp lại → không có onLoad → kẹt "Đang mở" mãi.
   useEffect(() => { if (cur?.key) setLoading(true); }, [cur?.key]);
+  // Khung nạp trang khác (đổi công cụ / bấm Tải lại) hoặc rời trang Tiện ích → xoá dấu "thanh dưới riêng" (lib/thanhDuoiRieng.ts):
+  // khung cũ bị gỡ có khi không kịp báo, để sót là thanh menu web ẩn luôn ở công cụ khác. Công cụ mới có thanh riêng sẽ tự báo lại.
+  useEffect(() => {
+    const xoa = () => { window.dispatchEvent(new CustomEvent(SU_KIEN_THANH_RIENG, { detail: { on: false } })); };
+    xoa();
+    return xoa;
+  }, [cur?.key, reloadN]);
   // Link mở công cụ nội bộ mà CHƯA đăng nhập → bật luôn CỬA SỔ ĐĂNG NHẬP (chủ dự án 15/9/2026, thay dòng báo vàng).
   // Đăng nhập xong: danh sách công cụ đổi → effect ở trên tự mở đúng mục. Tắt cửa sổ: ở lại Cẩm nang (tab đầu).
   // Chờ tải xong tài khoản mới hỏi, không thì người CÓ quyền cũng bị bật cửa sổ trong tích tắc lúc mở trang.

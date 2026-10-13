@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { toolIconSvg } from '@/lib/toolIcons';
 import { TIEN_ICH_TOOLS } from '@/lib/tienIchTools';
 import { runToolAction, locTheoQuyen } from '@/components/HubShell';
+import { SU_KIEN_THANH_RIENG } from '@/lib/thanhDuoiRieng';
 
 type Name = 'home' | 'find' | 'post' | 'map' | 'me' | 'tools';
 
@@ -65,12 +66,31 @@ export default function BottomNav() {
 
   // Ẩn ở form đăng/sửa tin (khỏi che nút lưu) và trang quản trị.
   const navShown = !(path.startsWith('/sales/post') || path.startsWith('/sales/edit') || path.startsWith('/admin'));
-  // Báo cho pill "Danh sách/Bản đồ" + bong bóng chat biết thanh dưới đang hiện/ẩn để tự canh vị trí (mượt).
+  // NHƯỜNG CHỖ cho trang có thanh dưới đáy riêng (vd Tra cứu luật) — xem lib/thanhDuoiRieng.ts. Trang mở thẳng thì đọc dấu trên
+  // <html> + nghe sự kiện; trang nằm trong khung Tiện ích thì nghe tin nhắn của khung (chỉ nhận từ khung còn trên trang — khung vừa
+  // bị gỡ báo muộn thì bỏ qua; HubShell tự xoá dấu khi đổi công cụ).
+  const [nhuong, setNhuong] = useState(false);
   useEffect(() => {
-    const show = navShown && !hidden;
-    document.documentElement.style.setProperty('--cl-fab-shift', show ? '-56px' : '0px');
-    document.documentElement.style.setProperty('--cl-hub-pb', show ? 'calc(3.375rem + env(safe-area-inset-bottom))' : '0px'); // chừa chỗ cho thanh dưới trong hub (mobile)
-  }, [hidden, navShown]);
+    setNhuong(document.documentElement.hasAttribute('data-thanh-duoi-rieng'));
+    const tuTrang = (e: Event) => setNhuong(!!(e as CustomEvent<{ on?: boolean }>).detail?.on);
+    const tuKhung = (e: MessageEvent) => {
+      if (e.origin !== window.location.origin || e.data?.loai !== SU_KIEN_THANH_RIENG) return;
+      if (!Array.from(document.querySelectorAll('iframe')).some((f) => f.contentWindow === e.source)) return;
+      setNhuong(!!e.data.on);
+    };
+    window.addEventListener(SU_KIEN_THANH_RIENG, tuTrang as EventListener);
+    window.addEventListener('message', tuKhung);
+    return () => { window.removeEventListener(SU_KIEN_THANH_RIENG, tuTrang as EventListener); window.removeEventListener('message', tuKhung); };
+  }, []);
+  // Báo cho pill "Danh sách/Bản đồ" + bong bóng chat biết thanh dưới đang hiện/ẩn để tự canh vị trí (mượt).
+  // Đang nhường: nút nổi vẫn nâng 56px (thanh của trang nằm đúng chỗ đó); khung Tiện ích chỉ chừa dải thanh vuốt iPhone ở đáy.
+  useEffect(() => {
+    const show = navShown && !hidden && !nhuong;
+    const goc = document.documentElement;
+    goc.style.setProperty('--cl-fab-shift', show || nhuong ? '-56px' : '0px');
+    goc.style.setProperty('--cl-hub-pb', show ? 'calc(3.375rem + env(safe-area-inset-bottom))' : nhuong ? 'env(safe-area-inset-bottom)' : '0px'); // chừa chỗ cho thanh dưới trong hub (mobile)
+    goc.classList.toggle('cl-nhuong-thanh-duoi', nhuong);
+  }, [hidden, navShown, nhuong]);
   // Hub Tiện ích: cuộn trong iframe → nhận tín hiệu ẩn/hiện thanh dưới.
   useEffect(() => {
     const onEmbed = (e: Event) => setHidden(!!(e as CustomEvent<{ hidden?: boolean }>).detail?.hidden);
@@ -127,7 +147,7 @@ export default function BottomNav() {
           Chiều cao GIỮ 54px — biến --cl-hub-pb ở trên đang tính theo đúng số này.
           Lúc ẩn đẩy xuống dư 1.25rem cho chắc: hồi nút còn nổi, đẩy vừa đúng 100% thì nửa hình tròn đỏ
           còn lòi lên ở đáy màn hình (chủ dự án chụp màn hình bắt lỗi 28/9/2026). */}
-      <nav className={`md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-xl shadow-[0_-1px_0_rgba(15,23,42,0.06),0_-6px_20px_rgba(15,23,42,0.06)] transition-transform duration-200 ease-out ${hidden ? 'translate-y-[calc(100%+1.25rem)]' : 'translate-y-0'}`} style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <nav className={`md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-xl shadow-[0_-1px_0_rgba(15,23,42,0.06),0_-6px_20px_rgba(15,23,42,0.06)] transition-transform duration-200 ease-out ${hidden || nhuong ? 'translate-y-[calc(100%+1.25rem)]' : 'translate-y-0'}`} style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <ul className="flex items-stretch h-[54px] max-w-lg mx-auto px-1">
           {tabs.map((t) => {
             const noi = t.name === 'post'; // nút giữa nổi lên

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { ALL_SLUGS } from '@/lib/seoLanding';
 import { TAT_CA_SLUG as DIA_DANH } from '@/lib/diaDanh';
+import { CONG_CU } from '@/lib/congCu';
 import { GUIDES } from '@/app/cam-nang/guides';
 import { SITE } from '@/lib/tenMien';
 
@@ -21,6 +22,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const diaDanh: MetadataRoute.Sitemap = [
     { url: `${SITE}/ban-do`, changeFrequency: 'monthly', priority: 0.8 },
     ...DIA_DANH.map((slug) => ({ url: `${SITE}/ban-do/${slug}`, changeFrequency: 'monthly' as const, priority: 0.7 })),
+  ];
+  // TRANG ĐÍCH CÔNG CỤ (13/10/2026): bản công khai của từng công cụ (lib/congCu.ts)
+  const congCu: MetadataRoute.Sitemap = [
+    { url: `${SITE}/cong-cu`, changeFrequency: 'monthly', priority: 0.8 },
+    ...CONG_CU.map((c) => ({ url: `${SITE}/cong-cu/${c.slug}`, changeFrequency: 'monthly' as const, priority: 0.75 })),
   ];
   let listings: MetadataRoute.Sitemap = [];
   try {
@@ -55,5 +61,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }));
     }
   } catch { /* kho tin lỗi -> bỏ qua phần tin tức */ }
-  return [...staticUrls, ...landing, ...diaDanh, ...guides, ...news, ...listings];
+  return [...staticUrls, ...landing, ...diaDanh, ...congCu, ...guides, ...news, ...listings];
 }

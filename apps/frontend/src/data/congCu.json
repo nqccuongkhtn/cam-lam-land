@@ -1,0 +1,547 @@
+[
+ {
+  "key": "map",
+  "slug": "tra-cuu-quy-hoach-cam-lam",
+  "href": "/map",
+  "canDangNhap": false,
+  "tuKhoa": [
+   "tra cứu quy hoạch Cam Lâm",
+   "bản đồ quy hoạch Cam Lâm 2045",
+   "kiểm tra quy hoạch thửa đất Cam Lâm",
+   "quy hoạch đô thị mới Cam Lâm",
+   "quy hoạch phân khu 1/2000 Cam Lâm",
+   "quy hoạch sử dụng đất Cam Lâm 2030",
+   "tra cứu thửa đất Khánh Hòa",
+   "phiếu thông tin quy hoạch thửa đất"
+  ],
+  "title": "Tra cứu quy hoạch Cam Lâm – loại đất, diện tích từng thửa",
+  "description": "Bấm vào thửa đất ở Cam Lâm để biết thuộc loại đất quy hoạch nào, mỗi loại bao nhiêu m² theo QĐ 205 (2045), QĐ 893 (2030), phân khu 1/2000. In phiếu tham khảo.",
+  "h1": "Tra cứu quy hoạch Cam Lâm theo từng thửa đất",
+  "gioiThieu": "Bản đồ quy hoạch của Cam Lâm Land cho bạn bấm thẳng vào một thửa đất để biết thửa đó nằm trong loại đất quy hoạch nào và mỗi loại chiếm bao nhiêu mét vuông. Dữ liệu chồng đủ các bản quy hoạch đã duyệt của huyện Cam Lâm cũ: quy hoạch chung đô thị mới Cam Lâm đến năm 2045, quy hoạch sử dụng đất đến năm 2030 và bảy bản quy hoạch phân khu tỷ lệ 1/2000. Ranh thửa, số thửa, số tờ thì có cho toàn tỉnh Khánh Hòa.",
+  "tinhNang": [
+   "Tìm thửa theo số thửa, số tờ (gõ gộp “95/15” cũng hiểu là thửa 95, tờ 15), theo tọa độ VN-2000, theo kinh độ – vĩ độ hoặc dán đường link Google Maps.",
+   "Chọn xã theo tên mới sau sáp nhập (1/7/2025) hoặc theo tên xã cũ; gõ không dấu vẫn ra.",
+   "Bảng thông tin thửa: số thửa, số tờ (cả số tờ mới nếu xã đã có bảng đối chiếu), diện tích, tên xã hiện nay và trước sáp nhập.",
+   "Mỗi bản quy hoạch đè lên thửa được kê riêng: tên loại đất và diện tích từng loại.",
+   "Xuất phiếu thông tin quy hoạch để in hoặc lưu PDF: sơ đồ thửa, bảng tọa độ VN-2000 các góc thửa, phụ lục cho từng bản quy hoạch.",
+   "Mục Căn cứ pháp lý mở được bản gốc quyết định phê duyệt của từng bản quy hoạch.",
+   "Đo khoảng cách, diện tích; đổi nền đường, vệ tinh, địa hình; vẽ thửa từ bảng tọa độ sổ đỏ; chỉ đường tới thửa."
+  ],
+  "cacBuoc": [
+   "Bấm nút mở Bản đồ quy hoạch bên dưới — không cần đăng nhập.",
+   "Chọn xã, phường rồi gõ số thửa, số tờ; hoặc phóng to bản đồ và bấm thẳng vào thửa đất.",
+   "Xem bảng Thông tin thửa; lướt ngang (hoặc bấm mũi tên) để xem lần lượt từng bản quy hoạch.",
+   "Cần giấy để trao đổi thì bấm Xuất phiếu kiểm tra quy hoạch, rồi in hoặc lưu thành PDF."
+  ],
+  "hoiDap": [
+   {
+    "q": "Quy hoạch trên bản đồ lấy theo văn bản nào?",
+    "a": "Theo các quyết định đã phê duyệt: QĐ 205/QĐ-TTg ngày 28/02/2024 của Thủ tướng (quy hoạch chung đô thị mới Cam Lâm đến năm 2045), QĐ 893/QĐ-UBND của UBND tỉnh Khánh Hòa (điều chỉnh quy hoạch sử dụng đất đến năm 2030 huyện Cam Lâm) và bảy quyết định duyệt quy hoạch phân khu 1/2000. Trên bản đồ có mục Căn cứ pháp lý để mở bản gốc từng quyết định."
+   },
+   {
+    "q": "Thửa đất ở Nha Trang, Cam Ranh, Ninh Hòa có xem được quy hoạch không?",
+    "a": "Chưa. Dữ liệu quy hoạch hiện mới có cho huyện Cam Lâm cũ (nay là các xã Cam Lâm, Suối Dầu, Cam Hiệp, Cam An). Ở nơi khác bản đồ vẫn hiện ranh thửa, số thửa, số tờ, diện tích và ghi rõ “chưa có dữ liệu quy hoạch”, không đoán."
+   },
+   {
+    "q": "Diện tích từng loại đất quy hoạch có chính xác không?",
+    "a": "Diện tích được tính bằng cách chồng ranh thửa địa chính lên bản vẽ quy hoạch đã số hóa, nên chỉ để tham khảo và có thể sai lệch so với hồ sơ gốc. Khi làm thủ tục hay giao dịch, hãy hỏi cơ quan nhà nước có thẩm quyền."
+   },
+   {
+    "q": "Phiếu thông tin quy hoạch in từ web có giá trị pháp lý không?",
+    "a": "Không. Đây là bản trích lục tham khảo do Cam Lâm Land lập tự động, không thay thế trích lục hay văn bản do cơ quan nhà nước cấp; nó giúp bạn nắm nhanh thông tin trước khi đi hỏi chính thức."
+   },
+   {
+    "q": "Có phải đăng nhập mới dùng được không?",
+    "a": "Không. Xem bản đồ, tra thửa, xem quy hoạch và in phiếu đều không cần đăng nhập; chỉ đọc bảng tọa độ từ ảnh chụp và lưu điểm mới cần tài khoản (miễn phí)."
+   }
+  ],
+  "luuY": "Dữ liệu quy hoạch hiện chỉ có ở huyện Cam Lâm cũ (nay là 4 xã Cam Lâm, Suối Dầu, Cam Hiệp, Cam An). Diện tích đo trên bản vẽ số hóa, chỉ để tham khảo — phải đối chiếu với cơ quan có thẩm quyền trước khi giao dịch.",
+  "ten": "Bản đồ quy hoạch"
+ },
+ {
+  "key": "tra-so-ban-do",
+  "slug": "tra-cuu-so-to-ban-do-sau-sap-nhap",
+  "href": "/tra-so-ban-do",
+  "canDangNhap": true,
+  "tuKhoa": [
+   "tra cứu số tờ bản đồ sau sáp nhập",
+   "số tờ bản đồ mới sau sáp nhập xã",
+   "đổi số tờ bản đồ cũ sang mới",
+   "tra số tờ bản đồ Cam Lâm",
+   "số tờ bản đồ xã Cam Lâm mới",
+   "bảng đối chiếu số tờ bản đồ địa chính",
+   "sổ đỏ ghi số tờ cũ sau sáp nhập"
+  ],
+  "title": "Tra cứu số tờ bản đồ sau sáp nhập – đổi tờ cũ sang mới Cam Lâm",
+  "description": "Đổi số tờ bản đồ địa chính cũ sang số tờ mới và ngược lại cho 4 xã mới của huyện Cam Lâm cũ sau sáp nhập 1/7/2025. Gõ số tờ kèm mã xã cũ, ra kết quả ngay.",
+  "h1": "Tra cứu số tờ bản đồ cũ ↔ mới sau sáp nhập – Cam Lâm",
+  "gioiThieu": "Từ 01/7/2025, 14 xã, thị trấn của huyện Cam Lâm cũ được sắp xếp thành 4 xã mới: Cam Lâm, Suối Dầu, Cam Hiệp và Cam An. Mỗi xã mới đánh lại số tờ bản đồ địa chính từ 1, nên số tờ in trên sổ đỏ cũ có thể không còn khớp với bản đồ hiện nay. Công cụ này tra hai chiều: từ số tờ cũ ra số tờ mới, và từ số tờ mới ra tờ cũ của xã nào.",
+  "tinhNang": [
+   "Đủ 4 xã mới của huyện Cam Lâm cũ, mỗi xã một bảng tra riêng.",
+   "Chiều cũ → mới: chọn xã cũ, gõ số tờ cũ, hiện ngay số tờ mới.",
+   "Chiều mới → cũ: gõ số tờ mới, biết tờ đó trước đây là tờ số mấy của xã cũ nào.",
+   "Gõ nhanh kèm mã xã cũ, ví dụ “34 CHĐ” (tờ 34 xã Cam Hải Đông), máy tự chọn đúng xã.",
+   "Xã cũ bị chia cho nhiều xã mới (như Cam Hòa, Suối Tân) thì mỗi xã mới có số tờ riêng — chọn từng xã mới để tra.",
+   "Dùng tốt trên điện thoại, kết quả hiện ngay khi gõ."
+  ],
+  "cacBuoc": [
+   "Đăng nhập (tài khoản miễn phí) rồi mở công cụ Tra cứu số tờ bản đồ.",
+   "Chọn xã MỚI nơi thửa đất nằm hiện nay: Cam Lâm, Suối Dầu, Cam Hiệp hoặc Cam An.",
+   "Đổi tờ cũ sang mới: chọn xã cũ trong ô sổ xuống, gõ số tờ in trên sổ đỏ.",
+   "Muốn biết tờ mới là tờ cũ nào: gõ số tờ mới ở dòng thứ hai."
+  ],
+  "hoiDap": [
+   {
+    "q": "Vì sao số tờ bản đồ thay đổi sau sáp nhập?",
+    "a": "Khi nhiều xã cũ gộp thành một xã mới, xã mới đánh lại số tờ liên tục từ 1. Xã cũ mà xã mới giữ lại mã số (như thị trấn Cam Đức trong xã Cam Lâm mới) thường giữ nguyên số tờ, các xã cũ còn lại được đánh nối tiếp theo từng khối."
+   },
+   {
+    "q": "Sổ đỏ của tôi ghi số tờ cũ, tra trên bản đồ thế nào?",
+    "a": "Trên Bản đồ của Cam Lâm Land, chọn chế độ 3 cấp và xã cũ rồi nhập số thửa, số tờ đúng như trên sổ; hoặc dùng công cụ này đổi sang số tờ mới rồi tra theo xã mới."
+   },
+   {
+    "q": "Xã, phường khác ngoài Cam Lâm có tra được không?",
+    "a": "Công cụ tra nhanh này hiện chỉ có 4 xã mới của huyện Cam Lâm cũ. Bảng đánh số lại tờ bản đồ của một số phường, xã khác (Nha Trang, Ninh Hòa, Vạn Ninh) xem ở các trang bản đồ theo địa danh; trên Bản đồ, chọn xã mới rồi nhập số tờ mới thì máy tự đổi sang số tờ cũ để tìm."
+   },
+   {
+    "q": "Kết quả tra có dùng làm hồ sơ được không?",
+    "a": "Không. Số liệu lập theo bảng đối chiếu của địa phương, chỉ để tham khảo; trước khi làm thủ tục hãy đối chiếu với Văn phòng Đăng ký đất đai."
+   }
+  ],
+  "luuY": "Hiện có 4 xã mới của huyện Cam Lâm cũ; bảng tra chưa có số tờ của xã Sơn Tân cũ. Kết quả chỉ để tham khảo, cần đối chiếu Văn phòng Đăng ký đất đai trước khi làm thủ tục.",
+  "ten": "Tra cứu số tờ bản đồ"
+ },
+ {
+  "key": "doc-so-do",
+  "slug": "doc-bang-toa-do-so-do",
+  "href": "/map",
+  "canDangNhap": true,
+  "tuKhoa": [
+   "đọc bảng tọa độ sổ đỏ",
+   "chụp ảnh sổ đỏ xem vị trí thửa đất",
+   "vẽ thửa đất từ tọa độ sổ đỏ",
+   "định vị thửa đất theo sổ đỏ",
+   "đọc tọa độ VN2000 trên sổ đỏ",
+   "xác định vị trí đất qua tọa độ sổ đỏ",
+   "đọc sổ đỏ"
+  ],
+  "title": "Đọc bảng tọa độ sổ đỏ – chụp ảnh, vẽ thửa đất lên bản đồ",
+  "description": "Chụp ảnh, dán hoặc gõ bảng tọa độ VN-2000 in trên sổ đỏ: máy tách số, vẽ thửa đất lên bản đồ vệ tinh, cho biết vị trí, diện tích, chu vi và chiều dài từng cạnh.",
+  "h1": "Đọc bảng tọa độ sổ đỏ và vẽ thửa đất lên bản đồ",
+  "gioiThieu": "Phần sơ đồ thửa đất trên sổ đỏ có bảng tọa độ các góc thửa theo hệ VN-2000. Trên Bản đồ của Cam Lâm Land, bạn gõ, dán hoặc chụp ảnh bảng số đó; máy tách ra từng điểm rồi vẽ thửa đất lên nền vệ tinh để thấy thửa nằm ở đâu, rộng bao nhiêu. Ở huyện Cam Lâm cũ, bấm vào trong thửa vừa vẽ còn xem được thửa dính quy hoạch gì.",
+  "tinhNang": [
+   "Ba cách nhập: gõ từng dòng X, Y; dán cả bảng chép từ Excel, Word, Zalo hoặc tệp .txt, .csv; chụp hay chọn ảnh bảng tọa độ.",
+   "Đọc ảnh: máy làm rõ ảnh, tách các số tọa độ rồi đổ vào bảng để bạn soát lại trước khi vẽ.",
+   "Tự nhận đâu là số Bắc (X), đâu là số Đông (Y) theo độ lớn của số — nhập đảo cột vẫn đúng.",
+   "Đổi tọa độ theo kinh tuyến trục 108°15′ của Khánh Hòa, vẽ thửa và ghi chiều dài từng cạnh ngay trên bản đồ.",
+   "Tính diện tích, chu vi thửa vừa vẽ để so với số ghi trên sổ.",
+   "Bay thẳng tới thửa; bấm Chỉ đường để đi tới tận nơi."
+  ],
+  "cacBuoc": [
+   "Mở Bản đồ (nút bên dưới). Trên máy tính bấm nút Vẽ; trên điện thoại bấm Tra cứu rồi chọn thẻ Góc ranh.",
+   "Chọn cách nhập: gõ bảng, dán hàng loạt, hoặc Chụp / Ảnh (đọc ảnh cần đăng nhập).",
+   "Soát lại từng số vừa nhận — đọc ảnh có thể nhầm — rồi bấm Vẽ & zoom tới thửa.",
+   "Xem thửa trên bản đồ cùng diện tích, chu vi; bấm vào trong thửa để xem số thửa, số tờ và quy hoạch."
+  ],
+  "hoiDap": [
+   {
+    "q": "Bảng tọa độ nằm ở đâu trên sổ đỏ?",
+    "a": "Ở phần sơ đồ thửa đất của sổ: một bảng gồm số hiệu điểm và hai cột X, Y. Ở Khánh Hòa, số X (hướng Bắc) khoảng 1.250.000–1.450.000 m, số Y (hướng Đông) khoảng 550.000–650.000 m."
+   },
+   {
+    "q": "Đọc từ ảnh chụp có chính xác không?",
+    "a": "Tính năng đọc ảnh đang thử nghiệm: ảnh mờ, nghiêng hoặc có hoa văn nền có thể làm máy đọc nhầm số. Vì vậy số đọc được luôn đổ vào bảng để bạn soát lại; gõ hoặc dán số thì chính xác tuyệt đối."
+   },
+   {
+    "q": "Có cần đăng nhập không?",
+    "a": "Gõ tay hoặc dán số thì không cần. Đọc từ ảnh chụp hay mở camera cần tài khoản Cam Lâm Land (miễn phí)."
+   },
+   {
+    "q": "Khác gì công cụ chuyển tọa độ VN-2000 sang WGS84?",
+    "a": "Công cụ chuyển tọa độ cho ra kinh độ, vĩ độ từng điểm để mở trên Google Maps. Ở đây thửa được vẽ thẳng lên bản đồ của Cam Lâm Land, có ranh thửa địa chính xung quanh và, ở Cam Lâm, cả thông tin quy hoạch."
+   }
+  ],
+  "luuY": "Đọc bảng tọa độ từ ảnh đang thử nghiệm và cần đăng nhập; luôn soát lại số trước khi vẽ. Công cụ chỉ đọc bảng tọa độ, không đọc tên chủ, diện tích hay các thông tin khác trên sổ.",
+  "ten": "Đọc bảng tọa độ sổ đỏ"
+ },
+ {
+  "key": "qr",
+  "slug": "tra-cuu-qr-so-do",
+  "href": "/qr",
+  "canDangNhap": true,
+  "tuKhoa": [
+   "tra cứu QR sổ đỏ",
+   "quét mã QR sổ đỏ",
+   "tra cứu mã QR giấy chứng nhận quyền sử dụng đất",
+   "kiểm tra sổ đỏ qua mã QR",
+   "quét QR sổ hồng",
+   "đọc mã QR trên sổ đỏ bằng điện thoại",
+   "tra cứu QR VBĐLIS"
+  ],
+  "title": "Tra cứu QR sổ đỏ – quét mã QR giấy chứng nhận bằng điện thoại",
+  "description": "Quét mã QR trên sổ đỏ bằng camera điện thoại hoặc tải ảnh lên, đọc ngay thông tin in trong mã, tự chép mã tra cứu và mở cổng tra cứu chính thức VBĐLIS.",
+  "h1": "Tra cứu QR sổ đỏ – quét mã trên Giấy chứng nhận",
+  "gioiThieu": "Nhiều sổ đỏ cấp gần đây có in mã QR. Công cụ này đọc mã đó bằng camera hoặc từ ảnh chụp, tách các thông tin in trong mã ra từng dòng dễ đọc và tự chép sẵn mã tra cứu. Sau đó bạn mở cổng tra cứu chính thức ngay trong trang để xem thông tin thửa đất do hệ thống nhà nước trả về.",
+  "tinhNang": [
+   "Quét trực tiếp bằng camera điện thoại hoặc máy tính.",
+   "Hoặc tải ảnh chụp có mã QR; ảnh nhỏ, khó đọc thì máy tự phóng to để bắt mã.",
+   "Đọc mã ngay trên máy bạn, tách thông tin trong mã ra từng dòng (ngày giờ, số phát hành, mã hồ sơ…), có nút chép từng dòng.",
+   "Tự chép sẵn mã tra cứu và mở cổng tra cứu chính thức tracuuqr.vbdlis.vn ngay trong trang hoặc ở thẻ mới.",
+   "Cam Lâm Land không lưu ảnh và dữ liệu bạn tra cứu."
+  ],
+  "cacBuoc": [
+   "Đăng nhập (miễn phí) rồi mở công cụ Tra cứu QR sổ đỏ.",
+   "Bấm Mở camera và hướng vào mã QR trên sổ, hoặc bấm Tải ảnh QR.",
+   "Xem các thông tin đọc được; mã tra cứu đã được chép sẵn.",
+   "Bấm Tra cứu ngay tại đây, dán mã, tích ô xác nhận không phải người máy rồi bấm Tìm kiếm trên cổng chính thức."
+  ],
+  "hoiDap": [
+   {
+    "q": "Quét mã QR có biết sổ đỏ thật hay giả không?",
+    "a": "Mã QR chỉ cho biết các thông tin in trong mã. Muốn chắc chắn, hãy mở cổng tra cứu chính thức bằng mã đó và so thông tin cổng trả về với sổ đang cầm; còn nghi ngờ thì hỏi Văn phòng Đăng ký đất đai."
+   },
+   {
+    "q": "Sổ đỏ không có mã QR thì tra thế nào?",
+    "a": "Công cụ chỉ dùng được với sổ có in mã QR. Sổ không có mã thì tra theo số thửa, số tờ trên Bản đồ của Cam Lâm Land hoặc hỏi Văn phòng Đăng ký đất đai."
+   },
+   {
+    "q": "Vì sao khung tra cứu chính thức bị trống?",
+    "a": "Đôi khi cổng chính thức không cho hiện bên trong trang khác. Khi đó bấm Mở tab mới — mã đã được chép sẵn, chỉ cần dán vào."
+   },
+   {
+    "q": "Ảnh chụp sổ có bị gửi đi đâu không?",
+    "a": "Không. Mã QR được đọc ngay trên điện thoại hoặc máy tính của bạn; Cam Lâm Land không lưu ảnh hay dữ liệu bạn tra cứu."
+   }
+  ],
+  "luuY": "Thông tin chi tiết của thửa đất (chủ, diện tích, ranh giới) do cổng tra cứu chính thức trả về, không phải do Cam Lâm Land; cổng có thể đòi xác thực hoặc tạm gián đoạn.",
+  "ten": "Tra cứu QR sổ đỏ"
+ },
+ {
+  "key": "hop-dong-dat-coc",
+  "slug": "mau-hop-dong-dat-coc-mua-ban-dat",
+  "href": "/hop-dong-dat-coc",
+  "canDangNhap": true,
+  "tuKhoa": [
+   "mẫu hợp đồng đặt cọc mua bán đất",
+   "hợp đồng đặt cọc mua bán nhà đất",
+   "mẫu giấy đặt cọc mua đất",
+   "soạn hợp đồng đặt cọc online",
+   "hợp đồng đặt cọc có bên môi giới làm chứng",
+   "hợp đồng đặt cọc nhiều người đứng tên",
+   "in hợp đồng đặt cọc PDF"
+  ],
+  "title": "Mẫu hợp đồng đặt cọc mua bán đất – điền và in PDF online",
+  "description": "Soạn hợp đồng đặt cọc mua bán nhà đất ngay trên điện thoại: điền bên bán, bên mua, môi giới, thửa đất, giá, tiền cọc; tự ghi số tiền bằng chữ, xuất PDF hoặc in.",
+  "h1": "Mẫu hợp đồng đặt cọc mua bán đất – soạn và in online",
+  "gioiThieu": "Điền thông tin vào các ô có sẵn, công cụ ghép thành hợp đồng đặt cọc hoàn chỉnh theo Điều 328 Bộ luật Dân sự 2015 và Luật Đất đai 2024, rồi xuất PDF hoặc in ngay. Có sẵn chỗ cho nhiều người cùng đứng tên bên bán và cho người môi giới làm chứng kèm mức hoa hồng.",
+  "tinhNang": [
+   "Bên nhận cọc (bên bán) ghi được tới 5 người cùng đứng tên, mỗi người đủ dòng thông tin và chỗ ký.",
+   "Bên môi giới làm chứng (Bên C) bật hoặc tắt tùy ý; ghi hoa hồng khi giao dịch thành công (% giá bán) và khi hủy cọc (% tiền cọc), tự quy ra số tiền.",
+   "Thông tin thửa đất: địa chỉ, số thửa, số tờ, diện tích, số giấy chứng nhận, nơi cấp, mục đích và thời hạn sử dụng.",
+   "Gõ giá và tiền cọc là hiện ngay số tiền bằng chữ; nhắc khi số CCCD, số điện thoại sai độ dài hoặc tiền cọc lớn hơn giá.",
+   "Điều khoản xử lý tiền cọc và cam kết của các bên soạn sẵn theo luật, sửa lại được khi cần.",
+   "Xuất PDF hoặc in; tùy chọn in thành cuốn kèm bìa mang tên, số điện thoại người môi giới và nhiều tờ hợp đồng một lượt.",
+   "Nội dung bạn điền chỉ nằm trên máy, không gửi lên máy chủ."
+  ],
+  "cacBuoc": [
+   "Đăng nhập (miễn phí) rồi mở công cụ Hợp đồng đặt cọc.",
+   "Điền ngày, nơi lập; thông tin bên bán, bên mua; bỏ tích Bên C nếu không có môi giới.",
+   "Điền thửa đất, giá chuyển nhượng, tiền cọc và số ngày phải ký hợp đồng công chứng.",
+   "Bấm Xuất PDF / In, chọn máy in hoặc lưu thành tệp PDF."
+  ],
+  "hoiDap": [
+   {
+    "q": "Hợp đồng đặt cọc này soạn theo luật nào?",
+    "a": "Theo Điều 328 Bộ luật Dân sự 2015 về đặt cọc, có dẫn Luật Đất đai 2024 và Luật Kinh doanh bất động sản. Điều khoản ghi sẵn: ký hợp đồng chuyển nhượng thì tiền cọc trừ vào giá; bên mua từ chối thì mất cọc; bên bán từ chối thì trả lại cọc và đền thêm một khoản bằng tiền cọc, trừ khi hai bên thỏa thuận khác."
+   },
+   {
+    "q": "Có nên công chứng hợp đồng đặt cọc không?",
+    "a": "Công cụ ghi rõ đây là mẫu tham khảo. Nên công chứng hoặc chứng thực và nhờ người có chuyên môn rà lại trước khi ký, nhất là giao dịch giá trị lớn."
+   },
+   {
+    "q": "Đất đứng tên hai vợ chồng thì ghi thế nào?",
+    "a": "Bấm Thêm người đứng tên để thêm người cùng sở hữu vào bên bán. Tài sản chung phải có đủ chữ ký của tất cả người đứng tên (Điều 35 Luật Hôn nhân và gia đình), thiếu một người hợp đồng có thể bị vô hiệu."
+   },
+   {
+    "q": "Có lưu lại hợp đồng để sửa sau không?",
+    "a": "Không. Hợp đồng không được lưu trên máy chủ, tải lại trang là mất phần đã điền, nên hãy xuất PDF ngay khi điền xong."
+   }
+  ],
+  "luuY": "Đây là mẫu tham khảo; nên công chứng/chứng thực và nhờ luật sư rà lại cho từng giao dịch. Nội dung không được lưu lại, tải lại trang là mất.",
+  "ten": "Hợp đồng đặt cọc"
+ },
+ {
+  "key": "crm",
+  "slug": "phan-mem-quan-ly-khach-hang-bat-dong-san",
+  "href": "/sales/crm",
+  "canDangNhap": true,
+  "tuKhoa": [
+   "phần mềm quản lý khách hàng bất động sản",
+   "CRM bất động sản miễn phí",
+   "quản lý rổ hàng bất động sản",
+   "app quản lý khách hàng cho môi giới nhà đất",
+   "quản lý nguồn hàng nhà đất trên bản đồ",
+   "quản lý lịch hẹn công chứng",
+   "sổ tay môi giới bất động sản"
+  ],
+  "title": "Phần mềm quản lý khách hàng bất động sản (CRM) miễn phí",
+  "description": "Quản lý khách cho môi giới nhà đất: nhu cầu, lịch chăm sóc, lịch công chứng; lưu lô hàng trên bản đồ kèm giá, chủ đất, hoa hồng; theo dõi tới lúc chốt.",
+  "h1": "Quản lý khách hàng và nguồn hàng bất động sản cho môi giới",
+  "gioiThieu": "Công cụ dành cho người làm môi giới nhà đất: mỗi khách có một hồ sơ riêng gồm nhu cầu, các lần gọi, nhắn, gặp và lịch ký công chứng. Nguồn hàng được lưu ngay trên bản đồ thành từng điểm kèm giá, diện tích, thông tin chủ đất và hoa hồng, rồi gắn với khách quan tâm để theo dõi tới lúc chốt.",
+  "tinhNang": [
+   "Danh sách khách: tên, số điện thoại, nguồn khách, ghi chú; tìm nhanh theo tên hoặc số điện thoại, bấm số là gọi.",
+   "Nhu cầu của khách: mua, thuê, bán hay ký gửi; loại nhà đất, ngân sách, diện tích, khu vực.",
+   "Nhật ký chăm sóc: ghi mỗi lần gọi, nhắn, gặp; hẹn ngày gọi lại, khách cần chăm hôm nay hiện ngay đầu trang.",
+   "Lưu lô hàng trên bản đồ: bấm vào thửa, ghi giá, diện tích, tên và số điện thoại chủ, hoa hồng, tới 5 ảnh; từ lô đã lưu bấm Đăng tin để rao bán.",
+   "Gắn khách vào từng lô và chuyển qua các giai đoạn: Mới → Đang tư vấn → Thương lượng → Đã chốt hoặc Không thành.",
+   "Gợi ý lô hàng đã lưu hợp khu vực, loại nhà đất khách cần.",
+   "Lịch công chứng: ngày giờ, văn phòng công chứng, giấy tờ cần mang; lịch sắp tới hiện ở trang tổng hợp."
+  ],
+  "cacBuoc": [
+   "Đăng nhập (miễn phí), mở CRM khách hàng.",
+   "Bấm + Thêm khách, ghi tên, số điện thoại, rồi thêm nhu cầu của khách.",
+   "Mở Bản đồ, bấm vào thửa đang có hàng → Lưu điểm, điền giá, chủ đất, hoa hồng.",
+   "Bấm vào lô đã lưu → + Thêm khách để gắn khách quan tâm; theo dõi tiến độ ở mục Pipeline (các giai đoạn chốt)."
+  ],
+  "hoiDap": [
+   {
+    "q": "CRM khách hàng có mất phí không?",
+    "a": "Không. Chỉ cần tài khoản Cam Lâm Land (miễn phí) là dùng được."
+   },
+   {
+    "q": "Người khác có xem được khách và nguồn hàng của tôi không?",
+    "a": "Khách, nhu cầu và lô hàng bạn lưu chỉ hiện trong tài khoản của bạn. Riêng quản trị viên của web có chế độ xem chung cả đội."
+   },
+   {
+    "q": "Có quản lý được rổ hàng không?",
+    "a": "Có ở mức cơ bản: mỗi lô hàng là một điểm lưu trên bản đồ, có giá, diện tích, chủ đất, hoa hồng, ảnh, xem lại ở mục Đã lưu. Chưa có bảng lọc, xuất Excel hay chia sẻ rổ hàng cho người khác."
+   },
+   {
+    "q": "Dùng trên điện thoại được không?",
+    "a": "Được. Công cụ chạy trên trình duyệt điện thoại, không cần cài ứng dụng; bấm vào số điện thoại khách là gọi ngay."
+   }
+  ],
+  "luuY": "Phần quản lý hàng mới ở mức cơ bản: mỗi lô phải gắn vào một điểm trên bản đồ; chưa lọc, chưa xuất Excel, chưa chia sẻ danh sách hàng.",
+  "ten": "Quản lý khách hàng (CRM)"
+ },
+ {
+  "key": "lap-danh-muc",
+  "slug": "lap-danh-muc-ho-so-luu-tru",
+  "href": "/lap-danh-muc",
+  "canDangNhap": true,
+  "tuKhoa": [
+   "lập danh mục hồ sơ lưu trữ",
+   "lập mục lục văn bản hồ sơ tự động",
+   "phần mềm lập danh mục tài liệu từ file scan",
+   "danh mục văn bản trong hồ sơ địa chính",
+   "chỉnh lý hồ sơ lưu trữ đất đai",
+   "chuyển hồ sơ scan PDF sang danh mục Excel",
+   "số hóa hồ sơ lưu trữ"
+  ],
+  "title": "Lập danh mục hồ sơ lưu trữ tự động từ file scan PDF",
+  "description": "Tải bộ hồ sơ scan PDF lên, máy tự tách từng văn bản và lập danh mục Excel: số ký hiệu, ngày tháng, tác giả, trích yếu, tờ số, ghi chú. Tính phí theo số trang.",
+  "h1": "Lập danh mục hồ sơ lưu trữ tự động từ bản scan",
+  "gioiThieu": "Dành cho người làm hồ sơ, lưu trữ: thay vì gõ tay mục lục từng bộ hồ sơ, bạn tải tệp PDF scan lên, máy tự tìm chỗ bắt đầu, kết thúc của từng văn bản, đọc số, ngày, cơ quan ban hành, trích yếu rồi xuất ra tệp Excel theo mẫu danh mục. Làm được nhiều bộ một lượt, mỗi bộ ra một tệp riêng.",
+  "tinhNang": [
+   "Nạp nhiều tệp PDF một lúc; trang trong tệp là bản scan hay ảnh chụp, kể cả trang bị xoay lệch, đều đọc được.",
+   "Tự tách từng văn bản trong tập, đọc số và ký hiệu, ngày tháng, tác giả (cơ quan ban hành), trích yếu.",
+   "Mỗi văn bản một dòng, có tờ số và ghi chú; mọi trang đều được gán vào một văn bản, không sót, không chồng.",
+   "Mỗi bộ xuất một tệp Excel riêng, tên tệp tự đặt theo tên người sử dụng đất kèm số thửa, số tờ.",
+   "Báo phí theo số trang trước khi chạy; các bộ chạy lần lượt, xong bộ nào tải về bộ đó, bộ đã xong không bị tính tiền lại.",
+   "Nạp ví bằng chuyển khoản hoặc quét mã QR ngân hàng, số dư dùng dần."
+  ],
+  "cacBuoc": [
+   "Đăng nhập, nạp tiền vào ví (chuyển khoản hoặc quét mã QR ngân hàng).",
+   "Kéo thả hoặc chọn các tệp PDF hồ sơ; máy đếm trang và báo phí từng bộ.",
+   "Bấm Chạy; xong bộ nào tệp Excel tự tải về máy bộ đó.",
+   "Mở tệp Excel soát lại trước khi dùng."
+  ],
+  "hoiDap": [
+   {
+    "q": "Chi phí tính thế nào?",
+    "a": "Tính theo số trang thực tế của hồ sơ, trừ vào ví đã nạp. Máy báo phí từng bộ trước khi chạy; giá mỗi trang xem ở mục Bảng giá trong công cụ."
+   },
+   {
+    "q": "Danh mục xuất ra gồm những cột nào?",
+    "a": "Mỗi văn bản một dòng: số và ký hiệu, ngày tháng, tác giả (cơ quan ban hành), trích yếu nội dung, tờ số và ghi chú."
+   },
+   {
+    "q": "Hồ sơ dài bao nhiêu trang thì chạy được?",
+    "a": "Mỗi tệp hiện tối đa 60 trang. Hồ sơ dài hơn hãy tách thành nhiều tệp nhỏ rồi chạy."
+   },
+   {
+    "q": "Hồ sơ của tôi có bị lưu lại không?",
+    "a": "Các trang hồ sơ được gửi tới dịch vụ AI để đọc chữ; tệp tạm trên máy chủ bị xóa ngay khi xong, còn tệp Excel tải thẳng về máy bạn."
+   },
+   {
+    "q": "Kết quả có đúng tuyệt đối không?",
+    "a": "Bản scan mờ, chữ viết tay hoặc trang thiếu có thể làm máy đọc sai hay sót; hãy soát lại tệp Excel trước khi nộp lưu."
+   }
+  ],
+  "luuY": "Dịch vụ tính phí theo trang (nạp ví trước), tối đa 60 trang mỗi tệp. Nếu máy đã đọc xong mà không nhận ra văn bản nào (scan quá mờ) hoặc xử lý quá lâu thì vẫn bị tính phí; lỗi do hệ thống bận thì được hoàn tiền.",
+  "ten": "Lập danh mục hồ sơ"
+ },
+ {
+  "key": "tao-video-ban-do",
+  "slug": "tao-video-ban-do-ve-tinh",
+  "href": "/tao-video-ban-do",
+  "canDangNhap": true,
+  "tuKhoa": [
+   "tạo video bản đồ vệ tinh",
+   "làm video vị trí dự án bất động sản",
+   "video khoanh lô đất trên bản đồ",
+   "tạo video bản đồ 3D bay như flycam",
+   "làm video TikTok bất động sản",
+   "video dẫn đường tới lô đất",
+   "phần mềm làm video bất động sản trên bản đồ"
+  ],
+  "title": "Tạo video bản đồ vệ tinh cho bất động sản – xuất MP4",
+  "description": "Khoanh lô đất, vẽ tuyến đường, gắn tiện ích, camera bay 3D trên ảnh vệ tinh rồi xuất video MP4 cho TikTok, YouTube, Facebook. Có mẫu dựng sẵn cho môi giới.",
+  "h1": "Tạo video bản đồ vệ tinh giới thiệu lô đất, dự án",
+  "gioiThieu": "Công cụ giúp môi giới tự làm video giới thiệu vị trí lô đất mà không cần bay flycam hay biết dựng phim: khoanh lô trên ảnh vệ tinh, vẽ đường đi, gắn ghim tiện ích, chọn kiểu camera bay rồi xuất video. Video dựng ngay trên máy của bạn, có đủ khổ dọc cho TikTok và khổ ngang cho YouTube.",
+  "tinhNang": [
+   "Khoanh lô đất, vẽ tuyến đường chạy động; gõ tên xã, phường để tự khoanh ranh giới; nhập ranh có sẵn từ tệp KML/KMZ.",
+   "Tìm đường đi thật giữa hai điểm; thẻ chú thích ghi khoảng cách tới lô, ghim, mũi tên, vòng bán kính.",
+   "Camera bay, nghiêng, xoay; đồi núi nổi 3D; lô đất dựng thành khối nổi.",
+   "9 mẫu dựng sẵn: Vị trí, Gần sân bay, Gần biển, Hạ tầng, Tiện ích, Đất nền, Đầu tư, Bán hàng, Dẫn đường.",
+   "Chèn chữ, lời thoại, ảnh, video, biểu đồ; nhạc nền, giọng đọc, tiếng động; nhờ AI viết lời thoại.",
+   "4 khổ: ngang 16:9, dọc 9:16, dọc 4:5, vuông 1:1; độ nét 1080p hoặc 720p; xuất nhiều video một lượt thành tệp ZIP.",
+   "Video dựng và lưu ngay trên máy bạn, không tải lên máy chủ."
+  ],
+  "cacBuoc": [
+   "Đăng nhập rồi mở công cụ Tạo video bản đồ.",
+   "Tìm tới khu đất, bấm Khoanh lô và chấm lần lượt các góc lô, hoặc nhập tệp KML/KMZ.",
+   "Chọn một mẫu dựng sẵn, điền tên dự án, giá, số điện thoại; thêm tuyến đường, tiện ích nếu muốn.",
+   "Bấm xem thử; ưng ý thì xuất video MP4 (cần gói Tạo video bản đồ)."
+  ],
+  "hoiDap": [
+   {
+    "q": "Tạo video bản đồ có mất phí không?",
+    "a": "Đăng nhập là dựng và xem thử được 8 giây đầu, có chữ BẢN DÙNG THỬ. Muốn xem trọn và tải video về máy thì cần gói Tạo video bản đồ; giá gói xem ở trang Dịch vụ."
+   },
+   {
+    "q": "Đăng TikTok, Facebook thì chọn khổ nào?",
+    "a": "TikTok, Reels, Shorts dùng khổ dọc 9:16; YouTube, Facebook, gửi Zalo dùng khổ ngang 16:9; Instagram hợp khổ 4:5; chạy quảng cáo hay dùng khổ vuông 1:1. Công cụ có đủ bốn khổ và xuất một lượt nhiều khổ được."
+   },
+   {
+    "q": "Máy yếu có làm được không?",
+    "a": "Được. Công cụ tự dò sức máy để chọn độ nét và số hình mỗi giây cho phù hợp; máy có card đồ họa rời dựng nhanh hơn nhiều."
+   },
+   {
+    "q": "Video có gắn logo không?",
+    "a": "Có. Video luôn kèm logo Cam Lâm Land; tên dự án, giá và số điện thoại liên hệ của bạn hiện trong phần chữ của video."
+   }
+  ],
+  "luuY": "Chưa có gói thì chỉ xem thử 8 giây đầu (có dấu BẢN DÙNG THỬ) và chưa tải video về được. Video luôn kèm logo Cam Lâm Land, chưa thay được bằng logo riêng.",
+  "ten": "Tạo video bản đồ"
+ },
+ {
+  "key": "pdf",
+  "slug": "chinh-sua-pdf-online",
+  "href": "/pdf",
+  "canDangNhap": true,
+  "tuKhoa": [
+   "chỉnh sửa PDF online",
+   "sửa chữ trong file PDF",
+   "ghép file PDF",
+   "chuyển PDF sang Word tiếng Việt",
+   "nén file PDF",
+   "ký tên vào file PDF",
+   "OCR PDF tiếng Việt",
+   "tách trang PDF"
+  ],
+  "title": "Chỉnh sửa PDF online – sửa chữ, ký tên, ghép, tách, chuyển Word",
+  "description": "Sửa chữ thẳng trên file PDF, ký tên, ghép, tách, nén, đánh số trang; chuyển PDF sang Word, Excel; nhận dạng chữ tiếng Việt cho bản scan. Dùng trên trình duyệt.",
+  "h1": "Chỉnh sửa PDF online: sửa chữ, ký tên, ghép, tách, chuyển đổi",
+  "gioiThieu": "Bộ công cụ PDF dùng ngay trên trình duyệt, hợp với giấy tờ nhà đất: sửa đúng chữ cần sửa mà trang vẫn giữ nguyên như bản gốc, thêm chữ ký, ghép nhiều tệp, biến bản scan thành chữ tìm được. Phần lớn thao tác chạy ngay trên máy bạn; việc nặng như chuyển sang Word hay nhận dạng chữ do máy chủ xử lý rồi trả tệp về.",
+  "tinhNang": [
+   "Sửa chữ: bấm vào dòng chữ trên PDF rồi gõ lại; chỉ chữ bạn sửa thay đổi, phần còn lại giữ nguyên.",
+   "Tìm và thay thế chữ trong cả tệp; thêm chữ, ảnh, chữ ký vẽ tay; bôi trắng, tô sáng, vẽ.",
+   "Ghép nhiều PDF, tách trang, trích trang, xóa trang, xoay và kéo đổi thứ tự trang, đảo ngược, chèn trang trắng.",
+   "Chuyển ảnh JPG, PNG thành PDF; PDF thành ảnh PNG, JPG.",
+   "PDF sang Word, Excel, văn bản; Word, Excel, PowerPoint sang PDF, nhiều tệp một lượt.",
+   "Nén giảm dung lượng, đánh số trang, chèn chữ mờ chìm.",
+   "Nhận dạng chữ tiếng Việt cho bản scan; đặt và gỡ mật khẩu PDF."
+  ],
+  "cacBuoc": [
+   "Đăng nhập (miễn phí), mở công cụ Chỉnh sửa PDF.",
+   "Chọn việc cần làm trong danh sách công cụ (Sửa chữ PDF, Ghép PDF, PDF → Word…).",
+   "Chọn hoặc kéo thả tệp; chỉnh tùy chọn nếu có (trang cần lấy, mật khẩu, chữ mờ…).",
+   "Bấm thực hiện rồi tải tệp kết quả về máy."
+  ],
+  "hoiDap": [
+   {
+    "q": "Sửa chữ trong PDF có làm xô lệch file không?",
+    "a": "Không. Trang gốc được giữ nguyên; chỉ đúng dòng bạn sửa được che đi và ghi lại chữ mới ngay chỗ đó, nên bố cục không bị xô lệch."
+   },
+   {
+    "q": "Tệp của tôi có bị gửi lên máy chủ không?",
+    "a": "Các việc sửa chữ, ghép, tách, xoay, nén, chuyển ảnh chạy ngay trên máy bạn, tệp không gửi đi. Riêng chuyển sang Word, Excel, nhận dạng chữ, đặt hoặc gỡ mật khẩu thì tệp được gửi lên máy chủ xử lý rồi xóa ngay."
+   },
+   {
+    "q": "Tệp lớn bao nhiêu thì dùng được?",
+    "a": "Các việc xử lý trên máy chủ nhận tệp tối đa 25 MB mỗi lần, đủ cho hồ sơ nhà đất scan thông thường. Các việc chạy trên máy bạn tùy sức máy."
+   },
+   {
+    "q": "PDF scan chuyển sang Word có giữ được chữ tiếng Việt không?",
+    "a": "Có tùy chọn nhận dạng chữ cho tệp scan; kết quả phụ thuộc độ rõ của bản scan, nên soát lại sau khi chuyển."
+   }
+  ],
+  "luuY": "Các việc xử lý trên máy chủ (chuyển Word, Excel, nhận dạng chữ, mật khẩu) nhận tệp tối đa 25 MB và tối đa 12 lần mỗi 10 phút.",
+  "ten": "Chỉnh sửa PDF"
+ },
+ {
+  "key": "van-ban",
+  "slug": "tra-cuu-van-ban-dat-dai-khanh-hoa",
+  "href": "/van-ban",
+  "canDangNhap": true,
+  "tuKhoa": [
+   "tra cứu văn bản pháp luật đất đai Khánh Hòa",
+   "văn bản quy hoạch Cam Lâm",
+   "quyết định thu hồi đất bồi thường Cam Lâm",
+   "văn bản tái định cư Khánh Hòa",
+   "công báo Khánh Hòa văn bản đất đai",
+   "quyết định giao đất cho thuê đất Khánh Hòa",
+   "văn bản nhà ở xã hội Khánh Hòa"
+  ],
+  "title": "Tra cứu văn bản pháp luật đất đai Khánh Hòa, Cam Lâm",
+  "description": "Tìm quyết định, nghị quyết về quy hoạch, bồi thường, tái định cư, giao đất, giá đất ở Khánh Hòa, Cam Lâm; lọc theo địa bàn, năm, cơ quan; xem và tải văn bản.",
+  "h1": "Tra cứu văn bản pháp luật nhà đất Khánh Hòa – Cam Lâm",
+  "gioiThieu": "Kho văn bản nhà đất được gom tự động từ Công báo tỉnh Khánh Hòa và cổng thông tin điện tử của tỉnh, các sở, các xã, phường, cập nhật nhiều lần mỗi ngày. Bạn gõ số hiệu hoặc vài chữ trong trích yếu, lọc theo chủ đề, địa bàn, thời gian, cơ quan ban hành rồi mở xem văn bản ngay trong trang.",
+  "tinhNang": [
+   "6 nhóm chủ đề: Quy hoạch; Bồi thường & tái định cư; Giao & thuê đất; Giấy chứng nhận; Định giá đất; Nhà ở xã hội.",
+   "Tìm theo số hiệu, trích yếu, cơ quan ban hành; gõ không dấu vẫn ra.",
+   "Lọc theo địa bàn (các xã, phường vùng Cam Lâm, Cam Ranh, Nha Trang, Diên Khánh; cấp tỉnh; trung ương), theo năm hoặc tháng ban hành, theo cơ quan ban hành.",
+   "Sắp xếp theo mới nhất hoặc được tải nhiều nhất.",
+   "Văn bản có tệp đính kèm thì mở xem ngay trong trang, xem được cả trên điện thoại, và tải tệp PDF về máy.",
+   "Tự cập nhật từ Công báo Khánh Hòa mỗi giờ và từ các cổng thông tin mỗi 6 giờ.",
+   "Danh bạ 25 cổng thông tin điện tử của tỉnh, sở ngành và xã, phường, có ô tìm nhanh."
+  ],
+  "cacBuoc": [
+   "Đăng nhập (miễn phí), mở Tra cứu văn bản.",
+   "Gõ số hiệu (ví dụ 205/QĐ-TTg) hoặc vài chữ trong trích yếu vào ô tìm.",
+   "Bấm ô chủ đề, chọn địa giới, thời gian hoặc cơ quan ban hành để thu hẹp kết quả.",
+   "Bấm biểu tượng PDF để xem văn bản ngay trong trang hoặc tải về."
+  ],
+  "hoiDap": [
+   {
+    "q": "Văn bản lấy từ đâu?",
+    "a": "Từ Công báo tỉnh Khánh Hòa, cổng thông tin điện tử của tỉnh, các sở ngành, các xã, phường và một số nguồn tra cứu công khai khác. Máy tự kiểm tra các nguồn định kỳ để thêm văn bản mới."
+   },
+   {
+    "q": "Văn bản trên web có thay được bản gốc không?",
+    "a": "Không. Đây là danh mục tham khảo; số hiệu và hiệu lực có thể đã được sửa đổi, bổ sung, nên trước khi làm thủ tục hãy đối chiếu bản gốc trên cổng của cơ quan ban hành."
+   },
+   {
+    "q": "Tìm văn bản bồi thường của một xã thế nào?",
+    "a": "Chọn chủ đề Bồi thường & Tái định cư, chọn xã ở ô Địa giới hành chính, rồi gõ thêm tên dự án vào ô tìm nếu cần."
+   },
+   {
+    "q": "Có phải đăng nhập không?",
+    "a": "Có. Kho văn bản là tiện ích dành cho thành viên; đăng ký tài khoản miễn phí, chỉ mất vài giây."
+   }
+  ],
+  "luuY": "Danh mục mang tính tham khảo; số hiệu, hiệu lực văn bản có thể đã thay đổi — luôn đối chiếu bản gốc trên cổng của cơ quan ban hành.",
+  "ten": "Tra cứu văn bản"
+ }
+]

@@ -17,6 +17,7 @@ const DISCOVER: [string, string][] = [
 ];
 const TOOLS: [string, string][] = [
   ['🧰 Tiện ích (tất cả công cụ)', '/tien-ich'],
+  ['Giới thiệu các công cụ nhà đất', '/cong-cu'],
   ['Bản đồ quy hoạch', '/map'],
   ['Chuyển tọa độ VN2000 ↔ WGS84', '/chuyen-doi-toa-do-vn2000'],
   ['Tra cứu QR thửa đất', '/qr'],

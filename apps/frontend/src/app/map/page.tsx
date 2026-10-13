@@ -999,11 +999,12 @@ export default function MapPage() {
     if (!x) return;
     setCap(x2 ? '2' : '3'); setC3(ma); setHuyenChon(x.huyen);
     // Danh mục xã về TRƯỚC khi bản đồ dựng xong → lệnh "vừa khung" gửi sớm bị MapView bỏ qua (nó chỉ nhận khi đã có bản đồ),
-    // rồi bước tự khớp khung vùng quy hoạch lúc mở còn ghi đè. Chờ bản đồ tải xong (__banDo.loaded) mới bay — không đụng lõi bản đồ.
+    // rồi bước tự khớp khung vùng quy hoạch lúc mở còn ghi đè. Chờ KIỂU BẢN ĐỒ nạp xong (isStyleLoaded — đúng mốc MapView khởi tạo lớp
+    // + tự khớp khung; ĐỪNG chờ loaded(): Chrome có lúc báo false mãi, xem ghi chú khoiTaoLop trong MapView) rồi mới bay.
     let lan = 0;
     const cho = () => {
       const bd = (window as any).__banDo;
-      if (bd && typeof bd.loaded === 'function' && bd.loaded()) { setTimeout(() => bayToiXa(x), 300); return; }
+      if (bd && typeof bd.isStyleLoaded === 'function' && bd.isStyleLoaded()) { setTimeout(() => bayToiXa(x), 400); return; }
       if (++lan < 80) setTimeout(cho, 250);
     };
     cho();

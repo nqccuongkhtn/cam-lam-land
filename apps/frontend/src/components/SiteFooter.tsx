@@ -18,6 +18,7 @@ const DISCOVER: [string, string][] = [
 const TOOLS: [string, string][] = [
   ['🧰 Tiện ích (tất cả công cụ)', '/tien-ich'],
   ['Bản đồ quy hoạch', '/map'],
+  ['Chuyển tọa độ VN2000 ↔ WGS84', '/chuyen-doi-toa-do-vn2000'],
   ['Tra cứu QR thửa đất', '/qr'],
   ['Giá đất khu vực & định giá', '/gia-dat'],
   ['Bảng giá đất Khánh Hòa', '/bang-gia-dat'],

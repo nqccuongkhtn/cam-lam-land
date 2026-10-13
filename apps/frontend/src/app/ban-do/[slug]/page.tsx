@@ -44,11 +44,12 @@ function meta(slug: string): { title: string; description: string; h1: string } 
     const c = t.x, h = huyenCuaXaCu(c);
     const vao = c.vao.map((v) => XA_MOI_THEO_ID.get(v.id)).filter(Boolean) as XaMoi[];
     const noi = vao.length ? noiDs(vao.map(tenMoi)) : 'xã mới';
-    const st = c.soTo[0];
+    const st = [...c.soTo].filter((r) => !(r.toCuTu === r.toMoiTu && r.toCuDen === r.toMoiDen)).sort((a, b) => b.soTo - a.soTo)[0];
+    const stMoi = st ? XA_MOI_THEO_ID.get(st.xaMoi) : null;
     return {
       h1: `${hoaDau(tenCu(c))}${h ? `, ${tenHuyen(h)}` : ''} (cũ)`,
       title: `${hoaDau(tenCu(c))}${h ? `, ${tenHuyen(h)}` : ''} (cũ) nay thuộc ${noi}`,
-      description: `${hoaDau(tenCu(c))}${h ? ` (${tenHuyen(h)} cũ, ${h.tinhCu})` : ''} ${c.vao[0]?.qua ? `nhập vào ${c.vao[0].qua}, từ 1/7/2025 thuộc` : `từ 1/7/2025 ${c.vao.some((v) => v.phan === 'mot-phan') ? 'được chia cho' : 'nhập vào'}`} ${noi}${c.vao[0]?.qua ? '' : ` theo ${NQ}`}.${st && !(st.toCuTu === st.toMoiTu && st.toCuDen === st.toMoiDen) ? ` Tờ bản đồ ${st.toCuTu}–${st.toCuDen} cũ nay là ${khoangTo(st.toMoiTu, st.toMoiDen)}.` : ''} Xem bản đồ địa chính, tra thửa đất.`,
+      description: `${hoaDau(tenCu(c))}${h ? ` (${tenHuyen(h)} cũ, ${h.tinhCu})` : ''} ${c.vao[0]?.qua ? `nhập vào ${c.vao[0].qua}, từ 1/7/2025 thuộc` : `từ 1/7/2025 ${c.vao.some((v) => v.phan === 'mot-phan') ? 'được chia cho' : 'nhập vào'}`} ${noi}${c.vao[0]?.qua ? '' : ` theo ${NQ}`}.${st ? ` ${hoaDau(khoangTo(st.toCuTu, st.toCuDen))} cũ nay là ${khoangTo(st.toMoiTu, st.toMoiDen)}${stMoi && vao.length > 1 ? ` của ${tenMoi(stMoi)}` : ''}.` : ''} Xem bản đồ địa chính, tra thửa đất.`,
     };
   }
   const h = t.x;
@@ -131,7 +132,7 @@ function TrangXaMoi({ m }: { m: XaMoi }) {
   const huyen = m.huyenCu.map((id) => HUYEN_THEO_ID.get(id)).filter(Boolean) as HuyenCu[];
   const lanCan = xaMoiCungKhuVuc(m);
   const nhaDat = camLamNhaDat(`xã ${m.ten}`);
-  const goc = m.donViGoc ? cu.find((g) => g.x.laGoc)?.x || null : null;
+  const goc = m.donViGoc ? cu.find((g) => g.x.laGoc && g.x.id === m.id)?.x || null : null;   // Cam Tân là gốc của Cam Hiệp, không phải của Cam Lâm
   const tongTo = m.soTo.length ? Math.max(...m.soTo.map((r) => r.toMoiDen)) : 0;
   const mo = `${ten} được thành lập từ ngày 1/7/2025 theo ${NQ}`;
   const cauGom = [
@@ -187,7 +188,7 @@ function TrangXaMoi({ m }: { m: XaMoi }) {
               const h = huyenCuaXaCu(x);
               return (
                 <li key={x.slug} className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 py-2 text-[14px]">
-                  <span><LkCu c={x} />{h && <span className="text-slate-500"> · <LkHuyen h={h} /></span>}{x.laGoc && <span className="ml-1.5 rounded-full bg-[#C8A14B]/15 px-2 py-0.5 text-[11.5px] font-semibold text-[#8a6d2a]">đơn vị gốc, giữ mã</span>}</span>
+                  <span><LkCu c={x} />{h && <span className="text-slate-500"> · <LkHuyen h={h} /></span>}{x.laGoc && x.id === m.id && <span className="ml-1.5 rounded-full bg-[#C8A14B]/15 px-2 py-0.5 text-[11.5px] font-semibold text-[#8a6d2a]">đơn vị gốc, giữ mã</span>}</span>
                   <span className={`text-[12.5px] font-semibold ${phan === 'toan-bo' ? 'text-emerald-700' : 'text-amber-700'}`}>{phan === 'toan-bo' ? 'toàn bộ' : 'một phần'}</span>
                 </li>
               );
@@ -208,7 +209,7 @@ function TrangXaMoi({ m }: { m: XaMoi }) {
             Sổ đỏ cấp trước sáp nhập vẫn ghi <b>số tờ cũ</b> — đối chiếu bảng dưới để biết số tờ mới.
           </p>
           <div className="mt-3 overflow-x-auto">
-            <table className="w-full min-w-[420px] text-left text-[13.5px] [font-variant-numeric:tabular-nums]">
+            <table className="w-full text-left text-[13.5px] [font-variant-numeric:tabular-nums]">
               <thead><tr className="border-b border-slate-200 text-[12px] uppercase tracking-wide text-slate-500"><th className="py-2 pr-3 font-semibold">Xã, phường cũ</th><th className="py-2 pr-3 font-semibold">Số tờ cũ</th><th className="py-2 pr-3 font-semibold">Số tờ mới</th><th className="py-2 font-semibold">Số tờ</th></tr></thead>
               <tbody>
                 {m.soTo.map((r, i) => (
@@ -324,7 +325,7 @@ function TrangXaCu({ c }: { c: XaCu }) {
         <section className={`mt-5 ${the}`}>
           <h2 className={h2}>Số tờ bản đồ {tenCu(c)} sau sáp nhập</h2>
           <ul className="mt-2 space-y-1.5 text-[14px] text-slate-700">
-            {c.soTo.map((r, i) => {
+            {[...c.soTo].sort((a, b) => b.soTo - a.soTo).map((r, i) => {
               const m = XA_MOI_THEO_ID.get(r.xaMoi);
               const giu = r.toCuTu === r.toMoiTu && r.toCuDen === r.toMoiDen;
               return (
@@ -382,7 +383,7 @@ function TrangHuyen({ h }: { h: HuyenCu }) {
       <section className={`mt-5 ${the}`}>
         <h2 className={h2}>Xã cũ nay thuộc xã, phường mới nào</h2>
         <div className="mt-3 overflow-x-auto">
-          <table className="w-full min-w-[420px] text-left text-[14px]">
+          <table className="w-full text-left text-[14px]">
             <thead><tr className="border-b border-slate-200 text-[12px] uppercase tracking-wide text-slate-500"><th className="py-2 pr-3 font-semibold">Trước 1/7/2025</th><th className="py-2 font-semibold">Nay thuộc</th></tr></thead>
             <tbody>
               {cu.map((x) => (

@@ -1654,7 +1654,7 @@ export default function TraCuuLuatPage() {
   const tongDieu = kho.reduce((s, x) => s + x.soDieu, 0);
 
   return (
-    <div className="mx-auto max-w-6xl px-3 pb-24 pt-3 sm:px-4 lg:pb-4 lg:pt-4">
+    <div className="mx-auto max-w-6xl px-3 pb-12 pt-3 sm:px-4 lg:pb-4 lg:pt-4">
       {/* Điện thoại: tên trang + số liệu gộp vào MỘT DÒNG. Máy tính vẫn để hai dòng như cũ. */}
       <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
         <h1 className="text-[16px] font-extrabold text-[#0A2540] sm:text-2xl">⚖️ Luật Đất đai</h1>
@@ -1667,8 +1667,39 @@ export default function TraCuuLuatPage() {
         {kho.length ? <><b className="text-[#0A2540]">{kho.length} văn bản</b> · <b className="text-[#0A2540]">{tongDieu} điều</b> · nguyên văn từ bản PDF ký số Công báo{dsTk.length ? <> · <b className="text-amber-700">{dsTk.length} văn bản tham khảo</b> (công văn hướng dẫn, giải đáp)</> : null}</> : 'Đang tải…'}
       </p>
 
-      {/* Màn hình điện thoại 390px không đủ cho 4 thẻ -> cho TRƯỢT NGANG, đừng để xuống
-          dòng thành hai hàng chen chúc. -mx-3 px-3 để vuốt được sát mép máy. */}
+      {/* ĐIỆN THOẠI: 5 THẺ NẰM ĐẦU TRANG (13/10/2026). Trước để thành thanh riêng DƯỚI ĐÁY, nhưng web đã có thanh menu
+          dưới đáy → mở trong Tiện ích là HAI THANH chồng nhau, ăn ~110px màn hình, nội dung bị chèn mất (chủ dự án khoanh
+          ảnh); mở thẳng trang thì thanh của web lại đè kín thanh này. Nay đáy màn hình chỉ còn MỘT thanh (của web, giữ
+          nút Tiện ích để đổi công cụ), 5 thẻ đưa lên đây, chia đều 5 cột nên không phải vuốt ngang. */}
+      <nav aria-label="Các phần của trang luật" className="-mx-3 mt-2 grid grid-cols-5 border-b border-slate-200 sm:-mx-4 lg:hidden">
+        {([['tinhhuong', '🧭', 'Tình huống', false],
+           ['luat', '⚖️', 'Toàn văn', false],
+           ['the', '🎴', 'Thẻ ôn', true],
+           ['sodo', '🧠', 'Sơ đồ', false],
+           ['danhmuc', '📚', 'Danh mục', false]] as const).map(([k, ic, nhan, dem]) => {
+          const dang = k === 'the' ? (the === 'sodo' && cheDoHoc === 'the')
+            : k === 'sodo' ? (the === 'sodo' && cheDoHoc === 'sodo') : the === k;
+          return (
+            <button key={k} aria-current={dang ? 'page' : undefined} onClick={() => {
+              if (k === 'the') { setThe('sodo'); setCheDoHoc('the'); }
+              else if (k === 'sodo') { setThe('sodo'); setCheDoHoc('sodo'); }
+              else setThe(k as typeof the);
+            }}
+              className={`relative flex flex-col items-center gap-0.5 pb-2 pt-1.5 text-[10.5px] font-semibold ${dang ? 'text-[#0A2540]' : 'text-slate-400'}`}>
+              <span className="text-[18px] leading-none">{ic}</span>
+              {nhan}
+              {dem && theHomNay.length > 0 && (
+                <span className="absolute right-[14%] top-0.5 rounded-full bg-rose-500 px-1 text-[9px] font-bold leading-[14px] text-white">
+                  {theHomNay.length}
+                </span>
+              )}
+              {dang && <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-[#0A2540]" />}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Máy tính: hàng nút tròn (điện thoại dùng hàng 5 cột ở trên). */}
       <div className="mt-3 -mx-3 hidden gap-1.5 overflow-x-auto px-3 pb-1 lg:flex [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {([['tinhhuong', '🧭 Tình huống'], ['luat', '⚖️ Toàn văn'],
            ['the', `🎴 Thẻ ôn tập${theHomNay.length ? ` (${theHomNay.length})` : ''}`],
@@ -1989,7 +2020,7 @@ export default function TraCuuLuatPage() {
                 };
                 // Thẻ CAO ĐẦY MÀN HÌNH như app học bài: trước đây thẻ nhỏ nằm trên cùng,
                 // bỏ trống hơn nửa màn hình phía dưới, mà nút "Xem đáp án" lại nằm tít trên
-                // cao — ngón cái với không tới. 100dvh trừ phần đầu trang và thanh đáy.
+                // cao — ngón cái với không tới. 100dvh trừ phần đầu trang, hàng 5 thẻ và thanh menu của web.
                 return (
                   <div className="mt-3 flex flex-col lg:block" style={{ minHeight: 'calc(100dvh - 210px)' }}>
                     <div className="flex flex-1 flex-col rounded-2xl border-2 border-slate-200 bg-white p-4">
@@ -3527,13 +3558,11 @@ export default function TraCuuLuatPage() {
         );
       })()}
 
-      {/* ── THANH ĐIỀU HƯỚNG DƯỚI ĐÁY — chỉ trên điện thoại ──
-          Ngón cái với tới được, không phải với lên đỉnh màn hình. Đây là cách mọi app
-          điện thoại làm, và là lý do bỏ hàng thẻ ở đầu trang đi. */}
-      {/* NÚT NỔI NHẢY CHỖ KHỚP (đợt 30) — chỉ khi đang tìm, đang đọc một điều có ≥ 2 chỗ tô vàng; nằm trên thanh thẻ ở điện thoại */}
+      {/* NÚT NỔI NHẢY CHỖ KHỚP (đợt 30) — chỉ khi đang tìm, đang đọc một điều có ≥ 2 chỗ tô vàng.
+          Điện thoại mở thẳng trang: nằm trên thanh menu dưới của web (54px). Trong khung Tiện ích (html.embed) thanh menu
+          nằm NGOÀI khung → hạ sát đáy. Từ 768px trở lên không có thanh dưới. (5 thẻ của trang đã lên đầu trang, 13/10/2026.) */}
       {the === 'luat' && tim.trim() && dieuDangXem && soMark >= 2 && (
-        <div className="fixed right-3 z-40 flex items-center gap-1 rounded-full border border-amber-300 bg-white/95 px-2 py-1 text-[12px] shadow-md backdrop-blur lg:bottom-5"
-          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 66px)' }}>
+        <div className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+66px)] right-3 z-40 flex items-center gap-1 rounded-full border border-amber-300 bg-white/95 px-2 py-1 text-[12px] shadow-md backdrop-blur md:bottom-5 [html.embed_&]:bottom-4">
           <span className="px-1 font-semibold text-amber-800" title="Chỗ khớp chữ tìm trong điều đang đọc">🔦 {viTriMark >= 0 ? viTriMark + 1 : '–'}/{soMark}</span>
           <button onClick={() => nhayMark(-1)} aria-label="Chỗ khớp trước"
             className="h-7 w-7 rounded-full border border-slate-200 text-[14px] font-bold text-[#0A2540]">‹</button>
@@ -3541,37 +3570,6 @@ export default function TraCuuLuatPage() {
             className="h-7 w-7 rounded-full border border-slate-200 text-[14px] font-bold text-[#0A2540]">›</button>
         </div>
       )}
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur lg:hidden"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-        <div className="mx-auto flex max-w-lg">
-          {([['tinhhuong', '🧭', 'Tình huống', false],
-             ['luat', '⚖️', 'Toàn văn', false],
-             ['the', '🎴', 'Thẻ ôn', true],
-             ['sodo', '🧠', 'Sơ đồ', false],
-             ['danhmuc', '📚', 'Danh mục', false]] as const).map(([k, ic, nhan, dem]) => {
-            const dang = k === 'the' ? (the === 'sodo' && cheDoHoc === 'the')
-              : k === 'sodo' ? (the === 'sodo' && cheDoHoc === 'sodo') : the === k;
-            return (
-              <button key={k} onClick={() => {
-                if (k === 'the') { setThe('sodo'); setCheDoHoc('the'); }
-                else if (k === 'sodo') { setThe('sodo'); setCheDoHoc('sodo'); }
-                else setThe(k as typeof the);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-                className={`relative flex flex-1 flex-col items-center gap-0.5 py-2 text-[10.5px] font-semibold ${dang ? 'text-[#0A2540]' : 'text-slate-400'}`}>
-                <span className="text-[19px] leading-none">{ic}</span>
-                {nhan}
-                {dem && theHomNay.length > 0 && (
-                  <span className="absolute right-[18%] top-1 rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white">
-                    {theHomNay.length}
-                  </span>
-                )}
-                {dang && <span className="absolute inset-x-4 top-0 h-0.5 rounded-full bg-[#0A2540]" />}
-              </button>
-            );
-          })}
-        </div>
-      </nav>
 
       {/* ── THẺ XEM NHANH ── nổi ngay dưới chỗ vừa bấm, đọc xong đóng lại là về chỗ cũ. */}
       {xemNhanh && (() => {

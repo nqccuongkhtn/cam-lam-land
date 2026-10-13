@@ -680,8 +680,9 @@ bật thì mới áp dụng giới hạn gói/thu phí đăng tin & đẩy tin.
 đầu `lib/packages.ts`, hoặc biến `VIDEO_PKG_PRICE`/`VIDEO_PKG_DAYS` trong `.env`.
 Giá = 0 nghĩa là **chưa công bố giá**: trang `/dichvu` hiện "Liên hệ", backend từ chối tạo đơn,
 admin cấp tay qua `POST /api/admin/users/:id/video` (`{ videoDays: 30 }` cấp, `{ videoDays: 0 }` thu hồi).
-Trang video tự chặn ở lớp bọc ngoài (`MapVideoPage` → `MapVideoTool`) nên khi chưa có quyền thì
-**công cụ không chạy chút nào** — không dựng bản đồ, không tải ảnh vệ tinh.
+Hiện trạng (đối chiếu mã 13/10/2026): ai **đã đăng nhập** cũng dựng được và **xem thử 8 giây đầu** (dấu "BẢN DÙNG THỬ",
+`THU_GIAY = 8` trong `MapVideoPage`); xem trọn và **tải video về** mới cần gói (`users.video_expires_at`) hoặc là admin. Logo riêng
+(Brand Kit) đang chỉ admin dùng được (`isPro = laAdmin`, có TODO mở cho gói trả phí).
 Lưu ý: video dựng **hoàn toàn trên máy khách**, không có endpoint máy chủ → đây là chặn ở giao diện.
 
 **Môi giới chuyên nghiệp** (`routes/moiGioiCn.ts`, 5/10/2026) — giống batdongsan.com.vn: trang xem tin hiện khung
@@ -969,6 +970,14 @@ Toàn bài vẫn nằm trong trang (Google đọc được, kéo khách), ngư�
 
 ## Những chỗ hay vấp
 
+- **Tiện ích Giá đền bù (`/den-bu`, `lib/denBuCamLam.ts`) — dữ liệu PHẢI bóc theo đúng ô bảng của bản Word Công báo**
+  (`scripts/den-bu/README.md`). 13/10/2026 chủ dự án báo "thiếu QĐ 12/2026": bộ bóc cũ đọc kiểu "tên – đơn vị – giá" ba dòng liền
+  nhau nên sót 126 dòng (cả mục Xây dựng mặt tiền nhà, 14 loại giếng…) và gắn nhầm tên nhóm. Nay: QĐ 08/2026 (ngày ký **22/01/2026**,
+  không phải 20/01) 180 dòng, QĐ 12/2026 315 dòng, **QĐ 35/2026 cây trồng, vật nuôi** 559 dòng + mật độ (thẻ ③). QĐ 32/2026 đã áp:
+  thưởng bàn giao Điều 15 (10% tổng, 1–8 triệu / dự án khoản 7 Điều 111: 5 + 3 triệu), tạm cư Điều 4, ổn định đời sống 70% Điều 6,
+  tỷ lệ 100/80/70% tài sản không đủ điều kiện Điều 10, cây vượt mật độ 80% Điều 11. Văn bản ghi số lạ thì KHÔNG tự sửa (vd mục 39.13
+  QĐ 12 "899.00" đã bỏ khỏi bảng, chờ hỏi Sở Xây dựng). Ngày ký QĐ 893 (quy hoạch sử dụng đất Cam Lâm) đang ghi hai cách trong mã:
+  `phieuQh.ts` 04/04/2025, `map/page.tsx` 04/4/2026 — chưa xác minh.
 - **Bản đồ trống / tin "đang tải" mãi** → backend chưa lên: `docker compose logs backend`.
 - **Không thấy lớp GIS nào** → xem worker: `docker compose logs gis-worker`, tìm dòng `imported ... features`.
 - **⚠️ Clone mới không có ảnh quy hoạch.** Trang bản đồ dùng `/tiles/qd205v11/{z}/{x}/{y}.png`, nhưng

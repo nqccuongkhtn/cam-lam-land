@@ -1,0 +1,119 @@
+# -*- coding: utf-8 -*-
+# Nan toa do CHUNG, tu nhan format nhan luoi: (a) 2 chu so viet tat, (b) km 3-4 so co the kem .0/.5,
+# (c) du met. Khop ben vung (RANSAC) nen bo duoc token doc sai.
+import sys, os, re
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import pymupdf, numpy as np
+import vn2000 as vn
+
+def cac_token(page):
+    out=[]
+    for w in page.get_text("words"):
+        t=w[4].strip()
+        if re.fullmatch(r"\d{1,7}", t):
+            out.append((int(t), t, (w[0]+w[2])/2, (w[1]+w[3])/2))
+    return out
+
+def gom_duong(toks, ngang, dungsai=7):
+    # gom token theo toa do vuong goc (y neu ngang, x neu doc) -> cac "duong" nhan
+    key=(lambda t:t[3]) if ngang else (lambda t:t[2])
+    sv=sorted(toks,key=key)
+    nhom=[]; cur=[sv[0]]
+    for t in sv[1:]:
+        if abs(key(t)-key(cur[-1]))<=dungsai: cur.append(t)
+        else: nhom.append(cur); cur=[t]
+    nhom.append(cur)
+    return nhom
+
+def phuc_hoi_gia_tri(line, ngang, tam_km):
+    # line: list token tren 1 duong. Tra list (pos, E_or_N_met).
+    pos=lambda t:(t[2] if ngang else t[3])
+    line=sorted(line,key=pos)
+    vals=[t[0] for t in line]
+    maxv=max(vals) if vals else 0
+    pts=[]
+    if maxv>=100000:              # DU MET: moi nhan 1 token
+        for t in line:
+            if t[0]>=100000: pts.append((pos(t), float(t[0])))
+    elif maxv>=100:               # KM (3-4 so), co the kem frac 0/500
+        km=[t for t in line if 100<=t[0]<=9999 and t[0] not in (500,)]
+        fr=[t for t in line if t[0] in (0,500)]
+        for t in km:
+            # tim frac gan ben phai
+            f=0
+            for ft in fr:
+                if 0<=pos(ft)-pos(t)<=55 and abs((t[3] if ngang else t[2])-(ft[3] if ngang else ft[2]))<40:
+                    f=ft[0]; break
+            pts.append((pos(t), t[0]*1000.0+f))
+    else:                          # VIET TAT 2 so: unwrap buoc 2
+        g=line
+        printed=[t[0] for t in g]; P=[pos(t) for t in g]
+        absv=[printed[0]]
+        for i in range(1,len(g)):
+            step=(printed[i]-printed[i-1])%100
+            absv.append(absv[-1]+(2 if step==2 else (-2 if step==98 else (printed[i]-printed[i-1]))))
+        mid=absv[len(absv)//2]
+        base=round((tam_km-mid)/100.0)*100
+        for p,a in zip(P,absv): pts.append((p,(a+base)*1000.0))
+    return pts
+
+def khop_ben_vung(pts):
+    pts=np.array(pts)
+    if len(pts)<4: return None
+    keep=np.ones(len(pts),bool); A=np.polyfit(pts[:,0],pts[:,1],1)
+    for _ in range(8):
+        pred=np.polyval(A,pts[:,0]); res=np.abs(pts[:,1]-pred)
+        thr=max(150.0, 4*np.median(res[keep])) if keep.any() else 150.0
+        keep=res<thr
+        if keep.sum()<4: break
+        A=np.polyfit(pts[keep,0],pts[keep,1],1)
+    pin=pts[keep]; pred=np.polyval(A,pin[:,0])
+    ss=np.sum((pin[:,1]-pred)**2); tot=np.sum((pin[:,1]-pin[:,1].mean())**2)
+    return A[0],A[1],(1-ss/tot if tot>0 else 0),int(keep.sum())
+
+def truc(toks, ngang, tam_m, dai):
+    # Moi "duong" (cum token cung y hoac cung x) TU KHOP rieng: chi nhan duong khop tot
+    # (R2>0.995, 80<pt/km<320) -> loai cac dong nhan rai trong than ban do.
+    nhom=gom_duong(toks, ngang)
+    good=[]
+    for line in nhom:
+        if len(line)<6: continue
+        pts=phuc_hoi_gia_tri(line, ngang, tam_m/1000.0)
+        if len(pts)<6: continue
+        ps=[p for p,_ in pts]
+        if max(ps)-min(ps) < 0.35*dai: continue
+        f=khop_ben_vung(pts)
+        if not f: continue
+        slope,inter,r2,nin=f
+        ppkm=abs(1000.0/slope) if slope!=0 else 0
+        if r2>0.995 and 80<ppkm<320 and nin>=6:
+            good.append(pts)
+    if not good: return None
+    allpts=[p for pts in good for p in pts]
+    return khop_ben_vung(allpts)
+
+def lap_phep_doi(pdf_path, tam_lng, tam_lat):
+    doc=pymupdf.open(pdf_path); page=doc[0]; W,H=page.rect.width,page.rect.height
+    E0,N0=vn.wgs84_to_vn2000(tam_lng,tam_lat)
+    toks=cac_token(page)
+    e=truc(toks, True,  E0, W); n=truc(toks, False, N0, H)
+    doc.close()
+    if not e or not n:
+        return None, None, dict(W=W,H=H, e=e, n=n, loi="khong khop du truc")
+    se,ie,r2e,ne=e; sn,inn,r2n,nn=n
+    def p2en(x,y): return (se*x+ie, sn*y+inn)
+    def p2w(x,y):
+        E,N=p2en(x,y); return vn.vn2000_to_wgs84(E,N)
+    info=dict(W=W,H=H,se=se,ie=ie,r2e=r2e,ne=ne,sn=sn,inn=inn,r2n=r2n,nn=nn,
+              ppkm_x=1000.0/se, ppkm_y=-1000.0/sn)
+    return p2en,p2w,info
+
+if __name__=="__main__":
+    pdf=sys.argv[1]; lng=float(sys.argv[2]); lat=float(sys.argv[3])
+    p2en,p2w,info=lap_phep_doi(pdf,lng,lat)
+    if not p2en: print("LOI:",info.get("loi"), "e=",info.get("e"),"n=",info.get("n")); sys.exit(1)
+    print(f"  E: {info['se']:.5f}*x+{info['ie']:.0f}  R2={info['r2e']:.7f} n={info['ne']} ({info['ppkm_x']:.3f}pt/km)")
+    print(f"  N: {info['sn']:.5f}*y+{info['inn']:.0f}  R2={info['r2n']:.7f} n={info['nn']} ({info['ppkm_y']:.3f}pt/km)")
+    W,H=info['W'],info['H']
+    for nm,(x,y) in [("tam",(W/2,H/2)),("TL",(0,0)),("BR",(W,H))]:
+        lo,la=p2w(x,y); print(f"  {nm}: lng={lo:.5f} lat={la:.5f}")

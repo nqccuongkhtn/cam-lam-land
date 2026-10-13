@@ -416,7 +416,11 @@ function buildHtml(o: PhieuOpts): string {
      phụ lục cuối lát bên phải — xếp các trang chồng mép lên nhau là ghép đủ con dấu, chứng minh các trang đi cùng
      một bộ (như đóng giáp lai trên giấy). Dùng đúng ảnh con dấu ở chỗ ký phiếu (dấu người dùng tải lên, không có
      thì dấu Cam Lâm Land). Lát dấu nằm NGOÀI khối .sheet (khối đó bị thu nhỏ cho vừa trang A4) nên trang nào
-     cũng đúng một cỡ, ghép mới khớp. Phiếu một trang thì không có giáp lai. */
+     cũng đúng một cỡ, ghép mới khớp. Phiếu một trang thì không có giáp lai.
+     ⛔ 13/10/2026 CHỦ DỰ ÁN CHỐT: giữ lát dấu cách mép phải 5 mm (xem .giaplai trong @media print), xếp lệch hở ~5 mm.
+     Đã thử và bỏ: sát mép (máy in cắt mất dấu), lùi 10 mm (hở rộng), kiểu dọc ở mép dưới (cũng hở — mép dưới máy chừa 4,6 mm),
+     chia lát giữ hình tròn (mất sọc). In bằng máy laser thì KHÔNG THỂ khít: chỗ nối nào cũng là mép tờ trên, dải mép máy không
+     in tới. Muốn khít chỉ có xén mép sau khi in / đóng dấu tay / máy in phun tràn lề — đừng thử lại các cách trên. */
   const soTrangIn = 1 + phuLuc.length;
   const giapLai = (k: number) => soTrangIn < 2 ? ''
     : `<div class="giaplai" style="--n:${soTrangIn};--k:${k}" aria-hidden="true"><img src="${logoSrc}" alt="" onerror="this.parentNode.style.display='none'"></div>`;

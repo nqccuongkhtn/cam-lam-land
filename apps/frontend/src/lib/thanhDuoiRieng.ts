@@ -14,7 +14,7 @@ import { useEffect } from 'react';
 export const SU_KIEN_THANH_RIENG = 'cl-thanh-duoi-rieng';
 export const SU_KIEN_MO_MENU_WEB = 'cl-mo-menu-web';
 
-/** Nút mở menu chính trên thanh riêng của trang — trang Luật dùng LOGO NHỎ ở đầu thanh (chủ dự án chọn 13/10/2026; trước đó
+/** Nút mở menu chính trên thanh riêng của trang — trang Luật dùng Ô ☰ HẸP ở cuối thanh (chủ dự án chọn 13/10/2026; trước đó
  *  hỏi: menu web nhường chỗ rồi thì đi Trang chủ / Nhà đất / Bản đồ / Tiện ích bằng gì?) → gọi thanh menu web TRỒI LÊN TẠM,
  *  đè lên thanh của trang; chạm ra ngoài là trượt xuống lại.
  *  Báo cả cửa sổ này (mở thẳng trang) lẫn trang mẹ (trong khung Tiện ích) — bên nào có thanh menu đang hiện thì bên đó nhận. */

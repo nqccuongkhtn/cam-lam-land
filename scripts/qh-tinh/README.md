@@ -56,26 +56,26 @@ python -P tiler2.py  ban-do.pdf  $TAM_LNG $TAM_LAT  ra/ranh.json  ra/tiles  tenl
 | TP Nha Trang | nhatrang2030v1 | `Portals/0/2022/Dat-dai/NhaTrang2030.pdf` | 1:27.000 |
 | Huyện Khánh Sơn | khanhson2030v1 | `Portals/0/2022/Dat-dai/KhanhSon2030.pdf` | 1:25.000 |
 | Huyện Vạn Ninh | vanninh2030v1 | `Portals/0/DCQH2030 VAN NINH.pdf` | 1:25.000 |
+| TP Cam Ranh | camranh2030v1 | `Portals/0/2022/Dat-dai/CamRanh2030.pdf` | 1:25.000 (nắn bằng dò lưới vector) |
 
 (Cam Lâm đã có sẵn QĐ205/893 + phân khu dựng từ CAD — không làm lại.)
 
-## CÒN VƯỚNG — 3 bản "nhãn lưới vẽ thành nét, không đọc được chữ"
-**Cam Ranh, Diên Khánh, Khánh Vĩnh** — `nan2.py` không nắn được vì:
-- Diên Khánh: toàn bộ chữ vẽ thành đường path (`get_text` ra 0 chữ).
-- Cam Ranh: chỉ còn vài nhãn là chữ, số bắc in XOAY DỌC.
-- Khánh Vĩnh: lẫn nhãn đường bình độ (1100/1200) + có ảnh JPEG nhúng.
-→ Cần nắn kiểu khác: **(a)** OCR nhãn lưới có xử lý xoay (tesseract có trong container backend, có `vie`),
-hoặc **(b)** nắn tay bằng QGIS (georeferencer, chọn điểm mốc trên lưới), hoặc **(c)** khớp hình thị xã
-trên bản đồ với ranh hành chính thật. PDF đã tải ở `scratchpad .../nguon/them/`.
+## CÁCH NẮN KHI NHÃN LƯỚI VẼ THÀNH NÉT (không đọc được chữ) — ĐÃ CHẠY ĐƯỢC cho Cam Ranh
+Vài bản (Cam Ranh, Diên Khánh, Khánh Vĩnh) in nhãn lưới dạng NÉT VẼ nên `nan2.py` không tự đọc được.
+Cách làm được (Cam Ranh thành công, R²=1,0, đúng 113,38 pt/km):
+1. **Render bản đồ, đọc BẰNG MẮT 1 nhãn lưới** ở góc (vd Cam Ranh đông 582.0 @ góc trái; Diên Khánh đông
+   574000, bắc 1372000) → suy phép nắn THÔ: `se=1000/113.386`, neo 1 điểm.
+2. `proof_manual.py <pdf> <se> <ie> <sn> <inn> <bbox> <z> <ra>` — ảnh thử THÔ. Nếu đã gần đúng (lệch < 1 km) → bước 3.
+3. `grid_vec.py <pdf> <se0> <ie0> <sn0> <inn0> <bước_km>` — dò **đường lưới trong NÉT VECTOR** (nét dài thẳng,
+   TRÁNH được nước biển vì nước là vùng tô, không phải nét), làm tròn về đúng giá trị lưới → **khớp chính xác**.
+4. Lưu kết quả vào file kèm `<pdf>.nan.json` `{"se":..,"ie":..,"sn":..,"inn":..}` → `nan2.py` tự đọc, cả
+   `ranh_tu_pdf.py` / `tiler2.py` / `proof.py` chạy như thường.
 
-**ĐÃ THỬ TỰ ĐỘNG CHO CAM RANH (đều hỏng, ghi lại để khỏi thử lại):**
-- OCR dải nhãn: nét quá mảnh + lẫn chữ "SƠ ĐỒ VỊ TRÍ…" của ô sơ đồ góc → đọc ra "40/860/900" thay vì "84.0/86.0/88.0".
-- Dò đường lưới cyan (`nan_luoi.py`): **NƯỚC BIỂN cũng màu cyan** như lưới → lẫn, ra 200 pt/km (sai, phải ~114,5).
-- **Số lưới Cam Ranh đọc bằng mắt (giúp nắn tay QGIS):** tỉ lệ **1:25.000** (~114,5 pt/km);
-  ĐÔNG (mép trên): `582.0 · 584.0 · 586.0 · 588.0 …` bước 2 km; BẮC (mép trái): `1330.0 …` bước 2 km.
-  Đường lưới dọc 582 km nằm quanh PDF x≈500 pt; đường ngang 1330 km quanh PDF y≈466 pt (ước lượng).
-  → Mở PDF trong QGIS, chọn 3–4 giao điểm lưới làm điểm mốc (vd (582000,1330000)…) là nắn xong.
-- `nan_luoi.py` dùng được khi dò được đúng đường lưới (không lẫn nước) — cần lọc nét mảnh/dài trước.
+**CÒN LẠI Diên Khánh + Khánh Vĩnh:** đường lưới KHÔNG phải nét dài đơn (grid_vec ra rỗng), dò cyan thì lẫn
+sông → tự động chưa chuẩn. **Nắn tay QGIS** (mở PDF, chọn 3–4 giao điểm lưới) là nhanh nhất. Số lưới đã biết:
+- Diên Khánh (1:25.000): đông 574000/576000/578000/580000/582000; bắc 1372000/1370000/1368000 (bước 2 km).
+- Khánh Vĩnh: còn lẫn nhãn bình độ 1100/1200 + ảnh JPEG nhúng — xem kỹ khi nắn.
+Nắn tay xong thì ghi `se/ie/sn/inn` vào `<pdf>.nan.json` rồi chạy `ranh_tu_pdf.py` + `tiler2.py` như Cam Ranh.
 
 ## Ninh Thuận cũ (nay thuộc Khánh Hòa) + cấp tỉnh
 Tên miền `ninhthuan.gov.vn` đã ngừng sau sáp nhập 1/7/2025, cổng Khánh Hòa chưa chuyển dữ liệu về.

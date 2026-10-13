@@ -806,9 +806,10 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   (khác chuỗi CAD ở trên). PDF là bản vẽ NÉT VECTOR có lưới km → `nan2.py` nắn theo số lưới (tự nhận
   nhiều kiểu ghi nhãn), `ranh_tu_pdf.py` tách ranh từ vùng màu, `tiler2.py` cắt tile khớp affine mỗi ô
   (ĐỪNG phóng lưới thô bằng cv2.resize — nhoè một dải). Đã lên web + kiểm: **Ninh Hòa (ninhhoa2030v2),
-  Nha Trang, Khánh Sơn, Vạn Ninh** — khai lớp trong `app/map/page.tsx` (`qh-ninhhoa2030`… bật là tự bay
-  tới, tile ở volume `camlam_tiles`). CÒN KHÓ: Cam Ranh/Diên Khánh/Khánh Vĩnh (nhãn lưới vẽ thành nét,
-  không đọc được chữ → cần OCR xoay hoặc nắn tay QGIS). Chi tiết `scripts/qh-tinh/README.md`.
+  Nha Trang, Khánh Sơn, Vạn Ninh, Cam Ranh** — khai lớp trong `app/map/page.tsx` (`qh-ninhhoa2030`… bật là
+  tự bay tới, tile ở volume `camlam_tiles`). Bản nào nhãn lưới vẽ thành NÉT (Cam Ranh) thì đọc tay 1 nhãn →
+  `grid_vec.py` dò đường lưới vector → lưu `<pdf>.nan.json`. CÒN KHÓ: Diên Khánh/Khánh Vĩnh (lưới không phải
+  nét đơn → nắn tay QGIS). Chi tiết `scripts/qh-tinh/README.md`.
   Lưu ý: 3 lớp mới CHỈ có ẢNH tile, CHƯA tích hợp tính quy hoạch theo thửa (phần đó vẫn chỉ Cam Lâm).
   Đã bỏ dòng "Quy hoạch chung 2045 (QĐ205)" khỏi bảng thông tin thửa (chủ dự án yêu cầu: QĐ205 là QH chung,
   chỉ có cho Cam Lâm cũ) — xem comment ở `trangQhCuaThua` trong `app/map/page.tsx`.

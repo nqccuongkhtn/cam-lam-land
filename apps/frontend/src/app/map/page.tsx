@@ -357,6 +357,11 @@ const RASTER_OVERLAYS = [
   { id: 'qh-vanninh2030', name: 'QHSDĐ 2030 huyện Vạn Ninh', url: '',
     tiles: ['/tiles/vanninh2030v1/{z}/{x}/{y}.png'], minzoom: 9, maxzoom: 16,
     coordinates: [[109.083, 12.871], [109.471, 12.871], [109.471, 12.536], [109.083, 12.536]] as [[number, number], [number, number], [number, number], [number, number]] },
+  // Cam Ranh: nhãn lưới vẽ thành nét (không đọc được chữ) → nắn bằng cách đọc tay 1 nhãn rồi dò ĐƯỜNG LƯỚI
+  // trong nét vector (tránh nước biển cùng màu cyan). Khớp R²=1,0, 113,38 pt/km. Xem scripts/qh-tinh/README.md.
+  { id: 'qh-camranh2030', name: 'QHSDĐ 2030 TP Cam Ranh', url: '',
+    tiles: ['/tiles/camranh2030v1/{z}/{x}/{y}.png'], minzoom: 9, maxzoom: 16,
+    coordinates: [[108.989, 12.032], [109.286, 12.032], [109.286, 11.801], [108.989, 11.801]] as [[number, number], [number, number], [number, number], [number, number]] },
 ];
 // MỤC CHỌN trên bảng "Bản đồ quy hoạch". Ba bản phân khu 1/2000 (QĐ2076 phía Bắc · QĐ2101 trung tâm ·
 // QĐ2222 ven biển · QĐ918 phức hợp phía Tây) là BỐN MẢNH CỦA CÙNG MỘT BỘ quy hoạch phân khu —
@@ -376,6 +381,7 @@ const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: s
   { id: 'qh-nhatrang2030', ten: 'QHSDĐ 2030 · TP Nha Trang', tenNgan: 'Nha Trang 2030', tenApp: 'QHSDĐ Nha Trang', gom: ['qh-nhatrang2030'], zBay: 12 },
   { id: 'qh-khanhson2030', ten: 'QHSDĐ 2030 · Huyện Khánh Sơn', tenNgan: 'Khánh Sơn 2030', tenApp: 'QHSDĐ Khánh Sơn', gom: ['qh-khanhson2030'], zBay: 11 },
   { id: 'qh-vanninh2030', ten: 'QHSDĐ 2030 · Huyện Vạn Ninh', tenNgan: 'Vạn Ninh 2030', tenApp: 'QHSDĐ Vạn Ninh', gom: ['qh-vanninh2030'], zBay: 11 },
+  { id: 'qh-camranh2030', ten: 'QHSDĐ 2030 · TP Cam Ranh', tenNgan: 'Cam Ranh 2030', tenApp: 'QHSDĐ Cam Ranh', gom: ['qh-camranh2030'], zBay: 11 },
 ];
 // CĂN CỨ PHÁP LÝ của từng bản quy hoạch đang chồng lên bản đồ.
 // Người xem hay hỏi "cái màu này dựa vào đâu?" — nên phải chỉ thẳng ra quyết định phê duyệt,
@@ -428,6 +434,9 @@ const CAN_CU_QH: Record<string, CanCu> = {
   'qh-vanninh2030': { so: '', ngay: '', coQuan: 'Sở Nông nghiệp và Môi trường tỉnh Khánh Hòa',
     ten: 'Bản đồ Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 — Huyện Vạn Ninh, tỉnh Khánh Hòa',
     tep: 'https://snnmt.khanhhoa.gov.vn/Portals/0/DCQH2030%20VAN%20NINH.pdf' },
+  'qh-camranh2030': { so: '', ngay: '', coQuan: 'Sở Nông nghiệp và Môi trường tỉnh Khánh Hòa',
+    ten: 'Bản đồ Quy hoạch sử dụng đất đến năm 2030 — TP Cam Ranh, tỉnh Khánh Hòa',
+    tep: 'https://snnmt.khanhhoa.gov.vn/Portals/0/2022/Dat-dai/CamRanh2030.pdf' },
 };
 
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
@@ -909,7 +918,7 @@ export default function MapPage() {
   // Ảnh PNG QĐ205 là lớp CHÍNH (đúng màu/ký hiệu gốc) — bật mặc định, hiển thị TRÊN lớp vector.
   // Hai lớp phân khu MẶC ĐỊNH TẮT: chúng nằm đè lên vùng QĐ205, bật sẵn cả ba thì màu chồng màu.
   // Người dùng tự tích vào mới hiện.
-  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd918': false, 'qh-cuhin': false, 'qh-taynam': false, 'qh-taybac': false, 'qh-qd893': false, 'qh-ninhhoa2030': false, 'qh-nhatrang2030': false, 'qh-khanhson2030': false, 'qh-vanninh2030': false });
+  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd918': false, 'qh-cuhin': false, 'qh-taynam': false, 'qh-taybac': false, 'qh-qd893': false, 'qh-ninhhoa2030': false, 'qh-nhatrang2030': false, 'qh-khanhson2030': false, 'qh-vanninh2030': false, 'qh-camranh2030': false });
   const [qhFillOn, setQhFillOn] = useState(false);        // TẮT mặc định — giống Guland: hiển thị bằng ẢNH raster. Bật tay nếu muốn lấp chỗ trống.
   // 'all' = gộp cả 3 kịch bản (phủ kín nhất). Từng kịch bản riêng lẻ chỉ phủ một phần.
   const [qhScenario, setQhScenario] = useState<'all' | 'HT' | '2030' | '2045'>('all');

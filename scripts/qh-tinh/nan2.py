@@ -93,6 +93,20 @@ def truc(toks, ngang, tam_m, dai):
     return khop_ben_vung(allpts)
 
 def lap_phep_doi(pdf_path, tam_lng, tam_lat):
+    # Phep nan NHAP TAY (cho ban nhan luoi ve thanh net, khong tu doc duoc): file ben canh <pdf>.nan.json
+    # chua {"se":..,"ie":..,"sn":..,"inn":..}. Co thi dung thang.
+    import json
+    side = pdf_path + ".nan.json"
+    if os.path.exists(side):
+        c=json.load(open(side,encoding="utf-8"))
+        se,ie,sn,inn=c["se"],c["ie"],c["sn"],c["inn"]
+        doc=pymupdf.open(pdf_path); W,H=doc[0].rect.width,doc[0].rect.height; doc.close()
+        def p2en(x,y): return (se*x+ie, sn*y+inn)
+        def p2w(x,y):
+            E,N=p2en(x,y); return vn.vn2000_to_wgs84(E,N)
+        info=dict(W=W,H=H,se=se,ie=ie,r2e=1.0,ne=c.get("ne",0),sn=sn,inn=inn,r2n=1.0,nn=c.get("nn",0),
+                  ppkm_x=1000.0/se, ppkm_y=-1000.0/sn, nhap_tay=True)
+        return p2en,p2w,info
     doc=pymupdf.open(pdf_path); page=doc[0]; W,H=page.rect.width,page.rect.height
     E0,N0=vn.wgs84_to_vn2000(tam_lng,tam_lat)
     toks=cac_token(page)

@@ -855,6 +855,9 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   sau đè lên (đúng thứ tự vẽ), không qua ảnh → không mất dải đường hẹp 2–3 m. 10 thửa đối chứng Nha Trang: 8 thửa đúng tên loại lệch
   0,1–3,0 % (kiểu ảnh cũ 0,5–12 %), 2 thửa đúng ranh nhưng chỉ ghi được "nhóm" (màu dùng chung). Mảng không còn điểm ảnh ở lượt 1 vẫn
   gán theo màu (trước để trống mà vẫn che mảng dưới). Chi tiết + số đo: `scripts/qh-tinh/README.md`.
+  **Diên Khánh KHÔNG có lớp chữ** (nhãn là hình, mỗi hình một chữ cái): `doc_nhan_hinh.py` gom chữ cái theo hình + bảng chữ người nhìn gán
+  (`nhan-hinh/bang-chu-dien-khanh.json`) → `boc_loai_dat.py --nhan-hinh=D:\KhoQH\qh-pdf\nhan-hinh-dienkhanh.json` — 7.701 nhãn mã, đọc
+  được cả chú giải; 2.845 ha lúa "nhóm" → LUC, nhóm công cộng tách TMD/DKV/DGD… Bóc lại Diên Khánh PHẢI kèm tuỳ chọn này.
   Máy chủ `lib/qhPdf.ts`: thửa NGOÀI Cam Lâm (không bản CAD nào phủ) nằm trong ranh bản nào thì tra bản đó, diện tích các loại
   chia lại cho cộng đúng bằng diện tích thửa, phần PDF không tô ghi "Chưa xác định loại đất"; hình thửa DỊCH về đúng chỗ trước khi
   chồng (độ trượt lớp `dia_chinh`, `LECH_DIA_CHINH` trong qhCompute.ts — y như phần Cam Lâm); mục `nguon:'pdf'` trong `qhCacBan`.

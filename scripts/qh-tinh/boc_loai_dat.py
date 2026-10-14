@@ -169,6 +169,21 @@ for b in pg.get_text('dict')['blocks']:
             a_do, a_den = phu_chu((x0, y0, x1, y1), GDO), phu_chu((x0, y0, x1, y1), GDEN)
             if a_do + a_den > 0.15 * max((x1 - x0) * (y1 - y0), 1e-6): do_ = a_do > a_den; so_do_hinh += 1
             nhan.append([t, cx, cy, do_, (y1 - y0) * S, (x1 - x0) * S, s['size']])
+# NHÃN VẼ BẰNG HÌNH (--nhan-hinh=<file.json>, 14/10/2026 khuya): bản KHÔNG có lớp chữ (Diên Khánh: 0 chữ, mọi nhãn là hình tô nhỏ, đỏ =
+# quy hoạch, đen = hiện trạng) → doc_nhan_hinh.py gom chữ cái theo hình dạng + bảng chữ người nhìn gán → [{t, do, bbox, cao}]. Dùng y như
+# nhãn chữ: trong ranh → nhãn; ngoài ranh → ứng viên chú giải (cỡ = chiều cao chữ, chú giải in to hơn nhãn). Màu lấy thẳng màu nét chữ.
+NHAN_HINH = next((a.split('=', 1)[1] for a in co if a.startswith('--nhan-hinh=')), None)
+if NHAN_HINH:
+    so_nh = 0
+    for w in json.load(open(NHAN_HINH, encoding='utf-8')):
+        t = w['t']
+        if t not in MA: continue
+        x0, y0, x1, y1 = w['bbox']; cx, cy = (x0 + x1) / 2 * S, (y0 + y1) / 2 * S
+        ix, iy = int(cx), int(cy)
+        if not (0 <= iy < Hp and 0 <= ix < Wp): continue
+        if not mask_ranh[iy, ix]: ngoai.append((t, cx, cy, w['cao'])); continue
+        nhan.append([t, cx, cy, bool(w['do']), (y1 - y0) * S, (x1 - x0) * S, w['cao']]); so_nh += 1
+    print(f'nhan ve bang hinh: {so_nh} trong ranh (tu {NHAN_HINH})')
 # CHÚ GIẢI = mã ngoài ranh có cỡ chữ TO hơn hẳn nhãn trên bản đồ (Cam Ranh: chú giải 5,1–5,5; nhãn 4,1–4,5).
 # Mã ngoài ranh cỡ chữ như nhãn = nhãn của huyện bên cạnh → bỏ (trước đọc lẫn nên màu đường giao thông ra 8 mã).
 co_nhan = sorted(n[6] for n in nhan)

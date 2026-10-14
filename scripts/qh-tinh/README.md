@@ -141,6 +141,16 @@ Vĩnh Phương: kiểu ảnh ghi 125,5 m² đường vì lấp chỗ ký hiệu 
 CHƯA LÀM: lô màu hồng cam công cộng (21 mã) không nhãn chỉ ra "nhóm"; thử thêm thửa ở Ninh Hòa (bản nhiều nét dày nhất: 17.847 nét
 trong suốt).
 
+### Bản KHÔNG có lớp chữ — nhãn vẽ bằng hình (Diên Khánh, 14/10/2026 khuya)
+PDF Diên Khánh có 0 chữ, 0 phông: mọi nhãn là hình tô nhỏ, MỖI HÌNH MỘT CHỮ CÁI (38.384 hình đen = hiện trạng, 21.531 hình đỏ = quy
+hoạch). Trước đó mọi vùng màu dùng chung ở Diên Khánh chỉ ghi "nhóm" và chú giải phải mượn bảng màu chuẩn. `doc_nhan_hinh.py`: vẽ mỗi
+chữ thành ảnh nhỏ, gom chữ giống nhau (cùng chữ cái thì hình y hệt) → người nhìn ảnh mẫu gán chữ in hoa (`nhan-hinh/bang-chu-dien-khanh.json`)
+→ ghép từ theo dòng → chỉ giữ mã hợp lệ → `boc_loai_dat.py … --nhan-hinh=<file>` (luật y như nhãn chữ: nhãn đỏ, nằm trong mảng, phân số
+lấy mã dưới). Kết quả: 7.701 nhãn mã (2.358 đỏ); đọc được CHÍNH khung chú giải (44 mã / 23 màu: lúa tách LUA #fffc82 · LUC #fffc8c · LUK
+#fffc96); 2.845 ha lúa "nhóm" → LUC, 558 ha → LUA; nhóm công cộng 1.174 ha → TMD 387 · DKV 180 · DGD 17,6 · DTT 16,2… (544 ha không có
+nhãn đỏ vẫn "nhóm"); phủ 94,4 → 94,7 %. Soi tay 4 vùng trên bản gốc: đúng cả 4 ("LUC/DGD" → DGD, "CLN/DKV" → DKV). Nhãn đã đọc lưu
+`D:\KhoQH\qh-pdf\nhan-hinh-dienkhanh.json`; bóc lại Diên Khánh nhớ thêm `--nhan-hinh=` file đó.
+
 ### Dữ liệu QHSDĐ DẠNG SỐ trên cổng GIS tỉnh (14/10/2026) — ĐỢT CŨ, chỉ để tham khảo / đo
 Cổng GIS chính thức `gis.khanhhoa.gov.vn` (mục "Tra cứu quy hoạch" `/public/8192/`, "Mời gọi đầu tư" `/public/8193/`) có dịch vụ ArcGIS
 công khai `…/ag/rest/public/get/Portal/QHSDD<Huyen>/MapServer/2` cho NhaTrang, CamRanh, DienKhanh, KhanhSon, CamLam (không có Ninh

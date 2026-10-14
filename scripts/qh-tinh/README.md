@@ -171,6 +171,18 @@ DXF: chủ dự án tự xuất 5 bản, Cam Hiệp Bắc xuất bằng `dgn_san
   quyết định ở `tai-lieu\`. `dua-len-web-14-10.sh` chép vào volume riêng `camlamgis_qh_rieng`; máy chủ `routes/qhRieng.ts` kiểm vé admin
   từng ô. ⚠️ MicroStation qua COM: không chạy 2 kịch bản cùng lúc; dùng `win32com.client.dynamic.Dispatch`.
 
+## BẢN VẼ KHÔNG CÓ LƯỚI, CÓ BẢNG TOẠ ĐỘ ĐIỂM RANH — `nan_theo_bang_ranh.py` (14/10/2026 tối)
+`python -P nan_theo_bang_ranh.py <tờ có bảng.pdf> <tờ cần nắn.pdf> <ra.nan.json> [ảnh soi] [--lop=net|to|ca] [--vung=x0,y0,x1,y1] [--ti-le=a,b]`
+— đọc bảng "TỌA ĐỘ" (số hiệu N1… + X bắc + Y đông, VN-2000) ở MỘT tờ (vd tờ hiện trạng), khớp đa giác đó với NÉT RANH đỏ của tờ khác
+(trượt hình dò tỷ lệ + xoay rồi ICP đồng dạng) → `"afin"`. Bẫy đã vấp ở phân khu 1/2000 Tây Nha Trang 2.2: nét đỏ mảnh là TIM ĐƯỜNG,
+nét ranh dày vẽ thành MẢNG TÔ đỏ thuần → `--lop=to`; góc phải có SƠ ĐỒ THU NHỎ cùng ranh (khớp nhầm ở 0,1 pt/m) → `--vung` khung bản
+đồ + `--ti-le=0.2,1.0`. Kết quả: bảng 50 điểm, 377,41 ha (thuyết minh 377,20), nét ranh dày ~8 m cách ranh bảng trung vị 2,1 m.
+## KIỂM Ô ẢNH ĐÃ CẮT — `kiem_o_luoi.py <thư mục ô> <z> <pdf.nan.json>`
+Đo ngay trên ô ảnh: mỗi vạch lưới km phải nằm đúng đường VN-2000 của nó (dò theo độ ĐỒNG MÀU dọc vạch, không cần biết màu vạch —
+dò "nét tối nhất" từng báo nhầm lệch 21 m vì vạch Nha Trang màu xanh lơ). 14/10 tối ở mức 17 (0,58 m/điểm ảnh): Nha Trang 15 vạch,
+Ninh Hòa 17, Khánh Sơn 24, Vạn Ninh 18, Cam Ranh 24, Diên Khánh 17 — lệch lớn nhất 0,29 m (nửa điểm ảnh). Khánh Vĩnh lưới in
+thành DẤU CỘNG ở giao điểm (không phải đường liền) nên công cụ này không đo được — soi giao điểm bằng mắt: trùng.
+
 - **ẢNH NÉT GẤP ĐÔI — `tiler3.py` (thay tiler2):** ô 512 điểm ảnh WebP (web vẫn khai tileSize 256 → điện thoại nét gấp đôi), MỖI MỨC
   PHÓNG VẼ LẠI TỪ PDF theo khối 4×4 ô bằng DisplayList (tiler2 lấy mẫu một ảnh lớn cho mọi mức → mức xa lấm tấm, mất nét mảnh),
   siêu lấy mẫu ×2 + gộp điểm ảnh với alpha nhân trước, toạ độ lưới 9×9 điểm chính xác mỗi ô (đúng cả nắn "luoi" gãy khúc).

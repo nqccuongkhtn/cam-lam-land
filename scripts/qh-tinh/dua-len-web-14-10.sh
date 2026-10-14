@@ -12,6 +12,11 @@
 set -euo pipefail
 # Git Bash tự đổi đối số dạng "/dest", "kho:/t" thành đường dẫn Windows (C:/Program Files/Git/dest) → docker cp / -v hỏng. Tắt:
 export MSYS_NO_PATHCONV=1
+# ...nhưng khi đó "/dev/null" cũng không được đổi → curl (bản Windows) không ghi được, báo lỗi 23 và set -e dừng kịch bản (đã vấp
+# 14/10 tối ở bước 7) → dùng thiết bị rỗng của Windows "NUL" khi chạy trong Git Bash.
+case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) RONG=NUL ;; *) RONG=/dev/null ;; esac
+# Chạy tiếp từ một bước (vd bước trước đã xong): --tu-buoc=7
+TU=1; for a in "$@"; do case "$a" in --tu-buoc=*) TU="${a#--tu-buoc=}" ;; esac; done
 cd "/d/Cam Lam gis" 2>/dev/null || cd "D:/Cam Lam gis"
 DC="docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.tunnel.yml"
 T="D:/KhoQH/tiles-qh"                 # bộ ô ảnh 7 lớp QHSDĐ (ổ D)
@@ -24,11 +29,13 @@ ANH="camlamgis-frontend:latest"       # ảnh có sẵn lệnh sh/find để tha
 psql_() { $DC exec -T postgis psql -v ON_ERROR_STOP=1 -U camlam -d camlam_gis "$@"; }
 dem_vol() { docker run --rm -v "$1":/t "$ANH" sh -c "find /t/$2 -type f 2>/dev/null | wc -l"; }
 
+if [ "$TU" -le 0 ]; then
 echo "[0/8] Kiểm đủ file trước khi làm…"
 for t in $MOI; do [ -d "$T/$t" ] || { echo "LỖI: thiếu bộ ô $T/$t"; exit 1; }; done
 for b in $BAN; do [ -s "$S/nap-$b.sql" ] || { echo "LỖI: thiếu file nạp $S/nap-$b.sql"; exit 1; }; done
 [ -s "$R/danh-sach.json" ] && [ -d "$R/tiles/qhct500-v1" ] && [ -d "$R/tai-lieu" ] || { echo "LỖI: thiếu dữ liệu lớp riêng ở $R"; exit 1; }
-
+fi
+if [ "$TU" -le 1 ]; then
 echo "[1/8] Chép 7 bộ ô ảnh mới vào kho ô ảnh của web (camlamgis_camlam_tiles) — chép sang tên tạm rồi mới đổi chỗ…"
 docker rm -f chep_tiles >/dev/null 2>&1 || true
 docker create --name chep_tiles -v camlamgis_camlam_tiles:/dest "$ANH" true >/dev/null
@@ -46,25 +53,29 @@ for t in $MOI; do
 done
 # đổi chỗ: bộ cũ cùng tên (nếu đã đưa lên trước đây theo phép nắn cũ) bị thay HẲN, không còn ô cũ lẫn vào
 for t in $MOI; do docker run --rm -v camlamgis_camlam_tiles:/t "$ANH" sh -c "rm -rf /t/$t && mv /t/$t.moi /t/$t"; done
-
+fi
+if [ "$TU" -le 2 ]; then
 echo "[2/8] Nạp quy hoạch theo thửa 7 huyện/thị (bóc lại theo phép nắn mới)…"
 for b in $BAN; do echo "   - $b"; psql_ -q < "$S/nap-$b.sql"; done
 psql_ -q < "$S/ten-ma-chu-giai.sql"
 psql_ -tA -c "SELECT '   ' || ban || ': ' || count(*) || ' vùng' FROM qh_pdf GROUP BY ban ORDER BY ban;"
-
+fi
+if [ "$TU" -le 3 ]; then
 echo "[3/8] Dựng lại máy chủ + giao diện (5–10 phút, web chập chờn ~10 giây lúc đổi)…"
 $DC up -d --no-deps --build backend frontend
 $DC restart nginx
 docker exec camlam_nginx sh -c 'rm -rf /var/cache/nginx/[0-9a-f]'      # CHỈ thư mục đệm 0-9a-f (CLAUDE.md: đừng xoá *)
-
+fi
+if [ "$TU" -le 4 ]; then
 echo "[4/8] Chờ web lên…"
 code=000
 for i in $(seq 1 90); do
-  code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost/api/health || true)
+  code=$(curl -s -o "$RONG" -w '%{http_code}' http://localhost/api/health || true)
   [ "$code" = 200 ] && break; sleep 4
 done
 echo "   /api/health → $code"; [ "$code" = 200 ] || { echo "LỖI: máy chủ chưa lên — xem: $DC logs --tail 80 backend"; exit 1; }
-
+fi
+if [ "$TU" -le 5 ]; then
 echo "[5/8] Chép lớp 1/500 CHÍNH THỨC (chỉ admin) vào volume riêng camlamgis_qh_rieng…"
 docker rm -f chep_rieng >/dev/null 2>&1 || true
 docker create --name chep_rieng -v camlamgis_qh_rieng:/dest "$ANH" true >/dev/null
@@ -77,31 +88,35 @@ n_may=$(find "$R/tiles/qhct500-v1" -type f -name '*.webp' | wc -l); n_web=$(dem_
 echo "   qhct500-v1: $n_web / $n_may ô"
 [ "$n_may" -eq "$n_web" ] || { echo "LỖI: chép thiếu ô lớp 1/500 — dừng"; exit 1; }
 docker run --rm -v camlamgis_qh_rieng:/t "$ANH" sh -c "rm -rf /t/tiles/qhct500-v1 && mv /t/tiles/qhct500-v1.moi /t/tiles/qhct500-v1 && ls /t /t/tai-lieu"
-
+fi
+if [ "$TU" -le 6 ]; then
 echo "[6/8] Bật tra quy hoạch theo thửa cho huyện/thị ngoài Cam Lâm (cờ qh_pdf_bat)…"
 psql_ -q -c "INSERT INTO app_flags(key) VALUES ('qh_pdf_bat') ON CONFLICT DO NOTHING;"
-
+fi
+if [ "$TU" -le 7 ]; then
 echo "[7/8] Kiểm thử trên web…"
 for t in $MOI; do
   f=$(cd "$T/$t" && find . -type f -name '*.webp' | sort | sed -n '1p' | sed 's|^\./||')
-  curl -s -o /dev/null -w "   ô $t/$f → %{http_code} %{content_type}\n" "http://localhost/tiles/$t/$f"
+  curl -s -o "$RONG" -w "   ô $t/$f → %{http_code} %{content_type}\n" "http://localhost/tiles/$t/$f"
 done
 # lớp riêng: KHÔNG đăng nhập phải bị chặn; vé giả phải bị chặn; ô không được nằm ở /tiles/ công khai
-c1=$(curl -s -o /dev/null -w '%{http_code}' http://localhost/api/qh-rieng/ve)
+c1=$(curl -s -o "$RONG" -w '%{http_code}' http://localhost/api/qh-rieng/ve)
 f=$(cd "$R/tiles/qhct500-v1" && find . -type f -name '*.webp' | sort | sed -n '1p' | sed 's|^\./||; s|\.webp$||')
-c2=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost/api/qh-rieng/o/qhct500-v1/$f?v=1.1.ve-gia")
-c3=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost/tiles/qhct500-v1/$f.webp")
+c2=$(curl -s -o "$RONG" -w '%{http_code}' "http://localhost/api/qh-rieng/o/qhct500-v1/$f?v=1.1.ve-gia")
+c3=$(curl -s -o "$RONG" -w '%{http_code}' "http://localhost/tiles/qhct500-v1/$f.webp")
 echo "   1/500 chỉ admin: xin vé khi chưa đăng nhập → $c1 (phải 401) · ô với vé giả → $c2 (phải 403) · tìm ở /tiles/ công khai → $c3 (phải 404)"
 [ "$c1" = 401 ] && [ "$c2" = 403 ] && [ "$c3" = 404 ] || { echo "LỖI: lớp 1/500 KHÔNG được chặn đúng — kiểm tra lại trước khi dùng"; exit 1; }
-# một thửa Diên Khánh (trong ranh bản QH) → phải có trang "Quy hoạch sử dụng đất 2030" (mã pdf-dienkhanh2030)
-diem=$(psql_ -tA -c "SELECT ST_X(c) || ',' || ST_Y(c) FROM (SELECT ST_PointOnSurface(d.geom) c FROM dia_chinh d, qh_pdf_ranh r WHERE r.ban = 'dienkhanh2030' AND d.geom && r.geom AND ST_Within(d.geom, r.geom) LIMIT 1) x;")
+# một thửa ĐÚNG xã của Diên Khánh (Diên Điền / Diên Thọ — ranh bản PDF lấn sang Cam Lâm / Nha Trang, thửa ở đó lấy bản CAD / Nha Trang) → phải có trang "Quy hoạch sử dụng đất 2030" (mã pdf-dienkhanh2030)
+diem=$(psql_ -tA -c "SELECT ST_X(c) || ',' || ST_Y(c) FROM (SELECT ST_PointOnSurface(d.geom) c FROM dia_chinh d JOIN dia_chinh_xa x ON x.xa_id = d.xa_id, qh_pdf_ranh r WHERE x.ten IN ('xã Diên Điền', 'xã Diên Thọ') AND r.ban = 'dienkhanh2030' AND d.geom && r.geom AND ST_Within(d.geom, r.geom) LIMIT 1) x;")
 lng=${diem%,*}; lat=${diem#*,}
 if curl -s "http://localhost/api/parcels/at?lng=$lng&lat=$lat" | grep -q 'pdf-dienkhanh2030'; then echo "   thửa Diên Khánh ($lng, $lat): CÓ quy hoạch theo thửa ✓"
 else echo "   CẢNH BÁO: thửa Diên Khánh ($lng, $lat) chưa ra quy hoạch theo thửa"; fi
-
+fi
+if [ "$TU" -le 8 ]; then
 echo "[8/8] Xoá các bộ ô cũ đã được thay + 1/500 dự thảo…"
 for t in $CU; do
   docker run --rm -v camlamgis_camlam_tiles:/t "$ANH" sh -c "[ -e /t/$t ] && rm -rf /t/$t && echo '   - đã xoá $t' || true"
 done
 docker run --rm -v camlamgis_camlam_tiles:/t "$ANH" sh -c 'du -sh /t; ls /t'
+fi
 echo "XONG — mở https://batdongsancamlam.dpdns.org/map (điện thoại: tải lại trang 1 lần). Lớp 1/500 chỉ hiện khi đăng nhập tài khoản admin."

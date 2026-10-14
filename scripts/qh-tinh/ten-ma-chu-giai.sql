@@ -46,3 +46,7 @@ UPDATE qh_pdf SET ten = 'Đất công trình công cộng, dịch vụ, sản xu
  WHERE ma LIKE 'NHOM:%' AND ten LIKE 'Nhóm đất chưa rõ loại%' AND string_to_array(substr(ma, 6), '/') <@ ARRAY['DBV','DCH','DDT','DDL','DGD','DKH',
    'DKV','DNL','DSH','DTS','DTT','DVH','DXH','DYT','PNK','SKC','SKK','SKN','SKS','SKX','TIN','TMD','TON','TSC','DSK','DCK','DRA','DNG','TSK',
    'CSK','SCC','SCT','CCC','DPC','DDD','DSN','DMT','DKT','DGT','DTL','DCT','DHT','PNN'];
+
+-- Nhóm RSN/RSX (màu xanh lá #b4ffb4 chú giải dùng cho RSX và RSN — RSN là "Trong đó: đất rừng sản xuất là rừng tự nhiên", tức MỘT PHẦN
+-- của RSX) → CHẮC CHẮN là đất rừng sản xuất; tên cũ "Đất rừng (chưa ghi rõ loại rừng)" mơ hồ hơn điều bản đồ nói (15/10/2026).
+UPDATE qh_pdf SET ten = 'Đất rừng sản xuất (bản vẽ chưa ghi rõ có phải là rừng tự nhiên)' WHERE ma IN ('NHOM:RSN/RSX', 'NHOM:RSX/RSN');

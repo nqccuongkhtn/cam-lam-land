@@ -374,6 +374,20 @@ for k in range(1, so_mang + 1):
 print(f'net day trong suot (ranh gioi, duong day…): {len(trong_suot)}')
 print(f'{so_mang} mang; trong ranh: {co_nhan_} theo nhan, {theo_mau_mot} theo mau mot ma ({len(mau_mot_ma)} mau), '
       f'{nhom} mau dung chung ghi NHOM, {bo_trong} de "chua xac dinh"')
+if '--thong-ke-den' in co:
+    # CHỈ ĐẾM, KHÔNG ĐỔI KẾT QUẢ (15/10/2026, chờ chủ dự án quyết): vùng "nhóm" (màu dùng chung) KHÔNG có nhãn đỏ hợp lệ nhưng CÓ nhãn ĐEN
+    # đứng một mình (đã bỏ mã trên của phân số) mang mã thuộc đúng tập mã của màu → theo quy ước bản đồ là đất GIỮ NGUYÊN loại hiện trạng.
+    px_m2 = (m_moi_pt / S) ** 2
+    dt_den = collections.Counter(); so_den = 0
+    for p, ds in nhan_mang.items():
+        if not bang[p] or not ds_ma[bang[p] - 1].startswith('NHOM:'): continue
+        tap = set(ds_ma[bang[p] - 1][5:].split('/'))
+        den = [t for t, do_ in ds if not do_ and t in tap]
+        if den: so_den += 1; dt_den[collections.Counter(den).most_common(1)[0][0]] += so_px[p] * px_m2
+    tong_nhom = sum(int(so_px[p]) for p in range(1, so_mang + 1) if bang[p] and ds_ma[bang[p] - 1].startswith('NHOM:')) * px_m2
+    print(f'THONG KE CHU DEN: {so_den} mang nhom co chu den cung nhom mau = {sum(dt_den.values()) / 1e4:.1f} ha / {tong_nhom / 1e4:.1f} ha nhom; '
+          f'ma: {[(m, round(v / 1e4, 1)) for m, v in dt_den.most_common(12)]}')
+    sys.exit(0)
 loai1 = bang[pimg]
 _tr = collections.Counter()
 for q in np.unique(pimg[(loai1 == 0) & (pimg > 0)]): _tr[mau_mang[q]] += int(so_px[q])
@@ -414,6 +428,8 @@ TEN.update({'LUA': 'Đất trồng lúa', 'LUK': 'Đất trồng lúa nước c�
 # (quy tắc ten-loai-dat.json).
 # Tên NHÓM (màu chú giải dùng chung nhiều mã): chỉ đặt tên khi MỌI mã trong nhóm cùng một họ; ngoài ra liệt kê mã.
 HO = [({'LUA', 'LUC', 'LUK', 'LUN'}, 'Đất trồng lúa'),
+      # RSN là MỘT PHẦN của RSX (chú giải: "Trong đó: Đất rừng sản xuất là rừng tự nhiên") → nhóm RSN/RSX CHẮC CHẮN là rừng sản xuất
+      ({'RSX', 'RSN'}, 'Đất rừng sản xuất (bản vẽ chưa ghi rõ có phải là rừng tự nhiên)'),
       ({'RSX', 'RSN', 'RPH', 'RDD', 'RST', 'RSM', 'LNP'}, 'Đất rừng (bản vẽ chưa ghi rõ loại rừng)'),
       # nhóm chỉ gồm mặt nước chuyên dùng / ven biển (Nha Trang: MNC + MVK cùng màu) — đừng gọi là "thuỷ lợi, sông suối, nuôi trồng"
       ({'MNC', 'TVC', 'MCS', 'MVB', 'MBV', 'MVT', 'MVK', 'MVR'}, 'Mặt nước chuyên dùng hoặc mặt nước ven biển (bản vẽ chưa ghi rõ loại)'),

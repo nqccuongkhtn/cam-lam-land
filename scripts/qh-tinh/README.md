@@ -155,6 +155,16 @@ nhãn đỏ vẫn "nhóm"); phủ 94,4 → 94,7 %. Soi tay 4 vùng trên bản g
 PNN / OTC / CQA / DSN…) → nhãn của chúng bị bỏ. Đã thêm vào danh sách mã (`boc_loai_dat.py` MA, `doc_nhan_hinh.py` MA_HOP_LE) + tên chép
 NGUYÊN VĂN cột "Tên loại đất" của chú giải Diên Khánh; tên RIÊNG cho bản Diên Khánh (vd LUC "Đất chuyên trồng lúa", NTD "…; đất cơ sở lưu
 trữ tro cốt") đặt trong `ten-ma-chu-giai.sql` (bản trong kho mã; chép sang `D:\KhoQH\qh-pdf\` để bước 2 của dua-len-web tự chạy).
+Vì sao quan trọng: mã QUY HOẠCH (đỏ, dưới phân số) không có trong danh sách thì nhãn bị bỏ → phân số không nhận ra → mã HIỆN TRẠNG (trên)
+còn lại một mình bị lấy làm loại đất. Đo được: Ninh Hòa 73 ha "CSD / CNT" từng ghi CSD (chưa sử dụng) — nay CNT; Khánh Vĩnh 226 ha ghi
+CLN / HNK / RSX (hiện trạng) — nay CNT; Nha Trang 718 ha mặt biển ven bờ (nhãn đỏ MVK) từng ghi MNC "ao hồ chuyên dùng" — nay MVK
+"Đất mặt nước ven biển có mục đích khác" (tên chép chú giải Nha Trang), 26 ha DHT "Đất phát triển hạ tầng cấp quốc gia, cấp tỉnh, cấp huyện,
+cấp xã" (tên chép chú giải Vạn Ninh). Soi tận mắt trên bản gốc từng loại: đúng. Quét chữ 7 bản: mã 3 chữ còn lạ (KDL khu du lịch, KDC, TDP
+chữ TRẮNG ẩn ở Ninh Hòa, RPT / RDT nhãn hiện trạng đen ở Khánh Sơn…) không phải loại đất quy hoạch.
+**Chú giải HAI CỘT "Hiện trạng | Quy hoạch"** (Thông tư 08/2024): cột Quy hoạch ghi mã ĐỎ trong ô màu quy hoạch; nhóm chưa sử dụng (MCS…)
+có màu ở cột Hiện trạng nhưng ô Quy hoạch để TRẮNG → đọc cả hai cột thì màu xanh hồ chứa bị gán thêm MCS (178 ha hồ thành "nhóm"). Nhãn
+hình có mã đỏ ngoài ranh → chỉ lấy mã đỏ. **Tên NHÓM** của Thông tư 08 (TVC, CCC, CSK, CHN, CQA…) hay tô cùng màu mã con: màu chỉ gồm tên
+nhóm + đúng một mã cụ thể thì là mã cụ thể đó (`TEN_NHOM_TT08`).
 
 ### Dữ liệu QHSDĐ DẠNG SỐ trên cổng GIS tỉnh (14/10/2026) — ĐỢT CŨ, chỉ để tham khảo / đo
 Cổng GIS chính thức `gis.khanhhoa.gov.vn` (mục "Tra cứu quy hoạch" `/public/8192/`, "Mời gọi đầu tư" `/public/8193/`) có dịch vụ ArcGIS

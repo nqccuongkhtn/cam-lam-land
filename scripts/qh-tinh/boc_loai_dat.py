@@ -136,7 +136,9 @@ MA = set(("ODT ONT LUA LUC LUK LUN BHK NHK HNK CLN RSX RPH RDD RSN RST RSM NTS L
           "SKS SKX TMD DGT DTL DNL DBV DVH DYT DGD DTT DSH DKV DRA DCH DDT DDL TON TIN NTD SON MNC PNK CSD BCS DCS NCS "
           "DNG DKH DXH DSK DCK MVB MBV TSK "
           # mã Thông tư 08/2024/TT-BTNMT (chú giải bản Diên Khánh QĐ 1564/2025 — đọc 14/10/2026 khuya)
-          "CNT DDD DPC CSK SCC SCT CCC DCT TVC CGT MCS NNP CHN PNN OTC CQA DSN DMT DKT LNP").split())
+          "CNT DDD DPC CSK SCC SCT CCC DCT TVC CGT MCS NNP CHN PNN OTC CQA DSN DMT DKT LNP "
+          # mã cũ có trong chú giải Nha Trang / Vạn Ninh (đọc 14/10/2026 khuya): phát triển hạ tầng, mặt nước ven biển
+          "DHT MVT MVK MVR").split())
 nhan = []   # [ma, cx, cy, do, cao, rong, co_chu] theo điểm ảnh lượt 1
 chu_giai = collections.defaultdict(collections.Counter)
 ngoai = []   # mã NGOÀI ranh: chú giải + nhãn của phần đất huyện bên cạnh (nếu bản vẽ có tô) → phải tách
@@ -176,16 +178,22 @@ for b in pg.get_text('dict')['blocks']:
 # nhãn chữ: trong ranh → nhãn; ngoài ranh → ứng viên chú giải (cỡ = chiều cao chữ, chú giải in to hơn nhãn). Màu lấy thẳng màu nét chữ.
 NHAN_HINH = next((a.split('=', 1)[1] for a in co if a.startswith('--nhan-hinh=')), None)
 if NHAN_HINH:
-    so_nh = 0
+    so_nh = 0; ngoai_hinh = []
     for w in json.load(open(NHAN_HINH, encoding='utf-8')):
         t = w['t']
         if t not in MA: continue
         x0, y0, x1, y1 = w['bbox']; cx, cy = (x0 + x1) / 2 * S, (y0 + y1) / 2 * S
         ix, iy = int(cx), int(cy)
         if not (0 <= iy < Hp and 0 <= ix < Wp): continue
-        if not mask_ranh[iy, ix]: ngoai.append((t, cx, cy, w['cao'])); continue
+        if not mask_ranh[iy, ix]: ngoai_hinh.append((t, cx, cy, w['cao'], bool(w['do']))); continue
         nhan.append([t, cx, cy, bool(w['do']), (y1 - y0) * S, (x1 - x0) * S, w['cao']]); so_nh += 1
-    print(f'nhan ve bang hinh: {so_nh} trong ranh (tu {NHAN_HINH})')
+    # Chú giải HAI CỘT "Hiện trạng | Quy hoạch" (Diên Khánh, Thông tư 08/2024): cột Quy hoạch ghi mã ĐỎ trong ô màu QUY HOẠCH; cột Hiện trạng
+    # ghi mã đen trong ô màu HIỆN TRẠNG — nhóm đất chưa sử dụng (MCS, CSD, BCS, DCS, CGT) có màu ở cột Hiện trạng nhưng ô Quy hoạch để TRẮNG.
+    # Đọc cả hai cột thì màu xanh mặt nước #b4ffff bị gán thêm MCS → 178 ha hồ chứa thành "nhóm". Có mã đỏ ngoài ranh → chỉ lấy mã đỏ.
+    co_do_ngoai = any(x[4] for x in ngoai_hinh)
+    ngoai += [(t, cx, cy, sz) for t, cx, cy, sz, do_ in ngoai_hinh if do_ or not co_do_ngoai]
+    print(f'nhan ve bang hinh: {so_nh} trong ranh, {len(ngoai_hinh)} ngoai ranh'
+          f'{" (chu giai: chi lay ma DO = cot Quy hoach)" if co_do_ngoai else ""} (tu {NHAN_HINH})')
 # CHÚ GIẢI = mã ngoài ranh có cỡ chữ TO hơn hẳn nhãn trên bản đồ (Cam Ranh: chú giải 5,1–5,5; nhãn 4,1–4,5).
 # Mã ngoài ranh cỡ chữ như nhãn = nhãn của huyện bên cạnh → bỏ (trước đọc lẫn nên màu đường giao thông ra 8 mã).
 co_nhan = sorted(n[6] for n in nhan)
@@ -247,8 +255,13 @@ for col, cc in theo_mau.items():
     top, n = cc.most_common(1)[0]; tong = sum(cc.values())
     if tong >= 5 and n / tong >= 0.85: mau_mot_ma[col] = top
 tu_chu_giai = 0
+# TÊN NHÓM trong chú giải Thông tư 08/2024 (dòng tiêu đề nhóm, hay tô CÙNG màu với mã con duy nhất của nó: Diên Khánh "TVC — Đất có mặt
+# nước chuyên dùng" cùng màu MNC) → màu chỉ gồm tên nhóm + đúng MỘT mã cụ thể thì là mã cụ thể đó (không phải màu dùng chung).
+TEN_NHOM_TT08 = {'NNP', 'CHN', 'LNP', 'PNN', 'OTC', 'CQA', 'DSN', 'CSK', 'SCC', 'CCC', 'TVC', 'CSD'}
 for col, cc in chu_giai.items():
+    cu_the = [m for m in cc if m not in TEN_NHOM_TT08]
     if len(cc) == 1: mau_mot_ma[col] = next(iter(cc)); tu_chu_giai += 1
+    elif len(cu_the) == 1: mau_mot_ma[col] = cu_the[0]; tu_chu_giai += 1
     elif col in mau_mot_ma: del mau_mot_ma[col]
 # Màu bản vẽ hay LỆCH ô mẫu chú giải (Cam Ranh: lúa #fffc8c ↔ #fffc82 = 324 ha; Khánh Vĩnh: CLN #ffd2a0 ↔ #ffd7aa) →
 # "GẦN NHẤT RÕ RÀNG": lệch ≤ 25 (tổng |ΔR|+|ΔG|+|ΔB|) VÀ màu chú giải gần thứ hai mà ghi MÃ KHÁC xa gấp ≥ 1,8 lần.
@@ -391,16 +404,19 @@ TEN.update({'LUA': 'Đất trồng lúa', 'LUK': 'Đất trồng lúa nước c�
             'DCT': 'Đất công trình cấp nước, thoát nước', 'DPC': 'Đất công trình phòng, chống thiên tai',
             'DDD': 'Đất có di tích lịch sử - văn hóa, danh lam thắng cảnh, di sản thiên nhiên', 'TVC': 'Đất có mặt nước chuyên dùng',
             'CGT': 'Đất do Nhà nước thu hồi theo quy định của pháp luật đất đai chưa giao, chưa cho thuê',
-            'MCS': 'Đất có mặt nước chưa sử dụng'})
+            'MCS': 'Đất có mặt nước chưa sử dụng',
+            # tên chép từ CHÚ GIẢI: DHT — bản Vạn Ninh (QĐ 701/2024); MVK — bản Nha Trang (QĐ 2978/2022). MVT, MVR: chú giải không ghi tên → giữ mã
+            'DHT': 'Đất phát triển hạ tầng cấp quốc gia, cấp tỉnh, cấp huyện, cấp xã',
+            'MVK': 'Đất mặt nước ven biển có mục đích khác'})
 # mã không có trong bảng (vd RST, MVB, TSK — chú giải các bản không ghi tên, Thông tư 08/2024 cũng không có) thì GIỮ NGUYÊN MÃ — không tự đặt tên
 # (quy tắc ten-loai-dat.json).
 # Tên NHÓM (màu chú giải dùng chung nhiều mã): chỉ đặt tên khi MỌI mã trong nhóm cùng một họ; ngoài ra liệt kê mã.
 HO = [({'LUA', 'LUC', 'LUK', 'LUN'}, 'Đất trồng lúa'),
       ({'RSX', 'RSN', 'RPH', 'RDD', 'RST', 'RSM', 'LNP'}, 'Đất rừng (bản vẽ chưa ghi rõ loại rừng)'),
-      ({'DTL', 'NTS', 'SON', 'MNC', 'MVB', 'MBV', 'TVC', 'DCT'}, 'Mặt nước – thuỷ lợi, sông suối hoặc nuôi trồng thuỷ sản (bản vẽ chưa ghi rõ)'),
+      ({'DTL', 'NTS', 'SON', 'MNC', 'MVB', 'MBV', 'TVC', 'DCT', 'MVT', 'MVK', 'MVR'}, 'Mặt nước – thuỷ lợi, sông suối hoặc nuôi trồng thuỷ sản (bản vẽ chưa ghi rõ)'),
       ({'DBV', 'DCH', 'DDT', 'DDL', 'DGD', 'DKH', 'DKV', 'DNL', 'DSH', 'DTS', 'DTT', 'DVH', 'DXH', 'DYT', 'PNK', 'SKC', 'SKK',
         'SKN', 'SKS', 'SKX', 'TIN', 'TMD', 'TON', 'TSC', 'DSK', 'DCK', 'DRA', 'DNG', 'TSK',
-        'CSK', 'SCC', 'SCT', 'CCC', 'DPC', 'DDD', 'DSN', 'DMT', 'DKT', 'DGT', 'DTL', 'DCT'},
+        'CSK', 'SCC', 'SCT', 'CCC', 'DPC', 'DDD', 'DSN', 'DMT', 'DKT', 'DGT', 'DTL', 'DCT', 'DHT'},
        'Đất công trình công cộng, dịch vụ, sản xuất (bản vẽ chưa ghi rõ loại)')]
 def ten_ma(m):
     if not m.startswith('NHOM:'): return TEN.get(m, m)

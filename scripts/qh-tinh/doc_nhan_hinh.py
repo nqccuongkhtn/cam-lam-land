@@ -191,7 +191,9 @@ if doc:
           "SKS SKX TMD DGT DTL DNL DBV DVH DYT DGD DTT DSH DKV DRA DCH DDT DDL TON TIN NTD SON MNC PNK CSD BCS DCS NCS "
           "DNG DKH DXH DSK DCK MVB MBV TSK "
           # mã Thông tư 08/2024/TT-BTNMT (chú giải bản Diên Khánh QĐ 1564/2025 — đọc 14/10/2026 khuya)
-          "CNT DDD DPC CSK SCC SCT CCC DCT TVC CGT MCS NNP CHN PNN OTC CQA DSN DMT DKT LNP").split())
+          "CNT DDD DPC CSK SCC SCT CCC DCT TVC CGT MCS NNP CHN PNN OTC CQA DSN DMT DKT LNP "
+          # mã cũ có trong chú giải Nha Trang / Vạn Ninh (đọc 14/10/2026 khuya): phát triển hạ tầng, mặt nước ven biển
+          "DHT MVT MVK MVR").split())
     ma = []; dem_ma = collections.Counter(); bo = collections.Counter()
     for w in ra_ds:
         t = w['t']; x0, y0, x1, y1 = w['bbox']

@@ -73,6 +73,9 @@ hinh = [None]                                    # hình từng mảng (điểm 
 hop = [(0, 0, 0, 0)]                             # khung bao từng mảng (điểm PDF)
 so_mang = 0
 glyph_do, glyph_den = [], []                     # khung (điểm PDF) các mảng tô nhỏ cỡ chữ màu ĐỎ / ĐEN = nét chữ của nhãn
+S_LO = 0.5                                       # ảnh mã mảng CHỈ GỒM MẢNG TÔ (không nét), 0,5 điểm ảnh / điểm PDF — để dò viền hồng ranh huyện
+H_LO, W_LO = int(round(H * S_LO)) + 1, int(round(W * S_LO)) + 1
+idlo = np.zeros((H_LO, W_LO), np.int32)
 def ma24(k): return (k >> 16, (k >> 8) & 255, k & 255)
 for dr in pg.get_drawings():
     if dr.get('color') is not None:
@@ -104,6 +107,11 @@ for dr in pg.get_drawings():
         if r_.width < 20 and r_.height < 20: (glyph_do if col == (255, 0, 0) else glyph_den).append((r_.x0, r_.y0, r_.x1, r_.y1))
         continue
     if min(col) > 245: continue                        # trắng (nền)
+    # (15/10/2026) XANH DƯƠNG THUẦN #0000ff cỡ chữ = nét chữ mã hiện trạng / vạch phân số / ký hiệu của NHÃN (Khánh Sơn 2.577 hình, Vạn Ninh
+    # 797, Diên Khánh 478; hình lớn nhất 14,8 điểm in; không bản nào dùng #0000ff làm màu loại đất). Trước thành mảng "chưa xác định" vẽ
+    # SAU nên CHE đất bên dưới → thửa nằm dưới nhãn mất cả trăm m² (Thửa 430 · Tờ 6 Suối Hiệp: vạch xanh che 549 / 831 m² thành "chưa xác
+    # định", đất thật bên dưới là CLN + đường). Nay bỏ qua như nét chữ đen / đỏ.
+    if col == (0, 0, 255) and dr['rect'].width < 20 and dr['rect'].height < 20: continue
     vong, cur, last = [], [], None
     for it in dr['items']:
         k = it[0]
@@ -125,6 +133,7 @@ for dr in pg.get_drawings():
     so_mang += 1; mau_mang.append(col); hinh.append(('to', va_, 0))
     a = np.vstack(va_); hop.append((a[:, 0].min(), a[:, 1].min(), a[:, 0].max(), a[:, 1].max()))
     cv2.fillPoly(idimg, vv, ma24(so_mang))
+    cv2.fillPoly(idlo, [np.round(v * S_LO).astype(np.int32) for v in va_], so_mang)
 hop = np.array(hop, np.float64)
 
 pimg = (idimg[:, :, 0].astype(np.int32) << 16) | (idimg[:, :, 1].astype(np.int32) << 8) | idimg[:, :, 2]
@@ -283,6 +292,46 @@ def mau_cg(col):
 print(f'chu giai: {sum(len(c) for c in chu_giai.values())} ma tren {len(chu_giai)} mau; {tu_chu_giai} mau chi dung cho 1 ma:',
       sorted((v, '#%02x%02x%02x' % k) for k, v in mau_mot_ma.items())[:30])
 
+# ---- 2b) VIỀN HỒNG QUANH RANH HUYỆN (15/10/2026) — KHÔNG PHẢI LOẠI ĐẤT
+# Bản vẽ tô một dải hồng rộng ~10–14 điểm in (~100–150 m) bao quanh ranh huyện (hoặc tô cả nền huyện màu hồng rồi vẽ đất đè lên — chỉ còn
+# lộ dải viền), màu trùng / sát màu đất ở: Diên Khánh #ffa0ff (= ODT), Vạn Ninh #ffa0ff, Khánh Sơn #ffd0ff (= ONT) + #ffbff1, Nha Trang
+# #ff9efc, Cam Ranh #ffa0fc, Ninh Hòa + Khánh Vĩnh #ffd0e8 (nền từng mảnh bản đồ). Ranh dựng từ vùng màu nên ôm cả dải này → trước bị bóc
+# thành "Đất ở…": Diên Khánh 1 vùng ODT 1.637 ha nằm trọn trên đất Nha Trang / Khánh Vĩnh / Cam Lâm (1 thửa Diên Khánh / 500 thửa huyện
+# khác), Vạn Ninh 1.008 ha, Khánh Sơn 516 ha…; thửa của chính huyện vắt qua ranh vẽ thì dính vài chục — vài trăm m² "đất ở" giả.
+# DÒ: mảng TÔ màu hồng (lệch ODT #ffa0ff / ONT #ffd0ff ≤ 45 mỗi kênh) mà ≥ 90 % phần NHÌN THẤY (trong ranh, chỉ xét mảng tô) nằm cách chỗ
+# KHÔNG TÔ GÌ (nền trắng ngoài bản đồ) ≤ 18 điểm in; vùng đất ở thật nằm lọt trong huyện ~0 % (đo cả 7 bản: viền 94–100 %, đất ở thật 0–10 %).
+#   • màu đúng ô chú giải (ODT / ONT) → còn phải lộ ≥ 10 ha (mảng đất ở nhỏ sát chỗ trắng giữ nguyên);
+#   • màu KHÔNG có trong chú giải mà ≥ 90 % diện tích lộ của màu đó là viền → màu NỀN: bỏ MỌI mảng màu đó (cả chỗ nền lộ qua khe trong huyện).
+# Mảng viền thành TRONG SUỐT (y như nét ranh giới): không ghi loại, không che mảng khác; chỗ đó trên thửa thành "Chưa xác định loại đất".
+mask_lo = cv2.resize(mask_ranh, (W_LO, H_LO), interpolation=cv2.INTER_NEAREST)
+co_to_lo = idlo > 0
+dist_lo = cv2.distanceTransform(co_to_lo.astype(np.uint8), cv2.DIST_L2, 3) / S_LO       # (điểm in) tới chỗ không tô gần nhất
+lo_trong = co_to_lo & (mask_lo > 0)
+vis_lo = np.bincount(idlo[lo_trong], minlength=so_mang + 1)
+gan_lo = np.bincount(idlo[lo_trong & (dist_lo <= 18)], minlength=so_mang + 1)
+del dist_lo, co_to_lo, lo_trong, mask_lo
+px_lo_m2 = (m_moi_pt / S_LO) ** 2
+def _hong(c): return min(max(abs(a - b) for a, b in zip(c, m)) for m in ((255, 160, 255), (255, 208, 255))) <= 45
+mau_hong = collections.defaultdict(lambda: [0, 0])                 # màu → [diện tích lộ, phần lộ của mảng viền]
+for k in range(1, so_mang + 1):
+    if hinh[k][0] != 'to' or not _hong(mau_mang[k]) or not vis_lo[k]: continue
+    mau_hong[mau_mang[k]][0] += vis_lo[k]
+    if gan_lo[k] >= 0.9 * vis_lo[k]: mau_hong[mau_mang[k]][1] += vis_lo[k]
+mau_nen = {c for c, (a, b) in mau_hong.items() if c not in chu_giai and b >= 0.9 * a}
+vien_hong = set()
+for k in range(1, so_mang + 1):
+    if hinh[k][0] != 'to': continue
+    if mau_mang[k] in mau_nen: vien_hong.add(k); continue
+    if _hong(mau_mang[k]) and vis_lo[k] * px_lo_m2 >= 1e5 and gan_lo[k] >= 0.9 * vis_lo[k]: vien_hong.add(k)
+# Mảng TRÙNG HÌNH mảng viền (Vạn Ninh vẽ dải viền HAI LẦN, mảng 86095 = 86096): mảng dưới bị che kín nên lượt 1 không lộ điểm nào, bỏ
+# mảng trên thì nó lộ ra và lại thành "Đất ở" 1.008 ha → cùng màu + cùng khung bao (lệch ≤ 0,1 điểm in) với mảng viền thì cũng là viền.
+_khung_vien = {(mau_mang[k], tuple(np.round(hop[k], 1))) for k in vien_hong}
+for k in range(1, so_mang + 1):
+    if hinh[k][0] == 'to' and k not in vien_hong and (mau_mang[k], tuple(np.round(hop[k], 1))) in _khung_vien: vien_hong.add(k)
+print(f'vien hong quanh ranh huyen (bo, khong phai loai dat): {len(vien_hong)} mang, lo {sum(int(vis_lo[k]) for k in vien_hong) * px_lo_m2 / 1e4:,.0f} ha; '
+      f'mau nen: {sorted("#%02x%02x%02x" % c for c in mau_nen)}')
+del idlo
+
 # ---- 3) mảng → loại đất
 ma_id, ds_ma = {}, []
 def id_ma(m):
@@ -376,6 +425,7 @@ trong_suot = set()
 for k in range(1, so_mang + 1):
     if hinh[k][0] == 'net' and not net_la_dat(k): trong_suot.add(k); bang[k] = 0
 print(f'net day trong suot (ranh gioi, duong day…): {len(trong_suot)}')
+for k in vien_hong: trong_suot.add(k); bang[k] = 0               # viền hồng ranh huyện (mục 2b) — trong suốt như nét ranh giới
 print(f'{so_mang} mang; trong ranh: {co_nhan_} theo nhan, {theo_mau_mot} theo mau mot ma ({len(mau_mot_ma)} mau), '
       f'{nhom} mau dung chung ghi NHOM, {bo_trong} de "chua xac dinh"')
 if '--thong-ke-den' in co:

@@ -147,8 +147,14 @@ nên lượt bóc ghi luôn thành "Đất ở…" và ranh dựng từ vùng m�
 KHÁC (đếm thửa địa chính theo huyện cũ của xã): Diên Khánh 1 vùng ODT 1.637,6 ha (1 thửa Diên Khánh / 500 thửa Nha Trang + Khánh Vĩnh +
 Cam Lâm, mẫu 1/7) · Vạn Ninh ODT 1.007,8 ha · Khánh Sơn ONT 515,9 ha · Nha Trang 2 × 189 ha · Cam Ranh 5 vùng 54–117 ha · Ninh Hòa ONT
 65,9 ha. Ranh hai huyện vì thế chồng nhau 380–2.760 ha. Máy chủ KHÔNG chọn bản theo ranh nữa mà theo HUYỆN CŨ của xã chứa thửa
-(`apps/backend/data/huyen-cu.json`, xem `lib/qhPdf.ts`) nên các vùng này không bao giờ bị áp cho thửa huyện khác. Bóc lại thì nên cắt
-vùng theo ranh huyện thật (chưa có lớp ranh huyện chuẩn — hợp thửa địa chính không phủ đường/sông nên không dùng làm ranh được).
+(`apps/backend/data/huyen-cu.json`, xem `lib/qhPdf.ts`) nên các vùng này không bao giờ bị áp cho thửa huyện khác.
+Từ 15/10/2026 `boc_loai_dat.py` (mục 2b) còn BỎ HẲN dải viền này khi bóc: mảng tô màu hồng (lệch ODT/ONT ≤ 45 mỗi kênh) mà ≥ 90 % phần
+lộ trong ranh nằm cách nền trắng ≤ 18 điểm in (vùng đất ở thật: 0–10 %) — màu đúng ô chú giải thì phải lộ ≥ 10 ha; màu KHÔNG có trong chú
+giải mà ≥ 90 % diện tích lộ là viền (nền hồng #ffd0e8 của Ninh Hòa / Khánh Vĩnh, #ff9efc Nha Trang, #ffbff1 Khánh Sơn…) thì bỏ mọi mảng
+màu đó. Mảng viền thành TRONG SUỐT như nét ranh giới. Đo (Khánh Sơn): bỏ 6 mảng, lộ 912 ha — ONT 1.090 → 573 ha, "CSD" 370 → 0 ha (dải
+#ffbff1 từng được nhãn đen gán CSD), ODT −13,6 ha; mọi loại khác y nguyên. "Phủ trong ranh" vì thế giảm (ranh vẫn ôm dải viền).
+**Nét chữ XANH DƯƠNG #0000ff** (mã hiện trạng, vạch phân số, ký hiệu — mọi hình < 15 điểm in) cũng bỏ như nét chữ đen / đỏ: trước thành mảng
+"chưa xác định" vẽ đè, khoét lỗ lên đất bên dưới (Thửa 430 · Tờ 6 Suối Hiệp mất 549 / 831 m²).
 
 ### Bản KHÔNG có lớp chữ — nhãn vẽ bằng hình (Diên Khánh, 14/10/2026 khuya)
 PDF Diên Khánh có 0 chữ, 0 phông: mọi nhãn là hình tô nhỏ, MỖI HÌNH MỘT CHỮ CÁI (38.384 hình đen = hiện trạng, 21.531 hình đỏ = quy

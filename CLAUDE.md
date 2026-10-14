@@ -586,6 +586,11 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   xanh nước KHÔNG ghi mã (4.585 ha) đang gọi "Đất sông, ngòi, kênh, rạch" dù chú dẫn dùng màu này cho cả hồ / thuỷ lợi / ao nuôi.
   (7) NHÃN GHÉP "+" ("TMD+ODT", "NKH+TMD", "DTT+DKV+TMD"… 119 nhãn) = một loại "Đất hỗn hợp (TMD + ODT)" — trước tách mã rồi bỏ mã trái
   màu (thửa 326 tờ 7 Cam Đức: app tham chiếu ghi đất hỗn hợp, web ghi thương mại dịch vụ). Chữ "%%u…%%U" (gạch chân CAD) bỏ trước khi đọc mã.
+- **QĐ893 BỎ DẢI VIỀN RANH HUYỆN (15/10/2026).** Vùng tô hồng #ff7fff ở Level 0 (h 6ADCB9) là dải viền 75 m chạy quanh cả huyện (khung
+  31 × 31 km, 860 ha) — từng thành ô "Đất ở" nằm dưới mọi ô khác nên chỉ lộ NGOÀI phần đã quy hoạch: 266 thửa Cam Lâm sát ranh (70,6 ha
+  "Đất ở" bịa — Thửa 368 · Tờ 1 Suối Dầu 40.272 m²) + 742 thửa huyện bên (431 ha). `5b` / `5f` có hàm `la_vien_ranh()` (khung bao ≥ 80 %
+  khung cả bản vẽ theo CẢ HAI chiều, diện tích ≤ 5 % khung bao) — `5f` cũng phải bỏ, không thì nó "bổ sung phần sót" lại đúng dải này.
+  `qh_zones_893.json` hiện hành đã bỏ đúng ô đó (khớp hết phần còn lại). 79 phiếu: 0 phiếu đổi; thửa 70 tờ 25 y hệt.
 - **DẢI TRẮNG HẸP DO TƯ VẤN TÔ SÓT (12/10/2026): `5k-sua-tay-khe.py` + `sua-tay-khe.json`.** Bản vẽ có chỗ để hở dải trắng
   hẹp (vd 1,38 m) giữa hai vùng tô; luật "trong ranh không tô = đường" biến nó thành đất giao thông. Chủ dự án soi trên MicroStation
   thấy ký hiệu cây xanh trong dải quanh hồ Cam Đức (Thửa 95 · Tờ 15, mảnh 2) → tô sót. Chỗ đã xác nhận ghi vào `sua-tay-khe.json`
@@ -871,7 +876,9 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   huyện chưa có bản PDF (Cam Lâm, Ninh Thuận cũ) thì không tra. ⚠️ ĐỪNG quay lại chọn theo ranh `qh_pdf_ranh` (15/10/2026): ranh dựng từ
   vùng màu, mà bản vẽ tô cả đất HUYỆN BÊN bằng màu đất ở (#ffa0ff ODT / #ffd0ff ONT) — Diên Khánh có vùng "Đất ở tại đô thị" 1.637 ha nằm
   trọn trên đất Nha Trang / Khánh Vĩnh / Cam Lâm (0 thửa Diên Khánh), Vạn Ninh 1.008 ha, Khánh Sơn 516 ha… → ranh hai huyện chồng nhau
-  380–2.760 ha; thửa Khánh Vĩnh từng ra "đất ở đô thị" của bản Diên Khánh, thửa Bác Ái ra QHSDĐ Cam Ranh. Diện tích các loại chia lại
+  380–2.760 ha; thửa Khánh Vĩnh từng ra "đất ở đô thị" của bản Diên Khánh, thửa Bác Ái ra QHSDĐ Cam Ranh. Từ 15/10/2026 `boc_loai_dat.py`
+  (mục 2b) còn BỎ HẲN dải viền / nền hồng khi bóc (đất ở giảm: Nha Trang −700 ha, Ninh Hòa −1.395, Khánh Vĩnh −2.233, Diên Khánh −1.629,
+  Khánh Sơn −514 + "CSD" −370…) và bỏ NÉT CHỮ XANH #0000ff của nhãn (từng khoét lỗ "chưa xác định" lên đất bên dưới). Diện tích các loại chia lại
   cho cộng ĐÚNG BẰNG diện tích thửa (làm tròn 0,1 m² kiểu "phần dư lớn nhất"); phần PDF không tô từ 0,5 m² ghi "Chưa xác định loại đất",
   nhỏ hơn chia theo tỷ lệ; hình thửa DỊCH về đúng chỗ trước khi
   chồng (độ trượt lớp `dia_chinh`, `LECH_DIA_CHINH` trong qhCompute.ts — y như phần Cam Lâm); mục `nguon:'pdf'` trong `qhCacBan`.

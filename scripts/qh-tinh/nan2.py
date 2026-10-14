@@ -99,10 +99,22 @@ def lap_phep_doi(pdf_path, tam_lng, tam_lat):
     side = pdf_path + ".nan.json"
     if os.path.exists(side):
         c=json.load(open(side,encoding="utf-8"))
-        se,ie,sn,inn=c["se"],c["ie"],c["sn"],c["inn"]
+        se,ie,sn,inn=c.get("se",1.0),c.get("ie",0.0),c.get("sn",-1.0),c.get("inn",0.0)
         doc=pymupdf.open(pdf_path); W,H=doc[0].rect.width,doc[0].rect.height; doc.close()
         def p2en(x,y): return (se*x+ie, sn*y+inn)
         def en2p(E,N): return ((E-ie)/se, (N-inn)/sn)
+        AF=c.get("afin")
+        if AF:
+            # NẮN AFFINE (14/10/2026 — bản vẽ 1/500 nắn theo bảng góc ranh, nan_1_500.py): E = a·x+b·y+c, N = d·x+e·y+f,
+            # x,y = điểm PDF của trang ĐÃ XOAY (như get_pixmap vẽ ra). Có thể xoay nhẹ nên phải đủ 6 tham số.
+            a_,b_,c_,d_,e_,f_ = AF
+            det = a_*e_ - b_*d_
+            def p2en(x,y): return (a_*x+b_*y+c_, d_*x+e_*y+f_)
+            def en2p(E,N):
+                E0, N0 = E-c_, N-f_
+                return ((e_*E0 - b_*N0)/det, (-d_*E0 + a_*N0)/det)
+            se, sn = (a_*a_+d_*d_)**0.5, -((b_*b_+e_*e_)**0.5)       # m/pt (chỉ để báo + chọn độ nét)
+            ie, inn = c_, f_
         L=c.get("luoi")
         if L:
             # NAN THEO TUNG O LUOI (14/10/2026): ban in co luoi KHONG DEU (Khanh Vinh: phia dong o rong 227,0 pt, phia tay 226,5)

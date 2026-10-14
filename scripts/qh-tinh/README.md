@@ -151,6 +151,23 @@ phải tinh chỉnh bằng điểm mốc lưới mới chính xác bằng 5 bả
 `curl -H "User-Agent: x" "https://nominatim.openstreetmap.org/lookup?osm_ids=R<id>&format=json&polygon_geojson=1"`
 (Cam Ranh R7081247, Diên Khánh R7081531; tìm id bằng /search ...&featuretype=settlement).
 
+## QUY HOẠCH CHI TIẾT 1/500 CAM LÂM (dự thảo lấy ý kiến) — 14/10/2026, chờ duyệt
+Hồ sơ 9 đồ án (125 file) ở `D:\KhoQH\camlam-1-500\` (dời khỏi thư mục tạm vì đường dẫn > 260 ký tự). Bản vẽ KHÔNG có lưới toạ độ →
+- `nan_1_500.py <tờ có bảng> <tờ cần nắn> <ra.nan.json> [ảnh soi]`: đọc "BẢNG KÊ TỌA ĐỘ GÓC RANH" (VN-2000; bảng dọc hoặc ngang,
+  số hiệu 12 / M12; điểm đầu lặp = khép kín), vẽ NÉT ĐỎ ranh lập quy hoạch (nét đứt bị tách hàng nghìn đoạn), dò tỷ lệ 0,5–20 pt/m
+  + xoay ±4° (thước in trên bản vẽ có khi sai — Cam Hiệp Bắc ghi "1 cm = 50 m" mà vạch không đều) bằng trượt hình tìm chỗ trùng nét
+  đỏ nhiều nhất, rồi tinh chỉnh kiểu ICP → `"afin":[a,b,c,d,e,f]` (nan2 hiểu, trang đã xoay như ảnh hiện ra).
+- `nan_1_500_nut.py <tờ giao thông> <tờ cần nắn> <ra.nan.json>`: khi không có bảng mà tờ giao thông ghi toạ độ NÚT tim đường
+  ("N8 · X=… · Y=…" + đường dẫn tới nút) — tính phép thô từ tâm hộp nhãn, chọn đầu đường dẫn gần vị trí dự đoán, thu hẹp dần
+  (Cam Hòa: 79/90 nút, sai số 0,09 m); hai tờ cùng bộ cùng khổ thì dò độ dời bằng ảnh nét đỏ (phaseCorrelate).
+- `ranh_1_500.py bang|net …` → ranh WGS84 (từ bảng góc ranh, hoặc từ vùng kín của nét đỏ — Cam Hòa nét đỏ không khép kín nên dùng
+  `ranh_tu_pdf.py` theo vùng tô màu: 73,8 ha gồm cả kênh, so với 59,68 ha lập quy hoạch).
+- `tiler2.py … qhct500-<ten> 14 19 <Ss ≈ m/pt ÷ 0,25>` → `gop_tile.py` gộp 5 bộ thành `qhct500camlam-v1` (1.587 ô) →
+  `ghep_tile_ve_tinh.py` làm ảnh thử đúng như web (tile chồng ảnh vệ tinh).
+Đã làm: Tiểu khu G quân đội (lệch nét ranh 0,5 m), TK B trung tâm Cam Đức (1,2 m), TK D Cam Hiệp Nam (2,2 m — cạnh cong), TK C Cam
+Hiệp Bắc (2,2 m), TK D phía Bắc Cam Hòa (0,09 m). File nắn + ranh: `nan/1-500/`. CHƯA: Cam Hải Đông, Cam Hải Tây, Cam Tân, Suối Tân
+(cùng đơn vị tư vấn, không có toạ độ dạng chữ — chữ số vẽ thành nét; cần đặt khớp theo đường giao thông của bản phân khu).
+
 ## Ninh Thuận cũ (nay thuộc Khánh Hòa) + cấp tỉnh
 Tên miền `ninhthuan.gov.vn` đã ngừng sau sáp nhập 1/7/2025, cổng Khánh Hòa chưa chuyển dữ liệu về.
 Bản đồ QHSDĐ cấp tỉnh không đăng PDF công khai (nằm trong phụ lục hồ sơ QH tỉnh). → Chờ nguồn.

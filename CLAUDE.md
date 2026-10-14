@@ -834,6 +834,10 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   không ghi tên lớp), kiểm vé TỪNG Ô (`/api/qh-rieng/o/<thư mục>/z/x/y?v=`); nginx có `location /api/qh-rieng/ { proxy_cache off }`.
   Giao diện: `lopRieng` → `rasterOverlays` / `mucQh` / `canCuQh` trong `app/map/page.tsx`. Thêm lớp chỉ-admin mới = thêm vào
   `danh-sach.json` + `tiles/` của volume, KHÔNG khai trong page.tsx.
+  ĐÃ LÊN WEB 14/10/2026 21:32 (tự kiểm qua tên miền thật: chưa đăng nhập 401, vé giả 403, `/tiles/` công khai 404, ô có vé hợp lệ trùng
+  từng byte file gốc, Cloudflare `DYNAMIC` không giữ). Volume riêng hiện có 2 lớp: `qh-ct500` (1/500 chính thức) và `qh-nt-tay-pk22`
+  (ĐC phân khu 1/2000 Tây Nha Trang tiểu PK 2.2, 377 ha — thuyết minh để TRỐNG số quyết định ⇒ "chưa xác minh", chờ chủ dự án quyết
+  công khai hay xoá; nắn bằng `nan_theo_bang_ranh.py` theo bảng toạ độ N1–N50). Thêm lớp: `them_lop_rieng.py` + `docker cp` vào volume.
   ⚠️ MicroStation qua COM: KHÔNG chạy 2 kịch bản cùng lúc (đã sập "RPC server is unavailable" / "object no longer valid"); dùng
   `win32com.client.dynamic.Dispatch` (bộ gen_py từng làm sập khi quét); khổ giấy tự đặt phải có `<Units>4</Units>` (thiếu là "Invalid
   Printer Driver Configuration"); 4800 dpi làm MicroStation 32 bit ngốn > 3 GB; xuất DXF qua COM phải bỏ model TRANG IN trên bản sao.

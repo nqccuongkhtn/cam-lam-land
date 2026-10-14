@@ -15,8 +15,8 @@ export MSYS_NO_PATHCONV=1
 # ...nhưng khi đó "/dev/null" cũng không được đổi → curl (bản Windows) không ghi được, báo lỗi 23 và set -e dừng kịch bản (đã vấp
 # 14/10 tối ở bước 7) → dùng thiết bị rỗng của Windows "NUL" khi chạy trong Git Bash.
 case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) RONG=NUL ;; *) RONG=/dev/null ;; esac
-# Chạy tiếp từ một bước (vd bước trước đã xong): --tu-buoc=7
-TU=1; for a in "$@"; do case "$a" in --tu-buoc=*) TU="${a#--tu-buoc=}" ;; esac; done
+# Chạy tiếp từ một bước (vd bước trước đã xong): --tu-buoc=7 · chỉ chạy một đoạn: --tu-buoc=2 --den-buoc=2 (vd chỉ nạp lại dữ liệu)
+TU=1; DEN=8; for a in "$@"; do case "$a" in --tu-buoc=*) TU="${a#--tu-buoc=}" ;; --den-buoc=*) DEN="${a#--den-buoc=}" ;; esac; done
 cd "/d/Cam Lam gis" 2>/dev/null || cd "D:/Cam Lam gis"
 DC="docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.tunnel.yml"
 T="D:/KhoQH/tiles-qh"                 # bộ ô ảnh 7 lớp QHSDĐ (ổ D)
@@ -29,13 +29,13 @@ ANH="camlamgis-frontend:latest"       # ảnh có sẵn lệnh sh/find để tha
 psql_() { $DC exec -T postgis psql -v ON_ERROR_STOP=1 -U camlam -d camlam_gis "$@"; }
 dem_vol() { docker run --rm -v "$1":/t "$ANH" sh -c "find /t/$2 -type f 2>/dev/null | wc -l"; }
 
-if [ "$TU" -le 0 ]; then
+if [ "$TU" -le 0 ] && [ 0 -le "$DEN" ]; then
 echo "[0/8] Kiểm đủ file trước khi làm…"
 for t in $MOI; do [ -d "$T/$t" ] || { echo "LỖI: thiếu bộ ô $T/$t"; exit 1; }; done
 for b in $BAN; do [ -s "$S/nap-$b.sql" ] || { echo "LỖI: thiếu file nạp $S/nap-$b.sql"; exit 1; }; done
 [ -s "$R/danh-sach.json" ] && [ -d "$R/tiles/qhct500-v1" ] && [ -d "$R/tai-lieu" ] || { echo "LỖI: thiếu dữ liệu lớp riêng ở $R"; exit 1; }
 fi
-if [ "$TU" -le 1 ]; then
+if [ "$TU" -le 1 ] && [ 1 -le "$DEN" ]; then
 echo "[1/8] Chép 7 bộ ô ảnh mới vào kho ô ảnh của web (camlamgis_camlam_tiles) — chép sang tên tạm rồi mới đổi chỗ…"
 docker rm -f chep_tiles >/dev/null 2>&1 || true
 docker create --name chep_tiles -v camlamgis_camlam_tiles:/dest "$ANH" true >/dev/null
@@ -54,19 +54,19 @@ done
 # đổi chỗ: bộ cũ cùng tên (nếu đã đưa lên trước đây theo phép nắn cũ) bị thay HẲN, không còn ô cũ lẫn vào
 for t in $MOI; do docker run --rm -v camlamgis_camlam_tiles:/t "$ANH" sh -c "rm -rf /t/$t && mv /t/$t.moi /t/$t"; done
 fi
-if [ "$TU" -le 2 ]; then
+if [ "$TU" -le 2 ] && [ 2 -le "$DEN" ]; then
 echo "[2/8] Nạp quy hoạch theo thửa 7 huyện/thị (bóc lại theo phép nắn mới)…"
 for b in $BAN; do echo "   - $b"; psql_ -q < "$S/nap-$b.sql"; done
 psql_ -q < "$S/ten-ma-chu-giai.sql"
 psql_ -tA -c "SELECT '   ' || ban || ': ' || count(*) || ' vùng' FROM qh_pdf GROUP BY ban ORDER BY ban;"
 fi
-if [ "$TU" -le 3 ]; then
+if [ "$TU" -le 3 ] && [ 3 -le "$DEN" ]; then
 echo "[3/8] Dựng lại máy chủ + giao diện (5–10 phút, web chập chờn ~10 giây lúc đổi)…"
 $DC up -d --no-deps --build backend frontend
 $DC restart nginx
 docker exec camlam_nginx sh -c 'rm -rf /var/cache/nginx/[0-9a-f]'      # CHỈ thư mục đệm 0-9a-f (CLAUDE.md: đừng xoá *)
 fi
-if [ "$TU" -le 4 ]; then
+if [ "$TU" -le 4 ] && [ 4 -le "$DEN" ]; then
 echo "[4/8] Chờ web lên…"
 code=000
 for i in $(seq 1 90); do
@@ -75,7 +75,7 @@ for i in $(seq 1 90); do
 done
 echo "   /api/health → $code"; [ "$code" = 200 ] || { echo "LỖI: máy chủ chưa lên — xem: $DC logs --tail 80 backend"; exit 1; }
 fi
-if [ "$TU" -le 5 ]; then
+if [ "$TU" -le 5 ] && [ 5 -le "$DEN" ]; then
 echo "[5/8] Chép lớp 1/500 CHÍNH THỨC (chỉ admin) vào volume riêng camlamgis_qh_rieng…"
 docker rm -f chep_rieng >/dev/null 2>&1 || true
 docker create --name chep_rieng -v camlamgis_qh_rieng:/dest "$ANH" true >/dev/null
@@ -89,11 +89,11 @@ echo "   qhct500-v1: $n_web / $n_may ô"
 [ "$n_may" -eq "$n_web" ] || { echo "LỖI: chép thiếu ô lớp 1/500 — dừng"; exit 1; }
 docker run --rm -v camlamgis_qh_rieng:/t "$ANH" sh -c "rm -rf /t/tiles/qhct500-v1 && mv /t/tiles/qhct500-v1.moi /t/tiles/qhct500-v1 && ls /t /t/tai-lieu"
 fi
-if [ "$TU" -le 6 ]; then
+if [ "$TU" -le 6 ] && [ 6 -le "$DEN" ]; then
 echo "[6/8] Bật tra quy hoạch theo thửa cho huyện/thị ngoài Cam Lâm (cờ qh_pdf_bat)…"
 psql_ -q -c "INSERT INTO app_flags(key) VALUES ('qh_pdf_bat') ON CONFLICT DO NOTHING;"
 fi
-if [ "$TU" -le 7 ]; then
+if [ "$TU" -le 7 ] && [ 7 -le "$DEN" ]; then
 echo "[7/8] Kiểm thử trên web…"
 for t in $MOI; do
   f=$(cd "$T/$t" && find . -type f -name '*.webp' | sort | sed -n '1p' | sed 's|^\./||')
@@ -112,7 +112,7 @@ lng=${diem%,*}; lat=${diem#*,}
 if curl -s "http://localhost/api/parcels/at?lng=$lng&lat=$lat" | grep -q 'pdf-dienkhanh2030'; then echo "   thửa Diên Khánh ($lng, $lat): CÓ quy hoạch theo thửa ✓"
 else echo "   CẢNH BÁO: thửa Diên Khánh ($lng, $lat) chưa ra quy hoạch theo thửa"; fi
 fi
-if [ "$TU" -le 8 ]; then
+if [ "$TU" -le 8 ] && [ 8 -le "$DEN" ]; then
 echo "[8/8] Xoá các bộ ô cũ đã được thay + 1/500 dự thảo…"
 for t in $CU; do
   docker run --rm -v camlamgis_camlam_tiles:/t "$ANH" sh -c "[ -e /t/$t ] && rm -rf /t/$t && echo '   - đã xoá $t' || true"

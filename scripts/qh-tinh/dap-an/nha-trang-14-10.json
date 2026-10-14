@@ -1,0 +1,12 @@
+[
+ {"xa": "phường Phước Long", "to": "4", "thua": "525", "loai": {"ODT": 60.0}, "nguon": "app tham chiếu, ảnh chủ dự án 17:43 14/10/2026"},
+ {"xa": "xã Vĩnh Lương", "to": "33", "thua": "15", "loai": {"DGT": 1.1, "PNK": 2302.8, "DKV": 6740.4}},
+ {"xa": "xã Vĩnh Lương", "to": "30", "thua": "931", "loai": {"DGT": 42.6, "ONT": 98.0}},
+ {"xa": "xã Phước Đồng", "to": "49", "thua": "165", "loai": {"DGT": 21.0, "ONT": 2028.9}},
+ {"xa": "xã Phước Đồng", "to": "49", "thua": "107", "loai": {"ONT": 1775.6, "DKV": 313.2}},
+ {"xa": "phường Ngọc Hiệp", "to": "35", "thua": "56", "loai": {"DGT": 126.5, "ODT": 87.5}},
+ {"xa": "phường Ngọc Hiệp", "to": "35", "thua": "63", "loai": {"DGT": 2.2, "ODT": 98.2}},
+ {"xa": "phường Phương Sơn", "to": "6", "thua": "59", "loai": {"DGT": 13.6, "ODT": 76.5}},
+ {"xa": "phường Phương Sơn", "to": "9", "thua": "9", "loai": {"DGT": 1.3, "ODT": 177.4}},
+ {"xa": "phường Phước Hòa", "to": "1", "thua": "1", "loai": {"DGT": 2.0, "ODT": 226.1}}
+]

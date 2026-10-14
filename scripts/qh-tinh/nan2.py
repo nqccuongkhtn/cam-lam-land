@@ -14,6 +14,53 @@ def cac_token(page):
             out.append((int(t), t, (w[0]+w[2])/2, (w[1]+w[3])/2))
     return out
 
+# BÁM VẠCH LƯỚI THẬT (14/10/2026): trước đây vị trí đường lưới = TÂM CHỮ nhãn. Nha Trang ghi "595" (km) trên-trái, "000" dưới-phải,
+# đường lưới đi GIỮA hai chữ → tâm chữ "595" lệch 6,5 điểm in ≈ 57 m đông (cạnh trái ~44 m bắc); chủ dự án so 10 thửa với app tham chiếu
+# thấy sai 72,7 % diện tích. Nay mỗi nhãn BÁM vào vạch lưới thật gần nhất (≤ 15 điểm in) nếu bản vẽ có vẽ đường lưới.
+# Đặt biến môi trường NAN2_KHONG_BAM=1 để dùng lại cách cũ (so sánh). Toạ độ theo hệ của get_text/get_drawings (trang CHƯA xoay).
+_VACH = None
+
+def vach_luoi(page, nguong=0.25):
+    # Vạch lưới = nét thẳng đứng / nằm ngang dài suốt bản đồ (thường đứt khúc): (1) gom theo bin 0,2 điểm in, bin nào TỔNG độ dài
+    # ≥ 25 % cạnh trang là ứng viên (gộp bin liền nhau); (2) TINH CHỈNH: vị trí vạch = trung bình có trọng số (độ dài) toạ độ THẬT
+    # của các đoạn ≥ 3 điểm in nằm trong ±0,3 điểm in quanh ứng viên — chính xác tới phần nghìn điểm in (~1 cm ngoài thực địa),
+    # không lẫn nét chữ / nét khác sát vạch. Trả (x các vạch dọc, y các vạch ngang).
+    doc_, ngang_, sd, sn_ = {}, {}, [], []
+    for dr in page.get_drawings():
+        for it in dr["items"]:
+            if it[0] != "l": continue
+            p, q = it[1], it[2]
+            if abs(p.x - q.x) < 0.3 and abs(p.y - q.y) > 2:
+                L = abs(p.y - q.y); x = (p.x + q.x) / 2; k = round(x / 0.2); doc_[k] = doc_.get(k, 0) + L
+                if L >= 3: sd.append((x, L))
+            elif abs(p.y - q.y) < 0.3 and abs(p.x - q.x) > 2:
+                L = abs(p.x - q.x); y = (p.y + q.y) / 2; k = round(y / 0.2); ngang_[k] = ngang_.get(k, 0) + L
+                if L >= 3: sn_.append((y, L))
+    R = page.cropbox
+    def ung_vien(d, dai):
+        a = sorted(k * 0.2 for k, L in d.items() if L > nguong * dai)
+        if not a: return []
+        out = [[a[0]]]
+        for v in a[1:]:
+            if v - out[-1][-1] <= 0.5: out[-1].append(v)
+            else: out.append([v])
+        return [sum(g) / len(g) for g in out]
+    def tinh(c, seg):
+        if not seg: return np.array([])
+        S = np.array(seg); ra = []
+        for v in c:
+            m = np.abs(S[:, 0] - v) <= 0.3
+            ra.append(float((S[m, 0] * S[m, 1]).sum() / S[m, 1].sum()) if m.any() else v)
+        return np.array(ra)
+    return tinh(ung_vien(doc_, R.height), sd), tinh(ung_vien(ngang_, R.width), sn_)
+
+def _bam(p, ngang):
+    if _VACH is None: return p
+    g = _VACH[0] if ngang else _VACH[1]
+    if len(g) == 0: return p
+    k = g[int(np.argmin(np.abs(g - p)))]
+    return float(k) if abs(k - p) <= 15 else p
+
 def gom_duong(toks, ngang, dungsai=7):
     # gom token theo toa do vuong goc (y neu ngang, x neu doc) -> cac "duong" nhan
     key=(lambda t:t[3]) if ngang else (lambda t:t[2])
@@ -27,7 +74,7 @@ def gom_duong(toks, ngang, dungsai=7):
 
 def phuc_hoi_gia_tri(line, ngang, tam_km):
     # line: list token tren 1 duong. Tra list (pos, E_or_N_met).
-    pos=lambda t:(t[2] if ngang else t[3])
+    pos=lambda t:_bam(t[2] if ngang else t[3], ngang)
     line=sorted(line,key=pos)
     vals=[t[0] for t in line]
     maxv=max(vals) if vals else 0
@@ -138,7 +185,12 @@ def lap_phep_doi(pdf_path, tam_lng, tam_lat):
     doc=pymupdf.open(pdf_path); page=doc[0]; W,H=page.rect.width,page.rect.height
     E0,N0=vn.wgs84_to_vn2000(tam_lng,tam_lat)
     toks=cac_token(page)
-    e=truc(toks, True,  E0, W); n=truc(toks, False, N0, H)
+    global _VACH
+    _VACH = None if os.environ.get('NAN2_KHONG_BAM') == '1' else vach_luoi(page)
+    try:
+        e=truc(toks, True,  E0, W); n=truc(toks, False, N0, H)
+    finally:
+        _VACH = None
     doc.close()
     if not e or not n:
         return None, None, dict(W=W,H=H, e=e, n=n, loi="khong khop du truc")

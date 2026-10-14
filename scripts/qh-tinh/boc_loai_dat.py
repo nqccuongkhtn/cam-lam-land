@@ -72,6 +72,7 @@ mau_mang = [None]
 hinh = [None]                                    # hình từng mảng (điểm PDF): ('to', [vòng…]) hoặc ('net', [đường…], dày_pt)
 hop = [(0, 0, 0, 0)]                             # khung bao từng mảng (điểm PDF)
 so_mang = 0
+glyph_do, glyph_den = [], []                     # khung (điểm PDF) các mảng tô nhỏ cỡ chữ màu ĐỎ / ĐEN = nét chữ của nhãn
 def ma24(k): return (k >> 16, (k >> 8) & 255, k & 255)
 for dr in pg.get_drawings():
     if dr.get('color') is not None:
@@ -95,8 +96,14 @@ for dr in pg.get_drawings():
     f = dr.get('fill')
     if not f: continue
     col = (int(round(f[0] * 255)), int(round(f[1] * 255)), int(round(f[2] * 255)))
-    if max(col) < 40 or min(col) > 245: continue      # đen (chữ/nét) và trắng (nền) không phải loại đất
-    if col == (255, 0, 0): continue                    # đỏ thuần = ký hiệu đường dây / nét, không phải loại đất
+    if max(col) < 40 or col == (255, 0, 0):
+        # đen (chữ/nét) và đỏ thuần (ký hiệu đường dây / nét) không phải loại đất. Nhưng mảng nhỏ cỡ chữ của hai màu này chính là
+        # NÉT CHỮ của nhãn (Nha Trang, Cam Ranh: nhãn vẽ bằng hình, phần chữ máy đọc được đều báo màu đen) → cất khung để biết
+        # nhãn nào in ĐỎ (quy hoạch) / ĐEN (hiện trạng)
+        r_ = dr['rect']
+        if r_.width < 20 and r_.height < 20: (glyph_do if col == (255, 0, 0) else glyph_den).append((r_.x0, r_.y0, r_.x1, r_.y1))
+        continue
+    if min(col) > 245: continue                        # trắng (nền)
     vong, cur, last = [], [], None
     for it in dr['items']:
         k = it[0]
@@ -138,6 +145,14 @@ def mau_tai(cx, cy):
     o = zone[max(0, iy-3):iy+4, max(0, ix-3):ix+4].reshape(-1, 3)
     o = [tuple(int(v) for v in c) for c in o if not (c >= 246).all()]
     return collections.Counter(o).most_common(1)[0][0] if o else None
+GDO = np.array(glyph_do, np.float64) if glyph_do else np.zeros((0, 4))
+GDEN = np.array(glyph_den, np.float64) if glyph_den else np.zeros((0, 4))
+def phu_chu(bb, G):                              # tổng diện tích giao giữa khung chữ bb và các khung nét chữ G (điểm PDF²)
+    if not len(G): return 0.0
+    ix = np.clip(np.minimum(G[:, 2], bb[2]) - np.maximum(G[:, 0], bb[0]), 0, None)
+    iy = np.clip(np.minimum(G[:, 3], bb[3]) - np.maximum(G[:, 1], bb[1]), 0, None)
+    return float((ix * iy).sum())
+so_do_hinh = 0                                   # số nhãn nhận màu theo NÉT CHỮ vẽ bằng hình (không theo màu chữ PDF báo)
 for b in pg.get_text('dict')['blocks']:
     for l in b.get('lines', []):
         for s in l['spans']:
@@ -149,7 +164,11 @@ for b in pg.get_text('dict')['blocks']:
             if not mask_ranh[iy, ix]:
                 ngoai.append((t, cx, cy, s['size'])); continue
             c = s['color']; r, gg, bb = (c >> 16) & 255, (c >> 8) & 255, c & 255
-            nhan.append([t, cx, cy, r > 150 and gg < 100 and bb < 100, (y1 - y0) * S, (x1 - x0) * S, s['size']])
+            do_ = r > 150 and gg < 100 and bb < 100
+            # Màu THẬT của nhãn = màu nét chữ vẽ bằng hình đè đúng chỗ chữ (Nha Trang: chữ PDF báo đen hết, nhãn quy hoạch đỏ là hình)
+            a_do, a_den = phu_chu((x0, y0, x1, y1), GDO), phu_chu((x0, y0, x1, y1), GDEN)
+            if a_do + a_den > 0.15 * max((x1 - x0) * (y1 - y0), 1e-6): do_ = a_do > a_den; so_do_hinh += 1
+            nhan.append([t, cx, cy, do_, (y1 - y0) * S, (x1 - x0) * S, s['size']])
 # CHÚ GIẢI = mã ngoài ranh có cỡ chữ TO hơn hẳn nhãn trên bản đồ (Cam Ranh: chú giải 5,1–5,5; nhãn 4,1–4,5).
 # Mã ngoài ranh cỡ chữ như nhãn = nhãn của huyện bên cạnh → bỏ (trước đọc lẫn nên màu đường giao thông ra 8 mã).
 co_nhan = sorted(n[6] for n in nhan)
@@ -240,12 +259,59 @@ def id_ma(m):
 bang = np.zeros(so_mang + 1, np.uint8)
 so_px = np.bincount(pimg.ravel(), minlength=so_mang + 1)
 co_nhan_ = theo_mau_mot = nhom = bo_trong = 0
+# GÁN MÃ (sửa 14/10/2026 — chủ dự án so 10 thửa Nha Trang với app tham chiếu): trước đây CÓ NHÃN TRONG MẢNG là lấy nhãn, kể cả khi
+# màu mảng nói khác → dải đường cam (DGT) dài chứa nhãn "DTL" của con kênh chạy cạnh bị ghi thành thuỷ lợi; vùng màu dùng chung chứa
+# nhãn đen hiện trạng "ONT" bị ghi ONT thay vì nhãn đỏ quy hoạch "DKV". Nay:
+#   1) màu chú giải chỉ dùng cho MỘT mã → theo MÀU (nhãn trong mảng có thể là của đối tượng khác);
+#   2) màu dùng chung nhiều mã (vd hồng cá hồi = 16 mã đất công cộng) → chỉ nhận nhãn THUỘC tập mã của màu đó và NẰM TRONG mảng.
+#      Bản có phân biệt màu nhãn (đỏ = quy hoạch, đen = hiện trạng — màu lấy theo NÉT CHỮ vẽ bằng hình, xem phu_chu) thì CHỈ nhận nhãn
+#      ĐỎ; không có nhãn đỏ hợp lệ trong mảng → ghi NHÓM "chưa ghi rõ loại" (bản đồ không ghi thì không đoán).
+#      Đã thử và BỎ: lấy nhãn hợp lệ gần nhất ngoài mảng (30 điểm in rồi 10 điểm in): 2/10 thửa đối chứng Nha Trang ra SAI tên
+#      (thửa 15 tờ 33 Vĩnh Lương: mảng không nhãn — app tham chiếu ghi PNK — bị gán DKV của mảng bên cạnh; thửa 107 tờ 49 Phước
+#      Đồng: dải ven sông — app ghi DKV — bị gán TMD là mã HIỆN TRẠNG in đen ở phân số "TMD / ONT").
+#   3) màu chú giải không có → theo nhãn trong mảng như cũ.
+#   (nhãn đỏ đè ra NGOÀI vùng — trên mặt sông, lòng đường — xem nhan_ngoai bên dưới)
+CO_CHU_DO = sum(1 for n in nhan if n[3]) >= max(20, 0.05 * len(nhan))
+print(f'nhan: {len(nhan)} trong ranh, {sum(1 for n in nhan if n[3])} nhan DO ({so_do_hinh} nhan xet mau theo net chu ve bang hinh)'
+      f' -> {"CHI NHAN DO cho mau dung chung" if CO_CHU_DO else "ban khong phan biet mau nhan"}')
+nhan_mang = collections.defaultdict(list)                    # mảng → [(mã, đỏ?)]
+for t, cx, cy, do_, *_ in nhan:
+    p = pid_tai(cx, cy)
+    if p: nhan_mang[p].append((t, do_))
+def tap_cua(p):
+    cg = mau_cg(mau_mang[p]) if p else None
+    return set(chu_giai[cg]) if (cg is not None and cg in chu_giai) else set()
+# NHÃN ĐÈ RA NGOÀI VÙNG: vùng hẹp / dải ven sông thì người vẽ hay đặt nhãn đè lên mặt sông, lòng đường bên cạnh (Nha Trang: thửa 15
+# tờ 33 Vĩnh Lương — "DKV" đỏ của vùng cá hồi nằm trên mặt sông #a0ffff). Nhãn đỏ hợp lệ mà mảng dưới tâm chữ KHÔNG cùng nhóm mã →
+# gán cho mảng cùng nhóm GẦN NHẤT trong 3 điểm in (~28 m ở 1:10.000), CHỈ KHI RÕ RÀNG: mảng cùng nhóm gần thứ hai xa gấp ≥ 2 lần.
+nhan_ngoai = collections.defaultdict(list)
+R_NG = int(round(3 * S))
+for t, cx, cy, do_, *_ in nhan:
+    if CO_CHU_DO and not do_: continue
+    p0 = pid_tai(cx, cy)
+    if p0 and t in tap_cua(p0): continue                     # nằm trong mảng của chính nó → đã tính ở trên
+    ix, iy = int(cx), int(cy)
+    y0_, x0_ = max(0, iy - R_NG), max(0, ix - R_NG)
+    w = pimg[y0_:iy + R_NG + 1, x0_:ix + R_NG + 1]
+    if not w.size: continue
+    yy, xx = np.nonzero(w > 0)
+    if not len(yy): continue
+    d = np.hypot(xx + x0_ - cx, yy + y0_ - cy); ids = w[yy, xx]
+    gan = {}
+    for q, dq in zip(ids.tolist(), d.tolist()):
+        if q != p0 and (q not in gan or dq < gan[q]): gan[q] = dq
+    ung = sorted((dq, q) for q, dq in gan.items() if dq <= R_NG and t in tap_cua(q) and len(tap_cua(q)) > 1)
+    if ung and (len(ung) == 1 or ung[1][0] >= 2 * max(ung[0][0], 0.5)): nhan_ngoai[ung[0][1]].append(t)
 for p in np.unique(pimg):
     if p == 0: continue
-    ds = theo_mang.get(int(p)); cg = mau_cg(mau_mang[p])
-    if ds: bang[p] = id_ma(collections.Counter(ds).most_common(1)[0][0]); co_nhan_ += 1
-    elif cg in mau_mot_ma: bang[p] = id_ma(mau_mot_ma[cg]); theo_mau_mot += 1
-    elif cg in chu_giai and len(chu_giai[cg]) > 1: bang[p] = id_ma('NHOM:' + '/'.join(sorted(chu_giai[cg]))); nhom += 1
+    p = int(p); ds = nhan_mang.get(p, []); cg = mau_cg(mau_mang[p])
+    tap = set(chu_giai[cg]) if (cg is not None and cg in chu_giai) else None
+    if cg in mau_mot_ma: bang[p] = id_ma(mau_mot_ma[cg]); theo_mau_mot += 1
+    elif tap and len(tap) > 1:
+        hop_le = [t for t, do_ in ds if t in tap and (do_ or not CO_CHU_DO)] or nhan_ngoai.get(p, [])
+        if hop_le: bang[p] = id_ma(collections.Counter(hop_le).most_common(1)[0][0]); co_nhan_ += 1
+        else: bang[p] = id_ma('NHOM:' + '/'.join(sorted(tap))); nhom += 1
+    elif ds: bang[p] = id_ma(collections.Counter(t for t, _ in ds).most_common(1)[0][0]); co_nhan_ += 1
     else: bo_trong += 1
 # NÉT DÀY chỉ là ĐẤT khi là đường giao thông hoặc kênh / sông / mặt nước (DGT, DTL, SON, MNC). Nét khác — RANH GIỚI hành chính
 # (hồng dày, màu gần ODT #ffa0ff nên từng bị ghi thành "đất ở đô thị" một dải 5–10 m dọc ranh huyện), đường dây điện… —

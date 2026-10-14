@@ -44,7 +44,12 @@ def ll2gp_vec(lon,lat,z):
 # --- render anh nguon 1 lan ---
 t0=time.time()
 doc=pymupdf.open(pdf); page=doc[0]
-pix=page.get_pixmap(matrix=pymupdf.Matrix(Ss,Ss),alpha=False)
+# chi dung PHAN TRANG phu ranh (+30 diem): to 1/500 ve ty le nho (Cam Hai Dong, Suoi Tan 0,57 pt/m -> Ss=7) dung ca trang
+# ra 16.688 x 23.590 diem anh -> MuPDF bao "Overly large image"
+_pp=np.array([EN2P(*vn.wgs84_to_vn2000(lo,la)) for r in rings for lo,la in r])
+_c=pymupdf.Rect(max(0,_pp[:,0].min()-30),max(0,_pp[:,1].min()-30),min(W,_pp[:,0].max()+30),min(H,_pp[:,1].max()+30))
+pix=page.get_pixmap(matrix=pymupdf.Matrix(Ss,Ss),clip=_c,alpha=False)
+DX,DY=pix.x,pix.y                      # goc tren-trai cua anh nguon (diem anh, he toa do trang x Ss)
 src=np.frombuffer(pix.samples,np.uint8).reshape(pix.height,pix.width,pix.n)
 src=cv2.cvtColor(src, cv2.COLOR_RGBA2BGR if pix.n==4 else cv2.COLOR_RGB2BGR)
 doc.close()
@@ -76,7 +81,7 @@ for z in range(zmin,zmax+1):
                     lon,lat=gp2ll(ox0+oxx,oy0+oy,z)
                     E,Nn=vn.wgs84_to_vn2000(lon,lat)
                     pdx,pdy=EN2P(E,Nn)
-                    P.append((oxx,oy,1.0)); SX.append(pdx*Ss); SY.append(pdy*Ss)
+                    P.append((oxx,oy,1.0)); SX.append(pdx*Ss-DX); SY.append(pdy*Ss-DY)
                     if 0<=pdx<=W and 0<=pdy<=H: oob=False
             if oob: continue
             P=np.array(P);

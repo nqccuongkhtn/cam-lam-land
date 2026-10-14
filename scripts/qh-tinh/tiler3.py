@@ -9,7 +9,7 @@
 #  4) Toạ độ: lưới 9×9 điểm chính xác mỗi ô (VN-2000 → trang PDF theo phép nắn) rồi nội suy song tuyến, tính theo TÂM điểm ảnh
 #     (tiler2 khớp một phép affine mỗi ô — đủ cho nắn tuyến tính, nhưng nắn theo ô lưới "luoi" có gãy khúc ở đường lưới).
 # Dùng: python -P tiler3.py <pdf> <clng> <clat> <ranh.json> <out_dir> <name> <zmin> <zmax> [--kich=512] [--sieu=2] [--khoi=4]
-#                                    [--dinh=webp|png] [--cl=90] [--phan=0/3]
+#                                    [--dinh=webp|png] [--cl=90] [--phan=0/3] [--bo-qua-co]
 import sys, os, math, json, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.stdout.reconfigure(encoding='utf-8')
@@ -23,6 +23,7 @@ pdf, clng, clat, ranh_path, out_dir, name = ts[0], float(ts[1]), float(ts[2]), t
 zmin, zmax = int(ts[6]), int(ts[7])
 KICH, SIEU, KHOI = int(tuy('kich', 512)), int(tuy('sieu', 2)), int(tuy('khoi', 4))
 DINH, CL = tuy('dinh', 'webp'), int(tuy('cl', 90))
+BO_QUA = '--bo-qua-co' in sys.argv                                # ô đã có file thì bỏ qua (chạy tiếp / chia lại việc)
 PHAN = tuple(map(int, tuy('phan', '0/1').split('/')))          # --phan=i/n: chỉ làm khối thứ i, i+n, … (chạy n tiến trình song song)
 N = KICH * SIEU                                                  # cạnh ô khi siêu lấy mẫu
 
@@ -78,6 +79,7 @@ for z in range(zmin, zmax + 1):
             for tx in range(bx, min(bx + KHOI, tx1 + 1)):
                 for ty in range(by, min(by + KHOI, ty1 + 1)):
                     ox0, oy0 = tx * 256, ty * 256
+                    if BO_QUA and os.path.exists(os.path.join(out_dir, name, str(z), str(tx), f'{ty}.{"webp" if DINH == "webp" else "png"}')): continue
                     mk = np.zeros((N, N), np.uint8); co_ranh = False
                     for rp in rp_all:
                         loc = (rp - [ox0, oy0]) * (N / 256) - 0.5

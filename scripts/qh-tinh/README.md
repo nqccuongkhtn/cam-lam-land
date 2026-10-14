@@ -142,6 +142,10 @@ Vĩnh Phương: kiểu ảnh ghi 125,5 m² đường vì lấp chỗ ký hiệu 
 CHƯA LÀM: lô màu hồng cam công cộng (21 mã) không nhãn chỉ ra "nhóm"; thử thêm thửa ở Ninh Hòa (bản nhiều nét dày nhất: 17.847 nét
 trong suốt).
 
+**TỰ KIỂM SAU MỖI LẦN NẠP: `python -X utf8 scripts/qh-tinh/kiem_qh_pdf.py`** (chỉ đọc, ~1 phút): phủ theo thửa của chính từng huyện,
+vùng đất ở > 50 ha nằm trên đất huyện khác (phải ra 0 — còn vùng nào là dải viền lọt lại), tên còn dạng mã thô. Đo 15/10/2026 2h30:
+99,56–100 % diện tích thửa có loại đất, 0 thửa trắng trơn, 0 vùng viền, 1 mã thô ("MVB" Ninh Hòa 401,8 ha — chú giải không ghi tên).
+
 **⚠️ BẢN VẼ TÔ CẢ ĐẤT HUYỆN BÊN (đo 15/10/2026).** Mấy bản tô phần đất huyện lân cận bằng màu đất ở (#ffa0ff = ODT, #ffd0ff = ONT),
 nên lượt bóc ghi luôn thành "Đất ở…" và ranh dựng từ vùng màu (`qh_pdf_ranh`) phình sang huyện bên. Vùng lớn nằm gần trọn trên đất huyện
 KHÁC (đếm thửa địa chính theo huyện cũ của xã): Diên Khánh 1 vùng ODT 1.637,6 ha (1 thửa Diên Khánh / 500 thửa Nha Trang + Khánh Vĩnh +

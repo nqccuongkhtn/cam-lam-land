@@ -14,6 +14,7 @@ Ss=float(sys.argv[9]) if len(sys.argv)>9 else 1.8
 
 p2en,p2w,info=NAN.lap_phep_doi(pdf,clng,clat)
 se,ie,sn,inn=info['se'],info['ie'],info['sn'],info['inn']
+EN2P=info.get('en2p') or (lambda E,N: ((E-ie)/se,(N-inn)/sn))   # nan theo o luoi neu co
 W,H=info['W'],info['H']
 
 # ranh
@@ -74,7 +75,7 @@ for z in range(zmin,zmax+1):
                 for oxx in gp:
                     lon,lat=gp2ll(ox0+oxx,oy0+oy,z)
                     E,Nn=vn.wgs84_to_vn2000(lon,lat)
-                    pdx=(E-ie)/se; pdy=(Nn-inn)/sn
+                    pdx,pdy=EN2P(E,Nn)
                     P.append((oxx,oy,1.0)); SX.append(pdx*Ss); SY.append(pdy*Ss)
                     if 0<=pdx<=W and 0<=pdy<=H: oob=False
             if oob: continue

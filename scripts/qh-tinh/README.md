@@ -71,7 +71,36 @@ Cách làm được (Cam Ranh thành công, R²=1,0, đúng 113,38 pt/km):
 4. Lưu kết quả vào file kèm `<pdf>.nan.json` `{"se":..,"ie":..,"sn":..,"inn":..}` → `nan2.py` tự đọc, cả
    `ranh_tu_pdf.py` / `tiler2.py` / `proof.py` chạy như thường.
 
-**CÒN LẠI Diên Khánh + Khánh Vĩnh:** đường lưới KHÔNG phải nét dài đơn (grid_vec ra rỗng), dò cyan thì lẫn
+**✅ DIÊN KHÁNH + KHÁNH VĨNH ĐÃ NẮN CHUẨN (14/10/2026) — `nan_luoi_dut.py`.** Hai bản này vẽ đường lưới thành
+NHIỀU ĐOẠN NGẮN nối nhau (không phải 1 nét dài) nên `grid_vec.py` ra rỗng. Cách làm: gom MỌI đoạn thẳng ngang/dọc theo toạ độ,
+đường nào tổng dài > 1/4 khung là đường lưới; dò NỐI TIẾP (đường sau tìm quanh đường trước + 1 ô) → khớp bình phương nhỏ nhất.
+Chỉ cần đọc bằng mắt NHÃN của 1 đường dọc + 1 đường ngang:
+```bash
+python -P nan_luoi_dut.py <pdf> <x_duong_doc_dau_pt> <E> <y_duong_ngang_dau_pt> <N> <buoc_pt> <buoc_m> <pdf>.nan.json
+# Diên Khánh: 164.5 574000 249.0 1372000 173.5 2000  → sai số TB 0,4 m (Đông) / 1,2 m (Bắc), 13 + 17 đường
+#   (bản in KHÔNG đúng 1:25.000: 86,75 pt/km — phép "khớp tâm" cũ giả định 113,4 pt/km nên lệch ~100 m)
+# Khánh Vĩnh: 526.4 548000 548.8 1382000 226.5 2000   (nhãn ghi tắt km: "46.0" = 546.000, "82.0" = 1.382.000;
+#   đường 297,8 là KHUNG, không phải lưới) → 19 + 21 đường
+```
+⚠️ **Khánh Vĩnh in lưới KHÔNG ĐỀU** (phía tây ô 226,5 pt, phía đông 227,0 pt) → một phép thẳng lệch tới 10 m ở mép đông.
+Nên file nắn có thêm `"luoi": {"x":[…],"E":[…],"y":[…],"N":[…]}` = vị trí từng đường lưới; `nan2.lap_phep_doi` thấy mục này thì
+NẮN THEO TỪNG Ô LƯỚI (nội suy giữa các đường, đúng tại mọi đường lưới) và trả thêm `p2en` / `en2p`; `tiler2.py`, `proof.py`,
+`ranh_tu_pdf.py` dùng chung hai hàm đó (file nắn KHÔNG có "luoi" thì y như cũ — 5 bản đã lên web không đổi).
+Bản sao file nắn + ranh: `scripts/qh-tinh/nan/` (PDF gốc nằm trong kho tài liệu, xem sổ KHO-QH.md).
+Ảnh thử (chồng vệ tinh): `bao-cao-qh/anh-thu-qh/dien-khanh-2030-THU-*.png`, `khanh-vinh-2030-THU-*.png` — CHỜ CHỦ DỰ ÁN DUYỆT
+rồi mới chép tile (`dienkhanh2030v1`, `khanhvinh2030v1`, đã cắt sẵn z9–16 ở thư mục nháp) + thêm lớp vào `app/map/page.tsx`.
+
+**BÓC LOẠI ĐẤT THEO THỬA TỪ PDF — `boc_loai_dat.py` (ĐANG LÀM, CHƯA DÙNG CHO WEB).** Mục tiêu: tính diện tích từng loại đất trên
+từng thửa cho các huyện ngoài Cam Lâm (chủ dự án chọn 14/10/2026: tự bóc từ PDF, chưa chờ file gốc của Sở).
+Cách: vẽ lại mọi mảng tô theo đúng thứ tự vẽ của PDF → mỗi MẢNG lấy mã theo nhãn nằm trong nó; nhãn PHÂN SỐ "CLN / TMD" lấy mã
+DƯỚI (quy hoạch); mảng không nhãn thì theo KHUNG CHÚ GIẢI (màu chỉ in cho đúng 1 mã) hoặc ghi "NHÓM … chưa rõ loại"; xuất GeoJSON
+WGS84 cắt theo ranh. Thử Cam Ranh (S=1,5 → 5,9 m/điểm ảnh): phủ 94 % trong ranh; thửa 246 tờ 8 Cam Phúc Nam ra TMD 831,4 m² (đúng
+bản vẽ "CLN/TMD"). CÒN PHẢI SỬA trước khi đưa lên web: (1) đọc chú giải đôi khi ghép màu với mã của dòng bên cạnh (ruộng lúa vàng ra
+nhóm "DTL/NTS"); (2) nhận phân số theo vị trí đôi khi bắt nhầm 2 nhãn của 2 thửa liền nhau (2.767 mã bị bỏ — cần kiểm thêm vạch
+ngang phân số); (3) màu hồng cam công cộng dùng chung 22 mã → nhiều lô chỉ ra "nhóm"; (4) nối vào `/api/parcels/at` (bảng PostGIS
+riêng + trang "Quy hoạch sử dụng đất 2030" trong bảng thông tin thửa; phiếu trích lục vẫn chỉ cho Cam Lâm).
+
+**(CŨ, giữ để tham khảo) CÒN LẠI Diên Khánh + Khánh Vĩnh:** đường lưới KHÔNG phải nét dài đơn (grid_vec ra rỗng), dò cyan thì lẫn
 sông → tự động chưa chuẩn. **Nắn tay QGIS** (mở PDF, chọn 3–4 giao điểm lưới) là nhanh nhất. Số lưới đã biết:
 - Diên Khánh (1:25.000): đông 574000/576000/578000/580000/582000; bắc 1372000/1370000/1368000 (bước 2 km).
 - Khánh Vĩnh: còn lẫn nhãn bình độ 1100/1200 + ảnh JPEG nhúng — xem kỹ khi nắn.

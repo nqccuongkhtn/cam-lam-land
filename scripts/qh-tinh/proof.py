@@ -12,6 +12,7 @@ lng0,lng1=min(lng0,lng1),max(lng0,lng1); lat0,lat1=min(lat0,lat1),max(lat0,lat1)
 
 p2en,p2w,info = NAN.lap_phep_doi(pdf,clng,clat)
 se,ie,sn,inn = info['se'],info['ie'],info['sn'],info['inn']
+EN2P=info.get('en2p') or (lambda E,N: ((E-ie)/se,(N-inn)/sn))   # nan theo o luoi neu co
 import vn2000 as vn
 
 def lonlat2gp(lon,lat,z):
@@ -58,7 +59,7 @@ print("Da ghep xong anh ve tinh.")
 # --- 3. render vung PDF phu bbox ---
 # tinh PDF pt cho nhieu diem tren bbox -> lay khung bao
 def wgs2pdf(lon,lat):
-    E,N=vn.wgs84_to_vn2000(lon,lat); return ((E-ie)/se,(N-inn)/sn)
+    E,N=vn.wgs84_to_vn2000(lon,lat); return EN2P(E,N)
 xs=[];ys=[]
 for a in range(11):
     for b in range(11):
@@ -83,7 +84,7 @@ for i,oy in enumerate(gy):
     for j,ox in enumerate(gx):
         lon,lat=gp2lonlat(gpx0+ox,gpy0+oy,z)
         E,N=vn.wgs84_to_vn2000(lon,lat)
-        pdx=(E-ie)/se; pdy=(N-inn)/sn
+        pdx,pdy=EN2P(E,N)
         mapx_c[i,j]=(pdx-px0)*S; mapy_c[i,j]=(pdy-py0)*S
 mapx=cv2.resize(mapx_c,(Wbig,Hbig),interpolation=cv2.INTER_LINEAR)
 mapy=cv2.resize(mapy_c,(Wbig,Hbig),interpolation=cv2.INTER_LINEAR)

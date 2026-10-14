@@ -11,6 +11,7 @@ import vn2000 as vn
 pdf=sys.argv[1]; clng=float(sys.argv[2]); clat=float(sys.argv[3]); outjson=sys.argv[4]; viz=sys.argv[5]
 p2en,p2w,info=NAN.lap_phep_doi(pdf,clng,clat)
 se,ie,sn,inn=info['se'],info['ie'],info['sn'],info['inn']
+P2EN=info.get('p2en') or (lambda x,y: (se*x+ie, sn*y+inn))   # nan theo o luoi neu co
 W,H=info['W'],info['H']
 S=0.4
 doc=pymupdf.open(pdf); page=doc[0]
@@ -54,7 +55,7 @@ for c in cnts:
     ring=[]
     for p in c[:,0,:]:
         px_pt=p[0]/S; py_pt=p[1]/S
-        E=se*px_pt+ie; Nn=sn*py_pt+inn
+        E,Nn=P2EN(px_pt,py_pt)
         lon,lat=vn.vn2000_to_wgs84(E,Nn)
         ring.append([round(lon,6),round(lat,6)])
     ring.append(ring[0])

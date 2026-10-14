@@ -102,10 +102,26 @@ def lap_phep_doi(pdf_path, tam_lng, tam_lat):
         se,ie,sn,inn=c["se"],c["ie"],c["sn"],c["inn"]
         doc=pymupdf.open(pdf_path); W,H=doc[0].rect.width,doc[0].rect.height; doc.close()
         def p2en(x,y): return (se*x+ie, sn*y+inn)
+        def en2p(E,N): return ((E-ie)/se, (N-inn)/sn)
+        L=c.get("luoi")
+        if L:
+            # NAN THEO TUNG O LUOI (14/10/2026): ban in co luoi KHONG DEU (Khanh Vinh: phia dong o rong 227,0 pt, phia tay 226,5)
+            # -> mot phep thang lech toi 10 m o mep. Noi suy tuyen tinh giua cac duong luoi = dung tai MOI duong luoi;
+            # ngoai duong luoi ngoai cung thi keo dai theo o cuoi. "luoi": {"x":[pt],"E":[m],"y":[pt],"N":[m]} (x,y tang dan).
+            def _ns(v, a, b):
+                if v <= a[0]: return b[0] + (v-a[0])*(b[1]-b[0])/(a[1]-a[0])
+                if v >= a[-1]: return b[-1] + (v-a[-1])*(b[-1]-b[-2])/(a[-1]-a[-2])
+                import bisect
+                k = bisect.bisect_right(a, v) - 1
+                return b[k] + (v-a[k])*(b[k+1]-b[k])/(a[k+1]-a[k])
+            lx, lE, ly, lN = [list(map(float, L[k])) for k in ("x","E","y","N")]
+            lNr, lyr = lN[::-1], ly[::-1]   # N tang dan (y giam dan) cho chieu nguoc
+            def p2en(x,y): return (_ns(x, lx, lE), _ns(y, ly, lN))
+            def en2p(E,N): return (_ns(E, lE, lx), _ns(N, lNr, lyr))
         def p2w(x,y):
             E,N=p2en(x,y); return vn.vn2000_to_wgs84(E,N)
         info=dict(W=W,H=H,se=se,ie=ie,r2e=1.0,ne=c.get("ne",0),sn=sn,inn=inn,r2n=1.0,nn=c.get("nn",0),
-                  ppkm_x=1000.0/se, ppkm_y=-1000.0/sn, nhap_tay=True)
+                  ppkm_x=1000.0/se, ppkm_y=-1000.0/sn, nhap_tay=True, p2en=p2en, en2p=en2p)
         return p2en,p2w,info
     doc=pymupdf.open(pdf_path); page=doc[0]; W,H=page.rect.width,page.rect.height
     E0,N0=vn.wgs84_to_vn2000(tam_lng,tam_lat)

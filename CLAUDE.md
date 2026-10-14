@@ -1043,8 +1043,9 @@ Toàn bài vẫn nằm trong trang (Google đọc được, kéo khách), ngư�
   không phải 20/01) 180 dòng, QĐ 12/2026 315 dòng, **QĐ 35/2026 cây trồng, vật nuôi** 559 dòng + mật độ (thẻ ③). QĐ 32/2026 đã áp:
   thưởng bàn giao Điều 15 (10% tổng, 1–8 triệu / dự án khoản 7 Điều 111: 5 + 3 triệu), tạm cư Điều 4, ổn định đời sống 70% Điều 6,
   tỷ lệ 100/80/70% tài sản không đủ điều kiện Điều 10, cây vượt mật độ 80% Điều 11. Văn bản ghi số lạ thì KHÔNG tự sửa (vd mục 39.13
-  QĐ 12 "899.00" đã bỏ khỏi bảng, chờ hỏi Sở Xây dựng). Ngày ký QĐ 893 (quy hoạch sử dụng đất Cam Lâm) đang ghi hai cách trong mã:
-  `phieuQh.ts` 04/04/2025, `map/page.tsx` 04/4/2026 — chưa xác minh.
+  QĐ 12 "899.00" đã bỏ khỏi bảng, chờ hỏi Sở Xây dựng). Ngày ký QĐ 893 (quy hoạch sử dụng đất Cam Lâm) = **04/4/2025** — đọc trên
+  bản quét Sở NN&MT đăng (chữ ký số 09/4/2025), xác minh 14/10/2026; `map/page.tsx` từng ghi nhầm 2026, đã sửa. Số + ngày quyết định
+  của 7 bản QHSDĐ 2030 PDF cũng đã xác minh cùng cách (thẻ căn cứ `qdQhsdd` trong `map/page.tsx`).
 - **Bản đồ trống / tin "đang tải" mãi** → backend chưa lên: `docker compose logs backend`.
 - **Không thấy lớp GIS nào** → xem worker: `docker compose logs gis-worker`, tìm dòng `imported ... features`.
 - **⚠️ Clone mới không có ảnh quy hoạch.** Trang bản đồ dùng `/tiles/qd205v11/{z}/{x}/{y}.png`, nhưng

@@ -425,6 +425,13 @@ const TL_QH = '/tai-lieu/quy-hoach/';
 // → thẻ liệt kê từng văn bản, mỗi dòng một đường mở bản gốc.
 type CanCu = { so: string; ngay: string; coQuan: string; ten: string; tep: string; loai?: string;
   cac?: { so: string; ngay: string; ten: string; tep: string }[] };
+// Thẻ căn cứ cho bản QHSDĐ 2030 do Sở NN&MT đăng: dòng đầu = quyết định phê duyệt, bên dưới hai dòng mở bản gốc (quyết định + bản đồ)
+const SNNMT = 'https://snnmt.khanhhoa.gov.vn';
+function qdQhsdd(so: string, ngay: string, ten: string, tepQd: string, tenBanDo: string, tepBanDo: string): CanCu {
+  return { so, ngay, coQuan: 'UBND tỉnh Khánh Hòa', ten, tep: SNNMT + tepQd,
+    cac: [{ so: 'Quyết định', ngay, ten: so + ' (bản quét có chữ ký)', tep: SNNMT + tepQd },
+      { so: 'Bản đồ', ngay, ten: tenBanDo + ' (Sở NN&MT công bố)', tep: SNNMT + tepBanDo }] };
+}
 const CAN_CU_QH: Record<string, CanCu> = {
   'qh-qd205': { so: '205/QĐ-TTg', ngay: '28/02/2024', coQuan: 'Thủ tướng Chính phủ',
     ten: 'Phê duyệt Quy hoạch chung đô thị mới Cam Lâm, tỉnh Khánh Hòa đến năm 2045',
@@ -450,34 +457,34 @@ const CAN_CU_QH: Record<string, CanCu> = {
   'qh-cuhin': { so: '30/QĐ-UBND', ngay: '15/01/2026', coQuan: 'UBND xã Suối Dầu',
     ten: 'Phê duyệt quy hoạch phân khu (tỷ lệ 1/2000) Phân khu sinh thái núi Cù Hin, đô thị mới Cam Lâm',
     tep: TL_QH + 'QD-30-2026-phan-khu-sinh-thai-nui-Cu-Hin.pdf' },
-  'qh-qd893': { so: '893/QĐ-UBND', ngay: '04/4/2026', coQuan: 'UBND tỉnh Khánh Hòa',
+  // Ngày 04/4/2025 (KHÔNG phải 2026): đọc trên bản quét QĐ 893 Sở NN&MT đăng (bài id 10974), chữ ký số ngày 09/4/2025 — xác minh 14/10/2026
+  'qh-qd893': { so: '893/QĐ-UBND', ngay: '04/4/2025', coQuan: 'UBND tỉnh Khánh Hòa',
     ten: 'Phê duyệt Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 huyện Cam Lâm',
     tep: 'https://congbaokhanhhoa.gov.vn/vi-vn/noi-dung-van-ban/vanbanid/22060' },
-  // Ninh Hòa: CHƯA ghi số quyết định (bản PDF bản đồ không in số QĐ ở dạng chữ đọc được; đang xác
-  // minh). Để trống so/ngay → card hiện TÊN bản đồ thay cho dòng "Quyết định …" (xem chỗ render).
-  'qh-ninhhoa2030': { so: '', ngay: '', coQuan: 'Sở Nông nghiệp và Môi trường tỉnh Khánh Hòa',
-    ten: 'Bản đồ Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 — Thị xã Ninh Hòa, tỉnh Khánh Hòa',
-    tep: 'https://snnmt.khanhhoa.gov.vn/Portals/0/2b_%20Ban%20do%20DCQHSD%20dat%20den%20nam%202030%20Tx%20Ninh%20Hoa.pdf' },
-  // Số QĐ 3 bản dưới ĐỂ TRỐNG chờ xác minh bản gốc (nhãn QĐ không ở dạng chữ đọc được trên bản đồ).
-  'qh-nhatrang2030': { so: '', ngay: '', coQuan: 'Sở Nông nghiệp và Môi trường tỉnh Khánh Hòa',
-    ten: 'Bản đồ Quy hoạch sử dụng đất đến năm 2030 — TP Nha Trang, tỉnh Khánh Hòa',
-    tep: 'https://snnmt.khanhhoa.gov.vn/Portals/0/2022/Dat-dai/NhaTrang2030.pdf' },
-  'qh-khanhson2030': { so: '', ngay: '', coQuan: 'Sở Nông nghiệp và Môi trường tỉnh Khánh Hòa',
-    ten: 'Bản đồ Quy hoạch sử dụng đất đến năm 2030 — Huyện Khánh Sơn, tỉnh Khánh Hòa',
-    tep: 'https://snnmt.khanhhoa.gov.vn/Portals/0/2022/Dat-dai/KhanhSon2030.pdf' },
-  'qh-vanninh2030': { so: '', ngay: '', coQuan: 'Sở Nông nghiệp và Môi trường tỉnh Khánh Hòa',
-    ten: 'Bản đồ Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 — Huyện Vạn Ninh, tỉnh Khánh Hòa',
-    tep: 'https://snnmt.khanhhoa.gov.vn/Portals/0/DCQH2030%20VAN%20NINH.pdf' },
-  'qh-camranh2030': { so: '', ngay: '', coQuan: 'Sở Nông nghiệp và Môi trường tỉnh Khánh Hòa',
-    ten: 'Bản đồ Quy hoạch sử dụng đất đến năm 2030 — TP Cam Ranh, tỉnh Khánh Hòa',
-    tep: 'https://snnmt.khanhhoa.gov.vn/Portals/0/2022/Dat-dai/CamRanh2030.pdf' },
-  // Diên Khánh / Khánh Vĩnh: bản đồ KHÔNG in số quyết định (Khánh Vĩnh ghi "ngày … tháng … năm 2025" để trống) → chưa ghi số QĐ.
-  'qh-dienkhanh2030': { so: '', ngay: '', coQuan: 'Sở Nông nghiệp và Môi trường tỉnh Khánh Hòa',
-    ten: 'Bản đồ Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 — Huyện Diên Khánh, tỉnh Khánh Hòa',
-    tep: 'https://snnmt.khanhhoa.gov.vn/Portals/0/3%20Ban%20do%20Dieu%20chinh%20Quy%20hoach%20su%20dung%20dat%20huyen%20Dien%20Khanh%20den%202030.pdf' },
-  'qh-khanhvinh2030': { so: '', ngay: '', coQuan: 'Sở Nông nghiệp và Môi trường tỉnh Khánh Hòa',
-    ten: 'Bản đồ Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 — Huyện Khánh Vĩnh, tỉnh Khánh Hòa (tỷ lệ 1/25.000)',
-    tep: 'https://snnmt.khanhhoa.gov.vn/Portals/0/DCQH%20SDD%20DEN%2020330%2008052025.pdf' },
+  // 7 BẢN QHSDĐ 2030 BÓC TỪ PDF — số + ngày quyết định ĐÃ XÁC MINH 14/10/2026: Sở NN&MT đăng mỗi bản đồ CÙNG BÀI với quyết định phê duyệt
+  // của nó (snnmt.khanhhoa.gov.vn → Quy hoạch - Kế hoạch sử dụng đất, id bài ghi ở từng dòng); file bản đồ web dùng trùng TỪNG BYTE file
+  // trong bài; số + ngày đọc trên chính bản quét quyết định (chữ viết tay / dấu — lớp chữ máy đọc của bản quét bị lỗi, đừng tin).
+  'qh-ninhhoa2030': qdQhsdd('1653/QĐ-UBND', '17/6/2025', 'Phê duyệt Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 và Kế hoạch sử dụng đất năm đầu của điều chỉnh quy hoạch sử dụng đất thị xã Ninh Hòa',   // bài 11416
+    '/Portals/0/QD%201653%20ngay%2017_6_2025%20cua%20UB%20tinh%20phe%20duyt%20diu%20chnh%20quy%20hoch%20SDD%202030%20TX%20Ninh%20Hoa.pdf',
+    'Bản đồ Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 — Thị xã Ninh Hòa', '/Portals/0/2b_%20Ban%20do%20DCQHSD%20dat%20den%20nam%202030%20Tx%20Ninh%20Hoa.pdf'),
+  'qh-nhatrang2030': qdQhsdd('2978/QĐ-UBND', '31/10/2022', 'Phê duyệt quy hoạch sử dụng đất đến năm 2030 và kế hoạch sử dụng đất năm đầu của quy hoạch sử dụng đất thành phố Nha Trang',   // bài 6077
+    '/Portals/0/2022/Dat-dai/QD%202978.pdf',
+    'Bản đồ Quy hoạch sử dụng đất đến năm 2030 — TP Nha Trang', '/Portals/0/2022/Dat-dai/NhaTrang2030.pdf'),
+  'qh-khanhson2030': qdQhsdd('4178/QĐ-UBND', '15/11/2021', 'Phê duyệt quy hoạch sử dụng đất đến năm 2030 và kế hoạch sử dụng đất năm 2021 của huyện Khánh Sơn',   // bài 5609
+    '/Portals/0/2022/Dat-dai/4178_QD_UBND.pdf',
+    'Bản đồ Quy hoạch sử dụng đất đến năm 2030 — Huyện Khánh Sơn', '/Portals/0/2022/Dat-dai/KhanhSon2030.pdf'),
+  'qh-vanninh2030': qdQhsdd('701/QĐ-UBND', '14/3/2024', 'Phê duyệt Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 và Kế hoạch sử dụng đất năm đầu của điều chỉnh quy hoạch sử dụng đất huyện Vạn Ninh',   // bài 9377
+    '/Portals/0/701_QD_UBND.pdf',
+    'Bản đồ Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 — Huyện Vạn Ninh', '/Portals/0/DCQH2030%20VAN%20NINH.pdf'),
+  'qh-camranh2030': qdQhsdd('860/QĐ-UBND', '31/3/2022', 'Phê duyệt quy hoạch sử dụng đất đến năm 2030 và kế hoạch sử dụng đất năm đầu của quy hoạch sử dụng đất thành phố Cam Ranh',   // bài 3412
+    '/Resources/Docs/2022/%C4%90%E1%BA%A5t%20%C4%91ai/860.signed.pdf',
+    'Bản đồ Quy hoạch sử dụng đất đến năm 2030 — TP Cam Ranh', '/Portals/0/2022/Dat-dai/CamRanh2030.pdf'),
+  'qh-dienkhanh2030': qdQhsdd('1564/QĐ-UBND', '10/6/2025', 'Phê duyệt Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 và Kế hoạch sử dụng đất năm đầu của điều chỉnh quy hoạch sử dụng đất huyện Diên Khánh',   // bài 11302
+    '/Portals/0/1564-QD-UBND_signed.pdf',
+    'Bản đồ Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 — Huyện Diên Khánh', '/Portals/0/3%20Ban%20do%20Dieu%20chinh%20Quy%20hoach%20su%20dung%20dat%20huyen%20Dien%20Khanh%20den%202030.pdf'),
+  'qh-khanhvinh2030': qdQhsdd('1650/QĐ-UBND', '16/6/2025', 'Phê duyệt Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 và Kế hoạch sử dụng đất năm đầu của điều chỉnh quy hoạch sử dụng đất huyện Khánh Vĩnh',   // bài 11348
+    '/Portals/0/1650_signed.pdf',
+    'Bản đồ Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 — Huyện Khánh Vĩnh (tỷ lệ 1/25.000)', '/Portals/0/DCQH%20SDD%20DEN%2020330%2008052025.pdf'),
 };
 
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];

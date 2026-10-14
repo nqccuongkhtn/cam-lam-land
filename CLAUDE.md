@@ -811,8 +811,19 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   `grid_vec.py` dò đường lưới vector → lưu `<pdf>.nan.json`. **Diên Khánh + Khánh Vĩnh nắn được 14/10/2026** bằng
   `nan_luoi_dut.py` (lưới vẽ ĐỨT KHÚC → gom đoạn ngắn thẳng hàng; Khánh Vĩnh lưới in không đều → `.nan.json` có mục `"luoi"`
   = nắn theo TỪNG Ô LƯỚI, `nan2.lap_phep_doi` trả `p2en`/`en2p`); file nắn + ranh 7 huyện sao lưu ở `scripts/qh-tinh/nan/`.
-  Hai lớp này CHỜ DUYỆT ảnh thử (trang https://claude.ai/artifact/LpPsf88ACSbMz2ApMTnyLm), tile cắt sẵn nhưng chưa lên web.
   Chi tiết `scripts/qh-tinh/README.md`.
+  **14/10/2026 chủ dự án chê ảnh "mờ, không thấy được" → MỌI lớp từ PDF cắt lại bằng `tiler3.py`:** ô **512 điểm ảnh WebP** (web vẫn
+  khai `tileSize: 256` → nét gấp đôi trên điện thoại, không sửa lõi MapView), mỗi mức phóng vẽ lại từ PDF (tiler2 lấy mẫu một ảnh lớn
+  cho mọi mức → mức xa lấm tấm), thêm mức 17; WebP 512 còn nhẹ hơn PNG 256 cũ. Bộ ô: `ninhhoa2030v3`, `nhatrang2030v2`, `khanhson2030v2`,
+  `vanninh2030v2`, `camranh2030v2`, `dienkhanh2030v2`, `khanhvinh2030v2` (z9–17) + **QH chi tiết 1/500 Cam Lâm `qhct500camlam-v3`**
+  (9 đồ án DỰ THẢO lấy ý kiến, z12–19, lớp `qh-qhct500`, căn cứ = 9 thông báo 285–291, 327, 328/TB-UBND xã Cam Lâm — thẻ căn cứ có
+  kiểu `loai: 'Thông báo'` + danh sách `cac`). Nắn 1/500: bảng toạ độ góc ranh / nút tim đường / nét hiện trạng khớp địa chính; TỰ KIỂM
+  bằng `kiem_nan_dia_chinh.py` + `kiem_nan_phan_khu.py` (ô đất 1/2000) → phát hiện Cam Hiệp Nam lệch ~3 m, Cam Hiệp Bắc ~2 m, TK B ~1,3 m
+  (nan_1_500 lẫn nét tim đường đỏ) → sửa bằng `tinh_ranh_net.py` / `tinh_goc_1_500.py`, nay cả 9 chỉ còn 0,02–0,37 m.
+  Kho cố định: PDF `D:\KhoQH\qhsdd-2030\` + `D:\KhoQH\camlam-1-500\`, ô ảnh `D:\KhoQH\tiles-qh\`, file nạp `D:\KhoQH\qh-pdf\`.
+  ĐƯA LÊN WEB: `DUA-LEN-WEB-14-10.bat` (nháy đúp) → `scripts/qh-tinh/dua-len-web-14-10.sh` (chép ô vào volume, nạp qh_pdf Diên Khánh /
+  Khánh Vĩnh, dựng lại, bật cờ `qh_pdf_bat`, kiểm thử, xoá 5 bộ ô cũ). ⚠️ Chạy docker trong Git Bash phải `MSYS_NO_PATHCONV=1`
+  (không thì `/dest` thành `C:/Program Files/Git/dest`). Trợ lý KHÔNG tự dựng web thật được (hệ thống an toàn chặn) — chủ dự án chạy.
   **QUY HOẠCH THEO THỬA TỪ PDF (14/10/2026, MẶC ĐỊNH TẮT):** `boc_loai_dat.py` bóc vùng loại đất từ PDF (2 lượt, ~2 m/điểm ảnh;
   nhãn phân số "CLN/TMD" lấy mã DƯỚI; khung chú giải + `bang-mau-chuan.json` = bảng màu chung 22 màu gom từ 6 bản; màu dùng chung
   nhiều mã → "NHÓM … chưa ghi rõ loại", không đoán; nét dày chỉ là đất khi là đường / nước) → `nap_qh_pdf.py` nạp vào bảng

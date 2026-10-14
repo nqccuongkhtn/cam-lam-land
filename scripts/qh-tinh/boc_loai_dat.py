@@ -73,6 +73,7 @@ hinh = [None]                                    # hình từng mảng (điểm 
 hop = [(0, 0, 0, 0)]                             # khung bao từng mảng (điểm PDF)
 so_mang = 0
 glyph_do, glyph_den = [], []                     # khung (điểm PDF) các mảng tô nhỏ cỡ chữ màu ĐỎ / ĐEN = nét chữ của nhãn
+MAU_NET_CHU = {(0, 0, 255), (150, 0, 150), (0, 135, 135)}   # màu NÉT CHỮ / ký hiệu nhãn (xanh dương, tím, xanh đậm) — không phải loại đất
 S_LO = 0.5                                       # ảnh mã mảng CHỈ GỒM MẢNG TÔ (không nét), 0,5 điểm ảnh / điểm PDF — để dò viền hồng ranh huyện
 H_LO, W_LO = int(round(H * S_LO)) + 1, int(round(W * S_LO)) + 1
 idlo = np.zeros((H_LO, W_LO), np.int32)
@@ -111,7 +112,9 @@ for dr in pg.get_drawings():
     # 797, Diên Khánh 478; hình lớn nhất 14,8 điểm in; không bản nào dùng #0000ff làm màu loại đất). Trước thành mảng "chưa xác định" vẽ
     # SAU nên CHE đất bên dưới → thửa nằm dưới nhãn mất cả trăm m² (Thửa 430 · Tờ 6 Suối Hiệp: vạch xanh che 549 / 831 m² thành "chưa xác
     # định", đất thật bên dưới là CLN + đường). Nay bỏ qua như nét chữ đen / đỏ.
-    if col == (0, 0, 255) and dr['rect'].width < 20 and dr['rect'].height < 20: continue
+    # Cùng kiểu: chữ TÊN ĐỊA DANH màu TÍM #960096 (Vạn Ninh 621 hình, Khánh Sơn 51 — chữ "g" của "Vạn Giã" che 177 m² Thửa 353 · Tờ 8
+    # xã Vạn Ninh) và XANH ĐẬM #008787 (Vạn Ninh 7 hình); mọi hình ≤ 8,8 điểm in, không màu nào trong chú giải.
+    if col in MAU_NET_CHU and dr['rect'].width < 20 and dr['rect'].height < 20: continue
     vong, cur, last = [], [], None
     for it in dr['items']:
         k = it[0]

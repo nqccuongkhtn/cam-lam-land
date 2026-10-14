@@ -155,6 +155,8 @@ màu đó. Mảng viền thành TRONG SUỐT như nét ranh giới. Đo (Khánh 
 #ffbff1 từng được nhãn đen gán CSD), ODT −13,6 ha; mọi loại khác y nguyên. "Phủ trong ranh" vì thế giảm (ranh vẫn ôm dải viền).
 **Nét chữ XANH DƯƠNG #0000ff** (mã hiện trạng, vạch phân số, ký hiệu — mọi hình < 15 điểm in) cũng bỏ như nét chữ đen / đỏ: trước thành mảng
 "chưa xác định" vẽ đè, khoét lỗ lên đất bên dưới (Thửa 430 · Tờ 6 Suối Hiệp mất 549 / 831 m²).
+Cùng luật cho chữ TÊN ĐỊA DANH màu tím #960096 (Vạn Ninh 621 hình, Khánh Sơn 51) và xanh đậm #008787 (bảng `MAU_NET_CHU`, mọi hình ≤ 8,8 điểm in):
+Thửa 353 · Tờ 8 xã Vạn Ninh từng mất 177 / 377 m² dưới chữ "g" của "Vạn Giã" → nay ODT 348,6 + đường 28,3. Vạn Ninh +61 ha, Khánh Sơn +2,5 ha đất có loại.
 
 ### Bản KHÔNG có lớp chữ — nhãn vẽ bằng hình (Diên Khánh, 14/10/2026 khuya)
 PDF Diên Khánh có 0 chữ, 0 phông: mọi nhãn là hình tô nhỏ, MỖI HÌNH MỘT CHỮ CÁI (38.384 hình đen = hiện trạng, 21.531 hình đỏ = quy

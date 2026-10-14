@@ -446,6 +446,9 @@ Kiểm tra nhanh trong Console: `Object.values(__banDo.style.sourceCaches['src-d
   trùng khít mang hai số khác nhau, vd Thửa 23 · Tờ 50 và Thửa 23 · Tờ 500). `/api/parcels/at` chọn theo thứ tự: thửa KHÔNG phải
   đường / sông / thuỷ lợi → thửa NHỎ nhất chứa điểm bấm → trong nhóm gần trùng khít (lệch ≤ 2 %) bản ghi CÓ loại đất → mã thửa.
   Trước đó `LIMIT 1` không sắp xếp nên bấm thửa nhỏ có lúc ra thửa to, hoặc vớ thửa đường rồi báo "không tra cứu".
+  Cả tỉnh có **6.052 cặp thửa trùng khít hình mang hai số khác nhau** (5.825 cặp cùng một xã; nhiều nhất Quảng Sơn 1.379 — Thửa 1016 ·
+  Tờ 171 = Thửa 1016 · Tờ 90 —, Ninh Sơn 892, Cam Nghĩa 430, Nam Nha Trang 260, Cam Hải Đông 216): số cũ + số mới cùng nằm trong file
+  nguồn. Số nào hiện hành phải hỏi Văn phòng Đăng ký — đừng tự xoá bản ghi nào.
 - Gõ `__banDo` trong Console trình duyệt để soi bản đồ khi cần tìm sự cố.
 
 ---

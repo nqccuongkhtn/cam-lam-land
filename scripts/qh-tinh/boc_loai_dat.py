@@ -2,9 +2,12 @@
 # BÓC VÙNG LOẠI ĐẤT từ bản đồ QHSDĐ 2030 dạng PDF (nét vector) → GeoJSON có toạ độ thật (WGS84), cắt theo ranh huyện.
 # Dùng để tính DIỆN TÍCH TỪNG LOẠI ĐẤT TRÊN TỪNG THỬA cho các huyện/thị ngoài Cam Lâm (Cam Lâm có CAD gốc, không dùng cái này).
 #
-# Dùng: python -P boc_loai_dat.py <pdf> <tam_lng> <tam_lat> <ranh.json> <S1 px/pt> <ra.geojson> [anh_thu.png] [--m=2.0]
+# Dùng: python -P boc_loai_dat.py <pdf> <tam_lng> <tam_lat> <ranh.json> <S1 px/pt> <ra.geojson> [anh_thu.png] [--m=2.0] [--mau-chuan=bang-mau-chuan.json]
 #   S1   = độ phóng LƯỢT 1 (quyết định loại đất cho từng mảng; 1,5 là đủ).
 #   --m  = mét / điểm ảnh của LƯỢT 2 (vẽ ranh vùng sắc nét theo từng ô 2048 điểm ảnh; mặc định 2 m).
+#   --mau-chuan = BẢNG MÀU CHUẨN của tỉnh (lap_bang_mau_chuan.py, gom từ chú giải các bản đọc được đầy đủ) — chỉ BỔ SUNG màu mà
+#       chú giải của chính bản này không có (Ninh Hòa đọc được 10 mã: thiếu #ffaa32 DGT, #ffa0ff ODT…). Chú giải của bản vẫn ưu tiên.
+#   Ghi kèm <ra>.chu-giai.json = chú giải bản này đọc được (để lập / soi bảng màu chuẩn).
 #   (pdf phải nắn được: nan2.py tự đọc nhãn lưới, hoặc có file <pdf>.nan.json bên cạnh — xem nan/)
 #
 # Cách làm (14/10/2026, phát triển từ bản thử Cam Ranh 13–14/10):
@@ -33,6 +36,7 @@ ts = [a for a in sys.argv[1:] if not a.startswith('--')]
 pdf, tlng, tlat, ranh_path, S, ra = ts[0], float(ts[1]), float(ts[2]), ts[3], float(ts[4]), ts[5]
 anh_thu = ts[6] if len(ts) > 6 else None
 M_PX = float(next((a.split('=')[1] for a in co if a.startswith('--m=')), 2.0))
+MAU_CHUAN = next((a.split('=', 1)[1] for a in co if a.startswith('--mau-chuan=')), None)
 t0 = time.time()
 
 p2en, p2w, info = nan2.lap_phep_doi(pdf, tlng, tlat)
@@ -162,6 +166,17 @@ if sum(len(c) for c in chu_giai.values()) < 8:
         col = mau_tai(cx, cy)
         if col: chu_giai[col][t] += 1
     print('chu giai: chu cung co nhan -> lay moi ma ngoai ranh (du phong)')
+
+json.dump({'#%02x%02x%02x' % k: dict(v) for k, v in chu_giai.items()}, open(ra.replace('.geojson', '') + '.chu-giai.json', 'w',
+          encoding='utf-8'), ensure_ascii=False, indent=0)
+if '--chi-chu-giai' in co: print('chu giai:', sum(len(c) for c in chu_giai.values()), 'ma tren', len(chu_giai), 'mau (chi doc chu giai)'); sys.exit(0)
+if MAU_CHUAN:
+    them = 0
+    for hx, mas in json.load(open(MAU_CHUAN, encoding='utf-8'))['mau'].items():
+        col = (int(hx[1:3], 16), int(hx[3:5], 16), int(hx[5:7], 16))
+        if col in chu_giai: continue                      # chú giải của chính bản này ưu tiên
+        chu_giai[col] = collections.Counter({m: 1 for m in mas['ma']}); them += 1
+    print(f'bang mau chuan: bo sung {them} mau chu giai ban nay khong co')
 
 # PHÂN SỐ "hiện trạng / quy hoạch" (CLN / TMD): hai mã XẾP CHỒNG thẳng hàng CÓ VẠCH NGANG ở giữa → bỏ mã TRÊN (hiện trạng).
 # Nhận theo VỊ TRÍ chứ không theo màu (Cam Ranh in mã dưới màu đỏ nhưng PDF báo màu chữ đen).

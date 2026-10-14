@@ -6,6 +6,8 @@ import { verifyToken, coVaiTro } from '../lib/auth.ts';
 import { computeQhAreas, computeQhTheoBan, outerRing, qhReady, ngoaiVungQh, chuanToaDoDiaChinh, manhQh205 } from '../lib/qhCompute.ts';
 import { sqlDienTichPhang, sqlHeSoPhang } from '../lib/dienTichPhang.ts';
 import { qhCoLuu, tinhQhHinh } from '../lib/qhLuu.ts';
+import { qhTuPdf } from '../lib/qhPdf.ts';
+import { isFlagOn } from '../lib/flags.ts';
 
 
 // Mã mục đích sử dụng KHÔNG mở tra cứu thửa — đây là hạ tầng công cộng do Nhà nước quản lý,
@@ -274,7 +276,16 @@ parcelsRouter.get('/at', async (req, res, next) => {
     // Một thửa hay bị NHIỀU bản quy hoạch phủ chồng (QĐ205 trùm cả huyện, bên trong còn QĐ893 và
     // các bản phân khu 1/2000). Liệt kê RIÊNG từng bản, mỗi bản ghi rõ loại đất + diện tích, để
     // người xem tự đối chiếu — không bản nào bị giấu đi.
-    const qhCacBan = parcel ? (kqQh ? kqQh.cacBan : computeQhTheoBan(ringThua, dtThua)) : [];
+    const qhCacBanCL = parcel ? (kqQh ? kqQh.cacBan : computeQhTheoBan(ringThua, dtThua)) : [];
+    // (14/10/2026) Thửa NGOÀI Cam Lâm (không bản CAD nào phủ): tra QHSDĐ 2030 của huyện/thị đó, BÓC TỪ BẢN ĐỒ PDF của Sở
+    // (lib/qhPdf.ts, chỉ thửa địa chính toàn tỉnh). Mục có nguon:'pdf' — giao diện ghi "tham khảo" và KHÔNG cho in phiếu.
+    // CÔNG TẮC: cờ 'qh_pdf_bat' trong app_flags (mặc định KHÔNG có = TẮT) — bật sau khi chủ dự án duyệt ảnh thử:
+    //   INSERT INTO app_flags(key) VALUES ('qh_pdf_bat') ON CONFLICT DO NOTHING;   ·  tắt: DELETE FROM app_flags WHERE key='qh_pdf_bat';
+    // (máy chủ THỬ để chụp ảnh duyệt đặt biến môi trường QH_PDF_THU=1)
+    const qhPdf = parcel && tuBangMoi && overlaps.length === 0 && qhCacBanCL.length === 0
+      && (process.env.QH_PDF_THU === '1' || await isFlagOn('qh_pdf_bat'))
+      ? await qhTuPdf(Number(parcel.id), dtThua) : [];
+    const qhCacBan = [...qhCacBanCL, ...qhPdf];
     res.json({ found: true, point: { lng, lat }, parcel: parcel ?? null, zoning: zoningOut, overlaps, neighbors, listings: linked,
                qhCacBan,
                // (10/10/2026) thêm: có thửa mà KHÔNG bản nào phủ (vd thửa Phước Đồng sát ranh QĐ205, nay phần ngoài ranh không còn bị

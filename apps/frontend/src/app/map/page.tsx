@@ -384,16 +384,18 @@ const VUNG_QH: { id: string; ten: string; tenNgan: string; tamXem: [number, numb
   { id: 'khanh-son', ten: 'Huyện Khánh Sơn',      tenNgan: 'Khánh Sơn', tamXem: [108.9500, 12.0300, 11] },
 ];
 // `zBay` = mức phóng bay tới khi chọn bản này mà đang nhìn xa hơn (không ghi thì tự tính = minzoom − 1).
-const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: string[]; zBay?: number; vung: string }[] = [
+// `pdf` = mã bản trong bảng qh_pdf (máy chủ lib/qhPdf.ts): thửa trong vùng bản này có trang "Quy hoạch sử dụng đất 2030"
+//   tính từ vùng loại đất BÓC TỪ BẢN ĐỒ PDF của Sở (14/10/2026) — chỉ tham khảo, không in phiếu.
+const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: string[]; zBay?: number; vung: string; pdf?: string }[] = [
   { id: 'qh-qd205', ten: 'Quy hoạch chung 2045 (QĐ205)', tenNgan: 'QH chung 205', tenApp: 'Quy hoạch chung 2045', gom: ['qh-qd205'], zBay: 10, vung: 'cam-lam' },   // chủ dự án cho thử z10 (14/9/2026)
   { id: 'phan-khu', ten: 'Quy hoạch phân khu 1/2000', tenNgan: 'Phân khu 1/2000', tenApp: 'QHXD Phân khu', gom:['qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin', 'qh-taynam', 'qh-taybac'], vung: 'cam-lam' },
   { id: 'qh-qd893', ten: 'Quy hoạch sử dụng đất 2030 (QĐ893)', tenNgan: 'Sử dụng đất 893', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-qd893'], vung: 'cam-lam' },
   // Ninh Hòa — bản xem thử (bật là bay tới thị xã Ninh Hòa). zBay 11 = nhìn gần hết thị xã.
-  { id: 'qh-ninhhoa2030', ten: 'QHSDĐ 2030 · Thị xã Ninh Hòa', tenNgan: 'Ninh Hòa 2030', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-ninhhoa2030'], zBay: 11, vung: 'ninh-hoa' },
-  { id: 'qh-nhatrang2030', ten: 'QHSDĐ 2030 · TP Nha Trang', tenNgan: 'Nha Trang 2030', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-nhatrang2030'], zBay: 12, vung: 'nha-trang' },
-  { id: 'qh-khanhson2030', ten: 'QHSDĐ 2030 · Huyện Khánh Sơn', tenNgan: 'Khánh Sơn 2030', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-khanhson2030'], zBay: 11, vung: 'khanh-son' },
-  { id: 'qh-vanninh2030', ten: 'QHSDĐ 2030 · Huyện Vạn Ninh', tenNgan: 'Vạn Ninh 2030', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-vanninh2030'], zBay: 11, vung: 'van-ninh' },
-  { id: 'qh-camranh2030', ten: 'QHSDĐ 2030 · TP Cam Ranh', tenNgan: 'Cam Ranh 2030', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-camranh2030'], zBay: 11, vung: 'cam-ranh' },
+  { id: 'qh-ninhhoa2030', ten: 'QHSDĐ 2030 · Thị xã Ninh Hòa', tenNgan: 'Ninh Hòa 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'ninhhoa2030', gom: ['qh-ninhhoa2030'], zBay: 11, vung: 'ninh-hoa' },
+  { id: 'qh-nhatrang2030', ten: 'QHSDĐ 2030 · TP Nha Trang', tenNgan: 'Nha Trang 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'nhatrang2030', gom: ['qh-nhatrang2030'], zBay: 12, vung: 'nha-trang' },
+  { id: 'qh-khanhson2030', ten: 'QHSDĐ 2030 · Huyện Khánh Sơn', tenNgan: 'Khánh Sơn 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'khanhson2030', gom: ['qh-khanhson2030'], zBay: 11, vung: 'khanh-son' },
+  { id: 'qh-vanninh2030', ten: 'QHSDĐ 2030 · Huyện Vạn Ninh', tenNgan: 'Vạn Ninh 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'vanninh2030', gom: ['qh-vanninh2030'], zBay: 11, vung: 'van-ninh' },
+  { id: 'qh-camranh2030', ten: 'QHSDĐ 2030 · TP Cam Ranh', tenNgan: 'Cam Ranh 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'camranh2030', gom: ['qh-camranh2030'], zBay: 11, vung: 'cam-ranh' },
 ];
 // CĂN CỨ PHÁP LÝ của từng bản quy hoạch đang chồng lên bản đồ.
 // Người xem hay hỏi "cái màu này dựa vào đâu?" — nên phải chỉ thẳng ra quyết định phê duyệt,
@@ -1970,7 +1972,7 @@ export default function MapPage() {
   // thứ tự MUC_QH. Lướt sang trang nào thì BẢN ĐỒ ĐỔI SANG LỚP ĐÓ, và trang chỉ hiện loại đất của bản đó:
   // mỗi dòng = ô diện tích TÔ ĐÚNG MÀU loại đất (màu lấy ở mau-loai-dat-qh.json) + tên loại đất.
   // Khác khối khoiQh() của máy tính (giản dị, không màu) — ở đây chủ dự án chủ động muốn ô màu như app.
-  const trangQhCuaThua = (): { muc: (typeof MUC_QH)[number]; tieuDe: string; phu?: string; areas: { type: string; areaM2: number }[]; bangMau: string }[] => {
+  const trangQhCuaThua = (): { muc: (typeof MUC_QH)[number]; tieuDe: string; phu?: string; areas: { type: string; areaM2: number }[]; bangMau: string; mauRieng?: Record<string, string> }[] => {
     if (!info?.parcel) return [];
     const cacBan: any[] = (info as any).qhCacBan || [];
     const PK = ['2076', '2101', '2222', '918', 'cuhin', 'taynam', 'taybac'];
@@ -1994,6 +1996,14 @@ export default function MapPage() {
         const b = cacBan.find((x) => String(x.ma) === '893');
         const areas = b ? gop(b.areas || []) : [];
         if (areas.length) ra.push({ muc, tieuDe: 'Quy hoạch sử dụng đất 2030', areas, bangMau: 'qd893' });
+      }
+      // QHSDĐ 2030 các huyện/thị ngoài Cam Lâm — BÓC TỪ BẢN ĐỒ PDF (máy chủ lib/qhPdf.ts, mục nguon:'pdf'). Màu ô = màu chính
+      // bản vẽ đó (máy chủ gửi kèm), không lấy bảng màu Cam Lâm. Ghi rõ "tham khảo" vì ranh vùng lấy từ bản in 1:25.000.
+      if (muc.pdf) {
+        const b = cacBan.find((x) => String(x.ma) === 'pdf-' + muc.pdf);
+        const areas = b ? gop(b.areas || []) : [];
+        if (areas.length) ra.push({ muc, tieuDe: 'Quy hoạch sử dụng đất 2030', phu: 'bóc từ bản đồ PDF · tham khảo', areas, bangMau: 'pdf',
+          mauRieng: Object.fromEntries(((b.areas || []) as any[]).filter((a) => a.mau).map((a) => [a.type, a.mau])) });
       }
     }
     return ra;
@@ -3243,7 +3253,7 @@ export default function MapPage() {
                             <p className={`truncate font-bold leading-snug text-[#0A2540] text-[13px]`}>{t.tieuDe}{t.phu && <span className="ml-1.5 text-[10.5px] font-normal text-slate-400">{t.phu}</span>}</p>
                             <div className="mt-1 space-y-[3px]">
                               {t.areas.map((a) => {
-                                const mau = mauQh?.[t.bangMau]?.[a.type] || '#e2e8f0';
+                                const mau = t.mauRieng?.[a.type] || mauQh?.[t.bangMau]?.[a.type] || '#e2e8f0';
                                 return (
                                   <div key={a.type} className="flex min-w-0 items-center gap-2" title={`${fmtM2(a.areaM2)} · ${a.type}`}>
                                     <span className="min-w-[64px] shrink-0 rounded border border-black/10 px-1.5 py-px text-right text-[12px] font-bold leading-[18px] tabular-nums"
@@ -3341,8 +3351,9 @@ export default function MapPage() {
                   lướt ngang nếu thiếu chỗ. Máy tính giữ nút phiếu to + hàng 3 nút. */}
               <div className={`${sheetNho ? 'max-sm:hidden' : ''} shrink-0 px-2.5 sm:px-4 pt-1.5 pb-2 bg-white border-t border-slate-100 grid grid-cols-4 gap-1 sm:block`}>
                 {/* Phiếu trích lục ghi rõ "Quy hoạch chung đô thị mới Cam Lâm 2045" nên chỉ cho xuất
-                    khi thửa nằm trong vùng có dữ liệu — ngoài vùng mà in ra là phiếu sai. */}
-                {info.parcel && !info.qhNgoaiVung && (
+                    khi thửa nằm trong vùng có dữ liệu — ngoài vùng mà in ra là phiếu sai.
+                    (14/10/2026) Thửa chỉ có số liệu BÓC TỪ PDF (huyện/thị ngoài Cam Lâm, nguon:'pdf') cũng KHÔNG in phiếu. */}
+                {info.parcel && !info.qhNgoaiVung && ((info.overlaps?.length || 0) > 0 || (((info as any).qhCacBan || []) as any[]).some((b) => b?.nguon !== 'pdf')) && (
                   <button
                     onClick={() => {
                       const g = (highlight as any)?.geometry || (info.parcel as any)?.geometry;
@@ -3359,7 +3370,7 @@ export default function MapPage() {
                         for (const x of (overlaps || []) as any[]) if (x?.hz) hzA[String(x.hz)] = (hzA[String(x.hz)] || 0) + (Number(x.areaM2) || 0);
                         const pieceHz = Object.keys(hzA).sort((a, b) => hzA[b] - hzA[a])[0] || mapScen;
                         // PHỤ LỤC: mỗi bản quy hoạch KHÁC đè lên thửa một trang trích lục trên ảnh của chính bản đó (lib/phieuQh.ts)
-                        const phuLuc = (((info as any).qhCacBan || []) as any[]).map((bn) => {
+                        const phuLuc = (((info as any).qhCacBan || []) as any[]).filter((bn) => bn?.nguon !== 'pdf').map((bn) => {
                           const ma = String(bn.ma);
                           const id = /^\d+$/.test(ma) ? 'qh-qd' + ma : 'qh-' + ma;
                           const tile = ((RASTER_OVERLAYS.find((x) => x.id === id) as any)?.tiles || [])[0] as string | undefined;
@@ -3371,7 +3382,7 @@ export default function MapPage() {
                             areas: ((bn.areas || []) as { type: string; areaM2: number }[]).map((a) => ({ ...a, mau: mauQh?.[bang]?.[a.type] })),
                           } : null;
                         }).filter(Boolean) as any[];
-                        const html = phieuQhHtml({ parcel: info.parcel as any, geometry: g, overlaps, qhCacBan: (info as any).qhCacBan, qhPieces: manh ? manh.map((m) => ({ lo: m.lo, c: mauQh?.qd205?.[m.lo], ring: m.ring })) : qhPiecesFor(g, pieceHz), roadFeats: roadFeatsFor(g), neighbors: (info as any).neighbors || [], point: info.point, user: user as any, scenario: mapScen, roadHz: pieceHz, phuLuc });
+                        const html = phieuQhHtml({ parcel: info.parcel as any, geometry: g, overlaps, qhCacBan: (((info as any).qhCacBan || []) as any[]).filter((bn) => bn?.nguon !== 'pdf'), qhPieces: manh ? manh.map((m) => ({ lo: m.lo, c: mauQh?.qd205?.[m.lo], ring: m.ring })) : qhPiecesFor(g, pieceHz), roadFeats: roadFeatsFor(g), neighbors: (info as any).neighbors || [], point: info.point, user: user as any, scenario: mapScen, roadHz: pieceHz, phuLuc });
                         try { win.document.open(); win.document.write(html); win.document.close(); win.focus(); } catch { /* */ }
                       };
                       // chỉ dùng số máy chủ (12/10/2026: bỏ tính bù từ qh_vector cũ — xem chỗ gọi /parcels/at)

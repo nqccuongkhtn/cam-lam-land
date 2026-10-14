@@ -1,0 +1,285 @@
+{
+ "_doc": "Bảng màu loại đất CHUNG của các bản đồ QHSDĐ 2030 Khánh Hòa (Sở NN&MT), gom từ chú giải đọc được trên PDF (lap_bang_mau_chuan.py). ma = các mã chú giải ghi cho màu đó (1 mã = màu riêng; nhiều mã = màu dùng chung); ban = các bản có màu này.",
+ "mau": {
+  "#00ffff": {
+   "ma": [
+    "SON"
+   ],
+   "ban": [
+    "nhatrang",
+    "vanninh"
+   ]
+  },
+  "#6eff64": {
+   "ma": [
+    "RDD"
+   ],
+   "ban": [
+    "nhatrang",
+    "vanninh"
+   ]
+  },
+  "#a0ffff": {
+   "ma": [
+    "MNC",
+    "SON"
+   ],
+   "ban": [
+    "camranh",
+    "khanhson",
+    "khanhvinh"
+   ]
+  },
+  "#aaffff": {
+   "ma": [
+    "DTL",
+    "NTS"
+   ],
+   "ban": [
+    "camranh",
+    "khanhson",
+    "khanhvinh",
+    "nhatrang",
+    "vanninh"
+   ]
+  },
+  "#b4ffb4": {
+   "ma": [
+    "RSN",
+    "RSX"
+   ],
+   "ban": [
+    "camranh",
+    "khanhson",
+    "khanhvinh",
+    "nhatrang",
+    "ninhhoa",
+    "vanninh"
+   ]
+  },
+  "#b4ffff": {
+   "ma": [
+    "MNC"
+   ],
+   "ban": [
+    "camranh",
+    "khanhvinh",
+    "nhatrang",
+    "vanninh"
+   ]
+  },
+  "#beff1e": {
+   "ma": [
+    "RPH"
+   ],
+   "ban": [
+    "camranh",
+    "khanhson",
+    "khanhvinh",
+    "nhatrang",
+    "ninhhoa",
+    "vanninh"
+   ]
+  },
+  "#cdaacd": {
+   "ma": [
+    "DRA",
+    "SKS",
+    "SKX"
+   ],
+   "ban": [
+    "camranh",
+    "khanhson",
+    "khanhvinh",
+    "nhatrang",
+    "vanninh"
+   ]
+  },
+  "#d2d2d2": {
+   "ma": [
+    "NTD"
+   ],
+   "ban": [
+    "camranh",
+    "khanhson",
+    "khanhvinh",
+    "nhatrang",
+    "vanninh"
+   ]
+  },
+  "#f5ffb4": {
+   "ma": [
+    "NKH"
+   ],
+   "ban": [
+    "camranh",
+    "khanhson",
+    "khanhvinh",
+    "nhatrang",
+    "ninhhoa",
+    "vanninh"
+   ]
+  },
+  "#faaaa0": {
+   "ma": [
+    "DDL",
+    "DNG",
+    "DTS",
+    "SKC",
+    "SKK",
+    "SKN",
+    "TMD"
+   ],
+   "ban": [
+    "nhatrang",
+    "vanninh"
+   ]
+  },
+  "#ff5046": {
+   "ma": [
+    "CAN"
+   ],
+   "ban": [
+    "camranh",
+    "khanhvinh",
+    "nhatrang",
+    "ninhhoa",
+    "vanninh"
+   ]
+  },
+  "#ff6450": {
+   "ma": [
+    "CQP"
+   ],
+   "ban": [
+    "camranh",
+    "khanhvinh",
+    "nhatrang",
+    "vanninh"
+   ]
+  },
+  "#ffa0ff": {
+   "ma": [
+    "ODT"
+   ],
+   "ban": [
+    "camranh",
+    "khanhson",
+    "nhatrang",
+    "vanninh"
+   ]
+  },
+  "#ffaa32": {
+   "ma": [
+    "DGT"
+   ],
+   "ban": [
+    "camranh",
+    "khanhson",
+    "khanhvinh",
+    "nhatrang",
+    "vanninh"
+   ]
+  },
+  "#ffaaa0": {
+   "ma": [
+    "DBV",
+    "DCH",
+    "DDT",
+    "DGD",
+    "DKH",
+    "DKV",
+    "DNL",
+    "DSH",
+    "DSK",
+    "DTS",
+    "DTT",
+    "DVH",
+    "DXH",
+    "DYT",
+    "PNK",
+    "SKC",
+    "SKK",
+    "SKN",
+    "TIN",
+    "TMD",
+    "TON",
+    "TSC"
+   ],
+   "ban": [
+    "camranh",
+    "khanhson",
+    "khanhvinh",
+    "nhatrang",
+    "vanninh"
+   ]
+  },
+  "#ffd0ff": {
+   "ma": [
+    "ONT"
+   ],
+   "ban": [
+    "camranh",
+    "khanhson",
+    "khanhvinh",
+    "nhatrang",
+    "vanninh"
+   ]
+  },
+  "#ffd2a0": {
+   "ma": [
+    "CLN"
+   ],
+   "ban": [
+    "nhatrang",
+    "vanninh"
+   ]
+  },
+  "#ffd7aa": {
+   "ma": [
+    "CLN"
+   ],
+   "ban": [
+    "camranh",
+    "khanhson",
+    "khanhvinh",
+    "ninhhoa"
+   ]
+  },
+  "#fff0b4": {
+   "ma": [
+    "HNK"
+   ],
+   "ban": [
+    "camranh",
+    "khanhson",
+    "khanhvinh",
+    "nhatrang",
+    "ninhhoa",
+    "vanninh"
+   ]
+  },
+  "#fffc82": {
+   "ma": [
+    "LUA",
+    "LUC"
+   ],
+   "ban": [
+    "camranh",
+    "khanhvinh"
+   ]
+  },
+  "#fffc8c": {
+   "ma": [
+    "LUA",
+    "LUC",
+    "LUK"
+   ],
+   "ban": [
+    "khanhvinh",
+    "nhatrang",
+    "vanninh"
+   ]
+  }
+ }
+}

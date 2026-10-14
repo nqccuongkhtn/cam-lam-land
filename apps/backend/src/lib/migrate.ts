@@ -830,6 +830,20 @@ export async function migrate(): Promise<void> {
   // scripts/dia-chinh/nap-tat-ca.sh tháo + dựng lại chỉ mục này cùng 3 chỉ mục kia khi nạp lại toàn bộ.
   dungChiMucNen('dia_chinh_xa_moi_thua_idx', `CREATE INDEX IF NOT EXISTS dia_chinh_xa_moi_thua_idx ON dia_chinh (xa_moi_id, thua_num)`);
 
+  // ── QHSDĐ 2030 CÁC HUYỆN/THỊ NGOÀI CAM LÂM — BÓC TỪ BẢN ĐỒ PDF CỦA SỞ (14/10/2026) ──
+  // qh_pdf      = vùng loại đất (mỗi dòng một vùng): ban (camranh2030…), ma (ODT / NHOM:…), ten, mau.
+  // qh_pdf_ranh = ranh thân bản đồ của từng bản → thửa nằm trong ranh bản nào thì chỉ tra bản đó (lib/qhPdf.ts).
+  // Nạp bằng scripts/qh-tinh/nap_qh_pdf.py (xoá sạch bản đó rồi nạp lại → chạy lại nhiều lần vẫn đúng).
+  await pool.query(`CREATE TABLE IF NOT EXISTS qh_pdf (
+      id serial PRIMARY KEY, ban text NOT NULL, ma text NOT NULL, ten text NOT NULL, mau text,
+      geom geometry(MultiPolygon, 4326) NOT NULL)`).catch((e) => console.error('[migrate] qh_pdf:', e.message));
+  await pool.query(`CREATE INDEX IF NOT EXISTS qh_pdf_geom_idx ON qh_pdf USING gist (geom)`).catch(() => {});
+  await pool.query(`CREATE INDEX IF NOT EXISTS qh_pdf_ban_idx ON qh_pdf (ban)`).catch(() => {});
+  await pool.query(`CREATE TABLE IF NOT EXISTS qh_pdf_ranh (
+      ban text PRIMARY KEY, ten text NOT NULL, nguon text, geom geometry(MultiPolygon, 4326) NOT NULL)`)
+    .catch((e) => console.error('[migrate] qh_pdf_ranh:', e.message));
+  await pool.query(`CREATE INDEX IF NOT EXISTS qh_pdf_ranh_geom_idx ON qh_pdf_ranh USING gist (geom)`).catch(() => {});
+
   console.log('[migrate] schema up to date');
 }
 

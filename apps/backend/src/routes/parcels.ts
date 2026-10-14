@@ -109,7 +109,17 @@ parcelsRouter.get('/at', async (req, res, next) => {
       -- Đổi số tờ CŨ (đang lưu trong dữ liệu) sang số tờ MỚI của xã sau sáp nhập.
       -- Khớp cả xa_moi_id vì một tờ cũ bị ranh xã mới cắt qua thì nằm ở hai xã mới với hai số khác nhau.
       LEFT JOIN dia_chinh_to tt ON tt.xa_cu_id = d.xa_id AND tt.to_cu = d.to_num AND tt.xa_moi_id = d.xa_moi_id
-      WHERE ST_Intersects(d.geom, ${pt}) LIMIT 1`, [lng, lat]).catch(() => [] as any[]);
+      WHERE ST_Intersects(d.geom, ${pt})
+      -- (15/10/2026) Thửa CHỒNG NHAU: mẫu 7.560 thửa → 7,3 % điểm giữa thửa nằm trong ≥ 2 thửa (437/555 khác cỡ — thường là thửa to "bao"
+      -- thửa nhỏ: bản ghi cũ chưa tách, vd Thửa 187 · Tờ 24 1.319 m² bao Thửa 324 · Tờ 24 236 m²; 118/555 gần trùng khít — cùng hình, hai
+      -- số khác nhau, vd Thửa 23 · Tờ 50 và Thửa 23 · Tờ 500). Trước "LIMIT 1" không sắp xếp → bấm vào thửa nhỏ có lúc ra thửa to, hoặc ra
+      -- thửa đường / suối rồi báo "không tra cứu". Nay: thửa KHÔNG phải đường / sông / thuỷ lợi trước, rồi thửa NHỎ nhất chứa điểm bấm
+      -- (cụ thể nhất); các thửa gần trùng khít với thửa nhỏ nhất (lệch ≤ 2 %) thì ưu tiên bản ghi CÓ ghi loại đất; còn hoà thì theo mã.
+      ORDER BY (upper(trim(coalesce(d.mdsd, ''))) IN (${Object.keys(CHAN_TRA_CUU).map((k) => `'${k}'`).join(',')})),
+               ST_Area(d.geom) > 1.02 * min(ST_Area(d.geom)) OVER (PARTITION BY upper(trim(coalesce(d.mdsd, ''))) IN (${Object.keys(CHAN_TRA_CUU).map((k) => `'${k}'`).join(',')})),
+               coalesce(trim(d.mdsd), '') = '',
+               ST_Area(d.geom), d.id
+      LIMIT 1`, [lng, lat]).catch(() => [] as any[]);
     // ── ĐẤT HẠ TẦNG CÔNG CỘNG: TẠM THỜI KHÔNG CHO TRA RA THỬA ──
     // Sổ địa chính cấp số tờ/số thửa cho cả đường sá, sông suối, kênh mương y như thửa đất của
     // dân — thường gom cả mạng đường (hoặc cả con suối) của một xã thành MỘT thửa khổng lồ:

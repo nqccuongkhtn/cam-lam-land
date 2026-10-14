@@ -371,17 +371,29 @@ const RASTER_OVERLAYS = [
 // không vừa, nút đầu và nút cuối bị cắt mất chữ (chủ dự án chụp màn hình báo lỗi 14/9/2026).
 // `tenApp` = tên ghi trong BẢNG ĐÁY chọn bản đồ + dòng tên góc trái dưới bản đồ (điện thoại) —
 // viết tắt đúng kiểu app tham chiếu cho gọn MỘT DÒNG (chủ dự án chê chữ to, xuống 2 dòng, 14/9/2026).
+//   Chỗ hiện tự ghép TÊN VÙNG đứng trước ("Nha Trang · QH Sử dụng đất 2030") nên `tenApp` đừng ghi lại tên vùng.
+// `vung` = địa giới hành chính (huyện/thị cũ) của bản quy hoạch này. Dùng để LỌC danh sách lớp:
+//   người xem chọn một địa giới thì chỉ hiện quy hoạch của địa giới đó, khỏi loạn vì quá nhiều bản.
+//   `tamXem` = [lng, lat, zoom] để BAY TỚI khi chọn địa giới (chưa bật lớp nào cụ thể).
+const VUNG_QH: { id: string; ten: string; tenNgan: string; tamXem: [number, number, number] }[] = [
+  { id: 'cam-lam',   ten: 'Huyện Cam Lâm (cũ)',  tenNgan: 'Cam Lâm',   tamXem: [109.0917, 12.0771, 12] },
+  { id: 'nha-trang', ten: 'TP. Nha Trang',        tenNgan: 'Nha Trang', tamXem: [109.1900, 12.2450, 12] },
+  { id: 'cam-ranh',  ten: 'TP. Cam Ranh',         tenNgan: 'Cam Ranh',  tamXem: [109.1500, 11.9050, 11] },
+  { id: 'ninh-hoa',  ten: 'Thị xã Ninh Hòa',      tenNgan: 'Ninh Hòa',  tamXem: [109.1300, 12.4900, 11] },
+  { id: 'van-ninh',  ten: 'Huyện Vạn Ninh',       tenNgan: 'Vạn Ninh',  tamXem: [109.2200, 12.7000, 11] },
+  { id: 'khanh-son', ten: 'Huyện Khánh Sơn',      tenNgan: 'Khánh Sơn', tamXem: [108.9500, 12.0300, 11] },
+];
 // `zBay` = mức phóng bay tới khi chọn bản này mà đang nhìn xa hơn (không ghi thì tự tính = minzoom − 1).
-const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: string[]; zBay?: number }[] = [
-  { id: 'qh-qd205', ten: 'Quy hoạch chung 2045 (QĐ205)', tenNgan: 'QH chung 205', tenApp: 'Quy hoạch chung 2045', gom: ['qh-qd205'], zBay: 10 },   // chủ dự án cho thử z10 (14/9/2026)
-  { id: 'phan-khu', ten: 'Quy hoạch phân khu 1/2000', tenNgan: 'Phân khu 1/2000', tenApp: 'QHXD Phân khu', gom:['qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin', 'qh-taynam', 'qh-taybac'] },
-  { id: 'qh-qd893', ten: 'Quy hoạch sử dụng đất 2030 (QĐ893)', tenNgan: 'Sử dụng đất 893', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-qd893'] },
+const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: string[]; zBay?: number; vung: string }[] = [
+  { id: 'qh-qd205', ten: 'Quy hoạch chung 2045 (QĐ205)', tenNgan: 'QH chung 205', tenApp: 'Quy hoạch chung 2045', gom: ['qh-qd205'], zBay: 10, vung: 'cam-lam' },   // chủ dự án cho thử z10 (14/9/2026)
+  { id: 'phan-khu', ten: 'Quy hoạch phân khu 1/2000', tenNgan: 'Phân khu 1/2000', tenApp: 'QHXD Phân khu', gom:['qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin', 'qh-taynam', 'qh-taybac'], vung: 'cam-lam' },
+  { id: 'qh-qd893', ten: 'Quy hoạch sử dụng đất 2030 (QĐ893)', tenNgan: 'Sử dụng đất 893', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-qd893'], vung: 'cam-lam' },
   // Ninh Hòa — bản xem thử (bật là bay tới thị xã Ninh Hòa). zBay 11 = nhìn gần hết thị xã.
-  { id: 'qh-ninhhoa2030', ten: 'QHSDĐ 2030 · Thị xã Ninh Hòa', tenNgan: 'Ninh Hòa 2030', tenApp: 'QHSDĐ Ninh Hòa', gom: ['qh-ninhhoa2030'], zBay: 11 },
-  { id: 'qh-nhatrang2030', ten: 'QHSDĐ 2030 · TP Nha Trang', tenNgan: 'Nha Trang 2030', tenApp: 'QHSDĐ Nha Trang', gom: ['qh-nhatrang2030'], zBay: 12 },
-  { id: 'qh-khanhson2030', ten: 'QHSDĐ 2030 · Huyện Khánh Sơn', tenNgan: 'Khánh Sơn 2030', tenApp: 'QHSDĐ Khánh Sơn', gom: ['qh-khanhson2030'], zBay: 11 },
-  { id: 'qh-vanninh2030', ten: 'QHSDĐ 2030 · Huyện Vạn Ninh', tenNgan: 'Vạn Ninh 2030', tenApp: 'QHSDĐ Vạn Ninh', gom: ['qh-vanninh2030'], zBay: 11 },
-  { id: 'qh-camranh2030', ten: 'QHSDĐ 2030 · TP Cam Ranh', tenNgan: 'Cam Ranh 2030', tenApp: 'QHSDĐ Cam Ranh', gom: ['qh-camranh2030'], zBay: 11 },
+  { id: 'qh-ninhhoa2030', ten: 'QHSDĐ 2030 · Thị xã Ninh Hòa', tenNgan: 'Ninh Hòa 2030', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-ninhhoa2030'], zBay: 11, vung: 'ninh-hoa' },
+  { id: 'qh-nhatrang2030', ten: 'QHSDĐ 2030 · TP Nha Trang', tenNgan: 'Nha Trang 2030', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-nhatrang2030'], zBay: 12, vung: 'nha-trang' },
+  { id: 'qh-khanhson2030', ten: 'QHSDĐ 2030 · Huyện Khánh Sơn', tenNgan: 'Khánh Sơn 2030', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-khanhson2030'], zBay: 11, vung: 'khanh-son' },
+  { id: 'qh-vanninh2030', ten: 'QHSDĐ 2030 · Huyện Vạn Ninh', tenNgan: 'Vạn Ninh 2030', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-vanninh2030'], zBay: 11, vung: 'van-ninh' },
+  { id: 'qh-camranh2030', ten: 'QHSDĐ 2030 · TP Cam Ranh', tenNgan: 'Cam Ranh 2030', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-camranh2030'], zBay: 11, vung: 'cam-ranh' },
 ];
 // CĂN CỨ PHÁP LÝ của từng bản quy hoạch đang chồng lên bản đồ.
 // Người xem hay hỏi "cái màu này dựa vào đâu?" — nên phải chỉ thẳng ra quyết định phê duyệt,
@@ -843,8 +855,12 @@ export default function MapPage() {
       const k = khungBanDoRef.current;
       const nav = document.querySelector('nav.fixed.bottom-0') as HTMLElement | null;
       if (!k) return;
-      const coMenu = !!nav && getComputedStyle(nav).display !== 'none';
-      const dinhMenu = coMenu ? nav!.getBoundingClientRect().top : window.innerHeight;
+      // Xét cả KÍCH THƯỚC thật: trang bị NHÚNG trong khung (Tiện ích, ?embed=1) thì thanh menu bị ẩn từ thẻ cha
+      // (html.embed .cl-chrome{display:none}) — display của chính nó vẫn 'block' nhưng cao 0, đỉnh = 0 → trước đây
+      // tính ra "menu cao bằng cả màn hình", bảng chọn lớp quy hoạch bị đẩy ra ngoài màn hình (thử 14/10/2026).
+      const rNav = nav ? nav.getBoundingClientRect() : null;
+      const coMenu = !!nav && getComputedStyle(nav).display !== 'none' && !!rNav && rNav.height > 0;
+      const dinhMenu = coMenu ? rNav!.top : window.innerHeight;
       const de = Math.max(0, Math.round(k.getBoundingClientRect().bottom - dinhMenu));
       const cao = Math.max(0, Math.round(window.innerHeight - dinhMenu));
       setMenuDo((c) => (c && c.de === de && c.cao === cao ? c : { de, cao }));
@@ -919,6 +935,10 @@ export default function MapPage() {
   // Hai lớp phân khu MẶC ĐỊNH TẮT: chúng nằm đè lên vùng QĐ205, bật sẵn cả ba thì màu chồng màu.
   // Người dùng tự tích vào mới hiện.
   const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd918': false, 'qh-cuhin': false, 'qh-taynam': false, 'qh-taybac': false, 'qh-qd893': false, 'qh-ninhhoa2030': false, 'qh-nhatrang2030': false, 'qh-khanhson2030': false, 'qh-vanninh2030': false, 'qh-camranh2030': false });
+  // ĐỊA GIỚI đang chọn để LỌC danh sách lớp quy hoạch — giờ nhiều bản quá, gom theo huyện/thị cho gọn
+  // (chủ dự án 14/10/2026: "chọn địa giới rồi hiện quy hoạch ở địa giới đó thôi để đỡ loạn"). Mặc định Cam Lâm.
+  const [vungQh, setVungQh] = useState<string>('cam-lam');
+  const mucHienThi = useMemo(() => MUC_QH.filter((o) => o.vung === vungQh), [vungQh]);
   const [qhFillOn, setQhFillOn] = useState(false);        // TẮT mặc định — giống Guland: hiển thị bằng ẢNH raster. Bật tay nếu muốn lấp chỗ trống.
   // 'all' = gộp cả 3 kịch bản (phủ kín nhất). Từng kịch bản riêng lẻ chỉ phủ một phần.
   const [qhScenario, setQhScenario] = useState<'all' | 'HT' | '2030' | '2045'>('all');
@@ -1203,6 +1223,16 @@ export default function MapPage() {
     let con = urls.length;
     for (const u of urls) { const im = new Image(); im.onload = im.onerror = () => { if (--con <= 0) bay(); }; im.src = u; }
     setTimeout(bay, 1800);
+  }, []);
+  // ĐỔI ĐỊA GIỚI đang lọc: tắt mọi lớp đang bật (vì danh sách lớp đổi theo vùng mới), đổi vùng,
+  // rồi BAY TỚI tâm địa giới đó cho người xem thấy ngay mình đang ở đâu. Không tự bật lớp nào —
+  // để người xem tự chọn bản muốn xem trong vùng (tránh chồng màu loạn).
+  const doiVung = useCallback((idVung: string) => {
+    setVungQh(idVung);
+    setOvOn(Object.fromEntries(RASTER_OVERLAYS.map((x) => [x.id, false])));  // tắt overlay vùng cũ cho khỏi chồng
+    const v = VUNG_QH.find((x) => x.id === idVung);
+    const m: any = (window as any).__banDo;
+    if (v && m && m.easeTo) m.easeTo({ center: [v.tamXem[0], v.tamXem[1]], zoom: v.tamXem[2], duration: 900 });
   }, []);
   // ĐẨY BẢN ĐỒ KHI THỬA BỊ BẢNG CHE.
   // Bảng "Thông tin thửa" nằm giữa-dưới, hay đè lên đúng thửa vừa bấm. Hàm này đo vị trí bảng,
@@ -2171,7 +2201,7 @@ export default function MapPage() {
           {tabBtn('search', 'Tra cứu', tool === 'search')}
           {tabBtn('measure', 'Đo', tool === 'measure', measure !== 'off')}
           {tabBtn('chugiai', 'Chú giải', tool === 'chugiai')}
-          {tabBtn('layers', `Lớp Q.Hoạch (${MUC_QH.length})`, qhSheet)}
+          {tabBtn('layers', `Lớp Q.Hoạch (${mucHienThi.length})`, qhSheet)}
         </div>
         {/* Tra cứu + Đo - vẽ trên điện thoại đã chuyển thành BẢNG ĐÁY kiểu app (xem dưới bản đồ);
             ở đây chỉ còn Chú giải xổ xuống. */}
@@ -2205,8 +2235,18 @@ export default function MapPage() {
           {/* Điện thoại: ô chọn NỀN BẢN ĐỒ + "Nhãn & đường" đã đưa ra NỔI TRÊN BẢN ĐỒ (nút "Nền"
               góc trái dưới) giống app tham chiếu — không còn nằm trong bảng này. */}
           <div className="pt-1">
+            {/* ĐỊA GIỚI: chọn huyện/thị để CHỈ HIỆN quy hoạch của vùng đó — giờ nhiều bản quá, gom cho gọn
+                (chủ dự án 14/10/2026). Đổi vùng là bay tới đó, chưa bật lớp nào. */}
+            <label className="block mb-2.5">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Địa giới</span>
+              <select value={vungQh} onChange={(e) => doiVung(e.target.value)}
+                className="mt-1 w-full border border-slate-300 rounded-lg px-2.5 py-2 text-sm font-semibold text-[#0A2540] bg-white focus:border-emerald-500 focus:outline-none">
+                {VUNG_QH.map((v) => (<option key={v.id} value={v.id}>{v.ten}</option>))}
+              </select>
+            </label>
             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1.5">Bản đồ quy hoạch</p>
-            {MUC_QH.map((o) => (
+            {mucHienThi.length === 0 && (<p className="text-sm text-slate-400 py-1.5">Chưa có bản quy hoạch cho địa giới này.</p>)}
+            {mucHienThi.map((o) => (
               <label key={o.id} className={`flex items-start gap-2.5 py-1.5 text-sm cursor-pointer lg:-mx-2 lg:rounded-lg lg:px-2 lg:py-2 lg:transition lg:hover:bg-[#0A2540]/[.05] ${o.gom.every((id) => !!ovOn[id]) ? 'lg:bg-[#0A2540]/[.07]' : ''}`}>
                 {/* MỖI LÚC CHỈ MỘT lớp quy hoạch — chọn lớp này là tự tắt lớp kia. Các bản quy hoạch
                     phủ đè lên nhau (QĐ205 trùm cả huyện, 3 bản 1/2000 nằm lọt bên trong), bật cùng
@@ -2633,7 +2673,7 @@ export default function MapPage() {
               Ẩn khi đang mở bảng đáy Tra cứu / Thước đo (bị che, lại rối mắt). */}
           {tool !== 'search' && !(tool === 'measure' && measure !== 'off') && (
             <div className="lg:hidden pointer-events-none absolute inset-x-2 bottom-[calc(var(--menu-de,56px)+4px)] z-10 flex items-end justify-between gap-2 text-[11px] text-white [text-shadow:0_0_3px_#000,0_0_2px_#000]">
-              <span className="truncate font-medium">{(() => { const m = MUC_QH.find((o) => o.gom.every((id) => !!ovOn[id])); return m ? `H.Cam Lâm - ${m.tenApp}` : ''; })()}</span>
+              <span className="truncate font-medium">{(() => { const m = MUC_QH.find((o) => o.gom.every((id) => !!ovOn[id])); if (!m) return ''; const tv = VUNG_QH.find((v) => v.id === m.vung)?.tenNgan || ''; return `${tv} · ${m.tenApp}`; })()}</span>
               <span className="shrink-0 text-right text-[10px] leading-tight opacity-90">Thông tin chỉ mang<br />tính tham khảo</span>
             </div>
           )}
@@ -2659,12 +2699,22 @@ export default function MapPage() {
               <div className="lg:hidden fixed inset-0 z-[58] flex flex-col justify-end bg-black/35 px-2.5 pb-[calc(var(--menu-cao,calc(56px+env(safe-area-inset-bottom)))+10px)] animate-[fadeIn_.15s_ease-out]" onClick={() => setQhSheet(false)}>
                 <div className="max-h-[62dvh] overflow-y-auto overscroll-contain rounded-lg bg-white/95 backdrop-blur-xl shadow-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" onClick={(e) => e.stopPropagation()}>
                   <p className="sticky top-0 z-20 bg-white/90 backdrop-blur px-4 py-2.5 text-center text-[12px] text-[#8a8a8e] border-b border-black/10">Chọn bản đồ quy hoạch</p>
-                  {MUC_QH.map((o) => {
+                  {/* Chọn ĐỊA GIỚI để lọc danh sách quy hoạch (chủ dự án 14/10/2026) */}
+                  <div className="flex items-center gap-2 border-b border-black/10 px-4 py-2.5">
+                    <span className="shrink-0 text-[12px] font-medium text-[#6d6d72]">Địa giới</span>
+                    <select value={vungQh} onChange={(e) => doiVung(e.target.value)}
+                      className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-[14px] font-semibold text-[#0A2540]">
+                      {VUNG_QH.map((v) => (<option key={v.id} value={v.id}>{v.ten}</option>))}
+                    </select>
+                  </div>
+                  {mucHienThi.length === 0 && (<p className="px-4 py-3 text-center text-[13px] text-[#8a8a8e]">Chưa có bản quy hoạch cho địa giới này.</p>)}
+                  {mucHienThi.map((o) => {
                     const bat = o.gom.every((id) => !!ovOn[id]);
+                    const tenVung = VUNG_QH.find((v) => v.id === o.vung)?.tenNgan || '';
                     return (
                       <button key={o.id} onClick={() => { chonLopQh(o, !bat); setQhSheet(false); }}
                         className={`relative block w-full truncate whitespace-nowrap border-b border-black/10 px-8 py-[11px] text-center text-[14px] text-[#0A2540] active:bg-black/5 ${bat ? 'font-medium' : ''}`}>
-                        {bat && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] font-bold text-[#C8A14B]">✓</span>}H.Cam Lâm - {o.tenApp}
+                        {bat && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] font-bold text-[#C8A14B]">✓</span>}{tenVung} · {o.tenApp}
                       </button>
                     );
                   })}
@@ -3205,8 +3255,9 @@ export default function MapPage() {
                 {/* Cách liệt kê cũ từng bản một khối (khoiQh) — MÁY TÍNH ĐÃ CHUYỂN SANG TRANG LƯỚT NGANG ở trên
                     (14/9/2026). Giữ lại ẩn phòng khi cần quay về; muốn bỏ hẳn thì xoá khối này + hàm khoiQh. */}
                 <div className="hidden">
+                {/* (14/10/2026) QĐ205 đã bỏ khỏi bảng thông tin thửa (xem trangQhCuaThua) — khối cũ này cũng bỏ theo.
                 {info.parcel && info.overlaps && info.overlaps.length > 0
-                  && khoiQh('Quy hoạch chung 2045 · QĐ205', info.overlaps, 'qd205')}
+                  && khoiQh('Quy hoạch chung 2045 · QĐ205', info.overlaps, 'qd205')} */}
 
                 {/* MỘT THỬA THƯỜNG DÍNH NHIỀU BẢN QUY HOẠCH CHỒNG LÊN NHAU: QĐ205 trùm cả huyện,
                     bên trong còn quy hoạch sử dụng đất QĐ893 và các bản phân khu 1/2000.
@@ -3218,14 +3269,16 @@ export default function MapPage() {
                   && (info as any).qhCacBan.map((b: any) => khoiQh(b.ten, b.areas, b.ma))}
                 </div>
 
-                {/* Ngoài huyện Cam Lâm cũ thì CHƯA có dữ liệu quy hoạch. Nói thẳng ra, vì trước đây
-                    máy chủ đoán bừa mọi thửa ngoài vùng thành "Đất giao thông" phủ kín cả thửa. */}
+                {/* Ngoài huyện Cam Lâm cũ thì CHƯA có số liệu quy hoạch tính theo từng thửa. Nói thẳng ra, vì trước đây
+                    máy chủ đoán bừa mọi thửa ngoài vùng thành "Đất giao thông" phủ kín cả thửa.
+                    (14/10/2026) Bỏ câu "Hiện mới có Quy hoạch chung đô thị mới Cam Lâm đến 2045 (QĐ 205/QĐ-TTg)…" theo yêu cầu
+                    chủ dự án — cùng đợt bỏ QĐ205 khỏi bảng thông tin thửa. Ghi "tính theo từng thửa" vì vài huyện/thị đã có
+                    ẢNH bản đồ QHSDĐ 2030 (nút Lớp Q.Hoạch), chỉ chưa có số diện tích theo thửa. */}
                 {info.parcel && info.qhNgoaiVung && (
                   <div className="mt-2 pt-1.5 border-t border-slate-100">
                     <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1">Quy hoạch</p>
                     <p className="text-slate-500 leading-relaxed">
-                      Khu vực này <b>chưa có dữ liệu quy hoạch</b> trong hệ thống.
-                      Hiện mới có <b>Quy hoạch chung đô thị mới Cam Lâm đến 2045</b> (QĐ 205/QĐ-TTg) cho huyện Cam Lâm cũ.
+                      Khu vực này <b>chưa có dữ liệu quy hoạch</b> tính theo từng thửa.
                     </p>
                   </div>
                 )}

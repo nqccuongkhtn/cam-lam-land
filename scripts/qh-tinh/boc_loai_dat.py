@@ -145,6 +145,14 @@ for t, cx, cy, sz in ngoai:
     if sz < nguong_co: continue
     col = mau_tai(cx, cy)
     if col: chu_giai[col][t] += 1
+if sum(len(c) for c in chu_giai.values()) < 8:
+    # Dự phòng: bản in chữ chú giải CÙNG CỠ nhãn (Khánh Vĩnh) → lấy mọi mã ngoài ranh. Chỉ an toàn khi bản vẽ KHÔNG tô màu
+    # phần huyện bên cạnh (Khánh Vĩnh: ngoài ranh để trắng) — bản nào tô cả huyện bên cạnh thì phải soi lại chú giải bằng mắt.
+    chu_giai.clear()
+    for t, cx, cy, sz in ngoai:
+        col = mau_tai(cx, cy)
+        if col: chu_giai[col][t] += 1
+    print('chu giai: chu cung co nhan -> lay moi ma ngoai ranh (du phong)')
 
 # PHÂN SỐ "hiện trạng / quy hoạch" (CLN / TMD): hai mã XẾP CHỒNG thẳng hàng → mã TRÊN là hiện trạng, BỎ; mã DƯỚI là quy hoạch 2030.
 # Nhận theo VỊ TRÍ chứ không theo màu (Cam Ranh in mã dưới màu đỏ nhưng PDF báo màu chữ đen).
@@ -185,12 +193,17 @@ for col, cc in chu_giai.items():           # chú giải là căn cứ chính: m
     elif col in mau_mot_ma: del mau_mot_ma[col]   # chú giải ghi màu này dùng chung → không lấy theo màu
 # Bản vẽ hay dùng màu LỆCH VÀI ĐƠN VỊ so với ô mẫu chú giải (Cam Ranh: lúa #fffc8c ↔ mẫu #fffc82 = 324 ha; ODT #ffa0fc ↔ #ffa0ff)
 # → so màu cho phép lệch ≤ 12 (tổng |ΔR|+|ΔG|+|ΔB|), lấy màu chú giải GẦN NHẤT.
-LECH_MAU = 12
+# Khánh Vĩnh lệch nhiều hơn (CLN #ffd2a0 ↔ mẫu #ffd7aa lệch 15; rừng đặc dụng lệch 20) → luật "GẦN NHẤT RÕ RÀNG":
+# lệch ≤ 25 VÀ màu chú giải gần thứ hai mà ghi MÃ KHÁC phải xa gấp ≥ 1,8 lần (không lẫn sang màu loại khác).
+LECH_MAU, GAP_RO = 25, 1.8
+_lech = lambda c, col: sum(abs(a - b) for a, b in zip(c, col))
 def mau_cg(col):
     if col in chu_giai or col in mau_mot_ma: return col
     if not chu_giai: return None
-    gan = min(chu_giai, key=lambda c: sum(abs(a - b) for a, b in zip(c, col)))
-    return gan if sum(abs(a - b) for a, b in zip(gan, col)) <= LECH_MAU else None
+    ds = sorted(chu_giai, key=lambda c: _lech(c, col)); gan = ds[0]; d1 = _lech(gan, col)
+    if d1 > LECH_MAU: return None
+    khac = [c for c in ds[1:] if set(chu_giai[c]) != set(chu_giai[gan])]
+    return gan if (not khac or _lech(khac[0], col) >= GAP_RO * max(d1, 1)) else None
 print(f'chu giai: {sum(len(c) for c in chu_giai.values())} ma tren {len(chu_giai)} mau; {tu_chu_giai} mau chi dung cho 1 ma:',
       sorted((v, '#%02x%02x%02x' % k) for k, v in mau_mot_ma.items())[:30])
 

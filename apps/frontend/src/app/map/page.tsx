@@ -376,7 +376,7 @@ const RASTER_OVERLAYS = [
 //   người xem chọn một địa giới thì chỉ hiện quy hoạch của địa giới đó, khỏi loạn vì quá nhiều bản.
 //   `tamXem` = [lng, lat, zoom] để BAY TỚI khi chọn địa giới (chưa bật lớp nào cụ thể).
 const VUNG_QH: { id: string; ten: string; tenNgan: string; tamXem: [number, number, number] }[] = [
-  { id: 'cam-lam',   ten: 'Huyện Cam Lâm (cũ)',  tenNgan: 'Cam Lâm',   tamXem: [109.0917, 12.0771, 12] },
+  { id: 'cam-lam',   ten: 'Huyện Cam Lâm',       tenNgan: 'Cam Lâm',   tamXem: [109.0917, 12.0771, 12] },   // bỏ chữ "(cũ)" — chủ dự án 14/10/2026
   { id: 'nha-trang', ten: 'TP. Nha Trang',        tenNgan: 'Nha Trang', tamXem: [109.1900, 12.2450, 12] },
   { id: 'cam-ranh',  ten: 'TP. Cam Ranh',         tenNgan: 'Cam Ranh',  tamXem: [109.1500, 11.9050, 11] },
   { id: 'ninh-hoa',  ten: 'Thị xã Ninh Hòa',      tenNgan: 'Ninh Hòa',  tamXem: [109.1300, 12.4900, 11] },

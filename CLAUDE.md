@@ -591,6 +591,9 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   "Đất ở" bịa — Thửa 368 · Tờ 1 Suối Dầu 40.272 m²) + 742 thửa huyện bên (431 ha). `5b` / `5f` có hàm `la_vien_ranh()` (khung bao ≥ 80 %
   khung cả bản vẽ theo CẢ HAI chiều, diện tích ≤ 5 % khung bao) — `5f` cũng phải bỏ, không thì nó "bổ sung phần sót" lại đúng dải này.
   `qh_zones_893.json` hiện hành đã bỏ đúng ô đó (khớp hết phần còn lại). 79 phiếu: 0 phiếu đổi; thửa 70 tờ 25 y hệt.
+  Cùng ngày: màu TÍM #a552a5 — khung chú dẫn tô CHUNG cho SKS (khoáng sản) và DRA (xử lý chất thải) → 17 ô / 82,1 ha không ghi mã từng
+  là "Loại đất khác", nay "Đất sử dụng cho hoạt động khoáng sản hoặc đất công trình xử lý chất thải (bản vẽ chưa ghi rõ loại)" (bảng
+  `nhieu_ma_qd893` trong `ten-loai-dat.json`, luật e'' của 5b / 5f; màu ô trên bảng thông tin thửa: `mau-loai-dat-qh.json`).
 - **DẢI TRẮNG HẸP DO TƯ VẤN TÔ SÓT (12/10/2026): `5k-sua-tay-khe.py` + `sua-tay-khe.json`.** Bản vẽ có chỗ để hở dải trắng
   hẹp (vd 1,38 m) giữa hai vùng tô; luật "trong ranh không tô = đường" biến nó thành đất giao thông. Chủ dự án soi trên MicroStation
   thấy ký hiệu cây xanh trong dải quanh hồ Cam Đức (Thửa 95 · Tờ 15, mảnh 2) → tô sót. Chỗ đã xác nhận ghi vào `sua-tay-khe.json`

@@ -229,5 +229,12 @@
   "#dfff7f": "NKH",
   "#dcdcdc": "NTD",
   "#ffaaaa": "DPC"
+ },
+ "nhieu_ma_qd893": {
+  "_doc": "CHỈ dùng cho QĐ893, cho vùng tô KHÔNG ghi mã chữ bên trong (luật e của 5b / 5f). Màu mà KHUNG CHÚ DẪN (Level 56) dùng CHUNG cho nhiều mã → tên ghép \"A hoặc b (bản vẽ chưa ghi rõ loại)\", không chọn bừa một mã. 15/10/2026: #a552a5 tím — chú dẫn tô cùng màu cho SKS (ô 1009B36/37) và DRA (ô 1009B42/43); ô có ghi mã trên bản vẽ cũng chỉ là SKS / DRA. Trước đây 82,1 ha không ghi mã thành \"Loại đất khác\".",
+  "#a552a5": [
+   "SKS",
+   "DRA"
+  ]
  }
 }

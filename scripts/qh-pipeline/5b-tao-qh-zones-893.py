@@ -44,6 +44,7 @@ BANG = json.load(io.open(os.path.join(HERE, 'ten-loai-dat.json'), encoding='utf-
 MAU_893 = {k.lower(): v for k, v in BANG['mau_qd893'].items() if not k.startswith('_')}
 NHOM_MAU = {k.lower(): v[0] for k, v in BANG['nhom_mau_qd893'].items() if not k.startswith('_')}
 MAU_MOT_MA = {k.lower(): v for k, v in BANG.get('mau_mot_ma_qd893', {}).items() if not k.startswith('_')}
+NHIEU_MA = {k.lower(): v for k, v in BANG.get('nhieu_ma_qd893', {}).items() if not k.startswith('_')}   # màu chú dẫn dùng chung nhiều mã
 MA_NUOC = ('MNC', 'SON', 'DTL', 'DCT', 'NTS')   # 5 mã chú dẫn tô CHUNG màu xanh nước #7fffff
 # XẾP LỚP NHƯ BẢN VẼ HIỂN THỊ (11/10/2026): mọi ô ngang bậc, ô có VÙNG TÔ GỐC nhỏ hơn nằm trên. Bản cũ: ô chỉ có màu bậc 0 (thua
 # cả ô có mã nằm DƯỚI nó — khối công cộng 35 ha 89411F mất 3 ha vào khu rừng phòng hộ 6.010 ha bên dưới) và xếp theo diện
@@ -126,6 +127,12 @@ def tach_lo(g, sau=0):
         except Exception:
             pass
     return [p for p in ra if isinstance(p, Polygon) and p.area > 0]
+
+
+def ten_nhieu_ma(ds):
+    """Tên vùng tô màu chú dẫn dùng chung nhiều mã: "Đất sử dụng cho hoạt động khoáng sản hoặc đất công trình xử lý chất thải (bản vẽ chưa ghi rõ loại)"."""
+    ts = [TEN[m] for m in ds]
+    return ' hoặc '.join([ts[0]] + [t[:1].lower() + t[1:] for t in ts[1:]]) + ' (bản vẽ chưa ghi rõ loại)'
 
 
 def la_vien_ranh(b, dt, khung):
@@ -242,6 +249,9 @@ def main(vao, tep_chu, tep_kh):
             # e'. màu mà KHUNG CHÚ DẪN chỉ dùng cho đúng MỘT mã (bảng mau_mot_ma_qd893) → tên của mã đó (vd xám = nghĩa trang,
             # trước ghi "Loại đất khác"). Vẫn bậc 0 như luật e: thua ô có mã chữ khi chồng nhau.
             loai[i], bac[i] = TEN[MAU_MOT_MA[m]], 0; chi_mau[i] = True; can_cu["e'. chỉ có màu — màu riêng một mã"] += 1
+        elif m in NHIEU_MA:
+            # e''. màu khung chú dẫn dùng CHUNG cho nhiều mã (bảng nhieu_ma_qd893, 15/10/2026: #a552a5 = SKS / DRA) → tên ghép, không chọn bừa
+            loai[i], bac[i] = ten_nhieu_ma(NHIEU_MA[m]), 0; chi_mau[i] = True; can_cu["e''. chỉ có màu — màu chung nhiều mã"] += 1
         else:
             loai[i], bac[i] = NHOM_MAU.get(m, 'Loại đất khác'), 0; chi_mau[i] = True; can_cu['e. chỉ có màu'] += 1
     print('Căn cứ gán loại đất:', dict(sorted(can_cu.items())))

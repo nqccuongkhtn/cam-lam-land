@@ -85,6 +85,7 @@ def main(vao, tep_chu):
         if mau in b5.MAU_893: loai, bac = b5.MAU_893[mau], 2   # a. màu đường / sông (như 5b)
         elif qh: loai, bac = b5.TEN[([x for x in qh if b5.hop_mau(x, mau)] or qh)[0]], 2
         elif ht: loai, bac = b5.TEN[ht[0]], 2
+        elif mau in b5.NHIEU_MA: loai, bac = b5.ten_nhieu_ma(b5.NHIEU_MA[mau]), 0   # màu chú dẫn dùng chung nhiều mã (như 5b)
         else:    loai, bac = b5.NHOM_MAU.get(mau, 'Loại đất khác'), 0
         for p in b5.tach_lo(con):
             if p.area * 1.21e10 < 50: continue

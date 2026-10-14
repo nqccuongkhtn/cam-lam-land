@@ -67,7 +67,6 @@
   "Đất du lịch, dịch vụ hiện hữu": "#ff00ff"
  },
  "qd893": {
-  "Loại đất khác": "#a552a5",
   "Đất an ninh": "#ff7f7f",
   "Đất chuyên trồng lúa": "#ffff7f",
   "Đất chăn nuôi tập trung": "#ffff7f",
@@ -103,6 +102,7 @@
   "Đất rừng đặc dụng": "#7fff7f",
   "Đất sông, ngòi, kênh, rạch": "#7fffff",
   "Đất sử dụng cho hoạt động khoáng sản": "#a552a5",
+  "Đất sử dụng cho hoạt động khoáng sản hoặc đất công trình xử lý chất thải (bản vẽ chưa ghi rõ loại)": "#a552a5",
   "Đất sử dụng vào mục đích công cộng": "#ff7f7f",
   "Đất thương mại, dịch vụ": "#ff7f7f",
   "Đất trồng cây hàng năm khác": "#ffdf7f",

@@ -151,7 +151,7 @@ phải tinh chỉnh bằng điểm mốc lưới mới chính xác bằng 5 bả
 `curl -H "User-Agent: x" "https://nominatim.openstreetmap.org/lookup?osm_ids=R<id>&format=json&polygon_geojson=1"`
 (Cam Ranh R7081247, Diên Khánh R7081531; tìm id bằng /search ...&featuretype=settlement).
 
-## QUY HOẠCH CHI TIẾT 1/500 CAM LÂM (dự thảo lấy ý kiến) — 14/10/2026, chờ duyệt
+## QUY HOẠCH CHI TIẾT 1/500 CAM LÂM (dự thảo lấy ý kiến) — 14/10/2026, ĐỦ 9 đồ án
 Hồ sơ 9 đồ án (125 file) ở `D:\KhoQH\camlam-1-500\` (dời khỏi thư mục tạm vì đường dẫn > 260 ký tự). Bản vẽ KHÔNG có lưới toạ độ →
 - `nan_1_500.py <tờ có bảng> <tờ cần nắn> <ra.nan.json> [ảnh soi]`: đọc "BẢNG KÊ TỌA ĐỘ GÓC RANH" (VN-2000; bảng dọc hoặc ngang,
   số hiệu 12 / M12; điểm đầu lặp = khép kín), vẽ NÉT ĐỎ ranh lập quy hoạch (nét đứt bị tách hàng nghìn đoạn), dò tỷ lệ 0,5–20 pt/m
@@ -182,6 +182,25 @@ Hiệp Bắc (2,2 m), TK D phía Bắc Cam Hòa (0,09 m). File nắn + ranh: `na
   đường / chỉ giới (chạy song song NGOÀI ranh, lấy lẫn thì phình 2–5 %); Cam Hải Tây gồm 4 mảnh → `--nhieu`. Kiểm bằng quy mô thuyết
   minh: Cam Hải Đông 177,36/178 ha · Cam Hải Tây 172,36/173,3 · Cam Tân 213,07/213,67 · Suối Tân 311,91/312,68 (lệch < 0,6 % — cũng
   là phép thử độc lập cho tỷ lệ nắn). Ss cắt tile = 4 / tỷ lệ (pt/m): 7,0 · 4,1 · 4,0 · 7,0.
+
+- **TỰ KIỂM + NẮN LẠI (14/10/2026, chủ dự án: "phải rõ nét và chính xác 100 %, tự kiểm tra rồi dựng").** Hai phép kiểm ĐỘC LẬP:
+  `kiem_nan_dia_chinh.py <tờ> <ranh>` (nét nền hiện trạng ↔ ranh thửa địa chính, đã trừ độ trượt LECH_DC của lớp dia_chinh) và
+  `kiem_nan_phan_khu.py <tờ> <ranh> apps/backend/data/qh_zones_<bản>.json` (viền mảng tô 1/500 ↔ viền ô đất phân khu 1/2000 dựng từ
+  CAD gốc — dùng cho đồ án không in nền hiện trạng). Mỗi phép in "nếu cho trượt thêm thì muốn dời bao nhiêu" — < 0,3 m là đúng chỗ.
+  Phát hiện 3 đồ án nắn theo bảng toạ độ bị LỆCH vì `nan_1_500.py` dùng MỌI nét đỏ (lẫn tim đường đỏ chạy song song ranh, gạch tô lô
+  đất #dd0000): **Cam Hiệp Nam ~3 m · Cam Hiệp Bắc ~2 m (sai tỷ lệ 0,4 %) · Tiểu khu B ~1,3 m**. Sửa bằng:
+  `tinh_ranh_net.py <tờ_có_bảng> <tờ> <nan cũ> <ra>` — tự tìm ĐÚNG LỚP NÉT RANH (lớp đỏ bám cạnh bảng nhiều nhất; các tờ này đều là
+  #ff0000 mảnh 0), khớp KHOẢNG CÁCH VUÔNG GÓC tới từng cạnh (đồng dạng, tuyến tính), tự bỏ cạnh cong (bản vẽ cung, bảng dây cung).
+  Khu Quân đội: nét ranh trùng cạnh bảng trung vị 0,085 m. `tinh_goc_1_500.py` (giao điểm 2 cạnh = góc ↔ góc bảng) dùng cho TK B
+  (9 góc, lệch TB 0,16 m — tỷ lệ 1,0307 trùng con số đo mù từ địa chính). Sau sửa, cả 9 đồ án: địa chính / 1/2000 chỉ còn muốn dời
+  0,02–0,37 m (Cam Hiệp Nam trùng mép ô đất 1/2000 trung vị 0,35 m). 4 đồ án nắn theo địa chính đã TRỪ độ trượt 0,53 m đông / 0,14 m bắc.
+- **ẢNH NÉT GẤP ĐÔI — `tiler3.py` (thay tiler2):** ô 512 điểm ảnh WebP (web vẫn khai tileSize 256 → điện thoại nét gấp đôi), MỖI MỨC
+  PHÓNG VẼ LẠI TỪ PDF theo khối 4×4 ô bằng DisplayList (tiler2 lấy mẫu một ảnh lớn cho mọi mức → mức xa lấm tấm, mất nét mảnh),
+  siêu lấy mẫu ×2 + gộp điểm ảnh với alpha nhân trước, toạ độ lưới 9×9 điểm chính xác mỗi ô (đúng cả nắn "luoi" gãy khúc).
+  WebP 512 còn NHẸ HƠN PNG 256 cũ (Nha Trang 43 so với 66 MB). QHSDĐ 2030: z9–17; 1/500: z12–19. `gop_tile.py` nay gộp được .webp
+  và chồng alpha đúng công thức. Đưa lên web: `dua-len-web-14-10.sh` (một lệnh: chép ô vào volume, nạp qh_pdf Diên Khánh/Khánh Vĩnh,
+  dựng lại web, bật cờ qh_pdf_bat, kiểm thử, xoá bộ ô cũ). Kho: PDF ở `D:\KhoQH\qhsdd-2030\`, ô ảnh `D:\KhoQH\tiles-qh\`,
+  file nạp `D:\KhoQH\qh-pdf\`.
 
 ## Ninh Thuận cũ (nay thuộc Khánh Hòa) + cấp tỉnh
 Tên miền `ninhthuan.gov.vn` đã ngừng sau sáp nhập 1/7/2025, cổng Khánh Hòa chưa chuyển dữ liệu về.

@@ -343,25 +343,42 @@ const RASTER_OVERLAYS = [
   // ⚠️ ĐÂY LÀ BẢN XEM THỬ: mới có ẢNH tile, CHƯA tách lớp vector loại đất, CHƯA tính trên từng thửa
   //    (phần tính quy hoạch theo thửa QĐ205/893 hiện chỉ cho huyện Cam Lâm cũ).
   // Quy trình dựng: scripts ở scratchpad quy-hoach-tinh (nan.py khớp lưới, tiler2.py cắt tile).
+  // 14/10/2026: MỌI lớp QHSDĐ 2030 + 1/500 cắt lại bằng scripts/qh-tinh/tiler3.py — ô ảnh 512 điểm (WebP) mà vẫn khai
+  // tileSize 256 → nét GẤP ĐÔI trên điện thoại (chủ dự án chê bản cũ "mờ, không thấy được"); mỗi mức phóng vẽ lại thẳng
+  // từ PDF nên mức xa không còn lấm tấm; thêm mức 17 (mức xem thửa). Bộ cũ (…v1, ninhhoa2030v2, PNG 256) đã xoá.
   { id: 'qh-ninhhoa2030', name: 'QHSDĐ 2030 thị xã Ninh Hòa', url: '',
-    tiles: ['/tiles/ninhhoa2030v2/{z}/{x}/{y}.png'], minzoom: 9, maxzoom: 16,   // v2 (13/10): sửa vệt nhoè (khớp affine mỗi ô thay vì phóng lưới thô)
+    tiles: ['/tiles/ninhhoa2030v3/{z}/{x}/{y}.webp'], minzoom: 9, maxzoom: 17,
     coordinates: [[108.868, 12.755], [109.345, 12.755], [109.345, 12.341], [108.868, 12.341]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── CẢ TỈNH · QHSDĐ 2030 từ PDF chính thức Sở NN&MT (cùng cách Ninh Hòa: nắn theo lưới km, cắt
-  //    theo ranh lấy từ vùng màu bản đồ, khớp AFFINE mỗi ô). Bản XEM THỬ: mới có ẢNH, chưa tính theo thửa.
+  //    theo ranh lấy từ vùng màu bản đồ). Tính quy hoạch theo thửa: bảng qh_pdf (máy chủ lib/qhPdf.ts), chỉ tham khảo.
   { id: 'qh-nhatrang2030', name: 'QHSDĐ 2030 TP Nha Trang', url: '',
-    tiles: ['/tiles/nhatrang2030v1/{z}/{x}/{y}.png'], minzoom: 9, maxzoom: 16,
+    tiles: ['/tiles/nhatrang2030v2/{z}/{x}/{y}.webp'], minzoom: 9, maxzoom: 17,
     coordinates: [[109.109, 12.379], [109.244, 12.379], [109.244, 12.136], [109.109, 12.136]] as [[number, number], [number, number], [number, number], [number, number]] },
   { id: 'qh-khanhson2030', name: 'QHSDĐ 2030 huyện Khánh Sơn', url: '',
-    tiles: ['/tiles/khanhson2030v1/{z}/{x}/{y}.png'], minzoom: 9, maxzoom: 16,
+    tiles: ['/tiles/khanhson2030v2/{z}/{x}/{y}.webp'], minzoom: 9, maxzoom: 17,
     coordinates: [[108.781, 12.162], [109.008, 12.162], [109.008, 11.914], [108.781, 11.914]] as [[number, number], [number, number], [number, number], [number, number]] },
   { id: 'qh-vanninh2030', name: 'QHSDĐ 2030 huyện Vạn Ninh', url: '',
-    tiles: ['/tiles/vanninh2030v1/{z}/{x}/{y}.png'], minzoom: 9, maxzoom: 16,
+    tiles: ['/tiles/vanninh2030v2/{z}/{x}/{y}.webp'], minzoom: 9, maxzoom: 17,
     coordinates: [[109.083, 12.871], [109.471, 12.871], [109.471, 12.536], [109.083, 12.536]] as [[number, number], [number, number], [number, number], [number, number]] },
   // Cam Ranh: nhãn lưới vẽ thành nét (không đọc được chữ) → nắn bằng cách đọc tay 1 nhãn rồi dò ĐƯỜNG LƯỚI
   // trong nét vector (tránh nước biển cùng màu cyan). Khớp R²=1,0, 113,38 pt/km. Xem scripts/qh-tinh/README.md.
   { id: 'qh-camranh2030', name: 'QHSDĐ 2030 TP Cam Ranh', url: '',
-    tiles: ['/tiles/camranh2030v1/{z}/{x}/{y}.png'], minzoom: 9, maxzoom: 16,
+    tiles: ['/tiles/camranh2030v2/{z}/{x}/{y}.webp'], minzoom: 9, maxzoom: 17,
     coordinates: [[108.989, 12.032], [109.286, 12.032], [109.286, 11.801], [108.989, 11.801]] as [[number, number], [number, number], [number, number], [number, number]] },
+  // Diên Khánh + Khánh Vĩnh (14/10/2026): lưới km in KHÔNG đều → nắn THEO TỪNG Ô LƯỚI ("luoi" trong nan/<pdf>.nan.json).
+  { id: 'qh-dienkhanh2030', name: 'QHSDĐ 2030 huyện Diên Khánh', url: '',
+    tiles: ['/tiles/dienkhanh2030v2/{z}/{x}/{y}.webp'], minzoom: 9, maxzoom: 17,
+    coordinates: [[108.931, 12.397], [109.144, 12.397], [109.144, 12.164], [108.931, 12.164]] as [[number, number], [number, number], [number, number], [number, number]] },
+  { id: 'qh-khanhvinh2030', name: 'QHSDĐ 2030 huyện Khánh Vĩnh', url: '',
+    tiles: ['/tiles/khanhvinh2030v2/{z}/{x}/{y}.webp'], minzoom: 9, maxzoom: 17,
+    coordinates: [[108.668, 12.515], [109.069, 12.515], [109.069, 12.086], [108.668, 12.086]] as [[number, number], [number, number], [number, number], [number, number]] },
+  // ── QUY HOẠCH CHI TIẾT 1/500 · 9 đồ án xã Cam Lâm đưa LẤY Ý KIẾN (DỰ THẢO, chưa phê duyệt) — 14/10/2026.
+  //    Bản vẽ không có lưới toạ độ: nắn theo bảng toạ độ góc ranh VN-2000 in trên hồ sơ (lớp nét ranh khớp cạnh bảng),
+  //    nút tim đường (Cam Hòa), hoặc nét hiện trạng khớp ranh thửa địa chính (4 đồ án không có toạ độ). Kiểm chéo bằng
+  //    địa chính + ô đất phân khu 1/2000: lệch còn 0,1–0,4 m. File nắn: scripts/qh-tinh/nan/1-500/.
+  { id: 'qh-qhct500', name: 'QH chi tiết 1/500 (dự thảo lấy ý kiến)', url: '',
+    tiles: ['/tiles/qhct500camlam-v3/{z}/{x}/{y}.webp'], minzoom: 12, maxzoom: 19,
+    coordinates: [[109.0602, 12.1676], [109.1906, 12.1676], [109.1906, 12.0152], [109.0602, 12.0152]] as [[number, number], [number, number], [number, number], [number, number]] },
 ];
 // MỤC CHỌN trên bảng "Bản đồ quy hoạch". Ba bản phân khu 1/2000 (QĐ2076 phía Bắc · QĐ2101 trung tâm ·
 // QĐ2222 ven biển · QĐ918 phức hợp phía Tây) là BỐN MẢNH CỦA CÙNG MỘT BỘ quy hoạch phân khu —
@@ -382,6 +399,8 @@ const VUNG_QH: { id: string; ten: string; tenNgan: string; tamXem: [number, numb
   { id: 'ninh-hoa',  ten: 'Thị xã Ninh Hòa',      tenNgan: 'Ninh Hòa',  tamXem: [109.1300, 12.4900, 11] },
   { id: 'van-ninh',  ten: 'Huyện Vạn Ninh',       tenNgan: 'Vạn Ninh',  tamXem: [109.2200, 12.7000, 11] },
   { id: 'khanh-son', ten: 'Huyện Khánh Sơn',      tenNgan: 'Khánh Sơn', tamXem: [108.9500, 12.0300, 11] },
+  { id: 'dien-khanh', ten: 'Huyện Diên Khánh',    tenNgan: 'Diên Khánh', tamXem: [109.0381, 12.2753, 11] },
+  { id: 'khanh-vinh', ten: 'Huyện Khánh Vĩnh',    tenNgan: 'Khánh Vĩnh', tamXem: [108.8414, 12.3126, 10] },
 ];
 // `zBay` = mức phóng bay tới khi chọn bản này mà đang nhìn xa hơn (không ghi thì tự tính = minzoom − 1).
 // `pdf` = mã bản trong bảng qh_pdf (máy chủ lib/qhPdf.ts): thửa trong vùng bản này có trang "Quy hoạch sử dụng đất 2030"
@@ -396,6 +415,10 @@ const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: s
   { id: 'qh-khanhson2030', ten: 'QHSDĐ 2030 · Huyện Khánh Sơn', tenNgan: 'Khánh Sơn 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'khanhson2030', gom: ['qh-khanhson2030'], zBay: 11, vung: 'khanh-son' },
   { id: 'qh-vanninh2030', ten: 'QHSDĐ 2030 · Huyện Vạn Ninh', tenNgan: 'Vạn Ninh 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'vanninh2030', gom: ['qh-vanninh2030'], zBay: 11, vung: 'van-ninh' },
   { id: 'qh-camranh2030', ten: 'QHSDĐ 2030 · TP Cam Ranh', tenNgan: 'Cam Ranh 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'camranh2030', gom: ['qh-camranh2030'], zBay: 11, vung: 'cam-ranh' },
+  { id: 'qh-dienkhanh2030', ten: 'QHSDĐ 2030 · Huyện Diên Khánh', tenNgan: 'Diên Khánh 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'dienkhanh2030', gom: ['qh-dienkhanh2030'], zBay: 11, vung: 'dien-khanh' },
+  { id: 'qh-khanhvinh2030', ten: 'QHSDĐ 2030 · Huyện Khánh Vĩnh', tenNgan: 'Khánh Vĩnh 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'khanhvinh2030', gom: ['qh-khanhvinh2030'], zBay: 10, vung: 'khanh-vinh' },
+  // 1/500: DỰ THẢO lấy ý kiến — tên phải ghi rõ để không ai tưởng là quy hoạch đã duyệt.
+  { id: 'qh-qhct500', ten: 'QH chi tiết 1/500 · dự thảo lấy ý kiến (9 khu)', tenNgan: 'Chi tiết 1/500', tenApp: 'QH chi tiết 1/500 (dự thảo)', gom: ['qh-qhct500'], zBay: 12, vung: 'cam-lam' },
 ];
 // CĂN CỨ PHÁP LÝ của từng bản quy hoạch đang chồng lên bản đồ.
 // Người xem hay hỏi "cái màu này dựa vào đâu?" — nên phải chỉ thẳng ra quyết định phê duyệt,
@@ -404,7 +427,10 @@ const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: s
 // bản quét đóng dấu ngày bằng tay, chữ số ngày KHÔNG đọc ra được — chỉ ghi "tháng 8/2024" cho
 // đúng sự thật, không đoán. Bản gốc vẫn đính kèm để ai cần thì tự xem.
 const TL_QH = '/tai-lieu/quy-hoach/';
-type CanCu = { so: string; ngay: string; coQuan: string; ten: string; tep: string };
+// `loai` = loại văn bản ghi ở dòng đầu thẻ (mặc định "Quyết định"); `cac` = nhiều văn bản cho CÙNG một lớp (1/500: 9 thông báo)
+// → thẻ liệt kê từng văn bản, mỗi dòng một đường mở bản gốc.
+type CanCu = { so: string; ngay: string; coQuan: string; ten: string; tep: string; loai?: string;
+  cac?: { so: string; ngay: string; ten: string; tep: string }[] };
 const CAN_CU_QH: Record<string, CanCu> = {
   'qh-qd205': { so: '205/QĐ-TTg', ngay: '28/02/2024', coQuan: 'Thủ tướng Chính phủ',
     ten: 'Phê duyệt Quy hoạch chung đô thị mới Cam Lâm, tỉnh Khánh Hòa đến năm 2045',
@@ -451,6 +477,28 @@ const CAN_CU_QH: Record<string, CanCu> = {
   'qh-camranh2030': { so: '', ngay: '', coQuan: 'Sở Nông nghiệp và Môi trường tỉnh Khánh Hòa',
     ten: 'Bản đồ Quy hoạch sử dụng đất đến năm 2030 — TP Cam Ranh, tỉnh Khánh Hòa',
     tep: 'https://snnmt.khanhhoa.gov.vn/Portals/0/2022/Dat-dai/CamRanh2030.pdf' },
+  // Diên Khánh / Khánh Vĩnh: bản đồ KHÔNG in số quyết định (Khánh Vĩnh ghi "ngày … tháng … năm 2025" để trống) → chưa ghi số QĐ.
+  'qh-dienkhanh2030': { so: '', ngay: '', coQuan: 'Sở Nông nghiệp và Môi trường tỉnh Khánh Hòa',
+    ten: 'Bản đồ Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 — Huyện Diên Khánh, tỉnh Khánh Hòa',
+    tep: 'https://snnmt.khanhhoa.gov.vn/Portals/0/3%20Ban%20do%20Dieu%20chinh%20Quy%20hoach%20su%20dung%20dat%20huyen%20Dien%20Khanh%20den%202030.pdf' },
+  'qh-khanhvinh2030': { so: '', ngay: '', coQuan: 'Sở Nông nghiệp và Môi trường tỉnh Khánh Hòa',
+    ten: 'Bản đồ Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 — Huyện Khánh Vĩnh, tỉnh Khánh Hòa (tỷ lệ 1/25.000)',
+    tep: 'https://snnmt.khanhhoa.gov.vn/Portals/0/DCQH%20SDD%20DEN%2020330%2008052025.pdf' },
+  // 1/500: KHÔNG phải quyết định phê duyệt — là THÔNG BÁO lấy ý kiến hồ sơ (dự thảo). Số + ngày đọc từ chính 9 bản thông báo.
+  'qh-qhct500': { loai: 'Thông báo', so: '285–291, 327, 328/TB-UBND', ngay: '29/4 và 19/5/2026', coQuan: 'UBND xã Cam Lâm',
+    ten: 'Lấy ý kiến góp ý hồ sơ lập đồ án Quy hoạch chi tiết xây dựng tỷ lệ 1/500 (DỰ THẢO, chưa phê duyệt)',
+    tep: TL_QH + 'TB-285-2026-QHCT-1-500-tieu-khu-C-ven-bien.pdf',
+    cac: [
+      { so: '327/TB-UBND', ngay: '19/5/2026', ten: 'Khu Gia đình Quân đội — Tiểu khu G, phân khu Trung tâm', tep: TL_QH + 'TB-327-2026-QHCT-1-500-khu-gia-dinh-quan-doi-TK-G.pdf' },
+      { so: '328/TB-UBND', ngay: '19/5/2026', ten: 'Một phần Tiểu khu B, phân khu Trung tâm', tep: TL_QH + 'TB-328-2026-QHCT-1-500-tieu-khu-B-trung-tam.pdf' },
+      { so: '290/TB-UBND', ngay: '29/4/2026', ten: 'Một phần Tiểu khu C, phân khu Trung tâm', tep: TL_QH + 'TB-290-2026-QHCT-1-500-tieu-khu-C-trung-tam.pdf' },
+      { so: '291/TB-UBND', ngay: '29/4/2026', ten: 'Một phần Tiểu khu D, phân khu Trung tâm', tep: TL_QH + 'TB-291-2026-QHCT-1-500-tieu-khu-D-trung-tam.pdf' },
+      { so: '289/TB-UBND', ngay: '29/4/2026', ten: 'Một phần Tiểu khu A và B, phân khu phía Bắc', tep: TL_QH + 'TB-289-2026-QHCT-1-500-tieu-khu-A-B-phia-Bac.pdf' },
+      { so: '287/TB-UBND', ngay: '29/4/2026', ten: 'Một phần Tiểu khu B, phân khu phía Bắc', tep: TL_QH + 'TB-287-2026-QHCT-1-500-tieu-khu-B-phia-Bac.pdf' },
+      { so: '288/TB-UBND', ngay: '29/4/2026', ten: 'Một phần Tiểu khu D, phân khu phía Bắc', tep: TL_QH + 'TB-288-2026-QHCT-1-500-tieu-khu-D-phia-Bac.pdf' },
+      { so: '286/TB-UBND', ngay: '29/4/2026', ten: 'Một phần Tiểu khu E, phân khu phía Bắc', tep: TL_QH + 'TB-286-2026-QHCT-1-500-tieu-khu-E-phia-Bac.pdf' },
+      { so: '285/TB-UBND', ngay: '29/4/2026', ten: 'Một phần Tiểu khu C, phân khu ven biển', tep: TL_QH + 'TB-285-2026-QHCT-1-500-tieu-khu-C-ven-bien.pdf' },
+    ] },
 };
 
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
@@ -936,7 +984,7 @@ export default function MapPage() {
   // Ảnh PNG QĐ205 là lớp CHÍNH (đúng màu/ký hiệu gốc) — bật mặc định, hiển thị TRÊN lớp vector.
   // Hai lớp phân khu MẶC ĐỊNH TẮT: chúng nằm đè lên vùng QĐ205, bật sẵn cả ba thì màu chồng màu.
   // Người dùng tự tích vào mới hiện.
-  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd918': false, 'qh-cuhin': false, 'qh-taynam': false, 'qh-taybac': false, 'qh-qd893': false, 'qh-ninhhoa2030': false, 'qh-nhatrang2030': false, 'qh-khanhson2030': false, 'qh-vanninh2030': false, 'qh-camranh2030': false });
+  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd918': false, 'qh-cuhin': false, 'qh-taynam': false, 'qh-taybac': false, 'qh-qd893': false, 'qh-ninhhoa2030': false, 'qh-nhatrang2030': false, 'qh-khanhson2030': false, 'qh-vanninh2030': false, 'qh-camranh2030': false, 'qh-dienkhanh2030': false, 'qh-khanhvinh2030': false, 'qh-qhct500': false });
   // ĐỊA GIỚI đang chọn để LỌC danh sách lớp quy hoạch — giờ nhiều bản quá, gom theo huyện/thị cho gọn
   // (chủ dự án 14/10/2026: "chọn địa giới rồi hiện quy hoạch ở địa giới đó thôi để đỡ loạn"). Mặc định Cam Lâm.
   const [vungQh, setVungQh] = useState<string>('cam-lam');
@@ -2831,14 +2879,31 @@ export default function MapPage() {
                   <button onClick={() => setCanCuOpen(false)} aria-label="Đóng" className="ml-auto text-lg leading-none text-slate-400 hover:text-slate-700">✕</button>
                 </div>
                 <p className="px-3.5 pt-2 text-[11.5px] leading-snug text-slate-500">
-                  {dangBat.length ? 'Bản quy hoạch đang hiện trên bản đồ được duyệt theo quyết định dưới đây.'
+                  {dangBat.length ? (dangBat.includes('qh-qhct500') ? 'Bản 1/500 đang hiện là DỰ THẢO xã đưa lấy ý kiến, CHƯA được phê duyệt — căn cứ là các thông báo dưới đây.'
+                    : 'Bản quy hoạch đang hiện trên bản đồ được duyệt theo quyết định dưới đây.')
                     : 'Bấm vào từng dòng để mở bản gốc (PDF) của quyết định phê duyệt.'}
                 </p>
                 <div className="space-y-1.5 p-3">
-                  {ds.map((id) => { const c = CAN_CU_QH[id]; return (
+                  {ds.map((id) => { const c = CAN_CU_QH[id]; if (!c) return null;
+                    // Nhiều văn bản cho một lớp (1/500: 9 thông báo) → thẻ liệt kê, mỗi dòng mở một bản gốc.
+                    if (c.cac?.length) return (
+                      <div key={id} className="rounded-xl border border-slate-200 px-2.5 py-2">
+                        <span className="block text-[12.5px] font-bold text-[#0A2540]">📄 {c.loai || 'Quyết định'} {c.so} — {c.ngay}</span>
+                        <span className="block text-[11.5px] leading-snug text-slate-500">{c.coQuan}</span>
+                        <span className="mt-0.5 block text-[11.5px] leading-snug text-slate-600">{c.ten}</span>
+                        <div className="mt-1.5 divide-y divide-slate-100 border-t border-slate-100">
+                          {c.cac.map((v) => (
+                            <a key={v.so} href={v.tep} target="_blank" rel="noreferrer" className="flex items-baseline gap-2 py-1 text-[11.5px] leading-snug hover:bg-slate-50">
+                              <b className="shrink-0 text-[#0A2540]">{v.so}</b><span className="text-slate-600">{v.ten} · {v.ngay}</span>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                    return (
                     <a key={id} href={c.tep} target="_blank" rel="noreferrer"
                       className="block rounded-xl border border-slate-200 px-2.5 py-2 transition hover:border-[#0A2540] hover:bg-slate-50">
-                      <span className="block text-[12.5px] font-bold text-[#0A2540]">{c.so ? `📄 Quyết định ${c.so} — ${c.ngay}` : '📄 Bản đồ quy hoạch (Sở công bố)'}</span>
+                      <span className="block text-[12.5px] font-bold text-[#0A2540]">{c.so ? `📄 ${c.loai || 'Quyết định'} ${c.so} — ${c.ngay}` : '📄 Bản đồ quy hoạch (Sở công bố)'}</span>
                       <span className="block text-[11.5px] leading-snug text-slate-500">{c.coQuan}</span>
                       <span className="mt-0.5 block text-[11.5px] leading-snug text-slate-600">{c.ten}</span>
                     </a>

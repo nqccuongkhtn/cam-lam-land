@@ -165,8 +165,23 @@ Hồ sơ 9 đồ án (125 file) ở `D:\KhoQH\camlam-1-500\` (dời khỏi thư 
 - `tiler2.py … qhct500-<ten> 14 19 <Ss ≈ m/pt ÷ 0,25>` → `gop_tile.py` gộp 5 bộ thành `qhct500camlam-v1` (1.587 ô) →
   `ghep_tile_ve_tinh.py` làm ảnh thử đúng như web (tile chồng ảnh vệ tinh).
 Đã làm: Tiểu khu G quân đội (lệch nét ranh 0,5 m), TK B trung tâm Cam Đức (1,2 m), TK D Cam Hiệp Nam (2,2 m — cạnh cong), TK C Cam
-Hiệp Bắc (2,2 m), TK D phía Bắc Cam Hòa (0,09 m). File nắn + ranh: `nan/1-500/`. CHƯA: Cam Hải Đông, Cam Hải Tây, Cam Tân, Suối Tân
-(cùng đơn vị tư vấn, không có toạ độ dạng chữ — chữ số vẽ thành nét; cần đặt khớp theo đường giao thông của bản phân khu).
+Hiệp Bắc (2,2 m), TK D phía Bắc Cam Hòa (0,09 m). File nắn + ranh: `nan/1-500/`.
+- **4 đồ án KHÔNG có toạ độ nào** (Cam Hải Đông, Cam Hải Tây, Cam Tân, Suối Tân — cùng đơn vị tư vấn Angkora, chữ số vẽ thành nét):
+  `nan_1_500_dia_chinh.py <tờ.pdf> <ra.nan.json> --xa="<tên xã CŨ trong dia_chinh_xa>" [--xa=…] --dien-tich-ha=<quy mô thuyết minh>
+  [--lop=767676_0.24] [--ti-le=0.9,2.4]` — đối chiếu NÉT NỀN HIỆN TRẠNG (bản đo in xám) với ranh thửa bảng `dia_chinh`: dò tỷ lệ +
+  vị trí bằng trượt hình (3 m rồi 2 m/điểm ảnh) rồi ICP. Thử mù trên TK B (đã có bảng toạ độ): ra 1,0306 pt/m, đáp án 1,029.
+  Kết quả (trung vị nét nền cách ranh thửa): Cam Tân 0,89 m · Suối Tân 0,23 m · Cam Hải Tây 1,26 m · Cam Hải Đông 4,6 m (nền có
+  nhiều ao tôm / đồng mức không trùng ranh thửa, nhưng soi gần thì đường + bờ ao khớp ranh thửa vài mét).
+  Ba bẫy đã vấp: (1) NÉT NỀN mỗi tư vấn một kiểu — TK B #c1c1c1 mảnh 0, Cam Hải Đông #7f7f7f dày 0,24 kèm 32 vạn CHẤM ký hiệu cát/cỏ
+  (công cụ bỏ đường vẽ < 3 điểm), Cam Hải Tây lớp xám nhiều nhất lại là ĐỒNG MỨC #989898 và vòng tròn ký hiệu cây #dadada → phải chỉ
+  định `--lop=767676_0.24` (công cụ in danh sách lớp xám để chọn; soi nhanh bằng cách vẽ riêng từng lớp); (2) KHU NẰM VẮT HAI XÃ —
+  "phía bắc Cam Hải Tây" phần lớn là đất Cam Hòa cũ: chỉ lấy thửa Cam Hải Tây thì hỏng (14,9 m), thêm `--xa="xã Cam Hòa"` thì đạt;
+  (3) dữ liệu địa chính có thửa SAI TOẠ ĐỘ (Suối Tân 2 thửa cách 300 km → khung 360 km, tràn bộ nhớ) — công cụ bỏ thửa cách > 15 km.
+  Tên xã cho Cam Tân là "Xã Cam Hiệp" (file địa chính của đơn vị gốc Cam Tân mang mã 22435).
+- Ranh 4 đồ án đó: `ranh_1_500.py net <tờ> <ra> --lop=ff0000_0.00 [--nhieu]` — ranh = nét đỏ mảnh 0 có chấm tròn; nét đỏ 0,24 là tim
+  đường / chỉ giới (chạy song song NGOÀI ranh, lấy lẫn thì phình 2–5 %); Cam Hải Tây gồm 4 mảnh → `--nhieu`. Kiểm bằng quy mô thuyết
+  minh: Cam Hải Đông 177,36/178 ha · Cam Hải Tây 172,36/173,3 · Cam Tân 213,07/213,67 · Suối Tân 311,91/312,68 (lệch < 0,6 % — cũng
+  là phép thử độc lập cho tỷ lệ nắn). Ss cắt tile = 4 / tỷ lệ (pt/m): 7,0 · 4,1 · 4,0 · 7,0.
 
 ## Ninh Thuận cũ (nay thuộc Khánh Hòa) + cấp tỉnh
 Tên miền `ninhthuan.gov.vn` đã ngừng sau sáp nhập 1/7/2025, cổng Khánh Hòa chưa chuyển dữ liệu về.

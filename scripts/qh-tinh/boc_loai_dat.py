@@ -134,7 +134,9 @@ pimg[mask_ranh == 0] = 0
 # ---- 2) nhãn mã loại đất (trong ranh) + khung chú giải (ngoài ranh)
 MA = set(("ODT ONT LUA LUC LUK LUN BHK NHK HNK CLN RSX RPH RDD RSN RST RSM NTS LMU NKH TSC DTS CQP CAN SKC SKK SKN SKT "
           "SKS SKX TMD DGT DTL DNL DBV DVH DYT DGD DTT DSH DKV DRA DCH DDT DDL TON TIN NTD SON MNC PNK CSD BCS DCS NCS "
-          "DNG DKH DXH DSK DCK MVB MBV TSK").split())
+          "DNG DKH DXH DSK DCK MVB MBV TSK "
+          # mã Thông tư 08/2024/TT-BTNMT (chú giải bản Diên Khánh QĐ 1564/2025 — đọc 14/10/2026 khuya)
+          "CNT DDD DPC CSK SCC SCT CCC DCT TVC CGT MCS NNP CHN PNN OTC CQA DSN DMT DKT LNP").split())
 nhan = []   # [ma, cx, cy, do, cao, rong, co_chu] theo điểm ảnh lượt 1
 chu_giai = collections.defaultdict(collections.Counter)
 ngoai = []   # mã NGOÀI ranh: chú giải + nhãn của phần đất huyện bên cạnh (nếu bản vẽ có tô) → phải tách
@@ -379,15 +381,26 @@ TEN.update({'LUA': 'Đất trồng lúa', 'LUK': 'Đất trồng lúa nước c�
             # RSN lấy THEO CHÚ GIẢI in trên bản đồ Cam Ranh / Ninh Hòa / Khánh Vĩnh (Khánh Sơn ghi "Đất CÓ rừng sản xuất…") — 14/10/2026
             'RSN': 'Đất rừng sản xuất là rừng tự nhiên',
             # DSK: Thông tư 08/2024/TT-BTNMT, Phụ lục II mục A, dòng 4.10
-            'DSK': 'Đất xây dựng công trình sự nghiệp khác'})
+            'DSK': 'Đất xây dựng công trình sự nghiệp khác',
+            # mã MỚI Thông tư 08/2024 — tên chép NGUYÊN VĂN chú giải bản Diên Khánh (QĐ 1564/QĐ-UBND 10/6/2025), 14/10/2026 khuya
+            'NNP': 'Nhóm đất nông nghiệp', 'CHN': 'Đất trồng cây hằng năm', 'LNP': 'Đất lâm nghiệp', 'CNT': 'Đất chăn nuôi tập trung',
+            'PNN': 'Nhóm đất phi nông nghiệp', 'OTC': 'Đất ở', 'CQA': 'Đất quốc phòng, an ninh', 'DSN': 'Đất xây dựng công trình sự nghiệp',
+            'DMT': 'Đất xây dựng cơ sở môi trường', 'DKT': 'Đất xây dựng cơ sở khí tượng thủy văn',
+            'CSK': 'Đất sản xuất, kinh doanh phi nông nghiệp', 'SCC': 'Đất khu công nghiệp, cụm công nghiệp',
+            'SCT': 'Đất khu công nghệ thông tin tập trung', 'CCC': 'Đất sử dụng vào mục đích công cộng',
+            'DCT': 'Đất công trình cấp nước, thoát nước', 'DPC': 'Đất công trình phòng, chống thiên tai',
+            'DDD': 'Đất có di tích lịch sử - văn hóa, danh lam thắng cảnh, di sản thiên nhiên', 'TVC': 'Đất có mặt nước chuyên dùng',
+            'CGT': 'Đất do Nhà nước thu hồi theo quy định của pháp luật đất đai chưa giao, chưa cho thuê',
+            'MCS': 'Đất có mặt nước chưa sử dụng'})
 # mã không có trong bảng (vd RST, MVB, TSK — chú giải các bản không ghi tên, Thông tư 08/2024 cũng không có) thì GIỮ NGUYÊN MÃ — không tự đặt tên
 # (quy tắc ten-loai-dat.json).
 # Tên NHÓM (màu chú giải dùng chung nhiều mã): chỉ đặt tên khi MỌI mã trong nhóm cùng một họ; ngoài ra liệt kê mã.
 HO = [({'LUA', 'LUC', 'LUK', 'LUN'}, 'Đất trồng lúa'),
-      ({'RSX', 'RSN', 'RPH', 'RDD', 'RST', 'RSM'}, 'Đất rừng (bản vẽ chưa ghi rõ loại rừng)'),
-      ({'DTL', 'NTS', 'SON', 'MNC', 'MVB', 'MBV'}, 'Mặt nước – thuỷ lợi, sông suối hoặc nuôi trồng thuỷ sản (bản vẽ chưa ghi rõ)'),
+      ({'RSX', 'RSN', 'RPH', 'RDD', 'RST', 'RSM', 'LNP'}, 'Đất rừng (bản vẽ chưa ghi rõ loại rừng)'),
+      ({'DTL', 'NTS', 'SON', 'MNC', 'MVB', 'MBV', 'TVC', 'DCT'}, 'Mặt nước – thuỷ lợi, sông suối hoặc nuôi trồng thuỷ sản (bản vẽ chưa ghi rõ)'),
       ({'DBV', 'DCH', 'DDT', 'DDL', 'DGD', 'DKH', 'DKV', 'DNL', 'DSH', 'DTS', 'DTT', 'DVH', 'DXH', 'DYT', 'PNK', 'SKC', 'SKK',
-        'SKN', 'SKS', 'SKX', 'TIN', 'TMD', 'TON', 'TSC', 'DSK', 'DCK', 'DRA', 'DNG', 'TSK'},
+        'SKN', 'SKS', 'SKX', 'TIN', 'TMD', 'TON', 'TSC', 'DSK', 'DCK', 'DRA', 'DNG', 'TSK',
+        'CSK', 'SCC', 'SCT', 'CCC', 'DPC', 'DDD', 'DSN', 'DMT', 'DKT', 'DGT', 'DTL', 'DCT'},
        'Đất công trình công cộng, dịch vụ, sản xuất (bản vẽ chưa ghi rõ loại)')]
 def ten_ma(m):
     if not m.startswith('NHOM:'): return TEN.get(m, m)

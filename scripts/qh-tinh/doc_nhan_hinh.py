@@ -189,7 +189,9 @@ if doc:
     # đều từng 3 chữ nếu MỌI phần đều là mã hợp lệ (chia lại khung theo tỷ lệ chữ)
     MA_HOP_LE = set(("ODT ONT LUA LUC LUK LUN BHK NHK HNK CLN RSX RPH RDD RSN RST RSM NTS LMU NKH TSC DTS CQP CAN SKC SKK SKN SKT "
           "SKS SKX TMD DGT DTL DNL DBV DVH DYT DGD DTT DSH DKV DRA DCH DDT DDL TON TIN NTD SON MNC PNK CSD BCS DCS NCS "
-          "DNG DKH DXH DSK DCK MVB MBV TSK").split())
+          "DNG DKH DXH DSK DCK MVB MBV TSK "
+          # mã Thông tư 08/2024/TT-BTNMT (chú giải bản Diên Khánh QĐ 1564/2025 — đọc 14/10/2026 khuya)
+          "CNT DDD DPC CSK SCC SCT CCC DCT TVC CGT MCS NNP CHN PNN OTC CQA DSN DMT DKT LNP").split())
     ma = []; dem_ma = collections.Counter(); bo = collections.Counter()
     for w in ra_ds:
         t = w['t']; x0, y0, x1, y1 = w['bbox']

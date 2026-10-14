@@ -150,6 +150,11 @@ lấy mã dưới). Kết quả: 7.701 nhãn mã (2.358 đỏ); đọc được 
 #fffc96); 2.845 ha lúa "nhóm" → LUC, 558 ha → LUA; nhóm công cộng 1.174 ha → TMD 387 · DKV 180 · DGD 17,6 · DTT 16,2… (544 ha không có
 nhãn đỏ vẫn "nhóm"); phủ 94,4 → 94,7 %. Soi tay 4 vùng trên bản gốc: đúng cả 4 ("LUC/DGD" → DGD, "CLN/DKV" → DKV). Nhãn đã đọc lưu
 `D:\KhoQH\qh-pdf\nhan-hinh-dienkhanh.json`; bóc lại Diên Khánh nhớ thêm `--nhan-hinh=` file đó.
+**Chú giải Diên Khánh in theo THÔNG TƯ 08/2024** (bảng mã mới của Luật Đất đai 2024): có mã trước đây chưa nằm trong danh sách hợp lệ
+(CNT chăn nuôi tập trung, DDD di tích – danh lam – di sản, DPC phòng chống thiên tai, CCC, CSK, SCC, SCT, DCT, TVC, CGT, MCS, nhóm NNP /
+PNN / OTC / CQA / DSN…) → nhãn của chúng bị bỏ. Đã thêm vào danh sách mã (`boc_loai_dat.py` MA, `doc_nhan_hinh.py` MA_HOP_LE) + tên chép
+NGUYÊN VĂN cột "Tên loại đất" của chú giải Diên Khánh; tên RIÊNG cho bản Diên Khánh (vd LUC "Đất chuyên trồng lúa", NTD "…; đất cơ sở lưu
+trữ tro cốt") đặt trong `ten-ma-chu-giai.sql` (bản trong kho mã; chép sang `D:\KhoQH\qh-pdf\` để bước 2 của dua-len-web tự chạy).
 
 ### Dữ liệu QHSDĐ DẠNG SỐ trên cổng GIS tỉnh (14/10/2026) — ĐỢT CŨ, chỉ để tham khảo / đo
 Cổng GIS chính thức `gis.khanhhoa.gov.vn` (mục "Tra cứu quy hoạch" `/public/8192/`, "Mời gọi đầu tư" `/public/8193/`) có dịch vụ ArcGIS

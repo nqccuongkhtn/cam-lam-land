@@ -126,14 +126,14 @@ trong suốt).
 
 ### Thử trên thửa thật mà KHÔNG đụng web
 Máy chủ thật có việc nền (nhắc lịch qua SMS, cào tin…) nên ĐỪNG chạy thêm một bản `index.ts`. Chạy riêng phần tra thửa trong
-container tạm, gắn mã mới chỉ-đọc, mọi đường khác chuyển sang nginx (`thu-server.mts` — xem scratchpad phiên 14/10):
+container tạm, gắn mã mới chỉ-đọc, mọi đường khác chuyển sang nginx (`thu/thu-server.mts`):
 ```bash
 docker inspect camlam_backend --format '{{range .Config.Env}}{{println .}}{{end}}' | grep -v '^PATH=' > env.txt; echo QH_PDF_THU=1 >> env.txt
-MSYS_NO_PATHCONV=1 docker run -d --name thu_api --network camlamgis_default -p 4001:4001 --env-file env.txt -w /app/apps/backend   -v "D:/Cam Lam gis/apps/backend/src:/app/apps/backend/src_moi:ro" -v "$PWD/thu-server.mts:/app/apps/backend/thu-server.mts:ro"   camlamgis-backend node_modules/.bin/tsx thu-server.mts ; rm env.txt
+MSYS_NO_PATHCONV=1 docker run -d --name thu_api --network camlamgis_default -p 4001:4001 --env-file env.txt -w /app/apps/backend   -v "D:/Cam Lam gis/apps/backend/src:/app/apps/backend/src_moi:ro" -v "D:/Cam Lam gis/scripts/qh-tinh/thu/thu-server.mts:/app/apps/backend/thu-server.mts:ro"   camlamgis-backend node_modules/.bin/tsx thu-server.mts ; rm env.txt
 cd apps/frontend && BACKEND_HOST=http://localhost:4001 npx next dev -p 3000      # bản thử giao diện
 # xong: docker rm -f thu_api
 ```
-Chụp ảnh tự động (cửa sổ Chrome bị che thì ảnh chụp đứng hình): puppeteer-core + Chrome cài sẵn, chạy ngầm (`headless: 'new'`).
+Chụp ảnh tự động: `thu/chup.mjs` (cửa sổ Chrome bị che thì công cụ trình duyệt chụp ra hình đứng — dùng cái này, Chrome chạy ngầm). Soi một thửa trên PDF gốc: `thu/thu_thua.py` (diện tích + cắt PDF quanh thửa), `thu/soi_thua.py` (vẽ vùng đã bóc quanh thửa).
 
 **(CŨ, giữ để tham khảo) CÒN LẠI Diên Khánh + Khánh Vĩnh:** đường lưới KHÔNG phải nét dài đơn (grid_vec ra rỗng), dò cyan thì lẫn
 sông → tự động chưa chuẩn. **Nắn tay QGIS** (mở PDF, chọn 3–4 giao điểm lưới) là nhanh nhất. Số lưới đã biết:

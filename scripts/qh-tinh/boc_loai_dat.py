@@ -282,8 +282,10 @@ TEN.update({'LUA': 'Đất trồng lúa', 'LUK': 'Đất trồng lúa nước c�
             'DKH': 'Đất xây dựng cơ sở khoa học và công nghệ', 'DXH': 'Đất xây dựng cơ sở dịch vụ xã hội',
             'DNG': 'Đất xây dựng cơ sở ngoại giao',
             # RSN lấy THEO CHÚ GIẢI in trên bản đồ Cam Ranh / Ninh Hòa / Khánh Vĩnh (Khánh Sơn ghi "Đất CÓ rừng sản xuất…") — 14/10/2026
-            'RSN': 'Đất rừng sản xuất là rừng tự nhiên'})
-# mã không có trong bảng (vd RST, MVB, DSK, TSK — chú giải các bản không ghi tên) thì GIỮ NGUYÊN MÃ — không tự đặt tên
+            'RSN': 'Đất rừng sản xuất là rừng tự nhiên',
+            # DSK: Thông tư 08/2024/TT-BTNMT, Phụ lục II mục A, dòng 4.10
+            'DSK': 'Đất xây dựng công trình sự nghiệp khác'})
+# mã không có trong bảng (vd RST, MVB, TSK — chú giải các bản không ghi tên, Thông tư 08/2024 cũng không có) thì GIỮ NGUYÊN MÃ — không tự đặt tên
 # (quy tắc ten-loai-dat.json).
 # Tên NHÓM (màu chú giải dùng chung nhiều mã): chỉ đặt tên khi MỌI mã trong nhóm cùng một họ; ngoài ra liệt kê mã.
 HO = [({'LUA', 'LUC', 'LUK', 'LUN'}, 'Đất trồng lúa'),

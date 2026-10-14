@@ -90,23 +90,50 @@ Bản sao file nắn + ranh: `scripts/qh-tinh/nan/` (PDF gốc nằm trong kho t
 Ảnh thử (chồng vệ tinh): `bao-cao-qh/anh-thu-qh/dien-khanh-2030-THU-*.png`, `khanh-vinh-2030-THU-*.png` — CHỜ CHỦ DỰ ÁN DUYỆT
 rồi mới chép tile (`dienkhanh2030v1`, `khanhvinh2030v1`, đã cắt sẵn z9–16 ở thư mục nháp) + thêm lớp vào `app/map/page.tsx`.
 
-**BÓC LOẠI ĐẤT THEO THỬA TỪ PDF — `boc_loai_dat.py` (ĐANG LÀM, CHƯA DÙNG CHO WEB).** Mục tiêu: tính diện tích từng loại đất trên
-từng thửa cho các huyện ngoài Cam Lâm (chủ dự án chọn 14/10/2026: tự bóc từ PDF, chưa chờ file gốc của Sở).
-Cách: vẽ lại mọi mảng tô theo đúng thứ tự vẽ của PDF → mỗi MẢNG lấy mã theo nhãn nằm trong nó; nhãn PHÂN SỐ "CLN / TMD" lấy mã
-DƯỚI (quy hoạch); mảng không nhãn thì theo KHUNG CHÚ GIẢI (màu chỉ in cho đúng 1 mã) hoặc ghi "NHÓM … chưa rõ loại"; xuất GeoJSON
-WGS84 cắt theo ranh. Đã sửa trong buổi 14/10 (thử Cam Ranh, S=1,5 → 5,9 m/điểm ảnh, ~40 giây):
-- Nhãn PHÂN SỐ nhận theo VỊ TRÍ + phải có VẠCH NGANG giữa hai mã (2.128 cặp) — thửa 246 tờ 8 Cam Phúc Nam ra TMD 831,4 m²
-  đúng bản vẽ "CLN/TMD" (bản thử cũ ra CLN).
-- CHÚ GIẢI tách khỏi nhãn huyện bên cạnh theo CỠ CHỮ (chú giải 5,1–5,5, nhãn 4,1–4,5) → 12 màu đúng 1 mã (CQP, ODT, ONT, DGT, NTD…);
-  so màu cho LỆCH ≤ 12 vì bản vẽ dùng màu lệch ô mẫu (lúa #fffc8c ↔ #fffc82 = 324 ha).
-- Màu dùng chung nhiều mã mà mảng không nhãn → "Nhóm đất chưa rõ loại (các mã…)", KHÔNG chọn bừa (mặt vịnh không còn thành "thuỷ sản").
-- Khe trắng do nét viền ≤ 2 điểm ảnh lấy loại kề bên; nét dày có màu (đường vẽ bằng nét) cũng tính như mảng.
-Kết quả Cam Ranh: phủ 94,6 % trong ranh; 6 thửa mẫu: 4 thửa khớp bản vẽ, 2 thửa nhỏ còn hụt mép.
-CÒN PHẢI LÀM trước khi đưa lên web: (1) độ phân giải 5,9 m/điểm ảnh quá thô cho thửa < 500 m² (thửa 348 m² chỉ ~10 điểm ảnh) →
-bóc ở S≈3 (2 m/điểm) theo TỪNG Ô cho đủ bộ nhớ; (2) màu hồng cam công cộng dùng chung 21 mã → lô không nhãn chỉ ra "nhóm";
-(3) thử thêm Nha Trang / Ninh Hòa / Vạn Ninh / Khánh Sơn / Khánh Vĩnh (kiểu nhãn khác nhau); (4) nối vào `/api/parcels/at`
-(bảng PostGIS riêng + trang "Quy hoạch sử dụng đất 2030" trong bảng thông tin thửa, ghi rõ "bóc từ bản đồ PDF – tham khảo";
-phiếu trích lục vẫn chỉ cho Cam Lâm). Thử nhanh trên thửa thật: scratchpad `thu_thua.py` (cắt PDF quanh thửa + vẽ ranh thửa).
+## QUY HOẠCH THEO TỪNG THỬA TỪ PDF (14/10/2026 — chờ chủ dự án duyệt, MẶC ĐỊNH TẮT)
+Chủ dự án chọn 14/10/2026: tự bóc từ PDF (chưa chờ file gốc của Sở). Ba bước, chạy lại bao nhiêu lần cũng được:
+```bash
+# 1) BÓC vùng loại đất (2 lượt: lượt 1 quyết định loại đất từng MẢNG tô, lượt 2 vẽ lại từng ô 2048 điểm ảnh ở ~2 m/điểm ảnh)
+python -P boc_loai_dat.py <pdf> <lng> <lat> nan/ranh-<huyen>.json 1.5 ra/<huyen>-loai-dat.geojson ra/<huyen>-thu.png --mau-chuan=bang-mau-chuan.json
+#    in ra: số mảng theo nhãn / theo màu một mã / NHÓM / còn trống + 6 màu còn trống nhiều nhất (soi màu nào chưa có trong chú giải)
+# 2) (khi thêm bản mới) LẬP LẠI BẢNG MÀU CHUẨN từ chú giải các bản đọc được đầy đủ (file .chu-giai.json do bước 1 ghi)
+python -P lap_bang_mau_chuan.py bang-mau-chuan.json ra/*-loai-dat.chu-giai.json
+# 3) NẠP vào cơ sở dữ liệu (xoá sạch bản đó rồi nạp lại trong một giao dịch)
+python -P nap_qh_pdf.py <ban> "QHSDĐ 2030 · TP Cam Ranh" ra/<huyen>-loai-dat.geojson nan/ranh-<huyen>.json "<nguồn>" > nap.sql
+docker compose exec -T postgis psql -U camlam -d camlam_gis -v ON_ERROR_STOP=1 < nap.sql
+```
+`<ban>` phải trùng trường `pdf` của mục trong `MUC_QH` (`app/map/page.tsx`): camranh2030, nhatrang2030, ninhhoa2030, vanninh2030,
+khanhson2030 (đã nạp) · dienkhanh2030, khanhvinh2030 (chưa nạp — chờ lớp bản đồ hai huyện được duyệt; nạp mà giao diện chưa có
+mục thì thửa ở đó hiện khung quy hoạch trống).
+
+Các luật đã chốt (mỗi luật sửa một lỗi thấy trên thửa thật, xem mô tả đầu `boc_loai_dat.py`):
+- Gán theo TỪNG MẢNG tô (đúng ranh khu như bản vẽ) — bỏ cách "mỗi màu một loại + chia theo nhãn gần nhất" (cả vịnh Cam Ranh
+  thành thuỷ sản, rừng chia mảnh cạnh thẳng) và bỏ "kế thừa mảng cùng màu gần nhất" (đoán).
+- Nhãn PHÂN SỐ "CLN / TMD": hai mã xếp chồng thẳng hàng CÓ VẠCH NGANG ở giữa → lấy mã DƯỚI (quy hoạch). Nhận theo vị trí,
+  không theo màu (Cam Ranh in mã đỏ nhưng PDF báo màu đen).
+- KHUNG CHÚ GIẢI: mã ngoài ranh cỡ chữ to hơn nhãn (Cam Ranh 5,1–5,5 so với 4,1–4,5); bản in chữ cùng cỡ (Khánh Vĩnh) thì lấy mọi
+  mã ngoài ranh. Màu bản vẽ lệch ô mẫu vài đơn vị → "gần nhất rõ ràng" (lệch ≤ 25, màu mã khác xa gấp ≥ 1,8 lần).
+- BẢNG MÀU CHUẨN (`bang-mau-chuan.json`, 22 màu, mỗi màu ghi các bản xác nhận): bổ sung cho bản đọc chú giải thiếu — Ninh Hòa
+  89,4 → 96,7 %, Diên Khánh (không có chữ nào) 0 → 94,8 %.
+- Màu dùng chung nhiều mã → "NHÓM" đặt tên theo họ (đất trồng lúa / đất rừng / mặt nước / công trình công cộng…), không chọn bừa.
+- NÉT DÀY chỉ là đất khi là đường hoặc nước (DGT, DTL, SON, MNC); ranh giới hành chính (hồng dày, gần màu ODT) trong suốt.
+- Khe do nét viền ≤ 12 m lấy loại kề bên; mỗi vùng nới NỬA điểm ảnh (góc vuông) cho hai vùng kề nhau khít mép (trước hở 1 điểm
+  ảnh, thửa sát ranh vùng hụt 5–10 % "chưa xác định"). Chồng nhẹ ở góc thì máy chủ chia lại theo tỷ lệ.
+Kết quả 14/10: Cam Ranh 95,7 % · Nha Trang 94,8 % · Ninh Hòa 96,7 % · Vạn Ninh 96,7 % · Khánh Sơn 95,9 % · Diên Khánh 94,8 % ·
+Khánh Vĩnh 97,8 % diện tích trong ranh có loại đất. Phần còn lại: mặt nước biển/vịnh, màu không có trong chú giải.
+CHƯA LÀM: lô màu hồng cam công cộng (21 mã) không nhãn chỉ ra "nhóm"; thử thêm thửa ở Ninh Hòa (bản nhiều nét dày nhất: 17.847 nét
+trong suốt).
+
+### Thử trên thửa thật mà KHÔNG đụng web
+Máy chủ thật có việc nền (nhắc lịch qua SMS, cào tin…) nên ĐỪNG chạy thêm một bản `index.ts`. Chạy riêng phần tra thửa trong
+container tạm, gắn mã mới chỉ-đọc, mọi đường khác chuyển sang nginx (`thu-server.mts` — xem scratchpad phiên 14/10):
+```bash
+docker inspect camlam_backend --format '{{range .Config.Env}}{{println .}}{{end}}' | grep -v '^PATH=' > env.txt; echo QH_PDF_THU=1 >> env.txt
+MSYS_NO_PATHCONV=1 docker run -d --name thu_api --network camlamgis_default -p 4001:4001 --env-file env.txt -w /app/apps/backend   -v "D:/Cam Lam gis/apps/backend/src:/app/apps/backend/src_moi:ro" -v "$PWD/thu-server.mts:/app/apps/backend/thu-server.mts:ro"   camlamgis-backend node_modules/.bin/tsx thu-server.mts ; rm env.txt
+cd apps/frontend && BACKEND_HOST=http://localhost:4001 npx next dev -p 3000      # bản thử giao diện
+# xong: docker rm -f thu_api
+```
+Chụp ảnh tự động (cửa sổ Chrome bị che thì ảnh chụp đứng hình): puppeteer-core + Chrome cài sẵn, chạy ngầm (`headless: 'new'`).
 
 **(CŨ, giữ để tham khảo) CÒN LẠI Diên Khánh + Khánh Vĩnh:** đường lưới KHÔNG phải nét dài đơn (grid_vec ra rỗng), dò cyan thì lẫn
 sông → tự động chưa chuẩn. **Nắn tay QGIS** (mở PDF, chọn 3–4 giao điểm lưới) là nhanh nhất. Số lưới đã biết:

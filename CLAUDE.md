@@ -808,9 +808,22 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   (ĐỪNG phóng lưới thô bằng cv2.resize — nhoè một dải). Đã lên web + kiểm: **Ninh Hòa (ninhhoa2030v2),
   Nha Trang, Khánh Sơn, Vạn Ninh, Cam Ranh** — khai lớp trong `app/map/page.tsx` (`qh-ninhhoa2030`… bật là
   tự bay tới, tile ở volume `camlam_tiles`). Bản nào nhãn lưới vẽ thành NÉT (Cam Ranh) thì đọc tay 1 nhãn →
-  `grid_vec.py` dò đường lưới vector → lưu `<pdf>.nan.json`. CÒN KHÓ: Diên Khánh/Khánh Vĩnh (lưới không phải
-  nét đơn → nắn tay QGIS). Chi tiết `scripts/qh-tinh/README.md`.
-  Lưu ý: 3 lớp mới CHỈ có ẢNH tile, CHƯA tích hợp tính quy hoạch theo thửa (phần đó vẫn chỉ Cam Lâm).
+  `grid_vec.py` dò đường lưới vector → lưu `<pdf>.nan.json`. **Diên Khánh + Khánh Vĩnh nắn được 14/10/2026** bằng
+  `nan_luoi_dut.py` (lưới vẽ ĐỨT KHÚC → gom đoạn ngắn thẳng hàng; Khánh Vĩnh lưới in không đều → `.nan.json` có mục `"luoi"`
+  = nắn theo TỪNG Ô LƯỚI, `nan2.lap_phep_doi` trả `p2en`/`en2p`); file nắn + ranh 7 huyện sao lưu ở `scripts/qh-tinh/nan/`.
+  Hai lớp này CHỜ DUYỆT ảnh thử (trang https://claude.ai/artifact/LpPsf88ACSbMz2ApMTnyLm), tile cắt sẵn nhưng chưa lên web.
+  Chi tiết `scripts/qh-tinh/README.md`.
+  **QUY HOẠCH THEO THỬA TỪ PDF (14/10/2026, MẶC ĐỊNH TẮT):** `boc_loai_dat.py` bóc vùng loại đất từ PDF (2 lượt, ~2 m/điểm ảnh;
+  nhãn phân số "CLN/TMD" lấy mã DƯỚI; khung chú giải + `bang-mau-chuan.json` = bảng màu chung 22 màu gom từ 6 bản; màu dùng chung
+  nhiều mã → "NHÓM … chưa ghi rõ loại", không đoán; nét dày chỉ là đất khi là đường / nước) → `nap_qh_pdf.py` nạp vào bảng
+  `qh_pdf` + `qh_pdf_ranh` (đã nạp Cam Ranh, Nha Trang, Ninh Hòa, Vạn Ninh, Khánh Sơn; Diên Khánh/Khánh Vĩnh chờ lớp bản đồ).
+  Máy chủ `lib/qhPdf.ts`: thửa NGOÀI Cam Lâm (không bản CAD nào phủ) nằm trong ranh bản nào thì tra bản đó, diện tích các loại
+  chia lại cho cộng đúng bằng diện tích thửa; mục `nguon:'pdf'` trong `qhCacBan`. Giao diện: trang "Quy hoạch sử dụng đất 2030 ·
+  bóc từ bản đồ PDF · tham khảo" (MUC_QH có trường `pdf`), KHÔNG in phiếu. CÔNG TẮC: cờ `qh_pdf_bat` trong `app_flags`
+  (`INSERT INTO app_flags(key) VALUES ('qh_pdf_bat')` = bật · `DELETE … WHERE key='qh_pdf_bat'` = tắt); máy chủ thử đặt
+  `QH_PDF_THU=1`. Kiểm 14/10: 40 thửa Cam Lâm ra y hệt mã cũ, 6 thửa mẫu 4 huyện khớp bản vẽ gốc.
+  Thử trên thửa thật (không đụng web): chạy riêng `routes/parcels.ts` trong container tạm gắn mã mới (không có việc nền) — xem
+  `scripts/qh-tinh/README.md` mục "Thử trên thửa thật".
   Bảng thông tin thửa: chỉ BỎ CÂU "Hiện mới có Quy hoạch chung đô thị mới Cam Lâm đến 2045 (QĐ 205)…" (thửa ngoài vùng);
   trang "Quy hoạch chung 2045 (QĐ205)" của thửa Cam Lâm PHẢI GIỮ (13/10 từng bỏ nhầm, chủ dự án hỏi lại 14/10).
   Trang bản đồ có ô "Địa giới" lọc danh sách lớp QH theo huyện/thị (`VUNG_QH`); lớp dữ liệu tên có "Cam Lâm" chỉ hiện ở Cam Lâm.

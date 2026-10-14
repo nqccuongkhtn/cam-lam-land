@@ -247,6 +247,19 @@ for p in np.unique(pimg):
     elif cg in mau_mot_ma: bang[p] = id_ma(mau_mot_ma[cg]); theo_mau_mot += 1
     elif cg in chu_giai and len(chu_giai[cg]) > 1: bang[p] = id_ma('NHOM:' + '/'.join(sorted(chu_giai[cg]))); nhom += 1
     else: bo_trong += 1
+# NÉT DÀY chỉ là ĐẤT khi là đường giao thông hoặc kênh / sông / mặt nước (DGT, DTL, SON, MNC). Nét khác — RANH GIỚI hành chính
+# (hồng dày, màu gần ODT #ffa0ff nên từng bị ghi thành "đất ở đô thị" một dải 5–10 m dọc ranh huyện), đường dây điện… —
+# là TRONG SUỐT: không vẽ ở lượt 2, đất bên dưới giữ nguyên loại.
+NET_LA_DAT = {'DGT', 'DTL', 'SON', 'MNC'}
+def net_la_dat(k):
+    m = ds_ma[bang[k] - 1] if bang[k] else None
+    if not m: return False
+    tap = set(m[5:].split('/')) if m.startswith('NHOM:') else {m}
+    return tap <= NET_LA_DAT | {'NTS'} and bool(tap & NET_LA_DAT)
+trong_suot = set()
+for k in range(1, so_mang + 1):
+    if hinh[k][0] == 'net' and not net_la_dat(k): trong_suot.add(k); bang[k] = 0
+print(f'net day trong suot (ranh gioi, duong day…): {len(trong_suot)}')
 print(f'{so_mang} mang; trong ranh: {co_nhan_} theo nhan, {theo_mau_mot} theo mau mot ma ({len(mau_mot_ma)} mau), '
       f'{nhom} mau dung chung ghi NHOM, {bo_trong} de "chua xac dinh"')
 loai1 = bang[pimg]
@@ -319,6 +332,7 @@ for oy in range(Y0, Y1, O):
         chon = np.nonzero((hop[:, 2] >= px0) & (hop[:, 0] <= px1) & (hop[:, 3] >= py0) & (hop[:, 1] <= py1))[0]
         idt = np.zeros((h, w, 3), np.uint8)
         for k in chon:
+            if k == 0 or k in trong_suot: continue
             kieu, hh, day = hinh[k]
             vv = [np.round(v * S2 - (ax, ay)).astype(np.int32) for v in hh]
             if kieu == 'to': cv2.fillPoly(idt, vv, ma24(int(k)))

@@ -56,10 +56,30 @@ def bez(p0, p1, p2, p3, n=6):
     return [((1-t)**3*p0.x + 3*(1-t)**2*t*p1.x + 3*(1-t)*t*t*p2.x + t**3*p3.x,
              (1-t)**3*p0.y + 3*(1-t)**2*t*p1.y + 3*(1-t)*t*t*p2.y + t**3*p3.y) for t in np.linspace(0, 1, n)[1:]]
 zone = np.full((Hp, Wp, 3), 255, np.uint8)      # màu gốc (chỉ để vẽ ảnh thử)
+vach = []                                        # đoạn NGANG ngắn (3–40 pt) = ứng viên vạch phân số (y, x0, x1) theo điểm ảnh
 idimg = np.zeros((Hp, Wp, 3), np.uint8)          # MÃ MẢNG mã hoá 24 bit (mảng thứ k → k)
 mau_mang = [None]
 so_mang = 0
 for dr in pg.get_drawings():
+    if dr.get('color') is not None:
+        for it in dr['items']:
+            if it[0] == 'l' and abs(it[1].y - it[2].y) < 0.05 and 3 < abs(it[1].x - it[2].x) < 40:
+                vach.append((it[1].y * S, min(it[1].x, it[2].x) * S, max(it[1].x, it[2].x) * S))
+    # NÉT DÀY CÓ MÀU (đường giao thông, kênh mương vẽ bằng nét cam/xanh ≥ 1 pt) = một "mảng" theo đúng thứ tự vẽ
+    sc, sw = dr.get('color'), dr.get('width') or 0
+    if sc is not None and sw >= 1.0 and not dr.get('fill'):
+        scol = (int(round(sc[0] * 255)), int(round(sc[1] * 255)), int(round(sc[2] * 255)))
+        if max(scol) >= 40 and min(scol) <= 245 and scol != (255, 0, 0):
+            net = []
+            for it in dr['items']:
+                if it[0] == 'l': net.append([(it[1].x, it[1].y), (it[2].x, it[2].y)])
+                elif it[0] == 'c': net.append([(it[1].x, it[1].y)] + bez(it[1], it[2], it[3], it[4]))
+            if net:
+                vv = [np.array([(x * S, y * S) for x, y in v], np.int32) for v in net]
+                day = max(1, int(round(sw * S)))
+                cv2.polylines(zone, vv, False, scol, day)
+                so_mang += 1; mau_mang.append(scol)
+                cv2.polylines(idimg, vv, False, (so_mang >> 16, (so_mang >> 8) & 255, so_mang & 255), day)
     f = dr.get('fill')
     if not f: continue
     col = (int(round(f[0] * 255)), int(round(f[1] * 255)), int(round(f[2] * 255)))
@@ -96,8 +116,11 @@ MA = set(("ODT ONT LUA LUC LUK LUN BHK NHK HNK CLN RSX RPH RDD RSN RST RSM NTS L
 nhan = []   # (ma, cx, cy, do, cao)
 # KHUNG CHÚ GIẢI (ngoài ranh): mã in TRONG ô màu mẫu → bảng màu → mã của chính bản vẽ (căn cứ, không đoán)
 chu_giai = collections.defaultdict(collections.Counter)
+ngoai = []   # mã nằm NGOÀI ranh: gồm chú giải + nhãn của phần đất huyện bên cạnh (cũng tô màu) → phải tách
 def mau_tai(cx, cy):
     ix, iy = int(cx), int(cy)
+    c0 = zone[iy, ix]
+    if not (c0 >= 246).all(): return tuple(int(v) for v in c0)      # đúng tại tâm chữ (chữ nằm trong ô màu mẫu)
     o = zone[max(0, iy-3):iy+4, max(0, ix-3):ix+4].reshape(-1, 3)
     o = [tuple(int(v) for v in c) for c in o if not (c >= 246).all()]
     return collections.Counter(o).most_common(1)[0][0] if o else None
@@ -110,17 +133,32 @@ for b in pg.get_text('dict')['blocks']:
             ix, iy = int(cx), int(cy)
             if not (0 <= iy < Hp and 0 <= ix < Wp): continue
             if not mask_ranh[iy, ix]:
-                col = mau_tai(cx, cy)
-                if col: chu_giai[col][t] += 1
+                ngoai.append((t, cx, cy, s['size']))
                 continue
             c = s['color']; r, gg, bb = (c >> 16) & 255, (c >> 8) & 255, c & 255
-            nhan.append([t, cx, cy, r > 150 and gg < 100 and bb < 100, (y1 - y0) * S, (x1 - x0) * S])
+            nhan.append([t, cx, cy, r > 150 and gg < 100 and bb < 100, (y1 - y0) * S, (x1 - x0) * S, s['size']])
+# CHÚ GIẢI = mã ngoài ranh có cỡ chữ TO hơn hẳn nhãn trên bản đồ (Cam Ranh: chú giải 5,1–5,5; nhãn 4,1–4,5).
+# Mã ngoài ranh cỡ chữ như nhãn = nhãn của huyện bên cạnh → bỏ (trước đọc lẫn nên màu đường giao thông ra 8 mã).
+co_nhan = sorted(n[6] for n in nhan)   # CỠ CHỮ (không phải chiều cao khung chữ)
+nguong_co = (co_nhan[len(co_nhan) // 2] * 1.12) if co_nhan else 0
+for t, cx, cy, sz in ngoai:
+    if sz < nguong_co: continue
+    col = mau_tai(cx, cy)
+    if col: chu_giai[col][t] += 1
+
 # PHÂN SỐ "hiện trạng / quy hoạch" (CLN / TMD): hai mã XẾP CHỒNG thẳng hàng → mã TRÊN là hiện trạng, BỎ; mã DƯỚI là quy hoạch 2030.
 # Nhận theo VỊ TRÍ chứ không theo màu (Cam Ranh in mã dưới màu đỏ nhưng PDF báo màu chữ đen).
+# Chỉ công nhận khi CÓ VẠCH NGANG nằm giữa hai mã (tránh bắt nhầm nhãn của hai thửa kề nhau theo chiều dọc).
+va = np.array(vach) if vach else np.zeros((0, 3))
+def co_vach(n, d):
+    if not len(va): return False
+    m = (va[:, 0] > n[2]) & (va[:, 0] < d[2]) & (va[:, 1] < max(n[1], d[1])) & (va[:, 2] > min(n[1], d[1]))
+    return bool(m.any())
 bo = set()
 for i, n in enumerate(nhan):
     for j, d in enumerate(nhan):
-        if i != j and 0.4 * n[4] < d[2] - n[2] < 1.6 * n[4] and abs(d[1] - n[1]) < 0.6 * max(n[5], d[5]): bo.add(i); break
+        if i != j and 0.4 * n[4] < d[2] - n[2] < 1.8 * n[4] and abs(d[1] - n[1]) < 0.6 * max(n[5], d[5]) and co_vach(n, d):
+            bo.add(i); break
 if bo: print(f'nhan phan so: bo {len(bo)} ma hien trang (ma tren), giu ma quy hoach (ma duoi)')
 nhan = [n for i, n in enumerate(nhan) if i not in bo]
 
@@ -145,6 +183,14 @@ tu_chu_giai = 0
 for col, cc in chu_giai.items():           # chú giải là căn cứ chính: màu chỉ in cho ĐÚNG MỘT mã
     if len(cc) == 1: mau_mot_ma[col] = next(iter(cc)); tu_chu_giai += 1
     elif col in mau_mot_ma: del mau_mot_ma[col]   # chú giải ghi màu này dùng chung → không lấy theo màu
+# Bản vẽ hay dùng màu LỆCH VÀI ĐƠN VỊ so với ô mẫu chú giải (Cam Ranh: lúa #fffc8c ↔ mẫu #fffc82 = 324 ha; ODT #ffa0fc ↔ #ffa0ff)
+# → so màu cho phép lệch ≤ 12 (tổng |ΔR|+|ΔG|+|ΔB|), lấy màu chú giải GẦN NHẤT.
+LECH_MAU = 12
+def mau_cg(col):
+    if col in chu_giai or col in mau_mot_ma: return col
+    if not chu_giai: return None
+    gan = min(chu_giai, key=lambda c: sum(abs(a - b) for a, b in zip(c, col)))
+    return gan if sum(abs(a - b) for a, b in zip(gan, col)) <= LECH_MAU else None
 print(f'chu giai: {sum(len(c) for c in chu_giai.values())} ma tren {len(chu_giai)} mau; {tu_chu_giai} mau chi dung cho 1 ma:',
       sorted((v, '#%02x%02x%02x' % k) for k, v in mau_mot_ma.items())[:30])
 
@@ -155,21 +201,41 @@ def id_ma(m):
     return ma_id[m]
 bang = np.zeros(so_mang + 1, np.uint8)
 co_nhan = theo_mau_mot = bo_trong = 0
+so_px = np.bincount(pimg.ravel(), minlength=so_mang + 1)
 for p in np.unique(pimg):
     if p == 0: continue
     ds = theo_mang.get(int(p))
     if ds: bang[p] = id_ma(collections.Counter(ds).most_common(1)[0][0]); co_nhan += 1
-    elif mau_mang[p] in mau_mot_ma: bang[p] = id_ma(mau_mot_ma[mau_mang[p]]); theo_mau_mot += 1
+    elif mau_cg(mau_mang[p]) in mau_mot_ma: bang[p] = id_ma(mau_mot_ma[mau_cg(mau_mang[p])]); theo_mau_mot += 1
     else: bo_trong += 1
 # Mảng KHÔNG nhãn, màu DÙNG CHUNG nhiều mã theo chú giải → ghi "NHÓM" (các mã có thể), KHÔNG chọn bừa một mã
 # (bản thử trước cho kế thừa mảng cùng màu gần nhất: thửa ở Cam Nghĩa ra "DKV" trong khi quanh đó toàn nhãn TMD — đoán, đã bỏ).
 nhom = 0
 for q in np.unique(pimg):
-    if q == 0 or bang[q] or mau_mang[q] not in chu_giai: continue
-    cc = chu_giai[mau_mang[q]]
+    if q == 0 or bang[q] or mau_cg(mau_mang[q]) not in chu_giai: continue
+    cc = chu_giai[mau_cg(mau_mang[q])]
     if len(cc) > 1: bang[q] = id_ma('NHOM:' + '/'.join(sorted(cc))); nhom += 1
 ke_thua = nhom
 loai = bang[pimg]
+# chẩn đoán: màu của các mảng còn TRỐNG (theo diện tích) + màu chú giải gần nhất
+_tr = collections.Counter()
+for q in np.unique(pimg[(loai == 0) & (pimg > 0)]): _tr[mau_mang[q]] += int(so_px[q]) if 'so_px' in dir() else 1
+for col, n in _tr.most_common(8):
+    gan = min(chu_giai, key=lambda c: sum(abs(a - b) for a, b in zip(c, col))) if chu_giai else None
+    print(f'   trong: #{col[0]:02x}{col[1]:02x}{col[2]:02x} {n * m_moi_px ** 2 / 1e4:,.0f} ha | gan chu giai #{gan[0]:02x}{gan[1]:02x}{gan[2]:02x} '
+          f'(lech {sum(abs(a - b) for a, b in zip(gan, col))}) = {"/".join(sorted(chu_giai[gan]))}' if gan else '')
+# KHE DO NÉT VIỀN: viền lô / ranh vẽ bằng NÉT (không phải mảng tô) nên để lại khe trắng rộng 1–2 điểm ảnh (~6–12 m)
+# giữa các mảng → thửa sát viền bị hụt "chưa xác định". Khe trắng (không thuộc mảng tô nào) trong ranh, cách vùng đã gán
+# ≤ 2 điểm ảnh → lấy loại của điểm gần nhất. Mảng tô có màu mà chưa gán loại thì KHÔNG đụng (giữ trống).
+khe = (pimg == 0) & (mask_ranh > 0)
+if khe.any():
+    hat = np.where(loai > 0, 0, 1).astype(np.uint8)
+    d, l = cv2.distanceTransformWithLabels(hat, cv2.DIST_L2, 3, labelType=cv2.DIST_LABEL_PIXEL)
+    pos = np.argwhere(hat == 0); l2t = np.zeros(len(pos) + 1, np.uint8); l2t[1:] = loai[pos[:, 0], pos[:, 1]]
+    lap = khe & (d <= 2.0)
+    loai[lap] = l2t[l[lap]]
+    print(f'lap khe net vien: {int(lap.sum()) * m_moi_px ** 2 / 1e4:,.0f} ha')
+    del d, l, hat
 print(f'{so_mang} mang to; trong ranh: {co_nhan} mang theo nhan, {theo_mau_mot} mang theo mau mot ma '
       f'({len(mau_mot_ma)} mau), {ke_thua} mang mau dung chung ghi NHOM, {bo_trong - ke_thua} mang de "chua xac dinh"')
 

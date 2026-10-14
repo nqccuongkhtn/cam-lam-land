@@ -94,11 +94,19 @@ rồi mới chép tile (`dienkhanh2030v1`, `khanhvinh2030v1`, đã cắt sẵn z
 từng thửa cho các huyện ngoài Cam Lâm (chủ dự án chọn 14/10/2026: tự bóc từ PDF, chưa chờ file gốc của Sở).
 Cách: vẽ lại mọi mảng tô theo đúng thứ tự vẽ của PDF → mỗi MẢNG lấy mã theo nhãn nằm trong nó; nhãn PHÂN SỐ "CLN / TMD" lấy mã
 DƯỚI (quy hoạch); mảng không nhãn thì theo KHUNG CHÚ GIẢI (màu chỉ in cho đúng 1 mã) hoặc ghi "NHÓM … chưa rõ loại"; xuất GeoJSON
-WGS84 cắt theo ranh. Thử Cam Ranh (S=1,5 → 5,9 m/điểm ảnh): phủ 94 % trong ranh; thửa 246 tờ 8 Cam Phúc Nam ra TMD 831,4 m² (đúng
-bản vẽ "CLN/TMD"). CÒN PHẢI SỬA trước khi đưa lên web: (1) đọc chú giải đôi khi ghép màu với mã của dòng bên cạnh (ruộng lúa vàng ra
-nhóm "DTL/NTS"); (2) nhận phân số theo vị trí đôi khi bắt nhầm 2 nhãn của 2 thửa liền nhau (2.767 mã bị bỏ — cần kiểm thêm vạch
-ngang phân số); (3) màu hồng cam công cộng dùng chung 22 mã → nhiều lô chỉ ra "nhóm"; (4) nối vào `/api/parcels/at` (bảng PostGIS
-riêng + trang "Quy hoạch sử dụng đất 2030" trong bảng thông tin thửa; phiếu trích lục vẫn chỉ cho Cam Lâm).
+WGS84 cắt theo ranh. Đã sửa trong buổi 14/10 (thử Cam Ranh, S=1,5 → 5,9 m/điểm ảnh, ~40 giây):
+- Nhãn PHÂN SỐ nhận theo VỊ TRÍ + phải có VẠCH NGANG giữa hai mã (2.128 cặp) — thửa 246 tờ 8 Cam Phúc Nam ra TMD 831,4 m²
+  đúng bản vẽ "CLN/TMD" (bản thử cũ ra CLN).
+- CHÚ GIẢI tách khỏi nhãn huyện bên cạnh theo CỠ CHỮ (chú giải 5,1–5,5, nhãn 4,1–4,5) → 12 màu đúng 1 mã (CQP, ODT, ONT, DGT, NTD…);
+  so màu cho LỆCH ≤ 12 vì bản vẽ dùng màu lệch ô mẫu (lúa #fffc8c ↔ #fffc82 = 324 ha).
+- Màu dùng chung nhiều mã mà mảng không nhãn → "Nhóm đất chưa rõ loại (các mã…)", KHÔNG chọn bừa (mặt vịnh không còn thành "thuỷ sản").
+- Khe trắng do nét viền ≤ 2 điểm ảnh lấy loại kề bên; nét dày có màu (đường vẽ bằng nét) cũng tính như mảng.
+Kết quả Cam Ranh: phủ 94,6 % trong ranh; 6 thửa mẫu: 4 thửa khớp bản vẽ, 2 thửa nhỏ còn hụt mép.
+CÒN PHẢI LÀM trước khi đưa lên web: (1) độ phân giải 5,9 m/điểm ảnh quá thô cho thửa < 500 m² (thửa 348 m² chỉ ~10 điểm ảnh) →
+bóc ở S≈3 (2 m/điểm) theo TỪNG Ô cho đủ bộ nhớ; (2) màu hồng cam công cộng dùng chung 21 mã → lô không nhãn chỉ ra "nhóm";
+(3) thử thêm Nha Trang / Ninh Hòa / Vạn Ninh / Khánh Sơn / Khánh Vĩnh (kiểu nhãn khác nhau); (4) nối vào `/api/parcels/at`
+(bảng PostGIS riêng + trang "Quy hoạch sử dụng đất 2030" trong bảng thông tin thửa, ghi rõ "bóc từ bản đồ PDF – tham khảo";
+phiếu trích lục vẫn chỉ cho Cam Lâm). Thử nhanh trên thửa thật: scratchpad `thu_thua.py` (cắt PDF quanh thửa + vẽ ranh thửa).
 
 **(CŨ, giữ để tham khảo) CÒN LẠI Diên Khánh + Khánh Vĩnh:** đường lưới KHÔNG phải nét dài đơn (grid_vec ra rỗng), dò cyan thì lẫn
 sông → tự động chưa chuẩn. **Nắn tay QGIS** (mở PDF, chọn 3–4 giao điểm lưới) là nhanh nhất. Số lưới đã biết:

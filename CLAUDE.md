@@ -866,8 +866,14 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   số không nhận ra → mã HIỆN TRẠNG bị lấy làm loại đất (đã sửa ~1.100 ha: CNT ở Ninh Hòa 75 · Khánh Vĩnh 226 · Diên Khánh 98 ha; Nha Trang
   718 ha mặt biển MVK từng ghi MNC). Thêm mã mới thì tên CHÉP từ chú giải (`ten-ma-chu-giai.sql`, chạy sau mỗi lần nạp). Chú giải 2 cột
   "Hiện trạng | Quy hoạch": mã đen nhóm CHƯA SỬ DỤNG (MCS…) không định màu quy hoạch; màu chỉ gồm tên nhóm + 1 mã cụ thể = mã cụ thể.
-  Máy chủ `lib/qhPdf.ts`: thửa NGOÀI Cam Lâm (không bản CAD nào phủ) nằm trong ranh bản nào thì tra bản đó, diện tích các loại
-  chia lại cho cộng đúng bằng diện tích thửa, phần PDF không tô ghi "Chưa xác định loại đất"; hình thửa DỊCH về đúng chỗ trước khi
+  Máy chủ `lib/qhPdf.ts`: thửa NGOÀI Cam Lâm (không bản CAD nào phủ) tra bản của **HUYỆN CŨ chứa xã của thửa** (mã xã → huyện cũ:
+  `apps/backend/data/huyen-cu.json`, sinh từ trường `huyenIdCu` của danh mục Sở bằng `node scripts/dia-chinh/dung-huyen-cu.mjs`);
+  huyện chưa có bản PDF (Cam Lâm, Ninh Thuận cũ) thì không tra. ⚠️ ĐỪNG quay lại chọn theo ranh `qh_pdf_ranh` (15/10/2026): ranh dựng từ
+  vùng màu, mà bản vẽ tô cả đất HUYỆN BÊN bằng màu đất ở (#ffa0ff ODT / #ffd0ff ONT) — Diên Khánh có vùng "Đất ở tại đô thị" 1.637 ha nằm
+  trọn trên đất Nha Trang / Khánh Vĩnh / Cam Lâm (0 thửa Diên Khánh), Vạn Ninh 1.008 ha, Khánh Sơn 516 ha… → ranh hai huyện chồng nhau
+  380–2.760 ha; thửa Khánh Vĩnh từng ra "đất ở đô thị" của bản Diên Khánh, thửa Bác Ái ra QHSDĐ Cam Ranh. Diện tích các loại chia lại
+  cho cộng ĐÚNG BẰNG diện tích thửa (làm tròn 0,1 m² kiểu "phần dư lớn nhất"); phần PDF không tô từ 0,5 m² ghi "Chưa xác định loại đất",
+  nhỏ hơn chia theo tỷ lệ; hình thửa DỊCH về đúng chỗ trước khi
   chồng (độ trượt lớp `dia_chinh`, `LECH_DIA_CHINH` trong qhCompute.ts — y như phần Cam Lâm); mục `nguon:'pdf'` trong `qhCacBan`.
   Giao diện: trang "Quy hoạch sử dụng đất 2030 · bóc từ bản đồ PDF · tham khảo" (MUC_QH có trường `pdf`), KHÔNG in phiếu. CÔNG TẮC:
   cờ `qh_pdf_bat` trong `app_flags` (`INSERT INTO app_flags(key) VALUES ('qh_pdf_bat')` = bật · `DELETE … WHERE key='qh_pdf_bat'` =

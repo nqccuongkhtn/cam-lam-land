@@ -142,6 +142,14 @@ Vĩnh Phương: kiểu ảnh ghi 125,5 m² đường vì lấp chỗ ký hiệu 
 CHƯA LÀM: lô màu hồng cam công cộng (21 mã) không nhãn chỉ ra "nhóm"; thử thêm thửa ở Ninh Hòa (bản nhiều nét dày nhất: 17.847 nét
 trong suốt).
 
+**⚠️ BẢN VẼ TÔ CẢ ĐẤT HUYỆN BÊN (đo 15/10/2026).** Mấy bản tô phần đất huyện lân cận bằng màu đất ở (#ffa0ff = ODT, #ffd0ff = ONT),
+nên lượt bóc ghi luôn thành "Đất ở…" và ranh dựng từ vùng màu (`qh_pdf_ranh`) phình sang huyện bên. Vùng lớn nằm gần trọn trên đất huyện
+KHÁC (đếm thửa địa chính theo huyện cũ của xã): Diên Khánh 1 vùng ODT 1.637,6 ha (1 thửa Diên Khánh / 500 thửa Nha Trang + Khánh Vĩnh +
+Cam Lâm, mẫu 1/7) · Vạn Ninh ODT 1.007,8 ha · Khánh Sơn ONT 515,9 ha · Nha Trang 2 × 189 ha · Cam Ranh 5 vùng 54–117 ha · Ninh Hòa ONT
+65,9 ha. Ranh hai huyện vì thế chồng nhau 380–2.760 ha. Máy chủ KHÔNG chọn bản theo ranh nữa mà theo HUYỆN CŨ của xã chứa thửa
+(`apps/backend/data/huyen-cu.json`, xem `lib/qhPdf.ts`) nên các vùng này không bao giờ bị áp cho thửa huyện khác. Bóc lại thì nên cắt
+vùng theo ranh huyện thật (chưa có lớp ranh huyện chuẩn — hợp thửa địa chính không phủ đường/sông nên không dùng làm ranh được).
+
 ### Bản KHÔNG có lớp chữ — nhãn vẽ bằng hình (Diên Khánh, 14/10/2026 khuya)
 PDF Diên Khánh có 0 chữ, 0 phông: mọi nhãn là hình tô nhỏ, MỖI HÌNH MỘT CHỮ CÁI (38.384 hình đen = hiện trạng, 21.531 hình đỏ = quy
 hoạch). Trước đó mọi vùng màu dùng chung ở Diên Khánh chỉ ghi "nhóm" và chú giải phải mượn bảng màu chuẩn. `doc_nhan_hinh.py`: vẽ mỗi

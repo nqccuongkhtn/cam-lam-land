@@ -844,17 +844,26 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   Kho cố định: PDF `D:\KhoQH\qhsdd-2030\`, ô ảnh `D:\KhoQH\tiles-qh\`, file nạp `D:\KhoQH\qh-pdf\`, lớp chỉ-admin `D:\KhoQH\qh-rieng\`.
   ĐƯA LÊN WEB: `DUA-LEN-WEB-14-10.bat` (nháy đúp) → `scripts/qh-tinh/dua-len-web-14-10.sh` (chép 7 bộ ô, nạp qh_pdf 7 bản, dựng lại,
   chép lớp 1/500 vào volume riêng, bật cờ `qh_pdf_bat`, tự kiểm 401/403/404 của lớp chỉ-admin, xoá bộ ô cũ + 1/500 dự thảo).
-  ⚠️ Chạy docker trong Git Bash phải `MSYS_NO_PATHCONV=1` (không thì `/dest` thành `C:/Program Files/Git/dest`). Trợ lý KHÔNG tự dựng
-  web thật được (hệ thống an toàn chặn) — chủ dự án chạy.
-  **QUY HOẠCH THEO THỬA TỪ PDF (14/10/2026, MẶC ĐỊNH TẮT):** `boc_loai_dat.py` bóc vùng loại đất từ PDF (2 lượt, ~2 m/điểm ảnh;
-  nhãn phân số "CLN/TMD" lấy mã DƯỚI; khung chú giải + `bang-mau-chuan.json` = bảng màu chung 22 màu gom từ 6 bản; màu dùng chung
-  nhiều mã → "NHÓM … chưa ghi rõ loại", không đoán; nét dày chỉ là đất khi là đường / nước) → `nap_qh_pdf.py` nạp vào bảng
-  `qh_pdf` + `qh_pdf_ranh` (đã nạp Cam Ranh, Nha Trang, Ninh Hòa, Vạn Ninh, Khánh Sơn; Diên Khánh/Khánh Vĩnh chờ lớp bản đồ).
+  ⚠️ Chạy docker trong Git Bash phải `MSYS_NO_PATHCONV=1` (không thì `/dest` thành `C:/Program Files/Git/dest`). Trợ lý chỉ tự dựng
+  web thật khi chủ dự án đã cho phép trong phiên (14/10 tối anh dặn "cứ dựng hẳn lên web"); chưa được phép thì để anh nháy đúp `.bat`.
+  Chạy lại một đoạn: `--tu-buoc=N --den-buoc=M` (vd `--tu-buoc=2 --den-buoc=2` = chỉ nạp lại quy hoạch theo thửa 7 bản).
+  **QUY HOẠCH THEO THỬA TỪ PDF (14/10/2026, ĐANG BẬT từ 21:3x 14/10):** `boc_loai_dat.py` bóc vùng loại đất từ PDF (lượt 1 quyết định
+  loại đất từng MẢNG tô; nhãn phân số "CLN/TMD" lấy mã DƯỚI; khung chú giải + `bang-mau-chuan.json` = bảng màu chung 22 màu gom từ 6
+  bản; màu dùng chung nhiều mã → "NHÓM … chưa ghi rõ loại", không đoán; nét dày chỉ là đất khi là đường / nước) → `nap_qh_pdf.py` nạp
+  vào bảng `qh_pdf` + `qh_pdf_ranh` (đủ 7 bản: Cam Ranh, Nha Trang, Ninh Hòa, Vạn Ninh, Khánh Sơn, Diên Khánh, Khánh Vĩnh).
+  **Lượt 2 KIỂU VECTOR (`--vector`, 14/10 khuya — dữ liệu web dùng cách này):** lấy thẳng HÌNH NÉT của PDF, mảng dưới trừ phần mảng vẽ
+  sau đè lên (đúng thứ tự vẽ), không qua ảnh → không mất dải đường hẹp 2–3 m. 10 thửa đối chứng Nha Trang: 8 thửa đúng tên loại lệch
+  0,1–3,0 % (kiểu ảnh cũ 0,5–12 %), 2 thửa đúng ranh nhưng chỉ ghi được "nhóm" (màu dùng chung). Mảng không còn điểm ảnh ở lượt 1 vẫn
+  gán theo màu (trước để trống mà vẫn che mảng dưới). Chi tiết + số đo: `scripts/qh-tinh/README.md`.
   Máy chủ `lib/qhPdf.ts`: thửa NGOÀI Cam Lâm (không bản CAD nào phủ) nằm trong ranh bản nào thì tra bản đó, diện tích các loại
-  chia lại cho cộng đúng bằng diện tích thửa; mục `nguon:'pdf'` trong `qhCacBan`. Giao diện: trang "Quy hoạch sử dụng đất 2030 ·
-  bóc từ bản đồ PDF · tham khảo" (MUC_QH có trường `pdf`), KHÔNG in phiếu. CÔNG TẮC: cờ `qh_pdf_bat` trong `app_flags`
-  (`INSERT INTO app_flags(key) VALUES ('qh_pdf_bat')` = bật · `DELETE … WHERE key='qh_pdf_bat'` = tắt); máy chủ thử đặt
-  `QH_PDF_THU=1`. Kiểm 14/10: 40 thửa Cam Lâm ra y hệt mã cũ, 6 thửa mẫu 4 huyện khớp bản vẽ gốc.
+  chia lại cho cộng đúng bằng diện tích thửa, phần PDF không tô ghi "Chưa xác định loại đất"; hình thửa DỊCH về đúng chỗ trước khi
+  chồng (độ trượt lớp `dia_chinh`, `LECH_DIA_CHINH` trong qhCompute.ts — y như phần Cam Lâm); mục `nguon:'pdf'` trong `qhCacBan`.
+  Giao diện: trang "Quy hoạch sử dụng đất 2030 · bóc từ bản đồ PDF · tham khảo" (MUC_QH có trường `pdf`), KHÔNG in phiếu. CÔNG TẮC:
+  cờ `qh_pdf_bat` trong `app_flags` (`INSERT INTO app_flags(key) VALUES ('qh_pdf_bat')` = bật · `DELETE … WHERE key='qh_pdf_bat'` =
+  tắt); máy chủ thử đặt `QH_PDF_THU=1`. Kiểm 14/10: 40 thửa Cam Lâm ra y hệt mã cũ, 6 thửa mẫu 4 huyện khớp bản vẽ gốc.
+  **Cổng GIS tỉnh (gis.khanhhoa.gov.vn) có QHSDĐ DẠNG SỐ** Nha Trang / Cam Ranh / Diên Khánh / Khánh Sơn / Cam Lâm (ArcGIS, có mã từng
+  vùng; tải bằng `tai_arcgis.py` về `D:\KhoQH\gis-tinh\`) nhưng là ĐỢT CŨ: khớp mã với PDF 2030 chỉ 49 % (NT) / 64 % (KS). KHÔNG mượn
+  mã của nó điền vùng "nhóm" (thử: sai 4 %; trái nguyên tắc mỗi bản QH xử lý độc lập). Muốn hiện thì làm lớp riêng, hỏi chủ dự án.
   Thử trên thửa thật (không đụng web): chạy riêng `routes/parcels.ts` trong container tạm gắn mã mới (không có việc nền) — xem
   `scripts/qh-tinh/README.md` mục "Thử trên thửa thật".
   Bảng thông tin thửa: chỉ BỎ CÂU "Hiện mới có Quy hoạch chung đô thị mới Cam Lâm đến 2045 (QĐ 205)…" (thửa ngoài vùng);

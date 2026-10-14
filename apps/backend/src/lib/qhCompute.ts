@@ -505,6 +505,8 @@ export function computeQhAreas(ring: number[][], dienTich: number): { type: stri
 // 60,7 m² → 4,4 m². Diện tích thửa KHÔNG đổi (chỉ tịnh tiến). CHỈ dùng cho thửa lấy từ dia_chinh — đừng dịch hình
 // thửa của phiếu / toạ độ VN-2000 người dùng nhập (những thứ đó đã đúng chỗ).
 const LECH_DC_X = 0.000004899, LECH_DC_Y = 0.000001273; // độ
+/** Cùng độ trượt, cho SQL (qhPdf.ts dịch hình thửa trước khi chồng lên vùng quy hoạch bóc từ PDF — cùng hệ VN-2000 với lớp QH). */
+export const LECH_DIA_CHINH = { x: LECH_DC_X, y: LECH_DC_Y };
 /**
  * Ô ĐẤT QĐ205 QUANH THỬA để vẽ SƠ ĐỒ trên phiếu in (12/10/2026) — trước phiếu vẽ từ file cũ public/qh_vector.geojson (tháng 7, chuỗi cũ:
  * lấp lỗ, tên cũ) nên hình trên sơ đồ có thể khác con số in cạnh bên. `ringQh` = vòng thửa ĐÃ NẮN (cùng hệ với ô đất); mỗi ô xén theo khung

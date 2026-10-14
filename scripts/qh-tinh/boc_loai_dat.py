@@ -313,6 +313,20 @@ for p in np.unique(pimg):
         else: bang[p] = id_ma('NHOM:' + '/'.join(sorted(tap))); nhom += 1
     elif ds: bang[p] = id_ma(collections.Counter(t for t, _ in ds).most_common(1)[0][0]); co_nhan_ += 1
     else: bo_trong += 1
+# MẢNG KHÔNG CÒN ĐIỂM ẢNH NÀO Ở LƯỢT 1 (14/10/2026 khuya): dải đường 2–3 m mảnh hơn 1 điểm ảnh, hay bị mảng vẽ sau đè kín ở độ phân giải
+# thô → vòng lặp trên chỉ duyệt mảng CÓ điểm ảnh nên bỏ sót, mảng thành "chưa xác định". Lượt 2 kiểu vector vẫn để nó CHE mảng dưới mà
+# không ghi ra gì → Thửa 59 · Tờ 6 Phương Sơn mất dải đường 13,9 m² (mảng cam #ffaa32 = DGT; app tham chiếu ghi DGT 13,6 m²).
+# Nay gán đúng luật trên: màu một mã → theo màu; màu dùng chung → NHÓM (không còn điểm ảnh thì không xét được nhãn nằm trong mảng).
+khong_px = 0
+for p in range(1, so_mang + 1):
+    if bang[p] or so_px[p]: continue
+    x0_, y0_, x1_, y1_ = hop[p]
+    if x1_ < RX0 or x0_ > RX1 or y1_ < RY0 or y0_ > RY1: continue      # ngoài khung ranh
+    cg = mau_cg(mau_mang[p])
+    if cg in mau_mot_ma: bang[p] = id_ma(mau_mot_ma[cg]); khong_px += 1
+    elif cg is not None and cg in chu_giai and len(chu_giai[cg]) > 1:
+        bang[p] = id_ma('NHOM:' + '/'.join(sorted(chu_giai[cg]))); khong_px += 1
+print(f'mang khong con diem anh o luot 1, gan theo mau: {khong_px}')
 # NÉT DÀY chỉ là ĐẤT khi là đường giao thông hoặc kênh / sông / mặt nước (DGT, DTL, SON, MNC). Nét khác — RANH GIỚI hành chính
 # (hồng dày, màu gần ODT #ffa0ff nên từng bị ghi thành "đất ở đô thị" một dải 5–10 m dọc ranh huyện), đường dây điện… —
 # là TRONG SUỐT: không vẽ ở lượt 2, đất bên dưới giữ nguyên loại.
@@ -382,6 +396,111 @@ if anh_thu:   # ảnh xem nhanh (lượt 1): trái = màu gốc trong ranh, ph�
     cv2.imwrite(anh_thu, cv2.resize(ghep, (2000, int(ghep.shape[0] * k)), interpolation=cv2.INTER_AREA))
     print('anh thu:', anh_thu)
 del zone, pimg, loai1, mask_ranh
+
+# ---- 5a) LƯỢT 2 KIỂU VECTOR (--vector, 14/10/2026 tối) — LẤY THẲNG HÌNH NÉT VECTOR CỦA PDF, KHÔNG QUA ẢNH.
+# Vì sao: soi Thửa 59 · Tờ 6 Phương Sơn — mảng tô PDF đè lên thửa cho đúng 76,1 m² ODT + 13,9 m² DGT (app tham chiếu 76,5 + 13,6:
+# cùng nguồn dữ liệu) nhưng lượt 2 vẽ ảnh 2 m/điểm ảnh ra 81,5 ODT + 3,2 DGT + 5,4 "chưa xác định": dải đường hẹp 2–3 m chỉ còn 1 điểm
+# ảnh, mép vùng răng cưa. Nay: mỗi mảng (tô / nét dày là đất) dựng đúng hình (chẵn–lẻ, đường cong đã bẻ ở lượt 1), phần NHÌN THẤY =
+# hình đó TRỪ mọi mảng vẽ SAU đè lên (đúng thứ tự vẽ của PDF như mắt nhìn), cắt theo ranh, đổi toạ độ từng đỉnh (chèn đỉnh ≤ 2 điểm in
+# để theo đúng phép nắn từng ô lưới). Mã loại đất từng mảng giữ nguyên như lượt 1. Không còn bước "lấp khe" — chỗ PDF không tô là
+# chỗ bản đồ để trắng thật.
+if '--vector' in co:
+    import shapely
+    from shapely.geometry import Polygon as _P, MultiLineString as _MLS
+    from shapely.ops import unary_union
+    from shapely.strtree import STRtree
+    import vn2000_np
+    t1 = time.time()
+    ranh_g = unary_union([_P(p[0], list(p[1:])).buffer(0) for p in ranh_pt])
+    def _hinh_to(vong):
+        g_ = None
+        for v in vong:
+            if len(v) < 3: continue
+            pp = _P(v)
+            if not pp.is_valid: pp = pp.buffer(0)
+            if pp.is_empty: continue
+            g_ = pp if g_ is None else g_.symmetric_difference(pp)
+        return g_
+    def _noi_net(ds_):                   # nối các đoạn liền nhau (đầu đoạn sau = cuối đoạn trước) thành MỘT đường → chỗ gãy được bo
+        out = []                         # như PDF vẽ (vẽ từng đoạn rời thì mỗi chỗ gãy hở một khe hình nêm ở phía ngoài khúc quanh)
+        for l in ds_:
+            l = np.asarray(l, float)
+            if out and abs(out[-1][-1][0] - l[0][0]) < 0.01 and abs(out[-1][-1][1] - l[0][1]) < 0.01: out[-1] = np.vstack([out[-1], l[1:]])
+            else: out.append(l)
+        return [o for o in out if len(o) >= 2]
+    gs = {}
+    for k in range(1, so_mang + 1):
+        if k in trong_suot: continue
+        kieu, hh, day = hinh[k]
+        try:
+            if kieu == 'to': g_ = _hinh_to(hh)
+            else:
+                ls = _noi_net([l for l in hh if len(l) >= 2])
+                g_ = _MLS(ls).buffer(day / 2, cap_style='flat', join_style='round') if ls else None
+        except Exception:
+            g_ = None
+        if g_ is None or g_.is_empty or not g_.intersects(ranh_g): continue
+        gs[k] = g_
+    ks = sorted(gs)
+    cay = STRtree([gs[k] for k in ks])
+    shapely.prepare(ranh_g)                          # hỏi "nằm trọn trong ranh?" nhanh — mảng trọn trong ranh khỏi cắt theo ranh
+    print(f'vector: {len(ks)} mang cham ranh, dung hinh {time.time() - t1:.0f}s', flush=True)
+    # phép nắn trang PDF → VN-2000 dạng MẢNG (y hệt nan2.lap_phep_doi: "luoi" nội suy từng ô lưới, "afin", hoặc thẳng)
+    nj = json.load(open(pdf + '.nan.json', encoding='utf-8')) if os.path.exists(pdf + '.nan.json') else {}
+    def _ns(v, a, b):
+        a = np.asarray(a, float); b = np.asarray(b, float); r = np.interp(v, a, b)
+        lo, hi = v < a[0], v > a[-1]
+        r[lo] = b[0] + (v[lo] - a[0]) * (b[1] - b[0]) / (a[1] - a[0])
+        r[hi] = b[-1] + (v[hi] - a[-1]) * (b[-1] - b[-2]) / (a[-1] - a[-2])
+        return r
+    if nj.get('luoi'):
+        L_ = nj['luoi']
+        def p2en_v(x, y): return _ns(x, L_['x'], L_['E']), _ns(y, L_['y'], L_['N'])
+    elif nj.get('afin'):
+        a_, b_, c_, d_, e_, f_ = nj['afin']
+        def p2en_v(x, y): return a_ * x + b_ * y + c_, d_ * x + e_ * y + f_
+    else:
+        def p2en_v(x, y): return info['se'] * x + info['ie'], info['sn'] * y + info['inn']
+    def doi(xy):
+        xy = np.asarray(xy, float); E, N = p2en_v(xy[:, 0], xy[:, 1]); lo_, la_ = vn2000_np.vn2000_to_wgs84(E, N)
+        return np.round(np.c_[lo_, la_], 8).tolist(), np.c_[E, N]
+    feats, dien_tich = [], collections.Counter()
+    so_manh = 0
+    for n_, k in enumerate(ks):
+        if not bang[k]: continue                      # mảng chưa xác định: vẫn CHE mảng dưới (đã tính ở mảng dưới), không ghi ra
+        g_ = gs[k]
+        # chỉ những mảng vẽ SAU mà ĐÈ THẬT lên mảng này (không lấy cả mảng chỉ nằm trong khung bao — mảng rừng lớn ở Khánh Sơn có
+        # khung bao trùm hàng nghìn mảng không chạm tới, gộp hết vào thì một mảng mất cả phút)
+        sau = [ks[i] for i in cay.query(g_, predicate='intersects') if ks[i] > k]
+        if sau:
+            che = unary_union([gs[j] for j in sau])
+            g_ = g_.difference(che)
+        if not ranh_g.contains(g_): g_ = g_.intersection(ranh_g)
+        if g_.is_empty: continue
+        g_ = shapely.segmentize(g_, 2.0)              # ≤ 2 điểm in giữa 2 đỉnh (theo đúng phép nắn gãy khúc ở đường lưới)
+        m = ds_ma[bang[k] - 1]
+        for pp in (g_.geoms if hasattr(g_, 'geoms') else [g_]):
+            if pp.geom_type != 'Polygon' or pp.area <= 0: continue
+            ngoai, en0 = doi(pp.exterior.coords)
+            trong = []; dt = _P(en0).area
+            for h in pp.interiors:
+                c_, enh = doi(h.coords); trong.append(c_); dt -= _P(enh).area
+            if dt < 0.01: continue
+            dien_tich[m] += dt; so_manh += 1
+            feats.append({'type': 'Feature', 'properties': {'ma': m, 'ten': ten_ma(m), 'mau': mau_ma.get(int(bang[k]), '#cccccc')},
+                          'geometry': {'type': 'Polygon', 'coordinates': [ngoai] + trong}})
+        if n_ % 2000 == 0: print(f'   ... {n_}/{len(ks)} mang, {so_manh} manh, {time.time() - t1:.0f}s', flush=True)
+    json.dump({'type': 'FeatureCollection', 'properties': {'nguon': os.path.basename(pdf), 'cach': 'vector'}, 'features': feats},
+              open(ra, 'w', encoding='utf-8'), ensure_ascii=False)
+    # diện tích ranh (mét vuông, trên VN-2000)
+    dt_ranh = 0.0
+    for pp in (ranh_g.geoms if hasattr(ranh_g, 'geoms') else [ranh_g]):
+        pp2 = shapely.segmentize(pp, 2.0); dt_ranh += _P(doi(pp2.exterior.coords)[1]).area - sum(_P(doi(h.coords)[1]).area for h in pp2.interiors)
+    print(f'luot 2 VECTOR: {so_manh} manh, {len(dien_tich)} loai, phu {100 * sum(dien_tich.values()) / max(dt_ranh, 1):.1f}% trong ranh, '
+          f'{time.time() - t1:.0f}s -> {ra}')
+    for m, v in dien_tich.most_common(12): print(f'   {m:40s} {v / 1e4:10.1f} ha')
+    print(f'XONG {time.time() - t0:.0f}s')
+    sys.exit(0)
 
 # ---- 5) LƯỢT 2: vẽ lại theo TỪNG Ô ở ~M_PX m/điểm ảnh → đa giác sắc nét
 S2 = m_moi_pt / M_PX

@@ -121,8 +121,33 @@ Các luật đã chốt (mỗi luật sửa một lỗi thấy trên thửa th�
   ảnh, thửa sát ranh vùng hụt 5–10 % "chưa xác định"). Chồng nhẹ ở góc thì máy chủ chia lại theo tỷ lệ.
 Kết quả 14/10: Cam Ranh 95,7 % · Nha Trang 94,8 % · Ninh Hòa 96,7 % · Vạn Ninh 96,7 % · Khánh Sơn 95,9 % · Diên Khánh 94,8 % ·
 Khánh Vĩnh 97,8 % diện tích trong ranh có loại đất. Phần còn lại: mặt nước biển/vịnh, màu không có trong chú giải.
+
+**LƯỢT 2 KIỂU VECTOR (`--vector`, 14/10/2026 khuya — nay là cách dùng để nạp web).** Lượt 2 vẽ ảnh ~2 m/điểm ảnh làm MẤT dải đường
+hẹp 2–3 m (chỉ còn 1 điểm ảnh) và mép vùng răng cưa: Thửa 525 · Tờ 4 Phước Long app tham chiếu 60,0 m² đất ở, ảnh ra 52,9 + 7,2 đường.
+Nay mỗi mảng (tô, hoặc nét dày là đất) dựng đúng HÌNH của PDF (chẵn–lẻ; nét nối liền từng đoạn rồi nới nửa bề dày), phần NHÌN THẤY
+= hình đó TRỪ mọi mảng vẽ SAU đè lên (đúng thứ tự vẽ như mắt nhìn), cắt theo ranh, chèn đỉnh ≤ 2 điểm in rồi đổi toạ độ từng đỉnh
+theo đúng phép nắn (`vn2000_np.py` = vn2000.py dạng mảng, lệch bản gốc 5·10⁻¹⁵ độ). Mã loại đất từng mảng lấy y lượt 1. KHÔNG còn
+bước "lấp khe" — chỗ PDF không tô là chỗ bản đồ để trắng thật → "Chưa xác định loại đất". Mảng KHÔNG CÒN ĐIỂM ẢNH nào ở lượt 1 (dải
+mảnh, bị đè kín) nay vẫn gán theo màu (trước để "chưa xác định" mà vẫn che mảng dưới → Thửa 59 · Tờ 6 Phương Sơn mất 13,9 m² đường).
+10 thửa đối chứng Nha Trang (`dap-an/nha-trang-14-10.json`, đã dịch thửa như máy chủ): 8 thửa đúng tên loại, lệch 0,1–3,0 % (kiểu
+ảnh: 0,5–12 %); 2 thửa còn lại đúng RANH nhưng màu dùng chung nên ghi "nhóm" (app ghi PNK / DKV). Hai thửa lệch nhất (Thửa 56 · Tờ 35
+Ngọc Hiệp 2,3 %, Thửa 1 · Tờ 1 Phước Hòa 3,0 %) soi trên PDF: số web = đúng phần mảng tô PDF đè lên thửa, phần lệch là do app dùng
+hình thửa / phép nắn khác. Chạy: thêm `--vector` vào bước 1 (Nha Trang ~4–13 phút, Ninh Hòa lâu nhất).
 CHƯA LÀM: lô màu hồng cam công cộng (21 mã) không nhãn chỉ ra "nhóm"; thử thêm thửa ở Ninh Hòa (bản nhiều nét dày nhất: 17.847 nét
 trong suốt).
+
+### Dữ liệu QHSDĐ DẠNG SỐ trên cổng GIS tỉnh (14/10/2026) — ĐỢT CŨ, chỉ để tham khảo / đo
+Cổng GIS chính thức `gis.khanhhoa.gov.vn` (mục "Tra cứu quy hoạch" `/public/8192/`, "Mời gọi đầu tư" `/public/8193/`) có dịch vụ ArcGIS
+công khai `…/ag/rest/public/get/Portal/QHSDD<Huyen>/MapServer/2` cho NhaTrang, CamRanh, DienKhanh, KhanhSon, CamLam (không có Ninh
+Hòa, Vạn Ninh, Khánh Vĩnh): vùng nét + mã loại đất (`Ma_Loai`, tên Unicode ở `Info`), hệ VN-2000 Khánh Hoà múi 3.
+```bash
+python -P tai_arcgis.py "https://gis.khanhhoa.gov.vn/ag/rest/public/get/Portal/QHSDDNhaTrang/MapServer/2" D:/KhoQH/gis-tinh/qhsdd-nhatrang-sdd.geojson
+python -P so_khop_hai_nguon.py <vung-pdf.geojson> D:/KhoQH/gis-tinh/qhsdd-nhatrang-sdd.geojson 4000    # chỉ đo, không ghi gì
+```
+Tải nhẹ tay (gói 500 theo KHOẢNG OBJECTID — liệt kê mã thì cổng trả 404 vì địa chỉ quá dài; nghỉ 1,5 giây giữa hai lần hỏi).
+Đo: khớp mã với PDF 2030 chỉ 49 % (Nha Trang), 64 % (Khánh Sơn) — có mã cũ BHK / DCS, vùng PDF ghi TMD thì GIS ghi RSX… ⇒ ĐỢT KHÁC.
+Chỗ hai bản cùng vẽ thì ranh trùng ~1 m (khớp app tham chiếu 0–0,2 %). Đã thử mượn mã GIS đặt tên vùng "nhóm" của PDF: đúng 96 %,
+sai 4 % → KHÔNG làm (mỗi bản quy hoạch xử lý độc lập — chủ dự án dặn 10/10/2026). Muốn hiện thì làm LỚP RIÊNG, hỏi chủ dự án trước.
 
 ### Thử trên thửa thật mà KHÔNG đụng web
 Máy chủ thật có việc nền (nhắc lịch qua SMS, cào tin…) nên ĐỪNG chạy thêm một bản `index.ts`. Chạy riêng phần tra thửa trong

@@ -1,5 +1,5 @@
 {
- "_doc": "Bảng màu loại đất CHUNG của các bản đồ QHSDĐ 2030 Khánh Hòa (Sở NN&MT), gom từ chú giải đọc được trên PDF (lap_bang_mau_chuan.py). ma = các mã chú giải ghi cho màu đó (1 mã = màu riêng; nhiều mã = màu dùng chung); ban = các bản có màu này.",
+ "_doc": "Bảng màu loại đất CHUNG của các bản đồ QHSDĐ 2030 Khánh Hòa (Sở NN&MT), gom từ chú giải đọc được trên PDF (lap_bang_mau_chuan.py). ma = các mã chú giải ghi cho màu đó (1 mã = màu riêng; nhiều mã = màu dùng chung); ban = các bản có màu này. 15/10/2026: thêm #e6e682 = CNT (chú giải Diên Khánh + Khánh Vĩnh, Thông tư 08/2024) — Ninh Hòa tô màu này 485 ha mà chú giải của bản không đọc được mã. Chạy lại lap_bang_mau_chuan.py với chú giải mới còn đổi thêm (#b4ffff thành dùng chung MNC/MVK/TVC vì chú giải Nha Trang ghi cả MVK; #ffaaa0 thêm mã Thông tư 08) — chưa áp, chờ chủ dự án.",
  "mau": {
   "#00ffff": {
    "ma": [
@@ -105,6 +105,15 @@
     "khanhvinh",
     "nhatrang",
     "vanninh"
+   ]
+  },
+  "#e6e682": {
+   "ma": [
+    "CNT"
+   ],
+   "ban": [
+    "dienkhanh",
+    "khanhvinh"
    ]
   },
   "#f5ffb4": {

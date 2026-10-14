@@ -10,7 +10,9 @@
 #   • XOÁ 5 bộ ô cũ đã được thay (chủ dự án dặn "lớp cắt cũ bị thay thế thì xoá đi cho nhẹ máy").
 # Dừng ngay khi có bước lỗi (set -e) — web cũ vẫn chạy nguyên, chạy lại lệnh là làm tiếp.
 set -euo pipefail
-cd "/d/Cam Lam gis"
+# Git Bash tự đổi đối số dạng "/dest", "kho:/t" thành đường dẫn Windows (C:/Program Files/Git/dest) → docker cp / -v hỏng. Tắt:
+export MSYS_NO_PATHCONV=1
+cd "/d/Cam Lam gis" 2>/dev/null || cd "D:/Cam Lam gis"
 DC="docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.tunnel.yml"
 T="D:/KhoQH/tiles-qh"                 # bộ ô ảnh mới (ổ D)
 S="D:/KhoQH/qh-pdf"                   # file nạp dữ liệu quy hoạch theo thửa

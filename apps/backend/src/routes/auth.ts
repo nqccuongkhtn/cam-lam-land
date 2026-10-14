@@ -89,7 +89,10 @@ authRouter.post('/login', async (req, res, next) => {
     const k = email.trim().toLowerCase();
     const conPhut = dangBiKhoa(k);
     if (conPhut) return res.status(429).json({ error: `Sai mật khẩu quá nhiều lần. Tài khoản tạm khoá, thử lại sau ${conPhut} phút.` });
-    const [user] = await query('SELECT * FROM users WHERE email=$1', [email]);
+    // (14/10/2026) Tìm theo email KHÔNG phân biệt hoa/thường, bỏ dấu cách thừa: điện thoại hay tự viết hoa chữ đầu / thêm dấu cách
+    // khi tự điền → trước đây báo "sai mật khẩu" dù gõ đúng (tài khoản banhchuoi… vừa được đặt lại mật khẩu vẫn không vào được).
+    // Mọi email trong bảng users đều lưu chữ thường, không trùng nhau khi bỏ hoa/thường (kiểm 14/10: 24/24).
+    const [user] = await query('SELECT * FROM users WHERE lower(email)=$1', [k]);
     // Email không tồn tại vẫn so với chuỗi băm GIẢ → thời gian trả lời NHƯ NHAU (không đo được email nào đã có).
     const dung = await verifyPassword(password, user?.password_hash || BAM_GIA);
     // Thông báo GỘP để không lộ email nào đã đăng ký (chống dò tài khoản).

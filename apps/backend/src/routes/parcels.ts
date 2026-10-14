@@ -282,7 +282,17 @@ parcelsRouter.get('/at', async (req, res, next) => {
     // CÔNG TẮC: cờ 'qh_pdf_bat' trong app_flags (mặc định KHÔNG có = TẮT) — bật sau khi chủ dự án duyệt ảnh thử:
     //   INSERT INTO app_flags(key) VALUES ('qh_pdf_bat') ON CONFLICT DO NOTHING;   ·  tắt: DELETE FROM app_flags WHERE key='qh_pdf_bat';
     // (máy chủ THỬ để chụp ảnh duyệt đặt biến môi trường QH_PDF_THU=1)
-    const qhPdf = parcel && tuBangMoi && overlaps.length === 0 && qhCacBanCL.length === 0
+    // (14/10/2026 khuya) Thửa SÁT RANH Cam Lâm mà bản CAD chỉ chạm một mẩu (Thửa 109 · Tờ 43 xã Suối Hiệp: QĐ893 phủ 76 m², 1.534 m² "ngoài
+    // phạm vi") trước bị bỏ hẳn quy hoạch PDF của huyện mình → người xem chỉ thấy mẩu QĐ893. Nay bản CAD phủ DƯỚI một nửa thửa thì vẫn tra
+    // thêm bản PDF (mỗi mục ghi rõ nguồn; phần ngoài bản nào thì bản đó tự ghi "ngoài phạm vi" / "chưa xác định").
+    const NGOAI_PHAM_VI = 'Nằm ngoài phạm vi bản quy hoạch này';
+    const phuCL = Math.max(0, ...qhCacBanCL.map((b: any) => {
+      const ds = (b?.areas || []) as { type: string; areaM2: number }[];
+      const tong = ds.reduce((s, a) => s + (Number(a.areaM2) || 0), 0);
+      const ngoai = ds.filter((a) => a.type === NGOAI_PHAM_VI).reduce((s, a) => s + (Number(a.areaM2) || 0), 0);
+      return tong > 0 ? (tong - ngoai) / tong : 0;
+    }));
+    const qhPdf = parcel && tuBangMoi && overlaps.length === 0 && (qhCacBanCL.length === 0 || phuCL < 0.5)
       && (process.env.QH_PDF_THU === '1' || await isFlagOn('qh_pdf_bat'))
       ? await qhTuPdf(Number(parcel.id), dtThua) : [];
     const qhCacBan = [...qhCacBanCL, ...qhPdf];

@@ -302,7 +302,13 @@ parcelsRouter.get('/at', async (req, res, next) => {
       const ngoai = ds.filter((a) => a.type === NGOAI_PHAM_VI).reduce((s, a) => s + (Number(a.areaM2) || 0), 0);
       return tong > 0 ? (tong - ngoai) / tong : 0;
     }));
-    const qhPdf = parcel && tuBangMoi && overlaps.length === 0 && (qhCacBanCL.length === 0 || phuCL < 0.5)
+    // (15/10/2026) Phần quy hoạch cũ tính sẵn (overlaps — QĐ205) cũng vậy: thửa Nha Trang / Diên Khánh… sát ranh Cam Lâm chỉ bị QĐ205 chạm một
+    // mẩu (Thửa 65 · Tờ 65 Phường Nam Nha Trang 222 ha: 0,8 ha "rừng sản xuất", còn lại "ngoài phạm vi") từng bị CHẶN hẳn QHSDĐ của chính
+    // huyện mình. Nay phủ DƯỚI một nửa thửa thì vẫn tra bản PDF.
+    const ngoaiPre = overlaps.filter((o) => o.type === NGOAI_PHAM_VI).reduce((s, o) => s + (Number(o.areaM2) || 0), 0);
+    const tongPre = overlaps.reduce((s, o) => s + (Number(o.areaM2) || 0), 0);
+    const phuPre = tongPre > 0 ? (tongPre - ngoaiPre) / tongPre : 0;
+    const qhPdf = parcel && tuBangMoi && (overlaps.length === 0 || phuPre < 0.5) && (qhCacBanCL.length === 0 || phuCL < 0.5)
       && (process.env.QH_PDF_THU === '1' || await isFlagOn('qh_pdf_bat'))
       ? await qhTuPdf(Number(parcel.id), dtThua) : [];
     const qhCacBan = [...qhCacBanCL, ...qhPdf];

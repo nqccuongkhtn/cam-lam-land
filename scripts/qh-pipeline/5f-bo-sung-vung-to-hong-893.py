@@ -41,6 +41,9 @@ def main(vao, tep_chu):
     CHU = [(Point(f['geometry']['coordinates'][:2]), (f['properties'].get('Text') or '').strip().upper(), f['properties'].get('lo'))
            for f in json.load(io.open(tep_chu, encoding='utf-8'))['features']]
     wgs = lambda g: transform(lambda x, y, z=None: tuple(zip(*[b1.vn2wgs(a, c) for a, c in zip(x, y)])), g)
+    # khung cả bản vẽ (theo các ô đã có) — để nhận ra DẢI VIỀN RANH HUYỆN (15/10/2026, b5.la_vien_ranh): 5b đã bỏ dải này; không bỏ ở đây
+    # thì cả dải "chưa có ô nào phủ" và bị bổ sung lại thành "Đất ở".
+    KHUNG = (min(e[0] for e in Z), min(e[1] for e in Z), max(e[2] for e in Z), max(e[3] for e in Z))
     them = []
     for f in json.load(io.open(vao, encoding='utf-8'))['features']:
         m = re.search(r'#[0-9a-fA-F]{6}', f['properties'].get('OGR_STYLE') or '')
@@ -69,6 +72,7 @@ def main(vao, tep_chu):
         W = make_valid(wgs(kq))
         x0, y0, x1, y1 = W.bounds
         if not (108.9 < x0 and x1 < 109.3 and 11.9 < y0 and y1 < 12.25): continue
+        if b5.la_vien_ranh(W.bounds, W.area, KHUNG): print('  bỏ dải viền ranh huyện', f['properties'].get('EntityHandle')); continue
         idx = ZT.query(W)
         con = W.difference(unary_union([ZP[i] for i in idx])) if len(idx) else W
         # chỉ giữ mảnh sót ≥ 500 m² và rộng ≥ 3 m (mảnh mỏng = chỗ vẽ chưa khít giữa 2 ô, không phải đất bị mất)

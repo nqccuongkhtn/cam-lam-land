@@ -128,9 +128,23 @@ def tach_lo(g, sau=0):
     return [p for p in ra if isinstance(p, Polygon) and p.area > 0]
 
 
+def la_vien_ranh(b, dt, khung):
+    """DẢI VIỀN RANH HUYỆN: khung bao ≥ 80 % khung cả bản vẽ theo CẢ HAI chiều mà diện tích ≤ 5 % khung bao (dải mảnh ôm cả huyện).
+    Dùng chung cho 5b, 5f (5f phải bỏ cùng vùng tô này, không thì nó "bổ sung phần sót" lại đúng dải viền)."""
+    x0, y0, x1, y1 = b
+    X0, Y0, X1, Y1 = khung
+    return (x1 - x0) >= 0.8 * (X1 - X0) and (y1 - y0) >= 0.8 * (Y1 - Y0) and dt <= 0.05 * (x1 - x0) * (y1 - y0)
+
+
 def main(vao, tep_chu, tep_kh):
     d = json.load(io.open(vao, encoding='utf-8'))
     vung, mau = [], []
+    # DẢI VIỀN RANH HUYỆN (15/10/2026): vùng tô hồng #ff7fff ở Level 0 (h 6ADCB9) là dải viền chạy quanh ranh huyện — khung 31 × 31 km
+    # = cả huyện, rộng trung bình 75 m, 860 ha, không phải đất. Trước đây thành ô "Đất ở" nằm DƯỚI mọi ô khác (vùng tô gốc lớn nhất) nên
+    # chỉ lộ ra NGOÀI phần đã quy hoạch: 266 thửa Cam Lâm sát ranh (70,6 ha — Thửa 368 · Tờ 1 Suối Dầu ghi 40.272 m² "Đất ở") và 742
+    # thửa huyện bên (431 ha) hiện dòng QĐ893 "Đất ở" bịa. Luật: khung bao ≥ 80 % khung cả bản vẽ theo CẢ HAI chiều mà diện tích
+    # ≤ 5 % khung bao (dải mảnh ôm cả huyện) → bỏ. Không vùng tô đất thật nào ôm cả huyện (vùng dài nhất là QL1A: 7,7 × 26,3 km).
+    hinh = []
     for f in d['features']:
         # Level 56 = phần TRÌNH BÀY của tờ bản vẽ, không phải đất (11/10/2026): 94 ô màu mẫu chú dẫn 11 ha/ô xếp cột ở mép tây,
         # sơ đồ vị trí in góc tây bắc (nước 616 ha…), 2 ô 108 ha + 68 ha góc đông nam sát Cam Ranh. Trước đây lọt vào dữ liệu web
@@ -142,6 +156,13 @@ def main(vao, tep_chu, tep_kh):
             if not g.is_valid:
                 g = g.buffer(0)
         except Exception:
+            continue
+        hinh.append((f, g))
+    KX0 = min(g.bounds[0] for f, g in hinh); KY0 = min(g.bounds[1] for f, g in hinh)
+    KX1 = max(g.bounds[2] for f, g in hinh); KY1 = max(g.bounds[3] for f, g in hinh)
+    for f, g in hinh:
+        if la_vien_ranh(g.bounds, g.area, (KX0, KY0, KX1, KY1)):
+            print('Bỏ dải viền ranh huyện: %s · %.1f ha' % (f.get('properties'), g.area * 111320 * 110574 * 0.978 / 1e4))
             continue
         for p in (g.geoms if hasattr(g, 'geoms') else [g]):
             if isinstance(p, Polygon) and p.area > 0:

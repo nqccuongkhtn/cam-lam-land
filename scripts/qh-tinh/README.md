@@ -132,7 +132,12 @@ mảnh, bị đè kín) nay vẫn gán theo màu (trước để "chưa xác đ�
 10 thửa đối chứng Nha Trang (`dap-an/nha-trang-14-10.json`, đã dịch thửa như máy chủ): 8 thửa đúng tên loại, lệch 0,1–3,0 % (kiểu
 ảnh: 0,5–12 %); 2 thửa còn lại đúng RANH nhưng màu dùng chung nên ghi "nhóm" (app ghi PNK / DKV). Hai thửa lệch nhất (Thửa 56 · Tờ 35
 Ngọc Hiệp 2,3 %, Thửa 1 · Tờ 1 Phước Hòa 3,0 %) soi trên PDF: số web = đúng phần mảng tô PDF đè lên thửa, phần lệch là do app dùng
-hình thửa / phép nắn khác. Chạy: thêm `--vector` vào bước 1 (Nha Trang ~4–13 phút, Ninh Hòa lâu nhất).
+hình thửa / phép nắn khác. Chạy: thêm `--vector` vào bước 1 (1–11 phút mỗi bản; chỉ gộp mảng vẽ sau ĐÈ THẬT lên mảng đang xét +
+mảng nằm trọn trong ranh khỏi cắt ranh — trước đó Khánh Sơn chạy > 30 phút chưa xong, nay 3,5 phút).
+ĐÃ LÊN WEB 14/10/2026 22:45 (7 bản, 292.815 vùng, bảng `qh_pdf` 421 MB). Phần trong ranh có loại đất (vector · kiểu ảnh cũ):
+Nha Trang 94,4 · 94,8 % — Ninh Hòa 96,7 · 96,7 — Khánh Sơn 95,5 · 95,9 — Vạn Ninh 96,3 · 96,7 — Cam Ranh 95,2 · 95,7 — Diên Khánh
+94,4 · 94,8 — Khánh Vĩnh 97,5 · 97,8 (kiểu ảnh cao hơn chút vì "lấp khe" ≤ 12 m bằng loại kề bên — tức là đoán; vd Thửa 3 · Tờ 8
+Vĩnh Phương: kiểu ảnh ghi 125,5 m² đường vì lấp chỗ ký hiệu đỏ vẽ đè, PDF thật chỉ 77,3 m² đường — web nay 78).
 CHƯA LÀM: lô màu hồng cam công cộng (21 mã) không nhãn chỉ ra "nhóm"; thử thêm thửa ở Ninh Hòa (bản nhiều nét dày nhất: 17.847 nét
 trong suốt).
 

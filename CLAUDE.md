@@ -858,6 +858,10 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   **Diên Khánh KHÔNG có lớp chữ** (nhãn là hình, mỗi hình một chữ cái): `doc_nhan_hinh.py` gom chữ cái theo hình + bảng chữ người nhìn gán
   (`nhan-hinh/bang-chu-dien-khanh.json`) → `boc_loai_dat.py --nhan-hinh=D:\KhoQH\qh-pdf\nhan-hinh-dienkhanh.json` — 7.701 nhãn mã, đọc
   được cả chú giải; 2.845 ha lúa "nhóm" → LUC, nhóm công cộng tách TMD/DKV/DGD… Bóc lại Diên Khánh PHẢI kèm tuỳ chọn này.
+  **Danh sách mã phải đủ mã của CHÍNH chú giải** (Thông tư 08/2024: CNT, DDD, DPC, CCC…; mã cũ DHT, MVK…): thiếu mã quy hoạch đỏ thì phân
+  số không nhận ra → mã HIỆN TRẠNG bị lấy làm loại đất (đã sửa ~1.100 ha: CNT ở Ninh Hòa 75 · Khánh Vĩnh 226 · Diên Khánh 98 ha; Nha Trang
+  718 ha mặt biển MVK từng ghi MNC). Thêm mã mới thì tên CHÉP từ chú giải (`ten-ma-chu-giai.sql`, chạy sau mỗi lần nạp). Chú giải 2 cột
+  "Hiện trạng | Quy hoạch": mã đen nhóm CHƯA SỬ DỤNG (MCS…) không định màu quy hoạch; màu chỉ gồm tên nhóm + 1 mã cụ thể = mã cụ thể.
   Máy chủ `lib/qhPdf.ts`: thửa NGOÀI Cam Lâm (không bản CAD nào phủ) nằm trong ranh bản nào thì tra bản đó, diện tích các loại
   chia lại cho cộng đúng bằng diện tích thửa, phần PDF không tô ghi "Chưa xác định loại đất"; hình thửa DỊCH về đúng chỗ trước khi
   chồng (độ trượt lớp `dia_chinh`, `LECH_DIA_CHINH` trong qhCompute.ts — y như phần Cam Lâm); mục `nguon:'pdf'` trong `qhCacBan`.

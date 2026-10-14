@@ -1,2 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+# Tệp lệnh bash PHẢI giữ xuống dòng kiểu Unix (LF) — CRLF làm bash báo ": command not found"
+*.sh text eol=lf

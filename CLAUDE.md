@@ -442,6 +442,10 @@ Kiểm tra nhanh trong Console: `Object.values(__banDo.style.sourceCaches['src-d
   Chuyển động do máy tự chạy (bay tới thửa, khớp khung) không có `originalEvent` nên không bị tính nhầm.
   Đã thử bằng chuột thật qua trình duyệt: kéo 280px làm bản đồ chạy ~800m → **0 lần** chọn thửa;
   bấm đứng yên → **1 lần**, bảng thông tin thửa mở đúng.
+- **THỬA CHỒNG NHAU (15/10/2026):** 7,3 % điểm giữa thửa nằm trong ≥ 2 thửa (thửa to "bao" thửa nhỏ chưa tách; hai bản ghi
+  trùng khít mang hai số khác nhau, vd Thửa 23 · Tờ 50 và Thửa 23 · Tờ 500). `/api/parcels/at` chọn theo thứ tự: thửa KHÔNG phải
+  đường / sông / thuỷ lợi → thửa NHỎ nhất chứa điểm bấm → trong nhóm gần trùng khít (lệch ≤ 2 %) bản ghi CÓ loại đất → mã thửa.
+  Trước đó `LIMIT 1` không sắp xếp nên bấm thửa nhỏ có lúc ra thửa to, hoặc vớ thửa đường rồi báo "không tra cứu".
 - Gõ `__banDo` trong Console trình duyệt để soi bản đồ khi cần tìm sự cố.
 
 ---

@@ -815,15 +815,33 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   **14/10/2026 chủ dự án chê ảnh "mờ, không thấy được" → MỌI lớp từ PDF cắt lại bằng `tiler3.py`:** ô **512 điểm ảnh WebP** (web vẫn
   khai `tileSize: 256` → nét gấp đôi trên điện thoại, không sửa lõi MapView), mỗi mức phóng vẽ lại từ PDF (tiler2 lấy mẫu một ảnh lớn
   cho mọi mức → mức xa lấm tấm), thêm mức 17; WebP 512 còn nhẹ hơn PNG 256 cũ. Bộ ô: `ninhhoa2030v3`, `nhatrang2030v2`, `khanhson2030v2`,
-  `vanninh2030v2`, `camranh2030v2`, `dienkhanh2030v2`, `khanhvinh2030v2` (z9–17) + **QH chi tiết 1/500 Cam Lâm `qhct500camlam-v3`**
-  (9 đồ án DỰ THẢO lấy ý kiến, z12–19, lớp `qh-qhct500`, căn cứ = 9 thông báo 285–291, 327, 328/TB-UBND xã Cam Lâm — thẻ căn cứ có
-  kiểu `loai: 'Thông báo'` + danh sách `cac`). Nắn 1/500: bảng toạ độ góc ranh / nút tim đường / nét hiện trạng khớp địa chính; TỰ KIỂM
-  bằng `kiem_nan_dia_chinh.py` + `kiem_nan_phan_khu.py` (ô đất 1/2000) → phát hiện Cam Hiệp Nam lệch ~3 m, Cam Hiệp Bắc ~2 m, TK B ~1,3 m
-  (nan_1_500 lẫn nét tim đường đỏ) → sửa bằng `tinh_ranh_net.py` / `tinh_goc_1_500.py`, nay cả 9 chỉ còn 0,02–0,37 m.
-  Kho cố định: PDF `D:\KhoQH\qhsdd-2030\` + `D:\KhoQH\camlam-1-500\`, ô ảnh `D:\KhoQH\tiles-qh\`, file nạp `D:\KhoQH\qh-pdf\`.
-  ĐƯA LÊN WEB: `DUA-LEN-WEB-14-10.bat` (nháy đúp) → `scripts/qh-tinh/dua-len-web-14-10.sh` (chép ô vào volume, nạp qh_pdf Diên Khánh /
-  Khánh Vĩnh, dựng lại, bật cờ `qh_pdf_bat`, kiểm thử, xoá 5 bộ ô cũ). ⚠️ Chạy docker trong Git Bash phải `MSYS_NO_PATHCONV=1`
-  (không thì `/dest` thành `C:/Program Files/Git/dest`). Trợ lý KHÔNG tự dựng web thật được (hệ thống an toàn chặn) — chủ dự án chạy.
+  `vanninh2030v2`, `camranh2030v2`, `dienkhanh2030v2`, `khanhvinh2030v2` (z9–17).
+  **⚠️ NẮN THEO VẠCH LƯỚI THẬT (14/10/2026 tối, `nan_vach_luoi.py` + `nan2.vach_luoi`).** Nắn theo TÂM CHỮ số lưới sai: nhãn "597 / 500"
+  in 2 dòng bị ghép hụt (đọc 597 000 thay vì 597 500) + tâm chữ lệch đường lưới vài điểm in → chủ dự án so 10 thửa Nha Trang với app tham
+  chiếu: sai 72,7 % diện tích, "nhìn tổng quát lệch hẳn bằng mắt thường". Bản cũ lệch: Nha Trang ~350 m · Khánh Sơn ~105 m · Ninh Hòa
+  ~70 m · Vạn Ninh 30–40 m (Cam Ranh / Diên Khánh / Khánh Vĩnh < 0,4 m). Nay dò mọi VẠCH lưới (nét dài suốt bản đồ), giữ dãy cách đều,
+  gán giá trị theo bước lưới → `"luoi"` trong `<pdf>.nan.json` (nội suy từng ô lưới, đúng tại mọi vạch ~1 cm). File nắn mới:
+  `D:\KhoQH\qhsdd-2030\*.nan.json` (bản cũ ở `nan-cu-13-10\`). Đổi dữ liệu đã dựng theo phép cũ sang phép mới: `doi_nan_geojson.py`.
+  Ô ảnh 7 bản đã cắt lại (cùng tên bộ — kịch bản đưa lên web chép sang tên tạm rồi đổi chỗ để không lẫn ô cũ).
+  **QH CHI TIẾT 1/500 CHÍNH THỨC — CHỈ ADMIN XEM (14/10/2026 tối):** 6 đồ án, QĐ 2043–2048/QĐ-UBND ngày 25/9/2026 của UBND xã Cam Lâm
+  (nguồn `quyhoach2025/1.500/`: 6 DGN V8 + 6 quyết định quét; DXF chủ dự án xuất, Cam Hiệp Bắc do `dgn_sang_dxf.py` xuất). Bản 1/500
+  DỰ THẢO (9 khu lấy ý kiến, lớp `qh-qhct500`) ĐÃ GỠ HẲN khỏi web + xoá khỏi máy theo lời chủ dự án. Ảnh: MicroStation V8i có sẵn trên
+  máy được điều khiển qua COM (`in_1_500_dgn.py`) IN THẲNG PDF nét vector đúng như MicroStation hiển thị (tỷ lệ ~1:1000, 600 dpi,
+  PDFPrecision 3); toạ độ không đoán: vẽ 4 DẤU CỘNG ở góc vùng in trên BẢN SAO DGN, tìm lại trong PDF → affine (sai số < 0,01 mm) →
+  `tiler3.py` z12–20 → `gop_tile.py` gộp 6 bộ thành `qhct500-v1`. Kiểm: nét ranh in đỏ nằm trên ranh DXF (trung vị lệch ~1 cm), ranh
+  khớp ranh thửa địa chính. CHẶN Ở MÁY CHỦ: ô + quyết định ở volume riêng `camlamgis_qh_rieng` (không ở `/tiles/` công khai),
+  `routes/qhRieng.ts` cấp vé HMAC 24 giờ CHỈ cho admin (`GET /api/qh-rieng/ve`, kèm danh sách lớp từ `danh-sach.json` — mã giao diện
+  không ghi tên lớp), kiểm vé TỪNG Ô (`/api/qh-rieng/o/<thư mục>/z/x/y?v=`); nginx có `location /api/qh-rieng/ { proxy_cache off }`.
+  Giao diện: `lopRieng` → `rasterOverlays` / `mucQh` / `canCuQh` trong `app/map/page.tsx`. Thêm lớp chỉ-admin mới = thêm vào
+  `danh-sach.json` + `tiles/` của volume, KHÔNG khai trong page.tsx.
+  ⚠️ MicroStation qua COM: KHÔNG chạy 2 kịch bản cùng lúc (đã sập "RPC server is unavailable" / "object no longer valid"); dùng
+  `win32com.client.dynamic.Dispatch` (bộ gen_py từng làm sập khi quét); khổ giấy tự đặt phải có `<Units>4</Units>` (thiếu là "Invalid
+  Printer Driver Configuration"); 4800 dpi làm MicroStation 32 bit ngốn > 3 GB; xuất DXF qua COM phải bỏ model TRANG IN trên bản sao.
+  Kho cố định: PDF `D:\KhoQH\qhsdd-2030\`, ô ảnh `D:\KhoQH\tiles-qh\`, file nạp `D:\KhoQH\qh-pdf\`, lớp chỉ-admin `D:\KhoQH\qh-rieng\`.
+  ĐƯA LÊN WEB: `DUA-LEN-WEB-14-10.bat` (nháy đúp) → `scripts/qh-tinh/dua-len-web-14-10.sh` (chép 7 bộ ô, nạp qh_pdf 7 bản, dựng lại,
+  chép lớp 1/500 vào volume riêng, bật cờ `qh_pdf_bat`, tự kiểm 401/403/404 của lớp chỉ-admin, xoá bộ ô cũ + 1/500 dự thảo).
+  ⚠️ Chạy docker trong Git Bash phải `MSYS_NO_PATHCONV=1` (không thì `/dest` thành `C:/Program Files/Git/dest`). Trợ lý KHÔNG tự dựng
+  web thật được (hệ thống an toàn chặn) — chủ dự án chạy.
   **QUY HOẠCH THEO THỬA TỪ PDF (14/10/2026, MẶC ĐỊNH TẮT):** `boc_loai_dat.py` bóc vùng loại đất từ PDF (2 lượt, ~2 m/điểm ảnh;
   nhãn phân số "CLN/TMD" lấy mã DƯỚI; khung chú giải + `bang-mau-chuan.json` = bảng màu chung 22 màu gom từ 6 bản; màu dùng chung
   nhiều mã → "NHÓM … chưa ghi rõ loại", không đoán; nét dày chỉ là đất khi là đường / nước) → `nap_qh_pdf.py` nạp vào bảng

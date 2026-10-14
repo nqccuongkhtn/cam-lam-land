@@ -112,6 +112,10 @@ services:
       - uploads:/data/uploads
       - logs:/app/apps/backend/logs        # GIỮ log lỗi/chậm qua các lần build lại
       - van_ban_kho:/app/.kho-van-ban      # file PDF văn bản đã tải sẵn — mở ngay, không mất khi dựng lại (6/10/2026)
+      # LỚP QUY HOẠCH CHỈ ADMIN XEM (14/10/2026, routes/qhRieng.ts): ô ảnh + quyết định 1/500 chính thức Cam Lâm.
+      # KHÔNG để chung volume camlam_tiles (nginx phục vụ thẳng /tiles/ cho mọi người) — chỉ backend đọc, có kiểm vé admin.
+      # Nạp: scripts/qh-tinh/dua-len-web-14-10.sh (docker cp vào volume camlamgis_qh_rieng).
+      - qh_rieng:/app/apps/backend/du-lieu-rieng/qh-rieng:ro
     depends_on:
       postgis:
         condition: service_healthy
@@ -223,6 +227,8 @@ volumes:
   tin_kho:
   # File PDF văn bản đã tải sẵn từ Drive / cổng TTĐT (xem routes/vanBan.ts).
   van_ban_kho:
+  # Lớp quy hoạch CHỈ ADMIN XEM (routes/qhRieng.ts) — tên thật trong Docker: camlamgis_qh_rieng.
+  qh_rieng:
 
   pgdata:
   uploads:

@@ -18,6 +18,7 @@ import { listingsRouter } from './routes/listings.ts';
 import { layersRouter } from './routes/layers.ts';
 import { parcelsRouter } from './routes/parcels.ts';
 import { diaChinhRouter } from './routes/diaChinh.ts'; // BẢN ĐỒ ĐỊA CHÍNH toàn tỉnh (ô vector + chống cào)
+import { qhRiengRouter } from './routes/qhRieng.ts'; // LỚP QUY HOẠCH CHỈ ADMIN XEM (1/500 chính thức Cam Lâm)
 import { importsRouter } from './routes/imports.ts';
 import { imagesRouter } from './routes/images.ts';
 import { adminRouter } from './routes/admin.ts';
@@ -102,6 +103,9 @@ app.use('/api/tiles', rateLimit({ windowMs: 10 * 60 * 1000, max: 6000, key: 'til
 app.use('/api/dc', rateLimit({ windowMs: 60 * 1000, max: 90, key: 'dc-hoi',
   skip: (req) => /^\/\d+\/\d+\/\d+/.test(req.path),
   message: 'Bạn tra cứu quá nhanh. Vui lòng chậm lại một chút.' }), diaChinhRouter);
+// LỚP QUY HOẠCH CHỈ ADMIN XEM — cũng đặt TRƯỚC giới hạn toàn cục (xem bản đồ 1/500 ở mức phóng sâu tải nhiều ô).
+// Mỗi ô đều phải có VÉ do /ve cấp riêng cho admin (routes/qhRieng.ts) nên chỉ cần trần rộng chống lụt.
+app.use('/api/qh-rieng', rateLimit({ windowMs: 60 * 1000, max: 3000, key: 'qh-rieng', message: 'Tải bản đồ quá nhanh. Vui lòng chậm lại một chút.' }), qhRiengRouter);
 // Chống lụt yêu cầu toàn cục (rộng rãi, không cản người dùng thật).
 app.use('/api', rateLimit({ windowMs: 60 * 1000, max: Number(process.env.RATE_LIMIT_GLOBAL) || 600, key: 'global' })); // đặt RATE_LIMIT_GLOBAL cao khi ĐO TẢI
 // ── GIỚI HẠN RIÊNG CHO CÁC ĐƯỜNG GHI DỮ LIỆU (11/10/2026 — rà soát bảo mật) ──

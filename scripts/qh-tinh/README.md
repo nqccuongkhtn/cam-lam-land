@@ -151,53 +151,30 @@ phải tinh chỉnh bằng điểm mốc lưới mới chính xác bằng 5 bả
 `curl -H "User-Agent: x" "https://nominatim.openstreetmap.org/lookup?osm_ids=R<id>&format=json&polygon_geojson=1"`
 (Cam Ranh R7081247, Diên Khánh R7081531; tìm id bằng /search ...&featuretype=settlement).
 
-## QUY HOẠCH CHI TIẾT 1/500 CAM LÂM (dự thảo lấy ý kiến) — 14/10/2026, ĐỦ 9 đồ án
-Hồ sơ 9 đồ án (125 file) ở `D:\KhoQH\camlam-1-500\` (dời khỏi thư mục tạm vì đường dẫn > 260 ký tự). Bản vẽ KHÔNG có lưới toạ độ →
-- `nan_1_500.py <tờ có bảng> <tờ cần nắn> <ra.nan.json> [ảnh soi]`: đọc "BẢNG KÊ TỌA ĐỘ GÓC RANH" (VN-2000; bảng dọc hoặc ngang,
-  số hiệu 12 / M12; điểm đầu lặp = khép kín), vẽ NÉT ĐỎ ranh lập quy hoạch (nét đứt bị tách hàng nghìn đoạn), dò tỷ lệ 0,5–20 pt/m
-  + xoay ±4° (thước in trên bản vẽ có khi sai — Cam Hiệp Bắc ghi "1 cm = 50 m" mà vạch không đều) bằng trượt hình tìm chỗ trùng nét
-  đỏ nhiều nhất, rồi tinh chỉnh kiểu ICP → `"afin":[a,b,c,d,e,f]` (nan2 hiểu, trang đã xoay như ảnh hiện ra).
-- `nan_1_500_nut.py <tờ giao thông> <tờ cần nắn> <ra.nan.json>`: khi không có bảng mà tờ giao thông ghi toạ độ NÚT tim đường
-  ("N8 · X=… · Y=…" + đường dẫn tới nút) — tính phép thô từ tâm hộp nhãn, chọn đầu đường dẫn gần vị trí dự đoán, thu hẹp dần
-  (Cam Hòa: 79/90 nút, sai số 0,09 m); hai tờ cùng bộ cùng khổ thì dò độ dời bằng ảnh nét đỏ (phaseCorrelate).
-- `ranh_1_500.py bang|net …` → ranh WGS84 (từ bảng góc ranh, hoặc từ vùng kín của nét đỏ — Cam Hòa nét đỏ không khép kín nên dùng
-  `ranh_tu_pdf.py` theo vùng tô màu: 73,8 ha gồm cả kênh, so với 59,68 ha lập quy hoạch).
-- `tiler2.py … qhct500-<ten> 14 19 <Ss ≈ m/pt ÷ 0,25>` → `gop_tile.py` gộp 5 bộ thành `qhct500camlam-v1` (1.587 ô) →
-  `ghep_tile_ve_tinh.py` làm ảnh thử đúng như web (tile chồng ảnh vệ tinh).
-Đã làm: Tiểu khu G quân đội (lệch nét ranh 0,5 m), TK B trung tâm Cam Đức (1,2 m), TK D Cam Hiệp Nam (2,2 m — cạnh cong), TK C Cam
-Hiệp Bắc (2,2 m), TK D phía Bắc Cam Hòa (0,09 m). File nắn + ranh: `nan/1-500/`.
-- **4 đồ án KHÔNG có toạ độ nào** (Cam Hải Đông, Cam Hải Tây, Cam Tân, Suối Tân — cùng đơn vị tư vấn Angkora, chữ số vẽ thành nét):
-  `nan_1_500_dia_chinh.py <tờ.pdf> <ra.nan.json> --xa="<tên xã CŨ trong dia_chinh_xa>" [--xa=…] --dien-tich-ha=<quy mô thuyết minh>
-  [--lop=767676_0.24] [--ti-le=0.9,2.4]` — đối chiếu NÉT NỀN HIỆN TRẠNG (bản đo in xám) với ranh thửa bảng `dia_chinh`: dò tỷ lệ +
-  vị trí bằng trượt hình (3 m rồi 2 m/điểm ảnh) rồi ICP. Thử mù trên TK B (đã có bảng toạ độ): ra 1,0306 pt/m, đáp án 1,029.
-  Kết quả (trung vị nét nền cách ranh thửa): Cam Tân 0,89 m · Suối Tân 0,23 m · Cam Hải Tây 1,26 m · Cam Hải Đông 4,6 m (nền có
-  nhiều ao tôm / đồng mức không trùng ranh thửa, nhưng soi gần thì đường + bờ ao khớp ranh thửa vài mét).
-  Ba bẫy đã vấp: (1) NÉT NỀN mỗi tư vấn một kiểu — TK B #c1c1c1 mảnh 0, Cam Hải Đông #7f7f7f dày 0,24 kèm 32 vạn CHẤM ký hiệu cát/cỏ
-  (công cụ bỏ đường vẽ < 3 điểm), Cam Hải Tây lớp xám nhiều nhất lại là ĐỒNG MỨC #989898 và vòng tròn ký hiệu cây #dadada → phải chỉ
-  định `--lop=767676_0.24` (công cụ in danh sách lớp xám để chọn; soi nhanh bằng cách vẽ riêng từng lớp); (2) KHU NẰM VẮT HAI XÃ —
-  "phía bắc Cam Hải Tây" phần lớn là đất Cam Hòa cũ: chỉ lấy thửa Cam Hải Tây thì hỏng (14,9 m), thêm `--xa="xã Cam Hòa"` thì đạt;
-  (3) dữ liệu địa chính có thửa SAI TOẠ ĐỘ (Suối Tân 2 thửa cách 300 km → khung 360 km, tràn bộ nhớ) — công cụ bỏ thửa cách > 15 km.
-  Tên xã cho Cam Tân là "Xã Cam Hiệp" (file địa chính của đơn vị gốc Cam Tân mang mã 22435).
-- Ranh 4 đồ án đó: `ranh_1_500.py net <tờ> <ra> --lop=ff0000_0.00 [--nhieu]` — ranh = nét đỏ mảnh 0 có chấm tròn; nét đỏ 0,24 là tim
-  đường / chỉ giới (chạy song song NGOÀI ranh, lấy lẫn thì phình 2–5 %); Cam Hải Tây gồm 4 mảnh → `--nhieu`. Kiểm bằng quy mô thuyết
-  minh: Cam Hải Đông 177,36/178 ha · Cam Hải Tây 172,36/173,3 · Cam Tân 213,07/213,67 · Suối Tân 311,91/312,68 (lệch < 0,6 % — cũng
-  là phép thử độc lập cho tỷ lệ nắn). Ss cắt tile = 4 / tỷ lệ (pt/m): 7,0 · 4,1 · 4,0 · 7,0.
+## QUY HOẠCH CHI TIẾT 1/500 CAM LÂM — BẢN CHÍNH THỨC, CHỈ ADMIN XEM (14/10/2026 tối)
+6 đồ án, QĐ 2043–2048/QĐ-UBND ngày 25/9/2026 của UBND xã Cam Lâm. Nguồn: `quyhoach2025/1.500/` (6 file DGN V8 + 6 quyết định quét;
+DXF: chủ dự án tự xuất 5 bản, Cam Hiệp Bắc xuất bằng `dgn_sang_dxf.py`). Bản DỰ THẢO 9 khu lấy ý kiến cùng mọi công cụ nắn của nó
+(nan_1_500*.py, ranh_1_500.py, tinh_goc_1_500.py, tinh_ranh_net.py, kiem_nan_*.py, nan/1-500/) ĐÃ XOÁ theo lời chủ dự án.
+- **Đổi DGN V8 → DXF:** `python -P dgn_sang_dxf.py <file.dgn> <thư mục tạm>` — MicroStation V8i trên máy (COM, File ▸ Save As ▸ DXF),
+  làm trên BẢN SAO; file có model TRANG IN (sheet) thì Save As DXF qua COM lỗi → bỏ model trang in trên bản sao trước khi lưu.
+- **In PDF:** `python -P in_1_500_dgn.py <file.dgn> <thư mục ra> <tên>` — MicroStation IN THẲNG PDF nét vector (y hệt MicroStation hiển
+  thị: mẫu tô, kiểu nét, ký hiệu, chữ), vùng in = khung ranh lập quy hoạch (level `BV_Rg_lapquyhoach`, kiểu nét `QH_Ranh…`) nới 30 m,
+  khổ giấy tự đặt cho tỷ lệ ~1:1000 (600 dpi, PDFPrecision 3 — toạ độ PDF 4 số lẻ). TOẠ ĐỘ KHÔNG ĐOÁN: trên bản sao DGN vẽ 4 DẤU CỘNG
+  (4 m, màu 3) ở 4 góc vùng in, toạ độ VN-2000 biết trước → tìm lại trong PDF (nét đứt cũng nối lại được) → affine `<pdf>.nan.json`
+  (`"afin"`), báo sai số: cả 6 bản < 0,01 mm, tỷ lệ 2 chiều bằng nhau.
+- **Ranh cắt ô:** `python -P ranh_1_500_dxf.py <file.dxf> <ra>` — đa giác khép kín trên `BV_Rg_lapquyhoach` kiểu nét QH_Ranh (cung tròn
+  tính đúng bằng `cung_chinh_xac.py`) → `<ra>.json` (ranh đúng) + `<ra>-cat.json` (nới 4 m để giữ trọn nét ranh in đậm).
+- **Ô ảnh:** `tiler3.py <pdf> … <ra>-cat.json … qh500-<tên> 12 20` → `gop_tile.py` gộp 6 bộ thành `qhct500-v1`.
+  Kiểm: `kiem_o_1_500.py <thư mục ô> <z> <ranh.json> <ảnh> --dc` — ghép ô, vẽ ranh DXF + ranh thửa địa chính, ĐO nét ranh in đỏ cách
+  ranh DXF (Gia đình Quân đội: trung vị −1,3 cm, Cam Đức −1,4 cm ở mức 18–19).
+- **Lên web (CHỈ ADMIN):** `lap_danh_sach_qh_rieng.py` → `D:\KhoQH\qh-rieng\danh-sach.json`; ô ở `D:\KhoQH\qh-rieng\tiles\qhct500-v1\`,
+  quyết định ở `tai-lieu\`. `dua-len-web-14-10.sh` chép vào volume riêng `camlamgis_qh_rieng`; máy chủ `routes/qhRieng.ts` kiểm vé admin
+  từng ô. ⚠️ MicroStation qua COM: không chạy 2 kịch bản cùng lúc; dùng `win32com.client.dynamic.Dispatch`.
 
-- **TỰ KIỂM + NẮN LẠI (14/10/2026, chủ dự án: "phải rõ nét và chính xác 100 %, tự kiểm tra rồi dựng").** Hai phép kiểm ĐỘC LẬP:
-  `kiem_nan_dia_chinh.py <tờ> <ranh>` (nét nền hiện trạng ↔ ranh thửa địa chính, đã trừ độ trượt LECH_DC của lớp dia_chinh) và
-  `kiem_nan_phan_khu.py <tờ> <ranh> apps/backend/data/qh_zones_<bản>.json` (viền mảng tô 1/500 ↔ viền ô đất phân khu 1/2000 dựng từ
-  CAD gốc — dùng cho đồ án không in nền hiện trạng). Mỗi phép in "nếu cho trượt thêm thì muốn dời bao nhiêu" — < 0,3 m là đúng chỗ.
-  Phát hiện 3 đồ án nắn theo bảng toạ độ bị LỆCH vì `nan_1_500.py` dùng MỌI nét đỏ (lẫn tim đường đỏ chạy song song ranh, gạch tô lô
-  đất #dd0000): **Cam Hiệp Nam ~3 m · Cam Hiệp Bắc ~2 m (sai tỷ lệ 0,4 %) · Tiểu khu B ~1,3 m**. Sửa bằng:
-  `tinh_ranh_net.py <tờ_có_bảng> <tờ> <nan cũ> <ra>` — tự tìm ĐÚNG LỚP NÉT RANH (lớp đỏ bám cạnh bảng nhiều nhất; các tờ này đều là
-  #ff0000 mảnh 0), khớp KHOẢNG CÁCH VUÔNG GÓC tới từng cạnh (đồng dạng, tuyến tính), tự bỏ cạnh cong (bản vẽ cung, bảng dây cung).
-  Khu Quân đội: nét ranh trùng cạnh bảng trung vị 0,085 m. `tinh_goc_1_500.py` (giao điểm 2 cạnh = góc ↔ góc bảng) dùng cho TK B
-  (9 góc, lệch TB 0,16 m — tỷ lệ 1,0307 trùng con số đo mù từ địa chính). Sau sửa, cả 9 đồ án: địa chính / 1/2000 chỉ còn muốn dời
-  0,02–0,37 m (Cam Hiệp Nam trùng mép ô đất 1/2000 trung vị 0,35 m). 4 đồ án nắn theo địa chính đã TRỪ độ trượt 0,53 m đông / 0,14 m bắc.
 - **ẢNH NÉT GẤP ĐÔI — `tiler3.py` (thay tiler2):** ô 512 điểm ảnh WebP (web vẫn khai tileSize 256 → điện thoại nét gấp đôi), MỖI MỨC
   PHÓNG VẼ LẠI TỪ PDF theo khối 4×4 ô bằng DisplayList (tiler2 lấy mẫu một ảnh lớn cho mọi mức → mức xa lấm tấm, mất nét mảnh),
   siêu lấy mẫu ×2 + gộp điểm ảnh với alpha nhân trước, toạ độ lưới 9×9 điểm chính xác mỗi ô (đúng cả nắn "luoi" gãy khúc).
-  WebP 512 còn NHẸ HƠN PNG 256 cũ (Nha Trang 43 so với 66 MB). QHSDĐ 2030: z9–17; 1/500: z12–19. `gop_tile.py` nay gộp được .webp
+  WebP 512 còn NHẸ HƠN PNG 256 cũ (Nha Trang 43 so với 66 MB). QHSDĐ 2030: z9–17; 1/500: z12–20. `gop_tile.py` nay gộp được .webp
   và chồng alpha đúng công thức. Đưa lên web: `dua-len-web-14-10.sh` (một lệnh: chép ô vào volume, nạp qh_pdf Diên Khánh/Khánh Vĩnh,
   dựng lại web, bật cờ qh_pdf_bat, kiểm thử, xoá bộ ô cũ). Kho: PDF ở `D:\KhoQH\qhsdd-2030\`, ô ảnh `D:\KhoQH\tiles-qh\`,
   file nạp `D:\KhoQH\qh-pdf\`.

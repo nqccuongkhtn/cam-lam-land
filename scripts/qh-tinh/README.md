@@ -133,7 +133,8 @@ mảnh, bị đè kín) nay vẫn gán theo màu (trước để "chưa xác đ�
 ảnh: 0,5–12 %); 2 thửa còn lại đúng RANH nhưng màu dùng chung nên ghi "nhóm" (app ghi PNK / DKV). Hai thửa lệch nhất (Thửa 56 · Tờ 35
 Ngọc Hiệp 2,3 %, Thửa 1 · Tờ 1 Phước Hòa 3,0 %) soi trên PDF: số web = đúng phần mảng tô PDF đè lên thửa, phần lệch là do app dùng
 hình thửa / phép nắn khác. Chạy: thêm `--vector` vào bước 1 (1–11 phút mỗi bản; chỉ gộp mảng vẽ sau ĐÈ THẬT lên mảng đang xét +
-mảng nằm trọn trong ranh khỏi cắt ranh — trước đó Khánh Sơn chạy > 30 phút chưa xong, nay 3,5 phút).
+mảng nằm trọn trong ranh khỏi cắt ranh — trước đó Khánh Sơn chạy > 30 phút chưa xong, nay 3,5 phút). ⚠️ Chạy tối đa 2 bản một lúc khi
+web đang chạy: 3 bản cùng lúc (Ninh Hòa ~2,5 GB + Vạn Ninh 1,6 GB + Cam Ranh 0,8 GB) cộng Docker làm máy 16 GB cạn bộ nhớ (15/10/2026 0h).
 ĐÃ LÊN WEB 14/10/2026 22:45 (7 bản, 292.815 vùng, bảng `qh_pdf` 421 MB). Phần trong ranh có loại đất (vector · kiểu ảnh cũ):
 Nha Trang 94,4 · 94,8 % — Ninh Hòa 96,7 · 96,7 — Khánh Sơn 95,5 · 95,9 — Vạn Ninh 96,3 · 96,7 — Cam Ranh 95,2 · 95,7 — Diên Khánh
 94,4 · 94,8 — Khánh Vĩnh 97,5 · 97,8 (kiểu ảnh cao hơn chút vì "lấp khe" ≤ 12 m bằng loại kề bên — tức là đoán; vd Thửa 3 · Tờ 8

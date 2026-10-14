@@ -187,13 +187,15 @@ if NHAN_HINH:
         if not (0 <= iy < Hp and 0 <= ix < Wp): continue
         if not mask_ranh[iy, ix]: ngoai_hinh.append((t, cx, cy, w['cao'], bool(w['do']))); continue
         nhan.append([t, cx, cy, bool(w['do']), (y1 - y0) * S, (x1 - x0) * S, w['cao']]); so_nh += 1
-    # Chú giải HAI CỘT "Hiện trạng | Quy hoạch" (Diên Khánh, Thông tư 08/2024): cột Quy hoạch ghi mã ĐỎ trong ô màu QUY HOẠCH; cột Hiện trạng
-    # ghi mã đen trong ô màu HIỆN TRẠNG — nhóm đất chưa sử dụng (MCS, CSD, BCS, DCS, CGT) có màu ở cột Hiện trạng nhưng ô Quy hoạch để TRẮNG.
-    # Đọc cả hai cột thì màu xanh mặt nước #b4ffff bị gán thêm MCS → 178 ha hồ chứa thành "nhóm". Có mã đỏ ngoài ranh → chỉ lấy mã đỏ.
+    # Chú giải HAI CỘT "Hiện trạng | Quy hoạch" (Diên Khánh, Thông tư 08/2024): cột Quy hoạch ghi mã ĐỎ trong ô màu quy hoạch; cột Hiện trạng
+    # ghi mã đen. Nhóm đất CHƯA SỬ DỤNG (MCS, CSD, BCS, DCS, CGT, NCS) có màu ở cột Hiện trạng nhưng ô Quy hoạch để TRẮNG → mã đen của nhóm này
+    # KHÔNG được định màu quy hoạch (trước: màu xanh hồ chứa #b4ffff bị gán thêm MCS → 178 ha hồ chứa thành "nhóm"). Mã khác giữ cả hai cột:
+    # thử "chỉ lấy mã đỏ" thì mất SKN (chữ đỏ SKN ở cột Quy hoạch đọc sót) → 87 ha cụm công nghiệp thành "nhóm".
+    CHUA_SD = {'MCS', 'CSD', 'BCS', 'DCS', 'CGT', 'NCS'}
     co_do_ngoai = any(x[4] for x in ngoai_hinh)
-    ngoai += [(t, cx, cy, sz) for t, cx, cy, sz, do_ in ngoai_hinh if do_ or not co_do_ngoai]
+    ngoai += [(t, cx, cy, sz) for t, cx, cy, sz, do_ in ngoai_hinh if do_ or not co_do_ngoai or t not in CHUA_SD]
     print(f'nhan ve bang hinh: {so_nh} trong ranh, {len(ngoai_hinh)} ngoai ranh'
-          f'{" (chu giai: chi lay ma DO = cot Quy hoach)" if co_do_ngoai else ""} (tu {NHAN_HINH})')
+          f'{" (chu giai: bo ma DEN nhom chua su dung)" if co_do_ngoai else ""} (tu {NHAN_HINH})')
 # CHÚ GIẢI = mã ngoài ranh có cỡ chữ TO hơn hẳn nhãn trên bản đồ (Cam Ranh: chú giải 5,1–5,5; nhãn 4,1–4,5).
 # Mã ngoài ranh cỡ chữ như nhãn = nhãn của huyện bên cạnh → bỏ (trước đọc lẫn nên màu đường giao thông ra 8 mã).
 co_nhan = sorted(n[6] for n in nhan)
@@ -413,10 +415,12 @@ TEN.update({'LUA': 'Đất trồng lúa', 'LUK': 'Đất trồng lúa nước c�
 # Tên NHÓM (màu chú giải dùng chung nhiều mã): chỉ đặt tên khi MỌI mã trong nhóm cùng một họ; ngoài ra liệt kê mã.
 HO = [({'LUA', 'LUC', 'LUK', 'LUN'}, 'Đất trồng lúa'),
       ({'RSX', 'RSN', 'RPH', 'RDD', 'RST', 'RSM', 'LNP'}, 'Đất rừng (bản vẽ chưa ghi rõ loại rừng)'),
+      # nhóm chỉ gồm mặt nước chuyên dùng / ven biển (Nha Trang: MNC + MVK cùng màu) — đừng gọi là "thuỷ lợi, sông suối, nuôi trồng"
+      ({'MNC', 'TVC', 'MCS', 'MVB', 'MBV', 'MVT', 'MVK', 'MVR'}, 'Mặt nước chuyên dùng hoặc mặt nước ven biển (bản vẽ chưa ghi rõ loại)'),
       ({'DTL', 'NTS', 'SON', 'MNC', 'MVB', 'MBV', 'TVC', 'DCT', 'MVT', 'MVK', 'MVR'}, 'Mặt nước – thuỷ lợi, sông suối hoặc nuôi trồng thuỷ sản (bản vẽ chưa ghi rõ)'),
       ({'DBV', 'DCH', 'DDT', 'DDL', 'DGD', 'DKH', 'DKV', 'DNL', 'DSH', 'DTS', 'DTT', 'DVH', 'DXH', 'DYT', 'PNK', 'SKC', 'SKK',
         'SKN', 'SKS', 'SKX', 'TIN', 'TMD', 'TON', 'TSC', 'DSK', 'DCK', 'DRA', 'DNG', 'TSK',
-        'CSK', 'SCC', 'SCT', 'CCC', 'DPC', 'DDD', 'DSN', 'DMT', 'DKT', 'DGT', 'DTL', 'DCT', 'DHT'},
+        'CSK', 'SCC', 'SCT', 'CCC', 'DPC', 'DDD', 'DSN', 'DMT', 'DKT', 'DGT', 'DTL', 'DCT', 'DHT', 'PNN'},   # PNN: tiêu đề nhóm phi nông nghiệp (Diên Khánh)
        'Đất công trình công cộng, dịch vụ, sản xuất (bản vẽ chưa ghi rõ loại)')]
 def ten_ma(m):
     if not m.startswith('NHOM:'): return TEN.get(m, m)

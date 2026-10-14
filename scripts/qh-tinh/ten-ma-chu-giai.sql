@@ -34,3 +34,15 @@ UPDATE qh_pdf AS z SET ten = t.ten FROM (VALUES
   ('CGT', 'Đất do Nhà nước thu hồi theo quy định của pháp luật đất đai chưa giao, chưa cho thuê'), ('BCS', 'Đất bằng chưa sử dụng'),
   ('DCS', 'Đất đồi núi chưa sử dụng'), ('MCS', 'Đất có mặt nước chưa sử dụng')
 ) AS t(ma, ten) WHERE z.ban = 'dienkhanh2030' AND z.ma = t.ma;
+
+-- Nhóm CHỈ gồm mặt nước chuyên dùng / ven biển (Nha Trang: MNC + MVK cùng màu, Diên Khánh: MNC + TVC + MCS) — tên chung "thuỷ lợi, sông suối
+-- hoặc nuôi trồng thuỷ sản" sai nghĩa với nhóm này (boc_loai_dat.py đã sửa cho lần bóc sau; câu dưới sửa luôn dữ liệu đã nạp).
+UPDATE qh_pdf SET ten = 'Mặt nước chuyên dùng hoặc mặt nước ven biển (bản vẽ chưa ghi rõ loại)'
+ WHERE ma LIKE 'NHOM:%' AND string_to_array(substr(ma, 6), '/') <@ ARRAY['MNC','TVC','MCS','MVB','MBV','MVT','MVK','MVR'];
+
+-- Nhóm màu hồng cá hồi (đất công trình công cộng, dịch vụ, sản xuất) có kèm mã TIÊU ĐỀ nhóm của Thông tư 08 (PNN, CCC, CSK, SCC, DSN…)
+-- — trước đặt tên "Nhóm đất chưa rõ loại (…)" vì PNN chưa nằm trong họ mã (Diên Khánh 515 ha).
+UPDATE qh_pdf SET ten = 'Đất công trình công cộng, dịch vụ, sản xuất (bản vẽ chưa ghi rõ loại)'
+ WHERE ma LIKE 'NHOM:%' AND ten LIKE 'Nhóm đất chưa rõ loại%' AND string_to_array(substr(ma, 6), '/') <@ ARRAY['DBV','DCH','DDT','DDL','DGD','DKH',
+   'DKV','DNL','DSH','DTS','DTT','DVH','DXH','DYT','PNK','SKC','SKK','SKN','SKS','SKX','TIN','TMD','TON','TSC','DSK','DCK','DRA','DNG','TSK',
+   'CSK','SCC','SCT','CCC','DPC','DDD','DSN','DMT','DKT','DGT','DTL','DCT','DHT','PNN'];

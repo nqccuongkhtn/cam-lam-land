@@ -939,6 +939,14 @@ export default function MapPage() {
   // (chủ dự án 14/10/2026: "chọn địa giới rồi hiện quy hoạch ở địa giới đó thôi để đỡ loạn"). Mặc định Cam Lâm.
   const [vungQh, setVungQh] = useState<string>('cam-lam');
   const mucHienThi = useMemo(() => MUC_QH.filter((o) => o.vung === vungQh), [vungQh]);
+  // LỚP DỮ LIỆU riêng Cam Lâm (vd "Ranh Thôn Cam Lâm Tháng 7/2026") CHỈ HIỆN khi địa giới đang chọn là Cam Lâm
+  // (chủ dự án 14/10/2026). Đổi sang vùng khác thì tắt luôn lớp đó trên bản đồ. "Ranh giới xã" là cả tỉnh nên vẫn hiện.
+  const laLopCamLam = (ten: string) => /cam\s*l[aâ]m/i.test(String(ten || '').normalize('NFC'));
+  const layersHienThi = useMemo(() => layers.filter((l) => vungQh === 'cam-lam' || !laLopCamLam(l.name)), [layers, vungQh]);
+  useEffect(() => {
+    if (vungQh === 'cam-lam') return;
+    setVisible((v) => { const tat = layers.filter((l) => laLopCamLam(l.name) && v[l.slug]); if (!tat.length) return v; const n = { ...v }; for (const l of tat) n[l.slug] = false; return n; });
+  }, [vungQh, layers]);
   const [qhFillOn, setQhFillOn] = useState(false);        // TẮT mặc định — giống Guland: hiển thị bằng ẢNH raster. Bật tay nếu muốn lấp chỗ trống.
   // 'all' = gộp cả 3 kịch bản (phủ kín nhất). Từng kịch bản riêng lẻ chỉ phủ một phần.
   const [qhScenario, setQhScenario] = useState<'all' | 'HT' | '2030' | '2045'>('all');
@@ -1973,11 +1981,10 @@ export default function MapPage() {
     };
     const ra: ReturnType<typeof trangQhCuaThua> = [];
     for (const muc of MUC_QH) {
-      // (13/10/2026) BỎ dòng QĐ205 "Quy hoạch chung 2045" khỏi bảng thông tin thửa theo yêu cầu chủ dự án:
-      // QĐ205 là quy hoạch CHUNG (đô thị mới Cam Lâm), chỉ có cho huyện Cam Lâm cũ — không phải loại đất
-      // theo từng thửa. Giữ lại lớp ảnh QĐ205 trên bản đồ + phiếu trích lục; chỉ ẩn ở bảng thông tin thửa.
-      // Cần bật lại thì bỏ comment dòng dưới:
-      // if (muc.id === 'qh-qd205' && info.overlaps?.length) ra.push({ muc, tieuDe: 'Quy hoạch chung 2045', areas: gop(info.overlaps as any), bangMau: 'qd205' });
+      // Trang "Quy hoạch chung 2045" (QĐ205) của thửa Cam Lâm — PHẢI GIỮ. 13/10/2026 phiên trước hiểu nhầm lời dặn "bỏ dòng
+      // 'Hiện mới có Quy hoạch chung đô thị mới Cam Lâm đến 2045 (QĐ 205/QĐ-TTg)…'" thành bỏ cả trang này; chủ dự án hỏi lại
+      // 14/10 "sao xoá mất cái Cam Lâm". Thứ phải bỏ chỉ là CÂU ghi chú cho thửa ngoài vùng (xem khối qhNgoaiVung).
+      if (muc.id === 'qh-qd205' && info.overlaps?.length) ra.push({ muc, tieuDe: 'Quy hoạch chung 2045', areas: gop(info.overlaps as any), bangMau: 'qd205' });
       if (muc.id === 'phan-khu') {
         const ban = cacBan.filter((b) => PK.includes(String(b.ma)));
         const areas = gop(ban.flatMap((b) => b.areas || []));
@@ -2291,7 +2298,7 @@ export default function MapPage() {
               ))}
             </div>
           )}
-          {layers.map((l) => (
+          {layersHienThi.map((l) => (
             <div key={l.slug} className="flex items-center gap-2.5 py-1.5 text-sm">
               <input type="checkbox" checked={visible[l.slug] ?? false} onChange={(e) => setVisible((v) => ({ ...v, [l.slug]: e.target.checked }))} className="accent-emerald-600 w-4 h-4" />
               <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: (l.style?.color as string) || DEFAULT_COLORS[l.layerType] }} />
@@ -2731,7 +2738,7 @@ export default function MapPage() {
                       {layers.length === 0 && !ranhXa && (
                         <p className="px-3 py-3 text-[14px] text-[#8a8a8e]">Đang tải các lớp…</p>
                       )}
-                      {layers.map((l) => {
+                      {layersHienThi.map((l) => {
                         const bat = visible[l.slug] ?? false;
                         return (
                           <div key={l.slug} className="flex min-h-[42px] items-center gap-3 border-b border-black/10 px-3 py-1.5 last:border-b-0">
@@ -3255,9 +3262,8 @@ export default function MapPage() {
                 {/* Cách liệt kê cũ từng bản một khối (khoiQh) — MÁY TÍNH ĐÃ CHUYỂN SANG TRANG LƯỚT NGANG ở trên
                     (14/9/2026). Giữ lại ẩn phòng khi cần quay về; muốn bỏ hẳn thì xoá khối này + hàm khoiQh. */}
                 <div className="hidden">
-                {/* (14/10/2026) QĐ205 đã bỏ khỏi bảng thông tin thửa (xem trangQhCuaThua) — khối cũ này cũng bỏ theo.
                 {info.parcel && info.overlaps && info.overlaps.length > 0
-                  && khoiQh('Quy hoạch chung 2045 · QĐ205', info.overlaps, 'qd205')} */}
+                  && khoiQh('Quy hoạch chung 2045 · QĐ205', info.overlaps, 'qd205')}
 
                 {/* MỘT THỬA THƯỜNG DÍNH NHIỀU BẢN QUY HOẠCH CHỒNG LÊN NHAU: QĐ205 trùm cả huyện,
                     bên trong còn quy hoạch sử dụng đất QĐ893 và các bản phân khu 1/2000.
@@ -3272,7 +3278,7 @@ export default function MapPage() {
                 {/* Ngoài huyện Cam Lâm cũ thì CHƯA có số liệu quy hoạch tính theo từng thửa. Nói thẳng ra, vì trước đây
                     máy chủ đoán bừa mọi thửa ngoài vùng thành "Đất giao thông" phủ kín cả thửa.
                     (14/10/2026) Bỏ câu "Hiện mới có Quy hoạch chung đô thị mới Cam Lâm đến 2045 (QĐ 205/QĐ-TTg)…" theo yêu cầu
-                    chủ dự án — cùng đợt bỏ QĐ205 khỏi bảng thông tin thửa. Ghi "tính theo từng thửa" vì vài huyện/thị đã có
+                    chủ dự án (CHỈ bỏ câu này — trang QĐ205 của thửa Cam Lâm vẫn giữ). Ghi "tính theo từng thửa" vì vài huyện/thị đã có
                     ẢNH bản đồ QHSDĐ 2030 (nút Lớp Q.Hoạch), chỉ chưa có số diện tích theo thửa. */}
                 {info.parcel && info.qhNgoaiVung && (
                   <div className="mt-2 pt-1.5 border-t border-slate-100">

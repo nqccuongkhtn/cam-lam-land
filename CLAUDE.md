@@ -811,8 +811,9 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   `grid_vec.py` dò đường lưới vector → lưu `<pdf>.nan.json`. CÒN KHÓ: Diên Khánh/Khánh Vĩnh (lưới không phải
   nét đơn → nắn tay QGIS). Chi tiết `scripts/qh-tinh/README.md`.
   Lưu ý: 3 lớp mới CHỈ có ẢNH tile, CHƯA tích hợp tính quy hoạch theo thửa (phần đó vẫn chỉ Cam Lâm).
-  Đã bỏ dòng "Quy hoạch chung 2045 (QĐ205)" khỏi bảng thông tin thửa (chủ dự án yêu cầu: QĐ205 là QH chung,
-  chỉ có cho Cam Lâm cũ) — xem comment ở `trangQhCuaThua` trong `app/map/page.tsx`.
+  Bảng thông tin thửa: chỉ BỎ CÂU "Hiện mới có Quy hoạch chung đô thị mới Cam Lâm đến 2045 (QĐ 205)…" (thửa ngoài vùng);
+  trang "Quy hoạch chung 2045 (QĐ205)" của thửa Cam Lâm PHẢI GIỮ (13/10 từng bỏ nhầm, chủ dự án hỏi lại 14/10).
+  Trang bản đồ có ô "Địa giới" lọc danh sách lớp QH theo huyện/thị (`VUNG_QH`); lớp dữ liệu tên có "Cam Lâm" chỉ hiện ở Cam Lâm.
 
 ---
 

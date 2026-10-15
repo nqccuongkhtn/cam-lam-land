@@ -505,6 +505,7 @@ Chủ dự án: "trả phí chia ra là các chức năng chung, còn trả phí
   để xem chứ liên hệ admin cái gì"). Hộp "liên hệ admin" (`hopKhoa`) chỉ còn cho trường hợp đã có gói mà vé chưa tải kịp.
 - **Chức năng riêng**: gói số tin đăng · gói đẩy tin · video (`lib/packages.ts`) · quảng cáo bản đồ (bảng `map_ads`, thẻ "Quảng cáo" — gắn
   theo nhà quảng cáo, không theo tài khoản).
+- **Hết hạn + khách tự xem gói** (chủ dự án hỏi 15/10/2026): mỗi gói một cột hạn (`goi_chung_het_han`, `post_expires_at`, `boost_expires_at`, `video_expires_at`); máy chủ so với giờ hiện tại MỖI lần dùng tính năng → tới hạn tự khoá, không cần việc chạy nền. Khách xem ở `/account#goi-cua-toi` (`components/GoiCuaToi.tsx`, mục "Gói của tôi" trong trình đơn tài khoản): gói thành viên + gói riêng + 20 đơn gần nhất (đơn chờ hiện nội dung chuyển khoản), còn ≤ 7 ngày nhắc gia hạn. CHƯA có nhắc qua email / thông báo đẩy.
 - **Quản trị** (`/admin` → Người dùng): cột "Trả phí" + khung **Quản lý trả phí**: gói thành viên (chọn gói → Kích hoạt = ghi đơn `ADMIN-<mã>`
   ở thẻ Thanh toán; "Cộng tay" số ngày — dùng thử / bù ngày, không ghi đơn; Thu hồi), gói riêng (kích hoạt / thu hồi). Ô "Chỉ tài khoản trả
   phí". Máy chủ: `POST /api/admin/users/:id/goi-chung {ngay}` · `/kich-hoat {packageId}` · `/thu-hoi {loai}`. Áp dụng ngay (`quenVaiTro`).

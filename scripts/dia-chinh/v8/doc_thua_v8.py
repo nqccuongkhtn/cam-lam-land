@@ -54,6 +54,8 @@ BO_NET = [LOI, LOI + ('Level 60',), LOI + ('Level 60', 'Level 46', 'Level 24', '
           LOI + ('Level 60', 'Level 46', 'Level 24', 'Level 30', 'Level 55')]
 MOI_LEVEL = set(x for b in BO_NET for x in b)
 SAI_NHAN = 0.15                                  # m² — nhãn làm tròn 0,1
+SAI_NHAN_CHAN = 0.55                             # m² — nhãn ghi diện tích SỐ CHẴN (làm tròn 1 m²)
+sai_cua = lambda v: v[3] if len(v) > 3 else SAI_NHAN
 GIONG_HINH_M, GIONG_DT_M2 = 0.05, 0.1
 
 def vn_sang_he_thong(g):                          # VN-2000 (m) → WGS84 + độ trượt hệ thống
@@ -85,7 +87,10 @@ def so_thap_phan(s):
     try: return float(s.strip().replace(',', '.'))
     except ValueError: return None
 
-LV_SO = ('Level 4', 'Level 51', 'Level 5', 'Level 13')      # lớp hay ghi số thửa (thứ tự ưu tiên khi tờ không có ô nhãn)
+LV_SO = ('Level 4', 'Level 51', 'Level 15', 'Level 5', 'Level 13')   # lớp hay ghi số thửa (thứ tự ưu tiên khi hoà điểm)
+BAN_KINH_KHOP_M = 60                                         # lượt ghép theo diện tích: mặt phải cách chỗ ghi số ≤ 60 m
+# KHÔNG BAO GIỜ là ranh thửa: nhà, nét khác, lưới / khung ngoài, khung, mép đường nhựa, chữ / nhãn, tâm thửa
+KHONG_RANH = ('Level 14', 'Level 50', 'Level 63', 'Level 62', 'Level 22', 'Level 13', 'Level 11')
 KHONG_PHAI_SO = ('Level 63', 'Level 55', 'Level 62')         # số lưới toạ độ / số hiệu tờ / khung
 BUNG_KHOI = ('Level 10', 'Level 23', 'Level 31', 'Level 32', 'Level 1', 'Level 9', 'Level 60')   # khối đặt trên level ranh → bung ra nét
 def doc_to(p):
@@ -95,11 +100,17 @@ def doc_to(p):
     for e in msp:
         L, t = e.dxf.layer, e.dxftype()
         if t == 'INSERT':
-            tx = [v.dxf.text.strip() for v in e.virtual_entities() if v.dxftype() == 'TEXT' and v.dxf.text.strip()]
-            dt = next((so_thap_phan(x) for x in tx if re.fullmatch(r'\d+[.,]\d+', x)), None)
-            sh = next((x for x in tx if re.fullmatch(r'\d+(-\d+)?', x)), None)
-            if sh and dt is not None:             # ô nhãn: số nguyên = số thửa, thập phân = diện tích, có chữ cái = loại đất
-                if sh not in nhan: nhan[sh] = (next((x for x in tx if re.search(r'[A-Za-z]', x)), ''), dt)
+            tx = [(v.dxf.text.strip(), v.dxf.insert) for v in e.virtual_entities() if v.dxftype() == 'TEXT' and v.dxf.text.strip()]
+            ma = next((x for x, _ in tx if re.search(r'[A-Za-z]', x)), '')
+            tps = [(so_thap_phan(x), q) for x, q in tx if re.fullmatch(r'\d+[.,]\d+', x)]
+            nguyen = sorted(((x, q) for x, q in tx if re.fullmatch(r'\d+(-\d+)?', x)), key=lambda t: -t[1][1])   # trên xuống dưới
+            sh = dt = None
+            sai = SAI_NHAN
+            if nguyen and tps: sh, q = nguyen[0]; dt = tps[0][0]
+            elif len(nguyen) >= 2 and ma and re.fullmatch(r'\d+', nguyen[-1][0]):   # diện tích ghi số chẵn (vd tờ 337 "6804"): số trên, diện tích dưới
+                (sh, q), dt = nguyen[0], float(nguyen[-1][0]); sai = SAI_NHAN_CHAN
+            if sh and dt is not None:             # ô nhãn: số thửa + diện tích (+ loại đất) + CHỖ ĐẶT nhãn + sai số cho phép
+                if sh not in nhan: nhan[sh] = (ma, dt, Point(q[0], q[1]), sai)
                 continue
             if L not in BUNG_KHOI: continue          # ký hiệu (cây, cột điện, tâm thửa…) — không phải nét ranh
         if t in ('LINE', 'LWPOLYLINE', 'POLYLINE', 'INSERT'): doc_net(e, net[L])
@@ -113,26 +124,42 @@ def doc_to(p):
                 if re.fullmatch(r'\d+(-\d+)?', s): so_lop[L].append((s, pt, h))
                 elif re.fullmatch(r'\d+[.,]\d+', s): tp_lop[L].append((so_thap_phan(s), pt, h))
                 elif re.fullmatch(r'[A-Z][A-Z+,\- ]*[A-Z]', s): chu_lop[L].append((s, pt, h))
-    # NHÃN RỜI (không đóng thành khối): số nguyên + số thập phân ngay dưới (≤ 4 lần cỡ chữ) cùng lớp = số thửa + diện tích
+    # NHÃN RỜI (không đóng thành khối): số nguyên + số ngay DƯỚI (≤ 4 lần cỡ chữ) cùng lớp = số thửa + diện tích. Diện tích số chẵn
+    # (tờ 311: "2983") chỉ nhận khi có mã loại đất ở gần — tránh ghép nhầm hai số bất kỳ.
     for L, ds in so_lop.items():
-        tps = tp_lop.get(L, [])
-        if not tps: continue
+        tps = tp_lop.get(L, []); cs = chu_lop.get(L, [])
         for sh, pt, h in ds:
             if sh in nhan: continue
-            gan = [(pt.distance(q), dt) for dt, q, _ in tps if abs(q.x - pt.x) <= 4 * max(h, 0.1) and 0 < pt.y - q.y <= 4 * max(h, 0.1)]
-            if gan:
-                ma = min(((pt.distance(q), c) for c, q, _ in chu_lop.get(L, []) if pt.distance(q) <= 8 * max(h, 0.1)), default=(0, ''))[1]
-                nhan[sh] = (ma, min(gan)[1])
+            hh = 4 * max(h, 0.1)
+            ma = min(((pt.distance(q), c) for c, q, _ in cs if pt.distance(q) <= 2 * hh), default=(0, ''))[1]
+            gan = [(pt.distance(q), dt) for dt, q, _ in tps if abs(q.x - pt.x) <= hh and 0 < pt.y - q.y <= hh]
+            sai = SAI_NHAN
+            if not gan and ma:
+                gan = [(pt.distance(q), float(x)) for x, q, _ in ds if x != sh and re.fullmatch(r'\d+', x) and abs(q.x - pt.x) <= hh and 0 < pt.y - q.y <= hh]
+                sai = SAI_NHAN_CHAN
+            if gan: nhan[sh] = (ma, min(gan)[1], pt, sai)
     return net, {L: [(s, pt) for s, pt, _ in ds] for L, ds in so_lop.items()}, loai, nhan, dem_cong
 
-def chon_lop_so(so_lop, nhan):
-    """Lớp số thửa của tờ (xét MỌI lớp): khớp nhiều nhất với số trong nhãn; không có nhãn → lớp LV_SO nhiều số nhất (≥ 3)"""
+def chon_lop_so(so_lop, nhan, mat_bo):
+    """Lớp số thửa của tờ (xét MỌI lớp) = lớp GHÉP ĐƯỢC NHIỀU THỬA NHẤT: đếm mặt chứa đúng MỘT số của lớp đó, lấy bộ nét cho điểm cao nhất
+    (tờ 113 khu phân lô: chỉ bộ nét cuối có nét chia lô); hoà thì lớp khớp nhiều số trong nhãn hơn, rồi theo thứ tự LV_SO. Lớp nhãn rời (số
+    thửa + diện tích số chẵn cùng lớp) tự thua vì mặt chứa 2 số."""
     uu = lambda L: -LV_SO.index(L) if L in LV_SO else -99
-    if nhan:
-        diem = {L: len(set(s for s, _ in ds) & set(nhan)) for L, ds in so_lop.items()}
-        tot = max(diem.items(), key=lambda kv: (kv[1], uu(kv[0])), default=(None, 0))
-        if tot[1] >= 3: return tot[0]
-    ung = [(len(so_lop.get(L, [])), uu(L), L) for L in LV_SO if len(so_lop.get(L, [])) >= 3]
+    cay_bo = [(m, STRtree(m)) for m in mat_bo if m]
+    diem = []
+    for L, ds in so_lop.items():
+        mot = 0
+        for mat0, cay in cay_bo:
+            trong = collections.defaultdict(set)
+            for x, p in ds:
+                hit = [i for i in cay.query(p) if mat0[i].contains(p)]
+                if hit: trong[min(hit, key=lambda i: mat0[i].area)].add(x)
+            mot = max(mot, sum(1 for v in trong.values() if len(v) == 1))
+        diem.append((mot, len(set(x for x, _ in ds) & set(nhan)), uu(L), L))
+    if not diem: return None
+    tot = max(diem)
+    if tot[0] or tot[1]: return tot[3]
+    ung = [(len(so_lop.get(L, [])), uu(L), L) for L in LV_SO if so_lop.get(L)]
     return max(ung)[2] if ung else None
 
 def lop_ranh_theo_web(net, ranh_web):
@@ -152,12 +179,18 @@ def lop_ranh_theo_web(net, ranh_web):
         elif ti_le >= 0.3: lan.append(L)
     return tuple(sorted(chinh)), tuple(sorted(lan))
 
-def ung_vien(net, so, bo_net):
-    """Mỗi bộ nét → {số thửa: mặt (gộp các chỗ ghi số đó) — chỉ khi mỗi mặt chứa DUY NHẤT số đó}"""
+def dung_bo(net, bo_net):
+    """Mỗi bộ nét → danh sách mặt khép kín (dựng một lần, dùng cho cả chọn lớp số, ghép theo số, ghép theo diện tích)"""
     ra_bo = []
     for bo in bo_net:
         ds = [g for L in bo for g in net[L]]
-        mat = [m for m in polygonize(unary_union(ds)) if m.area > 0.01] if ds else []
+        ra_bo.append([m for m in polygonize(unary_union(ds)) if m.area > 0.01] if ds else [])
+    return ra_bo
+
+def ung_vien(mat_bo, so):
+    """Mỗi bộ nét → {số thửa: mặt (gộp các chỗ ghi số đó) — chỉ khi mỗi mặt chứa DUY NHẤT số đó}"""
+    ra_bo = []
+    for mat in mat_bo:
         if not mat: ra_bo.append({}); continue
         cay = STRtree(mat); trong = collections.defaultdict(set); cho = collections.defaultdict(set)
         for s, p in so:
@@ -188,7 +221,6 @@ for f in tep:
     if str(N) not in bang['to']: print('BO QUA', f, '(khong co trong bang doi so to)'); continue
     xa_cu, to_cu = bang['to'][str(N)][0], str(bang['to'][str(N)][1])
     net, so_lop, loai, nhan, dem_cong = doc_to(os.path.join(thu_dxf, f))
-    lop_so = chon_lop_so(so_lop, nhan); so = so_lop.get(lop_so, [])
     ranh_web = [he_thong_sang_vn(shape(w['g'])).boundary for w in web_to.get((xa_cu, to_cu), [])]
     chinh, lan = lop_ranh_theo_web(net, ranh_web)
     # bộ nét: (0) CHỈ level ranh chuẩn → (1) + lớp dò theo web ≥ 80 % → (2) + lớp lẫn lộn → (3) + 46/24/30 → (4) + khung tờ / ranh khu.
@@ -200,35 +232,69 @@ for f in tep:
     b2 = co(b1 + ('Level 60',) + tuple(lan or ()))
     b3 = co(b2 + ('Level 46', 'Level 24', 'Level 30'))
     b4 = co(b3 + ('Level 55', 'Level 49'))     # khung tờ + ranh khu: chỉ để khép thửa đường / mương / rừng chạm mép
-    cac_bo = [b0, b1, b2, b3, b4]
+    # (5) BỘ NÉT CUỐI = mọi lớp có nét ≥ 50 m trừ KHONG_RANH — chỉ dùng khi diện tích KHỚP NHÃN (tờ 113: khu phân lô chia lô bằng
+    # level 12, mà ở Cam Đức level 12 lại là nét khác, nên không thể cho vào bộ nét thường)
+    b5 = co(b4 + tuple(sorted(L for L, ds in net.items() if L not in KHONG_RANH and sum(g.length for g in ds) >= 50)))
+    cac_bo = [b0, b1, b2, b3, b4, b5]
     bo_net = [b for i, b in enumerate(cac_bo) if b and b not in cac_bo[:i]]
-    uv = ung_vien(net, so, bo_net)
-    cac_so = list(dict.fromkeys(s for s, _ in so))
+    k_chi_khop = len(bo_net) - 1 if b5 and b5 not in cac_bo[:5] else -1   # bộ nét cuối: chỉ nhận mặt khớp nhãn
+    mat_bo = dung_bo(net, bo_net)
+    lop_so = chon_lop_so(so_lop, nhan, mat_bo); so = so_lop.get(lop_so, [])
+    uv = ung_vien(mat_bo, so)
+    # số thửa của tờ = số ở LỚP SỐ THỬA (đếm, báo chưa dựng). Số chỉ có ở NHÃN (thửa nhỏ ghi nhãn ngoài thửa, bảng "ghi chú các thửa đất
+    # nhỏ" bên lề) chỉ thử ở lượt ghép theo diện tích — ghép không được thì bỏ qua, không báo (tờ 139: 75 số là bảng ghi chú bên lề).
+    diem_so = {}
+    for x, p in so: diem_so.setdefault(x, p)
+    cac_so = list(diem_so)
+    nhan_ngoai = [x for x, v in nhan.items() if x not in diem_so and len(v) > 2 and v[2] is not None]
+    for x in nhan_ngoai: diem_so[x] = nhan[x][2]
+    cach = {}
     # chọn mặt: (1) thửa có nhãn — bộ nét ít level nhất mà diện tích khớp nhãn; (2) còn lại — bộ nét ít level nhất có mặt
     chon = {}
     for s in cac_so:
         dtn = nhan.get(s, ('', None))[1]
         if dtn is None: continue
         for k, kq in enumerate(uv):
-            if s in kq and abs(kq[s].area - dtn) <= SAI_NHAN: chon[s] = (kq[s], k, True); break
+            if s in kq and abs(kq[s].area - dtn) <= sai_cua(nhan[s]): chon[s] = (kq[s], k, True); break
     da = unary_union([g for g, *_ in chon.values()]) if chon else None
     for s in cac_so:
         if s in chon: continue
         for k, kq in enumerate(uv):
-            if s not in kq: continue
+            if s not in kq or k == k_chi_khop: continue
             g = kq[s]
             if da is not None and g.intersection(da).area > max(0.5, 0.01 * g.area): continue
             dtn = nhan.get(s, ('', None))[1]
             chon[s] = (g, k, None if dtn is None else False); da = g if da is None else unary_union([da, g]); break
+    # LƯỢT GHÉP THEO DIỆN TÍCH: số còn sót mà có diện tích nhãn → mặt (mọi bộ nét) trong vòng BAN_KINH_KHOP_M quanh chỗ ghi số / nhãn,
+    # diện tích khớp nhãn (≤ SAI_NHAN), không chứa số thửa KHÁC, không đè thửa đã nhận; nhiều mặt thì lấy mặt gần nhất.
+    moi_diem = [p for _, p in so] + [v[2] for v in nhan.values() if len(v) > 2 and v[2] is not None]
+    cay_bo = [STRtree(m) if m else None for m in mat_bo]
+    for s in cac_so + nhan_ngoai:
+        if s in chon or nhan.get(s, ('', None))[1] is None: continue
+        dtn = nhan[s][1]; goc = [diem_so[s]] + ([nhan[s][2]] if len(nhan[s]) > 2 and nhan[s][2] is not None else [])
+        ung = []
+        for k, (mat, cay) in enumerate(zip(mat_bo, cay_bo)):
+            if cay is None: continue
+            for g0 in goc:
+                for i in cay.query(g0.buffer(BAN_KINH_KHOP_M)):
+                    m = mat[i]
+                    if abs(m.area - dtn) > sai_cua(nhan[s]): continue
+                    so_trong = set(x for x, p in so if m.contains(p)) | set(x for x, v in nhan.items() if len(v) > 2 and v[2] is not None and m.contains(v[2]))
+                    if so_trong - {s}: continue
+                    if da is not None and m.intersection(da).area > 0.5: continue
+                    ung.append((m.distance(g0), k, m))
+        if ung:
+            _, k, m = min(ung, key=lambda t: (t[0], t[1]))
+            chon[s] = (m, k, True); cach[s] = 'khop-dien-tich'; da = m if da is None else unary_union([da, m])
     for s in cac_so:
         if s not in chon:
-            p = next(p for x, p in so if x == s)
+            p = diem_so[s]
             khong_dung.append({'toMoi': N, 'xaCu': xa_cu, 'toCu': to_cu, 'thua': s, 'x': round(p.x, 2), 'y': round(p.y, 2)})
     dem = collections.Counter(); gap_web = set()
     vung_to = unary_union([g for g, *_ in chon.values()]).buffer(0.5) if chon else None
     for s, (g, k, khop) in chon.items():
         if g.geom_type == 'MultiPolygon' and len(g.geoms) == 1: g = g.geoms[0]
-        p_so = next(p for x, p in so if x == s)
+        p_so = diem_so[s]
         ma_trong = [(x, q.distance(p_so)) for x, q in loai if g.contains(q)]
         ma = min(ma_trong, key=lambda t: t[1])[0] if ma_trong else nhan.get(s, ('', None))[0]
         dt_nhan = nhan.get(s, ('', None))[1]; dt_hinh = g.area
@@ -236,6 +302,7 @@ for f in tep:
                 'dienTich_m2': dt_nhan if dt_nhan is not None else round(dt_hinh, 1), 'mucDichSuDung': ma, 'nhan': f'Tờ {to_cu}, thửa {s}',
                 'toMoi': str(N), 'dienTichHinh': round(dt_hinh, 2), 'nguon': f'dc{N}.dgn', 'boNet': k + 1}
         if khop is not None: prop['khopNhan'] = khop
+        if s in cach: prop['cachDung'] = cach[s]
         ws = web_so.get((xa_cu, to_cu, s), [])
         if ws:
             gap_web.update(w['id'] for w in ws)
@@ -265,11 +332,12 @@ for f in tep:
             dong_dc.append([N, bang['tenXa'][xa_cu], to_cu, w['thua'], 'web-co-ban-ve-khong', w.get('mdsd') or '', '', '', w.get('dt') or '', '', '', '', '', ''])
     co_nhan = sum(1 for s in chon if nhan.get(s, ('', None))[1] is not None)
     khop_nhan = sum(1 for s, (_, _, kh) in chon.items() if kh)
+    them_nhan = sum(1 for x in nhan_ngoai if x in chon)
     tong.append({'toMoi': N, 'xaCu': bang['tenXa'][xa_cu], 'toCu': to_cu, 'lopSo': lop_so, 'lopRanh': list(bo_net[0]),
-                 'lopLan': [x for x in bo_net[-1] if x not in bo_net[0]], 'soThuaBanVe': len(cac_so), 'dungDuoc': len(chon),
-                 'chuaDung': len(cac_so) - len(chon), 'coNhanDienTich': co_nhan, 'khopNhan': khop_nhan, 'congTron': dem_cong, **dem})
+                 'lopLan': [x for x in bo_net[-1] if x not in bo_net[0]], 'soThuaBanVe': len(cac_so) + them_nhan, 'dungDuoc': len(chon),
+                 'chuaDung': len(cac_so) - (len(chon) - them_nhan), 'dungTuNhan': them_nhan, 'coNhanDienTich': co_nhan, 'khopNhan': khop_nhan, 'congTron': dem_cong, **dem})
     print(f"to {N:3d} ({bang['tenXa'][xa_cu]} to {to_cu}) [so: {lop_so} | ranh: {','.join(x.replace('Level ', '') for x in bo_net[0])}]: "
-          f"so {len(cac_so)}, dung {len(chon)}, chua {len(cac_so) - len(chon)}, "
+          f"so {len(cac_so) + them_nhan}, dung {len(chon)}, chua {len(cac_so) - (len(chon) - them_nhan)}, "
           f"khop nhan {khop_nhan}/{co_nhan} | " + ', '.join(f'{k} {v}' for k, v in sorted(dem.items())))
 
 for xa, fs in ra_xa.items():

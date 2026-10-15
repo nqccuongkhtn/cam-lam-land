@@ -38,7 +38,7 @@ export default function GoiCuaToi() {
   return (
     <div id="goi-cua-toi" className="scroll-mt-20 bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="font-bold text-[#0A2540]">Gói của tôi</h2>
+        <h2 className="font-bold text-[#0A2540]">Gói dịch vụ của tôi</h2>
         <Link href="/dichvu#thanh-vien" className="shrink-0 text-[13px] font-semibold text-[#0A2540] underline">Bảng giá</Link>
       </div>
 

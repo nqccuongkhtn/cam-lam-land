@@ -501,7 +501,7 @@ Chủ dự án: "trả phí chia ra là các chức năng chung, còn trả phí
   để xem chứ liên hệ admin cái gì"). Hộp "liên hệ admin" (`hopKhoa`) chỉ còn cho trường hợp đã có gói mà vé chưa tải kịp. **Chưa đăng nhập** thì `HopTraPhi` KHÔNG hiện mà mở thẳng hộp ĐĂNG NHẬP ("… là tính năng dành cho thành viên — vui lòng đăng nhập trước"; chủ dự án: "lỗi logic" khi khách chưa có tài khoản được mời mua gói); nút trang khoá trong bảng thửa ghi "Đăng nhập để xem".
 - **Chức năng riêng**: gói số tin đăng · gói đẩy tin · video (`lib/packages.ts`) · quảng cáo bản đồ (bảng `map_ads`, thẻ "Quảng cáo" — gắn
   theo nhà quảng cáo, không theo tài khoản).
-- **Hết hạn + khách tự xem gói** (chủ dự án hỏi 15/10/2026): mỗi gói một cột hạn (`goi_chung_het_han`, `post_expires_at`, `boost_expires_at`, `video_expires_at`); máy chủ so với giờ hiện tại MỖI lần dùng tính năng → tới hạn tự khoá, không cần việc chạy nền. Khách xem ở `/account#goi-cua-toi` (`components/GoiCuaToi.tsx`, mục "Gói của tôi" trong trình đơn tài khoản): gói thành viên + gói riêng + 20 đơn gần nhất (đơn chờ hiện nội dung chuyển khoản), còn ≤ 7 ngày nhắc gia hạn. CHƯA có nhắc qua email / thông báo đẩy.
+- **Hết hạn + khách tự xem gói** (chủ dự án hỏi 15/10/2026): mỗi gói một cột hạn (`goi_chung_het_han`, `post_expires_at`, `boost_expires_at`, `video_expires_at`); máy chủ so với giờ hiện tại MỖI lần dùng tính năng → tới hạn tự khoá, không cần việc chạy nền. Khách xem ở `/account#goi-cua-toi` (`components/GoiCuaToi.tsx`, mục "Gói dịch vụ của tôi" trong trình đơn tài khoản — đổi tên 15/10/2026): gói thành viên + gói riêng + 20 đơn gần nhất (đơn chờ hiện nội dung chuyển khoản), còn ≤ 7 ngày nhắc gia hạn. CHƯA có nhắc qua email / thông báo đẩy.
 - **Quản trị** (`/admin` → Người dùng): cột "Trả phí" + khung **Quản lý trả phí**: gói thành viên (chọn gói → Kích hoạt = ghi đơn `ADMIN-<mã>`
   ở thẻ Thanh toán; "Cộng tay" số ngày — dùng thử / bù ngày, không ghi đơn; Thu hồi), gói riêng (kích hoạt / thu hồi). Ô "Chỉ tài khoản trả
   phí". Máy chủ: `POST /api/admin/users/:id/goi-chung {ngay}` · `/kich-hoat {packageId}` · `/thu-hoi {loai}`. Áp dụng ngay (`quenVaiTro`).
@@ -951,8 +951,10 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   nạp bằng `to_mau_1_500.py nap-sql` (xoá sạch rồi nạp lại). `/api/parcels/at` gửi mục `ma:'ct500'` có loại đất + diện tích CHỈ cho admin
   (`nguoiDungTuYeuCau` kiểm thẻ đầy đủ; trả `Cache-Control: private, no-store`); người khác chỉ nhận `{ma:'ct500', khoa:true, areas:[]}`
   khi thửa nằm trong ranh → trang có khoá "Liên hệ admin để xem". Cách tính như qhPdf.ts: thửa dịch LECH_DIA_CHINH, đo elipxoit rồi đổi
-  tỷ lệ về diện tích sổ (các dòng cộng đúng bằng thửa); trong ranh không có lô = Đất giao thông; ngoài ranh = ngoài phạm vi. KHÔNG in phiếu
-  (lọc `nguon '1/500'` như PDF). Kiểm 15/10: 50 thửa tổng khớp diện tích sổ, đối chiếu cắt hình mặt phẳng VN-2000 lệch ≤ 0,11 m²/dòng.
+  tỷ lệ về diện tích sổ (các dòng cộng đúng bằng thửa); trong ranh không có lô = Đất giao thông; ngoài ranh = ngoài phạm vi. PHIẾU KIỂM TRA
+  QUY HOẠCH IN CẢ 1/500 (15/10/2026 tối, chủ dự án: "xuất phiếu kiểm tra quy hoạch đang thiếu quy hoạch" — trước lọc bỏ `nguon '1/500'`):
+  dòng căn cứ ở trang chính + một trang phụ lục trên ảnh lớp tô màu (đường có vé); căn cứ = TRÍCH YẾU NGUYÊN VĂN từng quyết định chép ở
+  trang đầu bản quét, trường `tenQd` trong danh-sach.json (ghi bằng `scripts/qh-tinh/ten_qd_1_500.py`, máy chủ gửi kèm vé). Kiểm 15/10: 50 thửa tổng khớp diện tích sổ, đối chiếu cắt hình mặt phẳng VN-2000 lệch ≤ 0,11 m²/dòng.
   **DẢI HẸP HƠN 7 cm = SAI SỐ VẼ (15/10/2026, chủ dự án hỏi Thửa 1449 · Tờ 157 "đâu ra đất tái định cư" rồi dặn "tự nghiên cứu làm đúng
   100 %"):** mẩu "Đất ở tái định cư 0,8 m²" là dải 6,3 cm × 13,4 m dọc viền thửa — lô TĐC thửa bên cạnh lấn vài cm. Đo góc lô 1/500 vẽ
   theo ranh thửa: lệch góc thửa địa chính +0,538 m Đông / +0,143 m Bắc ở 4 đồ án = đúng độ trượt `LECH_DIA_CHINH` (sai ~5 mm) → hệ toạ độ

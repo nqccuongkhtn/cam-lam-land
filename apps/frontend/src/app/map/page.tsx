@@ -456,8 +456,9 @@ const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: s
 const TL_QH = '/tai-lieu/quy-hoach/';
 // `loai` = loại văn bản ghi ở dòng đầu thẻ (mặc định "Quyết định"); `cac` = nhiều văn bản cho CÙNG một lớp (1/500 chính thức: 6 quyết định)
 // → thẻ liệt kê từng văn bản, mỗi dòng một đường mở bản gốc.
+// `cac[].tenQd` = trích yếu NGUYÊN VĂN của quyết định (lớp riêng 1/500 — scripts/qh-tinh/ten_qd_1_500.py), phiếu in dòng căn cứ từ đây
 type CanCu = { so: string; ngay: string; coQuan: string; ten: string; tep: string; loai?: string;
-  cac?: { so: string; ngay: string; ten: string; tep: string }[] };
+  cac?: { so: string; ngay: string; ten: string; tep: string; tenQd?: string }[] };
 // Thẻ căn cứ cho bản QHSDĐ 2030 do Sở NN&MT đăng: dòng đầu = quyết định phê duyệt, bên dưới hai dòng mở bản gốc (quyết định + bản đồ)
 const SNNMT = 'https://snnmt.khanhhoa.gov.vn';
 function qdQhsdd(so: string, ngay: string, ten: string, tepQd: string, tenBanDo: string, tepBanDo: string): CanCu {
@@ -3748,21 +3749,37 @@ export default function MapPage() {
                         const hzA: Record<string, number> = {};
                         for (const x of (overlaps || []) as any[]) if (x?.hz) hzA[String(x.hz)] = (hzA[String(x.hz)] || 0) + (Number(x.areaM2) || 0);
                         const pieceHz = Object.keys(hzA).sort((a, b) => hzA[b] - hzA[a])[0] || mapScen;
-                        // PHỤ LỤC: mỗi bản quy hoạch KHÁC đè lên thửa một trang trích lục trên ảnh của chính bản đó (lib/phieuQh.ts)
-                        const phuLuc = (((info as any).qhCacBan || []) as any[]).filter((bn) => bn?.nguon !== 'pdf' && bn?.nguon !== '1/500').map((bn) => {
+                        // PHỤ LỤC: mỗi bản quy hoạch KHÁC đè lên thửa một trang trích lục trên ảnh của chính bản đó (lib/phieuQh.ts).
+                        // QH CHI TIẾT 1/500 (15/10/2026, chủ dự án: "xuất phiếu kiểm tra quy hoạch đang thiếu quy hoạch" — bảng thông tin thửa có
+                        // 1/500 mà phiếu không in, vì trước đây 1/500 chỉ admin xem): nay in như các bản khác — ảnh = lớp riêng tô màu (đường có
+                        // vé), căn cứ = trích yếu NGUYÊN VĂN từng quyết định (`tenQd` trong danh-sach.json, gửi kèm vé). Mục 1/500 bị khoá thì bỏ.
+                        const cacBan = (((info as any).qhCacBan || []) as any[]).filter((bn) => bn && bn.nguon !== 'pdf'
+                          && !(bn.nguon === '1/500' && (bn.khoa || !(bn.areas || []).length)));
+                        const dongQd = (so: string, ngay: string, coQuan: string, ten: string) =>   // "tháng 8/2024" (không rõ ngày) thì không ghi chữ "ngày"
+                          `Quyết định số ${so} ${/^\d/.test(ngay) ? 'ngày ' : ''}${ngay} của ${coQuan} về việc ${ten.charAt(0).toLowerCase()}${ten.slice(1)}`;
+                        const phuLuc = cacBan.map((bn) => {
                           const ma = String(bn.ma);
-                          const id = /^\d+$/.test(ma) ? 'qh-qd' + ma : 'qh-' + ma;
-                          // ảnh lấy từ danh sách ĐANG DÙNG (phân khu bị khoá → đường có vé), bỏ phần tên miền vì phiếu tự ghép gốc trang
-                          const tile = tuongDoi(((rasterOverlaysRef.current.find((x) => x.id === id) as any)?.tiles || [])[0] as string | undefined);
-                          const cc = CAN_CU_QH[id];
+                          const id = ma === 'ct500' ? (['qh-ct500-mau', 'qh-ct500'].find((k) => rasterOverlaysRef.current.some((x) => x.id === k)) || 'qh-ct500-mau')
+                            : /^\d+$/.test(ma) ? 'qh-qd' + ma : 'qh-' + ma;
+                          // ảnh lấy từ danh sách ĐANG DÙNG (phân khu bị khoá → đường có vé), bỏ phần tên miền vì phiếu tự ghép gốc trang.
+                          // Không có ảnh vẫn trả mục (tile rỗng): phiếu bỏ trang phụ lục nhưng dòng căn cứ ở trang chính vẫn đủ số, ngày, cơ quan.
+                          const tile = tuongDoi(((rasterOverlaysRef.current.find((x) => x.id === id) as any)?.tiles || [])[0] as string | undefined) || '';
+                          const cc = canCuQh[id];
+                          if (ma === 'ct500') {   // thửa vắt qua hai đồ án → máy chủ ghi "2044/QĐ-UBND · 2048/QĐ-UBND"
+                            const dsQd = String(bn.qd || '').split('·').map((s) => s.trim()).filter(Boolean);
+                            const vb = dsQd.map((so) => cc?.cac?.find((v) => v.so === so)).filter(Boolean) as NonNullable<CanCu['cac']>;
+                            return { ma, tile,
+                              tieuDe: `${dsQd.length ? dsQd.map((so) => 'QĐ' + so.split('/')[0]).join(' + ') + ' — ' : ''}Quy hoạch chi tiết 1/500`,
+                              canCu: vb.length ? vb.map((v) => dongQd(v.so, v.ngay, cc!.coQuan, v.tenQd || `Phê duyệt Quy hoạch chi tiết (tỷ lệ 1/500) ${v.ten}`)).join('; ')
+                                : `Quy hoạch chi tiết 1/500${dsQd.length ? ' — Quyết định số ' + dsQd.join(', ') : ''}`,
+                              areas: (bn.areas || []) as { type: string; areaM2: number; mau?: string }[] };   // màu ô do máy chủ gửi (lib/qh500.ts)
+                          }
                           const bang = ma === '893' ? 'qd893' : 'phankhu';
-                          return tile ? {
-                            ma, tile, tieuDe: String(bn.ten || ma),
-                            canCu: cc ? `Quyết định số ${cc.so} ngày ${cc.ngay} của ${cc.coQuan} về việc ${cc.ten.charAt(0).toLowerCase()}${cc.ten.slice(1)}` : String(bn.ten || ma),
-                            areas: ((bn.areas || []) as { type: string; areaM2: number }[]).map((a) => ({ ...a, mau: mauQh?.[bang]?.[a.type] })),
-                          } : null;
-                        }).filter(Boolean) as any[];
-                        const html = phieuQhHtml({ parcel: info.parcel as any, geometry: g, overlaps, qhCacBan: (((info as any).qhCacBan || []) as any[]).filter((bn) => bn?.nguon !== 'pdf' && bn?.nguon !== '1/500'), qhPieces: manh ? manh.map((m) => ({ lo: m.lo, c: mauQh?.qd205?.[m.lo], ring: m.ring })) : qhPiecesFor(g, pieceHz), roadFeats: roadFeatsFor(g), neighbors: (info as any).neighbors || [], point: info.point, user: user as any, scenario: mapScen, roadHz: pieceHz, phuLuc,
+                          return { ma, tile, tieuDe: String(bn.ten || ma),
+                            canCu: cc ? dongQd(cc.so, cc.ngay, cc.coQuan, cc.ten) : String(bn.ten || ma),
+                            areas: ((bn.areas || []) as { type: string; areaM2: number }[]).map((a) => ({ ...a, mau: mauQh?.[bang]?.[a.type] })) };
+                        });
+                        const html = phieuQhHtml({ parcel: info.parcel as any, geometry: g, overlaps, qhCacBan: cacBan, qhPieces: manh ? manh.map((m) => ({ lo: m.lo, c: mauQh?.qd205?.[m.lo], ring: m.ring })) : qhPiecesFor(g, pieceHz), roadFeats: roadFeatsFor(g), neighbors: (info as any).neighbors || [], point: info.point, user: user as any, scenario: mapScen, roadHz: pieceHz, phuLuc,
                           tile205: tuongDoi(((rasterOverlaysRef.current.find((x) => x.id === 'qh-qd205') as any)?.tiles || [])[0]) });
                         try { win.document.open(); win.document.write(html); win.document.close(); win.focus(); } catch { /* */ }
                       };

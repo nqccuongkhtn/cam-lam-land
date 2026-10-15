@@ -3,6 +3,8 @@
 # Lớp 1/500 chính thức Cam Lâm: 6 đồ án, QĐ 2043–2048/QĐ-UBND ngày 25/9/2026 của UBND xã Cam Lâm (số, ngày, tên đọc từ trang đầu
 # bản quét quyết định). Khung bao lấy từ ranh lập quy hoạch của chính 6 bản vẽ (ranh_1_500_dxf.py).
 # Dùng: python -P lap_danh_sach_qh_rieng.py <thu_muc_ranh> <ra danh-sach.json>
+# ⚠️ Lập lại xong PHẢI chạy thêm ten_qd_1_500.py <ra danh-sach.json> — ghi trích yếu NGUYÊN VĂN từng quyết định (`tenQd`) mà phiếu
+#    kiểm tra quy hoạch in ở dòng căn cứ (15/10/2026); `ten` ở đây chỉ là tên khu rút gọn.
 import sys, os, json
 sys.stdout.reconfigure(encoding='utf-8')
 from shapely.geometry import shape

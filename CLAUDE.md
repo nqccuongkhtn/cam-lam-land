@@ -339,6 +339,12 @@ có bảng "Tìm thấy N thửa trùng số" cho người dùng chọn, mỗi d
 Cam An). Hai xã sau là ĐƠN VỊ GỐC (Cam Hiệp / Cam An kế thừa mã) nên trước bị coi là xã mới nguyên vẹn → 1.928 thửa trên tờ bị
 ranh cắt gán sai, đã chia lại bằng `scripts/dia-chinh/chia-thua-to-bi-cat.sql` (giá trị cũ lưu ở `dia_chinh_xa_moi_sao_luu`).
 **Nạp lại dữ liệu địa chính thì chạy lại file SQL đó sau `nap-bang-so-to.mjs`.**
+⚠️ **1.473 thửa có xã mới KHÔNG nằm trong bảng tra** (rà 15/10/2026 tối, chỉ đọc, CHƯA sửa): 9 cặp (xã cũ, tờ) — Cam Hòa tờ 1 (579 thửa),
+56 (132), 8 (49), 9 (15) đang gán **Cam Hiệp** trong khi `dia_chinh_to` ghi các tờ đó thuộc **Xã Cam Lâm + Suối Dầu**; Suối Tân tờ 18 (363),
+16 (271), 41 (30), 49 (30), 32 (4) đang gán **Suối Dầu / Cam Hiệp** trái với bảng (Cam Hiệp + Xã Cam Lâm). Bộ bản đồ V8 "Xã Cam Lâm" có đủ các
+tờ Cam Hòa này (vd tờ mới 246 = Cam Hòa tờ 1, 490 thửa V8 nằm trên chính các thửa web đang gán Cam Hiệp) → nghiêng về bảng tra đúng, phần
+"ước lượng theo vị trí" sai ở 9 cặp này. Câu kiểm: thửa có `xa_moi_id` không thuộc mảng xã mới của (xa_cu_id, to_cu) trong `dia_chinh_to`.
+Chờ chủ dự án quyết trước khi sửa (đụng bảng `dia_chinh`).
 Với các xã này phải xét **TỪNG THỬA**: thửa gần thửa của xã mới nào nhất thì thuộc xã đó, và **chỉ so với
 danh sách xã mới được phép** (khai trong `bi_chia`) nên không gán nhảy lung tung. Đây là **ước lượng
 theo vị trí**, không phải theo văn bản — chỗ duy nhất trong hệ thống không có căn cứ pháp lý tuyệt đối.

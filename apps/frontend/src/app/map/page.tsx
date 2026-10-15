@@ -400,7 +400,8 @@ const VUNG_QH: { id: string; ten: string; tenNgan: string; tamXem: [number, numb
 // `zBay` = mức phóng bay tới khi chọn bản này mà đang nhìn xa hơn (không ghi thì tự tính = minzoom − 1).
 // `pdf` = mã bản trong bảng qh_pdf (máy chủ lib/qhPdf.ts): thửa trong vùng bản này có trang "Quy hoạch sử dụng đất 2030"
 //   tính từ vùng loại đất BÓC TỪ BẢN ĐỒ PDF của Sở (14/10/2026) — chỉ tham khảo, không in phiếu.
-const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: string[]; zBay?: number; vung: string; pdf?: string }[] = [
+// `khoa` = dòng lớp CHỈ ADMIN hiện cho người khác xem tên (máy chủ GET /api/qh-rieng/gioi-thieu): bấm vào là hộp "liên hệ admin", không bật gì.
+const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: string[]; zBay?: number; vung: string; pdf?: string; khoa?: boolean }[] = [
   { id: 'qh-qd205', ten: 'Quy hoạch chung 2045 (QĐ205)', tenNgan: 'QH chung 205', tenApp: 'Quy hoạch chung 2045', gom: ['qh-qd205'], zBay: 10, vung: 'cam-lam' },   // chủ dự án cho thử z10 (14/9/2026)
   { id: 'phan-khu', ten: 'Quy hoạch phân khu 1/2000', tenNgan: 'Phân khu 1/2000', tenApp: 'QHXD Phân khu', gom:['qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin', 'qh-taynam', 'qh-taybac'], vung: 'cam-lam' },
   { id: 'qh-qd893', ten: 'Quy hoạch sử dụng đất 2030 (QĐ893)', tenNgan: 'Sử dụng đất 893', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-qd893'], vung: 'cam-lam' },
@@ -767,6 +768,16 @@ export default function MapPage() {
     api<{ ve: string; lop: LopRieng[] }>('/qh-rieng/ve').then((r) => { if (con) setLopRieng(r?.ve ? r : null); }).catch(() => { if (con) setLopRieng(null); });
     return () => { con = false; };
   }, [laQuanTri]);
+  // 15/10/2026 chủ dự án: lớp 1/500 "vẫn hiện ra chỗ chọn nhưng chỉ tài khoản admin được chọn, còn những tài khoản khác thì hiện popup
+  // liên hệ admin". Máy chủ gửi TÊN lớp nào được phép lộ tên (GET /api/qh-rieng/gioi-thieu — chỉ tên + khu vực, không có ô / vé) →
+  // hiện thành dòng có ổ khoá; bấm vào mở hộp `hopKhoa`. Ô ảnh vẫn đòi vé của admin nên biết tên cũng không tải được gì.
+  const [lopKhoa, setLopKhoa] = useState<{ id: string; ten: string; tenNgan: string; tenApp: string; vung: string }[]>([]);
+  const [hopKhoa, setHopKhoa] = useState<string | null>(null);   // tên lớp vừa bấm mà không có quyền xem
+  useEffect(() => {
+    let con = true;
+    api<{ lop: typeof lopKhoa }>('/qh-rieng/gioi-thieu').then((r) => { if (con) setLopKhoa(Array.isArray(r?.lop) ? r.lop : []); }).catch(() => {});
+    return () => { con = false; };
+  }, []);
   // Gộp lớp riêng vào ba danh sách tĩnh (RASTER_OVERLAYS · MUC_QH · CAN_CU_QH). Địa chỉ ô ghi ĐẦY ĐỦ (có tên miền) như ô địa chính.
   const rasterOverlays = useMemo<typeof RASTER_OVERLAYS>(() => {
     if (!lopRieng?.lop?.length) return RASTER_OVERLAYS;
@@ -777,8 +788,16 @@ export default function MapPage() {
       coordinates: [[l.khung[0], l.khung[3]], [l.khung[2], l.khung[3]], [l.khung[2], l.khung[1]], [l.khung[0], l.khung[1]]] as [[number, number], [number, number], [number, number], [number, number]] }))];
   }, [lopRieng]);
   const rasterOverlaysRef = useRef(rasterOverlays); rasterOverlaysRef.current = rasterOverlays;
-  const mucQh = useMemo<typeof MUC_QH>(() => [...MUC_QH, ...(lopRieng?.lop || []).map((l) => ({ id: l.id, ten: l.ten, tenNgan: l.tenNgan, tenApp: l.tenApp,
-    gom: [l.id], zBay: l.zBay, vung: l.vung }))], [lopRieng]);
+  const mucQh = useMemo<typeof MUC_QH>(() => {
+    const rieng = (lopRieng?.lop || []).map((l) => ({ id: l.id, ten: l.ten, tenNgan: l.tenNgan, tenApp: l.tenApp, gom: [l.id], zBay: l.zBay, vung: l.vung }));
+    const daCo = new Set(rieng.map((l) => l.id));
+    // dòng có khoá: lớp admin đã có thật thì thôi (không hiện hai dòng). `gom` giữ đúng mã lớp (không để rỗng — mảng rỗng
+    // thì `gom.every(...)` luôn đúng, dòng sẽ tưởng là đang bật).
+    const khoa = lopKhoa.filter((l) => !daCo.has(l.id)).map((l) => ({ id: l.id, ten: l.ten, tenNgan: l.tenNgan, tenApp: l.tenApp, gom: [l.id], vung: l.vung, khoa: true }));
+    return [...MUC_QH, ...rieng, ...khoa];
+  }, [lopRieng, lopKhoa]);
+  // Bấm một dòng quy hoạch: dòng có khoá → hộp "liên hệ admin", không bật lớp nào.
+  const bamMucQh = (o: (typeof MUC_QH)[number], bat: boolean) => { if (o.khoa) { setHopKhoa(o.tenApp || o.ten); return; } chonLopQh(o, bat); };
   const canCuQh = useMemo(() => {
     const ve = encodeURIComponent(lopRieng?.ve || '');
     // bản quét quyết định nằm ở thư mục riêng trên máy chủ → mở qua /api/qh-rieng/tai-lieu/<tên>?v=<vé>
@@ -2339,10 +2358,10 @@ export default function MapPage() {
                     khi đó chỉ còn ảnh nền — nhìn thực địa để đối chiếu. */}
                 {/* Ô VUÔNG cho đồng bộ với các lớp dữ liệu bên dưới, nhưng vẫn chỉ chọn được MỘT:
                     tích lớp này là các lớp kia tự bỏ tích; bỏ tích thì tắt hết, chỉ còn ảnh nền. */}
-                <input type="checkbox" checked={o.gom.every((id) => !!ovOn[id])}
-                  onChange={(e) => chonLopQh(o, e.target.checked)}
+                <input type="checkbox" checked={!o.khoa && o.gom.every((id) => !!ovOn[id])}
+                  onChange={(e) => bamMucQh(o, e.target.checked)}
                   className="accent-emerald-600 w-4 h-4 rounded-sm" />
-                <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 bg-amber-500" /><span className="min-w-0 flex-1 text-slate-700 leading-snug">{o.ten}</span>
+                <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 bg-amber-500" /><span className="min-w-0 flex-1 text-slate-700 leading-snug">{o.ten}{o.khoa && <span className="ml-1 text-[11px]" aria-label="chỉ quản trị viên">🔒</span>}</span>
               </label>
             ))}
             {/* Máy tính: thanh độ mờ nằm ở cột nút bên phải bản đồ (như điện thoại) → ẩn bản ở bảng này. */}
@@ -2794,12 +2813,12 @@ export default function MapPage() {
                   </div>
                   {mucHienThi.length === 0 && (<p className="px-4 py-3 text-center text-[13px] text-[#8a8a8e]">Chưa có bản quy hoạch cho địa giới này.</p>)}
                   {mucHienThi.map((o) => {
-                    const bat = o.gom.every((id) => !!ovOn[id]);
+                    const bat = !o.khoa && o.gom.every((id) => !!ovOn[id]);
                     const tenVung = VUNG_QH.find((v) => v.id === o.vung)?.tenNgan || '';
                     return (
-                      <button key={o.id} onClick={() => { chonLopQh(o, !bat); setQhSheet(false); }}
+                      <button key={o.id} onClick={() => { bamMucQh(o, !bat); setQhSheet(false); }}
                         className={`relative block w-full truncate whitespace-nowrap border-b border-black/10 px-8 py-[11px] text-center text-[14px] text-[#0A2540] active:bg-black/5 ${bat ? 'font-medium' : ''}`}>
-                        {bat && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] font-bold text-[#C8A14B]">✓</span>}{tenVung} · {o.tenApp}
+                        {bat && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] font-bold text-[#C8A14B]">✓</span>}{tenVung} · {o.tenApp}{o.khoa && <span className="ml-1 text-[12px]" aria-label="chỉ quản trị viên">🔒</span>}
                       </button>
                     );
                   })}
@@ -2842,6 +2861,28 @@ export default function MapPage() {
               </div>
             );
           })()}
+          {/* ── HỘP "LIÊN HỆ ADMIN" (15/10/2026): bấm dòng quy hoạch có khoá (lớp chỉ quản trị viên, vd QH chi tiết 1/500) ── */}
+          {hopKhoa && (
+            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 px-4 animate-[fadeIn_.15s_ease-out]" onClick={() => setHopKhoa(null)}>
+              <div role="dialog" aria-modal="true" aria-label="Chỉ quản trị viên được xem" className="w-full max-w-[340px] rounded-lg bg-white p-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                <p className="text-[15px] font-bold text-[#0A2540]">🔒 Chỉ quản trị viên được xem</p>
+                {laQuanTri ? (
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">Chưa tải được lớp <b>{hopKhoa}</b>. Tải lại trang hoặc đăng nhập lại rồi thử lần nữa.</p>
+                ) : (
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">Lớp <b>{hopKhoa}</b> hiện chỉ mở cho tài khoản quản trị. Muốn xem, vui lòng liên hệ admin Cam Lâm Land.</p>
+                )}
+                {!laQuanTri && (
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <a href="tel:0988888888" className="rounded bg-[#0A2540] py-2 text-center text-[13px] font-semibold text-white">📞 0988 888 888</a>
+                    <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="rounded border border-[#0068FF] py-2 text-center text-[13px] font-semibold text-[#0068FF]">Zalo admin</a>
+                    <button type="button" onClick={() => { setHopKhoa(null); try { window.dispatchEvent(new CustomEvent('cl-open-chat', { detail: { tab: 'support' } })); } catch { /* bỏ qua */ } }}
+                      className="col-span-2 rounded border border-slate-300 py-2 text-[13px] font-semibold text-[#0A2540]">💬 Nhắn tin cho admin</button>
+                  </div>
+                )}
+                <button type="button" onClick={() => setHopKhoa(null)} className="mt-2 w-full rounded py-2 text-[13px] font-semibold text-slate-500 active:bg-slate-100">Đóng</button>
+              </div>
+            </div>
+          )}
           {/* ── DANH SÁCH THỬA TÌM ĐƯỢC ── hiện khi có nhiều thửa cùng số tờ/số thửa.
               Rất hay gặp khi tra theo XÃ MỚI, vì một xã mới gộp nhiều xã cũ mà mỗi xã cũ
               lại có bộ số tờ/số thửa riêng — trùng số là chuyện bình thường. ── */}

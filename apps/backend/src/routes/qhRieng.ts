@@ -8,6 +8,7 @@
 //    (volume qh_rieng, chỉ backend đọc — docker-compose.yml);
 //  · GET /api/qh-rieng/ve (BẮT BUỘC admin) cấp VÉ ký HMAC gắn tài khoản, hạn 24 giờ, kèm danh sách lớp. Người khác gọi
 //    được 401/403, nên mã trang cũng không biết có lớp nào (danh sách không ghi cứng trong mã giao diện);
+//    riêng lớp có mục `congKhai` thì TÊN được hiện cho mọi người qua GET /gioi-thieu (15/10/2026) — bấm vào là hộp "liên hệ admin";
 //  · ô ảnh do bản đồ tự tải — không gửi kèm thẻ đăng nhập được — nên vé đi trong địa chỉ ô (?v=…), máy chủ kiểm TỪNG Ô;
 //  · trả 'Cache-Control: private' + nginx có luật riêng location /api/qh-rieng/ { proxy_cache off } → không lưu đệm
 //    chung ở nginx, Cloudflare không giữ (không phát nhầm cho người khác).
@@ -46,6 +47,19 @@ qhRiengRouter.get('/ve', adminRequired, (req: AuthedRequest, res) => {
   const than = `${req.user!.id}.${hetHan}`;
   res.set('Cache-Control', 'private, no-store');
   res.json({ ve: `${than}.${bam(than)}`, hetHan, lop: danhSach().lop || [] });
+});
+
+// GET /api/qh-rieng/gioi-thieu — CÔNG KHAI, ai cũng gọi được (15/10/2026). Chủ dự án: lớp 1/500 "vẫn hiện ra chỗ chọn nhưng chỉ tài
+// khoản admin được chọn, còn những tài khoản khác thì hiện popup liên hệ admin". Chỉ trả TÊN + khu vực của lớp nào trong danh-sach.json
+// có mục `congKhai` — KHÔNG có thư mục ô, khung, căn cứ, vé → biết tên cũng không tải được ô nào (ô vẫn đòi vé của admin).
+// Lớp không có `congKhai` (vd Tây Nha Trang 2.2 chờ xác minh quyết định) vẫn giấu hẳn như cũ.
+qhRiengRouter.get('/gioi-thieu', (_req, res) => {
+  const lop = (danhSach().lop || []).filter((l: any) => l && l.id && l.congKhai).map((l: any) => ({
+    id: String(l.id), vung: String(l.vung || ''),
+    ten: String(l.congKhai.ten || ''), tenNgan: String(l.congKhai.tenNgan || ''), tenApp: String(l.congKhai.tenApp || ''),
+  }));
+  res.set('Cache-Control', 'public, max-age=300');
+  res.json({ lop });
 });
 
 const TEN_THU_MUC = /^[a-z0-9][a-z0-9-]{0,40}$/;

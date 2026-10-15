@@ -849,6 +849,11 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   không ghi tên lớp), kiểm vé TỪNG Ô (`/api/qh-rieng/o/<thư mục>/z/x/y?v=`); nginx có `location /api/qh-rieng/ { proxy_cache off }`.
   Giao diện: `lopRieng` → `rasterOverlays` / `mucQh` / `canCuQh` trong `app/map/page.tsx`. Thêm lớp chỉ-admin mới = thêm vào
   `danh-sach.json` + `tiles/` của volume, KHÔNG khai trong page.tsx.
+  **Hiện TÊN cho mọi người (15/10/2026, chủ dự án: "vẫn hiện ra chỗ chọn nhưng chỉ tài khoản admin được chọn, còn lại hiện popup liên hệ
+  admin"):** lớp nào trong `danh-sach.json` có mục `congKhai` {ten, tenNgan, tenApp} thì `GET /api/qh-rieng/gioi-thieu` (công khai) trả TÊN
+  + khu vực — không thư mục ô, không khung, không vé. Giao diện hiện dòng có 🔒 (`lopKhoa`, `khoa: true` trong `mucQh`); bấm → hộp
+  `hopKhoa` "Chỉ quản trị viên được xem" (gọi / Zalo 0988 888 888 / nhắn tin). Hiện chỉ `qh-ct500` có `congKhai` (Tây NT 2.2 vẫn giấu hẳn).
+  Nhãn bỏ chữ "đã duyệt" theo lời chủ dự án. Tự kiểm 15/10 9h: gioi-thieu 200, ve 401, ô vé giả / không vé 403, `/tiles/` 404.
   ĐÃ LÊN WEB 14/10/2026 21:32 (tự kiểm qua tên miền thật: chưa đăng nhập 401, vé giả 403, `/tiles/` công khai 404, ô có vé hợp lệ trùng
   từng byte file gốc, Cloudflare `DYNAMIC` không giữ). Volume riêng hiện có 2 lớp: `qh-ct500` (1/500 chính thức) và `qh-nt-tay-pk22`
   (ĐC phân khu 1/2000 Tây Nha Trang tiểu PK 2.2, 377 ha — thuyết minh để TRỐNG số quyết định ⇒ "chưa xác minh", chờ chủ dự án quyết

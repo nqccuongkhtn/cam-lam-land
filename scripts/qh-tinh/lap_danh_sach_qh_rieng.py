@@ -20,7 +20,10 @@ gs = [shape(json.load(open(os.path.join(ranh_d, f'ranh-{t}.json'), encoding='utf
 x0, y0, x1, y1 = unary_union(gs).bounds
 lop = [{
     'id': 'qh-ct500', 'thuMuc': 'qhct500-v1',
-    'ten': 'QH chi tiết 1/500 · 6 đồ án đã phê duyệt (chỉ quản trị viên)', 'tenNgan': 'Chi tiết 1/500', 'tenApp': 'QH chi tiết 1/500 (đã duyệt)',
+    # 15/10/2026 chủ dự án: "bỏ chữ đã duyệt đi, vẫn hiện ra chỗ chọn nhưng chỉ tài khoản admin được chọn, còn lại hiện popup
+    # liên hệ admin" → `congKhai` = tên hiện cho MỌI NGƯỜI (máy chủ GET /api/qh-rieng/gioi-thieu, chỉ tên — ô ảnh vẫn chỉ admin).
+    'ten': 'QH chi tiết 1/500 · 6 đồ án (chỉ quản trị viên)', 'tenNgan': 'Chi tiết 1/500', 'tenApp': 'QH chi tiết 1/500',
+    'congKhai': {'ten': 'QH chi tiết 1/500 · 6 đồ án', 'tenNgan': 'Chi tiết 1/500', 'tenApp': 'QH chi tiết 1/500'},
     'vung': 'cam-lam', 'zBay': 12, 'minzoom': 12, 'maxzoom': 20,
     'khung': [round(x0 - 0.001, 5), round(y0 - 0.001, 5), round(x1 + 0.001, 5), round(y1 + 0.001, 5)],
     'canCu': {'so': '2043–2048/QĐ-UBND', 'ngay': '25/9/2026', 'coQuan': 'UBND xã Cam Lâm',

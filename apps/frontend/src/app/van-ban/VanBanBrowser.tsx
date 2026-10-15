@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useAuth, laAdmin } from '@/lib/auth';
+import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import { api, apiBase } from '@/lib/api';
 import { getToken } from '@/lib/token';
@@ -8,6 +8,7 @@ import { deEnt } from '@/lib/deEnt';   // làm sạch + giải mã chữ HTML �
 import { CHUDE_LIST, CHUDE_META, type ChuDeNhom, type VanBan } from './data';
 import XemVanBan, { type MoVanBan } from './XemVanBan';
 import { toast } from '@/lib/toast';
+import HopTraPhi from '@/components/HopTraPhi';
 
 const PER = 10;
 const kd = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
@@ -81,6 +82,9 @@ function SoXuong({ value, onChange, opts, w = '' }: { value: string; onChange: (
 
 export default function VanBanBrowser() {
   const { user } = useAuth();
+  // Quyền tra cứu văn bản (TÍNH NĂNG TRẢ PHÍ, 15/10/2026): admin · người quản lý văn bản · khách được cấp vai trò 'tracuuvb'.
+  const coQuyenVb = laAdmin(user as any) || coVaiTro(user as any, 'vanban', 'tracuuvb');
+  const [hopTraPhi, setHopTraPhi] = useState(false);
   const { openLogin } = useLoginGate();
   const [docs, setDocs] = useState<VanBan[] | null>(null);
   const [err, setErr] = useState('');
@@ -149,9 +153,10 @@ export default function VanBanBrowser() {
   // Mở KHUNG XEM ngay trong trang (không mở tab mới nữa — chủ dự án 6/10/2026)
   function taiPdf(d: VanBan) {
     if (!user) { openLogin(); return; }          // chưa đăng nhập → mở popup đăng nhập
+    if (!coQuyenVb) { setHopTraPhi(true); return; }   // TÍNH NĂNG TRẢ PHÍ (15/10/2026) — máy chủ cũng chặn tệp (403)
     if (!d.coFile) return;
     setDangXem({ id: d.id, ten: `${(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')} · ${d.trichYeu}`,
-      tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`, url: `${apiBase}/van-ban/${d.id}/pdf?v=9` /* v=9 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts) mới được giữ 30 ngày */, token: getToken() || '' });
+      tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`, url: `${apiBase}/van-ban/${d.id}/pdf?v=10` /* v=10 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts) mới được giữ 30 ngày */, token: getToken() || '' });
     setDocs((ds) => (ds || []).map((x) => x.id === d.id ? { ...x, luotTai: (x.luotTai || 0) + 1 } : x));
     doiDiaChi(d.id);
   }
@@ -176,6 +181,7 @@ export default function VanBanBrowser() {
     const d = docs.find((x) => x.id === vbCho);
     if (!d || !d.coFile) { setVbCho(null); toast.error('Văn bản trong đường dẫn không còn trên trang hoặc chưa có file.', 'Chưa mở được văn bản'); doiDiaChi(null); return; }
     if (!user) { if (!daHoiDangNhap.current) { daHoiDangNhap.current = true; openLogin(); } return; }
+    if (!coQuyenVb) { setVbCho(null); setHopTraPhi(true); return; }   // đường dẫn chia sẻ mà chưa có quyền → hộp "tính năng trả phí"
     setVbCho(null); taiPdf(d);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vbCho, docs, user]);
@@ -268,15 +274,15 @@ export default function VanBanBrowser() {
               {vis.map((d, i) => (
                 <tr key={d.id} className="border-t border-slate-100 even:bg-slate-50/60 hover:bg-amber-50/50 transition-colors">
                   <td className={`${td} text-center text-slate-400 hidden sm:table-cell`}>{(cur - 1) * PER + i + 1}</td>
-                  <td className={td}><span className="font-mono font-semibold text-[#0A2540] whitespace-nowrap" title={/^Không số/.test(d.soKyHieu || '') ? 'Văn bản không ghi số ký hiệu (danh sách, thông báo niêm yết…)' : undefined}>{(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')}</span></td>
+                  <td className={td}><span className={`font-mono font-semibold text-[#0A2540] whitespace-nowrap ${d.an ? 'blur-[3px] select-none' : ''}`} title={/^Không số/.test(d.soKyHieu || '') ? 'Văn bản không ghi số ký hiệu (danh sách, thông báo niêm yết…)' : undefined}>{(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')}</span></td>
                   <td className={`${td} text-center text-slate-500 hidden md:table-cell whitespace-nowrap`}>{d.luotTai != null ? d.luotTai.toLocaleString('vi-VN') : '—'}</td>
-                  <td className={`${td} text-slate-500 whitespace-nowrap hidden sm:table-cell`}>{fmtNgay(d.ngay)}</td>
+                  <td className={`${td} text-slate-500 whitespace-nowrap hidden sm:table-cell`}>{d.an ? <span className="blur-[3px] select-none">••/••/••••</span> : fmtNgay(d.ngay)}</td>
                   <td className={`${td} text-slate-500 hidden lg:table-cell`}>{d.coQuan}</td>
                   <td className={td}>
                     {d.coFile
                       ? <button onClick={() => taiPdf(d)} className="text-left text-[#0A2540] hover:text-[#C8A14B] font-medium leading-snug">{d.trichYeu}</button>
                       : <span className="text-[#0A2540] leading-snug">{d.trichYeu}</span>}
-                    <span className="block text-[11px] text-slate-400 mt-1 sm:hidden">{fmtNgay(d.ngay)} · {d.coQuan}{d.luotTai != null ? ` · ${d.luotTai.toLocaleString('vi-VN')} lượt tải` : ''}</span>
+                    <span className="block text-[11px] text-slate-400 mt-1 sm:hidden">{d.an ? <span className="blur-[3px] select-none">••/••/••••</span> : fmtNgay(d.ngay)} · {d.coQuan}{d.luotTai != null ? ` · ${d.luotTai.toLocaleString('vi-VN')} lượt tải` : ''}</span>
                   </td>
                   <td className={`${td} text-center`}>
                     {d.coFile
@@ -300,6 +306,7 @@ export default function VanBanBrowser() {
         </nav>
       )}
       {dangXem && <XemVanBan vb={dangXem} onDong={dongXem} onLoi={loiXem} />}
+      {hopTraPhi && <HopTraPhi ten="Tra cứu văn bản" onDong={() => setHopTraPhi(false)} />}
     </div>
   );
 }

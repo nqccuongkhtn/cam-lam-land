@@ -12,13 +12,14 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS tier           TEXT NOT NULL DEFAULT 
 ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar         TEXT;
 ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
 UPDATE users SET role='user' WHERE role='sales';
-ALTER TABLE users ADD  CONSTRAINT users_role_check CHECK (role IN ('user','admin','gis','vanban','hotlist','danhmuc','xacthuc'));
+-- 15/10/2026: thêm 'tracuuvb' (Tra cứu văn bản — trả phí) + 'denbu' (Tính giá đền bù — trả phí), admin cấp tay ở trang quản trị.
+ALTER TABLE users ADD  CONSTRAINT users_role_check CHECK (role IN ('user','admin','gis','vanban','hotlist','danhmuc','xacthuc','tracuuvb','denbu'));
 -- MỘT NGƯỜI CÓ THỂ GIỮ NHIỀU VAI TRÒ: cột roles là DANH SÁCH vai trò của tài khoản đó.
 -- Cột role cũ vẫn giữ, coi như "vai trò chính" (để chỗ nào chưa kịp đổi vẫn chạy bình thường).
 ALTER TABLE users ADD COLUMN IF NOT EXISTS roles TEXT[] NOT NULL DEFAULT '{}';
 UPDATE users SET roles = ARRAY[role] WHERE roles IS NULL OR cardinality(roles) = 0;
 ALTER TABLE users DROP CONSTRAINT IF EXISTS users_roles_check;
-ALTER TABLE users ADD  CONSTRAINT users_roles_check CHECK (roles <@ ARRAY['user','admin','gis','vanban','hotlist','danhmuc','xacthuc']::text[]);
+ALTER TABLE users ADD  CONSTRAINT users_roles_check CHECK (roles <@ ARRAY['user','admin','gis','vanban','hotlist','danhmuc','xacthuc','tracuuvb','denbu']::text[]);
 CREATE INDEX IF NOT EXISTS users_roles_idx ON users USING GIN (roles);
 CREATE TABLE IF NOT EXISTS email_verifications (
   id SERIAL PRIMARY KEY, email TEXT NOT NULL, code TEXT NOT NULL,

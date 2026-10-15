@@ -32,14 +32,15 @@ export const laAdmin = (u?: { role?: string | null; roles?: string[] | null } | 
  * Chọn "vai trò chính" để ghi vào cột role cũ: admin đứng trên hết, rồi tới các vai trò quản lý,
  * cuối cùng mới là khách. Nhờ vậy chỗ nào còn đọc mỗi cột role vẫn hiểu đúng quyền lớn nhất.
  */
-const THU_TU_VAI_TRO = ['admin', 'gis', 'vanban', 'hotlist', 'danhmuc', 'xacthuc', 'user'];
+const THU_TU_VAI_TRO = ['admin', 'gis', 'vanban', 'hotlist', 'danhmuc', 'xacthuc', 'tracuuvb', 'denbu', 'user'];
 export function vaiTroChinh(roles: string[]): string {
   for (const v of THU_TU_VAI_TRO) if (roles.includes(v)) return v;
   return 'user';
 }
 
 /** Lọc bỏ vai trò lạ và trùng lặp. Không còn vai trò nào hợp lệ thì mặc định là khách. */
-export const VAI_TRO_HOP_LE = ['user', 'admin', 'gis', 'vanban', 'hotlist', 'danhmuc', 'xacthuc'];
+// 'tracuuvb' = Tra cứu văn bản (trả phí), 'denbu' = Tính giá đền bù (trả phí) — 15/10/2026; nhớ thêm cả vào ràng buộc trong migrate.ts.
+export const VAI_TRO_HOP_LE = ['user', 'admin', 'gis', 'vanban', 'hotlist', 'danhmuc', 'xacthuc', 'tracuuvb', 'denbu'];
 export function chuanHoaVaiTro(ds: unknown): string[] {
   const ra = Array.isArray(ds) ? Array.from(new Set(ds.map((x) => String(x)).filter((x) => VAI_TRO_HOP_LE.includes(x)))) : [];
   return ra.length ? ra : ['user'];

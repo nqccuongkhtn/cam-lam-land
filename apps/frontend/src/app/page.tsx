@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api, apiBase, NO_IMG } from '@/lib/api';
 import dynamic from 'next/dynamic';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
+import HopTraPhi from '@/components/HopTraPhi';
 import { useLoginGate } from '@/lib/loginGate';
 import { getToken } from '@/lib/token';
 import type { MoVanBan } from './van-ban/XemVanBan';
@@ -181,19 +182,22 @@ function KhoiTraCuuVanBan({ onTim, tuNgoai }: { onTim: (tu: string) => void; tuN
 // Cột phải: 4 văn bản mới ban hành — GET /api/van-ban/moi-nhat (công khai, chỉ số hiệu · ngày · cơ quan · trích yếu).
 // Bấm một văn bản → MỞ KHUNG XEM NGAY TẠI TRANG CHỦ, y như trang /van-ban (chủ dự án 7/10/2026). Chưa đăng nhập thì
 // bật ô đăng nhập (file chỉ phát cho người đã đăng nhập). Văn bản chưa có file thật → sang trang tra cứu tìm sẵn số hiệu.
-type VbMoi = { id: number; soKyHieu: string; trichYeu: string; ngay: string | null; coQuan: string; coFile?: boolean };
+type VbMoi = { id: number; soKyHieu: string; trichYeu: string; ngay: string | null; coQuan: string; coFile?: boolean; an?: boolean };
 // tu = từ khoá đang tìm ở khối trái; rỗng thì hiện 4 văn bản mới như cũ.
 function VanBanMoiNhat({ tu, onXoa }: { tu: string; onXoa: () => void }) {
   const router = useRouter();
   const { user } = useAuth();
   const { openLogin } = useLoginGate();
   const [dangXem, setDangXem] = useState<MoVanBan | null>(null);
+  const [hopTraPhi, setHopTraPhi] = useState(false);
   function moXem(d: VbMoi) {
-    if (d.coFile === false) { router.push(`/van-ban?q=${encodeURIComponent(d.soKyHieu)}`); return; }   // /moi-nhat chỉ trả văn bản có file
-    if (!user) { openLogin({ reason: 'Đăng nhập để xem văn bản — miễn phí, chỉ mất vài giây.' }); return; }
+    if (d.coFile === false) { router.push(d.an ? '/van-ban' : `/van-ban?q=${encodeURIComponent(d.soKyHieu)}`); return; }   // số ký hiệu đã che → không đem đi tìm   // /moi-nhat chỉ trả văn bản có file
+    if (!user) { openLogin({ reason: 'Đăng nhập để xem văn bản.' }); return; }
+    // TÍNH NĂNG TRẢ PHÍ (15/10/2026): chưa có quyền tra cứu văn bản → sang /van-ban, trang đó hiện khung "liên hệ admin để đăng ký".
+    if (!(laAdmin(user as any) || coVaiTro(user as any, 'vanban', 'tracuuvb'))) { setHopTraPhi(true); return; }
     setDangXem({ id: d.id, ten: `${(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')} · ${d.trichYeu}`,
       tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`,
-      url: `${apiBase}/van-ban/${d.id}/pdf?v=9` /* v=9 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts), giống VanBanBrowser */, token: getToken() || '' });
+      url: `${apiBase}/van-ban/${d.id}/pdf?v=10` /* v=10 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts), giống VanBanBrowser */, token: getToken() || '' });
   }
   // Giải mã chữ HTML (&#253; → ý…) y như trang /van-ban — vài văn bản nguồn Công báo còn lưu kiểu này.
   const sach = (ds?: VbMoi[]) => (ds || []).map((d) => ({ ...d, soKyHieu: deEnt(d.soKyHieu), trichYeu: deEnt(d.trichYeu), coQuan: deEnt(d.coQuan) }));
@@ -227,12 +231,13 @@ function VanBanMoiNhat({ tu, onXoa }: { tu: string; onXoa: () => void }) {
         <button key={d.id} type="button" onClick={() => moXem(d)} className="group block w-full py-2.5 text-left">
           <div className="min-w-0">
             <p className="line-clamp-2 text-[15px] leading-snug text-slate-700 group-hover:text-red-600">{d.trichYeu}</p>
-            <p className="mt-1 truncate text-[12.5px] text-slate-500">{tu && <b className="font-semibold text-red-600">{d.soKyHieu} · </b>}{[d.ngay ? ngayVn(d.ngay) : '', d.coQuan].filter(Boolean).join(' · ')}</p>
+            <p className="mt-1 truncate text-[12.5px] text-slate-500">{tu && <b className={`font-semibold text-red-600 ${d.an ? 'blur-[3px] select-none' : ''}`}>{d.soKyHieu} · </b>}{d.an && <span className="blur-[3px] select-none">••/••/•••• · </span>}{[d.ngay ? ngayVn(d.ngay) : '', d.coQuan].filter(Boolean).join(' · ')}</p>
           </div>
         </button>
       ))}
       </div>
       {dangXem && <XemVanBan vb={dangXem} onDong={() => setDangXem(null)} onLoi={(m) => { setDangXem(null); alert(m); }} />}
+      {hopTraPhi && <HopTraPhi ten="Tra cứu văn bản" onDong={() => setHopTraPhi(false)} />}
       <div className="flex items-center justify-center gap-5 pt-3 pb-1 text-sm font-semibold">
         {tu && <button type="button" onClick={onXoa} className="text-slate-500 hover:text-red-600">✕ Bỏ tìm</button>}
         <Link href={trangChinh} className="flex items-center gap-1 text-red-600 hover:text-red-700">

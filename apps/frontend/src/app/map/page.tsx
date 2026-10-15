@@ -1059,16 +1059,10 @@ export default function MapPage() {
   type NhomChuGiai = { nhom: string; muc: { mau: string; tenDs: string[]; so: number }[] };
   const [chuGiai, setChuGiai] = useState<{ nhom: NhomChuGiai[]; ban: Record<string, NhomChuGiai[]> } | null>(null);
   const [chuGiaiOpen, setChuGiaiOpen] = useState(false);
-  // LỚP MẶC ĐỊNH (15/10/2026): QĐ893 — bản Cam Lâm duy nhất xem miễn phí (chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free").
-  // Người có vé (admin) mở bản đồ thì như trước: QĐ205 là lớp chính (đúng màu/ký hiệu gốc) — đổi sang khi vé về, nếu chưa tự chọn lớp.
+  // LỚP MẶC ĐỊNH (15/10/2026): QĐ893 — bản Cam Lâm duy nhất xem miễn phí (chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free") — cho MỌI
+  // tài khoản, kể cả admin (chủ dự án "đưa 2030 lên đầu", "đang mở 893 mà"): trước admin tự đổi sang QĐ205 khi vé về — đã bỏ.
   // Các lớp khác MẶC ĐỊNH TẮT: chồng lên nhau thì màu chồng màu. Người dùng tự tích vào mới hiện.
   const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': false, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd918': false, 'qh-cuhin': false, 'qh-taynam': false, 'qh-taybac': false, 'qh-qd893': true, 'qh-ninhhoa2030': false, 'qh-nhatrang2030': false, 'qh-khanhson2030': false, 'qh-vanninh2030': false, 'qh-camranh2030': false, 'qh-dienkhanh2030': false, 'qh-khanhvinh2030': false });
-  const daChonLop = useRef(false);   // người dùng đã tự chọn lớp / địa giới → không tự đổi lớp nữa
-  useEffect(() => {
-    if (!lopRieng?.ve || daChonLop.current) return;
-    setOvOn((cu) => (cu['qh-qd893'] && !Object.entries(cu).some(([k, v]) => v && k !== 'qh-qd893'))
-      ? { ...Object.fromEntries(Object.keys(cu).map((k) => [k, false])), 'qh-qd205': true } : cu);
-  }, [lopRieng]);
   // ĐỊA GIỚI đang chọn để LỌC danh sách lớp quy hoạch — giờ nhiều bản quá, gom theo huyện/thị cho gọn
   // (chủ dự án 14/10/2026: "chọn địa giới rồi hiện quy hoạch ở địa giới đó thôi để đỡ loạn"). Mặc định Cam Lâm.
   const [vungQh, setVungQh] = useState<string>('cam-lam');
@@ -1317,7 +1311,6 @@ export default function MapPage() {
   // nhưng từ khi ba bản phân khu được ghép lại thì lớp nào cũng phủ gần kín huyện — tự nhảy khung chỉ
   // làm người xem mất chỗ đang xem.
   const chonLopQh = useCallback((muc: { gom: string[]; zBay?: number }, bat: boolean) => {
-    daChonLop.current = true;
     const tat: Record<string, boolean> = Object.fromEntries(rasterOverlaysRef.current.map((x) => [x.id, false]));
     if (bat) for (const id of muc.gom) tat[id] = true;
     setOvOn(tat);
@@ -1375,7 +1368,6 @@ export default function MapPage() {
   // rồi BAY TỚI tâm địa giới đó cho người xem thấy ngay mình đang ở đâu. Không tự bật lớp nào —
   // để người xem tự chọn bản muốn xem trong vùng (tránh chồng màu loạn).
   const doiVung = useCallback((idVung: string) => {
-    daChonLop.current = true;
     setVungQh(idVung);
     setOvOn(Object.fromEntries(rasterOverlaysRef.current.map((x) => [x.id, false])));  // tắt overlay vùng cũ cho khỏi chồng
     const v = VUNG_QH.find((x) => x.id === idVung);

@@ -15,7 +15,7 @@ export const CAM_LAM = {
 //   gis     · quản lý lớp bản đồ         vanban  · quản lý văn bản pháp luật
 //   hotlist · quản lý danh sách nóng
 // ('sales' đã bỏ từ lâu — migrate.ts tự đổi các tài khoản cũ sang 'user'.)
-export type Role = 'user' | 'admin' | 'gis' | 'vanban' | 'hotlist' | 'danhmuc';
+export type Role = 'user' | 'admin' | 'gis' | 'vanban' | 'hotlist' | 'danhmuc' | 'xacthuc' | 'tracuuvb' | 'denbu';
 export type UserTier = 'free' | 'paid';
 export type PropertyType = 'land' | 'house' | 'apartment' | 'villa' | 'commercial' | 'farm';
 export type ListingStatus = 'active' | 'pending' | 'sold' | 'hidden';

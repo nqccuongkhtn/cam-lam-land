@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
+import HopTraPhi from '@/components/HopTraPhi';
 import {
   DEN_BU_NGUON, DU_AN_PHUC_HOP, GIA_LUA_2VU, GIA_NONG_NGHIEP, GIA_PHUC_HOP, GIA_RUNG_SAN_XUAT,
   BANG_GIA_NN, TEN_NGAN_LOAI_DAT, TEN_VI_TRI_PH, dsThon, giaBangGiaNN, giaDenBu, type LoaiDat, type ViTriPH,
@@ -8,7 +10,7 @@ import {
   GAO_KG_THANG, soThangOnDinh,
 } from '@/lib/denBuCamLam';
 
-const tien = (v: number) => Math.round(v).toLocaleString('vi-VN') + ' đ';
+const tienGoc = (v: number) => Math.round(v).toLocaleString('vi-VN') + ' đ';
 const so = (s: string) => {
   const v = parseFloat(s.replace(/\./g, '').replace(',', '.'));
   return Number.isFinite(v) && v > 0 ? v : 0;
@@ -32,6 +34,21 @@ type DongCay = { ten: string; dv: string; gia: number; sl: number; vuot: boolean
 type MatDo = { ten: string; dv: string; tuHat: number | null; chietGhep: number | null };
 
 export default function DenBuClient() {
+  // TÍNH GIÁ ĐỀN BÙ LÀ TÍNH NĂNG TRẢ PHÍ (15/10/2026, chủ dự án: "giá bồi thường cũng cho xem nhưng không cho tính, che mờ đi những số liệu
+  // quan trọng ở tài khoản free"). Có quyền: admin · khách được admin cấp vai trò 'denbu'. Người khác: mọi SỐ TIỀN hiện "•••.•••" (tien /
+  // soTien bên dưới), ô nhập để TÍNH bị khoá — bấm vào là hộp "tính năng trả phí"; ô TÌM trong danh sách (data-cho-xem) vẫn dùng được.
+  // ⚠️ Che ở GIAO DIỆN: số liệu gốc là văn bản công khai của tỉnh, vẫn nằm trong mã / tệp tĩnh của trang.
+  const { user } = useAuth();
+  const khoa = !(laAdmin(user as any) || coVaiTro(user as any, 'denbu'));
+  const [hopTraPhi, setHopTraPhi] = useState(false);
+  const tien = (v: number) => (khoa ? '•••.••• đ' : tienGoc(v));
+  const soTien = (v: number) => (khoa ? '•••.•••' : v.toLocaleString('vi-VN'));
+  const chanTinh = (e: React.SyntheticEvent) => {
+    if (!khoa) return;
+    const el = e.target as HTMLElement;
+    if (!/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName) || el.closest('[data-cho-xem]')) return;
+    e.preventDefault(); el.blur(); setHopTraPhi(true);
+  };
   const [tab, setTab] = useState<'dat' | 'nha' | 'cay' | 'khac' | 'cancu'>('dat');
 
   // ── Tiền đất ──────────────────────────────────────────────
@@ -200,7 +217,13 @@ export default function DenBuClient() {
   );
 
   return (
-    <div className="mx-auto max-w-3xl px-3 py-5 sm:px-4 sm:py-8">
+    <div className="mx-auto max-w-3xl px-3 py-5 sm:px-4 sm:py-8" onFocusCapture={chanTinh} onMouseDownCapture={chanTinh} onClickCapture={chanTinh}>
+      {hopTraPhi && <HopTraPhi ten="Tính giá đền bù" onDong={() => setHopTraPhi(false)} />}
+      {khoa && (
+        <button type="button" onClick={() => setHopTraPhi(true)} className="mb-3 block w-full rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-left text-[13px] leading-snug text-amber-900">
+          🔒 <b>Tính giá đền bù là tính năng trả phí</b> — số tiền trên trang đã được che. <span className="underline">Liên hệ admin để đăng ký</span>
+        </button>
+      )}
       <h1 className="text-xl font-extrabold text-[#0A2540] sm:text-3xl">Đền bù khi Nhà nước thu hồi đất — Cam Lâm</h1>
       <p className="mt-2 text-sm leading-relaxed text-slate-600">
         Tra giá đất bồi thường theo <b>từng thôn / từng dự án</b>, đơn giá <b>nhà và công trình</b>, rồi tính nhanh tổng tiền. Số liệu lấy nguyên từ văn bản của cơ quan nhà nước — bấm nút để xem bản gốc.
@@ -239,7 +262,7 @@ export default function DenBuClient() {
               {/* THÔN: vừa GÕ TÌM vừa sổ danh sách (chủ dự án 16/9/2026) — 45 thôn, cuộn tìm thì lâu. Gõ không dấu vẫn ra. */}
               <p className="mt-4 text-[13px] font-bold uppercase tracking-wide text-slate-400">Thôn</p>
               <div className="relative mt-2">
-                <input value={moThon ? timThon : thonDung}
+                <input data-cho-xem value={moThon ? timThon : thonDung}
                   onFocus={() => { setMoThon(true); setTimThon(''); }}
                   onClick={() => { setMoThon(true); setTimThon(''); }}
                   onChange={(e) => { setTimThon(e.target.value); setMoThon(true); }}
@@ -361,7 +384,7 @@ export default function DenBuClient() {
                     {GIA_NONG_NGHIEP.map((r) => (
                       <tr key={r[0]} className="border-t border-slate-100">
                         <td className="py-1.5 pr-2 text-slate-700">{r[0]}</td>
-                        {r.slice(1).map((v, i) => <td key={i} className="px-2 py-1.5 text-right tabular-nums text-[#0A2540]">{v == null ? '—' : (v as number).toLocaleString('vi-VN')}</td>)}
+                        {r.slice(1).map((v, i) => <td key={i} className="px-2 py-1.5 text-right tabular-nums text-[#0A2540]">{v == null ? '—' : soTien(v as number)}</td>)}
                       </tr>
                     ))}
                   </tbody>
@@ -371,8 +394,8 @@ export default function DenBuClient() {
                   {GIA_RUNG_SAN_XUAT.map((r) => (
                     <tr key={r[0]} className="border-t border-slate-100">
                       <td className="py-1.5 pr-2 text-slate-700">{r[0]}</td>
-                      <td className="px-2 py-1.5 text-right tabular-nums text-[#0A2540]">{r[1].toLocaleString('vi-VN')}</td>
-                      <td className="py-1.5 pl-2 text-right tabular-nums text-[#0A2540]">{r[2].toLocaleString('vi-VN')}</td>
+                      <td className="px-2 py-1.5 text-right tabular-nums text-[#0A2540]">{soTien(r[1])}</td>
+                      <td className="py-1.5 pl-2 text-right tabular-nums text-[#0A2540]">{soTien(r[2])}</td>
                     </tr>
                   ))}
                 </tbody></table>
@@ -389,7 +412,7 @@ export default function DenBuClient() {
           <p className="text-[13px] leading-snug text-slate-600">
             Đơn giá bồi thường nhà, nhà ở, công trình xây dựng theo <b>Quyết định 08/2026/QĐ-UBND</b> ngày 22/01/2026 của UBND tỉnh Khánh Hòa. Gõ tên hạng mục (nhà 1 tầng, tường rào, giếng, chuồng trại…) rồi bấm để cộng vào bảng tính.
           </p>
-          <input value={tim} onChange={(e) => setTim(e.target.value)} placeholder="Tìm: tường rào, mái tôn, giếng, sân bê tông…" className={`${O} mt-2.5`} />
+          <input value={tim} onChange={(e) => setTim(e.target.value)} placeholder="Tìm: tường rào, mái tôn, giếng, sân bê tông…" data-cho-xem className={`${O} mt-2.5`} />
           <div className="mt-2 max-h-[46vh] overflow-y-auto overscroll-contain rounded-xl border border-slate-100">
             {mucs.length === 0 && <p className="p-3 text-[13px] text-slate-400">Đang tải bảng đơn giá…</p>}
             {loc(mucs, tim).map(theMuc)}
@@ -449,7 +472,7 @@ export default function DenBuClient() {
               cây hằng năm (đ/m²), cây lâu năm theo tuổi hoặc loại A/B/C (đ/cây), cây lâm nghiệp theo năm chăm sóc, thủy sản theo thời gian nuôi.
               Gõ tên cây, con rồi bấm để cộng vào bảng tính.
             </p>
-            <input value={timCay} onChange={(e) => setTimCay(e.target.value)} placeholder="Tìm: sầu riêng, xoài ghép, keo lai, lúa, tôm thẻ…" className={`${O} mt-2.5`} />
+            <input value={timCay} onChange={(e) => setTimCay(e.target.value)} placeholder="Tìm: sầu riêng, xoài ghép, keo lai, lúa, tôm thẻ…" data-cho-xem className={`${O} mt-2.5`} />
             <div className="mt-2 max-h-[46vh] overflow-y-auto overscroll-contain rounded-xl border border-slate-100">
               {cays.length === 0 && <p className="p-3 text-[13px] text-slate-400">Đang tải bảng đơn giá…</p>}
               {locCay(timCay).map((m, i) => (
@@ -566,12 +589,12 @@ export default function DenBuClient() {
                     </select>
                   )}
                   <input value={giaNNTay} onChange={(e) => setGiaNNTay(e.target.value)} inputMode="decimal"
-                    placeholder={giaTuBangGia ? giaTuBangGia.toLocaleString('vi-VN') : 'nhập giá theo bảng giá cũ'}
+                    placeholder={giaTuBangGia ? soTien(giaTuBangGia) : 'nhập giá theo bảng giá cũ'}
                     className="w-32 rounded-lg border border-slate-300 px-2.5 py-1.5 text-right text-[16px] outline-none focus:border-[#0A2540]" />
                   <span className="text-[12.5px] text-slate-500">đ/m² {so(giaNNTay) > 0 ? '(bạn tự nhập)' : dungBangGiaMoi ? `(bảng giá mới, vị trí ${duAn === 'camlam' ? viTri : vtBG})` : '(chưa có — cần điền)'}</span>
                 </div>
                 <p className={`mt-1 text-[11.5px] leading-snug text-slate-400 ${dungBangGiaMoi ? '' : 'hidden'}`}>
-                  Bảng giá 4 xã vùng Cam Lâm: cây hằng năm / lâu năm {BANG_GIA_NN.cay.vt1.toLocaleString('vi-VN')} (VT1) · {BANG_GIA_NN.cay.vt2.toLocaleString('vi-VN')} (VT2) — thuỷ sản {BANG_GIA_NN.thuysan.vt1.toLocaleString('vi-VN')} · {BANG_GIA_NN.thuysan.vt2.toLocaleString('vi-VN')} — rừng sản xuất {BANG_GIA_NN.rung.vt1.toLocaleString('vi-VN')} · {BANG_GIA_NN.rung.vt2.toLocaleString('vi-VN')} đ/m².
+                  Bảng giá 4 xã vùng Cam Lâm: cây hằng năm / lâu năm {soTien(BANG_GIA_NN.cay.vt1)} (VT1) · {soTien(BANG_GIA_NN.cay.vt2)} (VT2) — thuỷ sản {soTien(BANG_GIA_NN.thuysan.vt1)} · {soTien(BANG_GIA_NN.thuysan.vt2)} — rừng sản xuất {soTien(BANG_GIA_NN.rung.vt1)} · {soTien(BANG_GIA_NN.rung.vt2)} đ/m².
                 </p>
               </div>
               <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -664,7 +687,7 @@ export default function DenBuClient() {
               <p className="mt-0.5 text-[12px] leading-snug text-slate-500">Khoản 1 Điều 8 Quy định kèm QĐ 17/2024, được thay bằng <b>khoản 6 Điều 2 QĐ 14/2025/QĐ-UBND</b>.</p>
               <select value={maDiChuyen} onChange={(e) => setMaDiChuyen(e.target.value)} className={`${O} mt-2`}>
                 <option value="">Không phải di chuyển chỗ ở</option>
-                {DI_CHUYEN.map((d) => <option key={d.ma} value={d.ma}>{d.ten} — {d.tien.toLocaleString('vi-VN')} đ/hộ</option>)}
+                {DI_CHUYEN.map((d) => <option key={d.ma} value={d.ma}>{d.ten} — {soTien(d.tien)} đ/hộ</option>)}
               </select>
               {!!maDiChuyen && (
                 <label className="mt-2 block text-[12.5px] text-slate-600">Nhà có mấy tầng (nhà nhiều tầng được cộng thêm 20% cho mỗi tầng tính từ tầng thứ 3)
@@ -678,7 +701,7 @@ export default function DenBuClient() {
               )}
               {tienDiChuyen > 0 && (
                 <p className="mt-1.5 text-[13px] text-slate-600">→ <b className="text-[#0A2540]">{tien(tienDiChuyen)}</b>
-                  <span className="ml-1 text-[12px] text-slate-400">({mucDiChuyen!.tien.toLocaleString('vi-VN')} đ{tangThem > 0 ? ` + ${tangThem} tầng × 20%` : ''}{tuLoChoO ? ' × 2 vì tự lo chỗ ở' : ''})</span></p>
+                  <span className="ml-1 text-[12px] text-slate-400">({soTien(mucDiChuyen!.tien)} đ{tangThem > 0 ? ` + ${tangThem} tầng × 20%` : ''}{tuLoChoO ? ' × 2 vì tự lo chỗ ở' : ''})</span></p>
               )}
             </div>
 
@@ -723,7 +746,7 @@ export default function DenBuClient() {
               <li>Phụ lục III — Đơn giá <b>tháo dỡ, di chuyển, lắp đặt tài sản</b>.</li>
               <li>Phụ lục IV — Đơn giá bồi thường <b>chi phí đầu tư vào đất còn lại</b>.</li>
             </ul>
-            <input value={timCp} onChange={(e) => setTimCp(e.target.value)} placeholder="Tìm: mộ xây, di chuyển máy lạnh, ao hồ, san lấp…" className={`${O} mt-2.5`} />
+            <input value={timCp} onChange={(e) => setTimCp(e.target.value)} placeholder="Tìm: mộ xây, di chuyển máy lạnh, ao hồ, san lấp…" data-cho-xem className={`${O} mt-2.5`} />
             <div className="mt-2 max-h-[44vh] overflow-y-auto overscroll-contain rounded-xl border border-slate-100">
               {chiPhi.length === 0 && <p className="p-3 text-[13px] text-slate-400">Đang tải bảng đơn giá…</p>}
               {loc(chiPhi, timCp).map(theMuc)}

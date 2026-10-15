@@ -386,7 +386,10 @@ function Users() {
 const VAI_TRO_DS: [string, string, string][] = [
   ['gis', '🗺️', 'Biên tập GIS'], ['vanban', '📄', 'Quản lý văn bản'],
   ['hotlist', '🔥', 'Tra cứu danh sách nóng'], ['danhmuc', '🗄️', 'Kho danh mục hồ sơ'],
-  ['xacthuc', '🔐', 'Tra mã xác thực 2 lớp'], ['admin', '👑', 'Admin — toàn quyền'],
+  ['xacthuc', '🔐', 'Tra mã xác thực 2 lớp'],
+  // 15/10/2026 — hai tính năng TRẢ PHÍ: tích cho khách đã mua (chủ dự án: "tra cứu văn bản… tính giá đền bù là tính năng trả phí")
+  ['tracuuvb', '📚', 'Tra cứu văn bản (trả phí)'], ['denbu', '💵', 'Tính giá đền bù (trả phí)'],
+  ['admin', '👑', 'Admin — toàn quyền'],
 ];
 function OVaiTro({ u, luu }: { u: any; luu: (roles: string[]) => void }) {
   const [mo, setMo] = useState(false);

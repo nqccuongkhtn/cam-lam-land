@@ -6,6 +6,7 @@ export interface VanBan {
   soKyHieu: string;
   trichYeu: string;
   ngay: string;        // 'YYYY-MM-DD'
+  an?: boolean;        // máy chủ đã CHE số ký hiệu + ngày (chưa có quyền tra cứu — tính năng trả phí, 15/10/2026)
   coQuan: string;
   chuDe: ChuDe;
   linhVuc: string;

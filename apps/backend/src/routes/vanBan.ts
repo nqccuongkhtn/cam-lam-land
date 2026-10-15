@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { vnNoAccent } from '../lib/vn.ts';
-import { authRequired, vanBanRequired, type AuthedRequest } from '../middleware/auth.ts';
+import { authRequired, vanBanRequired, nguoiDungTuYeuCau, type AuthedRequest } from '../middleware/auth.ts';
 import { kiemTimCongKhai } from '../lib/chongCaoVb.ts';
 import { laNguoiThat, capVe, veHopLe } from '../lib/turnstile.ts';
 import { coVaiTro } from '../lib/auth.ts';
@@ -501,7 +501,7 @@ export async function layPdfDrive(link: string): Promise<Buffer | null> {
 //    · qpdf gom các mảnh nhỏ thành luồng nén chung, nén lại mức cao nhất.
 //    Ép JPEG mạnh hơn chỉ bớt thêm ~1% mà làm dấu đỏ nhoè → không dùng.
 // Kho CHỈ giữ bản đã xử lý (vb-<phiên bản>-<mã>.pdf); đổi cách xử lý thì tăng PHIEN_BAN_FILE để làm lại.
-const PHIEN_BAN_FILE = 'v9';   // v9 (7/10/2026): chữ chéo nghiêng ít hơn (30° thay vì theo đường chéo); v8 (6/10/2026): chèn thêm trang 2 trắng có dấu bản quyền; v7: dấu bản quyền ghi tên miền mới batdongsancamlam.vn; v6: chữ chéo nhỏ lại; v4: chữ chéo 2 dòng (thêm link + SĐT) vẽ bằng xoay hệ toạ độ — không đè nhau; gắn cho MỌI văn bản
+const PHIEN_BAN_FILE = 'v10';  // v10 (15/10/2026): số điện thoại mới 0567 442 996 trên dấu (bản cũ ghi số giả 0988…); v9 (7/10/2026): chữ chéo nghiêng ít hơn (30° thay vì theo đường chéo); v8 (6/10/2026): chèn thêm trang 2 trắng có dấu bản quyền; v7: dấu bản quyền ghi tên miền mới batdongsancamlam.vn; v6: chữ chéo nhỏ lại; v4: chữ chéo 2 dòng (thêm link + SĐT) vẽ bằng xoay hệ toạ độ — không đè nhau; gắn cho MỌI văn bản
 const PHONG_DAU = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
 async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
   try {
@@ -812,8 +812,18 @@ export async function resolvePdf(link: string): Promise<string | null> {
 }
 
 // ── GET / (danh sách) — PHẢI ĐĂNG NHẬP (tiện ích lớp 1, 30/9/2026; trước đây công khai) ──
+// ── TRA CỨU VĂN BẢN LÀ TÍNH NĂNG TRẢ PHÍ (15/10/2026, chủ dự án: "chức năng tra cứu văn bản cũng khoá luôn, đây là tính năng trả phí") ──
+// Xem đủ + mở tệp CHỈ cho: admin · người quản lý văn bản ('vanban') · khách được cấp quyền 'tracuuvb' (admin tích ở trang quản trị khi
+// khách đã trả phí). Chủ dự án chỉnh thêm cùng ngày: "tài khoản thường vẫn vào xem văn bản được nhưng làm mờ số ký hiệu và ngày văn bản,
+// bấm vào xem thì không cho, cảnh báo chức năng trả phí" → danh sách (/), 4 văn bản mới (/moi-nhat), ô tìm (/tim) vẫn trả cho người
+// chưa có quyền nhưng SỐ KÝ HIỆU + NGÀY ĐÃ CHE Ở MÁY CHỦ (chữ số thành •, không gửi ngày — mở công cụ trình duyệt cũng không đọc được),
+// kèm cờ an:true để giao diện làm mờ; tệp văn bản (/:id/pdf) trả 403. Chữ báo lỗi KHÔNG nói tài khoản nào được xem.
+const duocTraCuuVb = (u: any) => coVaiTro(u, 'admin', 'vanban', 'tracuuvb');
+const CHUA_CO_QUYEN_VB = { error: 'Tra cứu văn bản là tính năng trả phí — vui lòng liên hệ admin Cam Lâm Land để đăng ký.', maLoi: 'TINH_NANG_TRA_PHI' };
+const cheVb = (d: any) => ({ ...d, soKyHieu: String(d.soKyHieu || '').replace(/\d/g, '•'), ngay: null, an: true });
 vanBanRouter.get('/', authRequired, async (req: AuthedRequest, res) => {
   try {
+    const du = duocTraCuuVb(req.user);
     const rows = await query(`
       SELECT id, so_hieu AS "soKyHieu", trich_yeu AS "trichYeu",
              to_char(ngay_ban_hanh,'YYYY-MM-DD') AS ngay, co_quan AS "coQuan",
@@ -822,22 +832,23 @@ vanBanRouter.get('/', authRequired, async (req: AuthedRequest, res) => {
              (link_goc IS NOT NULL AND link_goc <> '') AS "coFile"
       FROM van_ban ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 8000`);
     res.set('Cache-Control', 'private, max-age=300'); // chỉ trình duyệt của chính người đã đăng nhập giữ — không cho CDN/nginx phát cho người khác
-    res.json({ docs: rows });
+    res.json({ docs: du ? rows : rows.map(cheVb), an: !du });
   } catch (e: any) { loiChung(res, e, 'danh sách'); }
 });
 
 // ── GET /moi-nhat — 4 văn bản mới ban hành cho khối "Tra cứu văn bản" ở TRANG CHỦ (mẫu 105, 7/10/2026) ──
 // CÔNG KHAI nhưng chỉ có số hiệu · ngày · cơ quan · trích yếu của 4 văn bản (thông tin công bố công khai của
 // nhà nước), không có link file; xem toàn kho + mở file vẫn phải đăng nhập. Chỉ lấy văn bản có file thật.
-vanBanRouter.get('/moi-nhat', async (_req, res) => {
+vanBanRouter.get('/moi-nhat', async (req, res) => {
   try {
+    const du = duocTraCuuVb(await nguoiDungTuYeuCau(req).catch(() => null));   // chưa có quyền tra cứu → che số ký hiệu + ngày
     const rows = await query(`
       SELECT id, so_hieu AS "soKyHieu", trich_yeu AS "trichYeu",
              to_char(ngay_ban_hanh,'YYYY-MM-DD') AS ngay, co_quan AS "coQuan", link_goc
       FROM van_ban WHERE link_goc IS NOT NULL AND link_goc <> '' AND can_kiem_tra IS NULL
       ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 40`);
-    const docs = rows.filter((d: any) => coFileThat(d.link_goc)).slice(0, 4).map(({ link_goc, ...d }: any) => d);
-    res.set('Cache-Control', 'public, max-age=600');
+    const docs = rows.filter((d: any) => coFileThat(d.link_goc)).slice(0, 4).map(({ link_goc, ...d }: any) => (du ? d : cheVb(d)));
+    res.set('Cache-Control', du ? 'private, no-store' : 'public, max-age=600');
     res.json({ docs });
   } catch (e: any) { loiChung(res, e, 'mới nhất'); }
 });
@@ -864,8 +875,9 @@ vanBanRouter.get('/tim', async (req, res) => {
       WHERE can_kiem_tra IS NULL AND ${goc} LIKE ALL($1::text[])
       ORDER BY (vn_unaccent(lower(coalesce(so_hieu,''))) LIKE $2) DESC, ngay_ban_hanh DESC NULLS LAST, id DESC
       LIMIT 6`, [tu, '%' + kd.replace(/[\\%_]/g, (c) => '\\' + c) + '%']);
-    res.set('Cache-Control', 'public, max-age=300');
-    res.json({ docs: rows.map(({ link_goc, ...d }: any) => ({ ...d, coFile: coFileThat(link_goc) })) });
+    const du = duocTraCuuVb(await nguoiDungTuYeuCau(req).catch(() => null));   // chưa có quyền tra cứu → che số ký hiệu + ngày
+    res.set('Cache-Control', du ? 'private, no-store' : 'public, max-age=300');
+    res.json({ docs: rows.map(({ link_goc, ...d }: any) => { const x = { ...d, coFile: coFileThat(link_goc) }; return du ? x : cheVb(x); }) });
   } catch (e: any) { loiChung(res, e, 'tìm công khai'); }
 });
 
@@ -893,6 +905,7 @@ vanBanRouter.post('/ve-nguoi-that', authRequired, async (req: AuthedRequest, res
 
 vanBanRouter.get('/:id/pdf', authRequired, async (req: AuthedRequest, res) => {
   try {
+    if (!duocTraCuuVb(req.user)) { res.set('Cache-Control', 'no-store'); return res.status(403).json(CHUA_CO_QUYEN_VB); }
     const [row] = await query<any>('SELECT id, so_hieu, link_goc FROM van_ban WHERE id=$1', [Number(req.params.id)]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy văn bản' });
     // CHỐNG CÀO: phải có "vé người thật" (đã qua Cloudflare Turnstile) — lib/turnstile.ts. Chưa điền khoá thì bỏ qua.

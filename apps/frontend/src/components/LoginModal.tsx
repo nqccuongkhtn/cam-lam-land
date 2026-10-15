@@ -149,7 +149,7 @@ export default function LoginModal({ open, reason, onClose, onSuccess }: { open:
             <button type="button" onClick={() => setShowForgot((v) => !v)} className="font-medium text-slate-500 hover:text-[#0A2540]">Quên mật khẩu?</button>
             <span className="text-slate-500">Chưa có tài khoản? <Link href="/register" onClick={onClose} className="font-bold text-[#0A2540] hover:text-[#C8A14B]">Đăng ký</Link></span>
           </div>
-          {showForgot && <p className="mt-2 rounded-lg bg-slate-50 p-2.5 text-[13px] leading-relaxed text-slate-500">Hiện chưa hỗ trợ tự đặt lại mật khẩu online. Vui lòng liên hệ <a href="tel:0567442996" className="font-bold text-[#0A2540]">0567 442 996</a> (gọi/Zalo) để được cấp lại mật khẩu.</p>}
+          {showForgot && <p className="mt-2 rounded-lg bg-slate-50 p-2.5 text-[13px] leading-relaxed text-slate-500">Hiện chưa hỗ trợ tự đặt lại mật khẩu online. Vui lòng liên hệ <a href="tel:0567442996" className="font-bold text-[#0A2540]">0567 442 996</a> (gọi điện) hoặc <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" className="font-bold text-[#0068FF]">nhắn Zalo admin</a> để được cấp lại mật khẩu.</p>}
         </div>
       </div>
 

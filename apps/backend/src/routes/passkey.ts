@@ -159,6 +159,7 @@ const hoSo = (u: any) => ({
   fullName: u.full_name ?? null, phone: u.phone ?? null,
   tier: u.tier ?? 'free', status: u.status ?? 'active',
   emailVerified: u.email_verified ?? true, avatar: u.avatar ?? null,
+  goiChungDen: u.goi_chung_het_han ?? null,   // hạn GÓI CHỨC NĂNG CHUNG — giống routes/auth.ts profile
 });
 
 /* ══ 1. ĐĂNG KÝ vân tay cho máy này (phải đang đăng nhập) ══════════════════ */

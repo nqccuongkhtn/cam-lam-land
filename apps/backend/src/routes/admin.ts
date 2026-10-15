@@ -3,6 +3,8 @@ import { query } from '../lib/db.ts';
 import { adminRequired, quenVaiTro, type AuthedRequest } from '../middleware/auth.ts';
 import { hashPassword, dsVaiTro, chuanHoaVaiTro, vaiTroChinh } from '../lib/auth.ts';
 import { cacheDrop } from '../lib/cache.ts';
+import { findPkg } from '../lib/packages.ts';
+import { activate } from './payments.ts';
 
 export const adminRouter = Router();
 adminRouter.use(adminRequired);
@@ -411,7 +413,8 @@ adminRouter.get('/stats', async (_req, res, next) => {
       count(*) FILTER (WHERE 'gis' = ANY(roles))::int AS gis,
       count(*) FILTER (WHERE 'user' = ANY(roles))::int  AS users,
       count(*) FILTER (WHERE 'admin' = ANY(roles))::int AS admins,
-      count(*) FILTER (WHERE tier='paid')::int  AS paid
+      count(*) FILTER (WHERE tier='paid')::int  AS paid,
+      count(*) FILTER (WHERE goi_chung_het_han > now())::int AS "goiChung"
       FROM users`);
     const [listings] = await query(`SELECT
       count(*)::int AS total,
@@ -434,11 +437,18 @@ adminRouter.get('/users', async (req, res, next) => {
     const q = String(req.query.q || '').trim();
     const per = Math.min(100, Math.max(10, Number(req.query.per) || 30));
     const page = Math.max(1, Number(req.query.page) || 1);
-    const where = q ? `WHERE full_name ILIKE $1 OR email ILIKE $1 OR phone ILIKE $1` : '';
-    const params: any[] = q ? [`%${q}%`] : [];
+    // ?traPhi=1 → chỉ tài khoản đang có ít nhất một gói trả phí còn hạn (gói chung · đăng tin · đẩy tin · video)
+    const dk: string[] = [];
+    const params: any[] = [];
+    if (q) { params.push(`%${q}%`); dk.push(`(full_name ILIKE $1 OR email ILIKE $1 OR phone ILIKE $1)`); }
+    if (String(req.query.traPhi || '') === '1')
+      dk.push(`(goi_chung_het_han > now() OR post_expires_at > now() OR boost_expires_at > now() OR video_expires_at > now())`);
+    const where = dk.length ? `WHERE ${dk.join(' AND ')}` : '';
     const [{ total }] = await query(`SELECT count(*)::int AS total FROM users ${where}`, params);
     const rows = await query(`SELECT id, email, role, roles, full_name AS "fullName", phone, tier, status, boost_quota AS "boostQuota",
-      is_advisor AS "isAdvisor", email_verified AS "emailVerified", rating, rating_count AS "ratingCount", video_expires_at AS "videoExpiresAt", created_at AS "createdAt"
+      is_advisor AS "isAdvisor", email_verified AS "emailVerified", rating, rating_count AS "ratingCount", video_expires_at AS "videoExpiresAt", created_at AS "createdAt",
+      goi_chung_het_han AS "goiChungHetHan", post_quota AS "postQuota", post_used AS "postUsed", post_expires_at AS "postExpiresAt",
+      pkg_tier AS "pkgTier", boost_used AS "boostUsed", boost_expires_at AS "boostExpiresAt"
       FROM users ${where} ORDER BY created_at DESC LIMIT ${per} OFFSET ${(page - 1) * per}`, params);
     res.json({ users: rows.map((u: any) => ({ ...u, roles: dsVaiTro(u) })), total, page, per });
   } catch (e) { next(e); }
@@ -461,6 +471,60 @@ adminRouter.patch('/users/:id', async (req, res, next) => {
     if (!row) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
     quenVaiTro(id);                       // áp dụng vai trò mới NGAY, người kia không phải đăng nhập lại
     res.json({ user: { ...row, roles: dsVaiTro(row) } });
+  } catch (e) { next(e); }
+});
+
+// ── QUẢN LÝ TÀI KHOẢN TRẢ PHÍ (15/10/2026) ──
+// Chủ dự án: "trả phí chia ra là các chức năng chung, còn trả phí mua gói số tin đăng, đẩy tin hay quảng cáo bản đồ là chức năng riêng".
+//  · CHỨC NĂNG CHUNG = một gói có hạn (users.goi_chung_het_han, lib/auth.ts coGoiChung): tra cứu văn bản · giá đền bù · bản đồ QH Cam Lâm.
+//  · CHỨC NĂNG RIÊNG = gói số tin đăng · gói đẩy tin · tạo video (lib/packages.ts) · quảng cáo bản đồ (bảng map_ads, thẻ "Quảng cáo").
+// Cấp / gia hạn / thu hồi GÓI CHUNG (khách trả tiền ngoài web: chuyển khoản, tiền mặt…):
+//   { ngay: 30 } → cộng thêm 30 ngày (gói còn hạn thì cộng dồn từ ngày hết hạn) · { ngay: 0 } → thu hồi ngay
+adminRouter.post('/users/:id/goi-chung', async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    const ngay = Math.max(0, Math.min(3650, Math.round(Number(req.body?.ngay) || 0)));
+    const [row] = ngay > 0
+      ? await query(`UPDATE users SET goi_chung_het_han = GREATEST(COALESCE(goi_chung_het_han, now()), now()) + ($2::int) * interval '1 day', tier='paid'
+                     WHERE id=$1 RETURNING id, goi_chung_het_han AS "goiChungHetHan"`, [id, ngay])
+      : await query(`UPDATE users SET goi_chung_het_han = NULL WHERE id=$1 RETURNING id, goi_chung_het_han AS "goiChungHetHan"`, [id]);
+    if (!row) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+    quenVaiTro(id);   // áp dụng NGAY (máy chủ nhớ hạn gói 30 giây), người kia không phải đăng nhập lại
+    res.json({ user: row });
+  } catch (e) { next(e); }
+});
+// KÍCH HOẠT MỘT GÓI BẰNG TAY (gói đăng tin / đẩy tin / video / gói chung) khi khách trả tiền ngoài web: tạo một đơn ghi chú
+// "ADMIN-<mã admin>" rồi kích hoạt y như đơn đã trả tiền (payments.ts activate) → mọi gói đi đúng một đường, có dấu vết ở thẻ Thanh toán.
+adminRouter.post('/users/:id/kich-hoat', async (req: AuthedRequest, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    const pkg = findPkg(String(req.body?.packageId || ''));
+    if (!pkg) return res.status(400).json({ error: 'Gói không hợp lệ' });
+    const [u] = await query(`SELECT id FROM users WHERE id=$1`, [id]);
+    if (!u) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+    const [o] = await query(`INSERT INTO payments (user_id, package_id, amount, status, note) VALUES ($1,$2,$3,'pending',$4) RETURNING *`,
+      [id, pkg.id, pkg.price, `ADMIN-${req.user!.id}`]);
+    await activate(o);
+    quenVaiTro(id);
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+});
+// THU HỒI MỘT GÓI: { loai: 'chung' | 'post' | 'boost' | 'video' } — gói hết hiệu lực ngay (tài khoản về như khách miễn phí ở phần đó).
+const THU_HOI: Record<string, string> = {
+  chung: `goi_chung_het_han = NULL`,
+  post: `post_quota = 0, post_expires_at = NULL`,
+  boost: `pkg_id = NULL, pkg_tier = NULL, boost_quota = 0, boost_expires_at = NULL`,
+  video: `video_expires_at = NULL`,
+};
+adminRouter.post('/users/:id/thu-hoi', async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    const sql = THU_HOI[String(req.body?.loai || '')];
+    if (!sql) return res.status(400).json({ error: 'Loại gói không hợp lệ' });
+    const [row] = await query(`UPDATE users SET ${sql} WHERE id=$1 RETURNING id`, [id]);
+    if (!row) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+    quenVaiTro(id);
+    res.json({ ok: true });
   } catch (e) { next(e); }
 });
 

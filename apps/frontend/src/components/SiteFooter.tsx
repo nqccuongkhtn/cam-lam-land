@@ -87,10 +87,13 @@ export default function SiteFooter() {
             <InstallAppButton className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[#0A2540] hover:border-[#C8A14B] [&_b]:!text-[#0A2540]" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=0&data=https%3A%2F%2Fbatdongsancamlam.dpdns.org" alt="QR mở web Cam Lâm Land" width={56} height={56} className="hidden sm:block w-14 h-14 rounded-lg border border-slate-200 bg-white p-1" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+            {/* Mã QR kết bạn Zalo admin (chủ dự án gửi 15/10/2026 — không lộ số điện thoại) */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" title="Quét để kết bạn Zalo admin" className="hidden sm:block"><img src="/zalo-admin-qr.png" alt="QR kết bạn Zalo admin" width={56} height={56} className="w-14 h-14 rounded" /></a>
           </div>
           <div className="flex gap-2 mt-3 sm:mt-4">
             <a href="#" aria-label="Facebook" className="w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-[#0A2540] hover:border-[#C8A14B] font-bold">f</a>
-            <a href="https://zalo.me/0567442996" target="_blank" rel="noreferrer" aria-label="Zalo" className="w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-[#0A2540] hover:border-[#C8A14B] text-[11px] font-bold">Zalo</a>
+            <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" aria-label="Zalo" className="w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-[#0A2540] hover:border-[#C8A14B] text-[11px] font-bold">Zalo</a>
             <a href="tel:0567442996" aria-label="Gọi điện" className="w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-[#0A2540] hover:border-[#C8A14B]">☎</a>
           </div>
         </div>

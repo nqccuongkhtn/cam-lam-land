@@ -32,7 +32,7 @@ export default function ThietBiCuaToi() {
       {d.batGioiHan && (
         <p className="mt-3 text-[12px] leading-snug text-slate-500">
           Muốn đổi sang thiết bị khác, vui lòng liên hệ Zalo admin{' '}
-          <a href={`https://zalo.me/${d.zalo}`} target="_blank" rel="noreferrer" className="font-bold text-[#0068FF]">{d.zalo}</a>{' '}
+          <a href={String(d.zalo).startsWith('http') ? d.zalo : `https://zalo.me/${d.zalo}`} target="_blank" rel="noreferrer" className="font-bold text-[#0068FF]">(bấm để kết bạn Zalo)</a>{' '}
           để reset thiết bị (phí {d.phi.toLocaleString('vi-VN')}đ/lần).
         </p>
       )}

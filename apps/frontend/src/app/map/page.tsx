@@ -11,7 +11,8 @@ import { vn2000ToWgs84, wgs84ToVn2000 } from '@/lib/vn2000';
 import { openPhieuQh, phieuQhHtml } from '@/lib/phieuQh';
 import { getToken } from '@/lib/token';
 import { API_BASE } from '@/lib/config';
-import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
+import { useAuth, laAdmin, coVaiTro, coGoiChung } from '@/lib/auth';
+import HopTraPhi from '@/components/HopTraPhi';
 import { listMyPlaces, listAllPlaces, addPlace, removePlace, type SavedPlace } from '@/lib/savedPlaces';
 import { listCustomers, listInterests, addInterest, removeInterest, type Customer, type Interest } from '@/lib/crm';
 import { Skeleton } from '@/components/ui';
@@ -388,6 +389,14 @@ const RASTER_OVERLAYS = [
 // phiếu kiểm tra quy hoạch (in ảnh QĐ205) cũng khoá. Ai được xem đủ: một chỗ duy nhất ở máy chủ — `xemDuQhCamLam` (routes/parcels.ts).
 const KHOA_CAM_LAM = new Set(['qh-qd205', 'qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin', 'qh-taynam', 'qh-taybac']);
 const MUC_KHOA_CAM_LAM = new Set(['qh-qd205', 'phan-khu']);
+// GÓI CHỨC NĂNG CHUNG (15/10/2026 tối) — ai có gói (lib/auth coGoiChung, gồm admin) nhận vé xem đủ 8 lớp trên. Tài khoản thường:
+//  · vẫn CHỌN được 8 lớp nhưng chỉ XEM THỬ ở MỨC NHÌN XA NHẤT của bộ ảnh (chủ dự án: "các quy hoạch còn lại khi chọn vẫn cho hiện …, khi
+//    zoom lại gần hơn thì sẽ bị khoá và hiện bảng tính năng trả phí" — "cho hiện ở z nhỏ nhất của bản đồ đó có"): QĐ205 ô mức 10, phân khu
+//    ô mức 8 (= `minzoom` khai ở trên, khớp thư mục số nhỏ nhất của bộ ảnh). Máy chủ chỉ phát đúng mức đó khi không có vé (routes/qhRieng.ts
+//    zXaNhat). Phóng gần hơn → ẩn lớp + hộp "tính năng trả phí" (xem `xemThu` trong MapPage);
+//  · lớp Cam Lâm (cả QĐ893 miễn phí) KHÔNG chỉnh được độ mờ (chủ dự án: "ở 893 cứ cho tra cứu tới thửa như bình thường, chỉ khoá không cho
+//    làm mờ bản đồ quy hoạch") — lớp luôn đậm đủ, chạm thanh độ mờ là hộp trả phí.
+const LOP_CAM_LAM = new Set(['qh-qd893', ...KHOA_CAM_LAM]);
 // MỤC CHỌN trên bảng "Bản đồ quy hoạch". Ba bản phân khu 1/2000 (QĐ2076 phía Bắc · QĐ2101 trung tâm ·
 // QĐ2222 ven biển · QĐ918 phức hợp phía Tây) là BỐN MẢNH CỦA CÙNG MỘT BỘ quy hoạch phân khu —
 // nên gộp thành MỘT dòng, bật là bật cả ba. Ảnh của chúng nền trong suốt, vùng lại không trùm
@@ -414,7 +423,8 @@ const VUNG_QH: { id: string; ten: string; tenNgan: string; tamXem: [number, numb
 // `pdf` = mã bản trong bảng qh_pdf (máy chủ lib/qhPdf.ts): thửa trong vùng bản này có trang "Quy hoạch sử dụng đất 2030"
 //   tính từ vùng loại đất BÓC TỪ BẢN ĐỒ PDF của Sở (14/10/2026) — chỉ tham khảo, không in phiếu.
 // `khoa` = dòng lớp CHỈ ADMIN hiện cho người khác xem tên (máy chủ GET /api/qh-rieng/gioi-thieu): bấm vào là hộp "liên hệ admin", không bật gì.
-const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: string[]; zBay?: number; vung: string; pdf?: string; khoa?: boolean }[] = [
+// `xemThu` = lớp khoá mà tài khoản thường chỉ xem thử ở mức nhìn xa (gắn trong MapPage, xem LOP_CAM_LAM).
+const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: string[]; zBay?: number; vung: string; pdf?: string; khoa?: boolean; xemThu?: boolean }[] = [
   // (15/10/2026) chủ dự án: "đưa 2030 lên đầu" — QĐ893 (bản Cam Lâm xem miễn phí) đứng ĐẦU danh sách lớp, kéo theo cả thứ tự trang
   // quy hoạch trong bảng thửa (trangQhCuaThua đi theo đúng thứ tự mảng này).
   { id: 'qh-qd893', ten: 'Quy hoạch sử dụng đất 2030 (QĐ893)', tenNgan: 'Sử dụng đất 893', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-qd893'], vung: 'cam-lam' },
@@ -787,12 +797,15 @@ export default function MapPage() {
     chuGiai?: { nhom: string; muc: { mau: string; tenDs: string[]; so: number }[] }[] };
   const [lopRieng, setLopRieng] = useState<{ ve: string; lop: LopRieng[] } | null>(null);
   const laQuanTri = laAdmin(user);
+  // GÓI CHỨC NĂNG CHUNG (15/10/2026): admin + khách có gói còn hạn đều xin vé — máy chủ cấp vé xem đủ QĐ205 / phân khu; riêng admin
+  // nhận thêm danh sách lớp 1/500. Tài khoản thường không xin vé (xem thử ở mức nhìn xa — LOP_CAM_LAM).
+  const coGoi = coGoiChung(user);
   useEffect(() => {
-    if (!laQuanTri) { setLopRieng(null); return; }
+    if (!coGoi) { setLopRieng(null); return; }
     let con = true;
     api<{ ve: string; lop: LopRieng[] }>('/qh-rieng/ve').then((r) => { if (con) setLopRieng(r?.ve ? r : null); }).catch(() => { if (con) setLopRieng(null); });
     return () => { con = false; };
-  }, [laQuanTri]);
+  }, [coGoi, laQuanTri]);
   // 15/10/2026 chủ dự án: lớp 1/500 "vẫn hiện ra chỗ chọn nhưng chỉ tài khoản admin được chọn, còn những tài khoản khác thì hiện popup
   // liên hệ admin". Máy chủ gửi TÊN lớp nào được phép lộ tên (GET /api/qh-rieng/gioi-thieu — chỉ tên + khu vực, không có ô / vé) →
   // hiện thành dòng có ổ khoá; bấm vào mở hộp `hopKhoa`. Ô ảnh vẫn đòi vé của admin nên biết tên cũng không tải được gì.
@@ -807,18 +820,24 @@ export default function MapPage() {
   const rasterOverlays = useMemo<typeof RASTER_OVERLAYS>(() => {
     const goc = typeof window !== 'undefined' ? window.location.origin : '';
     const duong = API_BASE.startsWith('http') ? API_BASE : goc + API_BASE;
-    // KHOÁ CAM LÂM (15/10/2026): có vé → ảnh 8 lớp lấy qua đường có vé; không có vé → bỏ hẳn (bản đồ không xin ô nào của chúng)
+    // KHOÁ CAM LÂM (15/10/2026): có vé → ảnh 8 lớp lấy qua đường có vé. Không có vé (tài khoản thường) → XEM THỬ: chỉ ô ở mức nhìn xa
+    // nhất của bộ ảnh (minzoom = maxzoom = mức đó → gần hơn thì bản đồ tự phóng to ô đó lên, không xin ô mức khác — máy chủ cũng từ chối),
+    // `xemThu` = mức đó, dùng để ẩn lớp khi phóng gần (overlays bên dưới). Có gói mà vé chưa về → chờ vé (khỏi dựng ảnh xem thử rồi thay).
     const ve = lopRieng?.ve ? encodeURIComponent(lopRieng.ve) : '';
     const coBan = RASTER_OVERLAYS.flatMap((o) => {
       if (!KHOA_CAM_LAM.has(o.id)) return [o];
       const thuMuc = /\/tiles\/([^/]+)\//.exec(String(((o as any).tiles || [])[0] || ''))?.[1];
-      return ve && thuMuc ? [{ ...o, url: '', tiles: [`${duong}/qh-rieng/t/${thuMuc}/{z}/{x}/{y}?v=${ve}`] }] : [];
+      if (!thuMuc) return [];
+      if (ve) return [{ ...o, url: '', tiles: [`${duong}/qh-rieng/t/${thuMuc}/{z}/{x}/{y}?v=${ve}`] }];
+      if (coGoi) return [];
+      const zXa = Number((o as any).minzoom ?? 10);
+      return [{ ...o, url: '', tiles: [`${duong}/qh-rieng/t/${thuMuc}/{z}/{x}/{y}`], minzoom: zXa, maxzoom: zXa, xemThu: zXa } as any];
     });
     if (!lopRieng?.lop?.length) return coBan;
     return [...coBan, ...lopRieng.lop.map((l) => ({ id: l.id, name: l.ten, url: '',
       tiles: [`${duong}/qh-rieng/o/${l.thuMuc}/{z}/{x}/{y}?v=${encodeURIComponent(lopRieng.ve)}`], minzoom: l.minzoom, maxzoom: l.maxzoom,
       coordinates: [[l.khung[0], l.khung[3]], [l.khung[2], l.khung[3]], [l.khung[2], l.khung[1]], [l.khung[0], l.khung[1]]] as [[number, number], [number, number], [number, number], [number, number]] }))];
-  }, [lopRieng]);
+  }, [lopRieng, coGoi]);
   const rasterOverlaysRef = useRef(rasterOverlays); rasterOverlaysRef.current = rasterOverlays;
   // Bỏ phần tên miền khỏi một đường ảnh (phiếu in tự ghép gốc trang vào trước — lib/phieuQh.ts)
   const tuongDoi = (u?: string): string | undefined => {
@@ -831,12 +850,32 @@ export default function MapPage() {
     // dòng có khoá: lớp admin đã có thật thì thôi (không hiện hai dòng). `gom` giữ đúng mã lớp (không để rỗng — mảng rỗng
     // thì `gom.every(...)` luôn đúng, dòng sẽ tưởng là đang bật).
     const khoa = lopKhoa.filter((l) => !daCo.has(l.id)).map((l) => ({ id: l.id, ten: l.ten, tenNgan: l.tenNgan, tenApp: l.tenApp, gom: [l.id], vung: l.vung, khoa: true }));
-    // KHOÁ CAM LÂM: QĐ205 + phân khu 1/2000 hiện dòng có 🔒 khi chưa có vé (người không được xem đủ)
-    const coBan = MUC_QH.map((m) => (MUC_KHOA_CAM_LAM.has(m.id) && !lopRieng?.ve ? { ...m, khoa: true } : m));
+    // KHOÁ CAM LÂM: QĐ205 + phân khu 1/2000 với tài khoản thường (không gói, không vé) → dòng XEM THỬ (có 🔒, vẫn chọn được)
+    const coBan = MUC_QH.map((m) => (MUC_KHOA_CAM_LAM.has(m.id) && !lopRieng?.ve && !coGoi ? { ...m, xemThu: true } : m));
     return [...coBan, ...rieng, ...khoa];
-  }, [lopRieng, lopKhoa]);
-  // Bấm một dòng quy hoạch: dòng có khoá → hộp "liên hệ admin", không bật lớp nào.
-  const bamMucQh = (o: (typeof MUC_QH)[number], bat: boolean) => { if (o.khoa) { setHopKhoa(o.tenApp || o.ten); return; } chonLopQh(o, bat); };
+  }, [lopRieng, lopKhoa, coGoi]);
+  // Mức xem thử (mức ô xa nhất) + khung bao của một mục đang chọn — từ danh sách ảnh (rasterOverlays)
+  const xemThuCua = (gom: string[]) => {
+    const cac = rasterOverlaysRef.current.filter((o) => gom.includes(o.id) && (o as any).xemThu != null);
+    if (!cac.length) return null;
+    const xs = cac.flatMap((o) => o.coordinates.map((c) => c[0])), ys = cac.flatMap((o) => o.coordinates.map((c) => c[1]));
+    return { z: Math.min(...cac.map((o) => Number((o as any).xemThu))), khung: [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)] };
+  };
+  // Bấm một dòng quy hoạch: dòng có khoá → hộp "liên hệ admin", không bật lớp nào. Dòng XEM THỬ → bật như thường nhưng bản đồ đi theo
+  // mức xem thử: ô mức N hiện đúng nét ở mức bản đồ N − 1 (ô 256px — xem chonLopQh), nên đang nhìn gần hơn thì LÙI RA mức đó (giữ tâm);
+  // đứng ngoài vùng / nhìn quá xa thì chonLopQh tự bay tới (không truyền zBay để nó bay theo mức xem thử).
+  const bamMucQh = (o: (typeof MUC_QH)[number], bat: boolean) => {
+    if (o.khoa) { setHopKhoa(o.tenApp || o.ten); return; }
+    if (!o.xemThu) { chonLopQh(o, bat); return; }
+    chonLopQh({ gom: o.gom }, bat);
+    if (!bat) return;
+    const m: any = (window as any).__banDo, xt = xemThuCua(o.gom);
+    if (!m?.getZoom || !xt) return;
+    const c = m.getCenter(), [x0, y0, x1, y1] = xt.khung;
+    if (m.getZoom() >= xt.z - 0.5 && c.lng >= x0 && c.lng <= x1 && c.lat >= y0 && c.lat <= y1) m.easeTo({ zoom: xt.z - 1, duration: 800 });
+  };
+  // Tính năng trả phí vừa chạm (xem gần lớp khoá, kéo độ mờ, xuất phiếu…) → hộp HopTraPhi
+  const [traPhiQh, setTraPhiQh] = useState<string | null>(null);
   const canCuQh = useMemo(() => {
     const ve = encodeURIComponent(lopRieng?.ve || '');
     // bản quét quyết định nằm ở thư mục riêng trên máy chủ → mở qua /api/qh-rieng/tai-lieu/<tên>?v=<vé>
@@ -1461,8 +1500,41 @@ export default function MapPage() {
   // Giải phóng camera khi rời trang (tránh giữ camera chạy ngầm trên điện thoại).
   useEffect(() => () => { camStreamRef.current?.getTracks().forEach((t) => t.stop()); camStreamRef.current = null; if (ocrTimer.current) clearInterval(ocrTimer.current); }, []);
 
-  const overlays: ImageOverlay[] = useMemo(
-    () => rasterOverlays.map((o) => ({ id: o.id, url: o.url, coordinates: o.coordinates, opacity, visible: !!ovOn[o.id], pmtiles: (o as any).pmtiles, fillMaxzoom: (o as any).fillMaxzoom, tiles: (o as any).tiles, minzoom: (o as any).minzoom, maxzoom: (o as any).maxzoom })), [opacity, ovOn, rasterOverlays]);
+  // XEM THỬ lớp khoá (tài khoản thường): mức bản đồ ≥ mức ô xa nhất − 0,5 là thư viện bản đồ đã muốn ô mức gần hơn → lớp bị khoá (ẩn).
+  // `quaXemThu` = các mức xem thử đã vượt (chuỗi) — chỉ đổi khi VƯỢT NGƯỠNG, không đổi theo từng lần kéo bản đồ.
+  const quaXemThu = useMemo(() => [...new Set(rasterOverlays.map((o) => (o as any).xemThu).filter((z) => z != null) as number[])]
+    .filter((z) => zoomNow >= z - 0.5).sort().join(','), [rasterOverlays, zoomNow]);
+  const overlays: ImageOverlay[] = useMemo(() => {
+    const qua = new Set(quaXemThu ? quaXemThu.split(',').map(Number) : []);
+    return rasterOverlays.map((o) => {
+      const zXa = (o as any).xemThu;
+      return { id: o.id, url: o.url, coordinates: o.coordinates,
+        opacity: !coGoi && LOP_CAM_LAM.has(o.id) ? 1 : opacity,                  // tài khoản thường: lớp Cam Lâm luôn đậm đủ
+        visible: !!ovOn[o.id] && !(zXa != null && qua.has(Number(zXa))),        // xem thử: phóng gần quá mức → ẩn
+        pmtiles: (o as any).pmtiles, fillMaxzoom: (o as any).fillMaxzoom, tiles: (o as any).tiles, minzoom: (o as any).minzoom, maxzoom: (o as any).maxzoom };
+    });
+  }, [opacity, ovOn, rasterOverlays, coGoi, quaXemThu]);
+  // Lớp xem thử đang bật (tài khoản thường) + đã phóng gần quá mức chưa → nhãn 🔒 trên bản đồ; VỪA vượt ngưỡng (do phóng to) thì bật
+  // hộp "tính năng trả phí" một lần. Mới chọn lớp khi đang ở gần thì KHÔNG bật hộp (bản đồ tự lùi ra — bamMucQh).
+  const xemThuDangBat = useMemo(() => {
+    const cac = rasterOverlays.filter((o) => (o as any).xemThu != null && !!ovOn[o.id]);
+    if (!cac.length) return null;
+    const z = Math.min(...cac.map((o) => Number((o as any).xemThu)));
+    const muc = MUC_QH.find((m) => m.gom.includes(cac[0].id));
+    return { z, ten: muc?.ten || 'Bản đồ quy hoạch' };
+  }, [rasterOverlays, ovOn]);
+  const khoaGan = !!xemThuDangBat && zoomNow >= xemThuDangBat.z - 0.5;
+  const zoomTruocRef = useRef(zoomNow);
+  useEffect(() => {
+    const truoc = zoomTruocRef.current; zoomTruocRef.current = zoomNow;
+    if (!xemThuDangBat) return;
+    const nguong = xemThuDangBat.z - 0.5;
+    if (zoomNow >= nguong && truoc > 0 && truoc < nguong) setTraPhiQh(`Xem gần ${xemThuDangBat.ten}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [zoomNow]);
+  // Thanh độ mờ: tài khoản thường + đang bật lớp Cam Lâm → khoá (chạm vào là hộp trả phí)
+  const khoaDoMo = !coGoi && rasterOverlays.some((o) => LOP_CAM_LAM.has(o.id) && !!ovOn[o.id]);
+  const doMoHien = khoaDoMo ? 1 : opacity;
 
   // Lớp TÔ MÀU quy hoạch từ qh_vector: lọc theo kịch bản (hz), tô theo màu sẵn (thuộc tính c).
   // Sắp xếp thửa DIỆN TÍCH LỚN vẽ trước → thửa nhỏ (cụ thể) nằm trên, không bị che.
@@ -2135,7 +2207,7 @@ export default function MapPage() {
   // thứ tự MUC_QH. Lướt sang trang nào thì BẢN ĐỒ ĐỔI SANG LỚP ĐÓ, và trang chỉ hiện loại đất của bản đó:
   // mỗi dòng = ô diện tích TÔ ĐÚNG MÀU loại đất (màu lấy ở mau-loai-dat-qh.json) + tên loại đất.
   // Khác khối khoiQh() của máy tính (giản dị, không màu) — ở đây chủ dự án chủ động muốn ô màu như app.
-  const trangQhCuaThua = (): { muc: (typeof MUC_QH)[number]; tieuDe: string; phu?: string; areas: { type: string; areaM2: number }[]; bangMau: string; mauRieng?: Record<string, string>; khoa?: boolean }[] => {
+  const trangQhCuaThua = (): { muc: (typeof MUC_QH)[number]; tieuDe: string; phu?: string; areas: { type: string; areaM2: number }[]; bangMau: string; mauRieng?: Record<string, string>; khoa?: boolean; traPhi?: boolean }[] => {
     if (!info?.parcel) return [];
     const cacBan: any[] = (info as any).qhCacBan || [];
     const PK = ['2076', '2101', '2222', '918', 'cuhin', 'taynam', 'taybac'];
@@ -2154,13 +2226,13 @@ export default function MapPage() {
       const khoaMa = (ma: string) => cacBan.some((x) => String(x.ma) === ma && x.khoa);
       if (muc.id === 'qh-qd205') {
         if (info.overlaps?.length) ra.push({ muc, tieuDe: 'Quy hoạch chung 2045', areas: gop(info.overlaps as any), bangMau: 'qd205' });
-        else if (khoaMa('205')) ra.push({ muc: { ...muc, khoa: true }, tieuDe: 'Quy hoạch chung 2045', areas: [], bangMau: 'qd205', khoa: true });
+        else if (khoaMa('205')) ra.push({ muc: { ...muc, khoa: true }, tieuDe: 'Quy hoạch chung 2045', areas: [], bangMau: 'qd205', khoa: true, traPhi: true });
       }
       if (muc.id === 'phan-khu') {
         const ban = cacBan.filter((b) => PK.includes(String(b.ma)));
         const areas = gop(ban.flatMap((b) => b.areas || []));
         if (areas.length) ra.push({ muc, tieuDe: 'Quy hoạch phân khu 1/2000', phu: ban.map((b) => String(b.ten).split(' — ')[0].replace(/ 1\/2000$/, '')).join(' · '), areas, bangMau: 'phankhu' });
-        else if (khoaMa('pk')) ra.push({ muc: { ...muc, khoa: true }, tieuDe: 'Quy hoạch phân khu 1/2000', areas: [], bangMau: 'phankhu', khoa: true });
+        else if (khoaMa('pk')) ra.push({ muc: { ...muc, khoa: true }, tieuDe: 'Quy hoạch phân khu 1/2000', areas: [], bangMau: 'phankhu', khoa: true, traPhi: true });
       }
       if (muc.id === 'qh-qd893') {
         const b = cacBan.find((x) => String(x.ma) === '893');
@@ -2461,13 +2533,16 @@ export default function MapPage() {
                 <input type="checkbox" checked={!o.khoa && o.gom.every((id) => !!ovOn[id])}
                   onChange={(e) => bamMucQh(o, e.target.checked)}
                   className="accent-emerald-600 w-4 h-4 rounded-sm" />
-                <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 bg-amber-500" /><span className="min-w-0 flex-1 text-slate-700 leading-snug">{o.ten}{o.khoa && <span className="ml-1 text-[11px]" aria-label="liên hệ admin">🔒</span>}</span>
+                <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 bg-amber-500" /><span className="min-w-0 flex-1 text-slate-700 leading-snug">{o.ten}{(o.khoa || o.xemThu) && <span className="ml-1 text-[11px]" aria-label={o.xemThu ? 'xem ở mức nhìn xa' : 'liên hệ admin'}>🔒</span>}</span>
               </label>
             ))}
             {/* Máy tính: thanh độ mờ nằm ở cột nút bên phải bản đồ (như điện thoại) → ẩn bản ở bảng này. */}
             <div className="mt-1 pl-[26px] lg:hidden">
-              <div className="flex justify-between text-[11px] text-slate-400 mb-1"><span>Độ mờ</span><span className="font-semibold text-slate-500">{Math.round(opacity * 100)}%</span></div>
-              <input type="range" min={0} max={100} value={Math.round(opacity * 100)} onChange={(e) => setOpacity(Number(e.target.value) / 100)} className="w-full accent-emerald-600" />
+              <div className="flex justify-between text-[11px] text-slate-400 mb-1"><span>Độ mờ{khoaDoMo && ' 🔒'}</span><span className="font-semibold text-slate-500">{Math.round(doMoHien * 100)}%</span></div>
+              <div className="relative">
+                <input type="range" min={0} max={100} value={Math.round(doMoHien * 100)} disabled={khoaDoMo} onChange={(e) => setOpacity(Number(e.target.value) / 100)} className="w-full accent-emerald-600 disabled:opacity-50" />
+                {khoaDoMo && <button type="button" aria-label="Chỉnh độ mờ là tính năng trả phí" onClick={() => setTraPhiQh('Chỉnh độ mờ bản đồ quy hoạch')} className="absolute inset-0" />}
+              </div>
             </div>
             {/* ── CHÚ GIẢI ─────────────────────────────────────────────────────────────
                 Chỉ hiện khi đang bật một lớp phân khu 1/2000 — bốn bản đó mới là bản được
@@ -2864,8 +2939,11 @@ export default function MapPage() {
                 dải màu chính là từ dưới lên. Nền màu vẽ lên chính ô trượt, rãnh để trong suốt. */}
             {(qhFillOn || rasterOverlays.some((o) => !!ovOn[o.id])) && (
               <div className="relative h-[123px] w-7">{/* 160px → 2/3 (107px) → +15% (123px), chủ dự án chỉnh 14/9/2026 */}
-                <input type="range" min={0} max={100} value={Math.round(opacity * 100)} onChange={(e) => setOpacity(Number(e.target.value) / 100)} aria-label="Độ đậm lớp quy hoạch"
-                  style={{ background: `linear-gradient(to right, #dc2626 ${Math.round(opacity * 100)}%, rgba(255,255,255,.85) ${Math.round(opacity * 100)}%)` }}
+                {/* tài khoản thường + lớp Cam Lâm: thanh bị khoá — lớp phủ trong suốt bắt cú chạm → hộp trả phí; ổ khoá nhỏ ở chân thanh */}
+                {khoaDoMo && <button type="button" aria-label="Chỉnh độ mờ là tính năng trả phí" onClick={() => setTraPhiQh('Chỉnh độ mờ bản đồ quy hoạch')}
+                  className="absolute inset-0 z-10 flex items-end justify-center pb-0.5 text-[11px]">🔒</button>}
+                <input type="range" min={0} max={100} value={Math.round(doMoHien * 100)} disabled={khoaDoMo} onChange={(e) => setOpacity(Number(e.target.value) / 100)} aria-label="Độ đậm lớp quy hoạch"
+                  style={{ background: `linear-gradient(to right, #dc2626 ${Math.round(doMoHien * 100)}%, rgba(255,255,255,.85) ${Math.round(doMoHien * 100)}%)`, opacity: khoaDoMo ? 0.55 : 1 }}
                   className="absolute left-1/2 top-1/2 h-1 w-[123px] -translate-x-1/2 -translate-y-1/2 -rotate-90 cursor-pointer appearance-none rounded-full shadow-[0_0_2px_rgba(0,0,0,.5)]
                     [&::-webkit-slider-runnable-track]:h-1 [&::-webkit-slider-runnable-track]:bg-transparent
                     [&::-webkit-slider-thumb]:-mt-[8px] [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#dc2626] [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md
@@ -2918,7 +2996,7 @@ export default function MapPage() {
                     return (
                       <button key={o.id} onClick={() => { bamMucQh(o, !bat); setQhSheet(false); }}
                         className={`relative block w-full truncate whitespace-nowrap border-b border-black/10 px-8 py-[11px] text-center text-[14px] text-[#0A2540] active:bg-black/5 ${bat ? 'font-medium' : ''}`}>
-                        {bat && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] font-bold text-[#C8A14B]">✓</span>}{tenVung} · {o.tenApp}{o.khoa && <span className="ml-1 text-[12px]" aria-label="liên hệ admin">🔒</span>}
+                        {bat && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] font-bold text-[#C8A14B]">✓</span>}{tenVung} · {o.tenApp}{(o.khoa || o.xemThu) && <span className="ml-1 text-[12px]" aria-label={o.xemThu ? 'xem ở mức nhìn xa' : 'liên hệ admin'}>🔒</span>}
                       </button>
                     );
                   })}
@@ -2961,6 +3039,7 @@ export default function MapPage() {
               </div>
             );
           })()}
+          {traPhiQh && <HopTraPhi ten={traPhiQh} onDong={() => setTraPhiQh(null)} />}
           {/* ── HỘP "LIÊN HỆ ADMIN" (15/10/2026): bấm dòng quy hoạch có khoá (lớp chỉ quản trị viên, vd QH chi tiết 1/500) ── */}
           {hopKhoa && (
             <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 px-4 animate-[fadeIn_.15s_ease-out]" onClick={() => setHopKhoa(null)}>
@@ -2976,9 +3055,14 @@ export default function MapPage() {
                 {!laQuanTri && (
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <a href="tel:0567442996" className="rounded bg-[#0A2540] py-2 text-center text-[13px] font-semibold text-white">📞 0567 442 996</a>
-                    <a href="https://zalo.me/0567442996" target="_blank" rel="noreferrer" className="rounded border border-[#0068FF] py-2 text-center text-[13px] font-semibold text-[#0068FF]">Zalo admin</a>
+                    <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" className="rounded border border-[#0068FF] py-2 text-center text-[13px] font-semibold text-[#0068FF]">Zalo admin</a>
                     <button type="button" onClick={() => { setHopKhoa(null); try { window.dispatchEvent(new CustomEvent('cl-open-chat', { detail: { tab: 'support' } })); } catch { /* bỏ qua */ } }}
                       className="col-span-2 rounded border border-slate-300 py-2 text-[13px] font-semibold text-[#0A2540]">💬 Nhắn tin cho admin</button>
+                    <div className="col-span-2 hidden items-center gap-3 rounded border border-slate-200 p-2 sm:flex">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="/zalo-admin-qr.png" alt="Mã QR kết bạn Zalo admin" width={88} height={88} className="h-[88px] w-[88px]" />
+                      <p className="text-[12px] leading-snug text-slate-500">Quét mã bằng điện thoại để <b className="text-[#0A2540]">kết bạn Zalo admin</b>.</p>
+                    </div>
                   </div>
                 )}
                 <button type="button" onClick={() => setHopKhoa(null)} className="mt-2 w-full rounded py-2 text-[13px] font-semibold text-slate-500 active:bg-slate-100">Đóng</button>
@@ -3009,6 +3093,12 @@ export default function MapPage() {
               </div>
               <p className="px-3 py-1.5 text-[10px] text-slate-400 bg-slate-50">Bấm để xem từng thửa</p>
             </div>
+          )}
+          {khoaGan && xemThuDangBat && (
+            // lớp xem thử đang bật nhưng đã phóng gần quá mức xem thử → lớp ẩn; nhãn này nói rõ lý do, bấm vào là hộp trả phí
+            <button type="button" onClick={() => setTraPhiQh(`Xem gần ${xemThuDangBat.ten}`)}
+              className="absolute top-11 lg:top-[136px] left-1/2 -translate-x-1/2 z-10 max-w-[92vw] truncate bg-amber-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">
+              🔒 Phóng gần {xemThuDangBat.ten}: tính năng trả phí</button>
           )}
           {zoomNow > 0 && zoomNow < PARCEL_SHOW_ZOOM && (
             // Hàng nút quy hoạch nổi trên bản đồ đã bỏ (14/9/2026) nên về lại top-2 như máy tính.
@@ -3503,9 +3593,9 @@ export default function MapPage() {
                             {/* Tiêu đề + tên các mảnh phân khu gộp MỘT dòng cho gọn. */}
                             <p className={`truncate font-bold leading-snug text-[#0A2540] text-[13px]`}>{t.tieuDe}{t.khoa && <span className="ml-1 text-[12px]" aria-label="liên hệ admin">🔒</span>}{t.phu && <span className="ml-1.5 text-[10.5px] font-normal text-slate-400">{t.phu}</span>}</p>
                             {t.khoa && (
-                              <button type="button" onClick={() => setHopKhoa(t.tieuDe)}
+                              <button type="button" onClick={() => (t.traPhi ? setTraPhiQh(`Thông tin ${t.tieuDe}`) : setHopKhoa(t.tieuDe))}
                                 className="mt-1.5 rounded border border-slate-300 px-2.5 py-1 text-[12.5px] font-semibold text-[#0A2540] active:bg-slate-100">
-                                Liên hệ admin để xem
+                                {t.traPhi ? 'Đăng ký thành viên để xem' : 'Liên hệ admin để xem'}
                               </button>
                             )}
                             <div className="mt-1 space-y-[3px]">
@@ -3616,7 +3706,7 @@ export default function MapPage() {
                   <button
                     onClick={() => {
                       // KHOÁ CAM LÂM (15/10/2026): phiếu in ảnh + số liệu QĐ205 / phân khu → chỉ người có vé; người khác: hộp "liên hệ admin"
-                      if (!lopRieng?.ve) { setHopKhoa('Phiếu kiểm tra quy hoạch'); return; }
+                      if (!lopRieng?.ve) { if (coGoi) setHopKhoa('Phiếu kiểm tra quy hoạch'); else setTraPhiQh('Xuất phiếu kiểm tra quy hoạch'); return; }
                       const g = (highlight as any)?.geometry || (info.parcel as any)?.geometry;
                       const mapScen = qhScenario === 'all' ? '2045' : qhScenario;
                       // Ranh WGS84 của thửa (để đo diện tích theo ảnh QĐ205).

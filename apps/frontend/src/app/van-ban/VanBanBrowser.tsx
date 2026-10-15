@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
+import { useAuth, laAdmin, coVaiTro, coGoiChung } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import { api, apiBase } from '@/lib/api';
 import { getToken } from '@/lib/token';
@@ -82,8 +82,8 @@ function SoXuong({ value, onChange, opts, w = '' }: { value: string; onChange: (
 
 export default function VanBanBrowser() {
   const { user } = useAuth();
-  // Quyền tra cứu văn bản (TÍNH NĂNG TRẢ PHÍ, 15/10/2026): admin · người quản lý văn bản · khách được cấp vai trò 'tracuuvb'.
-  const coQuyenVb = laAdmin(user as any) || coVaiTro(user as any, 'vanban', 'tracuuvb');
+  // Quyền tra cứu văn bản (TÍNH NĂNG TRẢ PHÍ, 15/10/2026): admin · người quản lý văn bản · khách có GÓI CHỨC NĂNG CHUNG còn hạn.
+  const coQuyenVb = coVaiTro(user as any, 'admin', 'vanban') || coGoiChung(user);
   const [hopTraPhi, setHopTraPhi] = useState(false);
   const { openLogin } = useLoginGate();
   const [docs, setDocs] = useState<VanBan[] | null>(null);
@@ -120,10 +120,15 @@ export default function VanBanBrowser() {
     requestAnimationFrame(() => oTimRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   }, [canCuon, docs]);
 
+  // Tải lại danh sách mỗi khi ĐỔI TÀI KHOẢN / đổi quyền (15/10/2026): trước chỉ tải một lần lúc mở trang → đăng xuất admin, vào tài khoản
+  // thường mà trang (nhất là trong khung Tiện ích) chưa tải lại thì vẫn giữ danh sách KHÔNG CHE của admin.
+  const khoaNguoiXem = `${user?.id ?? 0}|${coQuyenVb ? 1 : 0}|${laAdmin(user as any) ? 1 : 0}`;
   useEffect(() => {
     setErr('');
-    api<{ docs: VanBan[] }>('/van-ban').then((r) => setDocs((r.docs || []).map((d) => ({ ...d, soKyHieu: deEnt(d.soKyHieu), trichYeu: deEnt(d.trichYeu), coQuan: deEnt(d.coQuan) })))).catch((e) => setErr(e?.message || 'Lỗi tải văn bản'));
-  }, []);
+    let con = true;
+    api<{ docs: VanBan[] }>('/van-ban').then((r) => { if (con) setDocs((r.docs || []).map((d) => ({ ...d, soKyHieu: deEnt(d.soKyHieu), trichYeu: deEnt(d.trichYeu), coQuan: deEnt(d.coQuan) }))); }).catch((e) => { if (con) setErr(e?.message || 'Lỗi tải văn bản'); });
+    return () => { con = false; };
+  }, [khoaNguoiXem]);
 
   // Danh sách chọn thời gian: mỗi năm có 1 dòng "Năm 2026" rồi tới các tháng CÓ văn bản của năm đó (mới nhất trước)
   const THOI_GIAN = useMemo(() => {
@@ -156,8 +161,9 @@ export default function VanBanBrowser() {
     if (!coQuyenVb) { setHopTraPhi(true); return; }   // TÍNH NĂNG TRẢ PHÍ (15/10/2026) — máy chủ cũng chặn tệp (403)
     if (!d.coFile) return;
     setDangXem({ id: d.id, ten: `${(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')} · ${d.trichYeu}`,
-      tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`, url: `${apiBase}/van-ban/${d.id}/pdf?v=10` /* v=10 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts) mới được giữ 30 ngày */, token: getToken() || '' });
-    setDocs((ds) => (ds || []).map((x) => x.id === d.id ? { ...x, luotTai: (x.luotTai || 0) + 1 } : x));
+      tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`, url: `${apiBase}/van-ban/${d.id}/pdf?v=12` /* v=12 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts) mới được giữ 30 ngày */, token: getToken() || '' });
+    // admin thấy số thật (+1); người khác thấy số hiển thị — máy chủ cộng ngẫu nhiên 2–5 mỗi lượt mở (routes/vanBan.ts LUOT_HIEN)
+    setDocs((ds) => (ds || []).map((x) => x.id === d.id ? { ...x, luotTai: (x.luotTai || 0) + (laAdmin(user as any) ? 1 : 2 + Math.floor(Math.random() * 4)) } : x));
     doiDiaChi(d.id);
   }
   // ĐƯỜNG DẪN MỞ THẲNG MỘT VĂN BẢN: /van-ban?vb=<mã> (15/10/2026 — nút "Chia sẻ" trong khung xem gửi đường dẫn này). Mở / đóng văn bản thì
@@ -282,7 +288,7 @@ export default function VanBanBrowser() {
                     {d.coFile
                       ? <button onClick={() => taiPdf(d)} className="text-left text-[#0A2540] hover:text-[#C8A14B] font-medium leading-snug">{d.trichYeu}</button>
                       : <span className="text-[#0A2540] leading-snug">{d.trichYeu}</span>}
-                    <span className="block text-[11px] text-slate-400 mt-1 sm:hidden">{d.an ? <span className="blur-[3px] select-none">••/••/••••</span> : fmtNgay(d.ngay)} · {d.coQuan}{d.luotTai != null ? ` · ${d.luotTai.toLocaleString('vi-VN')} lượt tải` : ''}</span>
+                    <span className="block text-[11px] text-slate-400 mt-1 sm:hidden">{d.an ? <span className="blur-[3px] select-none">••/••/••••</span> : fmtNgay(d.ngay)} · {d.coQuan}{d.luotTai != null ? ` · ${d.luotTai.toLocaleString('vi-VN')} ${laAdmin(user as any) ? 'lượt tải' : 'lượt xem'}` : ''}</span>
                   </td>
                   <td className={`${td} text-center`}>
                     {d.coFile

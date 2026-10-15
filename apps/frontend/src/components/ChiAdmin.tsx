@@ -8,8 +8,8 @@ import { useLoginGate } from '@/lib/loginGate';
  * chỉ hiện khung khoá "liên hệ admin" — chữ KHÔNG nói tiện ích dành cho tài khoản nào (chủ dự án: "liên hệ admin chứ đừng nói tài
  * khoản nào được xem"). Chưa đăng nhập thì có thêm nút Đăng nhập. Mở lại cho mọi người: đổi layout.tsx về như cũ.
  * ⚠️ Chặn ở GIAO DIỆN: mã + dữ liệu tĩnh của trang vẫn là tệp công khai — dữ liệu thật sự cần giấu phải để sau API có kiểm quyền.
- * TÍNH NĂNG TRẢ PHÍ (15/10/2026): `vaiTro` = vai trò được dùng ngoài admin (vd 'tracuuvb', 'denbu' — admin tích cho khách đã trả phí ở trang
- * quản trị); `traPhi` = khung khoá ghi "tính năng trả phí — liên hệ admin để đăng ký".
+ * `vaiTro` = vai trò được dùng ngoài admin; `traPhi` = khung khoá ghi "tính năng trả phí — liên hệ admin để đăng ký". (Tính năng trả phí
+ * chung — văn bản, đền bù, bản đồ QH Cam Lâm — nay theo GÓI CHỨC NĂNG CHUNG có hạn dùng: lib/auth coGoiChung, không qua thành phần này.)
  */
 export default function ChiAdmin({ ten, vaiTro = [], traPhi = false, children }: { ten: string; vaiTro?: string[]; traPhi?: boolean; children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -29,9 +29,14 @@ export default function ChiAdmin({ ten, vaiTro = [], traPhi = false, children }:
         <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">{traPhi ? 'Đây là tính năng trả phí — vui lòng liên hệ admin Cam Lâm Land để đăng ký dùng.' : 'Vui lòng liên hệ admin Cam Lâm Land để được dùng tiện ích này.'}</p>
         <div className="mt-3 grid grid-cols-2 gap-2">
           <a href="tel:0567442996" className="rounded bg-[#0A2540] py-2 text-center text-[13px] font-semibold text-white">📞 0567 442 996</a>
-          <a href="https://zalo.me/0567442996" target="_blank" rel="noreferrer" className="rounded border border-[#0068FF] py-2 text-center text-[13px] font-semibold text-[#0068FF]">Zalo admin</a>
+          <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" className="rounded border border-[#0068FF] py-2 text-center text-[13px] font-semibold text-[#0068FF]">Zalo admin</a>
           <button type="button" onClick={() => { try { window.dispatchEvent(new CustomEvent('cl-open-chat', { detail: { tab: 'support' } })); } catch { /* bỏ qua */ } }}
             className="col-span-2 rounded border border-slate-300 py-2 text-[13px] font-semibold text-[#0A2540]">💬 Nhắn tin cho admin</button>
+          <div className="col-span-2 hidden items-center gap-3 rounded border border-slate-200 p-2 sm:flex">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/zalo-admin-qr.png" alt="Mã QR kết bạn Zalo admin" width={88} height={88} className="h-[88px] w-[88px]" />
+            <p className="text-[12px] leading-snug text-slate-500">Quét mã bằng điện thoại để <b className="text-[#0A2540]">kết bạn Zalo admin</b>.</p>
+          </div>
           {!user && (
             <button type="button" onClick={() => openLogin({ reason: `Đăng nhập để dùng tiện ích ${ten}.` })}
               className="col-span-2 rounded py-2 text-[13px] font-semibold text-slate-500 active:bg-slate-100">Đăng nhập</button>

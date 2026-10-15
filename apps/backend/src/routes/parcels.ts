@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { query } from '../lib/db.ts';
 import { cached, cachePut } from '../lib/cache.ts';
 import { vnNoAccent } from '../lib/vn.ts';
-import { verifyToken, coVaiTro } from '../lib/auth.ts';
+import { verifyToken, coVaiTro, coGoiChung } from '../lib/auth.ts';
 import { computeQhAreas, computeQhTheoBan, outerRing, qhReady, ngoaiVungQh, chuanToaDoDiaChinh, manhQh205 } from '../lib/qhCompute.ts';
 import { sqlDienTichPhang, sqlHeSoPhang } from '../lib/dienTichPhang.ts';
 import { qhCoLuu, tinhQhHinh, dtPhangVong } from '../lib/qhLuu.ts';
@@ -14,7 +14,8 @@ import { nguoiDungTuYeuCau } from '../middleware/auth.ts';
 // ── AI ĐƯỢC XEM ĐỦ QUY HOẠCH CAM LÂM (15/10/2026) — MỘT CHỖ DUY NHẤT để đổi (vd sau này mở cho gói trả phí / vai trò riêng) ──
 // Chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free, còn lại khoá lại". Bị khoá: QĐ205 (quy hoạch chung 2045), 7 bản phân khu 1/2000,
 // 1/500 (lib/qh500.ts). Ảnh bản đồ các bản này: routes/qhRieng.ts (vé admin) + nginx chặn đường /tiles/ cũ.
-export const xemDuQhCamLam = (nd: any) => laAdmin(nd);
+// (15/10/2026) + khách có GÓI CHỨC NĂNG CHUNG còn hạn (lib/auth.ts coGoiChung — gồm cả admin): mở hết TRỪ 1/500 (1/500 vẫn chỉ admin — qh500).
+export const xemDuQhCamLam = (nd: any) => coGoiChung(nd);
 const PK_CAM_LAM = new Set(['2076', '2101', '2222', '918', 'cuhin', 'taynam', 'taybac']);   // mã 7 bản phân khu trong qhCacBan (qhCompute.ts)
 import { isFlagOn } from '../lib/flags.ts';
 
@@ -312,11 +313,13 @@ parcelsRouter.get('/at', async (req, res, next) => {
     // (15/10/2026) QH CHI TIẾT 1/500 (lib/qh500.ts): loại đất + diện tích CHỈ gửi cho ADMIN (kiểm thẻ đầy đủ). Người khác: thửa nằm trong
     // ranh 1/500 thì chỉ có dấu khoá (giao diện hiện "liên hệ admin"). Trả số liệu thì đánh dấu riêng tư — không cho nginx / Cloudflare
     // giữ lại phát cho người khác (nginx vốn đã bỏ qua đệm khi yêu cầu có thẻ đăng nhập).
+    // TRA THỬA Ở CAM LÂM VẪN MIỄN PHÍ (chủ dự án 15/10/2026: "ở 893 cứ cho tra cứu tới thửa như bình thường, chỉ khoá không cho làm mờ bản
+    // đồ quy hoạch"): người chưa có gói chung vẫn nhận thửa + QĐ893; QĐ205 / phân khu chỉ còn dấu khoá (khoaQhCamLam bên dưới).
     const nd = await nguoiDungTuYeuCau(req).catch(() => null);
     const xemDu = xemDuQhCamLam(nd);
     let qh500: any = null;
     if (parcel && tuBangMoi) {
-      qh500 = await qh500TrenThua(Number(parcel.id), dtThua, xemDu).catch(() => null);
+      qh500 = await qh500TrenThua(Number(parcel.id), dtThua, laAdmin(nd)).catch(() => null);   // 1/500: CHỈ admin (vai trò trả phí không mở)
     }
     const qhCacBan = [...qhCacBanCL, ...qhPdf, ...(qh500 ? [qh500] : [])];
     // (10/10/2026) thêm: có thửa mà KHÔNG bản nào phủ (vd thửa Phước Đồng sát ranh QĐ205, nay phần ngoài ranh không còn bị
@@ -413,7 +416,7 @@ parcelsRouter.post('/qh-tu-ve', async (req, res, next) => {
     const qhCacBanCL = kqQh ? kqQh.cacBan : computeQhTheoBan(ring, dt);
     const qhPdf = canTraPdf(overlaps, qhCacBanCL) && (process.env.QH_PDF_THU === '1' || await isFlagOn('qh_pdf_bat'))
       ? await qhTuPdfHinh(gj, xa?.xaId ? String(xa.xaId) : null, dt) : [];
-    const qh500 = await qh500TrenHinh(gj, dt, xemDu).catch(() => null);
+    const qh500 = await qh500TrenHinh(gj, dt, laAdmin(nd)).catch(() => null);   // 1/500: CHỈ admin
     const qhCacBan = [...qhCacBanCL, ...qhPdf, ...(qh500 ? [qh500] : [])];
     const qhNgoaiVung = overlaps.length === 0 && qhCacBan.length === 0;
     const kh = khoaQhCamLam(xemDu, overlaps, null, qhCacBan);

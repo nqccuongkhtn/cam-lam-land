@@ -16,6 +16,7 @@ const profile = (u: any) => ({
   fullName: u.full_name ?? null, phone: u.phone ?? null,
   tier: u.tier ?? 'free', status: u.status ?? 'active',
   emailVerified: u.email_verified ?? true, avatar: u.avatar ?? null,
+  goiChungDen: u.goi_chung_het_han ?? null,   // hạn GÓI CHỨC NĂNG CHUNG (lib/auth.ts coGoiChung) — giao diện mở khoá theo đây
 });
 const gen6 = () => String(Math.floor(100000 + Math.random() * 900000));
 const isEmail = (e: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);

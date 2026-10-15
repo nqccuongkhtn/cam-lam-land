@@ -12,14 +12,15 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS tier           TEXT NOT NULL DEFAULT 
 ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar         TEXT;
 ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
 UPDATE users SET role='user' WHERE role='sales';
--- 15/10/2026: thêm 'tracuuvb' (Tra cứu văn bản — trả phí) + 'denbu' (Tính giá đền bù — trả phí), admin cấp tay ở trang quản trị.
-ALTER TABLE users ADD  CONSTRAINT users_role_check CHECK (role IN ('user','admin','gis','vanban','hotlist','danhmuc','xacthuc','tracuuvb','denbu'));
+-- 15/10/2026: 'tracuuvb' / 'denbu' / 'qhcamlam' = ba vai trò trả phí lẻ thêm buổi sáng, buổi tối đã thay bằng GÓI CHỨC NĂNG CHUNG
+-- (cột goi_chung_het_han, cuối tệp). Tên vẫn để trong ràng buộc cho an toàn (tài khoản nào lỡ có vẫn hợp lệ) — mã không cấp nữa.
+ALTER TABLE users ADD  CONSTRAINT users_role_check CHECK (role IN ('user','admin','gis','vanban','hotlist','danhmuc','xacthuc','tracuuvb','denbu','qhcamlam'));
 -- MỘT NGƯỜI CÓ THỂ GIỮ NHIỀU VAI TRÒ: cột roles là DANH SÁCH vai trò của tài khoản đó.
 -- Cột role cũ vẫn giữ, coi như "vai trò chính" (để chỗ nào chưa kịp đổi vẫn chạy bình thường).
 ALTER TABLE users ADD COLUMN IF NOT EXISTS roles TEXT[] NOT NULL DEFAULT '{}';
 UPDATE users SET roles = ARRAY[role] WHERE roles IS NULL OR cardinality(roles) = 0;
 ALTER TABLE users DROP CONSTRAINT IF EXISTS users_roles_check;
-ALTER TABLE users ADD  CONSTRAINT users_roles_check CHECK (roles <@ ARRAY['user','admin','gis','vanban','hotlist','danhmuc','xacthuc','tracuuvb','denbu']::text[]);
+ALTER TABLE users ADD  CONSTRAINT users_roles_check CHECK (roles <@ ARRAY['user','admin','gis','vanban','hotlist','danhmuc','xacthuc','tracuuvb','denbu','qhcamlam']::text[]);
 CREATE INDEX IF NOT EXISTS users_roles_idx ON users USING GIN (roles);
 CREATE TABLE IF NOT EXISTS email_verifications (
   id SERIAL PRIMARY KEY, email TEXT NOT NULL, code TEXT NOT NULL,
@@ -406,6 +407,11 @@ export async function migrate(): Promise<void> {
   )`).catch((e: any) => console.error('[migrate] van_ban lỗi:', e?.message || e));
   await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS van_ban_key_idx ON van_ban (so_hieu, ngay_ban_hanh)`).catch((e: any) => console.error('[migrate] van_ban key lỗi:', e?.message || e));
   await pool.query(`CREATE INDEX IF NOT EXISTS van_ban_chude_idx ON van_ban (chu_de, ngay_ban_hanh DESC)`).catch(() => {});
+  // LƯỢT TẢI HIỂN THỊ (15/10/2026, chủ dự án: "lượt tải cái nào cũng cho trên 50 lượt hết, chỉ tài khoản admin thấy lượt thật, còn lại cho
+  // số lượng ảo 1 tí, 1 lượt xem thì cộng từ 2–5 random"). luot_tai = số THẬT (chỉ admin thấy); luot_ao = số hiện cho người khác:
+  // lần đầu = số thật + ngẫu nhiên 23…88 (chủ dự án đổi từ "trên 50" cùng ngày), mỗi lần mở văn bản cộng ngẫu nhiên 2–5 (routes/vanBan.ts). Văn bản mới thêm sau được điền ở lần khởi động kế.
+  await pool.query(`ALTER TABLE van_ban ADD COLUMN IF NOT EXISTS luot_ao INT`).catch((e: any) => console.error('[migrate] van_ban luot_ao lỗi:', e?.message || e));
+  await pool.query(`UPDATE van_ban SET luot_ao = luot_tai + 23 + floor(random() * 66)::int WHERE luot_ao IS NULL`).catch(() => {});
   // ── Index BỔ SUNG (tối ưu tốc độ + chống chậm): các cột hay LỌC/SẮP XẾP nhưng còn thiếu index ──
   await pool.query(`CREATE INDEX IF NOT EXISTS property_interests_user_idx ON property_interests (user_id)`).catch(() => {}); // CRM: bảng/nhu cầu/quan tâm lọc theo user_id
   await pool.query(`CREATE INDEX IF NOT EXISTS customer_needs_user_idx ON customer_needs (user_id)`).catch(() => {});
@@ -858,6 +864,10 @@ export async function migrate(): Promise<void> {
       ban text PRIMARY KEY, qd text NOT NULL, ten text NOT NULL, geom geometry(MultiPolygon, 4326) NOT NULL)`)
     .catch((e) => console.error('[migrate] qh_500_ranh:', e.message));
   await pool.query(`CREATE INDEX IF NOT EXISTS qh_500_ranh_geom_idx ON qh_500_ranh USING gist (geom)`).catch(() => {});
+  // GÓI CHỨC NĂNG CHUNG (15/10/2026) — hạn dùng các tính năng trả phí chung: tra cứu văn bản · giá đền bù · bản đồ QH Cam Lâm
+  // (lib/auth.ts coGoiChung). NULL / đã qua = không có gói.
+  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS goi_chung_het_han TIMESTAMPTZ`)
+    .catch((e: any) => console.error('[migrate] thêm cột goi_chung_het_han lỗi:', e?.message || e));
 
   console.log('[migrate] schema up to date');
 }

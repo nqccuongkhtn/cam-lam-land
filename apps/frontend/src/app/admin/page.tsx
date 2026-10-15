@@ -175,7 +175,7 @@ function QcTrangChu() {
               <input defaultValue={o.nut || ''} onBlur={(e) => sua(k, id, 'nut', e.target.value)} placeholder="Chữ nút — vd: Xem dự án" className={inp} />
               <label className="flex items-center gap-2 text-xs text-slate-500">Hết hạn<input type="date" value={o.hanDen || ''} onChange={(e) => sua(k, id, 'hanDen', e.target.value)} className={inp} /></label>
             </div>
-            <input defaultValue={o.link || ''} onBlur={(e) => sua(k, id, 'link', e.target.value)} placeholder="Bấm vào đi đâu — /listings/123 · https://... · tel:0567442996 · https://zalo.me/0567442996" className={inp} />
+            <input defaultValue={o.link || ''} onBlur={(e) => sua(k, id, 'link', e.target.value)} placeholder="Bấm vào đi đâu — /listings/123 · https://... · tel:0567442996 · https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" className={inp} />
             <input defaultValue={o.anh || ''} onBlur={(e) => sua(k, id, 'anh', e.target.value)} placeholder="Link ảnh nền (nên có — ảnh chạy động) — ảnh ngang, vd 800×500" className={inp} />
             <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500">Màu (khi không có ảnh):
               {Object.entries(MAU_QC).map(([mid, m]) => <button key={mid} onClick={() => sua(k, id, 'mau', mid)} className={`px-2 py-1 rounded text-[11px] font-bold ${(o.mau || 'xanh') === mid ? 'ring-2 ring-offset-1 ring-[#0A2540]' : ''}`} style={{ background: m.nen, color: m.chu }}>{m.ten}</button>)}
@@ -373,12 +373,138 @@ function DemoData() {
   );
 }
 
+// ══ QUẢN LÝ TÀI KHOẢN TRẢ PHÍ (15/10/2026) ══
+// Chủ dự án: "trả phí chia ra là các chức năng chung, còn trả phí mua gói số tin đăng, đẩy tin hay quảng cáo bản đồ là chức năng riêng".
+//  · CHỨC NĂNG CHUNG = MỘT gói có hạn dùng: tra cứu văn bản · tính giá đền bù · bản đồ quy hoạch Cam Lâm (trừ 1/500). Admin cấp / gia hạn
+//    (cộng dồn) / thu hồi — POST /api/admin/users/:id/goi-chung.
+//  · CHỨC NĂNG RIÊNG = gói số tin đăng · gói đẩy tin · tạo video bản đồ (kích hoạt bằng tay như đơn đã trả tiền — /kich-hoat, có dấu vết ở
+//    thẻ Thanh toán; thu hồi — /thu-hoi) · quảng cáo bản đồ (không gắn tài khoản — quản lý ở thẻ "Quảng cáo").
+const conNgay = (iso?: string | null) => { if (!iso) return 0; const ms = new Date(iso).getTime() - Date.now(); return ms > 0 ? Math.ceil(ms / 86400000) : 0; };
+const ngayVn = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString('vi-VN') : '');
+const TEN_HANG: Record<string, string> = { normal: 'Đẩy Thường', silver: 'VIP Bạc', gold: 'VIP Vàng', diamond: 'VIP Kim Cương' };
+/** Ô tóm tắt trong bảng người dùng: mỗi gói còn hạn một nhãn nhỏ; không có gì → "Miễn phí". */
+function TomTatTraPhi({ u }: { u: any }) {
+  const nhan: [string, string][] = [];
+  const c = conNgay(u.goiChungHetHan);
+  if (c) nhan.push([`⭐ Gói chung · ${c} ngày`, 'bg-[#C8A14B]/15 text-[#7a5c17]']);
+  if (conNgay(u.postExpiresAt)) nhan.push([`📝 ${u.postQuota} tin`, 'bg-emerald-50 text-emerald-700']);
+  if (conNgay(u.boostExpiresAt)) nhan.push([`🚀 ${TEN_HANG[u.pkgTier] || 'Đẩy tin'}`, 'bg-sky-50 text-sky-700']);
+  if (conNgay(u.videoExpiresAt)) nhan.push(['🎬 Video', 'bg-violet-50 text-violet-700']);
+  return (
+    <span className="flex flex-wrap items-center gap-1">
+      {nhan.length ? nhan.map(([t, m]) => <span key={t} className={`whitespace-nowrap rounded px-1.5 py-0.5 text-[11px] font-semibold ${m}`}>{t}</span>)
+        : <span className="text-[11px] text-slate-400">Miễn phí</span>}
+      <span className="whitespace-nowrap text-[11px] font-semibold text-[#0A2540] underline decoration-dotted">Quản lý ›</span>
+    </span>
+  );
+}
+function QuanLyTraPhi({ u, onDong, onDoi }: { u: any; onDong: () => void; onDoi: () => void }) {
+  const [goi, setGoi] = useState<any[]>([]);
+  const [ban, setBan] = useState('');
+  const [chonTin, setChonTin] = useState(''); const [chonDay, setChonDay] = useState(''); const [chonTv, setChonTv] = useState(''); const [ngayTay, setNgayTay] = useState('');
+  useEffect(() => { api<{ packages: any[] }>('/payments/packages').then((r) => setGoi(r.packages || [])).catch(() => {}); }, []);
+  const goiTin = goi.filter((p) => p.kind === 'post'), goiDay = goi.filter((p) => p.kind === 'boost'), goiTv = goi.filter((p) => p.kind === 'chung');
+  const ten = u.fullName || u.email;
+  async function lam(viec: string, duong: string, body: any, hoi?: string) {
+    if (hoi && !confirm(hoi)) return;
+    setBan(viec);
+    try { await api(`/admin/users/${u.id}/${duong}`, { method: 'POST', body: JSON.stringify(body) }); onDoi(); }
+    catch (e: any) { alert(e.message); } finally { setBan(''); }
+  }
+  const nut = 'rounded border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-[#0A2540] hover:border-[#0A2540] disabled:opacity-40';
+  const nutThuHoi = 'rounded px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-40';
+  const TrangThai = ({ iso, con }: { iso?: string | null; con: string }) => {
+    const n = conNgay(iso);
+    return n ? <p className="text-[12.5px] font-semibold text-emerald-700">✓ {con} · còn {n} ngày (đến {ngayVn(iso)})</p>
+      : <p className="text-[12.5px] text-slate-400">{iso ? `Đã hết hạn ngày ${ngayVn(iso)}` : 'Chưa có'}</p>;
+  };
+  const c = conNgay(u.goiChungHetHan);
+  return (
+    <div className="fixed inset-0 z-[95] grid place-items-center bg-black/50 p-3" onClick={onDong}>
+      <div role="dialog" aria-modal="true" aria-label="Quản lý trả phí" onClick={(e) => e.stopPropagation()}
+        className="max-h-[92dvh] w-full max-w-[440px] overflow-y-auto rounded-lg bg-white p-4 shadow-2xl">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0"><p className="text-[15px] font-bold text-[#0A2540]">Quản lý trả phí</p>
+            <p className="truncate text-xs text-slate-500">{ten}{u.fullName ? ` · ${u.email}` : ''}</p></div>
+          <button type="button" onClick={onDong} aria-label="Đóng" className="grid h-8 w-8 shrink-0 place-items-center rounded text-slate-400 hover:bg-slate-100">✕</button>
+        </div>
+
+        <div className="mt-3 rounded-lg border border-[#C8A14B]/50 bg-[#C8A14B]/5 p-3">
+          <p className="text-[13px] font-bold text-[#0A2540]">⭐ Gói chức năng chung</p>
+          <p className="mt-0.5 text-[11.5px] leading-snug text-slate-500">Tra cứu văn bản · tính giá đền bù · bản đồ quy hoạch Cam Lâm đầy đủ (trừ 1/500)</p>
+          <div className="mt-1.5"><TrangThai iso={u.goiChungHetHan} con="Đang dùng" /></div>
+          {/* GÓI THÀNH VIÊN (lib/packages.ts kind 'chung': 3 tháng 299K · 6 tháng 568K · 1 năm 1068K · 2 năm 1968K) — kích hoạt = ghi đơn "ADMIN" ở
+              thẻ Thanh toán (biết đã bán gói nào, bao nhiêu tiền). Cộng tay số ngày (dùng thử / bù ngày) KHÔNG ghi đơn. */}
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            <select value={chonTv} onChange={(e) => setChonTv(e.target.value)} className="min-w-0 flex-1 rounded border border-slate-300 bg-white px-1.5 py-1 text-xs">
+              <option value="">Chọn gói thành viên…</option>{goiTv.map((p) => <option key={p.id} value={p.id}>{p.name} · {Math.round(p.price / 1000)}K</option>)}
+            </select>
+            <button type="button" disabled={!chonTv || !!ban} onClick={() => lam('chung', 'kich-hoat', { packageId: chonTv },
+              `Kích hoạt "${goiTv.find((p) => p.id === chonTv)?.name}" (${Math.round((goiTv.find((p) => p.id === chonTv)?.price || 0) / 1000)}K) cho ${ten}? Ghi một đơn "ADMIN" ở thẻ Thanh toán; gói còn hạn thì cộng dồn.`)} className={nut}>Kích hoạt</button>
+          </div>
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            <input value={ngayTay} onChange={(e) => setNgayTay(e.target.value.replace(/\D/g, '').slice(0, 4))} inputMode="numeric" placeholder="số ngày"
+              className="w-20 rounded border border-slate-300 px-1.5 py-1 text-xs" />
+            <button type="button" disabled={!Number(ngayTay) || !!ban} onClick={() => lam('chung', 'goi-chung', { ngay: Number(ngayTay) },
+              `Cộng tay ${Number(ngayTay)} ngày Gói chức năng chung cho ${ten}? (không ghi đơn thanh toán — dùng cho dùng thử / bù ngày)`)} className={nut}>Cộng tay</button>
+            {c > 0 && <button type="button" disabled={!!ban} onClick={() => lam('chung', 'goi-chung', { ngay: 0 }, `Thu hồi Gói chức năng chung của ${ten}? Tài khoản bị khoá lại các tính năng trả phí chung ngay.`)} className={nutThuHoi}>Thu hồi</button>}
+          </div>
+          <p className="mt-1.5 text-[10.5px] text-slate-400">Gói còn hạn thì cộng dồn từ ngày hết hạn. Áp dụng ngay, khách không phải đăng nhập lại.</p>
+        </div>
+
+        <p className="mt-4 text-[11px] font-bold uppercase tracking-wide text-slate-400">Chức năng riêng · mua riêng từng gói</p>
+        <div className="mt-1.5 divide-y divide-slate-100 rounded-lg border border-slate-200">
+          <div className="p-3">
+            <p className="text-[13px] font-bold text-[#0A2540]">📝 Gói số tin đăng</p>
+            <TrangThai iso={u.postExpiresAt} con={`${u.postQuota} tin/tháng · đã đăng ${u.postUsed ?? 0}`} />
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <select value={chonTin} onChange={(e) => setChonTin(e.target.value)} className="min-w-0 flex-1 rounded border border-slate-300 px-1.5 py-1 text-xs">
+                <option value="">Chọn gói…</option>{goiTin.map((p) => <option key={p.id} value={p.id}>{p.name} · {p.days} ngày</option>)}
+              </select>
+              <button type="button" disabled={!chonTin || !!ban} onClick={() => lam('post', 'kich-hoat', { packageId: chonTin },
+                `Kích hoạt gói "${goiTin.find((p) => p.id === chonTin)?.name}" cho ${ten}? (ghi một đơn "ADMIN" ở thẻ Thanh toán; gói đăng tin đang dùng sẽ được thay)`)} className={nut}>Kích hoạt</button>
+              {conNgay(u.postExpiresAt) > 0 && <button type="button" disabled={!!ban} onClick={() => lam('post', 'thu-hoi', { loai: 'post' }, `Thu hồi gói số tin đăng của ${ten}?`)} className={nutThuHoi}>Thu hồi</button>}
+            </div>
+          </div>
+          <div className="p-3">
+            <p className="text-[13px] font-bold text-[#0A2540]">🚀 Gói đẩy tin</p>
+            <TrangThai iso={u.boostExpiresAt} con={`${TEN_HANG[u.pkgTier] || 'Đẩy tin'} · đã đẩy ${u.boostUsed ?? 0}/${u.boostQuota ?? 0}`} />
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <select value={chonDay} onChange={(e) => setChonDay(e.target.value)} className="min-w-0 flex-1 rounded border border-slate-300 px-1.5 py-1 text-xs">
+                <option value="">Chọn gói…</option>{goiDay.map((p) => <option key={p.id} value={p.id}>{p.name} · {p.days} ngày</option>)}
+              </select>
+              <button type="button" disabled={!chonDay || !!ban} onClick={() => lam('boost', 'kich-hoat', { packageId: chonDay },
+                `Kích hoạt gói "${goiDay.find((p) => p.id === chonDay)?.name}" cho ${ten}? (ghi một đơn "ADMIN" ở thẻ Thanh toán; gói đẩy tin đang dùng sẽ được thay)`)} className={nut}>Kích hoạt</button>
+              {conNgay(u.boostExpiresAt) > 0 && <button type="button" disabled={!!ban} onClick={() => lam('boost', 'thu-hoi', { loai: 'boost' }, `Thu hồi gói đẩy tin của ${ten}?`)} className={nutThuHoi}>Thu hồi</button>}
+            </div>
+          </div>
+          <div className="p-3">
+            <p className="text-[13px] font-bold text-[#0A2540]">🎬 Tạo video bản đồ</p>
+            <TrangThai iso={u.videoExpiresAt} con="Đang dùng" />
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              <button type="button" disabled={!!ban} onClick={() => lam('video', 'video', { videoDays: 30 }, `Cấp thêm 30 ngày tạo video bản đồ cho ${ten}?`)} className={nut}>+30 ngày</button>
+              {conNgay(u.videoExpiresAt) > 0 && <button type="button" disabled={!!ban} onClick={() => lam('video', 'video', { videoDays: 0 }, `Thu hồi quyền tạo video của ${ten}?`)} className={nutThuHoi}>Thu hồi</button>}
+            </div>
+          </div>
+          <div className="p-3">
+            <p className="text-[13px] font-bold text-[#0A2540]">📍 Quảng cáo trên bản đồ</p>
+            <p className="text-[12px] leading-snug text-slate-500">Quảng cáo gắn theo nhà quảng cáo (tên + số điện thoại), không theo tài khoản — đặt / gia hạn ở thẻ <b>Quảng cáo</b>.</p>
+          </div>
+        </div>
+        {ban && <p className="mt-2 text-center text-xs text-slate-500">Đang lưu…</p>}
+      </div>
+    </div>
+  );
+}
+
 function Users() {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState(''); const [dq, setDq] = useState(''); const [page, setPage] = useState(1); const [total, setTotal] = useState(0); const per = 30;
+  const [chiTraPhi, setChiTraPhi] = useState(false);              // chỉ hiện tài khoản đang có gói trả phí còn hạn
+  const [dangQl, setDangQl] = useState<number | null>(null);      // tài khoản đang mở khung Quản lý trả phí
   useEffect(() => { const t = setTimeout(() => { setDq(q.trim()); setPage(1); }, 300); return () => clearTimeout(t); }, [q]);
-  const load = useCallback(() => { setLoading(true); api<{ users: any[]; total: number }>(`/admin/users?q=${encodeURIComponent(dq)}&page=${page}&per=${per}`).then((d) => { setRows(d.users); setTotal(d.total || 0); }).catch(() => {}).finally(() => setLoading(false)); }, [dq, page]);
+  const load = useCallback(() => { setLoading(true); api<{ users: any[]; total: number }>(`/admin/users?q=${encodeURIComponent(dq)}&page=${page}&per=${per}${chiTraPhi ? '&traPhi=1' : ''}`).then((d) => { setRows(d.users); setTotal(d.total || 0); }).catch(() => {}).finally(() => setLoading(false)); }, [dq, page, chiTraPhi]);
   useEffect(() => { load(); }, [load]);
 // ── CẤP VAI TRÒ: MỘT NGƯỜI CÓ THỂ GIỮ NHIỀU VAI TRÒ ──
 // Một ô bấm vào là SỔ XUỐNG danh sách vai trò, mỗi dòng có ô tích. Tích bao nhiêu vai trò cũng được
@@ -387,8 +513,7 @@ const VAI_TRO_DS: [string, string, string][] = [
   ['gis', '🗺️', 'Biên tập GIS'], ['vanban', '📄', 'Quản lý văn bản'],
   ['hotlist', '🔥', 'Tra cứu danh sách nóng'], ['danhmuc', '🗄️', 'Kho danh mục hồ sơ'],
   ['xacthuc', '🔐', 'Tra mã xác thực 2 lớp'],
-  // 15/10/2026 — hai tính năng TRẢ PHÍ: tích cho khách đã mua (chủ dự án: "tra cứu văn bản… tính giá đền bù là tính năng trả phí")
-  ['tracuuvb', '📚', 'Tra cứu văn bản (trả phí)'], ['denbu', '💵', 'Tính giá đền bù (trả phí)'],
+  // Tính năng TRẢ PHÍ không nằm ở đây — xem cột "Trả phí" → khung Quản lý trả phí (gói chức năng chung + các gói riêng).
   ['admin', '👑', 'Admin — toàn quyền'],
 ];
 function OVaiTro({ u, luu }: { u: any; luu: (roles: string[]) => void }) {
@@ -457,17 +582,20 @@ function OVaiTro({ u, luu }: { u: any; luu: (roles: string[]) => void }) {
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm theo tên / email / số điện thoại…" className="min-w-[220px] flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        <label className="flex shrink-0 items-center gap-1.5 text-sm text-slate-600">
+          <input type="checkbox" checked={chiTraPhi} onChange={(e) => { setChiTraPhi(e.target.checked); setPage(1); }} className="h-4 w-4" /> Chỉ tài khoản trả phí
+        </label>
         <span className="shrink-0 text-sm text-slate-500">{total.toLocaleString('vi')} người dùng</span>
       </div>
       <div className="bg-white rounded-2xl border border-slate-200 overflow-x-auto">
       <table className="w-full text-sm min-w-[660px]">
-        <thead className="bg-slate-50 text-left text-slate-500"><tr><th className="p-2">Tài khoản</th><th className="p-2">Vai trò</th><th className="p-2">Gói</th><th className="p-2">Trạng thái</th><th className="p-2">Gói đẩy/th</th><th className="p-2">Tư vấn ĐT</th></tr></thead>
+        <thead className="bg-slate-50 text-left text-slate-500"><tr><th className="p-2">Tài khoản</th><th className="p-2">Vai trò</th><th className="p-2">Trả phí</th><th className="p-2">Trạng thái</th><th className="p-2">Gói đẩy/th</th><th className="p-2">Tư vấn ĐT</th></tr></thead>
         <tbody>
           {rows.map((u) => (
             <tr key={u.id} className="border-t">
               <td className="p-2"><div className="font-semibold text-[#0A2540]">{u.fullName || u.email}</div><div className="text-xs text-slate-400">{u.email} · {u.phone || '—'}</div></td>
               <td className="p-2"><OVaiTro u={u} luu={(roles) => upd(u.id, { roles })} /></td>
-              <td className="p-2"><select value={u.tier} onChange={(e) => upd(u.id, { tier: e.target.value })} className={sel}><option value="free">Free</option><option value="paid">Trả phí</option></select></td>
+              <td className="p-2"><button type="button" onClick={() => setDangQl(u.id)} title="Quản lý trả phí: gói chức năng chung + các gói riêng" className="text-left"><TomTatTraPhi u={u} /></button></td>
               <td className="p-2"><select value={u.status} onChange={(e) => { const status = e.target.value; if (status === 'suspended' && !confirm(`Khoá tài khoản ${u.email}? Người dùng sẽ không đăng nhập được.`)) return; upd(u.id, { status }); }} className={sel}><option value="active">Hoạt động</option><option value="suspended">Khoá</option></select></td>
               <td className="p-2"><input type="number" min="0" defaultValue={u.boostQuota ?? 0} onBlur={(e) => upd(u.id, { boostQuota: Math.max(0, Number(e.target.value) || 0) })} title="Số lượt đẩy tin/tháng" className="w-16 border border-slate-300 rounded px-1.5 py-1 text-xs" /></td>
               <td className="p-2"><button onClick={() => upd(u.id, { isAdvisor: !u.isAdvisor })} className={`px-2.5 py-1 rounded-full text-xs font-bold ${u.isAdvisor ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'}`} title="Cho phép tài khoản này trả lời kênh Tư vấn đầu tư">{u.isAdvisor ? '✓ Tư vấn' : 'Tắt'}</button> <select value={String(u.rating ?? 0)} onChange={(e) => upd(u.id, { rating: Number(e.target.value) })} title="Chấm sao môi giới (Cam Lâm Land)" className={sel}><option value="0">☆ chưa</option><option value="3">★★★</option><option value="3.5">★★★½</option><option value="4">★★★★</option><option value="4.5">★★★★½</option><option value="5">★★★★★</option></select></td>
@@ -477,6 +605,9 @@ function OVaiTro({ u, luu }: { u: any; luu: (roles: string[]) => void }) {
         </tbody>
       </table>
       </div>
+      {dangQl != null && rows.some((r) => r.id === dangQl) && (
+        <QuanLyTraPhi u={rows.find((r) => r.id === dangQl)} onDong={() => setDangQl(null)} onDoi={load} />
+      )}
       {pages > 1 && <div className="flex items-center justify-center gap-2 text-sm">
         <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="rounded-lg border px-3 py-1.5 disabled:opacity-40">‹ Trước</button>
         <span className="text-slate-500">Trang {page} / {pages}</span>

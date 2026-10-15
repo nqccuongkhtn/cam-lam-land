@@ -127,11 +127,21 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
   // VanBanBrowser tự mở khung xem; chưa đăng nhập thì hiện hộp đăng nhập trước), KHÔNG gửi file: file chỉ tải được khi đăng nhập + có
   // vé người thật (chống cào). Điện thoại mở bảng chia sẻ của máy (Zalo, Messenger…); máy tính chép đường dẫn — như nút "🔗 Gửi" ở Tra cứu luật.
   const [daChep, setDaChep] = useState(false);
+  // CHỮ ĐI KÈM ĐƯỜNG DẪN (15/10/2026, chủ dự án: "nếu share như này họ có dữ liệu để vào google tìm kiếm … vẫn thấy nội dung nhưng không
+  // đủ thông tin để tìm"): số ký hiệu che chữ số (như máy chủ che cho người chưa có quyền — "••/TB-UBND"), trích yếu chỉ giữ 10 chữ đầu —
+  // đủ biết văn bản nói về việc gì, không đủ để tra ra đúng văn bản trên Google; muốn đọc phải vào web.
+  const tieuDeChiaSe = (() => {
+    const i = vb.ten.indexOf(' · ');
+    const so = i > 0 ? vb.ten.slice(0, i) : '', ty = i > 0 ? vb.ten.slice(i + 3) : vb.ten;
+    const chu = ty.split(/\s+/).filter(Boolean);
+    return (so ? so.replace(/\d/g, '•') + ' · ' : '') + (chu.length > 10 ? chu.slice(0, 10).join(' ') + '…' : ty);
+  })();
   const chiaSe = async () => {
     const url = `${window.location.origin}/van-ban?vb=${vb.id}`;
+    const loiMoi = 'Xem toàn văn tại Cam Lâm Land';
     const dienThoai = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
-    if (dienThoai && typeof navigator.share === 'function') { try { await navigator.share({ title: vb.ten, url }); } catch { /* người dùng huỷ */ } return; }
-    try { await navigator.clipboard.writeText(vb.ten + '\n' + url); setDaChep(true); setTimeout(() => setDaChep(false), 2000); } catch { /* trình duyệt chặn chép */ }
+    if (dienThoai && typeof navigator.share === 'function') { try { await navigator.share({ title: tieuDeChiaSe, text: `📄 ${tieuDeChiaSe}\n${loiMoi}`, url }); } catch { /* người dùng huỷ */ } return; }
+    try { await navigator.clipboard.writeText(`📄 ${tieuDeChiaSe}\n${loiMoi}: ${url}`); setDaChep(true); setTimeout(() => setDaChep(false), 2000); } catch { /* trình duyệt chặn chép */ }
   };
   const mb = (b: number) => (b / 1048576).toLocaleString('vi-VN', { maximumFractionDigits: 1 });
 

@@ -16,7 +16,8 @@ export interface AuthedRequest extends Request { user?: JwtPayload; }
 // ⚠️ 11/10/2026 (chủ dự án báo lỗi): hỏi luôn "ĐỜI PHIÊN ĐĂNG NHẬP" (cột users.phien_dang_nhap). Đổi mật khẩu + chọn
 //    "Đăng xuất khỏi mọi thiết bị khác" (hoặc admin đặt lại mật khẩu bằng TAO-TAI-KHOAN.bat) thì số này tăng → mọi thẻ cấp
 //    trước đó (số pv trong thẻ nhỏ hơn) bị từ chối NGAY, dù chưa hết hạn 7 ngày. Thẻ cũ không có pv được hiểu là 0.
-type TinhTrang = { ds: string[]; khoa: boolean; mat: boolean; pv?: number; luc: number };
+// gc = hạn GÓI CHỨC NĂNG CHUNG (mili giây, 0 = không có) — lib/auth.ts coGoiChung (15/10/2026)
+type TinhTrang = { ds: string[]; khoa: boolean; mat: boolean; pv?: number; gc?: number; luc: number };
 const nhoVaiTro = new Map<number, TinhTrang>();
 const NHO_MS = 30_000;
 // Đếm số lần "quên" của từng tài khoản: kết quả hỏi database mà trong lúc chờ có lần quên mới (vd vừa đổi mật khẩu xong)
@@ -28,9 +29,10 @@ async function vaiTroMoiNhat(id: number, cu: string[]): Promise<TinhTrang> {
   if (co && Date.now() - co.luc < NHO_MS) return co;
   const dau = lanQuen.get(id) || 0;
   try {
-    const [u] = await query('SELECT role, roles, status, phien_dang_nhap FROM users WHERE id=$1', [id]);
+    const [u] = await query('SELECT role, roles, status, phien_dang_nhap, goi_chung_het_han FROM users WHERE id=$1', [id]);
     const tt: TinhTrang = u
-      ? { ds: dsVaiTro(u), khoa: u.status === 'suspended', mat: false, pv: Number(u.phien_dang_nhap) || 0, luc: Date.now() }
+      ? { ds: dsVaiTro(u), khoa: u.status === 'suspended', mat: false, pv: Number(u.phien_dang_nhap) || 0,
+          gc: u.goi_chung_het_han ? new Date(u.goi_chung_het_han).getTime() || 0 : 0, luc: Date.now() }
       : { ds: [], khoa: false, mat: true, luc: Date.now() };   // tài khoản đã bị xoá khỏi database
     if (nhoVaiTro.size > 2000) nhoVaiTro.clear();          // dọn cho khỏi phình bộ nhớ
     if ((lanQuen.get(id) || 0) === dau) nhoVaiTro.set(id, tt);
@@ -62,7 +64,7 @@ export async function xacMinhThe(token: string | null | undefined): Promise<JwtP
   if (!p) return null;
   const tt = await vaiTroMoiNhat(p.id, dsVaiTro(p));
   if (tt.mat || tt.khoa || theDoiCu(p, tt)) return null;
-  return { ...p, roles: tt.ds as any, role: (tt.ds[0] || p.role) as any };
+  return { ...p, roles: tt.ds as any, role: (tt.ds[0] || p.role) as any, gc: tt.gc || 0 };
 }
 /** Như xacMinhThe nhưng đọc thẻ từ tiêu đề Authorization của yêu cầu. */
 export function nguoiDungTuYeuCau(req: Request): Promise<JwtPayload | null> {
@@ -75,7 +77,7 @@ export function authRequired(req: AuthedRequest, res: Response, next: NextFuncti
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
   const payload = token ? verifyToken(token) : null;
   if (!payload) return res.status(401).json({ error: 'Unauthorized' });
-  req.user = payload;
+  req.user = { ...payload, gc: 0 };   // hạn gói chung CHỈ lấy từ database (dưới đây), không bao giờ tin số ghi trong thẻ
   // Chỉ gọi next() ĐÚNG MỘT LẦN (phòng khi có lỗi lạ rơi xuống .catch sau khi đã đi tiếp).
   let daDiTiep = false;
   const diTiep = () => { if (!daDiTiep && !res.headersSent) { daDiTiep = true; next(); } };
@@ -86,7 +88,7 @@ export function authRequired(req: AuthedRequest, res: Response, next: NextFuncti
       if (theDoiCu(payload, tt))
         return res.status(401).json({ error: 'Phiên đăng nhập đã hết hiệu lực vì mật khẩu tài khoản vừa được đổi. Vui lòng đăng nhập lại.', maLoi: 'DA_DOI_MAT_KHAU' });
       const ds = tt.ds;
-      req.user = { ...payload, roles: ds as any, role: (ds[0] || payload.role) as any };
+      req.user = { ...payload, roles: ds as any, role: (ds[0] || payload.role) as any, gc: tt.gc || 0 };
       // GIỚI HẠN THIẾT BỊ (lib/thietBi.ts): ghi máy đang dùng; khi bật giới hạn thì thẻ chỉ dùng được trên đúng máy đã đăng nhập
       const loi = await kiemMoiYeuCau(req.user!, req).catch(() => null);
       if (loi) return res.status(401).json({ error: loi, maLoi: 'THIET_BI' });

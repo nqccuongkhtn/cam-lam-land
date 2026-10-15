@@ -9,7 +9,9 @@ import type { Role } from '../shared.ts';
 // pv = "đời phiên đăng nhập" của tài khoản lúc cấp thẻ (cột users.phien_dang_nhap, 11/10/2026). Đổi mật khẩu và chọn
 //      "Đăng xuất khỏi mọi thiết bị khác" (hoặc admin đặt lại mật khẩu) thì số này TĂNG → mọi thẻ cấp trước đó, dù chưa
 //      hết hạn 7 ngày, bị máy chủ từ chối (middleware/auth.ts). Thẻ cũ không có pv được hiểu là 0.
-export interface JwtPayload { id: number; email: string; role: Role; roles?: Role[]; tb?: string; pv?: number; }
+// gc = hạn GÓI CHỨC NĂNG CHUNG (mili giây, 0 = không có) — KHÔNG ghi trong thẻ: middleware/auth.ts đọc cột users.goi_chung_het_han
+//      ở mỗi yêu cầu (nhớ 30 giây) rồi gắn vào → admin cấp / thu hồi là áp dụng ngay, khỏi đăng nhập lại. Xem coGoiChung.
+export interface JwtPayload { id: number; email: string; role: Role; roles?: Role[]; tb?: string; pv?: number; gc?: number; }
 
 /** Danh sách vai trò của một tài khoản. Tài khoản cũ chưa có `roles` thì lấy tạm `role`. */
 export function dsVaiTro(u?: { role?: string | null; roles?: string[] | null } | null): string[] {
@@ -29,18 +31,29 @@ export function coVaiTro(u: { role?: string | null; roles?: string[] | null } | 
 export const laAdmin = (u?: { role?: string | null; roles?: string[] | null } | null) => coVaiTro(u, 'admin');
 
 /**
+ * GÓI CHỨC NĂNG CHUNG (15/10/2026). Chủ dự án: "trả phí chia ra là các chức năng chung, còn trả phí mua gói số tin đăng, đẩy tin hay
+ * quảng cáo bản đồ là chức năng riêng". MỘT gói có hạn dùng mở MỌI tính năng trả phí chung: tra cứu văn bản (routes/vanBan.ts) ·
+ * tính giá đền bù (trang /den-bu) · bản đồ quy hoạch Cam Lâm đầy đủ — QĐ205, phân khu, xem gần, thông tin thửa (routes/parcels.ts,
+ * routes/qhRieng.ts) — TRỪ 1/500 (vẫn chỉ admin). Hạn ở cột users.goi_chung_het_han: admin cấp / gia hạn / thu hồi ở trang quản trị
+ * (POST /api/admin/users/:id/goi-chung), hoặc khách mua gói 'chung' (lib/packages.ts) khi đã đặt giá. Admin luôn dùng được.
+ * Thay ba vai trò lẻ 'tracuuvb' / 'denbu' / 'qhcamlam' làm buổi sáng cùng ngày (chưa ai được cấp, đã bỏ).
+ */
+export const coGoiChung = (u?: { role?: string | null; roles?: string[] | null; gc?: number } | null) =>
+  laAdmin(u) || (Number(u?.gc) || 0) > Date.now();
+
+/**
  * Chọn "vai trò chính" để ghi vào cột role cũ: admin đứng trên hết, rồi tới các vai trò quản lý,
  * cuối cùng mới là khách. Nhờ vậy chỗ nào còn đọc mỗi cột role vẫn hiểu đúng quyền lớn nhất.
  */
-const THU_TU_VAI_TRO = ['admin', 'gis', 'vanban', 'hotlist', 'danhmuc', 'xacthuc', 'tracuuvb', 'denbu', 'user'];
+const THU_TU_VAI_TRO = ['admin', 'gis', 'vanban', 'hotlist', 'danhmuc', 'xacthuc', 'user'];
 export function vaiTroChinh(roles: string[]): string {
   for (const v of THU_TU_VAI_TRO) if (roles.includes(v)) return v;
   return 'user';
 }
 
 /** Lọc bỏ vai trò lạ và trùng lặp. Không còn vai trò nào hợp lệ thì mặc định là khách. */
-// 'tracuuvb' = Tra cứu văn bản (trả phí), 'denbu' = Tính giá đền bù (trả phí) — 15/10/2026; nhớ thêm cả vào ràng buộc trong migrate.ts.
-export const VAI_TRO_HOP_LE = ['user', 'admin', 'gis', 'vanban', 'hotlist', 'danhmuc', 'xacthuc', 'tracuuvb', 'denbu'];
+// Thêm vai trò mới thì nhớ thêm cả vào ràng buộc trong migrate.ts. Tính năng TRẢ PHÍ không phải vai trò — xem coGoiChung (gói có hạn dùng).
+export const VAI_TRO_HOP_LE = ['user', 'admin', 'gis', 'vanban', 'hotlist', 'danhmuc', 'xacthuc'];
 export function chuanHoaVaiTro(ds: unknown): string[] {
   const ra = Array.isArray(ds) ? Array.from(new Set(ds.map((x) => String(x)).filter((x) => VAI_TRO_HOP_LE.includes(x)))) : [];
   return ra.length ? ra : ['user'];

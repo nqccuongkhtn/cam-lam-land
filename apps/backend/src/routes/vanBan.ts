@@ -4,7 +4,7 @@ import { vnNoAccent } from '../lib/vn.ts';
 import { authRequired, vanBanRequired, nguoiDungTuYeuCau, type AuthedRequest } from '../middleware/auth.ts';
 import { kiemTimCongKhai } from '../lib/chongCaoVb.ts';
 import { laNguoiThat, capVe, veHopLe } from '../lib/turnstile.ts';
-import { coVaiTro } from '../lib/auth.ts';
+import { coVaiTro, coGoiChung } from '../lib/auth.ts';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { mkdir, readFile, writeFile, rm, readdir, rename } from 'node:fs/promises';
@@ -501,17 +501,28 @@ export async function layPdfDrive(link: string): Promise<Buffer | null> {
 //    · qpdf gom các mảnh nhỏ thành luồng nén chung, nén lại mức cao nhất.
 //    Ép JPEG mạnh hơn chỉ bớt thêm ~1% mà làm dấu đỏ nhoè → không dùng.
 // Kho CHỈ giữ bản đã xử lý (vb-<phiên bản>-<mã>.pdf); đổi cách xử lý thì tăng PHIEN_BAN_FILE để làm lại.
-const PHIEN_BAN_FILE = 'v10';  // v10 (15/10/2026): số điện thoại mới 0567 442 996 trên dấu (bản cũ ghi số giả 0988…); v9 (7/10/2026): chữ chéo nghiêng ít hơn (30° thay vì theo đường chéo); v8 (6/10/2026): chèn thêm trang 2 trắng có dấu bản quyền; v7: dấu bản quyền ghi tên miền mới batdongsancamlam.vn; v6: chữ chéo nhỏ lại; v4: chữ chéo 2 dòng (thêm link + SĐT) vẽ bằng xoay hệ toạ độ — không đè nhau; gắn cho MỌI văn bản
+const PHIEN_BAN_FILE = 'v12';  // v12 (15/10/2026): thêm MÃ QR mở văn bản trên web (trang 2 to, các trang khác nhỏ ở góc); v11 (15/10/2026): dấu bỏ chữ "/Zalo" (Zalo admin là số khác, không in ra); v10 (15/10/2026): số điện thoại mới 0567 442 996 trên dấu (bản cũ ghi số giả 0988…); v9 (7/10/2026): chữ chéo nghiêng ít hơn (30° thay vì theo đường chéo); v8 (6/10/2026): chèn thêm trang 2 trắng có dấu bản quyền; v7: dấu bản quyền ghi tên miền mới batdongsancamlam.vn; v6: chữ chéo nhỏ lại; v4: chữ chéo 2 dòng (thêm link + SĐT) vẽ bằng xoay hệ toạ độ — không đè nhau; gắn cho MỌI văn bản
 const PHONG_DAU = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
-async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
+// Địa chỉ web in vào mã QR trên văn bản (đổi tên miền thì đặt SITE_URL trong .env rồi tăng PHIEN_BAN_FILE để đóng dấu lại).
+const WEB_QR = (process.env.SITE_URL || 'https://batdongsancamlam.dpdns.org').replace(/\/+$/, '');
+async function ganDauBanQuyen(buf: Buffer, idVb?: number): Promise<Buffer> {
   try {
     const { PDFDocument, rgb, pushGraphicsState, popGraphicsState, concatTransformationMatrix } = (await import('pdf-lib')) as any;
     const fontkit = ((await import('@pdf-lib/fontkit')) as any).default;
     const doc = await PDFDocument.load(buf, { ignoreEncryption: true, updateMetadata: false });
     doc.registerFontkit(fontkit);
     const font = await doc.embedFont(await readFile(PHONG_DAU), { subset: true });
-    const chan = 'Tải miễn phí tại batdongsancamlam.vn · Hotline/Zalo 0567 442 996 — Cam Lâm Land · Nhà đất & bản đồ quy hoạch Cam Lâm';
+    const chan = 'Tải miễn phí tại batdongsancamlam.vn · Hotline 0567 442 996 — Cam Lâm Land · Nhà đất & bản đồ quy hoạch Cam Lâm';
     const chu1 = 'CAM LÂM LAND', chu2 = 'batdongsancamlam.vn  ·  0567 442 996';
+    // MÃ QR MỞ VĂN BẢN TRÊN WEB (15/10/2026, chủ dự án: "bổ sung thêm QR để vào web lên văn bản, để người dùng cần web để vào"):
+    // trỏ thẳng /van-ban?vb=<mã> (mở đúng văn bản này — luật đăng nhập / trả phí của web vẫn áp như thường). Trang 2 (trang trắng chèn
+    // thêm) in mã TO giữa trang + dòng hướng dẫn; mọi trang khác in mã NHỎ ở góc dưới bên phải (nằm trong lề giấy).
+    let anhQr: any = null;
+    const urlQr = idVb ? `${WEB_QR}/van-ban?vb=${idVb}` : WEB_QR;
+    try {
+      const QRCode = ((await import('qrcode')) as any).default;
+      anhQr = await doc.embedPng(await QRCode.toBuffer(urlQr, { errorCorrectionLevel: 'M', margin: 1, scale: 8, color: { dark: '#0A2540ff', light: '#ffffffff' } }));
+    } catch (e: any) { console.error('[van-ban] tạo mã QR lỗi:', e?.message || e); }
     // TRANG 2 CHÈN THÊM (chủ dự án 6/10/2026, gửi hình mẫu): một trang trắng cùng khổ với trang 1 (theo mắt người đọc),
     // chỉ có chữ chéo + dòng chân trang như mọi trang khác — chèn vào sau trang 1 (file 1 trang thì thành trang cuối).
     // Tạo TRƯỚC vòng lặp để trang này cũng được vẽ dấu y hệt các trang khác.
@@ -521,7 +532,8 @@ async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
       const kho: [number, number] = x1 === 90 || x1 === 270 ? [H1, W1] : [W1, H1];
       doc.insertPage(Math.min(1, doc.getPageCount()), kho);
     }
-    for (const page of doc.getPages()) {
+    const trangChen = Math.min(1, doc.getPageCount() - 1);   // chỉ số trang trắng vừa chèn
+    for (const [iTrang, page] of doc.getPages().entries()) {
       const { width: W, height: H } = page.getSize();
       const xoay = ((page.getRotation()?.angle || 0) % 360 + 360) % 360;
       const ngang = xoay === 90 || xoay === 270;
@@ -546,6 +558,24 @@ async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
       // DÒNG CHÂN TRANG (giữ như cũ, thêm số điện thoại)
       let co = 7.5; while (co > 4.5 && font.widthOfTextAtSize(chan, co) > w - 24) co -= 0.5;
       page.drawText(chan, { x: (w - font.widthOfTextAtSize(chan, co)) / 2, y: 6, size: co, font, color: rgb(0.04, 0.15, 0.25), opacity: 0.7 });
+      if (anhQr) {
+        if (iTrang === trangChen) {
+          // trang trắng của web: mã TO ở PHẦN TRÊN trang + hướng dẫn ngay dưới — tránh dải chữ chìm chéo giữa trang (đặt giữa trang thì
+          // mã + chữ hướng dẫn đè lên chữ chìm, nhìn rối)
+          const kq = Math.min(w, h) * 0.26;
+          const yq = h * 0.92 - kq;
+          page.drawImage(anhQr, { x: (w - kq) / 2, y: yq, width: kq, height: kq });
+          const d1 = 'Quét mã để mở văn bản này trên web Cam Lâm Land';
+          let c1 = Math.min(w, h) * 0.03; while (font.widthOfTextAtSize(d1, c1) > w * 0.85) c1 *= 0.92;
+          page.drawText(d1, { x: (w - font.widthOfTextAtSize(d1, c1)) / 2, y: yq - c1 * 1.8, size: c1, font, color: rgb(0.04, 0.15, 0.25) });
+          let c2 = c1 * 0.62; while (font.widthOfTextAtSize(urlQr, c2) > w * 0.85) c2 *= 0.92;
+          page.drawText(urlQr, { x: (w - font.widthOfTextAtSize(urlQr, c2)) / 2, y: yq - c1 * 1.8 - c2 * 2, size: c2, font, color: rgb(0.78, 0.6, 0.22) });
+        } else {
+          // mã NHỎ ở góc dưới bên phải, nằm trong lề giấy (trên dòng chân trang)
+          const kq = Math.max(30, Math.min(w, h) * 0.06);
+          page.drawImage(anhQr, { x: w - kq - 8, y: 14, width: kq, height: kq });
+        }
+      }
       page.pushOperators(popGraphicsState());
     }
     doc.setProducer('Cam Lâm Land — batdongsancamlam.vn');
@@ -625,7 +655,7 @@ export function layFileVb(id: number, link: string | null): Promise<Buffer | nul
     // NGƯỜI ĐẦU TIÊN KHÔNG PHẢI CHỜ NÉN (9/10/2026): đóng dấu xong là lưu + trả ngay (đóng dấu chỉ ~1 giây);
     // việc nén (ghostscript, có file mất 5–10 giây) chạy NGẦM sau đó, nén xong thì thay bản trong kho
     // → người sau nhận bản nhẹ, ổ đĩa vẫn chỉ giữ bản đã nén. Vẫn đúng ý "chỉ tải khi có người mở lần đầu".
-    const dau = await ganDauBanQuyen(goc);
+    const dau = await ganDauBanQuyen(goc, id);
     await mkdir(KHO_DRIVE, { recursive: true }); await writeFile(f, dau).catch(() => {});
     nenNgam(f, dau);
     return dau;
@@ -813,12 +843,20 @@ export async function resolvePdf(link: string): Promise<string | null> {
 
 // ── GET / (danh sách) — PHẢI ĐĂNG NHẬP (tiện ích lớp 1, 30/9/2026; trước đây công khai) ──
 // ── TRA CỨU VĂN BẢN LÀ TÍNH NĂNG TRẢ PHÍ (15/10/2026, chủ dự án: "chức năng tra cứu văn bản cũng khoá luôn, đây là tính năng trả phí") ──
-// Xem đủ + mở tệp CHỈ cho: admin · người quản lý văn bản ('vanban') · khách được cấp quyền 'tracuuvb' (admin tích ở trang quản trị khi
-// khách đã trả phí). Chủ dự án chỉnh thêm cùng ngày: "tài khoản thường vẫn vào xem văn bản được nhưng làm mờ số ký hiệu và ngày văn bản,
+// Xem đủ + mở tệp CHỈ cho: admin · người quản lý văn bản ('vanban') · khách có GÓI CHỨC NĂNG CHUNG còn hạn (lib/auth.ts coGoiChung —
+// admin cấp ở trang quản trị khi khách đã trả phí). Chủ dự án chỉnh thêm cùng ngày: "tài khoản thường vẫn vào xem văn bản được nhưng làm mờ số ký hiệu và ngày văn bản,
 // bấm vào xem thì không cho, cảnh báo chức năng trả phí" → danh sách (/), 4 văn bản mới (/moi-nhat), ô tìm (/tim) vẫn trả cho người
 // chưa có quyền nhưng SỐ KÝ HIỆU + NGÀY ĐÃ CHE Ở MÁY CHỦ (chữ số thành •, không gửi ngày — mở công cụ trình duyệt cũng không đọc được),
 // kèm cờ an:true để giao diện làm mờ; tệp văn bản (/:id/pdf) trả 403. Chữ báo lỗi KHÔNG nói tài khoản nào được xem.
-const duocTraCuuVb = (u: any) => coVaiTro(u, 'admin', 'vanban', 'tracuuvb');
+const duocTraCuuVb = (u: any) => coVaiTro(u, 'admin', 'vanban') || coGoiChung(u);
+// LƯỢT TẢI: admin thấy số THẬT (luot_tai); người khác thấy số hiển thị luot_ao (khởi đầu số thật + 23…88, mỗi lần mở cộng ngẫu nhiên 2–5 — migrate.ts).
+// Văn bản vừa thêm chưa có luot_ao (điền ở lần khởi động kế) → tạm dùng số thật + 23 + (mã % 66) để số không nhảy lung tung.
+const LUOT_HIEN = `COALESCE(luot_ao, luot_tai + 23 + (id % 66))`;
+const luotChoNguoiXem = (u: any, d: any) => {
+  const { luotThat, luotAo, ...x } = d;
+  return laAdminVb(u) ? { ...x, luotTai: luotThat, luotAo } : { ...x, luotTai: luotAo };
+};
+const laAdminVb = (u: any) => coVaiTro(u, 'admin');
 const CHUA_CO_QUYEN_VB = { error: 'Tra cứu văn bản là tính năng trả phí — vui lòng liên hệ admin Cam Lâm Land để đăng ký.', maLoi: 'TINH_NANG_TRA_PHI' };
 const cheVb = (d: any) => ({ ...d, soKyHieu: String(d.soKyHieu || '').replace(/\d/g, '•'), ngay: null, an: true });
 vanBanRouter.get('/', authRequired, async (req: AuthedRequest, res) => {
@@ -828,10 +866,13 @@ vanBanRouter.get('/', authRequired, async (req: AuthedRequest, res) => {
       SELECT id, so_hieu AS "soKyHieu", trich_yeu AS "trichYeu",
              to_char(ngay_ban_hanh,'YYYY-MM-DD') AS ngay, co_quan AS "coQuan",
              chu_de AS "chuDe", linh_vuc AS "linhVuc", nguon,
-             luot_tai AS "luotTai", noi_bat AS "noiBat",
+             luot_tai AS "luotThat", ${LUOT_HIEN} AS "luotAo", noi_bat AS "noiBat",
              (link_goc IS NOT NULL AND link_goc <> '') AS "coFile"
-      FROM van_ban ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 8000`);
-    res.set('Cache-Control', 'private, max-age=300'); // chỉ trình duyệt của chính người đã đăng nhập giữ — không cho CDN/nginx phát cho người khác
+      FROM van_ban ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 8000`).then((ds) => ds.map((d: any) => luotChoNguoiXem(req.user, d)));
+    // KHÔNG cho trình duyệt dùng lại bản cũ khi ĐỔI TÀI KHOẢN (15/10/2026 — chủ dự án đăng xuất admin, vào tài khoản thường vẫn thấy số ký
+    // hiệu + ngày: trình duyệt giữ bản của admin 5 phút, cùng địa chỉ nên dùng lại). no-cache = lần nào cũng hỏi lại máy chủ (không đổi thì
+    // 304, nhẹ); Vary: Authorization = mỗi thẻ đăng nhập một bản riêng. Vẫn 'private' — không cho CDN/nginx phát cho người khác.
+    res.set('Cache-Control', 'private, no-cache'); res.set('Vary', 'Authorization');
     res.json({ docs: du ? rows : rows.map(cheVb), an: !du });
   } catch (e: any) { loiChung(res, e, 'danh sách'); }
 });
@@ -839,16 +880,25 @@ vanBanRouter.get('/', authRequired, async (req: AuthedRequest, res) => {
 // ── GET /moi-nhat — 4 văn bản mới ban hành cho khối "Tra cứu văn bản" ở TRANG CHỦ (mẫu 105, 7/10/2026) ──
 // CÔNG KHAI nhưng chỉ có số hiệu · ngày · cơ quan · trích yếu của 4 văn bản (thông tin công bố công khai của
 // nhà nước), không có link file; xem toàn kho + mở file vẫn phải đăng nhập. Chỉ lấy văn bản có file thật.
-vanBanRouter.get('/moi-nhat', async (req, res) => {
+// 4 VĂN BẢN MỚI NHẤT Ở TRANG CHỦ XEM MIỄN PHÍ (15/10/2026, chủ dự án: "ở đây cứ cho xem 4 văn bản mới nhất, nhưng vào trang tìm kiếm
+// hoặc văn bản tìm kiếm lên thì không cho xem vì là tính năng trả phí"): /moi-nhat trả ĐỦ số ký hiệu + ngày cho mọi người, và
+// /:id/pdf cho người đã đăng nhập mở đúng 4 văn bản này (vbMienPhi). Danh sách (/) và ô tìm (/tim) vẫn che như cũ.
+let vbMienPhiNho: { luc: number; docs: any[] } | null = null;
+async function vbMienPhi(): Promise<any[]> {
+  if (vbMienPhiNho && Date.now() - vbMienPhiNho.luc < 60_000) return vbMienPhiNho.docs;
+  const rows = await query(`
+    SELECT id, so_hieu AS "soKyHieu", trich_yeu AS "trichYeu",
+           to_char(ngay_ban_hanh,'YYYY-MM-DD') AS ngay, co_quan AS "coQuan", link_goc
+    FROM van_ban WHERE link_goc IS NOT NULL AND link_goc <> '' AND can_kiem_tra IS NULL
+    ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 40`);
+  const docs = rows.filter((d: any) => coFileThat(d.link_goc)).slice(0, 4).map(({ link_goc, ...d }: any) => d);
+  vbMienPhiNho = { luc: Date.now(), docs };
+  return docs;
+}
+vanBanRouter.get('/moi-nhat', async (_req, res) => {
   try {
-    const du = duocTraCuuVb(await nguoiDungTuYeuCau(req).catch(() => null));   // chưa có quyền tra cứu → che số ký hiệu + ngày
-    const rows = await query(`
-      SELECT id, so_hieu AS "soKyHieu", trich_yeu AS "trichYeu",
-             to_char(ngay_ban_hanh,'YYYY-MM-DD') AS ngay, co_quan AS "coQuan", link_goc
-      FROM van_ban WHERE link_goc IS NOT NULL AND link_goc <> '' AND can_kiem_tra IS NULL
-      ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 40`);
-    const docs = rows.filter((d: any) => coFileThat(d.link_goc)).slice(0, 4).map(({ link_goc, ...d }: any) => (du ? d : cheVb(d)));
-    res.set('Cache-Control', du ? 'private, no-store' : 'public, max-age=600');
+    const docs = await vbMienPhi();
+    res.set('Cache-Control', 'public, max-age=600');
     res.json({ docs });
   } catch (e: any) { loiChung(res, e, 'mới nhất'); }
 });
@@ -882,14 +932,14 @@ vanBanRouter.get('/tim', async (req, res) => {
 });
 
 // ── GET /manage — danh sách đầy đủ (có link gốc) cho người quản lý văn bản ──
-vanBanRouter.get('/manage', vanBanRequired, async (_req, res) => {
+vanBanRouter.get('/manage', vanBanRequired, async (req: AuthedRequest, res) => {
   try {
     const rows = await query(`
       SELECT id, so_hieu AS "soKyHieu", trich_yeu AS "trichYeu",
              to_char(ngay_ban_hanh,'YYYY-MM-DD') AS ngay, co_quan AS "coQuan",
              chu_de AS "chuDe", linh_vuc AS "linhVuc", nguon, link_goc AS "linkGoc",
-             luot_tai AS "luotTai", noi_bat AS "noiBat", can_kiem_tra AS "canKiemTra"
-      FROM van_ban ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 8000`);
+             luot_tai AS "luotThat", ${LUOT_HIEN} AS "luotAo", noi_bat AS "noiBat", can_kiem_tra AS "canKiemTra"
+      FROM van_ban ORDER BY ngay_ban_hanh DESC NULLS LAST, id DESC LIMIT 8000`).then((ds) => ds.map((d: any) => luotChoNguoiXem(req.user, d)));
     // coFile = có FILE THẬT xem được (không phải trang chung / trang tìm kiếm / link bị khoá) → admin lọc ra để tự tìm bằng tay
     res.json({ docs: rows.map((d: any) => ({ ...d, coFile: coFileThat(d.linkGoc) })) });
   } catch (e: any) { res.status(500).json({ error: e?.message || 'Lỗi' }); }
@@ -905,8 +955,12 @@ vanBanRouter.post('/ve-nguoi-that', authRequired, async (req: AuthedRequest, res
 
 vanBanRouter.get('/:id/pdf', authRequired, async (req: AuthedRequest, res) => {
   try {
-    if (!duocTraCuuVb(req.user)) { res.set('Cache-Control', 'no-store'); return res.status(403).json(CHUA_CO_QUYEN_VB); }
-    const [row] = await query<any>('SELECT id, so_hieu, link_goc FROM van_ban WHERE id=$1', [Number(req.params.id)]);
+    const idVb = Number(req.params.id);
+    // chưa có quyền tra cứu → chỉ mở được 4 văn bản mới nhất của trang chủ (xem vbMienPhi)
+    if (!duocTraCuuVb(req.user) && !(await vbMienPhi()).some((d: any) => Number(d.id) === idVb)) {
+      res.set('Cache-Control', 'no-store'); return res.status(403).json(CHUA_CO_QUYEN_VB);
+    }
+    const [row] = await query<any>('SELECT id, so_hieu, link_goc FROM van_ban WHERE id=$1', [idVb]);
     if (!row) return res.status(404).json({ error: 'Không tìm thấy văn bản' });
     // CHỐNG CÀO: phải có "vé người thật" (đã qua Cloudflare Turnstile) — lib/turnstile.ts. Chưa điền khoá thì bỏ qua.
     // Admin + người quản lý văn bản không cần vé.
@@ -914,7 +968,7 @@ vanBanRouter.get('/:id/pdf', authRequired, async (req: AuthedRequest, res) => {
       res.set('Cache-Control', 'no-store');
       return res.status(403).json({ error: 'Cần xác nhận bạn là người thật trước khi xem văn bản.', canVe: true });
     }
-    query('UPDATE van_ban SET luot_tai = luot_tai + 1 WHERE id=$1', [row.id]).catch(() => {});
+    query(`UPDATE van_ban SET luot_tai = luot_tai + 1, luot_ao = ${LUOT_HIEN} + 2 + floor(random() * 4)::int WHERE id=$1`, [row.id]).catch(() => {});
     const tenFile = `${String(row.so_hieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`;
     // Bản đã gắn dấu bản quyền + nén, lưu sẵn trong kho (mở nhanh, nhẹ)
     const buf = await layFileVb(row.id, row.link_goc);

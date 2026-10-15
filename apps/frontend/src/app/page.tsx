@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api, apiBase, NO_IMG } from '@/lib/api';
 import dynamic from 'next/dynamic';
-import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
+import { useAuth } from '@/lib/auth';
 import HopTraPhi from '@/components/HopTraPhi';
 import { useLoginGate } from '@/lib/loginGate';
 import { getToken } from '@/lib/token';
@@ -193,11 +193,13 @@ function VanBanMoiNhat({ tu, onXoa }: { tu: string; onXoa: () => void }) {
   function moXem(d: VbMoi) {
     if (d.coFile === false) { router.push(d.an ? '/van-ban' : `/van-ban?q=${encodeURIComponent(d.soKyHieu)}`); return; }   // số ký hiệu đã che → không đem đi tìm   // /moi-nhat chỉ trả văn bản có file
     if (!user) { openLogin({ reason: 'Đăng nhập để xem văn bản.' }); return; }
-    // TÍNH NĂNG TRẢ PHÍ (15/10/2026): chưa có quyền tra cứu văn bản → sang /van-ban, trang đó hiện khung "liên hệ admin để đăng ký".
-    if (!(laAdmin(user as any) || coVaiTro(user as any, 'vanban', 'tracuuvb'))) { setHopTraPhi(true); return; }
+    // TÍNH NĂNG TRẢ PHÍ (15/10/2026): văn bản máy chủ gửi về đã che (an) = chưa có quyền tra cứu → hộp "tính năng trả phí".
+    // 4 văn bản mới nhất (/moi-nhat) máy chủ gửi đủ cho mọi người → xem miễn phí (chủ dự án: "ở đây cứ cho xem 4 văn bản mới nhất");
+    // kết quả TÌM (/tim) của người chưa có quyền luôn bị che → không mở được ("văn bản tìm kiếm lên thì không cho xem").
+    if (d.an) { setHopTraPhi(true); return; }
     setDangXem({ id: d.id, ten: `${(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')} · ${d.trichYeu}`,
       tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`,
-      url: `${apiBase}/van-ban/${d.id}/pdf?v=10` /* v=10 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts), giống VanBanBrowser */, token: getToken() || '' });
+      url: `${apiBase}/van-ban/${d.id}/pdf?v=12` /* v=12 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts), giống VanBanBrowser */, token: getToken() || '' });
   }
   // Giải mã chữ HTML (&#253; → ý…) y như trang /van-ban — vài văn bản nguồn Công báo còn lưu kiểu này.
   const sach = (ds?: VbMoi[]) => (ds || []).map((d) => ({ ...d, soKyHieu: deEnt(d.soKyHieu), trichYeu: deEnt(d.trichYeu), coQuan: deEnt(d.coQuan) }));

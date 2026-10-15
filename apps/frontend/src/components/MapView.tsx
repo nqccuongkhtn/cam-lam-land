@@ -242,6 +242,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
   // khởi tạo lại vẽ theo danh sách cũ (QĐ893) → nút lớp + bảng thửa ghi QĐ205 mà bản đồ hiện QĐ893 (chủ dự án: "mở 893 nhưng thông tin
   // lại không phải"). syncOverlays đọc danh sách MỚI NHẤT qua ref này.
   const overlaysRef = useRef(overlays); overlaysRef.current = overlays;
+  const vanTayNguonRef = useRef(new Map<string, string>());   // mã nguồn ảnh quy hoạch → "vân tay" (đường ô + mức phóng) lúc dựng — xem syncOverlays
   const initialBoundsRef = useRef(initialBounds);
   initialBoundsRef.current = initialBounds;
   const didFitRef = useRef(false);
@@ -487,6 +488,16 @@ export default function MapView({ center, zoom, className, layers = [], markers 
           map.setLayoutProperty(id, 'visibility', ov.visible ? 'visible' : 'none');
         }
       } else {
+        // NGUỒN ẢNH ĐỔI (15/10/2026) — vd tài khoản thường đang xem thử QĐ205 ở mức nhìn xa (ô không vé, chỉ một mức) rồi được cấp gói:
+        // cùng mã lớp nhưng đường ô + mức phóng khác. Trước đây nguồn đã dựng thì không bao giờ dựng lại → kẹt ảnh xem thử tới khi tải lại
+        // trang. Nay "vân tay" nguồn khác lần trước thì gỡ lớp + nguồn cũ rồi dựng lại bên dưới. Không đổi gì thì không đụng tới.
+        const vanTay = JSON.stringify([ov.tiles || null, ov.url || null, ov.minzoom ?? null, ov.maxzoom ?? null]);
+        const truoc = vanTayNguonRef.current.get(srcId);
+        if (truoc !== undefined && truoc !== vanTay && map.getSource(srcId)) {
+          if (map.getLayer(ov.id)) map.removeLayer(ov.id);
+          map.removeSource(srcId);
+        }
+        vanTayNguonRef.current.set(srcId, vanTay);
         if (!map.getSource(srcId)) {
           if (ov.tiles && ov.tiles.length) map.addSource(srcId, { type: 'raster', tiles: ov.tiles, tileSize: 256, minzoom: ov.minzoom ?? 0, maxzoom: ov.maxzoom ?? 22 } as any);
           else map.addSource(srcId, { type: 'image', url: ov.url, coordinates: ov.coordinates as any });

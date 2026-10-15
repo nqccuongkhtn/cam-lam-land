@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { timingSafeEqual } from 'node:crypto';
 import { query } from '../lib/db.ts';
-import { authRequired, adminRequired, type AuthedRequest } from '../middleware/auth.ts';
+import { authRequired, adminRequired, quenVaiTro, type AuthedRequest } from '../middleware/auth.ts';
 import { PACKAGES, findPkg, BANK } from '../lib/packages.ts';
 
 export const paymentsRouter = Router();
 
-// Kích hoạt gói cho khách (gọi khi webhook báo đã trả tiền HOẶC admin xác nhận tay)
-async function activate(order: any): Promise<void> {
+// Kích hoạt gói cho khách (gọi khi webhook báo đã trả tiền HOẶC admin xác nhận tay / admin kích hoạt gói ở trang quản trị — admin.ts)
+export async function activate(order: any): Promise<void> {
   // NẠP VÍ công cụ Lập danh mục: đơn package_id='wallet' → cộng số dư (đồng) thay vì kích hoạt gói.
   if (order.package_id === 'wallet') {
     const flipped = await query(`UPDATE payments SET status='paid', paid_at=now() WHERE id=$1 AND status<>'paid' RETURNING id`, [order.id]);
@@ -21,7 +21,12 @@ async function activate(order: any): Promise<void> {
   // Nếu webhook gọi lặp / admin bấm xác nhận 2 lần → UPDATE không trả row → KHÔNG cộng gói lần nữa (chống cộng gói 2 lần).
   const flipped = await query(`UPDATE payments SET status='paid', paid_at=now() WHERE id=$1 AND status<>'paid' RETURNING id`, [order.id]);
   if (!flipped.length) return;
-  if (pkg.kind === 'video') {
+  if (pkg.kind === 'chung') {
+    // GÓI CHỨC NĂNG CHUNG (15/10/2026): cộng dồn ngày nếu gói cũ còn hạn; quên phần nhớ tạm của middleware → mở khoá NGAY.
+    await query(`UPDATE users SET goi_chung_het_han = GREATEST(COALESCE(goi_chung_het_han, now()), now()) + ($2::int) * interval '1 day', tier='paid' WHERE id=$1`,
+      [order.user_id, pkg.days]);
+    quenVaiTro(Number(order.user_id));
+  } else if (pkg.kind === 'video') {
     // Gói TẠO VIDEO BẢN ĐỒ: cộng dồn ngày nếu gói cũ còn hạn (mua sớm không bị mất ngày thừa).
     await query(`UPDATE users SET video_expires_at = GREATEST(COALESCE(video_expires_at, now()), now()) + ($2::int) * interval '1 day', tier='paid' WHERE id=$1`,
       [order.user_id, pkg.days]);
@@ -51,7 +56,7 @@ paymentsRouter.post('/order', authRequired, async (req: AuthedRequest, res, next
 // Trạng thái gói + đơn của tôi
 paymentsRouter.get('/my', authRequired, async (req: AuthedRequest, res, next) => {
   try {
-    const [u] = await query(`SELECT pkg_tier AS "pkgTier", boost_quota AS "boostQuota", boost_used AS "boostUsed", boost_expires_at AS "boostExpiresAt", post_quota AS "postQuota", post_expires_at AS "postExpiresAt", video_expires_at AS "videoExpiresAt" FROM users WHERE id=$1`, [req.user!.id]);
+    const [u] = await query(`SELECT pkg_tier AS "pkgTier", boost_quota AS "boostQuota", boost_used AS "boostUsed", boost_expires_at AS "boostExpiresAt", post_quota AS "postQuota", post_expires_at AS "postExpiresAt", video_expires_at AS "videoExpiresAt", goi_chung_het_han AS "goiChungHetHan" FROM users WHERE id=$1`, [req.user!.id]);
     const orders = await query(`SELECT id, package_id AS "packageId", amount, status, note, created_at AS "createdAt" FROM payments WHERE user_id=$1 ORDER BY id DESC LIMIT 20`, [req.user!.id]);
     res.json({ current: u ?? null, orders });
   } catch (e) { next(e); }

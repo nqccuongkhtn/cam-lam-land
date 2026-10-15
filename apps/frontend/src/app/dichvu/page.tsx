@@ -5,10 +5,15 @@ import { api } from '@/lib/api';
 import { useAuth, laAdmin } from '@/lib/auth';
 import { useFlags } from '@/lib/flags';
 
-interface Pkg { id: string; name: string; kind: 'post' | 'boost' | 'video'; tier?: 'normal' | 'silver' | 'gold' | 'diamond'; boosts?: number; posts?: number; days: number; price: number; perks: string[]; popular?: boolean }
+interface Pkg { id: string; name: string; kind: 'post' | 'boost' | 'video' | 'chung'; tier?: 'normal' | 'silver' | 'gold' | 'diamond'; boosts?: number; posts?: number; days: number; price: number; perks: string[]; popular?: boolean }
 interface Bank { bankId: string; account: string; name: string; demo?: boolean }
 
 const STATIC: Pkg[] = [
+  // GÓI THÀNH VIÊN = GÓI CHỨC NĂNG CHUNG (15/10/2026) — bản dự phòng khi chưa tải được bảng giá; giá thật ở máy chủ lib/packages.ts
+  { id: 'tv3t', name: 'Gói 3 tháng', kind: 'chung', days: 90, price: 299000, perks: ['Tra cứu toàn bộ kho văn bản: số ký hiệu, ngày ban hành, mở đọc tệp', 'Tính giá đền bù, bồi thường (đủ số liệu, máy tính)', 'Bản đồ quy hoạch Cam Lâm đầy đủ: QĐ205, phân khu 1/2000, xem gần, quy hoạch từng thửa'] },
+  { id: 'tv6t', name: 'Gói 6 tháng', kind: 'chung', days: 180, price: 568000, perks: ['Tra cứu toàn bộ kho văn bản: số ký hiệu, ngày ban hành, mở đọc tệp', 'Tính giá đền bù, bồi thường (đủ số liệu, máy tính)', 'Bản đồ quy hoạch Cam Lâm đầy đủ: QĐ205, phân khu 1/2000, xem gần, quy hoạch từng thửa'] },
+  { id: 'tv1n', name: 'Gói 1 năm', kind: 'chung', days: 365, price: 1068000, perks: ['Tra cứu toàn bộ kho văn bản: số ký hiệu, ngày ban hành, mở đọc tệp', 'Tính giá đền bù, bồi thường (đủ số liệu, máy tính)', 'Bản đồ quy hoạch Cam Lâm đầy đủ: QĐ205, phân khu 1/2000, xem gần, quy hoạch từng thửa'] },
+  { id: 'tv2n', name: 'Gói 2 năm', kind: 'chung', days: 730, price: 1968000, perks: ['Tra cứu toàn bộ kho văn bản: số ký hiệu, ngày ban hành, mở đọc tệp', 'Tính giá đền bù, bồi thường (đủ số liệu, máy tính)', 'Bản đồ quy hoạch Cam Lâm đầy đủ: QĐ205, phân khu 1/2000, xem gần, quy hoạch từng thửa'] },
   { id: 'post20', name: 'Đăng 20 tin', kind: 'post', posts: 20, days: 30, price: 119000, perks: ['Đăng tối đa 20 tin/tháng', 'Hiệu lực 30 ngày'] },
   { id: 'post50', name: 'Đăng 50 tin', kind: 'post', posts: 50, days: 30, price: 239000, perks: ['Đăng tối đa 50 tin/tháng', 'Hiệu lực 30 ngày'] },
   { id: 'post100', name: 'Đăng 100 tin', kind: 'post', posts: 100, days: 30, price: 449000, popular: true, perks: ['Đăng tối đa 100 tin/tháng', 'Phù hợp môi giới', 'Hiệu lực 30 ngày'] },
@@ -20,9 +25,9 @@ const STATIC: Pkg[] = [
   { id: 'diamond', name: 'VIP Kim Cương', kind: 'boost', tier: 'diamond', boosts: 20, days: 20, price: 9999000, perks: ['Hiển thị hạng VIP Kim Cương', '20 lượt đẩy', 'Tự nổi lại mỗi 6h', 'Luôn trên cùng · tiêu đề đỏ', 'Hiệu lực 20 ngày'] },
 ];
 const STATIC_BANK: Bank = { bankId: 'BIDV', account: '8855951682', name: 'NGUYEN QUOC CUONG', demo: false };
-const ACCENT: Record<string, string> = { video: '#8b5cf6', post: '#0ea5e9', normal: '#64748b', silver: '#94a3b8', gold: '#f59e0b', diamond: '#e11d48' };
+const ACCENT: Record<string, string> = { chung: '#C8A14B', video: '#8b5cf6', post: '#0ea5e9', normal: '#64748b', silver: '#94a3b8', gold: '#f59e0b', diamond: '#e11d48' };
 const fmt = (n: number) => n.toLocaleString('vi-VN') + 'đ';
-const keyOf = (p: Pkg) => (p.kind === 'video' ? 'video' : p.kind === 'post' ? 'post' : p.tier || 'silver');
+const keyOf = (p: Pkg) => (p.kind === 'chung' ? 'chung' : p.kind === 'video' ? 'video' : p.kind === 'post' ? 'post' : p.tier || 'silver');
 const dleft = (iso?: string | null) => (iso ? Math.max(0, Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000)) : 0);
 
 export default function ServicesPage() {
@@ -60,6 +65,12 @@ export default function ServicesPage() {
   const boostPkgs = packages.filter((p) => p.kind === 'boost');
   const videoPkgs = packages.filter((p) => p.kind === 'video');
   const videoDays = dleft(current?.videoExpiresAt);
+  const chungPkgs = packages.filter((p) => p.kind === 'chung');
+  const chungDays = dleft(current?.goiChungHetHan);
+  // Dịch vụ đăng tin / đẩy tin CHƯA MỞ (cờ services_live tắt) → khách chỉ thấy khối "Đăng ký thành viên" (gói chức năng chung) — hộp
+  // "tính năng trả phí" ở các trang trỏ về đây (#thanh-vien). Admin vẫn thấy đủ cả trang như cũ.
+  const chiThanhVien = !flags.services_live && !isAdmin;
+  const giaK = (n: number) => `${Math.round(n / 1000)}K`;
   const adsLeft = mapAds.filter((_, i) => i % 2 === 0);
   const adsRight = mapAds.filter((_, i) => i % 2 === 1);
   const RailCard = ({ a }: { a: any }) => (
@@ -101,23 +112,15 @@ export default function ServicesPage() {
   };
 
   if (!loaded) return <div className="bg-slate-50 min-h-[60vh] grid place-items-center text-slate-400">Đang tải…</div>;
-  if (!flags.services_live && !isAdmin) return (
-    <div className="bg-slate-50 min-h-[calc(100dvh-56px)] grid place-items-center px-4 text-center">
-      <div>
-        <div className="text-5xl">🛠️</div>
-        <h1 className="text-2xl font-extrabold text-[#0A2540] mt-3">Dịch vụ sắp ra mắt</h1>
-        <p className="text-slate-500 mt-2 max-w-sm mx-auto text-sm">Bảng giá & gói dịch vụ đang được hoàn thiện. Cần hỗ trợ, vui lòng liên hệ admin <a href="tel:0567442996" className="text-[#0A2540] font-bold underline">0567 442 996</a>.</p>
-      </div>
-    </div>
-  );
   return (
     <div className="bg-slate-50 min-h-[calc(100dvh-56px)]">
       {!flags.services_live && isAdmin && <div className="bg-amber-100 border-b border-amber-300 text-amber-800 text-sm font-semibold text-center py-2 px-4">⚠️ Trang đang ẩn với khách — bật “Dịch vụ” ở Quản trị để công khai.</div>}
       <div className="bg-[#0A2540] text-white">
         <div className="max-w-5xl mx-auto px-4 py-12 text-center">
           <span className="inline-block bg-[#C8A14B] text-[#0A2540] text-xs font-extrabold px-3 py-1 rounded-full">⚡ ƯU ĐÃI RA MẮT</span>
-          <h1 className="text-3xl md:text-4xl font-extrabold mt-3">Bảng giá dịch vụ</h1>
-          <p className="mt-2 text-slate-300 max-w-xl mx-auto text-sm">Đăng nhiều tin hơn & đẩy tin lên hạng VIP. Thanh toán tự động, kích hoạt tức thì.</p>
+          <h1 className="text-3xl md:text-4xl font-extrabold mt-3">{chiThanhVien ? 'Đăng ký thành viên' : 'Bảng giá dịch vụ'}</h1>
+          <p className="mt-2 text-slate-300 max-w-xl mx-auto text-sm">{chiThanhVien ? 'Mở tra cứu văn bản, tính giá đền bù và bản đồ quy hoạch Cam Lâm đầy đủ. Thanh toán bằng mã QR, kích hoạt cho chính tài khoản của bạn.'
+            : 'Mở các tính năng tra cứu, đăng nhiều tin hơn & đẩy tin lên hạng VIP. Thanh toán tự động, kích hoạt tức thì.'}</p>
           <div className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-xs text-slate-400">
             <span>🔒 An toàn</span><span>⚡ Tự kích hoạt</span><span>📞 Hỗ trợ 24/7</span>
           </div>
@@ -127,13 +130,40 @@ export default function ServicesPage() {
       <div className="max-w-[1360px] mx-auto px-4 py-10 xl:flex xl:gap-5 xl:items-start">
         <aside className="hidden xl:block w-44 shrink-0 xl:sticky xl:top-20 space-y-3">{adsLeft.map((a) => <RailCard key={a.id} a={a} />)}<RailCTA /></aside>
         <div className="flex-1 min-w-0 max-w-5xl mx-auto w-full">
-        {user && (postDays > 0 || boostDays > 0) && (
+        {user && (postDays > 0 || boostDays > 0 || chungDays > 0) && (
           <div className="mb-8 bg-white border border-emerald-200 rounded-xl p-3.5 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+            {chungDays > 0 && <span className="font-bold text-emerald-700">✓ Gói chức năng chung: còn {chungDays} ngày</span>}
             {postDays > 0 && <span className="font-bold text-emerald-700">✓ Gói đăng: {current.postQuota} tin · còn {postDays} ngày</span>}
             {boostDays > 0 && <span className="font-bold text-emerald-700">✓ Gói {current.pkgTier?.toUpperCase()}: đẩy {current.boostUsed}/{current.boostQuota} · còn {boostDays} ngày</span>}
           </div>
         )}
 
+        {/* CHỨC NĂNG CHUNG / CHỨC NĂNG RIÊNG (15/10/2026, chủ dự án: "trả phí chia ra là các chức năng chung, còn trả phí mua gói số tin
+            đăng, đẩy tin hay quảng cáo bản đồ là chức năng riêng") */}
+        {/* ĐĂNG KÝ THÀNH VIÊN (15/10/2026) — chủ dự án gửi mẫu "ĐĂNG KÝ THÀNH VIÊN" 4 gói: "thiết kế cho web của mình gói như này, bỏ gói 1 tháng
+            thay bằng 3 tháng giá 299, thay số 50 thành 68 hết". Khung xanh đậm, 4 dòng trắng bo góc, giá chữ đỏ; bấm một dòng = mua gói đó
+            (mã QR chuyển khoản như các gói khác). Giá ở máy chủ lib/packages.ts (kind 'chung'). */}
+        {chungPkgs.length > 0 && (
+          <section id="thanh-vien" className="mb-12 scroll-mt-20 rounded-2xl bg-[#0A2540] px-4 py-6 text-center sm:px-8 sm:py-8">
+            <h2 className="mx-auto inline-block rounded-xl bg-[#FFF6E5] px-5 py-2 text-[22px] font-extrabold uppercase tracking-wide text-[#0A2540] sm:text-[30px]">Đăng ký thành viên</h2>
+            <p className="mt-2 text-[13px] font-semibold text-[#C8A14B] sm:text-[15px]">Cam Lâm Land · Gói chức năng chung</p>
+            {chungDays > 0 && <p className="mt-2 text-[13px] font-bold text-emerald-300">✓ Gói của bạn còn {chungDays} ngày — mua thêm sẽ được cộng dồn.</p>}
+            <div className="mx-auto mt-4 grid max-w-2xl gap-3">
+              {chungPkgs.map((p) => (
+                <button key={p.id} type="button" onClick={() => buy(p)} disabled={busy === p.id}
+                  className="w-full rounded-xl bg-white px-3 py-3.5 text-[18px] font-extrabold uppercase tracking-wide text-[#0A2540] shadow transition hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60 sm:py-4 sm:text-[24px]">
+                  {busy === p.id ? 'Đang tạo đơn…' : <>{p.name} - <span className="text-red-600">{giaK(p.price)}</span></>}
+                </button>
+              ))}
+            </div>
+            <p className="mx-auto mt-4 max-w-2xl text-[13px] leading-relaxed text-slate-200 sm:text-[14px]">Mở cùng lúc: <b className="text-white">tra cứu toàn bộ văn bản</b> · <b className="text-white">tính giá đền bù</b> ·
+              <b className="text-white"> bản đồ quy hoạch Cam Lâm đầy đủ</b> (QĐ205, phân khu 1/2000, xem gần, quy hoạch từng thửa).</p>
+            <p className="mx-auto mt-2 max-w-2xl text-[13px] font-semibold leading-relaxed text-white sm:text-[14px]">Anh chị chọn gói nào thì chuyển khoản theo mã QR hiện ra — gói tự kích hoạt cho chính tài khoản đang đăng nhập.
+              Cần hỗ trợ, gọi <a href="tel:0567442996" className="text-[#C8A14B] underline">0567 442 996</a> hoặc nhắn Zalo admin. Xin cảm ơn!</p>
+          </section>
+        )}
+        {!chiThanhVien && (<>
+        <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400 mb-3">Chức năng riêng · mua riêng từng gói</p>
         <h2 className="text-xl font-extrabold text-[#0A2540] mb-1">Gói đăng tin</h2>
         <p className="text-sm text-slate-500 mb-5">Miễn phí 1 tin/tháng · mua gói để đăng thêm (đăng càng nhiều, giá mỗi tin càng rẻ).</p>
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5 mb-12 items-stretch">{postPkgs.map((p) => <Card key={p.id} p={p} />)}</div>
@@ -152,6 +182,7 @@ export default function ServicesPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 items-stretch">{videoPkgs.map((p) => <Card key={p.id} p={p} />)}</div>
           </>
         )}
+        </>)}
 
         <div className="mt-12 bg-white rounded-2xl border border-slate-200 p-6">
           <h3 className="text-xl font-extrabold text-[#0A2540]">💳 Phương thức thanh toán</h3>
@@ -171,6 +202,7 @@ export default function ServicesPage() {
           </div>
         </div>
 
+        {!chiThanhVien && (<>
         {/* Bán 2 ô quảng cáo cạnh Tin tức ở trang chủ (admin nhập ở /admin → Quảng cáo). Trang chủ có link "Đặt quảng cáo tại vị trí này" trỏ về đây. */}
         <div id="quang-cao" className="mt-6 scroll-mt-20 rounded-2xl bg-white border border-slate-200 p-6 md:flex items-center gap-6">
           <div className="flex-1">
@@ -185,7 +217,7 @@ export default function ServicesPage() {
           </div>
           <div className="mt-4 md:mt-0 flex flex-col gap-2 shrink-0 w-full md:w-auto">
             <a href="tel:0567442996" className="bg-[#0A2540] text-white font-bold px-6 py-2.5 rounded-xl text-center">📞 0567 442 996</a>
-            <a href="https://zalo.me/0567442996" target="_blank" rel="noreferrer" className="bg-[#0068FF] text-white font-bold px-6 py-2.5 rounded-xl text-center">Chat Zalo</a>
+            <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" className="bg-[#0068FF] text-white font-bold px-6 py-2.5 rounded-xl text-center">Chat Zalo</a>
           </div>
         </div>
 
@@ -196,9 +228,10 @@ export default function ServicesPage() {
           </div>
           <div className="mt-4 md:mt-0 flex flex-col gap-2 shrink-0 w-full md:w-auto">
             <a href="tel:0567442996" className="bg-[#0A2540] text-white font-bold px-6 py-2.5 rounded-xl text-center">📞 0567 442 996</a>
-            <a href="https://zalo.me/0567442996" target="_blank" rel="noreferrer" className="bg-[#0068FF] text-white font-bold px-6 py-2.5 rounded-xl text-center">Chat Zalo</a>
+            <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" className="bg-[#0068FF] text-white font-bold px-6 py-2.5 rounded-xl text-center">Chat Zalo</a>
           </div>
         </div>
+        </>)}
         </div>
         <aside className="hidden xl:block w-44 shrink-0 xl:sticky xl:top-20 space-y-3">{adsRight.map((a) => <RailCard key={a.id} a={a} />)}<RailCTA /></aside>
       </div>

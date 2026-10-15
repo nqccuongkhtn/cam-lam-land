@@ -1,7 +1,7 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { cloneElement, isValidElement, useEffect, useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { useAuth, laAdmin, coVaiTro } from '@/lib/auth';
+import { useAuth, coGoiChung } from '@/lib/auth';
 import HopTraPhi from '@/components/HopTraPhi';
 import {
   DEN_BU_NGUON, DU_AN_PHUC_HOP, GIA_LUA_2VU, GIA_NONG_NGHIEP, GIA_PHUC_HOP, GIA_RUNG_SAN_XUAT,
@@ -11,6 +11,47 @@ import {
 } from '@/lib/denBuCamLam';
 
 const tienGoc = (v: number) => Math.round(v).toLocaleString('vi-VN') + ' đ';
+// CHE SỐ LIỆU TRONG CHỮ VIẾT SẴN (15/10/2026 — chủ dự án chụp thẻ "Căn cứ pháp luật": "vẫn chưa che"). Tài khoản chưa có quyền tính giá đền
+// bù: mọi con số CÓ ĐƠN VỊ (đồng, đ, %, kg, tháng, triệu, lần, m², người, ha) hoặc có DẤU CHẤM NGHÌN trên trang đổi thành 0 + làm mờ.
+// Cùng ngày chủ dự án chụp thẻ ③: "che mà số quyết định các thứ còn như này họ tự kiếm tự xem cần gì mình" → che THÊM mọi thứ giúp tự tra ra
+// văn bản gốc + hệ số (× 1,12): số có gạch chéo (số hiệu "35/2026/QĐ-UBND" → "00/0000/QĐ-UBND", ngày "04/5/2026", phân số), số đứng sau Điều / khoản / điểm /
+// Chương / Mục / Số / STT / QĐ / NQ / Công văn / Quyết định…, và năm (19xx, 20xx). Chữ số DÍNH SAU CHỮ CÁI (m2, m3) là đơn vị → giữ nguyên;
+// số trong tên hạng mục ("Nhà ở 1 tầng") giữ để người xem vẫn hiểu nội dung. Duyệt cả cây giao diện (cloneElement).
+const RE_SO = /(\d{1,3}(?:\.\d{3})+(?:,\d+)?(?:\s?(?:đồng|đ(?![a-zà-ỹ])|triệu))?|\d+(?:[.,]\d+)?\s?(?:%|kg|tháng|triệu|lần|m²|đồng|đ(?![a-zà-ỹ])|người|ha(?![a-zà-ỹ]))|\d+(?:\s?\/\s?\d+)+\/?|×\s?\d+(?:[.,]\d+)?|(?:Điều|điều|Khoản|khoản|Điểm|điểm|Chương|chương|Mục|mục|Số|số|STT|QĐ|NQ|NĐ|TT|CV|Công văn|công văn|Quyết định|quyết định|Nghị quyết|nghị quyết|Nghị định|nghị định|Thông tư|thông tư)\s+\d+(?:\s*[,–-]\s*\d+)*|(?:19|20)\d{2}(?!\d))/g;
+// Chữ số đứng ngay sau chữ cái (m2, m3, UBTVQH15) không phải số liệu → không che. (Không dùng "lookbehind" trong biểu thức trên vì
+// iPhone đời cũ — Safari < 16.4 — không hiểu, cả trang sẽ hỏng.)
+const DINH_CHU = /[A-Za-zÀ-ỹĐđ]/;
+// Kèm: NÚT MỞ VĂN BẢN GỐC (đường dẫn /tai-lieu/… hoặc .pdf — chủ dự án: "bấm vào các văn bản vẫn cho xem") bị GỠ đường dẫn, bấm vào gọi moHop
+// (hộp "tính năng trả phí") — gỡ hẳn href nên chuột giữa / "mở tab mới" cũng không mở được.
+const LA_TEP_VB = /\/tai-lieu\/|\.pdf(?:[?#]|$)/i;
+function cheSo(node: ReactNode, moHop?: () => void): ReactNode {
+  if (typeof node === 'string') {
+    const ra: ReactNode[] = [];
+    let cuoi = 0, m: RegExpExecArray | null;
+    RE_SO.lastIndex = 0;
+    while ((m = RE_SO.exec(node))) {
+      if (DINH_CHU.test(node[m.index - 1] || '')) continue;   // m2, m3… — đơn vị, không che
+      if (m.index > cuoi) ra.push(node.slice(cuoi, m.index));
+      ra.push(<span key={m.index} className="select-none blur-[3px]">{m[0].replace(/\d/g, '0')}</span>);
+      cuoi = m.index + m[0].length;
+    }
+    if (!ra.length) return node;
+    if (cuoi < node.length) ra.push(node.slice(cuoi));
+    return ra;
+  }
+  if (Array.isArray(node)) return node.map((x) => cheSo(x, moHop));
+  if (isValidElement(node)) {
+    const pr = node.props as any;
+    const con = pr?.children;
+    if (node.type === 'a' && LA_TEP_VB.test(String(pr?.href || ''))) {
+      return cloneElement(node as any, { href: undefined, target: undefined, role: 'button', tabIndex: 0, style: { ...(pr.style || {}), cursor: 'pointer' },
+        onClick: (ev: any) => { ev.preventDefault(); moHop?.(); } }, con == null ? con : cheSo(con, moHop));
+    }
+    if (con == null || typeof con === 'function') return node;
+    return cloneElement(node as any, undefined, cheSo(con, moHop));
+  }
+  return node;
+}
 const so = (s: string) => {
   const v = parseFloat(s.replace(/\./g, '').replace(',', '.'));
   return Number.isFinite(v) && v > 0 ? v : 0;
@@ -26,7 +67,8 @@ type DongTinh = { ten: string; dv: string; gia: number; sl: number; tyLe: number
 // Bảng đơn giá bóc từ BẢN WORD trên Công báo tỉnh → mỗi hạng mục đủ tên, nhóm, mô tả kết cấu, đơn vị tính và số tiền.
 // Không phải OCR nên số chính xác. 13/10/2026 bóc lại theo đúng ô của bảng (scripts/den-bu/README.md): bản cũ sót 126 dòng
 // (cả mục "Xây dựng mặt tiền nhà", 14 loại giếng…) và gắn nhầm tên nhóm — chủ dự án báo "thiếu" QĐ 12/2026.
-type Muc = { pl?: string; nhom: string; phu: string; ketCau: string; ten: string; dv: string; gia: number };
+// vb = quyết định gốc của dòng: '08' (QĐ 08/2026 — nhà, công trình) hoặc '12' (QĐ 12/2026 — một số chi phí), gắn lúc tải tệp.
+type Muc = { pl?: string; nhom: string; phu: string; ketCau: string; ten: string; dv: string; gia: number; vb?: '08' | '12' };
 // Cây trồng, vật nuôi — QĐ 35/2026/QĐ-UBND: 559 dòng bóc từ bản Word Công báo (số 43 ngày 18/5/2026), đối chiếu bản PDF ký số
 // khớp 100% (13/10/2026). gia = null: văn bản ghi "tính theo thực tế" (gỗ, củi rừng trồng từ năm thứ 4/6) → người dùng tự nhập giá.
 type MucCay = { pl: string; nhom: string; ten: string; phanLoai: string; dv: string; gia: number | null; ghiChu?: string };
@@ -35,11 +77,11 @@ type MatDo = { ten: string; dv: string; tuHat: number | null; chietGhep: number 
 
 export default function DenBuClient() {
   // TÍNH GIÁ ĐỀN BÙ LÀ TÍNH NĂNG TRẢ PHÍ (15/10/2026, chủ dự án: "giá bồi thường cũng cho xem nhưng không cho tính, che mờ đi những số liệu
-  // quan trọng ở tài khoản free"). Có quyền: admin · khách được admin cấp vai trò 'denbu'. Người khác: mọi SỐ TIỀN hiện "•••.•••" (tien /
+  // quan trọng ở tài khoản free"). Có quyền: admin · khách có GÓI CHỨC NĂNG CHUNG còn hạn (lib/auth coGoiChung). Người khác: mọi SỐ TIỀN hiện "•••.•••" (tien /
   // soTien bên dưới), ô nhập để TÍNH bị khoá — bấm vào là hộp "tính năng trả phí"; ô TÌM trong danh sách (data-cho-xem) vẫn dùng được.
   // ⚠️ Che ở GIAO DIỆN: số liệu gốc là văn bản công khai của tỉnh, vẫn nằm trong mã / tệp tĩnh của trang.
   const { user } = useAuth();
-  const khoa = !(laAdmin(user as any) || coVaiTro(user as any, 'denbu'));
+  const khoa = !coGoiChung(user);
   const [hopTraPhi, setHopTraPhi] = useState(false);
   const tien = (v: number) => (khoa ? '•••.••• đ' : tienGoc(v));
   const soTien = (v: number) => (khoa ? '•••.•••' : v.toLocaleString('vi-VN'));
@@ -86,6 +128,9 @@ export default function DenBuClient() {
   const [chiPhi, setChiPhi] = useState<Muc[]>([]);
   const [tim, setTim] = useState('');
   const [timCp, setTimCp] = useState('');
+  // THẺ ② TÌM CHUNG QĐ 08 + QĐ 12 (15/10/2026, chủ dự án: "sao chưa đưa quyết định 12 vào chỗ giá đền bù và bồi thường" — bảng QĐ 12
+  // trước chỉ nằm ở thẻ ④ nên ở thẻ ② gõ "mộ", "di chuyển máy lạnh" không ra). locVb = lọc theo quyết định.
+  const [locVb, setLocVb] = useState<'' | '08' | '12'>('');
   const [dongs, setDongs] = useState<DongTinh[]>([]);
   // ── Cây trồng, vật nuôi (QĐ 35/2026) ──
   const [cays, setCays] = useState<MucCay[]>([]);
@@ -93,8 +138,8 @@ export default function DenBuClient() {
   const [timCay, setTimCay] = useState('');
   const [dongCay, setDongCay] = useState<DongCay[]>([]);
   useEffect(() => {
-    if (tab === 'nha' && !mucs.length) fetch('/den-bu-nha-qd08.json').then((r) => r.json()).then(setMucs).catch(() => setMucs([]));
-    if (tab === 'khac' && !chiPhi.length) fetch('/den-bu-chi-phi-qd12.json').then((r) => r.json()).then(setChiPhi).catch(() => setChiPhi([]));
+    if (tab === 'nha' && !mucs.length) fetch('/den-bu-nha-qd08.json').then((r) => r.json()).then((d: Muc[]) => setMucs(d.map((m) => ({ ...m, vb: '08' as const })))).catch(() => setMucs([]));
+    if ((tab === 'nha' || tab === 'khac') && !chiPhi.length) fetch('/den-bu-chi-phi-qd12.json').then((r) => r.json()).then((d: Muc[]) => setChiPhi(d.map((m) => ({ ...m, vb: '12' as const })))).catch(() => setChiPhi([]));
     if (tab === 'cay' && !cays.length) {
       fetch('/den-bu-cay-trong-qd35.json').then((r) => r.json()).then(setCays).catch(() => setCays([]));
       fetch('/den-bu-mat-do-cay-qd35.json').then((r) => r.json()).then(setMatDo).catch(() => setMatDo([]));
@@ -105,13 +150,13 @@ export default function DenBuClient() {
     const r = q ? ds.filter((m) => khongDau([m.ten, m.phu, m.nhom, m.ketCau].join(' ')).includes(q)) : ds;
     return r.slice(0, 80);
   };
-  const themMuc = (m: Muc) => setDongs((d) => [...d, { ten: [m.phu, m.ten].filter(Boolean).join(' · ') || m.nhom, dv: m.dv, gia: m.gia, sl: 1, tyLe: 1, heSo: 1 }]);
+  const themMuc = (m: Muc) => setDongs((d) => [...d, { ten: ([m.phu, m.ten].filter(Boolean).join(' · ') || m.nhom) + (m.vb ? ` (QĐ ${m.vb}/2026${m.pl ? ` · PL ${m.pl}` : ''})` : ''), dv: m.dv, gia: m.gia, sl: 1, tyLe: 1, heSo: 1 }]);
   const theMuc = (m: Muc, i: number) => (
     <button key={i} onClick={() => themMuc(m)} className="block w-full border-b border-slate-100 px-3 py-2 text-left last:border-b-0 hover:bg-slate-50 active:bg-slate-100">
       <span className="block text-[13.5px] font-semibold leading-snug text-slate-700">{[m.phu, m.ten].filter(Boolean).join(' · ')}</span>
       {m.ketCau && <span className="mt-0.5 block text-[11.5px] leading-snug text-slate-400">{m.ketCau}</span>}
       <span className="mt-0.5 block text-[12.5px] font-bold text-[#0A2540]">{tien(m.gia)} / {m.dv}
-        <span className="ml-1 font-normal text-slate-400">· {m.pl ? `PL ${m.pl} · ` : ''}{m.nhom.toLowerCase().trim()}</span></span>
+        <span className="ml-1 font-normal text-slate-400">· {m.vb ? `QĐ ${m.vb}/2026 · ` : ''}{m.pl ? `PL ${m.pl} · ` : ''}{m.nhom.toLowerCase().trim()}</span></span>
     </button>
   );
   const tienNha = dongs.reduce((s, d) => s + d.gia * d.sl * d.tyLe * d.heSo, 0);
@@ -216,7 +261,7 @@ export default function DenBuClient() {
       className={`cl-press whitespace-nowrap rounded-full px-3.5 py-2 text-[13px] font-semibold ${tab === k ? 'bg-[#0A2540] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>{nhan}</button>
   );
 
-  return (
+  const trang = (
     <div className="mx-auto max-w-3xl px-3 py-5 sm:px-4 sm:py-8" onFocusCapture={chanTinh} onMouseDownCapture={chanTinh} onClickCapture={chanTinh}>
       {hopTraPhi && <HopTraPhi ten="Tính giá đền bù" onDong={() => setHopTraPhi(false)} />}
       {khoa && (
@@ -410,15 +455,25 @@ export default function DenBuClient() {
       {tab === 'nha' && (
         <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <p className="text-[13px] leading-snug text-slate-600">
-            Đơn giá bồi thường nhà, nhà ở, công trình xây dựng theo <b>Quyết định 08/2026/QĐ-UBND</b> ngày 22/01/2026 của UBND tỉnh Khánh Hòa. Gõ tên hạng mục (nhà 1 tầng, tường rào, giếng, chuồng trại…) rồi bấm để cộng vào bảng tính.
+            Đơn giá bồi thường nhà, nhà ở, công trình xây dựng theo <b>Quyết định 08/2026/QĐ-UBND</b> ngày 22/01/2026 và đơn giá một số chi phí
+            (tự xây dựng, cải tạo, sửa chữa công trình · di dời mồ mả · tháo dỡ, di chuyển, lắp đặt tài sản · chi phí đầu tư vào đất còn lại) theo
+            {' '}<b>Quyết định 12/2026/QĐ-UBND</b> ngày 24/02/2026 của UBND tỉnh Khánh Hòa. Gõ tên hạng mục (nhà 1 tầng, tường rào, giếng, chuồng trại,
+            mộ xây, di chuyển máy lạnh…) rồi bấm để cộng vào bảng tính.
           </p>
-          <input value={tim} onChange={(e) => setTim(e.target.value)} placeholder="Tìm: tường rào, mái tôn, giếng, sân bê tông…" data-cho-xem className={`${O} mt-2.5`} />
-          <div className="mt-2 max-h-[46vh] overflow-y-auto overscroll-contain rounded-xl border border-slate-100">
-            {mucs.length === 0 && <p className="p-3 text-[13px] text-slate-400">Đang tải bảng đơn giá…</p>}
-            {loc(mucs, tim).map(theMuc)}
-            {mucs.length > 0 && loc(mucs, tim).length === 0 && <p className="p-3 text-[13px] text-slate-400">Không tìm thấy hạng mục nào.</p>}
+          <input value={tim} onChange={(e) => setTim(e.target.value)} placeholder="Tìm: tường rào, mái tôn, giếng, mộ xây, máy lạnh…" data-cho-xem className={`${O} mt-2.5`} />
+          <div className="mt-2 flex flex-wrap gap-1.5" data-cho-xem>
+            {([['', `Cả hai (${mucs.length + chiPhi.length})`], ['08', `QĐ 08 — nhà, công trình (${mucs.length})`], ['12', `QĐ 12 — chi phí (${chiPhi.length})`]] as ['' | '08' | '12', string][]).map(([k, nhan]) => (
+              <button key={k || 'tat-ca'} type="button" data-cho-xem onClick={() => setLocVb(k)}
+                className={`rounded-full px-2.5 py-1 text-[12px] font-semibold ${locVb === k ? 'bg-[#0A2540] text-white' : 'border border-slate-200 bg-white text-slate-600'}`}>{nhan}</button>
+            ))}
           </div>
-          <p className="mt-1.5 text-[12px] leading-snug text-slate-500">Bấm một hạng mục là cộng vào bảng tính. Bản gốc: <a href={TL + 'QD-08-2026-don-gia-boi-thuong-nha-cong-trinh.pdf'} target="_blank" rel="noreferrer" className="font-semibold text-[#0A2540] underline">QĐ 08/2026 (PDF)</a>. Nhà, công trình xây theo giấy phép có thời hạn mà giấy phép đã hết hạn thì <b>chỉ được hỗ trợ 20%</b> mức trên (Điều 3 QĐ 08/2026); tài sản không đủ điều kiện bồi thường được hỗ trợ 100 / 80 / 70% (Điều 10 QĐ 32/2026) — chọn ở từng hạng mục.</p>
+          <div className="mt-2 max-h-[46vh] overflow-y-auto overscroll-contain rounded-xl border border-slate-100">
+            {mucs.length === 0 && chiPhi.length === 0 && <p className="p-3 text-[13px] text-slate-400">Đang tải bảng đơn giá…</p>}
+            {loc(locVb === '08' ? mucs : locVb === '12' ? chiPhi : [...mucs, ...chiPhi], tim).map(theMuc)}
+            {mucs.length + chiPhi.length > 0 && loc(locVb === '08' ? mucs : locVb === '12' ? chiPhi : [...mucs, ...chiPhi], tim).length === 0 && <p className="p-3 text-[13px] text-slate-400">Không tìm thấy hạng mục nào.</p>}
+          </div>
+          <p className="mt-1.5 text-[12px] leading-snug text-slate-500">Bấm một hạng mục là cộng vào bảng tính. Bản gốc: <a href={TL + 'QD-08-2026-don-gia-boi-thuong-nha-cong-trinh.pdf'} target="_blank" rel="noreferrer" className="font-semibold text-[#0A2540] underline">QĐ 08/2026 (PDF)</a>
+            {' · '}<a href={TL + 'QD-12-2026-don-gia-boi-thuong-ho-tro-chi-phi.pdf'} target="_blank" rel="noreferrer" className="font-semibold text-[#0A2540] underline">QĐ 12/2026 (PDF)</a>. Nhà, công trình xây theo giấy phép có thời hạn mà giấy phép đã hết hạn thì <b>chỉ được hỗ trợ 20%</b> mức trên (Điều 3 QĐ 08/2026); tài sản không đủ điều kiện bồi thường được hỗ trợ 100 / 80 / 70% (Điều 10 QĐ 32/2026) — chọn ở từng hạng mục.</p>
 
           {dongs.length > 0 && (
             <div className="mt-3 rounded-xl bg-slate-50 p-3">
@@ -455,7 +510,7 @@ export default function DenBuClient() {
                   <li>Gác lửng bê tông: cao ≤ 1,6 m không tính, 1,6–2 m tính 1/2 diện tích, 2–2,5 m tính 2/3, trên 2,5 m tính đủ — nhập diện tích đã quy đổi vào ô khối lượng.</li>
                 </ul>
               </details>
-              <p className="mt-2 border-t border-slate-200 pt-2 text-[14px] text-slate-600">Cộng nhà &amp; công trình: <b className="text-[#0A2540]">{tien(tienNha)}</b></p>
+              <p className="mt-2 border-t border-slate-200 pt-2 text-[14px] text-slate-600">Cộng nhà, công trình &amp; chi phí (QĐ 08, QĐ 12): <b className="text-[#0A2540]">{tien(tienNha)}</b></p>
             </div>
           )}
         </div>
@@ -746,13 +801,13 @@ export default function DenBuClient() {
               <li>Phụ lục III — Đơn giá <b>tháo dỡ, di chuyển, lắp đặt tài sản</b>.</li>
               <li>Phụ lục IV — Đơn giá bồi thường <b>chi phí đầu tư vào đất còn lại</b>.</li>
             </ul>
-            <input value={timCp} onChange={(e) => setTimCp(e.target.value)} placeholder="Tìm: mộ xây, di chuyển máy lạnh, ao hồ, san lấp…" data-cho-xem className={`${O} mt-2.5`} />
-            <div className="mt-2 max-h-[44vh] overflow-y-auto overscroll-contain rounded-xl border border-slate-100">
-              {chiPhi.length === 0 && <p className="p-3 text-[13px] text-slate-400">Đang tải bảng đơn giá…</p>}
-              {loc(chiPhi, timCp).map(theMuc)}
-              {chiPhi.length > 0 && loc(chiPhi, timCp).length === 0 && <p className="p-3 text-[13px] text-slate-400">Không tìm thấy hạng mục nào.</p>}
-            </div>
-            <p className="mt-1.5 text-[12px] leading-snug text-slate-500">Số lấy từ bản Word đăng trên Công báo tỉnh Khánh Hòa (không phải bản scan), bấm để cộng vào bảng tính.</p>
+            {/* 15/10/2026: bảng QĐ 12 tra CHUNG với QĐ 08 ở thẻ ② (cùng một bảng tính "Hạng mục đã chọn") — trước tra riêng ở đây, cộng vào
+                bảng tính nằm ở thẻ ② nên người dùng không thấy, còn ở thẻ ② thì không tìm ra QĐ 12. */}
+            <button type="button" data-cho-xem onClick={() => { setLocVb('12'); setTim(timCp); setTab('nha'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              className="mt-2.5 w-full rounded-lg border border-[#0A2540] px-3 py-2 text-[13px] font-bold text-[#0A2540] hover:bg-[#0A2540] hover:text-white">
+              Tra đơn giá QĐ 12/2026 và cộng vào bảng tính → thẻ ② Nhà &amp; công trình
+            </button>
+            <p className="mt-1.5 text-[12px] leading-snug text-slate-500">Số lấy từ bản Word đăng trên Công báo tỉnh Khánh Hòa (không phải bản scan) — {chiPhi.length || 315} hạng mục của 4 phụ lục.</p>
             <div className="mt-2 flex flex-wrap gap-2">
               <a href={TL + 'QD-12-2026-don-gia-boi-thuong-ho-tro-chi-phi.pdf'} target="_blank" rel="noreferrer" className="rounded-lg bg-[#0A2540] px-3 py-1.5 text-[12.5px] font-bold text-white">📄 QĐ 12/2026 (PDF)</a>
               <a href={TL + '2093-SXD-huong-dan-ap-dung-QD08-QD12.pdf'} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 px-3 py-1.5 text-[12.5px] font-semibold text-[#0A2540] hover:bg-slate-200">📑 Hướng dẫn áp dụng của Sở Xây dựng</a>
@@ -843,4 +898,5 @@ export default function DenBuClient() {
       </div>
     </div>
   );
+  return khoa ? <>{cheSo(trang, () => setHopTraPhi(true))}</> : trang;
 }

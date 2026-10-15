@@ -10,6 +10,7 @@ export interface AuthUser {
   id: number; email: string; role: Role; roles?: Role[];
   fullName?: string | null; phone?: string | null;
   tier?: string; status?: string; emailVerified?: boolean; avatar?: string | null;
+  goiChungDen?: string | null;   // hạn GÓI CHỨC NĂNG CHUNG (máy chủ gửi ở /auth/me) — xem coGoiChung
 }
 interface Ctx { user: AuthUser | null; loading: boolean; login: (t: string, u: AuthUser, remember?: boolean) => void; logout: () => void; refresh: () => Promise<void>; }
 const AuthCtx = createContext<Ctx>({ user: null, loading: true, login: () => {}, logout: () => {}, refresh: async () => {} });
@@ -25,6 +26,13 @@ export const coVaiTro = (u: { role?: string | null; roles?: string[] | null } | 
 };
 /** Quản trị viên. */
 export const laAdmin = (u?: { role?: string | null; roles?: string[] | null } | null) => coVaiTro(u, 'admin');
+/**
+ * Có GÓI CHỨC NĂNG CHUNG còn hạn không (15/10/2026) — mở mọi tính năng trả phí chung: tra cứu văn bản · tính giá đền bù · bản đồ
+ * quy hoạch Cam Lâm (trừ 1/500). Admin luôn có. Gói đăng tin / đẩy tin / video / quảng cáo bản đồ là chức năng RIÊNG, không dính gì.
+ * ⚠️ Chỉ để giao diện hiện / ẩn — máy chủ kiểm lại bằng hạn đọc thẳng từ database (backend lib/auth.ts coGoiChung).
+ */
+export const coGoiChung = (u?: { role?: string | null; roles?: string[] | null; goiChungDen?: string | null } | null) =>
+  laAdmin(u) || (!!u?.goiChungDen && new Date(u.goiChungDen).getTime() > Date.now());
 /** Tên tiếng Việt của từng vai trò — dùng chung cho trang quản trị và chỗ nào cần hiện ra. */
 export const TEN_VAI_TRO: Record<string, string> = {
   user: 'Khách', admin: 'Admin', gis: 'Biên tập GIS', vanban: 'Quản lý văn bản',

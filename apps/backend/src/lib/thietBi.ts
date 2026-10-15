@@ -33,7 +33,10 @@ import { laAdmin, verifyToken } from './auth.ts';
 
 export const CO_GIOI_HAN = 'gioi_han_thiet_bi';
 export const TOI_DA_MAC_DINH = Number(process.env.THIET_BI_TOI_DA || 3);
-export const ZALO_ADMIN = process.env.ZALO_ADMIN || '0567442996';
+// Zalo admin (15/10/2026, chủ dự án: "zalo admin thì đưa về số 0582594956 cho tự kết bạn chứ không hiện số") — chỉ dùng làm ĐƯỜNG DẪN
+// zalo.me/<số>, KHÔNG in số ra chữ cho người dùng.
+// Đường dẫn = mã QR kết bạn Zalo admin chủ dự án gửi (zaloapp.com/qr/p/… — không lộ số); ZALO_ADMIN trong .env đè được.
+export const ZALO_ADMIN = process.env.ZALO_ADMIN || 'https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr';
 export const PHI_RESET = Number(process.env.PHI_RESET_THIET_BI || 100000);
 
 const ipCua = (req: Request) => String(req.headers['cf-connecting-ip'] || req.ip || '').slice(0, 64);
@@ -182,8 +185,8 @@ async function gioiHanCua(userId: number): Promise<number> {
 }
 
 export function loiQuaGioiHan(toiDa: number): string {
-  return `Tài khoản này đã đăng nhập đủ ${toiDa} thiết bị. Muốn đăng nhập trên thiết bị mới, vui lòng liên hệ Zalo admin `
-    + `${ZALO_ADMIN} để reset thiết bị (phí ${PHI_RESET.toLocaleString('vi-VN')}đ/lần).`;
+  return `Tài khoản này đã đăng nhập đủ ${toiDa} thiết bị. Muốn đăng nhập trên thiết bị mới, vui lòng nhắn Zalo admin (nút Zalo ở chân trang) `
+    + `để reset thiết bị (phí ${PHI_RESET.toLocaleString('vi-VN')}đ/lần).`;
 }
 
 /**

@@ -44,6 +44,9 @@ sys.stdout.reconfigure(encoding='utf-8', line_buffering=True)
 thu_dxf, bang_p, web_p, ra = sys.argv[1:5]
 chi_to = set(int(x) for x in sys.argv[5].split(',')) if len(sys.argv) > 5 else None
 bang = json.load(open(bang_p, encoding='utf-8'))
+# tờ lấy từ NGOÀI bộ chính (vd 303 / 313 / 314 nằm lẻ ở thư mục cha) — ghi rõ nguồn: <thu_muc_dxf>/nguon.json {"303": "…/dc303.dgn"}
+_p_nguon = os.path.join(thu_dxf, 'nguon.json')
+NGUON_RIENG = json.load(open(_p_nguon, encoding='utf-8')) if os.path.exists(_p_nguon) else {}
 VN2000 = ('+proj=tmerc +lat_0=0 +lon_0=108.25 +k=0.9999 +x_0=500000 +y_0=0 +a=6378137 +rf=298.257223563 '
           '+towgs84=-191.90441429,-39.30318279,-111.45032835,-0.00928836,0.01975479,-0.00427372,0.252906278 +units=m +no_defs')
 VE_WGS = Transformer.from_crs(VN2000, 'EPSG:4326', always_xy=True)
@@ -146,7 +149,8 @@ def chon_lop_so(so_lop, nhan, mat_bo):
     thửa + diện tích số chẵn cùng lớp) tự thua vì mặt chứa 2 số."""
     uu = lambda L: -LV_SO.index(L) if L in LV_SO else -99
     cay_bo = [(m, STRtree(m)) for m in mat_bo if m]
-    diem = []
+    co_nhan = len(nhan) >= 3      # tờ có nhãn: chỉ tính điểm số CÓ TRONG NHÃN — tờ 314 lớp "_0" chứa số lưới / thước / bảng ghi chú rải
+    diem = []                     # khắp nơi nên "mặt chứa đúng một số" nhiều hơn cả lớp số thật (level 4)
     for L, ds in so_lop.items():
         mot = 0
         for mat0, cay in cay_bo:
@@ -154,7 +158,7 @@ def chon_lop_so(so_lop, nhan, mat_bo):
             for x, p in ds:
                 hit = [i for i in cay.query(p) if mat0[i].contains(p)]
                 if hit: trong[min(hit, key=lambda i: mat0[i].area)].add(x)
-            mot = max(mot, sum(1 for v in trong.values() if len(v) == 1))
+            mot = max(mot, sum(1 for v in trong.values() if len(v) == 1 and (not co_nhan or next(iter(v)) in nhan)))
         diem.append((mot, len(set(x for x, _ in ds) & set(nhan)), uu(L), L))
     if not diem: return None
     tot = max(diem)
@@ -300,7 +304,7 @@ for f in tep:
         dt_nhan = nhan.get(s, ('', None))[1]; dt_hinh = g.area
         prop = {'to': to_cu, 'thua': s, 'xa': bang['tenXa'][xa_cu], 'xaId': xa_cu,
                 'dienTich_m2': dt_nhan if dt_nhan is not None else round(dt_hinh, 1), 'mucDichSuDung': ma, 'nhan': f'Tờ {to_cu}, thửa {s}',
-                'toMoi': str(N), 'dienTichHinh': round(dt_hinh, 2), 'nguon': f'dc{N}.dgn', 'boNet': k + 1}
+                'toMoi': str(N), 'dienTichHinh': round(dt_hinh, 2), 'nguon': NGUON_RIENG.get(str(N), f'dc{N}.dgn'), 'boNet': k + 1}
         if khop is not None: prop['khopNhan'] = khop
         if s in cach: prop['cachDung'] = cach[s]
         ws = web_so.get((xa_cu, to_cu, s), [])

@@ -3616,7 +3616,7 @@ export default function MapPage() {
                             {t.khoa && (
                               <button type="button" onClick={() => (t.traPhi ? setTraPhiQh(`Thông tin ${t.tieuDe}`) : setHopKhoa(t.tieuDe))}
                                 className="mt-1.5 rounded border border-slate-300 px-2.5 py-1 text-[12.5px] font-semibold text-[#0A2540] active:bg-slate-100">
-                                {t.traPhi ? 'Đăng ký thành viên để xem' : 'Liên hệ admin để xem'}
+                                {t.traPhi ? (daDangNhap ? 'Đăng ký thành viên để xem' : 'Đăng nhập để xem') : 'Liên hệ admin để xem'}
                               </button>
                             )}
                             <div className="mt-1 space-y-[3px]">

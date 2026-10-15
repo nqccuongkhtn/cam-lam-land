@@ -2,11 +2,15 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
+import { useLoginGate } from '@/lib/loginGate';
 
 /**
  * HỘP BÁO "TÍNH NĂNG TRẢ PHÍ" (15/10/2026). Chủ dự án: "tài khoản thường vẫn vào xem văn bản được nhưng làm mờ số ký hiệu và ngày văn bản,
  * bấm vào xem thì không cho, cảnh báo chức năng trả phí". Chữ KHÔNG nói tài khoản nào được dùng — chỉ mời liên hệ admin / đăng ký gói.
  * Có bảng giá GÓI THÀNH VIÊN (gói chức năng chung — máy chủ lib/packages.ts kind 'chung') + nút sang trang mua gói (/dichvu#thanh-vien).
+ * CHƯA ĐĂNG NHẬP thì KHÔNG hiện hộp này mà mở thẳng hộp ĐĂNG NHẬP (15/10/2026 — chủ dự án chụp khách bấm "Xuất phiếu" ra hộp "Đăng ký thành
+ * viên": "lỗi logic" — chưa có tài khoản thì chưa mua gói được). Mọi chỗ khoá trả phí dùng chung hộp này nên sửa một chỗ là đủ cả web.
  */
 type Goi = { id: string; name: string; kind: string; price: number };
 // Bản dự phòng khi chưa tải được bảng giá (giá thật ở máy chủ)
@@ -15,11 +19,20 @@ const GOI_DU_PHONG: Goi[] = [
   { id: 'tv1n', name: 'Gói 1 năm', kind: 'chung', price: 1068000 }, { id: 'tv2n', name: 'Gói 2 năm', kind: 'chung', price: 1968000 },
 ];
 export default function HopTraPhi({ ten, onDong }: { ten: string; onDong: () => void }) {
+  const { user, loading } = useAuth();
+  const { openLogin } = useLoginGate();
+  useEffect(() => {
+    if (loading || user) return;
+    onDong();
+    openLogin({ reason: `${ten} là tính năng dành cho thành viên — vui lòng đăng nhập trước.` });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, user]);
   const [goi, setGoi] = useState<Goi[]>(GOI_DU_PHONG);
   useEffect(() => {
     api<{ packages: Goi[] }>('/payments/packages')
       .then((r) => { const ds = (r.packages || []).filter((p) => p.kind === 'chung' && p.price > 0); if (ds.length) setGoi(ds); }).catch(() => {});
   }, []);
+  if (!user) return null;   // chưa đăng nhập: hộp đăng nhập mở ở trên
   return (
     <div className="fixed inset-0 z-[95] grid place-items-center bg-black/50 p-4" onClick={onDong}>
       <div role="dialog" aria-modal="true" aria-label="Tính năng trả phí" className="max-h-[92dvh] w-full max-w-[360px] overflow-y-auto rounded-lg bg-white p-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>

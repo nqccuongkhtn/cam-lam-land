@@ -96,15 +96,23 @@ BAN_KINH_KHOP_M = 60                                         # lượt ghép the
 KHONG_RANH = ('Level 14', 'Level 50', 'Level 63', 'Level 62', 'Level 22', 'Level 13', 'Level 11')
 KHONG_PHAI_SO = ('Level 63', 'Level 55', 'Level 62')         # số lưới toạ độ / số hiệu tờ / khung
 BUNG_KHOI = ('Level 10', 'Level 23', 'Level 31', 'Level 32', 'Level 1', 'Level 9', 'Level 60')   # khối đặt trên level ranh → bung ra nét
+LOP_TEN_CHU = ('Level 54', 'KHUNGTHU')           # lớp TÊN CHỦ SỬ DỤNG — bỏ qua hẳn, không đọc
+# Mã loại đất trong ô nhãn: chữ HOA không dấu / số, nối bằng + . , / - (ONT+LNQ, 2L, R.T.P…), không dấu cách, ≤ 12 ký tự. 15/10/2026 tối:
+# ô nhãn một số tờ có cả dòng TÊN CHỦ (vd khối N_THUA tờ 210) — bản đầu lấy "chữ đầu tiên có chữ cái" làm loại đất nên ghi nhầm 270 tên người
+# vào cột loại đất ⇒ chỉ nhận đúng dạng mã, mọi dòng chữ khác bỏ ngay, không lưu.
+MA_LOAI = re.compile(r'[A-Z0-9]+([+.,/-][A-Z0-9]+)*')
+la_ma_loai = lambda x: len(x) <= 12 and bool(re.search(r'[A-Z]', x)) and bool(MA_LOAI.fullmatch(x))
 def doc_to(p):
     doc = ezdxf.readfile(p); msp = doc.modelspace()
     net = collections.defaultdict(list); so_lop = collections.defaultdict(list); loai = []; nhan = {}; dem_cong = 0
     tp_lop = collections.defaultdict(list); chu_lop = collections.defaultdict(list)
     for e in msp:
         L, t = e.dxf.layer, e.dxftype()
+        if L in LOP_TEN_CHU: continue
         if t == 'INSERT':
             tx = [(v.dxf.text.strip(), v.dxf.insert) for v in e.virtual_entities() if v.dxftype() == 'TEXT' and v.dxf.text.strip()]
-            ma = next((x for x, _ in tx if re.search(r'[A-Za-z]', x)), '')
+            tx = [(x, q) for x, q in tx if la_ma_loai(x) or re.fullmatch(r'\d+([.,]\d+|-\d+)?', x)]   # chỉ giữ mã loại đất + con số
+            ma = next((x for x, _ in tx if la_ma_loai(x)), '')
             tps = [(so_thap_phan(x), q) for x, q in tx if re.fullmatch(r'\d+[.,]\d+', x)]
             nguyen = sorted(((x, q) for x, q in tx if re.fullmatch(r'\d+(-\d+)?', x)), key=lambda t: -t[1][1])   # trên xuống dưới
             sh = dt = None
@@ -122,11 +130,12 @@ def doc_to(p):
             s = e.dxf.text.strip()
             if not s: continue
             pt = Point(e.dxf.insert[0], e.dxf.insert[1]); h = e.dxf.height or 0
-            if L == 'Level 53': loai.append((s, pt))
+            if L == 'Level 53':                   # lớp loại đất — có tờ ghi lẫn tên cơ quan / chữ khác: chỉ nhận đúng dạng mã
+                if la_ma_loai(s): loai.append((s, pt))
             elif L not in KHONG_PHAI_SO and h < 5:
                 if re.fullmatch(r'\d+(-\d+)?', s): so_lop[L].append((s, pt, h))
                 elif re.fullmatch(r'\d+[.,]\d+', s): tp_lop[L].append((so_thap_phan(s), pt, h))
-                elif re.fullmatch(r'[A-Z][A-Z+,\- ]*[A-Z]', s): chu_lop[L].append((s, pt, h))
+                elif la_ma_loai(s): chu_lop[L].append((s, pt, h))
     # NHÃN RỜI (không đóng thành khối): số nguyên + số ngay DƯỚI (≤ 4 lần cỡ chữ) cùng lớp = số thửa + diện tích. Diện tích số chẵn
     # (tờ 311: "2983") chỉ nhận khi có mã loại đất ở gần — tránh ghép nhầm hai số bất kỳ.
     for L, ds in so_lop.items():
@@ -150,16 +159,22 @@ def chon_lop_so(so_lop, nhan, mat_bo):
     uu = lambda L: -LV_SO.index(L) if L in LV_SO else -99
     cay_bo = [(m, STRtree(m)) for m in mat_bo if m]
     co_nhan = len(nhan) >= 3      # tờ có nhãn: chỉ tính điểm số CÓ TRONG NHÃN — tờ 314 lớp "_0" chứa số lưới / thước / bảng ghi chú rải
-    diem = []                     # khắp nơi nên "mặt chứa đúng một số" nhiều hơn cả lớp số thật (level 4)
+                                  # khắp nơi nên "mặt chứa đúng một số" nhiều hơn cả lớp số thật (level 4)
+    # … và số phải nằm GẦN chính nhãn của nó (≤ BAN_KINH_KHOP_M): tờ 210 (tờ gần trống, 17 thửa) lớp "_0" là BẢNG thửa biến động + lưới
+    # toạ độ — ô bảng khép thành mặt, mỗi ô một số trùng số thửa có nhãn (3, 4, 5…) ⇒ "_0" thắng, báo 119 số / hụt 104. Bảng nằm xa nhãn.
+    gan = lambda x, p: not co_nhan or (x in nhan and nhan[x][2] is not None and nhan[x][2].distance(p) <= BAN_KINH_KHOP_M)
+    diem = []
     for L, ds in so_lop.items():
         mot = 0
         for mat0, cay in cay_bo:
-            trong = collections.defaultdict(set)
+            trong = collections.defaultdict(set); dat = set()
             for x, p in ds:
                 hit = [i for i in cay.query(p) if mat0[i].contains(p)]
-                if hit: trong[min(hit, key=lambda i: mat0[i].area)].add(x)
-            mot = max(mot, sum(1 for v in trong.values() if len(v) == 1 and (not co_nhan or next(iter(v)) in nhan)))
-        diem.append((mot, len(set(x for x, _ in ds) & set(nhan)), uu(L), L))
+                if hit:
+                    i = min(hit, key=lambda i: mat0[i].area); trong[i].add(x)
+                    if gan(x, p): dat.add((i, x))
+            mot = max(mot, sum(1 for i, v in trong.items() if len(v) == 1 and (i, next(iter(v))) in dat))
+        diem.append((mot, len(set(x for x, p in ds if x in nhan and gan(x, p))), uu(L), L))
     if not diem: return None
     tot = max(diem)
     if tot[0] or tot[1]: return tot[3]

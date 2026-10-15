@@ -279,6 +279,22 @@ thành DẤU CỘNG ở giao điểm (không phải đường liền) nên công
 Tên miền `ninhthuan.gov.vn` đã ngừng sau sáp nhập 1/7/2025, cổng Khánh Hòa chưa chuyển dữ liệu về.
 Bản đồ QHSDĐ cấp tỉnh không đăng PDF công khai (nằm trong phụ lục hồ sơ QH tỉnh). → Chờ nguồn.
 
+## TỈNH KHÁC — Lâm Đồng (15/10/2026 tối, CHƯA lên web)
+- Nguồn: cổng Sở NN&MT Lâm Đồng, mục "Quy hoạch sử dụng đất đến năm 2030" (mỗi huyện một thư mục: bản đồ PDF + quyết định ký số).
+  Đã tải Đà Lạt (QĐ 2199/QĐ-UBND 09/11/2023 — file bản đồ ghi "TrinhPheDuyet") + Đức Trọng (QĐ 1868/QĐ-UBND 29/9/2023) về
+  `D:\KhoQH\qhsdd-2030-lam-dong\` — đường dẫn gốc từng file ghi ở `NGUON.txt` cùng thư mục.
+- **KINH TUYẾN TRỤC KHÁC KHÁNH HÒA:** Lâm Đồng 107°45'. File nắn `<pdf>.nan.json` có thêm mục `"ktt": 107.75` → `nan2.lap_phep_doi` đặt
+  `vn2000.LON0` cho cả tiến trình (`vn2000_np` đọc theo); chạy công cụ khác thì đặt biến môi trường `VN2000_KTT_DO=107.75`. Không có
+  mục / biến này = 108°15' như cũ. Bộ 7 tham số Helmert là bộ chung toàn quốc, không đổi. ⚠️ Lần đầu đọc nhầm nhãn "560 000" thành
+  "500 000" → tưởng KTT 108°15' — phải phóng 12 lần mới đọc đúng; KIỂM bằng hồ nước + ảnh vệ tinh trước khi tin.
+- PDF Lâm Đồng **KHÔNG có lớp chữ** (chữ là hình vẽ) → `nan2.py` không tự đọc nhãn lưới: đọc tay vài nhãn trên ảnh phóng to, dò VẠCH
+  LƯỚI dài (nét vector), ghi `"luoi"` vào file nắn như cách `nan_vach_luoi.py`. Kiểm: tâm vùng tô nước ↔ hồ thật (Xuân Hương; Đại Ninh,
+  Đa Nhim), `proof.py` chồng ảnh vệ tinh (đường phố Đà Lạt, sân bay Liên Khương trùng khít).
+- Ranh: `ranh_tu_pdf.py` (Đà Lạt tâm 108.44, 11.94 · Đức Trọng 108.37, 11.73). Ô ảnh: `tiler3.py … --khoi=2` (khối mặc định báo
+  MemoryError ở mức 15 với bản đồ 1:25.000 khổ lớn) → `D:\KhoQH\tiles-qh\dalat2030v1`, `ductrong2030v1`. Chưa bóc loại đất theo thửa
+  (web chưa có thửa địa chính Lâm Đồng). Đưa lên web = khai lớp trong `app/map/page.tsx` như 7 huyện Khánh Hòa + chép ô vào volume
+  `camlam_tiles` — chờ ổ C trống ≥ 3 GB.
+
 ## Nắn toạ độ — chi tiết kỹ thuật
 - `vn2000.py` = bản chuyển Python của `apps/backend/src/lib/vn2000.ts` (VN-2000 Khánh Hòa, KTT 108°15',
   k=0.9999, Helmert 7 tham số) → lớp mới khớp 100% lớp Cam Lâm + địa chính. ĐỪNG sửa hằng số.

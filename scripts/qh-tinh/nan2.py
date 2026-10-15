@@ -146,6 +146,11 @@ def lap_phep_doi(pdf_path, tam_lng, tam_lat):
     side = pdf_path + ".nan.json"
     if os.path.exists(side):
         c=json.load(open(side,encoding="utf-8"))
+        if c.get("ktt") is not None:
+            # BẢN ĐỒ TỈNH KHÁC (15/10/2026): file nắn mang KINH TUYẾN TRỤC của tỉnh đó (vd Lâm Đồng 107.75) → đặt cho cả tiến trình
+            # (vn2000 / vn2000_np đọc LON0 lúc gọi). Không có mục này = 108°15' Khánh Hòa như cũ.
+            import math as _m
+            vn.LON0 = _m.radians(float(c["ktt"]))
         se,ie,sn,inn=c.get("se",1.0),c.get("ie",0.0),c.get("sn",-1.0),c.get("inn",0.0)
         doc=pymupdf.open(pdf_path); W,H=doc[0].rect.width,doc[0].rect.height; doc.close()
         def p2en(x,y): return (se*x+ie, sn*y+inn)

@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 # Port Python y het apps/backend/src/lib/vn2000.ts (VN-2000 Khanh Hoa <-> WGS84).
 # KTT 108 15', mui 3 do, k=0.9999, Helmert 7 tham so (Position Vector).
-import math
+import math, os
 a = 6378137.0; f = 1/298.257223563
 e2 = f*(2-f); ep2 = e2/(1-e2)
-LON0 = math.radians(108.25); K0 = 0.9999; FE = 500000.0
+# Kinh tuyến trục: mặc định 108°15' (Khánh Hòa — ĐỪNG đổi). Bản đồ TỈNH KHÁC (15/10/2026): đặt biến môi trường VN2000_KTT_DO theo
+# KTT của tỉnh đó, vd Lâm Đồng 107.75 (107°45'). Helmert 7 tham số là bộ chung toàn quốc nên không đổi.
+LON0 = math.radians(float(os.environ.get('VN2000_KTT_DO', '108.25'))); K0 = 0.9999; FE = 500000.0
 dX=-191.90441429; dY=-39.30318279; dZ=-111.45032835
 rx = math.radians(-0.00928836/3600); ry = math.radians(0.01975479/3600); rz = math.radians(-0.00427372/3600)
 s = 0.252906278e-6

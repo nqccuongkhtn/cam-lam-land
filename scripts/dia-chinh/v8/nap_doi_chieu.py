@@ -5,12 +5,17 @@
 # Dùng: python -P nap_doi_chieu.py <thu_muc_gop_ra> <thu_muc_ket_qua_1> [<thu_muc_ket_qua_2> ...]
 #   → <gop>/geojson/*.geojson (đúng khuôn file hệ thống) · doi-chieu.csv · chua-dung-duoc.csv · tong-hop.json · nap-doi-chieu.sql
 #   Nạp: docker compose exec -T postgis psql -U camlam -d camlam_gis < <gop>/nap-doi-chieu.sql
-import sys, os, json, csv, collections
+import sys, os, re, json, csv, collections
 import shapely
 from shapely.geometry import shape, MultiPolygon
 sys.stdout.reconfigure(encoding='utf-8')
 gop, vao = sys.argv[1], sys.argv[2:]
 os.makedirs(os.path.join(gop, 'geojson'), exist_ok=True)
+
+# LƯỚI AN TOÀN (15/10/2026 tối): cột loại đất chỉ được là MÃ (chữ HOA không dấu, số, + . , / -). Bản đầu ghi nhầm 270 tên chủ sử dụng
+# (dòng tên trong ô nhãn) vào cột này — doc_thua_v8.py đã sửa tận gốc; ở đây chặn thêm lần nữa: chữ thường / ký tự có dấu ⇒ bỏ trống.
+la_ma = lambda v: not v or (len(v) <= 12 and re.fullmatch(r'[A-Z0-9]+([+.,/-][A-Z0-9]+)*', v) is not None)
+bo_ma = 0
 
 # ── gộp GeoJSON theo xã cũ (giữ đúng tên file hệ thống) ──
 theo_tep = collections.defaultdict(list); ten_fc = {}
@@ -18,6 +23,8 @@ for d in vao:
     gd = os.path.join(d, 'geojson')
     for f in sorted(os.listdir(gd)) if os.path.isdir(gd) else []:
         fc = json.load(open(os.path.join(gd, f), encoding='utf-8'))
+        for ft in fc['features']:
+            if not la_ma(ft['properties'].get('mucDichSuDung')): ft['properties']['mucDichSuDung'] = ''; bo_ma += 1
         theo_tep[f].extend(fc['features']); ten_fc[f] = fc.get('name', '')
 for f, fs in theo_tep.items():
     fs.sort(key=lambda ft: (int(ft['properties']['to']), ft['properties']['thua']))
@@ -34,7 +41,11 @@ for ten in ('doi-chieu.csv', 'chua-dung-duoc.csv'):
         p = os.path.join(d, ten)
         if not os.path.exists(p): continue
         r = list(csv.reader(open(p, encoding='utf-8-sig')))
-        if r: dau = r[0]; dong.extend(r[1:])
+        if r:
+            dau = r[0]; c = dau.index('loai_dat_ban_ve') if 'loai_dat_ban_ve' in dau else -1
+            for x in r[1:]:
+                if c >= 0 and c < len(x) and not la_ma(x[c]): x[c] = ''; bo_ma += 1
+            dong.extend(r[1:])
     dong.sort(key=lambda x: (int(x[0]) if x and x[0].isdigit() else 0))
     with open(os.path.join(gop, ten), 'w', encoding='utf-8-sig', newline='') as fo:
         w = csv.writer(fo); w.writerow(dau or []); w.writerows(dong)
@@ -75,3 +86,4 @@ TRUNCATE dia_chinh_v8 RESTART IDENTITY;
     fo.write('\\.\nCOMMIT;\nANALYZE dia_chinh_v8;\nSELECT doi_chieu, count(*) FROM dia_chinh_v8 GROUP BY 1 ORDER BY 1;\n')
 os.replace(os.path.join(gop, 'nap-doi-chieu.sql.tmp'), os.path.join(gop, 'nap-doi-chieu.sql'))
 print('file nap:', os.path.join(gop, 'nap-doi-chieu.sql'), n, 'thua')
+print('loai dat khong dung dang ma (da bo trong):', bo_ma)

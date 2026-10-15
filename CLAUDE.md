@@ -482,7 +482,7 @@ Chủ dự án đưa bộ **387 tờ DGN V8 xã Cam Lâm** (`D:\BandoCamLam\Ban 
   diện tích khỏi danh sách số thửa; bỏ số trong BẢNG (≥ 8 số thẳng hàng tuyệt đối, chỉ tờ chữ lớn — áp cho chữ nhỏ thì mất số lô khu phân
   lô) và số NGOÀI KHUNG (khung nhận theo HÌNH: lớp có 4 cạnh dài khép kín chứa ≥ 50 % số — tờ 16 Level 55, tờ 247 Level 60) trừ số nằm
   trong mặt khép kín (tờ 16 Thửa 357 nằm trọn ngoài khung mà web vẫn có); lớp dài ≥ 2 km trùng ranh web < 2 % (đường đồng mức) bỏ khỏi
-  BỘ LÕI. 8 tờ: 537 → 1.876 thửa (giống web 87 → 680), không tờ nào giảm, không tờ nào bớt thửa "giống web". Tờ 386 (Cam An Nam tờ 1): nét ranh trùng web ≤ 9 %
+  BỘ LÕI. 8 tờ: 537 → 1.876 thửa (giống web 78 → 680), không tờ nào giảm, không tờ nào bớt thửa "giống web". Tờ 386 (Cam An Nam tờ 1): nét ranh trùng web ≤ 9 %
   ở mọi lớp — chưa dựng được, cần soi riêng.
 - **Tờ lẻ ngoài bộ `bddc`** (`D:\KhoQH\dia-chinh-v8\dxf\nguon.json` ghi nguồn từng tờ): 303, 313, 314 ở thư mục cha; **317 chỉ có trong
   "Sinh Du An VIN chuyen"** (bộ chính thiếu). Bản MỚI HƠN ngoài bộ chính của tờ 19 (`DC19.dgn` 8/1/2026), 312 + 314 (thư mục VIN, 16/4 và

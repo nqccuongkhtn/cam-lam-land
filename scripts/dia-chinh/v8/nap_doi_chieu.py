@@ -55,6 +55,15 @@ for d in vao:
     if os.path.exists(p): tong.extend(json.load(open(p, encoding='utf-8')))
 tong.sort(key=lambda t: t['toMoi'])
 json.dump(tong, open(os.path.join(gop, 'tong-hop.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+# BẢNG THEO TỪNG TỜ để chủ dự án mở bằng Excel (15/10/2026 tối): mỗi tờ một dòng, cột tiếng Việt, xếp theo tờ mới — xem nhanh tờ nào
+# web thiếu / lệch nhiều nhất trước khi quyết có thay lớp thửa web hay không.
+COT_TO = [('toMoi', 'To moi'), ('xaCu', 'Xa cu'), ('toCu', 'To cu'), ('soThuaBanVe', 'So thua tren ban ve'), ('dungDuoc', 'Dung duoc hinh'),
+          ('chuaDung', 'Chua dung duoc'), ('khopNhan', 'Dien tich khop nhan'), ('giong', 'Giong web'), ('dich', 'Cung hinh, lech vi tri'),
+          ('khac', 'Khac web'), ('moi', 'Web chua co'), ('web-co-ban-ve-khong', 'Web co, ban ve khong co'), ('lopSo', 'Lop so thua')]
+with open(os.path.join(gop, 'tong-hop-theo-to.csv.tmp'), 'w', encoding='utf-8-sig', newline='') as fo:
+    w = csv.writer(fo); w.writerow([t for _, t in COT_TO])
+    for t in tong: w.writerow([t.get(k, 0) if k not in ('xaCu', 'toCu', 'lopSo') else t.get(k, '') for k, _ in COT_TO])
+os.replace(os.path.join(gop, 'tong-hop-theo-to.csv.tmp'), os.path.join(gop, 'tong-hop-theo-to.csv'))
 
 # ── file nạp bảng dia_chinh_v8 (COPY dạng chữ: tab ngăn cột, \N = rỗng; xuống dòng KIỂU UNIX — CRLF làm psql từ chối) ──
 def o(v):

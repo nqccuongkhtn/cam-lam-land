@@ -153,8 +153,32 @@ export default function VanBanBrowser() {
     setDangXem({ id: d.id, ten: `${(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')} · ${d.trichYeu}`,
       tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`, url: `${apiBase}/van-ban/${d.id}/pdf?v=9` /* v=9 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts) mới được giữ 30 ngày */, token: getToken() || '' });
     setDocs((ds) => (ds || []).map((x) => x.id === d.id ? { ...x, luotTai: (x.luotTai || 0) + 1 } : x));
+    doiDiaChi(d.id);
   }
-  const dongXem = useCallback(() => setDangXem(null), []);
+  // ĐƯỜNG DẪN MỞ THẲNG MỘT VĂN BẢN: /van-ban?vb=<mã> (15/10/2026 — nút "Chia sẻ" trong khung xem gửi đường dẫn này). Mở / đóng văn bản thì
+  // địa chỉ trang đổi theo (chép địa chỉ trình duyệt cũng gửi được đúng văn bản đó). replaceState: không thêm bước "quay lại".
+  const doiDiaChi = (id: number | null) => {
+    try {
+      const u = new URL(window.location.href);
+      if (id) u.searchParams.set('vb', String(id)); else u.searchParams.delete('vb');
+      window.history.replaceState(window.history.state, '', u.pathname + u.search + u.hash);
+    } catch { /* bỏ qua */ }
+  };
+  const dongXem = useCallback(() => { setDangXem(null); doiDiaChi(null); }, []);
+  // Có ?vb=<mã>: chờ danh sách văn bản về rồi tự mở. Chưa đăng nhập → hộp đăng nhập (một lần), đăng nhập xong tự mở tiếp.
+  const [vbCho, setVbCho] = useState<number | null>(null);
+  const daHoiDangNhap = useRef(false);
+  useEffect(() => {
+    try { const v = Number(new URLSearchParams(window.location.search).get('vb')); if (Number.isInteger(v) && v > 0) setVbCho(v); } catch { /* */ }
+  }, []);
+  useEffect(() => {
+    if (!vbCho || !docs) return;
+    const d = docs.find((x) => x.id === vbCho);
+    if (!d || !d.coFile) { setVbCho(null); toast.error('Văn bản trong đường dẫn không còn trên trang hoặc chưa có file.', 'Chưa mở được văn bản'); doiDiaChi(null); return; }
+    if (!user) { if (!daHoiDangNhap.current) { daHoiDangNhap.current = true; openLogin(); } return; }
+    setVbCho(null); taiPdf(d);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vbCho, docs, user]);
   // Hộp báo của web (tiếng Việt, kiểu thông báo iPhone) thay cho hộp alert trơn của trình duyệt.
   const loiXem = useCallback((m: string) => { toast.error(m, 'Chưa mở được văn bản'); }, []);
 

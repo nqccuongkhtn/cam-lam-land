@@ -118,6 +118,16 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
   const hienPt = soTrang ? 100 : Math.round(Math.min(99, Math.max(ao, phanTram ?? 0)));
 
   const taiVe = () => { if (!blobUrl) return; const a = document.createElement('a'); a.href = blobUrl; a.download = vb.tenFile; a.click(); };
+  // CHIA SẺ VĂN BẢN (chủ dự án 15/10/2026: "thêm nút chia sẻ văn bản"). Gửi ĐƯỜNG DẪN mở thẳng văn bản này trên web (/van-ban?vb=<mã> —
+  // VanBanBrowser tự mở khung xem; chưa đăng nhập thì hiện hộp đăng nhập trước), KHÔNG gửi file: file chỉ tải được khi đăng nhập + có
+  // vé người thật (chống cào). Điện thoại mở bảng chia sẻ của máy (Zalo, Messenger…); máy tính chép đường dẫn — như nút "🔗 Gửi" ở Tra cứu luật.
+  const [daChep, setDaChep] = useState(false);
+  const chiaSe = async () => {
+    const url = `${window.location.origin}/van-ban?vb=${vb.id}`;
+    const dienThoai = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
+    if (dienThoai && typeof navigator.share === 'function') { try { await navigator.share({ title: vb.ten, url }); } catch { /* người dùng huỷ */ } return; }
+    try { await navigator.clipboard.writeText(vb.ten + '\n' + url); setDaChep(true); setTimeout(() => setDaChep(false), 2000); } catch { /* trình duyệt chặn chép */ }
+  };
   const mb = (b: number) => (b / 1048576).toLocaleString('vi-VN', { maximumFractionDigits: 1 });
 
   return (
@@ -127,6 +137,13 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
           <p className="truncate text-[13px] font-bold text-[#0A2540]">{vb.ten}</p>
           <p className="text-[11px] text-slate-500">{soTrang ? `${soTrang} trang` : `Đang tải… ${hienPt}%`}</p>
         </div>
+        <button type="button" onClick={chiaSe} title="Gửi đường dẫn mở thẳng văn bản này"
+          className={`inline-flex h-8 shrink-0 items-center gap-1 rounded-md border px-3 text-[13px] font-semibold ${daChep ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-[#0A2540] hover:bg-slate-50'}`}>
+          {daChep ? '✓ Đã chép đường dẫn' : (<>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5" aria-hidden="true">
+              <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4" />
+            </svg>Chia sẻ</>)}
+        </button>
         <button type="button" onClick={taiVe} disabled={!blobUrl} className="h-8 shrink-0 rounded-md border border-slate-200 px-3 text-[13px] font-semibold text-[#0A2540] hover:bg-slate-50 disabled:opacity-40">Tải về</button>
         <button type="button" onClick={onDong} aria-label="Đóng" className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-xl leading-none text-slate-500 hover:bg-slate-100">✕</button>
       </div>

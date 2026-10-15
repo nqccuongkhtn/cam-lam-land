@@ -478,11 +478,7 @@ Chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free, còn lại kh
   · **QĐ893 tra cứu tới thửa như bình thường** ("ở 893 cứ cho tra cứu tới thửa như bình thường, chỉ khoá không cho làm mờ") — đã GỠ bản khoá
     phóng gần / khoá bấm thửa theo vùng làm buổi chiều (chưa từng lên web).
   · **Thanh độ mờ bị khoá** khi đang bật lớp Cam Lâm (`khoaDoMo`): lớp luôn đậm 100 %, chạm thanh → hộp trả phí. Lớp huyện khác vẫn chỉnh được.
-  · **QĐ205 / phân khu: XEM THỬ ở MỨC ẢNH XA NHẤT của bộ ảnh** ("cho hiện ở z nhỏ nhất của bản đồ đó có"): QĐ205 ô mức 10 (bản đồ mức 8,5–9,5,
-    thấy cả huyện), 7 phân khu ô mức 8 (rất nhỏ). Máy chủ: không vé chỉ phát ô có `z` = thư mục số nhỏ nhất của bộ ảnh (`zXaNhat`,
-    routes/qhRieng.ts), mức khác 403. Giao diện: nguồn ảnh `minzoom = maxzoom = mức đó` (`xemThu`), bản đồ ≥ mức − 0,5 → ẩn lớp + nhãn vàng
-    "🔒 Phóng gần …: tính năng trả phí" + hộp trả phí (một lần mỗi lần VƯỢT ngưỡng do phóng to). Chọn lớp khi đang ở gần → tự lùi ra mức xem thử.
-    Muốn đổi mức xem thử: sửa `zXaNhat` (máy chủ) + `xemThu` (giao diện) cùng lúc.
+  · **QĐ205 / phân khu: XEM THỬ tới MỨC CHUNG `Z_XEM_THU` = 10 = mức ô xa nhất của QĐ205** (chủ dự án: "cho hiện ở z nhỏ nhất" → chốt "lấy mức của 205 là mức phóng chung cho tài khoản free"; trước phân khu theo mức xa nhất của nó = 8, nhỏ xíu). Bản đồ mức ≤ 9,5 thấy cả huyện. Máy chủ: không vé chỉ phát ô `z ≤ Z_XEM_THU` (routes/qhRieng.ts), gần hơn 403. Giao diện: nguồn ảnh `maxzoom = Z_XEM_THU` (`xemThu`), bản đồ ≥ 9,5 → ẩn lớp + nhãn vàng "🔒 <tên lớp>: tính năng trả phí" + hộp "Xem <tên lớp> là tính năng trả phí" (một lần mỗi lần VƯỢT ngưỡng do phóng to; chủ dự án bỏ chữ "gần"). Chọn lớp khi đang ở gần / ở xa → bản đồ về mức 9. Đổi mức: sửa `Z_XEM_THU` ở CẢ HAI nơi (routes/qhRieng.ts + app/map/page.tsx).
   · `MapView.syncOverlays` nay DỰNG LẠI nguồn ảnh khi đường ô / mức phóng đổi (`vanTayNguonRef`) — trước dựng một lần là kẹt (vd đang xem thử
     rồi được cấp gói thì vẫn kẹt ảnh xem thử tới khi tải lại trang).
 - ⚠️ **Cloudflare đã giữ bản sao ô QĐ205 / phân khu ở biên (Cache-Control 1 năm)** → chủ dự án phải bấm "Purge Everything" một lần. File

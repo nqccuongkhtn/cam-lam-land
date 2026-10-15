@@ -390,13 +390,14 @@ const RASTER_OVERLAYS = [
 const KHOA_CAM_LAM = new Set(['qh-qd205', 'qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin', 'qh-taynam', 'qh-taybac']);
 const MUC_KHOA_CAM_LAM = new Set(['qh-qd205', 'phan-khu']);
 // GÓI CHỨC NĂNG CHUNG (15/10/2026 tối) — ai có gói (lib/auth coGoiChung, gồm admin) nhận vé xem đủ 8 lớp trên. Tài khoản thường:
-//  · vẫn CHỌN được 8 lớp nhưng chỉ XEM THỬ ở MỨC NHÌN XA NHẤT của bộ ảnh (chủ dự án: "các quy hoạch còn lại khi chọn vẫn cho hiện …, khi
-//    zoom lại gần hơn thì sẽ bị khoá và hiện bảng tính năng trả phí" — "cho hiện ở z nhỏ nhất của bản đồ đó có"): QĐ205 ô mức 10, phân khu
-//    ô mức 8 (= `minzoom` khai ở trên, khớp thư mục số nhỏ nhất của bộ ảnh). Máy chủ chỉ phát đúng mức đó khi không có vé (routes/qhRieng.ts
-//    zXaNhat). Phóng gần hơn → ẩn lớp + hộp "tính năng trả phí" (xem `xemThu` trong MapPage);
+//  · vẫn CHỌN được 8 lớp nhưng chỉ XEM THỬ tới MỨC XEM THỬ CHUNG `Z_XEM_THU` = mức ô xa nhất của QĐ205 (chủ dự án: "các quy hoạch còn lại
+//    khi chọn vẫn cho hiện …, khi zoom lại gần hơn thì sẽ bị khoá và hiện bảng tính năng trả phí" → chốt: "lấy mức của 205 là mức phóng chung
+//    cho tài khoản free" — trước phân khu theo mức xa nhất của chính nó là 8, nhìn nhỏ xíu). Máy chủ cũng chỉ phát ô tới mức đó khi không có
+//    vé (routes/qhRieng.ts Z_XEM_THU). Phóng gần hơn → ẩn lớp + hộp "tính năng trả phí" (xem `xemThu` trong MapPage);
 //  · lớp Cam Lâm (cả QĐ893 miễn phí) KHÔNG chỉnh được độ mờ (chủ dự án: "ở 893 cứ cho tra cứu tới thửa như bình thường, chỉ khoá không cho
 //    làm mờ bản đồ quy hoạch") — lớp luôn đậm đủ, chạm thanh độ mờ là hộp trả phí.
 const LOP_CAM_LAM = new Set(['qh-qd893', ...KHOA_CAM_LAM]);
+const Z_XEM_THU = 10;   // mức ô xem thử chung của 8 lớp khoá (= mức ô xa nhất của QĐ205) — PHẢI khớp Z_XEM_THU ở routes/qhRieng.ts
 // MỤC CHỌN trên bảng "Bản đồ quy hoạch". Ba bản phân khu 1/2000 (QĐ2076 phía Bắc · QĐ2101 trung tâm ·
 // QĐ2222 ven biển · QĐ918 phức hợp phía Tây) là BỐN MẢNH CỦA CÙNG MỘT BỘ quy hoạch phân khu —
 // nên gộp thành MỘT dòng, bật là bật cả ba. Ảnh của chúng nền trong suốt, vùng lại không trùm
@@ -830,8 +831,9 @@ export default function MapPage() {
       if (!thuMuc) return [];
       if (ve) return [{ ...o, url: '', tiles: [`${duong}/qh-rieng/t/${thuMuc}/{z}/{x}/{y}?v=${ve}`] }];
       if (coGoi) return [];
-      const zXa = Number((o as any).minzoom ?? 10);
-      return [{ ...o, url: '', tiles: [`${duong}/qh-rieng/t/${thuMuc}/{z}/{x}/{y}`], minzoom: zXa, maxzoom: zXa, xemThu: zXa } as any];
+      // nguồn: từ mức xa nhất của bộ ảnh tới Z_XEM_THU (gần hơn thì bản đồ tự phóng to ô mức Z_XEM_THU, không xin ô mức khác)
+      return [{ ...o, url: '', tiles: [`${duong}/qh-rieng/t/${thuMuc}/{z}/{x}/{y}`],
+        minzoom: Math.min(Number((o as any).minzoom ?? Z_XEM_THU), Z_XEM_THU), maxzoom: Z_XEM_THU, xemThu: Z_XEM_THU } as any];
     });
     if (!lopRieng?.lop?.length) return coBan;
     return [...coBan, ...lopRieng.lop.map((l) => ({ id: l.id, name: l.ten, url: '',
@@ -869,7 +871,7 @@ export default function MapPage() {
     // chứ liên hệ admin cái gì". Có gói mà vé chưa về kịp (vài giây đầu) → hộp cũ báo tải lại.
     if (o.khoa) { if (coGoi) setHopKhoa(o.tenApp || o.ten); else setTraPhiQh(o.tenApp || o.ten); return; }
     if (!o.xemThu) { chonLopQh(o, bat); return; }
-    chonLopQh({ gom: o.gom }, bat);
+    chonLopQh({ gom: o.gom, zBay: (xemThuCua(o.gom)?.z ?? Z_XEM_THU) - 1 }, bat);   // nhìn quá xa / đứng ngoài vùng → bay tới đúng mức xem thử
     if (!bat) return;
     const m: any = (window as any).__banDo, xt = xemThuCua(o.gom);
     if (!m?.getZoom || !xt) return;
@@ -1531,7 +1533,7 @@ export default function MapPage() {
     const truoc = zoomTruocRef.current; zoomTruocRef.current = zoomNow;
     if (!xemThuDangBat) return;
     const nguong = xemThuDangBat.z - 0.5;
-    if (zoomNow >= nguong && truoc > 0 && truoc < nguong) setTraPhiQh(`Xem gần ${xemThuDangBat.ten}`);
+    if (zoomNow >= nguong && truoc > 0 && truoc < nguong) setTraPhiQh(`Xem ${xemThuDangBat.ten}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoomNow]);
   // Thanh độ mờ: tài khoản thường + đang bật lớp Cam Lâm → khoá (chạm vào là hộp trả phí)
@@ -3099,9 +3101,9 @@ export default function MapPage() {
           )}
           {khoaGan && xemThuDangBat && (
             // lớp xem thử đang bật nhưng đã phóng gần quá mức xem thử → lớp ẩn; nhãn này nói rõ lý do, bấm vào là hộp trả phí
-            <button type="button" onClick={() => setTraPhiQh(`Xem gần ${xemThuDangBat.ten}`)}
+            <button type="button" onClick={() => setTraPhiQh(`Xem ${xemThuDangBat.ten}`)}
               className="absolute top-11 lg:top-[136px] left-1/2 -translate-x-1/2 z-10 max-w-[92vw] truncate bg-amber-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">
-              🔒 Phóng gần {xemThuDangBat.ten}: tính năng trả phí</button>
+              🔒 {xemThuDangBat.ten}: tính năng trả phí</button>
           )}
           {zoomNow > 0 && zoomNow < PARCEL_SHOW_ZOOM && (
             // Hàng nút quy hoạch nổi trên bản đồ đã bỏ (14/9/2026) nên về lại top-2 như máy tính.

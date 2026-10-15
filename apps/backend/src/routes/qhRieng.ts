@@ -101,21 +101,11 @@ qhRiengRouter.get('/o/:thuMuc/:z/:x/:y', (req, res) => {
 const TILES_CONG = process.env.QH_TILES_DIR || path.resolve(process.cwd(), 'du-lieu-rieng', 'tiles-cong');
 const BO_KHOA_CAM_LAM = /^(qd205|qd2076|qd2101|qd2222|qd918|qdcuhin|qdtaynam|qdtaybac)[a-z0-9]{0,8}$/;
 // XEM Ở MỨC NHÌN XA KHÔNG CẦN VÉ (15/10/2026, chủ dự án: "các quy hoạch còn lại khi chọn vẫn cho hiện …, khi zoom lại gần hơn thì sẽ bị
-// khoá và hiện bảng tính năng trả phí" — "cho hiện ở z nhỏ nhất của bản đồ đó có"). Người không có vé chỉ lấy được ô ở MỨC PHÓNG XA
-// NHẤT mà bộ ảnh đó có (thư mục số nhỏ nhất: QĐ205 = 10, 7 bản phân khu = 8 — đo 15/10/2026); gần hơn vẫn đòi vé (403). Giao diện
-// (app/map/page.tsx) lấy đúng mức đó làm mức xem thử, phóng gần hơn là ẩn lớp + hộp "tính năng trả phí".
-const zXaNhatNho = new Map<string, number>();
-function zXaNhat(thuMuc: string): number {
-  const co = zXaNhatNho.get(thuMuc);
-  if (co !== undefined) return co;
-  let z = -1;   // không đọc được thư mục → không cho xem thử mức nào
-  try {
-    const ds = fs.readdirSync(path.join(TILES_CONG, thuMuc)).filter((t) => /^\d{1,2}$/.test(t)).map(Number);
-    if (ds.length) z = Math.min(...ds);
-  } catch { /* chưa có bộ ảnh */ }
-  if (z >= 0) zXaNhatNho.set(thuMuc, z);
-  return z;
-}
+// khoá và hiện bảng tính năng trả phí"). Người không có vé chỉ lấy được ô tới MỨC XEM THỬ CHUNG = mức ô xa nhất của QĐ205 (10) —
+// chủ dự án chốt cùng ngày: "lấy mức của 205 là mức phóng chung cho tài khoản free" (trước mỗi bộ theo mức xa nhất của chính nó: 7 phân
+// khu = 8, nhìn nhỏ xíu). Ô thô hơn (phân khu có mức 8–9) vẫn cho; gần hơn đòi vé (403). Giao diện dùng đúng số này (Z_XEM_THU trong
+// app/map/page.tsx): phóng gần hơn mức đó là ẩn lớp + hộp "tính năng trả phí".
+const Z_XEM_THU = 10;
 // GET /api/qh-rieng/t/:thuMuc/:z/:x/:y?v=<vé> — một ô PNG 256 của bộ ảnh quy hoạch Cam Lâm bị khoá
 qhRiengRouter.get('/t/:thuMuc/:z/:x/:y', (req, res) => {
   res.set('Cache-Control', 'private, no-store');
@@ -123,7 +113,7 @@ qhRiengRouter.get('/t/:thuMuc/:z/:x/:y', (req, res) => {
   const z = Number(req.params.z), x = Number(req.params.x), y = Number(String(req.params.y).replace(/\.png$/, ''));
   if (!BO_KHOA_CAM_LAM.test(thuMuc) || ![z, x, y].every((n) => Number.isInteger(n) && n >= 0) || z > 22) return res.status(400).end();
   const coVe = !!veHopLe(req.query.v);
-  if (!coVe && z !== zXaNhat(thuMuc)) return res.status(403).json({ error: 'Phóng gần bản đồ quy hoạch này là tính năng trả phí — vui lòng liên hệ admin.' });
+  if (!coVe && z > Z_XEM_THU) return res.status(403).json({ error: 'Phóng gần bản đồ quy hoạch này là tính năng trả phí — vui lòng đăng ký thành viên.' });
   const tep = path.join(TILES_CONG, thuMuc, String(z), String(x), `${y}.png`);
   fs.stat(tep, (loi, st) => {
     if (loi || !st.isFile()) return res.status(404).end();

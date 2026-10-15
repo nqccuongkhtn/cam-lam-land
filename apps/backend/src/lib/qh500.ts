@@ -20,8 +20,18 @@ const MAU_DUONG = '#c8c8c8';
 const NGUONG_M2 = 0.5;
 
 export async function qh500TrenThua(idThua: number, dtThua: number, coQuyen: boolean): Promise<Ban500 | null> {
-  const thamSo = [idThua, -LECH_DIA_CHINH.x, -LECH_DIA_CHINH.y];
-  const P = `WITH p AS (SELECT ST_Translate(ST_MakeValid(geom), $2, $3) AS geom FROM dia_chinh WHERE id = $1)`;
+  return tinh500('SELECT ST_Translate(ST_MakeValid(geom), $2, $3) AS geom FROM dia_chinh WHERE id = $1',
+    [idThua, -LECH_DIA_CHINH.x, -LECH_DIA_CHINH.y], dtThua, coQuyen);
+}
+
+/** Cùng phép tính cho THỬA KHÁCH TỰ VẼ từ toạ độ VN-2000 (15/10/2026, POST /api/parcels/qh-tu-ve): `geojson` = Polygon WGS84 đổi thẳng từ
+ *  toạ độ khách nhập — KHÔNG dịch (toạ độ chính thức đã đúng chỗ). Cùng luật khoá: không có quyền thì chỉ trả dấu khoá. */
+export async function qh500TrenHinh(geojson: string, dtThua: number, coQuyen: boolean): Promise<Ban500 | null> {
+  return tinh500('SELECT ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)) AS geom', [geojson], dtThua, coQuyen);
+}
+
+async function tinh500(pSql: string, thamSo: any[], dtThua: number, coQuyen: boolean): Promise<Ban500 | null> {
+  const P = `WITH p AS (${pSql})`;
   const ranh = await query<any>(`${P}
     SELECT r.ban, r.qd, ST_Area(ST_Intersection(r.geom, p.geom)::geography) AS dt, ST_Area(p.geom::geography) AS tong
     FROM qh_500_ranh r, p WHERE r.geom && p.geom AND ST_Intersects(r.geom, p.geom)`, thamSo)

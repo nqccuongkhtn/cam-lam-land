@@ -160,6 +160,10 @@ app.use('/api/passkey', rateLimit({ windowMs: 10 * 60 * 1000, max: 120, key: 'pa
 app.use('/api/listings', listingsRouter);
 app.use('/api/moi-gioi-cn', moiGioiCnRouter); // xin / duyệt MÔI GIỚI CHUYÊN NGHIỆP
 app.use('/api/layers', layersRouter);
+// Kiểm tra quy hoạch cho THỬA KHÁCH TỰ VẼ từ toạ độ (15/10/2026): mỗi lần là một lượt cắt hình trên mọi bản quy hoạch (thửa vài ha
+// tốn cả giây) → hạn mức riêng, chặt hơn bấm thửa thường. Người thật vẽ vài thửa là cùng.
+app.use('/api/parcels/qh-tu-ve', rateLimit({ windowMs: 10 * 60 * 1000, max: 40, key: 'thuave',
+  message: 'Bạn kiểm tra thửa tự vẽ quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.' }));
 // Bấm vào thửa để xem thông tin: người thật bấm nhiều lắm cũng vài lần mỗi giây, còn máy cào
 // thì gọi liên tục. 150 lần/phút là rất rộng rãi với người dùng nhưng chặn đứng kiểu quét tự động.
 app.use('/api/parcels', rateLimit({ windowMs: 60 * 1000, max: 150, key: 'thua',

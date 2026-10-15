@@ -32,13 +32,26 @@ const NGUONG_CHUA_XD_M2 = 0.5;
 
 export async function qhTuPdf(idThua: number, dtThua: number): Promise<BanPdf[]> {
   const [thua] = await query<any>('SELECT xa_id FROM dia_chinh WHERE id = $1', [idThua]).catch(() => [] as any[]);
-  const huyen = thua ? HUYEN_CU[String(thua.xa_id)] : undefined;
+  return tinhTuPdf('SELECT ST_Translate(ST_MakeValid(geom), $2, $3) AS geom FROM dia_chinh WHERE id = $1',
+    [idThua, -LECH_DIA_CHINH.x, -LECH_DIA_CHINH.y], thua ? String(thua.xa_id) : null, dtThua);
+}
+
+/** Cùng phép tính cho THỬA KHÁCH TỰ VẼ từ toạ độ VN-2000 (15/10/2026, routes/parcels.ts POST /qh-tu-ve): `geojson` = Polygon WGS84 đổi thẳng
+ *  từ toạ độ khách nhập — KHÔNG dịch (toạ độ VN-2000 chính thức đã đúng chỗ, chỉ lớp địa chính mới bị trượt). `xaId` = mã xã của thửa địa
+ *  chính ở giữa hình (để chọn đúng bản của huyện cũ). */
+export async function qhTuPdfHinh(geojson: string, xaId: string | null, dtThua: number): Promise<BanPdf[]> {
+  return tinhTuPdf('SELECT ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)) AS geom', [geojson], xaId, dtThua);
+}
+
+async function tinhTuPdf(pSql: string, thamSo: any[], xaId: string | null, dtThua: number): Promise<BanPdf[]> {
+  const huyen = xaId ? HUYEN_CU[xaId] : undefined;
   const banHuyen = huyen ? BAN_THEO_HUYEN[huyen] : undefined;
   if (huyen && !banHuyen) return [];
+  const iBan = thamSo.length + 1;     // số thứ tự tham số "bản của huyện cũ" — đứng sau các tham số của câu dựng hình thửa
   const rows = await query<any>(`
-    WITH p AS (SELECT ST_Translate(ST_MakeValid(geom), $2, $3) AS geom FROM dia_chinh WHERE id = $1),
+    WITH p AS (${pSql}),
          b AS (SELECT r.ban, r.ten FROM qh_pdf_ranh r, p
-               WHERE CASE WHEN $4::text IS NOT NULL THEN r.ban = $4::text
+               WHERE CASE WHEN $${iBan}::text IS NOT NULL THEN r.ban = $${iBan}::text
                           ELSE r.geom && p.geom AND ST_Intersects(r.geom, ST_PointOnSurface(p.geom)) END
                LIMIT 1)
     SELECT b.ban, b.ten AS ten_ban, z.ten, MIN(z.mau) AS mau,
@@ -46,7 +59,7 @@ export async function qhTuPdf(idThua: number, dtThua: number): Promise<BanPdf[]>
            MAX(ST_Area(p.geom::geography)) AS tong
     FROM b, p, qh_pdf z
     WHERE z.ban = b.ban AND z.geom && p.geom AND ST_Intersects(z.geom, p.geom)
-    GROUP BY b.ban, b.ten, z.ten`, [idThua, -LECH_DIA_CHINH.x, -LECH_DIA_CHINH.y, banHuyen ?? null])
+    GROUP BY b.ban, b.ten, z.ten`, [...thamSo, banHuyen ?? null])
     .catch((e) => { console.error('[qhPdf]', e?.message || e); return [] as any[]; });
   if (!rows.length) return [];
   const tong = Number(rows[0].tong) || 0;      // diện tích thửa trên elipxoit — cùng thước với các phần giao

@@ -472,6 +472,20 @@ Chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free, còn lại kh
 - Kiểm 15/10/2026 11h: `/tiles/qd205…` 404, `qd893v1` 200, có vé → ô trùng từng byte, không vé 403; Thửa 70 · Tờ 25 khách xem: QĐ893 =
   395,1 đất ở đô thị + 116,8 đường, QĐ205 / phân khu / 1/500 chỉ có khoá; trình duyệt không xin ô nào bị khoá.
 
+## THỬA KHÁCH TỰ VẼ TỪ TOẠ ĐỘ cũng kiểm tra quy hoạch được (15/10/2026)
+
+Chủ dự án: "nếu người dùng vẽ thửa từ toạ độ thì vẫn kiểm tra quy hoạch được, phần thửa tờ thông tin ghi thửa giả định do khách hàng tự vẽ".
+- Vẽ xong (`drawParcel` → `kiemQhThuaVe` trong page.tsx) là gửi `POST /api/parcels/qh-tu-ve` `{geometry: Polygon WGS84}` — đổi THẲNG từ toạ độ
+  VN-2000 khách nhập. Máy chủ tính Y HỆT `/at` (cùng `tinhQhHinh`, `qhTuPdfHinh`, `qh500TrenHinh`, cùng luật khoá `khoaQhCamLam`) rồi trả đúng
+  khuôn `/at` với `parcel.giaDinh = true`, `soTo/soThua = null` → mở chính bảng "Thông tin thửa", đầu bảng ghi **"Thửa giả định do khách hàng
+  tự vẽ"** + diện tích + khu vực (xã của thửa địa chính gần điểm giữa hình nhất). Phiếu in (admin) ghi như vậy ở mục số thửa/tờ; sơ đồ ô đất
+  QĐ205 lấy qua `POST /api/parcels/qh-manh-hinh` (chỉ người xem đủ).
+- **KHÔNG dịch hình** như thửa địa chính (toạ độ VN-2000 khách nhập đã đúng chỗ). Diện tích = diện tích phẳng VN-2000 của chính hình (`dtPhangVong`).
+- Chặn: hình tự cắt (ST_IsValid), < 3 điểm / > 1.000 điểm, ngoài vùng Khánh Hòa, > 50 ha (`THUA_VE_TOI_DA_M2`); hạn mức riêng 40 lần/10 phút
+  (index.ts). Không lưu vào `qh_luu`.
+- Kiểm 15/10/2026 (máy chủ thử): gửi đúng hình 34 thửa thật (Cam Lâm, Nha Trang, vùng 1/500) như khách tự vẽ → khớp `/at` 68/68 (khách + admin),
+  lệch 0,00 m²; `/at` mã mới = web cũ 70/70; thửa 40 ha tính 0,2 giây.
+
 ## Phần khó nhất: tính quy hoạch trên từng thửa
 
 `GET /api/parcels/at?lng=&lat=` (`routes/parcels.ts` + `lib/qhCompute.ts`) là **tính năng lõi & tinh vi nhất**.

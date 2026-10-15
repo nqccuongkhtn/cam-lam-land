@@ -534,7 +534,8 @@ const ZONING_MIN_ZOOM = 14; // lớp quy hoạch (vector) chỉ tải khi zoom g
 
 interface ParcelInfo {
   found: boolean; point: { lng: number; lat: number };
-  parcel: { properties: Record<string, any>; soTo?: string | null; soThua?: string | null; xa?: string | null; areaM2?: number } | null;
+  // giaDinh = THỬA KHÁCH TỰ VẼ từ bảng toạ độ (15/10/2026, POST /parcels/qh-tu-ve) — không có số thửa / số tờ
+  parcel: { properties: Record<string, any>; soTo?: string | null; soThua?: string | null; xa?: string | null; areaM2?: number; giaDinh?: boolean } | null;
   zoning: Record<string, any> | null;
   overlaps?: { layer: string; type: string; hz?: string; areaM2: number }[];
   // true = thửa nằm NGOÀI vùng đã có dữ liệu quy hoạch (hiện mới có huyện Cam Lâm cũ).
@@ -1098,6 +1099,9 @@ export default function MapPage() {
   // Bảng đầy đủ khi bấm gim tin lưu (như giỏ hàng) + khách quan tâm
   const [selPlace, setSelPlace] = useState<SavedPlace | null>(null);
   const pinClickRef = useRef(0);
+  // Lượt hỏi thông tin thửa: mỗi lần bấm thửa / vẽ thửa tăng 1. Kết quả "thửa tự vẽ" về muộn (máy chủ cắt hình mất vài giây) mà
+  // người dùng đã bấm sang thửa khác thì bỏ, không đè lên bảng đang xem.
+  const luotThuaRef = useRef(0);
   const [interests, setInterests] = useState<Interest[]>([]);
   const [showAddInt, setShowAddInt] = useState(false);
   const [custList, setCustList] = useState<Customer[]>([]);
@@ -1267,7 +1271,8 @@ export default function MapPage() {
   const [ocrOk, setOcrOk] = useState(0);
   const [ocrEngine, setOcrEngine] = useState('');
   const [pasteText, setPasteText] = useState('');
-  const [drawResult, setDrawResult] = useState<{ n: number; area: number; perim: number; lat: number; lng: number } | null>(null);
+  const [drawResult, setDrawResult] = useState<{ n: number; area: number; perim: number; lat: number; lng: number; hinh?: { type: 'Polygon'; coordinates: number[][][] } } | null>(null);
+  const [dangKiemVe, setDangKiemVe] = useState(false);   // đang chờ máy chủ tính quy hoạch cho thửa vừa vẽ
   const [tool, setTool] = useState<'none' | 'search' | 'chugiai' | 'measure'>('none'); // bảng công cụ trên mobile
   const [bangMuc, setBangMuc] = useState<'lop' | 'luu'>('lop'); // mẫu 51: khung nổi đang hiện LỚP hay ĐÃ LƯU (tách cho khỏi trùng)
   const [timMo, setTimMo] = useState(false); // mẫu 51: khung tìm mở rộng dưới ô tìm nổi (máy tính)
@@ -1593,6 +1598,7 @@ export default function MapPage() {
     }
     if (Date.now() - pinClickRef.current < 350) return; // vừa bấm gim tin lưu → không mở bảng quy hoạch
     setSelPlace(null); setShowSave(false); // click mới → thu gọn, chỉ hiện điểm + nút "Lưu tin này"
+    luotThuaRef.current++; setDangKiemVe(false);
     const vn = wgs84ToVn2000(lng, lat);
     setClickVN({ x: vn.y, y: vn.x, lng, lat }); // sổ: X=Bắc(Northing), Y=Đông(Easting)
     setFlyPoint({ lng, lat }); // bay tới + zoom cận, pin nằm giữa vùng trống phía trên bảng
@@ -1904,8 +1910,36 @@ export default function MapPage() {
     setHighlight({ type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [ring] } } as any);
     const lngs = ll.map((c) => c[0]), lats = ll.map((c) => c[1]);
     setFitTo([[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]]);
-    setDrawResult({ n: pts.length, area: polyAreaM2(pts), perim: perimeterM(pts), lat: ll[0][1], lng: ll[0][0] });
+    const hinh = { type: 'Polygon' as const, coordinates: [ring] };
+    setDrawResult({ n: pts.length, area: polyAreaM2(pts), perim: perimeterM(pts), lat: ll[0][1], lng: ll[0][0], hinh });
     setClickVN(null); setInfo(null); setFocusPoint(null); setDrawOpen(false);
+    kiemQhThuaVe(hinh);
+  }
+  // ── KIỂM TRA QUY HOẠCH CHO THỬA KHÁCH TỰ VẼ (15/10/2026) ──
+  // Chủ dự án: "nếu người dùng vẽ thửa từ toạ độ thì vẫn kiểm tra quy hoạch được, phần thửa tờ thông tin ghi thửa giả định do khách hàng
+  // tự vẽ". Máy chủ (POST /parcels/qh-tu-ve) tính y như thửa địa chính — cùng các bản quy hoạch, cùng luật khoá Cam Lâm — rồi trả về đúng
+  // khuôn của /parcels/at với parcel.giaDinh = true → mở chính bảng "Thông tin thửa", đầu bảng ghi "Thửa giả định do khách hàng tự vẽ".
+  // Toạ độ gửi đi là toạ độ khách nhập đổi thẳng sang WGS84 (lib/vn2000.ts) — máy chủ KHÔNG dịch hình như thửa địa chính.
+  async function kiemQhThuaVe(hinh: { type: 'Polygon'; coordinates: number[][][] }) {
+    const luot = ++luotThuaRef.current;
+    const t0 = Date.now();
+    setDangKiemVe(true);
+    try {
+      const r = await api<ParcelInfo>('/parcels/qh-tu-ve', { method: 'POST', body: JSON.stringify({ geometry: hinh }) });
+      if (luot !== luotThuaRef.current) return;
+      setInfo(r); setParcelMore(false); setSheetExpanded(false); setSheetNho(false); setShowSave(false);
+      // "Lưu điểm" + dòng toạ độ VN-2000 dùng điểm GIỮA thửa (máy chủ chọn điểm chắc chắn nằm trong thửa)
+      const vn = wgs84ToVn2000(r.point.lng, r.point.lat);
+      setClickVN({ x: vn.y, y: vn.x, lng: r.point.lng, lat: r.point.lat });
+      setHighlight({ type: 'Feature', properties: { dienTichChinhThuc: r.parcel?.areaM2 ?? null }, geometry: hinh } as any);
+      // bản đồ đang bay khít vào thửa (0,8 giây) — bay xong mới đo xem bảng có che thửa không
+      setTimeout(() => tranhBiChe(hinh), Math.max(0, 900 - (Date.now() - t0)));
+    } catch (e: any) {
+      if (luot !== luotThuaRef.current) return;
+      alert('Chưa kiểm tra được quy hoạch cho thửa vừa vẽ: ' + (e?.message || e));
+    } finally {
+      if (luot === luotThuaRef.current) setDangKiemVe(false);
+    }
   }
   const mBtn = (m: MeasureMode, label: string) => (
     <button onClick={() => { setMeasure(measure === m ? 'off' : m); setMResult(null); }}
@@ -3151,11 +3185,17 @@ export default function MapPage() {
             <div className="absolute top-3 lg:top-[96px] left-3 z-10 bg-white rounded-xl shadow-xl border border-slate-200 p-3 text-sm max-w-[250px]">
               <div className="flex justify-between items-center mb-1">
                 <b className="text-[#0A2540]">📐 Thửa đất đã vẽ</b>
-                <button onClick={() => { setDrawResult(null); setHighlight(null); }} className="text-slate-400 hover:text-slate-700">✕</button>
+                <button onClick={() => { luotThuaRef.current++; setDangKiemVe(false); setDrawResult(null); setHighlight(null); if (info?.parcel?.giaDinh) setInfo(null); }} className="text-slate-400 hover:text-slate-700">✕</button>
               </div>
               <p className="text-slate-600">Số điểm: <b>{drawResult.n}</b></p>
               <p className="text-slate-600">Diện tích: <b className="text-emerald-700">{fmtArea(drawResult.area)}</b></p>
               <p className="text-slate-600">Chu vi: <b>{fmtLen(drawResult.perim)}</b></p>
+              {/* Kiểm tra quy hoạch cho thửa vừa vẽ (15/10/2026) — tự chạy ngay khi vẽ; đóng bảng rồi muốn xem lại thì bấm nút này. */}
+              {dangKiemVe ? (
+                <p className="mt-2 rounded-lg bg-slate-50 px-2 py-1.5 text-center text-[12.5px] font-medium text-slate-600">⏳ Đang kiểm tra quy hoạch…</p>
+              ) : drawResult.hinh && !info?.parcel?.giaDinh && (
+                <button onClick={() => kiemQhThuaVe(drawResult.hinh!)} className="mt-2 w-full rounded-lg bg-[#0A2540] py-2 text-sm font-bold text-white hover:bg-[#0d3a6b]">📋 Kiểm tra quy hoạch</button>
+              )}
               <button onClick={() => moChiDuong(drawResult.lat, drawResult.lng, 'Thửa đã vẽ')} className="mt-2 w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg py-2">🧭 Chỉ đường tới thửa</button>
             </div>
           )}
@@ -3273,7 +3313,25 @@ export default function MapPage() {
                   một cái là mất luôn số tờ/số thửa — đang đối chiếu với sổ đỏ thì phải kéo lên
                   kéo xuống liên tục. */}
               <div {...vuotBang} onClick={() => { if (sheetNho) setSheetNho(false); }} className="shrink-0 px-4 pt-0 pb-1.5 sm:pt-1.5 sm:pb-2 text-sm border-b border-slate-100">
-                {info.parcel ? (() => {
+                {info.parcel?.giaDinh ? (
+                  /* THỬA KHÁCH TỰ VẼ từ bảng toạ độ (15/10/2026): không có số thửa / số tờ → ghi rõ "Thửa giả định do khách hàng tự vẽ"
+                     (chủ dự án dặn), kèm diện tích + khu vực (xã của thửa địa chính ở giữa hình) để người xem khỏi tưởng là thửa thật. */
+                  <>
+                    <div className="font-bold leading-snug text-[#0A2540] pr-8 sm:pr-0 text-[15px]">
+                      Thửa giả định do khách hàng tự vẽ
+                      {info.parcel.areaM2 != null && <> · <span className="font-normal text-slate-500">Diện tích</span> <span className="whitespace-nowrap">{fmtM2(info.parcel.areaM2)}</span></>}
+                    </div>
+                    {info.parcel.xa && (
+                      <div className="text-[12px] sm:text-[13px] leading-snug text-slate-500 mt-0.5">
+                        <span className="text-slate-400">Khu vực: </span><b className="font-semibold text-slate-700">{info.parcel.xa}</b>
+                        {(info.parcel as any).xaCu && (info.parcel as any).xaCu !== info.parcel.xa && (
+                          <span className="text-slate-400"> · trước sáp nhập: {(info.parcel as any).xaCu}</span>
+                        )}
+                      </div>
+                    )}
+                    <div className="text-[11px] leading-snug text-amber-700 mt-0.5">Vẽ từ toạ độ khách nhập — không phải thửa trên bản đồ địa chính.</div>
+                  </>
+                ) : info.parcel ? (() => {
                   const props = info.parcel.properties || {};
                   const owner = pickProp(props, ['TenChu', 'ten_chu', 'ChuSuDung', 'ChuSDD', 'TenChuSuDung', 'chusdd', 'HoTen', 'ho_ten', 'NguoiSDD', 'TEN_CHU']);
                   // "Khu vực mới" = đơn vị hành chính HIỆN HÀNH (sau sáp nhập 1/7/2025).
@@ -3600,8 +3658,11 @@ export default function MapPage() {
                       const areas = info.overlaps || [];
                       // SƠ ĐỒ ô đất lấy HÌNH MỚI từ máy chủ (12/10/2026) — trước vẽ từ file cũ qh_vector.geojson nên có thể khác con số in cạnh bên
                       const idThua = (info.parcel as any)?.id;
-                      (idThua ? api<{ manh: { lo: string; ring: number[][] }[] }>(`/parcels/${idThua}/qh-manh`).then((r) => r.manh || null).catch(() => null)
-                        : Promise.resolve(null)).then((manh) => finish(areas.length ? areas : [], manh));
+                      // thửa khách tự vẽ chưa có mã thửa → gửi thẳng vòng ranh (đúng toạ độ khách nhập, máy chủ không dịch)
+                      const hoiManh = idThua ? api<{ manh: { lo: string; ring: number[][] }[] }>(`/parcels/${idThua}/qh-manh`)
+                        : info.parcel?.giaDinh && ring.length >= 4 ? api<{ manh: { lo: string; ring: number[][] }[] }>('/parcels/qh-manh-hinh', { method: 'POST', body: JSON.stringify({ ring }) })
+                        : null;
+                      (hoiManh ? hoiManh.then((r) => r.manh || null).catch(() => null) : Promise.resolve(null)).then((manh) => finish(areas.length ? areas : [], manh));
                     }}
                     id="nut-phieu-qh"
                     className="min-w-0 whitespace-nowrap px-1 sm:px-0 sm:mb-1.5 sm:w-full flex items-center justify-center gap-1.5 sm:gap-2 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold bg-[#0A2540] hover:bg-[#0d3a6b] text-white">
@@ -3614,7 +3675,7 @@ export default function MapPage() {
                   ) : (
                     <Link id="nut-luu-diem" href="/login" className="min-w-0 whitespace-nowrap px-1 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold bg-[#7c3aed]/10 text-[#7c3aed]">🔒<span className="sm:hidden">Lưu</span><span className="hidden sm:inline"> Lưu điểm</span></Link>
                   )}
-                  <button id="nut-chia-se" onClick={() => { const t = `Thửa ${info.parcel?.soThua || '?'}, Tờ ${info.parcel?.soTo || '?'} —${info.parcel?.xa || 'Cam Lâm'}${info.point ? ` (${info.point.lat.toFixed(6)},${info.point.lng.toFixed(6)})` : ''}`; navigator.clipboard?.writeText(t).then(() => alert('Đã sao chép mã chia sẻ:\n' + t)).catch(() => alert(t)); }} className="min-w-0 whitespace-nowrap px-1 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">🔗 Chia sẻ</button>
+                  <button id="nut-chia-se" onClick={() => { const t = `${info.parcel?.giaDinh ? 'Thửa giả định do khách hàng tự vẽ' : `Thửa ${info.parcel?.soThua || '?'}, Tờ ${info.parcel?.soTo || '?'}`} —${info.parcel?.xa || 'Cam Lâm'}${info.point ? ` (${info.point.lat.toFixed(6)},${info.point.lng.toFixed(6)})` : ''}`; navigator.clipboard?.writeText(t).then(() => alert('Đã sao chép mã chia sẻ:\n' + t)).catch(() => alert(t)); }} className="min-w-0 whitespace-nowrap px-1 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">🔗 Chia sẻ</button>
                   {info.point && <button id="nut-chi-duong" onClick={() => moChiDuong(info.point!.lat, info.point!.lng, 'Thửa đang xem')} className="min-w-0 whitespace-nowrap px-1 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">🧭 Chỉ đường</button>}
                 </div>
               </div>

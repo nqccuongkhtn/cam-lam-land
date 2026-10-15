@@ -5,9 +5,9 @@ import { vnNoAccent } from '../lib/vn.ts';
 import { verifyToken, coVaiTro } from '../lib/auth.ts';
 import { computeQhAreas, computeQhTheoBan, outerRing, qhReady, ngoaiVungQh, chuanToaDoDiaChinh, manhQh205 } from '../lib/qhCompute.ts';
 import { sqlDienTichPhang, sqlHeSoPhang } from '../lib/dienTichPhang.ts';
-import { qhCoLuu, tinhQhHinh } from '../lib/qhLuu.ts';
-import { qhTuPdf } from '../lib/qhPdf.ts';
-import { qh500TrenThua } from '../lib/qh500.ts';
+import { qhCoLuu, tinhQhHinh, dtPhangVong } from '../lib/qhLuu.ts';
+import { qhTuPdf, qhTuPdfHinh } from '../lib/qhPdf.ts';
+import { qh500TrenThua, qh500TrenHinh } from '../lib/qh500.ts';
 import { laAdmin } from '../lib/auth.ts';
 import { nguoiDungTuYeuCau } from '../middleware/auth.ts';
 
@@ -278,8 +278,7 @@ parcelsRouter.get('/at', async (req, res, next) => {
     // Điểm rơi vào khoảng trống (đường) mà không trúng ô đất → dòng QH hiện "Đất giao thông"
     let zoningOut: any = zoning?.properties ?? null;
     if (!zoningOut && overlaps.some((o) => o.type === 'Đất giao thông')) zoningOut = { loai: 'Đất giao thông' };
-    // Chỉnh nhãn loại đất cho đúng chuẩn (sửa tên trích sai). Thêm cặp mới ở đây khi cần.
-    const RENAME_LOAI: Record<string, string> = { 'Làng xóm hiện trạng': 'Làng xóm đô thị hóa' };
+    // Chỉnh nhãn loại đất cho đúng chuẩn (bảng RENAME_LOAI ở cuối tệp, dùng chung với thửa khách tự vẽ).
     for (const o of overlaps) if (o.type && RENAME_LOAI[o.type]) o.type = RENAME_LOAI[o.type];
     if (zoningOut?.loai && RENAME_LOAI[zoningOut.loai]) zoningOut = { ...zoningOut, loai: RENAME_LOAI[zoningOut.loai] };
     const linked = parcel
@@ -304,20 +303,10 @@ parcelsRouter.get('/at', async (req, res, next) => {
     // (14/10/2026 khuya) Thửa SÁT RANH Cam Lâm mà bản CAD chỉ chạm một mẩu (Thửa 109 · Tờ 43 xã Suối Hiệp: QĐ893 phủ 76 m², 1.534 m² "ngoài
     // phạm vi") trước bị bỏ hẳn quy hoạch PDF của huyện mình → người xem chỉ thấy mẩu QĐ893. Nay bản CAD phủ DƯỚI một nửa thửa thì vẫn tra
     // thêm bản PDF (mỗi mục ghi rõ nguồn; phần ngoài bản nào thì bản đó tự ghi "ngoài phạm vi" / "chưa xác định").
-    const NGOAI_PHAM_VI = 'Nằm ngoài phạm vi bản quy hoạch này';
-    const phuCL = Math.max(0, ...qhCacBanCL.map((b: any) => {
-      const ds = (b?.areas || []) as { type: string; areaM2: number }[];
-      const tong = ds.reduce((s, a) => s + (Number(a.areaM2) || 0), 0);
-      const ngoai = ds.filter((a) => a.type === NGOAI_PHAM_VI).reduce((s, a) => s + (Number(a.areaM2) || 0), 0);
-      return tong > 0 ? (tong - ngoai) / tong : 0;
-    }));
     // (15/10/2026) Phần quy hoạch cũ tính sẵn (overlaps — QĐ205) cũng vậy: thửa Nha Trang / Diên Khánh… sát ranh Cam Lâm chỉ bị QĐ205 chạm một
     // mẩu (Thửa 65 · Tờ 65 Phường Nam Nha Trang 222 ha: 0,8 ha "rừng sản xuất", còn lại "ngoài phạm vi") từng bị CHẶN hẳn QHSDĐ của chính
-    // huyện mình. Nay phủ DƯỚI một nửa thửa thì vẫn tra bản PDF.
-    const ngoaiPre = overlaps.filter((o) => o.type === NGOAI_PHAM_VI).reduce((s, o) => s + (Number(o.areaM2) || 0), 0);
-    const tongPre = overlaps.reduce((s, o) => s + (Number(o.areaM2) || 0), 0);
-    const phuPre = tongPre > 0 ? (tongPre - ngoaiPre) / tongPre : 0;
-    const qhPdf = parcel && tuBangMoi && (overlaps.length === 0 || phuPre < 0.5) && (qhCacBanCL.length === 0 || phuCL < 0.5)
+    // huyện mình. Nay phủ DƯỚI một nửa thửa thì vẫn tra bản PDF.   (cách đo: phuCuaBan / phuCuaPre ở cuối tệp)
+    const qhPdf = parcel && tuBangMoi && canTraPdf(overlaps, qhCacBanCL)
       && (process.env.QH_PDF_THU === '1' || await isFlagOn('qh_pdf_bat'))
       ? await qhTuPdf(Number(parcel.id), dtThua) : [];
     // (15/10/2026) QH CHI TIẾT 1/500 (lib/qh500.ts): loại đất + diện tích CHỈ gửi cho ADMIN (kiểm thẻ đầy đủ). Người khác: thửa nằm trong
@@ -333,23 +322,126 @@ parcelsRouter.get('/at', async (req, res, next) => {
     // (10/10/2026) thêm: có thửa mà KHÔNG bản nào phủ (vd thửa Phước Đồng sát ranh QĐ205, nay phần ngoài ranh không còn bị
     // ghi đường giả) → cũng là "chưa có dữ liệu", kẻo trang hiện khung quy hoạch trống. Tính trên dữ liệu ĐỦ (trước khi khoá bớt).
     const qhNgoaiVung = (ngoaiQh || !!parcel) && overlaps.length === 0 && qhCacBan.length === 0;
-    // ── KHOÁ QUY HOẠCH CAM LÂM (15/10/2026, chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free, còn lại khoá lại, sửa cả phần thông tin
-    // kiểm tra quy hoạch"). Người không được xem đủ: KHÔNG gửi QĐ205 (overlaps + loại đất tại điểm bấm) và 7 bản phân khu 1/2000 — chỉ gửi
-    // DẤU KHOÁ cho bản nào có phủ thửa (giao diện hiện trang "🔒 … Liên hệ admin để xem"). QĐ893 + QHSDĐ 2030 các huyện (PDF) gửi đủ.
-    // Có số liệu riêng (QĐ205 / phân khu / 1/500) thì đánh dấu riêng tư: nginx / Cloudflare không giữ lại phát cho người khác.
-    let overlapsRa = overlaps, zoningRa = zoningOut, cacBanRa: any[] = qhCacBan;
-    if (!xemDu) {
-      const co205 = overlaps.length > 0;
-      const coPk = qhCacBan.some((b: any) => PK_CAM_LAM.has(String(b?.ma)));
-      overlapsRa = []; zoningRa = null;
-      cacBanRa = qhCacBan.filter((b: any) => !PK_CAM_LAM.has(String(b?.ma)));
-      if (coPk) cacBanRa.push({ ma: 'pk', ten: 'Quy hoạch phân khu 1/2000', nguon: 'khoa', khoa: true, areas: [] });
-      if (co205) cacBanRa.unshift({ ma: '205', ten: 'Quy hoạch chung 2045 (QĐ205)', nguon: 'khoa', khoa: true, areas: [] });
-    } else if (overlaps.length || qhCacBan.some((b: any) => PK_CAM_LAM.has(String(b?.ma)) || (b?.ma === 'ct500' && !b?.khoa))) {
-      res.set('Cache-Control', 'private, no-store');
-    }
-    res.json({ found: true, point: { lng, lat }, parcel: parcel ?? null, zoning: zoningRa, overlaps: overlapsRa, neighbors, listings: linked,
-               qhCacBan: cacBanRa, qhNgoaiVung });
+    const kh = khoaQhCamLam(xemDu, overlaps, zoningOut, qhCacBan);
+    if (kh.rieng) res.set('Cache-Control', 'private, no-store');
+    res.json({ found: true, point: { lng, lat }, parcel: parcel ?? null, zoning: kh.zoning, overlaps: kh.overlaps, neighbors, listings: linked,
+               qhCacBan: kh.qhCacBan, qhNgoaiVung });
+  } catch (e) { next(e); }
+});
+
+// ── KHOÁ QUY HOẠCH CAM LÂM (15/10/2026, chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free, còn lại khoá lại, sửa cả phần thông tin
+// kiểm tra quy hoạch"). Người không được xem đủ: KHÔNG gửi QĐ205 (overlaps + loại đất tại điểm bấm) và 7 bản phân khu 1/2000 — chỉ gửi
+// DẤU KHOÁ cho bản nào có phủ thửa (giao diện hiện trang "🔒 … Liên hệ admin để xem"). QĐ893 + QHSDĐ 2030 các huyện (PDF) gửi đủ.
+// `rieng` = có số liệu riêng (QĐ205 / phân khu / 1/500) → nơi gọi đánh dấu riêng tư: nginx / Cloudflare không giữ lại phát cho người khác.
+// Dùng chung cho thửa địa chính (/at) và thửa khách tự vẽ (/qh-tu-ve) — đổi luật khoá thì chỉ sửa ở đây.
+function khoaQhCamLam(xemDu: boolean, overlaps: any[], zoning: any, qhCacBan: any[]) {
+  if (xemDu) return { overlaps, zoning, qhCacBan, rieng: overlaps.length > 0 || qhCacBan.some((b: any) => PK_CAM_LAM.has(String(b?.ma)) || (b?.ma === 'ct500' && !b?.khoa)) };
+  const co205 = overlaps.length > 0;
+  const coPk = qhCacBan.some((b: any) => PK_CAM_LAM.has(String(b?.ma)));
+  const cacBan = qhCacBan.filter((b: any) => !PK_CAM_LAM.has(String(b?.ma)));
+  if (coPk) cacBan.push({ ma: 'pk', ten: 'Quy hoạch phân khu 1/2000', nguon: 'khoa', khoa: true, areas: [] });
+  if (co205) cacBan.unshift({ ma: '205', ten: 'Quy hoạch chung 2045 (QĐ205)', nguon: 'khoa', khoa: true, areas: [] });
+  return { overlaps: [] as any[], zoning: null, qhCacBan: cacBan, rieng: false };
+}
+
+// (14/10/2026 khuya) Thửa SÁT RANH Cam Lâm mà bản CAD chỉ phủ một mẩu vẫn tra thêm QHSDĐ PDF của huyện mình: chỉ tra khi CẢ phần QĐ205
+// (overlaps) LẪN các bản CAD khác phủ DƯỚI một nửa thửa (hoặc không có). Dùng chung cho /at và /qh-tu-ve.
+const NGOAI_PHAM_VI = 'Nằm ngoài phạm vi bản quy hoạch này';
+function phuCuaBan(qhCacBanCL: any[]): number {
+  return Math.max(0, ...qhCacBanCL.map((b: any) => {
+    const ds = (b?.areas || []) as { type: string; areaM2: number }[];
+    const tong = ds.reduce((s, a) => s + (Number(a.areaM2) || 0), 0);
+    const ngoai = ds.filter((a) => a.type === NGOAI_PHAM_VI).reduce((s, a) => s + (Number(a.areaM2) || 0), 0);
+    return tong > 0 ? (tong - ngoai) / tong : 0;
+  }));
+}
+function phuCuaPre(overlaps: any[]): number {
+  const ngoaiPre = overlaps.filter((o) => o.type === NGOAI_PHAM_VI).reduce((s, o) => s + (Number(o.areaM2) || 0), 0);
+  const tongPre = overlaps.reduce((s, o) => s + (Number(o.areaM2) || 0), 0);
+  return tongPre > 0 ? (tongPre - ngoaiPre) / tongPre : 0;
+}
+const canTraPdf = (overlaps: any[], qhCacBanCL: any[]) =>
+  (overlaps.length === 0 || phuCuaPre(overlaps) < 0.5) && (qhCacBanCL.length === 0 || phuCuaBan(qhCacBanCL) < 0.5);
+// Chỉnh nhãn loại đất cho đúng chuẩn (sửa tên trích sai). Thêm cặp mới ở đây khi cần.
+const RENAME_LOAI: Record<string, string> = { 'Làng xóm hiện trạng': 'Làng xóm đô thị hóa' };
+
+// ── POST /api/parcels/qh-tu-ve — KIỂM TRA QUY HOẠCH CHO THỬA KHÁCH TỰ VẼ (15/10/2026) ──────────────────────────────────────────────
+// Chủ dự án: "nếu người dùng vẽ thửa từ toạ độ thì vẫn kiểm tra quy hoạch được, phần thửa tờ thông tin ghi thửa giả định do khách hàng
+// tự vẽ". Thân yêu cầu: { geometry: GeoJSON Polygon WGS84 } — giao diện đổi THẲNG từ toạ độ VN-2000 khách nhập (lib/vn2000.ts).
+// Tính Y HỆT thửa địa chính (/at): cùng hàm, cùng luật khoá Cam Lâm (khoaQhCamLam), cùng cách chọn bản PDF theo huyện cũ. Chỉ khác:
+//  · KHÔNG dịch hình — toạ độ VN-2000 khách nhập đã đúng chỗ (chỉ lớp địa chính mới bị trượt 0,53 m, xem chuanToaDoDiaChinh);
+//  · diện tích = diện tích PHẲNG VN-2000 của chính hình đó (như sổ — dtPhangVong), không có số tờ / số thửa / thửa liền kề / tin rao;
+//  · không lưu kết quả (qh_luu chỉ dành cho thửa địa chính có mã).
+// Thửa vẽ to tính lâu (chủ yếu phần cắt hình QĐ205 + phân khu) → giới hạn diện tích + hạn mức riêng (index.ts).
+const THUA_VE_TOI_DA_M2 = 500_000;    // 50 ha — sổ đỏ hiếm khi lớn hơn; to hơn thì tính chậm mà không còn là "một thửa"
+parcelsRouter.post('/qh-tu-ve', async (req, res, next) => {
+  try {
+    res.set('Cache-Control', 'private, no-store');
+    const g = req.body?.geometry;
+    if (!g || g.type !== 'Polygon' || !Array.isArray(g.coordinates) || g.coordinates.length !== 1 || !Array.isArray(g.coordinates[0]))
+      return res.status(400).json({ error: 'Hình thửa không hợp lệ — vui lòng vẽ lại từ bảng toạ độ.' });
+    const ring: number[][] = g.coordinates[0].map((p: any) => [Number(p?.[0]), Number(p?.[1])]);
+    if (!ring.every(([x, y]) => Number.isFinite(x) && Number.isFinite(y) && x > 106.5 && x < 110 && y > 10.5 && y < 13.5))
+      return res.status(400).json({ error: 'Toạ độ nằm ngoài vùng Khánh Hòa — kiểm tra lại số X, Y.' });
+    const dau = ring[0], cuoi = ring[ring.length - 1];
+    if (dau[0] !== cuoi[0] || dau[1] !== cuoi[1]) ring.push([dau[0], dau[1]]);
+    if (ring.length < 4 || ring.length > 1001) return res.status(400).json({ error: 'Thửa cần từ 3 đến 1.000 điểm toạ độ.' });
+    const geom = { type: 'Polygon', coordinates: [ring] };
+    const gj = JSON.stringify(geom);
+    const [kt] = await query<any>(`
+      SELECT ST_IsValid(g) AS hop, ST_X(ST_PointOnSurface(ST_MakeValid(g))) AS lng, ST_Y(ST_PointOnSurface(ST_MakeValid(g))) AS lat
+      FROM (SELECT ST_SetSRID(ST_GeomFromGeoJSON($1), 4326) AS g) t`, [gj]);
+    if (!kt?.hop) return res.status(400).json({ error: 'Các điểm toạ độ tạo thành hình TỰ CẮT NHAU (cạnh thửa vắt chéo) — kiểm tra lại thứ tự các điểm theo sổ.' });
+    const dt = Math.round(dtPhangVong(ring) * 10) / 10;   // làm tròn 0,1 m² như diện tích thửa địa chính (/at)
+    if (!(dt >= 1)) return res.status(400).json({ error: 'Diện tích thửa quá nhỏ — kiểm tra lại các điểm toạ độ.' });
+    if (dt > THUA_VE_TOI_DA_M2) return res.status(400).json({ error: `Thửa vẽ quá lớn (${(dt / 10000).toLocaleString('vi-VN', { maximumFractionDigits: 1 })} ha) — chỉ kiểm tra được thửa đến ${THUA_VE_TOI_DA_M2 / 10000} ha.` });
+    const lng = Number(kt.lng), lat = Number(kt.lat);
+    // Xã của thửa: thửa địa chính tại (hoặc gần nhất, trong ~300 m) điểm giữa hình — để ghi "Khu vực" + chọn bản PDF của đúng huyện cũ.
+    const [xa] = await query<any>(`
+      SELECT d.xa_id AS "xaId", x.ten AS "xa", x.cap, x.huyen, x.ten_goc AS "tenGoc", xm.ten AS "xaMoi"
+      FROM dia_chinh d
+      LEFT JOIN dia_chinh_xa x  ON x.xa_id  = d.xa_id
+      LEFT JOIN dia_chinh_xa xm ON xm.xa_id = d.xa_moi_id
+      WHERE ST_DWithin(d.geom, ST_SetSRID(ST_MakePoint($1, $2), 4326), 0.003)
+      ORDER BY d.geom <-> ST_SetSRID(ST_MakePoint($1, $2), 4326) LIMIT 1`, [lng, lat]).catch(() => [] as any[]);
+    const nd = await nguoiDungTuYeuCau(req).catch(() => null);
+    const xemDu = xemDuQhCamLam(nd);
+    const ngoaiQh = ngoaiVungQh(ring);
+    const kqQh = qhReady() ? tinhQhHinh(geom, dt) : null;
+    const overlaps: any[] = !ngoaiQh && kqQh?.pre?.length
+      ? kqQh.pre.map((o) => ({ layer: 'Quy hoạch', type: RENAME_LOAI[o.type] || o.type, hz: o.hz, areaM2: o.areaM2 })) : [];
+    const qhCacBanCL = kqQh ? kqQh.cacBan : computeQhTheoBan(ring, dt);
+    const qhPdf = canTraPdf(overlaps, qhCacBanCL) && (process.env.QH_PDF_THU === '1' || await isFlagOn('qh_pdf_bat'))
+      ? await qhTuPdfHinh(gj, xa?.xaId ? String(xa.xaId) : null, dt) : [];
+    const qh500 = await qh500TrenHinh(gj, dt, xemDu).catch(() => null);
+    const qhCacBan = [...qhCacBanCL, ...qhPdf, ...(qh500 ? [qh500] : [])];
+    const qhNgoaiVung = overlaps.length === 0 && qhCacBan.length === 0;
+    const kh = khoaQhCamLam(xemDu, overlaps, null, qhCacBan);
+    const laCu = Number(xa?.cap) === 3;
+    const xaHienHanh = xa ? (xa.xaMoi || xa.xa || null) : null;
+    const parcel = {
+      id: null, giaDinh: true, soTo: null, soThua: null, areaM2: dt, geometry: geom,
+      xa: xaHienHanh, xaCu: xa ? (laCu ? xa.xa : (xa.tenGoc || null)) : null, huyenCu: laCu ? xa.huyen : null,
+      layer_name: 'Thửa giả định do khách hàng tự vẽ',
+      properties: { nhan: 'Thửa giả định do khách hàng tự vẽ', xa: xaHienHanh, dienTich_m2: dt },
+    };
+    res.json({ found: true, point: { lng, lat }, parcel, zoning: kh.zoning, overlaps: kh.overlaps, neighbors: [], listings: [],
+               qhCacBan: kh.qhCacBan, qhNgoaiVung });
+  } catch (e) { next(e); }
+});
+
+// POST /api/parcels/qh-manh-hinh — như GET /:id/qh-manh nhưng cho THỬA KHÁCH TỰ VẼ (chưa có mã thửa): thân { ring: [[lng,lat]…] } đúng
+// toạ độ khách nhập (không dịch). Cùng khoá: chỉ người được xem đủ quy hoạch Cam Lâm (phiếu in cũng chỉ mở cho họ).
+parcelsRouter.post('/qh-manh-hinh', async (req, res, next) => {
+  try {
+    if (!xemDuQhCamLam(await nguoiDungTuYeuCau(req).catch(() => null))) return res.status(403).json({ error: 'Vui lòng liên hệ admin để xem.' });
+    res.set('Cache-Control', 'private, no-store');
+    const r = req.body?.ring;
+    if (!Array.isArray(r) || r.length < 4 || r.length > 1001) return res.status(400).json({ error: 'Hình thửa không hợp lệ.' });
+    const ring: number[][] = r.map((p: any) => [Number(p?.[0]), Number(p?.[1])]);
+    if (!ring.every(([x, y]) => Number.isFinite(x) && Number.isFinite(y) && x > 106.5 && x < 110 && y > 10.5 && y < 13.5))
+      return res.status(400).json({ error: 'Hình thửa không hợp lệ.' });
+    res.json({ manh: qhReady() ? manhQh205(ring, 25, 150, false) : [] });
   } catch (e) { next(e); }
 });
 

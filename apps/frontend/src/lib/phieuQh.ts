@@ -13,7 +13,9 @@ const SITE = {
 };
 
 type Overlap = { type: string; areaM2: number; hz?: string | null };
-type Parcel = { soTo?: string | null; soThua?: string | null; xa?: string | null; areaM2?: number | null; properties?: Record<string, any> };
+// giaDinh = THỬA KHÁCH TỰ VẼ từ bảng toạ độ (15/10/2026) — không có số thửa / số tờ: phiếu ghi "Thửa giả định do khách hàng tự vẽ".
+type Parcel = { soTo?: string | null; soThua?: string | null; xa?: string | null; areaM2?: number | null; properties?: Record<string, any>; giaDinh?: boolean };
+const TEN_GIA_DINH = 'Thửa giả định do khách hàng tự vẽ';
 export type PhieuOpts = {
   parcel: Parcel;
   geometry: any;
@@ -404,8 +406,9 @@ function buildHtml(o: PhieuOpts): string {
 
   const lng = o.point?.lng, lat = o.point?.lat;
   const now = new Date();
-  const ma = `CLL-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-T${esc(p.soTo || '-')}Th${esc(p.soThua || '-')}`;
-  const mapUrl = `https://${SITE.domain}/map?` + (lng != null && lat != null ? `lng=${lng}&lat=${lat}&` : '') + `to=${encodeURIComponent(p.soTo || '')}&thua=${encodeURIComponent(p.soThua || '')}`;
+  const gd = !!p.giaDinh;
+  const ma = `CLL-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-` + (gd ? 'GD' : `T${esc(p.soTo || '-')}Th${esc(p.soThua || '-')}`);
+  const mapUrl = `https://${SITE.domain}/map?` + (lng != null && lat != null ? `lng=${lng}&lat=${lat}` : '') + (gd ? '' : `${lng != null && lat != null ? '&' : ''}to=${encodeURIComponent(p.soTo || '')}&thua=${encodeURIComponent(p.soThua || '')}`);
   const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=${encodeURIComponent(mapUrl)}`;
   const origin = (typeof window !== 'undefined' && window.location && window.location.origin) || ('https://' + SITE.domain);
   const logoSrc = o.logo || `${origin}/phieu/con-dau.png`;   // ưu tiên ảnh người dùng tải lên, sau đó file trong web
@@ -433,7 +436,7 @@ function buildHtml(o: PhieuOpts): string {
     return `<div class="trang pl"><div class="sheet">
     <div class="plhd"><b>${SITE.ten}</b><span>Phụ lục ${i + 1}/${phuLuc.length} kèm Phiếu cung cấp thông tin quy hoạch thửa đất · Mã tra cứu: ${ma}</span></div>
     <h1>Phụ lục ${i + 1}: Trích lục ${esc(pl.tieuDe)}</h1>
-    <div class="sub" style="font-style:normal;color:#222">Thửa <b>${esc(p.soThua || '—')}</b>, Tờ bản đồ số <b>${esc(p.soTo || '—')}</b>${p.xa ? ' — ' + esc(p.xa) : ''}, tỉnh Khánh Hòa · Diện tích <b>${numVi(dt, 1)} m²</b></div>
+    <div class="sub" style="font-style:normal;color:#222">${gd ? `<b>${TEN_GIA_DINH}</b>` : `Thửa <b>${esc(p.soThua || '—')}</b>, Tờ bản đồ số <b>${esc(p.soTo || '—')}</b>`}${p.xa ? ' — ' + esc(p.xa) : ''}, tỉnh Khánh Hòa · Diện tích <b>${numVi(dt, 1)} m²</b></div>
     <div class="grid2" style="margin-top:6px">
       <div>
         <div class="sec" style="margin-top:0">Sơ đồ thửa đất trên bản đồ quy hoạch</div>
@@ -451,7 +454,7 @@ function buildHtml(o: PhieuOpts): string {
   </div>${giapLai(i + 1)}</div>`;
   }).join('');
 
-  return `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Phiếu quy hoạch — Thửa ${esc(p.soThua || '')} Tờ ${esc(p.soTo || '')}</title>
+  return `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Phiếu quy hoạch — ${gd ? 'Thửa giả định' : `Thửa ${esc(p.soThua || '')} Tờ ${esc(p.soTo || '')}`}</title>
 <style>
   /* Lề PHẢI của trang in = 0 để tự đặt lát dấu giáp lai trong dải 10 mm sát mép (xem .giaplai trong @media print).
      Chữ vẫn cách mép phải 10 mm nhờ .wrap đệm phải 10 mm khi in. */
@@ -557,7 +560,7 @@ function buildHtml(o: PhieuOpts): string {
 
     <ol class="fld">
       <li>Tên người yêu cầu: <input class="e" style="min-width:150px" value="${uName}"> · Số CC/CCCD: <input class="e" style="min-width:110px"> · Số ĐT: <input class="e" value="${uPhone}"><br>Địa chỉ liên hệ: <input class="e" style="min-width:70%"></li>
-      <li>Số thửa/tờ thửa đất: Thửa <b>${esc(p.soThua || '—')}</b>, Tờ bản đồ số <b>${esc(p.soTo || '—')}</b>${p.xa ? ' — Thuộc bộ bản đồ địa chính ' + esc(p.xa) : ''}, tỉnh Khánh Hòa</li>
+      <li>Số thửa/tờ thửa đất: ${gd ? `<b>${TEN_GIA_DINH}</b> (vẽ từ bảng toạ độ VN-2000 khách hàng cung cấp — không phải thửa trên bản đồ địa chính)${p.xa ? ' — Khu vực ' + esc(p.xa) : ''}` : `Thửa <b>${esc(p.soThua || '—')}</b>, Tờ bản đồ số <b>${esc(p.soTo || '—')}</b>${p.xa ? ' — Thuộc bộ bản đồ địa chính ' + esc(p.xa) : ''}`}, tỉnh Khánh Hòa</li>
       <li>Diện tích: <b>${numVi(dt, 1)} m²</b></li>
       <li>Mục đích sử dụng đất: <input class="e" style="min-width:130px" value="${esc(mdsd)}"></li>
       <li>Mục đích sử dụng thông tin, dữ liệu: <b>Tham khảo</b></li>

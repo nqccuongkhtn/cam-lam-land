@@ -482,7 +482,9 @@ Chủ dự án đưa bộ **387 tờ DGN V8 xã Cam Lâm** (`D:\BandoCamLam\Ban 
   88.315. So với web: giống 62.978 · cùng hình nhưng lệch vị trí 8.134 (một cụm lệch đúng 0,27 m Đ / 0,07 m B = nửa độ trượt lớp web) · khác
   5.518 · **web chưa có 13.135** — trong đó **10.293 thửa / 1.450 ha nằm ở chỗ web KHÔNG CÓ THỬA NÀO** (web thiếu cả mảng — vd tờ 7: web 221
   thửa, V8 487), chỉ 486 thửa là web có thửa CÙNG HÌNH ở đúng chỗ nhưng KHÁC SỐ (đánh số lại — nhiều nhất tờ 343: 88; ghi ở
-  `thuaWebCungHinh` / cột `thua_web_cung_hinh`) · web có mà V8 không có 4.361. Lượt ghép theo diện tích nhận cả mặt có thêm một SỐ KHÔNG NHÃN (hay là số thửa cũ để lại — tờ 317: mặt 470,69 m² = nhãn thửa
+  `thuaWebCungHinh` / cột `thua_web_cung_hinh`) · web có mà V8 không có 4.361. **352 thửa ĐÁNH DẤU nghi ngờ** (`nghiNgo` / cột `nghi_ngo`):
+  không khớp nhãn và ô gấp > 5 lần hoặc < 1/5 diện tích nhãn (vd tờ 224 thửa 92: nhãn 1,1 ha, ô 98,7 ha — bản vẽ thiếu nét) — KHÔNG tự xoá được
+  vì 80 thửa loại "ô gấp > 5 lần" lại trùng khít web (nhãn ghép nhầm số, ô đúng). Bản đồ tổng quan: `ket-qua\ban-do-tong-quan-doi-chieu.png`. Lượt ghép theo diện tích nhận cả mặt có thêm một SỐ KHÔNG NHÃN (hay là số thửa cũ để lại — tờ 317: mặt 470,69 m² = nhãn thửa
   115 nhưng chứa cả số 114): +310 thửa, +150 giống web, không tờ nào giảm. Mặt KHÔNG khớp nhãn mà > 150 ha thì bỏ (`MAT_TOI_DA_KHONG_NHAN_M2`:
   tờ 386 "thửa 345" 6.297 ha, tờ 246 "thửa 332" 4.727 ha, tờ 120 "thửa 83" 860 ha là ô bao cả vùng tờ; thửa khớp nhãn lớn nhất chỉ 75 ha);
   số > 6 chữ số không phải số thửa ("3276109" là số toạ độ). Đã thử cho các lượt THEO NHÃN chạy trước lượt "mặt chứa duy nhất số đó" → HỎNG

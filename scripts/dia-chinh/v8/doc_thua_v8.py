@@ -471,6 +471,11 @@ for f in tep:
                 'dienTich_m2': dt_nhan if dt_nhan is not None else round(dt_hinh, 1), 'mucDichSuDung': ma, 'nhan': f'Tờ {to_cu}, thửa {s}',
                 'toMoi': str(N), 'dienTichHinh': round(dt_hinh, 2), 'nguon': NGUON_RIENG.get(str(N), f'dc{N}.dgn'), 'boNet': k + 1}
         if khop is not None: prop['khopNhan'] = khop
+        nghi = ''
+        if khop is False and dt_nhan:
+            tl = dt_hinh / dt_nhan
+            if tl > 5 or tl < 0.2: nghi = f'o gap {tl:.1f} lan dien tich nhan'   # ĐÁNH DẤU để soi, không bỏ (80 thửa loại này trùng khít web)
+        if nghi: prop['nghiNgo'] = nghi
         if to_bang: prop['toCuBangTra'] = to_bang
         if s in cach: prop['cachDung'] = cach[s]
         ws = web_so.get((xa_cu, to_cu, s), [])
@@ -491,6 +496,7 @@ for f in tep:
         else:
             tt = 'moi'; prop['doiChieu'] = 'moi'
         dem[tt] += 1
+        if nghi: dem['nghiNgo'] += 1
         # SO THEO VỊ TRÍ (15/10/2026 tối): tờ 343 — thửa "100" của bản vẽ nằm đúng chỗ một thửa web cùng hình nhưng web đánh số khác (đánh số
         # lại) → không phải "web thiếu" / "khác hình". Ghi số thửa web đó để chủ dự án thấy.
         if tt in ('khac', 'moi') and cay_web is not None:
@@ -503,12 +509,12 @@ for f in tep:
         dong_dc.append([N, bang['tenXa'][xa_cu], to_cu, s, tt, ma, '' if dt_nhan is None else dt_nhan, round(dt_hinh, 2),
                         prop.get('dienTichWeb', ''), round(dt_hinh - prop['dienTichWeb'], 2) if 'dienTichWeb' in prop else '',
                         prop.get('lechHinh_m', ''), ' '.join(map(str, prop.get('dich_m', []))), k + 1, '' if khop is None else ('co' if khop else 'KHONG'),
-                        prop.get('thuaWebCungHinh', '')])
+                        prop.get('thuaWebCungHinh', ''), nghi])
     for w in web_to.get((xa_cu, to_cu), []):      # thửa web cùng tờ cũ, nằm trong vùng tờ này mà bản vẽ không có
         if w['id'] in gap_web or vung_to is None: continue
         if vung_to.contains(he_thong_sang_vn(shape(w['g'])).representative_point()):
             dem['web-co-ban-ve-khong'] += 1
-            dong_dc.append([N, bang['tenXa'][xa_cu], to_cu, w['thua'], 'web-co-ban-ve-khong', w.get('mdsd') or '', '', '', w.get('dt') or '', '', '', '', '', '', ''])
+            dong_dc.append([N, bang['tenXa'][xa_cu], to_cu, w['thua'], 'web-co-ban-ve-khong', w.get('mdsd') or '', '', '', w.get('dt') or '', '', '', '', '', '', '', ''])
     co_nhan = sum(1 for s in chon if nhan.get(s, ('', None))[1] is not None)
     khop_nhan = sum(1 for s, (_, _, kh) in chon.items() if kh)
     them_nhan = sum(1 for x in nhan_ngoai if x in chon)
@@ -527,11 +533,11 @@ for xa, fs in ra_xa.items():
     os.replace(p + '.tmp', p); print('ghi', p, len(fs), 'thua')
 with open(os.path.join(ra, 'doi-chieu.csv'), 'w', encoding='utf-8-sig', newline='') as fo:
     w = csv.writer(fo); w.writerow(['to_moi', 'xa_cu', 'to_cu', 'thua', 'doi_chieu', 'loai_dat_ban_ve', 'dien_tich_nhan', 'dien_tich_hinh_ban_ve',
-                                    'dien_tich_web', 'chenh_dien_tich', 'lech_hinh_m', 'dich_m', 'bo_net', 'khop_nhan', 'thua_web_cung_hinh']); w.writerows(dong_dc)
+                                    'dien_tich_web', 'chenh_dien_tich', 'lech_hinh_m', 'dich_m', 'bo_net', 'khop_nhan', 'thua_web_cung_hinh', 'nghi_ngo']); w.writerows(dong_dc)
 with open(os.path.join(ra, 'chua-dung-duoc.csv'), 'w', encoding='utf-8-sig', newline='') as fo:
     w = csv.DictWriter(fo, ['toMoi', 'xaCu', 'toCu', 'thua', 'x', 'y']); w.writeheader(); w.writerows(khong_dung)
 json.dump(tong, open(os.path.join(ra, 'tong-hop.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 c = collections.Counter()
 for t in tong:
-    for k in ('soThuaBanVe', 'dungDuoc', 'chuaDung', 'coNhanDienTich', 'khopNhan', 'giong', 'dich', 'khac', 'moi', 'web-co-ban-ve-khong', 'khacSoCungHinh'): c[k] += t.get(k, 0)
+    for k in ('soThuaBanVe', 'dungDuoc', 'chuaDung', 'coNhanDienTich', 'khopNhan', 'giong', 'dich', 'khac', 'moi', 'web-co-ban-ve-khong', 'khacSoCungHinh', 'nghiNgo'): c[k] += t.get(k, 0)
 print('TONG:', dict(c))

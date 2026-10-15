@@ -3329,7 +3329,7 @@ export default function MapPage() {
                         )}
                       </div>
                     )}
-                    <div className="text-[11px] leading-snug text-amber-700 mt-0.5">Vẽ từ toạ độ khách nhập — không phải thửa trên bản đồ địa chính.</div>
+                    <div className="text-[11px] leading-snug text-amber-700 mt-0.5">Vẽ từ toạ độ khách nhập — không phải thửa địa chính.</div>
                   </>
                 ) : info.parcel ? (() => {
                   const props = info.parcel.properties || {};

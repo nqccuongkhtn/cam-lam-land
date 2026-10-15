@@ -478,11 +478,15 @@ Chủ dự án đưa bộ **387 tờ DGN V8 xã Cam Lâm** (`D:\BandoCamLam\Ban 
   `52`); tờ 58 Level 4 lại là số cao độ. **Level 54 / `KHUNGTHU` = TÊN CHỦ — không đọc, không ghi ra file.** Vì mỗi xã cũ vẽ một kiểu nên
   bộ đổi TỰ DÒ theo từng tờ (lớp ranh = lớp có ≥ 80 % chiều dài trùng ranh thửa web; lớp số = lớp khớp ô nhãn nhiều nhất) và **chọn hình
   KHỚP NHÃN**: thử dựng từ ít → nhiều lớp, thửa có nhãn lấy hình có diện tích khớp số trên nhãn (≤ 0,15 m²).
-- **Số liệu (bản cuối 15/10 tối, 391 tờ kể cả 303 / 313 / 314 / 317):** 90.789 số thửa → dựng được 89.766 (98,9 %), khớp nhãn 86.579 /
-  88.317. So với web: giống 62.978 · cùng hình nhưng lệch vị trí 8.134 (một cụm lệch đúng 0,27 m Đ / 0,07 m B = nửa độ trượt lớp web) · khác
-  5.518 · **web chưa có 13.136** (web THIẾU cả mảng — vd tờ 7: web 221 thửa, V8 487; chỗ đó trên web không có thửa nào) · web có mà V8 không
-  có 4.706. Lượt ghép theo diện tích nhận cả mặt có thêm một SỐ KHÔNG NHÃN (hay là số thửa cũ để lại — tờ 317: mặt 470,69 m² = nhãn thửa
-  115 nhưng chứa cả số 114): +310 thửa, +150 giống web, không tờ nào giảm. Thửa 70 · Tờ 25 V8 = 511,889 m², trùng web. Bảng theo từng tờ (mở Excel): `ket-qua\tong-hop-theo-to.csv`.
+- **Số liệu (bản cuối 15/10 tối, 391 tờ kể cả 303 / 313 / 314 / 317):** 90.782 số thửa → dựng được 89.765 (98,9 %), khớp nhãn 86.579 /
+  88.315. So với web: giống 62.978 · cùng hình nhưng lệch vị trí 8.134 (một cụm lệch đúng 0,27 m Đ / 0,07 m B = nửa độ trượt lớp web) · khác
+  5.518 · **web chưa có 13.135** — trong đó **10.293 thửa / 1.450 ha nằm ở chỗ web KHÔNG CÓ THỬA NÀO** (web thiếu cả mảng — vd tờ 7: web 221
+  thửa, V8 487), chỉ 486 thửa là web có thửa CÙNG HÌNH ở đúng chỗ nhưng KHÁC SỐ (đánh số lại — nhiều nhất tờ 343: 88; ghi ở
+  `thuaWebCungHinh` / cột `thua_web_cung_hinh`) · web có mà V8 không có 4.361. Lượt ghép theo diện tích nhận cả mặt có thêm một SỐ KHÔNG NHÃN (hay là số thửa cũ để lại — tờ 317: mặt 470,69 m² = nhãn thửa
+  115 nhưng chứa cả số 114): +310 thửa, +150 giống web, không tờ nào giảm. Mặt KHÔNG khớp nhãn mà > 150 ha thì bỏ (`MAT_TOI_DA_KHONG_NHAN_M2`:
+  tờ 386 "thửa 345" 6.297 ha, tờ 246 "thửa 332" 4.727 ha, tờ 120 "thửa 83" 860 ha là ô bao cả vùng tờ; thửa khớp nhãn lớn nhất chỉ 75 ha);
+  số > 6 chữ số không phải số thửa ("3276109" là số toạ độ). Đã thử cho các lượt THEO NHÃN chạy trước lượt "mặt chứa duy nhất số đó" → HỎNG
+  (nhãn rời ghép nhầm số: tờ 139 số 878 dính diện tích 3.703,6 của thửa 448 → cướp mặt thửa đang giống web) — giữ thứ tự cũ. Thửa 70 · Tờ 25 V8 = 511,889 m², trùng web. Bảng theo từng tờ (mở Excel): `ket-qua\tong-hop-theo-to.csv`.
 - ⚠️ **TỜ 396 / 397 / 398 LỆCH BẢNG TRA SỐ TỜ** (rà 15/10 tối: chồng điểm giữa mọi thửa V8 lên thửa web): 100 % thửa của file dc396 / dc397
   nằm trên thửa web Cam An Nam tờ 16 / 17, file dc398 tiêu đề ghi "xã Cam An Bắc - Tờ số 21" và nằm trên Cam An Bắc tờ 21 — trong khi bảng
   `dia_chinh_to` (từ `traSoBanDo.ts`) ghi tờ mới 396 / 397 / 398 = Cam An Nam 15 / 16 / 17. Lớp V8 đối chiếu theo tờ của BẢN VẼ
@@ -514,7 +518,7 @@ Chủ dự án đưa bộ **387 tờ DGN V8 xã Cam Lâm** (`D:\BandoCamLam\Ban 
 - **Trên web (chỉ admin):** bảng lớp → "Đối chiếu bản đồ V8 (xã Cam Lâm)": viền hồng nét đứt, tô đỏ = khác, vàng = lệch vị trí, xanh = web chưa
   có; bấm thửa → khung "Bản đồ V8 (đối chiếu)" trong bảng thông tin thửa. Máy chủ: `GET /api/qh-rieng/dc-v8/:z/:x/:y` (chỉ mức 16) +
   `/dc-v8/tai?lng&lat` — vé `'a'` (routes/qhRieng.ts). Bảng tạo trong `migrate.ts`.
-- **Còn dở:** 1.023 số thửa chưa dựng được hình (`chua-dung-duoc.csv`) — phần lớn do BẢN VẼ thiếu nét (vd tờ 344: lô 540–559 không có nét
+- **Còn dở:** 1.017 số thửa chưa dựng được hình (`chua-dung-duoc.csv`) — phần lớn do BẢN VẼ thiếu nét (vd tờ 344: lô 540–559 không có nét
   chia lô, nét Level 2 không chạm khối); tờ 162, 172 trống thật (không có thửa); 37 tờ hụt > 5 % (nặng nhất các tờ chữ lớn 59, 344, 58, 246, 247, 342).
   Chưa quyết: có thay lớp thửa web bằng bản V8 không (chờ chủ dự án đối chiếu xong).
 

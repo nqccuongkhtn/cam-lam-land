@@ -97,6 +97,9 @@ def so_thap_phan(s):
 
 LV_SO = ('Level 4', 'Level 51', 'Level 15', 'Level 5', 'Level 13')   # lớp hay ghi số thửa (thứ tự ưu tiên khi hoà điểm)
 BAN_KINH_KHOP_M = 60                                         # lượt ghép theo diện tích: mặt phải cách chỗ ghi số ≤ 60 m
+# Mặt KHÔNG có nhãn xác nhận mà rộng quá 150 ha thì không nhận (15/10 tối): tờ 386 "thửa 345" 6.297 ha, tờ 246 "thửa 332" 4.727 ha, tờ 120
+# "thửa 83" 860 ha là ô bao cả vùng tờ. Thửa khớp nhãn lớn nhất cả xã chỉ 75 ha; thửa khớp nhãn thì không giới hạn.
+MAT_TOI_DA_KHONG_NHAN_M2 = 1_500_000
 # KHÔNG BAO GIỜ là ranh thửa: nhà, nét khác, lưới / khung ngoài, khung, mép đường nhựa, chữ / nhãn, tâm thửa
 KHONG_RANH = ('Level 14', 'Level 50', 'Level 63', 'Level 62', 'Level 22', 'Level 13', 'Level 11')
 KHONG_PHAI_SO = ('Level 63', 'Level 55', 'Level 62')         # số lưới toạ độ / số hiệu tờ / khung
@@ -180,7 +183,7 @@ def doc_to(p):
                 # ghi số thửa Level 13 cao 18 m — bản đầu bỏ hết chữ >= 5 m (vì số cao độ tờ 58 cao 17 m) nên tờ 247 chỉ đọc được 54 / 289 số.
                 # Tách riêng thì số cao độ (Level 4~lon) và số thửa chữ lớn (Level 13~lon) tự thi nhau ở chon_lop_so như mọi lớp khác.
                 Lk = L if h < 5 else L + '~lon'
-                if re.fullmatch(r'\d+(-\d+)?', s): so_lop[Lk].append((s, pt, h))
+                if re.fullmatch(r'\d{1,6}(-\d+)?', s): so_lop[Lk].append((s, pt, h))   # ≤ 6 chữ số (diện tích số chẵn tới 99 ha vẫn cần để ghép nhãn); "3276109" là số toạ độ
                 elif re.fullmatch(r'\d+[.,]\d+', s): tp_lop[Lk].append((so_thap_phan(s), pt, h))
                 elif la_ma_loai(s):
                     chu_lop[Lk].append((s, pt, h))
@@ -331,7 +334,9 @@ for f in tep:
         to_bang = f"{bang['tenXa'].get(xa_cu, xa_cu)} tờ {to_cu}"
         xa_cu, to_cu = str(SUA_TO[str(N)][0]), str(SUA_TO[str(N)][1])
     net, so_lop, loai, nhan, dem_cong, khung = doc_to(os.path.join(thu_dxf, f))
-    ranh_web = [he_thong_sang_vn(shape(w['g'])).boundary for w in web_to.get((xa_cu, to_cu), [])]
+    web_pg = [(he_thong_sang_vn(shape(w['g'])), w) for w in web_to.get((xa_cu, to_cu), [])]
+    ranh_web = [pg.boundary for pg, _ in web_pg]
+    cay_web = STRtree([pg for pg, _ in web_pg]) if web_pg else None
     chinh, lan, bo_lop = lop_ranh_theo_web(net, ranh_web)
     # bộ nét: (0) CHỈ level ranh chuẩn → (1) + lớp dò theo web ≥ 80 % → (2) + lớp lẫn lộn → (3) + 46/24/30 → (4) + khung tờ / ranh khu.
     # Bộ đầu KHÔNG gộp lớp dò theo web: tờ 16 dò ra cả level 3/60/61 (trùng ranh ở chỗ này, chỗ khác chia ngang thửa) → nếu gộp ngay từ
@@ -375,11 +380,15 @@ for f in tep:
         for k, kq in enumerate(uv):
             if s in kq and abs(kq[s].area - dtn) <= sai_cua(nhan[s]): chon[s] = (kq[s], k, True); break
     da = unary_union([g for g, *_ in chon.values()]) if chon else None
+    # Mặt chứa duy nhất số đó (bộ nét ít lớp nhất) đi TRƯỚC các lượt ghép theo nhãn — đã thử đảo lại (15/10 tối) thì hỏng: nhãn rời có khi
+    # ghép nhầm số (tờ 139: số 878 dính diện tích 3.703,6 của thửa 448) hoặc lệch vài phần mười m² (tờ 8 thửa 246, 457) → lượt theo nhãn
+    # cướp mặt đúng của thửa đang giống web.
     for s in cac_so:
         if s in chon: continue
         for k, kq in enumerate(uv):
             if s not in kq or k in chi_khop: continue
             g = kq[s]
+            if g.area > MAT_TOI_DA_KHONG_NHAN_M2: continue   # mặt khổng lồ không có nhãn xác nhận = ô bao cả vùng tờ, không phải thửa
             if da is not None and g.intersection(da).area > max(0.5, 0.01 * g.area): continue
             dtn = nhan.get(s, ('', None))[1]
             chon[s] = (g, k, None if dtn is None else False); da = g if da is None else unary_union([da, g]); break
@@ -482,15 +491,24 @@ for f in tep:
         else:
             tt = 'moi'; prop['doiChieu'] = 'moi'
         dem[tt] += 1
+        # SO THEO VỊ TRÍ (15/10/2026 tối): tờ 343 — thửa "100" của bản vẽ nằm đúng chỗ một thửa web cùng hình nhưng web đánh số khác (đánh số
+        # lại) → không phải "web thiếu" / "khác hình". Ghi số thửa web đó để chủ dự án thấy.
+        if tt in ('khac', 'moi') and cay_web is not None:
+            for i in cay_web.query(g):
+                wv2, w2 = web_pg[i]
+                if str(w2['thua']) == s: continue
+                if abs(wv2.area - dt_hinh) <= GIONG_DT_M2 and g.hausdorff_distance(wv2) <= 0.6:
+                    prop['thuaWebCungHinh'] = str(w2['thua']); dem['khacSoCungHinh'] += 1; break
         ra_xa[xa_cu].append({'type': 'Feature', 'geometry': mapping(vn_sang_he_thong(g)), 'properties': prop})
         dong_dc.append([N, bang['tenXa'][xa_cu], to_cu, s, tt, ma, '' if dt_nhan is None else dt_nhan, round(dt_hinh, 2),
                         prop.get('dienTichWeb', ''), round(dt_hinh - prop['dienTichWeb'], 2) if 'dienTichWeb' in prop else '',
-                        prop.get('lechHinh_m', ''), ' '.join(map(str, prop.get('dich_m', []))), k + 1, '' if khop is None else ('co' if khop else 'KHONG')])
+                        prop.get('lechHinh_m', ''), ' '.join(map(str, prop.get('dich_m', []))), k + 1, '' if khop is None else ('co' if khop else 'KHONG'),
+                        prop.get('thuaWebCungHinh', '')])
     for w in web_to.get((xa_cu, to_cu), []):      # thửa web cùng tờ cũ, nằm trong vùng tờ này mà bản vẽ không có
         if w['id'] in gap_web or vung_to is None: continue
         if vung_to.contains(he_thong_sang_vn(shape(w['g'])).representative_point()):
             dem['web-co-ban-ve-khong'] += 1
-            dong_dc.append([N, bang['tenXa'][xa_cu], to_cu, w['thua'], 'web-co-ban-ve-khong', w.get('mdsd') or '', '', '', w.get('dt') or '', '', '', '', '', ''])
+            dong_dc.append([N, bang['tenXa'][xa_cu], to_cu, w['thua'], 'web-co-ban-ve-khong', w.get('mdsd') or '', '', '', w.get('dt') or '', '', '', '', '', '', ''])
     co_nhan = sum(1 for s in chon if nhan.get(s, ('', None))[1] is not None)
     khop_nhan = sum(1 for s, (_, _, kh) in chon.items() if kh)
     them_nhan = sum(1 for x in nhan_ngoai if x in chon)
@@ -509,11 +527,11 @@ for xa, fs in ra_xa.items():
     os.replace(p + '.tmp', p); print('ghi', p, len(fs), 'thua')
 with open(os.path.join(ra, 'doi-chieu.csv'), 'w', encoding='utf-8-sig', newline='') as fo:
     w = csv.writer(fo); w.writerow(['to_moi', 'xa_cu', 'to_cu', 'thua', 'doi_chieu', 'loai_dat_ban_ve', 'dien_tich_nhan', 'dien_tich_hinh_ban_ve',
-                                    'dien_tich_web', 'chenh_dien_tich', 'lech_hinh_m', 'dich_m', 'bo_net', 'khop_nhan']); w.writerows(dong_dc)
+                                    'dien_tich_web', 'chenh_dien_tich', 'lech_hinh_m', 'dich_m', 'bo_net', 'khop_nhan', 'thua_web_cung_hinh']); w.writerows(dong_dc)
 with open(os.path.join(ra, 'chua-dung-duoc.csv'), 'w', encoding='utf-8-sig', newline='') as fo:
     w = csv.DictWriter(fo, ['toMoi', 'xaCu', 'toCu', 'thua', 'x', 'y']); w.writeheader(); w.writerows(khong_dung)
 json.dump(tong, open(os.path.join(ra, 'tong-hop.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 c = collections.Counter()
 for t in tong:
-    for k in ('soThuaBanVe', 'dungDuoc', 'chuaDung', 'coNhanDienTich', 'khopNhan', 'giong', 'dich', 'khac', 'moi', 'web-co-ban-ve-khong'): c[k] += t.get(k, 0)
+    for k in ('soThuaBanVe', 'dungDuoc', 'chuaDung', 'coNhanDienTich', 'khopNhan', 'giong', 'dich', 'khac', 'moi', 'web-co-ban-ve-khong', 'khacSoCungHinh'): c[k] += t.get(k, 0)
 print('TONG:', dict(c))

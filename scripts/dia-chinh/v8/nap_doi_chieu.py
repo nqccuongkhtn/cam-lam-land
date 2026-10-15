@@ -59,7 +59,8 @@ json.dump(tong, open(os.path.join(gop, 'tong-hop.json'), 'w', encoding='utf-8'),
 # web thiếu / lệch nhiều nhất trước khi quyết có thay lớp thửa web hay không.
 COT_TO = [('toMoi', 'To moi'), ('xaCu', 'Xa cu'), ('toCu', 'To cu'), ('soThuaBanVe', 'So thua tren ban ve'), ('dungDuoc', 'Dung duoc hinh'),
           ('chuaDung', 'Chua dung duoc'), ('khopNhan', 'Dien tich khop nhan'), ('giong', 'Giong web'), ('dich', 'Cung hinh, lech vi tri'),
-          ('khac', 'Khac web'), ('moi', 'Web chua co'), ('web-co-ban-ve-khong', 'Web co, ban ve khong co'), ('lopSo', 'Lop so thua')]
+          ('khac', 'Khac web'), ('moi', 'Web chua co'), ('khacSoCungHinh', 'Trong do: web co thua cung hinh nhung khac so'),
+          ('web-co-ban-ve-khong', 'Web co, ban ve khong co'), ('lopSo', 'Lop so thua')]
 with open(os.path.join(gop, 'tong-hop-theo-to.csv.tmp'), 'w', encoding='utf-8-sig', newline='') as fo:
     w = csv.writer(fo); w.writerow([t for _, t in COT_TO])
     for t in tong: w.writerow([t.get(k, 0) if k not in ('xaCu', 'toCu', 'lopSo') else t.get(k, '') for k, _ in COT_TO])

@@ -13,6 +13,7 @@ import { getToken } from '@/lib/token';
 import { API_BASE } from '@/lib/config';
 import { useAuth, laAdmin, coVaiTro, coGoiChung } from '@/lib/auth';
 import HopTraPhi from '@/components/HopTraPhi';
+import { useLoginGate } from '@/lib/loginGate';
 import { listMyPlaces, listAllPlaces, addPlace, removePlace, type SavedPlace } from '@/lib/savedPlaces';
 import { listCustomers, listInterests, addInterest, removeInterest, type Customer, type Interest } from '@/lib/crm';
 import { Skeleton } from '@/components/ui';
@@ -428,7 +429,8 @@ const VUNG_QH: { id: string; ten: string; tenNgan: string; tamXem: [number, numb
 //   tính từ vùng loại đất BÓC TỪ BẢN ĐỒ PDF của Sở (14/10/2026) — chỉ tham khảo, không in phiếu.
 // `khoa` = dòng lớp CHỈ ADMIN hiện cho người khác xem tên (máy chủ GET /api/qh-rieng/gioi-thieu): bấm vào là hộp "liên hệ admin", không bật gì.
 // `xemThu` = lớp khoá mà tài khoản thường chỉ xem thử ở mức nhìn xa (gắn trong MapPage, xem LOP_CAM_LAM).
-const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: string[]; zBay?: number; vung: string; pdf?: string; khoa?: boolean; xemThu?: boolean }[] = [
+// `canDangNhap` = dòng khoá vì CHƯA ĐĂNG NHẬP (bấm là hộp mời đăng nhập).
+const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: string[]; zBay?: number; vung: string; pdf?: string; khoa?: boolean; xemThu?: boolean; canDangNhap?: boolean }[] = [
   // (15/10/2026) chủ dự án: "đưa 2030 lên đầu" — QĐ893 (bản Cam Lâm xem miễn phí) đứng ĐẦU danh sách lớp, kéo theo cả thứ tự trang
   // quy hoạch trong bảng thửa (trangQhCuaThua đi theo đúng thứ tự mảng này).
   { id: 'qh-qd893', ten: 'Quy hoạch sử dụng đất 2030 (QĐ893)', tenNgan: 'Sử dụng đất 893', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-qd893'], vung: 'cam-lam' },
@@ -799,17 +801,22 @@ export default function MapPage() {
   type LopRieng = { id: string; thuMuc: string; ten: string; tenNgan: string; tenApp: string; vung: string; zBay?: number;
     minzoom: number; maxzoom: number; khung: [number, number, number, number]; canCu?: CanCu;
     chuGiai?: { nhom: string; muc: { mau: string; tenDs: string[]; so: number }[] }[] };
-  const [lopRieng, setLopRieng] = useState<{ ve: string; lop: LopRieng[] } | null>(null);
+  // `pham` = phạm vi vé máy chủ cấp: 'a' admin · 'c' gói thành viên · 'f' tài khoản thường (vé XEM THỬ — ảnh QĐ205 / phân khu tới Z_XEM_THU).
+  const [lopRieng, setLopRieng] = useState<{ ve: string; lop: LopRieng[]; pham?: 'a' | 'c' | 'f' } | null>(null);
   const laQuanTri = laAdmin(user);
-  // GÓI CHỨC NĂNG CHUNG (15/10/2026): admin + khách có gói còn hạn đều xin vé — máy chủ cấp vé xem đủ QĐ205 / phân khu; riêng admin
-  // nhận thêm danh sách lớp 1/500. Tài khoản thường không xin vé (xem thử ở mức nhìn xa — LOP_CAM_LAM).
+  // VÉ XEM (15/10/2026): MỌI tài khoản ĐÃ ĐĂNG NHẬP đều xin vé — admin / gói thành viên được vé xem đủ, tài khoản thường được vé xem thử.
+  // CHƯA đăng nhập thì không có vé → không tải được ô nào của 8 lớp khoá (chủ dự án: "chưa đăng nhập vẫn xem được tạo lỗ hổng nhỉ").
   const coGoi = coGoiChung(user);
+  const daDangNhap = !!user;
+  const { openLogin } = useLoginGate();
   useEffect(() => {
-    if (!coGoi) { setLopRieng(null); return; }
+    if (!daDangNhap) { setLopRieng(null); return; }
     let con = true;
-    api<{ ve: string; lop: LopRieng[] }>('/qh-rieng/ve').then((r) => { if (con) setLopRieng(r?.ve ? r : null); }).catch(() => { if (con) setLopRieng(null); });
+    api<{ ve: string; lop: LopRieng[]; pham?: 'a' | 'c' | 'f' }>('/qh-rieng/ve').then((r) => { if (con) setLopRieng(r?.ve ? r : null); }).catch(() => { if (con) setLopRieng(null); });
     return () => { con = false; };
-  }, [coGoi, laQuanTri]);
+  }, [daDangNhap, user?.id, coGoi, laQuanTri]);
+  // vé XEM ĐỦ (admin / gói thành viên) — vé xem thử ('f') KHÔNG tính
+  const veDu = lopRieng?.ve && lopRieng.pham !== 'f' ? lopRieng.ve : '';
   // 15/10/2026 chủ dự án: lớp 1/500 "vẫn hiện ra chỗ chọn nhưng chỉ tài khoản admin được chọn, còn những tài khoản khác thì hiện popup
   // liên hệ admin". Máy chủ gửi TÊN lớp nào được phép lộ tên (GET /api/qh-rieng/gioi-thieu — chỉ tên + khu vực, không có ô / vé) →
   // hiện thành dòng có ổ khoá; bấm vào mở hộp `hopKhoa`. Ô ảnh vẫn đòi vé của admin nên biết tên cũng không tải được gì.
@@ -827,15 +834,16 @@ export default function MapPage() {
     // KHOÁ CAM LÂM (15/10/2026): có vé → ảnh 8 lớp lấy qua đường có vé. Không có vé (tài khoản thường) → XEM THỬ: chỉ ô ở mức nhìn xa
     // nhất của bộ ảnh (minzoom = maxzoom = mức đó → gần hơn thì bản đồ tự phóng to ô đó lên, không xin ô mức khác — máy chủ cũng từ chối),
     // `xemThu` = mức đó, dùng để ẩn lớp khi phóng gần (overlays bên dưới). Có gói mà vé chưa về → chờ vé (khỏi dựng ảnh xem thử rồi thay).
-    const ve = lopRieng?.ve ? encodeURIComponent(lopRieng.ve) : '';
+    const veD = lopRieng?.ve && lopRieng.pham !== 'f' ? encodeURIComponent(lopRieng.ve) : '';   // vé xem đủ
+    const veT = lopRieng?.ve && lopRieng.pham === 'f' ? encodeURIComponent(lopRieng.ve) : '';   // vé xem thử (tài khoản thường)
     const coBan = RASTER_OVERLAYS.flatMap((o) => {
       if (!KHOA_CAM_LAM.has(o.id)) return [o];
       const thuMuc = /\/tiles\/([^/]+)\//.exec(String(((o as any).tiles || [])[0] || ''))?.[1];
       if (!thuMuc) return [];
-      if (ve) return [{ ...o, url: '', tiles: [`${duong}/qh-rieng/t/${thuMuc}/{z}/{x}/{y}?v=${ve}`] }];
-      if (coGoi) return [];
-      // nguồn: từ mức xa nhất của bộ ảnh tới Z_XEM_THU (gần hơn thì bản đồ tự phóng to ô mức Z_XEM_THU, không xin ô mức khác)
-      return [{ ...o, url: '', tiles: [`${duong}/qh-rieng/t/${thuMuc}/{z}/{x}/{y}`],
+      if (veD) return [{ ...o, url: '', tiles: [`${duong}/qh-rieng/t/${thuMuc}/{z}/{x}/{y}?v=${veD}`] }];
+      if (!veT) return [];   // chưa đăng nhập / vé chưa về → không dựng lớp khoá (máy chủ cũng từ chối ô không vé)
+      // XEM THỬ: nguồn từ mức xa nhất của bộ ảnh tới Z_XEM_THU (gần hơn thì bản đồ tự phóng to ô mức Z_XEM_THU, không xin ô mức khác)
+      return [{ ...o, url: '', tiles: [`${duong}/qh-rieng/t/${thuMuc}/{z}/{x}/{y}?v=${veT}`],
         minzoom: Math.min(Number((o as any).minzoom ?? Z_XEM_THU), Z_XEM_THU), maxzoom: Z_XEM_THU, xemThu: Z_XEM_THU } as any];
     });
     if (!lopRieng?.lop?.length) return coBan;
@@ -855,10 +863,11 @@ export default function MapPage() {
     // dòng có khoá: lớp admin đã có thật thì thôi (không hiện hai dòng). `gom` giữ đúng mã lớp (không để rỗng — mảng rỗng
     // thì `gom.every(...)` luôn đúng, dòng sẽ tưởng là đang bật).
     const khoa = lopKhoa.filter((l) => !daCo.has(l.id)).map((l) => ({ id: l.id, ten: l.ten, tenNgan: l.tenNgan, tenApp: l.tenApp, gom: [l.id], vung: l.vung, khoa: true }));
-    // KHOÁ CAM LÂM: QĐ205 + phân khu 1/2000 với tài khoản thường (không gói, không vé) → dòng XEM THỬ (có 🔒, vẫn chọn được)
-    const coBan = MUC_QH.map((m) => (MUC_KHOA_CAM_LAM.has(m.id) && !lopRieng?.ve && !coGoi ? { ...m, xemThu: true } : m));
+    // KHOÁ CAM LÂM: QĐ205 + phân khu 1/2000 — có gói: dòng thường; tài khoản thường: dòng XEM THỬ (có 🔒, vẫn chọn được); CHƯA đăng nhập:
+    // dòng KHOÁ, bấm là hộp mời đăng nhập (không có vé thì máy chủ không phát ô nào).
+    const coBan = MUC_QH.map((m) => (!MUC_KHOA_CAM_LAM.has(m.id) || coGoi ? m : !daDangNhap ? { ...m, khoa: true, canDangNhap: true } : { ...m, xemThu: true }));
     return [...coBan, ...rieng, ...khoa];
-  }, [lopRieng, lopKhoa, coGoi]);
+  }, [lopRieng, lopKhoa, coGoi, daDangNhap]);
   // Mức xem thử (mức ô xa nhất) + khung bao của một mục đang chọn — từ danh sách ảnh (rasterOverlays)
   const xemThuCua = (gom: string[]) => {
     const cac = rasterOverlaysRef.current.filter((o) => gom.includes(o.id) && (o as any).xemThu != null);
@@ -872,7 +881,11 @@ export default function MapPage() {
   const bamMucQh = (o: (typeof MUC_QH)[number], bat: boolean) => {
     // dòng có khoá (QH chi tiết 1/500 với người chưa có gói) → hộp "tính năng trả phí" — chủ dự án 15/10/2026: "đăng ký thành viên để xem
     // chứ liên hệ admin cái gì". Có gói mà vé chưa về kịp (vài giây đầu) → hộp cũ báo tải lại.
-    if (o.khoa) { if (coGoi) setHopKhoa(o.tenApp || o.ten); else setTraPhiQh(o.tenApp || o.ten); return; }
+    if (o.khoa) {
+      if (!daDangNhap) { openLogin({ reason: 'Đăng nhập để xem bản đồ quy hoạch này.' }); return; }   // chưa đăng nhập: mời đăng nhập trước
+      if (coGoi) setHopKhoa(o.tenApp || o.ten); else setTraPhiQh(o.tenApp || o.ten);
+      return;
+    }
     if (!o.xemThu) { chonLopQh(o, bat); return; }
     chonLopQh({ gom: o.gom, zBay: (xemThuCua(o.gom)?.z ?? Z_XEM_THU) - 1 }, bat);   // nhìn quá xa / đứng ngoài vùng → bay tới đúng mức xem thử
     if (!bat) return;
@@ -1458,7 +1471,7 @@ export default function MapPage() {
   // (15/10/2026) KHOÁ CAM LÂM: đây là ô đất QĐ205 → chỉ người có vé mới tải, qua /api/qh-rieng/tep/qh_vector (đường /qh_vector.geojson
   // công khai đã bị nginx chặn). Người khác không tải gì.
   useEffect(() => {
-    if (!lopRieng?.ve) { setQhVector(null); return; }
+    if (!lopRieng?.ve || lopRieng.pham === 'f') { setQhVector(null); return; }   // tệp ô đất QĐ205: chỉ vé xem đủ
     const ve = encodeURIComponent(lopRieng.ve);
     const go = () => fetch(`${API_BASE}/qh-rieng/tep/qh_vector?v=${ve}`).then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) setQhVector(d); }).catch(() => {});
     const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void, o?: any) => number);
@@ -3714,7 +3727,7 @@ export default function MapPage() {
                   <button
                     onClick={() => {
                       // KHOÁ CAM LÂM (15/10/2026): phiếu in ảnh + số liệu QĐ205 / phân khu → chỉ người có vé; người khác: hộp "liên hệ admin"
-                      if (!lopRieng?.ve) { if (coGoi) setHopKhoa('Phiếu kiểm tra quy hoạch'); else setTraPhiQh('Xuất phiếu kiểm tra quy hoạch'); return; }
+                      if (!veDu) { if (coGoi) setHopKhoa('Phiếu kiểm tra quy hoạch'); else setTraPhiQh('Xuất phiếu kiểm tra quy hoạch'); return; }
                       const g = (highlight as any)?.geometry || (info.parcel as any)?.geometry;
                       const mapScen = qhScenario === 'all' ? '2045' : qhScenario;
                       // Ranh WGS84 của thửa (để đo diện tích theo ảnh QĐ205).
@@ -3758,7 +3771,7 @@ export default function MapPage() {
                     }}
                     id="nut-phieu-qh"
                     className="min-w-0 whitespace-nowrap px-1 sm:px-0 sm:mb-1.5 sm:w-full flex items-center justify-center gap-1.5 sm:gap-2 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold bg-[#0A2540] hover:bg-[#0d3a6b] text-white">
-                    🖨<span className="sm:hidden">Phiếu QH</span><span className="hidden sm:inline">Xuất phiếu kiểm tra quy hoạch</span>{!lopRieng?.ve && <span className="text-[10px]" aria-label="liên hệ admin">🔒</span>}
+                    🖨<span className="sm:hidden">Phiếu QH</span><span className="hidden sm:inline">Xuất phiếu kiểm tra quy hoạch</span>{!veDu && <span className="text-[10px]" aria-label="tính năng trả phí">🔒</span>}
                   </button>
                 )}
                 <div className="contents sm:grid sm:grid-cols-3 sm:gap-2">

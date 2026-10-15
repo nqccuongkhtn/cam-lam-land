@@ -266,7 +266,7 @@ export default function DenBuClient() {
       {hopTraPhi && <HopTraPhi ten="Tính giá đền bù" onDong={() => setHopTraPhi(false)} />}
       {khoa && (
         <button type="button" onClick={() => setHopTraPhi(true)} className="mb-3 block w-full rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-left text-[13px] leading-snug text-amber-900">
-          🔒 <b>Tính giá đền bù là tính năng trả phí</b> — số tiền trên trang đã được che. <span className="underline">Liên hệ admin để đăng ký</span>
+          🔒 <b>Tính giá đền bù là tính năng trả phí</b> — số tiền trên trang đã được che. <span className="underline">Đăng ký thành viên</span>
         </button>
       )}
       <h1 className="text-xl font-extrabold text-[#0A2540] sm:text-3xl">Đền bù khi Nhà nước thu hồi đất — Cam Lâm</h1>

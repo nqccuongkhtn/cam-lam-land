@@ -462,20 +462,63 @@ Kiểm tra nhanh trong Console: `Object.values(__banDo.style.sourceCaches['src-d
 
 Chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free, còn lại khoá lại, sửa cả phần thông tin kiểm tra quy hoạch".
 - **Bị khoá:** QĐ205 (quy hoạch chung 2045), 7 bản phân khu 1/2000, 1/500. **Mở:** QĐ893 + 7 QHSDĐ 2030 từ PDF các huyện + Tây NT 2.2.
-- **Ai xem đủ:** `xemDuQhCamLam` (routes/parcels.ts) — hiện = admin. MỘT CHỖ DUY NHẤT để mở cho gói trả phí / vai trò mới sau này.
+- **Ai xem đủ:** `xemDuQhCamLam` (routes/parcels.ts) = `coGoiChung` — admin + khách có **gói thành viên** còn hạn (mục "TÍNH NĂNG TRẢ PHÍ" dưới).
+  Từ 15/10/2026 tối gói thành viên xem được CẢ 1/500 (chủ dự án: "đăng ký thành viên để xem chứ liên hệ admin cái gì") — vé phạm vi 'c' nhận
+  danh sách lớp riêng trừ lớp `"chiAdmin": true` trong danh-sach.json; `qh500TrenThua(…, xemDu)`.
 - **Ảnh:** nginx chặn `/tiles/(qd205|qd2076|qd2101|qd2222|qd918|qdcuhin|qdtaynam|qdtaybac)…/`, `qh_vector|qh_fill|qh_lines|qh_smooth|qh_precomputed`,
   `/overlays/qd205`, `/qhtiles` (404). Luật chặn PHẢI đứng trước luật `\.(geojson|pmtiles)$`. Người có vé xem qua `/api/qh-rieng/t/<thư mục>/z/x/y?v=`
   — backend gắn CHỈ ĐỌC volume `camlam_tiles` (`QH_TILES_DIR` = `du-lieu-rieng/tiles-cong`) nên không chép thêm GB nào vào ổ C. `qh_vector` cho
   người có vé: `/api/qh-rieng/tep/qh_vector` (tệp ở `<qh_rieng>/tep/`) — đường KHÔNG có đuôi `.geojson` vì nginx đẩy mọi `.geojson` sang frontend.
 - **Tra thửa** (`/api/parcels/at`), người không xem đủ: `overlaps=[]`, `zoning=null`, bỏ mục 7 phân khu, thêm dấu khoá `{ma:'205'|'pk', khoa:true}`
   (`qhNgoaiVung` tính trên dữ liệu ĐỦ); `/:id/qh-manh` trả 403. Có số liệu khoá thì `Cache-Control: private, no-store`.
-- **Giao diện** (`KHOA_CAM_LAM` / `MUC_KHOA_CAM_LAM` trong page.tsx): không vé → bỏ ảnh 8 lớp + dòng 🔒 + hộp liên hệ admin; có vé → ảnh qua
-  đường vé. Lớp mặc định QĐ893 (có vé → QĐ205 như cũ nếu chưa tự chọn lớp). Bảng thửa: trang 🔒 "Liên hệ admin để xem". Phiếu kiểm tra quy
-  hoạch: khoá (in ảnh QĐ205) — có vé in qua đường vé (`tile205`, `rasterOverlaysRef`). `/listings` phủ QĐ893.
+- **Giao diện** (`KHOA_CAM_LAM` / `MUC_KHOA_CAM_LAM` / `LOP_CAM_LAM` trong page.tsx): có vé (admin / gói thành viên) → ảnh qua đường vé. Lớp
+  mặc định QĐ893 cho mọi người. Bảng thửa: trang 🔒 "Đăng ký thành viên để xem" (QĐ205 / phân khu, `traPhi`) hoặc "Liên hệ admin" (1/500).
+  Phiếu kiểm tra quy hoạch: không vé → hộp trả phí. `/listings` phủ QĐ893.
+- **TÀI KHOẢN THƯỜNG Ở CAM LÂM (15/10/2026 tối, chủ dự án chốt lại sau mấy lượt):**
+  · **QĐ893 tra cứu tới thửa như bình thường** ("ở 893 cứ cho tra cứu tới thửa như bình thường, chỉ khoá không cho làm mờ") — đã GỠ bản khoá
+    phóng gần / khoá bấm thửa theo vùng làm buổi chiều (chưa từng lên web).
+  · **Thanh độ mờ bị khoá** khi đang bật lớp Cam Lâm (`khoaDoMo`): lớp luôn đậm 100 %, chạm thanh → hộp trả phí. Lớp huyện khác vẫn chỉnh được.
+  · **QĐ205 / phân khu: XEM THỬ ở MỨC ẢNH XA NHẤT của bộ ảnh** ("cho hiện ở z nhỏ nhất của bản đồ đó có"): QĐ205 ô mức 10 (bản đồ mức 8,5–9,5,
+    thấy cả huyện), 7 phân khu ô mức 8 (rất nhỏ). Máy chủ: không vé chỉ phát ô có `z` = thư mục số nhỏ nhất của bộ ảnh (`zXaNhat`,
+    routes/qhRieng.ts), mức khác 403. Giao diện: nguồn ảnh `minzoom = maxzoom = mức đó` (`xemThu`), bản đồ ≥ mức − 0,5 → ẩn lớp + nhãn vàng
+    "🔒 Phóng gần …: tính năng trả phí" + hộp trả phí (một lần mỗi lần VƯỢT ngưỡng do phóng to). Chọn lớp khi đang ở gần → tự lùi ra mức xem thử.
+    Muốn đổi mức xem thử: sửa `zXaNhat` (máy chủ) + `xemThu` (giao diện) cùng lúc.
+  · `MapView.syncOverlays` nay DỰNG LẠI nguồn ảnh khi đường ô / mức phóng đổi (`vanTayNguonRef`) — trước dựng một lần là kẹt (vd đang xem thử
+    rồi được cấp gói thì vẫn kẹt ảnh xem thử tới khi tải lại trang).
 - ⚠️ **Cloudflare đã giữ bản sao ô QĐ205 / phân khu ở biên (Cache-Control 1 năm)** → chủ dự án phải bấm "Purge Everything" một lần. File
   `qd205.pmtiles` ở GitHub Releases (Dockerfile.render, route `/qhtiles`) vẫn công khai trên GitHub; bản dự phòng Render không có nginx nên không chặn.
 - Kiểm 15/10/2026 11h: `/tiles/qd205…` 404, `qd893v1` 200, có vé → ô trùng từng byte, không vé 403; Thửa 70 · Tờ 25 khách xem: QĐ893 =
   395,1 đất ở đô thị + 116,8 đường, QĐ205 / phân khu / 1/500 chỉ có khoá; trình duyệt không xin ô nào bị khoá.
+
+## TÍNH NĂNG TRẢ PHÍ — GÓI THÀNH VIÊN (= "gói chức năng chung", 15/10/2026)
+
+Chủ dự án: "trả phí chia ra là các chức năng chung, còn trả phí mua gói số tin đăng, đẩy tin hay quảng cáo bản đồ là chức năng riêng".
+- **Chức năng chung = MỘT gói có hạn**: tra cứu văn bản · tính giá đền bù · bản đồ quy hoạch Cam Lâm đầy đủ (cả 1/500 — mở cho gói tối 15/10). Hạn ở cột
+  `users.goi_chung_het_han`; kiểm bằng `coGoiChung` (backend `lib/auth.ts` — middleware đọc hạn từ DATABASE mỗi yêu cầu, nhớ 30 giây, gắn
+  `req.user.gc`; frontend `lib/auth.tsx` đọc `user.goiChungDen` từ `/auth/me`). Admin luôn có. Ba vai trò lẻ `tracuuvb/denbu/qhcamlam` làm
+  buổi sáng đã BỎ (chưa ai được cấp; tên còn trong ràng buộc DB cho an toàn).
+- **Bảng giá "ĐĂNG KÝ THÀNH VIÊN"** (`lib/packages.ts` kind `'chung'`, chủ dự án gửi mẫu: bỏ gói 1 tháng, "thay số 50 thành 68"):
+  3 tháng **299K** · 6 tháng **568K** · 1 năm **1068K** · 2 năm **1968K**. Mua còn hạn → cộng dồn. Trang `/dichvu#thanh-vien` (khối xanh đậm
+  4 dòng trắng, giá đỏ) — khách thấy khối này CẢ KHI cờ `services_live` tắt (chỉ khối này; gói đăng tin / đẩy tin vẫn ẩn).
+  Hộp `components/HopTraPhi.tsx` có bảng 4 gói + nút "Đăng ký thành viên" — MỌI chỗ khoá trả phí (văn bản, đền bù, độ mờ, phóng gần, phiếu in,
+  dòng 1/500, trang khoá trong bảng thửa) dùng CHUNG hộp này (chủ dự án: "chưa đồng bộ với những tính năng trả phí khác", "đăng ký thành viên
+  để xem chứ liên hệ admin cái gì"). Hộp "liên hệ admin" (`hopKhoa`) chỉ còn cho trường hợp đã có gói mà vé chưa tải kịp.
+- **Chức năng riêng**: gói số tin đăng · gói đẩy tin · video (`lib/packages.ts`) · quảng cáo bản đồ (bảng `map_ads`, thẻ "Quảng cáo" — gắn
+  theo nhà quảng cáo, không theo tài khoản).
+- **Quản trị** (`/admin` → Người dùng): cột "Trả phí" + khung **Quản lý trả phí**: gói thành viên (chọn gói → Kích hoạt = ghi đơn `ADMIN-<mã>`
+  ở thẻ Thanh toán; "Cộng tay" số ngày — dùng thử / bù ngày, không ghi đơn; Thu hồi), gói riêng (kích hoạt / thu hồi). Ô "Chỉ tài khoản trả
+  phí". Máy chủ: `POST /api/admin/users/:id/goi-chung {ngay}` · `/kich-hoat {packageId}` · `/thu-hoi {loai}`. Áp dụng ngay (`quenVaiTro`).
+- **Văn bản** (routes/vanBan.ts): người không có gói → danh sách `/` + tìm `/tim` che số ký hiệu + ngày Ở MÁY CHỦ; `/:id/pdf` 403 — TRỪ
+  **4 văn bản mới nhất ở trang chủ** (`vbMienPhi`, chủ dự án: "ở đây cứ cho xem 4 văn bản mới nhất") — đủ số + mở được (cần đăng nhập).
+  Danh sách trả `Cache-Control: private, no-cache` + `Vary: Authorization` và trang tải lại khi ĐỔI TÀI KHOẢN (trước giữ bản của admin 5 phút →
+  chủ dự án vào tài khoản thường vẫn thấy số). **Lượt tải hiển thị**: admin thấy số thật `luot_tai`; người khác thấy `luot_ao` (khởi đầu số
+  thật + ngẫu nhiên 23–88, mỗi lần mở cộng ngẫu nhiên 2–5 — `LUOT_HIEN`). **Mã QR** trên tệp đóng dấu trỏ `/van-ban?vb=<mã>` (trang 2 mã to,
+  trang khác mã nhỏ góc dưới phải; `PHIEN_BAN_FILE` v12 ↔ `?v=12` ở giao diện). **Chia sẻ** chỉ gửi số ký hiệu đã che + 10 chữ đầu trích yếu
+  ("họ có dữ liệu để vào google tìm kiếm").
+- **Đền bù** (`/den-bu`, chỉ chặn ở GIAO DIỆN — số liệu là văn bản công khai): người không có gói → che mọi số tiền, hệ số (× 1,12), số hiệu
+  văn bản, ngày, số Điều / khoản / STT, năm (`RE_SO` + `cheSo`, chủ dự án: "che mà số quyết định các thứ còn như này họ tự kiếm"); ô tính khoá;
+  nút mở văn bản gốc gỡ đường dẫn. Thẻ ② tìm CHUNG QĐ 08 + QĐ 12 (chủ dự án hỏi "sao chưa đưa quyết định 12 vào").
+- **Zalo admin** = mã QR kết bạn `zaloapp.com/qr/p/1dm0n6xcgp0zz` (không hiện số); ảnh `public/zalo-admin-qr.png`.
 
 ## THỬA KHÁCH TỰ VẼ TỪ TOẠ ĐỘ cũng kiểm tra quy hoạch được (15/10/2026)
 
@@ -876,7 +919,7 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   gán giá trị theo bước lưới → `"luoi"` trong `<pdf>.nan.json` (nội suy từng ô lưới, đúng tại mọi vạch ~1 cm). File nắn mới:
   `D:\KhoQH\qhsdd-2030\*.nan.json` (bản cũ ở `nan-cu-13-10\`). Đổi dữ liệu đã dựng theo phép cũ sang phép mới: `doi_nan_geojson.py`.
   Ô ảnh 7 bản đã cắt lại (cùng tên bộ — kịch bản đưa lên web chép sang tên tạm rồi đổi chỗ để không lẫn ô cũ).
-  **QH CHI TIẾT 1/500 CHÍNH THỨC — CHỈ ADMIN XEM (14/10/2026 tối):** 6 đồ án, QĐ 2043–2048/QĐ-UBND ngày 25/9/2026 của UBND xã Cam Lâm
+  **QH CHI TIẾT 1/500 CHÍNH THỨC — CHỈ ADMIN XEM (14/10/2026 tối; từ 15/10/2026 tối GÓI THÀNH VIÊN cũng xem — mục "TÍNH NĂNG TRẢ PHÍ"):** 6 đồ án, QĐ 2043–2048/QĐ-UBND ngày 25/9/2026 của UBND xã Cam Lâm
   (nguồn `quyhoach2025/1.500/`: 6 DGN V8 + 6 quyết định quét; DXF chủ dự án xuất, Cam Hiệp Bắc do `dgn_sang_dxf.py` xuất). Bản 1/500
   DỰ THẢO (9 khu lấy ý kiến, lớp `qh-qhct500`) ĐÃ GỠ HẲN khỏi web + xoá khỏi máy theo lời chủ dự án. Ảnh: MicroStation V8i có sẵn trên
   máy được điều khiển qua COM (`in_1_500_dgn.py`) IN THẲNG PDF nét vector đúng như MicroStation hiển thị (tỷ lệ ~1:1000, 600 dpi,

@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════════
-// LỚP QUY HOẠCH CHỈ QUẢN TRỊ VIÊN XEM (14/10/2026)
+// LỚP QUY HOẠCH RIÊNG (14/10/2026 — ban đầu CHỈ QUẢN TRỊ VIÊN XEM; từ 15/10/2026 tối GÓI THÀNH VIÊN cũng xem được, trừ lớp "chiAdmin")
 // ═══════════════════════════════════════════════════════════════════════════════
 // Lớp đầu tiên: Quy hoạch chi tiết 1/500 CHÍNH THỨC xã Cam Lâm — 6 đồ án, QĐ 2043–2048/QĐ-UBND ngày 25/9/2026 (thay bản
 // dự thảo lấy ý kiến đã gỡ). Chủ dự án dặn: "chỉ tài khoản admin được xem tất cả, còn lại không cho xem".
@@ -56,7 +56,9 @@ qhRiengRouter.get('/ve', authRequired, (req: AuthedRequest, res) => {
   if (!pham) return res.status(403).json({ error: 'Vui lòng liên hệ admin để xem lớp này.' });
   const hetHan = Math.min(Date.now() + VE_GIO * 3600 * 1000, pham === 'c' ? Number(req.user!.gc) || 0 : Infinity);
   const than = `${req.user!.id}.${hetHan}.${pham}`;
-  res.json({ ve: `${than}.${bam(than)}`, hetHan, lop: pham === 'a' ? (danhSach().lop || []) : [] });
+  // (15/10/2026 tối) gói thành viên xem được cả lớp riêng (QH chi tiết 1/500) — chủ dự án: "đăng ký thành viên để xem chứ liên hệ admin
+  // cái gì". Lớp nào sau này muốn CHỈ admin thì thêm "chiAdmin": true vào mục đó trong danh-sach.json.
+  res.json({ ve: `${than}.${bam(than)}`, hetHan, lop: (danhSach().lop || []).filter((l: any) => pham === 'a' || !l?.chiAdmin) });
 });
 
 // GET /api/qh-rieng/gioi-thieu — CÔNG KHAI, ai cũng gọi được (15/10/2026). Chủ dự án: lớp 1/500 "vẫn hiện ra chỗ chọn nhưng chỉ tài
@@ -76,8 +78,11 @@ const TEN_THU_MUC = /^[a-z0-9][a-z0-9-]{0,40}$/;
 // GET /api/qh-rieng/o/:thuMuc/:z/:x/:y?v=<vé> — một ô ảnh (webp 512 điểm ảnh)
 qhRiengRouter.get('/o/:thuMuc/:z/:x/:y', (req, res) => {
   res.set('Cache-Control', 'private, no-store');
-  if (veHopLe(req.query.v) !== 'a') return res.status(403).json({ error: 'Không có quyền xem lớp này.' });
+  const pv = veHopLe(req.query.v);
+  if (!pv) return res.status(403).json({ error: 'Không có quyền xem lớp này.' });
   const { thuMuc } = req.params;
+  // vé gói thành viên ('c') không lấy được ô của lớp đánh dấu chiAdmin trong danh-sach.json
+  if (pv !== 'a' && (danhSach().lop || []).some((l: any) => l?.chiAdmin && l.thuMuc === thuMuc)) return res.status(403).json({ error: 'Không có quyền xem lớp này.' });
   const z = Number(req.params.z), x = Number(req.params.x), y = Number(String(req.params.y).replace(/\.webp$/, ''));
   if (!TEN_THU_MUC.test(thuMuc) || ![z, x, y].every((n) => Number.isInteger(n) && n >= 0) || z > 22) return res.status(400).end();
   const tep = path.join(GOC, 'tiles', thuMuc, String(z), String(x), `${y}.webp`);
@@ -148,7 +153,7 @@ const TEN_TEP = /^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.pdf$/;
 // GET /api/qh-rieng/tai-lieu/:ten?v=<vé> — bản quét quyết định phê duyệt (mở trong trình duyệt)
 qhRiengRouter.get('/tai-lieu/:ten', (req, res) => {
   res.set('Cache-Control', 'private, no-store');
-  if (veHopLe(req.query.v) !== 'a') return res.status(403).json({ error: 'Không có quyền xem tài liệu này.' });
+  if (!veHopLe(req.query.v)) return res.status(403).json({ error: 'Không có quyền xem tài liệu này.' });
   const ten = String(req.params.ten);
   if (!TEN_TEP.test(ten)) return res.status(400).end();
   const tep = path.join(GOC, 'tai-lieu', ten);

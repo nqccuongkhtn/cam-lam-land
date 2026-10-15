@@ -865,7 +865,9 @@ export default function MapPage() {
   // mức xem thử: ô mức N hiện đúng nét ở mức bản đồ N − 1 (ô 256px — xem chonLopQh), nên đang nhìn gần hơn thì LÙI RA mức đó (giữ tâm);
   // đứng ngoài vùng / nhìn quá xa thì chonLopQh tự bay tới (không truyền zBay để nó bay theo mức xem thử).
   const bamMucQh = (o: (typeof MUC_QH)[number], bat: boolean) => {
-    if (o.khoa) { setHopKhoa(o.tenApp || o.ten); return; }
+    // dòng có khoá (QH chi tiết 1/500 với người chưa có gói) → hộp "tính năng trả phí" — chủ dự án 15/10/2026: "đăng ký thành viên để xem
+    // chứ liên hệ admin cái gì". Có gói mà vé chưa về kịp (vài giây đầu) → hộp cũ báo tải lại.
+    if (o.khoa) { if (coGoi) setHopKhoa(o.tenApp || o.ten); else setTraPhiQh(o.tenApp || o.ten); return; }
     if (!o.xemThu) { chonLopQh(o, bat); return; }
     chonLopQh({ gom: o.gom }, bat);
     if (!bat) return;
@@ -2222,7 +2224,7 @@ export default function MapPage() {
       // 'Hiện mới có Quy hoạch chung đô thị mới Cam Lâm đến 2045 (QĐ 205/QĐ-TTg)…'" thành bỏ cả trang này; chủ dự án hỏi lại
       // 14/10 "sao xoá mất cái Cam Lâm". Thứ phải bỏ chỉ là CÂU ghi chú cho thửa ngoài vùng (xem khối qhNgoaiVung).
       // KHOÁ CAM LÂM (15/10/2026): người không được xem đủ thì máy chủ chỉ gửi dấu khoá (mã '205' / 'pk', khoa:true) cho bản có phủ thửa
-      // → trang có 🔒 + nút "Liên hệ admin để xem", không có loại đất / diện tích.
+      // → trang có 🔒 + nút "Đăng ký thành viên để xem" (traPhi → hộp HopTraPhi), không có loại đất / diện tích.
       const khoaMa = (ma: string) => cacBan.some((x) => String(x.ma) === ma && x.khoa);
       if (muc.id === 'qh-qd205') {
         if (info.overlaps?.length) ra.push({ muc, tieuDe: 'Quy hoạch chung 2045', areas: gop(info.overlaps as any), bangMau: 'qd205' });
@@ -2255,7 +2257,7 @@ export default function MapPage() {
     if (b500) {
       const muc = mucQh.find((m) => m.id === 'qh-ct500-mau') || mucQh.find((m) => m.id === 'qh-ct500')
         || { id: 'qh-ct500', ten: 'QH chi tiết 1/500', tenNgan: 'Chi tiết 1/500', tenApp: 'QH chi tiết 1/500', gom: ['qh-ct500'], vung: 'cam-lam', khoa: true };
-      if (b500.khoa) ra.push({ muc: { ...muc, khoa: true }, tieuDe: 'Quy hoạch chi tiết 1/500', areas: [], bangMau: 'pdf', khoa: true });
+      if (b500.khoa) ra.push({ muc: { ...muc, khoa: true }, tieuDe: 'Quy hoạch chi tiết 1/500', areas: [], bangMau: 'pdf', khoa: true, traPhi: true });
       else {
         const areas = gop(b500.areas || []);
         if (areas.length) ra.push({ muc, tieuDe: 'Quy hoạch chi tiết 1/500', phu: b500.qd ? `QĐ ${b500.qd}` : undefined, areas, bangMau: 'pdf',
@@ -3047,12 +3049,12 @@ export default function MapPage() {
                   chỉ mời liên hệ admin. */}
               <div role="dialog" aria-modal="true" aria-label="Liên hệ admin" className="w-full max-w-[340px] rounded-lg bg-white p-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
                 <p className="text-[15px] font-bold text-[#0A2540]">🔒 {hopKhoa}</p>
-                {laQuanTri ? (
+                {coGoi ? (
                   <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">Chưa tải được lớp này. Tải lại trang hoặc đăng nhập lại rồi thử lần nữa.</p>
                 ) : (
                   <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">Vui lòng liên hệ admin Cam Lâm Land để được xem.</p>
                 )}
-                {!laQuanTri && (
+                {!coGoi && (
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <a href="tel:0567442996" className="rounded bg-[#0A2540] py-2 text-center text-[13px] font-semibold text-white">📞 0567 442 996</a>
                     <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" className="rounded border border-[#0068FF] py-2 text-center text-[13px] font-semibold text-[#0068FF]">Zalo admin</a>

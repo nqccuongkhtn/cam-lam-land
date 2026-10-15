@@ -4,7 +4,7 @@ export interface Pkg { id: string; name: string; kind: 'post' | 'boost' | 'video
 export const VIDEO_PRICE = Number(process.env.VIDEO_PKG_PRICE || 0);  // 0 = chưa đặt giá
 export const VIDEO_DAYS = Number(process.env.VIDEO_PKG_DAYS || 30);
 // Quyền lợi GÓI CHỨC NĂNG CHUNG (gói thành viên) — dùng chung cho 4 mức thời hạn ở đầu danh sách PACKAGES bên dưới.
-const QUYEN_GOI_CHUNG = ['Tra cứu toàn bộ kho văn bản: số ký hiệu, ngày ban hành, mở đọc tệp', 'Tính giá đền bù, bồi thường (đủ số liệu, máy tính)', 'Bản đồ quy hoạch Cam Lâm đầy đủ: QĐ205, phân khu 1/2000, xem gần, quy hoạch từng thửa'];
+const QUYEN_GOI_CHUNG = ['Tra cứu toàn bộ kho văn bản: số ký hiệu, ngày ban hành, mở đọc tệp', 'Tính giá đền bù, bồi thường (đủ số liệu, máy tính)', 'Bản đồ quy hoạch Cam Lâm đầy đủ: QĐ205, phân khu 1/2000, chi tiết 1/500, xem gần, quy hoạch từng thửa'];
 
 export const PACKAGES: Pkg[] = [
   // ═══════════════════════════════════════════════════════════════════════════

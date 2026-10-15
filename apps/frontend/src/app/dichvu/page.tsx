@@ -10,10 +10,10 @@ interface Bank { bankId: string; account: string; name: string; demo?: boolean }
 
 const STATIC: Pkg[] = [
   // GÓI THÀNH VIÊN = GÓI CHỨC NĂNG CHUNG (15/10/2026) — bản dự phòng khi chưa tải được bảng giá; giá thật ở máy chủ lib/packages.ts
-  { id: 'tv3t', name: 'Gói 3 tháng', kind: 'chung', days: 90, price: 299000, perks: ['Tra cứu toàn bộ kho văn bản: số ký hiệu, ngày ban hành, mở đọc tệp', 'Tính giá đền bù, bồi thường (đủ số liệu, máy tính)', 'Bản đồ quy hoạch Cam Lâm đầy đủ: QĐ205, phân khu 1/2000, xem gần, quy hoạch từng thửa'] },
-  { id: 'tv6t', name: 'Gói 6 tháng', kind: 'chung', days: 180, price: 568000, perks: ['Tra cứu toàn bộ kho văn bản: số ký hiệu, ngày ban hành, mở đọc tệp', 'Tính giá đền bù, bồi thường (đủ số liệu, máy tính)', 'Bản đồ quy hoạch Cam Lâm đầy đủ: QĐ205, phân khu 1/2000, xem gần, quy hoạch từng thửa'] },
-  { id: 'tv1n', name: 'Gói 1 năm', kind: 'chung', days: 365, price: 1068000, perks: ['Tra cứu toàn bộ kho văn bản: số ký hiệu, ngày ban hành, mở đọc tệp', 'Tính giá đền bù, bồi thường (đủ số liệu, máy tính)', 'Bản đồ quy hoạch Cam Lâm đầy đủ: QĐ205, phân khu 1/2000, xem gần, quy hoạch từng thửa'] },
-  { id: 'tv2n', name: 'Gói 2 năm', kind: 'chung', days: 730, price: 1968000, perks: ['Tra cứu toàn bộ kho văn bản: số ký hiệu, ngày ban hành, mở đọc tệp', 'Tính giá đền bù, bồi thường (đủ số liệu, máy tính)', 'Bản đồ quy hoạch Cam Lâm đầy đủ: QĐ205, phân khu 1/2000, xem gần, quy hoạch từng thửa'] },
+  { id: 'tv3t', name: 'Gói 3 tháng', kind: 'chung', days: 90, price: 299000, perks: ['Tra cứu toàn bộ kho văn bản: số ký hiệu, ngày ban hành, mở đọc tệp', 'Tính giá đền bù, bồi thường (đủ số liệu, máy tính)', 'Bản đồ quy hoạch Cam Lâm đầy đủ: QĐ205, phân khu 1/2000, chi tiết 1/500, xem gần, quy hoạch từng thửa'] },
+  { id: 'tv6t', name: 'Gói 6 tháng', kind: 'chung', days: 180, price: 568000, perks: ['Tra cứu toàn bộ kho văn bản: số ký hiệu, ngày ban hành, mở đọc tệp', 'Tính giá đền bù, bồi thường (đủ số liệu, máy tính)', 'Bản đồ quy hoạch Cam Lâm đầy đủ: QĐ205, phân khu 1/2000, chi tiết 1/500, xem gần, quy hoạch từng thửa'] },
+  { id: 'tv1n', name: 'Gói 1 năm', kind: 'chung', days: 365, price: 1068000, perks: ['Tra cứu toàn bộ kho văn bản: số ký hiệu, ngày ban hành, mở đọc tệp', 'Tính giá đền bù, bồi thường (đủ số liệu, máy tính)', 'Bản đồ quy hoạch Cam Lâm đầy đủ: QĐ205, phân khu 1/2000, chi tiết 1/500, xem gần, quy hoạch từng thửa'] },
+  { id: 'tv2n', name: 'Gói 2 năm', kind: 'chung', days: 730, price: 1968000, perks: ['Tra cứu toàn bộ kho văn bản: số ký hiệu, ngày ban hành, mở đọc tệp', 'Tính giá đền bù, bồi thường (đủ số liệu, máy tính)', 'Bản đồ quy hoạch Cam Lâm đầy đủ: QĐ205, phân khu 1/2000, chi tiết 1/500, xem gần, quy hoạch từng thửa'] },
   { id: 'post20', name: 'Đăng 20 tin', kind: 'post', posts: 20, days: 30, price: 119000, perks: ['Đăng tối đa 20 tin/tháng', 'Hiệu lực 30 ngày'] },
   { id: 'post50', name: 'Đăng 50 tin', kind: 'post', posts: 50, days: 30, price: 239000, perks: ['Đăng tối đa 50 tin/tháng', 'Hiệu lực 30 ngày'] },
   { id: 'post100', name: 'Đăng 100 tin', kind: 'post', posts: 100, days: 30, price: 449000, popular: true, perks: ['Đăng tối đa 100 tin/tháng', 'Phù hợp môi giới', 'Hiệu lực 30 ngày'] },
@@ -157,7 +157,7 @@ export default function ServicesPage() {
               ))}
             </div>
             <p className="mx-auto mt-4 max-w-2xl text-[13px] leading-relaxed text-slate-200 sm:text-[14px]">Mở cùng lúc: <b className="text-white">tra cứu toàn bộ văn bản</b> · <b className="text-white">tính giá đền bù</b> ·
-              <b className="text-white"> bản đồ quy hoạch Cam Lâm đầy đủ</b> (QĐ205, phân khu 1/2000, xem gần, quy hoạch từng thửa).</p>
+              <b className="text-white"> bản đồ quy hoạch Cam Lâm đầy đủ</b> (QĐ205, phân khu 1/2000, chi tiết 1/500, xem gần, quy hoạch từng thửa).</p>
             <p className="mx-auto mt-2 max-w-2xl text-[13px] font-semibold leading-relaxed text-white sm:text-[14px]">Anh chị chọn gói nào thì chuyển khoản theo mã QR hiện ra — gói tự kích hoạt cho chính tài khoản đang đăng nhập.
               Cần hỗ trợ, gọi <a href="tel:0567442996" className="text-[#C8A14B] underline">0567 442 996</a> hoặc nhắn Zalo admin. Xin cảm ơn!</p>
           </section>

@@ -8,7 +8,6 @@ import { sqlDienTichPhang, sqlHeSoPhang } from '../lib/dienTichPhang.ts';
 import { qhCoLuu, tinhQhHinh, dtPhangVong } from '../lib/qhLuu.ts';
 import { qhTuPdf, qhTuPdfHinh } from '../lib/qhPdf.ts';
 import { qh500TrenThua, qh500TrenHinh } from '../lib/qh500.ts';
-import { laAdmin } from '../lib/auth.ts';
 import { nguoiDungTuYeuCau } from '../middleware/auth.ts';
 
 // ── AI ĐƯỢC XEM ĐỦ QUY HOẠCH CAM LÂM (15/10/2026) — MỘT CHỖ DUY NHẤT để đổi (vd sau này mở cho gói trả phí / vai trò riêng) ──
@@ -319,7 +318,7 @@ parcelsRouter.get('/at', async (req, res, next) => {
     const xemDu = xemDuQhCamLam(nd);
     let qh500: any = null;
     if (parcel && tuBangMoi) {
-      qh500 = await qh500TrenThua(Number(parcel.id), dtThua, laAdmin(nd)).catch(() => null);   // 1/500: CHỈ admin (vai trò trả phí không mở)
+      qh500 = await qh500TrenThua(Number(parcel.id), dtThua, xemDu).catch(() => null);   // 1/500: admin + gói thành viên (15/10/2026 tối)
     }
     const qhCacBan = [...qhCacBanCL, ...qhPdf, ...(qh500 ? [qh500] : [])];
     // (10/10/2026) thêm: có thửa mà KHÔNG bản nào phủ (vd thửa Phước Đồng sát ranh QĐ205, nay phần ngoài ranh không còn bị
@@ -416,7 +415,7 @@ parcelsRouter.post('/qh-tu-ve', async (req, res, next) => {
     const qhCacBanCL = kqQh ? kqQh.cacBan : computeQhTheoBan(ring, dt);
     const qhPdf = canTraPdf(overlaps, qhCacBanCL) && (process.env.QH_PDF_THU === '1' || await isFlagOn('qh_pdf_bat'))
       ? await qhTuPdfHinh(gj, xa?.xaId ? String(xa.xaId) : null, dt) : [];
-    const qh500 = await qh500TrenHinh(gj, dt, laAdmin(nd)).catch(() => null);   // 1/500: CHỈ admin
+    const qh500 = await qh500TrenHinh(gj, dt, xemDu).catch(() => null);   // 1/500: admin + gói thành viên
     const qhCacBan = [...qhCacBanCL, ...qhPdf, ...(qh500 ? [qh500] : [])];
     const qhNgoaiVung = overlaps.length === 0 && qhCacBan.length === 0;
     const kh = khoaQhCamLam(xemDu, overlaps, null, qhCacBan);

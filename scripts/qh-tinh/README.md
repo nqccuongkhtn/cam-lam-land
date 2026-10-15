@@ -292,8 +292,10 @@ Bản đồ QHSDĐ cấp tỉnh không đăng PDF công khai (nằm trong phụ 
   Đa Nhim), `proof.py` chồng ảnh vệ tinh (đường phố Đà Lạt, sân bay Liên Khương trùng khít).
 - Ranh: `ranh_tu_pdf.py` (Đà Lạt tâm 108.44, 11.94 · Đức Trọng 108.37, 11.73). Ô ảnh: `tiler3.py … --khoi=2` (khối mặc định báo
   MemoryError ở mức 15 với bản đồ 1:25.000 khổ lớn) → `D:\KhoQH\tiles-qh\dalat2030v1`, `ductrong2030v1`. Chưa bóc loại đất theo thửa
-  (web chưa có thửa địa chính Lâm Đồng). Đưa lên web = khai lớp trong `app/map/page.tsx` như 7 huyện Khánh Hòa + chép ô vào volume
-  `camlam_tiles` — chờ ổ C trống ≥ 3 GB.
+  (web chưa có thửa địa chính Lâm Đồng). **ĐƯA LÊN WEB: nháy đúp `DUA-LEN-WEB-LAM-DONG.bat`** (→ `dua-len-web-lam-dong.sh`: tự kiểm ổ C
+  ≥ 3 GB + giờ, chép ô vào volume `camlam_tiles` sang tên tạm rồi đổi chỗ, `them_lop_lam_dong.py` khai 2 lớp vào `app/map/page.tsx` —
+  RASTER_OVERLAYS, VUNG_QH "Đà Lạt / Đức Trọng (Lâm Đồng)", MUC_QH, CAN_CU_QH (số / ngày / trích yếu đọc trên bản quét ký số), ovOn —
+  dựng lại frontend `--no-deps`, khởi động lại nginx, kiểm ô ảnh 200). Chưa chạy (15/10 tối ổ C còn 1,7 GB).
 
 ## Nắn toạ độ — chi tiết kỹ thuật
 - `vn2000.py` = bản chuyển Python của `apps/backend/src/lib/vn2000.ts` (VN-2000 Khánh Hòa, KTT 108°15',

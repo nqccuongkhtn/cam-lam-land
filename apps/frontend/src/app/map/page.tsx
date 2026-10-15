@@ -1341,8 +1341,15 @@ export default function MapPage() {
   const [dirNhat, setDirNhat] = useState<'di' | 'den' | null>(null); // đang chờ người dùng bấm lên bản đồ để nhặt điểm
   const dirNhatRef = useRef<'di' | 'den' | null>(null); dirNhatRef.current = dirNhat;
   // Mở bảng chỉ đường tới một chỗ. Thay cho kiểu cũ là nhảy thẳng sang Google Maps.
-  const moChiDuong = useCallback((lat: number, lng: number, ten?: string) => {
-    setDirDen({ lat, lng, ten }); setDirChon(null); setTool('none'); setSheetExpanded(false);
+  // CHỈ ĐƯỜNG = MỞ THẲNG GOOGLE MAPS (15/10/2026, chủ dự án: "tính năng chỉ đường trên map hay chuyển thẳng qua google map, mình viết không
+  // bằng họ đâu"). Điểm đến = chỗ đang chọn (thửa đang xem / điểm tìm / thửa tự vẽ / điểm đã lưu); điểm đi để Google tự lấy vị trí hiện tại
+  // của máy; điện thoại có app Google Maps thì mở bằng app. Khung chỉ đường tự viết (ChiDuongPanel) không còn mở từ đây — mã vẫn giữ
+  // (lib/chiDuong.ts còn dùng cho trang tạo video bản đồ).
+  const moChiDuong = useCallback((lat: number, lng: number, _ten?: string) => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+    // mở tab mới; trình duyệt chặn cửa sổ mới (trả về null) thì mở ngay trong trang. KHÔNG truyền 'noopener' — có nó window.open luôn trả
+    // null nên trang hiện tại cũng bị chuyển đi; tự cắt liên kết ngược bằng opener = null.
+    try { const w = window.open(url, '_blank'); if (w) w.opener = null; else window.location.href = url; } catch { window.location.href = url; }
   }, []);
 
   const refreshFeatures = useCallback((v: { west: number; south: number; east: number; north: number; zoom: number }) => {

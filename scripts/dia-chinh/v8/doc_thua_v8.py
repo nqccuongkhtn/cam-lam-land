@@ -102,6 +102,44 @@ LOP_TEN_CHU = ('Level 54', 'KHUNGTHU')           # lớp TÊN CHỦ SỬ DỤNG 
 # vào cột loại đất ⇒ chỉ nhận đúng dạng mã, mọi dòng chữ khác bỏ ngay, không lưu.
 MA_LOAI = re.compile(r'[A-Z0-9]+([+.,/-][A-Z0-9]+)*')
 la_ma_loai = lambda x: len(x) <= 12 and bool(re.search(r'[A-Z]', x)) and bool(MA_LOAI.fullmatch(x))
+def bo_so_trong_bang(ds):
+    """Bỏ số nằm trong BẢNG (bảng thống kê thửa / diện tích): ≥ 8 số cùng lớp THẲNG HÀNG tuyệt đối — cùng toạ độ Y (một hàng) hoặc cùng X (một
+    cột) trong phạm vi 5 % cỡ chữ. Tờ 344: bảng 2 hàng ~120 số nằm TRONG khung dưới đáy tờ; tờ 247: bảng cột bên lề. Số thửa ghi tay theo
+    từng thửa không bao giờ thẳng hàng như vậy."""
+    if len(ds) < 8: return ds
+    bo = set()
+    for truc in (0, 1):
+        thu_tu = sorted(range(len(ds)), key=lambda i: (ds[i][1].x, ds[i][1].y)[truc])
+        nhom = [thu_tu[0]]
+        for i in thu_tu[1:] + [None]:
+            if i is not None:
+                a, b = ds[nhom[-1]], ds[i]
+                if abs((b[1].x, b[1].y)[truc] - (a[1].x, a[1].y)[truc]) <= 0.05 * max(a[2], b[2], 0.1): nhom.append(i); continue
+            if len(nhom) >= 8: bo.update(nhom)
+            if i is not None: nhom = [i]
+    return [x for k, x in enumerate(ds) if k not in bo]
+
+def tim_khung(net, diem_so):
+    """KHUNG TRONG của tờ = lớp có các đoạn NGANG / ĐỨNG dài (≥ 200 m) mà tổng chiều dài ≈ chu vi khung bao của chính chúng (0,9–1,15 lần —
+    4 cạnh, không phải lưới km) và chứa ≥ 50 % số của tờ (tờ 247: bảng bên lề chiếm 1/3 số); nhiều lớp thì lấy khung NHỎ nhất. Mỗi tờ vẽ khung ở lớp khác nhau (tờ 16: Level
+    55, 1 × 1 km; tờ 247 / 344 / 59 tỷ lệ nhỏ: Level 60, 9 × 7 km) nên phải nhận theo HÌNH."""
+    if not diem_so: return None
+    ung = []
+    for L, ds in net.items():
+        doan = []
+        for g in ds:
+            c = list(g.coords)
+            for a, b in zip(c, c[1:]):
+                l = ((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2) ** 0.5
+                if l >= 200 and (abs(a[0] - b[0]) < 0.01 * l or abs(a[1] - b[1]) < 0.01 * l): doan.append((a, b, l))
+        if len(doan) < 4: continue
+        xs = [q[0] for a, b, _ in doan for q in (a, b)]; ys = [q[1] for a, b, _ in doan for q in (a, b)]
+        x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+        cv = 2 * ((x1 - x0) + (y1 - y0))
+        if (x1 - x0) * (y1 - y0) < 1e5 or not 0.9 <= sum(l for *_, l in doan) / cv <= 1.15: continue
+        if sum(1 for q in diem_so if x0 <= q.x <= x1 and y0 <= q.y <= y1) >= 0.5 * len(diem_so): ung.append(((x1 - x0) * (y1 - y0), (x0, y0, x1, y1)))
+    return min(ung)[1] if ung else None
+
 def doc_to(p):
     doc = ezdxf.readfile(p); msp = doc.modelspace()
     net = collections.defaultdict(list); so_lop = collections.defaultdict(list); loai = []; nhan = {}; dem_cong = 0
@@ -132,10 +170,37 @@ def doc_to(p):
             pt = Point(e.dxf.insert[0], e.dxf.insert[1]); h = e.dxf.height or 0
             if L == 'Level 53':                   # lớp loại đất — có tờ ghi lẫn tên cơ quan / chữ khác: chỉ nhận đúng dạng mã
                 if la_ma_loai(s): loai.append((s, pt))
-            elif L not in KHONG_PHAI_SO and h < 5:
-                if re.fullmatch(r'\d+(-\d+)?', s): so_lop[L].append((s, pt, h))
-                elif re.fullmatch(r'\d+[.,]\d+', s): tp_lop[L].append((so_thap_phan(s), pt, h))
-                elif la_ma_loai(s): chu_lop[L].append((s, pt, h))
+            elif L not in KHONG_PHAI_SO:
+                # Chữ cao >= 5 m xét RIÊNG thành lớp "<lớp>~lon": tờ tỷ lệ nhỏ (Cam Hòa, Suối Tân, Cam Hiệp miền núi, Cam Hải Đông 58–59…)
+                # ghi số thửa Level 13 cao 18 m — bản đầu bỏ hết chữ >= 5 m (vì số cao độ tờ 58 cao 17 m) nên tờ 247 chỉ đọc được 54 / 289 số.
+                # Tách riêng thì số cao độ (Level 4~lon) và số thửa chữ lớn (Level 13~lon) tự thi nhau ở chon_lop_so như mọi lớp khác.
+                Lk = L if h < 5 else L + '~lon'
+                if re.fullmatch(r'\d+(-\d+)?', s): so_lop[Lk].append((s, pt, h))
+                elif re.fullmatch(r'\d+[.,]\d+', s): tp_lop[Lk].append((so_thap_phan(s), pt, h))
+                elif la_ma_loai(s):
+                    chu_lop[Lk].append((s, pt, h))
+                    if Lk.endswith('~lon'): loai.append((s, pt))   # tờ chữ lớn: mã loại đất ghi cạnh số thửa (lớp 13), không ở lớp 53
+    # BẢNG BÊN LỀ: số nằm NGOÀI khung trong của tờ (Level 55) là bảng thống kê / bảng diện tích (tờ 247: cột "1 917, 2 1486…" ngoài khung)
+    # → bỏ. Chỉ tính khung khi nó chứa ≥ 80 % số của tờ — có tờ Level 55 không phải khung thì thôi. Việc LỌC làm ở vòng chính sau khi dựng
+    # mặt (loc_ngoai_khung) để giữ số của thửa vắt qua mép khung.
+    for L in [k for k in so_lop if k.endswith('~lon')]: so_lop[L] = bo_so_trong_bang(so_lop[L])   # chỉ tờ chữ lớn: khu phân lô chữ nhỏ có số lô
+    #   xếp thẳng hàng tuyệt đối (tờ 88, 64, 385…: mất 1–4 thửa giống web khi áp cho mọi lớp)
+    khung = tim_khung(net, [q for ds in so_lop.values() for _, q, _ in ds])
+    # TỜ CHỮ LỚN (lớp "~lon"): nhãn = SỐ THỬA ở trên + DIỆN TÍCH SỐ CHẴN ngay dưới (lệch xuống 0,8–2,2 cỡ chữ, ngang ≤ 1,5 cỡ chữ, cùng cỡ),
+    # thường KHÔNG kèm mã loại đất (tờ 247: "101" trên "25722", "99" trên "4327"). Số làm diện tích phải BỎ khỏi danh sách số thửa — không thì
+    # mặt nào cũng chứa 2 số và không thửa nào dựng được (tờ 247 từng 52 / 444). Xét từ trên xuống nên số thửa luôn được xét trước số diện tích.
+    for L in [k for k in so_lop if k.endswith('~lon')]:
+        ds = sorted(so_lop[L], key=lambda t: -t[1].y); la_dt = set(); cs = chu_lop.get(L, [])
+        for i, (sh, pt, h) in enumerate(ds):
+            if i in la_dt or (khung and not (khung[0] <= pt.x <= khung[2] and khung[1] <= pt.y <= khung[3])): continue
+            ung = [(pt.distance(q), j) for j, (x, q, h2) in enumerate(ds) if j != i and j not in la_dt and re.fullmatch(r'\d+', x)
+                   and abs(h2 - h) <= 0.3 * h and abs(q.x - pt.x) <= 1.5 * h and 0.8 * h <= pt.y - q.y <= 2.2 * h]
+            if not ung: continue
+            j = min(ung)[1]; la_dt.add(j)
+            if sh not in nhan:
+                ma = min(((pt.distance(q), c) for c, q, _ in cs if pt.distance(q) <= 4 * h), default=(0, ''))[1]
+                nhan[sh] = (ma, float(ds[j][0]), pt, SAI_NHAN_CHAN)
+        so_lop[L] = [x for k, x in enumerate(ds) if k not in la_dt]
     # NHÃN RỜI (không đóng thành khối): số nguyên + số ngay DƯỚI (≤ 4 lần cỡ chữ) cùng lớp = số thửa + diện tích. Diện tích số chẵn
     # (tờ 311: "2983") chỉ nhận khi có mã loại đất ở gần — tránh ghép nhầm hai số bất kỳ.
     for L, ds in so_lop.items():
@@ -150,7 +215,19 @@ def doc_to(p):
                 gan = [(pt.distance(q), float(x)) for x, q, _ in ds if x != sh and re.fullmatch(r'\d+', x) and abs(q.x - pt.x) <= hh and 0 < pt.y - q.y <= hh]
                 sai = SAI_NHAN_CHAN
             if gan: nhan[sh] = (ma, min(gan)[1], pt, sai)
-    return net, {L: [(s, pt) for s, pt, _ in ds] for L, ds in so_lop.items()}, loai, nhan, dem_cong
+    return net, {L: [(s, pt) for s, pt, _ in ds] for L, ds in so_lop.items()}, loai, nhan, dem_cong, khung
+
+def loc_ngoai_khung(so_lop, khung, mat_bo, chi_khop):
+    """Bỏ số nằm NGOÀI khung trong của tờ (bảng thống kê bên lề), TRỪ số nằm trong một mặt khép kín (bộ nét bất kỳ) — tờ có vẽ cả thửa
+    nằm ngoài khung (tờ 16 Thửa 357: cả thửa ngoài khung 13–60 m, web vẫn có ở tờ 16, giống hệt). Bảng bên lề kẻ bằng lớp không phải ranh
+    (13, 63…) nên số trong bảng không nằm trong mặt nào."""
+    if not khung: return so_lop
+    x0, y0, x1, y1 = khung
+    cay = [(m, STRtree(m)) for m in mat_bo if m]   # mọi bộ nét, kể cả bộ chỉ-khớp-nhãn: lô sát đường ở mép tờ chỉ khép được khi có mép đường
+    def giu(q):
+        if x0 <= q.x <= x1 and y0 <= q.y <= y1: return True
+        return any(m[i].contains(q) for m, c in cay for i in c.query(q))
+    return {L: [(x, q) for x, q in ds if giu(q)] for L, ds in so_lop.items()}
 
 def chon_lop_so(so_lop, nhan, mat_bo):
     """Lớp số thửa của tờ (xét MỌI lớp) = lớp GHÉP ĐƯỢC NHIỀU THỬA NHẤT: đếm mặt chứa đúng MỘT số của lớp đó, lấy bộ nét cho điểm cao nhất
@@ -182,9 +259,11 @@ def chon_lop_so(so_lop, nhan, mat_bo):
     return max(ung)[2] if ung else None
 
 def lop_ranh_theo_web(net, ranh_web):
-    """% chiều dài nét mỗi lớp nằm trùng ranh thửa web (≤ 5 cm) — rải điểm 1 m dọc nét. Trả (lớp chính ≥ 80 %, lớp lẫn lộn 30–80 %)"""
-    if not ranh_web: return None, None
-    cay = STRtree(ranh_web); chinh, lan = [], []
+    """% chiều dài nét mỗi lớp nằm trùng ranh thửa web (≤ 5 cm) — rải điểm 1 m dọc nét. Trả (lớp chính ≥ 80 %, lớp lẫn lộn 30–80 %,
+    lớp KHÔNG BAO GIỜ là ranh ở tờ này: dài ≥ 2 km mà trùng < 2 % — vd tờ 247 / 344 miền núi: Level 1 là ĐƯỜNG ĐỒNG MỨC (75 km, 0 %)
+    cắt ngang mọi thửa; chỉ áp khi web có ≥ 20 thửa và có lớp trùng ≥ 30 % — web lệch cả tờ thì không xét)"""
+    if not ranh_web: return None, None, ()
+    cay = STRtree(ranh_web); chinh, lan = [], []; ti = {}
     for L, ds in net.items():
         dai = sum(g.length for g in ds)
         if dai < 50: continue                      # lớp ít nét (ký hiệu, chữ gạch chân…) — không xét
@@ -193,10 +272,13 @@ def lop_ranh_theo_web(net, ranh_web):
             n = max(2, int(g.length) + 1)
             pts.extend(shapely.line_interpolate_point(g, np.linspace(0, g.length, n)))
         trung = cay.query(np.array(pts, dtype=object), predicate='dwithin', distance=0.05)
-        ti_le = len(set(trung[0].tolist())) / len(pts)
+        ti_le = len(set(trung[0].tolist())) / len(pts); ti[L] = (ti_le, dai)
         if ti_le >= 0.8: chinh.append(L)
         elif ti_le >= 0.3: lan.append(L)
-    return tuple(sorted(chinh)), tuple(sorted(lan))
+    bo = ()
+    if len(ranh_web) >= 20 and max((v[0] for v in ti.values()), default=0) >= 0.3:
+        bo = tuple(sorted(L for L, (t, d) in ti.items() if t < 0.02 and d >= 2000))
+    return tuple(sorted(chinh)), tuple(sorted(lan)), bo
 
 def dung_bo(net, bo_net):
     """Mỗi bộ nét → danh sách mặt khép kín (dựng một lần, dùng cho cả chọn lớp số, ghép theo số, ghép theo diện tích)"""
@@ -239,14 +321,18 @@ for f in tep:
     if chi_to and N not in chi_to: continue
     if str(N) not in bang['to']: print('BO QUA', f, '(khong co trong bang doi so to)'); continue
     xa_cu, to_cu = bang['to'][str(N)][0], str(bang['to'][str(N)][1])
-    net, so_lop, loai, nhan, dem_cong = doc_to(os.path.join(thu_dxf, f))
+    net, so_lop, loai, nhan, dem_cong, khung = doc_to(os.path.join(thu_dxf, f))
     ranh_web = [he_thong_sang_vn(shape(w['g'])).boundary for w in web_to.get((xa_cu, to_cu), [])]
-    chinh, lan = lop_ranh_theo_web(net, ranh_web)
+    chinh, lan, bo_lop = lop_ranh_theo_web(net, ranh_web)
     # bộ nét: (0) CHỈ level ranh chuẩn → (1) + lớp dò theo web ≥ 80 % → (2) + lớp lẫn lộn → (3) + 46/24/30 → (4) + khung tờ / ranh khu.
     # Bộ đầu KHÔNG gộp lớp dò theo web: tờ 16 dò ra cả level 3/60/61 (trùng ranh ở chỗ này, chỗ khác chia ngang thửa) → nếu gộp ngay từ
     # đầu thì không còn bộ nào dựng đúng thửa bị chia, khớp nhãn tụt 341/404. Tờ đất rừng (web ít thửa) vẫn có level chuẩn ở bộ đầu.
     co = lambda ds: tuple(x for x in dict.fromkeys(ds) if x in net)
-    b0 = co(LOI)
+    # lớp "không bao giờ là ranh ở tờ này" (bo_lop, vd đường đồng mức Level 1 ở tờ miền núi) chỉ bỏ khỏi bộ LÕI (bộ 5 / 6 chỉ nhận mặt khớp
+    # nhãn nên nét thừa ở đó vô hại, còn bỏ thì tờ 222 / 385 mất thửa ghép mặt giống web) —
+    # KHÔNG bỏ các lớp khép thửa thêm vào có chủ đích (60, 46, 24, 30, khung 55, ranh khu 49, mép đường 50 / 22): tờ 88, 17, 64, 385 từng mất
+    # 1–4 thửa giống web khi bỏ cả những lớp đó.
+    b0 = co(tuple(x for x in LOI if x not in bo_lop))
     b1 = co(b0 + tuple(chinh or ()))
     b2 = co(b1 + ('Level 60',) + tuple(lan or ()))
     b3 = co(b2 + ('Level 46', 'Level 24', 'Level 30'))
@@ -261,6 +347,7 @@ for f in tep:
     bo_net = [b for i, b in enumerate(cac_bo) if b and b not in cac_bo[:i]]
     chi_khop = {bo_net.index(b) for b in (b5, b6) if b and b in bo_net and b not in cac_bo[:5]}   # hai bộ cuối: chỉ nhận mặt khớp nhãn
     mat_bo = dung_bo(net, bo_net)
+    so_lop = loc_ngoai_khung(so_lop, khung, mat_bo, chi_khop)
     lop_so = chon_lop_so(so_lop, nhan, mat_bo); so = so_lop.get(lop_so, [])
     uv = ung_vien(mat_bo, so)
     # số thửa của tờ = số ở LỚP SỐ THỬA (đếm, báo chưa dựng). Số chỉ có ở NHÃN (thửa nhỏ ghi nhãn ngoài thửa, bảng "ghi chú các thửa đất
@@ -394,7 +481,7 @@ for f in tep:
     khop_nhan = sum(1 for s, (_, _, kh) in chon.items() if kh)
     them_nhan = sum(1 for x in nhan_ngoai if x in chon)
     tong.append({'toMoi': N, 'xaCu': bang['tenXa'][xa_cu], 'toCu': to_cu, 'lopSo': lop_so, 'lopRanh': list(bo_net[0]),
-                 'lopLan': [x for x in bo_net[-1] if x not in bo_net[0]], 'soThuaBanVe': len(cac_so) + them_nhan, 'dungDuoc': len(chon),
+                 'lopLan': [x for x in bo_net[-1] if x not in bo_net[0]], 'lopBo': list(bo_lop), 'soThuaBanVe': len(cac_so) + them_nhan, 'dungDuoc': len(chon),
                  'chuaDung': len(cac_so) - (len(chon) - them_nhan), 'dungTuNhan': them_nhan, 'coNhanDienTich': co_nhan, 'khopNhan': khop_nhan, 'congTron': dem_cong, **dem})
     print(f"to {N:3d} ({bang['tenXa'][xa_cu]} to {to_cu}) [so: {lop_so} | ranh: {','.join(x.replace('Level ', '') for x in bo_net[0])}]: "
           f"so {len(cac_so) + them_nhan}, dung {len(chon)}, chua {len(cac_so) - (len(chon) - them_nhan)}, "

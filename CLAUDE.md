@@ -472,10 +472,18 @@ Chủ dự án đưa bộ **387 tờ DGN V8 xã Cam Lâm** (`D:\BandoCamLam\Ban 
   `52`); tờ 58 Level 4 lại là số cao độ. **Level 54 / `KHUNGTHU` = TÊN CHỦ — không đọc, không ghi ra file.** Vì mỗi xã cũ vẽ một kiểu nên
   bộ đổi TỰ DÒ theo từng tờ (lớp ranh = lớp có ≥ 80 % chiều dài trùng ranh thửa web; lớp số = lớp khớp ô nhãn nhiều nhất) và **chọn hình
   KHỚP NHÃN**: thử dựng từ ít → nhiều lớp, thửa có nhãn lấy hình có diện tích khớp số trên nhãn (≤ 0,15 m²).
-- **Số liệu (bản cuối 15/10 tối, 391 tờ kể cả 303 / 313 / 314 / 317):** 89.023 số thửa → dựng được 88.116 (99,0 %), khớp nhãn 85.305 /
-  86.744. So với web: giống 62.053 · cùng hình nhưng lệch vị trí 8.028 (một cụm lệch đúng 0,27 m Đ / 0,07 m B = nửa độ trượt lớp web) · khác
-  5.210 · **web chưa có 12.825** (web THIẾU cả mảng — vd tờ 7: web 221 thửa, V8 487; chỗ đó trên web không có thửa nào) · web có mà V8 không
-  có 3.470. Thửa 70 · Tờ 25 V8 = 511,889 m², trùng web.
+- **Số liệu (bản cuối 15/10 tối, 391 tờ kể cả 303 / 313 / 314 / 317):** 90.739 số thửa → dựng được 89.456 (98,6 %), khớp nhãn 86.269 /
+  88.007. So với web: giống 62.655 · cùng hình nhưng lệch vị trí 8.092 (một cụm lệch đúng 0,27 m Đ / 0,07 m B = nửa độ trượt lớp web) · khác
+  5.488 · **web chưa có 13.221** (web THIẾU cả mảng — vd tờ 7: web 221 thửa, V8 487; chỗ đó trên web không có thửa nào) · web có mà V8 không
+  có 4.069. Thửa 70 · Tờ 25 V8 = 511,889 m², trùng web.
+- **TỜ CHỮ LỚN (tỷ lệ nhỏ, miền núi — tờ 58, 59, 246, 247, 341–344):** số thửa Level 13 cao 18 m, diện tích là SỐ CHẴN ngay dưới số thửa
+  ("101" trên "25722"), Level 1 là ĐƯỜNG ĐỒNG MỨC, có BẢNG thống kê (bên lề hoặc dải đáy trong khung). Bản đầu bỏ mọi chữ ≥ 5 m (vì số cao độ
+  tờ 58) nên tờ 247 chỉ thấy 54 / 289 số. Nay: chữ ≥ 5 m xét thành lớp riêng `<lớp>~lon`; ghép nhãn "số trên / diện tích dưới" rồi bỏ số
+  diện tích khỏi danh sách số thửa; bỏ số trong BẢNG (≥ 8 số thẳng hàng tuyệt đối, chỉ tờ chữ lớn — áp cho chữ nhỏ thì mất số lô khu phân
+  lô) và số NGOÀI KHUNG (khung nhận theo HÌNH: lớp có 4 cạnh dài khép kín chứa ≥ 50 % số — tờ 16 Level 55, tờ 247 Level 60) trừ số nằm
+  trong mặt khép kín (tờ 16 Thửa 357 nằm trọn ngoài khung mà web vẫn có); lớp dài ≥ 2 km trùng ranh web < 2 % (đường đồng mức) bỏ khỏi
+  BỘ LÕI. 8 tờ: 357 → 1.697 thửa, không tờ nào giảm, không tờ nào bớt thửa "giống web". Tờ 386 (Cam An Nam tờ 1): nét ranh trùng web ≤ 9 %
+  ở mọi lớp — chưa dựng được, cần soi riêng.
 - **Tờ lẻ ngoài bộ `bddc`** (`D:\KhoQH\dia-chinh-v8\dxf\nguon.json` ghi nguồn từng tờ): 303, 313, 314 ở thư mục cha; **317 chỉ có trong
   "Sinh Du An VIN chuyen"** (bộ chính thiếu). Bản MỚI HƠN ngoài bộ chính của tờ 19 (`DC19.dgn` 8/1/2026), 312 + 314 (thư mục VIN, 16/4 và
   16/1/2026) đã xuất riêng (`dxf-ban-moi`) và so TỪNG THỬA với bản đang dùng: hình, loại đất, diện tích Y HỆT (0 thửa khác) ⇒ giữ bản đang dùng.
@@ -493,8 +501,8 @@ Chủ dự án đưa bộ **387 tờ DGN V8 xã Cam Lâm** (`D:\BandoCamLam\Ban 
 - **Trên web (chỉ admin):** bảng lớp → "Đối chiếu bản đồ V8 (xã Cam Lâm)": viền hồng nét đứt, tô đỏ = khác, vàng = lệch vị trí, xanh = web chưa
   có; bấm thửa → khung "Bản đồ V8 (đối chiếu)" trong bảng thông tin thửa. Máy chủ: `GET /api/qh-rieng/dc-v8/:z/:x/:y` (chỉ mức 16) +
   `/dc-v8/tai?lng&lat` — vé `'a'` (routes/qhRieng.ts). Bảng tạo trong `migrate.ts`.
-- **Còn dở:** 907 số thửa chưa dựng được hình (`chua-dung-duoc.csv`) — phần lớn do BẢN VẼ thiếu nét (vd tờ 344: lô 540–559 không có nét
-  chia lô, nét Level 2 không chạm khối); tờ 162, 172 trống thật (không có thửa); 37 tờ hụt > 5 % (nặng nhất 344, 343, 59, 247, 341, 246).
+- **Còn dở:** 1.283 số thửa chưa dựng được hình (`chua-dung-duoc.csv`) — phần lớn do BẢN VẼ thiếu nét (vd tờ 344: lô 540–559 không có nét
+  chia lô, nét Level 2 không chạm khối); tờ 162, 172 trống thật (không có thửa); 37 tờ hụt > 5 % (nặng nhất các tờ chữ lớn 59, 344, 58, 246, 247, 342).
   Chưa quyết: có thay lớp thửa web bằng bản V8 không (chờ chủ dự án đối chiếu xong).
 
 ---

@@ -854,6 +854,16 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   + khu vực — không thư mục ô, không khung, không vé. Giao diện hiện dòng có 🔒 (`lopKhoa`, `khoa: true` trong `mucQh`); bấm → hộp
   `hopKhoa` "Chỉ quản trị viên được xem" (gọi / Zalo 0988 888 888 / nhắn tin). Hiện chỉ `qh-ct500` có `congKhai` (Tây NT 2.2 vẫn giấu hẳn).
   Nhãn bỏ chữ "đã duyệt" theo lời chủ dự án. Tự kiểm 15/10 9h: gioi-thieu 200, ve 401, ô vé giả / không vé 403, `/tiles/` 404.
+  **1/500 TÔ MÀU THEO LOẠI ĐẤT (15/10/2026, chủ dự án: "làm kiểu màu giống 1/2000 và 893, làm như kiểu 205 khó xem quá")** — lớp
+  `qh-ct500-mau` (bộ ô `qhct500-mau-v1`, 44 MB) đứng TRƯỚC lớp bản in gốc `qh-ct500` ("· bản vẽ gốc"); chờ chủ dự án chọn giữ một hay cả hai.
+  `scripts/qh-tinh/to_mau_1_500.py` (doc → cat → chu-giai) đọc thẳng DXF: bản vẽ 1/500 chỉ tô HOA VĂN nên in ra gần trắng; nay mỗi vùng tô =
+  một lô, loại đất theo TÊN LỚP (`mau-1-500.json`, từ khoá → loại → màu), màu = màu ảnh phân khu 1/2000 cho đúng loại đó (đo: chỗ lô nhà ở
+  1/500 thì ảnh 1/2000 là #979763 95–96 %, trường học / tôn giáo / y tế / hạ tầng khớp 53–82 %). Chẵn–lẻ + cung tròn đúng công thức như
+  1/2000; bỏ level tắt, cắt theo ranh (bỏ khung chú giải mẫu của bản Cam Thành Bắc), bỏ chữ / ký hiệu. Nét đường kiểu cố định cho cả 6 bản
+  (mỗi bản vẽ tự đặt màu khác nhau). Hai bẫy đã gặp: (1) ĐƯỜNG DẪN CHÚ THÍCH vẽ trên lớp hè đường → lọc theo VỊ TRÍ (nét đường > 50 % chiều
+  dài nằm trong lòng lô thì bỏ); (2) "cây xanh chuyên dụng" Cam Tân là LỚP PHỦ hành lang cắt ngang QL1A, chồng ~6.500 m² lên lô khác →
+  `lop_phu`: tô dưới cùng + hoa văn ô chéo phủ cả dải, không dùng để lọc nét. Chú giải lớp riêng nằm trong danh-sach.json (`chuGiai`),
+  gửi kèm vé — giao diện gộp vào bảng "Chú giải" (`banCG`). Thêm lớp: `them_lop_rieng.py … --truoc=<id>` (ghi tệp tạm rồi đổi tên).
   ĐÃ LÊN WEB 14/10/2026 21:32 (tự kiểm qua tên miền thật: chưa đăng nhập 401, vé giả 403, `/tiles/` công khai 404, ô có vé hợp lệ trùng
   từng byte file gốc, Cloudflare `DYNAMIC` không giữ). Volume riêng hiện có 2 lớp: `qh-ct500` (1/500 chính thức) và `qh-nt-tay-pk22`
   (ĐC phân khu 1/2000 Tây Nha Trang tiểu PK 2.2, 377 ha — thuyết minh để TRỐNG số quyết định ⇒ "chưa xác minh", chờ chủ dự án quyết

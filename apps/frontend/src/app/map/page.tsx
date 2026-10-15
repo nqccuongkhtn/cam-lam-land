@@ -758,8 +758,10 @@ export default function MapPage() {
   // ngày 25/9/2026, 6 đồ án). Chủ dự án: "chỉ tài khoản admin được xem tất cả, còn lại không cho xem" → danh sách lớp + VÉ xem lấy
   // từ máy chủ (GET /api/qh-rieng/ve — chỉ admin, routes/qhRieng.ts); người khác không nhận được gì, mã trang cũng không ghi tên lớp.
   // Ô ảnh tải qua /api/qh-rieng/o/… kèm vé (máy chủ kiểm vé TỪNG Ô) — không nằm ở /tiles/ công khai. Vé hạn 24 giờ (tải lại trang là có vé mới).
+  // `chuGiai` (15/10/2026): chú giải màu của lớp riêng (vd 1/500 tô màu theo loại đất) gửi kèm vé — không nằm trong /chu-giai-qh.json công khai.
   type LopRieng = { id: string; thuMuc: string; ten: string; tenNgan: string; tenApp: string; vung: string; zBay?: number;
-    minzoom: number; maxzoom: number; khung: [number, number, number, number]; canCu?: CanCu };
+    minzoom: number; maxzoom: number; khung: [number, number, number, number]; canCu?: CanCu;
+    chuGiai?: { nhom: string; muc: { mau: string; tenDs: string[]; so: number }[] }[] };
   const [lopRieng, setLopRieng] = useState<{ ve: string; lop: LopRieng[] } | null>(null);
   const laQuanTri = laAdmin(user);
   useEffect(() => {
@@ -2151,11 +2153,14 @@ export default function MapPage() {
   const chuGiaiDangBat = (): NhomChuGiai[] | null => {
     if (!chuGiai) return null;
     // Mọi bản đang bật (QĐ205 · phân khu · QĐ893 — 11/10/2026: trước chỉ có phân khu, chủ dự án hỏi "205 và 893 chưa có chú giải")
-    const ids = mucQh.flatMap((x) => x.gom).filter((id) => !!ovOn[id] && chuGiai.ban[id]);
+    // + lớp chỉ-admin có chú giải riêng (1/500 tô màu — máy chủ gửi kèm vé, 15/10/2026).
+    const banCG: Record<string, NhomChuGiai[]> = { ...chuGiai.ban };
+    for (const l of lopRieng?.lop || []) if (l.chuGiai?.length) banCG[l.id] = l.chuGiai;
+    const ids = mucQh.flatMap((x) => x.gom).filter((id) => !!ovOn[id] && banCG[id]);
     if (!ids.length) return [];
     const thuTu = chuGiai.nhom.map((n) => n.nhom);
     const gom = new Map<string, Map<string, { mau: string; ten: Map<string, number>; so: number }>>();
-    for (const id of ids) for (const n of chuGiai.ban[id]) {
+    for (const id of ids) for (const n of banCG[id]) {
       const g = gom.get(n.nhom) || new Map(); gom.set(n.nhom, g);
       for (const m of n.muc) {
         const o = g.get(m.mau) || { mau: m.mau, ten: new Map<string, number>(), so: 0 }; g.set(m.mau, o);

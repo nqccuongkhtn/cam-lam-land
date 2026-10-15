@@ -187,6 +187,14 @@ có màu ở cột Hiện trạng nhưng ô Quy hoạch để TRẮNG → đọc
 hình có mã đỏ ngoài ranh → chỉ lấy mã đỏ. **Tên NHÓM** của Thông tư 08 (TVC, CCC, CSK, CHN, CQA…) hay tô cùng màu mã con: màu chỉ gồm tên
 nhóm + đúng một mã cụ thể thì là mã cụ thể đó (`TEN_NHOM_TT08`).
 
+**LUẬT CHỮ ĐEN — KIỂU CHẶT (15/10/2026, chủ dự án duyệt; MẶC ĐỊNH BẬT, tắt bằng `--khong-chu-den`).** Vùng màu dùng chung (sẽ ghi "nhóm")
+mà KHÔNG có chữ đỏ nào bên trong, nhưng có mã ĐEN đứng một mình thuộc đúng tập mã của màu → theo quy ước bản đồ là đất GIỮ NGUYÊN loại hiện
+trạng → lấy mã đó. Vùng có chữ đỏ (kể cả mã khác nhóm màu) thì không áp — mâu thuẫn, không đoán (Nha Trang: một vùng có cả "TMD" đen lẫn
+"DKV" đỏ). Đếm trước khi áp (`--thong-ke-den --khong-chu-den`, chỉ đếm, ghi vị trí từng nhãn ra `<ra>.chu-den.json` để soi): 53.584 ha /
+133.783 ha "nhóm" của 7 bản — rừng sản xuất 35.511, rừng sản xuất là rừng tự nhiên 12.597, còn ~5.500 ha năng lượng / lúa / thương mại /
+công nghiệp…; soi 27 chỗ trên PDF gốc (Nha Trang, Vạn Ninh, Diên Khánh). Luật này KHÔNG phủ vùng vẽ TRẮNG (không màu — vd ruộng muối
+Ninh Hòa chỉ có chữ "LMU" đen): vùng đó vẫn "chưa xác định".
+
 ### Dữ liệu QHSDĐ DẠNG SỐ trên cổng GIS tỉnh (14/10/2026) — ĐỢT CŨ, chỉ để tham khảo / đo
 Cổng GIS chính thức `gis.khanhhoa.gov.vn` (mục "Tra cứu quy hoạch" `/public/8192/`, "Mời gọi đầu tư" `/public/8193/`) có dịch vụ ArcGIS
 công khai `…/ag/rest/public/get/Portal/QHSDD<Huyen>/MapServer/2` cho NhaTrang, CamRanh, DienKhanh, KhanhSon, CamLam (không có Ninh

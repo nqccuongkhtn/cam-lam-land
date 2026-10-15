@@ -356,7 +356,8 @@ co_nhan_ = theo_mau_mot = nhom = bo_trong = 0
 #   3) màu chú giải không có → theo nhãn trong mảng như cũ.
 #   (nhãn đỏ đè ra NGOÀI vùng — trên mặt sông, lòng đường — xem nhan_ngoai bên dưới)
 CO_CHU_DO = sum(1 for n in nhan if n[3]) >= max(20, 0.05 * len(nhan))
-CHU_DEN = '--chu-den' in co        # luật chữ đen đứng một mình — MẶC ĐỊNH TẮT (xem chỗ gán mã màu dùng chung)
+# Luật chữ đen đứng một mình, KIỂU CHẶT (xem chỗ gán mã màu dùng chung). 15/10/2026 chủ dự án DUYỆT → MẶC ĐỊNH BẬT; tắt: --khong-chu-den.
+CHU_DEN = '--khong-chu-den' not in co
 print(f'nhan: {len(nhan)} trong ranh, {sum(1 for n in nhan if n[3])} nhan DO ({so_do_hinh} nhan xet mau theo net chu ve bang hinh)'
       f' -> {"CHI NHAN DO cho mau dung chung" if CO_CHU_DO else "ban khong phan biet mau nhan"}')
 nhan_mang = collections.defaultdict(list)                    # mảng → [(mã, đỏ?)]
@@ -394,9 +395,12 @@ for p in np.unique(pimg):
     if cg in mau_mot_ma: bang[p] = id_ma(mau_mot_ma[cg]); theo_mau_mot += 1
     elif tap and len(tap) > 1:
         hop_le = [t for t, do_ in ds if t in tap and (do_ or not CO_CHU_DO)] or nhan_ngoai.get(p, [])
-        # --chu-den (15/10/2026, MẶC ĐỊNH TẮT — chờ chủ dự án quyết): không có nhãn đỏ hợp lệ thì nhận nhãn ĐEN đứng một mình (mã trên của
-        # phân số đã bỏ) thuộc đúng tập mã của màu — theo quy ước bản đồ: đất GIỮ NGUYÊN loại hiện trạng (đổi loại thì phải có mã đỏ).
-        if not hop_le and CHU_DEN: hop_le = [t for t, do_ in ds if t in tap and not do_]
+        # LUẬT CHỮ ĐEN — KIỂU CHẶT (15/10/2026, chủ dự án duyệt sau khi xem số liệu: 53.584 ha / 133.783 ha "nhóm" của 7 bản ghi được đúng tên,
+        # 90 % là rừng; soi 18 chỗ trên PDF đều hợp lý): không có nhãn đỏ hợp lệ thì nhận nhãn ĐEN đứng một mình (mã trên của phân số đã bỏ)
+        # thuộc đúng tập mã của màu — theo quy ước bản đồ: đất GIỮ NGUYÊN loại hiện trạng (đổi loại thì phải có mã đỏ). CHỈ KHI trong mảng
+        # KHÔNG có nhãn đỏ nào (kể cả mã khác nhóm màu): có là mâu thuẫn, không đoán (Nha Trang: vùng có cả "TMD" đen lẫn "DKV" đỏ).
+        if not hop_le and CHU_DEN and not any(do_ for _, do_ in ds):
+            hop_le = [t for t, do_ in ds if t in tap and not do_]
         if hop_le: bang[p] = id_ma(collections.Counter(hop_le).most_common(1)[0][0]); co_nhan_ += 1
         else: bang[p] = id_ma('NHOM:' + '/'.join(sorted(tap))); nhom += 1
     elif ds: bang[p] = id_ma(collections.Counter(t for t, _ in ds).most_common(1)[0][0]); co_nhan_ += 1
@@ -432,7 +436,8 @@ for k in vien_hong: trong_suot.add(k); bang[k] = 0               # viền hồng
 print(f'{so_mang} mang; trong ranh: {co_nhan_} theo nhan, {theo_mau_mot} theo mau mot ma ({len(mau_mot_ma)} mau), '
       f'{nhom} mau dung chung ghi NHOM, {bo_trong} de "chua xac dinh"')
 if '--thong-ke-den' in co:
-    # CHỈ ĐẾM, KHÔNG ĐỔI KẾT QUẢ (15/10/2026, chờ chủ dự án quyết): vùng "nhóm" (màu dùng chung) KHÔNG có nhãn đỏ hợp lệ nhưng CÓ nhãn ĐEN
+    # CHỈ ĐẾM, KHÔNG ĐỔI KẾT QUẢ (15/10/2026 — đếm để chủ dự án quyết; từ khi luật chữ đen BẬT mặc định thì chỉ còn đếm phần mà luật bỏ qua —
+    # muốn đếm như lúc chưa áp thì chạy kèm --khong-chu-den): vùng "nhóm" (màu dùng chung) KHÔNG có nhãn đỏ hợp lệ nhưng CÓ nhãn ĐEN
     # đứng một mình (đã bỏ mã trên của phân số) mang mã thuộc đúng tập mã của màu → theo quy ước bản đồ là đất GIỮ NGUYÊN loại hiện trạng.
     px_m2 = (m_moi_pt / S) ** 2
     dt_den = collections.Counter(); so_den = 0

@@ -473,9 +473,15 @@ Chủ dự án đưa bộ **387 tờ DGN V8 xã Cam Lâm** (`D:\BandoCamLam\Ban 
   bộ đổi TỰ DÒ theo từng tờ (lớp ranh = lớp có ≥ 80 % chiều dài trùng ranh thửa web; lớp số = lớp khớp ô nhãn nhiều nhất) và **chọn hình
   KHỚP NHÃN**: thử dựng từ ít → nhiều lớp, thửa có nhãn lấy hình có diện tích khớp số trên nhãn (≤ 0,15 m²).
 - **Số liệu (bản cuối 15/10 tối, 391 tờ kể cả 303 / 313 / 314 / 317):** 90.739 số thửa → dựng được 89.456 (98,6 %), khớp nhãn 86.269 /
-  88.007. So với web: giống 62.655 · cùng hình nhưng lệch vị trí 8.092 (một cụm lệch đúng 0,27 m Đ / 0,07 m B = nửa độ trượt lớp web) · khác
-  5.488 · **web chưa có 13.221** (web THIẾU cả mảng — vd tờ 7: web 221 thửa, V8 487; chỗ đó trên web không có thửa nào) · web có mà V8 không
-  có 4.069. Thửa 70 · Tờ 25 V8 = 511,889 m², trùng web.
+  88.007. So với web: giống 62.828 · cùng hình nhưng lệch vị trí 8.104 (một cụm lệch đúng 0,27 m Đ / 0,07 m B = nửa độ trượt lớp web) · khác
+  5.453 · **web chưa có 13.071** (web THIẾU cả mảng — vd tờ 7: web 221 thửa, V8 487; chỗ đó trên web không có thửa nào) · web có mà V8 không
+  có 4.649. Thửa 70 · Tờ 25 V8 = 511,889 m², trùng web. Bảng theo từng tờ (mở Excel): `ket-qua\tong-hop-theo-to.csv`.
+- ⚠️ **TỜ 396 / 397 / 398 LỆCH BẢNG TRA SỐ TỜ** (rà 15/10 tối: chồng điểm giữa mọi thửa V8 lên thửa web): 100 % thửa của file dc396 / dc397
+  nằm trên thửa web Cam An Nam tờ 16 / 17, file dc398 tiêu đề ghi "xã Cam An Bắc - Tờ số 21" và nằm trên Cam An Bắc tờ 21 — trong khi bảng
+  `dia_chinh_to` (từ `traSoBanDo.ts`) ghi tờ mới 396 / 397 / 398 = Cam An Nam 15 / 16 / 17. Lớp V8 đối chiếu theo tờ của BẢN VẼ
+  (`to-cu-theo-ban-ve.json` trong thư mục dxf, bản chép ở `scripts/dia-chinh/v8/du-lieu/`; thửa mang thêm `toCuBangTra`) → giống web 0 →
+  124 / 19 / 30. **Bảng tra của web CHƯA sửa** (tra "Xã Cam Lâm tờ 396" vẫn ra Cam An Nam tờ 15) — chờ chủ dự án hỏi Văn phòng Đăng ký
+  xem bảng tra hay bộ file V8 đúng. 5 tờ lệch khác chỉ là tờ sát ranh xã bên / tờ một thửa (55, 117, 118, 337, 366).
 - **TỜ CHỮ LỚN (tỷ lệ nhỏ, miền núi — tờ 58, 59, 246, 247, 341–344):** số thửa Level 13 cao 18 m, diện tích là SỐ CHẴN ngay dưới số thửa
   ("101" trên "25722"), Level 1 là ĐƯỜNG ĐỒNG MỨC, có BẢNG thống kê (bên lề hoặc dải đáy trong khung). Bản đầu bỏ mọi chữ ≥ 5 m (vì số cao độ
   tờ 58) nên tờ 247 chỉ thấy 54 / 289 số. Nay: chữ ≥ 5 m xét thành lớp riêng `<lớp>~lon`; ghép nhãn "số trên / diện tích dưới" rồi bỏ số

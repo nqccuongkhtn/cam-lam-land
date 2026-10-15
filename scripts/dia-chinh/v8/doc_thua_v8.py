@@ -47,6 +47,11 @@ bang = json.load(open(bang_p, encoding='utf-8'))
 # tờ lấy từ NGOÀI bộ chính (vd 303 / 313 / 314 nằm lẻ ở thư mục cha) — ghi rõ nguồn: <thu_muc_dxf>/nguon.json {"303": "…/dc303.dgn"}
 _p_nguon = os.path.join(thu_dxf, 'nguon.json')
 NGUON_RIENG = json.load(open(_p_nguon, encoding='utf-8')) if os.path.exists(_p_nguon) else {}
+# tờ mà NỘI DUNG bản vẽ là một tờ cũ KHÁC bảng tra số tờ (dia_chinh_to) — <thu_muc_dxf>/to-cu-theo-ban-ve.json {"396": ["22471", 16, "căn cứ"]}.
+# 15/10/2026: tờ 396 / 397 / 398 — 100 % thửa nằm trên thửa web Cam An Nam tờ 16 / tờ 17 / Cam An Bắc tờ 21 (tiêu đề dc398 ghi "xã Cam An
+# Bắc - Tờ số 21") trong khi bảng tra ghi Cam An Nam 15 / 16 / 17. Đối chiếu theo tờ của BẢN VẼ, giữ số theo bảng ở `toCuBangTra`.
+_p_sua = os.path.join(thu_dxf, 'to-cu-theo-ban-ve.json')
+SUA_TO = json.load(open(_p_sua, encoding='utf-8')) if os.path.exists(_p_sua) else {}
 VN2000 = ('+proj=tmerc +lat_0=0 +lon_0=108.25 +k=0.9999 +x_0=500000 +y_0=0 +a=6378137 +rf=298.257223563 '
           '+towgs84=-191.90441429,-39.30318279,-111.45032835,-0.00928836,0.01975479,-0.00427372,0.252906278 +units=m +no_defs')
 VE_WGS = Transformer.from_crs(VN2000, 'EPSG:4326', always_xy=True)
@@ -321,6 +326,10 @@ for f in tep:
     if chi_to and N not in chi_to: continue
     if str(N) not in bang['to']: print('BO QUA', f, '(khong co trong bang doi so to)'); continue
     xa_cu, to_cu = bang['to'][str(N)][0], str(bang['to'][str(N)][1])
+    to_bang = None
+    if str(N) in SUA_TO:
+        to_bang = f"{bang['tenXa'].get(xa_cu, xa_cu)} tờ {to_cu}"
+        xa_cu, to_cu = str(SUA_TO[str(N)][0]), str(SUA_TO[str(N)][1])
     net, so_lop, loai, nhan, dem_cong, khung = doc_to(os.path.join(thu_dxf, f))
     ranh_web = [he_thong_sang_vn(shape(w['g'])).boundary for w in web_to.get((xa_cu, to_cu), [])]
     chinh, lan, bo_lop = lop_ranh_theo_web(net, ranh_web)
@@ -449,6 +458,7 @@ for f in tep:
                 'dienTich_m2': dt_nhan if dt_nhan is not None else round(dt_hinh, 1), 'mucDichSuDung': ma, 'nhan': f'Tờ {to_cu}, thửa {s}',
                 'toMoi': str(N), 'dienTichHinh': round(dt_hinh, 2), 'nguon': NGUON_RIENG.get(str(N), f'dc{N}.dgn'), 'boNet': k + 1}
         if khop is not None: prop['khopNhan'] = khop
+        if to_bang: prop['toCuBangTra'] = to_bang
         if s in cach: prop['cachDung'] = cach[s]
         ws = web_so.get((xa_cu, to_cu, s), [])
         if ws:
@@ -481,7 +491,7 @@ for f in tep:
     khop_nhan = sum(1 for s, (_, _, kh) in chon.items() if kh)
     them_nhan = sum(1 for x in nhan_ngoai if x in chon)
     tong.append({'toMoi': N, 'xaCu': bang['tenXa'][xa_cu], 'toCu': to_cu, 'lopSo': lop_so, 'lopRanh': list(bo_net[0]),
-                 'lopLan': [x for x in bo_net[-1] if x not in bo_net[0]], 'lopBo': list(bo_lop), 'soThuaBanVe': len(cac_so) + them_nhan, 'dungDuoc': len(chon),
+                 'lopLan': [x for x in bo_net[-1] if x not in bo_net[0]], 'lopBo': list(bo_lop), **({'toCuBangTra': to_bang} if to_bang else {}), 'soThuaBanVe': len(cac_so) + them_nhan, 'dungDuoc': len(chon),
                  'chuaDung': len(cac_so) - (len(chon) - them_nhan), 'dungTuNhan': them_nhan, 'coNhanDienTich': co_nhan, 'khopNhan': khop_nhan, 'congTron': dem_cong, **dem})
     print(f"to {N:3d} ({bang['tenXa'][xa_cu]} to {to_cu}) [so: {lop_so} | ranh: {','.join(x.replace('Level ', '') for x in bo_net[0])}]: "
           f"so {len(cac_so) + them_nhan}, dung {len(chon)}, chua {len(cac_so) - (len(chon) - them_nhan)}, "

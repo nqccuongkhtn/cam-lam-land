@@ -34,7 +34,7 @@ const lyrOf = (b: BaseMap) => (b === 'satellite' ? 's' : b === 'terrain' ? 'p' :
 // bị KHOÁ (chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free") — đường /tiles/qd205… đã bị nginx chặn. Thông số như app/map/page.tsx.
 const QH = {
   id: 'qh-qd893', url: '',
-  tiles: ['/tiles/qd893v1/{z}/{x}/{y}.png?v=2'], minzoom: 8, maxzoom: 18,
+  tiles: ['/tiles/qd893v1/{z}/{x}/{y}.png?v=3'],   // ?v=3 (15/10/2026): vá 242 ô thủng — xem map/page.tsx minzoom: 8, maxzoom: 18,
   coordinates: [[108.9335, 12.2239], [109.2624, 12.2239], [109.2624, 11.9328], [108.9335, 11.9328]] as [[number, number], [number, number], [number, number], [number, number]],
 };
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];

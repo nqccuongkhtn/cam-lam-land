@@ -333,7 +333,7 @@ const RASTER_OVERLAYS = [
   // Bản này KHÔNG cần lớp nét: nó vốn là các mảng tô kín (nông nghiệp, đất ở, giao thông, mặt
   // nước) chứ không phải bản vẽ nét như ba bản 1/2000 ở trên.
   { id: 'qh-qd893', name: 'Quy hoạch sử dụng đất QĐ893 (đến 2030)', url: '',
-    tiles: ['/tiles/qd893v1/{z}/{x}/{y}.png?v=2'], minzoom: 8, maxzoom: 18,   // ?v=2: như QĐ205 — bỏ "không có ô" đã nhớ từ trước ngày cắt bù   // đã cắt bù thêm z8–11 (12/9/2026) để thu nhỏ vẫn thấy
+    tiles: ['/tiles/qd893v1/{z}/{x}/{y}.png?v=3'], minzoom: 8, maxzoom: 18,   // ?v=3 (15/10/2026): vá 242 ô THỦNG (vùng tô hỏng viền của bản vẽ — điện mặt trời Cam An, đất quốc phòng Cam Hòa…; scratchpad va_lo_thung.py, sao lưu D:\KhoQH\sao-luu\qd893v1-truoc-va-thung-15-10) — đổi số để trình duyệt / Cloudflare tải ô mới   // ?v=2: như QĐ205 — bỏ "không có ô" đã nhớ từ trước ngày cắt bù   // đã cắt bù thêm z8–11 (12/9/2026) để thu nhỏ vẫn thấy
     coordinates: [[108.9335, 12.2239], [109.2624, 12.2239], [109.2624, 11.9328], [108.9335, 11.9328]] as [[number, number], [number, number], [number, number], [number, number]] },
   // ── NINH HÒA · QUY HOẠCH SỬ DỤNG ĐẤT đến 2030 (thị xã Ninh Hòa) ─────────────────────
   // Dựng 13/10/2026 từ bản đồ PDF CHÍNH THỨC của Sở NN&MT Khánh Hòa (bản vẽ NÉT VECTOR, tỉ lệ
@@ -2540,9 +2540,9 @@ export default function MapPage() {
             ))}
             {/* Máy tính: thanh độ mờ nằm ở cột nút bên phải bản đồ (như điện thoại) → ẩn bản ở bảng này. */}
             <div className="mt-1 pl-[26px] lg:hidden">
-              <div className="flex justify-between text-[11px] text-slate-400 mb-1"><span>Độ mờ{khoaDoMo && ' 🔒'}</span><span className="font-semibold text-slate-500">{Math.round(doMoHien * 100)}%</span></div>
+              <div className="flex justify-between text-[11px] text-slate-400 mb-1"><span>Độ mờ</span><span className="font-semibold text-slate-500">{Math.round(doMoHien * 100)}%</span></div>
               <div className="relative">
-                <input type="range" min={0} max={100} value={Math.round(doMoHien * 100)} disabled={khoaDoMo} onChange={(e) => setOpacity(Number(e.target.value) / 100)} className="w-full accent-emerald-600 disabled:opacity-50" />
+                <input type="range" min={0} max={100} value={Math.round(doMoHien * 100)} disabled={khoaDoMo} onChange={(e) => setOpacity(Number(e.target.value) / 100)} className="w-full accent-emerald-600" />
                 {khoaDoMo && <button type="button" aria-label="Chỉnh độ mờ là tính năng trả phí" onClick={() => setTraPhiQh('Chỉnh độ mờ bản đồ quy hoạch')} className="absolute inset-0" />}
               </div>
             </div>
@@ -2941,11 +2941,12 @@ export default function MapPage() {
                 dải màu chính là từ dưới lên. Nền màu vẽ lên chính ô trượt, rãnh để trong suốt. */}
             {(qhFillOn || rasterOverlays.some((o) => !!ovOn[o.id])) && (
               <div className="relative h-[123px] w-7">{/* 160px → 2/3 (107px) → +15% (123px), chủ dự án chỉnh 14/9/2026 */}
-                {/* tài khoản thường + lớp Cam Lâm: thanh bị khoá — lớp phủ trong suốt bắt cú chạm → hộp trả phí; ổ khoá nhỏ ở chân thanh */}
+                {/* tài khoản thường + lớp Cam Lâm: thanh bị khoá — lớp phủ trong suốt bắt cú chạm → hộp trả phí. KHÔNG vẽ ổ khoá / làm mờ thanh
+                    (chủ dự án 15/10/2026 khoanh ổ khoá: "bỏ cái khoá đi") — thanh nhìn như thường, chạm vào mới biết. */}
                 {khoaDoMo && <button type="button" aria-label="Chỉnh độ mờ là tính năng trả phí" onClick={() => setTraPhiQh('Chỉnh độ mờ bản đồ quy hoạch')}
-                  className="absolute inset-0 z-10 flex items-end justify-center pb-0.5 text-[11px]">🔒</button>}
+                  className="absolute inset-0 z-10" />}
                 <input type="range" min={0} max={100} value={Math.round(doMoHien * 100)} disabled={khoaDoMo} onChange={(e) => setOpacity(Number(e.target.value) / 100)} aria-label="Độ đậm lớp quy hoạch"
-                  style={{ background: `linear-gradient(to right, #dc2626 ${Math.round(doMoHien * 100)}%, rgba(255,255,255,.85) ${Math.round(doMoHien * 100)}%)`, opacity: khoaDoMo ? 0.55 : 1 }}
+                  style={{ background: `linear-gradient(to right, #dc2626 ${Math.round(doMoHien * 100)}%, rgba(255,255,255,.85) ${Math.round(doMoHien * 100)}%)` }}
                   className="absolute left-1/2 top-1/2 h-1 w-[123px] -translate-x-1/2 -translate-y-1/2 -rotate-90 cursor-pointer appearance-none rounded-full shadow-[0_0_2px_rgba(0,0,0,.5)]
                     [&::-webkit-slider-runnable-track]:h-1 [&::-webkit-slider-runnable-track]:bg-transparent
                     [&::-webkit-slider-thumb]:-mt-[8px] [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#dc2626] [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md

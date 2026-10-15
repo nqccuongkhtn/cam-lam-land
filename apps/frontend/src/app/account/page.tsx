@@ -10,6 +10,7 @@ import ImageCropper from '@/components/ImageCropper';
 import QuanLyVanTay from '@/components/QuanLyVanTay';
 import XinMoiGioiCn from '@/components/XinMoiGioiCn';
 import ThietBiCuaToi from '@/components/ThietBiCuaToi';
+import GoiCuaToi from '@/components/GoiCuaToi';
 import { toast } from '@/lib/toast';
 
 export default function Account() {
@@ -96,6 +97,9 @@ export default function Account() {
           <div><label className={lbl}>Email</label><input className={`${inp} bg-slate-50 text-slate-500`} value={user.email} disabled /></div>
           <button disabled={busy || uploading} className="cl-press bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold px-6 py-2.5 rounded-xl shadow-sm shadow-red-600/30">Lưu thông tin</button>
         </form>
+
+        {/* Gói đã mua + hạn dùng + lịch sử đơn (15/10/2026) */}
+        <GoiCuaToi />
 
         <form onSubmit={savePw} className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-4">
           <h2 className="font-bold text-[#0A2540]">Đổi mật khẩu</h2>

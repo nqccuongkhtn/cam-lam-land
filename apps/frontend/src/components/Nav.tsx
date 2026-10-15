@@ -188,6 +188,7 @@ export default function Nav() {
                     </div>
                     <Link href="/sales/post" className={`${mItem} sm:hidden text-[#C8A14B]`}>＋ Đăng tin mới</Link>
                     <Link href="/account" className={mItem}>Tài khoản của tôi</Link>
+                    <Link href="/account#goi-cua-toi" className={mItem}>Gói của tôi</Link>
                     <Link href="/sales" className={mItem}>Tin của tôi</Link>
                     {(laAdmin(user) || coVaiTro(user, 'gis') || coVaiTro(user, 'vanban')) && <Link href="/quan-tri" className={`${mItem} font-bold text-[#0A2540]`}>🛠️ Trang quản lý</Link>}
                     <div className="border-t border-slate-100 my-1" />

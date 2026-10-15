@@ -24,7 +24,9 @@ export const theoDoiRouter = Router();
 // Hai tài khoản chủ dự án yêu cầu (tìm theo EMAIL, không ghi cứng mã số).
 const EMAIL_THEO_DOI = ['banhchuoi8833@gmail.com', 'nguyenthiminhnguyet737@gmail.com',
   // thêm 10/10/2026 theo yêu cầu chủ dự án
-  'vtthoixnk@gmail.com', 'lethianhdung.b9pbc2020@gmail.com', 'tqdung_cl@gmail.com', 'nguyenthanhhauqg12@gmail.com'];
+  'vtthoixnk@gmail.com', 'lethianhdung.b9pbc2020@gmail.com', 'tqdung_cl@gmail.com', 'nguyenthanhhauqg12@gmail.com',
+  // thêm 15/10/2026 theo yêu cầu chủ dự án
+  'hung70vn@yahoo.com', 'ddhoang@ictu.edu.vn'];
 
 let dangTheoDoi = new Set<number>();          // mã các tài khoản đang theo dõi — nhớ trong RAM cho nhanh
 async function napDanhSach() {

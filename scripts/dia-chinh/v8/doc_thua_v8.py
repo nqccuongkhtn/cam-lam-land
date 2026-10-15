@@ -398,7 +398,11 @@ for f in tep:
                     m = mat[i]
                     if abs(m.area - dtn) > sai_cua(nhan[s]): continue
                     so_trong = set(x for x, p in so if m.contains(p)) | set(x for x, v in nhan.items() if len(v) > 2 and v[2] is not None and m.contains(v[2]))
-                    if so_trong - {s}: continue
+                    # số KHÁC trong mặt: chỉ chặn khi số đó cũng có nhãn khớp mặt (mơ hồ) hoặc có từ 2 số có nhãn trở lên. Số không nhãn nằm
+                    # chung mặt hay là SỐ THỬA CŨ để lại (tờ 317: mặt 470,69 m² = nhãn thửa 115 nhưng chứa cả số 114 không nhãn) — 15/10 tối.
+                    khac = so_trong - {s}
+                    if any(x in nhan and abs(m.area - nhan[x][1]) <= sai_cua(nhan[x]) for x in khac): continue
+                    if any(x in nhan for x in khac) and len(khac) > 1: continue
                     if da is not None and m.intersection(da).area > 0.5: continue
                     ung.append((m.distance(g0), k, m))
         if ung:

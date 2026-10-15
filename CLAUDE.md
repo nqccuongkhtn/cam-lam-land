@@ -478,10 +478,11 @@ Chủ dự án đưa bộ **387 tờ DGN V8 xã Cam Lâm** (`D:\BandoCamLam\Ban 
   `52`); tờ 58 Level 4 lại là số cao độ. **Level 54 / `KHUNGTHU` = TÊN CHỦ — không đọc, không ghi ra file.** Vì mỗi xã cũ vẽ một kiểu nên
   bộ đổi TỰ DÒ theo từng tờ (lớp ranh = lớp có ≥ 80 % chiều dài trùng ranh thửa web; lớp số = lớp khớp ô nhãn nhiều nhất) và **chọn hình
   KHỚP NHÃN**: thử dựng từ ít → nhiều lớp, thửa có nhãn lấy hình có diện tích khớp số trên nhãn (≤ 0,15 m²).
-- **Số liệu (bản cuối 15/10 tối, 391 tờ kể cả 303 / 313 / 314 / 317):** 90.739 số thửa → dựng được 89.456 (98,6 %), khớp nhãn 86.269 /
-  88.007. So với web: giống 62.828 · cùng hình nhưng lệch vị trí 8.104 (một cụm lệch đúng 0,27 m Đ / 0,07 m B = nửa độ trượt lớp web) · khác
-  5.453 · **web chưa có 13.071** (web THIẾU cả mảng — vd tờ 7: web 221 thửa, V8 487; chỗ đó trên web không có thửa nào) · web có mà V8 không
-  có 4.649. Thửa 70 · Tờ 25 V8 = 511,889 m², trùng web. Bảng theo từng tờ (mở Excel): `ket-qua\tong-hop-theo-to.csv`.
+- **Số liệu (bản cuối 15/10 tối, 391 tờ kể cả 303 / 313 / 314 / 317):** 90.789 số thửa → dựng được 89.766 (98,9 %), khớp nhãn 86.579 /
+  88.317. So với web: giống 62.978 · cùng hình nhưng lệch vị trí 8.134 (một cụm lệch đúng 0,27 m Đ / 0,07 m B = nửa độ trượt lớp web) · khác
+  5.518 · **web chưa có 13.136** (web THIẾU cả mảng — vd tờ 7: web 221 thửa, V8 487; chỗ đó trên web không có thửa nào) · web có mà V8 không
+  có 4.706. Lượt ghép theo diện tích nhận cả mặt có thêm một SỐ KHÔNG NHÃN (hay là số thửa cũ để lại — tờ 317: mặt 470,69 m² = nhãn thửa
+  115 nhưng chứa cả số 114): +310 thửa, +150 giống web, không tờ nào giảm. Thửa 70 · Tờ 25 V8 = 511,889 m², trùng web. Bảng theo từng tờ (mở Excel): `ket-qua\tong-hop-theo-to.csv`.
 - ⚠️ **TỜ 396 / 397 / 398 LỆCH BẢNG TRA SỐ TỜ** (rà 15/10 tối: chồng điểm giữa mọi thửa V8 lên thửa web): 100 % thửa của file dc396 / dc397
   nằm trên thửa web Cam An Nam tờ 16 / 17, file dc398 tiêu đề ghi "xã Cam An Bắc - Tờ số 21" và nằm trên Cam An Bắc tờ 21 — trong khi bảng
   `dia_chinh_to` (từ `traSoBanDo.ts`) ghi tờ mới 396 / 397 / 398 = Cam An Nam 15 / 16 / 17. Lớp V8 đối chiếu theo tờ của BẢN VẼ
@@ -495,7 +496,7 @@ Chủ dự án đưa bộ **387 tờ DGN V8 xã Cam Lâm** (`D:\BandoCamLam\Ban 
   lô) và số NGOÀI KHUNG (khung nhận theo HÌNH: lớp có 4 cạnh dài khép kín chứa ≥ 50 % số — tờ 16 Level 55, tờ 247 Level 60) trừ số nằm
   trong mặt khép kín (tờ 16 Thửa 357 nằm trọn ngoài khung mà web vẫn có); lớp dài ≥ 2 km trùng ranh web < 2 % (đường đồng mức) bỏ khỏi
   BỘ LÕI. 8 tờ: 537 → 1.876 thửa (giống web 78 → 680), không tờ nào giảm, không tờ nào bớt thửa "giống web". Tờ 386 (Cam An Nam tờ 1): nét ranh trùng web ≤ 9 %
-  ở mọi lớp — chưa dựng được, cần soi riêng.
+  ở mọi lớp — soi 15/10 tối: bản vẽ CHỈ có đường đồng mức (Level 1 + 2), không có nét ranh thửa nào ở chỗ web có 349 thửa → cần bản vẽ khác.
 - **Tờ lẻ ngoài bộ `bddc`** (`D:\KhoQH\dia-chinh-v8\dxf\nguon.json` ghi nguồn từng tờ): 303, 313, 314 ở thư mục cha; **317 chỉ có trong
   "Sinh Du An VIN chuyen"** (bộ chính thiếu). Bản MỚI HƠN ngoài bộ chính của tờ 19 (`DC19.dgn` 8/1/2026), 312 + 314 (thư mục VIN, 16/4 và
   16/1/2026) đã xuất riêng (`dxf-ban-moi`) và so TỪNG THỬA với bản đang dùng: hình, loại đất, diện tích Y HỆT (0 thửa khác) ⇒ giữ bản đang dùng.
@@ -513,7 +514,7 @@ Chủ dự án đưa bộ **387 tờ DGN V8 xã Cam Lâm** (`D:\BandoCamLam\Ban 
 - **Trên web (chỉ admin):** bảng lớp → "Đối chiếu bản đồ V8 (xã Cam Lâm)": viền hồng nét đứt, tô đỏ = khác, vàng = lệch vị trí, xanh = web chưa
   có; bấm thửa → khung "Bản đồ V8 (đối chiếu)" trong bảng thông tin thửa. Máy chủ: `GET /api/qh-rieng/dc-v8/:z/:x/:y` (chỉ mức 16) +
   `/dc-v8/tai?lng&lat` — vé `'a'` (routes/qhRieng.ts). Bảng tạo trong `migrate.ts`.
-- **Còn dở:** 1.283 số thửa chưa dựng được hình (`chua-dung-duoc.csv`) — phần lớn do BẢN VẼ thiếu nét (vd tờ 344: lô 540–559 không có nét
+- **Còn dở:** 1.023 số thửa chưa dựng được hình (`chua-dung-duoc.csv`) — phần lớn do BẢN VẼ thiếu nét (vd tờ 344: lô 540–559 không có nét
   chia lô, nét Level 2 không chạm khối); tờ 162, 172 trống thật (không có thửa); 37 tờ hụt > 5 % (nặng nhất các tờ chữ lớn 59, 344, 58, 246, 247, 342).
   Chưa quyết: có thay lớp thửa web bằng bản V8 không (chờ chủ dự án đối chiếu xong).
 

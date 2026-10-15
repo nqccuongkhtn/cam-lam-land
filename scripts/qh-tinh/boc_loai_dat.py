@@ -436,14 +436,30 @@ if '--thong-ke-den' in co:
     # đứng một mình (đã bỏ mã trên của phân số) mang mã thuộc đúng tập mã của màu → theo quy ước bản đồ là đất GIỮ NGUYÊN loại hiện trạng.
     px_m2 = (m_moi_pt / S) ** 2
     dt_den = collections.Counter(); so_den = 0
+    dt_chat = collections.Counter(); so_chat = 0     # bản CHẶT: trong mảng KHÔNG có nhãn đỏ nào (kể cả mã khác nhóm màu) — không có gì mâu thuẫn
     for p, ds in nhan_mang.items():
         if not bang[p] or not ds_ma[bang[p] - 1].startswith('NHOM:'): continue
         tap = set(ds_ma[bang[p] - 1][5:].split('/'))
         den = [t for t, do_ in ds if not do_ and t in tap]
         if den: so_den += 1; dt_den[collections.Counter(den).most_common(1)[0][0]] += so_px[p] * px_m2
+        if den and not any(do_ for _, do_ in ds) and not nhan_ngoai.get(p):
+            so_chat += 1; dt_chat[collections.Counter(den).most_common(1)[0][0]] += so_px[p] * px_m2
     tong_nhom = sum(int(so_px[p]) for p in range(1, so_mang + 1) if bang[p] and ds_ma[bang[p] - 1].startswith('NHOM:')) * px_m2
     print(f'THONG KE CHU DEN: {so_den} mang nhom co chu den cung nhom mau = {sum(dt_den.values()) / 1e4:.1f} ha / {tong_nhom / 1e4:.1f} ha nhom; '
           f'ma: {[(m, round(v / 1e4, 1)) for m, v in dt_den.most_common(12)]}')
+    print(f'THONG KE CHU DEN (CHAT - mang khong co nhan do nao): {so_chat} mang = {sum(dt_chat.values()) / 1e4:.1f} ha; '
+          f'ma: {[(m, round(v / 1e4, 1)) for m, v in dt_chat.most_common(12)]}')
+    # Ghi VỊ TRÍ từng nhãn đen đó (điểm PDF) ra <ra>.chu-den.json — để cắt ảnh PDF đúng chỗ mà soi bằng mắt trước khi quyết.
+    mau_den = []
+    for t, cx, cy, do_, *_ in nhan:
+        if do_: continue
+        p = pid_tai(cx, cy)
+        if not p or not bang[p] or not ds_ma[bang[p] - 1].startswith('NHOM:'): continue
+        if t not in set(ds_ma[bang[p] - 1][5:].split('/')): continue
+        mau_den.append({'ma': t, 'nhom': ds_ma[bang[p] - 1][5:], 'mang': p, 'ha': round(float(so_px[p] * px_m2) / 1e4, 2),
+                        'x_pt': round(cx / S, 1), 'y_pt': round(cy / S, 1), 'mau': str(mau_mang[p]),
+                        'chat': not any(d_ for _, d_ in nhan_mang.get(p, [])) and not nhan_ngoai.get(p)})
+    json.dump(mau_den, open(ra + '.chu-den.json', 'w', encoding='utf-8'), ensure_ascii=False)
     sys.exit(0)
 loai1 = bang[pimg]
 _tr = collections.Counter()

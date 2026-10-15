@@ -175,7 +175,7 @@ function QcTrangChu() {
               <input defaultValue={o.nut || ''} onBlur={(e) => sua(k, id, 'nut', e.target.value)} placeholder="Chữ nút — vd: Xem dự án" className={inp} />
               <label className="flex items-center gap-2 text-xs text-slate-500">Hết hạn<input type="date" value={o.hanDen || ''} onChange={(e) => sua(k, id, 'hanDen', e.target.value)} className={inp} /></label>
             </div>
-            <input defaultValue={o.link || ''} onBlur={(e) => sua(k, id, 'link', e.target.value)} placeholder="Bấm vào đi đâu — /listings/123 · https://... · tel:0567442996 · https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" className={inp} />
+            <input defaultValue={o.link || ''} onBlur={(e) => sua(k, id, 'link', e.target.value)} placeholder="Bấm vào đi đâu — /listings/123 · https://... · tel:0567442996 · https://zalo.me/0582594956" className={inp} />
             <input defaultValue={o.anh || ''} onBlur={(e) => sua(k, id, 'anh', e.target.value)} placeholder="Link ảnh nền (nên có — ảnh chạy động) — ảnh ngang, vd 800×500" className={inp} />
             <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500">Màu (khi không có ảnh):
               {Object.entries(MAU_QC).map(([mid, m]) => <button key={mid} onClick={() => sua(k, id, 'mau', mid)} className={`px-2 py-1 rounded text-[11px] font-bold ${(o.mau || 'xanh') === mid ? 'ring-2 ring-offset-1 ring-[#0A2540]' : ''}`} style={{ background: m.nen, color: m.chu }}>{m.ten}</button>)}

@@ -35,8 +35,9 @@ export const CO_GIOI_HAN = 'gioi_han_thiet_bi';
 export const TOI_DA_MAC_DINH = Number(process.env.THIET_BI_TOI_DA || 3);
 // Zalo admin (15/10/2026, chủ dự án: "zalo admin thì đưa về số 0582594956 cho tự kết bạn chứ không hiện số") — chỉ dùng làm ĐƯỜNG DẪN
 // zalo.me/<số>, KHÔNG in số ra chữ cho người dùng.
-// Đường dẫn = mã QR kết bạn Zalo admin chủ dự án gửi (zaloapp.com/qr/p/… — không lộ số); ZALO_ADMIN trong .env đè được.
-export const ZALO_ADMIN = process.env.ZALO_ADMIN || 'https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr';
+// Đường dẫn Zalo admin = zalo.me/<số> (mở thẳng khung chat / kết bạn; chữ hiện ra chỉ ghi "Zalo admin", không in số). KHÔNG dùng đường trong
+// mã QR (zaloapp.com/qr/p/…): chỉ chạy khi quét bằng app Zalo, mở bằng trình duyệt bị đẩy về trang chủ (15/10/2026). ZALO_ADMIN trong .env đè được.
+export const ZALO_ADMIN = process.env.ZALO_ADMIN || 'https://zalo.me/0582594956';
 export const PHI_RESET = Number(process.env.PHI_RESET_THIET_BI || 100000);
 
 const ipCua = (req: Request) => String(req.headers['cf-connecting-ip'] || req.ip || '').slice(0, 64);

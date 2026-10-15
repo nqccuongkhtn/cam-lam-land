@@ -518,7 +518,7 @@ Chủ dự án: "trả phí chia ra là các chức năng chung, còn trả phí
 - **Đền bù** (`/den-bu`, chỉ chặn ở GIAO DIỆN — số liệu là văn bản công khai): người không có gói → che mọi số tiền, hệ số (× 1,12), số hiệu
   văn bản, ngày, số Điều / khoản / STT, năm (`RE_SO` + `cheSo`, chủ dự án: "che mà số quyết định các thứ còn như này họ tự kiếm"); ô tính khoá;
   nút mở văn bản gốc gỡ đường dẫn. Thẻ ② tìm CHUNG QĐ 08 + QĐ 12 (chủ dự án hỏi "sao chưa đưa quyết định 12 vào").
-- **Zalo admin** = mã QR kết bạn `zaloapp.com/qr/p/1dm0n6xcgp0zz` (không hiện số); ảnh `public/zalo-admin-qr.png`.
+- **Zalo admin**: nút / đường dẫn = `https://zalo.me/0582594956` (chữ trên nút chỉ ghi "Zalo admin", không hiện số). ĐỪNG dùng đường trong mã QR (`zaloapp.com/qr/p/1dm0n6xcgp0zz`): chỉ chạy khi QUÉT bằng app Zalo, mở bằng trình duyệt là bị đẩy về trang chủ zalo.me/vi/ (chủ dự án báo 15/10/2026). Ảnh mã QR để quét: `public/zalo-admin-qr.png`; máy chủ: `ZALO_ADMIN` (lib/thietBi.ts).
 
 ## THỬA KHÁCH TỰ VẼ TỪ TOẠ ĐỘ cũng kiểm tra quy hoạch được (15/10/2026)
 
@@ -670,6 +670,7 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   (4.585 ha) gọi "Đất sông, ngòi, kênh, rạch" dù chú dẫn dùng màu này cho cả hồ / thuỷ lợi / ao nuôi — 15/10/2026 chủ dự án chọn ĐỂ NGUYÊN.
   (7) NHÃN GHÉP "+" ("TMD+ODT", "NKH+TMD", "DTT+DKV+TMD"… 119 nhãn) = một loại "Đất hỗn hợp (TMD + ODT)" — trước tách mã rồi bỏ mã trái
   màu (thửa 326 tờ 7 Cam Đức: app tham chiếu ghi đất hỗn hợp, web ghi thương mại dịch vụ). Chữ "%%u…%%U" (gạch chân CAD) bỏ trước khi đọc mã.
+- **ẢNH QĐ893 VÁ CHỖ THỦNG (15/10/2026 chiều — chủ dự án: "893 vẫn có vài chỗ lổm chổm").** Bộ ảnh `qd893v1` cắt từ dữ liệu GDAL cũ nên thiếu đúng các vùng tô hỏng viền / lẫn vòng hỏng mà 5f đã bổ sung cho phần TÍNH (11/10) → nhìn xuyên xuống ảnh vệ tinh. Dò ở mức 15: 22 chỗ, 78,7 ha (điện mặt trời Cam An 66,7 ha, đất công cộng 5,4 + 1,6 ha, đất ở Cam Hiệp Bắc 2,5 ha, đất quốc phòng Cam Hòa 2,1 ha, ~15 khe đường nhỏ). Vá 242 ô (mức 8–18) bằng MÀU TÔ GỐC của bản vẽ (`quyhoach2025/qd893_qh_chanle.geojson` trường `c`) — chỉ trong khung chỗ thủng, ảnh cũ đè lên màu tô (điểm đã có màu / nét giữ nguyên); dò lại = 0 chỗ thủng. Sao lưu ô cũ: `D:\KhoQH\sao-luu\qd893v1-truoc-va-thung-15-10\` (trả lại = chép đè ngược vào `public/tiles/qd893v1` + volume `camlamgis_camlam_tiles`). Đường ảnh đổi `?v=3` (map + listings) cho máy khách tải ô mới. Kịch bản dò / vá: `scripts/qh-pipeline/va-anh-893/` (`do_lo_thung.py` → `lo-thung.json` → `va_lo_thung.py [--thu]`) — cắt lại bộ ảnh 893 từ đầu thì phải vá lại.
 - **QĐ893 BỎ DẢI VIỀN RANH HUYỆN (15/10/2026).** Vùng tô hồng #ff7fff ở Level 0 (h 6ADCB9) là dải viền 75 m chạy quanh cả huyện (khung
   31 × 31 km, 860 ha) — từng thành ô "Đất ở" nằm dưới mọi ô khác nên chỉ lộ NGOÀI phần đã quy hoạch: 266 thửa Cam Lâm sát ranh (70,6 ha
   "Đất ở" bịa — Thửa 368 · Tờ 1 Suối Dầu 40.272 m²) + 742 thửa huyện bên (431 ha). `5b` / `5f` có hàm `la_vien_ranh()` (khung bao ≥ 80 %

@@ -217,7 +217,7 @@ export default function ServicesPage() {
           </div>
           <div className="mt-4 md:mt-0 flex flex-col gap-2 shrink-0 w-full md:w-auto">
             <a href="tel:0567442996" className="bg-[#0A2540] text-white font-bold px-6 py-2.5 rounded-xl text-center">📞 0567 442 996</a>
-            <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" className="bg-[#0068FF] text-white font-bold px-6 py-2.5 rounded-xl text-center">Chat Zalo</a>
+            <a href="https://zalo.me/0582594956" target="_blank" rel="noreferrer" className="bg-[#0068FF] text-white font-bold px-6 py-2.5 rounded-xl text-center">Chat Zalo</a>
           </div>
         </div>
 
@@ -228,7 +228,7 @@ export default function ServicesPage() {
           </div>
           <div className="mt-4 md:mt-0 flex flex-col gap-2 shrink-0 w-full md:w-auto">
             <a href="tel:0567442996" className="bg-[#0A2540] text-white font-bold px-6 py-2.5 rounded-xl text-center">📞 0567 442 996</a>
-            <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" className="bg-[#0068FF] text-white font-bold px-6 py-2.5 rounded-xl text-center">Chat Zalo</a>
+            <a href="https://zalo.me/0582594956" target="_blank" rel="noreferrer" className="bg-[#0068FF] text-white font-bold px-6 py-2.5 rounded-xl text-center">Chat Zalo</a>
           </div>
         </div>
         </>)}

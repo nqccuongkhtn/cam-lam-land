@@ -14,10 +14,10 @@ const tienGoc = (v: number) => Math.round(v).toLocaleString('vi-VN') + ' đ';
 // CHE SỐ LIỆU TRONG CHỮ VIẾT SẴN (15/10/2026 — chủ dự án chụp thẻ "Căn cứ pháp luật": "vẫn chưa che"). Tài khoản chưa có quyền tính giá đền
 // bù: mọi con số CÓ ĐƠN VỊ (đồng, đ, %, kg, tháng, triệu, lần, m², người, ha) hoặc có DẤU CHẤM NGHÌN trên trang đổi thành 0 + làm mờ.
 // Cùng ngày chủ dự án chụp thẻ ③: "che mà số quyết định các thứ còn như này họ tự kiếm tự xem cần gì mình" → che THÊM mọi thứ giúp tự tra ra
-// văn bản gốc + hệ số (× 1,12): số có gạch chéo (số hiệu "35/2026/QĐ-UBND" → "00/0000/QĐ-UBND", ngày "04/5/2026", phân số), số đứng sau Điều / khoản / điểm /
+// văn bản gốc + hệ số (× 1,12): số có gạch chéo (số hiệu "35/2026/QĐ-UBND" → "00/0000/QĐ-UBND", "306/TB-HĐTĐ" → "000/TB-HĐTĐ", ngày "04/5/2026", phân số), số đứng sau Thông báo / Điều / khoản / điểm /
 // Chương / Mục / Số / STT / QĐ / NQ / Công văn / Quyết định…, và năm (19xx, 20xx). Chữ số DÍNH SAU CHỮ CÁI (m2, m3) là đơn vị → giữ nguyên;
 // số trong tên hạng mục ("Nhà ở 1 tầng") giữ để người xem vẫn hiểu nội dung. Duyệt cả cây giao diện (cloneElement).
-const RE_SO = /(\d{1,3}(?:\.\d{3})+(?:,\d+)?(?:\s?(?:đồng|đ(?![a-zà-ỹ])|triệu))?|\d+(?:[.,]\d+)?\s?(?:%|kg|tháng|triệu|lần|m²|đồng|đ(?![a-zà-ỹ])|người|ha(?![a-zà-ỹ]))|\d+(?:\s?\/\s?\d+)+\/?|×\s?\d+(?:[.,]\d+)?|(?:Điều|điều|Khoản|khoản|Điểm|điểm|Chương|chương|Mục|mục|Số|số|STT|QĐ|NQ|NĐ|TT|CV|Công văn|công văn|Quyết định|quyết định|Nghị quyết|nghị quyết|Nghị định|nghị định|Thông tư|thông tư)\s+\d+(?:\s*[,–-]\s*\d+)*|(?:19|20)\d{2}(?!\d))/g;
+const RE_SO = /(\d{1,3}(?:\.\d{3})+(?:,\d+)?(?:\s?(?:đồng|đ(?![a-zà-ỹ])|triệu))?|\d+(?:[.,]\d+)?\s?(?:%|kg|tháng|triệu|lần|m²|đồng|đ(?![a-zà-ỹ])|người|ha(?![a-zà-ỹ]))|\d+(?:\s?\/\s?\d+)+\/?|\d+\/(?=[A-ZĐ])|×\s?\d+(?:[.,]\d+)?|(?:Thông báo|thông báo|Tờ trình|tờ trình|Kế hoạch|kế hoạch|Điều|điều|Khoản|khoản|Điểm|điểm|Chương|chương|Mục|mục|Số|số|STT|QĐ|NQ|NĐ|TT|CV|Công văn|công văn|Quyết định|quyết định|Nghị quyết|nghị quyết|Nghị định|nghị định|Thông tư|thông tư)\s+\d+(?:\s*[,–-]\s*\d+)*|(?:19|20)\d{2}(?!\d))/g;
 // Chữ số đứng ngay sau chữ cái (m2, m3, UBTVQH15) không phải số liệu → không che. (Không dùng "lookbehind" trong biểu thức trên vì
 // iPhone đời cũ — Safari < 16.4 — không hiểu, cả trang sẽ hỏng.)
 const DINH_CHU = /[A-Za-zÀ-ỹĐđ]/;

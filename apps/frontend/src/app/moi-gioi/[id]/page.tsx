@@ -77,7 +77,7 @@ export default function AgentProfilePage() {
       {/* Contact */}
       <div className="max-w-5xl mx-auto px-3 sm:px-4 -mt-4">
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-3 sm:p-4 flex flex-wrap gap-2.5">
-          <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-[#0068FF] hover:bg-[#0058d6] text-white font-bold py-2.5 rounded-xl">💬 Chat qua Zalo</a>
+          <a href="https://zalo.me/0582594956" target="_blank" rel="noreferrer" className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-[#0068FF] hover:bg-[#0058d6] text-white font-bold py-2.5 rounded-xl">💬 Chat qua Zalo</a>
           {soDu
             ? <a href={`tel:${soDu.replace(/\s/g, '')}`} className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold py-2.5 rounded-xl">📞 Gọi {soDu}</a>
             : agent.phone

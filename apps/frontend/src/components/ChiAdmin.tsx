@@ -29,7 +29,7 @@ export default function ChiAdmin({ ten, vaiTro = [], traPhi = false, children }:
         <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">{traPhi ? 'Đây là tính năng trả phí — vui lòng liên hệ admin Cam Lâm Land để đăng ký dùng.' : 'Vui lòng liên hệ admin Cam Lâm Land để được dùng tiện ích này.'}</p>
         <div className="mt-3 grid grid-cols-2 gap-2">
           <a href="tel:0567442996" className="rounded bg-[#0A2540] py-2 text-center text-[13px] font-semibold text-white">📞 0567 442 996</a>
-          <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" className="rounded border border-[#0068FF] py-2 text-center text-[13px] font-semibold text-[#0068FF]">Zalo admin</a>
+          <a href="https://zalo.me/0582594956" target="_blank" rel="noreferrer" className="rounded border border-[#0068FF] py-2 text-center text-[13px] font-semibold text-[#0068FF]">Zalo admin</a>
           <button type="button" onClick={() => { try { window.dispatchEvent(new CustomEvent('cl-open-chat', { detail: { tab: 'support' } })); } catch { /* bỏ qua */ } }}
             className="col-span-2 rounded border border-slate-300 py-2 text-[13px] font-semibold text-[#0A2540]">💬 Nhắn tin cho admin</button>
           <div className="col-span-2 hidden items-center gap-3 rounded border border-slate-200 p-2 sm:flex">

@@ -344,7 +344,7 @@ export default function ListingDetail() {
                   <p className="min-w-0 text-[17px] font-medium leading-snug text-[#2c2c2c]">{l.contactName || 'Cam Lâm Land'}</p>
                 </div>
                 <div className="mt-4 space-y-2.5">
-                  <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white text-[15px] font-medium text-[#2c2c2c] hover:bg-slate-50"><svg viewBox="0 0 24 24" fill="#0068FF" className="h-5 w-5"><path d="M12 2C6.5 2 2 5.8 2 10.5c0 2.6 1.4 4.9 3.6 6.4-.1.9-.5 2.2-1.2 3.1 1.4-.2 2.8-.8 3.9-1.5 1.1.3 2.4.5 3.7.5 5.5 0 10-3.8 10-8.5S17.5 2 12 2z" /></svg> Chat qua Zalo</a>
+                  <a href="https://zalo.me/0582594956" target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white text-[15px] font-medium text-[#2c2c2c] hover:bg-slate-50"><svg viewBox="0 0 24 24" fill="#0068FF" className="h-5 w-5"><path d="M12 2C6.5 2 2 5.8 2 10.5c0 2.6 1.4 4.9 3.6 6.4-.1.9-.5 2.2-1.2 3.1 1.4-.2 2.8-.8 3.9-1.5 1.1.3 2.4.5 3.7.5 5.5 0 10-3.8 10-8.5S17.5 2 12 2z" /></svg> Chat qua Zalo</a>
                   {full ? (
                     <a href={`tel:${full.replace(/\s/g, '')}`} className="flex h-12 items-center justify-center gap-2 rounded-lg bg-[#009ba1] text-[15px] font-semibold text-white hover:bg-[#008a90]"><IPhone /> {full}</a>
                   ) : (
@@ -384,7 +384,7 @@ export default function ListingDetail() {
                 )}
               </div>
               <div className="px-2 pt-2.5 pb-2.5 space-y-2">
-                <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-white hover:bg-slate-50 border border-slate-200 text-[#0A2540] font-bold py-2.5 rounded-lg text-[14px]"><svg viewBox="0 0 24 24" fill="#0068FF" className="w-5 h-5"><path d="M12 2C6.5 2 2 5.8 2 10.5c0 2.6 1.4 4.9 3.6 6.4-.1.9-.5 2.2-1.2 3.1 1.4-.2 2.8-.8 3.9-1.5 1.1.3 2.4.5 3.7.5 5.5 0 10-3.8 10-8.5S17.5 2 12 2z" /></svg> Chat qua Zalo</a>
+                <a href="https://zalo.me/0582594956" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-white hover:bg-slate-50 border border-slate-200 text-[#0A2540] font-bold py-2.5 rounded-lg text-[14px]"><svg viewBox="0 0 24 24" fill="#0068FF" className="w-5 h-5"><path d="M12 2C6.5 2 2 5.8 2 10.5c0 2.6 1.4 4.9 3.6 6.4-.1.9-.5 2.2-1.2 3.1 1.4-.2 2.8-.8 3.9-1.5 1.1.3 2.4.5 3.7.5 5.5 0 10-3.8 10-8.5S17.5 2 12 2z" /></svg> Chat qua Zalo</a>
                 {full ? (
                   <a href={`tel:${full.replace(/\s/g, '')}`} className="flex items-center justify-center gap-2 bg-[#0e8b80] hover:bg-[#0b7d72] text-white font-extrabold text-[15px] py-2.5 rounded-lg"><IPhone /> {full}</a>
                 ) : (

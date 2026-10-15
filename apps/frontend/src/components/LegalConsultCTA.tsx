@@ -42,7 +42,7 @@ export default function LegalConsultCTA({ topic, className }: { topic?: string; 
             <button onClick={submit} disabled={busy} className="cl-press bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold px-5 py-2.5 rounded-lg whitespace-nowrap">{busy ? 'Đang gửi…' : 'Nhận tư vấn'}</button>
           </div>
           {err && <p className="text-xs text-red-600 mt-1.5 font-semibold">{err}</p>}
-          <p className="text-[12px] text-slate-500 mt-2">Hoặc <button type="button" onClick={openChat} className="font-bold text-emerald-700 underline underline-offset-2 hover:text-emerald-800">💬 chat tư vấn trực tiếp</button> · gọi <b>0567 442 996</b> · <a href="https://zaloapp.com/qr/p/1dm0n6xcgp0zz?src=qr" target="_blank" rel="noreferrer" className="font-bold text-[#0068FF]">Zalo admin</a> · Bảo mật thông tin.</p>
+          <p className="text-[12px] text-slate-500 mt-2">Hoặc <button type="button" onClick={openChat} className="font-bold text-emerald-700 underline underline-offset-2 hover:text-emerald-800">💬 chat tư vấn trực tiếp</button> · gọi <b>0567 442 996</b> · <a href="https://zalo.me/0582594956" target="_blank" rel="noreferrer" className="font-bold text-[#0068FF]">Zalo admin</a> · Bảo mật thông tin.</p>
         </>
       )}
     </div>

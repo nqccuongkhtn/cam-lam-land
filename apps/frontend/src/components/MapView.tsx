@@ -238,6 +238,10 @@ export default function MapView({ center, zoom, className, layers = [], markers 
   // Giữ địa chỉ ô địa chính trong ref: nếu vé xem về TRƯỚC khi bản đồ nạp xong thì
   // lúc nạp xong vẫn đọc được giá trị mới nhất (đọc thẳng biến sẽ dính giá trị cũ).
   const dcTilesRef = useRef(diaChinhTiles); dcTilesRef.current = diaChinhTiles;
+  // Cùng lý do cho DANH SÁCH LỚP ẢNH QUY HOẠCH (15/10/2026): vé admin về trước khi bản đồ nạp xong → trang đổi sang QĐ205 nhưng bước
+  // khởi tạo lại vẽ theo danh sách cũ (QĐ893) → nút lớp + bảng thửa ghi QĐ205 mà bản đồ hiện QĐ893 (chủ dự án: "mở 893 nhưng thông tin
+  // lại không phải"). syncOverlays đọc danh sách MỚI NHẤT qua ref này.
+  const overlaysRef = useRef(overlays); overlaysRef.current = overlays;
   const initialBoundsRef = useRef(initialBounds);
   initialBoundsRef.current = initialBounds;
   const didFitRef = useRef(false);
@@ -460,7 +464,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
 
   function syncOverlays() {
     const map = mapRef.current; if (!map || !readyRef.current) return;
-    for (const ov of overlays) {
+    for (const ov of overlaysRef.current) {
       const srcId = `ovsrc-${ov.id}`;
       if (ov.pmtiles) {
         // Đọc pmtiles theo dạng tile-template để tự đặt maxzoom riêng cho từng lớp.

@@ -296,6 +296,9 @@ Bản đồ QHSDĐ cấp tỉnh không đăng PDF công khai (nằm trong phụ 
   ≥ 3 GB + giờ, chép ô vào volume `camlam_tiles` sang tên tạm rồi đổi chỗ, `them_lop_lam_dong.py` khai 2 lớp vào `app/map/page.tsx` —
   RASTER_OVERLAYS, VUNG_QH "Đà Lạt / Đức Trọng (Lâm Đồng)", MUC_QH, CAN_CU_QH (số / ngày / trích yếu đọc trên bản quét ký số), ovOn —
   dựng lại frontend `--no-deps`, khởi động lại nginx, kiểm ô ảnh 200). Chưa chạy (15/10 tối ổ C còn 1,7 GB).
+- **Bóc loại đất Lâm Đồng: CHƯA có.** Thử 15/10 22h với Đà Lạt (`boc_loai_dat.py … --mau-chuan=bang-mau-chuan.json --vector`, không lớp chữ
+  nên chỉ theo màu): tiến trình ăn ~5,7 GB RAM, máy còn 1,3 GB trống → hệ thống dừng lệnh; tiến trình sót đã tắt, web không ảnh hưởng.
+  Chạy lại thì chạy RIÊNG lúc máy rảnh (không song song việc khác). Web chưa có thửa địa chính Lâm Đồng nên chưa cần gấp.
 
 ## Nắn toạ độ — chi tiết kỹ thuật
 - `vn2000.py` = bản chuyển Python của `apps/backend/src/lib/vn2000.ts` (VN-2000 Khánh Hòa, KTT 108°15',

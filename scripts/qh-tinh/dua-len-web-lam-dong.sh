@@ -27,6 +27,16 @@ echo "   Ổ C còn trống: ${trong_c:-?} MB"
 gio=$(date +%H%M); if [ "$gio" -ge 0200 ] && [ "$gio" -lt 0215 ]; then echo "DỪNG: 2h00–2h15 máy đang tự nén kho Docker — chạy lại sau 2h15."; exit 1; fi
 for t in $BO; do [ -d "$T/$t" ] || { echo "LỖI: thiếu bộ ô $T/$t"; exit 1; }; done
 if [ "$TU" -le 1 ]; then
+# Bộ ô đã có ĐỦ trong kho (đếm khớp ổ D) thì bỏ qua bước chép — 16/10 2h17 bước 1–2 đã xong, chỉ bước dựng giao diện bị máy dừng vì thiếu RAM.
+du_ca=1
+for t in $BO; do
+  n_may=$(find "$T/$t" -type f -name '*.webp' | wc -l)
+  n_web=$(docker run --rm -v camlamgis_camlam_tiles:/t "$ANH" sh -c "find /t/$t -type f -name '*.webp' 2>/dev/null | wc -l")
+  [ "$n_may" -eq "$n_web" ] || du_ca=0
+done
+if [ "$du_ca" = 1 ]; then echo "[1/4] Kho ô ảnh đã có đủ 2 bộ ô (đếm khớp ổ D) — bỏ qua bước chép."; TU=2; fi
+fi
+if [ "$TU" -le 1 ]; then
 echo "[1/4] Chép 2 bộ ô ảnh vào kho ô ảnh của web (camlamgis_camlam_tiles)…"
 docker rm -f chep_tiles_ld >/dev/null 2>&1 || true
 docker create --name chep_tiles_ld -v camlamgis_camlam_tiles:/dest "$ANH" true >/dev/null
@@ -49,8 +59,9 @@ echo "[2/4] Khai 2 lớp vào trang bản đồ…"
 python -P scripts/qh-tinh/them_lop_lam_dong.py
 fi
 if [ "$TU" -le 3 ]; then
-echo "[3/4] Dựng lại phần giao diện (chỉ frontend, --no-deps) rồi khởi động lại nginx…"
+echo "[3/4] Dựng lại phần giao diện (chỉ frontend, --no-deps), xoá đệm nginx (CHỈ thư mục đệm [0-9a-f]) rồi khởi động lại nginx…"
 $DC up -d --no-deps --build frontend
+docker exec camlam_nginx sh -c 'rm -rf /var/cache/nginx/[0-9a-f]' || true
 $DC restart nginx
 fi
 echo "[4/4] Tự kiểm ô ảnh qua nginx…"

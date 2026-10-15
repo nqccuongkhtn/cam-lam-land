@@ -295,7 +295,11 @@ Bản đồ QHSDĐ cấp tỉnh không đăng PDF công khai (nằm trong phụ 
   (web chưa có thửa địa chính Lâm Đồng). **ĐƯA LÊN WEB: nháy đúp `DUA-LEN-WEB-LAM-DONG.bat`** (→ `dua-len-web-lam-dong.sh`: tự kiểm ổ C
   ≥ 3 GB + giờ, chép ô vào volume `camlam_tiles` sang tên tạm rồi đổi chỗ, `them_lop_lam_dong.py` khai 2 lớp vào `app/map/page.tsx` —
   RASTER_OVERLAYS, VUNG_QH "Đà Lạt / Đức Trọng (Lâm Đồng)", MUC_QH, CAN_CU_QH (số / ngày / trích yếu đọc trên bản quét ký số), ovOn —
-  dựng lại frontend `--no-deps`, khởi động lại nginx, kiểm ô ảnh 200). Chưa chạy (15/10 tối ổ C còn 1,7 GB).
+  dựng lại frontend `--no-deps`, khởi động lại nginx, kiểm ô ảnh 200). **16/10 2h15 đã chạy (sau khi máy nén kho, ổ C còn 5,9 GB):
+  bước 1–2 XONG** — 2 bộ ô đã ở volume (6.504 + 14.761 ô, `/tiles/dalat2030v1/…` ra 200), `page.tsx` đã khai 2 lớp (đã lưu mã);
+  **bước dựng giao diện bị máy DỪNG vì thiếu RAM** (còn ~2 GB trống: WSL 5,2 GB + 3 cửa sổ Claude 1,6 GB + Edge 1,1 GB) — trợ lý đã dừng nốt
+  lệnh dựng còn sót để web giữ bản cũ (không lỗi 502). Web hiện CHƯA hiện 2 lớp. Chạy lại `.bat` lúc máy rảnh: kịch bản tự bỏ qua bước chép
+  (đếm thấy đủ ô) và đi thẳng tới bước dựng.
 - **Bóc loại đất Lâm Đồng: CHƯA có.** Thử 15/10 22h với Đà Lạt (`boc_loai_dat.py … --mau-chuan=bang-mau-chuan.json --vector`, không lớp chữ
   nên chỉ theo màu): tiến trình ăn ~5,7 GB RAM, máy còn 1,3 GB trống → hệ thống dừng lệnh; tiến trình sót đã tắt, web không ảnh hưởng.
   Chạy lại thì chạy RIÊNG lúc máy rảnh (không song song việc khác). Web chưa có thửa địa chính Lâm Đồng nên chưa cần gấp.

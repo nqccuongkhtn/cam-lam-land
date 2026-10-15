@@ -514,7 +514,7 @@ Chủ dự án: "trả phí chia ra là các chức năng chung, còn trả phí
   chủ dự án vào tài khoản thường vẫn thấy số). **Lượt tải hiển thị**: admin thấy số thật `luot_tai`; người khác thấy `luot_ao` (khởi đầu số
   thật + ngẫu nhiên 23–88, mỗi lần mở cộng ngẫu nhiên 2–5 — `LUOT_HIEN`). **Mã QR** trên tệp đóng dấu: mã NHỎ ở góc dưới phải MỌI trang, trỏ
   TRANG CHỦ web (chủ dự án bỏ khối mã to + chữ ở trang 2: "chỉ để lại mã QR trang chủ web ở chỗ hợp lý và nhỏ"); `PHIEN_BAN_FILE` v13 ↔ `?v=13` ở giao diện. **Chia sẻ** chỉ gửi số ký hiệu đã che + 10 chữ đầu trích yếu
-  ("họ có dữ liệu để vào google tìm kiếm").
+  ("họ có dữ liệu để vào google tìm kiếm"). Lưới "Cổng thông tin điện tử" cuối trang `/van-ban` (`CongTtdt.tsx`) chỉ còn TÊN cổng, không còn đường dẫn (chủ dự án: "không cho bấm tới mấy link này nữa"; địa chỉ vẫn giữ trong `data.ts` PORTALS).
 - **Đền bù** (`/den-bu`, chỉ chặn ở GIAO DIỆN — số liệu là văn bản công khai): người không có gói → che mọi số tiền, hệ số (× 1,12), số hiệu
   văn bản, ngày, số Điều / khoản / STT, năm (`RE_SO` + `cheSo`, chủ dự án: "che mà số quyết định các thứ còn như này họ tự kiếm"); ô tính khoá;
   nút mở văn bản gốc gỡ đường dẫn. Thẻ ② tìm CHUNG QĐ 08 + QĐ 12 (chủ dự án hỏi "sao chưa đưa quyết định 12 vào").

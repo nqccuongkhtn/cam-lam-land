@@ -28,7 +28,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
           <button onClick={() => reset()} className="bg-[#0A2540] hover:bg-[#0d2f54] text-white font-bold px-5 py-2.5 rounded-xl">↻ Thử lại</button>
           <Link href="/" className="bg-white border border-slate-200 hover:bg-slate-50 text-[#0A2540] font-bold px-5 py-2.5 rounded-xl">Về trang chủ</Link>
         </div>
-        <p className="mt-4 text-[11px] text-slate-400">Nếu cần hỗ trợ: 0988 888 888</p>
+        <p className="mt-4 text-[11px] text-slate-400">Nếu cần hỗ trợ: 0567 442 996</p>
       </div>
     </div>
   );

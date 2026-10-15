@@ -67,7 +67,7 @@ export default function Page() {
 
           <h2 className="text-lg font-bold text-[#0A2540] mt-6 mb-2">Liên hệ</h2>
           <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm text-slate-700 space-y-1">
-            <p>📞 Hotline: <a href="tel:0988888888" className="font-bold text-[#0A2540]">0988 888 888</a></p>
+            <p>📞 Hotline: <a href="tel:0567442996" className="font-bold text-[#0A2540]">0567 442 996</a></p>
             <p>✉️ Email: lienhe@camlamland.vn</p>
             <p>📍 Địa chỉ: Cam Lâm, Khánh Hòa</p>
           </div>

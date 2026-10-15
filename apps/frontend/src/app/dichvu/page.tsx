@@ -72,7 +72,7 @@ export default function ServicesPage() {
     </a>
   );
   const RailCTA = () => (
-    <a href="tel:0988888888" className="block bg-slate-100 border border-dashed border-slate-300 rounded-xl p-4 text-center hover:bg-slate-200 transition">
+    <a href="tel:0567442996" className="block bg-slate-100 border border-dashed border-slate-300 rounded-xl p-4 text-center hover:bg-slate-200 transition">
       <p className="text-2xl leading-none text-slate-400">＋</p><p className="text-xs font-bold text-slate-600 mt-1">Đặt quảng cáo</p><p className="text-[10px] text-slate-400">Liên hệ admin</p>
     </a>
   );
@@ -92,7 +92,7 @@ export default function ServicesPage() {
           {p.perks.map((t) => <li key={t} className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5 shrink-0">✓</span>{t}</li>)}
         </ul>
         {p.price <= 0 ? (
-          <a href="tel:0988888888" className="mt-5 w-full font-bold py-2.5 rounded-xl transition text-center bg-[#0A2540] text-white hover:bg-[#0d2f54]">Gọi để kích hoạt</a>
+          <a href="tel:0567442996" className="mt-5 w-full font-bold py-2.5 rounded-xl transition text-center bg-[#0A2540] text-white hover:bg-[#0d2f54]">Gọi để kích hoạt</a>
         ) : (
         <button onClick={() => buy(p)} disabled={busy === p.id} className={`mt-5 w-full font-bold py-2.5 rounded-xl transition ${p.popular ? 'bg-[#0A2540] text-white hover:bg-[#0d2f54]' : 'bg-slate-100 text-[#0A2540] hover:bg-[#0A2540] hover:text-white'}`}>{busy === p.id ? 'Đang tạo…' : 'Mua ngay'}</button>
         )}
@@ -106,7 +106,7 @@ export default function ServicesPage() {
       <div>
         <div className="text-5xl">🛠️</div>
         <h1 className="text-2xl font-extrabold text-[#0A2540] mt-3">Dịch vụ sắp ra mắt</h1>
-        <p className="text-slate-500 mt-2 max-w-sm mx-auto text-sm">Bảng giá & gói dịch vụ đang được hoàn thiện. Cần hỗ trợ, vui lòng liên hệ admin <a href="tel:0988888888" className="text-[#0A2540] font-bold underline">0988 888 888</a>.</p>
+        <p className="text-slate-500 mt-2 max-w-sm mx-auto text-sm">Bảng giá & gói dịch vụ đang được hoàn thiện. Cần hỗ trợ, vui lòng liên hệ admin <a href="tel:0567442996" className="text-[#0A2540] font-bold underline">0567 442 996</a>.</p>
       </div>
     </div>
   );
@@ -184,8 +184,8 @@ export default function ServicesPage() {
             </ul>
           </div>
           <div className="mt-4 md:mt-0 flex flex-col gap-2 shrink-0 w-full md:w-auto">
-            <a href="tel:0988888888" className="bg-[#0A2540] text-white font-bold px-6 py-2.5 rounded-xl text-center">📞 0988 888 888</a>
-            <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="bg-[#0068FF] text-white font-bold px-6 py-2.5 rounded-xl text-center">Chat Zalo</a>
+            <a href="tel:0567442996" className="bg-[#0A2540] text-white font-bold px-6 py-2.5 rounded-xl text-center">📞 0567 442 996</a>
+            <a href="https://zalo.me/0567442996" target="_blank" rel="noreferrer" className="bg-[#0068FF] text-white font-bold px-6 py-2.5 rounded-xl text-center">Chat Zalo</a>
           </div>
         </div>
 
@@ -195,8 +195,8 @@ export default function ServicesPage() {
             <p className="text-slate-500 mt-1.5 text-sm max-w-xl">Đặt logo doanh nghiệp / sales ngay trên bản đồ quy hoạch — độc quyền theo xã. Hiện <b>liên hệ trực tiếp admin</b> để tư vấn vị trí & gói.</p>
           </div>
           <div className="mt-4 md:mt-0 flex flex-col gap-2 shrink-0 w-full md:w-auto">
-            <a href="tel:0988888888" className="bg-[#0A2540] text-white font-bold px-6 py-2.5 rounded-xl text-center">📞 0988 888 888</a>
-            <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="bg-[#0068FF] text-white font-bold px-6 py-2.5 rounded-xl text-center">Chat Zalo</a>
+            <a href="tel:0567442996" className="bg-[#0A2540] text-white font-bold px-6 py-2.5 rounded-xl text-center">📞 0567 442 996</a>
+            <a href="https://zalo.me/0567442996" target="_blank" rel="noreferrer" className="bg-[#0068FF] text-white font-bold px-6 py-2.5 rounded-xl text-center">Chat Zalo</a>
           </div>
         </div>
         </div>
@@ -225,7 +225,7 @@ export default function ServicesPage() {
                   <div className="flex justify-between"><span className="text-slate-500">Số tiền</span><b className="text-red-600">{fmt(order.amount)}</b></div>
                   <div className="flex justify-between"><span className="text-slate-500">Nội dung</span><b className="text-red-600">{order.note}</b></div>
                 </div>
-                {order.bank.demo && <p className="text-[11px] text-amber-600 mt-2 text-center font-medium">Số tài khoản đang ở chế độ thử nghiệm — liên hệ <a href="tel:0988888888" className="underline">admin</a> trước khi chuyển khoản.</p>}
+                {order.bank.demo && <p className="text-[11px] text-amber-600 mt-2 text-center font-medium">Số tài khoản đang ở chế độ thử nghiệm — liên hệ <a href="tel:0567442996" className="underline">admin</a> trước khi chuyển khoản.</p>}
                 <p className="text-xs text-slate-500 mt-2 text-center">Quét QR hoặc chuyển khoản <b>đúng nội dung</b>. Gói <b>tự kích hoạt</b> sau khi nhận tiền.</p>
               </>
             )}

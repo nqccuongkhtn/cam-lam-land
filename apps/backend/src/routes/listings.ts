@@ -27,7 +27,7 @@ const SELECT = `
          listings.property_type AS "propertyType", listings.address, listings.ward, listings.bedrooms,
          listings.bathrooms, listings.direction, listings.legal, listings.frontage,
          COALESCE(listings.contact_name, u.full_name, 'Cam Lâm Land') AS "contactName",
-         COALESCE(listings.contact_phone, u.phone, '0988888888') AS "contactPhone",
+         COALESCE(listings.contact_phone, u.phone, '0567442996') AS "contactPhone",
          u.avatar AS "posterAvatar", CASE WHEN COALESCE(u.rating_count,0) > 0 THEN u.rating END AS "posterRating", u.rating_count AS "posterRatingCount",
          listings.status, listings.deal, listings.views, listings.boosted, listings.tier, listings.verified, listings.bumped_at AS "bumpedAt", listings.images, listings.created_by AS "createdBy",
          ST_X(listings.geom) AS lng, ST_Y(listings.geom) AS lat, listings.created_at AS "createdAt"
@@ -323,7 +323,7 @@ listingsRouter.post('/agent/:id/reveal', authRequired, async (req: AuthedRequest
 listingsRouter.post('/:id/reveal', authRequired, async (req: AuthedRequest, res, next) => {
   try {
     const id = Number(req.params.id);
-    const [l] = await query(`SELECT COALESCE(listings.contact_phone, u.phone, '0988888888') AS contact_phone, COALESCE(listings.contact_name, u.full_name, 'Cam Lâm Land') AS contact_name, listings.created_by, listings.status FROM listings LEFT JOIN users u ON u.id = listings.created_by WHERE listings.id=$1`, [id]);
+    const [l] = await query(`SELECT COALESCE(listings.contact_phone, u.phone, '0567442996') AS contact_phone, COALESCE(listings.contact_name, u.full_name, 'Cam Lâm Land') AS contact_name, listings.created_by, listings.status FROM listings LEFT JOIN users u ON u.id = listings.created_by WHERE listings.id=$1`, [id]);
     if (!l) return res.status(404).json({ error: 'Không tìm thấy tin' });
     // Tin đang ẨN / CHỜ DUYỆT: chỉ chủ tin hoặc admin (giống GET /:id) — trước đây ai đoán số tin là lấy được SĐT.
     if ((l.status === 'hidden' || l.status === 'pending') && l.created_by !== req.user!.id && !laAdmin(req.user))

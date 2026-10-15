@@ -450,6 +450,11 @@ Kiểm tra nhanh trong Console: `Object.values(__banDo.style.sourceCaches['src-d
   Tờ 171 = Thửa 1016 · Tờ 90 —, Ninh Sơn 892, Cam Nghĩa 430, Nam Nha Trang 260, Cam Hải Đông 216): số cũ + số mới cùng nằm trong file
   nguồn. Số nào hiện hành phải hỏi Văn phòng Đăng ký — đừng tự xoá bản ghi nào.
 - Gõ `__banDo` trong Console trình duyệt để soi bản đồ khi cần tìm sự cố.
+- **Lớp ảnh quy hoạch lúc mở trang (15/10/2026):** `MapView.syncOverlays` đọc danh sách lớp qua `overlaysRef` (như `dcTilesRef`). Trước đọc
+  biến của lần vẽ đầu: vé admin về TRƯỚC khi bản đồ nạp xong → trang đổi sang QĐ205 nhưng bản đồ vẫn vẽ QĐ893 → nút lớp + bảng thửa ghi
+  QĐ205 mà ảnh là QĐ893 (chủ dự án: "mở 893 nhưng thông tin lại không phải"). Thứ tự `MUC_QH`: QĐ893 đứng ĐẦU (chủ dự án "đưa 2030 lên đầu").
+- **Số điện thoại / Zalo của web: 0567 442 996** (đổi 15/10/2026 từ số giả 0988 888 888 — 70 chỗ trong 26 tệp mã + bảng `map_ads` (chữ chìm,
+  huy hiệu bản đồ), `users.phone` admin, dòng thử `customers` / `game_scores`). Đổi số lần sau: tìm `0567 442 996` · `0567442996` · `0567.442.996`.
 
 ---
 
@@ -885,7 +890,7 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   **Hiện TÊN cho mọi người (15/10/2026, chủ dự án: "vẫn hiện ra chỗ chọn nhưng chỉ tài khoản admin được chọn, còn lại hiện popup liên hệ
   admin"):** lớp nào trong `danh-sach.json` có mục `congKhai` {ten, tenNgan, tenApp} thì `GET /api/qh-rieng/gioi-thieu` (công khai) trả TÊN
   + khu vực — không thư mục ô, không khung, không vé. Giao diện hiện dòng có 🔒 (`lopKhoa`, `khoa: true` trong `mucQh`); bấm → hộp
-  `hopKhoa` "Chỉ quản trị viên được xem" (gọi / Zalo 0988 888 888 / nhắn tin). Hiện chỉ `qh-ct500` có `congKhai` (Tây NT 2.2 vẫn giấu hẳn).
+  `hopKhoa` "Chỉ quản trị viên được xem" (gọi / Zalo 0567 442 996 / nhắn tin). Hiện chỉ `qh-ct500` có `congKhai` (Tây NT 2.2 vẫn giấu hẳn).
   Nhãn bỏ chữ "đã duyệt", rồi bỏ cả "6 đồ án" + "chỉ quản trị viên" (chủ dự án 15/10) — tên lớp: "QH chi tiết 1/500 · tô màu theo loại
   đất" / "· bản vẽ gốc", người thường thấy "QH chi tiết 1/500". Tự kiểm 15/10 9h: gioi-thieu 200, ve 401, ô vé giả / không vé 403, `/tiles/` 404.
   **1/500 TÔ MÀU THEO LOẠI ĐẤT (15/10/2026, chủ dự án: "làm kiểu màu giống 1/2000 và 893, làm như kiểu 205 khó xem quá")** — lớp
@@ -907,6 +912,15 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   khi thửa nằm trong ranh → trang có khoá "Liên hệ admin để xem". Cách tính như qhPdf.ts: thửa dịch LECH_DIA_CHINH, đo elipxoit rồi đổi
   tỷ lệ về diện tích sổ (các dòng cộng đúng bằng thửa); trong ranh không có lô = Đất giao thông; ngoài ranh = ngoài phạm vi. KHÔNG in phiếu
   (lọc `nguon '1/500'` như PDF). Kiểm 15/10: 50 thửa tổng khớp diện tích sổ, đối chiếu cắt hình mặt phẳng VN-2000 lệch ≤ 0,11 m²/dòng.
+  **DẢI HẸP HƠN 7 cm = SAI SỐ VẼ (15/10/2026, chủ dự án hỏi Thửa 1449 · Tờ 157 "đâu ra đất tái định cư" rồi dặn "tự nghiên cứu làm đúng
+  100 %"):** mẩu "Đất ở tái định cư 0,8 m²" là dải 6,3 cm × 13,4 m dọc viền thửa — lô TĐC thửa bên cạnh lấn vài cm. Đo góc lô 1/500 vẽ
+  theo ranh thửa: lệch góc thửa địa chính +0,538 m Đông / +0,143 m Bắc ở 4 đồ án = đúng độ trượt `LECH_DIA_CHINH` (sai ~5 mm) → hệ toạ độ
+  khớp, chỉ còn sai số vẽ từng đoạn. Quy chuẩn bản đồ địa chính (TT 25/2014, sửa bởi TT 33/2017): sai số điểm ranh thửa 7 cm (tờ 1:500) ·
+  15 cm (1:1000) · 30 cm (1:2000). `qh500.ts`: PHÉP MỞ HÌNH trên UTM 49N (gọt vào 3,5 cm rồi nở ra) tách phần hẹp hơn `RONG_SAI_SO_M`
+  = 0,07 m, mỗi mẩu hẹp nhập vào THÂN ĐẶC kề nó dài nhất (xét từng mẩu, KHÔNG xét cả loại đất — phần "đường" dính liền cả khe vụn dọc
+  viền nên mượn bề rộng lòng đường, từng làm dải TĐC nhập nhầm vào đường); thửa chỉ chạm ranh đồ án bằng dải hẹp = không thuộc đồ án.
+  Thửa 1449 nay: nhà ở nông thôn 2.470,7 + giao thông 516,2. Kiểm 300 thửa ngẫu nhiên: 280 giống hệt, 18 xê dịch 0,1–2,9 m² (soi Thửa 2001
+  · Tờ 18 Cam Tân: dải 2,2 cm × 70 m dọc viền thửa → nhập vào đường kề nó — đúng). Chỉ áp cho 1/500 (QĐ205 chủ dự án đã chọn giữ đúng từng cm).
   **Chữ cho người thường KHÔNG nói ai được xem** (chủ dự án: "liên hệ admin chứ đừng nói tài khoản nào được xem") — chỉ "🔒 … liên hệ admin".
   ĐÃ LÊN WEB 14/10/2026 21:32 (tự kiểm qua tên miền thật: chưa đăng nhập 401, vé giả 403, `/tiles/` công khai 404, ô có vé hợp lệ trùng
   từng byte file gốc, Cloudflare `DYNAMIC` không giữ). Volume riêng hiện có 1 lớp: `qh-ct500-mau` (1/500 tô màu). Lớp `qh-nt-tay-pk22`
@@ -924,7 +938,10 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   Chạy lại một đoạn: `--tu-buoc=N --den-buoc=M` (vd `--tu-buoc=2 --den-buoc=2` = chỉ nạp lại quy hoạch theo thửa 7 bản).
   **QUY HOẠCH THEO THỬA TỪ PDF (14/10/2026, ĐANG BẬT từ 21:3x 14/10):** `boc_loai_dat.py` bóc vùng loại đất từ PDF (lượt 1 quyết định
   loại đất từng MẢNG tô; nhãn phân số "CLN/TMD" lấy mã DƯỚI; khung chú giải + `bang-mau-chuan.json` = bảng màu chung 22 màu gom từ 6
-  bản; màu dùng chung nhiều mã → "NHÓM … chưa ghi rõ loại", không đoán; nét dày chỉ là đất khi là đường / nước) → `nap_qh_pdf.py` nạp
+  bản; màu dùng chung nhiều mã → "NHÓM … chưa ghi rõ loại", không đoán — TRỪ luật CHỮ ĐEN kiểu chặt (15/10/2026 chủ dự án duyệt, mặc định
+  BẬT, tắt `--khong-chu-den`): vùng KHÔNG có chữ đỏ nào mà có mã ĐEN thuộc đúng nhóm màu = đất giữ nguyên loại hiện trạng → lấy mã đó
+  (đếm trước khi áp: 53.584 / 133.783 ha "nhóm" của 7 bản, 90 % rừng; vùng có chữ đỏ khác nhóm là mâu thuẫn → vẫn "nhóm"); nét dày chỉ là
+  đất khi là đường / nước) → `nap_qh_pdf.py` nạp
   vào bảng `qh_pdf` + `qh_pdf_ranh` (đủ 7 bản: Cam Ranh, Nha Trang, Ninh Hòa, Vạn Ninh, Khánh Sơn, Diên Khánh, Khánh Vĩnh).
   **Lượt 2 KIỂU VECTOR (`--vector`, 14/10 khuya — dữ liệu web dùng cách này):** lấy thẳng HÌNH NÉT của PDF, mảng dưới trừ phần mảng vẽ
   sau đè lên (đúng thứ tự vẽ), không qua ảnh → không mất dải đường hẹp 2–3 m. 10 thửa đối chứng Nha Trang: 8 thửa đúng tên loại lệch

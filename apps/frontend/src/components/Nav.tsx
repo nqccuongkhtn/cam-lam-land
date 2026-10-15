@@ -165,7 +165,7 @@ export default function Nav() {
         </nav>
 
         <div className="flex items-center gap-2 shrink-0">
-          <a href="tel:0988888888" className={`hidden xl:flex items-center gap-1.5 text-sm font-bold ${txt}`}>📞 0988 888 888</a>
+          <a href="tel:0567442996" className={`hidden xl:flex items-center gap-1.5 text-sm font-bold ${txt}`}>📞 0567 442 996</a>
           <button onClick={() => window.dispatchEvent(new CustomEvent('cl-open-chat', { detail: { tab: 'advisory' } }))} aria-label="Nhắn tin" title="Nhắn tin / Tư vấn" className={`sm:hidden grid place-items-center w-10 h-10 rounded-lg border transition ${solid ? 'border-slate-200 text-[#0A2540] hover:bg-slate-50' : 'border-white/40 text-white hover:bg-white/10'}`}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z" /></svg>
           </button>
@@ -233,7 +233,7 @@ export default function Nav() {
             </div>
           )}
           <div className="mt-1.5 pt-2 border-t border-slate-100 first:mt-0 first:pt-0 first:border-t-0">
-            <a href="tel:0988888888" className="flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-bold text-[#0A2540] hover:bg-slate-50"><span className="text-[#C8A14B]"><MIco><path d="M6.6 4.5h2.9l1.2 4-1.8 1.4a11 11 0 0 0 5.2 5.2l1.4-1.8 4 1.2v2.9a1.5 1.5 0 0 1-1.6 1.5C10.6 19.6 4.4 13.4 3.6 6.1A1.5 1.5 0 0 1 5.1 4.5h1.5Z" /></MIco></span>Hotline 0988 888 888</a>
+            <a href="tel:0567442996" className="flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-bold text-[#0A2540] hover:bg-slate-50"><span className="text-[#C8A14B]"><MIco><path d="M6.6 4.5h2.9l1.2 4-1.8 1.4a11 11 0 0 0 5.2 5.2l1.4-1.8 4 1.2v2.9a1.5 1.5 0 0 1-1.6 1.5C10.6 19.6 4.4 13.4 3.6 6.1A1.5 1.5 0 0 1 5.1 4.5h1.5Z" /></MIco></span>Hotline 0567 442 996</a>
             <button onClick={() => { setOpen(false); window.dispatchEvent(new CustomEvent('cl-open-chat', { detail: { tab: 'advisory' } })); }} className="w-full text-left flex items-center gap-3 py-2.5 px-2 rounded-lg text-sm font-semibold text-[#0A2540] hover:bg-slate-50"><span className="text-[#C8A14B]"><MIco><path d="M20 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-4.4A8 8 0 1 1 20 11.5Z" /></MIco></span>Chat với chúng tôi</button>
             {user ? (
               <button onClick={doLogout} className="w-full text-left flex items-center gap-3 py-2.5 px-2 mt-1.5 pt-3 border-t border-slate-100 rounded-lg text-sm font-semibold text-red-600 hover:bg-slate-50"><MIco><path d="M14.5 4.5H6.5A1.5 1.5 0 0 0 5 6v12a1.5 1.5 0 0 0 1.5 1.5h8" /><path d="M18.5 12H9.5m9 0-3.2-3.2m3.2 3.2-3.2 3.2" /></MIco>Đăng xuất</button>

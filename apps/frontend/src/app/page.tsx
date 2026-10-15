@@ -734,13 +734,13 @@ export default function Home() {
               className="block aspect-[2/1] w-full object-cover sm:aspect-auto sm:h-64 md:h-full" />
             {/* HUY HIỆU "Cam Lâm Land · Hotline" — ảnh gốc có sẵn ở góc dưới phải nhưng dạng ảnh rộng bị cắt mất
                 (chủ dự án 2/10/2026) → dựng lại bằng chữ thật, đè lên góc ảnh, bấm là gọi. Giống hệt kiểu trong ảnh gốc. */}
-            <a href="tel:0988888888" className="absolute bottom-1.5 right-1.5 z-[2] hidden sm:flex items-center gap-1 rounded bg-[#0f2236]/80 px-1 py-0.5 text-white shadow-lg backdrop-blur-sm sm:bottom-4 sm:right-4 sm:gap-2.5 sm:rounded-lg sm:px-3 sm:py-2">
+            <a href="tel:0567442996" className="absolute bottom-1.5 right-1.5 z-[2] hidden sm:flex items-center gap-1 rounded bg-[#0f2236]/80 px-1 py-0.5 text-white shadow-lg backdrop-blur-sm sm:bottom-4 sm:right-4 sm:gap-2.5 sm:rounded-lg sm:px-3 sm:py-2">
               {/* ĐÚNG LOGO CỦA WEB (chữ C vàng trên nền xanh đậm) — bản đầu dùng hình ngôi nhà là sai (chủ dự án 2/10/2026). */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/logo-gon.webp" alt="" width={36} height={36} className="h-4 w-4 rounded-sm sm:h-9 sm:w-9 sm:rounded-md" />
               <span className="leading-tight">
                 <b className="block text-[9px] sm:text-[15px]">Cam Lâm <span className="text-[#C8A14B]">Land</span></b>
-                <span className="block text-[7.5px] font-semibold sm:text-[12.5px]">Hotline <span className="text-[#C8A14B]">0988 888 888</span></span>
+                <span className="block text-[7.5px] font-semibold sm:text-[12.5px]">Hotline <span className="text-[#C8A14B]">0567 442 996</span></span>
               </span>
             </a>
           </div>
@@ -796,7 +796,7 @@ export default function Home() {
           </div>
           <div className="flex gap-2 shrink-0">
             <Link href="/dichvu" className="border border-slate-300 text-[#0A2540] font-semibold px-5 py-2.5 rounded-xl hover:bg-slate-50 text-sm whitespace-nowrap">Xem dịch vụ</Link>
-            <a href="tel:0988888888" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-5 py-2.5 rounded-xl text-sm whitespace-nowrap">Liên hệ quảng cáo</a>
+            <a href="tel:0567442996" className="cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white font-semibold px-5 py-2.5 rounded-xl text-sm whitespace-nowrap">Liên hệ quảng cáo</a>
           </div>
         </div>
       </section>

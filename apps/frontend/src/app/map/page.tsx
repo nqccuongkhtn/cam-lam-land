@@ -415,9 +415,11 @@ const VUNG_QH: { id: string; ten: string; tenNgan: string; tamXem: [number, numb
 //   tính từ vùng loại đất BÓC TỪ BẢN ĐỒ PDF của Sở (14/10/2026) — chỉ tham khảo, không in phiếu.
 // `khoa` = dòng lớp CHỈ ADMIN hiện cho người khác xem tên (máy chủ GET /api/qh-rieng/gioi-thieu): bấm vào là hộp "liên hệ admin", không bật gì.
 const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: string[]; zBay?: number; vung: string; pdf?: string; khoa?: boolean }[] = [
+  // (15/10/2026) chủ dự án: "đưa 2030 lên đầu" — QĐ893 (bản Cam Lâm xem miễn phí) đứng ĐẦU danh sách lớp, kéo theo cả thứ tự trang
+  // quy hoạch trong bảng thửa (trangQhCuaThua đi theo đúng thứ tự mảng này).
+  { id: 'qh-qd893', ten: 'Quy hoạch sử dụng đất 2030 (QĐ893)', tenNgan: 'Sử dụng đất 893', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-qd893'], vung: 'cam-lam' },
   { id: 'qh-qd205', ten: 'Quy hoạch chung 2045 (QĐ205)', tenNgan: 'QH chung 205', tenApp: 'Quy hoạch chung 2045', gom: ['qh-qd205'], zBay: 10, vung: 'cam-lam' },   // chủ dự án cho thử z10 (14/9/2026)
   { id: 'phan-khu', ten: 'Quy hoạch phân khu 1/2000', tenNgan: 'Phân khu 1/2000', tenApp: 'QHXD Phân khu', gom:['qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin', 'qh-taynam', 'qh-taybac'], vung: 'cam-lam' },
-  { id: 'qh-qd893', ten: 'Quy hoạch sử dụng đất 2030 (QĐ893)', tenNgan: 'Sử dụng đất 893', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-qd893'], vung: 'cam-lam' },
   // Ninh Hòa — bản xem thử (bật là bay tới thị xã Ninh Hòa). zBay 11 = nhìn gần hết thị xã.
   { id: 'qh-ninhhoa2030', ten: 'QHSDĐ 2030 · Thị xã Ninh Hòa', tenNgan: 'Ninh Hòa 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'ninhhoa2030', gom: ['qh-ninhhoa2030'], zBay: 11, vung: 'ninh-hoa' },
   { id: 'qh-nhatrang2030', ten: 'QHSDĐ 2030 · TP Nha Trang', tenNgan: 'Nha Trang 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'nhatrang2030', gom: ['qh-nhatrang2030'], zBay: 12, vung: 'nha-trang' },
@@ -2981,8 +2983,8 @@ export default function MapPage() {
                 )}
                 {!laQuanTri && (
                   <div className="mt-3 grid grid-cols-2 gap-2">
-                    <a href="tel:0988888888" className="rounded bg-[#0A2540] py-2 text-center text-[13px] font-semibold text-white">📞 0988 888 888</a>
-                    <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" className="rounded border border-[#0068FF] py-2 text-center text-[13px] font-semibold text-[#0068FF]">Zalo admin</a>
+                    <a href="tel:0567442996" className="rounded bg-[#0A2540] py-2 text-center text-[13px] font-semibold text-white">📞 0567 442 996</a>
+                    <a href="https://zalo.me/0567442996" target="_blank" rel="noreferrer" className="rounded border border-[#0068FF] py-2 text-center text-[13px] font-semibold text-[#0068FF]">Zalo admin</a>
                     <button type="button" onClick={() => { setHopKhoa(null); try { window.dispatchEvent(new CustomEvent('cl-open-chat', { detail: { tab: 'support' } })); } catch { /* bỏ qua */ } }}
                       className="col-span-2 rounded border border-slate-300 py-2 text-[13px] font-semibold text-[#0A2540]">💬 Nhắn tin cho admin</button>
                   </div>

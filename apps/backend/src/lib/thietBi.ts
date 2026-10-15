@@ -33,7 +33,7 @@ import { laAdmin, verifyToken } from './auth.ts';
 
 export const CO_GIOI_HAN = 'gioi_han_thiet_bi';
 export const TOI_DA_MAC_DINH = Number(process.env.THIET_BI_TOI_DA || 3);
-export const ZALO_ADMIN = process.env.ZALO_ADMIN || '0988888888';
+export const ZALO_ADMIN = process.env.ZALO_ADMIN || '0567442996';
 export const PHI_RESET = Number(process.env.PHI_RESET_THIET_BI || 100000);
 
 const ipCua = (req: Request) => String(req.headers['cf-connecting-ip'] || req.ip || '').slice(0, 64);

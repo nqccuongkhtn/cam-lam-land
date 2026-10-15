@@ -81,7 +81,7 @@ export default function SiteFooter() {
         <div className="col-span-2 sm:col-span-1">
           <p className="font-extrabold text-lg sm:text-xl text-[#0A2540]">Cam Lâm <span className="text-[#C8A14B]">Land</span></p>
           <p className="text-[13px] sm:text-sm mt-1.5 sm:mt-3 text-slate-500">Nền tảng bất động sản &amp; bản đồ quy hoạch khu vực Cam Lâm, Khánh Hòa.</p>
-          <a href="tel:0988888888" className="inline-flex items-center gap-1.5 text-base sm:text-lg font-extrabold text-[#a8842f] hover:text-[#0A2540] mt-2 sm:mt-4">📞 0988 888 888</a>
+          <a href="tel:0567442996" className="inline-flex items-center gap-1.5 text-base sm:text-lg font-extrabold text-[#a8842f] hover:text-[#0A2540] mt-2 sm:mt-4">📞 0567 442 996</a>
           <p className="text-[13px] sm:text-sm text-slate-500 mt-0.5 sm:mt-1">✉️ lienhe@camlamland.vn</p>
           <div className="flex flex-wrap items-center gap-2.5 mt-3 sm:mt-4">
             <InstallAppButton className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[#0A2540] hover:border-[#C8A14B] [&_b]:!text-[#0A2540]" />
@@ -90,8 +90,8 @@ export default function SiteFooter() {
           </div>
           <div className="flex gap-2 mt-3 sm:mt-4">
             <a href="#" aria-label="Facebook" className="w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-[#0A2540] hover:border-[#C8A14B] font-bold">f</a>
-            <a href="https://zalo.me/0988888888" target="_blank" rel="noreferrer" aria-label="Zalo" className="w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-[#0A2540] hover:border-[#C8A14B] text-[11px] font-bold">Zalo</a>
-            <a href="tel:0988888888" aria-label="Gọi điện" className="w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-[#0A2540] hover:border-[#C8A14B]">☎</a>
+            <a href="https://zalo.me/0567442996" target="_blank" rel="noreferrer" aria-label="Zalo" className="w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-[#0A2540] hover:border-[#C8A14B] text-[11px] font-bold">Zalo</a>
+            <a href="tel:0567442996" aria-label="Gọi điện" className="w-9 h-9 grid place-items-center rounded-full border border-slate-200 bg-white text-[#0A2540] hover:border-[#C8A14B]">☎</a>
           </div>
         </div>
 
@@ -126,7 +126,7 @@ export default function SiteFooter() {
       {/* Khối cuối chân trang CANH GIỮA — trước canh trái nên dồn một góc, lệch với các cột phía trên (chủ dự án chỉ). */}
       <div className="mx-auto max-w-7xl px-4 sm:px-4 pt-4 sm:pt-6 pb-3 sm:pb-4 border-t border-slate-200 text-center text-[11px] sm:text-xs text-slate-500 leading-relaxed">
         <p><b className="text-[#0A2540]">CAM LÂM LAND</b> — Nền tảng bất động sản &amp; quy hoạch khu vực Cam Lâm, tỉnh Khánh Hòa.</p>
-        <p className="mt-1">Địa chỉ: Cam Lâm, Khánh Hòa · Hotline: 0988 888 888 · Email: lienhe@camlamland.vn.</p>
+        <p className="mt-1">Địa chỉ: Cam Lâm, Khánh Hòa · Hotline: 0567 442 996 · Email: lienhe@camlamland.vn.</p>
       </div>
       <div className="mx-auto max-w-7xl px-3 sm:px-4 text-center text-[11px] sm:text-xs text-slate-500 pb-5 sm:pb-6">© 2018 Cam Lâm Land</div>
     </footer>

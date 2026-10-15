@@ -18,7 +18,7 @@ function WmImg({ src, alt, wrap, img }: { src: string; alt?: string; wrap?: stri
       <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/55 to-transparent pointer-events-none" />
       <div className="absolute right-2.5 bottom-2 flex items-center gap-1.5 pointer-events-none">
         <img src="/icons/icon-192.png" alt="" className="w-4 h-4 rounded-sm" />
-        <span className="text-white text-[11px] font-bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,.7)' }}>Cam Lâm Land · 0988 888 888</span>
+        <span className="text-white text-[11px] font-bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,.7)' }}>Cam Lâm Land · 0567 442 996</span>
       </div>
     </div>
   );

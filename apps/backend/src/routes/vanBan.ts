@@ -510,8 +510,8 @@ async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
     const doc = await PDFDocument.load(buf, { ignoreEncryption: true, updateMetadata: false });
     doc.registerFontkit(fontkit);
     const font = await doc.embedFont(await readFile(PHONG_DAU), { subset: true });
-    const chan = 'Tải miễn phí tại batdongsancamlam.vn · Hotline/Zalo 0988 888 888 — Cam Lâm Land · Nhà đất & bản đồ quy hoạch Cam Lâm';
-    const chu1 = 'CAM LÂM LAND', chu2 = 'batdongsancamlam.vn  ·  0988 888 888';
+    const chan = 'Tải miễn phí tại batdongsancamlam.vn · Hotline/Zalo 0567 442 996 — Cam Lâm Land · Nhà đất & bản đồ quy hoạch Cam Lâm';
+    const chu1 = 'CAM LÂM LAND', chu2 = 'batdongsancamlam.vn  ·  0567 442 996';
     // TRANG 2 CHÈN THÊM (chủ dự án 6/10/2026, gửi hình mẫu): một trang trắng cùng khổ với trang 1 (theo mắt người đọc),
     // chỉ có chữ chéo + dòng chân trang như mọi trang khác — chèn vào sau trang 1 (file 1 trang thì thành trang cuối).
     // Tạo TRƯỚC vòng lặp để trang này cũng được vẽ dấu y hệt các trang khác.

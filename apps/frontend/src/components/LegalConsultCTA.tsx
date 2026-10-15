@@ -30,7 +30,7 @@ export default function LegalConsultCTA({ topic, className }: { topic?: string; 
         <div className="text-center py-2">
           <div className="w-11 h-11 rounded-full bg-emerald-100 text-emerald-600 grid place-items-center mx-auto text-2xl font-bold">✓</div>
           <p className="font-extrabold text-emerald-700 mt-2">Đã nhận yêu cầu tư vấn!</p>
-          <p className="text-sm text-slate-500 mt-0.5">Cam Lâm Land sẽ gọi lại sớm nhất. Cần gấp: <a href="tel:0988888888" className="font-bold text-[#0A2540]">0988 888 888</a>.</p>
+          <p className="text-sm text-slate-500 mt-0.5">Cam Lâm Land sẽ gọi lại sớm nhất. Cần gấp: <a href="tel:0567442996" className="font-bold text-[#0A2540]">0567 442 996</a>.</p>
         </div>
       ) : (
         <>
@@ -42,7 +42,7 @@ export default function LegalConsultCTA({ topic, className }: { topic?: string; 
             <button onClick={submit} disabled={busy} className="cl-press bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold px-5 py-2.5 rounded-lg whitespace-nowrap">{busy ? 'Đang gửi…' : 'Nhận tư vấn'}</button>
           </div>
           {err && <p className="text-xs text-red-600 mt-1.5 font-semibold">{err}</p>}
-          <p className="text-[12px] text-slate-500 mt-2">Hoặc <button type="button" onClick={openChat} className="font-bold text-emerald-700 underline underline-offset-2 hover:text-emerald-800">💬 chat tư vấn trực tiếp</button> · gọi/Zalo <b>0988 888 888</b> · Bảo mật thông tin.</p>
+          <p className="text-[12px] text-slate-500 mt-2">Hoặc <button type="button" onClick={openChat} className="font-bold text-emerald-700 underline underline-offset-2 hover:text-emerald-800">💬 chat tư vấn trực tiếp</button> · gọi/Zalo <b>0567 442 996</b> · Bảo mật thông tin.</p>
         </>
       )}
     </div>

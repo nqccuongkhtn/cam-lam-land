@@ -20,7 +20,7 @@ export default function Page() {
         { h: 'Giới hạn trách nhiệm', body: <p>Thông tin trên website (bản đồ quy hoạch, số liệu tra cứu, tin đăng, biểu mẫu hợp đồng) mang <b>tính tham khảo</b>. Cam Lâm Land không chịu trách nhiệm cho thiệt hại phát sinh từ việc bạn dựa vào thông tin để ra quyết định, hoặc từ giao dịch giữa bạn với bên thứ ba. Vui lòng đối chiếu cơ quan chức năng và nhờ luật sư/công chứng cho giao dịch cụ thể.</p> },
         { h: 'Sở hữu trí tuệ', body: <p>Giao diện, logo, thương hiệu và mã nguồn của website thuộc quyền sở hữu của Cam Lâm Land. Không sao chép, khai thác lại khi chưa được đồng ý bằng văn bản.</p> },
         { h: 'Luật áp dụng & giải quyết tranh chấp', body: <p>Điều khoản này được điều chỉnh bởi <b>pháp luật Việt Nam</b>. Mọi tranh chấp được ưu tiên thương lượng; nếu không thành, đưa ra <b>Tòa án nhân dân có thẩm quyền</b> giải quyết.</p> },
-        { h: 'Thay đổi điều khoản', body: <p>Điều khoản có thể được cập nhật theo thời gian; phiên bản mới có hiệu lực kể từ khi đăng tải. Việc bạn tiếp tục sử dụng đồng nghĩa chấp nhận bản cập nhật. Liên hệ: hotline 0988 888 888 · lienhe@camlamland.vn.</p> },
+        { h: 'Thay đổi điều khoản', body: <p>Điều khoản có thể được cập nhật theo thời gian; phiên bản mới có hiệu lực kể từ khi đăng tải. Việc bạn tiếp tục sử dụng đồng nghĩa chấp nhận bản cập nhật. Liên hệ: hotline 0567 442 996 · lienhe@camlamland.vn.</p> },
       ]}
     />
   );

@@ -633,7 +633,7 @@ export default function ChatWidget() {
                   <textarea className={`${inp} min-h-[70px]`} value={sf.description} onChange={(e) => setS('description', e.target.value)} placeholder="Mô tả thêm (hướng, pháp lý…)" />
                   {serr && <p className="text-sm text-red-600 font-semibold">{serr}</p>}
                   <button disabled={busy} onClick={submitSell} className="cl-press w-full bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold py-3 rounded-xl">{busy ? 'Đang gửi…' : 'Gửi thông tin'}</button>
-                  <p className="text-[11px] text-slate-400 text-center">Hoặc gọi <a href="tel:0988888888" className="font-bold text-[#0A2540]">0988 888 888</a></p>
+                  <p className="text-[11px] text-slate-400 text-center">Hoặc gọi <a href="tel:0567442996" className="font-bold text-[#0A2540]">0567 442 996</a></p>
                 </div>
               )}
             </div>
@@ -720,7 +720,7 @@ export default function ChatWidget() {
                   <div className="flex items-center gap-2 px-2.5 py-1">
                     <span className="min-w-0 flex-1 leading-tight">
                       <span className="block text-[11px] font-bold text-[#0A2540] truncate">👥 Cộng đồng Cam Lâm Land</span>
-                      <span className="block text-[9px] text-slate-500 truncate">Hỗ trợ: <a href="tel:0988888888" className="font-semibold text-[#0A2540]">0988 888 888</a></span>
+                      <span className="block text-[9px] text-slate-500 truncate">Hỗ trợ: <a href="tel:0567442996" className="font-semibold text-[#0A2540]">0567 442 996</a></span>
                     </span>
                     <button onClick={() => setGameOpen((v) => !v)} className="shrink-0 flex items-center gap-1 rounded-full bg-[#0A2540] pl-2 pr-2.5 py-1 text-[10px] font-bold text-white hover:brightness-110">
                       <span>🎮</span><span className="text-[#C8A14B]">Game giải trí</span><span>{gameOpen ? '▴' : '▾'}</span>

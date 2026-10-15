@@ -6,7 +6,7 @@ import ServicesSection from '@/components/ServicesSection';
 
 const inp = 'w-full min-w-0 border border-slate-300 rounded-lg px-3 py-2.5 sm:py-2 text-base sm:text-sm outline-none focus:border-[#0A2540]';
 const lbl = 'block text-[12px] font-semibold text-slate-500 mb-1';
-const HOTLINE = '0988 888 888';
+const HOTLINE = '0567 442 996';
 const today = new Date().toISOString().slice(0, 10);
 
 const DEFAULT5 = `Việc xử lý tiền đặt cọc thực hiện theo Điều 328 Bộ luật Dân sự 2015:

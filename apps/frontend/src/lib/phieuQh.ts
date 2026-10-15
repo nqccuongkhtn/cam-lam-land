@@ -6,7 +6,7 @@ import { wgs84ToVn2000 } from './vn2000';
 const SITE = {
   ten: 'CAM LÂM LAND',
   mota: 'Nền tảng bất động sản & bản đồ quy hoạch Cam Lâm, Khánh Hòa',
-  hotline: '0988 888 888',
+  hotline: '0567 442 996',
   email: 'lienhe@camlamland.vn',
   diaChi: 'Cam Lâm, Khánh Hòa',
   domain: 'batdongsancamlam.vn',

@@ -593,15 +593,15 @@ const WIDGETS: Widget[] = [
   { key: 'ios', name: 'Thông báo điện thoại', note: 'Thẻ báo nổi lên như tin nhắn tới', w: 0.62, d: { t1: 'CAM LÂM LAND', t2: 'Vừa có khách chốt lô B12', t3: 'Còn 3 lô cuối · giá gốc chủ đầu tư' } },
   { key: 'lock', name: 'Màn khoá điện thoại', note: 'Cả cái điện thoại, có giờ và thông báo', w: 0.46, d: { t1: 'CAM LÂM LAND', t2: 'Đất nền ven biển', t3: 'Sổ đỏ từng lô · 1,2 tỷ', t4: '9:41' } },
   { key: 'chat', name: 'Khung chat', note: 'Hội thoại hiện dần từng câu', w: 0.5, d: { t1: 'Khách hỏi', t2: 'Lô này còn không anh?', t3: 'Còn đúng 2 lô cuối ạ', t4: 'Cho em xem sổ với' } },
-  { key: 'profile', name: 'Trang cá nhân', note: 'Hồ sơ, số liệu, nút theo dõi', w: 0.5, d: { t1: 'Cam Lâm Land', t2: 'Đất nền · Sổ đỏ · Cam Lâm', t3: '0988 888 888' } },
-  { key: 'call', name: 'Cuộc gọi đến', note: 'Màn hình đang có khách gọi', w: 0.46, d: { t1: 'Khách xem đất', t2: 'Cuộc gọi đến…', t3: '0988 888 888' } },
+  { key: 'profile', name: 'Trang cá nhân', note: 'Hồ sơ, số liệu, nút theo dõi', w: 0.5, d: { t1: 'Cam Lâm Land', t2: 'Đất nền · Sổ đỏ · Cam Lâm', t3: '0567 442 996' } },
+  { key: 'call', name: 'Cuộc gọi đến', note: 'Màn hình đang có khách gọi', w: 0.46, d: { t1: 'Khách xem đất', t2: 'Cuộc gọi đến…', t3: '0567 442 996' } },
   { key: 'price', name: 'Bảng giá lô đất', note: 'Riêng cho bất động sản — diện tích, giá, pháp lý', w: 0.56, d: { t1: 'LÔ B12 · MẶT TIỀN', t2: '100 m² · 5×20', t3: '1,25 tỷ', t4: 'Sổ đỏ riêng · Công chứng ngay' } },
   // ══ THẺ GIỚI THIỆU RỜI ══
   // Khác hẳn "Thẻ chú thích": thẻ kia CẮM vào một điểm trên bản đồ, có dây nối, bản đồ xoay thì nó
   // chạy theo. Ba mẫu dưới đây là LỚP RỜI — nằm yên một chỗ trên khung hình, kéo thả tuỳ ý, đặt giờ
   // hiện/tắt riêng. Dùng để giới thiệu dự án, khoe thông số hay dán danh thiếp môi giới vào góc video.
   { key: 'theso', name: 'Thẻ thông số (rời)', note: 'Thẻ đứng riêng một góc: tên lô, thông số, giá — không dính vào bản đồ', w: 0.44, d: { t1: 'ĐẤT NỀN CAM LÂM', t2: '120 m² · 5×24 · Hướng Đông Nam', t3: '2,8 tỷ', t4: 'Sổ đỏ riêng · Đường nhựa 12 m' } },
-  { key: 'moigioi', name: 'Thẻ môi giới (rời)', note: 'Danh thiếp góc video: tên, chức danh, số điện thoại', w: 0.4, d: { t1: 'TÊN CỦA BẠN', t2: 'Chuyên viên đất nền Cam Lâm', t3: '0988 888 888' } },
+  { key: 'moigioi', name: 'Thẻ môi giới (rời)', note: 'Danh thiếp góc video: tên, chức danh, số điện thoại', w: 0.4, d: { t1: 'TÊN CỦA BẠN', t2: 'Chuyên viên đất nền Cam Lâm', t3: '0567 442 996' } },
   { key: 'huyhieuct', name: 'Huy hiệu công ty (rời)', note: 'Huy hiệu tròn + tên công ty, hợp làm dấu ở góc suốt video', w: 0.36, d: { t1: 'CAM LÂM LAND', t2: 'Đất nền · Sổ đỏ · Cam Lâm', t3: '' } },
   // ══ THANH LIÊN HỆ ══
   // Thanh nhỏ dán góc video: ô vuông màu thương hiệu bên trái, chữ bên phải. Người xem nhìn phát
@@ -611,8 +611,8 @@ const WIDGETS: Widget[] = [
   { key: 'thanhngang', name: 'Thanh ngang + icon', note: 'Icon nhà bên trái, tên bên phải, gạch vàng dưới — gọn, đọc nhanh', w: 0.38, d: { t1: 'CHO THUÊ', t2: 'Biệt thự biển', t3: '' } },
   { key: 'khunggia', name: 'Khung giá nổi bật', note: 'Ô vàng đặc, chữ đen to — chỉ để khoe GIÁ, đập vào mắt nhất', w: 0.26, d: { t1: '6,5 TỶ', t2: '', t3: '' } },
   { key: 'haivachthe', name: 'Hai vạch vàng + chữ', note: 'Hai vạch vàng kẹp trên dưới, tên ở giữa — sang mà nhẹ', w: 0.34, d: { t1: 'CHO THUÊ', t2: 'BIỆT THỰ', t3: '' } },
-  { key: 'lhphone', name: 'Thanh · Số điện thoại', note: 'Ô xanh lá có hình điện thoại + số — dán góc suốt video', w: 0.34, d: { t1: '0988 888 888', t2: 'phone', t3: '' } },
-  { key: 'lhzalo', name: 'Thanh · Zalo', note: 'Ô xanh dương kiểu Zalo + số/tên tài khoản', w: 0.34, d: { t1: '0988 888 888', t2: 'zalo', t3: '' } },
+  { key: 'lhphone', name: 'Thanh · Số điện thoại', note: 'Ô xanh lá có hình điện thoại + số — dán góc suốt video', w: 0.34, d: { t1: '0567 442 996', t2: 'phone', t3: '' } },
+  { key: 'lhzalo', name: 'Thanh · Zalo', note: 'Ô xanh dương kiểu Zalo + số/tên tài khoản', w: 0.34, d: { t1: '0567 442 996', t2: 'zalo', t3: '' } },
   { key: 'lhface', name: 'Thanh · Facebook', note: 'Ô xanh Facebook + tên trang', w: 0.36, d: { t1: 'Cam Lâm Land', t2: 'face', t3: '' } },
   { key: 'lhyoutube', name: 'Thanh · YouTube', note: 'Ô đỏ YouTube + tên kênh', w: 0.36, d: { t1: 'Cam Lâm Land', t2: 'yt', t3: '' } },
   { key: 'lhtiktok', name: 'Thanh · TikTok', note: 'Ô đen TikTok + tên tài khoản', w: 0.34, d: { t1: '@camlamland', t2: 'tt', t3: '' } },
@@ -1048,7 +1048,7 @@ function camAtTime(keys: CamKeyframe[], el: number): { lng: number; lat: number;
   }
   return ks[n - 1];
 }
-function mkSettings(key: string, name = 'Đất nền Cam Lâm', phone = '0988 888 888'): Settings {
+function mkSettings(key: string, name = 'Đất nền Cam Lâm', phone = '0567 442 996'): Settings {
   // Tiêu đề CHỈ là tên dự án — KHÔNG ghép nhãn kịch bản (Vị trí/Dẫn đường…) vào video.
   return { title: name, sub: 'Liên hệ: ' + phone, layout: 'bottomLeft', orient: '16:9', res: '1080', duration: 8, base: 'sat', parcelFx: 'glow', parcelColor: '#C8A14B', chartOn: false, chartTitle: 'Lượt quan tâm theo ngày', chartType: 'bar', chartRaw: 'T2:80, T3:120, T4:150, T5:190, T6:250, T7:300', subs: [], textAnim: 'fade' };
 }
@@ -2291,7 +2291,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
   const [ready, setReady] = useState(false);
   const [rec, setRec] = useState(false);
   const [title, setTitle] = useState('Đất nền Cam Lâm');
-  const [sub, setSub] = useState('Liên hệ: 0988 888 888');
+  const [sub, setSub] = useState('Liên hệ: 0567 442 996');
   const [logo, setLogo] = useState(true);
   const [logoStyle, setLogoStyle] = useState('vienthuoc');  // kiểu thẻ thương hiệu đóng lên video
   const [logoPos, setLogoPos] = useState('auto');           // góc đặt thẻ ('auto' = tự né chỗ có chữ)
@@ -2693,7 +2693,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
   useEffect(() => { layoutRef.current = layout; }, [layout]);
 
   // ── PHASE 2: dự án + 5 kịch bản + tự lưu ──
-  const [property, setProperty] = useState<{ name: string; address: string; price: string; area: string; phone: string; zalo: string; website: string; qrOn?: boolean; qrData?: string }>({ name: 'Đất nền Cam Lâm', address: '', price: '', area: '', phone: '0988 888 888', zalo: '', website: '' });
+  const [property, setProperty] = useState<{ name: string; address: string; price: string; area: string; phone: string; zalo: string; website: string; qrOn?: boolean; qrData?: string }>({ name: 'Đất nền Cam Lâm', address: '', price: '', area: '', phone: '0567 442 996', zalo: '', website: '' });
   const [scripts, setScripts] = useState<{ key: string; name: string; focus: string; settings: Settings }[]>(() => SCRIPTS0.map((s) => ({ ...s, settings: mkSettings(s.key) })));
   const [activeScript, setActiveScript] = useState(0);
   // Kịch bản "Bay cao" có sàn riêng: thấp nhất 2,6 km, không cho hạ thấp hơn (hạ nữa thì hết là bay cao).
@@ -2911,7 +2911,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
 
   // Tạo NHANH 5 kịch bản KHÁC NHAU từ thông tin dự án: khác chữ + bố cục + khổ + hiệu ứng (kết hợp camera riêng → 5 video khác hẳn).
   function autoFillScripts() {
-    const name = property.name?.trim() || 'Dự án'; const phone = property.phone?.trim() || '0988 888 888';
+    const name = property.name?.trim() || 'Dự án'; const phone = property.phone?.trim() || '0567 442 996';
     const price = property.price?.trim(); const addr = property.address?.trim();
     const base0 = { res, duration, base, chartTitle, chartType, chartRaw, chartSeries };
     const P: Record<string, Settings> = {
@@ -9687,7 +9687,7 @@ function MapVideoTool({ coQuyen = false, daDangNhap = false }: { coQuyen?: boole
                   ) : (
                     <>
                       <a href="/dichvu" className="rounded-xl px-4 py-2.5 text-center text-sm font-bold" style={{ background: GOLD, color: NAVY }}>Xem gói &amp; nâng cấp</a>
-                      <a href="tel:0988888888" className="rounded-xl px-4 py-2 text-center text-[13px] font-semibold" style={{ background: 'rgba(255,255,255,.08)', color: INK }}>Gọi 0988 888 888 để được tư vấn</a>
+                      <a href="tel:0567442996" className="rounded-xl px-4 py-2 text-center text-[13px] font-semibold" style={{ background: 'rgba(255,255,255,.08)', color: INK }}>Gọi 0567 442 996 để được tư vấn</a>
                     </>
                   )}
                   <button onClick={() => setMoiNangCap('')} className="rounded-xl px-4 py-2 text-center text-[12px] font-semibold text-slate-400 hover:text-white">Để sau — quay lại dựng tiếp</button>

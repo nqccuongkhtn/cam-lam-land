@@ -2366,7 +2366,7 @@ export default function MapPage() {
                 <input type="checkbox" checked={!o.khoa && o.gom.every((id) => !!ovOn[id])}
                   onChange={(e) => bamMucQh(o, e.target.checked)}
                   className="accent-emerald-600 w-4 h-4 rounded-sm" />
-                <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 bg-amber-500" /><span className="min-w-0 flex-1 text-slate-700 leading-snug">{o.ten}{o.khoa && <span className="ml-1 text-[11px]" aria-label="chỉ quản trị viên">🔒</span>}</span>
+                <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 bg-amber-500" /><span className="min-w-0 flex-1 text-slate-700 leading-snug">{o.ten}{o.khoa && <span className="ml-1 text-[11px]" aria-label="liên hệ admin">🔒</span>}</span>
               </label>
             ))}
             {/* Máy tính: thanh độ mờ nằm ở cột nút bên phải bản đồ (như điện thoại) → ẩn bản ở bảng này. */}
@@ -2823,7 +2823,7 @@ export default function MapPage() {
                     return (
                       <button key={o.id} onClick={() => { bamMucQh(o, !bat); setQhSheet(false); }}
                         className={`relative block w-full truncate whitespace-nowrap border-b border-black/10 px-8 py-[11px] text-center text-[14px] text-[#0A2540] active:bg-black/5 ${bat ? 'font-medium' : ''}`}>
-                        {bat && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] font-bold text-[#C8A14B]">✓</span>}{tenVung} · {o.tenApp}{o.khoa && <span className="ml-1 text-[12px]" aria-label="chỉ quản trị viên">🔒</span>}
+                        {bat && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] font-bold text-[#C8A14B]">✓</span>}{tenVung} · {o.tenApp}{o.khoa && <span className="ml-1 text-[12px]" aria-label="liên hệ admin">🔒</span>}
                       </button>
                     );
                   })}
@@ -2869,12 +2869,14 @@ export default function MapPage() {
           {/* ── HỘP "LIÊN HỆ ADMIN" (15/10/2026): bấm dòng quy hoạch có khoá (lớp chỉ quản trị viên, vd QH chi tiết 1/500) ── */}
           {hopKhoa && (
             <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 px-4 animate-[fadeIn_.15s_ease-out]" onClick={() => setHopKhoa(null)}>
-              <div role="dialog" aria-modal="true" aria-label="Chỉ quản trị viên được xem" className="w-full max-w-[340px] rounded-lg bg-white p-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-                <p className="text-[15px] font-bold text-[#0A2540]">🔒 Chỉ quản trị viên được xem</p>
+              {/* 15/10/2026 chủ dự án: "liên hệ admin chứ đừng có nói là tài khoản nào được xem" → KHÔNG nhắc ai được xem / quyền gì,
+                  chỉ mời liên hệ admin. */}
+              <div role="dialog" aria-modal="true" aria-label="Liên hệ admin" className="w-full max-w-[340px] rounded-lg bg-white p-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                <p className="text-[15px] font-bold text-[#0A2540]">🔒 {hopKhoa}</p>
                 {laQuanTri ? (
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">Chưa tải được lớp <b>{hopKhoa}</b>. Tải lại trang hoặc đăng nhập lại rồi thử lần nữa.</p>
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">Chưa tải được lớp này. Tải lại trang hoặc đăng nhập lại rồi thử lần nữa.</p>
                 ) : (
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">Lớp <b>{hopKhoa}</b> hiện chỉ mở cho tài khoản quản trị. Muốn xem, vui lòng liên hệ admin Cam Lâm Land.</p>
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">Vui lòng liên hệ admin Cam Lâm Land để được xem lớp này.</p>
                 )}
                 {!laQuanTri && (
                   <div className="mt-3 grid grid-cols-2 gap-2">

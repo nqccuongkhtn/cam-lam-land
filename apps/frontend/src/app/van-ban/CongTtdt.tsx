@@ -24,12 +24,13 @@ export default function CongTtdt() {
       </div>
       {ds.length ? (
         <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-5">
+          {/* KHÔNG CÒN LÀ ĐƯỜNG DẪN (15/10/2026, chủ dự án: "không cho bấm tới mấy link này nữa") — tra cứu văn bản là tính năng trả phí,
+              đưa khách sang cổng nhà nước thì họ tự tìm văn bản ở đó. Chỉ hiện TÊN cổng (ô tìm vẫn lọc được); địa chỉ vẫn giữ trong data.ts. */}
           {ds.map((c) => (
-            <a key={c.url} href={c.url} target="_blank" rel="noreferrer" title={`${c.ten} — ${c.nhom}`}
-              className="group flex min-w-0 items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[13px] text-slate-700 transition hover:border-slate-300 hover:text-red-600 sm:text-sm">
+            <div key={c.url} title={`${c.ten} — ${c.nhom}`}
+              className="flex min-w-0 items-center rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[13px] text-slate-700 sm:text-sm">
               <span className="min-w-0 leading-snug">{c.ten}</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3 shrink-0 text-slate-300 group-hover:text-red-600" aria-hidden><path d="M7 17 17 7M9 7h8v8" /></svg>
-            </a>
+            </div>
           ))}
         </div>
       ) : (

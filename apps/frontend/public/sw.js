@@ -1,4 +1,4 @@
-const CACHE = 'camlam-v93';  /* v93 (11/10/2026): xoá trang cũ đã lưu — trang Bản đồ còn chạy bản mã cũ (chưa có phụ lục phiếu) vì dấu "bản mới" chỉ so file CSS · v92 (2/10/2026): khung Tiện ích mở bản trang cũ gọi tới file mã đã bị thay → "Có lỗi khi hiển thị trang" */   // tăng số này là xoá sạch cache cũ của mọi máy ở lần vào sau
+const CACHE = 'camlam-v94';  /* v94 (15/10/2026): chủ dự án vẫn thấy bảng thửa bản cũ ("Liên hệ admin để xem") sau khi đã dựng bản "Đăng ký thành viên" — xoá trang cũ mọi máy · v93 (11/10/2026): xoá trang cũ đã lưu — trang Bản đồ còn chạy bản mã cũ (chưa có phụ lục phiếu) vì dấu "bản mới" chỉ so file CSS · v92 (2/10/2026): khung Tiện ích mở bản trang cũ gọi tới file mã đã bị thay → "Có lỗi khi hiển thị trang" */   // tăng số này là xoá sạch cache cũ của mọi máy ở lần vào sau
 const API_CACHE = 'camlam-api-v1'; // cache RIÊNG cho API công khai (dễ dọn, giới hạn dung lượng)
 const OFFLINE = '/offline.html';
 // Precache khung app để MỞ APP là vẽ ngay (không chờ mạng → hết màn đen ~1s lúc khởi động).

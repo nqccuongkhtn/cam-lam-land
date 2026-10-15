@@ -501,11 +501,11 @@ export async function layPdfDrive(link: string): Promise<Buffer | null> {
 //    · qpdf gom các mảnh nhỏ thành luồng nén chung, nén lại mức cao nhất.
 //    Ép JPEG mạnh hơn chỉ bớt thêm ~1% mà làm dấu đỏ nhoè → không dùng.
 // Kho CHỈ giữ bản đã xử lý (vb-<phiên bản>-<mã>.pdf); đổi cách xử lý thì tăng PHIEN_BAN_FILE để làm lại.
-const PHIEN_BAN_FILE = 'v12';  // v12 (15/10/2026): thêm MÃ QR mở văn bản trên web (trang 2 to, các trang khác nhỏ ở góc); v11 (15/10/2026): dấu bỏ chữ "/Zalo" (Zalo admin là số khác, không in ra); v10 (15/10/2026): số điện thoại mới 0567 442 996 trên dấu (bản cũ ghi số giả 0988…); v9 (7/10/2026): chữ chéo nghiêng ít hơn (30° thay vì theo đường chéo); v8 (6/10/2026): chèn thêm trang 2 trắng có dấu bản quyền; v7: dấu bản quyền ghi tên miền mới batdongsancamlam.vn; v6: chữ chéo nhỏ lại; v4: chữ chéo 2 dòng (thêm link + SĐT) vẽ bằng xoay hệ toạ độ — không đè nhau; gắn cho MỌI văn bản
+const PHIEN_BAN_FILE = 'v13';  // v13 (15/10/2026): chỉ còn MÃ QR NHỎ trỏ TRANG CHỦ ở góc mỗi trang (bỏ khối QR to + chữ ở trang 2); v12 (15/10/2026): thêm MÃ QR mở văn bản trên web (trang 2 to, các trang khác nhỏ ở góc); v11 (15/10/2026): dấu bỏ chữ "/Zalo" (Zalo admin là số khác, không in ra); v10 (15/10/2026): số điện thoại mới 0567 442 996 trên dấu (bản cũ ghi số giả 0988…); v9 (7/10/2026): chữ chéo nghiêng ít hơn (30° thay vì theo đường chéo); v8 (6/10/2026): chèn thêm trang 2 trắng có dấu bản quyền; v7: dấu bản quyền ghi tên miền mới batdongsancamlam.vn; v6: chữ chéo nhỏ lại; v4: chữ chéo 2 dòng (thêm link + SĐT) vẽ bằng xoay hệ toạ độ — không đè nhau; gắn cho MỌI văn bản
 const PHONG_DAU = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
-// Địa chỉ web in vào mã QR trên văn bản (đổi tên miền thì đặt SITE_URL trong .env rồi tăng PHIEN_BAN_FILE để đóng dấu lại).
+// Địa chỉ web in vào mã QR trên văn bản = TRANG CHỦ (đổi tên miền thì đặt SITE_URL trong .env rồi tăng PHIEN_BAN_FILE để đóng dấu lại).
 const WEB_QR = (process.env.SITE_URL || 'https://batdongsancamlam.dpdns.org').replace(/\/+$/, '');
-async function ganDauBanQuyen(buf: Buffer, idVb?: number): Promise<Buffer> {
+async function ganDauBanQuyen(buf: Buffer): Promise<Buffer> {
   try {
     const { PDFDocument, rgb, pushGraphicsState, popGraphicsState, concatTransformationMatrix } = (await import('pdf-lib')) as any;
     const fontkit = ((await import('@pdf-lib/fontkit')) as any).default;
@@ -514,14 +514,13 @@ async function ganDauBanQuyen(buf: Buffer, idVb?: number): Promise<Buffer> {
     const font = await doc.embedFont(await readFile(PHONG_DAU), { subset: true });
     const chan = 'Tải miễn phí tại batdongsancamlam.vn · Hotline 0567 442 996 — Cam Lâm Land · Nhà đất & bản đồ quy hoạch Cam Lâm';
     const chu1 = 'CAM LÂM LAND', chu2 = 'batdongsancamlam.vn  ·  0567 442 996';
-    // MÃ QR MỞ VĂN BẢN TRÊN WEB (15/10/2026, chủ dự án: "bổ sung thêm QR để vào web lên văn bản, để người dùng cần web để vào"):
-    // trỏ thẳng /van-ban?vb=<mã> (mở đúng văn bản này — luật đăng nhập / trả phí của web vẫn áp như thường). Trang 2 (trang trắng chèn
-    // thêm) in mã TO giữa trang + dòng hướng dẫn; mọi trang khác in mã NHỎ ở góc dưới bên phải (nằm trong lề giấy).
+    // MÃ QR TRANG CHỦ WEB (15/10/2026, chủ dự án: "bổ sung thêm QR để vào web lên văn bản, để người dùng cần web để vào" — cùng ngày chỉnh lại:
+    // "bỏ cái này đi, chỉ để lại mã QR trang chủ web ở chỗ hợp lý và nhỏ chứ không làm to như hiện tại"): một mã NHỎ ở góc dưới bên phải
+    // MỌI trang (cả trang trắng chèn thêm), nằm trong lề giấy, trỏ TRANG CHỦ web — không còn khối mã to + dòng chữ ở trang 2.
     let anhQr: any = null;
-    const urlQr = idVb ? `${WEB_QR}/van-ban?vb=${idVb}` : WEB_QR;
     try {
       const QRCode = ((await import('qrcode')) as any).default;
-      anhQr = await doc.embedPng(await QRCode.toBuffer(urlQr, { errorCorrectionLevel: 'M', margin: 1, scale: 8, color: { dark: '#0A2540ff', light: '#ffffffff' } }));
+      anhQr = await doc.embedPng(await QRCode.toBuffer(WEB_QR, { errorCorrectionLevel: 'M', margin: 1, scale: 8, color: { dark: '#0A2540ff', light: '#ffffffff' } }));
     } catch (e: any) { console.error('[van-ban] tạo mã QR lỗi:', e?.message || e); }
     // TRANG 2 CHÈN THÊM (chủ dự án 6/10/2026, gửi hình mẫu): một trang trắng cùng khổ với trang 1 (theo mắt người đọc),
     // chỉ có chữ chéo + dòng chân trang như mọi trang khác — chèn vào sau trang 1 (file 1 trang thì thành trang cuối).
@@ -532,8 +531,7 @@ async function ganDauBanQuyen(buf: Buffer, idVb?: number): Promise<Buffer> {
       const kho: [number, number] = x1 === 90 || x1 === 270 ? [H1, W1] : [W1, H1];
       doc.insertPage(Math.min(1, doc.getPageCount()), kho);
     }
-    const trangChen = Math.min(1, doc.getPageCount() - 1);   // chỉ số trang trắng vừa chèn
-    for (const [iTrang, page] of doc.getPages().entries()) {
+    for (const page of doc.getPages()) {
       const { width: W, height: H } = page.getSize();
       const xoay = ((page.getRotation()?.angle || 0) % 360 + 360) % 360;
       const ngang = xoay === 90 || xoay === 270;
@@ -559,22 +557,9 @@ async function ganDauBanQuyen(buf: Buffer, idVb?: number): Promise<Buffer> {
       let co = 7.5; while (co > 4.5 && font.widthOfTextAtSize(chan, co) > w - 24) co -= 0.5;
       page.drawText(chan, { x: (w - font.widthOfTextAtSize(chan, co)) / 2, y: 6, size: co, font, color: rgb(0.04, 0.15, 0.25), opacity: 0.7 });
       if (anhQr) {
-        if (iTrang === trangChen) {
-          // trang trắng của web: mã TO ở PHẦN TRÊN trang + hướng dẫn ngay dưới — tránh dải chữ chìm chéo giữa trang (đặt giữa trang thì
-          // mã + chữ hướng dẫn đè lên chữ chìm, nhìn rối)
-          const kq = Math.min(w, h) * 0.26;
-          const yq = h * 0.92 - kq;
-          page.drawImage(anhQr, { x: (w - kq) / 2, y: yq, width: kq, height: kq });
-          const d1 = 'Quét mã để mở văn bản này trên web Cam Lâm Land';
-          let c1 = Math.min(w, h) * 0.03; while (font.widthOfTextAtSize(d1, c1) > w * 0.85) c1 *= 0.92;
-          page.drawText(d1, { x: (w - font.widthOfTextAtSize(d1, c1)) / 2, y: yq - c1 * 1.8, size: c1, font, color: rgb(0.04, 0.15, 0.25) });
-          let c2 = c1 * 0.62; while (font.widthOfTextAtSize(urlQr, c2) > w * 0.85) c2 *= 0.92;
-          page.drawText(urlQr, { x: (w - font.widthOfTextAtSize(urlQr, c2)) / 2, y: yq - c1 * 1.8 - c2 * 2, size: c2, font, color: rgb(0.78, 0.6, 0.22) });
-        } else {
-          // mã NHỎ ở góc dưới bên phải, nằm trong lề giấy (trên dòng chân trang)
-          const kq = Math.max(30, Math.min(w, h) * 0.06);
-          page.drawImage(anhQr, { x: w - kq - 8, y: 14, width: kq, height: kq });
-        }
+        // mã NHỎ ở góc dưới bên phải, nằm trong lề giấy (trên dòng chân trang)
+        const kq = Math.max(30, Math.min(w, h) * 0.06);
+        page.drawImage(anhQr, { x: w - kq - 8, y: 14, width: kq, height: kq });
       }
       page.pushOperators(popGraphicsState());
     }
@@ -655,7 +640,7 @@ export function layFileVb(id: number, link: string | null): Promise<Buffer | nul
     // NGƯỜI ĐẦU TIÊN KHÔNG PHẢI CHỜ NÉN (9/10/2026): đóng dấu xong là lưu + trả ngay (đóng dấu chỉ ~1 giây);
     // việc nén (ghostscript, có file mất 5–10 giây) chạy NGẦM sau đó, nén xong thì thay bản trong kho
     // → người sau nhận bản nhẹ, ổ đĩa vẫn chỉ giữ bản đã nén. Vẫn đúng ý "chỉ tải khi có người mở lần đầu".
-    const dau = await ganDauBanQuyen(goc, id);
+    const dau = await ganDauBanQuyen(goc);
     await mkdir(KHO_DRIVE, { recursive: true }); await writeFile(f, dau).catch(() => {});
     nenNgam(f, dau);
     return dau;

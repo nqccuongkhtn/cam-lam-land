@@ -512,8 +512,8 @@ Chủ dự án: "trả phí chia ra là các chức năng chung, còn trả phí
   **4 văn bản mới nhất ở trang chủ** (`vbMienPhi`, chủ dự án: "ở đây cứ cho xem 4 văn bản mới nhất") — đủ số + mở được (cần đăng nhập).
   Danh sách trả `Cache-Control: private, no-cache` + `Vary: Authorization` và trang tải lại khi ĐỔI TÀI KHOẢN (trước giữ bản của admin 5 phút →
   chủ dự án vào tài khoản thường vẫn thấy số). **Lượt tải hiển thị**: admin thấy số thật `luot_tai`; người khác thấy `luot_ao` (khởi đầu số
-  thật + ngẫu nhiên 23–88, mỗi lần mở cộng ngẫu nhiên 2–5 — `LUOT_HIEN`). **Mã QR** trên tệp đóng dấu trỏ `/van-ban?vb=<mã>` (trang 2 mã to,
-  trang khác mã nhỏ góc dưới phải; `PHIEN_BAN_FILE` v12 ↔ `?v=12` ở giao diện). **Chia sẻ** chỉ gửi số ký hiệu đã che + 10 chữ đầu trích yếu
+  thật + ngẫu nhiên 23–88, mỗi lần mở cộng ngẫu nhiên 2–5 — `LUOT_HIEN`). **Mã QR** trên tệp đóng dấu: mã NHỎ ở góc dưới phải MỌI trang, trỏ
+  TRANG CHỦ web (chủ dự án bỏ khối mã to + chữ ở trang 2: "chỉ để lại mã QR trang chủ web ở chỗ hợp lý và nhỏ"); `PHIEN_BAN_FILE` v13 ↔ `?v=13` ở giao diện. **Chia sẻ** chỉ gửi số ký hiệu đã che + 10 chữ đầu trích yếu
   ("họ có dữ liệu để vào google tìm kiếm").
 - **Đền bù** (`/den-bu`, chỉ chặn ở GIAO DIỆN — số liệu là văn bản công khai): người không có gói → che mọi số tiền, hệ số (× 1,12), số hiệu
   văn bản, ngày, số Điều / khoản / STT, năm (`RE_SO` + `cheSo`, chủ dự án: "che mà số quyết định các thứ còn như này họ tự kiếm"); ô tính khoá;

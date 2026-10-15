@@ -161,7 +161,7 @@ export default function VanBanBrowser() {
     if (!coQuyenVb) { setHopTraPhi(true); return; }   // TÍNH NĂNG TRẢ PHÍ (15/10/2026) — máy chủ cũng chặn tệp (403)
     if (!d.coFile) return;
     setDangXem({ id: d.id, ten: `${(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')} · ${d.trichYeu}`,
-      tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`, url: `${apiBase}/van-ban/${d.id}/pdf?v=12` /* v=12 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts) mới được giữ 30 ngày */, token: getToken() || '' });
+      tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`, url: `${apiBase}/van-ban/${d.id}/pdf?v=13` /* v=13 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts) mới được giữ 30 ngày */, token: getToken() || '' });
     // admin thấy số thật (+1); người khác thấy số hiển thị — máy chủ cộng ngẫu nhiên 2–5 mỗi lượt mở (routes/vanBan.ts LUOT_HIEN)
     setDocs((ds) => (ds || []).map((x) => x.id === d.id ? { ...x, luotTai: (x.luotTai || 0) + (laAdmin(user as any) ? 1 : 2 + Math.floor(Math.random() * 4)) } : x));
     doiDiaChi(d.id);

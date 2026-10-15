@@ -199,7 +199,7 @@ function VanBanMoiNhat({ tu, onXoa }: { tu: string; onXoa: () => void }) {
     if (d.an) { setHopTraPhi(true); return; }
     setDangXem({ id: d.id, ten: `${(d.soKyHieu || '').replace(/^Không số \(\d+\)$/, 'Không số')} · ${d.trichYeu}`,
       tenFile: `${String(d.soKyHieu || 'van-ban').replace(/[^\w.-]/g, '_')}.pdf`,
-      url: `${apiBase}/van-ban/${d.id}/pdf?v=12` /* v=12 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts), giống VanBanBrowser */, token: getToken() || '' });
+      url: `${apiBase}/van-ban/${d.id}/pdf?v=13` /* v=13 PHẢI khớp PHIEN_BAN_FILE bên máy chủ (routes/vanBan.ts), giống VanBanBrowser */, token: getToken() || '' });
   }
   // Giải mã chữ HTML (&#253; → ý…) y như trang /van-ban — vài văn bản nguồn Công báo còn lưu kiểu này.
   const sach = (ds?: VbMoi[]) => (ds || []).map((d) => ({ ...d, soKyHieu: deEnt(d.soKyHieu), trichYeu: deEnt(d.trichYeu), coQuan: deEnt(d.coQuan) }));

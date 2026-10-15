@@ -453,6 +453,25 @@ Kiểm tra nhanh trong Console: `Object.values(__banDo.style.sourceCaches['src-d
 
 ---
 
+## ⚠️ KHOÁ QUY HOẠCH CAM LÂM — chỉ QĐ893 xem miễn phí (15/10/2026)
+
+Chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free, còn lại khoá lại, sửa cả phần thông tin kiểm tra quy hoạch".
+- **Bị khoá:** QĐ205 (quy hoạch chung 2045), 7 bản phân khu 1/2000, 1/500. **Mở:** QĐ893 + 7 QHSDĐ 2030 từ PDF các huyện + Tây NT 2.2.
+- **Ai xem đủ:** `xemDuQhCamLam` (routes/parcels.ts) — hiện = admin. MỘT CHỖ DUY NHẤT để mở cho gói trả phí / vai trò mới sau này.
+- **Ảnh:** nginx chặn `/tiles/(qd205|qd2076|qd2101|qd2222|qd918|qdcuhin|qdtaynam|qdtaybac)…/`, `qh_vector|qh_fill|qh_lines|qh_smooth|qh_precomputed`,
+  `/overlays/qd205`, `/qhtiles` (404). Luật chặn PHẢI đứng trước luật `\.(geojson|pmtiles)$`. Người có vé xem qua `/api/qh-rieng/t/<thư mục>/z/x/y?v=`
+  — backend gắn CHỈ ĐỌC volume `camlam_tiles` (`QH_TILES_DIR` = `du-lieu-rieng/tiles-cong`) nên không chép thêm GB nào vào ổ C. `qh_vector` cho
+  người có vé: `/api/qh-rieng/tep/qh_vector` (tệp ở `<qh_rieng>/tep/`) — đường KHÔNG có đuôi `.geojson` vì nginx đẩy mọi `.geojson` sang frontend.
+- **Tra thửa** (`/api/parcels/at`), người không xem đủ: `overlaps=[]`, `zoning=null`, bỏ mục 7 phân khu, thêm dấu khoá `{ma:'205'|'pk', khoa:true}`
+  (`qhNgoaiVung` tính trên dữ liệu ĐỦ); `/:id/qh-manh` trả 403. Có số liệu khoá thì `Cache-Control: private, no-store`.
+- **Giao diện** (`KHOA_CAM_LAM` / `MUC_KHOA_CAM_LAM` trong page.tsx): không vé → bỏ ảnh 8 lớp + dòng 🔒 + hộp liên hệ admin; có vé → ảnh qua
+  đường vé. Lớp mặc định QĐ893 (có vé → QĐ205 như cũ nếu chưa tự chọn lớp). Bảng thửa: trang 🔒 "Liên hệ admin để xem". Phiếu kiểm tra quy
+  hoạch: khoá (in ảnh QĐ205) — có vé in qua đường vé (`tile205`, `rasterOverlaysRef`). `/listings` phủ QĐ893.
+- ⚠️ **Cloudflare đã giữ bản sao ô QĐ205 / phân khu ở biên (Cache-Control 1 năm)** → chủ dự án phải bấm "Purge Everything" một lần. File
+  `qd205.pmtiles` ở GitHub Releases (Dockerfile.render, route `/qhtiles`) vẫn công khai trên GitHub; bản dự phòng Render không có nginx nên không chặn.
+- Kiểm 15/10/2026 11h: `/tiles/qd205…` 404, `qd893v1` 200, có vé → ô trùng từng byte, không vé 403; Thửa 70 · Tờ 25 khách xem: QĐ893 =
+  395,1 đất ở đô thị + 116,8 đường, QĐ205 / phân khu / 1/500 chỉ có khoá; trình duyệt không xin ô nào bị khoá.
+
 ## Phần khó nhất: tính quy hoạch trên từng thửa
 
 `GET /api/parcels/at?lng=&lat=` (`routes/parcels.ts` + `lib/qhCompute.ts`) là **tính năng lõi & tinh vi nhất**.
@@ -585,8 +604,8 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   ngòi"); (4) màu chú dẫn chỉ dùng cho MỘT mã (bảng `mau_mot_ma_qd893`: xám = NTD, #ffbf7f = CLN, #ffdf7f = HNK, #bfff00 = RPH,
   #dfff7f = NKH, #ffaaaa = DPC) → vùng không ghi mã gọi đúng tên mã; (5) "lọt trong ô có mã" phải PHỦ ≥ 95 % và CÙNG MÀU mới bỏ;
   (6) xếp lớp như bản vẽ hiển thị: mọi ô ngang bậc, ô có vùng tô gốc nhỏ hơn nằm trên (diện tích xếp = vòng ngoài vùng tô gốc, không
-  phải mảnh). 79 phiếu: 9.315 → 9.269 m² (8 phiếu tốt lên, 4 phiếu đổi 0,1 m² do làm tròn cung). Còn để nguyên chờ chủ dự án: 714 vùng
-  xanh nước KHÔNG ghi mã (4.585 ha) đang gọi "Đất sông, ngòi, kênh, rạch" dù chú dẫn dùng màu này cho cả hồ / thuỷ lợi / ao nuôi.
+  phải mảnh). 79 phiếu: 9.315 → 9.269 m² (8 phiếu tốt lên, 4 phiếu đổi 0,1 m² do làm tròn cung). 714 vùng xanh nước KHÔNG ghi mã
+  (4.585 ha) gọi "Đất sông, ngòi, kênh, rạch" dù chú dẫn dùng màu này cho cả hồ / thuỷ lợi / ao nuôi — 15/10/2026 chủ dự án chọn ĐỂ NGUYÊN.
   (7) NHÃN GHÉP "+" ("TMD+ODT", "NKH+TMD", "DTT+DKV+TMD"… 119 nhãn) = một loại "Đất hỗn hợp (TMD + ODT)" — trước tách mã rồi bỏ mã trái
   màu (thửa 326 tờ 7 Cam Đức: app tham chiếu ghi đất hỗn hợp, web ghi thương mại dịch vụ). Chữ "%%u…%%U" (gạch chân CAD) bỏ trước khi đọc mã.
 - **QĐ893 BỎ DẢI VIỀN RANH HUYỆN (15/10/2026).** Vùng tô hồng #ff7fff ở Level 0 (h 6ADCB9) là dải viền 75 m chạy quanh cả huyện (khung
@@ -856,7 +875,9 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   Nhãn bỏ chữ "đã duyệt", rồi bỏ cả "6 đồ án" + "chỉ quản trị viên" (chủ dự án 15/10) — tên lớp: "QH chi tiết 1/500 · tô màu theo loại
   đất" / "· bản vẽ gốc", người thường thấy "QH chi tiết 1/500". Tự kiểm 15/10 9h: gioi-thieu 200, ve 401, ô vé giả / không vé 403, `/tiles/` 404.
   **1/500 TÔ MÀU THEO LOẠI ĐẤT (15/10/2026, chủ dự án: "làm kiểu màu giống 1/2000 và 893, làm như kiểu 205 khó xem quá")** — lớp
-  `qh-ct500-mau` (bộ ô `qhct500-mau-v1`, 44 MB) đứng TRƯỚC lớp bản in gốc `qh-ct500` ("· bản vẽ gốc"); chờ chủ dự án chọn giữ một hay cả hai.
+  `qh-ct500-mau` (bộ ô `qhct500-mau-v1`, 44 MB), tên "QH chi tiết 1/500". 15/10/2026 chủ dự án chọn CHỈ GIỮ bản tô màu: lớp bản in gốc
+  `qh-ct500` đã gỡ khỏi danh-sach.json (mục cất ở `D:\KhoQH\qh-rieng\tung-ban\lop-da-go-15-10.json`, ô ảnh `qhct500-v1` vẫn ở volume —
+  bật lại = thêm mục bằng them_lop_rieng.py); `congKhai` chuyển sang `qh-ct500-mau`.
   `scripts/qh-tinh/to_mau_1_500.py` (doc → cat → chu-giai) đọc thẳng DXF: bản vẽ 1/500 chỉ tô HOA VĂN nên in ra gần trắng; nay mỗi vùng tô =
   một lô, loại đất theo TÊN LỚP (`mau-1-500.json`, từ khoá → loại → màu), màu = màu ảnh phân khu 1/2000 cho đúng loại đó (đo: chỗ lô nhà ở
   1/500 thì ảnh 1/2000 là #979763 95–96 %, trường học / tôn giáo / y tế / hạ tầng khớp 53–82 %). Chẵn–lẻ + cung tròn đúng công thức như
@@ -874,9 +895,10 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   (lọc `nguon '1/500'` như PDF). Kiểm 15/10: 50 thửa tổng khớp diện tích sổ, đối chiếu cắt hình mặt phẳng VN-2000 lệch ≤ 0,11 m²/dòng.
   **Chữ cho người thường KHÔNG nói ai được xem** (chủ dự án: "liên hệ admin chứ đừng nói tài khoản nào được xem") — chỉ "🔒 … liên hệ admin".
   ĐÃ LÊN WEB 14/10/2026 21:32 (tự kiểm qua tên miền thật: chưa đăng nhập 401, vé giả 403, `/tiles/` công khai 404, ô có vé hợp lệ trùng
-  từng byte file gốc, Cloudflare `DYNAMIC` không giữ). Volume riêng hiện có 2 lớp: `qh-ct500` (1/500 chính thức) và `qh-nt-tay-pk22`
-  (ĐC phân khu 1/2000 Tây Nha Trang tiểu PK 2.2, 377 ha — thuyết minh để TRỐNG số quyết định ⇒ "chưa xác minh", chờ chủ dự án quyết
-  công khai hay xoá; nắn bằng `nan_theo_bang_ranh.py` theo bảng toạ độ N1–N50). Thêm lớp: `them_lop_rieng.py` + `docker cp` vào volume.
+  từng byte file gốc, Cloudflare `DYNAMIC` không giữ). Volume riêng hiện có 1 lớp: `qh-ct500-mau` (1/500 tô màu). Lớp `qh-nt-tay-pk22`
+  (ĐC phân khu 1/2000 Tây Nha Trang tiểu PK 2.2, 377 ha, đất xã Diên Khánh — thuyết minh để TRỐNG số quyết định ⇒ "chưa xác minh"; nắn bằng
+  `nan_theo_bang_ranh.py` theo bảng toạ độ N1–N50) 15/10/2026 chủ dự án chọn CÔNG KHAI: khai thẳng trong page.tsx (vung `dien-khanh`, ô ở
+  `/tiles/nttaypk22v1`, hai PDF hồ sơ ở `public/tai-lieu/quy-hoach/`, thẻ căn cứ ghi "chưa ghi số quyết định"). Thêm lớp riêng: `them_lop_rieng.py` + `docker cp` vào volume.
   ⚠️ MicroStation qua COM: KHÔNG chạy 2 kịch bản cùng lúc (đã sập "RPC server is unavailable" / "object no longer valid"); dùng
   `win32com.client.dynamic.Dispatch` (bộ gen_py từng làm sập khi quét); khổ giấy tự đặt phải có `<Units>4</Units>` (thiếu là "Invalid
   Printer Driver Configuration"); 4800 dpi làm MicroStation 32 bit ngốn > 3 GB; xuất DXF qua COM phải bỏ model TRANG IN trên bản sao.

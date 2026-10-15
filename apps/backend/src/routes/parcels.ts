@@ -10,6 +10,12 @@ import { qhTuPdf } from '../lib/qhPdf.ts';
 import { qh500TrenThua } from '../lib/qh500.ts';
 import { laAdmin } from '../lib/auth.ts';
 import { nguoiDungTuYeuCau } from '../middleware/auth.ts';
+
+// ── AI ĐƯỢC XEM ĐỦ QUY HOẠCH CAM LÂM (15/10/2026) — MỘT CHỖ DUY NHẤT để đổi (vd sau này mở cho gói trả phí / vai trò riêng) ──
+// Chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free, còn lại khoá lại". Bị khoá: QĐ205 (quy hoạch chung 2045), 7 bản phân khu 1/2000,
+// 1/500 (lib/qh500.ts). Ảnh bản đồ các bản này: routes/qhRieng.ts (vé admin) + nginx chặn đường /tiles/ cũ.
+export const xemDuQhCamLam = (nd: any) => laAdmin(nd);
+const PK_CAM_LAM = new Set(['2076', '2101', '2222', '918', 'cuhin', 'taynam', 'taybac']);   // mã 7 bản phân khu trong qhCacBan (qhCompute.ts)
 import { isFlagOn } from '../lib/flags.ts';
 
 
@@ -317,18 +323,33 @@ parcelsRouter.get('/at', async (req, res, next) => {
     // (15/10/2026) QH CHI TIẾT 1/500 (lib/qh500.ts): loại đất + diện tích CHỈ gửi cho ADMIN (kiểm thẻ đầy đủ). Người khác: thửa nằm trong
     // ranh 1/500 thì chỉ có dấu khoá (giao diện hiện "liên hệ admin"). Trả số liệu thì đánh dấu riêng tư — không cho nginx / Cloudflare
     // giữ lại phát cho người khác (nginx vốn đã bỏ qua đệm khi yêu cầu có thẻ đăng nhập).
+    const nd = await nguoiDungTuYeuCau(req).catch(() => null);
+    const xemDu = xemDuQhCamLam(nd);
     let qh500: any = null;
     if (parcel && tuBangMoi) {
-      const nd = await nguoiDungTuYeuCau(req).catch(() => null);
-      qh500 = await qh500TrenThua(Number(parcel.id), dtThua, laAdmin(nd)).catch(() => null);
-      if (qh500 && !qh500.khoa) res.set('Cache-Control', 'private, no-store');
+      qh500 = await qh500TrenThua(Number(parcel.id), dtThua, xemDu).catch(() => null);
     }
     const qhCacBan = [...qhCacBanCL, ...qhPdf, ...(qh500 ? [qh500] : [])];
-    res.json({ found: true, point: { lng, lat }, parcel: parcel ?? null, zoning: zoningOut, overlaps, neighbors, listings: linked,
-               qhCacBan,
-               // (10/10/2026) thêm: có thửa mà KHÔNG bản nào phủ (vd thửa Phước Đồng sát ranh QĐ205, nay phần ngoài ranh không còn bị
-               // ghi đường giả) → cũng là "chưa có dữ liệu", kẻo trang hiện khung quy hoạch trống
-               qhNgoaiVung: (ngoaiQh || !!parcel) && overlaps.length === 0 && qhCacBan.length === 0 });
+    // (10/10/2026) thêm: có thửa mà KHÔNG bản nào phủ (vd thửa Phước Đồng sát ranh QĐ205, nay phần ngoài ranh không còn bị
+    // ghi đường giả) → cũng là "chưa có dữ liệu", kẻo trang hiện khung quy hoạch trống. Tính trên dữ liệu ĐỦ (trước khi khoá bớt).
+    const qhNgoaiVung = (ngoaiQh || !!parcel) && overlaps.length === 0 && qhCacBan.length === 0;
+    // ── KHOÁ QUY HOẠCH CAM LÂM (15/10/2026, chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free, còn lại khoá lại, sửa cả phần thông tin
+    // kiểm tra quy hoạch"). Người không được xem đủ: KHÔNG gửi QĐ205 (overlaps + loại đất tại điểm bấm) và 7 bản phân khu 1/2000 — chỉ gửi
+    // DẤU KHOÁ cho bản nào có phủ thửa (giao diện hiện trang "🔒 … Liên hệ admin để xem"). QĐ893 + QHSDĐ 2030 các huyện (PDF) gửi đủ.
+    // Có số liệu riêng (QĐ205 / phân khu / 1/500) thì đánh dấu riêng tư: nginx / Cloudflare không giữ lại phát cho người khác.
+    let overlapsRa = overlaps, zoningRa = zoningOut, cacBanRa: any[] = qhCacBan;
+    if (!xemDu) {
+      const co205 = overlaps.length > 0;
+      const coPk = qhCacBan.some((b: any) => PK_CAM_LAM.has(String(b?.ma)));
+      overlapsRa = []; zoningRa = null;
+      cacBanRa = qhCacBan.filter((b: any) => !PK_CAM_LAM.has(String(b?.ma)));
+      if (coPk) cacBanRa.push({ ma: 'pk', ten: 'Quy hoạch phân khu 1/2000', nguon: 'khoa', khoa: true, areas: [] });
+      if (co205) cacBanRa.unshift({ ma: '205', ten: 'Quy hoạch chung 2045 (QĐ205)', nguon: 'khoa', khoa: true, areas: [] });
+    } else if (overlaps.length || qhCacBan.some((b: any) => PK_CAM_LAM.has(String(b?.ma)) || (b?.ma === 'ct500' && !b?.khoa))) {
+      res.set('Cache-Control', 'private, no-store');
+    }
+    res.json({ found: true, point: { lng, lat }, parcel: parcel ?? null, zoning: zoningRa, overlaps: overlapsRa, neighbors, listings: linked,
+               qhCacBan: cacBanRa, qhNgoaiVung });
   } catch (e) { next(e); }
 });
 
@@ -336,6 +357,9 @@ parcelsRouter.get('/at', async (req, res, next) => {
 // public/qh_vector.geojson (tháng 7) nên hình có thể khác con số máy chủ tính. Giao diện chỉ gọi khi bấm in phiếu; chung hạn mức /api/parcels.
 parcelsRouter.get('/:id(\\d+)/qh-manh', async (req, res, next) => {
   try {
+    // (15/10/2026) Ô đất QĐ205 = quy hoạch Cam Lâm bị KHOÁ → chỉ người được xem đủ (phiếu in cũng chỉ mở cho họ).
+    if (!xemDuQhCamLam(await nguoiDungTuYeuCau(req).catch(() => null))) return res.status(403).json({ error: 'Vui lòng liên hệ admin để xem.' });
+    res.set('Cache-Control', 'private, no-store');
     if (!qhReady()) return res.json({ manh: [] });
     const [p] = await query<any>('SELECT ST_AsGeoJSON(geom)::json g FROM dia_chinh WHERE id=$1', [Number(req.params.id)]);
     if (!p) return res.status(404).json({ error: 'Không có thửa này' });

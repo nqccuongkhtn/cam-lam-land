@@ -35,6 +35,9 @@ export type PhieuOpts = {
   // khác áp lên thửa này"). Sơ đồ trang chính chỉ in ảnh QĐ205 → mỗi bản KHÁC đè lên thửa (QĐ893, các bản phân khu) in thêm
   // MỘT TRANG: sơ đồ trích lục trên ảnh của CHÍNH bản đó + bảng toạ độ + căn cứ + loại đất/diện tích (màu đúng bảng màu web).
   phuLuc?: { ma: string; tieuDe: string; canCu: string; tile: string; areas: { type: string; areaM2: number; mau?: string }[] }[];
+  // Ảnh nền QĐ205 cho sơ đồ trang chính (15/10/2026): QĐ205 bị KHOÁ — đường công khai /tiles/qd205… đã chặn, trang bản đồ đưa vào đường
+  // CÓ VÉ (/api/qh-rieng/t/…, chỉ người được xem đủ). Không có thì dùng đường cũ (QD205_TILE).
+  tile205?: string;
 };
 
 // Màu theo loại đất quy hoạch (để tô nét QH trên thửa + chú giải).
@@ -566,7 +569,7 @@ function buildHtml(o: PhieuOpts): string {
         <div class="diagram" style="position:relative">
           <div class="zoomctl noprint"><button id="zin" type="button" title="Phóng to">＋</button><button id="zout" type="button" title="Thu nhỏ">－</button><button id="zreset" type="button" title="Về mặc định">⟳</button></div>
           <div class="northind"><svg viewBox="0 0 24 34" width="13" height="19"><line x1="12" y1="31" x2="12" y2="8" stroke="#111" stroke-width="2"/><polygon points="12,2 7,12 17,12" fill="#111"/></svg><b>B</b></div>
-          ${buildSvgRaster(ring as [number, number][], dt, { soThua: p.soThua || '', neighbors: o.neighbors || [], origin })}
+          ${buildSvgRaster(ring as [number, number][], dt, { soThua: p.soThua || '', neighbors: o.neighbors || [], origin, tile: o.tile205 })}
         </div>
         ${legendHtml}
         <div class="sec" style="margin-top:5px">Thông tin quy hoạch</div>

@@ -116,6 +116,10 @@ services:
       # KHÔNG để chung volume camlam_tiles (nginx phục vụ thẳng /tiles/ cho mọi người) — chỉ backend đọc, có kiểm vé admin.
       # Nạp: scripts/qh-tinh/dua-len-web-14-10.sh (docker cp vào volume camlamgis_qh_rieng).
       - qh_rieng:/app/apps/backend/du-lieu-rieng/qh-rieng:ro
+      # KHOÁ QUY HOẠCH CAM LÂM (15/10/2026, chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free, còn lại khoá lại"): backend đọc CHỈ ĐỌC
+      # kho ảnh công khai để phát ảnh QĐ205 + 7 bản phân khu qua /api/qh-rieng/t/… (vé admin); nginx chặn đường /tiles/qd205…,
+      # /tiles/qd2076… với người ngoài. Dùng chung volume nên không chép thêm GB nào vào ổ C.
+      - camlam_tiles:/app/apps/backend/du-lieu-rieng/tiles-cong:ro
     depends_on:
       postgis:
         condition: service_healthy

@@ -30,12 +30,12 @@ const RENT_PRICE_RANGES: [string, string, string][] = [['Tất cả mức giá',
 const AREA_RANGES: [string, number, number][] = [['Tất cả diện tích', 0, 0], ['Dưới 50 m²', 0, 50], ['50 - 80 m²', 50, 80], ['80 - 100 m²', 80, 100], ['100 - 150 m²', 100, 150], ['150 - 300 m²', 150, 300], ['Trên 300 m²', 300, 0]];
 const lyrOf = (b: BaseMap) => (b === 'satellite' ? 's' : b === 'terrain' ? 'p' : 'm');
 
+// Ảnh quy hoạch phủ bản đồ tin đăng: QĐ893 — quy hoạch sử dụng đất 2030 huyện Cam Lâm (15/10/2026). Trước dùng QĐ205, nay QĐ205 + phân khu
+// bị KHOÁ (chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free") — đường /tiles/qd205… đã bị nginx chặn. Thông số như app/map/page.tsx.
 const QH = {
-  id: 'qh-qd205', url: '/overlays/QD205.png',
-  // Bộ tile render từ DGN (QD205) → z10-18, ĐẦY ĐỦ mọi zone.
-  // minzoom = ĐÚNG mức thấp nhất đã cắt (z12) — khai 10 là đi đòi ô không tồn tại, nhận 404.
-  tiles: ['/tiles/qd205v11/{z}/{x}/{y}.png?v=7'], minzoom: 12, maxzoom: 18,   // ?v=2: xem ghi chú ở app/map/page.tsx
-  coordinates: [[108.9401268, 12.217594], [109.2563886, 12.217594], [109.2563886, 11.9257021], [108.9401268, 11.9257021]] as [[number, number], [number, number], [number, number], [number, number]],
+  id: 'qh-qd893', url: '',
+  tiles: ['/tiles/qd893v1/{z}/{x}/{y}.png?v=2'], minzoom: 8, maxzoom: 18,
+  coordinates: [[108.9335, 12.2239], [109.2624, 12.2239], [109.2624, 11.9328], [108.9335, 11.9328]] as [[number, number], [number, number], [number, number], [number, number]],
 };
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
 // Màu gim theo trạng thái chốt deal — quản lý deal trực quan trên bản đồ.

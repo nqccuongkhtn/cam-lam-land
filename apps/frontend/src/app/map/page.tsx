@@ -372,9 +372,22 @@ const RASTER_OVERLAYS = [
   { id: 'qh-khanhvinh2030', name: 'QHSDĐ 2030 huyện Khánh Vĩnh', url: '',
     tiles: ['/tiles/khanhvinh2030v2/{z}/{x}/{y}.webp'], minzoom: 9, maxzoom: 17,
     coordinates: [[108.668, 12.515], [109.069, 12.515], [109.069, 12.086], [108.668, 12.086]] as [[number, number], [number, number], [number, number], [number, number]] },
+  // ── ĐIỀU CHỈNH QHPK 1/2000 TÂY NHA TRANG · TIỂU PHÂN KHU 2.2 (377 ha, đất xã Diên Khánh) — CÔNG KHAI từ 15/10/2026 (chủ dự án chọn;
+  //    trước chỉ admin xem). Hồ sơ Sở Xây dựng công bố, thuyết minh ghi "Kèm theo Quyết định số …… năm 2025" để TRỐNG → tên lớp + thẻ căn
+  //    cứ ghi rõ "chưa xác minh quyết định". Nắn theo bảng toạ độ N1–N50 của chính bản vẽ (scripts/qh-tinh/nan_theo_bang_ranh.py), ô 512 WebP.
+  { id: 'qh-nt-tay-pk22', name: 'ĐC phân khu 1/2000 Tây Nha Trang · tiểu phân khu 2.2', url: '',
+    tiles: ['/tiles/nttaypk22v1/{z}/{x}/{y}.webp'], minzoom: 12, maxzoom: 18,
+    coordinates: [[109.09844, 12.2651], [109.12705, 12.2651], [109.12705, 12.24377], [109.09844, 12.24377]] as [[number, number], [number, number], [number, number], [number, number]] },
   // (14/10/2026: đã GỠ lớp 1/500 DỰ THẢO lấy ý kiến 9 khu — thay bằng 1/500 CHÍNH THỨC 6 đồ án, CHỈ ADMIN XEM: danh sách
   //  lớp + ô ảnh lấy từ máy chủ /api/qh-rieng (routes/qhRieng.ts), không ghi ở đây — xem `lopRieng` trong MapPage.)
 ];
+// ── KHOÁ QUY HOẠCH CAM LÂM (15/10/2026, chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free, còn lại khoá lại, sửa cả phần thông tin
+// kiểm tra quy hoạch") ── 8 lớp dưới đây KHÔNG còn ở đường công khai /tiles/… (nginx chặn): chỉ người có VÉ (admin — GET /api/qh-rieng/ve)
+// xem được, qua /api/qh-rieng/t/<thư mục>/… (máy chủ kiểm vé từng ô; đường /tiles/… ghi ở trên chỉ để lấy TÊN THƯ MỤC). Người khác: dòng
+// có 🔒 trong danh sách + hộp "liên hệ admin"; bảng thửa chỉ có số liệu QĐ893 (máy chủ không gửi QĐ205 / phân khu, chỉ gửi dấu khoá);
+// phiếu kiểm tra quy hoạch (in ảnh QĐ205) cũng khoá. Ai được xem đủ: một chỗ duy nhất ở máy chủ — `xemDuQhCamLam` (routes/parcels.ts).
+const KHOA_CAM_LAM = new Set(['qh-qd205', 'qh-qd2076', 'qh-qd2101', 'qh-qd2222', 'qh-qd918', 'qh-cuhin', 'qh-taynam', 'qh-taybac']);
+const MUC_KHOA_CAM_LAM = new Set(['qh-qd205', 'phan-khu']);
 // MỤC CHỌN trên bảng "Bản đồ quy hoạch". Ba bản phân khu 1/2000 (QĐ2076 phía Bắc · QĐ2101 trung tâm ·
 // QĐ2222 ven biển · QĐ918 phức hợp phía Tây) là BỐN MẢNH CỦA CÙNG MỘT BỘ quy hoạch phân khu —
 // nên gộp thành MỘT dòng, bật là bật cả ba. Ảnh của chúng nền trong suốt, vùng lại không trùm
@@ -413,6 +426,7 @@ const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: s
   { id: 'qh-camranh2030', ten: 'QHSDĐ 2030 · TP Cam Ranh', tenNgan: 'Cam Ranh 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'camranh2030', gom: ['qh-camranh2030'], zBay: 11, vung: 'cam-ranh' },
   { id: 'qh-dienkhanh2030', ten: 'QHSDĐ 2030 · Huyện Diên Khánh', tenNgan: 'Diên Khánh 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'dienkhanh2030', gom: ['qh-dienkhanh2030'], zBay: 11, vung: 'dien-khanh' },
   { id: 'qh-khanhvinh2030', ten: 'QHSDĐ 2030 · Huyện Khánh Vĩnh', tenNgan: 'Khánh Vĩnh 2030', tenApp: 'QH Sử dụng đất 2030', pdf: 'khanhvinh2030', gom: ['qh-khanhvinh2030'], zBay: 10, vung: 'khanh-vinh' },
+  { id: 'qh-nt-tay-pk22', ten: 'ĐC phân khu 1/2000 Tây Nha Trang 2.2 (chưa xác minh quyết định)', tenNgan: 'Tây NT 2.2', tenApp: 'ĐC phân khu 1/2000 Tây NT 2.2', gom: ['qh-nt-tay-pk22'], zBay: 13, vung: 'dien-khanh' },
   // (1/500 chính thức: mục chọn do máy chủ gửi riêng cho admin — `mucQh` trong MapPage)
 ];
 // CĂN CỨ PHÁP LÝ của từng bản quy hoạch đang chồng lên bản đồ.
@@ -458,6 +472,12 @@ const CAN_CU_QH: Record<string, CanCu> = {
   'qh-cuhin': { so: '30/QĐ-UBND', ngay: '15/01/2026', coQuan: 'UBND xã Suối Dầu',
     ten: 'Phê duyệt quy hoạch phân khu (tỷ lệ 1/2000) Phân khu sinh thái núi Cù Hin, đô thị mới Cam Lâm',
     tep: TL_QH + 'QD-30-2026-phan-khu-sinh-thai-nui-Cu-Hin.pdf' },
+  // Tây Nha Trang 2.2: hồ sơ Sở Xây dựng công bố, THUYẾT MINH ĐỂ TRỐNG SỐ QUYẾT ĐỊNH → ghi đúng như vậy, không đoán số (15/10/2026)
+  'qh-nt-tay-pk22': { loai: 'Hồ sơ', so: '(chưa ghi số quyết định)', ngay: '2025', coQuan: 'UBND xã Diên Khánh (theo hồ sơ Sở Xây dựng công bố)',
+    ten: 'Điều chỉnh Quy hoạch phân khu (tỷ lệ 1/2.000) Khu đô thị phía Tây Nha Trang (Tiểu phân khu 2.2), 377,2 ha — thuyết minh ghi "Kèm theo Quyết định số …… năm 2025" để trống, CHƯA XÁC MINH đã phê duyệt',
+    tep: TL_QH + 'DC-QHPK-1-2000-Tay-Nha-Trang-tieu-phan-khu-2-2-ban-do-SDD.pdf',
+    cac: [{ so: 'Bản đồ', ngay: '2025', ten: 'Bản đồ sử dụng đất quy hoạch (tờ dùng để dựng lớp)', tep: TL_QH + 'DC-QHPK-1-2000-Tay-Nha-Trang-tieu-phan-khu-2-2-ban-do-SDD.pdf' },
+      { so: 'Thuyết minh', ngay: '2025', ten: 'Thuyết minh quy hoạch (100 trang)', tep: TL_QH + 'DC-QHPK-1-2000-Tay-Nha-Trang-tieu-phan-khu-2-2-thuyet-minh.pdf' }] },
   // Ngày 04/4/2025 (KHÔNG phải 2026): đọc trên bản quét QĐ 893 Sở NN&MT đăng (bài id 10974), chữ ký số ngày 09/4/2025 — xác minh 14/10/2026
   'qh-qd893': { so: '893/QĐ-UBND', ngay: '04/4/2025', coQuan: 'UBND tỉnh Khánh Hòa',
     ten: 'Phê duyệt Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 huyện Cam Lâm',
@@ -782,21 +802,35 @@ export default function MapPage() {
   }, []);
   // Gộp lớp riêng vào ba danh sách tĩnh (RASTER_OVERLAYS · MUC_QH · CAN_CU_QH). Địa chỉ ô ghi ĐẦY ĐỦ (có tên miền) như ô địa chính.
   const rasterOverlays = useMemo<typeof RASTER_OVERLAYS>(() => {
-    if (!lopRieng?.lop?.length) return RASTER_OVERLAYS;
     const goc = typeof window !== 'undefined' ? window.location.origin : '';
     const duong = API_BASE.startsWith('http') ? API_BASE : goc + API_BASE;
-    return [...RASTER_OVERLAYS, ...lopRieng.lop.map((l) => ({ id: l.id, name: l.ten, url: '',
+    // KHOÁ CAM LÂM (15/10/2026): có vé → ảnh 8 lớp lấy qua đường có vé; không có vé → bỏ hẳn (bản đồ không xin ô nào của chúng)
+    const ve = lopRieng?.ve ? encodeURIComponent(lopRieng.ve) : '';
+    const coBan = RASTER_OVERLAYS.flatMap((o) => {
+      if (!KHOA_CAM_LAM.has(o.id)) return [o];
+      const thuMuc = /\/tiles\/([^/]+)\//.exec(String(((o as any).tiles || [])[0] || ''))?.[1];
+      return ve && thuMuc ? [{ ...o, url: '', tiles: [`${duong}/qh-rieng/t/${thuMuc}/{z}/{x}/{y}?v=${ve}`] }] : [];
+    });
+    if (!lopRieng?.lop?.length) return coBan;
+    return [...coBan, ...lopRieng.lop.map((l) => ({ id: l.id, name: l.ten, url: '',
       tiles: [`${duong}/qh-rieng/o/${l.thuMuc}/{z}/{x}/{y}?v=${encodeURIComponent(lopRieng.ve)}`], minzoom: l.minzoom, maxzoom: l.maxzoom,
       coordinates: [[l.khung[0], l.khung[3]], [l.khung[2], l.khung[3]], [l.khung[2], l.khung[1]], [l.khung[0], l.khung[1]]] as [[number, number], [number, number], [number, number], [number, number]] }))];
   }, [lopRieng]);
   const rasterOverlaysRef = useRef(rasterOverlays); rasterOverlaysRef.current = rasterOverlays;
+  // Bỏ phần tên miền khỏi một đường ảnh (phiếu in tự ghép gốc trang vào trước — lib/phieuQh.ts)
+  const tuongDoi = (u?: string): string | undefined => {
+    const g = typeof window !== 'undefined' ? window.location.origin : '';
+    return u && g && u.startsWith(g) ? u.slice(g.length) : u;
+  };
   const mucQh = useMemo<typeof MUC_QH>(() => {
     const rieng = (lopRieng?.lop || []).map((l) => ({ id: l.id, ten: l.ten, tenNgan: l.tenNgan, tenApp: l.tenApp, gom: [l.id], zBay: l.zBay, vung: l.vung }));
     const daCo = new Set(rieng.map((l) => l.id));
     // dòng có khoá: lớp admin đã có thật thì thôi (không hiện hai dòng). `gom` giữ đúng mã lớp (không để rỗng — mảng rỗng
     // thì `gom.every(...)` luôn đúng, dòng sẽ tưởng là đang bật).
     const khoa = lopKhoa.filter((l) => !daCo.has(l.id)).map((l) => ({ id: l.id, ten: l.ten, tenNgan: l.tenNgan, tenApp: l.tenApp, gom: [l.id], vung: l.vung, khoa: true }));
-    return [...MUC_QH, ...rieng, ...khoa];
+    // KHOÁ CAM LÂM: QĐ205 + phân khu 1/2000 hiện dòng có 🔒 khi chưa có vé (người không được xem đủ)
+    const coBan = MUC_QH.map((m) => (MUC_KHOA_CAM_LAM.has(m.id) && !lopRieng?.ve ? { ...m, khoa: true } : m));
+    return [...coBan, ...rieng, ...khoa];
   }, [lopRieng, lopKhoa]);
   // Bấm một dòng quy hoạch: dòng có khoá → hộp "liên hệ admin", không bật lớp nào.
   const bamMucQh = (o: (typeof MUC_QH)[number], bat: boolean) => { if (o.khoa) { setHopKhoa(o.tenApp || o.ten); return; } chonLopQh(o, bat); };
@@ -1022,10 +1056,16 @@ export default function MapPage() {
   type NhomChuGiai = { nhom: string; muc: { mau: string; tenDs: string[]; so: number }[] };
   const [chuGiai, setChuGiai] = useState<{ nhom: NhomChuGiai[]; ban: Record<string, NhomChuGiai[]> } | null>(null);
   const [chuGiaiOpen, setChuGiaiOpen] = useState(false);
-  // Ảnh PNG QĐ205 là lớp CHÍNH (đúng màu/ký hiệu gốc) — bật mặc định, hiển thị TRÊN lớp vector.
-  // Hai lớp phân khu MẶC ĐỊNH TẮT: chúng nằm đè lên vùng QĐ205, bật sẵn cả ba thì màu chồng màu.
-  // Người dùng tự tích vào mới hiện.
-  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': true, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd918': false, 'qh-cuhin': false, 'qh-taynam': false, 'qh-taybac': false, 'qh-qd893': false, 'qh-ninhhoa2030': false, 'qh-nhatrang2030': false, 'qh-khanhson2030': false, 'qh-vanninh2030': false, 'qh-camranh2030': false, 'qh-dienkhanh2030': false, 'qh-khanhvinh2030': false });
+  // LỚP MẶC ĐỊNH (15/10/2026): QĐ893 — bản Cam Lâm duy nhất xem miễn phí (chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free").
+  // Người có vé (admin) mở bản đồ thì như trước: QĐ205 là lớp chính (đúng màu/ký hiệu gốc) — đổi sang khi vé về, nếu chưa tự chọn lớp.
+  // Các lớp khác MẶC ĐỊNH TẮT: chồng lên nhau thì màu chồng màu. Người dùng tự tích vào mới hiện.
+  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': false, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd918': false, 'qh-cuhin': false, 'qh-taynam': false, 'qh-taybac': false, 'qh-qd893': true, 'qh-ninhhoa2030': false, 'qh-nhatrang2030': false, 'qh-khanhson2030': false, 'qh-vanninh2030': false, 'qh-camranh2030': false, 'qh-dienkhanh2030': false, 'qh-khanhvinh2030': false });
+  const daChonLop = useRef(false);   // người dùng đã tự chọn lớp / địa giới → không tự đổi lớp nữa
+  useEffect(() => {
+    if (!lopRieng?.ve || daChonLop.current) return;
+    setOvOn((cu) => (cu['qh-qd893'] && !Object.entries(cu).some(([k, v]) => v && k !== 'qh-qd893'))
+      ? { ...Object.fromEntries(Object.keys(cu).map((k) => [k, false])), 'qh-qd205': true } : cu);
+  }, [lopRieng]);
   // ĐỊA GIỚI đang chọn để LỌC danh sách lớp quy hoạch — giờ nhiều bản quá, gom theo huyện/thị cho gọn
   // (chủ dự án 14/10/2026: "chọn địa giới rồi hiện quy hoạch ở địa giới đó thôi để đỡ loạn"). Mặc định Cam Lâm.
   const [vungQh, setVungQh] = useState<string>('cam-lam');
@@ -1270,6 +1310,7 @@ export default function MapPage() {
   // nhưng từ khi ba bản phân khu được ghép lại thì lớp nào cũng phủ gần kín huyện — tự nhảy khung chỉ
   // làm người xem mất chỗ đang xem.
   const chonLopQh = useCallback((muc: { gom: string[]; zBay?: number }, bat: boolean) => {
+    daChonLop.current = true;
     const tat: Record<string, boolean> = Object.fromEntries(rasterOverlaysRef.current.map((x) => [x.id, false]));
     if (bat) for (const id of muc.gom) tat[id] = true;
     setOvOn(tat);
@@ -1327,6 +1368,7 @@ export default function MapPage() {
   // rồi BAY TỚI tâm địa giới đó cho người xem thấy ngay mình đang ở đâu. Không tự bật lớp nào —
   // để người xem tự chọn bản muốn xem trong vùng (tránh chồng màu loạn).
   const doiVung = useCallback((idVung: string) => {
+    daChonLop.current = true;
     setVungQh(idVung);
     setOvOn(Object.fromEntries(rasterOverlaysRef.current.map((x) => [x.id, false])));  // tắt overlay vùng cũ cho khỏi chồng
     const v = VUNG_QH.find((x) => x.id === idVung);
@@ -1368,12 +1410,16 @@ export default function MapPage() {
   useEffect(() => { load(); api<any>('/map-ads/active').then((r) => setAds(r.ads || [])).catch(() => {}); }, [load]);
   // qh_vector (2.1MB) chủ yếu để TRA loại đất khi bấm (giống "dữ liệu ô đất" của Meey Map);
   // phần HIỂN THỊ do ảnh raster lo (giống Guland) → nạp TRỄ lúc rảnh cho nhẹ.
+  // (15/10/2026) KHOÁ CAM LÂM: đây là ô đất QĐ205 → chỉ người có vé mới tải, qua /api/qh-rieng/tep/qh_vector (đường /qh_vector.geojson
+  // công khai đã bị nginx chặn). Người khác không tải gì.
   useEffect(() => {
-    const go = () => fetch('/qh_vector.geojson').then((r) => r.json()).then(setQhVector).catch(() => {});
+    if (!lopRieng?.ve) { setQhVector(null); return; }
+    const ve = encodeURIComponent(lopRieng.ve);
+    const go = () => fetch(`${API_BASE}/qh-rieng/tep/qh_vector?v=${ve}`).then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) setQhVector(d); }).catch(() => {});
     const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void, o?: any) => number);
     const id = ric ? ric(go, { timeout: 4000 }) : window.setTimeout(go, 1800);
     return () => { const cic = (window as any).cancelIdleCallback; if (ric && cic) cic(id); else clearTimeout(id); };
-  }, []);
+  }, [lopRieng]);
   useEffect(() => { if (viewRef.current) refreshFeatures(viewRef.current); }, [visible, refreshFeatures]);
   useEffect(() => { setCanDelete(laAdmin(user) || coVaiTro(user, 'gis')); }, [user]);
   // Chỉ tải ranh xã (384KB) KHI người dùng bật lớp — mặc định tắt nên không tốn dữ liệu trên điện thoại.
@@ -2075,11 +2121,18 @@ export default function MapPage() {
       // Trang "Quy hoạch chung 2045" (QĐ205) của thửa Cam Lâm — PHẢI GIỮ. 13/10/2026 phiên trước hiểu nhầm lời dặn "bỏ dòng
       // 'Hiện mới có Quy hoạch chung đô thị mới Cam Lâm đến 2045 (QĐ 205/QĐ-TTg)…'" thành bỏ cả trang này; chủ dự án hỏi lại
       // 14/10 "sao xoá mất cái Cam Lâm". Thứ phải bỏ chỉ là CÂU ghi chú cho thửa ngoài vùng (xem khối qhNgoaiVung).
-      if (muc.id === 'qh-qd205' && info.overlaps?.length) ra.push({ muc, tieuDe: 'Quy hoạch chung 2045', areas: gop(info.overlaps as any), bangMau: 'qd205' });
+      // KHOÁ CAM LÂM (15/10/2026): người không được xem đủ thì máy chủ chỉ gửi dấu khoá (mã '205' / 'pk', khoa:true) cho bản có phủ thửa
+      // → trang có 🔒 + nút "Liên hệ admin để xem", không có loại đất / diện tích.
+      const khoaMa = (ma: string) => cacBan.some((x) => String(x.ma) === ma && x.khoa);
+      if (muc.id === 'qh-qd205') {
+        if (info.overlaps?.length) ra.push({ muc, tieuDe: 'Quy hoạch chung 2045', areas: gop(info.overlaps as any), bangMau: 'qd205' });
+        else if (khoaMa('205')) ra.push({ muc: { ...muc, khoa: true }, tieuDe: 'Quy hoạch chung 2045', areas: [], bangMau: 'qd205', khoa: true });
+      }
       if (muc.id === 'phan-khu') {
         const ban = cacBan.filter((b) => PK.includes(String(b.ma)));
         const areas = gop(ban.flatMap((b) => b.areas || []));
         if (areas.length) ra.push({ muc, tieuDe: 'Quy hoạch phân khu 1/2000', phu: ban.map((b) => String(b.ten).split(' — ')[0].replace(/ 1\/2000$/, '')).join(' · '), areas, bangMau: 'phankhu' });
+        else if (khoaMa('pk')) ra.push({ muc: { ...muc, khoa: true }, tieuDe: 'Quy hoạch phân khu 1/2000', areas: [], bangMau: 'phankhu', khoa: true });
       }
       if (muc.id === 'qh-qd893') {
         const b = cacBan.find((x) => String(x.ma) === '893');
@@ -2890,7 +2943,7 @@ export default function MapPage() {
                 {laQuanTri ? (
                   <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">Chưa tải được lớp này. Tải lại trang hoặc đăng nhập lại rồi thử lần nữa.</p>
                 ) : (
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">Vui lòng liên hệ admin Cam Lâm Land để được xem lớp này.</p>
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">Vui lòng liên hệ admin Cam Lâm Land để được xem.</p>
                 )}
                 {!laQuanTri && (
                   <div className="mt-3 grid grid-cols-2 gap-2">
@@ -3398,7 +3451,7 @@ export default function MapPage() {
                             {/* Tiêu đề + tên các mảnh phân khu gộp MỘT dòng cho gọn. */}
                             <p className={`truncate font-bold leading-snug text-[#0A2540] text-[13px]`}>{t.tieuDe}{t.khoa && <span className="ml-1 text-[12px]" aria-label="liên hệ admin">🔒</span>}{t.phu && <span className="ml-1.5 text-[10.5px] font-normal text-slate-400">{t.phu}</span>}</p>
                             {t.khoa && (
-                              <button type="button" onClick={() => setHopKhoa('QH chi tiết 1/500')}
+                              <button type="button" onClick={() => setHopKhoa(t.tieuDe)}
                                 className="mt-1.5 rounded border border-slate-300 px-2.5 py-1 text-[12.5px] font-semibold text-[#0A2540] active:bg-slate-100">
                                 Liên hệ admin để xem
                               </button>
@@ -3510,6 +3563,8 @@ export default function MapPage() {
                 {info.parcel && !info.qhNgoaiVung && ((info.overlaps?.length || 0) > 0 || (((info as any).qhCacBan || []) as any[]).some((b) => b?.nguon !== 'pdf' && b?.nguon !== '1/500')) && (
                   <button
                     onClick={() => {
+                      // KHOÁ CAM LÂM (15/10/2026): phiếu in ảnh + số liệu QĐ205 / phân khu → chỉ người có vé; người khác: hộp "liên hệ admin"
+                      if (!lopRieng?.ve) { setHopKhoa('Phiếu kiểm tra quy hoạch'); return; }
                       const g = (highlight as any)?.geometry || (info.parcel as any)?.geometry;
                       const mapScen = qhScenario === 'all' ? '2045' : qhScenario;
                       // Ranh WGS84 của thửa (để đo diện tích theo ảnh QĐ205).
@@ -3527,7 +3582,8 @@ export default function MapPage() {
                         const phuLuc = (((info as any).qhCacBan || []) as any[]).filter((bn) => bn?.nguon !== 'pdf' && bn?.nguon !== '1/500').map((bn) => {
                           const ma = String(bn.ma);
                           const id = /^\d+$/.test(ma) ? 'qh-qd' + ma : 'qh-' + ma;
-                          const tile = ((RASTER_OVERLAYS.find((x) => x.id === id) as any)?.tiles || [])[0] as string | undefined;
+                          // ảnh lấy từ danh sách ĐANG DÙNG (phân khu bị khoá → đường có vé), bỏ phần tên miền vì phiếu tự ghép gốc trang
+                          const tile = tuongDoi(((rasterOverlaysRef.current.find((x) => x.id === id) as any)?.tiles || [])[0] as string | undefined);
                           const cc = CAN_CU_QH[id];
                           const bang = ma === '893' ? 'qd893' : 'phankhu';
                           return tile ? {
@@ -3536,7 +3592,8 @@ export default function MapPage() {
                             areas: ((bn.areas || []) as { type: string; areaM2: number }[]).map((a) => ({ ...a, mau: mauQh?.[bang]?.[a.type] })),
                           } : null;
                         }).filter(Boolean) as any[];
-                        const html = phieuQhHtml({ parcel: info.parcel as any, geometry: g, overlaps, qhCacBan: (((info as any).qhCacBan || []) as any[]).filter((bn) => bn?.nguon !== 'pdf' && bn?.nguon !== '1/500'), qhPieces: manh ? manh.map((m) => ({ lo: m.lo, c: mauQh?.qd205?.[m.lo], ring: m.ring })) : qhPiecesFor(g, pieceHz), roadFeats: roadFeatsFor(g), neighbors: (info as any).neighbors || [], point: info.point, user: user as any, scenario: mapScen, roadHz: pieceHz, phuLuc });
+                        const html = phieuQhHtml({ parcel: info.parcel as any, geometry: g, overlaps, qhCacBan: (((info as any).qhCacBan || []) as any[]).filter((bn) => bn?.nguon !== 'pdf' && bn?.nguon !== '1/500'), qhPieces: manh ? manh.map((m) => ({ lo: m.lo, c: mauQh?.qd205?.[m.lo], ring: m.ring })) : qhPiecesFor(g, pieceHz), roadFeats: roadFeatsFor(g), neighbors: (info as any).neighbors || [], point: info.point, user: user as any, scenario: mapScen, roadHz: pieceHz, phuLuc,
+                          tile205: tuongDoi(((rasterOverlaysRef.current.find((x) => x.id === 'qh-qd205') as any)?.tiles || [])[0]) });
                         try { win.document.open(); win.document.write(html); win.document.close(); win.focus(); } catch { /* */ }
                       };
                       // chỉ dùng số máy chủ (12/10/2026: bỏ tính bù từ qh_vector cũ — xem chỗ gọi /parcels/at)
@@ -3548,7 +3605,7 @@ export default function MapPage() {
                     }}
                     id="nut-phieu-qh"
                     className="min-w-0 whitespace-nowrap px-1 sm:px-0 sm:mb-1.5 sm:w-full flex items-center justify-center gap-1.5 sm:gap-2 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold bg-[#0A2540] hover:bg-[#0d3a6b] text-white">
-                    🖨<span className="sm:hidden">Phiếu QH</span><span className="hidden sm:inline">Xuất phiếu kiểm tra quy hoạch</span>
+                    🖨<span className="sm:hidden">Phiếu QH</span><span className="hidden sm:inline">Xuất phiếu kiểm tra quy hoạch</span>{!lopRieng?.ve && <span className="text-[10px]" aria-label="liên hệ admin">🔒</span>}
                   </button>
                 )}
                 <div className="contents sm:grid sm:grid-cols-3 sm:gap-2">

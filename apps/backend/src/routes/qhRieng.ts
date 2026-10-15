@@ -79,6 +79,44 @@ qhRiengRouter.get('/o/:thuMuc/:z/:x/:y', (req, res) => {
   });
 });
 
+// ── KHOÁ QUY HOẠCH CAM LÂM (15/10/2026, chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free, còn lại khoá lại") ──────────────
+// Ảnh QĐ205 + 7 bản phân khu 1/2000 vẫn nằm ở kho ảnh công khai (volume camlam_tiles — không chép thêm GB nào vào ổ C) nhưng nginx
+// đã CHẶN đường /tiles/qd205…, /tiles/qd2076… (trả 404). Máy chủ gắn CHỈ ĐỌC kho đó (QH_TILES_DIR, docker-compose.yml) và phát từng ô
+// qua đường dưới đây — phải có vé admin như lớp 1/500. Chỉ phát đúng các bộ ảnh bị khoá (mẫu tên), không phát bộ khác.
+const TILES_CONG = process.env.QH_TILES_DIR || path.resolve(process.cwd(), 'du-lieu-rieng', 'tiles-cong');
+const BO_KHOA_CAM_LAM = /^(qd205|qd2076|qd2101|qd2222|qd918|qdcuhin|qdtaynam|qdtaybac)[a-z0-9]{0,8}$/;
+// GET /api/qh-rieng/t/:thuMuc/:z/:x/:y?v=<vé> — một ô PNG 256 của bộ ảnh quy hoạch Cam Lâm bị khoá
+qhRiengRouter.get('/t/:thuMuc/:z/:x/:y', (req, res) => {
+  res.set('Cache-Control', 'private, no-store');
+  if (!veHopLe(req.query.v)) return res.status(403).json({ error: 'Vui lòng liên hệ admin để xem lớp này.' });
+  const { thuMuc } = req.params;
+  const z = Number(req.params.z), x = Number(req.params.x), y = Number(String(req.params.y).replace(/\.png$/, ''));
+  if (!BO_KHOA_CAM_LAM.test(thuMuc) || ![z, x, y].every((n) => Number.isInteger(n) && n >= 0) || z > 22) return res.status(400).end();
+  const tep = path.join(TILES_CONG, thuMuc, String(z), String(x), `${y}.png`);
+  fs.stat(tep, (loi, st) => {
+    if (loi || !st.isFile()) return res.status(404).end();
+    res.set('Content-Type', 'image/png');
+    res.set('Cache-Control', 'private, max-age=86400');      // chỉ máy của chính admin giữ; nginx / Cloudflare không giữ
+    fs.createReadStream(tep).on('error', () => res.destroy()).pipe(res);
+  });
+});
+// GET /api/qh-rieng/tep/:ten?v=<vé> — tệp GeoJSON quy hoạch Cam Lâm bị khoá, gọi KHÔNG KÈM ĐUÔI (vd /tep/qh_vector → tep/qh_vector.geojson:
+// ô đất QĐ205 bản cũ dùng cho lớp tô màu tuỳ chọn + sơ đồ dự phòng của phiếu in). Trước nằm ở thư mục công khai của web — nay nginx chặn
+// đường cũ, tệp cất ở <QH_RIENG_DIR>/tep/. ⚠️ Không cho đường này đuôi ".geojson": nginx có luật "mọi đường đuôi .geojson → giao diện"
+// nên đường có đuôi sẽ không bao giờ tới được máy chủ.
+const TEN_TEP_DL = /^[a-z0-9][a-z0-9_-]{0,80}$/;
+qhRiengRouter.get('/tep/:ten', (req, res) => {
+  res.set('Cache-Control', 'private, no-store');
+  if (!veHopLe(req.query.v)) return res.status(403).json({ error: 'Vui lòng liên hệ admin để xem lớp này.' });
+  const ten = String(req.params.ten);
+  if (!TEN_TEP_DL.test(ten)) return res.status(400).end();
+  const tep = path.join(GOC, 'tep', ten + '.geojson');
+  if (!fs.existsSync(tep)) return res.status(404).json({ error: 'Chưa có tệp này trên máy chủ.' });
+  res.set('Content-Type', 'application/geo+json');
+  res.set('Cache-Control', 'private, max-age=3600');
+  fs.createReadStream(tep).on('error', () => res.destroy()).pipe(res);
+});
+
 const TEN_TEP = /^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.pdf$/;
 // GET /api/qh-rieng/tai-lieu/:ten?v=<vé> — bản quét quyết định phê duyệt (mở trong trình duyệt)
 qhRiengRouter.get('/tai-lieu/:ten', (req, res) => {

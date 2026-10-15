@@ -853,7 +853,8 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   admin"):** lớp nào trong `danh-sach.json` có mục `congKhai` {ten, tenNgan, tenApp} thì `GET /api/qh-rieng/gioi-thieu` (công khai) trả TÊN
   + khu vực — không thư mục ô, không khung, không vé. Giao diện hiện dòng có 🔒 (`lopKhoa`, `khoa: true` trong `mucQh`); bấm → hộp
   `hopKhoa` "Chỉ quản trị viên được xem" (gọi / Zalo 0988 888 888 / nhắn tin). Hiện chỉ `qh-ct500` có `congKhai` (Tây NT 2.2 vẫn giấu hẳn).
-  Nhãn bỏ chữ "đã duyệt" theo lời chủ dự án. Tự kiểm 15/10 9h: gioi-thieu 200, ve 401, ô vé giả / không vé 403, `/tiles/` 404.
+  Nhãn bỏ chữ "đã duyệt", rồi bỏ cả "6 đồ án" + "chỉ quản trị viên" (chủ dự án 15/10) — tên lớp: "QH chi tiết 1/500 · tô màu theo loại
+  đất" / "· bản vẽ gốc", người thường thấy "QH chi tiết 1/500". Tự kiểm 15/10 9h: gioi-thieu 200, ve 401, ô vé giả / không vé 403, `/tiles/` 404.
   **1/500 TÔ MÀU THEO LOẠI ĐẤT (15/10/2026, chủ dự án: "làm kiểu màu giống 1/2000 và 893, làm như kiểu 205 khó xem quá")** — lớp
   `qh-ct500-mau` (bộ ô `qhct500-mau-v1`, 44 MB) đứng TRƯỚC lớp bản in gốc `qh-ct500` ("· bản vẽ gốc"); chờ chủ dự án chọn giữ một hay cả hai.
   `scripts/qh-tinh/to_mau_1_500.py` (doc → cat → chu-giai) đọc thẳng DXF: bản vẽ 1/500 chỉ tô HOA VĂN nên in ra gần trắng; nay mỗi vùng tô =

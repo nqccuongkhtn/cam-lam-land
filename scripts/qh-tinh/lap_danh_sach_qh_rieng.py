@@ -22,12 +22,13 @@ lop = [{
     'id': 'qh-ct500', 'thuMuc': 'qhct500-v1',
     # 15/10/2026 chủ dự án: "bỏ chữ đã duyệt đi, vẫn hiện ra chỗ chọn nhưng chỉ tài khoản admin được chọn, còn lại hiện popup
     # liên hệ admin" → `congKhai` = tên hiện cho MỌI NGƯỜI (máy chủ GET /api/qh-rieng/gioi-thieu, chỉ tên — ô ảnh vẫn chỉ admin).
-    'ten': 'QH chi tiết 1/500 · 6 đồ án (chỉ quản trị viên)', 'tenNgan': 'Chi tiết 1/500', 'tenApp': 'QH chi tiết 1/500',
-    'congKhai': {'ten': 'QH chi tiết 1/500 · 6 đồ án', 'tenNgan': 'Chi tiết 1/500', 'tenApp': 'QH chi tiết 1/500'},
+    # 15/10/2026 tiếp: "bỏ chữ 6 đồ án và chỉ quản trị viên đi"; có thêm lớp tô màu (to_mau_1_500.py) nên lớp này gọi "bản vẽ gốc".
+    'ten': 'QH chi tiết 1/500 · bản vẽ gốc', 'tenNgan': '1/500 bản gốc', 'tenApp': 'QH chi tiết 1/500 · bản vẽ gốc',
+    'congKhai': {'ten': 'QH chi tiết 1/500', 'tenNgan': 'Chi tiết 1/500', 'tenApp': 'QH chi tiết 1/500'},
     'vung': 'cam-lam', 'zBay': 12, 'minzoom': 12, 'maxzoom': 20,
     'khung': [round(x0 - 0.001, 5), round(y0 - 0.001, 5), round(x1 + 0.001, 5), round(y1 + 0.001, 5)],
     'canCu': {'so': '2043–2048/QĐ-UBND', 'ngay': '25/9/2026', 'coQuan': 'UBND xã Cam Lâm',
-              'ten': 'Phê duyệt Quy hoạch chi tiết (tỷ lệ 1/500) — 6 đồ án thuộc quy hoạch phân khu đô thị Trung tâm và phía Bắc, xã Cam Lâm',
+              'ten': 'Phê duyệt Quy hoạch chi tiết (tỷ lệ 1/500) thuộc quy hoạch phân khu đô thị Trung tâm và phía Bắc, xã Cam Lâm',
               'tep': DO_AN[0][3],
               'cac': [{'so': so, 'ngay': '25/9/2026', 'ten': ten, 'tep': tep} for _, so, ten, tep in DO_AN]},
 }]

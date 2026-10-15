@@ -498,7 +498,7 @@ Chủ dự án: "trả phí chia ra là các chức năng chung, còn trả phí
   4 dòng trắng, giá đỏ) — khách thấy khối này CẢ KHI cờ `services_live` tắt (chỉ khối này; gói đăng tin / đẩy tin vẫn ẩn).
   Hộp `components/HopTraPhi.tsx` có bảng 4 gói + nút "Đăng ký thành viên" — MỌI chỗ khoá trả phí (văn bản, đền bù, độ mờ, phóng gần, phiếu in,
   dòng 1/500, trang khoá trong bảng thửa) dùng CHUNG hộp này (chủ dự án: "chưa đồng bộ với những tính năng trả phí khác", "đăng ký thành viên
-  để xem chứ liên hệ admin cái gì"). Hộp "liên hệ admin" (`hopKhoa`) chỉ còn cho trường hợp đã có gói mà vé chưa tải kịp.
+  để xem chứ liên hệ admin cái gì"). Hộp "liên hệ admin" (`hopKhoa`) chỉ còn cho trường hợp đã có gói mà vé chưa tải kịp. **Chưa đăng nhập** thì `HopTraPhi` KHÔNG hiện mà mở thẳng hộp ĐĂNG NHẬP ("… là tính năng dành cho thành viên — vui lòng đăng nhập trước"; chủ dự án: "lỗi logic" khi khách chưa có tài khoản được mời mua gói); nút trang khoá trong bảng thửa ghi "Đăng nhập để xem".
 - **Chức năng riêng**: gói số tin đăng · gói đẩy tin · video (`lib/packages.ts`) · quảng cáo bản đồ (bảng `map_ads`, thẻ "Quảng cáo" — gắn
   theo nhà quảng cáo, không theo tài khoản).
 - **Hết hạn + khách tự xem gói** (chủ dự án hỏi 15/10/2026): mỗi gói một cột hạn (`goi_chung_het_han`, `post_expires_at`, `boost_expires_at`, `video_expires_at`); máy chủ so với giờ hiện tại MỖI lần dùng tính năng → tới hạn tự khoá, không cần việc chạy nền. Khách xem ở `/account#goi-cua-toi` (`components/GoiCuaToi.tsx`, mục "Gói của tôi" trong trình đơn tài khoản): gói thành viên + gói riêng + 20 đơn gần nhất (đơn chờ hiện nội dung chuyển khoản), còn ≤ 7 ngày nhắc gia hạn. CHƯA có nhắc qua email / thông báo đẩy.

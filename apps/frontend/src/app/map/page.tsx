@@ -397,7 +397,9 @@ const MUC_KHOA_CAM_LAM = new Set(['qh-qd205', 'phan-khu']);
 //  · lớp Cam Lâm (cả QĐ893 miễn phí) KHÔNG chỉnh được độ mờ (chủ dự án: "ở 893 cứ cho tra cứu tới thửa như bình thường, chỉ khoá không cho
 //    làm mờ bản đồ quy hoạch") — lớp luôn đậm đủ, chạm thanh độ mờ là hộp trả phí.
 const LOP_CAM_LAM = new Set(['qh-qd893', ...KHOA_CAM_LAM]);
-const Z_XEM_THU = 10;   // mức ô xem thử chung của 8 lớp khoá (= mức ô xa nhất của QĐ205) — PHẢI khớp Z_XEM_THU ở routes/qhRieng.ts
+// mức ô xem thử chung của 8 lớp khoá = mức ô xa nhất của QĐ205 (10) + 2 (chủ dự án 15/10/2026 tối: "cho mức phóng theo 205 + thêm 2 z")
+// — PHẢI khớp Z_XEM_THU ở routes/qhRieng.ts. Bản đồ khoá từ mức Z_XEM_THU − 0,5; chọn lớp thì bay về Z_XEM_THU − 1.
+const Z_XEM_THU = 12;
 // MỤC CHỌN trên bảng "Bản đồ quy hoạch". Ba bản phân khu 1/2000 (QĐ2076 phía Bắc · QĐ2101 trung tâm ·
 // QĐ2222 ven biển · QĐ918 phức hợp phía Tây) là BỐN MẢNH CỦA CÙNG MỘT BỘ quy hoạch phân khu —
 // nên gộp thành MỘT dòng, bật là bật cả ba. Ảnh của chúng nền trong suốt, vùng lại không trùm

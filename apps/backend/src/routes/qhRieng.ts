@@ -105,7 +105,8 @@ const BO_KHOA_CAM_LAM = /^(qd205|qd2076|qd2101|qd2222|qd918|qdcuhin|qdtaynam|qdt
 // chủ dự án chốt cùng ngày: "lấy mức của 205 là mức phóng chung cho tài khoản free" (trước mỗi bộ theo mức xa nhất của chính nó: 7 phân
 // khu = 8, nhìn nhỏ xíu). Ô thô hơn (phân khu có mức 8–9) vẫn cho; gần hơn đòi vé (403). Giao diện dùng đúng số này (Z_XEM_THU trong
 // app/map/page.tsx): phóng gần hơn mức đó là ẩn lớp + hộp "tính năng trả phí".
-const Z_XEM_THU = 10;
+// (15/10/2026 tối) chủ dự án nới: "cho mức phóng theo 205 + thêm 2 z" → 10 + 2 = 12.
+const Z_XEM_THU = 12;
 // GET /api/qh-rieng/t/:thuMuc/:z/:x/:y?v=<vé> — một ô PNG 256 của bộ ảnh quy hoạch Cam Lâm bị khoá
 qhRiengRouter.get('/t/:thuMuc/:z/:x/:y', (req, res) => {
   res.set('Cache-Control', 'private, no-store');

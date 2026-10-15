@@ -30,7 +30,7 @@
 #
 # Dùng: python -P doc_thua_v8.py <thu_muc_dxf> <bang.json> <web-cu.ndjson> <thu_muc_ra> [to1,to2,...]
 #   bang.json = {"to": {"<tờ mới>": ["<mã xã cũ>", <tờ cũ>]}, "tenXa": {"<mã>": "<tên>"}, "tenFile": {"<mã>": "<tên file hệ thống>"}}
-import sys, os, re, json, csv, collections
+import sys, os, re, json, csv, collections, itertools
 import numpy as np
 import ezdxf
 import shapely
@@ -254,9 +254,12 @@ for f in tep:
     # (5) BỘ NÉT CUỐI = mọi lớp có nét ≥ 50 m trừ KHONG_RANH — chỉ dùng khi diện tích KHỚP NHÃN (tờ 113: khu phân lô chia lô bằng
     # level 12, mà ở Cam Đức level 12 lại là nét khác, nên không thể cho vào bộ nét thường)
     b5 = co(b4 + tuple(sorted(L for L, ds in net.items() if L not in KHONG_RANH and sum(g.length for g in ds) >= 50)))
-    cac_bo = [b0, b1, b2, b3, b4, b5]
+    # (6) + MÉP ĐƯỜNG (Level 50 / 22 — thường KHÔNG phải ranh) — cũng chỉ nhận khi KHỚP NHÃN: tờ 8 dãy lô 747–749, 321–323 sát đường lấy
+    # đúng nét mép đường (Level 50) làm cạnh lô, thiếu nét này thì không khép được thửa nào.
+    b6 = co(b5 + ('Level 50', 'Level 22'))
+    cac_bo = [b0, b1, b2, b3, b4, b5, b6]
     bo_net = [b for i, b in enumerate(cac_bo) if b and b not in cac_bo[:i]]
-    k_chi_khop = len(bo_net) - 1 if b5 and b5 not in cac_bo[:5] else -1   # bộ nét cuối: chỉ nhận mặt khớp nhãn
+    chi_khop = {bo_net.index(b) for b in (b5, b6) if b and b in bo_net and b not in cac_bo[:5]}   # hai bộ cuối: chỉ nhận mặt khớp nhãn
     mat_bo = dung_bo(net, bo_net)
     lop_so = chon_lop_so(so_lop, nhan, mat_bo); so = so_lop.get(lop_so, [])
     uv = ung_vien(mat_bo, so)
@@ -279,7 +282,7 @@ for f in tep:
     for s in cac_so:
         if s in chon: continue
         for k, kq in enumerate(uv):
-            if s not in kq or k == k_chi_khop: continue
+            if s not in kq or k in chi_khop: continue
             g = kq[s]
             if da is not None and g.intersection(da).area > max(0.5, 0.01 * g.area): continue
             dtn = nhan.get(s, ('', None))[1]
@@ -305,6 +308,44 @@ for f in tep:
         if ung:
             _, k, m = min(ung, key=lambda t: (t[0], t[1]))
             chon[s] = (m, k, True); cach[s] = 'khop-dien-tich'; da = m if da is None else unary_union([da, m])
+    # LƯỢT GHÉP MẶT KHỚP NHÃN (15/10/2026 tối): số còn sót có nhãn, mặt chứa số NHỎ HƠN nhãn → ghép thêm 1–2 mặt LIỀN KỀ (chung cạnh > 0,1 m)
+    # KHÔNG chứa số / nhãn nào, tổng diện tích khớp nhãn (≤ sai số nhãn); chỉ nhận khi ĐÚNG MỘT tổ hợp khớp, xét bộ nét MỊN nhất trước.
+    # Tờ 8: dãy lô sát đường bị nét mép đường (Level 50) chia ngang, phần lô bên kia nét là một dải ~2 m — 31/38 số còn sót ghép được,
+    # 11 lô trùng khít thửa web (lệch 0 cm). Đánh dấu cachDung = 'ghep-mat' để chủ dự án soi lại.
+    co_diem = []
+    for mat, cay in zip(mat_bo, cay_bo):
+        cs = set()
+        if cay is not None:
+            for p in moi_diem:
+                for i in cay.query(p):
+                    if mat[i].contains(p): cs.add(i)
+        co_diem.append(cs)
+    for s in cac_so:
+        if s in chon or nhan.get(s, ('', None))[1] is None: continue
+        dtn = nhan[s][1]; tol = sai_cua(nhan[s]); p = diem_so[s]
+        for k in range(len(mat_bo) - 1, -1, -1):
+            mat, cay = mat_bo[k], cay_bo[k]
+            if cay is None: continue
+            hit = [i for i in cay.query(p) if mat[i].contains(p)]
+            if not hit: continue
+            i0 = min(hit, key=lambda i: mat[i].area); f0 = mat[i0]
+            if f0.area > dtn + tol: continue
+            if (set(x for x, q in so if f0.contains(q)) | set(x for x, v in nhan.items() if len(v) > 2 and v[2] is not None and f0.contains(v[2]))) - {s}:
+                continue
+            if da is not None and f0.intersection(da).area > 0.5: continue
+            vien = f0.buffer(0.05)
+            ke = [j for j in cay.query(vien) if j != i0 and j not in co_diem[k] and f0.boundary.intersection(mat[j].boundary).length > 0.1
+                  and (da is None or mat[j].intersection(da).area <= 0.5)]
+            ke = sorted(ke, key=lambda j: mat[j].area)[:8]
+            dung = []
+            for r in (1, 2):
+                for to in itertools.combinations(ke, r):
+                    if abs(f0.area + sum(mat[j].area for j in to) - dtn) <= tol:
+                        u = unary_union([f0] + [mat[j] for j in to])
+                        if u.geom_type == 'Polygon': dung.append(u)
+            if len(dung) == 1:
+                chon[s] = (dung[0], k, True); cach[s] = 'ghep-mat'; da = dung[0] if da is None else unary_union([da, dung[0]])
+            if dung: break
     for s in cac_so:
         if s not in chon:
             p = diem_so[s]

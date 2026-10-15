@@ -472,10 +472,14 @@ Chủ dự án đưa bộ **387 tờ DGN V8 xã Cam Lâm** (`D:\BandoCamLam\Ban 
   `52`); tờ 58 Level 4 lại là số cao độ. **Level 54 / `KHUNGTHU` = TÊN CHỦ — không đọc, không ghi ra file.** Vì mỗi xã cũ vẽ một kiểu nên
   bộ đổi TỰ DÒ theo từng tờ (lớp ranh = lớp có ≥ 80 % chiều dài trùng ranh thửa web; lớp số = lớp khớp ô nhãn nhiều nhất) và **chọn hình
   KHỚP NHÃN**: thử dựng từ ít → nhiều lớp, thửa có nhãn lấy hình có diện tích khớp số trên nhãn (≤ 0,15 m²).
-- **Số liệu (bản cuối 15/10 tối, 390 tờ kể cả 303 / 313 / 314):** 88.716 số thửa → dựng được 87.665 (98,8 %), khớp nhãn 84.866 / 86.301. So
-  với web: giống 61.822 · cùng hình nhưng lệch vị trí 7.972 (một cụm lệch đúng 0,27 m Đ / 0,07 m B = nửa độ trượt lớp web) · khác 5.164 ·
-  **web chưa có 12.707** (web THIẾU cả mảng — vd tờ 7: web 221 thửa, V8 487; chỗ đó trên web không có thửa nào) · web có mà V8 không có 3.452.
+- **Số liệu (bản cuối 15/10 tối, 390 tờ kể cả 303 / 313 / 314):** 88.716 số thửa → dựng được 87.830 (99,0 %), khớp nhãn 85.035 / 86.466. So
+  với web: giống 61.914 · cùng hình nhưng lệch vị trí 7.995 (một cụm lệch đúng 0,27 m Đ / 0,07 m B = nửa độ trượt lớp web) · khác 5.183 ·
+  **web chưa có 12.738** (web THIẾU cả mảng — vd tờ 7: web 221 thửa, V8 487; chỗ đó trên web không có thửa nào) · web có mà V8 không có 3.458.
   Thửa 70 · Tờ 25 V8 = 511,889 m², trùng web.
+- **Bộ nét 6 + lượt GHÉP MẶT (15/10 tối):** bộ nét cuối thêm mép đường (Level 50 / 22), chỉ nhận khi khớp nhãn. Số còn sót mà mặt chứa số
+  NHỎ HƠN nhãn → ghép thêm 1–2 mặt liền kề không chứa số nào, tổng khớp nhãn, chỉ nhận khi ĐÚNG MỘT tổ hợp khớp (`cachDung: 'ghep-mat'`). Tờ 8:
+  dãy lô sát đường bị nét mép đường chia ngang (lô 747: mặt 318,6 m² + dải 19,7 m² = nhãn 338,3). Cả xã 85 thửa ghép mặt: 44 trùng khít web +
+  11 trùng hình lệch vị trí (55/72 thửa có trên web), 17 khác, 13 web chưa có.
 - ⚠️ **TÊN CHỦ LỌT VÀO CỘT LOẠI ĐẤT (đã sửa 15/10 tối):** ô nhãn (khối `N_THUA`…) của một số tờ có cả DÒNG TÊN CHỦ; bản đầu lấy "chữ đầu tiên có
   chữ cái" làm loại đất ⇒ 270 tên người nằm trong cột `mdsd` của `dia_chinh_v8` + file GeoJSON / CSV. Đã xoá khỏi bảng, xoá kết quả cũ, sửa tận
   gốc (`LOP_TEN_CHU` bỏ hẳn, `la_ma_loai`: chỉ nhận MÃ chữ HOA không dấu / số nối + . , / -; lớp 53 cũng lọc) + lưới an toàn trong
@@ -486,8 +490,8 @@ Chủ dự án đưa bộ **387 tờ DGN V8 xã Cam Lâm** (`D:\BandoCamLam\Ban 
 - **Trên web (chỉ admin):** bảng lớp → "Đối chiếu bản đồ V8 (xã Cam Lâm)": viền hồng nét đứt, tô đỏ = khác, vàng = lệch vị trí, xanh = web chưa
   có; bấm thửa → khung "Bản đồ V8 (đối chiếu)" trong bảng thông tin thửa. Máy chủ: `GET /api/qh-rieng/dc-v8/:z/:x/:y` (chỉ mức 16) +
   `/dc-v8/tai?lng&lat` — vé `'a'` (routes/qhRieng.ts). Bảng tạo trong `migrate.ts`.
-- **Còn dở:** 1.051 số thửa chưa dựng được hình (`chua-dung-duoc.csv`) — phần lớn do BẢN VẼ thiếu nét (vd tờ 344: lô 540–559 không có nét
-  chia lô, nét Level 2 không chạm khối); tờ 162, 172 trống thật (không có thửa); 40 tờ hụt > 5 % (nặng nhất 344, 8, 343, 59, 247, 341). Chưa
+- **Còn dở:** 886 số thửa chưa dựng được hình (`chua-dung-duoc.csv`) — phần lớn do BẢN VẼ thiếu nét (vd tờ 344: lô 540–559 không có nét
+  chia lô, nét Level 2 không chạm khối); tờ 162, 172 trống thật (không có thửa); 37 tờ hụt > 5 % (nặng nhất 344, 343, 59, 247, 341, 246). Chưa
   đưa vào: tờ 19 bản mới hơn (8/1/2026, thư mục cha), thư mục "Sinh Du An VIN chuyen" (312–317). Chưa quyết: có thay lớp thửa web bằng bản
   V8 không (chờ chủ dự án đối chiếu xong).
 

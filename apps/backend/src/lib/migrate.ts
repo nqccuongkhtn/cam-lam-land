@@ -844,6 +844,20 @@ export async function migrate(): Promise<void> {
     .catch((e) => console.error('[migrate] qh_pdf_ranh:', e.message));
   await pool.query(`CREATE INDEX IF NOT EXISTS qh_pdf_ranh_geom_idx ON qh_pdf_ranh USING gist (geom)`).catch(() => {});
 
+  // ── QH CHI TIẾT 1/500 CAM LÂM (QĐ 2043–2048/QĐ-UBND) TRÊN TỪNG THỬA — CHỈ ADMIN (15/10/2026, lib/qh500.ts) ──
+  // qh_500      = lô đất có màu, ĐÃ TÁCH KHÔNG CHỒNG theo đúng thứ tự vẽ của ảnh tô màu (lô nằm trên giữ phần chồng) → cộng diện
+  //               tích theo loại không đếm trùng. Đường (phần trong ranh không có lô) KHÔNG lưu — tính ra từ ranh.
+  // qh_500_ranh = ranh lập quy hoạch từng đồ án + số quyết định.
+  // Nạp bằng scripts/qh-tinh/to_mau_1_500.py nap-sql (xoá sạch rồi nạp lại → chạy lại nhiều lần vẫn đúng).
+  await pool.query(`CREATE TABLE IF NOT EXISTS qh_500 (
+      id serial PRIMARY KEY, ban text NOT NULL, loai text NOT NULL, ten text NOT NULL, mau text,
+      geom geometry(MultiPolygon, 4326) NOT NULL)`).catch((e) => console.error('[migrate] qh_500:', e.message));
+  await pool.query(`CREATE INDEX IF NOT EXISTS qh_500_geom_idx ON qh_500 USING gist (geom)`).catch(() => {});
+  await pool.query(`CREATE TABLE IF NOT EXISTS qh_500_ranh (
+      ban text PRIMARY KEY, qd text NOT NULL, ten text NOT NULL, geom geometry(MultiPolygon, 4326) NOT NULL)`)
+    .catch((e) => console.error('[migrate] qh_500_ranh:', e.message));
+  await pool.query(`CREATE INDEX IF NOT EXISTS qh_500_ranh_geom_idx ON qh_500_ranh USING gist (geom)`).catch(() => {});
+
   console.log('[migrate] schema up to date');
 }
 

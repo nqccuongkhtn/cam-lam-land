@@ -7,6 +7,9 @@ import { computeQhAreas, computeQhTheoBan, outerRing, qhReady, ngoaiVungQh, chua
 import { sqlDienTichPhang, sqlHeSoPhang } from '../lib/dienTichPhang.ts';
 import { qhCoLuu, tinhQhHinh } from '../lib/qhLuu.ts';
 import { qhTuPdf } from '../lib/qhPdf.ts';
+import { qh500TrenThua } from '../lib/qh500.ts';
+import { laAdmin } from '../lib/auth.ts';
+import { nguoiDungTuYeuCau } from '../middleware/auth.ts';
 import { isFlagOn } from '../lib/flags.ts';
 
 
@@ -311,7 +314,16 @@ parcelsRouter.get('/at', async (req, res, next) => {
     const qhPdf = parcel && tuBangMoi && (overlaps.length === 0 || phuPre < 0.5) && (qhCacBanCL.length === 0 || phuCL < 0.5)
       && (process.env.QH_PDF_THU === '1' || await isFlagOn('qh_pdf_bat'))
       ? await qhTuPdf(Number(parcel.id), dtThua) : [];
-    const qhCacBan = [...qhCacBanCL, ...qhPdf];
+    // (15/10/2026) QH CHI TIẾT 1/500 (lib/qh500.ts): loại đất + diện tích CHỈ gửi cho ADMIN (kiểm thẻ đầy đủ). Người khác: thửa nằm trong
+    // ranh 1/500 thì chỉ có dấu khoá (giao diện hiện "liên hệ admin"). Trả số liệu thì đánh dấu riêng tư — không cho nginx / Cloudflare
+    // giữ lại phát cho người khác (nginx vốn đã bỏ qua đệm khi yêu cầu có thẻ đăng nhập).
+    let qh500: any = null;
+    if (parcel && tuBangMoi) {
+      const nd = await nguoiDungTuYeuCau(req).catch(() => null);
+      qh500 = await qh500TrenThua(Number(parcel.id), dtThua, laAdmin(nd)).catch(() => null);
+      if (qh500 && !qh500.khoa) res.set('Cache-Control', 'private, no-store');
+    }
+    const qhCacBan = [...qhCacBanCL, ...qhPdf, ...(qh500 ? [qh500] : [])];
     res.json({ found: true, point: { lng, lat }, parcel: parcel ?? null, zoning: zoningOut, overlaps, neighbors, listings: linked,
                qhCacBan,
                // (10/10/2026) thêm: có thửa mà KHÔNG bản nào phủ (vd thửa Phước Đồng sát ranh QĐ205, nay phần ngoài ranh không còn bị

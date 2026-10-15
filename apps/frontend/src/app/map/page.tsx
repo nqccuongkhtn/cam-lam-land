@@ -2061,7 +2061,7 @@ export default function MapPage() {
   // thứ tự MUC_QH. Lướt sang trang nào thì BẢN ĐỒ ĐỔI SANG LỚP ĐÓ, và trang chỉ hiện loại đất của bản đó:
   // mỗi dòng = ô diện tích TÔ ĐÚNG MÀU loại đất (màu lấy ở mau-loai-dat-qh.json) + tên loại đất.
   // Khác khối khoiQh() của máy tính (giản dị, không màu) — ở đây chủ dự án chủ động muốn ô màu như app.
-  const trangQhCuaThua = (): { muc: (typeof MUC_QH)[number]; tieuDe: string; phu?: string; areas: { type: string; areaM2: number }[]; bangMau: string; mauRieng?: Record<string, string> }[] => {
+  const trangQhCuaThua = (): { muc: (typeof MUC_QH)[number]; tieuDe: string; phu?: string; areas: { type: string; areaM2: number }[]; bangMau: string; mauRieng?: Record<string, string>; khoa?: boolean }[] => {
     if (!info?.parcel) return [];
     const cacBan: any[] = (info as any).qhCacBan || [];
     const PK = ['2076', '2101', '2222', '918', 'cuhin', 'taynam', 'taybac'];
@@ -2093,6 +2093,20 @@ export default function MapPage() {
         const areas = b ? gop(b.areas || []) : [];
         if (areas.length) ra.push({ muc, tieuDe: 'Quy hoạch sử dụng đất 2030', phu: 'bóc từ bản đồ PDF · tham khảo', areas, bangMau: 'pdf',
           mauRieng: Object.fromEntries(((b.areas || []) as any[]).filter((a) => a.mau).map((a) => [a.type, a.mau])) });
+      }
+    }
+    // QH CHI TIẾT 1/500 (15/10/2026, chủ dự án: "thông tin thửa chưa hiện thông tin quy hoạch 1-500") — máy chủ lib/qh500.ts, mục ma 'ct500'.
+    // Admin: loại đất + diện tích (màu = màu lớp "QH chi tiết 1/500 · tô màu", máy chủ gửi kèm); lướt tới trang này là bật lớp tô màu.
+    // Người khác: máy chủ chỉ gửi dấu khoa (thửa nằm trong ranh 1/500) → trang có khoá, bấm "Liên hệ admin" mở hộp hopKhoa.
+    const b500 = cacBan.find((x) => String(x.ma) === 'ct500');
+    if (b500) {
+      const muc = mucQh.find((m) => m.id === 'qh-ct500-mau') || mucQh.find((m) => m.id === 'qh-ct500')
+        || { id: 'qh-ct500', ten: 'QH chi tiết 1/500', tenNgan: 'Chi tiết 1/500', tenApp: 'QH chi tiết 1/500', gom: ['qh-ct500'], vung: 'cam-lam', khoa: true };
+      if (b500.khoa) ra.push({ muc: { ...muc, khoa: true }, tieuDe: 'Quy hoạch chi tiết 1/500', areas: [], bangMau: 'pdf', khoa: true });
+      else {
+        const areas = gop(b500.areas || []);
+        if (areas.length) ra.push({ muc, tieuDe: 'Quy hoạch chi tiết 1/500', phu: b500.qd ? `QĐ ${b500.qd}` : undefined, areas, bangMau: 'pdf',
+          mauRieng: Object.fromEntries(((b500.areas || []) as any[]).filter((a) => a.mau).map((a) => [a.type, a.mau])) });
       }
     }
     return ra;
@@ -2136,7 +2150,7 @@ export default function MapPage() {
     if (i === trangQh) return;
     setTrangQh(i);
     const t = trangQhCuaThua()[i];
-    if (t && !t.muc.gom.every((id) => !!ovOn[id])) chonLopQh(t.muc, true);   // lướt tới đâu, bản đồ đổi lớp tới đó
+    if (t && !t.khoa && !t.muc.gom.every((id) => !!ovOn[id])) chonLopQh(t.muc, true);   // lướt tới đâu, bản đồ đổi lớp tới đó (trang có khoá thì thôi)
   };
   // Nạp bảng chú giải MỘT LẦN, lúc người dùng bấm mở (ai không xem thì khỏi tải thêm gì).
   const napChuGiai = () => {
@@ -3382,7 +3396,13 @@ export default function MapPage() {
                         {ds.map((t) => (
                           <div key={t.muc.id} className={`w-full shrink-0 snap-center ${ds.length > 1 ? 'px-4 sm:pr-14' : 'px-4'}`}>{/* sm:pr-14: chừa góc phải cho mũi tên nhỏ khỏi đè tiêu đề */}
                             {/* Tiêu đề + tên các mảnh phân khu gộp MỘT dòng cho gọn. */}
-                            <p className={`truncate font-bold leading-snug text-[#0A2540] text-[13px]`}>{t.tieuDe}{t.phu && <span className="ml-1.5 text-[10.5px] font-normal text-slate-400">{t.phu}</span>}</p>
+                            <p className={`truncate font-bold leading-snug text-[#0A2540] text-[13px]`}>{t.tieuDe}{t.khoa && <span className="ml-1 text-[12px]" aria-label="liên hệ admin">🔒</span>}{t.phu && <span className="ml-1.5 text-[10.5px] font-normal text-slate-400">{t.phu}</span>}</p>
+                            {t.khoa && (
+                              <button type="button" onClick={() => setHopKhoa('QH chi tiết 1/500')}
+                                className="mt-1.5 rounded border border-slate-300 px-2.5 py-1 text-[12.5px] font-semibold text-[#0A2540] active:bg-slate-100">
+                                Liên hệ admin để xem
+                              </button>
+                            )}
                             <div className="mt-1 space-y-[3px]">
                               {t.areas.map((a) => {
                                 const mau = t.mauRieng?.[a.type] || mauQh?.[t.bangMau]?.[a.type] || '#e2e8f0';
@@ -3485,7 +3505,7 @@ export default function MapPage() {
                 {/* Phiếu trích lục ghi rõ "Quy hoạch chung đô thị mới Cam Lâm 2045" nên chỉ cho xuất
                     khi thửa nằm trong vùng có dữ liệu — ngoài vùng mà in ra là phiếu sai.
                     (14/10/2026) Thửa chỉ có số liệu BÓC TỪ PDF (huyện/thị ngoài Cam Lâm, nguon:'pdf') cũng KHÔNG in phiếu. */}
-                {info.parcel && !info.qhNgoaiVung && ((info.overlaps?.length || 0) > 0 || (((info as any).qhCacBan || []) as any[]).some((b) => b?.nguon !== 'pdf')) && (
+                {info.parcel && !info.qhNgoaiVung && ((info.overlaps?.length || 0) > 0 || (((info as any).qhCacBan || []) as any[]).some((b) => b?.nguon !== 'pdf' && b?.nguon !== '1/500')) && (
                   <button
                     onClick={() => {
                       const g = (highlight as any)?.geometry || (info.parcel as any)?.geometry;
@@ -3502,7 +3522,7 @@ export default function MapPage() {
                         for (const x of (overlaps || []) as any[]) if (x?.hz) hzA[String(x.hz)] = (hzA[String(x.hz)] || 0) + (Number(x.areaM2) || 0);
                         const pieceHz = Object.keys(hzA).sort((a, b) => hzA[b] - hzA[a])[0] || mapScen;
                         // PHỤ LỤC: mỗi bản quy hoạch KHÁC đè lên thửa một trang trích lục trên ảnh của chính bản đó (lib/phieuQh.ts)
-                        const phuLuc = (((info as any).qhCacBan || []) as any[]).filter((bn) => bn?.nguon !== 'pdf').map((bn) => {
+                        const phuLuc = (((info as any).qhCacBan || []) as any[]).filter((bn) => bn?.nguon !== 'pdf' && bn?.nguon !== '1/500').map((bn) => {
                           const ma = String(bn.ma);
                           const id = /^\d+$/.test(ma) ? 'qh-qd' + ma : 'qh-' + ma;
                           const tile = ((RASTER_OVERLAYS.find((x) => x.id === id) as any)?.tiles || [])[0] as string | undefined;
@@ -3514,7 +3534,7 @@ export default function MapPage() {
                             areas: ((bn.areas || []) as { type: string; areaM2: number }[]).map((a) => ({ ...a, mau: mauQh?.[bang]?.[a.type] })),
                           } : null;
                         }).filter(Boolean) as any[];
-                        const html = phieuQhHtml({ parcel: info.parcel as any, geometry: g, overlaps, qhCacBan: (((info as any).qhCacBan || []) as any[]).filter((bn) => bn?.nguon !== 'pdf'), qhPieces: manh ? manh.map((m) => ({ lo: m.lo, c: mauQh?.qd205?.[m.lo], ring: m.ring })) : qhPiecesFor(g, pieceHz), roadFeats: roadFeatsFor(g), neighbors: (info as any).neighbors || [], point: info.point, user: user as any, scenario: mapScen, roadHz: pieceHz, phuLuc });
+                        const html = phieuQhHtml({ parcel: info.parcel as any, geometry: g, overlaps, qhCacBan: (((info as any).qhCacBan || []) as any[]).filter((bn) => bn?.nguon !== 'pdf' && bn?.nguon !== '1/500'), qhPieces: manh ? manh.map((m) => ({ lo: m.lo, c: mauQh?.qd205?.[m.lo], ring: m.ring })) : qhPiecesFor(g, pieceHz), roadFeats: roadFeatsFor(g), neighbors: (info as any).neighbors || [], point: info.point, user: user as any, scenario: mapScen, roadHz: pieceHz, phuLuc });
                         try { win.document.open(); win.document.write(html); win.document.close(); win.focus(); } catch { /* */ }
                       };
                       // chỉ dùng số máy chủ (12/10/2026: bỏ tính bù từ qh_vector cũ — xem chỗ gọi /parcels/at)

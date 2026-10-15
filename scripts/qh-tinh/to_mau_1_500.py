@@ -17,6 +17,8 @@
 #   python -X utf8 to_mau_1_500.py doc <thư mục DXF> <thư mục ranh> <ra.json>                 # đọc 6 bản → vùng + nét (WGS84)
 #   python -X utf8 to_mau_1_500.py cat <vào.json> <thư mục ô ra> [zmin=12] [zmax=20] [--sieu=3]  # cắt ô 512 điểm ảnh WebP
 #   python -X utf8 to_mau_1_500.py chu-giai <vào.json> > chu-giai.json                          # chú giải → danh-sach.json "chuGiai"
+#   python -X utf8 to_mau_1_500.py nap-sql <vào.json> <ra.sql>   rồi  docker compose exec -T postgis psql -U camlam -d camlam_gis < ra.sql
+#                                                                # → bảng qh_500 / qh_500_ranh: quy hoạch 1/500 trên từng thửa (lib/qh500.ts)
 import sys, os, json, math, re, unicodedata, collections
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'qh-pipeline'))
@@ -392,10 +394,71 @@ def chu_giai(vao):
     return ra
 
 
+# ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# BƯỚC 4 — NẠP VÀO CƠ SỞ DỮ LIỆU để tính quy hoạch 1/500 TRÊN TỪNG THỬA (máy chủ lib/qh500.ts, CHỈ ADMIN thấy số liệu)
+# ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# Lô chồng nhau (dải cây xanh chuyên dụng Cam Tân đè lô thương mại, lô nhà ở vẽ trùng ở Cam Hiệp Bắc…) → TÁCH KHÔNG CHỒNG theo đúng
+# thứ tự vẽ của ảnh tô màu: lô nằm TRÊN giữ phần chồng, lô dưới bị khoét → màu thấy trên ảnh = loại đất được tính, không đếm trùng.
+# Lô không màu (giao thông) không nạp: máy chủ tính đường = phần trong ranh không có lô.
+QD_BAN = {'gdqd': ('2043/QĐ-UBND', 'Khu Gia đình Quân đội thuộc một phần Tiểu khu G, phân khu đô thị Trung tâm'),
+          'camduc': ('2044/QĐ-UBND', 'Một phần Tiểu khu B, phân khu đô thị Trung tâm'),
+          'camhiepbac': ('2048/QĐ-UBND', 'Một phần Tiểu khu C, phân khu đô thị Trung tâm'),
+          'camtan': ('2047/QĐ-UBND', 'Một phần Tiểu khu B, phân khu đô thị phía Bắc'),
+          'camhoa': ('2045/QĐ-UBND', 'Một phần Tiểu khu D, phân khu đô thị phía Bắc'),
+          'camhaitay': ('2046/QĐ-UBND', 'Một phần Tiểu khu E, phân khu đô thị phía Bắc')}   # như lap_danh_sach_qh_rieng.py
+
+
+def nap_sql(vao, ra):
+    from shapely.geometry import shape, Polygon, MultiPolygon
+    from shapely.ops import unary_union
+    from shapely.strtree import STRtree
+    from shapely.validation import make_valid
+    d = json.load(open(vao, encoding='utf-8'))
+    loai = {m['ma']: m for m in BANG['loai']}
+    V = []
+    for v in d['vung']:
+        L = loai.get(v['loai'])
+        if not L or not L.get('mau'): continue
+        V.append((v, make_valid(shape(v['g'])), (0 if L.get('lop_phu') else v['bac'], -v['dt']), L))
+    V.sort(key=lambda t: t[2])                     # dưới → trên, y như thứ tự vẽ ô ảnh (_nap / _ve_o)
+    hinh = [t[1] for t in V]; cay = STRtree(hinh)
+    K = 111320 * math.cos(math.radians(12.1)) * 110574
+
+    def da_giac(g):
+        if g is None or g.is_empty: return []
+        if isinstance(g, Polygon): return [g]
+        return [p for q in getattr(g, 'geoms', []) for p in da_giac(q)]
+    def wkt(g):
+        ps = [p for p in da_giac(g) if p.area * K >= 0.01]
+        if not ps: return None
+        def vong(r): return '(' + ','.join(f'{x:.8f} {y:.8f}' for x, y in r.coords) + ')'
+        return 'MULTIPOLYGON(' + ','.join('(' + ','.join([vong(p.exterior)] + [vong(r) for r in p.interiors]) + ')' for p in ps) + ')'
+    def q(s): return "'" + str(s).replace("'", "''") + "'"
+    dong, tong_truoc, tong_sau = [], 0.0, 0.0
+    for i, (v, g, _, L) in enumerate(V):
+        tren = [hinh[j] for j in cay.query(g) if j > i and hinh[j].intersects(g)]
+        m = make_valid(g.difference(unary_union(tren))) if tren else g
+        tong_truoc += g.area * K; tong_sau += m.area * K
+        w = wkt(m)
+        if w: dong.append(f"({q(v['ban'])},{q(v['loai'])},{q(L['ten'])},{q(L['mau'])},ST_Multi(ST_CollectionExtract(ST_MakeValid(ST_GeomFromText('{w}',4326)),3)))")
+    with open(ra, 'w', encoding='utf-8', newline='\n') as f:
+        f.write('-- QH chi tiết 1/500 trên từng thửa (scripts/qh-tinh/to_mau_1_500.py nap-sql) — chạy lại nhiều lần vẫn đúng\nBEGIN;\n')
+        f.write('DELETE FROM qh_500; DELETE FROM qh_500_ranh;\n')
+        for k in range(0, len(dong), 200):
+            f.write('INSERT INTO qh_500 (ban, loai, ten, mau, geom) VALUES\n' + ',\n'.join(dong[k:k + 200]) + ';\n')
+        for ma, r in d['ranh'].items():
+            so, ten = QD_BAN.get(ma, ('', ma))
+            f.write(f"INSERT INTO qh_500_ranh (ban, qd, ten, geom) VALUES ({q(ma)},{q(so)},{q(ten)},"
+                    f"ST_Multi(ST_CollectionExtract(ST_MakeValid(ST_GeomFromText('{wkt(shape(r))}',4326)),3)));\n")
+        f.write('COMMIT;\nSELECT ban, count(*), round((sum(ST_Area(geom::geography))/1e4)::numeric, 2) AS ha FROM qh_500 GROUP BY ban ORDER BY ban;\n')
+    print(f'ĐÃ GHI {ra}: {len(dong)} lô (tách không chồng: {tong_truoc / 1e4:.2f} ha → {tong_sau / 1e4:.2f} ha), {len(d["ranh"])} ranh', file=sys.stderr)
+
+
 if __name__ == '__main__':
     lenh = sys.argv[1] if len(sys.argv) > 1 else ''
     ts = [a for a in sys.argv[2:] if not a.startswith('--')]
     if lenh == 'doc': doc(ts[0], ts[1], ts[2])
     elif lenh == 'cat': cat(*ts)
     elif lenh == 'chu-giai': print(json.dumps(chu_giai(ts[0]), ensure_ascii=False, indent=1))
+    elif lenh == 'nap-sql': nap_sql(ts[0], ts[1])
     else: print(open(__file__, encoding='utf-8').read()[:2400])

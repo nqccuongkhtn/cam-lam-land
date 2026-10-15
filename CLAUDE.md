@@ -865,6 +865,14 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   dài nằm trong lòng lô thì bỏ); (2) "cây xanh chuyên dụng" Cam Tân là LỚP PHỦ hành lang cắt ngang QL1A, chồng ~6.500 m² lên lô khác →
   `lop_phu`: tô dưới cùng + hoa văn ô chéo phủ cả dải, không dùng để lọc nét. Chú giải lớp riêng nằm trong danh-sach.json (`chuGiai`),
   gửi kèm vé — giao diện gộp vào bảng "Chú giải" (`banCG`). Thêm lớp: `them_lop_rieng.py … --truoc=<id>` (ghi tệp tạm rồi đổi tên).
+  **1/500 TRONG BẢNG "THÔNG TIN THỬA" (15/10/2026, "thông tin thửa chưa hiện thông tin quy hoạch 1-500")** — `lib/qh500.ts` + bảng
+  `qh_500` (lô tô màu ĐÃ TÁCH KHÔNG CHỒNG theo thứ tự vẽ: lô nằm trên giữ phần chồng — 479,81 → 478,50 ha) + `qh_500_ranh` (ranh + số QĐ),
+  nạp bằng `to_mau_1_500.py nap-sql` (xoá sạch rồi nạp lại). `/api/parcels/at` gửi mục `ma:'ct500'` có loại đất + diện tích CHỈ cho admin
+  (`nguoiDungTuYeuCau` kiểm thẻ đầy đủ; trả `Cache-Control: private, no-store`); người khác chỉ nhận `{ma:'ct500', khoa:true, areas:[]}`
+  khi thửa nằm trong ranh → trang có khoá "Liên hệ admin để xem". Cách tính như qhPdf.ts: thửa dịch LECH_DIA_CHINH, đo elipxoit rồi đổi
+  tỷ lệ về diện tích sổ (các dòng cộng đúng bằng thửa); trong ranh không có lô = Đất giao thông; ngoài ranh = ngoài phạm vi. KHÔNG in phiếu
+  (lọc `nguon '1/500'` như PDF). Kiểm 15/10: 50 thửa tổng khớp diện tích sổ, đối chiếu cắt hình mặt phẳng VN-2000 lệch ≤ 0,11 m²/dòng.
+  **Chữ cho người thường KHÔNG nói ai được xem** (chủ dự án: "liên hệ admin chứ đừng nói tài khoản nào được xem") — chỉ "🔒 … liên hệ admin".
   ĐÃ LÊN WEB 14/10/2026 21:32 (tự kiểm qua tên miền thật: chưa đăng nhập 401, vé giả 403, `/tiles/` công khai 404, ô có vé hợp lệ trùng
   từng byte file gốc, Cloudflare `DYNAMIC` không giữ). Volume riêng hiện có 2 lớp: `qh-ct500` (1/500 chính thức) và `qh-nt-tay-pk22`
   (ĐC phân khu 1/2000 Tây Nha Trang tiểu PK 2.2, 377 ha — thuyết minh để TRỐNG số quyết định ⇒ "chưa xác minh", chờ chủ dự án quyết

@@ -3407,10 +3407,12 @@ export default function MapPage() {
                               {t.areas.map((a) => {
                                 const mau = t.mauRieng?.[a.type] || mauQh?.[t.bangMau]?.[a.type] || '#e2e8f0';
                                 return (
-                                  <div key={a.type} className="flex min-w-0 items-center gap-2" title={`${fmtM2(a.areaM2)} · ${a.type}`}>
+                                  <div key={a.type} className="flex min-w-0 items-start gap-2" title={`${fmtM2(a.areaM2)} · ${a.type}`}>
                                     <span className="min-w-[64px] shrink-0 rounded border border-black/10 px-1.5 py-px text-right text-[12px] font-bold leading-[18px] tabular-nums"
                                       style={{ background: mau, color: chuTrenMau(mau) }}>{fmtM2(a.areaM2)}</span>
-                                    <span className="min-w-0 truncate text-[12.5px] font-medium text-slate-700">{a.type}</span>
+                                    {/* 15/10/2026: tên dài XUỐNG DÒNG cho đủ chữ — trước cắt "…" ("Đất sử dụng cho hoạt động khoán…"), điện thoại không
+                                        rê chuột xem được chữ đầy đủ. Tên ngắn vẫn một dòng; ô diện tích đứng ngang dòng đầu. */}
+                                    <span className="min-w-0 break-words py-px text-[12.5px] font-medium leading-[18px] text-slate-700">{a.type}</span>
                                   </div>
                                 );
                               })}

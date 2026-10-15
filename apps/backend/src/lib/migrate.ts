@@ -869,6 +869,20 @@ export async function migrate(): Promise<void> {
   await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS goi_chung_het_han TIMESTAMPTZ`)
     .catch((e: any) => console.error('[migrate] thêm cột goi_chung_het_han lỗi:', e?.message || e));
 
+  // ĐỐI CHIẾU BẢN ĐỒ ĐỊA CHÍNH V8 (15/10/2026) — thửa dựng từ bộ 387 tờ DGN V8 xã Cam Lâm của chủ dự án (scripts/dia-chinh/v8/), CHỈ để
+  // admin xem đối chiếu với lớp thửa đang dùng (chủ dự án: "vẫn giữ cái cũ lại, tôi đối chiếu đã, đừng bỏ hẳn"). KHÔNG thay bảng dia_chinh,
+  // không đi vào phép tính quy hoạch. Nạp / nạp lại: scripts/dia-chinh/v8/nap_doi_chieu.py (xoá sạch rồi nạp).
+  // xa_id / so_to = xã CŨ + tờ CŨ (như dia_chinh) · to_moi = tờ ghi trên bản vẽ · dien_tich = số trên nhãn · dien_tich_hinh = đo mặt phẳng
+  // VN-2000 · doi_chieu = giong | dich | khac | moi (so với thửa web cùng số).
+  await pool.query(`CREATE TABLE IF NOT EXISTS dia_chinh_v8 (
+      id SERIAL PRIMARY KEY, xa_id TEXT NOT NULL, so_to TEXT NOT NULL, so_thua TEXT NOT NULL, to_moi INT, mdsd TEXT,
+      dien_tich NUMERIC, dien_tich_hinh NUMERIC, doi_chieu TEXT, lech_hinh NUMERIC, dich_x NUMERIC, dich_y NUMERIC,
+      dien_tich_web NUMERIC, id_web INT, khop_nhan BOOLEAN, bo_net INT, nguon TEXT,
+      geom geometry(MultiPolygon, 4326) NOT NULL)`)
+    .catch((e: any) => console.error('[migrate] tạo bảng dia_chinh_v8 lỗi:', e?.message || e));
+  await pool.query(`CREATE INDEX IF NOT EXISTS dia_chinh_v8_geom_idx ON dia_chinh_v8 USING GIST (geom)`)
+    .catch((e: any) => console.error('[migrate] chỉ mục dia_chinh_v8 lỗi:', e?.message || e));
+
   console.log('[migrate] schema up to date');
 }
 

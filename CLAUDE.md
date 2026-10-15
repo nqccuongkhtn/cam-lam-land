@@ -456,6 +456,31 @@ Kiểm tra nhanh trong Console: `Object.values(__banDo.style.sourceCaches['src-d
 - **Số điện thoại / Zalo của web: 0567 442 996** (đổi 15/10/2026 từ số giả 0988 888 888 — 70 chỗ trong 26 tệp mã + bảng `map_ads` (chữ chìm,
   huy hiệu bản đồ), `users.phone` admin, dòng thử `customers` / `game_scores`). Đổi số lần sau: tìm `0567 442 996` · `0567442996` · `0567.442.996`.
 
+### BẢN ĐỒ ĐỊA CHÍNH V8 XÃ CAM LÂM — CHỈ ĐỂ ĐỐI CHIẾU (15/10/2026)
+Chủ dự án đưa bộ **387 tờ DGN V8 xã Cam Lâm** (`D:\BandoCamLam\Ban do chep xa Cam Lam\bddc`, đánh số tờ MỚI 1–399, thiếu 271 287 303 313 314
+317 329 338 339 346 347 348; tờ 303 / 313 / 314 + một bản tờ 19 mới hơn (8/1/2026) nằm lẻ ở thư mục cha; thư mục "Sinh Du An VIN chuyen" có tờ
+312–317) — "làm chuẩn như file geojson của hệ thống", rồi dặn **"vẫn giữ cái cũ lại, tôi đối chiếu đã, đừng bỏ hẳn"** ⇒ KHÔNG đụng bảng
+`dia_chinh`, KHÔNG vào phép tính quy hoạch; thửa V8 nằm ở bảng RIÊNG `dia_chinh_v8` chỉ admin xem.
+- Chuỗi `scripts/dia-chinh/v8/`: `xuat_dxf_hang_loat.py` (MicroStation qua COM, mở BẢN SAO → DXF ở `D:\KhoQH\dia-chinh-v8\dxf`) →
+  `doc_thua_v8.py` (dựng thửa, đổi tờ mới → tờ cũ theo `dia_chinh_to`, toạ độ CÙNG HỆ file hệ thống — đã cộng độ trượt `LECH_DIA_CHINH`, thửa
+  không đổi chồng khít) → `nap_doi_chieu.py` (gộp + file nạp `dia_chinh_v8`, xoá sạch rồi nạp). Kết quả ở `D:\KhoQH\dia-chinh-v8\ket-qua\`:
+  11 GeoJSON đúng tên + khuôn 147 file hệ thống (`to` = tờ CŨ, thêm `toMoi`, `dienTichHinh` đo mặt phẳng VN-2000, `doiChieu`…) + `doi-chieu.csv`
+  (mở bằng Excel) + `chua-dung-duoc.csv` + `tong-hop.json`.
+- **Cách đọc bản vẽ** (đo 15/10): ranh thửa = Level 10, 23 (mép khối), 31 (bờ ao / ruộng), 32 (mép mương), 1, 9; lẫn lộn 60 / 46 / 24 / 30;
+  KHÔNG phải ranh: 14 nhà, 50, 22 mép đường nhựa, 63 lưới, **55 khung trong (thửa vắt qua mép khung vẽ trọn — không được cắt)**. Số thửa:
+  Level 4 (Cam Đức, Cam Hải Tây, Cam Thành Bắc…), Level 51 / chữ rời Level 13 (Cam Hải Đông), lớp tên chữ (tờ 139: số ở `THUCVAT`, ô nhãn ở
+  `52`); tờ 58 Level 4 lại là số cao độ. **Level 54 / `KHUNGTHU` = TÊN CHỦ — không đọc, không ghi ra file.** Vì mỗi xã cũ vẽ một kiểu nên
+  bộ đổi TỰ DÒ theo từng tờ (lớp ranh = lớp có ≥ 80 % chiều dài trùng ranh thửa web; lớp số = lớp khớp ô nhãn nhiều nhất) và **chọn hình
+  KHỚP NHÃN**: thử dựng từ ít → nhiều lớp, thửa có nhãn lấy hình có diện tích khớp số trên nhãn (≤ 0,15 m²).
+- **Số liệu:** 87.846 số thửa → dựng được 86.507 (98,5 %), khớp nhãn 83.574 / 84.991. So với web: giống 61.233 · cùng hình nhưng lệch vị trí
+  7.881 (một cụm lệch đúng 0,27 m Đ / 0,07 m B = nửa độ trượt lớp web) · khác 5.038 · **web chưa có 12.355** (web THIẾU cả mảng — vd tờ 7: web 221
+  thửa, V8 487; chỗ đó trên web không có thửa nào) · web có mà V8 không có 3.238. Thửa 70 · Tờ 25 V8 = 511,889 m², trùng web.
+- **Trên web (chỉ admin):** bảng lớp → "Đối chiếu bản đồ V8 (xã Cam Lâm)": viền hồng nét đứt, tô đỏ = khác, vàng = lệch vị trí, xanh = web chưa
+  có; bấm thửa → khung "Bản đồ V8 (đối chiếu)" trong bảng thông tin thửa. Máy chủ: `GET /api/qh-rieng/dc-v8/:z/:x/:y` (chỉ mức 16) +
+  `/dc-v8/tai?lng&lat` — vé `'a'` (routes/qhRieng.ts). Bảng tạo trong `migrate.ts`.
+- **Còn dở:** 1.339 số thửa chưa dựng được hình (`chua-dung-duoc.csv`); 8 tờ chưa tìm ra lớp số (116 162 172 183 184 337 340 366); 51 tờ hụt
+  > 5 % (nặng nhất 113, 344, 8, 311, 343, 59). Chưa quyết: có thay lớp thửa web bằng bản V8 không (chờ chủ dự án đối chiếu xong).
+
 ---
 
 ## ⚠️ KHOÁ QUY HOẠCH CAM LÂM — chỉ QĐ893 xem miễn phí (15/10/2026)

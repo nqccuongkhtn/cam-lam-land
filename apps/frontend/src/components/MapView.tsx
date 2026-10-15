@@ -46,6 +46,9 @@ interface Props {
   // Truyền vào địa chỉ ô kèm "vé xem"; vé hết hạn thì chỉ cần truyền địa chỉ mới,
   // bản đồ tự đổi chứ không phải dựng lại lớp (nên không bị chớp màn hình).
   diaChinhTiles?: string[] | null;
+  // ĐỐI CHIẾU BẢN ĐỒ V8 (15/10/2026, chỉ admin): ô vector thửa dựng từ bộ DGN V8 xã Cam Lâm (bảng riêng dia_chinh_v8) — vẽ ĐÈ lên lớp
+  // thửa đang dùng: viền hồng nét đứt; tô đỏ = khác web, vàng = cùng hình nhưng lệch vị trí, xanh lá = thửa web chưa có. null = tắt.
+  doiChieuTiles?: string[] | null;
   routes?: TuyenVe[];                 // các phương án đường đi (chỉ đường)
   onPickRoute?: (id: number) => void; // bấm vào tuyến xám → chọn tuyến đó
 }
@@ -187,7 +190,7 @@ function parcelDims(hl: any): any[] {
   return out;
 }
 
-export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, flyToPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, fitMinZoom, onMapClick, onMeasure, onViewport, textLabels = [], routes = [], onPickRoute, diaChinhTiles = null }: Props) {
+export default function MapView({ center, zoom, className, layers = [], markers = [], overlays = [], baseMap = 'street', labels = true, measureMode = 'off', focusPoint = null, flyToPoint = null, highlight = null, initialBounds, adMarkers = [], adOpacity = 1, fitTo = null, fitMinZoom, onMapClick, onMeasure, onViewport, textLabels = [], routes = [], onPickRoute, diaChinhTiles = null, doiChieuTiles = null }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const markerRefs = useRef<Marker[]>([]);
@@ -238,6 +241,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
   // Giữ địa chỉ ô địa chính trong ref: nếu vé xem về TRƯỚC khi bản đồ nạp xong thì
   // lúc nạp xong vẫn đọc được giá trị mới nhất (đọc thẳng biến sẽ dính giá trị cũ).
   const dcTilesRef = useRef(diaChinhTiles); dcTilesRef.current = diaChinhTiles;
+  const v8TilesRef = useRef(doiChieuTiles); v8TilesRef.current = doiChieuTiles;   // cùng lý do — lớp đối chiếu V8 (admin)
   // Cùng lý do cho DANH SÁCH LỚP ẢNH QUY HOẠCH (15/10/2026): vé admin về trước khi bản đồ nạp xong → trang đổi sang QĐ205 nhưng bước
   // khởi tạo lại vẽ theo danh sách cũ (QĐ893) → nút lớp + bảng thửa ghi QĐ205 mà bản đồ hiện QĐ893 (chủ dự án: "mở 893 nhưng thông tin
   // lại không phải"). syncOverlays đọc danh sách MỚI NHẤT qua ref này.
@@ -368,7 +372,7 @@ export default function MapView({ center, zoom, className, layers = [], markers 
       // HOÀNG SA · TRƯỜNG SA — chồng lên trên cùng, luôn bật. Ảnh nền của nhà cung cấp nước ngoài
       // hay bỏ trống hai quần đảo này; lớp đây vẽ đè lên nên ảnh chụp màn hình bản đồ không bị bắt bẻ.
       themLopBienDao(map);
-      syncBase(); syncOverlays(); syncLayers(); syncDiaChinh(); syncRoutes(); tryInitialFit();
+      syncBase(); syncOverlays(); syncLayers(); syncDiaChinh(); syncDoiChieu(); syncRoutes(); tryInitialFit();
       map.on('zoom', locCanhTheoZoom);
     };
     map.on('load', khoiTaoLop);
@@ -624,9 +628,48 @@ export default function MapView({ center, zoom, className, layers = [], markers 
                 'text-font': ['Noto Sans Regular'], 'text-allow-overlap': false },
       paint: { 'text-color': '#0d47a1', 'text-halo-color': 'rgba(255,255,255,0.85)', 'text-halo-width': 1.2 },
     } as any);
+    for (const id of V8_LOP) if (map.getLayer(id)) map.moveLayer(id);   // lớp đối chiếu V8 (nếu đã bật trước) luôn nằm trên lớp thửa
     themLopBienDao(map);   // hai quần đảo luôn nằm trên cùng
   }
   useEffect(() => { syncDiaChinh(); /* eslint-disable-next-line */ }, [diaChinhTiles]);
+
+  // ══ ĐỐI CHIẾU BẢN ĐỒ V8 (15/10/2026, chỉ admin) — xem thuộc tính doiChieuTiles ══════════════════════════
+  // Cùng kiểu lớp thửa ở trên (ô chỉ mức 16, gần hơn tự phóng to). Thửa "giống web" không tô — chỉ chỗ khác mới lộ màu.
+  const V8_LOP = ['v8-fill', 'v8-line', 'v8-nhan'];
+  function syncDoiChieu() {
+    const map = mapRef.current; if (!map || !readyRef.current) return;
+    const tiles = v8TilesRef.current;
+    const src = map.getSource('src-dc-v8') as any;
+    if (!tiles || !tiles.length) {
+      for (const id of V8_LOP) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'none');
+      return;
+    }
+    if (src) {
+      if (typeof src.setTiles === 'function') src.setTiles(tiles);
+      for (const id of V8_LOP) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'visible');
+      return;
+    }
+    map.addSource('src-dc-v8', { type: 'vector', tiles, minzoom: 16, maxzoom: 16 } as any);
+    map.addLayer({
+      id: 'v8-fill', type: 'fill', source: 'src-dc-v8', 'source-layer': 'v8', minzoom: DC_MIN_ZOOM,
+      paint: { 'fill-color': ['match', ['get', 'dc'], 'khac', '#e53935', 'dich', '#f9a825', 'moi', '#2e7d32', '#000000'] as any,
+               'fill-opacity': ['match', ['get', 'dc'], 'khac', 0.32, 'dich', 0.3, 'moi', 0.3, 0] as any },
+    } as any);
+    map.addLayer({
+      id: 'v8-line', type: 'line', source: 'src-dc-v8', 'source-layer': 'v8', minzoom: DC_MIN_ZOOM,
+      paint: { 'line-color': '#d81b60', 'line-width': ['interpolate', ['linear'], ['zoom'], 16, 1, 18, 1.8, 20, 2.4] as any, 'line-dasharray': [2.5, 1.5] },
+    } as any);
+    // Số thửa V8 chỉ ghi ở thửa khác / mới / lệch (thửa giống web đã có số của lớp thửa), đặt thấp hơn số thửa thường cho khỏi chồng
+    map.addLayer({
+      id: 'v8-nhan', type: 'symbol', source: 'src-dc-v8', 'source-layer': 'v8', minzoom: 17,
+      filter: ['in', ['get', 'dc'], ['literal', ['khac', 'moi', 'dich']]] as any,
+      layout: { 'text-field': ['get', 's'], 'text-size': ['interpolate', ['linear'], ['zoom'], 17, 10, 20, 13] as any,
+                'text-font': ['Noto Sans Regular'], 'text-offset': [0, 1.3], 'text-allow-overlap': false },
+      paint: { 'text-color': '#ad1457', 'text-halo-color': 'rgba(255,255,255,0.9)', 'text-halo-width': 1.2 },
+    } as any);
+    themLopBienDao(map);
+  }
+  useEffect(() => { syncDoiChieu(); /* eslint-disable-next-line */ }, [doiChieuTiles]);
 
   useEffect(() => {
     const map = mapRef.current; if (!map) return;

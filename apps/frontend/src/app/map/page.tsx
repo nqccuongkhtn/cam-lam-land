@@ -914,6 +914,28 @@ export default function MapPage() {
   const viewRef = useRef<{ west: number; south: number; east: number; north: number; zoom: number } | null>(null);
   const featTimer = useRef<any>(null);
   const [info, setInfo] = useState<ParcelInfo | null>(null);
+  // ĐỐI CHIẾU BẢN ĐỒ V8 (15/10/2026, chỉ admin) — thửa dựng từ bộ 387 tờ DGN V8 xã Cam Lâm (bảng RIÊNG dia_chinh_v8, scripts/dia-chinh/v8/)
+  // vẽ đè lên lớp thửa đang dùng để chủ dự án đối chiếu ("vẫn giữ cái cũ lại, tôi đối chiếu đã, đừng bỏ hẳn") — lớp thửa cũ + phép tính
+  // quy hoạch giữ nguyên. Ô + thông tin thửa đi qua vé admin (/qh-rieng/dc-v8, routes/qhRieng.ts). Địa chỉ ô ghi ĐẦY ĐỦ như ô thửa thường.
+  const coV8 = lopRieng?.pham === 'a';
+  const [doiChieuV8, setDoiChieuV8] = useState(false);
+  const v8Tiles = useMemo(() => {
+    if (!coV8 || !doiChieuV8 || !lopRieng?.ve) return null;
+    const goc = typeof window !== 'undefined' ? window.location.origin : '';
+    const duong = API_BASE.startsWith('http') ? API_BASE : goc + API_BASE;
+    return [`${duong}/qh-rieng/dc-v8/{z}/{x}/{y}?v=${encodeURIComponent(lopRieng.ve)}`];
+  }, [coV8, doiChieuV8, lopRieng?.ve]);
+  type V8Thua = { thua: string; to: string; toMoi: number | null; xa: string | null; mdsd: string | null; dienTich: number | null;
+    dienTichHinh: number | null; dienTichWeb: number | null; doiChieu: string; lechHinh: number | null; dichX: number | null; dichY: number | null };
+  const [v8Thua, setV8Thua] = useState<V8Thua[] | null>(null);
+  useEffect(() => {
+    const p = info?.point;
+    if (!v8Tiles || !p || !lopRieng?.ve) { setV8Thua(null); return; }
+    let con = true;
+    api<{ thua: V8Thua[] }>(`/qh-rieng/dc-v8/tai?lng=${p.lng}&lat=${p.lat}&v=${encodeURIComponent(lopRieng.ve)}`)
+      .then((r) => { if (con) setV8Thua(r?.thua || []); }).catch(() => { if (con) setV8Thua(null); });
+    return () => { con = false; };
+  }, [v8Tiles, info?.point?.lng, info?.point?.lat, lopRieng?.ve]);
   const [showSave, setShowSave] = useState(false); // chỉ hiện form lưu sản phẩm khi bấm "Lưu tin này"
   const [clickVN, setClickVN] = useState<{ x: number; y: number; lng: number; lat: number } | null>(null);
   const [flyPoint, setFlyPoint] = useState<{ lng: number; lat: number } | null>(null);
@@ -2587,6 +2609,12 @@ export default function MapPage() {
               <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 bg-[#C8A14B]" /><span className="flex-1 text-slate-700">🗺️ Ranh giới xã</span>
             </label>
           )}
+          {coV8 && (
+            <label className="flex items-center gap-2.5 py-1.5 text-sm cursor-pointer">
+              <input type="checkbox" checked={doiChieuV8} onChange={(e) => setDoiChieuV8(e.target.checked)} className="accent-pink-600 w-4 h-4" />
+              <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 border-2 border-dashed border-[#d81b60]" /><span className="flex-1 text-slate-700">Đối chiếu bản đồ V8 (xã Cam Lâm)</span>
+            </label>
+          )}
           {layers.length === 0 && (
             <div className="space-y-2 py-1" aria-hidden>
               {Array.from({ length: 3 }).map((_, i) => (
@@ -2679,7 +2707,7 @@ export default function MapPage() {
         <div ref={khungBanDoRef} className="relative flex-1 min-h-0">
           <MapView layers={geoLayers} overlays={overlays} markers={allMarkers} baseMap={baseMap} labels={labels} measureMode={measure}
             focusPoint={focusPoint} flyToPoint={flyPoint} highlight={highlight} onMapClick={onMapClick} onMeasure={setMResult} onViewport={onViewport} initialBounds={QH_BOUNDS} adMarkers={ads} adOpacity={1} fitTo={fitTo} textLabels={textLabels}
-            routes={dirTuyen} onPickRoute={setDirChon} diaChinhTiles={dcTiles} />
+            routes={dirTuyen} onPickRoute={setDirChon} diaChinhTiles={dcTiles} doiChieuTiles={v8Tiles} />
 
           {/* ══ MẪU 51: Ô TÌM NỔI + HÀNG CHIP ══════════════════════════════════════════════════════
               Điện thoại: ô tìm chừa cột nút bên phải (nút ?, phóng to…) → bấm mở BẢNG ĐÁY Tra cứu sẵn có.
@@ -3039,6 +3067,13 @@ export default function MapPage() {
                           {congTac(ranhOn, () => setRanhOn(!ranhOn), 'Ranh giới xã')}
                         </div>
                       )}
+                      {coV8 && (
+                        <div className="flex min-h-[42px] items-center gap-3 border-b border-black/10 px-3 py-1.5 last:border-b-0">
+                          <span className="h-3 w-3 shrink-0 rounded-sm border-2 border-dashed border-[#d81b60]" />
+                          <span className="min-w-0 flex-1 truncate text-[14px] text-black">Đối chiếu bản đồ V8</span>
+                          {congTac(doiChieuV8, () => setDoiChieuV8(!doiChieuV8), 'Đối chiếu bản đồ V8')}
+                        </div>
+                      )}
                       {layers.length === 0 && !ranhXa && (
                         <p className="px-3 py-3 text-[14px] text-[#8a8a8e]">Đang tải các lớp…</p>
                       )}
@@ -3128,6 +3163,17 @@ export default function MapPage() {
             <button type="button" onClick={() => setTraPhiQh(`Xem ${xemThuDangBat.ten}`)}
               className="absolute top-11 lg:top-[136px] left-1/2 -translate-x-1/2 z-10 max-w-[92vw] truncate bg-amber-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow">
               🔒 {xemThuDangBat.ten}: tính năng trả phí</button>
+          )}
+          {v8Tiles && (
+            // Chú giải lớp đối chiếu V8 (chỉ admin) — góc dưới trái, không chặn bấm bản đồ
+            <div className="pointer-events-none absolute left-2 bottom-2 z-10 max-w-[92vw] rounded-lg bg-white/95 px-2.5 py-1.5 text-[11px] leading-snug text-slate-700 shadow">
+              <b className="text-[#ad1457]">Đối chiếu bản đồ V8</b> · viền hồng nét đứt = ranh bản V8
+              <div className="mt-0.5 flex flex-wrap gap-x-2.5">
+                <span><i className="mr-1 inline-block h-2.5 w-2.5 rounded-sm bg-[#e53935]/60 align-[-1px]" />khác web</span>
+                <span><i className="mr-1 inline-block h-2.5 w-2.5 rounded-sm bg-[#f9a825]/60 align-[-1px]" />cùng hình, lệch vị trí</span>
+                <span><i className="mr-1 inline-block h-2.5 w-2.5 rounded-sm bg-[#2e7d32]/60 align-[-1px]" />thửa web chưa có</span>
+              </div>
+            </div>
           )}
           {zoomNow > 0 && zoomNow < PARCEL_SHOW_ZOOM && (
             // Hàng nút quy hoạch nổi trên bản đồ đã bỏ (14/9/2026) nên về lại top-2 như máy tính.
@@ -3535,6 +3581,27 @@ export default function MapPage() {
                         </>
                       )}
                       </div>
+                      {/* ĐỐI CHIẾU BẢN ĐỒ V8 (chỉ admin, khi đang bật lớp đối chiếu): thửa V8 tại điểm bấm so với thửa web */}
+                      {v8Tiles && v8Thua && (
+                        <div className="mt-1.5 rounded-lg border border-pink-200 bg-pink-50/70 px-2.5 py-1.5 text-[11.5px] leading-snug text-slate-700">
+                          <b className="text-[#ad1457]">Bản đồ V8 (đối chiếu)</b>
+                          {v8Thua.length === 0 ? <span className="text-slate-500"> — chỗ này bản V8 không có thửa nào</span> : v8Thua.map((t, i) => {
+                            const ten: Record<string, string> = { giong: 'giống web', dich: 'cùng hình, lệch vị trí', khac: 'khác web', moi: 'web chưa có thửa này' };
+                            const mau: Record<string, string> = { giong: 'text-emerald-700', dich: 'text-amber-700', khac: 'text-red-600', moi: 'text-green-700' };
+                            const dich = t.dichX != null && t.dichY != null ? Math.hypot(t.dichX, t.dichY) : null;
+                            return (
+                              <div key={i} className="mt-0.5">
+                                Thửa <b>{t.thua}</b> · Tờ <b>{t.to}</b>{t.toMoi != null && String(t.toMoi) !== String(t.to) ? <> (tờ mới <b>{t.toMoi}</b>)</> : null}
+                                {' — '}nhãn {t.dienTich != null ? fmtM2(t.dienTich) : '—'} · hình {t.dienTichHinh != null ? fmtM2(t.dienTichHinh) : '—'}
+                                {t.dienTichWeb != null ? <> · web {fmtM2(t.dienTichWeb)}</> : null}
+                                {' · '}<b className={mau[t.doiChieu] || ''}>{ten[t.doiChieu] || t.doiChieu}</b>
+                                {t.doiChieu === 'dich' && dich != null ? <> ({dich.toLocaleString('vi-VN', { maximumFractionDigits: 2 })} m)</> : null}
+                                {t.doiChieu === 'khac' && t.lechHinh != null ? <> (ranh lệch tới {t.lechHinh.toLocaleString('vi-VN', { maximumFractionDigits: 2 })} m)</> : null}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                       {/* BỎ nút "Xem thêm" — hiện thẳng luôn phần tên chủ + toạ độ. Bấm vào thửa là
                           muốn xem cho đủ, bắt bấm thêm một nút nữa chỉ tổ vướng. */}
                       {true && (

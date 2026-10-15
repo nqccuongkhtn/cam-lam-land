@@ -22,6 +22,7 @@ import path from 'node:path';
 import { env } from '../lib/env.ts';
 import { authRequired, type AuthedRequest } from '../middleware/auth.ts';
 import { laAdmin, coGoiChung } from '../lib/auth.ts';
+import { query } from '../lib/db.ts';
 
 export const qhRiengRouter = Router();
 
@@ -155,4 +156,46 @@ qhRiengRouter.get('/tai-lieu/:ten', (req, res) => {
   res.set('Content-Type', 'application/pdf');
   res.set('Content-Disposition', `inline; filename="${ten}"`);
   fs.createReadStream(tep).on('error', () => res.destroy()).pipe(res);
+});
+
+// ── ĐỐI CHIẾU BẢN ĐỒ ĐỊA CHÍNH V8 (15/10/2026) — CHỈ ADMIN (vé 'a') ──────────────────────────────────────────────────────────────
+// Chủ dự án đưa bộ 387 tờ DGN V8 xã Cam Lâm và dặn "vẫn giữ cái cũ lại, tôi đối chiếu đã, đừng bỏ hẳn" → thửa V8 nằm ở bảng RIÊNG
+// dia_chinh_v8 (scripts/dia-chinh/v8/), hiện thành lớp đối chiếu đè lên lớp thửa đang dùng. KHÔNG đụng bảng dia_chinh / phép tính QH.
+// Thửa V8 cùng hệ toạ độ với lớp thửa web (đã cộng độ trượt như file hệ thống) → thửa không đổi chồng khít, chỉ chỗ khác mới lộ màu.
+// GET /api/qh-rieng/dc-v8/tai?lng=&lat=&v=<vé admin> — thửa V8 chứa điểm bấm (khung đối chiếu trong bảng thông tin thửa)
+qhRiengRouter.get('/dc-v8/tai', async (req, res) => {
+  res.set('Cache-Control', 'private, no-store');
+  if (veHopLe(req.query.v) !== 'a') return res.status(403).json({ error: 'Không có quyền xem lớp này.' });
+  const lng = Number(req.query.lng), lat = Number(req.query.lat);
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return res.status(400).json({ error: 'Thiếu toạ độ.' });
+  try {
+    const thua = await query(`SELECT d.so_thua AS thua, d.so_to AS "to", d.to_moi AS "toMoi", x.ten AS xa, d.mdsd, d.dien_tich::float AS "dienTich",
+        d.dien_tich_hinh::float AS "dienTichHinh", d.dien_tich_web::float AS "dienTichWeb", d.doi_chieu AS "doiChieu",
+        d.lech_hinh::float AS "lechHinh", d.dich_x::float AS "dichX", d.dich_y::float AS "dichY", d.khop_nhan AS "khopNhan", d.nguon
+      FROM dia_chinh_v8 d LEFT JOIN dia_chinh_xa x ON x.xa_id = d.xa_id
+      WHERE d.geom && ST_SetSRID(ST_MakePoint($1, $2), 4326) AND ST_Intersects(d.geom, ST_SetSRID(ST_MakePoint($1, $2), 4326))
+      ORDER BY ST_Area(d.geom) LIMIT 3`, [lng, lat]);
+    res.json({ thua });
+  } catch (e: any) { console.error('[qh-rieng] tra thửa đối chiếu V8 lỗi', e?.message || e); res.status(500).json({ error: 'Lỗi tra thửa.' }); }
+});
+// GET /api/qh-rieng/dc-v8/:z/:x/:y?v=<vé admin> — một ô vector, chỉ mức 16 như ô thửa thường (gần hơn bản đồ tự phóng to ô đó)
+qhRiengRouter.get('/dc-v8/:z/:x/:y', async (req, res) => {
+  res.set('Cache-Control', 'private, no-store');
+  if (veHopLe(req.query.v) !== 'a') return res.status(403).json({ error: 'Không có quyền xem lớp này.' });
+  const z = Number(req.params.z), x = Number(req.params.x), y = Number(String(req.params.y).replace(/\.(mvt|pbf)$/i, ''));
+  if (![z, x, y].every((n) => Number.isInteger(n) && n >= 0) || z !== 16 || x >= 2 ** z || y >= 2 ** z) return res.status(400).end();
+  try {
+    const r = await query<{ mvt: Buffer }>(
+      `WITH b AS (SELECT ST_TileEnvelope($1,$2,$3) AS e3857, ST_Transform(ST_TileEnvelope($1,$2,$3), 4326) AS e4326)
+       SELECT COALESCE(ST_AsMVT(q, 'v8', 4096, 'geom'), ''::bytea) AS mvt FROM (
+         SELECT * FROM (
+           SELECT d.so_thua AS s, d.so_to AS t, d.to_moi AS tm, d.doi_chieu AS dc,
+                  ST_AsMVTGeom(ST_Transform(d.geom, 3857), b.e3857, 4096, 64, true) AS geom
+           FROM dia_chinh_v8 d, b WHERE d.geom && b.e4326
+         ) z WHERE z.geom IS NOT NULL
+       ) q`, [z, x, y]);
+    const buf: Buffer = (r[0]?.mvt as any) || Buffer.alloc(0);
+    res.set('Content-Type', 'application/vnd.mapbox-vector-tile');
+    return res.status(buf.length ? 200 : 204).end(buf.length ? buf : undefined);
+  } catch (e: any) { console.error('[qh-rieng] dựng ô đối chiếu V8 lỗi', e?.message || e); return res.status(500).end(); }
 });

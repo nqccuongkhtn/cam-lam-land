@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useAuth } from '@/lib/auth';
+import { useAuth, laAdmin } from '@/lib/auth';
 import { useLoginGate } from '@/lib/loginGate';
 import { api, apiBase } from '@/lib/api';
 import { getToken } from '@/lib/token';
@@ -236,7 +236,7 @@ export default function VanBanBrowser() {
         <div className="flex items-center gap-1 text-[13px]">
           <span className="text-slate-400 hidden sm:inline">Sắp xếp:</span>
           <button onClick={() => { setSort('moi'); reset(); }} className={`px-2.5 py-1 rounded-lg font-semibold ${sort === 'moi' ? 'bg-slate-100 text-[#0A2540]' : 'text-slate-400 hover:text-[#0A2540]'}`}>Mới nhất</button>
-          <button onClick={() => { setSort('tai'); reset(); }} className={`px-2.5 py-1 rounded-lg font-semibold ${sort === 'tai' ? 'bg-slate-100 text-[#0A2540]' : 'text-slate-400 hover:text-[#0A2540]'}`}>Tải nhiều</button>
+          <button onClick={() => { setSort('tai'); reset(); }} className={`px-2.5 py-1 rounded-lg font-semibold ${sort === 'tai' ? 'bg-slate-100 text-[#0A2540]' : 'text-slate-400 hover:text-[#0A2540]'}`}>{laAdmin(user as any) ? 'Tải nhiều' : 'Xem nhiều'}</button>
         </div>
       </div>
 
@@ -261,7 +261,7 @@ export default function VanBanBrowser() {
                 <th className={`${th} hidden sm:table-cell`}>Ngày</th>
                 <th className={`${th} hidden lg:table-cell`}>Cơ quan</th>
                 <th className={th}>Trích yếu</th>
-                <th className={`${th} text-center w-16`}>Tải</th>
+                <th className={`${th} text-center w-16`}>{laAdmin(user as any) ? 'Tải' : 'Xem'}</th>
               </tr>
             </thead>
             <tbody>
@@ -280,7 +280,7 @@ export default function VanBanBrowser() {
                   </td>
                   <td className={`${td} text-center`}>
                     {d.coFile
-                      ? <button onClick={() => taiPdf(d)} disabled={taiId === d.id} title="Xem / Tải văn bản" className="inline-grid place-items-center w-9 h-9 rounded-lg text-red-600 hover:bg-red-50 disabled:opacity-50">{taiId === d.id ? <span className="w-4 h-4 border-2 border-red-300 border-t-red-600 rounded-full animate-spin" /> : <PdfIcon />}</button>
+                      ? <button onClick={() => taiPdf(d)} disabled={taiId === d.id} title={laAdmin(user as any) ? 'Xem / Tải văn bản' : 'Xem văn bản'} className="inline-grid place-items-center w-9 h-9 rounded-lg text-red-600 hover:bg-red-50 disabled:opacity-50">{taiId === d.id ? <span className="w-4 h-4 border-2 border-red-300 border-t-red-600 rounded-full animate-spin" /> : <PdfIcon />}</button>
                       : <span className="text-slate-300">—</span>}
                   </td>
                 </tr>

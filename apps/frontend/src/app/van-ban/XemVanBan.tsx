@@ -3,10 +3,13 @@
 // · Bấm là khung mở NGAY, có thanh % đang tải (đọc dần từng phần file, biết tổng dung lượng thì ra %).
 // · Vẽ bằng PDF.js (cùng thư viện công cụ Sửa PDF) thay vì trình xem PDF của trình duyệt — điện thoại Android
 //   không xem được PDF nhúng, iPhone chỉ hiện trang đầu. Trang nào cuộn tới mới vẽ trang đó cho nhẹ máy.
-// · Nút "Tải về" lưu đúng file (đã có dấu bản quyền Cam Lâm Land do máy chủ gắn).
+// · Nút "Tải về" lưu đúng file (đã có dấu bản quyền Cam Lâm Land do máy chủ gắn) — CHỈ HIỆN VỚI ADMIN (chủ dự án 15/10/2026: "ở văn bản chỉ có
+//   tài khoản admin được tải về, còn lại chỉ có nút chia sẻ"). Người khác vẫn XEM được ngay trong khung (máy họ vẫn phải nhận file để vẽ
+//   trang — muốn chặn hẳn việc lấy file thì phải đổi sang máy chủ vẽ sẵn ảnh từng trang).
 import { useEffect, useRef, useState } from 'react';
 import { dauThietBi } from '@/lib/thietBi';
 import { layVeXemVanBan } from '@/lib/turnstile';
+import { useAuth, laAdmin } from '@/lib/auth';
 
 const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
 const WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -31,6 +34,8 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
   const [blobUrl, setBlobUrl] = useState('');
   const docRef = useRef<any>(null);
   const khungRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+  const choTai = laAdmin(user as any);   // chỉ admin có nút "Tải về"
 
   // Giữ onDong/onLoi trong ref: trang chủ truyền hàm MỚI mỗi lần vẽ lại (kéo trang là vẽ lại) → nếu để chúng
   // trong danh sách theo dõi của useEffect thì mỗi lần kéo, file bị HUỶ rồi tải lại giữa lúc đang vẽ trang
@@ -144,7 +149,7 @@ export default function XemVanBan({ vb, onDong, onLoi }: { vb: MoVanBan; onDong:
               <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4" />
             </svg>Chia sẻ</>)}
         </button>
-        <button type="button" onClick={taiVe} disabled={!blobUrl} className="h-8 shrink-0 rounded-md border border-slate-200 px-3 text-[13px] font-semibold text-[#0A2540] hover:bg-slate-50 disabled:opacity-40">Tải về</button>
+        {choTai && <button type="button" onClick={taiVe} disabled={!blobUrl} className="h-8 shrink-0 rounded-md border border-slate-200 px-3 text-[13px] font-semibold text-[#0A2540] hover:bg-slate-50 disabled:opacity-40">Tải về</button>}
         <button type="button" onClick={onDong} aria-label="Đóng" className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-xl leading-none text-slate-500 hover:bg-slate-100">✕</button>
       </div>
       {/* thanh % ngay dưới đầu khung */}

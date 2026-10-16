@@ -46,6 +46,7 @@ NHOM_MAU = {k.lower(): v[0] for k, v in BANG['nhom_mau_qd893'].items() if not k.
 MAU_MOT_MA = {k.lower(): v for k, v in BANG.get('mau_mot_ma_qd893', {}).items() if not k.startswith('_')}
 NHIEU_MA = {k.lower(): v for k, v in BANG.get('nhieu_ma_qd893', {}).items() if not k.startswith('_')}   # màu chú dẫn dùng chung nhiều mã
 MA_NUOC = ('MNC', 'SON', 'DTL', 'DCT', 'NTS')   # 5 mã chú dẫn tô CHUNG màu xanh nước #7fffff
+MAU_DAT_O = '#ff7fff'   # màu hồng chú dẫn dùng CHUNG cho ODT và ONT (luật e0 bên dưới)
 # XẾP LỚP NHƯ BẢN VẼ HIỂN THỊ (11/10/2026): mọi ô ngang bậc, ô có VÙNG TÔ GỐC nhỏ hơn nằm trên. Bản cũ: ô chỉ có màu bậc 0 (thua
 # cả ô có mã nằm DƯỚI nó — khối công cộng 35 ha 89411F mất 3 ha vào khu rừng phòng hộ 6.010 ha bên dưới) và xếp theo diện
 # tích MẢNH sau khi cắt lỗ (mảnh nhỏ của khu rừng lớn thắng khối nằm trên). Đặt QH893_THEO_BAN_VE=0 để chạy kiểu cũ (so sánh).
@@ -129,6 +130,25 @@ def tach_lo(g, sau=0):
     return [p for p in ra if isinstance(p, Polygon) and p.area > 0]
 
 
+_TT_CAM_DUC = []
+def dat_o_tt_cam_duc(mau, hinh):
+    """Luật e0 (16/10/2026, dùng chung 5b + 5f): khối HỒNG không ghi chữ nằm trong THỊ TRẤN CAM ĐỨC cũ = Đất ở tại đô thị.
+    Màu hồng trên bản vẽ dùng cho cả ODT lẫn ONT (khối hồng có chữ ở các xã ghi cả hai) nên ngoài thị trấn vẫn để tên nhóm "Đất ở".
+    Trong thị trấn thì chắc: (1) đất ở thuộc thị trấn là đất ở tại đô thị (Luật Đất đai), (2) cả 143 khối hồng CÓ chữ ở đây đều ODT
+    (120 "ODT" + 23 "ODT+TMD", không khối nào ONT). App tham chiếu cũng ghi ODT (Thửa 437 · Tờ 4). Ranh thị trấn = hợp các thửa
+    dia_chinh xa_id 22453 (ranh-tt-cam-duc.geojson cùng thư mục) — thiếu tệp thì luật này tắt."""
+    if mau != MAU_DAT_O:
+        return False
+    if not _TT_CAM_DUC:
+        tep = os.path.join(HERE, 'ranh-tt-cam-duc.geojson')
+        if os.path.exists(tep):
+            from shapely.prepared import prep
+            _TT_CAM_DUC.append(prep(shape(json.load(io.open(tep, encoding='utf-8'))['features'][0]['geometry'])))
+        else:
+            print('⚠️ Không có ranh-tt-cam-duc.geojson — bỏ luật e0'); _TT_CAM_DUC.append(None)
+    return _TT_CAM_DUC[0] is not None and _TT_CAM_DUC[0].contains(hinh.representative_point())
+
+
 def ten_nhieu_ma(ds):
     """Tên vùng tô màu chú dẫn dùng chung nhiều mã: "Đất sử dụng cho hoạt động khoáng sản hoặc đất công trình xử lý chất thải (bản vẽ chưa ghi rõ loại)"."""
     ts = [TEN[m] for m in ds]
@@ -195,11 +215,14 @@ def main(vao, tep_chu, tep_kh):
         # %%u / %%U = mã gạch chân của CAD dính liền chữ ("%%uHNK+RSX+CSD%%U") → bỏ trước, không thì mã đầu bị sót.
         t = re.sub(r'%%[uUoO]', '', t)
         ds = [ma for ma in re.findall(r'\b[A-Z]{3}\b', t) if ma in TEN]
-        # NHÃN GHÉP bằng dấu "+" (11/10/2026): "TMD+ODT", "NKH+TMD", "DTT+DKV+TMD"… = ĐẤT HỖN HỢP gồm các mã đó (119 nhãn quy
-        # hoạch). Trước đây tách rời từng mã rồi bỏ mã "trái màu" → web ghi một loại đơn lẻ (thửa 326 tờ 7 Cam Đức: bản vẽ ghi
-        # "TMD+ODT", web ghi "Đất thương mại, dịch vụ"; app tham chiếu ghi đất hỗn hợp). Nay giữ cả nhãn thành MỘT loại.
-        if '+' in t and len(ds) >= 2:
-            ds = [ma_ghep(ds)]
+        # NHÃN GHÉP bằng dấu "+" ("ODT+TMD", "TMD+ODT", "DTT+DKV+TMD"… 119 nhãn) = đất sử dụng KẾT HỢP nhiều mục đích; quy hoạch sử
+        # dụng đất tính khối đó vào MỤC ĐÍCH CHÍNH = mã cùng NHÓM MÀU tô của khối (luật trai_mau / chon bên dưới; nhiều mã cùng nhóm thì
+        # mã đứng ĐẦU). 16/10/2026 trả lại cách này (chủ dự án gửi ảnh app tham chiếu "Điều chỉnh QHSDĐ 2030": Thửa 437 · Tờ 4 Cam Đức —
+        # khối hồng ghi "ODT+TMD" = Đất ở tại đô thị, khối đỏ cam ghi "TMD+ODT" = Đất thương mại, dịch vụ). Bản 11/10 gộp cả nhãn thành
+        # "Đất hỗn hợp (A + B)" — QHSDĐ không có loại "đất hỗn hợp" (đó là tên của quy hoạch xây dựng, vd QĐ205), và căn cứ hôm đó (app
+        # ghi "đất hỗn hợp" ở thửa 326 tờ 7) nhiều khả năng là lớp QĐ205 của app. ma_ghep() giữ lại để dùng nếu cần quay về.
+        # Thống kê chính bản vẽ (16/10/2026): khối HỒNG có nhãn ghép 39 (ODT+TMD 25, ONT+TMD 14) — mã đầu luôn cùng màu → ODT / ONT;
+        # khối ĐỎ CAM "TMD+ODT" 47 → TMD; riêng 8 khối đỏ cam ghi "ODT+TMD" (ở các xã) thì mã đầu trái màu → theo màu = TMD.
         for ma in ds:
             i = gan(Point(f['geometry']['coordinates']), ma)
             if i is not None:
@@ -252,6 +275,9 @@ def main(vao, tep_chu, tep_kh):
         elif m in NHIEU_MA:
             # e''. màu khung chú dẫn dùng CHUNG cho nhiều mã (bảng nhieu_ma_qd893, 15/10/2026: #a552a5 = SKS / DRA) → tên ghép, không chọn bừa
             loai[i], bac[i] = ten_nhieu_ma(NHIEU_MA[m]), 0; chi_mau[i] = True; can_cu["e''. chỉ có màu — màu chung nhiều mã"] += 1
+        elif dat_o_tt_cam_duc(m, vung[i]):
+            # e0. (16/10/2026) khối HỒNG không ghi chữ nằm trong THỊ TRẤN CAM ĐỨC cũ → Đất ở tại đô thị — xem dat_o_tt_cam_duc(). Vẫn bậc 0.
+            loai[i], bac[i] = TEN['ODT'], 0; chi_mau[i] = True; can_cu['e0. màu hồng không chữ trong TT Cam Đức → ODT'] += 1
         else:
             loai[i], bac[i] = NHOM_MAU.get(m, 'Loại đất khác'), 0; chi_mau[i] = True; can_cu['e. chỉ có màu'] += 1
     print('Căn cứ gán loại đất:', dict(sorted(can_cu.items())))

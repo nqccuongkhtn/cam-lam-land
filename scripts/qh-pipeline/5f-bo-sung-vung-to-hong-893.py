@@ -80,12 +80,15 @@ def main(vao, tep_chu):
                            and 2 * p.area / p.length * 111000 >= 3])
         if con.is_empty: continue
         # chữ / ký hiệu chỉ lấy trong PHẦN SÓT — lấy cả vùng tô thì vớ nhầm chữ của ô nhỏ lồng bên trong (5b gán chữ cho ô NHỎ NHẤT)
-        qh = [t for p, t, l in CHU if l == b5.LV_QH and t in b5.TEN and con.contains(p)]
+        # nhãn ghép "ODT+TMD"… tách từng mã như 5b (16/10/2026) — mục đích chính = mã cùng nhóm màu, ưu tiên mã đứng đầu
+        qh = [ma for p, t, l in CHU if l == b5.LV_QH and con.contains(p)
+              for ma in re.findall(r'\b[A-Z]{3}\b', re.sub(r'%%[UO]', '', t)) if ma in b5.TEN]
         ht = [t for p, t, l in CHU if l == b5.LV_HT and t in b5.TEN and con.contains(p) and b5.hop_mau(t, mau)]
         if mau in b5.MAU_893: loai, bac = b5.MAU_893[mau], 2   # a. màu đường / sông (như 5b)
         elif qh: loai, bac = b5.TEN[([x for x in qh if b5.hop_mau(x, mau)] or qh)[0]], 2
         elif ht: loai, bac = b5.TEN[ht[0]], 2
         elif mau in b5.NHIEU_MA: loai, bac = b5.ten_nhieu_ma(b5.NHIEU_MA[mau]), 0   # màu chú dẫn dùng chung nhiều mã (như 5b)
+        elif b5.dat_o_tt_cam_duc(mau, con): loai, bac = b5.TEN['ODT'], 0   # luật e0 của 5b (16/10/2026): hồng không chữ trong TT Cam Đức
         else:    loai, bac = b5.NHOM_MAU.get(mau, 'Loại đất khác'), 0
         for p in b5.tach_lo(con):
             if p.area * 1.21e10 < 50: continue

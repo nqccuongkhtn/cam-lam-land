@@ -60,7 +60,10 @@ python -P scripts/qh-tinh/them_lop_lam_dong.py
 fi
 if [ "$TU" -le 3 ]; then
 echo "[3/4] Dựng lại phần giao diện (chỉ frontend, --no-deps), xoá đệm nginx (CHỈ thư mục đệm [0-9a-f]) rồi khởi động lại nginx…"
-$DC up -d --no-deps --build frontend
+# Tách 2 nhịp (16/10/2026): dựng ẢNH trước — lâu, ngốn RAM, hỏng / bị dừng giữa chừng thì web đang chạy KHÔNG bị đụng —
+# rồi mới thay máy con giao diện (vài giây). Gộp "up --build" thì lỡ bị dừng sau khi dựng xong là máy con bị thay mà nginx chưa khởi động lại → 502.
+$DC build frontend
+$DC up -d --no-deps frontend
 docker exec camlam_nginx sh -c 'rm -rf /var/cache/nginx/[0-9a-f]' || true
 $DC restart nginx
 fi

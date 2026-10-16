@@ -1125,6 +1125,13 @@ frontend), ảnh nhẹ đi 1,8 GB, mỗi lần dựng lại chỉ còn tốn và
 **Thư mục `apps/frontend/public/tiles` phải có sẵn trên ổ đĩa** — không có thì bản đồ mất ảnh
 quy hoạch (volume sẽ gắn vào một thư mục rỗng).
 
+**⚠️ 16/10/2026: KHO Ô ẢNH + LỚP RIÊNG ĐÃ CHUYỂN HẲN RA Ổ D** (chủ dự án: "lưu trữ ưu tiên ở ổ D, nếu trùng thì bỏ cái ổ C"):
+`TILES_QG_DIR=D:/KhoQH/tiles-qg` (nginx `/tiles/` + `/tiles-qg/`, backend `tiles-cong`, frontend `public/tiles` đều gắn thẳng thư mục này —
+cả 19 bộ cũ lẫn bộ các tỉnh khác) và `QH_RIENG_HOST_DIR=D:/KhoQH/qh-rieng` (lớp riêng 1/500). Trước khi đổi đã so TỪNG TỆP: trùng khít volume.
+Đo 400 ô / 8 luồng qua nginx: lần đầu ổ D 21 ms/ô (volume cũ 8 ms), đọc lại 6 ms (5 ms) — Cloudflare giữ ô công khai 1 năm nên không đáng kể.
+Volume `camlamgis_camlam_tiles` ĐÃ XOÁ; thêm / thay bộ ô = chép thẳng vào `D:\KhoQH\tiles-qg` (không còn `docker cp`). Mấy đoạn dưới đây
+nói về volume là LỊCH SỬ. Thư mục `apps/frontend/public/tiles` trong repo nay rỗng.
+
 **Bộ tile do NGINX phục vụ thẳng, không qua Next.js nữa.** `location /tiles/` dùng `alias`
 đọc file từ volume `camlam_tiles` gắn vào nginx. Đo thật 3 lần trên cùng máy:
 **nằm trong ảnh Docker 5–7 ms/ô · gắn volume rồi chuyển tiếp qua Next.js 12–16 ms · nginx đọc

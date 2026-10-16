@@ -1087,6 +1087,10 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   Bảng thông tin thửa: chỉ BỎ CÂU "Hiện mới có Quy hoạch chung đô thị mới Cam Lâm đến 2045 (QĐ 205)…" (thửa ngoài vùng);
   trang "Quy hoạch chung 2045 (QĐ205)" của thửa Cam Lâm PHẢI GIỮ (13/10 từng bỏ nhầm, chủ dự án hỏi lại 14/10).
   Trang bản đồ có ô "Địa giới" lọc danh sách lớp QH theo huyện/thị (`VUNG_QH`); lớp dữ liệu tên có "Cam Lâm" chỉ hiện ở Cam Lâm.
+  **TỈNH LÂM ĐỒNG (lên web 16/10/2026):** 2 lớp ảnh QHSDĐ 2030 TP Đà Lạt (QĐ 2199/QĐ-UBND 2023) + huyện Đức Trọng (QĐ 1868/QĐ-UBND 2023),
+  ô `dalat2030v1` / `ductrong2030v1`, Địa giới "TP. Đà Lạt / Huyện Đức Trọng (Lâm Đồng)". Chỉ có ẢNH — chưa bóc loại đất, web chưa có thửa
+  địa chính Lâm Đồng. ⚠️ Kinh tuyến trục Lâm Đồng 107°45' (khác Khánh Hòa 108°15') — mục `"ktt"` trong file nắn; chi tiết + cách đưa lên
+  web (`DUA-LEN-WEB-LAM-DONG.bat`): `scripts/qh-tinh/README.md` mục "TỈNH KHÁC — Lâm Đồng".
 
 ---
 

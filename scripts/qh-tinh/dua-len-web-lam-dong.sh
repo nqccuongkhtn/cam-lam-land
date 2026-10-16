@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# ĐƯA 2 LỚP QHSDĐ 2030 TỈNH LÂM ĐỒNG (TP Đà Lạt, huyện Đức Trọng) LÊN WEB THẬT — chuẩn bị 15/10/2026 tối, CHƯA chạy.
+# ĐƯA 2 LỚP QHSDĐ 2030 TỈNH LÂM ĐỒNG (TP Đà Lạt, huyện Đức Trọng) LÊN WEB THẬT — chuẩn bị 15/10/2026 tối, ĐÃ CHẠY XONG 16/10/2026 08:37
+# (chạy lại vẫn an toàn: bộ ô đủ thì bỏ qua bước chép, lớp đã khai thì không sửa trang, ảnh không đổi thì không thay máy con).
 # Chủ dự án nháy đúp DUA-LEN-WEB-LAM-DONG.bat ở thư mục gốc (hoặc: bash "D:/Cam Lam gis/scripts/qh-tinh/dua-len-web-lam-dong.sh").
 # Chờ ổ C còn TRỐNG ≥ 3 GB mới chạy (ô ảnh ~520 MB chép vào kho Docker nằm trên ổ C + dựng lại phần giao diện) — kịch bản tự kiểm, thiếu
 # chỗ thì dừng ngay, không đụng gì. Các bước:

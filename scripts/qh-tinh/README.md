@@ -279,7 +279,7 @@ thành DẤU CỘNG ở giao điểm (không phải đường liền) nên công
 Tên miền `ninhthuan.gov.vn` đã ngừng sau sáp nhập 1/7/2025, cổng Khánh Hòa chưa chuyển dữ liệu về.
 Bản đồ QHSDĐ cấp tỉnh không đăng PDF công khai (nằm trong phụ lục hồ sơ QH tỉnh). → Chờ nguồn.
 
-## TỈNH KHÁC — Lâm Đồng (15/10/2026 tối, CHƯA lên web)
+## TỈNH KHÁC — Lâm Đồng (15/10/2026 tối; ĐÃ LÊN WEB 16/10/2026 08:37)
 - Nguồn: cổng Sở NN&MT Lâm Đồng, mục "Quy hoạch sử dụng đất đến năm 2030" (mỗi huyện một thư mục: bản đồ PDF + quyết định ký số).
   Đã tải Đà Lạt (QĐ 2199/QĐ-UBND 09/11/2023 — file bản đồ ghi "TrinhPheDuyet") + Đức Trọng (QĐ 1868/QĐ-UBND 29/9/2023) về
   `D:\KhoQH\qhsdd-2030-lam-dong\` — đường dẫn gốc từng file ghi ở `NGUON.txt` cùng thư mục.
@@ -298,8 +298,12 @@ Bản đồ QHSDĐ cấp tỉnh không đăng PDF công khai (nằm trong phụ 
   dựng lại frontend `--no-deps`, khởi động lại nginx, kiểm ô ảnh 200). **16/10 2h15 đã chạy (sau khi máy nén kho, ổ C còn 5,9 GB):
   bước 1–2 XONG** — 2 bộ ô đã ở volume (6.504 + 14.761 ô, `/tiles/dalat2030v1/…` ra 200), `page.tsx` đã khai 2 lớp (đã lưu mã);
   **bước dựng giao diện bị máy DỪNG vì thiếu RAM** (còn ~2 GB trống: WSL 5,2 GB + 3 cửa sổ Claude 1,6 GB + Edge 1,1 GB) — trợ lý đã dừng nốt
-  lệnh dựng còn sót để web giữ bản cũ (không lỗi 502). Web hiện CHƯA hiện 2 lớp. Chạy lại `.bat` lúc máy rảnh: kịch bản tự bỏ qua bước chép
-  (đếm thấy đủ ô) và đi thẳng tới bước dựng.
+  lệnh dựng còn sót để web giữ bản cũ (không lỗi 502). **16/10 08:37 chạy lại → XONG, 2 lớp đã lên web** (chủ dự án: "làm việc 1"):
+  kịch bản nay TÁCH dựng ảnh (`build`, lâu, ngốn RAM — hỏng giữa chừng web cũ vẫn nguyên) khỏi thay máy con (`up -d --no-deps`, vài giây).
+  Tự kiểm qua tên miền thật: ô mức 9 / 12 / 15 / 17 của cả hai lớp 200; trang `/map` dùng bản giao diện mới (có mã `qh-dalat2030`,
+  `qh-ductrong2030`); ô Địa giới có "TP. Đà Lạt (Lâm Đồng)" / "Huyện Đức Trọng (Lâm Đồng)", chọn xong bản đồ bay tới đúng nơi, bật lớp
+  thấy ảnh; chồng mờ 45 % lên ảnh vệ tinh: bờ hồ Xuân Hương, hồ Lắng, đường Trần Quốc Toản / Yersin (Đà Lạt) và khu sân bay Liên Khương +
+  QL20 (Đức Trọng) trùng khít.
 - **Bóc loại đất Lâm Đồng: CHƯA có.** Thử 15/10 22h với Đà Lạt (`boc_loai_dat.py … --mau-chuan=bang-mau-chuan.json --vector`, không lớp chữ
   nên chỉ theo màu): tiến trình ăn ~5,7 GB RAM, máy còn 1,3 GB trống → hệ thống dừng lệnh; tiến trình sót đã tắt, web không ảnh hưởng.
   Chạy lại thì chạy RIÊNG lúc máy rảnh (không song song việc khác). Web chưa có thửa địa chính Lâm Đồng nên chưa cần gấp.

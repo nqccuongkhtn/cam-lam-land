@@ -733,8 +733,16 @@ ghi loại → "ngoài phạm vi", đúng nguyên tắc), QĐ205 2,46 % → < 1 
   (6) xếp lớp như bản vẽ hiển thị: mọi ô ngang bậc, ô có vùng tô gốc nhỏ hơn nằm trên (diện tích xếp = vòng ngoài vùng tô gốc, không
   phải mảnh). 79 phiếu: 9.315 → 9.269 m² (8 phiếu tốt lên, 4 phiếu đổi 0,1 m² do làm tròn cung). 714 vùng xanh nước KHÔNG ghi mã
   (4.585 ha) gọi "Đất sông, ngòi, kênh, rạch" dù chú dẫn dùng màu này cho cả hồ / thuỷ lợi / ao nuôi — 15/10/2026 chủ dự án chọn ĐỂ NGUYÊN.
-  (7) NHÃN GHÉP "+" ("TMD+ODT", "NKH+TMD", "DTT+DKV+TMD"… 119 nhãn) = một loại "Đất hỗn hợp (TMD + ODT)" — trước tách mã rồi bỏ mã trái
-  màu (thửa 326 tờ 7 Cam Đức: app tham chiếu ghi đất hỗn hợp, web ghi thương mại dịch vụ). Chữ "%%u…%%U" (gạch chân CAD) bỏ trước khi đọc mã.
+  (7) NHÃN GHÉP "+" ("ODT+TMD", "TMD+ODT", "DTT+DKV+TMD"… 119 nhãn) = đất kết hợp nhiều mục đích → tính theo **MỤC ĐÍCH CHÍNH** = mã cùng
+  nhóm MÀU tô của khối (nhiều mã cùng nhóm thì mã ĐẦU): khối hồng "ODT+TMD" = Đất ở tại đô thị, khối đỏ cam "TMD+ODT" = Đất thương mại, dịch vụ,
+  8 khối đỏ cam ghi "ODT+TMD" = TMD (theo màu). 16/10/2026 bỏ cách 11/10 ("Đất hỗn hợp (A + B)" — QHSDĐ không có loại đất hỗn hợp; căn cứ
+  hôm đó nhiều khả năng là lớp QĐ205 của app) sau khi chủ dự án gửi ảnh app tham chiếu "Điều chỉnh QHSDĐ 2030": Thửa 437 · Tờ 4 Cam Đức
+  = ODT 2.732,1 + TMD 2.558,9 + DGT 3.975,4 — web nay 2.732,9 + 2.562,2 + 3.971,3. Chữ "%%u…%%U" (gạch chân CAD) bỏ trước khi đọc mã.
+  (8) **Khối HỒNG không ghi chữ trong THỊ TRẤN CAM ĐỨC cũ = Đất ở tại đô thị** (luật e0, `dat_o_tt_cam_duc()` dùng chung 5b + 5f; ranh =
+  `scripts/qh-pipeline/ranh-tt-cam-duc.geojson`, hợp các thửa dia_chinh xa_id 22453): màu hồng dùng chung ODT / ONT nên ngoài thị trấn vẫn
+  ghi tên nhóm "Đất ở"; trong thị trấn cả 143 khối hồng có chữ đều ODT + đất ở thị trấn là đất ở đô thị theo luật. 62 khối đổi tên.
+  Lần sửa này: 177 ô đổi tên, hình giữ nguyên, 79 phiếu chính thức ra y hệt. ⚠️ 5f cần tệp vùng tô xuất từ DXF bằng ogr2ogr của QGIS
+  (`C:\Program Files\QGIS 3.44.11\bin\o4w_env.bat` rồi lệnh ogr2ogr ghi trong đầu 5f) — 16/10 chạy lại: thêm 0 mảnh (1d đã đủ vùng tô).
 - **ẢNH QĐ893 VÁ CHỖ THỦNG (15/10/2026 chiều — chủ dự án: "893 vẫn có vài chỗ lổm chổm").** Bộ ảnh `qd893v1` cắt từ dữ liệu GDAL cũ nên thiếu đúng các vùng tô hỏng viền / lẫn vòng hỏng mà 5f đã bổ sung cho phần TÍNH (11/10) → nhìn xuyên xuống ảnh vệ tinh. Dò ở mức 15: 22 chỗ, 78,7 ha (điện mặt trời Cam An 66,7 ha, đất công cộng 5,4 + 1,6 ha, đất ở Cam Hiệp Bắc 2,5 ha, đất quốc phòng Cam Hòa 2,1 ha, ~15 khe đường nhỏ). Vá 242 ô (mức 8–18) bằng MÀU TÔ GỐC của bản vẽ (`quyhoach2025/qd893_qh_chanle.geojson` trường `c`) — chỉ trong khung chỗ thủng, ảnh cũ đè lên màu tô (điểm đã có màu / nét giữ nguyên); dò lại = 0 chỗ thủng. Sao lưu ô cũ: `D:\KhoQH\sao-luu\qd893v1-truoc-va-thung-15-10\` (trả lại = chép đè ngược vào `public/tiles/qd893v1` + volume `camlamgis_camlam_tiles`). Đường ảnh đổi `?v=3` (map + listings) cho máy khách tải ô mới. Kịch bản dò / vá: `scripts/qh-pipeline/va-anh-893/` (`do_lo_thung.py` → `lo-thung.json` → `va_lo_thung.py [--thu]`) — cắt lại bộ ảnh 893 từ đầu thì phải vá lại.
 - **QĐ893 BỎ DẢI VIỀN RANH HUYỆN (15/10/2026).** Vùng tô hồng #ff7fff ở Level 0 (h 6ADCB9) là dải viền 75 m chạy quanh cả huyện (khung
   31 × 31 km, 860 ha) — từng thành ô "Đất ở" nằm dưới mọi ô khác nên chỉ lộ NGOÀI phần đã quy hoạch: 266 thửa Cam Lâm sát ranh (70,6 ha

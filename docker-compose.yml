@@ -218,6 +218,9 @@ services:
       # Bộ tile bản đồ: để NGINX PHỤC VỤ THẲNG, không chuyển qua Next.js nữa.
       # Đo thật: qua Next.js mất 12-16 mili-giây một ô; nginx đọc file tĩnh nhanh hơn hẳn.
       - camlam_tiles:/usr/share/nginx/tiles:ro
+      # Ô ảnh QHSDĐ 2030 các tỉnh khác (16/10/2026): thư mục THẬT trên ổ D (ổ C gần đầy) — đặt TILES_QG_DIR trong .env.
+      # Máy không đặt biến này thì gắn thư mục rỗng trong repo (đường /tiles-qg/ trả 404, web vẫn chạy bình thường).
+      - ${TILES_QG_DIR:-./du-lieu-ngoai/tiles-qg}:/usr/share/nginx/tiles-qg:ro
     ports:
       - "${NGINX_PORT:-80}:80"
     depends_on:

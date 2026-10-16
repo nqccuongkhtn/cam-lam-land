@@ -115,11 +115,13 @@ services:
       # LỚP QUY HOẠCH CHỈ ADMIN XEM (14/10/2026, routes/qhRieng.ts): ô ảnh + quyết định 1/500 chính thức Cam Lâm.
       # KHÔNG để chung volume camlam_tiles (nginx phục vụ thẳng /tiles/ cho mọi người) — chỉ backend đọc, có kiểm vé admin.
       # Nạp: scripts/qh-tinh/dua-len-web-14-10.sh (docker cp vào volume camlamgis_qh_rieng).
-      - qh_rieng:/app/apps/backend/du-lieu-rieng/qh-rieng:ro
+      # ⚠️ 16/10/2026 ĐỔI sang thư mục THẬT trên ổ D (chủ dự án: "lưu trữ ưu tiên ở ổ D, nếu trùng thì bỏ cái ổ C") — QH_RIENG_HOST_DIR
+      # trong .env (máy chủ nhà = D:/KhoQH/qh-rieng, trước đó so từng tệp: trùng khít volume). Thêm lớp = chép thẳng vào thư mục đó.
+      - ${QH_RIENG_HOST_DIR:-./du-lieu-ngoai/qh-rieng}:/app/apps/backend/du-lieu-rieng/qh-rieng:ro
       # KHOÁ QUY HOẠCH CAM LÂM (15/10/2026, chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free, còn lại khoá lại"): backend đọc CHỈ ĐỌC
       # kho ảnh công khai để phát ảnh QĐ205 + 7 bản phân khu qua /api/qh-rieng/t/… (vé admin); nginx chặn đường /tiles/qd205…,
-      # /tiles/qd2076… với người ngoài. Dùng chung volume nên không chép thêm GB nào vào ổ C.
-      - camlam_tiles:/app/apps/backend/du-lieu-rieng/tiles-cong:ro
+      # /tiles/qd2076… với người ngoài. Dùng chung kho ô ảnh (16/10/2026: kho nằm ở ổ D — TILES_QG_DIR, xem nginx bên dưới).
+      - ${TILES_QG_DIR:-./du-lieu-ngoai/tiles-qg}:/app/apps/backend/du-lieu-rieng/tiles-cong:ro
     depends_on:
       postgis:
         condition: service_healthy
@@ -197,7 +199,11 @@ services:
       #
       # Nạp lại bộ tile vào volume (chỉ làm khi thay bộ tile mới):
       #   docker run --rm -v camlam_tiles:/dest camlamgis-frontend:latest sh -c 'cp -a /app/public/tiles/. /dest/'
-      - camlam_tiles:/app/public/tiles:ro
+      # ⚠️ 16/10/2026 ĐỔI: kho ô ảnh chuyển hẳn ra Ổ D (chủ dự án: "lưu trữ ưu tiên ở ổ D, nếu trùng thì bỏ cái ổ C") — thư mục
+      # TILES_QG_DIR (.env, máy chủ nhà = D:/KhoQH/tiles-qg), volume camlam_tiles đã bỏ. Đo lại trước khi đổi (400 ô, 8 luồng song song
+      # qua nginx): lần đọc đầu ổ D 21 ms/ô (volume 8 ms), đọc lại 6 ms (volume 5 ms) — chấp nhận được vì Cloudflare giữ ô công khai 1 năm.
+      # Thêm / thay bộ ô = chép thẳng vào thư mục đó (không cần docker cp nữa).
+      - ${TILES_QG_DIR:-./du-lieu-ngoai/tiles-qg}:/app/public/tiles:ro
       # ── KHO TIN TỨC (29/9/2026) ── app/feed/news/route.ts ghi kho tin ra /app/.kho-tin/tin.json để
       # khởi động lại không mất bài. Nhưng thư mục đó nằm TRONG container → mỗi lần DỰNG LẠI web
       # (container mới) là mất sạch, lượt khách đầu tiên phải chờ ~11 giây tải lại tin (đo thật).
@@ -217,9 +223,9 @@ services:
       - ./nginx:/usr/share/nginx/maintenance:ro
       # Bộ tile bản đồ: để NGINX PHỤC VỤ THẲNG, không chuyển qua Next.js nữa.
       # Đo thật: qua Next.js mất 12-16 mili-giây một ô; nginx đọc file tĩnh nhanh hơn hẳn.
-      - camlam_tiles:/usr/share/nginx/tiles:ro
-      # Ô ảnh QHSDĐ 2030 các tỉnh khác (16/10/2026): thư mục THẬT trên ổ D (ổ C gần đầy) — đặt TILES_QG_DIR trong .env.
-      # Máy không đặt biến này thì gắn thư mục rỗng trong repo (đường /tiles-qg/ trả 404, web vẫn chạy bình thường).
+      # 16/10/2026: CẢ /tiles/ lẫn /tiles-qg/ đọc CÙNG một thư mục THẬT trên ổ D (TILES_QG_DIR trong .env; xem giải thích ở service
+      # frontend). Máy không đặt biến này thì gắn thư mục rỗng trong repo (ô ảnh trả 404, web vẫn chạy bình thường).
+      - ${TILES_QG_DIR:-./du-lieu-ngoai/tiles-qg}:/usr/share/nginx/tiles:ro
       - ${TILES_QG_DIR:-./du-lieu-ngoai/tiles-qg}:/usr/share/nginx/tiles-qg:ro
     ports:
       - "${NGINX_PORT:-80}:80"
@@ -228,14 +234,12 @@ services:
       - backend
 
 volumes:
-  # Bộ tile bản đồ quy hoạch — xem lời giải thích ở service frontend.
-  camlam_tiles:
+  # (16/10/2026 đã BỎ volume camlam_tiles — kho ô ảnh nằm ở ổ D, TILES_QG_DIR; xem lời giải thích ở service frontend.)
   # Kho tin tức đã biên tập (xem service frontend).
   tin_kho:
   # File PDF văn bản đã tải sẵn từ Drive / cổng TTĐT (xem routes/vanBan.ts).
   van_ban_kho:
-  # Lớp quy hoạch CHỈ ADMIN XEM (routes/qhRieng.ts) — tên thật trong Docker: camlamgis_qh_rieng.
-  qh_rieng:
+  # (16/10/2026 đã BỎ volume qh_rieng — lớp quy hoạch riêng nằm ở ổ D, QH_RIENG_HOST_DIR; xem service backend.)
 
   pgdata:
   uploads:

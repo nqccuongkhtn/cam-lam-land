@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -422,18 +422,64 @@ const Z_XEM_THU = 13;
 // `vung` = địa giới hành chính (huyện/thị cũ) của bản quy hoạch này. Dùng để LỌC danh sách lớp:
 //   người xem chọn một địa giới thì chỉ hiện quy hoạch của địa giới đó, khỏi loạn vì quá nhiều bản.
 //   `tamXem` = [lng, lat, zoom] để BAY TỚI khi chọn địa giới (chưa bật lớp nào cụ thể).
-const VUNG_QH: { id: string; ten: string; tenNgan: string; tamXem: [number, number, number] }[] = [
-  { id: 'cam-lam',   ten: 'Huyện Cam Lâm',       tenNgan: 'Cam Lâm',   tamXem: [109.0917, 12.0771, 12] },   // bỏ chữ "(cũ)" — chủ dự án 14/10/2026
-  { id: 'nha-trang', ten: 'TP. Nha Trang',        tenNgan: 'Nha Trang', tamXem: [109.1900, 12.2450, 12] },
-  { id: 'cam-ranh',  ten: 'TP. Cam Ranh',         tenNgan: 'Cam Ranh',  tamXem: [109.1500, 11.9050, 11] },
-  { id: 'ninh-hoa',  ten: 'Thị xã Ninh Hòa',      tenNgan: 'Ninh Hòa',  tamXem: [109.1300, 12.4900, 11] },
-  { id: 'van-ninh',  ten: 'Huyện Vạn Ninh',       tenNgan: 'Vạn Ninh',  tamXem: [109.2200, 12.7000, 11] },
-  { id: 'khanh-son', ten: 'Huyện Khánh Sơn',      tenNgan: 'Khánh Sơn', tamXem: [108.9500, 12.0300, 11] },
-  { id: 'dien-khanh', ten: 'Huyện Diên Khánh',    tenNgan: 'Diên Khánh', tamXem: [109.0381, 12.2753, 11] },
-  { id: 'khanh-vinh', ten: 'Huyện Khánh Vĩnh',    tenNgan: 'Khánh Vĩnh', tamXem: [108.8414, 12.3126, 10] },
-  { id: 'da-lat',    ten: 'TP. Đà Lạt (Lâm Đồng)',      tenNgan: 'Đà Lạt',    tamXem: [108.4641, 11.9201, 12] },
-  { id: 'duc-trong', ten: 'Huyện Đức Trọng (Lâm Đồng)', tenNgan: 'Đức Trọng', tamXem: [108.3865, 11.6524, 11] },
+//   `tinh` = mã TỈNH hiện hành (TINH_VN bên dưới) chứa huyện cũ này — ô "Địa giới" chọn tỉnh trước rồi mới tới huyện.
+const VUNG_QH: { id: string; ten: string; tenNgan: string; tinh: string; tamXem: [number, number, number] }[] = [
+  { id: 'cam-lam',   ten: 'Huyện Cam Lâm',       tenNgan: 'Cam Lâm',   tinh: 'khanh-hoa', tamXem: [109.0917, 12.0771, 12] },   // bỏ chữ "(cũ)" — chủ dự án 14/10/2026
+  { id: 'nha-trang', ten: 'TP. Nha Trang',        tenNgan: 'Nha Trang', tinh: 'khanh-hoa', tamXem: [109.1900, 12.2450, 12] },
+  { id: 'cam-ranh',  ten: 'TP. Cam Ranh',         tenNgan: 'Cam Ranh',  tinh: 'khanh-hoa', tamXem: [109.1500, 11.9050, 11] },
+  { id: 'ninh-hoa',  ten: 'Thị xã Ninh Hòa',      tenNgan: 'Ninh Hòa',  tinh: 'khanh-hoa', tamXem: [109.1300, 12.4900, 11] },
+  { id: 'van-ninh',  ten: 'Huyện Vạn Ninh',       tenNgan: 'Vạn Ninh',  tinh: 'khanh-hoa', tamXem: [109.2200, 12.7000, 11] },
+  { id: 'khanh-son', ten: 'Huyện Khánh Sơn',      tenNgan: 'Khánh Sơn', tinh: 'khanh-hoa', tamXem: [108.9500, 12.0300, 11] },
+  { id: 'dien-khanh', ten: 'Huyện Diên Khánh',    tenNgan: 'Diên Khánh', tinh: 'khanh-hoa', tamXem: [109.0381, 12.2753, 11] },
+  { id: 'khanh-vinh', ten: 'Huyện Khánh Vĩnh',    tenNgan: 'Khánh Vĩnh', tinh: 'khanh-hoa', tamXem: [108.8414, 12.3126, 10] },
+  { id: 'da-lat',    ten: 'TP. Đà Lạt',           tenNgan: 'Đà Lạt',    tinh: 'lam-dong', tamXem: [108.4641, 11.9201, 12] },
+  { id: 'duc-trong', ten: 'Huyện Đức Trọng',      tenNgan: 'Đức Trọng', tinh: 'lam-dong', tamXem: [108.3865, 11.6524, 11] },
 ];
+// TỈNH / THÀNH PHỐ (16/10/2026 — chủ dự án: "chia địa giới hành chính tìm kiếm theo tỉnh nữa đang thiếu", làm cho cả nước): đủ 34 đơn vị
+// cấp tỉnh từ 1/7/2025 (Nghị quyết 202/2025/QH15; ghi chú = các tỉnh cũ đã nhập vào). Bản QHSDĐ 2030 lập theo HUYỆN CŨ nên ô "Địa giới" là
+// hai tầng: tỉnh hiện hành → huyện / thị / TP cũ (VUNG_QH). Tỉnh CHƯA có bản nào không chọn được (gộp một dòng "đang cập nhật") — có bản là
+// tự hiện, không phải sửa chỗ khác. `tamXem` = tâm phỏng chừng + mức phóng nhìn trọn tỉnh, để bay tới khi chọn tỉnh.
+const TINH_VN: { id: string; ten: string; tamXem: [number, number, number] }[] = [
+  { id: 'khanh-hoa',   ten: 'Tỉnh Khánh Hòa',    tamXem: [109.00, 11.95, 8.2] },   // + Ninh Thuận
+  { id: 'lam-dong',    ten: 'Tỉnh Lâm Đồng',     tamXem: [107.90, 11.60, 7.5] },   // + Đắk Nông, Bình Thuận
+  { id: 'an-giang',    ten: 'Tỉnh An Giang',     tamXem: [104.90, 10.20, 7.8] },   // + Kiên Giang
+  { id: 'bac-ninh',    ten: 'Tỉnh Bắc Ninh',     tamXem: [106.30, 21.30, 8.5] },   // + Bắc Giang
+  { id: 'ca-mau',      ten: 'Tỉnh Cà Mau',       tamXem: [105.25, 9.20, 8.2] },    // + Bạc Liêu
+  { id: 'cao-bang',    ten: 'Tỉnh Cao Bằng',     tamXem: [106.10, 22.75, 8.3] },
+  { id: 'can-tho',     ten: 'TP. Cần Thơ',       tamXem: [105.80, 9.75, 8.3] },    // + Sóc Trăng, Hậu Giang
+  { id: 'da-nang',     ten: 'TP. Đà Nẵng',       tamXem: [108.00, 15.65, 7.9] },   // + Quảng Nam
+  { id: 'dak-lak',     ten: 'Tỉnh Đắk Lắk',      tamXem: [108.60, 12.90, 7.7] },   // + Phú Yên
+  { id: 'dien-bien',   ten: 'Tỉnh Điện Biên',    tamXem: [102.95, 21.70, 8.0] },
+  { id: 'dong-nai',    ten: 'Tỉnh Đồng Nai',     tamXem: [106.95, 11.40, 7.9] },   // + Bình Phước
+  { id: 'dong-thap',   ten: 'Tỉnh Đồng Tháp',    tamXem: [105.95, 10.45, 8.3] },   // + Tiền Giang
+  { id: 'gia-lai',     ten: 'Tỉnh Gia Lai',      tamXem: [108.55, 13.90, 7.6] },   // + Bình Định
+  { id: 'ha-noi',      ten: 'TP. Hà Nội',        tamXem: [105.70, 21.00, 8.6] },
+  { id: 'ha-tinh',     ten: 'Tỉnh Hà Tĩnh',      tamXem: [105.75, 18.30, 8.3] },
+  { id: 'hai-phong',   ten: 'TP. Hải Phòng',     tamXem: [106.55, 20.90, 8.6] },   // + Hải Dương
+  { id: 'ho-chi-minh', ten: 'TP. Hồ Chí Minh',   tamXem: [106.75, 10.85, 8.0] },   // + Bình Dương, Bà Rịa – Vũng Tàu
+  { id: 'hue',         ten: 'TP. Huế',           tamXem: [107.55, 16.35, 8.6] },
+  { id: 'hung-yen',    ten: 'Tỉnh Hưng Yên',     tamXem: [106.20, 20.60, 8.7] },   // + Thái Bình
+  { id: 'lai-chau',    ten: 'Tỉnh Lai Châu',     tamXem: [103.30, 22.30, 8.2] },
+  { id: 'lang-son',    ten: 'Tỉnh Lạng Sơn',     tamXem: [106.60, 21.85, 8.3] },
+  { id: 'lao-cai',     ten: 'Tỉnh Lào Cai',      tamXem: [104.30, 22.00, 7.9] },   // + Yên Bái
+  { id: 'nghe-an',     ten: 'Tỉnh Nghệ An',      tamXem: [104.95, 19.20, 7.8] },
+  { id: 'ninh-binh',   ten: 'Tỉnh Ninh Bình',    tamXem: [106.05, 20.30, 8.7] },   // + Hà Nam, Nam Định
+  { id: 'phu-tho',     ten: 'Tỉnh Phú Thọ',      tamXem: [105.35, 21.05, 8.0] },   // + Vĩnh Phúc, Hòa Bình
+  { id: 'quang-ngai',  ten: 'Tỉnh Quảng Ngãi',   tamXem: [108.25, 14.85, 7.6] },   // + Kon Tum
+  { id: 'quang-ninh',  ten: 'Tỉnh Quảng Ninh',   tamXem: [107.30, 21.15, 8.2] },
+  { id: 'quang-tri',   ten: 'Tỉnh Quảng Trị',    tamXem: [106.55, 17.20, 7.8] },   // + Quảng Bình
+  { id: 'son-la',      ten: 'Tỉnh Sơn La',       tamXem: [104.00, 21.15, 7.9] },
+  { id: 'tay-ninh',    ten: 'Tỉnh Tây Ninh',     tamXem: [106.15, 11.00, 8.0] },   // + Long An
+  { id: 'thai-nguyen', ten: 'Tỉnh Thái Nguyên',  tamXem: [105.85, 21.90, 8.2] },   // + Bắc Kạn
+  { id: 'thanh-hoa',   ten: 'Tỉnh Thanh Hóa',    tamXem: [105.35, 20.00, 8.0] },
+  { id: 'tuyen-quang', ten: 'Tỉnh Tuyên Quang',  tamXem: [105.10, 22.40, 7.7] },   // + Hà Giang
+  { id: 'vinh-long',   ten: 'Tỉnh Vĩnh Long',    tamXem: [106.25, 10.05, 8.4] },   // + Bến Tre, Trà Vinh
+];
+// Tỉnh ĐÃ có bản quy hoạch (đứng đầu danh sách, chọn được) và số tỉnh còn lại (gộp một dòng "đang cập nhật").
+const TINH_CO_QH = TINH_VN.filter((t) => VUNG_QH.some((v) => v.tinh === t.id));
+const SO_TINH_CHUA_QH = TINH_VN.length - TINH_CO_QH.length;
+// Tra số tờ / số thửa: kho thửa địa chính hiện CHỈ có tỉnh Khánh Hòa (733.249 thửa) — tỉnh khác chưa có dữ liệu thửa.
+const TINH_CO_THUA = ['khanh-hoa'];
 // `zBay` = mức phóng bay tới khi chọn bản này mà đang nhìn xa hơn (không ghi thì tự tính = minzoom − 1).
 // `pdf` = mã bản trong bảng qh_pdf (máy chủ lib/qhPdf.ts): thửa trong vùng bản này có trang "Quy hoạch sử dụng đất 2030"
 //   tính từ vùng loại đất BÓC TỪ BẢN ĐỒ PDF của Sở (14/10/2026) — chỉ tham khảo, không in phiếu.
@@ -1169,15 +1215,24 @@ export default function MapPage() {
   // Các lớp khác MẶC ĐỊNH TẮT: chồng lên nhau thì màu chồng màu. Người dùng tự tích vào mới hiện.
   const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': false, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd918': false, 'qh-cuhin': false, 'qh-taynam': false, 'qh-taybac': false, 'qh-qd893': true, 'qh-ninhhoa2030': false, 'qh-nhatrang2030': false, 'qh-khanhson2030': false, 'qh-vanninh2030': false, 'qh-camranh2030': false, 'qh-dienkhanh2030': false, 'qh-khanhvinh2030': false, 'qh-dalat2030': false, 'qh-ductrong2030': false });
   // ĐỊA GIỚI đang chọn để LỌC danh sách lớp quy hoạch — giờ nhiều bản quá, gom theo huyện/thị cho gọn
-  // (chủ dự án 14/10/2026: "chọn địa giới rồi hiện quy hoạch ở địa giới đó thôi để đỡ loạn"). Mặc định Cam Lâm.
+  // (chủ dự án 14/10/2026: "chọn địa giới rồi hiện quy hoạch ở địa giới đó thôi để đỡ loạn"). Mặc định Khánh Hòa · Cam Lâm.
+  // Hai tầng (16/10/2026): TỈNH (tinhQh) → huyện / thị cũ (vungQh). vungQh = '' là "cả tỉnh": hiện mọi bản của tỉnh, chia nhóm theo huyện.
+  const [tinhQh, setTinhQh] = useState<string>('khanh-hoa');
   const [vungQh, setVungQh] = useState<string>('cam-lam');
-  const mucHienThi = useMemo(() => mucQh.filter((o) => o.vung === vungQh), [vungQh, mucQh]);
+  const vungCuaTinh = useMemo(() => VUNG_QH.filter((v) => v.tinh === tinhQh), [tinhQh]);
+  const mucHienThi = useMemo(() => {
+    if (vungQh) return mucQh.filter((o) => o.vung === vungQh);
+    const thuTu = (o: { vung: string }) => vungCuaTinh.findIndex((v) => v.id === o.vung);
+    return mucQh.filter((o) => thuTu(o) >= 0).sort((a, b) => thuTu(a) - thuTu(b));   // sort ổn định: trong mỗi huyện giữ thứ tự cũ
+  }, [vungQh, mucQh, vungCuaTinh]);
   // LỚP DỮ LIỆU riêng Cam Lâm (vd "Ranh Thôn Cam Lâm Tháng 7/2026") CHỈ HIỆN khi địa giới đang chọn là Cam Lâm
   // (chủ dự án 14/10/2026). Đổi sang vùng khác thì tắt luôn lớp đó trên bản đồ. "Ranh giới xã" là cả tỉnh nên vẫn hiện.
+  // Lớp "Đối chiếu bản đồ V8" (thửa xã Cam Lâm, chỉ admin) cũng vậy — chủ dự án 16/10/2026: "đối chiếu bản đồ v8 chỉ hiện ở cam lâm".
   const laLopCamLam = (ten: string) => /cam\s*l[aâ]m/i.test(String(ten || '').normalize('NFC'));
   const layersHienThi = useMemo(() => layers.filter((l) => vungQh === 'cam-lam' || !laLopCamLam(l.name)), [layers, vungQh]);
   useEffect(() => {
     if (vungQh === 'cam-lam') return;
+    setDoiChieuV8(false);
     setVisible((v) => { const tat = layers.filter((l) => laLopCamLam(l.name) && v[l.slug]); if (!tat.length) return v; const n = { ...v }; for (const l of tat) n[l.slug] = false; return n; });
   }, [vungQh, layers]);
   const [qhFillOn, setQhFillOn] = useState(false);        // TẮT mặc định — giống Guland: hiển thị bằng ẢNH raster. Bật tay nếu muốn lấp chỗ trống.
@@ -1482,9 +1537,19 @@ export default function MapPage() {
   const doiVung = useCallback((idVung: string) => {
     setVungQh(idVung);
     setOvOn(Object.fromEntries(rasterOverlaysRef.current.map((x) => [x.id, false])));  // tắt overlay vùng cũ cho khỏi chồng
-    const v = VUNG_QH.find((x) => x.id === idVung);
+    // '' = "cả tỉnh" → bay tới tâm tỉnh đang chọn
+    const dich = VUNG_QH.find((x) => x.id === idVung)?.tamXem || TINH_VN.find((t) => t.id === tinhQh)?.tamXem;
     const m: any = (window as any).__banDo;
-    if (v && m && m.easeTo) m.easeTo({ center: [v.tamXem[0], v.tamXem[1]], zoom: v.tamXem[2], duration: 900 });
+    if (dich && m && m.easeTo) m.easeTo({ center: [dich[0], dich[1]], zoom: dich[2], duration: 900 });
+  }, [tinhQh]);
+  // ĐỔI TỈNH: về "cả tỉnh" (hiện mọi bản quy hoạch của tỉnh, chia theo huyện — chọn huyện để lọc gọn), tắt lớp đang bật, bay tới tỉnh.
+  const doiTinh = useCallback((idTinh: string) => {
+    setTinhQh(idTinh);
+    setVungQh('');
+    setOvOn(Object.fromEntries(rasterOverlaysRef.current.map((x) => [x.id, false])));
+    const t = TINH_VN.find((x) => x.id === idTinh);
+    const m: any = (window as any).__banDo;
+    if (t && m && m.easeTo) m.easeTo({ center: [t.tamXem[0], t.tamXem[1]], zoom: t.tamXem[2], duration: 900 });
   }, []);
   // ĐẨY BẢN ĐỒ KHI THỬA BỊ BẢNG CHE.
   // Bảng "Thông tin thửa" nằm giữa-dưới, hay đè lên đúng thửa vừa bấm. Hàm này đo vị trí bảng,
@@ -2169,6 +2234,15 @@ export default function MapPage() {
         <input ref={giu('mot')} value={c1} onChange={(e) => setC1(e.target.value)} onKeyDown={phimEnter(full, 'hai', kp)} enterKeyHint="search" placeholder="Dán link Google Maps (…/@12.34,109.12…)" className={`col-span-2 border rounded-lg px-2.5 ${full ? 'py-2 text-[16px] w-full' : 'py-1.5 text-xs w-56'}`} />
       ) : (
         <>
+          {/* ── TỈNH / THÀNH PHỐ đứng đầu địa giới (16/10/2026, chủ dự án: "chia địa giới hành chính tìm kiếm theo tỉnh nữa đang thiếu").
+              Kho thửa địa chính hiện chỉ có Khánh Hòa (TINH_CO_THUA) — tỉnh khác hiện một dòng "chưa có dữ liệu thửa", không chọn được. ── */}
+          {searchMode === 'parcel' && (
+            <select value={TINH_CO_THUA[0]} onChange={() => { /* hiện chỉ một tỉnh có dữ liệu thửa */ }} title="Tỉnh / thành phố" aria-label="Tỉnh / thành phố"
+              className={`border rounded-lg px-2 py-1.5 text-xs bg-white ${full ? 'flex-1 min-w-[120px]' : 'w-[120px]'}`}>
+              {TINH_VN.filter((t) => TINH_CO_THUA.includes(t.id)).map((t) => (<option key={t.id} value={t.id}>{t.ten}</option>))}
+              <option value="" disabled>Tỉnh / thành khác: chưa có dữ liệu thửa</option>
+            </select>
+          )}
           {searchMode === 'parcel' && (
             <select value={cap} onChange={(e) => { setCap(e.target.value as any); setC3(''); setHuyenChon(''); donKetQuaCu(); }} className={`border rounded-lg px-2 py-1.5 text-xs bg-white ${full ? 'flex-1 min-w-[84px]' : 'w-[96px]'}`} title="Cấp hành chính">
               <option value="3">3 cấp (huyện–xã)</option>
@@ -2230,7 +2304,7 @@ export default function MapPage() {
         </>
       )}
       {/* Điện thoại (full): tra xong đóng bảng đáy để thấy kết quả trên bản đồ. */}
-      <button onClick={() => traCuu(full)} title="Tra cứu (phím Enter)" className={`cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white px-4 rounded-lg font-bold whitespace-nowrap ${full ? 'w-full mt-1.5 py-2.5 text-sm' : 'py-1.5 text-xs'}`}>Tra cứu</button>
+      <button onClick={() => traCuu(full)} title="Tra cứu (phím Enter)" className={`cl-press bg-[#0A2540] hover:bg-[#0d2f54] text-white px-4 rounded-lg font-bold whitespace-nowrap ${full ? 'w-full mt-1.5 py-2.5 text-sm' : 'py-1.5 text-xs'} ${anChon ? 'col-span-2' : ''}`}>Tra cứu</button>
     </div>
     );
   };
@@ -2584,19 +2658,30 @@ export default function MapPage() {
           {/* Điện thoại: ô chọn NỀN BẢN ĐỒ + "Nhãn & đường" đã đưa ra NỔI TRÊN BẢN ĐỒ (nút "Nền"
               góc trái dưới) giống app tham chiếu — không còn nằm trong bảng này. */}
           <div className="pt-1">
-            {/* ĐỊA GIỚI: chọn huyện/thị để CHỈ HIỆN quy hoạch của vùng đó — giờ nhiều bản quá, gom cho gọn
-                (chủ dự án 14/10/2026). Đổi vùng là bay tới đó, chưa bật lớp nào. */}
-            <label className="block mb-2.5">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Địa giới</span>
-              <select value={vungQh} onChange={(e) => doiVung(e.target.value)}
-                className="mt-1 w-full border border-slate-300 rounded-lg px-2.5 py-2 text-sm font-semibold text-[#0A2540] bg-white focus:border-emerald-500 focus:outline-none">
-                {VUNG_QH.map((v) => (<option key={v.id} value={v.id}>{v.ten}</option>))}
+            {/* ĐỊA GIỚI: chọn TỈNH rồi huyện/thị để CHỈ HIỆN quy hoạch của vùng đó — giờ nhiều bản quá, gom cho gọn
+                (chủ dự án 14/10/2026; thêm tầng tỉnh 16/10/2026). Đổi vùng là bay tới đó, chưa bật lớp nào. */}
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Địa giới</p>
+            <div className="mt-1 mb-2.5 grid grid-cols-2 gap-1.5">
+              <select value={tinhQh} onChange={(e) => doiTinh(e.target.value)} aria-label="Tỉnh / thành phố" title="Tỉnh / thành phố"
+                className="min-w-0 w-full border border-slate-300 rounded-lg px-2 py-2 text-sm font-semibold text-[#0A2540] bg-white focus:border-emerald-500 focus:outline-none">
+                {TINH_CO_QH.map((t) => (<option key={t.id} value={t.id}>{t.ten}</option>))}
+                {SO_TINH_CHUA_QH > 0 && <option value="" disabled>{SO_TINH_CHUA_QH} tỉnh / thành khác: đang cập nhật</option>}
               </select>
-            </label>
+              <select value={vungQh} onChange={(e) => doiVung(e.target.value)} aria-label="Huyện / thị xã / thành phố" title="Huyện / thị xã / thành phố"
+                className="min-w-0 w-full border border-slate-300 rounded-lg px-2 py-2 text-sm font-semibold text-[#0A2540] bg-white focus:border-emerald-500 focus:outline-none">
+                <option value="">Cả tỉnh</option>
+                {vungCuaTinh.map((v) => (<option key={v.id} value={v.id}>{v.ten}</option>))}
+              </select>
+            </div>
             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1.5">Bản đồ quy hoạch</p>
             {mucHienThi.length === 0 && (<p className="text-sm text-slate-400 py-1.5">Chưa có bản quy hoạch cho địa giới này.</p>)}
-            {mucHienThi.map((o) => (
-              <label key={o.id} className={`flex items-start gap-2.5 py-1.5 text-sm cursor-pointer lg:-mx-2 lg:rounded-lg lg:px-2 lg:py-2 lg:transition lg:hover:bg-[#0A2540]/[.05] ${o.gom.every((id) => !!ovOn[id]) ? 'lg:bg-[#0A2540]/[.07]' : ''}`}>
+            {mucHienThi.map((o, i) => (
+              <Fragment key={o.id}>
+              {/* "Cả tỉnh": mỗi huyện một dòng tên nhỏ phía trên các bản của huyện đó */}
+              {!vungQh && (i === 0 || mucHienThi[i - 1].vung !== o.vung) && (
+                <p className="mt-1.5 text-[11px] font-semibold text-slate-500">{VUNG_QH.find((v) => v.id === o.vung)?.ten}</p>
+              )}
+              <label className={`flex items-start gap-2.5 py-1.5 text-sm cursor-pointer lg:-mx-2 lg:rounded-lg lg:px-2 lg:py-2 lg:transition lg:hover:bg-[#0A2540]/[.05] ${o.gom.every((id) => !!ovOn[id]) ? 'lg:bg-[#0A2540]/[.07]' : ''}`}>
                 {/* MỖI LÚC CHỈ MỘT lớp quy hoạch — chọn lớp này là tự tắt lớp kia. Các bản quy hoạch
                     phủ đè lên nhau (QĐ205 trùm cả huyện, 3 bản 1/2000 nằm lọt bên trong), bật cùng
                     lúc là màu chồng màu, không đọc được gì. Bấm lại vào lớp đang bật để TẮT HẾT,
@@ -2608,6 +2693,7 @@ export default function MapPage() {
                   className="accent-emerald-600 w-4 h-4 rounded-sm" />
                 <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 bg-amber-500" /><span className="min-w-0 flex-1 text-slate-700 leading-snug">{o.ten}{(o.khoa || o.xemThu) && <span className="ml-1 text-[11px]" aria-label={o.xemThu ? 'xem ở mức nhìn xa' : 'liên hệ admin'}>🔒</span>}</span>
               </label>
+              </Fragment>
             ))}
             {/* Máy tính: thanh độ mờ nằm ở cột nút bên phải bản đồ (như điện thoại) → ẩn bản ở bảng này. */}
             <div className="mt-1 pl-[26px] lg:hidden">
@@ -2632,7 +2718,7 @@ export default function MapPage() {
               <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 bg-[#C8A14B]" /><span className="flex-1 text-slate-700">🗺️ Ranh giới xã</span>
             </label>
           )}
-          {coV8 && (
+          {coV8 && vungQh === 'cam-lam' && (
             <label className="flex items-center gap-2.5 py-1.5 text-sm cursor-pointer">
               <input type="checkbox" checked={doiChieuV8} onChange={(e) => setDoiChieuV8(e.target.checked)} className="accent-pink-600 w-4 h-4" />
               <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0 border-2 border-dashed border-[#d81b60]" /><span className="flex-1 text-slate-700">Đối chiếu bản đồ V8 (xã Cam Lâm)</span>
@@ -2759,8 +2845,9 @@ export default function MapPage() {
                 </div>
                 <button type="button" onClick={() => setTimMo(false)} aria-label="Đóng" className="ml-auto grid h-7 w-7 place-items-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700">✕</button>
               </div>
-              {/* Lưới 3 cột đều, kín khung (hàng 1: cấp · huyện · xã; hàng 2: thửa · tờ · Tra cứu) — bản đầu xếp hàng dồn trái, hở nhiều (chủ dự án 6/10/2026) */}
-              <div className="mt-2.5 [&>div]:grid [&>div]:grid-cols-3 [&>div]:gap-2 [&>div>*]:!w-full [&>div>*]:min-w-0 [&>div>*]:!py-2 [&>div>*]:!text-[13px]">{searchCtrl(false, true)}</div>
+              {/* Lưới 4 cột đều, kín khung (hàng 1: tỉnh · cấp · huyện · xã; hàng 2: thửa · tờ · Tra cứu [2 ô]) — bản đầu xếp hàng dồn trái, hở
+                  nhiều (chủ dự án 6/10/2026); thêm ô tỉnh 16/10/2026 nên 3 → 4 cột. Toạ độ: X · Y · Tra cứu; link: ô link [2] · Tra cứu [2]. */}
+              <div className="mt-2.5 [&>div]:grid [&>div]:grid-cols-4 [&>div]:gap-2 [&>div>*]:!w-full [&>div>*]:min-w-0 [&>div>*]:!py-2 [&>div>*]:!text-[13px]">{searchCtrl(false, true)}</div>
               <p className="mt-1.5 text-[11px] leading-snug text-slate-400">Phím tắt: <b className="font-semibold text-slate-500">Enter</b> tra cứu · <b className="font-semibold text-slate-500">Tab</b> sang ô sau · <b className="font-semibold text-slate-500">↑↓</b> chọn xã · <b className="font-semibold text-slate-500">Esc</b> đóng · gõ gộp <b className="font-semibold text-slate-500">95/15</b> = thửa 95 tờ 15 · phím <b className="font-semibold text-slate-500">/</b> mở ô tìm</p>
             </div>
           )}
@@ -2893,6 +2980,12 @@ export default function MapPage() {
                 {tcTab === 'to' && (
                   <div className="space-y-1.5">
                     {([
+                      // TỈNH / THÀNH PHỐ đứng đầu địa giới (16/10/2026) — kho thửa hiện chỉ có Khánh Hòa (TINH_CO_THUA).
+                      ['Tỉnh / thành phố', (
+                        <OChonBang nhan="Chọn" tieuDe="Chọn tỉnh / thành phố" giaTri={TINH_CO_THUA[0]}
+                          dsMuc={TINH_VN.filter((t) => TINH_CO_THUA.includes(t.id)).map((t) => ({ id: t.id, ten: t.ten, phu: 'Tỉnh / thành khác: đang cập nhật dữ liệu thửa' }))}
+                          khiChon={() => { /* hiện chỉ một tỉnh có dữ liệu thửa */ }} />
+                      )],
                       ['Hệ thống hành chính', (
                         <OChonBang nhan="Chọn" tieuDe="Chọn hệ thống hành chính" giaTri={cap}
                           dsMuc={[{ id: '3', ten: '3 cấp (huyện – xã)' }, { id: '2', ten: '2 cấp (xã mới)' }]}
@@ -3061,12 +3154,19 @@ export default function MapPage() {
               <div className="lg:hidden fixed inset-0 z-[58] flex flex-col justify-end bg-black/35 px-2.5 pb-[calc(var(--menu-cao,calc(56px+env(safe-area-inset-bottom)))+10px)] animate-[fadeIn_.15s_ease-out]" onClick={() => setQhSheet(false)}>
                 <div className="max-h-[62dvh] overflow-y-auto overscroll-contain rounded-lg bg-white/95 backdrop-blur-xl shadow-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" onClick={(e) => e.stopPropagation()}>
                   <p className="sticky top-0 z-20 bg-white/90 backdrop-blur px-4 py-2.5 text-center text-[12px] text-[#8a8a8e] border-b border-black/10">Chọn bản đồ quy hoạch</p>
-                  {/* Chọn ĐỊA GIỚI để lọc danh sách quy hoạch (chủ dự án 14/10/2026) */}
-                  <div className="flex items-center gap-2 border-b border-black/10 px-4 py-2.5">
-                    <span className="shrink-0 text-[12px] font-medium text-[#6d6d72]">Địa giới</span>
-                    <select value={vungQh} onChange={(e) => doiVung(e.target.value)}
-                      className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-[14px] font-semibold text-[#0A2540]">
-                      {VUNG_QH.map((v) => (<option key={v.id} value={v.id}>{v.ten}</option>))}
+                  {/* Chọn ĐỊA GIỚI để lọc danh sách quy hoạch (chủ dự án 14/10/2026): tỉnh → huyện / thị (thêm tầng tỉnh 16/10/2026). */}
+                  <div className="grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1.5 border-b border-black/10 px-4 py-2.5">
+                    <span className="text-[12px] font-medium text-[#6d6d72]">Tỉnh / TP</span>
+                    <select value={tinhQh} onChange={(e) => doiTinh(e.target.value)} aria-label="Tỉnh / thành phố"
+                      className="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[14px] font-semibold text-[#0A2540]">
+                      {TINH_CO_QH.map((t) => (<option key={t.id} value={t.id}>{t.ten}</option>))}
+                      {SO_TINH_CHUA_QH > 0 && <option value="" disabled>{SO_TINH_CHUA_QH} tỉnh / thành khác: đang cập nhật</option>}
+                    </select>
+                    <span className="text-[12px] font-medium text-[#6d6d72]">Huyện / thị</span>
+                    <select value={vungQh} onChange={(e) => doiVung(e.target.value)} aria-label="Huyện / thị xã / thành phố"
+                      className="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[14px] font-semibold text-[#0A2540]">
+                      <option value="">Cả tỉnh</option>
+                      {vungCuaTinh.map((v) => (<option key={v.id} value={v.id}>{v.ten}</option>))}
                     </select>
                   </div>
                   {mucHienThi.length === 0 && (<p className="px-4 py-3 text-center text-[13px] text-[#8a8a8e]">Chưa có bản quy hoạch cho địa giới này.</p>)}
@@ -3090,7 +3190,7 @@ export default function MapPage() {
                           {congTac(ranhOn, () => setRanhOn(!ranhOn), 'Ranh giới xã')}
                         </div>
                       )}
-                      {coV8 && (
+                      {coV8 && vungQh === 'cam-lam' && (
                         <div className="flex min-h-[42px] items-center gap-3 border-b border-black/10 px-3 py-1.5 last:border-b-0">
                           <span className="h-3 w-3 shrink-0 rounded-sm border-2 border-dashed border-[#d81b60]" />
                           <span className="min-w-0 flex-1 truncate text-[14px] text-black">Đối chiếu bản đồ V8</span>

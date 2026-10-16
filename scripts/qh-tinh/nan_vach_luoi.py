@@ -13,7 +13,12 @@ sys.stdout.reconfigure(encoding='utf-8')
 import numpy as np, pymupdf
 import nan2
 
-pdf, lng, lat, ra = sys.argv[1], float(sys.argv[2]), float(sys.argv[3]), sys.argv[4]
+co = [a for a in sys.argv[1:] if a.startswith('--')]; ts = [a for a in sys.argv[1:] if not a.startswith('--')]
+pdf, lng, lat, ra = ts[0], float(ts[1]), float(ts[2]), ts[3]
+# --goc-E=<m> / --goc-N=<m> (16/10/2026): lưới KHÔNG nằm ở bội số tròn của bước (Hàm Thuận Nam: vạch đứng 414.000 + 2.500·k, vạch ngang
+# 1.236.500 − 2.500·k) → giá trị mỗi vạch = gốc + bội số bước. Mặc định 0 (lưới ở bội số tròn, như mọi bản trước).
+GOC = {'E': float(next((a.split('=', 1)[1] for a in co if a.startswith('--goc-E=')), 0)),
+       'N': float(next((a.split('=', 1)[1] for a in co if a.startswith('--goc-N=')), 0))}
 pg = pymupdf.open(pdf)[0]
 if pg.rotation: sys.exit(f'LOI: trang xoay {pg.rotation} do — vach_luoi dung he chua xoay, can doi he truoc')
 xs, ys = nan2.vach_luoi(pg)
@@ -34,7 +39,8 @@ def deu(v, he, ten, la_E):
     gia = []
     for x in giu:
         E = p2en(x, 0)[0] if la_E else p2en(0, x)[1]
-        gia.append(round(E / buoc_m) * buoc_m)
+        g0 = GOC['E' if la_E else 'N']
+        gia.append(g0 + round((E - g0) / buoc_m) * buoc_m)
     gia = np.array(gia, float)
     # kiểm: giá trị liền nhau phải cách đúng số bước tương ứng
     k = np.round((giu - giu[0]) / buoc)
@@ -67,9 +73,16 @@ def moi(x, y): return float(np.interp(x, gx, gE, left=None)), float(np.interp(y,
 for nm, (x, y) in [('tam', (W / 2, H / 2)), ('goc tren trai', (W * 0.15, H * 0.1)), ('goc duoi phai', (W * 0.85, H * 0.9))]:
     E1, N1 = p2en(x, y); E2 = np.interp(x, gx, gE); N2 = np.interp(y, gy, gN)
     print(f'  {nm}: noi dung doi dong {E2 - E1:+.1f} m, bac {N2 - N1:+.1f} m so voi phep nan cu')
-json.dump({'cach': 'nan_vach_luoi.py — vach luoi that, gia tri theo buoc luoi', 'luoi': {'x': [round(float(v), 3) for v in gx], 'E': [float(v) for v in gE],
+# GIỮ các mục khác của tệp nắn cũ (16/10/2026): "ktt" (kinh tuyến trục tỉnh khác) từng bị ghi đè mất → bản đồ tỉnh khác lại tính
+# theo 108°15' của Khánh Hòa (lệch hàng chục km). Chỉ thay phần lưới + hệ số.
+giu_lai = {k: v for k, v in (json.load(open(side, encoding='utf-8')) if os.path.exists(side) else {}).items()
+           if k not in ('cach', 'luoi', 'se', 'ie', 'sn', 'inn', 'ne', 'nn', 'nguon_nan')}
+if os.path.exists(ra) and os.path.abspath(ra) != os.path.abspath(side):
+    giu_lai.update({k: v for k, v in json.load(open(ra, encoding='utf-8')).items() if k == 'ktt'})
+json.dump({**giu_lai, 'cach': 'nan_vach_luoi.py — vach luoi that, gia tri theo buoc luoi' + (f' (goc E {GOC["E"]:.0f}, goc N {GOC["N"]:.0f})' if GOC['E'] or GOC['N'] else ''),
+           'luoi': {'x': [round(float(v), 3) for v in gx], 'E': [float(v) for v in gE],
            'y': [round(float(v), 3) for v in gy], 'N': [float(v) for v in gN]},
            'se': float(np.polyfit(gx, gE, 1)[0]), 'ie': float(np.polyfit(gx, gE, 1)[1]),
            'sn': float(np.polyfit(gy, gN, 1)[0]), 'inn': float(np.polyfit(gy, gN, 1)[1]), 'ne': len(gx), 'nn': len(gy)},
-          open(ra, 'w', encoding='utf-8'))
+          open(ra, 'w', encoding='utf-8'), ensure_ascii=False)
 print('da ghi', ra)

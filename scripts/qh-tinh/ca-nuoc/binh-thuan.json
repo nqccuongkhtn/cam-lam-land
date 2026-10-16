@@ -1,0 +1,277 @@
+{
+ "_ghiChu": "Khai báo lớp QHSDĐ 2030 Bình Thuận cũ (nay thuộc tỉnh Lâm Đồng) — 16/10/2026. Nguồn: stnmt.binhthuan.gov.vn mục Công bố quy hoạch đất đai, tệp ở storage-vnportal.vnpt.vn (máy chủ tệp của cổng tỉnh). PDF bản đồ + quyết định tải về D:/KhoQH/qhsdd-2030-binh-thuan. Kinh tuyến trục 108°30' (ghi trên bản đồ Hàm Thuận Bắc). Số / ngày / trích yếu đọc từ chính tệp quyết định. TP Phan Thiết chỉ có bản vẽ DGN (chưa làm); Hàm Tân chưa tìm thấy.",
+ "lop": [
+  {
+   "id": "qh-lagi2030",
+   "bo": "lagi2030v1",
+   "ranh": "D:/KhoQH/qhsdd-2030-binh-thuan/ra/ranh-la-gi.json",
+   "vung": {
+    "id": "la-gi",
+    "ten": "Thị xã La Gi (Bình Thuận cũ)",
+    "tenNgan": "La Gi",
+    "tinh": "lam-dong"
+   },
+   "ten": "QHSDĐ 2030 · Thị xã La Gi (Bình Thuận cũ)",
+   "tenNgan": "La Gi 2030",
+   "canCu": {
+    "so": "198/QĐ-UBND",
+    "ngay": "30/01/2023",
+    "coQuan": "UBND tỉnh Bình Thuận",
+    "ten": "Phê duyệt quy hoạch sử dụng đất thời kỳ 2021 - 2030, tầm nhìn đến năm 2050 của thị xã La Gi",
+    "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/198qdub._la-gi.pdf",
+    "cac": [
+     {
+      "so": "Quyết định",
+      "ngay": "30/01/2023",
+      "ten": "198/QĐ-UBND (bản có chữ ký số)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/198qdub._la-gi.pdf"
+     },
+     {
+      "so": "Bản đồ",
+      "ngay": "30/01/2023",
+      "ten": "Bản đồ QHSDĐ đến năm 2030 thị xã La Gi (Sở TN&MT Bình Thuận công bố)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/2-qh-30-la-gi-in-default-000.pdf"
+     }
+    ]
+   }
+  },
+  {
+   "id": "qh-tuyphong2030",
+   "bo": "tuyphong2030v1",
+   "ranh": "D:/KhoQH/qhsdd-2030-binh-thuan/ra/ranh-tuy-phong.json",
+   "vung": {
+    "id": "tuy-phong",
+    "ten": "Huyện Tuy Phong (Bình Thuận cũ)",
+    "tenNgan": "Tuy Phong",
+    "tinh": "lam-dong"
+   },
+   "ten": "QHSDĐ 2030 · Huyện Tuy Phong (Bình Thuận cũ)",
+   "tenNgan": "Tuy Phong 2030",
+   "canCu": {
+    "so": "200/QĐ-UBND",
+    "ngay": "30/01/2023",
+    "coQuan": "UBND tỉnh Bình Thuận",
+    "ten": "Phê duyệt quy hoạch sử dụng đất thời kỳ 2021 - 2030, tầm nhìn đến năm 2050 của huyện Tuy Phong",
+    "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/200qdub_tuy-phong.pdf",
+    "cac": [
+     {
+      "so": "Quyết định",
+      "ngay": "30/01/2023",
+      "ten": "200/QĐ-UBND (bản có chữ ký số)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/200qdub_tuy-phong.pdf"
+     },
+     {
+      "so": "Bản đồ",
+      "ngay": "30/01/2023",
+      "ten": "Bản đồ QHSDĐ đến năm 2030 huyện Tuy Phong (Sở TN&MT Bình Thuận công bố)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/ban-do-quy-hoach-tuy-phong-2030.pdf"
+     }
+    ]
+   }
+  },
+  {
+   "id": "qh-bacbinh2030",
+   "bo": "bacbinh2030v1",
+   "ranh": "D:/KhoQH/qhsdd-2030-binh-thuan/ra/ranh-bac-binh.json",
+   "vung": {
+    "id": "bac-binh",
+    "ten": "Huyện Bắc Bình (Bình Thuận cũ)",
+    "tenNgan": "Bắc Bình",
+    "tinh": "lam-dong"
+   },
+   "ten": "QHSDĐ 2030 · Huyện Bắc Bình (Bình Thuận cũ)",
+   "tenNgan": "Bắc Bình 2030",
+   "canCu": {
+    "so": "199/QĐ-UBND",
+    "ngay": "30/01/2023",
+    "coQuan": "UBND tỉnh Bình Thuận",
+    "ten": "Phê duyệt quy hoạch sử dụng đất thời kỳ 2021 - 2030, tầm nhìn đến năm 2050 của huyện Bắc Bình",
+    "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/199qdub_bac-binh.pdf",
+    "cac": [
+     {
+      "so": "Quyết định",
+      "ngay": "30/01/2023",
+      "ten": "199/QĐ-UBND (bản có chữ ký số)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/199qdub_bac-binh.pdf"
+     },
+     {
+      "so": "Bản đồ",
+      "ngay": "30/01/2023",
+      "ten": "Bản đồ QHSDĐ đến năm 2030 huyện Bắc Bình (Sở TN&MT Bình Thuận công bố)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/ban-do-quy-hoach-2030-bac-binh-default-000.pdf"
+     }
+    ]
+   }
+  },
+  {
+   "id": "qh-hamthuanbac2030",
+   "bo": "hamthuanbac2030v1",
+   "ranh": "D:/KhoQH/qhsdd-2030-binh-thuan/ra/ranh-ham-thuan-bac.json",
+   "vung": {
+    "id": "ham-thuan-bac",
+    "ten": "Huyện Hàm Thuận Bắc (Bình Thuận cũ)",
+    "tenNgan": "Hàm Thuận Bắc",
+    "tinh": "lam-dong"
+   },
+   "ten": "QHSDĐ 2030 · Huyện Hàm Thuận Bắc (Bình Thuận cũ)",
+   "tenNgan": "Hàm Thuận Bắc 2030",
+   "canCu": {
+    "so": "233/QĐ-UBND",
+    "ngay": "06/02/2023",
+    "coQuan": "UBND tỉnh Bình Thuận",
+    "ten": "Phê duyệt quy hoạch sử dụng đất thời kỳ 2021 - 2030, tầm nhìn đến năm 2050 của huyện Hàm Thuận Bắc",
+    "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/233qdub_ham-thuan-bac.pdf",
+    "cac": [
+     {
+      "so": "Quyết định",
+      "ngay": "06/02/2023",
+      "ten": "233/QĐ-UBND (bản có chữ ký số)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/233qdub_ham-thuan-bac.pdf"
+     },
+     {
+      "so": "Bản đồ",
+      "ngay": "06/02/2023",
+      "ten": "Bản đồ QHSDĐ đến năm 2030 huyện Hàm Thuận Bắc (Sở TN&MT Bình Thuận công bố)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/ban-do-quy-hoach-2030-ham-thuan-bac-default-000.pdf"
+     }
+    ]
+   }
+  },
+  {
+   "id": "qh-hamthuannam2030",
+   "bo": "hamthuannam2030v1",
+   "ranh": "D:/KhoQH/qhsdd-2030-binh-thuan/ra/ranh-ham-thuan-nam.json",
+   "vung": {
+    "id": "ham-thuan-nam",
+    "ten": "Huyện Hàm Thuận Nam (Bình Thuận cũ)",
+    "tenNgan": "Hàm Thuận Nam",
+    "tinh": "lam-dong"
+   },
+   "ten": "QHSDĐ 2030 · Huyện Hàm Thuận Nam (Bình Thuận cũ)",
+   "tenNgan": "Hàm Thuận Nam 2030",
+   "canCu": {
+    "so": "226/QĐ-UBND",
+    "ngay": "03/02/2023",
+    "coQuan": "UBND tỉnh Bình Thuận",
+    "ten": "Phê duyệt quy hoạch sử dụng đất thời kỳ 2021 - 2030, tầm nhìn đến năm 2050 của huyện Hàm Thuận Nam",
+    "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/226qdub_ham-thuan-nam.pdf",
+    "cac": [
+     {
+      "so": "Quyết định",
+      "ngay": "03/02/2023",
+      "ten": "226/QĐ-UBND (bản có chữ ký số)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/226qdub_ham-thuan-nam.pdf"
+     },
+     {
+      "so": "Bản đồ",
+      "ngay": "03/02/2023",
+      "ten": "Bản đồ QHSDĐ đến năm 2030 huyện Hàm Thuận Nam (Sở TN&MT Bình Thuận công bố)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/2.bando_qh2030_htn_26.12.2022_in-default-000.pdf"
+     }
+    ]
+   }
+  },
+  {
+   "id": "qh-tanhlinh2030",
+   "bo": "tanhlinh2030v1",
+   "ranh": "D:/KhoQH/qhsdd-2030-binh-thuan/ra/ranh-tanh-linh.json",
+   "vung": {
+    "id": "tanh-linh",
+    "ten": "Huyện Tánh Linh (Bình Thuận cũ)",
+    "tenNgan": "Tánh Linh",
+    "tinh": "lam-dong"
+   },
+   "ten": "QHSDĐ 2030 · Huyện Tánh Linh (Bình Thuận cũ)",
+   "tenNgan": "Tánh Linh 2030",
+   "canCu": {
+    "so": "201/QĐ-UBND",
+    "ngay": "30/01/2023",
+    "coQuan": "UBND tỉnh Bình Thuận",
+    "ten": "Phê duyệt quy hoạch sử dụng đất thời kỳ 2021 - 2030, tầm nhìn đến năm 2050 của huyện Tánh Linh",
+    "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/root/6463/2023/thang2/file/qd-phe-duyet-qh-su-dung-dat-den-nam-2030-tam-nhin-2050-cua-huyen-tanh-linh.doc",
+    "cac": [
+     {
+      "so": "Quyết định",
+      "ngay": "30/01/2023",
+      "ten": "201/QĐ-UBND (tệp Word)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/root/6463/2023/thang2/file/qd-phe-duyet-qh-su-dung-dat-den-nam-2030-tam-nhin-2050-cua-huyen-tanh-linh.doc"
+     },
+     {
+      "so": "Bản đồ",
+      "ngay": "30/01/2023",
+      "ten": "Bản đồ QHSDĐ đến năm 2030 huyện Tánh Linh (Sở TN&MT Bình Thuận công bố)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/qh_2030_h_tanhlinh-default-000.pdf"
+     }
+    ]
+   }
+  },
+  {
+   "id": "qh-duclinh2030",
+   "bo": "duclinh2030v1",
+   "ranh": "D:/KhoQH/qhsdd-2030-binh-thuan/ra/ranh-duc-linh.json",
+   "vung": {
+    "id": "duc-linh",
+    "ten": "Huyện Đức Linh (Bình Thuận cũ)",
+    "tenNgan": "Đức Linh",
+    "tinh": "lam-dong"
+   },
+   "ten": "QHSDĐ 2030 · Huyện Đức Linh (Bình Thuận cũ)",
+   "tenNgan": "Đức Linh 2030",
+   "canCu": {
+    "so": "202/QĐ-UBND",
+    "ngay": "30/01/2023",
+    "coQuan": "UBND tỉnh Bình Thuận",
+    "ten": "Phê duyệt quy hoạch sử dụng đất thời kỳ 2021 - 2030, tầm nhìn đến năm 2050 của huyện Đức Linh",
+    "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/202qdub_duc-linh.pdf",
+    "cac": [
+     {
+      "so": "Quyết định",
+      "ngay": "30/01/2023",
+      "ten": "202/QĐ-UBND (bản có chữ ký số)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/202qdub_duc-linh.pdf"
+     },
+     {
+      "so": "Bản đồ",
+      "ngay": "30/01/2023",
+      "ten": "Bản đồ QHSDĐ đến năm 2030 huyện Đức Linh (Sở TN&MT Bình Thuận công bố)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/2.bd-qhsdd2030-default-000.pdf"
+     }
+    ]
+   }
+  },
+  {
+   "id": "qh-phuquy2030",
+   "bo": "phuquy2030v1",
+   "ranh": "D:/KhoQH/qhsdd-2030-binh-thuan/ra/ranh-phu-quy.json",
+   "vung": {
+    "id": "phu-quy",
+    "ten": "Huyện Phú Quý (Bình Thuận cũ)",
+    "tenNgan": "Phú Quý",
+    "tinh": "lam-dong"
+   },
+   "ten": "QHSDĐ 2030 · Huyện Phú Quý (Bình Thuận cũ)",
+   "tenNgan": "Phú Quý 2030",
+   "canCu": {
+    "so": "231/QĐ-UBND",
+    "ngay": "06/02/2023",
+    "coQuan": "UBND tỉnh Bình Thuận",
+    "ten": "Phê duyệt quy hoạch sử dụng đất thời kỳ 2021 - 2030, tầm nhìn đến năm 2050 của huyện Phú Quý",
+    "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/231qdub-phu-quy.pdf",
+    "cac": [
+     {
+      "so": "Quyết định",
+      "ngay": "06/02/2023",
+      "ten": "231/QĐ-UBND (bản có chữ ký số)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/231qdub-phu-quy.pdf"
+     },
+     {
+      "so": "Bản đồ",
+      "ngay": "06/02/2023",
+      "ten": "Bản đồ QHSDĐ đến năm 2030 huyện Phú Quý (Sở TN&MT Bình Thuận công bố)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/ban-do-quy-hoach-2030-phu-quy-10_10_2022-qp-default-000.pdf"
+     }
+    ]
+   }
+  }
+ ]
+}

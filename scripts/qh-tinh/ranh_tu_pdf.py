@@ -34,6 +34,20 @@ if n<=1:
     print("KHONG tim thay vung"); sys.exit(1)
 idx=1+int(np.argmax(stats[1:,cv2.CC_STAT_AREA]))
 body=(lab==idx).astype(np.uint8)
+# --them=x,y;x,y (16/10/2026): GỘP THÊM các mảng màu chứa các điểm này (toạ độ ĐIỂM IN trên trang PDF). Tuy Phong: mũi rừng tây bắc
+# chỉ nối với thân bản đồ bằng một khúc hẹp → bị tách thành mảng riêng và bỏ (ranh hụt 21 % diện tích huyện); đảo Hòn Cau cũng vậy.
+for a in [a for a in sys.argv[6:] if a.startswith('--them=')]:
+    for cap in a.split('=',1)[1].split(';'):
+        if not cap.strip(): continue
+        x_pt,y_pt=map(float,cap.split(','))
+        px,py=int(round(x_pt*S)),int(round(y_pt*S))
+        k=lab[py,px] if 0<=py<Hh and 0<=px<Ww else 0
+        if k==0:   # điểm rơi vào nét / nền trắng → tìm mảng gần nhất trong bán kính 6 điểm ảnh
+            o=lab[max(0,py-6):py+7,max(0,px-6):px+7]; ks=o[o>0]
+            k=int(np.bincount(ks).argmax()) if ks.size else 0
+        if k>0:
+            body[lab==k]=1; print(f"gop them mang mau tai ({x_pt:.0f},{y_pt:.0f}) diem in: {int(stats[k,cv2.CC_STAT_AREA])} diem anh")
+        else: print(f"CANH BAO: khong thay mang mau tai ({x_pt:.0f},{y_pt:.0f})")
 # noi lien + lap lo + noi rong ra chut cho khoi cat thieu mep
 body=cv2.morphologyEx(body, cv2.MORPH_CLOSE, np.ones((25,25),np.uint8), iterations=2)
 # lap lo trong (flood tu bien)
@@ -49,7 +63,7 @@ cnts=sorted(cnts,key=cv2.contourArea,reverse=True)
 # giu cac vung du lon (than + ban dao roi neu co)
 polys=[]
 for c in cnts:
-    if cv2.contourArea(c) < 0.002*Hh*Ww: continue
+    if cv2.contourArea(c) < (0.0001 if any(a.startswith("--them=") for a in sys.argv[6:]) else 0.002)*Hh*Ww: continue   # có điểm gieo: giữ cả đảo nhỏ đã gộp
     c=cv2.approxPolyDP(c, 1.2, True)   # don gian hoa ~1.2px
     if len(c)<4: continue
     ring=[]

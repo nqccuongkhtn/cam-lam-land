@@ -1,0 +1,919 @@
+{
+  "nhom": "A",
+  "ngay_khao_sat": "2026-10-16",
+  "ghi_chu_chung": "Mỗi mục ban_do có thêm 2 khoá: con_song (tình trạng tải được hôm 16/10/2026, chỉ hỏi phần đầu tệp, KHÔNG tải tệp về) và ban_luu (bản lưu web.archive.org của chính tệp trên trang .gov.vn, nếu máy chủ gốc đã chết). trang_thai = co-ban-do khi đã thấy tệp bản đồ (còn sống hoặc chỉ còn bản lưu — xem con_song). Dung lượng: số đo thật (HTTP Content-Length) khi máy chủ còn sống; dấu ~ là ước theo bản lưu. Mục lục tệp nén ZIP/RAR đọc bằng cách chỉ xin phần đầu khối (không tải cả tệp). Sau 1/7/2025 phần lớn tên miền huyện / Sở cũ đã chết hoặc nay trỏ sang cổng XÃ mới; riêng máy chủ lưu tệp storage-vnportal.vnpt.vn (cổng VNPT của Bình Thuận, Đắk Nông, Phú Yên cũ) VẪN SỐNG nên tệp ở đó tải được dù trang đăng đã chết. Bản lưu web.archive.org cỡ ~1 MB tròn thường là bản chụp bị cắt cụt.",
+  "tinh": [
+    {
+      "tinh_cu": "Ninh Thuận",
+      "tinh_moi": "Khánh Hòa",
+      "trang_nguon": [
+        "https://prtc.ninhthuan.gov.vn/portal/Pages/2023-1-9/Ban-do-Quy-hoach-su-dung-dat-den-nam-2030-thanh-phmuu6zt.aspx",
+        "https://bacai.ninhthuan.gov.vn/portal/Pages/2022-10-6/Quy-hoach-su-dung-dat-den-nam-20302sqw0c.aspx",
+        "https://ninhson.ninhthuan.gov.vn/portal/VanBan/2023-09/80af9e4d9ba1e82dBDQHSDD%202030_HuyenNinhSon%204-9-2022%20ngay%2017.8.23.dgn.pdf"
+      ],
+      "huyen": [
+        {
+          "ten": "TP. Phan Rang – Tháp Chàm",
+          "trang_thai": "khong-vao-duoc",
+          "ban_do": [
+            {
+              "url": "https://prtc.ninhthuan.gov.vn/portal/Photos/2023-01-09/96fad81c7f6903bdQH2030%20Phan%20Rang%20C%C3%B4ng%20khai.jpg",
+              "dinh_dang": "jpg",
+              "dung_luong": "chưa rõ (ảnh nhúng giữa bài, hiển thị 480×617 điểm ảnh)",
+              "loai": "QHSDĐ 2030",
+              "con_song": "không — tên miền *.ninhthuan.gov.vn không còn phân giải",
+              "ban_luu": "",
+              "ghi_chu": "Bài 'Bản đồ Quy hoạch sử dụng đất đến năm 2030 thành phố Phan Rang - Tháp Chàm, tỉnh Ninh Thuận' (9/1/2023) chỉ có MỘT ảnh JPG này, không có tệp PDF. Đọc được bài qua bản lưu https://web.archive.org/web/20231001212116/http://prtc.ninhthuan.gov.vn/portal/Pages/2023-1-9/Ban-do-Quy-hoach-su-dung-dat-den-nam-2030-thanh-phmuu6zt.aspx nhưng kho lưu trữ KHÔNG giữ ảnh."
+            }
+          ],
+          "quyet_dinh": { "so": "369/QĐ-UBND", "ngay": "28/06/2022", "url": "" },
+          "trang": "https://prtc.ninhthuan.gov.vn/portal/Pages/2023-1-9/Ban-do-Quy-hoach-su-dung-dat-den-nam-2030-thanh-phmuu6zt.aspx",
+          "ghi_chu": "Số + ngày QĐ: theo danh sách đầu bài và trang tóm tắt luatvietnam (tư nhân) — chưa thấy bản QĐ trên trang nhà nước."
+        },
+        {
+          "ten": "Huyện Bác Ái",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            {
+              "url": "https://bacai.ninhthuan.gov.vn/portal/VanBan/2022-10/3d2adb57aca3b0d0.%20PDUYET%20QH2030%20HUYEN%20BAC%20AI%20T8.2022.pdf",
+              "dinh_dang": "pdf",
+              "dung_luong": "~3 MB (theo bản lưu)",
+              "loai": "QHSDĐ 2030 (bản phê duyệt T8/2022)",
+              "con_song": "không — tên miền không còn phân giải",
+              "ban_luu": "https://web.archive.org/web/20240714195436/https://bacai.ninhthuan.gov.vn/portal/VanBan/2022-10/3d2adb57aca3b0d0.%20PDUYET%20QH2030%20HUYEN%20BAC%20AI%20T8.2022.pdf",
+              "ghi_chu": "Đính kèm bài 'Quy hoạch sử dụng đất đến năm 2030' (06/10/2022) của Phòng TN&MT huyện. Dung lượng nhỏ so với bản đồ huyện → có thể là bản rút gọn, cần mở xem."
+            },
+            {
+              "url": "https://bacai.ninhthuan.gov.vn/portal/VanBan/2022-10/ff148dda8c5b751dQH2030%20Bac%20Ai%20Cong%20Khai.jpg",
+              "dinh_dang": "jpg",
+              "dung_luong": "chưa rõ",
+              "loai": "QHSDĐ 2030 (ảnh công khai)",
+              "con_song": "không",
+              "ban_luu": "",
+              "ghi_chu": "Cùng bài trên; kho lưu trữ không giữ ảnh này."
+            },
+            {
+              "url": "https://bacai.ninhthuan.gov.vn/bacai/PublishingImages/2021/9/B%E1%BA%A2N%20%C4%90%E1%BB%92%20QH%20SD%C4%90%202021-2030%20%20HUY%E1%BB%86N%20B%C3%81C%20%C3%81I.pdf",
+              "dinh_dang": "pdf",
+              "dung_luong": "~30,6 MB (theo bản lưu)",
+              "loai": "QHSDĐ 2030 — bản DỰ THẢO lấy ý kiến (đăng 9/2021, trước QĐ phê duyệt)",
+              "con_song": "không",
+              "ban_luu": "https://web.archive.org/web/20220801152522/https://bacai.ninhthuan.gov.vn/bacai/PublishingImages/2021/9/B%E1%BA%A2N%20%C4%90%E1%BB%92%20QH%20SD%C4%90%202021-2030%20%20HUY%E1%BB%86N%20B%C3%81C%20%C3%81I.pdf",
+              "ghi_chu": "Không phải bản phê duyệt — chỉ dùng tham khảo."
+            }
+          ],
+          "quyet_dinh": {
+            "so": "462/QĐ-UBND",
+            "ngay": "15/08/2022",
+            "url": "https://bacai.ninhthuan.gov.vn/portal/VanBan/2022-10/7ebc134bcbaf2acd462-QĐ-UBND 15.8.22 QĐ VV PD QH SDĐ ĐẾN NĂM 2030 HUYỆN BÁC ÁI.pdf"
+          },
+          "trang": "https://bacai.ninhthuan.gov.vn/portal/Pages/2022-10-6/Quy-hoach-su-dung-dat-den-nam-20302sqw0c.aspx",
+          "ghi_chu": "Số + ngày QĐ đọc trên tên tệp đính kèm của bài (qua bản lưu 07/06/2023). Bài còn có 'PHỤ LỤC KÈM QĐ 462.pdf'. Máy chủ gốc chết — chỉ còn bản lưu."
+        },
+        {
+          "ten": "Huyện Ninh Sơn",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            {
+              "url": "https://ninhson.ninhthuan.gov.vn/portal/VanBan/2023-09/80af9e4d9ba1e82dBDQHSDD%202030_HuyenNinhSon%204-9-2022%20ngay%2017.8.23.dgn.pdf",
+              "dinh_dang": "pdf (in từ DGN)",
+              "dung_luong": "~11,9 MB (theo bản lưu)",
+              "loai": "QHSDĐ 2030",
+              "con_song": "không",
+              "ban_luu": "https://web.archive.org/web/20250505084232/https://ninhson.ninhthuan.gov.vn/portal/VanBan/2023-09/80af9e4d9ba1e82dBDQHSDD%202030_HuyenNinhSon%204-9-2022%20ngay%2017.8.23.dgn.pdf",
+              "ghi_chu": "Tên tệp ghi bản đồ ngày 4/9/2022, đăng 9/2023. Chưa tìm được bài đăng kèm."
+            }
+          ],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "",
+          "ghi_chu": "Chỉ thấy qua danh sách tệp của kho lưu trữ web (bài đăng chưa tìm ra)."
+        },
+        {
+          "ten": "Huyện Ninh Hải",
+          "trang_thai": "khong-tim-thay",
+          "ban_do": [],
+          "quyet_dinh": { "so": "371/QĐ-UBND", "ngay": "28/06/2022", "url": "" },
+          "trang": "https://ninhhai.ninhthuan.gov.vn/portal/Pages/2021/uy-ban-nhan-dan-huyen-thong-bao-lay-y-kien-quy-hoach-su-dung-dat-thoi-ky-2021-2030-huyen-ninh-hai-tinh-ninh-thuan-e90df5.aspx",
+          "ghi_chu": "Chỉ thấy bài lấy ý kiến dự thảo (2021, bản lưu). Số QĐ theo danh sách đầu bài — chưa đối chiếu. Có bài báo phapluat 'Phê duyệt QHSDĐ đến năm 2030 huyện Ninh Hải' (không mở)."
+        },
+        {
+          "ten": "Huyện Ninh Phước",
+          "trang_thai": "khong-tim-thay",
+          "ban_do": [],
+          "quyet_dinh": { "so": "350/QĐ-UBND", "ngay": "", "url": "" },
+          "trang": "",
+          "ghi_chu": "Chỉ thấy biểu kèm báo cáo thuyết minh BẢN DỰ THẢO (portalold.ninhthuan.gov.vn/chinhquyen/ninhphuoc/Admin/Lịch 2021/đất/1.2 Bieu kem BCTM QHSDD 2030 H NINH PHUOC (ban du thao).pdf, bản lưu 2022). Số QĐ theo danh sách đầu bài + tiêu đề luatvietnam (tư nhân)."
+        },
+        {
+          "ten": "Huyện Thuận Bắc",
+          "trang_thai": "khong-tim-thay",
+          "ban_do": [],
+          "quyet_dinh": { "so": "370/QĐ-UBND", "ngay": "", "url": "" },
+          "trang": "",
+          "ghi_chu": "Chỉ thấy 'Báo cáo tóm tắt QHSDD huyện Thuận Bắc 2030.pdf' (dự thảo lấy ý kiến 2021, bản lưu). Số QĐ theo danh sách đầu bài — chưa đối chiếu."
+        },
+        {
+          "ten": "Huyện Thuận Nam",
+          "trang_thai": "khong-tim-thay",
+          "ban_do": [],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "https://thuannam.ninhthuan.gov.vn/portal/Pages/2021/Thong-bao-ve-viec-lay-y-kien-Quy-hoach-su-dung-dat-giai-doan-2021-2030-huyen-Thuan-Nam,-tinh-Ninh-Thuan.aspx",
+          "ghi_chu": "Chỉ thấy thông báo lấy ý kiến + 'Báo cáo tóm tắt QHSDD huyện Thuận Nam 2030.pdf' (dự thảo 2021)."
+        }
+      ],
+      "ghi_chu": "16/10/2026: mọi tên miền *.ninhthuan.gov.vn (cổng tỉnh, Sở TNMT, prtc, 6 huyện) KHÔNG còn phân giải; nội dung chỉ đọc được qua bản lưu web.archive.org (cổng SharePoint cũ, tệp ở /portal/VanBan/ và /portal/Photos/). Cổng tỉnh Khánh Hòa mới (khanhhoa.gov.vn) và Sở NN&MT Khánh Hòa: không thấy mục bản đồ QHSDĐ các huyện Ninh Thuận cũ (khớp sổ rà 15/10). Kho lưu trữ không có bản lưu nào của stnmt.ninhthuan.gov.vn. Thuận Bắc, Ninh Phước, Ninh Hải, Thuận Nam chỉ còn tài liệu dự thảo 2021."
+    },
+    {
+      "tinh_cu": "Bình Thuận",
+      "tinh_moi": "Lâm Đồng",
+      "trang_nguon": [
+        "https://stnmt.binhthuan.gov.vn/1326/32800/65791/cong-bo-quy-hoach-dat-dai",
+        "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/",
+        "https://duclinh.binhthuan.gov.vn/quy-hoach-ke-hoach-su-dung-dat/ban-do-quy-hoach-su-dung-dat-den-nam-2030-huyen-duc-linh-tinh-binh-thuan-631092",
+        "https://tuyphong.binhthuan.gov.vn/cong-khai-ke-hoach-su-dung-dat/quy-hoach-su-dung-dat-den-nam-2030-huyen-tuy-phong-tinh-binh-thuan-610354"
+      ],
+      "huyen": [
+        {
+          "ten": "TP. Phan Thiết",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            {
+              "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/kem-qh-pt.rar",
+              "dinh_dang": "rar (bên trong: dgn + pdf)",
+              "dung_luong": "23,7 MB",
+              "loai": "QHSDĐ 2030",
+              "con_song": "có (HTTP 200)",
+              "ban_luu": "",
+              "ghi_chu": "Mục lục: 'kem QH PT/2.QHSDD_2030_PhanThiet_in.dgn' (24,1 MB) + 'Danh muc CT-DA.pdf'. Phan Thiết KHÔNG có bản PDF bản đồ — chỉ có tệp DGN."
+            }
+          ],
+          "quyet_dinh": { "so": "536/QĐ-UBND", "ngay": "23/03/2023", "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/536qdub.signed.signed.pdf" },
+          "trang": "https://stnmt.binhthuan.gov.vn/1326/32802/65791/632411/cong-bo-quy-hoach-dat-dai/phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-tam-nhin-den-nam-2050-cua-thanh-pho-phan-thiet.aspx",
+          "ghi_chu": "Số + ngày đọc trên trang 1 của QĐ."
+        },
+        {
+          "ten": "TX. La Gi",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/2-qh-30-la-gi-in-default-000.pdf", "dinh_dang": "pdf", "dung_luong": "3,6 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "" },
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/la-gi-copy.rar", "dinh_dang": "rar (bên trong: dgn)", "dung_luong": "12,6 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Mục lục: BDQH2030_lagi.dgn (10,3 MB) + 'Bao cao QHSDD2021-2030 LaGi - Trinh Duyet.pdf' + 'cong trinh su dung dat la gi.pdf'." }
+          ],
+          "quyet_dinh": { "so": "198/QĐ-UBND", "ngay": "30/01/2023", "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/198qdub._la-gi.pdf" },
+          "trang": "https://stnmt.binhthuan.gov.vn/1326/32802/65791/630110/cong-bo-quy-hoach-dat-dai/phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-tam-nhin-den-nam-2050-cua-thi-xa-la-gi.aspx",
+          "ghi_chu": ""
+        },
+        {
+          "ten": "Huyện Tuy Phong",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/ban-do-quy-hoach-tuy-phong-2030.pdf", "dinh_dang": "pdf", "dung_luong": "4,5 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "" },
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/tuy-phong-copy.rar", "dinh_dang": "rar (bên trong: dgn)", "dung_luong": "11,4 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Mục lục: 'Ban do quy hoach tuy phong 2030.dgn' (10,4 MB) + báo cáo .docx + biểu .pdf." },
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/tuyphong/nam-2022/thang-1/kem-cv.38.2022-ban-do-quy-hoach-tuy-phong-2030.pdf", "dinh_dang": "pdf", "dung_luong": "12,2 MB", "loai": "QHSDĐ 2030 — bản kèm công văn 38/2022 (tháng 1/2022, TRƯỚC QĐ phê duyệt → nhiều khả năng là dự thảo)", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Đăng trên cổng huyện Tuy Phong (trang huyện đã chết, đọc qua bản lưu 03/04/2025)." }
+          ],
+          "quyet_dinh": { "so": "200/QĐ-UBND", "ngay": "30/01/2023", "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/200qdub_tuy-phong.pdf" },
+          "trang": "https://stnmt.binhthuan.gov.vn/1326/32802/65791/630111/cong-bo-quy-hoach-dat-dai/phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-tam-nhin-den-nam-2050-cua-huyen-tuy-phong.aspx",
+          "ghi_chu": "Có ĐIỀU CHỈNH QHSDĐ 2030: QĐ 965/QĐ-UBND năm 2025 (chỉ thấy tiêu đề trên luatvietnam — tư nhân; chưa thấy bản đồ điều chỉnh trên trang nhà nước)."
+        },
+        {
+          "ten": "Huyện Bắc Bình",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/ban-do-quy-hoach-2030-bac-binh-default-000.pdf", "dinh_dang": "pdf", "dung_luong": "20,1 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "" },
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/bac-binh-copy.rar", "dinh_dang": "rar (bên trong: dgn)", "dung_luong": "30,2 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Mục lục: 'BAN DO QUY HOACH 2030 BAC BINH.dgn' (30,2 MB) + 'Bang bieu.pdf' + 'BCTHQH_BACBINH_2030.doc'." },
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/bacbinh/nam-2023/qh-2030.rar", "dinh_dang": "rar (bên trong: dgn)", "dung_luong": "30,4 MB", "loai": "QHSDĐ 2030 (bản đăng trên cổng huyện)", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Mục lục: 'QH 2030\\QUY HOACH 2030.dgn' (30,2 MB) + QĐ phê duyệt .pdf + 'SO LIEU.xlsx'." }
+          ],
+          "quyet_dinh": { "so": "199/QĐ-UBND", "ngay": "30/01/2023", "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/199qdub_bac-binh.pdf" },
+          "trang": "https://stnmt.binhthuan.gov.vn/1326/32802/65791/630107/cong-bo-quy-hoach-dat-dai/phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-tam-nhin-den-nam-2050-cua-huyen-bac-binh.aspx",
+          "ghi_chu": ""
+        },
+        {
+          "ten": "Huyện Hàm Thuận Bắc",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/ban-do-quy-hoach-2030-ham-thuan-bac-default-000.pdf", "dinh_dang": "pdf", "dung_luong": "17,9 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Bài của Sở không có tệp nén DGN (ham-thuan-bac-copy.rar trả 404)." },
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/hamthuanbac/4829/van-phong-ubnd-huyen/2023/qhsdd2030_hamthuanbac.pdf", "dinh_dang": "pdf", "dung_luong": "13,0 MB", "loai": "QHSDĐ 2030 (bản đăng trên cổng huyện)", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "" }
+          ],
+          "quyet_dinh": { "so": "233/QĐ-UBND", "ngay": "06/02/2023", "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/233qdub_ham-thuan-bac.pdf" },
+          "trang": "https://stnmt.binhthuan.gov.vn/1326/32802/65791/630116/cong-bo-quy-hoach-dat-dai/phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-tam-nhin-den-nam-2050-cua-huyen-ham-thuan-bac.aspx",
+          "ghi_chu": ""
+        },
+        {
+          "ten": "Huyện Hàm Thuận Nam",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/2.bando_qh2030_htn_26.12.2022_in-default-000.pdf", "dinh_dang": "pdf", "dung_luong": "11,3 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "" },
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/ham-thuan-nam-copy.rar", "dinh_dang": "rar (bên trong: dgn)", "dung_luong": "34,1 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Mục lục: '2.Bando_QH2030_HTN_26.12.2022_in.dgn' (33,5 MB) + biểu .pdf + báo cáo .docx." }
+          ],
+          "quyet_dinh": { "so": "226/QĐ-UBND", "ngay": "03/02/2023", "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/226qdub_ham-thuan-nam.pdf" },
+          "trang": "https://stnmt.binhthuan.gov.vn/1326/32802/65791/630113/cong-bo-quy-hoach-dat-dai/phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-tam-nhin-den-nam-2050-cua-huyen-ham-thuan-nam.aspx",
+          "ghi_chu": ""
+        },
+        {
+          "ten": "Huyện Tánh Linh",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/qh_2030_h_tanhlinh-default-000.pdf", "dinh_dang": "pdf", "dung_luong": "6,6 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Bản trên cổng huyện (tanhlinh/thong-bao/qh_2030_h_tanhlinh-30-01-2023-.pdf) nay trả 404." }
+          ],
+          "quyet_dinh": { "so": "201/QĐ-UBND", "ngay": "30/01/2023", "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/root/6463/2023/thang2/file/qd-phe-duyet-qh-su-dung-dat-den-nam-2030-tam-nhin-2050-cua-huyen-tanh-linh.doc" },
+          "trang": "https://stnmt.binhthuan.gov.vn/1326/32802/65791/630621/cong-bo-quy-hoach-dat-dai/phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-tam-nhin-den-nam-2050-cua-huyen-tanh-linh.aspx",
+          "ghi_chu": "Bài của Sở chỉ có bản đồ (không kèm QĐ); số + ngày đọc trong tệp .doc QĐ trên kho tệp của cổng tỉnh."
+        },
+        {
+          "ten": "Huyện Đức Linh",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/2.bd-qhsdd2030-default-000.pdf", "dinh_dang": "pdf", "dung_luong": "7,1 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "" },
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/duc-linh-copy.rar", "dinh_dang": "rar (bên trong: dgn)", "dung_luong": "12,8 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Mục lục: '2.BD-QHSDD2030.dgn' (12,1 MB) + báo cáo .docx + hệ thống biểu .pdf." },
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/duclinh/bd-qhsdd2030_duclinh-.pdf", "dinh_dang": "pdf", "dung_luong": "12,5 MB", "loai": "QHSDĐ 2030 (bản trên cổng huyện)", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "" },
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/duclinh/ban-do-quy-hoach-su-dung-dat-den-nam-2030.pdf", "dinh_dang": "pdf", "dung_luong": "4,3 MB", "loai": "QHSDĐ 2030 (bản trên cổng huyện)", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Tệp của bài 'Bản đồ quy hoạch sử dụng đất đến năm 2030 huyện Đức Linh' (03/03/2023)." }
+          ],
+          "quyet_dinh": { "so": "202/QĐ-UBND", "ngay": "30/01/2023", "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/202qdub_duc-linh.pdf" },
+          "trang": "https://stnmt.binhthuan.gov.vn/1326/32802/65791/630112/cong-bo-quy-hoach-dat-dai/phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-tam-nhin-den-nam-2050-cua-huyen-duc-linh.aspx",
+          "ghi_chu": "Trang huyện: https://duclinh.binhthuan.gov.vn/quy-hoach-ke-hoach-su-dung-dat/ban-do-quy-hoach-su-dung-dat-den-nam-2030-huyen-duc-linh-tinh-binh-thuan-631092 (chết; bản lưu 20/07/2025)."
+        },
+        {
+          "ten": "Huyện Hàm Tân",
+          "trang_thai": "khong-tim-thay",
+          "ban_do": [],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "",
+          "ghi_chu": "Không có bài của Sở trong mục 'Công bố quy hoạch đất đai' (9 bài, thiếu Hàm Tân); kho tệp cổng huyện chỉ có tài liệu quy hoạch 2020."
+        },
+        {
+          "ten": "Huyện Phú Quý",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/ban-do-quy-hoach-2030-phu-quy-10_10_2022-qp-default-000.pdf", "dinh_dang": "pdf", "dung_luong": "3,2 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "" },
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/phu-quy-copy.rar", "dinh_dang": "rar (bên trong: dgn)", "dung_luong": "6,6 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Mục lục: 'Ban do Quy Hoach 2030 Phu Quy 10_10_2022 QP.dgn' (6,3 MB) + báo cáo + công trình." },
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/phuquy/nam-2023/thang-2/192-qd-kem-ban-do-quy-hoach-2030-phu-quy-10_10_2022-qp.pdf", "dinh_dang": "pdf", "dung_luong": "7,2 MB", "loai": "QHSDĐ 2030 (bản trên cổng huyện)", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "" },
+            { "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/phuquy/N%C4%83m%202024/Th%C3%A1ng%208/170-TB%20kem%20Ban%20do%20DC%20Quy%20Hoach%202030%20Phu%20Quy%20170824.pdf", "dinh_dang": "pdf", "dung_luong": "4,5 MB", "loai": "điều chỉnh QHSDĐ 2030 — bản DỰ THẢO lấy ý kiến (kèm TB 170, 8/2024)", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Bản đồ điều chỉnh ĐÃ PHÊ DUYỆT chưa tìm thấy." }
+          ],
+          "quyet_dinh": { "so": "231/QĐ-UBND", "ngay": "06/02/2023", "url": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/231qdub-phu-quy.pdf" },
+          "trang": "https://stnmt.binhthuan.gov.vn/1326/32802/65791/630114/cong-bo-quy-hoach-dat-dai/phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-tam-nhin-den-nam-2050-cua-huyen-phu-quy.aspx",
+          "ghi_chu": "ĐIỀU CHỈNH (mới nhất): QĐ 955/QĐ-UBND ngày 26/5/2025 của UBND tỉnh Bình Thuận — đọc trong TB 89/TB-UBND ngày 05/6/2025 công bố công khai (https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/phuquy/N%C4%83m%202025/Th%C3%A1ng%206/89-TB%20cong%20bo%20cong%20khai%20Dieu%20chinh%20quy%20hoach%20su%20dung%20dat%20TK%202021-2030%20tam%20nhin%20den%20nam%202050%20huyen%20Phu%20Quy.signed.signed.pdf)."
+        }
+      ],
+      "ghi_chu": "Nguồn tốt nhất trong nhóm: Sở TNMT Bình Thuận đăng 9 bài 'Phê duyệt quy hoạch sử dụng đất thời kỳ 2021 - 2030, tầm nhìn đến năm 2050 của …' (mục Công bố quy hoạch đất đai), mỗi bài: QĐ + bản đồ PDF + (7 huyện) tệp RAR chứa bản đồ DGN gốc. Trang của Sở và cổng tỉnh/huyện đã chết (đọc qua bản lưu web.archive.org 23/09/2023), nhưng MỌI tệp trên storage-vnportal.vnpt.vn vẫn tải được (kiểm 16/10/2026). Ngày QĐ đọc trên trang 1 của từng QĐ."
+    },
+    {
+      "tinh_cu": "Đắk Nông",
+      "tinh_moi": "Lâm Đồng",
+      "trang_nguon": [
+        "https://daknong.gov.vn/quy-hoach-ke-hoach-su-dung-dat",
+        "https://storage-vnportal.vnpt.vn/dkg-chinhquyen/",
+        "http://daksong.daknong.gov.vn/Ban-do/quyet-dinh-ve-viec-phe-duyet-dieu-chinh-quy-hoach-su-dung-dat-den-nam-2030-huyen-dak-song-tinh-d-520636"
+      ],
+      "huyen": [
+        {
+          "ten": "TP. Gia Nghĩa",
+          "trang_thai": "khong-tim-thay",
+          "ban_do": [],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "",
+          "ghi_chu": "Chỉ thấy báo cáo thuyết minh tổng hợp QHSDĐ (http://cdn.daknong.gov.vn/gia-nghia-files/_b_o_c_o_thuy_t_minh_t_ng_h_p_qhsdd_gia_ngh_a_2023-0-3-13-33-18.pdf, bản lưu 01/08/2024) và bản đồ KHSDĐ 2023 (không phải QHSDĐ 2030). cdn.daknong.gov.vn không còn kết nối."
+        },
+        {
+          "ten": "Huyện Cư Jút",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            {
+              "url": "http://cdn.daknong.gov.vn/cu-jut-files/bdqh2030cujut_cong_khai_in_2023-0-9-10-20-41.pdf",
+              "dinh_dang": "pdf",
+              "dung_luong": "~15,8 MB (theo bản lưu)",
+              "loai": "QHSDĐ 2030 (bản công khai)",
+              "con_song": "không — cdn.daknong.gov.vn không kết nối được",
+              "ban_luu": "https://web.archive.org/web/20240815131703/http://cdn.daknong.gov.vn/cu-jut-files/bdqh2030cujut_cong_khai_in_2023-0-9-10-20-41.pdf",
+              "ghi_chu": "Tìm thấy qua danh sách tệp của kho lưu trữ web."
+            }
+          ],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "http://cujut.daknong.gov.vn/thong-bao-so-258tb-ubnd-ngay-16122022-vv-cong-khai-quy-hoach-su-dung-dat-den-nam-2030-ke-hoach-su-dung-dat-nam-2022-cua-ubnd-huyen-cu-jut/",
+          "ghi_chu": "Thông báo 258/TB-UBND ngày 16/12/2022 công khai QHSDĐ 2030 (bản lưu mở ra 404). Có bài lấy ý kiến dự thảo ĐIỀU CHỈNH QHSDĐ 2030 (2025)."
+        },
+        {
+          "ten": "Huyện Đắk Glong",
+          "trang_thai": "chi-co-quyet-dinh",
+          "ban_do": [],
+          "quyet_dinh": {
+            "so": "2081/QĐ-UBND",
+            "ngay": "09/12/2022",
+            "url": "http://daksom.dakglong.daknong.gov.vn/wp-content/uploads/2025/03/QD-2081-VE-PHE-DUYET-QUY-HOACH-SU-DUNG-DAT-DAK-GLONG-DEN-2030.pdf"
+          },
+          "trang": "https://dakglong.daknong.gov.vn/ra-soat-dieu-chinh-quy-hoach-su-dung-dat-den-nam-2030-huyen-dak-glong-tinh-dak-nong/",
+          "ghi_chu": "Tệp QĐ đăng lại trên trang xã Đắk Som (bản lưu 21/08/2025); ngày theo tiêu đề trên hethongphapluat (tư nhân). 2025: rà soát điều chỉnh QHSDĐ 2030, mời tư vấn lập điều chỉnh — chưa thấy bản điều chỉnh phê duyệt."
+        },
+        {
+          "ten": "Huyện Đắk Mil",
+          "trang_thai": "khong-tim-thay",
+          "ban_do": [],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "http://dakmil.daknong.gov.vn/thong-bao/thong-bao-cong-bo-cong-khai-quy-hoach-su-dung-dat-den-nam-2030-ke-hoach-su-dung-dat-nam-2022-huyen-da-k-mil-tinh-dak-non.html",
+          "ghi_chu": "Bài 'Thông báo công bố công khai QHSDĐ đến năm 2030, KHSDĐ năm 2022' (bản lưu 10/06/2023) chỉ nhúng 1 tệp văn bản (dakmil.daknong.gov.vn/upload/2005706/20230105/document__8___1__b864b.pdf); không thấy tệp bản đồ."
+        },
+        {
+          "ten": "Huyện Đắk R'lấp",
+          "trang_thai": "khong-tim-thay",
+          "ban_do": [],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "http://dakrlap.daknong.gov.vn/thong-bao-cong-bo-cong-khai-dieu-chinh-quy-hoach-su-dung-dat-den-nam-2030-huyen-dak-rlap-tinh-dak-nong/",
+          "ghi_chu": "Có bài công bố công khai ĐIỀU CHỈNH QHSDĐ 2030 (bản lưu 11/07/2025, phần tệp đính kèm không lưu được) + Nghị quyết HĐND thông qua điều chỉnh (6/2025)."
+        },
+        {
+          "ten": "Huyện Đắk Song",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            {
+              "url": "https://storage-vnportal.vnpt.vn/dkg-chinhquyen/4807/quantritintuc/BẢN ĐỒ ĐC QHSDĐ 2030638870444399713675.pdf",
+              "dinh_dang": "pdf",
+              "dung_luong": "16,2 MB",
+              "loai": "điều chỉnh QHSDĐ 2030 (MỚI NHẤT)",
+              "con_song": "có (HTTP 200) qua storage-vnportal.vnpt.vn",
+              "ban_luu": "",
+              "ghi_chu": "Bài gốc trỏ storage.daknong.gov.vn/... (nay không kết nối) — cùng tệp tải được ở storage-vnportal.vnpt.vn. Bài còn có báo cáo thuyết minh + thông báo công khai + QĐ 901 cùng thư mục, và nhúng WebGIS gis.daknong.gov.vn/quyhoachv4.aspx (chưa thử)."
+            }
+          ],
+          "quyet_dinh": { "so": "2078/QĐ-UBND", "ngay": "09/12/2022", "url": "https://storage-vnportal.vnpt.vn/dkg-chinhquyen/1/quantritintuc/2078qdub638073006255499620.pdf" },
+          "trang": "http://daksong.daknong.gov.vn/Ban-do/quyet-dinh-ve-viec-phe-duyet-dieu-chinh-quy-hoach-su-dung-dat-den-nam-2030-huyen-dak-song-tinh-d-520636",
+          "ghi_chu": "QĐ gốc 2078 (bản quét, còn tải được) đăng ở cổng tỉnh https://daknong.gov.vn/quy-hoach-ke-hoach-su-dung-dat/phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-dak-song-tinh-dak-nong-353502 (bản lưu); ngày theo kết quả tìm kiếm. ĐIỀU CHỈNH: QĐ 901/QĐ-UBND của UBND tỉnh (2025; bản quét — chưa đọc được ngày): https://storage-vnportal.vnpt.vn/dkg-chinhquyen/4807/quantritintuc/QUYẾT ĐỊNH SỐ  901-QĐ-UBND TỈNH638870444595810850.pdf. Chưa thấy bản đồ QHSDĐ 2030 gốc (2022)."
+        },
+        {
+          "ten": "Huyện Krông Nô",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            {
+              "url": "http://krongno.daknong.gov.vn/upload/102504/fck/ubndhuyenkrongno/BD%20QH2030%20KRONGNO.rar",
+              "dinh_dang": "rar",
+              "dung_luong": "~162 MB (theo bản lưu)",
+              "loai": "QHSDĐ 2030 — đăng 8/2022, TRƯỚC QĐ phê duyệt → có thể là bản dự thảo",
+              "con_song": "không — đường dẫn nay chỉ trả 6 KB",
+              "ban_luu": "https://web.archive.org/web/20220809161153/http://krongno.daknong.gov.vn/upload/102504/fck/ubndhuyenkrongno/BD%20QH2030%20KRONGNO.rar",
+              "ghi_chu": "Chưa xem được mục lục (kho lưu trữ từ chối kết nối lúc kiểm)."
+            }
+          ],
+          "quyet_dinh": { "so": "2074/QĐ-UBND", "ngay": "09/12/2022", "url": "https://krongno.daknong.gov.vn/upload/102504/20230131/QD_phe_duyet_QH2030_krong_no_f5b62.pdf" },
+          "trang": "",
+          "ghi_chu": "Tệp QĐ chỉ còn bản lưu (27/03/2023); số + ngày theo kết quả tìm kiếm (meeymap — tư nhân) và tệp tờ trình huyện. Huyện đã trình HĐND nghị quyết thông qua ĐIỀU CHỈNH QHSDĐ 2030 (krongno.daknong.gov.vn/upload/102504/fck/vinhtc/81-TTr-UBND_.pdf)."
+        },
+        {
+          "ten": "Huyện Tuy Đức",
+          "trang_thai": "chi-co-quyet-dinh",
+          "ban_do": [],
+          "quyet_dinh": { "so": "2079/QĐ-UBND", "ngay": "", "url": "https://tuyduc.daknong.gov.vn/wp-content/uploads/2023/01/Quyet-dinh-2079-phe-duyet-QH-den-2030.pdf" },
+          "trang": "http://tuyduc.daknong.gov.vn/thong-bao/thong-bao-so-243-tb-ubnd-ngay-19-12-2022-ve-cong-bo-cong-khai-quy-hoach-su-dung-dat-thoi-ky-2021-2030-huyen-tuy-d/",
+          "ghi_chu": "TB 243/TB-UBND ngày 19/12/2022 công bố công khai (tệp https://tuyduc.daknong.gov.vn/wp-content/uploads/2023/01/243_TB_UBND_Thong-bao-cong-khai-Quy-hoach-2030.pdf). Cả hai tệp chỉ còn bản lưu (03/06/2023). Ngày QĐ chưa đọc (cùng đợt 09/12/2022 với các huyện khác — chưa xác minh)."
+        }
+      ],
+      "ghi_chu": "Tên miền daknong.gov.vn, stnmt.daknong.gov.vn, cdn.daknong.gov.vn, storage.daknong.gov.vn: không còn phân giải / kết nối (16/10/2026); một số cổng huyện còn phân giải nhưng tệp cũ đã mất. Tệp của cổng VNPT Đắk Nông vẫn tải được nếu đổi máy chủ sang storage-vnportal.vnpt.vn/dkg-chinhquyen/... (đã thử với Đắk Song). Danh sách tệp tìm bằng chỉ mục kho lưu trữ web (không có trang Sở nào liệt kê đủ 8 huyện). 4 QĐ phê duyệt cùng ngày 09/12/2022 (2074, 2078, 2079, 2081)."
+    },
+    {
+      "tinh_cu": "Đắk Lắk",
+      "tinh_moi": "Đắk Lắk",
+      "trang_nguon": [
+        "https://snnmt.daklak.gov.vn/categories/thong-tin-quy-hoach-dat-dai-46.html",
+        "https://tuongtaccongdan.daklak.gov.vn/articles/cong-bo-quy-hoach-35.html",
+        "https://vpubnd.daklak.gov.vn/van-ban.html"
+      ],
+      "huyen": [
+        {
+          "ten": "TP. Buôn Ma Thuột",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            {
+              "url": "https://drive.google.com/file/d/1---kfUcjtR_4mz6y0Kumrn55FZVCT_1e/view?usp=share_link",
+              "dinh_dang": "rar (Google Drive; bên trong: pdf)",
+              "dung_luong": "20,2 MB",
+              "loai": "QHSDĐ 2030 (hồ sơ công khai)",
+              "con_song": "có (Google Drive tải được)",
+              "ban_luu": "",
+              "ghi_chu": "Tên tệp 'Ho so cong khai QH2030 thanh pho BMT.rar'. Mục lục: 'BDQHA3.dgn.pdf' (28,5 MB — bản đồ, tên gợi ý khổ A3) + '876_QD-UBND_11052023-signed_01.pdf' + Phụ lục I, II, III. Liên kết do bài của Sở NN&MT trỏ tới."
+            }
+          ],
+          "quyet_dinh": { "so": "876/QĐ-UBND", "ngay": "11/05/2023", "url": "" },
+          "trang": "https://snnmt.daklak.gov.vn/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-thanh-pho-buon-ma-thuot-tinh-dak-lak-1881.html",
+          "ghi_chu": "QĐ nằm trong tệp nén trên. Trang công bố của thành phố (https://buonmathuot.daklak.gov.vn/cong-bo-cong-khai-quy-hoach-su-dung-dat-den-nam-2030-cua-thanh-pho-buon-ma-thuot-tinh-dak-lak-6979.html) trả lỗi 500 hôm 16/10/2026."
+        },
+        {
+          "ten": "TX. Buôn Hồ",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://buonho.daklak.gov.vn/documents/10181/2852599/Ban%20do%20quy%20hoach%20SDD%20den%20nam%202030.pdf", "dinh_dang": "pdf", "dung_luong": "12,4 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "" }
+          ],
+          "quyet_dinh": { "so": "1174/QĐ-UBND", "ngay": "23/05/2022", "url": "https://snnmt.daklak.gov.vn/CMS/Content/QuyHoachKeHoach/QH2030/2 BH_QĐ1174.pdf" },
+          "trang": "https://buonho.daklak.gov.vn/cong-bo-cong-khai-quy-hoach-su-dung-dat-den-nam-2030-thi-xa-buon-ho-tinh-dak-lak-4790.html",
+          "ghi_chu": "Trang thị xã còn sống: QĐ 1174 + Phụ lục I–III + báo cáo thuyết minh + TB 112 công bố + bản đồ. Bài của Sở: https://snnmt.daklak.gov.vn/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-thi-xa-buon-ho-tinh-dak-lak-1620.html."
+        },
+        {
+          "ten": "Huyện Buôn Đôn",
+          "trang_thai": "chi-co-quyet-dinh",
+          "ban_do": [],
+          "quyet_dinh": { "so": "1476/QĐ-UBND", "ngay": "04/07/2022", "url": "https://snnmt.daklak.gov.vn/CMS/Content/QuyHoachKeHoach/QH2030/3 BĐ_1476.QĐ-UBND.pdf" },
+          "trang": "https://snnmt.daklak.gov.vn/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-buon-don-tinh-dak-lak-1667.html",
+          "ghi_chu": "ĐIỀU CHỈNH (mới nhất): QĐ 1376/QĐ-UBND (tệp ngày 20/06/2025) 'phê duyệt Điều chỉnh QHSDĐ đến năm 2030 huyện Buôn Đôn': https://vpubnd.daklak.gov.vn/CMS/Content/VanBan/2025/thang-6/1376_QD-UBND_20062025-signed_01.pdf (trang tin https://vpubnd.daklak.gov.vn/Documents/Detail/8186). Không thấy bản đồ."
+        },
+        {
+          "ten": "Huyện Cư Kuin",
+          "trang_thai": "khong-vao-duoc",
+          "ban_do": [],
+          "quyet_dinh": { "so": "1630/QĐ-UBND", "ngay": "25/07/2022", "url": "" },
+          "trang": "https://cukuin.daklak.gov.vn/Documents/Detail/408?alias=ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-cu-kuin-tinh-dak-lak",
+          "ghi_chu": "cukuin.daklak.gov.vn không còn phân giải; số + ngày theo đoạn trích kết quả tìm kiếm của chính trang này. Sở NN&MT không có bài QHSDĐ 2030 của Cư Kuin; trang Công bố quy hoạch chỉ có quy hoạch xây dựng xã."
+        },
+        {
+          "ten": "Huyện Cư M'gar",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://iocqh.vnptdaklak.vn/pdf_quyhoach/CUMGAR/File%20ban%20do%20QHSD%20dat%202030.pdf", "dinh_dang": "pdf", "dung_luong": "14,6 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Máy chủ tệp mà trang tuongtaccongdan.daklak.gov.vn trỏ tới." },
+            { "url": "https://cumgar.daklak.gov.vn/documents/10641/5711354/BDQHSDD%202030%20HUYEN%20CU%20MGAR%20%283%29.jpg", "dinh_dang": "jpg", "dung_luong": "~45,8 MB (theo bản lưu)", "loai": "QHSDĐ 2030", "con_song": "không (404)", "ban_luu": "https://web.archive.org/web/20220809050417/https://cumgar.daklak.gov.vn/documents/10641/5711354/BDQHSDD%202030%20HUYEN%20CU%20MGAR%20%283%29.jpg?t=1637634569356", "ghi_chu": "Đăng 11/2021 (trước QĐ 31/05/2022) → có thể là bản trình duyệt." }
+          ],
+          "quyet_dinh": { "so": "1219/QĐ-UBND", "ngay": "31/05/2022", "url": "https://snnmt.daklak.gov.vn/CMS/Content/QuyHoachKeHoach/QH2030/5 CM_1219.QĐ-UBND.pdf" },
+          "trang": "https://snnmt.daklak.gov.vn/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-cu-mgar-tinh-dak-lak-1668.html",
+          "ghi_chu": "Trang tuongtaccongdan còn có bản đồ KHSDĐ 2024 + bản đồ chuyển mục đích 2024 (không phải QHSDĐ)."
+        },
+        {
+          "ten": "Huyện Ea H'leo",
+          "trang_thai": "chi-co-quyet-dinh",
+          "ban_do": [],
+          "quyet_dinh": { "so": "1314/QĐ-UBND", "ngay": "13/06/2022", "url": "https://snnmt.daklak.gov.vn/CMS/Content/QuyHoachKeHoach/QH2030/6 EH_1314.QĐ-UBND.pdf" },
+          "trang": "https://snnmt.daklak.gov.vn/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-ea-hleo-tinh-dak-lak-1669.html",
+          "ghi_chu": "Bài của Sở: QĐ + 3 phụ lục bảng biểu, không có bản đồ."
+        },
+        {
+          "ten": "Huyện Ea Kar",
+          "trang_thai": "chi-co-quyet-dinh",
+          "ban_do": [],
+          "quyet_dinh": { "so": "1284/QĐ-UBND", "ngay": "08/06/2022", "url": "https://snnmt.daklak.gov.vn/CMS/Content/QuyHoachKeHoach/QH2030/7 EK_1284.QĐ-STNMT.pdf" },
+          "trang": "https://snnmt.daklak.gov.vn/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-ea-kar-tinh-dak-lak-1670.html",
+          "ghi_chu": "Tệp QĐ là bản quét (không có lớp chữ); ngày theo đoạn trích QĐ khác của UBND tỉnh trích dẫn lại. Cổng huyện từng đăng 'QĐ Vv QHSDĐ đến năm 2030 huyện Ea Kar.pdf' (bản lưu 26/09/2022)."
+        },
+        {
+          "ten": "Huyện Ea Súp",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://easup.daklak.gov.vn/uploads/easup/tin-tuc/quy-hoach-su-dung-dat-dai/BD%20QHSDD%20EA%20SUP%202030%20-%20Cong%20bo.pdf", "dinh_dang": "pdf", "dung_luong": "26,0 MB", "loai": "QHSDĐ 2030 (bản công bố)", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "" },
+            { "url": "https://iocqh.vnptdaklak.vn/pdf_quyhoach/EASUP/1%20QHSDD%20EA%20SUP%202030.pdf", "dinh_dang": "pdf", "dung_luong": "36,6 MB", "loai": "QHSDĐ 2030 (chưa mở xem — dung lượng lớn nên nhiều khả năng là bản đồ)", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "" }
+          ],
+          "quyet_dinh": { "so": "2185/QĐ-UBND", "ngay": "28/09/2022", "url": "https://snnmt.daklak.gov.vn/CMS/Content/QuyHoachKeHoach/QH2030/ES.2030.2185.QĐ-UBND.pdf" },
+          "trang": "https://snnmt.daklak.gov.vn/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-ea-sup-tinh-dak-lak-1761.html",
+          "ghi_chu": "ĐIỀU CHỈNH (mới nhất): QĐ 1414/QĐ-UBND ngày 24/6/2025 (https://vpubnd.daklak.gov.vn/CMS/Content/VanBan/2025/thang-6/1414_QD-UBND_24062025-signed_01.pdf) + 5 phụ lục trên daklak.gov.vn/documents/10181/3633623/182017…182021-*_DCQH2030_EASUP.pdf (bản lưu). Chưa thấy bản đồ điều chỉnh."
+        },
+        {
+          "ten": "Huyện Krông Ana",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://iocqh.vnptdaklak.vn/pdf_quyhoach/KRONG%20ANA/Quy%20hoach%20su%20dung%20dat%202030/3.%20BAN%20DO%20QHSDD%202021%20DEN%202030.pdf", "dinh_dang": "pdf", "dung_luong": "11,7 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "" },
+            { "url": "https://krongana.daklak.gov.vn/Upload/Images/QH2030_HUYEN_KRONGANA_dgn.pdf", "dinh_dang": "pdf (in từ DGN)", "dung_luong": "20,2 MB", "loai": "QHSDĐ 2030", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Trên cổng huyện." }
+          ],
+          "quyet_dinh": { "so": "1872/QĐ-UBND", "ngay": "22/08/2022", "url": "https://snnmt.daklak.gov.vn/CMS/Content/QuyHoachKeHoach/QH2030/KA.2030.1872.QĐ-UBND.pdf" },
+          "trang": "https://snnmt.daklak.gov.vn/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-krong-ana-tinh-dak-lak-1736.html",
+          "ghi_chu": "ĐIỀU CHỈNH (mới nhất): QĐ 1395/QĐ-UBND ngày 24/06/2025 (https://vpubnd.daklak.gov.vn/CMS/Content/VanBan/2025/thang-6/1395_QD-UBND_24062025-signed_01.pdf; QĐ ghi kèm bản đồ điều chỉnh tỷ lệ 1/25.000) — chưa thấy tệp bản đồ điều chỉnh."
+        },
+        {
+          "ten": "Huyện Krông Bông",
+          "trang_thai": "khong-vao-duoc",
+          "ban_do": [
+            {
+              "url": "https://krongbong.daklak.gov.vn/documents/10181/455738/QHSDD2021-2030KRB.rar/76cb05a4-f479-4969-a9e5-6ed2ed1163a0",
+              "dinh_dang": "rar",
+              "dung_luong": "~26,1 MB (theo bản lưu)",
+              "loai": "QHSDĐ 2030 (hồ sơ — chưa xác minh bên trong có bản đồ)",
+              "con_song": "không (HTTP 500)",
+              "ban_luu": "https://web.archive.org/web/20220818222414/https://krongbong.daklak.gov.vn/documents/10181/455738/QHSDD2021-2030KRB.rar/76cb05a4-f479-4969-a9e5-6ed2ed1163a0",
+              "ghi_chu": "Chưa xem được mục lục (kho lưu trữ từ chối kết nối lúc kiểm)."
+            }
+          ],
+          "quyet_dinh": { "so": "1183/QĐ-UBND", "ngay": "24/05/2022", "url": "https://snnmt.daklak.gov.vn/CMS/Content/QuyHoachKeHoach/QH2030/10 KBO_1183.QĐ-UBND.pdf" },
+          "trang": "https://snnmt.daklak.gov.vn/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-krong-bong-tinh-dak-lak-1671.html",
+          "ghi_chu": "ĐIỀU CHỈNH: 540/QĐ-UBND ngày 10/03/2025 (theo một danh sách văn bản trong kết quả tìm kiếm — chưa mở xác minh)."
+        },
+        {
+          "ten": "Huyện Krông Búk",
+          "trang_thai": "chi-co-quyet-dinh",
+          "ban_do": [],
+          "quyet_dinh": { "so": "1731/QĐ-UBND", "ngay": "05/08/2022", "url": "https://snnmt.daklak.gov.vn/CMS/Content/QuyHoachKeHoach/QH2030/9 KBU 1731.QĐ-UBND.pdf" },
+          "trang": "https://snnmt.daklak.gov.vn/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-krong-buk-tinh-dak-lak-1710.html",
+          "ghi_chu": "ĐIỀU CHỈNH (mới nhất): QĐ 1323/QĐ-UBND ngày 17/6/2025 (https://vpubnd.daklak.gov.vn/CMS/Content/1323_QD-UBND_17062025-signed_01.pdf). Không thấy bản đồ."
+        },
+        {
+          "ten": "Huyện Krông Năng",
+          "trang_thai": "chi-co-quyet-dinh",
+          "ban_do": [],
+          "quyet_dinh": { "so": "1104/QĐ-UBND", "ngay": "13/05/2022", "url": "https://snnmt.daklak.gov.vn/CMS/Content/QuyHoachKeHoach/QH2030/12 KN_QĐ1104.pdf" },
+          "trang": "https://snnmt.daklak.gov.vn/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-krong-nang-tinh-dak-lak-1614.html",
+          "ghi_chu": ""
+        },
+        {
+          "ten": "Huyện Krông Pắc",
+          "trang_thai": "chi-co-quyet-dinh",
+          "ban_do": [],
+          "quyet_dinh": { "so": "1960/QĐ-UBND", "ngay": "31/08/2022", "url": "https://snnmt.daklak.gov.vn/CMS/Content/QuyHoachKeHoach/QH2030/KP.2030.1960.QĐ-UBND.pdf" },
+          "trang": "https://snnmt.daklak.gov.vn/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-krong-pac-tinh-dak-lak-1737.html",
+          "ghi_chu": "ĐIỀU CHỈNH + KHSDĐ 2025: QĐ 1097/QĐ-UBND ngày 20/05/2025 (tiêu đề thấy ở https://vpubnd.daklak.gov.vn/Documents/Detail/7968; số + ngày theo tóm tắt kết quả tìm kiếm — chưa mở). Xã Ea Yông đăng một ảnh 'Bản đồ QHSDĐ huyện Krông Pắc đến năm 2030.jpg' chỉ ~100 KB (bản lưu 25/06/2025) — quá nhỏ, không dùng được."
+        },
+        {
+          "ten": "Huyện Lắk",
+          "trang_thai": "chi-co-quyet-dinh",
+          "ban_do": [],
+          "quyet_dinh": { "so": "1790/QĐ-UBND", "ngay": "10/08/2022", "url": "https://snnmt.daklak.gov.vn/CMS/Content/QuyHoachKeHoach/QH2030/12 LAK 1790.QĐ-UBND.pdf" },
+          "trang": "https://snnmt.daklak.gov.vn/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-lak-tinh-dak-lak-1711.html",
+          "ghi_chu": "ĐIỀU CHỈNH (mới nhất): QĐ 1398/QĐ-UBND ngày 24/6/2025 (https://vpubnd.daklak.gov.vn/CMS/Content/VanBan/2025/thang-6/1398_QD-UBND_24062025-signed_01.pdf — số + ngày theo tên tệp và kết quả tìm kiếm)."
+        },
+        {
+          "ten": "Huyện M'Đrắk",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            {
+              "url": "https://daklak.gov.vn/documents/10181/2163501/QHSDĐ+2030+MDR+GUI+VPUB+TINH.rar/a56ad73b-bfb3-4d21-8b64-f40b093cd8ec",
+              "dinh_dang": "rar (bên trong: pdf + jpg)",
+              "dung_luong": "50,2 MB",
+              "loai": "QHSDĐ 2030 — hồ sơ 'gửi VPUB tỉnh' (có thể là bản trình duyệt)",
+              "con_song": "chưa rõ — máy này không kết nối được daklak.gov.vn hôm 16/10/2026",
+              "ban_luu": "https://web.archive.org/web/20250626071232/https://daklak.gov.vn/documents/10181/2163501/QHSD%C4%90+2030+MDR+GUI+VPUB+TINH.rar/a56ad73b-bfb3-4d21-8b64-f40b093cd8ec",
+              "ghi_chu": "Mục lục (đọc qua bản lưu): 'BD QH2030 MDRAK.pdf' (17,8 MB) + 'BD QH2030 MDRAK.jpg' (35,6 MB) + 'BC Tom tat QHSDĐ 2030 MDR.pdf' + 'Bieu kem bao cao.xlsx' + 'Copy of 987.pdf'."
+            }
+          ],
+          "quyet_dinh": { "so": "1069/QĐ-UBND", "ngay": "11/05/2022", "url": "https://snnmt.daklak.gov.vn/CMS/Content/QuyHoachKeHoach/QH2030/15 MD_QĐ1069.pdf" },
+          "trang": "https://snnmt.daklak.gov.vn/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-mdrak-tinh-dak-lak-1615.html",
+          "ghi_chu": "ĐIỀU CHỈNH (mới nhất): QĐ 1159/QĐ-UBND ngày 29/5/2025 (đã đọc trang 1: https://daklak.gov.vn/documents/10181/3633623/180010-1159_QD-UBND.pdf?version=1.0); một danh sách văn bản khác ghi '539/QĐ-UBND 10/03/2025 phê duyệt điều chỉnh QHSDĐ M'Drắk' — chưa xác minh. Trang tuongtaccongdan (iocqh) có TB công khai + báo cáo thuyết minh + biểu QH 2030, không có bản đồ."
+        }
+      ],
+      "ghi_chu": "Sở NN&MT (snnmt.daklak.gov.vn, còn sống) có 14 bài QHSDĐ 2030 cấp huyện (thiếu Cư Kuin) — mỗi bài nhúng QĐ + 3 phụ lục bảng biểu ở CMS/Content/QuyHoachKeHoach/QH2030/, KHÔNG kèm bản đồ (riêng BMT là tệp nén Google Drive có bản đồ). Bản đồ nằm rải rác: trang 'Công bố quy hoạch' của Cổng giao tiếp công dân (tệp ở iocqh.vnptdaklak.vn — VNPT Đắk Lắk) và cổng từng huyện. Ngày QĐ đọc trên trang 1 của QĐ (trừ Ea Kar bản quét, Cư Kuin). Đợt điều chỉnh QHSDĐ 2030 tháng 5–6/2025 (theo QĐ 105/QĐ-UBND 17/01/2025 phân bổ chỉ tiêu cho cấp huyện) — chỉ thấy quyết định, chưa thấy bản đồ điều chỉnh."
+    },
+    {
+      "tinh_cu": "Phú Yên",
+      "tinh_moi": "Đắk Lắk",
+      "trang_nguon": [
+        "https://storage-vnportal.vnpt.vn/pyn-ubnd/",
+        "https://tptuyhoa.phuyen.gov.vn/thong-tin-thong-bao/thong-bao-ve-viec-cong-khai-dieu-chinh-quy-hoach-su-dung-dat-den-nam-2030-thanh-pho-tuy-hoa-788414",
+        "https://songhinh.phuyen.gov.vn/van-ban-phap-luat/van-ban-chi-dao/ubnd-huyen-song-hinh/thong-bao-v-v-cong-bo-cong-khai-dieu-chinh-quy-hoach-su-dung-dat-den-nam-2030-huyen-song-hinh.html",
+        "https://congbao.phuyen.gov.vn/van-ban-theo-linh-vuc/quyet-dinh-so-270-qd-ubnd-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-cua-huyen-dong-xuan.html"
+      ],
+      "huyen": [
+        {
+          "ten": "TP. Tuy Hòa",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://storage-vnportal.vnpt.vn/pyn-ubnd/7329/THANG 022025/BD DC QHSDD TP.pdf", "dinh_dang": "pdf", "dung_luong": "17,1 MB", "loai": "điều chỉnh QHSDĐ 2030 (MỚI NHẤT)", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Kèm thông báo công khai điều chỉnh (2/2025) cùng QĐ, biểu, báo cáo." },
+            { "url": "https://storage-vnportal.vnpt.vn/pyn-ubnd/7329/TUYHOA/ban-do-quy-hoach-2021-2030-tp-tuy-hoa.pdf", "dinh_dang": "pdf", "dung_luong": "23,1 MB", "loai": "QHSDĐ 2030 (bản gốc)", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Thấy qua chỉ mục kho lưu trữ; chưa thấy bài đăng kèm." },
+            { "url": "https://storage-vnportal.vnpt.vn/pyn-ubnd/7329/AMTHANH/bdqh-2021-2030-full_final.pdf", "dinh_dang": "pdf", "dung_luong": "19,0 MB", "loai": "QHSDĐ 2021-2030 (chưa mở; cùng kho tệp cổng TP Tuy Hòa — có thể trùng bản trên)", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "" }
+          ],
+          "quyet_dinh": { "so": "84/QĐ-UBND (điều chỉnh)", "ngay": "23/01/2025", "url": "https://storage-vnportal.vnpt.vn/pyn-ubnd/7329/THANG 022025/QD PHE DUYET DIEU CHINH.pdf" },
+          "trang": "https://tptuyhoa.phuyen.gov.vn/thong-tin-thong-bao/thong-bao-ve-viec-cong-khai-dieu-chinh-quy-hoach-su-dung-dat-den-nam-2030-thanh-pho-tuy-hoa-788414",
+          "ghi_chu": "Số 84 theo tên tệp 'Quyết dịnh 84 Quy hoạch sử dụng đất.pdf' (cùng dung lượng) trên trang phường 5; ngày 23/01/2025 theo nguồn tổng hợp — chưa đọc QĐ. QĐ gốc QHSDĐ 2030: 389/QĐ-UBND năm 2022 (nguồn tổng hợp, chưa xác minh). Trang TP đã chết (đọc qua bản lưu 19/03/2025), tệp vẫn tải được."
+        },
+        {
+          "ten": "TX. Sông Cầu",
+          "trang_thai": "khong-vao-duoc",
+          "ban_do": [
+            {
+              "url": "https://songcau.phuyen.gov.vn/wps/wcm/connect/songcau/6743d81d-21c4-479f-8b03-7fbbfedf98a5/QH+SDD2030.rar?MOD=AJPERES&attachment=true&id=1649132958926",
+              "dinh_dang": "rar",
+              "dung_luong": "chưa rõ",
+              "loai": "QHSDĐ 2030 (hồ sơ — chưa xác minh bên trong)",
+              "con_song": "không",
+              "ban_luu": "",
+              "ghi_chu": "Không có bản lưu. Kho tệp còn sống chỉ có ảnh xem trước 47 KB (https://storage-vnportal.vnpt.vn/pyn-ubnd/7607/Bando/ban-do-quy-hoach-su-dung-dat-thi-xa-song-cau-den-nam-2030_page-0001.jpg) — quá nhỏ."
+            }
+          ],
+          "quyet_dinh": { "so": "326/QĐ-UBND", "ngay": "", "url": "https://congbao.phuyen.gov.vn/van-ban-theo-linh-vuc/quyet-dinh-so-326-qd-ubnd-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-cua-thi-xa-song-cau.html" },
+          "trang": "https://songcau.phuyen.gov.vn/thong-bao/thong-bao-cong-bo-quy-hoach-su-dung-dat-den-nam-2030-cua-thi-xa-song-cau-616471",
+          "ghi_chu": "TB 273/TB-UBND công bố (bản lưu). ĐIỀU CHỈNH (mới nhất): QĐ 1218/QĐ-UBND ngày 09/9/2024 của UBND tỉnh — đọc trong TB công bố còn tải được: https://storage-vnportal.vnpt.vn/pyn-ubnd/7607/ThongBao/Thông báo công bố điều chỉnh quy hoạch sử dụng đất đến năm 2030 thị xã Sông Cầu.signed.signed.signed.pdf. Chưa thấy bản đồ điều chỉnh."
+        },
+        {
+          "ten": "TX. Đông Hòa",
+          "trang_thai": "khong-vao-duoc",
+          "ban_do": [
+            {
+              "url": "https://donghoa.phuyen.gov.vn/upload/104702/20220315/Cong_khai_QHSDD_2030_Dong_Hoa_220315093130_ff4e7.rar",
+              "dinh_dang": "rar",
+              "dung_luong": "chưa rõ",
+              "loai": "QHSDĐ 2030 (hồ sơ công khai — chưa xác minh bên trong)",
+              "con_song": "không",
+              "ban_luu": "https://web.archive.org/web/20220816064413/https://donghoa.phuyen.gov.vn/upload/104702/20220315/Cong_khai_QHSDD_2030_Dong_Hoa_220315093130_ff4e7.rar",
+              "ghi_chu": "Chưa xem được mục lục (kho lưu trữ từ chối kết nối lúc kiểm)."
+            }
+          ],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "https://donghoa.phuyen.gov.vn/thong-tin-can-biet/cac-du-an-quy-hoach-va-kh-su-dung-dat/v-v-cong-khai-ho-so-quy-hoach-su-dung-dat-den-nam-2030-cua-t.html",
+          "ghi_chu": "Bài 'V/v công khai hồ sơ QHSDĐ đến năm 2030 của thị xã Đông Hòa' (3/2022, bản lưu). Điều chỉnh: lấy ý kiến 6–7/2024, HĐND thị xã thông qua 10/2024 — chưa thấy QĐ tỉnh / bản đồ điều chỉnh."
+        },
+        {
+          "ten": "Huyện Đồng Xuân",
+          "trang_thai": "khong-vao-duoc",
+          "ban_do": [
+            {
+              "url": "https://dongxuan.phuyen.gov.vn/upload/105518/20241118/qhdat_2991c.rar",
+              "dinh_dang": "rar",
+              "dung_luong": "chưa rõ",
+              "loai": "điều chỉnh QHSDĐ 2030 (hồ sơ — chưa xác minh bên trong)",
+              "con_song": "không",
+              "ban_luu": "",
+              "ghi_chu": "Không có bản lưu."
+            }
+          ],
+          "quyet_dinh": { "so": "270/QĐ-UBND", "ngay": "22/02/2022", "url": "https://congbao.phuyen.gov.vn/van-ban-theo-linh-vuc/quyet-dinh-so-270-qd-ubnd-ve-viec-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-cua-huyen-dong-xuan.html" },
+          "trang": "https://dongxuan.phuyen.gov.vn/van-ban/thong-bao-cong-bo-cong-khai-dieu-chinh-quy-hoach-su-dung-dat-den-nam-2030-huyen-dong-xuan.html",
+          "ghi_chu": "Ngày QĐ 270 theo nguồn tổng hợp. ĐIỀU CHỈNH (mới nhất): QĐ 1425/QĐ-UBND (cuối 2024) — tệp https://dongxuan.phuyen.gov.vn/upload/105518/20241225/QD_1425-QD-UBND_dieu_chinh_QHSDD_2030_huyen_Dong_Xuan_0353c.pdf (máy chủ chết)."
+        },
+        {
+          "ten": "Huyện Phú Hòa",
+          "trang_thai": "khong-tim-thay",
+          "ban_do": [],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "https://phuhoa.phuyen.gov.vn/van-ban/van-ban-quan-ly-hanh-chinh/nghi-quyet-so-18-nq-hdnd-ngay-5-7-2024-ve-viec-dieu-chinh-quy-hoach-su-dung-dat-den-nam-2030-huyen-phu-hoa.html",
+          "ghi_chu": "Chỉ thấy Nghị quyết 18/NQ-HĐND ngày 05/7/2024 (HĐND huyện thông qua điều chỉnh QHSDĐ 2030). Trang tư nhân tracuuquyhoach.com có 'QHSDĐ đến năm 2030 huyện Phú Hòa' — không lấy."
+        },
+        {
+          "ten": "Huyện Sơn Hòa",
+          "trang_thai": "chi-co-quyet-dinh",
+          "ban_do": [],
+          "quyet_dinh": { "so": "327/QĐ-UBND", "ngay": "10/03/2022", "url": "https://storage-vnportal.vnpt.vn/pyn-ubnd/7346/VBCongKhai/327_qd_ubnd.pdf" },
+          "trang": "https://sonhoa.phuyen.gov.vn/quy-hoach-kh-su-dung-dat/quyet-dinh-v-v-phe-duyet-quy-hoach-su-dung-dat-den-nam-2030-huyen-son-hoa-598708",
+          "ghi_chu": "Ngày theo chữ ký số trên QĐ. Tệp 'bando_dcqhsdd.pdf' trong kho tệp (pyn-ubnd/7338/CKSudungDAT/Nam2020/) là điều chỉnh QHSDĐ đến năm 2020 — KHÔNG phải 2030."
+        },
+        {
+          "ten": "Huyện Sông Hinh",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://storage-vnportal.vnpt.vn/pyn-ubnd/7397/VNPT/2- BD DCQH 2030 H. Song hinh v8.pdf", "dinh_dang": "pdf", "dung_luong": "28,0 MB", "loai": "điều chỉnh QHSDĐ 2030 (MỚI NHẤT)", "con_song": "có (HTTP 200)", "ban_luu": "", "ghi_chu": "Thấy qua chỉ mục kho lưu trữ." },
+            { "url": "https://songhinh.phuyen.gov.vn/upload/103900/20241102/2__BD_DCQH_2030_H__Song_hinh_cong_bo_bb8ac.pdf", "dinh_dang": "pdf", "dung_luong": "chưa rõ", "loai": "điều chỉnh QHSDĐ 2030 (bản công bố)", "con_song": "không", "ban_luu": "https://web.archive.org/web/20250402135140/https://songhinh.phuyen.gov.vn/upload/103900/20241102/2__BD_DCQH_2030_H__Song_hinh_cong_bo_bb8ac.pdf", "ghi_chu": "Đính kèm thông báo số 404 công bố công khai (11/2024)." }
+          ],
+          "quyet_dinh": { "so": "1424/QĐ-UBND (điều chỉnh)", "ngay": "", "url": "https://songhinh.phuyen.gov.vn/upload/103900/20241102/1424_qd_1__Song_Hinh_48114.pdf" },
+          "trang": "https://songhinh.phuyen.gov.vn/van-ban-phap-luat/van-ban-chi-dao/ubnd-huyen-song-hinh/thong-bao-v-v-cong-bo-cong-khai-dieu-chinh-quy-hoach-su-dung-dat-den-nam-2030-huyen-song-hinh.html",
+          "ghi_chu": "QĐ điều chỉnh đăng 02/11/2024 (ngày ký chưa đọc). Chưa thấy QĐ / bản đồ QHSDĐ 2030 gốc (2022)."
+        },
+        {
+          "ten": "Huyện Tây Hòa",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            {
+              "url": "https://hoamytay.tayhoa.phuyen.gov.vn/laws/detail/Thong-bao-Ve-viec-cong-bo-cong-khai-Dieu-chinh-quy-hoach-su-dung-dat-nam-2030-huyen-Tay-Hoa-54/?download=1&id=1",
+              "dinh_dang": "pdf",
+              "dung_luong": "chưa rõ",
+              "loai": "điều chỉnh QHSDĐ 2030 (đợt 2023)",
+              "con_song": "không",
+              "ban_luu": "https://web.archive.org/web/20240530110617/http://hoamytay.tayhoa.phuyen.gov.vn/laws/detail/Thong-bao-Ve-viec-cong-bo-cong-khai-Dieu-chinh-quy-hoach-su-dung-dat-nam-2030-huyen-Tay-Hoa-54/?download=1&id=1",
+              "ghi_chu": "Tệp 2 'bandodchq.pdf' của thông báo công bố công khai điều chỉnh QHSDĐ 2030 huyện Tây Hòa, đăng lại trên trang xã Hòa Mỹ Tây."
+            }
+          ],
+          "quyet_dinh": { "so": "852/QĐ-UBND (điều chỉnh)", "ngay": "06/07/2023 (theo tên tệp, chưa đọc)", "url": "https://hoamytay.tayhoa.phuyen.gov.vn/laws/detail/Thong-bao-Ve-viec-cong-bo-cong-khai-Dieu-chinh-quy-hoach-su-dung-dat-nam-2030-huyen-Tay-Hoa-54/?download=1&id=2" },
+          "trang": "https://hoamytay.tayhoa.phuyen.gov.vn/laws/detail/Thong-bao-Ve-viec-cong-bo-cong-khai-Dieu-chinh-quy-hoach-su-dung-dat-nam-2030-huyen-Tay-Hoa-54/",
+          "ghi_chu": "Năm 2024 huyện lại lấy ý kiến bước 1–4 một đợt điều chỉnh mới (cổng huyện) — chưa thấy QĐ đợt này. Chưa thấy QĐ gốc (2022)."
+        },
+        {
+          "ten": "Huyện Tuy An",
+          "trang_thai": "khong-vao-duoc",
+          "ban_do": [
+            {
+              "url": "https://tuyan.phuyen.gov.vn/upload/105445/20250120/1__Ban_do_DCQH_SDD_den_nam_2030_Tuy_An_bc537.pdf",
+              "dinh_dang": "pdf",
+              "dung_luong": "chưa rõ",
+              "loai": "điều chỉnh QHSDĐ 2030 (MỚI NHẤT)",
+              "con_song": "không",
+              "ban_luu": "",
+              "ghi_chu": "Không có bản lưu của tệp (chỉ có bản lưu trang 15/05/2025)."
+            }
+          ],
+          "quyet_dinh": { "so": "chưa xác minh (tệp '3__Quyet_dinh_phe_duyet_dcd47.pdf')", "ngay": "", "url": "https://tuyan.phuyen.gov.vn/upload/105445/20250120/3__Quyet_dinh_phe_duyet_dcd47.pdf" },
+          "trang": "https://tuyan.phuyen.gov.vn/van-ban/van-ban-chi-dao-dieu-hanh/ve-viec-cong-bo-cong-khai-dieu-chinh-quy-hoach-su-dung-dat-den-nam-2030-huyen-tuy-an.html",
+          "ghi_chu": "Thông báo số 09 ngày 10/01/2025 công bố công khai điều chỉnh QHSDĐ 2030 (kèm QĐ, báo cáo thuyết minh, bản đồ) — mọi tệp trên máy chủ đã chết."
+        }
+      ],
+      "ghi_chu": "16/10/2026: phuyen.gov.vn và mọi cổng huyện *.phuyen.gov.vn không còn phân giải; đọc bài qua bản lưu web.archive.org. Tệp đặt ở kho VNPT storage-vnportal.vnpt.vn/pyn-ubnd/ VẪN tải được; tệp đặt ở /upload/ của cổng huyện (Sông Hinh, Tuy An, Đồng Xuân, Đông Hòa) thì mất. Không tìm thấy trang Sở TNMT Phú Yên (stnmt.phuyen.gov.vn không có bản lưu). Cả 9 đơn vị đều làm điều chỉnh QHSDĐ 2030 năm 2023–2025 → bản đồ điều chỉnh là bản mới nhất. Trang tư nhân có bản đồ: tracuuquyhoach.com, qhviet.com, meeymap, bandovietnam.com.vn (không lấy)."
+    },
+    {
+      "tinh_cu": "Gia Lai",
+      "tinh_moi": "Gia Lai",
+      "trang_nguon": [
+        "https://stnmt.gialai.gov.vn/thong-tin-chuyen-nganh/dat-dai/quy-hoach-su-dung-dat/cap-huyen",
+        "https://tnmtgialai.gov.vn/"
+      ],
+      "huyen": [
+        {
+          "ten": "TP. Pleiku",
+          "trang_thai": "chi-co-quyet-dinh",
+          "ban_do": [],
+          "quyet_dinh": { "so": "429/QĐ-UBND", "ngay": "", "url": "https://web.archive.org/web/20230329215111/http://pleiku.gialai.gov.vn/getattachment/61e9a063-432b-4c2a-ae83-0a77ca6587f8/429-Q%EF%BF%BD%EF%BF%BD-phe-duyet-QH-SD-%EF%BF%BD%EF%BF%BDat-%EF%BF%BD%EF%BF%BDen-nam-2030-va-KH-SD-%EF%BF%BD%EF%BF%BDat-nam-%EF%BF%BD%EF%BF%BDau-Pleiku.pdf.aspx" },
+          "trang": "",
+          "ghi_chu": "Số theo tên tệp '429-QĐ phê duyệt QH SD đất đến năm 2030 và KH SD đất năm đầu Pleiku' (chỉ còn bản lưu; đường dẫn cũ nay chuyển về trang chủ). Có thêm báo cáo thuyết minh, phụ biểu 01–34, tệp '2030.pdf' (0,8 MB, chưa rõ)."
+        },
+        {
+          "ten": "TX. An Khê",
+          "trang_thai": "khong-tim-thay",
+          "ban_do": [],
+          "quyet_dinh": { "so": "334/QĐ-UBND", "ngay": "2022", "url": "" },
+          "trang": "",
+          "ghi_chu": "Số QĐ theo tiêu đề trên thuvienphapluat (tư nhân) — chưa xác minh trên trang nhà nước. Bản lưu cổng thị xã không có tài liệu QHSDĐ 2030."
+        },
+        {
+          "ten": "TX. Ayun Pa",
+          "trang_thai": "chi-co-quyet-dinh",
+          "ban_do": [],
+          "quyet_dinh": { "so": "chưa đọc", "ngay": "", "url": "https://web.archive.org/web/20220815122841/http://ayunpa.gialai.gov.vn/getattachment/190ce2c6-6504-4a07-86b5-a71cc504f467/phe-duyet-Quy-hoach-su-dung-%C4%91at-%C4%91en-nam-2030-va-ke-hoach-su-dung-%C4%91at-nam-%C4%91au-cua-quy-hoach-su-dung-%C4%91at-thi-xa-Ayun-Pa,-tinh-Gia-Lai.pdf.aspx" },
+          "trang": "",
+          "ghi_chu": "Còn có tệp 'Quy hoạch sử dụng đất thời kỳ 2021-2030 và kế hoạch sử dụng đất năm đầu của thị xã Ayun Pa' ~4,4 MB (https://web.archive.org/web/20220815145126/http://ayunpa.gialai.gov.vn/getattachment/73542e64-c59d-4b61-a500-e853cf40be3c/Quy-hoach-su-dung-%C4%91at-thoi-ky-2021-2030-va-ke-hoach-su-dung-%C4%91at-nam-%C4%91au-cua-thi-xa-Ayun-Pa,-tinh-Gia-Lai.pdf.aspx) — chưa mở, có thể là bản đồ hoặc báo cáo; và báo cáo thuyết minh."
+        },
+        {
+          "ten": "Huyện Chư Păh",
+          "trang_thai": "chi-co-quyet-dinh",
+          "ban_do": [],
+          "quyet_dinh": { "so": "chưa đọc", "ngay": "", "url": "https://web.archive.org/web/20220728140902/http://chupah.gialai.gov.vn/Media/ResourceAdmin/files/Q%C4%90_QHSDD%202030_Chu%20Pah_signed_signed_signed.pdf" },
+          "trang": "",
+          "ghi_chu": "Thông báo công bố QH 2030 (bản lưu 27/07/2022) + 'HS LAY Y KIEN quy hoạch 2030.rar' ~23 MB (hồ sơ lấy ý kiến = dự thảo). ĐIỀU CHỈNH: 370/QĐ-UBND ngày 24/06/2025 (trích dẫn trong văn bản cấp xã — chưa xác minh)."
+        },
+        {
+          "ten": "Huyện Chư Prông",
+          "trang_thai": "khong-tim-thay",
+          "ban_do": [],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "",
+          "ghi_chu": "Chỉ có bản đồ DỰ THẢO lấy ý kiến 6/2021 ('Ban-đo-QHSDD2030.pdf', bản lưu ~1 MB — có thể bị cắt) và 'Quyết định 4141 công bố công khai quy hoạch 2030' (bản lưu 24/04/2025). Trang tư nhân quyhoachbinhdinh.vn (hệ thống JMAP, không rõ đơn vị vận hành) có 'Bản đồ điều chỉnh QHSDĐ đến năm 2030 huyện Chư Prông' — không lấy."
+        },
+        { "ten": "Huyện Chư Pưh", "trang_thai": "khong-tim-thay", "ban_do": [], "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" }, "trang": "", "ghi_chu": "Bản lưu cổng huyện không có tài liệu QHSDĐ 2030." },
+        {
+          "ten": "Huyện Chư Sê",
+          "trang_thai": "khong-tim-thay",
+          "ban_do": [],
+          "quyet_dinh": { "so": "333/QĐ-UBND", "ngay": "09/05/2022", "url": "" },
+          "trang": "",
+          "ghi_chu": "Số + ngày theo nguồn tổng hợp (tư nhân) — chưa xác minh. Chỉ có bản đồ DỰ THẢO 5/2021 (https://chuse.gialai.gov.vn/CorporateSite111/media/TAI-LIEU/Ban-do-QH-SDD-2021-2030.pdf, bản lưu ~1 MB — có thể bị cắt) và Nghị quyết HĐND thông qua QHSDĐ 2030."
+        },
+        { "ten": "Huyện Đak Đoa", "trang_thai": "khong-tim-thay", "ban_do": [], "quyet_dinh": { "so": "344/QĐ-UBND (điều chỉnh)", "ngay": "18/06/2025", "url": "" }, "trang": "", "ghi_chu": "Số QĐ điều chỉnh trích dẫn trong thông báo cấp xã năm 2026 — chưa xác minh. dakdoa.gialai.gov.vn nay là cổng xã Đak Đoa." },
+        { "ten": "Huyện Đak Pơ", "trang_thai": "khong-tim-thay", "ban_do": [], "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" }, "trang": "", "ghi_chu": "Chỉ có báo cáo thuyết minh + biểu QHSDĐ 2030 (bản lưu 14/08/2022)." },
+        {
+          "ten": "Huyện Đức Cơ",
+          "trang_thai": "khong-vao-duoc",
+          "ban_do": [
+            {
+              "url": "https://ducco.gialai.gov.vn/getattachment/8303be52-60e1-4a3b-8d7a-d57c4a0baa2a/Ban-%C4%90o-Quy-hoach-%C4%90at-huyen-%C4%90uc-Co-%C4%90en-nam-2030-the.aspx",
+              "dinh_dang": "pdf (đoán theo kiểu tệp)",
+              "dung_luong": "~1 MB trong bản lưu (nhiều khả năng bị cắt cụt)",
+              "loai": "QHSDĐ 2030 (tên tệp 'Bản đồ Quy hoạch đất huyện Đức Cơ đến năm 2030 …')",
+              "con_song": "không — đường dẫn chuyển về trang chủ cổng xã mới",
+              "ban_luu": "https://web.archive.org/web/20230330185724/https://ducco.gialai.gov.vn/getattachment/8303be52-60e1-4a3b-8d7a-d57c4a0baa2a/Ban-%EF%BF%BD%EF%BF%BDo-Quy-hoach-%EF%BF%BD%EF%BF%BDat-huyen-%EF%BF%BD%EF%BF%BDuc-Co-%EF%BF%BD%EF%BF%BDen-nam-2030-the.aspx",
+              "ghi_chu": ""
+            }
+          ],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "",
+          "ghi_chu": ""
+        },
+        { "ten": "Huyện Ia Grai", "trang_thai": "khong-tim-thay", "ban_do": [], "quyet_dinh": { "so": "19/QĐ-UBND (điều chỉnh)", "ngay": "10/06/2025", "url": "" }, "trang": "", "ghi_chu": "Số theo đoạn trích kết quả tìm kiếm từ trang Sở TNMT cũ (số rất nhỏ so với QĐ tỉnh — cần đối chiếu)." },
+        {
+          "ten": "Huyện Ia Pa",
+          "trang_thai": "khong-vao-duoc",
+          "ban_do": [
+            {
+              "url": "https://iapa.gialai.gov.vn/getattachment/928f8a84-f75f-4928-bf52-c85d7142434f/BDQH-2030.pdf.aspx",
+              "dinh_dang": "pdf",
+              "dung_luong": "~1 MB trong bản lưu (nhiều khả năng bị cắt cụt)",
+              "loai": "QHSDĐ 2030",
+              "con_song": "không — đường dẫn chuyển về trang chủ",
+              "ban_luu": "https://web.archive.org/web/20230322151955/https://iapa.gialai.gov.vn/getattachment/928f8a84-f75f-4928-bf52-c85d7142434f/BDQH-2030.pdf.aspx",
+              "ghi_chu": ""
+            }
+          ],
+          "quyet_dinh": { "so": "98/QĐ-UBND (điều chỉnh, kèm KHSDĐ 2025)", "ngay": "25/06/2025", "url": "" },
+          "trang": "https://iapa.gialai.gov.vn/getattachment/chuyen-muc/Quy-hoach-Ke-hoach-(1)/quy-hoach,-ke-hoach-su-dung-%C4%91at/Cong-bo,-cong-khai-Quy-hoach-su-dung-%C4%91at-%C4%91en-nam-2/",
+          "ghi_chu": "Mục 'Công bố, công khai QHSDĐ đến năm 2030' (bản lưu 2022) có thông báo công bố, NQ HĐND, báo cáo thuyết minh, biểu 03/04/05. Số QĐ điều chỉnh theo đoạn trích tìm kiếm từ Sở TNMT cũ — chưa xác minh."
+        },
+        { "ten": "Huyện KBang", "trang_thai": "khong-tim-thay", "ban_do": [], "quyet_dinh": { "so": "328/QĐ-UBND", "ngay": "09/05/2022", "url": "" }, "trang": "", "ghi_chu": "Số + ngày theo nguồn tổng hợp — chưa xác minh. Bản lưu cổng huyện có NQ HĐND thông qua QHSDĐ 2030 và tài liệu 'QHSDĐ 2021-2030, KHSDĐ…' (~0,7 MB), không thấy bản đồ." },
+        { "ten": "Huyện Kông Chro", "trang_thai": "khong-tim-thay", "ban_do": [], "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" }, "trang": "", "ghi_chu": "" },
+        { "ten": "Huyện Krông Pa", "trang_thai": "khong-tim-thay", "ban_do": [], "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" }, "trang": "", "ghi_chu": "Chỉ có Tờ trình 149/TTr-UBND QHSDĐ đến năm 2030 (bản lưu 2022). Tên miền krongpa.gialai.gov.vn không còn phân giải." },
+        { "ten": "Huyện Mang Yang", "trang_thai": "khong-tim-thay", "ban_do": [], "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" }, "trang": "", "ghi_chu": "" },
+        { "ten": "Huyện Phú Thiện", "trang_thai": "khong-tim-thay", "ban_do": [], "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" }, "trang": "", "ghi_chu": "Có một tệp tên chung 'Ban-đo' ~5,3 MB (https://web.archive.org/web/20220818015026/http://phuthien.gialai.gov.vn/getattachment/8f7f5b78-d7b1-49b6-9c4c-5e41f550d8ef/Ban-%C4%91o.aspx) — không rõ là bản đồ gì." }
+      ],
+      "ghi_chu": "Sở TNMT Gia Lai cũ có mục 'Quy hoạch sử dụng đất › Cấp huyện' nhưng tên miền stnmt.gialai.gov.vn không còn phân giải; bản lưu 17/01/2026 không chứa danh sách bài (nạp bằng JS). Sở NN&MT Gia Lai MỚI (snnmt.gialai.gov.vn) chỉ mang dữ liệu Bình Định cũ. Các tên miền huyện cũ *.gialai.gov.vn nay là cổng XÃ mới (cùng tên) — đường dẫn tệp cũ chuyển về trang chủ, nên chỉ còn bản lưu; nhiều bản lưu bản đồ ~1 MB là bị cắt cụt. Theo báo cáo Sở TNMT 2022, 17/17 huyện đã có QĐ phê duyệt QHSDĐ 2030 năm 2022. tnmtgialai.gov.vn (Cổng CSDL TN&MT) có phần mềm công bố QHSDĐ — chưa khai thác."
+    },
+    {
+      "tinh_cu": "Bình Định",
+      "tinh_moi": "Gia Lai",
+      "trang_nguon": [
+        "https://snnmt.gialai.gov.vn/vi/quy-hoach-su-dung-dat/cap-huyen-thi-xa-thanh-pho.html",
+        "https://gialai.gov.vn/van-ban-chi-dao-dieu-hanh/"
+      ],
+      "huyen": [
+        { "ten": "TP. Quy Nhơn", "trang_thai": "chi-co-quyet-dinh", "ban_do": [], "quyet_dinh": { "so": "269/QĐ-UBND", "ngay": "31/01/2023", "url": "https://snnmt.gialai.gov.vn/uploads/quy-hoach-su-dung-dat/quynhon_quyhoach2030.zip" }, "trang": "https://snnmt.gialai.gov.vn/vi/quy-hoach-su-dung-dat/cap-huyen-thi-xa-thanh-pho.html", "ghi_chu": "ZIP 1,8 MB gồm QĐ + Phụ lục I–III + TB công khai — KHÔNG có bản đồ. ĐIỀU CHỈNH (mới nhất): 1654/QĐ-UBND ngày 16/05/2025 (https://gialai.gov.vn/upload/2005340/20250516/1654_qd__144dpi_75__5b951.pdf; trang https://gialai.gov.vn/van-ban-chi-dao-dieu-hanh/ve-viec-phe-duyet-dieu-chinh-quy-hoach-su-dung-dat-thanh-pho-quy-nhon-thoi-ky-2021-2030.html, đọc qua bản lưu)." },
+        { "ten": "TX. An Nhơn", "trang_thai": "chi-co-quyet-dinh", "ban_do": [], "quyet_dinh": { "so": "268/QĐ-UBND", "ngay": "31/01/2023", "url": "https://snnmt.gialai.gov.vn/uploads/quy-hoach-su-dung-dat/annhon_quyhoach2030.zip" }, "trang": "https://snnmt.gialai.gov.vn/vi/quy-hoach-su-dung-dat/cap-huyen-thi-xa-thanh-pho.html", "ghi_chu": "ZIP 1,9 MB: QĐ + phụ lục + TB, không có bản đồ. Chưa thấy QĐ điều chỉnh." },
+        { "ten": "TX. Hoài Nhơn", "trang_thai": "chi-co-quyet-dinh", "ban_do": [], "quyet_dinh": { "so": "13/QĐ-UBND", "ngay": "04/01/2023", "url": "https://snnmt.gialai.gov.vn/uploads/quy-hoach-su-dung-dat/hoainhon_quyhoach2030.zip" }, "trang": "https://snnmt.gialai.gov.vn/vi/quy-hoach-su-dung-dat/cap-huyen-thi-xa-thanh-pho.html", "ghi_chu": "ZIP 1,6 MB, không có bản đồ. ĐIỀU CHỈNH (mới nhất): 1245/QĐ-UBND ngày 14/04/2025 (https://gialai.gov.vn/upload/2005340/20250414/1245_qd_2025_48639.pdf)." },
+        { "ten": "Huyện An Lão", "trang_thai": "chi-co-quyet-dinh", "ban_do": [], "quyet_dinh": { "so": "83/QĐ-UBND", "ngay": "10/01/2023", "url": "https://snnmt.gialai.gov.vn/uploads/quy-hoach-su-dung-dat/anlao_quyhoach2030.zip" }, "trang": "https://snnmt.gialai.gov.vn/vi/quy-hoach-su-dung-dat/cap-huyen-thi-xa-thanh-pho.html", "ghi_chu": "Số + ngày theo TÊN TỆP trong ZIP ('Huyen An Lao (83 - 10.01.2023).pdf') — TRÙNG với Phù Mỹ, cần mở QĐ đối chiếu. ZIP 1,6 MB không có bản đồ. ĐIỀU CHỈNH (mới nhất): 1614/QĐ-UBND ngày 15/05/2025 (https://gialai.gov.vn/upload/2005340/20250515/1614_qd__5b377.pdf)." },
+        { "ten": "Huyện Hoài Ân", "trang_thai": "chi-co-quyet-dinh", "ban_do": [], "quyet_dinh": { "so": "4405/QĐ-UBND", "ngay": "26/12/2022", "url": "https://snnmt.gialai.gov.vn/uploads/quy-hoach-su-dung-dat/hoaian_quyhoach2030.zip" }, "trang": "https://snnmt.gialai.gov.vn/vi/quy-hoach-su-dung-dat/cap-huyen-thi-xa-thanh-pho.html", "ghi_chu": "ZIP 3,3 MB, không có bản đồ. Chưa thấy QĐ điều chỉnh." },
+        { "ten": "Huyện Phù Cát", "trang_thai": "chi-co-quyet-dinh", "ban_do": [], "quyet_dinh": { "so": "4232/QĐ-UBND", "ngay": "16/12/2022", "url": "https://snnmt.gialai.gov.vn/uploads/quy-hoach-su-dung-dat/phucat_quyhoach2030.zip" }, "trang": "https://snnmt.gialai.gov.vn/vi/quy-hoach-su-dung-dat/cap-huyen-thi-xa-thanh-pho.html", "ghi_chu": "ZIP 1,5 MB, không có bản đồ. Chưa thấy QĐ điều chỉnh." },
+        { "ten": "Huyện Phù Mỹ", "trang_thai": "chi-co-quyet-dinh", "ban_do": [], "quyet_dinh": { "so": "83/QĐ-UBND", "ngay": "10/01/2023", "url": "https://snnmt.gialai.gov.vn/uploads/quy-hoach-su-dung-dat/phumy_quyhoach2030.zip" }, "trang": "https://snnmt.gialai.gov.vn/vi/quy-hoach-su-dung-dat/cap-huyen-thi-xa-thanh-pho.html", "ghi_chu": "Số + ngày theo TÊN TỆP — trùng An Lão, cần đối chiếu. ZIP 2,2 MB không có bản đồ. ĐIỀU CHỈNH (mới nhất): 976/QĐ-UBND ngày 27/03/2025 (https://gialai.gov.vn/upload/2005340/20250327/976_qd_2025_20e4f.pdf)." },
+        { "ten": "Huyện Tây Sơn", "trang_thai": "chi-co-quyet-dinh", "ban_do": [], "quyet_dinh": { "so": "4384/QĐ-UBND", "ngay": "23/12/2022", "url": "https://snnmt.gialai.gov.vn/uploads/quy-hoach-su-dung-dat/tayson_quyhoach2030.zip" }, "trang": "https://snnmt.gialai.gov.vn/vi/quy-hoach-su-dung-dat/cap-huyen-thi-xa-thanh-pho.html", "ghi_chu": "ZIP 2,8 MB, không có bản đồ. ĐIỀU CHỈNH (mới nhất): 1246/QĐ-UBND, trang ghi ngày ban hành 14/04/2025 (một kết quả tìm kiếm ghi 10/4/2025): https://gialai.gov.vn/upload/2005340/20250414/1246_qd_2025_dc7dc.pdf." },
+        { "ten": "Huyện Tuy Phước", "trang_thai": "chi-co-quyet-dinh", "ban_do": [], "quyet_dinh": { "so": "4231/QĐ-UBND", "ngay": "16/12/2022", "url": "https://snnmt.gialai.gov.vn/uploads/quy-hoach-su-dung-dat/tuyphuoc_quyhoach2030.zip" }, "trang": "https://snnmt.gialai.gov.vn/vi/quy-hoach-su-dung-dat/cap-huyen-thi-xa-thanh-pho.html", "ghi_chu": "ZIP 2,2 MB, không có bản đồ. Chưa thấy QĐ điều chỉnh." },
+        { "ten": "Huyện Vân Canh", "trang_thai": "chi-co-quyet-dinh", "ban_do": [], "quyet_dinh": { "so": "12/QĐ-UBND", "ngay": "04/01/2023", "url": "https://snnmt.gialai.gov.vn/uploads/quy-hoach-su-dung-dat/vancanh_quyhoach2030.zip" }, "trang": "https://snnmt.gialai.gov.vn/vi/quy-hoach-su-dung-dat/cap-huyen-thi-xa-thanh-pho.html", "ghi_chu": "ZIP 1,7 MB, không có bản đồ. ĐIỀU CHỈNH (mới nhất): 1255/QĐ-UBND ngày 14/04/2025 (https://gialai.gov.vn/upload/2005340/20250414/1255_qd_2025_c9e9f.pdf)." },
+        { "ten": "Huyện Vĩnh Thạnh", "trang_thai": "chi-co-quyet-dinh", "ban_do": [], "quyet_dinh": { "so": "11/QĐ-UBND", "ngay": "04/01/2023", "url": "https://snnmt.gialai.gov.vn/uploads/quy-hoach-su-dung-dat/vinhthanh_quyhoach2030.zip" }, "trang": "https://snnmt.gialai.gov.vn/vi/quy-hoach-su-dung-dat/cap-huyen-thi-xa-thanh-pho.html", "ghi_chu": "ZIP 1,9 MB, không có bản đồ. ĐIỀU CHỈNH (mới nhất): 4121/QĐ-UBND ngày 02/12/2024 (https://gialai.gov.vn/upload/2005340/20241202/4121_qd_2024_e8c5a.pdf)." }
+      ],
+      "ghi_chu": "Sở NN&MT Gia Lai mới (snnmt.gialai.gov.vn — còn sống, mang nội dung Sở TNMT Bình Định cũ) có đủ 11 tệp '<huyện>_quyhoach2030.zip' 'Công khai QHSDĐ … thời kỳ 2021-2030' (đăng 21/3/2023), nhưng mỗi ZIP CHỈ gồm QĐ + Phụ lục I–III + thông báo công khai, KHÔNG có bản đồ (đã xem mục lục). Số + ngày QĐ lấy từ tên tệp trong ZIP. QĐ điều chỉnh 2024–2025 đăng ở cổng tỉnh gialai.gov.vn (không kết nối được từ máy này hôm 16/10, đọc qua bản lưu 6–7/2025): chỉ QĐ, không bản đồ. binhdinh.gov.vn/quy-hoach-ke-hoach-pt/quy-hoach-su-dung-dat: lỗi kết nối. Trang quyhoachbinhdinh.vn (hệ thống JMAP, KHÔNG phải .gov.vn, không ghi đơn vị vận hành) có lớp 'Bản đồ QHSDĐ đến năm 2030 TP Quy Nhơn' — chỉ ghi chú, không lấy."
+    },
+    {
+      "tinh_cu": "Kon Tum",
+      "tinh_moi": "Quảng Ngãi",
+      "trang_nguon": [
+        "https://huyendakglei.kontum.gov.vn/quy-hoach-ke-hoach/Thong-bao-Cong-khai-Quy-hoach-su-dung-dat-thoi-ky-20212030-cua-huyen-Dak-Glei,-tinh-Kon-Tum-3158",
+        "https://huyendakto.kontum.gov.vn/thong-tin-cong-khai/Quy-hoach-su-dung-dat-thoi-ky-20212030-cua-huyen-Dak-To-1507",
+        "https://huyentumorong.kontum.gov.vn/nha-dau-tu/quy-hoach-ke-hoach/quy-hoach-su-dung-dat-thoi-ky-2021-2030.html",
+        "https://quangngai.gov.vn/thong-tin-dat-dai/quy-hoach-ke-hoach-su-dung-dat2"
+      ],
+      "huyen": [
+        {
+          "ten": "TP. Kon Tum",
+          "trang_thai": "khong-vao-duoc",
+          "ban_do": [
+            { "url": "https://kontumcityadmin.kontum.gov.vn/Content/Upload/20220613101352-TB cong khai QSDD-2022.rar", "dinh_dang": "rar", "dung_luong": "chưa rõ", "loai": "QHSDĐ 2030 (hồ sơ công khai — chưa xác minh bên trong)", "con_song": "không", "ban_luu": "", "ghi_chu": "Không có bản lưu." }
+          ],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "https://kontumcity.kontum.gov.vn/thong-tin/detail/13635/Thong-bao-Cong-bo-cong-khai-Quy-hoach-su-dung-dat-thoi-ky-2021-2030-thanh-pho-Kon-Tum-tinh-Kon-Tum.html",
+          "ghi_chu": "Bài 'Thông báo công bố công khai QHSDĐ thời kỳ 2021-2030 thành phố Kon Tum' (bản lưu 18/06/2022) chỉ có 1 tệp nén."
+        },
+        {
+          "ten": "Huyện Đăk Glei",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://huyendakglei.kontum.gov.vn/Uploads/files/VanBan/2022/cong%20khai/BD%20QH%202021-2030%20DAKGLEI.pdf", "dinh_dang": "pdf", "dung_luong": "~28,4 MB (theo bản lưu)", "loai": "QHSDĐ 2030", "con_song": "không — kontum.gov.vn không còn phân giải", "ban_luu": "https://web.archive.org/web/20250710200730/https://huyendakglei.kontum.gov.vn/Uploads/files/VanBan/2022/cong%20khai/BD%20QH%202021-2030%20DAKGLEI.pdf", "ghi_chu": "" }
+          ],
+          "quyet_dinh": { "so": "98/QĐ-UBND", "ngay": "01/3/2022 (tên tệp ghi '98-01-3-2021' — chưa đọc QĐ)", "url": "https://huyendakglei.kontum.gov.vn/Uploads/files/VanBan/2022/cong%20khai/Quy%E1%BA%BFt%20%C4%91%E1%BB%8Bnh%2098-01-3-2021.pdf" },
+          "trang": "https://huyendakglei.kontum.gov.vn/quy-hoach-ke-hoach/Thong-bao-Cong-khai-Quy-hoach-su-dung-dat-thoi-ky-20212030-cua-huyen-Dak-Glei,-tinh-Kon-Tum-3158",
+          "ghi_chu": "Bài còn có TB công khai, phụ lục kèm QĐ 98, báo cáo thuyết minh (15/12/2021). 2024–2025 có lấy ý kiến hồ sơ ĐIỀU CHỈNH — chưa thấy QĐ điều chỉnh."
+        },
+        {
+          "ten": "Huyện Đăk Hà",
+          "trang_thai": "chi-co-quyet-dinh",
+          "ban_do": [],
+          "quyet_dinh": { "so": "chưa đọc (QĐ UBND tỉnh ngày 13/5/2022 theo tên tệp)", "ngay": "13/05/2022", "url": "https://huyendakha.kontum.gov.vn/upload/104863/20220826/13-5-2022_QDUB_Quyet_dinh_phe_duyet_quy_hoach_su_dung_dat_thoi_ky_2021-2030_Dak_Ha_0c3b7.pdf" },
+          "trang": "https://huyendakha.kontum.gov.vn/van-ban-phap-quy/thong-bao/thong-bao-cong-bo-cong-khai-quy-hoach-su-dung-dat-thoi-ky-2021-2030-cua-huyen-dak-ha.html",
+          "ghi_chu": "Chỉ còn bản lưu. Có NQ điều chỉnh (4/2024), báo cáo thuyết minh điều chỉnh, TB lấy ý kiến QHSDĐ đến 2030 (1/2025) — không thấy bản đồ."
+        },
+        {
+          "ten": "Huyện Đăk Tô",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://huyendakto.kontum.gov.vn/Uploads/files/CongKhai/BDoQHSDD2030.pdf", "dinh_dang": "pdf", "dung_luong": "~6,2 MB (theo bản lưu)", "loai": "QHSDĐ 2030", "con_song": "không", "ban_luu": "https://web.archive.org/web/20250705175948/http://huyendakto.kontum.gov.vn/Uploads/files/CongKhai/BDoQHSDD2030.pdf", "ghi_chu": "" }
+          ],
+          "quyet_dinh": { "so": "96/QĐ-UBND", "ngay": "01/03/2022", "url": "https://huyendakto.kontum.gov.vn/Uploads/files/CongKhai/QD96-UBNDtinh.pdf" },
+          "trang": "https://huyendakto.kontum.gov.vn/thong-tin-cong-khai/Quy-hoach-su-dung-dat-thoi-ky-20212030-cua-huyen-Dak-To-1507",
+          "ghi_chu": "Số + ngày đọc trong chữ của bài (bản lưu 05/07/2025). 2025: tờ trình + dự thảo NQ ĐIỀU CHỈNH, báo cáo thuyết minh điều chỉnh — chưa thấy QĐ điều chỉnh."
+        },
+        {
+          "ten": "Huyện Ia H'Drai",
+          "trang_thai": "khong-tim-thay",
+          "ban_do": [],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "https://www.iahdrai.kontum.gov.vn/thong-tin-quy-hoach-ke-hoach/Thong-bao-ve-viec-cong-bo-cong-khai-Quy-hoach-su-dung-dat-thoi-ky-20212030-huyen-Ia-H’Drai,-tinh-Kon-Tum-8424",
+          "ghi_chu": "Bản lưu có báo cáo thuyết minh (.docx), biểu (.xlsx), NQ (.doc) QHSDĐ 2021-2030 và TB công bố công khai ĐIỀU CHỈNH QHSDĐ (2025) — không thấy bản đồ."
+        },
+        {
+          "ten": "Huyện Kon Plông",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "http://www.konplong.kontum.gov.vn/Uploads/files/BANDO_DIEUCHINH_QHSDD_KONPLONG_DENNAM_2030_phe_duyet_QD269_dgn(1).pdf", "dinh_dang": "pdf (in từ DGN)", "dung_luong": "~9,3 MB (theo bản lưu)", "loai": "điều chỉnh QHSDĐ 2030 (MỚI NHẤT — phê duyệt theo QĐ 269)", "con_song": "không", "ban_luu": "https://web.archive.org/web/20250712185243/http://www.konplong.kontum.gov.vn/Uploads/files/BANDO_DIEUCHINH_QHSDD_KONPLONG_DENNAM_2030_phe_duyet_QD269_dgn(1).pdf", "ghi_chu": "" },
+            { "url": "http://www.konplong.kontum.gov.vn/Uploads/files/4_BAN DO QHSDD 2030 HUYEN KONPLONG-Default-000.pdf", "dinh_dang": "pdf", "dung_luong": "~29,5 MB (theo bản lưu)", "loai": "QHSDĐ 2030 (bản gốc)", "con_song": "không", "ban_luu": "https://web.archive.org/web/20250712202553/http://www.konplong.kontum.gov.vn/Uploads/files/4_BAN%20DO%20QHSDD%202030%20HUYEN%20KONPLONG-Default-000.pdf", "ghi_chu": "" },
+            { "url": "http://www.konplong.kontum.gov.vn/Uploads/files/2024/BẢN ĐỒ ĐIỀU CHỈNH QUY HOẠCH SỬ DỤNG ĐẤT ĐẾN NĂM 2030.pdf", "dinh_dang": "pdf", "dung_luong": "~26,7 MB (theo bản lưu 05/07/2025)", "loai": "điều chỉnh QHSDĐ 2030 (thư mục 2024 — có thể là bản trình)", "con_song": "không", "ban_luu": "", "ghi_chu": "Có trong chỉ mục kho lưu trữ (05/07/2025)." }
+          ],
+          "quyet_dinh": { "so": "80/QĐ-UBND", "ngay": "18/02/2022 (theo tên tệp)", "url": "http://www.konplong.kontum.gov.vn/Uploads/files/18-2-2022 80 QĐUB_Quyet dinh phe duyet quy hoach su dung dat thoi ky 2021-2030 Kon Plong.pdf" },
+          "trang": "http://www.konplong.kontum.gov.vn/quy-hoach-ke-hoach/Ban-do-dieu-chinh-quy-hoach-su-dung-dat-thoi-ky-20212030-2218",
+          "ghi_chu": "ĐIỀU CHỈNH: QĐ 269 (2025, theo tên tệp bản đồ; ngày chưa xác minh) — bài 'Phê duyệt điều chỉnh QHSDĐ thời kỳ 2021-2030 huyện Kon Plông' (bản lưu 20/05/2025); NQ 07/NQ-HĐND thông qua điều chỉnh. HĐND huyện còn đăng 'BẢN ĐỒ ĐIỀU CHỈNH QHSDĐ HUYỆN KON PLÔNG ĐẾN NĂM 2030(1).pdf' ~16,2 MB (hdndkonplong.kontum.gov.vn, 1/2025 — bản trình HĐND)."
+        },
+        {
+          "ten": "Huyện Kon Rẫy",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://konray.kontum.gov.vn/upload/104895/20220505/BD_QH_2021-2030_KON_RAY_446c1.pdf", "dinh_dang": "pdf", "dung_luong": "~22,2 MB (theo bản lưu)", "loai": "QHSDĐ 2030", "con_song": "không", "ban_luu": "https://web.archive.org/web/20240705103436/https://konray.kontum.gov.vn/upload/104895/20220505/BD_QH_2021-2030_KON_RAY_446c1.pdf", "ghi_chu": "Cùng thư mục còn '5__BD_QHSDDKONRAY2021-2030_e3553.pdf' cùng dung lượng (bản trùng)." }
+          ],
+          "quyet_dinh": { "so": "135/QĐ-UBND", "ngay": "22/03/2022 (theo tên tệp)", "url": "https://konray.kontum.gov.vn/upload/104895/20220505/1__QDUB_135_22-3-2022___Quyet_dinh_phe_duyet_quy_hoach_su_dung_dat_thoi_ky_2021-2030_huyen_Kon_Ray_ed848.pdf" },
+          "trang": "https://konray.kontum.gov.vn/doanh-nghiep/quy-hoach-ke-hoach/bd-qh-2021-2030-kon-ray.html",
+          "ghi_chu": "2023–2024: nhiều QĐ cập nhật / điều chỉnh tên, vị trí dự án trong QHSDĐ 2021-2030 (không phải điều chỉnh toàn bộ, không kèm bản đồ mới)."
+        },
+        {
+          "ten": "Huyện Ngọc Hồi",
+          "trang_thai": "khong-vao-duoc",
+          "ban_do": [
+            { "url": "https://ngochoi.kontum.gov.vn/Uploads/files/Quy%20hoach.rar", "dinh_dang": "rar", "dung_luong": "chưa rõ", "loai": "QHSDĐ 2030 (hồ sơ công khai — chưa xác minh bên trong)", "con_song": "không", "ban_luu": "https://web.archive.org/web/20250702192941/http://ngochoi.kontum.gov.vn/Uploads/files/Quy%20hoach.rar", "ghi_chu": "Chưa xem được mục lục (kho lưu trữ từ chối kết nối lúc kiểm)." }
+          ],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "https://ngochoi.kontum.gov.vn/thong-tin-quy-hoach/Thong-bao-cong-khai-quy-hoach-su-dung-dat-thoi-ky-20212030-cua-huyen-Ngoc-Hoi,-tinh-Kon-Tum-27776",
+          "ghi_chu": "Ảnh 'qhSD dat OK-Model-1.jpg' ~150 KB trên cổng huyện — quá nhỏ."
+        },
+        {
+          "ten": "Huyện Sa Thầy",
+          "trang_thai": "khong-tim-thay",
+          "ban_do": [],
+          "quyet_dinh": { "so": "chưa xác minh", "ngay": "", "url": "" },
+          "trang": "https://huyensathay.kontum.gov.vn/thong-bao/TB-Cong-khai-Quy-hoach-su-dung-dat-giai-doan-20212030-cua-huyen-Sa-Thay,-tinh-Kon-Tum-1309",
+          "ghi_chu": "Bài công khai chỉ nhúng văn bản thông báo ('2-Cong-khai-Quy-hoach-su-dung-dat-nam-2021-2030.pdf'). 11/2024 lấy ý kiến hồ sơ ĐIỀU CHỈNH."
+        },
+        {
+          "ten": "Huyện Tu Mơ Rông",
+          "trang_thai": "co-ban-do",
+          "ban_do": [
+            { "url": "https://huyentumorong.kontum.gov.vn/upload/104884/20220420/3__BAN_DO_QHSDD_2021-2030__HUYEN_TU_MO_RONG__25eef.pdf", "dinh_dang": "pdf", "dung_luong": "~11,1 MB (theo bản lưu)", "loai": "QHSDĐ 2030", "con_song": "không", "ban_luu": "https://web.archive.org/web/20220803154515/https://huyentumorong.kontum.gov.vn/upload/104884/20220420/3__BAN_DO_QHSDD_2021-2030__HUYEN_TU_MO_RONG__25eef.pdf", "ghi_chu": "Chỉ mục kho lưu trữ ghi có bản lưu 03/08/2022 (dịch vụ hỏi nhanh của kho báo không có — cần thử mở)." }
+          ],
+          "quyet_dinh": { "so": "100/QĐ-UBND", "ngay": "01/03/2022", "url": "https://huyentumorong.kontum.gov.vn/upload/104884/20220420/1__QUYET_DINH_100QD-UBND_ngay_01032022_PHE_DUYET_QHSDD_2021-2030__HUYEN_TU_MO_RONG__d12b4.pdf" },
+          "trang": "https://huyentumorong.kontum.gov.vn/nha-dau-tu/quy-hoach-ke-hoach/quy-hoach-su-dung-dat-thoi-ky-2021-2030.html",
+          "ghi_chu": "Kèm báo cáo thuyết minh. Số + ngày theo tên tệp QĐ."
+        }
+      ],
+      "ghi_chu": "16/10/2026: kontum.gov.vn và mọi tên miền con không còn phân giải — 5 bản đồ tìm được đều CHỈ còn bản lưu web.archive.org. Cổng Quảng Ngãi mới (quangngai.gov.vn › Thông tin đất đai › Quy hoạch, kế hoạch sử dụng đất) chỉ có các huyện Quảng Ngãi cũ, KHÔNG có huyện Kon Tum cũ. Bản lưu Sở TNMT Kon Tum (stnmt.kontum.gov.vn) không có mục QHSDĐ 2030 cấp huyện. QĐ phê duyệt của UBND tỉnh Kon Tum đều trong khoảng 18/2–13/5/2022."
+    }
+  ]
+}

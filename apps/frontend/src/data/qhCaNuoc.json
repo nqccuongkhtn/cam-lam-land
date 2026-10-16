@@ -1,0 +1,105 @@
+{
+ "_ghiChu": "Lớp QHSDĐ 2030 các tỉnh khác — GHI BẰNG scripts/qh-tinh/them_lop_ca_nuoc.py, đừng sửa tay. Ô ảnh ở kho ổ D của máy chủ (nginx /tiles-qg/, TILES_QG_DIR). `vung.tinh` = mã tỉnh hiện hành trong TINH_VN (app/map/page.tsx).",
+ "vung": [
+  {
+   "id": "phu-quy",
+   "ten": "Huyện Phú Quý (Bình Thuận cũ)",
+   "tenNgan": "Phú Quý",
+   "tinh": "lam-dong",
+   "tamXem": [
+    108.9453,
+    10.528,
+    13
+   ]
+  },
+  {
+   "id": "la-gi",
+   "ten": "Thị xã La Gi (Bình Thuận cũ)",
+   "tenNgan": "La Gi",
+   "tinh": "lam-dong",
+   "tamXem": [
+    107.7827,
+    10.7106,
+    11.9
+   ]
+  }
+ ],
+ "lop": [
+  {
+   "id": "qh-phuquy2030",
+   "ten": "QHSDĐ 2030 · Huyện Phú Quý (Bình Thuận cũ)",
+   "tenNgan": "Phú Quý 2030",
+   "tenApp": "QH Sử dụng đất 2030",
+   "vung": "phu-quy",
+   "zBay": 13,
+   "tiles": "/tiles-qg/phuquy2030v1/{z}/{x}/{y}.webp",
+   "minzoom": 9,
+   "maxzoom": 16,
+   "khung": [
+    108.9228,
+    10.502,
+    108.9679,
+    10.5539
+   ],
+   "canCu": {
+    "so": "231/QĐ-UBND",
+    "ngay": "06/02/2023",
+    "coQuan": "UBND tỉnh Bình Thuận",
+    "ten": "Phê duyệt quy hoạch sử dụng đất thời kỳ 2021 - 2030, tầm nhìn đến năm 2050 của huyện Phú Quý",
+    "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/231qdub-phu-quy.pdf",
+    "cac": [
+     {
+      "so": "Quyết định",
+      "ngay": "06/02/2023",
+      "ten": "231/QĐ-UBND (bản có chữ ký số)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/231qdub-phu-quy.pdf"
+     },
+     {
+      "so": "Bản đồ",
+      "ngay": "06/02/2023",
+      "ten": "Bản đồ QHSDĐ đến năm 2030 huyện Phú Quý (Sở TN&MT Bình Thuận công bố)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/ban-do-quy-hoach-2030-phu-quy-10_10_2022-qp-default-000.pdf"
+     }
+    ]
+   }
+  },
+  {
+   "id": "qh-lagi2030",
+   "ten": "QHSDĐ 2030 · Thị xã La Gi (Bình Thuận cũ)",
+   "tenNgan": "La Gi 2030",
+   "tenApp": "QH Sử dụng đất 2030",
+   "vung": "la-gi",
+   "zBay": 11,
+   "tiles": "/tiles-qg/lagi2030v1/{z}/{x}/{y}.webp",
+   "minzoom": 9,
+   "maxzoom": 16,
+   "khung": [
+    107.6769,
+    10.6231,
+    107.8884,
+    10.7981
+   ],
+   "canCu": {
+    "so": "198/QĐ-UBND",
+    "ngay": "30/01/2023",
+    "coQuan": "UBND tỉnh Bình Thuận",
+    "ten": "Phê duyệt quy hoạch sử dụng đất thời kỳ 2021 - 2030, tầm nhìn đến năm 2050 của thị xã La Gi",
+    "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/198qdub._la-gi.pdf",
+    "cac": [
+     {
+      "so": "Quyết định",
+      "ngay": "30/01/2023",
+      "ten": "198/QĐ-UBND (bản có chữ ký số)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/198qdub._la-gi.pdf"
+     },
+     {
+      "so": "Bản đồ",
+      "ngay": "30/01/2023",
+      "ten": "Bản đồ QHSDĐ đến năm 2030 thị xã La Gi (Sở TN&MT Bình Thuận công bố)",
+      "tep": "https://storage-vnportal.vnpt.vn/btn-ubnd/sitefolders/stnmt/2023/cong-khai-qh/2-qh-30-la-gi-in-default-000.pdf"
+     }
+    ]
+   }
+  }
+ ]
+}

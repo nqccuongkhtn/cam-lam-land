@@ -1,0 +1,1308 @@
+{
+ "nhom": "E",
+ "ngay_khao_sat": "2026-10-16",
+ "tinh": [
+  {
+   "tinh_cu": "Cao Bằng",
+   "tinh_moi": "Cao Bằng",
+   "trang_nguon": [
+    "https://caobang.gov.vn (không vào được)"
+   ],
+   "huyen": [
+    {
+     "ten": "TP. Cao Bằng",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "2030/QĐ-UBND — chưa xác minh trên trang nhà nước (chỉ thấy trong kết quả máy tìm kiếm, nguồn: trang tư nhân hethongphapluat.com)",
+      "ngay": "29/10/2021",
+      "url": ""
+     },
+     "trang": "",
+     "ghi_chu": "Không có tên miền thanhpho.caobang.gov.vn; cổng tỉnh bị ngắt kết nối."
+    },
+    {
+     "ten": "Huyện Bảo Lâm",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://baolam.caobang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Bảo Lạc",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1822/QĐ-UBND — chưa xác minh trên trang nhà nước (chỉ thấy trong kết quả máy tìm kiếm, nguồn: trang tư nhân hethongphapluat.com)",
+      "ngay": "2021 (ngày cụ thể chưa xác minh)",
+      "url": ""
+     },
+     "trang": "https://baolac.caobang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Hà Quảng",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "2099/QĐ-UBND — chưa xác minh trên trang nhà nước (chỉ thấy trong kết quả máy tìm kiếm, nguồn: trang tư nhân hethongphapluat.com)",
+      "ngay": "08/11/2021",
+      "url": ""
+     },
+     "trang": "https://haquang.caobang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Hạ Lang",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://halang.caobang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Hòa An",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://hoaan.caobang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Nguyên Bình",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://nguyenbinh.caobang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Quảng Hòa",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://quanghoa.caobang.gov.vn",
+     "ghi_chu": "Tên miền chỉ có địa chỉ IPv6, không mở được từ mạng đang dùng."
+    },
+    {
+     "ten": "Huyện Thạch An",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://thachan.caobang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Trùng Khánh",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://trungkhanh.caobang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    }
+   ],
+   "ghi_chu": "Toàn bộ web nhà nước Cao Bằng bị ngắt kết nối (connection reset) từ cả 3 đường đã thử (máy nhà, WebFetch, trình duyệt Chrome): caobang.gov.vn, cổng huyện *.caobang.gov.vn (cùng máy chủ 14.225.40.24 / 2001:ee0:305:a::508), sonnmt.caobang.gov.vn, gis.caobang.gov.vn. Tên miền stnmt / snnmt / sotnmt .caobang.gov.vn không còn. Số QĐ ghi trong bảng chỉ thấy trong kết quả máy tìm kiếm trỏ tới trang tư nhân (hethongphapluat.com) — chưa xác minh. Gợi ý dò lại khi máy chủ mở: cổng Sở NN&MT sonnmt.caobang.gov.vn và hệ thống gis.caobang.gov.vn."
+  },
+  {
+   "tinh_cu": "Bắc Kạn",
+   "tinh_moi": "Thái Nguyên",
+   "trang_nguon": [
+    "https://bachthong.thainguyen.gov.vn/ban-do-quy-hoach-su-dung-dat"
+   ],
+   "huyen": [
+    {
+     "ten": "TP. Bắc Kạn",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://backan.thainguyen.gov.vn",
+     "ghi_chu": "Tên miền này nay là cổng 'Phường Bắc Kạn' (mới); không thấy mục QHSDĐ."
+    },
+    {
+     "ten": "Huyện Ba Bể",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://babe.thainguyen.gov.vn",
+     "ghi_chu": "Nay là cổng 'Xã Ba Bể'; không thấy mục QHSDĐ."
+    },
+    {
+     "ten": "Huyện Bạch Thông",
+     "trang_thai": "co-ban-do",
+     "ban_do": [
+      {
+       "url": "https://storage-vnportal.vnpt.vn/gov-tnn/10087/FileQuanTriTinTuc/5.%20BAN%20DO%20DCQH%202021%20-%202030%20H%20BACH%20THONG_CONGKHAI-787329.pdf",
+       "dinh_dang": "pdf",
+       "dung_luong": "13,5 MB (13.515.032 byte)",
+       "loai": "điều chỉnh QHSDĐ 2030",
+       "ghi_chu": "Tên file '5. BAN DO DCQH 2021 - 2030 H BACH THONG_CONGKHAI' (bản đồ điều chỉnh QHSDĐ 2021-2030 huyện Bạch Thông, bản công khai). Trang tiêu đề 'Bản đồ quy hoạch sử dụng Đất xã Bạch Thông giai đoạn 2021 - 2030' trên cổng xã Bạch Thông mới."
+      }
+     ],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://bachthong.thainguyen.gov.vn/ban-do-quy-hoach-su-dung-dat",
+     "ghi_chu": "Số QĐ phê duyệt chưa xác minh."
+    },
+    {
+     "ten": "Huyện Chợ Đồn",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://chodon.thainguyen.gov.vn",
+     "ghi_chu": "Nay là cổng 'Xã Chợ Đồn'; không thấy mục QHSDĐ."
+    },
+    {
+     "ten": "Huyện Chợ Mới",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://chomoi.thainguyen.gov.vn",
+     "ghi_chu": "Nay là cổng 'Xã Chợ Mới'; không thấy mục QHSDĐ (máy tìm kiếm có thấy file của cổng này trên storage-vnportal.vnpt.vn/gov-tnn/10067 nhưng là nhiệm vụ quy hoạch phân khu KCN, không phải QHSDĐ)."
+    },
+    {
+     "ten": "Huyện Na Rì",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://nari.thainguyen.gov.vn",
+     "ghi_chu": "Nay là cổng 'Xã Na Rì'; không thấy mục QHSDĐ. (Trang tư nhân có QĐ 857/QĐ-UBND — đó là KHSDĐ 2025, không phải QHSDĐ 2030.)"
+    },
+    {
+     "ten": "Huyện Ngân Sơn",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://nganson.thainguyen.gov.vn",
+     "ghi_chu": "Nay là cổng 'Xã Ngân Sơn'; không thấy mục QHSDĐ."
+    },
+    {
+     "ten": "Huyện Pác Nặm",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "",
+     "ghi_chu": "Không có tên miền pacnam.thainguyen.gov.vn; cổng cũ pacnam.backan.gov.vn không còn."
+    }
+   ],
+   "ghi_chu": "Toàn bộ tên miền backan.gov.vn (cổng tỉnh, stnmt.backan.gov.vn, cổng các huyện) KHÔNG CÒN (không phân giải được). Sau sáp nhập, các tên miền mang tên huyện cũ nay là cổng xã/phường mới dưới thainguyen.gov.vn; chỉ cổng xã Bạch Thông còn giữ trang 'Bản đồ Quy hoạch sử dụng đất' với bản đồ điều chỉnh QHSDĐ 2021-2030 của huyện Bạch Thông cũ. Không tìm được số QĐ phê duyệt QHSDĐ của huyện nào trên nguồn nhà nước."
+  },
+  {
+   "tinh_cu": "Thái Nguyên",
+   "tinh_moi": "Thái Nguyên",
+   "trang_nguon": [
+    "https://dinhhoa.thainguyen.gov.vn/cong-khai-quy-hoach-su-dung-at",
+    "https://phubinh.thainguyen.gov.vn/thong-tin-quy-hoach",
+    "https://phoyen.thainguyen.gov.vn/thong-tin-quy-hoach",
+    "https://sonnmt.thainguyen.gov.vn/dat-dai",
+    "https://thainguyen.gov.vn/thong-tin-quy-hoach"
+   ],
+   "huyen": [
+    {
+     "ten": "TP. Thái Nguyên",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "",
+     "ghi_chu": "Không tìm được cổng của TP Thái Nguyên cũ (thử tptn / thanhpho / tpthainguyen .thainguyen.gov.vn — không có tên miền). Trang Sở NN&MT (sonnmt.thainguyen.gov.vn) mục Đất đai chỉ có thông báo huỷ GCN; mục 'Bản đồ trực tuyến' trả 404."
+    },
+    {
+     "ten": "TP. Sông Công",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://songcong.thainguyen.gov.vn",
+     "ghi_chu": "Cổng nay là 'Phường Sông Công'; chỉ có các mục quy hoạch đô thị (chung, phân khu, chi tiết, KCN, nông thôn mới), không thấy mục QHSDĐ."
+    },
+    {
+     "ten": "TP. Phổ Yên",
+     "trang_thai": "co-ban-do",
+     "ban_do": [
+      {
+       "url": "https://storage-vnportal.vnpt.vn/gov-tnn/10294/FileQuanTriTinTuc/Quy%20ho%E1%BA%A1ch%20s%E1%BB%AD%20d%E1%BB%A5ng%20%C4%91%E1%BA%A5t%20ph%C3%B4%20y%C3%AAn%202030.pdf",
+       "dinh_dang": "pdf",
+       "dung_luong": "12,1 MB (12.147.361 byte)",
+       "loai": "điều chỉnh QHSDĐ 2030",
+       "ghi_chu": "Bài ghi 'BẢN ĐỒ ĐIỀU CHỈNH QUY HOẠCH SỬ DỤNG ĐẤT THỜI KỲ 2021 - 2030' (đăng 24/11/2025 trên cổng phường Phổ Yên). Tên file gốc: 'Quy hoạch sử dụng đất phô yên 2030.pdf'. Máy chủ file VNPT mà cổng .gov.vn trỏ tới."
+      }
+     ],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://phoyen.thainguyen.gov.vn/tin-noi-bat/ban-do-quy-hoach-su-dung-dat-nam-2021-2030-178556",
+     "ghi_chu": "Bài chỉ có bản đồ, không ghi số QĐ phê duyệt (chưa xác minh)."
+    },
+    {
+     "ten": "Huyện Đại Từ",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://daitu.thainguyen.gov.vn/thong-tin-quy-hoach",
+     "ghi_chu": "Cổng nay là 'Xã Đại Từ'; mục 'Thông tin quy hoạch' chỉ có quy hoạch xây dựng vùng huyện đến 2040 và quy hoạch chi tiết, không có QHSDĐ 2030 (chưa dò hết các mục khác — ô tìm kiếm của cổng chạy bằng biểu mẫu nên không dùng)."
+    },
+    {
+     "ten": "Huyện Định Hóa",
+     "trang_thai": "co-ban-do",
+     "ban_do": [
+      {
+       "url": "https://storage-vnportal.vnpt.vn/gov-tnn/10253/FileQuanTriTinTuc/BDDCQH-DinhHoa-21-30%20(15-4)_2-Model-000-075021.pdf",
+       "dinh_dang": "pdf",
+       "dung_luong": "23,6 MB (23.554.662 byte)",
+       "loai": "điều chỉnh QHSDĐ 2030",
+       "ghi_chu": "'Bản đồ điều chỉnh quy hoạch sử dụng đất thời kỳ 2021 - 2030 huyện Định Hóa', đăng 04/04/2024. Cùng bài có Báo cáo thuyết minh tổng hợp: https://storage-vnportal.vnpt.vn/gov-tnn/10253/FileQuanTriTinTuc/BCTM-DCQHSDD-DinhHoa%2021-30-T%E1%BB%95ng_3.pdf"
+      }
+     ],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://dinhhoa.thainguyen.gov.vn/cong-khai-quy-hoach-su-dung-at/ban-do-dieu-chinh-quy-hoach-su-dung-dat-thoi-ky-2021-2030-huyen-dinh-hoa-174438",
+     "ghi_chu": "Cổng nay là 'Xã Định Hóa', còn giữ mục 'Công khai Quy hoạch sử dụng đất' của huyện cũ (gồm cả KHSDĐ 2024, 2025: QĐ 3421/QĐ-UBND phê duyệt KHSDĐ 2025, QĐ 2426/QĐ-UBND bổ sung KHSDĐ 2024). Số QĐ phê duyệt điều chỉnh QHSDĐ chưa xác minh."
+    },
+    {
+     "ten": "Huyện Đồng Hỷ",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://donghy.thainguyen.gov.vn/thong-tin-quy-hoach",
+     "ghi_chu": "Cổng nay là 'Xã Đồng Hỷ'; mục 'Thông tin quy hoạch' không có bài QHSDĐ."
+    },
+    {
+     "ten": "Huyện Phú Bình",
+     "trang_thai": "co-ban-do",
+     "ban_do": [
+      {
+       "url": "https://storage-vnportal.vnpt.vn/gov-tnn/10299/ConvertFiles/601605/documents/1141327/19391433/BD%20DCQH%20DEN%20NAM%202030%20HUYEN%20PHU%20BINH%20KY.pdf",
+       "dinh_dang": "pdf",
+       "dung_luong": "16,1 MB (16.111.917 byte)",
+       "loai": "điều chỉnh QHSDĐ 2030",
+       "ghi_chu": "Nhúng trong bài 'BẢN ĐỒ ĐIỀU CHỈNH QUY HOẠCH SỬ DỤNG ĐẤT THỜI KỲ 2021-2030 HUYỆN PHÚ BÌNH' (qua trình xem ViewerJS). Tên file có chữ 'KY' (bản ký số)."
+      }
+     ],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://phubinh.thainguyen.gov.vn/thong-tin-tuyen-truyen/ban-do-dieu-chinh-quy-hoach-su-dung-dat-thoi-ky-2021-2030-huyen-phu-binh-tinh-thai-nguyen-58456",
+     "ghi_chu": "Số QĐ phê duyệt điều chỉnh chưa xác minh."
+    },
+    {
+     "ten": "Huyện Phú Lương",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://phuluong.thainguyen.gov.vn",
+     "ghi_chu": "Cổng còn chạy (xã mới) nhưng không có mục quy hoạch sử dụng đất; đường /thong-tin-quy-hoach trả 404."
+    },
+    {
+     "ten": "Huyện Võ Nhai",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://vonhai.thainguyen.gov.vn/thong-tin-quy-hoach",
+     "ghi_chu": "Cổng nay là 'Xã Võ Nhai'; mục 'Thông tin quy hoạch' không có bài QHSDĐ."
+    }
+   ],
+   "ghi_chu": "Trang Sở TN&MT cũ (stnmt.thainguyen.gov.vn) không còn tên miền; trang Sở NN&MT mới (sonnmt.thainguyen.gov.vn) không có mục QHSDĐ. Cổng các huyện cũ (daitu, dinhhoa, donghy, phubinh, phuluong, vonhai, songcong, phoyen .thainguyen.gov.vn) nay là cổng xã/phường mới nhưng MỘT SỐ vẫn giữ bài cũ của huyện: tìm được 3 bản đồ điều chỉnh QHSDĐ 2021-2030 (Định Hóa, Phú Bình, Phổ Yên), file PDF 12–24 MB trên máy chủ file storage-vnportal.vnpt.vn mà cổng trỏ tới. Ô tìm kiếm của các cổng này chạy bằng biểu mẫu (postback) nên không dùng; các đơn vị còn lại có thể vẫn có bài nằm ở mục khác chưa dò hết."
+  },
+  {
+   "tinh_cu": "Tuyên Quang",
+   "tinh_moi": "Tuyên Quang",
+   "trang_nguon": [
+    "https://hamyen.tuyenquang.gov.vn/vi/tin-bai/cong-khai-quy-hoach-su-dung-dat-giai-doan-2021-2030-huyen-ham-yen?type=NEWS&id=54010",
+    "https://www.tuyenquang.gov.vn/vi/category/thong-tin-quy-hoach-3?id=3934&type=POSTED_CONTENT&sub_id=3937",
+    "https://sonduong.tuyenquang.gov.vn/vi/thong-tin-quy-hoach-4?id=4251&type=NEWS"
+   ],
+   "huyen": [
+    {
+     "ten": "TP. Tuyên Quang",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://thanhpho.tuyenquang.gov.vn/vi",
+     "ghi_chu": "Cổng thanhpho.tuyenquang.gov.vn còn chạy nhưng trang chủ không có mục quy hoạch sử dụng đất; chưa tìm được bài công bố QHSDĐ 2030."
+    },
+    {
+     "ten": "Huyện Chiêm Hóa",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://chiemhoa.tuyenquang.gov.vn",
+     "ghi_chu": "Máy chủ chiemhoa.tuyenquang.gov.vn ngắt kết nối (connection reset) khi mở."
+    },
+    {
+     "ten": "Huyện Hàm Yên",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [
+      {
+       "url": "http://hamyen.org.vn/media/files/2021/BAN-DO.pdf",
+       "dinh_dang": "pdf",
+       "dung_luong": "không rõ",
+       "loai": "QHSDĐ 2030",
+       "ghi_chu": "Liên kết 'Download bản đồ Quy hoạch' trên bài của cổng hamyen.tuyenquang.gov.vn trỏ sang máy chủ file cũ hamyen.org.vn — tên miền này NAY KHÔNG CÒN (không phân giải được, 16/10/2026) ⇒ liên kết hỏng, chưa tải được. Cùng bài còn: báo cáo thuyết minh http://hamyen.org.vn/media/files/2021/BAO-CAO-THUYET-MINH.pdf, biểu http://hamyen.org.vn/media/files/2021/2_-BIEU-QH-HAM-YEN-2021-2030.xlsx (cũng hỏng)."
+      }
+     ],
+     "quyet_dinh": {
+      "so": "253/QĐ-UBND",
+      "ngay": "20/05/2021",
+      "url": "http://hamyen.org.vn/media/files/2021/QD_253_Phe_duyet_QHSDD_Ham_Yen_2021_20210616050043251250.pdf"
+     },
+     "trang": "https://hamyen.tuyenquang.gov.vn/vi/tin-bai/cong-khai-quy-hoach-su-dung-dat-giai-doan-2021-2030-huyen-ham-yen?type=NEWS&id=54010",
+     "ghi_chu": "Thông báo 74/TB-UBND ngày 17/6/2021 công khai QHSDĐ giai đoạn 2021-2030 huyện Hàm Yên (QĐ 253/QĐ-UBND ngày 20/5/2021 của UBND tỉnh). Mọi file đính kèm nằm trên hamyen.org.vn (đã chết). Mục 'Quy hoạch' của cổng còn bài lấy ý kiến 'phương án điều chỉnh QHSDĐ đến năm 2030 huyện Hàm Yên' (14/10/2022) — chưa thấy QĐ phê duyệt điều chỉnh."
+    },
+    {
+     "ten": "Huyện Lâm Bình",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://lambinh.tuyenquang.gov.vn/vi",
+     "ghi_chu": "Cổng còn chạy (tên 'Huyện Lâm Bình'), trang chủ không có mục quy hoạch sử dụng đất."
+    },
+    {
+     "ten": "Huyện Na Hang",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://nahang.tuyenquang.gov.vn/vi",
+     "ghi_chu": "Cổng còn chạy, trang chủ không có mục quy hoạch sử dụng đất."
+    },
+    {
+     "ten": "Huyện Sơn Dương",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://sonduong.tuyenquang.gov.vn/vi/thong-tin-quy-hoach-4?id=4251&type=NEWS",
+     "ghi_chu": "Mục 'Thông tin quy hoạch' của cổng Sơn Dương chỉ có quy hoạch xây dựng vùng huyện, quy hoạch tỉnh, quy hoạch chi tiết khu dân cư — không có QHSDĐ 2030."
+    },
+    {
+     "ten": "Huyện Yên Sơn",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://yenson.tuyenquang.gov.vn/vi",
+     "ghi_chu": "Tên miền nay là cổng 'Xã Yên Sơn' (cổng huyện cũ đã chuyển thành cổng xã), không thấy mục QHSDĐ."
+    }
+   ],
+   "ghi_chu": "Cổng tỉnh tuyenquang.gov.vn (nền tảng mới, danh sách nạp bằng script — phải mở bằng trình duyệt) mục 'Thông tin quy hoạch › Quy hoạch huyện - thành phố' báo 'Không có thông tin'. Trang Sở TN&MT cũ (tnmt.tuyenquang.gov.vn) nay chuyển hướng sang sonnmt.tuyenquang.gov.vn, không có mục QHSDĐ; ô tìm kiếm của trang Sở không lọc theo từ khoá (trả 28.845 kết quả). Chỉ cổng huyện Hàm Yên còn giữ bài công khai QHSDĐ 2021-2030 kèm 'Download bản đồ Quy hoạch', nhưng file nằm trên tên miền cũ hamyen.org.vn đã chết. Số QĐ QHSDĐ của 6 đơn vị còn lại chưa xác minh."
+  },
+  {
+   "tinh_cu": "Hà Giang",
+   "tinh_moi": "Tuyên Quang",
+   "trang_nguon": [
+    "https://stnmt.hagiang.gov.vn (không vào được)",
+    "https://hagiang.gov.vn (404)",
+    "https://bacme.hagiang.gov.vn/documents/portlet_file_entry/44693/2.+bieu+qh+2021-2030+bac+me.pdf/9eaf8b97-8676-fe63-c9fc-acc70b0c09c1?status=0 (thấy qua máy tìm kiếm, máy chủ không cho kết nối)"
+   ],
+   "huyen": [
+    {
+     "ten": "TP. Hà Giang",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://thanhpho.hagiang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset)."
+    },
+    {
+     "ten": "Huyện Bắc Mê",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://bacme.hagiang.gov.vn",
+     "ghi_chu": "Máy tìm kiếm còn lưu file biểu QHSDĐ 2021-2030 Bắc Mê trên chính cổng huyện: https://bacme.hagiang.gov.vn/documents/portlet_file_entry/44693/2.+bieu+qh+2021-2030+bac+me.pdf/9eaf8b97-8676-fe63-c9fc-acc70b0c09c1?status=0 (tên '2. biểu' gợi ý cổng từng đăng cả bộ hồ sơ — có thể gồm bản đồ), nhưng máy chủ ngắt kết nối nên chưa xác minh."
+    },
+    {
+     "ten": "Huyện Bắc Quang",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://bacquang.hagiang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối."
+    },
+    {
+     "ten": "Huyện Đồng Văn",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1603/QĐ-UBND (điều chỉnh QHSDĐ đến năm 2030) — chưa xác minh trên trang nhà nước",
+      "ngay": "19/11/2024",
+      "url": ""
+     },
+     "trang": "https://dongvan.hagiang.gov.vn",
+     "ghi_chu": "Số QĐ chỉ thấy trên trang tư nhân hethongphapluat.com (không lấy file). Cổng huyện ngắt kết nối."
+    },
+    {
+     "ten": "Huyện Hoàng Su Phì",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://hoangsuphi.hagiang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối."
+    },
+    {
+     "ten": "Huyện Mèo Vạc",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://meovac.hagiang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối."
+    },
+    {
+     "ten": "Huyện Quản Bạ",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://quanba.hagiang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối."
+    },
+    {
+     "ten": "Huyện Quang Bình",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1604/QĐ-UBND (điều chỉnh QHSDĐ đến năm 2030) — chưa xác minh trên trang nhà nước",
+      "ngay": "2024 (ngày cụ thể chưa xác minh)",
+      "url": ""
+     },
+     "trang": "https://quangbinh.hagiang.gov.vn",
+     "ghi_chu": "Số QĐ chỉ thấy trên trang tư nhân hethongphapluat.com. Cổng huyện ngắt kết nối."
+    },
+    {
+     "ten": "Huyện Vị Xuyên",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://vixuyen.hagiang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối. (Trang tư nhân có QĐ 2618/QĐ-UBND năm 2023 — đó là KHSDĐ 2024, không phải QHSDĐ 2030.)"
+    },
+    {
+     "ten": "Huyện Xín Mần",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://xinman.hagiang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối."
+    },
+    {
+     "ten": "Huyện Yên Minh",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://yenminh.hagiang.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối."
+    }
+   ],
+   "ghi_chu": "Toàn bộ hạ tầng web Hà Giang cũ không dùng được: hagiang.gov.vn trả 404; stnmt.hagiang.gov.vn và 11 cổng huyện (*.hagiang.gov.vn, cùng máy chủ 157.66.10.23) đều ngắt kết nối (connection reset) — thử bằng 3 đường: máy nhà, WebFetch và trình duyệt Chrome. Cổng tỉnh Tuyên Quang mới (sau sáp nhập) mục 'Quy hoạch huyện - thành phố' trống. Bằng chứng duy nhất: máy tìm kiếm còn lưu file biểu QHSDĐ 2021-2030 huyện Bắc Mê trên bacme.hagiang.gov.vn (Liferay, đường /documents/portlet_file_entry/…) ⇒ các cổng huyện Hà Giang TỪNG đăng hồ sơ QHSDĐ; nếu máy chủ mở lại thì nên dò lại. Không có bản đồ nào xác minh được."
+  },
+  {
+   "tinh_cu": "Lào Cai",
+   "tinh_moi": "Lào Cai",
+   "trang_nguon": [
+    "https://laocai.gov.vn (không vào được)"
+   ],
+   "huyen": [
+    {
+     "ten": "TP. Lào Cai",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "",
+     "ghi_chu": "Không có tên miền riêng còn hoạt động (thanhpho / tplaocai .laocai.gov.vn không có); cổng tỉnh bị ngắt kết nối."
+    },
+    {
+     "ten": "TX. Sa Pa",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://sapa.laocai.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Bát Xát",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://batxat.laocai.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Bảo Thắng",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://baothang.laocai.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Bảo Yên",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://baoyen.laocai.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Bắc Hà",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://bacha.laocai.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Mường Khương",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://muongkhuong.laocai.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Si Ma Cai",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://simacai.laocai.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Văn Bàn",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://vanban.laocai.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    }
+   ],
+   "ghi_chu": "Toàn bộ web nhà nước Lào Cai bị ngắt kết nối (connection reset) từ máy nhà, WebFetch và trình duyệt Chrome: laocai.gov.vn, stnmt.laocai.gov.vn, snnmt.laocai.gov.vn, gis.laocai.gov.vn, congbao.laocai.gov.vn và 8 cổng huyện. Báo Lào Cai (không phải nguồn file) cho biết UBND tỉnh phê duyệt QHSDĐ 2021-2030 cấp huyện năm 2021 và phê duyệt điều chỉnh năm 2023 — số QĐ từng huyện chưa tìm được. File của cổng tỉnh nằm trên máy chủ storage-vnportal.vnpt.vn/lci-ubnd-responsive/… nhưng không có trang danh mục để lần ra đường dẫn."
+  },
+  {
+   "tinh_cu": "Yên Bái",
+   "tinh_moi": "Lào Cai",
+   "trang_nguon": [
+    "https://yenbai.gov.vn (máy chủ còn nhưng trả 404 / 403 — đã gỡ cổng)"
+   ],
+   "huyen": [
+    {
+     "ten": "TP. Yên Bái",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "2258/QĐ-UBND (điều chỉnh QHSDĐ thời kỳ 2021-2030) — chưa xác minh trên trang nhà nước (chỉ thấy trong kết quả máy tìm kiếm, nguồn: trang tư nhân luatvietnam.vn)",
+      "ngay": "2023 (ngày cụ thể chưa xác minh)",
+      "url": ""
+     },
+     "trang": "",
+     "ghi_chu": "Tên miền tpyenbai.yenbai.gov.vn không còn."
+    },
+    {
+     "ten": "TX. Nghĩa Lộ",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "",
+     "ghi_chu": "Tên miền nghialo.yenbai.gov.vn không còn."
+    },
+    {
+     "ten": "Huyện Lục Yên",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "",
+     "ghi_chu": "Tên miền lucyen.yenbai.gov.vn không còn."
+    },
+    {
+     "ten": "Huyện Mù Cang Chải",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "",
+     "ghi_chu": "Tên miền mucangchai.yenbai.gov.vn không còn."
+    },
+    {
+     "ten": "Huyện Trạm Tấu",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "",
+     "ghi_chu": "Tên miền tramtau.yenbai.gov.vn không còn."
+    },
+    {
+     "ten": "Huyện Trấn Yên",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "",
+     "ghi_chu": "Tên miền tranyen.yenbai.gov.vn không còn."
+    },
+    {
+     "ten": "Huyện Văn Chấn",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "",
+     "ghi_chu": "Tên miền vanchan.yenbai.gov.vn không còn."
+    },
+    {
+     "ten": "Huyện Văn Yên",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "",
+     "ghi_chu": "Tên miền vanyen.yenbai.gov.vn không còn."
+    },
+    {
+     "ten": "Huyện Yên Bình",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "",
+     "ghi_chu": "Tên miền yenbinh.yenbai.gov.vn không còn."
+    }
+   ],
+   "ghi_chu": "Hạ tầng web Yên Bái đã bị gỡ sau sáp nhập vào Lào Cai: yenbai.gov.vn chỉ còn máy chủ trống (HTTPS 404, HTTP 403); www / stnmt / tnmt / sotnmt .yenbai.gov.vn, các tên miền riêng kiểu stnmtyenbai.gov.vn, sctyenbai.gov.vn và toàn bộ cổng huyện đều không còn tên miền. Cổng tỉnh Lào Cai mới thì bị ngắt kết nối. Không tìm được bản đồ hay QĐ nào trên nguồn nhà nước."
+  },
+  {
+   "tinh_cu": "Lai Châu",
+   "tinh_moi": "Lai Châu",
+   "trang_nguon": [
+    "https://laichau.gov.vn/thong-tin-tra-cuu/thong-tin-quy-hoach",
+    "https://laichau.gov.vn/page/search?&keyword=quy+ho%E1%BA%A1ch+s%E1%BB%AD+d%E1%BB%A5ng+%C4%91%E1%BA%A5t+%C4%91%E1%BA%BFn+n%C4%83m+2030",
+    "https://sonnmt.laichau.gov.vn/pho-bien-kien-thuc/quy-hoach"
+   ],
+   "huyen": [
+    {
+     "ten": "TP. Lai Châu",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [
+      {
+       "url": "https://laichau.gov.vn/upload/2000066/fck/ntkanh/BAN%20DO%20KH2025%20TP%20LAI%20CHAU.pdf",
+       "dinh_dang": "pdf",
+       "dung_luong": "39,8 MB (39.758.003 byte, theo phần đầu máy chủ trả về)",
+       "loai": "KHSDĐ 2025",
+       "ghi_chu": "Bản đồ kế hoạch sử dụng đất năm 2025 (QĐ 401/QĐ-UBND ngày 27/2/2025) — KHÔNG phải bản đồ QHSDĐ 2030"
+      }
+     ],
+     "quyet_dinh": {
+      "so": "1152/QĐ-UBND",
+      "ngay": "31/08/2021",
+      "url": "https://laichau.gov.vn/upload/2000066/fck/files/Q___1152_9d054.pdf"
+     },
+     "trang": "https://laichau.gov.vn/thong-tin-tra-cuu/thong-tin-quy-hoach/quyet-dinh-so-1152-qd-ubnd-ngay-31-8-2021-cua-ubnd-tinh-lai-.html",
+     "ghi_chu": "QĐ phê duyệt QHSDĐ thời kỳ 2021-2030 + KHSDĐ 2021. Bài chỉ đính kèm QĐ + biểu (https://laichau.gov.vn/upload/2000066/fck/files/Bi___u_Q___1152_ac017.pdf), KHÔNG có bản đồ QHSDĐ 2030. Có bài lấy ý kiến dự thảo 'Lập điều chỉnh QHSDĐ đến năm 2030 thành phố Lai Châu' nhưng chưa thấy QĐ phê duyệt điều chỉnh. Bài KHSDĐ 2025: https://laichau.gov.vn/thong-tin-tra-cuu/thong-tin-quy-hoach/quyet-dinh-so-401-qd-ubnd-ngay-27-2-2025-cua-ubnd-tinh-lai-chau-ve-viec-phe-duyet-ke-hoach-su-dung-dat-nam-2025-thanh-ph.html"
+    },
+    {
+     "ten": "Huyện Tam Đường",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "659/QĐ-UBND",
+      "ngay": "08/06/2021",
+      "url": "https://laichau.gov.vn/upload/2000066/fck/files/Q___659_24f99.pdf"
+     },
+     "trang": "https://laichau.gov.vn/thong-tin-tra-cuu/thong-tin-quy-hoach/quyet-dinh-so-659-qd-ubnd-ngay-8-6-2021-cua-ubnd-tinh-lai-ch.html",
+     "ghi_chu": "QHSDĐ thời kỳ 2021-2030 + KHSDĐ 2021; đính kèm QĐ + biểu (https://laichau.gov.vn/upload/2000066/fck/files/Q___659_bi___u_1eb0f.pdf), không có bản đồ. Có bài lấy ý kiến dự thảo 'Lập điều chỉnh QHSDĐ thời kỳ 2021-2030 huyện Tam Đường' — chưa thấy QĐ phê duyệt điều chỉnh. KHSDĐ 2025 (QĐ 604/QĐ-UBND ngày 1/4/2025) không thấy kèm bản đồ."
+    },
+    {
+     "ten": "Huyện Sìn Hồ",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "661/QĐ-UBND",
+      "ngay": "08/06/2021",
+      "url": "https://laichau.gov.vn/upload/2000066/fck/files/Q___661_ec995.pdf"
+     },
+     "trang": "https://laichau.gov.vn/thong-tin-tra-cuu/thong-tin-quy-hoach/quyet-dinh-so-661-qd-ubnd-ngay-8-6-2021-cua-ubnd-tinh-lai-ch.html",
+     "ghi_chu": "QHSDĐ thời kỳ 2021-2030 + KHSDĐ 2021; đính kèm QĐ + biểu (https://laichau.gov.vn/upload/2000066/fck/files/Q___661_bi___u_231fb.pdf), không có bản đồ. KHSDĐ 2025: QĐ 760/QĐ-UBND ngày 5/5/2025 (chưa xác minh có bản đồ)."
+    },
+    {
+     "ten": "Huyện Than Uyên",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [
+      {
+       "url": "https://laichau.gov.vn/upload/2000066/fck/ntkanh/1_%20BD%20KH2025%20THAN%20UYEN%2012_3_25duyet.pdf",
+       "dinh_dang": "pdf",
+       "dung_luong": "22,8 MB (22.757.195 byte)",
+       "loai": "KHSDĐ 2025",
+       "ghi_chu": "Bản đồ KHSDĐ năm 2025 (QĐ 540/QĐ-UBND ngày 19/3/2025) — không phải QHSDĐ 2030"
+      }
+     ],
+     "quyet_dinh": {
+      "so": "620/QĐ-UBND (điều chỉnh QHSDĐ đến năm 2030 — bản mới nhất)",
+      "ngay": "27/04/2023",
+      "url": "https://laichau.gov.vn/upload/2000066/fck/ntkanh/Q%C4%90%20620.pdf"
+     },
+     "trang": "https://laichau.gov.vn/tin-tuc-su-kien/chuyen-de/tin-trong-nuoc/quyet-dinh-so-620-qd-ubnd-ngay-27-4-2023-cua-ubnd-tinh-lai-chau-ve-viec-ve-viec-phe-duyet-dieu-chinh-quy-hoach-su-dung-d.html",
+     "ghi_chu": "QHSDĐ gốc: 803/QĐ-UBND ngày 06/07/2021 (trang hệ thống văn bản https://laichau.gov.vn/he-thong-van-ban/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-thoi-ky-25.html). Điều chỉnh QHSDĐ đến 2030: 620/QĐ-UBND ngày 27/4/2023 (mới nhất), đính kèm QĐ + biểu, không có bản đồ."
+    },
+    {
+     "ten": "Huyện Tân Uyên",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "897/QĐ-UBND (điều chỉnh QHSDĐ đến năm 2030 — bản mới nhất)",
+      "ngay": "24/06/2024",
+      "url": "https://laichau.gov.vn/upload/2000066/fck/ntkanh/Q%C4%90%20897.pdf"
+     },
+     "trang": "https://laichau.gov.vn/thong-tin-tra-cuu/thong-tin-quy-hoach/quyet-dinh-so-897-qd-ubnd-ngay-24-6-2024-cua-ubnd-tinh-lai-chau-ve-viec-phe-duyet-dieu-chinh-quy-hoach-sudung-dat-den-na.html",
+     "ghi_chu": "QHSDĐ gốc: 631/QĐ-UBND ngày 03/06/2021 (https://laichau.gov.vn/he-thong-van-ban/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-thoi-ky-22.html). Điều chỉnh: 897/QĐ-UBND ngày 24/6/2024 (mới nhất) — đính kèm QĐ + biểu, không có bản đồ."
+    },
+    {
+     "ten": "Huyện Nậm Nhùn",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [
+      {
+       "url": "https://laichau.gov.vn/upload/2000066/fck/ntkanh/BDKH%202025%20NAM%20NHUN%20(pheduyet).pdf",
+       "dinh_dang": "pdf",
+       "dung_luong": "15,4 MB (15.446.650 byte)",
+       "loai": "KHSDĐ 2025",
+       "ghi_chu": "Bản đồ KHSDĐ năm 2025 (QĐ 563/QĐ-UBND ngày 25/3/2025) — không phải QHSDĐ 2030"
+      }
+     ],
+     "quyet_dinh": {
+      "so": "1012/QĐ-UBND (điều chỉnh QHSDĐ đến năm 2030 — bản mới nhất)",
+      "ngay": "10/07/2024",
+      "url": "https://laichau.gov.vn/upload/2000066/fck/ntkanh/Q%C4%901012.pdf"
+     },
+     "trang": "https://laichau.gov.vn/thong-tin-tra-cuu/thong-tin-quy-hoach/quyet-dinh-so-1012-qd-ubnd-ngay-10-7-2024-cua-ubnd-tinh-lai-chau-ve-viec-phe-duyet-dieu-chinh-quy-hoach-su-dung-dat-den-.html",
+     "ghi_chu": "QHSDĐ gốc: 623/QĐ-UBND ngày 01/06/2021 (https://laichau.gov.vn/he-thong-van-ban/quyet-dinh-ve-viec-phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2.html). Điều chỉnh 1012/QĐ-UBND ngày 10/7/2024 (mới nhất), đính kèm QĐ + biểu, không có bản đồ."
+    },
+    {
+     "ten": "Huyện Mường Tè",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1010/QĐ-UBND (điều chỉnh QHSDĐ đến năm 2030 — bản mới nhất)",
+      "ngay": "09/07/2024",
+      "url": "https://laichau.gov.vn/upload/2000066/fck/ntkanh/Q%C4%90%201010.pdf"
+     },
+     "trang": "https://laichau.gov.vn/thong-tin-tra-cuu/thong-tin-quy-hoach/quyet-dinh-so-1010-qd-ubnd-ngay-9-7-2024-cua-ubnd-tinh-lai-chau-ve-viec-phe-duyet-dieu-chinh-quy-hoach-su-dung-dat-den-n.html",
+     "ghi_chu": "Đính kèm QĐ + biểu (https://laichau.gov.vn/upload/2000066/fck/ntkanh/Bi%E1%BB%83u%20kem%20Quy%E1%BA%BFt%20%C4%91%E1%BB%8Bnh%20c%E1%BB%A7a%20MTe.pdf), không có bản đồ. Chưa tìm thấy số QĐ QHSDĐ gốc năm 2021 trên cổng (chưa xác minh). KHSDĐ 2025 (QĐ 582/QĐ-UBND) không thấy kèm bản đồ."
+    },
+    {
+     "ten": "Huyện Phong Thổ",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [
+      {
+       "url": "https://laichau.gov.vn/upload/2000066/fck/ntkanh/B%E1%BA%A3n%20%C4%91%E1%BB%93.pdf",
+       "dinh_dang": "pdf",
+       "dung_luong": "44,4 MB (44.428.497 byte)",
+       "loai": "KHSDĐ 2025",
+       "ghi_chu": "Bản đồ KHSDĐ năm 2025 huyện Phong Thổ (QĐ 482/QĐ-UBND ngày 10/3/2025) — không phải QHSDĐ 2030"
+      }
+     ],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://laichau.gov.vn/thong-tin-tra-cuu/thong-tin-quy-hoach/quyet-dinh-so-482-qd-ubnd-ngay-10-3-2025-cua-ubnd-tinh-lai-chau-ve-viec-phe-duyet-ke-hoach-su-dung-dat-nam-2025-huyen-ph.html",
+     "ghi_chu": "Không tìm thấy QĐ phê duyệt QHSDĐ 2021-2030 gốc của Phong Thổ trên cổng (chỉ thấy nhiều QĐ 'điều chỉnh quy mô, địa điểm dự án trong QHSDĐ thời kỳ 2021-2030' như 387/QĐ-UBND 29/3/2022, 1438/QĐ-UBND 15/9/2023, 2239/QĐ-UBND 13/12/2023, 874/QĐ-UBND 18/6/2024 — đây là điều chỉnh danh mục công trình, không phải bản đồ)."
+    }
+   ],
+   "ghi_chu": "Cổng tỉnh laichau.gov.vn (mục 'Chiến lược, quy hoạch, kế hoạch' + ô tìm kiếm /page/search?&keyword=…) đăng QĐ phê duyệt QHSDĐ 2021-2030 (2021) và các QĐ điều chỉnh QHSDĐ đến 2030 (2023-2024) của các huyện, nhưng CHỈ kèm file QĐ + biểu số liệu, KHÔNG kèm bản đồ QHSDĐ 2030. Bản đồ chỉ có cho KHSDĐ năm 2025 của 4 đơn vị (TP Lai Châu, Phong Thổ, Than Uyên, Nậm Nhùn), PDF 15–44 MB. Trang Sở NN&MT (sonnmt.laichau.gov.vn) mục 'Quy hoạch' trống. Cổng các huyện cũ (tamduong/phongtho/sinho/muongte/namnhun/thanuyen .laichau.gov.vn) không còn tên miền. Kết quả tìm kiếm của cổng chỉ hiện 12/28 kết quả (phân trang chạy bằng script) nên có thể còn bài chưa thấy."
+  },
+  {
+   "tinh_cu": "Điện Biên",
+   "tinh_moi": "Điện Biên",
+   "trang_nguon": [
+    "https://dienbien.gov.vn/vi/tim-kiem?key=quy+ho%E1%BA%A1ch+s%E1%BB%AD+d%E1%BB%A5ng+%C4%91%E1%BA%A5t+th%E1%BB%9Di+k%E1%BB%B3+2021-2030",
+    "https://dienbien.gov.vn/vi/chuyen-muc/thong-tin-chien-luoc-quy-hoach",
+    "https://dienbien.gov.vn/vi/chuyen-muc/quy-hoach-ke-hoach-su-dung-dat",
+    "https://snnmt.dienbien.gov.vn/vi/chuyen-muc/menu-chien-luoc-quy-hoach-ke-hoach"
+   ],
+   "huyen": [
+    {
+     "ten": "TP. Điện Biên Phủ",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1556/QĐ-UBND",
+      "ngay": "31/08/2022",
+      "url": "https://dienbien.gov.vn/portal/VanBan/2023-02/dde33c477e75c74ddb.pdf"
+     },
+     "trang": "https://dienbien.gov.vn/vi/bai-viet/Phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-p40oum",
+     "ghi_chu": "Bài đăng 02/02/2023 mục 'Thông tin chiến lược quy hoạch' chỉ đính kèm file QĐ (~455 KB), không có bản đồ. Số + ngày đọc từ trang đầu file QĐ."
+    },
+    {
+     "ten": "TX. Mường Lay",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1558/QĐ-UBND",
+      "ngay": "31/08/2022",
+      "url": "https://dienbien.gov.vn/portal/VanBan/2023-02/9275fc9adb855bbdml.pdf"
+     },
+     "trang": "https://dienbien.gov.vn/vi/bai-viet/Phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-ujcipc",
+     "ghi_chu": "Chỉ file QĐ, không có bản đồ."
+    },
+    {
+     "ten": "Huyện Điện Biên",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1559/QĐ-UBND",
+      "ngay": "31/08/2022",
+      "url": "https://dienbien.gov.vn/portal/VanBan/2023-02/e627e4c3d34d371dhuy%E1%BB%87n%20db.pdf"
+     },
+     "trang": "https://dienbien.gov.vn/vi/bai-viet/Phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-nro6gt",
+     "ghi_chu": "Chỉ file QĐ, không có bản đồ."
+    },
+    {
+     "ten": "Huyện Điện Biên Đông",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1557/QĐ-UBND",
+      "ngay": "31/08/2022",
+      "url": "https://dienbien.gov.vn/portal/VanBan/2023-02/c78d3b6bc2296f8ddbd.pdf"
+     },
+     "trang": "https://dienbien.gov.vn/vi/bai-viet/Phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-zzm1vd",
+     "ghi_chu": "Chỉ file QĐ, không có bản đồ."
+    },
+    {
+     "ten": "Huyện Mường Ảng",
+     "trang_thai": "khong-tim-thay",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "",
+     "ghi_chu": "Ô tìm kiếm cổng tỉnh không ra bài QHSDĐ 2021-2030 của Mường Ảng (9 huyện còn lại đều có bài đăng cùng ngày 02/02/2023). Số QĐ chưa xác minh."
+    },
+    {
+     "ten": "Huyện Mường Chà",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1549/QĐ-UBND",
+      "ngay": "29/08/2022",
+      "url": "https://dienbien.gov.vn/portal/VanBan/2023-02/3e353cdf317a6a3dmc.pdf"
+     },
+     "trang": "https://dienbien.gov.vn/vi/bai-viet/Phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-9v21ig",
+     "ghi_chu": "Chỉ file QĐ, không có bản đồ."
+    },
+    {
+     "ten": "Huyện Mường Nhé",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1652/QĐ-UBND",
+      "ngay": "13/09/2022",
+      "url": "https://dienbien.gov.vn/portal/VanBan/2023-02/1d19d7b4f1d7de9dmn.pdf"
+     },
+     "trang": "https://dienbien.gov.vn/vi/bai-viet/Phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-z4m78s",
+     "ghi_chu": "Chỉ file QĐ, không có bản đồ."
+    },
+    {
+     "ten": "Huyện Nậm Pồ",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1548/QĐ-UBND",
+      "ngay": "29/08/2022",
+      "url": "https://dienbien.gov.vn/portal/VanBan/2023-02/c64addc4e1dafd5dnp.pdf"
+     },
+     "trang": "https://dienbien.gov.vn/vi/bai-viet/Phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-dkrn0f",
+     "ghi_chu": "Chỉ file QĐ, không có bản đồ."
+    },
+    {
+     "ten": "Huyện Tủa Chùa",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1550/QĐ-UBND",
+      "ngay": "29/08/2022",
+      "url": "https://dienbien.gov.vn/portal/VanBan/2023-02/6beb2f29e8dd302dtc.pdf"
+     },
+     "trang": "https://dienbien.gov.vn/vi/bai-viet/Phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-eiba85",
+     "ghi_chu": "Chỉ file QĐ, không có bản đồ."
+    },
+    {
+     "ten": "Huyện Tuần Giáo",
+     "trang_thai": "chi-co-quyet-dinh",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1731/QĐ-UBND",
+      "ngay": "20/09/2022",
+      "url": "https://dienbien.gov.vn/portal/VanBan/2023-02/4e3cf1df4191908dtg.pdf"
+     },
+     "trang": "https://dienbien.gov.vn/vi/bai-viet/Phe-duyet-quy-hoach-su-dung-dat-thoi-ky-2021-2030-z0dtj6",
+     "ghi_chu": "Chỉ file QĐ, không có bản đồ."
+    }
+   ],
+   "ghi_chu": "Cổng tỉnh dienbien.gov.vn mục 'Thông tin chiến lược quy hoạch' (tìm bằng ô tìm kiếm /vi/tim-kiem?key=…) có bài 'Phê duyệt QHSDĐ thời kỳ 2021-2030' cho 9/10 đơn vị, đăng 02/02/2023, mỗi bài chỉ kèm 1 file QĐ PDF ~455 KB (đã đọc trang đầu để lấy số/ngày) — KHÔNG có bản đồ. Mục 'Quy hoạch, kế hoạch sử dụng đất' của cổng chỉ còn QĐ KHSDĐ 2017-2018. Trang Sở NN&MT mới (snnmt.dienbien.gov.vn) mục 'Chiến lược, quy hoạch, kế hoạch' không có bài QHSDĐ; trang Sở TN&MT cũ stnmt.dienbien.gov.vn (Longwin CMS) trả trang 404. Cổng các huyện cũ: phần lớn đã thành cổng xã/phường; cổng 'Huyện Điện Biên' (huyendienbien.dienbien.gov.vn) và cổng Tủa Chùa (tuachua.dienbien.gov.vn) còn mục 'Quy hoạch, kế hoạch sử dụng đất' nhưng chỉ chứa QĐ thu hồi / chuyển mục đích / KHSDĐ hằng năm, không có bản đồ QHSDĐ 2030. Không thấy bản đồ QHSDĐ 2030 nào trên nguồn nhà nước đã mở."
+  },
+  {
+   "tinh_cu": "Sơn La",
+   "tinh_moi": "Sơn La",
+   "trang_nguon": [
+    "https://sonla.gov.vn (không vào được)",
+    "https://congbao.sonla.gov.vn (vào được nhưng ô tìm kiếm không lọc theo từ khoá)"
+   ],
+   "huyen": [
+    {
+     "ten": "TP. Sơn La",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://tpsonla.sonla.gov.vn",
+     "ghi_chu": "Tên miền chỉ có địa chỉ IPv6, không mở được từ mạng đang dùng."
+    },
+    {
+     "ten": "Huyện Bắc Yên",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://bacyen.sonla.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Mai Sơn",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://maison.sonla.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối. (Kết quả tìm kiếm nhắc QĐ 2902/QĐ-UBND ngày 31/12/2025 — đó là KHSDĐ năm 2025, không phải QHSDĐ 2030.)"
+    },
+    {
+     "ten": "Huyện Mộc Châu",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://mocchau.sonla.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Mường La",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://muongla.sonla.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Phù Yên",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1665/QĐ-UBND (điều chỉnh QHSDĐ đến năm 2030) — chưa xác minh trên trang nhà nước (chỉ thấy trong kết quả máy tìm kiếm, nguồn: trang tư nhân thuviennhadat.vn)",
+      "ngay": "30/06/2025",
+      "url": ""
+     },
+     "trang": "https://phuyen.sonla.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Quỳnh Nhai",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "1671/QĐ-UBND (điều chỉnh QHSDĐ đến năm 2030) — chưa xác minh trên trang nhà nước (chỉ thấy trong kết quả máy tìm kiếm, nguồn: trang tư nhân thuviennhadat.vn)",
+      "ngay": "30/06/2025",
+      "url": ""
+     },
+     "trang": "https://quynhnhai.sonla.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Sông Mã",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://songma.sonla.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Sốp Cộp",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://sopcop.sonla.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Thuận Châu",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://thuanchau.sonla.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Vân Hồ",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://vanho.sonla.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    },
+    {
+     "ten": "Huyện Yên Châu",
+     "trang_thai": "khong-vao-duoc",
+     "ban_do": [],
+     "quyet_dinh": {
+      "so": "",
+      "ngay": "",
+      "url": ""
+     },
+     "trang": "https://yenchau.sonla.gov.vn",
+     "ghi_chu": "Máy chủ ngắt kết nối (connection reset) — không vào được."
+    }
+   ],
+   "ghi_chu": "Cổng tỉnh sonla.gov.vn, sonnmt.sonla.gov.vn và 11 cổng huyện (cùng cụm máy chủ 2001:ee0:305:a::508 / 14.225.40.24) bị ngắt kết nối từ máy nhà, WebFetch và trình duyệt; stnmt / sotnmt / tpsonla / quyhoach / gis .sonla.gov.vn chỉ có địa chỉ IPv6 nên không mở được từ mạng đang dùng. Chỉ trang Công báo Sơn La (congbao.sonla.gov.vn) vào được nhưng là nơi đăng văn bản quy phạm, ô tìm kiếm không lọc theo từ khoá. Hai QĐ điều chỉnh QHSDĐ (Phù Yên, Quỳnh Nhai, cùng ngày 30/6/2025) chỉ thấy qua máy tìm kiếm từ trang tư nhân — chưa xác minh."
+  }
+ ]
+}

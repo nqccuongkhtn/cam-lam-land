@@ -19,6 +19,18 @@ import { listCustomers, listInterests, addInterest, removeInterest, type Custome
 import { Skeleton } from '@/components/ui';
 import type { Diem } from '@/components/ChiDuongPanel';
 import { useDayCotNutBanDo } from '@/lib/cotNutBanDo';
+// LỚP QHSDĐ 2030 CÁC TỈNH KHÁC (16/10/2026, chủ dự án: "tiếp tục làm cho cả nước") — danh mục ở src/data/qhCaNuoc.json, GHI BẰNG
+// scripts/qh-tinh/them_lop_ca_nuoc.py (đừng sửa tay). Ô ảnh nằm ở ổ D của máy chủ (nginx /tiles-qg/, TILES_QG_DIR — ổ C gần đầy).
+// Thêm huyện = chạy công cụ đó + dựng lại giao diện; trang này tự gộp vào RASTER_OVERLAYS · VUNG_QH · MUC_QH · CAN_CU_QH · ovOn.
+import QH_CA_NUOC_JSON from '@/data/qhCaNuoc.json';
+type CanCuQg = { so: string; ngay: string; coQuan: string; ten: string; tep: string; cac?: { so: string; ngay: string; ten: string; tep: string }[] };
+const QH_CA_NUOC = QH_CA_NUOC_JSON as unknown as {
+  vung: { id: string; ten: string; tenNgan: string; tinh: string; tamXem: [number, number, number] }[];
+  lop: { id: string; ten: string; tenNgan: string; tenApp: string; vung: string; zBay?: number; tiles: string; minzoom: number; maxzoom: number;
+         khung: [number, number, number, number]; canCu?: CanCuQg }[];
+};
+const bonGoc = (k: [number, number, number, number]) =>
+  [[k[0], k[3]], [k[2], k[3]], [k[2], k[1]], [k[0], k[1]]] as [[number, number], [number, number], [number, number], [number, number]];
 
 // Bỏ dấu tiếng Việt để gõ tìm không cần dấu: gõ "cam lam" vẫn ra "Cam Lâm".
 const boDauVn = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
@@ -390,6 +402,8 @@ const RASTER_OVERLAYS = [
     coordinates: [[109.09844, 12.2651], [109.12705, 12.2651], [109.12705, 12.24377], [109.09844, 12.24377]] as [[number, number], [number, number], [number, number], [number, number]] },
   // (14/10/2026: đã GỠ lớp 1/500 DỰ THẢO lấy ý kiến 9 khu — thay bằng 1/500 CHÍNH THỨC 6 đồ án, CHỈ ADMIN XEM: danh sách
   //  lớp + ô ảnh lấy từ máy chủ /api/qh-rieng (routes/qhRieng.ts), không ghi ở đây — xem `lopRieng` trong MapPage.)
+  // ── CÁC TỈNH KHÁC (16/10/2026): từ src/data/qhCaNuoc.json, ô ở /tiles-qg/ (ổ D) ──
+  ...QH_CA_NUOC.lop.map((l) => ({ id: l.id, name: l.ten, url: '', tiles: [l.tiles], minzoom: l.minzoom, maxzoom: l.maxzoom, coordinates: bonGoc(l.khung) })),
 ];
 // ── KHOÁ QUY HOẠCH CAM LÂM (15/10/2026, chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free, còn lại khoá lại, sửa cả phần thông tin
 // kiểm tra quy hoạch") ── 8 lớp dưới đây KHÔNG còn ở đường công khai /tiles/… (nginx chặn): chỉ người có VÉ (admin — GET /api/qh-rieng/ve)
@@ -434,6 +448,7 @@ const VUNG_QH: { id: string; ten: string; tenNgan: string; tinh: string; tamXem:
   { id: 'khanh-vinh', ten: 'Huyện Khánh Vĩnh',    tenNgan: 'Khánh Vĩnh', tinh: 'khanh-hoa', tamXem: [108.8414, 12.3126, 10] },
   { id: 'da-lat',    ten: 'TP. Đà Lạt',           tenNgan: 'Đà Lạt',    tinh: 'lam-dong', tamXem: [108.4641, 11.9201, 12] },
   { id: 'duc-trong', ten: 'Huyện Đức Trọng',      tenNgan: 'Đức Trọng', tinh: 'lam-dong', tamXem: [108.3865, 11.6524, 11] },
+  ...QH_CA_NUOC.vung,   // các tỉnh khác (src/data/qhCaNuoc.json)
 ];
 // TỈNH / THÀNH PHỐ (16/10/2026 — chủ dự án: "chia địa giới hành chính tìm kiếm theo tỉnh nữa đang thiếu", làm cho cả nước): đủ 34 đơn vị
 // cấp tỉnh từ 1/7/2025 (Nghị quyết 202/2025/QH15; ghi chú = các tỉnh cũ đã nhập vào). Bản QHSDĐ 2030 lập theo HUYỆN CŨ nên ô "Địa giới" là
@@ -504,6 +519,8 @@ const MUC_QH: { id: string; ten: string; tenNgan: string; tenApp: string; gom: s
   { id: 'qh-ductrong2030', ten: 'QHSDĐ 2030 · Huyện Đức Trọng (Lâm Đồng)', tenNgan: 'Đức Trọng 2030', tenApp: 'QH Sử dụng đất 2030', gom: ['qh-ductrong2030'], zBay: 11, vung: 'duc-trong' },
   { id: 'qh-nt-tay-pk22', ten: 'ĐC phân khu 1/2000 Tây Nha Trang 2.2 (chưa xác minh quyết định)', tenNgan: 'Tây NT 2.2', tenApp: 'ĐC phân khu 1/2000 Tây NT 2.2', gom: ['qh-nt-tay-pk22'], zBay: 13, vung: 'dien-khanh' },
   // (1/500 chính thức: mục chọn do máy chủ gửi riêng cho admin — `mucQh` trong MapPage)
+  // các tỉnh khác (src/data/qhCaNuoc.json)
+  ...QH_CA_NUOC.lop.map((l) => ({ id: l.id, ten: l.ten, tenNgan: l.tenNgan, tenApp: l.tenApp, gom: [l.id], zBay: l.zBay, vung: l.vung })),
 ];
 // CĂN CỨ PHÁP LÝ của từng bản quy hoạch đang chồng lên bản đồ.
 // Người xem hay hỏi "cái màu này dựa vào đâu?" — nên phải chỉ thẳng ra quyết định phê duyệt,
@@ -595,6 +612,7 @@ const CAN_CU_QH: Record<string, CanCu> = {
     '/Portals/0/1650_signed.pdf',
     'Bản đồ Điều chỉnh Quy hoạch sử dụng đất đến năm 2030 — Huyện Khánh Vĩnh (tỷ lệ 1/25.000)', '/Portals/0/DCQH%20SDD%20DEN%2020330%2008052025.pdf'),
 };
+for (const l of QH_CA_NUOC.lop) if (l.canCu) CAN_CU_QH[l.id] = l.canCu;   // các tỉnh khác (src/data/qhCaNuoc.json)
 
 const QH_BOUNDS: [[number, number], [number, number]] = [[108.9401268, 11.9257021], [109.2563886, 12.217594]];
 // Khung bao [tây, nam, đông, bắc] của một hình GeoJSON bất kỳ (điểm, đường, vùng, nhiều vùng).
@@ -1213,7 +1231,8 @@ export default function MapPage() {
   // LỚP MẶC ĐỊNH (15/10/2026): QĐ893 — bản Cam Lâm duy nhất xem miễn phí (chủ dự án: "ở Cam Lâm chỉ cho 893 là được xem free") — cho MỌI
   // tài khoản, kể cả admin (chủ dự án "đưa 2030 lên đầu", "đang mở 893 mà"): trước admin tự đổi sang QĐ205 khi vé về — đã bỏ.
   // Các lớp khác MẶC ĐỊNH TẮT: chồng lên nhau thì màu chồng màu. Người dùng tự tích vào mới hiện.
-  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': false, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd918': false, 'qh-cuhin': false, 'qh-taynam': false, 'qh-taybac': false, 'qh-qd893': true, 'qh-ninhhoa2030': false, 'qh-nhatrang2030': false, 'qh-khanhson2030': false, 'qh-vanninh2030': false, 'qh-camranh2030': false, 'qh-dienkhanh2030': false, 'qh-khanhvinh2030': false, 'qh-dalat2030': false, 'qh-ductrong2030': false });
+  const [ovOn, setOvOn] = useState<Record<string, boolean>>({ 'qh-qd205': false, 'qh-qd2076': false, 'qh-qd2101': false, 'qh-qd2222': false, 'qh-qd918': false, 'qh-cuhin': false, 'qh-taynam': false, 'qh-taybac': false, 'qh-qd893': true, 'qh-ninhhoa2030': false, 'qh-nhatrang2030': false, 'qh-khanhson2030': false, 'qh-vanninh2030': false, 'qh-camranh2030': false, 'qh-dienkhanh2030': false, 'qh-khanhvinh2030': false, 'qh-dalat2030': false, 'qh-ductrong2030': false,
+    ...Object.fromEntries(QH_CA_NUOC.lop.map((l) => [l.id, false])) });
   // ĐỊA GIỚI đang chọn để LỌC danh sách lớp quy hoạch — giờ nhiều bản quá, gom theo huyện/thị cho gọn
   // (chủ dự án 14/10/2026: "chọn địa giới rồi hiện quy hoạch ở địa giới đó thôi để đỡ loạn"). Mặc định Khánh Hòa · Cam Lâm.
   // Hai tầng (16/10/2026): TỈNH (tinhQh) → huyện / thị cũ (vungQh). vungQh = '' là "cả tỉnh": hiện mọi bản của tỉnh, chia nhóm theo huyện.

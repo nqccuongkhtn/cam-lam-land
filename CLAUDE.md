@@ -1091,6 +1091,11 @@ Khi làm việc gì đụng tới **Claude/Anthropic API** (route `danhMuc`, `ai
   ô `dalat2030v1` / `ductrong2030v1`, Địa giới "TP. Đà Lạt / Huyện Đức Trọng (Lâm Đồng)". Chỉ có ẢNH — chưa bóc loại đất, web chưa có thửa
   địa chính Lâm Đồng. ⚠️ Kinh tuyến trục Lâm Đồng 107°45' (khác Khánh Hòa 108°15') — mục `"ktt"` trong file nắn; chi tiết + cách đưa lên
   web (`DUA-LEN-WEB-LAM-DONG.bat`): `scripts/qh-tinh/README.md` mục "TỈNH KHÁC — Lâm Đồng".
+  **Ô "Địa giới" HAI TẦNG (16/10/2026, chủ dự án: "chia địa giới hành chính tìm kiếm theo tỉnh nữa đang thiếu"):** TỈNH (`TINH_VN` = đủ 34
+  tỉnh / thành từ 1/7/2025, kèm tâm bay tới) → huyện / thị cũ (`VUNG_QH`, trường `tinh`). Chỉ tỉnh có ít nhất một dòng `VUNG_QH` mới chọn được
+  (`TINH_CO_QH`), tỉnh khác gộp một dòng "N tỉnh / thành khác: đang cập nhật". Đổi tỉnh → "Cả tỉnh" (`vungQh = ''`: mọi bản của tỉnh, mỗi huyện
+  một dòng tên nhỏ). Thêm huyện của tỉnh mới = thêm dòng `VUNG_QH` có `tinh` là đủ. Tra cứu thửa cũng có ô Tỉnh đứng đầu (`TINH_CO_THUA` — kho
+  thửa hiện chỉ Khánh Hòa). Lớp "Đối chiếu bản đồ V8" + lớp dữ liệu tên có "Cam Lâm" CHỈ hiện khi đang chọn huyện Cam Lâm (đổi vùng là tự tắt).
 
 ---
 

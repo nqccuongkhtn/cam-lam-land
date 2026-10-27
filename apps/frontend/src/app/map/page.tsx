@@ -3936,7 +3936,7 @@ export default function MapPage() {
                   Trước ghim bằng "sticky" với khoảng cách đoán sẵn nên vẫn nhúc nhích. */}
               {/* Điện thoại: TẤT CẢ NÚT MỘT HÀNG NGANG gọn như app (Phiếu QH · Lưu · Chia sẻ · Chỉ đường),
                   lướt ngang nếu thiếu chỗ. Máy tính giữ nút phiếu to + hàng 3 nút. */}
-              <div className={`${sheetNho ? 'max-sm:hidden' : ''} shrink-0 px-2.5 sm:px-4 pt-1.5 pb-2 bg-white border-t border-slate-100 grid grid-cols-4 gap-1 sm:block`}>
+              <div className={`${sheetNho ? 'max-sm:hidden' : ''} shrink-0 px-2.5 sm:px-4 pt-1.5 pb-2 bg-white border-t border-slate-100 flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:block`}>
                 {/* Phiếu trích lục ghi rõ "Quy hoạch chung đô thị mới Cam Lâm 2045" nên chỉ cho xuất
                     khi thửa nằm trong vùng có dữ liệu — ngoài vùng mà in ra là phiếu sai.
                     (14/10/2026) Thửa chỉ có số liệu BÓC TỪ PDF (huyện/thị ngoài Cam Lâm, nguon:'pdf') cũng KHÔNG in phiếu. */}
@@ -4003,18 +4003,18 @@ export default function MapPage() {
                       (hoiManh ? hoiManh.then((r) => r.manh || null).catch(() => null) : Promise.resolve(null)).then((manh) => finish(areas.length ? areas : [], manh));
                     }}
                     id="nut-phieu-qh"
-                    className="min-w-0 whitespace-nowrap px-1 sm:px-0 sm:mb-1.5 sm:w-full flex items-center justify-center gap-1.5 sm:gap-2 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold bg-[#0A2540] hover:bg-[#0d3a6b] text-white">
+                    className="shrink-0 flex-auto sm:min-w-0 whitespace-nowrap px-2 sm:px-0 sm:mb-1.5 sm:w-full flex items-center justify-center gap-1 sm:gap-2 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold bg-[#0A2540] hover:bg-[#0d3a6b] text-white">
                     🖨<span className="sm:hidden">Phiếu QH</span><span className="hidden sm:inline">Xuất phiếu kiểm tra quy hoạch</span>{!veDu && <span className="text-[10px]" aria-label="tính năng trả phí">🔒</span>}
                   </button>
                 )}
                 <div className="contents sm:grid sm:grid-cols-3 sm:gap-2">
                   {user ? (
-                    <button id="nut-luu-diem" onClick={() => setShowSave((v) => { const nv = !v; if (nv) { setSheetExpanded(true); setParcelMore(true); } return nv; })} className={`min-w-0 whitespace-nowrap px-1 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold transition ${showSave ? 'bg-[#7c3aed] text-white' : 'bg-[#7c3aed]/10 text-[#7c3aed] hover:bg-[#7c3aed]/20'}`}>📌<span className="sm:hidden">Lưu</span><span className="hidden sm:inline"> Lưu điểm</span></button>
+                    <button id="nut-luu-diem" onClick={() => setShowSave((v) => { const nv = !v; if (nv) { setSheetExpanded(true); setParcelMore(true); } return nv; })} className={`shrink-0 flex-auto sm:min-w-0 whitespace-nowrap px-2 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold transition ${showSave ? 'bg-[#7c3aed] text-white' : 'bg-[#7c3aed]/10 text-[#7c3aed] hover:bg-[#7c3aed]/20'}`}>📌<span className="sm:hidden">Lưu</span><span className="hidden sm:inline"> Lưu điểm</span></button>
                   ) : (
-                    <Link id="nut-luu-diem" href="/login" className="min-w-0 whitespace-nowrap px-1 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold bg-[#7c3aed]/10 text-[#7c3aed]">🔒<span className="sm:hidden">Lưu</span><span className="hidden sm:inline"> Lưu điểm</span></Link>
+                    <Link id="nut-luu-diem" href="/login" className="shrink-0 flex-auto sm:min-w-0 whitespace-nowrap px-2 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold bg-[#7c3aed]/10 text-[#7c3aed]">🔒<span className="sm:hidden">Lưu</span><span className="hidden sm:inline"> Lưu điểm</span></Link>
                   )}
-                  <button id="nut-chia-se" onClick={() => { const t = `${info.parcel?.giaDinh ? 'Thửa giả định do khách hàng tự vẽ' : `Thửa ${info.parcel?.soThua || '?'}, Tờ ${info.parcel?.soTo || '?'}`} —${info.parcel?.xa || 'Cam Lâm'}${info.point ? ` (${info.point.lat.toFixed(6)},${info.point.lng.toFixed(6)})` : ''}`; navigator.clipboard?.writeText(t).then(() => alert('Đã sao chép mã chia sẻ:\n' + t)).catch(() => alert(t)); }} className="min-w-0 whitespace-nowrap px-1 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">🔗 Chia sẻ</button>
-                  {info.point && <button id="nut-chi-duong" onClick={() => moChiDuong(info.point!.lat, info.point!.lng, 'Thửa đang xem')} className="min-w-0 whitespace-nowrap px-1 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">🧭 Chỉ đường</button>}
+                  <button id="nut-chia-se" onClick={() => { const t = `${info.parcel?.giaDinh ? 'Thửa giả định do khách hàng tự vẽ' : `Thửa ${info.parcel?.soThua || '?'}, Tờ ${info.parcel?.soTo || '?'}`} —${info.parcel?.xa || 'Cam Lâm'}${info.point ? ` (${info.point.lat.toFixed(6)},${info.point.lng.toFixed(6)})` : ''}`; navigator.clipboard?.writeText(t).then(() => alert('Đã sao chép mã chia sẻ:\n' + t)).catch(() => alert(t)); }} className="shrink-0 flex-auto sm:min-w-0 whitespace-nowrap px-2 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">🔗 Chia sẻ</button>
+                  {info.point && <button id="nut-chi-duong" onClick={() => moChiDuong(info.point!.lat, info.point!.lng, 'Thửa đang xem')} className="shrink-0 flex-auto sm:min-w-0 whitespace-nowrap px-2 sm:px-0 flex items-center justify-center gap-1 rounded-full sm:rounded-lg py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">🧭 Chỉ đường</button>}
                 </div>
               </div>
             </div>
